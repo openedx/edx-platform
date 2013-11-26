@@ -1,13 +1,13 @@
 <%! from django.utils.translation import ugettext as _ %>
-<%! from django.utils import translation    %>
-
 
 <%inherit file="main.html" />
 <%namespace name='static' file='static_content.html'/>
-<%block name="title"><title>${course.number} ${_("Textbook")}</title></%block>
+<%block name="title"><title>${_("{course_number} Textbook").format(course_number=course.display_number_with_default) | h}</title></%block>
 
 <%block name="headextra">
-<%static:css group='course'/>
+<%static:css group='style-course-vendor'/>
+<%static:css group='style-course'/>
+
 <%static:js group='courseware'/>
 </%block>
 
@@ -27,7 +27,7 @@ $(document).ready(function(){
 });
 
 function goto_page(n) {
-  log_event("book", {"type":"gotopage","old":page,"new":n});
+  Logger.log("book", {"type":"gotopage","old":page,"new":n});
   page=n;
   var prefix = "";
   if(n<100) {
@@ -44,14 +44,14 @@ function prev_page() {
   var newpage=page-1;
   if(newpage< ${start_page}) newpage=${start_page};
   goto_page(newpage);
-  log_event("book", {"type":"prevpage","new":page});
+  Logger.log("book", {"type":"prevpage","new":page});
 }
 
 function next_page() {
   var newpage=page+1;
   if(newpage> ${end_page}) newpage=${end_page};
   goto_page(newpage);
-  log_event("book", {"type":"nextpage","new":page});
+  Logger.log("book", {"type":"nextpage","new":page});
 }
 
 $("#open_close_accordion a").click(function(){
@@ -70,9 +70,9 @@ $("#open_close_accordion a").click(function(){
 <section class="container">
   <div class="book-wrapper">
 
-    <section aria-label="Textbook Navigation" class="book-sidebar">
+    <section aria-label="${_('Textbook Navigation')}" class="book-sidebar">
       <header id="open_close_accordion">
-        <a href="#">${_("close")}</a>
+        <a href="#">close</a>
       </header>
 
       <ul id="booknav" class="treeview-booknav">
@@ -101,10 +101,10 @@ $("#open_close_accordion a").click(function(){
           % for entry in table_of_contents:
             ${print_entry(entry)}
           % endfor
-        
+
         ## Don't delete this empty list item. Without it, Jquery.TreeView won't
         ## render the last list item as expandable.
-        <li></li> 
+        <li></li>
       </ul>
     </section>
 
@@ -113,10 +113,10 @@ $("#open_close_accordion a").click(function(){
         <nav>
           <ul>
             <li class="last">
-              <a href="javascript:prev_page()">${_("Previous page")}</a>
+              <a href="javascript:prev_page()">${_('Previous page')}</a>
             </li>
             <li class="next">
-              <a href="javascript:next_page()">${_("Next page")}</a>
+              <a href="javascript:next_page()">${_('Next page')}</a>
             </li>
           </ul>
         </nav>

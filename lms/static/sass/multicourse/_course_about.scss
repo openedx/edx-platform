@@ -98,7 +98,7 @@
           @include transition(all 0.15s linear 0s);
           width: flex-grid(12);
 
-          > a.find-courses, a.register {
+          > a.find-courses, a.register, a.add-to-cart {
             @include button(shiny, $button-color);
             @include box-sizing(border-box);
             border-radius: 3px;
@@ -139,7 +139,7 @@
             }
           }
 
-          span.register {
+          span.register, span.add-to-cart {
             background: $button-archive-color;
             border: 1px solid darken($button-archive-color, 50%);
             @include box-sizing(border-box);
@@ -214,7 +214,7 @@
           }
         }
 
-        &:hover {
+        &:hover, &:focus {
           text-decoration: none;
 
           .play-intro {
@@ -242,7 +242,7 @@
       width: flex-grid(12);
 
       &::after {
-        @extend .faded-hr-divider;
+        @extend %faded-hr-divider;
         content: "";
         display: none;
       }
@@ -261,7 +261,7 @@
           margin-left: 0px;
         }
 
-        &:hover, &.active {
+        &:hover, &.active, &:focus {
           border-color: $border-color-2;
           color: $base-font-color;
           text-decoration: none;
@@ -390,7 +390,7 @@
       text-align: center;
 
       &::after {
-        @extend .faded-hr-divider;
+        @extend %faded-hr-divider;
         content: "";
         display: block;
         height: 1px;
@@ -411,7 +411,7 @@
         margin-right: 15px;
         padding-right: 15px;
 
-        &:hover {
+        &:hover, &:focus {
           color: $lighter-base-font-color;
         }
       }
@@ -427,7 +427,7 @@
 
         float: none;
 
-        &:hover {
+        &:hover, &:focus {
           .sharing-message {
             opacity: 1.0;
             top: 56px;
@@ -456,7 +456,7 @@
           top: 65px;
           width: 220px;
 
-          &:hover {
+          &:hover, &:focus {
             opacity: 0;
           }
         }
@@ -469,7 +469,7 @@
           @include transition(all 0.15s linear 0s);
           width: 44px;
 
-          &:hover {
+          &:hover, &:focus {
             opacity: 1.0;
           }
 
@@ -512,7 +512,7 @@
           }
         }
 
-        &:hover {
+        &:hover, &:focus {
           .icon {
             opacity: 1.0;
           }

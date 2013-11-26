@@ -5,7 +5,7 @@
 nav {
 
   ol, ul {
-    @extend .no-list;
+    @extend %cont-no-list;
   }
 
   .nav-item {
@@ -64,12 +64,16 @@ nav {
     opacity: 0.0;
     pointer-events: none;
     width: ($baseline*8);
+    overflow: hidden;
+    height: 0;
 
 
     // dropped down state
     &.is-shown {
       opacity: 1.0;
       pointer-events: auto;
+      overflow: visible;
+      height: auto;
     }
   }
 
@@ -107,7 +111,7 @@ nav {
     }
 
     .nav-item {
-      @extend .t-action3;
+      @extend %t-action3;
       display: block;
       margin: 0 0 ($baseline/4) 0;
       border-bottom: 1px solid $gray-l5;

@@ -1,4 +1,4 @@
-// studio - elements - icons
+// studio - elements - icons & badges
 // ====================
 
 .icon {
@@ -13,4 +13,46 @@
   display: inline-block;
   vertical-align: middle;
   margin-right: ($baseline/4);
+}
+
+// ui - badges
+.wrapper-ui-badge {
+  position: absolute;
+  top: -1px;
+  left: ($baseline*1.5);
+  width: 100%;
+}
+
+%ui-badge {
+  @extend %t-title9;
+  position: relative;
+  border-bottom-right-radius: ($baseline/10);
+  border-bottom-left-radius: ($baseline/10);
+  padding: ($baseline/4) ($baseline/2) ($baseline/4) ($baseline/2);
+  font-weight: 600;
+  text-transform: uppercase;
+
+  * [class^="icon-"] {
+    margin-right: ($baseline/5);
+  }
+
+  // OPTION: add this class for a visual hanging display
+  &.is-hanging {
+    @include box-sizing(border-box);
+    @extend %ui-depth2;
+    top: -($baseline/4);
+
+    &:after {
+      position: absolute;
+      top: 0;
+      right: -($baseline/4);
+      display: block;
+      height: 0;
+      width: 0;
+      border-bottom: ($baseline/4) solid $black-t3;
+      border-right: ($baseline/4) solid transparent;
+      content: "";
+      opacity: 0.5;
+    }
+  }
 }

@@ -1,31 +1,34 @@
-<%! from django.utils.translation import ugettext as _ %>
-
-
-
 <%inherit file="base.html" />
-<%! from django.core.urlresolvers import reverse %>
-<%block name="title">${_("Course Checklists")}</%block>
-<%block name="bodyclass">is-signedin course uxdesign checklists</%block>
+<%!
+  from django.core.urlresolvers import reverse
+  from django.utils.translation import ugettext as _
+%>
+<%block name="title">Course Checklists</%block>
+<%block name="bodyclass">is-signedin course view-checklists</%block>
 
 <%namespace name='static' file='static_content.html'/>
+
+<%block name="header_extras">
+% for template_name in ["checklist"]:
+  <script type="text/template" id="${template_name}-tpl">
+    <%static:include path="js/${template_name}.underscore" />
+  </script>
+% endfor
+</%block>
+
 <%block name="jsextra">
-
-<script type="text/javascript" src="${static.url('js/template_loader.js')}"></script>
-<script type="text/javascript" src="${static.url('js/views/checklists_view.js')}"></script>
-<script type="text/javascript" src="${static.url('js/models/checklists.js')}"></script>
-
 <script type="text/javascript">
-    $(document).ready(function () {
-        var checklistCollection = new CMS.Models.ChecklistCollection();
-        checklistCollection.url = "${reverse('checklists_updates', kwargs=dict(org=context_course.location.org, course=context_course.location.course, name=context_course.location.name))}";
+require(["domReady!", "jquery", "js/collections/checklist", "js/views/checklist"],
+        function(doc, $, ChecklistCollection, ChecklistView) {
+    var checklistCollection = new ChecklistCollection();
+    checklistCollection.url = "${handler_url}";
 
-        var editor = new CMS.Views.Checklists({
-            el: $('.course-checklists'),
-            collection: checklistCollection
-        });
-
+    var editor = new ChecklistView({
+        el: $('.course-checklists'),
+        collection: checklistCollection
     });
-
+    checklistCollection.fetch({reset: true});
+});
 </script>
 </%block>
 
@@ -50,17 +53,17 @@
 
     <aside class="content-supplementary" role="complimentary">
       <div class="bit">
-        <h3 class="title title-3">${_("What are checklists?")}</h3>
+        <h3 class="title title-3">${_("What are course checklists?")}</h3>
         <p>
-          ${_("Running a course on edX is a complex undertaking. Course checklists are designed to help you understand and keep track of all the steps necessary to get your course ready for students.")}
+          ${_("Course checklists are tools to help you understand and keep track of all the steps necessary to get your course ready for students.")}
         </p>
         <p>
-          ${_("These checklists are shared among your course team, and any changes you make are immediately visible to other members of the team and saved automatically.")}
+          ${_("Any changes you make to these checklists are saved automatically and are immediately visible to other course team members.")}
         </p>
       </div>
 
       <div class="bit">
-        <h3 class="title title-3">${_("Studio checklists")}</h3>
+        <h3 class="title title-3">Studio checklists</h3>
         <nav class="nav-page checklists-current">
           <ol>
             % for checklist in checklists:

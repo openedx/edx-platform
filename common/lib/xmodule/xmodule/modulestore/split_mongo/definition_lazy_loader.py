@@ -1,4 +1,4 @@
-from xmodule.modulestore.locator import DescriptionLocator
+from xmodule.modulestore.locator import DefinitionLocator
 
 
 class DefinitionLazyLoader(object):
@@ -15,12 +15,11 @@ class DefinitionLazyLoader(object):
         :param definition_locator: the id of the record in the above to fetch
         """
         self.modulestore = modulestore
-        self.definition_locator = DescriptionLocator(definition_id)
+        self.definition_locator = DefinitionLocator(definition_id)
 
     def fetch(self):
         """
         Fetch the definition. Note, the caller should replace this lazy
         loader pointer with the result so as not to fetch more than once
         """
-        return self.modulestore.definitions.find_one(
-            {'_id': self.definition_locator.definition_id})
+        return self.modulestore.db_connection.get_definition(self.definition_locator.definition_id)

@@ -2,7 +2,7 @@
 // ====================
 
 .modal-cover {
-	@extend .depth3;
+	@extend %ui-depth3;
 	display: none;
 	position: fixed;
 	top: 0;
@@ -13,7 +13,7 @@
 }
 
 .modal {
-	@extend .depth4;
+	@extend %ui-depth4;
 	display: none;
 	position: fixed;
 	top: 60px;
@@ -61,7 +61,7 @@
 
 // lean modal alternative
 #lean_overlay {
-	@extend .depth4;
+	@extend %ui-depth4;
 	position: fixed;
 	top: 0px;
 	left: 0px;

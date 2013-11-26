@@ -1,0 +1,63 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%!
+  from django.core.urlresolvers import reverse
+%>
+
+<%namespace name='static' file='../static_content.html'/>
+
+%if verification_status == 'approved':
+<li class="status status-verification is-accepted">
+  <span class="title status-title">${_("ID-Verification Status")}</span>
+
+  <div class="status-data">
+    <span class="status-data-message">${_("Reviewed and Verified")}</span>
+
+    <div class="status-note">
+      <span class="deco-arrow"></span>
+
+      <p>${_("Your verification status is good for one year after submission.")}</p>
+    </div>
+  </div>
+</li>
+%endif
+
+%if verification_status == 'pending':
+<li class="status status-verification is-pending">
+  <span class="title status-title">${_("ID-Verification Status")}</span>
+
+  <div class="status-data">
+    <span class="status-data-message">${_("Pending")}</span>
+
+    <div class="status-note">
+      <span class="deco-arrow"></span>
+
+      <p>${_("Your verification photos have been submitted and will be reviewed shortly.")}</p>
+    </div>
+  </div>
+</li>
+
+%endif
+
+%if verification_status == 'must_reverify':
+<li class="status status-verification is-denied">
+  <span class="title status-title">${_("ID-Verification Status")}</span>
+
+  <div class="status-data">
+    <span class="status-data-message">${verification_msg}</span>
+
+    <ul class="list-actions">
+    <li class="action-item action-item-reverify">
+      <a href="${reverse('verify_student_reverify')}" class="action action-reverify">${_("Re-verify Yourself")}</a>
+    </li>
+    </ul>
+
+    <div class="status-note">
+      <span class="deco-arrow"></span>
+
+      <p>${_("If you fail to pass a verification attempt before your course ends, you will not receive a verified certificate.")}</p>
+    </div>
+  </div>
+</li>
+%endif
+
+

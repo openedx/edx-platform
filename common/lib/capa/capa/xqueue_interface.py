@@ -30,9 +30,11 @@ def make_xheader(lms_callback_url, lms_key, queue_name):
           'queue_name': designate a specific queue within xqueue server, e.g. 'MITx-6.00x' (string)
         }
     """
-    return json.dumps({'lms_callback_url': lms_callback_url,
-                        'lms_key': lms_key,
-                        'queue_name': queue_name})
+    return json.dumps({
+        'lms_callback_url': lms_callback_url,
+        'lms_key': lms_key,
+        'queue_name': queue_name
+    })
 
 
 def parse_xreply(xreply):
@@ -60,9 +62,10 @@ class XQueueInterface(object):
     '''
 
     def __init__(self, url, django_auth, requests_auth=None):
-        self.url  = url
+        self.url = url
         self.auth = django_auth
-        self.session = requests.session(auth=requests_auth)
+        self.session = requests.Session()
+        self.session.auth = requests_auth
 
     def send_to_queue(self, header, body, files_to_upload=None):
         """
@@ -95,12 +98,12 @@ class XQueueInterface(object):
 
         return (error, msg)
 
-
     def _login(self):
-        payload = {'username': self.auth['username'],
-                    'password': self.auth['password']}
+        payload = {
+            'username': self.auth['username'],
+            'password': self.auth['password']
+        }
         return self._http_post(self.url + '/xqueue/login/', payload)
-
 
     def _send_to_queue(self, header, body, files_to_upload):
         payload = {'xqueue_header': header,
@@ -111,7 +114,6 @@ class XQueueInterface(object):
                 files.update({f.name: f})
 
         return self._http_post(self.url + '/xqueue/submit/', payload, files=files)
-
 
     def _http_post(self, url, data, files=None):
         try:

@@ -7,42 +7,42 @@ import courseware.tabs as tabs
 from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
 
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 
+FAKE_REQUEST = None
+
+def tab_constructor(active_page, course, user, tab={'name': 'same'}, generator=tabs._progress):
+    return generator(tab, user, course, active_page, FAKE_REQUEST)
 
 class ProgressTestCase(TestCase):
 
     def setUp(self):
 
-        self.mockuser1 = MagicMock()
-        self.mockuser0 = MagicMock()
+        self.user = MagicMock()
+        self.anonymous_user = MagicMock()
         self.course = MagicMock()
-        self.mockuser1.is_authenticated.return_value = True
-        self.mockuser0.is_authenticated.return_value = False
+        self.user.is_authenticated.return_value = True
+        self.anonymous_user.is_authenticated.return_value = False
         self.course.id = 'edX/toy/2012_Fall'
         self.tab = {'name': 'same'}
-        self.active_page1 = 'progress'
-        self.active_page0 = 'stagnation'
+        self.progress_page = 'progress'
+        self.stagnation_page = 'stagnation'
 
     def test_progress(self):
 
-        self.assertEqual(tabs._progress(self.tab, self.mockuser0, self.course,
-                                        self.active_page0), [])
+        self.assertEqual(tab_constructor(self.stagnation_page, self.course, self.anonymous_user), [])
 
-        self.assertEqual(tabs._progress(self.tab, self.mockuser1, self.course,
-                                        self.active_page1)[0].name, 'same')
-
-        self.assertEqual(tabs._progress(self.tab, self.mockuser1, self.course,
-                                        self.active_page1)[0].link,
-                         reverse('progress', args=[self.course.id]))
-
-        self.assertEqual(tabs._progress(self.tab, self.mockuser1, self.course,
-                                        self.active_page0)[0].is_active, False)
-
-        self.assertEqual(tabs._progress(self.tab, self.mockuser1, self.course,
-                                        self.active_page1)[0].is_active, True)
+        self.assertEqual(tab_constructor(self.progress_page, self.course, self.user)[0].name, 'same')
+        
+        tab_list = tab_constructor(self.progress_page, self.course, self.user)
+        expected_link = reverse('progress', args=[self.course.id])
+        self.assertEqual(tab_list[0].link, expected_link)
+        
+        self.assertEqual(tab_constructor(self.stagnation_page, self.course, self.user)[0].is_active, False)
+        
+        self.assertEqual(tab_constructor(self.progress_page, self.course, self.user)[0].is_active, True)
 
 
 class WikiTestCase(TestCase):
@@ -53,33 +53,30 @@ class WikiTestCase(TestCase):
         self.course = MagicMock()
         self.course.id = 'edX/toy/2012_Fall'
         self.tab = {'name': 'same'}
-        self.active_page1 = 'wiki'
-        self.active_page0 = 'miki'
+        self.wiki_page = 'wiki'
+        self.miki_page = 'miki'
 
     @override_settings(WIKI_ENABLED=True)
     def test_wiki_enabled(self):
 
-        self.assertEqual(tabs._wiki(self.tab, self.user,
-                                    self.course, self.active_page1)[0].name,
-                         'same')
+        tab_list = tab_constructor(self.wiki_page, self.course, self.user, generator=tabs._wiki)
+        self.assertEqual(tab_list[0].name, 'same')
 
-        self.assertEqual(tabs._wiki(self.tab, self.user,
-                                    self.course, self.active_page1)[0].link,
-                         reverse('course_wiki', args=[self.course.id]))
+        tab_list = tab_constructor(self.wiki_page, self.course, self.user, generator=tabs._wiki)
+        expected_link = reverse('course_wiki', args=[self.course.id])
+        self.assertEqual(tab_list[0].link, expected_link)
 
-        self.assertEqual(tabs._wiki(self.tab, self.user,
-                                    self.course, self.active_page1)[0].is_active,
-                         True)
+        tab_list = tab_constructor(self.wiki_page, self.course, self.user, generator=tabs._wiki)
+        self.assertEqual(tab_list[0].is_active, True)
 
-        self.assertEqual(tabs._wiki(self.tab, self.user,
-                                    self.course, self.active_page0)[0].is_active,
-                         False)
+        tab_list = tab_constructor(self.miki_page, self.course, self.user, generator=tabs._wiki)
+        self.assertEqual(tab_list[0].is_active, False)
 
     @override_settings(WIKI_ENABLED=False)
     def test_wiki_enabled_false(self):
 
-        self.assertEqual(tabs._wiki(self.tab, self.user,
-                                    self.course, self.active_page1), [])
+        tab_list = tab_constructor(self.wiki_page, self.course, self.user, generator=tabs._wiki)
+        self.assertEqual(tab_list, [])
 
 
 class ExternalLinkTestCase(TestCase):
@@ -89,26 +86,30 @@ class ExternalLinkTestCase(TestCase):
         self.user = MagicMock()
         self.course = MagicMock()
         self.tabby = {'name': 'same', 'link': 'blink'}
-        self.active_page0 = None
-        self.active_page00 = True
+        self.no_page = None
+        self.true = True
 
     def test_external_link(self):
 
-        self.assertEqual(tabs._external_link(self.tabby, self.user,
-                                             self.course, self.active_page0)[0].name,
-                         'same')
+        tab_list = tab_constructor(
+            self.no_page, self.course, self.user, tab=self.tabby, generator=tabs._external_link
+        )
+        self.assertEqual(tab_list[0].name, 'same')
 
-        self.assertEqual(tabs._external_link(self.tabby, self.user,
-                                             self.course, self.active_page0)[0].link,
-                         'blink')
+        tab_list = tab_constructor(
+            self.no_page, self.course, self.user, tab=self.tabby, generator=tabs._external_link
+        )
+        self.assertEqual(tab_list[0].link, 'blink')
 
-        self.assertEqual(tabs._external_link(self.tabby, self.user,
-                                             self.course, self.active_page0)[0].is_active,
-                         False)
+        tab_list = tab_constructor(
+            self.no_page, self.course, self.user, tab=self.tabby, generator=tabs._external_link
+        )
+        self.assertEqual(tab_list[0].is_active, False)
 
-        self.assertEqual(tabs._external_link(self.tabby, self.user,
-                                             self.course, self.active_page00)[0].is_active,
-                         False)
+        tab_list = tab_constructor(
+            self.true, self.course, self.user, tab=self.tabby, generator=tabs._external_link
+        )
+        self.assertEqual(tab_list[0].is_active, False)
 
 
 class StaticTabTestCase(TestCase):
@@ -119,107 +120,124 @@ class StaticTabTestCase(TestCase):
         self.course = MagicMock()
         self.tabby = {'name': 'same', 'url_slug': 'schmug'}
         self.course.id = 'edX/toy/2012_Fall'
-        self.active_page1 = 'static_tab_schmug'
-        self.active_page0 = 'static_tab_schlug'
+        self.schmug = 'static_tab_schmug'
+        self.schlug = 'static_tab_schlug'
 
     def test_static_tab(self):
 
-        self.assertEqual(tabs._static_tab(self.tabby, self.user,
-                                          self.course, self.active_page1)[0].name,
-                         'same')
+        tab_list = tab_constructor(
+            self.schmug, self.course, self.user, tab=self.tabby, generator=tabs._static_tab
+        )
+        self.assertEqual(tab_list[0].name, 'same')
 
-        self.assertEqual(tabs._static_tab(self.tabby, self.user,
-                                          self.course, self.active_page1)[0].link,
-                         reverse('static_tab', args=[self.course.id,
-                                                     self.tabby['url_slug']]))
+        tab_list = tab_constructor(
+            self.schmug, self.course, self.user, tab=self.tabby, generator=tabs._static_tab
+        )
+        expected_link = reverse('static_tab', args=[self.course.id,self.tabby['url_slug']])
+        self.assertEqual(tab_list[0].link, expected_link)
 
-        self.assertEqual(tabs._static_tab(self.tabby, self.user,
-                                          self.course, self.active_page1)[0].is_active,
-                         True)
+        tab_list = tab_constructor(
+            self.schmug, self.course, self.user, tab=self.tabby, generator=tabs._static_tab
+        )
+        self.assertEqual(tab_list[0].is_active, True)
 
-        self.assertEqual(tabs._static_tab(self.tabby, self.user,
-                                          self.course, self.active_page0)[0].is_active,
-                         False)
-
+        tab_list = tab_constructor(
+            self.schlug, self.course, self.user, tab=self.tabby, generator=tabs._static_tab
+        )
+        self.assertEqual(tab_list[0].is_active, False)
 
 class TextbooksTestCase(TestCase):
 
     def setUp(self):
 
-        self.mockuser1 = MagicMock()
-        self.mockuser0 = MagicMock()
+        self.user = MagicMock()
+        self.anonymous_user = MagicMock()
         self.course = MagicMock()
         self.tab = MagicMock()
         A = MagicMock()
         T = MagicMock()
-        self.mockuser1.is_authenticated.return_value = True
-        self.mockuser0.is_authenticated.return_value = False
-        self.course.id = 'edX/toy/2012_Fall'
-        self.active_page0 = 'textbook/0'
-        self.active_page1 = 'textbook/1'
-        self.active_pageX = 'you_shouldnt_be_seein_this'
         A.title = 'Algebra'
         T.title = 'Topology'
         self.course.textbooks = [A, T]
+        self.user.is_authenticated.return_value = True
+        self.anonymous_user.is_authenticated.return_value = False
+        self.course.id = 'edX/toy/2012_Fall'
+        self.textbook_0 = 'textbook/0'
+        self.textbook_1 = 'textbook/1'
+        self.prohibited_page = 'you_shouldnt_be_seein_this'
 
     @override_settings(MITX_FEATURES={'ENABLE_TEXTBOOK': True})
     def test_textbooks1(self):
 
-        self.assertEqual(tabs._textbooks(self.tab, self.mockuser1,
-                                         self.course, self.active_page0)[0].name,
-                         'Algebra')
+        tab_list = tab_constructor(
+            self.textbook_0, self.course, self.user, tab=self.tab, generator=tabs._textbooks
+        )
+        self.assertEqual(tab_list[0].name, 'Algebra')
 
-        self.assertEqual(tabs._textbooks(self.tab, self.mockuser1,
-                                         self.course, self.active_page0)[0].link,
-                         reverse('book', args=[self.course.id, 0]))
+        tab_list = tab_constructor(
+            self.textbook_0, self.course, self.user, tab=self.tab, generator=tabs._textbooks
+        )
+        expected_link = reverse('book', args=[self.course.id, 0])
+        self.assertEqual(tab_list[0].link, expected_link)
 
-        self.assertEqual(tabs._textbooks(self.tab, self.mockuser1,
-                                         self.course, self.active_page0)[0].is_active,
-                         True)
+        tab_list = tab_constructor(
+            self.textbook_0, self.course, self.user, tab=self.tab, generator=tabs._textbooks
+        )
+        self.assertEqual(tab_list[0].is_active, True)
 
-        self.assertEqual(tabs._textbooks(self.tab, self.mockuser1,
-                                         self.course, self.active_pageX)[0].is_active,
-                         False)
+        tab_list = tab_constructor(
+            self.prohibited_page, self.course, self.user, tab=self.tab, generator=tabs._textbooks
+        )
+        self.assertEqual(tab_list[0].is_active, False)
 
-        self.assertEqual(tabs._textbooks(self.tab, self.mockuser1,
-                                         self.course, self.active_page1)[1].name,
-                         'Topology')
+        tab_list = tab_constructor(
+            self.textbook_1, self.course, self.user, tab=self.tab, generator=tabs._textbooks
+        )
+        self.assertEqual(tab_list[1].name, 'Topology')
 
-        self.assertEqual(tabs._textbooks(self.tab, self.mockuser1,
-                                         self.course, self.active_page1)[1].link,
-                         reverse('book', args=[self.course.id, 1]))
+        tab_list = tab_constructor(
+            self.textbook_1, self.course, self.user, tab=self.tab, generator=tabs._textbooks
+        )
+        expected_link = reverse('book', args=[self.course.id, 1])
+        self.assertEqual(tab_list[1].link, expected_link)
 
-        self.assertEqual(tabs._textbooks(self.tab, self.mockuser1,
-                                         self.course, self.active_page1)[1].is_active,
-                         True)
+        tab_list = tab_constructor(
+            self.textbook_1, self.course, self.user, tab=self.tab, generator=tabs._textbooks
+        )
+        self.assertEqual(tab_list[1].is_active, True)
 
-        self.assertEqual(tabs._textbooks(self.tab, self.mockuser1,
-                                         self.course, self.active_pageX)[1].is_active,
-                         False)
+        tab_list = tab_constructor(
+            self.prohibited_page, self.course, self.user, tab=self.tab, generator=tabs._textbooks
+        )
+        self.assertEqual(tab_list[1].is_active, False)
 
     @override_settings(MITX_FEATURES={'ENABLE_TEXTBOOK': False})
     def test_textbooks0(self):
 
-        self.assertEqual(tabs._textbooks(self.tab, self.mockuser1,
-                                         self.course, self.active_pageX), [])
+        tab_list = tab_constructor(
+            self.prohibited_page, self.course, self.user, tab=self.tab, generator=tabs._textbooks
+        )
+        self.assertEqual(tab_list, [])
 
-        self.assertEqual(tabs._textbooks(self.tab, self.mockuser0,
-                                         self.course, self.active_pageX), [])
+        tab_list = tab_constructor(
+            self.prohibited_page, self.course, self.anonymous_user, tab=self.tab, generator=tabs._textbooks
+        )
+        self.assertEqual(tab_list, [])
 
 
 class KeyCheckerTestCase(TestCase):
 
     def setUp(self):
 
-        self.expected_keys1 = ['a', 'b']
-        self.expected_keys0 = ['a', 'v', 'g']
+        self.valid_keys = ['a', 'b']
+        self.invalid_keys = ['a', 'v', 'g']
         self.dictio = {'a': 1, 'b': 2, 'c': 3}
 
     def test_key_checker(self):
 
-        self.assertIsNone(tabs.key_checker(self.expected_keys1)(self.dictio))
+        self.assertIsNone(tabs.key_checker(self.valid_keys)(self.dictio))
         self.assertRaises(tabs.InvalidTabsException,
-                          tabs.key_checker(self.expected_keys0), self.dictio)
+                          tabs.key_checker(self.invalid_keys), self.dictio)
 
 
 class NullValidatorTestCase(TestCase):
@@ -261,7 +279,7 @@ class ValidateTabsTestCase(TestCase):
         self.assertRaises(tabs.InvalidTabsException, tabs.validate_tabs, self.courses[4])
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class DiscussionLinkTestCase(ModuleStoreTestCase):
 
     def setUp(self):

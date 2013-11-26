@@ -1,5 +1,3 @@
-<%! from django.utils.translation import ugettext as _ %>
-
 <%
   import hashlib
   hlskey = hashlib.md5(module.location.url()).hexdigest()
@@ -17,20 +15,20 @@
           <textarea name="" data-metadata-name="source_code" class="source-edit-box hls-data" rows="8" cols="40">${editable_metadata_fields['source_code']['value']|h}</textarea>
       </section>
       <div class="submit">
-        <button type="reset" class="hls-compile">${_("Save &amp; Compile to edX XML")}</button>
-        <button type="reset" class="hls-save">${_("Save")}</button>
-        <button type="reset" class="hls-refresh">${_("Refresh")}</button>
+        <button type="reset" class="hls-compile">Save &amp; Compile to edX XML</button>
+        <button type="reset" class="hls-save">Save</button>
+        <button type="reset" class="hls-refresh">Refresh</button>
 	<div style="display:none" id="hls-finput"></div>
         <span id="message"></span>
-        <button type="reset" class="hls-upload" style="float:right">${_("Upload")}</button>
+        <button type="reset" class="hls-upload" style="float:right">Upload</button>
       </div>
     </form>
 
   </div>
   </section>
-    
-  <script type="text/javascript" src="/static/js/vendor/CodeMirror/stex.js"></script>
+
   <script type = "text/javascript">
+require(["jquery", "jquery.leanModal", "codemirror/stex"], function($) {
   hlstrig = $('#hls-trig-${hlskey}');
   hlsmodal = $('#hls-modal-${hlskey}');
 
@@ -52,7 +50,7 @@
 
       ## setup file input
       ## need to insert this only after hls triggered, because otherwise it
-      ## causes other <form> elements to become multipart/form-data, 
+      ## causes other <form> elements to become multipart/form-data,
       ## thus breaking multiple-choice input forms, for example.
       $('#hls-finput').append('<input type="file" name="hlsfile" id="hlsfile" />');
 
@@ -70,7 +68,7 @@
   function setup_autoupload(el){
       el.find('#hlsfile').change(function() {
           var file = el.find('#hlsfile')[0].files[0];
-    
+
           var reader = new FileReader();
           reader.onload = function(event) {
               var contents = event.target.result;
@@ -134,7 +132,7 @@
           }
       });
   }
-  
+
   function process_return_${hlskey}(datadict) {
       // datadict is json of array with "xml" and "message"
       // if "xml" value is '' then the conversion failed
@@ -174,4 +172,5 @@
       hlsmodal.find('#hlsfile').trigger('click');
   });
 
+}); // end require()
   </script>

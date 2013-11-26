@@ -1,58 +1,68 @@
-<%! from django.utils.translation import ugettext as _ %>
-<%! from django.utils import translation    %>
-<div class="modal hide fade" id="cheatsheetModal">
-	<a href="#" class="close-btn">×</a>
-	<div id="cheatsheet-body" class="modal-body">
-		<div class="left-column">
-			<section>
-				<h2>${_("Wiki Syntax Help")}</h2>
-				<p>${_("This wiki uses <strong>Markdown</strong> for styling. There are several useful guides online. See any of the links below for in-depth details:")}</p>
-				<ul>
-					<li><a href="http://daringfireball.net/projects/markdown/basics" target="_blank">${_("Markdown: Basics")}</a></li>
-					<li><a href="http://greg.vario.us/doc/markdown.txt" target="_blank">${_("Quick Markdown Syntax Guide")}</a></li>
-					<li><a href="http://www.lowendtalk.com/discussion/6/miniature-markdown-guide" target="_blank">${_("Miniature Markdown Guide")}</a></li>
-				</ul>
-				<p>${_("To create a new wiki article, create a link to it. Clicking the link gives you the creation page.")}</p>
-				<pre>[Article Name](wiki:ArticleName)</pre>
-			</section>
-			<section>
-				<h3>${_("edX Additions")}:</h3>
-				<pre>
-circuit-schematic:</pre>
-				<pre>
-$LaTeX Math Expression$</pre>
-			</section>
-		</div>
+{% load i18n %}
+<section id="cheatsheetModal" class="modal" aria-hidden="true">
+  <div class="inner-wrapper" role="dialog" aria-labelledby="cheatsheet-title">
+    <button class="close-modal">&#10005; <span class="sr">{% trans 'Close Modal' %}</span></button>
 
-		<div class="right-column">
-			<section>
-				<h3>Useful examples:</h3>
-				<pre>
-http://wikipedia.org
-[Wikipedia](http://wikipedia.org)
-[edX Wiki](wiki:/edx/)</pre>
-				<pre>
-Huge Header
+    <header>
+      <h2 id="cheatsheet-title">{% trans "Wiki Cheatsheet" %}<span class="sr">, {% trans "modal open" %}</span></h2>
+      <hr/>
+    </header>
+    <div id="cheatsheet-body" class="modal-body">
+      <div class="left-column">
+        <section>
+          <h2>{% trans "Wiki Syntax Help" %}</h2>
+          <p>{% trans "This wiki uses <strong>Markdown</strong> for styling. There are several useful guides online. See any of the links below for in-depth details:" %}</p>
+          <ul>
+              <li><a href="http://daringfireball.net/projects/markdown/basics" target="_blank">{% trans 'Markdown: Basics' %}</a></li>
+              <li><a href="http://greg.vario.us/doc/markdown.txt" target="_blank">{% trans 'Quick Markdown Syntax Guide' %}</a></li>
+              <li><a href="http://www.lowendtalk.com/discussion/6/miniature-markdown-guide" target="_blank">{% trans 'Miniature Markdown Guide' %}</a></li>
+          </ul>
+          <p>{% trans "To create a new wiki article, create a link to it. Clicking the link gives you the creation page." %}</p>
+          <pre>{% trans "[Article Name](wiki:ArticleName)" %}</pre>
+        </section>
+        <section>
+          {% comment %}
+              Translators: Do not translate "edX"
+          {% endcomment %}
+          <h3>{% trans "edX Additions:" %}</h3>
+          <pre>circuit-schematic:</pre>
+          <pre>$LaTeX Math Expression$</pre>
+        </section>
+      </div>
+
+      <div class="right-column">
+          <section>
+              <h3>{% trans "Useful examples:" %}</h3>
+              <pre>
+{% comment %}
+  Translators: Do not translate "edX" or "Wikipedia"
+{% endcomment %}
+{% trans "http://wikipedia.org" %}
+{% trans "[Wikipedia](http://wikipedia.org)" %}
+{% trans "[edX Wiki](wiki:/edx/)" %}
+              </pre>
+              <pre>
+{% trans "Huge Header" %}
 ===========</pre>
-				<pre>
-Smaller Header
+              <pre>
+{% trans "Smaller Header" %}
 --------------</pre>
-				<pre>
-*emphasis* or _emphasis_</pre>
-				<pre>
-**strong** or __strong__</pre>
-				<pre>
-- Unordered List
-	- Sub Item 1
-	- Sub Item 2</pre>
-				<pre>
-1. Ordered
-2. List</pre>
-				<pre>
-> Quotes</pre>
-			</section>
-		</div>
+              <pre>
+{% trans "*emphasis* or _emphasis_" %}</pre>
+              <pre>
+{% trans "**strong** or __strong__" %}</pre>
+              <pre>
+- {% trans "Unordered List" %}
+  - {% trans "Sub Item 1" %}
+      - {% trans "Sub Item 2" %}</pre>
+              <pre>
+1. {% trans "Ordered" %}
+2. {% trans "List" %}</pre>
+              <pre>
+> {% trans "Quotes" %}</pre>
+          </section>
+      </div>
 
-		</div>
-	</div>
-</div>
+    </div>
+  </div>
+</section>

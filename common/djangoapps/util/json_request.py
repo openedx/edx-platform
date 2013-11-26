@@ -5,9 +5,7 @@ from django.core.serializers import serialize
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models.query import QuerySet
 from django.http import HttpResponse
-import sys
-reload(sys)
-sys.setdefaultencoding("utf-8")
+
 
 def expect_json(view_function):
     """
@@ -16,18 +14,17 @@ def expect_json(view_function):
     request.POST with the contents.
     """
     @wraps(view_function)
-    def expect_json_with_cloned_request(request, *args, **kwargs):
+    def parse_json_into_request(request, *args, **kwargs):
         # cdodge: fix postback errors in CMS. The POST 'content-type' header can include additional information
         # e.g. 'charset', so we can't do a direct string compare
-        if request.META.get('CONTENT_TYPE', '').lower().startswith("application/json"):
-            cloned_request = copy.copy(request)
-            print(cloned_request)
-            cloned_request.POST = json.loads(request.body)
-            return view_function(cloned_request, *args, **kwargs)
+        if "application/json" in request.META.get('CONTENT_TYPE', '') and request.body:
+            request.json = json.loads(request.body)
         else:
-            return view_function(request, *args, **kwargs)
+            request.json = {}
 
-    return expect_json_with_cloned_request
+        return view_function(request, *args, **kwargs)
+
+    return parse_json_into_request
 
 
 class JsonResponse(HttpResponse):

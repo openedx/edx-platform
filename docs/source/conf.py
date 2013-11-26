@@ -100,6 +100,9 @@ pygments_style = 'sphinx'
 # A list of ignored prefixes for module index sorting.
 #modindex_common_prefix = []
 
+# When auto-doc'ing a class, write the class' docstring and the __init__ docstring
+# into the class docs.
+autoclass_content = "both"
 
 # -- Options for HTML output ---------------------------------------------------
 

@@ -1,203 +1,173 @@
-from factory import Factory, lazy_attribute_sequence, lazy_attribute
-from uuid import uuid4
 import datetime
 
-from xmodule.modulestore import Location
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.inheritance import own_metadata
-from xmodule.x_module import ModuleSystem
-from mitxmako.shortcuts import render_to_string
-from xblock.runtime import InvalidScopeError
+from factory import Factory, lazy_attribute_sequence, lazy_attribute
+from factory.containers import CyclicDefinitionError
+from uuid import uuid4
 from pytz import UTC
 
+from xmodule.modulestore import Location
+from xmodule.x_module import XModuleDescriptor
 
-class XModuleCourseFactory(Factory):
+
+class Dummy(object):
+    pass
+
+
+class XModuleFactory(Factory):
+    """
+    Factory for XModules
+    """
+
+    # We have to give a Factory a FACTORY_FOR.
+    # However, the class that we create is actually determined by the category
+    # specified in the factory
+    FACTORY_FOR = Dummy
+
+    @lazy_attribute
+    def modulestore(self):
+        # Delayed import so that we only depend on django if the caller
+        # hasn't provided their own modulestore
+        from xmodule.modulestore.django import editable_modulestore
+        return editable_modulestore('direct')
+
+
+class CourseFactory(XModuleFactory):
     """
     Factory for XModule courses.
     """
-
-    ABSTRACT_FACTORY = True
+    org = 'MITx'
+    number = '999'
+    display_name = 'Robot Super Course'
 
     @classmethod
     def _create(cls, target_class, **kwargs):
 
-        template = Location('i4x', 'edx', 'templates', 'course', 'Empty')
+        # All class attributes (from this class and base classes) are
+        # passed in via **kwargs. However, some of those aren't actual field values,
+        # so pop those off for use separately
         org = kwargs.pop('org', None)
-        number = kwargs.pop('number', None)
-        display_name = kwargs.pop('display_name', None)
-        location = Location('i4x', org, number, 'course', Location.clean(display_name))
+        # because the factory provides a default 'number' arg, prefer the non-defaulted 'course' arg if any
+        number = kwargs.pop('course', kwargs.pop('number', None))
+        store = kwargs.pop('modulestore')
 
-        try:
-            store = modulestore('direct')
-        except KeyError:
-            store = modulestore()
+        location = Location('i4x', org, number, 'course', Location.clean(kwargs.get('display_name')))
 
         # Write the data to the mongo datastore
-        new_course = store.clone_item(template, location)
+        new_course = store.create_xmodule(location, metadata=kwargs.get('metadata', None))
 
-        # This metadata code was copied from cms/djangoapps/contentstore/views.py
-        if display_name is not None:
-            new_course.display_name = display_name
-
-        new_course.lms.start = datetime.datetime.now(UTC)
-        new_course.tabs = kwargs.pop(
-            'tabs',
-            [
-                {"type": "courseware"},
-                {"type": "course_info", "name": "Course Info"},
-                {"type": "discussion", "name": "Discussion"},
-                {"type": "wiki", "name": "Wiki"},
-                {"type": "progress", "name": "Progress"}
-            ]
-        )
+        new_course.start = datetime.datetime.now(UTC).replace(microsecond=0)
 
         # The rest of kwargs become attributes on the course:
         for k, v in kwargs.iteritems():
             setattr(new_course, k, v)
 
         # Update the data in the mongo datastore
-        store.update_metadata(new_course.location, own_metadata(new_course))
-        store.update_item(new_course.location, new_course._model_data._kvs._data)
-
-        # update_item updates the the course as it exists in the modulestore, but doesn't
-        # update the instance we are working with, so have to refetch the course after updating it.
-        new_course = store.get_instance(new_course.id, new_course.location)
-
+        store.save_xmodule(new_course)
         return new_course
 
 
-class Course:
-    pass
-
-
-class CourseFactory(XModuleCourseFactory):
-    FACTORY_FOR = Course
-
-    template = 'i4x://edx/templates/course/Empty'
-    org = 'MITx'
-    number = '999'
-    display_name = 'Robot Super Course'
-
-
-class XModuleItemFactory(Factory):
+class ItemFactory(XModuleFactory):
     """
     Factory for XModule items.
     """
 
-    ABSTRACT_FACTORY = True
+    category = 'chapter'
+    parent = None
 
-    display_name = None
-
-    @lazy_attribute
-    def category(attr):
-        template = Location(attr.template)
-        return template.category
+    @lazy_attribute_sequence
+    def display_name(self, n):
+        return "{} {}".format(self.category, n)
 
     @lazy_attribute
-    def location(attr):
-        parent = Location(attr.parent_location)
-        dest_name = attr.display_name.replace(" ", "_") if attr.display_name is not None else uuid4().hex
-        return parent._replace(category=attr.category, name=dest_name)
+    def location(self):
+        if self.display_name is None:
+            dest_name = uuid4().hex
+        else:
+            dest_name = self.display_name.replace(" ", "_")
+
+        return self.parent_location.replace(category=self.category, name=dest_name)
+
+    @lazy_attribute
+    def parent_location(self):
+        default_location = Location('i4x://MITx/999/course/Robot_Super_Course')
+        try:
+            parent = self.parent
+        # This error is raised if the caller hasn't provided either parent or parent_location
+        # In this case, we'll just return the default parent_location
+        except CyclicDefinitionError:
+            return default_location
+
+        if parent is None:
+            return default_location
+
+        return parent.location
 
     @classmethod
     def _create(cls, target_class, **kwargs):
         """
-        Uses *kwargs*:
+        Uses ``**kwargs``:
 
-        *parent_location* (required): the location of the parent module
+        :parent_location: (required): the location of the parent module
             (e.g. the parent course or section)
 
-        *template* (required): the template to create the item from
-            (e.g. i4x://templates/section/Empty)
+        :category: the category of the resulting item.
 
-        *data* (optional): the data for the item
+        :data: (optional): the data for the item
             (e.g. XML problem definition for a problem item)
 
-        *display_name* (optional): the display name of the item
+        :display_name: (optional): the display name of the item
 
-        *metadata* (optional): dictionary of metadata attributes
+        :metadata: (optional): dictionary of metadata attributes
 
-        *target_class* is ignored
+        :boilerplate: (optional) the boilerplate for overriding field values
+
+        :target_class: is ignored
         """
 
+        # All class attributes (from this class and base classes) are
+        # passed in via **kwargs. However, some of those aren't actual field values,
+        # so pop those off for use separately
+
         DETACHED_CATEGORIES = ['about', 'static_tab', 'course_info']
+        # catch any old style users before they get into trouble
+        assert 'template' not in kwargs
+        parent_location = Location(kwargs.pop('parent_location', None))
+        data = kwargs.pop('data', None)
+        category = kwargs.pop('category', None)
+        display_name = kwargs.pop('display_name', None)
+        metadata = kwargs.pop('metadata', {})
+        location = kwargs.pop('location')
+        assert location != parent_location
 
-        parent_location = Location(kwargs.get('parent_location'))
-        template = Location(kwargs.get('template'))
-        data = kwargs.get('data')
-        display_name = kwargs.get('display_name')
-        metadata = kwargs.get('metadata', {})
-
-        store = modulestore('direct')
+        store = kwargs.pop('modulestore')
 
         # This code was based off that in cms/djangoapps/contentstore/views.py
-        parent = store.get_item(parent_location)
+        parent = kwargs.pop('parent', None) or store.get_item(parent_location)
 
-        new_item = store.clone_item(template, kwargs.get('location'))
+        if 'boilerplate' in kwargs:
+            template_id = kwargs.pop('boilerplate')
+            clz = XModuleDescriptor.load_class(category)
+            template = clz.get_template(template_id)
+            assert template is not None
+            metadata.update(template.get('metadata', {}))
+            if not isinstance(data, basestring):
+                data.update(template.get('data'))
 
         # replace the display name with an optional parameter passed in from the caller
         if display_name is not None:
-            new_item.display_name = display_name
+            metadata['display_name'] = display_name
+        module = store.create_and_save_xmodule(location, metadata=metadata, definition_data=data)
 
-        # Add additional metadata or override current metadata
-        item_metadata = own_metadata(new_item)
-        item_metadata.update(metadata)
-        store.update_metadata(new_item.location.url(), item_metadata)
+        module = store.get_item(location)
 
-        # replace the data with the optional *data* parameter
-        if data is not None:
-            store.update_item(new_item.location, data)
+        for attr, val in kwargs.items():
+            setattr(module, attr, val)
+        module.save()
 
-        if new_item.location.category not in DETACHED_CATEGORIES:
-            store.update_children(parent_location, parent.children + [new_item.location.url()])
+        store.save_xmodule(module)
 
-        # update_children updates the the item as it exists in the modulestore, but doesn't
-        # update the instance we are working with, so have to refetch the item after updating it.
-        new_item = store.get_item(new_item.location)
+        if location.category not in DETACHED_CATEGORIES:
+            parent.children.append(location.url())
+            store.update_children(parent_location, parent.children)
 
-        return new_item
-
-
-class Item:
-    pass
-
-
-class ItemFactory(XModuleItemFactory):
-    FACTORY_FOR = Item
-
-    parent_location = 'i4x://MITx/999/course/Robot_Super_Course'
-    template = 'i4x://edx/templates/chapter/Empty'
-
-    @lazy_attribute_sequence
-    def display_name(attr, n):
-        return "{} {}".format(attr.category.title(), n)
-
-
-def get_test_xmodule_for_descriptor(descriptor):
-    """
-    Attempts to create an xmodule which responds usually correctly from the descriptor. Not guaranteed.
-
-    :param descriptor:
-    """
-    module_sys = ModuleSystem(
-        ajax_url='',
-        track_function=None,
-        get_module=None,
-        render_template=render_to_string,
-        replace_urls=None,
-        xblock_model_data=_test_xblock_model_data_accessor(descriptor)
-    )
-    return descriptor.xmodule(module_sys)
-
-
-def _test_xblock_model_data_accessor(descriptor):
-    simple_map = {}
-    for field in descriptor.fields:
-        try:
-            simple_map[field.name] = getattr(descriptor, field.name)
-        except InvalidScopeError:
-            simple_map[field.name] = field.default
-    for field in descriptor.module_class.fields:
-        if field.name not in simple_map:
-            simple_map[field.name] = field.default
-    return lambda o: simple_map
+        return store.get_item(location)

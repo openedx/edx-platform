@@ -11,13 +11,13 @@
 
 
   // edx.org - marketing typography
-  .heading-1, .heading-2, .heading-3, .heading-4, .heading-5, .body-text-emphasized, .body-text, .button-primary, .button-secondary {
+  %heading-1, %heading-2, %heading-3, %heading-4, %heading-5, %body-text-emphasized, %body-text, %button-primary, %button-secondary {
     display: block;
     font-family: $sans-serif;
     line-height: lh(1);
   }
 
-  .heading-2 {
+  %heading-2 {
     font-size: 25px;
     margin: 0 0 $baseline 0;
     font-weight: 300;
@@ -25,26 +25,26 @@
     color: $link-color-d1;
   }
 
-  .heading-3 {
+  %heading-3 {
     font-size: 21px;
     margin: 0 0 $baseline 0;
     font-weight: 300;
     color: $base-font-color;
   }
 
-  .heading-4 {
+  %heading-4 {
     font-size: 14px;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0 !important;
-    color: saturate($link-color-d1,15%);
+    color: $m-gray-d2;
   }
 
-  .heading-5 {
+  %heading-5 {
   }
 
   // specific examples - body
-  .body-text-emphasized {
+  %body-text-emphasized {
     font-size: 18px;
     margin: 0 0 $baseline 0;
     font-weight: 300;
@@ -53,7 +53,7 @@
     line-height: lh(1.1);
   }
 
-  .body-text {
+  %body-text {
     font-size: 15px;
     margin: 0 0 $baseline 0;
     color: $base-font-color;
@@ -61,7 +61,7 @@
   }
 
   // specific examples - buttons
-  .button-primary {
+  %button-primary {
     border-radius: 0;
     @include linear-gradient(saturate($link-color-d1,15%) 5%, shade($link-color-d1,15%) 95%);
     display: inline-block;
@@ -79,7 +79,7 @@
     box-shadow: none !important;
   }
 
-  .button-secondary {
+  %button-secondary {
     @include linear-gradient($outer-border-color 5%, $lighter-base-font-color 95%);
     display: inline-block;
     padding: $baseline/2 $baseline*2.5;
@@ -117,11 +117,43 @@
   .introduction {
     padding: ($baseline*2) $baseline 0 $baseline;
 
-    header h1 {
-      @extend .heading-2;
-      margin-bottom: $baseline;
-      padding-bottom: $baseline;
-      text-align: left;
+    header {
+      position: relative;
+
+      // CASE: normal typographical headings
+      h1 {
+        @extend %heading-2;
+        margin-bottom: $baseline;
+        padding-bottom: $baseline;
+        text-align: left;
+      }
+
+      // CASE: marketing/imageery-based headings
+      .title {
+        position: absolute;
+        top: ($baseline*2.5);
+        left:($baseline*1.5);
+
+        .title-super, .title-sub {
+          @extend %t-weight1;
+          display: block;
+          letter-spacing: 0;
+        }
+
+        .title-super {
+          @include font-size(26);
+          @include line-height(18);
+          text-transform: uppercase;
+          color: $header-graphic-super-color;
+        }
+
+        .title-sub {
+          @include font-size(20);
+          margin-left: ($baseline*2);
+          text-transform: lowercase;
+          color: $header-graphic-sub-color;
+        }
+      }
     }
   }
 }
@@ -131,7 +163,7 @@
 
   // reset - horrible, but necessary
   p, ol, ul, h1, h2, h3, h4, h5, h6, label, input, textarea {
-    @extend .body-text;
+    @extend %body-text;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -141,14 +173,14 @@
   a {
     @include transition(color 0.15s ease-in-out 0s, border 0.15s ease-in-out 0s);
 
-    &:link, &:visited, &:hover, &:active {
+    &:link, &:visited, &:hover, &:active, &:focus {
       color: $link-color-d1;
       font-weight: 400;
       text-decoration: none !important; // needed but nasty
       font-family: $sans-serif;
     }
 
-    &:hover, &:active {
+    &:hover, &:active, &:focus {
       text-decoration: none !important; // needed but nasty
       border-bottom: 1px dotted $link-color-d1;
     }
@@ -194,7 +226,7 @@
       }
 
       h3 {
-        @extend .heading-4;
+        @extend %heading-4;
         margin: 0 0 ($baseline/4) 0;
       }
     }
@@ -204,11 +236,11 @@
   form {
 
     .instructions {
-      @extend .body-text-emphasized;
+      @extend %body-text-emphasized;
       margin-bottom: $baseline;
     }
 
-    fieldset {
+    .group-form {
       margin: 0;
       padding-top: 0;
       padding-bottom: $baseline;
@@ -390,7 +422,7 @@
     @include clearfix();
 
     button[type="submit"] {
-      @extend .button-primary;
+      @extend %m-btn-primary;
 
       &:disabled, &.is-disabled {
         opacity: 0.3;
@@ -427,15 +459,14 @@
     background: tint($yellow,20%);
 
     .message-title {
-      @extend .heading-4;
+      @extend %heading-4;
       margin: 0 0 ($baseline/4) 0;
       font-size: em(14);
       font-weight: 600;
-      color: $m-gray-d2 !important;
     }
 
     .message-copy {
-      @extend .body-text;
+      @extend %body-text;
       margin: 0 !important;
       padding: 0;
       list-style: none;
@@ -560,7 +591,7 @@
       }
 
       h2 {
-        @extend .heading-2;
+        @extend %heading-2;
         text-align: left;
       }
     }
@@ -609,7 +640,7 @@
   }
 
   .modal-form-error {
-    @extend .body-text;
+    @extend %body-text;
     box-shadow: inset 0 -1px 2px 0 tint($red, 85%);
     @include box-sizing(border-box);
     margin: $baseline 0 ($baseline/2) 0 !important;

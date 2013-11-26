@@ -1,8 +1,20 @@
-Dear ${first_name} ${last_name}
+<%! from django.utils.translation import ugettext as _ %>
 
-You have been enrolled in ${course_id} at ${site_name} by a member of the course staff. The course should now appear on your ${site_name} dashboard.
+${_("Dear {full_name}").format(full_name=full_name)}
 
-To start accessing course materials, please visit ${course_url}
+${_("You have been enrolled in {course_name} at {site_name} by a member "
+	"of the course staff. The course should now appear on your {site_name} "
+	"dashboard.").format(
+		course_name=course.display_name_with_default,
+		site_name=site_name
+	)}
+
+${_("To start accessing course materials, please visit {course_url}").format(
+		course_url=course_url
+	)}
 
 ----
-This email was automatically sent from ${site_name} to ${first_name} ${last_name}
+${_("This email was automatically sent from {site_name} to "
+	"{full_name}").format(
+		site_name=site_name, full_name=full_name
+	)}

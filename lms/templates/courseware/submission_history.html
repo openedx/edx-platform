@@ -1,5 +1,5 @@
 <% import json  %>
-<h3>${username} > ${course_id} > ${location}</h3>
+<h3>${username | h} > ${course_id | h} > ${location | h}</h3>
 
 % for i, entry in enumerate(history_entries):
 <hr/>

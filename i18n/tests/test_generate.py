@@ -1,10 +1,15 @@
-import os, string, random, re
+import os
+import string
+import random
+import re
 from polib import pofile
 from unittest import TestCase
 from datetime import datetime, timedelta
+from pytz import UTC
 
 import generate
 from config import CONFIGURATION
+
 
 class TestGenerate(TestCase):
     """
@@ -15,7 +20,7 @@ class TestGenerate(TestCase):
     def setUp(self):
         # Subtract 1 second to help comparisons with file-modify time succeed,
         # since os.path.getmtime() is not millisecond-accurate
-        self.start_time = datetime.now() - timedelta(seconds=1)
+        self.start_time = datetime.now(UTC) - timedelta(seconds=1)
 
     def test_merge(self):
         """
@@ -41,7 +46,7 @@ class TestGenerate(TestCase):
                 path = os.path.join(CONFIGURATION.get_messages_dir(locale), mofile)
                 exists = os.path.exists(path)
                 self.assertTrue(exists, msg='Missing file in locale %s: %s' % (locale, mofile))
-                self.assertTrue(datetime.fromtimestamp(os.path.getmtime(path)) >= self.start_time,
+                self.assertTrue(datetime.fromtimestamp(os.path.getmtime(path), UTC) >= self.start_time,
                                 msg='File not recently modified: %s' % path)
             self.assert_merge_headers(locale)
 
@@ -49,7 +54,7 @@ class TestGenerate(TestCase):
         """
         This is invoked by test_main to ensure that it runs after
         calling generate.main().
-        
+
         There should be exactly three merge comment headers
         in our merged .po file. This counts them to be sure.
         A merge comment looks like this:

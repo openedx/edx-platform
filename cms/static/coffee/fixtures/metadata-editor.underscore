@@ -1,6 +1,0 @@
-<ul class="list-input settings-list">
-    <% _.each(_.range(numEntries), function() { %>
-    <li class="field comp-setting-entry metadata_entry" id="settings-listing">
-    </li>
-    <% }) %>
-</ul>

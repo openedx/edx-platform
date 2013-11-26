@@ -8,12 +8,16 @@ import re
 
 from collections import namedtuple
 
+from abc import ABCMeta, abstractmethod
+
 from .exceptions import InvalidLocationError, InsufficientSpecificationError
 from xmodule.errortracker import make_error_tracker
-from bson.son import SON
 
 log = logging.getLogger('mitx.' + 'modulestore')
 
+SPLIT_MONGO_MODULESTORE_TYPE = 'split'
+MONGO_MODULESTORE_TYPE = 'mongo'
+XML_MODULESTORE_TYPE = 'xml'
 
 URL_RE = re.compile("""
     (?P<tag>[^:]+)://?
@@ -168,7 +172,9 @@ class Location(_LocationBase):
             # names allow colons
             check(list_[4], INVALID_CHARS_NAME)
 
-        if isinstance(location, basestring):
+        if isinstance(location, Location):
+            return location
+        elif isinstance(location, basestring):
             match = URL_RE.match(location)
             if match is None:
                 log.debug('location is instance of %s but no URL match' % basestring)
@@ -194,8 +200,6 @@ class Location(_LocationBase):
 
             check_dict(kwargs)
             return _LocationBase.__new__(_cls, **kwargs)
-        elif isinstance(location, Location):
-            return _LocationBase.__new__(_cls, location)
         else:
             raise InvalidLocationError(location)
 
@@ -203,7 +207,7 @@ class Location(_LocationBase):
         """
         Return a string containing the URL for this location
         """
-        url = "{tag}://{org}/{course}/{category}/{name}".format(**self.dict())
+        url = "{0.tag}://{0.org}/{0.course}/{0.category}/{0.name}".format(self)
         if self.revision:
             url += "@" + self.revision
         return url
@@ -213,9 +217,8 @@ class Location(_LocationBase):
         Return a string with a version of the location that is safe for use in
         html id attributes
         """
-        s = "-".join(str(v) for v in self.list()
-                     if v is not None)
-        return Location.clean_for_html(s)
+        id_string = "-".join(str(v) for v in self.list() if v is not None)
+        return Location.clean_for_html(id_string)
 
     def dict(self):
         """
@@ -235,8 +238,15 @@ class Location(_LocationBase):
 
     @property
     def course_id(self):
-        """Return the ID of the Course that this item belongs to by looking
-        at the location URL hierachy"""
+        """
+        Return the ID of the Course that this item belongs to by looking
+        at the location URL hierachy.
+
+        Throws an InvalidLocationError is this location does not represent a course.
+        """
+        if self.category != 'course':
+            raise InvalidLocationError('Cannot call course_id for {0} because it is not of category course'.format(self))
+
         return "/".join([self.org, self.course, self.name])
 
     def replace(self, **kwargs):
@@ -246,17 +256,22 @@ class Location(_LocationBase):
         return self._replace(**kwargs)
 
 
-class ModuleStore(object):
+class ModuleStoreRead(object):
     """
     An abstract interface for a database backend that stores XModuleDescriptor
-    instances
+    instances and extends read-only functionality
     """
-    def has_item(self, location):
+
+    __metaclass__ = ABCMeta
+
+    @abstractmethod
+    def has_item(self, course_id, location):
         """
         Returns True if location exists in this ModuleStore.
         """
-        raise NotImplementedError
+        pass
 
+    @abstractmethod
     def get_item(self, location, depth=0):
         """
         Returns an XModuleDescriptor instance for the item at location.
@@ -274,15 +289,17 @@ class ModuleStore(object):
             in the request. The depth is counted in the number of calls to
             get_children() to cache. None indicates to cache all descendents
         """
-        raise NotImplementedError
+        pass
 
+    @abstractmethod
     def get_instance(self, course_id, location, depth=0):
         """
         Get an instance of this location, with policy for course_id applied.
         TODO (vshnayder): this may want to live outside the modulestore eventually
         """
-        raise NotImplementedError
+        pass
 
+    @abstractmethod
     def get_item_errors(self, location):
         """
         Return a list of (msg, exception-or-None) errors that the modulestore
@@ -293,8 +310,9 @@ class ModuleStore(object):
         Raises the same exceptions as get_item if the location isn't found or
         isn't fully specified.
         """
-        raise NotImplementedError
+        pass
 
+    @abstractmethod
     def get_items(self, location, course_id=None, depth=0):
         """
         Returns a list of XModuleDescriptor instances for the items
@@ -308,16 +326,59 @@ class ModuleStore(object):
             in the request. The depth is counted in the number of calls to
             get_children() to cache. None indicates to cache all descendents
         """
-        raise NotImplementedError
+        pass
 
-    def clone_item(self, source, location):
-        """
-        Clone a new item that is a copy of the item at the location `source`
-        and writes it to `location`
-        """
-        raise NotImplementedError
+    @abstractmethod
+    def get_courses(self):
+        '''
+        Returns a list containing the top level XModuleDescriptors of the courses
+        in this modulestore.
+        '''
+        pass
 
-    def update_item(self, location, data):
+    @abstractmethod
+    def get_course(self, course_id):
+        '''
+        Look for a specific course id.  Returns the course descriptor, or None if not found.
+        '''
+        pass
+
+    @abstractmethod
+    def get_parent_locations(self, location, course_id):
+        '''Find all locations that are the parents of this location in this
+        course.  Needed for path_to_location().
+
+        returns an iterable of things that can be passed to Location.
+        '''
+        pass
+
+    @abstractmethod
+    def get_errored_courses(self):
+        """
+        Return a dictionary of course_dir -> [(msg, exception_str)], for each
+        course_dir where course loading failed.
+        """
+        pass
+
+    @abstractmethod
+    def get_modulestore_type(self, course_id):
+        """
+        Returns a type which identifies which modulestore is servicing the given
+        course_id. The return can be either "xml" (for XML based courses) or "mongo" for MongoDB backed courses
+        """
+        pass
+
+
+class ModuleStoreWrite(ModuleStoreRead):
+    """
+    An abstract interface for a database backend that stores XModuleDescriptor
+    instances and extends both read and write functionality
+    """
+
+    __metaclass__ = ABCMeta
+
+    @abstractmethod
+    def update_item(self, location, data, allow_not_found=False):
         """
         Set the data in the item specified by the location to
         data
@@ -325,8 +386,9 @@ class ModuleStore(object):
         location: Something that can be passed to Location
         data: A nested dictionary of problem data
         """
-        raise NotImplementedError
+        pass
 
+    @abstractmethod
     def update_children(self, location, children):
         """
         Set the children for the item specified by the location to
@@ -335,8 +397,9 @@ class ModuleStore(object):
         location: Something that can be passed to Location
         children: A list of child item identifiers
         """
-        raise NotImplementedError
+        pass
 
+    @abstractmethod
     def update_metadata(self, location, metadata):
         """
         Set the metadata for the item specified by the location to
@@ -345,65 +408,40 @@ class ModuleStore(object):
         location: Something that can be passed to Location
         metadata: A nested dictionary of module metadata
         """
-        raise NotImplementedError
+        pass
 
+    @abstractmethod
     def delete_item(self, location):
         """
         Delete an item from this modulestore
 
         location: Something that can be passed to Location
         """
-        raise NotImplementedError
-
-    def get_courses(self):
-        '''
-        Returns a list containing the top level XModuleDescriptors of the courses
-        in this modulestore.
-        '''
-        course_filter = Location("i4x", category="course")
-        return self.get_items(course_filter)
-
-    def get_course(self, course_id):
-        '''
-        Look for a specific course id.  Returns the course descriptor, or None if not found.
-        '''
-        raise NotImplementedError
-
-    def get_parent_locations(self, location, course_id):
-        '''Find all locations that are the parents of this location in this
-        course.  Needed for path_to_location().
-
-        returns an iterable of things that can be passed to Location.
-        '''
-        raise NotImplementedError
-
-    def get_containing_courses(self, location):
-        '''
-        Returns the list of courses that contains the specified location
-
-        TODO (cpennington): This should really take a module instance id,
-        rather than a location
-        '''
-        courses = [
-            course
-            for course in self.get_courses()
-            if course.location.org == location.org and course.location.course == location.course
-        ]
-
-        return courses
+        pass
 
 
-class ModuleStoreBase(ModuleStore):
+class ModuleStoreReadBase(ModuleStoreRead):
     '''
     Implement interface functionality that can be shared.
     '''
-    def __init__(self):
+    # pylint: disable=W0613
+
+    def __init__(
+        self,
+        doc_store_config=None,  # ignore if passed up
+        metadata_inheritance_cache_subsystem=None, request_cache=None,
+        modulestore_update_signal=None, xblock_mixins=(),
+        # temporary parms to enable backward compatibility. remove once all envs migrated
+        db=None, collection=None, host=None, port=None, tz_aware=True, user=None, password=None
+    ):
         '''
         Set up the error-tracking logic.
         '''
         self._location_errors = {}  # location -> ErrorLog
-        self.metadata_inheritance_cache = None
-        self.modulestore_update_signal = None  # can be set by runtime to route notifications of datastore changes
+        self.metadata_inheritance_cache_subsystem = metadata_inheritance_cache_subsystem
+        self.modulestore_update_signal = modulestore_update_signal
+        self.request_cache = request_cache
+        self.xblock_mixins = xblock_mixins
 
     def _get_errorlog(self, location):
         """
@@ -431,6 +469,15 @@ class ModuleStoreBase(ModuleStore):
         errorlog = self._get_errorlog(location)
         return errorlog.errors
 
+    def get_errored_courses(self):
+        """
+        Returns an empty dict.
+
+        It is up to subclasses to extend this method if the concept
+        of errored courses makes sense for their implementation.
+        """
+        return {}
+
     def get_course(self, course_id):
         """Default impl--linear search through course list"""
         for c in self.get_courses():
@@ -439,11 +486,8 @@ class ModuleStoreBase(ModuleStore):
         return None
 
 
-def namedtuple_to_son(namedtuple, prefix=''):
-    """
-    Converts a namedtuple into a SON object with the same key order
-    """
-    son = SON()
-    for idx, field_name in enumerate(namedtuple._fields):
-        son[prefix + field_name] = namedtuple[idx]
-    return son
+class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
+    '''
+    Implement interface functionality that can be shared.
+    '''
+    pass

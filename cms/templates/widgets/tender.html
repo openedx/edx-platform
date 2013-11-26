@@ -1,15 +1,12 @@
-<%! from django.utils import translation    %>
-
 % if user.is_authenticated():
-
 <script type="text/javascript">
-  Tender = {
-    hideToggle: true,
-    title: '',
-    body: '',
-    hide_kb: 'true',
-    widgetToggles: $('.show-tender')
-  }
+window.Tender = {
+  hideToggle: true,
+  title: '',
+  body: '',
+  hide_kb: 'true',
+  widgetToggles: document.getElementsByClassName('show-tender')
+}
+require(['tender']);
 </script>
-<script src="https://edxedge.tenderapp.com/tender_widget.js" type="text/javascript"></script>
 % endif

@@ -7,32 +7,49 @@ from lxml import etree
 from path import path
 
 from pkg_resources import resource_string
-from xblock.core import Scope, String
+from xblock.fields import Scope, String, Boolean
 from xmodule.editing_module import EditingDescriptor
 from xmodule.html_checker import check_html
 from xmodule.stringify import stringify_children
 from xmodule.x_module import XModule
 from xmodule.xml_module import XmlDescriptor, name_to_pathname
+import textwrap
+from xmodule.contentstore.content import StaticContent
 
 log = logging.getLogger("mitx.courseware")
 
 
 class HtmlFields(object):
-    data = String(help="Html contents to display for this module", scope=Scope.content)
+    display_name = String(
+        display_name="Display Name",
+        help="This name appears in the horizontal navigation at the top of the page.",
+        scope=Scope.settings,
+        # it'd be nice to have a useful default but it screws up other things; so,
+        # use display_name_with_default for those
+        default="Text"
+    )
+    data = String(help="Html contents to display for this module", default=u"", scope=Scope.content)
     source_code = String(help="Source code for LaTeX documents. This feature is not well-supported.", scope=Scope.settings)
+    use_latex_compiler = Boolean(
+        help="Enable LaTeX templates?",
+        default=False,
+        scope=Scope.settings
+    )
 
 
 class HtmlModule(HtmlFields, XModule):
-    js = {'coffee': [resource_string(__name__, 'js/src/javascript_loader.coffee'),
-                     resource_string(__name__, 'js/src/collapsible.coffee'),
-                     resource_string(__name__, 'js/src/html/display.coffee')
-                    ]
-         }
+    js = {
+        'coffee': [
+            resource_string(__name__, 'js/src/javascript_loader.coffee'),
+            resource_string(__name__, 'js/src/collapsible.coffee'),
+            resource_string(__name__, 'js/src/html/display.coffee')
+        ]
+    }
     js_module_name = "HTMLModule"
     css = {'scss': [resource_string(__name__, 'css/html/display.scss')]}
 
     def get_html(self):
-        if self.system.anonymous_student_id: 
+        if self.system.anonymous_student_id:
             return self.data.replace("%%USER_ID%%", self.system.anonymous_student_id)
         return self.data
 
@@ -70,6 +87,30 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
                 nc.append(candidate[:-4] + '.html')
         return candidates + nc
 
+    @classmethod
+    def filter_templates(cls, template, course):
+        """
+        Filter template that contains 'latex' from templates.
+
+        Show them only if use_latex_compiler is set to True in
+        course settings.
+        """
+        return (not 'latex' in template['template_id'] or course.use_latex_compiler)
+
+    def get_context(self):
+        """
+        an override to add in specific rendering context, in this case we need to
+        add in a base path to our c4x content addressing scheme
+        """
+        _context = EditingDescriptor.get_context(self)
+        # Add some specific HTML rendering context when editing HTML modules where we pass
+        # the root /c4x/ url for assets. This allows client-side substitutions to occur.
+        _context.update({
+            'base_asset_url': StaticContent.get_base_url_path_for_course_assets(self.location) + '/',
+            'enable_latex_compiler': self.use_latex_compiler,
+        })
+        return _context
+
     # NOTE: html descriptors are special.  We do not want to parse and
     # export them ourselves, because that can break things (e.g. lxml
     # adds body tags when it exports, but they should just be html
@@ -97,8 +138,10 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
             # from .html
             # 'filename' in html pointers is a relative path
             # (not same as 'html/blah.html' when the pointer is in a directory itself)
-            pointer_path = "{category}/{url_path}".format(category='html',
-                                                  url_path=name_to_pathname(location.name))
+            pointer_path = "{category}/{url_path}".format(
+                category='html',
+                url_path=name_to_pathname(location.name)
+            )
             base = path(pointer_path).dirname()
             # log.debug("base = {0}, base.dirname={1}, filename={2}".format(base, base.dirname(), filename))
             filepath = "{base}/{name}.html".format(base=base, name=filename)
@@ -143,24 +186,21 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
     # TODO (vshnayder): make export put things in the right places.
 
     def definition_to_xml(self, resource_fs):
-        '''If the contents are valid xml, write them to filename.xml.  Otherwise,
-        write just <html filename="" [meta-attrs="..."]> to filename.xml, and the html
+        ''' Write <html filename="" [meta-attrs="..."]> to filename.xml, and the html
         string to filename.html.
         '''
-        try:
-            return etree.fromstring(self.data)
-        except etree.XMLSyntaxError:
-            pass
 
-        # Not proper format.  Write html to file, return an empty tag
+        # Write html to file, return an empty tag
         pathname = name_to_pathname(self.url_name)
-        filepath = u'{category}/{pathname}.html'.format(category=self.category,
-                                                    pathname=pathname)
+        filepath = u'{category}/{pathname}.html'.format(
+            category=self.category,
+            pathname=pathname
+        )
 
         resource_fs.makedir(os.path.dirname(filepath), recursive=True, allow_recreate=True)
-        with resource_fs.open(filepath, 'w') as file:
+        with resource_fs.open(filepath, 'w') as filestream:
             html_data = self.data.encode('utf-8')
-            file.write(html_data)
+            filestream.write(html_data)
 
         # write out the relative name
         relname = path(pathname).basename()
@@ -169,26 +209,99 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
         elt.set("filename", relname)
         return elt
 
+    @property
+    def non_editable_metadata_fields(self):
+        non_editable_fields = super(HtmlDescriptor, self).non_editable_metadata_fields
+        non_editable_fields.append(HtmlDescriptor.use_latex_compiler)
+        return non_editable_fields
 
-class AboutDescriptor(HtmlDescriptor):
+
+class AboutFields(object):
+    display_name = String(
+        help="Display name for this module",
+        scope=Scope.settings,
+        default="overview",
+    )
+    data = String(
+        help="Html contents to display for this module",
+        default="",
+        scope=Scope.content
+    )
+
+
+class AboutModule(AboutFields, HtmlModule):
+    """
+    Overriding defaults but otherwise treated as HtmlModule.
+    """
+    pass
+
+
+class AboutDescriptor(AboutFields, HtmlDescriptor):
     """
     These pieces of course content are treated as HtmlModules but we need to overload where the templates are located
     in order to be able to create new ones
     """
     template_dir_name = "about"
+    module_class = AboutModule
 
 
-class StaticTabDescriptor(HtmlDescriptor):
+class StaticTabFields(object):
+    """
+    The overrides for Static Tabs
+    """
+    display_name = String(
+        display_name="Display Name",
+        help="This name appears in the horizontal navigation at the top of the page.",
+        scope=Scope.settings,
+        default="Empty",
+    )
+    data = String(
+        default=textwrap.dedent("""\
+            <p>This is where you can add additional pages to your courseware. Click the 'edit' button to begin editing.</p>
+        """),
+        scope=Scope.content,
+        help="HTML for the additional pages"
+    )
+
+
+class StaticTabModule(StaticTabFields, HtmlModule):
+    """
+    Supports the field overrides
+    """
+    pass
+
+
+class StaticTabDescriptor(StaticTabFields, HtmlDescriptor):
     """
     These pieces of course content are treated as HtmlModules but we need to overload where the templates are located
     in order to be able to create new ones
     """
-    template_dir_name = "statictab"
+    template_dir_name = None
+    module_class = StaticTabModule
 
 
-class CourseInfoDescriptor(HtmlDescriptor):
+class CourseInfoFields(object):
+    """
+    Field overrides
+    """
+    data = String(
+        help="Html contents to display for this module",
+        default="<ol></ol>",
+        scope=Scope.content
+    )
+
+
+class CourseInfoModule(CourseInfoFields, HtmlModule):
+    """
+    Just to support xblock field overrides
+    """
+    pass
+
+
+class CourseInfoDescriptor(CourseInfoFields, HtmlDescriptor):
     """
     These pieces of course content are treated as HtmlModules but we need to overload where the templates are located
     in order to be able to create new ones
     """
-    template_dir_name = "courseinfo"
+    template_dir_name = None
+    module_class = CourseInfoModule

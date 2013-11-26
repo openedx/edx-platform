@@ -103,7 +103,6 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
           
 
     else if cmd == 'save_grade'
-      console.log("eval: #{data.score} pts,  Feedback: #{data.feedback}")
       response =
         @mock('get_next', {location: data.location})
     # get_problem_list
@@ -143,16 +142,18 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
     else
       # TODO: replace with postWithPrefix when that's loaded
       $.post(@ajax_url + cmd, data, callback)
-        .error => callback({success: false, error: "Error occured while performing javascript AJAX post."})
+        .error => callback({success: false, error: "Error occurred while performing javascript AJAX post."})
 
 
 class @StaffGrading
+  grading_message_sel: '.grading-message'
+
   constructor: (backend) ->
     AjaxPrefix.addAjaxPrefix(jQuery, -> "")
     @backend = backend
 
     # all the jquery selectors
-
+    @el = $('.staff-grading')
     @problem_list_container = $('.problem-list-container')
     @problem_list = $('.problem-list')
 
@@ -224,12 +225,12 @@ class @StaffGrading
   setup_score_selection: =>
     @score_selection_container.html(@rubric)
     $('input[class="score-selection"]').change => @graded_callback()
-    Rubric.initialize(@location)
-
+    @rub = new Rubric(@el)
+    @rub.initialize(@location)
 
   graded_callback: () =>
    # show button if we have scores for all categories
-    if Rubric.check_complete()
+    if @rub.check_complete()
       @state = state_graded
       @submit_button.show()
 
@@ -237,7 +238,7 @@ class @StaffGrading
     #Previously, responses were submitted when hitting enter.  Add in a modifier that ensures that ctrl+enter is needed.
     if event.which == 17 && @is_ctrl==false
       @is_ctrl=true
-    else if @is_ctrl==true && event.which == 13 && !@list_view && Rubric.check_complete()
+    else if @is_ctrl==true && event.which == 13 && !@list_view && @rub.check_complete()
       @submit_and_get_next()
 
   keyup_handler: (event) =>
@@ -252,7 +253,7 @@ class @StaffGrading
     # always clear out errors and messages on transition.
     @error_msg = ''
     @message = ''
-    
+
     if response.success
       if response.problem_list
         @problems = response.problem_list
@@ -264,6 +265,7 @@ class @StaffGrading
       @error(response.error)
 
     @render_view()
+    @scroll_to_top()
        
   get_next_submission: (location) ->
     @location = location
@@ -272,13 +274,14 @@ class @StaffGrading
 
   skip_and_get_next: () =>
     data =
-      score: Rubric.get_total_score()
-      rubric_scores: Rubric.get_score_list()
+      score: @rub.get_total_score()
+      rubric_scores: @rub.get_score_list()
       feedback: @feedback_area.val()
       submission_id: @submission_id
       location: @location
       skipped: true
       submission_flagged: false
+    @gentle_alert "Skipped the submission."
     @backend.post('save_grade', data, @ajax_callback)
 
   get_problem_list: () ->
@@ -287,14 +290,20 @@ class @StaffGrading
 
   submit_and_get_next: () ->
     data =
-      score: Rubric.get_total_score()
-      rubric_scores: Rubric.get_score_list()
+      score: @rub.get_total_score()
+      rubric_scores: @rub.get_score_list()
       feedback: @feedback_area.val()
       submission_id: @submission_id
       location: @location
       submission_flagged: @flag_submission_checkbox.is(':checked')
-    
+    @gentle_alert "Grades saved.  Fetching the next submission to grade."
     @backend.post('save_grade', data, @ajax_callback)
+
+  gentle_alert: (msg) =>
+    @grading_message = $(@grading_message_sel)
+    @grading_message.html("")
+    @grading_message.fadeIn()
+    @grading_message.html("<p>" + msg + "</p>")
 
   error: (msg) ->
     @error_msg = msg
@@ -465,6 +474,15 @@ class @StaffGrading
       Logger.log 'staff_grading_show_question', {location: @location}
       new_text = "(Hide)"
     @question_header.text(new_text)
+
+  scroll_to_top: () =>
+    #This try/catch is needed because jasmine fails with it
+    try
+      $('html, body').animate({
+                              scrollTop: $(".staff-grading").offset().top
+                              }, 200)
+    catch error
+      console.log("Scrolling error.")
 
 
 

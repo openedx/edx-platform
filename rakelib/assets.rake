@@ -30,7 +30,11 @@ def coffee_cmd(watch=false, debug=false)
 
         end
     end
-    "node_modules/.bin/coffee --compile #{watch ? '--watch' : ''} ."
+    if watch
+        "node_modules/.bin/coffee --compile --watch lms/ cms/ common/"
+    else
+        "node_modules/.bin/coffee --compile `find lms/ cms/ common/ -type f -name *.coffee` "
+    end
 end
 
 def sass_cmd(watch=false, debug=false)
@@ -41,7 +45,7 @@ def sass_cmd(watch=false, debug=false)
       sass_watch_paths << THEME_SASS
     end
 
-    "sass #{debug ? '--debug-info' : '--style compressed'} " +
+    "sass #{debug ? '' : '--style compressed'} " +
           "--load-path #{sass_load_paths.join(' ')} " +
           "#{watch ? '--watch' : '--update'} -E utf-8 #{sass_watch_paths.join(' ')}"
 end

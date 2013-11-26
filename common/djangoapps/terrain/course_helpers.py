@@ -2,18 +2,10 @@
 # pylint: disable=W0621
 
 from lettuce import world
-from .factories import *
-from django.conf import settings
-from django.http import HttpRequest
-from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login
-from django.contrib.auth.middleware import AuthenticationMiddleware
-from django.contrib.sessions.middleware import SessionMiddleware
+from django.contrib.auth.models import User, Group
 from student.models import CourseEnrollment
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import editable_modulestore
 from xmodule.contentstore.django import contentstore
-from xmodule.templates import update_templates
-from urllib import quote_plus
 
 
 @world.absorb
@@ -23,7 +15,7 @@ def create_user(uname, password):
     if len(User.objects.filter(username=uname)) > 0:
         return
 
-    portal_user = UserFactory.build(username=uname, email=uname + '@edx.org')
+    portal_user = world.UserFactory.build(username=uname, email=uname + '@edx.org')
     portal_user.set_password(password)
     portal_user.save()
 
@@ -31,58 +23,54 @@ def create_user(uname, password):
     registration.register(portal_user)
     registration.activate()
 
-    user_profile = world.UserProfileFactory(user=portal_user)
+    world.UserProfileFactory(user=portal_user)
 
 
 @world.absorb
-def log_in(username, password):
+def log_in(username='robot', password='test', email='robot@edx.org', name='Robot'):
     """
-    Log the user in programatically.
-    This will delete any existing cookies to ensure that the user
-    logs in to the correct session.
+    Use the auto_auth feature to programmatically log the user in
     """
+    url = '/auto_auth?username=%s&password=%s&name=%s&email=%s' % (username,
+          password, name, email)
+    world.visit(url)
 
-    # Authenticate the user
-    world.scenario_dict['USER'] = authenticate(username=username, password=password)
-    assert(world.scenario_dict['USER'] is not None and world.scenario_dict['USER'].is_active)
-
-    # Send a fake HttpRequest to log the user in
-    # We need to process the request using
-    # Session middleware and Authentication middleware
-    # to ensure that session state can be stored
-    request = HttpRequest()
-    SessionMiddleware().process_request(request)
-    AuthenticationMiddleware().process_request(request)
-    login(request, world.scenario_dict['USER'])
-
-    # Save the session
-    request.session.save()
-
-    # Retrieve the sessionid and add it to the browser's cookies
-    cookie_dict = {settings.SESSION_COOKIE_NAME: request.session.session_key}
-    world.browser.cookies.delete()
-    world.browser.cookies.add(cookie_dict)
+    # Save the user info in the world scenario_dict for use in the tests
+    user = User.objects.get(username=username)
+    world.scenario_dict['USER'] = user
 
 
 @world.absorb
-def register_by_course_id(course_id, is_staff=False):
-    create_user('robot')
-    u = User.objects.get(username='robot')
+def register_by_course_id(course_id, username='robot', password='test', is_staff=False):
+    create_user(username, password)
+    user = User.objects.get(username=username)
     if is_staff:
-        u.is_staff = True
-        u.save()
-    CourseEnrollment.objects.get_or_create(user=u, course_id=course_id)
+        user.is_staff = True
+        user.save()
+    CourseEnrollment.enroll(user, course_id)
+
+
+@world.absorb
+def add_to_course_staff(username, course_num):
+    """
+    Add the user with `username` to the course staff group
+    for `course_num`.
+    """
+    # Based on code in lms/djangoapps/courseware/access.py
+    group_name = "instructor_{}".format(course_num)
+    group, _ = Group.objects.get_or_create(name=group_name)
+    group.save()
+
+    user = User.objects.get(username=username)
+    user.groups.add(group)
 
 
 @world.absorb
 def clear_courses():
     # Flush and initialize the module store
-    # It needs the templates because it creates new records
-    # by cloning from the template.
     # Note that if your test module gets in some weird state
     # (though it shouldn't), do this manually
     # from the bash shell to drop it:
     # $ mongo test_xmodule --eval "db.dropDatabase()"
-    modulestore().collection.drop()
-    update_templates(modulestore('direct'))
+    editable_modulestore().collection.drop()
     contentstore().fs_files.drop()

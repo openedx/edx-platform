@@ -93,6 +93,234 @@ form {
   }
 }
 
+// ELEM: form wrapper
+.wrapper-create-element {
+  height: 0;
+  margin-bottom: $baseline;
+  opacity: 0.0;
+  pointer-events: none;
+  overflow: hidden;
+
+  &.animate {
+    @include transition(opacity $tmg-f1 ease-in-out 0s, height $tmg-f1 ease-in-out 0s);
+  }
+
+  &.is-shown {
+    height: auto; // define a specific height for the animating version of this UI to work properly
+    opacity: 1.0;
+    pointer-events: auto;
+  }
+}
+
+// ELEM: form
+// form styling for creating a new content item (course, user, textbook)
+form[class^="create-"] {
+  @extend %ui-window;
+
+  .title {
+    @extend %t-title4;
+    font-weight: 600;
+    padding: $baseline ($baseline*1.5) 0 ($baseline*1.5);
+  }
+
+  fieldset {
+    padding: $baseline ($baseline*1.5);
+  }
+
+
+  .list-input {
+    @extend %cont-no-list;
+
+    .field {
+      margin: 0 0 ($baseline*0.75) 0;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      &.required {
+
+        label {
+          font-weight: 600;
+        }
+
+        label:after {
+          margin-left: ($baseline/4);
+          content: "*";
+        }
+      }
+
+      label, input, textarea {
+        display: block;
+      }
+
+      label {
+        @extend %t-copy-sub1;
+        @include transition(color $tmg-f3 ease-in-out 0s);
+        margin: 0 0 ($baseline/4) 0;
+
+        &.is-focused {
+          color: $blue;
+        }
+      }
+
+
+      input, textarea {
+        @extend %t-copy-base;
+        @include transition(all $tmg-f2 ease-in-out 0s);
+        height: 100%;
+        width: 100%;
+        padding: ($baseline/2);
+
+        &.long {
+          width: 100%;
+        }
+
+        &.short {
+          width: 25%;
+        }
+
+        /*@include placeholder {
+          color: $gray-l3;
+        }*/
+
+        &:focus {
+
+          + .tip {
+            color: $gray;
+          }
+        }
+      }
+
+      textarea.long {
+        height: ($baseline*5);
+      }
+
+      input[type="checkbox"] {
+        display: inline-block;
+        margin-right: ($baseline/4);
+        width: auto;
+        height: auto;
+
+        & + label {
+          display: inline-block;
+        }
+      }
+
+      .tip {
+        @extend %t-copy-sub2;
+        @include transition(color, 0.15s, ease-in-out);
+        display: block;
+        margin-top: ($baseline/4);
+        color: $gray-l3;
+      }
+
+      .tip-error {
+        display: none;
+        float: none;
+      }
+
+      &.error {
+        label {
+          color: $red;
+        }
+
+        .is-showing {
+            @extend %anim-fadeIn;
+        }
+
+        .is-hiding {
+            @extend %anim-fadeOut;
+        }
+
+        .tip-error {
+          display: block;
+          color: $red;
+        }
+
+        input {
+          border-color: $red;
+        }
+      }
+    }
+
+    .field-inline {
+
+      input, textarea, select {
+        width: 62%;
+        display: inline-block;
+      }
+
+      .tip-stacked {
+        display: inline-block;
+        float: right;
+        width: 35%;
+        margin-top: 0;
+      }
+
+      &.error {
+        .tip-error {
+        }
+      }
+
+    }
+
+    .field-group {
+      @include clearfix();
+      margin: 0 0 ($baseline/2) 0;
+
+      .field {
+        display: block;
+        width: 47%;
+        border-bottom: none;
+        margin: 0 ($baseline*0.75) 0 0;
+        padding: ($baseline/4) 0 0 0;
+        float: left;
+        position: relative;
+
+        &:nth-child(odd) {
+          float: left;
+        }
+
+        &:nth-child(even) {
+          float: right;
+          margin-right: 0;
+        }
+
+        input, textarea {
+          width: 100%;
+        }
+      }
+    }
+  }
+
+  .actions {
+    box-shadow: inset 0 1px 2px $shadow;
+    margin-top: ($baseline*0.75);
+    border-top: 1px solid $gray-l1;
+    padding: ($baseline*0.75) ($baseline*1.5);
+    background: $gray-l6;
+
+    .action {
+      @include transition(all $tmg-f2 linear 0s);
+      display: inline-block;
+      padding: ($baseline/5) $baseline;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .action-primary {
+      @include blue-button;
+      @extend %t-action2;
+    }
+
+    .action-secondary {
+      @include grey-button;
+      @extend %t-action2;
+    }
+  }
+}
+
 // ====================
 
 // forms - grandfathered

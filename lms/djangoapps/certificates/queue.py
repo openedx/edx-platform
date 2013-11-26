@@ -3,7 +3,6 @@ from certificates.models import certificate_status_for_student
 from certificates.models import CertificateStatuses as status
 from certificates.models import CertificateWhitelist
 
-from mitxmako.middleware import MakoMiddleware
 from courseware import grades, courses
 from django.test.client import RequestFactory
 from capa.xqueue_interface import XQueueInterface
@@ -52,14 +51,6 @@ class XQueueCertInterface(object):
     """
 
     def __init__(self, request=None):
-        # MakoMiddleware Note:
-        # Line below has the side-effect of writing to a module level lookup
-        # table that will allow problems to render themselves. If this is not
-        # present, problems that a student hasn't seen will error when loading,
-        # causing the grading system to under-count the possible score and
-        # inflate their grade. This dependency is bad and was probably recently
-        # introduced. This is the bandage until we can trace the root cause.
-        m = MakoMiddleware()
 
         # Get basic auth (username/password) for
         # xqueue connection if it's in the settings
@@ -83,29 +74,36 @@ class XQueueCertInterface(object):
                 )
         self.whitelist = CertificateWhitelist.objects.all()
         self.restricted = UserProfile.objects.filter(allow_certificate=False)
+        self.use_https = True
 
-    def regen_cert(self, student, course_id):
-        """
+    def regen_cert(self, student, course_id, course=None):
+        """(Re-)Make certificate for a particular student in a particular course
+
         Arguments:
-          student - User.object
+          student   - User.object
           course_id - courseenrollment.course_id (string)
 
-        Removes certificate for a student, will change
-        the certificate status to 'regenerating'.
+        WARNING: this command will leave the old certificate, if one exists,
+                 laying around in AWS taking up space. If this is a problem, 
+                 take pains to clean up storage before running this command.
 
-        Certificate must be in the 'error' or 'downloadable' state
+        Change the certificate status to unavailable (if it exists) and request
+        grading. Passing grades will put a certificate request on the queue.
 
-        If the student has a passing grade a certificate
-        request will be put on the queue
-
-        If the student is not passing his state will change
-        to status.notpassing
-
-        otherwise it will return the current state
-
+        Return the status object.
         """
+        # TODO: when del_cert is implemented and plumbed through certificates 
+        #       repo also, do a deletion followed by a creation r/t a simple
+        #       recreation. XXX: this leaves orphan cert files laying around in
+        #       AWS. See note in the docstring too.
+        try:
+            certificate = GeneratedCertificate.objects.get(user=student, course_id=course_id)
+            certificate.status = status.unavailable
+            certificate.save()
+        except GeneratedCertificate.DoesNotExist:
+            pass
 
-        raise NotImplementedError
+        return self.add_cert(student, course_id, course)
 
     def del_cert(self, student, course_id):
 
@@ -143,7 +141,6 @@ class XQueueCertInterface(object):
         If a student has allow_certificate set to False in the
         userprofile table the status will change to 'restricted'
 
-
         If a student does not have a passing grade the status
         will change to status.notpassing
 
@@ -152,11 +149,12 @@ class XQueueCertInterface(object):
         """
 
         VALID_STATUSES = [status.generating,
-                status.unavailable, status.deleted, status.error,
-                status.notpassing]
+                          status.unavailable, 
+                          status.deleted, 
+                          status.error,
+                          status.notpassing]
 
-        cert_status = certificate_status_for_student(
-                              student, course_id)['status']
+        cert_status = certificate_status_for_student(student, course_id)['status']
 
         if cert_status in VALID_STATUSES:
             # grade the student
@@ -201,6 +199,7 @@ class XQueueCertInterface(object):
                         'username': student.username,
                         'course_id': course_id,
                         'name': profile.name,
+                        'grade': grade['grade'],
                     }
                     cert.status = status.generating
                     cert.save()
@@ -218,9 +217,14 @@ class XQueueCertInterface(object):
 
     def _send_to_xqueue(self, contents, key):
 
+        if self.use_https:
+            proto = "https"
+        else:
+            proto = "http"
+
         xheader = make_xheader(
-            'https://{0}/update_certificate?{1}'.format(
-                settings.SITE_NAME, key), key, settings.CERT_QUEUE)
+            '{0}://{1}/update_certificate?{2}'.format(
+                proto, settings.SITE_NAME, key), key, settings.CERT_QUEUE)
 
         (error, msg) = self.xqueue_interface.send_to_queue(
                 header=xheader, body=json.dumps(contents))

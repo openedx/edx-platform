@@ -1,8 +1,10 @@
-if (!CMS.Models['Settings']) CMS.Models.Settings = new Object();
+define(["backbone", "underscore", "gettext"], function(Backbone, _, gettext) {
 
-CMS.Models.Settings.CourseDetails = Backbone.Model.extend({
+var CourseDetails = Backbone.Model.extend({
     defaults: {
-        location : null,	// the course's Location model, required
+        org : '',
+        course_id: '',
+        run: '',
         start_date: null,	// maps to 'start'
         end_date: null,		// maps to 'end'
         enrollment_start: null,
@@ -10,14 +12,13 @@ CMS.Models.Settings.CourseDetails = Backbone.Model.extend({
         syllabus: null,
         overview: "",
         intro_video: null,
-        effort: null	// an int or null
+        effort: null,	// an int or null,
+        course_image_name: '', // the filename
+        course_image_asset_path: '' // the full URL (/c4x/org/course/num/asset/filename)
     },
 
     // When init'g from html script, ensure you pass {parse: true} as an option (2nd arg to reset)
     parse: function(attributes) {
-        if (attributes['course_location']) {
-            attributes.location = new CMS.Models.Location(attributes.course_location, {parse:true});
-        }
         if (attributes['start_date']) {
             attributes.start_date = new Date(attributes.start_date);
         }
@@ -75,7 +76,11 @@ CMS.Models.Settings.CourseDetails = Backbone.Model.extend({
         return this.videosourceSample();
     },
     videosourceSample : function() {
-        if (this.has('intro_video')) return "http://www.youtube.com/embed/" + this.get('intro_video');
+        if (this.has('intro_video')) return "//www.youtube.com/embed/" + this.get('intro_video');
         else return "";
     }
 });
+
+return CourseDetails;
+
+}); // end define()

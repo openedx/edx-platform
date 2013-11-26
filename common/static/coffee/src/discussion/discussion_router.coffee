@@ -20,10 +20,13 @@ if Backbone?
 
     allThreads: ->
       @nav.updateSidebar()
+      @nav.goHome()
 
     setActiveThread: =>
       if @thread
         @nav.setActiveThread(@thread.get("id"))
+      else
+        @nav.goHome
 
     showThread: (forum_name, thread_id) ->
       @thread = @discussion.get(thread_id)

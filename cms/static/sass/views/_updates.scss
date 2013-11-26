@@ -1,13 +1,7 @@
 // studio - views - course updates
 // ====================
 
-body.course.updates {
-	
-	h2 {
-		margin-bottom: 24px;
-		font-size: 22px;
-		font-weight: 300;
-	}
+.view-updates {
 
 	.course-info-wrapper {
 		display: table;
@@ -173,6 +167,7 @@ body.course.updates {
 }
 
 .course-handouts {
+	@extend %ui-window;
 	width: 30%;
 	padding: 20px 30px;
 	margin: 0;
@@ -180,9 +175,10 @@ body.course.updates {
 	border-left: none;
 	background: $lightGrey;
 
-	h2 {
-		font-size: 18px;
-		font-weight: 700;
+	.title {
+		margin-bottom: 24px;
+		font-size: 22px;
+		font-weight: 300;
 	}
 
 	.edit-button {

@@ -29,12 +29,12 @@ class DummySystem(ImportSystem):
         parent_tracker = Mock()
 
         super(DummySystem, self).__init__(
-            xmlstore,
-            course_id,
-            course_dir,
-            policy,
-            error_tracker,
-            parent_tracker,
+            xmlstore=xmlstore,
+            course_id=course_id,
+            course_dir=course_dir,
+            policy=policy,
+            error_tracker=error_tracker,
+            parent_tracker=parent_tracker,
             load_error_modules=load_error_modules,
         )
 
@@ -53,7 +53,7 @@ def get_dummy_course(start, announcement=None, is_new=None, advertised_start=Non
     end = to_attrb('end', end)
 
     start_xml = '''
-         <course org="{org}" course="{course}"
+         <course org="{org}" course="{course}" display_organization="{org}_display" display_coursenumber="{course}_display"
                 graceperiod="1 day" url_name="test"
                 start="{start}"
                 {announcement}
@@ -140,6 +140,16 @@ class IsNewCourseTestCase(unittest.TestCase):
             d = get_dummy_course(start=s[0], advertised_start=s[1])
             print "Checking start=%s advertised=%s" % (s[0], s[1])
             self.assertEqual(d.start_date_text, s[2])
+
+    def test_display_organization(self):
+        descriptor = get_dummy_course(start='2012-12-02T12:00', is_new=True)
+        self.assertNotEqual(descriptor.location.org, descriptor.display_org_with_default)
+        self.assertEqual(descriptor.display_org_with_default, "{0}_display".format(ORG))
+
+    def test_display_coursenumber(self):
+        descriptor = get_dummy_course(start='2012-12-02T12:00', is_new=True)
+        self.assertNotEqual(descriptor.location.course, descriptor.display_number_with_default)
+        self.assertEqual(descriptor.display_number_with_default, "{0}_display".format(COURSE))
 
     def test_is_newish(self):
         descriptor = get_dummy_course(start='2012-12-02T12:00', is_new=True)

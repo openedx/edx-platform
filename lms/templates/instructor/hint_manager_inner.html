@@ -1,0 +1,47 @@
+<%block name="main">
+<div id="field-label" style="display:none">${field}</div>
+
+<h1> ${field_label} </h1>
+Switch to <a id="switch-fields" other-field="${other_field}">${other_field_label}</a>
+
+<p style="color:red"> ${error} </p>
+
+% for definition_id in all_hints:
+    <h2> Problem: ${id_to_name[definition_id]} </h2>
+    % for answer, hint_dict in all_hints[definition_id]:
+        % if len(hint_dict) > 0:
+            <h4> Answer: ${answer} </h4><div style="background-color:#EEEEEE">
+        % endif
+        % for pk, hint in hint_dict.items():
+            <p data-problem="${definition_id}" data-pk="${pk}" data-answer="${answer}">
+                <input class="hint-select" type="checkbox"/> ${hint[0]}
+                <br /> 
+                Votes: <input type="text" class="votes" value="${str(hint[1])}" style="font-size:12px; height:20px; width:50px"></input>
+                <br /><br />
+            </p>
+        % endfor
+        % if len(hint_dict) > 0:
+            </div><br />
+        % endif
+    % endfor        
+
+    <h4> Add a hint to this problem </h4>
+    <h4> Answer: </h4>
+    <input type="text" class="submit-hint-answer" data-problem="${definition_id}"/>
+    (Be sure to format your answer in the same way as the other answers you see here.)
+    <br /> 
+    Hint: <br />
+    <textarea cols="50" style="height:200px" class="submit-hint-text" data-problem="${definition_id}"></textarea>
+    <br />
+    <button class="submit-new-hint" data-problem="${definition_id}"> Submit </button>
+    <br />
+% endfor
+
+<p style="color:red"> ${error} </p>
+<button id="hint-delete"> Delete selected </button> <button id="update-votes"> Update votes </button>
+
+% if field == 'mod_queue':
+    <button id="approve"> Approve selected </button>
+% endif
+
+</%block>

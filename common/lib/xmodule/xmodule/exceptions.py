@@ -13,6 +13,7 @@ class ProcessingError(Exception):
     '''
     pass
 
+
 class InvalidVersionError(Exception):
     """
     Tried to save an item with a location that a store cannot support (e.g., draft version
@@ -20,4 +21,13 @@ class InvalidVersionError(Exception):
     """
     def __init__(self, location):
         super(InvalidVersionError, self).__init__()
+        self.location = location
+
+
+class SerializationError(Exception):
+    """
+    Thrown when a module cannot be exported to XML
+    """
+    def __init__(self, location, msg):
+        super(SerializationError, self).__init__(msg)
         self.location = location

@@ -131,9 +131,11 @@ $ ->
         initialText = $elem.html()
         $elem.empty()
         _append = appended_id || ""
+        wmdInputId = "wmd-input#{_append}"
         $wmdPanel = $("<div>").addClass("wmd-panel")
                    .append($("<div>").attr("id", "wmd-button-bar#{_append}"))
-                   .append($("<textarea>").addClass("wmd-input").attr("id", "wmd-input#{_append}").html(initialText))
+                   .append($("<label>").addClass("sr").attr("for", wmdInputId).text("Post body"))
+                   .append($("<textarea>").addClass("wmd-input").attr("id", wmdInputId).html(initialText))
                    .append($("<div>").attr("id", "wmd-preview#{_append}").addClass("wmd-panel wmd-preview"))
         $elem.append($wmdPanel)
 

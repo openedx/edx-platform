@@ -1,0 +1,123 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%page args="section_data"/>
+
+<div class="student-specific-container action-type-container">
+  <h2>${_("Student-specific grade inspection")}</h2>
+  <div class="request-response-error"></div>
+  <p>
+    <!-- Doesn't work for username but this MUST work -->
+  ${_("Specify the {platform_name} email address or username of a student here:").format(platform_name=settings.PLATFORM_NAME)}
+  <input type="text" name="student-select-progress" placeholder="${_("Student Email or Username")}">
+  </p>
+  <br>
+
+  <div class="progress-link-wrapper">
+  <p>
+    ${_("Click this link to view the student's progress page:")}
+
+    <a href="" class="progress-link" data-endpoint="${ section_data['get_student_progress_url_url'] }"> ${_("Student Progress Page")} </a>
+  </p>
+  </div>
+
+  <hr>
+</div>
+
+<div class="student-grade-container action-type-container">
+  <h2>${_("Student-specific grade adjustment")}</h2>
+  <div class="request-response-error"></div>
+  <p>
+    <!-- Doesn't work for username but this MUST work -->
+  ${_("Specify the {platform_name} email address or username of a student here:").format(platform_name=settings.PLATFORM_NAME)}
+  <input type="text" name="student-select-grade" placeholder="${_("Student Email or Username")}">
+  </p>
+  <br>
+
+  <p> ${_('Specify a particular problem in the course here by its url:')} 
+  <input type="text" name="problem-select-single" placeholder="${_("Problem urlname")}">
+  </p>
+
+  <p>
+    ${_('You may use just the "urlname" if a problem, or "modulename/urlname" if not. (For example, if the location is {location1}, then just provide the {urlname1}. If the location is {location2}, then provide {urlname2}.)').format(
+    location1="<tt>i4x://university/course/problem/problemname</tt>",
+    urlname1="<tt>problemname</tt>",
+    location2="<tt>i4x://university/course/notaproblem/someothername</tt>",
+    urlname2="<tt>notaproblem/someothername</tt>")
+    }
+  </p>
+
+  <p>
+  ${_("Next, select an action to perform for the given user and problem:")}
+  </p>
+
+  <p>
+  <input type="button" name="reset-attempts-single" value="${_("Reset Student Attempts")}" data-endpoint="${ section_data['reset_student_attempts_url'] }">
+
+  %if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS') and section_data['access']['instructor']:
+    <input type="button" name="rescore-problem-single" value="${_("Rescore Student Submission")}" data-endpoint="${ section_data['rescore_problem_url'] }">
+  %endif
+  </p>
+
+  <p>
+  %if section_data['access']['instructor']:
+    <p> ${_('You may also delete the entire state of a student for the specified problem:')} </p>
+    <input type="button" class="molly-guard" name="delete-state-single" value="${_("Delete Student State for Problem")}" data-endpoint="${ section_data['reset_student_attempts_url'] }">
+  %endif
+  </p>
+
+
+  %if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS') and section_data['access']['instructor']:
+    <p>
+      ${_("Rescoring runs in the background, and status for active tasks will appear in a table on the Course Info tab. "
+      "To see status for all tasks submitted for this problem and student, click on this button:")}
+    </p>
+
+    <input type="button" name="task-history-single" value="${_("Show Background Task History for Student")}" data-endpoint="${ section_data['list_instructor_tasks_url'] }">
+    <div class="task-history-single-table"></div>
+  %endif
+  <hr>
+</div>
+
+%if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS') and section_data['access']['instructor']:
+  <div class="course-specific-container action-type-container">
+    <h2>${_('Course-specific grade adjustment')}</h2>
+    <div class="request-response-error"></div>
+
+    <p>
+      ${_("Specify a particular problem in the course here by its url:")}
+      <input type="text" name="problem-select-all" size="60">
+    </p>
+    <p>
+      ${_('You may use just the "urlname" if a problem, or "modulename/urlname" if not. (For example, if the location is {location1}, then just provide the {urlname1}. If the location is {location2}, then provide {urlname2}.)').format(
+      location1="<tt>i4x://university/course/problem/problemname</tt>",
+      urlname1="<tt>problemname</tt>",
+      location2="<tt>i4x://university/course/notaproblem/someothername</tt>",
+      urlname2="<tt>notaproblem/someothername</tt>")
+      }
+    </p>
+    <p>
+      ${_("Then select an action")}:
+      <input type="button" class="molly-guard" name="reset-attempts-all" value="${_("Reset ALL students' attempts")}" data-endpoint="${ section_data['reset_student_attempts_url'] }">
+      <input type="button" class="molly-guard" name="rescore-problem-all" value="${_("Rescore ALL students' problem submissions")}" data-endpoint="${ section_data['rescore_problem_url'] }">
+    </p>
+    <p>
+    <p>
+      ${_("These actions run in the background, and status for active tasks will appear in a table on the Course Info tab. "
+      "To see status for all tasks submitted for this problem, click on this button")}:
+    </p>
+      <input type="button" name="task-history-all" value="${_("Show Background Task History for Problem")}" data-endpoint="${ section_data['list_instructor_tasks_url'] }">
+      <div class="task-history-all-table"></div>
+    </p>
+  </div>
+%endif
+
+%if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
+  <div class="running-tasks-container action-type-container">
+    <hr>
+    <h2> ${_("Pending Instructor Tasks")} </h2>
+    <p>${_("The status for any active tasks appears in a table below.")} </p>
+    <br />
+
+    <div class="running-tasks-table" data-endpoint="${ section_data['list_instructor_tasks_url'] }"></div>
+  </div>
+
+%endif

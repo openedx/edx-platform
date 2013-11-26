@@ -779,3 +779,109 @@ class SymbolicResponseXMLFactory(ResponseXMLFactory):
 
     def create_input_element(self, **kwargs):
         return ResponseXMLFactory.textline_input_xml(**kwargs)
+
+
+class ChoiceTextResponseXMLFactory(ResponseXMLFactory):
+    """ Factory for producing <choicetextresponse> xml """
+
+    def create_response_element(self, **kwargs):
+        """ Create a <choicetextresponse> element """
+        return etree.Element("choicetextresponse")
+
+    def create_input_element(self, **kwargs):
+        """ Create a <checkboxgroup> element.
+        choices can be specified in the following format:
+        [("true", [{"answer": "5", "tolerance": 0}]),
+        ("false", [{"answer": "5", "tolerance": 0}])
+        ]
+
+        This indicates that the first checkbox/radio is correct and it
+        contains a numtolerance_input with an answer of 5 and a tolerance of 0
+
+        It also indicates that the second has a second incorrect radiobutton
+        or checkbox with a numtolerance_input.
+        """
+        choices = kwargs.get('choices', [("true", {})])
+        choice_inputs = []
+        # Ensure that the first element of choices is an ordered
+        # collection. It will start as a list, a tuple, or not a Container.
+        if type(choices[0]) not in [list, tuple]:
+            choices = [choices]
+
+        for choice in choices:
+            correctness, answers = choice
+            numtolerance_inputs = []
+            # If the current `choice` contains any("answer": number)
+            # elements, turn those into numtolerance_inputs
+            if answers:
+                # `answers` will be a list or tuple of answers or a single
+                # answer, representing the answers for numtolerance_inputs
+                # inside of this specific choice.
+
+                # Make sure that `answers` is an ordered collection for
+                # convenience.
+                if type(answers) not in [list, tuple]:
+                    answers = [answers]
+
+                numtolerance_inputs = [
+                    self._create_numtolerance_input_element(answer)
+                    for answer in answers
+                ]
+
+            choice_inputs.append(
+                self._create_choice_element(
+                    correctness=correctness,
+                    inputs=numtolerance_inputs
+                )
+            )
+        # Default type is 'radiotextgroup'
+        input_type = kwargs.get('type', 'radiotextgroup')
+        input_element = etree.Element(input_type)
+
+        for ind, choice in enumerate(choice_inputs):
+            # Give each choice text equal to it's position(0,1,2...)
+            choice.text = "choice_{0}".format(ind)
+            input_element.append(choice)
+
+        return input_element
+
+    def _create_choice_element(self, **kwargs):
+        """
+        Creates a choice element for a choictextproblem.
+        Defaults to a correct choice with no numtolerance_input
+        """
+        text = kwargs.get('text', '')
+        correct = kwargs.get('correctness', "true")
+        inputs = kwargs.get('inputs', [])
+        choice_element = etree.Element("choice")
+        choice_element.set("correct", correct)
+        choice_element.text = text
+        for inp in inputs:
+            # Add all of the inputs as children of this choice
+            choice_element.append(inp)
+
+        return choice_element
+
+    def _create_numtolerance_input_element(self, params):
+        """
+        Creates a <numtolerance_input/>  or <decoy_input/> element with
+        optionally specified tolerance and answer.
+        """
+        answer = params['answer'] if 'answer' in params else None
+        # If there is not an answer specified, Then create a <decoy_input/>
+        # otherwise create a <numtolerance_input/> and set its tolerance
+        # and answer attributes.
+        if answer:
+            text_input = etree.Element("numtolerance_input")
+            text_input.set('answer', answer)
+            # If tolerance was specified, was specified use it, otherwise
+            # Set the tolerance to "0"
+            text_input.set(
+                'tolerance',
+                params['tolerance'] if 'tolerance' in params else "0"
+            )
+
+        else:
+            text_input = etree.Element("decoy_input")
+
+        return text_input

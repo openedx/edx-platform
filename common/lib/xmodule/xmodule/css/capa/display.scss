@@ -3,6 +3,7 @@ h2 {
   margin-bottom: 15px;
 
   &.problem-header {
+    display: inline-block;
     section.staff {
       margin-top: 30px;
       font-size: 80%;
@@ -18,22 +19,29 @@ h2 {
 
 
 iframe[seamless]{
-    background-color: transparent;
-    border: 0px none transparent;
-    padding: 0px;
-    overflow: hidden;
+  overflow: hidden;
+  padding: 0px;
+  border: 0px none transparent;
+  background-color: transparent;
 }
 
 .inline-error {
   color: darken($error-red, 11%);
 }
 
+section.problem-progress {
+  display: inline-block;
+  padding-left: 5px;
+  color: #999;
+  font-weight: 100;
+  font-size: em(16);
+}
 
 section.problem {
   @media print {
     display: block;
-    width: auto;
     padding: 0;
+    width: auto;
 
     canvas, img {
       page-break-inside: avoid;
@@ -41,29 +49,28 @@ section.problem {
   }
 
   .inline {
-      display: inline;
+    display: inline;
   }
 
   .choicegroup {
     @include clearfix;
-
-    label.choicegroup_correct{
-      &:after{
-        content: url('../images/correct-icon.png');
-        margin-left:15px
-      }
-    }
-
-    label.choicegroup_incorrect{
-      &:after{
-        content: url('../images/incorrect-icon.png');
-        margin-left:15px;
-      }
-    }
-
-    min-width:100px;
+    min-width: 100px;
     width: auto !important;
     width: 100px;
+
+    label.choicegroup_correct {
+      &:after {
+        margin-left: 15px;
+        content: url('../images/correct-icon.png');
+      }
+    }
+
+    label.choicegroup_incorrect {
+      &:after {
+        margin-left: 15px;
+        content: url('../images/incorrect-icon.png');
+      }
+    }
 
     .indicator_container {
       float: left;
@@ -74,9 +81,9 @@ section.problem {
 
     fieldset {
       @include box-sizing(border-box);
+      margin: 0px 0px $baseline;
+      padding-left: $baseline;
       border-left: 1px solid #ddd;
-      padding-left: 20px;
-      margin: 0px 0px 20px;
     }
 
     input[type="radio"],
@@ -94,21 +101,21 @@ section.problem {
   ol.enumerate {
     li {
       &:before {
-        content: " ";
         display: block;
-        height: 0;
         visibility: hidden;
+        height: 0;
+        content: " ";
       }
     }
   }
 
   .solution-span {
     > span {
-      margin: 20px 0;
+      margin: $baseline 0;
       display: block;
       border: 1px solid #ddd;
-      padding: 9px 15px 20px;
-      background: #FFF;
+      padding: 9px 15px $baseline;
+      background: #fff;
       position: relative;
       box-shadow: inset 0 0 0 1px #eee;
       border-radius: 3px;
@@ -125,26 +132,26 @@ section.problem {
         margin-top: -2px;
       }
       &.status {
+        margin: 8px 0 0 $baseline/2;
         text-indent: -9999px;
-        margin: 8px 0 0 10px;
       }
     }
 
     &.unanswered {
       p.status {
         @include inline-block();
-        background: url('../images/unanswered-icon.png') center center no-repeat;
-        height: 14px;
         width: 14px;
+        height: 14px;
+        background: url('../images/unanswered-icon.png') center center no-repeat;
       }
     }
 
     &.correct, &.ui-icon-check {
       p.status {
         @include inline-block();
-        background: url('../images/correct-icon.png') center center no-repeat;
-        height: 20px;
         width: 25px;
+        height: 20px;
+        background: url('../images/correct-icon.png') center center no-repeat;
       }
 
       input {
@@ -155,9 +162,9 @@ section.problem {
     &.processing {
       p.status {
         @include inline-block();
-        background: url('../images/spinner.gif') center center no-repeat;
-        height: 20px;
         width: 20px;
+        height: 20px;
+        background: url('../images/spinner.gif') center center no-repeat;
       }
 
       input {
@@ -165,12 +172,12 @@ section.problem {
       }
     }
 
-    &.incorrect, &.ui-icon-close {
+    &.incorrect, &.incomplete, &.ui-icon-close {
       p.status {
         @include inline-block();
-        background: url('../images/incorrect-icon.png') center center no-repeat;
-        height: 20px;
         width: 20px;
+        height: 20px;
+        background: url('../images/incorrect-icon.png') center center no-repeat;
         text-indent: -9999px;
       }
 
@@ -187,12 +194,12 @@ section.problem {
     p.answer {
       @include inline-block();
       margin-bottom: 0;
-      margin-left: 10px;
+      margin-left: $baseline/2;
 
       &:before {
+        display: inline;
         content: "Answer: ";
         font-weight: bold;
-        display: inline;
 
       }
       &:empty {
@@ -206,16 +213,26 @@ section.problem {
       clear: both;
       margin-top: 3px;
 
+      .MathJax_Display {
+        display: inline-block;
+        width: auto;
+      }
+
+      img.loading {
+        display: inline-block;
+        padding-left: 10px;
+      }
+
       span {
         margin-bottom: 0;
 
         &.math {
-          padding: 6px;
-          background: #f1f1f1;
-          border: 1px solid #e3e3e3;
           @include inline-block;
-          border-radius: 4px;
+          padding: 6px;
           min-width: 30px;
+          border: 1px solid #e3e3e3;
+          border-radius: 4px;
+          background: #f1f1f1;
         }
       }
     }
@@ -223,98 +240,91 @@ section.problem {
     span {
       &.unanswered, &.ui-icon-bullet {
         @include inline-block();
-        background: url('../images/unanswered-icon.png') center center no-repeat;
-        height: 14px;
         position: relative;
         top: 4px;
         width: 14px;
+        height: 14px;
+        background: url('../images/unanswered-icon.png') center center no-repeat;
       }
 
       &.processing, &.ui-icon-processing {
         @include inline-block();
-        background: url('../images/spinner.gif') center center no-repeat;
-        height: 20px;
         position: relative;
         top: 6px;
         width: 25px;
+        height: 20px;
+        background: url('../images/spinner.gif') center center no-repeat;
       }
 
       &.correct, &.ui-icon-check {
         @include inline-block();
-        background: url('../images/correct-icon.png') center center no-repeat;
-        height: 20px;
         position: relative;
         top: 3px;
         width: 25px;
+        height: 20px;
+        background: url('../images/correct-icon.png') center center no-repeat;
       }
 
       &.partially-correct {
         @include inline-block();
-        background: url('../images/partially-correct-icon.png') center center no-repeat;
-        height: 20px;
         position: relative;
         top: 6px;
         width: 25px;
+        height: 20px;
+        background: url('../images/partially-correct-icon.png') center center no-repeat;
       }
 
-      &.incorrect, &.ui-icon-close {
+      &.incorrect, &.incomplete, &.ui-icon-close {
         @include inline-block();
-        background: url('../images/incorrect-icon.png') center center no-repeat;
-        height: 20px;
-        width: 20px;
         position: relative;
         top: 3px;
+        width: 20px;
+        height: 20px;
+        background: url('../images/incorrect-icon.png') center center no-repeat;
       }
     }
 
-    .reload
-    {
+    .reload {
       float:right;
-      margin: 10px;
+      margin: $baseline/2;
     }
 
 
     .grader-status {
-      padding: 9px;
-      background: #F6F6F6;
-      border: 1px solid #ddd;
-      border-top: 0;
-      margin-bottom: 20px;
       @include clearfix;
+      margin: $baseline/2 0;
+      padding: $baseline/2;
+      border-radius: 5px;
+      background: #F6F6F6;
 
       span {
-        text-indent: -9999px;
-        overflow: hidden;
         display: block;
         float: left;
+        overflow: hidden;
         margin: -7px 7px 0 0;
+        text-indent: -9999px;
       }
 
       .grading {
-        background: url('../images/info-icon.png') left center no-repeat;
-        padding-left: 25px;
-        text-indent: 0px;
         margin: 0px 7px 0 0;
+        padding-left: 25px;
+        background: url('../images/info-icon.png') left center no-repeat;
+        text-indent: 0px;
       }
 
       p {
-        line-height: 20px;
-        text-transform: capitalize;
-        margin-bottom: 0;
         float: left;
+        margin-bottom: 0;
+        text-transform: capitalize;
+        line-height: 20px;
       }
 
       &.file {
-        background: #FFF;
-        margin-top: 20px;
-        padding: 20px 0 0 0;
-
-        border: {
-          top: 1px solid #eee;
-          right: 0;
-          bottom: 0;
-          left: 0;
-        }
+        margin-top: $baseline;
+        padding: $baseline 0 0 0;
+        border: 0;
+        border-top: 1px solid #eee;
+        background: #fff;
 
         p.debug {
           display: none;
@@ -327,54 +337,54 @@ section.problem {
 
     }
     .evaluation {
-        p {
-            margin-bottom: 4px;
-        }
+      p {
+        margin-bottom: 4px;
+      }
     }
 
 
     .feedback-on-feedback {
-        height: 100px;
-        margin-right: 20px;
+      margin-right: $baseline;
+      height: 100px;
     }
 
     .evaluation-response {
-        header {
-            text-align: right;
-            a {
-                font-size: .85em;
-            }
+      header {
+        text-align: right;
+        a {
+          font-size: .85em;
         }
+      }
     }
 
     .evaluation-scoring {
-        .scoring-list {
-            list-style-type: none;
-            margin-left: 3px;
+      .scoring-list {
+        margin-left: 3px;
+        list-style-type: none;
 
-            li {
-                &:first-child {
-                    margin-left: 0px;
-                }
-                display:inline;
-                margin-left: 50px;
+        li {
+          display:inline;
+          margin-left: 50px;
 
-                label {
-                    font-size: .9em;
-                }
+          &:first-child {
+            margin-left: 0px;
+          }
 
-            }
+          label {
+            font-size: .9em;
+          }
         }
-
+      }
     }
+
     .submit-message-container {
-        margin: 10px 0px ;
+      margin: $baseline 0px ;
     }
   }
 
   form.option-input {
-    margin: -10px 0 20px;
-    padding-bottom: 20px;
+    margin: -$baseline/2 0 $baseline;
+    padding-bottom: $baseline;
 
     select {
       margin-right: flex-gutter();
@@ -382,17 +392,17 @@ section.problem {
   }
 
   ul {
-    list-style: disc outside none;
     margin-bottom: lh();
     margin-left: .75em;
     margin-left: .75rem;
+    list-style: disc outside none;
   }
 
   ol {
-    list-style: decimal outside none;
     margin-bottom: lh();
     margin-left: .75em;
     margin-left: .75rem;
+    list-style: decimal outside none;
   }
 
   dl {
@@ -413,8 +423,8 @@ section.problem {
   }
 
   li {
-    line-height: 1.4em;
     margin-bottom: lh(.5);
+    line-height: 1.4em;
 
     &:last-child {
       margin-bottom: 0;
@@ -426,13 +436,28 @@ section.problem {
   }
 
   table {
-    margin-bottom: lh();
+    margin: lh() 0;
     border-collapse: collapse;
     table-layout: auto;
 
+    td, th {
+
+      &.cont-justified-left {
+        text-align: left !important; // nasty, but needed to override the bad specificity of the xmodule css selectors
+      }
+
+      &.cont-justified-right {
+        text-align: right !important; // nasty, but needed to override the bad specificity of the xmodule css selectors
+      }
+
+      &.cont-justified-center {
+        text-align: center !important; // nasty, but needed to override the bad specificity of the xmodule css selectorsstyles
+      }
+    }
+
     th {
-      font-weight: bold;
       text-align: left;
+      font-weight: bold;
     }
 
     td {
@@ -445,44 +470,43 @@ section.problem {
     }
 
     caption {
-      background: #f1f1f1;
       margin-bottom: .75em;
       margin-bottom: .75rem;
       padding: .75em 0;
       padding: .75rem 0;
+      background: #f1f1f1;
     }
 
     tr, td, th {
       vertical-align: middle;
     }
-
   }
 
   code {
     margin: 0 2px;
     padding: 0px 5px;
-    white-space: nowrap;
-    border: 1px solid #EAEAEA;
-    background-color: #F8F8F8;
+    border: 1px solid #eaeaea;
     border-radius: 3px;
+    background-color: #f8f8f8;
+    white-space: nowrap;
     font-size: .9em;
   }
 
   pre {
-    background-color: #F8F8F8;
-    border: 1px solid #CCC;
+    overflow: auto;
+    padding: 6px $baseline/2;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    background-color: #f8f8f8;
     font-size: .9em;
     line-height: 1.4;
-    overflow: auto;
-    padding: 6px 10px;
-    border-radius: 3px;
 
     > code {
       margin: 0;
       padding: 0;
-      white-space: pre;
       border: none;
       background: transparent;
+      white-space: pre;
     }
   }
 
@@ -499,26 +523,25 @@ section.problem {
     }
 
     pre {
-      border-radius: 0;
-      border-radius: 0;
-      border-width: 0;
+      overflow: hidden;
       margin: 0;
       padding: 0;
+      border-width: 0;
+      border-radius: 0;
       background: transparent;
-      font-family: inherit;
-      font-size: inherit;
       white-space: pre;
       word-wrap: normal;
-      overflow: hidden;
+      font-size: inherit;
+      font-family: inherit;
       resize: none;
 
       &.CodeMirror-cursor {
-        z-index: 10;
         position: absolute;
+        z-index: 10;
         visibility: hidden;
-        border-left: 1px solid black;
-        border-right: none;
         width: 0;
+        border-right: none;
+        border-left: 1px solid black;
       }
     }
   }
@@ -528,14 +551,14 @@ section.problem {
   }
 
   hr {
-    background: #ddd;
-    border: none;
-    clear: both;
-    color: #ddd;
     float: none;
-    height: 1px;
+    clear: both;
     margin: 0 0 .75rem;
     width: 100%;
+    height: 1px;
+    border: none;
+    background: #ddd;
+    color: #ddd;
   }
 
   .hidden {
@@ -552,17 +575,17 @@ section.problem {
   center {
     display: block;
     margin: lh() 0;
-    border: 1px solid #ccc;
     padding: lh();
+    border: 1px solid #ccc;
   }
 
   section.action {
-    margin-top: 20px;
+    margin-top: $baseline;
 
-    .save, .check, .show {
+    .save, .check, .show, .reset {
       height: ($baseline*2);
-      font-weight: 600;
       vertical-align: middle;
+      font-weight: 600;
     }
 
     .save {
@@ -572,8 +595,8 @@ section.problem {
     .show {
 
       .show-label {
-        font-size: 1.0em;
         font-weight: 600;
+        font-size: 1.0em;
       }
     }
 
@@ -584,20 +607,20 @@ section.problem {
       // padding: 8px 12px;
       // margin-top: 10px;
       @include inline-block;
-      font-style: italic;
-      margin: 8px 0 0 10px;
+      margin: 8px 0 0 $baseline/2;
       color: #777;
+      font-style: italic;
       -webkit-font-smoothing: antialiased;
     }
   }
 
   .detailed-solution {
     > p:first-child {
-      font-size: 0.9em;
+      color: #aaa;
+      text-transform: uppercase;
       font-weight: bold;
       font-style: normal;
-      text-transform: uppercase;
-      color: #AAA;
+      font-size: 0.9em;
     }
 
     p:last-child {
@@ -606,12 +629,12 @@ section.problem {
   }
 
   div.capa_alert {
+    margin-top: $baseline;
     padding: 8px 12px;
-    border: 1px solid #EBE8BF;
+    border: 1px solid #ebe8bf;
     border-radius: 3px;
-    background: #FFFCDD;
+    background: #fffcdd;
     font-size: 0.9em;
-    margin-top: 10px;
   }
 
   div.capa_reset {
@@ -620,12 +643,14 @@ section.problem {
     background-color: lighten($error-red, 25%);
     border-radius: 3px;
     font-size: 1em;
-    margin-top: 10px;
-    margin-bottom: 10px;
+    margin-top: $baseline/2;
+    margin-bottom: $baseline/2;
   }
+
   .capa_reset>h2 {
-    color: #AA0000;
+    color: #aa0000;
   }
+
   .capa_reset li {
     font-size: 0.9em;
   }
@@ -634,10 +659,10 @@ section.problem {
     border: 1px solid #ccc;
 
     h3 {
-      border-bottom: 1px solid #e3e3e3;
-      text-shadow: 0 1px 0 #fff;
       padding: 9px;
+      border-bottom: 1px solid #e3e3e3;
       background: #eee;
+      text-shadow: 0 1px 0 #fff;
       font-weight: bold;
       font-size: em(16);
     }
@@ -657,7 +682,7 @@ section.problem {
         a {
           display: block;
           padding: 9px;
-          background: #F6F6F6;
+          background: #f6f6f6;
           box-shadow: inset 0 0 0 1px #fff;
         }
       }
@@ -675,22 +700,22 @@ section.problem {
       margin-bottom: 12px;
 
       h3 {
-        font-size: 0.9em;
+        color: #aaa;
+        text-transform: uppercase;
         font-weight: bold;
         font-style: normal;
-        text-transform: uppercase;
-        color: #AAA;
+        font-size: 0.9em;
       }
     }
 
     > section {
-      border: 1px solid #ddd;
-      padding: 9px 9px 20px;
-      margin-bottom: 10px;
-      background: #FFF;
       position: relative;
-      box-shadow: inset 0 0 0 1px #eee;
+      margin-bottom: $baseline/2;
+      padding: 9px 9px $baseline;
+      border: 1px solid #ddd;
       border-radius: 3px;
+      background: #fff;
+      box-shadow: inset 0 0 0 1px #eee;
 
       p:last-of-type {
         margin-bottom: 0;
@@ -701,28 +726,32 @@ section.problem {
       }
 
       a.full {
-        @include position(absolute,  0 0 1px 0px);
-        font-size: .8em;
-        padding: 4px;
-        text-align: right;
-        width: 100%;
-        display: block;
-        background: #F3F3F3;
+        @include position(absolute, 0 0px 1px 0px);
         @include box-sizing(border-box);
+        display: block;
+        padding: 4px;
+        background: #f3f3f3;
+        text-align: right;
+        font-size: 1em;
+
+        &.full-top{
+          @include position(absolute, 1px 0px auto 0px);
+        }
       }
     }
   }
 
   .external-grader-message {
     section {
-      padding-left: 20px;
-      background-color: #FAFAFA;
-      color: #2C2C2C;
-      font-family: monospace;
+      padding-top: ($baseline*1.5);
+      padding-left: $baseline;
+      background-color: #fafafa;
+      color: #2c2c2c;
       font-size: 1em;
-      padding-top: 10px;
+      font-family: monospace;
+
       header {
-          font-size: 1.4em;
+        font-size: 1.4em;
       }
 
       .shortform {
@@ -730,35 +759,36 @@ section.problem {
       }
 
       .longform {
-        padding: 0px;
-        margin: 0px;
+        margin: 0;
+        padding: 0;
 
         .result-errors {
-          margin: 5px;
-          padding: 10px 10px 10px 40px;
+          margin: $baseline/4;
+          padding: $baseline/2 $baseline/2 $baseline/2 $baseline*2;
           background: url('../images/incorrect-icon.png') center left no-repeat;
+
           li {
-            color: #B00;
-            }
+            color: #b00;
+          }
         }
 
         .result-output {
-          margin: 5px;
-          padding: 20px 0px 15px 50px;
-          border-top: 1px solid #DDD;
-          border-left: 20px solid #FAFAFA;
+          margin: $baseline/4;
+          padding: $baseline 0 15px 50px;
+          border-top: 1px solid #ddd;
+          border-left: $baseline solid #fafafa;
 
           h4 {
-            font-family: monospace;
             font-size: 1em;
+            font-family: monospace;
           }
 
           dl {
-            margin: 0px;
+            margin: 0;
           }
 
           dt {
-            margin-top: 20px;
+            margin-top: $baseline;
           }
 
           dd {
@@ -768,6 +798,7 @@ section.problem {
 
         .result-correct {
           background: url('../images/correct-icon.png') left 20px no-repeat;
+
           .result-actual-output {
             color: #090;
           }
@@ -775,6 +806,7 @@ section.problem {
 
         .result-incorrect {
           background: url('../images/incorrect-icon.png') left 20px no-repeat;
+
           .result-actual-output {
             color: #B00;
           }
@@ -782,16 +814,16 @@ section.problem {
 
         .markup-text{
           margin: 5px;
-          padding: 20px 0px 15px 50px;
-          border-top: 1px solid #DDD;
-          border-left: 20px solid #FAFAFA;
+          padding: $baseline 0 15px 50px;
+          border-top: 1px solid #ddd;
+          border-left: 20px solid #fafafa;
 
           bs {
-            color: #BB0000;
+            color: #bb0000;
           }
 
           bg {
-            color: #BDA046;
+            color: #bda046;
           }
         }
       }
@@ -799,96 +831,111 @@ section.problem {
   }
 
   .rubric {
-      tr {
-          margin:10px 0px;
-          height: 100%;
-      }
-      td {
-          padding: 20px 0px;
-          margin: 10px 0px;
-          height: 100%;
-      }
-      th {
-          padding: 5px;
-          margin: 5px;
-      }
-      label,
-      .view-only {
-          margin:3px;
-          position: relative;
-          padding: 15px;
-          width: 150px;
-          height:100%;
-          display: inline-block;
-          min-height: 50px;
-          min-width: 50px;
-          background-color: #CCC;
-          font-size: .9em;
-      }
-      .grade {
-        position: absolute;
-        bottom:0px;
-        right:0px;
-        margin:10px;
-      }
-      .selected-grade {
-        background: #666;
-        color: white;
-      }
-      input[type=radio]:checked + label {
-        background: #666;
-        color: white; }
-      input[class='score-selection'] {
-        display: none;
-      }
+    tr {
+      margin: $baseline/2 0;
+      height: 100%;
+    }
+
+    td {
+      margin: $baseline/2 0;
+      padding: $baseline 0;
+      height: 100%;
+    }
+
+    th {
+      margin: $baseline/4;
+      padding: $baseline/4;
+    }
+
+    label,
+    .view-only {
+      position: relative;
+      display: inline-block;
+      margin: 3px;
+      padding: 15px;
+      min-width: 50px;
+      min-height: 50px;
+      width: 150px;
+      height: 100%;
+      background-color: #ccc;
+      font-size: .9em;
+    }
+
+    .grade {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      margin: $baseline/2;
+    }
+
+    .selected-grade {
+      background: #666;
+      color: white;
+    }
+
+    input[type=radio]:checked + label {
+      background: #666;
+      color: white;
+    }
+
+    input[class='score-selection'] {
+      display: none;
+    }
   }
 
   .annotation-input {
     $yellow: rgba(255,255,10,0.3);
-
+    margin: 0 0 1em 0;
     border: 1px solid #ccc;
     border-radius: 1em;
-    margin: 0 0 1em 0;
 
     .annotation-header {
-      font-weight: bold;
-      border-bottom: 1px solid #ccc;
       padding: .5em 1em;
+      border-bottom: 1px solid #ccc;
+      font-weight: bold;
     }
+
     .annotation-body { padding: .5em 1em; }
+
     a.annotation-return {
       float: right;
       font: inherit;
       font-weight: normal;
     }
+
     a.annotation-return:after { content: " \2191" }
 
     .block, ul.tags {
       margin: .5em 0;
       padding: 0;
     }
+
     .block-highlight {
       padding: .5em;
+      border: 1px solid darken($yellow, 10%);
+      background-color: $yellow;
       color:  #333;
       font-style: normal;
-      background-color: $yellow;
-      border: 1px solid darken($yellow, 10%);
     }
+
     .block-comment { font-style: italic; }
 
     ul.tags {
       display: block;
-      list-style-type: none;
       margin-left: 1em;
+      list-style-type: none;
+
       li {
+        position: relative;
         display: block;
         margin: 1em 0 0 0;
-        position: relative;
+
         .tag {
           display: inline-block;
-          cursor: pointer;
+          margin-left: $baseline*2;
           border: 1px solid rgb(102,102,102);
-          margin-left: 40px;
+          cursor: pointer;
+
           &.selected {
             background-color: $yellow;
           }
@@ -900,33 +947,69 @@ section.problem {
         .tag-status, .tag { padding: .25em .5em; }
       }
     }
+
     textarea.comment {
       $num-lines-to-show: 5;
       $line-height: 1.4em;
       $padding: .2em;
-      width: 100%;
       padding: $padding (2 * $padding);
-      line-height: $line-height;
+      width: 100%;
       height: ($num-lines-to-show * $line-height) + (2*$padding) - (($line-height - 1)/2);
+      line-height: $line-height;
     }
+
     .answer-annotation { display: block; margin: 0; }
 
     /* for debugging the input value field. enable the debug flag on the inputtype */
     .debug-value {
-        color: #fff;
-        padding: 1em;
-        margin: 1em 0;
-        background-color: #999;
-        border: 1px solid #000;
-        input[type="text"] { width: 100%; }
-        pre { background-color: #CCC; color: #000; }
-        &:before {
-          display: block;
-          content: "debug input value";
-          text-transform: uppercase;
-          font-weight: bold;
-          font-size: 1.5em;
-        }
+      margin: 1em 0;
+      padding: 1em;
+      border: 1px solid #000;
+      background-color: #999;
+      color: #fff;
+
+      input[type="text"] { width: 100%; }
+
+      pre { background-color: #CCC; color: #000; }
+
+      &:before {
+        display: block;
+        content: "debug input value";
+        text-transform: uppercase;
+        font-weight: bold;
+        font-size: 1.5em;
+      }
+    }
+  }
+
+  .choicetextgroup{
+    @extend .choicegroup;
+
+    input[type="text"]{
+      margin-bottom: 0.5em;
+    }
+
+    label.choicetextgroup_correct, section.choicetextgroup_correct {
+      @extend label.choicegroup_correct;
+
+      input[type="text"] {
+        border-color: green;
+      }
+    }
+
+    label.choicetextgroup_incorrect, section.choicetextgroup_incorrect {
+      @extend label.choicegroup_incorrect;
+    }
+
+    label.choicetextgroup_show_correct, section.choicetextgroup_show_correct {
+      &:after {
+        margin-left:15px;
+        content: url('../images/correct-icon.png');
+      }
+    }
+
+    span.mock_label {
+      cursor : default;
     }
   }
 }

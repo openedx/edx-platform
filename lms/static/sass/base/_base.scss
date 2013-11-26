@@ -66,7 +66,7 @@ p {
     text-decoration: none;
     @include transition(all 0.1s linear 0s);
 
-    &:hover {
+    &:hover, &:focus {
       color: $link-color;
       text-decoration: underline;
     }
@@ -79,8 +79,14 @@ a:link, a:visited {
   text-decoration: none;
   @include transition(all 0.1s linear 0s);
 
-  &:hover {
+  &:hover, &:focus {
     text-decoration: underline;
+  }
+
+  &:disabled, &.is-disabled, &.disabled {
+    pointer-events: none;
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 }
 
@@ -217,7 +223,7 @@ mark {
 }
 
 .sr {
-  @extend .text-sr;
+  @extend %text-sr;
 }
 
 .help-tab {
@@ -240,7 +246,7 @@ mark {
     padding: 6px 22px 11px;
     display: inline-block;
 
-    &:hover {
+    &:hover, &:focus {
       color: #fff;
       background: #1D9DD9;
     }
@@ -269,7 +275,7 @@ mark {
       border-radius: 0px 0px 10px 10px;
     }
 
-    &:hover {
+    &:hover, &:focus {
       color: #fff;
       background: #1D9DD9;
     }
@@ -278,4 +284,24 @@ mark {
 
 #feedback_form textarea[name="details"] {
   height: 150px;
+}
+
+// ui - skipnav
+.nav-skip {
+  display: block;
+  position: absolute;
+  left: 0px;
+  top:- ($baseline*30);
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  background: $white;
+  border-bottom: 1px solid $border-color-4;
+  padding: ($baseline*0.75) ($baseline/2);
+
+  &:focus, &:active {
+    position: static;
+    width: auto;
+    height: auto;
+  }
 }

@@ -1,23 +1,27 @@
-<section id="self_assessment_${id}" class="open-ended-child" data-ajax-url="${ajax_url}"
+<%! from django.utils.translation import ugettext as _ %>
+<section id="self_assessment_${module_id}" class="open-ended-child" data-ajax-url="${ajax_url}"
          data-id="${id}" data-state="${state}" data-allow_reset="${allow_reset}" data-child-type="${child_type}">
     <div class="error"></div>
     <div class="prompt">
     ${prompt}
     </div>
-
-    <h4>Response</h4>
-    <div>
-    <textarea name="answer" class="answer short-form-response" cols="70" rows="20">${previous_answer|n}</textarea>
+    <div class="visibility-control visibility-control-response">
+        <div class="inner">
+        </div>
+        <label class="section-header section-header-response" for="answer_${module_id}">Response</label>
     </div>
+    <div>
+    <textarea name="answer" class="answer short-form-response" cols="70" rows="20" id="answer_${module_id}">${previous_answer|n}</textarea>
 
-    <div class="open-ended-action"></div>
+    <div class="message-wrapper"></div>
+    <div class="grader-status"></div>
 
     <div class="rubric-wrapper">${initial_rubric}</div>
 
-    <div class="hint-wrapper"></div>
-
-    <div class="message-wrapper"></div>
-
     <div class="file-upload"></div>
-    <input type="button" value="Submit" class="submit-button" name="show"/>
+    <input type="button" value="${_('Save')}" class="save-button" name="save"/>
+    <input type="button" value="${_('Submit')}" class="submit-button" name="show"/>
+
+    <div class="open-ended-action"></div>
+    <span id="answer_${id}"></span>
 </section>

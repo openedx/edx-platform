@@ -19,6 +19,8 @@ def find_full_path(path_to_file):
 def main(argv):
     parser = argparse.ArgumentParser(description="Run just one test")
     parser.add_argument('--nocapture', '-s', action='store_true', help="Don't capture stdout (any stdout output will be printed immediately)")
+    parser.add_argument('--pdb', action='store_true', help="Use pdb for test errors")
+    parser.add_argument('--pdb-fail', action='store_true', help="Use pdb for test failures")
     parser.add_argument('words', metavar="WORDS", nargs='+', help="The description of a test failure, like 'ERROR: test_set_missing_field (courseware.tests.test_model_data.TestStudentModuleStorage)'")
 
     args = parser.parse_args(argv)
@@ -41,20 +43,24 @@ def main(argv):
     test_py_path = find_full_path(test_py_path)
     test_spec = "%s:%s.%s" % (test_py_path, test_class, test_method)
 
-    settings = None
+    system = None
     if test_py_path.startswith('cms'):
-        settings = 'cms.envs.test'
+        system = 'cms'
     elif test_py_path.startswith('lms'):
-        settings = 'lms.envs.test'
+        system = 'lms'
 
-    if settings:
+    if system:
         # Run as a django test suite
         from django.core import management
 
-        django_args = ["django-admin.py", "test", "--pythonpath=."]
-        django_args.append("--settings=%s" % settings)
+        os.environ['DJANGO_SETTINGS_MODULE'] = system + '.envs.test'
+        django_args = ["./manage.py", "test"]
         if args.nocapture:
             django_args.append("-s")
+        if args.pdb:
+            django_args.append("--pdb")
+        if args.pdb_fail:
+            django_args.append("--pdb-fail")
         django_args.append(test_spec)
 
         print " ".join(django_args)

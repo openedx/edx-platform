@@ -93,7 +93,7 @@ class Migration(SchemaMigration):
         'student.testcenterregistration': {
             'Meta': {'object_name': 'TestCenterRegistration'},
             'accommodation_code': ('django.db.models.fields.CharField', [], {'max_length': '64', 'blank': 'True'}),
-            'accommodation_request': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '1024', 'blank': 'True'}),
+            'accommodation_request': ('django.db.models.fields.CharField', [], {'db_index': 'False', 'max_length': '1024', 'blank': 'True'}),
             'authorization_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'db_index': 'True'}),
             'client_authorization_id': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '20', 'db_index': 'True'}),
             'confirmed_at': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'db_index': 'True'}),

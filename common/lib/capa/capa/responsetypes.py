@@ -17,6 +17,7 @@ import logging
 import numbers
 import numpy
 import os
+from pyparsing import ParseException
 import sys
 import random
 import re
@@ -33,17 +34,18 @@ from shapely.geometry import Point, MultiPoint
 from calc import evaluator, UndefinedVariable
 from . import correctmap
 from datetime import datetime
-from .util import *
+from pytz import UTC
+from .util import compare_with_tolerance, contextualize_text, convert_files_to_filenames, is_list_of_files, find_with_default
 from lxml import etree
 from lxml.html.soupparser import fromstring as fromstring_bs     # uses Beautiful Soup!!! FIXME?
 import capa.xqueue_interface as xqueue_interface
 
-import safe_exec
+import capa.safe_exec as safe_exec
 
 log = logging.getLogger(__name__)
 
 
-CorrectMap = correctmap.CorrectMap
+CorrectMap = correctmap.CorrectMap  # pylint: disable=C0103
 CORRECTMAP_PY = None
 
 
@@ -653,6 +655,7 @@ class ChoiceResponse(LoncapaResponse):
     response_tag = 'choiceresponse'
     max_inputfields = 1
     allowed_inputfields = ['checkboxgroup', 'radiogroup']
+    correct_choices = None
 
     def setup_response(self):
 
@@ -704,6 +707,7 @@ class MultipleChoiceResponse(LoncapaResponse):
     response_tag = 'multiplechoiceresponse'
     max_inputfields = 1
     allowed_inputfields = ['choicegroup']
+    correct_choices = None
 
     def setup_response(self):
         # call secondary setup for MultipleChoice questions, to set name
@@ -789,6 +793,7 @@ class OptionResponse(LoncapaResponse):
     response_tag = 'optionresponse'
     hint_tag = 'optionhint'
     allowed_inputfields = ['optioninput']
+    answer_fields = None
 
     def setup_response(self):
         self.answer_fields = self.inputfields
@@ -821,60 +826,118 @@ class NumericalResponse(LoncapaResponse):
 
     response_tag = 'numericalresponse'
     hint_tag = 'numericalhint'
-    allowed_inputfields = ['textline']
+    allowed_inputfields = ['textline', 'formulaequationinput']
     required_attributes = ['answer']
     max_inputfields = 1
+
+    def __init__(self, *args, **kwargs):
+        self.correct_answer = ''
+        self.tolerance = '0'  # Default value
+        super(NumericalResponse, self).__init__(*args, **kwargs)
 
     def setup_response(self):
         xml = self.xml
         context = self.context
         self.correct_answer = contextualize_text(xml.get('answer'), context)
+
+        # Find the tolerance
+        tolerance_xml = xml.xpath(
+            '//*[@id=$id]//responseparam[@type="tolerance"]/@default',
+            id=xml.get('id')
+        )
+        if tolerance_xml:  # If it isn't an empty list...
+            self.tolerance = contextualize_text(tolerance_xml[0], context)
+
+    def get_staff_ans(self):
+        """
+        Given the staff answer as a string, find its float value.
+
+        Use `evaluator` for this, but for backward compatability, try the
+        built-in method `complex` (which used to be the standard).
+        """
+
         try:
-            self.tolerance_xml = xml.xpath(
-                '//*[@id=$id]//responseparam[@type="tolerance"]/@default',
-                id=xml.get('id'))[0]
-            self.tolerance = contextualize_text(self.tolerance_xml, context)
-        except IndexError:  # xpath found an empty list, so (...)[0] is the error
-            self.tolerance = '0'
-        try:
-            self.answer_id = xml.xpath('//*[@id=$id]//textline/@id',
-                                       id=xml.get('id'))[0]
-        except IndexError:  # Same as above
-            self.answer_id = None
+            correct_ans = complex(self.correct_answer)
+        except ValueError:
+            # When `correct_answer` is not of the form X+Yj, it raises a
+            # `ValueError`. Then test if instead it is a math expression.
+            # `complex` seems to only generate `ValueErrors`, only catch these.
+            try:
+                correct_ans = evaluator({}, {}, self.correct_answer)
+            except Exception:
+                log.debug("Content error--answer '%s' is not a valid number", self.correct_answer)
+                raise StudentInputError(
+                    "There was a problem with the staff answer to this problem"
+                )
+
+        return correct_ans
 
     def get_score(self, student_answers):
         '''Grade a numeric response '''
         student_answer = student_answers[self.answer_id]
 
+        correct_float = self.get_staff_ans()
+
+        general_exception = StudentInputError(
+            u"Could not interpret '{0}' as a number".format(cgi.escape(student_answer))
+        )
+
+        # Begin `evaluator` block
+        # Catch a bunch of exceptions and give nicer messages to the student.
         try:
-            correct_ans = complex(self.correct_answer)
-        except ValueError:
-            log.debug("Content error--answer '{0}' is not a valid complex number".format(
-                self.correct_answer))
+            student_float = evaluator({}, {}, student_answer)
+        except UndefinedVariable as undef_var:
             raise StudentInputError(
-                "There was a problem with the staff answer to this problem")
+                u"You may not use variables ({0}) in numerical problems".format(undef_var.message)
+            )
+        except ValueError as val_err:
+            if 'factorial' in val_err.message:
+                # This is thrown when fact() or factorial() is used in an answer
+                #   that evaluates on negative and/or non-integer inputs
+                # ve.message will be: `factorial() only accepts integral values` or
+                # `factorial() not defined for negative values`
+                raise StudentInputError(
+                    ("factorial function evaluated outside its domain:"
+                     "'{0}'").format(cgi.escape(student_answer))
+                )
+            else:
+                raise general_exception
+        except ParseException:
+            raise StudentInputError(
+                u"Invalid math syntax: '{0}'".format(cgi.escape(student_answer))
+            )
+        except Exception:
+            raise general_exception
+        # End `evaluator` block -- we figured out the student's answer!
 
-        try:
-            correct = compare_with_tolerance(
-                evaluator(dict(), dict(), student_answer),
-                correct_ans, self.tolerance)
-        # We should catch this explicitly.
-        # I think this is just pyparsing.ParseException, calc.UndefinedVariable:
-        # But we'd need to confirm
-        except:
-            # Use the traceback-preserving version of re-raising with a
-            # different type
-            type, value, traceback = sys.exc_info()
-
-            raise StudentInputError, ("Could not interpret '%s' as a number" %
-                                      cgi.escape(student_answer)), traceback
-
+        correct = compare_with_tolerance(
+            student_float, correct_float, self.tolerance
+        )
         if correct:
             return CorrectMap(self.answer_id, 'correct')
         else:
             return CorrectMap(self.answer_id, 'incorrect')
 
-    # TODO: add check_hint_condition(self, hxml_set, student_answers)
+    def compare_answer(self, ans1, ans2):
+        """
+        Outside-facing function that lets us compare two numerical answers,
+        with this problem's tolerance.
+        """
+        return compare_with_tolerance(
+            evaluator({}, {}, ans1),
+            evaluator({}, {}, ans2),
+            self.tolerance
+        )
+
+    def validate_answer(self, answer):
+        """
+        Returns whether this answer is in a valid form.
+        """
+        try:
+            evaluator(dict(), dict(), answer)
+            return True
+        except (StudentInputError, UndefinedVariable):
+            return False
 
     def get_answers(self):
         return {self.answer_id: self.correct_answer}
@@ -883,16 +946,34 @@ class NumericalResponse(LoncapaResponse):
 
 
 class StringResponse(LoncapaResponse):
+    '''
+    This response type allows one or more answers. Use `_or_` separator to set
+    more than 1 answer.
 
+    Example:
+
+        # One answer
+        <stringresponse answer="Michigan">
+          <textline size="20" />
+        </stringresponse >
+
+        # Multiple answers
+        <stringresponse answer="Martin Luther King_or_Dr. Martin Luther King Jr.">
+          <textline size="20" />
+        </stringresponse >
+
+    '''
     response_tag = 'stringresponse'
     hint_tag = 'stringhint'
     allowed_inputfields = ['textline']
     required_attributes = ['answer']
     max_inputfields = 1
+    correct_answer = []
+    SEPARATOR = '_or_'
 
     def setup_response(self):
-        self.correct_answer = contextualize_text(
-            self.xml.get('answer'), self.context).strip()
+        self.correct_answer = [contextualize_text(answer, self.context).strip()
+            for answer in self.xml.get('answer').split(self.SEPARATOR)]
 
     def get_score(self, student_answers):
         '''Grade a string response '''
@@ -902,23 +983,25 @@ class StringResponse(LoncapaResponse):
 
     def check_string(self, expected, given):
         if self.xml.get('type') == 'ci':
-            return given.lower() == expected.lower()
-        return given == expected
+            return given.lower() in [i.lower() for i in expected]
+        return given in expected
 
     def check_hint_condition(self, hxml_set, student_answers):
         given = student_answers[self.answer_id].strip()
         hints_to_show = []
         for hxml in hxml_set:
             name = hxml.get('name')
-            correct_answer = contextualize_text(
-                hxml.get('answer'), self.context).strip()
+
+            correct_answer = [contextualize_text(answer, self.context).strip()
+            for answer in hxml.get('answer').split(self.SEPARATOR)]
+
             if self.check_string(correct_answer, given):
                 hints_to_show.append(name)
-        log.debug('hints_to_show = %s' % hints_to_show)
+        log.debug('hints_to_show = %s', hints_to_show)
         return hints_to_show
 
     def get_answers(self):
-        return {self.answer_id: self.correct_answer}
+        return {self.answer_id: ' <b>or</b> '.join(self.correct_answer)}
 
 #-----------------------------------------------------------------------------
 
@@ -935,7 +1018,9 @@ class CustomResponse(LoncapaResponse):
                            'chemicalequationinput', 'vsepr_input',
                            'drag_and_drop_input', 'editamoleculeinput',
                            'designprotein2dinput', 'editageneinput',
-                           'annotationinput', 'jsinput']
+                           'annotationinput', 'jsinput', 'formulaequationinput']
+    code = None
+    expect = None
 
     def setup_response(self):
         xml = self.xml
@@ -944,7 +1029,7 @@ class CustomResponse(LoncapaResponse):
         # that
         self.expect = xml.get('expect') or xml.get('answer')
 
-        log.debug('answer_ids=%s' % self.answer_ids)
+        log.debug('answer_ids=%s', self.answer_ids)
 
         # the <answer>...</answer> stanza should be local to the current <customresponse>.
         # So try looking there first.
@@ -960,7 +1045,7 @@ class CustomResponse(LoncapaResponse):
             # <script>...</script> stanza instead
             cfn = xml.get('cfn')
             if cfn:
-                log.debug("cfn = %s" % cfn)
+                log.debug("cfn = %s", cfn)
 
                 # This is a bit twisty.  We used to grab the cfn function from
                 # the context, but now that we sandbox Python execution, we
@@ -995,7 +1080,7 @@ class CustomResponse(LoncapaResponse):
         if not self.code:
             if answer is None:
                 log.error("[courseware.capa.responsetypes.customresponse] missing"
-                          " code checking script! id=%s" % self.id)
+                          " code checking script! id=%s", self.id)
                 self.code = ''
             else:
                 answer_src = answer.get('src')
@@ -1011,7 +1096,7 @@ class CustomResponse(LoncapaResponse):
         of each key removed (the string before the first "_").
         '''
 
-        log.debug('%s: student_answers=%s' % (unicode(self), student_answers))
+        log.debug('%s: student_answers=%s', unicode(self), student_answers)
 
         # ordered list of answer id's
         idset = sorted(self.answer_ids)
@@ -1121,11 +1206,11 @@ class CustomResponse(LoncapaResponse):
             fn = self.code
             answer_given = submission[0] if (len(idset) == 1) else submission
             kwnames = self.xml.get("cfn_extra_args", "").split()
-            kwargs = {n:self.context.get(n) for n in kwnames}
-            log.debug(" submission = %s" % submission)
+            kwargs = {n: self.context.get(n) for n in kwnames}
+            log.debug(" submission = %s", submission)
             try:
                 ret = fn(self.expect, answer_given, **kwargs)
-            except Exception as err:
+            except Exception as err:  # pylint: disable=broad-except
                 self._handle_exec_exception(err)
             log.debug(
                 "[courseware.capa.responsetypes.customresponse.get_score] ret = %s",
@@ -1244,7 +1329,7 @@ class CustomResponse(LoncapaResponse):
 
         # Notify student with a student input error
         _, _, traceback_obj = sys.exc_info()
-        raise ResponseError, err.message, traceback_obj
+        raise ResponseError(err.message, traceback_obj)
 
 #-----------------------------------------------------------------------------
 
@@ -1280,22 +1365,21 @@ class SymbolicResponse(CustomResponse):
                 debug=self.context.get('debug'),
             )
         except Exception as err:
-            log.error("oops in symbolicresponse (cfn) error %s" % err)
+            log.error("oops in symbolicresponse (cfn) error %s", err)
             log.error(traceback.format_exc())
-            raise Exception("oops in symbolicresponse (cfn) error %s" % err)
+            raise Exception("oops in symbolicresponse (cfn) error %s", err)
         self.context['messages'][0] = self.clean_message_html(ret['msg'])
         self.context['correct'] = ['correct' if ret['ok'] else 'incorrect'] * len(idset)
 
 #-----------------------------------------------------------------------------
 
-"""
-valid:       Flag indicating valid score_msg format (Boolean)
-correct:     Correctness of submission (Boolean)
-score:       Points to be assigned (numeric, can be float)
-msg:         Message from grader to display to student (string)
-"""
-ScoreMessage = namedtuple('ScoreMessage',
-                          ['valid', 'correct', 'points', 'msg'])
+## ScoreMessage named tuple ##
+## valid:       Flag indicating valid score_msg format (Boolean)
+## correct:     Correctness of submission (Boolean)
+## score:       Points to be assigned (numeric, can be float)
+## msg:         Message from grader to display to student (string)
+
+ScoreMessage = namedtuple('ScoreMessage', ['valid', 'correct', 'points', 'msg'])  # pylint: disable=invalid-name
 
 
 class CodeResponse(LoncapaResponse):
@@ -1317,6 +1401,11 @@ class CodeResponse(LoncapaResponse):
     response_tag = 'coderesponse'
     allowed_inputfields = ['textbox', 'filesubmission', 'matlabinput']
     max_inputfields = 1
+    payload = None
+    initial_display = None
+    url = None
+    answer = None
+    queue_name = None
 
     def setup_response(self):
         '''
@@ -1365,9 +1454,11 @@ class CodeResponse(LoncapaResponse):
             # Note that submission can be a file
             submission = student_answers[self.answer_id]
         except Exception as err:
-            log.error('Error in CodeResponse %s: cannot get student answer for %s;'
-                      ' student_answers=%s' %
-                     (err, self.answer_id, convert_files_to_filenames(student_answers)))
+            log.error(
+                'Error in CodeResponse %s: cannot get student answer for %s;'
+                ' student_answers=%s',
+                err, self.answer_id, convert_files_to_filenames(student_answers)
+            )
             raise Exception(err)
 
         # We do not support xqueue within Studio.
@@ -1381,19 +1472,20 @@ class CodeResponse(LoncapaResponse):
         #------------------------------------------------------------
 
         qinterface = self.system.xqueue['interface']
-        qtime = datetime.strftime(datetime.now(), xqueue_interface.dateformat)
+        qtime = datetime.strftime(datetime.now(UTC), xqueue_interface.dateformat)
 
         anonymous_student_id = self.system.anonymous_student_id
 
         # Generate header
-        queuekey = xqueue_interface.make_hashkey(str(self.system.seed) + qtime +
-                                                 anonymous_student_id +
-                                                 self.answer_id)
+        queuekey = xqueue_interface.make_hashkey(
+            str(self.system.seed) + qtime + anonymous_student_id + self.answer_id
+        )
         callback_url = self.system.xqueue['construct_callback']()
         xheader = xqueue_interface.make_xheader(
             lms_callback_url=callback_url,
             lms_key=queuekey,
-            queue_name=self.queue_name)
+            queue_name=self.queue_name
+        )
 
         # Generate body
         if is_list_of_files(submission):
@@ -1406,9 +1498,10 @@ class CodeResponse(LoncapaResponse):
 
         # Metadata related to the student submission revealed to the external
         # grader
-        student_info = {'anonymous_student_id': anonymous_student_id,
-                        'submission_time': qtime,
-                        }
+        student_info = {
+            'anonymous_student_id': anonymous_student_id,
+            'submission_time': qtime,
+        }
         contents.update({'student_info': json.dumps(student_info)})
 
         # Submit request. When successful, 'msg' is the prior length of the
@@ -1447,9 +1540,8 @@ class CodeResponse(LoncapaResponse):
         return cmap
 
     def update_score(self, score_msg, oldcmap, queuekey):
-
-        (valid_score_msg, correct, points,
-         msg) = self._parse_score_msg(score_msg)
+        """Updates the user's score based on the returned message from the grader."""
+        (valid_score_msg, correct, points, msg) = self._parse_score_msg(score_msg)
         if not valid_score_msg:
             oldcmap.set(self.answer_id,
                         msg='Invalid grader reply. Please contact the course staff.')
@@ -1472,8 +1564,11 @@ class CodeResponse(LoncapaResponse):
                 self.answer_id, npoints=points, correctness=correctness,
                 msg=msg.replace('&nbsp;', '&#160;'), queuestate=None)
         else:
-            log.debug('CodeResponse: queuekey %s does not match for answer_id=%s.' %
-                      (queuekey, self.answer_id))
+            log.debug(
+                'CodeResponse: queuekey %s does not match for answer_id=%s.',
+                queuekey,
+                self.answer_id
+            )
 
         return oldcmap
 
@@ -1482,6 +1577,10 @@ class CodeResponse(LoncapaResponse):
         return {self.answer_id: anshtml}
 
     def get_initial_display(self):
+        """
+        The course author can specify an initial display
+        to be displayed the code response box.
+        """
         return {self.answer_id: self.initial_display}
 
     def _parse_score_msg(self, score_msg):
@@ -1502,11 +1601,11 @@ class CodeResponse(LoncapaResponse):
             score_result = json.loads(score_msg)
         except (TypeError, ValueError):
             log.error("External grader message should be a JSON-serialized dict."
-                      " Received score_msg = %s" % score_msg)
+                      " Received score_msg = %s", score_msg)
             return fail
         if not isinstance(score_result, dict):
             log.error("External grader message should be a JSON-serialized dict."
-                      " Received score_result = %s" % score_result)
+                      " Received score_result = %s", score_result)
             return fail
         for tag in ['correct', 'score', 'msg']:
             if tag not in score_result:
@@ -1521,9 +1620,9 @@ class CodeResponse(LoncapaResponse):
         msg = score_result['msg']
         try:
             etree.fromstring(msg)
-        except etree.XMLSyntaxError as err:
+        except etree.XMLSyntaxError as _err:
             log.error("Unable to parse external grader message as valid"
-                      " XML: score_msg['msg']=%s" % msg)
+                      " XML: score_msg['msg']=%s", msg)
             return fail
 
         return (True, score_result['correct'], score_result['score'], msg)
@@ -1533,15 +1632,25 @@ class CodeResponse(LoncapaResponse):
 
 
 class ExternalResponse(LoncapaResponse):
-    '''
+    """
     Grade the students input using an external server.
 
     Typically used by coding problems.
 
-    '''
+    """
 
     response_tag = 'externalresponse'
     allowed_inputfields = ['textline', 'textbox']
+    awdmap = {
+        'EXACT_ANS': 'correct',         # TODO: handle other loncapa responses
+        'WRONG_FORMAT': 'incorrect',
+    }
+
+    def __init__(self, *args, **kwargs):
+        self.url = ''
+        self.tests = []
+        self.code = ''
+        super(ExternalResponse, self).__init__(*args, **kwargs)
 
     def setup_response(self):
         xml = self.xml
@@ -1569,45 +1678,44 @@ class ExternalResponse(LoncapaResponse):
         self.tests = xml.get('tests')
 
     def do_external_request(self, cmd, extra_payload):
-        '''
+        """
         Perform HTTP request / post to external server.
 
         cmd = remote command to perform (str)
         extra_payload = dict of extra stuff to post.
 
         Return XML tree of response (from response body)
-        '''
+        """
         xmlstr = etree.tostring(self.xml, pretty_print=True)
-        payload = {'xml': xmlstr,
-                   'edX_cmd': cmd,
-                   'edX_tests': self.tests,
-                   'processor': self.code,
-                   }
+        payload = {
+            'xml': xmlstr,
+            'edX_cmd': cmd,
+            'edX_tests': self.tests,
+            'processor': self.code,
+        }
         payload.update(extra_payload)
 
         try:
             # call external server. TODO: synchronous call, can block for a
             # long time
-            r = requests.post(self.url, data=payload)
+            req = requests.post(self.url, data=payload)
         except Exception as err:
-            msg = 'Error %s - cannot connect to external server url=%s' % (
-                err, self.url)
+            msg = 'Error {0} - cannot connect to external server url={1}'.format(err, self.url)
             log.error(msg)
             raise Exception(msg)
 
         if self.system.DEBUG:
-            log.info('response = %s' % r.text)
+            log.info('response = %s', req.text)
 
-        if (not r.text) or (not r.text.strip()):
+        if (not req.text) or (not req.text.strip()):
             raise Exception(
                 'Error: no response from external server url=%s' % self.url)
 
         try:
             # response is XML; parse it
-            rxml = etree.fromstring(r.text)
+            rxml = etree.fromstring(req.text)
         except Exception as err:
-            msg = 'Error %s - cannot parse response from external server r.text=%s' % (
-                err, r.text)
+            msg = 'Error {0} - cannot parse response from external server req.text={1}'.format(err, req.text)
             log.error(msg)
             raise Exception(msg)
 
@@ -1618,9 +1726,13 @@ class ExternalResponse(LoncapaResponse):
         cmap = CorrectMap()
         try:
             submission = [student_answers[k] for k in idset]
-        except Exception as err:
-            log.error('Error %s: cannot get student answer for %s; student_answers=%s' %
-                      (err, self.answer_ids, student_answers))
+        except Exception as err:  # pylint: disable=W0703
+            log.error(
+                'Error %s: cannot get student answer for %s; student_answers=%s',
+                err,
+                self.answer_ids,
+                student_answers
+            )
             raise Exception(err)
 
         self.context.update({'submission': submission})
@@ -1629,8 +1741,8 @@ class ExternalResponse(LoncapaResponse):
 
         try:
             rxml = self.do_external_request('get_score', extra_payload)
-        except Exception as err:
-            log.error('Error %s' % err)
+        except Exception as err:  # pylint: disable=W0703
+            log.error('Error %s', err)
             if self.system.DEBUG:
                 cmap.set_dict(dict(zip(sorted(
                     self.answer_ids), ['incorrect'] * len(idset))))
@@ -1639,13 +1751,11 @@ class ExternalResponse(LoncapaResponse):
                     '<span class="inline-error">%s</span>' % str(err).replace('<', '&lt;'))
                 return cmap
 
-        ad = rxml.find('awarddetail').text
-        admap = {'EXACT_ANS': 'correct',         # TODO: handle other loncapa responses
-                 'WRONG_FORMAT': 'incorrect',
-                 }
+        awd = rxml.find('awarddetail').text
+
         self.context['correct'] = ['correct']
-        if ad in admap:
-            self.context['correct'][0] = admap[ad]
+        if awd in self.awdmap:
+            self.context['correct'][0] = self.awdmap[awd]
 
         # create CorrectMap
         for key in idset:
@@ -1657,14 +1767,14 @@ class ExternalResponse(LoncapaResponse):
         return cmap
 
     def get_answers(self):
-        '''
+        """
         Use external server to get expected answers
-        '''
+        """
         try:
             rxml = self.do_external_request('get_answers', {})
             exans = json.loads(rxml.find('expected').text)
-        except Exception as err:
-            log.error('Error %s' % err)
+        except Exception as err:  # pylint: disable=W0703
+            log.error('Error %s', err)
             if self.system.DEBUG:
                 msg = '<span class="inline-error">%s</span>' % str(
                     err).replace('<', '&lt;')
@@ -1672,8 +1782,8 @@ class ExternalResponse(LoncapaResponse):
                 exans[0] = msg
 
         if not (len(exans) == len(self.answer_ids)):
-            log.error('Expected %d answers from external server, only got %d!' %
-                      (len(self.answer_ids), len(exans)))
+            log.error('Expected %s answers from external server, only got %s!',
+                      len(self.answer_ids), len(exans))
             raise Exception('Short response from external server')
         return dict(zip(self.answer_ids, exans))
 
@@ -1681,34 +1791,42 @@ class ExternalResponse(LoncapaResponse):
 #-----------------------------------------------------------------------------
 
 class FormulaResponse(LoncapaResponse):
-    '''
+    """
     Checking of symbolic math response using numerical sampling.
-    '''
+    """
 
     response_tag = 'formularesponse'
     hint_tag = 'formulahint'
-    allowed_inputfields = ['textline']
+    allowed_inputfields = ['textline', 'formulaequationinput']
     required_attributes = ['answer', 'samples']
     max_inputfields = 1
+
+    def __init__(self, *args, **kwargs):
+        self.correct_answer = ''
+        self.samples = ''
+        self.tolerance = '1e-5'  # Default value
+        self.case_sensitive = False
+        super(FormulaResponse, self).__init__(*args, **kwargs)
 
     def setup_response(self):
         xml = self.xml
         context = self.context
         self.correct_answer = contextualize_text(xml.get('answer'), context)
         self.samples = contextualize_text(xml.get('samples'), context)
-        try:
-            self.tolerance_xml = xml.xpath(
-                '//*[@id=$id]//responseparam[@type="tolerance"]/@default',
-                id=xml.get('id'))[0]
-            self.tolerance = contextualize_text(self.tolerance_xml, context)
-        except Exception:
-            self.tolerance = '0.00001'
 
-        ts = xml.get('type')
-        if ts is None:
+        # Find the tolerance
+        tolerance_xml = xml.xpath(
+            '//*[@id=$id]//responseparam[@type="tolerance"]/@default',
+            id=xml.get('id')
+        )
+        if tolerance_xml:  # If it isn't an empty list...
+            self.tolerance = contextualize_text(tolerance_xml[0], context)
+
+        types = xml.get('type')
+        if types is None:
             typeslist = []
         else:
-            typeslist = ts.split(',')
+            typeslist = types.split(',')
         if 'ci' in typeslist:
             # Case insensitive
             self.case_sensitive = False
@@ -1722,72 +1840,131 @@ class FormulaResponse(LoncapaResponse):
     def get_score(self, student_answers):
         given = student_answers[self.answer_id]
         correctness = self.check_formula(
-            self.correct_answer, given, self.samples)
+            self.correct_answer,
+            given,
+            self.samples
+        )
         return CorrectMap(self.answer_id, correctness)
 
-    def check_formula(self, expected, given, samples):
+    def tupleize_answers(self, answer, var_dict_list):
+        """
+        Takes in an answer and a list of dictionaries mapping variables to values.
+        Each dictionary represents a test case for the answer.
+        Returns a tuple of formula evaluation results.
+        """
+        out = []
+        for var_dict in var_dict_list:
+            try:
+                out.append(evaluator(
+                    var_dict,
+                    dict(),
+                    answer,
+                    case_sensitive=self.case_sensitive,
+                ))
+            except UndefinedVariable as err:
+                log.debug(
+                    'formularesponse: undefined variable in formula=%s',
+                    cgi.escape(answer)
+                )
+                raise StudentInputError(
+                    "Invalid input: " + err.message + " not permitted in answer"
+                )
+            except ValueError as err:
+                if 'factorial' in err.message:
+                    # This is thrown when fact() or factorial() is used in a formularesponse answer
+                    #   that tests on negative and/or non-integer inputs
+                    # err.message will be: `factorial() only accepts integral values` or
+                    # `factorial() not defined for negative values`
+                    log.debug(
+                        ('formularesponse: factorial function used in response '
+                         'that tests negative and/or non-integer inputs. '
+                         'Provided answer was: %s'),
+                        cgi.escape(answer)
+                    )
+                    raise StudentInputError(
+                        ("factorial function not permitted in answer "
+                         "for this problem. Provided answer was: "
+                         "{0}").format(cgi.escape(answer))
+                    )
+                # If non-factorial related ValueError thrown, handle it the same as any other Exception
+                log.debug('formularesponse: error %s in formula', err)
+                raise StudentInputError("Invalid input: Could not parse '%s' as a formula" %
+                                        cgi.escape(answer))
+            except Exception as err:
+                # traceback.print_exc()
+                log.debug('formularesponse: error %s in formula', err)
+                raise StudentInputError("Invalid input: Could not parse '%s' as a formula" %
+                                        cgi.escape(answer))
+        return out
+
+    def randomize_variables(self, samples):
+        """
+        Returns a list of dictionaries mapping variables to random values in range,
+        as expected by tupleize_answers.
+        """
         variables = samples.split('@')[0].split(',')
         numsamples = int(samples.split('@')[1].split('#')[1])
         sranges = zip(*map(lambda x: map(float, x.split(",")),
                            samples.split('@')[1].split('#')[0].split(':')))
-
         ranges = dict(zip(variables, sranges))
-        for i in range(numsamples):
-            instructor_variables = self.strip_dict(dict(self.context))
-            student_variables = dict()
+
+        out = []
+        for _ in range(numsamples):
+            var_dict = {}
             # ranges give numerical ranges for testing
             for var in ranges:
                 # TODO: allow specified ranges (i.e. integers and complex numbers) for random variables
                 value = random.uniform(*ranges[var])
-                instructor_variables[str(var)] = value
-                student_variables[str(var)] = value
-            # log.debug('formula: instructor_vars=%s, expected=%s' %
-            # (instructor_variables,expected))
-            instructor_result = evaluator(instructor_variables, dict(),
-                                          expected, cs=self.case_sensitive)
-            try:
-                # log.debug('formula: student_vars=%s, given=%s' %
-                # (student_variables,given))
-                student_result = evaluator(student_variables,
-                                           dict(),
-                                           given,
-                                           cs=self.case_sensitive)
-            except UndefinedVariable as uv:
-                log.debug(
-                    'formularesponse: undefined variable in given=%s' % given)
-                raise StudentInputError(
-                    "Invalid input: " + uv.message + " not permitted in answer")
-            except ValueError as ve:
-                if 'factorial' in ve.message:
-                    # This is thrown when fact() or factorial() is used in a formularesponse answer
-                    #   that tests on negative and/or non-integer inputs
-                    # ve.message will be: `factorial() only accepts integral values` or `factorial() not defined for negative values`
-                    log.debug(
-                        'formularesponse: factorial function used in response that tests negative and/or non-integer inputs. given={0}'.format(given))
-                    raise StudentInputError(
-                        "factorial function not permitted in answer for this problem. Provided answer was: {0}".format(given))
-                # If non-factorial related ValueError thrown, handle it the same as any other Exception
-                log.debug('formularesponse: error {0} in formula'.format(ve))
-                raise StudentInputError("Invalid input: Could not parse '%s' as a formula" %
-                                        cgi.escape(given))
-            except Exception as err:
-                # traceback.print_exc()
-                log.debug('formularesponse: error %s in formula' % err)
-                raise StudentInputError("Invalid input: Could not parse '%s' as a formula" %
-                                        cgi.escape(given))
-            if not compare_with_tolerance(student_result, instructor_result, self.tolerance):
-                return "incorrect"
-        return "correct"
+                var_dict[str(var)] = value
+            out.append(var_dict)
+        return out
 
-    def strip_dict(self, d):
-        ''' Takes a dict. Returns an identical dict, with all non-word
+    def check_formula(self, expected, given, samples):
+        """
+        Given an expected answer string, a given (student-produced) answer
+        string, and a samples string, return whether the given answer is
+        "correct" or "incorrect".
+        """
+        var_dict_list = self.randomize_variables(samples)
+        student_result = self.tupleize_answers(given, var_dict_list)
+        instructor_result = self.tupleize_answers(expected, var_dict_list)
+
+        correct = all(compare_with_tolerance(student, instructor, self.tolerance)
+                      for student, instructor in zip(student_result, instructor_result))
+        if correct:
+            return "correct"
+        else:
+            return "incorrect"
+
+    def compare_answer(self, ans1, ans2):
+        """
+        An external interface for comparing whether a and b are equal.
+        """
+        internal_result = self.check_formula(ans1, ans2, self.samples)
+        return internal_result == "correct"
+
+    def validate_answer(self, answer):
+        """
+        Returns whether this answer is in a valid form.
+        """
+        var_dict_list = self.randomize_variables(self.samples)
+        try:
+            self.tupleize_answers(answer, var_dict_list)
+            return True
+        except StudentInputError:
+            return False
+
+    def strip_dict(self, inp_d):
+        """
+        Takes a dict. Returns an identical dict, with all non-word
         keys and all non-numeric values stripped out. All values also
         converted to float. Used so we can safely use Python contexts.
-        '''
-        d = dict([(k, numpy.complex(d[k])) for k in d if type(k) == str and
-                  k.isalnum() and
-                  isinstance(d[k], numbers.Number)])
-        return d
+        """
+        inp_d = dict([(k, numpy.complex(inp_d[k]))
+                      for k in inp_d if type(k) == str and
+                      k.isalnum() and
+                      isinstance(inp_d[k], numbers.Number)])
+        return inp_d
 
     def check_hint_condition(self, hxml_set, student_answers):
         given = student_answers[self.answer_id]
@@ -1797,14 +1974,18 @@ class FormulaResponse(LoncapaResponse):
             name = hxml.get('name')
             correct_answer = contextualize_text(
                 hxml.get('answer'), self.context)
+            # pylint: disable=W0703
             try:
                 correctness = self.check_formula(
-                    correct_answer, given, samples)
+                    correct_answer,
+                    given,
+                    samples
+                )
             except Exception:
                 correctness = 'incorrect'
             if correctness == 'correct':
                 hints_to_show.append(name)
-        log.debug('hints_to_show = %s' % hints_to_show)
+        log.debug('hints_to_show = %s', hints_to_show)
         return hints_to_show
 
     def get_answers(self):
@@ -1814,9 +1995,15 @@ class FormulaResponse(LoncapaResponse):
 
 
 class SchematicResponse(LoncapaResponse):
-
+    """
+    Circuit schematic response type.
+    """
     response_tag = 'schematicresponse'
     allowed_inputfields = ['schematic']
+
+    def __init__(self, *args, **kwargs):
+        self.code = ''
+        super(SchematicResponse, self).__init__(*args, **kwargs)
 
     def setup_response(self):
         xml = self.xml
@@ -1887,6 +2074,10 @@ class ImageResponse(LoncapaResponse):
     response_tag = 'imageresponse'
     allowed_inputfields = ['imageinput']
 
+    def __init__(self, *args, **kwargs):
+        self.ielements = []
+        super(ImageResponse, self).__init__(*args, **kwargs)
+
     def setup_response(self):
         self.ielements = self.inputfields
         self.answer_ids = [ie.get('id') for ie in self.ielements]
@@ -1895,40 +2086,39 @@ class ImageResponse(LoncapaResponse):
         correct_map = CorrectMap()
         expectedset = self.get_mapped_answers()
         for aid in self.answer_ids:  # loop through IDs of <imageinput>
-        #  fields in our stanza
-            given = student_answers[
-                aid]  # this should be a string of the form '[x,y]'
+            # Fields in our stanza
+            given = student_answers[aid]  # This should be a string of the form '[x,y]'
             correct_map.set(aid, 'incorrect')
             if not given:  # No answer to parse. Mark as incorrect and move on
                 continue
-            # parse given answer
-            m = re.match(r'\[([0-9]+),([0-9]+)]', given.strip().replace(' ', ''))
-            if not m:
+            # Parse given answer
+            acoords = re.match(r'\[([0-9]+),([0-9]+)]', given.strip().replace(' ', ''))
+            if not acoords:
                 raise Exception('[capamodule.capa.responsetypes.imageinput] '
-                                'error grading %s (input=%s)' % (aid, given))
-            (gx, gy) = [int(x) for x in m.groups()]
+                                'error grading {0} (input={1})'.format(aid, given))
+            (ans_x, ans_y) = [int(x) for x in acoords.groups()]
 
             rectangles, regions = expectedset
-            if rectangles[aid]:  # rectangles part - for backward compatibility
+            if rectangles[aid]:  # Rectangles part - for backward compatibility
                 # Check whether given point lies in any of the solution
                 # rectangles
                 solution_rectangles = rectangles[aid].split(';')
                 for solution_rectangle in solution_rectangles:
                     # parse expected answer
                     # TODO: Compile regexp on file load
-                    m = re.match(
+                    sr_coords = re.match(
                         r'[\(\[]([0-9]+),([0-9]+)[\)\]]-[\(\[]([0-9]+),([0-9]+)[\)\]]',
                         solution_rectangle.strip().replace(' ', ''))
-                    if not m:
+                    if not sr_coords:
                         msg = 'Error in problem specification! cannot parse rectangle in %s' % (
                             etree.tostring(self.ielements[aid], pretty_print=True))
                         raise Exception(
                             '[capamodule.capa.responsetypes.imageinput] ' + msg)
-                    (llx, lly, urx, ury) = [int(x) for x in m.groups()]
+                    (llx, lly, urx, ury) = [int(x) for x in sr_coords.groups()]
 
                     # answer is correct if (x,y) is within the specified
                     # rectangle
-                    if (llx <= gx <= urx) and (lly <= gy <= ury):
+                    if (llx <= ans_x <= urx) and (lly <= ans_y <= ury):
                         correct_map.set(aid, 'correct')
                         break
             if correct_map[aid]['correctness'] != 'correct' and regions[aid]:
@@ -1942,13 +2132,13 @@ class ImageResponse(LoncapaResponse):
                     for region in parsed_region:
                         polygon = MultiPoint(region).convex_hull
                         if (polygon.type == 'Polygon' and
-                                polygon.contains(Point(gx, gy))):
+                                polygon.contains(Point(ans_x, ans_y))):
                             correct_map.set(aid, 'correct')
                             break
         return correct_map
 
     def get_mapped_answers(self):
-        '''
+        """
         Returns the internal representation of the answers
 
         Input:
@@ -1957,7 +2147,7 @@ class ImageResponse(LoncapaResponse):
             tuple (dict, dict) -
                 rectangles (dict) - a map of inputs to the defined rectangle for that input
                 regions (dict) - a map of inputs to the defined region for that input
-        '''
+        """
         answers = (
             dict([(ie.get('id'), ie.get(
                 'rectangle')) for ie in self.ielements]),
@@ -1965,7 +2155,7 @@ class ImageResponse(LoncapaResponse):
         return answers
 
     def get_answers(self):
-        '''
+        """
         Returns the external representation of the answers
 
         Input:
@@ -1973,11 +2163,11 @@ class ImageResponse(LoncapaResponse):
         Returns:
             dict (str, (str, str)) - a map of inputs to a tuple of their rectange
                 and their regions
-        '''
+        """
         answers = {}
-        for ie in self.ielements:
-            ie_id = ie.get('id')
-            answers[ie_id] = (ie.get('rectangle'), ie.get('regions'))
+        for ielt in self.ielements:
+            ie_id = ielt.get('id')
+            answers[ie_id] = (ielt.get('rectangle'), ielt.get('regions'))
 
         return answers
 
@@ -1985,26 +2175,32 @@ class ImageResponse(LoncapaResponse):
 
 
 class AnnotationResponse(LoncapaResponse):
-    '''
+    """
     Checking of annotation responses.
 
     The response contains both a comment (student commentary) and an option (student tag).
     Only the tag is currently graded. Answers may be incorrect, partially correct, or correct.
-    '''
+    """
     response_tag = 'annotationresponse'
     allowed_inputfields = ['annotationinput']
     max_inputfields = 1
     default_scoring = {'incorrect': 0, 'partially-correct': 1, 'correct': 2}
 
+    def __init__(self, *args, **kwargs):
+        self.scoring_map = {}
+        self.answer_map = {}
+        super(AnnotationResponse, self).__init__(*args, **kwargs)
+
     def setup_response(self):
-        xml = self.xml
         self.scoring_map = self._get_scoring_map()
         self.answer_map = self._get_answer_map()
         self.maxpoints = self._get_max_points()
 
     def get_score(self, student_answers):
-        ''' Returns a CorrectMap for the student answer, which may include
-            partially correct answers.'''
+        """
+        Returns a CorrectMap for the student answer, which may include
+        partially correct answers.
+        """
         student_answer = student_answers[self.answer_id]
         student_option = self._get_submitted_option_id(student_answer)
 
@@ -2023,23 +2219,26 @@ class AnnotationResponse(LoncapaResponse):
         return self.answer_map
 
     def _get_scoring_map(self):
-        ''' Returns a dict of option->scoring for each input. '''
+        """Returns a dict of option->scoring for each input."""
         scoring = self.default_scoring
         choices = dict([(choice, choice) for choice in scoring])
         scoring_map = {}
 
         for inputfield in self.inputfields:
-            option_scoring = dict([(option['id'], {
+            option_scoring = dict([(
+                option['id'],
+                {
                     'correctness': choices.get(option['choice']),
                     'points': scoring.get(option['choice'])
-                }) for option in self._find_options(inputfield)])
+                }
+            ) for option in self._find_options(inputfield)])
 
             scoring_map[inputfield.get('id')] = option_scoring
 
         return scoring_map
 
     def _get_answer_map(self):
-        ''' Returns a dict of answers for each input.'''
+        """Returns a dict of answers for each input."""
         answer_map = {}
         for inputfield in self.inputfields:
             correct_option = self._find_option_with_choice(
@@ -2050,13 +2249,13 @@ class AnnotationResponse(LoncapaResponse):
         return answer_map
 
     def _get_max_points(self):
-        ''' Returns a dict of the max points for each input: input id -> maxpoints. '''
+        """Returns a dict of the max points for each input: input id -> maxpoints."""
         scoring = self.default_scoring
         correct_points = scoring.get('correct')
         return dict([(inputfield.get('id'), correct_points) for inputfield in self.inputfields])
 
     def _find_options(self, inputfield):
-        ''' Returns an array of dicts where each dict represents an option. '''
+        """Returns an array of dicts where each dict represents an option. """
         elements = inputfield.findall('./options/option')
         return [{
                 'id': index,
@@ -2065,22 +2264,22 @@ class AnnotationResponse(LoncapaResponse):
                 } for (index, option) in enumerate(elements)]
 
     def _find_option_with_choice(self, inputfield, choice):
-        ''' Returns the option with the given choice value, otherwise None. '''
+        """Returns the option with the given choice value, otherwise None. """
         for option in self._find_options(inputfield):
             if option['choice'] == choice:
                 return option
 
     def _unpack(self, json_value):
-        ''' Unpacks a student response value submitted as JSON.'''
-        d = json.loads(json_value)
-        if type(d) != dict:
-            d = {}
+        """Unpacks a student response value submitted as JSON."""
+        json_d = json.loads(json_value)
+        if type(json_d) != dict:
+            json_d = {}
 
-        comment_value = d.get('comment', '')
-        if not isinstance(d, basestring):
+        comment_value = json_d.get('comment', '')
+        if not isinstance(json_d, basestring):
             comment_value = ''
 
-        options_value = d.get('options', [])
+        options_value = json_d.get('options', [])
         if not isinstance(options_value, list):
             options_value = []
 
@@ -2090,18 +2289,350 @@ class AnnotationResponse(LoncapaResponse):
         }
 
     def _get_submitted_option_id(self, student_answer):
-        ''' Return the single option that was selected, otherwise None.'''
+        """Return the single option that was selected, otherwise None."""
         submitted = self._unpack(student_answer)
         option_ids = submitted['options_value']
         if len(option_ids) == 1:
             return option_ids[0]
         return None
 
+
+class ChoiceTextResponse(LoncapaResponse):
+    """
+    Allows for multiple choice responses with text inputs
+    Desired semantics match those of NumericalResponse and
+    ChoiceResponse.
+    """
+
+    response_tag = 'choicetextresponse'
+    max_inputfields = 1
+    allowed_inputfields = ['choicetextgroup',
+                           'checkboxtextgroup',
+                           'radiotextgroup'
+                           ]
+
+    def __init__(self, *args, **kwargs):
+        self.correct_inputs = {}
+        self.answer_values = {}
+        self.correct_choices = {}
+        super(ChoiceTextResponse, self).__init__(*args, **kwargs)
+
+    def setup_response(self):
+        """
+        Sets up three dictionaries for use later:
+        `correct_choices`: These are the correct binary choices(radio/checkbox)
+        `correct_inputs`: These are the numerical/string answers for required
+        inputs.
+        `answer_values`: This is a dict, keyed by the name of the binary choice
+            which contains the correct answers for the text inputs separated by
+            commas e.g. "1, 0.5"
+
+        `correct_choices` and `correct_inputs` are used for grading the problem
+        and `answer_values` is used for displaying correct answers.
+
+        """
+        context = self.context
+        self.answer_values = {self.answer_id: []}
+        self.assign_choice_names()
+        correct_xml = self.xml.xpath('//*[@id=$id]//choice[@correct="true"]',
+                                     id=self.xml.get('id'))
+        for node in correct_xml:
+            # For each correct choice, set the `parent_name` to the
+            # current choice's name
+            parent_name = node.get('name')
+            # Add the name of the correct binary choice to the
+            # correct choices list as a key. The value is not important.
+            self.correct_choices[parent_name] = {'answer': ''}
+            # Add the name of the parent to the list of correct answers
+            self.answer_values[self.answer_id].append(parent_name)
+            answer_list = []
+            # Loop over <numtolerance_input> elements inside of the correct choices
+            for child in node:
+                answer = child.get('answer', None)
+                if not answer:
+                    # If the question creator does not specify an answer for a
+                    # <numtolerance_input> inside of a correct choice, raise an error
+                    raise LoncapaProblemError(
+                        "Answer not provided for numtolerance_input"
+                    )
+                # Contextualize the answer to allow script generated answers.
+                answer = contextualize_text(answer, context)
+                input_name = child.get('name')
+                # Contextualize the tolerance to value.
+                tolerance = contextualize_text(
+                    child.get('tolerance', '0'),
+                    context
+                )
+                # Add the answer and tolerance information for the current
+                # numtolerance_input to `correct_inputs`
+                self.correct_inputs[input_name] = {
+                    'answer': answer,
+                    'tolerance': tolerance
+                }
+                # Add the correct answer for this input to the list for show
+                answer_list.append(answer)
+            # Turn the list of numtolerance_input answers into a comma separated string.
+            self.answer_values[parent_name] = ', '.join(answer_list)
+        # Turn correct choices into a set. Allows faster grading.
+        self.correct_choices = set(self.correct_choices.keys())
+
+    def assign_choice_names(self):
+        """
+        Initialize name attributes in <choice> and <numtolerance_input> tags
+        for this response.
+
+        Example:
+        Assuming for simplicity that `self.answer_id` = '1_2_1'
+
+        Before the function is called `self.xml` =
+        <radiotextgroup>
+            <choice correct = "true">
+                The number
+                    <numtolerance_input answer="5"/>
+                Is the mean of the list.
+            </choice>
+            <choice correct = "false">
+                False demonstration choice
+            </choice>
+        </radiotextgroup>
+
+        After this is called the choices and numtolerance_inputs will have a name
+        attribute initialized and self.xml will be:
+
+        <radiotextgroup>
+        <choice correct = "true" name ="1_2_1_choiceinput_0bc">
+            The number
+                <numtolerance_input name = "1_2_1_choiceinput0_numtolerance_input_0"
+                 answer="5"/>
+            Is the mean of the list.
+        </choice>
+        <choice correct = "false" name = "1_2_1_choiceinput_1bc>
+            False demonstration choice
+        </choice>
+        </radiotextgroup>
+        """
+
+        for index, choice in enumerate(
+            self.xml.xpath('//*[@id=$id]//choice', id=self.xml.get('id'))
+        ):
+            # Set the name attribute for <choices>
+            # "bc" is appended at the end to indicate that this is a
+            # binary choice as opposed to a numtolerance_input, this convention
+            # is used when grading the problem
+            choice.set(
+                "name",
+                self.answer_id + "_choiceinput_" + str(index) + "bc"
+            )
+            # Set Name attributes for <numtolerance_input> elements
+            # Look for all <numtolerance_inputs> inside this choice.
+            numtolerance_inputs = choice.findall('numtolerance_input')
+            # Look for all <decoy_input> inside this choice
+            decoys = choice.findall('decoy_input')
+            # <decoy_input> would only be used in choices which do not contain
+            # <numtolerance_input>
+            inputs = numtolerance_inputs if numtolerance_inputs else decoys
+            # Give each input inside of the choice a name combining
+            # The ordinality of the choice, and the ordinality of the input
+            # within that choice e.g. 1_2_1_choiceinput_0_numtolerance_input_1
+            for ind, child in enumerate(inputs):
+                child.set(
+                    "name",
+                    self.answer_id + "_choiceinput_" + str(index) +
+                    "_numtolerance_input_" + str(ind)
+                )
+
+    def get_score(self, student_answers):
+        """
+        Returns a `CorrectMap` showing whether `student_answers` are correct.
+
+        `student_answers` contains keys for binary inputs(radiobutton,
+        checkbox) and numerical inputs. Keys ending with 'bc' are binary
+        choice inputs otherwise they are text fields.
+
+        This method first separates the two
+        types of answers and then grades them in separate methods.
+
+        The student is only correct if they have both the binary inputs and
+        numerical inputs correct.
+        """
+        answer_dict = student_answers.get(self.answer_id, "")
+        binary_choices, numtolerance_inputs = self._split_answers_dict(answer_dict)
+        # Check the binary choices first.
+        choices_correct = self._check_student_choices(binary_choices)
+        inputs_correct = self._check_student_inputs(numtolerance_inputs)
+        # Only return correct if the student got both the binary
+        # and numtolerance_inputs are correct
+        correct = choices_correct and inputs_correct
+
+        return CorrectMap(
+            self.answer_id,
+            'correct' if correct else 'incorrect'
+        )
+
+    def get_answers(self):
+        """
+        Returns a dictionary containing the names of binary choices as keys
+        and a string of answers to any numtolerance_inputs which they may have
+        e.g {choice_1bc : "answer1, answer2", choice_2bc : ""}
+        """
+        return self.answer_values
+
+    def _split_answers_dict(self, a_dict):
+        """
+        Returns two dicts:
+        `binary_choices` : dictionary {input_name: input_value} for
+        the binary choices which the student selected.
+        and
+        `numtolerance_choices` : a dictionary {input_name: input_value}
+        for the numtolerance_inputs inside of choices which were selected
+
+        Determines if an input is inside of a binary input by looking at
+        the beginning of it's name.
+
+        For example. If a binary_choice was named '1_2_1_choiceinput_0bc'
+        All of the numtolerance_inputs in it would have an idea that begins
+        with '1_2_1_choice_input_0_numtolerance_input'
+
+        Splits the name of the numtolerance_input at the occurence of
+        '_numtolerance_input_' and appends 'bc' to the end to get the name
+        of the choice it is contained in.
+
+        Example:
+        `a_dict` = {
+            '1_2_1_choiceinput_0bc': '1_2_1_choiceinput_0bc',
+            '1_2_1_choiceinput_0_numtolerance_input_0': '1',
+            '1_2_1_choiceinput_0_numtolerance_input_1': '2'
+            '1_2_1_choiceinput_1_numtolerance_input_0': '3'
+        }
+
+        In this case, the binary choice is '1_2_1_choiceinput_0bc', and
+        the numtolerance_inputs associated with it are
+        '1_2_1_choiceinput_0_numtolerance_input_0', and
+        '1_2_1_choiceinput_0_numtolerance_input_1'.
+
+        so the two return dictionaries would be
+        `binary_choices` = {'1_2_1_choiceinput_0bc': '1_2_1_choiceinput_0bc'}
+        and
+        `numtolerance_choices` ={
+            '1_2_1_choiceinput_0_numtolerance_input_0': '1',
+            '1_2_1_choiceinput_0_numtolerance_input_1': '2'
+        }
+
+        The entry '1_2_1_choiceinput_1_numtolerance_input_0': '3' is discarded
+        because it was not inside of a selected binary choice, and no validation
+        should be performed on numtolerance_inputs inside of non-selected choices.
+        """
+
+        # Initialize the two dictionaries that are returned
+        numtolerance_choices = {}
+        binary_choices = {}
+
+        # `selected_choices` is a list of binary choices which were "checked/selected"
+        # when the student submitted the problem.
+        # Keys in a_dict ending with 'bc' refer to binary choices.
+        selected_choices = [key for key in a_dict if key.endswith("bc")]
+        for key in selected_choices:
+            binary_choices[key] = a_dict[key]
+
+        # Convert the name of a numtolerance_input into the name of the binary
+        # choice that it is contained within, and append it to the list if
+        # the numtolerance_input's parent binary_choice is contained in
+        # `selected_choices`.
+        selected_numtolerance_inputs = [
+            key for key in a_dict if key.partition("_numtolerance_input_")[0] + "bc"
+            in selected_choices
+        ]
+
+        for key in selected_numtolerance_inputs:
+            numtolerance_choices[key] = a_dict[key]
+
+        return (binary_choices, numtolerance_choices)
+
+    def _check_student_choices(self, choices):
+        """
+        Compares student submitted checkbox/radiobutton answers against
+        the correct answers. Returns True or False.
+
+        True if all of the correct choices are selected and no incorrect
+        choices are selected.
+        """
+        student_choices = set(choices)
+        required_selected = len(self.correct_choices - student_choices) == 0
+        no_extra_selected = len(student_choices - self.correct_choices) == 0
+        correct = required_selected and no_extra_selected
+        return correct
+
+    def _check_student_inputs(self, numtolerance_inputs):
+        """
+        Compares student submitted numerical answers against the correct
+        answers and tolerances.
+
+        `numtolerance_inputs` is a dictionary {answer_name : answer_value}
+
+        Performs numerical validation by means of calling
+        `compare_with_tolerance()` on all of `numtolerance_inputs`
+
+        Performs a call to `compare_with_tolerance` even on values for
+        decoy_inputs. This is used to validate their numericality and
+        raise an error if the student entered a non numerical expression.
+
+        Returns True if and only if all student inputs are correct.
+        """
+        inputs_correct = True
+        for answer_name, answer_value in numtolerance_inputs.iteritems():
+            # If `self.corrrect_inputs` does not contain an entry for
+            # `answer_name`, this means that answer_name is a decoy
+            # input's value, and validation of its numericality is the
+            # only thing of interest from the later call to
+            # `compare_with_tolerance`.
+            params = self.correct_inputs.get(answer_name, {'answer': 0})
+
+            correct_ans = params['answer']
+            # Set the tolerance to '0' if it was not specified in the xml
+            tolerance = params.get('tolerance', '0')
+            # Make sure that the staff answer is a valid number
+            try:
+                correct_ans = complex(correct_ans)
+            except ValueError:
+                log.debug(
+                    "Content error--answer" +
+                    "'{0}' is not a valid complex number".format(correct_ans)
+                )
+                raise StudentInputError(
+                    "The Staff answer could not be interpreted as a number."
+                )
+            # Compare the student answer to the staff answer/ or to 0
+            # if all that is important is verifying numericality
+            try:
+                partial_correct = compare_with_tolerance(
+                    evaluator({}, {}, answer_value),
+                    correct_ans,
+                    tolerance
+                )
+            except:
+                # Use the traceback-preserving version of re-raising with a
+                # different type
+                _, _, trace = sys.exc_info()
+
+                raise StudentInputError(
+                    "Could not interpret '{0}' as a number{1}".format(
+                        cgi.escape(answer_value),
+                        trace
+                    )
+                )
+            # Ignore the results of the comparisons which were just for
+            # Numerical Validation.
+            if answer_name in self.correct_inputs and not partial_correct:
+                # If any input is not correct, set the return value to False
+                inputs_correct = False
+        return inputs_correct
+
 #-----------------------------------------------------------------------------
 
 # TEMPORARY: List of all response subclasses
 # FIXME: To be replaced by auto-registration
 
+# pylint: disable=E0604
 __all__ = [CodeResponse,
            NumericalResponse,
            FormulaResponse,
@@ -2116,4 +2647,5 @@ __all__ = [CodeResponse,
            MultipleChoiceResponse,
            TrueFalseResponse,
            JavascriptResponse,
-           AnnotationResponse]
+           AnnotationResponse,
+           ChoiceTextResponse]

@@ -2,18 +2,18 @@ from collections import defaultdict
 from fs.errors import ResourceNotFoundError
 import logging
 import inspect
+import re
 
 from path import path
 from django.http import Http404
-
+from django.conf import settings
 from .module_render import get_module
 from xmodule.course_module import CourseDescriptor
-from xmodule.modulestore import Location
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore import Location, XML_MODULESTORE_TYPE
+from xmodule.modulestore.django import modulestore, loc_mapper
 from xmodule.contentstore.content import StaticContent
-from xmodule.modulestore.xml import XMLModuleStore
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
-from courseware.model_data import ModelDataCache
+from courseware.model_data import FieldDataCache
 from static_replace import replace_static_urls
 from courseware.access import has_access
 import branding
@@ -36,11 +36,31 @@ def get_request_for_thread():
         del frame
 
 
+def get_course(course_id, depth=0):
+    """
+    Given a course id, return the corresponding course descriptor.
+
+    If course_id is not valid, raises a ValueError.  This is appropriate
+    for internal use.
+
+    depth: The number of levels of children for the modulestore to cache.
+    None means infinite depth.  Default is to fetch no children.
+    """
+    try:
+        course_loc = CourseDescriptor.id_to_location(course_id)
+        return modulestore().get_instance(course_id, course_loc, depth=depth)
+    except (KeyError, ItemNotFoundError):
+        raise ValueError("Course not found: {}".format(course_id))
+    except InvalidLocationError:
+        raise ValueError("Invalid location: {}".format(course_id))
+
+
 def get_course_by_id(course_id, depth=0):
     """
     Given a course id, return the corresponding course descriptor.
 
     If course_id is not valid, raises a 404.
+
     depth: The number of levels of children for the modulestore to cache. None means infinite depth
     """
     try:
@@ -50,6 +70,7 @@ def get_course_by_id(course_id, depth=0):
         raise Http404("Course not found.")
     except InvalidLocationError:
         raise Http404("Invalid location")
+
 
 def get_course_with_access(user, course_id, action, depth=0):
     """
@@ -82,27 +103,27 @@ def get_opt_course_with_access(user, course_id, action):
 def course_image_url(course):
     """Try to look up the image url for the course.  If it's not found,
     log an error and return the dead link"""
-    if isinstance(modulestore(), XMLModuleStore):
-        return '/static/' + course.data_dir + "/images/course_image.jpg"
+    if course.static_asset_path or modulestore().get_modulestore_type(course.location.course_id) == XML_MODULESTORE_TYPE:
+        return '/static/' + (course.static_asset_path or getattr(course, 'data_dir', '')) + "/images/course_image.jpg"
     else:
-        loc = course.location._replace(tag='c4x', category='asset', name='images_course_image.jpg')
-        path = StaticContent.get_url_path_from_location(loc)
-        return path
+        loc = course.location.replace(tag='c4x', category='asset', name=course.course_image)
+        _path = StaticContent.get_url_path_from_location(loc)
+        return _path
 
 
-def find_file(fs, dirs, filename):
+def find_file(filesystem, dirs, filename):
     """
     Looks for a filename in a list of dirs on a filesystem, in the specified order.
 
-    fs: an OSFS filesystem
+    filesystem: an OSFS filesystem
     dirs: a list of path objects
     filename: a string
 
     Returns d / filename if found in dir d, else raises ResourceNotFoundError.
     """
-    for d in dirs:
-        filepath = path(d) / filename
-        if fs.exists(filepath):
+    for directory in dirs:
+        filepath = path(directory) / filename
+        if filesystem.exists(filepath):
             return filepath
     raise ResourceNotFoundError("Could not find {0}".format(filename))
 
@@ -146,24 +167,25 @@ def get_course_about_section(course, section_key):
 
             request = get_request_for_thread()
 
-            loc = course.location._replace(category='about', name=section_key)
+            loc = course.location.replace(category='about', name=section_key)
 
             # Use an empty cache
-            model_data_cache = ModelDataCache([], course.id, request.user)
+            field_data_cache = FieldDataCache([], course.id, request.user)
             about_module = get_module(
                 request.user,
                 request,
                 loc,
-                model_data_cache,
+                field_data_cache,
                 course.id,
                 not_found_ok=True,
-                wrap_xmodule_display=False
+                wrap_xmodule_display=False,
+                static_asset_path=course.static_asset_path
             )
 
             html = ''
 
             if about_module is not None:
-                html = about_module.get_html()
+                html = about_module.render('student_view').content
 
             return html
 
@@ -174,12 +196,11 @@ def get_course_about_section(course, section_key):
     elif section_key == "title":
         return course.display_name_with_default
     elif section_key == "university":
-        return course.location.org
+        return course.display_org_with_default
     elif section_key == "number":
-        return course.number
+        return course.display_number_with_default
 
     raise KeyError("Invalid about key " + str(section_key))
-
 
 
 def get_course_info_section(request, course, section_key):
@@ -193,25 +214,24 @@ def get_course_info_section(request, course, section_key):
     - updates
     - guest_updates
     """
-
-
     loc = Location(course.location.tag, course.location.org, course.location.course, 'course_info', section_key)
 
     # Use an empty cache
-    model_data_cache = ModelDataCache([], course.id, request.user)
+    field_data_cache = FieldDataCache([], course.id, request.user)
     info_module = get_module(
         request.user,
         request,
         loc,
-        model_data_cache,
+        field_data_cache,
         course.id,
-        wrap_xmodule_display=False
+        wrap_xmodule_display=False,
+        static_asset_path=course.static_asset_path
     )
 
     html = ''
 
     if info_module is not None:
-        html = info_module.get_html()
+        html = info_module.render('student_view').content
 
     return html
 
@@ -235,15 +255,16 @@ def get_course_syllabus_section(course, section_key):
 
     if section_key in ['syllabus', 'guest_syllabus']:
         try:
-            fs = course.system.resources_fs
+            filesys = course.system.resources_fs
             # first look for a run-specific version
             dirs = [path("syllabus") / course.url_name, path("syllabus")]
-            filepath = find_file(fs, dirs, section_key + ".html")
-            with fs.open(filepath) as htmlFile:
+            filepath = find_file(filesys, dirs, section_key + ".html")
+            with filesys.open(filepath) as html_file:
                 return replace_static_urls(
-                    htmlFile.read().decode('utf-8'),
+                    html_file.read().decode('utf-8'),
                     getattr(course, 'data_dir', None),
-                    course_namespace=course.location
+                    course_id=course.location.course_id,
+                    static_asset_path=course.static_asset_path,
                 )
         except ResourceNotFoundError:
             log.exception("Missing syllabus section {key} in course {url}".format(
@@ -292,3 +313,14 @@ def sort_by_announcement(courses):
     courses = sorted(courses, key=key)
 
     return courses
+
+
+def get_cms_course_link(course):
+    """
+    Returns a link to course_index for editing the course in cms,
+    assuming that the course is actually cms-backed.
+    """
+    locator = loc_mapper().translate_location(
+        course.location.course_id, course.location, False, True
+    )
+    return "//" + settings.CMS_BASE + locator.url_reverse('course/', '')

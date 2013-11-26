@@ -1,6 +1,6 @@
 describe 'Navigation', ->
   beforeEach ->
-    loadFixtures 'accordion.html'
+    loadFixtures 'coffee/fixtures/accordion.html'
     @navigation = new Navigation
 
   describe 'constructor', ->
@@ -57,8 +57,7 @@ describe 'Navigation', ->
 
   describe 'log', ->
     beforeEach ->
-      window.log_event = ->
-      spyOn window, 'log_event'
+      spyOn Logger, 'log'
 
     it 'submit event log', ->
       @navigation.log {}, {
@@ -68,6 +67,6 @@ describe 'Navigation', ->
           text: -> "old"
       }
 
-      expect(window.log_event).toHaveBeenCalledWith 'accordion',
+      expect(Logger.log).toHaveBeenCalledWith 'accordion',
         newheader: 'new'
         oldheader: 'old'

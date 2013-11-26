@@ -6,11 +6,11 @@
     padding: 10px;
 
     &.invalid {
-      @extend .error-message-colors;
+      @extend %error-message-colors;
     }
 
     &.valid {
-      @extend .success-message-colors;
+      @extend %success-message-colors;
     }
   }
 

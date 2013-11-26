@@ -1,7 +1,7 @@
 // studio - views - course outline
 // ====================
 
-body.course.outline {
+.view-outline {
 
   input.courseware-unit-search-input {
       float: left;
@@ -137,394 +137,388 @@ body.course.outline {
 
 
   .courseware-section {
-      position: relative;
-      background: #fff;
-      border-radius: 3px;
-      border: 1px solid $mediumGrey;
-      margin-top: 15px;
-      padding-bottom: 12px;
-      box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+    @extend %ui-window;
+    @include transition(background $tmg-avg ease-in-out 0);
+    position: relative;
+    margin-top: ($baseline);
+    padding-bottom: ($baseline/2);
 
-      &:first-child {
-          margin-top: 0;
-      }
+    &.collapsed {
+        padding-bottom: 0;
+    }
 
-      &.collapsed {
-          padding-bottom: 0;
-      }
+    label {
+        float: left;
+        line-height: 29px;
+    }
 
-      label {
-          float: left;
-          line-height: 29px;
-      }
+    .datepair {
+        float: left;
+        margin-left: 10px;
+    }
 
-      .datepair {
-          float: left;
-          margin-left: 10px;
-      }
+    .section-published-date {
+        position: absolute;
+        top: 19px;
+        right: 80px;
+        padding: 4px 10px;
+        border-radius: 3px;
+        background: $lightGrey;
+        text-align: right;
 
-      .section-published-date {
-          position: absolute;
-          top: 19px;
-          right: 80px;
-          padding: 4px 10px;
+        .published-status {
+            @include font-size(12);
+            margin-right: 15px;
+
+            strong {
+                font-weight: bold;
+            }
+        }
+
+        .schedule-button {
+            @include blue-button;
+        }
+
+        .edit-button {
+            @include blue-button;
+        }
+
+        .schedule-button,
+        .edit-button {
+            @include font-size(11);
+            padding: 3px 15px 5px;
+        }
+    }
+
+    .datepair .date,
+    .datepair .time {
+        @include font-size(13);
+        box-shadow: none;
+        padding-left: 0;
+        padding-right: 0;
+        border: none;
+        background: none;
+        font-weight: bold;
+        color: $blue;
+        cursor: pointer;
+    }
+
+    .datepair .date {
+        width: 80px;
+    }
+
+    .datepair .time {
+        width: 65px;
+    }
+
+    &.collapsed .subsection-list,
+    .collapsed .subsection-list,
+    .collapsed > ol {
+        display: none !important;
+    }
+
+    header {
+        min-height: 75px;
+        @include clearfix();
+
+        .item-details, .section-published-date {
+
+        }
+
+        .item-details {
+            display: inline-block;
+            padding: 20px 0 10px 0;
+            @include clearfix();
+
+            .section-name {
+              @include font-size(19);
+              float: left;
+              margin-right: 10px;
+              width: 350px;
+              font-weight: bold;
+              color: $blue;
+            }
+
+            .section-name-span {
+              @include transition(color $tmg-f2 linear 0s);
+              cursor: pointer;
+
+              &:hover {
+                color: $orange;
+              }
+            }
+
+            .section-name-edit {
+              position: relative;
+              width: 400px;
+              background: $white;
+
+              input {
+              @include font-size(16);
+          }
+
+          .save-button {
+            @include blue-button;
+            padding: 7px 20px 7px;
+            margin-right: 5px;
+          }
+
+          .cancel-button {
+            @include white-button;
+            padding: 7px 20px 7px;
+          }
+        }
+
+        .section-published-date {
+          float: right;
           border-radius: 3px;
           background: $lightGrey;
-          text-align: right;
 
           .published-status {
-              @include font-size(12);
-              margin-right: 15px;
+            @include font-size(12);
+            margin-right: 15px;
 
-              strong {
-                  font-weight: bold;
-              }
+            strong {
+              font-weight: bold;
+            }
           }
 
           .schedule-button {
-              @include blue-button;
+            @include blue-button;
           }
 
           .edit-button {
-              @include blue-button;
+            @include blue-button;
           }
 
           .schedule-button,
           .edit-button {
-              @include font-size(11);
-              padding: 3px 15px 5px;
-          }
-      }
-
-      .datepair .date,
-      .datepair .time {
-          @include font-size(13);
-          box-shadow: none;
-          padding-left: 0;
-          padding-right: 0;
-          border: none;
-          background: none;
-          font-weight: bold;
-          color: $blue;
-          cursor: pointer;
-      }
-
-      .datepair .date {
-          width: 80px;
-      }
-
-      .datepair .time {
-          width: 65px;
-      }
-
-      &.collapsed .subsection-list,
-      .collapsed .subsection-list,
-      .collapsed > ol {
-          display: none !important;
-      }
-
-      header {
-          min-height: 75px;
-          @include clearfix();
-
-          .item-details, .section-published-date {
-
+            @include font-size(11);
+            padding: 0 15px 2px 15px;
+            }
           }
 
-          .item-details {
-              display: inline-block;
-              padding: 20px 0 10px 0;
-              @include clearfix();
+          .gradable-status {
+            position: absolute;
+            top: 20px;
+            right: 70px;
+            width: 145px;
 
-              .section-name {
-                @include font-size(19);
-                float: left;
-                margin-right: 10px;
-                width: 350px;
-                font-weight: bold;
+            .status-label {
+              @include font-size(12);
+              border-radius: 3px;
+              position: absolute;
+              top: 0;
+              right: 2px;
+              display: none;
+              width: 100px;
+              padding: 10px 35px 10px 10px;
+              background: $lightGrey;
+              color: $lightGrey;
+              text-align: right;
+              font-weight: bold;
+              line-height: 16px;
+            }
+
+            .menu-toggle {
+              z-index: 10;
+              position: absolute;
+              top: 2px;
+              right: 5px;
+              padding: 5px;
+              color: $lightGrey;
+
+              &:hover, &.is-active {
                 color: $blue;
               }
 
-              .section-name-span {
-                @include transition(color $tmg-f2 linear 0s);
-                cursor: pointer;
-
-                &:hover {
-                  color: $orange;
-                }
-              }
-
-              .section-name-edit {
-                position: relative;
-                width: 400px;
-                background: $white;
-
-                input {
-                @include font-size(16);
             }
 
-            .save-button {
-              @include blue-button;
-              padding: 7px 20px 7px;
-              margin-right: 5px;
-            }
-
-            .cancel-button {
-              @include white-button;
-              padding: 7px 20px 7px;
-            }
-          }
-
-          .section-published-date {
-            float: right;
-            border-radius: 3px;
-            background: $lightGrey;
-
-            .published-status {
+            .menu {
               @include font-size(12);
-              margin-right: 15px;
-
-              strong {
-                font-weight: bold;
-              }
-            }
-
-            .schedule-button {
-              @include blue-button;
-            }
-
-            .edit-button {
-              @include blue-button;
-            }
-
-            .schedule-button,
-            .edit-button {
-              @include font-size(11);
-              padding: 0 15px 2px 15px;
-              }
-            }
-
-            .gradable-status {
+              @include transition(opacity $tmg-f2 linear 0s, display $tmg-f2 linear 0s);
+              border-radius: 4px;
+              box-shadow: 0 1px 2px rgba(0, 0, 0, .2);
+              z-index: 1;
+              display: none;
+              opacity: 0.0;
               position: absolute;
-              top: 20px;
-              right: 70px;
-              width: 145px;
-
-              .status-label {
-                @include font-size(12);
-                border-radius: 3px;
-                position: absolute;
-                top: 0;
-                right: 2px;
-                display: none;
-                width: 100px;
-                padding: 10px 35px 10px 10px;
-                background: $lightGrey;
-                color: $lightGrey;
-                text-align: right;
-                font-weight: bold;
-                line-height: 16px;
-              }
-
-              .menu-toggle {
-                z-index: 10;
-                position: absolute;
-                top: 2px;
-                right: 5px;
-                padding: 5px;
-                color: $lightGrey;
-
-                &:hover, &.is-active {
-                  color: $blue;
-                }
-
-              }
-
-              .menu {
-                @include font-size(12);
-                @include transition(opacity $tmg-f2 linear 0s, display $tmg-f2 linear 0s);
-                border-radius: 4px;
-                box-shadow: 0 1px 2px rgba(0, 0, 0, .2);
-                z-index: 1;
-                display: none;
-                opacity: 0.0;
-                position: absolute;
-                top: -1px;
-                left: 2px;
-                margin: 0;
-                padding: 8px 12px;
-                background: $white;
-                border: 1px solid $mediumGrey;
+              top: -1px;
+              left: 2px;
+              margin: 0;
+              padding: 8px 12px;
+              background: $white;
+              border: 1px solid $mediumGrey;
 
 
 
-                li {
-                  width: 115px;
-                  margin-bottom: 3px;
-                  padding-bottom: 3px;
-                  border-bottom: 1px solid $lightGrey;
+              li {
+                width: 115px;
+                margin-bottom: 3px;
+                padding-bottom: 3px;
+                border-bottom: 1px solid $lightGrey;
 
-                  &:last-child {
-                    margin-bottom: 0;
-                    padding-bottom: 0;
-                    border: none;
+                &:last-child {
+                  margin-bottom: 0;
+                  padding-bottom: 0;
+                  border: none;
 
-                    a {
-                      color: $darkGrey;
-                    }
+                  a {
+                    color: $darkGrey;
                   }
                 }
-
-                a {
-
-                  &.is-selected {
-                    font-weight: bold;
-                  }
-                }
-            }
-
-            // dropdown state
-            &.is-active {
-
-              .menu {
-                z-index: 1000;
-                display: block;
-                opacity: 1.0;
               }
 
+              a {
 
-            .menu-toggle {
-              z-index: 10000;
-            }
+                &.is-selected {
+                  font-weight: bold;
+                }
+              }
           }
 
-          // set state
-          &.is-set {
+          // dropdown state
+          &.is-active {
 
-            .menu-toggle {
-              color: $blue;
-            }
-
-            .status-label {
+            .menu {
+              z-index: 1000;
               display: block;
-              color: $blue;
+              opacity: 1.0;
             }
-          }
 
-          float: left;
-          padding: 21px 0 0;
+
+          .menu-toggle {
+            z-index: 10000;
+          }
         }
+
+        // set state
+        &.is-set {
+
+          .menu-toggle {
+            color: $blue;
+          }
+
+          .status-label {
+            display: block;
+            color: $blue;
+          }
+        }
+
+        float: left;
+        padding: 21px 0 0;
       }
+    }
 
-          .item-actions {
-              margin-top: 21px;
-              margin-right: 12px;
+        .item-actions {
+            margin-top: 21px;
+            margin-right: 12px;
 
-              .edit-button,
-              .delete-button {
-                  margin-top: -3px;
-              }
-          }
-
-          .expand-collapse-icon {
-              @include transition(none);
-              float: left;
-              margin: 25px 6px 16px 16px;
-
-              &.expand {
-                  background-position: 0 0;
-              }
-
-              &.collapsed {
-
-              }
-          }
-
-          .drag-handle {
-              margin-left: 11px;
-          }
-      }
-
-      h3 {
-          @include font-size(19);
-          font-weight: 700;
-          color: $blue;
-      }
-
-      .section-name-span {
-          @include transition(color $tmg-f2 linear 0s);
-          cursor: pointer;
-
-          &:hover {
-              color: $orange;
-          }
-      }
-
-      .section-name-form {
-          margin-bottom: 15px;
-      }
-
-      .section-name-edit {
-          input {
-            @include font-size(16);
-          }
-
-          .save-button {
-              @include blue-button;
-              padding: 7px 20px 7px;
-              margin-right: 5px;
-          }
-
-          .cancel-button {
-              @include white-button;
-              padding: 7px 20px 7px;
-          }
-      }
-
-      h4 {
-          @include font-size(12);
-          color: #878e9d;
-
-          strong {
-              font-weight: bold;
-          }
-      }
-
-      .list-header {
-          @include linear-gradient(top, transparent, rgba(0, 0, 0, .1));
-          background-color: #ced2db;
-          border-radius: 3px 3px 0 0;
-      }
-
-      .subsection-list {
-          margin: 0 12px;
-
-          > ol {
-              @include tree-view;
-              border-top-width: 0;
-          }
-      }
-
-      &.new-section {
-
-          header {
-              @include clearfix();
-              height: auto;
-          }
-
-          .expand-collapse-icon {
-              visibility: hidden;
-          }
-
-          .item-details {
-            padding: 25px 0 0 0;
-
-            .section-name {
-              float: none;
-              width: 100%;
+            .edit-button,
+            .delete-button {
+                margin-top: -3px;
             }
+        }
+
+        .expand-collapse-icon {
+            @include transition(none);
+            float: left;
+            margin: 25px 6px 16px 16px;
+
+            &.expand {
+                background-position: 0 0;
+            }
+
+            &.collapsed {
+
+            }
+        }
+
+        .drag-handle {
+            margin-left: 11px;
+        }
+    }
+
+    h3 {
+        @include font-size(19);
+        font-weight: 700;
+        color: $blue;
+    }
+
+    .section-name-span {
+        @include transition(color $tmg-f2 linear 0s);
+        cursor: pointer;
+
+        &:hover {
+            color: $orange;
+        }
+    }
+
+    .section-name-form {
+        margin-bottom: 15px;
+    }
+
+    .section-name-edit {
+        input {
+          @include font-size(16);
+        }
+
+        .save-button {
+            @include blue-button;
+            padding: 7px 20px 7px;
+            margin-right: 5px;
+        }
+
+        .cancel-button {
+            @include white-button;
+            padding: 7px 20px 7px;
+        }
+    }
+
+    h4 {
+        @include font-size(12);
+        color: #878e9d;
+
+        strong {
+            font-weight: bold;
+        }
+    }
+
+    .list-header {
+        @include linear-gradient(top, transparent, rgba(0, 0, 0, .1));
+        background-color: #ced2db;
+        border-radius: 3px 3px 0 0;
+    }
+
+    .subsection-list {
+        margin: 0 12px;
+
+        > ol {
+            @include tree-view;
+            border-top-width: 0;
+        }
+    }
+
+    &.new-section {
+
+        header {
+            @include clearfix();
+            height: auto;
+        }
+
+        .expand-collapse-icon {
+            visibility: hidden;
+        }
+
+        .item-details {
+          padding: 25px 0 0 0;
+
+          .section-name {
+            float: none;
+            width: 100%;
           }
-      }
+        }
+    }
   }
 
   .toggle-button-sections {
@@ -630,7 +624,7 @@ body.course.outline {
             }
 
             label {
-              @extend .t-copy-sub1;
+              @extend %t-copy-sub1;
               margin-bottom: ($baseline/4);
             }
           }
@@ -675,35 +669,75 @@ body.course.outline {
       color: $darkGrey;
   }
 
-  // sort/drag and drop
-  .ui-droppable {
-      @include transition (padding 0.5s ease-in-out 0s);
-      min-height: 20px;
-      padding: 0;
+  // UI: DnD - specific elems/cases - section
+  .courseware-section {
 
-      &.dropover {
-          padding: 15px 0;
-      }
+    .draggable-drop-indicator-before {
+      top: -($baseline/2);
+    }
+
+    .draggable-drop-indicator-after {
+      bottom: -13px;
+    }
+
+    // CASE: DnD - empty subsection with unit dropping
+    .drop-target-prepend .draggable-drop-indicator-initial {
+      opacity: 1.0;
+    }
+
+    // STATE: was dropped
+    &.was-dropped {
+      background-color: $ui-update-color;
+    }
   }
 
-  .ui-draggable-dragging {
-      box-shadow: 0 1px 2px rgba(0, 0, 0, .3);
-      border: 1px solid $darkGrey;
-      opacity : 0.2;
-      &:hover {
-          opacity : 1.0;
-          .section-item {
-              background: $yellow !important;
-          }
-      }
+  // UI: DnD - specific elems/cases - subsection
+  .courseware-subsection {
 
-      // hiding unit button - temporary fix until this semantically corrected
-      .new-unit-item {
-        display: none;
+    .draggable-drop-indicator-before {
+      top: 0;
+    }
+
+    .draggable-drop-indicator-after {
+      bottom: 0;
+    }
+
+    // CASE: DnD - empty subsection with unit dropping
+    .drop-target-prepend .draggable-drop-indicator-initial {
+      opacity: 1.0;
+    }
+
+    // STATE: was dropped
+    &.was-dropped {
+
+      > .section-item {
+        background-color: $ui-update-color !important; // nasty, but needed for specificity
       }
+    }
   }
 
-  ol.ui-droppable .branch:first-child .section-item {
-      border-top: none;
+  // UI: DnD - specific elems/cases - unit
+  .courseware-unit {
+
+    .draggable-drop-indicator-before {
+      top: 0;
+    }
+
+    .draggable-drop-indicator-after {
+      bottom: 0;
+    }
+
+    // STATE: was dropped
+    &.was-dropped {
+
+      > .section-item {
+        background-color: $ui-update-color !important; // nasty, but needed for specificity
+      }
+    }
+  }
+
+  // UI: DnD - specific elems/cases - empty parents splint
+  .ui-splint-indicator {
+    position: relative;
   }
 }

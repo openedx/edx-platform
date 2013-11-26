@@ -1,4 +1,4 @@
-from .utils import merge_dict, perform_request, CommentClientError
+from .utils import merge_dict, perform_request, CommentClientRequestError
 
 import models
 import settings
@@ -41,7 +41,7 @@ class User(models.Model):
         elif voteable.type == 'comment':
             url = _url_for_vote_comment(voteable.id)
         else:
-            raise CommentClientError("Can only vote / unvote for threads or comments")
+            raise CommentClientRequestError("Can only vote / unvote for threads or comments")
         params = {'user_id': self.id, 'value': value}
         request = perform_request('put', url, params)
         voteable.update_attributes(request)
@@ -52,14 +52,14 @@ class User(models.Model):
         elif voteable.type == 'comment':
             url = _url_for_vote_comment(voteable.id)
         else:
-            raise CommentClientError("Can only vote / unvote for threads or comments")
+            raise CommentClientRequestError("Can only vote / unvote for threads or comments")
         params = {'user_id': self.id}
         request = perform_request('delete', url, params)
         voteable.update_attributes(request)
 
     def active_threads(self, query_params={}):
         if not self.course_id:
-            raise CommentClientError("Must provide course_id when retrieving active threads for the user")
+            raise CommentClientRequestError("Must provide course_id when retrieving active threads for the user")
         url = _url_for_user_active_threads(self.id)
         params = {'course_id': self.course_id}
         params = merge_dict(params, query_params)
@@ -68,7 +68,7 @@ class User(models.Model):
 
     def subscribed_threads(self, query_params={}):
         if not self.course_id:
-            raise CommentClientError("Must provide course_id when retrieving subscribed threads for the user")
+            raise CommentClientRequestError("Must provide course_id when retrieving subscribed threads for the user")
         url = _url_for_user_subscribed_threads(self.id)
         params = {'course_id': self.course_id}
         params = merge_dict(params, query_params)
@@ -102,3 +102,8 @@ def _url_for_user_active_threads(user_id):
 
 def _url_for_user_subscribed_threads(user_id):
     return "{prefix}/users/{user_id}/subscribed_threads".format(prefix=settings.PREFIX, user_id=user_id)
+
+def _url_for_user_stats(user_id,course_id):
+    return "{prefix}/users/{user_id}/stats?course_id={course_id}".format(prefix=settings.PREFIX, user_id=user_id,course_id=course_id)
+
+

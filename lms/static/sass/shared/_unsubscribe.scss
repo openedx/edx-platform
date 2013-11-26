@@ -1,0 +1,23 @@
+.container.unsubscribe {
+  padding: 60px 0px 120px;
+
+  h1 {
+    margin-bottom: 20px;
+    padding: 10px;
+    @extend %success-message-colors;
+  }
+
+  h1 + hr {
+    margin-bottom: 30px;
+  }
+
+  .message {
+    background: rgb(252,252,252);
+    border: 1px solid rgb(200,200,200);
+    box-shadow: 0 3px 20px 0 rgba(0,0,0, 0.2);
+    border-radius: 4px;
+    margin: 0 auto;
+    padding: 40px;
+    width: flex-grid(6);
+  }
+}

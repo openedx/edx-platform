@@ -5,13 +5,38 @@ from pkg_resources import resource_string
 
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
-from xblock.core import Scope, String
+from xblock.fields import Scope, String
+import textwrap
 
 log = logging.getLogger(__name__)
 
 
 class AnnotatableFields(object):
-    data = String(help="XML data for the annotation", scope=Scope.content)
+    data = String(help="XML data for the annotation", scope=Scope.content,
+        default=textwrap.dedent(
+        """\
+        <annotatable>
+            <instructions>
+                <p>Enter your (optional) instructions for the exercise in HTML format.</p>
+                <p>Annotations are specified by an <code>&lt;annotation&gt;</code> tag which may may have the following attributes:</p>
+                <ul class="instructions-template">
+                    <li><code>title</code> (optional). Title of the annotation. Defaults to <i>Commentary</i> if omitted.</li>
+                    <li><code>body</code> (<b>required</b>). Text of the annotation.</li>
+                    <li><code>problem</code> (optional). Numeric index of the problem associated with this annotation. This is a zero-based index, so the first problem on the page would have <code>problem="0"</code>.</li>
+                    <li><code>highlight</code> (optional). Possible values: yellow, red, orange, green, blue, or purple. Defaults to yellow if this attribute is omitted.</li>
+                </ul>
+            </instructions>
+            <p>Add your HTML with annotation spans here.</p>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. <annotation title="My title" body="My comment" highlight="yellow" problem="0">Ut sodales laoreet est, egestas gravida felis egestas nec.</annotation> Aenean at volutpat erat. Cras commodo viverra nibh in aliquam.</p>
+            <p>Nulla facilisi. <annotation body="Basic annotation example." problem="1">Pellentesque id vestibulum libero.</annotation> Suspendisse potenti. Morbi scelerisque nisi vitae felis dictum mattis. Nam sit amet magna elit. Nullam volutpat cursus est, sit amet sagittis odio vulputate et. Curabitur euismod, orci in vulputate imperdiet, augue lorem tempor purus, id aliquet augue turpis a est. Aenean a sagittis libero. Praesent fringilla pretium magna, non condimentum risus elementum nec. Pellentesque faucibus elementum pharetra. Pellentesque vitae metus eros.</p>
+        </annotatable>
+        """))
+    display_name = String(
+        display_name="Display Name",
+        help="Display name for this module",
+        scope=Scope.settings,
+        default='Annotation',
+    )
 
 
 class AnnotatableModule(AnnotatableFields, XModule):
@@ -125,5 +150,4 @@ class AnnotatableModule(AnnotatableFields, XModule):
 
 class AnnotatableDescriptor(AnnotatableFields, RawDescriptor):
     module_class = AnnotatableModule
-    template_dir_name = "annotatable"
     mako_template = "widgets/raw-edit.html"

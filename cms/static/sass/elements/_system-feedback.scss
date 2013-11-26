@@ -1,4 +1,46 @@
 // studio - elements - system feedback
+// ====================
+
+// messages
+.message {
+  @extend %t-copy-sub1;
+  display: block;
+}
+
+.message-status {
+  display: none;
+  @include border-top-radius(2px);
+  @include box-sizing(border-box);
+  border-bottom: 2px solid $yellow-d2;
+  margin: 0 0 $baseline 0;
+  padding: ($baseline/2) $baseline;
+  font-weight: 500;
+  background: $yellow-d1;
+  color: $white;
+
+  [class^="icon-"] {
+    position: relative;
+    top: 1px;
+    @include font-size(16);
+    display: inline-block;
+    margin-right: ($baseline/2);
+  }
+
+  .text {
+    display: inline-block;
+  }
+
+  &.error {
+    border-color: $red-d3;
+    background: $red-l1;
+  }
+
+  &.is-shown {
+    display: block;
+  }
+}
+
+
 // alerts, notifications, prompts, and status communication
 // ====================
 
@@ -7,7 +49,7 @@
   @include box-sizing(border-box);
 
   .copy {
-    @extend .t-copy-sub1;
+    @extend %t-copy-sub1;
   }
 }
 
@@ -144,8 +186,8 @@
 
 // prompts
 .wrapper-prompt {
-  @extend .depth5;
-  @include transition(all $tmg-f3 ease-in-out 0s);
+  @extend %ui-depth5;
+  @include transition(all $tmg-f3 ease-in-out  0s);
   position: fixed;
   top: 0;
   background: $black-t0;
@@ -191,12 +233,12 @@
       }
 
       .action-primary {
-        @extend .t-action4;
+        @extend %t-action4;
         font-weight: 600;
       }
 
       .action-secondary {
-        @extend .t-action4;
+        @extend %t-action4;
       }
     }
   }
@@ -242,7 +284,7 @@
 
 // notifications
 .wrapper-notification {
-  @extend .depth5;
+  @extend %ui-depth5;
   @include clearfix();
   box-shadow: 0 -1px 3px $shadow, inset 0 3px 1px $blue;
   position: fixed;
@@ -375,12 +417,12 @@
   }
 
   .copy {
-    @extend .t-copy-sub1;
+    @extend %t-copy-sub1;
     width: flex-grid(10, 12);
     color: $gray-l2;
 
     .title {
-      @extend .t-title7;
+      @extend %t-title7;
       margin-bottom: 0;
       color: $white;
     }
@@ -423,7 +465,7 @@
 
     .action-secondary {
 
-      @extend .t-action4;
+      @extend %t-action4;
     }
   }
 
@@ -444,7 +486,7 @@
     }
 
     .copy p {
-      @extend .text-sr;
+      @extend %cont-text-sr;
     }
   }
 }
@@ -453,7 +495,7 @@
 
 // alerts
 .wrapper-alert {
-  @extend .depth2;
+  @extend %ui-depth2;
   @include box-sizing(border-box);
   box-shadow: 0 1px 1px $white, inset 0 2px 2px $shadow-d1, inset 0 -4px 1px $blue;
   position: relative;
@@ -543,7 +585,7 @@
     color: $gray-l2;
 
     .title {
-      @extend .t-title7;
+      @extend %t-title7;
       margin-bottom: 0;
       color: $white;
     }
@@ -577,12 +619,12 @@
   	    }
 
         .action-primary {
-          @extend .t-action4;
+          @extend %t-action4;
           font-weight: 600;
         }
 
         .action-secondary {
-          @extend .t-action4;
+          @extend %t-action4;
         }
   	  }
   	}
@@ -599,7 +641,7 @@
     text-align: center;
 
     .label {
-      @extend .text-sr;
+      @extend %cont-text-sr;
     }
 
     [class^="icon"] {
@@ -670,7 +712,7 @@
 
   // notification showing/hiding
   .wrapper-notification {
-    bottom: -($notification-height);
+    bottom: -($ui-notification-height);
 
     // varying animations
     &.is-shown {
@@ -696,7 +738,7 @@ body.uxdesign.alerts {
   }
 
   .content-primary {
-    @extend .window;
+    @extend %ui-window;
     width: flex-grid(12, 12);
     margin-right: flex-gutter();
     padding: $baseline ($baseline*1.5);

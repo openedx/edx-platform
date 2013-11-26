@@ -1,5 +1,6 @@
 import logging
 import re
+import cgi
 
 from django.conf import settings
 from django.contrib.sites.models import Site
@@ -9,10 +10,7 @@ from wiki.core.exceptions import NoRootURL
 from wiki.models import URLPath, Article
 
 from courseware.courses import get_course_by_id
-import sys
-reload(sys)
-sys.setdefaultencoding("utf-8")
-
+from course_wiki.utils import course_wiki_slug
 
 log = logging.getLogger(__name__)
 
@@ -33,21 +31,7 @@ def course_wiki_redirect(request, course_id):
     example, "/6.002x") to keep things simple.
     """
     course = get_course_by_id(course_id)
-
-    course_slug = course.wiki_slug
-
-
-    # cdodge: fix for cases where self.location.course can be interpreted as an number rather than
-    # a string. We're seeing in Studio created courses that people often will enter in a stright number
-    # for 'course' (e.g. 201). This Wiki library expects a string to "do the right thing". We haven't noticed this before
-    # because - to now - 'course' has always had non-numeric characters in them
-    try:
-        float(course_slug)
-        # if the float() doesn't throw an exception, that means it's a number
-        course_slug = course_slug + "_"
-    except:
-        pass
-
+    course_slug = course_wiki_slug(course)
 
     valid_slug = True
     if not course_slug:
@@ -99,7 +83,7 @@ def course_wiki_redirect(request, course_id):
             root,
             course_slug,
             title=course_slug,
-            content="This is the wiki for **{0}**'s _{1}_.".format(course.org, course.display_name_with_default),
+            content=cgi.escape(u"This is the wiki for **{0}**'s _{1}_.".format(course.display_org_with_default, course.display_name_with_default)),
             user_message="Course page automatically created.",
             user=None,
             ip_address=None,

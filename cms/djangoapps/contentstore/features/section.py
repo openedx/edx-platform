@@ -3,9 +3,7 @@
 
 from lettuce import world, step
 from common import *
-from nose.tools import assert_equal
-
-############### ACTIONS ####################
+from nose.tools import assert_equal  # pylint: disable=E0611
 
 
 @step('I click the New Section link$')
@@ -35,20 +33,22 @@ def i_click_the_edit_link_for_the_release_date(_step):
     world.css_click(button_css)
 
 
-@step('I save a new section release date$')
-def i_save_a_new_section_release_date(_step):
-    set_date_and_time('input.start-date.date.hasDatepicker', '12/25/2013',
-        'input.start-time.time.ui-timepicker-input', '00:00')
+@step('I set the section release date to ([0-9/-]+)( [0-9:]+)?')
+def set_section_release_date(_step, datestring, timestring):
+    if hasattr(timestring, "strip"):
+        timestring = timestring.strip()
+    if not timestring:
+        timestring = "00:00"
+    set_date_and_time(
+        'input.start-date.date.hasDatepicker', datestring,
+        'input.start-time.time.ui-timepicker-input', timestring)
     world.browser.click_link_by_text('Save')
 
 
-@step('I see a "saving" notification')
-def i_see_a_saving_notification(step):
+@step('I see a "(saving|deleting)" notification')
+def i_see_a_mini_notification(_step, _type):
     saving_css = '.wrapper-notification-mini'
     assert world.is_css_present(saving_css)
-
-
-############ ASSERTIONS ###################
 
 
 @step('I see my section on the Courseware page$')
@@ -119,8 +119,6 @@ def the_section_release_date_is_updated(_step):
     status_text = world.css_text(css)
     assert_equal(status_text, 'Will Release: 12/25/2013 at 00:00 UTC')
 
-
-############ HELPER METHODS ###################
 
 def save_section_name(name):
     name_css = '.new-section-name'

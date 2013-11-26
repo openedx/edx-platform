@@ -4,7 +4,7 @@ if Backbone?
   
     events:
       "click .discussion-flag-abuse": "toggleFlagAbuse"
-  
+      "keypress .discussion-flag-abuse": "toggleFlagAbuseKeypress"
   
     attrRenderer:
       endorsed: (endorsed) ->
@@ -37,9 +37,9 @@ if Backbone?
 
       subscribed: (subscribed) ->
         if subscribed
-          @$(".dogear").addClass("is-followed")
+          @$(".dogear").addClass("is-followed").attr("aria-checked", "true")
         else
-          @$(".dogear").removeClass("is-followed")
+          @$(".dogear").removeClass("is-followed").attr("aria-checked", "false")
 
       ability: (ability) ->
         for action, selector of @abilityRenderer
@@ -106,6 +106,30 @@ if Backbone?
       @model.bind('change', @renderPartialAttrs, @)
       
      
+    toggleFollowingKeypress: (event) ->
+      # Activate on spacebar or enter
+      if event.which == 32 or event.which == 13
+        @toggleFollowing(event)
+
+    toggleFollowing: (event) ->
+      event.preventDefault()
+      $elem = $(event.target)
+      url = null
+      if not @model.get('subscribed')
+        @model.follow()
+        url = @model.urlFor("follow")
+      else
+        @model.unfollow()
+        url = @model.urlFor("unfollow")
+      DiscussionUtil.safeAjax
+        $elem: $elem
+        url: url
+        type: "POST"
+
+    toggleFlagAbuseKeypress: (event) ->
+      # Activate on spacebar or enter
+      if event.which == 32 or event.which == 13
+        @toggleFlagAbuse(event)
      
     toggleFlagAbuse: (event) ->
       event.preventDefault()

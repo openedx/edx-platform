@@ -1,12 +1,13 @@
-from nose.tools import assert_equals, assert_raises
+from nose.tools import assert_equals, assert_raises  # pylint: disable=E0611
 
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.search import path_to_location
 
-
 def check_path_to_location(modulestore):
-    '''Make sure that path_to_location works: should be passed a modulestore
-    with the toy and simple courses loaded.'''
+    """
+    Make sure that path_to_location works: should be passed a modulestore
+    with the toy and simple courses loaded.
+    """
     should_work = (
         ("i4x://edX/toy/video/Welcome",
          ("edX/toy/2012_Fall", "Overview", "Welcome", None)),

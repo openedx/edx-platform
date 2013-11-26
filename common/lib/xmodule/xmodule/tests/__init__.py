@@ -7,17 +7,26 @@ Run like this:
 
 """
 
-import unittest
+import json
 import os
-import fs
-import fs.osfs
+import pprint
+import unittest
 
-import numpy
-
-import calc
-import xmodule
-from xmodule.x_module import ModuleSystem
 from mock import Mock
+from path import path
+
+from xblock.field_data import DictFieldData
+from xmodule.x_module import ModuleSystem, XModuleDescriptor, XModuleMixin
+from xmodule.modulestore.inheritance import InheritanceMixin
+from xmodule.mako_module import MakoDescriptorSystem
+from xmodule.error_module import ErrorDescriptor
+
+
+# Location of common test DATA directory
+# '../../../../edx-platform/common/test/data/'
+MODULE_DIR = path(__file__).dirname()
+DATA_DIR = path.joinpath(*MODULE_DIR.splitall()[:-4]) / 'test/data/'
+
 
 open_ended_grading_interface = {
         'url': 'blah/',
@@ -29,7 +38,15 @@ open_ended_grading_interface = {
     }
 
 
-def get_test_system():
+class TestModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
+    """
+    ModuleSystem for testing
+    """
+    def handler_url(self, block, handler, suffix='', query=''):
+        return str(block.scope_ids.usage_id) + '/' + handler + '/' + suffix + '?' + query
+
+
+def get_test_system(course_id=''):
     """
     Construct a test ModuleSystem instance.
 
@@ -42,21 +59,46 @@ def get_test_system():
     where `my_render_func` is a function of the form my_render_func(template, context).
 
     """
-    return ModuleSystem(
-        ajax_url='courses/course_id/modx/a_location',
+    return TestModuleSystem(
+        static_url='/static',
         track_function=Mock(),
         get_module=Mock(),
-        render_template=lambda template, context: repr(context),
-        replace_urls=lambda html: str(html),
+        render_template=mock_render_template,
+        replace_urls=str,
         user=Mock(is_staff=False),
         filestore=Mock(),
         debug=True,
+        hostname="edx.org",
         xqueue={'interface': None, 'callback_url': '/', 'default_queuename': 'testqueue', 'waittime': 10, 'construct_callback' : Mock(side_effect="/")},
         node_path=os.environ.get("NODE_PATH", "/usr/local/lib/node_modules"),
-        xblock_model_data=lambda descriptor: descriptor._model_data,
         anonymous_student_id='student',
-        open_ended_grading_interface= open_ended_grading_interface
+        open_ended_grading_interface=open_ended_grading_interface,
+        course_id=course_id,
+        error_descriptor_class=ErrorDescriptor,
     )
+
+
+def get_test_descriptor_system():
+    """
+    Construct a test DescriptorSystem instance.
+    """
+    return MakoDescriptorSystem(
+        load_item=Mock(),
+        resources_fs=Mock(),
+        error_tracker=Mock(),
+        render_template=mock_render_template,
+        mixins=(InheritanceMixin, XModuleMixin),
+    )
+
+
+def mock_render_template(*args, **kwargs):
+    """
+    Pretty-print the args and kwargs.
+
+    Allows us to not depend on any actual template rendering mechanism,
+    while still returning a unicode object
+    """
+    return pprint.pformat((args, kwargs)).decode()
 
 
 class ModelsTest(unittest.TestCase):
@@ -64,50 +106,30 @@ class ModelsTest(unittest.TestCase):
         pass
 
     def test_load_class(self):
-        vc = xmodule.x_module.XModuleDescriptor.load_class('video')
+        vc = XModuleDescriptor.load_class('video')
         vc_str = "<class 'xmodule.video_module.VideoDescriptor'>"
         self.assertEqual(str(vc), vc_str)
 
-    def test_calc(self):
-        variables = {'R1': 2.0, 'R3': 4.0}
-        functions = {'sin': numpy.sin, 'cos': numpy.cos}
 
-        self.assertTrue(abs(calc.evaluator(variables, functions, "10000||sin(7+5)+0.5356")) < 0.01)
-        self.assertEqual(calc.evaluator({'R1': 2.0, 'R3': 4.0}, {}, "13"), 13)
-        self.assertEqual(calc.evaluator(variables, functions, "13"), 13)
-        self.assertEqual(calc.evaluator({'a': 2.2997471478310274, 'k': 9, 'm': 8, 'x': 0.66009498411213041}, {}, "5"), 5)
-        self.assertEqual(calc.evaluator({}, {}, "-1"), -1)
-        self.assertEqual(calc.evaluator({}, {}, "-0.33"), -.33)
-        self.assertEqual(calc.evaluator({}, {}, "-.33"), -.33)
-        self.assertEqual(calc.evaluator(variables, functions, "R1*R3"), 8.0)
-        self.assertTrue(abs(calc.evaluator(variables, functions, "sin(e)-0.41")) < 0.01)
-        self.assertTrue(abs(calc.evaluator(variables, functions, "k*T/q-0.025")) < 0.001)
-        self.assertTrue(abs(calc.evaluator(variables, functions, "e^(j*pi)") + 1) < 0.00001)
-        self.assertTrue(abs(calc.evaluator(variables, functions, "j||1") - 0.5 - 0.5j) < 0.00001)
-        variables['t'] = 1.0
-        # Use self.assertAlmostEqual here...
-        self.assertTrue(abs(calc.evaluator(variables, functions, "t") - 1.0) < 0.00001)
-        self.assertTrue(abs(calc.evaluator(variables, functions, "T") - 1.0) < 0.00001)
-        self.assertTrue(abs(calc.evaluator(variables, functions, "t", cs=True) - 1.0) < 0.00001)
-        self.assertTrue(abs(calc.evaluator(variables, functions, "T", cs=True) - 298) < 0.2)
-        # Use self.assertRaises here...
-        exception_happened = False
-        try:
-            calc.evaluator({}, {}, "5+7 QWSEKO")
-        except:
-            exception_happened = True
-        self.assertTrue(exception_happened)
+class LogicTest(unittest.TestCase):
+    """Base class for testing xmodule logic."""
+    descriptor_class = None
+    raw_field_data = {}
 
-        try:
-            calc.evaluator({'r1': 5}, {}, "r1+r2")
-        except calc.UndefinedVariable:
-            pass
+    def setUp(self):
+        class EmptyClass:
+            """Empty object."""
+            url_name = ''
+            category = 'test'
 
-        self.assertEqual(calc.evaluator(variables, functions, "r1*r3"), 8.0)
+        self.system = get_test_system()
+        self.descriptor = EmptyClass()
 
-        exception_happened = False
-        try:
-            calc.evaluator(variables, functions, "r1*r3", cs=True)
-        except:
-            exception_happened = True
-        self.assertTrue(exception_happened)
+        self.xmodule_class = self.descriptor_class.module_class
+        self.xmodule = self.xmodule_class(
+            self.descriptor, self.system, DictFieldData(self.raw_field_data), Mock()
+        )
+
+    def ajax_request(self, dispatch, data):
+        """Call Xmodule.handle_ajax."""
+        return json.loads(self.xmodule.handle_ajax(dispatch, data))

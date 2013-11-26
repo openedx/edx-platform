@@ -1,21 +1,19 @@
 <%! from django.utils.translation import ugettext as _ %>
-<%! from django.utils import translation    %>
-
-
 
 <%inherit file="main.html" />
+
 <%namespace name='static' file='static_content.html'/>
 <%namespace file='main.html' import="login_query"/>
 
 <%! from django.core.urlresolvers import reverse %>
 <%! from django.utils import html %>
 <%! from django_countries.countries import COUNTRIES %>
-
+<%! from django.utils.translation import ugettext as _ %>
 <%! from student.models import UserProfile %>
 <%! from datetime import date %>
 <%! import calendar %>
 
-<%block name="title"><title>${_("Register for")} ${settings.PLATFORM_NAME}</title></%block>
+<%block name="title"><title>${_("Register for {platform_name}").format(platform_name=settings.PLATFORM_NAME)}</title></%block>
 
 <%block name="js_extra">
   <script type="text/javascript">
@@ -49,15 +47,20 @@
         toggleSubmitButton(false);
       });
 
-      $('#register-form').on('ajax:complete', function() {
+      $('#register-form').on('ajax:error', function() {
         toggleSubmitButton(true);
       });
 
       $('#register-form').on('ajax:success', function(event, json, xhr) {
         if(json.success) {
-          $('.message.submission-error').removeClass('is-shown');
-          location.href="${reverse('dashboard')}";
+          if(json.redirect_url){
+            location.href=json.redirect_url;
+          }
+          else {
+            location.href="${reverse('dashboard')}";
+          }
        } else {
+         toggleSubmitButton(true);
          $('.status.message.submission-error').addClass('is-shown').focus();
          $('.status.message.submission-error .message-copy').html(json.value).stop().css("display", "block");
          $(".field-error").removeClass('field-error');
@@ -73,13 +76,13 @@
         $submitButton.
           removeClass('is-disabled').
           removeProp('disabled').
-          html('Create my ${settings.PLATFORM_NAME} Account');
+          html("${_('Create My {platform_name} Account').format(platform_name=settings.PLATFORM_NAME)}");
       }
       else {
         $submitButton.
           addClass('is-disabled').
           prop('disabled', true).
-          html('Processing your account information &hellip;');
+          html(gettext('Processing your account information &hellip;'));
       }
     }
   </script>
@@ -87,100 +90,103 @@
 
 <section class="introduction">
   <header>
-    <h1 class="sr">${_("Welcome! Register below to create your")} %(platform_name)s ${_("account")} % {'platform_name': settings.PLATFORM_NAME}</h1>
+    <h1 class="title">
+      <span class="title-super">${_("Welcome!")}</span>
+      <span class="title-sub">${_("Register below to create your {platform_name} account").format(platform_name=settings.PLATFORM_NAME)}</span>
+    </h1>
   </header>
 </section>
 
 <section class="register container">
   <section role="main" class="content">
     <form role="form" id="register-form" method="post" data-remote="true" action="/create_account" novalidate>
+      <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
 
       <!-- status messages -->
       <div role="alert" class="status message">
-        <h3 class="message-title">${_("We're sorry")}, ${settings.PLATFORM_NAME} ${_("enrollment is not available in your region")}</h3>
-        <p class="message-copy">${_("Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Lorem ipsum dolor sit amet, consectetuer adipiscing elit")}</p>
+        <h3 class="message-title">${_("We're sorry, {platform_name} enrollment is not available in your region").format(platform_name=settings.PLATFORM_NAME)}</h3>
       </div>
 
       <div role="alert" class="status message submission-error" tabindex="-1">
-        <h3 class="message-title">${_("The following errors occured while processing your registration")}: </h3>
+        <h3 class="message-title">${_("The following errors occured while processing your registration:")} </h3>
         <ul class="message-copy"> </ul>
       </div>
 
       <p class="instructions">
-        ${_("Please complete the following fields to register for an account")}. <br />
-        ${_("Required fields are noted by")} <strong class="indicator">${_("bold text and an asterisk")} (*)</strong>.
+        ${_("Please complete the following fields to register for an account. ")}<br />
+        ${_('Required fields are noted by <strong class="indicator">bold text and an asterisk (*)</strong>.')}
       </p>
 
-      <fieldset class="group group-form group-form-requiredinformation">
-        <legend class="sr">${_("Required Information")}</legend>
+      <div class="group group-form group-form-requiredinformation">
+        <h2 class="sr">${_('Required Information')}</h2>
 
         % if has_extauth_info is UNDEFINED:
 
         <ol class="list-input">
           <li class="field required text" id="field-email">
-            <label for="email">E-mail</label>
-            <input class="" id="email" type="email" name="email" value="" placeholder="example: username@domain.com" required aria-required="true" />
+            <label for="email">${_('E-mail')}</label>
+            <input class="" id="email" type="email" name="email" value="" placeholder="${_('example: username@domain.com')}" required aria-required="true" />
           </li>
           <li class="field required password" id="field-password">
-            <label for="password">${_("Password")}</label>
+            <label for="password">${_('Password')}</label>
             <input id="password" type="password" name="password" value="" required aria-required="true" />
           </li>
           <li class="field required text" id="field-username">
-            <label for="username">${_("Public Username")}</label>
-            <input id="username" type="text" name="username" value="" placeholder="example: JaneDoe" required aria-required="true" />
-            <span class="tip tip-input">${_("Will be shown in any discussions or forums you participate in")}</span>
+            <label for="username">${_('Public Username')}</label>
+            <input id="username" type="text" name="username" value="" placeholder="${_('example: JaneDoe')}" required aria-required="true" aria-describedby="username-tip"/>
+            <span class="tip tip-input" id="username-tip">${_('Will be shown in any discussions or forums you participate in')} <strong>(${_('cannot be changed later')})</strong></span>
           </li>
           <li class="field required text" id="field-name">
-            <label for="name">${_("Full Name")}</label>
-            <input id="name" type="text" name="name" value="" placeholder="example: Jane Doe" required aria-required="true" />
-            <span class="tip tip-input">${_("Needed for any certificates you may earn <strong>(cannot be changed later)</strong>")}</span>
+            <label for="name">${_('Full Name')}</label>
+            <input id="name" type="text" name="name" value="" placeholder="${_('example: Jane Doe')}" required aria-required="true" aria-describedby="name-tip" />
+            <span class="tip tip-input" id="name-tip">${_("Needed for any certificates you may earn")}</span>
           </li>
         </ol>
 
         % else:
 
         <div class="message">
-          <h3 class="message-title">${_("Welcome")} ${extauth_id}</h3>
-          <p class="message-copy">${_("Enter a public username:")}</p>
+          <h3 class="message-title">${_("Welcome {username}").format(username=extauth_id)}</h3>
+          <p class="message-copy">${_("Enter a Public Display Name:")}</p>
         </div>
 
         <ol class="list-input">
-          
+
           % if ask_for_email:
 
           <li class="field required text" id="field-email">
-            <label for="email">E-mail</label>
-            <input class="" id="email" type="email" name="email" value="" placeholder="example: username@domain.com" />
+            <label for="email">${_("E-mail")}</label>
+            <input class="" id="email" type="email" name="email" value="" placeholder="${_('example: username@domain.com')}" />
           </li>
-          
-          % endif
-          
-          <li class="field required text" id="field-username">
-            <label for="username">${_("Public Username")}</label>
 
-            <input id="username" type="text" name="username" value="${extauth_username}" placeholder="example: JaneDoe" required aria-required="true" />
-            <span class="tip tip-input">${_("Will be shown in any discussions or forums you participate in")}</span>
-          </li>
-          
-          % if ask_for_fullname:
-          
-          <li class="field required text" id="field-name">
-            <label for="name">${_("Full Name")}</label>
-            <input id="name" type="text" name="name" value="" placeholder="example: Jane Doe" />
-            <span class="tip tip-input">${_("Needed for any certificates you may earn <strong>(cannot be changed later)</strong>")}</span>
-          </li>
-          
           % endif
-          
+
+          <li class="field required text" id="field-username">
+            <label for="username">${_('Public Display Name')}</label>
+            <input id="username" type="text" name="username" value="${extauth_username}" placeholder="${_('example: JaneDoe')}" required aria-required="true" aria-describedby="username-tip" />
+            <span class="tip tip-input" id="id="username-tip>${_('Will be shown in any discussions or forums you participate in')} <strong>(${_('cannot be changed later')})</strong></span>
+          </li>
+
+          % if ask_for_fullname:
+
+          <li class="field required text" id="field-name">
+            <label for="name">${_('Full Name')}</label>
+            <input id="name" type="text" name="name" value="" placeholder="$_('example: Jane Doe')}" aria-describedby="name-tip" />
+            <span class="tip tip-input" id="name-tip">${_("Needed for any certificates you may earn")}</span>
+          </li>
+
+          % endif
+
         </ol>
 
         % endif
-      </fieldset>
+      </div>
 
-      <fieldset class="group group-form group-form-secondary group-form-personalinformation">
-        <legend class="sr">${_("Optional Personal Information")}</legend>
+      <div class="group group-form group-form-secondary group-form-personalinformation">
+        <h2 class="sr">${_("Optional Personal Information")}</h2>
 
         <ol class="list-input">
+          % if 'level_of_education' in settings.REGISTRATION_OPTIONAL_FIELDS:
           <li class="field-group">
             <div class="field select" id="field-education-level">
               <label for="education-level">${_("Highest Level of Education Completed")}</label>
@@ -191,7 +197,10 @@
                 %endfor
               </select>
             </div>
-
+          </li>
+          % endif
+          % if 'gender' in settings.REGISTRATION_OPTIONAL_FIELDS:
+          <li class="field-group">
             <div class="field select" id="field-gender">
               <label for="gender">${_("Gender")}</label>
               <select id="gender" name="gender">
@@ -201,7 +210,10 @@
                 %endfor
               </select>
             </div>
-
+          </li>
+          % endif
+          % if 'year_of_birth' in settings.REGISTRATION_OPTIONAL_FIELDS:
+          <li class="field-group">
             <div class="field select" id="field-yob">
               <label for="yob">${_("Year of Birth")}</label>
               <select id="yob" name="year_of_birth">
@@ -211,28 +223,33 @@
                 %endfor
               </select>
             </div>
+            % endif
           </li>
         </ol>
-      </fieldset>
+      </div>
 
-      <fieldset class="group group-form group-form-personalinformation2">
-        <legend class="sr">${_("Optional Personal Information")}</legend>
+      <div class="group group-form group-form-personalinformation2">
+        <h2 class="sr">${_("Optional Personal Information")}</h2>
 
         <ol class="list-input">
+          % if 'mailing_address' in settings.REGISTRATION_OPTIONAL_FIELDS:
           <li class="field text" id="field-address-mailing">
             <label for="address-mailing">${_("Mailing Address")}</label>
             <textarea id="address-mailing" name="mailing_address" value=""></textarea>
           </li>
+          % endif
 
+          % if 'goals' in settings.REGISTRATION_OPTIONAL_FIELDS:
           <li class="field text" id="field-goals">
-            <label for="goals">${_("Please share with us your reasons for registering with")} ${settings.PLATFORM_NAME}</label>
+            <label for="goals">${_("Please share with us your reasons for registering with {platform_name}").format(platform_name=settings.PLATFORM_NAME)}</label>
             <textarea id="goals" name="goals" value=""></textarea>
           </li>
+          % endif
         </ol>
-      </fieldset>
+      </div>
 
-      <fieldset class="group group-form group-form-accountacknowledgements">
-        <legend class="sr">${_("Account Acknowledgements")}</legend>
+      <div class="group group-form group-form-accountacknowledgements">
+        <h2 class="sr">${_("Account Acknowledgements")}</h2>
 
         <ol class="list-input">
           <li class="field-group">
@@ -241,7 +258,9 @@
 
             <div class="field required checkbox" id="field-tos">
               <input id="tos-yes" type="checkbox" name="terms_of_service" value="true" required aria-required="true" />
-              <label for="tos-yes">${_("I agree to the")} <a href="${marketing_link('TOS')}" class="new-vp">${_("Terms of Service")}</a></label>
+              <label for="tos-yes">${_('I agree to the {link_start}Terms of Service{link_end}').format(
+                link_start='<a href="{url}" class="new-vp">'.format(url=marketing_link('TOS')),
+                link_end='</a>')}</label>
             </div>
 
             % endif
@@ -255,11 +274,13 @@
                 else:
                   honor_code_path = marketing_link('HONOR')
               %>
-              <label for="honorcode-yes">${_("I agree to the")} <a href="${honor_code_path}" class="new-vp">${_("Honor Code")}</a></label>
+              <label for="honorcode-yes">${_('I agree to the {link_start}Honor Code{link_end}').format(
+                link_start='<a href="{url}" class="new-vp">'.format(url=honor_code_path),
+                link_end='</a>')}</label>
             </div>
           </li>
         </ol>
-      </fieldset>
+      </div>
 
 % if course_id and enrollment_action:
       <input type="hidden" name="enrollment_action" value="${enrollment_action | h}" />
@@ -267,7 +288,7 @@
 % endif
 
       <div class="form-actions">
-        <button name="submit" type="submit" id="submit" class="action action-primary action-update">${_("Register")} <span class="orn-plus">+</span> ${_("Create My Account")}</button>
+        <button name="submit" type="submit" id="submit" class="action action-primary action-update">${_('Register')} <span class="orn-plus">+</span> ${_('Create My Account')}</button>
       </div>
     </form>
   </section>
@@ -287,35 +308,35 @@
         </a>
       </p>
     </div>
-      
+
     % endif
 
     ## TODO: Use a %block tag or something to allow themes to
     ##       override in a more generalizable fashion.
     % if not self.stanford_theme_enabled():
       <div class="cta cta-welcome">
-        <h3>${_("Welcome to")} ${settings.PLATFORM_NAME}</h3>
-        <p>${_("Registering with")} ${settings.PLATFORM_NAME} ${_("gives you access to all of our current and future free courses. Not ready to take a course just yet? Registering puts you on our mailing list - we will update you as courses are added")}.</p>
+        <h3>${_("Welcome to {platform_name}").format(platform_name=settings.PLATFORM_NAME)}</h3>
+        <p>${_("Registering with {platform_name} gives you access to all of our current and future free courses. Not ready to take a course just yet? Registering puts you on our mailing list - we will update you as courses are added.").format(platform_name=settings.PLATFORM_NAME)}</p>
       </div>
     % endif
 
     <div class="cta cta-nextsteps">
       <h3>${_("Next Steps")}</h3>
       % if self.stanford_theme_enabled():
-        <p>${_("You will receive an activation email.  You must click on the activation link to complete the process.  Don't see the email?  Check your spam folder and mark emails from class.stanford.edu as 'not spam', since you'll want to be able to receive email from your courses")}.</p>
+        <p>${_("You will receive an activation email.  You must click on the activation link to complete the process.  Don't see the email?  Check your spam folder and mark emails from class.stanford.edu as 'not spam', since you'll want to be able to receive email from your courses.")}</p>
       % else:
-      <p>${_("As part of joining")} ${settings.PLATFORM_NAME}, ${_("you will receive an activation email.  You must click on the activation link to complete the process.  Don't see the email?  Check your spam folder and mark")} ${settings.PLATFORM_NAME} ${_("emails as 'not spam'")}.  At ${settings.PLATFORM_NAME}, ${_("we communicate mostly through email")}.</p>
+      <p>${_("As part of joining {platform_name}, you will receive an activation email.  You must click on the activation link to complete the process.  Don't see the email?  Check your spam folder and mark {platform_name} emails as 'not spam'.  At {platform_name}, we communicate mostly through email.").format(platform_name=settings.PLATFORM_NAME)}</p>
       % endif
     </div>
 
     % if settings.MKTG_URL_LINK_MAP.get('FAQ'):
       <div class="cta cta-help">
-        <h3>${_("Need Help")}?</h3>
-        <p>${_("Need help in registering with")} ${settings.PLATFORM_NAME}?
+        <h3>${_("Need Help?")}</h3>
+        <p>${_("Need help in registering with {platform_name}?").format(platform_name=settings.PLATFORM_NAME)}
           <a href="${marketing_link('FAQ')}">
-              ${_("View our FAQs for answers to commonly asked questions")}.
+              ${_("View our FAQs for answers to commonly asked questions.")}
           </a>
-          ${_("Once registered, most questions can be answered in the course specific discussion forums or through the FAQs")}.</p>
+          ${_("Once registered, most questions can be answered in the course specific discussion forums or through the FAQs.")}</p>
       </div>
     % endif
   </aside>

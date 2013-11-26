@@ -4,7 +4,7 @@ class @Sequence
     @contents = @$('.seq_contents')
     @num_contents = @contents.length
     @id = @el.data('id')
-    @modx_url = @el.data('course_modx_root')
+    @ajaxUrl = @el.data('ajax-url')
     @initProgress()
     @bind()
     @render parseInt(@el.data('position'))
@@ -45,7 +45,7 @@ class @Sequence
     new_progress = "NA"
     _this = this
     $('.problems-wrapper').each (index) ->
-      progress = $(this).attr 'progress'
+      progress = $(this).data 'progress_status'
       new_progress = _this.mergeProgress progress, new_progress
 
     @progressTable[@position] = new_progress
@@ -84,12 +84,15 @@ class @Sequence
     if @position != new_position
       if @position != undefined
         @mark_visited @position
-        modx_full_url = @modx_url + '/' + @id + '/goto_position'
+        modx_full_url = '#{@ajaxUrl}/goto_position'
         $.postWithPrefix modx_full_url, position: new_position
 
+      # On Sequence change, fire custom event "sequence:change" on element.
+      # Added for aborting video bufferization, see ../video/10_main.js
+      @el.trigger "sequence:change"
       @mark_active new_position
       @$('#seq_content').html @contents.eq(new_position - 1).text()
-      XModule.loadModules(@$('#seq_content'))
+      XBlock.initializeBlocks(@$('#seq_content'))
 
       MathJax.Hub.Queue(["Typeset", MathJax.Hub, "seq_content"]) # NOTE: Actually redundant. Some other MathJax call also being performed
       window.update_schematics() # For embedded circuit simulator exercises in 6.002x
@@ -100,6 +103,7 @@ class @Sequence
 
       sequence_links = @$('#seq_content a.seqnav')
       sequence_links.click @goto
+    @$("a.active").blur()
 
   goto: (event) =>
     event.preventDefault()
@@ -129,34 +133,38 @@ class @Sequence
     else
       alert 'Sequence error! Cannot navigate to tab ' + new_position + 'in the current SequenceModule. Please contact the course staff.'
 
-  next: (event) =>
+  next: (event) => @_change_sequential 'seq_next', event
+  previous: (event) => @_change_sequential 'seq_prev', event
+
+  # `direction` can be 'seq_prev' or 'seq_next'
+  _change_sequential: (direction, event) =>
+    # silently abort if direction is invalid.
+    return unless direction in ['seq_prev', 'seq_next']
+
     event.preventDefault()
-    new_position = @position + 1
-    Logger.log "seq_next", old: @position, new: new_position, id: @id
+    offset =
+      seq_next: 1
+      seq_prev: -1
+    new_position = @position + offset[direction]
+    Logger.log direction,
+      old: @position
+      new: new_position
+      id: @id
 
     analytics.pageview @id
 
-    # navigation using the next arrow
-    analytics.track "Accessed Next Sequential",
-      sequence_id: @id
-      current_sequential: @position
-      target_sequential: new_position 
-
-    @render new_position
-
-  previous: (event) =>
-    event.preventDefault()
-    new_position = @position - 1
-    Logger.log "seq_prev", old: @position, new: new_position, id: @id
-
-    analytics.pageview @id
-
-    # navigation using the previous arrow
-    analytics.track "Accessed Previous Sequential",
+    # navigation using the next or previous arrow button.
+    tracking_messages =
+      seq_prev: "Accessed Previous Sequential"
+      seq_next: "Accessed Next Sequential"
+    analytics.track tracking_messages[direction],
       sequence_id: @id
       current_sequential: @position
       target_sequential: new_position
 
+    # If the bottom nav is used, scroll to the top of the page on change.
+    if $(event.target).closest('nav[class="sequence-bottom"]').length > 0
+      $.scrollTo 0, 150
     @render new_position
 
   link_for: (position) ->

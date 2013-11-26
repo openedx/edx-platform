@@ -1,4 +1,6 @@
-<form class="option-input">
+<% doinline = "inline" if inline else "" %>
+
+<form class="inputtype option-input ${doinline}">
    <select name="input_${id}" id="input_${id}" aria-describedby="answer_${id}">
       <option value="option_${id}_dummy_default">  </option>
       % for option_id, option_description in options:
@@ -29,4 +31,9 @@
     <span class="sr">Status: incomplete</span>
   </span>
   % endif
+
+  % if msg:
+      <span class="message">${msg|n}</span>
+  % endif
+
 </form>

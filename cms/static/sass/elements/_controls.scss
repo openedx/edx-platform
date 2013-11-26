@@ -2,8 +2,8 @@
 // ====================
 
 // gray primary button
-.btn-primary-gray {
-  @extend .btn-primary;
+%btn-primary-gray {
+  @extend %ui-btn-primary;
   background: $gray-l1;
   border-color: $gray-l2;
   color: $white;
@@ -24,8 +24,8 @@
 }
 
 // blue primary button
-.btn-primary-blue {
-  @extend .btn-primary;
+%btn-primary-blue {
+  @extend %ui-btn-primary;
   background: $blue;
   border-color: $blue-s1;
   color: $white;
@@ -47,8 +47,8 @@
 }
 
 // green primary button
-.btn-primary-green {
-  @extend .btn-primary;
+%btn-primary-green {
+  @extend %ui-btn-primary;
   background: $green;
   border-color: $green;
   color: $white;
@@ -70,8 +70,8 @@
 }
 
 // gray secondary button
-.btn-secondary-gray {
-  @extend .btn-secondary;
+%btn-secondary-gray {
+  @extend %ui-btn-secondary;
   border-color: $gray-l3;
   color: $gray-l1;
 
@@ -91,8 +91,8 @@
 }
 
 // blue secondary button
-.btn-secondary-blue {
-  @extend .btn-secondary;
+%btn-secondary-blue {
+  @extend %ui-btn-secondary;
   border-color: $blue-l3;
   color: $blue;
 
@@ -113,8 +113,8 @@
 }
 
 // green secondary button
-.btn-secondary-green {
-  @extend .btn-secondary;
+%btn-secondary-green {
+  @extend %ui-btn-secondary;
   border-color: $green-l4;
   color: $green-l2;
 
@@ -148,9 +148,9 @@
 // ====================
 
 // simple dropdown button styling - should we move this elsewhere?
-.btn-dd {
-  @extend .btn;
-  @extend .btn-pill;
+%ui-btn-dd {
+  @extend %ui-btn;
+  @extend %ui-btn-pill;
   padding:($baseline/4) ($baseline/2);
   border-width: 1px;
   border-style: solid;
@@ -158,7 +158,7 @@
   text-align: center;
 
   &:hover, &:active {
-    @extend .fake-link;
+    @extend %ui-fake-link;
     border-color: $gray-l3;
   }
 
@@ -169,8 +169,8 @@
 }
 
 // layout-based buttons - nav dd
-.btn-dd-nav-primary {
-  @extend .btn-dd;
+%ui-btn-dd-nav-primary {
+  @extend %ui-btn-dd;
   background: $white;
   border-color: $white;
   color: $gray-d1;
@@ -197,6 +197,86 @@
 // ====================
 
 // specific buttons - view live
-.view-live-button {
-  @extend .t-action4;
+%view-live-button {
+  @extend %t-action4;
+}
+
+// ====================
+
+// UI: drag handles
+.drag-handle {
+
+  &:hover, &:focus {
+    cursor: move;
+  }
+}
+
+// UI: elem is draggable
+.is-draggable {
+  @include transition(border-color $tmg-f2 ease-in-out 0, box-shadow $tmg-f2 ease-in-out 0);
+  position: relative;
+
+  .draggable-drop-indicator {
+    @extend %ui-depth3;
+    @include transition(opacity $tmg-f2 linear 0s);
+    @include size(100%, auto);
+    position: absolute;
+    border-top: 1px solid $blue-l1;
+    opacity: 0.0;
+
+    *[class^="icon-caret"] {
+      @extend %t-icon5;
+      position: absolute;
+      top: -12px;
+      left: -($baseline/4);
+      color: $blue-s1;
+    }
+  }
+
+  .draggable-drop-indicator-before {
+    top: -($baseline/2);
+  }
+
+  .draggable-drop-indicator-after {
+    bottom: -($baseline/2);
+  }
+}
+
+// UI: drag state - is dragging
+.is-dragging {
+  @extend %ui-depth4;
+  left: -($baseline/4);
+  box-shadow: 0 1px 2px 0 $shadow-d1;
+  cursor: move;
+  opacity: 0.65;
+  border: 1px solid $gray-d3;
+
+  // UI: condition - valid drop
+  &.valid-drop {
+    border-color: $blue-s1;
+    box-shadow: 0 1px 2px 0 $blue-t2;
+  }
+}
+
+// UI: drag state - was dragging
+.was-dragging {
+  @include transition(transform $tmg-f2 ease-in-out 0);
+}
+
+// UI: drag target
+.drop-target {
+
+  &.drop-target-before {
+
+    > .draggable-drop-indicator-before {
+      opacity: 1.0;
+    }
+  }
+
+  &.drop-target-after {
+
+    > .draggable-drop-indicator-after {
+      opacity: 1.0;
+    }
+  }
 }

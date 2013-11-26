@@ -1,15 +1,23 @@
 #pylint: disable=E1103, E1101
 
-from django.conf import settings
-from xmodule.modulestore import Location
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError
-from django.core.urlresolvers import reverse
 import copy
 import logging
 import re
-from xmodule.modulestore.draft import DIRECT_ONLY_CATEGORIES
+
+from django.conf import settings
 from django.utils.translation import ugettext as _
+
+from xmodule.contentstore.content import StaticContent
+from xmodule.contentstore.django import contentstore
+from xmodule.modulestore import Location
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError
+from django_comment_common.utils import unseed_permissions_roles
+from auth.authz import _delete_course_group
+from xmodule.modulestore.store_utilities import delete_course
+from xmodule.course_module import CourseDescriptor
+from xmodule.modulestore.draft import DIRECT_ONLY_CATEGORIES
+
 
 log = logging.getLogger(__name__)
 
@@ -19,14 +27,39 @@ NOTES_PANEL = {"name": _("My Notes"), "type": "notes"}
 EXTRA_TAB_PANELS = dict([(p['type'], p) for p in [OPEN_ENDED_PANEL, NOTES_PANEL]])
 
 
-def get_modulestore(location):
+def delete_course_and_groups(course_id, commit=False):
+    """
+    This deletes the courseware associated with a course_id as well as cleaning update_item
+    the various user table stuff (groups, permissions, etc.)
+    """
+    module_store = modulestore('direct')
+    content_store = contentstore()
+
+    org, course_num, run = course_id.split("/")
+    module_store.ignore_write_events_on_courses.append('{0}/{1}'.format(org, course_num))
+
+    loc = CourseDescriptor.id_to_location(course_id)
+    if delete_course(module_store, content_store, loc, commit):
+        print 'removing forums permissions and roles...'
+        unseed_permissions_roles(course_id)
+
+        print 'removing User permissions from course....'
+        # in the django layer, we need to remove all the user permissions groups associated with this course
+        if commit:
+            try:
+                _delete_course_group(loc)
+            except Exception as err:
+                log.error("Error in deleting course groups for {0}: {1}".format(loc, err))
+
+
+def get_modulestore(category_or_location):
     """
     Returns the correct modulestore to use for modifying the specified location
     """
-    if not isinstance(location, Location):
-        location = Location(location)
+    if isinstance(category_or_location, Location):
+        category_or_location = category_or_location.category
 
-    if location.category in DIRECT_ONLY_CATEGORIES:
+    if category_or_location in DIRECT_ONLY_CATEGORIES:
         return modulestore('direct')
     else:
         return modulestore()
@@ -89,8 +122,17 @@ def get_course_for_item(location):
 
 
 def get_lms_link_for_item(location, preview=False, course_id=None):
+    """
+    Returns an LMS link to the course with a jump_to to the provided location.
+
+    :param location: the location to jump to
+    :param preview: True if the preview version of LMS should be returned. Default value is false.
+    :param course_id: the course_id within which the location lives. If not specified, the course_id is obtained
+           by calling Location(location).course_id; note that this only works for locations representing courses
+           instead of elements within courses.
+    """
     if course_id is None:
-        course_id = get_course_id(location)
+        course_id = Location(location).course_id
 
     if settings.LMS_BASE is not None:
         if preview:
@@ -136,7 +178,7 @@ def get_lms_link_for_about_page(location):
     if about_base is not None:
         lms_link = "//{about_base_url}/courses/{course_id}/about".format(
             about_base_url=about_base,
-            course_id=get_course_id(location)
+            course_id=Location(location).course_id
         )
     else:
         lms_link = None
@@ -144,12 +186,11 @@ def get_lms_link_for_about_page(location):
     return lms_link
 
 
-def get_course_id(location):
-    """
-    Returns the course_id from a given the location tuple.
-    """
-    # TODO: These will need to be changed to point to the particular instance of this problem in the particular course
-    return modulestore().get_containing_courses(Location(location))[0].id
+def course_image_url(course):
+    """Returns the image url for the course."""
+    loc = course.location._replace(tag='c4x', category='asset', name=course.course_image)
+    path = StaticContent.get_url_path_from_location(loc)
+    return path
 
 
 class UnitState(object):
@@ -186,38 +227,6 @@ def update_item(location, value):
         get_modulestore(location).delete_item(location)
     else:
         get_modulestore(location).update_item(location, value)
-
-
-def get_url_reverse(course_page_name, course_module):
-    """
-    Returns the course URL link to the specified location. This value is suitable to use as an href link.
-
-    course_page_name should correspond to an attribute in CoursePageNames (for example, 'ManageUsers'
-    or 'SettingsDetails'), or else it will simply be returned. This method passes back unknown values of
-    course_page_names so that it can also be used for absolute (known) URLs.
-
-    course_module is used to obtain the location, org, course, and name properties for a course, if
-    course_page_name corresponds to an attribute in CoursePageNames.
-    """
-    url_name = getattr(CoursePageNames, course_page_name, None)
-    ctx_loc = course_module.location
-
-    if CoursePageNames.ManageUsers == url_name:
-        return reverse(url_name, kwargs={"location": ctx_loc})
-    elif url_name in [CoursePageNames.SettingsDetails, CoursePageNames.SettingsGrading,
-                      CoursePageNames.CourseOutline, CoursePageNames.Checklists]:
-        return reverse(url_name, kwargs={'org': ctx_loc.org, 'course': ctx_loc.course, 'name': ctx_loc.name})
-    else:
-        return course_page_name
-
-
-class CoursePageNames:
-    """ Constants for pages that are recognized by get_url_reverse method. """
-    ManageUsers = "manage_users"
-    SettingsDetails = "settings_details"
-    SettingsGrading = "settings_grading"
-    CourseOutline = "course_index"
-    Checklists = "checklists"
 
 
 def add_extra_panel_tab(tab_type, course):

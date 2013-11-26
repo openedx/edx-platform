@@ -1,13 +1,16 @@
-import os, polib
+import os
+import polib
 from unittest import TestCase
 from nose.plugins.skip import SkipTest
 from datetime import datetime, timedelta
+from pytz import UTC
 
 import extract
 from config import CONFIGURATION
 
 # Make sure setup runs only once
 SETUP_HAS_RUN = False
+
 
 class TestExtract(TestCase):
     """
@@ -19,20 +22,20 @@ class TestExtract(TestCase):
         # Skip this test because it takes too long (>1 minute)
         # TODO: figure out how to declare a "long-running" test suite
         # and add this test to it.
-        raise SkipTest() 
+        raise SkipTest()
 
         global SETUP_HAS_RUN
-        
+
         # Subtract 1 second to help comparisons with file-modify time succeed,
         # since os.path.getmtime() is not millisecond-accurate
-        self.start_time = datetime.now() - timedelta(seconds=1)
+        self.start_time = datetime.now(UTC) - timedelta(seconds=1)
         super(TestExtract, self).setUp()
         if not SETUP_HAS_RUN:
             # Run extraction script. Warning, this takes 1 minute or more
             extract.main()
             SETUP_HAS_RUN = True
 
-    def get_files (self):
+    def get_files(self):
         """
         This is a generator.
         Returns the fully expanded filenames for all extracted files
@@ -65,19 +68,21 @@ class TestExtract(TestCase):
         entry2.msgid = "This is not a keystring"
         self.assertTrue(extract.is_key_string(entry1.msgid))
         self.assertFalse(extract.is_key_string(entry2.msgid))
-    
+
     def test_headers(self):
         """Verify all headers have been modified"""
         for path in self.get_files():
             po = polib.pofile(path)
             header = po.header
-            self.assertEqual(header.find('edX translation file'), 0,
-                             msg='Missing header in %s:\n"%s"' % \
-                             (os.path.basename(path), header))
+            self.assertEqual(
+                header.find('edX translation file'),
+                0,
+                msg='Missing header in %s:\n"%s"' % (os.path.basename(path), header)
+            )
 
     def test_metadata(self):
         """Verify all metadata has been modified"""
-        for path in self.get_files():    
+        for path in self.get_files():
             po = polib.pofile(path)
             metadata = po.metadata
             value = metadata['Report-Msgid-Bugs-To']

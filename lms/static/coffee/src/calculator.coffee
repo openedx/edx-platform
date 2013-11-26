@@ -3,26 +3,81 @@ class @Calculator
     $('.calc').click @toggle
     $('form#calculator').submit(@calculate).submit (e) ->
       e.preventDefault()
-    $('div.help-wrapper a').hover(@helpToggle).click (e) ->
-      e.preventDefault()
+    $('div.help-wrapper a')
+      .hover(
+        $.proxy(@helpShow, @),
+        $.proxy(@helpHide, @)
+      )
+      .click (e) ->
+        e.preventDefault()
+
+      $(document).keydown $.proxy(@handleKeyDown, @)
+
+      $('div.help-wrapper')
+        .focusin($.proxy @helpOnFocus, @)
+        .focusout($.proxy @helpOnBlur, @)
 
   toggle: (event) ->
     event.preventDefault()
+    $calc = $('.calc')
+    $calcWrapper = $('#calculator_wrapper')
+    text = gettext('Open Calculator')
+    isExpanded = false
+
     $('div.calc-main').toggleClass 'open'
-    if $('.calc.closed').length
-      $('.calc').attr 'aria-label', 'Open Calculator'
+    if $calc.hasClass('closed')
+      $calcWrapper
+        .find('input, a')
+        .attr 'tabindex', -1
     else
-      $('.calc').attr 'aria-label', 'Close Calculator'
+      text = gettext('Close Calculator')
+      isExpanded = true
+
+      $calcWrapper
+        .find('input, a,')
+        .attr 'tabindex', 0
       # TODO: Investigate why doing this without the timeout causes it to jump
       # down to the bottom of the page. I suspect it's because it's putting the
       # focus on the text field before it transitions onto the page.
-      setTimeout (-> $('#calculator_wrapper #calculator_input').focus()), 100
+      setTimeout (-> $calcWrapper.find('#calculator_input').focus()), 100
 
-    $('.calc').toggleClass 'closed'
+    $calc
+      .attr
+        'title': text
+        'aria-expanded': isExpanded
+      .text text
 
-  helpToggle: ->
-    $('.help').toggleClass 'shown'
+    $calc.toggleClass 'closed'
+
+  helpOnFocus: (e) ->
+    e.preventDefault()
+    @isFocusedHelp = true
+    @helpShow()
+
+  helpOnBlur: (e) ->
+    e.preventDefault()
+    @isFocusedHelp = false
+    @helpHide()
+
+  helpShow: ->
+    $('.help')
+      .addClass('shown')
+      .attr('aria-hidden', false)
+
+  helpHide: ->
+    if not @isFocusedHelp
+      $('.help')
+        .removeClass('shown')
+        .attr('aria-hidden', true)
+
+  handleKeyDown: (e) ->
+    ESC = 27
+    if e.which is ESC and $('.help').hasClass 'shown'
+      @isFocusedHelp = false
+      @helpHide()
 
   calculate: ->
     $.getWithPrefix '/calculate', { equation: $('#calculator_input').val() }, (data) ->
-      $('#calculator_output').val(data.result)
+      $('#calculator_output')
+        .val(data.result)
+        .focus()

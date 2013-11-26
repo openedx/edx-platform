@@ -1,6 +1,6 @@
-<%inherit file="main.html" />
 <%! from django.utils.translation import ugettext as _ %>
-<%! from django.utils import translation    %>
+
+<%inherit file="main.html" />
 
 <section class="container activation">
 
@@ -10,6 +10,6 @@
 
     <p>${_("An account with the new e-mail address already exists.")}</p>
 
-    <p>${_("Go back to the")} <a href="/">${_("home page")}</a>.</p>
+    <p>${_("Go back to the {link_start}home page{link_end}.").format(link_start='<a href="/">', link_end='</a>')}</p>
   </section>
 </section>

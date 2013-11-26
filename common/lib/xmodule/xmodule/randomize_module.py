@@ -6,7 +6,8 @@ from xmodule.seq_module import SequenceDescriptor
 
 from lxml import etree
 
-from xblock.core import Scope, Integer
+from xblock.fields import Scope, Integer
+from xblock.fragment import Fragment
 
 log = logging.getLogger('mitx.' + __name__)
 
@@ -77,12 +78,12 @@ class RandomizeModule(RandomizeFields, XModule):
         return [self.child_descriptor]
 
 
-    def get_html(self):
+    def student_view(self, context):
         if self.child is None:
             # raise error instead?  In fact, could complain on descriptor load...
-            return "<div>Nothing to randomize between</div>"
+            return Fragment(content=u"<div>Nothing to randomize between</div>")
 
-        return self.child.get_html()
+        return self.child.render('student_view', context)
 
     def get_icon_class(self):
         return self.child.get_icon_class() if self.child else 'other'

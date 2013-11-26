@@ -11,19 +11,20 @@ from django.test.utils import override_settings
 
 # Need access to internal func to put users in the right group
 from courseware import grades
-from courseware.model_data import ModelDataCache
+from courseware.model_data import FieldDataCache
 
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore, editable_modulestore
 
 #import factories and parent testcase modules
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from capa.tests.response_xml_factory import OptionResponseXMLFactory, CustomResponseXMLFactory, SchematicResponseXMLFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase
-from courseware.tests.modulestore_config import TEST_DATA_MONGO_MODULESTORE
+from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from lms.lib.xblock.runtime import quote_slashes
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
         Check that a course gets graded properly.
@@ -59,7 +60,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
         Returns the url of the problem given the problem's name
         """
 
-        return "i4x://"+self.course.org+"/{}/problem/{}".format(self.COURSE_SLUG, problem_url_name)
+        return "i4x://" + self.course.org + "/{}/problem/{}".format(self.COURSE_SLUG, problem_url_name)
 
     def modx_url(self, problem_location, dispatch):
         """
@@ -71,11 +72,12 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
             example: 'check_problem' for having responses processed
         """
         return reverse(
-            'modx_dispatch',
+            'xblock_handler',
             kwargs={
                 'course_id': self.course.id,
-                'location': problem_location,
-                'dispatch': dispatch,
+                'usage_id': quote_slashes(problem_location),
+                'handler': 'xmodule_handler',
+                'suffix': dispatch,
             }
         )
 
@@ -107,6 +109,15 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
         resp = self.client.post(modx_url)
         return resp
 
+    def show_question_answer(self, problem_url_name):
+        """
+        Shows the answer to the current student.
+        """
+        problem_location = self.problem_location(problem_url_name)
+        modx_url = self.modx_url(problem_location, 'problem_show')
+        resp = self.client.post(modx_url)
+        return resp
+
     def add_dropdown_to_section(self, section_location, name, num_inputs=2):
         """
         Create and return a dropdown problem.
@@ -119,7 +130,6 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
         num_input: the number of input fields to create in the problem
         """
 
-        problem_template = "i4x://edx/templates/problem/Blank_Common_Problem"
         prob_xml = OptionResponseXMLFactory().build_xml(
             question_text='The correct answer is Correct',
             num_inputs=num_inputs,
@@ -130,9 +140,9 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
         problem = ItemFactory.create(
             parent_location=section_location,
-            template=problem_template,
+            category='problem',
             data=prob_xml,
-            metadata={'randomize': 'always'},
+            metadata={'rerandomize': 'always'},
             display_name=name
         )
 
@@ -140,7 +150,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.refresh_course()
         return problem
 
-    def add_graded_section_to_course(self, name, section_format='Homework'):
+    def add_graded_section_to_course(self, name, section_format='Homework', late=False, reset=False, showanswer=False):
         """
         Creates a graded homework section within a chapter and returns the section.
         """
@@ -149,15 +159,47 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
         if not(hasattr(self, 'chapter')):
             self.chapter = ItemFactory.create(
                 parent_location=self.course.location,
-                template="i4x://edx/templates/chapter/Empty",
+                category='chapter'
             )
 
-        section = ItemFactory.create(
-            parent_location=self.chapter.location,
-            display_name=name,
-            template="i4x://edx/templates/sequential/Empty",
-            metadata={'graded': True, 'format': section_format}
-        )
+        if late:
+            section = ItemFactory.create(
+                parent_location=self.chapter.location,
+                display_name=name,
+                category='sequential',
+                metadata={'graded': True, 'format': section_format, 'due': '2013-05-20T23:30'}
+            )
+        elif reset:
+            section = ItemFactory.create(
+                parent_location=self.chapter.location,
+                display_name=name,
+                category='sequential',
+                rerandomize='always',
+                metadata={
+                    'graded': True,
+                    'format': section_format,
+                }
+            )
+
+        elif showanswer:
+            section = ItemFactory.create(
+                parent_location=self.chapter.location,
+                display_name=name,
+                category='sequential',
+                showanswer='never',
+                metadata={
+                    'graded': True,
+                    'format': section_format,
+                }
+            )
+
+        else:
+            section = ItemFactory.create(
+                parent_location=self.chapter.location,
+                display_name=name,
+                category='sequential',
+                metadata={'graded': True, 'format': section_format}
+            )
 
         # now that we've added the problem and section to the course
         # we fetch the course from the database so the object we are
@@ -177,7 +219,8 @@ class TestCourseGrader(TestSubmittingProblems):
         """
 
         course_data = {'grading_policy': grading_policy}
-        modulestore().update_item(self.course.location, course_data)
+        store = editable_modulestore('direct')
+        store.update_item(self.course.location, course_data)
         self.refresh_course()
 
     def get_grade_summary(self):
@@ -193,14 +236,11 @@ class TestCourseGrader(TestSubmittingProblems):
             make up the final grade. (For display)
         """
 
-        model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
-            self.course.id, self.student_user, self.course)
+        fake_request = self.factory.get(
+            reverse('progress', kwargs={'course_id': self.course.id})
+        )
 
-        fake_request = self.factory.get(reverse('progress',
-                                        kwargs={'course_id': self.course.id}))
-
-        return grades.grade(self.student_user, fake_request,
-                            self.course, model_data_cache)
+        return grades.grade(self.student_user, fake_request, self.course)
 
     def get_progress_summary(self):
         """
@@ -214,16 +254,13 @@ class TestCourseGrader(TestSubmittingProblems):
         etc.
         """
 
-        model_data_cache = ModelDataCache.cache_for_descriptor_descendents(
-            self.course.id, self.student_user, self.course)
+        fake_request = self.factory.get(
+            reverse('progress', kwargs={'course_id': self.course.id})
+        )
 
-        fake_request = self.factory.get(reverse('progress',
-                                        kwargs={'course_id': self.course.id}))
-
-        progress_summary = grades.progress_summary(self.student_user,
-                                                   fake_request,
-                                                   self.course,
-                                                   model_data_cache)
+        progress_summary = grades.progress_summary(
+            self.student_user, fake_request, self.course
+        )
         return progress_summary
 
     def check_grade_percent(self, percent):
@@ -258,7 +295,7 @@ class TestCourseGrader(TestSubmittingProblems):
         hw_section = next(section for section in sections_list if section.get('url_name') == hw_url_name)
         return [s.earned for s in hw_section['scores']]
 
-    def basic_setup(self):
+    def basic_setup(self, late=False, reset=False, showanswer=False):
         """
         Set up a simple course for testing basic grading functionality.
         """
@@ -279,7 +316,7 @@ class TestCourseGrader(TestSubmittingProblems):
         self.add_grading_policy(grading_policy)
 
         # set up a simple course with four problems
-        self.homework = self.add_graded_section_to_course('homework')
+        self.homework = self.add_graded_section_to_course('homework', late=late, reset=reset, showanswer=showanswer)
         self.add_dropdown_to_section(self.homework.location, 'p1', 1)
         self.add_dropdown_to_section(self.homework.location, 'p2', 1)
         self.add_dropdown_to_section(self.homework.location, 'p3', 1)
@@ -347,6 +384,41 @@ class TestCourseGrader(TestSubmittingProblems):
         self.add_dropdown_to_section(self.homework3.location, self.hw3_names[0], 1)
         self.add_dropdown_to_section(self.homework3.location, self.hw3_names[1], 1)
 
+    def test_submission_late(self):
+        """Test problem for due date in the past"""
+        self.basic_setup(late=True)
+        resp = self.submit_question_answer('p1', {'2_1': 'Correct'})
+        self.assertEqual(resp.status_code, 200)
+        err_msg = (
+            "The state of this problem has changed since you loaded this page. "
+            "Please refresh your page."
+        )
+        self.assertEqual(json.loads(resp.content).get("success"), err_msg)
+
+    def test_submission_reset(self):
+        """Test problem ProcessingErrors due to resets"""
+        self.basic_setup(reset=True)
+        resp = self.submit_question_answer('p1', {'2_1': 'Correct'})
+        #  submit a second time to draw NotFoundError
+        resp = self.submit_question_answer('p1', {'2_1': 'Correct'})
+        self.assertEqual(resp.status_code, 200)
+        err_msg = (
+            "The state of this problem has changed since you loaded this page. "
+            "Please refresh your page."
+        )
+        self.assertEqual(json.loads(resp.content).get("success"), err_msg)
+
+    def test_submission_show_answer(self):
+        """Test problem for ProcessingErrors due to showing answer"""
+        self.basic_setup(showanswer=True)
+        resp = self.show_question_answer('p1')
+        self.assertEqual(resp.status_code, 200)
+        err_msg = (
+            "The state of this problem has changed since you loaded this page. "
+            "Please refresh your page."
+        )
+        self.assertEqual(json.loads(resp.content).get("success"), err_msg)
+
     def test_none_grade(self):
         """
         Check grade is 0 to begin with.
@@ -405,7 +477,7 @@ class TestCourseGrader(TestSubmittingProblems):
         # Get both parts correct
         self.submit_question_answer('H1P1', {'2_1': 'Correct', '2_2': 'Correct'})
         self.check_grade_percent(0.25)
-        self.assertEqual(self.earned_hw_scores(), [2.0])   # Order matters
+        self.assertEqual(self.earned_hw_scores(), [2.0])  # Order matters
         self.assertEqual(self.score_for_hw('homework'), [2.0])
 
     def test_weighted_exam(self):
@@ -443,7 +515,7 @@ class TestCourseGrader(TestSubmittingProblems):
 
         self.assertEqual(self.score_for_hw('homework1'), [1.0, 0.0])
         self.assertEqual(self.score_for_hw('homework2'), [1.0, 1.0])
-        self.assertEqual(self.earned_hw_scores(), [1.0, 2.0, 0])   # Order matters
+        self.assertEqual(self.earned_hw_scores(), [1.0, 2.0, 0])  # Order matters
         self.check_grade_percent(0.75)
 
     def test_dropping_nochange(self):
@@ -457,7 +529,7 @@ class TestCourseGrader(TestSubmittingProblems):
         self.assertEqual(self.score_for_hw('homework1'), [1.0, 0.0])
         self.assertEqual(self.score_for_hw('homework2'), [1.0, 1.0])
         self.assertEqual(self.score_for_hw('homework3'), [1.0, 0.0])
-        self.assertEqual(self.earned_hw_scores(), [1.0, 2.0, 1.0])   # Order matters
+        self.assertEqual(self.earned_hw_scores(), [1.0, 2.0, 1.0])  # Order matters
         self.check_grade_percent(0.75)
 
     def test_dropping_all_correct(self):
@@ -471,7 +543,7 @@ class TestCourseGrader(TestSubmittingProblems):
             self.submit_question_answer(name, {'2_1': 'Correct'})
 
         self.check_grade_percent(1.0)
-        self.assertEqual(self.earned_hw_scores(), [1.0, 2.0, 2.0])   # Order matters
+        self.assertEqual(self.earned_hw_scores(), [1.0, 2.0, 2.0])  # Order matters
         self.assertEqual(self.score_for_hw('homework3'), [1.0, 1.0])
 
 
@@ -579,13 +651,13 @@ class TestPythonGradedResponse(TestSubmittingProblems):
         set up an example Circuit_Schematic_Builder problem
         """
 
-        schematic_template = "i4x://edx/templates/problem/Circuit_Schematic_Builder"
         script = self.SCHEMATIC_SCRIPT
 
         xmldata = SchematicResponseXMLFactory().build_xml(answer=script)
         ItemFactory.create(
             parent_location=self.section.location,
-            template=schematic_template,
+            category='problem',
+            boilerplate='circuitschematic.yaml',
             display_name=name,
             data=xmldata
         )
@@ -602,14 +674,14 @@ class TestPythonGradedResponse(TestSubmittingProblems):
         set up an example custom response problem using a check function
         """
 
-        custom_template = "i4x://edx/templates/problem/Custom_Python-Evaluated_Input"
         test_csv = self.CUSTOM_RESPONSE_SCRIPT
         expect = self.CUSTOM_RESPONSE_CORRECT
         cfn_problem_xml = CustomResponseXMLFactory().build_xml(script=test_csv, cfn='test_csv', expect=expect)
 
         ItemFactory.create(
             parent_location=self.section.location,
-            template=custom_template,
+            category='problem',
+            boilerplate='customgrader.yaml',
             data=cfn_problem_xml,
             display_name=name
         )
@@ -628,13 +700,12 @@ class TestPythonGradedResponse(TestSubmittingProblems):
 
         script = self.COMPUTED_ANSWER_SCRIPT
 
-        custom_template = "i4x://edx/templates/problem/Custom_Python-Evaluated_Input"
-
         computed_xml = CustomResponseXMLFactory().build_xml(answer=script)
 
         ItemFactory.create(
             parent_location=self.section.location,
-            template=custom_template,
+            category='problem',
+            boilerplate='customgrader.yaml',
             data=computed_xml,
             display_name=name
         )

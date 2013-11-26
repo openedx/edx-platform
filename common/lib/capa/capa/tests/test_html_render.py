@@ -8,6 +8,7 @@ import mock
 from .response_xml_factory import StringResponseXMLFactory, CustomResponseXMLFactory
 from . import test_system, new_loncapa_problem
 
+
 class CapaHtmlRenderTest(unittest.TestCase):
 
     def setUp(self):
@@ -30,8 +31,10 @@ class CapaHtmlRenderTest(unittest.TestCase):
 
     def test_include_html(self):
         # Create a test file to include
-        self._create_test_file('test_include.xml',
-                                '<test>Test include</test>')
+        self._create_test_file(
+            'test_include.xml',
+            '<test>Test include</test>'
+        )
 
         # Generate some XML with an <include>
         xml_str = textwrap.dedent("""
@@ -148,16 +151,19 @@ class CapaHtmlRenderTest(unittest.TestCase):
         # Expect that the template renderer was called with the correct
         # arguments, once for the textline input and once for
         # the solution
-        expected_textline_context = {'status': 'unsubmitted',
-                                        'value': '',
-                                        'preprocessor': None,
-                                        'msg': '',
-                                        'inline': False,
-                                        'hidden': False,
-                                        'do_math': False,
-                                        'id': '1_2_1',
-                                        'trailing_text': '',
-                                        'size': None}
+        expected_textline_context = {
+            'STATIC_URL': '/dummy-static/',
+            'status': 'unsubmitted',
+            'value': '',
+            'preprocessor': None,
+            'msg': '',
+            'inline': False,
+            'hidden': False,
+            'do_math': False,
+            'id': '1_2_1',
+            'trailing_text': '',
+            'size': None,
+        }
 
         expected_solution_context = {'id': '1_solution_1'}
 
@@ -225,6 +231,26 @@ class CapaHtmlRenderTest(unittest.TestCase):
         # Expect that the variable $test has been replaced with its value
         span_element = rendered_html.find('span')
         self.assertEqual(span_element.get('attr'), "TEST")
+
+    def test_xml_comments_and_other_odd_things(self):
+        # Comments and processing instructions should be skipped.
+        xml_str = textwrap.dedent("""\
+            <?xml version="1.0" encoding="utf-8"?>
+            <!DOCTYPE html [
+                <!ENTITY % wacky "lxml.etree is wacky!">
+            ]>
+            <problem>
+            <!-- A commment. -->
+            <?ignore this processing instruction. ?>
+            </problem>
+        """)
+
+        # Create the problem
+        problem = new_loncapa_problem(xml_str)
+
+        # Render the HTML
+        the_html = problem.get_html()
+        self.assertRegexpMatches(the_html, r"<div>\s+</div>")
 
     def _create_test_file(self, path, content_str):
         test_fp = self.system.filestore.open(path, "w")

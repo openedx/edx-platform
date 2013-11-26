@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 This file demonstrates writing tests using the unittest module. These will pass
 when you run "manage.py test".
@@ -9,23 +8,34 @@ import logging
 import json
 import re
 import unittest
+from datetime import datetime, timedelta
+import pytz
 
 from django.conf import settings
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.test.client import RequestFactory
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import UNUSABLE_PASSWORD
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import int_to_base36
+from django.core.urlresolvers import reverse
 
+from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from courseware.tests.tests import TEST_DATA_MIXED_MODULESTORE
 
-from mock import Mock, patch
+from mock import Mock, patch, sentinel
 from textwrap import dedent
 
-from student.models import unique_id_for_user
-from student.views import process_survey_link, _cert_info, password_reset, password_reset_confirm_wrapper
-from student.tests.factories import UserFactory
+from student.models import unique_id_for_user, CourseEnrollment
+from student.views import (process_survey_link, _cert_info, password_reset, password_reset_confirm_wrapper,
+                           change_enrollment, complete_course_mode_info)
+from student.tests.factories import UserFactory, CourseModeFactory
 from student.tests.test_email import mock_render_to_string
+
+import shoppingcart
+
 COURSE_1 = 'edX/toy/2012_Fall'
 COURSE_2 = 'edx/full/6.002_Spring_2012'
 
@@ -49,23 +59,28 @@ class ResetPasswordTests(TestCase):
         self.user_bad_passwd.password = UNUSABLE_PASSWORD
         self.user_bad_passwd.save()
 
+    @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
     def test_user_bad_password_reset(self):
         """Tests password reset behavior for user with password marked UNUSABLE_PASSWORD"""
 
         bad_pwd_req = self.request_factory.post('/password_reset/', {'email': self.user_bad_passwd.email})
         bad_pwd_resp = password_reset(bad_pwd_req)
+        # If they've got an unusable password, we return a successful response code
         self.assertEquals(bad_pwd_resp.status_code, 200)
-        self.assertEquals(bad_pwd_resp.content, json.dumps({'success': False,
-                                                            'error': 'E-mail hoặc người dùng không hợp lệ'}))
+        self.assertEquals(bad_pwd_resp.content, json.dumps({'success': True,
+                                                            'value': "('registration/password_reset_done.html', [])"}))
 
+    @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
     def test_nonexist_email_password_reset(self):
         """Now test the exception cases with of reset_password called with invalid email."""
 
         bad_email_req = self.request_factory.post('/password_reset/', {'email': self.user.email+"makeItFail"})
         bad_email_resp = password_reset(bad_email_req)
+        # Note: even if the email is bad, we return a successful response code
+        # This prevents someone potentially trying to "brute-force" find out which emails are and aren't registered with edX
         self.assertEquals(bad_email_resp.status_code, 200)
-        self.assertEquals(bad_email_resp.content, json.dumps({'success': False,
-                                                              'error': 'E-mail hoặc người dùng không hợp lệ'}))
+        self.assertEquals(bad_email_resp.content, json.dumps({'success': True,
+                                                              'value': "('registration/password_reset_done.html', [])"}))
 
     @unittest.skipUnless(not settings.MITX_FEATURES.get('DISABLE_PASSWORD_RESET_EMAIL_TEST', False),
                          dedent("""Skipping Test because CMS has not provided necessary templates for password reset.
@@ -84,7 +99,7 @@ class ResetPasswordTests(TestCase):
 
         ((subject, msg, from_addr, to_addrs), sm_kwargs) = send_email.call_args
         self.assertIn("Password reset", subject)
-        self.assertIn("Bạn nhận được e-mail này vì bạn yêu cầu thiết lập lại mật khẩu", msg)
+        self.assertIn("You're receiving this e-mail because you requested a password reset", msg)
         self.assertEquals(from_addr, settings.DEFAULT_FROM_EMAIL)
         self.assertEquals(len(to_addrs), 1)
         self.assertIn(self.user.email, to_addrs)
@@ -206,3 +221,288 @@ class CourseEndingTest(TestCase):
                           'show_survey_button': False,
                           'grade': '67'
                           })
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class DashboardTest(TestCase):
+    """
+    Tests for dashboard utility functions
+    """
+    # arbitrary constant
+    COURSE_SLUG = "100"
+    COURSE_NAME = "test_course"
+    COURSE_ORG = "EDX"
+
+    def setUp(self):
+        self.course = CourseFactory.create(org=self.COURSE_ORG, display_name=self.COURSE_NAME, number=self.COURSE_SLUG)
+        self.assertIsNotNone(self.course)
+        self.user = UserFactory.create(username="jack", email="jack@fake.edx.org")
+        CourseModeFactory.create(
+            course_id=self.course.id,
+            mode_slug='honor',
+            mode_display_name='Honor Code',
+        )
+
+    def test_course_mode_info(self):
+        verified_mode = CourseModeFactory.create(
+            course_id=self.course.id,
+            mode_slug='verified',
+            mode_display_name='Verified',
+            expiration_datetime=datetime.now(pytz.UTC) + timedelta(days=1)
+        )
+        enrollment = CourseEnrollment.enroll(self.user, self.course.id)
+        course_mode_info = complete_course_mode_info(self.course.id, enrollment)
+        self.assertTrue(course_mode_info['show_upsell'])
+        self.assertEquals(course_mode_info['days_for_upsell'], 1)
+
+        verified_mode.expiration_datetime = datetime.now(pytz.UTC) + timedelta(days=-1)
+        verified_mode.save()
+        course_mode_info = complete_course_mode_info(self.course.id, enrollment)
+        self.assertFalse(course_mode_info['show_upsell'])
+        self.assertIsNone(course_mode_info['days_for_upsell'])
+
+    def test_refundable(self):
+        verified_mode = CourseModeFactory.create(
+            course_id=self.course.id,
+            mode_slug='verified',
+            mode_display_name='Verified',
+            expiration_datetime=datetime.now(pytz.UTC) + timedelta(days=1)
+        )
+        enrollment = CourseEnrollment.enroll(self.user, self.course.id, mode='verified')
+
+        self.assertTrue(enrollment.refundable())
+
+        verified_mode.expiration_datetime = datetime.now(pytz.UTC) - timedelta(days=1)
+        verified_mode.save()
+        self.assertFalse(enrollment.refundable())
+
+
+
+class EnrollInCourseTest(TestCase):
+    """Tests enrolling and unenrolling in courses."""
+
+    def setUp(self):
+        patcher = patch('student.models.server_track')
+        self.mock_server_track = patcher.start()
+        self.addCleanup(patcher.stop)
+
+        crum_patcher = patch('student.models.crum.get_current_request')
+        self.mock_get_current_request = crum_patcher.start()
+        self.addCleanup(crum_patcher.stop)
+        self.mock_get_current_request.return_value = sentinel.request
+
+    def test_enrollment(self):
+        user = User.objects.create_user("joe", "joe@joe.com", "password")
+        course_id = "edX/Test101/2013"
+        course_id_partial = "edX/Test101"
+
+        # Test basic enrollment
+        self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
+        self.assertFalse(CourseEnrollment.is_enrolled_by_partial(user,
+            course_id_partial))
+        CourseEnrollment.enroll(user, course_id)
+        self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
+        self.assertTrue(CourseEnrollment.is_enrolled_by_partial(user,
+            course_id_partial))
+        self.assert_enrollment_event_was_emitted(user, course_id)
+
+        # Enrolling them again should be harmless
+        CourseEnrollment.enroll(user, course_id)
+        self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
+        self.assertTrue(CourseEnrollment.is_enrolled_by_partial(user,
+            course_id_partial))
+        self.assert_no_events_were_emitted()
+
+        # Now unenroll the user
+        CourseEnrollment.unenroll(user, course_id)
+        self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
+        self.assertFalse(CourseEnrollment.is_enrolled_by_partial(user,
+            course_id_partial))
+        self.assert_unenrollment_event_was_emitted(user, course_id)
+
+        # Unenrolling them again should also be harmless
+        CourseEnrollment.unenroll(user, course_id)
+        self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
+        self.assertFalse(CourseEnrollment.is_enrolled_by_partial(user,
+            course_id_partial))
+        self.assert_no_events_were_emitted()
+
+        # The enrollment record should still exist, just be inactive
+        enrollment_record = CourseEnrollment.objects.get(
+            user=user,
+            course_id=course_id
+        )
+        self.assertFalse(enrollment_record.is_active)
+
+    def assert_no_events_were_emitted(self):
+        """Ensures no events were emitted since the last event related assertion"""
+        self.assertFalse(self.mock_server_track.called)
+        self.mock_server_track.reset_mock()
+
+    def assert_enrollment_event_was_emitted(self, user, course_id):
+        """Ensures an enrollment event was emitted since the last event related assertion"""
+        self.mock_server_track.assert_called_once_with(
+            sentinel.request,
+            'edx.course.enrollment.activated',
+            {
+                'course_id': course_id,
+                'user_id': user.pk,
+                'mode': 'honor'
+            }
+        )
+        self.mock_server_track.reset_mock()
+
+    def assert_unenrollment_event_was_emitted(self, user, course_id):
+        """Ensures an unenrollment event was emitted since the last event related assertion"""
+        self.mock_server_track.assert_called_once_with(
+            sentinel.request,
+            'edx.course.enrollment.deactivated',
+            {
+                'course_id': course_id,
+                'user_id': user.pk,
+                'mode': 'honor'
+            }
+        )
+        self.mock_server_track.reset_mock()
+
+    def test_enrollment_non_existent_user(self):
+        # Testing enrollment of newly unsaved user (i.e. no database entry)
+        user = User(username="rusty", email="rusty@fake.edx.org")
+        course_id = "edX/Test101/2013"
+
+        self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
+
+        # Unenroll does nothing
+        CourseEnrollment.unenroll(user, course_id)
+        self.assert_no_events_were_emitted()
+
+        # Implicit save() happens on new User object when enrolling, so this
+        # should still work
+        CourseEnrollment.enroll(user, course_id)
+        self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
+        self.assert_enrollment_event_was_emitted(user, course_id)
+
+    def test_enrollment_by_email(self):
+        user = User.objects.create(username="jack", email="jack@fake.edx.org")
+        course_id = "edX/Test101/2013"
+
+        CourseEnrollment.enroll_by_email("jack@fake.edx.org", course_id)
+        self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
+        self.assert_enrollment_event_was_emitted(user, course_id)
+
+        # This won't throw an exception, even though the user is not found
+        self.assertIsNone(
+            CourseEnrollment.enroll_by_email("not_jack@fake.edx.org", course_id)
+        )
+        self.assert_no_events_were_emitted()
+
+        self.assertRaises(
+            User.DoesNotExist,
+            CourseEnrollment.enroll_by_email,
+            "not_jack@fake.edx.org",
+            course_id,
+            ignore_errors=False
+        )
+        self.assert_no_events_were_emitted()
+
+        # Now unenroll them by email
+        CourseEnrollment.unenroll_by_email("jack@fake.edx.org", course_id)
+        self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
+        self.assert_unenrollment_event_was_emitted(user, course_id)
+
+        # Harmless second unenroll
+        CourseEnrollment.unenroll_by_email("jack@fake.edx.org", course_id)
+        self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
+        self.assert_no_events_were_emitted()
+
+        # Unenroll on non-existent user shouldn't throw an error
+        CourseEnrollment.unenroll_by_email("not_jack@fake.edx.org", course_id)
+        self.assert_no_events_were_emitted()
+
+    def test_enrollment_multiple_classes(self):
+        user = User(username="rusty", email="rusty@fake.edx.org")
+        course_id1 = "edX/Test101/2013"
+        course_id2 = "MITx/6.003z/2012"
+
+        CourseEnrollment.enroll(user, course_id1)
+        self.assert_enrollment_event_was_emitted(user, course_id1)
+        CourseEnrollment.enroll(user, course_id2)
+        self.assert_enrollment_event_was_emitted(user, course_id2)
+        self.assertTrue(CourseEnrollment.is_enrolled(user, course_id1))
+        self.assertTrue(CourseEnrollment.is_enrolled(user, course_id2))
+
+        CourseEnrollment.unenroll(user, course_id1)
+        self.assert_unenrollment_event_was_emitted(user, course_id1)
+        self.assertFalse(CourseEnrollment.is_enrolled(user, course_id1))
+        self.assertTrue(CourseEnrollment.is_enrolled(user, course_id2))
+
+        CourseEnrollment.unenroll(user, course_id2)
+        self.assert_unenrollment_event_was_emitted(user, course_id2)
+        self.assertFalse(CourseEnrollment.is_enrolled(user, course_id1))
+        self.assertFalse(CourseEnrollment.is_enrolled(user, course_id2))
+
+    def test_activation(self):
+        user = User.objects.create(username="jack", email="jack@fake.edx.org")
+        course_id = "edX/Test101/2013"
+        self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
+
+        # Creating an enrollment doesn't actually enroll a student
+        # (calling CourseEnrollment.enroll() would have)
+        enrollment = CourseEnrollment.get_or_create_enrollment(user, course_id)
+        self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
+        self.assert_no_events_were_emitted()
+
+        # Until you explicitly activate it
+        enrollment.activate()
+        self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
+        self.assert_enrollment_event_was_emitted(user, course_id)
+
+        # Activating something that's already active does nothing
+        enrollment.activate()
+        self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
+        self.assert_no_events_were_emitted()
+
+        # Now deactive
+        enrollment.deactivate()
+        self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
+        self.assert_unenrollment_event_was_emitted(user, course_id)
+
+        # Deactivating something that's already inactive does nothing
+        enrollment.deactivate()
+        self.assertFalse(CourseEnrollment.is_enrolled(user, course_id))
+        self.assert_no_events_were_emitted()
+
+        # A deactivated enrollment should be activated if enroll() is called
+        # for that user/course_id combination
+        CourseEnrollment.enroll(user, course_id)
+        self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
+        self.assert_enrollment_event_was_emitted(user, course_id)
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class PaidRegistrationTest(ModuleStoreTestCase):
+    """
+    Tests for paid registration functionality (not verified student), involves shoppingcart
+    """
+    # arbitrary constant
+    COURSE_SLUG = "100"
+    COURSE_NAME = "test_course"
+    COURSE_ORG = "EDX"
+
+    def setUp(self):
+        # Create course
+        self.req_factory = RequestFactory()
+        self.course = CourseFactory.create(org=self.COURSE_ORG, display_name=self.COURSE_NAME, number=self.COURSE_SLUG)
+        self.assertIsNotNone(self.course)
+        self.user = User.objects.create(username="jack", email="jack@fake.edx.org")
+
+    @unittest.skipUnless(settings.MITX_FEATURES.get('ENABLE_SHOPPING_CART'), "Shopping Cart not enabled in settings")
+    def test_change_enrollment_add_to_cart(self):
+        request = self.req_factory.post(reverse('change_enrollment'), {'course_id': self.course.id,
+                                                                       'enrollment_action': 'add_to_cart'})
+        request.user = self.user
+        response = change_enrollment(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, reverse('shoppingcart.views.show_cart'))
+        self.assertTrue(shoppingcart.models.PaidCourseRegistration.contained_in_order(
+            shoppingcart.models.Order.get_cart_for_user(self.user), self.course.id))

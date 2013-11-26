@@ -1,3 +1,4 @@
+"""Implements basics of Capa, including class CapaModule."""
 import cgi
 import datetime
 import hashlib
@@ -15,12 +16,13 @@ from capa.responsetypes import StudentInputError, \
     ResponseError, LoncapaProblemError
 from capa.util import convert_files_to_filenames
 from .progress import Progress
-from xmodule.x_module import XModule
+from xmodule.x_module import XModule, module_attr
 from xmodule.raw_module import RawDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
-from xblock.core import Scope, String, Boolean, Dict, Integer, Float
+from xblock.fields import Scope, String, Boolean, Dict, Integer, Float
 from .fields import Timedelta, Date
 from django.utils.timezone import UTC
+from django.utils.translation import ugettext as _
 
 log = logging.getLogger("mitx.courseware")
 
@@ -39,11 +41,11 @@ def randomization_bin(seed, problem_id):
     interesting.  To avoid having sets of students that always get the same problems,
     we'll combine the system's per-student seed with the problem id in picking the bin.
     """
-    h = hashlib.sha1()
-    h.update(str(seed))
-    h.update(str(problem_id))
+    r_hash = hashlib.sha1()
+    r_hash.update(str(seed))
+    r_hash.update(str(problem_id))
     # get the first few digits of the hash, convert to an int, then mod.
-    return int(h.hexdigest()[:7], 16) % NUM_RANDOMIZATION_BINS
+    return int(r_hash.hexdigest()[:7], 16) % NUM_RANDOMIZATION_BINS
 
 
 class Randomization(String):
@@ -77,6 +79,14 @@ class CapaFields(object):
     """
     Define the possible fields for a Capa problem
     """
+    display_name = String(
+        display_name="Display Name",
+        help="This name appears in the horizontal navigation at the top of the page.",
+        scope=Scope.settings,
+        # it'd be nice to have a useful default but it screws up other things; so,
+        # use display_name_with_default for those
+        default="Blank Advanced Problem"
+    )
     attempts = Integer(help="Number of attempts taken by the student on this problem",
                        default=0, scope=Scope.user_state)
     max_attempts = Integer(
@@ -94,7 +104,8 @@ class CapaFields(object):
         display_name="Show Answer",
         help=("Defines when to show the answer to the problem. "
               "A default value can be set in Advanced Settings."),
-        scope=Scope.settings, default="closed",
+        scope=Scope.settings,
+        default="finished",
         values=[
             {"display_name": "Always", "value": "always"},
             {"display_name": "Answered", "value": "answered"},
@@ -106,21 +117,24 @@ class CapaFields(object):
     )
     force_save_button = Boolean(
         help="Whether to force the save button to appear on the page",
-        scope=Scope.settings, default=False
+        scope=Scope.settings,
+        default=False
     )
     rerandomize = Randomization(
         display_name="Randomization",
         help="Defines how often inputs are randomized when a student loads the problem. "
-        "This setting only applies to problems that can have randomly generated numeric values. "
-        "A default value can be set in Advanced Settings.",
-        default="always", scope=Scope.settings, values=[
+             "This setting only applies to problems that can have randomly generated numeric values. "
+             "A default value can be set in Advanced Settings.",
+        default="never",
+        scope=Scope.settings,
+        values=[
             {"display_name": "Always", "value": "always"},
             {"display_name": "On Reset", "value": "onreset"},
             {"display_name": "Never", "value": "never"},
             {"display_name": "Per Student", "value": "per_student"}
         ]
     )
-    data = String(help="XML data for the problem", scope=Scope.content)
+    data = String(help="XML data for the problem", scope=Scope.content, default="<problem></problem>")
     correct_map = Dict(help="Dictionary with the correctness of current student answers",
                        scope=Scope.user_state, default={})
     input_state = Dict(help="Dictionary for maintaining the state of inputtypes", scope=Scope.user_state)
@@ -134,9 +148,20 @@ class CapaFields(object):
         values={"min": 0, "step": .1},
         scope=Scope.settings
     )
-    markdown = String(help="Markdown source of this module", scope=Scope.settings)
+    markdown = String(help="Markdown source of this module", default=None, scope=Scope.settings)
     source_code = String(
         help="Source code for LaTeX and Word problems. This feature is not well-supported.",
+        scope=Scope.settings
+    )
+    text_customization = Dict(
+        help="String customization substitutions for particular locations",
+        scope=Scope.settings
+        # TODO: someday it should be possible to not duplicate this definition here
+        # and in inheritance.py
+    )
+    use_latex_compiler = Boolean(
+        help="Enable LaTeX templates?",
+        default=False,
         scope=Scope.settings
     )
 
@@ -196,7 +221,7 @@ class CapaModule(CapaFields, XModule):
             if self.seed is None:
                 self.seed = self.lcp.seed
 
-        except Exception as err:
+        except Exception as err:  # pylint: disable=broad-except
             msg = u'cannot create LoncapaProblem {loc}: {err}'.format(
                 loc=self.location.url(), err=err)
             # TODO (vshnayder): do modules need error handlers too?
@@ -294,10 +319,16 @@ class CapaModule(CapaFields, XModule):
         """
         For now, just return score / max_score
         """
-        d = self.get_score()
-        score = d['score']
-        total = d['total']
+        score_dict = self.get_score()
+        score = score_dict['score']
+        total = score_dict['total']
+
         if total > 0:
+            if self.weight is not None:
+                # scale score and total by weight/total:
+                score = score * self.weight / total
+                total = self.weight
+
             try:
                 return Progress(score, total)
             except (TypeError, ValueError):
@@ -309,11 +340,13 @@ class CapaModule(CapaFields, XModule):
         """
         Return some html with data about the module
         """
+        progress = self.get_progress()
         return self.system.render_template('problem_ajax.html', {
             'element_id': self.location.html_id(),
             'id': self.id,
             'ajax_url': self.system.ajax_url,
-            'progress': Progress.to_js_status_str(self.get_progress())
+            'progress_status': Progress.to_js_status_str(progress),
+            'progress_detail': Progress.to_js_detail_str(progress),
         })
 
     def check_button_name(self):
@@ -321,14 +354,26 @@ class CapaModule(CapaFields, XModule):
         Determine the name for the "check" button.
 
         Usually it is just "Check", but if this is the student's
-        final attempt, change the name to "Final Check"
+        final attempt, change the name to "Final Check".
+        The text can be customized by the text_customization setting.
         """
-        if self.max_attempts is not None:
-            final_check = (self.attempts >= self.max_attempts - 1)
-        else:
-            final_check = False
+        # The logic flow is a little odd so that _('xxx') strings can be found for
+        # translation while also running _() just once for each string.
+        check = _('Check')
+        final_check = _('Final Check')
 
-        return "Final Check" if final_check else "Check"
+        # Apply customizations if present
+        if 'custom_check' in self.text_customization:
+            check = _(self.text_customization.get('custom_check'))
+        if 'custom_final_check' in self.text_customization:
+            final_check = _(self.text_customization.get('custom_final_check'))
+        # TODO: need a way to get the customized words into the list of
+        # words to be translated
+
+        if self.max_attempts is not None and self.attempts >= self.max_attempts - 1:
+            return final_check
+        else:
+            return check
 
     def should_show_check_button(self):
         """
@@ -473,8 +518,7 @@ class CapaModule(CapaFields, XModule):
         """
         Return html for the problem.
 
-        Adds check, reset, save buttons as necessary based on the problem config
-        and state.
+        Adds check, reset, save buttons as necessary based on the problem config and state.
         """
 
         try:
@@ -482,7 +526,7 @@ class CapaModule(CapaFields, XModule):
 
         # If we cannot construct the problem HTML,
         # then generate an error message instead.
-        except Exception as err:
+        except Exception as err:  # pylint: disable=broad-except
             html = self.handle_problem_html_error(err)
 
         # The convention is to pass the name of the check button
@@ -504,20 +548,27 @@ class CapaModule(CapaFields, XModule):
                    'reset_button': self.should_show_reset_button(),
                    'save_button': self.should_show_save_button(),
                    'answer_available': self.answer_available(),
-                   'ajax_url': self.system.ajax_url,
                    'attempts_used': self.attempts,
                    'attempts_allowed': self.max_attempts,
-                   'progress': self.get_progress(),
                    }
 
         html = self.system.render_template('problem.html', context)
+
         if encapsulate:
             html = u'<div id="problem_{id}" class="problem" data-url="{ajax_url}">'.format(
                 id=self.location.html_id(), ajax_url=self.system.ajax_url
             ) + html + "</div>"
 
-        # now do the substitutions which are filesystem based, e.g. '/static/' prefixes
-        return self.system.replace_urls(html)
+        # now do all the substitutions which the LMS module_render normally does, but
+        # we need to do here explicitly since we can get called for our HTML via AJAX
+        html = self.system.replace_urls(html)
+        if self.system.replace_course_urls:
+            html = self.system.replace_course_urls(html)
+
+        if self.system.replace_jump_to_id_urls:
+            html = self.system.replace_jump_to_id_urls(html)
+
+        return html
 
     def handle_ajax(self, dispatch, data):
         """
@@ -541,22 +592,38 @@ class CapaModule(CapaFields, XModule):
             'ungraded_response': self.handle_ungraded_response
         }
 
+        generic_error_message = (
+            "We're sorry, there was an error with processing your request. "
+            "Please try reloading your page and trying again."
+        )
+
+        not_found_error_message = (
+            "The state of this problem has changed since you loaded this page. "
+            "Please refresh your page."
+        )
+
         if dispatch not in handlers:
-            return 'Error'
+            return 'Error: {} is not a known capa action'.format(dispatch)
 
         before = self.get_progress()
 
         try:
             result = handlers[dispatch](data)
+
+        except NotFoundError as err:
+            _, _, traceback_obj = sys.exc_info()  # pylint: disable=redefined-outer-name
+            raise ProcessingError, (not_found_error_message, err), traceback_obj
+
         except Exception as err:
-            _, _, traceback_obj = sys.exc_info()
-            raise ProcessingError(err.message, traceback_obj)
+            _, _, traceback_obj = sys.exc_info()  # pylint: disable=redefined-outer-name
+            raise ProcessingError, (generic_error_message, err), traceback_obj
 
         after = self.get_progress()
 
         result.update({
             'progress_changed': after != before,
             'progress_status': Progress.to_js_status_str(after),
+            'progress_detail': Progress.to_js_detail_str(after),
         })
 
         return json.dumps(result, cls=ComplexEncoder)
@@ -587,6 +654,7 @@ class CapaModule(CapaFields, XModule):
         Problem can be completely wrong.
         Pressing RESET button makes this function to return False.
         """
+        # used by conditional module
         return self.lcp.done
 
     def is_attempted(self):
@@ -601,8 +669,8 @@ class CapaModule(CapaFields, XModule):
         """
         True iff full points
         """
-        d = self.get_score()
-        return d['score'] == d['total']
+        score_dict = self.get_score()
+        return score_dict['score'] == score_dict['total']
 
     def answer_available(self):
         """
@@ -690,7 +758,7 @@ class CapaModule(CapaFields, XModule):
         self.set_state_from_lcp()
         return response
 
-    def get_answer(self, data):
+    def get_answer(self, _data):
         """
         For the "show answer" button.
 
@@ -735,7 +803,7 @@ class CapaModule(CapaFields, XModule):
         """
         Make dictionary of student responses (aka "answers")
 
-        `data` is POST dictionary (Django QueryDict).
+        `data` is POST dictionary (webob.multidict.MultiDict).
 
         The `data` dict has keys of the form 'x_y', which are mapped
         to key 'y' in the returned dict.  For example,
@@ -749,6 +817,13 @@ class CapaModule(CapaFields, XModule):
         then the output dict would contain {'1': ['test'] }
         (the value is a list).
 
+        Some other inputs such as ChoiceTextInput expect a dict of values in the returned
+        dict  If the key ends with '{}' then we will assume that the value is a json
+        encoded dict and deserialize it.
+        For example, if the `data` dict contains {'input_1{}': '{"1_2_1": 1}'}
+        then the output dict would contain {'1': {"1_2_1": 1} }
+        (the value is a dictionary)
+
         Raises an exception if:
 
         -A key in the `data` dictionary does not contain at least one underscore
@@ -760,9 +835,12 @@ class CapaModule(CapaFields, XModule):
         """
         answers = dict()
 
-        for key in data:
+        # webob.multidict.MultiDict is a view of a list of tuples,
+        # so it will return a multi-value key once for each value.
+        # We only want to consider each key a single time, so we use set(data.keys())
+        for key in set(data.keys()):
             # e.g. input_resistor_1 ==> resistor_1
-            _, _, name = key.partition('_')
+            _, _, name = key.partition('_')  # pylint: disable=redefined-outer-name
 
             # If key has no underscores, then partition
             # will return (key, '', '')
@@ -775,11 +853,22 @@ class CapaModule(CapaFields, XModule):
                 # the same form input (e.g. checkbox inputs). The convention is that
                 # if the name ends with '[]' (which looks like an array), then the
                 # answer will be an array.
+                # if the name ends with '{}' (Which looks like a dict),
+                # then the answer will be a dict
                 is_list_key = name.endswith('[]')
-                name = name[:-2] if is_list_key else name
+                is_dict_key = name.endswith('{}')
+                name = name[:-2] if is_list_key or is_dict_key else name
 
                 if is_list_key:
-                    val = data.getlist(key)
+                    val = data.getall(key)
+                elif is_dict_key:
+                    try:
+                        val = json.loads(data[key])
+                    # If the submission wasn't deserializable, raise an error.
+                    except(KeyError, ValueError):
+                        raise ValueError(
+                            u"Invalid submission: {val} for {key}".format(val=data[key], key=key)
+                        )
                 else:
                     val = data[key]
 
@@ -802,6 +891,8 @@ class CapaModule(CapaFields, XModule):
             'value': score['score'],
             'max_value': score['total'],
         })
+
+        return {'grade': score['score'], 'max_grade': score['total']}
 
     def check_problem(self, data):
         """
@@ -850,6 +941,9 @@ class CapaModule(CapaFields, XModule):
             log.warning("StudentInputError in capa_module:problem_check",
                         exc_info=True)
 
+            # Save the user's state before failing
+            self.set_state_from_lcp()
+
             # If the user is a staff member, include
             # the full exception, including traceback,
             # in the response
@@ -864,13 +958,16 @@ class CapaModule(CapaFields, XModule):
             return {'success': msg}
 
         except Exception as err:
+            # Save the user's state before failing
+            self.set_state_from_lcp()
+
             if self.system.DEBUG:
                 msg = u"Error checking problem: {}".format(err.message)
                 msg += u'\nTraceback:\n{}'.format(traceback.format_exc())
                 return {'success': msg}
             raise
 
-        self.publish_grade()
+        published_grade = self.publish_grade()
 
         # success = correct if ALL questions in this problem are correct
         success = 'correct'
@@ -880,6 +977,8 @@ class CapaModule(CapaFields, XModule):
 
         # NOTE: We are logging both full grading and queued-grading submissions. In the latter,
         #       'success' will always be incorrect
+        event_info['grade'] = published_grade['grade']
+        event_info['max_grade'] = published_grade['max_grade']
         event_info['correct_map'] = correct_map.get_dict()
         event_info['success'] = success
         event_info['attempts'] = self.attempts
@@ -1072,8 +1171,12 @@ class CapaDescriptor(CapaFields, RawDescriptor):
     mako_template = "widgets/problem-edit.html"
     js = {'coffee': [resource_string(__name__, 'js/src/problem/edit.coffee')]}
     js_module_name = "MarkdownEditingDescriptor"
-    css = {'scss': [resource_string(__name__, 'css/editor/edit.scss'),
-                    resource_string(__name__, 'css/problem/edit.scss')]}
+    css = {
+        'scss': [
+            resource_string(__name__, 'css/editor/edit.scss'),
+            resource_string(__name__, 'css/problem/edit.scss')
+        ]
+    }
 
     # Capa modules have some additional metadata:
     # TODO (vshnayder): do problems have any other metadata?  Do they
@@ -1085,10 +1188,23 @@ class CapaDescriptor(CapaFields, RawDescriptor):
     metadata_translations = dict(RawDescriptor.metadata_translations)
     metadata_translations['attempts'] = 'max_attempts'
 
+    @classmethod
+    def filter_templates(cls, template, course):
+        """
+        Filter template that contains 'latex' from templates.
+
+        Show them only if use_latex_compiler is set to True in
+        course settings.
+        """
+        return (not 'latex' in template['template_id'] or course.use_latex_compiler)
+
     def get_context(self):
         _context = RawDescriptor.get_context(self)
-        _context.update({'markdown': self.markdown,
-                         'enable_markdown': self.markdown is not None})
+        _context.update({
+            'markdown': self.markdown,
+            'enable_markdown': self.markdown is not None,
+            'enable_latex_compiler': self.use_latex_compiler,
+        })
         return _context
 
     # VS[compat]
@@ -1104,6 +1220,42 @@ class CapaDescriptor(CapaFields, RawDescriptor):
     @property
     def non_editable_metadata_fields(self):
         non_editable_fields = super(CapaDescriptor, self).non_editable_metadata_fields
-        non_editable_fields.extend([CapaDescriptor.due, CapaDescriptor.graceperiod,
-                                    CapaDescriptor.force_save_button, CapaDescriptor.markdown])
+        non_editable_fields.extend([
+            CapaDescriptor.due,
+            CapaDescriptor.graceperiod,
+            CapaDescriptor.force_save_button,
+            CapaDescriptor.markdown,
+            CapaDescriptor.text_customization,
+            CapaDescriptor.use_latex_compiler,
+        ])
         return non_editable_fields
+
+    # Proxy to CapaModule for access to any of its attributes
+    answer_available = module_attr('answer_available')
+    check_button_name = module_attr('check_button_name')
+    check_problem = module_attr('check_problem')
+    choose_new_seed = module_attr('choose_new_seed')
+    closed = module_attr('closed')
+    get_answer = module_attr('get_answer')
+    get_problem = module_attr('get_problem')
+    get_problem_html = module_attr('get_problem_html')
+    get_state_for_lcp = module_attr('get_state_for_lcp')
+    handle_input_ajax = module_attr('handle_input_ajax')
+    handle_problem_html_error = module_attr('handle_problem_html_error')
+    handle_ungraded_response = module_attr('handle_ungraded_response')
+    is_attempted = module_attr('is_attempted')
+    is_correct = module_attr('is_correct')
+    is_past_due = module_attr('is_past_due')
+    is_submitted = module_attr('is_submitted')
+    lcp = module_attr('lcp')
+    make_dict_of_responses = module_attr('make_dict_of_responses')
+    new_lcp = module_attr('new_lcp')
+    publish_grade = module_attr('publish_grade')
+    rescore_problem = module_attr('rescore_problem')
+    reset_problem = module_attr('reset_problem')
+    save_problem = module_attr('save_problem')
+    set_state_from_lcp = module_attr('set_state_from_lcp')
+    should_show_check_button = module_attr('should_show_check_button')
+    should_show_reset_button = module_attr('should_show_reset_button')
+    should_show_save_button = module_attr('should_show_save_button')
+    update_score = module_attr('update_score')

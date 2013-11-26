@@ -1,258 +1,367 @@
 """
-Unit tests for enrollment methods in views.py
-
+Unit tests for instructor.enrollment methods.
 """
 
-from django.test.utils import override_settings
-from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
-from courseware.tests.helpers import LoginEnrollmentTestCase
-from courseware.tests.modulestore_config import TEST_DATA_MONGO_MODULESTORE
-from xmodule.modulestore.tests.factories import CourseFactory
-from student.tests.factories import UserFactory, CourseEnrollmentFactory, AdminFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+import json
+from abc import ABCMeta
+from courseware.models import StudentModule
+from django.test import TestCase
+from student.tests.factories import UserFactory
+
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
-from instructor.views import get_and_clean_student_list, send_mail_to_student
-from django.core import mail
+from instructor.enrollment import (EmailEnrollmentState,
+                                   enroll_email, unenroll_email,
+                                   reset_student_attempts)
 
-USER_COUNT = 4
+
+class TestSettableEnrollmentState(TestCase):
+    """ Test the basis class for enrollment tests. """
+    def setUp(self):
+        self.course_id = 'robot:/a/fake/c::rse/id'
+
+    def test_mes_create(self):
+        """
+        Test SettableEnrollmentState creation of user.
+        """
+        mes = SettableEnrollmentState(
+            user=True,
+            enrollment=True,
+            allowed=False,
+            auto_enroll=False
+        )
+        # enrollment objects
+        eobjs = mes.create_user(self.course_id)
+        ees = EmailEnrollmentState(self.course_id, eobjs.email)
+        self.assertEqual(mes, ees)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
-class TestInstructorEnrollsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase):
+class TestEnrollmentChangeBase(TestCase):
     """
-    Check Enrollment/Unenrollment with/without auto-enrollment on activation and with/without email notification
+    Test instructor enrollment administration against database effects.
+
+    Test methods in derived classes follow a strict format.
+    `action` is a function which is run
+    the test will pass if `action` mutates state from `before_ideal` to `after_ideal`
     """
+
+    __metaclass__ = ABCMeta
 
     def setUp(self):
+        self.course_id = 'robot:/a/fake/c::rse/id'
 
-        instructor = AdminFactory.create()
-        self.client.login(username=instructor.username, password='test')
-
-        self.course = CourseFactory.create()
-
-        self.users = [
-            UserFactory.create(username="student%d" % i, email="student%d@test.com" % i)
-            for i in xrange(USER_COUNT)
-        ]
-
-        for user in self.users:
-            CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
-
-        # Empty the test outbox
-        mail.outbox = []
-
-    def test_unenrollment_email_off(self):
+    def _run_state_change_test(self, before_ideal, after_ideal, action):
         """
-        Do un-enrollment email off test
+        Runs a state change test.
+
+        `before_ideal` and `after_ideal` are SettableEnrollmentState's
+        `action` is a function which will be run in the middle.
+            `action` should transition the world from before_ideal to after_ideal
+            `action` will be supplied the following arguments (None-able arguments)
+                `email` is an email string
         """
+        # initialize & check before
+        print "checking initialization..."
+        eobjs = before_ideal.create_user(self.course_id)
+        before = EmailEnrollmentState(self.course_id, eobjs.email)
+        self.assertEqual(before, before_ideal)
 
-        course = self.course
+        # do action
+        print "running action..."
+        action(eobjs.email)
 
-        #Run the Un-enroll students command
-        url = reverse('instructor_dashboard', kwargs={'course_id': course.id})
-        response = self.client.post(url, {'action': 'Unenroll multiple students', 'multiple_students': 'student0@test.com student1@test.com'})
+        # check after
+        print "checking effects..."
+        after = EmailEnrollmentState(self.course_id, eobjs.email)
+        self.assertEqual(after, after_ideal)
 
-        #Check the page output
-        self.assertContains(response, '<td>student0@test.com</td>')
-        self.assertContains(response, '<td>student1@test.com</td>')
-        self.assertContains(response, '<td>un-enrolled</td>')
 
-        #Check the enrollment table
-        user = User.objects.get(email='student0@test.com')
-        ce = CourseEnrollment.objects.filter(course_id=course.id, user=user)
-        self.assertEqual(0, len(ce))
+class TestInstructorEnrollDB(TestEnrollmentChangeBase):
+    """ Test instructor.enrollment.enroll_email """
+    def test_enroll(self):
+        before_ideal = SettableEnrollmentState(
+            user=True,
+            enrollment=False,
+            allowed=False,
+            auto_enroll=False
+        )
 
-        user = User.objects.get(email='student1@test.com')
-        ce = CourseEnrollment.objects.filter(course_id=course.id, user=user)
-        self.assertEqual(0, len(ce))
+        after_ideal = SettableEnrollmentState(
+            user=True,
+            enrollment=True,
+            allowed=False,
+            auto_enroll=False
+        )
 
-        #Check the outbox
-        self.assertEqual(len(mail.outbox), 0)
+        action = lambda email: enroll_email(self.course_id, email)
 
-    def test_enrollment_new_student_autoenroll_on_email_off(self):
+        return self._run_state_change_test(before_ideal, after_ideal, action)
+
+    def test_enroll_again(self):
+        before_ideal = SettableEnrollmentState(
+            user=True,
+            enrollment=True,
+            allowed=False,
+            auto_enroll=False,
+        )
+
+        after_ideal = SettableEnrollmentState(
+            user=True,
+            enrollment=True,
+            allowed=False,
+            auto_enroll=False,
+        )
+
+        action = lambda email: enroll_email(self.course_id, email)
+
+        return self._run_state_change_test(before_ideal, after_ideal, action)
+
+    def test_enroll_nouser(self):
+        before_ideal = SettableEnrollmentState(
+            user=False,
+            enrollment=False,
+            allowed=False,
+            auto_enroll=False,
+        )
+
+        after_ideal = SettableEnrollmentState(
+            user=False,
+            enrollment=False,
+            allowed=True,
+            auto_enroll=False,
+        )
+
+        action = lambda email: enroll_email(self.course_id, email)
+
+        return self._run_state_change_test(before_ideal, after_ideal, action)
+
+    def test_enroll_nouser_again(self):
+        before_ideal = SettableEnrollmentState(
+            user=False,
+            enrollment=False,
+            allowed=True,
+            auto_enroll=False
+        )
+
+        after_ideal = SettableEnrollmentState(
+            user=False,
+            enrollment=False,
+            allowed=True,
+            auto_enroll=False,
+        )
+
+        action = lambda email: enroll_email(self.course_id, email)
+
+        return self._run_state_change_test(before_ideal, after_ideal, action)
+
+    def test_enroll_nouser_autoenroll(self):
+        before_ideal = SettableEnrollmentState(
+            user=False,
+            enrollment=False,
+            allowed=False,
+            auto_enroll=False,
+        )
+
+        after_ideal = SettableEnrollmentState(
+            user=False,
+            enrollment=False,
+            allowed=True,
+            auto_enroll=True,
+        )
+
+        action = lambda email: enroll_email(self.course_id, email, auto_enroll=True)
+
+        return self._run_state_change_test(before_ideal, after_ideal, action)
+
+    def test_enroll_nouser_change_autoenroll(self):
+        before_ideal = SettableEnrollmentState(
+            user=False,
+            enrollment=False,
+            allowed=True,
+            auto_enroll=True,
+        )
+
+        after_ideal = SettableEnrollmentState(
+            user=False,
+            enrollment=False,
+            allowed=True,
+            auto_enroll=False,
+        )
+
+        action = lambda email: enroll_email(self.course_id, email, auto_enroll=False)
+
+        return self._run_state_change_test(before_ideal, after_ideal, action)
+
+
+class TestInstructorUnenrollDB(TestEnrollmentChangeBase):
+    """ Test instructor.enrollment.unenroll_email """
+    def test_unenroll(self):
+        before_ideal = SettableEnrollmentState(
+            user=True,
+            enrollment=True,
+            allowed=False,
+            auto_enroll=False
+        )
+
+        after_ideal = SettableEnrollmentState(
+            user=True,
+            enrollment=False,
+            allowed=False,
+            auto_enroll=False
+        )
+
+        action = lambda email: unenroll_email(self.course_id, email)
+
+        return self._run_state_change_test(before_ideal, after_ideal, action)
+
+    def test_unenroll_notenrolled(self):
+        before_ideal = SettableEnrollmentState(
+            user=True,
+            enrollment=False,
+            allowed=False,
+            auto_enroll=False
+        )
+
+        after_ideal = SettableEnrollmentState(
+            user=True,
+            enrollment=False,
+            allowed=False,
+            auto_enroll=False
+        )
+
+        action = lambda email: unenroll_email(self.course_id, email)
+
+        return self._run_state_change_test(before_ideal, after_ideal, action)
+
+    def test_unenroll_disallow(self):
+        before_ideal = SettableEnrollmentState(
+            user=False,
+            enrollment=False,
+            allowed=True,
+            auto_enroll=True
+        )
+
+        after_ideal = SettableEnrollmentState(
+            user=False,
+            enrollment=False,
+            allowed=False,
+            auto_enroll=False
+        )
+
+        action = lambda email: unenroll_email(self.course_id, email)
+
+        return self._run_state_change_test(before_ideal, after_ideal, action)
+
+    def test_unenroll_norecord(self):
+        before_ideal = SettableEnrollmentState(
+            user=False,
+            enrollment=False,
+            allowed=False,
+            auto_enroll=False
+        )
+
+        after_ideal = SettableEnrollmentState(
+            user=False,
+            enrollment=False,
+            allowed=False,
+            auto_enroll=False
+        )
+
+        action = lambda email: unenroll_email(self.course_id, email)
+
+        return self._run_state_change_test(before_ideal, after_ideal, action)
+
+
+class TestInstructorEnrollmentStudentModule(TestCase):
+    """ Test student module manipulations. """
+    def setUp(self):
+        self.course_id = 'robot:/a/fake/c::rse/id'
+
+    def test_reset_student_attempts(self):
+        user = UserFactory()
+        msk = 'robot/module/state/key'
+        original_state = json.dumps({'attempts': 32, 'otherstuff': 'alsorobots'})
+        module = StudentModule.objects.create(student=user, course_id=self.course_id, module_state_key=msk, state=original_state)
+        # lambda to reload the module state from the database
+        module = lambda: StudentModule.objects.get(student=user, course_id=self.course_id, module_state_key=msk)
+        self.assertEqual(json.loads(module().state)['attempts'], 32)
+        reset_student_attempts(self.course_id, user, msk)
+        self.assertEqual(json.loads(module().state)['attempts'], 0)
+
+    def test_delete_student_attempts(self):
+        user = UserFactory()
+        msk = 'robot/module/state/key'
+        original_state = json.dumps({'attempts': 32, 'otherstuff': 'alsorobots'})
+        StudentModule.objects.create(student=user, course_id=self.course_id, module_state_key=msk, state=original_state)
+        self.assertEqual(StudentModule.objects.filter(student=user, course_id=self.course_id, module_state_key=msk).count(), 1)
+        reset_student_attempts(self.course_id, user, msk, delete_module=True)
+        self.assertEqual(StudentModule.objects.filter(student=user, course_id=self.course_id, module_state_key=msk).count(), 0)
+
+
+class EnrollmentObjects(object):
+    """
+    Container for enrollment objects.
+
+    `email` - student email
+    `user` - student User object
+    `cenr` - CourseEnrollment object
+    `cea` - CourseEnrollmentAllowed object
+
+    Any of the objects except email can be None.
+    """
+    def __init__(self, email, user, cenr, cea):
+        self.email = email
+        self.user = user
+        self.cenr = cenr
+        self.cea = cea
+
+
+class SettableEnrollmentState(EmailEnrollmentState):
+    """
+    Settable enrollment state.
+    Used for testing state changes.
+    SettableEnrollmentState can be constructed and then
+        a call to create_user will make objects which
+        correspond to the state represented in the SettableEnrollmentState.
+    """
+    def __init__(self, user=False, enrollment=False, allowed=False, auto_enroll=False):  # pylint: disable=W0231
+        self.user = user
+        self.enrollment = enrollment
+        self.allowed = allowed
+        self.auto_enroll = auto_enroll
+
+    def __eq__(self, other):
+        return self.to_dict() == other.to_dict()
+
+    def __neq__(self, other):
+        return not self == other
+
+    def create_user(self, course_id=None):
         """
-        Do auto-enroll on, email off test
+        Utility method to possibly create and possibly enroll a user.
+        Creates a state matching the SettableEnrollmentState properties.
+        Returns a tuple of (
+            email,
+            User, (optionally None)
+            CourseEnrollment, (optionally None)
+            CourseEnrollmentAllowed, (optionally None)
+        )
         """
-
-        course = self.course
-
-        #Run the Enroll students command
-        url = reverse('instructor_dashboard', kwargs={'course_id': course.id})
-        response = self.client.post(url, {'action': 'Enroll multiple students', 'multiple_students': 'student1_1@test.com, student1_2@test.com', 'auto_enroll': 'on'})
-
-        #Check the page output
-        self.assertContains(response, '<td>student1_1@test.com</td>')
-        self.assertContains(response, '<td>student1_2@test.com</td>')
-        self.assertContains(response, '<td>user does not exist, enrollment allowed, pending with auto enrollment on</td>')
-
-        #Check the outbox
-        self.assertEqual(len(mail.outbox), 0)
-
-        #Check the enrollmentallowed db entries
-        cea = CourseEnrollmentAllowed.objects.filter(email='student1_1@test.com', course_id=course.id)
-        self.assertEqual(1, cea[0].auto_enroll)
-        cea = CourseEnrollmentAllowed.objects.filter(email='student1_2@test.com', course_id=course.id)
-        self.assertEqual(1, cea[0].auto_enroll)
-
-        #Check there is no enrollment db entry other than for the other students
-        ce = CourseEnrollment.objects.filter(course_id=course.id)
-        self.assertEqual(4, len(ce))
-
-        #Create and activate student accounts with same email
-        self.student1 = 'student1_1@test.com'
-        self.password = 'bar'
-        self.create_account('s1_1', self.student1, self.password)
-        self.activate_user(self.student1)
-
-        self.student2 = 'student1_2@test.com'
-        self.create_account('s1_2', self.student2, self.password)
-        self.activate_user(self.student2)
-
-        #Check students are enrolled
-        user = User.objects.get(email='student1_1@test.com')
-        ce = CourseEnrollment.objects.filter(course_id=course.id, user=user)
-        self.assertEqual(1, len(ce))
-
-        user = User.objects.get(email='student1_2@test.com')
-        ce = CourseEnrollment.objects.filter(course_id=course.id, user=user)
-        self.assertEqual(1, len(ce))
-
-    def test_repeat_enroll(self):
-        """
-        Try to enroll an already enrolled student
-        """
-
-        course = self.course
-
-        url = reverse('instructor_dashboard', kwargs={'course_id': course.id})
-        response = self.client.post(url, {'action': 'Enroll multiple students', 'multiple_students': 'student0@test.com', 'auto_enroll': 'on'})
-        self.assertContains(response, '<td>student0@test.com</td>')
-        self.assertContains(response, '<td>already enrolled</td>')
-
-    def test_enrollmemt_new_student_autoenroll_off_email_off(self):
-        """
-        Do auto-enroll off, email off test
-        """
-
-        course = self.course
-
-        #Run the Enroll students command
-        url = reverse('instructor_dashboard', kwargs={'course_id': course.id})
-        response = self.client.post(url, {'action': 'Enroll multiple students', 'multiple_students': 'student2_1@test.com, student2_2@test.com'})
-
-        #Check the page output
-        self.assertContains(response, '<td>student2_1@test.com</td>')
-        self.assertContains(response, '<td>student2_2@test.com</td>')
-        self.assertContains(response, '<td>user does not exist, enrollment allowed, pending with auto enrollment off</td>')
-
-        #Check the outbox
-        self.assertEqual(len(mail.outbox), 0)
-
-        #Check the enrollmentallowed db entries
-        cea = CourseEnrollmentAllowed.objects.filter(email='student2_1@test.com', course_id=course.id)
-        self.assertEqual(0, cea[0].auto_enroll)
-        cea = CourseEnrollmentAllowed.objects.filter(email='student2_2@test.com', course_id=course.id)
-        self.assertEqual(0, cea[0].auto_enroll)
-
-        #Check there is no enrollment db entry other than for the setup instructor and students
-        ce = CourseEnrollment.objects.filter(course_id=course.id)
-        self.assertEqual(4, len(ce))
-
-        #Create and activate student accounts with same email
-        self.student = 'student2_1@test.com'
-        self.password = 'bar'
-        self.create_account('s2_1', self.student, self.password)
-        self.activate_user(self.student)
-
-        self.student = 'student2_2@test.com'
-        self.create_account('s2_2', self.student, self.password)
-        self.activate_user(self.student)
-
-        #Check students are not enrolled
-        user = User.objects.get(email='student2_1@test.com')
-        ce = CourseEnrollment.objects.filter(course_id=course.id, user=user)
-        self.assertEqual(0, len(ce))
-        user = User.objects.get(email='student2_2@test.com')
-        ce = CourseEnrollment.objects.filter(course_id=course.id, user=user)
-        self.assertEqual(0, len(ce))
-
-    def test_get_and_clean_student_list(self):
-        """
-        Clean user input test
-        """
-
-        string = "abc@test.com, def@test.com ghi@test.com \n \n jkl@test.com   \n mno@test.com   "
-        cleaned_string, cleaned_string_lc = get_and_clean_student_list(string)
-        self.assertEqual(cleaned_string, ['abc@test.com', 'def@test.com', 'ghi@test.com', 'jkl@test.com', 'mno@test.com'])
-
-    def test_enrollment_email_on(self):
-        """
-        Do email on enroll test
-        """
-
-        course = self.course
-
-        #Create activated, but not enrolled, user
-        UserFactory.create(username="student3_0", email="student3_0@test.com", first_name="Jim", last_name="Tester")
-
-        url = reverse('instructor_dashboard', kwargs={'course_id': course.id})
-        response = self.client.post(url, {'action': 'Enroll multiple students', 'multiple_students': 'student3_0@test.com, student3_1@test.com, student3_2@test.com', 'auto_enroll': 'on', 'email_students': 'on'})
-
-        #Check the page output
-        self.assertContains(response, '<td>student3_0@test.com</td>')
-        self.assertContains(response, '<td>student3_1@test.com</td>')
-        self.assertContains(response, '<td>student3_2@test.com</td>')
-        self.assertContains(response, '<td>added, email sent</td>')
-        self.assertContains(response, '<td>user does not exist, enrollment allowed, pending with auto enrollment on, email sent</td>')
-
-        #Check the outbox
-        self.assertEqual(len(mail.outbox), 3)
-        self.assertEqual(mail.outbox[0].subject, 'You have been enrolled in MITx/999/Robot_Super_Course')
-        self.assertEqual(mail.outbox[0].body, "Dear Jim Tester\n\nYou have been enrolled in MITx/999/Robot_Super_Course at edx.org by a member of the course staff. " +
-                                              "The course should now appear on your edx.org dashboard.\n\n" +
-                                              "To start accessing course materials, please visit https://edx.org/courses/MITx/999/Robot_Super_Course\n\n" +
-                                              "----\nThis email was automatically sent from edx.org to Jim Tester")
-
-        self.assertEqual(mail.outbox[1].subject, 'You have been invited to register for MITx/999/Robot_Super_Course')
-        self.assertEqual(mail.outbox[1].body, "Dear student,\n\nYou have been invited to join MITx/999/Robot_Super_Course at edx.org by a member of the course staff.\n\n" +
-                                              "To finish your registration, please visit https://edx.org/register and fill out the registration form.\n" +
-                                              "Once you have registered and activated your account, you will see MITx/999/Robot_Super_Course listed on your dashboard.\n\n" +
-                                              "----\nThis email was automatically sent from edx.org to student3_1@test.com")
-
-    def test_unenrollment_email_on(self):
-        """
-        Do email on unenroll test
-        """
-
-        course = self.course
-
-        #Create invited, but not registered, user
-        cea = CourseEnrollmentAllowed(email='student4_0@test.com', course_id=course.id)
-        cea.save()
-
-        url = reverse('instructor_dashboard', kwargs={'course_id': course.id})
-        response = self.client.post(url, {'action': 'Unenroll multiple students', 'multiple_students': 'student4_0@test.com, student2@test.com, student3@test.com', 'email_students': 'on'})
-
-        #Check the page output
-        self.assertContains(response, '<td>student2@test.com</td>')
-        self.assertContains(response, '<td>student3@test.com</td>')
-        self.assertContains(response, '<td>un-enrolled, email sent</td>')
-
-        #Check the outbox
-        self.assertEqual(len(mail.outbox), 3)
-        self.assertEqual(mail.outbox[0].subject, 'You have been un-enrolled from MITx/999/Robot_Super_Course')
-        self.assertEqual(mail.outbox[0].body, "Dear Student,\n\nYou have been un-enrolled from course MITx/999/Robot_Super_Course by a member of the course staff. " +
-                         "Please disregard the invitation previously sent.\n\n" +
-                         "----\nThis email was automatically sent from edx.org to student4_0@test.com")
-        self.assertEqual(mail.outbox[1].subject, 'You have been un-enrolled from MITx/999/Robot_Super_Course')
-
-    def test_send_mail_to_student(self):
-        """
-        Do invalid mail template test
-        """
-
-        d = {'message': 'message_type_that_doesn\'t_exist'}
-
-        send_mail_ret = send_mail_to_student('student0@test.com', d)
-        self.assertFalse(send_mail_ret)
+        # if self.user=False, then this will just be used to generate an email.
+        email = "robot_no_user_exists_with_this_email@edx.org"
+        if self.user:
+            user = UserFactory()
+            email = user.email
+            if self.enrollment:
+                cenr = CourseEnrollment.enroll(user, course_id)
+                return EnrollmentObjects(email, user, cenr, None)
+            else:
+                return EnrollmentObjects(email, user, None, None)
+        elif self.allowed:
+            cea = CourseEnrollmentAllowed.objects.create(
+                email=email,
+                course_id=course_id,
+                auto_enroll=self.auto_enroll,
+            )
+            return EnrollmentObjects(email, None, None, cea)
+        else:
+            return EnrollmentObjects(email, None, None, None)

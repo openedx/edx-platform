@@ -1,6 +1,6 @@
 import re
 
-from nose.tools import assert_equals, assert_true, assert_false
+from nose.tools import assert_equals, assert_true, assert_false  # pylint: disable=E0611
 from static_replace import (replace_static_urls, replace_course_urls,
                             _url_replace_regex)
 from mock import patch, Mock
@@ -10,7 +10,6 @@ from xmodule.modulestore.xml import XMLModuleStore
 
 DATA_DIRECTORY = 'data_dir'
 COURSE_ID = 'org/course/run'
-NAMESPACE = Location('org', 'course', 'run', None, None)
 STATIC_SOURCE = '"/static/file.png"'
 
 
@@ -52,18 +51,18 @@ def test_storage_url_not_exists(mock_storage):
 def test_mongo_filestore(mock_modulestore, mock_static_content):
 
     mock_modulestore.return_value = Mock(MongoModuleStore)
-    mock_static_content.convert_legacy_static_url.return_value = "c4x://mock_url"
+    mock_static_content.convert_legacy_static_url_with_course_id.return_value = "c4x://mock_url"
 
     # No namespace => no change to path
     assert_equals('"/static/data_dir/file.png"', replace_static_urls(STATIC_SOURCE, DATA_DIRECTORY))
 
     # Namespace => content url
     assert_equals(
-        '"' + mock_static_content.convert_legacy_static_url.return_value + '"',
-        replace_static_urls(STATIC_SOURCE, DATA_DIRECTORY, NAMESPACE)
+        '"' + mock_static_content.convert_legacy_static_url_with_course_id.return_value + '"',
+        replace_static_urls(STATIC_SOURCE, DATA_DIRECTORY, course_id=COURSE_ID)
     )
 
-    mock_static_content.convert_legacy_static_url.assert_called_once_with('file.png', NAMESPACE)
+    mock_static_content.convert_legacy_static_url_with_course_id.assert_called_once_with('file.png', COURSE_ID)
 
 
 @patch('static_replace.settings')
@@ -89,6 +88,20 @@ def test_raw_static_check():
 
     text = 'text <tag a="/static/js/capa/protex/protex.nocache.js?raw"/><div class="'
     assert_equals(path, replace_static_urls(path, text))
+
+
+@patch('static_replace.staticfiles_storage')
+@patch('static_replace.modulestore')
+def test_static_url_with_query(mock_modulestore, mock_storage):
+    """
+    Make sure urls with query have the parameter section unaltered
+    """
+    mock_storage.exists.return_value = False
+    mock_modulestore.return_value = Mock(MongoModuleStore)
+
+    pre_text = 'EMBED src ="/static/LAlec04_controller.swf?csConfigFile=/c4x/org/course/asset/LAlec04_config.xml"'
+    post_text = 'EMBED src ="/c4x/org/course/asset/LAlec04_controller.swf?csConfigFile=/c4x/org/course/asset/LAlec04_config.xml"'
+    assert_equals(post_text, replace_static_urls(pre_text, DATA_DIRECTORY, COURSE_ID))
 
 
 def test_regex():

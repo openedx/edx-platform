@@ -1,21 +1,22 @@
-<section id="openended_${id}" class="open-ended-child" data-state="${state}" data-child-type="${child_type}">
+<%! from django.utils.translation import ugettext as _ %>
+<section id="openended_${module_id}" class="open-ended-child" data-state="${state}" data-child-type="${child_type}">
    <div class="error"></div>
    <div class="prompt">
     ${prompt|n}
    </div>
-  <h4>Response</h4>
-  <textarea rows="${rows}" cols="${cols}" name="answer" class="answer short-form-response" id="input_${id}">${previous_answer|h}</textarea>
+    <div class="visibility-control visibility-control-response">
+        <div class="inner">
+        </div>
+        <label class="section-header section-header-response" for="answer_${module_id}">Response</label>
+    </div>
+  <textarea rows="${rows}" cols="${cols}" name="answer" class="answer short-form-response" id="answer_${module_id}">${previous_answer|h}</textarea>
 
   <div class="message-wrapper"></div>
   <div class="grader-status">
     % if state == 'initial':
-      <span class="unanswered" style="display:inline-block;" id="status_${id}">Unanswered</span>
-    % elif state in ['done', 'post_assessment'] and correct == 'correct':
-    <span class="correct" id="status_${id}"></span> <p>Correct</p>
-    % elif state in ['done', 'post_assessment'] and correct == 'incorrect':
-    <span class="incorrect" id="status_${id}"></span> <p>Incorrect. </p>
+      <span class="unanswered" style="display:inline-block;" id="status_${id}">${_("Unanswered")}</span>
     % elif state == 'assessing':
-      <span class="grading" id="status_${id}">Submitted for grading.
+      <span class="grading" id="status_${id}">
       % if eta_message is not None:
          ${eta_message}
       % endif
@@ -29,9 +30,9 @@
   </div>
 
   <div class="file-upload"></div>
-
-  <input type="button" value="Submit" class="submit-button" name="show"/>
-  <input name="skip" class="skip-button" type="button" value="Skip Post-Assessment"/>
+  <input type="button" value="${_('Save')}" class="save-button" name="save"/>
+  <input type="button" value="${_('Submit')}" class="submit-button" name="show"/>
+  <input name="skip" class="skip-button" type="button" value="${_('Skip Post-Assessment')}"/>
 
   <div class="open-ended-action"></div>
 

@@ -1,7 +1,5 @@
-<%! from django.utils.translation import ugettext as _ %>
-<%! from django.utils import translation    %>
-<%!translation.activate('vi')%>
 <%namespace name='static' file='static_content.html'/>
+<%! from django.utils.translation import ugettext as _ %>
 
 <%inherit file="main.html" />
 
@@ -10,7 +8,7 @@
   <section class="basic_stats">
 
     <div class="edx_summary">
-      <h2>${_("edX-wide Summary")}</h2>
+      <h2>${_("{platform_name}-wide Summary").format(platform_name=settings.PLATFORM_NAME)}</h2>
       <table style="margin-left:auto;margin-right:auto;width:50%">
       % for key in results["scalars"]:
         <tr>

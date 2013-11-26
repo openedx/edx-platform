@@ -89,6 +89,9 @@ evaluation=10.0 - ((float(5 * error + warning + refactor + convention) / stateme
 # evaluation report (RP0004).
 comment=no
 
+# Display symbolic names of messages in reports
+symbols=yes
+
 
 [TYPECHECK]
 
@@ -120,7 +123,10 @@ generated-members=
     content,
     status_code,
 # For factory_boy factories
-    create
+    create,
+    build,
+# For xblocks
+    fields,
 
 
 [BASIC]
@@ -160,7 +166,7 @@ variable-rgx=[a-z_][a-z0-9_]{2,30}$
 inlinevar-rgx=[A-Za-z_][A-Za-z0-9_]*$
 
 # Good variable names which should always be accepted, separated by a comma
-good-names=i,j,k,ex,Run,_
+good-names=f,i,j,k,db,ex,Run,_,__
 
 # Bad variable names which should always be refused, separated by a comma
 bad-names=foo,bar,baz,toto,tutu,tata

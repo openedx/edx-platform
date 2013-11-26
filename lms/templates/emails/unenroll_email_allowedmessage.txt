@@ -1,6 +1,13 @@
-Dear Student,
+<%! from django.utils.translation import ugettext as _ %>
 
-You have been un-enrolled from course ${course_id} by a member of the course staff. Please disregard the invitation previously sent.
+${_("Dear Student,")}
+
+${_("You have been un-enrolled from course {course_name} by a member "
+    "of the course staff. Please disregard the invitation "
+    "previously sent.").format(course_name=course.display_name_with_default)}
 
 ----
-This email was automatically sent from ${site_name} to ${email_address}
+${_("This email was automatically sent from {site_name} "
+	"to {email_address}").format(
+		site_name=site_name, email_address=email_address
+	)}

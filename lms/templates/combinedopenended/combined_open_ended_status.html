@@ -1,23 +1,16 @@
+<%! from django.utils.translation import ugettext as _ %>
 <div class="status-elements">
     <section id="combined-open-ended-status" class="combined-open-ended-status">
-        <div class="statusitem">
-            Status
-        </div>
         %for i in xrange(0,len(status_list)):
             <%status=status_list[i]%>
-            %if i==len(status_list)-1:
+            %if status['current']:
                 <div class="statusitem statusitem-current" data-status-number="${i}">
             %else:
                 <div class="statusitem" data-status-number="${i}">
             %endif
-                    %if status['grader_type'] in grader_type_image_dict and render_via_ajax:
-                        <% grader_image = grader_type_image_dict[status['grader_type']]%>
-                        <img src="${grader_image}" title=${status['human_grader_type']}>
-                    %else:
-                        ${status['human_task']}
-                    %endif
-                    (${status['human_state']})
+           	${status['human_task']}
             </div>
         %endfor
     </section>
+    <div class="hidden">Current Assessment Type: ${current_task_human_name}</div>
 </div>

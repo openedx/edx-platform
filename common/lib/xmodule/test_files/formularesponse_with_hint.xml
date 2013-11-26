@@ -32,7 +32,7 @@ $wrongans</tt> to see a hint.</p>
 
 <formularesponse samples="x@-5:5#11" id="11" answer="$answer">
  <responseparam description="Numerical Tolerance" type="tolerance" default="0.001" name="tol" /> 
- <text>y = <textline size="25" /></text>
+ <text>y = <formulaequationinput size="25" /></text>
   <hintgroup>
    <formulahint samples="x@-5:5#11" answer="$wrongans" name="inversegrad">
    </formulahint>

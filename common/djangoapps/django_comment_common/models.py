@@ -19,6 +19,20 @@ FORUM_ROLE_STUDENT = 'Student'
 
 @receiver(post_save, sender=CourseEnrollment)
 def assign_default_role(sender, instance, **kwargs):
+    # The code below would remove all forum Roles from a user when they unenroll
+    # from a course. Concerns were raised that it should apply only to students,
+    # or that even the history of student roles is important for research
+    # purposes. Since this was new functionality being added in this release,
+    # I'm just going to comment it out for now and let the forums team deal with
+    # implementing the right behavior.
+    #
+    # # We've unenrolled the student, so remove all roles for this course
+    # if not instance.is_active:
+    #     course_roles = list(Role.objects.filter(course_id=instance.course_id))
+    #     instance.user.roles.remove(*course_roles)
+    #     return
+
+    # We've enrolled the student, so make sure they have a default role
     if instance.user.is_staff:
         role = Role.objects.get_or_create(course_id=instance.course_id, name="Moderator")[0]
     else:

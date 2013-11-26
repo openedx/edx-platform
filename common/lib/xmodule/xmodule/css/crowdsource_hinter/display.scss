@@ -7,52 +7,6 @@
   background: rgb(253, 248, 235);
 }
 
-#answer-tabs {
-  background: #FFFFFF;
-  border: none;
-  margin-bottom: 20px;
-  padding-bottom: 20px;
-}
-
-#answer-tabs .ui-widget-header {
-  border-bottom: 1px solid #DCDCDC;
-  background: #FDF8EB;
-}
-
-#answer-tabs .ui-tabs-nav .ui-state-default {
-  border: 1px solid #DCDCDC;
-  background: #E6E6E3;
-  margin-bottom: 0px;
-}
-
-#answer-tabs .ui-tabs-nav .ui-state-default:hover {
-  background: #FFFFFF;
-}
-
-#answer-tabs .ui-tabs-nav .ui-state-active:hover {
-  background: #FFFFFF;
-}
-
-#answer-tabs .ui-tabs-nav .ui-state-active {
-  border: 1px solid #DCDCDC;
-  background: #FFFFFF;
-}
-
-#answer-tabs .ui-tabs-nav .ui-state-active a {
-  color: #222222;
-  background: #FFFFFF;
-}
-
-#answer-tabs .ui-tabs-nav .ui-state-default a:hover {
-  color: #222222;
-  background: #FFFFFF;
-}
-
-#answer-tabs .custom-hint {
-  height: 100px;
-  width: 100%;
-}
-
 .hint-inner-container {
   padding-left: 15px;
   padding-right: 15px;
@@ -62,4 +16,25 @@
 .vote {
   padding-top: 0px !important;
   padding-bottom: 0px !important;
+}
+
+.wizard-view {
+  float: left;
+  width: 790px;
+  margin-right: 10px;
+}
+
+.wizard-container {
+  width: 3000px;
+
+  -webkit-transition:all 1.0s ease-in-out;
+  -moz-transition:all 1.0s ease-in-out;
+  -o-transition:all 1.0s ease-in-out;
+  transition:all 1.0s ease-in-out;
+}
+
+.wizard-viewbox {
+  width: 800px;
+  overflow: hidden;
+  position: relative;
 }

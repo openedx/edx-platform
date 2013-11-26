@@ -1,139 +1,207 @@
 <%inherit file="base.html" />
-<%! from django.core.urlresolvers import reverse %>
-<%! from django.utils.translation import ugettext as _ %>
-<%block name="bodyclass">is-signedin course uploads</%block>
+<%!
+  from django.core.urlresolvers import reverse
+  from django.utils.translation import ugettext as _
+%>
 <%block name="title">${_("Files &amp; Uploads")}</%block>
+<%block name="bodyclass">is-signedin course uploads view-uploads</%block>
 
 <%namespace name='static' file='static_content.html'/>
 
+<%block name="header_extras">
+    <script type="text/template" id="asset-tpl">
+        <%static:include path="js/asset.underscore"/>
+    </script>
+</%block>
+
 <%block name="jsextra">
-<script src="${static.url('js/vendor/mustache.js')}"></script>
+<script type="text/javascript">
+require(["domReady", "jquery", "gettext", "js/models/asset", "js/collections/asset",
+         "js/views/assets", "js/views/feedback_prompt",
+         "js/views/feedback_notification", "js/utils/modal", "jquery.fileupload"],
+        function(domReady, $, gettext, AssetModel, AssetCollection, AssetsView, PromptView, NotificationView, ModalUtils) {
+
+    var assets = new AssetCollection(${asset_list});
+    assets.url = "${asset_callback_url}";
+    var assetsView = new AssetsView({collection: assets, el: $('#asset_table_body')});
+
+    var hideModal = function (e) {
+        if (e) {
+            e.preventDefault();
+        }
+        $('.file-input').unbind('change.startUpload');
+        ModalUtils.hideModal();
+    };
+
+    var showUploadModal = function (e) {
+        e.preventDefault();
+        resetUploadModal();
+        ModalUtils.showModal();
+        $('.file-input').bind('change', startUpload);
+        $('.upload-modal .file-chooser').fileupload({
+            dataType: 'json',
+            type: 'POST',
+            maxChunkSize: 100 * 1000 * 1000,      // 100 MB
+            autoUpload: true,
+            progressall: function(e, data) {
+                var percentComplete = parseInt((100 * data.loaded) / data.total, 10);
+                showUploadFeedback(e, percentComplete);
+            },
+            maxFileSize: 100 * 1000 * 1000,   // 100 MB
+            maxNumberofFiles: 100,
+            add: function(e, data) {
+                data.process().done(function () {
+                    data.submit();
+                });
+            },
+            done: function(e, data) {
+                displayFinishedUpload(data.result);
+            }
+
+        });
+    };
+
+    var showFileSelectionMenu = function(e) {
+        e.preventDefault();
+        $('.file-input').click();
+    };
+
+    var startUpload = function (e) {
+        var file = e.target.value;
+
+        $('.upload-modal h1').html(gettext('Uploading…'));
+        $('.upload-modal .file-name').html(file.substring(file.lastIndexOf("\\") + 1));
+        $('.upload-modal .choose-file-button').hide();
+        $('.upload-modal .progress-bar').removeClass('loaded').show();
+    };
+
+    var resetUploadModal = function () {
+        // Reset modal so it no longer displays information about previously
+        // completed uploads.
+        var percentVal = '0%';
+        $('.upload-modal .progress-fill').width(percentVal);
+        $('.upload-modal .progress-fill').html(percentVal);
+        $('.upload-modal .progress-bar').hide();
+
+        $('.upload-modal .file-name').show();
+        $('.upload-modal .file-name').html('');
+        $('.upload-modal .choose-file-button').html(gettext('Choose File'));
+        $('.upload-modal .embeddable-xml-input').val('');
+        $('.upload-modal .embeddable').hide();
+    };
+
+    var showUploadFeedback = function (event, percentComplete) {
+        var percentVal = percentComplete + '%';
+        $('.upload-modal .progress-fill').width(percentVal);
+        $('.upload-modal .progress-fill').html(percentVal);
+    };
+
+    var displayFinishedUpload = function (resp) {
+        var asset = resp.asset;
+
+        $('.upload-modal h1').html(gettext('Upload New File'));
+        $('.upload-modal .embeddable-xml-input').val(asset.portable_url);
+        $('.upload-modal .embeddable').show();
+        $('.upload-modal .file-name').hide();
+        $('.upload-modal .progress-fill').html(resp.msg);
+        $('.upload-modal .choose-file-button').html(gettext('Load Another File')).show();
+        $('.upload-modal .progress-fill').width('100%');
+
+        assetsView.addAsset(new AssetModel(asset));
+    };
+
+    domReady(function() {
+        $('.uploads .upload-button').bind('click', showUploadModal);
+        $('.upload-modal .close-button').bind('click', hideModal);
+        $('.upload-modal .choose-file-button').bind('click', showFileSelectionMenu);
+    });
+
+}); // end of require()
+    </script>
 </%block>
 
 <%block name="content">
 
-  <script type="text/template" id="new-asset-element">
-    <tr data-id='{{url}}'>
-      <td class="thumb-col">
-        <div class="thumb">
-          {{#thumb_url}}
-          <img src="{{thumb_url}}">
-          {{/thumb_url}}
-        </div>
-      </td>
-      <td class="name-col">
-        <a data-tooltip="Open/download this file" href="{{url}}" class="filename">{{displayname}}</a>
-        <div class="embeddable-xml"></div>
-      </td>
-      <td class="date-col">
-        {{uploadDate}}
-      </td>
-      <td class="embed-col">
-        <input type="text" class="embeddable-xml-input" value='{{url}}' readonly>
-      </td>
-      <td class="delete-col">
-        <a href="#" data-tooltip="${_('Delete this asset')}" class="remove-asset-button"><span class="delete-icon"></span></a>
-      </td>
-    </tr>
-  </script>
-
-  <div class="wrapper-mast wrapper">
+<div class="wrapper-mast wrapper">
     <header class="mast has-actions has-subtitle">
-      <h1 class="page-header">
-        <small class="subtitle">Content</small>
-        <span class="sr">&gt; </span>Files &amp; Uploads
-      </h1>
+        <h1 class="page-header">
+            <small class="subtitle">${_("Content")}</small>
+            <span class="sr">&gt; </span>${_("Files &amp; Uploads")}
+        </h1>
 
-      <nav class="nav-actions">
-        <h3 class="sr">Page Actions</h3>
-        <ul>
-          <li class="nav-item">
-            <a href="#" class="button upload-button new-button"><i class="icon-plus"></i> Upload New File</a>
-          </li>
-        </ul>
-      </nav>
-    </header>
-  </div>
-
-  <div class="main-wrapper">
-    <div class="inner-wrapper">
-      <div class="page-actions">
-        <input type="text" class="asset-search-input search wip-box" placeholder="search assets" style="display:none"/>
-      </div>
-      <article class="asset-library" data-remove-asset-callback-url='${remove_asset_callback_url}'>
-        <table>
-          <thead>
-            <tr>
-              <th class="thumb-col"></th>
-              <th class="name-col">Name</th>
-              <th class="date-col">Date Added</th>
-              <th class="embed-col">URL</th>
-              <th class="delete-col"></th>
-            </tr>
-          </thead>
-          <tbody id="asset_table_body">
-          % for asset in assets:
-            <tr data-id="${asset['url']}">
-              <td class="thumb-col">
-                <div class="thumb">
-                  % if asset['thumb_url'] is not None:
-                  <img src="${asset['thumb_url']}">
-                  % endif
-                </div>
-              </td>
-              <td class="name-col">
-                <a data-tooltip="Open/download this file" href="${asset['url']}" class="filename">${asset['displayname']}</a>
-                <div class="embeddable-xml"></div>
-              </td>
-              <td class="date-col">
-                ${asset['uploadDate']}
-              </td>
-              <td class="embed-col">
-                <input type="text" class="embeddable-xml-input" value="${asset['url']}" readonly>
-              </td>
-              <td class="delete-col">
-                <a href="#" data-tooltip="${_('Delete this asset')}" class="remove-asset-button"><span class="delete-icon"></span></a>
-              </td>
-            </tr>
-          % endfor
-          </tbody>
-        </table>
-        <nav class="pagination wip-box">
-          Page:
-          <ol class="pages">
-            <li>1</li>
-            <li><a href="#">2</a></li>
-            <li><a href="#">3</a></li>
-            <li><a href="#">4</a></li>
-            <li><a href="#">5</a></li>
-          </ol>
-          <a href="#" class="next">»</a>
+        <nav class="nav-actions">
+            <h3 class="sr">${_("Page Actions")}</h3>
+            <ul>
+                <li class="nav-item">
+                    <a href="#" class="button upload-button new-button"><i class="icon-plus"></i> ${_("Upload New File")}</a>
+                </li>
+            </ul>
         </nav>
-      </article>
+    </header>
+</div>
+
+<div class="wrapper-content wrapper">
+    <section class="content">
+        <article class="asset-library content-primary" role="main">
+            <table>
+                <caption class="sr">${_("List of uploaded files and assets in this course")}</caption>
+                <colgroup>
+                  <col class="thumb-cols" />
+                  <col class="name-cols" />
+                  <col class="date-cols" />
+                  <col class="embed-cols" />
+                  <col class="actions-cols" />
+                </colgroup>
+                <thead>
+                <tr>
+                    <th class="thumb-col">${_("Preview")}</th>
+                    <th class="name-col">${_("Name")}</th>
+                    <th class="date-col">${_("Date Added")}</th>
+                    <th class="embed-col">${_("URL")}</th>
+                    <th class="actions-col"><span class="sr">${_("Actions")}</span></th>
+                </tr>
+                </thead>
+                <tbody id="asset_table_body" >
+
+                </tbody>
+            </table>
+        </article>
+
+        <aside class="content-supplementary" role="complimentary">
+            <div class="bit">
+                <h3 class="title-3">${_("What files are listed here?")}</h3>
+            	<p>${_("In addition to the files you upload on this page, any files that you add to the course appear in this list. These files include your course image, textbook chapters, and files that appear on your Course Handouts sidebar.")}</p>
+            </div>
+            <div class="bit">
+                <h3 class="title-3">${_("What can I do on this page?")}</h3>
+                 <ul class="list-details">
+          			<li class="item-detail">${_("You can upload new files or view, download, or delete existing files. You can lock a file so that people who are not enrolled in your course cannot access that file.")}</li>
+          			<li class="item-detail">${_("Use the URL listed for a file to create a link to that file in the Course Handouts sidebar or in the body of the course.")}</li>
+        		</ul>
+            </div>
+        </aside>
+    </section>
+</div>
+
+<div class="upload-modal modal">
+    <a href="#" class="close-button"><i class="icon-remove-sign"></i> <span class="sr">${_('close')}</span></a>
+    <div class="modal-body">
+        <h1 class="title">${_("Upload New File")}</h1>
+        <p class="file-name">
+        <div class="progress-bar">
+            <div class="progress-fill"></div>
+        </div>
+        <div class="embeddable">
+            <label>URL:</label>
+            <input type="text" class="embeddable-xml-input" value='' readonly>
+        </div>
+        <form class="file-chooser" action="${asset_callback_url}"
+              method="post" enctype="multipart/form-data">
+            <a href="#" class="choose-file-button">${_("Choose File")}</a>
+            <input type="file" class="file-input" name="file" multiple>
+        </form>
     </div>
-  </div>
-
-  <div class="upload-modal modal">
-  	<a href="#" class="close-button"><span class="close-icon"></span></a>
-		<div class="modal-body">
-			<h1>Upload New File</h1>
-			<p class="file-name"></a>
-			<div class="progress-bar">
-				<div class="progress-fill"></div>
-			</div>
-      <div class="embeddable">
-        <label>URL:</label>
-        <input type="text" class="embeddable-xml-input" value='' readonly>
-      </div>
-			<form class="file-chooser" action="${upload_asset_callback_url}"
-                                method="post" enctype="multipart/form-data">
-				<a href="#" class="choose-file-button">Choose File</a>
-				<input type="file" class="file-input" name="file">
-			</form>
-		</div>
-	</div>
-
-	<div class="modal-cover"></div>
+</div>
 
 
 </%block>
@@ -141,17 +209,17 @@
 <%block name="view_alerts">
 <!-- alert: save confirmed with close -->
 <div class="wrapper wrapper-alert wrapper-alert-confirmation" role="status">
-  <div class="alert confirmation">
-    <i class="icon-ok"></i>
+    <div class="alert confirmation">
+        <i class="icon-ok"></i>
 
-    <div class="copy">
-      <h2 class="title title-3">${_('Your file has been deleted.')}</h2>
+        <div class="copy">
+            <h2 class="title title-3">${_('Your file has been deleted.')}</h2>
+        </div>
+
+        <a href="" rel="view" class="action action-alert-close">
+            <i class="icon-remove-sign"></i>
+            <span class="label">${_('close alert')}</span>
+        </a>
     </div>
-
-    <a href="" rel="view" class="action action-alert-close">
-      <i class="icon-remove-sign"></i>
-      <span class="label">${_('close alert')}</span>
-    </a>
-  </div>
 </div>
 </%block>

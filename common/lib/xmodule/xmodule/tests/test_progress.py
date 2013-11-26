@@ -1,6 +1,9 @@
 """Module progress tests"""
 
 import unittest
+from mock import Mock
+
+from xblock.field_data import DictFieldData
 
 from xmodule.progress import Progress
 from xmodule import x_module
@@ -90,15 +93,15 @@ class ProgressTest(unittest.TestCase):
         self.assertEqual(Progress.to_js_status_str(self.not_started), "none")
         self.assertEqual(Progress.to_js_status_str(self.half_done), "in_progress")
         self.assertEqual(Progress.to_js_status_str(self.done), "done")
-        self.assertEqual(Progress.to_js_status_str(None), "NA")
+        self.assertEqual(Progress.to_js_status_str(None), "0")
 
     def test_to_js_detail_str(self):
         '''Test the Progress.to_js_detail_str() method'''
         f = Progress.to_js_detail_str
         for p in (self.not_started, self.half_done, self.done):
             self.assertEqual(f(p), str(p))
-        # But None should be encoded as NA
-        self.assertEqual(f(None), "NA")
+        # But None should be encoded as 0
+        self.assertEqual(f(None), "0")
 
     def test_add(self):
         '''Test the Progress.add_counts() method'''
@@ -134,6 +137,6 @@ class ModuleProgressTest(unittest.TestCase):
     '''
     def test_xmodule_default(self):
         '''Make sure default get_progress exists, returns None'''
-        xm = x_module.XModule(get_test_system(), None, {'location': 'a://b/c/d/e'})
+        xm = x_module.XModule(Mock(), get_test_system(), DictFieldData({'location': 'a://b/c/d/e'}), Mock())
         p = xm.get_progress()
         self.assertEqual(p, None)

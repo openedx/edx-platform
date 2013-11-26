@@ -1,3 +1,4 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%inherit file="/main.html" />
 <%! from django.core.urlresolvers import reverse %>
 <%namespace name='static' file='/static_content.html'/>
@@ -10,7 +11,8 @@
 </%block>
 
 <%block name="headextra">
-  <%static:css group='course'/>
+<%static:css group='style-course-vendor'/>
+<%static:css group='style-course'/>
 
   <style type="text/css">
   % for (grade, _), color in zip(ordered_grades, ['green', 'Chocolate']):
@@ -36,7 +38,7 @@
 <section class="container">
 <div class="gradebook-wrapper">
   <section class="gradebook-content">
-    <h1>Gradebook</h1>
+    <h1>${_("Gradebook")}</h1>
 
     <table class="student-table">
       <thead>

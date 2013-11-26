@@ -18,13 +18,14 @@ from capa.tests.response_xml_factory import OptionResponseXMLFactory, \
     ChoiceResponseXMLFactory, MultipleChoiceResponseXMLFactory, \
     StringResponseXMLFactory, NumericalResponseXMLFactory, \
     FormulaResponseXMLFactory, CustomResponseXMLFactory, \
-    CodeResponseXMLFactory
-from nose.tools import assert_true
+    CodeResponseXMLFactory, ChoiceTextResponseXMLFactory
 
 
 # Factories from capa.tests.response_xml_factory that we will use
 # to generate the problem XML, with the keyword args used to configure
 # the output.
+# 'correct', 'incorrect', and 'unanswered' keys are lists of CSS selectors
+# the presence of any in the list is sufficient
 PROBLEM_DICT = {
     'drop down': {
         'factory': OptionResponseXMLFactory(),
@@ -131,15 +132,45 @@ PROBLEM_DICT = {
             'grader_payload': '{"grader": "ps1/Spring2013/test_grader.py"}', },
         'correct': ['span.correct'],
         'incorrect': ['span.incorrect'],
+        'unanswered': ['span.unanswered']},
+
+    'radio_text': {
+        'factory': ChoiceTextResponseXMLFactory(),
+        'kwargs': {
+            'question_text': 'The correct answer is Choice 0 and input 8',
+            'type': 'radiotextgroup',
+            'choices': [("true", {"answer": "8", "tolerance": "1"}),
+                        ("false", {"answer": "8", "tolerance": "1"})
+                        ]
+        },
+        'correct': ['section.choicetextgroup_correct'],
+        'incorrect': ['section.choicetextgroup_incorrect', 'span.incorrect'],
+        'unanswered': ['span.unanswered']},
+
+    'checkbox_text': {
+        'factory': ChoiceTextResponseXMLFactory(),
+        'kwargs': {
+            'question_text': 'The correct answer is Choice 0 and input 8',
+            'type': 'checkboxtextgroup',
+            'choices': [("true", {"answer": "8", "tolerance": "1"}),
+                        ("false", {"answer": "8", "tolerance": "1"})
+                        ]
+        },
+        'correct': ['span.correct'],
+        'incorrect': ['span.incorrect'],
         'unanswered': ['span.unanswered']}
 }
 
 
 def answer_problem(problem_type, correctness):
+    # Make sure that the problem has been completely rendered before
+    # starting to input an answer.
+    world.wait_for_ajax_complete()
+
     if problem_type == "drop down":
         select_name = "input_i4x-edx-model_course-problem-drop_down_2_1"
         option_text = 'Option 2' if correctness == 'correct' else 'Option 3'
-        world.browser.select(select_name, option_text)
+        world.select_option(select_name, option_text)
 
     elif problem_type == "multiple choice":
         if correctness == 'correct':
@@ -196,13 +227,26 @@ def answer_problem(problem_type, correctness):
         # (configured in the problem XML above)
         pass
 
+    elif problem_type == 'radio_text' or problem_type == 'checkbox_text':
+
+        input_value = "8" if correctness == 'correct' else "5"
+        choice = "choiceinput_0bc" if correctness == 'correct' else "choiceinput_1bc"
+        world.css_fill(
+            inputfield(
+                problem_type,
+                choice="choiceinput_0_numtolerance_input_0"
+            ),
+            input_value
+        )
+        world.css_check(inputfield(problem_type, choice=choice))
+
 
 def problem_has_answer(problem_type, answer_class):
     if problem_type == "drop down":
         if answer_class == 'blank':
-            assert world.browser.is_element_not_present_by_css('option[selected="true"]')
+            assert world.is_css_not_present('option[selected="true"]')
         else:
-            actual = world.browser.find_by_css('option[selected="true"]').value
+            actual = world.css_value('option[selected="true"]')
             expected = 'Option 2' if answer_class == 'correct' else 'Option 3'
             assert actual == expected
 
@@ -244,6 +288,17 @@ def problem_has_answer(problem_type, answer_class):
             expected = "x^2+2*x+y" if answer_class == 'correct' else 'x^2'
         assert_textfield('formula', expected)
 
+    elif problem_type in ("radio_text", "checkbox_text"):
+        if answer_class == 'blank':
+            expected = ('', '')
+            assert_choicetext_values(problem_type, (), expected)
+        elif answer_class == 'incorrect':
+            expected = ('5', '')
+            assert_choicetext_values(problem_type, ["choiceinput_1bc"], expected)
+        else:
+            expected = ('8', '')
+            assert_choicetext_values(problem_type, ["choiceinput_0bc"], expected)
+
     else:
         # The other response types use random data,
         # which would be difficult to check
@@ -251,10 +306,6 @@ def problem_has_answer(problem_type, answer_class):
         # input type coverage in this test.
         pass
 
-
-##############################
-#       HELPER METHODS
-##############################
 
 def add_problem_to_course(course, problem_type, extraMeta=None):
     '''
@@ -273,9 +324,9 @@ def add_problem_to_course(course, problem_type, extraMeta=None):
     # Create a problem item using our generated XML
     # We set rerandomize=always in the metadata so that the "Reset" button
     # will appear.
-    template_name = "i4x://edx/templates/problem/Blank_Common_Problem"
-    world.ItemFactory.create(parent_location=section_location(course),
-                            template=template_name,
+    category_name = "problem"
+    return world.ItemFactory.create(parent_location=section_location(course),
+                            category=category_name,
                             display_name=str(problem_type),
                             data=problem_xml,
                             metadata=metadata)
@@ -291,6 +342,12 @@ def inputfield(problem_type, choice=None, input_num=1):
 
     sel = ("input#input_i4x-edx-model_course-problem-%s_2_%s" %
            (problem_type.replace(" ", "_"), str(input_num)))
+
+   # this is necessary due to naming requirement for this problem type
+    if problem_type in ("radio_text", "checkbox_text"):
+        sel = "input#i4x-edx-model_course-problem-{0}_2_{1}".format(
+            problem_type.replace(" ", "_"), str(input_num)
+        )
 
     if choice is not None:
         base = "_choice_" if problem_type == "multiple choice" else "_"
@@ -325,3 +382,29 @@ def assert_checked(problem_type, choices):
 def assert_textfield(problem_type, expected_text, input_num=1):
     element_value = world.css_value(inputfield(problem_type, input_num=input_num))
     assert element_value == expected_text
+
+
+def assert_choicetext_values(problem_type, choices, expected_values):
+    """
+    Asserts that only the given choices are checked, and given
+    text fields have a desired value
+    """
+    # Names of the radio buttons or checkboxes
+    all_choices = ['choiceinput_0bc', 'choiceinput_1bc']
+    # Names of the numtolerance_inputs
+    all_inputs = [
+        "choiceinput_0_numtolerance_input_0",
+        "choiceinput_1_numtolerance_input_0"
+    ]
+    for this_choice in all_choices:
+        element = world.css_find(inputfield(problem_type, choice=this_choice))
+
+        if this_choice in choices:
+            assert element.checked
+        else:
+            assert not element.checked
+
+    for (name, expected) in zip(all_inputs, expected_values):
+        element = world.css_find(inputfield(problem_type, name))
+        # Remove any trailing spaces that may have been added
+        assert element.value.strip() == expected

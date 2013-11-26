@@ -12,10 +12,6 @@ from django.contrib.auth.models import User
 
 from student.models import UserProfile
 
-import mitxmako.middleware as middleware
-
-middleware.MakoMiddleware()
-
 
 def import_user(u):
     user_info = u['u']

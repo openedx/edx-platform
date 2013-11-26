@@ -10,15 +10,15 @@ from django.core.urlresolvers import reverse
 from django.core.management import call_command
 from util.testing import UrlResetMixin
 
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
-from nose.tools import assert_true, assert_equal
-from mock import patch
+from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from nose.tools import assert_true, assert_equal  # pylint: disable=E0611
+from mock import patch, ANY
 
 log = logging.getLogger(__name__)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
-@patch('comment_client.utils.requests.request')
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@patch('lms.lib.comment_client.utils.requests.request')
 class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
 
     @patch.dict("django.conf.settings.MITX_FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -87,14 +87,20 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
                                                'course_id': self.course_id})
         response = self.client.post(url, data=thread)
         assert_true(mock_request.called)
-        mock_request.assert_called_with('post',
-                                        'http://localhost:4567/api/v1/i4x-MITx-999-course-Robot_Super_Course/threads',
-                                        data={'body': u'this is a post',
-                                        'anonymous_to_peers': False, 'user_id': 1,
-                                        'title': u'Hello',
-                                        'commentable_id': u'i4x-MITx-999-course-Robot_Super_Course',
-                                        'anonymous': False, 'course_id': u'MITx/999/Robot_Super_Course',
-                                        'api_key': 'PUT_YOUR_API_KEY_HERE'}, timeout=5)
+        mock_request.assert_called_with(
+            'post',
+            'http://localhost:4567/api/v1/i4x-MITx-999-course-Robot_Super_Course/threads',
+            data={
+                'body': u'this is a post',
+                'anonymous_to_peers': False, 'user_id': 1,
+                'title': u'Hello',
+                'commentable_id': u'i4x-MITx-999-course-Robot_Super_Course',
+                'anonymous': False, 'course_id': u'MITx/999/Robot_Super_Course',
+            },
+            params={'request_id': ANY},
+            headers={'X-Edx-Api-Key': 'PUT_YOUR_API_KEY_HERE'},
+            timeout=5
+        )
         assert_equal(response.status_code, 200)
 
     def test_flag_thread(self, mock_request):
@@ -123,9 +129,35 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
         response = self.client.post(url)
         assert_true(mock_request.called)
 
-        call_list = [(('get', 'http://localhost:4567/api/v1/threads/518d4237b023791dca00000d'), {'params': {'mark_as_read': True, 'api_key': 'PUT_YOUR_API_KEY_HERE'}, 'timeout': 5}),
-                     (('put', 'http://localhost:4567/api/v1/threads/518d4237b023791dca00000d/abuse_flag'), {'data': {'api_key': 'PUT_YOUR_API_KEY_HERE', 'user_id': '1'}, 'timeout': 5}),
-                     (('get', 'http://localhost:4567/api/v1/threads/518d4237b023791dca00000d'), {'params': {'mark_as_read': True, 'api_key': 'PUT_YOUR_API_KEY_HERE'}, 'timeout': 5})]
+        call_list = [
+            (
+                ('get', 'http://localhost:4567/api/v1/threads/518d4237b023791dca00000d'),
+                {
+                    'data': None,
+                    'params': {'mark_as_read': True, 'request_id': ANY},
+                    'headers': {'X-Edx-Api-Key': 'PUT_YOUR_API_KEY_HERE'},
+                    'timeout': 5
+                }
+            ),
+            (
+                ('put', 'http://localhost:4567/api/v1/threads/518d4237b023791dca00000d/abuse_flag'),
+                {
+                    'data': {'user_id': '1'},
+                    'params': {'request_id': ANY},
+                    'headers': {'X-Edx-Api-Key': 'PUT_YOUR_API_KEY_HERE'},
+                    'timeout': 5
+                }
+            ),
+            (
+                ('get', 'http://localhost:4567/api/v1/threads/518d4237b023791dca00000d'),
+                {
+                    'data': None,
+                    'params': {'mark_as_read': True, 'request_id': ANY},
+                    'headers': {'X-Edx-Api-Key': 'PUT_YOUR_API_KEY_HERE'},
+                    'timeout': 5
+                }
+            )
+        ]
 
         assert_equal(call_list, mock_request.call_args_list)
 
@@ -157,9 +189,35 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
         response = self.client.post(url)
         assert_true(mock_request.called)
 
-        call_list = [(('get', 'http://localhost:4567/api/v1/threads/518d4237b023791dca00000d'), {'params': {'mark_as_read': True, 'api_key': 'PUT_YOUR_API_KEY_HERE'}, 'timeout': 5}),
-                     (('put', 'http://localhost:4567/api/v1/threads/518d4237b023791dca00000d/abuse_unflag'), {'data': {'api_key': 'PUT_YOUR_API_KEY_HERE', 'user_id': '1'}, 'timeout': 5}),
-                     (('get', 'http://localhost:4567/api/v1/threads/518d4237b023791dca00000d'), {'params': {'mark_as_read': True, 'api_key': 'PUT_YOUR_API_KEY_HERE'}, 'timeout': 5})]
+        call_list = [
+            (
+                ('get', 'http://localhost:4567/api/v1/threads/518d4237b023791dca00000d'),
+                {
+                    'data': None,
+                    'params': {'mark_as_read': True, 'request_id': ANY},
+                    'headers': {'X-Edx-Api-Key': 'PUT_YOUR_API_KEY_HERE'},
+                    'timeout': 5
+                }
+            ),
+            (
+                ('put', 'http://localhost:4567/api/v1/threads/518d4237b023791dca00000d/abuse_unflag'),
+                {
+                    'data': {'user_id': '1'},
+                    'params': {'request_id': ANY},
+                    'headers': {'X-Edx-Api-Key': 'PUT_YOUR_API_KEY_HERE'},
+                    'timeout': 5
+                }
+            ),
+            (
+                ('get', 'http://localhost:4567/api/v1/threads/518d4237b023791dca00000d'),
+                {
+                    'data': None,
+                    'params': {'mark_as_read': True, 'request_id': ANY},
+                    'headers': {'X-Edx-Api-Key': 'PUT_YOUR_API_KEY_HERE'},
+                    'timeout': 5
+                }
+            )
+        ]
 
         assert_equal(call_list, mock_request.call_args_list)
 
@@ -187,9 +245,35 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
         response = self.client.post(url)
         assert_true(mock_request.called)
 
-        call_list = [(('get', 'http://localhost:4567/api/v1/comments/518d4237b023791dca00000d'), {'params': {'api_key': 'PUT_YOUR_API_KEY_HERE'}, 'timeout': 5}),
-                     (('put', 'http://localhost:4567/api/v1/comments/518d4237b023791dca00000d/abuse_flag'), {'data': {'api_key': 'PUT_YOUR_API_KEY_HERE', 'user_id': '1'}, 'timeout': 5}),
-                     (('get', 'http://localhost:4567/api/v1/comments/518d4237b023791dca00000d'), {'params': {'api_key': 'PUT_YOUR_API_KEY_HERE'}, 'timeout': 5})]
+        call_list = [
+            (
+                ('get', 'http://localhost:4567/api/v1/comments/518d4237b023791dca00000d'),
+                {
+                    'data': None,
+                    'params': {'request_id': ANY},
+                    'headers': {'X-Edx-Api-Key': 'PUT_YOUR_API_KEY_HERE'},
+                    'timeout': 5
+                }
+            ),
+            (
+                ('put', 'http://localhost:4567/api/v1/comments/518d4237b023791dca00000d/abuse_flag'),
+                {
+                    'data': {'user_id': '1'},
+                    'params': {'request_id': ANY},
+                    'headers': {'X-Edx-Api-Key': 'PUT_YOUR_API_KEY_HERE'},
+                    'timeout': 5
+                }
+            ),
+            (
+                ('get', 'http://localhost:4567/api/v1/comments/518d4237b023791dca00000d'),
+                {
+                    'data': None,
+                    'params': {'request_id': ANY},
+                    'headers': {'X-Edx-Api-Key': 'PUT_YOUR_API_KEY_HERE'},
+                    'timeout': 5
+                }
+            )
+        ]
 
         assert_equal(call_list, mock_request.call_args_list)
 
@@ -217,9 +301,35 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
         response = self.client.post(url)
         assert_true(mock_request.called)
 
-        call_list = [(('get', 'http://localhost:4567/api/v1/comments/518d4237b023791dca00000d'), {'params': {'api_key': 'PUT_YOUR_API_KEY_HERE'}, 'timeout': 5}),
-                     (('put', 'http://localhost:4567/api/v1/comments/518d4237b023791dca00000d/abuse_unflag'), {'data': {'api_key': 'PUT_YOUR_API_KEY_HERE', 'user_id': '1'}, 'timeout': 5}),
-                     (('get', 'http://localhost:4567/api/v1/comments/518d4237b023791dca00000d'), {'params': {'api_key': 'PUT_YOUR_API_KEY_HERE'}, 'timeout': 5})]
+        call_list = [
+            (
+                ('get', 'http://localhost:4567/api/v1/comments/518d4237b023791dca00000d'),
+                {
+                    'data': None,
+                    'params': {'request_id': ANY},
+                    'headers': {'X-Edx-Api-Key': 'PUT_YOUR_API_KEY_HERE'},
+                    'timeout': 5
+                }
+            ),
+            (
+                ('put', 'http://localhost:4567/api/v1/comments/518d4237b023791dca00000d/abuse_unflag'),
+                {
+                    'data': {'user_id': '1'},
+                    'params': {'request_id': ANY},
+                    'headers': {'X-Edx-Api-Key': 'PUT_YOUR_API_KEY_HERE'},
+                    'timeout': 5
+                }
+            ),
+            (
+                ('get', 'http://localhost:4567/api/v1/comments/518d4237b023791dca00000d'),
+                {
+                    'data': None,
+                    'params': {'request_id': ANY},
+                    'headers': {'X-Edx-Api-Key': 'PUT_YOUR_API_KEY_HERE'},
+                    'timeout': 5
+                }
+            )
+        ]
 
         assert_equal(call_list, mock_request.call_args_list)
 

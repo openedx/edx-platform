@@ -4,14 +4,12 @@ import time
 from django.core.management.base import BaseCommand
 from django.conf import settings
 
-import mitxmako.middleware as middleware
+import mitxmako
 
 from django.core.mail import send_mass_mail
 import sys
 
 import datetime
-
-middleware.MakoMiddleware()
 
 
 def chunks(l, n):
@@ -41,8 +39,8 @@ rate -- messages per second
 
         users = [u.strip() for u in open(user_file).readlines()]
 
-        message = middleware.lookup['main'].get_template('emails/' + message_base + "_body.txt").render()
-        subject = middleware.lookup['main'].get_template('emails/' + message_base + "_subject.txt").render().strip()
+        message = mitxmako.lookup['main'].get_template('emails/' + message_base + "_body.txt").render()
+        subject = mitxmako.lookup['main'].get_template('emails/' + message_base + "_subject.txt").render().strip()
         rate = int(ratestr)
 
         self.log_file = open(logfilename, "a+", buffering=0)

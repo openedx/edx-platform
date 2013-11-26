@@ -1,8 +1,6 @@
 <%! from django.utils.translation import ugettext as _ %>
-<%! from django.utils import translation    %>
 
-
-<div class="wrapper-comp-editor" id="editor-tab">
+<div class="wrapper-comp-editor" id="editor-tab" data-base-asset-url="${base_asset_url}">
     <section class="html-editor editor">
       <ul class="editor-tabs">
         <li><a href="#" class="visual-tab tab current" data-tab="visual">${_("Visual")}</a></li>

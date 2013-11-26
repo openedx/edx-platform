@@ -1,39 +1,31 @@
 import logging
-import copy
-import yaml
 import os
+import sys
+import yaml
 
+from functools import partial
 from lxml import etree
 from collections import namedtuple
 from pkg_resources import resource_listdir, resource_string, resource_isdir
+from webob import Response
+from webob.multidict import MultiDict
 
 from xmodule.modulestore import Location
-from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.exceptions import ItemNotFoundError, InsufficientSpecificationError, InvalidLocationError
 
-from xblock.core import XBlock, Scope, String, Integer, Float, ModelType
+from xblock.core import XBlock
+from xblock.fields import Scope, Integer, Float, List, XBlockMixin, String
+from xmodule.fields import RelativeTime
+from xblock.fragment import Fragment
+from xblock.runtime import Runtime
+from xmodule.errortracker import exc_info_to_str
+from xmodule.modulestore.locator import BlockUsageLocator
 
 log = logging.getLogger(__name__)
 
 
 def dummy_track(_event_type, _event):
     pass
-
-
-class LocationField(ModelType):
-    """
-    XBlock field for storing Location values
-    """
-    def from_json(self, value):
-        """
-        Parse the json value as a Location
-        """
-        return Location(value)
-
-    def to_json(self, value):
-        """
-        Store the Location as a url string in json
-        """
-        return value.url()
 
 
 class HTMLSnippet(object):
@@ -96,34 +88,35 @@ class HTMLSnippet(object):
             .format(self.__class__))
 
 
-class XModuleFields(object):
-    display_name = String(
-        display_name="Display Name",
-        help="This name appears in the horizontal navigation at the top of the page.",
-        scope=Scope.settings,
-        default=None
-    )
-
-    # Please note that in order to be compatible with XBlocks more generally,
-    # the LMS and CMS shouldn't be using this field. It's only for internal
-    # consumption by the XModules themselves
-    location = LocationField(
-        display_name="Location",
-        help="This is the location id for the XModule.",
-        scope=Scope.content,
-        default=Location(None),
-    )
+def shim_xmodule_js(fragment):
+    """
+    Set up the XBlock -> XModule shim on the supplied :class:`xblock.fragment.Fragment`
+    """
+    if not fragment.js_init_fn:
+        fragment.initialize_js('XBlockToXModuleShim')
 
 
-class XModule(XModuleFields, HTMLSnippet, XBlock):
-    ''' Implements a generic learning module.
+class XModuleMixin(XBlockMixin):
+    """
+    Fields and methods used by XModules internally.
 
-        Subclasses must at a minimum provide a definition for get_html in order
-        to be displayed to users.
+    Adding this Mixin to an :class:`XBlock` allows it to cooperate with old-style :class:`XModules`
+    """
 
-        See the HTML module for a simple example.
-    '''
+    # Attributes for inspection of the descriptor
 
+    # This indicates whether the xmodule is a problem-type.
+    # It should respond to max_score() and grade(). It can be graded or ungraded
+    # (like a practice problem).
+    has_score = False
+
+    # Class level variable
+
+    # True if this descriptor always requires recalculation of grades, for
+    # example if the score can change via an extrnal service, not just when the
+    # student interacts with the module on the page.  A specific example is
+    # FoldIt, which posts grade-changing updates through a separate API.
+    always_recalculate_grades = False
     # The default implementation of get_icon_class returns the icon_class
     # attribute of the class
     #
@@ -132,86 +125,113 @@ class XModule(XModuleFields, HTMLSnippet, XBlock):
     # in the module
     icon_class = 'other'
 
+    display_name = String(
+        display_name="Display Name",
+        help="This name appears in the horizontal navigation at the top of the page.",
+        scope=Scope.settings,
+        # it'd be nice to have a useful default but it screws up other things; so,
+        # use display_name_with_default for those
+        default=None
+    )
 
-    def __init__(self, runtime, descriptor, model_data):
-        '''
-        Construct a new xmodule
-
-        runtime: An XBlock runtime allowing access to external resources
-
-        descriptor: the XModuleDescriptor that this module is an instance of.
-
-        model_data: A dictionary-like object that maps field names to values
-            for those fields.
-        '''
-        super(XModule, self).__init__(runtime, model_data)
-        self._model_data = model_data
-        self.system = runtime
-        self.descriptor = descriptor
-        self.url_name = self.location.name
-        self.category = self.location.category
-        self._loaded_children = None
+    @property
+    def course_id(self):
+        return self.runtime.course_id
 
     @property
     def id(self):
         return self.location.url()
 
     @property
+    def category(self):
+        return self.scope_ids.block_type
+
+    @property
+    def location(self):
+        try:
+            return Location(self.scope_ids.usage_id)
+        except InvalidLocationError:
+            if isinstance(self.scope_ids.usage_id, BlockUsageLocator):
+                return self.scope_ids.usage_id
+            else:
+                return BlockUsageLocator(self.scope_ids.usage_id)
+
+    @location.setter
+    def location(self, value):
+        self.scope_ids = self.scope_ids._replace(
+            def_id=value,
+            usage_id=value,
+        )
+
+    @property
+    def url_name(self):
+        if isinstance(self.location, Location):
+            return self.location.name
+        elif isinstance(self.location, BlockUsageLocator):
+            return self.location.usage_id
+        else:
+            raise InsufficientSpecificationError()
+
+    @property
     def display_name_with_default(self):
-        '''
+        """
         Return a display name for the module: use display_name if defined in
         metadata, otherwise convert the url name.
-        '''
+        """
         name = self.display_name
         if name is None:
             name = self.url_name.replace('_', ' ')
         return name
 
+    def get_explicitly_set_fields_by_scope(self, scope=Scope.content):
+        """
+        Get a dictionary of the fields for the given scope which are set explicitly on this xblock. (Including
+        any set to None.)
+        """
+        result = {}
+        for field in self.fields.values():
+            if (field.scope == scope and field.is_set_on(self)):
+                result[field.name] = field.read_json(self)
+        return result
+
+    @property
+    def xblock_kvs(self):
+        """
+        Use w/ caution. Really intended for use by the persistence layer.
+        """
+        # if caller wants kvs, caller's assuming it's up to date; so, decache it
+        self.save()
+        return self._field_data._kvs  # pylint: disable=protected-access
+
     def get_children(self):
-        '''
-        Return module instances for all the children of this module.
-        '''
-        if self._loaded_children is None:
-            child_descriptors = self.get_child_descriptors()
-            children = [self.system.get_module(descriptor) for descriptor in child_descriptors]
-            # get_module returns None if the current user doesn't have access
-            # to the location.
-            self._loaded_children = [c for c in children if c is not None]
+        """Returns a list of XBlock instances for the children of
+        this module"""
 
-        return self._loaded_children
+        if not self.has_children:
+            return []
 
-    def __unicode__(self):
-        return '<x_module(id={0})>'.format(self.id)
+        if getattr(self, '_child_instances', None) is None:
+            self._child_instances = []  # pylint: disable=attribute-defined-outside-init
+            for child_loc in self.children:
+                try:
+                    child = self.runtime.get_block(child_loc)
+                except ItemNotFoundError:
+                    log.exception('Unable to load item {loc}, skipping'.format(loc=child_loc))
+                    continue
+                self._child_instances.append(child)
 
-    def get_child_descriptors(self):
-        '''
-        Returns the descriptors of the child modules
+        return self._child_instances
 
-        Overriding this changes the behavior of get_children and
-        anything that uses get_children, such as get_display_items.
-
-        This method will not instantiate the modules of the children
-        unless absolutely necessary, so it is cheaper to call than get_children
-
-        These children will be the same children returned by the
-        descriptor unless descriptor.has_dynamic_children() is true.
-        '''
-        return self.descriptor.get_children()
-
-    def get_child_by(self, selector):
-        """
-        Return a child XModuleDescriptor with the specified url_name, if it exists, and None otherwise.
-        """
-        for child in self.get_children():
-            if selector(child):
-                return child
-        return None
+    def get_required_module_descriptors(self):
+        """Returns a list of XModuleDescriptor instances upon which this module depends, but are
+        not children of this module"""
+        return []
 
     def get_display_items(self):
-        '''
+        """
         Returns a list of descendent module instances that will display
         immediately inside this module.
-        '''
+        """
         items = []
         for child in self.get_children():
             items.extend(child.displayable_items())
@@ -219,16 +239,25 @@ class XModule(XModuleFields, HTMLSnippet, XBlock):
         return items
 
     def displayable_items(self):
-        '''
+        """
         Returns list of displayable modules contained by this module. If this
         module is visible, should return [self].
-        '''
+        """
         return [self]
 
+    def get_child_by(self, selector):
+        """
+        Return a child XBlock that matches the specified selector
+        """
+        for child in self.get_children():
+            if selector(child):
+                return child
+        return None
+
     def get_icon_class(self):
-        '''
+        """
         Return a css class identifying this module in the context of an icon
-        '''
+        """
         return self.icon_class
 
     # Functions used in the LMS
@@ -245,13 +274,12 @@ class XModule(XModuleFields, HTMLSnippet, XBlock):
 
           NOTE (vshnayder): not sure if this was the intended return value, but
           that's what it's doing now.  I suspect that we really want it to just
-          return a number.  Would need to change (at least) capa and
-          modx_dispatch to match if we did that.
+          return a number.  Would need to change (at least) capa to match if we did that.
         """
         return None
 
     def max_score(self):
-        ''' Maximum score. Two notes:
+        """ Maximum score. Two notes:
 
             * This is generic; in abstract, a problem could be 3/5 points on one
               randomization, and 5/7 on another
@@ -259,23 +287,205 @@ class XModule(XModuleFields, HTMLSnippet, XBlock):
             * In practice, this is a Very Bad Idea, and (a) will break some code
               in place (although that code should get fixed), and (b) break some
               analytics we plan to put in place.
-        '''
+        """
         return None
 
     def get_progress(self):
-        ''' Return a progress.Progress object that represents how far the
+        """ Return a progress.Progress object that represents how far the
         student has gone in this module.  Must be implemented to get correct
         progress tracking behavior in nesting modules like sequence and
         vertical.
 
         If this module has no notion of progress, return None.
-        '''
+        """
         return None
 
+    def bind_for_student(self, xmodule_runtime, field_data):
+        """
+        Set up this XBlock to act as an XModule instead of an XModuleDescriptor.
+
+        :param xmodule_runtime: the runtime to use when accessing student facing methods
+        :type xmodule_runtime: :class:`ModuleSystem`
+        :param field_data: The :class:`FieldData` to use for all subsequent data access
+        :type field_data: :class:`FieldData`
+        """
+        # pylint: disable=attribute-defined-outside-init
+        self.xmodule_runtime = xmodule_runtime
+        self._field_data = field_data
+
+
+class ProxyAttribute(object):
+    """
+    A (python) descriptor that proxies attribute access.
+
+    For example:
+
+    class Foo(object):
+        def __init__(self, value):
+            self.foo_attr = value
+
+    class Bar(object):
+        foo = Foo('x')
+        foo_attr = ProxyAttribute('foo', 'foo_attr')
+
+    bar = Bar()
+
+    assert bar.foo_attr == 'x'
+    bar.foo_attr = 'y'
+    assert bar.foo.foo_attr == 'y'
+    del bar.foo_attr
+    assert not hasattr(bar.foo, 'foo_attr')
+    """
+    def __init__(self, source, name):
+        """
+        :param source: The name of the attribute to proxy to
+        :param name: The name of the attribute to proxy
+        """
+        self._source = source
+        self._name = name
+
+    def __get__(self, instance, owner):
+        if instance is None:
+            return self
+
+        return getattr(getattr(instance, self._source), self._name)
+
+    def __set__(self, instance, value):
+        setattr(getattr(instance, self._source), self._name, value)
+
+    def __delete__(self, instance):
+        delattr(getattr(instance, self._source), self._name)
+
+
+module_attr = partial(ProxyAttribute, '_xmodule')  # pylint: disable=invalid-name
+descriptor_attr = partial(ProxyAttribute, 'descriptor')  # pylint: disable=invalid-name
+module_runtime_attr = partial(ProxyAttribute, 'xmodule_runtime')  # pylint: disable=invalid-name
+
+
+class XModule(XModuleMixin, HTMLSnippet, XBlock):  # pylint: disable=abstract-method
+    """ Implements a generic learning module.
+
+        Subclasses must at a minimum provide a definition for get_html in order
+        to be displayed to users.
+
+        See the HTML module for a simple example.
+    """
+
+
+    has_score = descriptor_attr('has_score')
+    _field_data_cache = descriptor_attr('_field_data_cache')
+    _field_data = descriptor_attr('_field_data')
+    _dirty_fields = descriptor_attr('_dirty_fields')
+
+    def __init__(self, descriptor, *args, **kwargs):
+        """
+        Construct a new xmodule
+
+        runtime: An XBlock runtime allowing access to external resources
+
+        descriptor: the XModuleDescriptor that this module is an instance of.
+
+        field_data: A dictionary-like object that maps field names to values
+            for those fields.
+        """
+        # Set the descriptor first so that we can proxy to it
+        self.descriptor = descriptor
+        super(XModule, self).__init__(*args, **kwargs)
+        self._loaded_children = None
+        self.system = self.runtime
+
+    def __unicode__(self):
+        return u'<x_module(id={0})>'.format(self.id)
+
     def handle_ajax(self, _dispatch, _data):
-        ''' dispatch is last part of the URL.
-            data is a dictionary-like object with the content of the request'''
-        return ""
+        """ dispatch is last part of the URL.
+            data is a dictionary-like object with the content of the request"""
+        return u""
+
+    def xmodule_handler(self, request, suffix=None):
+        """
+        XBlock handler that wraps `handle_ajax`
+        """
+        class FileObjForWebobFiles(object):
+            """
+            Turn Webob cgi.FieldStorage uploaded files into pure file objects.
+
+            Webob represents uploaded files as cgi.FieldStorage objects, which
+            have a .file attribute.  We wrap the FieldStorage object, delegating
+            attribute access to the .file attribute.  But the files have no
+            name, so we carry the FieldStorage .filename attribute as the .name.
+
+            """
+            def __init__(self, webob_file):
+                self.file = webob_file.file
+                self.name = webob_file.filename
+
+            def __getattr__(self, name):
+                return getattr(self.file, name)
+
+        # WebOb requests have multiple entries for uploaded files.  handle_ajax
+        # expects a single entry as a list.
+        request_post = MultiDict(request.POST)
+        for key in set(request.POST.iterkeys()):
+            if hasattr(request.POST[key], "file"):
+                request_post[key] = map(FileObjForWebobFiles, request.POST.getall(key))
+
+        response_data = self.handle_ajax(suffix, request_post)
+        return Response(response_data, content_type='application/json')
+
+    def get_children(self):
+        """
+        Return module instances for all the children of this module.
+        """
+        if self._loaded_children is None:
+            child_descriptors = self.get_child_descriptors()
+
+            # This deliberately uses system.get_module, rather than runtime.get_block,
+            # because we're looking at XModule children, rather than XModuleDescriptor children.
+            # That means it can use the deprecated XModule apis, rather than future XBlock apis
+
+            # TODO: Once we're in a system where this returns a mix of XModuleDescriptors
+            # and XBlocks, we're likely to have to change this more
+            children = [self.system.get_module(descriptor) for descriptor in child_descriptors]
+            # get_module returns None if the current user doesn't have access
+            # to the location.
+            self._loaded_children = [c for c in children if c is not None]
+
+        return self._loaded_children
+
+    def get_child_descriptors(self):
+        """
+        Returns the descriptors of the child modules
+
+        Overriding this changes the behavior of get_children and
+        anything that uses get_children, such as get_display_items.
+
+        This method will not instantiate the modules of the children
+        unless absolutely necessary, so it is cheaper to call than get_children
+
+        These children will be the same children returned by the
+        descriptor unless descriptor.has_dynamic_children() is true.
+        """
+        return self.descriptor.get_children()
+
+    def displayable_items(self):
+        """
+        Returns list of displayable modules contained by this module. If this
+        module is visible, should return [self].
+        """
+        return [self.descriptor]
+
+    # ~~~~~~~~~~~~~~~ XBlock API Wrappers ~~~~~~~~~~~~~~~~
+    def student_view(self, context):
+        """
+        Return a fragment with the html from this XModule
+
+        Doesn't yet add any of the javascript to the fragment, nor the css.
+        Also doesn't expect any javascript binding, yet.
+
+        Makes no use of the context parameter
+        """
+        return Fragment(self.get_html())
 
 
 def policy_key(location):
@@ -290,38 +500,69 @@ Template = namedtuple("Template", "metadata data children")
 
 
 class ResourceTemplates(object):
+    """
+    Gets the templates associated w/ a containing cls. The cls must have a 'template_dir_name' attribute.
+    It finds the templates as directly in this directory under 'templates'.
+    """
     @classmethod
     def templates(cls):
         """
-        Returns a list of Template objects that describe possible templates that can be used
-        to create a module of this type.
-        If no templates are provided, there will be no way to create a module of
-        this type
+        Returns a list of dictionary field: value objects that describe possible templates that can be used
+        to seed a module of this type.
 
         Expects a class attribute template_dir_name that defines the directory
         inside the 'templates' resource directory to pull templates from
         """
         templates = []
-        dirname = os.path.join('templates', cls.template_dir_name)
-        if not resource_isdir(__name__, dirname):
-            log.warning("No resource directory {dir} found when loading {cls_name} templates".format(
-                dir=dirname,
-                cls_name=cls.__name__,
-            ))
-            return []
-
-        for template_file in resource_listdir(__name__, dirname):
-            if not template_file.endswith('.yaml'):
-                log.warning("Skipping unknown template file %s" % template_file)
-                continue
-            template_content = resource_string(__name__, os.path.join(dirname, template_file))
-            template = yaml.safe_load(template_content)
-            templates.append(Template(**template))
+        dirname = cls.get_template_dir()
+        if dirname is not None:
+            for template_file in resource_listdir(__name__, dirname):
+                if not template_file.endswith('.yaml'):
+                    log.warning("Skipping unknown template file %s", template_file)
+                    continue
+                template_content = resource_string(__name__, os.path.join(dirname, template_file))
+                template = yaml.safe_load(template_content)
+                template['template_id'] = template_file
+                templates.append(template)
 
         return templates
 
+    @classmethod
+    def get_template_dir(cls):
+        if getattr(cls, 'template_dir_name', None):
+            dirname = os.path.join('templates', cls.template_dir_name)
+            if not resource_isdir(__name__, dirname):
+                log.warning("No resource directory {dir} found when loading {cls_name} templates".format(
+                    dir=dirname,
+                    cls_name=cls.__name__,
+                ))
+                return None
+            else:
+                return dirname
+        else:
+            return None
 
-class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
+    @classmethod
+    def get_template(cls, template_id):
+        """
+        Get a single template by the given id (which is the file name identifying it w/in the class's
+        template_dir_name)
+
+        """
+        dirname = cls.get_template_dir()
+        if dirname is not None:
+            try:
+                template_content = resource_string(__name__, os.path.join(dirname, template_id))
+            except IOError:
+                return None
+            template = yaml.safe_load(template_content)
+            template['template_id'] = template_id
+            return template
+        else:
+            return None
+
+
+class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
     """
     An XModuleDescriptor is a specification for an element of a course. This
     could be a problem, an organizational element (a group of content), or a
@@ -335,27 +576,6 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
     entry_point = "xmodule.v1"
     module_class = XModule
 
-    # Attributes for inspection of the descriptor
-
-    # This indicates whether the xmodule is a problem-type.
-    # It should respond to max_score() and grade(). It can be graded or ungraded
-    # (like a practice problem).
-    has_score = False
-
-    # A list of descriptor attributes that must be equal for the descriptors to
-    # be equal
-    equality_attributes = ('_model_data', 'location')
-
-    # Name of resource directory to load templates from
-    template_dir_name = "default"
-
-    # Class level variable
-
-    # True if this descriptor always requires recalculation of grades, for
-    # example if the score can change via an extrnal service, not just when the
-    # student interacts with the module on the page.  A specific example is
-    # FoldIt, which posts grade-changing updates through a separate API.
-    always_recalculate_grades = False
 
     # VS[compat].  Backwards compatibility code that can go away after
     # importing 2012 courses.
@@ -379,75 +599,19 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
 
         runtime: A DescriptorSystem for interacting with external resources
 
-        model_data: A dictionary-like object that maps field names to values
+        field_data: A dictionary-like object that maps field names to values
             for those fields.
 
         XModuleDescriptor.__init__ takes the same arguments as xblock.core:XBlock.__init__
         """
         super(XModuleDescriptor, self).__init__(*args, **kwargs)
         self.system = self.runtime
-        self.url_name = self.location.name
-        self.category = self.location.category
-        self._child_instances = None
-
-    @property
-    def id(self):
-        return self.location.url()
-
-    @property
-    def display_name_with_default(self):
-        '''
-        Return a display name for the module: use display_name if defined in
-        metadata, otherwise convert the url name.
-        '''
-        name = self.display_name
-        if name is None:
-            name = self.url_name.replace('_', ' ')
-        return name
-
-    def get_required_module_descriptors(self):
-        """Returns a list of XModuleDescritpor instances upon which this module depends, but are
-        not children of this module"""
-        return []
-
-    def get_children(self):
-        """Returns a list of XModuleDescriptor instances for the children of
-        this module"""
-        if not self.has_children:
-            return []
-
-        if self._child_instances is None:
-            self._child_instances = []
-            for child_loc in self.children:
-                try:
-                    child = self.system.load_item(child_loc)
-                except ItemNotFoundError:
-                    log.exception('Unable to load item {loc}, skipping'.format(loc=child_loc))
-                    continue
-                self._child_instances.append(child)
-
-        return self._child_instances
-
-    def get_child_by(self, selector):
-        """
-        Return a child XModuleDescriptor with the specified url_name, if it exists, and None otherwise.
-        """
-        for child in self.get_children():
-            if selector(child):
-                return child
-        return None
-
-    def xmodule(self, system):
-        """
-        Returns an XModule.
-
-        system: Module system
-        """
-        return self.module_class(
-            system,
-            self,
-            system.xblock_model_data(self),
-        )
+        # update_version is the version which last updated this xblock v prev being the penultimate updater
+        # leaving off original_version since it complicates creation w/o any obv value yet and is computable
+        # by following previous until None
+        # definition_locator is only used by mongostores which separate definitions from blocks
+        self.edited_by = self.edited_on = self.previous_version = self.update_version = self.definition_locator = None
+        self.xmodule_runtime = None
 
     def has_dynamic_children(self):
         """
@@ -459,102 +623,27 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         """
         return False
 
-    # ================================= JSON PARSING ===========================
-    @staticmethod
-    def load_from_json(json_data, system, default_class=None):
-        """
-        This method instantiates the correct subclass of XModuleDescriptor based
-        on the contents of json_data.
-
-        json_data must contain a 'location' element, and must be suitable to be
-        passed into the subclasses `from_json` method as model_data
-        """
-        class_ = XModuleDescriptor.load_class(
-            json_data['location']['category'],
-            default_class
-        )
-        return class_.from_json(json_data, system)
-
-    @classmethod
-    def from_json(cls, json_data, system):
-        """
-        Creates an instance of this descriptor from the supplied json_data.
-        This may be overridden by subclasses
-
-        json_data: A json object with the keys 'definition' and 'metadata',
-            definition: A json object with the keys 'data' and 'children'
-                data: A json value
-                children: A list of edX Location urls
-            metadata: A json object with any keys
-
-        This json_data is transformed to model_data using the following rules:
-            1) The model data contains all of the fields from metadata
-            2) The model data contains the 'children' array
-            3) If 'definition.data' is a json object, model data contains all of its fields
-               Otherwise, it contains the single field 'data'
-            4) Any value later in this list overrides a value earlier in this list
-
-        system: A DescriptorSystem for interacting with external resources
-        """
-        model_data = {}
-
-        for key, value in json_data.get('metadata', {}).items():
-            model_data[cls._translate(key)] = value
-
-        model_data.update(json_data.get('metadata', {}))
-
-        definition = json_data.get('definition', {})
-        if 'children' in definition:
-            model_data['children'] = definition['children']
-
-        if 'data' in definition:
-            if isinstance(definition['data'], dict):
-                model_data.update(definition['data'])
-            else:
-                model_data['data'] = definition['data']
-
-        model_data['location'] = json_data['location']
-
-        return cls(system, model_data)
-
     @classmethod
     def _translate(cls, key):
         'VS[compat]'
         return cls.metadata_translations.get(key, key)
 
     # ================================= XML PARSING ============================
-    @staticmethod
-    def load_from_xml(xml_data,
-                      system,
-                      org=None,
-                      course=None,
-                      default_class=None):
+    @classmethod
+    def parse_xml(cls, node, runtime, keys):
         """
-        This method instantiates the correct subclass of XModuleDescriptor based
-        on the contents of xml_data.
-
-        xml_data must be a string containing valid xml
-
-        system is an XMLParsingSystem
-
-        org and course are optional strings that will be used in the generated
-            module's url identifiers
+        Interpret the parsed XML in `node`, creating an XModuleDescriptor.
         """
-        class_ = XModuleDescriptor.load_class(
-            etree.fromstring(xml_data).tag,
-            default_class
-        )
-        # leave next line, commented out - useful for low-level debugging
-        # log.debug('[XModuleDescriptor.load_from_xml] tag=%s, class_=%s' % (
-        #        etree.fromstring(xml_data).tag,class_))
-
-        return class_.from_xml(xml_data, system, org, course)
+        xml = etree.tostring(node)
+        # TODO: change from_xml to not take org and course, it can use self.system.
+        block = cls.from_xml(xml, runtime, runtime.org, runtime.course)
+        return block
 
     @classmethod
     def from_xml(cls, xml_data, system, org=None, course=None):
         """
         Creates an instance of this descriptor from the supplied xml_data.
-        This may be overridden by subclasses
+        This may be overridden by subclasses.
 
         xml_data: A string of xml that will be translated into data and children
             for this module
@@ -564,13 +653,12 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         org and course are optional strings that will be used in the generated
             module's url identifiers
         """
-        raise NotImplementedError(
-            'Modules must implement from_xml to be parsable from xml')
+        raise NotImplementedError('Modules must implement from_xml to be parsable from xml')
 
     def export_to_xml(self, resource_fs):
         """
         Returns an xml string representing this module, and all modules
-        underneath it.  May also write required resources out to resource_fs
+        underneath it.  May also write required resources out to resource_fs.
 
         Assumes that modules have single parentage (that no module appears twice
         in the same course), and that it is thus safe to nest modules as xml
@@ -580,33 +668,23 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         XModuleDescriptor using the from_xml method with the same system, org,
         and course
         """
-        raise NotImplementedError(
-            'Modules must implement export_to_xml to enable xml export')
-
-    # =============================== Testing ==================================
-    def get_sample_state(self):
-        """
-        Return a list of tuples of instance_state, shared_state. Each tuple
-        defines a sample case for this module
-        """
-        return [('{}', '{}')]
+        raise NotImplementedError('Modules must implement export_to_xml to enable xml export')
 
     # =============================== BUILTIN METHODS ==========================
     def __eq__(self, other):
-        eq = (self.__class__ == other.__class__ and
-                all(getattr(self, attr, None) == getattr(other, attr, None)
-                    for attr in self.equality_attributes))
-
-        return eq
+        return (self.scope_ids == other.scope_ids and
+                self.fields.keys() == other.fields.keys() and
+                all(getattr(self, field.name) == getattr(other, field.name)
+                    for field in self.fields.values()))
 
     def __repr__(self):
-        return ("{class_}({system!r}, location={location!r},"
-                " model_data={model_data!r})".format(
-            class_=self.__class__.__name__,
-            system=self.system,
-            location=self.location,
-            model_data=self._model_data,
-        ))
+        return (
+            "{0.__class__.__name__}("
+            "{0.runtime!r}, "
+            "{0._field_data!r}, "
+            "{0.scope_ids!r}"
+            ")".format(self)
+        )
 
     @property
     def non_editable_metadata_fields(self):
@@ -618,6 +696,7 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
         # We are not allowing editing of xblock tag and name fields at this time (for any component).
         return [XBlock.tags, XBlock.name]
 
+
     @property
     def editable_metadata_fields(self):
         """
@@ -625,60 +704,143 @@ class XModuleDescriptor(XModuleFields, HTMLSnippet, ResourceTemplates, XBlock):
 
         Can be limited by extending `non_editable_metadata_fields`.
         """
-        inherited_metadata = getattr(self, '_inherited_metadata', {})
-        inheritable_metadata = getattr(self, '_inheritable_metadata', {})
+        def jsonify_value(field, json_choice):
+            if isinstance(json_choice, dict) and 'value' in json_choice:
+                json_choice = dict(json_choice)  # make a copy so below doesn't change the original
+                json_choice['value'] = field.to_json(json_choice['value'])
+            else:
+                json_choice = field.to_json(json_choice)
+            return json_choice
+
         metadata_fields = {}
-        for field in self.fields:
+
+        # Only use the fields from this class, not mixins
+        fields = getattr(self, 'unmixed_class', self.__class__).fields
+
+        for field in fields.values():
 
             if field.scope != Scope.settings or field in self.non_editable_metadata_fields:
                 continue
 
-            inheritable = False
-            value = getattr(self, field.name)
-            default_value = field.default
-            explicitly_set = field.name in self._model_data
-            if field.name in inheritable_metadata:
-                inheritable = True
-                default_value = field.from_json(inheritable_metadata.get(field.name))
-                if field.name in inherited_metadata:
-                    explicitly_set = False
+            # gets the 'default_value' and 'explicitly_set' attrs
+            metadata_fields[field.name] = self.runtime.get_field_provenance(self, field)
+            metadata_fields[field.name]['field_name'] = field.name
+            metadata_fields[field.name]['display_name'] = field.display_name
+            metadata_fields[field.name]['help'] = field.help
+            metadata_fields[field.name]['value'] = field.read_json(self)
 
             # We support the following editors:
             # 1. A select editor for fields with a list of possible values (includes Booleans).
             # 2. Number editors for integers and floats.
             # 3. A generic string editor for anything else (editing JSON representation of the value).
             editor_type = "Generic"
-            values = [] if field.values is None else copy.deepcopy(field.values)
-            if isinstance(values, tuple):
-                values = list(values)
-            if isinstance(values, list):
-                if len(values) > 0:
-                    editor_type = "Select"
-                for index, choice in enumerate(values):
-                    json_choice = copy.deepcopy(choice)
-                    if isinstance(json_choice, dict) and 'value' in json_choice:
-                        json_choice['value'] = field.to_json(json_choice['value'])
-                    else:
-                        json_choice = field.to_json(json_choice)
-                    values[index] = json_choice
+            values = field.values
+            if isinstance(values, (tuple, list)) and len(values) > 0:
+                editor_type = "Select"
+                values = [jsonify_value(field, json_choice) for json_choice in values]
             elif isinstance(field, Integer):
                 editor_type = "Integer"
             elif isinstance(field, Float):
                 editor_type = "Float"
-            metadata_fields[field.name] = {'field_name': field.name,
-                                           'type': editor_type,
-                                           'display_name': field.display_name,
-                                           'value': field.to_json(value),
-                                           'options': values,
-                                           'default_value': field.to_json(default_value),
-                                           'inheritable': inheritable,
-                                           'explicitly_set': explicitly_set,
-                                           'help': field.help}
+            elif isinstance(field, List):
+                editor_type = "List"
+            elif isinstance(field, RelativeTime):
+                editor_type = "RelativeTime"
+            metadata_fields[field.name]['type'] = editor_type
+            metadata_fields[field.name]['options'] = [] if values is None else values
 
         return metadata_fields
 
+    # ~~~~~~~~~~~~~~~ XModule Indirection ~~~~~~~~~~~~~~~~
+    @property
+    def _xmodule(self):
+        """
+        Returns the XModule corresponding to this descriptor. Expects that the system
+        already supports all of the attributes needed by xmodules
+        """
+        assert self.xmodule_runtime is not None
+        assert self.xmodule_runtime.error_descriptor_class is not None
+        if self.xmodule_runtime.xmodule_instance is None:
+            try:
+                self.xmodule_runtime.xmodule_instance = self.xmodule_runtime.construct_xblock_from_class(
+                    self.module_class,
+                    descriptor=self,
+                    scope_ids=self.scope_ids,
+                    field_data=self._field_data,
+                )
+                self.xmodule_runtime.xmodule_instance.save()
+            except Exception:  # pylint: disable=broad-except
+                if isinstance(self, self.xmodule_runtime.error_descriptor_class):
+                    log.exception('Error creating an ErrorModule from an ErrorDescriptor')
+                    raise
 
-class DescriptorSystem(object):
+                log.exception('Error creating xmodule')
+                descriptor = self.xmodule_runtime.error_descriptor_class.from_descriptor(
+                    self,
+                    error_msg=exc_info_to_str(sys.exc_info())
+                )
+                descriptor.xmodule_runtime = self.xmodule_runtime
+                self.xmodule_runtime.xmodule_instance = descriptor._xmodule  # pylint: disable=protected-access
+        return self.xmodule_runtime.xmodule_instance
+
+    course_id = module_attr('course_id')
+    displayable_items = module_attr('displayable_items')
+    get_display_items = module_attr('get_display_items')
+    get_icon_class = module_attr('get_icon_class')
+    get_progress = module_attr('get_progress')
+    get_score = module_attr('get_score')
+    handle_ajax = module_attr('handle_ajax')
+    max_score = module_attr('max_score')
+    student_view = module_attr('student_view')
+    get_child_descriptors = module_attr('get_child_descriptors')
+    xmodule_handler = module_attr('xmodule_handler')
+
+    # ~~~~~~~~~~~~~~~ XBlock API Wrappers ~~~~~~~~~~~~~~~~
+    def studio_view(self, _context):
+        """
+        Return a fragment with the html from this XModuleDescriptor's editing view
+
+        Doesn't yet add any of the javascript to the fragment, nor the css.
+        Also doesn't expect any javascript binding, yet.
+
+        Makes no use of the context parameter
+        """
+        return Fragment(self.get_html())
+
+
+class ConfigurableFragmentWrapper(object):  # pylint: disable=abstract-method
+    """
+    Runtime mixin that allows for composition of many `wrap_child` wrappers
+    """
+    def __init__(self, wrappers=None, **kwargs):
+        """
+        :param wrappers: A list of wrappers, where each wrapper is:
+
+            def wrapper(block, view, frag, context):
+                ...
+                return wrapped_frag
+        """
+        super(ConfigurableFragmentWrapper, self).__init__(**kwargs)
+        if wrappers is not None:
+            self.wrappers = wrappers
+        else:
+            self.wrappers = []
+
+    def wrap_child(self, block, view, frag, context):
+        """
+        See :func:`Runtime.wrap_child`
+        """
+        for wrapper in self.wrappers:
+            frag = wrapper(block, view, frag, context)
+
+        return frag
+
+
+class DescriptorSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abstract-method
+    """
+    Base class for :class:`Runtime`s to be used with :class:`XModuleDescriptor`s
+    """
+
     def __init__(self, load_item, resources_fs, error_tracker, **kwargs):
         """
         load_item: Takes a Location and returns an XModuleDescriptor
@@ -716,29 +878,73 @@ class DescriptorSystem(object):
                that you're about to re-raise---let the caller track them.
         """
 
+        # Right now, usage_store is unused, and field_data is always supplanted
+        # with an explicit field_data during construct_xblock, so None's suffice.
+        super(DescriptorSystem, self).__init__(usage_store=None, field_data=None, **kwargs)
+
         self.load_item = load_item
         self.resources_fs = resources_fs
         self.error_tracker = error_tracker
 
+    def get_block(self, block_id):
+        """See documentation for `xblock.runtime:Runtime.get_block`"""
+        return self.load_item(block_id)
+
+    def get_field_provenance(self, xblock, field):
+        """
+        For the given xblock, return a dict for the field's current state:
+        {
+            'default_value': what json'd value will take effect if field is unset: either the field default or
+            inherited value,
+            'explicitly_set': boolean for whether the current value is set v default/inherited,
+        }
+        :param xblock:
+        :param field:
+        """
+        # in runtime b/c runtime contains app-specific xblock behavior. Studio's the only app
+        # which needs this level of introspection right now. runtime also is 'allowed' to know
+        # about the kvs, dbmodel, etc.
+
+        result = {}
+        result['explicitly_set'] = xblock._field_data.has(xblock, field.name)
+        try:
+            block_inherited = xblock.xblock_kvs.inherited_settings
+        except AttributeError:  # if inherited_settings doesn't exist on kvs
+            block_inherited = {}
+        if field.name in block_inherited:
+            result['default_value'] = block_inherited[field.name]
+        else:
+            result['default_value'] = field.to_json(field.default)
+        return result
+
+    def render(self, block, view_name, context=None):
+        if view_name == 'student_view':
+            assert block.xmodule_runtime is not None
+            if isinstance(block, (XModule, XModuleDescriptor)):
+                to_render = block._xmodule
+            else:
+                to_render = block
+            return block.xmodule_runtime.render(to_render, view_name, context)
+        else:
+            return super(DescriptorSystem, self).render(block, view_name, context)
+
 
 class XMLParsingSystem(DescriptorSystem):
-    def __init__(self, load_item, resources_fs, error_tracker, process_xml, policy, **kwargs):
+    def __init__(self, process_xml, policy, **kwargs):
         """
-        load_item, resources_fs, error_tracker: see DescriptorSystem
-
         policy: a policy dictionary for overriding xml metadata
 
         process_xml: Takes an xml string, and returns a XModuleDescriptor
             created from that xml
         """
-        DescriptorSystem.__init__(self, load_item, resources_fs, error_tracker,
-                                  **kwargs)
+
+        super(XMLParsingSystem, self).__init__(**kwargs)
         self.process_xml = process_xml
         self.policy = policy
 
 
-class ModuleSystem(object):
-    '''
+class ModuleSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abstract-method
+    """
     This is an abstraction such that x_modules can function independent
     of the courseware (e.g. import into other types of courseware, LMS,
     or if we want to have a sandbox server for user-contributed content)
@@ -748,31 +954,19 @@ class ModuleSystem(object):
 
     Note that these functions can be closures over e.g. a django request
     and user, or other environment-specific info.
-    '''
-    def __init__(self,
-                 ajax_url,
-                 track_function,
-                 get_module,
-                 render_template,
-                 replace_urls,
-                 xblock_model_data,
-                 user=None,
-                 filestore=None,
-                 debug=False,
-                 xqueue=None,
-                 publish=None,
-                 node_path="",
-                 anonymous_student_id='',
-                 course_id=None,
-                 open_ended_grading_interface=None,
-                 s3_interface=None,
-                 cache=None,
-                 can_execute_unsafe_code=None,
-    ):
-        '''
+    """
+    def __init__(
+            self, static_url, track_function, get_module, render_template,
+            replace_urls, user=None, filestore=None,
+            debug=False, hostname="", xqueue=None, publish=None, node_path="",
+            anonymous_student_id='', course_id=None,
+            open_ended_grading_interface=None, s3_interface=None,
+            cache=None, can_execute_unsafe_code=None, replace_course_urls=None,
+            replace_jump_to_id_urls=None, error_descriptor_class=None, **kwargs):
+        """
         Create a closure around the system environment.
 
-        ajax_url - the url where ajax calls to the encapsulating module go.
+        static_url - the base URL to static assets
 
         track_function - function of (event_type, event), intended for logging
                          or otherwise tracking the event.
@@ -808,9 +1002,6 @@ class ModuleSystem(object):
 
         publish(event) - A function that allows XModules to publish events (such as grade changes)
 
-        xblock_model_data - A dict-like object containing the all data available to this
-            xblock
-
         cache - A cache object with two methods:
             .get(key) returns an object from the cache or None.
             .set(key, value, timeout_secs=None) stores a value in the cache with a timeout.
@@ -818,21 +1009,28 @@ class ModuleSystem(object):
         can_execute_unsafe_code - A function returning a boolean, whether or
             not to allow the execution of unsafe, unsandboxed code.
 
-        '''
-        self.ajax_url = ajax_url
+        error_descriptor_class - The class to use to render XModules with errors
+
+        """
+
+        # Right now, usage_store is unused, and field_data is always supplanted
+        # with an explicit field_data during construct_xblock, so None's suffice.
+        super(ModuleSystem, self).__init__(usage_store=None, field_data=None, **kwargs)
+
+        self.STATIC_URL = static_url
         self.xqueue = xqueue
         self.track_function = track_function
         self.filestore = filestore
         self.get_module = get_module
         self.render_template = render_template
         self.DEBUG = self.debug = debug
+        self.HOSTNAME = self.hostname = hostname
         self.seed = user.id if user is not None else 0
         self.replace_urls = replace_urls
         self.node_path = node_path
         self.anonymous_student_id = anonymous_student_id
         self.course_id = course_id
         self.user_is_staff = user is not None and user.is_staff
-        self.xblock_model_data = xblock_model_data
 
         if publish is None:
             publish = lambda e: None
@@ -844,13 +1042,17 @@ class ModuleSystem(object):
 
         self.cache = cache or DoNothingCache()
         self.can_execute_unsafe_code = can_execute_unsafe_code or (lambda: False)
+        self.replace_course_urls = replace_course_urls
+        self.replace_jump_to_id_urls = replace_jump_to_id_urls
+        self.error_descriptor_class = error_descriptor_class
+        self.xmodule_instance = None
 
     def get(self, attr):
-        '''	provide uniform access to attributes (like etree).'''
+        """	provide uniform access to attributes (like etree)."""
         return self.__dict__.get(attr)
 
     def set(self, attr, val):
-        '''provide uniform access to attributes (like etree)'''
+        """provide uniform access to attributes (like etree)"""
         self.__dict__[attr] = val
 
     def __repr__(self):
@@ -858,6 +1060,13 @@ class ModuleSystem(object):
 
     def __str__(self):
         return str(self.__dict__)
+
+    @property
+    def ajax_url(self):
+        """
+        The url prefix to be used by XModules to call into handle_ajax
+        """
+        return self.handler_url(self.xmodule_instance, 'xmodule_handler', '', '').rstrip('/?')
 
 
 class DoNothingCache(object):

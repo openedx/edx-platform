@@ -1,14 +1,125 @@
 .instructor-dashboard-wrapper {
-	display: table;
+  display: table;
+  position: relative;
 
-	section.instructor-dashboard-content {
-		@extend .content;
+  .beta-button-wrapper {
+    position: absolute;
+    top: 2em;
+    right: 2em;
+  }
+
+  .studio-edit-link{
+    position: absolute;
+    top: 3.5em;
+    right: 2em;
+  }
+
+  section.instructor-dashboard-content {
+    @extend .content;
     padding: 40px;
     width: 100%;
 
     h1 {
       @extend .top-header;
     }
-	}
+  }
+
+  // form fields
+  .list-fields {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    .field {
+      margin-bottom: 20px;
+      padding: 0;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      .tip {
+        display: block;
+        margin-top: ($baseline/4);
+        color: tint(rgb(127,127,127),50%);
+        @include font-size(12);
+      }
+
+    }
+
+  }
+
+  // ====================
+
+  // system feedback - messages
+  .msg {
+    border-radius: 1px;
+    padding: 10px 15px;
+    margin-bottom: 20px;
+
+    .copy {
+      font-weight: 600;
+    }
+  }
+
+  // TYPE: warning
+  .msg-warning {
+    border-top: 2px solid $warning-color;
+    background: tint($warning-color,95%);
+
+    .copy {
+      color: $warning-color;
+    }
+  }
+
+  // TYPE: confirm
+  .msg-confirm {
+    border-top: 2px solid $confirm-color;
+    background: tint($confirm-color,95%);
+
+    .copy {
+      color: $confirm-color;
+    }
+  }
+
+  // TYPE: confirm
+  .msg-error {
+    border-top: 2px solid $error-color;
+    background: tint($error-color,95%);
+
+    .copy {
+      color: $error-color;
+    }
+  }
+
+  // ====================
+
+  // inline copy
+  .copy-confirm {
+    color: $confirm-color;
+  }
+
+  .copy-warning {
+    color: $warning-color;
+  }
+
+  .copy-error {
+    color: $error-color;
+  }
+
+  .list-advice {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+
+    .item {
+      font-weight: 600;
+      margin-bottom: 10px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
 }
 

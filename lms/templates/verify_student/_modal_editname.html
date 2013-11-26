@@ -1,0 +1,34 @@
+<%! from django.utils.translation import ugettext as _ %>
+
+<section id="edit-name" class="modal">
+  <div class="inner-wrapper">
+    <header>
+      <h2>${_("Edit Your Name")}</h2>
+      <hr />
+    </header>
+    <div id="change_name_body">
+    <form id="course-checklists" class="course-checklists" method="post" action="">
+      <div role="alert" class="status message submission-error" tabindex="-1">
+        <p class="message-title">${_("The following error occured while editing your name:")}
+          <span class="message-copy"> </span>
+        </p>
+      </div>
+      <p>${_("To uphold the credibility of {platform} certificates, all name changes will be logged and recorded.").format(platform=settings.PLATFORM_NAME)}</p>
+      <fieldset>
+        <div class="input-group">
+          <label for="name">${_('Full Name')}</label>
+          <input id="name" type="text" name="name" value="" placeholder="${user_full_name}" required aria-required="true" />
+          <label>${_("Reason for name change:")}</label>
+          <textarea id="name_rationale_field" value=""></textarea>
+        </div>
+
+      <div class="actions">
+        <button id="submit" class="action action-primary action-save">${_("Change my name")}</button>
+      </div>
+    </form>
+  </div>
+    <a href="javascript:void(0)" data-dismiss="leanModal" rel="view" class="action action-close action-editname-close close-modal">
+      <i class="icon-remove-sign"></i>
+      <span class="sr">${_("close")}</span>
+    </a>
+</section>

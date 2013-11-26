@@ -1,0 +1,19 @@
+.editor{
+  @include clearfix();
+
+  .CodeMirror {
+    @include box-sizing(border-box);
+    width: 100%;
+    position: relative;
+    height: 379px;
+    border: 1px solid #3c3c3c;
+    border-top: 1px solid #8891a1;
+    background: $white;
+    color: #3c3c3c;
+  }
+
+  .CodeMirror-scroll {
+    height: 100%;
+  }
+}
+

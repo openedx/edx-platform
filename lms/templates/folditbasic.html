@@ -1,24 +1,26 @@
+<%! from django.utils.translation import ugettext as _ %>
+
 <%!
 from xmodule.util.date_utils import get_default_time_display
 %>
 <div class="folditbasic">
-<p><strong>Due:</strong> ${get_default_time_display(due)}
+<p><strong>${_("Due:")}</strong> ${get_default_time_display(due)}
 
 <p>
-  <strong>Status:</strong>
+  <strong>${_("Status:")}</strong>
   % if success:
-  You have successfully gotten to level ${goal_level}.
+  ${_('You have successfully gotten to level {goal_level}.').format(goal_level=goal_level)}'
   % else:
-  You have not yet gotten to level ${goal_level}.
+  ${_('You have not yet gotten to level {goal_level}.').format(goal_level=goal_level)}
   % endif
 </p>
 
-<h3>Completed puzzles</h3>
+<h3>${_("Completed puzzles")}</h3>
 
 <table>
   <tr>
-    <th>Level</th>
-    <th>Submitted</th>
+    <th>${_("Level")}</th>
+    <th>${_("Submitted")}</th>
   </tr>
   % for puzzle in completed:
   <tr>

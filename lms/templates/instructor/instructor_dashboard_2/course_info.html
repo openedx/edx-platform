@@ -1,0 +1,92 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%page args="section_data"/>
+
+<div class="enrollment-wrapper">
+  <h2>${_("Enrollment Information")}</h2>
+  <span class="tip">${_("Total number of enrollees (instructors, staff members, and students)")}</span>
+  <br/><br/>
+  <span style="color: green;"><b>${ section_data['enrollment_count'] }</b></span>
+
+</div>
+<hr>
+
+<div class="basic-wrapper">
+  <h2>${_("Basic Course Information")}</h2>
+
+  <ul class="list-input">
+    <li class="field text is-not-editable" id="field-course-organization">
+      <label for="course-organization">${_("Organization:")}</label>
+      <b>${ section_data['course_org'] }</b>
+    </li>
+
+    <li class="field text is-not-editable" id="field-course-number">
+      <label for="course-number">${_("Course Number:")}</label>
+      <b>${ section_data['course_num'] }</b>
+    </li>
+
+    <li class="field text is-not-editable" id="field-course-name">
+      <label for="course-name">${_("Course Name:")}</label>
+      <b>${ section_data['course_name'] }</b>
+    </li>
+
+    <li class="field text is-not-editable" id="field-course-display-name">
+      <label for="course-display-name">${_("Course Display Name:")}</label>
+      <b>${ section_data['course_display_name'] }</b>
+    </li>
+
+    <li class="field text is-not-editable" id="field-course-started">
+      <label for="start-date">${_("Has the course started?")}</label>
+
+      <b>${_("Yes") if section_data['grade_cutoffs'] else _("No")}</b>
+
+    </li>
+
+    <li class="field text is-not-editable" id="field-course-ended">
+      <label for="start-date">${_("Has the course ended?")}</label>
+      %if section_data['has_ended']:
+      <b>${_("Yes")}</b>
+      %else:
+      <b>${_("No")}</b>
+      %endif
+    </li>
+
+    <li class="field text is-not-editable" id="field-grade-cutoffs">
+      <label for="start-date">${_("Grade Cutoffs:")}</label>
+      <b>${ section_data['grade_cutoffs'] }</b>
+    </li>
+  </ul>
+</div>
+
+
+%if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
+  <div class="running-tasks-container action-type-container">
+    <hr>
+    <h2> ${_("Pending Instructor Tasks")} </h2>
+    <p>${_("The status for any active tasks appears in a table below.")} </p>
+    <br />
+
+    <div class="running-tasks-table" data-endpoint="${ section_data['list_instructor_tasks_url'] }"></div>
+  </div>
+
+%endif
+
+%if len(section_data['course_errors']):
+  <div class="course-errors-wrapper">
+    <hr>
+    <p>
+    <div class="toggle-wrapper">
+      <h2 class="title">${_("Course Warnings")}:</h2>
+      <div class="triangle"></div>
+    </div>
+    <div class="course-errors-visibility-wrapper">
+      %for error in section_data['course_errors']:
+        <div class="course-error">
+          <code class=course-error-first>  ${ error[0] } </code><br>
+          <code class=course-error-second> ${ error[1] } </code>
+        </div>
+      %endfor
+    </div>
+    <p>
+  </div>
+<br>
+%endif

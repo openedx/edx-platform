@@ -10,7 +10,7 @@ import requests
 from django.test.utils import override_settings
 from django.core.urlresolvers import reverse, NoReverseMatch
 
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
+from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -36,7 +36,8 @@ HTML_BOOK = {
     ],
 }
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class StaticBookTest(ModuleStoreTestCase):
     """
     Helpers for the static book tests.
@@ -103,6 +104,12 @@ class StaticImageBookTest(StaticBookTest):
         url = self.make_url('book', book_index=0)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
+
+    def test_bad_page_id(self):
+        # A bad page id will cause a 404.        
+        self.make_course(textbooks=[IMAGE_BOOK])
+        with self.assertRaises(NoReverseMatch):
+            self.make_url('book', book_index=0, page='xyzzy')
 
 
 class StaticPdfBookTest(StaticBookTest):

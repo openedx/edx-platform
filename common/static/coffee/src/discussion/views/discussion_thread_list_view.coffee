@@ -2,6 +2,7 @@ if Backbone?
   class @DiscussionThreadListView extends Backbone.View
     events:
       "click .search": "showSearch"
+      "click .home": "goHome"
       "click .browse": "toggleTopicDrop"
       "keydown .post-search-field": "performSearch"
       "click .sort-bar a": "sortThreads"
@@ -43,6 +44,7 @@ if Backbone?
       if active
         @setActiveThread(thread_id)
 
+
     #TODO fix this entire chain of events
     addAndSelectThread: (thread) =>
       commentable_id = thread.get("commentable_id")
@@ -62,10 +64,8 @@ if Backbone?
 
       sidebar = $(".sidebar")
       if scrollTop > discussionsBodyTop - @sidebar_padding
-        sidebar.addClass('fixed');
-        sidebar.css('top', @sidebar_padding);
+        sidebar.css('top', scrollTop - discussionsBodyTop + @sidebar_padding);
       else
-        sidebar.removeClass('fixed');
         sidebar.css('top', '0');
 
       sidebarWidth = .31 * $(".discussion-body").width();
@@ -95,6 +95,7 @@ if Backbone?
       @timer = 0
       @$el.html(@template())
 
+      $(window).bind "load", @updateSidebar
       $(window).bind "scroll", @updateSidebar
       $(window).bind "resize", @updateSidebar
 
@@ -123,8 +124,11 @@ if Backbone?
     loadMorePages: (event) ->
       if event
         event.preventDefault()
-      @$(".more-pages").html('<div class="loading-animation"></div>')
+      @$(".more-pages").html('<div class="loading-animation" tabindex=0><span class="sr" role="alert">Loading more threads</span></div>')
       @$(".more-pages").addClass("loading")
+      loadingDiv = @$(".more-pages .loading-animation")
+      DiscussionUtil.makeFocusTrap(loadingDiv)
+      loadingDiv.focus()
       options = {}
       switch @mode
         when 'search'
@@ -143,7 +147,23 @@ if Backbone?
             options.group_id = @group_id
         
     
-      @collection.retrieveAnotherPage(@mode, options, {sort_key: @sortBy})
+      lastThread = @collection.last()?.get('id')
+      if lastThread
+        # Pagination; focus the first thread after what was previously the last thread
+        @once("threads:rendered", ->
+          $(".post-list li:has(a[data-id='#{lastThread}']) + li a").focus()
+        )
+      else
+        # Totally refreshing the list (e.g. from clicking a sort button); focus the first thread
+        @once("threads:rendered", ->
+          $(".post-list a").first()?.focus()
+        )
+
+      error = =>
+        @renderThreads()
+        DiscussionUtil.discussionAlert("Sorry", "We had some trouble loading more threads. Please try again.")
+
+      @collection.retrieveAnotherPage(@mode, options, {sort_key: @sortBy}, error)
 
     renderThread: (thread) =>
       content = $(_.template($("#thread-list-item-template").html())(thread.toJSON()))
@@ -190,6 +210,25 @@ if Backbone?
       @$(".search").addClass('is-open')
       @$(".browse").removeClass('is-open')
       setTimeout (-> @$(".post-search-field").focus()), 200
+
+    goHome: ->
+      @template = _.template($("#discussion-home").html())
+      $(".discussion-column").html(@template)
+      $(".post-list a").removeClass("active")
+      $("input.email-setting").bind "click", @updateEmailNotifications
+      url = DiscussionUtil.urlFor("notifications_status",window.user.get("id"))
+      DiscussionUtil.safeAjax
+          url: url
+          type: "GET"
+          success: (response, textStatus) =>
+            if response.status
+              $('input.email-setting').attr('checked','checked')
+            else
+              $('input.email-setting').removeAttr('checked')
+      thread_id = null
+      @trigger("thread:removed")  
+      #select all threads
+
 
     toggleTopicDrop: (event) =>
       event.preventDefault()
@@ -312,6 +351,7 @@ if Backbone?
           if callback?
             callback()
 
+    
     retrieveDiscussions: (discussion_ids) ->
       @discussionIds = discussion_ids.join(',')
       @mode = 'commentables'
@@ -333,9 +373,13 @@ if Backbone?
       @loadMorePages(event)
 
     sortThreads: (event) ->
-      @$(".sort-bar a").removeClass("active")
-      $(event.target).addClass("active")
-      @sortBy = $(event.target).data("sort")
+      activeSort = @$(".sort-bar a[class='active']")
+      activeSort.removeClass("active")
+      activeSort.attr("aria-checked", "false")
+      newSort = $(event.target)
+      newSort.addClass("active")
+      newSort.attr("aria-checked", "true")
+      @sortBy = newSort.data("sort")
 
       @displayedCollection.comparator = switch @sortBy
         when 'date' then @displayedCollection.sortByDateRecentFirst
@@ -368,7 +412,7 @@ if Backbone?
         type: "GET"
         $loading: $
         loadingCallback: =>
-          @$(".post-list").html('<li class="loading"><div class="loading-animation"></div></li>')
+          @$(".post-list").html('<li class="loading"><div class="loading-animation"><span class="sr">Loading thread list</span></div></li>')
         loadedCallback: =>
           if callback
             callback.apply @, [value]
@@ -418,3 +462,19 @@ if Backbone?
     retrieveFollowed: (event)=>
       @mode = 'followed'
       @retrieveFirstPage(event)
+
+    updateEmailNotifications: () =>
+      if $('input.email-setting').attr('checked')
+        DiscussionUtil.safeAjax
+          url: DiscussionUtil.urlFor("enable_notifications")
+          type: "POST"
+          error: () =>
+            $('input.email-setting').removeAttr('checked')
+      else
+        DiscussionUtil.safeAjax
+          url: DiscussionUtil.urlFor("disable_notifications")
+          type: "POST"
+          error: () =>
+            $('input.email-setting').attr('checked','checked')
+
+          

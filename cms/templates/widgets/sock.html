@@ -1,53 +1,52 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
-<%! from django.utils import translation    %>
-
 <div class="wrapper-sock wrapper">
   <ul class="list-actions list-cta">
     <li class="action-item">
-      <a href="#sock" class="cta cta-show-sock"><i class="icon-question-sign"></i> <span class="copy">Looking for Help with Studio?</span></a>
+      <a href="#sock" class="cta cta-show-sock"><i class="icon-question-sign"></i> <span class="copy">${_("Looking for Help with Studio?")}</span></a>
     </li>
   </ul>
 
   <div class="wrapper-inner wrapper">
     <section class="sock" id="sock">
       <header>
-        <h2 class="title sr">edX Studio Help</h2>
+        <h2 class="title sr">${_("edX Studio Help")}</h2>
       </header>
 
       <div class="support">
-        <h3 class="title">Studio Support</h3>
+        <h3 class="title">${_("Studio Support")}</h3>
 
         <div class="copy">
-           <p>Need help with Studio? Creating a course is complex, so we're here to help. Take advantage of our documentation, help center, as well as our edX101 introduction course for course authors.</p>
+           <p>${_("Need help with Studio? Creating a course is complex, so we're here to help. Take advantage of our documentation, help center, as well as our edX101 introduction course for course authors.")}</p>
         </div>
 
       <ul class="list-actions">
         <li class="action-item">
-          <a href="http://files.edx.org/Getting_Started_with_Studio.pdf" class="action action-primary" title="This is a PDF Document">Download Studio Documentation</a>
-          <span class="tip">How to use Studio to build your course</span>
+          <a href="http://files.edx.org/Getting_Started_with_Studio.pdf" class="action action-primary" title='${_("This is a PDF Document")}'>${_("Download Studio Documentation")}</a>
+          <span class="tip">${_("How to use Studio to build your course")}</span>
         </li>
         <li class="action-item">
-          <a href="http://help.edge.edx.org/" rel="external" class="action action-primary">Studio Help Center</a>
-          <span class="tip">Studio Help Center</span>
+          <a href="http://help.edge.edx.org/" rel="external" class="action action-primary">${_("Studio Help Center")}</a>
+          <span class="tip">${_("Studio Help Center")}</span>
         </li>
         <li class="action-item">
-          <a href="https://edge.edx.org/courses/edX/edX101/How_to_Create_an_edX_Course/about" rel="external" class="action action-primary">Enroll in edX101</a>
-          <span class="tip">How to use Studio to build your course</span>
+          <a href="https://edge.edx.org/courses/edX/edX101/How_to_Create_an_edX_Course/about" rel="external" class="action action-primary">${_("Enroll in edX101")}</a>
+          <span class="tip">${_("How to use Studio to build your course")}</span>
         </li>
       </ul>
       </div>
 
       <div class="feedback">
-        <h3 class="title">Contact us about Studio</h3>
+        <h3 class="title">${_("Contact us about Studio")}</h3>
 
         <div class="copy">
-           <p>Have problems, questions, or suggestions about Studio? We're also here to listen to any feedback you want to share.</p>
+           <p>${_("Have problems, questions, or suggestions about Studio? We're also here to listen to any feedback you want to share.")}</p>
         </div>
 
         <ul class="list-actions">
           <li class="action-item">
 
-            <a href="http://help.edge.edx.org/discussion/new" class="action action-primary show-tender" title="Use our feedback tool, Tender, to share your feedback"><i class="icon-comments"></i> Contact Us</a>
+            <a href="http://help.edge.edx.org/discussion/new" class="action action-primary show-tender" title='${_("Use our feedback tool, Tender, to share your feedback")}'><i class="icon-comments"></i>${_("Contact Us")}</a>
           </li>
         </ul>
       </div>

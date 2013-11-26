@@ -1,10 +1,14 @@
-Feature: Textbooks
+@shard_3
+Feature: CMS.Textbooks
 
   Scenario: No textbooks
     Given I have opened a new course in Studio
     When I go to the textbooks page
     Then I should see a message telling me to create a new textbook
 
+  # IE and Safari on sauce labs will not upload the textbook correctly resulting in an error
+  @skip_internetexplorer
+  @skip_safari
   Scenario: Create a textbook
     Given I have opened a new course in Studio
     And I go to the textbooks page

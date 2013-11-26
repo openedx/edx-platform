@@ -1,7 +1,7 @@
 // studio - views - course static pages
 // ====================
 
-body.course.static-pages {
+.view-static-pages {
 
   .new-static-page-button {
     @include grey-button;
@@ -171,7 +171,7 @@ body.course.static-pages {
   }
 
   .static-page-details {
-    @extend .window;
+    @extend %ui-window;
     padding: 32px 40px;
 
     .row {

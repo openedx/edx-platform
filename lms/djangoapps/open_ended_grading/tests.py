@@ -1,40 +1,106 @@
 """
 Tests for open ended grading interfaces
 
-django-admin.py test --settings=lms.envs.test --pythonpath=. lms/djangoapps/open_ended_grading
+./manage.py lms --settings test test lms/djangoapps/open_ended_grading
 """
 
 import json
-from mock import MagicMock, patch, Mock
-
-from django.core.urlresolvers import reverse
-from django.contrib.auth.models import Group, User
-from django.conf import settings
-from mitxmako.shortcuts import render_to_string
-
-from xmodule.open_ended_grading_classes import peer_grading_service, controller_query_service
-from xmodule import peer_grading_module
-from xmodule.modulestore.django import modulestore
-import xmodule.modulestore.django
-from xmodule.x_module import ModuleSystem
-
-from open_ended_grading import staff_grading_service, views
-from courseware.access import _course_staff_group_name
-
 import logging
 
-log = logging.getLogger(__name__)
+from django.conf import settings
+from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
+from mock import MagicMock, patch, Mock
+from xblock.field_data import DictFieldData
+from xblock.fields import ScopeIds
 
+from xmodule import peer_grading_module
+from xmodule.error_module import ErrorDescriptor
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.open_ended_grading_classes import peer_grading_service, controller_query_service
 from xmodule.tests import test_util_open_ended
 
 from courseware.tests import factories
-from courseware.tests.modulestore_config import TEST_DATA_XML_MODULESTORE
 from courseware.tests.helpers import LoginEnrollmentTestCase, check_for_get_code, check_for_post_code
+from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from lms.lib.xblock.runtime import LmsModuleSystem
+from courseware.roles import CourseStaffRole
+from mitxmako.shortcuts import render_to_string
+from student.models import unique_id_for_user
+
+from open_ended_grading import staff_grading_service, views, utils
+
+log = logging.getLogger(__name__)
 
 
-@override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
-class TestStaffGradingService(LoginEnrollmentTestCase):
+class EmptyStaffGradingService(object):
+    """
+    A staff grading service that does not return a problem list from get_problem_list.
+    Used for testing to see if error message for empty problem list is correctly displayed.
+    """
+
+    def get_problem_list(self, course_id, user_id):
+        """
+        Return a staff grading response that is missing a problem list key.
+        """
+        return json.dumps({'success': True, 'error': 'No problems found.'})
+
+
+def make_instructor(course, user_email):
+    """
+    Makes a given user an instructor in a course.
+    """
+    CourseStaffRole(course.location).add_users(User.objects.get(email=user_email))
+
+
+class StudentProblemListMockQuery(object):
+    """
+    Mock controller query service for testing student problem list functionality.
+    """
+    def get_grading_status_list(self, *args, **kwargs):
+        """
+        Get a mock grading status list with locations from the open_ended test course.
+        @returns: json formatted grading status message.
+        """
+        grading_status_list = json.dumps(
+            {
+                "version": 1,
+                "problem_list": [
+                    {
+                        "problem_name": "Test1",
+                        "grader_type": "IN",
+                        "eta_available": True,
+                        "state": "Finished",
+                        "eta": 259200,
+                        "location": "i4x://edX/open_ended/combinedopenended/SampleQuestion1Attempt"
+                    },
+                    {
+                        "problem_name": "Test2",
+                        "grader_type": "NA",
+                        "eta_available": True,
+                        "state": "Waiting to be Graded",
+                        "eta": 259200,
+                        "location": "i4x://edX/open_ended/combinedopenended/SampleQuestion"
+                    },
+                    {
+                        "problem_name": "Test3",
+                        "grader_type": "PE",
+                        "eta_available": True,
+                        "state": "Waiting to be Graded",
+                        "eta": 259200,
+                        "location": "i4x://edX/open_ended/combinedopenended/SampleQuestion454"
+                    },
+                ],
+                "success": True
+            }
+        )
+        return grading_status_list
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class TestStaffGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
     '''
     Check that staff grading service proxy works.  Basically just checking the
     access control and error handling logic -- all the actual work is on the
@@ -42,8 +108,6 @@ class TestStaffGradingService(LoginEnrollmentTestCase):
     '''
 
     def setUp(self):
-        xmodule.modulestore.django._MODULESTORES = {}
-
         self.student = 'view@test.com'
         self.instructor = 'view2@test.com'
         self.password = 'foo'
@@ -56,12 +120,7 @@ class TestStaffGradingService(LoginEnrollmentTestCase):
         self.course_id = "edX/toy/2012_Fall"
         self.toy = modulestore().get_course(self.course_id)
 
-        def make_instructor(course):
-            group_name = _course_staff_group_name(course.location)
-            group = Group.objects.create(name=group_name)
-            group.user_set.add(User.objects.get(email=self.instructor))
-
-        make_instructor(self.toy)
+        make_instructor(self.toy, self.instructor)
 
         self.mock_service = staff_grading_service.staff_grading_service()
 
@@ -134,12 +193,33 @@ class TestStaffGradingService(LoginEnrollmentTestCase):
         response = check_for_post_code(self, 200, url, data)
         content = json.loads(response.content)
 
-        self.assertTrue(content['success'], str(content))
-        self.assertIsNotNone(content['problem_list'])
+        self.assertTrue(content['success'])
+        self.assertEqual(content['problem_list'], [])
+
+    @patch('open_ended_grading.staff_grading_service._service', EmptyStaffGradingService())
+    def test_get_problem_list_missing(self):
+        """
+        Test to see if a staff grading response missing a problem list is given the appropriate error.
+        Mock the staff grading service to enable the key to be missing.
+        """
+
+        # Get a valid user object.
+        instructor = User.objects.get(email=self.instructor)
+        # Mock a request object.
+        request = Mock(
+            user=instructor,
+        )
+        # Get the response and load its content.
+        response = json.loads(staff_grading_service.get_problem_list(request, self.course_id).content)
+
+        # A valid response will have an "error" key.
+        self.assertTrue('error' in response)
+        # Check that the error text is correct.
+        self.assertIn("Cannot find", response['error'])
 
 
-@override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
-class TestPeerGradingService(LoginEnrollmentTestCase):
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class TestPeerGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
     '''
     Check that staff grading service proxy works.  Basically just checking the
     access control and error handling logic -- all the actual work is on the
@@ -147,8 +227,6 @@ class TestPeerGradingService(LoginEnrollmentTestCase):
     '''
 
     def setUp(self):
-        xmodule.modulestore.django._MODULESTORES = {}
-
         self.student = 'view@test.com'
         self.instructor = 'view2@test.com'
         self.password = 'foo'
@@ -161,21 +239,22 @@ class TestPeerGradingService(LoginEnrollmentTestCase):
         self.course_id = "edX/toy/2012_Fall"
         self.toy = modulestore().get_course(self.course_id)
         location = "i4x://edX/toy/peergrading/init"
-        model_data = {'data': "<peergrading/>", 'location': location}
+        field_data = DictFieldData({'data': "<peergrading/>", 'location': location, 'category':'peergrading'})
         self.mock_service = peer_grading_service.MockPeerGradingService()
-        self.system = ModuleSystem(
-            ajax_url=location,
+        self.system = LmsModuleSystem(
+            static_url=settings.STATIC_URL,
             track_function=None,
             get_module=None,
             render_template=render_to_string,
             replace_urls=None,
-            xblock_model_data={},
             s3_interface=test_util_open_ended.S3_INTERFACE,
-            open_ended_grading_interface=test_util_open_ended.OPEN_ENDED_GRADING_INTERFACE
+            open_ended_grading_interface=test_util_open_ended.OPEN_ENDED_GRADING_INTERFACE,
+            mixins=settings.XBLOCK_MIXINS,
+            error_descriptor_class=ErrorDescriptor,
         )
-        self.descriptor = peer_grading_module.PeerGradingDescriptor(self.system, model_data)
-        model_data = {'location': location}
-        self.peer_module = peer_grading_module.PeerGradingModule(self.system, self.descriptor, model_data)
+        self.descriptor = peer_grading_module.PeerGradingDescriptor(self.system, field_data, ScopeIds(None, None, None, None))
+        self.descriptor.xmodule_runtime = self.system
+        self.peer_module = self.descriptor
         self.peer_module.peer_gs = self.mock_service
         self.logout()
 
@@ -205,7 +284,9 @@ class TestPeerGradingService(LoginEnrollmentTestCase):
             'submission_key': 'fake key',
             'score': 2,
             'feedback': 'feedback',
-            'submission_flagged': 'false'
+            'submission_flagged': 'false',
+            'answer_unknown': 'false',
+            'rubric_scores_complete' : 'true'
         }
 
         qdict = MagicMock()
@@ -291,8 +372,8 @@ class TestPeerGradingService(LoginEnrollmentTestCase):
         self.assertFalse('actual_score' in response)
 
 
-@override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
-class TestPanel(LoginEnrollmentTestCase):
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class TestPanel(ModuleStoreTestCase):
     """
     Run tests on the open ended panel
     """
@@ -311,7 +392,15 @@ class TestPanel(LoginEnrollmentTestCase):
         found_module, peer_grading_module = views.find_peer_grading_module(self.course)
         self.assertTrue(found_module)
 
-    @patch('open_ended_grading.views.controller_qs', controller_query_service.MockControllerQueryService(settings.OPEN_ENDED_GRADING_INTERFACE, views.system))
+    @patch(
+        'open_ended_grading.utils.create_controller_query_service',
+        Mock(
+            return_value=controller_query_service.MockControllerQueryService(
+                settings.OPEN_ENDED_GRADING_INTERFACE,
+                utils.SYSTEM
+            )
+        )
+    )
     def test_problem_list(self):
         """
         Ensure that the problem list from the grading controller server can be rendered properly locally
@@ -319,4 +408,63 @@ class TestPanel(LoginEnrollmentTestCase):
         """
         request = Mock(user=self.user)
         response = views.student_problem_list(request, self.course.id)
-        self.assertRegexpMatches(response.content, "Here are a list of open ended problems for this course.")
+        self.assertRegexpMatches(response.content, "Here is a list of open ended problems for this course.")
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class TestPeerGradingFound(ModuleStoreTestCase):
+    """
+    Test to see if peer grading modules can be found properly.
+    """
+
+    def setUp(self):
+        self.course_name = 'edX/open_ended_nopath/2012_Fall'
+        self.course = modulestore().get_course(self.course_name)
+
+    def test_peer_grading_nopath(self):
+        """
+        The open_ended_nopath course contains a peer grading module with no path to it.
+        Ensure that the exception is caught.
+        """
+
+        found, url = views.find_peer_grading_module(self.course)
+        self.assertEqual(found, False)
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class TestStudentProblemList(ModuleStoreTestCase):
+    """
+    Test if the student problem list correctly fetches and parses problems.
+    """
+
+    def setUp(self):
+        # Load an open ended course with several problems.
+        self.course_name = 'edX/open_ended/2012_Fall'
+        self.course = modulestore().get_course(self.course_name)
+        self.user = factories.UserFactory()
+        # Enroll our user in our course and make them an instructor.
+        make_instructor(self.course, self.user.email)
+
+    @patch(
+        'open_ended_grading.utils.create_controller_query_service',
+        Mock(return_value=StudentProblemListMockQuery())
+    )
+    def test_get_problem_list(self):
+        """
+        Test to see if the StudentProblemList class can get and parse a problem list from ORA.
+        Mock the get_grading_status_list function using StudentProblemListMockQuery.
+        """
+        # Initialize a StudentProblemList object.
+        student_problem_list = utils.StudentProblemList(self.course.id, unique_id_for_user(self.user))
+        # Get the initial problem list from ORA.
+        success = student_problem_list.fetch_from_grading_service()
+        # Should be successful, and we should have three problems.  See mock class for details.
+        self.assertTrue(success)
+        self.assertEqual(len(student_problem_list.problem_list), 3)
+
+        # See if the problem locations are valid.
+        valid_problems = student_problem_list.add_problem_data(reverse('courses'))
+        # One location is invalid, so we should now have two.
+        self.assertEqual(len(valid_problems), 2)
+        # Ensure that human names are being set properly.
+        self.assertEqual(valid_problems[0]['grader_type_display_name'], "Instructor Assessment")

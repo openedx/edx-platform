@@ -1,20 +1,23 @@
 # -*- coding: utf-8 -*-
 
+import datetime
 import unittest
-from fs.memoryfs import MemoryFS
 
+from fs.memoryfs import MemoryFS
 from lxml import etree
 from mock import Mock, patch
+
+from django.utils.timezone import UTC
 
 from xmodule.xml_module import is_pointer_tag
 from xmodule.modulestore import Location
 from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
 from xmodule.modulestore.inheritance import compute_inherited_metadata
+from xmodule.x_module import XModuleMixin
 from xmodule.fields import Date
+from xmodule.tests import DATA_DIR
+from xmodule.modulestore.inheritance import InheritanceMixin
 
-from .test_export import DATA_DIR
-import datetime
-from django.utils.timezone import UTC
 
 ORG = 'test_org'
 COURSE = 'test_course'
@@ -33,13 +36,14 @@ class DummySystem(ImportSystem):
         parent_tracker = Mock()
 
         super(DummySystem, self).__init__(
-            xmlstore,
-            course_id,
-            course_dir,
-            policy,
-            error_tracker,
-            parent_tracker,
+            xmlstore=xmlstore,
+            course_id=course_id,
+            course_dir=course_dir,
+            policy=policy,
+            error_tracker=error_tracker,
+            parent_tracker=parent_tracker,
             load_error_modules=load_error_modules,
+            mixins=(InheritanceMixin, XModuleMixin)
         )
 
     def render_template(self, _template, _context):
@@ -57,7 +61,7 @@ class BaseCourseTestCase(unittest.TestCase):
         """Get a test course by directory name.  If there's more than one, error."""
         print("Importing {0}".format(name))
 
-        modulestore = XMLModuleStore(DATA_DIR, course_dirs=[name])
+        modulestore = XMLModuleStore(DATA_DIR, course_dirs=[name], xblock_mixins=(InheritanceMixin,))
         courses = modulestore.get_courses()
         self.assertEquals(len(courses), 1)
         return courses[0]
@@ -75,7 +79,7 @@ class ImportTestCase(BaseCourseTestCase):
 
         descriptor = system.process_xml(bad_xml)
 
-        self.assertEqual(descriptor.__class__.__name__, 'ErrorDescriptor')
+        self.assertEqual(descriptor.__class__.__name__, 'ErrorDescriptorWithMixins')
 
     def test_unique_url_names(self):
         '''Check that each error gets its very own url_name'''
@@ -101,7 +105,7 @@ class ImportTestCase(BaseCourseTestCase):
         re_import_descriptor = system.process_xml(tag_xml)
 
         self.assertEqual(re_import_descriptor.__class__.__name__,
-                         'ErrorDescriptor')
+                         'ErrorDescriptorWithMixins')
 
         self.assertEqual(descriptor.contents,
                          re_import_descriptor.contents)
@@ -149,19 +153,17 @@ class ImportTestCase(BaseCourseTestCase):
         compute_inherited_metadata(descriptor)
 
         # pylint: disable=W0212
-        print(descriptor, descriptor._model_data)
-        self.assertEqual(descriptor.lms.due, ImportTestCase.date.from_json(v))
+        print(descriptor, descriptor._field_data)
+        self.assertEqual(descriptor.due, ImportTestCase.date.from_json(v))
 
         # Check that the child inherits due correctly
         child = descriptor.get_children()[0]
-        self.assertEqual(child.lms.due, ImportTestCase.date.from_json(v))
-        self.assertEqual(child._inheritable_metadata, child._inherited_metadata)
-        self.assertEqual(2, len(child._inherited_metadata))
-        self.assertLessEqual(
-            ImportTestCase.date.from_json(child._inherited_metadata['start']),
-            datetime.datetime.now(UTC())
+        self.assertEqual(child.due, ImportTestCase.date.from_json(v))
+        # need to convert v to canonical json b4 comparing
+        self.assertEqual(
+            ImportTestCase.date.to_json(ImportTestCase.date.from_json(v)),
+            child.xblock_kvs.inherited_settings['due']
         )
-        self.assertEqual(v, child._inherited_metadata['due'])
 
         # Now export and check things
         resource_fs = MemoryFS()
@@ -211,17 +213,13 @@ class ImportTestCase(BaseCourseTestCase):
         descriptor = system.process_xml(start_xml)
         compute_inherited_metadata(descriptor)
 
-        self.assertEqual(descriptor.lms.due, None)
+        self.assertEqual(descriptor.due, None)
 
         # Check that the child does not inherit a value for due
         child = descriptor.get_children()[0]
-        self.assertEqual(child.lms.due, None)
-        # pylint: disable=W0212
-        self.assertEqual(child._inheritable_metadata, child._inherited_metadata)
-        self.assertEqual(1, len(child._inherited_metadata))
-        # why do these tests look in the internal structure v just calling child.start?
+        self.assertEqual(child.due, None)
         self.assertLessEqual(
-            ImportTestCase.date.from_json(child._inherited_metadata['start']),
+            child.start,
             datetime.datetime.now(UTC())
         )
 
@@ -243,19 +241,16 @@ class ImportTestCase(BaseCourseTestCase):
         descriptor = system.process_xml(start_xml)
         child = descriptor.get_children()[0]
         # pylint: disable=W0212
-        child._model_data['due'] = child_due
+        child._field_data.set(child, 'due', child_due)
         compute_inherited_metadata(descriptor)
 
-        self.assertEqual(descriptor.lms.due, ImportTestCase.date.from_json(course_due))
-        self.assertEqual(child.lms.due, ImportTestCase.date.from_json(child_due))
+        self.assertEqual(descriptor.due, ImportTestCase.date.from_json(course_due))
+        self.assertEqual(child.due, ImportTestCase.date.from_json(child_due))
         # Test inherited metadata. Due does not appear here (because explicitly set on child).
-        self.assertEqual(1, len(child._inherited_metadata))
-        self.assertLessEqual(
-            ImportTestCase.date.from_json(child._inherited_metadata['start']),
-            datetime.datetime.now(UTC()))
-        # Test inheritable metadata. This has the course inheritable value for due.
-        self.assertEqual(2, len(child._inheritable_metadata))
-        self.assertEqual(course_due, child._inheritable_metadata['due'])
+        self.assertEqual(
+            ImportTestCase.date.to_json(ImportTestCase.date.from_json(course_due)),
+            child.xblock_kvs.inherited_settings['due']
+        )
 
     def test_is_pointer_tag(self):
         """
@@ -290,14 +285,14 @@ class ImportTestCase(BaseCourseTestCase):
         print("Starting import")
         course = self.get_course('toy')
 
-        def check_for_key(key, node):
+        def check_for_key(key, node, value):
             "recursive check for presence of key"
             print("Checking {0}".format(node.location.url()))
-            self.assertTrue(key in node._model_data)
+            self.assertEqual(getattr(node, key), value)
             for c in node.get_children():
-                check_for_key(key, c)
+                check_for_key(key, c, value)
 
-        check_for_key('graceperiod', course)
+        check_for_key('graceperiod', course, course.graceperiod)
 
     def test_policy_loading(self):
         """Make sure that when two courses share content with the same
@@ -320,7 +315,7 @@ class ImportTestCase(BaseCourseTestCase):
 
         # Also check that keys from policy are run through the
         # appropriate attribute maps -- 'graded' should be True, not 'true'
-        self.assertEqual(toy.lms.graded, True)
+        self.assertEqual(toy.graded, True)
 
     def test_definition_loading(self):
         """When two courses share the same org and course name and
@@ -373,6 +368,32 @@ class ImportTestCase(BaseCourseTestCase):
         loc = Location(cloc.tag, cloc.org, cloc.course, 'html', 'secret:toylab')
         html = modulestore.get_instance(course_id, loc)
         self.assertEquals(html.display_name, "Toy lab")
+
+    def test_unicode(self):
+        """Check that courses with unicode characters in filenames and in
+        org/course/name import properly. Currently, this means: (a) Having
+        files with unicode names does not prevent import; (b) if files are not
+        loaded because of unicode filenames, there are appropriate
+        exceptions/errors to that effect."""
+
+        print("Starting import")
+        modulestore = XMLModuleStore(DATA_DIR, course_dirs=['test_unicode'])
+        courses = modulestore.get_courses()
+        self.assertEquals(len(courses), 1)
+        course = courses[0]
+
+        print("course errors:")
+
+        # Expect to find an error/exception about characters in "®esources"
+        expect = "Invalid characters"
+        errors = [(msg.encode("utf-8"), err.encode("utf-8"))
+                    for msg, err in
+                    modulestore.get_item_errors(course.location)]
+
+        self.assertTrue(any(expect in msg or expect in err
+            for msg, err in errors))
+        chapters = course.get_children()
+        self.assertEqual(len(chapters), 3)
 
     def test_url_name_mangling(self):
         """
@@ -456,7 +477,7 @@ class ImportTestCase(BaseCourseTestCase):
         render_string_from_sample_gst_xml = """
         <slider var="a" style="width:400px;float:left;"/>\
 <plot style="margin-top:15px;margin-bottom:15px;"/>""".strip()
-        self.assertEqual(gst_sample.render, render_string_from_sample_gst_xml)
+        self.assertIn(render_string_from_sample_gst_xml, gst_sample.data)
 
     def test_word_cloud_import(self):
         modulestore = XMLModuleStore(DATA_DIR, course_dirs=['word_cloud'])

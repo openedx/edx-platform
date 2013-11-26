@@ -15,20 +15,22 @@ from lettuce import world, step
 from .course_helpers import *
 from .ui_helpers import *
 from lettuce.django import django_url
-from nose.tools import assert_equals
+from nose.tools import assert_equals  # pylint: disable=E0611
 
 from logging import getLogger
 logger = getLogger(__name__)
 
 
-@step(r'I wait (?:for )?"(\d+)" seconds?$')
-def wait(step, seconds):
+@step(r'I wait (?:for )?"(\d+\.?\d*)" seconds?$')
+def wait_for_seconds(step, seconds):
     world.wait(seconds)
 
 
 @step('I reload the page$')
 def reload_the_page(step):
+    world.wait_for_ajax_complete()
     world.browser.reload()
+    world.wait_for_js_to_load()
 
 
 @step('I press the browser back button$')
@@ -88,18 +90,18 @@ def the_page_title_should_contain(step, title):
 
 @step('I log in$')
 def i_log_in(step):
-    world.log_in('robot', 'test')
+    world.log_in(username='robot', password='test')
 
 
 @step('I am a logged in user$')
 def i_am_logged_in_user(step):
     world.create_user('robot', 'test')
-    world.log_in('robot', 'test')
+    world.log_in(username='robot', password='test')
 
 
 @step('I am not logged in$')
 def i_am_not_logged_in(step):
-    world.browser.cookies.delete()
+    world.visit('logout')
 
 
 @step('I am staff for course "([^"]*)"$')
@@ -129,21 +131,32 @@ def should_have_link_with_id_and_text(step, link_id, text):
     assert_equals(link.text, text)
 
 
+@step(r'should see a link to "([^"]*)" with the text "([^"]*)"$')
+def should_have_link_with_path_and_text(step, path, text):
+    link = world.browser.find_link_by_text(text)
+    assert len(link) > 0
+    assert_equals(link.first["href"], django_url(path))
+
+
 @step(r'should( not)? see "(.*)" (?:somewhere|anywhere) (?:in|on) (?:the|this) page')
 def should_see_in_the_page(step, doesnt_appear, text):
-    if doesnt_appear:
-        assert world.browser.is_text_not_present(text, wait_time=5)
+    if world.LETTUCE_SELENIUM_CLIENT == 'saucelabs':
+        multiplier = 2
     else:
-        assert world.browser.is_text_present(text, wait_time=5)
+        multiplier = 1
+    if doesnt_appear:
+        assert world.browser.is_text_not_present(text, wait_time=5 * multiplier)
+    else:
+        assert world.browser.is_text_present(text, wait_time=5 * multiplier)
 
 
 @step('I am logged in$')
 def i_am_logged_in(step):
     world.create_user('robot', 'test')
-    world.log_in('robot', 'test')
+    world.log_in(username='robot', password='test')
     world.browser.visit(django_url('/'))
-    # You should not see the login link
-    assert_equals(world.browser.find_by_css('a#login'), [])
+    dash_css = 'section.container.dashboard'
+    assert world.is_css_present(dash_css)
 
 
 @step(u'I am an edX user$')
@@ -159,6 +172,16 @@ def registered_edx_user(step, uname):
 @step(u'All dialogs should be closed$')
 def dialogs_are_closed(step):
     assert world.dialogs_closed()
+
+
+@step(u'visit the url "([^"]*)"')
+def visit_url(step, url):
+    world.browser.visit(django_url(url))
+
+
+@step(u'wait for AJAX to (?:finish|complete)')
+def wait_ajax(_step):
+    wait_for_ajax_complete()
 
 
 @step('I will confirm all alerts')
@@ -189,3 +212,11 @@ def i_answer_prompts_with(step, prompt):
     In addition, this method changes the functionality of ONLY future alerts
     """
     world.browser.execute_script('window.prompt = function(){return %s;}') % prompt
+
+
+@step('I run ipdb')
+def run_ipdb(_step):
+    """Run ipdb as step for easy debugging"""
+    import ipdb
+    ipdb.set_trace()
+    assert True

@@ -15,6 +15,9 @@ sessions. Assumes structure:
 from .common import *
 import os
 from path import path
+from warnings import filterwarnings
+
+os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = 'localhost:8000-9000'
 
 # can't test start dates with this True, but on the other hand,
 # can test everything else :)
@@ -29,16 +32,28 @@ MITX_FEATURES['ENABLE_SERVICE_STATUS'] = True
 
 MITX_FEATURES['ENABLE_HINTER_INSTRUCTOR_VIEW'] = True
 
+MITX_FEATURES['ENABLE_INSTRUCTOR_BETA_DASHBOARD'] = True
+
+MITX_FEATURES['ENABLE_SHOPPING_CART'] = True
+
 # Need wiki for courseware views to work. TODO (vshnayder): shouldn't need it.
 WIKI_ENABLED = True
 
 # Makes the tests run much faster...
-SOUTH_TESTS_MIGRATE = False   # To disable migrations and use syncdb instead
+SOUTH_TESTS_MIGRATE = False  # To disable migrations and use syncdb instead
 
 # Nose Test Runner
-INSTALLED_APPS += ('django_nose',)
-
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+
+_system = 'lms'
+
+_report_dir = REPO_ROOT / 'reports' / _system
+_report_dir.makedirs_p()
+
+NOSE_ARGS = [
+    '--id-file', REPO_ROOT / '.testids' / _system / 'noseids',
+    '--xunit-file', _report_dir / 'nosetests.xml',
+]
 
 # Local Directories
 TEST_ROOT = path("test_root")
@@ -63,7 +78,7 @@ XQUEUE_INTERFACE = {
     },
     "basic_auth": ('anant', 'agarwal'),
 }
-XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5   # seconds
+XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5  # seconds
 
 
 # Don't rely on a real staff grading backend
@@ -94,6 +109,23 @@ MODULESTORE = {
     }
 }
 
+# Starting modulestores generates log messages.  If we wait to init modulestores,
+# then those messages will be silenced by the test runner.
+INIT_MODULESTORE_ON_STARTUP = False
+
+CONTENTSTORE = {
+    'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
+    'DOC_STORE_CONFIG': {
+        'host': 'localhost',
+        'db': 'xcontent',
+    }
+}
+
+DOC_STORE_CONFIG = {
+    'host': 'localhost',
+    'db': 'test_xmodule',
+    'collection': 'test_modulestore',
+}
 
 DATABASES = {
     'default': {
@@ -135,6 +167,9 @@ CACHES = {
 # Dummy secret key for dev
 SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 
+# hide ratelimit warnings while running tests
+filterwarnings('ignore', message='No request passed to the backend, unable to rate-limit')
+
 ################################## OPENID #####################################
 MITX_FEATURES['AUTH_USE_OPENID'] = True
 MITX_FEATURES['AUTH_USE_OPENID_PROVIDER'] = True
@@ -148,6 +183,25 @@ OPENID_CREATE_USERS = False
 OPENID_UPDATE_DETAILS_FROM_SREG = True
 OPENID_USE_AS_ADMIN_LOGIN = False
 OPENID_PROVIDER_TRUSTED_ROOTS = ['*']
+
+###################### Payment ##############################3
+# Enable fake payment processing page
+MITX_FEATURES['ENABLE_PAYMENT_FAKE'] = True
+# Configure the payment processor to use the fake processing page
+# Since both the fake payment page and the shoppingcart app are using
+# the same settings, we can generate this randomly and guarantee
+# that they are using the same secret.
+from random import choice
+import string
+RANDOM_SHARED_SECRET = ''.join(
+    choice(string.letters + string.digits + string.punctuation)
+    for x in range(250)
+)
+
+CC_PROCESSOR['CyberSource']['SHARED_SECRET'] = RANDOM_SHARED_SECRET
+CC_PROCESSOR['CyberSource']['MERCHANT_ID'] = "edx"
+CC_PROCESSOR['CyberSource']['SERIAL_NUMBER'] = "0123456789012345678901"
+CC_PROCESSOR['CyberSource']['PURCHASE_ENDPOINT'] = "/shoppingcart/payment_fake"
 
 ################################# CELERY ######################################
 
@@ -175,7 +229,7 @@ for static_dir in STATICFILES_DIRS:
         new_staticfiles_dirs.append(static_dir)
 STATICFILES_DIRS = new_staticfiles_dirs
 
-FILE_UPLOAD_TEMP_DIR = PROJECT_ROOT / "uploads"
+FILE_UPLOAD_TEMP_DIR = TEST_ROOT / "uploads"
 FILE_UPLOAD_HANDLERS = (
     'django.core.files.uploadhandler.MemoryFileUploadHandler',
     'django.core.files.uploadhandler.TemporaryFileUploadHandler',
@@ -199,4 +253,4 @@ PASSWORD_HASHERS = (
 #   Generated checkid_setup request to http://testserver/openid/provider/login/ with assocication {HMAC-SHA1}{51d49995}{s/kRmA==}
 
 import openid.oidutil
-openid.oidutil.log = lambda message, level=0: None
+openid.oidutil.log = lambda message, level = 0: None

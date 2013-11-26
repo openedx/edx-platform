@@ -1,0 +1,152 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%page args="section_data"/>
+
+<script type="text/template" id="member-list-widget-template">
+  <div class="member-list-widget">
+    <div class="header">
+      <div class="title"> {{title}} </div>
+      <div class="info-badge"></div>
+    </div>
+    <div class="info"> {{info}} </div>
+    <div class="member-list">
+      <table>
+        <thead>
+          <tr>
+            {{#labels}}
+              <td class="label">{{.}}</td>
+            {{/labels}}
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="bottom-bar">
+      <input type="text" name="add-field" class="add-field" placeholder="{{add_placeholder}}">
+      <input type="button" name="add" class="add" value="{{add_btn_label}}">
+    </div>
+  </div>
+</script>
+
+<div class="vert-left batch-enrollment">
+  <h2> ${_("Batch Enrollment")} </h2>
+  <p> ${_("Enter student emails separated by new lines or commas.")} </p>
+  <textarea rows="6" cols="50" name="student-emails" placeholder="${_("Student Emails")}" spellcheck="false"></textarea>
+  <br>
+
+  <input type="checkbox" name="auto-enroll" value="${_("Auto-Enroll")}" style="margin-top: 1em;">
+  <label for="auto-enroll">${_("Auto Enroll")}</label>
+  <div class="auto-enroll-hint">
+    <p> ${_("If auto enroll is <em>checked</em>, students who have not yet registered for edX will be automatically enrolled.")}
+        ${_("If auto enroll is left <em>unchecked</em>, students who have not yet registered for edX will not be enrolled, but will be allowed to enroll.")}
+    </p>
+  </div>
+  
+  <div>
+    <input type="checkbox" name="email-students" value="${_("Notify-students-by-email")}">
+    <label for="email-students">${_("Notify students by email")}</label>
+    <div class="email-students-hint">
+      <p> ${_("If email students is <em>checked</em> students will receive an email notification.")}
+      </p>
+    </div>
+  </div>
+  
+  <div>
+    <input type="button" name="enroll" value="${_("Enroll")}" data-endpoint="${ section_data['enroll_button_url'] }" >
+    <input type="button" name="unenroll" value="${_("Unenroll")}" data-endpoint="${ section_data['unenroll_button_url'] }" >
+  </div>
+
+  <div class="request-response"></div>
+  <div class="request-response-error"></div>
+</div>
+
+<div class="vert-right member-lists-management">
+  <h2> ${_("Administration List Management")} </h2>
+
+  <select id="member-lists-selector">
+    <option> ${_("Getting available lists...")} </option>
+  </select>
+
+  <div class="request-response-error"></div>
+
+  %if not section_data['access']['instructor']:
+    <p>
+      ${_("Staff cannot modify staff or beta tester lists. To modify these lists, "
+      "contact your instructor and ask them to add you as an instructor for staff "
+      "and beta lists, or a forum admin for forum management.")}
+    </p>
+  %endif
+
+  %if section_data['access']['instructor']:
+    <div class="auth-list-container"
+      data-rolename="staff"
+      data-display-name="${_("Course Staff")}"
+      data-info-text="
+        ${_("Course staff can help you manage limited aspects of your course. Staff "
+        "can enroll and unenroll students, as well as modify their grades and "
+        "see all course data. Course staff are not automatically given access "
+        "to Studio and will not be able to edit your course.")}"
+      data-list-endpoint="${ section_data['list_course_role_members_url'] }"
+      data-modify-endpoint="${ section_data['modify_access_url'] }"
+      data-add-button-label="${_("Add Staff")}"
+    ></div>
+
+    <div class="auth-list-container"
+      data-rolename="instructor"
+      data-display-name="${_("Instructors")}"
+      data-info-text="
+        ${_("Instructors are the core administration of your course. Instructors can "
+        "add and remove course staff, as well as administer forum access.")}"
+      data-list-endpoint="${ section_data['list_course_role_members_url'] }"
+      data-modify-endpoint="${ section_data['modify_access_url'] }"
+      data-add-button-label="${_("Add Instructor")}"
+    ></div>
+
+    <div class="auth-list-container"
+      data-rolename="beta"
+      data-display-name="${_("Beta Testers")}"
+      data-info-text="
+        ${_("Beta testers can see course content before the rest of the students. "
+        "They can make sure that the content works, but have no additional "
+        "privileges.")}"
+      data-list-endpoint="${ section_data['list_course_role_members_url'] }"
+      data-modify-endpoint="${ section_data['modify_access_url'] }"
+      data-add-button-label="Add ${_("Beta Tester")}"
+    ></div>
+
+    <div class="auth-list-container"
+      data-rolename="Administrator"
+      data-display-name="${_("Forum Admins")}"
+      data-info-text="
+        ${_("Forum admins can moderate the course forums as well as administer "
+        "other forum roles.")}"
+      data-list-endpoint="${ section_data['list_forum_members_url'] }"
+      data-modify-endpoint="${ section_data['update_forum_role_membership_url'] }"
+      data-add-button-label="Add ${_("Forum Admin")}"
+    ></div>
+  %endif
+
+  %if section_data['access']['instructor'] or section_data['access']['forum_admin']:
+    <div class="auth-list-container"
+      data-rolename="Moderator"
+      data-display-name="${_("Forum Moderators")}"
+      data-info-text="
+        ${_("Forum moderators can moderate the course forums. They cannot add other "
+        "moderators.")}"
+      data-list-endpoint="${ section_data['list_forum_members_url'] }"
+      data-modify-endpoint="${ section_data['update_forum_role_membership_url'] }"
+      data-add-button-label="${_("Add Moderator")}"
+    ></div>
+
+    <div class="auth-list-container"
+      data-rolename="Community TA"
+      data-display-name="${_("Forum Community TAs")}"
+      data-info-text="
+        ${_("Community TA's are members of the community whom you deem particularly "
+        "helpful on the forums.")}"
+      data-list-endpoint="${ section_data['list_forum_members_url'] }"
+      data-modify-endpoint="${ section_data['update_forum_role_membership_url'] }"
+      data-add-button-label="Add ${_("Community TA")}"
+    ></div>
+  %endif
+
+</div>

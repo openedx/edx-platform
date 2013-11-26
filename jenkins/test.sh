@@ -36,6 +36,13 @@ github_status state:pending "is running"
 # Reset the submodule, in case it changed
 git submodule foreach 'git reset --hard HEAD'
 
+# Assumes that Xvfb has been started by upstart
+# and is capturing display :1
+# The command for this is:
+# /usr/bin/Xvfb :1 -screen 0 1024x268x24
+# This allows us to run Chrome or Firefox without a display
+export DISPLAY=:1
+
 # Set the IO encoding to UTF-8 so that askbot will start
 export PYTHONIOENCODING=UTF-8
 
@@ -55,7 +62,7 @@ VIRTUALENV_DIR="/mnt/virtualenvs/${JOB_NAME}${WORKSPACE_SUFFIX}"
 
 if [ ! -d "$VIRTUALENV_DIR" ]; then
     mkdir -p "$VIRTUALENV_DIR"
-    virtualenv "$VIRTUALENV_DIR"
+    virtualenv --system-site-packages "$VIRTUALENV_DIR"
 fi
 
 export PIP_DOWNLOAD_CACHE=/mnt/pip-cache
@@ -76,6 +83,9 @@ rake pylint > pylint.log || cat pylint.log
 
 # Generate coverage reports
 rake coverage
+
+# Generate quality reports
+rake quality
 
 rake autodeploy_properties
 

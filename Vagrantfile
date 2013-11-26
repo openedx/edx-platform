@@ -22,12 +22,13 @@ Vagrant.configure("2") do |config|
 
   config.vm.provider :virtualbox do |vb|
     # Use VBoxManage to customize the VM. For example to change memory:
-    vb.customize ["modifyvm", :id, "--memory", "1024"]
+    vb.customize ["modifyvm", :id, "--memory", "2048"]
 
     # This setting makes it so that network access from inside the vagrant guest
     # is able to resolve DNS using the hosts VPN connection.
     vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
   end
 
+  config.vm.provision :shell, :path => "scripts/install-acceptance-req.sh"
   config.vm.provision :shell, :path => "scripts/vagrant-provisioning.sh"
 end

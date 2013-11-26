@@ -50,6 +50,10 @@ Write a persuasive essay to a newspaper reflecting your vies on censorship in li
       mode: null
       })
       @setCurrentEditor(@markdown_editor)
+      selection = @markdown_editor.getSelection()
+      #Auto-add in the needed template if it isn't already in there.
+      if(@markdown_editor.getValue() == "")
+        @markdown_editor.setValue(OpenEndedMarkdownEditingDescriptor.promptTemplate + "\n" + OpenEndedMarkdownEditingDescriptor.rubricTemplate + "\n" + OpenEndedMarkdownEditingDescriptor.tasksTemplate)
       # Add listeners for toolbar buttons (only present for markdown editor)
       @element.on('click', '.xml-tab', @onShowXMLButton)
       @element.on('click', '.format-buttons a', @onToolbarButton)
@@ -58,6 +62,8 @@ Write a persuasive essay to a newspaper reflecting your vies on censorship in li
       $(@element.find('.xml-box')).hide()
     else
       @createXMLEditor()
+
+    @alertTaskRubricModification()
 
   ###
   Creates the XML Editor and sets it as the current editor. If text is passed in,
@@ -89,6 +95,8 @@ Write a persuasive essay to a newspaper reflecting your vies on censorship in li
       # Hide markdown-specific toolbar buttons
       $(@element.find('.editor-bar')).hide()
 
+  alertTaskRubricModification: ->
+    return alert("Before you edit, please note that if you alter the tasks block or the rubric block of this question after students have submitted responses, it may result in their responses and grades being deleted!  Use caution when altering problems that have already been released to students.")
   ###
   Have the user confirm the one-way conversion to XML.
   Returns true if the user clicked OK, else false.
@@ -153,8 +161,7 @@ Write a persuasive essay to a newspaper reflecting your vies on censorship in li
     else
       {
       data: @xml_editor.getValue()
-      metadata:
-        markdown: null
+      nullout: ['markdown']
       }
 
   @insertRubric: (selectedText) ->

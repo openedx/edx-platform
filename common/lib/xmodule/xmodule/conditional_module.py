@@ -4,13 +4,14 @@ some xmodules by conditions.
 
 import json
 import logging
+from lazy import lazy
 from lxml import etree
 from pkg_resources import resource_string
 
 from xmodule.x_module import XModule
 from xmodule.modulestore import Location
 from xmodule.seq_module import SequenceDescriptor
-from xblock.core import Scope, List
+from xblock.fields import Scope, List
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 
@@ -18,6 +19,7 @@ log = logging.getLogger('mitx.' + __name__)
 
 
 class ConditionalFields(object):
+    has_children = True
     show_tag_list = List(help="Poll answers", scope=Scope.content)
 
 
@@ -96,10 +98,12 @@ class ConditionalModule(ConditionalFields, XModule):
                 return xml_value, attr_name
         raise Exception('Error in conditional module: unknown condition "%s"' % xml_attr)
 
-    def is_condition_satisfied(self):
-        self.required_modules = [self.system.get_module(descriptor) for
-                                 descriptor in self.descriptor.get_required_module_descriptors()]
+    @lazy
+    def required_modules(self):
+        return [self.system.get_module(descriptor) for
+                descriptor in self.descriptor.get_required_module_descriptors()]
 
+    def is_condition_satisfied(self):
         xml_value, attr_name = self._get_condition()
 
         if xml_value and self.required_modules:
@@ -148,7 +152,7 @@ class ConditionalModule(ConditionalFields, XModule):
                                                context)
             return json.dumps({'html': [html], 'message': bool(message)})
 
-        html = [child.get_html() for child in self.get_display_items()]
+        html = [child.render('student_view').content for child in self.get_display_items()]
 
         return json.dumps({'html': html})
 

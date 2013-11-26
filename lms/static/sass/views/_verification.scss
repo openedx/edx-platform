@@ -1,0 +1,2098 @@
+// lms - views - verification flow
+// ====================
+
+// MISC: extends - type
+// application: canned headings
+%hd-lv1 {
+  @extend %t-title1;
+  @extend %t-weight1;
+  color: $m-gray-d4;
+  margin: 0 0 ($baseline*2) 0;
+}
+
+%hd-lv2 {
+  @extend %t-title4;
+  @extend %t-weight1;
+  margin: 0 0 ($baseline*0.75) 0;
+  border-bottom: 1px solid $m-gray-l4;
+  padding-bottom: ($baseline/2);
+  color: $m-gray-d4;
+}
+
+%hd-lv3 {
+  @extend %t-title6;
+  @extend %t-weight4;
+  margin: 0 0 ($baseline/4) 0;
+  color: $m-gray-d4;
+}
+
+%hd-lv4 {
+  @extend %t-title6;
+  @extend %t-weight2;
+  margin: 0 0 $baseline 0;
+  color: $m-gray-d4;
+}
+
+%hd-lv5 {
+  @extend %t-title7;
+  @extend %t-weight4;
+  margin: 0 0 ($baseline/4) 0;
+  color: $m-gray-d4;
+}
+
+// application: canned copy
+%copy-base {
+  @extend %t-copy-base;
+  color: $m-gray-d2;
+}
+
+%copy-lead1 {
+  @extend %t-copy-lead2;
+  color: $m-gray;
+}
+
+%copy-detail {
+  @extend %t-copy-sub1;
+  @extend %t-weight3;
+  color: $m-gray-d1;
+}
+
+%copy-metadata {
+  @extend %t-copy-sub2;
+  color: $m-gray-d1;
+
+
+  %copy-metadata-value {
+    @extend %t-weight2;
+  }
+
+  %copy-metadata-value {
+    @extend %t-weight4;
+  }
+}
+
+// application: canned links
+%copy-link {
+  border-bottom: 1px dotted transparent;
+
+  &:hover, &:active {
+    border-color: $link-color-d1;
+  }
+}
+
+// ====================
+
+// MISC: extends - button
+%btn-verify-primary {
+  @extend %btn-primary-green;
+}
+
+// ====================
+
+// MISC: extends - UI - window
+%ui-window {
+  @include clearfix();
+  border-radius: ($baseline/10);
+  box-shadow: 0 1px 2px 1px $shadow-l1;
+  margin-bottom: $baseline;
+  border: 1px solid $m-gray-l3;
+  background: $white;
+}
+
+// ====================
+
+// MISC: extends - UI - well
+%ui-well {
+  box-shadow: inset 0 1px 2px 1px $shadow-l1;
+  padding: ($baseline*0.75) $baseline;
+}
+
+// ====================
+
+// MISC: expandable UI
+.is-expandable {
+
+  .title-expand {
+
+  }
+
+  .expandable-icon {
+    @include transition(all 0.25s ease-in-out 0s);
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: ($baseline/4);
+  }
+
+  // STATE: active
+  &.is-ready {
+
+    .expandable-icon {
+      @include transform(rotate(-90deg));
+    }
+
+    .title-expand {
+      @extend %ui-fake-link;
+      color: $m-blue-d2;
+
+      &:hover {
+        color: $m-blue;
+      }
+    }
+  }
+
+  // STATE: expanded
+  &.is-expanded {
+
+    .expandable-icon {
+      @include transform(rotate(0));
+      @include transform-origin(50% 50%);
+    }
+  }
+}
+
+// ====================
+
+// VIEW: all verification steps
+.verification-process {
+
+  // reset: box-sizing (making things so right its scary)
+  * {
+    @include box-sizing(border-box);
+  }
+
+  // reset: typography
+  font-family: $sans-serif;
+
+  // reset: typography - heading
+  h1, h2, h3, h4, h5 ,h6 {
+    @extend %t-title;
+    color: $m-gray-d4;
+  }
+
+  // reset: typography - copy
+  p, ol, ul, dl, input, select, textarea {
+    font-family: $f-sans-serif;
+    color: $m-gray-d1;
+  }
+
+  .copy {
+
+    p, ul, li, dl, blockquote, input, select {
+      margin-bottom: ($baseline*0.75);
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  // reset: copy/text
+
+
+  // reset: forms
+  input,textarea {
+    font-style: normal;
+    font-weight: 400;
+    margin-right: ($baseline/5);
+    padding: ($baseline/4) ($baseline/2);
+  }
+
+  textarea {
+    padding: ($baseline/2);
+  }
+
+  label {
+    @extend %t-weight4;
+    font-family: $sans-serif;
+    font-style: normal;
+    color: $m-gray-d4;
+  }
+
+  // HACK: nasty override due to our bad input/button styling
+  button, input[type="submit"], input[type="button"], button[type="submit"] {
+    @include font-size(16);
+    @extend %t-weight4;
+    text-transform: none;
+    text-shadow: none;
+    letter-spacing: 0;
+  }
+
+  .checkbox label {
+    display: inline-block;
+  }
+
+  input[type="checkbox"] {
+    width: auto;
+  }
+
+  //  reset: lists
+  .list-actions, .list-steps, .progress-steps, .list-controls, .list-fields, .list-nav, .list-help, .list-faq, .nav-wizard, .list-reqs, .list-faq, .review-tasks, .list-tips, .wrapper-photos, .field-group, .list-info {
+    @extend %ui-no-list;
+  }
+
+  // ====================
+
+  // elements: layout
+  .content-wrapper {
+    background: $m-gray-l4;
+    padding-bottom: 0;
+  }
+
+  .container {
+    background-color: $white;
+    padding: ($baseline*1.5) ($baseline*1.5) ($baseline*2) ($baseline*1.5);
+  }
+
+  // ====================
+
+  // elements: common copy
+  .title {
+    @extend %t-title5;
+    @extend %t-weight1;
+  }
+
+  .copy {
+    @extend %t-weight1;
+  }
+
+  // ====================
+
+  // elements - controls
+  .action-primary {
+    @extend %btn-primary-blue;
+    // needed for override due to .register a:link styling
+    border: 0 !important;
+    color: $white !important;
+  }
+
+  .action-confirm {
+    @extend %btn-verify-primary;
+    // needed for override due to .register a:link styling
+    border: 0 !important;
+    color: $white !important;
+  }
+
+  // ====================
+
+  // elements: page depth
+
+  // ====================
+
+  // UI: reports/tables
+  .wrapper-report {
+
+    .report {
+      @extend %ui-window;
+      width: flex-grid(12,12);
+      border-color: $m-gray-t3;
+      border-collapse:collapse;
+
+      tr {
+        text-align: left;
+      }
+
+      td {
+        @extend %t-weight3;
+        vertical-align: middle;
+        padding: ($baseline*0.75) $baseline;
+        color: $m-gray-d3;
+      }
+
+      th {
+        @extend %t-weight2;
+        padding: ($baseline/2) $baseline;
+      }
+
+      thead {
+
+        tr {
+          border-bottom: 1px solid $m-gray-l3;
+        }
+
+        th[scope="col"] {
+          @extend %t-title7;
+          @extend %t-weight2;
+          vertical-align: middle;
+          color: $m-gray-l1;
+          background: $m-gray-l4;
+        }
+      }
+
+      tbody {
+
+        tr {
+          border-bottom: 1px solid $m-gray-l3;
+        }
+      }
+
+      tfoot {
+        background: $m-blue-t0;
+
+        th[scope="row"] {
+
+        }
+      }
+    }
+  }
+
+  // ====================
+
+  // UI: help
+  .help-item {
+
+    .title {
+      @extend %hd-lv4;
+      margin-bottom: ($baseline/4);
+    }
+
+    .copy {
+      @extend %copy-detail;
+    }
+
+    strong {
+      color: $m-gray-d2;
+    }
+  }
+
+  // ====================
+
+  // UI : message
+  .wrapper-msg {
+    margin-bottom: ($baseline*1.5);
+    border-bottom: ($baseline/4) solid $m-blue;
+    padding: $baseline ($baseline*1.5);
+    background: tint($m-blue, 95%);
+
+    .msg {
+      @include clearfix();
+      max-width: grid-width(12);
+      min-width: 760px;
+      width: flex-grid(12);
+      margin: 0 auto;
+    }
+
+    .msg-content, .msg-icon {
+      display: block;
+      float: left;
+    }
+
+    .msg-content {
+      width: flex-grid(11,12);
+
+      .title {
+        @extend %t-title6;
+        @extend %t-weight4;
+      }
+
+      .copy {
+        @extend %t-copy-sub1;
+      }
+    }
+
+    .msg-icon {
+      width: flex-grid(1,12);
+      @extend %t-icon2;
+      margin-right: flex-gutter();
+      text-align: center;
+      color: $m-blue;
+    }
+  }
+
+  // UI: error
+  .wrapper-msg-error {
+    border-bottom-color: $red;
+    background: tint($red, 95%);
+
+    .msg-icon {
+      color: $red;
+    }
+
+    .msg-content {
+
+      .title {
+        color: $red;
+      }
+    }
+  }
+
+  // UI: error
+  .wrapper-msg-activate {
+    border-bottom-color: $m-pink;
+    background: tint($m-pink, 95%);
+
+    .msg-icon {
+      color: $m-pink;
+    }
+
+    .msg-content {
+
+      .title {
+        color: $m-pink;
+      }
+    }
+  }
+
+  // ====================
+
+  // UI: inline messages
+  .msg-inline {
+
+    &.msg-error {
+
+      .copy, .copy p {
+        color: $red;
+      }
+    }
+  }
+
+  // ====================
+
+  // UI: page header
+  .page-header {
+    width: flex-grid(12,12);
+    margin: 0 0 ($baseline/2) 0;
+    border-bottom: ($baseline/4) solid $m-gray-l4;
+
+    .title {
+      @include clearfix();
+      width: flex-grid(12,12);
+
+      .sts-course, .sts-track {
+        display: inline-block;
+        vertical-align: middle;
+      }
+
+      .sts-track {
+        width: flex-grid(3,12);
+        text-align: right;
+
+        .sts-track-value {
+          @extend %copy-badge;
+          color: $white;
+          background: $verified-color-lvl3;
+
+          .context {
+            margin-right: ($baseline/4);
+            opacity: 0.80;
+            color: $white;
+            letter-spacing: 0.1rem;
+          }
+        }
+      }
+
+      .sts-label {
+        @extend %t-title7;
+        @extend %t-weight4;
+        display: block;
+        margin-bottom: ($baseline/2);
+        border-bottom: ($baseline/10) solid $m-gray-l4;
+        padding-bottom: ($baseline/2);
+        color: $m-gray-d1;
+      }
+
+      .sts-course {
+        @extend %t-title;
+        width: flex-grid(9,12);
+        text-transform: none;
+      }
+
+      .sts-course-org, .sts-course-number {
+        @extend %t-title5;
+        @extend %t-weight4;
+        display: inline-block;
+      }
+
+      .sts-course-org {
+        margin-right: ($baseline/4);
+      }
+
+      .sts-course-name {
+        @include font-size(28);
+        @include line-height(28);
+        @extend %t-weight4;
+        display: block;
+      }
+    }
+  }
+
+  // ====================
+
+  // UI : progress
+  .wrapper-progress {
+    position: relative;
+    margin-bottom: ($baseline*1.5);
+  }
+
+  .progress-sts {
+    @include size(($baseline/4));
+    @extend %ui-depth1;
+    position: absolute;
+    top: 43px;
+    left: 7%;
+    display: block;
+    width: 83%;
+    margin: 0 auto;
+    background: $m-gray-l4;
+
+    .progress-sts-value {
+      width: 0%;
+      height: 100%;
+      display: block;
+      background: $verified-color-lvl4;
+    }
+  }
+
+  .progress {
+    width: flex-grid(12,12);
+    margin: 0 auto;
+    border-bottom: ($baseline/4) solid $m-gray-l4;
+
+    .progress-steps {
+      @include clearfix();
+      position: relative;
+      top: ($baseline/4);
+      display: table;
+      width: 100%;
+    }
+
+    .progress-step {
+      @extend %ui-depth2;
+      position: relative;
+      display: table-cell;
+      height: ($baseline*6);
+      padding: $baseline $baseline ($baseline*1.5) $baseline;
+      text-align: center;
+
+      .wrapper-step-number, .step-number, .step-name {
+        display: block;
+      }
+
+      .wrapper-step-number {
+        @include size(($baseline*2) ($baseline*2));
+        margin: 0 auto ($baseline/2) auto;
+        border-radius: ($baseline*10);
+        border: ($baseline/5) solid $m-gray-l4;
+        background: $white;
+
+        .step-number {
+          @extend %t-title7;
+          @extend %t-weight4;
+          @include line-height(0);
+          margin: 16px auto 0 auto;
+          color: $m-gray-l1;
+        }
+      }
+
+      .step-name {
+        @extend %t-title7;
+        @extend %t-weight4;
+        color: $m-gray-l1;
+      }
+
+      // confirmation step w/ icon
+      &.progress-step-icon {
+
+        .step-number {
+          margin-top: ($baseline/2);
+        }
+      }
+
+      // STATE: is completed
+      &.is-completed {
+        border-bottom: ($baseline/5) solid $verified-color-lvl3;
+
+        .wrapper-step-number {
+          border-color: $verified-color-lvl3;
+        }
+
+        .step-number, .step-name {
+          color: $m-gray-l3;
+        }
+      }
+
+      // STATE: is current
+      &.is-current {
+        border-bottom: ($baseline/5) solid $m-blue-d1;
+        opacity: 1.0;
+
+        .wrapper-step-number {
+          border-color: $m-blue-d1;
+        }
+
+        .step-number, .step-name {
+          color: $m-gray-d3;
+        }
+      }
+    }
+  }
+
+  // ====================
+
+  // UI: reverification message
+  .wrapper-reverification {
+    border-bottom: ($baseline/10) solid $m-pink;
+    margin-bottom: $baseline;
+    padding-bottom: $baseline;
+    position: relative;
+
+    .deco-arrow {
+      @include triangle($baseline, $m-pink, down);
+      position: absolute;
+      bottom: -($baseline);
+      left: 50%;
+    }
+  }
+
+  .reverification {
+
+    .message {
+
+      .title {
+        @extend %hd-lv3;
+        color: $m-pink;
+      }
+
+      .copy {
+        @extend %t-copy-sub1;
+      }
+    }
+  }
+
+  // ====================
+
+  // UI: slides
+  .carousel {
+
+    // carousel item
+    .carousel-item {
+      opacity: 0.0;
+    }
+
+    // STATE: active
+    .carousel-active {
+      opacity: 1.0;
+    }
+
+    // indiv slides
+    .wrapper-view {
+
+    }
+
+    .view {
+      width: flex-grid(12,12);
+
+      > .title {
+        @extend %hd-lv2;
+        color: $m-blue-d1;
+      }
+
+      .instruction {
+        @extend %t-copy-lead1;
+        margin-bottom: $baseline;
+      }
+    }
+
+    .wrapper-task {
+      @include clearfix();
+      width: flex-grid(12,12);
+      margin: $baseline 0;
+
+      .wrapper-help {
+        float: right;
+        width: flex-grid(6,12);
+        padding: 0 $baseline;
+
+        .help {
+          margin-bottom: ($baseline*1.5);
+
+          &:last-child {
+            margin-bottom: 0;
+          }
+
+          .title {
+            @extend %hd-lv3;
+          }
+
+          .copy {
+            @extend %copy-detail;
+          }
+
+          .example {
+            color: $m-gray-l2;
+          }
+
+          // help - general list
+          .list-help {
+            margin-top: ($baseline/2);
+            color: $black;
+
+            .help-item {
+              margin-bottom: ($baseline/4);
+              border-bottom: 1px solid $m-gray-l4;
+              padding-bottom: ($baseline/4);
+
+              &:last-child {
+                margin-bottom: 0;
+                border-bottom: none;
+                padding-bottom: 0;
+              }
+            }
+
+            .help-item-emphasis {
+              @extend %t-weight4;
+            }
+          }
+
+          // help - faq
+          .list-faq {
+            margin-bottom: $baseline;
+          }
+        }
+      }
+
+      .task {
+        @extend %ui-window;
+        float: left;
+        width: flex-grid(6,12);
+        margin-right: flex-gutter();
+      }
+
+      .controls {
+        padding: ($baseline*0.75) $baseline;
+        background: $m-gray-l4;
+
+        .list-controls {
+          position: relative;
+        }
+
+        .control {
+          position: absolute;
+
+          .action {
+            @extend %btn-primary-blue;
+            padding: ($baseline/2) ($baseline*0.75);
+
+            *[class^="icon-"] {
+              @extend %t-icon4;
+              padding: ($baseline*.25) ($baseline*.5);
+              display: block;
+            }
+          }
+
+          // STATE: hidden
+          &.is-hidden {
+            visibility: hidden;
+          }
+
+          // STATE: shown
+          &.is-shown {
+            visibility: visible;
+          }
+
+          // STATE: approved
+          &.approved {
+
+            .action {
+              @extend %btn-verify-primary;
+              padding: ($baseline/2) ($baseline*0.75);
+            }
+          }
+        }
+
+        // control - redo
+        .control-redo {
+          position: absolute;
+          left: ($baseline/2);
+        }
+
+        // control - take/do
+        .control-do {
+          left: 45%;
+        }
+
+        // control - approve
+        .control-approve {
+          position: absolute;
+          right: ($baseline/2);
+        }
+      }
+
+      .msg {
+        @include clearfix();
+        margin-top: ($baseline*2);
+
+        .copy {
+          float: left;
+          width: flex-grid(8,12);
+          margin-right: flex-gutter();
+        }
+
+        .list-actions {
+          position: relative;
+          top: -($baseline/2);
+          float: left;
+          width: flex-grid(4,12);
+          text-align: right;
+
+          .action-retakephotos a {
+            @extend %btn-primary-blue;
+            @include font-size(14);
+            padding: ($baseline/2) ($baseline*.75);
+          }
+        }
+      }
+
+      .msg-followup {
+        border-top: ($baseline/10) solid $m-gray-t0;
+        padding-top: $baseline;
+      }
+    }
+
+    // indiv slides - photo
+    #wrapper-facephoto {
+
+    }
+
+    // indiv slides - ID
+    #wrapper-idphoto {
+
+    }
+
+    // indiv slides - review
+    #wrapper-review {
+
+      .review-task {
+        margin-bottom: ($baseline*1.5);
+        padding: ($baseline*0.75) $baseline;
+        border-radius: ($baseline/10);
+        background: $m-gray-l4;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        > .title {
+          @extend %hd-lv3;
+        }
+
+        .copy {
+          @extend %copy-base;
+
+          strong {
+            @extend %t-weight5;
+            color: $m-gray-d4;
+          }
+        }
+      }
+
+      // individual task - photos
+      .review-task-photos {
+
+        .wrapper-photos {
+          @include clearfix();
+          width: flex-grid(12,12);
+          margin: $baseline 0;
+
+          .wrapper-photo {
+            float: left;
+            width: flex-grid(6,12);
+            margin-right: flex-gutter();
+
+            &:last-child {
+              margin-right: 0;
+            }
+
+            .placeholder-photo {
+              @extend %ui-window;
+              padding: ($baseline*0.75) $baseline;
+
+              img {
+                display: block;
+                width: 100%;
+                margin: 0 auto;
+              }
+            }
+          }
+
+          .help-tips {
+            margin-left: $baseline;
+
+            .title {
+              @extend %hd-lv5;
+            }
+
+            .copy {
+              @extend %copy-detail;
+            }
+
+            // help - general list
+            .list-tips {
+              color: $black;
+
+              .tip {
+                margin-bottom: ($baseline/4);
+                border-bottom: 1px solid $m-gray-t0;
+                padding-bottom: ($baseline/4);
+
+                &:last-child {
+                  margin-bottom: 0;
+                  border-bottom: none;
+                  padding-bottom: 0;
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // individual task - name
+      .review-task-name {
+        @include clearfix();
+
+        .copy {
+          float: left;
+          width: flex-grid(8,12);
+          margin-right: flex-gutter();
+        }
+
+        .list-actions {
+          position: relative;
+          top: -($baseline);
+          float: left;
+          width: flex-grid(4,12);
+          text-align: right;
+
+          .action-editname a {
+            @extend %btn-primary-blue;
+            @include font-size(14);
+            padding: ($baseline/2) ($baseline*.75);
+          }
+        }
+      }
+
+      // individual task - contribution
+      .review-task-contribution {
+
+        .list-fields {
+          @include clearfix();
+          margin: $baseline 0;
+
+          .field {
+            float: left;
+            margin-right: ($baseline/2);
+            padding: ($baseline/2) ($baseline*0.75);
+            background: $m-gray-t0;
+
+            &:last-child {
+              margin-right: 0;
+            }
+          }
+
+          .field-group-other {
+
+            .contribution-option {
+              display: inline-block;
+              vertical-align: middle;
+              margin-right: ($baseline/4);
+              padding: 3px 0;
+
+              &:last-child {
+                margin-right: 0;
+              }
+            }
+
+            .contribution-option-other1 label, .contribution-option-other2 label {
+              @extend %text-sr;
+            }
+          }
+        }
+      }
+    }
+
+  }
+
+  // UI: camera states
+  .cam {
+
+    .placeholder-cam {
+      position: relative;
+      width: 95%;
+      height: 375px;
+      margin: ($baseline/2) auto;
+      background: $m-blue-l5;
+
+      // placeholders
+      .placeholder-art {
+        opacity: 0.7;
+        z-index: 100;
+
+        .copy {
+          position: absolute;
+          top: 40%;
+          margin: 0 40px;
+          text-align: center;
+        }
+      }
+
+      // previously defined in HTML
+      video, canvas {
+        position: relative;
+        display: block;
+        @include size(100% 100%);
+        z-index: 500;
+      }
+    }
+
+    .controls {
+      height: ($baseline*4);
+    }
+  }
+
+  // ====================
+
+  // UI: deco - divider
+  .deco-divider {
+    position: relative;
+    display: block;
+    margin: $baseline 0 ($baseline*2) 0;
+    border-top: ($baseline/5) solid $m-gray-l4;
+
+    .copy {
+      @extend %t-copy-lead1;
+      @extend %t-weight4;
+      position: absolute;
+      top: -($baseline*1.25);
+      left: 45%;
+      padding: ($baseline/2) ($baseline*1.5);
+      background: white;
+      text-align: center;
+      color: $m-gray-l2;
+    }
+  }
+
+
+  // ====================
+
+  // UI: nav - wizard
+  .nav-wizard {
+    @extend %ui-well;
+    @include clearfix;
+    width: flex-grid(12,12);
+    border-radius: ($baseline/10);
+    background: $m-gray-l4;
+
+    .help-inline, .wizard-steps {
+
+    }
+
+    .help-inline {
+      @extend %t-copy-sub1;
+      float: left;
+      width: flex-grid(6,12);
+      margin: ($baseline*0.75) flex-gutter() 0 0;
+    }
+
+    .wizard-steps {
+      float: right;
+      width: flex-grid(6,12);
+      text-align: right;
+    }
+
+    // STATE: is ready
+    &.is-ready {
+      background: $m-blue-l4;
+    }
+
+    &.is-not-ready {
+      background: $m-gray-l4;
+
+      .action-primary {
+        @extend %btn-primary-disabled;
+      }
+    }
+  }
+
+  // ====================
+
+  // UI: forms - payment
+  .contribution-options {
+
+    .contribution-option {
+      border-radius: ($baseline/5);
+
+      .label, label, input {
+        display: inline-block;
+        vertical-align: middle;
+      }
+
+      .label, label {
+        margin-bottom: 0;
+        padding: 6px 0;
+      }
+
+      input {
+        margin-right: ($baseline/4);
+      }
+
+      .deco-denomination, .label-value, .denomination-name {
+        display: inline-block;
+        vertical-align: middle;
+      }
+
+      .deco-denomination {
+      }
+
+      .label-value {
+        @extend %t-weight4;
+      }
+
+      .denomination-name {
+        @include font-size(14);
+        color: $m-gray-l1;
+      }
+
+      // specific fields
+      #contribution-other-amt {
+        width: ($baseline*4.5);
+        padding: ($baseline/4) ($baseline/2);
+      }
+    }
+  }
+
+  // ====================
+
+  // help - faq
+  .list-faq {
+
+    .faq-question {
+      @extend %hd-lv3;
+      border-bottom: 1px solid $m-gray-l4;
+      padding-bottom: ($baseline/4);
+    }
+
+    .faq-answer {
+      margin-bottom: ($baseline*1.25);
+    }
+  }
+
+  // ====================
+
+  // UI: main content
+  .wrapper-content-main {
+
+  }
+
+  .content-main {
+    width: flex-grid(12,12);
+
+    > .title {
+      @extend %hd-lv2;
+      color: $m-blue-d1;
+    }
+
+    .instruction {
+      @extend %t-copy-lead1;
+      margin-bottom: $baseline;
+    }
+  }
+
+  // ====================
+
+  // UI: supplemental content
+  .wrapper-content-supplementary {
+    margin: ($baseline*1.5) 0;
+    border-top: ($baseline/4) solid $m-gray-l4;
+  }
+
+  .content-supplementary {
+    width: flex-grid(12,12);
+
+    .list-help {
+      @include clearfix();
+
+      .help-item {
+        width: flex-grid(4,12);
+        float: left;
+        margin-right: flex-gutter();
+
+        &:last-child {
+          margin-right: 0
+        }
+      }
+    }
+  }
+
+  // ====================
+
+  // VIEW: select a track
+  &.step-select-track {
+
+    .sts-track {
+      @extend %text-sr;
+    }
+
+    .form-register-choose {
+      @include clearfix();
+      width: flex-grid(12,12);
+      margin: ($baseline*2) 0;
+
+      .deco-divider {
+        width: flex-grid(8,12);
+        float: left;
+      }
+    }
+
+    .register-choice, .help-register {
+      float: left;
+    }
+
+    .register-choice {
+      width: flex-grid(8,12);
+      margin: 0 flex-gutter() $baseline 0;
+      border-top: ($baseline/4) solid $m-gray-d4;
+      padding: $baseline ($baseline*1.5);
+      background: $m-gray-l4;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      .wrapper-copy, .list-actions {
+        display: inline-block;
+        vertical-align: middle;
+      }
+
+      .wrapper-copy {
+        width: flex-grid(8,8);
+      }
+
+      .list-actions {
+        width: flex-grid(8,8);
+        text-align: right;
+      }
+
+      .title {
+        @extend %t-title5;
+        @extend %t-weight5;
+        margin-bottom: ($baseline/2);
+      }
+
+      .copy {
+        @extend %t-copy-base;
+      }
+
+      .action-select input {
+        @extend %t-weight4;
+        padding: ($baseline/2) ($baseline*0.75);
+      }
+    }
+
+    .register-choice-audit {
+      border-color: $m-blue-d1;
+
+      .wrapper-copy {
+        width: flex-grid(5,8);
+      }
+
+      .list-actions {
+        width: flex-grid(3,8);
+      }
+
+      .action-select input {
+        @extend %btn-primary-blue;
+      }
+    }
+
+    .register-choice-certificate {
+      border-color: $verified-color-lvl3;
+      position: relative;
+
+      .deco-ribbon {
+        position: absolute;
+        top: -($baseline*1.5);
+        right: $baseline;
+        display: block;
+        width: ($baseline*3);
+        height: ($baseline*4);
+        background: transparent url('../images/vcert-ribbon-s.png') no-repeat 0 0;
+      }
+
+      .list-actions {
+        margin: ($baseline/2) 0;
+        border-top: ($baseline/10) solid $m-gray-t1;
+        padding-top: $baseline;
+      }
+
+      .action-intro, .action-select {
+        display: inline-block;
+        vertical-align: middle;
+      }
+
+      .action-intro {
+        @extend %copy-detail;
+        width: flex-grid(3,8);
+        text-align: left;
+      }
+
+      .action-select {
+        width: flex-grid(5,8);
+      }
+
+      .action-select input {
+        @extend %btn-verify-primary;
+      }
+
+      .action-intro {
+
+      }
+
+      // extra register options/info
+      .title-expand {
+        @extend %t-copy-sub1;
+        font-weight: 500 !important;
+        display: inline-block;
+        margin: 0;
+      }
+
+      .expandable-area {
+        margin: $baseline 0;
+      }
+    }
+
+    .help-register {
+      width: flex-grid(4,12);
+
+      .title {
+        @extend %hd-lv4;
+        @extend %t-weight4;
+        margin-top: $baseline;
+        margin-bottom: ($baseline/2);
+      }
+
+      .copy {
+        @extend %copy-detail;
+      }
+    }
+
+    // progress indicator
+    .progress-sts-value {
+      width: 0%;
+    }
+
+    // contribution selection
+    .field-certificate-contribution {
+      margin: $baseline 0;
+
+      .label {
+        @extend %hd-lv4;
+        @extend %t-weight4;
+        margin-bottom: ($baseline/2);
+      }
+    }
+
+    .contribution-options {
+      @include clearfix();
+      margin: $baseline 0;
+
+      .field {
+        float: left;
+        margin: 0 ($baseline/2) ($baseline/2) 0;
+        padding: ($baseline/2) ($baseline*0.75);
+        background: $m-gray-t0;
+
+        input {
+          width: auto;
+          padding: 0;
+        }
+
+        &:last-child {
+          margin-right: 0;
+        }
+      }
+
+      #contribution-other-amt {
+        width: ($baseline*4.5);
+        padding: ($baseline/4) ($baseline/2);
+      }
+
+      .field-group-other {
+
+        .contribution-option {
+          display: inline-block;
+          vertical-align: middle;
+          margin-right: ($baseline/4);
+          padding: 1px 0;
+
+          &:last-child {
+            margin-right: 0;
+          }
+        }
+
+        .contribution-option-other1 label, .contribution-option-other2 label {
+          @extend %text-sr;
+        }
+      }
+    }
+  }
+
+  // VIEW: requirements
+  &.step-requirements {
+
+    .help-item-technical {
+      display: none;
+    }
+
+    // progress nav
+    .progress .progress-step {
+
+      // STATE: is current
+      &#progress-step0 {
+        border-bottom: ($baseline/5) solid $m-blue-d1;
+        opacity: 1.0;
+
+        .wrapper-step-number {
+          border-color: $m-blue-d1;
+        }
+
+        .step-number, .step-name {
+          color: $m-gray-d3;
+        }
+      }
+    }
+
+    // progress indicator
+    .progress-sts-value {
+      width: 0%;
+    }
+
+    .list-reqs {
+      @include clearfix();
+      width: flex-grid(12,12);
+
+      .req {
+        @extend %ui-window;
+        width: flex-grid(4,12);
+        min-height: ($baseline*15);
+        float: left;
+        margin-right: flex-gutter();
+        border-color: $verified-color-lvl4;
+        text-align: center;
+
+        &:last-child {
+          margin-right: 0;
+        }
+
+        .title {
+          @extend %t-title5;
+          @extend %t-weight4;
+          padding: $baseline;
+          border-bottom: 1px solid $verified-color-lvl4;
+          background: $verified-color-lvl5;
+
+        }
+
+        .placeholder-art {
+          position: relative;
+          display: inline-block;
+          margin: $baseline 0 ($baseline/2) 0;
+          padding: $baseline;
+          background: $verified-color-lvl3;
+          border-radius: ($baseline*10);
+
+          *[class^="icon"] {
+            @extend %t-icon1;
+            color: $white;
+          }
+
+          .icon-over, .icon-under {
+            position: relative;
+          }
+
+          .icon-under {
+            @extend %ui-depth1;
+          }
+
+          .icon-over {
+            @extend %ui-depth2;
+            @extend %t-icon5;
+            position: absolute;
+            left: 24px;
+            top: 34px;
+            background: $verified-color-lvl3;
+            padding: 3px 5px;
+          }
+        }
+
+        .copy {
+          padding: ($baseline/2) $baseline;
+        }
+
+        .copy-super, .copy-sub {
+          display: block;
+        }
+
+        .copy-super {
+          @extend %t-copy-base;
+          margin-bottom: ($baseline/2);
+          color: $verified-color-lvl1;
+        }
+
+        .copy-sub {
+          @extend %t-copy-sub2;
+        }
+
+        .actions {
+          padding: ($baseline/2) $baseline;
+        }
+      }
+
+      // specific requirements
+      .req-activate {
+        float: left;
+        text-align: center;
+        border-color: $m-pink-l3;
+
+        .title {
+          @extend %t-title5;
+          @extend %t-weight4;
+          border-bottom-color: $m-pink-l3;
+          background: tint($m-pink, 95%);
+          color: $m-pink;
+        }
+
+        .placeholder-art {
+          background: $m-pink-l1;
+        }
+
+        .copy-super {
+          @extend %t-copy-lead1;
+          color: $m-pink;
+        }
+
+        .copy-sub {
+          @extend %t-copy-base;
+        }
+      }
+
+      // CASE: account not activated
+      &.account-not-activated {
+
+        .req {
+          width: flex-grid(3,12);
+          min-height: ($baseline*18);
+        }
+      }
+    }
+  }
+
+  // VIEW: take and review photos
+  &.step-photos {
+
+  }
+
+  // VIEW: take cam photo
+  &.step-photos-cam {
+
+    // progress nav
+    .progress .progress-step {
+
+      // STATE: is completed
+       &#progress-step0 {
+        border-bottom: ($baseline/5) solid $verified-color-lvl3;
+
+        .wrapper-step-number {
+          border-color: $verified-color-lvl3;
+        }
+
+        .step-number, .step-name {
+          color: $m-gray-l3;
+        }
+      }
+
+      // STATE: is current
+      &#progress-step1 {
+        border-bottom: ($baseline/5) solid $m-blue-d1;
+        opacity: 1.0;
+
+        .wrapper-step-number {
+          border-color: $m-blue-d1;
+        }
+
+        .step-number, .step-name {
+          color: $m-gray-d3;
+        }
+      }
+    }
+
+    // progress indicator
+    .progress-sts-value {
+      width: 14%;
+    }
+  }
+
+  // VIEW: take id photo
+  &.step-photos-id {
+
+    // progress nav
+    .progress .progress-step {
+
+      // STATE: is completed
+       &#progress-step0, &#progress-step1 {
+        border-bottom: ($baseline/5) solid $verified-color-lvl3;
+
+        .wrapper-step-number {
+          border-color: $verified-color-lvl3;
+        }
+
+        .step-number, .step-name {
+          color: $m-gray-l3;
+        }
+      }
+
+      // STATE: is current
+      &#progress-step2 {
+        border-bottom: ($baseline/5) solid $m-blue-d1;
+        opacity: 1.0;
+
+        .wrapper-step-number {
+          border-color: $m-blue-d1;
+        }
+
+        .step-number, .step-name {
+          color: $m-gray-d3;
+        }
+      }
+    }
+
+    // progress indicator
+    .progress-sts-value {
+      width: 36%;
+    }
+  }
+
+  // VIEW: review photos
+  &.step-review {
+
+    .help-item-technical {
+      display: none;
+    }
+
+    .modal.edit-name .submit input {
+      color: #fff;
+    }
+
+    .modal {
+
+      fieldset {
+        margin-top: $baseline;
+      }
+
+      .close-modal {
+        @include font-size(24);
+        color: $m-blue-d3;
+
+        &:hover, &:focus {
+          color: $m-blue-d1;
+          border: none;
+        }
+      }
+    }
+
+    .nav-wizard {
+
+      .prompt-verify {
+        float: left;
+        width: flex-grid(6,12);
+        margin: 0 flex-gutter() 0 0;
+
+        .title {
+          @extend %hd-lv4;
+          margin-bottom: ($baseline/4);
+        }
+
+        .copy {
+          @extend %t-copy-sub1;
+          @extend %t-weight3;
+        }
+
+        .list-actions {
+          margin-top: ($baseline/2);
+        }
+
+        .action-verify label  {
+          @extend %t-copy-sub1;
+        }
+      }
+
+      .wizard-steps {
+        margin-top: ($baseline/2);
+
+        .wizard-step {
+          margin-right: flex-gutter();
+          display: inline-block;
+          vertical-align: middle;
+
+          &:last-child {
+            margin-right: 0;
+          }
+        }
+      }
+
+      .step-match {
+
+        label {
+          @extend %t-copy-sub1;
+        }
+      }
+
+      .step-proceed {
+
+      }
+    }
+
+    // progress nav
+    .progress .progress-step {
+
+      // STATE: is completed
+       &#progress-step0, &#progress-step1, &#progress-step2 {
+        border-bottom: ($baseline/5) solid $verified-color-lvl3;
+
+        .wrapper-step-number {
+          border-color: $verified-color-lvl3;
+        }
+
+        .step-number, .step-name {
+          color: $m-gray-l3;
+        }
+      }
+
+      // STATE: is current
+      &#progress-step3 {
+        border-bottom: ($baseline/5) solid $m-blue-d1;
+        opacity: 1.0;
+
+        .wrapper-step-number {
+          border-color: $m-blue-d1;
+        }
+
+        .step-number, .step-name {
+          color: $m-gray-d3;
+        }
+      }
+    }
+
+    // progress indicator
+    .progress-sts-value {
+      width: 55%;
+    }
+  }
+
+  // VIEW: confirmation/receipt
+  &.step-confirmation {
+
+    .help-item-technical {
+      display: none;
+    }
+
+    // progress nav
+    .progress .progress-step {
+
+      // STATE: is completed
+       &#progress-step0, &#progress-step1, &#progress-step2, &#progress-step3, &#progress-step4 {
+        border-bottom: ($baseline/5) solid $verified-color-lvl3;
+
+        .wrapper-step-number {
+          border-color: $verified-color-lvl3;
+        }
+
+        .step-number, .step-name {
+          color: $m-gray-l3;
+        }
+      }
+
+      // STATE: is current
+      &#progress-step5 {
+        border-bottom: ($baseline/5) solid $m-blue-d1;
+        opacity: 1.0;
+
+        .wrapper-step-number {
+          border-color: $m-blue-d1;
+        }
+
+        .step-number, .step-name {
+          color: $m-gray-d3;
+        }
+      }
+    }
+
+    // progress indicator
+    .progress-sts-value {
+      width: 100%;
+    }
+
+    // information elements
+    .list-info {
+
+      .info-item {
+        margin-bottom: ($baseline*1.5);
+        border-bottom: ($baseline/4) solid $m-gray-l4;
+        padding-bottom: ($baseline*1.5);
+
+        &:last-child {
+          margin-bottom: 0;
+          border-bottom: none;
+          padding-bottom: 0;
+        }
+
+        > .title {
+          @extend %hd-lv3;
+          margin-bottom: $baseline;
+        }
+
+        .copy {
+          @extend %copy-base;
+          margin-bottom: $baseline;
+        }
+      }
+    }
+
+    // information - course
+    .course-info {
+
+      .options {
+
+        .action-course {
+          @extend %btn-primary-blue;
+          @include font-size(14);
+          padding: 5px 10px;
+        }
+      }
+
+      .course-actions {
+
+        .action-dashboard {
+          @extend %btn-primary-blue;
+        }
+      }
+    }
+
+    // information - verification
+    .verification-info {
+
+    }
+
+    // information - payment
+    .payment-info {
+
+    }
+
+    // UI: table/report
+    .wrapper-report {
+
+      .report {
+
+      }
+    }
+  }
+}
+// ====================
+
+// STATE: already verified
+.register.is-verified {
+
+  .nav-wizard .price-value {
+    @extend %t-weight4;
+    @include font-size(16);
+    margin-top: 18px;
+    color: $m-blue-d1;
+  }
+
+  // progress nav
+  .progress .progress-step {
+
+    // STATE: is completed
+     &#progress-step1 {
+      border-bottom: ($baseline/5) solid $verified-color-lvl3;
+
+      .wrapper-step-number {
+        border-color: $verified-color-lvl3;
+      }
+
+      .step-number, .step-name {
+        color: $m-gray-l3;
+      }
+    }
+
+    // STATE: is current
+    &#progress-step2 {
+      border-bottom: ($baseline/5) solid $m-blue-d1;
+      opacity: 1.0;
+
+      .wrapper-step-number {
+        border-color: $m-blue-d1;
+      }
+
+      .step-number, .step-name {
+        color: $m-gray-d3;
+      }
+    }
+  }
+
+  // progress indicator
+  .progress-sts {
+    width: 75%;
+    left: 13%;
+  }
+
+  .progress-sts-value {
+    width: 32% !important;
+  }
+}
+
+// ====================
+
+// STATE: upgrading registration type
+.register.is-upgrading {
+
+  .form-register-choose {
+    margin-top: ($baseline*2) !important;
+  }
+}
+
+// STATE: re-verifying
+.register.is-not-verified {
+
+  .help-item-emphasis {
+    color: $m-pink;
+  }
+
+  // progress indicator
+  .progress-sts {
+    width: 72%;
+    left: 15%;
+  }
+
+  // VIEW: photo
+  &.step-photos {
+
+    // progress nav
+    .progress .progress-step {
+
+      // STATE: is current
+      &#progress-step1 {
+        border-bottom: ($baseline/5) solid $m-blue-d1;
+        opacity: 1.0;
+
+        .wrapper-step-number {
+          border-color: $m-blue-d1;
+        }
+
+        .step-number, .step-name {
+          color: $m-gray-d3;
+        }
+      }
+    }
+
+    .progress-sts-value {
+      width: 0% !important;
+    }
+  }
+
+  // VIEW: ID
+  &.step-photos-id {
+
+    // progress nav
+    .progress .progress-step {
+
+      // STATE: is completed
+       &#progress-step1 {
+        border-bottom: ($baseline/5) solid $verified-color-lvl3;
+
+        .wrapper-step-number {
+          border-color: $verified-color-lvl3;
+        }
+
+        .step-number, .step-name {
+          color: $m-gray-l3;
+        }
+      }
+
+      // STATE: is current
+      &#progress-step2 {
+        border-bottom: ($baseline/5) solid $m-blue-d1;
+        opacity: 1.0;
+
+        .wrapper-step-number {
+          border-color: $m-blue-d1;
+        }
+
+        .step-number, .step-name {
+          color: $m-gray-d3;
+        }
+      }
+    }
+
+    .progress-sts-value {
+      width: 40% !important;
+    }
+  }
+
+  // VIEW: REVIEW
+  &.step-review {
+
+    // progress nav
+    .progress .progress-step {
+
+      // STATE: is completed
+       &#progress-step1, &#progress-step2 {
+        border-bottom: ($baseline/5) solid $verified-color-lvl3;
+
+        .wrapper-step-number {
+          border-color: $verified-color-lvl3;
+        }
+
+        .step-number, .step-name {
+          color: $m-gray-l3;
+        }
+      }
+
+      // STATE: is current
+      &#progress-step3 {
+        border-bottom: ($baseline/5) solid $m-blue-d1;
+        opacity: 1.0;
+
+        .wrapper-step-number {
+          border-color: $m-blue-d1;
+        }
+
+        .step-number, .step-name {
+          color: $m-gray-d3;
+        }
+      }
+    }
+
+    .progress-sts-value {
+      width: 70% !important;
+    }
+  }
+
+  &.step-confirmation {
+
+    .content-confirmation {
+      margin-bottom: ($baseline*2);
+    }
+
+    .view {
+
+      .title {
+        @extend %hd-lv2;
+        color: $m-blue-d1;
+      }
+
+      .instruction {
+        @extend %t-copy-lead1;
+        margin-bottom: $baseline;
+      }
+    }
+  }
+}

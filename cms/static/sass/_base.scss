@@ -8,7 +8,7 @@ html {
 }
 
 body {
-  @extend .t-copy-base;
+  @extend %t-copy-base;
   min-width: $fg-min-width;
   background: $gray-l5;
   color: $gray-d2;
@@ -29,7 +29,7 @@ a {
 }
 
 h1 {
-  @extend .t-title4;
+  @extend %t-title4;
   font-weight: 300;
 }
 
@@ -51,13 +51,13 @@ h1 {
 
 // typography - basic
 .page-header {
-  @extend .t-title3;
+  @extend %t-title3;
   display: block;
   font-weight: 600;
   color: $gray-d3;
 
   .subtitle {
-    @extend .t-title7;
+    @extend %t-title7;
     position: relative;
     top: ($baseline/4);
     display: block;
@@ -67,29 +67,29 @@ h1 {
 }
 
 .section-header {
-  @extend .t-title4;
+  @extend %t-title4;
   font-weight: 600;
 
   .subtitle {
-    @extend .t-title7;
+    @extend %t-title7;
   }
 }
 
 .area-header {
-  @extend .t-title6;
+  @extend %t-title6;
   font-weight: 600;
 
   .subtitle {
-    @extend .t-title8;
+    @extend %t-title8;
   }
 }
 
 .area-subheader {
-  @extend .t-title7;
+  @extend %t-title7;
   font-weight: 600;
 
   .subtitle {
-    @extend .t-title9;
+    @extend %t-title9;
   }
 }
 
@@ -198,35 +198,35 @@ h1 {
 
 // typography - loose headings (BT: needs to be removed once html is clean)
 .title-1 {
-  @extend .t-title3;
+  @extend %t-title3;
   margin-bottom: ($baseline*1.5);
 }
 
 .title-2 {
-  @extend .t-title4;
+  @extend %t-title4;
   margin-bottom: $baseline;
 }
 
 .title-3 {
-  @extend .t-title5;
+  @extend %t-title5;
   margin-bottom: ($baseline/2);
 }
 
 .title-4 {
-  @extend .t-title7;
+  @extend %t-title7;
   margin-bottom: $baseline;
   font-weight: 500
 }
 
 .title-5 {
-  @extend .t-title7;
+  @extend %t-title7;
   color: $gray-l1;
   margin-bottom: $baseline;
   font-weight: 500
 }
 
 .title-6 {
-  @extend .t-title7;
+  @extend %t-title7;
   color: $gray-l2;
   margin-bottom: $baseline;
   font-weight: 500
@@ -340,7 +340,7 @@ p, ul, ol, dl {
 
 .content {
   @include clearfix();
-  @extend .t-copy-base;
+  @extend %t-copy-base;
   max-width: $fg-max-width;
   min-width: $fg-min-width;
   width: flex-grid(12);
@@ -354,54 +354,18 @@ p, ul, ol, dl {
     padding-bottom: ($baseline/2);
 
     .title-sub {
-      @extend .t-copy-sub1;
+      @extend %t-copy-sub1;
       display: block;
       margin: 0;
       color: $gray-l2;
     }
 
     .title-1 {
-      @extend .t-title3;
+      @extend %t-title3;
       margin: 0;
       padding: 0;
       font-weight: 600;
       color: $gray-d3;
-    }
-  }
-
-  .introduction {
-    @include box-sizing(border-box);
-    @extend .t-copy-sub1;
-    width: flex-grid(12);
-    margin: 0 0 $baseline 0;
-
-    .copy strong {
-      font-weight: 600;
-    }
-
-    &.has-links {
-      @include clearfix();
-
-      .copy {
-        float: left;
-        width: flex-grid(8,12);
-        margin-right: flex-gutter();
-      }
-
-      .nav-introduction-supplementary {
-        @extend .t-copy-sub2;
-        float: right;
-        width: flex-grid(4,12);
-        display: block;
-        text-align: right;
-
-        .icon {
-          @extend .t-action3;
-          display: inline-block;
-          vertical-align: middle;
-          margin-right: ($baseline/4);
-        }
-      }
     }
   }
 }
@@ -414,16 +378,16 @@ p, ul, ol, dl {
 .content-primary {
 
   .title-1 {
-    @extend .t-title3;
+    @extend %t-title3;
   }
 
   .title-2 {
-    @extend .t-title4;
+    @extend %t-title4;
     margin: 0 0 ($baseline/2) 0;
   }
 
   .title-3 {
-    @extend .t-title6;
+    @extend %t-title6;
     margin: 0 0 ($baseline/2) 0;
   }
 
@@ -437,7 +401,7 @@ p, ul, ol, dl {
     }
 
     .tip {
-      @extend .t-copy-sub2;
+      @extend %t-copy-sub2;
       width: flex-grid(7, 12);
       float: right;
       margin-top: ($baseline/2);
@@ -452,52 +416,6 @@ p, ul, ol, dl {
 
   > section {
     margin: 0 0 $baseline 0;
-  }
-
-  .bit {
-    @extend .t-copy-sub1;
-    margin: 0 0 $baseline 0;
-    border-bottom: 1px solid $gray-l4;
-    padding: 0 0 $baseline 0;
-    color: $gray-l1;
-
-    &:last-child {
-      margin-bottom: 0;
-      border: none;
-      padding-bottom: 0;
-    }
-
-    h3 {
-      @extend .t-title7;
-      margin: 0 0 ($baseline/4) 0;
-      color: $gray-d2;
-      font-weight: 600;
-    }
-
-    p {
-      margin: 0 0 $baseline 0;
-
-      &:last-child {
-        margin-bottom: 0;
-      }
-    }
-
-    // navigation
-    .nav-related, .nav-page {
-
-      .nav-item {
-        margin-bottom: ($baseline/4);
-        border-bottom: 1px dotted $gray-l4;
-        padding-bottom: ($baseline/4);
-
-
-        &:last-child {
-          margin-bottom: 0;
-          border: none;
-          padding-bottom: 0;
-        }
-      }
-    }
   }
 }
 
@@ -546,9 +464,9 @@ p, ul, ol, dl {
 .new-subsection-item,
 .new-policy-item {
   @include grey-button;
-  margin: 5px 8px;
-  padding: 3px 10px 4px 10px;
-  font-size: 10px;
+  @include font-size(10);
+  margin: ($baseline/2);
+  padding: 3px ($baseline/2) 4px ($baseline/2);
 
   .new-folder-icon,
   .new-policy-icon,
@@ -576,7 +494,7 @@ p, ul, ol, dl {
 
 // misc
 hr.divide {
-  @extend .text-sr;
+  @extend %cont-text-sr;
 }
 
 .item-details {
@@ -737,7 +655,7 @@ hr.divide {
 
 .new-button {
   @include green-button;
-  @extend .t-action4;
+  @extend %t-action4;
   padding: 8px 20px 10px;
   text-align: center;
 
@@ -753,7 +671,7 @@ hr.divide {
 
 .view-button {
   @include blue-button;
-  @extend .t-copy-base;
+  @extend %t-action4;
   text-align: center;
 
   &.big {
@@ -772,7 +690,7 @@ hr.divide {
 
 .edit-button.standard,
 .delete-button.standard {
-  @extend .t-action4;
+  @extend %t-action4;
   @include white-button;
   float: left;
   padding: 3px 10px 4px;
@@ -824,7 +742,7 @@ hr.divide {
 
 // basic utility
 .sr {
-  @extend .text-sr;
+  @extend %cont-text-sr;
 }
 
 .fake-link {
@@ -844,8 +762,30 @@ hr.divide {
   word-wrap: break-word;
 }
 
+// ui - semantic + visual divider
 hr.divider {
-  @extend .sr;
+  @extend %cont-text-sr;
+}
+
+// ui - skipnav
+.nav-skip {
+  @include font-size(13);
+  display: block;
+  position: absolute;
+  left: 0px;
+  top: -($baseline*30);
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  background: $white;
+  border-bottom: 1px solid $gray-l4;
+  padding: ($baseline*0.75) ($baseline/2);
+
+  &:focus, &:active {
+    position: static;
+    width: auto;
+    height: auto;
+  }
 }
 
 // ====================
@@ -877,7 +817,7 @@ body.js {
       text-align: center;
 
       .label {
-        @extend .text-sr;
+        @extend %cont-text-sr;
       }
 
       [class^="icon-"] {
@@ -900,14 +840,14 @@ body.js {
     }
 
     .title {
-      @extend .t-title5;
+      @extend %t-title5;
       margin: 0 0 ($baseline/2) 0;
       font-weight: 600;
       color: $gray-d3;
     }
 
     .description {
-      @extend .t-copy-sub2;
+      @extend %t-copy-sub2;
       margin-top: ($baseline/2);
       color: $gray-l1;
     }

@@ -1,6 +1,4 @@
 <%! from django.utils.translation import ugettext as _ %>
-<%! from django.utils import translation    %>
-
 
 <%! from django.core.urlresolvers import reverse %>
 <%! from time import strftime %>
@@ -13,7 +11,7 @@
       <div class="title">
         <hgroup>
           % if self.stanford_theme_enabled():
-            <h1>${_("Free courses from <strong>Stanford</strong>")}</h1>
+            <h1>${_("Free courses from <strong>{university_name}</strong>").format(university_name="Stanford")}</h1>
           % else:
             <h1>${_("The Future of Online Education")}</h1>
           % endif
@@ -29,7 +27,7 @@
 
             <div class="secondary-actions">
               <div class="social-sharing">
-                <div class="sharing-message">${_("Stay up to date with all edX has to offer!")}</div>
+                <div class="sharing-message">${_("Stay up to date with all {platform_name} has to offer!").format(platform_name=settings.PLATFORM_NAME)}</div>
                 <a href="https://twitter.com/edXOnline" class="share">
                   <img src="${static.url('images/social/twitter-sharing.png')}">
                 </a>
@@ -58,12 +56,12 @@
     <section class="highlighted-courses">
       ## Disable university partner logos and sites for non-edX sites
       % if not self.theme_enabled():
-        <h2>${_("Explore free courses from")} <span class="edx">edX</span> ${_("universities")}</h2>
+        <h2>${_('Explore free courses from {span_start}{platform_name}{span_end} universities').format(platform_name="edX", span_start='<span class="edx">', span_end='</span>')}</h2>
 
         <section class="university-partners university-partners2x6">
           <ol class="partners">
             <li class="partner mit">
-              <a href="${reverse('university_profile', args=['MITx'])}">
+              <a href="#">
                 <img src="${static.url('images/university/mit/mit.png')}" />
                 <div class="name">
                   <span>MITx</span>
@@ -71,7 +69,7 @@
               </a>
             </li>
             <li class="partner">
-              <a href="${reverse('university_profile', args=['HarvardX'])}">
+              <a href="#">
                 <img src="${static.url('images/university/harvard/harvard.png')}" />
                 <div class="name">
                   <span>HarvardX</span>
@@ -79,7 +77,7 @@
               </a>
             </li>
             <li class="partner">
-              <a href="${reverse('university_profile', args=['BerkeleyX'])}">
+              <a href="#">
                 <img src="${static.url('images/university/berkeley/berkeley.png')}" />
                 <div class="name">
                   <span>BerkeleyX</span>
@@ -87,7 +85,7 @@
               </a>
             </li>
             <li class="partner">
-              <a href="${reverse('university_profile', args=['UTx'])}">
+              <a href="#">
                 <img src="${static.url('images/university/ut/ut-rollover_350x150.png')}" />
                 <div class="name">
                   <span>UTx</span>
@@ -95,7 +93,7 @@
               </a>
             </li>
             <li class="partner">
-              <a href="${reverse('university_profile', args=['McGillX'])}">
+              <a href="#">
                 <img src="${static.url('images/university/mcgill/mcgill.png')}" />
                 <div class="name">
                   <span>McGillX</span>
@@ -103,7 +101,7 @@
               </a>
             </li>
             <li class="partner">
-              <a href="${reverse('university_profile', args=['ANUx'])}">
+              <a href="#">
                 <img src="${static.url('images/university/anu/anu.png')}" />
                 <div class="name">
                   <span>ANUx</span>
@@ -116,7 +114,7 @@
 
           <ol class="partners">
             <li class="partner">
-              <a href="${reverse('university_profile', args=['WellesleyX'])}">
+              <a href="#">
                 <img src="${static.url('images/university/wellesley/wellesley-rollover_350x150.png')}" />
                 <div class="name">
                   <span>WellesleyX</span>
@@ -124,7 +122,7 @@
               </a>
             </li>
             <li class="partner">
-              <a href="${reverse('university_profile', args=['GeorgetownX'])}">
+              <a href="#">
                 <img src="${static.url('images/university/georgetown/georgetown-rollover_350x150.png')}" />
                 <div class="name">
                   <span>GeorgetownX</span>
@@ -132,15 +130,15 @@
               </a>
             </li>
             <li class="partner">
-              <a href="${reverse('university_profile', args=['TorontoX'])}">
+              <a href="#">
                 <img src="${static.url('images/university/toronto/toronto.png')}" />
                 <div class="name">
-                  <span>${_("University of TorontoX")}</span>
+                  <span>University of TorontoX</span>
                 </div>
               </a>
             </li>
             <li class="partner">
-              <a href="${reverse('university_profile', args=['EPFLx'])}">
+              <a href="#">
                 <img src="${static.url('images/university/epfl/epfl.png')}" />
                 <div class="name">
                   <span>EPFLx</span>
@@ -148,7 +146,7 @@
               </a>
             </li>
             <li class="partner">
-              <a href="${reverse('university_profile', args=['DelftX'])}">
+              <a href="#">
                 <img src="${static.url('images/university/delft/delft.png')}" />
                 <div class="name">
                   <span>DelftX</span>
@@ -156,7 +154,7 @@
               </a>
             </li>
             <li class="partner">
-              <a href="${reverse('university_profile', args=['RiceX'])}">
+              <a href="#">
                 <img src="${static.url('images/university/rice/rice.png')}" />
                 <div class="name">
                   <span>RiceX</span>
@@ -167,57 +165,19 @@
         </section>
       % endif
 
-      <section class="courses">
-          <ul class="courses-listing">
-          %for course in courses:
-            <li class="courses-listing-item">
-              <%include file="course.html" args="course=course" />
-            </li>
-          %endfor
-          </ul>
-      </section>
+      % if settings.MITX_FEATURES.get('COURSES_ARE_BROWSABLE'):
+        <section class="courses">
+            <ul class="courses-listing">
+            %for course in courses:
+              <li class="courses-listing-item">
+                <%include file="course.html" args="course=course" />
+              </li>
+            %endfor
+            </ul>
+        </section>
+      % endif
     </section>
   </section>
-
-  ## Disable press and marketing for non-edX sites
-  % if not self.theme_enabled():
-    <section class="container">
-      <section class="more-info">
-        <header>
-          <h2><span class="edx">edX</span>${_("News &amp; Announcements")}</h2>
-          <a class="action action-mediakit" href="${reverse('media-kit')}"> <span class="org-name">edX</span> MEDIA KIT</a>
-        </header>
-        <section class="news">
-          <section class="blog-posts">
-              %for entry in news:
-              <article>
-                  %if entry.image:
-                      <a href="${entry.link}" class="post-graphics" target="_blank"><img src="${entry.image}" /></a>
-                  %endif
-                  <div class="post-name">
-                      <a href="${entry.link}" target="_blank">${entry.title}</a>
-                      %if entry.summary:
-                          <p>${entry.summary}</p>
-                      %endif
-                      <p class="post-date">${strftime("%m/%d/%y", entry.published_parsed)}</p>
-                  </div>
-              </article>
-              %endfor
-          </section>
-          <section class="press-links">
-            <h3>edX in the News:</h3>
-            <a target="_blank" href="http://www.nytimes.com/2013/04/30/education/adapting-to-blended-courses-and-finding-early-benefits.html?ref=education">The New York Times</a>,
-            <a target="_blank" href="http://online.wsj.com/article/SB10001424127887323741004578414861572832182.html?mod=googlenews_wsj">The Wall Street Journal</a>,
-            <a target="_blank" href="http://www.washingtonpost.com/local/education/stanford-to-help-build-edx-mooc-platform/2013/04/02/5b53bb3e-9bbe-11e2-9a79-eb5280c81c63_story.html">The Washington Post</a>,
-            <a target="_blank" href="http://www.cbsnews.com/video/watch/?id=50143164n">CBS Television</a>,
-            <a target="_blank" href="http://bostonglobe.com/2012/12/04/edx/AqnQ808q4IEcaUa8KuZuBO/story.html">The Boston Globe</a>
-            <a href="${reverse('press')}" class="read-more">Read More &rarr;</a>
-          </section>
-        </section>
-      </section>
-    </section>
-  % endif
-
 </section>
 
 <section id="video-modal" class="modal home-page-video-modal video-modal">
@@ -228,13 +188,12 @@
       else:
         youtube_video_id = "XNaiOGxWeto"
     %>
-    <iframe width="640" height="360" src="http://www.youtube.com/embed/${youtube_video_id}?showinfo=0" frameborder="0" allowfullscreen></iframe>
+    <iframe width="640" height="360" src="//www.youtube.com/embed/${youtube_video_id}?showinfo=0" frameborder="0" allowfullscreen></iframe>
   </div>
 </section>
 
-
 <%block name="js_extra">
-   <script type="text/javascript"">
+   <script type="text/javascript">
       $(window).load(function() {
          if(getParameterByName('next')) {
               $('#login').trigger("click");

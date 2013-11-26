@@ -10,7 +10,7 @@
 
   .wrapper-inner {
     @include linear-gradient($gray-d3 0%, $gray-d3 98%, $black 100%);
-    @extend .depth0;
+    @extend %ui-depth0;
     display: none;
     width: 100% !important;
     border-bottom: 1px solid $white;
@@ -19,7 +19,7 @@
 
   // sock - actions
   .list-cta {
-    @extend .depth1;
+    @extend %ui-depth1;
     position: absolute;
     top: -($baseline*0.75);
     width: 100%;
@@ -27,8 +27,8 @@
     text-align: center;
 
     .cta-show-sock {
-      @extend .btn-pill;
-      @extend .t-action4;
+      @extend %ui-btn-pill;
+      @extend %t-action4;
       background: $gray-l5;
       padding: ($baseline/2) $baseline;
       color: $gray;
@@ -48,7 +48,7 @@
   // sock - additional help
   .sock {
     @include clearfix();
-    @extend .t-copy-sub2;
+    @extend %t-copy-sub2;
     max-width: $fg-max-width;
     min-width: $fg-min-width;
     width: flex-grid(12);
@@ -60,7 +60,7 @@
     header {
 
       .title {
-        @extend .t-title4;
+        @extend %t-title4;
       }
 
     }
@@ -70,13 +70,13 @@
       @include box-sizing(border-box);
 
       .title {
-        @extend .t-title6;
+        @extend %t-title6;
         color: $white;
         margin-bottom: ($baseline/2);
       }
 
       .copy {
-        @extend .t-copy-sub2;
+        @extend %t-copy-sub2;
         margin: 0 0 $baseline 0;
       }
 
@@ -92,7 +92,7 @@
           }
 
           .action {
-            @extend .t-action4;
+            @extend %t-action4;
             display: block;
 
             [class^="icon-"] {
@@ -108,13 +108,13 @@
           }
 
           .tip {
-            @extend .sr;
+            @extend %cont-text-sr;
           }
         }
 
         .action-primary {
-          @extend .btn-primary-blue;
-          @extend .t-action3;
+          @extend %btn-primary-blue;
+          @extend %t-action3;
         }
       }
     }

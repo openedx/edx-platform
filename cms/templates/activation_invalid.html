@@ -2,16 +2,32 @@
 <%inherit file="base.html" />
 
 <%block name="content">
-<section class="tos">
-<div>
-<h1>${_("Activation Invalid")}</h1>
-
-<p>${_("Something went wrong. Check to make sure the URL you went to was"
-  "correct -- e-mail programs will sometimes split it into two"
-  "lines. If you still have issues, e-mail us to let us know what happened"
-  "at")} <a href="mailto:bugs@mitx.mit.edu">bugs@mitx.mit.edu</a>.</p>
-
-  <p>${_("Or you can go back to the")} <a href="/">${_("home page")}</a>.</p>
+<div class="wrapper-mast wrapper sr">
+  <header class="mast">
+    <h1 class="page-header">${_("Studio Account Activation")}</h1>
+  </header>
 </div>
-</section>
+
+<div class="wrapper-content wrapper">
+  <section class="content activation is-invalid">
+    <article class="content-primary" role="main">
+    </article>
+
+    <div class="notice notice-incontext notice-instruction has-actions">
+      <div class="msg">
+        <h1 class="title">${_('Your account activation is invalid')}</h1>
+        <div class="copy">
+          <p>${_("We're sorry. Something went wrong with your activation. Check to make sure the URL you went to was correct &mdash; e-mail programs will sometimes split it into two lines.")}</p>
+          <p>${_("If you still have issues, contact edX Support. In the meatime, you can also return to")} <a href="/">{_('the Studio homepage.')}</a></p>
+        </div>
+      </div>
+
+      <ul class="list-actions">
+        <li class="action-item">
+          <a href="http://help.edge.edx.org/discussion/new" class="action action-primary show-tender">${_('Contact edX Support')}</a>
+        </li>
+      </ul>
+    </div>
+  </section>
+</div>
 </%block>

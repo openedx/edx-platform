@@ -1,19 +1,21 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%inherit file="/main.html" />
 <%namespace name='static' file='/static_content.html'/>
 
 <%block name="headextra">
-  <%static:css group='course'/>
+<%static:css group='style-course-vendor'/>
+<%static:css group='style-course'/>
 </%block>
 
 <%namespace name="progress_graph" file="/courseware/progress_graph.js"/>
 
-<%block name="title"><title>${course.number} Progress</title></%block>
+<%block name="title"><title>${_("{course_number} Progress").format(course_number=course.display_number_with_default) | h}</title></%block>
 
 <%!
     from django.core.urlresolvers import reverse
 %>
 
-<%! from xmodule.util.date_utils import get_default_time_display %>
+<%! from xmodule.util.date_utils import get_time_display %>
 
 <%block name="js_extra">
 <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
@@ -31,7 +33,7 @@ ${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph",
 
     <section class="course-info">
       <header>
-        <h1>Course Progress for Student '${student.username}' (${student.email})</h1>
+      <h1>${_("Course Progress for Student '{username}' ({email})").format(username=student.username, email=student.email)}</h1>
       </header>
 
       %if not course.disable_progress_graph:
@@ -68,8 +70,12 @@ ${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph",
                 ${section['format']}
 
                 %if section.get('due') is not None:
+                  <%
+                      formatted_string = get_time_display(section['due'], course.due_date_display_format)
+                      due_date = '' if len(formatted_string)==0 else _('due {date}'.format(date=formatted_string))
+                  %>
                   <em>
-                  due ${get_default_time_display(section['due'], course.show_timezone)}
+                  ${due_date}
                   </em>
                 %endif
               </p>
@@ -83,7 +89,7 @@ ${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph",
                     %endfor
                   </ol>
                 %else:
-                  <h3 class="no-scores"> No problem scores in this section </h3>
+                  <h3 class="no-scores"> ${_("No problem scores in this section")} </h3>
                 %endif
               </section>
 

@@ -1,0 +1,187 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%! from django.core.urlresolvers import reverse %>
+<%inherit file="../main.html" />
+<%block name="bodyclass">register verification-process step-requirements ${'is-upgrading' if upgrade else ''}</%block>
+<%block name="title">
+  <title>
+    %if upgrade:
+      ${_("Upgrade Your Registration for {}").format(course_name)}
+    %else:
+      ${_("Register for {}").format(course_name)}
+    %endif
+  </title>
+</%block>
+
+<%block name="content">
+%if is_not_active:
+<div class="wrapper-msg wrapper-msg-activate">
+  <div class=" msg msg-activate">
+    <i class="msg-icon icon-warning-sign"></i>
+    <div class="msg-content">
+      <h3 class="title">${_("You need to activate your edX account before proceeding")}</h3>
+      <div class="copy">
+        <p>${_("Please check your email for further instructions on activating your new account.")}</p>
+      </div>
+    </div>
+  </div>
+</div>
+%endif
+
+<div class="container">
+  <section class="wrapper">
+
+    <%include file="_verification_header.html" args="course_name=course_name"/>
+
+    <div class="wrapper-progress">
+      <section class="progress">
+        <h3 class="sr title">${_("Your Progress")}</h3>
+
+        <ol class="progress-steps">
+          <li class="progress-step is-current" id="progress-step0">
+            <span class="wrapper-step-number"><span class="step-number">0</span></span>
+            <span class="step-name"><span class="sr">${_("Current Step: ")}</span>${_("Intro")}</span>
+          </li>
+
+          <li class="progress-step" id="progress-step1">
+            <span class="wrapper-step-number"><span class="step-number">1</span></span>
+            <span class="step-name">${_("Take Photo")}</span>
+          </li>
+
+          <li class="progress-step" id="progress-step2">
+            <span class="wrapper-step-number"><span class="step-number">2</span></span>
+            <span class="step-name">${_("Take ID Photo")}</span>
+          </li>
+
+          <li class="progress-step" id="progress-step3">
+            <span class="wrapper-step-number"><span class="step-number">3</span></span>
+            <span class="step-name">${_("Review")}</span>
+          </li>
+
+          <li class="progress-step" id="progress-step4">
+            <span class="wrapper-step-number"><span class="step-number">4</span></span>
+            <span class="step-name">${_("Make Payment")}</span>
+          </li>
+
+          <li class="progress-step progress-step-icon" id="progress-step5">
+            <span class="wrapper-step-number"><span class="step-number">
+              <i class="icon-ok"></i>
+            </span></span>
+            <span class="step-name">${_("Confirmation")}</span>
+          </li>
+        </ol>
+
+        <span class="progress-sts">
+          <span class="progress-sts-value"></span>
+        </span>
+      </section>
+    </div>
+
+
+    <div class="wrapper-content-main">
+      <article class="content-main">
+        %if upgrade:
+          <h3 class="title">${_("What You Will Need to Upgrade")}</h3>
+
+          <div class="instruction">
+            <p>${_("There are three things you will need to upgrade to being an ID verified student:")}</p>
+          </div>
+        %else:
+          <h3 class="title">${_("What You Will Need to Register")}</h3>
+
+          <div class="instruction">
+            <p>${_("There are three things you will need to register as an ID verified student:")}</p>
+          </div>
+        %endif
+
+        <ul class="list-reqs ${"account-not-activated" if is_not_active else ""}">
+          %if is_not_active:
+          <li class="req req-0 req-activate">
+            <h4 class="title">${_("Activate Your Account")}</h4>
+            <div class="placeholder-art">
+              <i class="icon-envelope-alt"></i>
+            </div>
+
+            <div class="copy">
+              <p>
+                <span class="copy-super">${_("Check your email")}</span>
+                <span class="copy-sub">${_("you need an active edX account before registering - check your email for instructions")}</span>
+              </p>
+            </div>
+          </li>
+          %endif
+
+          <li class="req req-1 req-id">
+            <h4 class="title">${_("Identification")}</h4>
+            <div class="placeholder-art">
+              <i class="icon-list-alt icon-under"></i>
+              <i class="icon-user icon-over"></i>
+            </div>
+
+            <div class="copy">
+              <p>
+                <span class="copy-super">${_("A photo identification document")}</span>
+                <span class="copy-sub">${_("a drivers license, passport, or other goverment or school-issued ID with your name and picture on it")}</span>
+              </p>
+            </div>
+          </li>
+
+          <li class="req req-2 req-webcam">
+            <h4 class="title">${_("Webcam")}</h4>
+            <div class="placeholder-art">
+              <i class="icon-facetime-video"></i>
+            </div>
+
+            <div class="copy">
+              <p>
+                <%
+                  browser_links = {
+                    "ff_a_start": '<a rel="{rel}" href="{url}">'.format(url="https://www.mozilla.org/en-US/firefox/new/", rel="external"),
+                    "chrome_a_start": '<a rel="{rel}" href="{url}">'.format(url="https://www.google.com/intl/en/chrome/browser/", rel="external"),
+                    "safari_a_start": '<a rel="{rel}" href="{url}">'.format(url="http://www.apple.com/safari/", rel="external"),
+                    "ie_a_start": '<a rel="{rel}" href="{url}">'.format(url="http://windows.microsoft.com/en-us/internet-explorer/download-ie", rel="external"),
+                    "a_end": '</a>'
+                  }
+                %>
+                <span class="copy-super">${_("A webcam and a modern browser")}</span>
+                <span class="copy-sub"><strong>${_("{ff_a_start}Firefox{a_end}, {chrome_a_start}Chrome{a_end}, {safari_a_start}Safari{a_end}, {ie_a_start}IE9+{a_end}").format(**browser_links)}</strong> - ${_("Please make sure your browser is updated to the most recent version possible")}
+                </span>
+              </p>
+            </div>
+          </li>
+
+          <li class="req req-3 req-payment">
+            <h4 class="title">${_("Credit or Debit Card")}</h4>
+            <div class="placeholder-art">
+              <i class="icon-credit-card"></i>
+            </div>
+
+            <div class="copy">
+              <p>
+                <span class="copy-super">${_("A major credit or debit card")}</span>
+                <span class="copy-sub">${_("Visa, Master Card, American Express, Discover, Diners Club, JCB with Discover logo")}</span>
+              </p>
+            </div>
+          </li>
+        </ul>
+
+        <nav class="nav-wizard ${"is-not-ready" if is_not_active else "is-ready"}">
+
+          %if upgrade:
+            <span class="help help-inline">${_("Missing something? You can always continue to audit this course instead.")}</span>
+          %else:
+            <span class="help help-inline">${_("Missing something? You can always {a_start} audit this course instead {a_end}").format(a_start='<a href="/course_modes/choose/' + course_id + '">', a_end="</a>")}</span>
+          %endif
+
+          <ol class="wizard-steps">
+            <li class="wizard-step">
+            <a class="next action-primary ${"disabled" if is_not_active else ""}" id="face_next_button" href="${reverse('verify_student_verify', kwargs={'course_id': course_id})}?upgrade=${upgrade}">${_("Go to Step 1: Take my Photo")}</a>
+            </li>
+          </ol>
+        </nav>
+      </article>
+    </div> <!-- /wrapper-content-main -->
+
+    <%include file="_verification_support.html" />
+  </section>
+</div>
+</%block>

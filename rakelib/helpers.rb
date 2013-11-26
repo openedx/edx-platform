@@ -1,6 +1,7 @@
 require 'digest/md5'
 require 'sys/proctable'
 require 'colorize'
+require 'timeout'
 
 def find_executable(exec)
     path = %x(which #{exec}).strip
@@ -12,8 +13,7 @@ def select_executable(*cmds)
 end
 
 def django_admin(system, env, command, *args)
-    django_admin = ENV['DJANGO_ADMIN_PATH'] || select_executable('django-admin.py', 'django-admin')
-    return "#{django_admin} #{command} --traceback --settings=#{system}.envs.#{env} --pythonpath=. #{args.join(' ')}"
+    return "./manage.py #{system} --settings #{env} #{command} --traceback #{args.join(' ')}"
 end
 
 def report_dir_path(dir)
@@ -52,8 +52,14 @@ end
 
 # Runs Process.spawn, and kills the process at the end of the rake process
 # Expects the same arguments as Process.spawn
-def background_process(*command)
-    pid = Process.spawn({}, *command, {:pgroup => true})
+def background_process(command, logfile=nil)
+    spawn_opts = {:pgroup => true}
+    if !logfile.nil?
+        puts "Running '#{command.join(' ')}', redirecting output to #{logfile}".red
+        spawn_opts[[:err, :out]] = [logfile, 'a']
+    end
+    pid = Process.spawn({}, *command, spawn_opts)
+    command = [*command]
 
     at_exit do
         puts "Ending process and children"
@@ -88,9 +94,10 @@ end
 
 # Runs a command as a background process, as long as no other processes
 # tagged with the same tag are running
-def singleton_process(*command)
+def singleton_process(command, logfile=nil)
+    command = [*command]
     if Sys::ProcTable.ps.select {|proc| proc.cmdline.include?(command.join(' '))}.empty?
-        background_process(*command)
+        background_process(command, logfile)
     else
         puts "Process '#{command.join(' ')} already running, skipping".blue
     end

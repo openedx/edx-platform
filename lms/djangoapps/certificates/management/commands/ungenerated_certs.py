@@ -8,17 +8,19 @@ from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.django import modulestore
 from certificates.models import CertificateStatuses
 import datetime
+from pytz import UTC
 
 
 class Command(BaseCommand):
 
     help = """
-    Find all students that need certificates
-    for courses that have finished and
-    put their cert requests on the queue
+    Find all students that need certificates for courses that have finished and
+    put their cert requests on the queue.
 
-    Use the --noop option to test without actually
-    putting certificates on the queue to be generated.
+    If --user is given, only grade and certify the requested username.
+
+    Use the --noop option to test without actually putting certificates on the
+    queue to be generated.
     """
 
     option_list = BaseCommand.option_list + (
@@ -27,6 +29,11 @@ class Command(BaseCommand):
                     dest='noop',
                     default=False,
                     help="Don't add certificate requests to the queue"),
+        make_option('--insecure',
+                    action='store_true',
+                    dest='insecure',
+                    default=False,
+                    help="Don't use https for the callback url to the LMS, useful in http test environments"),
         make_option('-c', '--course',
                     metavar='COURSE_ID',
                     dest='course',
@@ -41,7 +48,6 @@ class Command(BaseCommand):
                     'whose entry in the certificate table matches STATUS. '
                     'STATUS can be generating, unavailable, deleted, error '
                     'or notpassing.'),
-
     )
 
     def handle(self, *args, **options):
@@ -80,23 +86,26 @@ class Command(BaseCommand):
             enrolled_students = User.objects.filter(
                 courseenrollment__course_id=course_id).prefetch_related(
                     "groups").order_by('username')
+
             xq = XQueueCertInterface()
+            if options['insecure']:
+                xq.use_https = False
             total = enrolled_students.count()
             count = 0
-            start = datetime.datetime.now()
+            start = datetime.datetime.now(UTC)
             for student in enrolled_students:
                 count += 1
                 if count % STATUS_INTERVAL == 0:
                     # Print a status update with an approximation of
                     # how much time is left based on how long the last
                     # interval took
-                    diff = datetime.datetime.now() - start
+                    diff = datetime.datetime.now(UTC) - start
                     timeleft = diff * (total - count) / STATUS_INTERVAL
                     hours, remainder = divmod(timeleft.seconds, 3600)
                     minutes, seconds = divmod(remainder, 60)
                     print "{0}/{1} completed ~{2:02}:{3:02}m remaining".format(
                         count, total, hours, minutes)
-                    start = datetime.datetime.now()
+                    start = datetime.datetime.now(UTC)
 
                 if certificate_status_for_student(
                         student, course_id)['status'] in valid_statuses:

@@ -1,0 +1,266 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%! from django.core.urlresolvers import reverse %>
+<%! from student.views import course_from_id %>
+
+<%inherit file="../main.html" />
+<%block name="bodyclass">register verification-process step-confirmation</%block>
+
+<%block name="title"><title>${_("Receipt (Order")} ${order.id})</title></%block>
+
+<%block name="content">
+% if notification is not UNDEFINED:
+<section class="notification">
+    ${notification}
+</section>
+% endif
+
+<div class="container">
+  <section class="wrapper cart-list">
+
+    <header class="page-header">
+      <h2 class="title">
+        <span class="sts-label">${_("You are now registered for: ")}</span>
+
+        <span class="wrapper-sts">
+          <span class="sts-course">
+            <span class="sts-course-org">${course_org}</span>
+            <span class="sts-course-number">${course_num}</span>
+            <span class="sts-course-name">${course_name}</span>
+          </span>
+
+          <span class="sts-track">
+            <span class="sts-track-value">
+              <span class="context">${_("Registered as: ")}</span> ${_("ID Verified")}
+            </span>
+          </span>
+        </span>
+      </h2>
+    </header>
+
+    <div class="wrapper-progress">
+      <section class="progress">
+        <h3 class="sr title">${_("Your Progress")}</h3>
+
+        <ol class="progress-steps">
+          <li class="progress-step is-current" id="progress-step0">
+            <span class="wrapper-step-number"><span class="step-number">0</span></span>
+            <span class="step-name"><span class="sr">${_("Current Step: ")}</span>${_("Intro")}</span>
+          </li>
+
+          <li class="progress-step" id="progress-step1">
+            <span class="wrapper-step-number"><span class="step-number">1</span></span>
+            <span class="step-name">${_("Take Photo")}</span>
+          </li>
+
+          <li class="progress-step" id="progress-step2">
+            <span class="wrapper-step-number"><span class="step-number">2</span></span>
+            <span class="step-name">${_("Take ID Photo")}</span>
+          </li>
+
+          <li class="progress-step" id="progress-step3">
+            <span class="wrapper-step-number"><span class="step-number">3</span></span>
+            <span class="step-name">${_("Review")}</span>
+          </li>
+
+          <li class="progress-step" id="progress-step4">
+            <span class="wrapper-step-number"><span class="step-number">4</span></span>
+            <span class="step-name">${_("Make Payment")}</span>
+          </li>
+
+          <li class="progress-step progress-step-icon" id="progress-step5">
+            <span class="wrapper-step-number"><span class="step-number">
+              <i class="icon-ok"></i>
+            </span></span>
+            <span class="step-name"><span class="sr">${_("Current Step: ")}</span>${_("Confirmation")}</span>
+          </li>
+        </ol>
+
+        <span class="progress-sts">
+          <span class="progress-sts-value"></span>
+        </span>
+      </section>
+    </div>
+
+    <div class="wrapper-content-main">
+      <article class="content-main">
+        <h3 class="title">${_("Congratulations! You are now verified on ")} ${_(settings.PLATFORM_NAME)}.</h3>
+
+        <div class="instruction">
+          <p>${_("You are now registered as a verified student! Your registration details are below.")}</p>
+        </div>
+
+        <ul class="list-info">
+          <li class="info-item course-info">
+            <h4 class="title">${_("You are registered for:")}</h4>
+
+            <div class="wrapper-report">
+              <table class="report report-course">
+                <caption class="sr">${_("A list of courses you have just registered for as a verified student")}</caption>
+                <thead>
+                  <tr>
+                    <th scope="col" >${_("Course")}</th>
+                    <th scope="col" >${_("Status")}</th>
+                    <th scope="col" ><span class="sr">${_("Options")}</span></th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  % for item in order_items:
+                  <tr>
+                    <td>${item.line_desc}</td>
+                    <td>
+                       ${_("Starts: {start_date}").format(start_date=course_start_date_text)}
+                    </td>
+                    <td class="options">
+                      %if course_has_started:
+                          <a class="action action-course" href="${reverse('course_root', kwargs={'course_id': item.course_id})}">${_("Go to Course")}</a>
+                      %else:
+                      %endif
+                    </td>
+                  </tr>
+                  % endfor
+                </tbody>
+                <tfoot>
+                  <tr class="course-actions">
+                    <td colspan="3">
+                      <a class="action action-dashboard" href="${reverse('dashboard')}">${_("Go to your Dashboard")}</a>
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </li>
+
+          <li class="info-item verification-info">
+            <h4 class="title">${_("Verified Status")}</h4>
+
+            <div class="copy">
+              <p>${_("We have received your identification details to verify your identity. If there is a problem with any of the items, we will contact you to resubmit. You can now register for any of the verified certificate courses this semester without having to re-verify.")}</p>
+
+              <p>${_("The professor will ask you to periodically submit a new photo to verify your work during the course (usually at exam times).")}</p>
+            </div>
+          </li>
+
+          <li class="info-item payment-info">
+            <h4 class="title">${_("Payment Details")}</h4>
+
+            <div class="copy">
+              <p>${_("Please print this page for your records; it serves as your receipt. You will also receive an email with the same information.")}</p>
+            </div>
+
+            <div class="wrapper-report">
+              <table class="report report-receipt">
+                <thead>
+                  <tr>
+                    <th scope="col" >${_("Order No.")}</th>
+                    <th scope="col" >${_("Description")}</th>
+                    <th scope="col" >${_("Date")}</th>
+                    <th scope="col" >${_("Description")}</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  % for item in order_items:
+                  <tr>
+                    % if item.status == "purchased":
+                    <td>${order.id}</td>
+                    <td>${item.line_desc}</td>
+                    <td>${order.purchase_time.date().isoformat()}</td>
+                    <td>${"{0:0.2f}".format(item.line_cost)} (${item.currency.upper()})</td>
+
+                    % elif item.status == "refunded":
+                    <td><del>${order.id}</del></td>
+                    <td><del>${item.line_desc}</del></td>
+                    <td><del>${order.purchase_time.date().isoformat()}</del></td>
+                    <td><del>${"{0:0.2f}".format(item.line_cost)} (${item.currency.upper()})</del></td>
+                    % endif
+                  </tr>
+                  % endfor
+                </tbody>
+
+                <tfoot>
+                  <tr>
+                    <th scope="row" class="total-label" colspan="1">${_("Total")}</th>
+                    <td claass="total-value" colspan="3">
+                      <span class="value-amount">${"{0:0.2f}".format(order.total_cost)} </span>
+                       <span class="value-currency">(${item.currency.upper()})</span>
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+
+              % if any_refunds:
+              <div class="msg msg-refunds">
+                <h4 class="title sr">Please Note:</h4>
+                <div class="copy">
+                  <p>${_("Note: items with strikethough like ")}<del>${_("this")}</del>${_(" have been refunded.")}</p>
+                </div>
+              </div>
+              % endif
+            </div>
+
+            <div class="copy">
+              <p>${_("Billed To")}:
+                <span class="name-first">${order.bill_to_first}</span> <span class="name-last">${order.bill_to_last}</span> (<span class="address-city">${order.bill_to_city}</span>, <span class="address-state">${order.bill_to_state}</span> <span class="address-postalcode">${order.bill_to_postalcode}</span> <span class="address-country">${order.bill_to_country.upper()}</span>)
+              </p>
+            </div>
+          </li>
+
+          <%doc>
+          <li class="info-item billing-info">
+            <h4 class="title">${_("Billing Information")}</h4>
+
+            <div class="wrapper-report">
+              <table class="report report-billing">
+                <thead>
+                  <tr>
+                    <th scope="col">${_("Billed To")}</th>
+                    <th scope="col">${_("Billing Address")}</th>
+                    <th scope="col">${_("Payment Method Type")}</th>
+                    <th scope="col">${_("Payment Method Details")}</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <tr>
+                    <td class="billing-to">
+                      ${order.bill_to_first} ${order.bill_to_last}
+                    </td>
+
+                    <td class="billing-address">
+                      <span class="address-street1">${order.bill_to_street1}</span>
+                      <span class="address-street2">${order.bill_to_street2}</span>
+
+                      <span class="address-city">${order.bill_to_street2}</span>,
+                      <span class="address-state">${order.bill_to_state}</span>
+                      <span class="address-postalcode">${order.bill_to_postalcode}</span>
+
+                      <span class="address-country">${order.bill_to_country.upper()}</span>
+                    </td>
+
+                    <td class="billing-methodtype">
+                      ${order.bill_to_cardtype}
+                    </td>
+                    <td class="method-details">
+                      ${order.bill_to_ccnum}
+                    </td>
+                  </tr>
+                </tbody>
+
+                <tfoot>
+                  <tr>
+                    <th scope="row" class="total-label" colspan="1">${_("Total")}</th>
+                    <td class="total-value" colspan="3"><span class="value-amount">${"{0:0.2f}".format(order.total_cost)}</span> <span class="value-currency">(${item.currency.upper()})</span></td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </li>
+          </%doc>
+        </ul>
+      </article>
+    </div>
+
+</section>
+</div>
+</%block>

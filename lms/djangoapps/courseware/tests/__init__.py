@@ -11,41 +11,69 @@ from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
 from django.test.client import Client
 
+from mitxmako.shortcuts import render_to_string
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
-from xmodule.tests import get_test_system
+from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from xblock.field_data import DictFieldData
+from xblock.fields import Scope
+from xmodule.tests import get_test_system, get_test_descriptor_system
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from lms.lib.xblock.field_data import LmsFieldData
+from lms.lib.xblock.runtime import quote_slashes
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class BaseTestXmodule(ModuleStoreTestCase):
     """Base class for testing Xmodules with mongo store.
 
     This class prepares course and users for tests:
         1. create test course;
-        2. create, enrol and login users for this course;
+        2. create, enroll and login users for this course;
 
     Any xmodule should overwrite only next parameters for test:
-        1. TEMPLATE_NAME
+        1. CATEGORY
         2. DATA
         3. MODEL_DATA
+        4. COURSE_DATA and USER_COUNT if needed
 
-    This class should not contain any tests, because TEMPLATE_NAME
+    This class should not contain any tests, because CATEGORY
     should be defined in child class.
     """
     USER_COUNT = 2
+    COURSE_DATA = {}
 
     # Data from YAML common/lib/xmodule/xmodule/templates/NAME/default.yaml
-    TEMPLATE_NAME = ""
+    CATEGORY = "vertical"
     DATA = ''
     MODEL_DATA = {'data': '<some_module></some_module>'}
 
+    def new_module_runtime(self):
+        """
+        Generate a new ModuleSystem that is minimally set up for testing
+        """
+        runtime = get_test_system(course_id=self.course.id)
+
+        # When asked for a module out of a descriptor, just create a new xmodule runtime,
+        # and inject it into the descriptor
+        def get_module(descr):
+            descr.xmodule_runtime = self.new_module_runtime()
+            return descr
+
+        runtime.get_module = get_module
+
+        return runtime
+
+    def new_descriptor_runtime(self):
+        runtime = get_test_descriptor_system()
+        runtime.get_block = modulestore().get_item
+        return runtime
+
     def setUp(self):
 
-        self.course = CourseFactory.create()
+        self.course = CourseFactory.create(data=self.COURSE_DATA)
 
         # Turn off cache.
         modulestore().request_cache = None
@@ -53,16 +81,16 @@ class BaseTestXmodule(ModuleStoreTestCase):
 
         chapter = ItemFactory.create(
             parent_location=self.course.location,
-            template="i4x://edx/templates/sequential/Empty",
+            category="sequential",
         )
         section = ItemFactory.create(
             parent_location=chapter.location,
-            template="i4x://edx/templates/sequential/Empty"
+            category="sequential"
         )
 
         # username = robot{0}, password = 'test'
         self.users = [
-            UserFactory.create(username='robot%d' % i, email='robot+test+%d@edx.org' % i)
+            UserFactory.create()
             for i in range(self.USER_COUNT)
         ]
 
@@ -71,18 +99,20 @@ class BaseTestXmodule(ModuleStoreTestCase):
 
         self.item_descriptor = ItemFactory.create(
             parent_location=section.location,
-            template=self.TEMPLATE_NAME,
+            category=self.CATEGORY,
             data=self.DATA
         )
 
-        system = get_test_system()
-        system.render_template = lambda template, context: context
-        model_data = {'location': self.item_descriptor.location}
-        model_data.update(self.MODEL_DATA)
+        self.runtime = self.new_descriptor_runtime()
 
-        self.item_module = self.item_descriptor.module_class(
-            system, self.item_descriptor, model_data
-        )
+        field_data = {}
+        field_data.update(self.MODEL_DATA)
+        student_data = DictFieldData(field_data)
+        self.item_descriptor._field_data = LmsFieldData(self.item_descriptor._field_data, student_data)
+
+        self.item_descriptor.xmodule_runtime = self.new_module_runtime()
+        self.item_module = self.item_descriptor
+
         self.item_url = Location(self.item_module.location).url()
 
         # login all users for acces to Xmodule
@@ -98,10 +128,17 @@ class BaseTestXmodule(ModuleStoreTestCase):
     def get_url(self, dispatch):
         """Return item url with dispatch."""
         return reverse(
-            'modx_dispatch',
-            args=(self.course.id, self.item_url, dispatch)
+            'xblock_handler',
+            args=(self.course.id, quote_slashes(self.item_url), 'xmodule_handler', dispatch)
         )
 
-    def tearDown(self):
-        for user in self.users:
-            user.delete()
+
+class XModuleRenderingTestBase(BaseTestXmodule):
+
+    def new_module_runtime(self):
+        """
+        Create a runtime that actually does html rendering
+        """
+        runtime = super(XModuleRenderingTestBase, self).new_module_runtime()
+        runtime.render_template = render_to_string
+        return runtime

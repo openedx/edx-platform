@@ -1,9 +1,20 @@
-<%! from django.core.urlresolvers import reverse %>
-<%! from xmodule.util.date_utils import get_default_time_display %>
+<%!
+    from django.core.urlresolvers import reverse
+    from xmodule.util.date_utils import get_time_display
+    from django.utils.translation import ugettext as _
+%>
 
 <%def name="make_chapter(chapter)">
   <div class="chapter">
-      <h3 ${' class="active"' if 'active' in chapter and chapter['active'] else ''} aria-label="${chapter['display_name']}${', current chapter' if 'active' in chapter and chapter['active'] else ''}">
+      <%
+          if chapter.get('active'):
+              aria_label = _('{chapter}, current chapter').format(chapter=chapter['display_name'])
+              active_class = ' class="active"'
+          else:
+              aria_label = chapter['display_name']
+              active_class = ''
+      %>
+      <h3 ${active_class} aria-label="${aria_label}">
         <a href="#">
           ${chapter['display_name']}
         </a>
@@ -14,7 +25,14 @@
           <li class="${'active' if 'active' in section and section['active'] else ''} ${'graded'  if 'graded' in section and section['graded'] else ''}">
             <a href="${reverse('courseware_section', args=[course_id, chapter['url_name'], section['url_name']])}">
               <p>${section['display_name']} ${'<span class="sr">, current section</span>' if 'active' in section and section['active'] else ''}</p>
-              <p class="subtitle">${section['format']} ${"due " + get_default_time_display(section['due'], show_timezone) if section.get('due') is not None else ''}</p>
+              <%
+                if section.get('due') is None:
+                    due_date = ''
+                else:
+                    formatted_string = get_time_display(section['due'], due_date_display_format)
+                    due_date = '' if len(formatted_string)==0 else _('due {date}'.format(date=formatted_string))
+              %>
+              <p class="subtitle">${section['format']} ${due_date}</p>
             </a>
           </li>
       % endfor

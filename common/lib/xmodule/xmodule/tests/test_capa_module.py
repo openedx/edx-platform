@@ -8,18 +8,25 @@ Tests of the Capa XModule
 #pylint: disable=C0302
 
 import datetime
-from mock import Mock, patch
-import unittest
-import random
 import json
+import random
+import os
+import textwrap
+import unittest
+
+from mock import Mock, patch
+import webob
+from webob.multidict import MultiDict
 
 import xmodule
+from xmodule.tests import DATA_DIR
 from capa.responsetypes import (StudentInputError, LoncapaProblemError,
                                 ResponseError)
+from capa.xqueue_interface import XQueueInterface
 from xmodule.capa_module import CapaModule, ComplexEncoder
 from xmodule.modulestore import Location
-
-from django.http import QueryDict
+from xblock.field_data import DictFieldData
+from xblock.fields import ScopeIds
 
 from . import get_test_system
 from pytz import UTC
@@ -31,42 +38,47 @@ class CapaFactory(object):
     A helper class to create problem modules with various parameters for testing.
     """
 
-    sample_problem_xml = """<?xml version="1.0"?>
-<problem>
-  <text>
-    <p>What is pi, to two decimal placs?</p>
-  </text>
-<numericalresponse answer="3.14">
-<textline math="1" size="30"/>
-</numericalresponse>
-</problem>
-"""
+    sample_problem_xml = textwrap.dedent("""\
+        <?xml version="1.0"?>
+        <problem>
+            <text>
+                <p>What is pi, to two decimal places?</p>
+            </text>
+        <numericalresponse answer="3.14">
+        <textline math="1" size="30"/>
+        </numericalresponse>
+        </problem>
+    """)
 
     num = 0
 
-    @staticmethod
-    def next_num():
-        CapaFactory.num += 1
-        return CapaFactory.num
+    @classmethod
+    def next_num(cls):
+        cls.num += 1
+        return cls.num
 
-    @staticmethod
-    def input_key():
+    @classmethod
+    def input_key(cls, input_num=2):
         """
         Return the input key to use when passing GET parameters
         """
-        return ("input_" + CapaFactory.answer_key())
+        return ("input_" + cls.answer_key(input_num))
 
-    @staticmethod
-    def answer_key():
+    @classmethod
+    def answer_key(cls, input_num=2):
         """
         Return the key stored in the capa problem answer dict
         """
-        return ("-".join(['i4x', 'edX', 'capa_test', 'problem',
-                         'SampleProblem%d' % CapaFactory.num]) +
-                "_2_1")
+        return (
+            "%s_%d_1" % (
+                "-".join(['i4x', 'edX', 'capa_test', 'problem', 'SampleProblem%d' % cls.num]),
+                input_num,
+            )
+        )
 
-    @staticmethod
-    def create(graceperiod=None,
+    @classmethod
+    def create(cls,
+               graceperiod=None,
                due=None,
                max_attempts=None,
                showanswer=None,
@@ -75,7 +87,8 @@ class CapaFactory(object):
                attempts=None,
                problem_state=None,
                correct=False,
-               done=None
+               done=None,
+               text_customization=None
                ):
         """
         All parameters are optional, and are added to the created problem if specified.
@@ -94,35 +107,43 @@ class CapaFactory(object):
             attempts: also added to instance state.  Will be converted to an int.
         """
         location = Location(["i4x", "edX", "capa_test", "problem",
-                             "SampleProblem{0}".format(CapaFactory.next_num())])
-        model_data = {'data': CapaFactory.sample_problem_xml, 'location': location}
+                             "SampleProblem{0}".format(cls.next_num())])
+        field_data = {'data': cls.sample_problem_xml}
 
         if graceperiod is not None:
-            model_data['graceperiod'] = graceperiod
+            field_data['graceperiod'] = graceperiod
         if due is not None:
-            model_data['due'] = due
+            field_data['due'] = due
         if max_attempts is not None:
-            model_data['max_attempts'] = max_attempts
+            field_data['max_attempts'] = max_attempts
         if showanswer is not None:
-            model_data['showanswer'] = showanswer
+            field_data['showanswer'] = showanswer
         if force_save_button is not None:
-            model_data['force_save_button'] = force_save_button
+            field_data['force_save_button'] = force_save_button
         if rerandomize is not None:
-            model_data['rerandomize'] = rerandomize
+            field_data['rerandomize'] = rerandomize
         if done is not None:
-            model_data['done'] = done
+            field_data['done'] = done
+        if text_customization is not None:
+            field_data['text_customization'] = text_customization
 
         descriptor = Mock(weight="1")
         if problem_state is not None:
-            model_data.update(problem_state)
+            field_data.update(problem_state)
         if attempts is not None:
             # converting to int here because I keep putting "0" and "1" in the tests
             # since everything else is a string.
-            model_data['attempts'] = int(attempts)
+            field_data['attempts'] = int(attempts)
 
         system = get_test_system()
         system.render_template = Mock(return_value="<div>Test Template HTML</div>")
-        module = CapaModule(system, descriptor, model_data)
+        module = CapaModule(
+            descriptor,
+            system,
+            DictFieldData(field_data),
+            ScopeIds(None, None, location, location),
+        )
+        system.xmodule_instance = module
 
         if correct:
             # TODO: probably better to actually set the internal state properly, but...
@@ -131,6 +152,47 @@ class CapaFactory(object):
             module.get_score = lambda: {'score': 0, 'total': 1}
 
         return module
+
+
+class CapaFactoryWithFiles(CapaFactory):
+    """
+    A factory for creating a Capa problem with files attached.
+    """
+    sample_problem_xml = textwrap.dedent("""\
+        <problem>
+            <coderesponse queuename="BerkeleyX-cs188x">
+                <!-- actual filenames here don't matter for server-side tests,
+                     they are only acted upon in the browser. -->
+                <filesubmission
+                    points="25"
+                    allowed_files="prog1.py prog2.py prog3.py"
+                    required_files="prog1.py prog2.py prog3.py"
+                />
+                <codeparam>
+                    <answer_display>
+                        If you're having trouble with this Project,
+                        please refer to the Lecture Slides and attend office hours.
+                    </answer_display>
+                    <grader_payload>{"project": "p3"}</grader_payload>
+                </codeparam>
+            </coderesponse>
+
+            <customresponse>
+                <text>
+                    If you worked with a partner, enter their username or email address. If you
+                    worked alone, enter None.
+                </text>
+
+                <textline points="0" size="40" correct_answer="Your partner's username or 'None'"/>
+                <answer type="loncapa/python">
+correct=['correct']
+s = str(submission[0]).strip()
+if submission[0] == '':
+    correct[0] = 'incorrect'
+                </answer>
+            </customresponse>
+        </problem>
+    """)
 
 
 class CapaModuleTest(unittest.TestCase):
@@ -320,18 +382,16 @@ class CapaModuleTest(unittest.TestCase):
 
     def test_parse_get_params(self):
 
-        # We have to set up Django settings in order to use QueryDict
-        from django.conf import settings
-        settings.configure()
-
         # Valid GET param dict
-        valid_get_dict = self._querydict_from_dict({'input_1': 'test',
-                                                    'input_1_2': 'test',
-                                                    'input_1_2_3': 'test',
-                                                    'input_[]_3': 'test',
-                                                    'input_4': None,
-                                                    'input_5': [],
-                                                    'input_6': 5})
+        # 'input_5' intentionally left unset,
+        valid_get_dict = MultiDict({
+            'input_1': 'test',
+            'input_1_2': 'test',
+            'input_1_2_3': 'test',
+            'input_[]_3': 'test',
+            'input_4': None,
+            'input_6': 5
+        })
 
         result = CapaModule.make_dict_of_responses(valid_get_dict)
 
@@ -344,51 +404,30 @@ class CapaModuleTest(unittest.TestCase):
             self.assertEqual(valid_get_dict[original_key], result[key])
 
         # Valid GET param dict with list keys
-        valid_get_dict = self._querydict_from_dict({'input_2[]': ['test1', 'test2']})
+        # Each tuple represents a single parameter in the query string
+        valid_get_dict = MultiDict((('input_2[]', 'test1'), ('input_2[]', 'test2')))
         result = CapaModule.make_dict_of_responses(valid_get_dict)
         self.assertTrue('2' in result)
         self.assertEqual(['test1', 'test2'], result['2'])
 
         # If we use [] at the end of a key name, we should always
         # get a list, even if there's just one value
-        valid_get_dict = self._querydict_from_dict({'input_1[]': 'test'})
+        valid_get_dict = MultiDict({'input_1[]': 'test'})
         result = CapaModule.make_dict_of_responses(valid_get_dict)
         self.assertEqual(result['1'], ['test'])
 
         # If we have no underscores in the name, then the key is invalid
-        invalid_get_dict = self._querydict_from_dict({'input': 'test'})
+        invalid_get_dict = MultiDict({'input': 'test'})
         with self.assertRaises(ValueError):
             result = CapaModule.make_dict_of_responses(invalid_get_dict)
 
         # Two equivalent names (one list, one non-list)
         # One of the values would overwrite the other, so detect this
         # and raise an exception
-        invalid_get_dict = self._querydict_from_dict({'input_1[]': 'test 1',
-                                                      'input_1': 'test 2'})
+        invalid_get_dict = MultiDict({'input_1[]': 'test 1',
+                                      'input_1': 'test 2'})
         with self.assertRaises(ValueError):
             result = CapaModule.make_dict_of_responses(invalid_get_dict)
-
-    def _querydict_from_dict(self, param_dict):
-        """
-        Create a Django QueryDict from a Python dictionary
-        """
-
-        # QueryDict objects are immutable by default, so we make
-        # a copy that we can update.
-        querydict = QueryDict('')
-        copyDict = querydict.copy()
-
-        for (key, val) in param_dict.items():
-
-            # QueryDicts handle lists differently from ordinary values,
-            # so we have to specifically tell the QueryDict that
-            # this is a list
-            if type(val) is list:
-                copyDict.setlist(key, val)
-            else:
-                copyDict[key] = val
-
-        return copyDict
 
     def test_check_problem_correct(self):
 
@@ -502,6 +541,88 @@ class CapaModuleTest(unittest.TestCase):
 
         # Expect that the number of attempts is NOT incremented
         self.assertEqual(module.attempts, 1)
+
+    def test_check_problem_with_files(self):
+        # Check a problem with uploaded files, using the check_problem API.
+        # pylint: disable=W0212
+
+        # The files we'll be uploading.
+        fnames = ["prog1.py", "prog2.py", "prog3.py"]
+        fpaths = [os.path.join(DATA_DIR, "capa", fname) for fname in fnames]
+        fileobjs = [open(fpath) for fpath in fpaths]
+        for fileobj in fileobjs:
+            self.addCleanup(fileobj.close)
+
+        module = CapaFactoryWithFiles.create()
+
+        # Mock the XQueueInterface.
+        xqueue_interface = XQueueInterface("http://example.com/xqueue", Mock())
+        xqueue_interface._http_post = Mock(return_value=(0, "ok"))
+        module.system.xqueue['interface'] = xqueue_interface
+
+        # Create a request dictionary for check_problem.
+        get_request_dict = {
+            CapaFactoryWithFiles.input_key(input_num=2): fileobjs,
+            CapaFactoryWithFiles.input_key(input_num=3): 'None',
+        }
+
+        module.check_problem(get_request_dict)
+
+        # _http_post is called like this:
+        #   _http_post(
+        #       'http://example.com/xqueue/xqueue/submit/',
+        #       {
+        #           'xqueue_header': '{"lms_key": "df34fb702620d7ae892866ba57572491", "lms_callback_url": "/", "queue_name": "BerkeleyX-cs188x"}',
+        #           'xqueue_body': '{"student_info": "{\\"anonymous_student_id\\": \\"student\\", \\"submission_time\\": \\"20131117183318\\"}", "grader_payload": "{\\"project\\": \\"p3\\"}", "student_response": ""}',
+        #       },
+        #       files={
+        #           path(u'/home/ned/edx/edx-platform/common/test/data/uploads/asset.html'):
+        #               <open file u'/home/ned/edx/edx-platform/common/test/data/uploads/asset.html', mode 'r' at 0x49c5f60>,
+        #           path(u'/home/ned/edx/edx-platform/common/test/data/uploads/image.jpg'):
+        #               <open file u'/home/ned/edx/edx-platform/common/test/data/uploads/image.jpg', mode 'r' at 0x49c56f0>,
+        #           path(u'/home/ned/edx/edx-platform/common/test/data/uploads/textbook.pdf'):
+        #               <open file u'/home/ned/edx/edx-platform/common/test/data/uploads/textbook.pdf', mode 'r' at 0x49c5a50>,
+        #       },
+        #   )
+
+        self.assertEqual(xqueue_interface._http_post.call_count, 1)
+        _, kwargs = xqueue_interface._http_post.call_args
+        self.assertItemsEqual(fpaths, kwargs['files'].keys())
+        for fpath, fileobj in kwargs['files'].iteritems():
+            self.assertEqual(fpath, fileobj.name)
+
+    def test_check_problem_with_files_as_xblock(self):
+        # Check a problem with uploaded files, using the XBlock API.
+        # pylint: disable=W0212
+
+        # The files we'll be uploading.
+        fnames = ["prog1.py", "prog2.py", "prog3.py"]
+        fpaths = [os.path.join(DATA_DIR, "capa", fname) for fname in fnames]
+        fileobjs = [open(fpath) for fpath in fpaths]
+        for fileobj in fileobjs:
+            self.addCleanup(fileobj.close)
+
+        module = CapaFactoryWithFiles.create()
+
+        # Mock the XQueueInterface.
+        xqueue_interface = XQueueInterface("http://example.com/xqueue", Mock())
+        xqueue_interface._http_post = Mock(return_value=(0, "ok"))
+        module.system.xqueue['interface'] = xqueue_interface
+
+        # Create a webob Request with the files uploaded.
+        post_data = []
+        for fname, fileobj in zip(fnames, fileobjs):
+            post_data.append((CapaFactoryWithFiles.input_key(input_num=2), (fname, fileobj)))
+        post_data.append((CapaFactoryWithFiles.input_key(input_num=3), 'None'))
+        request = webob.Request.blank("/some/fake/url", POST=post_data, content_type='multipart/form-data')
+
+        module.handle('xmodule_handler', request, 'problem_check')
+
+        self.assertEqual(xqueue_interface._http_post.call_count, 1)
+        _, kwargs = xqueue_interface._http_post.call_args
+        self.assertItemsEqual(fnames, kwargs['files'].keys())
+        for fpath, fileobj in kwargs['files'].iteritems():
+            self.assertEqual(fpath, fileobj.name)
 
     def test_check_problem_error(self):
 
@@ -636,10 +757,10 @@ class CapaModuleTest(unittest.TestCase):
 
         # Expect that the problem was reset
         module.new_lcp.assert_called_once_with(None)
-        module.choose_new_seed.assert_called_once_with()
 
     def test_reset_problem_closed(self):
-        module = CapaFactory.create()
+        # pre studio default
+        module = CapaFactory.create(rerandomize="always")
 
         # Simulate that the problem is closed
         with patch('xmodule.capa_module.CapaModule.closed') as mock_closed:
@@ -829,6 +950,19 @@ class CapaModuleTest(unittest.TestCase):
         module = CapaFactory.create(attempts=0)
         self.assertEqual(module.check_button_name(), "Check")
 
+    def test_check_button_name_customization(self):
+        module = CapaFactory.create(attempts=1,
+                                    max_attempts=10,
+                                    text_customization={"custom_check": "Submit", "custom_final_check": "Final Submit"}
+                                    )
+        self.assertEqual(module.check_button_name(), "Submit")
+
+        module = CapaFactory.create(attempts=9,
+                                    max_attempts=10,
+                                    text_customization={"custom_check": "Submit", "custom_final_check": "Final Submit"}
+                                    )
+        self.assertEqual(module.check_button_name(), "Final Submit")
+
     def test_should_show_check_button(self):
 
         attempts = random.randint(1, 10)
@@ -900,13 +1034,13 @@ class CapaModuleTest(unittest.TestCase):
         module = CapaFactory.create(done=False)
         self.assertFalse(module.should_show_reset_button())
 
-        # Otherwise, DO show the reset button
-        module = CapaFactory.create(done=True)
+        # pre studio default value, DO show the reset button
+        module = CapaFactory.create(rerandomize="always", done=True)
         self.assertTrue(module.should_show_reset_button())
 
         # If survey question for capa (max_attempts = 0),
         # DO show the reset button
-        module = CapaFactory.create(max_attempts=0, done=True)
+        module = CapaFactory.create(rerandomize="always", max_attempts=0, done=True)
         self.assertTrue(module.should_show_reset_button())
 
     def test_should_show_save_button(self):
@@ -940,8 +1074,8 @@ class CapaModuleTest(unittest.TestCase):
         module = CapaFactory.create(max_attempts=None, rerandomize="per_student", done=True)
         self.assertFalse(module.should_show_save_button())
 
-        # Otherwise, DO show the save button
-        module = CapaFactory.create(done=False)
+        # pre-studio default, DO show the save button
+        module = CapaFactory.create(rerandomize="always", done=False)
         self.assertTrue(module.should_show_save_button())
 
         # If we're not randomizing and we have limited attempts,  then we can save
@@ -1232,6 +1366,37 @@ class CapaModuleTest(unittest.TestCase):
             self.assertIsNone(module.get_progress())
             mock_log.exception.assert_called_once_with('Got bad progress')
             mock_log.reset_mock()
+
+    @patch('xmodule.capa_module.Progress')
+    def test_get_progress_calculate_progress_fraction(self, mock_progress):
+        """
+        Check that score and total are calculated correctly for the progress fraction.
+        """
+        module = CapaFactory.create()
+        module.weight = 1
+        module.get_progress()
+        mock_progress.assert_called_with(0, 1)
+
+        other_module = CapaFactory.create(correct=True)
+        other_module.weight = 1
+        other_module.get_progress()
+        mock_progress.assert_called_with(1, 1)
+
+    def test_get_html(self):
+        """
+        Check that get_html() calls get_progress() with no arguments.
+        """
+        module = CapaFactory.create()
+        module.get_progress = Mock(wraps=module.get_progress)
+        module.get_html()
+        module.get_progress.assert_called_once_with()
+
+    def test_get_problem(self):
+        """
+        Check that get_problem() returns the expected dictionary.
+        """
+        module = CapaFactory.create()
+        self.assertEquals(module.get_problem("data"), {'html': module.get_problem_html(encapsulate=False)})
 
 
 class ComplexEncoderTest(unittest.TestCase):

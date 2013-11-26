@@ -1,7 +1,7 @@
 // studio - views - course settings
 // ====================
 
-body.course.settings {
+.view-settings {
 
   .content-primary, .content-supplementary {
     @include box-sizing(border-box);
@@ -9,7 +9,7 @@ body.course.settings {
   }
 
   .content-primary {
-    @extend .window;
+    @extend %ui-window;
     width: flex-grid(9, 12);
     margin-right: flex-gutter();
     padding: $baseline ($baseline*1.5);
@@ -72,7 +72,7 @@ body.course.settings {
       }
 
       .tip {
-        @extend .t-copy-sub2;
+        @extend %t-copy-sub2;
         width: flex-grid(5, 9);
         float: right;
         margin-top: ($baseline/2);
@@ -92,12 +92,12 @@ body.course.settings {
 
     // in form  -UI hints/tips/messages
     .instructions {
-      @extend .t-copy-sub1;
+      @extend %t-copy-sub1;
       margin: 0 0 $baseline 0;
     }
 
     .tip {
-      @extend .t-copy-sub2;
+      @extend %t-copy-sub2;
       @include transition(color $tmg-f2 ease-in-out 0s);
       display: block;
       margin-top: ($baseline/4);
@@ -105,7 +105,7 @@ body.course.settings {
     }
 
     .message-error {
-      @extend .t-copy-sub1;
+      @extend %t-copy-sub1;
       display: block;
       margin-top: ($baseline/4);
       margin-bottom: ($baseline/2);
@@ -115,12 +115,12 @@ body.course.settings {
     // buttons
     .remove-item {
       @include white-button;
-      @extend .t-action3;
+      @extend %t-action3;
       font-weight: 400;
     }
 
     .new-button {
-      // @extend .t-action3; - bad buttons won't render this properly
+      // @extend %t-action3; - bad buttons won't render this properly
       @include font-size(14);
     }
 
@@ -131,7 +131,7 @@ body.course.settings {
       list-style: none;
 
       .field {
-        margin: 0 0 $baseline 0;
+        margin: 0 0 ($baseline*2) 0;
 
         &:last-child {
           margin-bottom: 0;
@@ -154,7 +154,7 @@ body.course.settings {
         }
 
         label {
-          @extend .t-copy-sub1;
+          @extend %t-copy-sub1;
           @include transition(color $tmg-f2 ease-in-out 0s);
           margin: 0 0 ($baseline/4) 0;
           font-weight: 400;
@@ -165,7 +165,7 @@ body.course.settings {
         }
 
         input, textarea {
-          @extend .t-copy-base;
+          @extend %t-copy-base;
           @include placeholder($gray-l4);
           @include size(100%,100%);
           padding: ($baseline/2);
@@ -265,7 +265,7 @@ body.course.settings {
         }
 
         input, textarea {
-          @extend .t-copy-lead1;
+          @extend %t-copy-lead1;
           box-shadow: none;
           border: none;
           background: none;
@@ -301,7 +301,7 @@ body.course.settings {
         padding: ($baseline/2) 0 0 0;
 
         .title {
-          @extend .t-copy-sub1;
+          @extend %t-copy-sub1;
           margin: 0 0 ($baseline/10) 0;
           padding: 0 ($baseline/2);
 
@@ -315,7 +315,7 @@ body.course.settings {
           padding: 0 ($baseline/2) ($baseline/2) ($baseline/2);
 
           .link-courseURL {
-            @extend .t-copy-lead1;
+            @extend %t-copy-lead1;
             @include box-sizing(border-box);
             display: block;
             width: 100%;
@@ -337,11 +337,11 @@ body.course.settings {
 
           .action-primary {
             @include blue-button();
-            @extend .t-action3;
+            @extend %t-action3;
             font-weight: 600;
 
             [class^="icon-"] {
-              @extend .t-icon5;
+              @extend %t-icon5;
               display: inline-block;
               vertical-align: middle;
               margin-top: -3px;
@@ -432,6 +432,61 @@ body.course.settings {
       }
     }
 
+    // specific fields - course image
+    #field-course-image {
+
+      .current-course-image {
+        margin-bottom: ($baseline/2);
+        padding: ($baseline/2) $baseline;
+        background: $gray-l5;
+        text-align: center;
+
+        .wrapper-course-image {
+          display: block;
+          width: 375px;
+          height: 200px;
+          overflow: hidden;
+          margin: 0 auto;
+          border: 1px solid $gray-l4;
+          box-shadow: 0 1px 1px $shadow-l1;
+          padding: ($baseline/2);
+          background: $white;
+        }
+
+        .course-image {
+          display: block;
+          width: 100%;
+          min-height: 100%;
+        }
+
+        .msg {
+          @extend %t-copy-sub2;
+          display: block;
+          margin-top: ($baseline/2);
+          color: $gray-l3;
+        }
+      }
+
+      .wrapper-input {
+        @include clearfix();
+        width: flex-grid(9,9);
+
+        .input {
+          float: left;
+          width: flex-grid(6,9);
+          margin-right: flex-gutter();
+        }
+
+        .action-upload-image {
+          @extend %ui-btn-flat-outline;
+          float: right;
+          width: flex-grid(2,9);
+          margin-top: ($baseline/4);
+          padding: ($baseline/2) $baseline;
+        }
+      }
+    }
+
     // specific fields - requirements
     &.requirements {
 
@@ -445,7 +500,7 @@ body.course.settings {
       margin-bottom: ($baseline*3);
 
       .grade-controls {
-        @include clearfix;
+        @include clearfix();
         width: flex-grid(9,9);
       }
 
@@ -765,7 +820,7 @@ body.course.settings {
 
       // specific to code mirror instance in JSON policy editing, need to sync up with other similar code mirror UIs
       .CodeMirror {
-        @extend .t-copy-base;
+        @extend %t-copy-base;
         @include box-sizing(border-box);
         box-shadow: 0 1px 2px rgba(0, 0, 0, .1) inset;
         @include linear-gradient($lightGrey, tint($lightGrey, 90%));

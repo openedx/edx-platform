@@ -111,7 +111,7 @@ nav.sequence-nav {
           outline: 0;
         }
 
-        &:hover {
+        &:hover, &:focus {
           background-color: #fff;
           background-repeat: no-repeat;
           background-position: center 14px;
@@ -211,6 +211,8 @@ nav.sequence-nav {
           @include transition(all .1s $ease-in-out-quart 0s);
           white-space: pre;
           z-index: 99;
+          visibility: hidden;
+          pointer-events: none;
 
           &:empty {
             background: none;
@@ -233,11 +235,12 @@ nav.sequence-nav {
           }
         }
 
-        &:hover {
+        &:hover, &:focus {
           p {
             display: block;
             margin-top: 4px;
             opacity: 1.0;
+            visibility: visible;
           }
         }
       }
@@ -263,6 +266,7 @@ nav.sequence-nav {
       border: 1px solid #ccc;
       @include linear-gradient(top, #eee, #ddd);
       box-shadow: 0 1px 0 rgba(255, 255, 255, .7) inset;
+      z-index: 1;
 
       &.prev, &.next {
 
@@ -270,7 +274,7 @@ nav.sequence-nav {
           background-position: center;
           background-repeat: no-repeat;
           display: block;
-          height: 34px;
+          height: 100%;
           width: 40px;
           text-indent: -9999px;
           @include transition(all .2s $ease-in-out-quad 0s);

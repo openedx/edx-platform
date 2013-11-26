@@ -45,8 +45,8 @@ def get_commit_id(course):
 
 def set_commit_id(course, commit_id):
     #course.metadata['GIT_COMMIT_ID'] = commit_id
-    setattr(course, 'GIT_COMMIT_ID', commit_id)
-    # setattr(def_ms.courses[reload_dir], 'GIT_COMMIT_ID', new_commit_id)
+    course.GIT_COMMIT_ID = commit_id
+    # def_ms.courses[reload_dir].GIT_COMMIT_ID = new_commit_id
 
 
 def manage_modulestores(request, reload_dir=None, commit_id=None):

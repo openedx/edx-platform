@@ -6,6 +6,7 @@ XASSET_THUMBNAIL_TAIL_NAME = '.jpg'
 import os
 import logging
 import StringIO
+from urlparse import urlparse, urlunparse
 
 from xmodule.modulestore import Location
 from .django import contentstore
@@ -15,9 +16,9 @@ from PIL import Image
 
 class StaticContent(object):
     def __init__(self, loc, name, content_type, data, last_modified_at=None, thumbnail_location=None, import_path=None,
-                 length=None):
+                 length=None, locked=False):
         self.location = loc
-        self.name = name   # a display string which can be edited, and thus not part of the location which needs to be fixed
+        self.name = name  # a display string which can be edited, and thus not part of the location which needs to be fixed
         self.content_type = content_type
         self._data = data
         self.length = length
@@ -26,6 +27,7 @@ class StaticContent(object):
         # optional information about where this file was imported from. This is needed to support import/export
         # cycles
         self.import_path = import_path
+        self.locked = locked
 
     @property
     def is_thumbnail(self):
@@ -54,7 +56,38 @@ class StaticContent(object):
     @staticmethod
     def get_url_path_from_location(location):
         if location is not None:
-            return "/{tag}/{org}/{course}/{category}/{name}".format(**location.dict())
+            return u"/{tag}/{org}/{course}/{category}/{name}".format(**location.dict())
+        else:
+            return None
+
+    @staticmethod
+    def is_c4x_path(path_string):
+        """
+        Returns a boolean if a path is believed to be a c4x link based on the leading element
+        """
+        return path_string.startswith('/{0}/'.format(XASSET_LOCATION_TAG))
+
+    @staticmethod
+    def renamespace_c4x_path(path_string, target_location):
+        """
+        Returns an updated string which incorporates a new org/course in order to remap an asset path
+        to a new namespace
+        """
+        location = StaticContent.get_location_from_path(path_string)
+        location = location.replace(org=target_location.org, course=target_location.course)
+        return StaticContent.get_url_path_from_location(location)
+
+    @staticmethod
+    def get_static_path_from_location(location):
+        """
+        This utility static method will take a location identifier and create a 'durable' /static/.. URL representation of it.
+        This link is 'durable' as it can maintain integrity across cloning of courseware across course-ids, e.g. reruns of
+        courses.
+        In the LMS/CMS, we have runtime link-rewriting, so at render time, this /static/... format will get translated into
+        the actual /c4x/... path which the client needs to reference static content
+        """
+        if location is not None:
+            return "/static/{name}".format(**location.dict())
         else:
             return None
 
@@ -86,16 +119,32 @@ class StaticContent(object):
         loc = StaticContent.compute_location(course_namespace.org, course_namespace.course, path)
         return StaticContent.get_url_path_from_location(loc)
 
+    @staticmethod
+    def convert_legacy_static_url_with_course_id(path, course_id):
+        """
+        Returns a path to a piece of static content when we are provided with a filepath and
+        a course_id
+        """
+        org, course_num, __ = course_id.split("/")
+
+        # Generate url of urlparse.path component
+        scheme, netloc, orig_path, params, query, fragment = urlparse(path)
+        loc = StaticContent.compute_location(org, course_num, orig_path)
+        loc_url = StaticContent.get_url_path_from_location(loc)
+
+        # Reconstruct with new path
+        return urlunparse((scheme, netloc, loc_url, params, query, fragment))
+
     def stream_data(self):
         yield self._data
 
 
 class StaticContentStream(StaticContent):
     def __init__(self, loc, name, content_type, stream, last_modified_at=None, thumbnail_location=None, import_path=None,
-                 length=None):
+                 length=None, locked=False):
         super(StaticContentStream, self).__init__(loc, name, content_type, None, last_modified_at=last_modified_at,
                                                   thumbnail_location=thumbnail_location, import_path=import_path,
-                                                  length=length)
+                                                  length=length, locked=locked)
         self._stream = stream
 
     def stream_data(self):
@@ -112,7 +161,7 @@ class StaticContentStream(StaticContent):
         self._stream.seek(0)
         content = StaticContent(self.location, self.name, self.content_type, self._stream.read(),
                                 last_modified_at=self.last_modified_at, thumbnail_location=self.thumbnail_location,
-                                import_path=self.import_path, length=self.length)
+                                import_path=self.import_path, length=self.length, locked=self.locked)
         return content
 
 
@@ -126,7 +175,7 @@ class ContentStore(object):
     def find(self, filename):
         raise NotImplementedError
 
-    def get_all_content_for_course(self, location):
+    def get_all_content_for_course(self, location, start=0, maxresults=-1, sort=None):
         '''
         Returns a list of all static assets for a course. The return format is a list of dictionary elements. Example:
 

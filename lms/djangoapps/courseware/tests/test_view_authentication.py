@@ -3,23 +3,23 @@ import pytz
 
 from mock import patch
 
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 
 # Need access to internal func to put users in the right group
-from courseware.access import (has_access, _course_staff_group_name,
-                               course_beta_test_group_name, settings as access_settings)
+from courseware.access import has_access
+from courseware.roles import CourseBetaTesterRole, CourseInstructorRole, CourseStaffRole, GlobalStaff
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
-from helpers import LoginEnrollmentTestCase, check_for_get_code
-from modulestore_config import TEST_DATA_MONGO_MODULESTORE
+from courseware.tests.helpers import LoginEnrollmentTestCase, check_for_get_code
+from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Check that view authentication works properly.
@@ -173,9 +173,7 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         email, password = self.ACCOUNT_INFO[1]
 
         # Make the instructor staff in self.course
-        group_name = _course_staff_group_name(self.course.location)
-        group = Group.objects.create(name=group_name)
-        group.user_set.add(User.objects.get(email=email))
+        CourseInstructorRole(self.course.location).add_users(User.objects.get(email=email))
 
         self.login(email, password)
 
@@ -206,7 +204,7 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         for url in urls:
             check_for_get_code(self, 200, url)
 
-    @patch.dict(access_settings.MITX_FEATURES, {'DISABLE_START_DATES': False})
+    @patch.dict('courseware.access.settings.MITX_FEATURES', {'DISABLE_START_DATES': False})
     def test_dark_launch_enrolled_student(self):
         """
         Make sure that before course start, students can't access course
@@ -237,7 +235,7 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self._check_non_staff_light(self.test_course)
         self._check_non_staff_dark(self.test_course)
 
-    @patch.dict(access_settings.MITX_FEATURES, {'DISABLE_START_DATES': False})
+    @patch.dict('courseware.access.settings.MITX_FEATURES', {'DISABLE_START_DATES': False})
     def test_dark_launch_instructor(self):
         """
         Make sure that before course start instructors can access the
@@ -253,9 +251,8 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.test_course = self.update_course(self.test_course, test_course_data)
 
         # Make the instructor staff in  self.course
-        group_name = _course_staff_group_name(self.course.location)
-        group = Group.objects.create(name=group_name)
-        group.user_set.add(User.objects.get(email=instructor_email))
+        CourseStaffRole(self.course.location).add_users(User.objects.get(email=instructor_email))
+
         self.logout()
         self.login(instructor_email, instructor_password)
         # Enroll in the classes---can't see courseware otherwise.
@@ -267,7 +264,7 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self._check_non_staff_dark(self.test_course)
         self._check_staff(self.course)
 
-    @patch.dict(access_settings.MITX_FEATURES, {'DISABLE_START_DATES': False})
+    @patch.dict('courseware.access.settings.MITX_FEATURES', {'DISABLE_START_DATES': False})
     def test_dark_launch_staff(self):
         """
         Make sure that before course start staff can access
@@ -295,7 +292,7 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self._check_staff(self.course)
         self._check_staff(self.test_course)
 
-    @patch.dict(access_settings.MITX_FEATURES, {'DISABLE_START_DATES': False})
+    @patch.dict('courseware.access.settings.MITX_FEATURES', {'DISABLE_START_DATES': False})
     def test_enrollment_period(self):
         """
         Check that enrollment periods work.
@@ -323,25 +320,22 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertTrue(self.enroll(self.test_course))
 
         # Make the instructor staff in the self.course
-        group_name = _course_staff_group_name(self.course.location)
-        group = Group.objects.create(name=group_name)
-        group.user_set.add(User.objects.get(email=instructor_email))
+        instructor_role = CourseInstructorRole(self.course.location)
+        instructor_role.add_users(User.objects.get(email=instructor_email))
 
         self.logout()
         self.login(instructor_email, instructor_password)
         self.assertTrue(self.enroll(self.course))
 
         # now make the instructor global staff, but not in the instructor group
-        group.user_set.remove(User.objects.get(email=instructor_email))
-        instructor = User.objects.get(email=instructor_email)
-        instructor.is_staff = True
-        instructor.save()
+        instructor_role.remove_users(User.objects.get(email=instructor_email))
+        GlobalStaff().add_users(User.objects.get(email=instructor_email))
 
         # unenroll and try again
         self.unenroll(self.course)
         self.assertTrue(self.enroll(self.course))
 
-    @patch.dict(access_settings.MITX_FEATURES, {'DISABLE_START_DATES': False})
+    @patch.dict('courseware.access.settings.MITX_FEATURES', {'DISABLE_START_DATES': False})
     def test_beta_period(self):
         """
         Check that beta-test access works.
@@ -359,16 +353,14 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertFalse(self.course.has_started())
 
         # but should be accessible for beta testers
-        self.course.lms.days_early_for_beta = 2
+        self.course.days_early_for_beta = 2
 
         # student user shouldn't see it
         student_user = User.objects.get(email=student_email)
         self.assertFalse(has_access(student_user, self.course, 'load'))
 
         # now add the student to the beta test group
-        group_name = course_beta_test_group_name(self.course.location)
-        group = Group.objects.create(name=group_name)
-        group.user_set.add(student_user)
+        CourseBetaTesterRole(self.course.location).add_users(student_user)
 
         # now the student should see it
         self.assertTrue(has_access(student_user, self.course, 'load'))

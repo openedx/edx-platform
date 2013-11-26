@@ -32,6 +32,8 @@ import capa.xqueue_interface as xqueue_interface
 import capa.responsetypes as responsetypes
 from capa.safe_exec import safe_exec
 
+from pytz import UTC
+
 # dict of tagname, Response Class -- this should come from auto-registering
 response_tag_dict = dict([(x.response_tag, x) for x in responsetypes.__all__])
 
@@ -42,13 +44,22 @@ solution_tags = ['solution']
 response_properties = ["codeparam", "responseparam", "answer", "openendedparam"]
 
 # special problem tags which should be turned into innocuous HTML
-html_transforms = {'problem': {'tag': 'div'},
-                   'text': {'tag': 'span'},
-                   'math': {'tag': 'span'},
-                   }
+html_transforms = {
+    'problem': {'tag': 'div'},
+    'text': {'tag': 'span'},
+    'math': {'tag': 'span'},
+}
 
 # These should be removed from HTML output, including all subelements
-html_problem_semantics = ["codeparam", "responseparam", "answer", "script", "hintgroup", "openendedparam", "openendedrubric"]
+html_problem_semantics = [
+    "codeparam",
+    "responseparam",
+    "answer",
+    "script",
+    "hintgroup",
+    "openendedparam",
+    "openendedrubric"
+]
 
 log = logging.getLogger(__name__)
 
@@ -242,11 +253,15 @@ class LoncapaProblem(object):
             return None
 
         # Get a list of timestamps of all queueing requests, then convert it to a DateTime object
-        queuetime_strs = [self.correct_map.get_queuetime_str(answer_id)
-                          for answer_id in self.correct_map
-                          if self.correct_map.is_queued(answer_id)]
-        queuetimes = [datetime.strptime(qt_str, xqueue_interface.dateformat)
-                      for qt_str in queuetime_strs]
+        queuetime_strs = [
+            self.correct_map.get_queuetime_str(answer_id)
+            for answer_id in self.correct_map
+            if self.correct_map.is_queued(answer_id)
+        ]
+        queuetimes = [
+            datetime.strptime(qt_str, xqueue_interface.dateformat).replace(tzinfo=UTC)
+            for qt_str in queuetime_strs
+        ]
 
         return max(queuetimes)
 
@@ -404,10 +419,16 @@ class LoncapaProblem(object):
                     # open using ModuleSystem OSFS filestore
                     ifp = self.system.filestore.open(filename)
                 except Exception as err:
-                    log.warning('Error %s in problem xml include: %s' % (
-                            err, etree.tostring(inc, pretty_print=True)))
-                    log.warning('Cannot find file %s in %s' % (
-                            filename, self.system.filestore))
+                    log.warning(
+                        'Error %s in problem xml include: %s' % (
+                            err, etree.tostring(inc, pretty_print=True)
+                        )
+                    )
+                    log.warning(
+                        'Cannot find file %s in %s' % (
+                            filename, self.system.filestore
+                        )
+                    )
                     # if debugging, don't fail - just log error
                     # TODO (vshnayder): need real error handling, display to users
                     if not self.system.get('DEBUG'):
@@ -418,8 +439,11 @@ class LoncapaProblem(object):
                     # read in and convert to XML
                     incxml = etree.XML(ifp.read())
                 except Exception as err:
-                    log.warning('Error %s in problem xml include: %s' % (
-                            err, etree.tostring(inc, pretty_print=True)))
+                    log.warning(
+                        'Error %s in problem xml include: %s' % (
+                            err, etree.tostring(inc, pretty_print=True)
+                        )
+                    )
                     log.warning('Cannot parse XML in %s' % (filename))
                     # if debugging, don't fail - just log error
                     # TODO (vshnayder): same as above
@@ -531,6 +555,13 @@ class LoncapaProblem(object):
 
         Used by get_html.
         '''
+        if not isinstance(problemtree.tag, basestring):
+            # Comment and ProcessingInstruction nodes are not Elements,
+            # and we're ok leaving those behind.
+            # BTW: etree gives us no good way to distinguish these things
+            # other than to examine .tag to see if it's a string. :(
+            return
+
         if (problemtree.tag == 'script' and problemtree.get('type')
             and 'javascript' in problemtree.get('type')):
             # leave javascript intact.
@@ -579,8 +610,9 @@ class LoncapaProblem(object):
         # let each Response render itself
         if problemtree in self.responders:
             overall_msg = self.correct_map.get_overall_message()
-            return self.responders[problemtree].render_html(self._extract_html,
-                                                response_msg=overall_msg)
+            return self.responders[problemtree].render_html(
+                self._extract_html, response_msg=overall_msg
+            )
 
         # let each custom renderer render itself:
         if problemtree.tag in customrender.registry.registered_tags():
@@ -628,9 +660,10 @@ class LoncapaProblem(object):
 
             answer_id = 1
             input_tags = inputtypes.registry.registered_tags()
-            inputfields = tree.xpath("|".join(['//' + response.tag + '[@id=$id]//' + x
-                                               for x in (input_tags + solution_tags)]),
-                                    id=response_id_str)
+            inputfields = tree.xpath(
+                "|".join(['//' + response.tag + '[@id=$id]//' + x for x in (input_tags + solution_tags)]),
+                id=response_id_str
+            )
 
             # assign one answer_id for each input type or solution type
             for entry in inputfields:

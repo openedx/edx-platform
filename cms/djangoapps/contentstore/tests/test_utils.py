@@ -1,12 +1,21 @@
 """ Tests for utils. """
 from contentstore import utils
 import mock
+import unittest
 import collections
 import copy
+import json
+from uuid import uuid4
+
 from django.test import TestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 from django.test.utils import override_settings
 from xmodule.modulestore.tests.factories import CourseFactory
+
+from xmodule.contentstore.content import StaticContent
+from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.exceptions import NotFoundError
 
 
 class LMSLinksTestCase(TestCase):
@@ -56,63 +65,26 @@ class LMSLinksTestCase(TestCase):
     def get_about_page_link(self):
         """ create mock course and return the about page link """
         location = 'i4x', 'mitX', '101', 'course', 'test'
-        utils.get_course_id = mock.Mock(return_value="mitX/101/test")
         return utils.get_lms_link_for_about_page(location)
 
     def lms_link_test(self):
         """ Tests get_lms_link_for_item. """
         location = 'i4x', 'mitX', '101', 'vertical', 'contacting_us'
-        utils.get_course_id = mock.Mock(return_value="mitX/101/test")
-        link = utils.get_lms_link_for_item(location, False)
+        link = utils.get_lms_link_for_item(location, False, "mitX/101/test")
         self.assertEquals(link, "//localhost:8000/courses/mitX/101/test/jump_to/i4x://mitX/101/vertical/contacting_us")
-        link = utils.get_lms_link_for_item(location, True)
+        link = utils.get_lms_link_for_item(location, True, "mitX/101/test")
         self.assertEquals(
             link,
             "//preview/courses/mitX/101/test/jump_to/i4x://mitX/101/vertical/contacting_us"
         )
 
-
-class UrlReverseTestCase(ModuleStoreTestCase):
-    """ Tests for get_url_reverse """
-    def test_course_page_names(self):
-        """ Test the defined course pages. """
-        course = CourseFactory.create(org='mitX', number='666', display_name='URL Reverse Course')
-
+        # If no course_id is passed in, it is obtained from the location. This is the case for
+        # Studio dashboard.
+        location = 'i4x', 'mitX', '101', 'course', 'test'
+        link = utils.get_lms_link_for_item(location)
         self.assertEquals(
-            '/manage_users/i4x://mitX/666/course/URL_Reverse_Course',
-            utils.get_url_reverse('ManageUsers', course)
-        )
-
-        self.assertEquals(
-            '/mitX/666/settings-details/URL_Reverse_Course',
-            utils.get_url_reverse('SettingsDetails', course)
-        )
-
-        self.assertEquals(
-            '/mitX/666/settings-grading/URL_Reverse_Course',
-            utils.get_url_reverse('SettingsGrading', course)
-        )
-
-        self.assertEquals(
-            '/mitX/666/course/URL_Reverse_Course',
-            utils.get_url_reverse('CourseOutline', course)
-        )
-
-        self.assertEquals(
-            '/mitX/666/checklists/URL_Reverse_Course',
-            utils.get_url_reverse('Checklists', course)
-        )
-
-    def test_unknown_passes_through(self):
-        """ Test that unknown values pass through. """
-        course = CourseFactory.create(org='mitX', number='666', display_name='URL Reverse Course')
-        self.assertEquals(
-            'foobar',
-            utils.get_url_reverse('foobar', course)
-        )
-        self.assertEquals(
-            'https://edge.edx.org/courses/edX/edX101/How_to_Create_an_edX_Course/about',
-            utils.get_url_reverse('https://edge.edx.org/courses/edX/edX101/How_to_Create_an_edX_Course/about', course)
+            link,
+            "//localhost:8000/courses/mitX/101/test/jump_to/i4x://mitX/101/course/test"
         )
 
 
@@ -126,8 +98,10 @@ class ExtraPanelTabTestCase(TestCase):
         else:
             return []
 
-    def get_course_with_tabs(self, tabs=[]):
+    def get_course_with_tabs(self, tabs=None):
         """ Returns a mock course object with a tabs attribute. """
+        if tabs is None:
+            tabs = []
         course = collections.namedtuple('MockCourse', ['tabs'])
         if isinstance(tabs, basestring):
             course.tabs = self.get_tab_type_dicts(tabs)
@@ -190,3 +164,12 @@ class ExtraPanelTabTestCase(TestCase):
                 self.assertFalse(changed)
                 self.assertEqual(actual_tabs, expected_tabs)
 
+
+class CourseImageTestCase(TestCase):
+    """Tests for course image URLs."""
+
+    def test_get_image_url(self):
+        """Test image URL formatting."""
+        course = CourseFactory.create(org='edX', course='999')
+        url = utils.course_image_url(course)
+        self.assertEquals(url, '/c4x/edX/999/asset/{0}'.format(course.course_image))

@@ -6,6 +6,7 @@ from django.db import models
 
 log = logging.getLogger(__name__)
 
+
 class Score(models.Model):
     """
     This model stores the scores of different users on FoldIt problems.
@@ -35,9 +36,8 @@ class Score(models.Model):
         """
         return (-score) * 10 + 8000 * sum_of
 
-
     @staticmethod
-    def get_tops_n(n, puzzles=['994559']):
+    def get_tops_n(n, puzzles=['994559'], course_list=None):
         """
         Arguments:
             puzzles: a list of puzzle ids that we will use. If not specified,
@@ -46,22 +46,34 @@ class Score(models.Model):
 
 
         Returns:
-            The top n sum of scores for puzzles in <puzzles>. Output is a list
-            of disctionaries, sorted by display_score:
+            The top n sum of scores for puzzles in <puzzles>,
+            filtered by course. If no courses is specified we default
+            the pool of students to all courses. Output is a list
+            of dictionaries, sorted by display_score:
                 [ {username: 'a_user',
                    score: 12000} ...]
         """
-        if not(type(puzzles) == list):
+
+        if not isinstance(puzzles, list):
             puzzles = [puzzles]
-        scores = Score.objects \
-            .filter(puzzle_id__in=puzzles) \
-            .annotate(total_score=models.Sum('best_score')) \
-            .order_by('total_score')[:n]
+        if course_list is None:
+            scores = Score.objects \
+                .filter(puzzle_id__in=puzzles) \
+                .annotate(total_score=models.Sum('best_score')) \
+                .order_by('total_score')[:n]
+        else:
+            scores = Score.objects \
+                .filter(puzzle_id__in=puzzles) \
+                .filter(user__courseenrollment__course_id__in=course_list) \
+                .annotate(total_score=models.Sum('best_score')) \
+                .order_by('total_score')[:n]
         num = len(puzzles)
 
-        return [{'username': s.user.username,
-                 'score': Score.display_score(s.total_score, num)}
-                 for s in scores]
+        return [
+            {'username': score.user.username,
+             'score': Score.display_score(score.total_score, num)}
+            for score in scores
+        ]
 
 
 class PuzzleComplete(models.Model):
@@ -93,7 +105,6 @@ class PuzzleComplete(models.Model):
             self.user.username, self.puzzle_id,
             self.puzzle_set, self.puzzle_subset,
             self.created)
-
 
     @staticmethod
     def completed_puzzles(anonymous_user_id):

@@ -2,11 +2,9 @@ import json
 import logging
 from collections import defaultdict
 
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseBadRequest
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_http_methods
 from django.core.exceptions import PermissionDenied
-from django_future.csrf import ensure_csrf_cookie
 from django.conf import settings
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 from mitxmako.shortcuts import render_to_response
@@ -14,28 +12,29 @@ from mitxmako.shortcuts import render_to_response
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.util.date_utils import get_default_time_display
+from xmodule.modulestore.django import loc_mapper
 
-from xblock.core import Scope
-from util.json_request import expect_json, JsonResponse
+from xblock.fields import Scope
+from util.json_request import expect_json
 
-from contentstore.module_info_model import get_module_info, set_module_info
-from contentstore.utils import get_modulestore, get_lms_link_for_item, \
-    compute_unit_state, UnitState, get_course_for_item
+from contentstore.utils import get_lms_link_for_item, compute_unit_state, UnitState, get_course_for_item
 
 from models.settings.course_grading import CourseGradingModel
 
-from .requests import _xmodule_recurse
+from .helpers import _xmodule_recurse
 from .access import has_access
+from xmodule.x_module import XModuleDescriptor
+from xblock.plugin import PluginMissingError
+from xblock.runtime import Mixologist
 
 __all__ = ['OPEN_ENDED_COMPONENT_TYPES',
            'ADVANCED_COMPONENT_POLICY_KEY',
            'edit_subsection',
            'edit_unit',
-           'assignment_type_update',
            'create_draft',
            'publish_draft',
            'unpublish_unit',
-           'module_info']
+           ]
 
 log = logging.getLogger(__name__)
 
@@ -44,13 +43,19 @@ COMPONENT_TYPES = ['discussion', 'html', 'problem', 'video']
 
 OPEN_ENDED_COMPONENT_TYPES = ["combinedopenended", "peergrading"]
 NOTE_COMPONENT_TYPES = ['notes']
-ADVANCED_COMPONENT_TYPES = ['annotatable', 'word_cloud', 'videoalpha'] + OPEN_ENDED_COMPONENT_TYPES + NOTE_COMPONENT_TYPES
+ADVANCED_COMPONENT_TYPES = [
+    'annotatable',
+    'word_cloud',
+    'graphical_slider_tool',
+    'lti',
+] + OPEN_ENDED_COMPONENT_TYPES + NOTE_COMPONENT_TYPES
 ADVANCED_COMPONENT_CATEGORY = 'advanced'
 ADVANCED_COMPONENT_POLICY_KEY = 'advanced_modules'
 
 
 @login_required
 def edit_subsection(request, location):
+    "Edit the subsection of a course"
     # check that we have permissions to edit this item
     try:
         course = get_course_for_item(location)
@@ -68,7 +73,8 @@ def edit_subsection(request, location):
     lms_link = get_lms_link_for_item(location, course_id=course.location.course_id)
     preview_link = get_lms_link_for_item(location, course_id=course.location.course_id, preview=True)
 
-    # make sure that location references a 'sequential', otherwise return BadRequest
+    # make sure that location references a 'sequential', otherwise return
+    # BadRequest
     if item.location.category != 'sequential':
         return HttpResponseBadRequest()
 
@@ -76,18 +82,25 @@ def edit_subsection(request, location):
 
     # we're for now assuming a single parent
     if len(parent_locs) != 1:
-        logging.error('Multiple (or none) parents have been found for {0}'.format(location))
+        logging.error(
+            'Multiple (or none) parents have been found for %s',
+            location
+        )
 
     # this should blow up if we don't find any parents, which would be erroneous
     parent = modulestore().get_item(parent_locs[0])
 
-    # remove all metadata from the generic dictionary that is presented in a more normalized UI
+    # remove all metadata from the generic dictionary that is presented in a
+    # more normalized UI. We only want to display the XBlocks fields, not
+    # the fields from any mixins that have been added
+    fields = getattr(item, 'unmixed_class', item.__class__).fields
 
     policy_metadata = dict(
         (field.name, field.read_from(item))
         for field
-        in item.fields
-        if field.name not in ['display_name', 'start', 'due', 'format'] and field.scope == Scope.settings
+        in fields.values()
+        if field.name not in ['display_name', 'start', 'due', 'format']
+        and field.scope == Scope.settings
     )
 
     can_view_live = False
@@ -98,19 +111,38 @@ def edit_subsection(request, location):
             can_view_live = True
             break
 
-    return render_to_response('edit_subsection.html',
-                              {'subsection': item,
-                               'context_course': course,
-                               'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty'),
-                               'lms_link': lms_link,
-                               'preview_link': preview_link,
-                               'course_graders': json.dumps(CourseGradingModel.fetch(course.location).graders),
-                               'parent_location': course.location,
-                               'parent_item': parent,
-                               'policy_metadata': policy_metadata,
-                               'subsection_units': subsection_units,
-                               'can_view_live': can_view_live
-                               })
+    course_locator = loc_mapper().translate_location(
+        course.location.course_id, course.location, False, True
+    )
+    locator = loc_mapper().translate_location(
+        course.location.course_id, item.location, False, True
+    )
+
+    return render_to_response(
+        'edit_subsection.html',
+        {
+            'subsection': item,
+            'context_course': course,
+            'new_unit_category': 'vertical',
+            'lms_link': lms_link,
+            'preview_link': preview_link,
+            'course_graders': json.dumps(CourseGradingModel.fetch(course_locator).graders),
+            'parent_item': parent,
+            'locator': locator,
+            'policy_metadata': policy_metadata,
+            'subsection_units': subsection_units,
+            'can_view_live': can_view_live
+        }
+    )
+
+
+def load_mixed_class(category):
+    """
+    Load an XBlock by category name, and apply all defined mixins
+    """
+    component_class = XModuleDescriptor.load_class(category)
+    mixologist = Mixologist(settings.XBLOCK_MIXINS)
+    return mixologist.mix(component_class)
 
 
 @login_required
@@ -118,7 +150,7 @@ def edit_unit(request, location):
     """
     Display an editing page for the specified module.
 
-    Expects a GET request with the parameter 'id'.
+    Expects a GET request with the parameter `id`.
 
     id: A Location URL
     """
@@ -134,42 +166,87 @@ def edit_unit(request, location):
         item = modulestore().get_item(location, depth=1)
     except ItemNotFoundError:
         return HttpResponseBadRequest()
+    lms_link = get_lms_link_for_item(
+        item.location,
+        course_id=course.location.course_id
+    )
 
-    lms_link = get_lms_link_for_item(item.location, course_id=course.location.course_id)
+    # Note that the unit_state (draft, public, private) does not match up with the published value
+    # passed to translate_location. The two concepts are different at this point.
+    unit_locator = loc_mapper().translate_location(
+        course.location.course_id, Location(location), False, True
+    )
 
     component_templates = defaultdict(list)
+    for category in COMPONENT_TYPES:
+        component_class = load_mixed_class(category)
+        # add the default template
+        # TODO: Once mixins are defined per-application, rather than per-runtime,
+        # this should use a cms mixed-in class. (cpennington)
+        if hasattr(component_class, 'display_name'):
+            display_name = component_class.display_name.default or 'Blank'
+        else:
+            display_name = 'Blank'
+        component_templates[category].append((
+            display_name,
+            category,
+            False,  # No defaults have markdown (hardcoded current default)
+            None  # no boilerplate for overrides
+        ))
+        # add boilerplates
+        if hasattr(component_class, 'templates'):
+            for template in component_class.templates():
+                filter_templates = getattr(component_class, 'filter_templates', None)
+                if not filter_templates or filter_templates(template, course):
+                    component_templates[category].append((
+                        template['metadata'].get('display_name'),
+                        category,
+                        template['metadata'].get('markdown') is not None,
+                        template.get('template_id')
+                    ))
 
-    # Check if there are any advanced modules specified in the course policy. These modules
-    # should be specified as a list of strings, where the strings are the names of the modules
-    # in ADVANCED_COMPONENT_TYPES that should be enabled for the course.
+    # Check if there are any advanced modules specified in the course policy.
+    # These modules should be specified as a list of strings, where the strings
+    # are the names of the modules in ADVANCED_COMPONENT_TYPES that should be
+    # enabled for the course.
     course_advanced_keys = course.advanced_modules
 
     # Set component types according to course policy file
-    component_types = list(COMPONENT_TYPES)
     if isinstance(course_advanced_keys, list):
-        course_advanced_keys = [c for c in course_advanced_keys if c in ADVANCED_COMPONENT_TYPES]
-        if len(course_advanced_keys) > 0:
-            component_types.append(ADVANCED_COMPONENT_CATEGORY)
+        for category in course_advanced_keys:
+            if category in ADVANCED_COMPONENT_TYPES:
+                # Do I need to allow for boilerplates or just defaults on the
+                # class? i.e., can an advanced have more than one entry in the
+                # menu? one for default and others for prefilled boilerplates?
+                try:
+                    component_class = load_mixed_class(category)
+
+                    component_templates['advanced'].append((
+                        component_class.display_name.default or category,
+                        category,
+                        False,
+                        None  # don't override default data
+                    ))
+                except PluginMissingError:
+                    # dhm: I got this once but it can happen any time the
+                    # course author configures an advanced component which does
+                    # not exist on the server. This code here merely
+                    # prevents any authors from trying to instantiate the
+                    # non-existent component type by not showing it in the menu
+                    pass
     else:
-        log.error("Improper format for course advanced keys! {0}".format(course_advanced_keys))
-
-    templates = modulestore().get_items(Location('i4x', 'edx', 'templates'))
-    for template in templates:
-        category = template.location.category
-
-        if category in course_advanced_keys:
-            category = ADVANCED_COMPONENT_CATEGORY
-
-        if category in component_types:
-            # This is a hack to create categories for different xmodules
-            component_templates[category].append((
-                template.display_name_with_default,
-                template.location.url(),
-                hasattr(template, 'markdown') and template.markdown is not None
-            ))
+        log.error(
+            "Improper format for course advanced keys! %s",
+            course_advanced_keys
+        )
 
     components = [
-        component.location.url()
+        [
+            component.location.url(),
+            loc_mapper().translate_location(
+                course.location.course_id, component.location, False, True
+            )
+        ]
         for component
         in item.get_children()
     ]
@@ -180,14 +257,16 @@ def edit_unit(request, location):
 
     containing_subsection_locs = modulestore().get_parent_locations(location, None)
     containing_subsection = modulestore().get_item(containing_subsection_locs[0])
-
-    containing_section_locs = modulestore().get_parent_locations(containing_subsection.location, None)
+    containing_section_locs = modulestore().get_parent_locations(
+        containing_subsection.location, None
+    )
     containing_section = modulestore().get_item(containing_section_locs[0])
 
     # cdodge hack. We're having trouble previewing drafts via jump_to redirect
     # so let's generate the link url here
 
-    # need to figure out where this item is in the list of children as the preview will need this
+    # need to figure out where this item is in the list of children as the
+    # preview will need this
     index = 1
     for child in containing_subsection.get_children():
         if child.location == item.location:
@@ -196,7 +275,10 @@ def edit_unit(request, location):
 
     preview_lms_base = settings.MITX_FEATURES.get('PREVIEW_LMS_BASE')
 
-    preview_lms_link = '//{preview_lms_base}/courses/{org}/{course}/{course_name}/courseware/{section}/{subsection}/{index}'.format(
+    preview_lms_link = (
+        '//{preview_lms_base}/courses/{org}/{course}/'
+        '{course_name}/courseware/{section}/{subsection}/{index}'
+    ).format(
         preview_lms_base=preview_lms_base,
         lms_base=settings.LMS_BASE,
         org=course.location.org,
@@ -204,56 +286,47 @@ def edit_unit(request, location):
         course_name=course.location.name,
         section=containing_section.location.name,
         subsection=containing_subsection.location.name,
-        index=index)
-
-    unit_state = compute_unit_state(item)
+        index=index
+    )
 
     return render_to_response('unit.html', {
         'context_course': course,
         'unit': item,
+        # Still needed for creating a draft.
         'unit_location': location,
+        'unit_locator': unit_locator,
         'components': components,
         'component_templates': component_templates,
         'draft_preview_link': preview_lms_link,
         'published_preview_link': lms_link,
         'subsection': containing_subsection,
-        'release_date': get_default_time_display(containing_subsection.lms.start) if containing_subsection.lms.start is not None else None,
+        'release_date': (
+            get_default_time_display(containing_subsection.start)
+            if containing_subsection.start is not None else None
+        ),
         'section': containing_section,
-        'create_new_unit_template': Location('i4x', 'edx', 'templates', 'vertical', 'Empty'),
-        'unit_state': unit_state,
-        'published_date': get_default_time_display(item.cms.published_date) if item.cms.published_date is not None else None
+        'new_unit_category': 'vertical',
+        'unit_state': compute_unit_state(item),
+        'published_date': (
+            get_default_time_display(item.published_date)
+            if item.published_date is not None else None
+        ),
     })
-
-
-@expect_json
-@login_required
-@ensure_csrf_cookie
-def assignment_type_update(request, org, course, category, name):
-    '''
-    CRUD operations on assignment types for sections and subsections and anything else gradable.
-    '''
-    location = Location(['i4x', org, course, category, name])
-    if not has_access(request.user, location):
-        return HttpResponseForbidden()
-
-    if request.method == 'GET':
-        return JsonResponse(CourseGradingModel.get_section_grader_type(location))
-    elif request.method == 'POST':  # post or put, doesn't matter.
-        return JsonResponse(CourseGradingModel.update_section_grader_type(location, request.POST))
 
 
 @login_required
 @expect_json
 def create_draft(request):
-    location = request.POST['id']
+    "Create a draft"
+    location = request.json['id']
 
     # check permissions for this user within this course
     if not has_access(request.user, location):
         raise PermissionDenied()
 
-    # This clones the existing item location to a draft location (the draft is implicit,
-    # because modulestore is a Draft modulestore)
-    modulestore().clone_item(location, location)
+    # This clones the existing item location to a draft location (the draft is
+    # implicit, because modulestore is a Draft modulestore)
+    modulestore().convert_to_draft(location)
 
     return HttpResponse()
 
@@ -261,14 +334,20 @@ def create_draft(request):
 @login_required
 @expect_json
 def publish_draft(request):
-    location = request.POST['id']
+    """
+    Publish a draft
+    """
+    location = request.json['id']
 
     # check permissions for this user within this course
     if not has_access(request.user, location):
         raise PermissionDenied()
 
     item = modulestore().get_item(location)
-    _xmodule_recurse(item, lambda i: modulestore().publish(i.location, request.user.id))
+    _xmodule_recurse(
+        item,
+        lambda i: modulestore().publish(i.location, request.user.id)
+    )
 
     return HttpResponse()
 
@@ -276,7 +355,8 @@ def publish_draft(request):
 @login_required
 @expect_json
 def unpublish_unit(request):
-    location = request.POST['id']
+    "Unpublish a unit"
+    location = request.json['id']
 
     # check permissions for this user within this course
     if not has_access(request.user, location):
@@ -286,27 +366,3 @@ def unpublish_unit(request):
     _xmodule_recurse(item, lambda i: modulestore().unpublish(i.location))
 
     return HttpResponse()
-
-
-@expect_json
-@require_http_methods(("GET", "POST", "PUT"))
-@login_required
-@ensure_csrf_cookie
-def module_info(request, module_location):
-    location = Location(module_location)
-
-    # check that logged in user has permissions to this item
-    if not has_access(request.user, location):
-        raise PermissionDenied()
-
-    rewrite_static_links = request.GET.get('rewrite_url_links', 'True') in ['True', 'true']
-    logging.debug('rewrite_static_links = {0} {1}'.format(request.GET.get('rewrite_url_links', 'False'), rewrite_static_links))
-
-    # check that logged in user has permissions to this item
-    if not has_access(request.user, location):
-        raise PermissionDenied()
-
-    if request.method == 'GET':
-        return JsonResponse(get_module_info(get_modulestore(location), location, rewrite_static_links=rewrite_static_links))
-    elif request.method in ("POST", "PUT"):
-        return JsonResponse(set_module_info(get_modulestore(location), location, request.POST))

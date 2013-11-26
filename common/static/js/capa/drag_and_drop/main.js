@@ -1,6 +1,10 @@
 (function (requirejs, require, define) {
 define(
-    ['logme', 'state', 'config_parser', 'container', 'base_image', 'scroller', 'draggables', 'targets', 'update_input'],
+    ['js/capa/drag_and_drop/logme', 'js/capa/drag_and_drop/state',
+     'js/capa/drag_and_drop/config_parser', 'js/capa/drag_and_drop/container',
+     'js/capa/drag_and_drop/base_image', 'js/capa/drag_and_drop/scroller',
+     'js/capa/drag_and_drop/draggables', 'js/capa/drag_and_drop/targets',
+     'js/capa/drag_and_drop/update_input'],
     function (logme, State, configParser, Container, BaseImage, Scroller, Draggables, Targets, updateInput) {
     return Main;
 

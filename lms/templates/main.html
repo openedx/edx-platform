@@ -1,6 +1,5 @@
 <%! from django.utils.translation import ugettext as _ %>
-<%! from django.utils import translation    %>
-<%!translation.activate('vi')%>
+
 <%namespace name='static' file='static_content.html'/>
 <%! from django.utils import html %>
 
@@ -17,15 +16,21 @@
 </%def>
 
 <!DOCTYPE html>
-
-<html>
+<!--[if IE 7]><html class="ie ie7 lte9 lte8 lte7" lang="en-us"><![endif]-->
+<!--[if IE 8]><html class="ie ie8 lte9 lte8" lang="en-us"><![endif]-->
+<!--[if IE 9]><html class="ie ie9 lte9" lang="en-us"><![endif]-->
+<!--[if gt IE 9]><!--><html lang="en-us"><!--<![endif]-->
 <head>
   <%block name="title">
     % if stanford_theme_enabled():
-      <title>${_("Home | class.stanford.edu")}</title>
+      <title>${_("Home")} | class.stanford.edu</title>
     % else:
+      ## "edX" should not be translated
       <title>edX</title>
-      
+
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+
       <script type="text/javascript">
         /* immediately break out of an iframe if coming from the marketing website */
         (function(window) {
@@ -37,23 +42,26 @@
     % endif
   </%block>
 
+  <script type="text/javascript" src="/jsi18n/"></script>
+
   <link rel="icon" type="image/x-icon" href="${static.url(settings.FAVICON_PATH)}" />
 
-  <%static:css group='application'/>
+  <%static:css group='style-vendor'/>
+  <%static:css group='style-app'/>
+  <%static:css group='style-app-extend1'/>
+  <%static:css group='style-app-extend2'/>
 
   <%static:js group='main_vendor'/>
+
   <%block name="headextra"/>
   % if theme_enabled():
     <%include file="theme-head-extra.html" />
   % endif
 
   <!--[if lt IE 9]>
-  <script src="${static.url('js/html5shiv.js')}"></script>
+    <script src="${static.url('js/html5shiv.js')}"></script>
   <![endif]-->
 
-  <!--[if lte IE 9]>
-  <%static:css group='ie-fixes'/>
-  <![endif]-->
   <meta name="path_prefix" content="${MITX_ROOT_URL}">
   <meta name="google-site-verification" content="_mipQ4AtZQDNmbtOkwehQDOgCxUUV2fb_C0b6wbiRHY" />
 
@@ -70,6 +78,9 @@
 </head>
 
 <body class="<%block name='bodyclass'/>">
+  <a class="nav-skip" href="#content">${_("Skip to this view's content")}</a>
+
+  <%include file="mathjax_accessible.html" />
 
 % if theme_enabled():
   <%include file="theme-header.html" />
@@ -77,7 +88,7 @@
   <%include file="navigation.html" />
 % endif
 
-  <section class="content-wrapper">
+  <section class="content-wrapper" id="content">
     ${self.body()}
     <%block name="bodyextra"/>
   </section>
@@ -88,6 +99,7 @@
   <%include file="footer.html" />
 % endif
 
+  <script>window.baseUrl = "${settings.STATIC_URL}";</script>
   <%static:js group='application'/>
   <%static:js group='module-js'/>
 

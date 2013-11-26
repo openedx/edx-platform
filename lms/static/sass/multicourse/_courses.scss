@@ -49,7 +49,7 @@
           vertical-align: middle;
 
           &::after {
-            @extend .faded-vertical-divider;
+            @extend %faded-vertical-divider;
             content: "";
             display: block;
             height: 80px;

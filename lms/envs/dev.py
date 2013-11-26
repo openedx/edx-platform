@@ -16,10 +16,15 @@ from .common import *
 from logsettings import get_logger_config
 
 DEBUG = True
+USE_I18N = True
+# For displaying the dummy text, we need to provide a language mapping.
+LANGUAGES = (
+    ('eo', 'Esperanto'),
+)
 TEMPLATE_DEBUG = True
 
 
-MITX_FEATURES['DISABLE_START_DATES'] = True
+MITX_FEATURES['DISABLE_START_DATES'] = False
 MITX_FEATURES['ENABLE_SQL_TRACKING_LOGS'] = True
 MITX_FEATURES['SUBDOMAIN_COURSE_LISTINGS'] = False  # Enable to test subdomains--otherwise, want all courses to show up
 MITX_FEATURES['SUBDOMAIN_BRANDING'] = True
@@ -28,7 +33,15 @@ MITX_FEATURES['ENABLE_MANUAL_GIT_RELOAD'] = True
 MITX_FEATURES['ENABLE_PSYCHOMETRICS'] = False    # real-time psychometrics (eg item response theory analysis in instructor dashboard)
 MITX_FEATURES['ENABLE_INSTRUCTOR_ANALYTICS'] = True
 MITX_FEATURES['ENABLE_SERVICE_STATUS'] = True
+MITX_FEATURES['ENABLE_INSTRUCTOR_EMAIL'] = True     # Enable email for all Studio courses
+MITX_FEATURES['REQUIRE_COURSE_EMAIL_AUTH'] = False  # Give all courses email (don't require django-admin perms)
 MITX_FEATURES['ENABLE_HINTER_INSTRUCTOR_VIEW'] = True
+MITX_FEATURES['ENABLE_INSTRUCTOR_BETA_DASHBOARD'] = True
+MITX_FEATURES['MULTIPLE_ENROLLMENT_ROLES'] = True
+MITX_FEATURES['ENABLE_SHOPPING_CART'] = True
+MITX_FEATURES['AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'] = True
+
+FEEDBACK_SUBMISSION_EMAIL = "dummy@example.com"
 
 WIKI_ENABLED = True
 
@@ -250,11 +263,25 @@ ANALYTICS_API_KEY = ""
 
 ##### segment-io  ######
 
-# If there's an environment variable set, grab it and turn on segment io
+# If there's an environment variable set, grab it and turn on Segment.io
 SEGMENT_IO_LMS_KEY = os.environ.get('SEGMENT_IO_LMS_KEY')
 if SEGMENT_IO_LMS_KEY:
     MITX_FEATURES['SEGMENT_IO_LMS'] = True
 
+###################### Payment ##############################3
+
+CC_PROCESSOR['CyberSource']['SHARED_SECRET'] = os.environ.get('CYBERSOURCE_SHARED_SECRET', '')
+CC_PROCESSOR['CyberSource']['MERCHANT_ID'] = os.environ.get('CYBERSOURCE_MERCHANT_ID', '')
+CC_PROCESSOR['CyberSource']['SERIAL_NUMBER'] = os.environ.get('CYBERSOURCE_SERIAL_NUMBER', '')
+CC_PROCESSOR['CyberSource']['PURCHASE_ENDPOINT'] = os.environ.get('CYBERSOURCE_PURCHASE_ENDPOINT', '')
+
+
+########################## USER API ########################
+EDX_API_KEY = None
+
+
+####################### Shoppingcart ###########################
+MITX_FEATURES['ENABLE_SHOPPING_CART'] = True
 
 #####################################################################
 # Lastly, see if the developer has any local overrides.

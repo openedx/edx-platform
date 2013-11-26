@@ -1,178 +1,159 @@
 import logging
-import json
-import os
-import tarfile
-import shutil
-from tempfile import mkdtemp
-from path import path
+from functools import partial
 
-from django.conf import settings
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import HttpResponseBadRequest
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_http_methods
 from django_future.csrf import ensure_csrf_cookie
-from django.core.urlresolvers import reverse
-from django.core.servers.basehttp import FileWrapper
-from django.core.files.temp import NamedTemporaryFile
 from django.views.decorators.http import require_POST
 
 from mitxmako.shortcuts import render_to_response
 from cache_toolbox.core import del_cached_content
-from auth.authz import create_all_course_groups
 
-from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.contentstore.django import contentstore
-from xmodule.modulestore.xml_exporter import export_to_xml
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import Location
 from xmodule.contentstore.content import StaticContent
 from xmodule.util.date_utils import get_default_time_display
 from xmodule.modulestore import InvalidLocationError
 from xmodule.exceptions import NotFoundError
+from django.core.exceptions import PermissionDenied
+from xmodule.modulestore.django import loc_mapper
+from .access import has_access
+from xmodule.modulestore.locator import BlockUsageLocator
 
-from ..utils import get_url_reverse
-from .access import get_location_and_verify_access
 from util.json_request import JsonResponse
+from django.http import HttpResponseNotFound
+import json
+from django.utils.translation import ugettext as _
+from pymongo import DESCENDING
 
 
-__all__ = ['asset_index', 'upload_asset', 'import_course', 'generate_export_course', 'export_course']
-
-
-def assets_to_json_dict(assets):
-    """
-    Transform the results of a contentstore query into something appropriate
-    for output via JSON.
-    """
-    ret = []
-    for asset in assets:
-        obj = {
-            "name": asset.get("displayname", ""),
-            "chunkSize": asset.get("chunkSize", 0),
-            "path": asset.get("filename", ""),
-            "length": asset.get("length", 0),
-        }
-        uploaded = asset.get("uploadDate")
-        if uploaded:
-            obj["uploaded"] = uploaded.isoformat()
-        thumbnail = asset.get("thumbnail_location")
-        if thumbnail:
-            obj["thumbnail"] = thumbnail
-        id_info = asset.get("_id")
-        if id_info:
-            obj["id"] = "/{tag}/{org}/{course}/{revision}/{category}/{name}".format(
-                org=id_info.get("org", ""),
-                course=id_info.get("course", ""),
-                revision=id_info.get("revision", ""),
-                tag=id_info.get("tag", ""),
-                category=id_info.get("category", ""),
-                name=id_info.get("name", ""),
-            )
-        ret.append(obj)
-    return ret
+__all__ = ['assets_handler']
 
 
 @login_required
 @ensure_csrf_cookie
-def asset_index(request, org, course, name):
+def assets_handler(request, tag=None, course_id=None, branch=None, version_guid=None, block=None, asset_id=None):
     """
-    Display an editable asset library
+    The restful handler for assets.
+    It allows retrieval of all the assets (as an HTML page), as well as uploading new assets,
+    deleting assets, and changing the "locked" state of an asset.
 
-    org, course, name: Attributes of the Location for the item to edit
+    GET
+        html: return html page of all course assets (note though that a range of assets can be requested using start
+        and max query parameters)
+        json: not currently supported
+    POST
+        json: create (or update?) an asset. The only updating that can be done is changing the lock state.
+    PUT
+        json: update the locked state of an asset
+    DELETE
+        json: delete an asset
     """
-    location = get_location_and_verify_access(request, org, course, name)
+    location = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
+    if not has_access(request.user, location):
+        raise PermissionDenied()
 
-    upload_asset_callback_url = reverse('upload_asset', kwargs={
-        'org': org,
-        'course': course,
-        'coursename': name
-    })
+    if 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
+        if request.method == 'GET':
+            raise NotImplementedError('coming soon')
+        else:
+            return _update_asset(request, location, asset_id)
+    elif request.method == 'GET':  # assume html
+        return _asset_index(request, location)
+    else:
+        return HttpResponseNotFound()
 
-    course_module = modulestore().get_item(location)
 
-    course_reference = StaticContent.compute_location(org, course, name)
-    assets = contentstore().get_all_content_for_course(course_reference)
+def _asset_index(request, location):
+    """
+    Display an editable asset library.
 
-    # sort in reverse upload date order
-    assets = sorted(assets, key=lambda asset: asset['uploadDate'], reverse=True)
+    Supports start (0-based index into the list of assets) and max query parameters.
+    """
+    old_location = loc_mapper().translate_locator_to_location(location)
 
-    if request.META.get('HTTP_ACCEPT', "").startswith("application/json"):
-        return JsonResponse(assets_to_json_dict(assets))
+    course_module = modulestore().get_item(old_location)
+    maxresults = request.REQUEST.get('max', None)
+    start = request.REQUEST.get('start', None)
+    course_reference = StaticContent.compute_location(old_location.org, old_location.course, old_location.name)
+    if maxresults is not None:
+        maxresults = int(maxresults)
+        start = int(start) if start else 0
+        assets = contentstore().get_all_content_for_course(
+            course_reference, start=start, maxresults=maxresults,
+            sort=[('uploadDate', DESCENDING)]
+        )
+    else:
+        assets = contentstore().get_all_content_for_course(
+            course_reference, sort=[('uploadDate', DESCENDING)]
+        )
 
-    asset_display = []
+    asset_json = []
     for asset in assets:
         asset_id = asset['_id']
-        display_info = {}
-        display_info['displayname'] = asset['displayname']
-        display_info['uploadDate'] = get_default_time_display(asset['uploadDate'])
-
         asset_location = StaticContent.compute_location(asset_id['org'], asset_id['course'], asset_id['name'])
-        display_info['url'] = StaticContent.get_url_path_from_location(asset_location)
-
         # note, due to the schema change we may not have a 'thumbnail_location' in the result set
         _thumbnail_location = asset.get('thumbnail_location', None)
         thumbnail_location = Location(_thumbnail_location) if _thumbnail_location is not None else None
-        display_info['thumb_url'] = StaticContent.get_url_path_from_location(thumbnail_location) if thumbnail_location is not None else None
 
-        asset_display.append(display_info)
+        asset_locked = asset.get('locked', False)
+        asset_json.append(_get_asset_json(asset['displayname'], asset['uploadDate'], asset_location, thumbnail_location, asset_locked))
 
     return render_to_response('asset_index.html', {
         'context_course': course_module,
-        'assets': asset_display,
-        'upload_asset_callback_url': upload_asset_callback_url,
-        'remove_asset_callback_url': reverse('remove_asset', kwargs={
-            'org': org,
-            'course': course,
-            'name': name
-        })
+        'asset_list': json.dumps(asset_json),
+        'asset_callback_url': location.url_reverse('assets/', '')
     })
 
 
 @require_POST
 @ensure_csrf_cookie
 @login_required
-def upload_asset(request, org, course, coursename):
+def _upload_asset(request, location):
     '''
-    This method allows for POST uploading of files into the course asset library, which will
-    be supported by GridFS in MongoDB.
+    This method allows for POST uploading of files into the course asset
+    library, which will be supported by GridFS in MongoDB.
     '''
-    # construct a location from the passed in path
-    location = get_location_and_verify_access(request, org, course, coursename)
+    old_location = loc_mapper().translate_locator_to_location(location)
 
-    # Does the course actually exist?!? Get anything from it to prove its existance
-
+    # Does the course actually exist?!? Get anything from it to prove its
+    # existence
     try:
-        modulestore().get_item(location)
+        modulestore().get_item(old_location)
     except:
         # no return it as a Bad Request response
-        logging.error('Could not find course' + location)
+        logging.error('Could not find course' + old_location)
         return HttpResponseBadRequest()
 
-    if 'file' not in request.FILES:
-        return HttpResponseBadRequest()
-
-    # compute a 'filename' which is similar to the location formatting, we're using the 'filename'
-    # nomenclature since we're using a FileSystem paradigm here. We're just imposing
-    # the Location string formatting expectations to keep things a bit more consistent
+    # compute a 'filename' which is similar to the location formatting, we're
+    # using the 'filename' nomenclature since we're using a FileSystem paradigm
+    # here. We're just imposing the Location string formatting expectations to
+    # keep things a bit more consistent
     upload_file = request.FILES['file']
     filename = upload_file.name
     mime_type = upload_file.content_type
 
-    content_loc = StaticContent.compute_location(org, course, filename)
+    content_loc = StaticContent.compute_location(old_location.org, old_location.course, filename)
 
     chunked = upload_file.multiple_chunks()
+    sc_partial = partial(StaticContent, content_loc, filename, mime_type)
     if chunked:
-        content = StaticContent(content_loc, filename, mime_type, upload_file.chunks())
+        content = sc_partial(upload_file.chunks())
+        tempfile_path = upload_file.temporary_file_path()
     else:
-        content = StaticContent(content_loc, filename, mime_type, upload_file.read())
-
-    thumbnail_content = None
-    thumbnail_location = None
+        content = sc_partial(upload_file.read())
+        tempfile_path = None
 
     # first let's see if a thumbnail can be created
-    (thumbnail_content, thumbnail_location) = contentstore().generate_thumbnail(content,
-                                                                                tempfile_path=None if not chunked else
-                                                                                upload_file.temporary_file_path())
+    (thumbnail_content, thumbnail_location) = contentstore().generate_thumbnail(
+            content,
+            tempfile_path=tempfile_path
+    )
 
-    # delete cached thumbnail even if one couldn't be created this time (else the old thumbnail will continue to show)
+    # delete cached thumbnail even if one couldn't be created this time (else
+    # the old thumbnail will continue to show)
     del_cached_content(thumbnail_location)
     # now store thumbnail location only if we could create it
     if thumbnail_content is not None:
@@ -185,189 +166,91 @@ def upload_asset(request, org, course, coursename):
     # readback the saved content - we need the database timestamp
     readback = contentstore().find(content.location)
 
-    response_payload = {'displayname': content.name,
-                        'uploadDate': get_default_time_display(readback.last_modified_at),
-                        'url': StaticContent.get_url_path_from_location(content.location),
-                        'thumb_url': StaticContent.get_url_path_from_location(thumbnail_location) if thumbnail_content is not None else None,
-                        'msg': 'Upload completed'
-                        }
+    locked = getattr(content, 'locked', False)
+    response_payload = {
+        'asset': _get_asset_json(content.name, readback.last_modified_at, content.location, content.thumbnail_location, locked),
+        'msg': _('Upload completed')
+    }
 
-    response = JsonResponse(response_payload)
-    response['asset_url'] = StaticContent.get_url_path_from_location(content.location)
-    return response
+    return JsonResponse(response_payload)
 
 
-@ensure_csrf_cookie
+@require_http_methods(("DELETE", "POST", "PUT"))
 @login_required
-def remove_asset(request, org, course, name):
-    '''
-    This method will perform a 'soft-delete' of an asset, which is basically to copy the asset from
-    the main GridFS collection and into a Trashcan
-    '''
-    get_location_and_verify_access(request, org, course, name)
+@ensure_csrf_cookie
+def _update_asset(request, location, asset_id):
+    """
+    restful CRUD operations for a course asset.
+    Currently only DELETE, POST, and PUT methods are implemented.
 
-    location = request.POST['location']
-
-    # make sure the location is valid
-    try:
-        loc = StaticContent.get_location_from_path(location)
-    except InvalidLocationError:
-        # return a 'Bad Request' to browser as we have a malformed Location
-        response = HttpResponse()
-        response.status_code = 400
-        return response
-
-    # also make sure the item to delete actually exists
-    try:
-        content = contentstore().find(loc)
-    except NotFoundError:
-        response = HttpResponse()
-        response.status_code = 404
-        return response
-
-    # ok, save the content into the trashcan
-    contentstore('trashcan').save(content)
-
-    # see if there is a thumbnail as well, if so move that as well
-    if content.thumbnail_location is not None:
+    asset_id: the URL of the asset (used by Backbone as the id)
+    """
+    def get_asset_location(asset_id):
+        """ Helper method to get the location (and verify it is valid). """
         try:
-            thumbnail_content = contentstore().find(content.thumbnail_location)
-            contentstore('trashcan').save(thumbnail_content)
-            # hard delete thumbnail from origin
-            contentstore().delete(thumbnail_content.get_id())
-            # remove from any caching
-            del_cached_content(thumbnail_content.location)
-        except:
-            pass  # OK if this is left dangling
+            return StaticContent.get_location_from_path(asset_id)
+        except InvalidLocationError as err:
+            # return a 'Bad Request' to browser as we have a malformed Location
+            return JsonResponse({"error": err.message}, status=400)
 
-    # delete the original
-    contentstore().delete(content.get_id())
-    # remove from cache
-    del_cached_content(content.location)
+    if request.method == 'DELETE':
+        loc = get_asset_location(asset_id)
+        # Make sure the item to delete actually exists.
+        try:
+            content = contentstore().find(loc)
+        except NotFoundError:
+            return JsonResponse(status=404)
 
-    return HttpResponse()
+        # ok, save the content into the trashcan
+        contentstore('trashcan').save(content)
+
+        # see if there is a thumbnail as well, if so move that as well
+        if content.thumbnail_location is not None:
+            try:
+                thumbnail_content = contentstore().find(content.thumbnail_location)
+                contentstore('trashcan').save(thumbnail_content)
+                # hard delete thumbnail from origin
+                contentstore().delete(thumbnail_content.get_id())
+                # remove from any caching
+                del_cached_content(thumbnail_content.location)
+            except:
+                logging.warning('Could not delete thumbnail: ' + content.thumbnail_location)
+
+        # delete the original
+        contentstore().delete(content.get_id())
+        # remove from cache
+        del_cached_content(content.location)
+        return JsonResponse()
+
+    elif request.method in ('PUT', 'POST'):
+        if 'file' in request.FILES:
+            return _upload_asset(request, location)
+        else:
+            # Update existing asset
+            try:
+                modified_asset = json.loads(request.body)
+            except ValueError:
+                return HttpResponseBadRequest()
+            asset_id = modified_asset['url']
+            asset_location = get_asset_location(asset_id)
+            contentstore().set_attr(asset_location, 'locked', modified_asset['locked'])
+            # Delete the asset from the cache so we check the lock status the next time it is requested.
+            del_cached_content(asset_location)
+            return JsonResponse(modified_asset, status=201)
 
 
-@ensure_csrf_cookie
-@login_required
-def import_course(request, org, course, name):
+def _get_asset_json(display_name, date, location, thumbnail_location, locked):
     """
-    This method will handle a POST request to upload and import a .tar.gz file into a specified course
+    Helper method for formatting the asset information to send to client.
     """
-    location = get_location_and_verify_access(request, org, course, name)
-
-    if request.method == 'POST':
-        filename = request.FILES['course-data'].name
-
-        if not filename.endswith('.tar.gz'):
-            return HttpResponse(json.dumps({'ErrMsg': 'We only support uploading a .tar.gz file.'}))
-
-        data_root = path(settings.GITHUB_REPO_ROOT)
-
-        course_subdir = "{0}-{1}-{2}".format(org, course, name)
-        course_dir = data_root / course_subdir
-        if not course_dir.isdir():
-            os.mkdir(course_dir)
-
-        temp_filepath = course_dir / filename
-
-        logging.debug('importing course to {0}'.format(temp_filepath))
-
-        # stream out the uploaded files in chunks to disk
-        temp_file = open(temp_filepath, 'wb+')
-        for chunk in request.FILES['course-data'].chunks():
-            temp_file.write(chunk)
-        temp_file.close()
-
-        tar_file = tarfile.open(temp_filepath)
-        tar_file.extractall(course_dir + '/')
-
-        # find the 'course.xml' file
-
-        for dirpath, _dirnames, filenames in os.walk(course_dir):
-            for filename in filenames:
-                if filename == 'course.xml':
-                    break
-            if filename == 'course.xml':
-                break
-
-        if filename != 'course.xml':
-            return HttpResponse(json.dumps({'ErrMsg': 'Could not find the course.xml file in the package.'}))
-
-        logging.debug('found course.xml at {0}'.format(dirpath))
-
-        if dirpath != course_dir:
-            for fname in os.listdir(dirpath):
-                shutil.move(dirpath / fname, course_dir)
-
-        _module_store, course_items = import_from_xml(modulestore('direct'), settings.GITHUB_REPO_ROOT,
-                                                      [course_subdir], load_error_modules=False,
-                                                      static_content_store=contentstore(),
-                                                      target_location_namespace=location,
-                                                      draft_store=modulestore())
-
-        # we can blow this away when we're done importing.
-        shutil.rmtree(course_dir)
-
-        logging.debug('new course at {0}'.format(course_items[0].location))
-
-        create_all_course_groups(request.user, course_items[0].location)
-
-        return HttpResponse(json.dumps({'Status': 'OK'}))
-    else:
-        course_module = modulestore().get_item(location)
-
-        return render_to_response('import.html', {
-            'context_course': course_module,
-            'successful_import_redirect_url': get_url_reverse('CourseOutline', course_module)
-        })
-
-
-@ensure_csrf_cookie
-@login_required
-def generate_export_course(request, org, course, name):
-    """
-    This method will serialize out a course to a .tar.gz file which contains a XML-based representation of
-    the course
-    """
-    location = get_location_and_verify_access(request, org, course, name)
-
-    loc = Location(location)
-    export_file = NamedTemporaryFile(prefix=name + '.', suffix=".tar.gz")
-
-    root_dir = path(mkdtemp())
-
-    # export out to a tempdir
-    logging.debug('root = {0}'.format(root_dir))
-
-    export_to_xml(modulestore('direct'), contentstore(), loc, root_dir, name, modulestore())
-
-    logging.debug('tar file being generated at {0}'.format(export_file.name))
-    tar_file = tarfile.open(name=export_file.name, mode='w:gz')
-    tar_file.add(root_dir / name, arcname=name)
-    tar_file.close()
-
-    # remove temp dir
-    shutil.rmtree(root_dir / name)
-
-    wrapper = FileWrapper(export_file)
-    response = HttpResponse(wrapper, content_type='application/x-tgz')
-    response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename(export_file.name)
-    response['Content-Length'] = os.path.getsize(export_file.name)
-    return response
-
-
-@ensure_csrf_cookie
-@login_required
-def export_course(request, org, course, name):
-    """
-    This method serves up the 'Export Course' page
-    """
-    location = get_location_and_verify_access(request, org, course, name)
-
-    course_module = modulestore().get_item(location)
-
-    return render_to_response('export.html', {
-        'context_course': course_module,
-        'successful_import_redirect_url': ''
-    })
+    asset_url = StaticContent.get_url_path_from_location(location)
+    return {
+        'display_name': display_name,
+        'date_added': get_default_time_display(date),
+        'url': asset_url,
+        'portable_url': StaticContent.get_static_path_from_location(location),
+        'thumbnail': StaticContent.get_url_path_from_location(thumbnail_location) if thumbnail_location is not None else None,
+        'locked': locked,
+        # Needed for Backbone delete/update.
+        'id': asset_url
+    }

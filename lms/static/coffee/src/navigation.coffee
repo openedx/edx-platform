@@ -20,7 +20,7 @@ class @Navigation
       $('#accordion a').click @setChapter
 
   log: (event, ui) ->
-    log_event 'accordion',
+    Logger.log 'accordion',
       newheader: ui.newHeader.text()
       oldheader: ui.oldHeader.text()
 

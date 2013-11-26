@@ -1,11 +1,9 @@
 ## mako
-<%! from django.utils.translation import ugettext as _ %>
-<%! from django.utils import translation    %>
-
 <%namespace name='static' file='static_content.html'/>
 <%namespace file='main.html' import="login_query, stanford_theme_enabled"/>
 <%!
 from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
 
 # App that handles subdomain specific branding
 import branding
@@ -37,51 +35,61 @@ site_status_msg = get_site_status_msg(course_id)
 
 
 % if course:
-  <header class="global slim" aria-label="Global Navigation">
+  <header class="global slim" aria-label="${_('Global Navigation')}">
 % else:
-  <header class="global" aria-label="Global Navigation">
+  <header class="global" aria-label="${_('Global Navigation')}">
 % endif
   <nav>
 
   <h1 class="logo">
     <a href="${marketing_link('ROOT')}">
       <%block name="navigation_logo">
-        <img src="${static.url(branding.get_logo_url(request.META.get('HTTP_HOST')))}" alt="edX home" />
+        <img src="${static.url(branding.get_logo_url(request.META.get('HTTP_HOST')))}" alt="${settings.PLATFORM_NAME} ${_('Home')}" />
       </%block>
     </a>
   </h1>
 
     % if course:
-      <h2><span class="provider">${course.org}:</span> ${course.number} ${course.display_name_with_default}</h2>
+      <h2><span class="provider">${course.display_org_with_default | h}:</span> ${course.display_number_with_default | h} ${course.display_name_with_default}</h2>
     % endif
 
     % if user.is_authenticated():
 
     <ol class="left nav-global authenticated">
       <%block name="navigation_global_links_authenticated">
-        <li class="nav-global-01">
-          <a href="${marketing_link('COURSES')}">${_("Find Courses")}</a>
-        </li>
+        % if settings.MITX_FEATURES.get('COURSES_ARE_BROWSABLE'):
+          <li class="nav-global-01">
+            <a href="${marketing_link('COURSES')}">${_('Find Courses')}</a>
+          </li>
+        % endif  
       </%block>
     </ol>
     <ol class="user">
       <li class="primary">
         <a href="${reverse('dashboard')}" class="user-link">
           <span class="avatar"></span>
-          <span class="sr">${_("Dashboard for")}: </span> ${user.username}
+          <span class="sr">${_("Dashboard for:")} </span> ${user.username}
         </a>
       </li>
       <li class="primary">
-        <a href="#" class="dropdown"><span class="sr">${_("More options dropdown")}</span> &#9662</a>
-        <ul class="dropdown-menu">
+        <a href="#" class="dropdown" aria-haspopup="true" aria-expanded="false"><span class="sr">${_("More options dropdown")}</span> &#9662;</a>
+        <ul class="dropdown-menu" aria-label="More Options" role="menu">
           <%block name="navigation_dropdown_menu_links" >
             <li><a href="${marketing_link('FAQ')}">${_("Help")}</a></li>
           </%block>
-          <li><a href="${reverse('logout')}">${_("Log Out")}</a></li>
+          <li role="presentation"><a href="${reverse('logout')}" role="menuitem">${_("Log Out")}</a></li>
         </ul>
       </li>
     </ol>
-
+      % if display_shopping_cart: # see shoppingcart.context_processor.user_has_cart_context_processor
+        <ol class="user">
+          <li class="primary">
+            <a class="shopping-cart" href="${reverse('shoppingcart.views.show_cart')}">
+              <i class="icon-shopping-cart"></i> Shopping Cart
+            </a>
+          </li>
+        </ol>
+      % endif
     % else:
     <ol class="left nav-global">
       <%block name="navigation_global_links">
@@ -125,7 +133,7 @@ site_status_msg = get_site_status_msg(course_id)
   </nav>
 </header>
 % if course:
-<div class="ie-banner">${_("<strong>Warning:</strong> Your browser is not fully supported. We strongly recommend using ")}<a href="https://www.google.com/intl/en/chrome/browser/" target="_blank">Chrome</a> ${_("or")} <a href="http://www.mozilla.org/en-US/firefox/new/" target="_blank">Firefox</a>.</div>
+<div class="ie-banner" aria-hidden="true">${_('<strong>Warning:</strong> Your browser is not fully supported. We strongly recommend using {chrome_link_start}Chrome{chrome_link_end} or {ff_link_start}Firefox{ff_link_end}.').format(chrome_link_start='<a href="https://www.google.com/intl/en/chrome/browser/" target="_blank">', chrome_link_end='</a>', ff_link_start='<a href="http://www.mozilla.org/en-US/firefox/new/" target="_blank">', ff_link_end='</a>')}</div>
 % endif
 
 %if not user.is_authenticated():

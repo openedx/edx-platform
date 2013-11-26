@@ -8,7 +8,8 @@ from xmodule.xml_module import XmlDescriptor
 from xmodule.x_module import XModule
 from xmodule.progress import Progress
 from xmodule.exceptions import NotFoundError
-from xblock.core import Integer, Scope
+from xblock.fields import Integer, Scope
+from xblock.fragment import Fragment
 from pkg_resources import resource_string
 
 log = logging.getLogger(__name__)
@@ -40,17 +41,8 @@ class SequenceModule(SequenceFields, XModule):
         XModule.__init__(self, *args, **kwargs)
 
         # if position is specified in system, then use that instead
-        if self.system.get('position'):
-            self.position = int(self.system.get('position'))
-
-        self.rendered = False
-
-    def get_instance_state(self):
-        return json.dumps({'position': self.position})
-
-    def get_html(self):
-        self.render()
-        return self.content
+        if getattr(self.system, 'position', None) is not None:
+            self.position = int(self.system.position)
 
     def get_progress(self):
         ''' Return the total progress, adding total done and total available.
@@ -69,20 +61,24 @@ class SequenceModule(SequenceFields, XModule):
             return json.dumps({'success': True})
         raise NotFoundError('Unexpected dispatch type')
 
-    def render(self):
+    def student_view(self, context):
         # If we're rendering this sequence, but no position is set yet,
         # default the position to the first element
         if self.position is None:
             self.position = 1
 
-        if self.rendered:
-            return
         ## Returns a set of all types of all sub-children
         contents = []
+
+        fragment = Fragment()
+
         for child in self.get_display_items():
             progress = child.get_progress()
+            rendered_child = child.render('student_view', context)
+            fragment.add_frag_resources(rendered_child)
+
             childinfo = {
-                'content': child.get_html(),
+                'content': rendered_child.content,
                 'title': "\n".join(
                     grand_child.display_name
                     for grand_child in child.get_children()
@@ -101,11 +97,13 @@ class SequenceModule(SequenceFields, XModule):
                   'element_id': self.location.html_id(),
                   'item_id': self.id,
                   'position': self.position,
-                  'tag': self.location.category
+                  'tag': self.location.category,
+                  'ajax_url': self.system.ajax_url,
                   }
 
-        self.content = self.system.render_template('seq_module.html', params)
-        self.rendered = True
+        fragment.add_content(self.system.render_template('seq_module.html', params))
+
+        return fragment
 
     def get_icon_class(self):
         child_classes = set(child.get_icon_class()
@@ -133,7 +131,7 @@ class SequenceDescriptor(SequenceFields, MakoModuleDescriptor, XmlDescriptor):
             except Exception as e:
                 log.exception("Unable to load child when parsing Sequence. Continuing...")
                 if system.error_tracker is not None:
-                    system.error_tracker("ERROR: " + str(e))
+                    system.error_tracker("ERROR: " + unicode(e))
                 continue
         return {}, children
 

@@ -17,24 +17,24 @@ import sys
 import logging
 import copy
 
-from collections import namedtuple
+from bson.son import SON
 from fs.osfs import OSFS
 from itertools import repeat
 from path import path
-from operator import attrgetter
-from uuid import uuid4
 
 from importlib import import_module
 from xmodule.errortracker import null_error_tracker, exc_info_to_str
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.x_module import XModuleDescriptor
 from xmodule.error_module import ErrorDescriptor
-from xblock.runtime import DbModel, KeyValueStore, InvalidScopeError
-from xblock.core import Scope
+from xblock.runtime import DbModel
+from xblock.exceptions import InvalidScopeError
+from xblock.fields import Scope, ScopeIds
 
-from xmodule.modulestore import ModuleStoreBase, Location, namedtuple_to_son
-from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateItemError
-from xmodule.modulestore.inheritance import own_metadata, INHERITABLE_METADATA, inherit_metadata
+from xmodule.modulestore import ModuleStoreWriteBase, Location, MONGO_MODULESTORE_TYPE
+from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.inheritance import own_metadata, InheritanceMixin, inherit_metadata, InheritanceKeyValueStore
+import re
 
 log = logging.getLogger(__name__)
 
@@ -57,16 +57,16 @@ class InvalidWriteError(Exception):
     """
 
 
-class MongoKeyValueStore(KeyValueStore):
+class MongoKeyValueStore(InheritanceKeyValueStore):
     """
     A KeyValueStore that maps keyed data access to one of the 3 data areas
     known to the MongoModuleStore (data, children, and metadata)
     """
-    def __init__(self, data, children, metadata, location):
+    def __init__(self, data, children, metadata):
+        super(MongoKeyValueStore, self).__init__()
         self._data = data
         self._children = children
         self._metadata = metadata
-        self._location = location
 
     def get(self, key):
         if key.scope == Scope.children:
@@ -76,14 +76,12 @@ class MongoKeyValueStore(KeyValueStore):
         elif key.scope == Scope.settings:
             return self._metadata[key.field_name]
         elif key.scope == Scope.content:
-            if key.field_name == 'location':
-                return self._location
-            elif key.field_name == 'data' and not isinstance(self._data, dict):
+            if key.field_name == 'data' and not isinstance(self._data, dict):
                 return self._data
             else:
                 return self._data[key.field_name]
         else:
-            raise InvalidScopeError(key.scope)
+            raise InvalidScopeError(key)
 
     def set(self, key, value):
         if key.scope == Scope.children:
@@ -91,14 +89,12 @@ class MongoKeyValueStore(KeyValueStore):
         elif key.scope == Scope.settings:
             self._metadata[key.field_name] = value
         elif key.scope == Scope.content:
-            if key.field_name == 'location':
-                self._location = value
-            elif key.field_name == 'data' and not isinstance(self._data, dict):
+            if key.field_name == 'data' and not isinstance(self._data, dict):
                 self._data = value
             else:
                 self._data[key.field_name] = value
         else:
-            raise InvalidScopeError(key.scope)
+            raise InvalidScopeError(key)
 
     def delete(self, key):
         if key.scope == Scope.children:
@@ -107,14 +103,12 @@ class MongoKeyValueStore(KeyValueStore):
             if key.field_name in self._metadata:
                 del self._metadata[key.field_name]
         elif key.scope == Scope.content:
-            if key.field_name == 'location':
-                self._location = Location(None)
-            elif key.field_name == 'data' and not isinstance(self._data, dict):
+            if key.field_name == 'data' and not isinstance(self._data, dict):
                 self._data = None
             else:
                 del self._data[key.field_name]
         else:
-            raise InvalidScopeError(key.scope)
+            raise InvalidScopeError(key)
 
     def has(self, key):
         if key.scope in (Scope.children, Scope.parent):
@@ -122,17 +116,12 @@ class MongoKeyValueStore(KeyValueStore):
         elif key.scope == Scope.settings:
             return key.field_name in self._metadata
         elif key.scope == Scope.content:
-            if key.field_name == 'location':
-                return True
-            elif key.field_name == 'data' and not isinstance(self._data, dict):
+            if key.field_name == 'data' and not isinstance(self._data, dict):
                 return True
             else:
                 return key.field_name in self._data
         else:
             return False
-
-
-MongoUsage = namedtuple('MongoUsage', 'id, def_id')
 
 
 class CachingDescriptorSystem(MakoDescriptorSystem):
@@ -142,8 +131,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
     TODO (cdodge) when the 'split module store' work has been completed we can remove all
     references to metadata_inheritance_tree
     """
-    def __init__(self, modulestore, module_data, default_class, resources_fs,
-                 error_tracker, render_template, cached_metadata=None):
+    def __init__(self, modulestore, module_data, default_class, cached_metadata, **kwargs):
         """
         modulestore: the module store that can be used to retrieve additional modules
 
@@ -160,8 +148,8 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         render_template: a function for rendering templates, as per
             MakoDescriptorSystem
         """
-        super(CachingDescriptorSystem, self).__init__(self.load_item, resources_fs,
-                                                      error_tracker, render_template)
+        super(CachingDescriptorSystem, self).__init__(load_item=self.load_item, **kwargs)
+
         self.modulestore = modulestore
         self.module_data = module_data
         self.default_class = default_class
@@ -180,18 +168,19 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
             module = self.modulestore.get_item(location)
             if module is not None:
                 # update our own cache after going to the DB to get cache miss
-                self.module_data.update(module.system.module_data)
+                self.module_data.update(module.runtime.module_data)
             return module
         else:
             # load the module and apply the inherited metadata
             try:
+                category = json_data['location']['category']
                 class_ = XModuleDescriptor.load_class(
-                    json_data['location']['category'],
+                    category,
                     self.default_class
                 )
                 definition = json_data.get('definition', {})
                 metadata = json_data.get('metadata', {})
-                for old_name, new_name in class_.metadata_translations.items():
+                for old_name, new_name in getattr(class_, 'metadata_translations', {}).items():
                     if old_name in metadata:
                         metadata[new_name] = metadata[old_name]
                         del metadata[old_name]
@@ -200,25 +189,41 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                     definition.get('data', {}),
                     definition.get('children', []),
                     metadata,
-                    location,
                 )
 
-                model_data = DbModel(kvs, class_, None, MongoUsage(self.course_id, location))
-                module = class_(self, model_data)
+                field_data = DbModel(kvs)
+                scope_ids = ScopeIds(None, category, location, location)
+                module = self.construct_xblock_from_class(class_, scope_ids, field_data)
                 if self.cached_metadata is not None:
                     # parent container pointers don't differentiate between draft and non-draft
                     # so when we do the lookup, we should do so with a non-draft location
                     non_draft_loc = location.replace(revision=None)
+
+                    # Convert the serialized fields values in self.cached_metadata
+                    # to python values
                     metadata_to_inherit = self.cached_metadata.get(non_draft_loc.url(), {})
                     inherit_metadata(module, metadata_to_inherit)
+                # decache any computed pending field settings
+                module.save()
                 return module
             except:
                 log.warning("Failed to load descriptor", exc_info=True)
                 return ErrorDescriptor.from_json(
                     json_data,
                     self,
+                    json_data['location'],
                     error_msg=exc_info_to_str(sys.exc_info())
                 )
+
+
+def namedtuple_to_son(namedtuple, prefix=''):
+    """
+    Converts a namedtuple into a SON object with the same key order
+    """
+    son = SON()
+    for idx, field_name in enumerate(namedtuple._fields):
+        son[prefix + field_name] = namedtuple[idx]
+    return son
 
 
 def location_to_query(location, wildcard=True):
@@ -241,32 +246,46 @@ def location_to_query(location, wildcard=True):
     return query
 
 
-metadata_cache_key = attrgetter('org', 'course')
+def metadata_cache_key(location):
+    """Turn a `Location` into a useful cache key."""
+    return u"{0.org}/{0.course}".format(location)
 
 
-class MongoModuleStore(ModuleStoreBase):
+class MongoModuleStore(ModuleStoreWriteBase):
     """
     A Mongodb backed ModuleStore
     """
 
     # TODO (cpennington): Enable non-filesystem filestores
-    def __init__(self, host, db, collection, fs_root, render_template,
-                 port=27017, default_class=None,
+    # pylint: disable=C0103
+    # pylint: disable=W0201
+    def __init__(self, doc_store_config, fs_root, render_template,
+                 default_class=None,
                  error_tracker=null_error_tracker,
-                 user=None, password=None, request_cache=None,
-                 metadata_inheritance_cache_subsystem=None, **kwargs):
+                 **kwargs):
+        """
+        :param doc_store_config: must have a host, db, and collection entries. Other common entries: port, tz_aware.
+        """
 
-        super(MongoModuleStore, self).__init__()
+        super(MongoModuleStore, self).__init__(**kwargs)
 
-        self.collection = pymongo.connection.Connection(
-            host=host,
-            port=port,
-            tz_aware=True,
-            **kwargs
-        )[db][collection]
+        def do_connection(
+            db, collection, host, port=27017, tz_aware=True, user=None, password=None, **kwargs
+        ):
+            """
+            Create & open the connection, authenticate, and provide pointers to the collection
+            """
+            self.collection = pymongo.connection.Connection(
+                host=host,
+                port=port,
+                tz_aware=tz_aware,
+                **kwargs
+            )[db][collection]
 
-        if user is not None and password is not None:
-            self.collection.database.authenticate(user, password)
+            if user is not None and password is not None:
+                self.collection.database.authenticate(user, password)
+
+        do_connection(**doc_store_config)
 
         # Force mongo to report errors, at the expense of performance
         self.collection.safe = True
@@ -274,7 +293,8 @@ class MongoModuleStore(ModuleStoreBase):
         # Force mongo to maintain an index over _id.* that is in the same order
         # that is used when querying by a location
         self.collection.ensure_index(
-            zip(('_id.' + field for field in Location._fields), repeat(1)))
+            zip(('_id.' + field for field in Location._fields), repeat(1))
+        )
 
         if default_class is not None:
             module_path, _, class_name = default_class.rpartition('.')
@@ -286,8 +306,6 @@ class MongoModuleStore(ModuleStoreBase):
         self.error_tracker = error_tracker
         self.render_template = render_template
         self.ignore_write_events_on_courses = []
-        self.request_cache = request_cache
-        self.metadata_inheritance_cache_subsystem = metadata_inheritance_cache_subsystem
 
     def compute_metadata_inheritance_tree(self, location):
         '''
@@ -298,7 +316,7 @@ class MongoModuleStore(ModuleStoreBase):
         # note this is a bit ugly as when we add new categories of containers, we have to add it here
         query = {'_id.org': location.org,
                  '_id.course': location.course,
-                 '_id.category': {'$in': ['course', 'chapter', 'sequential', 'vertical',
+                 '_id.category': {'$in': ['course', 'chapter', 'sequential', 'vertical', 'videosequence',
                                           'wrapper', 'problemset', 'conditional', 'randomize']}
                  }
         # we just want the Location, children, and inheritable metadata
@@ -306,8 +324,8 @@ class MongoModuleStore(ModuleStoreBase):
 
         # just get the inheritable metadata since that is all we need for the computation
         # this minimizes both data pushed over the wire
-        for attr in INHERITABLE_METADATA:
-            record_filter['metadata.{0}'.format(attr)] = 1
+        for field_name in InheritanceMixin.fields:
+            record_filter['metadata.{0}'.format(field_name)] = 1
 
         # call out to the DB
         resultset = self.collection.find(query, record_filter)
@@ -319,16 +337,14 @@ class MongoModuleStore(ModuleStoreBase):
         for result in resultset:
             location = Location(result['_id'])
             # We need to collate between draft and non-draft
-            # i.e. draft verticals can have children which are not in non-draft versions
+            # i.e. draft verticals will have draft children but will have non-draft parents currently
             location = location.replace(revision=None)
             location_url = location.url()
             if location_url in results_by_url:
                 existing_children = results_by_url[location_url].get('definition', {}).get('children', [])
                 additional_children = result.get('definition', {}).get('children', [])
                 total_children = existing_children + additional_children
-                if 'definition' not in results_by_url[location_url]:
-                    results_by_url[location_url]['definition'] = {}
-                results_by_url[location_url]['definition']['children'] = total_children
+                results_by_url[location_url].setdefault('definition', {})['children'] = total_children
             results_by_url[location.url()] = result
             if location.category == 'course':
                 root = location.url()
@@ -479,13 +495,14 @@ class MongoModuleStore(ModuleStoreBase):
         # TODO (cdodge): When the 'split module store' work has been completed, we should remove
         # the 'metadata_inheritance_tree' parameter
         system = CachingDescriptorSystem(
-            self,
-            data_cache,
-            self.default_class,
-            resource_fs,
-            self.error_tracker,
-            self.render_template,
-            cached_metadata,
+            modulestore=self,
+            module_data=data_cache,
+            default_class=self.default_class,
+            resources_fs=resource_fs,
+            error_tracker=self.error_tracker,
+            render_template=self.render_template,
+            cached_metadata=cached_metadata,
+            mixins=self.xblock_mixins,
         )
         return system.load_item(item['location'])
 
@@ -530,7 +547,7 @@ class MongoModuleStore(ModuleStoreBase):
             raise ItemNotFoundError(location)
         return item
 
-    def has_item(self, location):
+    def has_item(self, course_id, location):
         """
         Returns True if location exists in this ModuleStore.
         """
@@ -582,51 +599,106 @@ class MongoModuleStore(ModuleStoreBase):
         modules = self._load_items(list(items), depth)
         return modules
 
-    def clone_item(self, source, location):
+    def create_xmodule(self, location, definition_data=None, metadata=None, system=None):
         """
-        Clone a new item that is a copy of the item at the location `source`
-        and writes it to `location`
+        Create the new xmodule but don't save it. Returns the new module.
+
+        :param location: a Location--must have a category
+        :param definition_data: can be empty. The initial definition_data for the kvs
+        :param metadata: can be empty, the initial metadata for the kvs
+        :param system: if you already have an xblock from the course, the xblock.runtime value
         """
-        item = None
-        try:
-            source_item = self.collection.find_one(location_to_query(source))
-
-            # allow for some programmatically generated substitutions in metadata, e.g. Discussion_id's should be auto-generated
-            for key in source_item['metadata'].keys():
-                if source_item['metadata'][key] == '$$GUID$$':
-                    source_item['metadata'][key] = uuid4().hex
-
-            source_item['_id'] = Location(location).dict()
-            self.collection.insert(
-                source_item,
-                # Must include this to avoid the django debug toolbar (which defines the deprecated "safe=False")
-                # from overriding our default value set in the init method.
-                safe=self.collection.safe
+        if not isinstance(location, Location):
+            location = Location(location)
+        # differs from split mongo in that I believe most of this logic should be above the persistence
+        # layer but added it here to enable quick conversion. I'll need to reconcile these.
+        if metadata is None:
+            metadata = {}
+        if system is None:
+            system = CachingDescriptorSystem(
+                modulestore=self,
+                module_data={},
+                default_class=self.default_class,
+                resources_fs=None,
+                error_tracker=self.error_tracker,
+                render_template=self.render_template,
+                cached_metadata={},
+                mixins=self.xblock_mixins,
             )
-            item = self._load_items([source_item])[0]
+        xblock_class = XModuleDescriptor.load_class(location.category, self.default_class)
+        if definition_data is None:
+            if hasattr(xblock_class, 'data') and xblock_class.data.default is not None:
+                definition_data = xblock_class.data.default
+            else:
+                definition_data = {}
+        dbmodel = self._create_new_field_data(location.category, location, definition_data, metadata)
+        xmodule = system.construct_xblock_from_class(
+            xblock_class,
+            # We're loading a descriptor, so student_id is meaningless
+            # We also don't have separate notions of definition and usage ids yet,
+            # so we use the location for both.
+            ScopeIds(None, location.category, location, location),
+            dbmodel,
+        )
+        # decache any pending field settings from init
+        xmodule.save()
+        return xmodule
 
-            # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
-            # if we add one then we need to also add it to the policy information (i.e. metadata)
-            # we should remove this once we can break this reference from the course to static tabs
-            if location.category == 'static_tab':
-                course = self.get_course_for_item(item.location)
-                existing_tabs = course.tabs or []
-                existing_tabs.append({
-                    'type': 'static_tab',
-                    'name': item.display_name,
-                    'url_slug': item.location.name
-                })
-                course.tabs = existing_tabs
-                self.update_metadata(course.location, course._model_data._kvs._metadata)
+    def save_xmodule(self, xmodule):
+        """
+        Save the given xmodule (will either create or update based on whether id already exists).
+        Pulls out the data definition v metadata v children locally but saves it all.
 
-        except pymongo.errors.DuplicateKeyError:
-            raise DuplicateItemError(location)
-
+        :param xmodule:
+        """
+        # Save any changes to the xmodule to the MongoKeyValueStore
+        xmodule.save()
+        self.collection.save({
+                '_id': xmodule.location.dict(),
+                'metadata': own_metadata(xmodule),
+                'definition': {
+                    'data': xmodule.get_explicitly_set_fields_by_scope(Scope.content),
+                    'children': xmodule.children if xmodule.has_children else []
+                }
+            })
         # recompute (and update) the metadata inheritance tree which is cached
-        self.refresh_cached_metadata_inheritance_tree(Location(location))
-        self.fire_updated_modulestore_signal(get_course_id_no_run(Location(location)), Location(location))
+        self.refresh_cached_metadata_inheritance_tree(xmodule.location)
+        self.fire_updated_modulestore_signal(get_course_id_no_run(xmodule.location), xmodule.location)
 
-        return item
+    def create_and_save_xmodule(self, location, definition_data=None, metadata=None, system=None):
+        """
+        Create the new xmodule and save it. Does not return the new module because if the caller
+        will insert it as a child, it's inherited metadata will completely change. The difference
+        between this and just doing create_xmodule and save_xmodule is this ensures static_tabs get
+        pointed to by the course.
+
+        :param location: a Location--must have a category
+        :param definition_data: can be empty. The initial definition_data for the kvs
+        :param metadata: can be empty, the initial metadata for the kvs
+        :param system: if you already have an xblock from the course, the xblock.runtime value
+        """
+        # differs from split mongo in that I believe most of this logic should be above the persistence
+        # layer but added it here to enable quick conversion. I'll need to reconcile these.
+        new_object = self.create_xmodule(location, definition_data, metadata, system)
+        location = new_object.location
+        self.save_xmodule(new_object)
+
+        # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
+        # if we add one then we need to also add it to the policy information (i.e. metadata)
+        # we should remove this once we can break this reference from the course to static tabs
+        # TODO move this special casing to app tier (similar to attaching new element to parent)
+        if location.category == 'static_tab':
+            course = self._get_course_for_item(location)
+            existing_tabs = course.tabs or []
+            existing_tabs.append({
+                'type': 'static_tab',
+                'name': new_object.display_name,
+                'url_slug': new_object.location.name
+            })
+            course.tabs = existing_tabs
+            # Save any changes to the course to the MongoKeyValueStore
+            course.save()
+            self.update_metadata(course.location, course.get_explicitly_set_fields_by_scope(Scope.settings))
 
     def fire_updated_modulestore_signal(self, course_id, location):
         """
@@ -636,7 +708,7 @@ class MongoModuleStore(ModuleStoreBase):
             self.modulestore_update_signal.send(self, modulestore=self, course_id=course_id,
                                                 location=location)
 
-    def get_course_for_item(self, location, depth=0):
+    def _get_course_for_item(self, location, depth=0):
         '''
         VS[compat]
         cdodge: for a given Xmodule, return the course that it belongs to
@@ -683,7 +755,7 @@ class MongoModuleStore(ModuleStoreBase):
         if result['n'] == 0:
             raise ItemNotFoundError(location)
 
-    def update_item(self, location, data):
+    def update_item(self, location, data, allow_not_found=False):
         """
         Set the data in the item specified by the location to
         data
@@ -691,8 +763,11 @@ class MongoModuleStore(ModuleStoreBase):
         location: Something that can be passed to Location
         data: A nested dictionary of problem data
         """
-
-        self._update_single_item(location, {'definition.data': data})
+        try:
+            self._update_single_item(location, {'definition.data': data})
+        except ItemNotFoundError:
+            if not allow_not_found:
+                raise
 
     def update_children(self, location, children):
         """
@@ -703,7 +778,11 @@ class MongoModuleStore(ModuleStoreBase):
         children: A list of child item identifiers
         """
 
-        self._update_single_item(location, {'definition.children': children})
+        # We expect the children IDs to always be the non-draft version. With view refactoring
+        # for split, we are now passing the draft version in some cases.
+        children_ids = [Location(child).replace(revision=None).url() for child in children]
+
+        self._update_single_item(location, {'definition.children': children_ids})
         # recompute (and update) the metadata inheritance tree which is cached
         self.refresh_cached_metadata_inheritance_tree(Location(location))
         # fire signal that we've written to DB
@@ -722,13 +801,15 @@ class MongoModuleStore(ModuleStoreBase):
         # we should remove this once we can break this reference from the course to static tabs
         loc = Location(location)
         if loc.category == 'static_tab':
-            course = self.get_course_for_item(loc)
+            course = self._get_course_for_item(loc)
             existing_tabs = course.tabs or []
             for tab in existing_tabs:
                 if tab.get('url_slug') == loc.name:
-                    tab['name'] = metadata.get('display_name')
+                    tab['name'] = metadata.get('display_name', tab.get('name'))
                     break
             course.tabs = existing_tabs
+            # Save the updates to the course to the MongoKeyValueStore
+            course.save()
             self.update_metadata(course.location, own_metadata(course))
 
         self._update_single_item(location, {'metadata': metadata})
@@ -748,9 +829,11 @@ class MongoModuleStore(ModuleStoreBase):
         # we should remove this once we can break this reference from the course to static tabs
         if location.category == 'static_tab':
             item = self.get_item(location)
-            course = self.get_course_for_item(item.location)
+            course = self._get_course_for_item(item.location)
             existing_tabs = course.tabs or []
             course.tabs = [tab for tab in existing_tabs if tab.get('url_slug') != location.name]
+            # Save the updates to the course to the MongoKeyValueStore
+            course.save()
             self.update_metadata(course.location, own_metadata(course))
 
         # Must include this to avoid the django debug toolbar (which defines the deprecated "safe=False")
@@ -769,9 +852,43 @@ class MongoModuleStore(ModuleStoreBase):
                                      {'_id': True})
         return [i['_id'] for i in items]
 
-    def get_errored_courses(self):
+    def get_modulestore_type(self, course_id):
         """
-        This function doesn't make sense for the mongo modulestore, as courses
-        are loaded on demand, rather than up front
+        Returns an enumeration-like type reflecting the type of this modulestore
+        The return can be one of:
+        "xml" (for XML based courses),
+        "mongo" for old-style MongoDB backed courses,
+        "split" for new-style split MongoDB backed courses.
         """
-        return {}
+        return MONGO_MODULESTORE_TYPE
+
+    def get_orphans(self, course_location, detached_categories, _branch):
+        """
+        Return an array all of the locations for orphans in the course.
+        """
+        all_items = self.collection.find({
+            '_id.org': course_location.org,
+            '_id.course': course_location.course,
+            '_id.category': {'$nin': detached_categories}
+        })
+        all_reachable = set()
+        item_locs = set()
+        for item in all_items:
+            if item['_id']['category'] != 'course':
+                item_locs.add(Location(item['_id']).replace(revision=None).url())
+            all_reachable = all_reachable.union(item.get('definition', {}).get('children', []))
+        item_locs -= all_reachable
+        return list(item_locs)
+
+    def _create_new_field_data(self, category, location, definition_data, metadata):
+        """
+        To instantiate a new xmodule which will be saved latter, set up the dbModel and kvs
+        """
+        kvs = MongoKeyValueStore(
+            definition_data,
+            [],
+            metadata,
+        )
+
+        field_data = DbModel(kvs)
+        return field_data

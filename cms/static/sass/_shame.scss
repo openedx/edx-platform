@@ -2,10 +2,80 @@
 // // shame file - used for any bad-form/orphaned scss that knowingly violate edX FED architecture/standards (see - http://csswizardry.com/2013/04/shame-css/)
 // ====================
 
+// view - dashboard
+.view-dashboard {
 
-// known things to do (paint the fence, sand the floor, wax on/off)
+  // elements - authorship controls
+  .wrapper-authorshiprights {
+
+    .ui-toggle-control {
+      // needed to override general a element transition properties - need to fix.
+      transition-duration: 0.25s;
+      transition-timing-function: ease-in-out;
+    }
+
+    .icon-remove-sign {
+      // needed to override general a element transition properties - need to fix.
+      transition-duration: 0.25s;
+      transition-timing-function: ease-in-out;
+    }
+  }
+}
+
 // ====================
-// * centralize and move form styling into forms.scss - cms/static/sass/views/_textbooks.scss and cms/static/sass/views/_settings.scss
-// * move dialogue styles into cms/static/sass/elements/_modal.scss
-// * use the @include placeholder Bourbon mixin (http://bourbon.io/docs/#placeholder) for any placeholder styling
 
+.view-unit {
+
+  .unit-location .draggable-drop-indicator {
+    display: none; //needed to not show DnD UI (UI is shared across both views)
+  }
+}
+
+// ====================
+
+// needed to override ui-window styling for dragging state (outline selectors get too specific)
+.courseware-section.is-dragging {
+    box-shadow: 0 1px 2px 0 $shadow-d1 !important;
+    border: 1px solid $gray-d3 !important;
+}
+
+.courseware-section.is-dragging.valid-drop {
+  border-color: $blue-s1 !important;
+  box-shadow: 0 1px 2px 0 $blue-t2 !important;
+}
+
+// ====================
+
+// needed for poorly scoped margin rules on all content elements
+.branch .sortable-unit-list {
+  margin-bottom: 0;
+}
+
+
+// yes we have no boldness today - need to fix the resets
+body strong,
+body b {
+  font-weight: 700;
+}
+
+// ====================
+
+// needed display property reinforcement since manual CSS abstraction happened
+#page-prompt {
+
+  .wrapper-prompt:before {
+    display: inline-block;
+  }
+}
+
+.ui-datepicker {
+  background: $white !important;
+}
+
+/* known things to do (paint the fence, sand the floor, wax on/off):
+
+* centralize and move form styling into forms.scss - cms/static/sass/views/_textbooks.scss and cms/static/sass/views/_settings.scss
+* move dialogue styles into cms/static/sass/elements/_modal.scss
+* use the @include placeholder Bourbon mixin (http://bourbon.io/docs/#placeholder) for any placeholder styling
+
+*/

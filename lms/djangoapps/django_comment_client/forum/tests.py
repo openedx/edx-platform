@@ -6,8 +6,8 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from django.core.urlresolvers import reverse
 from util.testing import UrlResetMixin
 
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
-from nose.tools import assert_true
+from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from nose.tools import assert_true  # pylint: disable=E0611
 from mock import patch, Mock
 
 import logging
@@ -15,7 +15,7 @@ import logging
 log = logging.getLogger(__name__)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):
 
     @patch.dict("django.conf.settings.MITX_FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -65,7 +65,7 @@ class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):
         self.assertEqual(self.response.status_code, 404)
 
     @patch('student.models.cc.User.from_django_user')
-    @patch('student.models.cc.User.active_threads')
+    @patch('student.models.cc.User.subscribed_threads')
     def test_user_followed_threads_exception(self, mock_threads, mock_from_django_user):
 
         # Mock the code that makes the HTTP requests to the cs_comment_service app

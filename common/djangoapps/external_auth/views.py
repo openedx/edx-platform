@@ -5,6 +5,7 @@ import random
 import re
 import string       # pylint: disable=W0402
 import fnmatch
+import unicodedata
 
 from textwrap import dedent
 from external_auth.models import ExternalAuthMap
@@ -17,10 +18,13 @@ from django.core.urlresolvers import reverse
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 
+if settings.MITX_FEATURES.get('AUTH_USE_CAS'):
+    from django_cas.views import login as django_cas_login
+
 from student.models import UserProfile, TestCenterUser, TestCenterRegistration
 
-from django.http import HttpResponse, HttpResponseRedirect, HttpRequest
-from django.utils.http import urlquote
+from django.http import HttpResponse, HttpResponseRedirect, HttpRequest, HttpResponseForbidden
+from django.utils.http import urlquote, is_safe_url
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 
@@ -30,7 +34,6 @@ try:
 except ImportError:
     from django.contrib.csrf.middleware import csrf_exempt
 from django_future.csrf import ensure_csrf_cookie
-from util.cache import cache_if_anonymous
 
 import django_openid_auth.views as openid_views
 from django_openid_auth import auth as openid_auth
@@ -39,18 +42,19 @@ from openid.consumer.consumer import SUCCESS
 from openid.server.server import Server, ProtocolError, UntrustedReturnURL
 from openid.server.trustroot import TrustRoot
 from openid.extensions import ax, sreg
+from ratelimitbackend.exceptions import RateLimitException
 
-import student.views as student_views
-# Required for Pearson
-from courseware.views import get_module_for_descriptor, jump_to
-from courseware.model_data import ModelDataCache
+import student.views
 from xmodule.modulestore.django import modulestore
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 log = logging.getLogger("mitx.external_auth")
+AUDIT_LOG = logging.getLogger("audit")
 
+SHIBBOLETH_DOMAIN_PREFIX = 'shib:'
+OPENID_DOMAIN_PREFIX = 'openid:'
 
 # -----------------------------------------------------------------------------
 # OpenID Common
@@ -81,7 +85,7 @@ def default_render_failure(request,
 def generate_password(length=12, chars=string.letters + string.digits):
     """Generate internal password for externally authenticated user"""
     choice = random.SystemRandom().choice
-    return ''.join([choice(chars) for i in range(length)])
+    return ''.join([choice(chars) for _i in range(length)])
 
 
 @csrf_exempt
@@ -105,29 +109,30 @@ def openid_login_complete(request,
         log.debug('openid success, details=%s', details)
 
         url = getattr(settings, 'OPENID_SSO_SERVER_URL', None)
-        external_domain = "openid:%s" % url
+        external_domain = "{0}{1}".format(OPENID_DOMAIN_PREFIX, url)
         fullname = '%s %s' % (details.get('first_name', ''),
                               details.get('last_name', ''))
 
-        return external_login_or_signup(request,
-                                        external_id,
-                                        external_domain,
-                                        details,
-                                        details.get('email', ''),
-                                        fullname)
+        return _external_login_or_signup(
+            request,
+            external_id,
+            external_domain,
+            details,
+            details.get('email', ''),
+            fullname
+        )
 
     return render_failure(request, 'Openid failure')
 
 
-def external_login_or_signup(request,
-                             external_id,
-                             external_domain,
-                             credentials,
-                             email,
-                             fullname,
-                             retfun=None):
+def _external_login_or_signup(request,
+                              external_id,
+                              external_domain,
+                              credentials,
+                              email,
+                              fullname,
+                              retfun=None):
     """Generic external auth login or signup"""
-
     # see if we have a map from this external_id to an edX username
     try:
         eamap = ExternalAuthMap.objects.get(external_id=external_id,
@@ -142,22 +147,25 @@ def external_login_or_signup(request,
         eamap.external_name = fullname
         eamap.internal_password = generate_password()
         log.debug('Created eamap=%s', eamap)
-
         eamap.save()
 
     log.info(u"External_Auth login_or_signup for %s : %s : %s : %s", external_domain, external_id, email, fullname)
+    uses_shibboleth = settings.MITX_FEATURES.get('AUTH_USE_SHIB') and external_domain.startswith(SHIBBOLETH_DOMAIN_PREFIX)
     internal_user = eamap.user
     if internal_user is None:
-        if settings.MITX_FEATURES.get('AUTH_USE_SHIB'):
-            # if we are using shib, try to link accounts using email
+        if uses_shibboleth:
+            # If we are using shib, try to link accounts
+            # For Stanford shib, the email the idp returns is actually under the control of the user.
+            # Since the id the idps return is not user-editable, and is of the from "username@stanford.edu",
+            # use the id to link accounts instead.
             try:
-                link_user = User.objects.get(email=eamap.external_email)
+                link_user = User.objects.get(email=eamap.external_id)
                 if not ExternalAuthMap.objects.filter(user=link_user).exists():
                     # if there's no pre-existing linked eamap, we link the user
                     eamap.user = link_user
                     eamap.save()
                     internal_user = link_user
-                    log.info('SHIB: Linking existing account for %s', eamap.external_email)
+                    log.info('SHIB: Linking existing account for %s', eamap.external_id)
                     # now pass through to log in
                 else:
                     # otherwise, there must have been an error, b/c we've already linked a user with these external
@@ -169,14 +177,14 @@ def external_login_or_signup(request,
                     return default_render_failure(request, failure_msg)
             except User.DoesNotExist:
                 log.info('SHIB: No user for %s yet, doing signup', eamap.external_email)
-                return signup(request, eamap)
+                return _signup(request, eamap)
         else:
             log.info('No user for %s yet. doing signup', eamap.external_email)
-            return signup(request, eamap)
+            return _signup(request, eamap)
 
     # We trust shib's authentication, so no need to authenticate using the password again
-    if settings.MITX_FEATURES.get('AUTH_USE_SHIB'):
-        uname = internal_user.username
+    uname = internal_user.username
+    if uses_shibboleth:
         user = internal_user
         # Assuming this 'AUTHENTICATION_BACKENDS' is set in settings, which I think is safe
         if settings.AUTHENTICATION_BACKENDS:
@@ -184,61 +192,71 @@ def external_login_or_signup(request,
         else:
             auth_backend = 'django.contrib.auth.backends.ModelBackend'
         user.backend = auth_backend
-        log.info('SHIB: Logging in linked user %s', user.email)
+        AUDIT_LOG.info('Linked user "%s" logged in via Shibboleth', user.email)
     else:
-        uname = internal_user.username
-        user = authenticate(username=uname, password=eamap.internal_password)
+        user = authenticate(username=uname, password=eamap.internal_password, request=request)
     if user is None:
-        log.warning("External Auth Login failed for %s / %s",
-                    uname, eamap.internal_password)
-        return signup(request, eamap)
+        # we want to log the failure, but don't want to log the password attempted:
+        AUDIT_LOG.warning('External Auth Login failed for "%s"', uname)
+        return _signup(request, eamap)
 
     if not user.is_active:
-        log.warning("User %s is not active", uname)
+        AUDIT_LOG.warning('User "%s" is not active after external login', uname)
         # TODO: improve error page
         msg = 'Account not yet activated: please look for link in your email'
         return default_render_failure(request, msg)
+
     login(request, user)
     request.session.set_expiry(0)
 
     # Now to try enrollment
     # Need to special case Shibboleth here because it logs in via a GET.
     # testing request.method for extra paranoia
-    if settings.MITX_FEATURES.get('AUTH_USE_SHIB') and 'shib:' in external_domain and request.method == 'GET':
-        enroll_request = make_shib_enrollment_request(request)
-        student_views.try_change_enrollment(enroll_request)
+    if uses_shibboleth and request.method == 'GET':
+        enroll_request = _make_shib_enrollment_request(request)
+        student.views.try_change_enrollment(enroll_request)
     else:
-        student_views.try_change_enrollment(request)
-    log.info("Login success - %s (%s)", user.username, user.email)
+        student.views.try_change_enrollment(request)
+    AUDIT_LOG.info("Login success - %s (%s)", user.username, user.email)
     if retfun is None:
         return redirect('/')
     return retfun()
 
 
+def _flatten_to_ascii(txt):
+    """
+    Flattens possibly unicode txt to ascii (django username limitation)
+    @param name:
+    @return: the flattened txt (in the same type as was originally passed in)
+    """
+    if isinstance(txt, str):
+        txt = txt.decode('utf-8')
+        return unicodedata.normalize('NFKD', txt).encode('ASCII', 'ignore')
+    else:
+        return unicode(unicodedata.normalize('NFKD', txt).encode('ASCII', 'ignore'))
+
+
 @ensure_csrf_cookie
-@cache_if_anonymous
-def signup(request, eamap=None):
+def _signup(request, eamap):
     """
     Present form to complete for signup via external authentication.
     Even though the user has external credentials, he/she still needs
     to create an account on the edX system, and fill in the user
     registration form.
 
-    eamap is an ExteralAuthMap object, specifying the external user
+    eamap is an ExternalAuthMap object, specifying the external user
     for which to complete the signup.
     """
-
-    if eamap is None:
-        pass
-
     # save this for use by student.views.create_account
     request.session['ExternalAuthMap'] = eamap
 
-    # default conjoin name, no spaces
-    username = eamap.external_name.replace(' ', '')
+    # default conjoin name, no spaces, flattened to ascii b/c django can't handle unicode usernames, sadly
+    # but this only affects username, not fullname
+    username = re.sub(r'\s', '', _flatten_to_ascii(eamap.external_name), flags=re.UNICODE)
 
     context = {'has_extauth_info': True,
                'show_signup_immediately': True,
+               'extauth_domain': eamap.external_domain,
                'extauth_id': eamap.external_id,
                'extauth_email': eamap.external_email,
                'extauth_username': username,
@@ -248,8 +266,9 @@ def signup(request, eamap=None):
 
     # Some openEdX instances can't have terms of service for shib users, like
     # according to Stanford's Office of General Counsel
-    if settings.MITX_FEATURES.get('AUTH_USE_SHIB') and settings.MITX_FEATURES.get('SHIB_DISABLE_TOS') and \
-       ('shib' in eamap.external_domain):
+    uses_shibboleth = (settings.MITX_FEATURES.get('AUTH_USE_SHIB') and
+                       eamap.external_domain.startswith(SHIBBOLETH_DOMAIN_PREFIX))
+    if uses_shibboleth and settings.MITX_FEATURES.get('SHIB_DISABLE_TOS'):
         context['ask_for_tos'] = False
 
     # detect if full name is blank and ask for it from user
@@ -264,7 +283,7 @@ def signup(request, eamap=None):
 
     log.info('EXTAUTH: Doing signup for %s', eamap.external_id)
 
-    return student_views.register_user(request, extra_context=context)
+    return student.views.register_user(request, extra_context=context)
 
 
 # -----------------------------------------------------------------------------
@@ -272,19 +291,19 @@ def signup(request, eamap=None):
 # -----------------------------------------------------------------------------
 
 
-def ssl_dn_extract_info(dn):
+def _ssl_dn_extract_info(dn_string):
     """
     Extract username, email address (may be anyuser@anydomain.com) and
     full name from the SSL DN string.  Return (user,email,fullname) if
     successful, and None otherwise.
     """
-    ss = re.search('/emailAddress=(.*)@([^/]+)', dn)
+    ss = re.search('/emailAddress=(.*)@([^/]+)', dn_string)
     if ss:
         user = ss.group(1)
         email = "%s@%s" % (user, ss.group(2))
     else:
         return None
-    ss = re.search('/CN=([^/]+)/', dn)
+    ss = re.search('/CN=([^/]+)/', dn_string)
     if ss:
         fullname = ss.group(1)
     else:
@@ -292,7 +311,7 @@ def ssl_dn_extract_info(dn):
     return (user, email, fullname)
 
 
-def ssl_get_cert_from_request(request):
+def _ssl_get_cert_from_request(request):
     """
     Extract user information from certificate, if it exists, returning (user, email, fullname).
     Else return None.
@@ -311,9 +330,6 @@ def ssl_get_cert_from_request(request):
 
     return cert
 
-    (user, email, fullname) = ssl_dn_extract_info(cert)
-    return (user, email, fullname)
-
 
 def ssl_login_shortcut(fn):
     """
@@ -324,24 +340,26 @@ def ssl_login_shortcut(fn):
         if not settings.MITX_FEATURES['AUTH_USE_MIT_CERTIFICATES']:
             return fn(*args, **kwargs)
         request = args[0]
-        cert = ssl_get_cert_from_request(request)
+        cert = _ssl_get_cert_from_request(request)
         if not cert:		# no certificate information - show normal login window
             return fn(*args, **kwargs)
 
-        (user, email, fullname) = ssl_dn_extract_info(cert)
-        return external_login_or_signup(request,
-                                        external_id=email,
-                                        external_domain="ssl:MIT",
-                                        credentials=cert,
-                                        email=email,
-                                        fullname=fullname)
+        (_user, email, fullname) = _ssl_dn_extract_info(cert)
+        return _external_login_or_signup(
+            request,
+            external_id=email,
+            external_domain="ssl:MIT",
+            credentials=cert,
+            email=email,
+            fullname=fullname
+        )
     return wrapped
 
 
 @csrf_exempt
 def ssl_login(request):
     """
-    This is called by student.views.index when
+    This is called by branding.views.index when
     MITX_FEATURES['AUTH_USE_MIT_CERTIFICATES'] = True
 
     Used for MIT user authentication.  This presumes the web server
@@ -355,22 +373,54 @@ def ssl_login(request):
 
     Else continues on with student.views.index, and no authentication.
     """
-    cert = ssl_get_cert_from_request(request)
+    # Just to make sure we're calling this only at MIT:
+    if not settings.MITX_FEATURES['AUTH_USE_MIT_CERTIFICATES']:
+        return HttpResponseForbidden()
+
+    cert = _ssl_get_cert_from_request(request)
 
     if not cert:
         # no certificate information - go onward to main index
-        return student_views.index(request)
+        return student.views.index(request)
 
-    (user, email, fullname) = ssl_dn_extract_info(cert)
+    (_user, email, fullname) = _ssl_dn_extract_info(cert)
 
-    retfun = functools.partial(student_views.index, request)
-    return external_login_or_signup(request,
-                                    external_id=email,
-                                    external_domain="ssl:MIT",
-                                    credentials=cert,
-                                    email=email,
-                                    fullname=fullname,
-                                    retfun=retfun)
+    retfun = functools.partial(student.views.index, request)
+    return _external_login_or_signup(
+        request,
+        external_id=email,
+        external_domain="ssl:MIT",
+        credentials=cert,
+        email=email,
+        fullname=fullname,
+        retfun=retfun
+    )
+
+
+# -----------------------------------------------------------------------------
+# CAS (Central Authentication Service)
+# -----------------------------------------------------------------------------
+def cas_login(request, next_page=None, required=False):
+    """
+        Uses django_cas for authentication.
+        CAS is a common authentcation method pioneered by Yale.
+        See http://en.wikipedia.org/wiki/Central_Authentication_Service
+
+        Does normal CAS login then generates user_profile if nonexistent,
+        and if login was successful.  We assume that user details are
+        maintained by the central service, and thus an empty user profile
+        is appropriate.
+    """
+
+    ret = django_cas_login(request, next_page, required)
+
+    if request.user.is_authenticated():
+        user = request.user
+        if not UserProfile.objects.filter(user=user):
+            user_profile = UserProfile(name=user.username, user=user)
+            user_profile.save()
+
+    return ret
 
 
 # -----------------------------------------------------------------------------
@@ -396,28 +446,52 @@ def shib_login(request):
         log.error("SHIB: no Shib-Identity-Provider in request.META")
         return default_render_failure(request, shib_error_msg)
     else:
-        #if we get here, the user has authenticated properly
+        # If we get here, the user has authenticated properly
         shib = {attr: request.META.get(attr, '')
-                for attr in ['REMOTE_USER', 'givenName', 'sn', 'mail', 'Shib-Identity-Provider']}
+                for attr in ['REMOTE_USER', 'givenName', 'sn', 'mail', 'Shib-Identity-Provider', 'displayName']}
 
-        #Clean up first name, last name, and email address
-        #TODO: Make this less hardcoded re: format, but split will work
-        #even if ";" is not present since we are accessing 1st element
-        shib['sn'] = shib['sn'].split(";")[0].strip().capitalize().decode('utf-8')
-        shib['givenName'] = shib['givenName'].split(";")[0].strip().capitalize().decode('utf-8')
+        # Clean up first name, last name, and email address
+        # TODO: Make this less hardcoded re: format, but split will work
+        # even if ";" is not present, since we are accessing 1st element
+        shib['sn'] = shib['sn'].split(";")[0].strip().capitalize()
+        shib['givenName'] = shib['givenName'].split(";")[0].strip().capitalize()
 
+    # TODO: should we be logging creds here, at info level?
     log.info("SHIB creds returned: %r", shib)
 
-    return external_login_or_signup(request,
-                                    external_id=shib['REMOTE_USER'],
-                                    external_domain="shib:" + shib['Shib-Identity-Provider'],
-                                    credentials=shib,
-                                    email=shib['mail'],
-                                    fullname=u'%s %s' % (shib['givenName'], shib['sn']),
-                                    )
+    fullname = shib['displayName'] if shib['displayName'] else u'%s %s' % (shib['givenName'], shib['sn'])
+
+    redirect_to = request.REQUEST.get('next')
+    retfun = None
+    if redirect_to:
+        retfun = functools.partial(_safe_postlogin_redirect, redirect_to, request.get_host())
+
+    return _external_login_or_signup(
+        request,
+        external_id=shib['REMOTE_USER'],
+        external_domain=SHIBBOLETH_DOMAIN_PREFIX + shib['Shib-Identity-Provider'],
+        credentials=shib,
+        email=shib['mail'],
+        fullname=fullname,
+        retfun=retfun
+    )
 
 
-def make_shib_enrollment_request(request):
+def _safe_postlogin_redirect(redirect_to, safehost, default_redirect='/'):
+    """
+    If redirect_to param is safe (not off this host), then perform the redirect.
+    Otherwise just redirect to '/'.
+    Basically copied from django.contrib.auth.views.login
+    @param redirect_to: user-supplied redirect url
+    @param safehost: which host is safe to redirect to
+    @return: an HttpResponseRedirect
+    """
+    if is_safe_url(url=redirect_to, host=safehost):
+        return redirect(redirect_to)
+    return redirect(default_redirect)
+
+
+def _make_shib_enrollment_request(request):
     """
         Need this hack function because shibboleth logins don't happen over POST
         but change_enrollment expects its request to be a POST, with
@@ -447,20 +521,18 @@ def course_specific_login(request, course_id):
        Dispatcher function for selecting the specific login method
        required by the course
     """
-    query_string = request.META.get("QUERY_STRING", '')
-
     try:
         course = course_from_id(course_id)
     except ItemNotFoundError:
-        #couldn't find the course, will just return vanilla signin page
-        return redirect_with_querystring('signin_user', query_string)
+        # couldn't find the course, will just return vanilla signin page
+        return _redirect_with_get_querydict('signin_user', request.GET)
 
-    #now the dispatching conditionals.  Only shib for now
-    if settings.MITX_FEATURES.get('AUTH_USE_SHIB') and 'shib:' in course.enrollment_domain:
-        return redirect_with_querystring('shib-login', query_string)
+    # now the dispatching conditionals.  Only shib for now
+    if settings.MITX_FEATURES.get('AUTH_USE_SHIB') and course.enrollment_domain.startswith(SHIBBOLETH_DOMAIN_PREFIX):
+        return _redirect_with_get_querydict('shib-login', request.GET)
 
-    #Default fallthrough to normal signin page
-    return redirect_with_querystring('signin_user', query_string)
+    # Default fallthrough to normal signin page
+    return _redirect_with_get_querydict('signin_user', request.GET)
 
 
 def course_specific_register(request, course_id):
@@ -468,29 +540,28 @@ def course_specific_register(request, course_id):
         Dispatcher function for selecting the specific registration method
         required by the course
     """
-    query_string = request.META.get("QUERY_STRING", '')
-
     try:
         course = course_from_id(course_id)
     except ItemNotFoundError:
-        #couldn't find the course, will just return vanilla registration page
-        return redirect_with_querystring('register_user', query_string)
+        # couldn't find the course, will just return vanilla registration page
+        return _redirect_with_get_querydict('register_user', request.GET)
 
-    #now the dispatching conditionals.  Only shib for now
-    if settings.MITX_FEATURES.get('AUTH_USE_SHIB') and 'shib:' in course.enrollment_domain:
-        #shib-login takes care of both registration and login flows
-        return redirect_with_querystring('shib-login', query_string)
+    # now the dispatching conditionals.  Only shib for now
+    if settings.MITX_FEATURES.get('AUTH_USE_SHIB') and course.enrollment_domain.startswith(SHIBBOLETH_DOMAIN_PREFIX):
+        # shib-login takes care of both registration and login flows
+        return _redirect_with_get_querydict('shib-login', request.GET)
 
-    #Default fallthrough to normal registration page
-    return redirect_with_querystring('register_user', query_string)
+    # Default fallthrough to normal registration page
+    return _redirect_with_get_querydict('register_user', request.GET)
 
 
-def redirect_with_querystring(view_name, query_string):
+def _redirect_with_get_querydict(view_name, get_querydict):
     """
-        Helper function to add query string to redirect views
+        Helper function to carry over get parameters across redirects
+        Using urlencode(safe='/') because the @login_required decorator generates 'next' queryparams with '/' unencoded
     """
-    if query_string:
-        return redirect("%s?%s" % (reverse(view_name), query_string))
+    if get_querydict:
+        return redirect("%s?%s" % (reverse(view_name), get_querydict.urlencode(safe='/')))
     return redirect(view_name)
 
 
@@ -702,18 +773,23 @@ def provider_login(request):
         except User.DoesNotExist:
             request.session['openid_error'] = True
             msg = "OpenID login failed - Unknown user email: %s"
-            log.warning(msg, email)
+            AUDIT_LOG.warning(msg, email)
             return HttpResponseRedirect(openid_request_url)
 
         # attempt to authenticate user (but not actually log them in...)
         # Failure is again redirected to the login dialog.
         username = user.username
         password = request.POST.get('password', None)
-        user = authenticate(username=username, password=password)
+        try:
+            user = authenticate(username=username, password=password, request=request)
+        except RateLimitException:
+            AUDIT_LOG.warning('OpenID - Too many failed login attempts.')
+            return HttpResponseRedirect(openid_request_url)
+
         if user is None:
             request.session['openid_error'] = True
             msg = "OpenID login failed - password for %s is invalid"
-            log.warning(msg, email)
+            AUDIT_LOG.warning(msg, email)
             return HttpResponseRedirect(openid_request_url)
 
         # authentication succeeded, so fetch user information
@@ -723,8 +799,8 @@ def provider_login(request):
             if 'openid_error' in request.session:
                 del request.session['openid_error']
 
-            log.info("OpenID login success - %s (%s)",
-                     user.username, user.email)
+            AUDIT_LOG.info("OpenID login success - %s (%s)",
+                           user.username, user.email)
 
             # redirect user to return_to location
             url = endpoint + urlquote(user.username)
@@ -755,7 +831,7 @@ def provider_login(request):
         # the account is not active, so redirect back to the login page:
         request.session['openid_error'] = True
         msg = "Login failed - Account not active for user %s"
-        log.warning(msg, username)
+        AUDIT_LOG.warning(msg, username)
         return HttpResponseRedirect(openid_request_url)
 
     # determine consumer domain if applicable
@@ -818,12 +894,17 @@ def test_center_login(request):
     ''' Log in students taking exams via Pearson
 
     Takes a POST request that contains the following keys:
-        - code - a security code provided by  Pearson
+        - code - a security code provided by Pearson
         - clientCandidateID
         - registrationID
         - exitURL - the url that we redirect to once we're done
         - vueExamSeriesCode - a code that indicates the exam that we're using
     '''
+    # Imports from lms/djangoapps/courseware -- these should not be
+    # in a common djangoapps.
+    from courseware.views import get_module_for_descriptor, jump_to
+    from courseware.model_data import FieldDataCache
+
     # errors are returned by navigating to the error_url, adding a query parameter named "code"
     # which contains the error code describing the exceptional condition.
     def makeErrorURL(error_url, error_code):
@@ -856,8 +937,10 @@ def test_center_login(request):
     try:
         testcenteruser = TestCenterUser.objects.get(client_candidate_id=client_candidate_id)
     except TestCenterUser.DoesNotExist:
-        log.error("not able to find demographics for cand ID {}".format(client_candidate_id))
+        AUDIT_LOG.error("not able to find demographics for cand ID {}".format(client_candidate_id))
         return HttpResponseRedirect(makeErrorURL(error_url, "invalidClientCandidateID"))
+
+    AUDIT_LOG.info("Attempting to log in test-center user '{}' for test of cand {}".format(testcenteruser.user.username, client_candidate_id))
 
     # find testcenter_registration that matches the provided exam code:
     # Note that we could rely in future on either the registrationId or the exam code,
@@ -867,13 +950,13 @@ def test_center_login(request):
         # we are not allowed to make up a new error code, according to Pearson,
         # so instead of "missingExamSeriesCode", we use a valid one that is
         # inaccurate but at least distinct.  (Sigh.)
-        log.error("missing exam series code for cand ID {}".format(client_candidate_id))
+        AUDIT_LOG.error("missing exam series code for cand ID {}".format(client_candidate_id))
         return HttpResponseRedirect(makeErrorURL(error_url, "missingPartnerID"))
     exam_series_code = request.POST.get('vueExamSeriesCode')
 
     registrations = TestCenterRegistration.objects.filter(testcenter_user=testcenteruser, exam_series_code=exam_series_code)
     if not registrations:
-        log.error("not able to find exam registration for exam {} and cand ID {}".format(exam_series_code, client_candidate_id))
+        AUDIT_LOG.error("not able to find exam registration for exam {} and cand ID {}".format(exam_series_code, client_candidate_id))
         return HttpResponseRedirect(makeErrorURL(error_url, "noTestsAssigned"))
 
     # TODO: figure out what to do if there are more than one registrations....
@@ -883,14 +966,14 @@ def test_center_login(request):
     course_id = registration.course_id
     course = course_from_id(course_id)  # assume it will be found....
     if not course:
-        log.error("not able to find course from ID {} for cand ID {}".format(course_id, client_candidate_id))
+        AUDIT_LOG.error("not able to find course from ID {} for cand ID {}".format(course_id, client_candidate_id))
         return HttpResponseRedirect(makeErrorURL(error_url, "incorrectCandidateTests"))
     exam = course.get_test_center_exam(exam_series_code)
     if not exam:
-        log.error("not able to find exam {} for course ID {} and cand ID {}".format(exam_series_code, course_id, client_candidate_id))
+        AUDIT_LOG.error("not able to find exam {} for course ID {} and cand ID {}".format(exam_series_code, course_id, client_candidate_id))
         return HttpResponseRedirect(makeErrorURL(error_url, "incorrectCandidateTests"))
     location = exam.exam_url
-    log.info("proceeding with test of cand {} on exam {} for course {}: URL = {}".format(client_candidate_id, exam_series_code, course_id, location))
+    log.info("Proceeding with test of cand {} on exam {} for course {}: URL = {}".format(client_candidate_id, exam_series_code, course_id, location))
 
     # check if the test has already been taken
     timelimit_descriptor = modulestore().get_instance(course_id, Location(location))
@@ -898,7 +981,7 @@ def test_center_login(request):
         log.error("cand {} on exam {} for course {}: descriptor not found for location {}".format(client_candidate_id, exam_series_code, course_id, location))
         return HttpResponseRedirect(makeErrorURL(error_url, "missingClientProgram"))
 
-    timelimit_module_cache = ModelDataCache.cache_for_descriptor_descendents(course_id, testcenteruser.user,
+    timelimit_module_cache = FieldDataCache.cache_for_descriptor_descendents(course_id, testcenteruser.user,
                                                                              timelimit_descriptor, depth=None)
     timelimit_module = get_module_for_descriptor(request.user, request, timelimit_descriptor,
                                                  timelimit_module_cache, course_id, position=None)
@@ -907,7 +990,7 @@ def test_center_login(request):
         return HttpResponseRedirect(makeErrorURL(error_url, "missingClientProgram"))
 
     if timelimit_module and timelimit_module.has_ended:
-        log.warning("cand {} on exam {} for course {}: test already over at {}".format(client_candidate_id, exam_series_code, course_id, timelimit_module.ending_at))
+        AUDIT_LOG.warning("cand {} on exam {} for course {}: test already over at {}".format(client_candidate_id, exam_series_code, course_id, timelimit_module.ending_at))
         return HttpResponseRedirect(makeErrorURL(error_url, "allTestsTaken"))
 
     # check if we need to provide an accommodation:
@@ -922,7 +1005,7 @@ def test_center_login(request):
 
     if time_accommodation_code:
         timelimit_module.accommodation_code = time_accommodation_code
-        log.info("cand {} on exam {} for course {}: receiving accommodation {}".format(client_candidate_id, exam_series_code, course_id, time_accommodation_code))
+        AUDIT_LOG.info("cand {} on exam {} for course {}: receiving accommodation {}".format(client_candidate_id, exam_series_code, course_id, time_accommodation_code))
 
     # UGLY HACK!!!
     # Login assumes that authentication has occurred, and that there is a
@@ -936,6 +1019,7 @@ def test_center_login(request):
     # testcenteruser.user.backend = "%s.%s" % (backend.__module__, backend.__class__.__name__)
     testcenteruser.user.backend = "%s.%s" % ("TestcenterAuthenticationModule", "TestcenterAuthenticationClass")
     login(request, testcenteruser.user)
+    AUDIT_LOG.info("Logged in user '{}' for test of cand {} on exam {} for course {}: URL = {}".format(testcenteruser.user.username, client_candidate_id, exam_series_code, course_id, location))
 
     # And start the test:
     return jump_to(request, course_id, location)

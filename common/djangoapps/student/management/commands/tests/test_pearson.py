@@ -303,15 +303,13 @@ class PearsonTransferTestCase(PearsonTestCase):
     '''
 
     def test_transfer_config(self):
-        with self.settings(DATADOG_API='FAKE_KEY'):
-            # TODO: why is this failing with the wrong error message?!
-            stderrmsg = get_command_error_text('pearson_transfer', **{'mode': 'garbage'})
-            self.assertErrorContains(stderrmsg, 'Error: No PEARSON entries')
-        with self.settings(DATADOG_API='FAKE_KEY'):
-            stderrmsg = get_command_error_text('pearson_transfer')
-            self.assertErrorContains(stderrmsg, 'Error: No PEARSON entries')
-        with self.settings(DATADOG_API='FAKE_KEY',
-                           PEARSON={'LOCAL_EXPORT': self.export_dir,
+        stderrmsg = get_command_error_text('pearson_transfer', **{'mode': 'garbage'})
+        self.assertErrorContains(stderrmsg, 'Error: No PEARSON entries')
+
+        stderrmsg = get_command_error_text('pearson_transfer')
+        self.assertErrorContains(stderrmsg, 'Error: No PEARSON entries')
+
+        with self.settings(PEARSON={'LOCAL_EXPORT': self.export_dir,
                                     'LOCAL_IMPORT': self.import_dir}):
             stderrmsg = get_command_error_text('pearson_transfer')
             self.assertErrorContains(stderrmsg, 'Error: No entry in the PEARSON settings')
@@ -319,8 +317,7 @@ class PearsonTransferTestCase(PearsonTestCase):
     def test_transfer_export_missing_dest_dir(self):
         raise SkipTest()
         create_multiple_registrations('export_missing_dest')
-        with self.settings(DATADOG_API='FAKE_KEY',
-                           PEARSON={'LOCAL_EXPORT': self.export_dir,
+        with self.settings(PEARSON={'LOCAL_EXPORT': self.export_dir,
                                     'SFTP_EXPORT': 'this/does/not/exist',
                                     'SFTP_HOSTNAME': SFTP_HOSTNAME,
                                     'SFTP_USERNAME': SFTP_USERNAME,
@@ -336,8 +333,7 @@ class PearsonTransferTestCase(PearsonTestCase):
     def test_transfer_export(self):
         raise SkipTest()
         create_multiple_registrations("transfer_export")
-        with self.settings(DATADOG_API='FAKE_KEY',
-                           PEARSON={'LOCAL_EXPORT': self.export_dir,
+        with self.settings(PEARSON={'LOCAL_EXPORT': self.export_dir,
                                     'SFTP_EXPORT': 'results/topvue',
                                     'SFTP_HOSTNAME': SFTP_HOSTNAME,
                                     'SFTP_USERNAME': SFTP_USERNAME,
@@ -354,8 +350,7 @@ class PearsonTransferTestCase(PearsonTestCase):
     def test_transfer_import_missing_source_dir(self):
         raise SkipTest()
         create_multiple_registrations('import_missing_src')
-        with self.settings(DATADOG_API='FAKE_KEY',
-                           PEARSON={'LOCAL_IMPORT': self.import_dir,
+        with self.settings(PEARSON={'LOCAL_IMPORT': self.import_dir,
                                     'SFTP_IMPORT': 'this/does/not/exist',
                                     'SFTP_HOSTNAME': SFTP_HOSTNAME,
                                     'SFTP_USERNAME': SFTP_USERNAME,
@@ -371,8 +366,7 @@ class PearsonTransferTestCase(PearsonTestCase):
     def test_transfer_import(self):
         raise SkipTest()
         create_multiple_registrations('import_missing_src')
-        with self.settings(DATADOG_API='FAKE_KEY',
-                           PEARSON={'LOCAL_IMPORT': self.import_dir,
+        with self.settings(PEARSON={'LOCAL_IMPORT': self.import_dir,
                                     'SFTP_IMPORT': 'results',
                                     'SFTP_HOSTNAME': SFTP_HOSTNAME,
                                     'SFTP_USERNAME': SFTP_USERNAME,

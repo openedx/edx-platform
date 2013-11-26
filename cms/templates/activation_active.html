@@ -1,18 +1,32 @@
-
 <%! from django.utils.translation import ugettext as _ %>
-
 <%inherit file="base.html" />
 
 <%block name="content">
-
-<section class="tos">
-<div>
-
-<section class="activation">
-  <h1>${_("Account already active")}!</h1>
-  <p> ${_("This account has already been activated")}. <a href="/signin">${_("Log in here")}</a>.</p>
-</section>
+<div class="wrapper-mast wrapper sr">
+  <header class="mast">
+    <h1 class="page-header">${_("Studio Account Activation")}</h1>
+  </header>
 </div>
-</section>
 
+<div class="wrapper-content wrapper">
+  <section class="content activation is-active">
+    <article class="content-primary" role="main">
+    </article>
+
+    <div class="notice notice-incontext notice-instruction has-actions">
+      <div class="msg">
+        <h2 class="title">${_("Your account is already active")}</h2>
+        <div class="copy">
+          <p>${_("This account, set up using {0}, has already been activated. Please sign in to start working within edX Studio.".format(user.email))}</p>
+        </div>
+      </div>
+
+      <ul class="list-actions">
+        <li class="action-item">
+          <a href="/signin" class="action-primary action-signin">${_("Sign into Studio")}</a>
+        </li>
+      </ul>
+    </div>
+  </section>
+</div>
 </%block>

@@ -1,71 +1,67 @@
-
-<%! from django.core.urlresolvers import reverse %>
-<%! from django.utils.translation import ugettext as tx %>
-
-
 <%inherit file="base.html" />
-
-
+<%!
+from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
+from xmodule.modulestore.django import loc_mapper
+%>
 <%namespace name="units" file="widgets/units.html" />
-<%block name="title">${tx("Individual Unit")}</%block>
-<%block name="bodyclass">is-signedin course unit</%block>
+<%block name="title">${_("Individual Unit")}</%block>
+<%block name="bodyclass">is-signedin course unit view-unit</%block>
 
 <%block name="jsextra">
   <script type='text/javascript'>
-  $(document).ready(function() {
-    new CMS.Views.UnitEdit({
-      el: $('.main-wrapper'),
-      model: new CMS.Models.Module({
-        id: '${unit_location}',
-        state: '${unit_state}'
-      })
-    });
+require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit", "jquery.ui"],
+    function(doc, $, ModuleModel, UnitEditView, ui) {
+  window.unit_location_analytics = '${unit_locator}';
 
-    $(document).ready(function() {
+  // tabs
+  $('.tab-group').tabs();
 
-      // tabs
-      $('.tab-group').tabs();
-    });
+  new UnitEditView({
+    el: $('.main-wrapper'),
+    model: new ModuleModel({
+      id: '${unit_locator}',
+      state: '${unit_state}'
+    })
+  });
 
-    $('.new-component-template').each(function(){
-        $emptyEditor = $(this).find('.empty');
-        $(this).prepend($emptyEditor);
-      });
-    });
-
-    var unit_location_analytics = '${unit_location}';
+  $('.new-component-template').each(function(){
+      $emptyEditor = $(this).find('.empty');
+      $(this).prepend($emptyEditor);
+  });
+});
   </script>
 
 </%block>
 <%block name="content">
-  <div class="main-wrapper edit-state-${unit_state}" data-id="${unit_location}">
+  <div class="main-wrapper edit-state-${unit_state}" data-id="${unit_location}" data-locator="${unit_locator}">
     <div class="inner-wrapper">
       <div class="alert editing-draft-alert">
-        <p class="alert-message"><strong>${tx("You are editing a draft.")}</strong>
+        <p class="alert-message"><strong>${_("You are editing a draft.")}</strong>
         % if published_date:
-        This unit was originally published on ${published_date}.
+        ${_("This unit was originally published on {date}.").format(date=published_date)}
         % endif
         </p>
-        <a href="${published_preview_link}" target="_blank" class="alert-action secondary">${tx("View the Live Version")}</a>
+        <a href="${published_preview_link}" target="_blank" class="alert-action secondary">${_("View the Live Version")}</a>
       </div>
       <div class="main-column">
         <article class="unit-body window">
-          <p class="unit-name-input"><label>${tx("Display Name:")}</label><input type="text" value="${unit.display_name_with_default | h}" class="unit-display-name-input" /></p>
+        <p class="unit-name-input"><label>${_("Display Name:")}</label><input type="text" value="${unit.display_name_with_default | h}" class="unit-display-name-input" /></p>
           <ol class="components">
-            % for id in components:
-            <li class="component" data-id="${id}"/>
+            % for id, locator in components:
+            <li class="component" data-locator="${locator}" data-id="${id}" />
             % endfor
             <li class="new-component-item adding">
               <div class="new-component">
-                <h5>${tx("Add New Component")}</h5>
+                <h5>${_("Add New Component")}</h5>
                 <ul class="new-component-type">
                   % for type, templates in sorted(component_templates.items()):
                   <li>
                   % if type == 'advanced' or len(templates) > 1:
                     <a href="#" class="multiple-templates" data-type="${type}">
                   % else:
-                    % for _, location, _ in templates:
-                    <a href="#" class="single-template" data-type="${type}" data-location="${location}">
+                    % for __, category, __, __ in templates:
+                    <a href="#" class="single-template" data-type="${type}" data-category="${category}">
                     % endfor
                   % endif
                       <span class="large-template-icon large-${type}-icon"></span>
@@ -79,49 +75,60 @@
                   % if len(templates) > 1 or type == 'advanced':
                 <div class="new-component-templates new-component-${type}">
                     % if type == "problem":
-                      <div class="tab-group tabs">
-                              <ul class="problem-type-tabs nav-tabs">
-                                <li class="current">
-                                  <a class="link-tab" href="#tab1">${tx("Common Problem Types")}</a>
-                                </li>
-                                <li>
-                                  <a class="link-tab" href="#tab2">${tx("Advanced")}</a>
-                                </li>
-                              </ul>
-                      % endif
-                          <div class="tab current" id="tab1">
-                            <ul class="new-component-template">
-                                % for name, location, has_markdown in templates:
-                                  % if has_markdown or type != "problem":
-                                    <li class="editor-md">
-                                      <a href="#" id="${location}" data-location="${location}">
-                                        <span class="name"> ${name}</span>
-                                      </a>
-                                    </li>
-                                  % endif
-  
-                                %endfor
+                    <div class="tab-group tabs">
+                            <ul class="problem-type-tabs nav-tabs">
+                              <li class="current">
+                                <a class="link-tab" href="#tab1">${_("Common Problem Types")}</a>
+                              </li>
+                              <li>
+                                <a class="link-tab" href="#tab2">${_("Advanced")}</a>
+                              </li>
                             </ul>
-                          </div>
-                      % if type == "problem":
-                              <div class="tab" id="tab2">
-                                <ul class="new-component-template">
-                                    % for name, location, has_markdown in templates:
-                                      % if not has_markdown:
-                                        <li class="editor-manual">
-                                          <a href="#" id="${location}" data-location="${location}">
-                                            <span class="name"> ${name}</span>
-                                          </a>
-                                        </li>
-                                      % endif
-                                    % endfor
-                                </ul>
-                              </div>
-                      </div>
-                      % endif
-                      <a href="#" class="cancel-button">${tx("Cancel")}</a>
-                  </div>
-                  % endif
+                    % endif
+                    <div class="tab current" id="tab1">
+                      <ul class="new-component-template">
+                          % for name, category, has_markdown, boilerplate_name in sorted(templates):
+                            % if has_markdown or type != "problem":
+                                % if boilerplate_name is None:
+                                  <li class="editor-md empty">
+                                    <a href="#" data-category="${category}">
+                                      <span class="name">${name}</span>
+                                    </a>
+                                  </li>
+
+                                % else:
+                                  <li class="editor-md">
+                                    <a href="#" data-category="${category}"
+                                       data-boilerplate="${boilerplate_name}">
+                                      <span class="name">${name}</span>
+                                    </a>
+                                  </li>
+                                % endif
+                            % endif
+
+                          %endfor
+                      </ul>
+                    </div>
+                    % if type == "problem":
+                        <div class="tab" id="tab2">
+                          <ul class="new-component-template">
+                              % for name, category, has_markdown, boilerplate_name in sorted(templates):
+                                % if not has_markdown:
+                                  <li class="editor-manual">
+                                    <a href="#" data-category="${category}"
+                                       data-boilerplate="${boilerplate_name}">
+                                      <span class="name">${name}</span>
+                                    </a>
+                                  </li>
+                                % endif
+                              % endfor
+                          </ul>
+                        </div>
+                    </div>
+                    % endif
+                    <a href="#" class="cancel-button">Cancel</a>
+                </div>
+                % endif
                 % endfor
             </li>
           </ol>
@@ -130,40 +137,54 @@
 
       <div class="sidebar">
         <div class="unit-settings window">
-          <h4 class="header">${tx("Unit Settings")}</h4>
+          <h4 class="header">${_("Unit Settings")}</h4>
           <div class="window-contents">
             <div class="row visibility">
-              <label class="inline-label">${tx("Visibility")}:</label>
-              <select class='visibility-select'>
-                <option value="public">${tx("Public")}</option>
-                <option value="private">${tx("Private")}</option>
+              <label class="inline-label">${_("Visibility:")}</label>
+              <select name="visibility-select" class='visibility-select'>
+                <option value="public">${_("Public")}</option>
+                <option value="private">${_("Private")}</option>
               </select>
             </div>
             <div class="row published-alert">
-              <p class="edit-draft-message">${tx("This unit has been published. To make changes, you must")} <a href="#" class="create-draft">${tx("edit a draft")}</a>.</p>
-              <p class="publish-draft-message">${tx("This is a draft of the published unit. To update the live version, you must")} <a href="#" class="publish-draft">${tx("replace it with this draft")}</a>.</p>
+              <p class="edit-draft-message">${_('This unit has been published. To make changes, you must {link_start}edit a draft{link_end}.').format(link_start='<a href="#" class="create-draft">', link_end='</a>')}</p>
+              <p class="publish-draft-message">${_('This is a draft of the published unit. To update the live version, you must {link_start}replace it with this draft{link_end}.').format(link_start='<a href="#" class="publish-draft">', link_end='</a>')}</p>
             </div>
             <div class="row status">
-              <p>${tx("This unit is scheduled to be released to <strong>students</strong>")}
+              <p>${_("This unit is scheduled to be released to <strong>students</strong>")}
               % if release_date is not None:
-                  on <strong>${release_date}</strong>
+                ${_(u"on {date}").format(date=u"<strong>{}</strong>".format(release_date))}
               % endif
-              with the subsection <a href="${reverse('edit_subsection', kwargs={'location': subsection.location})}">"${subsection.display_name_with_default}"</a></p>
+              ${_("with the subsection {link_start}{name}{link_end}").format(
+                  name=subsection.display_name_with_default,
+                  link_start='<a href="{url}">'.format(url=reverse('edit_subsection', kwargs={'location': subsection.location})),
+                  link_end='</a>',
+                )}
+              </p>
             </div>
             <div class="row unit-actions">
-              <a href="#" class="delete-draft delete-button">${tx("Delete Draft")}</a>
-              <a href="${draft_preview_link}" target="_blank" class="preview-button">${tx("Preview")}</a>
-              <a href="${published_preview_link}" target="_blank" class="view-button">${tx("View Live")}</a>
+              <a href="#" class="delete-draft delete-button">${_("Delete Draft")}</a>
+              <a href="${draft_preview_link}" target="_blank" class="preview-button">${_("Preview")}</a>
+              <a href="${published_preview_link}" target="_blank" class="view-button">${_("View Live")}</a>
             </div>
           </div>
         </div>
         <div class="window unit-location">
-          <h4 class="header">${tx("Unit Location")}</h4>
+          <h4 class="header">${_("Unit Location")}</h4>
           <div class="window-contents">
-            <div><input type="text" class="url" value="/courseware/${section.url_name}/${subsection.url_name}" disabled /></div>
+            <div class="row wrapper-unit-id">
+              <p class="unit-id">
+                <span class="label">${_("Unit Identifier:")}</span>
+                <input type="text" class="url value" value="${unit.location.name}" disabled />
+              </p>
+            </div>
             <ol>
               <li>
-                <a href="#" class="section-item">${section.display_name_with_default}</a>
+                <%
+                  ctx_loc = context_course.location
+                  index_url = loc_mapper().translate_location(ctx_loc.course_id, ctx_loc, False, True).url_reverse('course/', '')
+                %>
+                <a href="${index_url}" class="section-item">${section.display_name_with_default}</a>
                 <ol>
                   <li>
                     <a href="${reverse('edit_subsection', args=[subsection.location])}" class="section-item">

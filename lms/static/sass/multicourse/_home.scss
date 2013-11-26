@@ -43,7 +43,7 @@
       @include transition(all 0.2s linear 0s);
       vertical-align: top;
 
-      &:hover {
+      &:hover, &:focus {
         .actions {
           display: none;
         }
@@ -93,7 +93,7 @@
       width: flex-grid(2) + flex-gutter();
       z-index: 2;
 
-      &:hover {
+      &:hover, &:focus {
         text-decoration: underline;
       }
 
@@ -140,7 +140,7 @@
         }
       }
 
-      &:hover {
+      &:hover, &:focus {
         .play-intro {
           @include background-image(linear-gradient(-90deg, rgba(0,0,0, 0.75), rgba(0,0,0, 0.8)));
           box-shadow: 0 1px 12px 0 rgba(0,0,0, 0.5);
@@ -187,27 +187,27 @@
     width: flex-grid(12);
 
     &::before {
-      @extend .faded-hr-divider-medium;
+      @extend %faded-hr-divider-medium;
       content: "";
       display: block;
     }
 
     &::after {
-      @extend .faded-hr-divider-medium;
+      @extend %faded-hr-divider-medium;
       content: "";
       display: block;
     }
 
 
     hr {
-      @extend .faded-hr-divider-light;
+      @extend %faded-hr-divider-light;
       border: none;
       margin: 0px;
       position: relative;
       z-index: 2;
 
       &::after {
-        @extend .faded-hr-divider;
+        @extend %faded-hr-divider;
         bottom: 0px;
         content: "";
         display: block;
@@ -229,7 +229,7 @@
         overflow: hidden;
 
         &::before {
-          @extend .faded-vertical-divider;
+          @extend %faded-vertical-divider;
           content: "";
           display: block;
           height: 80px;
@@ -240,7 +240,7 @@
         }
 
         &::after {
-          @extend .faded-vertical-divider-light;
+          @extend %faded-vertical-divider-light;
           content: "";
           display: block;
           height: 80px;
@@ -295,7 +295,7 @@
             text-shadow: 0 1px rgba(255,255,255, 0.6);
             @include transition(all 0.15s ease-in-out 0s);
 
-            &:hover {
+            &:hover, &:focus {
               color: $lighter-base-font-color;
             }
           }
@@ -308,7 +308,7 @@
           z-index: 2;
         }
 
-        &:hover {
+        &:hover, &:focus {
           text-decoration: none;
 
           &::before {
@@ -354,7 +354,7 @@
               font-size: 1.0em;
             }
 
-            &:hover {
+            &:hover, &:focus {
               .name {
                 bottom: 14px;
               }
@@ -431,7 +431,7 @@
           @include transition(all 0.15s linear 0s);
           width: flex-grid(4);
 
-          &:hover {
+          &:hover, &:focus {
             background: $body-bg;
             border: 1px solid $border-color-2;
             box-shadow: inset 0 0 3px 0 rgba(0,0,0, 0.1);
@@ -467,7 +467,7 @@
               color: $base-font-color;
               font: 700 1em/1.2em $sans-serif;
 
-              &:hover {
+              &:hover, &:focus {
                 color: $blue;
                 text-decoration: underline;
               }
@@ -500,7 +500,7 @@
             float: right;
             color: lighten($base-font-color, 50%);
 
-            &:hover {
+            &:hover, &:focus {
               color: $blue;
               text-decoration: underline;
             }

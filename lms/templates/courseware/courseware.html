@@ -1,11 +1,23 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%inherit file="/main.html" />
 <%namespace name='static' file='/static_content.html'/>
 <%block name="bodyclass">courseware ${course.css_class}</%block>
-<%block name="title"><title>${course.number} Courseware</title></%block>
+<%block name="title"><title>${_("{course_number} Courseware").format(course_number=course.display_number_with_default) | h}</title></%block>
 
 <%block name="headextra">
-  <%static:css group='course'/>
-  <%include file="../discussion/_js_head_dependencies.html" />
+<%static:css group='style-course-vendor'/>
+<%static:css group='style-course'/>
+
+<%include file="../discussion/_js_head_dependencies.html" />
+
+  % if show_chat:
+    <link rel="stylesheet" href="${static.url('css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css')}" />
+    ## It'd be better to have this in a place like lms/css/vendor/candy,
+    ## but the candy_res/ folder contains images and other junk, and it
+    ## all needs to stay together for the Candy.js plugin to work.
+    <link rel="stylesheet" href="${static.url('candy_res/candy_full.css')}" />
+  % endif
+  ${fragment.head_html()}
 </%block>
 
 <%block name="js_extra">
@@ -108,13 +120,49 @@
   </script>
 % endif
 
+% if show_chat:
+  <script type="text/javascript" src="${static.url('js/vendor/candy_libs/libs.min.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/vendor/candy.min.js')}"></script>
+
+  <script type="text/javascript">
+    // initialize the Candy.js plugin
+    $(document).ready(function() {
+      Candy.init("http://${chat['domain']}:5280/http-bind/", {
+        core: { debug: true, autojoin: ["${chat['room']}@conference.${chat['domain']}"] },
+        view: { resources: "${static.url('candy_res/')}"}
+      });
+      Candy.Core.connect("${chat['username']}", "${chat['password']}");
+
+      // show/hide the chat widget
+      $('#chat-toggle').click(function() {
+        var toggle = $(this);
+        if (toggle.hasClass('closed')) {
+          $('#chat-block').show().animate({height: '400px'}, 'slow', function() {
+            $('#chat-open').hide();
+            $('#chat-close').show();
+          });
+        } else {
+          $('#chat-block').animate({height: '0px'}, 'slow', function() {
+            $('#chat-open').show();
+            $('#chat-close').hide();
+            $(this).hide(); // do this at the very end
+          });
+        }
+        toggle.toggleClass('closed');
+      });
+    });
+  </script>
+% endif
+
+${fragment.foot_html()}
+
 </%block>
 
 % if timer_expiration_duration:
 <div class="timer-main">
   <div id="timer_wrapper">
     % if timer_navigation_return_url:
-    <a href="${timer_navigation_return_url}" class="timer_return_url">Return to Exam</a>
+    <a href="${timer_navigation_return_url}" class="timer_return_url">${_("Return to Exam")}</a>
     % endif
     <div class="timer_label">Time Remaining:</div> <div id="exam_timer" class="timer_value">&nbsp;</div>
   </div>
@@ -129,9 +177,9 @@
   <div class="course-wrapper">
 
 % if accordion:
-    <section aria-label="Course Navigation" class="course-index">
+    <section aria-label="${_('Course Navigation')}" class="course-index">
       <header id="open_close_accordion">
-        <a href="#">close</a>
+        <a href="#">${_("close")}</a>
       </header>
 
       <div id="accordion" style="display: none">
@@ -143,41 +191,141 @@
 % endif
 
     <section class="course-content">
-      ${content}
+      ${fragment.body_html()}
     </section>
   </div>
 </section>
 
+% if show_chat:
+  <div id="chat-wrapper">
+    <div id="chat-toggle" class="closed">
+      <span id="chat-open">Open Chat <em class="icon-chevron-up"></em></span>
+      <span id="chat-close">Close Chat <em class="icon-chevron-down"></em></span>
+    </div>
+    <div id="chat-block">
+      ## The Candy.js plugin wants to render in an element with #candy
+      <div id="candy"></div>
+    </div>
+  </div>
+% endif
 
 % if course.show_calculator:
     <div class="calc-main">
-        <a aria-label="Open Calculator" href="#" class="calc">Calculator</a>
-
+        <a title="${_('Open Calculator')}" href="#" role="button" aria-controls="calculator_wrapper" aria-expanded="false" class="calc">${_("Open Calculator")}</a>
         <div id="calculator_wrapper">
             <form id="calculator">
                 <div class="input-wrapper">
-                    <input type="text" id="calculator_input" title="Calculator Input Field" />
+                    <input type="text" id="calculator_input" title="${_('Calculator Input Field')}" tabindex="-1" />
 
                     <div class="help-wrapper">
-                        <a href="#">Hints</a>
-                        <dl class="help">
-                            <dt>Suffixes:</dt>
-                            <dd> %kMGTcmunp</dd>
-                            <dt>Operations:</dt>
-                            <dd>^ * / + - ()</dd>
-                            <dt>Functions:</dt>
-                            <dd>sin, cos, tan, sqrt, log10, log2, ln, arccos, arcsin, arctan, abs </dd>
-                            <dt>Constants</dt>
-                            <dd>e, pi</dd>
-
-                            <!-- Students won't know what parallel means at this time.  Complex numbers aren't well tested in the courseware, so we would prefer to not expose them.  If you read the comments in the source, feel free to use them. If you run into a bug, please let us know. But we can't officially support them right now.
-
-                            <dt>Unsupported:</dt> <dd>||, j </dd>  -->
-                        </dl>
+                        <a id="calculator_hint" href="#" role="button" aria-describedby="calculator_input_help" tabindex="-1">${_("Hints")}</a>
+                        <div id="calculator_input_help" class="help" role="tooltip" aria-hidden="true">
+                            <p><span class="bold">${_("Integers")}:</span> 2520</p>
+                            <p><span class="bold">${_("Decimals")}:</span> 3.14 or .98</p>
+                            <p><span class="bold">${_("Scientific notation")}:</span> 1.2e-2 (=0.012), -4.4e+5 = -4.4e5 (=-440,000)</p>
+                            <p><span class="bold">${_("Appending SI postfixes")}:</span> 2.25k (=2,250)</p>
+                            <p><span class="bold">${_("Supported SI postfixes")}:</span></p>
+                            <table class="calc-postfixes">
+                              <tbody>
+                                <tr>
+                                  <td>%</td>
+                                  <td>percent</td>
+                                  <td>0.01 = 1e-2</td>
+                                </tr>
+                                <tr>
+                                  <td>T</td>
+                                  <td>tera</td>
+                                  <td>1e12</td>
+                                </tr>
+                                <tr>
+                                  <td>G</td>
+                                  <td>giga</td>
+                                  <td>1e9</td>
+                                </tr>
+                                <tr>
+                                  <td>M</td>
+                                  <td>mega</td>
+                                  <td>1e6</td>
+                                </tr>
+                                <tr>
+                                  <td>k</td>
+                                  <td>kilo</td>
+                                  <td>1000 = 1e3</td>
+                                </tr>
+                                <tr>
+                                  <td>c</td>
+                                  <td>centi</td>
+                                  <td>0.01 = 1e-2</td>
+                                </tr>
+                                <tr>
+                                  <td>m</td>
+                                  <td>milli</td>
+                                  <td>0.001 = 1e-3</td>
+                                </tr>
+                                <tr>
+                                  <td>u</td>
+                                  <td>micro</td>
+                                  <td>1e-6</td>
+                                </tr>
+                                <tr>
+                                  <td>n</td>
+                                  <td>nano</td>
+                                  <td>1e-9</td>
+                                </tr>
+                                <tr>
+                                  <td>p</td>
+                                  <td>pico</td>
+                                  <td>1e-12</td>
+                                </tr>
+                              </tbody>
+                            </table>
+                            <p><span class="bold">${_("Operators")}:</span> + - * / ^ and || (${_("parallel resistors function")})</p>
+                            <p><span class="bold">${_("Functions")}:</span> sin, cos, tan, sqrt, log10, log2, ln, arccos, arcsin, arctan, abs, fact/factorial</p>
+                            <p><span class="bold">${_("Constants")}:</span></p>
+                              <table>
+                                <tbody>
+                                <tr>
+                                  <td>j</td>
+                                  <td>=</td>
+                                  <td>sqrt(-1)</td>
+                                </tr>
+                                <tr>
+                                  <td>e</td>
+                                  <td>=</td>
+                                  <td>${_("Euler's number")}</td>
+                                </tr>
+                                <tr>
+                                  <td>pi</td>
+                                  <td>=</td>
+                                  <td>${_("ratio of a circle's circumference to it's diameter")}</td>
+                                </tr>
+                                <tr>
+                                  <td>k</td>
+                                  <td>=</td>
+                                  <td>${_("Boltzmann constant")}</td>
+                                </tr>
+                                <tr>
+                                  <td>c</td>
+                                  <td>=</td>
+                                  <td>${_("speed of light")}</td>
+                                </tr>
+                                <tr>
+                                  <td>T</td>
+                                  <td>=</td>
+                                  <td>${_("freezing point of water in degrees Kelvin")}</td>
+                                </tr>
+                                <tr>
+                                  <td>q</td>
+                                  <td>=</td>
+                                  <td>${_("fundamental charge")}</td>
+                                </tr>
+                                </tbody>
+                              </table>
+                        </div>
                     </div>
                 </div>
-                <input id="calculator_button" type="submit" title="Calculate" value="="/>
-                <input type="text" id="calculator_output" title="Calculator Output Field" readonly />
+                <input id="calculator_button" type="submit" title="${_('Calculate')}" value="=" aria-label="${_('Calculate')}" value="=" tabindex="-1" />
+                <input type="text" id="calculator_output" title="${_('Calculator Output Field')}" readonly tabindex="-1" />
             </form>
 
         </div>

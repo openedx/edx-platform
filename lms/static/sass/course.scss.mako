@@ -37,6 +37,7 @@
 @import 'course/courseware/amplifier';
 @import 'course/layout/calculator';
 @import 'course/layout/timer';
+@import 'course/layout/chat';
 
 // course-specific courseware (all styles in these files should be gated by a
 // course-specific class). This should be replaced with a better way of
@@ -63,6 +64,9 @@
 
 // instructor
 @import "course/instructor/instructor";
+@import "course/instructor/instructor_2";
+@import "course/instructor/email";
+@import "xmodule/descriptors/css/module-styles.scss";
 
 // discussion
 @import "course/discussion/form-wmd-toolbar";

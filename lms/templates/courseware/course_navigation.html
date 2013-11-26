@@ -12,19 +12,25 @@ def url_class(is_active):
   return ""
 %>
 <%! from courseware.tabs import get_course_tabs %>
+<%! from django.utils.translation import ugettext as _ %>
+<% import waffle %>
 
 <nav class="${active_page} course-material">
   <div class="inner-wrapper">
     <ol class="course-tabs">
-      % for tab in get_course_tabs(user, course, active_page):
+      % for tab in get_course_tabs(user, course, active_page, request):
+        % if waffle.flag_is_active(request, 'visual_treatment') or waffle.flag_is_active(request, 'merge_course_tabs'):
+          <li class="${"prominent" if tab.name in ("Courseware", "Course Content") else ""}">
+        % else:
           <li>
+        % endif
              <a href="${tab.link | h}" class="${url_class(tab.is_active)}">
                  ${tab.name | h}
                  % if tab.is_active == True:
-                  <span class="sr">, current location</span>
+                   <span class="sr">, current location</span>
                  %endif
                  % if tab.has_img == True:
-                    <img src="${tab.img}"/>
+                   <img src="${tab.img}"/>
                  %endif
              </a>
           </li>
@@ -32,7 +38,7 @@ def url_class(is_active):
     <%block name="extratabs" />
         % if masquerade is not UNDEFINED:
           % if staff_access and masquerade is not None:
-          <li style="float:right"><a href="#" id="staffstatus">Staff view</a></li>
+          <li style="float:right"><a href="#" id="staffstatus">${_("Staff view")}</a></li>
           % endif
         % endif
     </ol>
@@ -46,9 +52,9 @@ masq = (function(){
     var el = $('#staffstatus');
     var setstat = function(status){
         if (status=='student'){
-            el.html('<font color="green">Student view</font>');
+            el.html('<font color="green">${_("Student view")}</font>');
         }else{
-            el.html('<font color="red">Staff view</font>');
+            el.html('<font color="red">${_("Staff view")}</font>');
         }
     }
     setstat('${masquerade}');

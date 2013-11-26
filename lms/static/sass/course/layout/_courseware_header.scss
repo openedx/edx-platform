@@ -23,6 +23,17 @@ nav.course-material {
       list-style: none;
       margin-right: 6px;
 
+      &.prominent {
+        margin-right: 16px;
+        background: rgba(255, 255, 255, .5);
+        border-radius: 3px; 
+      }
+
+      &.prominent + li {
+          padding-left: 15px;
+          border-left: 1px solid #333;
+      }
+
       a {
         border-radius: 3px;
         color: #555;
@@ -34,7 +45,7 @@ nav.course-material {
         text-decoration: none;
         // text-shadow: 0 1px 0 rgba(0, 0, 0, .4);
 
-        &:hover {
+        &:hover, &:focus {
           color: #333;
           background: rgba(255, 255, 255, .6);
         }
@@ -112,7 +123,7 @@ header.global.slim {
     padding-right: 20px;
 
     &:before {
-      @extend .faded-vertical-divider;
+      @extend %faded-vertical-divider;
       content: "";
       display: block;
       height: 35px;
@@ -123,7 +134,7 @@ header.global.slim {
     }
 
     &:after {
-      @extend .faded-vertical-divider-light;
+      @extend %faded-vertical-divider-light;
       content: "";
       display: block;
       height: 35px;

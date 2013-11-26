@@ -21,94 +21,34 @@ Longer TODO:
 
 # We intentionally define lots of variables that aren't used, and
 # want to import all variables from base settings files
-# pylint: disable=W0401, W0611, W0614
+# pylint: disable=W0401, W0611, W0614, C0103
 
 import sys
 import os
-# import cms.devs.common
 
 from path import path
 
 from .discussionsettings import *
 
+from lms.lib.xblock.mixin import LmsBlockMixin
+from xmodule.modulestore.inheritance import InheritanceMixin
+from xmodule.x_module import XModuleMixin
+
 ################################### FEATURES ###################################
 # The display name of the platform to be used in templates/emails/etc.
 PLATFORM_NAME = "edX"
-############################# SET PATH INFORMATION #############################
-PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /mitx/cms
-REPO_ROOT = PROJECT_ROOT.dirname()
-COMMON_ROOT = REPO_ROOT / "common"
-ENV_ROOT = REPO_ROOT.dirname()  # virtualenv dir /mitx is in
+CC_MERCHANT_NAME = PLATFORM_NAME
 
-GITHUB_REPO_ROOT = ENV_ROOT / "data"
-
-sys.path.append(REPO_ROOT)
-sys.path.append(PROJECT_ROOT / 'djangoapps')
-sys.path.append(PROJECT_ROOT / 'lib')
-sys.path.append(COMMON_ROOT / 'djangoapps')
-sys.path.append(COMMON_ROOT / 'lib')
 COURSEWARE_ENABLED = True
 ENABLE_JASMINE = False
 
-GENERATE_RANDOM_USER_CREDENTIALS = False
 PERFSTATS = False
-STATICFILES_FINDERS = (
-    'staticfiles.finders.FileSystemFinder',
-    'staticfiles.finders.AppDirectoriesFinder',
-)
 
-# List of callables that know how to import templates from various sources.
-TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-)
-
-MIDDLEWARE_CLASSES = (
-    'contentserver.middleware.StaticContentServer',
-    'request_cache.middleware.RequestCache',
-    'django.middleware.cache.UpdateCacheMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'method_override.middleware.MethodOverrideMiddleware',
-
-    # Instead of AuthenticationMiddleware, we use a cache-backed version
-    'cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
-
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'track.middleware.TrackMiddleware',
-    'mitxmako.middleware.MakoMiddleware',
-
-    # Detects user-requested locale from 'accept-language' header in http request
-    'django.middleware.locale.LocaleMiddleware',
-
-    'django.middleware.transaction.TransactionMiddleware'
-)
 DISCUSSION_SETTINGS = {
     'MAX_COMMENT_DEPTH': 2,
 }
 
-# Locale/Internationalization
-# TIME_ZONE = 'America/New_York'
-TIME_ZONE = 'Asia/Ho_Chi_Minh'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
-# LANGUAGE_CODE = 'en'
-LANGUAGE_CODE = 'vi'  # http://www.i18nguy.com/unicode/language-identifiers.html
 
-USE_I18N = True
-USE_L10N = True
-
-# Localization strings (e.g. django.po) are under this directory
-LOCALE_PATHS = (REPO_ROOT + '/conf/locale',)  # mitx/conf/locale/
-
-# Tracking
-TRACK_MAX_EVENT = 10000
-
-# Messages
-MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
-
-############################### Pipeline #######################################
-
-STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
 # Features
 MITX_FEATURES = {
     'SAMPLE': False,
@@ -136,10 +76,13 @@ MITX_FEATURES = {
 
     'ENABLE_TEXTBOOK': True,
     'ENABLE_DISCUSSION_SERVICE': True,
+    # discussion home panel, which includes a subscription on/off setting for discussion digest emails.
+    # this should remain off in production until digest notifications are online.
+    'ENABLE_DISCUSSION_HOME_PANEL': False,
 
     'ENABLE_PSYCHOMETRICS': False,  # real-time psychometrics (eg item response theory analysis in instructor dashboard)
 
-    'ENABLE_DJANGO_ADMIN_SITE': False,  # set true to enable django's admin site, even on prod (e.g. for course ops)
+    'ENABLE_DJANGO_ADMIN_SITE': True,  # set true to enable django's admin site, even on prod (e.g. for course ops)
     'ENABLE_SQL_TRACKING_LOGS': False,
     'ENABLE_LMS_MIGRATION': False,
     'ENABLE_MANUAL_GIT_RELOAD': False,
@@ -148,31 +91,43 @@ MITX_FEATURES = {
 
     'DISABLE_LOGIN_BUTTON': False,  # used in systems where login is automatic, eg MIT SSL
 
-    'STUB_VIDEO_FOR_TESTING': False,  # do not display video when running automated acceptance tests
-
     # extrernal access methods
     'ACCESS_REQUIRE_STAFF_FOR_COURSE': False,
     'AUTH_USE_OPENID': False,
     'AUTH_USE_MIT_CERTIFICATES': False,
     'AUTH_USE_OPENID_PROVIDER': False,
+    # Even though external_auth is in common, shib assumes the LMS views / urls, so it should only be enabled
+    # in LMS
     'AUTH_USE_SHIB': False,
+    'AUTH_USE_CAS': False,
 
     # This flag disables the requirement of having to agree to the TOS for users registering
     # with Shib.  Feature was requested by Stanford's office of general counsel
     'SHIB_DISABLE_TOS': False,
-    
+
+    # Can be turned off if course lists need to be hidden. Effects views and templates.
+    'COURSES_ARE_BROWSABLE': True,
+
     # Enables ability to restrict enrollment in specific courses by the user account login method
     'RESTRICT_ENROLL_BY_REG_METHOD': False,
 
     # analytics experiments
     'ENABLE_INSTRUCTOR_ANALYTICS': False,
 
-    # enable analytics server.  
+    # Enables the LMS bulk email feature for course staff
+    'ENABLE_INSTRUCTOR_EMAIL': True,
+    # If True and ENABLE_INSTRUCTOR_EMAIL: Forces email to be explicitly turned on
+    #   for each course via django-admin interface.
+    # If False and ENABLE_INSTRUCTOR_EMAIL: Email will be turned on by default
+    #   for all Mongo-backed courses.
+    'REQUIRE_COURSE_EMAIL_AUTH': True,
+
+    # enable analytics server.
     # WARNING: THIS SHOULD ALWAYS BE SET TO FALSE UNDER NORMAL
     # LMS OPERATION. See analytics.py for details about what
-    # this does. 
+    # this does.
 
-    'RUN_AS_ANALYTICS_SERVER_ENABLED' : False, 
+    'RUN_AS_ANALYTICS_SERVER_ENABLED': False,
 
     # Flip to True when the YouTube iframe API breaks (again)
     'USE_YOUTUBE_OBJECT_API': False,
@@ -200,14 +155,43 @@ MITX_FEATURES = {
     # Toggle to indicate use of a custom theme
     'USE_CUSTOM_THEME': False,
 
-    # Do autoplay videos for students
-    'AUTOPLAY_VIDEOS': True,
+    # Don't autoplay videos for students
+    'AUTOPLAY_VIDEOS': False,
 
     # Enable instructor dash to submit background tasks
     'ENABLE_INSTRUCTOR_BACKGROUND_TASKS': True,
 
+    # Enable instructor dash beta version link
+    'ENABLE_INSTRUCTOR_BETA_DASHBOARD': True,
+
     # Allow use of the hint managment instructor view.
     'ENABLE_HINTER_INSTRUCTOR_VIEW': False,
+
+    # for load testing
+    'AUTOMATIC_AUTH_FOR_TESTING': False,
+
+    # Toggle to enable chat availability (configured on a per-course
+    # basis in Studio)
+    'ENABLE_CHAT': False,
+
+    # Allow users to enroll with methods other than just honor code certificates
+    'MULTIPLE_ENROLLMENT_ROLES': False,
+
+    # Toggle the availability of the shopping cart page
+    'ENABLE_SHOPPING_CART': False,
+
+    # Toggle storing detailed billing information
+    'STORE_BILLING_INFO': False,
+
+    # Enable flow for payments for course registration (DIFFERENT from verified student flow)
+    'ENABLE_PAID_COURSE_REGISTRATION': False,
+
+    # Automatically approve student identity verification attempts
+    'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': False,
+
+    # Disable instructor dash buttons for downloading course data
+    # when enrollment exceeds this number
+    'MAX_ENROLLMENT_INSTR_BUTTONS': 200,
 }
 
 # Used for A/B testing
@@ -221,7 +205,7 @@ XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5  # seconds
 
 
 ############################# SET PATH INFORMATION #############################
-PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /mitx/lms
+PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /edx-platform/lms
 REPO_ROOT = PROJECT_ROOT.dirname()
 COMMON_ROOT = REPO_ROOT / "common"
 ENV_ROOT = REPO_ROOT.dirname()  # virtualenv dir /mitx is in
@@ -229,9 +213,9 @@ COURSES_ROOT = ENV_ROOT / "data"
 
 DATA_DIR = COURSES_ROOT
 
+# TODO: Remove the rest of the sys.path modification here and in cms/envs/common.py
 sys.path.append(REPO_ROOT)
 sys.path.append(PROJECT_ROOT / 'djangoapps')
-sys.path.append(PROJECT_ROOT / 'lib')
 sys.path.append(COMMON_ROOT / 'djangoapps')
 sys.path.append(COMMON_ROOT / 'lib')
 
@@ -239,10 +223,11 @@ sys.path.append(COMMON_ROOT / 'lib')
 
 system_node_path = os.environ.get("NODE_PATH", REPO_ROOT / 'node_modules')
 
-node_paths = [COMMON_ROOT / "static/js/vendor",
-              COMMON_ROOT / "static/coffee/src",
-              system_node_path
-              ]
+node_paths = [
+    COMMON_ROOT / "static/js/vendor",
+    COMMON_ROOT / "static/coffee/src",
+    system_node_path,
+]
 NODE_PATH = ':'.join(node_paths)
 
 
@@ -278,7 +263,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.messages.context_processors.messages',
     #'django.core.context_processors.i18n',
     'django.contrib.auth.context_processors.auth',  # this is required for admin
-    'django.core.context_processors.csrf',  # necessary for csrf protection
+    'django.core.context_processors.csrf',
 
     # Added for django-wiki
     'django.core.context_processors.media',
@@ -289,8 +274,15 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 
     # Hack to get required link URLs to password reset templates
     'mitxmako.shortcuts.marketing_link_context_processor',
+
+    # Shoppingcart processor (detects if request.user has a cart)
+    'shoppingcart.context_processor.user_has_cart_context_processor',
 )
 
+# use the ratelimit backend to prevent brute force attacks
+AUTHENTICATION_BACKENDS = (
+    'ratelimitbackend.backends.RateLimitModelBackend',
+)
 STUDENT_FILEUPLOAD_MAX_SIZE = 4 * 1000 * 1000  # 4 MB
 MAX_FILEUPLOADS_PER_INPUT = 20
 
@@ -310,10 +302,6 @@ RSS_TIMEOUT = 600
 STATIC_GRAB = False
 DEV_CONTENT = True
 
-# FIXME: Should we be doing this truncation?
-TRACK_MAX_EVENT = 10000
-DEBUG_TRACK_LOG = False
-
 MITX_ROOT_URL = ''
 
 LOGIN_REDIRECT_URL = MITX_ROOT_URL + '/accounts/login'
@@ -332,16 +320,49 @@ WIKI_ENABLED = False
 ###
 
 COURSE_DEFAULT = '6.002x_Fall_2012'
-COURSE_SETTINGS = {'6.002x_Fall_2012': {'number': '6.002x',
-                                          'title': 'Circuits and Electronics',
-                                          'xmlpath': '6002x/',
-                                          'location': 'i4x://edx/6002xs12/course/6.002x_Fall_2012',
-                                          }
-                    }
+COURSE_SETTINGS = {
+    '6.002x_Fall_2012': {
+        'number': '6.002x',
+        'title': 'Circuits and Electronics',
+        'xmlpath': '6002x/',
+        'location': 'i4x://edx/6002xs12/course/6.002x_Fall_2012',
+    }
+}
 
 # IP addresses that are allowed to reload the course, etc.
 # TODO (vshnayder): Will probably need to change as we get real access control in.
 LMS_MIGRATION_ALLOWED_IPS = []
+
+
+############################## EVENT TRACKING #################################
+
+# FIXME: Should we be doing this truncation?
+TRACK_MAX_EVENT = 10000
+
+DEBUG_TRACK_LOG = False
+
+TRACKING_BACKENDS = {
+    'logger': {
+        'ENGINE': 'track.backends.logger.LoggerBackend',
+        'OPTIONS': {
+            'name': 'tracking'
+        }
+    }
+}
+
+# Backwards compatibility with ENABLE_SQL_TRACKING_LOGS feature flag.
+# In the future, adding the backend to TRACKING_BACKENDS enough.
+if MITX_FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):
+    TRACKING_BACKENDS.update({
+        'sql': {
+            'ENGINE': 'track.backends.django.DjangoBackend'
+        }
+    })
+
+# We're already logging events, and we don't want to capture user
+# names/passwords.  Heartbeat events are likely not interesting.
+TRACKING_IGNORE_URL_PATTERNS = [r'^/event', r'^/login', r'^/heartbeat']
+TRACKING_ENABLED = True
 
 ######################## subdomain specific settings ###########################
 COURSE_LISTINGS = {}
@@ -359,6 +380,17 @@ MODULESTORE = {
     }
 }
 CONTENTSTORE = None
+DOC_STORE_CONFIG = None
+
+# Should we initialize the modulestores at startup, or wait until they are
+# needed?
+INIT_MODULESTORE_ON_STARTUP = True
+
+############# XBlock Configuration ##########
+
+# This should be moved into an XBlock Runtime/Application object
+# once the responsibility of XBlock creation is moved out of modulestore - cpennington
+XBLOCK_MIXINS = (LmsBlockMixin, InheritanceMixin, XModuleMixin)
 
 #################### Python sandbox ############################################
 
@@ -395,6 +427,9 @@ DEBUG = False
 TEMPLATE_DEBUG = False
 USE_TZ = True
 
+# CMS base
+CMS_BASE = 'localhost:8001'
+
 # Site info
 SITE_ID = 1
 SITE_NAME = "edx.org"
@@ -402,17 +437,15 @@ HTTPS = 'on'
 ROOT_URLCONF = 'lms.urls'
 IGNORABLE_404_ENDS = ('favicon.ico')
 
-# Email
+# Platform Email
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-DEFAULT_FROM_EMAIL = 'registration@edx.org'
-DEFAULT_FEEDBACK_EMAIL = 'feedback@edx.org'
-SERVER_EMAIL = 'devops@edx.org'
-TECH_SUPPORT_EMAIL = 'technical@edx.org'
-CONTACT_EMAIL = 'info@edx.org'
-BUGS_EMAIL = 'bugs@edx.org'
-ADMINS = (
-    ('edX Admins', 'admin@edx.org'),
-)
+DEFAULT_FROM_EMAIL = 'registration@example.com'
+DEFAULT_FEEDBACK_EMAIL = 'feedback@example.com'
+SERVER_EMAIL = 'devops@example.com'
+TECH_SUPPORT_EMAIL = 'technical@example.com'
+CONTACT_EMAIL = 'info@example.com'
+BUGS_EMAIL = 'bugs@example.com'
+ADMINS = ()
 MANAGERS = ADMINS
 
 # Static content
@@ -428,12 +461,20 @@ STATICFILES_DIRS = [
 FAVICON_PATH = 'images/favicon.ico'
 
 # Locale/Internationalization
-# TIME_ZONE = 'America/New_York'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
-TIME_ZONE = 'Asia/Ho_Chi_Minh'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
-LANGUAGE_CODE = 'vi'  # http://www.i18nguy.com/unicode/language-identifiers.html
-USE_I18N = True
+TIME_ZONE = 'America/New_York'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
+LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
+LANGUAGES = ()
+
+# We want i18n to be turned off in production, at least until we have full localizations.
+# Thus we want the Django translation engine to be disabled. Otherwise even without
+# localization files, if the user's browser is set to a language other than us-en,
+# strings like "login" and "password" will be translated and the rest of the page will be
+# in English, which is confusing.
+USE_I18N = False
 USE_L10N = True
 
+# Localization strings (e.g. django.po) are under this directory
+LOCALE_PATHS = (REPO_ROOT + '/conf/locale',)  # edx-platform/conf/locale/
 # Messages
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
@@ -458,12 +499,17 @@ SIMPLE_WIKI_REQUIRE_LOGIN_EDIT = True
 SIMPLE_WIKI_REQUIRE_LOGIN_VIEW = False
 
 ################################# WIKI ###################################
+from course_wiki import settings as course_wiki_settings
+
 WIKI_ACCOUNT_HANDLING = False
 WIKI_EDITOR = 'course_wiki.editors.CodeMirror'
 WIKI_SHOW_MAX_CHILDREN = 0  # We don't use the little menu that shows children of an article in the breadcrumb
 WIKI_ANONYMOUS = False  # Don't allow anonymous access until the styling is figured out
-WIKI_CAN_CHANGE_PERMISSIONS = lambda article, user: user.is_staff or user.is_superuser
-WIKI_CAN_ASSIGN = lambda article, user: user.is_staff or user.is_superuser
+
+WIKI_CAN_DELETE = course_wiki_settings.CAN_DELETE
+WIKI_CAN_MODERATE = course_wiki_settings.CAN_MODERATE
+WIKI_CAN_CHANGE_PERMISSIONS = course_wiki_settings.CAN_CHANGE_PERMISSIONS
+WIKI_CAN_ASSIGN = course_wiki_settings.CAN_ASSIGN
 
 WIKI_USE_BOOTSTRAP_SELECT_WIDGET = False
 WIKI_LINK_LIVE_LOOKUPS = False
@@ -472,7 +518,7 @@ WIKI_LINK_DEFAULT_LEVEL = 2
 ################################# Pearson TestCenter config  ################
 
 PEARSONVUE_SIGNINPAGE_URL = "https://www1.pearsonvue.com/testtaker/signin/SignInPage/EDX"
-# TESTCENTER_ACCOMMODATION_REQUEST_EMAIL = "exam-help@edx.org"
+# TESTCENTER_ACCOMMODATION_REQUEST_EMAIL = "exam-help@example.com"
 
 ##### Feedback submission mechanism #####
 FEEDBACK_SUBMISSION_EMAIL = None
@@ -482,18 +528,32 @@ ZENDESK_URL = None
 ZENDESK_USER = None
 ZENDESK_API_KEY = None
 
+##### shoppingcart Payment #####
+PAYMENT_SUPPORT_EMAIL = 'payment@example.com'
+##### Using cybersource by default #####
+CC_PROCESSOR = {
+    'CyberSource': {
+        'SHARED_SECRET': '',
+        'MERCHANT_ID': '',
+        'SERIAL_NUMBER': '',
+        'ORDERPAGE_VERSION': '7',
+        'PURCHASE_ENDPOINT': '',
+    }
+}
+# Setting for PAID_COURSE_REGISTRATION, DOES NOT AFFECT VERIFIED STUDENTS
+PAID_COURSE_REGISTRATION_CURRENCY = ['usd', '$']
 ################################# open ended grading config  #####################
 
 #By setting up the default settings with an incorrect user name and password,
 # will get an error when attempting to connect
 OPEN_ENDED_GRADING_INTERFACE = {
-    'url': 'http://sandbox-grader-001.m.edx.org/peer_grading',
+    'url': 'http://example.com/peer_grading',
     'username': 'incorrect_user',
     'password': 'incorrect_pass',
-    'staff_grading' : 'staff_grading',
-    'peer_grading' : 'peer_grading',
-    'grading_controller' : 'grading_controller'
-    }
+    'staff_grading': 'staff_grading',
+    'peer_grading': 'peer_grading',
+    'grading_controller': 'grading_controller'
+}
 
 # Used for testing, debugging peer grading
 MOCK_PEER_GRADING = False
@@ -504,12 +564,21 @@ MOCK_STAFF_GRADING = False
 ################################# Jasmine ###################################
 JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/static/coffee'
 
+################################# Waffle ###################################
+
+# Name prepended to cookies set by Waffle
+WAFFLE_COOKIE = "waffle_flag_%s"
+
+# Two weeks (in sec)
+WAFFLE_MAX_AGE = 1209600
+
 ################################# Middleware ###################################
 # List of finder classes that know how to find static files in
 # various locations.
 STATICFILES_FINDERS = (
     'staticfiles.finders.FileSystemFinder',
     'staticfiles.finders.AppDirectoriesFinder',
+    'pipeline.finders.PipelineFinder',
 )
 
 # List of callables that know how to import templates from various sources.
@@ -523,28 +592,39 @@ TEMPLATE_LOADERS = (
 )
 
 MIDDLEWARE_CLASSES = (
-    'contentserver.middleware.StaticContentServer',
     'request_cache.middleware.RequestCache',
     'django_comment_client.middleware.AjaxExceptionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
 
     # Instead of AuthenticationMiddleware, we use a cached backed version
     #'django.contrib.auth.middleware.AuthenticationMiddleware',
     'cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
+    'student.middleware.UserStandingMiddleware',
+    'contentserver.middleware.StaticContentServer',
+    'crum.CurrentRequestUserMiddleware',
 
     'django.contrib.messages.middleware.MessageMiddleware',
     'track.middleware.TrackMiddleware',
     'mitxmako.middleware.MakoMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
 
     'course_wiki.course_nav.Middleware',
+
+    # Detects user-requested locale from 'accept-language' header in http request
+    'django.middleware.locale.LocaleMiddleware',
 
     'django.middleware.transaction.TransactionMiddleware',
     # 'debug_toolbar.middleware.DebugToolbarMiddleware',
 
     'django_comment_client.utils.ViewNameMiddleware',
     'codejail.django_integration.ConfigureCodeJailMiddleware',
+
+    # catches any uncaught RateLimitExceptions and returns a 403 instead of a 500
+    'ratelimitbackend.middleware.RateLimitMiddleware',
+
+    # For A/B testing
+    'waffle.middleware.WaffleMiddleware',
 )
 
 ############################### Pipeline #######################################
@@ -561,47 +641,71 @@ courseware_js = (
     sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/modules/**/*.js'))
 )
 
-# 'js/vendor/RequireJS.js' - Require JS wrapper.
-# See https://edx-wiki.atlassian.net/wiki/display/LMS/Integration+of+Require+JS+into+the+system
 main_vendor_js = [
-  'js/vendor/RequireJS.js',
-  'js/vendor/json2.js',
-  'js/vendor/jquery.min.js',
-  'js/vendor/jquery-ui.min.js',
-  'js/vendor/jquery.cookie.js',
-  'js/vendor/jquery.qtip.min.js',
-  'js/vendor/swfobject/swfobject.js',
-  'js/vendor/jquery.ba-bbq.min.js',
-  'js/vendor/annotator.min.js',
-  'js/vendor/annotator.store.min.js',
-  'js/vendor/annotator.tags.min.js'
+    'js/vendor/require.js',
+    'js/RequireJS-namespace-undefine.js',
+    'js/vendor/json2.js',
+    'js/vendor/jquery.min.js',
+    'js/vendor/jquery-ui.min.js',
+    'js/vendor/jquery.cookie.js',
+    'js/vendor/jquery.qtip.min.js',
+    'js/vendor/swfobject/swfobject.js',
+    'js/vendor/jquery.ba-bbq.min.js',
+    'js/vendor/annotator.min.js',
+    'js/vendor/annotator.store.min.js',
+    'js/vendor/annotator.tags.min.js'
 ]
 
-discussion_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/discussion/**/*.js'))
+discussion_js = sorted(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/discussion/**/*.js'))
 staff_grading_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/staff_grading/**/*.js'))
 open_ended_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/open_ended/**/*.js'))
-notes_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/notes/**/*.coffee'))
+notes_js = ['coffee/src/notes.js']
+instructor_dash_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/instructor_dashboard/**/*.js'))
 
 PIPELINE_CSS = {
-    'application': {
-        'source_filenames': ['sass/application.css'],
-        'output_filename': 'css/lms-application.css',
+    'style-vendor': {
+        'source_filenames': [
+            'css/vendor/font-awesome.css',
+            'css/vendor/jquery.qtip.min.css',
+            'css/vendor/responsive-carousel/responsive-carousel.css',
+            'css/vendor/responsive-carousel/responsive-carousel.slide.css',
+        ],
+        'output_filename': 'css/lms-style-vendor.css',
     },
-    'course': {
+    'style-app': {
+        'source_filenames': [
+            'sass/application.css',
+            'sass/ie.css'
+        ],
+        'output_filename': 'css/lms-style-app.css',
+    },
+    'style-app-extend1': {
+        'source_filenames': [
+            'sass/application-extend1.css',
+        ],
+        'output_filename': 'css/lms-style-app-extend1.css',
+    },
+    'style-app-extend2': {
+        'source_filenames': [
+            'sass/application-extend2.css',
+        ],
+        'output_filename': 'css/lms-style-app-extend2.css',
+    },
+    'style-course-vendor': {
         'source_filenames': [
             'js/vendor/CodeMirror/codemirror.css',
             'css/vendor/jquery.treeview.css',
             'css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css',
-            'css/vendor/jquery.qtip.min.css',
             'css/vendor/annotator.min.css',
+        ],
+        'output_filename': 'css/lms-style-course-vendor.css',
+    },
+    'style-course': {
+        'source_filenames': [
             'sass/course.css',
             'xmodule/modules.css',
         ],
-        'output_filename': 'css/lms-course.css',
-    },
-    'ie-fixes': {
-        'source_filenames': ['sass/ie.css'],
-        'output_filename': 'css/lms-ie.css',
+        'output_filename': 'css/lms-style-course.css',
     },
 }
 
@@ -615,13 +719,15 @@ PIPELINE_JS = {
         'source_filenames': sorted(
             set(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/**/*.js') +
                 rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/**/*.js')) -
-            set(courseware_js + discussion_js + staff_grading_js + open_ended_js + notes_js)
+            set(courseware_js + discussion_js + staff_grading_js + open_ended_js + notes_js + instructor_dash_js)
         ) + [
             'js/form.ext.js',
             'js/my_courses_dropdown.js',
             'js/toggle_login_modal.js',
             'js/sticky_filter.js',
             'js/query-params.js',
+            'js/src/utility.js',
+            'js/src/accessibility_tools.js',
         ],
         'output_filename': 'js/lms-application.js',
 
@@ -636,6 +742,11 @@ PIPELINE_JS = {
         'source_filenames': main_vendor_js,
         'output_filename': 'js/lms-main_vendor.js',
         'test_order': 0,
+    },
+    'module-descriptor-js': {
+        'source_filenames': rooted_glob(COMMON_ROOT / 'static/', 'xmodule/descriptors/js/*.js'),
+        'output_filename': 'js/lms-module-descriptors.js',
+        'test_order': 8,
     },
     'module-js': {
         'source_filenames': rooted_glob(COMMON_ROOT / 'static', 'xmodule/modules/js/*.js'),
@@ -661,6 +772,11 @@ PIPELINE_JS = {
         'source_filenames': notes_js,
         'output_filename': 'js/notes.js',
         'test_order': 7
+    },
+    'instructor_dash': {
+        'source_filenames': instructor_dash_js,
+        'output_filename': 'js/instructor_dash.js',
+        'test_order': 9,
     },
 }
 
@@ -744,6 +860,45 @@ CELERY_QUEUES = {
     DEFAULT_PRIORITY_QUEUE: {}
 }
 
+# let logging work as configured:
+CELERYD_HIJACK_ROOT_LOGGER = False
+
+################################ Bulk Email ###################################
+
+# Suffix used to construct 'from' email address for bulk emails.
+# A course-specific identifier is prepended.
+BULK_EMAIL_DEFAULT_FROM_EMAIL = 'no-reply@example.com'
+
+# Parameters for breaking down course enrollment into subtasks.
+BULK_EMAIL_EMAILS_PER_TASK = 100
+BULK_EMAIL_EMAILS_PER_QUERY = 1000
+
+# Initial delay used for retrying tasks.  Additional retries use
+# longer delays.  Value is in seconds.
+BULK_EMAIL_DEFAULT_RETRY_DELAY = 30
+
+# Maximum number of retries per task for errors that are not related
+# to throttling.
+BULK_EMAIL_MAX_RETRIES = 5
+
+# Maximum number of retries per task for errors that are related to
+# throttling.  If this is not set, then there is no cap on such retries.
+BULK_EMAIL_INFINITE_RETRY_CAP = 1000
+
+# We want Bulk Email running on the high-priority queue, so we define the
+# routing key that points to it.  At the moment, the name is the same.
+BULK_EMAIL_ROUTING_KEY = HIGH_PRIORITY_QUEUE
+
+# Flag to indicate if individual email addresses should be logged as they are sent
+# a bulk email message.
+BULK_EMAIL_LOG_SENT_EMAILS = False
+
+# Delay in seconds to sleep between individual mail messages being sent,
+# when a bulk email task is retried for rate-related reasons.  Choose this
+# value depending on the number of workers that might be sending email in
+# parallel, and what the SES rate is.
+BULK_EMAIL_RETRY_DELAY_BETWEEN_SENDS = 0.02
+
 ################################### APPS ######################################
 INSTALLED_APPS = (
     # Standard ones that are always installed...
@@ -768,11 +923,12 @@ INSTALLED_APPS = (
     # Our courseware
     'circuit',
     'courseware',
-    'perfstats',
+    'lms.lib.perfstats',
     'student',
     'static_template_view',
     'staticbook',
     'track',
+    'eventtracking.django',
     'util',
     'certificates',
     'instructor',
@@ -781,12 +937,13 @@ INSTALLED_APPS = (
     'psychometrics',
     'licenses',
     'course_groups',
+    'bulk_email',
 
     # External auth (OpenID, shib)
     'external_auth',
     'django_openid_auth',
 
-    #For the wiki
+    # For the wiki
     'wiki',  # The new django-wiki from benjaoming
     'django_notify',
     'course_wiki',  # Our customizations
@@ -797,17 +954,40 @@ INSTALLED_APPS = (
     'wiki.plugins.notifications',
     'course_wiki.plugins.markdownedx',
 
-    # foldit integration
+    # Foldit integration
     'foldit',
+
+    # For A/B testing
+    'waffle',
 
     # For testing
     'django.contrib.admin',  # only used in DEBUG mode
+    'django_nose',
     'debug',
 
     # Discussion forums
     'django_comment_client',
     'django_comment_common',
     'notes',
+
+    # Monitoring
+    'datadog',
+
+    # User API
+    'rest_framework',
+    'user_api',
+
+    # Shopping cart
+    'shoppingcart',
+
+    # Notification preferences setting
+    'notification_prefs',
+
+    # Different Course Modes
+    'course_modes',
+
+    # Student Identity Verification
+    'verify_student',
 )
 
 ######################### MARKETING SITE ###############################
@@ -822,7 +1002,11 @@ MKTG_URL_LINK_MAP = {
     'TOS': 'tos',
     'HONOR': 'honor',
     'PRIVACY': 'privacy_edx',
+
+    # Verified Certificates
+    'WHAT_IS_VERIFIED_CERT': 'verified-certificate',
 }
+
 
 ############################### THEME ################################
 def enable_theme(theme_name):
@@ -851,3 +1035,29 @@ def enable_theme(theme_name):
     STATICFILES_DIRS.append((u'themes/%s' % theme_name,
                              theme_root / 'static'))
 
+################# Student Verification #################
+VERIFY_STUDENT = {
+    "DAYS_GOOD_FOR": 365,  # How many days is a verficiation good for?
+}
+
+######################## CAS authentication ###########################
+
+if MITX_FEATURES.get('AUTH_USE_CAS'):
+    CAS_SERVER_URL = 'https://provide_your_cas_url_here'
+    AUTHENTICATION_BACKENDS = (
+        'django.contrib.auth.backends.ModelBackend',
+        'django_cas.backends.CASBackend',
+    )
+    INSTALLED_APPS += ('django_cas',)
+    MIDDLEWARE_CLASSES += ('django_cas.middleware.CASMiddleware',)
+
+###################### Registration ##################################
+
+# Remove some of the fields from the list to not display them
+REGISTRATION_OPTIONAL_FIELDS = set([
+    'level_of_education',
+    'gender',
+    'year_of_birth',
+    'mailing_address',
+    'goals',
+])

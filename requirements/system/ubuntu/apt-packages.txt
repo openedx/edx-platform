@@ -16,6 +16,8 @@ gfortran
 libfreetype6-dev
 libpng12-dev
 libjpeg-dev
+libtiff4-dev
+zlib1g-dev
 libxml2-dev
 libxslt-dev
 yui-compressor
@@ -33,3 +35,4 @@ coffeescript
 mysql-client
 virtualenvwrapper
 libgeos-ruby1.8
+lynx-cur

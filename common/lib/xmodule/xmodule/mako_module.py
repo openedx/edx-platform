@@ -2,10 +2,8 @@ from .x_module import XModuleDescriptor, DescriptorSystem
 
 
 class MakoDescriptorSystem(DescriptorSystem):
-    def __init__(self, load_item, resources_fs, error_tracker,
-                 render_template, **kwargs):
-        super(MakoDescriptorSystem, self).__init__(
-            load_item, resources_fs, error_tracker, **kwargs)
+    def __init__(self, render_template, **kwargs):
+        super(MakoDescriptorSystem, self).__init__(**kwargs)
 
         self.render_template = render_template
 

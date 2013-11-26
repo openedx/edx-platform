@@ -1,0 +1,170 @@
+"""
+Test instructor.access
+"""
+
+from nose.tools import raises
+from student.tests.factories import UserFactory
+from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+
+from django.test.utils import override_settings
+from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from courseware.roles import CourseBetaTesterRole, CourseStaffRole
+
+from django_comment_common.models import (Role,
+                                          FORUM_ROLE_MODERATOR)
+from instructor.access import (allow_access,
+                               revoke_access,
+                               list_with_level,
+                               update_forum_role)
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class TestInstructorAccessList(ModuleStoreTestCase):
+    """ Test access listings. """
+    def setUp(self):
+        self.course = CourseFactory.create()
+
+        self.instructors = [UserFactory.create() for _ in xrange(4)]
+        for user in self.instructors:
+            allow_access(self.course, user, 'instructor')
+        self.beta_testers = [UserFactory.create() for _ in xrange(4)]
+        for user in self.beta_testers:
+            allow_access(self.course, user, 'beta')
+
+    def test_list_instructors(self):
+        instructors = list_with_level(self.course, 'instructor')
+        self.assertEqual(set(instructors), set(self.instructors))
+
+    def test_list_beta(self):
+        beta_testers = list_with_level(self.course, 'beta')
+        self.assertEqual(set(beta_testers), set(self.beta_testers))
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class TestInstructorAccessAllow(ModuleStoreTestCase):
+    """ Test access allow. """
+    def setUp(self):
+        self.course = CourseFactory.create()
+
+    def test_allow(self):
+        user = UserFactory()
+        allow_access(self.course, user, 'staff')
+        self.assertTrue(CourseStaffRole(self.course.location).has_user(user))
+
+    def test_allow_twice(self):
+        user = UserFactory()
+        allow_access(self.course, user, 'staff')
+        allow_access(self.course, user, 'staff')
+        self.assertTrue(CourseStaffRole(self.course.location).has_user(user))
+
+    def test_allow_beta(self):
+        """ Test allow beta against list beta. """
+        user = UserFactory()
+        allow_access(self.course, user, 'beta')
+        self.assertTrue(CourseBetaTesterRole(self.course.location).has_user(user))
+
+    @raises(ValueError)
+    def test_allow_badlevel(self):
+        user = UserFactory()
+        allow_access(self.course, user, 'robot-not-a-level')
+
+    @raises(Exception)
+    def test_allow_noneuser(self):
+        user = None
+        allow_access(self.course, user, 'staff')
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class TestInstructorAccessRevoke(ModuleStoreTestCase):
+    """ Test access revoke. """
+    def setUp(self):
+        self.course = CourseFactory.create()
+
+        self.staff = [UserFactory.create() for _ in xrange(4)]
+        for user in self.staff:
+            allow_access(self.course, user, 'staff')
+        self.beta_testers = [UserFactory.create() for _ in xrange(4)]
+        for user in self.beta_testers:
+            allow_access(self.course, user, 'beta')
+
+    def test_revoke(self):
+        user = self.staff[0]
+        revoke_access(self.course, user, 'staff')
+        self.assertFalse(CourseStaffRole(self.course.location).has_user(user))
+
+    def test_revoke_twice(self):
+        user = self.staff[0]
+        revoke_access(self.course, user, 'staff')
+        self.assertFalse(CourseStaffRole(self.course.location).has_user(user))
+
+    def test_revoke_beta(self):
+        user = self.beta_testers[0]
+        revoke_access(self.course, user, 'beta')
+        self.assertFalse(CourseBetaTesterRole(self.course.location).has_user(user))
+
+    @raises(ValueError)
+    def test_revoke_badrolename(self):
+        user = UserFactory()
+        revoke_access(self.course, user, 'robot-not-a-level')
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class TestInstructorAccessForum(ModuleStoreTestCase):
+    """
+    Test forum access control.
+    """
+    def setUp(self):
+        self.course = CourseFactory.create()
+
+        self.mod_role = Role.objects.create(
+            course_id=self.course.id,
+            name=FORUM_ROLE_MODERATOR
+        )
+        self.moderators = [UserFactory.create() for _ in xrange(4)]
+        for user in self.moderators:
+            self.mod_role.users.add(user)
+
+    def test_allow(self):
+        user = UserFactory.create()
+        update_forum_role(self.course.id, user, FORUM_ROLE_MODERATOR, 'allow')
+        self.assertIn(user, self.mod_role.users.all())
+
+    def test_allow_twice(self):
+        user = UserFactory.create()
+        update_forum_role(self.course.id, user, FORUM_ROLE_MODERATOR, 'allow')
+        self.assertIn(user, self.mod_role.users.all())
+        update_forum_role(self.course.id, user, FORUM_ROLE_MODERATOR, 'allow')
+        self.assertIn(user, self.mod_role.users.all())
+
+    @raises(Role.DoesNotExist)
+    def test_allow_badrole(self):
+        user = UserFactory.create()
+        update_forum_role(self.course.id, user, 'robot-not-a-real-role', 'allow')
+
+    def test_revoke(self):
+        user = self.moderators[0]
+        update_forum_role(self.course.id, user, FORUM_ROLE_MODERATOR, 'revoke')
+        self.assertNotIn(user, self.mod_role.users.all())
+
+    def test_revoke_twice(self):
+        user = self.moderators[0]
+        update_forum_role(self.course.id, user, FORUM_ROLE_MODERATOR, 'revoke')
+        self.assertNotIn(user, self.mod_role.users.all())
+        update_forum_role(self.course.id, user, FORUM_ROLE_MODERATOR, 'revoke')
+        self.assertNotIn(user, self.mod_role.users.all())
+
+    def test_revoke_notallowed(self):
+        user = UserFactory()
+        update_forum_role(self.course.id, user, FORUM_ROLE_MODERATOR, 'revoke')
+        self.assertNotIn(user, self.mod_role.users.all())
+
+    @raises(Role.DoesNotExist)
+    def test_revoke_badrole(self):
+        user = self.moderators[0]
+        update_forum_role(self.course.id, user, 'robot-not-a-real-role', 'allow')
+
+    @raises(ValueError)
+    def test_bad_mode(self):
+        user = UserFactory()
+        update_forum_role(self.course.id, user, FORUM_ROLE_MODERATOR, 'robot-not-a-mode')

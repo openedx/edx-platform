@@ -1,18 +1,160 @@
+import re
 from xmodule.contentstore.content import StaticContent
 from xmodule.modulestore import Location
-from xmodule.modulestore.mongo import MongoModuleStore
+from xmodule.modulestore.inheritance import own_metadata
 
 import logging
 
 
-def clone_course(modulestore, contentstore, source_location, dest_location, delete_original=False):
-    # first check to see if the modulestore is Mongo backed
-    if not isinstance(modulestore, MongoModuleStore):
-        raise Exception("Expected a MongoModuleStore in the runtime. Aborting....")
+def _prefix_only_url_replace_regex(prefix):
+    """
+    Match static urls in quotes that don't end in '?raw'.
 
+    To anyone contemplating making this more complicated:
+    http://xkcd.com/1171/
+    """
+    return r"""
+        (?x)                      # flags=re.VERBOSE
+        (?P<quote>\\?['"])        # the opening quotes
+        (?P<prefix>{prefix})      # the prefix
+        (?P<rest>.*?)             # everything else in the url
+        (?P=quote)                # the first matching closing quote
+        """.format(prefix=re.escape(prefix))
+
+
+def _prefix_and_category_url_replace_regex(prefix):
+    """
+    Match static urls in quotes that don't end in '?raw'.
+
+    To anyone contemplating making this more complicated:
+    http://xkcd.com/1171/
+    """
+    return r"""
+        (?x)                      # flags=re.VERBOSE
+        (?P<quote>\\?['"])        # the opening quotes
+        (?P<prefix>{prefix})      # the prefix
+        (?P<category>[^/]+)/
+        (?P<rest>.*?)             # everything else in the url
+        (?P=quote)                # the first matching closing quote
+        """.format(prefix=re.escape(prefix))
+
+
+def rewrite_nonportable_content_links(source_course_id, dest_course_id, text):
+    """
+    Does a regex replace on non-portable links:
+         /c4x/<org>/<course>/asset/<name> -> /static/<name>
+         /jump_to/i4x://<org>/<course>/<category>/<name> -> /jump_to_id/<id>
+
+    """
+
+    org, course, run = source_course_id.split("/")
+    dest_org, dest_course, dest_run = dest_course_id.split("/")
+
+    def portable_asset_link_subtitution(match):
+        quote = match.group('quote')
+        rest = match.group('rest')
+        return quote + '/static/' + rest + quote
+
+    def portable_jump_to_link_substitution(match):
+        quote = match.group('quote')
+        rest = match.group('rest')
+        return quote + '/jump_to_id/' + rest + quote
+
+    def generic_courseware_link_substitution(match):
+        quote = match.group('quote')
+        rest = match.group('rest')
+        dest_generic_courseware_lik_base = '/courses/{org}/{course}/{run}/'.format(
+            org=dest_org, course=dest_course, run=dest_run
+        )
+        return quote + dest_generic_courseware_lik_base + rest + quote
+
+    course_location = Location(['i4x', org, course, 'course', run])
+
+    # NOTE: ultimately link updating is not a hard requirement, so if something blows up with
+    # the regex subsitution, log the error and continue
+    try:
+        c4x_link_base = '{0}/'.format(StaticContent.get_base_url_path_for_course_assets(course_location))
+        text = re.sub(_prefix_only_url_replace_regex(c4x_link_base), portable_asset_link_subtitution, text)
+    except Exception, e:
+        logging.warning("Error going regex subtituion %r on text = %r.\n\nError msg = %s", c4x_link_base, text, str(e))
+
+    try:
+        jump_to_link_base = '/courses/{org}/{course}/{run}/jump_to/i4x://{org}/{course}/'.format(
+            org=org, course=course, run=run
+        )
+        text = re.sub(_prefix_and_category_url_replace_regex(jump_to_link_base), portable_jump_to_link_substitution, text)
+    except Exception, e:
+        logging.warning("Error going regex subtituion %r on text = %r.\n\nError msg = %s", jump_to_link_base, text, str(e))
+
+    # Also, there commonly is a set of link URL's used in the format:
+    # /courses/<org>/<course>/<run> which will be broken if migrated to a different course_id
+    # so let's rewrite those, but the target will also be non-portable,
+    #
+    # Note: we only need to do this if we are changing course-id's
+    #
+    if source_course_id != dest_course_id:
+        try:
+            generic_courseware_link_base = '/courses/{org}/{course}/{run}/'.format(
+                org=org, course=course, run=run
+            )
+            text = re.sub(_prefix_only_url_replace_regex(generic_courseware_link_base), portable_asset_link_subtitution, text)
+        except Exception, e:
+            logging.warning("Error going regex subtituion %r on text = %r.\n\nError msg = %s", generic_courseware_link_base, text, str(e))
+
+    return text
+
+
+def _clone_modules(modulestore, modules, source_location, dest_location):
+    for module in modules:
+        original_loc = Location(module.location)
+
+        if original_loc.category != 'course':
+            module.location = module.location._replace(
+                tag=dest_location.tag,
+                org=dest_location.org,
+                course=dest_location.course
+            )
+        else:
+            # on the course module we also have to update the module name
+            module.location = module.location._replace(
+                tag=dest_location.tag,
+                org=dest_location.org,
+                course=dest_location.course,
+                name=dest_location.name
+            )
+
+        print "Cloning module {0} to {1}....".format(original_loc, module.location)
+
+        # NOTE: usage of the the internal module.xblock_kvs._data does not include any 'default' values for the fields
+        data = module.xblock_kvs._data
+        if isinstance(data, basestring):
+            data = rewrite_nonportable_content_links(
+                source_location.course_id, dest_location.course_id, data)
+
+        modulestore.update_item(module.location, data)
+
+        # repoint children
+        if module.has_children:
+            new_children = []
+            for child_loc_url in module.children:
+                child_loc = Location(child_loc_url)
+                child_loc = child_loc._replace(
+                    tag=dest_location.tag,
+                    org=dest_location.org,
+                    course=dest_location.course
+                )
+                new_children.append(child_loc.url())
+
+            modulestore.update_children(module.location, new_children)
+
+        # save metadata
+        modulestore.update_metadata(module.location, own_metadata(module))
+
+
+def clone_course(modulestore, contentstore, source_location, dest_location, delete_original=False):
     # check to see if the dest_location exists as an empty course
     # we need an empty course because the app layers manage the permissions and users
-    if not modulestore.has_item(dest_location):
+    if not modulestore.has_item(dest_location.course_id, dest_location):
         raise Exception("An empty course at {0} must have already been created. Aborting...".format(dest_location))
 
     # verify that the dest_location really is an empty course, which means only one with an optional 'overview'
@@ -31,44 +173,16 @@ def clone_course(modulestore, contentstore, source_location, dest_location, dele
         raise Exception("Course at destination {0} is not an empty course. You can only clone into an empty course. Aborting...".format(dest_location))
 
     # check to see if the source course is actually there
-    if not modulestore.has_item(source_location):
+    if not modulestore.has_item(source_location.course_id, source_location):
         raise Exception("Cannot find a course at {0}. Aborting".format(source_location))
 
     # Get all modules under this namespace which is (tag, org, course) tuple
 
     modules = modulestore.get_items([source_location.tag, source_location.org, source_location.course, None, None, None])
+    _clone_modules(modulestore, modules, source_location, dest_location)
 
-    for module in modules:
-        original_loc = Location(module.location)
-
-        if original_loc.category != 'course':
-            module.location = module.location._replace(tag=dest_location.tag, org=dest_location.org,
-                                                       course=dest_location.course)
-        else:
-            # on the course module we also have to update the module name
-            module.location = module.location._replace(tag=dest_location.tag, org=dest_location.org,
-                                                       course=dest_location.course, name=dest_location.name)
-
-        print "Cloning module {0} to {1}....".format(original_loc, module.location)
-
-        modulestore.update_item(module.location, module._model_data._kvs._data)
-
-        # repoint children
-        if module.has_children:
-            new_children = []
-            for child_loc_url in module.children:
-                child_loc = Location(child_loc_url)
-                child_loc = child_loc._replace(
-                    tag=dest_location.tag,
-                    org=dest_location.org,
-                    course=dest_location.course
-                )
-                new_children.append(child_loc.url())
-
-            modulestore.update_children(module.location, new_children)
-
-        # save metadata
-        modulestore.update_metadata(module.location, module._model_data._kvs._metadata)
+    modules = modulestore.get_items([source_location.tag, source_location.org, source_location.course, None, None, 'draft'])
+    _clone_modules(modulestore, modules, source_location, dest_location)
 
     # now iterate through all of the assets and clone them
     # first the thumbnails
@@ -138,7 +252,7 @@ def delete_course(modulestore, contentstore, source_location, commit=False):
     """
 
     # check to see if the source course is actually there
-    if not modulestore.has_item(source_location):
+    if not modulestore.has_item(source_location.course_id, source_location):
         raise Exception("Cannot find a course at {0}. Aborting".format(source_location))
 
     # first delete all of the thumbnails

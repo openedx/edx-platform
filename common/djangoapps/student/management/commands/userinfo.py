@@ -1,12 +1,9 @@
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 
-import mitxmako.middleware as middleware
 import json
 
 from student.models import UserProfile
-
-middleware.MakoMiddleware()
 
 
 class Command(BaseCommand):

@@ -10,14 +10,14 @@
         },
         "blocks":{
             "head12345":{
-                "children":[
-                    "chapter1",
-                    "chapter2",
-                    "chapter3"
-                ],
                 "category":"course",
-                "definition":"head12345_12",
-                "metadata":{
+                "definition":{ "$oid" : "ad00000000000000dddd0000"},
+                "fields":{
+                    "children":[
+                        "chapter1",
+                        "chapter2",
+                        "chapter3"
+                    ],
                     "end":"2013-06-13T04:30",
                     "tabs":[
                         {
@@ -54,93 +54,105 @@
                     "advertised_start":"Fall 2013",
                     "display_name":"The Ancient Greek Hero"
                 },
-                "update_version":{ "$oid" : "1d00000000000000dddd0000" },
-                "previous_version":{ "$oid" : "1d00000000000000dddd1111" },
-                "edited_by":"testassist@edx.org",
-                "edited_on":{
-                    "$date":1364483713238
+                "edit_info": {
+                    "update_version":{ "$oid" : "1d00000000000000dddd0000" },
+                    "previous_version":{ "$oid" : "1d00000000000000dddd1111" },
+                    "edited_by":"testassist@edx.org",
+                    "edited_on":{
+                        "$date":1364483713238
+                    }
                 }
             },
             "chapter1":{
-                "children":[
-                    
-                ],
                 "category":"chapter",
-                "definition":"chapter12345_1",
-                "metadata":{
+                "definition":{ "$oid" : "cd00000000000000dddd0020"},
+                "fields":{
+                    "children":[
+                        
+                    ],
                     "display_name":"Hercules"
                 },
-                "update_version":{ "$oid" : "1d00000000000000dddd0000" },
-                "previous_version":null,
-                "edited_by":"testassist@edx.org",
-                "edited_on":{
-                    "$date":1364483713238
+                "edit_info": {
+                    "update_version":{ "$oid" : "1d00000000000000dddd0000" },
+                    "previous_version":null,
+                    "edited_by":"testassist@edx.org",
+                    "edited_on":{
+                        "$date":1364483713238
+                    }
                 }
             },
             "chapter2":{
-                "children":[
-                    
-                ],
                 "category":"chapter",
-                "definition":"chapter12345_2",
-                "metadata":{
+                "definition":{ "$oid" : "cd00000000000000dddd0022"},
+                "fields":{
+                    "children":[
+                        
+                    ],
                     "display_name":"Hera heckles Hercules"
                 },
-                "update_version":{ "$oid" : "1d00000000000000dddd0000" },
-                "previous_version":null,
-                "edited_by":"testassist@edx.org",
-                "edited_on":{
-                    "$date":1364483713238
+                "edit_info": {
+                    "update_version":{ "$oid" : "1d00000000000000dddd0000" },
+                    "previous_version":null,
+                    "edited_by":"testassist@edx.org",
+                    "edited_on":{
+                        "$date":1364483713238
+                    }
                 }
             },
             "chapter3":{
-                "children":[
-                    "problem1",
-                    "problem3_2"
-                ],
                 "category":"chapter",
-                "definition":"chapter12345_3",
-                "metadata":{
+                "definition":{ "$oid" : "cd00000000000000dddd0032"},
+                "fields":{
+                    "children":[
+                        "problem1",
+                        "problem3_2"
+                    ],
                     "display_name":"Hera cuckolds Zeus"
                 },
-                "update_version":{ "$oid" : "1d00000000000000dddd0000" },
-                "previous_version":null,
-                "edited_by":"testassist@edx.org",
-                "edited_on":{
-                    "$date":1364483713238
+                "edit_info": {
+                    "update_version":{ "$oid" : "1d00000000000000dddd0000" },
+                    "previous_version":null,
+                    "edited_by":"testassist@edx.org",
+                    "edited_on":{
+                        "$date":1364483713238
+                    }
                 }
             },
             "problem1":{
-                "children":[
-                    
-                ],
                 "category":"problem",
-                "definition":"problem12345_3_1",
-                "metadata":{
+                "definition":{ "$oid" : "0d00000040000000dddd0031"},
+                "fields":{
+                    "children":[
+                        
+                    ],
                     "display_name":"Problem 3.1",
                     "graceperiod":"4 hours 0 minutes 0 seconds"
                 },
-                "update_version":{ "$oid" : "1d00000000000000dddd0000" },
-                "previous_version":null,
-                "edited_by":"testassist@edx.org",
-                "edited_on":{
-                    "$date":1364483713238
+                "edit_info": {
+                    "update_version":{ "$oid" : "1d00000000000000dddd0000" },
+                    "previous_version":null,
+                    "edited_by":"testassist@edx.org",
+                    "edited_on":{
+                        "$date":1364483713238
+                    }
                 }
             },
             "problem3_2":{
-                "children":[
-                    
-                ],
                 "category":"problem",
-                "definition":"problem12345_3_2",
-                "metadata":{
+                "definition":{ "$oid" : "0d00000040000000dddd0032"},
+                "fields":{
+                    "children":[
+                        
+                    ],
                     "display_name":"Problem 3.2"
                 },
-                "update_version":{ "$oid" : "1d00000000000000dddd0000" },
-                "previous_version":null,
-                "edited_by":"testassist@edx.org",
-                "edited_on":{
-                    "$date":1364483713238
+                "edit_info": {
+                    "update_version":{ "$oid" : "1d00000000000000dddd0000" },
+                    "previous_version":null,
+                    "edited_by":"testassist@edx.org",
+                    "edited_on":{
+                        "$date":1364483713238
+                    }
                 }
             }
         }
@@ -156,12 +168,12 @@
         },
         "blocks":{
             "head12345":{
-                "children":[
-                    
-                ],
                 "category":"course",
-                "definition":"head12345_11",
-                "metadata":{
+                "definition":{ "$oid" : "ad00000000000000dddd0001"},
+                "fields":{
+                    "children":[
+                        
+                    ],
                     "end":"2013-04-13T04:30",
                     "tabs":[
                         {
@@ -198,11 +210,13 @@
                     "advertised_start":null,
                     "display_name":"The Ancient Greek Hero"
                 },
-                "update_version":{ "$oid" : "1d00000000000000dddd1111" },
-                "previous_version":{ "$oid" : "1d00000000000000dddd3333" },
-                "edited_by":"testassist@edx.org",
-                "edited_on":{
-                    "$date":1364481713238
+                "edit_info": {
+                    "update_version":{ "$oid" : "1d00000000000000dddd1111" },
+                    "previous_version":{ "$oid" : "1d00000000000000dddd3333" },
+                    "edited_by":"testassist@edx.org",
+                    "edited_on":{
+                        "$date":1364481713238
+                    }
                 }
             }
         }
@@ -218,12 +232,12 @@
         },
         "blocks":{
             "head12345":{
-                "children":[
-                    
-                ],
                 "category":"course",
-                "definition":"head12345_10",
-                "metadata":{
+                "definition":{ "$oid" : "ad00000000000000dddd0010"},
+                "fields":{
+                    "children":[
+                        
+                    ],
                     "end":null,
                     "tabs":[
                         {
@@ -250,11 +264,13 @@
                     "advertised_start":null,
                     "display_name":"The Ancient Greek Hero"
                 },
-                "update_version":{ "$oid" : "1d00000000000000dddd3333" },
-                "previous_version":null,
-                "edited_by":"test@edx.org",
-                "edited_on":{
-                    "$date":1364473713238
+                "edit_info": {
+                    "update_version":{ "$oid" : "1d00000000000000dddd3333" },
+                    "previous_version":null,
+                    "edited_by":"test@edx.org",
+                    "edited_on":{
+                        "$date":1364473713238
+                    }
                 }
             }
         }
@@ -270,12 +286,12 @@
         },
         "blocks":{
             "head23456":{
-                "children":[
-                    
-                ],
                 "category":"course",
-                "definition":"head23456_1",
-                "metadata":{
+                "definition":{ "$oid" : "ad00000000000000dddd0020"},
+                "fields":{
+                    "children":[
+                        
+                    ],
                     "end":null,
                     "tabs":[
                         {
@@ -302,11 +318,13 @@
                     "advertised_start":null,
                     "display_name":"The most wonderful course"
                 },
-                "update_version":{ "$oid" : "1d00000000000000dddd2222" },
-                "previous_version":{ "$oid" : "1d00000000000000dddd4444" },
-                "edited_by":"test@edx.org",
-                "edited_on":{
-                    "$date":1364481313238
+                "edit_info": {
+                    "update_version":{ "$oid" : "1d00000000000000dddd2222" },
+                    "previous_version":{ "$oid" : "1d00000000000000dddd4444" },
+                    "edited_by":"test@edx.org",
+                    "edited_on":{
+                        "$date":1364481313238
+                    }
                 }
                 
             }
@@ -323,12 +341,12 @@
         },
         "blocks":{
             "head23456":{
-                "children":[
-                    
-                ],
                 "category":"course",
-                "definition":"head23456_0",
-                "metadata":{
+                "definition":{ "$oid" : "2d00000000000000dddd0020"},
+                "fields":{
+                    "children":[
+                        
+                    ],
                     "end":null,
                     "tabs":[
                         {
@@ -355,11 +373,13 @@
                     "advertised_start":null,
                     "display_name":"A wonderful course"
                 },
-                "update_version":{ "$oid" : "1d00000000000000dddd4444" },
-                "previous_version":null,
-                "edited_by":"test@edx.org",
-                "edited_on":{
-                    "$date":1364480313238
+                "edit_info": {
+                    "update_version":{ "$oid" : "1d00000000000000dddd4444" },
+                    "previous_version":null,
+                    "edited_by":"test@edx.org",
+                    "edited_on":{
+                        "$date":1364480313238
+                    }
                 }
             }
         }
@@ -375,12 +395,12 @@
         },
         "blocks":{
             "head23456":{
-                "children":[
-                    
-                ],
                 "category":"course",
-                "definition":"head23456_1",
-                "metadata":{
+                "definition":{ "$oid" : "ad00000000000000dddd0020"},
+                "fields":{
+                    "children":[
+                        
+                    ],
                     "end":null,
                     "tabs":[
                         {
@@ -407,11 +427,13 @@
                     "advertised_start":null,
                     "display_name":"The most wonderful course"
                 },
-                "update_version":{ "$oid" : "1d00000000000000eeee0000" },
-                "previous_version":null,
-                "edited_by":"test@edx.org",
-                "edited_on":{
-                    "$date":1364481333238
+                "edit_info": {
+                    "update_version":{ "$oid" : "1d00000000000000eeee0000" },
+                    "previous_version":null,
+                    "edited_by":"test@edx.org",
+                    "edited_on":{
+                        "$date":1364481333238
+                    }
                 }
             }
         }
@@ -427,12 +449,12 @@
         },
         "blocks":{
             "head345679":{
-                "children":[
-                    
-                ],
                 "category":"course",
-                "definition":"head345679_1",
-                "metadata":{
+                "definition":{ "$oid" : "3d00000000000000dddd0020"},
+                "fields":{
+                    "children":[
+                        
+                    ],
                     "end":null,
                     "tabs":[
                         {
@@ -459,11 +481,13 @@
                     "advertised_start":null,
                     "display_name":"Yet another contender"
                 },
-                "update_version":{ "$oid" : "1d00000000000000dddd5555" },
-                "previous_version":null,
-                "edited_by":"test@guestx.edu",
-                "edited_on":{
-                    "$date":1364491313238
+                "edit_info": {
+                    "update_version":{ "$oid" : "1d00000000000000dddd5555" },
+                    "previous_version":null,
+                    "edited_by":"test@guestx.edu",
+                    "edited_on":{
+                        "$date":1364491313238
+                    }
                 }
             }
         }

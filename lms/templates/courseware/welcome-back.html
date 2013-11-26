@@ -1,3 +1,41 @@
+<%!
+from django.utils.translation import ugettext as _ 
+import waffle
+%>
+
 <h2>${chapter_module.display_name_with_default}</h2>
 
-<p>You were most recently in <a href="${prev_section_url}">${prev_section.display_name_with_default}</a>.  If you're done with that, choose another section on the left.</p>
+<p>${_("You were most recently in {section_link}.  If you\'re done with that, choose another section on the left.").format(
+	    section_link=u'<a href="{url}">{section_name}</a>'.format(
+	        url=prev_section_url,
+	        section_name=prev_section.display_name_with_default,
+	    )
+    )}</p>
+
+% if waffle.flag_is_active(request, 'merge_course_tabs'):
+  <%! from courseware.courses import get_course_info_section %>
+
+  <section class="container">
+    <div class="info-wrapper">
+      % if user.is_authenticated():
+      <section class="updates">
+        <h1>${_("Course Updates &amp; News")}</h1>
+        ${get_course_info_section(request, course, 'updates')}
+      </section>
+      <section aria-label="${_('Handout Navigation')}" class="handouts">
+        <h1>${course.info_sidebar_name}</h1>
+        ${get_course_info_section(request, course, 'handouts')}
+      </section>
+      % else:
+      <section class="updates">
+        <h1>${_("Course Updates &amp; News")}</h1>
+        ${get_course_info_section(request, course, 'guest_updates')}
+      </section>
+      <section aria-label="${_('Handout Navigation')}" class="handouts">
+        <h1>${_("Course Handouts")}</h1>
+        ${get_course_info_section(request, course, 'guest_handouts')}
+      </section>
+      % endif
+    </div>
+  </section>
+% endif

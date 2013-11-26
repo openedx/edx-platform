@@ -2,37 +2,39 @@
 #pylint: disable=W0621
 
 from lettuce import world, step
-from django.contrib.auth.models import User
-from lettuce.django import django_url
-from student.models import CourseEnrollment
 from common import course_id, course_location
 from problems_setup import PROBLEM_DICT
-
-TEST_SECTION_NAME = 'Test Section'
-TEST_SUBSECTION_NAME = 'Test Subsection'
+from nose.tools import assert_in
 
 
 @step(u'I am viewing a course with multiple sections')
 def view_course_multiple_sections(step):
     create_course()
-    # Add a section to the course to contain problems
-    section1 = world.ItemFactory.create(parent_location=course_location(world.scenario_dict['COURSE'].number),
-                                       display_name=section_name(1))
 
-    # Add a section to the course to contain problems
-    section2 = world.ItemFactory.create(parent_location=course_location(world.scenario_dict['COURSE'].number),
-                                       display_name=section_name(2))
+    section1 = world.ItemFactory.create(
+        parent_location=course_location(world.scenario_dict['COURSE'].number),
+        display_name="Test Section 1"
+    )
 
-    place1 = world.ItemFactory.create(parent_location=section1.location,
-                                               template='i4x://edx/templates/sequential/Empty',
-                                               display_name=subsection_name(1))
+    section2 = world.ItemFactory.create(
+        parent_location=course_location(world.scenario_dict['COURSE'].number),
+        display_name="Test Section 2"
+    )
 
-    place2 = world.ItemFactory.create(parent_location=section2.location,
-                                               template='i4x://edx/templates/sequential/Empty',
-                                               display_name=subsection_name(2))
+    place1 = world.ItemFactory.create(
+        parent_location=section1.location,
+        category='sequential',
+        display_name="Test Subsection 1"
+    )
 
-    add_problem_to_course_section('model_course', 'multiple choice', place1.location)
-    add_problem_to_course_section('model_course', 'drop down', place2.location)
+    place2 = world.ItemFactory.create(
+        parent_location=section2.location,
+        category='sequential',
+        display_name="Test Subsection 2"
+    )
+
+    add_problem_to_course_section(place1.location, "Problem 1")
+    add_problem_to_course_section(place2.location, "Problem 2")
 
     create_user_and_visit_course()
 
@@ -41,19 +43,24 @@ def view_course_multiple_sections(step):
 def view_course_multiple_subsections(step):
     create_course()
 
-    # Add a section to the course to contain problems
-    section1 = world.ItemFactory.create(parent_location=course_location(world.scenario_dict['COURSE'].number),
-                                       display_name=section_name(1))
+    section1 = world.ItemFactory.create(
+        parent_location=course_location(world.scenario_dict['COURSE'].number),
+        display_name="Test Section 1"
+    )
 
-    place1 = world.ItemFactory.create(parent_location=section1.location,
-                                               template='i4x://edx/templates/sequential/Empty',
-                                               display_name=subsection_name(1))
+    place1 = world.ItemFactory.create(
+        parent_location=section1.location,
+        category='sequential',
+        display_name="Test Subsection 1"
+    )
 
-    place2 = world.ItemFactory.create(parent_location=section1.location,
-                                       display_name=subsection_name(2))
+    place2 = world.ItemFactory.create(
+        parent_location=section1.location,
+        display_name="Test Subsection 2"
+    )
 
-    add_problem_to_course_section('model_course', 'multiple choice', place1.location)
-    add_problem_to_course_section('model_course', 'drop down', place2.location)
+    add_problem_to_course_section(place1.location, "Problem 3")
+    add_problem_to_course_section(place2.location, "Problem 4")
 
     create_user_and_visit_course()
 
@@ -61,125 +68,121 @@ def view_course_multiple_subsections(step):
 @step(u'I am viewing a section with multiple sequences')
 def view_course_multiple_sequences(step):
     create_course()
-    # Add a section to the course to contain problems
-    section1 = world.ItemFactory.create(parent_location=course_location(world.scenario_dict['COURSE'].number),
-                                       display_name=section_name(1))
 
-    place1 = world.ItemFactory.create(parent_location=section1.location,
-                                               template='i4x://edx/templates/sequential/Empty',
-                                               display_name=subsection_name(1))
+    section1 = world.ItemFactory.create(
+        parent_location=course_location(world.scenario_dict['COURSE'].number),
+        display_name="Test Section 1"
+    )
 
-    add_problem_to_course_section('model_course', 'multiple choice', place1.location)
-    add_problem_to_course_section('model_course', 'drop down', place1.location)
+    place1 = world.ItemFactory.create(
+        parent_location=section1.location,
+        category='sequential',
+        display_name="Test Subsection 1"
+    )
+
+    add_problem_to_course_section(place1.location, "Problem 5")
+    add_problem_to_course_section(place1.location, "Problem 6")
 
     create_user_and_visit_course()
 
 
-@step(u'I click on section "([^"]*)"$')
-def click_on_section(step, section):
-    section_css = 'h3[tabindex="-1"]'
-    world.css_click(section_css)
+@step(u'I navigate to a section')
+def when_i_navigate_to_a_section(step):
+    # Prevent jQuery menu animations from interferring with the clicks
+    world.disable_jquery_animations()
 
-    subid = "ui-accordion-accordion-panel-" + str(int(section) - 1)
-    subsection_css = 'ul.ui-accordion-content-active[id=\'%s\'] > li > a' % subid
-    prev_url = world.browser.url
-    changed_section = lambda: prev_url != world.browser.url
+    # Open the 2nd section
+    world.css_click(css_selector='div.chapter', index=1)
+    subsection_css = 'a[href*="Test_Subsection_2/"]'
 
-    #for some reason needed to do it in two steps
-    world.css_click(subsection_css, success_condition=changed_section)
-
-
-@step(u'I click on subsection "([^"]*)"$')
-def click_on_subsection(step, subsection):
-    subsection_css = 'ul[id="ui-accordion-accordion-panel-0"]> li > a'
-    world.css_click(subsection_css, index=(int(subsection) - 1))
+    # Click on the subsection to see the content
+    world.css_click(subsection_css)
 
 
-@step(u'I click on sequence "([^"]*)"$')
-def click_on_sequence(step, sequence):
-    sequence_css = 'a[data-element="%s"]' % sequence
+@step(u'I navigate to a subsection')
+def when_i_navigate_to_a_subsection(step):
+    # Click on the 2nd subsection to see the content
+    subsection_css = 'a[href*="Test_Subsection_2/"]'
+    world.css_click(subsection_css)
+
+
+@step(u'I navigate to an item in a sequence')
+def when_i_navigate_to_an_item_in_a_sequence(step):
+    sequence_css = 'a[data-element="2"]'
     world.css_click(sequence_css)
 
 
-@step(u'I should see the content of (?:sub)?section "([^"]*)"$')
-def see_section_content(step, section):
-    if section == "2":
-        text = 'The correct answer is Option 2'
-    elif section == "1":
-        text = 'The correct answer is Choice 3'
-    step.given('I should see "' + text + '" somewhere on the page')
+@step(u'I see the content of the section')
+def then_i_see_the_content_of_the_section(step):
+    wait_for_problem('PROBLEM 2')
 
 
-@step(u'I should see the content of sequence "([^"]*)"$')
-def see_sequence_content(step, sequence):
-    step.given('I should see the content of section "2"')
+@step(u'I see the content of the subsection')
+def then_i_see_the_content_of_the_subsection(step):
+    wait_for_problem('PROBLEM 4')
 
 
-@step(u'I return later')
-def return_to_course(step):
-    step.given('I visit the homepage')
+@step(u'I see the content of the sequence item')
+def then_i_see_the_content_of_the_sequence_item(step):
+    wait_for_problem('PROBLEM 6')
+
+
+@step(u'I return to the courseware')
+def and_i_return_to_the_courseware(step):
+    world.visit('/')
     world.click_link("View Course")
     world.click_link("Courseware")
 
 
-@step(u'I should see that I was most recently in section "([^"]*)"$')
-def see_recent_section(step, section):
-    step.given('I should see "You were most recently in %s" somewhere on the page' % subsection_name(int(section)))
-
-#####################
-#      HELPERS
-#####################
-
-
-def section_name(section):
-    return TEST_SECTION_NAME + str(section)
-
-
-def subsection_name(section):
-    return TEST_SUBSECTION_NAME + str(section)
+@step(u'I see that I was most recently in the subsection')
+def then_i_see_that_i_was_most_recently_in_the_subsection(step):
+    message = world.css_text('section.course-content > p')
+    assert_in("You were most recently in Test Subsection 2", message)
 
 
 def create_course():
     world.clear_courses()
-
-    world.scenario_dict['COURSE'] = world.CourseFactory.create(org='edx', number='model_course', display_name='Test Course')
+    world.scenario_dict['COURSE'] = world.CourseFactory.create(
+        org='edx', number='999', display_name='Test Course'
+    )
 
 
 def create_user_and_visit_course():
-    world.create_user('robot', 'test')
-    u = User.objects.get(username='robot')
-
-    CourseEnrollment.objects.get_or_create(user=u, course_id=course_id(world.scenario_dict['COURSE'].number))
-
-    world.log_in('robot', 'test')
-    chapter_name = (TEST_SECTION_NAME + "1").replace(" ", "_")
-    section_name = (TEST_SUBSECTION_NAME + "1").replace(" ", "_")
-    url = django_url('/courses/edx/model_course/Test_Course/courseware/%s/%s' %
-                    (chapter_name, section_name))
-
-    world.browser.visit(url)
+    world.register_by_course_id('edx/999/Test_Course')
+    world.log_in()
+    world.visit('/courses/edx/999/Test_Course/courseware/')
 
 
-def add_problem_to_course_section(course, problem_type, parent_location, extraMeta=None):
-    '''
-    Add a problem to the course we have created using factories.
-    '''
+def add_problem_to_course_section(parent_location, display_name):
+    """
+    Add a problem to the course at `parent_location` (a `Location` instance)
 
-    assert(problem_type in PROBLEM_DICT)
+    `display_name` is the name of the problem to display, which
+    is useful to identify which problem we're looking at.
+    """
 
     # Generate the problem XML using capa.tests.response_xml_factory
-    factory_dict = PROBLEM_DICT[problem_type]
+    # Since this is just a placeholder, we always use multiple choice.
+    factory_dict = PROBLEM_DICT['multiple choice']
     problem_xml = factory_dict['factory'].build_xml(**factory_dict['kwargs'])
-    metadata = {'rerandomize': 'always'} if not 'metadata' in factory_dict else factory_dict['metadata']
-    if extraMeta:
-        metadata = dict(metadata, **extraMeta)
 
-    # Create a problem item using our generated XML
-    # We set rerandomize=always in the metadata so that the "Reset" button
-    # will appear.
-    template_name = "i4x://edx/templates/problem/Blank_Common_Problem"
-    world.ItemFactory.create(parent_location=parent_location,
-                            template=template_name,
-                            display_name=str(problem_type),
-                            data=problem_xml,
-                            metadata=metadata)
+    # Add the problem
+    world.ItemFactory.create(
+        parent_location=parent_location,
+        category='problem',
+        display_name=display_name,
+        data=problem_xml
+    )
+
+
+def wait_for_problem(display_name):
+    """
+    Wait for the problem with `display_name` to appear on the page.
+    """
+    # Wait for the problem to reload
+    world.wait_for_ajax_complete()
+
+    wait_func = lambda _: world.css_has_text(
+        'h2.problem-header', display_name, strip=True
+    )
+    world.wait_for(wait_func)

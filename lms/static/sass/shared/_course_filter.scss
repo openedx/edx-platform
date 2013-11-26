@@ -62,7 +62,7 @@
         }
       }
 
-      &:hover {
+      &:hover, &:focus {
         .filter-heading {
           background: rgb(255,255,255);
           @include background-image(linear-gradient(-90deg, rgb(250,250,250), rgb(255,255,255)));

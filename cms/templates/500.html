@@ -9,9 +9,13 @@
   <section class="content">
     <h1>${_("The <em>Studio</em> servers encountered an error")}</h1>
     <p>
-      ${_("An error occurred in Studio and the page could not be loaded. Please try again in a few moments."
-      "We've logged the error and our staff is currently working to resolve this error as soon as possible."
-      "If the problem persists, please email us at")} <a href="mailto:technical@edx.org">technical@edx.org</a>.
+      ${_("An error occurred in Studio and the page could not be loaded. Please try again in a few moments.")}
+      ${_("We've logged the error and our staff is currently working to resolve this error as soon as possible.")}
+      ${_('If the problem persists, please email us at {email_link}.').format(
+            email_link=u'<a href="mailto:{email_address}">{email_address}</a>'.format(
+                email_address=settings.TECH_SUPPORT_EMAIL,
+            )
+        )}
     </p>
   </section>
 </div>

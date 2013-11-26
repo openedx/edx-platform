@@ -1,3 +1,4 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%def name="render_form_filter_dropdown(map)">
     % for child in map["children"]:
         % if child in map["entries"]:
@@ -9,48 +10,47 @@
 </%def>
 
 <%def name="render_entry(entries, entry)">
-    <li><a href="#" class="topic" data-discussion_id="${entries[entry]['id']}" cohorted = "${entries[entry]['id'] in cohorted_commentables}">${entry}</a></li>
+    <li role="menuitem"><a href="#" class="topic" data-discussion_id="${entries[entry]['id']}" aria-describedby="topic-name-span-${entries[entry]['id']}" cohorted = "${entries[entry]['id'] in cohorted_commentables}">${entry}</a></li>
 </%def>
 
 <%def name="render_category(categories, category)">
-    <li>
-        <a href="#">${category}</a>
-        <ul>
+    <li role="menuitem">
+        <a href="#"><span class="category-menu-span">${category}</span></a>
+        <ul role="menu">
             ${render_form_filter_dropdown(categories[category])}
         </ul>
     </li>
 </%def>
-
-
 <article class="new-post-article">
     <div class="inner-wrapper">
         <form class="new-post-form">
             <div class="left-column">
-                <label>Create new post about:</label>
+                <span class="topic-dropdown-label" id="topic-dropdown-label">${_("Create new post about:")}</span>
                 <div class="form-topic-drop">
-                    <a href="#" class="topic_dropdown_button">Show All Discussions<span class="drop-arrow">▾</span></a>
+                    <a href="#" aria-labelledby="topic-dropdown-label" class="topic_dropdown_button">${_("Show All Discussions")}<span class="drop-arrow" aria-hidden="true">▾</span></a>
                     <div class="topic_menu_wrapper">
-                        <div class="topic_menu_search">
-                            <input type="text" class="form-topic-drop-search-input" placeholder="filter topics">
+                        <div class="topic_menu_search" role="menu">
+                            <label class="sr" for="browse-topic-newpost">${_("Filter List")}</label>
+                            <input type="text" id="browse-topic-newpost" class="form-topic-drop-search-input" placeholder="Filter discussion areas">
                         </div>
-                        <ul class="topic_menu">
+                        <ul class="topic_menu" role="menu">
                             ${render_form_filter_dropdown(category_map)}
                         </ul>
                     </div>
                 </div>
                 <div class="options">
-                    <input type="checkbox" name="follow" class="discussion-follow" class="discussion-follow" id="new-post-follow" checked><label for="new-post-follow">follow this post</label>
+                    <input type="checkbox" name="follow" class="discussion-follow" class="discussion-follow" id="new-post-follow" checked><label for="new-post-follow">${_("follow this post")}</label>
                     <br>
                     % if course.allow_anonymous:
-                        <input type="checkbox" name="anonymous" class="discussion-anonymous" id="new-post-anonymous"><label for="new-post-anonymous">post anonymously</label>
+                        <input type="checkbox" name="anonymous" class="discussion-anonymous" id="new-post-anonymous"><label for="new-post-anonymous">${_("post anonymously")}</label>
                     %elif course.allow_anonymous_to_peers:
-                        <input type="checkbox" name="anonymous_to_peers" class="discussion-anonymous-to-peers" id="new-post-anonymous-to-peers"><label for="new-post-anonymous-to-peers">post anonymously to classmates</label>
+                        <input type="checkbox" name="anonymous_to_peers" class="discussion-anonymous-to-peers" id="new-post-anonymous-to-peers"><label for="new-post-anonymous-to-peers">${_("post anonymously to classmates")}</label>
                     %endif
                     %if is_course_cohorted and is_moderator:
                     <div class="form-group-label choose-cohort">
-                        Make visible to:
+                        ${_("Make visible to:")}
                         <select class="group-filter-select new-post-group" name = "group_id">
-                            <option value="">All Groups</option>
+                            <option value="">${_("All Groups")}</option>
                             %for c in cohorts:
                                 <option value="${c.id}"
                                 %if user_cohort and str(user_cohort) == str(c.id):
@@ -66,7 +66,8 @@
             <div class="right-column">
                 <ul class="new-post-form-errors"></ul>
                 <div class="form-row">
-                    <input type="text" class="new-post-title" name="title" placeholder="Title">
+                    <label class="sr" for="new-post-title">${_("new post title")}</label>
+                    <input type="text" id="new-post-title" class="new-post-title" name="title" placeholder="Title">
                 </div>
                 <div class="form-row">
                     <div class="new-post-body" name="body" placeholder="Enter your question or comment…"></div>
@@ -74,10 +75,11 @@
                 </div>
                 ## TODO tags commenting out til we figure out what to do w/ tags
                 ##<div class="form-row">
-                ##    <input type="text" class="new-post-tags" name="tags" placeholder="Tags">
+                ##    <label class="sr" for="new-post-tags">${_("Add post tags")}</label>
+                ##    <input type="text" id="new-post-tags" class="new-post-tags" name="tags" placeholder="Tags">
                 ##</div>
-                <input type="submit" class="submit" value="Add post">
-                <a href="#" class="new-post-cancel">Cancel</a>
+                <input type="submit" id="new-post-submit" class="submit" value="${_("Add post")}">
+                <a href="#" class="new-post-cancel">${_("Cancel")}</a>
             </div>
         </form>
     </div>

@@ -4,59 +4,59 @@
 // Scale - (6, 7, 8, 9, 10, 11, 12, 14, 16, 18, 21, 24, 36, 48, 60, 72)
 
 // headings/titles
-.t-title {
+%t-title {
   font-family: $f-sans-serif;
 }
 
-.t-title1 {
-  @extend .t-title;
+%t-title1 {
+  @extend %t-title;
   @include font-size(60);
   @include line-height(60);
 }
 
-.t-title2 {
-  @extend .t-title;
+%t-title2 {
+  @extend %t-title;
   @include font-size(48);
   @include line-height(48);
 }
 
-.t-title3 {
+%t-title3 {
   @include font-size(36);
   @include line-height(36);
 }
 
-.t-title4 {
-  @extend .t-title;
+%t-title4 {
+  @extend %t-title;
   @include font-size(24);
   @include line-height(24);
 }
 
-.t-title5 {
-  @extend .t-title;
+%t-title5 {
+  @extend %t-title;
   @include font-size(18);
   @include line-height(18);
 }
 
-.t-title6 {
-  @extend .t-title;
+%t-title6 {
+  @extend %t-title;
   @include font-size(16);
   @include line-height(16);
 }
 
-.t-title7 {
-  @extend .t-title;
+%t-title7 {
+  @extend %t-title;
   @include font-size(14);
   @include line-height(14);
 }
 
-.t-title8 {
-  @extend .t-title;
+%t-title8 {
+  @extend %t-title;
   @include font-size(12);
   @include line-height(12);
 }
 
-.t-title9 {
-  @extend .t-title;
+%t-title9 {
+  @extend %t-title;
   @include font-size(11);
   @include line-height(11);
 }
@@ -64,36 +64,36 @@
 // ====================
 
 // copy
-.t-copy {
+%t-copy {
   font-family: $f-sans-serif;
 }
 
-.t-copy-base {
-  @extend .t-copy;
+%t-copy-base {
+  @extend %t-copy;
   @include font-size(16);
   @include line-height(16);
 }
 
-.t-copy-lead1 {
-  @extend .t-copy;
+%t-copy-lead1 {
+  @extend %t-copy;
   @include font-size(18);
   @include line-height(18);
 }
 
-.t-copy-lead2 {
-  @extend .t-copy;
+%t-copy-lead2 {
+  @extend %t-copy;
   @include font-size(24);
   @include line-height(24);
 }
 
-.t-copy-sub1 {
-  @extend .t-copy;
+%t-copy-sub1 {
+  @extend %t-copy;
   @include font-size(14);
   @include line-height(14);
 }
 
-.t-copy-sub2 {
-  @extend .t-copy;
+%t-copy-sub2 {
+  @extend %t-copy;
   @include font-size(12);
   @include line-height(12);
 }
@@ -101,22 +101,22 @@
 // ====================
 
 // actions/labels
-.t-action1 {
+%t-action1 {
   @include font-size(18);
   @include line-height(18);
 }
 
-.t-action2 {
+%t-action2 {
   @include font-size(16);
   @include line-height(16);
 }
 
-.t-action3 {
+%t-action3 {
   @include font-size(14);
   @include line-height(14);
 }
 
-.t-action4 {
+%t-action4 {
   @include font-size(12);
   @include line-height(12);
 }
@@ -125,54 +125,54 @@
 // ====================
 
 // code
-.t-code {
+%t-code {
   font-family: $f-monospace;
 }
 
 // ====================
 
 // icons
-.t-icon1 {
+%t-icon1 {
   @include font-size(48);
   @include line-height(48);
 }
 
-.t-icon2 {
+%t-icon2 {
   @include font-size(36);
   @include line-height(36);
 }
 
-.t-icon3 {
+%t-icon3 {
   @include font-size(24);
   @include line-height(24);
 }
 
-.t-icon4 {
+%t-icon4 {
   @include font-size(18);
   @include line-height(18);
 }
 
-.t-icon5 {
+%t-icon5 {
   @include font-size(16);
   @include line-height(16);
 }
 
-.t-icon6 {
+%t-icon6 {
   @include font-size(14);
   @include line-height(14);
 }
 
-.t-icon7 {
+%t-icon7 {
   @include font-size(12);
   @include line-height(12);
 }
 
-.t-icon8 {
+%t-icon8 {
   @include font-size(11);
   @include line-height(11);
 }
 
-.t-icon9 {
+%t-icon9 {
   @include font-size(10);
   @include line-height(10);
 }

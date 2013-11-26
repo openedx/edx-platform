@@ -1,0 +1,55 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%page args="section_data"/>
+
+<script type="text/template" id="profile-distribution-widget-template">
+  <div class="profile-distribution-widget">
+    <div class="header">
+      <h2 class="title"> {{title}} </h2>
+    </div>
+    <div class="view">
+      <div class="display-errors"></div>
+      <div class="display-text"></div>
+      <div class="display-graph"></div>
+      <div class="display-table"></div>
+    </div>
+  </div>
+</script>
+
+<script type="text/template" id="grade-distributions-widget-template">
+  <div class="grade-distributions-widget">
+    <div class="header">
+      <h2 class="title"> ${_("Grade Distribution")} </h2>
+      ${_("Problem")}: <select class="problem-selector">
+        <option> ${_("Loading problem list...")} </option>
+      </select>
+      <div class="last-updated"></div>
+    </div>
+    <div class="view">
+      <div class="display-errors"></div>
+      <div class="display-text"></div>
+      <div class="display-graph"></div>
+    </div>
+  </div>
+</script>
+
+<div class="grade-distributions-widget-container"
+  data-endpoint="${ section_data['proxy_legacy_analytics_url'] }"
+></div>
+
+<div class="profile-distribution-widget-container"
+  data-title="${_("Year of Birth")}"
+  data-feature="year_of_birth"
+  data-endpoint="${ section_data['get_distribution_url'] }"
+></div>
+
+<div class="profile-distribution-widget-container"
+  data-title="${_("Gender Distribution")}"
+  data-feature="gender"
+  data-endpoint="${ section_data['get_distribution_url'] }"
+></div>
+
+<div class="profile-distribution-widget-container"
+  data-title="${_("Level of Education")}"
+  data-feature="level_of_education"
+  data-endpoint="${ section_data['get_distribution_url'] }"
+></div>

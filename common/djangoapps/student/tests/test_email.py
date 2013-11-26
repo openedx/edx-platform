@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import json
 import django.db
 
@@ -26,6 +25,9 @@ def mock_render_to_string(template_name, context):
 
 def mock_render_to_response(template_name, context):
     """Return an HttpResponse with content that encodes template_name and context"""
+    # View confirm_email_change uses @transaction.commit_manually.
+    # This simulates any db access in the templates.
+    UserProfile.objects.exists()
     return HttpResponse(mock_render_to_string(template_name, context))
 
 
@@ -143,12 +145,12 @@ class EmailChangeRequestTests(TestCase):
 
     def test_invalid_password(self):
         self.request.POST['password'] = 'wrong'
-        self.assertFailedRequest(self.run_request(), 'Mật khẩu không hợp lệ')
+        self.assertFailedRequest(self.run_request(), 'Invalid password')
 
     def test_invalid_emails(self):
         for email in ('bad_email', 'bad_email@', '@bad_email'):
             self.request.POST['new_email'] = email
-            self.assertFailedRequest(self.run_request(), 'Địa chỉ email yêu cầu hợp lệ.')
+            self.assertFailedRequest(self.run_request(), 'Valid e-mail address required.')
 
     def check_duplicate_email(self, email):
         """Test that a request to change a users email to `email` fails"""
@@ -157,7 +159,7 @@ class EmailChangeRequestTests(TestCase):
             'password': 'test',
         })
         request.user = self.user
-        self.assertFailedRequest(self.run_request(request), 'Một tài khoản với e-mail này đã tồn tại.')
+        self.assertFailedRequest(self.run_request(request), 'An account with this e-mail already exists.')
 
     def test_duplicate_email(self):
         UserFactory.create(email=self.new_email)

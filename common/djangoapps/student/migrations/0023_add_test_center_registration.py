@@ -21,7 +21,7 @@ class Migration(SchemaMigration):
             ('eligibility_appointment_date_first', self.gf('django.db.models.fields.DateField')(db_index=True)),
             ('eligibility_appointment_date_last', self.gf('django.db.models.fields.DateField')(db_index=True)),
             ('accommodation_code', self.gf('django.db.models.fields.CharField')(max_length=64, blank=True)),
-            ('accommodation_request', self.gf('django.db.models.fields.CharField')(db_index=True, max_length=1024, blank=True)),
+            ('accommodation_request', self.gf('django.db.models.fields.CharField')(db_index=False, max_length=1024, blank=True)),
             ('uploaded_at', self.gf('django.db.models.fields.DateTimeField')(null=True, db_index=True)),
             ('processed_at', self.gf('django.db.models.fields.DateTimeField')(null=True, db_index=True)),
             ('upload_status', self.gf('django.db.models.fields.CharField')(db_index=True, max_length=20, blank=True)),
@@ -163,7 +163,7 @@ class Migration(SchemaMigration):
         'student.testcenterregistration': {
             'Meta': {'object_name': 'TestCenterRegistration'},
             'accommodation_code': ('django.db.models.fields.CharField', [], {'max_length': '64', 'blank': 'True'}),
-            'accommodation_request': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '1024', 'blank': 'True'}),
+            'accommodation_request': ('django.db.models.fields.CharField', [], {'db_index': 'False', 'max_length': '1024', 'blank': 'True'}),
             'authorization_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'db_index': 'True'}),
             'client_authorization_id': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '20', 'db_index': 'True'}),
             'confirmed_at': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'db_index': 'True'}),

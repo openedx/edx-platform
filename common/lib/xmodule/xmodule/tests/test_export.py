@@ -2,28 +2,21 @@
 Tests of XML export
 """
 
-import unittest
-import pytz
-
 from datetime import datetime, timedelta, tzinfo
+from tempfile import mkdtemp
+import unittest
+import shutil
+from textwrap import dedent
+import mock
+
+import pytz
 from fs.osfs import OSFS
 from path import path
-from tempfile import mkdtemp
-import shutil
-
-from xmodule.modulestore.xml import XMLModuleStore
-from xmodule.modulestore.xml_exporter import EdxJSONEncoder
 
 from xmodule.modulestore import Location
-
-# from ~/mitx_all/mitx/common/lib/xmodule/xmodule/tests/
-# to   ~/mitx_all/mitx/common/test
-TEST_DIR = path(__file__).abspath().dirname()
-for i in range(4):
-    TEST_DIR = TEST_DIR.dirname()
-TEST_DIR = TEST_DIR / 'test'
-
-DATA_DIR = TEST_DIR / 'data'
+from xmodule.modulestore.xml import XMLModuleStore
+from xmodule.modulestore.xml_exporter import EdxJSONEncoder
+from xmodule.tests import DATA_DIR
 
 
 def strip_filenames(descriptor):
@@ -31,7 +24,8 @@ def strip_filenames(descriptor):
     Recursively strips 'filename' from all children's definitions.
     """
     print("strip filename from {desc}".format(desc=descriptor.location.url()))
-    descriptor._model_data.pop('filename', None)
+    if descriptor._field_data.has(descriptor, 'filename'):
+        descriptor._field_data.delete(descriptor, 'filename')
 
     if hasattr(descriptor, 'xml_attributes'):
         if 'filename' in descriptor.xml_attributes:
@@ -40,14 +34,27 @@ def strip_filenames(descriptor):
     for d in descriptor.get_children():
         strip_filenames(d)
 
+    descriptor.save()
+
 
 class RoundTripTestCase(unittest.TestCase):
-    ''' Check that our test courses roundtrip properly.
-        Same course imported , than exported, then imported again.
-        And we compare original import with second import (after export).
-        Thus we make sure that export and import work properly.
-    '''
-    def check_export_roundtrip(self, data_dir, course_dir):
+    """
+    Check that our test courses roundtrip properly.
+    Same course imported , than exported, then imported again.
+    And we compare original import with second import (after export).
+    Thus we make sure that export and import work properly.
+    """
+
+    @mock.patch('xmodule.course_module.requests.get')
+    def check_export_roundtrip(self, data_dir, course_dir, mock_get):
+
+        # Patch network calls to retrieve the textbook TOC
+        mock_get.return_value.text = dedent("""
+            <?xml version="1.0"?><table_of_contents>
+            <entry page="5" page_label="ii" name="Table of Contents"/>
+            </table_of_contents>
+        """).strip()
+
         root_dir = path(self.temp_dir)
         print("Copying test course to temp dir {0}".format(root_dir))
 
@@ -96,12 +103,6 @@ class RoundTripTestCase(unittest.TestCase):
         print("Checking module equality")
         for location in initial_import.modules[course_id].keys():
             print("Checking", location)
-            if location.category == 'html':
-                print(
-                    "Skipping html modules--they can't import in"
-                    " final form without writing files..."
-                )
-                continue
             self.assertEquals(initial_import.modules[course_id][location],
                               second_import.modules[course_id][location])
 

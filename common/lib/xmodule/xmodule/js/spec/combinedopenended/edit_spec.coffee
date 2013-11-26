@@ -11,13 +11,13 @@ describe 'OpenEndedMarkdownEditingDescriptor', ->
       @descriptor = new OpenEndedMarkdownEditingDescriptor($('.combinedopenended-editor'))
       @descriptor.createXMLEditor('replace with markdown')
       saveResult = @descriptor.save()
-      expect(saveResult.metadata.markdown).toEqual(null)
+      expect(saveResult.nullout).toEqual(['markdown'])
       expect(saveResult.data).toEqual('replace with markdown')
     it 'saves xml from the xml editor', ->
       loadFixtures 'combinedopenended-without-markdown.html'
       @descriptor = new OpenEndedMarkdownEditingDescriptor($('.combinedopenended-editor'))
       saveResult = @descriptor.save()
-      expect(saveResult.metadata.markdown).toEqual(null)
+      expect(saveResult.nullout).toEqual(['markdown'])
       expect(saveResult.data).toEqual('xml only')
 
   describe 'insertPrompt', ->

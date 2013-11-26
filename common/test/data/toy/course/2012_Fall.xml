@@ -3,10 +3,17 @@
   <chapter url_name="Overview">
     <videosequence url_name="Toy_Videos">
       <html url_name="secret:toylab"/>
-      <video url_name="Video_Resources" youtube_id_1_0="1bK-WdDi6Qw"/>
+      <html url_name="toyjumpto"/>
+      <html url_name="toyhtml"/>
+      <html url_name="nonportable"/>
+      <html url_name="nonportable_link"/>
+      <html url_name="badlink"/>
+      <html url_name="with_styling"/>
+      <html url_name="just_img"/>
+      <video url_name="Video_Resources" youtube_id_1_0="1bK-WdDi6Qw" display_name="Video Resources"/>
     </videosequence>
-    <video url_name="Welcome" youtube_id_1_0="p2Q6BrNhdh8"/>
-    <video url_name="video_123456789012" youtube_id_1_0="p2Q6BrNhdh8"/>
+    <video url_name="Welcome" youtube_id_1_0="p2Q6BrNhdh8" display_name="Welcome"/>
+    <video url_name="video_123456789012" youtube_id_1_0="p2Q6BrNhdh8" display_name='Test Video'/>
     <video url_name="video_4f66f493ac8f" youtube_id_1_0="p2Q6BrNhdh8"/>
   </chapter>
   <chapter url_name="secret:magic"/>

@@ -1,4 +1,5 @@
-Feature: All the high level tabs should work
+@shard_1
+Feature: LMS.All the high level tabs should work
   In order to preview the courseware
   As a student
   I want to navigate through the high level tabs

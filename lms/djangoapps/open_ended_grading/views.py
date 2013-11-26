@@ -1,5 +1,3 @@
-# Grading Views
-
 import logging
 
 from django.conf import settings
@@ -10,8 +8,6 @@ from django.core.urlresolvers import reverse
 from student.models import unique_id_for_user
 from courseware.courses import get_course_with_access
 
-from xmodule.x_module import ModuleSystem
-from xmodule.open_ended_grading_classes.controller_query_service import ControllerQueryService, convert_seconds_to_human_readable
 from xmodule.open_ended_grading_classes.grading_service_module import GradingServiceError
 import json
 from student.models import unique_id_for_user
@@ -20,32 +16,25 @@ import open_ended_notifications
 
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import search
-from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from mitxmako.shortcuts import render_to_string
+from django.utils.translation import ugettext as _
+
+from open_ended_grading.utils import (STAFF_ERROR_MESSAGE, STUDENT_ERROR_MESSAGE,
+                                      StudentProblemList, generate_problem_url, create_controller_query_service)
 
 log = logging.getLogger(__name__)
 
-system = ModuleSystem(
-    ajax_url=None,
-    track_function=None,
-    get_module=None,
-    render_template=render_to_string,
-    replace_urls=None,
-    xblock_model_data={}
-)
-
-controller_qs = ControllerQueryService(settings.OPEN_ENDED_GRADING_INTERFACE, system)
-
-"""
-Reverses the URL from the name and the course id, and then adds a trailing slash if
-it does not exist yet
-
-"""
-
-
 def _reverse_with_slash(url_name, course_id):
+    """
+    Reverses the URL given the name and the course id, and then adds a trailing slash if
+    it does not exist yet.
+    @param url_name: The name of the url (eg 'staff_grading').
+    @param course_id: The id of the course object (eg course.id).
+    @returns: The reversed url with a trailing slash.
+    """
     ajax_url = _reverse_without_slash(url_name, course_id)
     if not ajax_url.endswith('/'):
         ajax_url += '/'
@@ -58,21 +47,18 @@ def _reverse_without_slash(url_name, course_id):
 
 
 DESCRIPTION_DICT = {
-    'Peer Grading': "View all problems that require peer assessment in this particular course.",
-    'Staff Grading': "View ungraded submissions submitted by students for the open ended problems in the course.",
-    'Problems you have submitted': "View open ended problems that you have previously submitted for grading.",
-    'Flagged Submissions': "View submissions that have been flagged by students as inappropriate."
+    'Peer Grading': _("View all problems that require peer assessment in this particular course."),
+    'Staff Grading': _("View ungraded submissions submitted by students for the open ended problems in the course."),
+    'Problems you have submitted': _("View open ended problems that you have previously submitted for grading."),
+    'Flagged Submissions': _("View submissions that have been flagged by students as inappropriate."),
 }
+
 ALERT_DICT = {
-    'Peer Grading': "New submissions to grade",
-    'Staff Grading': "New submissions to grade",
-    'Problems you have submitted': "New grades have been returned",
-    'Flagged Submissions': "Submissions have been flagged for review"
+    'Peer Grading': _("New submissions to grade"),
+    'Staff Grading': _("New submissions to grade"),
+    'Problems you have submitted': _("New grades have been returned"),
+    'Flagged Submissions': _("Submissions have been flagged for review"),
 }
-
-STUDENT_ERROR_MESSAGE = "Error occured while contacting the grading service.  Please notify course staff."
-STAFF_ERROR_MESSAGE = "Error occured while contacting the grading service.  Please notify the development team.  If you do not have a point of contact, please email Vik at vik@edx.org"
-
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def staff_grading(request, course_id):
@@ -97,25 +83,30 @@ def find_peer_grading_module(course):
     @param course: A course object.
     @return: boolean found_module, string problem_url
     """
-    #Reverse the base course url
+
+    # Reverse the base course url.
     base_course_url = reverse('courses')
     found_module = False
     problem_url = ""
 
-    #Get the course id and split it
+    # Get the course id and split it.
     course_id_parts = course.id.split("/")
-    log.info("COURSE ID PARTS")
-    log.info(course_id_parts)
-    #Get the peer grading modules currently in the course.  Explicitly specify the course id to avoid issues with different runs.
+    # Get the peer grading modules currently in the course.  Explicitly specify the course id to avoid issues with different runs.
     items = modulestore().get_items(['i4x', course_id_parts[0], course_id_parts[1], 'peergrading', None],
                                     course_id=course.id)
     #See if any of the modules are centralized modules (ie display info from multiple problems)
     items = [i for i in items if not getattr(i, "use_for_single_location", True)]
-    #Get the first one
-    if len(items) > 0:
-        item_location = items[0].location
-        #Generate a url for the first module and redirect the user to it
-        problem_url_parts = search.path_to_location(modulestore(), course.id, item_location)
+    # Loop through all potential peer grading modules, and find the first one that has a path to it.
+    for item in items:
+        item_location = item.location
+        # Generate a url for the first module and redirect the user to it.
+        try:
+            problem_url_parts = search.path_to_location(modulestore(), course.id, item_location)
+        except NoPathToItem:
+            # In the case of nopathtoitem, the peer grading module that was found is in an invalid state, and
+            # can no longer be accessed.  Log an informational message, but this will not impact normal behavior.
+            log.info(u"Invalid peer grading module location {0} in course {1}.  This module may need to be removed.".format(item_location, course.id))
+            continue
         problem_url = generate_problem_url(problem_url_parts, base_course_url)
         found_module = True
 
@@ -134,121 +125,60 @@ def peer_grading(request, course_id):
 
     found_module, problem_url = find_peer_grading_module(course)
     if not found_module:
-        #This is a student_facing_error
-        error_message = """
+        error_message = _("""
         Error with initializing peer grading.
         There has not been a peer grading module created in the courseware that would allow you to grade others.
         Please check back later for this.
-        """
-        #This is a dev_facing_error
-        log.exception(error_message + "Current course is: {0}".format(course_id))
+        """)
+        log.exception(error_message + u"Current course is: {0}".format(course_id))
         return HttpResponse(error_message)
 
     return HttpResponseRedirect(problem_url)
 
-
-def generate_problem_url(problem_url_parts, base_course_url):
-    """
-    From a list of problem url parts generated by search.path_to_location and a base course url, generates a url to a problem
-    @param problem_url_parts: Output of search.path_to_location
-    @param base_course_url: Base url of a given course
-    @return: A path to the problem
-    """
-    problem_url = base_course_url + "/"
-    for z in xrange(0, len(problem_url_parts)):
-        part = problem_url_parts[z]
-        if part is not None:
-            if z == 1:
-                problem_url += "courseware/"
-            problem_url += part + "/"
-    return problem_url
-
-
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def student_problem_list(request, course_id):
-    '''
-    Show a student problem list to a student.  Fetch the list from the grading controller server, get some metadata,
-    and then show it to the student.
-    '''
+    """
+    Show a list of problems they have attempted to a student.
+    Fetch the list from the grading controller server and append some data.
+    @param request: The request object for this view.
+    @param course_id: The id of the course to get the problem list for.
+    @return: Renders an HTML problem list table.
+    """
+
+    # Load the course.  Don't catch any errors here, as we want them to be loud.
     course = get_course_with_access(request.user, course_id, 'load')
+
+    # The anonymous student id is needed for communication with ORA.
     student_id = unique_id_for_user(request.user)
-
-    # call problem list service
-    success = False
-    error_text = ""
-    problem_list = []
     base_course_url = reverse('courses')
+    error_text = ""
 
-    try:
-        #Get list of all open ended problems that the grading server knows about
-        problem_list_json = controller_qs.get_grading_status_list(course_id, unique_id_for_user(request.user))
-        problem_list_dict = json.loads(problem_list_json)
-        success = problem_list_dict['success']
-        if 'error' in problem_list_dict:
-            error_text = problem_list_dict['error']
-            problem_list = []
-        else:
-            problem_list = problem_list_dict['problem_list']
+    student_problem_list = StudentProblemList(course_id, student_id)
+    # Get the problem list from ORA.
+    success = student_problem_list.fetch_from_grading_service()
+    # If we fetched the problem list properly, add in additional problem data.
+    if success:
+        # Add in links to problems.
+        valid_problems = student_problem_list.add_problem_data(base_course_url)
+    else:
+        # Get an error message to show to the student.
+        valid_problems = []
+        error_text = student_problem_list.error_text
 
-        #A list of problems to remove (problems that can't be found in the course)
-        list_to_remove = []
-        for i in xrange(0, len(problem_list)):
-            try:
-                #Try to load each problem in the courseware to get links to them
-                problem_url_parts = search.path_to_location(modulestore(), course.id, problem_list[i]['location'])
-            except ItemNotFoundError:
-                #If the problem cannot be found at the location received from the grading controller server, it has been deleted by the course author.
-                #Continue with the rest of the location to construct the list
-                error_message = "Could not find module for course {0} at location {1}".format(course.id,
-                                                                                              problem_list[i][
-                                                                                                  'location'])
-                log.error(error_message)
-                #Mark the problem for removal from the list
-                list_to_remove.append(i)
-                continue
-            problem_url = generate_problem_url(problem_url_parts, base_course_url)
-            problem_list[i].update({'actual_url': problem_url})
-            eta_available = problem_list[i]['eta_available']
-            if isinstance(eta_available, basestring):
-                eta_available = (eta_available.lower() == "true")
-
-            eta_string = "N/A"
-            if eta_available:
-                try:
-                    eta_string = convert_seconds_to_human_readable(int(problem_list[i]['eta']))
-                except:
-                    #This is a student_facing_error
-                    eta_string = "Error getting ETA."
-            problem_list[i].update({'eta_string': eta_string})
-
-    except GradingServiceError:
-        #This is a student_facing_error
-        error_text = STUDENT_ERROR_MESSAGE
-        #This is a dev facing error
-        log.error("Problem contacting open ended grading service.")
-        success = False
-    # catch error if if the json loads fails
-    except ValueError:
-        #This is a student facing error
-        error_text = STUDENT_ERROR_MESSAGE
-        #This is a dev_facing_error
-        log.error("Problem with results from external grading service for open ended.")
-        success = False
-
-    #Remove problems that cannot be found in the courseware from the list
-    problem_list = [problem_list[i] for i in xrange(0, len(problem_list)) if i not in list_to_remove]
     ajax_url = _reverse_with_slash('open_ended_problems', course_id)
 
-    return render_to_response('open_ended_problems/open_ended_problems.html', {
+    context = {
         'course': course,
         'course_id': course_id,
         'ajax_url': ajax_url,
         'success': success,
-        'problem_list': problem_list,
+        'problem_list': valid_problems,
         'error_text': error_text,
         # Checked above
-        'staff_access': False, })
+        'staff_access': False,
+        }
 
+    return render_to_response('open_ended_problems/open_ended_problems.html', context)
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def flagged_problem_list(request, course_id):
@@ -264,6 +194,8 @@ def flagged_problem_list(request, course_id):
     problem_list = []
     base_course_url = reverse('courses')
 
+    # Make a service that can query edX ORA.
+    controller_qs = create_controller_query_service()
     try:
         problem_list_json = controller_qs.get_flagged_problem_list(course_id)
         problem_list_dict = json.loads(problem_list_json)
@@ -375,11 +307,12 @@ def take_action_on_flags(request, course_id):
     required = ['submission_id', 'action_type', 'student_id']
     for key in required:
         if key not in request.POST:
-            #This is a staff_facing_error
-            return HttpResponse(json.dumps({'success': False,
-                                            'error': STAFF_ERROR_MESSAGE + 'Missing key {0} from submission.  Please reload and try again.'.format(
-                                                key)}),
-                                mimetype="application/json")
+            error_message = u'Missing key {0} from submission.  Please reload and try again.'.format(key)
+            response = {
+                'success': False,
+                'error': STAFF_ERROR_MESSAGE + error_message
+            }
+            return HttpResponse(json.dumps(response), mimetype="application/json")
 
     p = request.POST
     submission_id = p['submission_id']
@@ -388,12 +321,20 @@ def take_action_on_flags(request, course_id):
     student_id = student_id.strip(' \t\n\r')
     submission_id = submission_id.strip(' \t\n\r')
     action_type = action_type.lower().strip(' \t\n\r')
+
+    # Make a service that can query edX ORA.
+    controller_qs = create_controller_query_service()
     try:
         response = controller_qs.take_action_on_flags(course_id, student_id, submission_id, action_type)
         return HttpResponse(response, mimetype="application/json")
     except GradingServiceError:
-        #This is a dev_facing_error
         log.exception(
-            "Error taking action on flagged peer grading submissions, submission_id: {0}, action_type: {1}, grader_id: {2}".format(
-                submission_id, action_type, grader_id))
-        return _err_response(STAFF_ERROR_MESSAGE)
+            u"Error taking action on flagged peer grading submissions, "
+            u"submission_id: {0}, action_type: {1}, grader_id: {2}".format(
+            submission_id, action_type, student_id)
+        )
+        response = {
+            'success': False,
+            'error': STAFF_ERROR_MESSAGE
+        }
+        return HttpResponse(json.dumps(response),mimetype="application/json")

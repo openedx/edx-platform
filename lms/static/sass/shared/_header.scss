@@ -66,7 +66,7 @@ header.global {
           margin-right: 0px;
         }
 
-        &:hover {
+        &:hover, &:focus {
           color: $base-font-color;
         }
       }
@@ -98,7 +98,7 @@ header.global {
           margin-right: 0px;
         }
 
-        &:hover, &.active {
+        &:hover, &:focus, &.active {
           background: $button-bg-hover-color;
         }
       }
@@ -123,6 +123,13 @@ header.global {
             border-radius: 0 4px 4px 0;
             border-left: none;
             padding: 5px 8px 7px 8px;
+            
+            &.shopping-cart {
+              border-radius: 4px;
+              border: 1px solid $border-color-2;
+              margin-right: 10px;
+              padding-bottom: 6px;
+            }
           }
         }
       }
@@ -149,7 +156,7 @@ header.global {
           width: 26px;
         }
 
-        &:hover {
+        &:hover, &:focus {
           .avatar {
             opacity: 0.8;
           }
@@ -217,7 +224,7 @@ header.global {
             white-space: nowrap;
             width: 100%;
 
-            &:hover {
+            &:hover, &:focus {
               color: $base-font-color;
               text-decoration: none;
             }
@@ -249,7 +256,7 @@ header.global {
         color: $lighter-base-font-color;
         font-weight: 600;
 
-        &:hover, &:active {
+        &:hover, &:focus, &:active {
           text-decoration: none;
           color: $link-color;
         }
@@ -278,26 +285,8 @@ header.global {
     li {
       display: inline-block;
 
-      a {
-        border-radius: 0;
-        @include linear-gradient(saturate($link-color-d1,15%) 5%, shade($link-color-d1,15%) 95%);
-        display: inline-block;
-        padding: $baseline/2 $baseline*2.5;
-        text-transform: lowercase;
-        color: $very-light-text;
-        letter-spacing: 0.1rem;
-        font-weight: 300;
-        cursor: pointer;
-        text-align: center;
-        border: none !important;
-        text-shadow: none;
-        letter-spacing: 0.1rem;
-        font-size: 14px;
-        box-shadow: none !important;
-
-        &:hover {
-          text-decoration: none;
-        }
+      .cta {
+        @extend %m-btn-primary;
       }
     }
 

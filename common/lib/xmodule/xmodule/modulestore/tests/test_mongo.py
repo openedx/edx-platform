@@ -1,20 +1,30 @@
-import pymongo
-
-from nose.tools import assert_equals, assert_raises, assert_not_equals, assert_false
 from pprint import pprint
-
-from xblock.core import Scope
-from xblock.runtime import KeyValueStore, InvalidScopeError
-
-from xmodule.modulestore import Location
-from xmodule.modulestore.mongo import MongoModuleStore, MongoKeyValueStore
-from xmodule.modulestore.xml_importer import import_from_xml
-from xmodule.templates import update_templates
-
-from .test_modulestore import check_path_to_location
-from . import DATA_DIR
+# pylint: disable=E0611
+from nose.tools import assert_equals, assert_raises, \
+    assert_not_equals, assert_false
+from itertools import ifilter
+# pylint: enable=E0611
+import pymongo
+import logging
 from uuid import uuid4
 
+from xblock.fields import Scope
+from xblock.runtime import KeyValueStore
+from xblock.exceptions import InvalidScopeError
+
+from xmodule.tests import DATA_DIR
+from xmodule.modulestore import Location, MONGO_MODULESTORE_TYPE
+from xmodule.modulestore.mongo import MongoModuleStore, MongoKeyValueStore
+from xmodule.modulestore.draft import DraftModuleStore
+from xmodule.modulestore.xml_importer import import_from_xml, perform_xlint
+from xmodule.contentstore.mongo import MongoContentStore
+
+from xmodule.modulestore.tests.test_modulestore import check_path_to_location
+from IPython.testing.nose_assert_methods import assert_in, assert_not_in
+from xmodule.exceptions import NotFoundError
+from xmodule.modulestore.exceptions import InsufficientSpecificationError
+
+log = logging.getLogger(__name__)
 
 HOST = 'localhost'
 PORT = 27017
@@ -36,7 +46,7 @@ class TestMongoModuleStore(object):
         # is ok only as long as none of the tests modify the db.
         # If (when!) that changes, need to either reload the db, or load
         # once and copy over to a tmp db for each test.
-        cls.store = cls.initdb()
+        cls.store, cls.content_store, cls.draft_store = cls.initdb()
 
     @classmethod
     def teardownClass(cls):
@@ -46,13 +56,34 @@ class TestMongoModuleStore(object):
     @staticmethod
     def initdb():
         # connect to the db
-        store = MongoModuleStore(HOST, DB, COLLECTION, FS_ROOT, RENDER_TEMPLATE,
-            default_class=DEFAULT_CLASS)
+        doc_store_config = {
+            'host': HOST,
+            'db': DB,
+            'collection': COLLECTION,
+        }
+        store = MongoModuleStore(doc_store_config, FS_ROOT, RENDER_TEMPLATE, default_class=DEFAULT_CLASS)
+        # since MongoModuleStore and MongoContentStore are basically assumed to be together, create this class
+        # as well
+        content_store = MongoContentStore(HOST, DB)
+        #
+        # Also test draft store imports
+        #
+        draft_store = DraftModuleStore(doc_store_config, FS_ROOT, RENDER_TEMPLATE, default_class=DEFAULT_CLASS)
         # Explicitly list the courses to load (don't want the big one)
-        courses = ['toy', 'simple']
-        import_from_xml(store, DATA_DIR, courses)
-        update_templates(store)
-        return store
+        courses = ['toy', 'simple', 'simple_with_draft', 'test_unicode']
+        import_from_xml(store, DATA_DIR, courses, draft_store=draft_store, static_content_store=content_store)
+
+        # also test a course with no importing of static content
+        import_from_xml(
+            store,
+            DATA_DIR,
+            ['test_import_course'],
+            static_content_store=content_store,
+            do_import_static=False,
+            verbose=True
+        )
+
+        return store, content_store, draft_store
 
     @staticmethod
     def destroy_db(connection):
@@ -66,6 +97,19 @@ class TestMongoModuleStore(object):
     def tearDown(self):
         pass
 
+    def get_course_by_id(self, name):
+        """
+        Returns the first course with `id` of `name`, or `None` if there are none.
+        """
+        courses = self.store.get_courses()
+        return next(ifilter(lambda x: x.id == name, courses), None)
+
+    def course_with_id_exists(self, name):
+        """
+        Returns true iff there exists some course with `id` of `name`.
+        """
+        return (self.get_course_by_id(name) is not None)
+
     def test_init(self):
         '''Make sure the db loads, and print all the locations in the db.
         Call this directly from failing tests to see what is loaded'''
@@ -73,13 +117,22 @@ class TestMongoModuleStore(object):
 
         pprint([Location(i['_id']).url() for i in ids])
 
+    def test_mongo_modulestore_type(self):
+        store = MongoModuleStore(
+            {'host': HOST, 'db': DB, 'collection': COLLECTION},
+            FS_ROOT, RENDER_TEMPLATE, default_class=DEFAULT_CLASS
+        )
+        assert_equals(store.get_modulestore_type('foo/bar/baz'), MONGO_MODULESTORE_TYPE)
+
     def test_get_courses(self):
         '''Make sure the course objects loaded properly'''
         courses = self.store.get_courses()
-        assert_equals(len(courses), 2)
-        courses.sort(key=lambda c: c.id)
-        assert_equals(courses[0].id, 'edX/simple/2012_Fall')
-        assert_equals(courses[1].id, 'edX/toy/2012_Fall')
+        assert_equals(len(courses), 5)
+        assert self.course_with_id_exists('edX/simple/2012_Fall')
+        assert self.course_with_id_exists('edX/simple_with_draft/2012_Fall')
+        assert self.course_with_id_exists('edX/test_import_course/2012_Fall')
+        assert self.course_with_id_exists('edX/test_unicode/2012_Fall')
+        assert self.course_with_id_exists('edX/toy/2012_Fall')
 
     def test_loads(self):
         assert_not_equals(
@@ -93,6 +146,22 @@ class TestMongoModuleStore(object):
         assert_not_equals(
             self.store.get_item("i4x://edX/toy/video/Welcome"),
             None)
+
+    def test_unicode_loads(self):
+        assert_not_equals(
+            self.store.get_item("i4x://edX/test_unicode/course/2012_Fall"),
+            None)
+        # All items with ascii-only filenames should load properly.
+        assert_not_equals(
+            self.store.get_item("i4x://edX/test_unicode/video/Welcome"),
+            None)
+        assert_not_equals(
+            self.store.get_item("i4x://edX/test_unicode/video/Welcome"),
+            None)
+        assert_not_equals(
+            self.store.get_item("i4x://edX/test_unicode/chapter/Overview"),
+            None)
+
 
     def test_find_one(self):
         assert_not_equals(
@@ -111,6 +180,13 @@ class TestMongoModuleStore(object):
         '''Make sure that path_to_location works'''
         check_path_to_location(self.store)
 
+    def test_xlinter(self):
+        '''
+        Run through the xlinter, we know the 'toy' course has violations, but the
+        number will continue to grow over time, so just check > 0
+        '''
+        assert_not_equals(perform_xlint(DATA_DIR, ['toy']), 0)
+
     def test_get_courses_has_no_templates(self):
         courses = self.store.get_courses()
         for course in courses:
@@ -119,22 +195,101 @@ class TestMongoModuleStore(object):
                 '{0} is a template course'.format(course)
             )
 
+    def test_static_tab_names(self):
+
+        def get_tab_name(index):
+            """
+            Helper function for pulling out the name of a given static tab.
+
+            Assumes the information is desired for courses[4] ('toy' course).
+            """
+            course = self.get_course_by_id('edX/toy/2012_Fall')
+            return course.tabs[index]['name']
+
+        # There was a bug where model.save was not getting called after the static tab name
+        # was set set for tabs that have a URL slug. 'Syllabus' and 'Resources' fall into that
+        # category, but for completeness, I'm also testing 'Course Info' and 'Discussion' (no url slug).
+        assert_equals('Course Info', get_tab_name(1))
+        assert_equals('Syllabus', get_tab_name(2))
+        assert_equals('Resources', get_tab_name(3))
+        assert_equals('Discussion', get_tab_name(4))
+
+    def test_contentstore_attrs(self):
+        """
+        Test getting, setting, and defaulting the locked attr and arbitrary attrs.
+        """
+        location = Location('i4x', 'edX', 'toy', 'course', '2012_Fall')
+        course_content = TestMongoModuleStore.content_store.get_all_content_for_course(location)
+        assert len(course_content) > 0
+        # a bit overkill, could just do for content[0]
+        for content in course_content:
+            assert not content.get('locked', False)
+            assert not TestMongoModuleStore.content_store.get_attr(content['_id'], 'locked', False)
+            attrs = TestMongoModuleStore.content_store.get_attrs(content['_id'])
+            assert_in('uploadDate', attrs)
+            assert not attrs.get('locked', False)
+            TestMongoModuleStore.content_store.set_attr(content['_id'], 'locked', True)
+            assert TestMongoModuleStore.content_store.get_attr(content['_id'], 'locked', False)
+            attrs = TestMongoModuleStore.content_store.get_attrs(content['_id'])
+            assert_in('locked', attrs)
+            assert attrs['locked'] is True
+            TestMongoModuleStore.content_store.set_attrs(content['_id'], {'miscel': 99})
+            assert_equals(TestMongoModuleStore.content_store.get_attr(content['_id'], 'miscel'), 99)
+        assert_raises(
+            AttributeError, TestMongoModuleStore.content_store.set_attr, course_content[0]['_id'],
+            'md5', 'ff1532598830e3feac91c2449eaa60d6'
+        )
+        assert_raises(
+            AttributeError, TestMongoModuleStore.content_store.set_attrs, course_content[0]['_id'],
+            {'foo': 9, 'md5': 'ff1532598830e3feac91c2449eaa60d6'}
+        )
+        assert_raises(
+            NotFoundError, TestMongoModuleStore.content_store.get_attr,
+            Location('bogus', 'bogus', 'bogus', 'asset', 'bogus'),
+            'displayname'
+        )
+        assert_raises(
+            NotFoundError, TestMongoModuleStore.content_store.set_attr,
+            Location('bogus', 'bogus', 'bogus', 'asset', 'bogus'),
+            'displayname', 'hello'
+        )
+        assert_raises(
+            NotFoundError, TestMongoModuleStore.content_store.get_attrs,
+            Location('bogus', 'bogus', 'bogus', 'asset', 'bogus')
+        )
+        assert_raises(
+            NotFoundError, TestMongoModuleStore.content_store.set_attrs,
+            Location('bogus', 'bogus', 'bogus', 'asset', 'bogus'),
+            {'displayname': 'hello'}
+        )
+        assert_raises(
+            InsufficientSpecificationError, TestMongoModuleStore.content_store.set_attrs,
+            Location('bogus', 'bogus', 'bogus', 'asset', None),
+            {'displayname': 'hello'}
+        )
+
+
 class TestMongoKeyValueStore(object):
+    """
+    Tests for MongoKeyValueStore.
+    """
 
     def setUp(self):
         self.data = {'foo': 'foo_value'}
         self.location = Location('i4x://org/course/category/name@version')
         self.children = ['i4x://org/course/child/a', 'i4x://org/course/child/b']
         self.metadata = {'meta': 'meta_val'}
-        self.kvs = MongoKeyValueStore(self.data, self.children, self.metadata, self.location)
+        self.kvs = MongoKeyValueStore(self.data, self.children, self.metadata)
 
     def _check_read(self, key, expected_value):
+        """
+        Asserts the get and has methods.
+        """
         assert_equals(expected_value, self.kvs.get(key))
         assert self.kvs.has(key)
 
     def test_read(self):
         assert_equals(self.data['foo'], self.kvs.get(KeyValueStore.Key(Scope.content, None, None, 'foo')))
-        assert_equals(self.location, self.kvs.get(KeyValueStore.Key(Scope.content, None, None, 'location')))
         assert_equals(self.children, self.kvs.get(KeyValueStore.Key(Scope.children, None, None, 'children')))
         assert_equals(self.metadata['meta'], self.kvs.get(KeyValueStore.Key(Scope.settings, None, None, 'meta')))
         assert_equals(None, self.kvs.get(KeyValueStore.Key(Scope.parent, None, None, 'parent')))
@@ -156,7 +311,6 @@ class TestMongoKeyValueStore(object):
 
     def test_write(self):
         yield (self._check_write, KeyValueStore.Key(Scope.content, None, None, 'foo'), 'new_data')
-        yield (self._check_write, KeyValueStore.Key(Scope.content, None, None, 'location'), Location('i4x://org/course/category/name@new_version'))
         yield (self._check_write, KeyValueStore.Key(Scope.children, None, None, 'children'), [])
         yield (self._check_write, KeyValueStore.Key(Scope.settings, None, None, 'meta'), 'new_settings')
 
@@ -182,7 +336,6 @@ class TestMongoKeyValueStore(object):
 
     def test_delete(self):
         yield (self._check_delete_key_error, KeyValueStore.Key(Scope.content, None, None, 'foo'))
-        yield (self._check_delete_default, KeyValueStore.Key(Scope.content, None, None, 'location'), Location(None))
         yield (self._check_delete_default, KeyValueStore.Key(Scope.children, None, None, 'children'), [])
         yield (self._check_delete_key_error, KeyValueStore.Key(Scope.settings, None, None, 'meta'))
 

@@ -1,58 +1,111 @@
 <%! from django.utils.translation import ugettext as _ %>
-<%! from django.utils import translation    %>
-
 
 % if display_name is not UNDEFINED and display_name is not None:
-  <h2> ${display_name} </h2>
+    <h2>${display_name}</h2>
 % endif
 
-%if settings.MITX_FEATURES.get('USE_YOUTUBE_OBJECT_API') and normal_speed_video_id:
-  <object width="640" height="390">
-    <param name="movie"
-    % if not settings.MITX_FEATURES['STUB_VIDEO_FOR_TESTING']:
-    value="https://www.youtube.com/v/${normal_speed_video_id}?version=3&amp;autoplay=1&amp;rel=0">
-    % endif
-    </param>
-    <param name="allowScriptAccess" value="always"></param>
-    <embed 
-       % if not settings.MITX_FEATURES['STUB_VIDEO_FOR_TESTING']:
-       src="https://www.youtube.com/v/${normal_speed_video_id}?version=3&amp;autoplay=1&amp;rel=0"
-       % endif
-       type="application/x-shockwave-flash"
-       allowscriptaccess="always"
-       width="640" height="390"></embed>
-  </object>
-%else:
-  <div id="video_${id}"
-       class="video"
-       data-youtube-id-0-75="${youtube_id_0_75}"
-       data-youtube-id-1-0="${youtube_id_1_0}"
-       data-youtube-id-1-25="${youtube_id_1_25}"
-       data-youtube-id-1-5="${youtube_id_1_5}"
-       data-show-captions="${show_captions}"
-       data-start="${start}"
-       data-end="${end}"
-       data-caption-asset-path="${caption_asset_path}"
-       data-autoplay="${settings.MITX_FEATURES['AUTOPLAY_VIDEOS']}">
+<div
+    id="video_${id}"
+    class="video"
+
+    data-streams="${youtube_streams}"
+
+    ${'data-sub="{}"'.format(sub) if sub else ''}
+    ${'data-autoplay="{}"'.format(autoplay) if autoplay else ''}
+
+    ${'data-mp4-source="{}"'.format(sources.get('mp4')) if sources.get('mp4') else ''}
+    ${'data-webm-source="{}"'.format(sources.get('webm')) if sources.get('webm') else ''}
+    ${'data-ogg-source="{}"'.format(sources.get('ogv')) if sources.get('ogv') else ''}
+
+    data-caption-data-dir="${data_dir}"
+    data-show-captions="${show_captions}"
+    data-start="${start}"
+    data-end="${end}"
+    data-caption-asset-path="${caption_asset_path}"
+    data-autoplay="${autoplay}"
+    data-yt-test-timeout="${yt_test_timeout}"
+    data-yt-test-url="${yt_test_url}"
+
+    ## For now, the option "data-autohide-html5" is hard coded. This option
+    ## either enables or disables autohiding of controls and captions on mouse
+    ## inactivity. If set to true, controls and captions will autohide for
+    ## HTML5 sources (non-YouTube) after a period of mouse inactivity over the
+    ## whole video. When the mouse moves (or a key is pressed while any part of
+    ## the video player is focused), the captions and controls will be shown
+    ## once again.
+    ##
+    ## There is no option in the "Advanced Editor" to set this option. However,
+    ## this option will have an effect if changed to "True". The code on
+    ## front-end exists.
+    data-autohide-html5="False"
+
+    tabindex="-1"
+>
+    <div class="focus_grabber first"></div>
+
     <div class="tc-wrapper">
+      <a href="#before-transcript_${id}" class="nav-skip sr">${_("Skip to a navigable version of this video's transcript.")}</a>
+
       <article class="video-wrapper">
-        <section class="video-player">
-          <div id="${id}"></div>
-        </section>
-        <section class="video-controls"></section>
+          <span tabindex="0" class="spinner" aria-hidden="false" aria-label="${_('Loading video player')}"></span>
+          <div class="video-player-pre"></div>
+          <section class="video-player">
+              <div id="${id}"></div>
+              <h3 class="hidden">${_('ERROR: No playable video sources found!')}</h3>
+          </section>
+          <div class="video-player-post"></div>
+          <section class="video-controls">
+              <div class="slider" title="Video position"></div>
+
+              <div>
+                  <ul class="vcr">
+                      <li><a class="video_control" href="#" title="${_('Play')}" role="button" aria-disabled="false"></a></li>
+                      <li><div class="vidtime">0:00 / 0:00</div></li>
+                  </ul>
+                  <div class="secondary-controls">
+                      <div class="speeds">
+                          <a href="#" title="${_('Speeds')}" role="button" aria-disabled="false">
+                              <h3>${_('Speed')}</h3>
+                              <p class="active"></p>
+                          </a>
+                          <ol class="video_speeds"></ol>
+                      </div>
+                      <div class="volume">
+                          <a href="#" title="${_('Volume')}" role="button" aria-disabled="false"></a>
+                          <div class="volume-slider-container">
+                              <div class="volume-slider"></div>
+                          </div>
+                      </div>
+                      <a href="#" class="add-fullscreen" title="${_('Fill browser')}" role="button" aria-disabled="false">${_('Fill browser')}</a>
+                      <a href="#" class="quality_control" title="${_('HD off')}" role="button" aria-disabled="false">${_('HD off')}</a>
+
+                      <a href="#" class="hide-subtitles" title="${_('Turn off captions')}" role="button" aria-disabled="false">${_('Turn off captions')}</a>
+                  </div>
+              </div>
+          </section>
+          <a class="nav-skip sr" id="before-transcript_${id}" href="#after-transcript_${id}">${_('Skip to end of transcript.')}</a>
       </article>
+
+      <ol id="transcript-captions" class="subtitles" tabindex="0" title="${_('Captions')}" role="group" aria-label="${_('Activating an item in this group will spool the video to the corresponding time point. To skip transcript, go to previous item.')}">
+        <li></li>
+      </ol>
     </div>
-  </div>
-%endif
 
-% if source:
-<div class="video-sources">
-  <p>${_("Download video")} <a href="${source}">${_("here")}</a>.</p>
-</div>
-% endif
+    <a class="nav-skip sr" id="after-transcript_${id}" href="#before-transcript_${id}">${_('Go back to start of transcript.')}</a>
 
-% if track:
-<div class="video-tracks">
-  <p>${_("Download subtitles")} <a href="${track}">${_("here")}</a>.</p>
+    <div class="focus_grabber last"></div>
+  <ul class="wrapper-downloads">
+    % if sources.get('main'):
+        <li class="video-sources">
+            ${('<a href="%s">' + _('Download video') + '</a>') % sources.get('main')}
+        </li>
+    % endif
+    % if track:
+        <li class="video-tracks">
+            ${('<a href="%s">' + _('Download timed transcript') + '</a>') % track}
+        </li>
+    % endif
+  </ul>
 </div>
-% endif
+
+

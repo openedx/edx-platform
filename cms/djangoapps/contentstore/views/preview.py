@@ -1,52 +1,72 @@
 import logging
-import sys
 from functools import partial
 
-from django.http import HttpResponse, Http404, HttpResponseBadRequest, HttpResponseForbidden
+from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.http import Http404, HttpResponseBadRequest
 from django.contrib.auth.decorators import login_required
-from mitxmako.shortcuts import render_to_response
+from mitxmako.shortcuts import render_to_response, render_to_string
 
-from xmodule_modifiers import replace_static_urls, wrap_xmodule
+from xmodule_modifiers import replace_static_urls, wrap_xblock
 from xmodule.error_module import ErrorDescriptor
-from xmodule.errortracker import exc_info_to_str
 from xmodule.exceptions import NotFoundError, ProcessingError
-from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.mongo import MongoUsage
 from xmodule.x_module import ModuleSystem
 from xblock.runtime import DbModel
+from xblock.django.request import webob_to_django_response, django_to_webob_request
+from xblock.exceptions import NoSuchHandlerError
+
+from lms.lib.xblock.field_data import LmsFieldData
+from lms.lib.xblock.runtime import quote_slashes, unquote_slashes
 
 from util.sandboxing import can_execute_unsafe_code
 
 import static_replace
 from .session_kv_store import SessionKeyValueStore
-from .requests import render_from_lms
-from .access import has_access
+from .helpers import render_from_lms
 from ..utils import get_course_for_item
 
-__all__ = ['preview_dispatch', 'preview_component']
+__all__ = ['preview_handler']
 
 log = logging.getLogger(__name__)
 
 
+def handler_prefix(block, handler='', suffix=''):
+    """
+    Return a url prefix for XBlock handler_url. The full handler_url
+    should be '{prefix}/{handler}/{suffix}?{query}'.
+
+    Trailing `/`s are removed from the returned url.
+    """
+    return reverse('preview_handler', kwargs={
+        'usage_id': quote_slashes(str(block.scope_ids.usage_id)),
+        'handler': handler,
+        'suffix': suffix,
+    }).rstrip('/?')
+
+
 @login_required
-def preview_dispatch(request, preview_id, location, dispatch=None):
+def preview_handler(request, usage_id, handler, suffix=''):
     """
-    Dispatch an AJAX action to a preview XModule
+    Dispatch an AJAX action to an xblock
 
-    Expects a POST request, and passes the arguments to the module
-
-    preview_id (str): An identifier specifying which preview this module is used for
-    location: The Location of the module to dispatch to
-    dispatch: The action to execute
+    usage_id: The usage-id of the block to dispatch to, passed through `quote_slashes`
+    handler: The handler to execute
+    suffix: The remainder of the url to be passed to the handler
     """
+
+    location = unquote_slashes(usage_id)
 
     descriptor = modulestore().get_item(location)
-    instance = load_preview_module(request, preview_id, descriptor)
+    instance = _load_preview_module(request, descriptor)
     # Let the module handle the AJAX
+    req = django_to_webob_request(request)
     try:
-        ajax_return = instance.handle_ajax(dispatch, request.POST)
+        resp = instance.handle(handler, req, suffix)
+
+    except NoSuchHandlerError:
+        log.exception("XBlock %s attempted to access missing handler %r", instance, handler)
+        raise Http404
 
     except NotFoundError:
         log.exception("Module indicating to user that request doesn't exist")
@@ -57,127 +77,87 @@ def preview_dispatch(request, preview_id, location, dispatch=None):
                     exc_info=True)
         return HttpResponseBadRequest()
 
-    except:
+    except Exception:
         log.exception("error processing ajax call")
         raise
 
-    return HttpResponse(ajax_return)
+    return webob_to_django_response(resp)
 
 
-@login_required
-def preview_component(request, location):
-    # TODO (vshnayder): change name from id to location in coffee+html as well.
-    if not has_access(request.user, location):
-        return HttpResponseForbidden()
-
-    component = modulestore().get_item(location)
-
-    return render_to_response('component.html', {
-        'preview': get_module_previews(request, component)[0],
-        'editor': wrap_xmodule(component.get_html, component, 'xmodule_edit.html')(),
-    })
+class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
+    """
+    An XModule ModuleSystem for use in Studio previews
+    """
+    def handler_url(self, block, handler_name, suffix='', query=''):
+        return handler_prefix(block, handler_name, suffix) + '?' + query
 
 
-def preview_module_system(request, preview_id, descriptor):
+def _preview_module_system(request, descriptor):
     """
     Returns a ModuleSystem for the specified descriptor that is specialized for
     rendering module previews.
 
     request: The active django request
-    preview_id (str): An identifier specifying which preview this module is used for
     descriptor: An XModuleDescriptor
     """
-
-    def preview_model_data(descriptor):
-        return DbModel(
-            SessionKeyValueStore(request, descriptor._model_data),
-            descriptor.module_class,
-            preview_id,
-            MongoUsage(preview_id, descriptor.location.url()),
-        )
 
     course_id = get_course_for_item(descriptor.location).location.course_id
 
-    return ModuleSystem(
-        ajax_url=reverse('preview_dispatch', args=[preview_id, descriptor.location.url(), '']).rstrip('/'),
+    return PreviewModuleSystem(
+        static_url=settings.STATIC_URL,
         # TODO (cpennington): Do we want to track how instructors are using the preview problems?
         track_function=lambda event_type, event: None,
-        filestore=descriptor.system.resources_fs,
-        get_module=partial(get_preview_module, request, preview_id),
+        filestore=descriptor.runtime.resources_fs,
+        get_module=partial(_load_preview_module, request),
         render_template=render_from_lms,
         debug=True,
-        replace_urls=partial(static_replace.replace_static_urls, data_directory=None, course_namespace=descriptor.location),
+        replace_urls=partial(static_replace.replace_static_urls, data_directory=None, course_id=course_id),
         user=request.user,
-        xblock_model_data=preview_model_data,
         can_execute_unsafe_code=(lambda: can_execute_unsafe_code(course_id)),
+        mixins=settings.XBLOCK_MIXINS,
+        course_id=course_id,
+        anonymous_student_id='student',
+
+        # Set up functions to modify the fragment produced by student_view
+        wrappers=(
+            # This wrapper wraps the module in the template specified above
+            partial(wrap_xblock, handler_prefix, display_name_only=descriptor.location.category == 'static_tab'),
+
+            # This wrapper replaces urls in the output that start with /static
+            # with the correct course-specific url for the static content
+            partial(
+                replace_static_urls,
+                getattr(descriptor, 'data_dir', descriptor.location.course),
+                course_id=descriptor.location.org + '/' + descriptor.location.course + '/BOGUS_RUN_REPLACE_WHEN_AVAILABLE',
+            ),
+        ),
+        error_descriptor_class=ErrorDescriptor,
     )
 
 
-def get_preview_module(request, preview_id, descriptor):
+def _load_preview_module(request, descriptor):
     """
-    Returns a preview XModule at the specified location. The preview_data is chosen arbitrarily
-    from the set of preview data for the descriptor specified by Location
+    Return a preview XModule instantiated from the supplied descriptor.
 
     request: The active django request
-    preview_id (str): An identifier specifying which preview this module is used for
-    location: A Location
-    """
-
-    return load_preview_module(request, preview_id, descriptor)
-
-
-def load_preview_module(request, preview_id, descriptor):
-    """
-    Return a preview XModule instantiated from the supplied descriptor, instance_state, and shared_state
-
-    request: The active django request
-    preview_id (str): An identifier specifying which preview this module is used for
     descriptor: An XModuleDescriptor
-    instance_state: An instance state string
-    shared_state: A shared state string
     """
-    system = preview_module_system(request, preview_id, descriptor)
+    student_data = DbModel(SessionKeyValueStore(request))
+    descriptor.bind_for_student(
+        _preview_module_system(request, descriptor),
+        LmsFieldData(descriptor._field_data, student_data),  # pylint: disable=protected-access
+    )
+    return descriptor
+
+
+def get_preview_html(request, descriptor):
+    """
+    Returns the HTML returned by the XModule's student_view,
+    specified by the descriptor and idx.
+    """
+    module = _load_preview_module(request, descriptor)
     try:
-        module = descriptor.xmodule(system)
-    except:
-        log.debug("Unable to load preview module", exc_info=True)
-        module = ErrorDescriptor.from_descriptor(
-            descriptor,
-            error_msg=exc_info_to_str(sys.exc_info())
-        ).xmodule(system)
-
-    # cdodge: Special case
-    if module.location.category == 'static_tab':
-        module.get_html = wrap_xmodule(
-            module.get_html,
-            module,
-            "xmodule_tab_display.html",
-        )
-    else:
-        module.get_html = wrap_xmodule(
-            module.get_html,
-            module,
-            "xmodule_display.html",
-        )
-
-    module.get_html = replace_static_urls(
-        module.get_html,
-        getattr(module, 'data_dir', module.location.course),
-        course_namespace=Location([module.location.tag, module.location.org, module.location.course, None, None])
-    )
-
-    return module
-
-
-def get_module_previews(request, descriptor):
-    """
-    Returns a list of preview XModule html contents. One preview is returned for each
-    pair of states returned by get_sample_state() for the supplied descriptor.
-
-    descriptor: An XModuleDescriptor
-    """
-    preview_html = []
-    for idx, (_instance_state, _shared_state) in enumerate(descriptor.get_sample_state()):
-        module = load_preview_module(request, str(idx), descriptor)
-        preview_html.append(module.get_html())
-    return preview_html
+        content = module.render("student_view").content
+    except Exception as exc:                          # pylint: disable=W0703
+        content = render_to_string('html_error.html', {'message': str(exc)})
+    return content

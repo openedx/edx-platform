@@ -1,10 +1,17 @@
+<%! from django.utils.translation import ugettext as _ %>
+<% from random import randint %>
 <form class="rubric-template" id="inputtype_${id}" xmlns="http://www.w3.org/1999/html">
-    <h3>Rubric</h3>
+    <div class="visibility-control visibility-control-rubric">
+        <div class="inner">
+        </div>
+        <span class="section-header section-header-rubric">${_("Rubric")}</span>
+    </div>
     <p>Select the criteria you feel best represents this submission in each category.</p>
     <div class="rubric">
         % for i in range(len(categories)):
         <% category = categories[i] %>
-            <span class="rubric-category">${category['description']}</span> <br/>
+        <% m = randint(0,1000) %>
+            <span class="rubric-category" tabindex="${i}">${category['description']}</span>
             <ul class="rubric-list">
                 % for j in range(len(category['options'])):
                 <% option = category['options'][j] %>
@@ -13,8 +20,8 @@
                     %else:
                         <li class="rubric-list-item">
                     % endif
-                    <label class="rubric-label" for="score-${i}-${j}">
-                        <input type="radio" class="score-selection" data-category="${i}" name="score-selection-${i}" id="score-${i}-${j}" value="${option['points']}"/>
+                    <label class="rubric-label" for="score-${i}-${j}-${m}">
+                        <span class="wrapper-score-selection"><input type="radio" class="score-selection" data-category="${i}" name="score-selection-${i}" id="score-${i}-${j}-${m}" value="${option['points']}"/></span>
                         <span class="wrappable"> ${option['points']} points : ${option['text']}</span>
                     </label>
                     </li>

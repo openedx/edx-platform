@@ -1,81 +1,228 @@
 // studio - views - course users
 // ====================
 
-body.course.users {
+.view-team {
 
-  .new-user-form {
-    display: none;
-    padding: 15px 20px;
-    background-color: $lightBluishGrey2;
+  // LAYOUT: page
+  .content-primary, .content-supplementary {
+    @include box-sizing(border-box);
+    float: left;
+  }
 
-    #result {
-      display: none;
-      float: left;
-      margin-bottom: 15px;
-      padding: 3px 15px;
-      border-radius: 3px;
-      background: $error-red;
-      font-size: 14px;
-      color: #fff;
-    }
+  .content-primary {
+    width: flex-grid(9, 12);
+    margin-right: flex-gutter();
+  }
 
-    .form-elements {
-      clear: both;
-    }
+  .content-supplementary {
+    width: flex-grid(3, 12);
+  }
 
-    label {
-      display: inline-block;
-      margin-right: 10px;
-    }
+  // ELEM: content
+  .content {
 
-    .email-input {
-      width: 350px;
-      padding: 8px 8px 10px;
-      border-color: $darkGrey;
-    }
-
-    .add-button {
-      @include blue-button;
-      padding: 5px 20px 9px;
-    }
-
-    .cancel-button {
-      @include white-button;
-      padding: 5px 20px 9px;
+    .introduction {
+      @extend %t-copy-sub1;
+      margin: 0 0 ($baseline*2) 0;
     }
   }
 
-  .user-list {
-    border: 1px solid $mediumGrey;
-    background: #fff;
+  // ELEM: no users notice
+  .content .notice-create {
+    width: flexgrid(9, 9);
+    margin-top: $baseline;
 
-    li {
+    // CASE: notice has actions {
+    &.has-actions {
+
+      .msg, .list-actions {
+        display: inline-block;
+        vertical-align: middle;
+      }
+
+      .msg {
+        width: flex-grid(6, 9);
+        margin-right: flex-gutter();
+      }
+
+      .list-actions {
+        width: flex-grid(3, 9);
+        text-align: right;
+        margin-top: 0;
+
+        .action-item {
+
+        }
+
+        .action-primary {
+          @include green-button(); // overwriting for the sake of syncing older green button styles for now
+          @extend %t-action3;
+          padding: ($baseline/2) $baseline;
+        }
+      }
+    }
+  }
+
+
+  // ELEM: new user form
+  .wrapper-create-user {
+
+    &.is-shown {
+      height: ($baseline*15);
+    }
+  }
+
+  // ELEM: listing of users
+  .user-list, .user-item, .item-metadata, .item-actions {
+    @include box-sizing(border-box);
+  }
+
+  .user-list {
+
+    .user-item {
+      @extend %ui-window;
+      @include clearfix();
       position: relative;
-      padding: 20px;
-      border-bottom: 1px solid $mediumGrey;
+      width: flex-grid(9, 9);
+      margin: 0 0 ($baseline/2) 0;
+      padding: ($baseline*1.25) ($baseline*1.5) $baseline ($baseline*1.5);
 
       &:last-child {
-        border-bottom: none;
+        margin-bottom: 0;
       }
 
-      span {
+      .item-metadata, .item-actions {
         display: inline-block;
+        vertical-align: middle;
       }
 
-      .user-name {
-        margin-right: 10px;
-        font-size: 24px;
-        font-weight: 300;
+      // ELEM: item - flag
+      .flag-role {
+        @extend %ui-badge;
+        color: $white;
+
+        .msg-you {
+          margin-left: ($baseline/5);
+          text-transform: none;
+          font-weight: 500;
+          color: $pink-l3;
+        }
+
+        &:after {
+          border-bottom-color: $pink-d4;
+        }
+
+        &.flag-role-staff {
+          background: $pink-u3;
+        }
+
+        &.flag-role-admin {
+          background: $pink;
+        }
       }
 
-      .user-email {
-        font-size: 14px;
-        font-style: italic;
-        color: $mediumGrey;
+      // ELEM: item - metadata
+      .item-metadata {
+        width: flex-grid(5, 9);
+        margin-right: flex-gutter();
+
+        .user-username, .user-email {
+          display: inline-block;
+          vertical-align: middle;
+        }
+
+        .user-username {
+          @extend %t-title4;
+          @include transition(color $tmg-f2 ease-in-out 0s);
+          margin: 0 ($baseline/2) ($baseline/10) 0;
+          color: $gray-d4;
+          font-weight: 600;
+        }
+
+        .user-email {
+          @extend %t-title6;
+        }
       }
 
+      // ELEM: item - actions
       .item-actions {
-        top: 24px;
+        width: flex-grid(4, 9);
+        position: static; // nasty reset needed due to base.scss
+        text-align: right;
+
+        .action {
+          display: inline-block;
+          vertical-align: middle;
+        }
+
+        .action-role {
+          width: flex-grid(3, 4);
+          margin-right: flex-gutter();
+        }
+
+        .action-delete {
+          width: flex-grid(1, 4);
+
+          // STATE: disabled
+          &.is-disabled {
+            opacity: 0.0;
+            visibility: hidden;
+            pointer-events: none;
+          }
+        }
+
+        .delete {
+          @extend %ui-btn-non;
+        }
+
+        // HACK: nasty reset needed due to base.scss
+        .delete-button {
+          margin-right: 0;
+          float: none;
+          color: inherit;
+        }
+
+        // ELEM: admin role controls
+        .toggle-admin-role {
+
+          &.add-admin-role {
+            @include blue-button;
+            @extend %t-action2;
+            @include transition(all .15s);
+            display: inline-block;
+            padding: ($baseline/5) $baseline;
+            font-weight: 600;
+          }
+
+          &.remove-admin-role {
+            @include grey-button;
+            @extend %t-action2;
+            @include transition(all .15s);
+            display: inline-block;
+            padding: ($baseline/5) $baseline;
+            font-weight: 600;
+          }
+        }
+
+        .notoggleforyou {
+          @extend %t-copy-sub1;
+          color: $gray-l2;
+        }
+      }
+
+      // STATE: hover
+      &:hover {
+
+        .user-username {
+        }
+
+        .user-email {
+
+        }
+
+        .item-actions {
+
+        }
       }
     }
   }

@@ -1,6 +1,7 @@
 // Studio - Course Settings
 // ====================
-body.course.checklists {
+
+.view-checklists {
 
   .content-primary, .content-supplementary {
     @include box-sizing(border-box);
@@ -14,7 +15,7 @@ body.course.checklists {
 
   // checklists - general
   .course-checklist {
-    @extend .window;
+    @extend %ui-window;
     margin: 0 0 ($baseline*2) 0;
 
     &:last-child {
@@ -23,7 +24,7 @@ body.course.checklists {
 
     // visual status
     .viz-checklist-status {
-      @extend .text-hide;
+      @extend %cont-text-hide;
       @include size(100%,($baseline/4));
       position: relative;
       display: block;
@@ -40,7 +41,7 @@ body.course.checklists {
         background: $green;
 
         .int {
-          @extend .text-sr;
+          @extend %cont-text-sr;
         }
       }
     }
@@ -83,7 +84,7 @@ body.course.checklists {
       }
 
       .checklist-status {
-        @extend .t-copy-sub1;
+        @extend %t-copy-sub1;
         width: flex-grid(3, 9);
         float: right;
         margin-top: ($baseline/2);
@@ -99,7 +100,7 @@ body.course.checklists {
         }
 
         .status-count {
-          @extend .t-copy-base;
+          @extend %t-copy-base;
           margin-left: ($baseline/4);
           margin-right: ($baseline/4);
           color: $gray-d3;
@@ -107,7 +108,7 @@ body.course.checklists {
         }
 
         .status-amount {
-          @extend .t-copy-base;
+          @extend %t-copy-base;
           margin-left: ($baseline/4);
           color: $gray-d3;
           font-weight: 600;
@@ -138,7 +139,7 @@ body.course.checklists {
 
       .action-secondary {
         @include grey-button();
-        @extend .t-action3;
+        @extend %t-action3;
         font-weight: 400;
         float: right;
 
@@ -245,13 +246,13 @@ body.course.checklists {
         }
 
         .task-description {
-          @extend .t-copy-sub1;
+          @extend %t-copy-sub1;
           @include transition(color $tmg-f2 ease-in-out 0s);
           color: $gray-l2;
         }
 
         .task-support {
-          @extend .t-copy-sub2;
+          @extend %t-copy-sub2;
           @include transition(opacity $tmg-f2 ease-in-out 0s);
           opacity: 0.0;
           pointer-events: none;
@@ -272,13 +273,13 @@ body.course.checklists {
 
         .action-primary {
           @include blue-button;
-          @extend .t-action4;
+          @extend %t-action4;
           font-weight: 600;
           text-align: center;
         }
 
         .action-secondary {
-          @extend .t-action4;
+          @extend %t-action4;
           margin-top: ($baseline/2);
         }
       }
@@ -319,7 +320,7 @@ body.course.checklists {
 
           .action-primary {
             @include grey-button;
-            @extend .t-action4;
+            @extend %t-action4;
             font-weight: 600;
             text-align: center;
           }

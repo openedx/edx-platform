@@ -1,6 +1,7 @@
+<%! from django.utils.translation import ugettext as _ %>
 <section class="legend-container">
     <div class="legenditem">
-        Legend
+        ${_("Legend")}
     </div>
     % for i in xrange(0,len(legend_list)):
     <%legend_title=legend_list[i]['name'] %>

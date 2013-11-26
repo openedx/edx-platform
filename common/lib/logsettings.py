@@ -72,7 +72,7 @@ def get_logger_config(log_dir,
                 'level': console_loglevel,
                 'class': 'logging.StreamHandler',
                 'formatter': 'standard',
-                'stream': sys.stdout,
+                'stream': sys.stderr,
             },
             'syslogger-remote': {
                 'level': 'INFO',
@@ -82,7 +82,7 @@ def get_logger_config(log_dir,
             },
             'newrelic': {
                 'level': 'ERROR',
-                'class': 'newrelic_logging.NewRelicHandler',
+                'class': 'lms.lib.newrelic_logging.NewRelicHandler',
                 'formatter': 'raw',
             }
         },

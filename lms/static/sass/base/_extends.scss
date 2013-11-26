@@ -1,40 +1,40 @@
-.faded-hr-divider {
+%faded-hr-divider {
   @include background-image($faded-hr-image-1);
   height: 1px;
   width: 100%;
 }
 
-.faded-hr-divider-medium {
+%faded-hr-divider-medium {
   @include background-image($faded-hr-image-4);
   height: 1px;
   width: 100%;
 }
 
-.faded-hr-divider-light {
+%faded-hr-divider-light {
   @include background-image($faded-hr-image-5);
   height: 1px;
   width: 100%;
 }
 
-.faded-vertical-divider {
+%faded-vertical-divider {
   @include background-image($faded-hr-image-1);
   height: 100%;
   width: 1px;
 }
 
-.faded-vertical-divider-light {
+%faded-vertical-divider-light {
   @include background-image($faded-hr-image-6);
   background: transparent;
   height: 100%;
   width: 1px;
 }
 
-.vertical-divider {
-  @extend .faded-vertical-divider;
+%vertical-divider {
+  @extend %faded-vertical-divider;
   position: relative;
 
   &::after {
-    @extend .faded-vertical-divider-light;
+    @extend %faded-vertical-divider-light;
     content: "";
     display: block;
     position: absolute;
@@ -42,13 +42,13 @@
   }
 }
 
-.horizontal-divider {
+%horizontal-divider {
   border: none;
-  @extend .faded-hr-divider;
+  @extend %faded-hr-divider;
   position: relative;
 
   &::after {
-    @extend .faded-hr-divider-light;
+    @extend %faded-hr-divider-light;
     content: "";
     display: block;
     position: absolute;
@@ -56,24 +56,24 @@
   }
 }
 
-.fade-right-hr-divider {
+%fade-right-hr-divider {
   @include background-image($faded-hr-image-2);
   border: none;
 }
 
-.fade-left-hr-divider {
+%fade-left-hr-divider {
   @include background-image($faded-hr-image-3);
   border: none;
 }
 
 //Styles for Error messages
-.error-message-colors {
+%error-message-colors {
   background: $error-red;
   border: 1px solid rgb(202, 17, 17);
   color: rgb(143, 14, 14);
 }
 
-.success-message-colors {
+%success-message-colors {
   background: rgb(19, 159, 58);
   border: 1px solid rgb(6, 65, 18);
   color: rgb(255, 255, 255);
@@ -82,5 +82,34 @@
 .global {
   h2 {
     display: none;
+  }
+}
+
+// ====================
+
+// needed utility extend for resetting poor basic <button> elem styling
+%ui-reset-button  {
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  text-shadow: none !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+
+  &:focus {
+    // outline: thin dotted !important;
+  }
+}
+
+// removes list styling/spacing when using uls, ols for navigation and less content-centric cases
+%ui-no-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  text-indent: 0;
+
+  li {
+    margin: 0;
+    padding: 0;
   }
 }

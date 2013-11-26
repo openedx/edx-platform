@@ -102,40 +102,9 @@ class StudentModuleHistory(models.Model):
             history_entry.save()
 
 
-class XModuleContentField(models.Model):
+class XModuleUserStateSummaryField(models.Model):
     """
-    Stores data set in the Scope.content scope by an xmodule field
-    """
-
-    class Meta:
-        unique_together = (('definition_id', 'field_name'),)
-
-    # The name of the field
-    field_name = models.CharField(max_length=64, db_index=True)
-
-    # The definition id for the module
-    definition_id = models.CharField(max_length=255, db_index=True)
-
-    # The value of the field. Defaults to None dumped as json
-    value = models.TextField(default='null')
-
-    created = models.DateTimeField(auto_now_add=True, db_index=True)
-    modified = models.DateTimeField(auto_now=True, db_index=True)
-
-    def __repr__(self):
-        return 'XModuleContentField<%r>' % ({
-            'field_name': self.field_name,
-            'definition_id': self.definition_id,
-            'value': self.value,
-        },)
-
-    def __unicode__(self):
-        return unicode(repr(self))
-
-
-class XModuleSettingsField(models.Model):
-    """
-    Stores data set in the Scope.settings scope by an xmodule field
+    Stores data set in the Scope.user_state_summary scope by an xmodule field
     """
 
     class Meta:
@@ -144,17 +113,17 @@ class XModuleSettingsField(models.Model):
     # The name of the field
     field_name = models.CharField(max_length=64, db_index=True)
 
-    # The usage id for the module
+    # The definition id for the module
     usage_id = models.CharField(max_length=255, db_index=True)
 
-    # The value of the field. Defaults to None, dumped as json
+    # The value of the field. Defaults to None dumped as json
     value = models.TextField(default='null')
 
     created = models.DateTimeField(auto_now_add=True, db_index=True)
     modified = models.DateTimeField(auto_now=True, db_index=True)
 
     def __repr__(self):
-        return 'XModuleSettingsField<%r>' % ({
+        return 'XModuleUserStateSummaryField<%r>' % ({
             'field_name': self.field_name,
             'usage_id': self.usage_id,
             'value': self.value,

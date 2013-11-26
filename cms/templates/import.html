@@ -1,12 +1,10 @@
-<%! from django.utils.translation import ugettext as _ %>
-
-
 <%inherit file="base.html" />
 <%namespace name='static' file='static_content.html'/>
-
-<%! from django.core.urlresolvers import reverse %>
+<%!
+  from django.utils.translation import ugettext as _
+%>
 <%block name="title">${_("Course Import")}</%block>
-<%block name="bodyclass">is-signedin course tools import</%block>
+<%block name="bodyclass">is-signedin course tools view-import</%block>
 
 <%block name="content">
 <div class="wrapper-mast wrapper">
@@ -18,68 +16,245 @@
   </header>
 </div>
 
-<div class="main-wrapper">
-  <div class="inner-wrapper">
-    <article class="import-overview">
-      <div class="description">
-        <p><strong>${_("Importing a new course will delete all content currently associated with your course"
-        "and replace it with the contents of the uploaded file.")}</strong></p>
-        <p>${_("File uploads must be gzipped tar files (.tar.gz) containing, at a minimum, a <code>course.xml</code> file.")}</p>
-        <p>${_("Please note that if your course has any problems with auto-generated <code>url_name</code> nodes,"
-        "re-importing your course could cause the loss of student data associated with those problems.")}</p>
+<div class="wrapper-content wrapper">
+  <section class="content">
+    <article class="content-primary" role="main">
+
+      <div class="introduction">
+          <p>${_("Be sure you want to import a course before continuing. Content of the imported course replaces all the content of this course. {em_start}You cannot undo a course import{em_end}. We recommend that you first export the current course, so you have a backup copy of it.").format(em_start='<strong>', em_end="</strong>")}</p>
+          ## Translators: ".tar.gz" is a file extension, and files with that extension are called "gzipped tar files": these terms should not be translated
+          <p>${_("The course that you import must be in a .tar.gz file (that is, a .tar file compressed with GNU Zip). This .tar.gz file must contain a course.xml file. It may also contain other files.")}</p>
+          <p>${_("The import process has five stages. During the first two stages, you must stay on this page. You can leave this page after the Unpacking stage has completed. We recommend, however, that you don't make important changes to your course until the import operation has completed.")}</p>
       </div>
-      <form action="${reverse('import_course', kwargs=dict(org=context_course.location.org, course=context_course.location.course, name=context_course.location.name))}" method="post" enctype="multipart/form-data" class="import-form">
-        <h2>${_("Course to import:")}</h2>
+
+      <form id="fileupload" method="post" enctype="multipart/form-data" class="import-form">
+
+        ## Translators: ".tar.gz" is a file extension, and files with that extension are called "gzipped tar files": these terms should not be translated
+        <h2 class="title">${_("Select a .tar.gz File to Replace Your Course Content")}</h2>
+
         <p class="error-block"></p>
-        <a href="#" class="choose-file-button">${_("Choose File")}</a>
-        <p class="file-name-block"><span class="file-name"></span><a href="#" class="choose-file-button-inline">${_("change")}</a></p>
-        <input type="file" name="course-data" class="file-input">
-        <input type="submit" value="Replace my course with the one above" class="submit-button">
-        <div class="progress-bar">
-          <div class="progress-fill"></div>
-          <div class="percent">0%</div>
+
+        <a href="#" class="action action-choose-file choose-file-button">
+          <i class="icon-upload"></i>
+          <span class="copy">${_("Choose a File to Import")}</span>
+        </a>
+
+        <div class="wrapper wrapper-file-name file-name-block">
+            <h3 class="title">
+              <span class="label">${_("File Chosen:")}</span>
+              <span class="file-name"></span>
+            </h3>
+
+          <input type="file" name="course-data" class="file-input" />
+
+          <input type="submit" value="${_('Replace my course with the one above')}" class="submit-button" />
+        </div>
+
+        <div class="wrapper wrapper-status is-hidden">
+          <h3 class="title">${_("Course Import Status")}</h3>
+
+          <ol class="status-progress list-progress">
+            <li class="item-progresspoint item-progresspoint-upload is-complete">
+              <span class="deco status-visual">
+                <i class="icon-cog"></i>
+                <i class="icon-warning-sign"></i>
+              </span>
+
+              <div class="status-detail">
+                <h3 class="title">${_("Uploading")}</h3>
+                <p class="copy">${_("Transferring your file to our servers")}</p>
+              </div>
+            </li>
+
+            <li class="item-progresspoint item-progresspoint-unpack is-started">
+              <span class="deco status-visual">
+                <i class="icon-cog icon-spin"></i>
+                <i class="icon-warning-sign"></i>
+              </span>
+
+              <div class="status-detail">
+                <h3 class="title">${_("Unpacking")}</h3>
+                <p class="copy">${_("Expanding and preparing folder/file structure (You can now leave this page safely, but avoid making drastic changes to content until this import is complete)")}</p>
+              </div>
+            </li>
+
+
+            <li class="item-progresspoint item-progresspoint-verify is-not-started">
+              <span class="deco status-visual">
+                <i class="icon-cog"></i>
+                <i class="icon-warning-sign"></i>
+              </span>
+
+              <div class="status-detail">
+                <h3 class="title">${_("Verifying")}</h3>
+                <p class="copy">${_("Reviewing semantics, syntax, and required data")}</p>
+              </div>
+            </li>
+
+            <li class="item-progresspoint item-progresspoint-import is-not-started">
+              <span class="deco status-visual">
+                <i class="icon-cog"></i>
+                <i class="icon-warning-sign"></i>
+              </span>
+
+              <div class="status-detail">
+                <h3 class="title">${_("Updating Course")}</h3>
+                <p class="copy">${_("Integrating your imported content into this course. This may take a while with larger courses.")}</p>
+              </div>
+            </li>
+            <li class="item-progresspoint item-progresspoint-success has-actions is-not-started">
+              <span class="deco status-visual">
+                <i class="icon-check"></i>
+              </span>
+
+              <div class="status-detail">
+                <h3 class="title">${_("Success")}</h3>
+                <p class="copy">${_("Your imported content has now been integrated into this course")}</p>
+
+                <ul class="list-actions">
+                  <li class="item-action">
+                    <a href="${successful_import_redirect_url}" class="action action-primary">${_("View Updated Outline")}</a>
+                  </li>
+                </ul>
+              </div>
+            </li>
+          </ol>
         </div>
       </form>
     </article>
-  </div>
+
+    <aside class="content-supplementary" role="complimentary">
+      <div class="bit">
+        <h3 class="title-3">${_("Why import a course?")}</h3>
+        ## Translators: ".tar.gz" is a file extension, and files with that extension are called "gzipped tar files": these terms should not be translated
+        <p>${_("You may want to run a new version of an existing course, or replace an existing course altogether. Or, you may have developed a course outside Studio.")}</p>
+      </div>
+
+      <div class="bit">
+        <h3 class="title-3">${_("What content is imported?")}</h3>
+        ## Translators: ".tar.gz" is a file extension, and files with that extension are called "gzipped tar files": these terms should not be translated
+        <p>${_("Only the course content and structure (including sections, subsections, and units) are imported. Other data, including student data, grading information, discussion forum data, course settings, and course team information, remains the same as it was in the existing course.")}</p>
+      </div>
+
+      <div class="bit">
+        ## Translators: ".tar.gz" is a file extension, and should not be translated
+        <h3 class="title-3">${_("Warning: Importing while a course is running")}</h3>
+
+        <p>${_("If you perform an import while your course is running, and you change the URL names (or url_name nodes) of any Problem components, the student data associated with those Problem components may be lost. This data includes students' problem scores.")}</p>
+      </div>
+    </aside>
+  </section>
 </div>
 </%block>
 
 <%block name="jsextra">
 <script>
-(function() {
+require(
+        ["js/views/import", "jquery", "gettext", "jquery.fileupload"],
+        function(CourseImport, $, gettext) {
 
+var file;
 var bar = $('.progress-bar');
 var fill = $('.progress-fill');
 var percent = $('.percent');
 var status = $('#status');
+var statusBlock = $('.status-block');
 var submitBtn = $('.submit-button');
+var chooseBtn = $('.choose-file-button');
 
-$('form').ajaxForm({
-    beforeSend: function() {
-        status.empty();
-        var percentVal = '0%';
-        bar.show();
-        fill.width(percentVal);
-        percent.html(percentVal);
-        submitBtn.hide();
+var allStats = $('#status-infos');
+
+var feedbackUrl = "${import_status_url}";
+
+var defaults = [
+    '${_("There was an error during the upload process.")}\n',
+    '${_("There was an error while unpacking the file.")}\n',
+    '${_("There was an error while verifying the file you submitted.")}\n',
+    '${_("There was an error while importing the new course to our database.")}\n'
+];
+
+$('#fileupload').fileupload({
+
+    dataType: 'json',
+    type: 'POST',
+
+    maxChunkSize: 20 * 1000000, // 20 MB
+
+    autoUpload: false,
+
+    add: function(e, data) {
+        CourseImport.clearImportDisplay();
+        submitBtn.unbind('click');
+        file = data.files[0];
+        if (file.name.match(/tar\.gz$/)) {
+            submitBtn.click(function(e){
+                e.preventDefault();
+                submitBtn.hide();
+                data.submit().complete(function(result, textStatus, xhr) {
+                    CourseImport.stopGetStatus = true;
+                    window.onbeforeunload = null;
+                    if (xhr.status != 200) {
+                        if (!result.responseText) {
+                            alert(gettext("Your import may have failed. Please check your course and try again if necessary."));
+                            return;
+                        }
+                        var serverMsg = $.parseJSON(result.responseText);
+                        var errMsg = serverMsg.hasOwnProperty("ErrMsg") ?  serverMsg.ErrMsg : "" ;
+                        if (serverMsg.hasOwnProperty("Stage")) {
+                            var stage = serverMsg.Stage;
+                            CourseImport.stageError(stage, defaults[stage] + errMsg);
+                        }
+                        else {
+                            alert('${_("Your import has failed.")}\n\n' + errMsg);
+                        }
+                        chooseBtn.html('${_("Choose new file")}').show();
+                        bar.hide();
+                    }
+                    chooseBtn.html('${_("Choose new file")}').show();
+                    bar.hide();
+                });
+            });
+        } else {
+            data.files = [];
+        }
     },
-    uploadProgress: function(event, position, total, percentComplete) {
-        var percentVal = percentComplete + '%';
-        fill.width(percentVal);
-        percent.html(percentVal);
+
+    progressall: function(e, data){
+        var doneAt;
+        var percentInt = data.loaded / data.total * 100
+        var percentVal = parseInt(percentInt, 10) + "%";
+        // Firefox makes ProgressEvent.loaded equal ProgressEvent.total only
+        // after receiving a response from the server (see Mozilla bug 637002),
+        // so for Firefox we jump the gun a little.
+        if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
+            doneAt = 95;
+        } else {
+            doneAt = 99;
+        }
+        if (percentInt >= doneAt) {
+            bar.hide();
+            CourseImport.startServerFeedback(feedbackUrl.replace("fillerName", file.name));
+        } else {
+            bar.show();
+            fill.width(percentVal);
+            percent.html(percentVal);
+        }
     },
-    complete: function(xhr) {
-      if (xhr.status == 200) {
-        alert('Your import was successful.');
-        window.location = '${successful_import_redirect_url}';
-      }
-      else
-        alert('Your import has failed.\n\n' + xhr.responseText);
-        submitBtn.show();
+    done: function(e, data){
         bar.hide();
-    }
-  });
-})();
+        window.onbeforeunload = null;
+        CourseImport.displayFinishedImport();
+    },
+    start: function(e) {
+        window.onbeforeunload = function() {
+            return '${_("Your import is in progress; navigating away will abort it.")}';
+        }
+    },
+    sequentialUploads: true,
+    notifyOnError: false
+
+});
+
+}); // end define()
 </script>
 </%block>

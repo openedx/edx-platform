@@ -56,6 +56,7 @@ class InstructorTask(models.Model):
     requester = models.ForeignKey(User, db_index=True)
     created = models.DateTimeField(auto_now_add=True, null=True)
     updated = models.DateTimeField(auto_now=True)
+    subtasks = models.TextField(blank=True)  # JSON dictionary
 
     def __repr__(self):
         return 'InstructorTask<%r>' % ({

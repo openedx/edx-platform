@@ -2,7 +2,7 @@
 import datetime
 import unittest
 from django.utils.timezone import UTC
-from xmodule.fields import Date, Timedelta
+from xmodule.fields import Date, Timedelta, RelativeTime
 from xmodule.timeinfo import TimeInfo
 import time
 
@@ -44,7 +44,8 @@ class DateTest(unittest.TestCase):
     def test_return_None(self):
         self.assertIsNone(DateTest.date.from_json(""))
         self.assertIsNone(DateTest.date.from_json(None))
-        self.assertIsNone(DateTest.date.from_json(['unknown value']))
+        with self.assertRaises(TypeError):
+            DateTest.date.from_json(['unknown value'])
 
     def test_old_due_date_format(self):
         current = datetime.datetime.today()
@@ -83,6 +84,8 @@ class DateTest(unittest.TestCase):
             DateTest.date.to_json(
                 DateTest.date.from_json("2012-12-31T23:00:01-01:00")),
             "2012-12-31T23:00:01-01:00")
+        with self.assertRaises(TypeError):
+            DateTest.date.to_json('2012-12-31T23:00:01-01:00')
 
 
 class TimedeltaTest(unittest.TestCase):
@@ -113,3 +116,59 @@ class TimeInfoTest(unittest.TestCase):
         timeinfo = TimeInfo(due_date, grace_pd_string)
         self.assertEqual(timeinfo.close_date,
             due_date + Timedelta().from_json(grace_pd_string))
+
+
+class RelativeTimeTest(unittest.TestCase):
+
+    delta = RelativeTime()
+
+    def test_from_json(self):
+        self.assertEqual(
+            RelativeTimeTest.delta.from_json('0:05:07'),
+            datetime.timedelta(seconds=307)
+        )
+
+        self.assertEqual(
+            RelativeTimeTest.delta.from_json(100.0),
+            datetime.timedelta(seconds=100)
+        )
+        self.assertEqual(
+            RelativeTimeTest.delta.from_json(None),
+            datetime.timedelta(seconds=0)
+        )
+
+        with self.assertRaises(TypeError):
+            RelativeTimeTest.delta.from_json(1234)  # int
+
+        with self.assertRaises(ValueError):
+            RelativeTimeTest.delta.from_json("77:77:77")
+
+    def test_to_json(self):
+        self.assertEqual(
+            "01:02:03",
+            RelativeTimeTest.delta.to_json(datetime.timedelta(seconds=3723))
+        )
+        self.assertEqual(
+            "00:00:00",
+            RelativeTimeTest.delta.to_json(None)
+        )
+        self.assertEqual(
+            "00:01:40",
+            RelativeTimeTest.delta.to_json(100.0)
+        )
+
+        with self.assertRaisesRegexp(ValueError, "RelativeTime max value is 23:59:59=86400.0 seconds, but 90000.0 seconds is passed"):
+            RelativeTimeTest.delta.to_json(datetime.timedelta(seconds=90000))
+
+        with self.assertRaises(TypeError):
+            RelativeTimeTest.delta.to_json("123")
+
+    def test_str(self):
+        self.assertEqual(
+            "01:02:03",
+            RelativeTimeTest.delta.to_json(datetime.timedelta(seconds=3723))
+        )
+        self.assertEqual(
+            "11:02:03",
+            RelativeTimeTest.delta.to_json(datetime.timedelta(seconds=39723))
+        )

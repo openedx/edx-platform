@@ -1,0 +1,35 @@
+<%! from django.utils.translation import ugettext as _ %>
+
+<div class="wrapper-content-supplementary">
+  <aside class="content-supplementary">
+    <ul class="list-help">
+      <li class="help-item help-item-questions">
+        <h3 class="title">${_("Have questions?")}</h3>
+        <div class="copy">
+            <p>${_("Please read {a_start}our FAQs to view common questions about our certificates{a_end}.").format(a_start='<a rel="external" href="'+ marketing_link('WHAT_IS_VERIFIED_CERT') + '">', a_end="</a>")}</p>
+        </div>
+      </li>
+
+      <li class="help-item help-item-coldfeet">
+        %if upgrade:
+          <h3 class="title">${_("Change your mind?")}</h3>
+          <div class="copy">
+            <p>${_("You can always continue to audit the course without verifying.")}</p>
+          </div>
+        %else:
+           <h3 class="title">${_("Change your mind?")}</h3>
+          <div class="copy">
+            <p>${_("You can always {a_start} audit the course for free {a_end} without verifying.").format(a_start='<a rel="external" href="/course_modes/choose/' + course_id + '">', a_end="</a>")}</p>
+          </div>
+        %endif
+      </li>
+
+      <li class="help-item help-item-technical">
+        <h3 class="title">${_("Technical Requirements")}</h3>
+        <div class="copy">
+          <p>${_("Please make sure your browser is updated to the {strong_start}{a_start}most recent version possible{a_end}{strong_end}. Also, please make sure your {strong_start}web cam is plugged in, turned on, and allowed to function in your web browser (commonly adjustable in your browser settings).{strong_end}").format(a_start='<a rel="external" href="http://browsehappy.com/">', a_end="</a>", strong_start="<strong>", strong_end="</strong>")}</p>
+        </div>
+      </li>
+    </ul>
+  </aside>
+</div> <!-- /wrapper-content-supplementary -->

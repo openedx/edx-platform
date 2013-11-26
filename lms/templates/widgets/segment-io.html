@@ -1,14 +1,21 @@
 % if settings.MITX_FEATURES.get('SEGMENT_IO_LMS'):
 <!-- begin Segment.io -->
+<%! from django.core.urlresolvers import reverse %>
+<%! import waffle %>
+
+<% active_flags = " + ".join(waffle.get_flags(request)) %>
+
 <script type="text/javascript">
   var analytics=analytics||[];analytics.load=function(e){var t=document.createElement("script");t.type="text/javascript",t.async=!0,t.src=("https:"===document.location.protocol?"https://":"http://")+"d2dq2ahtl5zl1z.cloudfront.net/analytics.js/v1/"+e+"/analytics.min.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(t,n);var r=function(e){return function(){analytics.push([e].concat(Array.prototype.slice.call(arguments,0)))}},i=["identify","track","trackLink","trackForm","trackClick","trackSubmit","pageview","ab","alias","ready"];for(var s=0;s<i.length;s++)analytics[i[s]]=r(i[s])};
   analytics.load("${ settings.SEGMENT_IO_LMS_KEY }");
 
   % if user.is_authenticated():
-  analytics.identify("${ user.id }", {
-      email     : "${ user.email }",
-      username  : "${ user.username }"
-  });
+
+    analytics.identify("${ user.id }", {
+      email          : "${ user.email }",
+      username       : "${ user.username }",
+      "Active Flags" : "${ active_flags }",
+    });
 
   % endif
 </script>

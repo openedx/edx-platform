@@ -4,8 +4,10 @@ if Backbone?
     events:
       "click .discussion-vote": "toggleVote"
       "click .discussion-flag-abuse": "toggleFlagAbuse"
+      "keypress .discussion-flag-abuse": "toggleFlagAbuseKeypress"
       "click .admin-pin": "togglePin"
       "click .action-follow": "toggleFollowing"
+      "keypress .action-follow": "toggleFollowingKeypress"
       "click .action-edit": "edit"
       "click .action-delete": "_delete"
       "click .action-openclose": "toggleClosed"
@@ -24,7 +26,6 @@ if Backbone?
     render: ->
       @$el.html(@renderTemplate())
       @delegateEvents()
-      @renderDogear()
       @renderVoted()
       @renderFlagged()
       @renderPinned()
@@ -35,24 +36,24 @@ if Backbone?
       @highlight @$("h1,h3")
       @
 
-    renderDogear: ->
-      if window.user.following(@model)
-        @$(".dogear").addClass("is-followed")
-
     renderVoted: =>
       if window.user.voted(@model)
         @$("[data-role=discussion-vote]").addClass("is-cast")
+        @$("[data-role=discussion-vote] span.sr").html("votes (click to remove your vote)")
       else
         @$("[data-role=discussion-vote]").removeClass("is-cast")
+        @$("[data-role=discussion-vote] span.sr").html("votes (click to vote)")
         
     renderFlagged: =>
       if window.user.id in @model.get("abuse_flaggers") or (DiscussionUtil.isFlagModerator and @model.get("abuse_flaggers").length > 0)
         @$("[data-role=thread-flag]").addClass("flagged")  
         @$("[data-role=thread-flag]").removeClass("notflagged")
+        @$(".discussion-flag-abuse").attr("aria-pressed", "true")
         @$(".discussion-flag-abuse .flag-label").html("Misuse Reported")
       else
         @$("[data-role=thread-flag]").removeClass("flagged")  
         @$("[data-role=thread-flag]").addClass("notflagged")      
+        @$(".discussion-flag-abuse").attr("aria-pressed", "false")
         @$(".discussion-flag-abuse .flag-label").html("Report Misuse")
 
     renderPinned: =>
@@ -70,7 +71,12 @@ if Backbone?
       @renderVoted()
       @renderFlagged()
       @renderPinned()
-      @$("[data-role=discussion-vote] .votes-count-number").html(@model.get("votes")["up_count"])
+      @$("[data-role=discussion-vote] .votes-count-number").html(@model.get("votes")["up_count"] + '<span class ="sr"></span>')
+      if window.user.voted(@model)
+        @$("[data-role=discussion-vote] .votes-count-number span.sr").html("votes (click to remove your vote)")
+      else
+        @$("[data-role=discussion-vote] .votes-count-number span.sr").html("votes (click to vote)")
+
 
     convertMath: ->
       element = @$(".post-body")
@@ -83,20 +89,6 @@ if Backbone?
         @unvote()
       else
         @vote()
-
-    toggleFollowing: (event) ->
-      $elem = $(event.target)
-      url = null
-      if not @model.get('subscribed')
-        @model.follow()
-        url = @model.urlFor("follow")
-      else
-        @model.unfollow()
-        url = @model.urlFor("unfollow")
-      DiscussionUtil.safeAjax
-        $elem: $elem
-        url: url
-        type: "POST"
 
     vote: ->
       window.user.vote(@model)

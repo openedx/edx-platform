@@ -1,16 +1,18 @@
 <%! from django.utils.translation import ugettext as _ %>
-<%! from django.utils import translation    %>
-
+<%! from django.core.urlresolvers import reverse %>
+<%! from auth.authz import is_user_in_course_group_role %>
+<%! import json %>
+<%! from xmodule.modulestore.django import loc_mapper %>
 <%inherit file="base.html" />
 <%block name="title">${_("Course Team Settings")}</%block>
-<%block name="bodyclass">is-signedin course users settings team</%block>
-
+<%block name="bodyclass">is-signedin course users view-team</%block>
 
 <%block name="content">
+
 <div class="wrapper-mast wrapper">
   <header class="mast has-actions has-subtitle">
     <h1 class="page-header">
-      <small class="subtitle">${_("Course Settings")}</small>
+      <small class="subtitle">${_("Settings")}</small>
       <span class="sr">&gt; </span>${_("Course Team")}
     </h1>
 
@@ -19,7 +21,7 @@
       <ul>
         %if allow_actions:
         <li class="nav-item">
-          <a href="#" class="button new-button new-user-button"><i class="icon-plus"></i>${_("New User")}</a>
+          <a href="#" class="button new-button create-user-button"><i class="icon-plus"></i> ${_("New Team Member")}</a>
         </li>
         %endif
       </ul>
@@ -27,106 +29,346 @@
   </header>
 </div>
 
-<div class="main-wrapper">
-  <div class="inner-wrapper">
-
-    <div class="details">
-      <p>${_("The following list of users have been designated as course staff. This means that these users will have permissions to modify course content. You may add additional course staff below, if you are the course instructor. Please note that they must have already registered and verified their account.")}</p>
-    </div>
-
-    <article class="user-overview">
+<div class="wrapper-content wrapper">
+  <section class="content">
+    <article class="content-primary" role="main">
       %if allow_actions:
-      <form class="new-user-form">
-        <div id="result"></div>
-        <div class="form-elements">
-          <label>email: </label><input type="text" id="email" class="email-input" autocomplete="off" placeholder="email@example.com">
-          <input type="submit" value="${_('Add User')}" id="add_user" class="add-button" />
-          <input type="button" value="${_('Cancel')}" class="cancel-button" />
-        </div>
-      </form>
-      %endif
-      <div>
-        <ol class="user-list">
-          % for user in staff:
-          <li>
-            <span class="user-name">${user.username}</span>
-            <span class="user-email">${user.email}</span>
-            %if allow_actions :
-            <div class="item-actions">
-              %if request_user_id != user.id:
-              <a href="#" class="delete-button remove-user" data-id="${user.email}"><span class="delete-icon"></span></a>
-              %endif
-            </div>
-            %endif
-          </li>
-          % endfor
-        </ol>
+      <div class="wrapper-create-element animate wrapper-create-user">
+        <form class="create-user" id="create-user-form" name="create-user-form">
+          <div class="wrapper-form">
+            <h3 class="title">${_("Add a User to Your Course's Team")}</h3>
+
+            <fieldset class="form-fields">
+              <legend class="sr">${_("New Team Member Information")}</legend>
+
+                <ol class="list-input">
+                  <li class="field text required create-user-email">
+                    <label for="user-email-input">${_("User's Email Address")}</label>
+                    <input id="user-email-input" name="user-email" type="text" placeholder="${_('e.g. jane.doe@gmail.com')}" value="">
+                    <span class="tip tip-stacked">${_("Please provide the email address of the course staff member you'd like to add")}</span>
+                  </li>
+                </ol>
+            </fieldset>
+          </div>
+
+          <div class="actions">
+            <button class="action action-primary" type="submit">${_("Add User")}</button>
+            <button class="action action-secondary action-cancel">${_("Cancel")}</button>
+          </div>
+        </form>
       </div>
+      %endif
+
+      <ol class="user-list">
+        <% new_location = loc_mapper().translate_location(context_course.location.course_id, context_course.location, False, True) %>
+        % for user in staff:
+
+        <li class="user-item" data-email="${user.email}" data-url="${new_location.url_reverse('course_team/', user.email) }">
+
+        <% is_instuctor = is_user_in_course_group_role(user, context_course.location, 'instructor', check_staff=False) %>
+          % if is_instuctor:
+          <span class="wrapper-ui-badge">
+            <span class="flag flag-role flag-role-admin is-hanging">
+              <span class="label sr">${_("Current Role:")}</span>
+              <span class="value">
+                ${_("Admin")}
+                % if request.user.id == user.id:
+                    <span class="msg-you">${_("You!")}</span>
+                % endif
+              </span>
+            </span>
+          </span>
+          % else:
+          <span class="wrapper-ui-badge">
+            <span class="flag flag-role flag-role-staff is-hanging">
+              <span class="label sr">${_("Current Role:")}</span>
+              <span class="value">
+                ${_("Staff")}
+                % if request.user.id == user.id:
+                    <span class="msg-you">${_("You!")}</span>
+                % endif
+              </span>
+            </span>
+          </span>
+          % endif
+
+          <div class="item-metadata">
+            <h3 class="user-name">
+              <span class="user-username">${user.username}</span>
+              <span class="user-email">
+                <a class="action action-email" href="mailto:${user.email}" title="${_("send an email message to {email}").format(email=user.email)}">${user.email}</a>
+              </span>
+            </h3>
+          </div>
+
+          % if allow_actions:
+          <ul  class="item-actions user-actions">
+            <li class="action action-role">
+              % if is_instuctor and len(instructors) == 1:
+                <span class="admin-role notoggleforyou">${_("Promote another member to Admin to remove your admin rights")}</span>
+              % else:
+                <a href="#" class="admin-role toggle-admin-role ${'remove' if is_instuctor else 'add'}-admin-role">${_("Remove Admin Access") if is_instuctor else _("Add Admin Access")}</a>
+              % endif
+            </li>
+            <li class="action action-delete ${"is-disabled" if request.user.id == user.id else ""}">
+                <a href="#" class="delete remove-user action-icon" data-id="${user.email}"><i class="icon-trash"></i><span class="sr">${_("Delete the user, {username}").format(username=user.username)}</span></a>
+            </li>
+          </ul>
+          % endif
+
+        </li>
+        % endfor
+      </ol>
+
+      <% user_is_instuctor = is_user_in_course_group_role(request.user, context_course.location, 'instructor', check_staff=False) %>
+      % if user_is_instuctor and len(staff) == 1:
+      <div class="notice notice-incontext notice-create has-actions">
+        <div class="msg">
+          <h3 class="title">${_('Add Team Members to This Course')}</h3>
+          <div class="copy">
+            <p>${_('Adding team members makes course authoring collaborative. Users must be signed up for Studio and have an active account. ')}</p>
+          </div>
+        </div>
+
+        <ul class="list-actions">
+          <li class="action-item">
+            <a href="#" class="action action-primary button new-button create-user-button"><i class="icon-plus icon-inline"></i> ${_('Add a New Team Member')}</a>
+          </li>
+        </ul>
+      </div>
+      %endif
     </article>
-  </div>
+
+    <aside class="content-supplementary" role="complimentary">
+      <div class="bit">
+        <h3 class="title-3">${_("Course Team Roles")}</h3>
+        <p>${_("Course team members, or staff, are course co-authors. They have full writing and editing privileges on all course content.")}</p>
+        <p>${_("Admins are course team members who can add and remove other course team members.")}</p>      
+      </div>
+
+      % if user_is_instuctor and len(instructors) == 1:
+      <div class="bit">
+        <h3 class="title-3">${_("Transferring Ownership")}</h3>
+        <p>${_("Every course must have an Admin. If you're the Admin and you want transfer ownership of the course, click Add admin access to make another user the Admin, then ask that user to remove you from the Course Team list.")}</p>
+      </div>
+      % endif
+    </aside>
+  </section>
 </div>
 </%block>
 
 <%block name="jsextra">
 <script type="text/javascript">
-  var $newUserForm;
+require(["jquery", "underscore", "gettext", "js/views/feedback_prompt"],
+    function($, _, gettext, PromptView) {
 
-  function showNewUserForm(e) {
-    e.preventDefault();
-    $newUserForm.slideDown(150);
-    $newUserForm.find('.email-input').focus();
-  }
+  var staffEmails = ${json.dumps([user.email for user in staff])};
+  var tplUserURL = "${loc_mapper().\
+      translate_location(context_course.location.course_id, context_course.location, False, True).\
+      url_reverse('course_team/', "@@EMAIL@@")}";
 
-  function hideNewUserForm(e) {
-    e.preventDefault();
-    $newUserForm.slideUp(150);
-    $('#result').hide();
-    $('#email').val('');
-  }
-
-  function checkForCancel(e) {
-    if(e.which == 27) {
-      e.data.$cancelButton.click();
-    }
-  }
-
-  function addUser(e) {
-    e.preventDefault();
-
-    $.ajax({
-      url: '${add_user_postback_url}',
-      type: 'POST',
-      dataType: 'json',
-      contentType: 'application/json',
-      data:JSON.stringify({ 'email': $('#email').val()}),
-    }).done(function(data) {
-      if (data.ErrMsg != undefined)
-        $('#result').show().empty().append(data.ErrMsg);
-      else
-        location.reload();
-    });
-  }
+  var unknownErrorMessage = gettext("Unknown");
 
   $(document).ready(function() {
-    $newUserForm = $('.new-user-form');
-    var $cancelButton = $newUserForm.find('.cancel-button');
-    $newUserForm.bind('submit', addUser);
-    $cancelButton.bind('click', hideNewUserForm);
-
-    $('.new-user-button').bind('click', showNewUserForm);
-    $('body').bind('keyup', { $cancelButton: $cancelButton }, checkForCancel);
-
-    $('.remove-user').click(function() {
+    var $createUserForm = $('#create-user-form');
+    var $createUserFormWrapper = $createUserForm.closest('.wrapper-create-user');
+    $createUserForm.bind('submit', function(e) {
+      e.preventDefault();
+      var email = $('#user-email-input').val().trim();
+      if(!email) {
+        var msg = new PromptView.Error({
+          title: gettext("A valid email address is required"),
+          message: gettext("You must enter a valid email address in order to add a new team member"),
+          actions: {
+            primary: {
+              text: gettext("Return and add email address"),
+              click: function(view) {
+                view.hide();
+                $("#user-email-input").focus();
+              }
+            }
+          }
+        })
+        msg.show();
+        return;
+      }
+      if(_.contains(staffEmails, email)) {
+        var msg = new PromptView.Warning({
+          title: gettext("Already a course team member"),
+          message: _.template(gettext("{email} is already on the “{course}” team. If you're trying to add a new member, please double-check the email address you provided."), {email: email, course: course.escape('name')}, {interpolate: /\{(.+?)\}/g}),
+          actions: {
+            primary: {
+              text: gettext("Return to team listing"),
+              click: function(view) {
+                view.hide();
+                $("#user-email-input").focus();
+              }
+            }
+          }
+        })
+        msg.show();
+        return;
+      }
+      var url = tplUserURL.replace("@@EMAIL@@", $('#user-email-input').val().trim())
       $.ajax({
-        url: '${remove_user_postback_url}',
+        url: url,
         type: 'POST',
         dataType: 'json',
         contentType: 'application/json',
-        data:JSON.stringify({ 'email': $(this).data('id')}),
-        }).done(function() {
+        data: JSON.stringify({
+          role: 'staff',
+        }),
+        success: function(data) {
           location.reload();
-        })
+        },
+        notifyOnError: false,
+        error: function(jqXHR, textStatus, errorThrown) {
+          var message;
+          try {
+            message = JSON.parse(jqXHR.responseText).error || unknownErrorMessage;
+          } catch (e) {
+            message = unknownErrorMessage
+          }
+          var prompt = new PromptView.Error({
+            title: gettext("Error adding user"),
+            message: message,
+            actions: {
+              primary: {
+                text: gettext("OK"),
+                click: function(view) {
+                  view.hide();
+                  $("#user-email-input").focus()
+                }
+              }
+            }
+          })
+          prompt.show();
+        }
+      });
     });
+
+    var $cancelButton = $createUserForm.find('.action-cancel');
+    $cancelButton.bind('click', function(e) {
+      e.preventDefault();
+      $('.create-user-button').toggleClass('is-disabled');
+      $createUserFormWrapper.toggleClass('is-shown');
+      $('#user-email-input').val('');
+    });
+
+    $('.create-user-button').bind('click', function(e) {
+      e.preventDefault();
+      $('.create-user-button').toggleClass('is-disabled');
+      $createUserFormWrapper.toggleClass('is-shown');
+      $createUserForm.find('#user-email-input').focus();
+    });
+
+    $('body').bind('keyup', function(e) {
+      if(e.which == 27) {
+        $cancelButton.click();
+      }
+    });
+
+    $('.remove-user').click(function() {
+      var email = $(this).data('id');
+      var msg = new PromptView.Warning({
+        title: gettext("Are you sure?"),
+        message: _.template(gettext("Are you sure you want to delete {email} from the course team for “{course}”?"), {email: email, course: course.get('name')}, {interpolate: /\{(.+?)\}/g}),
+        actions: {
+          primary: {
+            text: gettext("Delete"),
+            click: function(view) {
+              view.hide();
+              var url = tplUserURL.replace("@@EMAIL@@", email)
+              $.ajax({
+                url: url,
+                type: 'DELETE',
+                dataType: 'json',
+                contentType: 'application/json',
+                success: function(data) {
+                  location.reload();
+                },
+                notifyOnError: false,
+                error: function(jqXHR, textStatus, errorThrown) {
+                  var message;
+                  try {
+                    message = JSON.parse(jqXHR.responseText).error || unknownErrorMessage;
+                  } catch (e) {
+                    message = unknownErrorMessage;
+                  }
+                  var prompt = new PromptView.Error({
+                    title: gettext("Error removing user"),
+                    message: message,
+                    actions: {
+                      primary: {
+                        text: gettext("OK"),
+                        click: function(view) {
+                          view.hide();
+                        }
+                      }
+                    }
+                  })
+                  prompt.show();
+                }
+              });
+            }
+          },
+          secondary: {
+            text: gettext("Cancel"),
+            click: function(view) {
+              view.hide();
+            }
+          }
+        }
+      });
+      msg.show();
+    });
+
+    $(".toggle-admin-role").click(function(e) {
+      e.preventDefault()
+      var type;
+      if($(this).hasClass("add-admin-role")) {
+        role = 'instructor';
+      } else {
+        role = 'staff';
+      }
+      var url = $(this).closest("li[data-url]").data("url");
+      $.ajax({
+        url: url,
+        type: 'POST',
+        dataType: 'json',
+        contentType: 'application/json',
+        data: JSON.stringify({
+          role: role
+        }),
+        success: function(data) {
+          location.reload();
+        },
+        notifyOnError: false,
+        error: function(jqXHR, textStatus, errorThrown) {
+          var message;
+          try {
+            message = JSON.parse(jqXHR.responseText).error || unknownErrorMessage;
+          } catch (e) {
+            message = unknownErrorMessage;
+          }
+          var prompt = new PromptView.Error({
+            title: gettext("There was an error changing the user's role"),
+            message: message,
+            actions: {
+              primary: {
+                text: gettext("Try Again"),
+                click: function(view) {
+                  view.hide();
+                }
+              }
+            }
+          })
+          prompt.show();
+        }
+      })
+    })
+
   });
+});
 </script>
 </%block>

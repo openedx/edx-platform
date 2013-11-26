@@ -5,18 +5,38 @@ from pkg_resources import resource_string
 
 from xmodule.raw_module import RawDescriptor
 from .x_module import XModule
-from xblock.core import Integer, Scope, String, List, Float, Boolean
+from xblock.fields import Integer, Scope, String, List, Float, Boolean
 from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import CombinedOpenEndedV1Module, CombinedOpenEndedV1Descriptor
 from collections import namedtuple
-from .fields import Date
+from .fields import Date, Timedelta
+import textwrap
 
 log = logging.getLogger("mitx.courseware")
 
-V1_SETTINGS_ATTRIBUTES = ["display_name", "attempts", "is_graded", "accept_file_upload",
-                          "skip_spelling_checks", "due", "graceperiod", "weight"]
+V1_SETTINGS_ATTRIBUTES = [
+    "display_name",
+    "max_attempts",
+    "graded",
+    "accept_file_upload",
+    "skip_spelling_checks",
+    "due",
+    "graceperiod",
+    "weight",
+    "min_to_calibrate",
+    "max_to_calibrate",
+    "peer_grader_count",
+    "required_peer_grading",
+    "peer_grade_finished_submissions_when_none_pending",
+]
 
-V1_STUDENT_ATTRIBUTES = ["current_task_number", "task_states", "state",
-                         "student_attempts", "ready_to_reset"]
+V1_STUDENT_ATTRIBUTES = [
+    "current_task_number",
+    "task_states",
+    "state",
+    "student_attempts",
+    "ready_to_reset",
+    "old_task_states",
+]
 
 V1_ATTRIBUTES = V1_SETTINGS_ATTRIBUTES + V1_STUDENT_ATTRIBUTES
 
@@ -27,6 +47,126 @@ VERSION_TUPLES = {
 }
 
 DEFAULT_VERSION = 1
+DEFAULT_DATA = textwrap.dedent("""\
+<combinedopenended>
+    <prompt>
+        <h3>Censorship in the Libraries</h3>
+
+        <p>'All of us can think of a book that we hope none of our children or any other children have taken off the shelf. But if I have the right to remove that book from the shelf -- that work I abhor -- then you also have exactly the same right and so does everyone else. And then we have no books left on the shelf for any of us.' --Katherine Paterson, Author
+        </p>
+
+        <p>
+        Write a persuasive essay to a newspaper reflecting your views on censorship in libraries. Do you believe that certain materials, such as books, music, movies, magazines, etc., should be removed from the shelves if they are found offensive? Support your position with convincing arguments from your own experience, observations, and/or reading.
+        </p>
+
+    </prompt>
+    <rubric>
+        <rubric>
+            <category>
+                <description>
+                Ideas
+                </description>
+                <option>
+                Difficult for the reader to discern the main idea.  Too brief or too repetitive to establish or maintain a focus.
+                </option>
+                <option>
+                Attempts a main idea.  Sometimes loses focus or ineffectively displays focus.
+                </option>
+                <option>
+                Presents a unifying theme or main idea, but may include minor tangents.  Stays somewhat focused on topic and task.
+                </option>
+                <option>
+                Presents a unifying theme or main idea without going off on tangents.  Stays completely focused on topic and task.
+                </option>
+            </category>
+            <category>
+                <description>
+                Content
+                </description>
+                <option>
+                Includes little information with few or no details or unrelated details.  Unsuccessful in attempts to explore any facets of the topic.
+                </option>
+                <option>
+                Includes little information and few or no details.  Explores only one or two facets of the topic.
+                </option>
+                <option>
+                Includes sufficient information and supporting details. (Details may not be fully developed; ideas may be listed.)  Explores some facets of the topic.
+                </option>
+                <option>
+                Includes in-depth information and exceptional supporting details that are fully developed.  Explores all facets of the topic.
+                </option>
+            </category>
+            <category>
+            <description>
+                Organization
+                </description>
+                <option>
+                Ideas organized illogically, transitions weak, and response difficult to follow.
+                </option>
+                <option>
+                Attempts to logically organize ideas.  Attempts to progress in an order that enhances meaning, and demonstrates use of transitions.
+                </option>
+                <option>
+                Ideas organized logically.  Progresses in an order that enhances meaning.  Includes smooth transitions.
+                </option>
+            </category>
+            <category>
+                <description>
+                Style
+                </description>
+                <option>
+                Contains limited vocabulary, with many words used incorrectly.  Demonstrates problems with sentence patterns.
+                </option>
+                <option>
+                Contains basic vocabulary, with words that are predictable and common.  Contains mostly simple sentences (although there may be an attempt at more varied sentence patterns).
+                </option>
+                <option>
+                Includes vocabulary to make explanations detailed and precise.  Includes varied sentence patterns, including complex sentences.
+                </option>
+            </category>
+            <category>
+                <description>
+                Voice
+                </description>
+                <option>
+                Demonstrates language and tone that may be inappropriate to task and reader.
+                </option>
+                <option>
+                Demonstrates an attempt to adjust language and tone to task and reader.
+                </option>
+                <option>
+                Demonstrates effective adjustment of language and tone to task and reader.
+                </option>
+
+            </category>
+        </rubric>
+    </rubric>
+
+    <task>
+    <selfassessment/></task>
+    <task>
+
+        <openended min_score_to_attempt="4" max_score_to_attempt="12" >
+            <openendedparam>
+                <initial_display>Enter essay here.</initial_display>
+                <answer_display>This is the answer.</answer_display>
+                <grader_payload>{"grader_settings" : "ml_grading.conf", "problem_id" : "6.002x/Welcome/OETest"}</grader_payload>
+            </openendedparam>
+        </openended>
+    </task>
+    <task>
+
+        <openended min_score_to_attempt="9" max_score_to_attempt="12" >
+            <openendedparam>
+                <initial_display>Enter essay here.</initial_display>
+                <answer_display>This is the answer.</answer_display>
+                <grader_payload>{"grader_settings" : "peer_grading.conf", "problem_id" : "6.002x/Welcome/OETest"}</grader_payload>
+            </openendedparam>
+        </openended>
+    </task>
+
+</combinedopenended>
+""")
 
 
 class VersionInteger(Integer):
@@ -51,47 +191,171 @@ class CombinedOpenEndedFields(object):
     display_name = String(
         display_name="Display Name",
         help="This name appears in the horizontal navigation at the top of the page.",
-        default="Open Ended Grading", scope=Scope.settings
+        default="Open Response Assessment",
+        scope=Scope.settings
     )
-    current_task_number = Integer(help="Current task that the student is on.", default=0, scope=Scope.user_state)
-    task_states = List(help="List of state dictionaries of each task within this module.", scope=Scope.user_state)
-    state = String(help="Which step within the current task that the student is on.", default="initial",
-                   scope=Scope.user_state)
-    student_attempts = Integer(help="Number of attempts taken by the student on this problem", default=0,
-                               scope=Scope.user_state)
-    ready_to_reset = Boolean(
-        help="If the problem is ready to be reset or not.", default=False,
+    current_task_number = Integer(
+        help="Current task that the student is on.",
+        default=0,
         scope=Scope.user_state
     )
-    attempts = Integer(
-        display_name="Maximum Attempts",
-        help="The number of times the student can try to answer this problem.", default=1,
-        scope=Scope.settings, values={"min" : 1 }
+    old_task_states = List(
+        help=("A list of lists of state dictionaries for student states that are saved."
+               "This field is only populated if the instructor changes tasks after"
+               "the module is created and students have attempted it (for example changes a self assessed problem to "
+               "self and peer assessed."),
+        scope = Scope.user_state
     )
-    is_graded = Boolean(display_name="Graded", help="Whether or not the problem is graded.", default=False, scope=Scope.settings)
+    task_states = List(
+        help="List of state dictionaries of each task within this module.",
+        scope=Scope.user_state
+    )
+    state = String(
+        help="Which step within the current task that the student is on.",
+        default="initial",
+        scope=Scope.user_state
+    )
+    graded = Boolean(
+        display_name="Graded",
+        help='Defines whether the student gets credit for grading this problem.',
+        default=False,
+        scope=Scope.settings
+    )
+    student_attempts = Integer(
+        help="Number of attempts taken by the student on this problem",
+        default=0,
+        scope=Scope.user_state
+    )
+    ready_to_reset = Boolean(
+        help="If the problem is ready to be reset or not.",
+        default=False,
+        scope=Scope.user_state
+    )
+    max_attempts = Integer(
+        display_name="Maximum Attempts",
+        help="The number of times the student can try to answer this problem.",
+        default=1,
+        scope=Scope.settings,
+        values={"min": 1 }
+    )
     accept_file_upload = Boolean(
         display_name="Allow File Uploads",
-        help="Whether or not the student can submit files as a response.", default=False, scope=Scope.settings
+        help="Whether or not the student can submit files as a response.",
+        default=False,
+        scope=Scope.settings
     )
     skip_spelling_checks = Boolean(
         display_name="Disable Quality Filter",
         help="If False, the Quality Filter is enabled and submissions with poor spelling, short length, or poor grammar will not be peer reviewed.",
-        default=False, scope=Scope.settings
+        default=False,
+        scope=Scope.settings
     )
-    due = Date(help="Date that this problem is due by", default=None, scope=Scope.settings)
-    graceperiod = String(
+    track_changes = Boolean(
+        display_name="Peer Track Changes",
+        help=("EXPERIMENTAL FEATURE FOR PEER GRADING ONLY:  "
+              "If set to 'True', peer graders will be able to make changes to the student "
+              "submission and those changes will be tracked and shown along with the graded feedback."),
+        default=False,
+        scope=Scope.settings
+    )
+    due = Date(
+        help="Date that this problem is due by",
+        scope=Scope.settings
+    )
+    graceperiod = Timedelta(
         help="Amount of time after the due date that submissions will be accepted",
-        default=None,
         scope=Scope.settings
     )
     version = VersionInteger(help="Current version number", default=DEFAULT_VERSION, scope=Scope.settings)
-    data = String(help="XML data for the problem", scope=Scope.content)
+    data = String(help="XML data for the problem", scope=Scope.content,
+        default=DEFAULT_DATA)
     weight = Float(
         display_name="Problem Weight",
         help="Defines the number of points each problem is worth. If the value is not set, each problem is worth one point.",
-        scope=Scope.settings, values={"min" : 0 , "step": ".1"}
+        scope=Scope.settings,
+        values={"min": 0, "step": ".1"},
+        default=1
     )
-    markdown = String(help="Markdown source of this module", scope=Scope.settings)
+    min_to_calibrate = Integer(
+        display_name="Minimum Peer Grading Calibrations",
+        help="The minimum number of calibration essays each student will need to complete for peer grading.",
+        default=3,
+        scope=Scope.settings,
+        values={"min": 1, "max": 20, "step": "1"}
+    )
+    max_to_calibrate = Integer(
+        display_name="Maximum Peer Grading Calibrations",
+        help="The maximum number of calibration essays each student will need to complete for peer grading.",
+        default=6,
+        scope=Scope.settings,
+        values={"min": 1, "max": 20, "step": "1"}
+    )
+    peer_grader_count = Integer(
+        display_name="Peer Graders per Response",
+        help="The number of peers who will grade each submission.",
+        default=3,
+        scope=Scope.settings,
+        values={"min": 1, "step": "1", "max": 5}
+    )
+    required_peer_grading = Integer(
+        display_name="Required Peer Grading",
+        help="The number of other students each student making a submission will have to grade.",
+        default=3,
+        scope=Scope.settings,
+        values={"min": 1, "step": "1", "max": 5}
+    )
+    peer_grade_finished_submissions_when_none_pending = Boolean(
+        display_name='Allow "overgrading" of peer submissions',
+        help=("EXPERIMENTAL FEATURE.  Allow students to peer grade submissions that already have the requisite number of graders, "
+              "but ONLY WHEN all submissions they are eligible to grade already have enough graders.  "
+              "This is intended for use when settings for `Required Peer Grading` > `Peer Graders per Response`"),
+        default=False,
+        scope=Scope.settings,
+    )
+    markdown = String(
+        help="Markdown source of this module",
+        default=textwrap.dedent("""\
+                    [prompt]
+                        <h3>Censorship in the Libraries</h3>
+
+                        <p>'All of us can think of a book that we hope none of our children or any other children have taken off the shelf. But if I have the right to remove that book from the shelf -- that work I abhor -- then you also have exactly the same right and so does everyone else. And then we have no books left on the shelf for any of us.' --Katherine Paterson, Author
+                        </p>
+
+                        <p>
+                        Write a persuasive essay to a newspaper reflecting your vies on censorship in libraries. Do you believe that certain materials, such as books, music, movies, magazines, etc., should be removed from the shelves if they are found offensive? Support your position with convincing arguments from your own experience, observations, and/or reading.
+                        </p>
+                    [prompt]
+                    [rubric]
+                    + Ideas
+                    - Difficult for the reader to discern the main idea.  Too brief or too repetitive to establish or maintain a focus.
+                    - Attempts a main idea.  Sometimes loses focus or ineffectively displays focus.
+                    - Presents a unifying theme or main idea, but may include minor tangents.  Stays somewhat focused on topic and task.
+                    - Presents a unifying theme or main idea without going off on tangents.  Stays completely focused on topic and task.
+                    + Content
+                    - Includes little information with few or no details or unrelated details.  Unsuccessful in attempts to explore any facets of the topic.
+                    - Includes little information and few or no details.  Explores only one or two facets of the topic.
+                    - Includes sufficient information and supporting details. (Details may not be fully developed; ideas may be listed.)  Explores some facets of the topic.
+                    - Includes in-depth information and exceptional supporting details that are fully developed.  Explores all facets of the topic.
+                    + Organization
+                    - Ideas organized illogically, transitions weak, and response difficult to follow.
+                    - Attempts to logically organize ideas.  Attempts to progress in an order that enhances meaning, and demonstrates use of transitions.
+                    - Ideas organized logically.  Progresses in an order that enhances meaning.  Includes smooth transitions.
+                    + Style
+                    - Contains limited vocabulary, with many words used incorrectly.  Demonstrates problems with sentence patterns.
+                    - Contains basic vocabulary, with words that are predictable and common.  Contains mostly simple sentences (although there may be an attempt at more varied sentence patterns).
+                    - Includes vocabulary to make explanations detailed and precise.  Includes varied sentence patterns, including complex sentences.
+                    + Voice
+                    - Demonstrates language and tone that may be inappropriate to task and reader.
+                    - Demonstrates an attempt to adjust language and tone to task and reader.
+                    - Demonstrates effective adjustment of language and tone to task and reader.
+                    [rubric]
+                    [tasks]
+                    (Self), ({4-12}AI), ({9-12}Peer)
+                    [tasks]
+
+        """),
+        scope=Scope.settings
+    )
 
 
 class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):
@@ -143,37 +407,9 @@ class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):
 
     def __init__(self, *args, **kwargs):
         """
-        Definition file should have one or many task blocks, a rubric block, and a prompt block:
+        Definition file should have one or many task blocks, a rubric block, and a prompt block.
 
-        Sample file:
-        <combinedopenended attempts="10000">
-            <rubric>
-                Blah blah rubric.
-            </rubric>
-            <prompt>
-                Some prompt.
-            </prompt>
-            <task>
-                <selfassessment>
-                    <hintprompt>
-                        What hint about this problem would you give to someone?
-                    </hintprompt>
-                    <submitmessage>
-                        Save Succcesful.  Thanks for participating!
-                    </submitmessage>
-                </selfassessment>
-            </task>
-            <task>
-                <openended min_score_to_attempt="1" max_score_to_attempt="1">
-                        <openendedparam>
-                            <initial_display>Enter essay here.</initial_display>
-                            <answer_display>This is the answer.</answer_display>
-                            <grader_payload>{"grader_settings" : "ml_grading.conf",
-                            "problem_id" : "6.002x/Welcome/OETest"}</grader_payload>
-                        </openendedparam>
-                </openended>
-            </task>
-        </combinedopenended>
+        See DEFAULT_DATA for a sample.
 
         """
         XModule.__init__(self, *args, **kwargs)
@@ -182,6 +418,9 @@ class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):
 
         if self.task_states is None:
             self.task_states = []
+
+        if self.old_task_states is None:
+            self.old_task_states = []
 
         version_tuple = VERSION_TUPLES[self.version]
 
@@ -253,6 +492,11 @@ class CombinedOpenEndedDescriptor(CombinedOpenEndedFields, RawDescriptor):
     js = {'coffee': [resource_string(__name__, 'js/src/combinedopenended/edit.coffee')]}
     js_module_name = "OpenEndedMarkdownEditingDescriptor"
     css = {'scss': [resource_string(__name__, 'css/editor/edit.scss'), resource_string(__name__, 'css/combinedopenended/edit.scss')]}
+
+    metadata_translations = {
+        'is_graded': 'graded',
+        'attempts': 'max_attempts',
+    }
 
     def get_context(self):
         _context = RawDescriptor.get_context(self)

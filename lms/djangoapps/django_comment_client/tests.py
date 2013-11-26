@@ -26,8 +26,8 @@ class PermissionsTestCase(TestCase):
                                              password="123456", email="staff@edx.org")
         self.moderator.is_staff = True
         self.moderator.save()
-        self.student_enrollment = CourseEnrollment.objects.create(user=self.student, course_id=self.course_id)
-        self.moderator_enrollment = CourseEnrollment.objects.create(user=self.moderator, course_id=self.course_id)
+        self.student_enrollment = CourseEnrollment.enroll(self.student, self.course_id)
+        self.moderator_enrollment = CourseEnrollment.enroll(self.moderator, self.course_id)
 
     def tearDown(self):
         self.student_enrollment.delete()

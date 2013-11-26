@@ -1,5 +1,3 @@
 <%! from django.utils.translation import ugettext as _ %>
-
-
-<h1>${_("Check your email")}</h1>
-<p>${_("An activation link has been sent to { email }, along with instructions for activating your account.")}.format(email=email)</p>
+<h1>Check your email</h1>
+<p>${_("An activation link has been sent to {emaiL}, along with instructions for activating your account.").format(email=email)}</p>

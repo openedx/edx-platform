@@ -1,13 +1,10 @@
-<%! from django.utils.translation import ugettext as _ %>
-
-
 <%inherit file="base.html" />
-<%! from django.core.urlresolvers import reverse %>
-
-
-<%block name="title">Sign In</%block>
-<%block name="bodyclass">not-signedin signin</%block>
-
+<%!
+from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
+%>
+<%block name="title">${_("Sign In")}</%block>
+<%block name="bodyclass">not-signedin view-signin</%block>
 
 <%block name="content">
 
@@ -20,20 +17,20 @@
 
     <article class="content-primary" role="main">
       <form id="login_form" method="post" action="login_post">
-        
+
         <fieldset>
           <legend class="sr">${_("Required Information to Sign In to edX Studio")}</legend>
-          
+
           <ol class="list-input">
             <li class="field text required" id="field-email">
               <label for="email">${_("Email Address")}</label>
-              <input id="email" type="email" name="email" placeholder="e.g. jane.doe@gmail.com" />              
+              <input id="email" type="email" name="email" placeholder="e.g. jane.doe@gmail.com" />
             </li>
 
             <li class="field text required" id="field-password">
               <a href="${forgot_password_link}" class="action action-forgotpassword" tabindex="-1">${_("Forgot password?")}</a>
               <label for="password">${_("Password")}</label>
-              <input id="password" type="password" name="password" />              
+              <input id="password" type="password" name="password" />
             </li>
           </ol>
         </fieldset>
@@ -52,7 +49,7 @@
 
       <div class="bit">
         <h3 class="title-3">${_("Need Help?")}</h3>
-         <p>${_("Having trouble with your account? Use")} <a href="http://help.edge.edx.org" rel="external">${_("our support center")}</a> ${_("to look over self help steps, find solutions others have found to the same problem, or let us know of your issue.")}</p>
+        <p>${_('Having trouble with your account? Use {link_start}our support center{link_end} to look over self help steps, find solutions others have found to the same problem, or let us know of your issue.').format(link_start='<a href="http://help.edge.edx.org" rel="external">', link_end='</a>')}</p>
       </div>
     </aside>
   </section>
@@ -61,17 +58,14 @@
 
 <%block name="jsextra">
 <script type="text/javascript">
-(function() {
-  function getCookie(name) {
-    return $.cookie(name);
-  }
+require(["jquery", "jquery.cookie", "utility"], function($) {
   function postJSON(url, data, callback) {
     $.ajax({type:'POST',
       url: url,
       dataType: 'json',
       data: data,
       success: callback,
-      headers : {'X-CSRFToken':getCookie('csrftoken')}
+      headers : {'X-CSRFToken':$.cookie('csrftoken')}
     });
   }
 
@@ -84,7 +78,7 @@
       function(json) {
         if(json.success) {
           var next = /next=([^&]*)/g.exec(decodeURIComponent(window.location.search));
-          if (next && next.length > 1) {
+          if (next && next.length > 1 && !isExternal(next[1])) {
             location.href = next[1];
           }
           else location.href = "${reverse('homepage')}";
@@ -98,6 +92,6 @@
       }
     );
   });
-})(this)
+});
 </script>
 </%block>

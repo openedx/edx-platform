@@ -1,9 +1,7 @@
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 
-import mitxmako.middleware as middleware
-
-middleware.MakoMiddleware()
+import mitxmako
 
 
 class Command(BaseCommand):
@@ -17,8 +15,8 @@ body, and an _subject.txt for the subject. '''
         #text = open(args[0]).read()
         #subject = open(args[1]).read()
         users = User.objects.all()
-        text = middleware.lookup['main'].get_template('email/' + args[0] + ".txt").render()
-        subject = middleware.lookup['main'].get_template('email/' + args[0] + "_subject.txt").render().strip()
+        text = mitxmako.lookup['main'].get_template('email/' + args[0] + ".txt").render()
+        subject = mitxmako.lookup['main'].get_template('email/' + args[0] + "_subject.txt").render().strip()
         for user in users:
             if user.is_active:
                 user.email_user(subject, text)

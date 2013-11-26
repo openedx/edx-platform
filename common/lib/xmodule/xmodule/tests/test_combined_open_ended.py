@@ -1,30 +1,3 @@
-import json
-from mock import Mock, MagicMock, ANY
-import unittest
-
-from test_util_open_ended import MockQueryDict, DummyModulestore
-
-from xmodule.open_ended_grading_classes.openendedchild import OpenEndedChild
-from xmodule.open_ended_grading_classes.open_ended_module import OpenEndedModule
-from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import CombinedOpenEndedV1Module
-from xmodule.open_ended_grading_classes.grading_service_module import GradingServiceError
-from xmodule.combined_open_ended_module import CombinedOpenEndedModule
-from xmodule.modulestore import Location
-
-from lxml import etree
-import capa.xqueue_interface as xqueue_interface
-from datetime import datetime
-import logging
-
-log = logging.getLogger(__name__)
-
-from . import get_test_system
-
-ORG = 'edX'
-COURSE = 'open_ended'      # name of directory with course data
-
-import test_util_open_ended
-
 """
 Tests for the various pieces of the CombinedOpenEndedGrading system
 
@@ -32,6 +5,40 @@ OpenEndedChild
 OpenEndedModule
 
 """
+
+import json
+import logging
+import unittest
+
+from datetime import datetime
+from lxml import etree
+from mock import Mock, MagicMock, ANY, patch
+from pytz import UTC
+from webob.multidict import MultiDict
+
+from xmodule.open_ended_grading_classes.openendedchild import OpenEndedChild
+from xmodule.open_ended_grading_classes.open_ended_module import OpenEndedModule
+from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import CombinedOpenEndedV1Module
+from xmodule.open_ended_grading_classes.grading_service_module import GradingServiceError
+from xmodule.combined_open_ended_module import CombinedOpenEndedModule
+from xmodule.modulestore import Location
+from xmodule.tests import get_test_system, test_util_open_ended
+from xmodule.progress import Progress
+from xmodule.tests.test_util_open_ended import (
+    DummyModulestore, TEST_STATE_SA_IN,
+    MOCK_INSTANCE_STATE, TEST_STATE_SA, TEST_STATE_AI, TEST_STATE_AI2, TEST_STATE_AI2_INVALID,
+    TEST_STATE_SINGLE, TEST_STATE_PE_SINGLE, MockUploadedFile
+)
+
+from xblock.field_data import DictFieldData
+from xblock.fields import ScopeIds
+import capa.xqueue_interface as xqueue_interface
+
+
+log = logging.getLogger(__name__)
+
+ORG = 'edX'
+COURSE = 'open_ended'      # name of directory with course data
 
 
 class OpenEndedChildTest(unittest.TestCase):
@@ -63,12 +70,20 @@ class OpenEndedChildTest(unittest.TestCase):
         's3_interface': "",
         'open_ended_grading_interface': {},
         'skip_basic_checks': False,
+        'control': {
+            'required_peer_grading': 1,
+            'peer_grader_count': 1,
+            'min_to_calibrate': 3,
+            'max_to_calibrate': 6,
+            'peer_grade_finished_submissions_when_none_pending': False,
+        }
     }
     definition = Mock()
     descriptor = Mock()
 
     def setUp(self):
         self.test_system = get_test_system()
+        self.test_system.open_ended_grading_interface = None
         self.openendedchild = OpenEndedChild(self.test_system, self.location,
                                              self.definition, self.descriptor, self.static_data, self.metadata)
 
@@ -179,6 +194,13 @@ class OpenEndedModuleTest(unittest.TestCase):
         's3_interface': test_util_open_ended.S3_INTERFACE,
         'open_ended_grading_interface': test_util_open_ended.OPEN_ENDED_GRADING_INTERFACE,
         'skip_basic_checks': False,
+        'control': {
+            'required_peer_grading': 1,
+            'peer_grader_count': 1,
+            'min_to_calibrate': 3,
+            'max_to_calibrate': 6,
+            'peer_grade_finished_submissions_when_none_pending': False,
+        }
     }
 
     oeparam = etree.XML('''
@@ -191,9 +213,42 @@ class OpenEndedModuleTest(unittest.TestCase):
     definition = {'oeparam': oeparam}
     descriptor = Mock()
 
+    feedback = {
+        "success": True,
+        "feedback": "Grader Feedback"
+    }
+
+    single_score_msg = {
+        'correct': True,
+        'score': 4,
+        'msg': 'Grader Message',
+        'feedback': json.dumps(feedback),
+        'grader_type': 'IN',
+        'grader_id': '1',
+        'submission_id': '1',
+        'success': True,
+        'rubric_scores': [0],
+        'rubric_scores_complete': True,
+        'rubric_xml': etree.tostring(rubric)
+    }
+
+    multiple_score_msg = {
+        'correct': True,
+        'score': [0, 1],
+        'msg': 'Grader Message',
+        'feedback': [json.dumps(feedback), json.dumps(feedback)],
+        'grader_type': 'PE',
+        'grader_id': ['1', '2'],
+        'submission_id': '1',
+        'success': True,
+        'rubric_scores': [[0], [0]],
+        'rubric_scores_complete': [True, True],
+        'rubric_xml': [etree.tostring(rubric), etree.tostring(rubric)]
+    }
+
     def setUp(self):
         self.test_system = get_test_system()
-
+        self.test_system.open_ended_grading_interface = None
         self.test_system.location = self.location
         self.mock_xqueue = MagicMock()
         self.mock_xqueue.send_to_queue.return_value = (None, "Message")
@@ -212,7 +267,7 @@ class OpenEndedModuleTest(unittest.TestCase):
                'submission_id': '1',
                'grader_id': '1',
                'score': 3}
-        qtime = datetime.strftime(datetime.now(), xqueue_interface.dateformat)
+        qtime = datetime.strftime(datetime.now(UTC), xqueue_interface.dateformat)
         student_info = {'anonymous_student_id': self.test_system.anonymous_student_id,
                         'submission_time': qtime}
         contents = {
@@ -233,7 +288,7 @@ class OpenEndedModuleTest(unittest.TestCase):
 
     def test_send_to_grader(self):
         submission = "This is a student submission"
-        qtime = datetime.strftime(datetime.now(), xqueue_interface.dateformat)
+        qtime = datetime.strftime(datetime.now(UTC), xqueue_interface.dateformat)
         student_info = {'anonymous_student_id': self.test_system.anonymous_student_id,
                         'submission_time': qtime}
         contents = self.openendedmodule.payload.copy()
@@ -248,37 +303,14 @@ class OpenEndedModuleTest(unittest.TestCase):
 
     def update_score_single(self):
         self.openendedmodule.new_history_entry("New Entry")
-        score_msg = {
-            'correct': True,
-            'score': 4,
-            'msg': 'Grader Message',
-            'feedback': "Grader Feedback"
-        }
         get = {'queuekey': "abcd",
-               'xqueue_body': score_msg}
+               'xqueue_body': json.dumps(self.single_score_msg)}
         self.openendedmodule.update_score(get, self.test_system)
 
-    def update_score_single(self):
+    def update_score_multiple(self):
         self.openendedmodule.new_history_entry("New Entry")
-        feedback = {
-            "success": True,
-            "feedback": "Grader Feedback"
-        }
-        score_msg = {
-            'correct': True,
-            'score': 4,
-            'msg': 'Grader Message',
-            'feedback': json.dumps(feedback),
-            'grader_type': 'IN',
-            'grader_id': '1',
-            'submission_id': '1',
-            'success': True,
-            'rubric_scores': [0],
-            'rubric_scores_complete': True,
-            'rubric_xml': etree.tostring(self.rubric)
-        }
         get = {'queuekey': "abcd",
-               'xqueue_body': json.dumps(score_msg)}
+               'xqueue_body': json.dumps(self.multiple_score_msg)}
         self.openendedmodule.update_score(get, self.test_system)
 
     def test_latest_post_assessment(self):
@@ -288,11 +320,72 @@ class OpenEndedModuleTest(unittest.TestCase):
         # check for errors
         self.assertFalse('errors' in assessment)
 
-    def test_update_score(self):
+    def test_update_score_single(self):
         self.update_score_single()
         score = self.openendedmodule.latest_score()
         self.assertEqual(score, 4)
 
+    def test_update_score_multiple(self):
+        """
+        Tests that a score of [0, 1] gets aggregated to 1.  A change in behavior added by @jbau
+        """
+        self.update_score_multiple()
+        score = self.openendedmodule.latest_score()
+        self.assertEquals(score, 1)
+
+    @patch('xmodule.open_ended_grading_classes.open_ended_module.log.error')
+    def test_update_score_nohistory(self, error_logger):
+        """
+        Tests error handling when there is no child_history
+        """
+        # NOTE that we are not creating any history items
+        get = {'queuekey': "abcd",
+               'xqueue_body': json.dumps(self.multiple_score_msg)}
+        error_msg = ("Trying to update score without existing studentmodule child_history:\n"
+                     "   location: i4x://edX/sa_test/selfassessment/SampleQuestion\n"
+                     "   score: 1\n"
+                     "   grader_ids: [u'1', u'2']\n"
+                     "   submission_ids: [u'1', u'1']")
+        self.openendedmodule.update_score(get, self.test_system)
+        (msg,), _ = error_logger.call_args
+        self.assertTrue(error_logger.called)
+        self.assertEqual(msg, error_msg)
+
+    def test_open_ended_display(self):
+        """
+        Test storing answer with the open ended module.
+        """
+
+        # Create a module with no state yet.  Important that this start off as a blank slate.
+        test_module = OpenEndedModule(self.test_system, self.location,
+                                                self.definition, self.descriptor, self.static_data, self.metadata)
+
+        saved_response = "Saved response."
+        submitted_response = "Submitted response."
+
+        # Initially, there will be no stored answer.
+        self.assertEqual(test_module.stored_answer, None)
+        # And the initial answer to display will be an empty string.
+        self.assertEqual(test_module.get_display_answer(), "")
+
+        # Now, store an answer in the module.
+        test_module.handle_ajax("store_answer", {'student_answer' : saved_response}, get_test_system())
+        # The stored answer should now equal our response.
+        self.assertEqual(test_module.stored_answer, saved_response)
+        self.assertEqual(test_module.get_display_answer(), saved_response)
+
+        # Mock out the send_to_grader function so it doesn't try to connect to the xqueue.
+        test_module.send_to_grader = Mock(return_value=True)
+        # Submit a student response to the question.
+        test_module.handle_ajax(
+            "save_answer",
+            {"student_answer": submitted_response},
+            get_test_system()
+        )
+        # Submitting an answer should clear the stored answer.
+        self.assertEqual(test_module.stored_answer, None)
+        # Confirm that the answer is stored properly.
+        self.assertEqual(test_module.latest_answer(), submitted_response)
 
 class CombinedOpenEndedModuleTest(unittest.TestCase):
     """
@@ -335,7 +428,7 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
         's3_interface': test_util_open_ended.S3_INTERFACE,
         'open_ended_grading_interface': test_util_open_ended.OPEN_ENDED_GRADING_INTERFACE,
         'skip_basic_checks': False,
-        'is_graded': True,
+        'graded': True,
     }
 
     oeparam = etree.XML('''
@@ -368,19 +461,18 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
     full_definition = definition_template.format(prompt=prompt, rubric=rubric, task1=task_xml1, task2=task_xml2)
     descriptor = Mock(data=full_definition)
     test_system = get_test_system()
+    test_system.open_ended_grading_interface = None
     combinedoe_container = CombinedOpenEndedModule(
-        test_system,
-        descriptor,
-        model_data={
+        descriptor=descriptor,
+        runtime=test_system,
+        field_data=DictFieldData({
             'data': full_definition,
             'weight': '1',
-            'location': location
-        }
+        }),
+        scope_ids=ScopeIds(None, None, None, None),
     )
 
     def setUp(self):
-        # TODO: this constructor call is definitely wrong, but neither branch
-        # of the merge matches the module constructor.  Someone (Vik?) should fix this.
         self.combinedoe = CombinedOpenEndedV1Module(self.test_system,
                                                     self.location,
                                                     self.definition,
@@ -390,16 +482,25 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
                                                     instance_state=self.static_data)
 
     def test_get_tag_name(self):
+        """
+        Test to see if the xml tag name is correct
+        """
         name = self.combinedoe.get_tag_name("<t>Tag</t>")
         self.assertEqual(name, "t")
 
     def test_get_last_response(self):
+        """
+        See if we can parse the last response
+        """
         response_dict = self.combinedoe.get_last_response(0)
         self.assertEqual(response_dict['type'], "selfassessment")
         self.assertEqual(response_dict['max_score'], self.max_score)
         self.assertEqual(response_dict['state'], CombinedOpenEndedV1Module.INITIAL)
 
     def test_update_task_states(self):
+        """
+        See if we can update the task states properly
+        """
         changed = self.combinedoe.update_task_states()
         self.assertFalse(changed)
 
@@ -410,6 +511,9 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
         self.assertTrue(changed)
 
     def test_get_max_score(self):
+        """
+        Try to get the max score of the problem
+        """
         self.combinedoe.update_task_states()
         self.combinedoe.state = "done"
         self.combinedoe.is_scored = True
@@ -417,24 +521,62 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
         self.assertEqual(max_score, 1)
 
     def test_container_get_max_score(self):
-        #The progress view requires that this function be exposed
+        """
+        See if we can get the max score from the actual xmodule
+        """
+        # The progress view requires that this function be exposed
         max_score = self.combinedoe_container.max_score()
         self.assertEqual(max_score, None)
 
+    def test_container_get_progress(self):
+        """
+        See if we can get the progress from the actual xmodule
+        """
+        progress = self.combinedoe_container.max_score()
+        self.assertEqual(progress, None)
+
+    def test_get_progress(self):
+        """
+        Test if we can get the correct progress from the combined open ended class
+        """
+        self.combinedoe.update_task_states()
+        self.combinedoe.state = "done"
+        self.combinedoe.is_scored = True
+        progress = self.combinedoe.get_progress()
+        self.assertIsInstance(progress, Progress)
+
+        # progress._a is the score of the xmodule, which is 0 right now.
+        self.assertEqual(progress._a, 0)
+
+        # progress._b is the max_score (which is 1), divided by the weight (which is 1).
+        self.assertEqual(progress._b, 1)
+
     def test_container_weight(self):
+        """
+        Check the problem weight in the container
+        """
         weight = self.combinedoe_container.weight
         self.assertEqual(weight, 1)
 
     def test_container_child_weight(self):
+        """
+        Test the class to see if it picks up the right weight
+        """
         weight = self.combinedoe_container.child_module.weight
         self.assertEqual(weight, 1)
 
     def test_get_score(self):
+        """
+        See if scoring works
+        """
         score_dict = self.combinedoe.get_score()
         self.assertEqual(score_dict['score'], 0)
         self.assertEqual(score_dict['total'], 1)
 
     def test_alternate_orderings(self):
+        """
+        Try multiple ordering of definitions to see if the problem renders different steps correctly.
+        """
         t1 = self.task_xml1
         t2 = self.task_xml2
         xml_to_test = [[t1], [t2], [t1, t1], [t1, t2], [t2, t2], [t2, t1], [t1, t2, t1]]
@@ -452,9 +594,28 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
             changed = combinedoe.update_task_states()
             self.assertFalse(changed)
 
+            combinedoe = CombinedOpenEndedV1Module(self.test_system,
+                                                   self.location,
+                                                   definition,
+                                                   descriptor,
+                                                   static_data=self.static_data,
+                                                   metadata=self.metadata,
+                                                   instance_state={'task_states': TEST_STATE_SA})
+
+            combinedoe = CombinedOpenEndedV1Module(self.test_system,
+                                                   self.location,
+                                                   definition,
+                                                   descriptor,
+                                                   static_data=self.static_data,
+                                                   metadata=self.metadata,
+                                                   instance_state={'task_states': TEST_STATE_SA_IN})
+
+
     def test_get_score_realistic(self):
-        instance_state = r"""{"ready_to_reset": false, "skip_spelling_checks": true, "current_task_number": 1, "weight": 5.0, "graceperiod": "1 day 12 hours 59 minutes 59 seconds", "is_graded": "True", "task_states": ["{\"child_created\": false, \"child_attempts\": 4, \"version\": 1, \"child_history\": [{\"answer\": \"The students\\u2019 data are recorded in the table below.\\r\\n\\r\\nStarting Mass (g)\\tEnding Mass (g)\\tDifference in Mass (g)\\r\\nMarble\\t 9.8\\t 9.4\\t\\u20130.4\\r\\nLimestone\\t10.4\\t 9.1\\t\\u20131.3\\r\\nWood\\t11.2\\t11.2\\t 0.0\\r\\nPlastic\\t 7.2\\t 7.1\\t\\u20130.1\\r\\nAfter reading the group\\u2019s procedure, describe what additional information you would need in order to replicate the expe\", \"post_assessment\": \"{\\\"submission_id\\\": 3097, \\\"score\\\": 0, \\\"feedback\\\": \\\"{\\\\\\\"spelling\\\\\\\": \\\\\\\"Spelling: Ok.\\\\\\\", \\\\\\\"grammar\\\\\\\": \\\\\\\"Grammar: More grammar errors than average.\\\\\\\", \\\\\\\"markup-text\\\\\\\": \\\\\\\"the students data are recorded in the <bg>table below . starting mass</bg> g ending mass g difference in mass g marble . . . limestone . . . wood . . . plastic . . . after reading the groups <bg>procedure , describe what additional</bg> information you would need in order to replicate the <bs>expe</bs>\\\\\\\"}\\\", \\\"success\\\": true, \\\"grader_id\\\": 3233, \\\"grader_type\\\": \\\"ML\\\", \\\"rubric_scores_complete\\\": true, \\\"rubric_xml\\\": \\\"<rubric><category><description>Response Quality</description><score>0</score><option points='0'>The response is not a satisfactory answer to the question.  It either fails to address the question or does so in a limited way, with no evidence of higher-order thinking.</option><option points='1'>The response is a marginal answer to the question.  It may contain some elements of a proficient response, but it is inaccurate or incomplete.</option><option points='2'>The response is a proficient answer to the question.  It is generally correct, although it may contain minor inaccuracies.  There is limited evidence of higher-order thinking.</option><option points='3'>The response is correct, complete, and contains evidence of higher-order thinking.</option></category></rubric>\\\"}\", \"score\": 0}, {\"answer\": \"After 24 hours, remove the samples from the containers and rinse each sample with distilled water.\\r\\nAllow the samples to sit and dry for 30 minutes.\\r\\nDetermine the mass of each sample.\\r\\nThe students\\u2019 data are recorded in the table below.\\r\\n\\r\\nStarting Mass (g)\\tEnding Mass (g)\\tDifference in Mass (g)\\r\\nMarble\\t 9.8\\t 9.4\\t\\u20130.4\\r\\nLimestone\\t10.4\\t 9.1\\t\\u20131.3\\r\\nWood\\t11.2\\t11.2\\t 0.0\\r\\nPlastic\\t 7.2\\t 7.1\\t\\u20130.1\\r\\nAfter reading the\", \"post_assessment\": \"[3]\", \"score\": 3}, {\"answer\": \"To replicate the experiment, the procedure would require more detail. One piece of information that is omitted is the amount of vinegar used in the experiment. It is also important to know what temperature the experiment was kept at during the 24 hours. Finally, the procedure needs to include details about the experiment, for example if the whole sample must be submerged.\", \"post_assessment\": \"[3]\", \"score\": 3}, {\"answer\": \"e the mass of four different samples.\\r\\nPour vinegar in each of four separate, but identical, containers.\\r\\nPlace a sample of one material into one container and label. Repeat with remaining samples, placing a single sample into a single container.\\r\\nAfter 24 hours, remove the samples from the containers and rinse each sample with distilled water.\\r\\nAllow the samples to sit and dry for 30 minutes.\\r\\nDetermine the mass of each sample.\\r\\nThe students\\u2019 data are recorded in the table below.\\r\\n\", \"post_assessment\": \"[3]\", \"score\": 3}, {\"answer\": \"\", \"post_assessment\": \"[3]\", \"score\": 3}], \"max_score\": 3, \"child_state\": \"done\"}", "{\"child_created\": false, \"child_attempts\": 0, \"version\": 1, \"child_history\": [{\"answer\": \"The students\\u2019 data are recorded in the table below.\\r\\n\\r\\nStarting Mass (g)\\tEnding Mass (g)\\tDifference in Mass (g)\\r\\nMarble\\t 9.8\\t 9.4\\t\\u20130.4\\r\\nLimestone\\t10.4\\t 9.1\\t\\u20131.3\\r\\nWood\\t11.2\\t11.2\\t 0.0\\r\\nPlastic\\t 7.2\\t 7.1\\t\\u20130.1\\r\\nAfter reading the group\\u2019s procedure, describe what additional information you would need in order to replicate the expe\", \"post_assessment\": \"{\\\"submission_id\\\": 3097, \\\"score\\\": 0, \\\"feedback\\\": \\\"{\\\\\\\"spelling\\\\\\\": \\\\\\\"Spelling: Ok.\\\\\\\", \\\\\\\"grammar\\\\\\\": \\\\\\\"Grammar: More grammar errors than average.\\\\\\\", \\\\\\\"markup-text\\\\\\\": \\\\\\\"the students data are recorded in the <bg>table below . starting mass</bg> g ending mass g difference in mass g marble . . . limestone . . . wood . . . plastic . . . after reading the groups <bg>procedure , describe what additional</bg> information you would need in order to replicate the <bs>expe</bs>\\\\\\\"}\\\", \\\"success\\\": true, \\\"grader_id\\\": 3233, \\\"grader_type\\\": \\\"ML\\\", \\\"rubric_scores_complete\\\": true, \\\"rubric_xml\\\": \\\"<rubric><category><description>Response Quality</description><score>0</score><option points='0'>The response is not a satisfactory answer to the question.  It either fails to address the question or does so in a limited way, with no evidence of higher-order thinking.</option><option points='1'>The response is a marginal answer to the question.  It may contain some elements of a proficient response, but it is inaccurate or incomplete.</option><option points='2'>The response is a proficient answer to the question.  It is generally correct, although it may contain minor inaccuracies.  There is limited evidence of higher-order thinking.</option><option points='3'>The response is correct, complete, and contains evidence of higher-order thinking.</option></category></rubric>\\\"}\", \"score\": 0}, {\"answer\": \"After 24 hours, remove the samples from the containers and rinse each sample with distilled water.\\r\\nAllow the samples to sit and dry for 30 minutes.\\r\\nDetermine the mass of each sample.\\r\\nThe students\\u2019 data are recorded in the table below.\\r\\n\\r\\nStarting Mass (g)\\tEnding Mass (g)\\tDifference in Mass (g)\\r\\nMarble\\t 9.8\\t 9.4\\t\\u20130.4\\r\\nLimestone\\t10.4\\t 9.1\\t\\u20131.3\\r\\nWood\\t11.2\\t11.2\\t 0.0\\r\\nPlastic\\t 7.2\\t 7.1\\t\\u20130.1\\r\\nAfter reading the\", \"post_assessment\": \"{\\\"submission_id\\\": 3098, \\\"score\\\": 0, \\\"feedback\\\": \\\"{\\\\\\\"spelling\\\\\\\": \\\\\\\"Spelling: Ok.\\\\\\\", \\\\\\\"grammar\\\\\\\": \\\\\\\"Grammar: Ok.\\\\\\\", \\\\\\\"markup-text\\\\\\\": \\\\\\\"after hours , remove the samples from the containers and rinse each sample with distilled water . allow the samples to sit and dry for minutes . determine the mass of each sample . the students data are recorded in the <bg>table below . starting mass</bg> g ending mass g difference in mass g marble . . . limestone . . . wood . . . plastic . . . after reading the\\\\\\\"}\\\", \\\"success\\\": true, \\\"grader_id\\\": 3235, \\\"grader_type\\\": \\\"ML\\\", \\\"rubric_scores_complete\\\": true, \\\"rubric_xml\\\": \\\"<rubric><category><description>Response Quality</description><score>0</score><option points='0'>The response is not a satisfactory answer to the question.  It either fails to address the question or does so in a limited way, with no evidence of higher-order thinking.</option><option points='1'>The response is a marginal answer to the question.  It may contain some elements of a proficient response, but it is inaccurate or incomplete.</option><option points='2'>The response is a proficient answer to the question.  It is generally correct, although it may contain minor inaccuracies.  There is limited evidence of higher-order thinking.</option><option points='3'>The response is correct, complete, and contains evidence of higher-order thinking.</option></category></rubric>\\\"}\", \"score\": 0}, {\"answer\": \"To replicate the experiment, the procedure would require more detail. One piece of information that is omitted is the amount of vinegar used in the experiment. It is also important to know what temperature the experiment was kept at during the 24 hours. Finally, the procedure needs to include details about the experiment, for example if the whole sample must be submerged.\", \"post_assessment\": \"{\\\"submission_id\\\": 3099, \\\"score\\\": 3, \\\"feedback\\\": \\\"{\\\\\\\"spelling\\\\\\\": \\\\\\\"Spelling: Ok.\\\\\\\", \\\\\\\"grammar\\\\\\\": \\\\\\\"Grammar: Ok.\\\\\\\", \\\\\\\"markup-text\\\\\\\": \\\\\\\"to replicate the experiment , the procedure would require <bg>more detail . one</bg> piece of information <bg>that is omitted is the</bg> amount of vinegar used in the experiment . it is also important to know what temperature the experiment was kept at during the hours . finally , the procedure needs to include details about the experiment , for example if the whole sample must be submerged .\\\\\\\"}\\\", \\\"success\\\": true, \\\"grader_id\\\": 3237, \\\"grader_type\\\": \\\"ML\\\", \\\"rubric_scores_complete\\\": true, \\\"rubric_xml\\\": \\\"<rubric><category><description>Response Quality</description><score>3</score><option points='0'>The response is not a satisfactory answer to the question.  It either fails to address the question or does so in a limited way, with no evidence of higher-order thinking.</option><option points='1'>The response is a marginal answer to the question.  It may contain some elements of a proficient response, but it is inaccurate or incomplete.</option><option points='2'>The response is a proficient answer to the question.  It is generally correct, although it may contain minor inaccuracies.  There is limited evidence of higher-order thinking.</option><option points='3'>The response is correct, complete, and contains evidence of higher-order thinking.</option></category></rubric>\\\"}\", \"score\": 3}, {\"answer\": \"e the mass of four different samples.\\r\\nPour vinegar in each of four separate, but identical, containers.\\r\\nPlace a sample of one material into one container and label. Repeat with remaining samples, placing a single sample into a single container.\\r\\nAfter 24 hours, remove the samples from the containers and rinse each sample with distilled water.\\r\\nAllow the samples to sit and dry for 30 minutes.\\r\\nDetermine the mass of each sample.\\r\\nThe students\\u2019 data are recorded in the table below.\\r\\n\", \"post_assessment\": \"{\\\"submission_id\\\": 3100, \\\"score\\\": 0, \\\"feedback\\\": \\\"{\\\\\\\"spelling\\\\\\\": \\\\\\\"Spelling: Ok.\\\\\\\", \\\\\\\"grammar\\\\\\\": \\\\\\\"Grammar: Ok.\\\\\\\", \\\\\\\"markup-text\\\\\\\": \\\\\\\"e the mass of four different samples . pour vinegar in <bg>each of four separate</bg> , but identical , containers . place a sample of one material into one container and label . repeat with remaining samples , placing a single sample into a single container . after hours , remove the samples from the containers and rinse each sample with distilled water . allow the samples to sit and dry for minutes . determine the mass of each sample . the students data are recorded in the table below . \\\\\\\"}\\\", \\\"success\\\": true, \\\"grader_id\\\": 3239, \\\"grader_type\\\": \\\"ML\\\", \\\"rubric_scores_complete\\\": true, \\\"rubric_xml\\\": \\\"<rubric><category><description>Response Quality</description><score>0</score><option points='0'>The response is not a satisfactory answer to the question.  It either fails to address the question or does so in a limited way, with no evidence of higher-order thinking.</option><option points='1'>The response is a marginal answer to the question.  It may contain some elements of a proficient response, but it is inaccurate or incomplete.</option><option points='2'>The response is a proficient answer to the question.  It is generally correct, although it may contain minor inaccuracies.  There is limited evidence of higher-order thinking.</option><option points='3'>The response is correct, complete, and contains evidence of higher-order thinking.</option></category></rubric>\\\"}\", \"score\": 0}, {\"answer\": \"\", \"post_assessment\": \"{\\\"submission_id\\\": 3101, \\\"score\\\": 0, \\\"feedback\\\": \\\"{\\\\\\\"spelling\\\\\\\": \\\\\\\"Spelling: Ok.\\\\\\\", \\\\\\\"grammar\\\\\\\": \\\\\\\"Grammar: Ok.\\\\\\\", \\\\\\\"markup-text\\\\\\\": \\\\\\\"invalid essay .\\\\\\\"}\\\", \\\"success\\\": true, \\\"grader_id\\\": 3241, \\\"grader_type\\\": \\\"ML\\\", \\\"rubric_scores_complete\\\": true, \\\"rubric_xml\\\": \\\"<rubric><category><description>Response Quality</description><score>0</score><option points='0'>The response is not a satisfactory answer to the question.  It either fails to address the question or does so in a limited way, with no evidence of higher-order thinking.</option><option points='1'>The response is a marginal answer to the question.  It may contain some elements of a proficient response, but it is inaccurate or incomplete.</option><option points='2'>The response is a proficient answer to the question.  It is generally correct, although it may contain minor inaccuracies.  There is limited evidence of higher-order thinking.</option><option points='3'>The response is correct, complete, and contains evidence of higher-order thinking.</option></category></rubric>\\\"}\", \"score\": 0}], \"max_score\": 3, \"child_state\": \"done\"}"], "attempts": "10000", "student_attempts": 0, "due": null, "state": "done", "accept_file_upload": false, "display_name": "Science Question -- Machine Assessed"}"""
-        instance_state = json.loads(instance_state)
+        """
+        Try to parse the correct score from a json instance state
+        """
+        instance_state = json.loads(MOCK_INSTANCE_STATE)
         rubric = """
         <rubric>
             <rubric>
@@ -482,6 +643,79 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
         self.assertEqual(score_dict['score'], 15.0)
         self.assertEqual(score_dict['total'], 15.0)
 
+    def generate_oe_module(self, task_state, task_number, task_xml):
+        """
+        Return a combined open ended module with the specified parameters
+        """
+        definition = {
+            'prompt': etree.XML(self.prompt),
+            'rubric': etree.XML(self.rubric),
+            'task_xml': task_xml
+        }
+        descriptor = Mock(data=definition)
+        module = Mock(scope_ids=Mock(usage_id='dummy-usage-id'))
+        instance_state = {'task_states': task_state, 'graded': True}
+        if task_number is not None:
+            instance_state.update({'current_task_number': task_number})
+        combinedoe = CombinedOpenEndedV1Module(self.test_system,
+                                               self.location,
+                                               definition,
+                                               descriptor,
+                                               static_data=self.static_data,
+                                               metadata=self.metadata,
+                                               instance_state=instance_state)
+        self.test_system.xmodule_instance = module
+        return combinedoe
+
+    def ai_state_reset(self, task_state, task_number=None):
+        """
+        See if state is properly reset
+        """
+        combinedoe = self.generate_oe_module(task_state, task_number, [self.task_xml2])
+        html = combinedoe.get_html()
+        self.assertIsInstance(html, basestring)
+
+        score = combinedoe.get_score()
+        if combinedoe.is_scored:
+            self.assertEqual(score['score'], 0)
+        else:
+            self.assertEqual(score['score'], None)
+
+    def ai_state_success(self, task_state, task_number=None, iscore=2, tasks=None):
+        """
+        See if state stays the same
+        """
+        if tasks is None:
+            tasks = [self.task_xml1, self.task_xml2]
+        combinedoe = self.generate_oe_module(task_state, task_number, tasks)
+        html = combinedoe.get_html()
+        self.assertIsInstance(html, basestring)
+        score = combinedoe.get_score()
+        self.assertEqual(int(score['score']), iscore)
+
+    def test_ai_state_reset(self):
+        self.ai_state_reset(TEST_STATE_AI)
+
+    def test_ai_state2_reset(self):
+        self.ai_state_reset(TEST_STATE_AI2)
+
+    def test_ai_invalid_state(self):
+        self.ai_state_reset(TEST_STATE_AI2_INVALID)
+
+    def test_ai_state_rest_task_number(self):
+        self.ai_state_reset(TEST_STATE_AI, task_number=2)
+        self.ai_state_reset(TEST_STATE_AI, task_number=5)
+        self.ai_state_reset(TEST_STATE_AI, task_number=1)
+        self.ai_state_reset(TEST_STATE_AI, task_number=0)
+
+    def test_ai_state_success(self):
+        self.ai_state_success(TEST_STATE_AI)
+
+    def test_state_single(self):
+        self.ai_state_success(TEST_STATE_SINGLE, iscore=12)
+
+    def test_state_pe_single(self):
+        self.ai_state_success(TEST_STATE_PE_SINGLE, iscore=0, tasks=[self.task_xml2])
 
 class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
     """
@@ -494,6 +728,7 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
 
     def setUp(self):
         self.test_system = get_test_system()
+        self.test_system.open_ended_grading_interface = None
         self.test_system.xqueue['interface'] = Mock(
             send_to_queue=Mock(side_effect=[1, "queued"])
         )
@@ -504,11 +739,13 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         See if we can load the module and save an answer
         @return:
         """
-        #Load the module
+        # Load the module
         module = self.get_module_from_location(self.problem_location, COURSE)
 
-        #Try saving an answer
+        # Try saving an answer
         module.handle_ajax("save_answer", {"student_answer": self.answer})
+        # Save our modifications to the underlying KeyValueStore so they can be persisted
+        module.save()
         task_one_json = json.loads(module.task_states[0])
         self.assertEqual(task_one_json['child_history'][0]['answer'], self.answer)
 
@@ -524,31 +761,39 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         assessment = [0, 1]
         module = self.get_module_from_location(self.problem_location, COURSE)
 
-        #Simulate a student saving an answer
+        # Simulate a student saving an answer
+        html = module.handle_ajax("get_html", {})
+        module.save()
         module.handle_ajax("save_answer", {"student_answer": self.answer})
-        status = module.handle_ajax("get_status", {})
-        self.assertTrue(isinstance(status, basestring))
+        module.save()
+        html = module.handle_ajax("get_html", {})
+        module.save()
 
-        #Mock a student submitting an assessment
-        assessment_dict = MockQueryDict()
-        assessment_dict.update({'assessment': sum(assessment), 'score_list[]': assessment})
+        # Mock a student submitting an assessment
+        assessment_dict = MultiDict({'assessment': sum(assessment)})
+        assessment_dict.extend(('score_list[]', val) for val in assessment)
+
         module.handle_ajax("save_assessment", assessment_dict)
+        module.save()
         task_one_json = json.loads(module.task_states[0])
         self.assertEqual(json.loads(task_one_json['child_history'][0]['post_assessment']), assessment)
-        status = module.handle_ajax("get_status", {})
-        self.assertTrue(isinstance(status, basestring))
+        rubric = module.handle_ajax("get_combined_rubric", {})
+        module.save()
 
-        #Move to the next step in the problem
+        # Move to the next step in the problem
         module.handle_ajax("next_problem", {})
+        module.save()
         self.assertEqual(module.current_task_number, 0)
 
-        html = module.get_html()
-        self.assertTrue(isinstance(html, basestring))
+        html = module.render('student_view').content
+        self.assertIsInstance(html, basestring)
 
         rubric = module.handle_ajax("get_combined_rubric", {})
-        self.assertTrue(isinstance(rubric, basestring))
+        module.save()
+        self.assertIsInstance(rubric, basestring)
         self.assertEqual(module.state, "assessing")
         module.handle_ajax("reset", {})
+        module.save()
         self.assertEqual(module.current_task_number, 0)
 
     def test_open_ended_flow_correct(self):
@@ -558,40 +803,44 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         @return:
         """
         assessment = [1, 1]
-        #Load the module
+        # Load the module
         module = self.get_module_from_location(self.problem_location, COURSE)
 
-        #Simulate a student saving an answer
+        # Simulate a student saving an answer
         module.handle_ajax("save_answer", {"student_answer": self.answer})
+        module.save()
         status = module.handle_ajax("get_status", {})
-        self.assertTrue(isinstance(status, basestring))
+        module.save()
+        self.assertIsInstance(status, basestring)
 
-        #Mock a student submitting an assessment
-        assessment_dict = MockQueryDict()
-        assessment_dict.update({'assessment': sum(assessment), 'score_list[]': assessment})
-        #from nose.tools import set_trace; set_trace()
+        # Mock a student submitting an assessment
+        assessment_dict = MultiDict({'assessment': sum(assessment)})
+        assessment_dict.extend(('score_list[]', val) for val in assessment)
+
         module.handle_ajax("save_assessment", assessment_dict)
+        module.save()
         task_one_json = json.loads(module.task_states[0])
         self.assertEqual(json.loads(task_one_json['child_history'][0]['post_assessment']), assessment)
-        module.handle_ajax("get_status", {})
 
-        #Move to the next step in the problem
+        # Move to the next step in the problem
         try:
             module.handle_ajax("next_problem", {})
+            module.save()
         except GradingServiceError:
-            #This error is okay.  We don't have a grading service to connect to!
+            # This error is okay.  We don't have a grading service to connect to!
             pass
         self.assertEqual(module.current_task_number, 1)
         try:
-            module.get_html()
+            module.render('student_view')
         except GradingServiceError:
-            #This error is okay.  We don't have a grading service to connect to!
+            # This error is okay.  We don't have a grading service to connect to!
             pass
 
-        #Try to get the rubric from the module
+        # Try to get the rubric from the module
         module.handle_ajax("get_combined_rubric", {})
+        module.save()
 
-        #Make a fake reply from the queue
+        # Make a fake reply from the queue
         queue_reply = {
             'queuekey': "",
             'xqueue_body': json.dumps({
@@ -608,24 +857,249 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         }
 
         module.handle_ajax("check_for_score", {})
+        module.save()
 
-        #Update the module with the fake queue reply
+        # Update the module with the fake queue reply
         module.handle_ajax("score_update", queue_reply)
+        module.save()
         self.assertFalse(module.ready_to_reset)
         self.assertEqual(module.current_task_number, 1)
 
-        #Get html and other data client will request
-        module.get_html()
-        legend = module.handle_ajax("get_legend", {})
-        self.assertTrue(isinstance(legend, basestring))
+        # Get html and other data client will request
+        module.render('student_view')
 
-        module.handle_ajax("get_status", {})
         module.handle_ajax("skip_post_assessment", {})
-        self.assertTrue(isinstance(legend, basestring))
+        module.save()
 
-        #Get all results
-        module.handle_ajax("get_results", {})
+        # Get all results
+        module.handle_ajax("get_combined_rubric", {})
+        module.save()
 
-        #reset the problem
+        # reset the problem
         module.handle_ajax("reset", {})
+        module.save()
         self.assertEqual(module.state, "initial")
+
+
+class OpenEndedModuleXmlAttemptTest(unittest.TestCase, DummyModulestore):
+    """
+    Test if student is able to reset the problem
+    """
+    problem_location = Location(["i4x", "edX", "open_ended", "combinedopenended", "SampleQuestion1Attempt"])
+    answer = "blah blah"
+    assessment = [0, 1]
+    hint = "blah"
+
+    def setUp(self):
+        self.test_system = get_test_system()
+        self.test_system.open_ended_grading_interface = None
+        self.test_system.xqueue['interface'] = Mock(
+            send_to_queue=Mock(side_effect=[1, "queued"])
+        )
+        self.setup_modulestore(COURSE)
+
+    def test_reset_fail(self):
+        """
+       Test the flow of the module if we complete the self assessment step and then reset
+       Since the problem only allows one attempt, should fail.
+       @return:
+       """
+        assessment = [0, 1]
+        module = self.get_module_from_location(self.problem_location, COURSE)
+        module.save()
+
+        # Simulate a student saving an answer
+        module.handle_ajax("save_answer", {"student_answer": self.answer})
+        module.save()
+
+        # Mock a student submitting an assessment
+        assessment_dict = MultiDict({'assessment': sum(assessment)})
+        assessment_dict.extend(('score_list[]', val) for val in assessment)
+
+        module.handle_ajax("save_assessment", assessment_dict)
+        module.save()
+        task_one_json = json.loads(module.task_states[0])
+        self.assertEqual(json.loads(task_one_json['child_history'][0]['post_assessment']), assessment)
+
+        # Move to the next step in the problem
+        module.handle_ajax("next_problem", {})
+        module.save()
+        self.assertEqual(module.current_task_number, 0)
+
+        html = module.render('student_view').content
+        self.assertIsInstance(html, basestring)
+
+        # Module should now be done
+        rubric = module.handle_ajax("get_combined_rubric", {})
+        module.save()
+        self.assertIsInstance(rubric, basestring)
+        self.assertEqual(module.state, "done")
+
+        # Try to reset, should fail because only 1 attempt is allowed
+        reset_data = json.loads(module.handle_ajax("reset", {}))
+        module.save()
+        self.assertEqual(reset_data['success'], False)
+
+class OpenEndedModuleXmlImageUploadTest(unittest.TestCase, DummyModulestore):
+    """
+    Test if student is able to upload images properly.
+    """
+    problem_location = Location(["i4x", "edX", "open_ended", "combinedopenended", "SampleQuestionImageUpload"])
+    answer_text = "Hello, this is my amazing answer."
+    file_text = "Hello, this is my amazing file."
+    file_name = "Student file 1"
+    answer_link = "http://www.edx.org"
+    autolink_tag = "<a href="
+
+    def setUp(self):
+        self.test_system = get_test_system()
+        self.test_system.open_ended_grading_interface = None
+        self.test_system.s3_interface = test_util_open_ended.S3_INTERFACE
+        self.test_system.xqueue['interface'] = Mock(
+            send_to_queue=Mock(side_effect=[1, "queued"])
+        )
+        self.setup_modulestore(COURSE)
+
+    def test_file_upload_fail(self):
+        """
+        Test to see if a student submission without a file attached fails.
+        """
+        module = self.get_module_from_location(self.problem_location, COURSE)
+
+        # Simulate a student saving an answer
+        response = module.handle_ajax("save_answer", {"student_answer": self.answer_text})
+        response = json.loads(response)
+        self.assertFalse(response['success'])
+        self.assertIn('error', response)
+
+    @patch(
+        'xmodule.open_ended_grading_classes.openendedchild.S3Connection',
+        test_util_open_ended.MockS3Connection
+    )
+    @patch(
+        'xmodule.open_ended_grading_classes.openendedchild.Key',
+        test_util_open_ended.MockS3Key
+    )
+    def test_file_upload_success(self):
+        """
+        Test to see if a student submission with a file is handled properly.
+        """
+        module = self.get_module_from_location(self.problem_location, COURSE)
+
+        # Simulate a student saving an answer with a file
+        response = module.handle_ajax("save_answer", {
+            "student_answer": self.answer_text,
+            "valid_files_attached": True,
+            "student_file": [MockUploadedFile(self.file_name, self.file_text)],
+        })
+
+        response = json.loads(response)
+        self.assertTrue(response['success'])
+        self.assertIn(self.file_name, response['student_response'])
+        self.assertIn(self.autolink_tag, response['student_response'])
+
+    def test_link_submission_success(self):
+        """
+        Students can submit links instead of files.  Check that the link is properly handled.
+        """
+        module = self.get_module_from_location(self.problem_location, COURSE)
+
+        # Simulate a student saving an answer with a link.
+        response = module.handle_ajax("save_answer", {
+            "student_answer": "{0} {1}".format(self.answer_text, self.answer_link)
+            })
+
+        response = json.loads(response)
+
+        self.assertTrue(response['success'])
+        self.assertIn(self.answer_link, response['student_response'])
+        self.assertIn(self.autolink_tag, response['student_response'])
+
+
+class OpenEndedModuleUtilTest(unittest.TestCase):
+    """
+    Tests for the util functions of OpenEndedModule.  Currently just for the html_sanitizer and <br/> inserter
+    """
+    script_dirty = u'<script>alert("xss!")</script>'
+    script_clean = u'alert("xss!")'
+    img_dirty = u'<img alt="cats" height="200" onclick="eval()" src="http://example.com/lolcats.jpg" width="200">'
+    img_clean = u'<img alt="cats" height="200" src="http://example.com/lolcats.jpg" width="200">'
+    embed_dirty = u'<embed height="200" id="cats" onhover="eval()" src="http://example.com/lolcats.swf" width="200"/>'
+    embed_clean = u'<embed height="200" id="cats" src="http://example.com/lolcats.swf" width="200">'
+    iframe_dirty = u'<iframe class="cats" height="200" onerror="eval()" src="http://example.com/lolcats" width="200"/>'
+    iframe_clean = u'<iframe class="cats" height="200" src="http://example.com/lolcats" width="200"></iframe>'
+
+    text = u'I am a \u201c\xfcber student\u201d'
+    text_lessthan_noencd = u'This used to be broken < by the other parser. 3>5'
+    text_lessthan_encode = u'This used to be broken &lt; by the other parser. 3&gt;5'
+    text_linebreaks = u"St\xfcdent submission:\nI like lamp."
+    text_brs = u"St\xfcdent submission:<br/>I like lamp."
+
+    link_text = u'I love going to www.lolcatz.com'
+    link_atag = u'I love going to <a href="http://www.lolcatz.com" target="_blank">www.lolcatz.com</a>'
+
+    def test_script(self):
+        """
+        Basic test for stripping <script>
+        """
+        self.assertEqual(OpenEndedChild.sanitize_html(self.script_dirty), self.script_clean)
+
+    def test_img(self):
+        """
+        Basic test for passing through img, but stripping bad attr
+        """
+        self.assertEqual(OpenEndedChild.sanitize_html(self.img_dirty), self.img_clean)
+
+    def test_embed(self):
+        """
+        Basic test for passing through embed, but stripping bad attr
+        """
+        self.assertEqual(OpenEndedChild.sanitize_html(self.embed_dirty), self.embed_clean)
+
+    def test_iframe(self):
+        """
+        Basic test for passing through iframe, but stripping bad attr
+        """
+        self.assertEqual(OpenEndedChild.sanitize_html(self.iframe_dirty), self.iframe_clean)
+
+    def test_text(self):
+        """
+        Test for passing through text unchanged, including unicode
+        """
+        self.assertEqual(OpenEndedChild.sanitize_html(self.text), self.text)
+
+    def test_lessthan(self):
+        """
+        Tests that `<` in text context is handled properly
+        """
+        self.assertEqual(OpenEndedChild.sanitize_html(self.text_lessthan_noencd), self.text_lessthan_encode)
+
+    def test_linebreaks(self):
+        """
+        tests the replace_newlines function
+        """
+        self.assertEqual(OpenEndedChild.replace_newlines(self.text_linebreaks), self.text_brs)
+
+    def test_linkify(self):
+        """
+        tests the replace_newlines function
+        """
+        self.assertEqual(OpenEndedChild.sanitize_html(self.link_text), self.link_atag)
+
+    def test_combined(self):
+        """
+        tests a combination of inputs
+        """
+        test_input = u"{}\n{}\n{}\n\n{}{}\n{}".format(self.link_text,
+                                                      self.text,
+                                                      self.script_dirty,
+                                                      self.embed_dirty,
+                                                      self.text_lessthan_noencd,
+                                                      self.img_dirty)
+        test_output = u"{}<br/>{}<br/>{}<br/><br/>{}{}<br/>{}".format(self.link_atag,
+                                                                      self.text,
+                                                                      self.script_clean,
+                                                                      self.embed_clean,
+                                                                      self.text_lessthan_encode,
+                                                                      self.img_clean)
+        self.assertEqual(OpenEndedChild.sanitize_html(test_input), test_output)

@@ -4,12 +4,13 @@
 from lettuce import world, step
 from selenium.webdriver.common.keys import Keys
 from common import type_in_codemirror
+from nose.tools import assert_in  # pylint: disable=E0611
 
 
 @step(u'I go to the course updates page')
 def go_to_updates(_step):
     menu_css = 'li.nav-course-courseware'
-    updates_css = 'li.nav-course-courseware-updates'
+    updates_css = 'li.nav-course-courseware-updates a'
     world.css_click(menu_css)
     world.css_click(updates_css)
 
@@ -21,14 +22,17 @@ def add_update(_step, text):
     change_text(text)
 
 
-@step(u'I should( not)? see the update "([^"]*)"$')
-def check_update(_step, doesnt_see_update, text):
+@step(u'I should see the update "([^"]*)"$')
+def check_update(_step, text):
     update_css = 'div.update-contents'
-    update = world.css_find(update_css, wait_time=1)
-    if doesnt_see_update:
-        assert len(update) == 0 or not text in update.html
-    else:
-        assert text in update.html
+    update_html = world.css_find(update_css).html
+    assert_in(text, update_html)
+
+
+@step(u'I should not see the update "([^"]*)"$')
+def check_no_update(_step, text):
+    update_css = 'div.update-contents'
+    assert world.is_css_not_present(update_css)
 
 
 @step(u'I modify the text to "([^"]*)"$')
@@ -36,6 +40,16 @@ def modify_update(_step, text):
     button_css = 'div.post-preview a.edit-button'
     world.css_click(button_css)
     change_text(text)
+
+
+@step(u'I change the update from "([^"]*)" to "([^"]*)"$')
+def change_existing_update(_step, before, after):
+    verify_text_in_editor_and_update('div.post-preview a.edit-button', before, after)
+
+
+@step(u'I change the handout from "([^"]*)" to "([^"]*)"$')
+def change_existing_handout(_step, before, after):
+    verify_text_in_editor_and_update('div.course-handouts a.edit-button', before, after)
 
 
 @step(u'I delete the update$')
@@ -76,7 +90,43 @@ def check_handout(_step, handout):
     assert handout in world.css_html(handout_css)
 
 
+@step(u'I see the handout error text')
+def check_handout_error(_step):
+    handout_error_css = 'div#handout_error'
+    assert world.css_has_class(handout_error_css, 'is-shown')
+
+
+@step(u'I see handout save button disabled')
+def check_handout_error(_step):
+    handout_save_button = 'form.edit-handouts-form a.save-button'
+    assert world.css_has_class(handout_save_button, 'is-disabled')
+
+
+@step(u'I edit the handout to "([^"]*)"$')
+def edit_handouts(_step, text):
+    type_in_codemirror(0, text)
+
+
+@step(u'I see handout save button re-enabled')
+def check_handout_error(_step):
+    handout_save_button = 'form.edit-handouts-form a.save-button'
+    assert not world.css_has_class(handout_save_button, 'is-disabled')
+
+
+@step(u'I save handout edit')
+def check_handout_error(_step):
+    save_css = 'a.save-button'
+    world.css_click(save_css)
+
+
 def change_text(text):
     type_in_codemirror(0, text)
     save_css = 'a.save-button'
     world.css_click(save_css)
+
+
+def verify_text_in_editor_and_update(button_css, before, after):
+    world.css_click(button_css)
+    text = world.css_find(".cm-string").html
+    assert before in text
+    change_text(after)

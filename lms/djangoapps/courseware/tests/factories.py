@@ -1,44 +1,57 @@
-from datetime import datetime
 import json
 from functools import partial
 
-from factory import DjangoModelFactory, SubFactory
-from student.tests.factories import UserFactory as StudentUserFactory
-from student.tests.factories import GroupFactory as StudentGroupFactory
+from factory import DjangoModelFactory, SubFactory, post_generation
+
+# Imported to re-export
+# pylint: disable=unused-import
+from student.tests.factories import UserFactory  # Imported to re-export
+from student.tests.factories import GroupFactory  # Imported to re-export
+from student.tests.factories import CourseEnrollmentAllowedFactory  # Imported to re-export
+from student.tests.factories import RegistrationFactory  # Imported to re-export
+# pylint: enable=unused-import
+
 from student.tests.factories import UserProfileFactory as StudentUserProfileFactory
-from student.tests.factories import CourseEnrollmentAllowedFactory as StudentCourseEnrollmentAllowedFactory
-from student.tests.factories import RegistrationFactory as StudentRegistrationFactory
-from courseware.models import StudentModule, XModuleContentField, XModuleSettingsField
+from courseware.models import StudentModule, XModuleUserStateSummaryField
 from courseware.models import XModuleStudentInfoField, XModuleStudentPrefsField
+from courseware.roles import CourseInstructorRole, CourseStaffRole
 
 from xmodule.modulestore import Location
-from pytz import UTC
+
 
 location = partial(Location, 'i4x', 'edX', 'test_course', 'problem')
 
 
 class UserProfileFactory(StudentUserProfileFactory):
-    name = 'Robot Studio'
     courseware = 'course.xml'
 
 
-class RegistrationFactory(StudentRegistrationFactory):
-    pass
+class InstructorFactory(UserFactory):
+    """
+    Given a course Location, returns a User object with instructor
+    permissions for `course`.
+    """
+    last_name = "Instructor"
+
+    @post_generation
+    def course(self, create, extracted, **kwargs):
+        if extracted is None:
+            raise ValueError("Must specify a course location for a course instructor user")
+        CourseInstructorRole(extracted).add_users(self)
 
 
-class UserFactory(StudentUserFactory):
-    email = 'robot@edx.org'
-    last_name = 'Tester'
-    last_login = datetime.now(UTC)
-    date_joined = datetime.now(UTC)
+class StaffFactory(UserFactory):
+    """
+    Given a course Location, returns a User object with staff
+    permissions for `course`.
+    """
+    last_name = "Staff"
 
-
-class GroupFactory(StudentGroupFactory):
-    name = 'test_group'
-
-
-class CourseEnrollmentAllowedFactory(StudentCourseEnrollmentAllowedFactory):
-    pass
+    @post_generation
+    def course(self, create, extracted, **kwargs):
+        if extracted is None:
+            raise ValueError("Must specify a course location for a course staff user")
+        CourseStaffRole(extracted).add_users(self)
 
 
 class StudentModuleFactory(DjangoModelFactory):
@@ -53,20 +66,12 @@ class StudentModuleFactory(DjangoModelFactory):
     done = 'na'
 
 
-class ContentFactory(DjangoModelFactory):
-    FACTORY_FOR = XModuleContentField
+class UserStateSummaryFactory(DjangoModelFactory):
+    FACTORY_FOR = XModuleUserStateSummaryField
 
     field_name = 'existing_field'
     value = json.dumps('old_value')
-    definition_id = location('def_id').url()
-
-
-class SettingsFactory(DjangoModelFactory):
-    FACTORY_FOR = XModuleSettingsField
-
-    field_name = 'existing_field'
-    value = json.dumps('old_value')
-    usage_id = '%s-%s' % ('edX/test_course/test', location('def_id').url())
+    usage_id = location('def_id').url()
 
 
 class StudentPrefsFactory(DjangoModelFactory):

@@ -37,15 +37,16 @@ class TemplateTestCase(unittest.TestCase):
         self.template_path = os.path.join(capa_path,
                                           'templates',
                                           self.TEMPLATE_NAME)
-        template_file = open(self.template_path)
-        self.template = MakoTemplate(template_file.read())
-        template_file.close()
+        with open(self.template_path) as f:
+            self.template = MakoTemplate(f.read())
 
     def render_to_xml(self, context_dict):
         """
         Render the template using the `context_dict` dict.
         Returns an `etree` XML element.
         """
+        # add dummy STATIC_URL to template context
+        context_dict.setdefault("STATIC_URL", "/dummy-static/")
         try:
             xml_str = self.template.render_unicode(**context_dict)
         except:
@@ -352,10 +353,10 @@ class TextlineTemplateTest(TemplateTestCase):
         super(TextlineTemplateTest, self).setUp()
 
     def test_section_class(self):
-        cases = [({}, ' capa_inputtype '),
-                 ({'do_math': True}, 'text-input-dynamath capa_inputtype '),
-                 ({'inline': True}, ' capa_inputtype inline'),
-                 ({'do_math': True, 'inline': True}, 'text-input-dynamath capa_inputtype inline'), ]
+        cases = [({}, ' capa_inputtype  textline'),
+                 ({'do_math': True}, 'text-input-dynamath capa_inputtype  textline'),
+                 ({'inline': True}, ' capa_inputtype inline textline'),
+                 ({'do_math': True, 'inline': True}, 'text-input-dynamath capa_inputtype inline textline'), ]
 
         for (context, css_class) in cases:
             base_context = self.context.copy()
@@ -447,6 +448,32 @@ class TextlineTemplateTest(TemplateTestCase):
         xpath = "//span[@class='message']"
         self.assert_has_text(xml, xpath, self.context['msg'])
 
+
+class FormulaEquationInputTemplateTest(TemplateTestCase):
+    """
+    Test make template for `<formulaequationinput>`s.
+    """
+    TEMPLATE_NAME = 'formulaequationinput.html'
+
+    def setUp(self):
+        self.context = {
+            'id': 2,
+            'value': 'PREFILLED_VALUE',
+            'status': 'unsubmitted',
+            'previewer': 'file.js',
+            'reported_status': 'REPORTED_STATUS',
+        }
+        super(FormulaEquationInputTemplateTest, self).setUp()
+
+    def test_no_size(self):
+        xml = self.render_to_xml(self.context)
+        self.assert_no_xpath(xml, "//input[@size]", self.context)
+
+    def test_size(self):
+        self.context['size'] = '40'
+        xml = self.render_to_xml(self.context)
+
+        self.assert_has_xpath(xml, "//input[@size='40']", self.context)
 
 class AnnotationInputTemplateTest(TemplateTestCase):
     """
@@ -714,3 +741,170 @@ class DragAndDropTemplateTest(TemplateTestCase):
         # escaping the HTML.  We should be able to traverse the XML tree.
         xpath = "//div[@class='drag_and_drop_problem_json']/p/b"
         self.assert_has_text(xml, xpath, 'HTML')
+
+
+class ChoiceTextGroupTemplateTest(TemplateTestCase):
+    """Test mako template for `<choicetextgroup>` input"""
+
+    TEMPLATE_NAME = 'choicetext.html'
+    VALUE_DICT = {'1_choiceinput_0bc': '1_choiceinput_0bc', '1_choiceinput_0_textinput_0': '0',
+                  '1_choiceinput_1_textinput_0': '0'}
+    EMPTY_DICT = {'1_choiceinput_0_textinput_0': '',
+                  '1_choiceinput_1_textinput_0': ''}
+    BOTH_CHOICE_CHECKBOX = {'1_choiceinput_0bc': 'choiceinput_0',
+                            '1_choiceinput_1bc': 'choiceinput_1',
+                            '1_choiceinput_0_textinput_0': '0',
+                            '1_choiceinput_1_textinput_0': '0'}
+    WRONG_CHOICE_CHECKBOX = {'1_choiceinput_1bc': 'choiceinput_1',
+                             '1_choiceinput_0_textinput_0': '0',
+                             '1_choiceinput_1_textinput_0': '0'}
+
+    def setUp(self):
+        choices = [('1_choiceinput_0bc',
+                   [{'tail_text': '', 'type': 'text', 'value': '', 'contents': ''},
+                   {'tail_text': '', 'type': 'textinput', 'value': '', 'contents': 'choiceinput_0_textinput_0'}]),
+                   ('1_choiceinput_1bc', [{'tail_text': '', 'type': 'text', 'value': '', 'contents': ''},
+                   {'tail_text': '', 'type': 'textinput', 'value': '', 'contents': 'choiceinput_1_textinput_0'}])]
+        self.context = {'id': '1',
+                        'choices': choices,
+                        'status': 'correct',
+                        'input_type': 'radio',
+                        'value': self.VALUE_DICT}
+
+        super(ChoiceTextGroupTemplateTest, self).setUp()
+
+    def test_grouping_tag(self):
+        """
+        Tests whether we are using a section or a label to wrap choice elements.
+        Section is used for checkbox, so inputting text does not deselect
+        """
+        input_tags = ('radio', 'checkbox')
+        self.context['status'] = 'correct'
+        xpath = "//section[@id='forinput1_choiceinput_0bc']"
+
+        self.context['value'] = {}
+        for input_type in input_tags:
+            self.context['input_type'] = input_type
+            xml = self.render_to_xml(self.context)
+            self.assert_has_xpath(xml, xpath, self.context)
+
+    def test_problem_marked_correct(self):
+        """Test conditions under which the entire problem
+        (not a particular option) is marked correct"""
+
+        self.context['status'] = 'correct'
+        self.context['input_type'] = 'checkbox'
+        self.context['value'] = self.VALUE_DICT
+
+        # Should mark the entire problem correct
+        xml = self.render_to_xml(self.context)
+        xpath = "//div[@class='indicator_container']/span[@class='correct']"
+        self.assert_has_xpath(xml, xpath, self.context)
+
+        # Should NOT mark individual options
+        self.assert_no_xpath(xml, "//label[@class='choicetextgroup_incorrect']",
+                             self.context)
+
+        self.assert_no_xpath(xml, "//label[@class='choicetextgroup_correct']",
+                             self.context)
+
+    def test_problem_marked_incorrect(self):
+        """Test all conditions under which the entire problem
+        (not a particular option) is marked incorrect"""
+        grouping_tags = {'radio': 'label', 'checkbox': 'section'}
+        conditions = [
+            {'status': 'incorrect', 'input_type': 'radio', 'value': {}},
+            {'status': 'incorrect', 'input_type': 'checkbox', 'value': self.WRONG_CHOICE_CHECKBOX},
+            {'status': 'incorrect', 'input_type': 'checkbox', 'value': self.BOTH_CHOICE_CHECKBOX},
+            {'status': 'incorrect', 'input_type': 'checkbox', 'value': self.VALUE_DICT},
+            {'status': 'incomplete', 'input_type': 'radio', 'value': {}},
+            {'status': 'incomplete', 'input_type': 'checkbox', 'value': self.WRONG_CHOICE_CHECKBOX},
+            {'status': 'incomplete', 'input_type': 'checkbox', 'value': self.BOTH_CHOICE_CHECKBOX},
+            {'status': 'incomplete', 'input_type': 'checkbox', 'value': self.VALUE_DICT}]
+
+        for test_conditions in conditions:
+            self.context.update(test_conditions)
+            xml = self.render_to_xml(self.context)
+            xpath = "//div[@class='indicator_container']/span[@class='incorrect']"
+            self.assert_has_xpath(xml, xpath, self.context)
+
+            # Should NOT mark individual options
+            grouping_tag = grouping_tags[test_conditions['input_type']]
+            self.assert_no_xpath(xml,
+                                 "//{0}[@class='choicetextgroup_incorrect']".format(grouping_tag),
+                                 self.context)
+
+            self.assert_no_xpath(xml,
+                                 "//{0}[@class='choicetextgroup_correct']".format(grouping_tag),
+                                 self.context)
+
+    def test_problem_marked_unsubmitted(self):
+        """Test all conditions under which the entire problem
+        (not a particular option) is marked unanswered"""
+        grouping_tags = {'radio': 'label', 'checkbox': 'section'}
+
+        conditions = [
+            {'status': 'unsubmitted', 'input_type': 'radio', 'value': {}},
+            {'status': 'unsubmitted', 'input_type': 'radio', 'value': self.EMPTY_DICT},
+            {'status': 'unsubmitted', 'input_type': 'checkbox', 'value': {}},
+            {'status': 'unsubmitted', 'input_type': 'checkbox', 'value': self.EMPTY_DICT},
+            {'status': 'unsubmitted', 'input_type': 'checkbox', 'value': self.VALUE_DICT},
+            {'status': 'unsubmitted', 'input_type': 'checkbox', 'value': self.BOTH_CHOICE_CHECKBOX}]
+
+        self.context['status'] = 'unanswered'
+
+        for test_conditions in conditions:
+            self.context.update(test_conditions)
+            xml = self.render_to_xml(self.context)
+            xpath = "//div[@class='indicator_container']/span[@class='unanswered']"
+            self.assert_has_xpath(xml, xpath, self.context)
+
+            # Should NOT mark individual options
+            grouping_tag = grouping_tags[test_conditions['input_type']]
+            self.assert_no_xpath(xml,
+                                 "//{0}[@class='choicetextgroup_incorrect']".format(grouping_tag),
+                                 self.context)
+
+            self.assert_no_xpath(xml,
+                                 "//{0}[@class='choicetextgroup_correct']".format(grouping_tag),
+                                 self.context)
+
+    def test_option_marked_correct(self):
+        """Test conditions under which a particular option
+        (not the entire problem) is marked correct."""
+
+        conditions = [
+            {'input_type': 'radio', 'value': self.VALUE_DICT}]
+
+        self.context['status'] = 'correct'
+
+        for test_conditions in conditions:
+            self.context.update(test_conditions)
+            xml = self.render_to_xml(self.context)
+            xpath = "//section[@id='forinput1_choiceinput_0bc' and\
+                    @class='choicetextgroup_correct']"
+            self.assert_has_xpath(xml, xpath, self.context)
+
+            # Should NOT mark the whole problem
+            xpath = "//div[@class='indicator_container']/span"
+            self.assert_no_xpath(xml, xpath, self.context)
+
+    def test_option_marked_incorrect(self):
+        """Test conditions under which a particular option
+        (not the entire problem) is marked incorrect."""
+
+        conditions = [
+            {'input_type': 'radio', 'value': self.VALUE_DICT}]
+
+        self.context['status'] = 'incorrect'
+
+        for test_conditions in conditions:
+            self.context.update(test_conditions)
+            xml = self.render_to_xml(self.context)
+            xpath = "//section[@id='forinput1_choiceinput_0bc' and\
+                    @class='choicetextgroup_incorrect']"
+            self.assert_has_xpath(xml, xpath, self.context)
+
+            # Should NOT mark the whole problem
+            xpath = "//div[@class='indicator_container']/span"
+            self.assert_no_xpath(xml, xpath, self.context)

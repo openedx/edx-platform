@@ -2,17 +2,18 @@ import json
 
 from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
+from mock import patch, MagicMock
 
-from courseware.models import XModuleContentField
-from courseware.tests.factories import ContentFactory
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
+from courseware.models import XModuleUserStateSummaryField
+from courseware.tests.factories import UserStateSummaryFactory
+from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 import instructor.hint_manager as view
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class HintManagerTest(ModuleStoreTestCase):
 
     def setUp(self):
@@ -27,22 +28,22 @@ class HintManagerTest(ModuleStoreTestCase):
         self.c.login(username='robot', password='test')
         self.problem_id = 'i4x://Me/19.002/crowdsource_hinter/crowdsource_hinter_001'
         self.course_id = 'Me/19.002/test_course'
-        ContentFactory.create(field_name='hints',
-                              definition_id=self.problem_id,
+        UserStateSummaryFactory.create(field_name='hints',
+                              usage_id=self.problem_id,
                               value=json.dumps({'1.0': {'1': ['Hint 1', 2],
                                                         '3': ['Hint 3', 12]},
                                                 '2.0': {'4': ['Hint 4', 3]}
                                                 }))
-        ContentFactory.create(field_name='mod_queue',
-                              definition_id=self.problem_id,
+        UserStateSummaryFactory.create(field_name='mod_queue',
+                              usage_id=self.problem_id,
                               value=json.dumps({'2.0': {'2': ['Hint 2', 1]}}))
 
-        ContentFactory.create(field_name='hint_pk',
-                              definition_id=self.problem_id,
+        UserStateSummaryFactory.create(field_name='hint_pk',
+                              usage_id=self.problem_id,
                               value=5)
         # Mock out location_to_problem_name, which ordinarily accesses the modulestore.
         # (I can't figure out how to get fake structures into the modulestore.)
-        view.location_to_problem_name = lambda loc: "Test problem"
+        view.location_to_problem_name = lambda course_id, loc: "Test problem"
 
     def test_student_block(self):
         """
@@ -116,7 +117,7 @@ class HintManagerTest(ModuleStoreTestCase):
                                        'op': 'delete hints',
                                        1: [self.problem_id, '1.0', '1']})
         view.delete_hints(post, self.course_id, 'hints')
-        problem_hints = XModuleContentField.objects.get(field_name='hints', definition_id=self.problem_id).value
+        problem_hints = XModuleUserStateSummaryField.objects.get(field_name='hints', usage_id=self.problem_id).value
         self.assertTrue('1' not in json.loads(problem_hints)['1.0'])
 
     def test_changevotes(self):
@@ -128,7 +129,7 @@ class HintManagerTest(ModuleStoreTestCase):
                                        'op': 'change votes',
                                        1: [self.problem_id, '1.0', '1', 5]})
         view.change_votes(post, self.course_id, 'hints')
-        problem_hints = XModuleContentField.objects.get(field_name='hints', definition_id=self.problem_id).value
+        problem_hints = XModuleUserStateSummaryField.objects.get(field_name='hints', usage_id=self.problem_id).value
         # hints[answer][hint_pk (string)] = [hint text, vote count]
         print json.loads(problem_hints)['1.0']['1']
         self.assertTrue(json.loads(problem_hints)['1.0']['1'][1] == 5)
@@ -137,15 +138,44 @@ class HintManagerTest(ModuleStoreTestCase):
         """
         Check that instructors can add new hints.
         """
+        # Because add_hint accesses the xmodule, this test requires a bunch
+        # of monkey patching.
+        hinter = MagicMock()
+        hinter.validate_answer = lambda string: True
+
         request = RequestFactory()
         post = request.post(self.url, {'field': 'mod_queue',
                                        'op': 'add hint',
                                        'problem': self.problem_id,
                                        'answer': '3.14',
                                        'hint': 'This is a new hint.'})
-        view.add_hint(post, self.course_id, 'mod_queue')
-        problem_hints = XModuleContentField.objects.get(field_name='mod_queue', definition_id=self.problem_id).value
+        post.user = 'fake user'
+        with patch('courseware.module_render.get_module', MagicMock(return_value=hinter)):
+            with patch('courseware.model_data.FieldDataCache', MagicMock(return_value=None)):
+                view.add_hint(post, self.course_id, 'mod_queue')
+        problem_hints = XModuleUserStateSummaryField.objects.get(field_name='mod_queue', usage_id=self.problem_id).value
         self.assertTrue('3.14' in json.loads(problem_hints))
+
+    def test_addbadhint(self):
+        """
+        Check that instructors cannot add hints with unparsable answers.
+        """
+        # Patching.
+        hinter = MagicMock()
+        hinter.validate_answer = lambda string: False
+
+        request = RequestFactory()
+        post = request.post(self.url, {'field': 'mod_queue',
+                                       'op': 'add hint',
+                                       'problem': self.problem_id,
+                                       'answer': 'fish',
+                                       'hint': 'This is a new hint.'})
+        post.user = 'fake user'
+        with patch('courseware.module_render.get_module', MagicMock(return_value=hinter)):
+            with patch('courseware.model_data.FieldDataCache', MagicMock(return_value=None)):
+                view.add_hint(post, self.course_id, 'mod_queue')
+        problem_hints = XModuleUserStateSummaryField.objects.get(field_name='mod_queue', usage_id=self.problem_id).value
+        self.assertTrue('fish' not in json.loads(problem_hints))
 
     def test_approve(self):
         """
@@ -157,8 +187,8 @@ class HintManagerTest(ModuleStoreTestCase):
                                        'op': 'approve',
                                        1: [self.problem_id, '2.0', '2']})
         view.approve(post, self.course_id, 'mod_queue')
-        problem_hints = XModuleContentField.objects.get(field_name='mod_queue', definition_id=self.problem_id).value
+        problem_hints = XModuleUserStateSummaryField.objects.get(field_name='mod_queue', usage_id=self.problem_id).value
         self.assertTrue('2.0' not in json.loads(problem_hints) or len(json.loads(problem_hints)['2.0']) == 0)
-        problem_hints = XModuleContentField.objects.get(field_name='hints', definition_id=self.problem_id).value
+        problem_hints = XModuleUserStateSummaryField.objects.get(field_name='hints', usage_id=self.problem_id).value
         self.assertTrue(json.loads(problem_hints)['2.0']['2'] == ['Hint 2', 1])
         self.assertTrue(len(json.loads(problem_hints)['2.0']) == 2)

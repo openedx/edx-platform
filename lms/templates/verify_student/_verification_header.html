@@ -1,0 +1,29 @@
+<%! from django.utils.translation import ugettext as _ %>
+
+<header class="page-header">
+  <h2 class="title">
+    %if upgrade:
+      <span class="sts-label">${_("You are upgrading your registration for")}</span>
+    %else:
+      <span class="sts-label">${_("You are registering for")}</span>
+    %endif
+
+    <span class="wrapper-sts">
+      <span class="sts-course">
+        <span class="sts-course-org">${course_org}</span>
+        <span class="sts-course-number">${course_num}</span>
+        <span class="sts-course-name">${course_name}</span>
+      </span>
+
+      <span class="sts-track">
+        <span class="sts-track-value">
+          %if upgrade:
+            <span class="context">${_("Upgrading to:")}</span> ${_("ID Verified")}
+          %else:
+            <span class="context">${_("Registering as: ")}</span> ${_("ID Verified")}
+          %endif
+        </span>
+      </span>
+    </span>
+  </h2>
+</header>

@@ -1,4 +1,4 @@
-Feature: Open ended grading
+Feature: LMS.Open ended grading
   As a student in an edX course
   In order to complete the courseware questions
   I want the machine learning grading to be functional

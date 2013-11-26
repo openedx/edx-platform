@@ -17,7 +17,7 @@
 }
 
 // canned animation - use if you want out of the box/non-customized anim
-.anim-fadeIn {
+%anim-fadeIn {
   @include animation(fadeIn $tmg-f2 linear 1);
 }
 
@@ -38,7 +38,7 @@
 }
 
 // canned animation - use if you want out of the box/non-customized anim
-.anim-fadeOut {
+%anim-fadeOut {
   @include animation(fadeOut $tmg-f2 linear 1);
 }
 
@@ -62,7 +62,7 @@
 }
 
 // canned animation - use if you want out of the box/non-customized anim
-.anim-rotateUp {
+%anim-rotateUp {
   @include animation(rotateUp $tmg-f2 ease-in-out 1);
 }
 
@@ -83,7 +83,7 @@
 }
 
 // canned animation - use if you want out of the box/non-customized anim
-.anim-rotateDown {
+%anim-rotateDown {
   @include animation(rotateDown $tmg-f2 ease-in-out 1);
 }
 
@@ -104,7 +104,7 @@
 }
 
 // canned animation - use if you want out of the box/non-customized anim
-.anim-rotateCW {
+%anim-rotateCW {
   @include animation(rotateCW $tmg-s1 linear infinite);
 }
 
@@ -125,7 +125,7 @@
 }
 
 // canned  animation - use if you want out of the box/non-customized anim
-.anim-rotateCCW {
+%anim-rotateCCW {
   @include animation(rotateCCW $tmg-s1 linear infinite);
 }
 
@@ -140,22 +140,22 @@
   }
 
   90% {
-    @include transform(translateY(-($notification-height)));
+    @include transform(translateY(-($ui-notification-height)));
   }
 
   100% {
-    @include transform(translateY(-($notification-height*0.99)));
+    @include transform(translateY(-($ui-notification-height*0.99)));
   }
 }
 
 // notifications slide down
 @include keyframes(notificationSlideDown) {
   0% {
-    @include transform(translateY(-($notification-height*0.99)));
+    @include transform(translateY(-($ui-notification-height*0.99)));
   }
 
   10% {
-    @include transform(translateY(-($notification-height)));
+    @include transform(translateY(-($ui-notification-height)));
   }
 
   100% {
@@ -185,7 +185,7 @@
 }
 
 // canned animation - use if you want out of the box/non-customized anim
-.anim-bounceIn {
+%anim-bounceIn {
   @include animation(bounceIn $tmg-f1 ease-in-out 1);
 }
 
@@ -208,6 +208,42 @@
 }
 
 // canned animation - use if you want out of the box/non-customized anim
-.anim-bounceOut {
+%anim-bounceOut {
   @include animation(bounceOut $tmg-f1 ease-in-out 1);
+}
+
+
+// ====================
+
+
+// flash
+@include keyframes(flash) {
+  0%, 100% {
+    opacity: 1.0;
+  }
+
+  50% {
+    opacity: 0.0;
+  }
+}
+
+// canned animation - use if you want out of the box/non-customized anim
+%anim-flash {
+  @include animation(flash $tmg-f1 ease-in-out 1);
+}
+
+// flash - double
+@include keyframes(flashDouble) {
+0%, 50%, 100% {
+  opacity: 1.0;
+}
+
+25%, 75% {
+    opacity: 0.0;
+  }
+  }
+
+// canned animation - use if you want out of the box/non-customized anim
+%anim-flashDouble {
+  @include animation(flashDouble $tmg-f1 ease-in-out 1);
 }

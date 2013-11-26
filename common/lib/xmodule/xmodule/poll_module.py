@@ -19,7 +19,7 @@ from xmodule.x_module import XModule
 from xmodule.stringify import stringify_children
 from xmodule.mako_module import MakoModuleDescriptor
 from xmodule.xml_module import XmlDescriptor
-from xblock.core import Scope, String, Dict, Boolean, List
+from xblock.fields import Scope, String, Dict, Boolean, List
 
 log = logging.getLogger(__name__)
 
@@ -30,7 +30,7 @@ class PollFields(object):
 
     voted = Boolean(help="Whether this student has voted on the poll", scope=Scope.user_state, default=False)
     poll_answer = String(help="Student answer", scope=Scope.user_state, default='')
-    poll_answers = Dict(help="All possible answers for the poll fro other students", scope=Scope.content)
+    poll_answers = Dict(help="All possible answers for the poll fro other students", scope=Scope.user_state_summary)
 
     answers = List(help="Poll answers from xml", scope=Scope.content, default=[])
     question = String(help="Poll question", scope=Scope.content, default='')
@@ -140,7 +140,6 @@ class PollDescriptor(PollFields, MakoModuleDescriptor, XmlDescriptor):
     _child_tag_name = 'answer'
 
     module_class = PollModule
-    template_dir_name = 'poll'
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):

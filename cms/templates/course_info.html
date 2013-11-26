@@ -1,45 +1,45 @@
-<%! from django.utils.translation import ugettext as _ %>
-
-
+<%! 
+    from django.utils.translation import ugettext as _
+%>
 <%inherit file="base.html" />
 <%namespace name='static' file='static_content.html'/>
 
 <!-- TODO decode course # from context_course into title -->
 <%block name="title">${_("Course Updates")}</%block>
-<%block name="bodyclass">is-signedin course course-info updates</%block>
+<%block name="bodyclass">is-signedin course course-info updates view-updates</%block>
 
+<%block name="header_extras">
+<link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
+% for template_name in ["course_info_update", "course_info_handouts"]:
+  <script type="text/template" id="${template_name}-tpl">
+    <%static:include path="js/${template_name}.underscore" />
+  </script>
+% endfor
+</%block>
 
 <%block name="jsextra">
-  <script type="text/javascript" src="${static.url('js/template_loader.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/models/course_info.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/models/module_info.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/views/course_info_edit.js')}"></script>
-  <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
-  <script src="${static.url('js/vendor/timepicker/jquery.timepicker.js')}"></script>
-  <script src="${static.url('js/vendor/timepicker/datepair.js')}"></script>
-  <script src="${static.url('js/vendor/date.js')}"></script>
-
   <script type="text/javascript" charset="utf-8">
-  $(document).ready(function(){
-    var course_updates = new CMS.Models.CourseUpdateCollection();
-    course_updates.urlbase = '${url_base}';
+  
+require(["domReady!", "jquery", "js/collections/course_update", "js/models/module_info", "js/models/course_info", "js/views/course_info_edit"],
+  function(doc, $, CourseUpdateCollection, ModuleInfoModel, CourseInfoModel, CourseInfoEditView) {
+    var course_updates = new CourseUpdateCollection();
+    course_updates.url = '${updates_url}';
     course_updates.fetch({reset: true});
 
-    var course_handouts = new CMS.Models.ModuleInfo({
-        id: '${handouts_location}'
+    var course_handouts = new ModuleInfoModel({
+        id: '${handouts_locator}'
       });
-    course_handouts.urlbase = '${url_base}';
 
-    var editor = new CMS.Views.CourseInfoEdit({
+    var editor = new CourseInfoEditView({
       el: $('.main-wrapper'),
-      model : new CMS.Models.CourseInfo({
-        courseId : '${context_course.location}',
+      model : new CourseInfoModel({
         updates : course_updates,
+        base_asset_url : '${base_asset_url}',
         handouts : course_handouts
         })
     });
     editor.render();
-  });
+});
   </script>
 </%block>
 
@@ -52,10 +52,10 @@
       </h1>
 
       <nav class="nav-actions">
-        <h3 class="sr">${_("Page Actions")}</h3>
+        <h3 class="sr">${_('Page Actions')}</h3>
         <ul>
           <li class="nav-item">
-            <a href="#" class=" button new-button new-update-button"><i class="icon-plus"></i> ${_("New Update")}</a>
+            <a href="#" class=" button new-button new-update-button"><i class="icon-plus"></i> ${_('New Update')}</a>
           </li>
         </ul>
       </nav>
@@ -65,7 +65,7 @@
   <div class="wrapper-content wrapper">
     <section class="content">
       <div class="introduction">
-        <p clas="copy">${_("Course updates are announcements or notifications you want to share with your class. Other course authors have used them for important exam/date reminders, change in schedules, and to call out any important steps students need to be aware of.")}</p>
+        <p clas="copy">${_('Use course updates to notify students of important dates or exams, highlight particular discussions in the forums, announce schedule changes, and respond to student questions. You add or edit updates in HTML.')}</p>
       </div>
     </section>
   </div>
@@ -78,7 +78,7 @@
             <ol class="update-list" id="course-update-list"></ol>
           </article>
         </div>
-        <div class="sidebar window course-handouts" id="course-handouts-view"></div>
+        <div class="sidebar course-handouts" id="course-handouts-view"></div>
       </div>
     </div>
   </div>

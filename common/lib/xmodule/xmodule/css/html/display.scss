@@ -1,4 +1,4 @@
-// HTML component display: 
+// HTML component display:
 * {
   line-height: 1.4em;
 }
@@ -92,7 +92,7 @@ ul {
 a {
   &:link, &:visited, &:hover, &:active {
     color: #1d9dd9;
-  } 
+  }
 }
 
 img {
@@ -116,20 +116,32 @@ code {
 }
 
 table {
-  width: 100%; 
+  width: 100%;
+  margin: 20px 0;
   border-collapse: collapse;
   font-size: 16px;
+
+  td, th {
+    margin: 20px 0;
+    padding: 10px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+
+    &.cont-justified-left {
+      text-align: left !important; // nasty, but needed to override the bad specificity of the xmodule css selectors
+    }
+
+    &.cont-justified-right {
+      text-align: right !important; // nasty, but needed to override the bad specificity of the xmodule css selectors
+    }
+
+    &.cont-justified-center {
+      text-align: center !important; // nasty, but needed to override the bad specificity of the xmodule css selectorsstyles
+    }
+  }
 }
 
-th { 
-  background: #eee; 
-  font-weight: bold; 
-}
-
-table td, th { 
-  margin: 20px 0;
-  padding: 10px; 
-  border: 1px solid #ccc; 
-  text-align: left;
-  font-size: 14px;
+th {
+  background: #eee;
+  font-weight: bold;
 }

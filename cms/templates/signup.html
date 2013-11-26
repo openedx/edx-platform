@@ -1,12 +1,9 @@
-
 <%! from django.utils.translation import ugettext as _ %>
-<%! from django.utils import translation    %>
-
 <%inherit file="base.html" />
 <%! from django.core.urlresolvers import reverse %>
 
-<%block name="title">Sign Up</%block>
-<%block name="bodyclass">not-signedin signup</%block>
+<%block name="title">${_("Sign Up")}</%block>
+<%block name="bodyclass">not-signedin view-signup</%block>
 
 <%block name="content">
 
@@ -23,19 +20,19 @@
       <form id="register_form" method="post" action="register_post">
         <div id="register_error" name="register_error" class="message message-status message-status error">
         </div>
-        
+
         <fieldset>
           <legend class="sr">${_("Required Information to Sign Up for edX Studio")}</legend>
-          
+
           <ol class="list-input">
             <li class="field text required" id="field-email">
               <label for="email">${_("Email Address")}</label>
-              <input id="email" type="email" name="email" placeholder="e.g. jane.doe@gmail.com" />              
+              <input id="email" type="email" name="email" placeholder="e.g. jane.doe@gmail.com" />
             </li>
 
             <li class="field text required" id="field-password">
               <label for="password">${_("Password")}</label>
-              <input id="password" type="password" name="password" />              
+              <input id="password" type="password" name="password" />
             </li>
 
             <li class="field text required" id="field-username">
@@ -46,18 +43,18 @@
 
             <li class="field text required" id="field-name">
               <label for="name">${_("Full Name")}</label>
-              <input id="name" type="text" name="name" placeholder="e.g. Jane Doe" />              
+              <input id="name" type="text" name="name" placeholder="e.g. Jane Doe" />
             </li>
 
             <li class="field-group">
               <div class="field text" id="field-location">
                 <label for="location">${_("Your Location")}</label>
-                <input class="short" id="location" type="text" name="location" />              
+                <input class="short" id="location" type="text" name="location" />
               </div>
 
               <div class="field text" id="field-language">
                 <label for="language">${_("Preferred Language")}</label>
-                <input class="short" id="language" type="text" name="language" />              
+                <input class="short" id="language" type="text" name="language" />
               </div>
             </li>
 
@@ -69,7 +66,7 @@
         </fieldset>
 
         <div class="form-actions">
-          <button type="submit" id="submit" name="submit" class="action action-primary">${_("Create My Account & Start Authoring Courses")}</button>
+          <button type="submit" id="submit" name="submit" class="action action-primary">${_("Create My Account &amp; Start Authoring Courses")}</button>
         </div>
 
         <!-- no honor code for CMS, but need it because we're using the lms student object -->
@@ -101,45 +98,39 @@
 
 <%block name="jsextra">
   <script type="text/javascript">
-    (function() {
+require(["jquery", "jquery.cookie"], function($) {
+  $("form :input").focus(function() {
+    $("label[for='" + this.id + "']").addClass("is-focused");
+  }).blur(function() {
+    $("label").removeClass("is-focused");
+  });
 
-      $("form :input").focus(function() {
-        $("label[for='" + this.id + "']").addClass("is-focused");
-      }).blur(function() {
-        $("label").removeClass("is-focused");
-      });
-  
+  // form validation
+  function postJSON(url, data, callback) {
+    $.ajax({type:'POST',
+      url: url,
+      dataType: 'json',
+      data: data,
+      success: callback,
+      headers : {'X-CSRFToken': $.cookie('csrftoken')}
+    });
+  }
 
-      function getCookie(name) {
-        return $.cookie(name);
+  $('form#register_form').submit(function(e) {
+    e.preventDefault();
+    var submit_data = $('#register_form').serialize();
+
+    postJSON('/create_account',
+      submit_data,
+      function(json) {
+        if(json.success) {
+          location.href = "${'/course'}";
+        } else {
+          $('#register_error').html(json.value).stop().addClass('is-shown');
+        }
       }
-
-      // form validation
-      function postJSON(url, data, callback) {
-        $.ajax({type:'POST',
-          url: url,
-          dataType: 'json',
-          data: data,
-          success: callback,
-          headers : {'X-CSRFToken':getCookie('csrftoken')}
-        });
-      }
-
-      $('form#register_form').submit(function(e) {
-        e.preventDefault();
-        var submit_data = $('#register_form').serialize();
-
-        postJSON('/create_account',
-          submit_data,
-          function(json) {
-            if(json.success) {
-              location.href = "${reverse('index')}";
-            } else {
-              $('#register_error').html(json.value).stop().addClass('is-shown');
-            }
-          }
-        );
-      });
-    })(this)
+    );
+  });
+});
   </script>
 </%block>

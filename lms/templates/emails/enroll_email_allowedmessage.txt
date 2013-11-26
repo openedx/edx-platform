@@ -1,13 +1,41 @@
-Dear student,
+<%! from django.utils.translation import ugettext as _ %>
 
-You have been invited to join ${course_id} at ${site_name} by a member of the course staff.
+${_("Dear student,")}
 
-To finish your registration, please visit ${registration_url} and fill out the registration form.
+${_("You have been invited to join {course_name} at {site_name} by a "
+	"member of the course staff.").format(
+		course_name=course.display_name_with_default,
+		site_name=site_name
+	)}
+% if is_shib_course:
+
 % if auto_enroll:
-Once you have registered and activated your account, you will see ${course_id} listed on your dashboard.
+${_("To access the course visit {course_url} and login.").format(course_url=course_url)}
 % else:
-Once you have registered and activated your account, visit ${course_url} to join the course.
+${_("To access the course visit {course_about_url} and register for the course.").format(
+		course_about_url=course_about_url)}
 % endif
 
+% else:
+
+${_("To finish your registration, please visit {registration_url} and fill "
+	"out the registration form making sure to use {email_address} in the E-mail field.").format(
+		registration_url=registration_url,
+		email_address=email_address
+	)}
+% if auto_enroll:
+${_("Once you have registered and activated your account, you will see "
+	"{course_name} listed on your dashboard.").format(
+		course_name=course.display_name_with_default
+	)}
+% else:
+${_("Once you have registered and activated your account, visit {course_about_url} "
+	"to join the course.").format(course_about_url=course_about_url)}
+% endif
+
+% endif
 ----
-This email was automatically sent from ${site_name} to ${email_address}
+${_("This email was automatically sent from {site_name} to "
+	"{email_address}").format(
+		site_name=site_name, email_address=email_address
+	)}

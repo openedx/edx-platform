@@ -42,5 +42,7 @@ class @Logger
           page: window.location.href
         async: false
 
-# Keeping this for compatibility issue only.
+
+# log_event exists for compatibility reasons
+# and will soon be deprecated.
 @log_event = Logger.log

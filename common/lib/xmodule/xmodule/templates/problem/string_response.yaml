@@ -1,18 +1,13 @@
 ---
 metadata:
     display_name: Text Input
-    rerandomize: never
-    showanswer: finished
-    # Note, the extra newlines are needed to make the yaml parser add blank lines instead of folding
-    markdown: 
-        "A text input problem accepts a line of text from the 
+    markdown: |
+        A text input problem accepts a line of text from the 
         student, and evaluates the input for correctness based on an expected 
         answer.
-        
     
         The answer is correct if it matches every character of the expected answer. This can be a problem with  
         international spelling, dates, or anything where the format of the answer is not clear.
-         
     
         Which US state has Lansing as its capital?
 
@@ -23,9 +18,8 @@ metadata:
         Lansing is the capital of Michigan, although it is not Michgan's largest city, 
         or even the seat of the county in which it resides.
         [explanation]
-        "
 data: |
-    <problem showanswer="always">
+    <problem>
     <p>
 
     A text input problem accepts a line of text from the
@@ -46,4 +40,3 @@ data: |
             </div>
         </solution>
     </problem>
-children: []

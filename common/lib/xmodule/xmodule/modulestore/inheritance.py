@@ -1,16 +1,56 @@
-from xblock.core import Scope
+from datetime import datetime
+from pytz import UTC
 
-# A list of metadata that this module can inherit from its parent module
-INHERITABLE_METADATA = (
-    'graded', 'start', 'due', 'graceperiod', 'showanswer', 'rerandomize',
-    # TODO (ichuang): used for Fall 2012 xqa server access
-    'xqa_key',
-    # How many days early to show a course element to beta testers (float)
-    # intended to be set per-course, but can be overridden in for specific
-    # elements.  Can be a float.
-    'days_early_for_beta',
-    'giturl'  # for git edit link
-)
+from xblock.fields import Scope, Boolean, String, Float, XBlockMixin, Dict
+from xmodule.fields import Date, Timedelta
+from xblock.runtime import KeyValueStore
+
+
+class InheritanceMixin(XBlockMixin):
+    """Field definitions for inheritable fields"""
+
+    graded = Boolean(
+        help="Whether this module contributes to the final course grade",
+        default=False,
+        scope=Scope.settings
+    )
+
+    start = Date(
+        help="Start time when this module is visible",
+        default=datetime.fromtimestamp(0, UTC),
+        scope=Scope.settings
+    )
+    due = Date(help="Date that this problem is due by", scope=Scope.settings)
+    giturl = String(help="url root for course data git repository", scope=Scope.settings)
+    xqa_key = String(help="DO NOT USE", scope=Scope.settings)
+    graceperiod = Timedelta(
+        help="Amount of time after the due date that submissions will be accepted",
+        scope=Scope.settings
+    )
+    showanswer = String(
+        help="When to show the problem answer to the student",
+        scope=Scope.settings,
+        default="finished"
+    )
+    rerandomize = String(
+        help="When to rerandomize the problem",
+        default="never",
+        scope=Scope.settings
+    )
+    days_early_for_beta = Float(
+        help="Number of days early to show content to beta users",
+        default=None,
+        scope=Scope.settings
+    )
+    static_asset_path = String(help="Path to use for static assets - overrides Studio c4x://", scope=Scope.settings, default='')
+    text_customization = Dict(
+        help="String customization substitutions for particular locations",
+        scope=Scope.settings
+    )
+    use_latex_compiler = Boolean(
+        help="Enable LaTeX templates?",
+        default=False,
+        scope=Scope.settings)
 
 
 def compute_inherited_metadata(descriptor):
@@ -20,57 +60,69 @@ def compute_inherited_metadata(descriptor):
 
     NOTE: This means that there is no such thing as lazy loading at the
     moment--this accesses all the children."""
-    for child in descriptor.get_children():
-        inherit_metadata(child, descriptor._model_data)
-        compute_inherited_metadata(child)
+    if descriptor.has_children:
+        parent_metadata = descriptor.xblock_kvs.inherited_settings.copy()
+        # add any of descriptor's explicitly set fields to the inheriting list
+        for field in InheritanceMixin.fields.values():
+            if field.is_set_on(descriptor):
+                # inherited_settings values are json repr
+                parent_metadata[field.name] = field.read_json(descriptor)
+
+        for child in descriptor.get_children():
+            inherit_metadata(child, parent_metadata)
+            compute_inherited_metadata(child)
 
 
-def inherit_metadata(descriptor, model_data):
+def inherit_metadata(descriptor, inherited_data):
     """
     Updates this module with metadata inherited from a containing module.
     Only metadata specified in self.inheritable_metadata will
     be inherited
+
+    `inherited_data`: A dictionary mapping field names to the values that
+        they should inherit
     """
-    # The inherited values that are actually being used.
-    if not hasattr(descriptor, '_inherited_metadata'):
-        setattr(descriptor, '_inherited_metadata', {})
-
-    # All inheritable metadata values (for which a value exists in model_data).
-    if not hasattr(descriptor, '_inheritable_metadata'):
-        setattr(descriptor, '_inheritable_metadata', {})
-
-    # Set all inheritable metadata from kwargs that are
-    # in self.inheritable_metadata and aren't already set in metadata
-    for attr in INHERITABLE_METADATA:
-        if attr in model_data:
-            descriptor._inheritable_metadata[attr] = model_data[attr]
-            if attr not in descriptor._model_data:
-                descriptor._inherited_metadata[attr] = model_data[attr]
-                descriptor._model_data[attr] = model_data[attr]
+    try:
+        descriptor.xblock_kvs.inherited_settings = inherited_data
+    except AttributeError:  # the kvs doesn't have inherited_settings probably b/c it's an error module
+        pass
 
 
 def own_metadata(module):
     """
     Return a dictionary that contains only non-inherited field keys,
-    mapped to their values
+    mapped to their serialized values
     """
-    inherited_metadata = getattr(module, '_inherited_metadata', {})
-    metadata = {}
-    for field in module.fields + module.lms.fields:
-        # Only save metadata that wasn't inherited
-        if field.scope != Scope.settings:
-            continue
+    return module.get_explicitly_set_fields_by_scope(Scope.settings)
 
-        if field.name in inherited_metadata and module._model_data.get(field.name) == inherited_metadata.get(field.name):
-            continue
 
-        if field.name not in module._model_data:
-            continue
+class InheritanceKeyValueStore(KeyValueStore):
+    """
+    Common superclass for kvs's which know about inheritance of settings. Offers simple
+    dict-based storage of fields and lookup of inherited values.
 
-        try:
-            metadata[field.name] = module._model_data[field.name]
-        except KeyError:
-            # Ignore any missing keys in _model_data
-            pass
+    Note: inherited_settings is a dict of key to json values (internal xblock field repr)
+    """
+    def __init__(self, initial_values=None, inherited_settings=None):
+        super(InheritanceKeyValueStore, self).__init__()
+        self.inherited_settings = inherited_settings or {}
+        self._fields = initial_values or {}
 
-    return metadata
+    def get(self, key):
+        return self._fields[key.field_name]
+
+    def set(self, key, value):
+        # xml backed courses are read-only, but they do have some computed fields
+        self._fields[key.field_name] = value
+
+    def delete(self, key):
+        del self._fields[key.field_name]
+
+    def has(self, key):
+        return key.field_name in self._fields
+
+    def default(self, key):
+        """
+        Check to see if the default should be from inheritance rather than from the field's global default
+        """
+        return self.inherited_settings[key.field_name]

@@ -1,10 +1,8 @@
 <%! from django.utils.translation import ugettext as _ %>
-<%! from django.utils import translation    %>
-
 
 <h1>${_("Student Enrollment Form")} </h1>
 
-<p> ${_("Course")}: ${ course }
+<p> ${_("Course: ") % course}
 
 <form method="POST"> 
 <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
@@ -18,13 +16,13 @@
 
 <p> ${ existing_students }
 
-<p> ${_("New students added:")}
+<p> ${_("New students added: ")}
 ${ added_students }
 
-<p> ${_("Students rejected:")}
+<p> ${_("Students rejected: ")}
 ${ rejected_students }
 
-<p> ${_("Debug:")}
+<p> ${_("Debug: ")}
 <p> ${ debug }
 
 

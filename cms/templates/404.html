@@ -8,7 +8,13 @@
   <section class="content">
 
     <h1>${_("Page not found")}</h1>
-    <p>${_("The page that you were looking for was not found. Go back to the <a href="/">homepage</a> or let us know about any pages that may have been moved at")} <a href="mailto:technical@edx.org">technical@edx.org</a>.</p>
+    <p>${_('The page that you were looking for was not found.')}
+       ${_('Go back to the {homepage} or let us know about any pages that may have been moved at {email}.').format(
+            homepage='<a href="/">homepage</a>',
+            email=u'<a href="mailto:{address}">{address}</a>'.format(
+                address=settings.TECH_SUPPORT_EMAIL,
+            ))}
+    </p>
   </section>
 </div>
 

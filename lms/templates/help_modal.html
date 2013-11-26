@@ -1,7 +1,6 @@
-<%namespace name='static' file='static_content.html'/>
 <%! from django.utils.translation import ugettext as _ %>
-<%! from django.utils import translation    %>
 
+<%namespace name='static' file='static_content.html'/>
 <%! from datetime import datetime %>
 <%! import pytz %>
 <%! from django.conf import settings %>
@@ -10,13 +9,16 @@
 % if settings.MITX_FEATURES.get('ENABLE_FEEDBACK_SUBMISSION', False):
 
 <div class="help-tab">
-  <a href="#help-modal" rel="leanModal">${_("Help")}</a>
+  <a href="#help-modal" rel="leanModal" role="button">${_("Help")}</a>
 </div>
 
-<section id="help-modal" class="modal">
+<section id="help-modal" class="modal" aria-hidden="true" role="dialog" aria-label='${_("{platform_name} Help").format(platform_name=settings.PLATFORM_NAME)}'>
   <div class="inner-wrapper" id="help_wrapper">
+    ## TODO: find a way to refactor this
+    <button class="close-modal "tabindex="0">&#10005; <span class="sr">${_('Close Modal')}</span></button>
+
     <header>
-      <h2><span class="edx">edX</span> ${_("Help")}</h2>
+      <h2>${_('{span_start}{platform_name}{span_end} Help').format(span_start='<span class="edx">', span_end='</span>', platform_name=settings.PLATFORM_NAME)}</h2>
       <hr>
     </header>
 
@@ -25,90 +27,111 @@ discussion_link = get_discussion_link(course) if course else None
 %>
 
 % if discussion_link:
-    <p>${_("For <strong>questions on course lectures, homework, tools, or materials for this course</strong>, post in the")}
-       <a href="${discussion_link}" target="_blank"/>${_("course discussion forum")}</a>.
+    <p>${_('For <strong>questions on course lectures, homework, tools, or materials for this course</strong>, post in the {link_start}course discussion forum{link_end}.').format(
+      link_start='<a href="{url}" target="_blank">'.format(url=discussion_link),
+      link_end='</a>',
+      )}
     </p>
 % endif
-    
-    <p>${_("Have <strong>general questions about edX</strong>? You can find lots of helpful information in the edX")}
-       <a href="/help" target="_blank">FAQ</a>.</p>
 
-    <p>${_("Have a <strong>question about something specific</strong>? You can contact the edX general support team directly")}:</p>
+    <p>${_('Have <strong>general questions about {platform_name}</strong>? You can find lots of helpful information in the {platform_name} {link_start}FAQ{link_end}.').format(
+        link_start='<a href="{url}" target="_blank">'.format(
+          url=marketing_link('FAQ')
+        ),
+        link_end='</a>',
+        platform_name=settings.PLATFORM_NAME)}
+      </p>
+
+    <p>${_('Have a <strong>question about something specific</strong>? You can contact the {platform_name} general support team directly:').format(platform_name=settings.PLATFORM_NAME)}</p>
     <hr>
 
     <div class="help-buttons">
-      <a href="#" id="feedback_link_problem">${_("Report a problem")}</a>
-      <a href="#" id="feedback_link_suggestion">${_("Make a suggestion")}</a>
-      <a href="#" id="feedback_link_question">${_("Ask a question")}</a>
-    </div>
-
-## TODO: find a way to refactor this
-    <div class="close-modal">
-      <div class="inner">
-        <p>&#10005;</p>
-      </div>
+      <a href="#" id="feedback_link_problem">${_('Report a problem')}</a>
+      <a href="#" id="feedback_link_suggestion">${_('Make a suggestion')}</a>
+      <a href="#" id="feedback_link_question">${_('Ask a question')}</a>
     </div>
   </div>
 
   <div class="inner-wrapper" id="feedback_form_wrapper">
+    <button class="close-modal">&#10005; <span class="sr">${_('Close Modal')}</span></button>
+
     <header></header>
 
     <form id="feedback_form" class="feedback_form" method="post" data-remote="true" action="/submit_feedback">
-      <div id="feedback_error" class="modal-form-error"></div>
+      <div id="feedback_error" class="modal-form-error" tabindex="-1"></div>
 % if not user.is_authenticated():
-      <label data-field="name">${_("Name")}*</label>
-      <input name="name" type="text">
-      <label data-field="email">E-mail*</label>
-      <input name="email" type="text">
+      <label data-field="name" for="feedback_form_name">${_('Name*')}</label>
+      <input name="name" type="text" id="feedback_form_name" aria-required="true">
+      <label data-field="email" for="feedback_form_email">${_('E-mail*')}</label>
+      <input name="email" type="text" id="feedback_form_email" aria-required="true">
 % endif
-      <label data-field="subject">${_("Briefly describe your issue")}*</label>
-      <input name="subject" type="text">
-      <label data-field="details">${_("Tell us the details")}*
-<span class="tip">${_("Include error messages, steps which lead to the issue, etc")}</span></label>
-      <textarea name="details"></textarea>
+      <label data-field="subject" for="feedback_form_subject">${_('Briefly describe your issue*')}</label>
+      <input name="subject" type="text" id="feedback_form_subject" aria-required="true">
+      <label data-field="details" for="feedback_form_details">${_('Tell us the details*')}
+<span class="tip">${_('Include error messages, steps which lead to the issue, etc')}</span></label>
+      <textarea name="details" id="feedback_form_details" aria-required="true"></textarea>
       <input name="issue_type" type="hidden">
 % if course:
       <input name="course_id" type="hidden" value="${course.id | h}">
 % endif
       <div class="submit">
-        <input name="submit" type="submit" value="Submit">
+        <input name="submit" type="submit" value="Submit" id="feedback_submit">
       </div>
     </form>
-
-    <div class="close-modal">
-      <div class="inner">
-        <p>&#10005;</p>
-      </div>
-    </div>
   </div>
 
-  <div class="inner-wrapper" id="feedback_success_wrapper">
+  <div class="inner-wrapper" id="feedback_success_wrapper" tabindex="0">
+    <button class="close-modal "tabindex="0">&#10005; <span class="sr">${_('Close Modal')}</span></button>
+
     <header>
-      <h2>${_("Thank You")}!</h2>
+      <h2>${_('Thank You!')}</h2>
       <hr>
     </header>
 
     <%
       dst = datetime.now(pytz.utc).astimezone(pytz.timezone("America/New_York")).dst()
-      business_hours = "13:00 UTC to 21:00 UTC" if dst else "14:00 UTC to 22:00 UTC"
+      if dst:
+        open_time = "13:00"
+        close_time = "21:00"
+      else:
+        open_time = "14:00"
+        close_time = "22:00"
     %>
     <p>
-    ${_("Thank you for your inquiry or feedback.  We typically respond to a request within one business day (Monday to Friday")},
-    ${business_hours}.) ${_("In the meantime, please review our")}
-    <a href="/help" target="_blank">${_("detailed")} FAQs</a>
-    ${_("where most questions have already been answered")}.
+    ${_(
+        'Thank you for your inquiry or feedback.  We typically respond to a request '
+        'within one business day (Monday to Friday, {open_time} UTC to {close_time} UTC.) In the meantime, please '
+        'review our {link_start}detailed FAQs{link_end} where most questions have '
+        'already been answered.'
+    ).format(
+        open_time=open_time,
+        close_time=close_time,
+        link_start='<a href="{}" target="_blank" id="feedback-faq-link" tabindex="0">'.format(marketing_link('FAQ')),
+        link_end='</a>'
+    )}
     </p>
-
-    <div class="close-modal">
-      <div class="inner">
-        <p>&#10005;</p>
-      </div>
-    </div>
   </div>
 </section>
 
 <script type="text/javascript">
 (function() {
+    var onModalClose = function() {
+            $(".help-modal .close-modal").off("click");
+            $("#lean_overlay").off("click");
+            $("#help-modal").attr("aria-hidden", "true");
+            $('area,input,select,textarea,button').removeAttr('tabindex');
+            $(".help-tab a").focus();
+        },
+        cycle_modal_tab = function(from_element_name, to_element_name) {
+            $(from_element_name).on('keydown', function(e) {
+                var keyCode = e.keyCode || e.which;
+                if (keyCode === 9) {
+                    e.preventDefault();
+                    $(to_element_name).focus();
+                }
+            });
+        };
+
     $(".help-tab").click(function() {
         $(".field-error").removeClass("field-error");
         $("#feedback_form")[0].reset();
@@ -117,6 +140,10 @@ discussion_link = get_discussion_link(course) if course else None
         $("#feedback_error").css("display", "none");
         $("#feedback_success_wrapper").css("display", "none");
         $("#help_wrapper").css("display", "block");
+        $("#help-modal").attr("aria-hidden", "false");
+        $("#help-modal .close-modal").click(onModalClose);
+        $("#lean_overlay").click(onModalClose);
+        $("#help_wrapper .close-modal").focus();
     });
     showFeedback = function(event, issue_type, title, subject_label, details_label) {
         $("#help_wrapper").css("display", "none");
@@ -125,37 +152,51 @@ discussion_link = get_discussion_link(course) if course else None
         $("#feedback_form_wrapper header").html("<h2>" + title + "</h2><hr>");
         $("#feedback_form_wrapper label[data-field='subject']").html(subject_label);
         $("#feedback_form_wrapper label[data-field='details']").html(details_label);
+        $("#feedback_form_wrapper .close-modal").focus();
         event.preventDefault();
     };
+    cycle_modal_tab("#feedback_link_question", "#help_wrapper .close-modal");
+    cycle_modal_tab("#feedback_submit", "#feedback_form_wrapper .close-modal");
+    cycle_modal_tab("#feedback-faq-link", "#feedback_success_wrapper .close-modal");
+    $("#help-modal").on("keydown", function(e) {
+        var keyCode = e.keyCode || e.which;
+        if (keyCode === 27) {
+            e.preventDefault();
+            $("#help_wrapper .close-modal").click();
+        }
+    });
     $("#feedback_link_problem").click(function(event) {
         showFeedback(
             event,
-            "problem",
-            "Report a Problem",
-            "Brief description of the problem*",
-            "Details of the problem you are encountering* <span class='tip'>Include error messages, steps which lead to the issue, etc.</span>"
+            gettext("problem"),
+            gettext("Report a Problem"),
+            gettext("Brief description of the problem*"),
+            gettext("Details of the problem you are encountering*") + "<span class='tip'>" +
+              gettext("Include error messages, steps which lead to the issue, etc.") + "</span>"
         );
     });
     $("#feedback_link_suggestion").click(function(event) {
         showFeedback(
             event,
-            "suggestion",
-            "Make a Suggestion",
-            "Brief description of your suggestion*",
-            "Details*"
+            gettext("suggestion"),
+            gettext("Make a Suggestion"),
+            gettext("Brief description of your suggestion*"),
+            gettext("Details*")
         );
     });
     $("#feedback_link_question").click(function(event) {
         showFeedback(
             event,
-            "question",
-            "Ask a Question",
-            "Brief summary of your question*",
-            "Details*"
+            gettext("question"),
+            gettext("Ask a Question"),
+            gettext("Brief summary of your question*"),
+            gettext("Details*")
         );
     });
     $("#feedback_form").submit(function() {
         $("input[type='submit']", this).attr("disabled", "disabled");
+        $('area,input,select,textarea,button').attr('tabindex', -1);
+        $("#feedback_form_wrapper .close-modal").focus();
     });
     $("#feedback_form").on("ajax:complete", function() {
         $("input[type='submit']", this).removeAttr("disabled");
@@ -163,26 +204,30 @@ discussion_link = get_discussion_link(course) if course else None
     $("#feedback_form").on("ajax:success", function(event, data, status, xhr) {
         $("#feedback_form_wrapper").css("display", "none");
         $("#feedback_success_wrapper").css("display", "block");
+        $("#feedback_success_wrapper").focus();
     });
     $("#feedback_form").on("ajax:error", function(event, xhr, status, error) {
-        $(".field-error").removeClass("field-error");
+        $(".field-error").removeClass("field-error").removeAttr("aria-invalid");
         var responseData;
         try {
             responseData = jQuery.parseJSON(xhr.responseText);
         } catch(err) {
         }
         if (responseData) {
-            $("[data-field='"+responseData.field+"']").addClass("field-error");
+            $("[data-field='"+responseData.field+"']").addClass("field-error").attr("aria-invalid", "true");
             $("#feedback_error").html(responseData.error).stop().css("display", "block");
         } else {
             // If no data (or malformed data) is returned, a server error occurred
-            htmlStr = "An error has occurred.";
+            htmlStr = gettext("An error has occurred.");
 % if settings.FEEDBACK_SUBMISSION_EMAIL:
-            htmlStr += " Please <a href='#' id='feedback_email'>send us e-mail</a>.";
+            htmlStr += " " + _.template(
+              gettext("Please {link_start}send us e-mail{link_end}."),
+              {link_start: '<a href="#" id="feedback_email">', link_end: '</a>'},
+              {interpolate: /\{(.+?)\}/g})
 % else:
             // If no email is configured, we can't do much other than
             // ask the user to try again later
-            htmlStr += " Please try again later.";
+            htmlStr += gettext(" Please try again later.");
 % endif
             $("#feedback_error").html(htmlStr).stop().css("display", "block");
 % if settings.FEEDBACK_SUBMISSION_EMAIL:
@@ -195,6 +240,8 @@ discussion_link = get_discussion_link(course) if course else None
             });
 %endif
         }
+        // Make change explicit to assistive technology
+        $("#feedback_error").focus();
     });
 })(this)
 </script>

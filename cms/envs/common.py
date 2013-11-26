@@ -25,13 +25,14 @@ Longer TODO:
 
 import sys
 import lms.envs.common
-
-
-from lms.envs.common import USE_TZ
+from lms.envs.common import USE_TZ, TECH_SUPPORT_EMAIL, PLATFORM_NAME, BUGS_EMAIL
 from path import path
 
-
-
+from lms.lib.xblock.mixin import LmsBlockMixin
+from cms.xmodule_namespace import CmsBlockMixin
+from xmodule.modulestore.inheritance import InheritanceMixin
+from xmodule.x_module import XModuleMixin
+from dealer.git import git
 
 ############################ FEATURE CONFIGURATION #############################
 
@@ -44,11 +45,8 @@ MITX_FEATURES = {
 
     'AUTH_USE_MIT_CERTIFICATES': False,
 
-    # do not display video when running automated acceptance tests
-    'STUB_VIDEO_FOR_TESTING': False,
-
-    # email address for staff (eg to request course creation)
-    'STAFF_EMAIL': '',
+    # email address for studio staff (eg to request course creation)
+    'STUDIO_REQUEST_EMAIL': '',
 
     'STUDIO_NPS_SURVEY': True,
 
@@ -63,18 +61,16 @@ MITX_FEATURES = {
 
     # If set to True, new Studio users won't be able to author courses unless
     # edX has explicitly added them to the course creator group.
-    'ENABLE_CREATOR_GROUP': False
+    'ENABLE_CREATOR_GROUP': False,
 }
 ENABLE_JASMINE = False
-
-# needed to use lms student app
-GENERATE_RANDOM_USER_CREDENTIALS = False
 
 
 ############################# SET PATH INFORMATION #############################
 PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /mitx/cms
 REPO_ROOT = PROJECT_ROOT.dirname()
 COMMON_ROOT = REPO_ROOT / "common"
+LMS_ROOT = REPO_ROOT / "lms"
 ENV_ROOT = REPO_ROOT.dirname()  # virtualenv dir /mitx is in
 
 GITHUB_REPO_ROOT = ENV_ROOT / "data"
@@ -94,7 +90,8 @@ MAKO_TEMPLATES = {}
 MAKO_TEMPLATES['main'] = [
     PROJECT_ROOT / 'templates',
     COMMON_ROOT / 'templates',
-    COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates'
+    COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates',
+    COMMON_ROOT / 'djangoapps' / 'pipeline_js' / 'templates',
 ]
 
 for namespace, template_dirs in lms.envs.common.MAKO_TEMPLATES.iteritems():
@@ -113,7 +110,13 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.static',
     'django.contrib.messages.context_processors.messages',
     'django.contrib.auth.context_processors.auth',  # this is required for admin
-    'django.core.context_processors.csrf',  # necessary for csrf protection
+    'django.core.context_processors.csrf',
+    'dealer.contrib.django.staff.context_processor',  # access git revision
+)
+
+# use the ratelimit backend to prevent brute force attacks
+AUTHENTICATION_BACKENDS = (
+    'ratelimitbackend.backends.RateLimitModelBackend',
 )
 
 LMS_BASE = None
@@ -133,6 +136,7 @@ XQUEUE_INTERFACE = {
 STATICFILES_FINDERS = (
     'staticfiles.finders.FileSystemFinder',
     'staticfiles.finders.AppDirectoriesFinder',
+    'pipeline.finders.PipelineFinder',
 )
 
 # List of callables that know how to import templates from various sources.
@@ -142,16 +146,18 @@ TEMPLATE_LOADERS = (
 )
 
 MIDDLEWARE_CLASSES = (
-    'contentserver.middleware.StaticContentServer',
     'request_cache.middleware.RequestCache',
     'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
     'method_override.middleware.MethodOverrideMiddleware',
 
     # Instead of AuthenticationMiddleware, we use a cache-backed version
     'cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
+    'student.middleware.UserStandingMiddleware',
+    'contentserver.middleware.StaticContentServer',
+    'crum.CurrentRequestUserMiddleware',
 
     'django.contrib.messages.middleware.MessageMiddleware',
     'track.middleware.TrackMiddleware',
@@ -160,9 +166,18 @@ MIDDLEWARE_CLASSES = (
     # Detects user-requested locale from 'accept-language' header in http request
     'django.middleware.locale.LocaleMiddleware',
 
-    'django.middleware.transaction.TransactionMiddleware'
+    'django.middleware.transaction.TransactionMiddleware',
 
+    # catches any uncaught RateLimitExceptions and returns a 403 instead of a 500
+    'ratelimitbackend.middleware.RateLimitMiddleware',
 )
+
+############# XBlock Configuration ##########
+
+# This should be moved into an XBlock Runtime/Application object
+# once the responsibility of XBlock creation is moved out of modulestore - cpennington
+XBLOCK_MIXINS = (LmsBlockMixin, CmsBlockMixin, InheritanceMixin, XModuleMixin)
+
 
 ############################ SIGNAL HANDLERS ################################
 # This is imported to register the exception signal handling that logs exceptions
@@ -182,41 +197,40 @@ IGNORABLE_404_ENDS = ('favicon.ico')
 
 # Email
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-DEFAULT_FROM_EMAIL = 'registration@edx.org'
-DEFAULT_FEEDBACK_EMAIL = 'feedback@edx.org'
-SERVER_EMAIL = 'devops@edx.org'
-ADMINS = (
-    ('edX Admins', 'admin@edx.org'),
-)
+DEFAULT_FROM_EMAIL = 'registration@example.com'
+DEFAULT_FEEDBACK_EMAIL = 'feedback@example.com'
+SERVER_EMAIL = 'devops@example.com'
+ADMINS = ()
 MANAGERS = ADMINS
 
 # Static content
-STATIC_URL = '/static/'
+STATIC_URL = '/static/' + git.revision + "/"
 ADMIN_MEDIA_PREFIX = '/static/admin/'
-STATIC_ROOT = ENV_ROOT / "staticfiles"
+STATIC_ROOT = ENV_ROOT / "staticfiles" / git.revision
 
 STATICFILES_DIRS = [
     COMMON_ROOT / "static",
     PROJECT_ROOT / "static",
+    LMS_ROOT / "static",
 
-# This is how you would use the textbook images locally
-# ("book", ENV_ROOT / "book_images")
+    # This is how you would use the textbook images locally
+    # ("book", ENV_ROOT / "book_images")
 ]
 
 # Locale/Internationalization
-# TIME_ZONE = 'America/New_York'
-TIME_ZONE = 'Asia/Ho_Chi_Minh'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
-# LANGUAGE_CODE = 'en'
-LANGUAGE_CODE = 'vi'  # http://www.i18nguy.com/unicode/language-identifiers.html
+TIME_ZONE = 'America/New_York'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
+LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
 
-USE_I18N = True
+# We want i18n to be turned off in production, at least until we have full localizations.
+# Thus we want the Django translation engine to be disabled. Otherwise even without
+# localization files, if the user's browser is set to a language other than us-en,
+# strings like "login" and "password" will be translated and the rest of the page will be
+# in English, which is confusing.
+USE_I18N = False
 USE_L10N = True
 
 # Localization strings (e.g. django.po) are under this directory
 LOCALE_PATHS = (REPO_ROOT + '/conf/locale',)  # mitx/conf/locale/
-
-# Tracking
-TRACK_MAX_EVENT = 10000
 
 # Messages
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
@@ -228,52 +242,74 @@ STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
 from rooted_paths import rooted_glob
 
 PIPELINE_CSS = {
-    'base-style': {
+    'style-vendor': {
         'source_filenames': [
+            'css/vendor/normalize.css',
+            'css/vendor/font-awesome.css',
             'js/vendor/CodeMirror/codemirror.css',
             'css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css',
             'css/vendor/jquery.qtip.min.css',
-            'sass/base-style.css',
-            'xmodule/modules.css',
-            'xmodule/descriptor.css',
+            'js/vendor/markitup/skins/simple/style.css',
+            'js/vendor/markitup/sets/wiki/style.css',
         ],
-        'output_filename': 'css/cms-base-style.css',
+        'output_filename': 'css/cms-style-vendor.css',
+    },
+    'style-app': {
+        'source_filenames': [
+            'sass/style-app.css',
+        ],
+        'output_filename': 'css/cms-style-app.css',
+    },
+    'style-app-extend1': {
+        'source_filenames': [
+            'sass/style-app-extend1.css',
+        ],
+        'output_filename': 'css/cms-style-app-extend1.css',
+    },
+    'style-xmodule': {
+        'source_filenames': [
+            'sass/style-xmodule.css',
+        ],
+        'output_filename': 'css/cms-style-xmodule.css',
     },
 }
 
 # test_order: Determines the position of this chunk of javascript on
 # the jasmine test page
 PIPELINE_JS = {
-    'main': {
-        'source_filenames': sorted(
-            rooted_glob(COMMON_ROOT / 'static/', 'coffee/src/**/*.js') +
-            rooted_glob(PROJECT_ROOT / 'static/', 'coffee/src/**/*.js')
-        ) + ['js/hesitate.js', 'js/base.js', 'js/views/feedback.js',
-             'js/models/section.js', 'js/views/section.js',
-             'js/models/metadata_model.js', 'js/views/metadata_editor_view.js',
-             'js/models/textbook.js', 'js/views/textbook.js',
-             'js/views/assets.js'],
-        'output_filename': 'js/cms-application.js',
-        'test_order': 0
-    },
     'module-js': {
         'source_filenames': (
             rooted_glob(COMMON_ROOT / 'static/', 'xmodule/descriptors/js/*.js') +
-            rooted_glob(COMMON_ROOT / 'static/', 'xmodule/modules/js/*.js')
+            rooted_glob(COMMON_ROOT / 'static/', 'xmodule/modules/js/*.js') +
+            rooted_glob(COMMON_ROOT / 'static/', 'coffee/src/discussion/*.js')
         ),
         'output_filename': 'js/cms-modules.js',
         'test_order': 1
     },
 }
 
+PIPELINE_COMPILERS = (
+    'pipeline.compilers.coffee.CoffeeScriptCompiler',
+)
+
 PIPELINE_CSS_COMPRESSOR = None
 PIPELINE_JS_COMPRESSOR = None
 
 STATICFILES_IGNORE_PATTERNS = (
-    "sass/*",
-    "coffee/*",
     "*.py",
     "*.pyc"
+    # it would be nice if we could do, for example, "**/*.scss",
+    # but these strings get passed down to the `fnmatch` module,
+    # which doesn't support that. :(
+    # http://docs.python.org/2/library/fnmatch.html
+    "sass/*.scss",
+    "sass/*/*.scss",
+    "sass/*/*/*.scss",
+    "sass/*/*/*/*.scss",
+    "coffee/*.coffee",
+    "coffee/*/*.coffee",
+    "coffee/*/*/*.coffee",
+    "coffee/*/*/*/*.coffee",
 )
 
 PIPELINE_YUI_BINARY = 'yui-compressor'
@@ -339,6 +375,9 @@ INSTALLED_APPS = (
     # Monitor the status of services
     'service_status',
 
+    # Testing
+    'django_nose',
+
     # For CMS
     'contentstore',
     'auth',
@@ -346,8 +385,12 @@ INSTALLED_APPS = (
     'student',  # misleading name due to sharing with lms
     'course_groups',  # not used in cms (yet), but tests run
 
-    # tracking
+    # Tracking
     'track',
+    'eventtracking.django',
+
+    # Monitoring
+    'datadog',
 
     # For asset pipelining
     'mitxmako',
@@ -359,8 +402,12 @@ INSTALLED_APPS = (
     'django_comment_common',
 
     # for course creator table
-    'django.contrib.admin'
+    'django.contrib.admin',
+
+    # for managing course modes
+    'course_modes'
 )
+
 
 ################# EDX MARKETING SITE ##################################
 
@@ -378,3 +425,28 @@ MKTG_URL_LINK_MAP = {
 }
 
 COURSES_WITH_UNSAFE_CODE = []
+
+############################## EVENT TRACKING #################################
+
+TRACK_MAX_EVENT = 10000
+
+TRACKING_BACKENDS = {
+    'logger': {
+        'ENGINE': 'track.backends.logger.LoggerBackend',
+        'OPTIONS': {
+            'name': 'tracking'
+        }
+    }
+}
+
+# We're already logging events, and we don't want to capture user
+# names/passwords.  Heartbeat events are likely not interesting.
+TRACKING_IGNORE_URL_PATTERNS = [r'^/event', r'^/login', r'^/heartbeat']
+TRACKING_ENABLED = True
+
+# Current youtube api for requesting transcripts.
+# for example: http://video.google.com/timedtext?lang=en&v=j_jEn79vS3g.
+YOUTUBE_API = {
+    'url': "http://video.google.com/timedtext",
+    'params': {'lang': 'en', 'v': 'set_youtube_id_of_11_symbols_here'}
+}

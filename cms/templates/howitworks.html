@@ -1,17 +1,20 @@
-<%! from django.utils.translation import ugettext as _ %>
-
 <%inherit file="base.html" />
-<%! from django.core.urlresolvers import reverse %>
+<%namespace name='static' file='static_content.html'/>
+<%!
+  from django.core.urlresolvers import reverse
+  from django.utils.translation import ugettext as _
+%>
 
 <%block name="title">${_("Welcome")}</%block>
-<%block name="bodyclass">not-signedin index howitworks</%block>
+<%block name="bodyclass">not-signedin index view-howitworks</%block>
 
 <%block name="content">
 
 <div class="wrapper-content-header wrapper">
   <section class="content content-header">
     <header>
-      <h1>${_("Welcome to")} <span class="logo">edX Studio</span></h1>
+      ## "edX Studio" should not be translated
+      <h1><span class="wrapper-text-welcome">${_('Welcome to')}</span><span class="logo">edX Studio</span></h1>
       <p class="tagline">${_("Studio helps manage your courses online, so you can focus on teaching them")}</p>
     </header>
   </section>
@@ -27,7 +30,7 @@
       <li class="feature">
         <figure class="img zoom">
           <a rel="modal" href="#hiw-feature1">
-            <img src="/static/img/thumb-hiw-feature1.png" alt="Studio Helps You Keep Your Courses Organized" />
+            <img src="${static.url("img/thumb-hiw-feature1.png")}" alt="${_('Studio Helps You Keep Your Courses Organized')}" />
             <figcaption class="sr">${_("Studio Helps You Keep Your Courses Organized")}</figcaption>
             <span class="action-zoom">
               <i class="icon-zoom-in"></i>
@@ -42,7 +45,7 @@
           <ul class="list-proofpoints">
             <li class="proofpoint">
               <h4 class="title">${_("Simple Organization For Content")}</h4>
-              <p>${_("Studio uses a simple hierarchy of")} <strong>${_("sections")}</strong> ${_("and")} <strong>${_("subsections")}</strong> ${_("to organize your content.")}</p>
+              <p>${_("Studio uses a simple hierarchy of <strong>sections</strong> and <strong>subsections</strong> to organize your content.")}</p>
             </li>
 
             <li class="proofpoint">
@@ -52,7 +55,7 @@
 
             <li class="proofpoint">
               <h4 class="title">${_("Go A Week Or A Semester At A Time")}</h4>
-              <p>${_("Build and release")} <strong>${_("sections")}</strong> ${_("to your students incrementally. You don't have to have it all done at once.")}</p>
+              <p>${_("Build and release <strong>sections</strong> to your students incrementally. You don't have to have it all done at once.")}</p>
             </li>
           </ul>
         </div>
@@ -61,7 +64,7 @@
       <li class="feature">
         <figure class="img zoom">
         <a rel="modal" href="#hiw-feature2">
-          <img src="/static/img/thumb-hiw-feature2.png" alt="Learning is More than Just Lectures" />
+          <img src="${static.url("img/thumb-hiw-feature2.png")}" alt="${_('Learning is More than Just Lectures')}" />
           <figcaption class="sr">${_("Learning is More than Just Lectures")}</figcaption>
           <span class="action-zoom">
             <i class="icon-zoom-in"></i>
@@ -81,12 +84,12 @@
 
             <li class="proofpoint">
               <h4 class="title">${_("Work Visually, Organize Quickly")}</h4>
-              <p>${_("Work visually and see exactly what your students will see. Reorganize all your content with drag and drop")}.</p>
+              <p>${_("Work visually and see exactly what your students will see. Reorganize all your content with drag and drop.")}</p>
             </li>
 
             <li class="proofpoint">
               <h4 class="title">${_("A Broad Library of Problem Types")}</h4>
-              <p>${_("It's more than just multiple choice. Studio has nearly a dozen types of problems to challenge your learners")}.</p>
+              <p>${_("It's more than just multiple choice. Studio has nearly a dozen types of problems to challenge your learners.")}</p>
             </li>
           </ul>
         </div>
@@ -95,8 +98,8 @@
       <li class="feature">
         <figure class="img zoom">
           <a rel="modal" href="#hiw-feature3">
-            <img src="/static/img/thumb-hiw-feature3.png" alt="Studio Gives You Simple, Fast, and Incremental Publishing. With Friends." />
-            <figcaption class="sr">${_("Studio Gives You Simple, Fast, and Incremental Publishing. With Friends")}.</figcaption>
+            <img src="${static.url("img/thumb-hiw-feature3.png")}" alt="${_('Studio Gives You Simple, Fast, and Incremental Publishing. With Friends.')}" />
+            <figcaption class="sr">${_("Studio Gives You Simple, Fast, and Incremental Publishing. With Friends.")}</figcaption>
             <span class="action-zoom">
               <i class="icon-zoom-in"></i>
             </span>
@@ -104,7 +107,7 @@
         </figure>
 
         <div class="copy">
-          <h3>${_("Simple, Fast, and Incremental Publishing. With Friends")}.</h3>
+          <h3>${_("Simple, Fast, and Incremental Publishing. With Friends.")}</h3>
           <p>${_("Studio works like web applications you already know, yet understands how you build curriculum. Instant publishing to the web when you want it, incremental release when it makes sense. And with co-authors, you can have a whole team building a course, together.")}</p>
 
           <ul class="list-proofpoints">
@@ -115,7 +118,7 @@
 
             <li class="proofpoint">
               <h4 class="title">${_("Release-On Date Publishing")}</h4>
-              <p>${_("When you've finished a")} <strong>${_("section")}</strong>, ${_("pick when you want it to go live and Studio takes care of the rest. Build your course incrementally.")}</p>
+              <p>${_("When you've finished a <strong>section</strong>, pick when you want it to go live and Studio takes care of the rest. Build your course incrementally.")}</p>
             </li>
 
             <li class="proofpoint">
@@ -149,7 +152,7 @@
 <div class="content-modal" id="hiw-feature1">
   <h3 class="title">${_("Outlining Your Course")}</h3>
   <figure>
-    <img src="/static/img/hiw-feature1.png" alt="" />
+    <img src="${static.url("img/hiw-feature1.png")}" alt="" />
     <figcaption class="description">${_("Simple two-level outline to organize your couse. Drag and drop, and see your course at a glance.")}</figcaption>
   </figure>
 
@@ -162,7 +165,7 @@
 <div class="content-modal" id="hiw-feature2">
   <h3 class="title">${_("More than Just Lectures")}</h3>
   <figure>
-    <img src="/static/img/hiw-feature2.png" alt="" />
+    <img src="${static.url("img/hiw-feature2.png")}" alt="" />
     <figcaption class="description">${_("Quickly create videos, text snippets, inline discussions, and a variety of problem types.")}</figcaption>
   </figure>
 
@@ -175,7 +178,7 @@
 <div class="content-modal" id="hiw-feature3">
   <h3 class="title">${_("Publishing on Date")}</h3>
   <figure>
-    <img src="/static/img/hiw-feature3.png" alt="" />
+    <img src="${static.url("img/hiw-feature3.png")}" alt="" />
     <figcaption class="description">${_("Simply set the date of a section or subsection, and Studio will publish it to your students for you.")}</figcaption>
   </figure>
 

@@ -3,7 +3,7 @@
 
 from lettuce import world, step
 from lettuce.django import django_url
-from nose.tools import assert_equals, assert_in
+from nose.tools import assert_equals, assert_in  # pylint: disable=E0611
 from logging import getLogger
 logger = getLogger(__name__)
 
@@ -11,7 +11,7 @@ logger = getLogger(__name__)
 @step('I navigate to an openended question$')
 def navigate_to_an_openended_question(step):
     world.register_by_course_id('MITx/3.091x/2012_Fall')
-    world.log_in('robot@edx.org', 'test')
+    world.log_in(email='robot@edx.org', password='test')
     problem = '/courses/MITx/3.091x/2012_Fall/courseware/Week_10/Polymer_Synthesis/'
     world.browser.visit(django_url(problem))
     tab_css = 'ol#sequence-list > li > a[data-element="5"]'
@@ -21,7 +21,7 @@ def navigate_to_an_openended_question(step):
 @step('I navigate to an openended question as staff$')
 def navigate_to_an_openended_question_as_staff(step):
     world.register_by_course_id('MITx/3.091x/2012_Fall', True)
-    world.log_in('robot@edx.org', 'test')
+    world.log_in(email='robot@edx.org', password='test')
     problem = '/courses/MITx/3.091x/2012_Fall/courseware/Week_10/Polymer_Synthesis/'
     world.browser.visit(django_url(problem))
     tab_css = 'ol#sequence-list > li > a[data-element="5"]'

@@ -1,10 +1,13 @@
+<%! from django.utils.translation import ugettext as _ %>
+
 <%inherit file="main.html" />
 <%namespace name='static' file='static_content.html'/>
-<%block name="title"><title>${course.number} Textbook</title>
+<%block name="title"><title>${_('{course_number} Textbook').format(course_number=course.display_number_with_default) | h}</title>
 </%block>
 
 <%block name="headextra">
-<%static:css group='course'/>
+<%static:css group='style-course-vendor'/>
+<%static:css group='style-course'/>
 <%static:js group='courseware'/>
 </%block>
 
@@ -22,7 +25,7 @@
         }
         var chapterToLoad = 1;
         if (options.chapterNum) {
-            // TODO: this should only be specified if there are 
+            // TODO: this should only be specified if there are
             // chapters, and it should be in-bounds.
             chapterToLoad = options.chapterNum;
         }
@@ -51,9 +54,9 @@
 	    // if there is an anchor set, then go to that location:
             if (anchorId != null) {
 		// TODO: add implementation....
-            } 
+            }
 
-        }; 
+        };
 
         loadChapterUrl = function htmlViewLoadChapterUrl(chapterNum, anchorId) {
             if (chapterNum < 1 || chapterNum > chapterUrls.length) {
@@ -63,7 +66,7 @@
             loadUrl(chapterUrl, anchorId);
         };
 
-        // define navigation links for chapters:  
+        // define navigation links for chapters:
         if (chapterUrls != null) {
             var loadChapterUrlHelper = function(i) {
                 return function(event) {
@@ -73,7 +76,7 @@
             };
             for (var index = 1; index <= chapterUrls.length; index += 1) {
                 $("#htmlchapter-" + index).click(loadChapterUrlHelper(index));
-            }   
+            }
         }
 
         // finally, load the appropriate url/page
@@ -81,7 +84,7 @@
             loadUrl(urlToLoad, anchorToLoad);
         } else {
             loadChapterUrl(chapterToLoad, anchorToLoad);
-        }       
+        }
 
     }
 })(jQuery);
@@ -112,7 +115,7 @@
 
         $('#outerContainer').myHTMLViewer(options);
     });
-  </script>  
+  </script>
 </%block>
 
 <%include file="/courseware/course_navigation.html" args="active_page='htmltextbook/{0}'.format(book_index)" />
@@ -121,7 +124,7 @@
       <div id="mainContainer" class="book-wrapper">
 
         %if 'chapters' in textbook:
-        <section aria-label="Textbook Navigation" class="book-sidebar">
+        <section aria-label="${_('Textbook Navigation')}" class="book-sidebar">
           <ul id="booknav" class="treeview-booknav">
             <%def name="print_entry(entry, index_value)">
               <li id="htmlchapter-${index_value}">
@@ -139,9 +142,9 @@
         %endif
 
         <section id="viewerContainer" class="book">
-          <section class="page"> 
+          <section class="page">
             <div id="bookpage" />
-          </section> 
+          </section>
         </section>
 
       </div>

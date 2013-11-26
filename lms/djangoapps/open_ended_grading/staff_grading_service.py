@@ -4,17 +4,20 @@ This module provides views that proxy to the staff grading backend service.
 
 import json
 import logging
-from xmodule.open_ended_grading_classes.grading_service_module import GradingService, GradingServiceError
 
 from django.conf import settings
 from django.http import HttpResponse, Http404
 
-from courseware.access import has_access
-from util.json_request import expect_json
 from xmodule.course_module import CourseDescriptor
-from student.models import unique_id_for_user
-from xmodule.x_module import ModuleSystem
+from xmodule.open_ended_grading_classes.grading_service_module import GradingService, GradingServiceError
+
+from courseware.access import has_access
+from lms.lib.xblock.runtime import LmsModuleSystem
 from mitxmako.shortcuts import render_to_string
+from student.models import unique_id_for_user
+from util.json_request import expect_json
+
+from open_ended_grading.utils import does_location_exist
 
 log = logging.getLogger(__name__)
 
@@ -66,13 +69,12 @@ class StaffGradingService(GradingService):
     """
 
     def __init__(self, config):
-        config['system'] = ModuleSystem(
-            ajax_url=None,
+        config['system'] = LmsModuleSystem(
+            static_url='/static',
             track_function=None,
             get_module = None,
             render_template=render_to_string,
             replace_urls=None,
-            xblock_model_data= {}
         )
         super(StaffGradingService, self).__init__(config)
         self.url = config['url'] + config['staff_grading']
@@ -240,7 +242,6 @@ def get_next(request, course_id):
     return HttpResponse(_get_next(course_id, grader_id, location),
                         mimetype="application/json")
 
-
 def get_problem_list(request, course_id):
     """
     Get all the problems for the given course id
@@ -262,10 +263,35 @@ def get_problem_list(request, course_id):
             min_for_ml: the number of responses that need to be graded before
                 the ml can be run
 
+        'error': if success is False, will have an error message with more info.
     """
     _check_access(request.user, course_id)
     try:
         response = staff_grading_service().get_problem_list(course_id, unique_id_for_user(request.user))
+        response = json.loads(response)
+
+        # If 'problem_list' is in the response, then we got a list of problems from the ORA server.
+        # If it is not, then ORA could not find any problems.
+        if 'problem_list' in response:
+            problem_list = response['problem_list']
+        else:
+            problem_list = []
+            # Make an error messages to reflect that we could not find anything to grade.
+            response['error'] = ("Cannot find any open response problems in this course.  "
+                                 "Have you submitted answers to any open response assessment questions?  "
+                                 "If not, please do so and return to this page.")
+        valid_problem_list = []
+        for i in xrange(0,len(problem_list)):
+            # Needed to ensure that the 'location' key can be accessed.
+            try:
+                problem_list[i] = json.loads(problem_list[i])
+            except Exception:
+                pass
+            if does_location_exist(course_id, problem_list[i]['location']):
+                valid_problem_list.append(problem_list[i])
+        response['problem_list'] = valid_problem_list
+        response = json.dumps(response)
+
         return HttpResponse(response,
                             mimetype="application/json")
     except GradingServiceError:
@@ -296,7 +322,6 @@ def _get_next(course_id, grader_id, location):
                            'error': STAFF_ERROR_MESSAGE})
 
 
-@expect_json
 def save_grade(request, course_id):
     """
     Save the grade and feedback for a submission, and, if all goes well, return

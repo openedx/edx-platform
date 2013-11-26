@@ -1,4 +1,5 @@
-Feature: Homepage for web users
+@shard_1
+Feature: LMS.Homepage for web users
   In order to get an idea what edX is about
   As a an anonymous web user
   I want to check the information on the home page

@@ -1,4 +1,8 @@
 describe 'HTMLEditingDescriptor', ->
+  beforeEach ->
+    window.baseUrl = "/static/deadbeef"
+  afterEach ->
+    delete window.baseUrl
   describe 'Read data from server, create Editor, and get data back out', ->
     it 'Does not munge &lt', ->
 #     This is a test for Lighthouse #22,
@@ -48,6 +52,16 @@ describe 'HTMLEditingDescriptor', ->
       expect(@descriptor.showingVisualEditor).toEqual(true)
       data = @descriptor.save().data
       expect(data).toEqual('from visual editor')
+    it 'Performs link rewriting for static assets when saving', ->
+      visualEditorStub =
+        isDirty: () -> true
+        getContent: () -> 'from visual editor with /c4x/foo/bar/asset/image.jpg'
+      spyOn(@descriptor, 'getVisualEditor').andCallFake () ->
+        visualEditorStub
+      expect(@descriptor.showingVisualEditor).toEqual(true)
+      @descriptor.base_asset_url = '/c4x/foo/bar/asset/'
+      data = @descriptor.save().data
+      expect(data).toEqual('from visual editor with /static/image.jpg')
   describe 'Can switch to Advanced Editor', ->
     beforeEach ->
       loadFixtures 'html-edit.html'
@@ -88,3 +102,23 @@ describe 'HTMLEditingDescriptor', ->
       expect(visualEditorStub.isDirty()).toEqual(false)
       expect(visualEditorStub.getContent()).toEqual('Advanced Editor Text')
       expect(visualEditorStub.startContent).toEqual('Advanced Editor Text')
+    it 'When switching to visual editor links are rewritten to c4x format', ->
+      loadFixtures 'html-edit-with-links.html'
+      @descriptor = new HTMLEditingDescriptor($('.html-edit'))
+      @descriptor.base_asset_url = '/c4x/foo/bar/asset/'
+      @descriptor.showingVisualEditor = false
+
+      visualEditorStub =
+        isNotDirty: false
+        content: 'not set'
+        startContent: 'not set',
+        focus: () -> true
+        isDirty: () -> not @isNotDirty
+        setContent: (x) -> @content = x
+        getContent: -> @content
+
+      @descriptor.showVisualEditor(visualEditorStub)
+      expect(@descriptor.showingVisualEditor).toEqual(true)
+      expect(visualEditorStub.isDirty()).toEqual(false)
+      expect(visualEditorStub.getContent()).toEqual('Advanced Editor Text with link /c4x/foo/bar/asset/dummy.jpg')
+      expect(visualEditorStub.startContent).toEqual('Advanced Editor Text with link /c4x/foo/bar/asset/dummy.jpg')

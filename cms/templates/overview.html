@@ -1,62 +1,49 @@
-<%! from django.utils.translation import ugettext as _ %>
-
-
 <%inherit file="base.html" />
-
 <%!
-   import logging
-   from xmodule.util import date_utils
+  import logging
+  from xmodule.util import date_utils
+  from django.utils.translation import ugettext as _
+  from django.core.urlresolvers import reverse
+  from xmodule.modulestore.django import loc_mapper
 %>
-<%! from django.core.urlresolvers import reverse %>
 <%block name="title">${_("Course Outline")}</%block>
-<%block name="bodyclass">is-signedin course outline</%block>
+<%block name="bodyclass">is-signedin course view-outline</%block>
 
 <%namespace name='static' file='static_content.html'/>
 <%namespace name="units" file="widgets/units.html" />
 
 <%block name="jsextra">
-  <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
-  <script src="${static.url('js/vendor/timepicker/jquery.timepicker.js')}"></script>
-  <script src="${static.url('js/vendor/timepicker/datepair.js')}"></script>
-  <script src="${static.url('js/vendor/date.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/models/course_relative.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/views/grader-select-view.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/views/overview.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/models/settings/course_grading_policy.js')}"></script>
-
+<link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
+<link rel="stylesheet" type="text/css" href="${static.url('css/vendor/html5-input-polyfills/number-polyfill.css')}" />
   <script type="text/template" id="section-name-edit-tpl">
     <%static:include path="js/section-name-edit.underscore" />
   </script>
-  <script type="text/javascript" src="${static.url('js/models/section.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/views/section.js')}"></script>
 
   <script type="text/javascript">
-  $(document).ready(function(){
-    // TODO figure out whether these should be in window or someplace else or whether they're only needed as local vars
-    // I believe that current (New Section/New Subsection) cause full page reloads which means these aren't needed globally
-    // but we really should change that behavior.
-    if (!window.graderTypes) {
-      window.graderTypes = new CMS.Models.Settings.CourseGraderCollection();
-      window.graderTypes.course_location = new CMS.Models.Location('${parent_location}');
-      window.graderTypes.reset(${course_graders|n});
-    }
+require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/views/section_show", "js/views/overview_assignment_grader", "js/collections/course_grader", "js/views/overview", "jquery.inputnumber"],
+    function(doc, $, Location, SectionModel, SectionShowView, OverviewAssignmentGrader, CourseGraderCollection){
+  // TODO figure out whether these should be in window or someplace else or whether they're only needed as local vars
+  // I believe that current (New Section/New Subsection) cause full page reloads which means these aren't needed globally
+  // but we really should change that behavior.
+  if (!window.graderTypes) {
+    window.graderTypes = new CourseGraderCollection(${course_graders|n}, {parse:true});
+  }
 
-    $(".gradable-status").each(function(index, ele) {
-        var gradeView = new CMS.Views.OverviewAssignmentGrader({
-            el : ele,
-            graders : window.graderTypes
-        });
-    });
-
-    $(".section-name").each(function() {
-        var model = new CMS.Models.Section({
-            id: $(this).parent(".item-details").data("id"),
-            name: $(this).data("name")
-        });
-        new CMS.Views.SectionShow({model: model, el: this}).render();
-    })
+  $(".gradable-status").each(function(index, ele) {
+      var gradeView = new OverviewAssignmentGrader({
+          el : ele,
+          graders : window.graderTypes
+      });
   });
 
+  $(".section-name").each(function() {
+      var model = new SectionModel({
+          id: $(this).parent(".item-details").data("locator"),
+          name: $(this).data("name")
+      });
+      new SectionShowView({model: model, el: this}).render();
+  })
+});
   </script>
 </%block>
 
@@ -64,12 +51,13 @@
   <script type="text/template" id="new-section-template">
     <section class="courseware-section branch new-section">
       <header>
-        <a href="#"  data-tooltip="Collapse/expand this section" class="expand-collapse-icon collapse"></a>
+      <a href="#"  data-tooltip="${_('Collapse/expand this section')}" class="expand-collapse-icon collapse"></a>
         <div class="item-details">
           <h3 class="section-name">
           <form class="section-name-form">
             <input type="text" value="${_('New Section Name')}" class="new-section-name" />
-            <input type="submit" class="new-section-name-save" data-parent="${parent_location}" data-template="${new_section_template}" value="${_('Save')}" />
+            <input type="submit" class="new-section-name-save" data-parent="${parent_locator}"
+                   data-category="${new_section_category}" value="${_('Save')}" />
             <input type="button" class="new-section-name-cancel" value="${_('Cancel')}" /></h3>
           </form>
         </div>
@@ -80,19 +68,20 @@
   <script type="text/template" id="blank-slate-template">
     <section class="courseware-section branch new-section">
       <header>
-        <a href="#"  data-tooltip="Collapse/expand this section" class="expand-collapse-icon collapse"></a>
+      <a href="#"  data-tooltip="${_('Collapse/expand this section')}" class="expand-collapse-icon collapse"></a>
         <div class="item-details">
           <h3 class="section-name">
-          <span class="section-name-span">${_("Click here to set the section name")}</span>
+          <span class="section-name-span">Click here to set the section name</span>
           <form class="section-name-form">
             <input type="text" value="${_('New Section Name')}" class="new-section-name" />
-            <input type="submit" class="new-section-name-save" data-parent="${parent_location}" data-template="${new_section_template}" value="${_('Save')}" />
-            <input type="button" class="new-section-name-cancel" value="${_('Cancel')}" /></h3>
+            <input type="submit" class="new-section-name-save" data-parent="${parent_locator}"
+                   data-category="${new_section_category}" value="${_('Save')}" />
+            <input type="button" class="new-section-name-cancel" value="$(_('Cancel')}" /></h3>
           </form>
         </div>
         <div class="item-actions">
-          <a href="#" data-tooltip="Delete this section" class="delete-button delete-section-button"><span class="delete-icon"></span></a>
-          <a href="#" data-tooltip="Drag to re-order" class="drag-handle"></a>
+          <a href="#" data-tooltip="${_('Delete this section')}" class="delete-button delete-section-button"><span class="delete-icon"></span></a>
+          <span data-tooltip="${_('Drag to re-order')}" class="drag-handle"></span>
         </div>
       </header>
     </section>
@@ -113,7 +102,7 @@
       <ol>
         <li>
           <a href="unit.html" class="new-unit-item">
-            <span class="new-unit-icon"></span>${_("New Unit")}
+            <span class="new-unit-icon"></span>${_('New Unit')}
           </a>
         </li>
       </ol>
@@ -122,7 +111,6 @@
 </%block>
 
 <%block name="content">
-
   <div class="wrapper-mast wrapper">
     <header class="mast has-actions has-subtitle">
       <h1 class="page-header">
@@ -149,80 +137,111 @@
 
   <div class="main-wrapper">
     <div class="inner-wrapper">
-      <article class="courseware-overview" data-course-id="${context_course.location.url()}">
-        % for section in sections:
-        <section class="courseware-section branch" data-id="${section.location}">
-          <header>
-            <a href="#" data-tooltip="Expand/collapse this section" class="expand-collapse-icon collapse"></a>
 
-            <div class="item-details" data-id="${section.location}">
-              <h3 class="section-name" data-name="${section.display_name_with_default | h}"></h3>
-              <div class="section-published-date">
-                <%
-                  if section.lms.start is not None:
-                      start_date_str = section.lms.start.strftime('%m/%d/%Y')
-                      start_time_str = section.lms.start.strftime('%H:%M')
-                  else:
-                      start_date_str = ''
-                      start_time_str = ''
-                %>
-                %if section.lms.start is None:
-                  <span class="published-status">${_("This section has not been released.")}</span>
-                  <a href="#" class="schedule-button" data-date="" data-time="" data-id="${section.location}">${_("Schedule")}</a>
-                %else:
-                  <span class="published-status"><strong>${_("Will Release:")}</strong>
-                  ${date_utils.get_default_time_display(section.lms.start)}</span>
-                  <a href="#" class="edit-button" data-date="${start_date_str}"
-                    data-time="${start_time_str}" data-id="${section.location}">${_("Edit")}</a>
-                %endif
-              </div>
-            </div>
+      <div class="wrapper-dnd">
+        <%
+          course_locator = loc_mapper().translate_location(
+            context_course.location.course_id, context_course.location, False, True
+          )
+        %>
+        <article class="courseware-overview" data-locator="${course_locator}">
+          % for section in sections:
+          <%
+            section_locator = loc_mapper().translate_location(
+              context_course.location.course_id, section.location, False, True
+            )
+          %>
+          <section class="courseware-section branch is-draggable" data-parent="${course_locator}"
+                   data-locator="${section_locator}">
+            <%include file="widgets/_ui-dnd-indicator-before.html" />
 
-            <div class="item-actions">
-              <a href="#" data-tooltip="Delete this section" class="delete-button delete-section-button"><span class="delete-icon"></span></a>
-              <a href="#" data-tooltip="Drag to reorder" class="drag-handle"></a>
-            </div>
-          </header>
-          <div class="subsection-list">
-            <div class="list-header">
-              <a href="#" class="new-subsection-item" data-template="${new_subsection_template}">
-                <span class="new-folder-icon"></span>${_("New Subsection")}
-              </a>
-            </div>
-            <ol data-section-id="${section.location.url()}">
-              % for subsection in section.get_children():
-              <li class="branch collapsed id-holder" data-id="${subsection.location}">
-                <div class="section-item">
-                  <div class="details">
-                    <a href="#" data-tooltip="Expand/collapse this subsection" class="expand-collapse-icon expand"></a>
-                    <a href="${reverse('edit_subsection', args=[subsection.location])}">
-                      <span class="folder-icon"></span>
-                      <span class="subsection-name"><span class="subsection-name-value">${subsection.display_name_with_default}</span></span>
-                    </a>
-                  </div>
+            <header>
+            <a href="#" data-tooltip="${_('Expand/collapse this section')}" class="expand-collapse-icon collapse"></a>
 
-                  <div class="gradable-status" data-initial-status="${subsection.lms.format if subsection.lms.format is not None else 'Not Graded'}">
-                  </div>
-
-                  <div class="item-actions">
-                    <a href="#" data-tooltip="Delete this subsection" class="delete-button delete-subsection-button"><span class="delete-icon"></span></a>
-                    <a href="#" data-tooltip="Drag to reorder" class="drag-handle"></a>
-                  </div>
+              <div class="item-details" data-locator="${section_locator}">
+                <h3 class="section-name" data-name="${section.display_name_with_default | h}"></h3>
+                <div class="section-published-date">
+                  <%
+                    if section.start is not None:
+                        start_date_str = section.start.strftime('%m/%d/%Y')
+                        start_time_str = section.start.strftime('%H:%M')
+                    else:
+                        start_date_str = ''
+                        start_time_str = ''
+                  %>
+                  %if section.start is None:
+                    <span class="published-status">${_("This section has not been released.")}</span>
+                    <a href="#" class="schedule-button" data-date="" data-time="" data-locator="${section_locator}">${_("Schedule")}</a>
+                  %else:
+                    <span class="published-status"><strong>${_("Will Release:")}</strong>
+                    ${date_utils.get_default_time_display(section.start)}</span>
+                    <a href="#" class="edit-button" data-date="${start_date_str}"
+                      data-time="${start_time_str}" data-locator="${section_locator}">${_("Edit")}</a>
+                  %endif
                 </div>
+              </div>
 
-                ${units.enum_units(subsection)}
-              </li>
-              % endfor
-            </ol>
-          </div>
-        </section>
-        % endfor
-      </article>
+              <div class="item-actions">
+                <a href="#" data-tooltip="${_('Delete this section')}" class="delete-button delete-section-button"><span class="delete-icon"></span></a>
+                <span data-tooltip="${_('Drag to reorder')}" class="drag-handle section-drag-handle"></span>
+              </div>
+            </header>
+            <div class="subsection-list">
+              <div class="list-header">
+                <a href="#" class="new-subsection-item" data-category="${new_subsection_category}">
+                  <span class="new-folder-icon"></span>${_("New Subsection")}
+                </a>
+              </div>
+              <ol class="sortable-subsection-list">
+                % for subsection in section.get_children():
+                  <%
+                    subsection_locator = loc_mapper().translate_location(
+                      context_course.location.course_id, subsection.location, False, True
+                    )
+                  %>
+                <li class="courseware-subsection branch collapsed id-holder is-draggable"
+                    data-parent="${section_locator}" data-locator="${subsection_locator}">
+
+                  <%include file="widgets/_ui-dnd-indicator-before.html" />
+
+                  <div class="section-item">
+                    <div class="details">
+                      <a href="#" data-tooltip="${_('Expand/collapse this subsection')}" class="expand-collapse-icon expand"></a>
+                      <a href="${reverse('edit_subsection', args=[subsection.location])}">
+                        <span class="folder-icon"></span>
+                        <span class="subsection-name"><span class="subsection-name-value">${subsection.display_name_with_default}</span></span>
+                      </a>
+                    </div>
+
+                    <div class="gradable-status" data-initial-status="${subsection.format if subsection.format is not None else _('Not Graded')}">
+                    </div>
+
+                    <div class="item-actions">
+                      <a href="#" data-tooltip="${_('Delete this subsection')}" class="delete-button delete-subsection-button"><span class="delete-icon"></span></a>
+                      <span data-tooltip="${_('Drag to reorder')}" class="drag-handle subsection-drag-handle"></span>
+                    </div>
+                  </div>
+                  ${units.enum_units(subsection)}
+
+                  <%include file="widgets/_ui-dnd-indicator-after.html" />
+                </li>
+                % endfor
+                <li class="ui-splint ui-splint-indicator">
+                  <%include file="widgets/_ui-dnd-indicator-initial.html" />
+                </li>
+              </ol>
+            </div>
+
+            <%include file="widgets/_ui-dnd-indicator-after.html" />
+          </section>
+          % endfor
+        </article>
+      </div>
     </div>
   </div>
   <footer></footer>
 
-  <div class="edit-subsection-publish-settings">
+  <div class="edit-subsection-publish-settings showAsModal">
     <div class="settings">
       <h3>${_("Section Release Date")}</h3>
       <div class="picker datepair">
@@ -231,12 +250,12 @@
           <input class="start-date date" type="text" name="start_date" value="" placeholder="MM/DD/YYYY" class="date" size='15' autocomplete="off"/>
         </div>
         <div class="field field-start-time">
-          <label for="">${_("Release Time")} (<abbr title="Coordinated Universal Time">UTC</abbr>)</label>
+          <label for="">${_("Release Time")} (<abbr title="${_("Coordinated Universal Time")}">UTC</abbr>)</label>
           <input class="start-time time" type="text" name="start_time" value="" placeholder="HH:MM" class="time" size='10' autocomplete="off"/>
         </div>
 
         <div class="description">
-          <p>${_("On the date set above, this section")} – <strong class="section-name"></strong> – ${_("will be released to students. Any units marked private will only be visible to admins.")}</p>
+          <p>${_('On the date set above, this section - {name} - will be released to students. Any units marked private will only be visible to admins.').format(name='<strong class="section-name"></strong>')}</p>
         </div>
       </div>
       <a href="#" class="save-button">${_("Save")}</a><a href="#" class="cancel-button">${_("Cancel")}</a>

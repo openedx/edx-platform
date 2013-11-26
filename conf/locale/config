@@ -1,4 +1,4 @@
 {
- "locales" : ["vi", "en"],
- "dummy-locale" : "vi"
+ "locales" : ["en"],
+ "dummy-locale" : "eo"
 }

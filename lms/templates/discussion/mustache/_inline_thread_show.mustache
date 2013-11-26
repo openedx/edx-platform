@@ -1,13 +1,13 @@
 <div class="discussion-post local">
     <div><a href="javascript:void(0)" class="dogear action-follow" data-tooltip="follow"></a></div>
     <header>
-        <a href="#" class="vote-btn discussion-vote discussion-vote-up" data-role="discussion-vote" data-tooltip="vote"><span class="plus-icon">+</span> <span class='votes-count-number'>{{votes.up_count}}</span></a>
+        <a href="#" class="vote-btn discussion-vote discussion-vote-up" data-role="discussion-vote" data-tooltip="vote"><span class="plus-icon">+</span> <span class='votes-count-number'>{{votes.up_count}}</span><span class="sr">votes (click to vote)</span></a>
         <h3>{{title}}</h3>
         <div class="discussion-flag-abuse notflagged" data-role="thread-flag" data-tooltip="Report Misuse">
-        <i class="icon"></i><span class="flag-label">Flagged</span></div>
+        <i class="icon icon-flag"></i><span class="flag-label">Flagged</span></div>
 
         <div class="discussion-pin-inline pinned  pinned-{{pinned}}" data-tooltip="This thread has been pinned by course staff.">                
-        <i class="icon"></i><span class="pin-label">Pinned</span></div>
+        <i class="icon icon-pushpin"></i><span class="pin-label">Pinned</span></div>
 
         <p class="posted-details">
             {{#user}}

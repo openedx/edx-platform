@@ -1,15 +1,15 @@
 ## mako
-<%! from django.utils.translation import ugettext as _ %>
-<%! from django.utils import translation    %>
-<%! 
+<%!
   from django.core.urlresolvers import reverse
+  from django.utils.translation import ugettext as _
   from wiki.core.permissions import can_change_permissions
 %>
 
 <li class="${"active" if selected_tab == "view" else ""}">
   <a href="${reverse('wiki:get', kwargs={'article_id' : article.id, 'path' : urlpath.path})}">
     <span class="icon-home icon"></span>
-    ${_("View")}
+    View
+    ${_("{span_start}active{span_end}").format(span_start="<span class='sr'>(", span_end=")</span>") if selected_tab == "view" else ""}
   </a>
 </li>
 
@@ -17,7 +17,8 @@
   <li class="${"active" if selected_tab == "edit" else ""}">
     <a href="${reverse('wiki:edit', kwargs={'article_id' : article.id, 'path' : urlpath.path})}">
       <span class="icon-edit icon"></span>
-      ${_("Edit")}
+      Edit
+    ${_("{span_start}active{span_end}").format(span_start="<span class='sr'>(", span_end=")</span>") if selected_tab == "edit" else ""}
     </a>
   </li>
 %endif
@@ -25,7 +26,8 @@
 <li class="${"active" if selected_tab == "history" else ""}">
   <a href="${reverse('wiki:history', kwargs={'article_id' : article.id, 'path' : urlpath.path})}">
     <span class="icon-changes icon"></span>
-    ${_("Changes")}
+    Changes
+    ${_("{span_start}active{span_end}").format(span_start="<span class='sr'>(", span_end=")</span>") if selected_tab == "history" else ""}
   </a>
 </li>
 
@@ -35,6 +37,7 @@
       <a href="${reverse('wiki:plugin', kwargs={'slug' : plugin.slug, 'article_id' : article.id, 'path' : urlpath.path}) }">
         <span class="${plugin.article_tab[1]} icon"></span>
         ${plugin.article_tab[0]}
+    ${_("{span_start}active{span_end}").format(span_start="<span class='sr'>(", span_end=")</span>") if selected_tab == plugin.slug else ""}
       </a>
     </li>
   %endif
@@ -49,7 +52,8 @@ ${_("This should be enabled for all non-anonymous users once the notifications a
 <li class="${"active" if selected_tab == "settings" else ""}">
   <a href="${reverse('wiki:settings', kwargs={'article_id' : article.id, 'path' : urlpath.path})}">
     <span class="icon-settings icon"></span>
-    Settings
+    ${_("Settings")}
+    ${_("{span_start}active{span_end}").format(span_start="<span class='sr'>(", span_end=")</span>") if selected_tab == "settings" else ""}
   </a>
 </li>
 %endif

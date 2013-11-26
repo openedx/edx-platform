@@ -1,5 +1,3 @@
-jasmine.getFixtures().fixturesPath = "/_jasmine/fixtures/"
-
 jasmine.stubbedMetadata =
   slowerSpeedYoutubeId:
     id: 'slowerSpeedYoutubeId'

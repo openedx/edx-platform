@@ -31,7 +31,10 @@ def offline_grade_calculation(course_id):
     '''
 
     tstart = time.time()
-    enrolled_students = User.objects.filter(courseenrollment__course_id=course_id).prefetch_related("groups").order_by('username')
+    enrolled_students = User.objects.filter(
+        courseenrollment__course_id=course_id,
+        courseenrollment__is_active=1
+    ).prefetch_related("groups").order_by('username')
 
     enc = MyEncoder()
 
@@ -44,12 +47,14 @@ def offline_grade_calculation(course_id):
         def is_secure(self):
             return False
 
-    request = DummyRequest()
-
     print "%d enrolled students" % len(enrolled_students)
     course = get_course_by_id(course_id)
 
     for student in enrolled_students:
+        request = DummyRequest()
+        request.user = student
+        request.session = {}
+
         gradeset = grades.grade(student, request, course, keep_raw_scores=True)
         gs = enc.encode(gradeset)
         ocg, created = models.OfflineComputedGrade.objects.get_or_create(user=student, course_id=course_id)

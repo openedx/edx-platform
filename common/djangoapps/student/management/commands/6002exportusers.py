@@ -16,10 +16,6 @@ from django.contrib.auth.models import User
 
 from student.models import UserProfile
 
-import mitxmako.middleware as middleware
-
-middleware.MakoMiddleware()
-
 
 class Command(BaseCommand):
     help = \

@@ -4,13 +4,10 @@
 from __future__ import absolute_import
 
 from lettuce import world, step
-from nose.tools import assert_equals, assert_in
-from lettuce.django import django_url
 from django.contrib.auth.models import User
 from student.models import CourseEnrollment
 from xmodule.modulestore import Location
-from xmodule.modulestore.django import _MODULESTORES, modulestore
-from xmodule.templates import update_templates
+from xmodule.modulestore.django import modulestore
 from xmodule.course_module import CourseDescriptor
 from courseware.courses import get_course_by_id
 from xmodule import seq_module, vertical_module
@@ -20,7 +17,7 @@ logger = getLogger(__name__)
 
 
 @step(u'The course "([^"]*)" exists$')
-def create_course(step, course):
+def create_course(_step, course):
 
     # First clear the modulestore so we don't try to recreate
     # the same course twice
@@ -38,9 +35,10 @@ def create_course(step, course):
     world.scenario_dict['SECTION'] = world.ItemFactory.create(parent_location=world.scenario_dict['COURSE'].location,
                                        display_name='Test Section')
 
-    problem_section = world.ItemFactory.create(parent_location=world.scenario_dict['SECTION'].location,
-                                               template='i4x://edx/templates/sequential/Empty',
-                                               display_name='Test Section')
+    world.ItemFactory.create(
+        parent_location=world.scenario_dict['SECTION'].location,
+        category='sequential',
+        display_name='Test Section')
 
 
 @step(u'I am registered for the course "([^"]*)"$')
@@ -54,16 +52,24 @@ def i_am_registered_for_the_course(step, course):
 
     # If the user is not already enrolled, enroll the user.
     # TODO: change to factory
-    CourseEnrollment.objects.get_or_create(user=u, course_id=course_id(course))
+    CourseEnrollment.enroll(u, course_id(course))
 
-    world.log_in('robot', 'test')
+    world.log_in(username='robot', password='test')
 
 
 @step(u'The course "([^"]*)" has extra tab "([^"]*)"$')
-def add_tab_to_course(step, course, extra_tab_name):
-    section_item = world.ItemFactory.create(parent_location=course_location(course),
-                                            template="i4x://edx/templates/static_tab/Empty",
-                                            display_name=str(extra_tab_name))
+def add_tab_to_course(_step, course, extra_tab_name):
+    world.ItemFactory.create(
+        parent_location=course_location(course),
+        category="static_tab",
+        display_name=str(extra_tab_name))
+
+
+@step(u'I am in a course$')
+def go_into_course(step):
+    step.given('I am registered for the course "6.002x"')
+    step.given('And I am logged in')
+    step.given('And I click on View Courseware')
 
 
 def course_id(course_num):
@@ -105,7 +111,7 @@ def get_courseware_with_tabs(course_id):
     the tabs on the right hand main navigation page.
 
     This hides the appropriate courseware as defined by the hide_from_toc field:
-    chapter.lms.hide_from_toc
+    chapter.hide_from_toc
 
     Example:
 
@@ -158,14 +164,14 @@ def get_courseware_with_tabs(course_id):
     """
 
     course = get_course_by_id(course_id)
-    chapters = [chapter for chapter in course.get_children() if not chapter.lms.hide_from_toc]
+    chapters = [chapter for chapter in course.get_children() if not chapter.hide_from_toc]
     courseware = [{'chapter_name': c.display_name_with_default,
                    'sections': [{'section_name': s.display_name_with_default,
                                 'clickable_tab_count': len(s.get_children()) if (type(s) == seq_module.SequenceDescriptor) else 0,
                                 'tabs': [{'children_count': len(t.get_children()) if (type(t) == vertical_module.VerticalDescriptor) else 0,
                                          'class': t.__class__.__name__}
                                          for t in s.get_children()]}
-                                for s in c.get_children() if not s.lms.hide_from_toc]}
+                                for s in c.get_children() if not s.hide_from_toc]}
                   for c in chapters]
 
     return courseware

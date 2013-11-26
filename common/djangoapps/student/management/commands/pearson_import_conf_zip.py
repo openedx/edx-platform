@@ -1,21 +1,24 @@
 import csv
-
-from zipfile import ZipFile, is_zipfile
 from time import strptime, strftime
-
 from datetime import datetime
+from zipfile import ZipFile, is_zipfile
+
 from dogapi import dog_http_api
+from pytz import UTC
 
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
 
+import django_startup
+
 from student.models import TestCenterUser, TestCenterRegistration
-from pytz import UTC
+
+
+django_startup.autostartup()
 
 
 class Command(BaseCommand):
 
-    dog_http_api.api_key = settings.DATADOG_API
     args = '<input zip file>'
     help = """
     Import Pearson confirmation files and update TestCenterUser

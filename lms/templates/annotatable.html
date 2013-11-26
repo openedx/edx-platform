@@ -1,6 +1,4 @@
 <%! from django.utils.translation import ugettext as _ %>
-<%! from django.utils import translation    %>
-<%!translation.activate('vi')%>
 
 <div class="annotatable-wrapper">
 	<div class="annotatable-header">
@@ -13,7 +11,7 @@
     <div class="annotatable-section shaded">
         <div class="annotatable-section-title">
             ${_("Instructions")}
-            <a class="annotatable-toggle annotatable-toggle-instructions expanded" href="javascript:void(0)">Collapse Instructions</a>
+            <a class="annotatable-toggle annotatable-toggle-instructions expanded" href="javascript:void(0)">${_("Collapse Instructions")}</a>
         </div>
         <div class="annotatable-section-body annotatable-instructions">
             ${instructions_html}
@@ -24,7 +22,7 @@
     <div class="annotatable-section">
         <div class="annotatable-section-title">
             ${_("Guided Discussion")}
-            <a class="annotatable-toggle annotatable-toggle-annotations" href="javascript:void(0)">Hide Annotations</a>
+            <a class="annotatable-toggle annotatable-toggle-annotations" href="javascript:void(0)">${_("Hide Annotations")}</a>
         </div>
         <div class="annotatable-section-body annotatable-content">
             ${content_html}

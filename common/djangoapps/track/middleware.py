@@ -1,14 +1,30 @@
 import json
+import re
+import logging
 
-import views
+from django.conf import settings
+
+from track import views
+from track import contexts
+from eventtracking import tracker
 
 
-class TrackMiddleware:
+log = logging.getLogger(__name__)
+
+CONTEXT_NAME = 'edx.request'
+
+
+class TrackMiddleware(object):
+    """
+    Tracks all requests made, as well as setting up context for other server
+    emitted events.
+    """
+
     def process_request(self, request):
         try:
-            # We're already logging events, and we don't want to capture user
-            # names/passwords.
-            if request.META['PATH_INFO'] in ['/event', '/login']:
+            self.enter_request_context(request)
+
+            if not self.should_process_request(request):
                 return
 
             # Removes passwords from the tracking logs
@@ -45,3 +61,43 @@ class TrackMiddleware:
             views.server_track(request, request.META['PATH_INFO'], event)
         except:
             pass
+
+    def should_process_request(self, request):
+        """Don't track requests to the specified URL patterns"""
+        path = request.META['PATH_INFO']
+
+        ignored_url_patterns = getattr(settings, 'TRACKING_IGNORE_URL_PATTERNS', [])
+        for pattern in ignored_url_patterns:
+            # Note we are explicitly relying on python's internal caching of
+            # compiled regular expressions here.
+            if re.match(pattern, path):
+                return False
+        return True
+
+    def enter_request_context(self, request):
+        """
+        Extract information from the request and add it to the tracking
+        context.
+        """
+        context = {}
+        context.update(contexts.course_context_from_url(request.build_absolute_uri()))
+        try:
+            context['user_id'] = request.user.pk
+        except AttributeError:
+            context['user_id'] = ''
+            if settings.DEBUG:
+                log.error('Cannot determine primary key of logged in user.')
+
+        tracker.get_tracker().enter_context(
+            CONTEXT_NAME,
+            context
+        )
+
+    def process_response(self, request, response):  # pylint: disable=unused-argument
+        """Exit the context if it exists."""
+        try:
+            tracker.get_tracker().exit_context(CONTEXT_NAME)
+        except:  # pylint: disable=bare-except
+            pass
+
+        return response

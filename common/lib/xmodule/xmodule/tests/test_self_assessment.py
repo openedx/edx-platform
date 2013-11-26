@@ -1,6 +1,7 @@
 import json
-from mock import Mock, MagicMock
 import unittest
+from mock import Mock, MagicMock
+from webob.multidict import MultiDict
 
 from xmodule.open_ended_grading_classes.self_assessment_module import SelfAssessmentModule
 from xmodule.modulestore import Location
@@ -20,10 +21,11 @@ class SelfAssessmentTest(unittest.TestCase):
          </rubric></rubric>'''
 
     prompt = etree.XML("<prompt>This is sample prompt text.</prompt>")
-    definition = {'rubric': rubric,
-                  'prompt': prompt,
-                  'submitmessage': 'Shall we submit now?',
-                  'hintprompt': 'Consider this...',
+    definition = {
+        'rubric': rubric,
+        'prompt': prompt,
+        'submitmessage': 'Shall we submit now?',
+        'hintprompt': 'Consider this...',
     }
 
     location = Location(["i4x", "edX", "sa_test", "selfassessment",
@@ -32,13 +34,7 @@ class SelfAssessmentTest(unittest.TestCase):
     descriptor = Mock()
 
     def setUp(self):
-        state = json.dumps({'student_answers': ["Answer 1", "answer 2", "answer 3"],
-                            'scores': [0, 1],
-                            'hints': ['o hai'],
-                            'state': SelfAssessmentModule.INITIAL,
-                            'attempts': 2})
-
-        static_data = {
+        self.static_data = {
             'max_attempts': 10,
             'rubric': etree.XML(self.rubric),
             'prompt': self.prompt,
@@ -49,12 +45,24 @@ class SelfAssessmentTest(unittest.TestCase):
             's3_interface': test_util_open_ended.S3_INTERFACE,
             'open_ended_grading_interface': test_util_open_ended.OPEN_ENDED_GRADING_INTERFACE,
             'skip_basic_checks': False,
+            'control': {
+                'required_peer_grading': 1,
+                'peer_grader_count': 1,
+                'min_to_calibrate': 3,
+                'max_to_calibrate': 6,
+                'peer_grade_finished_submissions_when_none_pending': False,
+            }
         }
 
-        self.module = SelfAssessmentModule(get_test_system(), self.location,
-                                           self.definition,
-                                           self.descriptor,
-                                           static_data)
+        system = get_test_system()
+        system.xmodule_instance = Mock(scope_ids=Mock(usage_id='dummy-usage-id'))
+        self.module = SelfAssessmentModule(
+            system,
+            self.location,
+            self.definition,
+            self.descriptor,
+            self.static_data
+        )
 
     def test_get_html(self):
         html = self.module.get_html(self.module.system)
@@ -75,7 +83,7 @@ class SelfAssessmentTest(unittest.TestCase):
 
         mock_query_dict = MagicMock()
         mock_query_dict.__getitem__.side_effect = get_fake_item
-        mock_query_dict.getlist = get_fake_item
+        mock_query_dict.getall = get_fake_item
 
         self.module.peer_gs.get_data_for_location = get_data_for_location
 
@@ -98,3 +106,48 @@ class SelfAssessmentTest(unittest.TestCase):
         responses['assessment'] = '1'
         self.module.save_assessment(mock_query_dict, self.module.system)
         self.assertEqual(self.module.child_state, self.module.DONE)
+
+    def test_self_assessment_display(self):
+        """
+        Test storing an answer with the self assessment module.
+        """
+
+        # Create a module with no state yet.  Important that this start off as a blank slate.
+        test_module = SelfAssessmentModule(get_test_system(), self.location,
+                                            self.definition,
+                                            self.descriptor,
+                                            self.static_data)
+
+        saved_response = "Saved response."
+        submitted_response = "Submitted response."
+
+        # Initially, there will be no stored answer.
+        self.assertEqual(test_module.stored_answer, None)
+        # And the initial answer to display will be an empty string.
+        self.assertEqual(test_module.get_display_answer(), "")
+
+        # Now, store an answer in the module.
+        test_module.handle_ajax("store_answer", {'student_answer' : saved_response}, get_test_system())
+        # The stored answer should now equal our response.
+        self.assertEqual(test_module.stored_answer, saved_response)
+        self.assertEqual(test_module.get_display_answer(), saved_response)
+
+        # Submit a student response to the question.
+        test_module.handle_ajax("save_answer", {"student_answer": submitted_response}, get_test_system())
+        # Submitting an answer should clear the stored answer.
+        self.assertEqual(test_module.stored_answer, None)
+        # Confirm that the answer is stored properly.
+        self.assertEqual(test_module.latest_answer(), submitted_response)
+
+        # Mock saving an assessment.
+        assessment_dict = MultiDict({'assessment': 0, 'score_list[]': 0})
+        data = test_module.handle_ajax("save_assessment", assessment_dict, get_test_system())
+        self.assertTrue(json.loads(data)['success'])
+
+        # Reset the module so the student can try again.
+        test_module.reset(get_test_system())
+
+        # Confirm that the right response is loaded.
+        self.assertEqual(test_module.get_display_answer(), submitted_response)
+
+

@@ -1,42 +1,42 @@
-<%! from django.utils.translation import ugettext as _ %>
-
-
 <%inherit file="base.html" />
 <%block name="title">${_("Grading Settings")}</%block>
-<%block name="bodyclass">is-signedin course grading settings</%block>
+<%block name="bodyclass">is-signedin course grading view-settings</%block>
 
 <%namespace name='static' file='static_content.html'/>
 <%!
-from contentstore import utils
+  from contentstore import utils
+  from django.utils.translation import ugettext as _
+  from xmodule.modulestore.django import loc_mapper
+  from django.core.urlresolvers import reverse
 %>
+
+<%block name="header_extras">
+% for template_name in ["course_grade_policy"]:
+  <script type="text/template" id="${template_name}-tpl">
+    <%static:include path="js/${template_name}.underscore" />
+  </script>
+% endfor
+</%block>
 
 <%block name="jsextra">
   <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
-  <script src="${static.url('js/vendor/timepicker/jquery.timepicker.js')}"></script>
-
-  <script type="text/javascript" src="${static.url('js/template_loader.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/models/course_relative.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/views/validating_view.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/models/settings/course_grading_policy.js')}"></script>
-  <script type="text/javascript" src="${static.url('js/views/settings/settings_grading_view.js')}"></script>
-
   <script type="text/javascript">
-    $(document).ready(function(){
-
-      $("form :input").focus(function() {
-        $("label[for='" + this.id + "']").addClass("is-focused");
-      }).blur(function() {
-        $("label").removeClass("is-focused");
-      });
-
-      var editor = new CMS.Views.Settings.Grading({
-          el: $('.settings-grading'),
-          model : new CMS.Models.Settings.CourseGradingPolicy(${course_details|n},{parse:true})
-      });
-
-      editor.render();
+require(["domReady!", "jquery", "js/views/settings/grading", "js/models/settings/course_grading_policy"], function(doc, $, GradingView, CourseGradingPolicyModel) {
+    $("form :input").focus(function() {
+      $("label[for='" + this.id + "']").addClass("is-focused");
+    }).blur(function() {
+      $("label").removeClass("is-focused");
     });
 
+    var model = new CourseGradingPolicyModel(${course_details|n},{parse:true});
+    model.urlRoot = '${grading_url}';
+    var editor = new GradingView({
+        el: $('.settings-grading'),
+        model : model
+    });
+
+    editor.render();
+});
   </script>
 </%block>
 
@@ -57,7 +57,7 @@ from contentstore import utils
         <section class="group-settings grade-range">
           <header>
             <h2 class="title-2">${_("Overall Grade Range")}</h2>
-            <span class="tip">${_("Your overall grading scale for student final gradesz")}</span>
+            <span class="tip">${_("Your overall grading scale for student final grades")}</span>
           </header>
 
           <ol class="list-input">
@@ -99,7 +99,7 @@ from contentstore import utils
           <ol class="list-input">
             <li class="field text" id="field-course-grading-graceperiod">
               <label for="course-grading-graceperiod">${_("Grace Period on Deadline:")}</label>
-              <input type="text" class="short time" id="course-grading-graceperiod" value="0:00" placeholder="HH:MM" autocomplete="off" />
+              <input type="text" class="short time" id="course-grading-graceperiod" value="00:00" placeholder="HH:MM" autocomplete="off" />
               <span class="tip tip-inline">${_("Leeway on due dates")}</span>
             </li>
           </ol>
@@ -119,7 +119,7 @@ from contentstore import utils
 
           <div class="actions">
             <a href="#" class="new-button new-course-grading-item add-grading-data">
-              <i class="icon-plus"></i>${_("New Assignment Type")}
+              <i class="icon-plus"></i> ${_("New Assignment Type")}
             </a>
           </div>
         </section>
@@ -128,21 +128,25 @@ from contentstore import utils
 
     <aside class="content-supplementary" role="complimentary">
       <div class="bit">
-        <h3 class="title-3">${_("How will these settings be used?")}</h3>
-        <p>${_("Your grading settings will be used to calculate students grades and performance.")}</p>
+        <h3 class="title-3">${_("What can I do on this page?")}</h3>
+        <p>${_("You can use the slider under Overall Grade Range to specify whether your course is pass/fail or graded by letter, and to establish the thresholds for each grade.")}</p>
 
-        <p>${_("Overall grade range will be used in students' final grades, which are calculated by the weighting you determine for each custom assignment type.")}</p>
+        <p>${_("You can specify whether your course offers students a grace period for late assignments.")}</p>
+      	<p>${_("You can also create assignment types, such as homework, labs, quizzes, and exams, and specify how much of a student's grade each assignment type is worth.")}</p>
+
       </div>
 
       <div class="bit">
       % if context_course:
-      <% ctx_loc = context_course.location %>
-      <%! from django.core.urlresolvers import reverse %>
+        <%
+          ctx_loc = context_course.location
+          course_team_url = course_locator.url_reverse('course_team/')
+        %>
         <h3 class="title-3">${_("Other Course Settings")}</h3>
         <nav class="nav-related">
           <ul>
-            <li class="nav-item"><a href="${reverse('contentstore.views.get_course_settings', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">${_("Details &amp; Schedule")}</a></li>
-            <li class="nav-item"><a href="${reverse('manage_users', kwargs=dict(location=ctx_loc))}">${_("Course Team")}</a></li>
+            <li class="nav-item"><a href="${course_locator.url_reverse('settings/details/')}">${_("Details &amp; Schedule")}</a></li>
+            <li class="nav-item"><a href="${course_team_url}">${_("Course Team")}</a></li>
             <li class="nav-item"><a href="${reverse('course_advanced_settings', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">${_("Advanced Settings")}</a></li>
           </ul>
         </nav>
