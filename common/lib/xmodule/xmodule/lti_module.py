@@ -45,7 +45,6 @@ import textwrap
 from lxml import etree
 from webob import Response
 import mock
-import re
 from xml.sax.saxutils import escape
 
 from xmodule.editing_module import MetadataOnlyEditingDescriptor
