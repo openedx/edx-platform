@@ -11,6 +11,8 @@ from ratelimitbackend import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',  # nopep8
+    url(r'', include('social_auth.urls')),
+    url(r'^newuser$', 'contentstore.views.user.new_user_social', name='new_user_social'),# add new
 
     url(r'^transcripts/upload$', 'contentstore.views.upload_transcripts', name='upload_transcripts'),
     url(r'^transcripts/download$', 'contentstore.views.download_transcripts', name='download_transcripts'),

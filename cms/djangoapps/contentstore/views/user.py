@@ -16,13 +16,27 @@ from auth.authz import (
 from course_creators.views import user_requested_access
 
 from .access import has_access
-
+from django.http import HttpResponseRedirect
+from student.models import (UserProfile)
 from student.models import CourseEnrollment
 from xmodule.modulestore.locator import BlockUsageLocator
 from django.http import HttpResponseNotFound
 
 
 __all__ = ['request_course_creator', 'course_team_handler']
+
+@ensure_csrf_cookie
+def new_user_social(request):
+    if not request.user.is_authenticated():
+
+        return HttpResponseRedirect('signin')
+    try:
+        userprofile=UserProfile(user=request.user)
+        userprofile.save()
+    except:
+        return JsonResponse({"error": _("malformed JSON")}, 400)
+
+    return HttpResponseRedirect('howitworks')
 
 
 @require_POST

@@ -236,6 +236,20 @@ def _cert_info(user, course, cert_status):
 
 
 @ensure_csrf_cookie
+def new_user_social(request):
+    if not request.user.is_authenticated():
+        context = {
+        'course_id': request.GET.get('course_id'),
+        'enrollment_action': request.GET.get('enrollment_action')
+        }
+        return render_to_response('login.html', context)
+
+    userprofile=UserProfile(user=request.user)
+    userprofile.save()
+
+    return redirect(reverse('dashboard'))
+
+@ensure_csrf_cookie
 def signin_user(request):
     """
     This view will display the non-modal login form

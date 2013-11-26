@@ -25,7 +25,11 @@ Longer TODO:
 
 import sys
 import os
-
+try:
+    import social_auth
+except ImportError:
+    import sys
+    sys.path.insert(0, '..')
 from path import path
 
 from .discussionsettings import *
@@ -285,12 +289,76 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 
     # Shoppingcart processor (detects if request.user has a cart)
     'shoppingcart.context_processor.user_has_cart_context_processor',
+    #Add for django-social-auth
+    'social_auth.context_processors.social_auth_by_type_backends',
 )
 
 # use the ratelimit backend to prevent brute force attacks
 AUTHENTICATION_BACKENDS = (
-    'ratelimitbackend.backends.RateLimitModelBackend',
+    'social_auth.backends.twitter.TwitterBackend',
+    'social_auth.backends.facebook.FacebookBackend',
+    'social_auth.backends.google.GoogleOAuthBackend',
+    'social_auth.backends.google.GoogleOAuth2Backend',
+    'social_auth.backends.google.GoogleBackend',
+    'social_auth.backends.yahoo.YahooBackend',
+    'social_auth.backends.stripe.StripeBackend',
+    'social_auth.backends.contrib.linkedin.LinkedinBackend',
+    'social_auth.backends.contrib.skyrock.SkyrockBackend',
+    'social_auth.backends.contrib.flickr.FlickrBackend',
+    'social_auth.backends.contrib.instagram.InstagramBackend',
+    'social_auth.backends.contrib.github.GithubBackend',
+    'social_auth.backends.contrib.yandex.YandexBackend',
+    'social_auth.backends.contrib.disqus.DisqusBackend',
+    'social_auth.backends.contrib.yahoo.YahooOAuthBackend',
+    'social_auth.backends.contrib.foursquare.FoursquareBackend',
+    'social_auth.backends.OpenIDBackend',
+    'social_auth.backends.contrib.live.LiveBackend',
+    'social_auth.backends.contrib.livejournal.LiveJournalBackend',
+    'social_auth.backends.contrib.douban.DoubanBackend',
+    'social_auth.backends.browserid.BrowserIDBackend',
+    'social_auth.backends.contrib.vkontakte.VKontakteBackend',
+    'social_auth.backends.contrib.yandex.YandexOAuth2Backend',
+    'social_auth.backends.contrib.yandex.YaruBackend',
+    'social_auth.backends.contrib.odnoklassniki.OdnoklassnikiBackend',
+    'social_auth.backends.contrib.odnoklassniki.OdnoklassnikiAppBackend',
+    'social_auth.backends.contrib.vkontakte.VKontakteOAuth2Backend',
+    'social_auth.backends.contrib.mailru.MailruBackend',
+    'social_auth.backends.contrib.dailymotion.DailymotionBackend',
+    'social_auth.backends.contrib.shopify.ShopifyBackend',
+    'social_auth.backends.contrib.stocktwits.StocktwitsBackend',
+    'social_auth.backends.contrib.behance.BehanceBackend',
+    'django.contrib.auth.backends.ModelBackend'
 )
+
+
+GOOGLE_OAUTH2_CLIENT_ID      = '1048574522094-oopvg77op4msldjdsggvlrnv58kg2che.apps.googleusercontent.com'  # this is on the credentials web page from above
+GOOGLE_OAUTH2_CLIENT_SECRET  = '_2ejDqSCeCoUAfs5TXKFDPl8'
+
+FACEBOOK_APP_ID='405978756174944'
+FACEBOOK_API_SECRET='d1dee59d9ce06e4f49fc659214ff420d'
+
+SOCIAL_AUTH_PIPELINE = (
+
+    'social_auth.backends.pipeline.social.social_auth_user',
+    'social_auth.backends.pipeline.associate.associate_by_email',
+    'social_auth.backends.pipeline.misc.save_status_to_session',
+    'social_auth.backends.pipeline.user.get_username',
+    'social_auth.backends.pipeline.user.create_user',
+    'social_auth.backends.pipeline.social.associate_user',
+    'social_auth.backends.pipeline.social.load_extra_data',
+    'social_auth.backends.pipeline.user.update_user_details',
+    'social_auth.backends.pipeline.misc.save_status_to_session'
+)
+
+SOCIAL_AUTH_ENABLED_BACKENDS = ('google-oauth2','facebook')
+SOCIAL_AUTH_COMPLETE_URL_NAME = 'socialauth_complete'
+SOCIAL_AUTH_ASSOCIATE_URL_NAME = 'socialauth_associate_complete'
+SOCIAL_AUTH_USER_MODEL = 'auth.User'
+FACEBOOK_EXTENDED_PERMISSIONS=['email']
+
+
+
+
 STUDENT_FILEUPLOAD_MAX_SIZE = 4 * 1000 * 1000  # 4 MB
 MAX_FILEUPLOADS_PER_INPUT = 20
 
@@ -314,6 +382,11 @@ MITX_ROOT_URL = ''
 
 LOGIN_REDIRECT_URL = MITX_ROOT_URL + '/accounts/login'
 LOGIN_URL = MITX_ROOT_URL + '/accounts/login'
+SOCIAL_AUTH_RAISE_EXCEPTIONS=False
+SOCIAL_AUTH_BACKEND_ERROR_URL=MITX_ROOT_URL+'/accounts/login'
+LOGIN_ERROR_URL=LOGIN_URL
+SOCIAL_AUTH_NEW_USER_REDIRECT_URL = MITX_ROOT_URL+ '/newuser'
+SOCIAL_AUTH_LOGIN_REDIRECT_URL='/dashboard'
 
 COURSE_NAME = "6.002_Spring_2012"
 COURSE_NUMBER = "6.002x"
@@ -633,6 +706,8 @@ MIDDLEWARE_CLASSES = (
 
     # For A/B testing
     'waffle.middleware.WaffleMiddleware',
+    #For Canceled Django-social-auth
+    'student.middleware.AuthCanceledSocialAuthExceptionMiddleware'
 )
 
 ############################### Pipeline #######################################
@@ -920,7 +995,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'djcelery',
     'south',
-
+    'social_auth',
     # Monitor the status of services
     'service_status',
 
