@@ -522,7 +522,7 @@ class TestHtmlModifiers(ModuleStoreTestCase):
             result_fragment.content
         )
 
-PER_COURSE_ANONYMIZED_DESCRIPTORS = [LTIDescriptor]
+PER_COURSE_ANONYMIZED_DESCRIPTORS = (LTIDescriptor, )
 
 PER_STUDENT_ANONYMIZED_DESCRIPTORS = [
     class_ for (name, class_) in XModuleDescriptor.load_classes()
