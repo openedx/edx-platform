@@ -15,10 +15,11 @@ from django.test.utils import override_settings
 from xblock.field_data import FieldData
 from xblock.runtime import Runtime
 from xblock.fields import ScopeIds
-from xmodule.modulestore.django import modulestore
+from xmodule.lti_module import LTIDescriptor
 from xmodule.modulestore import Location
-from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
+from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
 from xmodule.x_module import XModuleDescriptor
 import courseware.module_render as render
 from courseware.tests.tests import LoginEnrollmentTestCase
@@ -521,7 +522,7 @@ class TestHtmlModifiers(ModuleStoreTestCase):
             result_fragment.content
         )
 
-PER_COURSE_ANONYMIZED_DESCRIPTORS = ()
+PER_COURSE_ANONYMIZED_DESCRIPTORS = (LTIDescriptor, )
 
 PER_STUDENT_ANONYMIZED_DESCRIPTORS = [
     class_ for (name, class_) in XModuleDescriptor.load_classes()
