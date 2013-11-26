@@ -11,6 +11,12 @@ following use cases
 - Enroll/Unenroll in course
 - Get list of enrolled courses
 
+IMPORTANT: This API contract was specifically designed to cover
+the short term goals to support a MVP mobile client. This API will
+be replaced by more long term API's that are currently in a design
+phase (as of 11/26/2014). These API designs are visible for public
+review at docs.edxapi.apiary.io.
+
 The amount of data returned to the client will be restricted
 to only contain information for these use cases. For example,
 the "get course navigational items" method will not - say - 
