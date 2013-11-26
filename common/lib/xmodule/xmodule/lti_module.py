@@ -1,14 +1,38 @@
 """
-Module that allows to insert LTI tools to page.
+Learning Tools Interoperability (LTI) module.
 
-Protocol is oauth1, LTI version is 1.1.1:
-http://www.imsglobal.org/LTI/v1p1p1/ltiIMGv1p1p1.html
 
-Table A1.2 Interpretation of the 'CodeMajor/severity' matrix.
-http://www.imsglobal.org/gws/gwsv1p0/imsgws_wsdlBindv1p0.html
+Resources
+---------
 
-play and test:
-http://www.imsglobal.org/developers/LTI/test/v1p1/lms.php
+Theoretical background and detailed specifications of LTI can be found on:
+
+    http://www.imsglobal.org/LTI/v1p1p1/ltiIMGv1p1p1.html
+
+This module is based on the version 1.1.1 of the LTI specifications by the
+IMS Global authority. For authentication, it uses OAuth1.
+
+When responding back to the LTI tool provider, we must issue a correct
+response. Types of responses and their message payload is available at:
+
+    Table A1.2 Interpretation of the 'CodeMajor/severity' matrix.
+    http://www.imsglobal.org/gws/gwsv1p0/imsgws_wsdlBindv1p0.html
+
+A resource to test the LTI protocol (PHP realization):
+
+    http://www.imsglobal.org/developers/LTI/test/v1p1/lms.php
+
+
+What is supported:
+------------------
+
+1.) Display of simple LTI in iframe or a new window.
+2.) Multiple LTI components on a single page.
+3.) The use of multiple LTI providers per course.
+4.) Use of advance LTI component that provides back a grade.
+    a.) The LTI provider sends back a grade to a specified URL.
+    b.) Currently only action "update" is supported. "Read", and "delete"
+        actions initially weren't required.
 """
 
 import logging
@@ -46,7 +70,7 @@ class LTIFields(object):
     except credentials, which should be set in course settings::
 
     `lti_id` is id to connect tool with credentials in course settings. It should not contain :: (double semicolon)
-    `launch_url` is launch url of tool.
+    `launch_url` is launch URL of tool.
     `custom_parameters` are additional parameters to navigate to proper book and book page.
 
     For example, for Vitalsource provider, `launch_url` should be
@@ -56,7 +80,7 @@ class LTIFields(object):
         vbid=put_book_id_here
         book_location=page/put_page_number_here
 
-    Default non-empty url for `launch_url` is needed due to oauthlib demand (url scheme should be presented)::
+    Default non-empty URL for `launch_url` is needed due to oauthlib demand (URL scheme should be presented)::
 
     https://github.com/idan/oauthlib/blob/master/oauthlib/oauth1/rfc5849/signature.py#L136
     """
@@ -69,7 +93,7 @@ class LTIFields(object):
 
 
 class LTIModule(LTIFields, XModule):
-    '''
+    """
     Module provides LTI integration to course.
 
     Except usual Xmodule structure it proceeds with OAuth signing.
@@ -96,7 +120,7 @@ class LTIModule(LTIFields, XModule):
         That pair should be obtained from LTI provider and set into course settings by course author.
         After that signature and other OAuth data are generated.
 
-         OAuth data which is generated after signing is usual::
+        OAuth data which is generated after signing is usual::
 
             oauth_callback
             oauth_nonce
@@ -112,34 +136,34 @@ class LTIModule(LTIFields, XModule):
         Form example::
 
             <form
-                    action="${launch_url}"
-                    name="ltiLaunchForm-${element_id}"
-                    class="ltiLaunchForm"
-                    method="post"
-                    target="ltiLaunchFrame-${element_id}"
-                    encType="application/x-www-form-urlencoded"
-                >
-                    <input name="launch_presentation_return_url" value="" />
-                    <input name="lis_outcome_service_url" value="" />
-                    <input name="lis_result_sourcedid" value="" />
-                    <input name="lti_message_type" value="basic-lti-launch-request" />
-                    <input name="lti_version" value="LTI-1p0" />
-                    <input name="oauth_callback" value="about:blank" />
-                    <input name="oauth_consumer_key" value="${oauth_consumer_key}" />
-                    <input name="oauth_nonce" value="${oauth_nonce}" />
-                    <input name="oauth_signature_method" value="HMAC-SHA1" />
-                    <input name="oauth_timestamp" value="${oauth_timestamp}" />
-                    <input name="oauth_version" value="1.0" />
-                    <input name="user_id" value="${user_id}" />
-                    <input name="role" value="student" />
-                    <input name="oauth_signature" value="${oauth_signature}" />
+                action="${launch_url}"
+                name="ltiLaunchForm-${element_id}"
+                class="ltiLaunchForm"
+                method="post"
+                target="ltiLaunchFrame-${element_id}"
+                encType="application/x-www-form-urlencoded"
+            >
+                <input name="launch_presentation_return_url" value="" />
+                <input name="lis_outcome_service_url" value="" />
+                <input name="lis_result_sourcedid" value="" />
+                <input name="lti_message_type" value="basic-lti-launch-request" />
+                <input name="lti_version" value="LTI-1p0" />
+                <input name="oauth_callback" value="about:blank" />
+                <input name="oauth_consumer_key" value="${oauth_consumer_key}" />
+                <input name="oauth_nonce" value="${oauth_nonce}" />
+                <input name="oauth_signature_method" value="HMAC-SHA1" />
+                <input name="oauth_timestamp" value="${oauth_timestamp}" />
+                <input name="oauth_version" value="1.0" />
+                <input name="user_id" value="${user_id}" />
+                <input name="role" value="student" />
+                <input name="oauth_signature" value="${oauth_signature}" />
 
-                    <input name="custom_1" value="${custom_param_1_value}" />
-                    <input name="custom_2" value="${custom_param_2_value}" />
-                    <input name="custom_..." value="${custom_param_..._value}" />
+                <input name="custom_1" value="${custom_param_1_value}" />
+                <input name="custom_2" value="${custom_param_2_value}" />
+                <input name="custom_..." value="${custom_param_..._value}" />
 
-                    <input type="submit" value="Press to Launch" />
-                </form>
+                <input type="submit" value="Press to Launch" />
+            </form>
 
     5. LTI provider has same secret key and it signs data string via *OAuth1* and compares signatures.
 
@@ -147,7 +171,7 @@ class LTIModule(LTIFields, XModule):
         and LTI tool is rendered to iframe inside course.
 
         Otherwise error message from LTI provider is generated.
-    '''
+    """
 
     js = {'js': [resource_string(__name__, 'js/src/lti/lti.js')]}
     css = {'scss': [resource_string(__name__, 'css/lti/lti.scss')]}
@@ -223,7 +247,7 @@ class LTIModule(LTIFields, XModule):
         context = {
             'input_fields': input_fields,
 
-            # these params do not participate in oauth signing
+            # these params do not participate in OAuth signing
             'launch_url': self.launch_url.strip(),
             'element_id': self.location.html_id(),
             'element_class': self.category,
@@ -240,7 +264,7 @@ class LTIModule(LTIFields, XModule):
 
     def get_outcome_service_url(self):
         """
-        Return url for storing grades
+        Return URL for storing grades
         """
         uri = 'http://{host}{path}'.format(
                 host=self.system.hostname,
