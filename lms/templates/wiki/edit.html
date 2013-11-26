@@ -10,19 +10,19 @@
   {% include "wiki/includes/editor.html" %}
   <div class="form-actions">
       <button type="submit" name="save" value="1" class="btn btn-large btn-primary" onclick="this.form.target=''; this.form.action='{% url 'wiki:edit' path=urlpath.path article_id=article.id %}'">
-        <span class="icon-ok"></span>
+        <i class="icon-ok"></i>
         {% trans "Save changes" %}
       </button>
       <button type="submit" name="preview" value="1" class="btn btn-large" onclick="$('#previewModal').modal('show'); this.form.target = 'previewWindow'; this.form.action = '{% url 'wiki:preview' path=urlpath.path article_id=article.id %}';">
-        <span class="icon-eye-open"></span>
+        <i class="icon-eye-open"></i>
         {% trans "Preview" %}
       </button>
-      
+
       <a href="{% url 'wiki:delete' path=urlpath.path article_id=article.id %}" class="pull-right btn btn-danger">
-        <span class="icon-trash"></span>
+        <i class="icon-trash"></i>
         {% trans "Delete article" %}
       </a>
-      
+
   </div>
   <div class="modal hide fade" id="previewModal">
     <div class="modal-body">
@@ -30,12 +30,12 @@
     </div>
     <div class="modal-footer">
       <button type="submit" name="save" value="1" class="btn btn-large btn-primary" onclick="this.form.target=''; this.form.action='{% url 'wiki:edit' path=urlpath.path article_id=article.id %}'">
-        <span class="icon-ok"></span>
+        <i class="icon-ok"></i>
         {% trans "Save changes" %}
       </button>
 
       <a href="#" class="btn btn-large" data-dismiss="modal">
-        <span class="icon-circle-arrow-left"></span>
+        <i class="icon-circle-arrow-left"></i>
         {% trans "Back to editor" %}
       </a>
     </div>

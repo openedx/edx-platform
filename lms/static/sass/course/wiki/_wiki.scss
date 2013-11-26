@@ -326,6 +326,10 @@ section.wiki {
         background: url(../images/wiki-icons.png) no-repeat;
       }
 
+      [class^="icon-"] {
+        padding-right: ($baseline/4);
+      }
+
       .icon-view,
       .icon-home {
         background-position: 0 0;

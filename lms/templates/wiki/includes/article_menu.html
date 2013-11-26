@@ -7,7 +7,7 @@
 
 <li class="${"active" if selected_tab == "view" else ""}">
   <a href="${reverse('wiki:get', kwargs={'article_id' : article.id, 'path' : urlpath.path})}">
-    <span class="icon-home icon"></span>
+    <i class="icon-eye-open"></i>
     View
     ${_("{span_start}active{span_end}").format(span_start="<span class='sr'>(", span_end=")</span>") if selected_tab == "view" else ""}
   </a>
@@ -16,7 +16,7 @@
 %if article.can_write(user):
   <li class="${"active" if selected_tab == "edit" else ""}">
     <a href="${reverse('wiki:edit', kwargs={'article_id' : article.id, 'path' : urlpath.path})}">
-      <span class="icon-edit icon"></span>
+      <i class="icon-pencil"></i>
       Edit
     ${_("{span_start}active{span_end}").format(span_start="<span class='sr'>(", span_end=")</span>") if selected_tab == "edit" else ""}
     </a>
@@ -25,7 +25,7 @@
 
 <li class="${"active" if selected_tab == "history" else ""}">
   <a href="${reverse('wiki:history', kwargs={'article_id' : article.id, 'path' : urlpath.path})}">
-    <span class="icon-changes icon"></span>
+    <i class="icon-time"></i>
     Changes
     ${_("{span_start}active{span_end}").format(span_start="<span class='sr'>(", span_end=")</span>") if selected_tab == "history" else ""}
   </a>
@@ -35,7 +35,7 @@
   %if hasattr(plugin, "article_tab"):
     <li class="${"active" if selected_tab == plugin.slug else ""}">
       <a href="${reverse('wiki:plugin', kwargs={'slug' : plugin.slug, 'article_id' : article.id, 'path' : urlpath.path}) }">
-        <span class="${plugin.article_tab[1]} icon"></span>
+        <i class="icon-file ${plugin.article_tab[1]}"></i>
         ${plugin.article_tab[0]}
     ${_("{span_start}active{span_end}").format(span_start="<span class='sr'>(", span_end=")</span>") if selected_tab == plugin.slug else ""}
       </a>
@@ -51,7 +51,7 @@ ${_("This should be enabled for all non-anonymous users once the notifications a
 %if can_change_permissions(article,user):
 <li class="${"active" if selected_tab == "settings" else ""}">
   <a href="${reverse('wiki:settings', kwargs={'article_id' : article.id, 'path' : urlpath.path})}">
-    <span class="icon-settings icon"></span>
+    <i class="icon-cog"></i>
     ${_("Settings")}
     ${_("{span_start}active{span_end}").format(span_start="<span class='sr'>(", span_end=")</span>") if selected_tab == "settings" else ""}
   </a>
