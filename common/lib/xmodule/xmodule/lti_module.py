@@ -1,14 +1,38 @@
 """
-Module that allows to insert LTI tools to page.
+Learning Tools Interoperability (LTI) module.
 
-Protocol is oauth1, LTI version is 1.1.1:
-http://www.imsglobal.org/LTI/v1p1p1/ltiIMGv1p1p1.html
 
-Table A1.2 Interpretation of the 'CodeMajor/severity' matrix.
-http://www.imsglobal.org/gws/gwsv1p0/imsgws_wsdlBindv1p0.html
+Resources
+---------
 
-play and test:
-http://www.imsglobal.org/developers/LTI/test/v1p1/lms.php
+Theoretical background and detailed specifications of LTI can be found on:
+
+    http://www.imsglobal.org/LTI/v1p1p1/ltiIMGv1p1p1.html
+
+This module is based on the version 1.1.1 of the LTI specifications by the
+IMS Global authority. For authentication, it uses OAuth1.
+
+When responding back to the LTI tool provider, we must issue a correct
+response. Types of responses and their message payload is available at:
+
+    Table A1.2 Interpretation of the 'CodeMajor/severity' matrix.
+    http://www.imsglobal.org/gws/gwsv1p0/imsgws_wsdlBindv1p0.html
+
+A resource to test the LTI protocol (PHP realization):
+
+    http://www.imsglobal.org/developers/LTI/test/v1p1/lms.php
+
+
+What is supported:
+------------------
+
+1.) Display of simple LTI in iframe or a new window.
+2.) Multiple LTI components on a single page.
+3.) The use of multiple LTI providers per course.
+4.) Use of advanced LTI component that provides back a grade.
+    a.) The LTI provider sends back a grade to a specified URL.
+    b.) Currently only action "update" is supported. "Read", and "delete"
+        actions initially weren't required.
 """
 
 import logging
@@ -46,7 +70,7 @@ class LTIFields(object):
     except credentials, which should be set in course settings::
 
     `lti_id` is id to connect tool with credentials in course settings. It should not contain :: (double semicolon)
-    `launch_url` is launch url of tool.
+    `launch_url` is launch URL of tool.
     `custom_parameters` are additional parameters to navigate to proper book and book page.
 
     For example, for Vitalsource provider, `launch_url` should be
@@ -56,7 +80,7 @@ class LTIFields(object):
         vbid=put_book_id_here
         book_location=page/put_page_number_here
 
-    Default non-empty url for `launch_url` is needed due to oauthlib demand (url scheme should be presented)::
+    Default non-empty URL for `launch_url` is needed due to oauthlib demand (URL scheme should be presented)::
 
     https://github.com/idan/oauthlib/blob/master/oauthlib/oauth1/rfc5849/signature.py#L136
     """
@@ -69,7 +93,7 @@ class LTIFields(object):
 
 
 class LTIModule(LTIFields, XModule):
-    '''
+    """
     Module provides LTI integration to course.
 
     Except usual Xmodule structure it proceeds with OAuth signing.
@@ -96,7 +120,7 @@ class LTIModule(LTIFields, XModule):
         That pair should be obtained from LTI provider and set into course settings by course author.
         After that signature and other OAuth data are generated.
 
-         OAuth data which is generated after signing is usual::
+        OAuth data which is generated after signing is usual::
 
             oauth_callback
             oauth_nonce
@@ -112,34 +136,34 @@ class LTIModule(LTIFields, XModule):
         Form example::
 
             <form
-                    action="${launch_url}"
-                    name="ltiLaunchForm-${element_id}"
-                    class="ltiLaunchForm"
-                    method="post"
-                    target="ltiLaunchFrame-${element_id}"
-                    encType="application/x-www-form-urlencoded"
-                >
-                    <input name="launch_presentation_return_url" value="" />
-                    <input name="lis_outcome_service_url" value="" />
-                    <input name="lis_result_sourcedid" value="" />
-                    <input name="lti_message_type" value="basic-lti-launch-request" />
-                    <input name="lti_version" value="LTI-1p0" />
-                    <input name="oauth_callback" value="about:blank" />
-                    <input name="oauth_consumer_key" value="${oauth_consumer_key}" />
-                    <input name="oauth_nonce" value="${oauth_nonce}" />
-                    <input name="oauth_signature_method" value="HMAC-SHA1" />
-                    <input name="oauth_timestamp" value="${oauth_timestamp}" />
-                    <input name="oauth_version" value="1.0" />
-                    <input name="user_id" value="${user_id}" />
-                    <input name="role" value="student" />
-                    <input name="oauth_signature" value="${oauth_signature}" />
+                action="${launch_url}"
+                name="ltiLaunchForm-${element_id}"
+                class="ltiLaunchForm"
+                method="post"
+                target="ltiLaunchFrame-${element_id}"
+                encType="application/x-www-form-urlencoded"
+            >
+                <input name="launch_presentation_return_url" value="" />
+                <input name="lis_outcome_service_url" value="" />
+                <input name="lis_result_sourcedid" value="" />
+                <input name="lti_message_type" value="basic-lti-launch-request" />
+                <input name="lti_version" value="LTI-1p0" />
+                <input name="oauth_callback" value="about:blank" />
+                <input name="oauth_consumer_key" value="${oauth_consumer_key}" />
+                <input name="oauth_nonce" value="${oauth_nonce}" />
+                <input name="oauth_signature_method" value="HMAC-SHA1" />
+                <input name="oauth_timestamp" value="${oauth_timestamp}" />
+                <input name="oauth_version" value="1.0" />
+                <input name="user_id" value="${user_id}" />
+                <input name="role" value="student" />
+                <input name="oauth_signature" value="${oauth_signature}" />
 
-                    <input name="custom_1" value="${custom_param_1_value}" />
-                    <input name="custom_2" value="${custom_param_2_value}" />
-                    <input name="custom_..." value="${custom_param_..._value}" />
+                <input name="custom_1" value="${custom_param_1_value}" />
+                <input name="custom_2" value="${custom_param_2_value}" />
+                <input name="custom_..." value="${custom_param_..._value}" />
 
-                    <input type="submit" value="Press to Launch" />
-                </form>
+                <input type="submit" value="Press to Launch" />
+            </form>
 
     5. LTI provider has same secret key and it signs data string via *OAuth1* and compares signatures.
 
@@ -147,7 +171,7 @@ class LTIModule(LTIFields, XModule):
         and LTI tool is rendered to iframe inside course.
 
         Otherwise error message from LTI provider is generated.
-    '''
+    """
 
     js = {'js': [resource_string(__name__, 'js/src/lti/lti.js')]}
     css = {'scss': [resource_string(__name__, 'css/lti/lti.scss')]}
@@ -223,7 +247,7 @@ class LTIModule(LTIFields, XModule):
         context = {
             'input_fields': input_fields,
 
-            # these params do not participate in oauth signing
+            # These parameters do not participate in OAuth signing.
             'launch_url': self.launch_url.strip(),
             'element_id': self.location.html_id(),
             'element_class': self.category,
@@ -240,7 +264,7 @@ class LTIModule(LTIFields, XModule):
 
     def get_outcome_service_url(self):
         """
-        Return url for storing grades
+        Return URL for storing grades.
         """
         uri = 'http://{host}{path}'.format(
                 host=self.system.hostname,
@@ -252,10 +276,13 @@ class LTIModule(LTIFields, XModule):
         """
         This is an opaque unique identifier that the TC guarantees will be unique
         within the TC for every placement of the link.
+
         If the tool / activity is placed multiple times in the same context,
         each of those placements will be distinct.
+
         This value will also change if the item is exported from one system or
         context and imported into another system or context.
+
         This parameter is required.
         """
         return unicode(urllib.quote(self.id))
@@ -271,7 +298,7 @@ class LTIModule(LTIFields, XModule):
 
         context_id is - is an opaque identifier that uniquely identifies the context that contains
         the link being launched.
-        lti_id should be context_id by meaning
+        lti_id should be context_id by meaning.
         """
         return u':'.join(urllib.quote(i) for i in (self.lti_id, self.get_resource_link_id(), self.get_user_id()))
 
@@ -291,7 +318,7 @@ class LTIModule(LTIFields, XModule):
             client_secret=unicode(client_secret)
         )
 
-        # must have parameters for correct signing from LTI:
+        # Must have parameters for correct signing from LTI:
         body = {
             u'user_id': self.get_user_id(),
             u'oauth_callback': u'about:blank',
@@ -307,7 +334,7 @@ class LTIModule(LTIFields, XModule):
 
         }
 
-        # appending custom parameter for signing
+        # Appending custom parameter for signing.
         body.update(custom_parameters)
 
         headers = {
@@ -321,9 +348,9 @@ class LTIModule(LTIFields, XModule):
                 http_method=u'POST',
                 body=body,
                 headers=headers)
-        except ValueError:  # scheme not in url
-            #https://github.com/idan/oauthlib/blob/master/oauthlib/oauth1/rfc5849/signature.py#L136
-            #Stubbing headers for now:
+        except ValueError:  # Scheme not in url.
+            # https://github.com/idan/oauthlib/blob/master/oauthlib/oauth1/rfc5849/signature.py#L136
+            # Stubbing headers for now:
             headers = {
                 u'Content-Type': u'application/x-www-form-urlencoded',
                 u'Authorization': u'OAuth oauth_nonce="80966668944732164491378916897", \
@@ -331,7 +358,7 @@ oauth_timestamp="1378916897", oauth_version="1.0", oauth_signature_method="HMAC-
 oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
 
         params = headers['Authorization']
-        # parse headers to pass to template as part of context:
+        # Parse headers to pass to template as part of context:
         params = dict([param.strip().replace('"', '').split('=') for param in params.split(',')])
 
         params[u'oauth_nonce'] = params[u'OAuth oauth_nonce']
@@ -344,7 +371,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         # So we need to decode signature back:
         params[u'oauth_signature'] = urllib.unquote(params[u'oauth_signature']).decode('utf8')
 
-        # add lti parameters to oauth parameters for sending in form
+        # Add LTI parameters to OAuth parameters for sending in form.
         params.update(body)
         return params
 
@@ -386,7 +413,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
               </imsx_POXBody>
             </imsx_POXEnvelopeRequest>
 
-        Example of correct/incorrect answer XML body:: see response_xml_template
+        Example of correct/incorrect answer XML body:: see response_xml_template.
         """
         response_xml_template = textwrap.dedent("""
             <?xml version="1.0" encoding="UTF-8"?>
@@ -419,7 +446,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         # Returns if:
         #   - score is out of range;
         #   - can't parse response from TP;
-        #   - can't verify oauth signing or oauth signing is incorrect.
+        #   - can't verify OAuth signing or OAuth signing is incorrect.
         failure_values = {
             'imsx_codeMajor': 'failure',
             'imsx_description': 'The request has failed.',
@@ -432,7 +459,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         except Exception:
             return Response(response_xml_template.format(**failure_values), content_type="application/xml")
 
-        # verify oauth signing
+        # Verify OAuth signing.
         try:
             self.verify_oauth_body_sign(request)
         except (ValueError, LTIError):
@@ -485,7 +512,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         sourcedId = root.xpath("//def:sourcedId", namespaces=namespaces)[0].text
         score = root.xpath("//def:textString", namespaces=namespaces)[0].text
         action = root.xpath("//def:imsx_POXBody", namespaces=namespaces)[0].getchildren()[0].tag.replace('{'+lti_spec_namespace+'}', '')
-        #Raise exception if score is not float or not in range 0.0-1.0 regarding spec.
+        # Raise exception if score is not float or not in range 0.0-1.0 regarding spec.
         score = float(score)
         if not 0 <= score <= 1:
             raise LTIError
@@ -501,10 +528,11 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
             This specification extends the OAuth signature to include integrity checks on HTTP request bodies
             with content types other than application/x-www-form-urlencoded.
 
-        Args:
-        request: DjangoWebobRequest.
+        Arguments:
+            request: DjangoWebobRequest.
 
-        Raises: LTIError if request is incorrect.
+        Raises:
+            LTIError if request is incorrect.
         """
 
         client_key, client_secret = self.get_client_key_secret()
@@ -534,7 +562,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
 
     def get_client_key_secret(self):
         """
-         Obtains client_key and client_secret credentials from current course.
+        Obtains client_key and client_secret credentials from current course.
         """
         course_id = self.course_id
         course_location = CourseDescriptor.id_to_location(course_id)
