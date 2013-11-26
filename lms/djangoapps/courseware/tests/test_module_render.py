@@ -15,10 +15,7 @@ from django.test.utils import override_settings
 from xblock.field_data import FieldData
 from xblock.runtime import Runtime
 from xblock.fields import ScopeIds
-from xmodule.capa_module import CapaDescriptor
-from xmodule.combined_open_ended_module import CombinedOpenEndedDescriptor
-from xmodule.foldit_module import FolditDescriptor
-from xmodule.html_module import HtmlDescriptor
+from xmodule.lti_module import LTIDescriptor
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -525,17 +522,11 @@ class TestHtmlModifiers(ModuleStoreTestCase):
             result_fragment.content
         )
 
+PER_COURSE_ANONYMIZED_DESCRIPTORS = [LTIDescriptor]
 
-PER_STUDENT_ANONYMIZED_DESCRIPTORS = (
-    CapaDescriptor,
-    HtmlDescriptor,
-    FolditDescriptor,
-    CombinedOpenEndedDescriptor
-)
-
-PER_COURSE_ANONYMIZED_DESCRIPTORS = [
+PER_STUDENT_ANONYMIZED_DESCRIPTORS = [
     class_ for (name, class_) in XModuleDescriptor.load_classes()
-    if not issubclass(class_, PER_STUDENT_ANONYMIZED_DESCRIPTORS)
+    if not issubclass(class_, PER_COURSE_ANONYMIZED_DESCRIPTORS)
 ]
 
 

@@ -371,16 +371,15 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
             block_wrappers.append(partial(add_histogram, user))
 
     # These modules store data using the anonymous_student_id as a key.
-    # To prevent loss of data, we will continue to provide these modules
-    # with the per-student anonymized id (as we have in the past),
-    # while giving all other modules a per-course anonymized id
-    if issubclass(
-        getattr(descriptor, 'module_class', None),
-        (CapaModule, HtmlModule, CombinedOpenEndedModule, FolditModule)
-    ):
-        anonymous_student_id = anonymous_id_for_user(user, '')
-    else:
+    # To prevent loss of data, we will continue to provide old modules with
+    # the per-student anonymized id (as we have in the past),
+    # while giving selected modules a per-course anonymized id.
+    # As we have the time to manually test more modules, we can add to the list
+    # of modules that get the per-course anonymized id.
+    if issubclass(getattr(descriptor, 'module_class', None), [LtiModule]):
         anonymous_student_id = anonymous_id_for_user(user, course_id)
+    else:
+        anonymous_student_id = anonymous_id_for_user(user, '')
 
     system = LmsModuleSystem(
         track_function=track_function,
