@@ -59,7 +59,7 @@ ${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph",
                 ${ section['display_name'] }
                 %if total > 0 or earned > 0:
                   <span class="sr">
-                    ${"{0:.3n} of {1:.3n} possible points".format( float(earned), float(total) )}
+                    ${_("{earned:.3n} of {total:.3n} possible points").format( earned = float(earned), total = float(total) )}
                   </span></a>
                 %endif
                 %if total > 0 or earned > 0:
@@ -72,7 +72,7 @@ ${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph",
                 %if section.get('due') is not None:
                   <%
                       formatted_string = get_time_display(section['due'], course.due_date_display_format)
-                      due_date = '' if len(formatted_string)==0 else _('due {date}'.format(date=formatted_string))
+                      due_date = '' if len(formatted_string)==0 else _(u'due {date}').format(date=formatted_string)
                   %>
                   <em>
                   ${due_date}
@@ -82,7 +82,7 @@ ${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph",
 
               <section class="scores">
                 %if len(section['scores']) > 0:
-                  <h3> ${ "Problem Scores: " if section['graded'] else "Practice Scores: "} </h3>
+                  <h3> ${ _("Problem Scores: ") if section['graded'] else _("Practice Scores: ")} </h3>
                   <ol>
                     %for score in section['scores']:
                     <li>${"{0:.3n}/{1:.3n}".format(float(score.earned),float(score.possible))}</li>

@@ -189,7 +189,6 @@ class @StaffGrading
     $(window).keyup @keyup_handler
     @question_header = $('.question-header')
     @question_header.click @collapse_question
-    @collapse_question()
     
     # model state
     @state = state_no_data
@@ -296,7 +295,7 @@ class @StaffGrading
       submission_id: @submission_id
       location: @location
       submission_flagged: @flag_submission_checkbox.is(':checked')
-    @gentle_alert "Grades saved.  Fetching the next submission to grade."
+    @gentle_alert gettext("Grades saved.  Fetching the next submission to grade.")
     @backend.post('save_grade', data, @ajax_callback)
 
   gentle_alert: (msg) =>
@@ -344,11 +343,11 @@ class @StaffGrading
     # clear the problem list and breadcrumbs
     @problem_list.html('''
         <tr>
-            <th>Problem Name</th>
-            <th>Graded</th>
-            <th>Available to Grade</th>
-            <th>Required</th>
-            <th>Progress</th>
+            <th>''' + gettext("Problem Name") + '''</th>
+            <th>''' + gettext("Graded") + '''</th>
+            <th>''' + gettext("Available to Grade") + '''</th>
+            <th>''' + gettext("Required") + '''</th>
+            <th>''' + gettext("Progress") + '''</th>
         </tr>
     ''')    
     @breadcrumbs.html('')
@@ -410,7 +409,7 @@ class @StaffGrading
     show_action_button = true
 
     problem_list_link = $('<a>').attr('href', 'javascript:void(0);')
-      .append("< Back to problem list")
+      .append("< " + gettext("Back to problem list"))
       .click => @get_problem_list()
 
     # set up the breadcrumbing
@@ -418,15 +417,15 @@ class @StaffGrading
       
 
     if @state == state_error
-      @set_button_text('Try loading again')
+      @set_button_text(gettext('Try loading again'))
       show_action_button = true
 
     else if @state == state_grading
       @ml_error_info_container.html(@ml_error_info)
       meta_list = $("<div>")
-      meta_list.append("<div class='meta-info'>#{@num_pending} available | </div>")
-      meta_list.append("<div class='meta-info'>#{@num_graded} graded | </div>")
-      meta_list.append("<div class='meta-info'>#{Math.max(@min_for_ml - @num_graded, 0)} more needed to start ML </div><br/>")
+      meta_list.append("<div class='meta-info'>#{@num_pending} " + gettext('available') + " | </div>")
+      meta_list.append("<div class='meta-info'>#{@num_graded} " + gettext('graded') + " | </div>")
+      meta_list.append("<div class='meta-info'>#{Math.max(@min_for_ml - @num_graded, 0)} " + gettext('more needed to start ML') + " </div><br/>")
       @problem_meta_info.html(meta_list)
 
       @prompt_container.html(@prompt)
@@ -439,15 +438,15 @@ class @StaffGrading
       @setup_score_selection()
       
     else if @state == state_graded
-      @set_button_text('Submit')
+      @set_button_text(gettext('Submit'))
       show_action_button = false
 
     else if @state == state_no_data
       @message_container.html(@message)
-      @set_button_text('Re-check for submissions')
+      @set_button_text(gettext('Re-check for submissions'))
 
     else
-      @error('System got into invalid state ' + @state)
+      @error(gettext('System got into invalid state ') + @state)
 
     @submit_button.toggle(show_submit_button)
     @action_button.toggle(show_action_button)
@@ -462,17 +461,17 @@ class @StaffGrading
     else if @state == state_no_data
       @get_next_submission(@location)
     else
-      @error('System got into invalid state for submission: ' + @state)
+      @error(gettext('System got into invalid state for submission: ') + @state)
 
   collapse_question: () =>
     @prompt_container.slideToggle()
     @prompt_container.toggleClass('open')
-    if @question_header.text() == "(Hide)"
+    if @question_header.text() == gettext("(Hide)")
       Logger.log 'staff_grading_hide_question', {location: @location}
-      new_text = "(Show)"
+      new_text = gettext("(Show)")
     else
       Logger.log 'staff_grading_show_question', {location: @location}
-      new_text = "(Hide)"
+      new_text = gettext("(Hide)")
     @question_header.text(new_text)
 
   scroll_to_top: () =>
