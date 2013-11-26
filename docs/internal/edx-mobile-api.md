@@ -287,7 +287,7 @@ application/json
 This method will return all non-leaf nodes in a course tree,
 e.g. Course, Chapters, Sections, Subsections.
 
-**Request: HTTPS GET /edx-pi/courseware/v1/<course.id>**
+**Request: HTTPS GET /edx-api/courseware/v1/<course.id>**
 
 example: /edx-api/courseware/v1/foo.bar.2013_Spring
 
