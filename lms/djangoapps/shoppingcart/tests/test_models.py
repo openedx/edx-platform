@@ -451,8 +451,9 @@ class CertificateItemTest(ModuleStoreTestCase):
             sentinel.request,
             'edx.user.upgrade.purchased',
             {
-                'user': user,
                 'course_id': course_id,
+                'user_id': user.pk,
+                'mode': 'honor'
             }
         )
         self.mock_server_track.reset_mock()

@@ -57,13 +57,3 @@ def course_context_from_course_id(course_id):
             )
 
     return context
-
-
-def user_context(user):
-    """
-    Creates a user context from `user`
-    """
-    context = {
-        'user': user,
-    }
-    return context

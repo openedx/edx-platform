@@ -25,7 +25,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_string
 from student.views import course_from_id
-from student.models import CourseEnrollment, unenroll_done, UserMethods
+from student.models import CourseEnrollment, unenroll_done
 
 from verify_student.models import SoftwareSecurePhotoVerification
 
@@ -608,7 +608,7 @@ class CertificateItem(OrderItem):
                 "Could not submit verification attempt for enrollment {}".format(self.course_enrollment)
             )
         if self.upgrade is True:
-            UserMethods.emit_event(self.user, self.course_enrollment.course_id, EVENT_NAME_USER_UPGRADED)
+            self.course_enrollment.emit_event(EVENT_NAME_USER_UPGRADED)
         self.course_enrollment.change_mode(self.mode)
         self.course_enrollment.activate()
 

@@ -80,7 +80,7 @@
                   <a class="action action-upgrade" href="${reverse('course_modes_choose', kwargs={'course_id': course.id})}?upgrade=True">
                     <img class="deco-graphic" src="${static.url('images/vcert-ribbon-s.png')}" alt="ID Verified Ribbon/Badge">
                     <span class="wrapper-copy">
-                      <span class="copy">${_("Upgrade to Verified Track")}</span>
+                      <span class="copy" id="upgrade-to-verified" data-course-id="${course.id}" data-user="${user.username}">${_("Upgrade to Verified Track")}</span>
                     </span>
                   </a>
                 </li>

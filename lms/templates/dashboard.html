@@ -22,6 +22,12 @@
         $(this).closest('.message.is-expandable').toggleClass('is-expanded');
     }
 
+    $("#upgrade-to-verified").click(function(event) {
+      $user = $(event.target).data("user");
+      $course = $(event.target).data("course-id");
+      Logger.log('EVENT-NAME-USER-CLICKED-UPGRADE', [$user, $course], null);
+    });
+
     $(".email-settings").click(function(event) {
       $("#email_settings_course_id").val( $(event.target).data("course-id") );
       $("#email_settings_course_number").text( $(event.target).data("course-number") );
