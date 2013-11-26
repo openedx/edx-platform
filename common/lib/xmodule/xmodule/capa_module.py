@@ -269,9 +269,6 @@ class CapaModule(CapaFields, XModule):
         Generate a new Loncapa Problem
         """
 
-        # import ipdb
-        # ipdb.set_trace()
-
         if text is None:
             text = self.data
 
@@ -295,13 +292,10 @@ class CapaModule(CapaFields, XModule):
             'seed': self.seed,
         }
 
-    def set_state_from_lcp(self, recordTime=True):
+    def set_state_from_lcp(self, isTimeRecorded=False):
         """
         Set the module's state from the settings in `self.lcp`
         """
-
-        # import ipdb
-        # ipdb.set_trace()
 
         lcp_state = self.lcp.get_state()
         self.done = lcp_state['done']
@@ -310,7 +304,7 @@ class CapaModule(CapaFields, XModule):
         self.student_answers = lcp_state['student_answers']
         self.seed = lcp_state['seed']
         
-        if recordTime:
+        if isTimeRecorded:
             self.lastSubmissionTime = datetime.datetime.now(UTC())
 
     def get_score(self):
@@ -774,6 +768,7 @@ class CapaModule(CapaFields, XModule):
 
         Returns the answers: {'answers' : answers}
         """
+
         event_info = dict()
         event_info['problem_id'] = self.location.url()
         self.system.track_function('showanswer', event_info)
@@ -951,7 +946,7 @@ class CapaModule(CapaFields, XModule):
             correct_map = self.lcp.grade_answers(answers)
             self.attempts = self.attempts + 1
             self.lcp.done = True
-            self.set_state_from_lcp()
+            self.set_state_from_lcp(True)
 
         except (StudentInputError, ResponseError, LoncapaProblemError) as inst:
             log.warning("StudentInputError in capa_module:problem_check",
@@ -1112,7 +1107,7 @@ class CapaModule(CapaFields, XModule):
 
         self.lcp.student_answers = answers
 
-        self.set_state_from_lcp(False)
+        self.set_state_from_lcp()
 
         self.system.track_function('save_problem_success', event_info)
         msg = "Your answers have been saved"
@@ -1148,6 +1143,18 @@ class CapaModule(CapaFields, XModule):
             self.system.track_function('reset_problem_fail', event_info)
             return {'success': False,
                     'error': "Refresh the page and make an attempt before resetting."}
+
+        # Wait time between resets
+        # current_time = datetime.datetime.now(UTC())
+        # if self.lastSubmissionTime is not None:
+        #     if (current_time - self.lastSubmissionTime).total_seconds() < self.submissionWaitSeconds:
+        #         secLeft = int(self.submissionWaitSeconds - (current_time - self.lastSubmissionTime).total_seconds()) + 1
+        #         msg = u'You must wait at least {wait} seconds between resets - {s} to go'.format(
+        #             wait=self.submissionWaitSeconds, s=secLeft)
+
+        #         print "\n\nCANNOT RESET YET\n\n"
+
+        #         return {'success': u"Hey", 'html': ''}  # Prompts a modal dialog in ajax callback
 
         if self.rerandomize in ["always", "onreset"]:
             # Reset random number generator seed.

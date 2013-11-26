@@ -602,6 +602,9 @@ class LoncapaProblem(object):
 
         html = contextualize_text(etree.tostring(self._extract_html(process_this)), self.context)
 
+        # import ipdb
+        # ipdb.set_trace()
+
         return html
 
     # def get_htmlBAD(self):
