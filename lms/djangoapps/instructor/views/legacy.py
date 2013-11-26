@@ -170,10 +170,11 @@ def instructor_dashboard(request, course_id):
                 student = User.objects.get(email=unique_student_identifier)
             else:
                 student = User.objects.get(username=unique_student_identifier)
-            msg += "Found a single student.  "
+            msg += _u("Found a single student.  ")
         except User.DoesNotExist:
             student = None
-            msg += "<font color='red'>" + _u("Couldn't find student with that email or username.") + "  </font>"
+            msg += "<font color='red'>{text}</font>".format(
+                text=_u("Couldn't find student with that email or username."))
         return msg, student
 
     # process actions from form POST
@@ -252,14 +253,18 @@ def instructor_dashboard(request, course_id):
         try:
             instructor_task = submit_rescore_problem_for_all_students(request, course_id, problem_url)
             if instructor_task is None:
-                msg += '<font color="red">' + _u('Failed to create a background task for rescoring "{0}".').format(problem_url) + '</font>'
+                msg += '<font color="red">{text}</font>'.format(
+                    text=_u('Failed to create a background task for rescoring "{0}".').format(problem_url))
             else:
                 track.views.server_track(request, "rescore-all-submissions", {"problem": problem_url, "course": course_id}, page="idashboard")
         except ItemNotFoundError as err:
-            msg += '<font color="red">' + _u('Failed to create a background task for rescoring "{0}": problem not found.').format(problem_url) + '</font>'
+            msg += '<font color="red">{text}</font>'.format(
+                text=_u('Failed to create a background task for rescoring "{0}": problem not found.').format(problem_url))
         except Exception as err:
             log.error("Encountered exception from rescore: {0}".format(err))
-            msg += '<font color="red">' + _u('Failed to create a background task for rescoring "{url}": {message}.').format(url = problem_url, message = err.message) + '</font>'
+            msg += '<font color="red">{text}</font>'.format(
+                text=_u('Failed to create a background task for rescoring "{url}": {message}.').format(
+                    url=problem_url, message=err.message))
 
     elif "Reset ALL students' attempts" in action:
         problem_urlname = request.POST.get('problem_for_all_students', '')
@@ -267,15 +272,19 @@ def instructor_dashboard(request, course_id):
         try:
             instructor_task = submit_reset_problem_attempts_for_all_students(request, course_id, problem_url)
             if instructor_task is None:
-                msg += '<font color="red">' + _u('Failed to create a background task for resetting "{0}".').format(problem_url) + '</font>'
+                msg += '<font color="red">{text}</font>'.format(
+                    text=_u('Failed to create a background task for resetting "{0}".').format(problem_url))
             else:
                 track.views.server_track(request, "reset-all-attempts", {"problem": problem_url, "course": course_id}, page="idashboard")
         except ItemNotFoundError as err:
             log.error('Failure to reset: unknown problem "{0}"'.format(err))
-            msg += '<font color="red">' + _u('Failed to create a background task for resetting "{0}": problem not found.').format(problem_url) + '</font>'
+            msg += '<font color="red">{text}</font>'.format(
+                text=_u('Failed to create a background task for resetting "{0}": problem not found.').format(problem_url))
         except Exception as err:
             log.error("Encountered exception from reset: {0}".format(err))
-            msg += '<font color="red">' + _u('Failed to create a background task for resetting "{url}": {message}.').format(url = problem_url, message = err.message) + '</font>'
+            msg += '<font color="red">{text}</font>'.format(
+                text=_u('Failed to create a background task for resetting "{url}": {message}.').format(
+                    url=problem_url, message=err.message))
 
     elif "Show Background Task History for Student" in action:
         # put this before the non-student case, since the use of "in" will cause this to be missed
@@ -318,8 +327,8 @@ def instructor_dashboard(request, course_id):
                 )
                 msg += _u("Found module.  ")
             except StudentModule.DoesNotExist as err:
-                error_msg = _u("Couldn't find module with that urlname: {url}. ").format(url = problem_urlname)
-                msg += "<font color='red'>" + error_msg + "({0}) ".format(err) + "</font>"
+                error_msg = _u("Couldn't find module with that urlname: {url}. ").format(url=problem_urlname)
+                msg += "<font color='red'>{err_msg} ({err})</font>".format(err_msg=error_msg, err=err)
                 log.debug(error_msg)
 
         if student_module is not None:
@@ -327,7 +336,8 @@ def instructor_dashboard(request, course_id):
                 # delete the state
                 try:
                     student_module.delete()
-                    msg += "<font color='red'>" + _u("Deleted student module state for {state}!").format(state = module_state_key) + "</font>"
+                    msg += "<font color='red'>{text}</font>".format(
+                        text=_u("Deleted student module state for {state}!").format(state=module_state_key))
                     event = {
                         "problem": module_state_key,
                         "student": unique_student_identifier,
@@ -341,9 +351,9 @@ def instructor_dashboard(request, course_id):
                     )
                 except Exception as err:
                     error_msg = _u("Failed to delete module state for {id}/{url}. ").format(
-                        id = unique_student_identifier, url = problem_urlname
+                        id=unique_student_identifier, url=problem_urlname
                     )
-                    msg += "<font color='red'>" + error_msg + "({0}) ".format(err) + "</font>"
+                    msg += "<font color='red'>{err_msg} ({err})</font>".format(err_msg=error_msg, err=err)
                     log.exception(error_msg)
             elif "Reset student's attempts" in action:
                 # modify the problem's state
@@ -363,23 +373,28 @@ def instructor_dashboard(request, course_id):
                         "course": course_id
                     }
                     track.views.server_track(request, "reset-student-attempts", event, page="idashboard")
-                    msg += "<font color='green'>" + _u("Module state successfully reset!") + "</font>"
+                    msg += "<font color='green'>{text}</font>".format(
+                        text=_u("Module state successfully reset!"))
                 except Exception as err:
                     error_msg = _u("Couldn't reset module state for {id}/{url}. ").format(
-                        id = unique_student_identifier, url = problem_urlname
+                        id=unique_student_identifier, url=problem_urlname
                     )
-                    msg += "<font color='red'>" + error_msg + "({0}) ".format(err) + "</font>"
+                    msg += "<font color='red'>{err_msg} ({err})</font>".format(err_msg=error_msg, err=err)
                     log.exception(error_msg)
             else:
                 # "Rescore student's problem submission" case
                 try:
                     instructor_task = submit_rescore_problem_for_student(request, course_id, module_state_key, student)
                     if instructor_task is None:
-                        msg += '<font color="red">' + _u('Failed to create a background task for rescoring "{key}" for student {id}.').format(key = module_state_key, id = unique_student_identifier)  + '</font>'
+                        msg += '<font color="red">{text}</font>'.format(
+                            text=_u('Failed to create a background task for rescoring "{key}" for student {id}.').format(
+                                key=module_state_key, id=unique_student_identifier))
                     else:
                         track.views.server_track(request, "rescore-student-submission", {"problem": module_state_key, "student": unique_student_identifier, "course": course_id}, page="idashboard")
                 except Exception as err:
-                    msg += '<font color="red">' + _u('Failed to create a background task for rescoring "{key}": {id}.').format(key = module_state_key, id = err.message) + '</font>'
+                    msg += '<font color="red">{text}</font>'.format(
+                        text=_u('Failed to create a background task for rescoring "{key}": {id}.').format(
+                            key=module_state_key, id=err.message))
                     log.exception("Encountered exception from rescore: student '{0}' problem '{1}'".format(
                         unique_student_identifier, module_state_key
                     )
@@ -393,7 +408,10 @@ def instructor_dashboard(request, course_id):
         if student is not None:
             progress_url = reverse('student_progress', kwargs={'course_id': course_id, 'student_id': student.id})
             track.views.server_track(request, "get-student-progress-page", {"student": unicode(student), "instructor": unicode(request.user), "course": course_id}, page="idashboard")
-            msg += "<a href='{0}' target='_blank'> ".format(progress_url) + _u("Progress page for username: {username} with email address: {email}").format(username = student.username, email = student.email) + "</a>."
+            msg += "<a href='{url}' target='_blank'>{text}</a>.".format(
+                url=progress_url,
+                text=_u("Progress page for username: {username} with email address: {email}").format(
+                    username=student.username, email=student.email))
 
     #----------------------------------------
     # export grades to remote gradebook
@@ -431,11 +449,12 @@ def instructor_dashboard(request, course_id):
         datatable = {}
         aname = request.POST.get('assignment_name', '')
         if not aname:
-            msg += "<font color='red'>" + _u("Please enter an assignment name") + "</font>"
+            msg += "<font color='red'>{text}</font>".format(text=_u("Please enter an assignment name"))
         else:
             allgrades = get_student_grade_summary_data(request, course, course_id, get_grades=True, use_offline=use_offline)
             if aname not in allgrades['assignments']:
-                msg += "<font color='red'>" + _u("Invalid assignment name '{name}'").format(name = aname) + "</font>" 
+                msg += "<font color='red'>{text}</font>".format(
+                    text=_u("Invalid assignment name '{name}'").format(name=aname))
             else:
                 aidx = allgrades['assignments'].index(aname)
                 datatable = {'header': [_u('External email'), aname]}
@@ -525,10 +544,12 @@ def instructor_dashboard(request, course_id):
             smdat = StudentModule.objects.filter(course_id=course_id,
                                                  module_state_key=module_state_key)
             smdat = smdat.order_by('student')
-            msg += _u("Found {num} records to dump ").format(num = smdat)
+            msg += _u("Found {num} records to dump ").format(num=smdat)
         except Exception as err:
-            msg += "<font color='red'>" + _u("Couldn't find module with that urlname.") + "  </font>"
-            msg += "<pre>{err}</pre>".format(err = escape(err))
+            msg += "<font color='red'>{text}</font><pre>{err}</pre>".format(
+                text=_u("Couldn't find module with that urlname."),
+                err=escape(err)
+            )
             smdat = []
 
         if smdat:
@@ -690,9 +711,15 @@ def instructor_dashboard(request, course_id):
         else:
             # If sending the task succeeds, deliver a success message to the user.
             if email_to_option == "all":
-                email_msg = '<div class="msg msg-confirm"><p class="copy">' + _u('Your email was successfully queued for sending. Please note that for large classes, it may take up to an hour (or more, if other courses are simultaneously sending email) to send all emails.') + '</p></div>'
+                text = _u(
+                    "Your email was successfully queued for sending. "
+                    "Please note that for large classes, it may take up to an hour "
+                    "(or more, if other courses are simultaneously sending email) "
+                    "to send all emails."
+                )
             else:
-                email_msg = '<div class="msg msg-confirm"><p class="copy">' + _u('Your email was successfully queued for sending.') + '</p></div>'
+                text = _u('Your email was successfully queued for sending.')
+            email_msg = '<div class="msg msg-confirm"><p class="copy">{text}</p></div>'.format(text=text)
 
     elif "Show Background Email Task History" in action:
         message, datatable = get_background_task_table(course_id, task_type='bulk_course_email')
@@ -759,7 +786,9 @@ def instructor_dashboard(request, course_id):
     # offline grades?
 
     if use_offline:
-        msg += "<br/><font color='orange'>Grades from %s</font>" % offline_grades_available(course_id)
+        msg += "<br/><font color='orange'>{text}</font>".format(
+            text=_u("Grades from {course_id}").format(
+                course_id=offline_grades_available(course_id)))
 
     # generate list of pending background tasks
     if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
