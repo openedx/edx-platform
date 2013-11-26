@@ -4,6 +4,7 @@ import oauthlib
 from . import BaseTestXmodule
 from collections import OrderedDict
 import mock
+import urllib
 
 
 class TestLTI(BaseTestXmodule):
@@ -26,17 +27,23 @@ class TestLTI(BaseTestXmodule):
         mocked_signature_after_sign = u'my_signature%3D'
         mocked_decoded_signature = u'my_signature='
 
+        lti_id = self.item_module.lti_id
+        module_id = unicode(urllib.quote(self.item_module.id))
+        user_id = unicode(self.item_descriptor.xmodule_runtime.anonymous_student_id)
+
+        sourcedId = u':'.join(urllib.quote(i) for i in (lti_id, module_id, user_id))
+
         self.correct_headers = {
-            u'user_id': unicode(self.item_descriptor.xmodule_runtime.anonymous_student_id),
+            u'user_id': user_id,
             u'oauth_callback': u'about:blank',
             u'launch_presentation_return_url': '',
             u'lti_message_type': u'basic-lti-launch-request',
             u'lti_version': 'LTI-1p0',
             u'role': u'student',
 
-            u'resource_link_id': u'i4x%3A//MITx/999/lti/lti_3',
+            u'resource_link_id': module_id,
             u'lis_outcome_service_url': 'http://edx.orgi4x://MITx/999/lti/lti_3/grade_handler',
-            u'lis_result_sourcedid': u':i4x%253A//MITx/999/lti/lti_3:student',
+            u'lis_result_sourcedid': sourcedId,
 
             u'oauth_nonce': mocked_nonce,
             u'oauth_timestamp': mocked_timestamp,

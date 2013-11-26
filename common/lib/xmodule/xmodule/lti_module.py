@@ -407,18 +407,26 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
                 <imsx_POXBody>{response}</imsx_POXBody>
             </imsx_POXEnvelopeResponse>
         """)
+        # Returns when `action` is unsupported.
+        # Supported actions:
+        #   - replaceResultRequest.
         unsupported_values = {
             'imsx_codeMajor': 'unsupported',
             'imsx_description': 'Target does not support the requested operation.',
             'imsx_messageIdentifier': 'unknown',
             'response': ''
         }
+        # Returns if:
+        #   - score is out of range;
+        #   - can't parse response from TP;
+        #   - can't verify oauth signing or oauth signing is incorrect.
         failure_values = {
             'imsx_codeMajor': 'failure',
             'imsx_description': 'The request has failed.',
             'imsx_messageIdentifier': 'unknown',
             'response': ''
         }
+
         try:
             imsx_messageIdentifier, sourcedId, score, action = self.parse_grade_xml_body(request.body)
         except Exception:
@@ -428,6 +436,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         try:
             self.verify_oauth_body_sign(request)
         except (ValueError, LTIError):
+            failure_values['imsx_messageIdentifier'] = escape(imsx_messageIdentifier)
             return Response(response_xml_template.format(**failure_values), content_type="application/xml")
 
 
@@ -443,7 +452,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
             )
 
             values = {
-                'imsx_codeMajor': 'Success',
+                'imsx_codeMajor': 'success',
                 'imsx_description': 'Score for {sourced_id} is now {score}'.format(sourced_id=sourcedId, score=score),
                 'imsx_messageIdentifier': escape(imsx_messageIdentifier),
                 'response': '<replaceResultResponse/>'
