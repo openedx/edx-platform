@@ -28,12 +28,13 @@
         <i class="icon-ok"></i>
         {% trans "Save changes" %}
       </button>
+
       <a class="btn btn-large" id="previewButton" href="#previewModal" rel="leanModal"
         onclick="
           document.article_edit_form.target='previewWindow';
           document.article_edit_form.action='{% url 'wiki:preview' path=urlpath.path article_id=article.id %}';
           document.article_edit_form.submit();">
-        <span class="icon-eye-open"></span>
+        <i class="icon-eye-open"></i>
         {% trans "Preview" %}
       </a>
 
@@ -62,7 +63,7 @@
       </button>
 
       <a id="previewModalBackToEditor" href="#" class="btn btn-large">
-        <span class="icon-circle-arrow-left"></span>
+        <i class="icon-circle-arrow-left"></i>
         {% trans "Back to editor" %}
       </a>
     </div>
