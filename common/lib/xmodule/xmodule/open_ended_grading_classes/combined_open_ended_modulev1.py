@@ -182,7 +182,7 @@ class CombinedOpenEndedV1Module():
         """
         msgs = []
         #Loop through each task state and make sure it matches the xml definition
-        for task_xml, task_state in zip(tasks_xml, task_states):
+        for task_index, (task_xml, task_state) in enumerate(zip(tasks_xml, task_states)):
             tag_name = self.get_tag_name(task_xml)
             children = self.child_modules()
             task_descriptor = children['descriptors'][tag_name](self.system)
@@ -212,6 +212,11 @@ class CombinedOpenEndedV1Module():
                     elif tag_name == "selfassessment" and not isinstance(post_assessment, list):
                         msgs.append("Type is self assessment and post assessment is not a list.")
                         break
+                    # In the case of ML grading check if aggregate score is consistent with rubric scores.
+                    if tag_name == "openended":
+                        if task.attempt_score_needed_consistency(attempt, self.system):
+                            task_states[task_index] = task.get_instance_state()
+
                 #See if we can properly render the task.  Will go into the exception clause below if not.
                 task.get_html(self.system)
             except Exception:
