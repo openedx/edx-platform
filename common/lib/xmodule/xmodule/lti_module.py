@@ -29,7 +29,7 @@ What is supported:
 1.) Display of simple LTI in iframe or a new window.
 2.) Multiple LTI components on a single page.
 3.) The use of multiple LTI providers per course.
-4.) Use of advance LTI component that provides back a grade.
+4.) Use of advanced LTI component that provides back a grade.
     a.) The LTI provider sends back a grade to a specified URL.
     b.) Currently only action "update" is supported. "Read", and "delete"
         actions initially weren't required.
@@ -247,7 +247,7 @@ class LTIModule(LTIFields, XModule):
         context = {
             'input_fields': input_fields,
 
-            # these params do not participate in OAuth signing
+            # These parameters do not participate in OAuth signing.
             'launch_url': self.launch_url.strip(),
             'element_id': self.location.html_id(),
             'element_class': self.category,
@@ -264,7 +264,7 @@ class LTIModule(LTIFields, XModule):
 
     def get_outcome_service_url(self):
         """
-        Return URL for storing grades
+        Return URL for storing grades.
         """
         uri = 'http://{host}{path}'.format(
                 host=self.system.hostname,
@@ -276,10 +276,13 @@ class LTIModule(LTIFields, XModule):
         """
         This is an opaque unique identifier that the TC guarantees will be unique
         within the TC for every placement of the link.
+
         If the tool / activity is placed multiple times in the same context,
         each of those placements will be distinct.
+
         This value will also change if the item is exported from one system or
         context and imported into another system or context.
+
         This parameter is required.
         """
         return unicode(urllib.quote(self.id))
@@ -295,7 +298,7 @@ class LTIModule(LTIFields, XModule):
 
         context_id is - is an opaque identifier that uniquely identifies the context that contains
         the link being launched.
-        lti_id should be context_id by meaning
+        lti_id should be context_id by meaning.
         """
         return u':'.join(urllib.quote(i) for i in (self.lti_id, self.get_resource_link_id(), self.get_user_id()))
 
@@ -315,7 +318,7 @@ class LTIModule(LTIFields, XModule):
             client_secret=unicode(client_secret)
         )
 
-        # must have parameters for correct signing from LTI:
+        # Must have parameters for correct signing from LTI:
         body = {
             u'user_id': self.get_user_id(),
             u'oauth_callback': u'about:blank',
@@ -331,7 +334,7 @@ class LTIModule(LTIFields, XModule):
 
         }
 
-        # appending custom parameter for signing
+        # Appending custom parameter for signing.
         body.update(custom_parameters)
 
         headers = {
@@ -345,9 +348,9 @@ class LTIModule(LTIFields, XModule):
                 http_method=u'POST',
                 body=body,
                 headers=headers)
-        except ValueError:  # scheme not in url
-            #https://github.com/idan/oauthlib/blob/master/oauthlib/oauth1/rfc5849/signature.py#L136
-            #Stubbing headers for now:
+        except ValueError:  # Scheme not in url.
+            # https://github.com/idan/oauthlib/blob/master/oauthlib/oauth1/rfc5849/signature.py#L136
+            # Stubbing headers for now:
             headers = {
                 u'Content-Type': u'application/x-www-form-urlencoded',
                 u'Authorization': u'OAuth oauth_nonce="80966668944732164491378916897", \
@@ -355,7 +358,7 @@ oauth_timestamp="1378916897", oauth_version="1.0", oauth_signature_method="HMAC-
 oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
 
         params = headers['Authorization']
-        # parse headers to pass to template as part of context:
+        # Parse headers to pass to template as part of context:
         params = dict([param.strip().replace('"', '').split('=') for param in params.split(',')])
 
         params[u'oauth_nonce'] = params[u'OAuth oauth_nonce']
@@ -368,7 +371,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         # So we need to decode signature back:
         params[u'oauth_signature'] = urllib.unquote(params[u'oauth_signature']).decode('utf8')
 
-        # add lti parameters to oauth parameters for sending in form
+        # Add LTI parameters to OAuth parameters for sending in form.
         params.update(body)
         return params
 
@@ -410,7 +413,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
               </imsx_POXBody>
             </imsx_POXEnvelopeRequest>
 
-        Example of correct/incorrect answer XML body:: see response_xml_template
+        Example of correct/incorrect answer XML body:: see response_xml_template.
         """
         response_xml_template = textwrap.dedent("""
             <?xml version="1.0" encoding="UTF-8"?>
@@ -443,7 +446,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         # Returns if:
         #   - score is out of range;
         #   - can't parse response from TP;
-        #   - can't verify oauth signing or oauth signing is incorrect.
+        #   - can't verify OAuth signing or OAuth signing is incorrect.
         failure_values = {
             'imsx_codeMajor': 'failure',
             'imsx_description': 'The request has failed.',
@@ -456,7 +459,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         except Exception:
             return Response(response_xml_template.format(**failure_values), content_type="application/xml")
 
-        # verify oauth signing
+        # Verify OAuth signing.
         try:
             self.verify_oauth_body_sign(request)
         except (ValueError, LTIError):
@@ -509,7 +512,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         sourcedId = root.xpath("//def:sourcedId", namespaces=namespaces)[0].text
         score = root.xpath("//def:textString", namespaces=namespaces)[0].text
         action = root.xpath("//def:imsx_POXBody", namespaces=namespaces)[0].getchildren()[0].tag.replace('{'+lti_spec_namespace+'}', '')
-        #Raise exception if score is not float or not in range 0.0-1.0 regarding spec.
+        # Raise exception if score is not float or not in range 0.0-1.0 regarding spec.
         score = float(score)
         if not 0 <= score <= 1:
             raise LTIError
@@ -525,10 +528,11 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
             This specification extends the OAuth signature to include integrity checks on HTTP request bodies
             with content types other than application/x-www-form-urlencoded.
 
-        Args:
-        request: DjangoWebobRequest.
+        Arguments:
+            request: DjangoWebobRequest.
 
-        Raises: LTIError if request is incorrect.
+        Raises:
+            LTIError if request is incorrect.
         """
 
         client_key, client_secret = self.get_client_key_secret()
@@ -558,7 +562,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
 
     def get_client_key_secret(self):
         """
-         Obtains client_key and client_secret credentials from current course.
+        Obtains client_key and client_secret credentials from current course.
         """
         course_id = self.course_id
         course_location = CourseDescriptor.id_to_location(course_id)
