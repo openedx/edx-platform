@@ -1,11 +1,15 @@
 """
 Test for Mock_LTI_Server
 """
+import mock
+from mock import Mock
 import unittest
 import threading
+import textwrap
 import urllib
-from mock_lti_server import MockLTIServer
 import requests
+from mock_lti_server import MockLTIServer
+
 
 
 class MockLTIServerTest(unittest.TestCase):
@@ -20,7 +24,7 @@ class MockLTIServerTest(unittest.TestCase):
 
         # Create the server
         server_port = 8034
-        server_host = '127.0.0.1'
+        server_host = 'localhost'
         address = (server_host, server_port)
         self.server = MockLTIServer(address)
         self.server.oauth_settings = {
@@ -39,45 +43,12 @@ class MockLTIServerTest(unittest.TestCase):
         # Stop the server, freeing up the port
         self.server.shutdown()
 
-    def test_request(self):
+    def test_wrong_signature(self):
         """
         Tests that LTI server processes request with right program
-        path,  and responses with incorrect signature.
+        path and responses with incorrect signature.
         """
-        request = {
-            'user_id': 'default_user_id',
-            'role': 'student',
-            'oauth_nonce': '',
-            'oauth_timestamp': '',
-            'oauth_consumer_key': 'client_key',
-            'lti_version': 'LTI-1p0',
-            'oauth_signature_method': 'HMAC-SHA1',
-            'oauth_version': '1.0',
-            'oauth_signature': '',
-            'lti_message_type': 'basic-lti-launch-request',
-            'oauth_callback': 'about:blank',
-            'launch_presentation_return_url': '',
-            'lis_outcome_service_url': '',
-            'lis_result_sourcedid': ''
-        }
-
-        response_handle = urllib.urlopen(
-            self.server.oauth_settings['lti_base'] + self.server.oauth_settings['lti_endpoint'],
-            urllib.urlencode(request)
-        )
-        response = response_handle.read()
-        self.assertTrue('Wrong LTI signature' in response)
-
-    def test_graded_request(self):
-        """
-        Tests that LTI server processes a graded request. It should trigger
-        the callback URL provided.
-        """
-        server_port = 8000
-        server_host = 'localhost'
-        callback_url = 'http://{}:{}/grade_lti'.format(server_host, server_port)
-
-        request = {
+        payload = {
             'user_id': 'default_user_id',
             'role': 'student',
             'oauth_nonce': '',
@@ -92,22 +63,45 @@ class MockLTIServerTest(unittest.TestCase):
             'launch_presentation_return_url': '',
             'lis_outcome_service_url': '',
             'lis_result_sourcedid': '',
-
-            # TODO: Generate properly.
-            "lis_person_sourcedid": "857298237538593757",
-
-            # TODO: Get course based callback URL.
-            "lis_outcome_service_url": callback_url,
+            'resource_link_id':'',
         }
 
-        response_handle = urllib.urlopen(
-            self.server.oauth_settings['lti_base'] + self.server.oauth_settings['lti_endpoint'],
-            urllib.urlencode(request)
-        )
-        response = response_handle.read()
-        self.assertTrue('Wrong LTI signature' in response)
+        uri = self.server.oauth_settings['lti_base'] + self.server.oauth_settings['lti_endpoint']
+        headers = {'referer': 'http://localhost:8000/'}
+        response = requests.post(uri, data=payload, headers=headers)
 
-        # reading grading result back
-        response = requests.get(callback_url)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, "Hello, Valera and Anton!")
+        self.assertTrue('Wrong LTI signature' in response.content)
+
+    
+    def test_success_response_launch_lti(self):
+        """
+        Success lti launch.
+        """
+
+        payload = {
+            'user_id': 'default_user_id',
+            'role': 'student',
+            'oauth_nonce': '',
+            'oauth_timestamp': '',
+            'oauth_consumer_key': 'client_key',
+            'lti_version': 'LTI-1p0',
+            'oauth_signature_method': 'HMAC-SHA1',
+            'oauth_version': '1.0',
+            'oauth_signature': '',
+            'lti_message_type': 'basic-lti-launch-request',
+            'oauth_callback': 'about:blank',
+            'launch_presentation_return_url': '',
+            'lis_outcome_service_url': '',
+            'lis_result_sourcedid': '',
+            'resource_link_id':'',
+            "lis_outcome_service_url": '',
+        }
+        self.server.check_oauth_signature = Mock(return_value=True)
+        
+        uri = self.server.oauth_settings['lti_base'] + self.server.oauth_settings['lti_endpoint']
+        headers = {'referer': 'http://localhost:8000/'}
+        
+        response = requests.post(uri, data=payload, headers=headers)
+        
+        self.assertTrue('This is LTI tool. Success.' in response.content)
+
