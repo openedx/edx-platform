@@ -1,6 +1,7 @@
 <%inherit file="base.html" />
 <%block name="title">${_("Schedule &amp; Details Settings")}</%block>
-<%block name="bodyclass">is-signedin course schedule view-settings feature-upload</%block>
+<%block name="bodyclass">is-signedin course schedule view-settings view-settings-details feature-upload</%block>
+<%block name='dataview'>view-settings-details</%block>
 
 <%namespace name='static' file='static_content.html'/>
 <%!
@@ -67,19 +68,19 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
           <ol class="list-input">
             <li class="field text is-not-editable" id="field-course-organization">
               <label for="course-organization">${_("Organization")}</label>
-              <input title="${_('This field is disabled: this information cannot be changed.')}" type="text" 
+              <input title="${_('This field is disabled: this information cannot be changed.')}" type="text"
                 class="long" id="course-organization" readonly />
             </li>
 
             <li class="field text is-not-editable" id="field-course-number">
               <label for="course-number">${_("Course Number")}</label>
-              <input title="${_('This field is disabled: this information cannot be changed.')}" type="text" 
+              <input title="${_('This field is disabled: this information cannot be changed.')}" type="text"
                 class="short" id="course-number" readonly>
             </li>
 
             <li class="field text is-not-editable" id="field-course-name">
               <label for="course-name">${_("Course Name")}</label>
-              <input title="${_('This field is disabled: this information cannot be changed.')}" type="text" 
+              <input title="${_('This field is disabled: this information cannot be changed.')}" type="text"
                 class="long" id="course-name" readonly />
             </li>
           </ol>
@@ -88,12 +89,12 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
           <div class="note note-promotion note-promotion-courseURL has-actions">
             <h3 class="title">${_("Course Summary Page")} <span class="tip">${_("(for student enrollment and access)")}</span></h3>
             <div class="copy">
-              <p><a class="link-courseURL" rel="external" href="https:${lms_link_for_about_page}">https:${lms_link_for_about_page}</a></p>
+              <p><a class="link-courseURL" rel="external" data-rel="external" href="https:${lms_link_for_about_page}">https:${lms_link_for_about_page}</a></p>
             </div>
 
             <ul class="list-actions">
               <li class="action-item">
-                <a title="${_('Send a note to students via email')}" 
+                <a title="${_('Send a note to students via email')}"
                     href="mailto:someone@domain.com?Subject=Enroll%20in%20${context_course.display_name_with_default}&body=The%20course%20&quot;${context_course.display_name_with_default}&quot;,%20provided%20by%20edX,%20is%20open%20for%20enrollment.%20Please%20navigate%20to%20this%20course%20at%20https:${lms_link_for_about_page}%20to%20enroll." class="action action-primary">
                     <i class="icon-envelope-alt icon-inline"></i>${_("Invite your students")}</a>
               </li>
@@ -200,7 +201,7 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
                   <label for="course-overview">${_("Course Overview")}</label>
                   <textarea class="tinymce text-editor" id="course-overview"></textarea>
                   <%def name='overview_text()'><%
-                    a_link_start = '<a class="link-courseURL" rel="external" href="'
+                    a_link_start = '<a class="link-courseURL" rel="external" data-rel="external" href="'
                     a_link_end = '">' + _("your course summary page") + '</a>'
                     a_link = a_link_start + lms_link_for_about_page + a_link_end
                     text = _("Introductions, prerequisites, FAQs that are used on %s (formatted in HTML)") % a_link

@@ -40,10 +40,10 @@
       <nav class="nav-course nav-dd ui-left">
         <h2 class="sr">${_("{course_name}'s Navigation:").format(course_name=context_course.display_name_with_default)}</h2>
         <ol>
-          <li class="nav-item nav-course-courseware">
-            <h3 class="title"><span class="label"><span class="label-prefix sr">${_("Course")} </span>${_("Content")}</span> <i class="icon-caret-down ui-toggle-dd"></i></h3>
+          <li class="nav-item nav-course-courseware" data-menu="dropdown">
+            <h3 class="title" data-menu="dropdown--control"><span class="label"><span class="label-prefix sr">${_("Course")} </span>${_("Content")}</span> <i class="icon-caret-down ui-toggle-dd"></i></h3>
 
-            <div class="wrapper wrapper-nav-sub">
+            <div class="wrapper wrapper-nav-sub" data-menu="dropdown--content">
               <div class="nav-sub">
                 <ul>
                   <li class="nav-item nav-course-courseware-outline">
@@ -66,10 +66,10 @@
             </div>
           </li>
 
-          <li class="nav-item nav-course-settings">
-            <h3 class="title"><span class="label"><span class="label-prefix sr">${_("Course")} </span>${_("Settings")}</span> <i class="icon-caret-down ui-toggle-dd"></i></h3>
+          <li class="nav-item nav-course-settings" data-menu="dropdown">
+            <h3 class="title" data-menu="dropdown--control"><span class="label"><span class="label-prefix sr">${_("Course")} </span>${_("Settings")}</span> <i class="icon-caret-down ui-toggle-dd"></i></h3>
 
-            <div class="wrapper wrapper-nav-sub">
+            <div class="wrapper wrapper-nav-sub" data-menu="dropdown--content">
               <div class="nav-sub">
                 <ul>
                   <li class="nav-item nav-course-settings-schedule">
@@ -89,10 +89,10 @@
             </div>
           </li>
 
-          <li class="nav-item nav-course-tools">
-            <h3 class="title"><span class="label">${_("Tools")}</span> <i class="icon-caret-down ui-toggle-dd"></i></h3>
+          <li class="nav-item nav-course-tools" data-menu="dropdown">
+            <h3 class="title" data-menu="dropdown--control"><span class="label">${_("Tools")}</span> <i class="icon-caret-down ui-toggle-dd"></i></h3>
 
-            <div class="wrapper wrapper-nav-sub">
+            <div class="wrapper wrapper-nav-sub" data-menu="dropdown--content">
               <div class="nav-sub">
                 <ul>
                   <li class="nav-item nav-course-tools-checklists">
@@ -119,17 +119,17 @@
         <h2 class="sr">${_("Help &amp; Account Navigation")}</h2>
 
         <ol>
-          <li class="nav-item nav-account-help">
-            <h3 class="title"><span class="label">${_("Help")}</span> <i class="icon-caret-down ui-toggle-dd"></i></h3>
+          <li class="nav-item nav-account-help" data-menu="dropdown">
+            <h3 class="title" data-menu="dropdown--control"><span class="label">${_("Help")}</span> <i class="icon-caret-down ui-toggle-dd"></i></h3>
 
-            <div class="wrapper wrapper-nav-sub">
+            <div class="wrapper wrapper-nav-sub" data-menu="dropdown--content">
               <div class="nav-sub">
                 <ul>
                   <li class="nav-item nav-help-documentation">
                     <a href="http://files.edx.org/Getting_Started_with_Studio.pdf" title="${_("This is a PDF Document")}">${_("Studio Documentation")}</a>
                   </li>
                   <li class="nav-item nav-help-helpcenter">
-                    <a href="http://help.edge.edx.org/" rel="external">${_("Studio Help Center")}</a>
+                    <a href="http://help.edge.edx.org/" rel="external" data-rel="external">${_("Studio Help Center")}</a>
                   </li>
                   <li class="nav-item nav-help-feedback">
                     <a href="http://help.edge.edx.org/discussion/new" class="show-tender" title="${_("Use our feedback tool, Tender, to share your feedback")}">${_("Contact Us")}</a>
@@ -139,10 +139,10 @@
             </div>
           </li>
 
-          <li class="nav-item nav-account-user">
-            <h3 class="title"><span class="label"><span class="label-prefix sr">${_("Currently signed in as:")}</span><span class="account-username" title="${ user.username }">${ user.username }</span></span> <i class="icon-caret-down ui-toggle-dd"></i></h3>
+          <li class="nav-item nav-account-user" data-menu="dropdown">
+            <h3 class="title" data-menu="dropdown--control"><span class="label"><span class="label-prefix sr">${_("Currently signed in as:")}</span><span class="account-username" title="${ user.username }">${ user.username }</span></span> <i class="icon-caret-down ui-toggle-dd"></i></h3>
 
-            <div class="wrapper wrapper-nav-sub">
+            <div class="wrapper wrapper-nav-sub" data-menu="dropdown--content">
               <div class="nav-sub">
                 <ul>
                   <li class="nav-item nav-account-dashboard">
@@ -166,7 +166,7 @@
             <a href="/">${_("How Studio Works")}</a>
           </li>
           <li class="nav-item nav-not-signedin-help">
-            <a href="http://help.edge.edx.org/" rel="external">${_("Studio Help")}</a>
+            <a href="http://help.edge.edx.org/" rel="external" data-rel="external">${_("Studio Help")}</a>
           </li>
           <li class="nav-item nav-not-signedin-signup">
             <a class="action action-signup" href="${reverse('signup')}">${_("Sign Up")}</a>
