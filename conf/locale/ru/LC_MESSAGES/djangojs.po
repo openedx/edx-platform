@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
-"POT-Creation-Date: 2013-11-26 14:39+0000\n"
+"POT-Creation-Date: 2013-11-26 15:31+0000\n"
 "PO-Revision-Date: 2013-11-26 18:49+0300\n"
 "Last-Translator: Lenar Safin <safin@smartdec.ru>\n"
 "Language-Team: Select LTD\n"
@@ -547,7 +547,7 @@ msgid ""
 "You have been registered for this master class. We will provide addition "
 "information soon."
 msgstr ""
-"Вы зарегистрированны на мастер-класс. Мы сообщим дополнительную информацию в "
+"Вы зарегистрированы на мастер-класс. Мы сообщим дополнительную информацию в "
 "скором времени."
 
 #: common/lib/xmodule/xmodule/js/src/master_class/master_class_main.js:178
@@ -557,7 +557,7 @@ msgid ""
 "You are pending for registration for this master class. Please visit this "
 "page later for result."
 msgstr ""
-"Вы ожидаете подтверждения регистрации на мастер-класс. Пожалуйста посетите "
+"Вы ожидаете подтверждения регистрации на мастер-класс. Пожалуйста, посетите "
 "данную страницу позже для результатов."
 
 #: common/lib/xmodule/xmodule/js/src/video/04_video_control.js:76
@@ -643,6 +643,7 @@ msgid "Misuse Reported"
 msgstr "Жалоба отправлена"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js:91
+#: common/static/coffee/src/discussion/views/response_comment_show_view.js:84
 #: common/static/coffee/src/discussion/views/thread_response_show_view.js:166
 msgid "Report Misuse"
 msgstr "Пожаловаться"

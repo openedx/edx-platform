@@ -1908,7 +1908,7 @@ msgid ""
 "You are pending for registration for this master class. Please visit this "
 "page later for result."
 msgstr ""
-"Вы ожидаете подтверждения регистрации на мастер-класс. Пожалуйста посетите "
+"Вы ожидаете подтверждения регистрации на мастер-класс. Пожалуйста, посетите "
 "данную страницу позже для результатов."
 
 #: common/lib/xmodule/xmodule/peer_grading_module.py:29

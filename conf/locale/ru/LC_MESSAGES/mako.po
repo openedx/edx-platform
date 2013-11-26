@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
-"POT-Creation-Date: 2013-11-26 10:43+0000\n"
-"PO-Revision-Date: 2013-11-21 10:21+0300\n"
+"POT-Creation-Date: 2013-11-26 15:30+0000\n"
+"PO-Revision-Date: 2013-11-26 19:39+0300\n"
 "Last-Translator: JK <korvin.lucky@gmail.com>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
@@ -7056,7 +7056,7 @@ msgstr "Студенты, ожидащие регистрацию"
 
 #: lms/templates/master_class.html:35
 msgid "Students passed registration"
-msgstr "Студенты, прошедшие регистарацию"
+msgstr "Студенты, прошедшие регистрацию"
 
 #: lms/templates/mathjax_accessible.html:5
 msgid ""
@@ -9376,6 +9376,10 @@ msgstr "Создать новое сообщение о:"
 #: lms/templates/discussion/_new_post.html:33
 msgid "Filter List"
 msgstr "Фильтр списка"
+
+#: lms/templates/discussion/_new_post.html:34
+msgid "Filter discussion areas"
+msgstr "Искать дискуссию"
 
 #: lms/templates/discussion/_recent_active_posts.html:7
 msgid "Following"
