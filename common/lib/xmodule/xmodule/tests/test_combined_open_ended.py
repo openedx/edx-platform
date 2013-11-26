@@ -794,6 +794,15 @@ class CombinedOpenEndedModuleConsistencyTest(unittest.TestCase):
     descriptor = Mock(data=full_definition)
     test_system = get_test_system()
     test_system.open_ended_grading_interface = None
+    combinedoe_container = CombinedOpenEndedModule(
+        descriptor=descriptor,
+        runtime=test_system,
+        field_data=DictFieldData({
+            'data': full_definition,
+            'weight': '1',
+        }),
+        scope_ids=ScopeIds(None, None, None, None),
+    )
 
     def setUp(self):
         self.combinedoe = CombinedOpenEndedV1Module(self.test_system,
