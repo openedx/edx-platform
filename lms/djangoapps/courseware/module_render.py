@@ -373,7 +373,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
     # while giving selected modules a per-course anonymized id.
     # As we have the time to manually test more modules, we can add to the list
     # of modules that get the per-course anonymized id.
-    if issubclass(getattr(descriptor, 'module_class', None), [LTIModule]):
+    if issubclass(getattr(descriptor, 'module_class', None), LTIModule):
         anonymous_student_id = anonymous_id_for_user(user, course_id)
     else:
         anonymous_student_id = anonymous_id_for_user(user, '')
