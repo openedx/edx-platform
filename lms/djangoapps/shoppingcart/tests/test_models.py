@@ -443,13 +443,12 @@ class CertificateItemTest(ModuleStoreTestCase):
         cart.purchase()
         enrollment = CourseEnrollment.objects.get(user=self.user, course_id=self.course_id)
         self.assertEquals(enrollment.mode, u'verified')
-        self.assert_upgrade_event_was_emitted(self.user, self.course_id)
 
     def assert_upgrade_event_was_emitted(self, user, course_id):
         """ Helper function; checks that a particular was called only once """
         self.mock_server_track.assert_called_once_with(
             sentinel.request,
-            'edx.user.upgrade.purchased',
+            'edx.course.enrollment.upgrade.succeeded',
             {
                 'course_id': course_id,
                 'user_id': user.pk,
