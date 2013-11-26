@@ -11,8 +11,8 @@ from ratelimitbackend import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',  # nopep8
-    url(r'^edit/(?P<location>.*?)$', 'contentstore.views.edit_unit', name='edit_unit'),
-    url(r'^subsection/(?P<location>.*?)$', 'contentstore.views.edit_subsection', name='edit_subsection'),
+    url(r'', include('social_auth.urls')),
+    url(r'^newuser$', 'contentstore.views.user.new_user_social', name='new_user_social'),# add new
 
     url(r'^transcripts/upload$', 'contentstore.views.upload_transcripts', name='upload_transcripts'),
     url(r'^transcripts/download$', 'contentstore.views.download_transcripts', name='download_transcripts'),
@@ -21,10 +21,6 @@ urlpatterns = patterns('',  # nopep8
     url(r'^transcripts/replace$', 'contentstore.views.replace_transcripts', name='replace_transcripts'),
     url(r'^transcripts/rename$', 'contentstore.views.rename_transcripts', name='rename_transcripts'),
     url(r'^transcripts/save$', 'contentstore.views.save_transcripts', name='save_transcripts'),
-
-    url(r'^create_draft$', 'contentstore.views.create_draft', name='create_draft'),
-    url(r'^publish_draft$', 'contentstore.views.publish_draft', name='publish_draft'),
-    url(r'^unpublish_unit$', 'contentstore.views.unpublish_unit', name='unpublish_unit'),
 
     url(r'^preview/xblock/(?P<usage_id>.*?)/handler/(?P<handler>[^/]*)(?:/(?P<suffix>[^/]*))?$',
         'contentstore.views.preview_handler', name='preview_handler'),
@@ -89,6 +85,8 @@ urlpatterns += patterns(
         'course_info_update_handler'
         ),
     url(r'(?ix)^course($|/){}$'.format(parsers.URL_RE_SOURCE), 'course_handler'),
+    url(r'(?ix)^subsection($|/){}$'.format(parsers.URL_RE_SOURCE), 'subsection_handler'),
+    url(r'(?ix)^unit($|/){}$'.format(parsers.URL_RE_SOURCE), 'unit_handler'),
     url(r'(?ix)^checklists/{}(/)?(?P<checklist_index>\d+)?$'.format(parsers.URL_RE_SOURCE), 'checklists_handler'),
     url(r'(?ix)^orphan/{}$'.format(parsers.URL_RE_SOURCE), 'orphan_handler'),
     url(r'(?ix)^assets/{}(/)?(?P<asset_id>.+)?$'.format(parsers.URL_RE_SOURCE), 'assets_handler'),

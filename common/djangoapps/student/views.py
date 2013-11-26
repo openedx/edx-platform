@@ -185,7 +185,8 @@ def _cert_info(user, course, cert_status):
     default_info = {'status': default_status,
                     'show_disabled_download_button': False,
                     'show_download_url': False,
-                    'show_survey_button': False}
+                    'show_survey_button': False,
+                    }
 
     if cert_status is None:
         return default_info
@@ -203,7 +204,8 @@ def _cert_info(user, course, cert_status):
 
     d = {'status': status,
          'show_download_url': status == 'ready',
-         'show_disabled_download_button': status == 'generating', }
+         'show_disabled_download_button': status == 'generating',
+         'mode': cert_status.get('mode', None)}
 
     if (status in ('generating', 'ready', 'notpassing', 'restricted') and
             course.end_of_course_survey_url is not None):
@@ -232,6 +234,19 @@ def _cert_info(user, course, cert_status):
 
     return d
 
+@ensure_csrf_cookie
+def new_user_social(request):
+    if not request.user.is_authenticated():
+        context = {
+        'course_id': request.GET.get('course_id'),
+        'enrollment_action': request.GET.get('enrollment_action')
+        }
+        return render_to_response('login.html', context)
+
+    userprofile=UserProfile(user=request.user)
+    userprofile.save()
+
+    return redirect(reverse('dashboard'))
 
 @ensure_csrf_cookie
 def signin_user(request):
@@ -296,7 +311,7 @@ def complete_course_mode_info(course_id, enrollment):
 def dashboard(request):
     user = request.user
 
-    # Build our (course, enorllment) list for the user, but ignore any courses that no 
+    # Build our (course, enrollment) list for the user, but ignore any courses that no
     # longer exist (because the course IDs have changed). Still, we don't delete those
     # enrollments, because it could have been a data push snafu.
     course_enrollment_pairs = []

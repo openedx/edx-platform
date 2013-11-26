@@ -153,7 +153,7 @@
                 });
             });
 
-            // Turned off test due to flakiness (30.10.2013).
+            // Turned off test due to flakiness (11/25/13)
             xit('trigger seek event', function() {
                 runs(function () {
                     videoProgressSlider.onSlide(
@@ -219,7 +219,7 @@
                 });
             });
 
-            // Turned off test due to flakiness (30.10.2013).
+            // Turned off test due to flakiness (11/25/13)
             xit('trigger seek event', function() {
                 runs(function () {
                     videoProgressSlider.onStop(

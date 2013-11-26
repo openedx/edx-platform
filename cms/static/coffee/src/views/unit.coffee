@@ -166,7 +166,7 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
       @wait(true)
       $.ajax({
           type: 'DELETE',
-          url: @model.urlRoot + "/" + @$el.data('locator') + "?" + $.param({recurse: true})
+          url: @model.url() + "?" + $.param({recurse: true})
       }).success(=>
 
           analytics.track "Deleted Draft",
@@ -179,8 +179,8 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
     createDraft: (event) ->
       @wait(true)
 
-      $.postJSON('/create_draft', {
-        id: @$el.data('id')
+      $.postJSON(@model.url(), {
+        publish: 'create_draft'
       }, =>
         analytics.track "Created Draft",
           course: course_location_analytics
@@ -193,8 +193,8 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
       @wait(true)
       @saveDraft()
 
-      $.postJSON('/publish_draft', {
-        id: @$el.data('id')
+      $.postJSON(@model.url(), {
+        publish: 'make_public'
       }, =>
         analytics.track "Published Draft",
           course: course_location_analytics
@@ -205,16 +205,16 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
 
     setVisibility: (event) ->
       if @$('.visibility-select').val() == 'private'
-        target_url = '/unpublish_unit'
+        action = 'make_private'
         visibility = "private"
       else
-        target_url = '/publish_draft'
+        action = 'make_public'
         visibility = "public"
 
       @wait(true)
 
-      $.postJSON(target_url, {
-        id: @$el.data('id')
+      $.postJSON(@model.url(), {
+        publish: action
       }, =>
         analytics.track "Set Unit Visibility",
           course: course_location_analytics

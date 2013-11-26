@@ -2,19 +2,22 @@
 # Copyright (C) 2013 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
+# Translators:
+# ngocchung75 <ngocchung75@gmail.com>, 2013
 msgid ""
 msgstr ""
-"Project-Id-Version: EdX Studio\n"
+"Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
 "POT-Creation-Date: 2013-05-02 13:13-0400\n"
-"PO-Revision-Date: 2013-05-02 13:27-0400\n"
-"Last-Translator: \n"
-"Language-Team: translation team <translation_team@edx.org>\n"
+"PO-Revision-Date: 2013-10-25 13:40+0000\n"
+"Last-Translator: hdvd2309 <huynq23091@gmail.com>\n"
+"Language-Team: Vietnamese (http://www.transifex.com/projects/p/edx-platform/language/vi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: en\n"
+"Language: vi\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 
 # empty
 msgid "This is a key string."
-msgstr ""
+msgstr "Đây là một chuỗi khóa."

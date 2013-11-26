@@ -207,7 +207,7 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
                   <div class="section-item">
                     <div class="details">
                       <a href="#" data-tooltip="${_('Expand/collapse this subsection')}" class="expand-collapse-icon expand"></a>
-                      <a href="${reverse('edit_subsection', args=[subsection.location])}">
+                      <a href="${subsection_locator.url_reverse('subsection')}">
                         <span class="folder-icon"></span>
                         <span class="subsection-name"><span class="subsection-name-value">${subsection.display_name_with_default}</span></span>
                       </a>

@@ -7,6 +7,13 @@ from django.utils.translation import ugettext as _
 from django.conf import settings
 from student.models import UserStanding
 
+from django.core.urlresolvers import reverse
+
+from social_auth.exceptions import AuthAlreadyAssociated
+from social_auth.middleware import SocialAuthExceptionMiddleware
+from social_auth.exceptions import AuthCanceled
+
+
 class UserStandingMiddleware(object):
     """
     Checks a user's standing on request. Returns a 403 if the user's
@@ -35,3 +42,14 @@ class UserStandingMiddleware(object):
                             link_end=u'</a>'
                         )
                 return HttpResponseForbidden(msg)
+
+class AuthCanceledSocialAuthExceptionMiddleware(SocialAuthExceptionMiddleware):
+    def raise_exception(self, request, exception):
+        return False
+
+    def get_redirect_uri(self, request, exception):
+            if isinstance(exception, AuthCanceled):
+                return '/accounts/login'
+            else:
+                return super(AuthCanceledSocialAuthExceptionMiddleware, self).get_redirect_uri(request, exception)
+

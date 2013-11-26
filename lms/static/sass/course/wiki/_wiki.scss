@@ -536,8 +536,12 @@ section.wiki {
     }
 
     .modal-header {
+      border: 1px solid $danger-red;
+      padding: ($baseline/2) ($baseline/2) 0 ($baseline/2);
+      margin-bottom: ($baseline/2);
+
       h1, p {
-        color: #fff;
+        color: $base-font-color;
       }
 
       h1 {

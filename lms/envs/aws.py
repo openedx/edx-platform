@@ -86,6 +86,7 @@ CELERY_DEFAULT_EXCHANGE = 'edx.{0}core'.format(QUEUE_VARIANT)
 HIGH_PRIORITY_QUEUE = 'edx.{0}core.high'.format(QUEUE_VARIANT)
 DEFAULT_PRIORITY_QUEUE = 'edx.{0}core.default'.format(QUEUE_VARIANT)
 LOW_PRIORITY_QUEUE = 'edx.{0}core.low'.format(QUEUE_VARIANT)
+HIGH_MEM_QUEUE = 'edx.{0}core.high_mem'.format(QUEUE_VARIANT)
 
 CELERY_DEFAULT_QUEUE = DEFAULT_PRIORITY_QUEUE
 CELERY_DEFAULT_ROUTING_KEY = DEFAULT_PRIORITY_QUEUE
@@ -93,8 +94,18 @@ CELERY_DEFAULT_ROUTING_KEY = DEFAULT_PRIORITY_QUEUE
 CELERY_QUEUES = {
     HIGH_PRIORITY_QUEUE: {},
     LOW_PRIORITY_QUEUE: {},
-    DEFAULT_PRIORITY_QUEUE: {}
+    DEFAULT_PRIORITY_QUEUE: {},
+    HIGH_MEM_QUEUE: {},
 }
+
+# If we're a worker on the high_mem queue, set ourselves to die after processing
+# one request to avoid having memory leaks take down the worker server. This env
+# var is set in /etc/init/edx-workers.conf -- this should probably be replaced
+# with some celery API call to see what queue we started listening to, but I
+# don't know what that call is or if it's active at this point in the code.
+if os.environ.get('QUEUE') == 'high_mem':
+    CELERYD_MAX_TASKS_PER_CHILD = 1
+
 
 ########################## NON-SECURE ENV CONFIG ##############################
 # Things like server locations, ports, etc.
@@ -318,3 +329,8 @@ TRACKING_BACKENDS.update(AUTH_TOKENS.get("TRACKING_BACKENDS", {}))
 
 # Student identity verification settings
 VERIFY_STUDENT = AUTH_TOKENS.get("VERIFY_STUDENT", VERIFY_STUDENT)
+
+# Grades download
+GRADES_DOWNLOAD_ROUTING_KEY = HIGH_MEM_QUEUE
+
+GRADES_DOWNLOAD = ENV_TOKENS.get("GRADES_DOWNLOAD", GRADES_DOWNLOAD)

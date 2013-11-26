@@ -241,7 +241,11 @@ def _has_access_descriptor(user, descriptor, action, course_context=None):
         # Check start date
         if descriptor.start is not None:
             now = datetime.now(UTC())
-            effective_start = _adjust_start_date_for_beta_testers(user, descriptor)
+            effective_start = _adjust_start_date_for_beta_testers(
+                user,
+                descriptor,
+                course_context=course_context
+            )
             if now > effective_start:
                 # after start date, everyone can see it
                 debug("Allow: now > effective start date")
@@ -337,7 +341,7 @@ def _dispatch(table, action, user, obj):
         type(obj), action))
 
 
-def _adjust_start_date_for_beta_testers(user, descriptor):
+def _adjust_start_date_for_beta_testers(user, descriptor, course_context=None):
     """
     If user is in a beta test group, adjust the start date by the appropriate number of
     days.
@@ -364,7 +368,7 @@ def _adjust_start_date_for_beta_testers(user, descriptor):
         # bail early if no beta testing is set up
         return descriptor.start
 
-    if CourseBetaTesterRole(descriptor.location).has_user(user):
+    if CourseBetaTesterRole(descriptor.location, course_context=course_context).has_user(user):
         debug("Adjust start time: user in beta role for %s", descriptor)
         delta = timedelta(descriptor.days_early_for_beta)
         effective = descriptor.start - delta
