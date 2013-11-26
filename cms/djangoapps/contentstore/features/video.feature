@@ -64,12 +64,13 @@ Feature: CMS.Video Component
   #  Then Captions are "visible"
 
   # 9
-  Scenario: Closed captions are invisible when mouse doesn't hover on CC button
-    Given I have created a Video component with subtitles
-    And Make sure captions are closed
-    Then Captions become "invisible"
-    And I hover over button "volume"
-    Then Captions are "invisible"
+  # Disabled 11/26 due to flakiness in master
+  #Scenario: Closed captions are invisible when mouse doesn't hover on CC button
+  #  Given I have created a Video component with subtitles
+  #  And Make sure captions are closed
+  #  Then Captions become "invisible"
+  #  And I hover over button "volume"
+  #  Then Captions are "invisible"
 
   # 10
   # Disabled 11/26 due to flakiness in master
