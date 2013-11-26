@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Test for LTI Xmodule functional logic."""
 
-from mock import Mock
+from mock import Mock, patch
 import textwrap
 from lxml import etree
 from webob.request import Request
@@ -213,4 +213,23 @@ class LTIModuleTest(LogicTest):
         self.assertEqual(response.status_code, 200)
         self.assertDictEqual(expected_response, real_repsonse)
 
+    def test_user_id(self):
+        expected_user_id = unicode(urllib.quote(self.xmodule.runtime.anonymous_student_id))
+        real_user_id = self.xmodule.get_user_id()
+        self.assertEqual(real_user_id, expected_user_id)
+
+    def test_outcome_service_url(self):
+        expected_outcome_service_url = 'http://{host}{path}'.format(
+                host=self.xmodule.runtime.hostname,
+                path=self.xmodule.runtime.handler_url(self.xmodule, 'grade_handler', thirdparty=True).rstrip('/?')
+            )
+
+        real_outcome_service_url = self.xmodule.get_outcome_service_url()
+        self.assertEqual(real_outcome_service_url, expected_outcome_service_url)
+
+    def test_verify_oauth_body_sign(self):
+        pass
+
+    def test_client_key_secret(self):
+        pass
 
