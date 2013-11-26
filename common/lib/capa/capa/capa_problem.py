@@ -253,6 +253,7 @@ class LoncapaProblem(object):
         Returns a DateTime object that represents the timestamp of the most recent
         queueing request, or None if not queued
         '''
+
         if not self.is_queued():
             return None
 
@@ -444,7 +445,7 @@ class LoncapaProblem(object):
                 choicegroup.append(choice)
         return shuffled
 
-    def sample_from_answer_pool(self, choices):
+    def sample_from_answer_pool(self, choices, rnd):
         """
         Returns a list with 2 items:
             1. the solutionID corresponding with the chosen correct answer
@@ -465,9 +466,7 @@ class LoncapaProblem(object):
         if len(correctChoices) < 1 or len(incorrectChoices) < 3:
             return []
 
-        # Uses self.seed -- but want to randomize every time reaches this problem,
-        # so problem's "randomization" should be set to "always"
-        rnd = Random(self.seed)
+        # Use rnd given to us to generate a random number (see details in answer_pool_tree method)
         ix = rnd.randint(0, len(correctChoices) - 1)
         correctChoice = correctChoices[ix]
         subsetChoices.append(correctChoice)
@@ -509,12 +508,17 @@ class LoncapaProblem(object):
         if not tree.xpath(query):
             return None
 
+        # Uses self.seed -- but want to randomize every time reaches this problem,
+        # so problem's "randomization" should be set to "always"
+        rnd = Random(self.seed)
+
         for multChoiceResponse in tree.xpath(query):
             # Does this multChoiceResponse have targeted solutions?
             # Targeted solutions = display an explanation based on the user's selected answer, not the correct answer
             #
             # If 'targeted-feedback' is 'true', then targeted feedback will show on the screen after a student incorrectly answers
             showTargetedFeedback = multChoiceResponse.get('targeted-feedback') == 'true'
+            showExplanation = multChoiceResponse.get('always-show-explanation') == 'true'
 
             # Grab the first choicegroup (there should only be one within each <multiplechoiceresponse> tag)
             choicegroup = multChoiceResponse.xpath('./choicegroup[@type="MultipleChoice"]')[0]
@@ -535,7 +539,7 @@ class LoncapaProblem(object):
                 choicegroup.remove(choice)
 
             # Sample from the answer pool to get the subset choices and solution id
-            [solutionID, subsetChoices] = self.sample_from_answer_pool(choicesList)
+            [solutionID, subsetChoices] = self.sample_from_answer_pool(choicesList, rnd)
 
             for choice in subsetChoices:
                 choicegroup.append(choice)
@@ -560,12 +564,24 @@ class LoncapaProblem(object):
 
             # Filter out solutions that don't correspond to the correct answer we selected to show
             solutionset = multChoiceResponse.xpath('./following-sibling::solutionset')
+            # import ipdb
+            # ipdb.set_trace()
             if len(solutionset) != 0:
                 solutionset = solutionset[0]
                 solutions = solutionset.xpath('./solution')
                 for solution in solutions:
                     if solution.get('explanation-id') != solutionID:
                         solutionset.remove(solution)
+                    elif showExplanation and self.done:
+                        # Add our solution instead to the targetedfeedbackset and change its tag name
+                        # and optionally, its class name if you want to have the solution specifically styled
+                        # so that our solution will appear without needing to click "Show Answer" button
+                        solutionset.remove(solution)
+                        solution.tag = 'targetedfeedback'
+                        # innerDIV = solution.xpath('./div')
+                        # if(len(innerDIV) != 0):
+                        #     innerDIV[0].set('class', 'detailed-solution')
+                        targetedfeedbackset.append(solution)
 
         return tree
 
@@ -573,8 +589,6 @@ class LoncapaProblem(object):
         '''
         Main method called externally to get the HTML to be rendered for this capa Problem.
         '''
-        #import ipdb
-        #ipdb.set_trace()
         shuffled = self.shuffled_tree(self.tree)
         treeUsingAnswerPool = self.answer_pool_tree(self.tree)
         

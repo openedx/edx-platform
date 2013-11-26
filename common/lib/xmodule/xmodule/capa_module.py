@@ -140,6 +140,11 @@ class CapaFields(object):
     student_answers = Dict(help="Dictionary with the current student responses", scope=Scope.user_state)
     done = Boolean(help="Whether the student has answered the problem", scope=Scope.user_state)
     seed = Integer(help="Random seed for this student", scope=Scope.user_state)
+   
+    lastSubmissionTime = Date(help="Last submission time", scope=Scope.user_state)
+    submissionWaitSeconds = Integer(display_name="Seconds Between Submissions", help="Seconds to wait between submissions", 
+        scope=Scope.settings, default=0)
+
     weight = Float(
         display_name="Problem Weight",
         help=("Defines the number of points each problem is worth. "
@@ -263,6 +268,10 @@ class CapaModule(CapaFields, XModule):
         """
         Generate a new Loncapa Problem
         """
+
+        # import ipdb
+        # ipdb.set_trace()
+
         if text is None:
             text = self.data
 
@@ -286,16 +295,23 @@ class CapaModule(CapaFields, XModule):
             'seed': self.seed,
         }
 
-    def set_state_from_lcp(self):
+    def set_state_from_lcp(self, recordTime=True):
         """
         Set the module's state from the settings in `self.lcp`
         """
+
+        # import ipdb
+        # ipdb.set_trace()
+
         lcp_state = self.lcp.get_state()
         self.done = lcp_state['done']
         self.correct_map = lcp_state['correct_map']
         self.input_state = lcp_state['input_state']
         self.student_answers = lcp_state['student_answers']
         self.seed = lcp_state['seed']
+        
+        if recordTime:
+            self.lastSubmissionTime = datetime.datetime.now(UTC())
 
     def get_score(self):
         """
@@ -905,8 +921,6 @@ class CapaModule(CapaFields, XModule):
             self.system.track_function('problem_check_fail', event_info)
             raise NotFoundError('Problem is closed')
 
-        print "\n\n\n\n\nSELF.RERANDOMIZE: ", self.rerandomize, "\n\n\n\n\n"
-
         # Problem submitted. Student should reset before checking again
         if self.done and self.rerandomize == "always":
             event_info['failure'] = 'unreset'
@@ -917,10 +931,20 @@ class CapaModule(CapaFields, XModule):
         if self.lcp.is_queued():
             current_time = datetime.datetime.now(UTC())
             prev_submit_time = self.lcp.get_recentmost_queuetime()
+
             waittime_between_requests = self.system.xqueue['waittime']
             if (current_time - prev_submit_time).total_seconds() < waittime_between_requests:
                 msg = u'You must wait at least {wait} seconds between submissions'.format(
                     wait=waittime_between_requests)
+                return {'success': msg, 'html': ''}  # Prompts a modal dialog in ajax callback
+
+        # Wait time between resets
+        current_time = datetime.datetime.now(UTC())
+        if self.lastSubmissionTime is not None:
+            if (current_time - self.lastSubmissionTime).total_seconds() < self.submissionWaitSeconds:
+                secLeft = int(self.submissionWaitSeconds - (current_time - self.lastSubmissionTime).total_seconds()) + 1
+                msg = u'You must wait at least {wait} seconds between submissions - {s} to go'.format(
+                    wait=self.submissionWaitSeconds, s=secLeft)
                 return {'success': msg, 'html': ''}  # Prompts a modal dialog in ajax callback
 
         try:
@@ -1088,7 +1112,7 @@ class CapaModule(CapaFields, XModule):
 
         self.lcp.student_answers = answers
 
-        self.set_state_from_lcp()
+        self.set_state_from_lcp(False)
 
         self.system.track_function('save_problem_success', event_info)
         msg = "Your answers have been saved"

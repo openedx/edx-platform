@@ -130,7 +130,7 @@ section.problem {
     > span {
       margin: $baseline 0;
       display: block;
-      border: 1px solid red;
+      border: 1px solid black;
       padding: 9px 15px $baseline;
       background: #fff;
       position: relative;
@@ -648,6 +648,20 @@ section.problem {
   .detailed-targeted-feedback {
     > p:first-child {
       color: red;
+      text-transform: uppercase;
+      font-weight: bold;
+      font-style: normal;
+      font-size: 0.9em;
+    }
+
+    p:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .detailed-targeted-feedback-correct {
+    > p:first-child {
+      color: green;
       text-transform: uppercase;
       font-weight: bold;
       font-style: normal;
