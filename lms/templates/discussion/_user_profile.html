@@ -2,6 +2,7 @@
 <%! from django_comment_client.helpers import pluralize %>
 <%! from django_comment_client.permissions import has_permission, check_permissions_by_view %>
 <%! from operator import attrgetter %>
+<%! from django.utils.translation import ungettext%>
 
 
 <div class="user-profile">
@@ -10,8 +11,26 @@
   %>
   <div class="sidebar-username">${django_user.username | h}</div>
   <div class="sidebar-user-roles">
-    ${", ".join(role_names)}
+    ${", ".join([ _(x) for x in role_names])}
   </div>
-  <div class="sidebar-threads-count"><span>${profiled_user['threads_count'] | h}</span> ${pluralize('discussion', profiled_user['threads_count']) | h} started</div>
-  <div class="sidebar-comments-count"><span>${profiled_user['comments_count'] | h}</span> ${pluralize('comment', profiled_user['comments_count']) | h}</div>
+  <div class="sidebar-threads-count">${ungettext(
+      '{tag_start}{count}{tag_end} discussion started',
+      '{tag_start}{count}{tag_end} discussions started',
+      profiled_user['threads_count'],
+    ).format(
+      tag_start="<span>",
+      tag_end="</span>",
+      count=profiled_user['threads_count'],
+    )}
+  </div>
+  <div class="sidebar-comments-count">${ungettext(
+      '{tag_start}{count}{tag_end} comment',
+      '{tag_start}{count}{tag_end} comments',
+      profiled_user['comments_count'],
+    ).format(
+      tag_start="<span>",
+      tag_end="</span>",
+      count=profiled_user['comments_count'],
+    )}
+  </div>
 </div>

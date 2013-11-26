@@ -51,22 +51,22 @@ if Backbone?
         @$("[data-role=thread-flag]").addClass("flagged")  
         @$("[data-role=thread-flag]").removeClass("notflagged")
         @$(".discussion-flag-abuse").attr("aria-pressed", "true")
-        @$(".discussion-flag-abuse .flag-label").html("Misuse Reported")
+        @$(".discussion-flag-abuse .flag-label").html(gettext("Misuse Reported"))
       else
         @$("[data-role=thread-flag]").removeClass("flagged")  
         @$("[data-role=thread-flag]").addClass("notflagged")      
         @$(".discussion-flag-abuse").attr("aria-pressed", "false")
-        @$(".discussion-flag-abuse .flag-label").html("Report Misuse")
+        @$(".discussion-flag-abuse .flag-label").html(gettext("Report Misuse"))
 
     renderPinned: =>
       if @model.get("pinned")
         @$("[data-role=thread-pin]").addClass("pinned")  
         @$("[data-role=thread-pin]").removeClass("notpinned")  
-        @$(".discussion-pin .pin-label").html("Pinned")
+        @$(".discussion-pin .pin-label").html(gettext("Pinned"))
       else
         @$("[data-role=thread-pin]").removeClass("pinned")  
         @$("[data-role=thread-pin]").addClass("notpinned")  
-        @$(".discussion-pin .pin-label").html("Pin Thread")
+        @$(".discussion-pin .pin-label").html(gettext("Pin Thread"))
 
 
     updateModelDetails: =>
@@ -139,7 +139,7 @@ if Backbone?
           if textStatus == 'success'
             @model.set('pinned', true)
         error: =>
-          $('.admin-pin').text("Pinning not currently available")
+          $('.admin-pin').text(gettext("Pinning not currently available"))
        
     unPin: ->
       url = @model.urlFor("unPinThread")
