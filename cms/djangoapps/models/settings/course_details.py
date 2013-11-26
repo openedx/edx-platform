@@ -32,11 +32,11 @@ class CourseDetails(object):
         self.course_image_asset_path = ""  # URL of the course image
 
     @classmethod
-    def fetch(cls, course_location):
+    def fetch(cls, course_locator):
         """
         Fetch the course details for the given course from persistence and return a CourseDetails model.
         """
-        course_old_location = loc_mapper().translate_locator_to_location(course_location)
+        course_old_location = loc_mapper().translate_locator_to_location(course_locator)
         descriptor = get_modulestore(course_old_location).get_item(course_old_location)
         course = cls(course_old_location.org, course_old_location.course, course_old_location.name)
 
@@ -75,11 +75,11 @@ class CourseDetails(object):
         return course
 
     @classmethod
-    def update_from_json(cls, course_location, jsondict):
+    def update_from_json(cls, course_locator, jsondict):
         """
         Decode the json into CourseDetails and save any changed attrs to the db
         """
-        course_old_location = loc_mapper().translate_locator_to_location(course_location)
+        course_old_location = loc_mapper().translate_locator_to_location(course_locator)
         descriptor = get_modulestore(course_old_location).get_item(course_old_location)
 
         dirty = False
@@ -153,7 +153,7 @@ class CourseDetails(object):
 
         # Could just return jsondict w/o doing any db reads, but I put the reads in as a means to confirm
         # it persisted correctly
-        return CourseDetails.fetch(course_location)
+        return CourseDetails.fetch(course_locator)
 
     @staticmethod
     def parse_video_tag(raw_video):
