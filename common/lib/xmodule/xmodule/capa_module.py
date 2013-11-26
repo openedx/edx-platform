@@ -292,7 +292,7 @@ class CapaModule(CapaFields, XModule):
             'seed': self.seed,
         }
 
-    def set_state_from_lcp(self, isTimeRecorded=False):
+    def set_state_from_lcp(self):
         """
         Set the module's state from the settings in `self.lcp`
         """
@@ -303,9 +303,12 @@ class CapaModule(CapaFields, XModule):
         self.input_state = lcp_state['input_state']
         self.student_answers = lcp_state['student_answers']
         self.seed = lcp_state['seed']
-        
-        if isTimeRecorded:
-            self.lastSubmissionTime = datetime.datetime.now(UTC())
+
+    def set_last_submission_time(self):
+        """
+        Set the module's last submission time (when the problem was checked)
+        """
+        self.lastSubmissionTime = datetime.datetime.now(UTC())
 
     def get_score(self):
         """
@@ -938,15 +941,16 @@ class CapaModule(CapaFields, XModule):
         if self.lastSubmissionTime is not None:
             if (current_time - self.lastSubmissionTime).total_seconds() < self.submissionWaitSeconds:
                 secLeft = int(self.submissionWaitSeconds - (current_time - self.lastSubmissionTime).total_seconds()) + 1
-                msg = u'You must wait at least {wait} seconds between submissions - {s} to go'.format(
-                    wait=self.submissionWaitSeconds, s=secLeft)
+                msg = u'You must wait at least {w} between submissions. {s} remaining.'.format(
+                    w=self.prettyPrintSeconds(self.submissionWaitSeconds), s=self.prettyPrintSeconds(secLeft))
                 return {'success': msg, 'html': ''}  # Prompts a modal dialog in ajax callback
 
         try:
             correct_map = self.lcp.grade_answers(answers)
             self.attempts = self.attempts + 1
             self.lcp.done = True
-            self.set_state_from_lcp(True)
+            self.set_state_from_lcp()
+            self.set_last_submission_time()
 
         except (StudentInputError, ResponseError, LoncapaProblemError) as inst:
             log.warning("StudentInputError in capa_module:problem_check",
@@ -996,6 +1000,14 @@ class CapaModule(CapaFields, XModule):
         return {'success': success,
                 'contents': html,
                 }
+
+    def prettyPrintSeconds(self, numSeconds):
+        if(numSeconds < 60):
+            return "%i seconds" % (numSeconds)
+        elif(numSeconds < 60*60):
+            return "%i min, %i sec" % (int(numSeconds / 60), numSeconds % 60)
+        else:
+            return "%i hrs, %i min, %i sec" % (int(numSeconds / 3600), int((numSeconds % 3600) / 60), (numSeconds % 60))
 
     def rescore_problem(self):
         """
