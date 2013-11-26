@@ -371,7 +371,6 @@ class XModule(XModuleMixin, HTMLSnippet, XBlock):  # pylint: disable=abstract-me
         See the HTML module for a simple example.
     """
 
-
     has_score = descriptor_attr('has_score')
     _field_data_cache = descriptor_attr('_field_data_cache')
     _field_data = descriptor_attr('_field_data')
@@ -403,6 +402,7 @@ class XModule(XModuleMixin, HTMLSnippet, XBlock):  # pylint: disable=abstract-me
             data is a dictionary-like object with the content of the request"""
         return u""
 
+    @XBlock.handler
     def xmodule_handler(self, request, suffix=None):
         """
         XBlock handler that wraps `handle_ajax`
@@ -967,7 +967,7 @@ class ModuleSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abs
             anonymous_student_id='', course_id=None,
             open_ended_grading_interface=None, s3_interface=None,
             cache=None, can_execute_unsafe_code=None, replace_course_urls=None,
-            replace_jump_to_id_urls=None, error_descriptor_class=None, **kwargs):
+            replace_jump_to_id_urls=None, error_descriptor_class=None, get_real_user=None, **kwargs):
         """
         Create a closure around the system environment.
 
@@ -1051,6 +1051,8 @@ class ModuleSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abs
         self.replace_jump_to_id_urls = replace_jump_to_id_urls
         self.error_descriptor_class = error_descriptor_class
         self.xmodule_instance = None
+
+        self.get_real_user = get_real_user
 
     def get(self, attr):
         """	provide uniform access to attributes (like etree)."""
