@@ -37,10 +37,7 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule_modifiers import replace_course_urls, replace_jump_to_id_urls, replace_static_urls, add_histogram, wrap_xblock
-from xmodule.capa_module import CapaModule
-from xmodule.combined_open_ended_module import CombinedOpenEndedModule
-from xmodule.html_module import HtmlModule
-from xmodule.foldit_module import FolditModule
+from xmodule.lti_module import LTIModule
 
 
 log = logging.getLogger(__name__)
@@ -376,7 +373,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
     # while giving selected modules a per-course anonymized id.
     # As we have the time to manually test more modules, we can add to the list
     # of modules that get the per-course anonymized id.
-    if issubclass(getattr(descriptor, 'module_class', None), [LtiModule]):
+    if issubclass(getattr(descriptor, 'module_class', None), [LTIModule]):
         anonymous_student_id = anonymous_id_for_user(user, course_id)
     else:
         anonymous_student_id = anonymous_id_for_user(user, '')
