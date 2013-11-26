@@ -99,22 +99,3 @@ class TestLTI(BaseTestXmodule):
             generated_context,
             self.runtime.render_template('lti.html', expected_context),
         )
-
-
-    def test_resource_link_id(self):
-        module = LTIModule(self.item_descriptor, self.runtime, self.item_descriptor._field_data, Mock())
-        expected_resource_link_id = unicode(self.item_descriptor.xmodule_runtime.anonymous_student_id)
-        real_resource_link_id = module.get_resource_link_id()
-
-        self.assertEqual(real_resource_link_id, expected_resource_link_id)
-
-
-    def test_lis_result_sourcedid(self):
-        user_id = self.item_descriptor.xmodule_runtime.anonymous_student_id
-        lti_id = self.item_module.lti_id
-        module_id = 'test'
-        expected_sourcedId = u':'.join(urllib.quote(i) for i in (lti_id, module_id, user_id))
-
-        real_lis_result_sourcedid = self.item_module.get_lis_result_sourcedid()
-        self.assertEqual(real_lis_result_sourcedid, expected_sourcedId)
-

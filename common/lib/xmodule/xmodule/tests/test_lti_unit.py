@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 """Test for LTI Xmodule functional logic."""
 
-from mock import Mock, patch
+from mock import Mock, patch, PropertyMock
 import textwrap
 from lxml import etree
 from webob.request import Request
 from copy import copy
 import urllib
 
-from xmodule.lti_module import LTIModuleDescriptor
+from xmodule.lti_module import LTIModuleDescriptor, LTIModule
 
 from . import LogicTest
 
@@ -50,11 +50,11 @@ class LTIModuleTest(LogicTest):
         self.xmodule.get_client_key_secret = Mock(return_value=('key', 'secret'))
         self.system.publish = Mock()
 
-        user_id = self.xmodule.runtime.anonymous_student_id
-        lti_id = self.xmodule.lti_id
-        module_id = '//MITx/999/lti/'
+        self.user_id = self.xmodule.runtime.anonymous_student_id
+        self.lti_id = self.xmodule.lti_id
+        self.module_id = '//MITx/999/lti/'
 
-        sourcedId = u':'.join(urllib.quote(i) for i in (lti_id, module_id, user_id))
+        sourcedId = u':'.join(urllib.quote(i) for i in (self.lti_id, self.module_id, self.user_id))
 
         self.DEFAULTS = {
             'sourcedId': sourcedId,
@@ -97,10 +97,10 @@ class LTIModuleTest(LogicTest):
         Request has no Authorization header.
         This is an unknown service request, i.e., it is not a part of the original service specification.
         """
-        incorrect_request = Request(self.environ)
-        incorrect_request.body = self.get_request_body()
-        response = self.xmodule.grade_handler(incorrect_request, '')
-        real_repsonse = self.get_response_values(response)
+        request = Request(self.environ)
+        request.body = self.get_request_body()
+        response = self.xmodule.grade_handler(request, '')
+        real_response = self.get_response_values(response)
         expected_response = {
             'action': None,
             'code_major': 'failure',
@@ -109,18 +109,18 @@ class LTIModuleTest(LogicTest):
         }
 
         self.assertEqual(response.status_code, 200)
-        self.assertDictEqual(expected_response, real_repsonse)
+        self.assertDictEqual(expected_response, real_response)
 
     def test_authorization_header_empty(self):
         """
         Request Authorization header has no value.
         This is an unknown service request, i.e., it is not a part of the original service specification.
         """
-        incorrect_request = Request(self.environ)
-        incorrect_request.authorization = "bad authorization header"
-        incorrect_request.body = self.get_request_body()
-        response = self.xmodule.grade_handler(incorrect_request, '')
-        real_repsonse = self.get_response_values(response)
+        request = Request(self.environ)
+        request.authorization = "bad authorization header"
+        request.body = self.get_request_body()
+        response = self.xmodule.grade_handler(request, '')
+        real_response = self.get_response_values(response)
         expected_response = {
             'action': None,
             'code_major': 'failure',
@@ -129,17 +129,17 @@ class LTIModuleTest(LogicTest):
         }
 
         self.assertEqual(response.status_code, 200)
-        self.assertDictEqual(expected_response, real_repsonse)
+        self.assertDictEqual(expected_response, real_response)
 
     def test_grade_not_in_range(self):
         """
         Grade returned from Tool Provider is outside the range 0.0-1.0.
         """
         self.xmodule.verify_oauth_body_sign = Mock()
-        incorrect_request = Request(self.environ)
-        incorrect_request.body = self.get_request_body(params={'grade': '10'})
-        response = self.xmodule.grade_handler(incorrect_request, '')
-        real_repsonse = self.get_response_values(response)
+        request = Request(self.environ)
+        request.body = self.get_request_body(params={'grade': '10'})
+        response = self.xmodule.grade_handler(request, '')
+        real_response = self.get_response_values(response)
         expected_response = {
             'action': None,
             'code_major': 'failure',
@@ -148,17 +148,17 @@ class LTIModuleTest(LogicTest):
         }
 
         self.assertEqual(response.status_code, 200)
-        self.assertDictEqual(expected_response, real_repsonse)
+        self.assertDictEqual(expected_response, real_response)
 
     def test_bad_grade_decimal(self):
         """
         Grade returned from Tool Provider doesn't use a period as the decimal point.
         """
         self.xmodule.verify_oauth_body_sign = Mock()
-        incorrect_request = Request(self.environ)
-        incorrect_request.body = self.get_request_body(params={'grade': '0,5'})
-        response = self.xmodule.grade_handler(incorrect_request, '')
-        real_repsonse = self.get_response_values(response)
+        request = Request(self.environ)
+        request.body = self.get_request_body(params={'grade': '0,5'})
+        response = self.xmodule.grade_handler(request, '')
+        real_response = self.get_response_values(response)
         expected_response = {
             'action': None,
             'code_major': 'failure',
@@ -167,7 +167,7 @@ class LTIModuleTest(LogicTest):
         }
 
         self.assertEqual(response.status_code, 200)
-        self.assertDictEqual(expected_response, real_repsonse)
+        self.assertDictEqual(expected_response, real_response)
 
     def test_unsupported_action(self):
         """
@@ -175,10 +175,10 @@ class LTIModuleTest(LogicTest):
         `replaceResultRequest` is supported only.
         """
         self.xmodule.verify_oauth_body_sign = Mock()
-        incorrect_request = Request(self.environ)
-        incorrect_request.body = self.get_request_body({'action': 'wrongAction'})
-        response = self.xmodule.grade_handler(incorrect_request, '')
-        real_repsonse = self.get_response_values(response)
+        request = Request(self.environ)
+        request.body = self.get_request_body({'action': 'wrongAction'})
+        response = self.xmodule.grade_handler(request, '')
+        real_response = self.get_response_values(response)
         expected_response = {
             'action': None,
             'code_major': 'unsupported',
@@ -187,22 +187,22 @@ class LTIModuleTest(LogicTest):
         }
 
         self.assertEqual(response.status_code, 200)
-        self.assertDictEqual(expected_response, real_repsonse)
+        self.assertDictEqual(expected_response, real_response)
 
     def test_good_request(self):
         """
         Response from Tool Provider is correct.
         """
         self.xmodule.verify_oauth_body_sign = Mock()
-        incorrect_request = Request(self.environ)
-        incorrect_request.body = self.get_request_body()
-        response = self.xmodule.grade_handler(incorrect_request, '')
+        request = Request(self.environ)
+        request.body = self.get_request_body()
+        response = self.xmodule.grade_handler(request, '')
         code_major, description, messageIdentifier, action = self.get_response_values(response)
         description_expected = 'Score for {sourcedId} is now {score}'.format(
                 sourcedId=self.DEFAULTS['sourcedId'],
                 score=self.DEFAULTS['grade'],
             )
-        real_repsonse = self.get_response_values(response)
+        real_response = self.get_response_values(response)
         expected_response = {
             'action': 'replaceResultResponse',
             'code_major': 'success',
@@ -211,7 +211,7 @@ class LTIModuleTest(LogicTest):
         }
 
         self.assertEqual(response.status_code, 200)
-        self.assertDictEqual(expected_response, real_repsonse)
+        self.assertDictEqual(expected_response, real_response)
 
     def test_user_id(self):
         expected_user_id = unicode(urllib.quote(self.xmodule.runtime.anonymous_student_id))
@@ -226,6 +226,22 @@ class LTIModuleTest(LogicTest):
 
         real_outcome_service_url = self.xmodule.get_outcome_service_url()
         self.assertEqual(real_outcome_service_url, expected_outcome_service_url)
+
+    def test_resource_link_id(self):
+        with patch('xmodule.lti_module.LTIModule.id', new_callable=PropertyMock) as mock_id:
+            mock_id.return_value = self.module_id
+            expected_resource_link_id = unicode(urllib.quote(self.module_id))
+            real_resource_link_id = self.xmodule.get_resource_link_id()
+            self.assertEqual(real_resource_link_id, expected_resource_link_id)
+
+
+    def test_lis_result_sourcedid(self):
+        with patch('xmodule.lti_module.LTIModule.id', new_callable=PropertyMock) as mock_id:
+            mock_id.return_value = self.module_id
+            expected_sourcedId = u':'.join(urllib.quote(i) for i in (self.lti_id, self.module_id, self.user_id))
+            real_lis_result_sourcedid = self.xmodule.get_lis_result_sourcedid()
+            self.assertEqual(real_lis_result_sourcedid, expected_sourcedId)
+
 
     def test_verify_oauth_body_sign(self):
         pass
