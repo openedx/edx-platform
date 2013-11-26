@@ -8,14 +8,14 @@ from webob.request import Request
 from copy import copy
 import urllib
 
-from xmodule.lti_module import LTIModuleDescriptor, LTIModule
+from xmodule.lti_module import LTIDescriptor
 
 from . import LogicTest
 
 
 class LTIModuleTest(LogicTest):
     """Logic tests for LTI module."""
-    descriptor_class = LTIModuleDescriptor
+    descriptor_class = LTIDescriptor
 
     def setUp(self):
         super(LTIModuleTest, self).setUp()
