@@ -1,4 +1,4 @@
-<%! 
+<%!
     from django.utils.translation import ugettext as _
 %>
 <%inherit file="base.html" />
@@ -8,6 +8,7 @@
 <!-- TODO decode course # from context_course into title -->
 <%block name="title">${_("Course Updates")}</%block>
 <%block name="bodyclass">is-signedin course course-info updates view-updates</%block>
+<%block name='dataview'>view-updates</%block>
 
 <%block name="header_extras">
 <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
@@ -20,7 +21,7 @@
 
 <%block name="jsextra">
   <script type="text/javascript" charset="utf-8">
-  
+
 require(["domReady!", "jquery", "js/collections/course_update", "js/models/module_info", "js/models/course_info", "js/views/course_info_edit"],
   function(doc, $, CourseUpdateCollection, ModuleInfoModel, CourseInfoModel, CourseInfoEditView) {
     var course_updates = new CourseUpdateCollection();

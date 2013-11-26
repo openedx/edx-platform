@@ -2,6 +2,7 @@
 <%inherit file="base.html" />
 <%! from django.core.urlresolvers import reverse %>
 <%block name="bodyclass">error</%block>
+<%block name='dataview'>view-error</%block>
 <%block name="title">
   % if error == '404':
     404 - ${_("Page Not Found")}

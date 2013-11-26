@@ -4,6 +4,7 @@
 <%def name="online_help_token()"><% return "home" %></%def>
 <%block name="title">${_("My Courses")}</%block>
 <%block name="bodyclass">is-signedin index view-dashboard</%block>
+<%block name='dataview'>view-dashboard</%block>
 
 <%block name="jsextra">
 <script type="text/javascript">
@@ -155,7 +156,7 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
 
             <ul  class="item-actions course-actions">
               <li class="action">
-                <a href="${lms_link}" rel="external" class="button view-button view-live-button">${_("View Live")}</a>
+                <a href="${lms_link}" rel="external" data-rel="external" class="button view-button view-live-button">${_("View Live")}</a>
               </li>
             </ul>
           </li>

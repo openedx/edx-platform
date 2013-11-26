@@ -6,6 +6,7 @@
 <%def name="online_help_token()"><% return "team" %></%def>
 <%block name="title">${_("Course Team Settings")}</%block>
 <%block name="bodyclass">is-signedin course users view-team</%block>
+<%block name='dataview'>view-team</%block>
 
 <%block name="content">
 
@@ -147,7 +148,7 @@
       <div class="bit">
         <h3 class="title-3">${_("Course Team Roles")}</h3>
         <p>${_("Course team members, or staff, are course co-authors. They have full writing and editing privileges on all course content.")}</p>
-        <p>${_("Admins are course team members who can add and remove other course team members.")}</p>      
+        <p>${_("Admins are course team members who can add and remove other course team members.")}</p>
       </div>
 
       % if user_is_instuctor and len(instructors) == 1:

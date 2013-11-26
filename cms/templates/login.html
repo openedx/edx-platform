@@ -6,6 +6,7 @@ from django.utils.translation import ugettext as _
 %>
 <%block name="title">${_("Sign In")}</%block>
 <%block name="bodyclass">not-signedin view-signin</%block>
+<%block name='dataview'>view-signin</%block>
 
 <%block name="content">
 
@@ -50,7 +51,7 @@ from django.utils.translation import ugettext as _
 
       <div class="bit">
         <h3 class="title-3">${_("Need Help?")}</h3>
-        <p>${_('Having trouble with your account? Use {link_start}our support center{link_end} to look over self help steps, find solutions others have found to the same problem, or let us know of your issue.').format(link_start='<a href="http://help.edge.edx.org" rel="external">', link_end='</a>')}</p>
+        <p>${_('Having trouble with your account? Use {link_start}our support center{link_end} to look over self help steps, find solutions others have found to the same problem, or let us know of your issue.').format(link_start='<a href="http://help.edge.edx.org" rel="external" data-rel="external">', link_end='</a>')}</p>
       </div>
     </aside>
   </section>
