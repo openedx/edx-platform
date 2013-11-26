@@ -265,5 +265,5 @@ def click_grade(_step):
     iframe_name = 'ltiLaunchFrame-' + location
     with world.browser.get_iframe(iframe_name) as iframe:
         iframe.find_by_name('submit-button').first.click()
-        assert iframe.is_text_present('LTI consumer (edX) responsed with XML content')
+        assert iframe.is_text_present('LTI consumer (edX) responded with XML content')
 

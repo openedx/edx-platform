@@ -63,7 +63,7 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
         '''
         # Respond to grade request
         if 'grade' in self.path and self._send_graded_result().status_code == 200:
-            status_message = 'LTI consumer (edX) responsed with XML content:<br>' + self.server.grade_data['TC answer']
+            status_message = 'LTI consumer (edX) responded with XML content:<br>' + self.server.grade_data['TC answer']
             self.server.grade_data['callback_url'] = None
         # Respond to request with correct lti endpoint:
         elif self._is_correct_lti_request():
