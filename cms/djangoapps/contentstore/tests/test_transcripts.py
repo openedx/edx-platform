@@ -60,7 +60,7 @@ class Basetranscripts(CourseTestCase):
             'type': 'video'
         }
         resp = self.client.ajax_post('/xblock', data)
-        self.item_location = self._get_location(resp)
+        self.item_locator, self.item_location = self._get_locator(resp)
         self.assertEqual(resp.status_code, 200)
 
         # hI10vDNYz4M - valid Youtube ID with transcripts.
@@ -73,10 +73,10 @@ class Basetranscripts(CourseTestCase):
         # Remove all transcripts for current module.
         self.clear_subs_content()
 
-    def _get_location(self, resp):
-        """ Returns the location (as a string) from the response returned by a create operation. """
+    def _get_locator(self, resp):
+        """ Returns the locator and old-style location (as a string) from the response returned by a create operation. """
         locator = json.loads(resp.content).get('locator')
-        return loc_mapper().translate_locator_to_location(BlockUsageLocator(locator)).url()
+        return locator, loc_mapper().translate_locator_to_location(BlockUsageLocator(locator)).url()
 
     def get_youtube_ids(self):
         """Return youtube speeds and ids."""
@@ -142,7 +142,7 @@ class TestUploadtranscripts(Basetranscripts):
         link = reverse('upload_transcripts')
         filename = os.path.splitext(os.path.basename(self.good_srt_file.name))[0]
         resp = self.client.post(link, {
-            'id': self.item_location,
+            'locator': self.item_locator,
             'file': self.good_srt_file,
             'video_list': json.dumps([{
                 'type': 'html5',
@@ -164,20 +164,20 @@ class TestUploadtranscripts(Basetranscripts):
         link = reverse('upload_transcripts')
         resp = self.client.post(link, {'file': self.good_srt_file})
         self.assertEqual(resp.status_code, 400)
-        self.assertEqual(json.loads(resp.content).get('status'), 'POST data without "id" form data.')
+        self.assertEqual(json.loads(resp.content).get('status'), 'POST data without "locator" form data.')
 
     def test_fail_data_without_file(self):
         link = reverse('upload_transcripts')
-        resp = self.client.post(link, {'id': self.item_location})
+        resp = self.client.post(link, {'locator': self.item_locator})
         self.assertEqual(resp.status_code, 400)
         self.assertEqual(json.loads(resp.content).get('status'), 'POST data without "file" form data.')
 
-    def test_fail_data_with_bad_location(self):
+    def test_fail_data_with_bad_locator(self):
         # Test for raising `InvalidLocationError` exception.
         link = reverse('upload_transcripts')
         filename = os.path.splitext(os.path.basename(self.good_srt_file.name))[0]
         resp = self.client.post(link, {
-            'id': 'BAD_LOCATION',
+            'locator': 'BAD_LOCATOR',
             'file': self.good_srt_file,
             'video_list': json.dumps([{
                 'type': 'html5',
@@ -186,13 +186,13 @@ class TestUploadtranscripts(Basetranscripts):
             }])
         })
         self.assertEqual(resp.status_code, 400)
-        self.assertEqual(json.loads(resp.content).get('status'), "Can't find item by location.")
+        self.assertEqual(json.loads(resp.content).get('status'), "Can't find item by locator.")
 
         # Test for raising `ItemNotFoundError` exception.
         link = reverse('upload_transcripts')
         filename = os.path.splitext(os.path.basename(self.good_srt_file.name))[0]
         resp = self.client.post(link, {
-            'id': '{0}_{1}'.format(self.item_location, 'BAD_LOCATION'),
+            'locator': '{0}_{1}'.format(self.item_locator, 'BAD_LOCATOR'),
             'file': self.good_srt_file,
             'video_list': json.dumps([{
                 'type': 'html5',
@@ -201,7 +201,7 @@ class TestUploadtranscripts(Basetranscripts):
             }])
         })
         self.assertEqual(resp.status_code, 400)
-        self.assertEqual(json.loads(resp.content).get('status'), "Can't find item by location.")
+        self.assertEqual(json.loads(resp.content).get('status'), "Can't find item by locator.")
 
     def test_fail_for_non_video_module(self):
         # non_video module: setup
@@ -211,7 +211,7 @@ class TestUploadtranscripts(Basetranscripts):
             'type': 'non_video'
         }
         resp = self.client.ajax_post('/xblock', data)
-        item_location = self._get_location(resp)
+        item_locator, item_location = self._get_locator(resp)
         data = '<non_video youtube="0.75:JMD_ifUUfsU,1.0:hI10vDNYz4M" />'
         modulestore().update_item(item_location, data)
 
@@ -220,7 +220,7 @@ class TestUploadtranscripts(Basetranscripts):
         link = reverse('upload_transcripts')
         filename = os.path.splitext(os.path.basename(self.good_srt_file.name))[0]
         resp = self.client.post(link, {
-            'id': item_location,
+            'locator': item_locator,
             'file': self.good_srt_file,
             'video_list': json.dumps([{
                 'type': 'html5',
@@ -238,7 +238,7 @@ class TestUploadtranscripts(Basetranscripts):
         link = reverse('upload_transcripts')
         filename = os.path.splitext(os.path.basename(self.good_srt_file.name))[0]
         resp = self.client.post(link, {
-            'id': self.item_location,
+            'locator': self.item_locator,
             'file': self.good_srt_file,
             'video_list': json.dumps([{
                 'type': 'html5',
@@ -255,7 +255,7 @@ class TestUploadtranscripts(Basetranscripts):
         link = reverse('upload_transcripts')
         filename = os.path.splitext(os.path.basename(self.bad_data_srt_file.name))[0]
         resp = self.client.post(link, {
-            'id': self.item_location,
+            'locator': self.item_locator,
             'file': self.bad_data_srt_file,
             'video_list': json.dumps([{
                 'type': 'html5',
@@ -270,7 +270,7 @@ class TestUploadtranscripts(Basetranscripts):
         link = reverse('upload_transcripts')
         filename = os.path.splitext(os.path.basename(self.bad_name_srt_file.name))[0]
         resp = self.client.post(link, {
-            'id': self.item_location,
+            'locator': self.item_locator,
             'file': self.bad_name_srt_file,
             'video_list': json.dumps([{
                 'type': 'html5',
@@ -297,7 +297,7 @@ class TestUploadtranscripts(Basetranscripts):
         link = reverse('upload_transcripts')
         filename = os.path.splitext(os.path.basename(srt_file.name))[0]
         resp = self.client.post(link, {
-            'id': self.item_location,
+            'locator': self.item_locator,
             'file': srt_file,
             'video_list': json.dumps([{
                 'type': 'html5',
@@ -359,7 +359,7 @@ class TestDownloadtranscripts(Basetranscripts):
         self.save_subs_to_store(subs, 'JMD_ifUUfsU')
 
         link = reverse('download_transcripts')
-        resp = self.client.get(link, {'id': self.item_location, 'subs_id': "JMD_ifUUfsU"})
+        resp = self.client.get(link, {'locator': self.item_locator, 'subs_id': "JMD_ifUUfsU"})
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.content, """0\n00:00:00,100 --> 00:00:00,200\nsubs #1\n\n1\n00:00:00,200 --> 00:00:00,240\nsubs #2\n\n2\n00:00:00,240 --> 00:00:00,380\nsubs #3\n\n""")
 
@@ -386,7 +386,7 @@ class TestDownloadtranscripts(Basetranscripts):
         self.save_subs_to_store(subs, subs_id)
 
         link = reverse('download_transcripts')
-        resp = self.client.get(link, {'id': self.item_location, 'subs_id': subs_id})
+        resp = self.client.get(link, {'locator': self.item_locator, 'subs_id': subs_id})
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(
             resp.content,
@@ -397,21 +397,21 @@ class TestDownloadtranscripts(Basetranscripts):
 
     def test_fail_data_without_file(self):
         link = reverse('download_transcripts')
-        resp = self.client.get(link, {'id': ''})
+        resp = self.client.get(link, {'locator': ''})
         self.assertEqual(resp.status_code, 404)
 
         resp = self.client.get(link, {})
         self.assertEqual(resp.status_code, 404)
 
-    def test_fail_data_with_bad_location(self):
+    def test_fail_data_with_bad_locator(self):
         # Test for raising `InvalidLocationError` exception.
         link = reverse('download_transcripts')
-        resp = self.client.get(link, {'id': 'BAD_LOCATION'})
+        resp = self.client.get(link, {'locator': 'BAD_LOCATOR'})
         self.assertEqual(resp.status_code, 404)
 
         # Test for raising `ItemNotFoundError` exception.
         link = reverse('download_transcripts')
-        resp = self.client.get(link, {'id': '{0}_{1}'.format(self.item_location, 'BAD_LOCATION')})
+        resp = self.client.get(link, {'locator': '{0}_{1}'.format(self.item_locator, 'BAD_LOCATOR')})
         self.assertEqual(resp.status_code, 404)
 
     def test_fail_for_non_video_module(self):
@@ -422,7 +422,7 @@ class TestDownloadtranscripts(Basetranscripts):
             'type': 'videoalpha'
         }
         resp = self.client.ajax_post('/xblock', data)
-        item_location = self._get_location(resp)
+        item_locator, item_location = self._get_locator(resp)
         subs_id = str(uuid4())
         data = textwrap.dedent("""
             <videoalpha youtube="" sub="{}">
@@ -445,7 +445,7 @@ class TestDownloadtranscripts(Basetranscripts):
         self.save_subs_to_store(subs, subs_id)
 
         link = reverse('download_transcripts')
-        resp = self.client.get(link, {'id': item_location})
+        resp = self.client.get(link, {'locator': item_locator})
         self.assertEqual(resp.status_code, 404)
 
     def test_fail_nonyoutube_subs_dont_exist(self):
@@ -459,7 +459,7 @@ class TestDownloadtranscripts(Basetranscripts):
         modulestore().update_item(self.item_location, data)
 
         link = reverse('download_transcripts')
-        resp = self.client.get(link, {'id': self.item_location})
+        resp = self.client.get(link, {'locator': self.item_locator})
         self.assertEqual(resp.status_code, 404)
 
     def test_empty_youtube_attr_and_sub_attr(self):
@@ -473,7 +473,7 @@ class TestDownloadtranscripts(Basetranscripts):
         modulestore().update_item(self.item_location, data)
 
         link = reverse('download_transcripts')
-        resp = self.client.get(link, {'id': self.item_location})
+        resp = self.client.get(link, {'locator': self.item_locator})
 
         self.assertEqual(resp.status_code, 404)
 
@@ -498,7 +498,7 @@ class TestDownloadtranscripts(Basetranscripts):
         self.save_subs_to_store(subs, 'JMD_ifUUfsU')
 
         link = reverse('download_transcripts')
-        resp = self.client.get(link, {'id': self.item_location})
+        resp = self.client.get(link, {'locator': self.item_locator})
 
         self.assertEqual(resp.status_code, 404)
 
@@ -553,7 +553,7 @@ class TestChecktranscripts(Basetranscripts):
         self.save_subs_to_store(subs, subs_id)
 
         data = {
-            'id':  self.item_location,
+            'locator':  self.item_locator,
             'videos': [{
                 'type': 'html5',
                 'video': subs_id,
@@ -597,7 +597,7 @@ class TestChecktranscripts(Basetranscripts):
         self.save_subs_to_store(subs, 'JMD_ifUUfsU')
         link = reverse('check_transcripts')
         data = {
-            'id': self.item_location,
+            'locator': self.item_locator,
             'videos': [{
                 'type': 'youtube',
                 'video': 'JMD_ifUUfsU',
@@ -625,7 +625,7 @@ class TestChecktranscripts(Basetranscripts):
     def test_fail_data_without_id(self):
         link = reverse('check_transcripts')
         data = {
-            'id': '',
+            'locator': '',
             'videos': [{
                 'type': '',
                 'video': '',
@@ -634,13 +634,13 @@ class TestChecktranscripts(Basetranscripts):
         }
         resp = self.client.get(link, {'data': json.dumps(data)})
         self.assertEqual(resp.status_code, 400)
-        self.assertEqual(json.loads(resp.content).get('status'), "Can't find item by location.")
+        self.assertEqual(json.loads(resp.content).get('status'), "Can't find item by locator.")
 
-    def test_fail_data_with_bad_location(self):
+    def test_fail_data_with_bad_locator(self):
         # Test for raising `InvalidLocationError` exception.
         link = reverse('check_transcripts')
         data = {
-            'id': '',
+            'locator': '',
             'videos': [{
                 'type': '',
                 'video': '',
@@ -649,11 +649,11 @@ class TestChecktranscripts(Basetranscripts):
         }
         resp = self.client.get(link, {'data': json.dumps(data)})
         self.assertEqual(resp.status_code, 400)
-        self.assertEqual(json.loads(resp.content).get('status'), "Can't find item by location.")
+        self.assertEqual(json.loads(resp.content).get('status'), "Can't find item by locator.")
 
         # Test for raising `ItemNotFoundError` exception.
         data = {
-            'id':  '{0}_{1}'.format(self.item_location, 'BAD_LOCATION'),
+            'locator':  '{0}_{1}'.format(self.item_locator, 'BAD_LOCATOR'),
             'videos': [{
                 'type': '',
                 'video': '',
@@ -662,7 +662,7 @@ class TestChecktranscripts(Basetranscripts):
         }
         resp = self.client.get(link, {'data': json.dumps(data)})
         self.assertEqual(resp.status_code, 400)
-        self.assertEqual(json.loads(resp.content).get('status'), "Can't find item by location.")
+        self.assertEqual(json.loads(resp.content).get('status'), "Can't find item by locator.")
 
     def test_fail_for_non_video_module(self):
         # Not video module: setup
@@ -672,7 +672,7 @@ class TestChecktranscripts(Basetranscripts):
             'type': 'not_video'
         }
         resp = self.client.ajax_post('/xblock', data)
-        item_location = self._get_location(resp)
+        item_locator, item_location = self._get_locator(resp)
         subs_id = str(uuid4())
         data = textwrap.dedent("""
             <not_video youtube="" sub="{}">
@@ -695,7 +695,7 @@ class TestChecktranscripts(Basetranscripts):
         self.save_subs_to_store(subs, subs_id)
 
         data = {
-            'id':  item_location,
+            'locator':  item_locator,
             'videos': [{
                 'type': '',
                 'video': '',
