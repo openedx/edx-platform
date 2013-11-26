@@ -5,12 +5,12 @@
 # Settings for edx4edx production instance
 from .aws import *
 COURSE_NAME = "edx4edx"
-COURSE_NUMBER = "edX.01"
+COURSE_NUMBER = "MITx.01"
 COURSE_TITLE = "edx4edx: edX Author Course"
 EDX4EDX_ROOT = ENV_ROOT / "data/edx4edx"
 
 ### Dark code. Should be enabled in local settings for devel.
-ENABLE_MULTICOURSE = True   # set to False to disable multicourse display (see lib.util.views.mitxhome)
+ENABLE_MULTICOURSE = True   # set to False to disable multicourse display (see lib.util.views.edXhome)
 ###
 PIPELINE_CSS_COMPRESSOR = None
 PIPELINE_JS_COMPRESSOR = None

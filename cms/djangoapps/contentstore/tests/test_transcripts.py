@@ -31,7 +31,7 @@ TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().
 class Basetranscripts(CourseTestCase):
     """Base test class for transcripts tests."""
 
-    org = 'MITx'
+    org = 'edX'
     number = '999'
 
     def clear_subs_content(self):

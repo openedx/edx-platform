@@ -57,11 +57,11 @@ site_status_msg = get_site_status_msg(course_id)
 
     <ol class="left nav-global authenticated">
       <%block name="navigation_global_links_authenticated">
-        % if settings.MITX_FEATURES.get('COURSES_ARE_BROWSABLE'):
+        % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
           <li class="nav-global-01">
             <a href="${marketing_link('COURSES')}">${_('Find Courses')}</a>
           </li>
-        % endif  
+        % endif
       </%block>
     </ol>
     <ol class="user">
@@ -93,7 +93,7 @@ site_status_msg = get_site_status_msg(course_id)
     % else:
     <ol class="left nav-global">
       <%block name="navigation_global_links">
-        % if settings.MITX_FEATURES.get('ENABLE_MKTG_SITE'):
+        % if settings.FEATURES.get('ENABLE_MKTG_SITE'):
           <li class="nav-global-01">
             <a href="${marketing_link('HOW_IT_WORKS')}">${_("How it Works")}</a>
           </li>
@@ -105,8 +105,8 @@ site_status_msg = get_site_status_msg(course_id)
           </li>
         % endif
       </%block>
-      % if not settings.MITX_FEATURES['DISABLE_LOGIN_BUTTON']:
-          % if course and settings.MITX_FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
+      % if not settings.FEATURES['DISABLE_LOGIN_BUTTON']:
+          % if course and settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
           <li class="nav-global-04">
             <a class="cta cta-register" href="${reverse('course-specific-register', args=[course.id])}">${_("Register Now")}</a>
           </li>
@@ -120,8 +120,8 @@ site_status_msg = get_site_status_msg(course_id)
 
     <ol class="right nav-courseware">
     <li class="nav-courseware-01">
-      % if not settings.MITX_FEATURES['DISABLE_LOGIN_BUTTON']:
-          % if course and settings.MITX_FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
+      % if not settings.FEATURES['DISABLE_LOGIN_BUTTON']:
+          % if course and settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
           <a class="cta cta-login" href="${reverse('course-specific-login', args=[course.id])}${login_query()}">${_("Log in")}</a>
           % else:
           <a class="cta cta-login" href="/login${login_query()}">${_("Log in")}</a>

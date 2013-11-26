@@ -30,7 +30,7 @@ from student.models import CourseEnrollment
 from django.http import HttpResponseBadRequest
 from xblock.fields import Scope
 from preview import handler_prefix, get_preview_html
-from mitxmako.shortcuts import render_to_response, render_to_string
+from edxmako.shortcuts import render_to_response, render_to_string
 from models.settings.course_grading import CourseGradingModel
 
 __all__ = ['orphan_handler', 'xblock_handler']
@@ -67,7 +67,7 @@ def xblock_handler(request, tag=None, course_id=None, branch=None, version_guid=
                        to None! Absent ones will be left alone.
                 :nullout: which metadata fields to set to None
                 :graderType: change how this unit is graded
-                :publish: can be one of three values, 'make_public, 'make_private', or 'create_draft'         
+                :publish: can be one of three values, 'make_public, 'make_private', or 'create_draft'
               The JSON representation on the updated xblock (minus children) is returned.
 
               if xblock locator is not specified, create a new xblock instance. The json playload can contain

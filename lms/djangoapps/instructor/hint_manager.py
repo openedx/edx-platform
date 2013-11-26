@@ -2,9 +2,9 @@
 Views for hint management.
 
 Get to these views through courseurl/hint_manager.
-For example: https://courses.edx.org/courses/MITx/2.01x/2013_Spring/hint_manager
+For example: https://courses.edx.org/courses/edX/2.01x/2013_Spring/hint_manager
 
-These views will only be visible if MITX_FEATURES['ENABLE_HINTER_INSTRUCTOR_VIEW'] = True
+These views will only be visible if edX_FEATURES['ENABLE_HINTER_INSTRUCTOR_VIEW'] = True
 """
 
 import json
@@ -13,7 +13,7 @@ import re
 from django.http import HttpResponse, Http404
 from django_future.csrf import ensure_csrf_cookie
 
-from mitxmako.shortcuts import render_to_response, render_to_string
+from edxmako.shortcuts import render_to_response, render_to_string
 
 from courseware.courses import get_course_with_access
 from courseware.models import XModuleUserStateSummaryField

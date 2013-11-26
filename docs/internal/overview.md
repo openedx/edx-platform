@@ -101,8 +101,6 @@ The LMS is a django site, with root in `lms/`.  It runs in many different enviro
 
   - ajax calls go to `module_render.py:handle_xblock_callback()`, which passes it to one of the `XBlock`s handler functions
 
-  - [This diagram](https://github.com/MITx/mitx/wiki/MITx-Architecture) visually shows how the clients communicate with problems + modules.
-
 - See `lms/urls.py` for the wirings of urls to views.
 
 - Tracking: there is support for basic tracking of client-side events in `lms/djangoapps/track`.

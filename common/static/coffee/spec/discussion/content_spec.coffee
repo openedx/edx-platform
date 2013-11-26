@@ -2,7 +2,7 @@ describe 'All Content', ->
     beforeEach ->
         # TODO: figure out a better way of handling this
         # It is set up in main.coffee DiscussionApp.start
-        window.$$course_id = 'mitX/999/test'
+        window.$$course_id = 'edX/999/test'
         window.user = new DiscussionUser {id: '567'}
 
     describe 'Content', ->
@@ -10,7 +10,7 @@ describe 'All Content', ->
             @content = new Content {
                 id: '01234567',
                 user_id: '567',
-                course_id: 'mitX/999/test',
+                course_id: 'edX/999/test',
                 body: 'this is some content',
                 abuse_flaggers: ['123']
             }
@@ -22,7 +22,7 @@ describe 'All Content', ->
             @content.initialize
             expect(Content.contents['01234567']).toEqual @content
             expect(@content.get 'id').toEqual '01234567'
-            expect(@content.get 'user_url').toEqual '/courses/mitX/999/test/discussion/forum/users/567'
+            expect(@content.get 'user_url').toEqual '/courses/edX/999/test/discussion/forum/users/567'
             expect(@content.get 'children').toEqual []
             expect(@content.get 'comments').toEqual(jasmine.any(Comments))
 

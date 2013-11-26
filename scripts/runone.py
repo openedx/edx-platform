@@ -5,7 +5,7 @@ import os
 import sys
 
 # I want this:
-#   ERROR: test_update_and_fetch (mitx.cms.djangoapps.contentstore.tests.test_course_settings.CourseDetailsViewTest)
+#   ERROR: test_update_and_fetch (edX.cms.djangoapps.contentstore.tests.test_course_settings.CourseDetailsViewTest)
 # to become:
 #   test --settings=cms.envs.test --pythonpath=. -s cms/djangoapps/contentstore/tests/test_course_settings.py:CourseDetailsViewTest.test_update_and_fetch
 
@@ -34,7 +34,7 @@ def main(argv):
 
     test_method = words[0]
     test_path = words[1].split('.')
-    if test_path[0] == 'mitx':
+    if test_path[0] == 'edX':
         del test_path[0]
     test_class = test_path[-1]
     del test_path[-1]

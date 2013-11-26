@@ -16,8 +16,8 @@ from django.template import Context
 from django.http import HttpResponse
 import logging
 
-import mitxmako
-import mitxmako.middleware
+import edxmako
+import edxmako.middleware
 from django.conf import settings
 from django.core.urlresolvers import reverse
 log = logging.getLogger(__name__)
@@ -35,13 +35,13 @@ def marketing_link(name):
     # link_map maps URLs from the marketing site to the old equivalent on
     # the Django site
     link_map = settings.MKTG_URL_LINK_MAP
-    if settings.MITX_FEATURES.get('ENABLE_MKTG_SITE') and name in settings.MKTG_URLS:
+    if settings.FEATURES.get('ENABLE_MKTG_SITE') and name in settings.MKTG_URLS:
         # special case for when we only want the root marketing URL
         if name == 'ROOT':
             return settings.MKTG_URLS.get('ROOT')
         return settings.MKTG_URLS.get('ROOT') + settings.MKTG_URLS.get(name)
     # only link to the old pages when the marketing site isn't on
-    elif not settings.MITX_FEATURES.get('ENABLE_MKTG_SITE') and name in link_map:
+    elif not settings.FEATURES.get('ENABLE_MKTG_SITE') and name in link_map:
         # don't try to reverse disabled marketing links
         if link_map[name] is not None:
             return reverse(link_map[name])
@@ -77,19 +77,19 @@ def render_to_string(template_name, dictionary, context=None, namespace='main'):
     # collapse context_instance to a single dictionary for mako
     context_dictionary = {}
     context_instance['settings'] = settings
-    context_instance['MITX_ROOT_URL'] = settings.MITX_ROOT_URL
+    context_instance['EDX_ROOT_URL'] = settings.EDX_ROOT_URL
     context_instance['marketing_link'] = marketing_link
 
     # In various testing contexts, there might not be a current request context.
-    if mitxmako.middleware.requestcontext is not None:
-        for d in mitxmako.middleware.requestcontext:
+    if edxmako.middleware.requestcontext is not None:
+        for d in edxmako.middleware.requestcontext:
             context_dictionary.update(d)
     for d in context_instance:
         context_dictionary.update(d)
     if context:
         context_dictionary.update(context)
     # fetch and render template
-    template = mitxmako.lookup[namespace].get_template(template_name)
+    template = edxmako.lookup[namespace].get_template(template_name)
     return template.render_unicode(**context_dictionary)
 
 

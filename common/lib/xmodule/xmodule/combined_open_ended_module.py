@@ -11,7 +11,7 @@ from collections import namedtuple
 from .fields import Date, Timedelta
 import textwrap
 
-log = logging.getLogger("mitx.courseware")
+log = logging.getLogger("edx.courseware")
 
 V1_SETTINGS_ATTRIBUTES = [
     "display_name",

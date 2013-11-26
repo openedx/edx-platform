@@ -1,7 +1,7 @@
 
 # Packaging constants
 COMMIT = (ENV["GIT_COMMIT"] || `git rev-parse HEAD`).chomp()[0, 10]
-PACKAGE_NAME = "mitx"
+PACKAGE_NAME = "edx"
 BRANCH = (ENV["GIT_BRANCH"] || `git symbolic-ref -q HEAD`).chomp().gsub('refs/heads/', '').gsub('origin/', '')
 
 desc "Build a properties file used to trigger autodeploy builds"

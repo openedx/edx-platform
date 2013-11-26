@@ -161,7 +161,7 @@ class OrderTest(ModuleStoreTestCase):
         )
 
     @patch('shoppingcart.models.render_to_string')
-    @patch.dict(settings.MITX_FEATURES, {'STORE_BILLING_INFO': True})
+    @patch.dict(settings.FEATURES, {'STORE_BILLING_INFO': True})
     def test_billing_info_storage_on(self, render):
         cart = Order.get_cart_for_user(self.user)
         self.purchase_with_data(cart)
@@ -179,7 +179,7 @@ class OrderTest(ModuleStoreTestCase):
         self.assertTrue(context['has_billing_info'])
 
     @patch('shoppingcart.models.render_to_string')
-    @patch.dict(settings.MITX_FEATURES, {'STORE_BILLING_INFO': False})
+    @patch.dict(settings.FEATURES, {'STORE_BILLING_INFO': False})
     def test_billing_info_storage_off(self, render):
         cart = Order.get_cart_for_user(self.user)
         self.purchase_with_data(cart)
@@ -243,9 +243,9 @@ class OrderItemTest(TestCase):
 class PaidCourseRegistrationTest(ModuleStoreTestCase):
     def setUp(self):
         self.user = UserFactory.create()
-        self.course_id = "MITx/999/Robot_Super_Course"
+        self.course_id = "edX/999/Robot_Super_Course"
         self.cost = 40
-        self.course = CourseFactory.create(org='MITx', number='999', display_name='Robot Super Course')
+        self.course = CourseFactory.create(org='edX', number='999', display_name='Robot Super Course')
         self.course_mode = CourseMode(course_id=self.course_id,
                                       mode_slug="honor",
                                       mode_display_name="honor cert",
@@ -292,7 +292,7 @@ class PaidCourseRegistrationTest(ModuleStoreTestCase):
         """
         Add 2 courses to the order and make sure the instruction_set only contains 1 element (no dups)
         """
-        course2 = CourseFactory.create(org='MITx', number='998', display_name='Robot Duper Course')
+        course2 = CourseFactory.create(org='edX', number='998', display_name='Robot Duper Course')
         course_mode2 = CourseMode(course_id=course2.id,
                                   mode_slug="honor",
                                   mode_display_name="honor cert",

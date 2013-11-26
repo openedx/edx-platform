@@ -38,7 +38,7 @@
     <id>tag:www.edx.org,2013:Post/15</id>
     <published>2013-03-14T10:00:00-07:00</published>
     <updated>2013-03-14T10:00:00-07:00</updated>
-    <link type="text/html" rel="alternate" href="/courses/MITx/2.01x/2013_Spring/about"/>
+    <link type="text/html" rel="alternate" href="/courses/edX/2.01x/2013_Spring/about"/>
     <title>New mechanical engineering course open for enrollment</title>
     <content type="html">&lt;img src=&quot;${static.url('images/press/releases/201x_240x180.jpg')}&quot; /&gt;
         &lt;p&gt;&lt;/p&gt;</content>

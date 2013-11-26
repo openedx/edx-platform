@@ -37,7 +37,7 @@ class InternationalizationTest(ModuleStoreTestCase):
         self.user.save()
 
         self.course_data = {
-            'org': 'MITx',
+            'org': 'edX',
             'number': '999',
             'display_name': 'Robot Super Course',
         }

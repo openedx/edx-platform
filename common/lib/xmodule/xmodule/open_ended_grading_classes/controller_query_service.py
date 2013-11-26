@@ -106,11 +106,11 @@ class MockControllerQueryService(object):
         return combined_notifications
 
     def get_grading_status_list(self, *args, **kwargs):
-        grading_status_list = '{"version": 1, "problem_list": [{"problem_name": "Science Question -- Machine Assessed", "grader_type": "NA", "eta_available": true, "state": "Waiting to be Graded", "eta": 259200, "location": "i4x://MITx/oe101x/combinedopenended/Science_SA_ML"}, {"problem_name": "Humanities Question -- Peer Assessed", "grader_type": "NA", "eta_available": true, "state": "Waiting to be Graded", "eta": 259200, "location": "i4x://MITx/oe101x/combinedopenended/Humanities_SA_Peer"}], "success": true}'
+        grading_status_list = '{"version": 1, "problem_list": [{"problem_name": "Science Question -- Machine Assessed", "grader_type": "NA", "eta_available": true, "state": "Waiting to be Graded", "eta": 259200, "location": "i4x://edX/oe101x/combinedopenended/Science_SA_ML"}, {"problem_name": "Humanities Question -- Peer Assessed", "grader_type": "NA", "eta_available": true, "state": "Waiting to be Graded", "eta": 259200, "location": "i4x://edX/oe101x/combinedopenended/Humanities_SA_Peer"}], "success": true}'
         return grading_status_list
 
     def get_flagged_problem_list(self, *args, **kwargs):
-        flagged_problem_list = '{"version": 1, "success": false, "error": "No flagged submissions exist for course: MITx/oe101x/2012_Fall"}'
+        flagged_problem_list = '{"version": 1, "success": false, "error": "No flagged submissions exist for course: edX/oe101x/2012_Fall"}'
         return flagged_problem_list
 
     def take_action_on_flags(self, *args, **kwargs):

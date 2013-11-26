@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# File:  mitx/lib/loncapa/loncapa_check.py
+# File:  edX/lib/loncapa/loncapa_check.py
 #
 # Python functions which duplicate the standard comparison functions available to LON-CAPA problems.
 # Used in translating LON-CAPA problems to i4x problem specification language.

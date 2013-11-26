@@ -18,7 +18,7 @@ from shoppingcart.models import Order, CertificateItem, PaidCourseRegistration, 
 from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
 from course_modes.models import CourseMode
-from mitxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response
 from shoppingcart.processors import render_purchase_form_html
 from mock import patch, Mock
 
@@ -42,9 +42,9 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.user = UserFactory.create()
         self.user.set_password('password')
         self.user.save()
-        self.course_id = "MITx/999/Robot_Super_Course"
+        self.course_id = "edX/999/Robot_Super_Course"
         self.cost = 40
-        self.course = CourseFactory.create(org='MITx', number='999', display_name='Robot Super Course')
+        self.course = CourseFactory.create(org='edX', number='999', display_name='Robot Super Course')
         self.course_mode = CourseMode(course_id=self.course_id,
                                       mode_slug="honor",
                                       mode_display_name="honor cert",

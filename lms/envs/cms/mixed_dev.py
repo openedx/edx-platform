@@ -13,7 +13,7 @@ MODULESTORE = {
         'ENGINE': 'xmodule.modulestore.mixed.MixedModuleStore',
         'OPTIONS': {
             'mappings': {
-                'MITx/2.01x/2013_Spring': 'xml'
+                'edX/2.01x/2013_Spring': 'xml'
             },
             'stores': {
                 'xml': {
@@ -33,7 +33,7 @@ MODULESTORE = {
                     'OPTIONS': {
                         'default_class': 'xmodule.raw_module.RawDescriptor',
                         'fs_root': DATA_DIR,
-                        'render_template': 'mitxmako.shortcuts.render_to_string',
+                        'render_template': 'edxmako.shortcuts.render_to_string',
                     }
                 }
             },

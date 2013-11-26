@@ -19,7 +19,7 @@ from django.core.files.storage import get_storage_class
 from django.utils.translation import ugettext as _
 from django.contrib.auth.models import User
 
-from mitxmako.shortcuts import render_to_string
+from edxmako.shortcuts import render_to_string
 from courseware.courses import get_course_with_access, get_course_by_id
 from course_groups.cohorts import get_cohort_id, is_commentable_cohorted
 
