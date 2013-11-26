@@ -6,7 +6,7 @@
             </div>
             <form class="new-post-form">
                 <div class="form-row">
-                    <input type="text" class="new-post-title" name="title" placeholder="Title">
+                    <input type="text" class="new-post-title" name="title" placeholder="Заголовок">
                 </div>
                 <div class="form-row">
                     <div class="new-post-body" name="body" placeholder="Enter your question or comment&hellip;"></div>
@@ -16,16 +16,16 @@
                 {{!<div class="form-row">}}
                 {{!    <input type="text" class="new-post-tags" name="tags" placeholder="Tags">}}
                 {{!</div>}}
-                <input type="submit" class="submit" value="Add post">
-                <a href="#" class="new-post-cancel">Cancel</a>
+                <input type="submit" class="submit" value="Добавить запись">
+                <a href="#" class="new-post-cancel">Отменить</a>
                 <div class="options">
-                    <input type="checkbox" name="follow" class="discussion-follow" class="discussion-follow" id="new-post-follow" checked><label for="new-post-follow">follow this post</label>
+                    <input type="checkbox" name="follow" class="discussion-follow" class="discussion-follow" id="new-post-follow" checked><label for="new-post-follow">получать уведомления</label>
                     <br>
                     {{#allow_anonymous}}
-                        <input type="checkbox" name="anonymous" class="discussion-anonymous" id="new-post-anonymous"><label for="new-post-anonymous">post anonymously</label>
+                        <input type="checkbox" name="anonymous" class="discussion-anonymous" id="new-post-anonymous"><label for="new-post-anonymous">отправить анонимно</label>
                     {{/allow_anonymous}}
                     {{#allow_anonymous_to_peers}}
-                        <input type="checkbox" name="anonymous" class="discussion-anonymous-to-peers" id="new-post-anonymous-to-peers"><label for="new-post-anonymous-to-peers">post anonymously to classmates</label>
+                        <input type="checkbox" name="anonymous" class="discussion-anonymous-to-peers" id="new-post-anonymous-to-peers"><label for="new-post-anonymous-to-peers">анонимно для одноклассников</label>
                     {{/allow_anonymous_to_peers}}
                 </div>
             </form>

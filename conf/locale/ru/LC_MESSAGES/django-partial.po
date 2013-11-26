@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
-"POT-Creation-Date: 2013-11-21 09:56+0400\n"
+"POT-Creation-Date: 2013-11-26 10:43+0000\n"
 "PO-Revision-Date: 2013-11-21 10:11+0300\n"
 "Last-Translator: JK <korvin.lucky@gmail.com>\n"
 "Language-Team: Select LTD\n"
@@ -102,7 +102,7 @@ msgid "Courseware"
 msgstr "Курс"
 
 #: cms/djangoapps/contentstore/views/tabs.py:38
-#: lms/djangoapps/instructor/views/instructor_dashboard.py:104
+#: lms/djangoapps/instructor/views/instructor_dashboard.py:102
 msgid "Course Info"
 msgstr "Информация о курсе"
 
@@ -1015,7 +1015,7 @@ msgstr "Проверка"
 msgid "Final Check"
 msgstr "Последняя проверка"
 
-#: common/lib/xmodule/xmodule/capa_module.py:953
+#: common/lib/xmodule/xmodule/capa_module.py:950
 msgid "Error: {msg}"
 msgstr "Ошибка: {msg}"
 
@@ -2244,27 +2244,27 @@ msgstr ""
 msgid "Incomplete"
 msgstr "Загрузка завершена"
 
-#: lms/djangoapps/instructor/views/instructor_dashboard.py:136
+#: lms/djangoapps/instructor/views/instructor_dashboard.py:134
 msgid "Membership"
 msgstr "Членство"
 
-#: lms/djangoapps/instructor/views/instructor_dashboard.py:152
+#: lms/djangoapps/instructor/views/instructor_dashboard.py:150
 msgid "Student Admin"
 msgstr "Администратор студентов"
 
-#: lms/djangoapps/instructor/views/instructor_dashboard.py:167
+#: lms/djangoapps/instructor/views/instructor_dashboard.py:165
 msgid "Data Download"
 msgstr "Загрузка данных"
 
-#: lms/djangoapps/instructor/views/instructor_dashboard.py:189
+#: lms/djangoapps/instructor/views/instructor_dashboard.py:183
 msgid "Email"
 msgstr "Эл. почта"
 
-#: lms/djangoapps/instructor/views/instructor_dashboard.py:203
+#: lms/djangoapps/instructor/views/instructor_dashboard.py:197
 msgid "Analytics"
 msgstr "Аналитика"
 
-#: lms/djangoapps/instructor/views/legacy.py:585
+#: lms/djangoapps/instructor/views/legacy.py:583
 msgid "Found {number} record to dump"
 msgid_plural "Found {number} records to dump"
 msgstr[0] ""
@@ -2422,7 +2422,7 @@ msgstr ""
 msgid " (out of {total})"
 msgstr ""
 
-#: lms/djangoapps/open_ended_grading/staff_grading_service.py:281
+#: lms/djangoapps/open_ended_grading/staff_grading_service.py:282
 msgid ""
 "Cannot find any open response problems in this course.  Have you submitted "
 "answers to any open response assessment questions?  If not, please do so and "
@@ -2465,7 +2465,7 @@ msgid ""
 "point of contact."
 msgstr ""
 
-#: lms/djangoapps/open_ended_grading/utils.py:98
+#: lms/djangoapps/open_ended_grading/utils.py:100
 msgid "for course {0} and student {1}."
 msgstr "для курса {0} и студента {1}."
 
