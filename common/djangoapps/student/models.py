@@ -22,6 +22,9 @@ from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver, Signal
+import django.dispatch
+from django.forms import ModelForm, forms
+from django.core.exceptions import ObjectDoesNotExist
 
 from course_modes.models import CourseMode
 import lms.lib.comment_client as cc
@@ -37,6 +40,63 @@ unenroll_done = Signal(providing_args=["course_enrollment"])
 
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
+
+
+class AnonymousUserId(models.Model):
+    """
+    This table contains user, course_Id and anonymous_user_id
+
+    Purpose of this table is to provide user by anonymous_user_id.
+
+    We are generating anonymous_user_id using md5 algorithm, so resulting length will always be 16 bytes.
+    http://docs.python.org/2/library/md5.html#md5.digest_size
+    """
+    user = models.ForeignKey(User, db_index=True)
+    anonymous_user_id = models.CharField(unique=True, max_length=16)
+    course_id = models.CharField(db_index=True, max_length=255)
+    unique_together = (user, course_id)
+
+
+def anonymous_id_for_user(user, course_id):
+    """
+    Return a unique id for a (user, course) pair, suitable for inserting
+    into e.g. personalized survey links.
+
+    If user is an `AnonymousUser`, returns `None`
+    """
+    # This part is for ability to get xblock instance in xblock_noauth handlers, where user is unauthenticated.
+    if user.is_anonymous():
+        return None
+
+    # include the secret key as a salt, and to make the ids unique across different LMS installs.
+    hasher = hashlib.md5()
+    hasher.update(settings.SECRET_KEY)
+    hasher.update(str(user.id))
+    hasher.update(course_id)
+
+    return AnonymousUserId.objects.get_or_create(
+        defaults={'anonymous_user_id': hasher.hexdigest()},
+        user=user,
+        course_id=course_id
+    )[0].anonymous_user_id
+
+
+def user_by_anonymous_id(id):
+    """
+    Return user by anonymous_user_id using AnonymousUserId lookup table.
+
+    Do not raise `django.ObjectDoesNotExist` exception,
+    if there is no user for anonymous_student_id,
+    because this function will be used inside xmodule w/o django access.
+    """
+
+    if id is None:
+        return None
+
+    try:
+        return User.objects.get(anonymoususerid__anonymous_user_id=id)
+    except ObjectDoesNotExist:
+        return None
 
 
 class UserStanding(models.Model):
@@ -147,12 +207,9 @@ def unique_id_for_user(user):
     Return a unique id for a user, suitable for inserting into
     e.g. personalized survey links.
     """
-    # include the secret key as a salt, and to make the ids unique across
-    # different LMS installs.
-    h = hashlib.md5()
-    h.update(settings.SECRET_KEY)
-    h.update(str(user.id))
-    return h.hexdigest()
+    # Setting course_id to '' makes it not affect the generated hash,
+    # and thus produce the old per-student anonymous id
+    return anonymous_id_for_user(user, '')
 
 
 # TODO: Should be renamed to generic UserGroup, and possibly

@@ -88,7 +88,7 @@ class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
     """
     An XModule ModuleSystem for use in Studio previews
     """
-    def handler_url(self, block, handler_name, suffix='', query=''):
+    def handler_url(self, block, handler_name, suffix='', query='', thirdparty=False):
         return handler_prefix(block, handler_name, suffix) + '?' + query
 
 

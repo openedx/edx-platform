@@ -9,6 +9,10 @@ LMS: Add feature for providing background grade report generation via Celery
   instructor task, with reports uploaded to S3. Feature is visible on the beta
   instructor dashboard. LMS-58
 
+Blades: Added grading support for LTI module. LTI providers can now grade
+student's work and send edX scores. OAuth1 based authentication
+implemented. BLD-384.
+
 LMS: Beta-tester status is now set on a per-course-run basis, rather than being
   valid across all runs with the same course name. Old group membership will
   still work across runs, but new beta-testers will only be added to a single
@@ -39,7 +43,6 @@ LMS: Trap focus on the loading element when a user loads more threads
 in the forum sidebar to improve accessibility.
 
 LMS: Add error recovery when a user loads more threads in the forum sidebar.
->>>>>>> origin/master
 
 LMS: Add a user-visible alert modal when a forums AJAX request fails.
 

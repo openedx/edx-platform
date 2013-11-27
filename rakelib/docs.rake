@@ -32,7 +32,7 @@ task :showdocs, [:options] do |t, args|
     elsif args.options == 'data'
         path = "docs/data"
     else
-        path = "docs"
+        path = "docs/developers"
     end
 
     Launchy.open("#{path}/build/html/index.html")

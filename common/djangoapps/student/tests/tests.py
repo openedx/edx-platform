@@ -15,7 +15,7 @@ from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.test.client import RequestFactory
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AnonymousUser
 from django.contrib.auth.hashers import UNUSABLE_PASSWORD
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import int_to_base36
@@ -28,7 +28,7 @@ from courseware.tests.tests import TEST_DATA_MIXED_MODULESTORE
 from mock import Mock, patch, sentinel
 from textwrap import dedent
 
-from student.models import unique_id_for_user, CourseEnrollment
+from student.models import anonymous_id_for_user, user_by_anonymous_id, CourseEnrollment, unique_id_for_user
 from student.views import (process_survey_link, _cert_info, password_reset, password_reset_confirm_wrapper,
                            change_enrollment, complete_course_mode_info)
 from student.tests.factories import UserFactory, CourseModeFactory
@@ -522,3 +522,37 @@ class PaidRegistrationTest(ModuleStoreTestCase):
         self.assertEqual(response.content, reverse('shoppingcart.views.show_cart'))
         self.assertTrue(shoppingcart.models.PaidCourseRegistration.contained_in_order(
             shoppingcart.models.Order.get_cart_for_user(self.user), self.course.id))
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class AnonymousLookupTable(TestCase):
+    """
+    Tests for anonymous_id_functions
+    """
+    # arbitrary constant
+    COURSE_SLUG = "100"
+    COURSE_NAME = "test_course"
+    COURSE_ORG = "EDX"
+
+    def setUp(self):
+        self.course = CourseFactory.create(org=self.COURSE_ORG, display_name=self.COURSE_NAME, number=self.COURSE_SLUG)
+        self.assertIsNotNone(self.course)
+        self.user = UserFactory()
+        CourseModeFactory.create(
+            course_id=self.course.id,
+            mode_slug='honor',
+            mode_display_name='Honor Code',
+        )
+        patcher = patch('student.models.server_track')
+        self.mock_server_track = patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def test_for_unregistered_user(self):  # same path as for logged out user
+        self.assertEqual(None, anonymous_id_for_user(AnonymousUser(), self.course.id))
+        self.assertIsNone(user_by_anonymous_id(None))
+
+    def test_roundtrip_for_logged_user(self):
+        enrollment = CourseEnrollment.enroll(self.user, self.course.id)
+        anonymous_id = anonymous_id_for_user(self.user, self.course.id)
+        real_user = user_by_anonymous_id(anonymous_id)
+        self.assertEqual(self.user, real_user)
