@@ -42,6 +42,7 @@ import hashlib
 import base64
 import urllib
 import textwrap
+import json
 from lxml import etree
 from webob import Response
 import mock
@@ -252,9 +253,26 @@ class LTIModule(LTIFields, XModule):
             'element_class': self.category,
             'open_in_a_new_page': self.open_in_a_new_page,
             'display_name': self.display_name,
+            'ajax_url': self.system.ajax_url,
         }
 
         return self.system.render_template('lti.html', context)
+
+    def handle_ajax(self, dispatch, data):
+        """Ajax handler.
+
+        Args:
+            dispatch: string request slug
+            data: dict request data parameters
+
+        Returns:
+            json string
+        """
+        if dispatch == 'regenerate_signature':
+            return json.dumps({'status': 'OK'
+                               })
+        else:  # return error message
+            return json.dumps({'error': 'Unknown Command!'})
 
     def get_user_id(self):
         user_id = self.runtime.anonymous_student_id

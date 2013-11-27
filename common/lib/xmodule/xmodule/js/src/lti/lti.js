@@ -37,7 +37,7 @@ window.LTI = (function () {
     //
     // @return    undefined
     function initialize(element) {
-        var form, openInANewPage, formAction;
+        var form, openInANewPage, formAction, ajaxUrl, newSignature;
 
         // In cms (Studio) the element is already a jQuery object. In lms it is
         // a DOM object.
@@ -63,6 +63,26 @@ window.LTI = (function () {
         openInANewPage = element.find('.lti').data('open_in_a_new_page');
         openInANewPage = JSON.parse(openInANewPage);
 
+        ajaxUrl = element.find('.lti').data('ajax_url');
+        console.log('[initialize]: ajaxUrl = "' + ajaxUrl + '".');
+
+        newSignature = true;
+
+        form.on('submit', function (event) {
+            if (newSignature) {
+                console.log('[initialize]: Signature is new.');
+                newSignature = false;
+
+                return true;
+            }
+
+            console.log('[initialize]: Signature is OLD.');
+            event.preventDefault();
+            getNewSignature();
+
+            return false;
+        });
+
         // If the Form's action attribute is set (i.e. we can perform a normal
         // submit), then we (depending on instance settings) submit the form
         // when user will click on a link, or submit the form immediately.
@@ -77,6 +97,27 @@ window.LTI = (function () {
             //
             // Best case scenario is that `openInANewPage` is set to `true`.
             form.submit();
+        }
+
+        return;
+
+        function getNewSignature() {
+            console.log('[getNewSignature]: Getting new signature.');
+
+            $.postWithPrefix(
+                ajaxUrl + '/regenerate_signature',  {},
+                function (response) {
+                    console.log('[getNewSignature]: success! response = ');
+                    console.log(response);
+
+                    if (response && response.status && response.status === 'OK') {
+                        console.log('[getNewSignature]: re-submitting form.');
+                        newSignature = true;
+
+                        form.trigger('submit');
+                    }
+                }
+            );
         }
     }
 
