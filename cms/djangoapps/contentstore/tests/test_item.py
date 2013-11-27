@@ -9,6 +9,7 @@ from xmodule.capa_module import CapaDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.django import loc_mapper
 from xmodule.modulestore.locator import BlockUsageLocator
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 
 class ItemTest(CourseTestCase):
@@ -30,7 +31,7 @@ class ItemTest(CourseTestCase):
         """
         Get the item referenced by the locator from the modulestore
         """
-        store = modulestore('draft') if draft else modulestore()
+        store = modulestore('draft') if draft else modulestore('direct')
         return store.get_item(self.get_old_id(locator))
 
     def response_locator(self, response):
@@ -251,3 +252,105 @@ class TestEditItem(ItemTest):
         self.assertEqual(self.get_old_id(self.problem_locator).url(), children[0])
         self.assertEqual(self.get_old_id(unit1_locator).url(), children[2])
         self.assertEqual(self.get_old_id(unit2_locator).url(), children[1])
+
+    def test_make_public(self):
+        """ Test making a private problem public (publishing it). """
+        # When the problem is first created, it is only in draft (because of its category).
+        with self.assertRaises(ItemNotFoundError):
+            self.get_item_from_modulestore(self.problem_locator, False)
+        self.client.ajax_post(
+            self.problem_update_url,
+            data={'publish': 'make_public'}
+        )
+        self.assertIsNotNone(self.get_item_from_modulestore(self.problem_locator, False))
+
+    def test_make_private(self):
+        """ Test making a public problem private (un-publishing it). """
+        # Make problem public.
+        self.client.ajax_post(
+            self.problem_update_url,
+            data={'publish': 'make_public'}
+        )
+        self.assertIsNotNone(self.get_item_from_modulestore(self.problem_locator, False))
+        # Now make it private
+        self.client.ajax_post(
+            self.problem_update_url,
+            data={'publish': 'make_private'}
+        )
+        with self.assertRaises(ItemNotFoundError):
+            self.get_item_from_modulestore(self.problem_locator, False)
+
+    def test_make_draft(self):
+        """ Test creating a draft version of a public problem. """
+        # Make problem public.
+        self.client.ajax_post(
+            self.problem_update_url,
+            data={'publish': 'make_public'}
+        )
+        self.assertIsNotNone(self.get_item_from_modulestore(self.problem_locator, False))
+        # Now make it draft, which means both versions will exist.
+        self.client.ajax_post(
+            self.problem_update_url,
+            data={'publish': 'create_draft'}
+        )
+        # Update the draft version and check that published is different.
+        self.client.ajax_post(
+            self.problem_update_url,
+            data={'metadata': {'due': '2077-10-10T04:00Z'}}
+        )
+        published = self.get_item_from_modulestore(self.problem_locator, False)
+        self.assertIsNone(published.due)
+        draft = self.get_item_from_modulestore(self.problem_locator, True)
+        self.assertEqual(draft.due, datetime.datetime(2077, 10, 10, 4, 0, tzinfo=UTC))
+
+    def test_make_public_with_update(self):
+        """ Update a problem and make it public at the same time. """
+        self.client.ajax_post(
+            self.problem_update_url,
+            data={
+                'metadata': {'due': '2077-10-10T04:00Z'},
+                'publish': 'make_public'
+            }
+        )
+        published = self.get_item_from_modulestore(self.problem_locator, False)
+        self.assertEqual(published.due, datetime.datetime(2077, 10, 10, 4, 0, tzinfo=UTC))
+
+    def test_make_private_with_update(self):
+        """ Make a problem private and update it at the same time. """
+        # Make problem public.
+        self.client.ajax_post(
+            self.problem_update_url,
+            data={'publish': 'make_public'}
+        )
+        self.client.ajax_post(
+            self.problem_update_url,
+            data={
+                'metadata': {'due': '2077-10-10T04:00Z'},
+                'publish': 'make_private'
+            }
+        )
+        with self.assertRaises(ItemNotFoundError):
+            self.get_item_from_modulestore(self.problem_locator, False)
+        draft = self.get_item_from_modulestore(self.problem_locator, True)
+        self.assertEqual(draft.due, datetime.datetime(2077, 10, 10, 4, 0, tzinfo=UTC))
+
+    def test_create_draft_with_update(self):
+        """ Create a draft and update it at the same time. """
+        # Make problem public.
+        self.client.ajax_post(
+            self.problem_update_url,
+            data={'publish': 'make_public'}
+        )
+        self.assertIsNotNone(self.get_item_from_modulestore(self.problem_locator, False))
+        # Now make it draft, which means both versions will exist.
+        self.client.ajax_post(
+            self.problem_update_url,
+            data={
+                'metadata': {'due': '2077-10-10T04:00Z'},
+                'publish': 'create_draft'
+            }
+        )
+        published = self.get_item_from_modulestore(self.problem_locator, False)
+        self.assertIsNone(published.due)
+        draft = self.get_item_from_modulestore(self.problem_locator, True)
+        self.assertEqual(draft.due, datetime.datetime(2077, 10, 10, 4, 0, tzinfo=UTC))

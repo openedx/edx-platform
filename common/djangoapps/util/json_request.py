@@ -1,5 +1,4 @@
 from functools import wraps
-import copy
 import json
 from django.core.serializers import serialize
 from django.core.serializers.json import DjangoJSONEncoder

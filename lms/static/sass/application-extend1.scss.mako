@@ -46,7 +46,6 @@
 @import 'multicourse/home';
 @import 'multicourse/dashboard';
 @import 'multicourse/account';
-@import 'multicourse/testcenter-register';
 @import 'multicourse/courses';
 @import 'multicourse/course_about';
 @import 'multicourse/jobs';

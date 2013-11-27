@@ -13,9 +13,36 @@ Blades: Added grading support for LTI module. LTI providers can now grade
 student's work and send edX scores. OAuth1 based authentication
 implemented. BLD-384.
 
-LMS: Beta-tester status is now set on a per-course-run basis, rather than being valid
-  across all runs with the same course name. Old group membership will still work
-  across runs, but new beta-testers will only be added to a single course run.
+LMS: Beta-tester status is now set on a per-course-run basis, rather than being
+  valid across all runs with the same course name. Old group membership will
+  still work across runs, but new beta-testers will only be added to a single
+  course run.
+
+Blades: Enabled several Video Jasmine tests. BLD-463.
+
+Studio: Continued modification of Studio pages to follow a RESTful framework.
+includes Settings pages, edit page for Subsection and Unit, and interfaces
+for updating xblocks (xmodules) and getting their editing HTML.
+
+Blades: Put 2nd "Hide output" button at top of test box & increase text size for
+code response questions. BLD-126.
+
+Blades: Update the calculator hints tooltip with full information. BLD-400.
+
+Blades: Fix transcripts 500 error in studio (BLD-530)
+
+LMS: Add error recovery when a user loads or switches pages in an
+inline discussion.
+
+Blades: Allow multiple strings as the correct answer to a string response
+question. BLD-474.
+
+Blades: a11y - Videos will alert screenreaders when the video is over.
+
+LMS: Trap focus on the loading element when a user loads more threads
+in the forum sidebar to improve accessibility.
+
+LMS: Add error recovery when a user loads more threads in the forum sidebar.
 
 LMS: Add a user-visible alert modal when a forums AJAX request fails.
 
@@ -36,7 +63,8 @@ text like with bold or italics. (BLD-449)
 LMS: Beta instructor dashboard will only count actively enrolled students for
 course enrollment numbers.
 
-Blades: Fix speed menu that is not rendered correctly when YouTube is unavailable. (BLD-457).
+Blades: Fix speed menu that is not rendered correctly when YouTube is
+unavailable. (BLD-457).
 
 LMS: Users with is_staff=True no longer have the STAFF label appear on
 their forum posts.
@@ -54,6 +82,9 @@ key in course settings. (BLD-426)
 
 Blades: Fix bug when the speed can only be changed when the video is playing.
 
+LMS: The dialogs on the wiki "changes" page are now accessible to screen
+readers.  Now all wiki pages have been made accessible. (LMS-1337)
+
 LMS: Change bulk email implementation to use less memory, and to better handle
 duplicate tasks in celery.
 
@@ -70,8 +101,8 @@ client error are correctly passed through to the client.
 LMS: Improve performance of page load and thread list load for
 discussion tab
 
-LMS: The wiki markup cheatsheet dialog is now accessible to people with
-disabilites.  (LMS-1303)
+LMS: The wiki markup cheatsheet dialog is now accessible to screen readers.
+(LMS-1303)
 
 Common: Add skip links for accessibility to CMS and LMS. (LMS-1311)
 
