@@ -47,7 +47,7 @@ OrderItemSubclassPK = namedtuple('OrderItemSubclassPK', ['cls', 'pk'])  # pylint
 class Order(models.Model):
     """
     This is the model for an order.  Before purchase, an Order and its related OrderItems are used
-    as the shopping cart.
+    as the shopping cart. 
     FOR ANY USER, THERE SHOULD ONLY EVER BE ZERO OR ONE ORDER WITH STATUS='cart'.
     """
     user = models.ForeignKey(User, db_index=True)
