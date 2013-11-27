@@ -456,6 +456,7 @@ class CertificateItemTest(ModuleStoreTestCase):
         CourseEnrollment.unenroll(self.user, self.course_id)
         target_certs = CertificateItem.objects.filter(course_id=self.course_id, user_id=self.user, status='refunded', mode='verified')
         self.assertTrue(target_certs[0])
+        self.assertTrue(target_certs[0].refund_requested_time)
         self.assertEquals(target_certs[0].order.status, 'refunded')
 
     def test_refund_cert_callback_before_expiration(self):
@@ -479,6 +480,7 @@ class CertificateItemTest(ModuleStoreTestCase):
         CourseEnrollment.unenroll(self.user, course_id)
         target_certs = CertificateItem.objects.filter(course_id=course_id, user_id=self.user, status='refunded', mode='verified')
         self.assertTrue(target_certs[0])
+        self.assertTrue(target_certs[0].refund_requested_time)
         self.assertEquals(target_certs[0].order.status, 'refunded')
 
     @patch('shoppingcart.models.log.error')

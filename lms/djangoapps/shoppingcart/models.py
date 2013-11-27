@@ -54,6 +54,7 @@ class Order(models.Model):
     currency = models.CharField(default="usd", max_length=8)  # lower case ISO currency codes
     status = models.CharField(max_length=32, default='cart', choices=ORDER_STATUSES)
     purchase_time = models.DateTimeField(null=True, blank=True)
+    refunded_time = models.DateTimeField(null=True, blank=True)
     # Now we store data needed to generate a reasonable receipt
     # These fields only make sense after the purchase
     bill_to_first = models.CharField(max_length=64, blank=True)
@@ -208,6 +209,7 @@ class OrderItem(models.Model):
     line_desc = models.CharField(default="Misc. Item", max_length=1024)
     currency = models.CharField(default="usd", max_length=8)  # lower case ISO currency codes
     fulfilled_time = models.DateTimeField(null=True)
+    refund_requested_time = models.DateTimeField(null=True)
     # general purpose field, not user-visible.  Used for reporting
     report_comments = models.TextField(default="")
 
@@ -509,6 +511,7 @@ class CertificateItem(OrderItem):
             log.error("Matching CertificateItem not found while trying to refund.  User %s, Course %s", course_enrollment.user, course_enrollment.course_id)
             return
         target_cert.status = 'refunded'
+        target_cert.refund_requested_time = datetime.now(pytz.utc)
         target_cert.save()
         target_cert.order.status = 'refunded'
         target_cert.order.save()
