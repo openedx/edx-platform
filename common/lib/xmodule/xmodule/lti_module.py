@@ -177,11 +177,7 @@ class LTIModule(LTIFields, XModule):
     css = {'scss': [resource_string(__name__, 'css/lti/lti.scss')]}
     js_module_name = "LTI"
 
-    def get_html(self):
-        """
-        Renders parameters to template.
-        """
-
+    def get_input_fields(self):
         # LTI provides a list of default parameters that might be passed as
         # part of the POST data. These parameters should not be prefixed.
         # Likewise, The creator of an LTI link can add custom key/value parameters
@@ -239,13 +235,19 @@ class LTIModule(LTIFields, XModule):
 
             custom_parameters[unicode(param_name)] = unicode(param_value)
 
-        input_fields = self.oauth_params(
+        return self.oauth_params(
             custom_parameters,
             client_key,
             client_secret,
         )
+
+    def get_html(self):
+        """
+        Renders parameters to template.
+        """
+
         context = {
-            'input_fields': input_fields,
+            'input_fields': self.get_input_fields(),
 
             # These parameters do not participate in OAuth signing.
             'launch_url': self.launch_url.strip(),
@@ -269,8 +271,10 @@ class LTIModule(LTIFields, XModule):
             json string
         """
         if dispatch == 'regenerate_signature':
-            return json.dumps({'status': 'OK'
-                               })
+            return json.dumps({
+                'status': 'OK',
+                'input_fields': self.get_input_fields(),
+            })
         else:  # return error message
             return json.dumps({'error': 'Unknown Command!'})
 

@@ -110,9 +110,25 @@ window.LTI = (function () {
                     console.log('[getNewSignature]: success! response = ');
                     console.log(response);
 
-                    if (response && response.status && response.status === 'OK') {
+                    if (
+                        response &&
+                        response.status &&
+                        response.status === 'OK' &&
+                        response.input_fields &&
+                        $.isPlainObject(response.input_fields)
+                    ) {
                         console.log('[getNewSignature]: re-submitting form.');
                         newSignature = true;
+
+                        $.each(response.input_fields, function (name, value) {
+                            var inputEl = form.find("input[name='" + name + "']");
+
+                            console.log('[getNewSignature]: name = ' + name + ', value = ' + value);
+                            console.log('[getNewSignature]: inputEl = ', inputEl);
+                            console.log('');
+
+                            inputEl.val(value);
+                        });
 
                         form.trigger('submit');
                     }
