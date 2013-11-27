@@ -60,9 +60,29 @@ def unquote_slashes(text):
 
 def handler_url(course_id, block, handler, suffix='', query=''):
     """
-    Return an xblock handler url for the specified course, block and handler
+    Return an XBlock handler url for the specified course, block and handler.
+
+    If handler is an empty string, this function is being used to create a
+    prefix of the general URL, which is assumed to be followed by handler name
+    and suffix.
+
+    If handler is specified, then it is checked for being a valid handler
+    function, and ValueError is raised if not.
+
     """
-    return reverse('xblock_handler', kwargs={
+    view_name = 'xblock_handler'
+    if handler:
+        # Be sure this is really a handler.
+        func = getattr(block, handler, None)
+        if not func:
+            raise ValueError("{!r} is not a function name".format(handler))
+        if not getattr(func, "_is_xblock_handler", False):
+            raise ValueError("{!r} is not a handler name".format(handler))
+
+        if getattr(func, "_is_unauthenticated", False):
+            view_name = 'xblock_handler_noauth'
+
+    return reverse(view_name, kwargs={
         'course_id': course_id,
         'usage_id': quote_slashes(str(block.scope_ids.usage_id)),
         'handler': handler,
@@ -72,8 +92,11 @@ def handler_url(course_id, block, handler, suffix='', query=''):
 
 def handler_prefix(course_id, block):
     """
-    Returns a prefix for use by the javascript handler_url function.
-    The prefix is a valid handler url the handler name is appended to it.
+    Returns a prefix for use by the Javascript handler_url function.
+
+    The prefix is a valid handler url after the handler name is slash-appended
+    to it.
+
     """
     return handler_url(course_id, block, '').rstrip('/')
 

@@ -482,6 +482,14 @@ def xqueue_callback(request, course_id, userid, mod_id, dispatch):
     return HttpResponse("")
 
 
+@csrf_exempt
+def handle_xblock_callback_noauth(request, course_id, usage_id, handler, suffix=None):
+    """
+    Entry point for unauthenticated XBlock handlers.
+    """
+    return _invoke_xblock_handler(request, course_id, usage_id, handler, suffix)
+
+
 def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
     """
     Generic view for extensions. This is where AJAX calls go.
@@ -497,14 +505,22 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
     not accessible by the user, or the module raises NotFoundError. If the
     module raises any other error, it will escape this function.
     """
+    if not request.user.is_authenticated():
+        raise PermissionDenied
+
+    return _invoke_xblock_handler(request, course_id, usage_id, handler, suffix)
+
+
+def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix):
+    """
+    Invoke an XBlock handler, either authenticated or not.
+
+    """
     location = unquote_slashes(usage_id)
 
     # Check parameters and fail fast if there's a problem
     if not Location.is_valid(location):
         raise Http404("Invalid location")
-
-    if not request.user.is_authenticated():
-        raise PermissionDenied
 
     # Check submitted files
     files = request.FILES or {}

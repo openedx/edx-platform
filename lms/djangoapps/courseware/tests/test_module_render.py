@@ -185,9 +185,11 @@ class TestHandleXBlockCallback(ModuleStoreTestCase, LoginEnrollmentTestCase):
         return mock_file
 
     def test_invalid_location(self):
+        request = self.request_factory.post('dummy_url', data={'position': 1})
+        request.user = self.mock_user
         with self.assertRaises(Http404):
             render.handle_xblock_callback(
-                None,
+                request,
                 'dummy/course/id',
                 'invalid Location',
                 'dummy_handler'
