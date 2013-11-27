@@ -197,6 +197,7 @@ class CombinedOpenEndedV1Module():
                     instance_state=task_state,
                 )
                 #Loop through each attempt of the task and see if it is valid.
+                task_scores_normalized = False
                 for attempt in task.child_history:
                     if "post_assessment" not in attempt:
                         continue
@@ -214,8 +215,11 @@ class CombinedOpenEndedV1Module():
                         break
                     # In the case of ML grading check if aggregate score is consistent with rubric scores.
                     if tag_name == "openended":
-                        if task.attempt_score_needed_consistency(attempt, self.system):
-                            task_states[task_index] = task.get_instance_state()
+                        attempt_score_normalized = task.normalize_attempt_scores(attempt, self.system)
+                        task_scores_normalized = attempt_score_normalized or task_scores_normalized
+
+                if task_scores_normalized:
+                    task_states[task_index] = task.get_instance_state()
 
                 #See if we can properly render the task.  Will go into the exception clause below if not.
                 task.get_html(self.system)

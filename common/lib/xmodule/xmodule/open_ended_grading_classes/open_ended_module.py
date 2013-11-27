@@ -738,7 +738,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         html = system.render_template('{0}/open_ended.html'.format(self.TEMPLATE_DIR), context)
         return html
 
-    def attempt_score_needed_consistency(self, attempt, system):
+    def normalize_attempt_scores(self, attempt, system):
         """
         Return true if attempt score has been updated to be equal to sum of rubric scores.
 
