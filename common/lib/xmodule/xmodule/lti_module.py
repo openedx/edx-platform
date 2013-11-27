@@ -259,12 +259,8 @@ class LTIModule(LTIFields, XModule):
             'element_class': self.category,
             'open_in_a_new_page': self.open_in_a_new_page,
             'display_name': self.display_name,
-            'form_url': self.get_form_path(),
+            'form_url': self.runtime.handler_url(self, 'preview_handler').rstrip('/?'),
         }
-
-
-    def get_form_path(self):
-        return  self.runtime.handler_url(self, 'preview_handler').rstrip('/?')
 
     def get_html(self):
         """
@@ -272,24 +268,13 @@ class LTIModule(LTIFields, XModule):
         """
         return self.system.render_template('lti.html', self.get_context())
 
-    def get_form(self):
-        """
-        Renders parameters to form template.
-        """
-        return self.system.render_template('lti_form.html', self.get_context())
-
     @XBlock.handler
-    def preview_handler(self, request, dispatch):
+    def preview_handler(self, _, __):
         """
-        Ajax handler.
-
-        Args:
-            dispatch: string request slug
-
-        Returns:
-            json string
+        This is called to get context with new oauth params to iframe.
         """
-        return Response(self.get_form(), content_type='text/html')
+        template = self.system.render_template('lti_form.html', self.get_context())
+        return Response(template, content_type='text/html')
 
     def get_user_id(self):
         user_id = self.runtime.anonymous_student_id
@@ -299,11 +284,18 @@ class LTIModule(LTIFields, XModule):
     def get_outcome_service_url(self):
         """
         Return URL for storing grades.
+
+        To test LTI on sandbox we must use http scheme.
+
+        While testing locally and on Jenkins, mock_lti_server use http.referer
+        to obtain scheme, so it is ok to have http(s) anyway.
         """
-        uri = 'http://{host}{path}'.format(
-                host=self.system.hostname,
-                path=self.runtime.handler_url(self, 'grade_handler', thirdparty=True).rstrip('/?')
-            )
+        scheme = 'http' if 'sandbox' in self.system.hostname else 'https'
+        uri = '{scheme}://{host}{path}'.format(
+            scheme=scheme,
+            host=self.system.hostname,
+            path=self.runtime.handler_url(self, 'grade_handler', thirdparty=True).rstrip('/?')
+        )
         return uri
 
     def get_resource_link_id(self):
@@ -449,7 +441,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
 
         Example of correct/incorrect answer XML body:: see response_xml_template.
         """
-        response_xml_template = textwrap.dedent("""
+        response_xml_template = textwrap.dedent("""\
             <?xml version="1.0" encoding="UTF-8"?>
             <imsx_POXEnvelopeResponse xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
                 <imsx_POXHeader>
@@ -578,7 +570,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
 
         sha1 = hashlib.sha1()
         sha1.update(request.body)
-        oauth_body_hash = base64.b64encode(sha1.hexdigest())
+        oauth_body_hash = base64.b64encode(sha1.digest())
 
         oauth_params = signature.collect_parameters(headers=headers, exclude_oauth_signature=False)
         oauth_headers =dict(oauth_params)
