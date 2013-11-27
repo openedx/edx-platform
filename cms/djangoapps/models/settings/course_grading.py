@@ -18,11 +18,11 @@ class CourseGradingModel(object):
         self.grace_period = CourseGradingModel.convert_set_grace_period(course_descriptor)
 
     @classmethod
-    def fetch(cls, course_location):
+    def fetch(cls, course_locator):
         """
         Fetch the course grading policy for the given course from persistence and return a CourseGradingModel.
         """
-        course_old_location = loc_mapper().translate_locator_to_location(course_location)
+        course_old_location = loc_mapper().translate_locator_to_location(course_locator)
         descriptor = get_modulestore(course_old_location).get_item(course_old_location)
 
         model = cls(descriptor)
@@ -52,12 +52,12 @@ class CourseGradingModel(object):
                     }
 
     @staticmethod
-    def update_from_json(course_location, jsondict):
+    def update_from_json(course_locator, jsondict):
         """
         Decode the json into CourseGradingModel and save any changes. Returns the modified model.
         Probably not the usual path for updates as it's too coarse grained.
         """
-        course_old_location = loc_mapper().translate_locator_to_location(course_location)
+        course_old_location = loc_mapper().translate_locator_to_location(course_locator)
         descriptor = get_modulestore(course_old_location).get_item(course_old_location)
 
         graders_parsed = [CourseGradingModel.parse_grader(jsonele) for jsonele in jsondict['graders']]
@@ -69,9 +69,9 @@ class CourseGradingModel(object):
             course_old_location, descriptor.get_explicitly_set_fields_by_scope(Scope.content)
         )
 
-        CourseGradingModel.update_grace_period_from_json(course_location, jsondict['grace_period'])
+        CourseGradingModel.update_grace_period_from_json(course_locator, jsondict['grace_period'])
 
-        return CourseGradingModel.fetch(course_location)
+        return CourseGradingModel.fetch(course_locator)
 
     @staticmethod
     def update_grader_from_json(course_location, grader):

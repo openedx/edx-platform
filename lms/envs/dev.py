@@ -254,9 +254,6 @@ MITX_FEATURES['RESTRICT_ENROLL_BY_REG_METHOD'] = True
 
 PIPELINE_SASS_ARGUMENTS = '--debug-info --require {proj_dir}/static/sass/bourbon/lib/bourbon.rb'.format(proj_dir=PROJECT_ROOT)
 
-########################## PEARSON TESTING ###########################
-MITX_FEATURES['ENABLE_PEARSON_LOGIN'] = False
-
 ########################## ANALYTICS TESTING ########################
 
 ANALYTICS_SERVER_URL = "http://127.0.0.1:9000/"

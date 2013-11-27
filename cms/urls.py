@@ -23,13 +23,6 @@ urlpatterns = patterns('',  # nopep8
     url(r'^preview/xblock/(?P<usage_id>.*?)/handler/(?P<handler>[^/]*)(?:/(?P<suffix>[^/]*))?$',
         'contentstore.views.preview_handler', name='preview_handler'),
 
-    # This is the URL to initially render the course advanced settings.
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/settings-advanced/(?P<name>[^/]+)$',
-        'contentstore.views.course_config_advanced_page', name='course_advanced_settings'),
-    # This is the URL used by BackBone for updating and re-fetching the model.
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/settings-advanced/(?P<name>[^/]+)/update.*$',
-        'contentstore.views.course_advanced_updates', name='course_advanced_settings_updates'),
-
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/textbooks/(?P<name>[^/]+)$',
         'contentstore.views.textbook_index', name='textbook_index'),
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/textbooks/(?P<name>[^/]+)/new$',
@@ -95,6 +88,7 @@ urlpatterns += patterns(
     url(r'(?ix)^tabs/{}$'.format(parsers.URL_RE_SOURCE), 'tabs_handler'),
     url(r'(?ix)^settings/details/{}$'.format(parsers.URL_RE_SOURCE), 'settings_handler'),
     url(r'(?ix)^settings/grading/{}(/)?(?P<grader_index>\d+)?$'.format(parsers.URL_RE_SOURCE), 'grading_handler'),
+    url(r'(?ix)^settings/advanced/{}$'.format(parsers.URL_RE_SOURCE), 'advanced_settings_handler'),
 )
 
 js_info_dict = {

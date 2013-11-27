@@ -79,6 +79,9 @@ key in course settings. (BLD-426)
 
 Blades: Fix bug when the speed can only be changed when the video is playing.
 
+LMS: The dialogs on the wiki "changes" page are now accessible to screen
+readers.  Now all wiki pages have been made accessible. (LMS-1337)
+
 LMS: Change bulk email implementation to use less memory, and to better handle
 duplicate tasks in celery.
 
@@ -95,8 +98,8 @@ client error are correctly passed through to the client.
 LMS: Improve performance of page load and thread list load for
 discussion tab
 
-LMS: The wiki markup cheatsheet dialog is now accessible to people with
-disabilites.  (LMS-1303)
+LMS: The wiki markup cheatsheet dialog is now accessible to screen readers.
+(LMS-1303)
 
 Common: Add skip links for accessibility to CMS and LMS. (LMS-1311)
 

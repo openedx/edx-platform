@@ -53,30 +53,33 @@ Feature: CMS.Video Component
     Then Captions become "invisible"
 
   # 8
-  Scenario: Open captions never become invisible
-    Given I have created a Video component with subtitles
-    And Make sure captions are open
-    Then Captions are "visible"
-    And I hover over button "CC"
-    Then Captions are "visible"
-    And I hover over button "volume"
-    Then Captions are "visible"
+  # Disabled 11/26 due to flakiness in master
+  #Scenario: Open captions never become invisible
+  #  Given I have created a Video component with subtitles
+  #  And Make sure captions are open
+  #  Then Captions are "visible"
+  #  And I hover over button "CC"
+  #  Then Captions are "visible"
+  #  And I hover over button "volume"
+  #  Then Captions are "visible"
 
   # 9
-  Scenario: Closed captions are invisible when mouse doesn't hover on CC button
-    Given I have created a Video component with subtitles
-    And Make sure captions are closed
-    Then Captions become "invisible"
-    And I hover over button "volume"
-    Then Captions are "invisible"
+  # Disabled 11/26 due to flakiness in master
+  #Scenario: Closed captions are invisible when mouse doesn't hover on CC button
+  #  Given I have created a Video component with subtitles
+  #  And Make sure captions are closed
+  #  Then Captions become "invisible"
+  #  And I hover over button "volume"
+  #  Then Captions are "invisible"
 
   # 10
-  Scenario: When enter key is pressed on a caption shows an outline around it
-    Given I have created a Video component with subtitles
-    And Make sure captions are opened
-    Then I focus on caption line with data-index "0"
-    Then I press "enter" button on caption line with data-index "0"
-    And I see caption line with data-index "0" has class "focused"
+  # Disabled 11/26 due to flakiness in master
+  #Scenario: When enter key is pressed on a caption shows an outline around it
+  #  Given I have created a Video component with subtitles
+  #  And Make sure captions are opened
+  #  Then I focus on caption line with data-index "0"
+  #  Then I press "enter" button on caption line with data-index "0"
+  #  And I see caption line with data-index "0" has class "focused"
 
   # 11
   Scenario: When start end end times are specified, a range on slider is shown
