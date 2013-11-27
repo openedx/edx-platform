@@ -27,9 +27,9 @@ from xmodule.progress import Progress
 from xmodule.tests.test_util_open_ended import (
     DummyModulestore, TEST_STATE_SA_IN,
     MOCK_INSTANCE_STATE, TEST_STATE_SA, TEST_STATE_AI, TEST_STATE_AI2, TEST_STATE_AI2_INVALID,
-    TEST_STATE_SINGLE, TEST_STATE_PE_SINGLE, MockUploadedFile, MOCK_INSTANCE_INCONSISTENT_STATE,
-    MOCK_INSTANCE_INCONSISTENT_STATE2, MOCK_INSTANCE_INCONSISTENT_STATE3, MOCK_INSTANCE_INCONSISTENT_STATE4,
-    MOCK_INSTANCE_INCONSISTENT_STATE5
+    TEST_STATE_SINGLE, TEST_STATE_PE_SINGLE, MockUploadedFile, INSTANCE_INCONSISTENT_STATE,
+    INSTANCE_INCONSISTENT_STATE2, INSTANCE_INCONSISTENT_STATE3, INSTANCE_INCONSISTENT_STATE4,
+    INSTANCE_INCONSISTENT_STATE5
 )
 
 from xblock.field_data import DictFieldData
@@ -723,6 +723,9 @@ class CombinedOpenEndedModuleConsistencyTest(unittest.TestCase):
     """
     Unit tests for the combined open ended xmodule rubric scores consistency.
     """
+
+    # location, definition_template, prompt, rubric, max_score, metadata, oeparam, task_xml1, task_xml2
+    # All these variables are used to construct the xmodule descriptor.
     location = Location(["i4x", "edX", "open_ended", "combinedopenended",
                          "SampleQuestion"])
     definition_template = """
@@ -748,20 +751,6 @@ class CombinedOpenEndedModuleConsistencyTest(unittest.TestCase):
     max_score = 10
 
     metadata = {'attempts': '10', 'max_score': max_score}
-
-    static_data = {
-        'max_attempts': 20,
-        'prompt': prompt,
-        'rubric': rubric,
-        'max_score': max_score,
-        'display_name': 'Name',
-        'accept_file_upload': False,
-        'close_date': "",
-        's3_interface': test_util_open_ended.S3_INTERFACE,
-        'open_ended_grading_interface': test_util_open_ended.OPEN_ENDED_GRADING_INTERFACE,
-        'skip_basic_checks': False,
-        'graded': True,
-    }
 
     oeparam = etree.XML('''
       <openendedparam>
@@ -789,6 +778,22 @@ class CombinedOpenEndedModuleConsistencyTest(unittest.TestCase):
                     <grader_payload>{"grader_settings" : "ml_grading.conf", "problem_id" : "6.002x/Welcome/OETest"}</grader_payload>
            </openendedparam>
     </openended>'''
+
+
+    static_data = {
+        'max_attempts': 20,
+        'prompt': prompt,
+        'rubric': rubric,
+        'max_score': max_score,
+        'display_name': 'Name',
+        'accept_file_upload': False,
+        'close_date': "",
+        's3_interface': test_util_open_ended.S3_INTERFACE,
+        'open_ended_grading_interface': test_util_open_ended.OPEN_ENDED_GRADING_INTERFACE,
+        'skip_basic_checks': False,
+        'graded': True,
+    }
+
     definition = {'prompt': etree.XML(prompt), 'rubric': etree.XML(rubric), 'task_xml': [task_xml1, task_xml2]}
     full_definition = definition_template.format(prompt=prompt, rubric=rubric, task1=task_xml1, task2=task_xml2)
     descriptor = Mock(data=full_definition)
@@ -811,11 +816,11 @@ class CombinedOpenEndedModuleConsistencyTest(unittest.TestCase):
                                                     self.descriptor,
                                                     static_data=self.static_data,
                                                     metadata=self.metadata,
-                                                    instance_state=json.loads(MOCK_INSTANCE_INCONSISTENT_STATE))
+                                                    instance_state=json.loads(INSTANCE_INCONSISTENT_STATE))
 
     def test_get_score(self):
         """
-        See if scoring works
+        If grader type is ML score should be updated from rubric scores. Aggregate rubric scores = sum([3])*5.
         """
         score_dict = self.combinedoe.get_score()
         self.assertEqual(score_dict['score'], 15.0)
@@ -823,7 +828,7 @@ class CombinedOpenEndedModuleConsistencyTest(unittest.TestCase):
 
     def test_get_score_with_pe_grader(self):
         """
-        See if scoring works for PE grading
+        If grader type is PE score should not be updated from rubric scores. Aggregate rubric scores = sum([3])*5.
         """
         combinedoe = CombinedOpenEndedV1Module(self.test_system,
                                                self.location,
@@ -831,14 +836,13 @@ class CombinedOpenEndedModuleConsistencyTest(unittest.TestCase):
                                                self.descriptor,
                                                static_data=self.static_data,
                                                metadata=self.metadata,
-                                               instance_state=json.loads(MOCK_INSTANCE_INCONSISTENT_STATE2))
+                                               instance_state=json.loads(INSTANCE_INCONSISTENT_STATE2))
         score_dict = combinedoe.get_score()
-        self.assertEqual(score_dict['score'], 10.0)
-        self.assertEqual(score_dict['total'], 5.0)
+        self.assertNotEqual(score_dict['score'], 15.0)
 
     def test_get_score_with_different_score_value_in_rubric(self):
         """
-        See if scoring works when score value is different from rubric score
+        If grader type is ML score should be updated from rubric scores. Aggregate rubric scores = sum([5])*5.
         """
         combinedoe = CombinedOpenEndedV1Module(self.test_system,
                                                self.location,
@@ -846,14 +850,15 @@ class CombinedOpenEndedModuleConsistencyTest(unittest.TestCase):
                                                self.descriptor,
                                                static_data=self.static_data,
                                                metadata=self.metadata,
-                                               instance_state=json.loads(MOCK_INSTANCE_INCONSISTENT_STATE3))
+                                               instance_state=json.loads(INSTANCE_INCONSISTENT_STATE3))
         score_dict = combinedoe.get_score()
         self.assertEqual(score_dict['score'], 25.0)
         self.assertEqual(score_dict['total'], 5.0)
 
     def test_get_score_with_old_task_states(self):
         """
-        See if scoring works with old task states
+        If grader type is ML and old_task_states are present in instance inconsistent state score should be updated
+        from rubric scores. Aggregate rubric scores = sum([3])*5.
         """
         combinedoe = CombinedOpenEndedV1Module(self.test_system,
                                                self.location,
@@ -861,14 +866,15 @@ class CombinedOpenEndedModuleConsistencyTest(unittest.TestCase):
                                                self.descriptor,
                                                static_data=self.static_data,
                                                metadata=self.metadata,
-                                               instance_state=json.loads(MOCK_INSTANCE_INCONSISTENT_STATE4))
+                                               instance_state=json.loads(INSTANCE_INCONSISTENT_STATE4))
         score_dict = combinedoe.get_score()
         self.assertEqual(score_dict['score'], 15.0)
         self.assertEqual(score_dict['total'], 5.0)
 
     def test_get_score_with_score_missing(self):
         """
-        See if scoring works if score is missing in dict
+        If grader type is ML and score field is missing in instance inconsistent state score should be updated from
+        rubric scores. Aggregate rubric scores = sum([3])*5.
         """
         combinedoe = CombinedOpenEndedV1Module(self.test_system,
                                                self.location,
@@ -876,7 +882,7 @@ class CombinedOpenEndedModuleConsistencyTest(unittest.TestCase):
                                                self.descriptor,
                                                static_data=self.static_data,
                                                metadata=self.metadata,
-                                               instance_state=json.loads(MOCK_INSTANCE_INCONSISTENT_STATE5))
+                                               instance_state=json.loads(INSTANCE_INCONSISTENT_STATE5))
         score_dict = combinedoe.get_score()
         self.assertEqual(score_dict['score'], 15.0)
         self.assertEqual(score_dict['total'], 5.0)
