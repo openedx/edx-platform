@@ -1,6 +1,8 @@
 .. raw:: latex
   
       \newpage %
+      
+.. _Appendix A:
 
 ========================================
  APPENDIX A-Template For Course Overview
