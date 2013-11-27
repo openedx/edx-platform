@@ -326,11 +326,11 @@ AUTHENTICATION_BACKENDS = (
 )
 
 
-GOOGLE_OAUTH2_CLIENT_ID      = '1048574522094-oopvg77op4msldjdsggvlrnv58kg2che.apps.googleusercontent.com'  # this is on the credentials web page from above
-GOOGLE_OAUTH2_CLIENT_SECRET  = '_2ejDqSCeCoUAfs5TXKFDPl8'
+GOOGLE_OAUTH2_CLIENT_ID = 'App ID here'
+GOOGLE_OAUTH2_CLIENT_SECRET = 'App Secret here'
 
-FACEBOOK_APP_ID='405978756174944'
-FACEBOOK_API_SECRET='d1dee59d9ce06e4f49fc659214ff420d'
+FACEBOOK_APP_ID = 'App ID here'
+FACEBOOK_API_SECRET = 'App Secret here'
 
 SOCIAL_AUTH_PIPELINE = (
 
