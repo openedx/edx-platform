@@ -151,7 +151,7 @@ class @Problem
   # If some function wants to be called before sending the answer to the
   # server, give it a chance to do so.
   #
-  # check_waitfor allows the callee to send alerts if the user's input is
+  # check_save_waitfor allows the callee to send alerts if the user's input is
   # invalid. To do so, the callee must throw an exception named "Waitfor
   # Exception". This and any other errors or exceptions that arise from the
   # callee are rethrown and abort the submission.
@@ -159,18 +159,23 @@ class @Problem
   # In order to use this feature, add a 'data-waitfor' attribute to the input,
   # and specify the function to be called by the check button before sending
   # off @answers
-  check_waitfor: =>
+  check_save_waitfor: (callback) =>
     for inp in @inputs
       if ($(inp).is("input[waitfor]"))
         try
-          $(inp).data("waitfor")()
-          @refreshAnswers()
+          $(inp).data("waitfor")(() =>
+            @refreshAnswers()
+            callback()
+          )
         catch e
           if e.name == "Waitfor Exception"
             alert e.message
           else
             alert "Could not grade your answer. The submission was aborted."
           throw e
+        return true
+      else
+        return false
 
 
   ###
@@ -254,7 +259,10 @@ class @Problem
       $.ajaxWithPrefix("#{@url}/problem_check", settings)
 
   check: =>
-    @check_waitfor()
+    if not @check_save_waitfor(@check_internal)
+      @check_internal()  
+
+  check_internal: =>
     Logger.log 'problem_check', @answers
 
     # Segment.io
@@ -334,6 +342,10 @@ class @Problem
     @el.find('.capa_alert').css(opacity: 0).animate(opacity: 1, 700)
 
   save: =>
+    if not @check_save_waitfor(@save_internal)
+      @save_internal()
+
+  save_internal: =>
     Logger.log 'problem_save', @answers
     $.postWithPrefix "#{@url}/problem_save", @answers, (response) =>
       saveMessage = response.msg
