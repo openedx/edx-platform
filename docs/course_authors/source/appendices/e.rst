@@ -2,6 +2,8 @@
   
       \newpage %
 
+.. _Appendix E:
+
 
 ==========================
 APPENDIX E: Problem Types
@@ -580,7 +582,7 @@ default. These include:
 - ``pi``
 - ``k``: the Boltzmann constant (~1.38e-23 in Joules/Kelvin)
 - ``c``: the speed of light in m/s (2.998e8)
-- ``T``: typical room temperature (298.15 Kelvin, same as 25C/77F)
+- ``T``: the positive difference between 0K and 0°C (285.15)
 - ``q``: the fundamental charge (~1.602e-19 Coloumbs)
 
 Operators and Functions
