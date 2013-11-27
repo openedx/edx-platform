@@ -79,7 +79,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
 
                 # tags that really need unique names--they store (or should store) state.
                 need_uniq_names = ('problem', 'sequential', 'video', 'course', 'chapter',
-                                   'videosequence', 'poll_question', 'timelimit', 'vertical')
+                                   'videosequence', 'poll_question', 'vertical')
 
                 attr = xml_data.attrib
                 tag = xml_data.tag
