@@ -25,11 +25,6 @@ Longer TODO:
 
 import sys
 import os
-try:
-    import social_auth
-except ImportError:
-    import sys
-    sys.path.insert(0, '..')
 from path import path
 
 from .discussionsettings import *

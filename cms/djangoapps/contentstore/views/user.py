@@ -36,7 +36,7 @@ def new_user_social(request):
     except:
         return JsonResponse({"error": _("malformed JSON")}, 400)
 
-    return HttpResponseRedirect('howitworks')
+    return HttpResponseRedirect('course')
 
 
 @require_POST
