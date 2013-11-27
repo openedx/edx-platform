@@ -853,7 +853,7 @@ def create_account(request, post_override=None):
     # this is a good idea
     # TODO: Check password is sane
 
-    required_post_vars = ['username', 'email', 'name', 'password', 'terms_of_service', 'honor_code']
+    required_post_vars = ['username', 'email', 'name', 'password', 'terms_of_service', 'honor_code', 'city_id']
     if tos_not_required:
         required_post_vars = ['username', 'email', 'name', 'password', 'honor_code']
 
@@ -864,7 +864,8 @@ def create_account(request, post_override=None):
                          'name': _('Your legal name must be a minimum of two characters long.'),
                          'password': _('A valid password is required.'),
                          'terms_of_service': _('Accepting Terms of Service is required.'),
-                         'honor_code': _('Agreeing to the Honor Code is required.')}
+                         'honor_code': _('Agreeing to the Honor Code is required.'),
+                         'city_id': _('A valid City is required.')}
             js['value'] = error_str[a]
             js['field'] = a
             return HttpResponse(json.dumps(js))
