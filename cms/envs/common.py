@@ -217,15 +217,16 @@ STATICFILES_DIRS = [
 ]
 
 # Locale/Internationalization
-TIME_ZONE = 'America/New_York'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
-LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
+LANGUAGES = ( ('es_419', 'Spanish'), )
+TIME_ZONE = 'America/Guayaquil'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
+LANGUAGE_CODE = 'es_419'  # http://www.i18nguy.com/unicode/language-identifiers.html
 
 # We want i18n to be turned off in production, at least until we have full localizations.
 # Thus we want the Django translation engine to be disabled. Otherwise even without
 # localization files, if the user's browser is set to a language other than us-en,
 # strings like "login" and "password" will be translated and the rest of the page will be
 # in English, which is confusing.
-USE_I18N = False
+USE_I18N = True
 USE_L10N = True
 
 # Localization strings (e.g. django.po) are under this directory
