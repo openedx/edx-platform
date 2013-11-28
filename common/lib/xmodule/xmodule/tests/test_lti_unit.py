@@ -8,7 +8,7 @@ from webob.request import Request
 from copy import copy
 import urllib
 
-from xmodule.lti_module import LTIDescriptor
+from xmodule.lti_module import LTIDescriptor, LTIError
 
 from . import LogicTest
 
@@ -47,7 +47,7 @@ class LTIModuleTest(LogicTest):
                 </imsx_POXEnvelopeRequest>
             """)
         self.system.get_real_user = Mock()
-        self.xmodule.get_client_key_secret = Mock(return_value=('key', 'secret'))
+        #self.xmodule.get_client_key_secret = Mock(return_value=('key', 'secret'))
         self.system.publish = Mock()
 
         self.user_id = self.xmodule.runtime.anonymous_student_id
@@ -243,9 +243,64 @@ class LTIModuleTest(LogicTest):
             self.assertEqual(real_lis_result_sourcedid, expected_sourcedId)
 
 
+    @patch('xmodule.course_module.CourseDescriptor.id_to_location', return_value=Mock())
+    def test_client_key_secret(self, test):
+        """
+        LTI module gets client key and secret provided.
+        """
+
+        #this adds lti passports to system
+        mocked_course = Mock(lti_passports = ['lti_id:test_client:test_secret'])
+        modulestore = Mock()
+        attrs={'get_item.return_value':mocked_course}
+        modulestore.configure_mock(**attrs)
+        runtime = Mock(modulestore=modulestore)
+        self.xmodule.descriptor.runtime = runtime
+        self.xmodule.lti_id = "lti_id"
+        key, secret = self.xmodule.get_client_key_secret()
+        expected = ('test_client', 'test_secret')
+        self.assertEqual(expected, (key, secret))
+
+    @patch('xmodule.course_module.CourseDescriptor.id_to_location', return_value=Mock())
+    def test_client_key_secret_not_provided(self, test):
+        """
+        LTI module attempts to get client key and secret provided in cms.
+        There are key and secret but not for specific LTI.
+        """
+
+        #this adds lti passports to system
+        mocked_course = Mock(lti_passports = ['test_id:test_client:test_secret'])
+        modulestore = Mock()
+        attrs={'get_item.return_value': mocked_course}
+        modulestore.configure_mock(**attrs)
+        runtime = Mock(modulestore=modulestore)
+        self.xmodule.descriptor.runtime = runtime
+        #set another lti_id
+        self.xmodule.lti_id = "another_lti_id"
+        key_secret = self.xmodule.get_client_key_secret()
+        expected = ('','')
+        self.assertEqual(expected, key_secret)
+
+    @patch('xmodule.course_module.CourseDescriptor.id_to_location', return_value=Mock())
+    def test_bad_client_key_secret(self, test):
+        """
+        LTI module attempts to get client key and secret provided in cms.
+        There are key and secret provided in wrong format.
+        """
+        #import ipdb; ipdb.set_trace()
+        #this adds lti passports to system
+        #provide key and secret in wrong format
+        mocked_course = Mock(lti_passports = ['test_id_test_client_test_secret'])
+        modulestore = Mock()
+        attrs={'get_item.return_value': mocked_course}
+        modulestore.configure_mock(**attrs)
+        runtime = Mock(modulestore=modulestore)
+        self.xmodule.descriptor.runtime = runtime
+        self.xmodule.lti_id = "lti_id"
+        self.assertRaises(LTIError, self.xmodule.get_client_key_secret)
+
     def test_verify_oauth_body_sign(self):
         pass
 
-    def test_client_key_secret(self):
-        pass
+
 
