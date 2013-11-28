@@ -28,30 +28,34 @@
  * ~ Robert M. Pirsig
  */
 
-window.LTI = (function () {
-    // Function initialize(element)
-    //
-    // Initialize the LTI module.
-    //
-    // @param element    DOM element, or jQuery element object.
-    //
-    // @return    undefined
-    function initialize(element) {
-        var form, openInANewPage, formAction, ajaxUrl, newSignature;
+window.LTI = (function ($, undefined) {
+    var LTI = LTIConstructor;
+
+    LTI.prototype = {
+        constructor: LTIConstructor,
+        submitForm: submitForm,
+        newWindowBtnClick: newWindowBtnClick,
+        getNewSignature: getNewSignature
+    };
+
+    return LTI;
+
+    function LTIConstructor(element) {
+        var form, openInANewPage, formAction, ajaxUrl, signatureIsNew;
 
         // In cms (Studio) the element is already a jQuery object. In lms it is
         // a DOM object.
         //
         // To make sure that there is no error, we pass it through the $()
         // function. This will make it a jQuery object if it isn't already so.
-        element = $(element);
+        this.el = $(element);
 
-        form = element.find('.ltiLaunchForm');
-        formAction = form.attr('action');
+        this.formEl = this.el.find('.ltiLaunchForm');
+        this.formAction = this.formEl.attr('action');
 
         // If action is empty string, or action is the default URL that should
         // not cause a form submit.
-        if (!formAction || formAction === 'http://www.example.com') {
+        if (!this.formAction || this.formAction === 'http://www.example.com') {
 
             // Nothing to do - no valid action provided. Error message will be
             // displaced in browser (HTML).
@@ -59,83 +63,77 @@ window.LTI = (function () {
         }
 
         // We want a Boolean 'true' or 'false'. First we will retrieve the data
-        // attribute, and then we will parse it via native JSON.parse().
-        openInANewPage = element.find('.lti').data('open_in_a_new_page');
-        openInANewPage = JSON.parse(openInANewPage);
+        // attribute.
+        this.openInANewPage = this.el.find('.lti').data('open_in_a_new_page');
+        // Then we will parse it via native JSON.parse().
+        this.openInANewPage = JSON.parse(this.openInANewPage);
 
-        ajaxUrl = element.find('.lti').data('ajax_url');
-        console.log('[initialize]: ajaxUrl = "' + ajaxUrl + '".');
+        this.ajaxUrl = this.el.find('.lti').data('ajax_url');
 
-        newSignature = true;
+        this.signatureIsNew = true;
 
-        form.on('submit', function (event) {
-            if (newSignature) {
-                console.log('[initialize]: Signature is new.');
-                newSignature = false;
-
-                return true;
-            }
-
-            console.log('[initialize]: Signature is OLD.');
-            event.preventDefault();
-            getNewSignature();
-
-            return false;
-        });
+        this.formEl.on('submit', {'_this': this}, this.submitForm);
 
         // If the Form's action attribute is set (i.e. we can perform a normal
         // submit), then we (depending on instance settings) submit the form
         // when user will click on a link, or submit the form immediately.
-        if (openInANewPage === true) {
-            element.find('.link_lti_new_window').on('click', function () {
-                form.submit();
-            });
+        if (this.openInANewPage === true) {
+            this.newWindowBtnEl = this.el
+                .find('.link_lti_new_window')
+                .on('click', {'_this': this}, newWindowBtnClick);
         } else {
             // At this stage the form exists on the page and has a valid
             // action. We are safe to submit it, even if `openInANewPage` is
             // set to some weird value.
-            //
-            // Best case scenario is that `openInANewPage` is set to `true`.
-            form.submit();
-        }
-
-        return;
-
-        function getNewSignature() {
-            console.log('[getNewSignature]: Getting new signature.');
-
-            $.postWithPrefix(
-                ajaxUrl + '/regenerate_signature',  {},
-                function (response) {
-                    console.log('[getNewSignature]: success! response = ');
-                    console.log(response);
-
-                    if (
-                        response &&
-                        response.status &&
-                        response.status === 'OK' &&
-                        response.input_fields &&
-                        $.isPlainObject(response.input_fields)
-                    ) {
-                        console.log('[getNewSignature]: re-submitting form.');
-                        newSignature = true;
-
-                        $.each(response.input_fields, function (name, value) {
-                            var inputEl = form.find("input[name='" + name + "']");
-
-                            console.log('[getNewSignature]: name = ' + name + ', value = ' + value);
-                            console.log('[getNewSignature]: inputEl = ', inputEl);
-                            console.log('');
-
-                            inputEl.val(value);
-                        });
-
-                        form.trigger('submit');
-                    }
-                }
-            );
+            this.formEl.submit();
         }
     }
 
-    return initialize;
-}());
+    function submitForm(event) {
+        var _this = event.data['_this'];
+
+        if (_this.signatureIsNew) {
+            _this.signatureIsNew = false;
+
+            return true;
+        }
+
+        event.preventDefault();
+        _this.getNewSignature();
+
+        return false;
+    }
+
+    function newWindowBtnClick(event) {
+        var _this = event.data['_this'];
+
+        _this.formEl.submit();
+    }
+
+    function getNewSignature() {
+        var _this = this;
+
+        $.postWithPrefix(
+            this.ajaxUrl + '/regenerate_signature',  {},
+            function (response) {
+                if (
+                    response &&
+                    response.status &&
+                    response.status === 'OK' &&
+                    response.input_fields &&
+                    $.isPlainObject(response.input_fields)
+                ) {
+                    _this.signatureIsNew = true;
+
+                    $.each(response.input_fields, function (name, value) {
+                        var inputEl = _this.formEl.find("input[name='" + name + "']");
+
+                        inputEl.val(value);
+                    });
+
+                    _this.formEl.trigger('submit');
+                }
+            }
+        );
+    }
+}).call(this, window.jQuery);
