@@ -615,14 +615,14 @@ def instructor_dashboard(request, course_id):
         log.debug("users: {0!r}".format(users))
         group = get_beta_group(course)
         for username_or_email in split_by_comma_and_whitespace(users):
-            msg += "<p>{0}</p>".format(
+            msg += u"<p>{0}</p>".format(
                 add_user_to_group(request, username_or_email, group, 'beta testers', 'beta-tester'))
 
     elif action == 'Remove beta testers':
         users = request.POST['betausers']
         group = get_beta_group(course)
         for username_or_email in split_by_comma_and_whitespace(users):
-            msg += "<p>{0}</p>".format(
+            msg += u"<p>{0}</p>".format(
                 remove_user_from_group(request, username_or_email, group, 'beta testers', 'beta-tester'))
 
     #----------------------------------------

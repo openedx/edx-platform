@@ -41,14 +41,14 @@ class MasterClassFields(object):
     )
     total_places = Integer(
         display_name=_("Max places"),
-        help=_("Number of text boxes available for students to input words/sentences."),
+        help=_("Number of places available for students to register for masterclass."),
         scope=Scope.settings,
         default=30,
         values={"min": 1}
     )
     autopass_score = Integer(
         display_name=_("Autopass score"),
-        help=_("Maximum number of words to be displayed in generated word cloud."),
+        help=_("Autopass score to automaticly pass registration for masterclass."),
         scope=Scope.settings,
         default=250,
         values={"min": 1}

@@ -38,7 +38,7 @@ msgstr "html"
 
 #: cms/djangoapps/contentstore/views/component.py:53
 msgid "problem"
-msgstr "задача"
+msgstr "задачи"
 
 #: cms/djangoapps/contentstore/views/component.py:53
 msgid "video"
