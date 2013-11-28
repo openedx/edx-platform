@@ -74,10 +74,11 @@ window.LTI = (function ($, undefined) {
 
         // The OAuth signature can only be used once (because of timestamp
         // and nonce). This will be reset each time the form is submitted so
-        // that we know to fetch a new signature on subsequent form submit.
+        // that we know to fetch a new OAuth signature on subsequent form
+        // submit.
         this.signatureIsNew = true;
 
-        // Must catch all submits of form. The catcher will update the
+        // Must catch all submits of form. The catcher will update the OAuth
         // signature if it is old, before carrying on with form submission.
         this.formEl.on('submit', {'_this': this}, this.submitFormCatcher);
 
@@ -97,34 +98,40 @@ window.LTI = (function ($, undefined) {
     }
 
     // The form submit catcher. Before the form is submitted, we must check if
-    // the signature is new (valid). If it is not new, block form submission
-    // and request for a signature. After a new signature is fetched, submit
-    // the form.
+    // the OAuth signature is new (valid). If it is not new, block form
+    // submission and request for a signature. After a new signature is
+    // fetched, submit the form.
     function submitFormCatcher(event) {
         var _this = event.data['_this'];
 
         if (_this.signatureIsNew) {
+            // If the OAuth signature is new, mark it as old.
             _this.signatureIsNew = false;
 
+            // Continue with submitting the form.
             return true;
         } else {
-            event.preventDefault();
-
+            // The OAuth signature is old. Request for a new OAuth signature.
             _this.getNewSignature();
 
+            // Don't submit the form. It will be submitted once a new OAuth
+            // signature is received.
+            event.preventDefault();
             return false;
         }
     }
 
-    // Click handler for the "View LTI in new window" button.
+    // Click handler for the "View LTI in new window" button. When it is
+    // clicked, submit the form.
     function newWindowBtnClick(event) {
         var _this = event.data['_this'];
 
         _this.formEl.submit();
     }
 
-    // Request form the server a new signature. When signature is received,
-    // and if the data received back is OK, update the form, and submit it.
+    // Request form the server a new OAuth signature. When OAuth signature is
+    // received, and if the data received back is OK, update the form, and
+    // submit it.
     function getNewSignature() {
         var _this = this;
 
@@ -132,6 +139,7 @@ window.LTI = (function ($, undefined) {
             this.ajaxUrl + '/regenerate_signature',
             {},
             function (response) {
+                // If the response is valid, and contains expected data.
                 if (
                     response &&
                     response.status &&
@@ -139,14 +147,18 @@ window.LTI = (function ($, undefined) {
                     response.input_fields &&
                     $.isPlainObject(response.input_fields)
                 ) {
+                    // We received a new OAuth signature.
                     _this.signatureIsNew = true;
 
+                    // Update the form fields with new data, and new OAuth
+                    // signature.
                     $.each(response.input_fields, function (name, value) {
                         var inputEl = _this.formEl.find("input[name='" + name + "']");
 
                         inputEl.val(value);
                     });
 
+                    // Submit the form.
                     _this.formEl.trigger('submit');
                 }
             }
