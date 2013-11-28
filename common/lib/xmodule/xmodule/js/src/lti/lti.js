@@ -28,21 +28,21 @@
  * ~ Robert M. Pirsig
  */
 
+// JavaScript LTI XModule
 window.LTI = (function ($, undefined) {
     var LTI = LTIConstructor;
 
     LTI.prototype = {
         constructor: LTIConstructor,
-        submitForm: submitForm,
+        submitFormCatcher: submitFormCatcher,
         newWindowBtnClick: newWindowBtnClick,
         getNewSignature: getNewSignature
     };
 
     return LTI;
 
+    // JavaScript LTI XModule constructor
     function LTIConstructor(element) {
-        var form, openInANewPage, formAction, ajaxUrl, signatureIsNew;
-
         // In cms (Studio) the element is already a jQuery object. In lms it is
         // a DOM object.
         //
@@ -68,11 +68,18 @@ window.LTI = (function ($, undefined) {
         // Then we will parse it via native JSON.parse().
         this.openInANewPage = JSON.parse(this.openInANewPage);
 
+        // The URL where we can request for a new OAuth signature for form
+        // submission to the LTI provider.
         this.ajaxUrl = this.el.find('.lti').data('ajax_url');
 
+        // The OAuth signature can only be used once (because of timestamp
+        // and nonce). This will be reset each time the form is submitted so
+        // that we know to fetch a new signature on subsequent form submit.
         this.signatureIsNew = true;
 
-        this.formEl.on('submit', {'_this': this}, this.submitForm);
+        // Must catch all submits of form. The catcher will update the
+        // signature if it is old, before carrying on with form submission.
+        this.formEl.on('submit', {'_this': this}, this.submitFormCatcher);
 
         // If the Form's action attribute is set (i.e. we can perform a normal
         // submit), then we (depending on instance settings) submit the form
@@ -89,32 +96,41 @@ window.LTI = (function ($, undefined) {
         }
     }
 
-    function submitForm(event) {
+    // The form submit catcher. Before the form is submitted, we must check if
+    // the signature is new (valid). If it is not new, block form submission
+    // and request for a signature. After a new signature is fetched, submit
+    // the form.
+    function submitFormCatcher(event) {
         var _this = event.data['_this'];
 
         if (_this.signatureIsNew) {
             _this.signatureIsNew = false;
 
             return true;
+        } else {
+            event.preventDefault();
+
+            _this.getNewSignature();
+
+            return false;
         }
-
-        event.preventDefault();
-        _this.getNewSignature();
-
-        return false;
     }
 
+    // Click handler for the "View LTI in new window" button.
     function newWindowBtnClick(event) {
         var _this = event.data['_this'];
 
         _this.formEl.submit();
     }
 
+    // Request form the server a new signature. When signature is received,
+    // and if the data received back is OK, update the form, and submit it.
     function getNewSignature() {
         var _this = this;
 
         $.postWithPrefix(
-            this.ajaxUrl + '/regenerate_signature',  {},
+            this.ajaxUrl + '/regenerate_signature',
+            {},
             function (response) {
                 if (
                     response &&
