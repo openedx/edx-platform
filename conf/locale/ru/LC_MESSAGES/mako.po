@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
-"POT-Creation-Date: 2013-11-29 12:26+0400\n"
-"PO-Revision-Date: 2013-11-29 13:06+0300\n"
+"POT-Creation-Date: 2013-11-29 12:03+0000\n"
+"PO-Revision-Date: 2013-11-29 16:21+0300\n"
 "Last-Translator: JK <korvin.lucky@gmail.com>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
@@ -250,7 +250,7 @@ msgstr "Удаление&hellip;"
 #: lms/static/admin/js/admin/DateTimeShortcuts.js:92
 #: lms/static/admin/js/admin/DateTimeShortcuts.js:204
 #: lms/templates/discussion/_inline_new_post.html:51
-#: lms/templates/discussion/_new_post.html:82
+#: lms/templates/discussion/_new_post.html:83
 #: lms/templates/discussion/_underscore_templates.html:101
 #: lms/templates/discussion/_underscore_templates.html:152
 #: lms/templates/verify_student/face_upload.html:315
@@ -4672,6 +4672,10 @@ msgstr ""
 msgid "Use new chapter based progress render"
 msgstr ""
 
+#: common/lib/xmodule/xmodule/course_module.py:434
+msgid "General"
+msgstr "Основной раздел"
+
 #: common/lib/xmodule/xmodule/discussion_module.py:25
 #, fuzzy
 msgid "Category"
@@ -4679,7 +4683,7 @@ msgstr "Название категории"
 
 #: common/lib/xmodule/xmodule/discussion_module.py:26
 msgid "Week 1"
-msgstr ""
+msgstr "Рабочий раздел"
 
 #: common/lib/xmodule/xmodule/discussion_module.py:27
 msgid ""
@@ -4693,7 +4697,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/discussion_module.py:32
 msgid "Topic-Level Student-Visible Label"
-msgstr ""
+msgstr "Доступный студентам раздел"
 
 #: common/lib/xmodule/xmodule/discussion_module.py:33
 msgid ""
@@ -9318,7 +9322,6 @@ msgid "filter topics"
 msgstr "Фильтр тем"
 
 #: lms/templates/discussion/_filter_dropdown.html:35
-#: lms/templates/discussion/_new_post.html:30
 #: lms/templates/discussion/_thread_list_template.html:17
 msgid "Show All Discussions"
 msgstr "Показать все дискуссии"
@@ -9332,27 +9335,27 @@ msgid "Posts I'm Following"
 msgstr "Сообщения за которыми я слежу"
 
 #: lms/templates/discussion/_inline_new_post.html:9
-#: lms/templates/discussion/_new_post.html:42
+#: lms/templates/discussion/_new_post.html:43
 msgid "follow this post"
-msgstr "следить за сообщения"
+msgstr "следить за сообщением"
 
 #: lms/templates/discussion/_inline_new_post.html:12
-#: lms/templates/discussion/_new_post.html:45
+#: lms/templates/discussion/_new_post.html:46
 msgid "post anonymously"
 msgstr "отправить анонимно"
 
 #: lms/templates/discussion/_inline_new_post.html:14
-#: lms/templates/discussion/_new_post.html:47
+#: lms/templates/discussion/_new_post.html:48
 msgid "post anonymously to classmates"
 msgstr "Отправить анонимно одноклассникам"
 
 #: lms/templates/discussion/_inline_new_post.html:18
-#: lms/templates/discussion/_new_post.html:51
+#: lms/templates/discussion/_new_post.html:52
 msgid "Make visible to:"
 msgstr "Сделать видимым:"
 
 #: lms/templates/discussion/_inline_new_post.html:20
-#: lms/templates/discussion/_new_post.html:53
+#: lms/templates/discussion/_new_post.html:54
 msgid "All Groups"
 msgstr "Все группы"
 
@@ -9361,24 +9364,29 @@ msgid "My Cohort"
 msgstr "Моя когорта"
 
 #: lms/templates/discussion/_inline_new_post.html:38
-#: lms/templates/discussion/_new_post.html:69
+#: lms/templates/discussion/_new_post.html:70
 msgid "new post title"
 msgstr "заголовок нового сообщения"
 
 #: lms/templates/discussion/_inline_new_post.html:39
-#: lms/templates/discussion/_new_post.html:70
+#: lms/templates/discussion/_new_post.html:71
 #: lms/templates/discussion/_underscore_templates.html:89
 msgid "Title"
 msgstr "Заголовок"
 
 #: lms/templates/discussion/_inline_new_post.html:50
-#: lms/templates/discussion/_new_post.html:81
+#: lms/templates/discussion/_new_post.html:82
 msgid "Add post"
 msgstr "Добавить сообщение"
 
 #: lms/templates/discussion/_new_post.html:28
 msgid "Create new post about:"
 msgstr "Создать новое сообщение о:"
+
+#: lms/templates/discussion/_new_post.html:30
+#, fuzzy
+msgid "Show All Discussionsdf"
+msgstr "Показать все дискуссии"
 
 #: lms/templates/discussion/_new_post.html:33
 msgid "Filter List"
@@ -9473,7 +9481,7 @@ msgstr "следить"
 #: lms/templates/discussion/_underscore_templates.html:48
 #, fuzzy
 msgid "Follow this post"
-msgstr "следить за сообщения"
+msgstr "следить за сообщением"
 
 #: lms/templates/discussion/_underscore_templates.html:54
 #: lms/templates/discussion/_underscore_templates.html:135
@@ -13921,9 +13929,6 @@ msgstr "Войдите в {span_start}{platform_name}{span_end}"
 
 #~ msgid "Discussion Categories"
 #~ msgstr "Категории дискуссий"
-
-#~ msgid "General"
-#~ msgstr "Общее"
 
 #~ msgid "Troubleshooting"
 #~ msgstr "Поиск и устранение неисправностей"

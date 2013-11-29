@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
-"POT-Creation-Date: 2013-11-29 12:27+0400\n"
-"PO-Revision-Date: 2013-11-21 10:11+0300\n"
+"POT-Creation-Date: 2013-11-29 12:03+0000\n"
+"PO-Revision-Date: 2013-11-29 16:16+0300\n"
 "Last-Translator: JK <korvin.lucky@gmail.com>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
@@ -1783,6 +1783,10 @@ msgstr ""
 #: common/lib/xmodule/xmodule/course_module.py:396
 msgid "Use new chapter based progress render"
 msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py:434
+msgid "General"
+msgstr "Основной раздел"
 
 #: common/lib/xmodule/xmodule/discussion_module.py:25
 msgid "Category"

@@ -431,7 +431,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
 
         self.set_grading_policy(self.grading_policy)
         if self.discussion_topics == {}:
-            self.discussion_topics = {'General': {'id': self.location.html_id()}}
+            self.discussion_topics = {_('General'): {'id': self.location.html_id()}}
 
         self.test_center_exams = []
         test_center_info = self.testcenter_info

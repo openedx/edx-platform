@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
-"POT-Creation-Date: 2013-11-29 12:27+0400\n"
+"POT-Creation-Date: 2013-11-29 12:04+0000\n"
 "PO-Revision-Date: 2013-11-29 12:45+0300\n"
 "Last-Translator: Lenar Safin <safin@smartdec.ru>\n"
 "Language-Team: Select LTD\n"
@@ -385,16 +385,19 @@ msgstr "Файлы должны быть в формате PNG или JPEG."
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:462
 #: common/static/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:462
 #: lms/static/coffee/src/staff_grading/staff_grading.js:468
+#: test_root/staticfiles/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:462
 msgid "Submit"
 msgstr "Отправить"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js:106
 #: common/static/xmodule/modules/js/001-5d52f96e690b7d20791110be817c6bff.js:106
+#: test_root/staticfiles/xmodule/modules/js/001-5f4a12073cac33bb5da2ee6b5c1a315c.js:106
 msgid "points"
 msgstr "баллов"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js:110
 #: common/static/xmodule/modules/js/001-5d52f96e690b7d20791110be817c6bff.js:110
+#: test_root/staticfiles/xmodule/modules/js/001-5f4a12073cac33bb5da2ee6b5c1a315c.js:110
 #, c-format
 msgid "%s point possible"
 msgid_plural "%s points possible"
@@ -404,22 +407,26 @@ msgstr[2] "%s баллов"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js:554
 #: common/static/xmodule/modules/js/001-5d52f96e690b7d20791110be817c6bff.js:554
+#: test_root/staticfiles/xmodule/modules/js/001-5f4a12073cac33bb5da2ee6b5c1a315c.js:554
 msgid "unanswered"
 msgstr "не отвечен"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js:584
 #: common/static/xmodule/modules/js/001-5d52f96e690b7d20791110be817c6bff.js:584
+#: test_root/staticfiles/xmodule/modules/js/001-5f4a12073cac33bb5da2ee6b5c1a315c.js:584
 msgid "Status: unsubmitted"
 msgstr "Статус: не сдан"
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:351
 #: common/static/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:351
+#: test_root/staticfiles/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:351
 msgid "The problem state got out of sync.  Try reloading the page."
 msgstr ""
 "Состояние задачи не синхронизированно. Попробуйте перезагрузить страницу."
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:413
 #: common/static/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:413
+#: test_root/staticfiles/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:413
 msgid "You need to pick a rating before you can submit."
 msgstr "Вы должны выбрать оценки до того как вы сможете посылать результат"
 
@@ -427,6 +434,8 @@ msgstr "Вы должны выбрать оценки до того как вы 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:747
 #: common/static/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:458
 #: common/static/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:747
+#: test_root/staticfiles/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:458
+#: test_root/staticfiles/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:747
 msgid "Your score did not meet the criteria to move to the next step."
 msgstr ""
 "Ваши оценки не соответствуют критериям для того что приступить к следующему "
@@ -434,11 +443,13 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:471
 #: common/static/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:471
+#: test_root/staticfiles/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:471
 msgid "Submit assessment"
 msgstr "Отправить задание"
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:478
 #: common/static/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:478
+#: test_root/staticfiles/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:478
 msgid ""
 "Your response has been submitted.  Please check back later for your grade."
 msgstr ""
@@ -447,16 +458,19 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:489
 #: common/static/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:489
+#: test_root/staticfiles/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:489
 msgid "Submit post-assessment"
 msgstr "Отправить ответ"
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:532
 #: common/static/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:532
+#: test_root/staticfiles/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:532
 msgid "Answer saved, but not yet submitted."
 msgstr "Ваш ответ сохранен, но еще не отправлен."
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:563
 #: common/static/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:563
+#: test_root/staticfiles/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:563
 msgid ""
 "Please confirm that you wish to submit your work. You will not be able to "
 "make any changes after submitting."
@@ -466,17 +480,20 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:699
 #: common/static/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:699
+#: test_root/staticfiles/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:699
 msgid ""
 "Are you sure you want to remove your previous response to this question?"
 msgstr "Вы уверены, что хотите удалить предыдущий ответ на этот вопрос?"
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:745
 #: common/static/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:745
+#: test_root/staticfiles/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:745
 msgid "Moved to next step."
 msgstr "Перейти к следующему шагу."
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:803
 #: common/static/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:803
+#: test_root/staticfiles/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:803
 msgid ""
 "File uploads are required for this question, but are not supported in this "
 "browser. Try the newest version of google chrome.  Alternatively, if you "
@@ -495,6 +512,10 @@ msgstr ""
 #: common/static/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:841
 #: common/static/xmodule/modules/js/002-0b45725241efee6f326eaed444398070.js:631
 #: common/static/xmodule/modules/js/002-0b45725241efee6f326eaed444398070.js:640
+#: test_root/staticfiles/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:832
+#: test_root/staticfiles/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:841
+#: test_root/staticfiles/xmodule/modules/js/002-0b45725241efee6f326eaed444398070.js:631
+#: test_root/staticfiles/xmodule/modules/js/002-0b45725241efee6f326eaed444398070.js:640
 msgid "Hide Question"
 msgstr "Скрыть задание"
 
@@ -502,21 +523,26 @@ msgstr "Скрыть задание"
 #: common/lib/xmodule/xmodule/js/src/peergrading/peer_grading_problem.js:632
 #: common/static/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:833
 #: common/static/xmodule/modules/js/002-0b45725241efee6f326eaed444398070.js:632
+#: test_root/staticfiles/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:833
+#: test_root/staticfiles/xmodule/modules/js/002-0b45725241efee6f326eaed444398070.js:632
 msgid "Show Question"
 msgstr "Показать задание"
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:912
 #: common/static/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:912
+#: test_root/staticfiles/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:912
 msgid "See full feedback"
 msgstr "Посмотреть полную обратную связь"
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:914
 #: common/static/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:914
+#: test_root/staticfiles/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:914
 msgid "Respond to Feedback"
 msgstr "Ответить на обратную связь"
 
 #: common/lib/xmodule/xmodule/js/src/master_class/master_class_main.js:177
 #: common/static/xmodule/modules/js/002-09cb29587c5d3e7480b959195ae3a4f8.js:177
+#: test_root/staticfiles/xmodule/modules/js/002-09cb29587c5d3e7480b959195ae3a4f8.js:177
 msgid ""
 "You have been registered for this master class. We will provide addition "
 "information soon."
@@ -526,6 +552,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/master_class/master_class_main.js:178
 #: common/static/xmodule/modules/js/002-09cb29587c5d3e7480b959195ae3a4f8.js:178
+#: test_root/staticfiles/xmodule/modules/js/002-09cb29587c5d3e7480b959195ae3a4f8.js:178
 msgid ""
 "You are pending for registration for this master class. Please visit this "
 "page later for result."
@@ -535,51 +562,61 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/04_video_control.js:76
 #: common/static/xmodule/modules/js/005-1075ba49b142eee8810d95640aaebefc.js:76
+#: test_root/staticfiles/xmodule/modules/js/005-1075ba49b142eee8810d95640aaebefc.js:76
 msgid "video slider"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/04_video_control.js:156
 #: common/static/xmodule/modules/js/005-1075ba49b142eee8810d95640aaebefc.js:156
+#: test_root/staticfiles/xmodule/modules/js/005-1075ba49b142eee8810d95640aaebefc.js:156
 msgid "Pause"
 msgstr "Пауза"
 
 #: common/lib/xmodule/xmodule/js/src/video/04_video_control.js:161
 #: common/static/xmodule/modules/js/005-1075ba49b142eee8810d95640aaebefc.js:161
+#: test_root/staticfiles/xmodule/modules/js/005-1075ba49b142eee8810d95640aaebefc.js:161
 msgid "Play"
 msgstr "Воспроизвести"
 
 #: common/lib/xmodule/xmodule/js/src/video/04_video_control.js:184
 #: common/static/xmodule/modules/js/005-1075ba49b142eee8810d95640aaebefc.js:184
+#: test_root/staticfiles/xmodule/modules/js/005-1075ba49b142eee8810d95640aaebefc.js:184
 msgid "Fill browser"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/04_video_control.js:198
 #: common/static/xmodule/modules/js/005-1075ba49b142eee8810d95640aaebefc.js:198
+#: test_root/staticfiles/xmodule/modules/js/005-1075ba49b142eee8810d95640aaebefc.js:198
 msgid "Exit full browser"
 msgstr "Выйти из полноэкранного режима"
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js:70
 #: common/static/xmodule/modules/js/006-6ebb17a864932d2f0db132c5be91687b.js:70
+#: test_root/staticfiles/xmodule/modules/js/006-6ebb17a864932d2f0db132c5be91687b.js:70
 msgid "HD on"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js:76
 #: common/static/xmodule/modules/js/006-6ebb17a864932d2f0db132c5be91687b.js:76
+#: test_root/staticfiles/xmodule/modules/js/006-6ebb17a864932d2f0db132c5be91687b.js:76
 msgid "HD off"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js:222
 #: common/static/xmodule/modules/js/010-f54db23669849c9c6e64498b10c2bd2b.js:222
+#: test_root/staticfiles/xmodule/modules/js/010-f54db23669849c9c6e64498b10c2bd2b.js:222
 msgid "Caption will be displayed when "
 msgstr "Заголовки будут отображаться, когда"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js:707
 #: common/static/xmodule/modules/js/010-f54db23669849c9c6e64498b10c2bd2b.js:707
+#: test_root/staticfiles/xmodule/modules/js/010-f54db23669849c9c6e64498b10c2bd2b.js:707
 msgid "Turn on captions"
 msgstr "Включить заголовки"
 
 #: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js:715
 #: common/static/xmodule/modules/js/010-f54db23669849c9c6e64498b10c2bd2b.js:715
+#: test_root/staticfiles/xmodule/modules/js/010-f54db23669849c9c6e64498b10c2bd2b.js:715
 msgid "Turn off captions"
 msgstr "Отключить заголовки"
 
@@ -592,16 +629,6 @@ msgstr "Скрыть дискуссии"
 msgid "Show Discussion"
 msgstr "Показать дискуссии"
 
-#: common/static/coffee/src/discussion/views/discussion_content_view.js:58
-#: common/static/coffee/src/discussion/views/discussion_content_view.js:62
-msgid "Close"
-msgstr "Закрыть"
-
-#: common/static/coffee/src/discussion/views/discussion_content_view.js:58
-#: common/static/coffee/src/discussion/views/discussion_content_view.js:62
-msgid "Open"
-msgstr "Открыть"
-
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js:174
 msgid "Load more"
 msgstr "Загрузить еще"
@@ -611,15 +638,11 @@ msgid "Loading more threads"
 msgstr "Загрузить больше тем"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js:86
-#: common/static/coffee/src/discussion/views/response_comment_show_view.js:78
-#: common/static/coffee/src/discussion/views/response_comment_show_view.js:79
 #: common/static/coffee/src/discussion/views/thread_response_show_view.js:161
 msgid "Misuse Reported"
 msgstr "Жалоба отправлена"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_show_view.js:91
-#: common/static/coffee/src/discussion/views/response_comment_show_view.js:84
-#: common/static/coffee/src/discussion/views/response_comment_show_view.js:85
 #: common/static/coffee/src/discussion/views/thread_response_show_view.js:166
 msgid "Report Misuse"
 msgstr "Пожаловаться"
@@ -644,10 +667,6 @@ msgstr "аноним"
 #: common/static/coffee/src/discussion/views/thread_response_show_view.js:72
 msgid "staff"
 msgstr "преподаватель"
-
-#: common/static/coffee/src/discussion/views/response_comment_show_view.js:68
-msgid "Community TA"
-msgstr "Модератор"
 
 #: lms/static/admin/js/SelectFilter2.js:45
 #, c-format
@@ -1073,6 +1092,15 @@ msgstr "Спрятать"
 #: lms/static/coffee/src/staff_grading/staff_grading.js:501
 msgid "(Show)"
 msgstr "Показать"
+
+#~ msgid "Close"
+#~ msgstr "Закрыть"
+
+#~ msgid "Open"
+#~ msgstr "Открыть"
+
+#~ msgid "Community TA"
+#~ msgstr "Модератор"
 
 #~ msgid "Are you sure to delete thread"
 #~ msgstr "Вы уверены, что хотите удалить всю ветку"
