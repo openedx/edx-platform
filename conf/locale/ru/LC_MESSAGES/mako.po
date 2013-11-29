@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
 "POT-Creation-Date: 2013-11-29 18:40+0400\n"
-"PO-Revision-Date: 2013-11-29 18:02+0300\n"
+"PO-Revision-Date: 2013-11-29 19:04+0300\n"
 "Last-Translator: JK <korvin.lucky@gmail.com>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
@@ -4992,7 +4992,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/word_cloud_module.py:39
 msgid "Word cloud"
-msgstr ""
+msgstr "Облако слов"
 
 #: common/lib/xmodule/xmodule/word_cloud_module.py:42
 #, fuzzy
@@ -6361,12 +6361,12 @@ msgid "Tomorrow"
 msgstr "Завтра"
 
 #: lms/static/js/fake_i18n.js:1
-#, fuzzy, python-format
+#, python-format
 msgid "%s new comment"
 msgid_plural "%s new comments"
-msgstr[0] "Добавить комментарий"
-msgstr[1] "Добавить комментарий"
-msgstr[2] "Добавить комментарий"
+msgstr[0] "%s новый комментарий"
+msgstr[1] "%s новых комментария"
+msgstr[2] "%s новых комментариев"
 
 #: lms/templates/admin_dashboard.html:11
 msgid "{platform_name}-wide Summary"
@@ -8919,7 +8919,7 @@ msgstr "Тема:"
 #: lms/templates/courseware/instructor_dashboard.html:529
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html:32
 msgid "(Max 128 characters)"
-msgstr ""
+msgstr "(Максимум 128 символов)"
 
 #: lms/templates/courseware/instructor_dashboard.html:542
 #, fuzzy
@@ -8939,18 +8939,17 @@ msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html:545
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html:46
-#, fuzzy
 msgid ""
 "Have you sent the email to yourself first to make sure you're happy with how "
 "it's displayed, and that embedded links and images work properly?"
 msgstr ""
 "Вы отправили письмо себе чтобы убедиться, что удовлетворены тем, как оно "
-"отображается?"
+"отображается, и все ссылки и картинки работают правильно?"
 
 #: lms/templates/courseware/instructor_dashboard.html:548
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html:50
 msgid "CAUTION!"
-msgstr ""
+msgstr "ВНИМАНИЕ!"
 
 #: lms/templates/courseware/instructor_dashboard.html:549
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html:51
@@ -8958,11 +8957,13 @@ msgid ""
 "Once the 'Send Email' button is clicked, your email will be queued for "
 "sending."
 msgstr ""
+"Как только нажата кнопка 'Отослать письмо', ваше письмо будет поставленно в "
+"очередь."
 
 #: lms/templates/courseware/instructor_dashboard.html:550
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html:52
 msgid "A queued email CANNOT be cancelled."
-msgstr ""
+msgstr "Письма находящиеся в очереди НЕЛЬЗЯ отменить."
 
 #: lms/templates/courseware/instructor_dashboard.html:553
 msgid "Send email"
@@ -9034,7 +9035,7 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html:61
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html:116
 msgid "Pending Instructor Tasks"
-msgstr "Ожидающие задачи инструктора"
+msgstr "Ожидающие в очереди задания"
 
 #: lms/templates/courseware/instructor_dashboard.html:794
 msgid "Task Type"
@@ -9471,7 +9472,7 @@ msgstr "проголосовать"
 #: lms/templates/discussion/_underscore_templates.html:35
 #: lms/templates/discussion/_underscore_templates.html:126
 msgid "votes (click to vote)"
-msgstr ""
+msgstr "голосов (проголосовать)"
 
 #: lms/templates/discussion/_underscore_templates.html:44
 msgid "&bull; This thread is closed."
@@ -9546,7 +9547,7 @@ msgstr "Обновить ответ"
 
 #: lms/templates/discussion/_underscore_templates.html:161
 msgid "&ndash;posted {time} by {username}"
-msgstr ""
+msgstr "&ndash;отправлено {time} {username}"
 
 #: lms/templates/discussion/_underscore_templates.html:183
 msgid "DISCUSSION HOME"
@@ -9815,61 +9816,52 @@ msgid "Level of Education"
 msgstr "Уровень образования"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html:5
-#, fuzzy
 msgid "Enrollment Information"
-msgstr "Информация о пользователе"
+msgstr "Информация о регистрациях"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html:6
 msgid "Total number of enrollees (instructors, staff members, and students)"
-msgstr ""
+msgstr "Общее количество регистраций (инструкторы, преподаватели, студенты)"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html:14
-#, fuzzy
 msgid "Basic Course Information"
 msgstr "Информация о курсе"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html:28
-#, fuzzy
 msgid "Course Name:"
-msgstr "Имя курса"
+msgstr "Имя курса:"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html:33
-#, fuzzy
 msgid "Course Display Name:"
 msgstr "Отображаемое имя:"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html:38
-#, fuzzy
 msgid "Has the course started?"
-msgstr "Дата начала курса:"
+msgstr "Курс начат:"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html:40
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html:47
-#, fuzzy
 msgid "Yes"
-msgstr "да"
+msgstr "Да"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html:40
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html:49
-#, fuzzy
 msgid "No"
-msgstr "Сейчас"
+msgstr "Нет"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html:45
-#, fuzzy
 msgid "Has the course ended?"
-msgstr "Первый день курса"
+msgstr "Курс окончен?"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html:54
-#, fuzzy
 msgid "Grade Cutoffs:"
-msgstr "Проходной балл (grade cufoffs)"
+msgstr "Проходной балл:"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html:65
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html:27
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html:117
 msgid "The status for any active tasks appears in a table below."
-msgstr ""
+msgstr "Статус активных заданий появится в таблице ниже."
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html:78
 msgid "Course Warnings"
@@ -13561,7 +13553,6 @@ msgid ""
 msgstr ""
 
 #: lms/templates/verify_student/reverification_confirmation.html:66
-#, fuzzy
 msgid "Return to Your Dashboard"
 msgstr "Перейти к вашей личной странице"
 
