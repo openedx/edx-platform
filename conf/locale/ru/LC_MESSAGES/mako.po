@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
-"POT-Creation-Date: 2013-11-26 15:30+0000\n"
+"POT-Creation-Date: 2013-11-29 12:26+0400\n"
 "PO-Revision-Date: 2013-11-26 19:39+0300\n"
 "Last-Translator: JK <korvin.lucky@gmail.com>\n"
 "Language-Team: Select LTD\n"
@@ -4760,17 +4760,16 @@ msgid "Max places"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/master_class_module.py:44
-#: common/lib/xmodule/xmodule/word_cloud_module.py:43
-msgid "Number of text boxes available for students to input words/sentences."
-msgstr ""
+#, fuzzy
+msgid "Number of places available for students to register for masterclass."
+msgstr "Был ли этот студент зарегистрирован на этом мастер-классе."
 
 #: common/lib/xmodule/xmodule/master_class_module.py:50
 msgid "Autopass score"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/master_class_module.py:51
-#: common/lib/xmodule/xmodule/word_cloud_module.py:50
-msgid "Maximum number of words to be displayed in generated word cloud."
+msgid "Autopass score to automaticly pass registration for masterclass."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/master_class_module.py:59
@@ -4997,10 +4996,18 @@ msgstr ""
 msgid "Inputs"
 msgstr "Текстовое поле"
 
+#: common/lib/xmodule/xmodule/word_cloud_module.py:43
+msgid "Number of text boxes available for students to input words/sentences."
+msgstr ""
+
 #: common/lib/xmodule/xmodule/word_cloud_module.py:49
 #, fuzzy
 msgid "Maximum Words"
 msgstr "Максимальное число попыток"
+
+#: common/lib/xmodule/xmodule/word_cloud_module.py:50
+msgid "Maximum number of words to be displayed in generated word cloud."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/word_cloud_module.py:56
 #, fuzzy
