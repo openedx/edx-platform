@@ -22,11 +22,11 @@ if Backbone?
         return if not @$(".post-status-closed").length
         if closed
           @$(".post-status-closed").show()
-          @$(".action-openclose").html(@$(".action-openclose").html().replace("Close", "Open"))
+          @$(".action-openclose").html(@$(".action-openclose").html().replace(gettext("Close"), gettext("Open")))
           @$(".discussion-reply-new").hide()
         else
           @$(".post-status-closed").hide()
-          @$(".action-openclose").html(@$(".action-openclose").html().replace("Open", "Close"))
+          @$(".action-openclose").html(@$(".action-openclose").html().replace(gettext("Open"), gettext("Close")))
           @$(".discussion-reply-new").show()
 
       voted: (voted) ->
