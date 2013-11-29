@@ -158,10 +158,10 @@
     <div class="response-body">${'<%- body %>'}</div>
     <div class="discussion-flag-abuse notflagged" data-role="thread-flag" data-tooltip="${_('Report Misuse')}" role="button" aria-pressed="false" tabindex="0">
       <i class="icon icon-flag"></i><span class="sr flag-label">${_("Report Misuse")}</span></div>
-    <p class="posted-details">&ndash;posted <span class="timeago" title="${'<%- created_at %>'}">${'<%- created_at %>'}</span> by
-        ${"<% if (obj.username) { %>"}
-        <a href="${'<%- user_url %>'}" class="profile-link">${'<%- username %>'}</a>
-        ${"<% } else {print('anonymous');} %>"}
+    <p class="posted-details">${_('&ndash;posted {time} by {username}').format(
+        time = '<span class="timeago" title="<%- created_at %>"><%- created_at %></span>',
+        username = '<% if (obj.username) { %><a href="<%- user_url %>" class="profile-link"><%- username %></a><% } else {print("anonymous");} %>'
+     )}
     </p>
   </div>
 </script>
