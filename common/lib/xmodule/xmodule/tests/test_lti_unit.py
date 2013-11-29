@@ -6,7 +6,12 @@ import textwrap
 from lxml import etree
 from webob.request import Request
 from copy import copy
+from collections import OrderedDict
 import urllib
+import oauthlib
+import hashlib
+import base64
+
 
 from xmodule.lti_module import LTIDescriptor, LTIError
 
@@ -287,7 +292,6 @@ class LTIModuleTest(LogicTest):
         LTI module attempts to get client key and secret provided in cms.
         There are key and secret provided in wrong format.
         """
-        #import ipdb; ipdb.set_trace()
         #this adds lti passports to system
         #provide key and secret in wrong format
         mocked_course = Mock(lti_passports = ['test_id_test_client_test_secret'])
@@ -296,11 +300,199 @@ class LTIModuleTest(LogicTest):
         modulestore.configure_mock(**attrs)
         runtime = Mock(modulestore=modulestore)
         self.xmodule.descriptor.runtime = runtime
-        self.xmodule.lti_id = "lti_id"
+        self.xmodule.lti_id = 'lti_id'
         self.assertRaises(LTIError, self.xmodule.get_client_key_secret)
 
-    def test_verify_oauth_body_sign(self):
-        pass
+
+    @patch('xmodule.lti_module.LTIModule.get_client_key_secret', return_value=('test_client_key', u'test_client_secret'))
+    def test_successful_verify_oauth_body_sign(self, get_key_secret):
+
+        mocked_nonce = u'135685044251684026041377608307'
+        mocked_timestamp = u'1234567890'
+        mocked_signature_after_sign = u'my_signature%3D'
+        mocked_decoded_signature = u'my_signature='
+
+        headers = {
+            u'user_id': 'test_user_id',
+            u'oauth_callback': u'about:blank',
+            u'launch_presentation_return_url': '',
+            u'lti_message_type': u'basic-lti-launch-request',
+            u'lti_version': 'LTI-1p0',
+            u'role': u'student',
+
+            u'resource_link_id': 'test_module_id',
+            u'lis_outcome_service_url': 'test_lis_outcome_service_url',
+            u'lis_result_sourcedid': 'test_sourcedId',
+
+            u'oauth_nonce': mocked_nonce,
+            u'oauth_timestamp': mocked_timestamp,
+            u'oauth_consumer_key': u'',
+            u'oauth_signature_method': u'HMAC-SHA1',
+            u'oauth_version': u'1.0',
+            u'oauth_signature': mocked_decoded_signature
+        }
+
+        saved_sign = oauthlib.oauth1.Client.sign
+
+        def mocked_sign(self, *args, **kwargs):
+            """
+            Mocked oauth1 sign function.
+            """
+            # self is <oauthlib.oauth1.rfc5849.Client object> here:
+            __, headers, __ = saved_sign(self, *args, **kwargs)
+            # we should replace nonce, timestamp and signed_signature in headers:
+            old = headers[u'Authorization']
+            old_parsed = OrderedDict([param.strip().replace('"', '').split('=') for param in old.split(',')])
+            old_parsed[u'OAuth oauth_nonce'] = mocked_nonce
+            old_parsed[u'oauth_timestamp'] = mocked_timestamp
+            old_parsed[u'oauth_signature'] = mocked_signature_after_sign
+            headers[u'Authorization'] = ', '.join([k+'="'+v+'"' for k, v in old_parsed.items()])
+            return None, headers, None
+
+        patcher = patch.object(oauthlib.oauth1.Client, "sign", mocked_sign)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+
+        url = 'http://testurl'
+        body = textwrap.dedent("""
+            <?xml version = "1.0" encoding = "UTF-8"?>
+                <imsx_POXEnvelopeRequest  xmlns="http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
+                </imsx_POXEnvelopeRequest>
+        """)
+
+        #sign headers
+        client = oauthlib.oauth1.Client(
+            client_key=unicode(get_key_secret()[0]),
+            client_secret=unicode(get_key_secret()[1])
+        )
+        headers = {
+            # This is needed for body encoding:
+            'Content-Type': 'application/x-www-form-urlencoded',
+        }
+
+        #Calculate and encode body hash. See http://oauth.googlecode.com/svn/spec/ext/body_hash/1.0/oauth-bodyhash.html
+        sha1 = hashlib.sha1()
+        sha1.update(body)
+        oauth_body_hash = base64.b64encode(sha1.hexdigest())
+        __, headers, __ = client.sign(
+            unicode(url),
+            http_method=u'POST',
+            body={u'oauth_body_hash': oauth_body_hash},
+            headers=headers
+        )
+        headers = headers['Authorization'] + ', oauth_body_hash="{}"'.format(oauth_body_hash)
+
+        #create mocked request from LTI Provider
+        request_headers = {'Content-Type': 'application/xml', 'X-Requested-With': 'XMLHttpRequest'}
+        request_headers['Authorization'] = headers
+        mock_request = Mock(
+            url=unicode(urllib.unquote(url)),
+            http_method=unicode('POST'),
+            headers=request_headers,
+            body=body,
+
+        )
+
+        with patch('xmodule.lti_module.signature.verify_hmac_sha1') as mocked_verify:
+            mocked_verify.return_value = True
+            self.xmodule.verify_oauth_body_sign(mock_request)
+
+    @patch('xmodule.lti_module.LTIModule.get_client_key_secret', return_value=('test_client_key', u'test_client_secret'))
+    def test_failed_verify_oauth_body_sign(self, get_key_secret):
+
+        mocked_nonce = u'135685044251684026041377608307'
+        mocked_timestamp = u'1234567890'
+        mocked_signature_after_sign = u'my_signature%3D'
+        mocked_decoded_signature = u'my_signature='
+
+        headers = {
+            u'user_id': 'test_user_id',
+            u'oauth_callback': u'about:blank',
+            u'launch_presentation_return_url': '',
+            u'lti_message_type': u'basic-lti-launch-request',
+            u'lti_version': 'LTI-1p0',
+            u'role': u'student',
+
+            u'resource_link_id': 'test_module_id',
+            u'lis_outcome_service_url': 'test_lis_outcome_service_url',
+            u'lis_result_sourcedid': 'test_sourcedId',
+
+            u'oauth_nonce': mocked_nonce,
+            u'oauth_timestamp': mocked_timestamp,
+            u'oauth_consumer_key': u'',
+            u'oauth_signature_method': u'HMAC-SHA1',
+            u'oauth_version': u'1.0',
+            u'oauth_signature': mocked_decoded_signature
+        }
+
+
+
+        saved_sign = oauthlib.oauth1.Client.sign
+
+        def mocked_sign(self, *args, **kwargs):
+            """
+            Mocked oauth1 sign function.
+            """
+            # self is <oauthlib.oauth1.rfc5849.Client object> here:
+            __, headers, __ = saved_sign(self, *args, **kwargs)
+            # we should replace nonce, timestamp and signed_signature in headers:
+            old = headers[u'Authorization']
+            old_parsed = OrderedDict([param.strip().replace('"', '').split('=') for param in old.split(',')])
+            old_parsed[u'OAuth oauth_nonce'] = mocked_nonce
+            old_parsed[u'oauth_timestamp'] = mocked_timestamp
+            old_parsed[u'oauth_signature'] = mocked_signature_after_sign
+            headers[u'Authorization'] = ', '.join([k+'="'+v+'"' for k, v in old_parsed.items()])
+            return None, headers, None
+
+        patcher = patch.object(oauthlib.oauth1.Client, "sign", mocked_sign)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+
+        url = 'http://testurl'
+        body = textwrap.dedent("""
+            <?xml version = "1.0" encoding = "UTF-8"?>
+                <imsx_POXEnvelopeRequest  xmlns="http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
+                </imsx_POXEnvelopeRequest>
+        """)
+
+        #sign headers
+        client = oauthlib.oauth1.Client(
+            client_key=unicode(get_key_secret()[0]),
+            client_secret=unicode(get_key_secret()[1])
+        )
+        headers = {
+            # This is needed for body encoding:
+            'Content-Type': 'application/x-www-form-urlencoded',
+        }
+
+        #Calculate and encode body hash. See http://oauth.googlecode.com/svn/spec/ext/body_hash/1.0/oauth-bodyhash.html
+        sha1 = hashlib.sha1()
+        sha1.update(body)
+        oauth_body_hash = base64.b64encode(sha1.hexdigest())
+        __, headers, __ = client.sign(
+            unicode(url),
+            http_method=u'POST',
+            body={u'oauth_body_hash': oauth_body_hash},
+            headers=headers
+        )
+        headers = headers['Authorization'] + ', oauth_body_hash="{}"'.format(oauth_body_hash)
+
+        #create mocked request from LTI Provider
+        request_headers = {'Content-Type': 'application/xml', 'X-Requested-With': 'XMLHttpRequest'}
+        request_headers['Authorization'] = headers
+        mock_request = Mock(
+            url=unicode(urllib.unquote(url)),
+            http_method=unicode('POST'),
+            headers=request_headers,
+            body=body,
+
+        )
+        with patch('xmodule.lti_module.signature.verify_hmac_sha1') as mocked_verify:
+            mocked_verify.return_value = False
+            self.assertRaises(LTIError, self.xmodule.verify_oauth_body_sign, mock_request)
+
 
 
 
