@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
 "POT-Creation-Date: 2013-11-29 12:03+0000\n"
-"PO-Revision-Date: 2013-11-29 16:21+0300\n"
+"PO-Revision-Date: 2013-11-29 18:02+0300\n"
 "Last-Translator: JK <korvin.lucky@gmail.com>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
@@ -4761,20 +4761,20 @@ msgstr "Мастер-класс"
 
 #: common/lib/xmodule/xmodule/master_class_module.py:43
 msgid "Max places"
-msgstr ""
+msgstr "Максимальное количество мест"
 
 #: common/lib/xmodule/xmodule/master_class_module.py:44
-#, fuzzy
 msgid "Number of places available for students to register for masterclass."
-msgstr "Был ли этот студент зарегистрирован на этом мастер-классе."
+msgstr "Количество мест доступных студентам для регистрации на мастер-класс."
 
 #: common/lib/xmodule/xmodule/master_class_module.py:50
 msgid "Autopass score"
-msgstr ""
+msgstr "Автоматически проходной балл "
 
 #: common/lib/xmodule/xmodule/master_class_module.py:51
 msgid "Autopass score to automaticly pass registration for masterclass."
 msgstr ""
+"Проходной балл, при котором регистрация участника проходит автоматически."
 
 #: common/lib/xmodule/xmodule/master_class_module.py:59
 msgid "Whether this student has been register for this master class."
@@ -4873,9 +4873,8 @@ msgid "Poll question"
 msgstr "Задать вопрос"
 
 #: common/lib/xmodule/xmodule/video_module.py:43
-#, fuzzy
 msgid "Display name for this module."
-msgstr "Отображаемое имя для этого объекта"
+msgstr "Отображаемое имя для этого объекта."
 
 #: common/lib/xmodule/xmodule/video_module.py:44
 #, fuzzy
