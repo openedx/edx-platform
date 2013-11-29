@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
 "POT-Creation-Date: 2013-11-29 12:27+0400\n"
-"PO-Revision-Date: 2013-11-26 18:49+0300\n"
+"PO-Revision-Date: 2013-11-29 12:45+0300\n"
 "Last-Translator: Lenar Safin <safin@smartdec.ru>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
@@ -115,7 +115,7 @@ msgstr "Удалить %(type)s?"
 
 #: cms/static/js/base.js:267
 msgid "Deleting this %(type)s is permanent and cannot be undone."
-msgstr "Удаление %{type}s не может быть отменено."
+msgstr "Удаление %(type)s не может быть отменено."
 
 #: cms/static/js/base.js:270
 msgid "Yes, delete this "
@@ -595,12 +595,12 @@ msgstr "Показать дискуссии"
 #: common/static/coffee/src/discussion/views/discussion_content_view.js:58
 #: common/static/coffee/src/discussion/views/discussion_content_view.js:62
 msgid "Close"
-msgstr ""
+msgstr "Закрыть"
 
 #: common/static/coffee/src/discussion/views/discussion_content_view.js:58
 #: common/static/coffee/src/discussion/views/discussion_content_view.js:62
 msgid "Open"
-msgstr ""
+msgstr "Открыть"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js:174
 msgid "Load more"
@@ -647,7 +647,7 @@ msgstr "преподаватель"
 
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js:68
 msgid "Community TA"
-msgstr ""
+msgstr "Модератор"
 
 #: lms/static/admin/js/SelectFilter2.js:45
 #, c-format
@@ -886,6 +886,8 @@ msgid ""
 "Error getting student progress url for '<%= student_id %>'. Check that the "
 "student identifier is spelled correctly."
 msgstr ""
+"Ошибка при создании ссылки на прогресс для студента '<%= student_id %>'. "
+"Проверьте правильность ввода идентификатора студента."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js:95
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js:132
@@ -902,6 +904,8 @@ msgid ""
 "Success! Problem attempts reset for problem '<%= problem_id %>' and student "
 "'<%= student_id %>'."
 msgstr ""
+"Успешно! Попытки сдачи сброшены для  задачи  '<%= problem_id %>' и студента "
+"'<%= student_id %>'."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js:103
 msgid ""
@@ -909,21 +913,29 @@ msgid ""
 "'<%= student_id %>'. Check that the problem and student identifiers are "
 "spelled correctly."
 msgstr ""
+"Ошибка сброса попыток сдачи для  задачи  '<%= problem_id %>' и студента '<%= "
+"student_id %>'. Проверьте что имя задачи и идентификатор стуента введены "
+"правильно."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js:134
 msgid ""
 "Delete student '<%= student_id %>'s state on problem '<%= problem_id %>'?"
 msgstr ""
+"Удалить состояние для студента '<%= student_id %>' по задаче '<%= problem_id "
+"%>'?"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js:145
 msgid ""
 "Error deleting student '<%= student_id %>'s state on problem '<%= problem_id "
 "%>'. Check that the problem and student identifiers are spelled correctly."
 msgstr ""
+"Ошибка удаления состояния для студента '<%= student_id %>' по задаче '<%= "
+"problem_id %>'. Проверьте что имя задачи и идентификатор стуента введены "
+"правильно."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js:155
 msgid "Module state successfully deleted."
-msgstr ""
+msgstr "Состояние объекта успешно удалено."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js:179
 msgid ""
@@ -931,24 +943,28 @@ msgid ""
 "%= student_id %>'. Click the 'Show Background Task History for Student' "
 "button to see the status of the task."
 msgstr ""
+"Начата переоценка для студента '<%= student_id %>' по задаче '<%= problem_id "
+"%>'. Нажмите 'Показать состояния фоновых заданий' чтобы увидеть состояние "
+"задания."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js:184
 msgid ""
 "Error starting a task to rescore problem '<%= problem_id %>' for student '<"
 "%= student_id %>'. Check that the problem and student identifiers are "
 "spelled correctly."
-msgstr ""
+msgstr "Проверьте что имя задачи и идентификатор стуента введены правильно."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js:215
 msgid ""
 "Error getting task history for problem '<%= problem_id %>' and student '<%= "
 "student_id %>'. Check that the problem and student identifiers are spelled "
 "correctly."
-msgstr ""
+msgstr "Проверьте что имя задачи и идентификатор стуента введены правильно."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js:238
 msgid "Reset attempts for all students on problem '<%= problem_id %>'?"
 msgstr ""
+"Сбросить попытки сдачи для всех студентов по задаче '<%= problem_id %>'?"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js:247
 msgid ""
@@ -956,16 +972,21 @@ msgid ""
 "Click the 'Show Background Task History for Problem' button to see the "
 "status of the task."
 msgstr ""
+"Успешно начат сброс попыток сдачи задачи '<%= problem_id %>' для всех "
+"стуентов. Нажмите 'Показать состояния фоновых заданий' чтобы увидеть "
+"состояние задания."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js:251
 msgid ""
 "Error starting a task to reset attempts for all students on problem '<%= "
 "problem_id %>'. Check that the problem identifier is spelled correctly."
 msgstr ""
+"Ошибка при сбросе попыток сдачи для всех студентов по задаче '<%= problem_id "
+"%>'. Проверьте что имя задачи и идентификатор стуента введены правильно."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js:276
 msgid "Rescore problem '<%= problem_id %>' for all students?"
-msgstr ""
+msgstr "Переоценить задачу '<%= problem_id %>' у всех студентов?"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js:285
 msgid ""
@@ -973,16 +994,20 @@ msgid ""
 "students. Click the 'Show Background Task History for Problem' button to see "
 "the status of the task."
 msgstr ""
+"Успешно начато переоценка задачи '<%= problem_id %>' для всех стуентов. "
+"Нажмите 'Показать состояния фоновых заданий' чтобы увидеть состояние задания."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js:289
 msgid ""
 "Error starting a task to rescore problem '<%= problem_id %>'. Check that the "
 "problem identifier is spelled correctly."
 msgstr ""
+"Ошибка при переоценивани задачи '<%= problem_id %>'. Проверьте что имя "
+"задачи и идентификатор стуента введены правильно."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js:324
 msgid "Error listing task history for this student and problem."
-msgstr ""
+msgstr "Ошибка при отображении списка задании для задачи и студента."
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js:371
 msgid "Problem Name"

@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
 "POT-Creation-Date: 2013-11-29 12:26+0400\n"
-"PO-Revision-Date: 2013-11-26 19:39+0300\n"
+"PO-Revision-Date: 2013-11-29 13:06+0300\n"
 "Last-Translator: JK <korvin.lucky@gmail.com>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
@@ -10208,7 +10208,7 @@ msgstr "Задачи с открытым ответом"
 
 #: lms/templates/open_ended_problems/open_ended_problems.html:21
 msgid "Here is a list of open ended problems for this course."
-msgstr "Вот список задач с открытым ответом в данном курсе."
+msgstr "Список сданных задач с открытым ответом в данном курсе."
 
 #: lms/templates/open_ended_problems/open_ended_problems.html:25
 msgid "You have not attempted any open ended problems yet."
