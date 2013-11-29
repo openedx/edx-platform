@@ -17,8 +17,8 @@
     <div class="combined-notifications" data-ajax_url="${ajax_url}">
         <div class="error-container">${error_text}</div>
         <h1>${_("Open Ended Console")}</h1>
-        <h2>${_("Instructions")}</h2>
-        <p>${_("Here are items that could potentially need your attention.")}</p>
+        <h2 class="sr">${_("Instructions")}</h2>
+        <p class="sr">${_("Here are items that could potentially need your attention.")}</p>
         % if success:
             % if len(notification_list) == 0:
             <div class="message-container">
