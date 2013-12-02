@@ -6,7 +6,7 @@ from django.template.loader import make_origin, get_template_from_string
 from django.template.loaders.filesystem import Loader as FilesystemLoader
 from django.template.loaders.app_directories import Loader as AppDirectoriesLoader
 
-from mitxmako.template import Template
+from edxmako.template import Template
 
 import tempdir
 

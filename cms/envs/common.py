@@ -161,7 +161,7 @@ MIDDLEWARE_CLASSES = (
 
     'django.contrib.messages.middleware.MessageMiddleware',
     'track.middleware.TrackMiddleware',
-    'mitxmako.middleware.MakoMiddleware',
+    'edxmako.middleware.MakoMiddleware',
 
     # Detects user-requested locale from 'accept-language' header in http request
     'django.middleware.locale.LocaleMiddleware',
@@ -393,7 +393,7 @@ INSTALLED_APPS = (
     'datadog',
 
     # For asset pipelining
-    'mitxmako',
+    'edxmako',
     'pipeline',
     'staticfiles',
     'static_replace',

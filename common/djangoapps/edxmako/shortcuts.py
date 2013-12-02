@@ -16,8 +16,8 @@ from django.template import Context
 from django.http import HttpResponse
 import logging
 
-import mitxmako
-import mitxmako.middleware
+import edxmako
+import edxmako.middleware
 from django.conf import settings
 from django.core.urlresolvers import reverse
 log = logging.getLogger(__name__)
@@ -81,15 +81,15 @@ def render_to_string(template_name, dictionary, context=None, namespace='main'):
     context_instance['marketing_link'] = marketing_link
 
     # In various testing contexts, there might not be a current request context.
-    if mitxmako.middleware.requestcontext is not None:
-        for d in mitxmako.middleware.requestcontext:
+    if edxmako.middleware.requestcontext is not None:
+        for d in edxmako.middleware.requestcontext:
             context_dictionary.update(d)
     for d in context_instance:
         context_dictionary.update(d)
     if context:
         context_dictionary.update(context)
     # fetch and render template
-    template = mitxmako.lookup[namespace].get_template(template_name)
+    template = edxmako.lookup[namespace].get_template(template_name)
     return template.render_unicode(**context_dictionary)
 
 

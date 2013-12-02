@@ -6,7 +6,7 @@ from functools import partial
 from django.utils.translation import ugettext as _
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
-from mitxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
 from django.utils.html import escape
 from django.http import Http404

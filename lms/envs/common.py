@@ -281,7 +281,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'course_wiki.course_nav.context_processor',
 
     # Hack to get required link URLs to password reset templates
-    'mitxmako.shortcuts.marketing_link_context_processor',
+    'edxmako.shortcuts.marketing_link_context_processor',
 
     # Shoppingcart processor (detects if request.user has a cart)
     'shoppingcart.context_processor.user_has_cart_context_processor',
@@ -592,8 +592,8 @@ STATICFILES_FINDERS = (
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
-    'mitxmako.makoloader.MakoFilesystemLoader',
-    'mitxmako.makoloader.MakoAppDirectoriesLoader',
+    'edxmako.makoloader.MakoFilesystemLoader',
+    'edxmako.makoloader.MakoAppDirectoriesLoader',
 
     # 'django.template.loaders.filesystem.Loader',
     # 'django.template.loaders.app_directories.Loader',
@@ -615,7 +615,7 @@ MIDDLEWARE_CLASSES = (
 
     'django.contrib.messages.middleware.MessageMiddleware',
     'track.middleware.TrackMiddleware',
-    'mitxmako.middleware.MakoMiddleware',
+    'edxmako.middleware.MakoMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
 
     'course_wiki.course_nav.Middleware',
@@ -928,7 +928,7 @@ INSTALLED_APPS = (
     'service_status',
 
     # For asset pipelining
-    'mitxmako',
+    'edxmako',
     'pipeline',
     'staticfiles',
     'static_replace',

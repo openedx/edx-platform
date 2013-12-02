@@ -9,7 +9,7 @@ import static_replace
 
 from django.conf import settings
 from django.utils.timezone import UTC
-from mitxmako.shortcuts import render_to_string
+from edxmako.shortcuts import render_to_string
 from xblock.fragment import Fragment
 
 from xmodule.seq_module import SequenceModule

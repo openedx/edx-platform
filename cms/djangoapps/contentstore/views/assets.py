@@ -7,7 +7,7 @@ from django.views.decorators.http import require_http_methods
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST
 
-from mitxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response
 from cache_toolbox.core import del_cached_content
 
 from xmodule.contentstore.django import contentstore

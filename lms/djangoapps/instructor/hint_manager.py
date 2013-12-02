@@ -13,7 +13,7 @@ import re
 from django.http import HttpResponse, Http404
 from django_future.csrf import ensure_csrf_cookie
 
-from mitxmako.shortcuts import render_to_response, render_to_string
+from edxmako.shortcuts import render_to_response, render_to_string
 
 from courseware.courses import get_course_with_access
 from courseware.models import XModuleUserStateSummaryField

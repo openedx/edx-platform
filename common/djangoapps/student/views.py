@@ -35,7 +35,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 
 from ratelimitbackend.exceptions import RateLimitException
 
-from mitxmako.shortcuts import render_to_response, render_to_string
+from edxmako.shortcuts import render_to_response, render_to_string
 
 from course_modes.models import CourseMode
 from student.models import (

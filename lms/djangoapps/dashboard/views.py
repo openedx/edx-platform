@@ -1,5 +1,5 @@
 from django.http import Http404
-from mitxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response
 from django.db import connection
 
 from student.models import CourseEnrollment

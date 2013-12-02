@@ -5,7 +5,7 @@ from urlparse import urlparse
 from collections import namedtuple, defaultdict
 
 
-from mitxmako.shortcuts import render_to_string
+from edxmako.shortcuts import render_to_string
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User

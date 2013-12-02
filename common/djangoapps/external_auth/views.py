@@ -28,7 +28,7 @@ from django.utils.http import urlquote, is_safe_url
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 
-from mitxmako.shortcuts import render_to_response, render_to_string
+from edxmako.shortcuts import render_to_response, render_to_string
 try:
     from django.views.decorators.csrf import csrf_exempt
 except ImportError:

@@ -4,7 +4,7 @@ import xml.etree.ElementTree
 
 from django.http import Http404
 from django.http import HttpResponse
-from mitxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response
 
 from .models import ServerCircuit
 

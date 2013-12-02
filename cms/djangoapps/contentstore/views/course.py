@@ -16,7 +16,7 @@ from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseBadRequest, HttpResponseNotFound
 from util.json_request import JsonResponse
-from mitxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response
 
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore, loc_mapper

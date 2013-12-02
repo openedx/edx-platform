@@ -21,7 +21,7 @@ MODULESTORE = {
         'OPTIONS': {
             'default_class': 'xmodule.raw_module.RawDescriptor',
             'fs_root': GITHUB_REPO_ROOT,
-            'render_template': 'mitxmako.shortcuts.render_to_string',
+            'render_template': 'edxmako.shortcuts.render_to_string',
         }
     }
 }

@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
-from mitxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response
 from xmodule.modulestore import Location
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.django import modulestore
