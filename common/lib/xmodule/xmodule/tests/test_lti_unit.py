@@ -2,6 +2,7 @@
 """Test for LTI Xmodule functional logic."""
 
 from mock import Mock, patch, PropertyMock
+import mock
 import textwrap
 from lxml import etree
 from webob.request import Request
@@ -348,4 +349,103 @@ class LTIModuleTest(LogicTest):
         """)
         return mock_request
 
+    def test_oauth_params(self):
+        """
+        Ensure that parameters and custom parameters were prepared correctly for sending in form.
+        """
+        custom_parameters = {'test_custom_params': 'test_custom_param_value'}
+        client_key = 'test_client_key'
+        client_secret = 'test_client_secret'
+
+        saved_sign = oauthlib.oauth1.Client.sign
+
+        def mocked_sign(self, *args, **kwargs):
+            """
+            Mocked oauth1 sign function.
+            """
+            # self is <oauthlib.oauth1.rfc5849.Client object> here:
+            __, headers, __ = saved_sign(self, *args, **kwargs)
+            # we should replace nonce, timestamp and signed_signature in headers:
+            old = headers[u'Authorization']
+            old_parsed = OrderedDict([param.strip().replace('"', '').split('=') for param in old.split(',')])
+            old_parsed[u'OAuth oauth_nonce'] = u'135685044251684026041377608307'
+            old_parsed[u'oauth_timestamp'] = u'1234567890'
+            old_parsed[u'oauth_signature'] = u'my_signature%3D' #mocked_signature_after_sign
+            headers[u'Authorization'] = ', '.join([k+'="'+v+'"' for k, v in old_parsed.items()])
+            return None, headers, None
+
+        patcher = mock.patch.object(oauthlib.oauth1.Client, "sign", mocked_sign)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+        self.xmodule.get_resource_link_id = Mock(return_value = 'test_resource_link_id')
+        self.xmodule.get_outcome_service_url = Mock(return_value = 'http://test_outcome_service_url')
+
+        expected_params = {u'launch_presentation_return_url': '',
+            u'lti_version': 'LTI-1p0',
+            u'user_id': u'student',
+            u'oauth_nonce': u'135685044251684026041377608307',
+            u'oauth_timestamp': u'1234567890',
+            u'lis_result_sourcedid': u':test_resource_link_id:student',
+            u'oauth_consumer_key': u'test_client_key',
+            u'resource_link_id': 'test_resource_link_id',
+            u'oauth_signature_method': u'HMAC-SHA1',
+            u'oauth_version': u'1.0',
+            u'role': u'student',
+            u'lis_outcome_service_url': 'http://test_outcome_service_url',
+            u'oauth_signature': u'my_signature=',
+            u'lti_message_type': u'basic-lti-launch-request',
+            'test_custom_params': 'test_custom_param_value',
+            u'oauth_callback': u'about:blank'
+        }
+        params = self.xmodule.oauth_params(custom_parameters, client_key, client_secret)
+        self.assertEqual(params, expected_params)
+
+    def test_good_custom_params(self):
+        """
+        Custom parameters are present in right format.
+        """
+        self.xmodule.custom_parameters = {'test_custom_params=test_custom_param_value'}
+        self.xmodule.get_client_key_secret = Mock(return_value=('test_client_key', 'test_client_secret'))
+        self.xmodule.oauth_params = Mock()
+        self.xmodule.get_input_fields()
+        self.xmodule.oauth_params.assert_called_with(
+            {u'custom_test_custom_params': u'test_custom_param_value'},
+            'test_client_key', 'test_client_secret'
+        )
+
+    def test_bad_custom_params(self):
+        """
+        Custom parameters are present in wrong format.
+        """
+        bad_custom_params = {'test_custom_params: test_custom_param_value'}
+        self.xmodule.custom_parameters = bad_custom_params
+        self.xmodule.get_client_key_secret = Mock(return_value=('test_client_key', 'test_client_secret'))
+        self.xmodule.oauth_params = Mock()
+        self.assertRaises(
+            LTIError,
+            self.xmodule.get_input_fields,
+        )
+
+    def test_handle_ajax(self):
+        dispatch = 'regenerate_signature'
+        data = ''
+        self.xmodule.get_input_fields = Mock(return_value={'test_input_field_key': 'test_input_field_value'})
+        json_dump = self.xmodule.handle_ajax(dispatch, data)
+        expected_json_dump = '{"status": "OK", "input_fields": {"test_input_field_key": "test_input_field_value"}}'
+        self.assertEqual(
+            json_dump,
+            expected_json_dump
+        )
+
+    def test_handle_ajax_bad_dispatch(self):
+        dispatch = 'bad_dispatch'
+        data = ''
+        self.xmodule.get_input_fields = Mock(return_value={'test_input_field_key': 'test_input_field_value'})
+        json_dump = self.xmodule.handle_ajax(dispatch, data)
+        expected_json_dump = '{"error": "Unknown Command!"}'
+        self.assertEqual(
+            json_dump,
+            expected_json_dump
+        )
 
