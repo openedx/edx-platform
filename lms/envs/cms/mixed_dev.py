@@ -13,7 +13,7 @@ MODULESTORE = {
         'ENGINE': 'xmodule.modulestore.mixed.MixedModuleStore',
         'OPTIONS': {
             'mappings': {
-                'MITx/2.01x/2013_Spring': 'xml'
+                'edX/2.01x/2013_Spring': 'xml'
             },
             'stores': {
                 'xml': {

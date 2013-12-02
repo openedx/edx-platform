@@ -28,6 +28,7 @@ MAX_SCORE = 1
 FILE_NOT_FOUND_IN_RESPONSE_MESSAGE = "We could not find a file in your submission.  Please try choosing a file or pasting a link to your file into the answer box."
 ERROR_SAVING_FILE_MESSAGE = "We are having trouble saving your file.  Please try another file or paste a link to your file into the answer box."
 
+
 def upload_to_s3(file_to_upload, keyname, s3_interface):
     '''
     Upload file to S3 using provided keyname.

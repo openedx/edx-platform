@@ -137,7 +137,7 @@ class UserProfile(models.Model):
         * All fields are replicated into relevant Course databases
 
     Some of the fields are legacy ones that were captured during the initial
-    MITx fall prototype.
+    edX fall prototype.
     """
 
     class Meta:
@@ -675,9 +675,9 @@ def remove_user_from_group(user, group):
     utg.users.remove(User.objects.get(username=user))
     utg.save()
 
-default_groups = {'email_future_courses': 'Receive e-mails about future MITx courses',
-                  'email_helpers': 'Receive e-mails about how to help with MITx',
-                  'mitx_unenroll': 'Fully unenrolled -- no further communications',
+default_groups = {'email_future_courses': 'Receive e-mails about future edX courses',
+                  'email_helpers': 'Receive e-mails about how to help with edX',
+                  'edX_unenroll': 'Fully unenrolled -- no further communications',
                   '6002x_unenroll': 'Took and dropped 6002x'}
 
 

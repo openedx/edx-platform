@@ -4,7 +4,7 @@ sessions. Assumes structure:
 
 /envroot/
         /db   # This is where it'll write the database file
-        /mitx # The location of this repo
+        /edX # The location of this repo
         /log  # Where we're going to write log files
 """
 
@@ -130,7 +130,7 @@ DOC_STORE_CONFIG = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': TEST_ROOT / 'db' / 'mitx.db'
+        'NAME': TEST_ROOT / 'db' / 'edX.db'
     },
 
 }
@@ -140,7 +140,7 @@ CACHES = {
     # In staging/prod envs, the sessions also live here.
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'mitx_loc_mem_cache',
+        'LOCATION': 'edx_loc_mem_cache',
         'KEY_FUNCTION': 'util.memcache.safe_key',
     },
 
@@ -217,7 +217,7 @@ STATICFILES_DIRS.append(("uploads", MEDIA_ROOT))
 
 new_staticfiles_dirs = []
 # Strip out any static files that aren't in the repository root
-# so that the tests can run with only the mitx directory checked out
+# so that the tests can run with only the edX directory checked out
 for static_dir in STATICFILES_DIRS:
     # Handle both tuples and non-tuple directory definitions
     try:

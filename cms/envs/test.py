@@ -4,7 +4,7 @@ sessions. Assumes structure:
 
 /envroot/
         /db   # This is where it'll write the database file
-        /mitx # The location of this repo
+        /edx # The location of this repo
         /log  # Where we're going to write log files
 """
 
@@ -117,7 +117,7 @@ CACHES = {
     # In staging/prod envs, the sessions also live here.
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'mitx_loc_mem_cache',
+        'LOCATION': 'edx_loc_mem_cache',
         'KEY_FUNCTION': 'util.memcache.safe_key',
     },
 

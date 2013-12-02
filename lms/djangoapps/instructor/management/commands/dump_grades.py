@@ -26,7 +26,7 @@ class Command(BaseCommand):
 
         print "args = ", args
 
-        course_id = 'MITx/8.01rq_MW/Classical_Mechanics_Reading_Questions_Fall_2012_MW_Section'
+        course_id = 'edX/8.01rq_MW/Classical_Mechanics_Reading_Questions_Fall_2012_MW_Section'
         fn = "grades.csv"
         get_raw_scores = False
 

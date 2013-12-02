@@ -23,15 +23,15 @@ COURSE_LISTINGS = {
                  'BerkeleyX/CS188.1x/2012_Fall',
                  'HarvardX/CS50x/2012',
                  'HarvardX/PH207x/2012_Fall',
-                 'MITx/3.091x/2012_Fall',
-                 'MITx/6.002x/2012_Fall',
-                 'MITx/6.00x/2012_Fall'],
+                 'edX/3.091x/2012_Fall',
+                 'edX/6.002x/2012_Fall',
+                 'edX/6.00x/2012_Fall'],
 
     'berkeley': ['BerkeleyX/CS169.1x/2012_Fall',
                  'BerkeleyX/CS188.1x/2012_Fall'],
 
     'harvard': ['HarvardX/CS50x/2012'],
 
-    'mit': ['MITx/3.091x/2012_Fall',
-                 'MITx/6.00x/2012_Fall']
+    'mit': ['edX/3.091x/2012_Fall',
+                 'edX/6.00x/2012_Fall']
 }

@@ -117,7 +117,7 @@ def _filter_unstarted_categories(category_map):
 
     return result_map
 
-    
+
 def _sort_map_entries(category_map, sort_alpha):
     things = []
     for title, entry in category_map["entries"].items():

@@ -4,7 +4,7 @@ sessions. Assumes structure:
 
 /envroot/
         /db   # This is where it'll write the database file
-        /mitx # The location of this repo
+        /edX # The location of this repo
         /log  # Where we're going to write log files
 """
 
@@ -55,7 +55,7 @@ LOGGING = get_logger_config(ENV_ROOT / "log",
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': ENV_ROOT / "db" / "mitx.db",
+        'NAME': ENV_ROOT / "db" / "edX.db",
     }
 }
 
@@ -64,7 +64,7 @@ CACHES = {
     # In staging/prod envs, the sessions also live here.
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'mitx_loc_mem_cache',
+        'LOCATION': 'edx_loc_mem_cache',
         'KEY_FUNCTION': 'util.memcache.safe_key',
     },
 
@@ -110,20 +110,20 @@ COURSE_LISTINGS = {
                 'BerkeleyX/CS188.1x/2012_Fall',
                 'HarvardX/CS50x/2012',
                 'HarvardX/PH207x/2012_Fall',
-                'MITx/3.091x/2012_Fall',
-                'MITx/6.002x/2012_Fall',
-                'MITx/6.00x/2012_Fall'],
+                'edX/3.091x/2012_Fall',
+                'edX/6.002x/2012_Fall',
+                'edX/6.00x/2012_Fall'],
     'berkeley': ['BerkeleyX/CS169/fa12',
                  'BerkeleyX/CS188/fa12'],
     'harvard': ['HarvardX/CS50x/2012H'],
-    'mit': ['MITx/3.091/MIT_2012_Fall'],
-    'sjsu': ['MITx/6.002x-EE98/2012_Fall_SJSU'],
+    'mit': ['edX/3.091/MIT_2012_Fall'],
+    'sjsu': ['edX/6.002x-EE98/2012_Fall_SJSU'],
 }
 
 
 SUBDOMAIN_BRANDING = {
-    'sjsu': 'MITx',
-    'mit': 'MITx',
+    'sjsu': 'edX',
+    'mit': 'edX',
     'berkeley': 'BerkeleyX',
     'harvard': 'HarvardX',
 }
@@ -158,9 +158,9 @@ if os.path.isdir(DATA_DIR):
     ]
 
 
-################################# mitx revision string  #####################
+################################# edX revision string  #####################
 
-MITX_VERSION_STRING = os.popen('cd %s; git describe' % REPO_ROOT).read().strip()
+EDX_VERSION_STRING = os.popen('cd %s; git describe' % REPO_ROOT).read().strip()
 
 ############################ Open ended grading config  #####################
 

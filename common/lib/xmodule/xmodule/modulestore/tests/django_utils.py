@@ -17,7 +17,7 @@ def mixed_store_config(data_dir, mappings):
     `mappings` is a dictionary mapping course IDs to modulestores, for example:
 
         {
-            'MITx/2.01x/2013_Spring': 'xml',
+            'edX/2.01x/2013_Spring': 'xml',
             'edx/999/2013_Spring': 'default'
         }
 

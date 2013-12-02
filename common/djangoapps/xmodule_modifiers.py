@@ -171,7 +171,7 @@ def add_histogram(user, block, view, frag, context):  # pylint: disable=unused-a
             # doesn't like symlinks)
             filepath = filename
         data_dir = osfs.root_path.rsplit('/')[-1]
-        giturl = block.giturl or 'https://github.com/MITx'
+        giturl = block.giturl or 'https://github.com/edX'
         edit_link = "%s/%s/tree/master/%s" % (giturl, data_dir, filepath)
     else:
         edit_link = False

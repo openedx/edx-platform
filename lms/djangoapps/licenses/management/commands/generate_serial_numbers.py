@@ -17,7 +17,7 @@ class Command(BaseCommand):
 
     Example:
 
-       import_serial_numbers MITx/6.002x/2012_Fall matlab 100
+       import_serial_numbers edX/6.002x/2012_Fall matlab 100
 
     """
     args = "course_id software_id count"

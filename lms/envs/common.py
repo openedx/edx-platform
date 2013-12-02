@@ -216,7 +216,7 @@ XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5  # seconds
 PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /edx-platform/lms
 REPO_ROOT = PROJECT_ROOT.dirname()
 COMMON_ROOT = REPO_ROOT / "common"
-ENV_ROOT = REPO_ROOT.dirname()  # virtualenv dir /mitx is in
+ENV_ROOT = REPO_ROOT.dirname()  # virtualenv dir /edX is in
 COURSES_ROOT = ENV_ROOT / "data"
 
 DATA_DIR = COURSES_ROOT
@@ -245,7 +245,7 @@ STATUS_MESSAGE_PATH = ENV_ROOT / "status_message.json"
 ############################ OpenID Provider  ##################################
 OPENID_PROVIDER_TRUSTED_ROOTS = ['cs50.net', '*.cs50.net']
 
-################################## MITXWEB #####################################
+################################## EDX WEB #####################################
 # This is where we stick our compiled template files. Most of the app uses Mako
 # templates
 from tempdir import mkdtemp_clean
@@ -490,7 +490,7 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 # gitreload is used in LMS-workflow to pull content from github
 # gitreload requests are only allowed from these IP addresses, which are
 # the advertised public IPs of the github WebHook servers.
-# These are listed, eg at https://github.com/MITx/mitx/admin/hooks
+# These are listed, eg at https://github.com/edX/edx-platform/admin/hooks
 
 ALLOWED_GITRELOAD_IPS = ['207.97.227.253', '50.57.128.197', '108.171.174.178']
 
@@ -821,7 +821,7 @@ STATICFILES_IGNORE_PATTERNS = (
 
 PIPELINE_YUI_BINARY = 'yui-compressor'
 
-# Setting that will only affect the MITx version of django-pipeline until our changes are merged upstream
+# Setting that will only affect the edX version of django-pipeline until our changes are merged upstream
 PIPELINE_COMPILE_INPLACE = True
 
 ################################# CELERY ######################################

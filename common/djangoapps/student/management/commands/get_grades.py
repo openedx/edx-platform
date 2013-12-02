@@ -40,7 +40,7 @@ class Command(BaseCommand):
 
     Example:
       sudo -u www-data SERVICE_VARIANT=lms /opt/edx/bin/django-admin.py get_grades \
-        -c MITx/Chi6.00intro/A_Taste_of_Python_Programming -o /tmp/20130813-6.00x.csv \
+        -c edX/Chi6.00intro/A_Taste_of_Python_Programming -o /tmp/20130813-6.00x.csv \
         --settings=lms.envs.aws --pythonpath=/opt/wwc/edx-platform
     """
 

@@ -67,11 +67,11 @@ ENABLE_JASMINE = False
 
 
 ############################# SET PATH INFORMATION #############################
-PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /mitx/cms
+PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /edx/cms
 REPO_ROOT = PROJECT_ROOT.dirname()
 COMMON_ROOT = REPO_ROOT / "common"
 LMS_ROOT = REPO_ROOT / "lms"
-ENV_ROOT = REPO_ROOT.dirname()  # virtualenv dir /mitx is in
+ENV_ROOT = REPO_ROOT.dirname()  # virtualenv dir /edX is in
 
 GITHUB_REPO_ROOT = ENV_ROOT / "data"
 
@@ -230,7 +230,7 @@ USE_I18N = False
 USE_L10N = True
 
 # Localization strings (e.g. django.po) are under this directory
-LOCALE_PATHS = (REPO_ROOT + '/conf/locale',)  # mitx/conf/locale/
+LOCALE_PATHS = (REPO_ROOT + '/conf/locale',)  # edx/conf/locale/
 
 # Messages
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
