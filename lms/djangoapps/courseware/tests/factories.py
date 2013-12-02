@@ -119,7 +119,7 @@ class StudentModuleFactory(DjangoModelFactory):
 
     module_type = "problem"
     student = SubFactory(UserFactory)
-    course_id = "MITx/999/Robot_Super_Course"
+    course_id = "edX/999/Robot_Super_Course"
     state = None
     grade = None
     max_grade = None

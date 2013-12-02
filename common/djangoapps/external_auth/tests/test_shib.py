@@ -324,7 +324,7 @@ class ShibSPTest(ModuleStoreTestCase):
         """
         Tests that the correct course specific login and registration urls work for shib
         """
-        course = CourseFactory.create(org='MITx', number='999', display_name='Robot Super Course')
+        course = CourseFactory.create(org='edX', number='999', display_name='Robot Super Course')
 
         # Test for cases where course is found
         for domain in ["", "shib:https://idp.stanford.edu/"]:
@@ -335,37 +335,37 @@ class ShibSPTest(ModuleStoreTestCase):
             self.store.update_metadata(course.location.url(), metadata)
 
             # setting location to test that GET params get passed through
-            login_request = self.request_factory.get('/course_specific_login/MITx/999/Robot_Super_Course' +
-                                                     '?course_id=MITx/999/Robot_Super_Course' +
+            login_request = self.request_factory.get('/course_specific_login/edX/999/Robot_Super_Course' +
+                                                     '?course_id=edX/999/Robot_Super_Course' +
                                                      '&enrollment_action=enroll')
-            _reg_request = self.request_factory.get('/course_specific_register/MITx/999/Robot_Super_Course' +
-                                                    '?course_id=MITx/999/course/Robot_Super_Course' +
+            _reg_request = self.request_factory.get('/course_specific_register/edX/999/Robot_Super_Course' +
+                                                    '?course_id=edX/999/course/Robot_Super_Course' +
                                                     '&enrollment_action=enroll')
 
-            login_response = course_specific_login(login_request, 'MITx/999/Robot_Super_Course')
-            reg_response = course_specific_register(login_request, 'MITx/999/Robot_Super_Course')
+            login_response = course_specific_login(login_request, 'edX/999/Robot_Super_Course')
+            reg_response = course_specific_register(login_request, 'edX/999/Robot_Super_Course')
 
             if "shib" in domain:
                 self.assertIsInstance(login_response, HttpResponseRedirect)
                 self.assertEqual(login_response['Location'],
                                  reverse('shib-login') +
-                                 '?course_id=MITx/999/Robot_Super_Course' +
+                                 '?course_id=edX/999/Robot_Super_Course' +
                                  '&enrollment_action=enroll')
                 self.assertIsInstance(login_response, HttpResponseRedirect)
                 self.assertEqual(reg_response['Location'],
                                  reverse('shib-login') +
-                                 '?course_id=MITx/999/Robot_Super_Course' +
+                                 '?course_id=edX/999/Robot_Super_Course' +
                                  '&enrollment_action=enroll')
             else:
                 self.assertIsInstance(login_response, HttpResponseRedirect)
                 self.assertEqual(login_response['Location'],
                                  reverse('signin_user') +
-                                 '?course_id=MITx/999/Robot_Super_Course' +
+                                 '?course_id=edX/999/Robot_Super_Course' +
                                  '&enrollment_action=enroll')
                 self.assertIsInstance(login_response, HttpResponseRedirect)
                 self.assertEqual(reg_response['Location'],
                                  reverse('register_user') +
-                                 '?course_id=MITx/999/Robot_Super_Course' +
+                                 '?course_id=edX/999/Robot_Super_Course' +
                                  '&enrollment_action=enroll')
 
             # Now test for non-existent course
@@ -405,7 +405,7 @@ class ShibSPTest(ModuleStoreTestCase):
         metadata['enrollment_domain'] = shib_course.enrollment_domain
         self.store.update_metadata(shib_course.location.url(), metadata)
 
-        open_enroll_course = CourseFactory.create(org='MITx', number='999', display_name='Robot Super Course')
+        open_enroll_course = CourseFactory.create(org='edX', number='999', display_name='Robot Super Course')
         open_enroll_course.enrollment_domain = ''
         metadata = own_metadata(open_enroll_course)
         metadata['enrollment_domain'] = open_enroll_course.enrollment_domain

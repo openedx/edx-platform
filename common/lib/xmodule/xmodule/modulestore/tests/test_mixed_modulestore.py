@@ -27,7 +27,7 @@ FS_ROOT = DATA_DIR
 DEFAULT_CLASS = 'xmodule.raw_module.RawDescriptor'
 RENDER_TEMPLATE = lambda t_n, d, ctx = None, nsp = 'main': ''
 
-IMPORT_COURSEID = 'MITx/999/2013_Spring'
+IMPORT_COURSEID = 'edX/999/2013_Spring'
 XML_COURSEID1 = 'edX/toy/2012_Fall'
 XML_COURSEID2 = 'edX/simple/2012_Fall'
 

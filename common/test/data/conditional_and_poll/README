@@ -1,8 +1,8 @@
-Any place that says "YEAR_SEMESTER" needs to be replaced with something 
-in the form "2013_Spring". Take note of this name exactly, you'll need to 
+Any place that says "YEAR_SEMESTER" needs to be replaced with something
+in the form "2013_Spring". Take note of this name exactly, you'll need to
 use it everywhere, precisely - capitalization is very important.
 
-See https://github.com/MITx/mitx/blob/master/doc/xml-format.md for more on all this.
+See https://github.com/edx/edx-platform/blob/master/doc/xml-format.md for more on all this.
 -----------------------
 
 about/: Files that live here will be visible OUTSIDE OF COURSEWARE.

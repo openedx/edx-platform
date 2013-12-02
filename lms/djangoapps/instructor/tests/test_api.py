@@ -374,7 +374,7 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
             "at edx.org by a member of the course staff. "
             "The course should now appear on your edx.org dashboard.\n\n"
             "To start accessing course materials, please visit "
-            "https://edx.org/courses/MITx/999/Robot_Super_Course\n\n----\n"
+            "https://edx.org/courses/edX/999/Robot_Super_Course\n\n----\n"
             "This email was automatically sent from edx.org to NotEnrolled Student"
         )
 
@@ -396,7 +396,7 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
             "To finish your registration, please visit https://edx.org/register and fill out the registration form "
             "making sure to use robot-not-an-email-yet@robot.org in the E-mail field.\n"
             "Once you have registered and activated your account, "
-            "visit https://edx.org/courses/MITx/999/Robot_Super_Course/about to join the course.\n\n----\n"
+            "visit https://edx.org/courses/edX/999/Robot_Super_Course/about to join the course.\n\n----\n"
             "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org"
         )
 
@@ -575,7 +575,7 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(
             mail.outbox[0].body,
             "Dear student,\n\nYou have been invited to join Robot Super Course at edx.org by a member of the course staff.\n\n"
-            "To access the course visit https://edx.org/courses/MITx/999/Robot_Super_Course/about and register for the course.\n\n----\n"
+            "To access the course visit https://edx.org/courses/edX/999/Robot_Super_Course/about and register for the course.\n\n----\n"
             "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org"
         )
 
@@ -598,7 +598,7 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(
             mail.outbox[0].body,
             "Dear student,\n\nYou have been invited to join Robot Super Course at edx.org by a member of the course staff.\n\n"
-            "To access the course visit https://edx.org/courses/MITx/999/Robot_Super_Course and login.\n\n----\n"
+            "To access the course visit https://edx.org/courses/edX/999/Robot_Super_Course and login.\n\n----\n"
             "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org"
         )
 
@@ -1418,8 +1418,8 @@ class TestInstructorAPIHelpers(TestCase):
         self.assertEqual(_split_input_list(scary_unistuff), [scary_unistuff])
 
     def test_msk_from_problem_urlname(self):
-        args = ('MITx/6.002x/2013_Spring', 'L2Node1')
-        output = 'i4x://MITx/6.002x/problem/L2Node1'
+        args = ('edX/6.002x/2013_Spring', 'L2Node1')
+        output = 'i4x://edX/6.002x/problem/L2Node1'
         self.assertEqual(_msk_from_problem_urlname(*args), output)
 
     @raises(ValueError)

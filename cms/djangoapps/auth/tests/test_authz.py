@@ -129,7 +129,7 @@ class CourseGroupTest(TestCase):
         """ Test case setup """
         self.creator = User.objects.create_user('testcreator', 'testcreator+courses@edx.org', 'foo')
         self.staff = User.objects.create_user('teststaff', 'teststaff+courses@edx.org', 'foo')
-        self.location = 'i4x', 'mitX', '101', 'course', 'test'
+        self.location = 'i4x', 'edX', '101', 'course', 'test'
 
     def test_add_user_to_course_group(self):
         """
@@ -181,7 +181,7 @@ class CourseGroupTest(TestCase):
         create_all_course_groups(self.creator, self.location)
         add_user_to_course_group(self.creator, self.staff, self.location, STAFF_ROLE_NAME)
 
-        location2 = 'i4x', 'mitX', '103', 'course', 'test2'
+        location2 = 'i4x', 'edX', '103', 'course', 'test2'
         staff2 = User.objects.create_user('teststaff2', 'teststaff2+courses@edx.org', 'foo')
         create_all_course_groups(self.creator, location2)
         add_user_to_course_group(self.creator, staff2, location2, STAFF_ROLE_NAME)
@@ -193,7 +193,7 @@ class CourseGroupTest(TestCase):
         create_all_course_groups(self.creator, self.location)
         add_user_to_course_group(self.creator, self.staff, self.location, STAFF_ROLE_NAME)
 
-        location2 = 'i4x', 'mitX', '103', 'course', 'test2'
+        location2 = 'i4x', 'edX', '103', 'course', 'test2'
         creator2 = User.objects.create_user('testcreator2', 'testcreator2+courses@edx.org', 'foo')
         staff2 = User.objects.create_user('teststaff2', 'teststaff2+courses@edx.org', 'foo')
         create_all_course_groups(creator2, location2)

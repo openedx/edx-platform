@@ -438,7 +438,7 @@ class EnrollInCourseTest(TestCase):
     def test_enrollment_multiple_classes(self):
         user = User(username="rusty", email="rusty@fake.edx.org")
         course_id1 = "edX/Test101/2013"
-        course_id2 = "MITx/6.003z/2012"
+        course_id2 = "edX/6.003z/2012"
 
         CourseEnrollment.enroll(user, course_id1)
         self.assert_enrollment_event_was_emitted(user, course_id1)

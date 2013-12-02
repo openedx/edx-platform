@@ -1,8 +1,8 @@
 """
 
 
-verify_student/start?course_id=MITx/6.002x/2013_Spring # create
-              /upload_face?course_id=MITx/6.002x/2013_Spring
+verify_student/start?course_id=edX/6.002x/2013_Spring # create
+              /upload_face?course_id=edX/6.002x/2013_Spring
               /upload_photo_id
               /confirm # mark_ready()
 

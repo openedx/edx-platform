@@ -27,7 +27,7 @@ class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):
         super(ViewsExceptionTestCase, self).setUp()
 
         # create a course
-        self.course = CourseFactory.create(org='MITx', course='999',
+        self.course = CourseFactory.create(org='edX', course='999',
                                            display_name='Robot Super Course')
 
         # Patch the comment client user save method so it does not try

@@ -30,7 +30,7 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
         super(ViewsTestCase, self).setUp()
 
         # create a course
-        self.course = CourseFactory.create(org='MITx', course='999',
+        self.course = CourseFactory.create(org='edX', course='999',
                                            display_name='Robot Super Course')
         self.course_id = self.course.id
         # seed the forums permissions and roles
@@ -59,10 +59,10 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
         mock_request.return_value.status_code = 200
         mock_request.return_value.text = u'{"title":"Hello",\
                                             "body":"this is a post",\
-                                            "course_id":"MITx/999/Robot_Super_Course",\
+                                            "course_id":"edX/999/Robot_Super_Course",\
                                             "anonymous":false,\
                                             "anonymous_to_peers":false,\
-                                            "commentable_id":"i4x-MITx-999-course-Robot_Super_Course",\
+                                            "commentable_id":"i4x-edX-999-course-Robot_Super_Course",\
                                             "created_at":"2013-05-10T18:53:43Z",\
                                             "updated_at":"2013-05-10T18:53:43Z",\
                                             "at_position_list":[],\
@@ -83,19 +83,19 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
                   "anonymous": ["false"],
                   "title": ["Hello"]
                   }
-        url = reverse('create_thread', kwargs={'commentable_id': 'i4x-MITx-999-course-Robot_Super_Course',
+        url = reverse('create_thread', kwargs={'commentable_id': 'i4x-edX-999-course-Robot_Super_Course',
                                                'course_id': self.course_id})
         response = self.client.post(url, data=thread)
         assert_true(mock_request.called)
         mock_request.assert_called_with(
             'post',
-            'http://localhost:4567/api/v1/i4x-MITx-999-course-Robot_Super_Course/threads',
+            'http://localhost:4567/api/v1/i4x-edX-999-course-Robot_Super_Course/threads',
             data={
                 'body': u'this is a post',
                 'anonymous_to_peers': False, 'user_id': 1,
                 'title': u'Hello',
-                'commentable_id': u'i4x-MITx-999-course-Robot_Super_Course',
-                'anonymous': False, 'course_id': u'MITx/999/Robot_Super_Course',
+                'commentable_id': u'i4x-edX-999-course-Robot_Super_Course',
+                'anonymous': False, 'course_id': u'edX/999/Robot_Super_Course',
             },
             params={'request_id': ANY},
             headers={'X-Edx-Api-Key': 'PUT_YOUR_API_KEY_HERE'},
@@ -107,10 +107,10 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
         mock_request.return_value.status_code = 200
         mock_request.return_value.text = u'{"title":"Hello",\
                                             "body":"this is a post",\
-                                            "course_id":"MITx/999/Robot_Super_Course",\
+                                            "course_id":"edX/999/Robot_Super_Course",\
                                             "anonymous":false,\
                                             "anonymous_to_peers":false,\
-                                            "commentable_id":"i4x-MITx-999-course-Robot_Super_Course",\
+                                            "commentable_id":"i4x-edX-999-course-Robot_Super_Course",\
                                             "created_at":"2013-05-10T18:53:43Z",\
                                             "updated_at":"2013-05-10T18:53:43Z",\
                                             "at_position_list":[],\
@@ -167,10 +167,10 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
         mock_request.return_value.status_code = 200
         mock_request.return_value.text = u'{"title":"Hello",\
                                             "body":"this is a post",\
-                                            "course_id":"MITx/999/Robot_Super_Course",\
+                                            "course_id":"edX/999/Robot_Super_Course",\
                                             "anonymous":false,\
                                             "anonymous_to_peers":false,\
-                                            "commentable_id":"i4x-MITx-999-course-Robot_Super_Course",\
+                                            "commentable_id":"i4x-edX-999-course-Robot_Super_Course",\
                                             "created_at":"2013-05-10T18:53:43Z",\
                                             "updated_at":"2013-05-10T18:53:43Z",\
                                             "at_position_list":[],\
@@ -226,10 +226,10 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
     def test_flag_comment(self, mock_request):
         mock_request.return_value.status_code = 200
         mock_request.return_value.text = u'{"body":"this is a comment",\
-                                            "course_id":"MITx/999/Robot_Super_Course",\
+                                            "course_id":"edX/999/Robot_Super_Course",\
                                             "anonymous":false,\
                                             "anonymous_to_peers":false,\
-                                            "commentable_id":"i4x-MITx-999-course-Robot_Super_Course",\
+                                            "commentable_id":"i4x-edX-999-course-Robot_Super_Course",\
                                             "created_at":"2013-05-10T18:53:43Z",\
                                             "updated_at":"2013-05-10T18:53:43Z",\
                                             "at_position_list":[],\
@@ -282,10 +282,10 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
     def test_un_flag_comment(self, mock_request):
         mock_request.return_value.status_code = 200
         mock_request.return_value.text = u'{"body":"this is a comment",\
-                                            "course_id":"MITx/999/Robot_Super_Course",\
+                                            "course_id":"edX/999/Robot_Super_Course",\
                                             "anonymous":false,\
                                             "anonymous_to_peers":false,\
-                                            "commentable_id":"i4x-MITx-999-course-Robot_Super_Course",\
+                                            "commentable_id":"i4x-edX-999-course-Robot_Super_Course",\
                                             "created_at":"2013-05-10T18:53:43Z",\
                                             "updated_at":"2013-05-10T18:53:43Z",\
                                             "at_position_list":[],\

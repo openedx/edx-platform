@@ -42,9 +42,9 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.user = UserFactory.create()
         self.user.set_password('password')
         self.user.save()
-        self.course_id = "MITx/999/Robot_Super_Course"
+        self.course_id = "edX/999/Robot_Super_Course"
         self.cost = 40
-        self.course = CourseFactory.create(org='MITx', number='999', display_name='Robot Super Course')
+        self.course = CourseFactory.create(org='edX', number='999', display_name='Robot Super Course')
         self.course_mode = CourseMode(course_id=self.course_id,
                                       mode_slug="honor",
                                       mode_display_name="honor cert",

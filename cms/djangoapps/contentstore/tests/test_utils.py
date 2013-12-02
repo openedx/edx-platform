@@ -64,27 +64,27 @@ class LMSLinksTestCase(TestCase):
 
     def get_about_page_link(self):
         """ create mock course and return the about page link """
-        location = 'i4x', 'mitX', '101', 'course', 'test'
+        location = 'i4x', 'edX', '101', 'course', 'test'
         return utils.get_lms_link_for_about_page(location)
 
     def lms_link_test(self):
         """ Tests get_lms_link_for_item. """
-        location = 'i4x', 'mitX', '101', 'vertical', 'contacting_us'
-        link = utils.get_lms_link_for_item(location, False, "mitX/101/test")
-        self.assertEquals(link, "//localhost:8000/courses/mitX/101/test/jump_to/i4x://mitX/101/vertical/contacting_us")
-        link = utils.get_lms_link_for_item(location, True, "mitX/101/test")
+        location = 'i4x', 'edX', '101', 'vertical', 'contacting_us'
+        link = utils.get_lms_link_for_item(location, False, "edX/101/test")
+        self.assertEquals(link, "//localhost:8000/courses/edX/101/test/jump_to/i4x://edX/101/vertical/contacting_us")
+        link = utils.get_lms_link_for_item(location, True, "edX/101/test")
         self.assertEquals(
             link,
-            "//preview/courses/mitX/101/test/jump_to/i4x://mitX/101/vertical/contacting_us"
+            "//preview/courses/edX/101/test/jump_to/i4x://edX/101/vertical/contacting_us"
         )
 
         # If no course_id is passed in, it is obtained from the location. This is the case for
         # Studio dashboard.
-        location = 'i4x', 'mitX', '101', 'course', 'test'
+        location = 'i4x', 'edX', '101', 'course', 'test'
         link = utils.get_lms_link_for_item(location)
         self.assertEquals(
             link,
-            "//localhost:8000/courses/mitX/101/test/jump_to/i4x://mitX/101/course/test"
+            "//localhost:8000/courses/edX/101/test/jump_to/i4x://edX/101/course/test"
         )
 
 

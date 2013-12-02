@@ -53,7 +53,7 @@ class SplitModuleTest(unittest.TestCase):
     modulestore = None
 
     # These version_guids correspond to values hard-coded in fixture files
-    # used for these tests. The files live in mitx/fixtures/splitmongo_json/*
+    # used for these tests. The files live in edX/fixtures/splitmongo_json/*
 
     GUID_D0 = "1d00000000000000dddd0000"  # v12345d
     GUID_D1 = "1d00000000000000dddd1111"  # v12345d1

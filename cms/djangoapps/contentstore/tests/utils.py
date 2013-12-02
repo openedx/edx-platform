@@ -85,7 +85,7 @@ class CourseTestCase(ModuleStoreTestCase):
         self.client.login(username=uname, password=password)
 
         self.course = CourseFactory.create(
-            org='MITx',
+            org='edX',
             number='999',
             display_name='Robot Super Course',
         )

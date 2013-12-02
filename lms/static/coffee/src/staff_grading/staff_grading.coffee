@@ -109,12 +109,12 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
     # should get back a list of problem_ids, problem_names, num_graded, min_for_ml
     else if cmd == 'get_problem_list'
       @mock_cnt = 1
-      response = 
+      response =
         success: true
         problem_list: [
-          {location: 'i4x://MITx/3.091x/problem/open_ended_demo1', \
+          {location: 'i4x://edX/3.091x/problem/open_ended_demo1', \
             problem_name: "Problem 1", num_graded: 3, num_pending: 5, min_for_ml: 10},
-          {location: 'i4x://MITx/3.091x/problem/open_ended_demo2', \
+          {location: 'i4x://edX/3.091x/problem/open_ended_demo2', \
             problem_name: "Problem 2", num_graded: 1, num_pending: 5, min_for_ml: 10}
         ]
     else
@@ -123,7 +123,7 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
         error: 'Unknown command ' + cmd
 
     if @mock_cnt % 5 == 0
-        response = 
+        response =
           success: true
           message: 'No more submissions'
 
@@ -132,7 +132,7 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
       response =
         success: false
         error: 'An error for testing'
-        
+
     return response
 
 
