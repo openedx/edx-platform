@@ -27,6 +27,25 @@ define(["backbone", "backbone.associations"], function(Backbone){
                 description: this.get('description')
             };
         },
+
+        validate: function(attrs, options) {
+            if(!attrs.name && !attrs.description) {
+                return {
+                    message: "Topic name and description are both required",
+                    attributes: {name: true, description: true}
+                };
+            } else if(!attrs.name) {
+                return {
+                    message: "Chapter name is required",
+                    attributes: {name: true}
+                };
+            } else if (!attrs.description) {
+                return {
+                    message: "description is required",
+                    attributes: {description: true}
+                };
+            }
+        }
     });
     return Topic;
 });
