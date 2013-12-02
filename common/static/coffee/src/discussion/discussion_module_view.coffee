@@ -36,12 +36,15 @@ if Backbone?
       event.preventDefault()
       @newPostForm.slideUp(300)
 
+    hideDiscussion: ->
+      @$("section.discussion").slideUp()
+      @toggleDiscussionBtn.removeClass('shown')
+      @toggleDiscussionBtn.find('.button-text').html("Show Discussion")
+      @showed = false
+
     toggleDiscussion: (event) ->
       if @showed
-        @$("section.discussion").slideUp()
-        @toggleDiscussionBtn.removeClass('shown')
-        @toggleDiscussionBtn.find('.button-text').html("Show Discussion")
-        @showed = false
+        @hideDiscussion()
       else
         @toggleDiscussionBtn.addClass('shown')
         @toggleDiscussionBtn.find('.button-text').html("Hide Discussion")
@@ -51,9 +54,17 @@ if Backbone?
           @showed = true
         else
           $elem = @toggleDiscussionBtn
-          @loadPage $elem
+          @loadPage(
+            $elem,
+            =>
+              @hideDiscussion()
+              DiscussionUtil.discussionAlert(
+                "Sorry",
+                "We had some trouble loading the discussion. Please try again."
+              )
+          )
 
-    loadPage: ($elem)=>
+    loadPage: ($elem, error) =>
       discussionId = @$el.data("discussion-id")
       url = DiscussionUtil.urlFor('retrieve_discussion', discussionId) + "?page=#{@page}"
       DiscussionUtil.safeAjax
@@ -63,6 +74,7 @@ if Backbone?
         type: "GET"
         dataType: 'json'
         success: (response, textStatus, jqXHR) => @renderDiscussion($elem, response, textStatus, discussionId)
+        error: error
 
     renderDiscussion: ($elem, response, textStatus, discussionId) =>
       window.user = new DiscussionUser(response.user_info)
@@ -131,5 +143,14 @@ if Backbone?
     navigateToPage: (event) =>
       event.preventDefault()
       window.history.pushState({}, window.document.title, event.target.href)
+      currPage = @page
       @page = $(event.target).data('page-number')
-      @loadPage($(event.target))
+      @loadPage(
+        $(event.target),
+        =>
+          @page = currPage
+          DiscussionUtil.discussionAlert(
+            "Sorry",
+            "We had some trouble loading the threads you requested. Please try again."
+          )
+      )

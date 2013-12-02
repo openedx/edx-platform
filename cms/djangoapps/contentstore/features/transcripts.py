@@ -116,6 +116,7 @@ def i_see_status_message(_step, status):
     world.wait(DELAY)
     world.wait_for_ajax_complete()
 
+    assert not world.css_visible(SELECTORS['error_bar'])
     assert world.css_has_text(SELECTORS['status_bar'], STATUSES[status.strip()])
 
 

@@ -39,7 +39,7 @@ class RandomizeModule(RandomizeFields, XModule):
         modules.
 """
     def __init__(self, *args, **kwargs):
-        XModule.__init__(self, *args, **kwargs)
+        super(RandomizeModule, self).__init__(*args, **kwargs)
 
         # NOTE: calling self.get_children() creates a circular reference--
         # it calls get_child_descriptors() internally, but that doesn't work until

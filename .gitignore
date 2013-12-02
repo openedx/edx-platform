@@ -17,6 +17,7 @@ cms/envs/private.py
 /nbproject
 .idea/
 .redcar/
+codekit-config.json
 
 ### OS X artifacts
 *.DS_Store
@@ -28,6 +29,9 @@ cms/envs/private.py
 *.mo
 conf/locale/en/LC_MESSAGES/*.po
 !messages.po
+### Remove when we have real Esperanto translations. For now, ignore
+### dummy Esperanto files.
+conf/locale/eo/*
 
 ### Testing artifacts
 .testids/
@@ -45,14 +49,18 @@ reports/
 .prereqs_cache
 .vagrant/
 node_modules
+.bundle/
+bin/
 
 ### Static assets pipeline artifacts
 *.scssc
+lms/static/css/
 lms/static/sass/*.css
 lms/static/sass/application.scss
 lms/static/sass/application-extend1.scss
 lms/static/sass/application-extend2.scss
 lms/static/sass/course.scss
+cms/static/css/
 cms/static/sass/*.css
 
 ### Logging artifacts

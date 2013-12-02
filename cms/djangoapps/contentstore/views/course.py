@@ -27,13 +27,11 @@ from xmodule.modulestore.exceptions import (
     ItemNotFoundError, InvalidLocationError)
 from xmodule.modulestore import Location
 
-from contentstore.course_info_model import (
-    get_course_updates, update_course_updates, delete_course_update)
+from contentstore.course_info_model import get_course_updates, update_course_updates, delete_course_update
 from contentstore.utils import (
     get_lms_link_for_item, add_extra_panel_tab, remove_extra_panel_tab,
     get_modulestore)
-from models.settings.course_details import (
-    CourseDetails, CourseSettingsEncoder)
+from models.settings.course_details import CourseDetails, CourseSettingsEncoder
 
 from models.settings.course_grading import CourseGradingModel
 from models.settings.course_metadata import CourseMetadata
@@ -53,14 +51,13 @@ from student.models import CourseEnrollment
 from xmodule.html_module import AboutDescriptor
 from xmodule.modulestore.locator import BlockUsageLocator
 from course_creators.views import get_course_creator_status, add_user_with_status_unrequested
+from contentstore import utils
 
 __all__ = ['course_info_handler', 'course_handler', 'course_info_update_handler',
-           'get_course_settings',
-           'course_config_graders_page',
-           'course_config_advanced_page',
-           'course_settings_updates',
-           'course_grader_updates',
-           'course_advanced_updates', 'textbook_index', 'textbook_by_id',
+           'settings_handler',
+           'grading_handler',
+           'advanced_settings_handler',
+           'textbook_index', 'textbook_by_id',
            'create_textbook']
 
 
@@ -177,7 +174,6 @@ def course_index(request, course_id, branch, version_guid, block):
     if not has_access(request.user, location):
         raise PermissionDenied()
 
-
     old_location = loc_mapper().translate_locator_to_location(location)
 
     lms_link = get_lms_link_for_item(old_location)
@@ -190,9 +186,9 @@ def course_index(request, course_id, branch, version_guid, block):
         'lms_link': lms_link,
         'sections': sections,
         'course_graders': json.dumps(
-            CourseGradingModel.fetch(course.location).graders
+            CourseGradingModel.fetch(location).graders
         ),
-        'parent_location': course.location,
+        'parent_locator': location,
         'new_section_category': 'chapter',
         'new_subsection_category': 'sequential',
         'new_unit_category': 'vertical',
@@ -230,14 +226,20 @@ def create_new_course(request):
         pass
     if existing_course is not None:
         return JsonResponse({
-            'ErrMsg': _('There is already a course defined with the same '
+            'ErrMsg': _(
+                'There is already a course defined with the same '
                 'organization, course number, and course run. Please '
                 'change either organization or course number to be '
-                'unique.'),
-            'OrgErrMsg': _('Please change either the organization or '
-                'course number so that it is unique.'),
-            'CourseErrMsg': _('Please change either the organization or '
-                'course number so that it is unique.'),
+                'unique.'
+            ),
+            'OrgErrMsg': _(
+                'Please change either the organization or '
+                'course number so that it is unique.'
+            ),
+            'CourseErrMsg': _(
+                'Please change either the organization or '
+                'course number so that it is unique.'
+            ),
         })
 
     # dhm: this query breaks the abstraction, but I'll fix it when I do my suspended refactoring of this
@@ -252,12 +254,15 @@ def create_new_course(request):
     courses = modulestore().collection.find(course_search_location, fields=('_id'))
     if courses.count() > 0:
         return JsonResponse({
-            'ErrMsg': _('There is already a course defined with the same '
+            'ErrMsg': _(
+                'There is already a course defined with the same '
                 'organization and course number. Please '
                 'change at least one field to be unique.'),
-            'OrgErrMsg': _('Please change either the organization or '
+            'OrgErrMsg': _(
+                'Please change either the organization or '
                 'course number so that it is unique.'),
-            'CourseErrMsg': _('Please change either the organization or '
+            'CourseErrMsg': _(
+                'Please change either the organization or '
                 'course number so that it is unique.'),
         })
 
@@ -345,9 +350,8 @@ def course_info_handler(request, tag=None, course_id=None, branch=None, version_
 @ensure_csrf_cookie
 @require_http_methods(("GET", "POST", "PUT", "DELETE"))
 @expect_json
-def course_info_update_handler(
-    request, tag=None, course_id=None, branch=None, version_guid=None, block=None, provided_id=None
-    ):
+def course_info_update_handler(request, tag=None, course_id=None, branch=None, version_guid=None, block=None,
+                               provided_id=None):
     """
     restful CRUD operations on course_info updates.
     provided_id should be none if it's new (create) and index otherwise.
@@ -392,232 +396,206 @@ def course_info_update_handler(
 
 @login_required
 @ensure_csrf_cookie
-def get_course_settings(request, org, course, name):
-    """
-    Send models and views as well as html for editing the course settings to
-    the client.
-
-    org, course, name: Attributes of the Location for the item to edit
-    """
-    location = get_location_and_verify_access(request, org, course, name)
-
-    course_module = modulestore().get_item(location)
-
-    new_loc = loc_mapper().translate_location(location.course_id, location, False, True)
-    upload_asset_url = new_loc.url_reverse('assets/', '')
-
-    return render_to_response('settings.html', {
-        'context_course': course_module,
-        'course_location': location,
-        'details_url': reverse(course_settings_updates,
-                               kwargs={"org": org,
-                                       "course": course,
-                                       "name": name,
-                                       "section": "details"}),
-        'about_page_editable': not settings.MITX_FEATURES.get(
-            'ENABLE_MKTG_SITE', False
-        ),
-        'upload_asset_url': upload_asset_url
-    })
-
-
-@login_required
-@ensure_csrf_cookie
-def course_config_graders_page(request, org, course, name):
-    """
-    Send models and views as well as html for editing the course settings to
-    the client.
-
-    org, course, name: Attributes of the Location for the item to edit
-    """
-    location = get_location_and_verify_access(request, org, course, name)
-
-    course_module = modulestore().get_item(location)
-    course_details = CourseGradingModel.fetch(location)
-
-    return render_to_response('settings_graders.html', {
-        'context_course': course_module,
-        'course_location': location,
-        'course_details': json.dumps(course_details, cls=CourseSettingsEncoder)
-    })
-
-
-@login_required
-@ensure_csrf_cookie
-def course_config_advanced_page(request, org, course, name):
-    """
-    Send models and views as well as html for editing the advanced course
-    settings to the client.
-
-    org, course, name: Attributes of the Location for the item to edit
-    """
-    location = get_location_and_verify_access(request, org, course, name)
-
-    course_module = modulestore().get_item(location)
-
-    return render_to_response('settings_advanced.html', {
-        'context_course': course_module,
-        'course_location': location,
-        'advanced_dict': json.dumps(CourseMetadata.fetch(location)),
-    })
-
-
+@require_http_methods(("GET", "PUT", "POST"))
 @expect_json
+def settings_handler(request, tag=None, course_id=None, branch=None, version_guid=None, block=None):
+    """
+    Course settings for dates and about pages
+    GET
+        html: get the page
+        json: get the CourseDetails model
+    PUT
+        json: update the Course and About xblocks through the CourseDetails model
+    """
+    locator = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
+    if not has_access(request.user, locator):
+        raise PermissionDenied()
+
+    if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
+        course_old_location = loc_mapper().translate_locator_to_location(locator)
+        course_module = modulestore().get_item(course_old_location)
+
+        upload_asset_url = locator.url_reverse('assets/')
+
+        return render_to_response('settings.html', {
+            'context_course': course_module,
+            'course_locator': locator,
+            'lms_link_for_about_page': utils.get_lms_link_for_about_page(course_old_location),
+            'course_image_url': utils.course_image_url(course_module),
+            'details_url': locator.url_reverse('/settings/details/'),
+            'about_page_editable': not settings.MITX_FEATURES.get(
+                'ENABLE_MKTG_SITE', False
+            ),
+            'upload_asset_url': upload_asset_url
+        })
+    elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):
+        if request.method == 'GET':
+            return JsonResponse(
+                CourseDetails.fetch(locator),
+                # encoder serializes dates, old locations, and instances
+                encoder=CourseSettingsEncoder
+            )
+        else:  # post or put, doesn't matter.
+            return JsonResponse(
+                CourseDetails.update_from_json(locator, request.json),
+                encoder=CourseSettingsEncoder
+            )
+
+
 @login_required
 @ensure_csrf_cookie
-def course_settings_updates(request, org, course, name, section):
-    """
-    Restful CRUD operations on course settings. This differs from
-    get_course_settings by communicating purely through json (not rendering any
-    html) and handles section level operations rather than whole page.
-
-    org, course: Attributes of the Location for the item to edit
-    section: one of details, faculty, grading, problems, discussions
-    """
-    get_location_and_verify_access(request, org, course, name)
-
-    if section == 'details':
-        manager = CourseDetails
-    elif section == 'grading':
-        manager = CourseGradingModel
-    else:
-        return
-
-    if request.method == 'GET':
-        # Cannot just do a get w/o knowing the course name :-(
-        return JsonResponse(
-            manager.fetch(Location(['i4x', org, course, 'course', name])),
-            encoder=CourseSettingsEncoder
-        )
-    elif request.method in ('POST', 'PUT'):  # post or put, doesn't matter.
-        return JsonResponse(
-            manager.update_from_json(request.json),
-            encoder=CourseSettingsEncoder
-        )
-
-
-@expect_json
 @require_http_methods(("GET", "POST", "PUT", "DELETE"))
-@login_required
-@ensure_csrf_cookie
-def course_grader_updates(request, org, course, name, grader_index=None):
-    """
-    Restful CRUD operations on course_info updates. This differs from
-    get_course_settings by communicating purely through json (not rendering any
-    html) and handles section level operations rather than whole page.
-
-    org, course: Attributes of the Location for the item to edit
-    """
-
-    location = get_location_and_verify_access(request, org, course, name)
-
-    if request.method == 'GET':
-        # Cannot just do a get w/o knowing the course name :-(
-        return JsonResponse(CourseGradingModel.fetch_grader(
-            Location(location), grader_index
-        ))
-    elif request.method == "DELETE":
-        # ??? Should this return anything? Perhaps success fail?
-        CourseGradingModel.delete_grader(Location(location), grader_index)
-        return JsonResponse()
-    else:  # post or put, doesn't matter.
-        return JsonResponse(CourseGradingModel.update_grader_from_json(
-            Location(location),
-            request.json
-        ))
-
-
-@require_http_methods(("GET", "POST", "PUT", "DELETE"))
-@login_required
-@ensure_csrf_cookie
 @expect_json
-def course_advanced_updates(request, org, course, name):
+def grading_handler(request, tag=None, course_id=None, branch=None, version_guid=None, block=None, grader_index=None):
     """
-    Restful CRUD operations on metadata. The payload is a json rep of the
-    metadata dicts. For delete, otoh, the payload is either a key or a list of
-    keys to delete.
-
-    org, course: Attributes of the Location for the item to edit
+    Course Grading policy configuration
+    GET
+        html: get the page
+        json no grader_index: get the CourseGrading model (graceperiod, cutoffs, and graders)
+        json w/ grader_index: get the specific grader
+    PUT
+        json no grader_index: update the Course through the CourseGrading model
+        json w/ grader_index: create or update the specific grader (create if index out of range)
     """
-    location = get_location_and_verify_access(request, org, course, name)
+    locator = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
+    if not has_access(request.user, locator):
+        raise PermissionDenied()
 
-    if request.method == 'GET':
-        return JsonResponse(CourseMetadata.fetch(location))
-    elif request.method == 'DELETE':
-        return JsonResponse(CourseMetadata.delete_key(
-            location,
-            json.loads(request.body)
-        ))
-    else:
-        # Whether or not to filter the tabs key out of the settings metadata
-        filter_tabs = True
+    if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
+        course_old_location = loc_mapper().translate_locator_to_location(locator)
+        course_module = modulestore().get_item(course_old_location)
+        course_details = CourseGradingModel.fetch(locator)
 
-        # Check to see if the user instantiated any advanced components. This
-        # is a hack that does the following :
-        #   1) adds/removes the open ended panel tab to a course automatically
-        #   if the user has indicated that they want to edit the
-        #   combinedopendended or peergrading module
-        #   2) adds/removes the notes panel tab to a course automatically if
-        #   the user has indicated that they want the notes module enabled in
-        #   their course
-        # TODO refactor the above into distinct advanced policy settings
-        if ADVANCED_COMPONENT_POLICY_KEY in request.json:
-            # Get the course so that we can scrape current tabs
-            course_module = modulestore().get_item(location)
+        return render_to_response('settings_graders.html', {
+            'context_course': course_module,
+            'course_locator': locator,
+            'course_details': json.dumps(course_details, cls=CourseSettingsEncoder),
+            'grading_url': locator.url_reverse('/settings/grading/'),
+        })
+    elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):
+        if request.method == 'GET':
+            if grader_index is None:
+                return JsonResponse(
+                    CourseGradingModel.fetch(locator),
+                    # encoder serializes dates, old locations, and instances
+                    encoder=CourseSettingsEncoder
+                )
+            else:
+                return JsonResponse(CourseGradingModel.fetch_grader(locator, grader_index))
+        elif request.method in ('POST', 'PUT'):  # post or put, doesn't matter.
+            # None implies update the whole model (cutoffs, graceperiod, and graders) not a specific grader
+            if grader_index is None:
+                return JsonResponse(
+                    CourseGradingModel.update_from_json(locator, request.json),
+                    encoder=CourseSettingsEncoder
+                )
+            else:
+                return JsonResponse(
+                    CourseGradingModel.update_grader_from_json(locator, request.json)
+                )
+        elif request.method == "DELETE" and grader_index is not None:
+            CourseGradingModel.delete_grader(locator, grader_index)
+            return JsonResponse()
 
-            # Maps tab types to components
-            tab_component_map = {
-                'open_ended': OPEN_ENDED_COMPONENT_TYPES,
-                'notes': NOTE_COMPONENT_TYPES,
-            }
 
-            # Check to see if the user instantiated any notes or open ended
-            # components
-            for tab_type in tab_component_map.keys():
-                component_types = tab_component_map.get(tab_type)
-                found_ac_type = False
-                for ac_type in component_types:
-                    if ac_type in request.json[ADVANCED_COMPONENT_POLICY_KEY]:
-                        # Add tab to the course if needed
-                        changed, new_tabs = add_extra_panel_tab(
-                            tab_type,
-                            course_module
-                        )
-                        # If a tab has been added to the course, then send the
-                        # metadata along to CourseMetadata.update_from_json
-                        if changed:
-                            course_module.tabs = new_tabs
-                            request.json.update({'tabs': new_tabs})
-                            # Indicate that tabs should not be filtered out of
-                            # the metadata
-                            filter_tabs = False
-                        # Set this flag to avoid the tab removal code below.
-                        found_ac_type = True
-                        break
-                # If we did not find a module type in the advanced settings,
-                # we may need to remove the tab from the course.
-                if not found_ac_type:
-                    # Remove tab from the course if needed
-                    changed, new_tabs = remove_extra_panel_tab(
-                        tab_type, course_module
-                    )
+# pylint: disable=invalid-name
+def _config_course_advanced_components(request, course_module):
+    """
+    Check to see if the user instantiated any advanced components. This
+    is a hack that does the following :
+    1) adds/removes the open ended panel tab to a course automatically
+    if the user has indicated that they want to edit the
+    combinedopendended or peergrading module
+    2) adds/removes the notes panel tab to a course automatically if
+    the user has indicated that they want the notes module enabled in
+    their course
+    """
+    # TODO refactor the above into distinct advanced policy settings
+    filter_tabs = True  # Exceptional conditions will pull this to False
+    if ADVANCED_COMPONENT_POLICY_KEY in request.json:  # Maps tab types to components
+        tab_component_map = {
+            'open_ended':OPEN_ENDED_COMPONENT_TYPES,
+            'notes':NOTE_COMPONENT_TYPES,
+        }
+        # Check to see if the user instantiated any notes or open ended
+        # components
+        for tab_type in tab_component_map.keys():
+            component_types = tab_component_map.get(tab_type)
+            found_ac_type = False
+            for ac_type in component_types:
+                if ac_type in request.json[ADVANCED_COMPONENT_POLICY_KEY]:
+                    # Add tab to the course if needed
+                    changed, new_tabs = add_extra_panel_tab(tab_type, course_module)
+                    # If a tab has been added to the course, then send the
+                    # metadata along to CourseMetadata.update_from_json
                     if changed:
                         course_module.tabs = new_tabs
                         request.json.update({'tabs': new_tabs})
-                        # Indicate that tabs should *not* be filtered out of
+                        # Indicate that tabs should not be filtered out of
                         # the metadata
-                        filter_tabs = False
-        try:
-            return JsonResponse(CourseMetadata.update_from_json(
-                location,
-                request.json,
-                filter_tabs=filter_tabs
-            ))
-        except (TypeError, ValueError) as err:
-            return HttpResponseBadRequest(
-                "Incorrect setting format. " + str(err),
-                content_type="text/plain"
-            )
+                        filter_tabs = False  # Set this flag to avoid the tab removal code below.
+                    found_ac_type = True  #break
+
+            # If we did not find a module type in the advanced settings,
+            # we may need to remove the tab from the course.
+            if not found_ac_type:  # Remove tab from the course if needed
+                changed, new_tabs = remove_extra_panel_tab(tab_type, course_module)
+                if changed:
+                    course_module.tabs = new_tabs
+                    request.json.update({'tabs':new_tabs})
+                    # Indicate that tabs should *not* be filtered out of
+                    # the metadata
+                    filter_tabs = False
+
+    return filter_tabs
+
+
+@login_required
+@ensure_csrf_cookie
+@require_http_methods(("GET", "POST", "PUT"))
+@expect_json
+def advanced_settings_handler(request, course_id=None, branch=None, version_guid=None, block=None, tag=None):
+    """
+    Course settings configuration
+    GET
+        html: get the page
+        json: get the model
+    PUT, POST
+        json: update the Course's settings. The payload is a json rep of the
+            metadata dicts. The dict can include a "unsetKeys" entry which is a list
+            of keys whose values to unset: i.e., revert to default
+    """
+    locator = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
+    if not has_access(request.user, locator):
+        raise PermissionDenied()
+
+    course_old_location = loc_mapper().translate_locator_to_location(locator)
+    course_module = modulestore().get_item(course_old_location)
+
+    if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
+
+        return render_to_response('settings_advanced.html', {
+            'context_course': course_module,
+            'advanced_dict': json.dumps(CourseMetadata.fetch(course_module)),
+            'advanced_settings_url': locator.url_reverse('settings/advanced')
+        })
+    elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):
+        if request.method == 'GET':
+            return JsonResponse(CourseMetadata.fetch(course_module))
+        else:
+            # Whether or not to filter the tabs key out of the settings metadata
+            filter_tabs = _config_course_advanced_components(request, course_module)
+            try:
+                return JsonResponse(CourseMetadata.update_from_json(
+                    course_module,
+                    request.json,
+                    filter_tabs=filter_tabs
+                ))
+            except (TypeError, ValueError) as err:
+                return HttpResponseBadRequest(
+                    "Incorrect setting format. {}".format(err),
+                    content_type="text/plain"
+                )
 
 
 class TextbookValidationError(Exception):

@@ -92,6 +92,16 @@ class ImportTestCase(BaseCourseTestCase):
 
         self.assertNotEqual(descriptor1.location, descriptor2.location)
 
+        # Check that each vertical gets its very own url_name
+        bad_xml = '''<vertical display_name="abc"><problem url_name="exam1:2013_Spring:abc"/></vertical>'''
+        bad_xml2 = '''<vertical display_name="abc"><problem url_name="exam2:2013_Spring:abc"/></vertical>'''
+
+        descriptor1 = system.process_xml(bad_xml)
+        descriptor2 = system.process_xml(bad_xml2)
+
+        self.assertNotEqual(descriptor1.location, descriptor2.location)
+
+
     def test_reimport(self):
         '''Make sure an already-exported error xml tag loads properly'''
 
