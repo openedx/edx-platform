@@ -292,7 +292,8 @@ def create_new_course(request):
 
     initialize_course_tabs(new_course)
 
-    create_all_course_groups(request.user, new_course.location)
+    new_location = loc_mapper().translate_location(new_course.location.course_id, new_course.location, False, True)
+    create_all_course_groups(request.user, new_location)
 
     # seed the forums
     seed_permissions_roles(new_course.location.course_id)
@@ -301,7 +302,6 @@ def create_new_course(request):
     # work.
     CourseEnrollment.enroll(request.user, new_course.location.course_id)
 
-    new_location = loc_mapper().translate_location(new_course.location.course_id, new_course.location, False, True)
     return JsonResponse({'url': new_location.url_reverse("course/", "")})
 
 
