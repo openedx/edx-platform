@@ -26,8 +26,8 @@ urlpatterns = patterns('',  # nopep8
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/textbooks/(?P<name>[^/]+)$',
         'contentstore.views.textbook_index', name='textbook_index'),
 
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/syllabus/(?P<name>[^/]+)$',
-        'contentstore.views.syllabus', name='syllabus'),
+#    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/syllabus/(?P<name>[^/]+)$',
+#        'contentstore.views.syllabus', name='syllabus'),
 
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/textbooks/(?P<name>[^/]+)/new$',
         'contentstore.views.create_textbook', name='create_textbook'),
