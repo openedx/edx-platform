@@ -60,11 +60,16 @@ urlpatterns = patterns('',  # nopep8
 
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/syllabus/(?P<name>[^/]+)$',
         'contentstore.views.syllabus', name='syllabus'),
+    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/syllabus/(?P<name>[^/]+)/new$',
+        'contentstore.views.create_syllabus', name='create_syllabus'),
 
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/textbooks/(?P<name>[^/]+)/new$',
         'contentstore.views.create_textbook', name='create_textbook'),
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/textbooks/(?P<name>[^/]+)/(?P<tid>\d[^/]*)$',
         'contentstore.views.textbook_by_id', name='textbook_by_id'),
+    
+     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/syllabus/(?P<name>[^/]+)/(?P<tid>\d[^/]*)$',
+        'contentstore.views.syllabus_by_id', name='syllabus_by_id'),
 
     # temporary landing page for a course
     url(r'^edge/(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)$',
