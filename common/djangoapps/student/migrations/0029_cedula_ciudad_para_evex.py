@@ -61,7 +61,8 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'City'},
             'code': ('django.db.models.fields.CharField', [], {'max_length': '64'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '64'})
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '64'}),
+            'state': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': "orm['cities.State']", 'null': 'True', 'blank': 'True'}),            
         },
         'contenttypes.contenttype': {
             'Meta': {'ordering': "('name',)", 'unique_together': "(('app_label', 'model'),)", 'object_name': 'ContentType', 'db_table': "'django_content_type'"},
