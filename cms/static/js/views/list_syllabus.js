@@ -12,15 +12,16 @@ define(["backbone", "underscore", "jquery", "js/views/edit_syllabus", "js/views/
             var syllabus = this.collection;
             if(syllabus.length === 0) {
                 this.$el.html(this.emptyTemplate());
-            } else {
+            }
+            else {
                 this.$el.empty();
                 var that = this;
                 syllabus.each(function(syllabus) {
-                    var view;
-                    if (syllabus.get("editing")) {
+                   var view;
+                  if (syllabus.get("editing")) {
                         view = new EditSyllabusView({model: syllabus});
                     } else {
-                        view = new ShowSyllabysView({model: syllabus});
+                        view = new ShowSyllabusView({model: syllabus});
                     }
                     that.$el.append(view.render().el);
                 });
