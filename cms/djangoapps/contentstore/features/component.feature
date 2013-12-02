@@ -37,21 +37,23 @@ Feature: CMS.Component Adding
     Scenario: I can add Common Problem components
        Given I am in Studio editing a new unit
        When I add this type of Problem component:
-           | Component            |
-           | Blank Common Problem |
-           | Checkboxes           |
-           | Dropdown             |
-           | Multiple Choice      |
-           | Numerical Input      |
-           | Text Input           |
+           | Component                |
+           | Blank Common Problem     |
+           | Checkboxes               |
+           | Dropdown                 |
+           | Multiple Choice          |
+           | Numerical Input          |
+           | Symbolic Math Expression |
+           | Text Input               |
        Then I see Problem components in this order:
-           | Component            |
-           | Blank Common Problem |
-           | Checkboxes           |
-           | Dropdown             |
-           | Multiple Choice      |
-           | Numerical Input      |
-           | Text Input           |
+           | Component                |
+           | Blank Common Problem     |
+           | Checkboxes               |
+           | Dropdown                 |
+           | Multiple Choice          |
+           | Numerical Input          |
+           | Symbolic Math Expression |
+           | Text Input               |
 
     Scenario Outline: I can add Advanced Problem components
        Given I am in Studio editing a new unit
@@ -67,9 +69,7 @@ Feature: CMS.Component Adding
            | Custom Python-Evaluated Input |
            | Drag and Drop                 |
            | Image Mapped Input            |
-           | Math Expression Input         |
            | Problem with Adaptive Hint    |
-
 
     Scenario: I can add Advanced Latex Problem components
        Given I am in Studio editing a new unit

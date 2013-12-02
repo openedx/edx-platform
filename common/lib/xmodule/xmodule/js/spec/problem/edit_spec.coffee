@@ -62,6 +62,14 @@ describe 'MarkdownEditingDescriptor', ->
       revisedSelection = MarkdownEditingDescriptor.insertNumberInput('my text')
       expect(revisedSelection).toEqual('= my text')
 
+  describe 'insertMathInput', ->
+    it 'inserts the template if selection is empty', ->
+      revisedSelection = MarkdownEditingDescriptor.insertMathInput('')
+      expect(revisedSelection).toEqual(MarkdownEditingDescriptor.mathInputTemplate)
+    it 'wraps existing text', ->
+      revisedSelection = MarkdownEditingDescriptor.insertMathInput('my text')
+      expect(revisedSelection).toEqual('= \\(my text\\)')
+
   describe 'insertSelect', ->
     it 'inserts the template if selection is empty', ->
       revisedSelection = MarkdownEditingDescriptor.insertSelect('')
@@ -309,6 +317,104 @@ describe 'MarkdownEditingDescriptor', ->
         </div>
         </solution>
         </problem>""")
+
+
+    it 'converts FormulaResponse to xml', ->
+
+      caseDict = [
+        # VARIABLES
+        {
+          markdown: '''= \\( a + $b + _c + d1 \\)'''
+          answer: 'a+$b+_c+d1',
+          samples: 'a,b,_c,d1@-10,-10,-10,-10:10,10,10,10#10'
+        },
+        {
+          markdown: '''= \\(m*c^2 + .34\\)'''
+          answer: 'm*c^2+.34',
+          samples: 'm,c@-10,-10:10,10#10'
+        },
+        {
+          markdown: '''= \\((R_1*R_2)/R_3\\)'''
+          answer: '(R_1*R_2)/R_3',
+          samples: 'R_1,R_2,R_3@-10,-10,-10:10,10,10#10'
+        },
+        # duplication of variables
+        {
+          markdown: '''= \\(x^2 + 2*x*y + y^2\\)'''
+          answer: 'x^2+2*x*y+y^2',
+          samples: 'x,y@-10,-10:10,10#10'
+        },
+        # 1 variable
+        {
+          markdown: '''= \\(x^2\\)'''
+          answer: 'x^2',
+          samples: 'x@-10:10#10'
+        },
+        {
+          markdown: '''= \\(2*pi\\)'''
+          answer: '2*pi',
+          samples: 'pi@-10:10#10'
+        },
+        # SUFFIXES
+        {
+          markdown: '''= \\( x+5k+10k*10%+ 1e3%+99k+1%-20e-49+_c+10*k+$4-x10\\)'''
+          answer: 'x+5k+10k*10%+1e3%+99k+1%-20e-49+_c+10*k+$4-x10',
+          samples: 'x,_c,k,x10@-10,-10,-10,-10:10,10,10,10#10'
+        },
+        # FUNCTIONS
+        {
+          markdown: '''= \\(abs(-x)\\)'''
+          answer: 'abs(-x)',
+          samples: 'abs,x@-10,-10:10,10#10'
+        },
+        {
+          markdown: '''= \\(factorial(10)\\)'''
+          answer: 'factorial(10)',
+          samples: 'factorial@-10:10#10'
+        },
+        {
+          markdown: '''= \\(log2(4)\\)'''
+          answer: 'log2(4)',
+          samples: 'log2@-10:10#10'
+        }
+      ]
+
+      $.each caseDict, (index, data) =>
+        markdown = data.markdown
+        samples = data.samples
+        answer = data.answer
+
+        markdown = """Test description
+
+          #{markdown}
+
+          [Explanation]
+          Test explanation.
+          [Explanation]
+        """
+
+        xml = """<problem>
+          <p>Test description</p>
+
+          <formularesponse type="ci" samples="#{samples}" answer="#{answer}">
+            <responseparam type="tolerance" default="0.00001"/>
+            <formulaequationinput size="40" />
+          </formularesponse>
+
+          <solution>
+          <div class="detailed-solution">
+          <p>Explanation</p>
+
+          <p>Test explanation.</p>
+
+          </div>
+          </solution>
+          </problem>"""
+
+        result = MarkdownEditingDescriptor.markdownToXml(markdown)
+        expect(result).toBe(xml)
+
+
     # test oddities
     it 'converts headers and oddities to xml', ->
       data = MarkdownEditingDescriptor.markdownToXml("""Not a header
