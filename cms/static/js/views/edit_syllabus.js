@@ -25,13 +25,13 @@ define(["backbone", "underscore", "jquery", "js/views/edit_topic", "js/views/fee
             "click .action-cancel": "cancel",
             "click .action-add-topic": "createTopic"
         },
-        addOne: function(chapter) {
-            var view = new EditTopicView({model: topic});
-            this.$("ol.topcis").append(view.render().el);
+        addOne: function(topics) {
+            var view = new EditTopicView({model: topics});
+            this.$("ol.topics").append(view.render().el);
             return this;
         },
         addAll: function() {
-            this.model.get('topcis').each(this.addOne, this);
+            this.model.get('topics').each(this.addOne, this);
         },
         createTopic: function(e) {
             if(e && e.preventDefault) { e.preventDefault(); }
