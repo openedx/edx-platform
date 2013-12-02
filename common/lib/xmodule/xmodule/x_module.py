@@ -403,6 +403,7 @@ class XModule(XModuleMixin, HTMLSnippet, XBlock):  # pylint: disable=abstract-me
             data is a dictionary-like object with the content of the request"""
         return u""
 
+    @XBlock.handler
     def xmodule_handler(self, request, suffix=None):
         """
         XBlock handler that wraps `handle_ajax`
@@ -938,6 +939,12 @@ class DescriptorSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable
         else:
             return super(DescriptorSystem, self).render(block, view_name, context)
 
+    def handler_url(self, block, handler_name, suffix='', query='', thirdparty=False):
+        return super(DescriptorSystem, self).handler_url(block, handler_name, suffix, query, thirdparty)
+
+    def resources_url(self, resource):
+        return super(DescriptorSystem, self).resources_url(resource)
+
 
 class XMLParsingSystem(DescriptorSystem):
     def __init__(self, process_xml, policy, **kwargs):
@@ -1078,6 +1085,12 @@ class ModuleSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abs
         """
         assert self.xmodule_instance is not None
         return self.handler_url(self.xmodule_instance, 'xmodule_handler', '', '').rstrip('/?')
+
+    def get_block(self, block_id):
+        return super(ModuleSystem, self).get_block(block_id)
+
+    def resources_url(self, resource):
+        return super(ModuleSystem, self).resources_url(resource)
 
 
 class DoNothingCache(object):
