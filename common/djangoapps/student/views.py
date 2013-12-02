@@ -72,7 +72,7 @@ from pytz import UTC
 from util.json_request import JsonResponse
 
 
-log = logging.getLogger("mitx.student")
+log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
 
 Article = namedtuple('Article', 'title url author image deck publication publish_date')

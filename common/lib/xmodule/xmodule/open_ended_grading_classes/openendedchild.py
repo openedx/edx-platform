@@ -11,11 +11,10 @@ import controller_query_service
 
 from datetime import datetime
 from pytz import UTC
-import requests
 from boto.s3.connection import S3Connection
 from boto.s3.key import Key
 
-log = logging.getLogger("mitx.courseware")
+log = logging.getLogger("edx.courseware")
 
 # Set the default number of max attempts.  Should be 1 for production
 # Set higher for debugging/testing

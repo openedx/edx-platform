@@ -38,7 +38,7 @@ from xmodule.modulestore.search import path_to_location
 from xmodule.course_module import CourseDescriptor
 import shoppingcart
 
-log = logging.getLogger("mitx.courseware")
+log = logging.getLogger("edx.courseware")
 
 template_imports = {'urllib': urllib}
 

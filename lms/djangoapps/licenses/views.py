@@ -16,7 +16,7 @@ from licenses.models import CourseSoftware
 from licenses.models import get_courses_licenses, get_or_create_license, get_license
 
 
-log = logging.getLogger("mitx.licenses")
+log = logging.getLogger("edx.licenses")
 
 
 License = namedtuple('License', 'software serial')

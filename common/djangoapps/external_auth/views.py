@@ -50,7 +50,7 @@ from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
-log = logging.getLogger("mitx.external_auth")
+log = logging.getLogger("edx.external_auth")
 AUDIT_LOG = logging.getLogger("audit")
 
 SHIBBOLETH_DOMAIN_PREFIX = 'shib:'
