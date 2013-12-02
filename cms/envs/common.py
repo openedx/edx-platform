@@ -99,10 +99,10 @@ for namespace, template_dirs in lms.envs.common.MAKO_TEMPLATES.iteritems():
 
 TEMPLATE_DIRS = MAKO_TEMPLATES['main']
 
-MITX_ROOT_URL = ''
+EDX_ROOT_URL = ''
 
-LOGIN_REDIRECT_URL = MITX_ROOT_URL + '/signin'
-LOGIN_URL = MITX_ROOT_URL + '/signin'
+LOGIN_REDIRECT_URL = EDX_ROOT_URL + '/signin'
+LOGIN_URL = EDX_ROOT_URL + '/signin'
 
 
 TEMPLATE_CONTEXT_PROCESSORS = (
