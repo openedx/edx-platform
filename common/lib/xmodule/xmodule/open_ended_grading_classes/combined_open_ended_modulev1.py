@@ -13,7 +13,7 @@ from .combined_open_ended_rubric import CombinedOpenEndedRubric, GRADER_TYPE_IMA
 from xmodule.open_ended_grading_classes.peer_grading_service import PeerGradingService, MockPeerGradingService, GradingServiceError
 from xmodule.open_ended_grading_classes.openendedchild import OpenEndedChild
 
-log = logging.getLogger("mitx.courseware")
+log = logging.getLogger("edx.courseware")
 
 # Set the default number of max attempts.  Should be 1 for production
 # Set higher for debugging/testing

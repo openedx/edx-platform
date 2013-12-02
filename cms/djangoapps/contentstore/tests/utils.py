@@ -85,7 +85,7 @@ class CourseTestCase(ModuleStoreTestCase):
         self.client.login(username=uname, password=password)
 
         self.course = CourseFactory.create(
-            org='MITx',
+            org='edX',
             number='999',
             display_name='Robot Super Course',
         )
@@ -111,7 +111,7 @@ class CourseTestCase(ModuleStoreTestCase):
         client = Client()
         client.login(username=uname, password=password)
         return client, nonstaff
-    
+
     def populateCourse(self):
         """
         Add 2 chapters, 4 sections, 8 verticals, 16 problems to self.course (branching 2)

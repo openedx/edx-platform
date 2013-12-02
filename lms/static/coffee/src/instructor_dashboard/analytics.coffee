@@ -168,13 +168,13 @@ class GradeDistributionDisplay
   # {
   #   "aname": "ProblemGradeDistribution",
   #   "time": "2013-07-31T20:25:56+00:00",
-  #   "course_id": "MITx/6.002x/2013_Spring",
+  #   "course_id": "edX/6.002x/2013_Spring",
   #   "options": {
-  #     "course_id": "MITx/6.002x/2013_Spring",
+  #     "course_id": "edX/6.002x/2013_Spring",
   #   "_id": "6fudge2b49somedbid1e1",
   #   "data": [
   #     {
-  #       "module_id": "i4x://MITx/6.002x/problem/Capacitors_and_Energy_Storage",
+  #       "module_id": "i4x://edX/6.002x/problem/Capacitors_and_Energy_Storage",
   #       "grade_info": [
   #         {
   #           "grade": 0.0,

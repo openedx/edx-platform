@@ -12,15 +12,15 @@ class Command(BaseCommand):
 
         Add a user to the whitelist for a course
 
-        $ ... cert_whitelist --add joe -c "MITx/6.002x/2012_Fall"
+        $ ... cert_whitelist --add joe -c "edX/6.002x/2012_Fall"
 
         Remove a user from the whitelist for a course
 
-        $ ... cert_whitelist --del joe -c "MITx/6.002x/2012_Fall"
+        $ ... cert_whitelist --del joe -c "edX/6.002x/2012_Fall"
 
         Print out who is whitelisted for a course
 
-        $ ... cert_whitelist -c "MITx/6.002x/2012_Fall"
+        $ ... cert_whitelist -c "edX/6.002x/2012_Fall"
 
     """
 

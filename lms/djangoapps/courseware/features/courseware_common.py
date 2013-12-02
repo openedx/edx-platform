@@ -16,7 +16,7 @@ def i_click_on_the_tab(step, tab_text):
 
 @step('I visit the courseware URL$')
 def i_visit_the_course_info_url(step):
-    world.visit('/courses/MITx/6.002x/2012_Fall/courseware')
+    world.visit('/courses/edX/6.002x/2012_Fall/courseware')
 
 
 @step(u'I am on the dashboard page$')

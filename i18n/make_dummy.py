@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # Generate test translation files from human-readable po files.
-# 
+#
 # Dummy language is specified in configuration file (see config.py)
 # two letter language codes reference:
 # see http://www.loc.gov/standards/iso639-2/php/code_list.php
@@ -20,7 +20,7 @@
 # $ ./make_dummy.py ../conf/locale/en/LC_MESSAGES/django.po
 #
 # generates output to
-#    mitx/conf/locale/eo/LC_MESSAGES/django.po
+#    edX/conf/locale/eo/LC_MESSAGES/django.po
 
 import os, sys
 import polib

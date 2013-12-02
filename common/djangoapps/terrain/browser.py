@@ -155,7 +155,7 @@ def initial_setup(server):
 def reset_data(scenario):
     """
     Clean out the django test database defined in the
-    envs/acceptance.py file: mitx_all/db/test_mitx.db
+    envs/acceptance.py file: edx/db/test_edX.db
     """
     LOGGER.debug("Flushing the test database...")
     call_command('flush', interactive=False, verbosity=0)

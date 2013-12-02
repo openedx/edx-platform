@@ -31,8 +31,8 @@ course_id = 'HarvardX/PH207x/2012_Fall'
 location = 'i4x://HarvardX/PH207x/problem/ex_practice_2'
 
 #server = prompt('Server (no trailing slash)',  'http://127.0.0.1:8000')
-#course_id = prompt('Course id', 'MITx/7012x/2013_Spring')
-#location = prompt('problem location', 'i4x://MITx/7012x/problem/example_upload_answer')
+#course_id = prompt('Course id', 'edX/7012x/2013_Spring')
+#location = prompt('problem location', 'i4x://edX/7012x/problem/example_upload_answer')
 value = prompt('value to upload')
 
 username = prompt('username on server', 'victor@edx.org')
@@ -60,7 +60,7 @@ r.raise_for_status()
 
 url = '/'.join([server, 'courses', course_id, 'modx', location, 'problem_check'])
 data = {'input_{0}_2_1'.format(location.replace('/','-').replace(':','').replace('--','-')): value}
-#data = {'input_i4x-MITx-7012x-problem-example_upload_answer_2_1': value}
+#data = {'input_i4x-edX-7012x-problem-example_upload_answer_2_1': value}
 
 print "Posting to '{0}': {1}".format(url, data)
 

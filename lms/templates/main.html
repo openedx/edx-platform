@@ -8,7 +8,7 @@
 ## templates have access to these functions, and we can import these
 ## into non-inheriting templates via the %namespace tag.
 <%def name="theme_enabled()">
-  <% return settings.MITX_FEATURES["USE_CUSTOM_THEME"] %>
+  <% return settings.FEATURES["USE_CUSTOM_THEME"] %>
 </%def>
 
 <%def name="stanford_theme_enabled()">
@@ -62,7 +62,7 @@
     <script src="${static.url('js/html5shiv.js')}"></script>
   <![endif]-->
 
-  <meta name="path_prefix" content="${MITX_ROOT_URL}">
+  <meta name="path_prefix" content="${EDX_ROOT_URL}">
   <meta name="google-site-verification" content="_mipQ4AtZQDNmbtOkwehQDOgCxUUV2fb_C0b6wbiRHY" />
 
   % if not course:

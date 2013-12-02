@@ -81,7 +81,7 @@ class ShibSPTest(ModuleStoreTestCase):
     def setUp(self):
         self.store = editable_modulestore()
 
-    @unittest.skipUnless(settings.MITX_FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
+    @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
     def test_exception_shib_login(self):
         """
         Tests that we get the error page when there is no REMOTE_USER
@@ -107,7 +107,7 @@ class ShibSPTest(ModuleStoreTestCase):
         self.assertIn(u'logged in via Shibboleth', args[0])
         self.assertEquals(remote_user, args[1])
 
-    @unittest.skipUnless(settings.MITX_FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
+    @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
     def test_shib_login(self):
         """
         Tests that:
@@ -207,7 +207,7 @@ class ShibSPTest(ModuleStoreTestCase):
                     # no audit logging calls
                     self.assertEquals(len(audit_log_calls), 0)
 
-    @unittest.skipUnless(settings.MITX_FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
+    @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
     def test_registration_form(self):
         """
         Tests the registration form showing up with the proper parameters.
@@ -237,7 +237,7 @@ class ShibSPTest(ModuleStoreTestCase):
             # clean up b/c we don't want existing ExternalAuthMap for the next run
             client.session['ExternalAuthMap'].delete()
 
-    @unittest.skipUnless(settings.MITX_FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
+    @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
     def test_registration_form_submit(self):
         """
         Tests user creation after the registration form that pops is submitted.  If there is no shib
@@ -319,12 +319,12 @@ class ShibSPTest(ModuleStoreTestCase):
             Registration.objects.filter(user=user).delete()
             user.delete()
 
-    @unittest.skipUnless(settings.MITX_FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
+    @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
     def test_course_specific_login_and_reg(self):
         """
         Tests that the correct course specific login and registration urls work for shib
         """
-        course = CourseFactory.create(org='MITx', number='999', display_name='Robot Super Course')
+        course = CourseFactory.create(org='edX', number='999', display_name='Robot Super Course')
 
         # Test for cases where course is found
         for domain in ["", "shib:https://idp.stanford.edu/"]:
@@ -335,37 +335,37 @@ class ShibSPTest(ModuleStoreTestCase):
             self.store.update_metadata(course.location.url(), metadata)
 
             # setting location to test that GET params get passed through
-            login_request = self.request_factory.get('/course_specific_login/MITx/999/Robot_Super_Course' +
-                                                     '?course_id=MITx/999/Robot_Super_Course' +
+            login_request = self.request_factory.get('/course_specific_login/edX/999/Robot_Super_Course' +
+                                                     '?course_id=edX/999/Robot_Super_Course' +
                                                      '&enrollment_action=enroll')
-            _reg_request = self.request_factory.get('/course_specific_register/MITx/999/Robot_Super_Course' +
-                                                    '?course_id=MITx/999/course/Robot_Super_Course' +
+            _reg_request = self.request_factory.get('/course_specific_register/edX/999/Robot_Super_Course' +
+                                                    '?course_id=edX/999/course/Robot_Super_Course' +
                                                     '&enrollment_action=enroll')
 
-            login_response = course_specific_login(login_request, 'MITx/999/Robot_Super_Course')
-            reg_response = course_specific_register(login_request, 'MITx/999/Robot_Super_Course')
+            login_response = course_specific_login(login_request, 'edX/999/Robot_Super_Course')
+            reg_response = course_specific_register(login_request, 'edX/999/Robot_Super_Course')
 
             if "shib" in domain:
                 self.assertIsInstance(login_response, HttpResponseRedirect)
                 self.assertEqual(login_response['Location'],
                                  reverse('shib-login') +
-                                 '?course_id=MITx/999/Robot_Super_Course' +
+                                 '?course_id=edX/999/Robot_Super_Course' +
                                  '&enrollment_action=enroll')
                 self.assertIsInstance(login_response, HttpResponseRedirect)
                 self.assertEqual(reg_response['Location'],
                                  reverse('shib-login') +
-                                 '?course_id=MITx/999/Robot_Super_Course' +
+                                 '?course_id=edX/999/Robot_Super_Course' +
                                  '&enrollment_action=enroll')
             else:
                 self.assertIsInstance(login_response, HttpResponseRedirect)
                 self.assertEqual(login_response['Location'],
                                  reverse('signin_user') +
-                                 '?course_id=MITx/999/Robot_Super_Course' +
+                                 '?course_id=edX/999/Robot_Super_Course' +
                                  '&enrollment_action=enroll')
                 self.assertIsInstance(login_response, HttpResponseRedirect)
                 self.assertEqual(reg_response['Location'],
                                  reverse('register_user') +
-                                 '?course_id=MITx/999/Robot_Super_Course' +
+                                 '?course_id=edX/999/Robot_Super_Course' +
                                  '&enrollment_action=enroll')
 
             # Now test for non-existent course
@@ -391,7 +391,7 @@ class ShibSPTest(ModuleStoreTestCase):
                              '?course_id=DNE/DNE/DNE' +
                              '&enrollment_action=enroll')
 
-    @unittest.skipUnless(settings.MITX_FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
+    @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
     def test_enrollment_limit_by_domain(self):
         """
             Tests that the enrollmentDomain setting is properly limiting enrollment to those who have
@@ -405,7 +405,7 @@ class ShibSPTest(ModuleStoreTestCase):
         metadata['enrollment_domain'] = shib_course.enrollment_domain
         self.store.update_metadata(shib_course.location.url(), metadata)
 
-        open_enroll_course = CourseFactory.create(org='MITx', number='999', display_name='Robot Super Course')
+        open_enroll_course = CourseFactory.create(org='edX', number='999', display_name='Robot Super Course')
         open_enroll_course.enrollment_domain = ''
         metadata = own_metadata(open_enroll_course)
         metadata['enrollment_domain'] = open_enroll_course.enrollment_domain
@@ -455,7 +455,7 @@ class ShibSPTest(ModuleStoreTestCase):
                     self.assertEqual(response.status_code, 400)
                     self.assertFalse(CourseEnrollment.is_enrolled(student, course.id))
 
-    @unittest.skipUnless(settings.MITX_FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
+    @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
     def test_shib_login_enrollment(self):
         """
             A functionality test that a student with an existing shib login

@@ -9,7 +9,7 @@ import static_replace
 
 from django.conf import settings
 from django.utils.timezone import UTC
-from mitxmako.shortcuts import render_to_string
+from edxmako.shortcuts import render_to_string
 from xblock.fragment import Fragment
 
 from xmodule.seq_module import SequenceModule
@@ -163,7 +163,7 @@ def add_histogram(user, block, view, frag, context):  # pylint: disable=unused-a
         histogram = None
         render_histogram = False
 
-    if settings.MITX_FEATURES.get('ENABLE_LMS_MIGRATION'):
+    if settings.FEATURES.get('ENABLE_LMS_MIGRATION'):
         [filepath, filename] = getattr(block, 'xml_attributes', {}).get('filename', ['', None])
         osfs = block.system.filestore
         if filename is not None and osfs.exists(filename):
@@ -171,7 +171,7 @@ def add_histogram(user, block, view, frag, context):  # pylint: disable=unused-a
             # doesn't like symlinks)
             filepath = filename
         data_dir = osfs.root_path.rsplit('/')[-1]
-        giturl = block.giturl or 'https://github.com/MITx'
+        giturl = block.giturl or 'https://github.com/edX'
         edit_link = "%s/%s/tree/master/%s" % (giturl, data_dir, filepath)
     else:
         edit_link = False
@@ -201,7 +201,7 @@ def add_histogram(user, block, view, frag, context):  # pylint: disable=unused-a
                      'element_id': block.location.html_id().replace('-', '_'),
                      'edit_link': edit_link,
                      'user': user,
-                     'xqa_server': settings.MITX_FEATURES.get('USE_XQA_SERVER', 'http://xqa:server@content-qa.mitx.mit.edu/xqa'),
+                     'xqa_server': settings.FEATURES.get('USE_XQA_SERVER', 'http://xqa:server@content-qa.mitx.mit.edu/xqa'),
                      'histogram': json.dumps(histogram),
                      'render_histogram': render_histogram,
                      'block_content': frag.content,

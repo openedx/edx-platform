@@ -11,7 +11,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect
-from mitxmako.shortcuts import render_to_response, render_to_string
+from edxmako.shortcuts import render_to_response, render_to_string
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 from django.db import transaction
@@ -38,7 +38,7 @@ from xmodule.modulestore.search import path_to_location
 from xmodule.course_module import CourseDescriptor
 import shoppingcart
 
-log = logging.getLogger("mitx.courseware")
+log = logging.getLogger("edx.courseware")
 
 template_imports = {'urllib': urllib}
 
@@ -263,12 +263,12 @@ def index(request, course_id, chapter=None, section=None,
             'fragment': Fragment(),
             'staff_access': staff_access,
             'masquerade': masq,
-            'xqa_server': settings.MITX_FEATURES.get('USE_XQA_SERVER', 'http://xqa:server@content-qa.mitx.mit.edu/xqa')
+            'xqa_server': settings.FEATURES.get('USE_XQA_SERVER', 'http://xqa:server@content-qa.edX.mit.edu/xqa')
             }
 
         # Only show the chat if it's enabled by the course and in the
         # settings.
-        show_chat = course.show_chat and settings.MITX_FEATURES['ENABLE_CHAT']
+        show_chat = course.show_chat and settings.FEATURES['ENABLE_CHAT']
         if show_chat:
             context['chat'] = chat_settings(course, user)
             # If we couldn't load the chat settings, then don't show
@@ -514,7 +514,7 @@ def registered_for_course(course, user):
 @ensure_csrf_cookie
 @cache_if_anonymous
 def course_about(request, course_id):
-    if settings.MITX_FEATURES.get('ENABLE_MKTG_SITE', False):
+    if settings.FEATURES.get('ENABLE_MKTG_SITE', False):
         raise Http404
 
     course = get_course_with_access(request.user, course_id, 'see_exists')
@@ -526,14 +526,14 @@ def course_about(request, course_id):
         course_target = reverse('about_course', args=[course.id])
 
     show_courseware_link = (has_access(request.user, course, 'load') or
-                            settings.MITX_FEATURES.get('ENABLE_LMS_MIGRATION'))
+                            settings.FEATURES.get('ENABLE_LMS_MIGRATION'))
 
     # Note: this is a flow for payment for course registration, not the Verified Certificate flow.
     registration_price = 0
     in_cart = False
     reg_then_add_to_cart_link = ""
-    if (settings.MITX_FEATURES.get('ENABLE_SHOPPING_CART') and
-        settings.MITX_FEATURES.get('ENABLE_PAID_COURSE_REGISTRATION')):
+    if (settings.FEATURES.get('ENABLE_SHOPPING_CART') and
+        settings.FEATURES.get('ENABLE_PAID_COURSE_REGISTRATION')):
         registration_price = CourseMode.min_course_price_for_currency(course_id,
                                                                       settings.PAID_COURSE_REGISTRATION_CURRENCY[0])
         if request.user.is_authenticated():
@@ -579,7 +579,7 @@ def mktg_course_about(request, course_id):
     allow_registration = has_access(request.user, course, 'enroll')
 
     show_courseware_link = (has_access(request.user, course, 'load') or
-                            settings.MITX_FEATURES.get('ENABLE_LMS_MIGRATION'))
+                            settings.FEATURES.get('ENABLE_LMS_MIGRATION'))
     course_modes = CourseMode.modes_for_course(course.id)
 
     return render_to_response(

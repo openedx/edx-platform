@@ -170,7 +170,7 @@
       <h2 class="sr">${_("Helpful Information")}</h2>
     </header>
 
-    % if settings.MITX_FEATURES.get('AUTH_USE_OPENID'):
+    % if settings.FEATURES.get('AUTH_USE_OPENID'):
     <!-- <div class="cta cta-login-options-openid">
       <h3>${_("Login via OpenID")}</h3>
       <p>${_('You can now start learning with {platform_name} by logging in with your <a rel="external" href="http://openid.net/">OpenID account</a>.').format(platform_name=settings.PLATFORM_NAME)}</p>

@@ -28,32 +28,32 @@ class UserCartContextProcessorUnitTest(ModuleStoreTestCase):
         """
         Adds content to self.user's cart
         """
-        course = CourseFactory.create(org='MITx', number='999', display_name='Robot Super Course')
+        course = CourseFactory.create(org='edX', number='999', display_name='Robot Super Course')
         CourseModeFactory(course_id=course.id)
         cart = Order.get_cart_for_user(self.user)
         PaidCourseRegistration.add_to_order(cart, course.id)
 
-    @patch.dict(settings.MITX_FEATURES, {'ENABLE_SHOPPING_CART': False, 'ENABLE_PAID_COURSE_REGISTRATION': True})
+    @patch.dict(settings.FEATURES, {'ENABLE_SHOPPING_CART': False, 'ENABLE_PAID_COURSE_REGISTRATION': True})
     def test_no_enable_shoppingcart(self):
         """
-        Tests when MITX_FEATURES['ENABLE_SHOPPING_CART'] is not set
+        Tests when edX_FEATURES['ENABLE_SHOPPING_CART'] is not set
         """
         self.add_to_cart()
         self.request.user = self.user
         context = user_has_cart_context_processor(self.request)
         self.assertFalse(context['display_shopping_cart'])
 
-    @patch.dict(settings.MITX_FEATURES, {'ENABLE_SHOPPING_CART': True, 'ENABLE_PAID_COURSE_REGISTRATION': False})
+    @patch.dict(settings.FEATURES, {'ENABLE_SHOPPING_CART': True, 'ENABLE_PAID_COURSE_REGISTRATION': False})
     def test_no_enable_paid_course_registration(self):
         """
-        Tests when MITX_FEATURES['ENABLE_PAID_COURSE_REGISTRATION'] is not set
+        Tests when edX_FEATURES['ENABLE_PAID_COURSE_REGISTRATION'] is not set
         """
         self.add_to_cart()
         self.request.user = self.user
         context = user_has_cart_context_processor(self.request)
         self.assertFalse(context['display_shopping_cart'])
 
-    @patch.dict(settings.MITX_FEATURES, {'ENABLE_SHOPPING_CART': True, 'ENABLE_PAID_COURSE_REGISTRATION': True})
+    @patch.dict(settings.FEATURES, {'ENABLE_SHOPPING_CART': True, 'ENABLE_PAID_COURSE_REGISTRATION': True})
     def test_anonymous_user(self):
         """
         Tests when request.user is anonymous
@@ -62,7 +62,7 @@ class UserCartContextProcessorUnitTest(ModuleStoreTestCase):
         context = user_has_cart_context_processor(self.request)
         self.assertFalse(context['display_shopping_cart'])
 
-    @patch.dict(settings.MITX_FEATURES, {'ENABLE_SHOPPING_CART': True, 'ENABLE_PAID_COURSE_REGISTRATION': True})
+    @patch.dict(settings.FEATURES, {'ENABLE_SHOPPING_CART': True, 'ENABLE_PAID_COURSE_REGISTRATION': True})
     def test_no_items_in_cart(self):
         """
         Tests when request.user doesn't have a cart with items
@@ -71,7 +71,7 @@ class UserCartContextProcessorUnitTest(ModuleStoreTestCase):
         context = user_has_cart_context_processor(self.request)
         self.assertFalse(context['display_shopping_cart'])
 
-    @patch.dict(settings.MITX_FEATURES, {'ENABLE_SHOPPING_CART': True, 'ENABLE_PAID_COURSE_REGISTRATION': True})
+    @patch.dict(settings.FEATURES, {'ENABLE_SHOPPING_CART': True, 'ENABLE_PAID_COURSE_REGISTRATION': True})
     def test_items_in_cart(self):
         """
         Tests when request.user has a cart with items

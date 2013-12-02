@@ -23,7 +23,7 @@ be specified for this tag::
 
     sources - location id of required modules, separated by ';'
     [message | ""] - message for case, where one or more are not passed. Here you can use variable {link}, which generate link to required module.
-        
+
     [submitted] - map to `is_submitted` module method.
     (pressing RESET button makes this function to return False.)
 
@@ -48,7 +48,7 @@ Examples of conditional depends on poll
 
 .. code-block:: xml
 
-    <conditional sources="i4x://MITx/0.000x/poll_question/first_real_poll_seq_with_reset" poll_answer="man"
+    <conditional sources="i4x://edX/0.000x/poll_question/first_real_poll_seq_with_reset" poll_answer="man"
     message="{link} must be answered for this to become visible.">
         <html>
             <h2>You see this, cause your vote value for "First question" was "man"</h2>
@@ -60,10 +60,10 @@ Examples of conditional depends on poll (use <show> tag)
 
 .. code-block:: xml
 
-    <conditional sources="i4x://MITx/0.000x/poll_question/first_real_poll_seq_with_reset" poll_answer="man"
+    <conditional sources="i4x://edX/0.000x/poll_question/first_real_poll_seq_with_reset" poll_answer="man"
     message="{link} must be answered for this to become visible.">
         <html>
-            <show sources="i4x://MITx/0.000x/problem/test_1; i4x://MITx/0.000x/Video/Avi_resources; i4x://MITx/0.000x/problem/test_1"/>
+            <show sources="i4x://edX/0.000x/problem/test_1; i4x://edX/0.000x/Video/Avi_resources; i4x://edX/0.000x/problem/test_1"/>
         </html>
     </conditional>
 
@@ -72,9 +72,9 @@ Examples of conditional depends on problem
 
 .. code-block:: xml
 
-    <conditional sources="i4x://MITx/0.000x/problem/Conditional:lec27_Q1" attempted="True">
+    <conditional sources="i4x://edX/0.000x/problem/Conditional:lec27_Q1" attempted="True">
         <html display_name="HTML for attempted problem">You see this, cause "lec27_Q1" is attempted.</html>
     </conditional>
-    <conditional sources="i4x://MITx/0.000x/problem/Conditional:lec27_Q1" attempted="False">
+    <conditional sources="i4x://edX/0.000x/problem/Conditional:lec27_Q1" attempted="False">
         <html display_name="HTML for not attempted problem">You see this, cause "lec27_Q1" is not attempted.</html>
     </conditional>

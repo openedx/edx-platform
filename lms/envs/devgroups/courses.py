@@ -10,9 +10,9 @@ CLASSES_TO_DBS = {
     'BerkeleyX/CS188.1x/2012_Fall': "cs188_1.db",
     'HarvardX/CS50x/2012': "cs50.db",
     'HarvardX/PH207x/2012_Fall': "ph207.db",
-    'MITx/3.091x/2012_Fall': "3091.db",
-    'MITx/6.002x/2012_Fall': "6002.db",
-    'MITx/6.00x/2012_Fall': "600.db",
+    'edX/3.091x/2012_Fall': "3091.db",
+    'edX/6.002x/2012_Fall': "6002.db",
+    'edX/6.00x/2012_Fall': "600.db",
 }
 
 

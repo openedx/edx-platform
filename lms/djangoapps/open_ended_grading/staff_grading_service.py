@@ -13,7 +13,7 @@ from xmodule.open_ended_grading_classes.grading_service_module import GradingSer
 
 from courseware.access import has_access
 from lms.lib.xblock.runtime import LmsModuleSystem
-from mitxmako.shortcuts import render_to_string
+from edxmako.shortcuts import render_to_string
 from student.models import unique_id_for_user
 from util.json_request import expect_json
 
@@ -49,10 +49,10 @@ class MockStaffGradingService(object):
         self.cnt += 1
         return json.dumps({'success': True,
                            'problem_list': [
-                               json.dumps({'location': 'i4x://MITx/3.091x/problem/open_ended_demo1',
+                               json.dumps({'location': 'i4x://edX/3.091x/problem/open_ended_demo1',
                                            'problem_name': "Problem 1", 'num_graded': 3, 'num_pending': 5,
                                            'min_for_ml': 10}),
-                               json.dumps({'location': 'i4x://MITx/3.091x/problem/open_ended_demo2',
+                               json.dumps({'location': 'i4x://edX/3.091x/problem/open_ended_demo2',
                                            'problem_name': "Problem 2", 'num_graded': 1, 'num_pending': 5,
                                            'min_for_ml': 10})
                            ]})

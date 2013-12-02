@@ -106,7 +106,7 @@ class CourseDetailsTestCase(CourseTestCase):
     def test_marketing_site_fetch(self):
         settings_details_url = self.course_locator.url_reverse('settings/details/')
 
-        with mock.patch.dict('django.conf.settings.MITX_FEATURES', {'ENABLE_MKTG_SITE': True}):
+        with mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
             response = self.client.get_html(settings_details_url)
             self.assertNotContains(response, "Course Summary Page")
             self.assertNotContains(response, "Send a note to students via email")
@@ -127,7 +127,7 @@ class CourseDetailsTestCase(CourseTestCase):
     def test_regular_site_fetch(self):
         settings_details_url = self.course_locator.url_reverse('settings/details/')
 
-        with mock.patch.dict('django.conf.settings.MITX_FEATURES', {'ENABLE_MKTG_SITE': False}):
+        with mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': False}):
             response = self.client.get_html(settings_details_url)
             self.assertContains(response, "Course Summary Page")
             self.assertContains(response, "Send a note to students via email")
