@@ -516,6 +516,8 @@ class CombinedOpenEndedV1Module():
             'legend_list': LEGEND_LIST,
             'human_state': HUMAN_STATES.get(self.state, "Not started."),
             'is_staff': self.system.user_is_staff,
+            'max_attempts': self.max_attempts,
+            'student_attempts': self.student_attempts,
         }
 
         return context
