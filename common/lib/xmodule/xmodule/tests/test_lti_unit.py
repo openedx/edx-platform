@@ -432,7 +432,7 @@ class LTIModuleTest(LogicTest):
         data = ''
         self.xmodule.get_input_fields = Mock(return_value={'test_input_field_key': 'test_input_field_value'})
         json_dump = self.xmodule.handle_ajax(dispatch, data)
-        expected_json_dump = '{"status": "OK", "input_fields": {"test_input_field_key": "test_input_field_value"}}'
+        expected_json_dump = '{"input_fields": {"test_input_field_key": "test_input_field_value"}}'
         self.assertEqual(
             json_dump,
             expected_json_dump
