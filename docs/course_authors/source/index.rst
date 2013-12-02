@@ -4,10 +4,8 @@
    contain the root `toctree` directive.
 
 
-
 Contents
 ========
-
 
 .. toctree::
    :numbered:
