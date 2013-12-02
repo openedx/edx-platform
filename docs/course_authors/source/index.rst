@@ -20,6 +20,7 @@ Contents
    create_video
    create_discussion
    create_html_component
+   create_lti
    create_problem
    set_content_releasedates
    establish_course_settings
@@ -34,13 +35,13 @@ Contents
    checking_student_progress
    change_log
 
-   
-
-  
 
 
 
-Appendices 
+
+
+
+Appendices
 ==========
 
 .. toctree::

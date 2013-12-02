@@ -7,7 +7,8 @@
 # see http://www.loc.gov/standards/iso639-2/php/code_list.php
 #
 # Django will not localize in languages that django itself has not been
-# localized for. So we are using a well-known language (default='fr').
+# localized for. So we are using a well-known language (default='eo').
+# Django languages are listed in django.conf.global_settings.LANGUAGES
 #
 # po files can be generated with this:
 # django-admin.py makemessages --all --extension html -l en
@@ -19,7 +20,7 @@
 # $ ./make_dummy.py ../conf/locale/en/LC_MESSAGES/django.po
 #
 # generates output to
-#    mitx/conf/locale/fr/LC_MESSAGES/django.po
+#    mitx/conf/locale/eo/LC_MESSAGES/django.po
 
 import os, sys
 import polib

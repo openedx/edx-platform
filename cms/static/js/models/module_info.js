@@ -1,6 +1,6 @@
-define(["backbone"], function(Backbone) {
+define(["backbone", "js/utils/module"], function(Backbone, ModuleUtils) {
     var ModuleInfo = Backbone.Model.extend({
-      urlRoot: "/xblock",
+      urlRoot: ModuleUtils.urlRoot,
 
       defaults: {
         "id": null,

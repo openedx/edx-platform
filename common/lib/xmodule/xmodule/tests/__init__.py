@@ -42,7 +42,7 @@ class TestModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
     """
     ModuleSystem for testing
     """
-    def handler_url(self, block, handler, suffix='', query=''):
+    def handler_url(self, block, handler, suffix='', query='', thirdparty=False):
         return str(block.scope_ids.usage_id) + '/' + handler + '/' + suffix + '?' + query
 
 

@@ -11,9 +11,11 @@ from logsettings import get_logger_config
 DEBUG = True
 USE_I18N = True
 # Locale/Internationalization
-LANGUAGES = ( ('es_419', 'Spanish'), )
+LANGUAGES = ( ('es_419', 'Spanish'), ('eo', 'Esperanto'),)
 TIME_ZONE = 'America/Guayaquil'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 LANGUAGE_CODE = 'es_419'  # http://www.i18nguy.com/unicode/language-identifiers.html
+# For displaying the dummy text, we need to provide a language mapping.
+
 TEMPLATE_DEBUG = DEBUG
 LOGGING = get_logger_config(ENV_ROOT / "log",
                             logging_env="dev",

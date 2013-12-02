@@ -75,7 +75,7 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
     js_module_name = "Hinter"
 
     def __init__(self, *args, **kwargs):
-        XModule.__init__(self, *args, **kwargs)
+        super(CrowdsourceHinterModule, self).__init__(*args, **kwargs)
         # We need to know whether we are working with a FormulaResponse problem.
         try:
             responder = self.get_display_items()[0].lcp.responders.values()[0]

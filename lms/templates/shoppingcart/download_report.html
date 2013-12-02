@@ -1,0 +1,29 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%! from django.core.urlresolvers import reverse %>
+<%inherit file="../main.html" />
+
+<%block name="title"><title>${_("Download Purchase Report")}</title></%block>
+
+
+<section class="container">
+  <h2>${_("Download CSV of purchase data")}</h2>
+  % if date_fmt_error:
+    <section class="error_msg">
+      ${_("There was an error in your date input.  It should be formatted as YYYY-MM-DD")}
+    </section>
+  % endif
+  % if total_count_error:
+    <section class="error_msg">
+      ${_("There are too many results in your report.")} (>${settings.PAYMENT_REPORT_MAX_ITEMS}).
+      ${_("Try making the date range smaller.")}
+    </section>
+  % endif
+  <form method="post">
+    <label for="start_date">${_("Start Date: ")}</label>
+    <input id="start_date" type="text" value="${start_date}" name="start_date"/>
+    <label for="end_date">${_("End Date: ")}</label>
+    <input id="end_date" type="text" value="${end_date}" name="end_date"/>
+    <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}" />
+    <input type="submit" />
+  </form>
+</section>

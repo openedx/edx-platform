@@ -16,13 +16,17 @@
       <% 
             ctx_loc = context_course.location
             location = loc_mapper().translate_location(ctx_loc.course_id, ctx_loc, False, True)
-            index_url = location.url_reverse('course/')
-            checklists_url = location.url_reverse('checklists/')
-            course_team_url = location.url_reverse('course_team/')
-            assets_url = location.url_reverse('assets/')
-            import_url = location.url_reverse('import/')
-            course_info_url = location.url_reverse('course_info/')
-            export_url = location.url_reverse('export/', '')
+            index_url = location.url_reverse('course')
+            checklists_url = location.url_reverse('checklists')
+            course_team_url = location.url_reverse('course_team')
+            assets_url = location.url_reverse('assets')
+            import_url = location.url_reverse('import')
+            course_info_url = location.url_reverse('course_info')
+            export_url = location.url_reverse('export')
+            settings_url = location.url_reverse('settings/details/')
+            grading_url = location.url_reverse('settings/grading/')
+            advanced_settings_url = location.url_reverse('settings/advanced/')
+            tabs_url = location.url_reverse('tabs')
       %>
       <h2 class="info-course">
         <span class="sr">${_("Current Course:")}</span>
@@ -51,7 +55,7 @@
                     <a href="${reverse('syllabus', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">${_("Syllabus")}</a>
                   </li>
                   <li class="nav-item nav-course-courseware-pages">
-                    <a href="${reverse('edit_tabs', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, coursename=ctx_loc.name))}">${_("Static Pages")}</a>
+                    <a href="${tabs_url}">${_("Static Pages")}</a>
                   </li>
                   <li class="nav-item nav-course-courseware-uploads">
                     <a href="${assets_url}">${_("Files &amp; Uploads")}</a>
@@ -71,16 +75,16 @@
               <div class="nav-sub">
                 <ul>
                   <li class="nav-item nav-course-settings-schedule">
-                    <a href="${reverse('contentstore.views.get_course_settings', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">${_("Schedule &amp; Details")}</a>
+                    <a href="${settings_url}">${_("Schedule &amp; Details")}</a>
                   </li>
                   <li class="nav-item nav-course-settings-grading">
-                    <a href="${reverse('contentstore.views.course_config_graders_page', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">${_("Grading")}</a>
+                    <a href="${grading_url}">${_("Grading")}</a>
                   </li>
                   <li class="nav-item nav-course-settings-team">
                     <a href="${course_team_url}">${_("Course Team")}</a>
                   </li>
                   <li class="nav-item nav-course-settings-advanced">
-                    <a href="${reverse('course_advanced_settings', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">${_("Advanced Settings")}</a>
+                    <a href="${advanced_settings_url}">${_("Advanced Settings")}</a>
                   </li>
                 </ul>
               </div>

@@ -19,7 +19,7 @@ All of our tables will be described below, first in summary form with field type
   .. list-table::
      :widths: 10 80
      :header-rows: 1
-  
+
      * - Value
        - Meaning
      * - `int`
@@ -36,13 +36,13 @@ All of our tables will be described below, first in summary form with field type
        - Date
      * - `datetime`
        - Datetime in UTC, precision in seconds.
-  
+
 `Null`
 
   .. list-table::
      :widths: 10 80
      :header-rows: 1
-  
+
      * - Value
        - Meaning
      * - `YES`
@@ -57,7 +57,7 @@ All of our tables will be described below, first in summary form with field type
   .. list-table::
      :widths: 10 80
      :header-rows: 1
-  
+
      * - Value
        - Meaning
      * - `PRI`
@@ -252,19 +252,19 @@ There is an important split in demographic data gathered for the students who si
 
   `old_names`
     A list of the previous names this user had, and the timestamps at which they submitted a request to change those names. These name change request submissions used to require a staff member to approve it before the name change took effect. This is no longer the case, though we still record their previous names.
-  
+
     Note that the value stored for each entry is the name they had, not the name they requested to get changed to. People often changed their names as the time for certificate generation approached, to replace nicknames with their actual names or correct spelling/punctuation errors.
-  
+
     The timestamps are UTC, like all datetimes stored in our system.
-  
+
   `old_emails`
     A list of previous emails this user had, with timestamps of when they changed them, in a format similar to `old_names`. There was never an approval process for this.
-  
+
     The timestamps are UTC, like all datetimes stored in our system.
-  
+
   `6002x_exit_response`
     Answers to a survey that was sent to students after the prototype 6.002x course in the Spring of 2012. The questions and number of questions were randomly selected to measure how much survey length affected response rate. Only students from this course have this field.
-  
+
 
 `courseware`
 ------------
@@ -277,7 +277,7 @@ There is an important split in demographic data gathered for the students who si
   .. list-table::
      :widths: 10 80
      :header-rows: 1
-  
+
      * - Value
        - Meaning
      * - `NULL`
@@ -306,10 +306,10 @@ There is an important split in demographic data gathered for the students who si
   .. list-table::
      :widths: 10 80
      :header-rows: 1
-  
+
      * - Value
        - Meaning
-     * - `NULL` 
+     * - `NULL`
        - This student signed up before this information was collected
      * - `''` (blank)
        - User did not specify level of education.
@@ -335,7 +335,7 @@ There is an important split in demographic data gathered for the students who si
        - None
      * - `'other'`
        - Other
-     
+
 `goals`
 -------
   Text field collected during student signup in response to the prompt, "Goals in signing up for edX". We only started collecting this information after the transition from MITx to edX, so prototype course students will have `NULL` for this field. Students who elected not to enter anything will have a blank string.
@@ -382,7 +382,7 @@ Any piece of content in the courseware can store state and score in the `coursew
 
 .. warning::
    **Modules might not be what you expect!**
-   
+
    It's important to understand what "modules" are in the context of our system, as the terminology can be confusing. For the conventions of this table and many parts of our code, a "module" is a content piece that appears in the courseware. This can be nearly anything that appears when users are in the courseware tab: a video, a piece of HTML, a problem, etc. Modules can also be collections of other modules, such as sequences, verticals (modules stacked together on the same page), weeks, chapters, etc. In fact, the course itself is a top level module that contains all the other contents of the course as children. You can imagine the entire course as a tree with modules at every node.
 
    Modules can store state, but whether and how they do so is up to the implemenation for that particular kind of module. When a user loads page, we look up all the modules they need to render in order to display it, and then we ask the database to look up state for those modules for that user. If there is corresponding entry for that user for a given module, we create a new row and set the state to an empty JSON dictionary.
@@ -420,7 +420,7 @@ The `courseware_studentmodule` table holds all courseware state for a given user
   .. list-table::
      :widths: 10 80
      :header-rows: 0
-  
+
      * - `chapter`
        - The top level categories for a course. Each of these is usually labeled as a Week in the courseware, but this is just convention.
      * - `combinedopenended`
@@ -437,8 +437,6 @@ The `courseware_studentmodule` table holds all courseware state for a given user
        - Self assessment problems. An early test of the open ended grading system that is not in widespread use yet. Recently deprecated in favor of `combinedopenended`.
      * - `sequential`
        - A collection of videos, problems, and other materials, rendered as a horizontal icon bar in the courseware.
-     * - `timelimit`
-       - A special module that records the time you start working on a piece of courseware and enforces time limits, used for Pearson exams. This hasn't been completely generalized yet, so is not available for widespread use.
      * - `videosequence`
        - A collection of videos, exercise problems, and other materials, rendered as a horizontal icon bar in the courseware. Use is inconsistent, and some courses use a `sequential` instead.
 
@@ -451,20 +449,20 @@ The `courseware_studentmodule` table holds all courseware state for a given user
   .. list-table:: Breakdown of example `module_id`: `i4x://MITx/3.091x/problemset/Sample_Problems`
      :widths: 10 20 70
      :header-rows: 1
-     
+
      * - Part
        - Example
        - Definition
      * - `i4x://`
-       - 
+       -
        - Just a convention we ran with. We had plans for the domain `i4x.org` at one point.
      * - `org`
        - `MITx`
        - The organization part of the ID, indicating what organization created this piece of content.
-     * - `course_num` 
+     * - `course_num`
        - `3.091x`
        - The course number this content was created for. Note that there is no run information here, so you can't know what runs of the course this content is being used for from the `module_id` alone; you have to look at the `courseware_studentmodule.course_id` field.
-     * - `module_type` 
+     * - `module_type`
        - `problemset`
        - The module type, same value as what's in the `courseware_studentmodule.module_type` field.
      * - `module_name`
@@ -500,33 +498,6 @@ The `courseware_studentmodule` table holds all courseware state for a given user
 
   `selfassessment`
     TODO: More details to come.
-
-  `timelimit`
-    This very uncommon type was only used in one Pearson exam for one course, and the format may change significantly in the future. It is currently a JSON dictionary with fields:
-
-    .. list-table::
-       :widths: 10 20 70
-       :header-rows: 1
-
-       * - JSON field
-         - Example
-         - Definition
-       * - `beginning_at`
-         - `1360590255.488154`
-         - UTC time as measured in seconds since UNIX epoch representing when the exam was started.
-       * - `ending_at`
-         - `1360596632.559758`
-         - UTC time as measured in seconds since UNIX epoch representing the time the exam will close.
-       * - `accomodation_codes`
-         - `DOUBLE`
-         - (optional) Sometimes students are given more time for accessibility reasons. Possible values are:
-         
-           * `NONE`: no time accommodation
-           * `ADDHALFTIME`: 1.5X normal time allowance
-           * `ADD30MIN`: normal time allowance + 30 minutes
-           * `DOUBLE`: 2X normal time allowance
-           * `TESTING`: extra long period (for testing/debugging)
-
 
 `grade`
 -------
@@ -608,13 +579,13 @@ The generatedcertificate table tracks certificate state for students who have be
   * `notpassing`
   * `restricted`
   * `error`
-  
+
   After a course has been graded and certificates have been issued status will be one of:
-  
+
   * `downloadable`
   * `notpassing`
   * `restricted`
-  
+
   If the status is `downloadable` then the student passed the course and there will be a certificate available for download.
 
 `download_url`

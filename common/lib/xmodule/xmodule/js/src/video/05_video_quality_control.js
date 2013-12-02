@@ -8,6 +8,8 @@ function () {
 
     // VideoQualityControl() function - what this module "exports".
     return function (state) {
+        var dfd = $.Deferred();
+
         // Changing quality for now only works for YouTube videos.
         if (state.videoType !== 'youtube') {
             return;
@@ -18,6 +20,9 @@ function () {
         _makeFunctionsPublic(state);
         _renderElements(state);
         _bindHandlers(state);
+
+        dfd.resolve();
+        return dfd.promise();
     };
 
     // ***************************************************************

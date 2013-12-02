@@ -52,6 +52,7 @@ from chem import chemcalc
 from calc.preview import latex_preview
 import xqueue_interface
 from datetime import datetime
+from xmodule.stringify import stringify_children
 
 log = logging.getLogger(__name__)
 
@@ -406,13 +407,7 @@ class ChoiceGroup(InputTypeBase):
                 raise Exception(
                     "[capa.inputtypes.extract_choices] Expected a <choice> tag; got %s instead"
                     % choice.tag)
-            choice_text = ''.join([etree.tostring(x) for x in choice])
-            if choice.text is not None:
-                # TODO: fix order?
-                choice_text += choice.text
-
-            choices.append((choice.get("name"), choice_text))
-
+            choices.append((choice.get("name"), stringify_children(choice)))
         return choices
 
 

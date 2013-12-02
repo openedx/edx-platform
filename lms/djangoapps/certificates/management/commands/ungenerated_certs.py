@@ -93,6 +93,7 @@ class Command(BaseCommand):
             total = enrolled_students.count()
             count = 0
             start = datetime.datetime.now(UTC)
+
             for student in enrolled_students:
                 count += 1
                 if count % STATUS_INTERVAL == 0:

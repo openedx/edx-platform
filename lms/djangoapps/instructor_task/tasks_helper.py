@@ -4,24 +4,27 @@ running state of a course.
 
 """
 import json
+import urllib
+from datetime import datetime
 from time import time
 
 from celery import Task, current_task
 from celery.utils.log import get_task_logger
 from celery.states import SUCCESS, FAILURE
-
 from django.contrib.auth.models import User
 from django.db import transaction, reset_queries
 from dogapi import dog_stats_api
+from pytz import UTC
 
 from xmodule.modulestore.django import modulestore
-
 from track.views import task_track
 
+from courseware.grades import iterate_grades_for
 from courseware.models import StudentModule
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor_internal
-from instructor_task.models import InstructorTask, PROGRESS
+from instructor_task.models import GradesStore, InstructorTask, PROGRESS
+from student.models import CourseEnrollment
 
 # define different loggers for use within tasks and on client side
 TASK_LOG = get_task_logger(__name__)
@@ -465,3 +468,106 @@ def delete_problem_module_state(xmodule_instance_args, _module_descriptor, stude
     track_function = _get_track_function_for_task(student_module.student, xmodule_instance_args)
     track_function('problem_delete_state', {})
     return UPDATE_STATUS_SUCCEEDED
+
+
+def push_grades_to_s3(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name):
+    """
+    For a given `course_id`, generate a grades CSV file for all students that
+    are enrolled, and store using a `GradesStore`. Once created, the files can
+    be accessed by instantiating another `GradesStore` (via
+    `GradesStore.from_config()`) and calling `link_for()` on it. Writes are
+    buffered, so we'll never write part of a CSV file to S3 -- i.e. any files
+    that are visible in GradesStore will be complete ones.
+
+    As we start to add more CSV downloads, it will probably be worthwhile to
+    make a more general CSVDoc class instead of building out the rows like we
+    do here.
+    """
+    start_time = datetime.now(UTC)
+    status_interval = 100
+
+    enrolled_students = CourseEnrollment.users_enrolled_in(course_id)
+    num_total = enrolled_students.count()
+    num_attempted = 0
+    num_succeeded = 0
+    num_failed = 0
+    curr_step = "Calculating Grades"
+
+    def update_task_progress():
+        """Return a dict containing info about current task"""
+        current_time = datetime.now(UTC)
+        progress = {
+            'action_name': action_name,
+            'attempted': num_attempted,
+            'succeeded': num_succeeded,
+            'failed': num_failed,
+            'total': num_total,
+            'duration_ms': int((current_time - start_time).total_seconds() * 1000),
+            'step': curr_step,
+        }
+        _get_current_task().update_state(state=PROGRESS, meta=progress)
+
+        return progress
+
+    # Loop over all our students and build our CSV lists in memory
+    header = None
+    rows = []
+    err_rows = [["id", "username", "error_msg"]]
+    for student, gradeset, err_msg in iterate_grades_for(course_id, enrolled_students):
+        # Periodically update task status (this is a cache write)
+        if num_attempted % status_interval == 0:
+            update_task_progress()
+        num_attempted += 1
+
+        if gradeset:
+            # We were able to successfully grade this student for this course.
+            num_succeeded += 1
+            if not header:
+                header = [section['label'] for section in gradeset[u'section_breakdown']]
+                rows.append(["id", "email", "username", "grade"] + header)
+
+            percents = {
+                section['label']: section.get('percent', 0.0)
+                for section in gradeset[u'section_breakdown']
+                if 'label' in section
+            }
+
+            # Not everybody has the same gradable items. If the item is not
+            # found in the user's gradeset, just assume it's a 0. The aggregated
+            # grades for their sections and overall course will be calculated
+            # without regard for the item they didn't have access to, so it's
+            # possible for a student to have a 0.0 show up in their row but
+            # still have 100% for the course.
+            row_percents = [percents.get(label, 0.0) for label in header]
+            rows.append([student.id, student.email, student.username, gradeset['percent']] + row_percents)
+        else:
+            # An empty gradeset means we failed to grade a student.
+            num_failed += 1
+            err_rows.append([student.id, student.username, err_msg])
+
+    # By this point, we've got the rows we're going to stuff into our CSV files.
+    curr_step = "Uploading CSVs"
+    update_task_progress()
+
+    # Generate parts of the file name
+    timestamp_str = start_time.strftime("%Y-%m-%d-%H%M")
+    course_id_prefix = urllib.quote(course_id.replace("/", "_"))
+
+    # Perform the actual upload
+    grades_store = GradesStore.from_config()
+    grades_store.store_rows(
+        course_id,
+        "{}_grade_report_{}.csv".format(course_id_prefix, timestamp_str),
+        rows
+    )
+
+    # If there are any error rows (don't count the header), write them out as well
+    if len(err_rows) > 1:
+        grades_store.store_rows(
+            course_id,
+            "{}_grade_report_{}_err.csv".format(course_id_prefix, timestamp_str),
+            err_rows
+        )
+
+    # One last update before we close out...
+    return update_task_progress()

@@ -4,6 +4,9 @@ import oauthlib
 from . import BaseTestXmodule
 from collections import OrderedDict
 import mock
+import urllib
+from xmodule.lti_module import LTIModule
+from mock import Mock
 
 
 class TestLTI(BaseTestXmodule):
@@ -26,21 +29,33 @@ class TestLTI(BaseTestXmodule):
         mocked_signature_after_sign = u'my_signature%3D'
         mocked_decoded_signature = u'my_signature='
 
+        lti_id = self.item_module.lti_id
+        module_id = unicode(urllib.quote(self.item_module.id))
+        user_id = unicode(self.item_descriptor.xmodule_runtime.anonymous_student_id)
+
+        sourcedId = u':'.join(urllib.quote(i) for i in (lti_id, module_id, user_id))
+
+        lis_outcome_service_url = 'http://{host}{path}'.format(
+                host=self.item_descriptor.xmodule_runtime.hostname,
+                path=self.item_descriptor.xmodule_runtime.handler_url(self.item_module, 'grade_handler', thirdparty=True).rstrip('/?')
+            )
         self.correct_headers = {
+            u'user_id': user_id,
             u'oauth_callback': u'about:blank',
-            u'lis_outcome_service_url': '',
-            u'lis_result_sourcedid': '',
             u'launch_presentation_return_url': '',
             u'lti_message_type': u'basic-lti-launch-request',
             u'lti_version': 'LTI-1p0',
+            u'role': u'student',
+
+            u'resource_link_id': module_id,
+            u'lis_outcome_service_url': lis_outcome_service_url,
+            u'lis_result_sourcedid': sourcedId,
 
             u'oauth_nonce': mocked_nonce,
             u'oauth_timestamp': mocked_timestamp,
             u'oauth_consumer_key': u'',
             u'oauth_signature_method': u'HMAC-SHA1',
             u'oauth_version': u'1.0',
-            u'user_id': self.item_descriptor.xmodule_runtime.anonymous_student_id,
-            u'role': u'student',
             u'oauth_signature': mocked_decoded_signature
         }
 
@@ -70,14 +85,16 @@ class TestLTI(BaseTestXmodule):
         Makes sure that all parameters extracted.
         """
         generated_context = self.item_module.render('student_view').content
+
         expected_context = {
-            'input_fields': self.correct_headers,
             'display_name': self.item_module.display_name,
-            'element_class': self.item_module.location.category,
+            'input_fields': self.correct_headers,
+            'element_class': self.item_module.category,
             'element_id': self.item_module.location.html_id(),
             'launch_url': 'http://www.example.com',  # default value
             'open_in_a_new_page': True,
         }
+
         self.assertEqual(
             generated_context,
             self.runtime.render_template('lti.html', expected_context),

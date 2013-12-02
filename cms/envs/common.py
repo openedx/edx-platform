@@ -157,6 +157,7 @@ MIDDLEWARE_CLASSES = (
     'cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
     'student.middleware.UserStandingMiddleware',
     'contentserver.middleware.StaticContentServer',
+    'crum.CurrentRequestUserMiddleware',
 
     'django.contrib.messages.middleware.MessageMiddleware',
     'track.middleware.TrackMiddleware',
@@ -259,6 +260,12 @@ PIPELINE_CSS = {
             'sass/style-app.css',
         ],
         'output_filename': 'css/cms-style-app.css',
+    },
+    'style-app-extend1': {
+        'source_filenames': [
+            'sass/style-app-extend1.css',
+        ],
+        'output_filename': 'css/cms-style-app-extend1.css',
     },
     'style-xmodule': {
         'source_filenames': [

@@ -16,7 +16,6 @@ define(
 'video/01_initialize.js',
 ['video/03_video_player.js'],
 function (VideoPlayer) {
-
     // window.console.log() is expected to be available. We do not support
     // browsers which lack this functionality.
 
@@ -42,7 +41,20 @@ function (VideoPlayer) {
      */
     return function (state, element) {
         _makeFunctionsPublic(state);
-        state.initialize(element);
+
+        state.initialize(element)
+            .done(function () {
+                _initializeModules(state)
+                    .done(function () {
+                        state.el
+                            .addClass('is-initialized')
+                            .find('.spinner')
+                            .attr({
+                                'aria-hidden': 'true',
+                                'tabindex': -1
+                            });
+                    });
+            });
     };
 
     // ***************************************************************
@@ -94,12 +106,20 @@ function (VideoPlayer) {
         // Require JS. At the time when we reach this code, the stand alone
         // HTML5 player is already loaded, so no further testing in that case
         // is required.
+        var video;
+
         if(state.videoType === 'youtube') {
             YT.ready(function() {
-                VideoPlayer(state);
+                video = VideoPlayer(state);
+
+                state.modules.push(video);
+                state.__dfd__.resolve();
             });
         } else {
-            VideoPlayer(state);
+            video = VideoPlayer(state);
+
+            state.modules.push(video);
+            state.__dfd__.resolve();
         }
     }
 
@@ -191,6 +211,8 @@ function (VideoPlayer) {
             state.html5Sources.mp4 === null &&
             state.html5Sources.ogg === null
         ) {
+
+            // TODO: use 1 class to work with.
             state.el.find('.video-player div').addClass('hidden');
             state.el.find('.video-player h3').removeClass('hidden');
 
@@ -222,6 +244,22 @@ function (VideoPlayer) {
         state.controlHideTimeout = null;
         state.captionState = 'visible';
         state.captionHideTimeout = null;
+    }
+
+    function _initializeModules(state) {
+        var dfd = $.Deferred(),
+            modulesList = $.map(state.modules, function(module) {
+                if ($.isFunction(module)) {
+                    return module(state);
+                } else if ($.isPlainObject(module)) {
+                    return module;
+                }
+        });
+
+        $.when.apply(null, modulesList)
+            .done(dfd.resolve);
+
+        return dfd.promise();
     }
 
     // ***************************************************************
@@ -259,6 +297,7 @@ function (VideoPlayer) {
             data, tempYtTestTimeout;
         // This is used in places where we instead would have to check if an
         // element has a CSS class 'fullscreen'.
+        this.__dfd__ = $.Deferred();
         this.isFullScreen = false;
 
         // The parent element of the video, and the ID.
@@ -313,8 +352,9 @@ function (VideoPlayer) {
             // If we do not have YouTube ID's, try parsing HTML5 video sources.
             if (!_prepareHTML5Video(this)) {
 
+                this.__dfd__.reject();
                 // Non-YouTube sources were not found either.
-                return;
+                return this.__dfd__.promise();
             }
 
             console.log('[Video info]: Start player in HTML5 mode.');
@@ -381,6 +421,8 @@ function (VideoPlayer) {
                     _renderElements(_this);
                 });
         }
+
+        return this.__dfd__.promise();
     }
 
     /*

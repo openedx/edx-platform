@@ -16,9 +16,6 @@ class VerticalFields(object):
 class VerticalModule(VerticalFields, XModule):
     ''' Layout module for laying out submodules vertically.'''
 
-    def __init__(self, *args, **kwargs):
-        XModule.__init__(self, *args, **kwargs)
-
     def student_view(self, context):
         fragment = Fragment()
         contents = []
