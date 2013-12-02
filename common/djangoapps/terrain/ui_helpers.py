@@ -31,7 +31,7 @@ REQUIREJS_WAIT = {
 
     # Individual Unit (editing)
     re.compile('^Individual Unit \|'): [
-        "js/base", "coffee/src/models/module", "coffee/src/views/unit",
+        "js/base", "coffee/src/views/unit",
         "coffee/src/views/module_edit"],
 
     # Content - Outline
@@ -546,18 +546,21 @@ def save_the_html(path='/tmp'):
 
 @world.absorb
 def click_course_content():
+    world.wait_for_js_to_load()
     course_content_css = 'li.nav-course-courseware'
     css_click(course_content_css)
 
 
 @world.absorb
 def click_course_settings():
+    world.wait_for_js_to_load()
     course_settings_css = 'li.nav-course-settings'
     css_click(course_settings_css)
 
 
 @world.absorb
 def click_tools():
+    world.wait_for_js_to_load()
     tools_css = 'li.nav-course-tools'
     css_click(tools_css)
 

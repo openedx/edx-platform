@@ -3,21 +3,6 @@
         "graceperiod": "2 days 5 hours 59 minutes 59 seconds",
         "start": "2011-07-17T12:00",
         "display_name": "Toy Course",
-	"testcenter_info": {
-            "Midterm_Exam": {
-                "Exam_Series_Code": "Midterm_Exam",
-                "First_Eligible_Appointment_Date": "2012-11-09T00:00",
-                "Last_Eligible_Appointment_Date": "2012-11-09T23:59"
-            },
-            "Final_Exam": {
-                 "Exam_Series_Code": "mit6002xfall12a",
-                 "Exam_Display_Name": "Final Exam",
-                 "First_Eligible_Appointment_Date": "2013-01-25T00:00",
-                 "Last_Eligible_Appointment_Date": "2013-01-25T23:59",
-                 "Registration_Start_Date": "2013-01-01T00:00",
-                 "Registration_End_Date": "2013-01-21T23:59"
-            }
-	}
     },
     "chapter/Overview": {
         "display_name": "Overview"

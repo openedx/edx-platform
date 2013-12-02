@@ -1018,41 +1018,29 @@ class TestCourseCreation(SplitModuleTest):
         Test changing the org, pretty id, etc of a course. Test that it doesn't allow changing the id, etc.
         """
         locator = CourseLocator(course_id="GreekHero", branch='draft')
-        modulestore().update_course_index(locator, {'org': 'funkyU'})
+        course_info = modulestore().get_course_index_info(locator)
+        course_info['org'] = 'funkyU'
+        modulestore().update_course_index(course_info)
         course_info = modulestore().get_course_index_info(locator)
         self.assertEqual(course_info['org'], 'funkyU')
 
-        modulestore().update_course_index(locator, {'org': 'moreFunky', 'prettyid': 'Ancient Greek Demagods'})
+        course_info['org'] = 'moreFunky'
+        course_info['prettyid'] = 'Ancient Greek Demagods'
+        modulestore().update_course_index(course_info)
         course_info = modulestore().get_course_index_info(locator)
         self.assertEqual(course_info['org'], 'moreFunky')
         self.assertEqual(course_info['prettyid'], 'Ancient Greek Demagods')
 
-        self.assertRaises(ValueError, modulestore().update_course_index, locator, {'_id': 'funkygreeks'})
-
-        with self.assertRaises(ValueError):
-            modulestore().update_course_index(
-                locator,
-                {'edited_on': datetime.datetime.now(UTC)}
-            )
-        with self.assertRaises(ValueError):
-            modulestore().update_course_index(
-                locator,
-                {'edited_by': 'sneak'}
-            )
-
-        self.assertRaises(ValueError, modulestore().update_course_index, locator,
-                          {'versions': {'draft': self.GUID_D1}})
-
         # an allowed but not necessarily recommended way to revert the draft version
         versions = course_info['versions']
         versions['draft'] = self.GUID_D1
-        modulestore().update_course_index(locator, {'versions': versions}, update_versions=True)
+        modulestore().update_course_index(course_info)
         course = modulestore().get_course(locator)
         self.assertEqual(str(course.location.version_guid), self.GUID_D1)
 
         # an allowed but not recommended way to publish a course
         versions['published'] = self.GUID_D1
-        modulestore().update_course_index(locator, {'versions': versions}, update_versions=True)
+        modulestore().update_course_index(course_info)
         course = modulestore().get_course(CourseLocator(course_id=locator.course_id, branch="published"))
         self.assertEqual(str(course.location.version_guid), self.GUID_D1)
 
@@ -1068,9 +1056,9 @@ class TestCourseCreation(SplitModuleTest):
         self.assertEqual(new_course.location.usage_id, 'top')
         self.assertEqual(new_course.category, 'chapter')
         # look at db to verify
-        db_structure = modulestore().structures.find_one({
-            '_id': new_course.location.as_object_id(new_course.location.version_guid)
-        })
+        db_structure = modulestore().db_connection.get_structure(
+            new_course.location.as_object_id(new_course.location.version_guid)
+        )
         self.assertIsNotNone(db_structure, "Didn't find course")
         self.assertNotIn('course', db_structure['blocks'])
         self.assertIn('top', db_structure['blocks'])

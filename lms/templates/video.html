@@ -44,18 +44,16 @@
     <div class="focus_grabber first"></div>
 
     <div class="tc-wrapper">
-      <a href="#transcript-captions" class="sr">Skip to clickable transcript video links.</a>
-      
-      <article class="video-wrapper">
-          <div class="video-player-pre"></div>
+      <a href="#before-transcript_${id}" class="nav-skip sr">${_("Skip to a navigable version of this video's transcript.")}</a>
 
+      <article class="video-wrapper">
+          <span tabindex="0" class="spinner" aria-hidden="false" aria-label="${_('Loading video player')}"></span>
+          <div class="video-player-pre"></div>
           <section class="video-player">
               <div id="${id}"></div>
               <h3 class="hidden">${_('ERROR: No playable video sources found!')}</h3>
           </section>
-
           <div class="video-player-post"></div>
-
           <section class="video-controls">
               <div class="slider" title="Video position"></div>
 
@@ -85,25 +83,29 @@
                   </div>
               </div>
           </section>
+          <a class="nav-skip sr" id="before-transcript_${id}" href="#after-transcript_${id}">${_('Skip to end of transcript.')}</a>
       </article>
 
-      <ol id="transcript-captions" class="subtitles" tabindex="0" title="${_('Captions')}" role="group" aria-label="${_('Activating an item in this group will spool the video to the corresponding time point')}"><li></li></ol>
+      <ol id="transcript-captions" class="subtitles" tabindex="0" title="${_('Captions')}" role="group" aria-label="${_('Activating an item in this group will spool the video to the corresponding time point. To skip transcript, go to previous item.')}">
+        <li></li>
+      </ol>
     </div>
 
-    <div class="focus_grabber last"></div>
-<ul class="wrapper-downloads">
-% if sources.get('main'):
-    <li class="video-sources">
-        ${('<a href="%s">' + _('Download video') + '</a>') % sources.get('main')}
-    </li>
-% endif
+    <a class="nav-skip sr" id="after-transcript_${id}" href="#before-transcript_${id}">${_('Go back to start of transcript.')}</a>
 
-% if track:
-    <li class="video-tracks">
-        ${('<a href="%s">' + _('Download timed transcript') + '</a>') % track}
-    </li>
-% endif
-</ul>
+    <div class="focus_grabber last"></div>
+  <ul class="wrapper-downloads">
+    % if sources.get('main'):
+        <li class="video-sources">
+            ${('<a href="%s">' + _('Download video') + '</a>') % sources.get('main')}
+        </li>
+    % endif
+    % if track:
+        <li class="video-tracks">
+            ${('<a href="%s">' + _('Download timed transcript') + '</a>') % track}
+        </li>
+    % endif
+  </ul>
 </div>
 
 

@@ -5,7 +5,8 @@ functionality
 # For tests, ignore access to protected members
 # pylint: disable=protected-access
 
-from nose.tools import assert_equal  # pylint: disable=E0611
+import webob
+from nose.tools import assert_equal, assert_is_instance  # pylint: disable=E0611
 from unittest.case import SkipTest
 from mock import Mock
 
@@ -32,7 +33,7 @@ from xmodule.conditional_module import ConditionalDescriptor
 from xmodule.randomize_module import RandomizeDescriptor
 from xmodule.vertical_module import VerticalDescriptor
 from xmodule.wrapper_module import WrapperDescriptor
-from xmodule.tests import get_test_descriptor_system, mock_render_template
+from xmodule.tests import get_test_descriptor_system, get_test_system
 
 LEAF_XMODULES = (
     AnnotatableDescriptor,
@@ -66,24 +67,12 @@ NOT_STUDIO_EDITABLE = (
     PollDescriptor
 )
 
-
 class TestXBlockWrapper(object):
     """Helper methods used in test case classes below."""
 
     @property
     def leaf_module_runtime(self):
-        runtime = ModuleSystem(
-            render_template=mock_render_template,
-            anonymous_student_id='dummy_anonymous_student_id',
-            open_ended_grading_interface={},
-            static_url='/static',
-            ajax_url='dummy_ajax_url',
-            get_module=Mock(),
-            replace_urls=Mock(),
-            track_function=Mock(),
-            error_descriptor_class=ErrorDescriptor,
-        )
-        return runtime
+        return get_test_system()
 
     def leaf_descriptor(self, descriptor_cls):
         location = 'i4x://org/course/category/name'
@@ -258,3 +247,27 @@ class TestStudioView(TestXBlockWrapper):
             raise SkipTest(descriptor_cls.__name__ + "is not editable in studio")
 
         raise SkipTest("XBlock support in XModules not yet fully implemented")
+
+
+class TestXModuleHandler(TestXBlockWrapper):
+    """
+    Tests that the xmodule_handler function correctly wraps handle_ajax
+    """
+
+    def setUp(self):
+        self.module = XModule(descriptor=Mock(), field_data=Mock(), runtime=Mock(), scope_ids=Mock())
+        self.module.handle_ajax = Mock(return_value='{}')
+        self.request = webob.Request({})
+
+    def test_xmodule_handler_passed_data(self):
+        self.module.xmodule_handler(self.request)
+        self.module.handle_ajax.assert_called_with(None, self.request.POST)
+
+    def test_xmodule_handler_dispatch(self):
+        self.module.xmodule_handler(self.request, 'dispatch')
+        self.module.handle_ajax.assert_called_with('dispatch', self.request.POST)
+
+    def test_xmodule_handler_return_value(self):
+        response = self.module.xmodule_handler(self.request)
+        assert_is_instance(response, webob.Response)
+        assert_equal(response.body, '{}')

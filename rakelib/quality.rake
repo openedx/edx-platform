@@ -1,5 +1,10 @@
 def run_pylint(system, report_dir, flags='')
-    apps = Dir["#{system}", "#{system}/djangoapps/*", "#{system}/lib/*"].map do |app|
+    apps = Dir["#{system}", "#{system}/djangoapps/*"]
+    if system != 'lms'
+        apps += Dir["#{system}/lib/*"]
+    end
+
+    apps = apps.map do |app|
         File.basename(app)
     end.select do |app|
         app !=~ /.pyc$/

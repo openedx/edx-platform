@@ -41,9 +41,6 @@ urlpatterns = ('',  # nopep8
     url(r'^create_account$', 'student.views.create_account', name='create_account'),
     url(r'^activate/(?P<key>[^/]*)$', 'student.views.activate_account', name="activate"),
 
-    url(r'^begin_exam_registration/(?P<course_id>[^/]+/[^/]+/[^/]+)$', 'student.views.begin_exam_registration', name="begin_exam_registration"),
-    url(r'^create_exam_registration$', 'student.views.create_exam_registration'),
-
     url(r'^password_reset/$', 'student.views.password_reset', name='password_reset'),
     ## Obsolete Django views for password resets
     ## TODO: Replace with Mako-ized views
@@ -144,7 +141,7 @@ for key, value in settings.MKTG_URL_LINK_MAP.items():
 
 
 if settings.PERFSTATS:
-    urlpatterns += (url(r'^reprofile$', 'perfstats.views.end_profile'),)
+    urlpatterns += (url(r'^reprofile$', 'lms.lib.perfstats.views.end_profile'),)
 
 # Multicourse wiki (Note: wiki urls must be above the courseware ones because of
 # the custom tab catch-all)
@@ -175,9 +172,9 @@ if settings.COURSEWARE_ENABLED:
             'courseware.views.jump_to', name="jump_to"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/jump_to_id/(?P<module_id>.*)$',
             'courseware.views.jump_to_id', name="jump_to_id"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/modx/(?P<location>.*?)/(?P<dispatch>[^/]*)$',
-            'courseware.module_render.modx_dispatch',
-            name='modx_dispatch'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/xblock/(?P<usage_id>[^/]*)/handler/(?P<handler>[^/]*)(?:/(?P<suffix>.*))?$',
+            'courseware.module_render.handle_xblock_callback',
+            name='xblock_handler'),
 
 
         # Software Licenses
@@ -401,9 +398,6 @@ if settings.MITX_FEATURES.get('AUTH_USE_OPENID_PROVIDER'):
         url(r'^openid/provider/identity/$', 'external_auth.views.provider_identity', name='openid-provider-identity'),
         url(r'^openid/provider/xrds/$', 'external_auth.views.provider_xrds', name='openid-provider-xrds')
     )
-
-if settings.MITX_FEATURES.get('ENABLE_PEARSON_LOGIN', False):
-    urlpatterns += url(r'^testcenter/login$', 'external_auth.views.test_center_login'),
 
 if settings.MITX_FEATURES.get('ENABLE_LMS_MIGRATION'):
     urlpatterns += (

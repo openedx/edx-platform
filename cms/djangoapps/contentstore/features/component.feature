@@ -39,6 +39,7 @@ Feature: CMS.Component Adding
        When I add this type of Problem component:
            | Component            |
            | Blank Common Problem |
+           | Checkboxes           |
            | Dropdown             |
            | Multiple Choice      |
            | Numerical Input      |
@@ -46,6 +47,7 @@ Feature: CMS.Component Adding
        Then I see Problem components in this order:
            | Component            |
            | Blank Common Problem |
+           | Checkboxes           |
            | Dropdown             |
            | Multiple Choice      |
            | Numerical Input      |

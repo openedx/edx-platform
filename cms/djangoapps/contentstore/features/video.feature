@@ -46,52 +46,49 @@ Feature: CMS.Video Component
   Scenario: Closed captions become visible when the mouse hovers over CC button
     Given I have created a Video component with subtitles
     And Make sure captions are closed
-    Then Captions become "invisible" after 3 seconds
+    Then Captions become "invisible"
     And I hover over button "CC"
     Then Captions become "visible"
     And I hover over button "volume"
-    Then Captions become "invisible" after 3 seconds
+    Then Captions become "invisible"
 
   # 8
-  Scenario: Open captions never become invisible
-    Given I have created a Video component with subtitles
-    And Make sure captions are open
-    Then Captions are "visible"
-    And I hover over button "CC"
-    Then Captions are "visible"
-    And I hover over button "volume"
-    Then Captions are "visible"
+  # Disabled 11/26 due to flakiness in master
+  #Scenario: Open captions never become invisible
+  #  Given I have created a Video component with subtitles
+  #  And Make sure captions are open
+  #  Then Captions are "visible"
+  #  And I hover over button "CC"
+  #  Then Captions are "visible"
+  #  And I hover over button "volume"
+  #  Then Captions are "visible"
 
   # 9
-  Scenario: Closed captions are invisible when mouse doesn't hover on CC button
-    Given I have created a Video component with subtitles
-    And Make sure captions are closed
-    Then Captions become "invisible" after 3 seconds
-    And I hover over button "volume"
-    Then Captions are "invisible"
+  # Disabled 11/26 due to flakiness in master
+  #Scenario: Closed captions are invisible when mouse doesn't hover on CC button
+  #  Given I have created a Video component with subtitles
+  #  And Make sure captions are closed
+  #  Then Captions become "invisible"
+  #  And I hover over button "volume"
+  #  Then Captions are "invisible"
 
   # 10
-  Scenario: When enter key is pressed on a caption shows an outline around it
-    Given I have created a Video component with subtitles
-    And Make sure captions are opened
-    Then I focus on caption line with data-index 0
-    Then I press "enter" button on caption line with data-index 0
-    And I see caption line with data-index 0 has class "focused"
+  # Disabled 11/26 due to flakiness in master
+  #Scenario: When enter key is pressed on a caption shows an outline around it
+  #  Given I have created a Video component with subtitles
+  #  And Make sure captions are opened
+  #  Then I focus on caption line with data-index "0"
+  #  Then I press "enter" button on caption line with data-index "0"
+  #  And I see caption line with data-index "0" has class "focused"
 
   # 11
-  # Disabled until we come up with a more solid test, as this one is brittle.
-  # Scenario: When start end end times are specified, a range on slider is shown
-  #   Given I have created a Video component
-  #   And Make sure captions are closed
-  #   And I edit the component
-  #   And I open tab "Advanced"
-  #   And I set value "12" to the field "Start Time"
-  #   And I set value "24" to the field "End Time"
-  #   And I save changes
-  #   And I click video button "Play"
-
-    # The below line is a bit flaky. Numbers 73 and 73 were determined rather
-    # accidentally. They might change in the future as Video player gets CSS
-    # updates. If this test starts failing, 99.9% cause of failure is the line
-    # below.
-    # Then I see a range on slider with styles "left" set to 73 px and "width" set to 73 px
+  Scenario: When start end end times are specified, a range on slider is shown
+    Given I have created a Video component
+    And Make sure captions are closed
+    And I edit the component
+    And I open tab "Advanced"
+    And I set value "00:00:12" to the field "Start Time"
+    And I set value "00:00:24" to the field "End Time"
+    And I save changes
+    And I click video button "play"
+    Then I see a range on slider

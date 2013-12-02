@@ -17,7 +17,7 @@ from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import make_error_tracker, exc_info_to_str
 from xmodule.course_module import CourseDescriptor
 from xmodule.mako_module import MakoDescriptorSystem
-from xmodule.x_module import XMLParsingSystem, XModuleDescriptor
+from xmodule.x_module import XMLParsingSystem, prefer_xmodules
 
 from xmodule.html_module import HtmlDescriptor
 from xblock.core import XBlock
@@ -79,7 +79,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
 
                 # tags that really need unique names--they store (or should store) state.
                 need_uniq_names = ('problem', 'sequential', 'video', 'course', 'chapter',
-                                   'videosequence', 'poll_question', 'timelimit')
+                                   'videosequence', 'poll_question', 'vertical')
 
                 attr = xml_data.attrib
                 tag = xml_data.tag
@@ -238,7 +238,7 @@ def create_block_from_xml(xml_data, system, org=None, course=None, default_class
 
     """
     node = etree.fromstring(xml_data)
-    raw_class = XModuleDescriptor.load_class(node.tag, default_class)
+    raw_class = XBlock.load_class(node.tag, default_class, select=prefer_xmodules)
     xblock_class = system.mixologist.mix(raw_class)
 
     # leave next line commented out - useful for low-level debugging

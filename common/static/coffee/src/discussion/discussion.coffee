@@ -25,9 +25,8 @@ if Backbone?
         @add model
         model
 
-    retrieveAnotherPage: (mode, options={}, sort_options={})->
-      @current_page += 1
-      data = { page: @current_page }
+    retrieveAnotherPage: (mode, options={}, sort_options={}, error=null)->
+      data = { page: @current_page + 1 }
       switch mode
         when 'search'
           url = DiscussionUtil.urlFor 'search'
@@ -59,6 +58,7 @@ if Backbone?
           @reset new_collection
           @pages = response.num_pages
           @current_page = response.page
+        error: error
 
     sortByDate: (thread) ->
         #   

@@ -4,9 +4,17 @@ from student.models import (User, UserProfile, Registration,
                             PendingEmailChange, UserStanding,
                             )
 from course_modes.models import CourseMode
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, AnonymousUser
 from datetime import datetime
-from factory import DjangoModelFactory, SubFactory, PostGenerationMethodCall, post_generation, Sequence
+from factory import (
+    DjangoModelFactory,
+    Factory,
+    LazyAttribute,
+    post_generation,
+    PostGenerationMethodCall,
+    Sequence,
+    SubFactory,
+)
 from uuid import uuid4
 from pytz import UTC
 
@@ -16,8 +24,10 @@ from pytz import UTC
 
 class GroupFactory(DjangoModelFactory):
     FACTORY_FOR = Group
+    FACTORY_DJANGO_GET_OR_CREATE = ('name', )
 
-    name = u'staff_MITx/999/Robot_Super_Course'
+    name = Sequence(u'group{0}'.format)
+
 
 
 class UserStandingFactory(DjangoModelFactory):
@@ -30,9 +40,10 @@ class UserStandingFactory(DjangoModelFactory):
 
 class UserProfileFactory(DjangoModelFactory):
     FACTORY_FOR = UserProfile
+    FACTORY_DJANGO_GET_OR_CREATE = ('user', )
 
     user = None
-    name = u'Robot Test'
+    name = LazyAttribute(u'{0.user.first_name} {0.user.last_name}'.format)
     level_of_education = None
     gender = u'm'
     mailing_address = None
@@ -59,6 +70,7 @@ class RegistrationFactory(DjangoModelFactory):
 
 class UserFactory(DjangoModelFactory):
     FACTORY_FOR = User
+    FACTORY_DJANGO_GET_OR_CREATE = ('email', 'username')
 
     username = Sequence(u'robot{0}'.format)
     email = Sequence(u'robot+test+{0}@edx.org'.format)
@@ -81,6 +93,21 @@ class UserFactory(DjangoModelFactory):
             raise Exception("Cannot build a user profile without saving the user")
         else:
             return None
+
+    @post_generation
+    def groups(self, create, extracted, **kwargs):
+        if extracted is None:
+            return
+
+        if isinstance(extracted, basestring):
+            extracted = [extracted]
+
+        for group_name in extracted:
+            self.groups.add(GroupFactory.simple_generate(create, name=group_name))
+
+
+class AnonymousUserFactory(Factory):
+    FACTORY_FOR = AnonymousUser
 
 
 class AdminFactory(UserFactory):

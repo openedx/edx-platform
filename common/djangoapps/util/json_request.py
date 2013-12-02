@@ -1,5 +1,4 @@
 from functools import wraps
-import copy
 import json
 from django.core.serializers import serialize
 from django.core.serializers.json import DjangoJSONEncoder
@@ -17,7 +16,7 @@ def expect_json(view_function):
     def parse_json_into_request(request, *args, **kwargs):
         # cdodge: fix postback errors in CMS. The POST 'content-type' header can include additional information
         # e.g. 'charset', so we can't do a direct string compare
-        if "application/json" in request.META.get('CONTENT_TYPE', ''):
+        if "application/json" in request.META.get('CONTENT_TYPE', '') and request.body:
             request.json = json.loads(request.body)
         else:
             request.json = {}

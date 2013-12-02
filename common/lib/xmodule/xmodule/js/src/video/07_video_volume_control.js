@@ -8,11 +8,16 @@ function () {
 
     // VideoVolumeControl() function - what this module "exports".
     return function (state) {
+        var dfd = $.Deferred();
+
         state.videoVolumeControl = {};
 
         _makeFunctionsPublic(state);
         _renderElements(state);
         _bindHandlers(state);
+
+        dfd.resolve();
+        return dfd.promise();
     };
 
     // ***************************************************************

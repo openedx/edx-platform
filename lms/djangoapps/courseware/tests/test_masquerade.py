@@ -12,13 +12,14 @@ import json
 
 from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
-from django.contrib.auth.models import Group, User
+from django.contrib.auth.models import User
 
-from courseware.access import _course_staff_group_name
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from courseware.roles import CourseStaffRole
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.django import modulestore, clear_existing_modulestores
+from lms.lib.xblock.runtime import quote_slashes
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -41,9 +42,7 @@ class TestStaffMasqueradeAsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
         self.activate_user(self.instructor)
 
         def make_instructor(course):
-            group_name = _course_staff_group_name(course.location)
-            g = Group.objects.create(name=group_name)
-            g.user_set.add(User.objects.get(email=self.instructor))
+            CourseStaffRole(course.location).add_users(User.objects.get(email=self.instructor))
 
         make_instructor(self.graded_course)
 
@@ -91,10 +90,11 @@ class TestStaffMasqueradeAsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
         pun = 'H1P1'
         problem_location = "i4x://edX/graded/problem/%s" % pun
 
-        modx_url = reverse('modx_dispatch',
+        modx_url = reverse('xblock_handler',
                            kwargs={'course_id': self.graded_course.id,
-                                   'location': problem_location,
-                                   'dispatch': 'problem_get', })
+                                   'usage_id': quote_slashes(problem_location),
+                                   'handler': 'xmodule_handler',
+                                   'suffix': 'problem_get'})
 
         resp = self.client.get(modx_url)
 
@@ -115,6 +115,5 @@ class TestStaffMasqueradeAsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
 
         resp = self.get_problem()
         html = json.loads(resp.content)['html']
-        print html
         sabut = '<button class="show"><span class="show-label">Show Answer(s)</span> <span class="sr">(for question(s) above - adjacent to each field)</span></button>'
         self.assertFalse(sabut in html)

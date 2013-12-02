@@ -17,6 +17,10 @@ from logsettings import get_logger_config
 
 DEBUG = True
 USE_I18N = True
+# For displaying the dummy text, we need to provide a language mapping.
+LANGUAGES = (
+    ('eo', 'Esperanto'),
+)
 TEMPLATE_DEBUG = True
 
 
@@ -36,6 +40,7 @@ MITX_FEATURES['ENABLE_INSTRUCTOR_BETA_DASHBOARD'] = True
 MITX_FEATURES['MULTIPLE_ENROLLMENT_ROLES'] = True
 MITX_FEATURES['ENABLE_SHOPPING_CART'] = True
 MITX_FEATURES['AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'] = True
+MITX_FEATURES['ENABLE_S3_GRADE_DOWNLOADS'] = True
 
 FEEDBACK_SUBMISSION_EMAIL = "dummy@example.com"
 
@@ -248,9 +253,6 @@ MITX_FEATURES['RESTRICT_ENROLL_BY_REG_METHOD'] = True
 ########################### PIPELINE #################################
 
 PIPELINE_SASS_ARGUMENTS = '--debug-info --require {proj_dir}/static/sass/bourbon/lib/bourbon.rb'.format(proj_dir=PROJECT_ROOT)
-
-########################## PEARSON TESTING ###########################
-MITX_FEATURES['ENABLE_PEARSON_LOGIN'] = False
 
 ########################## ANALYTICS TESTING ########################
 

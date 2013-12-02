@@ -63,19 +63,19 @@ define ["backbone", "jquery", "underscore", "gettext", "xblock/runtime.v1",
       return _.extend(@metadataEditor.getModifiedMetadataValues(), @customMetadata())
 
     createItem: (parent, payload) ->
-      payload.parent_location = parent
+      payload.parent_locator = parent
       $.postJSON(
-          "/create_item"
+          @model.urlRoot
           payload
           (data) =>
-              @model.set(id: data.id)
-              @$el.data('id', data.id)
+              @model.set(id: data.locator)
+              @$el.data('locator', data.locator)
               @render()
       )
 
     render: ->
       if @model.id
-        @$el.load("/preview_component/#{@model.id}", =>
+        @$el.load(@model.url(), =>
           @loadDisplay()
           @delegateEvents()
         )

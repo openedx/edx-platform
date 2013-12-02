@@ -20,7 +20,6 @@ XMODULES = [
     "section = xmodule.backcompat_module:SemanticSectionDescriptor",
     "sequential = xmodule.seq_module:SequenceDescriptor",
     "slides = xmodule.backcompat_module:TranslateCustomTagDescriptor",
-    "timelimit = xmodule.timelimit_module:TimeLimitDescriptor",
     "vertical = xmodule.vertical_module:VerticalDescriptor",
     "video = xmodule.video_module:VideoDescriptor",
     "videoalpha = xmodule.video_module:VideoDescriptor",
@@ -51,6 +50,7 @@ setup(
         'docopt',
         'capa',
         'path.py',
+        'webob',
     ],
     package_data={
         'xmodule': ['js/module/*'],

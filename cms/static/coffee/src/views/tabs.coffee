@@ -1,15 +1,18 @@
-define ["jquery", "jquery.ui", "backbone", "js/views/feedback_prompt", "js/views/feedback_notification", "coffee/src/models/module", "coffee/src/views/module_edit"],
-($, ui, Backbone, PromptView, NotificationView, ModuleModel, ModuleEditView) ->
+define ["jquery", "jquery.ui", "backbone", "js/views/feedback_prompt", "js/views/feedback_notification",
+    "coffee/src/views/module_edit", "js/models/module_info", "js/utils/module"],
+($, ui, Backbone, PromptView, NotificationView, ModuleEditView, ModuleModel, ModuleUtils) ->
   class TabsEdit extends Backbone.View
 
     initialize: =>
       @$('.component').each((idx, element) =>
+          model = new ModuleModel({
+              id: $(element).data('locator')
+          })
+
           new ModuleEditView(
               el: element,
               onDelete: @deleteTab,
-              model: new ModuleModel(
-                  id: $(element).data('id'),
-              )
+              model: model
           )
       )
 
@@ -28,20 +31,23 @@ define ["jquery", "jquery.ui", "backbone", "js/views/feedback_prompt", "js/views
     tabMoved: (event, ui) =>
       tabs = []
       @$('.component').each((idx, element) =>
-          tabs.push($(element).data('id'))
+          tabs.push($(element).data('locator'))
       )
 
       analytics.track "Reordered Static Pages",
         course: course_location_analytics
 
+      saving = new NotificationView.Mini({title: gettext("Saving&hellip;")})
+      saving.show()
+
       $.ajax({
         type:'POST',
-        url: '/reorder_static_tabs',
+        url: @model.url(),
         data: JSON.stringify({
           tabs : tabs
         }),
         contentType: 'application/json'
-      })
+      }).success(=> saving.hide())
 
     addNewTab: (event) =>
       event.preventDefault()
@@ -78,13 +84,14 @@ define ["jquery", "jquery.ui", "backbone", "js/views/feedback_prompt", "js/views
 
               analytics.track "Deleted Static Page",
                 course: course_location_analytics
-                id: $component.data('id')
+                id: $component.data('locator')
               deleting = new NotificationView.Mini
                 title: gettext('Deleting&hellip;')
               deleting.show()
-              $.postJSON('/delete_item', {
-                id: $component.data('id')
-              }, =>
+              $.ajax({
+                type: 'DELETE',
+                url: ModuleUtils.getUpdateUrl($component.data('locator'))
+              }).success(=>
                 $component.remove()
                 deleting.hide()
               )

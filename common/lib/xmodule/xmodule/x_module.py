@@ -7,6 +7,8 @@ from functools import partial
 from lxml import etree
 from collections import namedtuple
 from pkg_resources import resource_listdir, resource_string, resource_isdir
+from webob import Response
+from webob.multidict import MultiDict
 
 from xmodule.modulestore import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError, InsufficientSpecificationError, InvalidLocationError
@@ -115,7 +117,6 @@ class XModuleMixin(XBlockMixin):
     # student interacts with the module on the page.  A specific example is
     # FoldIt, which posts grade-changing updates through a separate API.
     always_recalculate_grades = False
-
     # The default implementation of get_icon_class returns the icon_class
     # attribute of the class
     #
@@ -273,8 +274,7 @@ class XModuleMixin(XBlockMixin):
 
           NOTE (vshnayder): not sure if this was the intended return value, but
           that's what it's doing now.  I suspect that we really want it to just
-          return a number.  Would need to change (at least) capa and
-          modx_dispatch to match if we did that.
+          return a number.  Would need to change (at least) capa to match if we did that.
         """
         return None
 
@@ -393,6 +393,7 @@ class XModule(XModuleMixin, HTMLSnippet, XBlock):  # pylint: disable=abstract-me
         super(XModule, self).__init__(*args, **kwargs)
         self._loaded_children = None
         self.system = self.runtime
+        self.runtime.xmodule_instance = self
 
     def __unicode__(self):
         return u'<x_module(id={0})>'.format(self.id)
@@ -401,6 +402,37 @@ class XModule(XModuleMixin, HTMLSnippet, XBlock):  # pylint: disable=abstract-me
         """ dispatch is last part of the URL.
             data is a dictionary-like object with the content of the request"""
         return u""
+
+    def xmodule_handler(self, request, suffix=None):
+        """
+        XBlock handler that wraps `handle_ajax`
+        """
+        class FileObjForWebobFiles(object):
+            """
+            Turn Webob cgi.FieldStorage uploaded files into pure file objects.
+
+            Webob represents uploaded files as cgi.FieldStorage objects, which
+            have a .file attribute.  We wrap the FieldStorage object, delegating
+            attribute access to the .file attribute.  But the files have no
+            name, so we carry the FieldStorage .filename attribute as the .name.
+
+            """
+            def __init__(self, webob_file):
+                self.file = webob_file.file
+                self.name = webob_file.filename
+
+            def __getattr__(self, name):
+                return getattr(self.file, name)
+
+        # WebOb requests have multiple entries for uploaded files.  handle_ajax
+        # expects a single entry as a list.
+        request_post = MultiDict(request.POST)
+        for key in set(request.POST.iterkeys()):
+            if hasattr(request.POST[key], "file"):
+                request_post[key] = map(FileObjForWebobFiles, request.POST.getall(key))
+
+        response_data = self.handle_ajax(suffix, request_post)
+        return Response(response_data, content_type='application/json')
 
     def get_children(self):
         """
@@ -529,6 +561,11 @@ class ResourceTemplates(object):
             return template
         else:
             return None
+
+
+def prefer_xmodules(entry_points):
+    # Pick the first entry_point that comes from XModule
+    return sorted(entry_points, reverse=True, key=lambda e: e.dist.key == 'xmodule')[0]
 
 
 class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
@@ -731,7 +768,7 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
         assert self.xmodule_runtime.error_descriptor_class is not None
         if self.xmodule_runtime.xmodule_instance is None:
             try:
-                self.xmodule_runtime.xmodule_instance = self.xmodule_runtime.construct_xblock_from_class(
+                self.xmodule_runtime.construct_xblock_from_class(
                     self.module_class,
                     descriptor=self,
                     scope_ids=self.scope_ids,
@@ -739,6 +776,10 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
                 )
                 self.xmodule_runtime.xmodule_instance.save()
             except Exception:  # pylint: disable=broad-except
+                # xmodule_instance is set by the XModule.__init__. If we had an error after that,
+                # we need to clean it out so that we can set up the ErrorModule instead
+                self.xmodule_runtime.xmodule_instance = None
+
                 if isinstance(self, self.xmodule_runtime.error_descriptor_class):
                     log.exception('Error creating an ErrorModule from an ErrorDescriptor')
                     raise
@@ -762,9 +803,10 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
     max_score = module_attr('max_score')
     student_view = module_attr('student_view')
     get_child_descriptors = module_attr('get_child_descriptors')
+    xmodule_handler = module_attr('xmodule_handler')
 
     # ~~~~~~~~~~~~~~~ XBlock API Wrappers ~~~~~~~~~~~~~~~~
-    def studio_view(self, _context):
+    def studio_view(self, context):
         """
         Return a fragment with the html from this XModuleDescriptor's editing view
 
@@ -924,7 +966,7 @@ class ModuleSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abs
     and user, or other environment-specific info.
     """
     def __init__(
-            self, static_url, ajax_url, track_function, get_module, render_template,
+            self, static_url, track_function, get_module, render_template,
             replace_urls, user=None, filestore=None,
             debug=False, hostname="", xqueue=None, publish=None, node_path="",
             anonymous_student_id='', course_id=None,
@@ -935,8 +977,6 @@ class ModuleSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abs
         Create a closure around the system environment.
 
         static_url - the base URL to static assets
-
-        ajax_url - the url where ajax calls to the encapsulating module go.
 
         track_function - function of (event_type, event), intended for logging
                          or otherwise tracking the event.
@@ -988,7 +1028,6 @@ class ModuleSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abs
         super(ModuleSystem, self).__init__(usage_store=None, field_data=None, **kwargs)
 
         self.STATIC_URL = static_url
-        self.ajax_url = ajax_url
         self.xqueue = xqueue
         self.track_function = track_function
         self.filestore = filestore
@@ -1031,6 +1070,14 @@ class ModuleSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abs
 
     def __str__(self):
         return str(self.__dict__)
+
+    @property
+    def ajax_url(self):
+        """
+        The url prefix to be used by XModules to call into handle_ajax
+        """
+        assert self.xmodule_instance is not None
+        return self.handler_url(self.xmodule_instance, 'xmodule_handler', '', '').rstrip('/?')
 
 
 class DoNothingCache(object):

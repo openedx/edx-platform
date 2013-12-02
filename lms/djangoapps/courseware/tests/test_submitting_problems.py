@@ -21,6 +21,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from capa.tests.response_xml_factory import OptionResponseXMLFactory, CustomResponseXMLFactory, SchematicResponseXMLFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from lms.lib.xblock.runtime import quote_slashes
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -71,11 +72,12 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
             example: 'check_problem' for having responses processed
         """
         return reverse(
-            'modx_dispatch',
+            'xblock_handler',
             kwargs={
                 'course_id': self.course.id,
-                'location': problem_location,
-                'dispatch': dispatch,
+                'usage_id': quote_slashes(problem_location),
+                'handler': 'xmodule_handler',
+                'suffix': dispatch,
             }
         )
 
@@ -234,14 +236,11 @@ class TestCourseGrader(TestSubmittingProblems):
             make up the final grade. (For display)
         """
 
-        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-            self.course.id, self.student_user, self.course)
+        fake_request = self.factory.get(
+            reverse('progress', kwargs={'course_id': self.course.id})
+        )
 
-        fake_request = self.factory.get(reverse('progress',
-                                        kwargs={'course_id': self.course.id}))
-
-        return grades.grade(self.student_user, fake_request,
-                            self.course, field_data_cache)
+        return grades.grade(self.student_user, fake_request, self.course)
 
     def get_progress_summary(self):
         """
@@ -255,16 +254,13 @@ class TestCourseGrader(TestSubmittingProblems):
         etc.
         """
 
-        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-            self.course.id, self.student_user, self.course)
+        fake_request = self.factory.get(
+            reverse('progress', kwargs={'course_id': self.course.id})
+        )
 
-        fake_request = self.factory.get(reverse('progress',
-                                        kwargs={'course_id': self.course.id}))
-
-        progress_summary = grades.progress_summary(self.student_user,
-                                                   fake_request,
-                                                   self.course,
-                                                   field_data_cache)
+        progress_summary = grades.progress_summary(
+            self.student_user, fake_request, self.course
+        )
         return progress_summary
 
     def check_grade_percent(self, percent):

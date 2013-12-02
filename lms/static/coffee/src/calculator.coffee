@@ -10,6 +10,9 @@ class @Calculator
       )
       .click (e) ->
         e.preventDefault()
+
+      $(document).keydown $.proxy(@handleKeyDown, @)
+
       $('div.help-wrapper')
         .focusin($.proxy @helpOnFocus, @)
         .focusout($.proxy @helpOnBlur, @)
@@ -24,14 +27,14 @@ class @Calculator
     $('div.calc-main').toggleClass 'open'
     if $calc.hasClass('closed')
       $calcWrapper
-        .find('input, a, dt, dd')
+        .find('input, a')
         .attr 'tabindex', -1
     else
       text = gettext('Close Calculator')
       isExpanded = true
 
       $calcWrapper
-        .find('input, a, dt, dd')
+        .find('input, a,')
         .attr 'tabindex', 0
       # TODO: Investigate why doing this without the timeout causes it to jump
       # down to the bottom of the page. I suspect it's because it's putting the
@@ -57,13 +60,21 @@ class @Calculator
     @helpHide()
 
   helpShow: ->
-    $('.help').addClass 'shown'
-    $('#calculator_hint').attr 'aria-expanded', true
+    $('.help')
+      .addClass('shown')
+      .attr('aria-hidden', false)
 
   helpHide: ->
     if not @isFocusedHelp
-      $('.help').removeClass 'shown'
-      $('#calculator_hint').attr 'aria-expanded', false
+      $('.help')
+        .removeClass('shown')
+        .attr('aria-hidden', true)
+
+  handleKeyDown: (e) ->
+    ESC = 27
+    if e.which is ESC and $('.help').hasClass 'shown'
+      @isFocusedHelp = false
+      @helpHide()
 
   calculate: ->
     $.getWithPrefix '/calculate', { equation: $('#calculator_input').val() }, (data) ->

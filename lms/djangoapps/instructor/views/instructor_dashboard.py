@@ -1,6 +1,7 @@
 """
 Instructor Dashboard Views
 """
+from functools import partial
 
 from django.utils.translation import ugettext as _
 from django_future.csrf import ensure_csrf_cookie
@@ -18,11 +19,13 @@ from xmodule.modulestore.django import modulestore
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 from courseware.access import has_access
-from courseware.courses import get_course_by_id, get_cms_course_link_by_id
+from courseware.courses import get_course_by_id, get_cms_course_link
 from django_comment_client.utils import has_forum_access
 from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from student.models import CourseEnrollment
 from bulk_email.models import CourseAuthorization
+from lms.lib.xblock.runtime import handler_prefix
+
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
@@ -59,7 +62,7 @@ def instructor_dashboard_2(request, course_id):
 
     studio_url = None
     if is_studio_course:
-        studio_url = get_cms_course_link_by_id(course_id)
+        studio_url = get_cms_course_link(course)
 
     enrollment_count = sections[0]['enrollment_count']
     disable_buttons = False
@@ -106,7 +109,7 @@ def _section_course_info(course_id, access):
         'course_num': course_num,
         'course_name': course_name,
         'course_display_name': course.display_name,
-        'enrollment_count': CourseEnrollment.objects.filter(course_id=course_id).count(),
+        'enrollment_count': CourseEnrollment.objects.filter(course_id=course_id, is_active=1).count(),
         'has_started': course.has_started(),
         'has_ended': course.has_ended(),
         'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': course_id}),
@@ -168,15 +171,21 @@ def _section_data_download(course_id, access):
         'get_students_features_url': reverse('get_students_features', kwargs={'course_id': course_id}),
         'get_anon_ids_url': reverse('get_anon_ids', kwargs={'course_id': course_id}),
         'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': course_id}),
+        'list_grade_downloads_url': reverse('list_grade_downloads', kwargs={'course_id': course_id}),
+        'calculate_grades_csv_url': reverse('calculate_grades_csv', kwargs={'course_id': course_id}),
     }
     return section_data
 
 
 def _section_send_email(course_id, access, course):
     """ Provide data for the corresponding bulk email section """
-    html_module = HtmlDescriptor(course.system, DictFieldData({'data': ''}), ScopeIds(None, None, None, None))
+    html_module = HtmlDescriptor(
+        course.system,
+        DictFieldData({'data': ''}),
+        ScopeIds(None, None, None, 'i4x://dummy_org/dummy_course/html/dummy_name')
+    )
     fragment = course.system.render(html_module, 'studio_view')
-    fragment = wrap_xblock(html_module, 'studio_view', fragment, None)
+    fragment = wrap_xblock(partial(handler_prefix, course_id), html_module, 'studio_view', fragment, None)
     email_editor = fragment.content
     section_data = {
         'section_key': 'send_email',

@@ -270,7 +270,7 @@
             }
         });
 
-        // Disabled 10/29/13 due to flakiness in master
+        // Disabled 11/25/13 due to flakiness in master
         xdescribe('multiple YT on page', function () {
             var state1, state2, state3;
 

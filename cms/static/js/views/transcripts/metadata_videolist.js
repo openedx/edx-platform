@@ -28,7 +28,9 @@ function($, Backbone, _, AbstractEditor, Utils, MessageManager, MetadataView) {
             // Initialize MessageManager that is responsible for
             // status messages and errors.
 
-            this.messenger = new MessageManager({
+
+            var messenger = this.options.MessageManager || MessageManager;
+            this.messenger = new messenger({
                 el: this.$el,
                 parent: this
             });

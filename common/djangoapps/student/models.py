@@ -11,7 +11,6 @@ file and check it in at the same time as your model changes. To do that,
 3. Add the migration file created in edx-platform/common/djangoapps/student/migrations/
 """
 from datetime import datetime
-from random import randint
 import hashlib
 import json
 import logging
@@ -22,18 +21,23 @@ from django.contrib.auth.models import User
 from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.db import models
 from django.db.models.signals import post_save
-from django.dispatch import receiver
-import django.dispatch
-from django.forms import ModelForm, forms
+from django.dispatch import receiver, Signal
 
 from course_modes.models import CourseMode
-import comment_client as cc
+import lms.lib.comment_client as cc
 from pytz import UTC
+import crum
 
-unenroll_done = django.dispatch.Signal(providing_args=["course_enrollment"])
+from track import contexts
+from track.views import server_track
+from eventtracking import tracker
+
+
+unenroll_done = Signal(providing_args=["course_enrollment"])
 
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
+
 
 class UserStanding(models.Model):
     """
@@ -137,480 +141,6 @@ class UserProfile(models.Model):
     def set_meta(self, js):
         self.meta = json.dumps(js)
 
-TEST_CENTER_STATUS_ACCEPTED = "Accepted"
-TEST_CENTER_STATUS_ERROR = "Error"
-
-
-class TestCenterUser(models.Model):
-    """This is our representation of the User for in-person testing, and
-    specifically for Pearson at this point. A few things to note:
-
-    * Pearson only supports Latin-1, so we have to make sure that the data we
-      capture here will work with that encoding.
-    * While we have a lot of this demographic data in UserProfile, it's much
-      more free-structured there. We'll try to pre-pop the form with data from
-      UserProfile, but we'll need to have a step where people who are signing
-      up re-enter their demographic data into the fields we specify.
-    * Users are only created here if they register to take an exam in person.
-
-    The field names and lengths are modeled on the conventions and constraints
-    of Pearson's data import system, including oddities such as suffix having
-    a limit of 255 while last_name only gets 50.
-
-    Also storing here the confirmation information received from Pearson (if any)
-    as to the success or failure of the upload.  (VCDC file)
-    """
-    # Our own record keeping...
-    user = models.ForeignKey(User, unique=True, default=None)
-    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
-    updated_at = models.DateTimeField(auto_now=True, db_index=True)
-    # user_updated_at happens only when the user makes a change to their data,
-    # and is something Pearson needs to know to manage updates. Unlike
-    # updated_at, this will not get incremented when we do a batch data import.
-    user_updated_at = models.DateTimeField(db_index=True)
-
-    # Unique ID we assign our user for the Test Center.
-    client_candidate_id = models.CharField(unique=True, max_length=50, db_index=True)
-
-    # Name
-    first_name = models.CharField(max_length=30, db_index=True)
-    last_name = models.CharField(max_length=50, db_index=True)
-    middle_name = models.CharField(max_length=30, blank=True)
-    suffix = models.CharField(max_length=255, blank=True)
-    salutation = models.CharField(max_length=50, blank=True)
-
-    # Address
-    address_1 = models.CharField(max_length=40)
-    address_2 = models.CharField(max_length=40, blank=True)
-    address_3 = models.CharField(max_length=40, blank=True)
-    city = models.CharField(max_length=32, db_index=True)
-    # state example: HI -- they have an acceptable list that we'll just plug in
-    # state is required if you're in the US or Canada, but otherwise not.
-    state = models.CharField(max_length=20, blank=True, db_index=True)
-    # postal_code required if you're in the US or Canada
-    postal_code = models.CharField(max_length=16, blank=True, db_index=True)
-    # country is a ISO 3166-1 alpha-3 country code (e.g. "USA", "CAN", "MNG")
-    country = models.CharField(max_length=3, db_index=True)
-
-    # Phone
-    phone = models.CharField(max_length=35)
-    extension = models.CharField(max_length=8, blank=True, db_index=True)
-    phone_country_code = models.CharField(max_length=3, db_index=True)
-    fax = models.CharField(max_length=35, blank=True)
-    # fax_country_code required *if* fax is present.
-    fax_country_code = models.CharField(max_length=3, blank=True)
-
-    # Company
-    company_name = models.CharField(max_length=50, blank=True, db_index=True)
-
-    # time at which edX sent the registration to the test center
-    uploaded_at = models.DateTimeField(null=True, blank=True, db_index=True)
-
-    # confirmation back from the test center, as well as timestamps
-    # on when they processed the request, and when we received
-    # confirmation back.
-    processed_at = models.DateTimeField(null=True, db_index=True)
-    upload_status = models.CharField(max_length=20, blank=True, db_index=True)  # 'Error' or 'Accepted'
-    upload_error_message = models.CharField(max_length=512, blank=True)
-    # Unique ID given to us for this User by the Testing Center. It's null when
-    # we first create the User entry, and may be assigned by Pearson later.
-    # (However, it may never be set if we are always initiating such candidate creation.)
-    candidate_id = models.IntegerField(null=True, db_index=True)
-    confirmed_at = models.DateTimeField(null=True, db_index=True)
-
-    @property
-    def needs_uploading(self):
-        return self.uploaded_at is None or self.uploaded_at < self.user_updated_at
-
-    @staticmethod
-    def user_provided_fields():
-        return ['first_name', 'middle_name', 'last_name', 'suffix', 'salutation',
-                'address_1', 'address_2', 'address_3', 'city', 'state', 'postal_code', 'country',
-                'phone', 'extension', 'phone_country_code', 'fax', 'fax_country_code', 'company_name']
-
-    @property
-    def email(self):
-        return self.user.email
-
-    def needs_update(self, fields):
-        for fieldname in TestCenterUser.user_provided_fields():
-            if fieldname in fields and getattr(self, fieldname) != fields[fieldname]:
-                return True
-
-        return False
-
-    @staticmethod
-    def _generate_edx_id(prefix):
-        NUM_DIGITS = 12
-        return u"{}{:012}".format(prefix, randint(1, 10 ** NUM_DIGITS - 1))
-
-    @staticmethod
-    def _generate_candidate_id():
-        return TestCenterUser._generate_edx_id("edX")
-
-    @classmethod
-    def create(cls, user):
-        testcenter_user = cls(user=user)
-        # testcenter_user.candidate_id remains unset
-        # assign an ID of our own:
-        cand_id = cls._generate_candidate_id()
-        while TestCenterUser.objects.filter(client_candidate_id=cand_id).exists():
-            cand_id = cls._generate_candidate_id()
-        testcenter_user.client_candidate_id = cand_id
-        return testcenter_user
-
-    @property
-    def is_accepted(self):
-        return self.upload_status == TEST_CENTER_STATUS_ACCEPTED
-
-    @property
-    def is_rejected(self):
-        return self.upload_status == TEST_CENTER_STATUS_ERROR
-
-    @property
-    def is_pending(self):
-        return not self.is_accepted and not self.is_rejected
-
-
-class TestCenterUserForm(ModelForm):
-    class Meta:
-        model = TestCenterUser
-        fields = ('first_name', 'middle_name', 'last_name', 'suffix', 'salutation',
-                'address_1', 'address_2', 'address_3', 'city', 'state', 'postal_code', 'country',
-                'phone', 'extension', 'phone_country_code', 'fax', 'fax_country_code', 'company_name')
-
-    def update_and_save(self):
-        new_user = self.save(commit=False)
-        # create additional values here:
-        new_user.user_updated_at = datetime.now(UTC)
-        new_user.upload_status = ''
-        new_user.save()
-        log.info("Updated demographic information for user's test center exam registration: username \"{}\" ".format(new_user.user.username))
-
-    # add validation:
-
-    def clean_country(self):
-        code = self.cleaned_data['country']
-        if code and (len(code) != 3 or not code.isalpha()):
-            raise forms.ValidationError(u'Must be three characters (ISO 3166-1):  e.g. USA, CAN, MNG')
-        return code.upper()
-
-    def clean(self):
-        def _can_encode_as_latin(fieldvalue):
-            try:
-                fieldvalue.encode('iso-8859-1')
-            except UnicodeEncodeError:
-                return False
-            return True
-
-        cleaned_data = super(TestCenterUserForm, self).clean()
-
-        # check for interactions between fields:
-        if 'country' in cleaned_data:
-            country = cleaned_data.get('country')
-            if country == 'USA' or country == 'CAN':
-                if 'state' in cleaned_data and len(cleaned_data['state']) == 0:
-                    self._errors['state'] = self.error_class([u'Required if country is USA or CAN.'])
-                    del cleaned_data['state']
-
-                if 'postal_code' in cleaned_data and len(cleaned_data['postal_code']) == 0:
-                    self._errors['postal_code'] = self.error_class([u'Required if country is USA or CAN.'])
-                    del cleaned_data['postal_code']
-
-        if 'fax' in cleaned_data and len(cleaned_data['fax']) > 0 and 'fax_country_code' in cleaned_data and len(cleaned_data['fax_country_code']) == 0:
-            self._errors['fax_country_code'] = self.error_class([u'Required if fax is specified.'])
-            del cleaned_data['fax_country_code']
-
-        # check encoding for all fields:
-        cleaned_data_fields = [fieldname for fieldname in cleaned_data]
-        for fieldname in cleaned_data_fields:
-            if not _can_encode_as_latin(cleaned_data[fieldname]):
-                self._errors[fieldname] = self.error_class([u'Must only use characters in Latin-1 (iso-8859-1) encoding'])
-                del cleaned_data[fieldname]
-
-        # Always return the full collection of cleaned data.
-        return cleaned_data
-
-# our own code to indicate that a request has been rejected.
-ACCOMMODATION_REJECTED_CODE = 'NONE'
-
-ACCOMMODATION_CODES = (
-    (ACCOMMODATION_REJECTED_CODE, 'No Accommodation Granted'),
-    ('EQPMNT', 'Equipment'),
-    ('ET12ET', 'Extra Time - 1/2 Exam Time'),
-    ('ET30MN', 'Extra Time - 30 Minutes'),
-    ('ETDBTM', 'Extra Time - Double Time'),
-    ('SEPRMM', 'Separate Room'),
-    ('SRREAD', 'Separate Room and Reader'),
-    ('SRRERC', 'Separate Room and Reader/Recorder'),
-    ('SRRECR', 'Separate Room and Recorder'),
-    ('SRSEAN', 'Separate Room and Service Animal'),
-    ('SRSGNR', 'Separate Room and Sign Language Interpreter'),
-)
-
-ACCOMMODATION_CODE_DICT = {code: name for (code, name) in ACCOMMODATION_CODES}
-
-
-class TestCenterRegistration(models.Model):
-    """
-    This is our representation of a user's registration for in-person testing,
-    and specifically for Pearson at this point. A few things to note:
-
-    * Pearson only supports Latin-1, so we have to make sure that the data we
-      capture here will work with that encoding.  This is less of an issue
-      than for the TestCenterUser.
-    * Registrations are only created here when a user registers to take an exam in person.
-
-    The field names and lengths are modeled on the conventions and constraints
-    of Pearson's data import system.
-    """
-    # to find an exam registration, we key off of the user and course_id.
-    # If multiple exams per course are possible, we would also need to add the
-    # exam_series_code.
-    testcenter_user = models.ForeignKey(TestCenterUser, default=None)
-    course_id = models.CharField(max_length=128, db_index=True)
-
-    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
-    updated_at = models.DateTimeField(auto_now=True, db_index=True)
-    # user_updated_at happens only when the user makes a change to their data,
-    # and is something Pearson needs to know to manage updates. Unlike
-    # updated_at, this will not get incremented when we do a batch data import.
-    # The appointment dates, the exam count, and the accommodation codes can be updated,
-    # but hopefully this won't happen often.
-    user_updated_at = models.DateTimeField(db_index=True)
-    # "client_authorization_id" is our unique identifier for the authorization.
-    # This must be present for an update or delete to be sent to Pearson.
-    client_authorization_id = models.CharField(max_length=20, unique=True, db_index=True)
-
-    # information about the test, from the course policy:
-    exam_series_code = models.CharField(max_length=15, db_index=True)
-    eligibility_appointment_date_first = models.DateField(db_index=True)
-    eligibility_appointment_date_last = models.DateField(db_index=True)
-
-    # this is really a list of codes, using an '*' as a delimiter.
-    # So it's not a choice list.  We use the special value of ACCOMMODATION_REJECTED_CODE
-    # to indicate the rejection of an accommodation request.
-    accommodation_code = models.CharField(max_length=64, blank=True)
-
-    # store the original text of the accommodation request.
-    accommodation_request = models.CharField(max_length=1024, blank=True, db_index=False)
-
-    # time at which edX sent the registration to the test center
-    uploaded_at = models.DateTimeField(null=True, db_index=True)
-
-    # confirmation back from the test center, as well as timestamps
-    # on when they processed the request, and when we received
-    # confirmation back.
-    processed_at = models.DateTimeField(null=True, db_index=True)
-    upload_status = models.CharField(max_length=20, blank=True, db_index=True)  # 'Error' or 'Accepted'
-    upload_error_message = models.CharField(max_length=512, blank=True)
-    # Unique ID given to us for this registration by the Testing Center. It's null when
-    # we first create the registration entry, and may be assigned by Pearson later.
-    # (However, it may never be set if we are always initiating such candidate creation.)
-    authorization_id = models.IntegerField(null=True, db_index=True)
-    confirmed_at = models.DateTimeField(null=True, db_index=True)
-
-    @property
-    def candidate_id(self):
-        return self.testcenter_user.candidate_id
-
-    @property
-    def client_candidate_id(self):
-        return self.testcenter_user.client_candidate_id
-
-    @property
-    def authorization_transaction_type(self):
-        if self.authorization_id is not None:
-            return 'Update'
-        elif self.uploaded_at is None:
-            return 'Add'
-        elif self.registration_is_rejected:
-            # Assume that if the registration was rejected before,
-            # it is more likely this is the (first) correction
-            # than a second correction in flight before the first was
-            # processed.
-            return 'Add'
-        else:
-            # TODO: decide what to send when we have uploaded an initial version,
-            # but have not received confirmation back from that upload.  If the
-            # registration here has been changed, then we don't know if this changed
-            # registration should be submitted as an 'add' or an 'update'.
-            #
-            # If the first registration were lost or in error (e.g. bad code),
-            # the second should be an "Add".  If the first were processed successfully,
-            # then the second should be an "Update".  We just don't know....
-            return 'Update'
-
-    @property
-    def exam_authorization_count(self):
-        # Someday this could go in the database (with a default value).  But at present,
-        # we do not expect anyone to be authorized to take an exam more than once.
-        return 1
-
-    @property
-    def needs_uploading(self):
-        return self.uploaded_at is None or self.uploaded_at < self.user_updated_at
-
-    @classmethod
-    def create(cls, testcenter_user, exam, accommodation_request):
-        registration = cls(testcenter_user=testcenter_user)
-        registration.course_id = exam.course_id
-        registration.accommodation_request = accommodation_request.strip()
-        registration.exam_series_code = exam.exam_series_code
-        registration.eligibility_appointment_date_first = exam.first_eligible_appointment_date.strftime("%Y-%m-%d")
-        registration.eligibility_appointment_date_last = exam.last_eligible_appointment_date.strftime("%Y-%m-%d")
-        registration.client_authorization_id = cls._create_client_authorization_id()
-        # accommodation_code remains blank for now, along with Pearson confirmation information
-        return registration
-
-    @staticmethod
-    def _generate_authorization_id():
-        return TestCenterUser._generate_edx_id("edXexam")
-
-    @staticmethod
-    def _create_client_authorization_id():
-        """
-        Return a unique id for a registration, suitable for using as an authorization code
-        for Pearson.  It must fit within 20 characters.
-        """
-        # generate a random value, and check to see if it already is in use here
-        auth_id = TestCenterRegistration._generate_authorization_id()
-        while TestCenterRegistration.objects.filter(client_authorization_id=auth_id).exists():
-            auth_id = TestCenterRegistration._generate_authorization_id()
-        return auth_id
-
-    # methods for providing registration status details on registration page:
-    @property
-    def demographics_is_accepted(self):
-        return self.testcenter_user.is_accepted
-
-    @property
-    def demographics_is_rejected(self):
-        return self.testcenter_user.is_rejected
-
-    @property
-    def demographics_is_pending(self):
-        return self.testcenter_user.is_pending
-
-    @property
-    def accommodation_is_accepted(self):
-        return len(self.accommodation_request) > 0 and len(self.accommodation_code) > 0 and self.accommodation_code != ACCOMMODATION_REJECTED_CODE
-
-    @property
-    def accommodation_is_rejected(self):
-        return len(self.accommodation_request) > 0 and self.accommodation_code == ACCOMMODATION_REJECTED_CODE
-
-    @property
-    def accommodation_is_pending(self):
-        return len(self.accommodation_request) > 0 and len(self.accommodation_code) == 0
-
-    @property
-    def accommodation_is_skipped(self):
-        return len(self.accommodation_request) == 0
-
-    @property
-    def registration_is_accepted(self):
-        return self.upload_status == TEST_CENTER_STATUS_ACCEPTED
-
-    @property
-    def registration_is_rejected(self):
-        return self.upload_status == TEST_CENTER_STATUS_ERROR
-
-    @property
-    def registration_is_pending(self):
-        return not self.registration_is_accepted and not self.registration_is_rejected
-
-    # methods for providing registration status summary on dashboard page:
-    @property
-    def is_accepted(self):
-        return self.registration_is_accepted and self.demographics_is_accepted
-
-    @property
-    def is_rejected(self):
-        return self.registration_is_rejected or self.demographics_is_rejected
-
-    @property
-    def is_pending(self):
-        return not self.is_accepted and not self.is_rejected
-
-    def get_accommodation_codes(self):
-        return self.accommodation_code.split('*')
-
-    def get_accommodation_names(self):
-        return [ACCOMMODATION_CODE_DICT.get(code, "Unknown code " + code) for code in self.get_accommodation_codes()]
-
-    @property
-    def registration_signup_url(self):
-        return settings.PEARSONVUE_SIGNINPAGE_URL
-
-    def demographics_status(self):
-        if self.demographics_is_accepted:
-            return "Accepted"
-        elif self.demographics_is_rejected:
-            return "Rejected"
-        else:
-            return "Pending"
-
-    def accommodation_status(self):
-        if self.accommodation_is_skipped:
-            return "Skipped"
-        elif self.accommodation_is_accepted:
-            return "Accepted"
-        elif self.accommodation_is_rejected:
-            return "Rejected"
-        else:
-            return "Pending"
-
-    def registration_status(self):
-        if self.registration_is_accepted:
-            return "Accepted"
-        elif self.registration_is_rejected:
-            return "Rejected"
-        else:
-            return "Pending"
-
-
-class TestCenterRegistrationForm(ModelForm):
-    class Meta:
-        model = TestCenterRegistration
-        fields = ('accommodation_request', 'accommodation_code')
-
-    def clean_accommodation_request(self):
-        code = self.cleaned_data['accommodation_request']
-        if code and len(code) > 0:
-            return code.strip()
-        return code
-
-    def update_and_save(self):
-        registration = self.save(commit=False)
-        # create additional values here:
-        registration.user_updated_at = datetime.now(UTC)
-        registration.upload_status = ''
-        registration.save()
-        log.info("Updated registration information for user's test center exam registration: username \"{}\" course \"{}\", examcode \"{}\"".format(registration.testcenter_user.user.username, registration.course_id, registration.exam_series_code))
-
-    def clean_accommodation_code(self):
-        code = self.cleaned_data['accommodation_code']
-        if code:
-            code = code.upper()
-            codes = code.split('*')
-            for codeval in codes:
-                if codeval not in ACCOMMODATION_CODE_DICT:
-                    raise forms.ValidationError(u'Invalid accommodation code specified: "{}"'.format(codeval))
-        return code
-
-
-def get_testcenter_registration(user, course_id, exam_series_code):
-    try:
-        tcu = TestCenterUser.objects.get(user=user)
-    except TestCenterUser.DoesNotExist:
-        return []
-    return TestCenterRegistration.objects.filter(testcenter_user=tcu, course_id=course_id, exam_series_code=exam_series_code)
-
-# nosetests thinks that anything with _test_ in the name is a test.
-# Correct this (https://nose.readthedocs.org/en/latest/finding_tests.html)
-get_testcenter_registration.__test__ = False
-
 
 def unique_id_for_user(user):
     """
@@ -667,6 +197,11 @@ class PendingEmailChange(models.Model):
     activation_key = models.CharField(('activation key'), max_length=32, unique=True, db_index=True)
 
 
+
+EVENT_NAME_ENROLLMENT_ACTIVATED = 'edx.course.enrollment.activated'
+EVENT_NAME_ENROLLMENT_DEACTIVATED = 'edx.course.enrollment.deactivated'
+
+
 class CourseEnrollment(models.Model):
     """
     Represents a Student's Enrollment record for a single Course. You should
@@ -702,7 +237,7 @@ class CourseEnrollment(models.Model):
         ).format(self.user, self.course_id, self.created, self.is_active)
 
     @classmethod
-    def create_enrollment(cls, user, course_id, mode="honor", is_active=False):
+    def get_or_create_enrollment(cls, user, course_id):
         """
         Create an enrollment for a user in a class. By default *this enrollment
         is not active*. This is useful for when an enrollment needs to go
@@ -717,16 +252,6 @@ class CourseEnrollment(models.Model):
 
         `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall)
 
-        `mode` is a string specifying what kind of enrollment this is. The
-               default is "honor", meaning honor certificate. Future options
-               may include "audit", "verified_id", etc. Please don't use it
-               until we have these mapped out.
-
-        `is_active` is a boolean. If the CourseEnrollment object has
-                    `is_active=False`, then calling
-                    `CourseEnrollment.is_enrolled()` for that user/course_id
-                    will return False.
-
         It is expected that this method is called from a method which has already
         verified the user authentication and access.
         """
@@ -737,18 +262,69 @@ class CourseEnrollment(models.Model):
         if user.id is None:
             user.save()
 
-        enrollment, _ = CourseEnrollment.objects.get_or_create(
+        enrollment, created = CourseEnrollment.objects.get_or_create(
             user=user,
             course_id=course_id,
         )
-        # In case we're reactivating a deactivated enrollment, or changing the
-        # enrollment mode.
-        if enrollment.mode != mode or enrollment.is_active != is_active:
-            enrollment.mode = mode
-            enrollment.is_active = is_active
+
+        # If we *did* just create a new enrollment, set some defaults
+        if created:
+            enrollment.mode = "honor"
+            enrollment.is_active = False
             enrollment.save()
 
         return enrollment
+
+    def update_enrollment(self, mode=None, is_active=None):
+        """
+        Updates an enrollment for a user in a class.  This includes options
+        like changing the mode, toggling is_active True/False, etc.
+
+        Also emits relevant events for analytics purposes.
+
+        This saves immediately.
+        """
+        activation_changed = False
+        # if is_active is None, then the call to update_enrollment didn't specify
+        # any value, so just leave is_active as it is
+        if self.is_active != is_active and is_active is not None:
+            self.is_active = is_active
+            activation_changed = True
+
+        mode_changed = False
+        # if mode is None, the call to update_enrollment didn't specify a new
+        # mode, so leave as-is
+        if self.mode != mode and mode is not None:
+            self.mode = mode
+            mode_changed = True
+
+        if activation_changed or mode_changed:
+            self.save()
+        if activation_changed:
+            if self.is_active:
+                self.emit_event(EVENT_NAME_ENROLLMENT_ACTIVATED)
+            else:
+                unenroll_done.send(sender=None, course_enrollment=self)
+                self.emit_event(EVENT_NAME_ENROLLMENT_DEACTIVATED)
+
+    def emit_event(self, event_name):
+        """
+        Emits an event to explicitly track course enrollment and unenrollment.
+        """
+
+        try:
+            context = contexts.course_context_from_course_id(self.course_id)
+            data = {
+                'user_id': self.user.id,
+                'course_id': self.course_id,
+                'mode': self.mode,
+            }
+
+            with tracker.get_tracker().context(event_name, context):
+                server_track(crum.get_current_request(), event_name, data)
+        except:  # pylint: disable=bare-except
+            if event_name and self.course_id:
+                log.exception('Unable to emit event %s for user %s and course %s', event_name, self.user.username, self.course_id)
 
     @classmethod
     def enroll(cls, user, course_id, mode="honor"):
@@ -771,7 +347,9 @@ class CourseEnrollment(models.Model):
         It is expected that this method is called from a method which has already
         verified the user authentication and access.
         """
-        return cls.create_enrollment(user, course_id, mode, is_active=True)
+        enrollment = cls.get_or_create_enrollment(user, course_id)
+        enrollment.update_enrollment(is_active=True, mode=mode)
+        return enrollment
 
     @classmethod
     def enroll_by_email(cls, email, course_id, mode="honor", ignore_errors=True):
@@ -825,9 +403,8 @@ class CourseEnrollment(models.Model):
         """
         try:
             record = CourseEnrollment.objects.get(user=user, course_id=course_id)
-            record.is_active = False
-            record.save()
-            unenroll_done.send(sender=cls, course_enrollment=record)
+            record.update_enrollment(is_active=False)
+
         except cls.DoesNotExist:
             err_msg = u"Tried to unenroll student {} from {} but they were not enrolled"
             log.error(err_msg.format(user, course_id))
@@ -913,19 +490,27 @@ class CourseEnrollment(models.Model):
     def enrollments_for_user(cls, user):
         return CourseEnrollment.objects.filter(user=user, is_active=1)
 
+    @classmethod
+    def users_enrolled_in(cls, course_id):
+        """Return a queryset of User for every user enrolled in the course."""
+        return User.objects.filter(
+            courseenrollment__course_id=course_id,
+            courseenrollment__is_active=True
+        )
+
     def activate(self):
         """Makes this `CourseEnrollment` record active. Saves immediately."""
-        if not self.is_active:
-            self.is_active = True
-            self.save()
+        self.update_enrollment(is_active=True)
 
     def deactivate(self):
         """Makes this `CourseEnrollment` record inactive. Saves immediately. An
         inactive record means that the student is not enrolled in this course.
         """
-        if self.is_active:
-            self.is_active = False
-            self.save()
+        self.update_enrollment(is_active=False)
+
+    def change_mode(self, mode):
+        """Changes this `CourseEnrollment` record's mode to `mode`.  Saves immediately."""
+        self.update_enrollment(mode=mode)
 
     def refundable(self):
         """
@@ -937,7 +522,6 @@ class CourseEnrollment(models.Model):
             return False
         else:
             return True
-
 
 
 class CourseEnrollmentAllowed(models.Model):
