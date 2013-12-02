@@ -81,7 +81,7 @@ FEATURES['PREVIEW_LMS_BASE'] = "localhost:8000"
 REPOS = {
     'edx4edx': {
         'branch': 'master',
-        'origin': 'git@github.com:MITX/edx4edx.git',
+        'origin': 'git@github.com:MITx/edx4edx.git',
     },
     'content-mit-6002x': {
         'branch': 'master',
