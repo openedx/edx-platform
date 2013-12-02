@@ -34,7 +34,6 @@ from xblock.fields import Scope, ScopeIds
 from xmodule.modulestore import ModuleStoreWriteBase, Location, MONGO_MODULESTORE_TYPE
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.inheritance import own_metadata, InheritanceMixin, inherit_metadata, InheritanceKeyValueStore
-import re
 
 log = logging.getLogger(__name__)
 
