@@ -42,6 +42,7 @@ import hashlib
 import base64
 import urllib
 import textwrap
+import json
 from lxml import etree
 from webob import Response
 import mock
@@ -176,11 +177,7 @@ class LTIModule(LTIFields, XModule):
     css = {'scss': [resource_string(__name__, 'css/lti/lti.scss')]}
     js_module_name = "LTI"
 
-    def get_html(self):
-        """
-        Renders parameters to template.
-        """
-
+    def get_input_fields(self):
         # LTI provides a list of default parameters that might be passed as
         # part of the POST data. These parameters should not be prefixed.
         # Likewise, The creator of an LTI link can add custom key/value parameters
@@ -238,13 +235,19 @@ class LTIModule(LTIFields, XModule):
 
             custom_parameters[unicode(param_name)] = unicode(param_value)
 
-        input_fields = self.oauth_params(
+        return self.oauth_params(
             custom_parameters,
             client_key,
             client_secret,
         )
+
+    def get_html(self):
+        """
+        Renders parameters to template.
+        """
+
         context = {
-            'input_fields': input_fields,
+            'input_fields': self.get_input_fields(),
 
             # These parameters do not participate in OAuth signing.
             'launch_url': self.launch_url.strip(),
@@ -252,9 +255,25 @@ class LTIModule(LTIFields, XModule):
             'element_class': self.category,
             'open_in_a_new_page': self.open_in_a_new_page,
             'display_name': self.display_name,
+            'ajax_url': self.system.ajax_url,
         }
 
         return self.system.render_template('lti.html', context)
+
+    def handle_ajax(self, dispatch, data):
+        """Ajax handler.
+
+        Args:
+            dispatch: string request slug
+            data: dict request data parameters
+
+        Returns:
+            json string
+        """
+        if dispatch == 'regenerate_signature':
+            return json.dumps({ 'input_fields': self.get_input_fields() })
+        else:  # return error message
+            return json.dumps({'error': 'Unknown Command!'})
 
     def get_user_id(self):
         user_id = self.runtime.anonymous_student_id

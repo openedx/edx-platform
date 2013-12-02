@@ -153,7 +153,7 @@
                 });
             });
 
-            // Turned off test due to flakiness (30.10.2013).
+            // Turned off test due to flakiness (11/25/13)
             xit('trigger seek event', function() {
                 runs(function () {
                     videoProgressSlider.onSlide(
@@ -219,7 +219,7 @@
                 });
             });
 
-            // Turned off test due to flakiness (30.10.2013).
+            // Turned off test due to flakiness (11/25/13)
             xit('trigger seek event', function() {
                 runs(function () {
                     videoProgressSlider.onStop(
@@ -283,6 +283,55 @@
                     );
 
                 expect(params).toEqual(expectedParams);
+            });
+        });
+
+        describe('notifyThroughHandleEnd', function () {
+            beforeEach(function () {
+                initialize();
+
+                spyOnEvent(videoProgressSlider.handle, 'focus');
+                spyOn(videoProgressSlider, 'notifyThroughHandleEnd')
+                    .andCallThrough();
+            });
+
+            it('params.end = true', function () {
+                videoProgressSlider.notifyThroughHandleEnd({end: true});
+
+                expect(videoProgressSlider.handle.attr('title'))
+                    .toBe('video ended');
+
+                expect('focus').toHaveBeenTriggeredOn(videoProgressSlider.handle);
+            });
+
+            it('params.end = false', function () {
+                videoProgressSlider.notifyThroughHandleEnd({end: false});
+
+                expect(videoProgressSlider.handle.attr('title'))
+                    .toBe('video position');
+
+                expect('focus').not.toHaveBeenTriggeredOn(videoProgressSlider.handle);
+            });
+
+            it('is called when video plays', function () {
+                videoPlayer.play();
+
+                waitsFor(function () {
+                    var duration = videoPlayer.duration(),
+                        currentTime = videoPlayer.currentTime;
+
+                    return (
+                        isFinite(duration) &&
+                        duration > 0 &&
+                        isFinite(currentTime) &&
+                        currentTime > 0
+                    );
+                }, 'duration is set, video is playing', 5000);
+
+                runs(function () {
+                    expect(videoProgressSlider.notifyThroughHandleEnd)
+                        .toHaveBeenCalledWith({end: false});
+                });
             });
         });
     });

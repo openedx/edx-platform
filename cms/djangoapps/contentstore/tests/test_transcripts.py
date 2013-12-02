@@ -20,6 +20,7 @@ from xmodule.contentstore.django import contentstore, _CONTENTSTORE
 from xmodule.contentstore.content import StaticContent
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import loc_mapper
+from xmodule.modulestore.locator import BlockUsageLocator
 
 from contentstore.tests.modulestore_config import TEST_MODULESTORE
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
@@ -59,7 +60,7 @@ class Basetranscripts(CourseTestCase):
             'type': 'video'
         }
         resp = self.client.ajax_post('/xblock', data)
-        self.item_location = json.loads(resp.content).get('id')
+        self.item_location = self._get_location(resp)
         self.assertEqual(resp.status_code, 200)
 
         # hI10vDNYz4M - valid Youtube ID with transcripts.
@@ -71,6 +72,11 @@ class Basetranscripts(CourseTestCase):
 
         # Remove all transcripts for current module.
         self.clear_subs_content()
+
+    def _get_location(self, resp):
+        """ Returns the location (as a string) from the response returned by a create operation. """
+        locator = json.loads(resp.content).get('locator')
+        return loc_mapper().translate_locator_to_location(BlockUsageLocator(locator)).url()
 
     def get_youtube_ids(self):
         """Return youtube speeds and ids."""
@@ -205,7 +211,7 @@ class TestUploadtranscripts(Basetranscripts):
             'type': 'non_video'
         }
         resp = self.client.ajax_post('/xblock', data)
-        item_location = json.loads(resp.content).get('id')
+        item_location = self._get_location(resp)
         data = '<non_video youtube="0.75:JMD_ifUUfsU,1.0:hI10vDNYz4M" />'
         modulestore().update_item(item_location, data)
 
@@ -416,7 +422,7 @@ class TestDownloadtranscripts(Basetranscripts):
             'type': 'videoalpha'
         }
         resp = self.client.ajax_post('/xblock', data)
-        item_location = json.loads(resp.content).get('id')
+        item_location = self._get_location(resp)
         subs_id = str(uuid4())
         data = textwrap.dedent("""
             <videoalpha youtube="" sub="{}">
@@ -666,7 +672,7 @@ class TestChecktranscripts(Basetranscripts):
             'type': 'not_video'
         }
         resp = self.client.ajax_post('/xblock', data)
-        item_location = json.loads(resp.content).get('id')
+        item_location = self._get_location(resp)
         subs_id = str(uuid4())
         data = textwrap.dedent("""
             <not_video youtube="" sub="{}">

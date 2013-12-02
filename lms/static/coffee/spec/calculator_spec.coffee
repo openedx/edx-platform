@@ -1,4 +1,16 @@
 describe 'Calculator', ->
+
+  KEY =
+    TAB   : 9
+    ENTER : 13
+    ALT   : 18
+    ESC   : 27
+    SPACE : 32
+    LEFT  : 37
+    UP    : 38
+    RIGHT : 39
+    DOWN  : 40
+
   beforeEach ->
     loadFixtures 'coffee/fixtures/calculator.html'
     @calculator = new Calculator
@@ -9,15 +21,14 @@ describe 'Calculator', ->
 
     it 'bind the help button', ->
       # These events are bind by $.hover()
-      expect($('div.help-wrapper a')).toHandle 'mouseover'
-      expect($('div.help-wrapper a')).toHandle 'mouseout'
-      expect($('div.help-wrapper')).toHandle 'focusin'
-      expect($('div.help-wrapper')).toHandle 'focusout'
+      expect($('#calculator_hint')).toHandle 'mouseover'
+      expect($('#calculator_hint')).toHandle 'mouseout'
+      expect($('#calculator_hint')).toHandle 'keydown'
 
     it 'prevent default behavior on help button', ->
-      $('div.help-wrapper a').click (e) ->
+      $('#calculator_hint').click (e) ->
         expect(e.isDefaultPrevented()).toBeTruthy()
-      $('div.help-wrapper a').click()
+      $('#calculator_hint').click()
 
     it 'bind the calculator submit', ->
       expect($('form#calculator')).toHandleWith 'submit', @calculator.calculate
@@ -51,15 +62,261 @@ describe 'Calculator', ->
       @calculator.toggle(jQuery.Event("click"))
       expect($('.calc')).not.toHaveClass('closed')
 
-  describe 'helpShow', ->
+  describe 'showHint', ->
     it 'show the help overlay', ->
-      @calculator.helpShow()
+      @calculator.showHint()
       expect($('.help')).toHaveClass('shown')
+      expect($('.help')).toHaveAttr('aria-hidden', 'false')
 
-  describe 'helpHide', ->
+
+  describe 'hideHint', ->
     it 'show the help overlay', ->
-      @calculator.helpHide()
+      @calculator.hideHint()
       expect($('.help')).not.toHaveClass('shown')
+      expect($('.help')).toHaveAttr('aria-hidden', 'true')
+
+  describe 'handleClickOnDocument', ->
+    it 'on click out of the hint popup it becomes hidden', ->
+      @calculator.showHint()
+      e = jQuery.Event('click');
+      $(document).trigger(e);
+      expect($('.help')).not.toHaveClass 'shown'
+
+  describe 'selectHint', ->
+    it 'select correct hint item', ->
+      spyOn($.fn, 'focus')
+      element = $('.hint-item').eq(1)
+      @calculator.selectHint(element)
+
+      expect(element.focus).toHaveBeenCalled()
+      expect(@calculator.activeHint).toEqual(element)
+      expect(@calculator.hintPopup).toHaveAttr('aria-activedescendant', element.attr('id'))
+
+    it 'select the first hint if argument element is not passed', ->
+          @calculator.selectHint()
+          expect(@calculator.activeHint.attr('id')).toEqual($('.hint-item').first().attr('id'))
+
+    it 'select the first hint if argument element is empty', ->
+          @calculator.selectHint([])
+          expect(@calculator.activeHint.attr('id')).toBe($('.hint-item').first().attr('id'))
+
+  describe 'prevHint', ->
+
+    it 'Prev hint item is selected', ->
+      @calculator.activeHint = $('.hint-item').eq(1)
+      @calculator.prevHint()
+
+      expect(@calculator.activeHint.attr('id')).toBe($('.hint-item').eq(0).attr('id'))
+
+    it 'Prev hint item is selected', ->
+      @calculator.activeHint = $('.hint-item').eq(1)
+      @calculator.prevHint()
+
+      expect(@calculator.activeHint.attr('id')).toBe($('.hint-item').eq(0).attr('id'))
+
+    it 'if this was the first item, select the last one', ->
+      @calculator.activeHint = $('.hint-item').eq(0)
+      @calculator.prevHint()
+
+      expect(@calculator.activeHint.attr('id')).toBe($('.hint-item').eq(1).attr('id'))
+
+  describe 'nextHint', ->
+
+    it 'Next hint item is selected', ->
+      @calculator.activeHint = $('.hint-item').eq(0)
+      @calculator.nextHint()
+
+      expect(@calculator.activeHint.attr('id')).toBe($('.hint-item').eq(1).attr('id'))
+
+    it 'If this was the last item, select the first one', ->
+      @calculator.activeHint = $('.hint-item').eq(1)
+      @calculator.nextHint()
+
+      expect(@calculator.activeHint.attr('id')).toBe($('.hint-item').eq(0).attr('id'))
+
+  describe 'handleKeyDown', ->
+    assertHintIsHidden = (calc, key) ->
+      spyOn(calc, 'hideHint')
+      calc.showHint()
+      e = jQuery.Event('keydown', { keyCode: key });
+      value = calc.handleKeyDown(e)
+
+      expect(calc.hideHint).toHaveBeenCalled
+      expect(value).toBeFalsy()
+      expect(e.isDefaultPrevented()).toBeTruthy()
+
+    assertHintIsVisible = (calc, key) ->
+      spyOn(calc, 'showHint')
+      spyOn($.fn, 'focus')
+      e = jQuery.Event('keydown', { keyCode: key });
+      value = calc.handleKeyDown(e)
+
+      expect(calc.showHint).toHaveBeenCalled
+      expect(value).toBeFalsy()
+      expect(e.isDefaultPrevented()).toBeTruthy()
+      expect(calc.activeHint.focus).toHaveBeenCalled()
+
+    assertNothingHappens = (calc, key) ->
+      spyOn(calc, 'showHint')
+      e = jQuery.Event('keydown', { keyCode: key });
+      value = calc.handleKeyDown(e)
+
+      expect(calc.showHint).not.toHaveBeenCalled
+      expect(value).toBeTruthy()
+      expect(e.isDefaultPrevented()).toBeFalsy()
+
+    it 'hint popup becomes hidden on press ENTER', ->
+      assertHintIsHidden(@calculator, KEY.ENTER)
+
+    it 'hint popup becomes visible on press ENTER', ->
+      assertHintIsVisible(@calculator, KEY.ENTER)
+
+    it 'hint popup becomes hidden on press SPACE', ->
+      assertHintIsHidden(@calculator, KEY.SPACE)
+
+    it 'hint popup becomes visible on press SPACE', ->
+      assertHintIsVisible(@calculator, KEY.SPACE)
+
+    it 'Nothing happens on press ALT', ->
+      assertNothingHappens(@calculator, KEY.ALT)
+
+    it 'Nothing happens on press any other button', ->
+      assertNothingHappens(@calculator, KEY.DOWN)
+
+  describe 'handleKeyDownOnHint', ->
+    it 'Navigation works in proper way', ->
+      calc = @calculator
+
+      eventToShowHint = jQuery.Event('keydown', { keyCode: KEY.ENTER } );
+      $('#calculator_hint').trigger(eventToShowHint);
+
+      spyOn(calc, 'hideHint')
+      spyOn(calc, 'prevHint')
+      spyOn(calc, 'nextHint')
+      spyOn($.fn, 'focus')
+
+      cases =
+        left:
+          event:
+            keyCode: KEY.LEFT
+            shiftKey: false
+          returnedValue: false
+          called:
+            'prevHint': calc
+          isPropagationStopped: true
+
+        leftWithShift:
+          returnedValue: true
+          event:
+            keyCode: KEY.LEFT
+            shiftKey: true
+          not_called:
+            'prevHint': calc
+
+        up:
+          event:
+            keyCode: KEY.UP
+            shiftKey: false
+          returnedValue: false
+          called:
+            'prevHint': calc
+          isPropagationStopped: true
+
+        upWithShift:
+          returnedValue: true
+          event:
+            keyCode: KEY.UP
+            shiftKey: true
+          not_called:
+            'prevHint': calc
+
+        right:
+          event:
+            keyCode: KEY.RIGHT
+            shiftKey: false
+          returnedValue: false
+          called:
+            'nextHint': calc
+          isPropagationStopped: true
+
+        rightWithShift:
+          returnedValue: true
+          event:
+            keyCode: KEY.RIGHT
+            shiftKey: true
+          not_called:
+            'nextHint': calc
+
+        down:
+          event:
+            keyCode: KEY.DOWN
+            shiftKey: false
+          returnedValue: false
+          called:
+            'nextHint': calc
+          isPropagationStopped: true
+
+        downWithShift:
+          returnedValue: true
+          event:
+            keyCode: KEY.DOWN
+            shiftKey: true
+          not_called:
+            'nextHint': calc
+
+        tab:
+          returnedValue: true
+          event:
+            keyCode: KEY.TAB
+            shiftKey: false
+          called:
+            'hideHint': calc
+
+        esc:
+          returnedValue: false
+          event:
+            keyCode: KEY.ESC
+            shiftKey: false
+          called:
+            'hideHint': calc
+            'focus': $.fn
+          isPropagationStopped: true
+
+        alt:
+          returnedValue: true
+          event:
+            which: KEY.ALT
+          not_called:
+            'hideHint': calc
+            'nextHint': calc
+            'prevHint': calc
+
+      $.each(cases, (key, data) ->
+        calc.hideHint.reset()
+        calc.prevHint.reset()
+        calc.nextHint.reset()
+        $.fn.focus.reset()
+
+        e = jQuery.Event('keydown', data.event or {});
+        value = calc.handleKeyDownOnHint(e)
+
+        if data.called
+          $.each(data.called, (method, obj) ->
+            expect(obj[method]).toHaveBeenCalled()
+          )
+
+        if data.not_called
+          $.each(data.not_called, (method, obj) ->
+            expect(obj[method]).not.toHaveBeenCalled()
+          )
+
+        if data.isPropagationStopped
+          expect(e.isPropagationStopped()).toBeTruthy()
+        else
+          expect(e.isPropagationStopped()).toBeFalsy()
+
+        expect(value).toBe(data.returnedValue)
+      )
 
   describe 'calculate', ->
     beforeEach ->

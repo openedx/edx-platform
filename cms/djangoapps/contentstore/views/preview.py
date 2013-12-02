@@ -3,7 +3,7 @@ from functools import partial
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.http import Http404, HttpResponseBadRequest, HttpResponseForbidden
+from django.http import Http404, HttpResponseBadRequest
 from django.contrib.auth.decorators import login_required
 from mitxmako.shortcuts import render_to_response, render_to_string
 
@@ -24,10 +24,9 @@ from util.sandboxing import can_execute_unsafe_code
 import static_replace
 from .session_kv_store import SessionKeyValueStore
 from .helpers import render_from_lms
-from .access import has_access
 from ..utils import get_course_for_item
 
-__all__ = ['preview_handler', 'preview_component']
+__all__ = ['preview_handler']
 
 log = logging.getLogger(__name__)
 
@@ -53,13 +52,13 @@ def preview_handler(request, usage_id, handler, suffix=''):
 
     usage_id: The usage-id of the block to dispatch to, passed through `quote_slashes`
     handler: The handler to execute
-    suffix: The remaineder of the url to be passed to the handler
+    suffix: The remainder of the url to be passed to the handler
     """
 
     location = unquote_slashes(usage_id)
 
     descriptor = modulestore().get_item(location)
-    instance = load_preview_module(request, descriptor)
+    instance = _load_preview_module(request, descriptor)
     # Let the module handle the AJAX
     req = django_to_webob_request(request)
     try:
@@ -85,32 +84,6 @@ def preview_handler(request, usage_id, handler, suffix=''):
     return webob_to_django_response(resp)
 
 
-@login_required
-def preview_component(request, location):
-    "Return the HTML preview of a component"
-    # TODO (vshnayder): change name from id to location in coffee+html as well.
-    if not has_access(request.user, location):
-        return HttpResponseForbidden()
-
-    component = modulestore().get_item(location)
-    # Wrap the generated fragment in the xmodule_editor div so that the javascript
-    # can bind to it correctly
-    component.runtime.wrappers.append(partial(wrap_xblock, handler_prefix))
-
-    try:
-        content = component.render('studio_view').content
-    # catch exceptions indiscriminately, since after this point they escape the
-    # dungeon and surface as uneditable, unsaveable, and undeletable
-    # component-goblins.
-    except Exception as exc:                          # pylint: disable=W0703
-        content = render_to_string('html_error.html', {'message': str(exc)})
-
-    return render_to_response('component.html', {
-        'preview': get_preview_html(request, component),
-        'editor': content
-    })
-
-
 class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
     """
     An XModule ModuleSystem for use in Studio previews
@@ -119,7 +92,7 @@ class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
         return handler_prefix(block, handler_name, suffix) + '?' + query
 
 
-def preview_module_system(request, descriptor):
+def _preview_module_system(request, descriptor):
     """
     Returns a ModuleSystem for the specified descriptor that is specialized for
     rendering module previews.
@@ -135,7 +108,7 @@ def preview_module_system(request, descriptor):
         # TODO (cpennington): Do we want to track how instructors are using the preview problems?
         track_function=lambda event_type, event: None,
         filestore=descriptor.runtime.resources_fs,
-        get_module=partial(load_preview_module, request),
+        get_module=partial(_load_preview_module, request),
         render_template=render_from_lms,
         debug=True,
         replace_urls=partial(static_replace.replace_static_urls, data_directory=None, course_id=course_id),
@@ -162,7 +135,7 @@ def preview_module_system(request, descriptor):
     )
 
 
-def load_preview_module(request, descriptor):
+def _load_preview_module(request, descriptor):
     """
     Return a preview XModule instantiated from the supplied descriptor.
 
@@ -171,7 +144,7 @@ def load_preview_module(request, descriptor):
     """
     student_data = DbModel(SessionKeyValueStore(request))
     descriptor.bind_for_student(
-        preview_module_system(request, descriptor),
+        _preview_module_system(request, descriptor),
         LmsFieldData(descriptor._field_data, student_data),  # pylint: disable=protected-access
     )
     return descriptor
@@ -182,7 +155,7 @@ def get_preview_html(request, descriptor):
     Returns the HTML returned by the XModule's student_view,
     specified by the descriptor and idx.
     """
-    module = load_preview_module(request, descriptor)
+    module = _load_preview_module(request, descriptor)
     try:
         content = module.render("student_view").content
     except Exception as exc:                          # pylint: disable=W0703

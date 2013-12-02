@@ -181,7 +181,7 @@ def click_on_the_caption(_step, index):
 @step('I see caption line with data-index "([^"]*)" has class "([^"]*)"$')
 def caption_line_has_class(_step, index, className):
     SELECTOR = ".subtitles > li[data-index='{index}']".format(index=int(index.strip()))
-    world.css_has_class(SELECTOR, className.strip())
+    assert world.css_has_class(SELECTOR, className.strip())
 
 
 @step('I see a range on slider$')

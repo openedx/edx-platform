@@ -19,7 +19,7 @@ else:
 % elif cert_status['status'] in ('generating', 'ready', 'notpassing', 'restricted'):
       <p class="message-copy">${_("Your final grade:")}
       <span class="grade-value">${"{0:.0f}%".format(float(cert_status['grade'])*100)}</span>.
-      % if cert_status['status'] == 'notpassing':
+      % if cert_status['status'] == 'notpassing' and enrollment.mode != 'audit':
          ${_("Grade required for a certificate:")} <span class="grade-value">
            ${"{0:.0f}%".format(float(course.lowest_passing_grade)*100)}</span>.
       % elif cert_status['status'] == 'restricted' and enrollment.mode == 'verified':
@@ -41,6 +41,12 @@ else:
           ${_("Your Certificate is Generating")}</span></li>
     % elif cert_status['show_download_url'] and enrollment.mode == 'honor':
       <li class="action">
+      <a class="btn" href="${cert_status['download_url']}"
+         title="${_('This link will open/download a PDF document')}">
+         ${_("Download Your Certificate (PDF)")}</a></li>
+    % elif cert_status['show_download_url'] and enrollment.mode == 'verified' and cert_status['mode'] == 'honor':
+      <li class="action">
+      <p>${_('Since we did not have a valid set of verification photos from you when certificates were generated, we could not grant you a verified certificate. An honor code certificate has been granted instead.')}</p>
       <a class="btn" href="${cert_status['download_url']}"
          title="${_('This link will open/download a PDF document')}">
          ${_("Download Your Certificate (PDF)")}</a></li>

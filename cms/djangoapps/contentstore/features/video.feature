@@ -53,6 +53,8 @@ Feature: CMS.Video Component
     Then Captions become "invisible"
 
   # 8
+  # Disabled 11/26 due to flakiness in master.
+  # Enabled back on 11/29.
   Scenario: Open captions never become invisible
     Given I have created a Video component with subtitles
     And Make sure captions are open
@@ -63,6 +65,8 @@ Feature: CMS.Video Component
     Then Captions are "visible"
 
   # 9
+  # Disabled 11/26 due to flakiness in master.
+  # Enabled back on 11/29.
   Scenario: Closed captions are invisible when mouse doesn't hover on CC button
     Given I have created a Video component with subtitles
     And Make sure captions are closed
@@ -71,6 +75,8 @@ Feature: CMS.Video Component
     Then Captions are "invisible"
 
   # 10
+  # Disabled 11/26 due to flakiness in master.
+  # Enabled back on 11/29.
   Scenario: When enter key is pressed on a caption shows an outline around it
     Given I have created a Video component with subtitles
     And Make sure captions are opened

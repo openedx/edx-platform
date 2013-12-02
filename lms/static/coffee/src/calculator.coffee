@@ -1,18 +1,48 @@
+# Keyboard Support
+
+# If focus is on the hint button:
+#   * Enter: Open or close hint popup. Select last focused hint item if opening
+#   * Space: Open or close hint popup. Select last focused hint item if opening
+
+# If focus is on a hint item:
+#   * Left arrow: Select previous hint item
+#   * Up arrow: Select previous hint item
+#   * Right arrow: Select next hint item
+#   * Down arrow: Select next hint item
+
+
 class @Calculator
   constructor: ->
+    @hintButton = $('#calculator_hint')
+    @hintPopup = $('.help')
+    @hintsList = @hintPopup.find('.hint-item')
+    @selectHint($('#' + @hintPopup.attr('aria-activedescendant')));
+
     $('.calc').click @toggle
     $('form#calculator').submit(@calculate).submit (e) ->
       e.preventDefault()
-    $('div.help-wrapper a')
+    @hintButton
       .hover(
-        $.proxy(@helpShow, @),
-        $.proxy(@helpHide, @)
+        $.proxy(@showHint, @),
+        $.proxy(@hideHint, @)
       )
-      .click (e) ->
-        e.preventDefault()
-      $('div.help-wrapper')
-        .focusin($.proxy @helpOnFocus, @)
-        .focusout($.proxy @helpOnBlur, @)
+      .keydown($.proxy(@handleKeyDown, @))
+      .click (e) -> e.preventDefault()
+
+    @hintPopup
+      .keydown($.proxy(@handleKeyDownOnHint, @))
+
+    @handleClickOnDocument = $.proxy(@handleClickOnDocument, @)
+
+  KEY:
+    TAB   : 9
+    ENTER : 13
+    ESC   : 27
+    SPACE : 32
+    LEFT  : 37
+    UP    : 38
+    RIGHT : 39
+    DOWN  : 40
 
   toggle: (event) ->
     event.preventDefault()
@@ -24,14 +54,14 @@ class @Calculator
     $('div.calc-main').toggleClass 'open'
     if $calc.hasClass('closed')
       $calcWrapper
-        .find('input, a, dt, dd')
+        .find('input, a')
         .attr 'tabindex', -1
     else
       text = gettext('Close Calculator')
       isExpanded = true
 
       $calcWrapper
-        .find('input, a, dt, dd')
+        .find('input, a,')
         .attr 'tabindex', 0
       # TODO: Investigate why doing this without the timeout causes it to jump
       # down to the bottom of the page. I suspect it's because it's putting the
@@ -46,24 +76,110 @@ class @Calculator
 
     $calc.toggleClass 'closed'
 
-  helpOnFocus: (e) ->
-    e.preventDefault()
-    @isFocusedHelp = true
-    @helpShow()
+  showHint: ->
+    @hintPopup
+      .addClass('shown')
+      .attr('aria-hidden', false)
 
-  helpOnBlur: (e) ->
-    e.preventDefault()
-    @isFocusedHelp = false
-    @helpHide()
+    $(document).on('click', @handleClickOnDocument)
 
-  helpShow: ->
-    $('.help').addClass 'shown'
-    $('#calculator_hint').attr 'aria-expanded', true
+  hideHint: ->
+    @hintPopup
+      .removeClass('shown')
+      .attr('aria-hidden', true)
 
-  helpHide: ->
-    if not @isFocusedHelp
-      $('.help').removeClass 'shown'
-      $('#calculator_hint').attr 'aria-expanded', false
+    $(document).off('click', @handleClickOnDocument)
+
+  selectHint: (element) ->
+    if not element or (element and element.length == 0)
+      element = @hintsList.first()
+
+    @activeHint = element;
+    @activeHint.focus();
+    @hintPopup.attr('aria-activedescendant', element.attr('id'));
+
+  prevHint: () ->
+    prev = @activeHint.prev(); # the previous hint
+    # if this was the first item
+    # select the last one in the group.
+    if @activeHint.index() == 0
+      prev = @hintsList.last()
+    # select the previous hint
+    @selectHint(prev)
+
+  nextHint: () ->
+    next = @activeHint.next(); # the next hint
+    # if this was the last item,
+    # select the first one in the group.
+    if @activeHint.index() == @hintsList.length - 1
+      next = @hintsList.first()
+    # give the next hint focus
+    @selectHint(next)
+
+  handleKeyDown: (e) ->
+    if e.altKey
+      # do nothing
+      return true
+
+    if e.keyCode == @KEY.ENTER or e.keyCode == @KEY.SPACE
+      if @hintPopup.hasClass 'shown'
+          @hideHint()
+      else
+        @showHint()
+        @activeHint.focus()
+
+      e.preventDefault()
+      return false
+
+    # allow the event to propagate
+    return true
+
+  handleKeyDownOnHint: (e) ->
+    if e.altKey
+      # do nothing
+      return true
+
+    switch e.keyCode
+      when @KEY.TAB
+        # hide popup with hints
+        @hideHint()
+
+      when @KEY.ESC
+        # hide popup with hints
+        @hideHint()
+        @hintButton.focus()
+
+        e.stopPropagation()
+        return false
+
+      when @KEY.LEFT, @KEY.UP
+        if e.shiftKey
+           # do nothing
+          return true
+
+        @prevHint()
+
+        e.stopPropagation()
+        return false
+
+      when @KEY.RIGHT, @KEY.DOWN
+        if e.shiftKey
+          # do nothing
+          return true
+
+        @nextHint()
+
+        e.stopPropagation()
+        return false
+
+    # allow the event to propagate
+    return true
+
+  handleClickOnDocument: (e) ->
+    @hideHint()
+
+    # allow the event to propagate
+    return true;
 
   calculate: ->
     $.getWithPrefix '/calculate', { equation: $('#calculator_input').val() }, (data) ->
