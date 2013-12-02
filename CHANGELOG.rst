@@ -27,6 +27,8 @@ Studio: Continued modification of Studio pages to follow a RESTful framework.
 includes Settings pages, edit page for Subsection and Unit, and interfaces
 for updating xblocks (xmodules) and getting their editing HTML.
 
+LMS: Improve accessibility of inline discussions in courseware.
+
 Blades: Put 2nd "Hide output" button at top of test box & increase text size for
 code response questions. BLD-126.
 
