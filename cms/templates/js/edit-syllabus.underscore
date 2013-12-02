@@ -1,5 +1,5 @@
 
-<form class="edit-textbook" id="edit_textbook_form">
+<form class="edit-syllabus" id="edit_syllabus_form">
   <div class="wrapper-form">
   <% if (error && error.message) { %>
     <div id="edit_syllabus_error" class="message message-status message-status error is-shown" name="edit_syllabus_error">
@@ -15,11 +15,11 @@
           <span class="tip tip-stacked"><%= gettext("provide the title/name of the text book as you would like your students to see it") %></span>
         </div>
   </fieldset>
-  <fieldset class="chapters-fields">
+  <fieldset class="topics-fields">
     <legend class="sr"><%= gettext("Topic(s) information") %></legend>
       <ol class="topics list-input enum"></ol>
 
-    <button class="action action-add-chapter"><i class="icon-plus"></i> <%= gettext("Add a Topic") %></button>
+    <button class="action action-add-topic"><i class="icon-plus"></i> <%= gettext("Add a Topic") %></button>
   </fieldset>
   </div>
   <div class="actions">
