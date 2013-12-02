@@ -25,19 +25,176 @@
  */
 
 (function () {
-    var element, container, form, link,
-        IN_NEW_WINDOW = 'true',
+    var IN_NEW_WINDOW = 'true',
         IN_IFRAME = 'false',
         EMPTY_URL = '',
         DEFAULT_URL = 'http://www.example.com',
         NEW_URL = 'http://www.example.com/some_book';
 
-    function initialize(target, action) {
-        var tempEl;
+    describe('LTI XModule', function () {
+        describe('LTIConstructor method', function () {
+            describe('[in iframe, new url]', function () {
+                var lti;
 
-        loadFixtures('lti.html');
+                beforeEach(function () {
+                    loadFixtures('lti.html');
+                    setUpLtiElement($('.lti-wrapper'), IN_IFRAME, NEW_URL);
 
-        element = $('.lti-wrapper');
+                    spyOnEvent(
+                        $('.lti-wrapper').find('.ltiLaunchForm'), 'submit'
+                    );
+
+                    lti = new window.LTI('.lti-wrapper');
+                });
+
+                it('new LTI object contains all properties', function () {
+                    expect(lti.el).toBeDefined();
+                    expect(lti.el).toExist();
+
+                    expect(lti.formEl).toBeDefined();
+                    expect(lti.formEl).toExist();
+                    expect(lti.formEl).toHaveAttr('action');
+
+                    expect(lti.formAction).toEqual(NEW_URL);
+                    expect(lti.openInANewPage).toEqual(false);
+                    expect(lti.ajaxUrl).toEqual(jasmine.any(String));
+
+                    expect(lti.formEl).toHandleWith(
+                        'submit', lti.submitFormCatcher
+                    );
+
+                    expect('submit').toHaveBeenTriggeredOn(lti.formEl);
+                });
+
+                afterEach(function () {
+                    lti = undefined;
+                });
+            });
+
+            describe('in new window, new url', function () {
+                var lti;
+
+                beforeEach(function () {
+                    loadFixtures('lti.html');
+                    setUpLtiElement($('.lti-wrapper'), IN_NEW_WINDOW, NEW_URL);
+
+                    lti = new window.LTI('.lti-wrapper');
+                });
+
+                it('check extra properties and values', function () {
+                    expect(lti.openInANewPage).toEqual(true);
+                    expect(lti.signatureIsNew).toBeTruthy();
+
+                    expect(lti.newWindowBtnEl).toBeDefined();
+                    expect(lti.newWindowBtnEl).toExist();
+                    expect(lti.newWindowBtnEl).toHandleWith(
+                        'click', lti.newWindowBtnClick
+                    );
+                });
+
+                afterEach(function () {
+                    lti = undefined;
+                });
+            });
+
+            describe('[in iframe, NO new url]', function () {
+                var lti;
+
+                it('URL is blank', function () {
+                    loadFixtures('lti.html');
+                    setUpLtiElement($('.lti-wrapper'), IN_IFRAME, EMPTY_URL);
+
+                    lti = new window.LTI('.lti-wrapper');
+
+                    expect(lti.openInANewPage).not.toBeDefined();
+                });
+
+                it('URL is default', function () {
+                    loadFixtures('lti.html');
+                    setUpLtiElement($('.lti-wrapper'), IN_IFRAME, DEFAULT_URL);
+
+                    lti = new window.LTI('.lti-wrapper');
+
+                    expect(lti.openInANewPage).not.toBeDefined();
+                });
+            });
+        });
+
+        describe('submitFormCatcher method', function () {
+            var thisObj, eventObj;
+
+            beforeEach(function () {
+                thisObj = {
+                    signatureIsNew: undefined,
+                    getNewSignature: jasmine.createSpy('getNewSignature')
+                };
+
+                eventObj = {
+                    data: {
+                        '_this': thisObj
+                    },
+                    preventDefault: jasmine.createSpy('preventDefault')
+                };
+            });
+
+            it('signature is new', function () {
+                thisObj.signatureIsNew = true;
+
+                expect(window.LTI.prototype.submitFormCatcher(eventObj))
+                    .toBe(true);
+                expect(thisObj.signatureIsNew).toBe(false);
+            });
+
+            it('signature is old', function () {
+                thisObj.signatureIsNew = false;
+
+                expect(window.LTI.prototype.submitFormCatcher(eventObj))
+                    .toBe(false);
+
+                expect(thisObj.getNewSignature).toHaveBeenCalled();
+                expect(eventObj.preventDefault).toHaveBeenCalled();
+            });
+
+            afterEach(function () {
+                thisObj = undefined;
+                eventObj = undefined;
+            });
+        });
+
+        describe('newWindowBtnClick method', function () {
+            var thisObj, eventObj;
+
+            beforeEach(function () {
+                thisObj = {
+                    formEl: {
+                        submit: jasmine.createSpy('submit')
+                    }
+                };
+
+                eventObj = {
+                    data: {
+                        '_this': thisObj
+                    },
+                    preventDefault: jasmine.createSpy('preventDefault')
+                };
+            });
+
+            it('signature is new', function () {
+                window.LTI.prototype.newWindowBtnClick(eventObj);
+
+                expect(thisObj.formEl.submit).toHaveBeenCalled();
+            });
+
+            afterEach(function () {
+                thisObj = undefined;
+                eventObj = undefined;
+            });
+        });
+    });
+
+    function setUpLtiElement(element, target, action) {
+        var container, form;
+
         container = element.find('.lti');
         form = container.find('.ltiLaunchForm');
 
@@ -57,8 +214,6 @@
                     href: '#',
                     class: 'link_lti_new_window'
                 }).appendTo(container);
-
-                link = container.find('.link_lti_new_window');
             } else {
                 $('<iframe />', {
                     name: 'ltiLaunchFrame',
@@ -67,99 +222,5 @@
                 }).appendTo(container);
             }
         }
-
-        spyOnEvent(form, 'submit');
-
-        LTI(element);
     }
-
-    describe('LTI', function () {
-        describe('initialize', function () {
-            describe(
-                'open_in_a_new_page is "true", launch URL is empty',
-                function () {
-
-                beforeEach(function () {
-                    initialize(IN_NEW_WINDOW, EMPTY_URL);
-                });
-
-                it('form is not submitted', function () {
-                    expect('submit').not.toHaveBeenTriggeredOn(form);
-                });
-            });
-
-            describe(
-                'open_in_a_new_page is "true", launch URL is default',
-                function () {
-
-                beforeEach(function () {
-                    initialize(IN_NEW_WINDOW, DEFAULT_URL);
-                });
-
-                it('form is not submitted', function () {
-                    expect('submit').not.toHaveBeenTriggeredOn(form);
-                });
-            });
-
-            describe(
-                'open_in_a_new_page is "true", launch URL is not empty, and ' +
-                'not default',
-                function () {
-
-                beforeEach(function () {
-                    initialize(IN_NEW_WINDOW, NEW_URL);
-                });
-
-                it('form is not submitted', function () {
-                    expect('submit').not.toHaveBeenTriggeredOn(form);
-                });
-
-                it('after link is clicked, form is submitted', function () {
-                    link.trigger('click');
-
-                    expect('submit').toHaveBeenTriggeredOn(form);
-                });
-            });
-
-            describe(
-                'open_in_a_new_page is "false", launch URL is empty',
-                function () {
-
-                beforeEach(function () {
-                    initialize(IN_IFRAME, EMPTY_URL);
-                });
-
-                it('form is not submitted', function () {
-                    expect('submit').not.toHaveBeenTriggeredOn(form);
-                });
-            });
-
-            describe(
-                'open_in_a_new_page is "false", launch URL is default',
-                function () {
-
-                beforeEach(function () {
-                    initialize(IN_IFRAME, DEFAULT_URL);
-                });
-
-                it('form is not submitted', function () {
-                    expect('submit').not.toHaveBeenTriggeredOn(form);
-                });
-            });
-
-            describe(
-                'open_in_a_new_page is "false", launch URL is not empty, ' +
-                'and not default',
-                function () {
-
-                beforeEach(function () {
-                    initialize(IN_IFRAME, NEW_URL);
-                });
-
-                it('form is submitted', function () {
-                    expect('submit').toHaveBeenTriggeredOn(form);
-                });
-            });
-        });
-    });
 }());

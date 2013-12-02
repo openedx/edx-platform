@@ -36,7 +36,8 @@ window.LTI = (function ($, undefined) {
         constructor: LTIConstructor,
         submitFormCatcher: submitFormCatcher,
         newWindowBtnClick: newWindowBtnClick,
-        getNewSignature: getNewSignature
+        getNewSignature: getNewSignature,
+        handleAjaxUpdateSignature: handleAjaxUpdateSignature
     };
 
     return LTI;
@@ -129,39 +130,35 @@ window.LTI = (function ($, undefined) {
         _this.formEl.submit();
     }
 
-    // Request form the server a new OAuth signature. When OAuth signature is
-    // received, and if the data received back is OK, update the form, and
-    // submit it.
+    // Request form the server a new OAuth signature.
     function getNewSignature() {
-        var _this = this;
-
         $.postWithPrefix(
             this.ajaxUrl + '/regenerate_signature',
             {},
-            function (response) {
-                // If the response is valid, and contains expected data.
-                if (
-                    response &&
-                    response.status &&
-                    response.status === 'OK' &&
-                    response.input_fields &&
-                    $.isPlainObject(response.input_fields)
-                ) {
-                    // We received a new OAuth signature.
-                    _this.signatureIsNew = true;
-
-                    // Update the form fields with new data, and new OAuth
-                    // signature.
-                    $.each(response.input_fields, function (name, value) {
-                        var inputEl = _this.formEl.find("input[name='" + name + "']");
-
-                        inputEl.val(value);
-                    });
-
-                    // Submit the form.
-                    _this.formEl.trigger('submit');
-                }
-            }
+            this.handleAjaxUpdateSignature
         );
+    }
+
+    // When a new OAuth signature is received, and if the data received back is
+    // OK, update the form, and submit it.
+    function handleAjaxUpdateSignature(response) {
+        var _this = this;
+
+        // If the response is valid, and contains expected data.
+        if ($.isPlainObject(response.input_fields)) {
+            // We received a new OAuth signature.
+            this.signatureIsNew = true;
+
+            // Update the form fields with new data, and new OAuth
+            // signature.
+            $.each(response.input_fields, function (name, value) {
+                var inputEl = _this.formEl.find("input[name='" + name + "']");
+
+                inputEl.val(value);
+            });
+
+            // Submit the form.
+            this.formEl.trigger('submit');
+        }
     }
 }).call(this, window.jQuery);

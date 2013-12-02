@@ -271,10 +271,7 @@ class LTIModule(LTIFields, XModule):
             json string
         """
         if dispatch == 'regenerate_signature':
-            return json.dumps({
-                'status': 'OK',
-                'input_fields': self.get_input_fields(),
-            })
+            return json.dumps({ 'input_fields': self.get_input_fields() })
         else:  # return error message
             return json.dumps({'error': 'Unknown Command!'})
 
