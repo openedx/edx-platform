@@ -7,7 +7,7 @@
 
 <% if(topics.length > 1) {%>
     <p><a href="#" class="topic-toggle
-        <% if(showtopics){ print('hide'); } else { print('show'); } %>-topics">
+        <% if(showTopics){ print('hide'); } else { print('show'); } %>-topics">
         <i class="ui-toggle-expansion icon-caret-<% if(showTopics){ print('down'); } else { print('right'); } %>"></i>
         <%= topics.length %> PDF Chapters
     </a></p>
