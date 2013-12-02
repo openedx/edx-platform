@@ -6,9 +6,11 @@ Open Response Assessment Problems
 Introduction to Open Response Assessments
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-**Note** Open response assessments are still in beta. We recommend that
-you test them thoroughly in a practice course and only add them to
-courses that are **not** already running. Contact your edX Program Manager for more information.
+.. note:: 
+
+   Open response assessments are still in beta. We recommend that
+   you test them thoroughly in a practice course and only add them to
+   courses that are **not** already running. Contact your edX Program Manager for more information.
 
 Open response assessments allow instructors to assess student learning
 through questions that may not have definite answers. Tens of thousands

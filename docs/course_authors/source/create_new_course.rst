@@ -266,7 +266,9 @@ For example, the following navigation bar includes a
 
 .. image:: Images/image157.png
 
-You can use static pages for a syllabus, grading policy, course handouts, or any other purpose. 
+You can use static pages for a syllabus, grading policy, course handouts, or any other purpose.
+
+.. note:: The Course Info, Discussion, Wiki, and Progress pages are displayed to students by default. You cannot delete these pages.   
 
 To create a static page:
 
@@ -281,6 +283,8 @@ To create a static page:
 #. Enter text for your page. You can switch to HTML mode if needed.
 #. To edit the Display Name, click **Settings**.
 #. Click **Save**.
+
+To delete a static page, click **Delete** in the row for the page.  Confirm the deletion.
 
 
 ==================

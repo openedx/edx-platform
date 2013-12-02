@@ -91,12 +91,12 @@ viewing individual progress through a course or resetting problem attempts.
 .. _Assign Final Grades and Issuing Certificates:
 
 *********************************************** 
-Assign Final Grades and Issuing Certificates
+Assign Final Grades and Issue Certificates
 ***********************************************
 
 The final grades of a student in the course and the grading
 rubric you have set are used to determine whether the student has earned a
 Certificate of Mastery for the course. The process for issuing Certificates
 has to be started manually by you or by the edX support team at the end of the
-course run.
+course.
  
