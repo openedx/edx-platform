@@ -77,7 +77,7 @@ def render_to_string(template_name, dictionary, context=None, namespace='main'):
     # collapse context_instance to a single dictionary for mako
     context_dictionary = {}
     context_instance['settings'] = settings
-    context_instance['MITX_ROOT_URL'] = settings.MITX_ROOT_URL
+    context_instance['EDX_ROOT_URL'] = settings.EDX_ROOT_URL
     context_instance['marketing_link'] = marketing_link
 
     # In various testing contexts, there might not be a current request context.
