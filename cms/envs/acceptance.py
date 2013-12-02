@@ -87,7 +87,7 @@ PIPELINE = True
 STATICFILES_FINDERS += ('pipeline.finders.PipelineFinder', )
 
 # Use the auto_auth workflow for creating users and logging them in
-MITX_FEATURES['AUTOMATIC_AUTH_FOR_TESTING'] = True
+FEATURES['AUTOMATIC_AUTH_FOR_TESTING'] = True
 
 # HACK
 # Setting this flag to false causes imports to not load correctly in the lettuce python files

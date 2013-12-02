@@ -695,7 +695,7 @@ def add_user_to_default_group(user, group):
 
 @receiver(post_save, sender=User)
 def update_user_information(sender, instance, created, **kwargs):
-    if not settings.MITX_FEATURES['ENABLE_DISCUSSION_SERVICE']:
+    if not settings.FEATURES['ENABLE_DISCUSSION_SERVICE']:
         # Don't try--it won't work, and it will fill the logs with lots of errors
         return
     try:

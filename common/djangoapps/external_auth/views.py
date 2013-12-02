@@ -18,7 +18,7 @@ from django.core.urlresolvers import reverse
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 
-if settings.MITX_FEATURES.get('AUTH_USE_CAS'):
+if settings.FEATURES.get('AUTH_USE_CAS'):
     from django_cas.views import login as django_cas_login
 
 from student.models import UserProfile
@@ -150,7 +150,7 @@ def _external_login_or_signup(request,
         eamap.save()
 
     log.info(u"External_Auth login_or_signup for %s : %s : %s : %s", external_domain, external_id, email, fullname)
-    uses_shibboleth = settings.MITX_FEATURES.get('AUTH_USE_SHIB') and external_domain.startswith(SHIBBOLETH_DOMAIN_PREFIX)
+    uses_shibboleth = settings.FEATURES.get('AUTH_USE_SHIB') and external_domain.startswith(SHIBBOLETH_DOMAIN_PREFIX)
     internal_user = eamap.user
     if internal_user is None:
         if uses_shibboleth:
@@ -250,7 +250,7 @@ def _signup(request, eamap):
     # save this for use by student.views.create_account
     request.session['ExternalAuthMap'] = eamap
 
-    if settings.MITX_FEATURES.get('AUTH_USE_MIT_CERTIFICATES_IMMEDIATE_SIGNUP', ''):
+    if settings.FEATURES.get('AUTH_USE_MIT_CERTIFICATES_IMMEDIATE_SIGNUP', ''):
         # do signin immediately, by calling create_account, instead of asking
         # student to fill in form.  MIT students already have information filed.
         username = eamap.external_email.split('@', 1)[0]
@@ -278,9 +278,9 @@ def _signup(request, eamap):
 
     # Some openEdX instances can't have terms of service for shib users, like
     # according to Stanford's Office of General Counsel
-    uses_shibboleth = (settings.MITX_FEATURES.get('AUTH_USE_SHIB') and
+    uses_shibboleth = (settings.FEATURES.get('AUTH_USE_SHIB') and
                        eamap.external_domain.startswith(SHIBBOLETH_DOMAIN_PREFIX))
-    if uses_shibboleth and settings.MITX_FEATURES.get('SHIB_DISABLE_TOS'):
+    if uses_shibboleth and settings.FEATURES.get('SHIB_DISABLE_TOS'):
         context['ask_for_tos'] = False
 
     # detect if full name is blank and ask for it from user
@@ -349,7 +349,7 @@ def ssl_login_shortcut(fn):
     based on existing ExternalAuth record and MIT ssl certificate.
     """
     def wrapped(*args, **kwargs):
-        if not settings.MITX_FEATURES['AUTH_USE_MIT_CERTIFICATES']:
+        if not settings.FEATURES['AUTH_USE_MIT_CERTIFICATES']:
             return fn(*args, **kwargs)
         request = args[0]
         cert = _ssl_get_cert_from_request(request)
@@ -372,7 +372,7 @@ def ssl_login_shortcut(fn):
 def ssl_login(request):
     """
     This is called by branding.views.index when
-    MITX_FEATURES['AUTH_USE_MIT_CERTIFICATES'] = True
+    FEATURES['AUTH_USE_MIT_CERTIFICATES'] = True
 
     Used for MIT user authentication.  This presumes the web server
     (nginx) has been configured to require specific client
@@ -386,7 +386,7 @@ def ssl_login(request):
     Else continues on with student.views.index, and no authentication.
     """
     # Just to make sure we're calling this only at MIT:
-    if not settings.MITX_FEATURES['AUTH_USE_MIT_CERTIFICATES']:
+    if not settings.FEATURES['AUTH_USE_MIT_CERTIFICATES']:
         return HttpResponseForbidden()
 
     cert = _ssl_get_cert_from_request(request)
@@ -540,7 +540,7 @@ def course_specific_login(request, course_id):
         return _redirect_with_get_querydict('signin_user', request.GET)
 
     # now the dispatching conditionals.  Only shib for now
-    if settings.MITX_FEATURES.get('AUTH_USE_SHIB') and course.enrollment_domain.startswith(SHIBBOLETH_DOMAIN_PREFIX):
+    if settings.FEATURES.get('AUTH_USE_SHIB') and course.enrollment_domain.startswith(SHIBBOLETH_DOMAIN_PREFIX):
         return _redirect_with_get_querydict('shib-login', request.GET)
 
     # Default fallthrough to normal signin page
@@ -559,7 +559,7 @@ def course_specific_register(request, course_id):
         return _redirect_with_get_querydict('register_user', request.GET)
 
     # now the dispatching conditionals.  Only shib for now
-    if settings.MITX_FEATURES.get('AUTH_USE_SHIB') and course.enrollment_domain.startswith(SHIBBOLETH_DOMAIN_PREFIX):
+    if settings.FEATURES.get('AUTH_USE_SHIB') and course.enrollment_domain.startswith(SHIBBOLETH_DOMAIN_PREFIX):
         # shib-login takes care of both registration and login flows
         return _redirect_with_get_querydict('shib-login', request.GET)
 

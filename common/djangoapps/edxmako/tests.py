@@ -14,12 +14,12 @@ class ShortcutsTests(UrlResetMixin, TestCase):
     @override_settings(MKTG_URL_LINK_MAP={'ABOUT': 'login'})
     def test_marketing_link(self):
         # test marketing site on
-        with patch.dict('django.conf.settings.MITX_FEATURES', {'ENABLE_MKTG_SITE': True}):
+        with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
             expected_link = 'dummy-root/about-us'
             link = marketing_link('ABOUT')
             self.assertEquals(link, expected_link)
         # test marketing site off
-        with patch.dict('django.conf.settings.MITX_FEATURES', {'ENABLE_MKTG_SITE': False}):
+        with patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': False}):
             # we are using login because it is common across both cms and lms
             expected_link = reverse('login')
             link = marketing_link('ABOUT')

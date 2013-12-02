@@ -33,7 +33,7 @@ class CreatorGroupTest(TestCase):
 
     def test_creator_group_enabled_but_empty(self):
         """ Tests creator group feature on, but group empty. """
-        with mock.patch.dict('django.conf.settings.MITX_FEATURES', {"ENABLE_CREATOR_GROUP": True}):
+        with mock.patch.dict('django.conf.settings.FEATURES', {"ENABLE_CREATOR_GROUP": True}):
             self.assertFalse(is_user_in_creator_group(self.user))
 
             # Make user staff. This will cause is_user_in_creator_group to return True.
@@ -42,7 +42,7 @@ class CreatorGroupTest(TestCase):
 
     def test_creator_group_enabled_nonempty(self):
         """ Tests creator group feature on, user added. """
-        with mock.patch.dict('django.conf.settings.MITX_FEATURES', {"ENABLE_CREATOR_GROUP": True}):
+        with mock.patch.dict('django.conf.settings.FEATURES', {"ENABLE_CREATOR_GROUP": True}):
             self.assertTrue(add_user_to_creator_group(self.admin, self.user))
             self.assertTrue(is_user_in_creator_group(self.user))
 
@@ -70,7 +70,7 @@ class CreatorGroupTest(TestCase):
 
     def test_course_creation_disabled(self):
         """ Tests that the COURSE_CREATION_DISABLED flag overrides course creator group settings. """
-        with mock.patch.dict('django.conf.settings.MITX_FEATURES',
+        with mock.patch.dict('django.conf.settings.FEATURES',
                              {'DISABLE_COURSE_CREATION': True, "ENABLE_CREATOR_GROUP": True}):
             # Add user to creator group.
             self.assertTrue(add_user_to_creator_group(self.admin, self.user))

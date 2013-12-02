@@ -4,7 +4,7 @@ Views for hint management.
 Get to these views through courseurl/hint_manager.
 For example: https://courses.edx.org/courses/MITx/2.01x/2013_Spring/hint_manager
 
-These views will only be visible if MITX_FEATURES['ENABLE_HINTER_INSTRUCTOR_VIEW'] = True
+These views will only be visible if FEATURES['ENABLE_HINTER_INSTRUCTOR_VIEW'] = True
 """
 
 import json

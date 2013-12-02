@@ -166,7 +166,7 @@ class TextbooksTestCase(TestCase):
         self.textbook_1 = 'textbook/1'
         self.prohibited_page = 'you_shouldnt_be_seein_this'
 
-    @override_settings(MITX_FEATURES={'ENABLE_TEXTBOOK': True})
+    @override_settings(FEATURES={'ENABLE_TEXTBOOK': True})
     def test_textbooks1(self):
 
         tab_list = tab_constructor(
@@ -211,7 +211,7 @@ class TextbooksTestCase(TestCase):
         )
         self.assertEqual(tab_list[1].is_active, False)
 
-    @override_settings(MITX_FEATURES={'ENABLE_TEXTBOOK': False})
+    @override_settings(FEATURES={'ENABLE_TEXTBOOK': False})
     def test_textbooks0(self):
 
         tab_list = tab_constructor(
@@ -304,34 +304,34 @@ class DiscussionLinkTestCase(ModuleStoreTestCase):
                 return None
         return patch("courseware.tabs.reverse", patched_reverse)
 
-    @patch.dict("django.conf.settings.MITX_FEATURES", {"ENABLE_DISCUSSION_SERVICE": False})
+    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": False})
     def test_explicit_discussion_link(self):
         """Test that setting discussion_link overrides everything else"""
         course = CourseFactory.create(discussion_link="other_discussion_link", tabs=self.tabs_with_discussion)
         self.assertEqual(tabs.get_discussion_link(course), "other_discussion_link")
 
-    @patch.dict("django.conf.settings.MITX_FEATURES", {"ENABLE_DISCUSSION_SERVICE": False})
+    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": False})
     def test_discussions_disabled(self):
         """Test that other cases return None with discussions disabled"""
         for i, t in enumerate([None, self.tabs_with_discussion, self.tabs_without_discussion]):
             course = CourseFactory.create(tabs=t, number=str(i))
             self.assertEqual(tabs.get_discussion_link(course), None)
 
-    @patch.dict("django.conf.settings.MITX_FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def test_no_tabs(self):
         """Test a course without tabs configured"""
         course = CourseFactory.create(tabs=None)
         with self._patch_reverse(course):
             self.assertEqual(tabs.get_discussion_link(course), "default_discussion_link")
 
-    @patch.dict("django.conf.settings.MITX_FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def test_tabs_with_discussion(self):
         """Test a course with a discussion tab configured"""
         course = CourseFactory.create(tabs=self.tabs_with_discussion)
         with self._patch_reverse(course):
             self.assertEqual(tabs.get_discussion_link(course), "default_discussion_link")
 
-    @patch.dict("django.conf.settings.MITX_FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def test_tabs_without_discussion(self):
         """Test a course with tabs configured but without a discussion tab"""
         course = CourseFactory.create(tabs=self.tabs_without_discussion)

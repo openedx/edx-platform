@@ -56,7 +56,7 @@ def instructor_dashboard_2(request, course_id):
     ]
 
     # Gate access to course email by feature flag & by course-specific authorization
-    if settings.MITX_FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and \
+    if settings.FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and \
        is_studio_course and CourseAuthorization.instructor_email_enabled(course_id):
         sections.append(_section_send_email(course_id, access, course))
 
@@ -66,7 +66,7 @@ def instructor_dashboard_2(request, course_id):
 
     enrollment_count = sections[0]['enrollment_count']
     disable_buttons = False
-    max_enrollment_for_buttons = settings.MITX_FEATURES.get("MAX_ENROLLMENT_INSTR_BUTTONS")
+    max_enrollment_for_buttons = settings.FEATURES.get("MAX_ENROLLMENT_INSTR_BUTTONS")
     if max_enrollment_for_buttons is not None:
         disable_buttons = enrollment_count > max_enrollment_for_buttons
 

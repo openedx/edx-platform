@@ -5,7 +5,7 @@
   from courseware.access import has_access
   from django.conf import settings
 
-  if settings.MITX_FEATURES.get('ENABLE_SHOPPING_CART'):
+  if settings.FEATURES.get('ENABLE_SHOPPING_CART'):
       cart_link = reverse('shoppingcart.views.show_cart')
   else:
       cart_link = ""
@@ -31,7 +31,7 @@
       event.preventDefault();
     });
 
-    % if settings.MITX_FEATURES.get('ENABLE_SHOPPING_CART') and settings.MITX_FEATURES.get('ENABLE_PAID_COURSE_REGISTRATION'):
+    % if settings.FEATURES.get('ENABLE_SHOPPING_CART') and settings.FEATURES.get('ENABLE_PAID_COURSE_REGISTRATION'):
       add_course_complete_handler = function(jqXHR, textStatus) {
         if (jqXHR.status == 200) {
           location.href = "${cart_link}";
@@ -57,7 +57,7 @@
     % endif
 
     ## making the conditional around this entire JS block for sanity
-    %if settings.MITX_FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
+    %if settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
     $('#class_enroll_form').on('ajax:complete', function(event, xhr) {
       if(xhr.status == 200) {
         location.href = "${reverse('dashboard')}";
@@ -135,7 +135,7 @@
           <span class="add-to-cart">
             ${_('This course is in your <a href="{cart_link}">cart</a>.').format(cart_link=cart_link)}
           </span>
-        %elif settings.MITX_FEATURES.get('ENABLE_PAID_COURSE_REGISTRATION') and registration_price:
+        %elif settings.FEATURES.get('ENABLE_PAID_COURSE_REGISTRATION') and registration_price:
           <%
           if user.is_authenticated():
             reg_href = "#"
