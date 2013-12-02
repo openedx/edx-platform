@@ -20,7 +20,6 @@ USE_I18N = True
 LANGUAGES = ( ('es_419', 'Spanish'), ('eo', 'Esperanto') )
 TIME_ZONE = 'America/Guayaquil'
 LANGUAGE_CODE = 'es_419'
-=======
 # For displaying the dummy text, we need to provide a language mapping.
 TEMPLATE_DEBUG = True
 SITE_NAME = "iaen.edu.ec"

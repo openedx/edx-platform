@@ -26,6 +26,7 @@ from django.dispatch import receiver, Signal
 import django.dispatch
 from django.forms import ModelForm, forms
 from django.core.exceptions import ObjectDoesNotExist
+from django.utils.translation import ugettext as _
 
 from course_modes.models import CourseMode
 import lms.lib.comment_client as cc
