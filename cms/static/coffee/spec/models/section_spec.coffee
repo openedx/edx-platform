@@ -1,9 +1,9 @@
-define ["js/models/section", "sinon"], (Section, sinon) ->
+define ["js/models/section", "sinon", "js/utils/module"], (Section, sinon, ModuleUtils) ->
     describe "Section", ->
         describe "basic", ->
             beforeEach ->
                 @model = new Section({
-                    id: 42,
+                    id: 42
                     name: "Life, the Universe, and Everything"
                 })
 
@@ -14,11 +14,10 @@ define ["js/models/section", "sinon"], (Section, sinon) ->
                 expect(@model.get("name")).toEqual("Life, the Universe, and Everything")
 
             it "should have a URL set", ->
-                expect(@model.url).toEqual("/save_item")
+                expect(@model.url()).toEqual(ModuleUtils.getUpdateUrl(42))
 
             it "should serialize to JSON correctly", ->
                 expect(@model.toJSON()).toEqual({
-                id: 42,
                 metadata:
                     {
                     display_name: "Life, the Universe, and Everything"
@@ -30,7 +29,7 @@ define ["js/models/section", "sinon"], (Section, sinon) ->
                 spyOn(Section.prototype, 'showNotification')
                 spyOn(Section.prototype, 'hideNotification')
                 @model = new Section({
-                    id: 42,
+                    id: 42
                     name: "Life, the Universe, and Everything"
                 })
                 @requests = requests = []

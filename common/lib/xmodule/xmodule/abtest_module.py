@@ -45,7 +45,7 @@ class ABTestModule(ABTestFields, XModule):
     """
 
     def __init__(self, *args, **kwargs):
-        XModule.__init__(self, *args, **kwargs)
+        super(ABTestModule, self).__init__(*args, **kwargs)
 
         if self.group is None:
             self.group = group_from_value(

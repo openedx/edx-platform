@@ -46,7 +46,7 @@ class BaseTestXmodule(ModuleStoreTestCase):
     COURSE_DATA = {}
 
     # Data from YAML common/lib/xmodule/xmodule/templates/NAME/default.yaml
-    CATEGORY = ""
+    CATEGORY = "vertical"
     DATA = ''
     MODEL_DATA = {'data': '<some_module></some_module>'}
 

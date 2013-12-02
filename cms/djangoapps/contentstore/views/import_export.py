@@ -14,7 +14,6 @@ from django.conf import settings
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django_future.csrf import ensure_csrf_cookie
-from django.core.urlresolvers import reverse
 from django.core.servers.basehttp import FileWrapper
 from django.core.files.temp import NamedTemporaryFile
 from django.core.exceptions import SuspiciousOperation, PermissionDenied
@@ -140,7 +139,7 @@ def import_handler(request, tag=None, course_id=None, branch=None, version_guid=
                                   "size": size,
                                   "deleteUrl": "",
                                   "deleteType": "",
-                                  "url": location.url_reverse('import/', ''),
+                                  "url": location.url_reverse('import'),
                                   "thumbnailUrl": ""
                               }]
                 })
@@ -252,8 +251,8 @@ def import_handler(request, tag=None, course_id=None, branch=None, version_guid=
         course_module = modulestore().get_item(old_location)
         return render_to_response('import.html', {
             'context_course': course_module,
-            'successful_import_redirect_url': location.url_reverse("course/", ""),
-            'import_status_url': location.url_reverse("import_status/", "fillerName"),
+            'successful_import_redirect_url': location.url_reverse("course"),
+            'import_status_url': location.url_reverse("import_status", "fillerName"),
         })
     else:
         return HttpResponseNotFound()
@@ -313,7 +312,7 @@ def export_handler(request, tag=None, course_id=None, branch=None, version_guid=
     # an _accept URL parameter will be preferred over HTTP_ACCEPT in the header.
     requested_format = request.REQUEST.get('_accept', request.META.get('HTTP_ACCEPT', 'text/html'))
 
-    export_url = location.url_reverse('export/', '') + '?_accept=application/x-tgz'
+    export_url = location.url_reverse('export') + '?_accept=application/x-tgz'
     if 'application/x-tgz' in requested_format:
         name = old_location.name
         export_file = NamedTemporaryFile(prefix=name + '.', suffix=".tar.gz")
@@ -339,16 +338,16 @@ def export_handler(request, tag=None, course_id=None, branch=None, version_guid=
                 # if we have a nested exception, then we'll show the more generic error message
                 pass
 
+            unit_locator = loc_mapper().translate_location(old_location.course_id, parent.location, False, True)
+
             return render_to_response('export.html', {
                 'context_course': course_module,
                 'in_err': True,
                 'raw_err_msg': str(e),
                 'failed_module': failed_item,
                 'unit': unit,
-                'edit_unit_url': reverse('edit_unit', kwargs={
-                    'location': parent.location
-                }) if parent else '',
-                'course_home_url': location.url_reverse("course/", ""),
+                'edit_unit_url': unit_locator.url_reverse("unit") if parent else "",
+                'course_home_url': location.url_reverse("course"),
                 'export_url': export_url
 
             })
@@ -359,7 +358,7 @@ def export_handler(request, tag=None, course_id=None, branch=None, version_guid=
                 'in_err': True,
                 'unit': None,
                 'raw_err_msg': str(e),
-                'course_home_url': location.url_reverse("course/", ""),
+                'course_home_url': location.url_reverse("course"),
                 'export_url': export_url
             })
 

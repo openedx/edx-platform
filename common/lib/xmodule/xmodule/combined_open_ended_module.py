@@ -412,7 +412,7 @@ class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):
         See DEFAULT_DATA for a sample.
 
         """
-        XModule.__init__(self, *args, **kwargs)
+        super(CombinedOpenEndedModule, self).__init__(*args, **kwargs)
 
         self.system.set('location', self.location)
 

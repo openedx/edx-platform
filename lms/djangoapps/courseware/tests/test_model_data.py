@@ -40,11 +40,14 @@ def mock_descriptor(fields=[]):
 location = partial(Location, 'i4x', 'edX', 'test_course', 'problem')
 course_id = 'edX/test_course/test'
 
+# The user ids here are 1 because we make a student in the setUp functions, and
+# they get an id of 1.  There's an assertion in setUp to ensure that assumption
+# is still true.
 user_state_summary_key = partial(DjangoKeyValueStore.Key, Scope.user_state_summary, None, location('def_id'))
 settings_key = partial(DjangoKeyValueStore.Key, Scope.settings, None, location('def_id'))
-user_state_key = partial(DjangoKeyValueStore.Key, Scope.user_state, 'user', location('def_id'))
-prefs_key = partial(DjangoKeyValueStore.Key, Scope.preferences, 'user', 'MockProblemModule')
-user_info_key = partial(DjangoKeyValueStore.Key, Scope.user_info, 'user', None)
+user_state_key = partial(DjangoKeyValueStore.Key, Scope.user_state, 1, location('def_id'))
+prefs_key = partial(DjangoKeyValueStore.Key, Scope.preferences, 1, 'MockProblemModule')
+user_info_key = partial(DjangoKeyValueStore.Key, Scope.user_info, 1, None)
 
 
 class StudentModuleFactory(cmfStudentModuleFactory):
@@ -76,6 +79,7 @@ class TestStudentModuleStorage(TestCase):
     def setUp(self):
         student_module = StudentModuleFactory(state=json.dumps({'a_field': 'a_value', 'b_field': 'b_value'}))
         self.user = student_module.student
+        self.assertEqual(self.user.id, 1)   # check our assumption hard-coded in the key functions above.
         self.field_data_cache = FieldDataCache([mock_descriptor([mock_field(Scope.user_state, 'a_field')])], course_id, self.user)
         self.kvs = DjangoKeyValueStore(self.field_data_cache)
 
@@ -152,6 +156,7 @@ class TestStudentModuleStorage(TestCase):
 class TestMissingStudentModule(TestCase):
     def setUp(self):
         self.user = UserFactory.create(username='user')
+        self.assertEqual(self.user.id, 1)   # check our assumption hard-coded in the key functions above.
         self.field_data_cache = FieldDataCache([mock_descriptor()], course_id, self.user)
         self.kvs = DjangoKeyValueStore(self.field_data_cache)
 

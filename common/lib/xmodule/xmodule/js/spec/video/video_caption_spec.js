@@ -456,7 +456,7 @@
                     expect(videoCaption.currentIndex).toEqual(5);
                 });
 
-                // Disabled 10/25/13 due to flakiness in master
+                // Disabled 11/25/13 due to flakiness in master
                 xit('scroll caption to new position', function () {
                     expect($.fn.scrollTo).toHaveBeenCalled();
                 });
@@ -537,7 +537,7 @@
             });
         });
 
-        // Disabled 10/23/13 due to flakiness in master
+        // Disabled 11/25/13 due to flakiness in master
         xdescribe('scrollCaption', function () {
             beforeEach(function () {
                 initialize();
@@ -682,7 +682,7 @@
                         .toHaveAttr('title', 'Turn off captions');
                 });
 
-                // Test turned off due to flakiness (30.10.2013).
+                // Test turned off due to flakiness (11/25/13)
                 xit('scroll the caption', function () {
                     // After transcripts are shown, and the video plays for a
                     // bit.

@@ -40,10 +40,9 @@ from mitxmako.shortcuts import render_to_response, render_to_string
 
 from course_modes.models import CourseMode
 from student.models import (
-    Registration, UserProfile, TestCenterUser, TestCenterUserForm,
-    TestCenterRegistration, TestCenterRegistrationForm, PendingNameChange,
+    Registration, UserProfile, PendingNameChange,
     PendingEmailChange, CourseEnrollment, unique_id_for_user,
-    get_testcenter_registration, CourseEnrollmentAllowed, UserStanding,
+    CourseEnrollmentAllowed, UserStanding,
 )
 from student.forms import PasswordResetFormNoActive
 from student.validators import validate_cedula
@@ -187,7 +186,8 @@ def _cert_info(user, course, cert_status):
     default_info = {'status': default_status,
                     'show_disabled_download_button': False,
                     'show_download_url': False,
-                    'show_survey_button': False}
+                    'show_survey_button': False,
+                    }
 
     if cert_status is None:
         return default_info
@@ -205,7 +205,8 @@ def _cert_info(user, course, cert_status):
 
     d = {'status': status,
          'show_download_url': status == 'ready',
-         'show_disabled_download_button': status == 'generating', }
+         'show_disabled_download_button': status == 'generating',
+         'mode': cert_status.get('mode', None)}
 
     if (status in ('generating', 'ready', 'notpassing', 'restricted') and
             course.end_of_course_survey_url is not None):
@@ -298,7 +299,7 @@ def complete_course_mode_info(course_id, enrollment):
 def dashboard(request):
     user = request.user
 
-    # Build our (course, enorllment) list for the user, but ignore any courses that no 
+    # Build our (course, enrollment) list for the user, but ignore any courses that no
     # longer exist (because the course IDs have changed). Still, we don't delete those
     # enrollments, because it could have been a data push snafu.
     course_enrollment_pairs = []
@@ -978,172 +979,6 @@ def create_account(request, post_override=None):
     return response
 
 
-def exam_registration_info(user, course):
-    """ Returns a Registration object if the user is currently registered for a current
-    exam of the course.  Returns None if the user is not registered, or if there is no
-    current exam for the course.
-    """
-    exam_info = course.current_test_center_exam
-    if exam_info is None:
-        return None
-
-    exam_code = exam_info.exam_series_code
-    registrations = get_testcenter_registration(user, course.id, exam_code)
-    if registrations:
-        registration = registrations[0]
-    else:
-        registration = None
-    return registration
-
-
-@login_required
-@ensure_csrf_cookie
-def begin_exam_registration(request, course_id):
-    """ Handles request to register the user for the current
-    test center exam of the specified course.  Called by form
-    in dashboard.html.
-    """
-    user = request.user
-
-    try:
-        course = course_from_id(course_id)
-    except ItemNotFoundError:
-        log.error("User {0} enrolled in non-existent course {1}".format(user.username, course_id))
-        raise Http404
-
-    # get the exam to be registered for:
-    # (For now, we just assume there is one at most.)
-    # if there is no exam now (because someone bookmarked this stupid page),
-    # then return a 404:
-    exam_info = course.current_test_center_exam
-    if exam_info is None:
-        raise Http404
-
-    # determine if the user is registered for this course:
-    registration = exam_registration_info(user, course)
-
-    # we want to populate the registration page with the relevant information,
-    # if it already exists.  Create an empty object otherwise.
-    try:
-        testcenteruser = TestCenterUser.objects.get(user=user)
-    except TestCenterUser.DoesNotExist:
-        testcenteruser = TestCenterUser()
-        testcenteruser.user = user
-
-    context = {'course': course,
-               'user': user,
-               'testcenteruser': testcenteruser,
-               'registration': registration,
-               'exam_info': exam_info,
-               }
-
-    return render_to_response('test_center_register.html', context)
-
-
-@ensure_csrf_cookie
-def create_exam_registration(request, post_override=None):
-    """
-    JSON call to create a test center exam registration.
-    Called by form in test_center_register.html
-    """
-    post_vars = post_override if post_override else request.POST
-
-    # first determine if we need to create a new TestCenterUser, or if we are making any update
-    # to an existing TestCenterUser.
-    username = post_vars['username']
-    user = User.objects.get(username=username)
-    course_id = post_vars['course_id']
-    course = course_from_id(course_id)  # assume it will be found....
-
-    # make sure that any demographic data values received from the page have been stripped.
-    # Whitespace is not an acceptable response for any of these values
-    demographic_data = {}
-    for fieldname in TestCenterUser.user_provided_fields():
-        if fieldname in post_vars:
-            demographic_data[fieldname] = (post_vars[fieldname]).strip()
-    try:
-        testcenter_user = TestCenterUser.objects.get(user=user)
-        needs_updating = testcenter_user.needs_update(demographic_data)
-        log.info("User {0} enrolled in course {1} {2}updating demographic info for exam registration".format(user.username, course_id, "" if needs_updating else "not "))
-    except TestCenterUser.DoesNotExist:
-        # do additional initialization here:
-        testcenter_user = TestCenterUser.create(user)
-        needs_updating = True
-        log.info("User {0} enrolled in course {1} creating demographic info for exam registration".format(user.username, course_id))
-
-    # perform validation:
-    if needs_updating:
-        # first perform validation on the user information
-        # using a Django Form.
-        form = TestCenterUserForm(instance=testcenter_user, data=demographic_data)
-        if form.is_valid():
-            form.update_and_save()
-        else:
-            response_data = {'success': False}
-            # return a list of errors...
-            response_data['field_errors'] = form.errors
-            response_data['non_field_errors'] = form.non_field_errors()
-            return HttpResponse(json.dumps(response_data), mimetype="application/json")
-
-    # create and save the registration:
-    needs_saving = False
-    exam = course.current_test_center_exam
-    exam_code = exam.exam_series_code
-    registrations = get_testcenter_registration(user, course_id, exam_code)
-    if registrations:
-        registration = registrations[0]
-        # NOTE: we do not bother to check here to see if the registration has changed,
-        # because at the moment there is no way for a user to change anything about their
-        # registration.  They only provide an optional accommodation request once, and
-        # cannot make changes to it thereafter.
-        # It is possible that the exam_info content has been changed, such as the
-        # scheduled exam dates, but those kinds of changes should not be handled through
-        # this registration screen.
-
-    else:
-        accommodation_request = post_vars.get('accommodation_request', '')
-        registration = TestCenterRegistration.create(testcenter_user, exam, accommodation_request)
-        needs_saving = True
-        log.info("User {0} enrolled in course {1} creating new exam registration".format(user.username, course_id))
-
-    if needs_saving:
-        # do validation of registration.  (Mainly whether an accommodation request is too long.)
-        form = TestCenterRegistrationForm(instance=registration, data=post_vars)
-        if form.is_valid():
-            form.update_and_save()
-        else:
-            response_data = {'success': False}
-            # return a list of errors...
-            response_data['field_errors'] = form.errors
-            response_data['non_field_errors'] = form.non_field_errors()
-            return HttpResponse(json.dumps(response_data), mimetype="application/json")
-
-    # only do the following if there is accommodation text to send,
-    # and a destination to which to send it.
-    # TODO: still need to create the accommodation email templates
-#    if 'accommodation_request' in post_vars and 'TESTCENTER_ACCOMMODATION_REQUEST_EMAIL' in settings:
-#        d = {'accommodation_request': post_vars['accommodation_request'] }
-#
-#        # composes accommodation email
-#        subject = render_to_string('emails/accommodation_email_subject.txt', d)
-#        # Email subject *must not* contain newlines
-#        subject = ''.join(subject.splitlines())
-#        message = render_to_string('emails/accommodation_email.txt', d)
-#
-#        try:
-#            dest_addr = settings['TESTCENTER_ACCOMMODATION_REQUEST_EMAIL']
-#            from_addr = user.email
-#            send_mail(subject, message, from_addr, [dest_addr], fail_silently=False)
-#        except:
-#            log.exception(sys.exc_info())
-#            response_data = {'success': False}
-#            response_data['non_field_errors'] =  [ 'Could not send accommodation e-mail.', ]
-#            return HttpResponse(json.dumps(response_data), mimetype="application/json")
-
-    js = {'success': True}
-    return HttpResponse(json.dumps(js), mimetype="application/json")
-
-
 def auto_auth(request):
     """
     Automatically logs the user in with a generated random credentials
@@ -1243,11 +1078,8 @@ def password_reset(request):
                   from_email=settings.DEFAULT_FROM_EMAIL,
                   request=request,
                   domain_override=request.get_host())
-        return HttpResponse(json.dumps({'success': True,
+    return HttpResponse(json.dumps({'success': True,
                                         'value': render_to_string('registration/password_reset_done.html', {})}))
-    else:
-        return HttpResponse(json.dumps({'success': False,
-                                        'error': _('Invalid e-mail or user')}))
 
 
 def password_reset_confirm_wrapper(
