@@ -1,4 +1,3 @@
-import re
 from django.conf import settings
 from django.conf.urls import patterns, include, url
 
@@ -16,9 +15,6 @@ urlpatterns = patterns('',  # nopep8
     url(r'^edit/(?P<location>.*?)$', 'contentstore.views.edit_unit', name='edit_unit'),
     url(r'^subsection/(?P<location>.*?)$', 'contentstore.views.edit_subsection', name='edit_subsection'),
     url(r'^preview_component/(?P<location>.*?)$', 'contentstore.views.preview_component', name='preview_component'),
-    url(r'^save_item$', 'contentstore.views.save_item', name='save_item'),
-    url(r'^delete_item$', 'contentstore.views.delete_item', name='delete_item'),
-    url(r'^create_item$', 'contentstore.views.create_item', name='create_item'),
 
     url(r'^transcripts/upload$', 'contentstore.views.upload_transcripts', name='upload_transcripts'),
     url(r'^transcripts/download$', 'contentstore.views.download_transcripts', name='download_transcripts'),
@@ -33,13 +29,9 @@ urlpatterns = patterns('',  # nopep8
     url(r'^unpublish_unit$', 'contentstore.views.unpublish_unit', name='unpublish_unit'),
     url(r'^reorder_static_tabs', 'contentstore.views.reorder_static_tabs', name='reorder_static_tabs'),
 
-    url(r'^preview/modx/(?P<preview_id>[^/]*)/(?P<location>.*?)/(?P<dispatch>[^/]*)$',
-        'contentstore.views.preview_dispatch', name='preview_dispatch'),
+    url(r'^preview/xblock/(?P<usage_id>.*?)/handler/(?P<handler>[^/]*)(?:/(?P<suffix>[^/]*))?$',
+        'contentstore.views.preview_handler', name='preview_handler'),
 
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/info/(?P<name>[^/]+)$',
-        'contentstore.views.course_info', name='course_info'),
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/course_info/updates/(?P<provided_id>.*)$',
-        'contentstore.views.course_info_updates', name='course_info_json'),
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/settings-details/(?P<name>[^/]+)$',
         'contentstore.views.get_course_settings', name='settings_details'),
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/settings-grading/(?P<name>[^/]+)$',
@@ -67,11 +59,6 @@ urlpatterns = patterns('',  # nopep8
         'contentstore.views.create_textbook', name='create_textbook'),
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/textbooks/(?P<name>[^/]+)/(?P<tid>\d[^/]*)$',
         'contentstore.views.textbook_by_id', name='textbook_by_id'),
-
-    # this is a generic method to return the data/metadata associated with a xmodule
-    url(r'^module_info/(?P<module_location>.*)$',
-        'contentstore.views.module_info', name='module_info'),
-
 
     # temporary landing page for a course
     url(r'^edge/(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)$',
@@ -114,13 +101,19 @@ urlpatterns += patterns(
     url(r'^request_course_creator$', 'request_course_creator'),
     # (?ix) == ignore case and verbose (multiline regex)
     url(r'(?ix)^course_team/{}(/)?(?P<email>.+)?$'.format(parsers.URL_RE_SOURCE), 'course_team_handler'),
+    url(r'(?ix)^course_info/{}$'.format(parsers.URL_RE_SOURCE), 'course_info_handler'),
+    url(
+        r'(?ix)^course_info_update/{}(/)?(?P<provided_id>\d+)?$'.format(parsers.URL_RE_SOURCE),
+        'course_info_update_handler'
+        ),
     url(r'(?ix)^course($|/){}$'.format(parsers.URL_RE_SOURCE), 'course_handler'),
     url(r'(?ix)^checklists/{}(/)?(?P<checklist_index>\d+)?$'.format(parsers.URL_RE_SOURCE), 'checklists_handler'),
-    url(r'(?ix)^orphan/{}$'.format(parsers.URL_RE_SOURCE), 'orphan'),
+    url(r'(?ix)^orphan/{}$'.format(parsers.URL_RE_SOURCE), 'orphan_handler'),
     url(r'(?ix)^assets/{}(/)?(?P<asset_id>.+)?$'.format(parsers.URL_RE_SOURCE), 'assets_handler'),
     url(r'(?ix)^import/{}$'.format(parsers.URL_RE_SOURCE), 'import_handler'),
     url(r'(?ix)^import_status/{}/(?P<filename>.+)$'.format(parsers.URL_RE_SOURCE), 'import_status_handler'),
     url(r'(?ix)^export/{}$'.format(parsers.URL_RE_SOURCE), 'export_handler'),
+    url(r'(?ix)^xblock($|/){}$'.format(parsers.URL_RE_SOURCE), 'xblock_handler'),
 )
 
 js_info_dict = {

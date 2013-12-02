@@ -54,8 +54,8 @@ from xmodule.html_module import AboutDescriptor
 from xmodule.modulestore.locator import BlockUsageLocator
 from course_creators.views import get_course_creator_status, add_user_with_status_unrequested
 
-__all__ = ['course_info', 'course_handler',
-           'course_info_updates', 'get_course_settings',
+__all__ = ['course_info_handler', 'course_handler', 'course_info_update_handler',
+           'get_course_settings',
            'course_config_graders_page',
            'course_config_advanced_page',
            'course_settings_updates',
@@ -64,6 +64,7 @@ __all__ = ['course_info', 'course_handler',
            'create_textbook']
 
 
+# pylint: disable=unused-argument
 @login_required
 def course_handler(request, tag=None, course_id=None, branch=None, version_guid=None, block=None):
     """
@@ -191,7 +192,9 @@ def course_index(request, course_id, branch, version_guid, block):
         'course_graders': json.dumps(
             CourseGradingModel.fetch(course.location).graders
         ),
+        # This is used by course grader, which has not yet been updated.
         'parent_location': course.location,
+        'parent_locator': location,
         'new_section_category': 'chapter',
         'new_subsection_category': 'sequential',
         'new_unit_category': 'vertical',
@@ -299,61 +302,80 @@ def create_new_course(request):
     return JsonResponse({'url': new_location.url_reverse("course/", "")})
 
 
+# pylint: disable=unused-argument
 @login_required
 @ensure_csrf_cookie
-def course_info(request, org, course, name, provided_id=None):
+@require_http_methods(["GET"])
+def course_info_handler(request, tag=None, course_id=None, branch=None, version_guid=None, block=None):
     """
-    Send models and views as well as html for editing the course info to the
-    client.
-
-    org, course, name: Attributes of the Location for the item to edit
+    GET
+        html: return html for editing the course info handouts and updates.
     """
-    location = get_location_and_verify_access(request, org, course, name)
+    course_location = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
+    course_old_location = loc_mapper().translate_locator_to_location(course_location)
+    if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
+        if not has_access(request.user, course_location):
+            raise PermissionDenied()
 
-    course_module = modulestore().get_item(location)
+        course_module = modulestore().get_item(course_old_location)
 
-    # get current updates
-    location = Location(['i4x', org, course, 'course_info', "updates"])
+        handouts_old_location = course_old_location.replace(category='course_info', name='handouts')
+        handouts_locator = loc_mapper().translate_location(
+            course_old_location.course_id, handouts_old_location, False, True
+        )
 
-    return render_to_response(
-        'course_info.html',
-        {
-            'context_course': course_module,
-            'url_base': "/" + org + "/" + course + "/",
-            'course_updates': json.dumps(get_course_updates(location)),
-            'handouts_location': Location(['i4x', org, course, 'course_info', 'handouts']).url(),
-            'base_asset_url': StaticContent.get_base_url_path_for_course_assets(location) + '/'
-        }
-    )
+        update_location = course_old_location.replace(category='course_info', name='updates')
+        update_locator = loc_mapper().translate_location(
+            course_old_location.course_id, update_location, False, True
+        )
 
-@expect_json
+        return render_to_response(
+            'course_info.html',
+            {
+                'context_course': course_module,
+                'updates_url': update_locator.url_reverse('course_info_update/'),
+                'handouts_locator': handouts_locator,
+                'base_asset_url': StaticContent.get_base_url_path_for_course_assets(course_old_location) + '/'
+            }
+        )
+    else:
+        return HttpResponseBadRequest("Only supports html requests")
+
+
+# pylint: disable=unused-argument
+@login_required
+@ensure_csrf_cookie
 @require_http_methods(("GET", "POST", "PUT", "DELETE"))
-@login_required
-@ensure_csrf_cookie
-def course_info_updates(request, org, course, provided_id=None):
+@expect_json
+def course_info_update_handler(
+    request, tag=None, course_id=None, branch=None, version_guid=None, block=None, provided_id=None
+    ):
     """
     restful CRUD operations on course_info updates.
-
-    org, course: Attributes of the Location for the item to edit
-    provided_id should be none if it's new (create) and a composite of the
-    update db id + index otherwise.
+    provided_id should be none if it's new (create) and index otherwise.
+    GET
+        json: return the course info update models
+    POST
+        json: create an update
+    PUT or DELETE
+        json: change an existing update
     """
-    # ??? No way to check for access permission afaik
-    # get current updates
-    location = ['i4x', org, course, 'course_info', "updates"]
-
+    if 'application/json' not in request.META.get('HTTP_ACCEPT', 'application/json'):
+        return HttpResponseBadRequest("Only supports json requests")
+    updates_locator = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
+    updates_location = loc_mapper().translate_locator_to_location(updates_locator)
     if provided_id == '':
         provided_id = None
 
-    # check that logged in user has permissions to this item
-    if not has_access(request.user, location):
+    # check that logged in user has permissions to this item (GET shouldn't require this level?)
+    if not has_access(request.user, updates_location):
         raise PermissionDenied()
 
     if request.method == 'GET':
-        return JsonResponse(get_course_updates(location))
+        return JsonResponse(get_course_updates(updates_location, provided_id))
     elif request.method == 'DELETE':
         try:
-            return JsonResponse(delete_course_update(location, request.json, provided_id))
+            return JsonResponse(delete_course_update(updates_location, request.json, provided_id))
         except:
             return HttpResponseBadRequest(
                 "Failed to delete",
@@ -362,7 +384,7 @@ def course_info_updates(request, org, course, provided_id=None):
     # can be either and sometimes django is rewriting one to the other:
     elif request.method in ('POST', 'PUT'):
         try:
-            return JsonResponse(update_course_updates(location, request.json, provided_id))
+            return JsonResponse(update_course_updates(updates_location, request.json, provided_id))
         except:
             return HttpResponseBadRequest(
                 "Failed to save",

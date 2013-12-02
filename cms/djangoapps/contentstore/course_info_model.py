@@ -1,20 +1,20 @@
+import re
+import logging
+from lxml import html, etree
+from django.http import HttpResponseBadRequest
+import django.utils
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.django import modulestore
-from lxml import html, etree
-import re
-from django.http import HttpResponseBadRequest
-import logging
-import django.utils
 
 # # TODO store as array of { date, content } and override  course_info_module.definition_from_xml
 # # This should be in a class which inherits from XmlDescriptor
 log = logging.getLogger(__name__)
 
 
-def get_course_updates(location):
+def get_course_updates(location, provided_id):
     """
     Retrieve the relevant course_info updates and unpack into the model which the client expects:
-    [{id : location.url() + idx to make unique, date : string, content : html string}]
+    [{id : index, date : string, content : html string}]
     """
     try:
         course_updates = modulestore('direct').get_item(location)
@@ -35,15 +35,23 @@ def get_course_updates(location):
 
     # Confirm that root is <ol>, iterate over <li>, pull out <h2> subs and then rest of val
     course_upd_collection = []
+    provided_id = get_idx(provided_id) if provided_id is not None else None
     if course_html_parsed.tag == 'ol':
         # 0 is the newest
         for idx, update in enumerate(course_html_parsed):
             if len(update) > 0:
                 content = _course_info_content(update)
                 # make the id on the client be 1..len w/ 1 being the oldest and len being the newest
-                course_upd_collection.append({"id": location_base + "/" + str(len(course_html_parsed) - idx),
-                                              "date": update.findtext("h2"),
-                                              "content": content})
+                computed_id = len(course_html_parsed) - idx
+                payload = {
+                    "id": computed_id,
+                    "date": update.findtext("h2"),
+                    "content": content
+                }
+                if provided_id is None:
+                    course_upd_collection.append(payload)
+                elif provided_id == computed_id:
+                    return payload
 
     return course_upd_collection
 
@@ -57,7 +65,8 @@ def update_course_updates(location, update, passed_id=None):
     try:
         course_updates = modulestore('direct').get_item(location)
     except ItemNotFoundError:
-        return HttpResponseBadRequest()
+        modulestore('direct').create_and_save_xmodule(location)
+        course_updates = modulestore('direct').get_item(location)
 
     # purely to handle free formed updates not done via editor. Actually kills them, but at least doesn't break.
     try:
@@ -89,17 +98,17 @@ def update_course_updates(location, update, passed_id=None):
         course_html_parsed[-idx] = new_html_parsed
     else:
         course_html_parsed.insert(0, new_html_parsed)
-
         idx = len(course_html_parsed)
-        passed_id = course_updates.location.url() + "/" + str(idx)
 
     # update db record
     course_updates.data = html.tostring(course_html_parsed)
     modulestore('direct').update_item(location, course_updates.data)
 
-    return {"id": passed_id,
-            "date": update['date'],
-            "content": _course_info_content(new_html_parsed)}
+    return {
+        "id": idx,
+        "date": update['date'],
+        "content": _course_info_content(new_html_parsed),
+    }
 
 
 def _course_info_content(html_parsed):
@@ -115,6 +124,7 @@ def _course_info_content(html_parsed):
     return content
 
 
+# pylint: disable=unused-argument
 def delete_course_update(location, update, passed_id):
     """
     Delete the given course_info update from the db.
@@ -150,7 +160,7 @@ def delete_course_update(location, update, passed_id):
         store = modulestore('direct')
         store.update_item(location, course_updates.data)
 
-    return get_course_updates(location)
+    return get_course_updates(location, None)
 
 
 def get_idx(passed_id):
@@ -160,3 +170,5 @@ def get_idx(passed_id):
     idx_matcher = re.search(r'.*?/?(\d+)$', passed_id)
     if idx_matcher:
         return int(idx_matcher.group(1))
+    else:
+        return None

@@ -5,6 +5,39 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+LMS: Add feature for providing background grade report generation via Celery
+  instructor task, with reports uploaded to S3. Feature is visible on the beta
+  instructor dashboard. LMS-58
+
+Blades: Added grading support for LTI module. LTI providers can now grade
+student's work and send edX scores. OAuth1 based authentication
+implemented. BLD-384.
+
+LMS: Beta-tester status is now set on a per-course-run basis, rather than being valid
+  across all runs with the same course name. Old group membership will still work
+  across runs, but new beta-testers will only be added to a single course run.
+
+LMS: Add a user-visible alert modal when a forums AJAX request fails.
+
+Blades: Add template for checkboxes response to studio. BLD-193.
+
+Blades: Video player:
+  - Add spinner;
+  - Improve initialization of modules;
+  - Speed up video resizing during page loading;
+  - Speed up acceptance tests. (BLD-502)
+  - Fix transcripts bug - when show_captions is set to false. BLD-467.
+
+Studio: change create_item, delete_item, and save_item to RESTful API (STUD-847).
+
+Blades: Fix answer choices rearranging if user tries to stylize something in the
+text like with bold or italics. (BLD-449)
+
+LMS: Beta instructor dashboard will only count actively enrolled students for
+course enrollment numbers.
+
+Blades: Fix speed menu that is not rendered correctly when YouTube is unavailable. (BLD-457).
+
 LMS: Users with is_staff=True no longer have the STAFF label appear on
 their forum posts.
 

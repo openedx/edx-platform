@@ -12,14 +12,18 @@ define(
 'video/06_video_progress_slider.js',
 [],
 function () {
-
     // VideoProgressSlider() function - what this module "exports".
     return function (state) {
+        var dfd = $.Deferred();
+
         state.videoProgressSlider = {};
 
         _makeFunctionsPublic(state);
         _renderElements(state);
         // No callbacks to DOM events (click, mousemove, etc.).
+
+        dfd.resolve();
+        return dfd.promise();
     };
 
     // ***************************************************************
@@ -33,6 +37,7 @@ function () {
     function _makeFunctionsPublic(state) {
         var methodsDict = {
             buildSlider: buildSlider,
+            getRangeParams: getRangeParams,
             onSlide: onSlide,
             onStop: onStop,
             updatePlayTime: updatePlayTime,
@@ -47,7 +52,7 @@ function () {
     //     Create any necessary DOM elements, attach them, and set their
     //     initial configuration. Also make the created DOM elements available
     //     via the 'state' object. Much easier to work this way - you don't
-    // have to do repeated jQuery element selects.
+    //     have to do repeated jQuery element selects.
     function _renderElements(state) {
         if (!onTouchBasedDevice()) {
             state.videoProgressSlider.el = state.videoControl.sliderEl;
@@ -96,7 +101,7 @@ function () {
     }
 
     function updateStartEndTimeRegion(params) {
-        var left, width, start, end, step, duration;
+        var left, width, start, end, duration, rangeParams;
 
         // We must have a duration in order to determine the area of range.
         // It also must be non-zero.
@@ -124,9 +129,8 @@ function () {
         //
         // This will ensure that visually, the start-end range aligns nicely
         // with actual starting and ending point of the video.
-        step = 100.0 / duration;
-        left = start * step;
-        width = end * step - left;
+
+        rangeParams = getRangeParams(start, end, duration);
 
         if (!this.videoProgressSlider.sliderRange) {
             this.videoProgressSlider.sliderRange = $('<div />', {
@@ -135,8 +139,8 @@ function () {
                        'ui-corner-all ' +
                        'slider-range'
             }).css({
-                left: left + '%',
-                width: width + '%'
+                left: rangeParams.left,
+                width: rangeParams.width
             });
 
             this.videoProgressSlider.sliderProgress
@@ -144,10 +148,21 @@ function () {
         } else {
             this.videoProgressSlider.sliderRange
                 .css({
-                    left: left + '%',
-                    width: width + '%'
+                    left: rangeParams.left,
+                    width: rangeParams.width
                 });
         }
+    }
+
+    function getRangeParams(startTime, endTime, duration) {
+        var step = 100 / duration,
+            left = startTime * step,
+            width = endTime * step - left;
+
+        return {
+            left: left + '%',
+            width: width + '%'
+        };
     }
 
     function onSlide(event, ui) {

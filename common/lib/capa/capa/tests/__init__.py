@@ -33,9 +33,9 @@ def test_system():
     """
     the_system = Mock(
         spec=ModuleSystem,
+        ajax_url='/dummy-ajax-url',
         STATIC_URL='/dummy-static/',
         DEBUG=True,
-        ajax_url='courses/course_id/modx/a_location',
         track_function=Mock(),
         get_module=Mock(),
         render_template=tst_render_template,

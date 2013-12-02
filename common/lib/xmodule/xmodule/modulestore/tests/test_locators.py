@@ -249,6 +249,16 @@ class LocatorTest(TestCase):
             version_guid=ObjectId(test_id_loc)
         )
 
+    def test_colon_name(self):
+        """
+        It seems we used to use colons in names; so, ensure they're acceptable.
+        """
+        course_id = 'mit.eecs-1'
+        branch = 'foo'
+        usage_id = 'problem:with-colon~2'
+        testobj = BlockUsageLocator(course_id=course_id, branch=branch, usage_id=usage_id)
+        self.check_block_locn_fields(testobj, 'Cannot handle colon', course_id=course_id, branch=branch, block=usage_id)
+
     def test_repr(self):
         testurn = 'mit.eecs.6002x/' + BRANCH_PREFIX + 'published/' + BLOCK_PREFIX + 'HW3'
         testobj = BlockUsageLocator(course_id=testurn)

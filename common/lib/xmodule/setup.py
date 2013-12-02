@@ -39,7 +39,7 @@ XMODULES = [
     "hidden = xmodule.hidden_module:HiddenDescriptor",
     "raw = xmodule.raw_module:RawDescriptor",
     "crowdsource_hinter = xmodule.crowdsource_hinter:CrowdsourceHinterDescriptor",
-    "lti = xmodule.lti_module:LTIModuleDescriptor",
+    "lti = xmodule.lti_module:LTIDescriptor",
 ]
 
 setup(
@@ -51,6 +51,7 @@ setup(
         'docopt',
         'capa',
         'path.py',
+        'webob',
     ],
     package_data={
         'xmodule': ['js/module/*'],

@@ -1,7 +1,7 @@
 define ["jquery", "jquery.ui", "gettext", "backbone",
         "js/views/feedback_notification", "js/views/feedback_prompt",
-        "coffee/src/models/module", "coffee/src/views/module_edit"],
-($, ui, gettext, Backbone, NotificationView, PromptView, ModuleModel, ModuleEditView) ->
+        "coffee/src/views/module_edit", "js/models/module_info"],
+($, ui, gettext, Backbone, NotificationView, PromptView, ModuleEditView, ModuleModel) ->
   class UnitEditView extends Backbone.View
     events:
       'click .new-component .new-component-type a.multiple-templates': 'showComponentTemplates'
@@ -61,11 +61,13 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
       )
 
       @$('.component').each (idx, element) =>
+        model = new ModuleModel
+            id: $(element).data('locator')
+            old_id: $(element).data('id')
         new ModuleEditView
           el: element,
           onDelete: @deleteComponent,
-          model: new ModuleModel
-            id: $(element).data('id')
+          model: model
 
     showComponentTemplates: (event) =>
       event.preventDefault()
@@ -96,7 +98,7 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
       @$newComponentItem.before(editor.$el)
 
       editor.createItem(
-        @$el.data('id'),
+        @$el.data('locator'),
         $(event.currentTarget).data()
       )
 
@@ -107,7 +109,7 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
 
       @closeNewComponent(event)
 
-    components: => @$('.component').map((idx, el) -> $(el).data('id')).get()
+    components: => @$('.component').map((idx, el) -> $(el).data('locator')).get()
 
     wait: (value) =>
       @$('.unit-body').toggleClass("waiting", value)
@@ -134,14 +136,15 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
                 title: gettext('Deleting&hellip;'),
               deleting.show()
               $component = $(event.currentTarget).parents('.component')
-              $.postJSON('/delete_item', {
-                id: $component.data('id')
-              }, =>
+              $.ajax({
+                type: 'DELETE',
+                url: @model.urlRoot + "/" + $component.data('locator')
+              }).success(=>
                 deleting.hide()
                 analytics.track "Deleted a Component",
                   course: course_location_analytics
                   unit_id: unit_location_analytics
-                  id: $component.data('id')
+                  id: $component.data('locator')
 
                 $component.remove()
                 # b/c we don't vigilantly keep children up to date
@@ -162,16 +165,16 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
 
     deleteDraft: (event) ->
       @wait(true)
+      $.ajax({
+          type: 'DELETE',
+          url: @model.urlRoot + "/" + @$el.data('locator') + "?" + $.param({recurse: true})
+      }).success(=>
 
-      $.postJSON('/delete_item', {
-        id: @$el.data('id')
-        delete_children: true
-      }, =>
-        analytics.track "Deleted Draft",
-          course: course_location_analytics
-          unit_id: unit_location_analytics
+          analytics.track "Deleted Draft",
+              course: course_location_analytics
+              unit_id: unit_location_analytics
 
-        window.location.reload()
+          window.location.reload()
       )
 
     createDraft: (event) ->

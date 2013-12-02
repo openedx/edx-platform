@@ -19,6 +19,11 @@ SHOW_ANSWER = "Show Answer"
 @step('I have created a Blank Common Problem$')
 def i_created_blank_common_problem(step):
     world.create_course_with_unit()
+    step.given("I have created another Blank Common Problem")
+
+
+@step('I have created another Blank Common Problem$')
+def i_create_new_common_problem(step):
     world.create_component_instance(
         step=step,
         category='problem',
@@ -216,11 +221,6 @@ def i_go_to_import(_step):
 @step(u'I import the file "([^"]*)"$')
 def i_import_the_file(_step, filename):
     import_file(filename)
-
-
-@step(u'I click on "edit a draft"$')
-def i_edit_a_draft(_step):
-    world.css_click("a.create-draft")
 
 
 @step(u'I go to the vertical "([^"]*)"$')

@@ -284,9 +284,9 @@ def complete_course_mode_info(course_id, enrollment):
     if 'verified' in modes and enrollment.mode != 'verified':
         mode_info['show_upsell'] = True
         # if there is an expiration date, find out how long from now it is
-        if modes['verified'].expiration_date:
+        if modes['verified'].expiration_datetime:
             today = datetime.datetime.now(UTC).date()
-            mode_info['days_for_upsell'] = (modes['verified'].expiration_date - today).days
+            mode_info['days_for_upsell'] = (modes['verified'].expiration_datetime.date() - today).days
 
     return mode_info
 

@@ -3,15 +3,17 @@
 import logging
 from uuid import uuid4
 
+from static_replace import replace_static_urls
+
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
 
-from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore, loc_mapper
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 
 from util.json_request import expect_json, JsonResponse
+from util.string_utils import str_to_bool
 
 from ..transcripts_utils import manage_video_subtitles_save
 
@@ -21,92 +23,144 @@ from .access import has_access
 from .helpers import _xmodule_recurse
 from xmodule.x_module import XModuleDescriptor
 from django.views.decorators.http import require_http_methods
-from xmodule.modulestore.locator import CourseLocator, BlockUsageLocator
+from xmodule.modulestore.locator import BlockUsageLocator
 from student.models import CourseEnrollment
+from django.http import HttpResponseBadRequest
+from xblock.fields import Scope
 
-__all__ = ['save_item', 'create_item', 'delete_item', 'orphan']
+__all__ = ['orphan_handler', 'xblock_handler']
 
 log = logging.getLogger(__name__)
 
 # cdodge: these are categories which should not be parented, they are detached from the hierarchy
 DETACHED_CATEGORIES = ['about', 'static_tab', 'course_info']
 
+CREATE_IF_NOT_FOUND = ['course_info']
 
+
+# pylint: disable=unused-argument
+@require_http_methods(("DELETE", "GET", "PUT", "POST"))
 @login_required
 @expect_json
-def save_item(request):
+def xblock_handler(request, tag=None, course_id=None, branch=None, version_guid=None, block=None):
     """
-    Will carry a json payload with these possible fields
-    :id (required): the id
-    :data (optional): the new value for the data
-    :metadata (optional): new values for the metadata fields.
-        Any whose values are None will be deleted not set to None! Absent ones will be left alone
-    :nullout (optional): which metadata fields to set to None
+    The restful handler for xblock requests.
+
+    DELETE
+        json: delete this xblock instance from the course. Supports query parameters "recurse" to delete
+        all children and "all_versions" to delete from all (mongo) versions.
+    GET
+        json: returns representation of the xblock (locator id, data, and metadata).
+    PUT or POST
+        json: if xblock location is specified, update the xblock instance. The json payload can contain
+              these fields, all optional:
+                :data: the new value for the data.
+                :children: the locator ids of children for this xblock.
+                :metadata: new values for the metadata fields. Any whose values are None will be deleted not set
+                       to None! Absent ones will be left alone.
+                :nullout: which metadata fields to set to None
+              The JSON representation on the updated xblock (minus children) is returned.
+
+              if xblock location is not specified, create a new xblock instance. The json playload can contain
+              these fields:
+                :parent_locator: parent for new xblock, required
+                :category: type of xblock, required
+                :display_name: name for new xblock, optional
+                :boilerplate: template name for populating fields, optional
+              The locator (and old-style id) for the created xblock (minus children) is returned.
     """
-    # The nullout is a bit of a temporary copout until we can make module_edit.coffee and the metadata editors a
-    # little smarter and able to pass something more akin to {unset: [field, field]}
+    if course_id is not None:
+        location = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
+        if not has_access(request.user, location):
+            raise PermissionDenied()
+        old_location = loc_mapper().translate_locator_to_location(location)
 
-    try:
-        item_location = request.json['id']
-    except KeyError:
-        import inspect
+        if request.method == 'GET':
+            rsp = _get_module_info(location)
+            return JsonResponse(rsp)
+        elif request.method == 'DELETE':
+            delete_children = str_to_bool(request.REQUEST.get('recurse', 'False'))
+            delete_all_versions = str_to_bool(request.REQUEST.get('all_versions', 'False'))
 
-        log.exception(
-            '''Request missing required attribute 'id'.
-                Request info:
-                %s
-                Caller:
-                Function %s in file %s
-            ''',
-            request.META,
-            inspect.currentframe().f_back.f_code.co_name,
-            inspect.currentframe().f_back.f_code.co_filename
+            return _delete_item_at_location(old_location, delete_children, delete_all_versions)
+        else:  # Since we have a course_id, we are updating an existing xblock.
+            return _save_item(
+                location,
+                old_location,
+                data=request.json.get('data'),
+                children=request.json.get('children'),
+                metadata=request.json.get('metadata'),
+                nullout=request.json.get('nullout')
+            )
+    elif request.method in ('PUT', 'POST'):
+        return _create_item(request)
+    else:
+        return HttpResponseBadRequest(
+            "Only instance creation is supported without a course_id.",
+            content_type="text/plain"
         )
-        return JsonResponse({"error": "Request missing required attribute 'id'."}, 400)
+
+
+def _save_item(usage_loc, item_location, data=None, children=None, metadata=None, nullout=None):
+    """
+    Saves certain properties (data, children, metadata, nullout) for a given xblock item.
+
+    The item_location is still the old-style location.
+    """
+    store = get_modulestore(item_location)
 
     try:
-        old_item = modulestore().get_item(item_location)
-    except (ItemNotFoundError, InvalidLocationError):
+        existing_item = store.get_item(item_location)
+    except ItemNotFoundError:
+        if item_location.category in CREATE_IF_NOT_FOUND:
+            # New module at this location, for pages that are not pre-created.
+            # Used for course info handouts.
+            store.create_and_save_xmodule(item_location)
+            existing_item = store.get_item(item_location)
+        else:
+            raise
+    except InvalidLocationError:
         log.error("Can't find item by location.")
-        return JsonResponse({"error": "Can't find item by location"}, 404)
+        return JsonResponse({"error": "Can't find item by location: " + str(item_location)}, 404)
 
-    # check permissions for this user within this course
-    if not has_access(request.user, item_location):
-        raise PermissionDenied()
-
-    store = get_modulestore(Location(item_location))
-
-    if request.json.get('data'):
-        data = request.json['data']
+    if data:
         store.update_item(item_location, data)
+    else:
+        data = existing_item.get_explicitly_set_fields_by_scope(Scope.content)
 
-    if request.json.get('children') is not None:
-        children = request.json['children']
-        store.update_children(item_location, children)
+    if children is not None:
+        children_ids = [
+            loc_mapper().translate_locator_to_location(BlockUsageLocator(child_locator)).url()
+            for child_locator
+            in children
+        ]
+        store.update_children(item_location, children_ids)
 
     # cdodge: also commit any metadata which might have been passed along
-    if request.json.get('nullout') is not None or request.json.get('metadata') is not None:
+    if nullout is not None or metadata is not None:
         # the postback is not the complete metadata, as there's system metadata which is
-        # not presented to the end-user for editing. So let's fetch the original and
-        # 'apply' the submitted metadata, so we don't end up deleting system metadata
-        existing_item = modulestore().get_item(item_location)
-        for metadata_key in request.json.get('nullout', []):
-            setattr(existing_item, metadata_key, None)
+        # not presented to the end-user for editing. So let's use the original (existing_item) and
+        # 'apply' the submitted metadata, so we don't end up deleting system metadata.
+        if nullout is not None:
+            for metadata_key in nullout:
+                setattr(existing_item, metadata_key, None)
 
         # update existing metadata with submitted metadata (which can be partial)
         # IMPORTANT NOTE: if the client passed 'null' (None) for a piece of metadata that means 'remove it'. If
         # the intent is to make it None, use the nullout field
-        for metadata_key, value in request.json.get('metadata', {}).items():
-            field = existing_item.fields[metadata_key]
+        if metadata is not None:
+            for metadata_key, value in metadata.items():
+                field = existing_item.fields[metadata_key]
 
-            if value is None:
-                field.delete_from(existing_item)
-            else:
-                try:
-                    value = field.from_json(value)
-                except ValueError:
-                    return JsonResponse({"error": "Invalid data"}, 400)
-                field.write_to(existing_item, value)
+                if value is None:
+                    field.delete_from(existing_item)
+                else:
+                    try:
+                        value = field.from_json(value)
+                    except ValueError:
+                        return JsonResponse({"error": "Invalid data"}, 400)
+                    field.write_to(existing_item, value)
+
         # Save the data that we've just changed to the underlying
         # MongoKeyValueStore before we update the mongo datastore.
         existing_item.save()
@@ -114,16 +168,22 @@ def save_item(request):
         store.update_metadata(item_location, own_metadata(existing_item))
 
         if existing_item.category == 'video':
-            manage_video_subtitles_save(old_item, existing_item)
+            manage_video_subtitles_save(existing_item, existing_item)
 
-    return JsonResponse()
+    # Note that children aren't being returned until we have a use case.
+    return JsonResponse({
+        'id': unicode(usage_loc),
+        'data': data,
+        'metadata': own_metadata(existing_item)
+    })
 
 
 @login_required
 @expect_json
-def create_item(request):
+def _create_item(request):
     """View for create items."""
-    parent_location = Location(request.json['parent_location'])
+    parent_locator = BlockUsageLocator(request.json['parent_locator'])
+    parent_location = loc_mapper().translate_locator_to_location(parent_locator)
     category = request.json['category']
 
     display_name = request.json.get('display_name')
@@ -132,7 +192,10 @@ def create_item(request):
         raise PermissionDenied()
 
     parent = get_modulestore(category).get_item(parent_location)
-    dest_location = parent_location.replace(category=category, name=uuid4().hex)
+    # Necessary to set revision=None or else metadata inheritance does not work
+    # (the ID with @draft will be used as the key in the inherited metadata map,
+    # and that is not expected by the code that later references it).
+    dest_location = parent_location.replace(category=category, name=uuid4().hex, revision=None)
 
     # get the metadata, display_name, and definition from the request
     metadata = {}
@@ -159,24 +222,17 @@ def create_item(request):
     if category not in DETACHED_CATEGORIES:
         get_modulestore(parent.location).update_children(parent_location, parent.children + [dest_location.url()])
 
-    return JsonResponse({'id': dest_location.url()})
+    course_location = loc_mapper().translate_locator_to_location(parent_locator, get_course=True)
+    locator = loc_mapper().translate_location(course_location.course_id, dest_location, False, True)
+    return JsonResponse({'id': dest_location.url(), "locator": unicode(locator)})
 
 
-@login_required
-@expect_json
-def delete_item(request):
-    """View for removing items."""
-    item_location = request.json['id']
-    item_location = Location(item_location)
+def _delete_item_at_location(item_location, delete_children=False, delete_all_versions=False):
+    """
+    Deletes the item at with the given Location.
 
-    # check permissions for this user within this course
-    if not has_access(request.user, item_location):
-        raise PermissionDenied()
-
-    # optional parameter to delete all children (default False)
-    delete_children = request.json.get('delete_children', False)
-    delete_all_versions = request.json.get('delete_all_versions', False)
-
+    It is assumed that course permissions have already been checked.
+    """
     store = get_modulestore(item_location)
 
     item = store.get_item(item_location)
@@ -201,10 +257,11 @@ def delete_item(request):
 
     return JsonResponse()
 
+
 # pylint: disable=W0613
 @login_required
 @require_http_methods(("GET", "DELETE"))
-def orphan(request, tag=None, course_id=None, branch=None, version_guid=None, block=None):
+def orphan_handler(request, tag=None, course_id=None, branch=None, version_guid=None, block=None):
     """
     View for handling orphan related requests. GET gets all of the current orphans.
     DELETE removes all orphans (requires is_staff access)
@@ -231,3 +288,38 @@ def orphan(request, tag=None, course_id=None, branch=None, version_guid=None, bl
             return JsonResponse({'deleted': items})
         else:
             raise PermissionDenied()
+
+
+def _get_module_info(usage_loc, rewrite_static_links=True):
+    """
+    metadata, data, id representation of a leaf module fetcher.
+    :param usage_loc: A BlockUsageLocator
+    """
+    old_location = loc_mapper().translate_locator_to_location(usage_loc)
+    store = get_modulestore(old_location)
+    try:
+        module = store.get_item(old_location)
+    except ItemNotFoundError:
+        if old_location.category in CREATE_IF_NOT_FOUND:
+            # Create a new one for certain categories only. Used for course info handouts.
+            store.create_and_save_xmodule(old_location)
+            module = store.get_item(old_location)
+        else:
+            raise
+
+    data = module.data
+    if rewrite_static_links:
+        # we pass a partially bogus course_id as we don't have the RUN information passed yet
+        # through the CMS. Also the contentstore is also not RUN-aware at this point in time.
+        data = replace_static_urls(
+            module.data,
+            None,
+            course_id=module.location.org + '/' + module.location.course + '/BOGUS_RUN_REPLACE_WHEN_AVAILABLE'
+        )
+
+    # Note that children aren't being returned until we have a use case.
+    return {
+        'id': unicode(usage_loc),
+        'data': data,
+        'metadata': own_metadata(module)
+    }

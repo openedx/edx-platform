@@ -11,16 +11,15 @@ Notes for running by hand:
 from django.test.utils import override_settings
 
 # Need access to internal func to put users in the right group
-from django.contrib.auth.models import Group, User
+from django.contrib.auth.models import User
 
 from django.core.urlresolvers import reverse
 
-from courseware.access import _course_staff_group_name
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from courseware.roles import CourseStaffRole
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.django import modulestore, clear_existing_modulestores
-import xmodule.modulestore.django
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -44,9 +43,7 @@ class TestInstructorDashboardGradeDownloadCSV(ModuleStoreTestCase, LoginEnrollme
 
         def make_instructor(course):
             """ Create an instructor for the course. """
-            group_name = _course_staff_group_name(course.location)
-            group = Group.objects.create(name=group_name)
-            group.user_set.add(User.objects.get(email=self.instructor))
+            CourseStaffRole(course.location).add_users(User.objects.get(email=self.instructor))
 
         make_instructor(self.toy)
 

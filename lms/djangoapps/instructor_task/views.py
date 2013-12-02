@@ -75,7 +75,6 @@ def instructor_task_status(request):
           'traceback': optional, returned if task failed and produced a traceback.
 
     """
-
     output = {}
     if 'task_id' in request.REQUEST:
         task_id = request.REQUEST['task_id']

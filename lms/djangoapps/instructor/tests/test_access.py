@@ -3,15 +3,14 @@ Test instructor.access
 """
 
 from nose.tools import raises
-from django.contrib.auth.models import Group
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from django.test.utils import override_settings
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from courseware.roles import CourseBetaTesterRole, CourseStaffRole
 
-from courseware.access import get_access_group_name
 from django_comment_common.models import (Role,
                                           FORUM_ROLE_MODERATOR)
 from instructor.access import (allow_access,
@@ -51,39 +50,29 @@ class TestInstructorAccessAllow(ModuleStoreTestCase):
     def test_allow(self):
         user = UserFactory()
         allow_access(self.course, user, 'staff')
-        group = Group.objects.get(
-            name=get_access_group_name(self.course, 'staff')
-        )
-        self.assertIn(user, group.user_set.all())
+        self.assertTrue(CourseStaffRole(self.course.location).has_user(user))
 
     def test_allow_twice(self):
         user = UserFactory()
         allow_access(self.course, user, 'staff')
         allow_access(self.course, user, 'staff')
-        group = Group.objects.get(
-            name=get_access_group_name(self.course, 'staff')
-        )
-        self.assertIn(user, group.user_set.all())
+        self.assertTrue(CourseStaffRole(self.course.location).has_user(user))
 
     def test_allow_beta(self):
         """ Test allow beta against list beta. """
         user = UserFactory()
         allow_access(self.course, user, 'beta')
-        self.assertIn(user, list_with_level(self.course, 'beta'))
+        self.assertTrue(CourseBetaTesterRole(self.course.location).has_user(user))
 
     @raises(ValueError)
     def test_allow_badlevel(self):
         user = UserFactory()
         allow_access(self.course, user, 'robot-not-a-level')
-        group = Group.objects.get(name=get_access_group_name(self.course, 'robot-not-a-level'))
-        self.assertIn(user, group.user_set.all())
 
     @raises(Exception)
     def test_allow_noneuser(self):
         user = None
         allow_access(self.course, user, 'staff')
-        group = Group.objects.get(name=get_access_group_name(self.course, 'staff'))
-        self.assertIn(user, group.user_set.all())
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -102,32 +91,22 @@ class TestInstructorAccessRevoke(ModuleStoreTestCase):
     def test_revoke(self):
         user = self.staff[0]
         revoke_access(self.course, user, 'staff')
-        group = Group.objects.get(
-            name=get_access_group_name(self.course, 'staff')
-        )
-        self.assertNotIn(user, group.user_set.all())
+        self.assertFalse(CourseStaffRole(self.course.location).has_user(user))
 
     def test_revoke_twice(self):
         user = self.staff[0]
         revoke_access(self.course, user, 'staff')
-        group = Group.objects.get(
-            name=get_access_group_name(self.course, 'staff')
-        )
-        self.assertNotIn(user, group.user_set.all())
+        self.assertFalse(CourseStaffRole(self.course.location).has_user(user))
 
     def test_revoke_beta(self):
         user = self.beta_testers[0]
         revoke_access(self.course, user, 'beta')
-        self.assertNotIn(user, list_with_level(self.course, 'beta'))
+        self.assertFalse(CourseBetaTesterRole(self.course.location).has_user(user))
 
     @raises(ValueError)
     def test_revoke_badrolename(self):
         user = UserFactory()
         revoke_access(self.course, user, 'robot-not-a-level')
-        group = Group.objects.get(
-            name=get_access_group_name(self.course, 'robot-not-a-level')
-        )
-        self.assertNotIn(user, group.user_set.all())
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)

@@ -398,9 +398,15 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.assertEqual(course.tabs, expected_tabs)
 
     def test_static_tab_reordering(self):
+        def get_tab_locator(tab):
+            tab_location = 'i4x://MITx/999/static_tab/{0}'.format(tab['url_slug'])
+            return unicode(loc_mapper().translate_location(
+                course.location.course_id, Location(tab_location), False, True
+            ))
+
         module_store = modulestore('direct')
-        CourseFactory.create(org='edX', course='999', display_name='Robot Super Course')
-        course_location = Location(['i4x', 'edX', '999', 'course', 'Robot_Super_Course', None])
+        locator = _course_factory_create_course()
+        course_location = loc_mapper().translate_locator_to_location(locator)
 
         ItemFactory.create(
             parent_location=course_location,
@@ -411,23 +417,23 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             category="static_tab",
             display_name="Static_2")
 
-        course = module_store.get_item(Location(['i4x', 'edX', '999', 'course', 'Robot_Super_Course', None]))
+        course = module_store.get_item(course_location)
 
         # reverse the ordering
         reverse_tabs = []
         for tab in course.tabs:
             if tab['type'] == 'static_tab':
-                reverse_tabs.insert(0, 'i4x://edX/999/static_tab/{0}'.format(tab['url_slug']))
+                reverse_tabs.insert(0, get_tab_locator(tab))
 
         self.client.ajax_post(reverse('reorder_static_tabs'), {'tabs': reverse_tabs})
 
-        course = module_store.get_item(Location(['i4x', 'edX', '999', 'course', 'Robot_Super_Course', None]))
+        course = module_store.get_item(course_location)
 
         # compare to make sure that the tabs information is in the expected order after the server call
         course_tabs = []
         for tab in course.tabs:
             if tab['type'] == 'static_tab':
-                course_tabs.append('i4x://edX/999/static_tab/{0}'.format(tab['url_slug']))
+                course_tabs.append(get_tab_locator(tab))
 
         self.assertEqual(reverse_tabs, course_tabs)
 
@@ -488,11 +494,8 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # make sure the parent points to the child object which is to be deleted
         self.assertTrue(sequential.location.url() in chapter.children)
 
-        self.client.post(
-            reverse('delete_item'),
-            json.dumps({'id': sequential.location.url(), 'delete_children': 'true', 'delete_all_versions': 'true'}),
-            "application/json"
-        )
+        location = loc_mapper().translate_location(course_location.course_id, sequential.location, False, True)
+        self.client.delete(location.url_reverse('xblock'), {'recurse': True, 'all_versions': True})
 
         found = False
         try:
@@ -1203,9 +1206,11 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         import_from_xml(module_store, 'common/test/data/', ['toy'])
 
         handout_location = Location(['i4x', 'edX', 'toy', 'course_info', 'handouts'])
+        # get the translation
+        handouts_locator = loc_mapper().translate_location('edX/toy/2012_Fall', handout_location)
 
-        # get module info
-        resp = self.client.get_html(reverse('module_info', kwargs={'module_location': handout_location}))
+        # get module info (json)
+        resp = self.client.get(handouts_locator.url_reverse('/xblock', ''))
 
         # make sure we got a successful response
         self.assertEqual(resp.status_code, 200)
@@ -1529,22 +1534,22 @@ class ContentStoreTest(ModuleStoreTestCase):
         resp = self._show_course_overview(loc)
         self.assertContains(
             resp,
-            '<article class="courseware-overview" data-id="i4x://MITx/999/course/Robot_Super_Course">',
+            '<article class="courseware-overview" data-locator="MITx.999.Robot_Super_Course/branch/draft/block/Robot_Super_Course">',
             status_code=200,
             html=True
         )
 
     def test_create_item(self):
-        """Test cloning an item. E.g. creating a new section"""
-        CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
+        """Test creating a new xblock instance."""
+        locator = _course_factory_create_course()
 
         section_data = {
-            'parent_location': 'i4x://MITx/999/course/Robot_Super_Course',
+            'parent_locator': unicode(locator),
             'category': 'chapter',
             'display_name': 'Section One',
         }
 
-        resp = self.client.ajax_post(reverse('create_item'), section_data)
+        resp = self.client.ajax_post('/xblock', section_data)
 
         self.assertEqual(resp.status_code, 200)
         data = parse_json(resp)
@@ -1555,14 +1560,14 @@ class ContentStoreTest(ModuleStoreTestCase):
 
     def test_capa_module(self):
         """Test that a problem treats markdown specially."""
-        CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
+        locator = _course_factory_create_course()
 
         problem_data = {
-            'parent_location': 'i4x://MITx/999/course/Robot_Super_Course',
+            'parent_locator': unicode(locator),
             'category': 'problem'
         }
 
-        resp = self.client.ajax_post(reverse('create_item'), problem_data)
+        resp = self.client.ajax_post('/xblock', problem_data)
 
         self.assertEqual(resp.status_code, 200)
         payload = parse_json(resp)
@@ -1603,10 +1608,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         self.assertEqual(resp.status_code, 200)
 
         # course info
-        resp = self.client.get(reverse('course_info',
-                                       kwargs={'org': loc.org,
-                                               'course': loc.course,
-                                               'name': loc.name}))
+        resp = self.client.get(new_location.url_reverse('course_info'))
         self.assertEqual(resp.status_code, 200)
 
         # settings_details
@@ -1630,39 +1632,35 @@ class ContentStoreTest(ModuleStoreTestCase):
 
         # go look at a subsection page
         subsection_location = loc.replace(category='sequential', name='test_sequence')
-        resp = self.client.get_html(reverse('edit_subsection',
-                                       kwargs={'location': subsection_location.url()}))
+        resp = self.client.get_html(
+            reverse('edit_subsection', kwargs={'location': subsection_location.url()})
+        )
         self.assertEqual(resp.status_code, 200)
 
         # go look at the Edit page
         unit_location = loc.replace(category='vertical', name='test_vertical')
-        resp = self.client.get_html(reverse('edit_unit',
-                                       kwargs={'location': unit_location.url()}))
+        resp = self.client.get_html(
+            reverse('edit_unit', kwargs={'location': unit_location.url()}))
         self.assertEqual(resp.status_code, 200)
 
+        def delete_item(category, name):
+            """ Helper method for testing the deletion of an xblock item. """
+            del_loc = loc.replace(category=category, name=name)
+            del_location = loc_mapper().translate_location(loc.course_id, del_loc, False, True)
+            resp = self.client.delete(del_location.url_reverse('xblock'))
+            self.assertEqual(resp.status_code, 204)
+
         # delete a component
-        del_loc = loc.replace(category='html', name='test_html')
-        resp = self.client.post(reverse('delete_item'),
-                                json.dumps({'id': del_loc.url()}), "application/json")
-        self.assertEqual(resp.status_code, 204)
+        delete_item(category='html', name='test_html')
 
         # delete a unit
-        del_loc = loc.replace(category='vertical', name='test_vertical')
-        resp = self.client.post(reverse('delete_item'),
-                                json.dumps({'id': del_loc.url()}), "application/json")
-        self.assertEqual(resp.status_code, 204)
+        delete_item(category='vertical', name='test_vertical')
 
         # delete a unit
-        del_loc = loc.replace(category='sequential', name='test_sequence')
-        resp = self.client.post(reverse('delete_item'),
-                                json.dumps({'id': del_loc.url()}), "application/json")
-        self.assertEqual(resp.status_code, 204)
+        delete_item(category='sequential', name='test_sequence')
 
         # delete a chapter
-        del_loc = loc.replace(category='chapter', name='chapter_2')
-        resp = self.client.post(reverse('delete_item'),
-                                json.dumps({'id': del_loc.url()}), "application/json")
-        self.assertEqual(resp.status_code, 204)
+        delete_item(category='chapter', name='chapter_2')
 
     def test_import_into_new_course_id(self):
         module_store = modulestore('direct')
@@ -1919,7 +1917,7 @@ class MetadataSaveTestCase(ModuleStoreTestCase):
 
 def _create_course(test, course_data):
     """
-    Creates a course and verifies the URL returned in the response..
+    Creates a course via an AJAX request and verifies the URL returned in the response.
     """
     course_id = _get_course_id(course_data)
     new_location = loc_mapper().translate_location(course_id, CourseDescriptor.id_to_location(course_id), False, True)
@@ -1929,6 +1927,14 @@ def _create_course(test, course_data):
     data = parse_json(response)
     test.assertNotIn('ErrMsg', data)
     test.assertEqual(data['url'], new_location.url_reverse("course/", ""))
+
+
+def _course_factory_create_course():
+    """
+    Creates a course via the CourseFactory and returns the locator for it.
+    """
+    course = CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
+    return loc_mapper().translate_location(course.location.course_id, course.location, False, True)
 
 
 def _get_course_id(test_course_data):

@@ -1,11 +1,14 @@
 from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
-import urlparse
-import mock
-import threading
 import json
-from logging import getLogger
-logger = getLogger(__name__)
+import mock
+import sys
+import threading
 import time
+import urlparse
+from logging import getLogger
+
+
+logger = getLogger(__name__)
 
 class MockYoutubeRequestHandler(BaseHTTPRequestHandler):
     '''
@@ -13,6 +16,15 @@ class MockYoutubeRequestHandler(BaseHTTPRequestHandler):
     '''
 
     protocol = "HTTP/1.0"
+
+    def log_message(self, format, *args):
+        """Log an arbitrary message."""
+        # Code copied from BaseHTTPServer.py. Changed to write to sys.stdout
+        # so that messages won't pollute test output.
+        sys.stdout.write("%s - - [%s] %s\n" %
+                         (self.client_address[0],
+                          self.log_date_time_string(),
+                          format % args))
 
     def do_HEAD(self):
         code = 200

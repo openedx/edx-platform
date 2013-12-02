@@ -12,8 +12,10 @@ from mitxmako.shortcuts import render_to_response
 from xmodule.modulestore import Location
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import loc_mapper
+from xmodule.modulestore.locator import BlockUsageLocator
 
-from ..utils import get_course_for_item, get_modulestore
+from ..utils import get_modulestore
 
 from django.utils.translation import ugettext as _
 
@@ -46,11 +48,17 @@ def initialize_course_tabs(course):
 @expect_json
 def reorder_static_tabs(request):
     "Order the static tabs in the requested order"
-    tabs = request.json['tabs']
-    course = get_course_for_item(tabs[0])
+    def get_location_for_tab(tab):
+        tab_locator = BlockUsageLocator(tab)
+        return loc_mapper().translate_locator_to_location(tab_locator)
 
-    if not has_access(request.user, course.location):
+    tabs = request.json['tabs']
+    course_location = loc_mapper().translate_locator_to_location(BlockUsageLocator(tabs[0]), get_course=True)
+
+    if not has_access(request.user, course_location):
         raise PermissionDenied()
+
+    course = get_modulestore(course_location).get_item(course_location)
 
     # get list of existing static tabs in course
     # make sure they are the same lengths (i.e. the number of passed in tabs equals the number
@@ -63,7 +71,7 @@ def reorder_static_tabs(request):
     # load all reference tabs, return BadRequest if we can't find any of them
     tab_items = []
     for tab in tabs:
-        item = modulestore('direct').get_item(Location(tab))
+        item = modulestore('direct').get_item(get_location_for_tab(tab))
         if item is None:
             return HttpResponseBadRequest()
 
@@ -117,14 +125,24 @@ def edit_tabs(request, org, course, coursename):
         static_tabs.append(modulestore('direct').get_item(static_tab_loc))
 
     components = [
-        static_tab.location.url()
+        [
+            static_tab.location.url(),
+            loc_mapper().translate_location(
+                course_item.location.course_id, static_tab.location, False, True
+            )
+        ]
         for static_tab
         in static_tabs
     ]
 
+    course_locator = loc_mapper().translate_location(
+        course_item.location.course_id, course_item.location, False, True
+    )
+
     return render_to_response('edit-tabs.html', {
         'context_course': course_item,
-        'components': components
+        'components': components,
+        'locator': course_locator
     })
 
 

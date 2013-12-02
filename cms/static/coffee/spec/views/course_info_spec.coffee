@@ -34,6 +34,7 @@ define ["js/views/course_info_handout", "js/views/course_info_update", "js/model
             @xhrRestore = courseUpdatesXhr.restore
 
             @collection = new CourseUpdateCollection()
+            @collection.url = 'course_info_update/'
             @courseInfoEdit = new CourseInfoUpdateView({
                 el: $('.course-updates'),
                 collection: @collection,

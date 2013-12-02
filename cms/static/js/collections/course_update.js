@@ -4,7 +4,7 @@ define(["backbone", "js/models/course_update"], function(Backbone, CourseUpdateM
         collection of updates as [{ date : "month day", content : "html"}]
     */
     var CourseUpdateCollection = Backbone.Collection.extend({
-        url : function() {return this.urlbase  + "course_info/updates/";},
+        // instantiator must set url
 
         model : CourseUpdateModel
     });

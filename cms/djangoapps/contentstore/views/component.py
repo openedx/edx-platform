@@ -16,13 +16,12 @@ from mitxmako.shortcuts import render_to_response
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.util.date_utils import get_default_time_display
+from xmodule.modulestore.django import loc_mapper
 
 from xblock.fields import Scope
 from util.json_request import expect_json, JsonResponse
 
-from contentstore.module_info_model import get_module_info, set_module_info
-from contentstore.utils import (get_modulestore, get_lms_link_for_item,
-    compute_unit_state, UnitState, get_course_for_item)
+from contentstore.utils import get_lms_link_for_item, compute_unit_state, UnitState, get_course_for_item
 
 from models.settings.course_grading import CourseGradingModel
 
@@ -40,7 +39,7 @@ __all__ = ['OPEN_ENDED_COMPONENT_TYPES',
            'create_draft',
            'publish_draft',
            'unpublish_unit',
-           'module_info']
+           ]
 
 log = logging.getLogger(__name__)
 
@@ -121,6 +120,10 @@ def edit_subsection(request, location):
             can_view_live = True
             break
 
+    locator = loc_mapper().translate_location(
+        course.location.course_id, item.location, False, True
+    )
+
     return render_to_response(
         'edit_subsection.html',
         {
@@ -130,8 +133,10 @@ def edit_subsection(request, location):
            'lms_link': lms_link,
            'preview_link': preview_link,
            'course_graders': json.dumps(CourseGradingModel.fetch(course.location).graders),
+           # For grader, which is not yet converted
            'parent_location': course.location,
            'parent_item': parent,
+           'locator': locator,
            'policy_metadata': policy_metadata,
            'subsection_units': subsection_units,
            'can_view_live': can_view_live
@@ -172,6 +177,12 @@ def edit_unit(request, location):
     lms_link = get_lms_link_for_item(
             item.location,
             course_id=course.location.course_id
+    )
+
+    # Note that the unit_state (draft, public, private) does not match up with the published value
+    # passed to translate_location. The two concepts are different at this point.
+    unit_locator = loc_mapper().translate_location(
+        course.location.course_id, Location(location), False, True
     )
 
     component_templates = defaultdict(list)
@@ -233,12 +244,17 @@ def edit_unit(request, location):
                     pass
     else:
         log.error(
-            "Improper format for course advanced keys! %",
+            "Improper format for course advanced keys! %s",
             course_advanced_keys
         )
 
     components = [
-        component.location.url()
+        [
+            component.location.url(),
+            loc_mapper().translate_location(
+                course.location.course_id, component.location, False, True
+            )
+        ]
         for component
         in item.get_children()
     ]
@@ -283,12 +299,12 @@ def edit_unit(request, location):
             index=index
         )
 
-    unit_state = compute_unit_state(item)
-
     return render_to_response('unit.html', {
         'context_course': course,
         'unit': item,
+        # Still needed for creating a draft.
         'unit_location': location,
+        'unit_locator': unit_locator,
         'components': components,
         'component_templates': component_templates,
         'draft_preview_link': preview_lms_link,
@@ -300,7 +316,7 @@ def edit_unit(request, location):
         ),
         'section': containing_section,
         'new_unit_category': 'vertical',
-        'unit_state': unit_state,
+        'unit_state': compute_unit_state(item),
         'published_date': (
             get_default_time_display(item.published_date)
             if item.published_date is not None else None
@@ -382,39 +398,3 @@ def unpublish_unit(request):
     _xmodule_recurse(item, lambda i: modulestore().unpublish(i.location))
 
     return HttpResponse()
-
-
-@expect_json
-@require_http_methods(("GET", "POST", "PUT"))
-@login_required
-@ensure_csrf_cookie
-def module_info(request, module_location):
-    "Get or set information for a module in the modulestore"
-    location = Location(module_location)
-
-    # check that logged in user has permissions to this item
-    if not has_access(request.user, location):
-        raise PermissionDenied()
-
-    rewrite_static_links = request.GET.get('rewrite_url_links', 'True') in ['True', 'true']
-    logging.debug('rewrite_static_links = {0} {1}'.format(
-        request.GET.get('rewrite_url_links', False),
-        rewrite_static_links)
-    )
-
-    # check that logged in user has permissions to this item
-    if not has_access(request.user, location):
-        raise PermissionDenied()
-
-    if request.method == 'GET':
-        rsp = get_module_info(
-            get_modulestore(location),
-            location,
-            rewrite_static_links=rewrite_static_links
-        )
-    elif request.method in ("POST", "PUT"):
-        rsp = set_module_info(
-            get_modulestore(location),
-            location, request.json
-        )
-    return JsonResponse(rsp)

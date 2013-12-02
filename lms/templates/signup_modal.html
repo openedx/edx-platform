@@ -1,6 +1,7 @@
 <%! from django.utils.translation import ugettext as _ %>
 
 <%namespace name='static' file='static_content.html'/>
+<%! from django.conf import settings %>
 <%! from django.core.urlresolvers import reverse %>
 <%! from django_countries.countries import COUNTRIES %>
 <%! from student.models import UserProfile %>
@@ -57,6 +58,8 @@
         </div>
 
         <div class="input-group">
+
+          % if 'level_of_education' in settings.REGISTRATION_OPTIONAL_FIELDS:
           <section class="citizenship">
             <label data-field="level_of_education" for="signup_ed_level">${_("Ed. Completed")}</label>
             <div class="input-wrapper">
@@ -68,7 +71,9 @@
               </select>
             </div>
           </section>
+          % endif
 
+          % if 'gender' in settings.REGISTRATION_OPTIONAL_FIELDS:
           <section class="gender">
             <label data-field="gender" for="signup_gender">${_("Gender")}</label>
             <div class="input-wrapper">
@@ -80,7 +85,9 @@
               </select>
             </div>
           </section>
+          % endif
 
+          % if 'year_of_birth' in settings.REGISTRATION_OPTIONAL_FIELDS:
           <section class="date-of-birth">
             <label data-field="date-of-birth" for="signup_birth_year">${_("Year of birth")}</label>
             <div class="input-wrapper">
@@ -93,12 +100,17 @@
               ##<input name="year_of_birth" type="text" placeholder="Year of birth">
             </div>
           </section>
+          % endif
 
+          % if 'mailing_address' in settings.REGISTRATION_OPTIONAL_FIELDS:
           <label data-field="mailing_address" for="signup_mailing_address">${_("Mailing address")}</label>
 	    <textarea id="signup_mailing_address" name="mailing_address"></textarea>
+          % endif
 
+          % if 'goals' in settings.REGISTRATION_OPTIONAL_FIELDS:
           <label data-field="goals" for="signup_goals">${_("Goals in signing up for {platform_name}").format(platform_name=settings.PLATFORM_NAME)}</label>
 	    <textarea name="goals" id="signup_goals"></textarea>
+          % endif
 
         </div>
 

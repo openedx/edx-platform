@@ -411,8 +411,6 @@
             beforeEach(function () {
                 initialize();
 
-                videoPlayer.currentTime = 60;
-
                 spyOn(videoPlayer, 'updatePlayTime').andCallThrough();
                 spyOn(state, 'setSpeed').andCallThrough();
                 spyOn(videoPlayer, 'log').andCallThrough();
@@ -421,6 +419,8 @@
 
             describe('always', function () {
                 beforeEach(function () {
+
+                    videoPlayer.currentTime = 60;
                     videoPlayer.onSpeedChange('0.75', false);
                 });
 
@@ -446,8 +446,8 @@
 
             describe('when the video is playing', function () {
                 beforeEach(function () {
+                    videoPlayer.currentTime = 60;
                     videoPlayer.play();
-
                     videoPlayer.onSpeedChange('0.75', false);
                 });
 
@@ -459,14 +459,21 @@
 
             describe('when the video is not playing', function () {
                 beforeEach(function () {
-                    videoPlayer.pause();
-
                     videoPlayer.onSpeedChange('0.75', false);
                 });
 
                 it('trigger updatePlayTime event', function () {
                     expect(videoPlayer.player.setPlaybackRate)
                         .toHaveBeenCalledWith('0.75');
+                });
+
+                it('video has a correct speed', function () {
+                    spyOn(videoPlayer, 'onSpeedChange');
+                    state.speed = '2.0';
+                    videoPlayer.onPlay();
+                    expect(videoPlayer.onSpeedChange).toHaveBeenCalledWith('2.0');
+                    videoPlayer.onPlay();
+                    expect(videoPlayer.onSpeedChange.calls.length).toEqual(1);
                 });
             });
         });

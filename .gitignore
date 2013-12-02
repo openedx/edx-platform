@@ -28,6 +28,9 @@ cms/envs/private.py
 *.mo
 conf/locale/en/LC_MESSAGES/*.po
 !messages.po
+### Remove when we have real Esperanto translations. For now, ignore
+### dummy Esperanto files.
+conf/locale/eo/*
 
 ### Testing artifacts
 .testids/
