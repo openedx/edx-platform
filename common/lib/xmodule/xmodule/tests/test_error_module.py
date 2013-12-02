@@ -103,6 +103,17 @@ class TestException(Exception):
     pass
 
 
+class TestRuntime(Runtime):
+    def get_block(self, usage_id):
+        raise Exception("Not Used By Tests")
+
+    def handler_url(self, block, handler_name, suffix='', query='', thirdparty=False):
+        raise Exception("Not Used By Tests")
+
+    def resources_url(self, resource):
+        raise Exception("Not Used By Tests")
+
+
 class TestErrorModuleConstruction(unittest.TestCase):
     """
     Test that error module construction happens correctly
@@ -111,11 +122,11 @@ class TestErrorModuleConstruction(unittest.TestCase):
     def setUp(self):
         field_data = Mock(spec=FieldData)
         self.descriptor = BrokenDescriptor(
-            Runtime(Mock(spec=UsageStore), field_data),
+            TestRuntime(Mock(spec=UsageStore), field_data),
             field_data,
             ScopeIds(None, None, None, 'i4x://org/course/broken/name')
         )
-        self.descriptor.xmodule_runtime = Runtime(Mock(spec=UsageStore), field_data)
+        self.descriptor.xmodule_runtime = TestRuntime(Mock(spec=UsageStore), field_data)
         self.descriptor.xmodule_runtime.error_descriptor_class = ErrorDescriptor
         self.descriptor.xmodule_runtime.xmodule_instance = None
 
