@@ -133,8 +133,10 @@ def instructor_dashboard(request, course_id):
         else:
             response = file_pointer
         writer = csv.writer(response, dialect='excel', quotechar='"', quoting=csv.QUOTE_ALL)
-        writer.writerow(datatable['header'])
+        encoded_row = [unicode(s).encode('utf-8') for s in datatable['header']]
+        writer.writerow(encoded_row)
         for datarow in datatable['data']:
+            # 's' here may be an integer, float (eg score) or string (eg student name)
             encoded_row = [unicode(s).encode('utf-8') for s in datarow]
             writer.writerow(encoded_row)
         return response
