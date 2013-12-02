@@ -151,7 +151,7 @@ def submit_feedback(request):
     will be returned with no body; if ticket creation succeeds, an empty
     successful response (200) will be returned.
     """
-    if not settings.MITX_FEATURES.get('ENABLE_FEEDBACK_SUBMISSION', False):
+    if not settings.FEATURES.get('ENABLE_FEEDBACK_SUBMISSION', False):
         raise Http404()
     if request.method != "POST":
         return HttpResponseNotAllowed(["POST"])

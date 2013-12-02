@@ -116,5 +116,5 @@ course content can be setup to trigger an automatic reload when changes are push
 
 Note that the gitreload-based workflow is not meant for deployments on AWS (or elsewhere) which use collectstatic, since collectstatic is not run by a gitreload event.
 
-Also, the gitreload feature needs MITX_FEATURES['ENABLE_LMS_MIGRATION'] = True in the django settings.
+Also, the gitreload feature needs FEATURES['ENABLE_LMS_MIGRATION'] = True in the django settings.
 

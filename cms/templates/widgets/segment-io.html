@@ -9,7 +9,7 @@ from xmodule.modulestore.django import loc_mapper
 %>
 % endif
 
-% if settings.MITX_FEATURES.get('SEGMENT_IO'):
+% if settings.FEATURES.get('SEGMENT_IO'):
 <!-- begin Segment.io -->
 <script type="text/javascript">
   // if inside course, inject the course location into the JS namespace

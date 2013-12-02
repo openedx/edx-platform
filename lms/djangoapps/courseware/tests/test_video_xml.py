@@ -88,7 +88,7 @@ class VideoModuleUnitTest(unittest.TestCase):
             'sources': sources,
             'youtube_streams': _create_youtube_string(module),
             'track': '',
-            'autoplay': settings.MITX_FEATURES.get('AUTOPLAY_VIDEOS', False),
+            'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', False),
             'yt_test_timeout': 1500,
             'yt_test_url': 'https://gdata.youtube.com/feeds/api/videos/'
         }

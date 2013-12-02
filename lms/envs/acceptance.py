@@ -93,21 +93,21 @@ BULK_EMAIL_DEFAULT_FROM_EMAIL = "test@test.org"
 
 # Forums are disabled in test.py to speed up unit tests, but we do not have
 # per-test control for acceptance tests
-MITX_FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
+FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
 
 # Use the auto_auth workflow for creating users and logging them in
-MITX_FEATURES['AUTOMATIC_AUTH_FOR_TESTING'] = True
+FEATURES['AUTOMATIC_AUTH_FOR_TESTING'] = True
 
 # Enable fake payment processing page
-MITX_FEATURES['ENABLE_PAYMENT_FAKE'] = True
+FEATURES['ENABLE_PAYMENT_FAKE'] = True
 
 # Enable email on the instructor dash
-MITX_FEATURES['ENABLE_INSTRUCTOR_EMAIL'] = True
-MITX_FEATURES['REQUIRE_COURSE_EMAIL_AUTH'] = False
+FEATURES['ENABLE_INSTRUCTOR_EMAIL'] = True
+FEATURES['REQUIRE_COURSE_EMAIL_AUTH'] = False
 
 # Don't actually send any requests to Software Secure for student identity
 # verification.
-MITX_FEATURES['AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'] = True
+FEATURES['AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'] = True
 
 # Configure the payment processor to use the fake processing page
 # Since both the fake payment page and the shoppingcart app are using
@@ -128,7 +128,7 @@ CC_PROCESSOR['CyberSource']['PURCHASE_ENDPOINT'] = "/shoppingcart/payment_fake"
 # We do not yet understand why this occurs. Setting this to true is a stopgap measure
 USE_I18N = True
 
-MITX_FEATURES['ENABLE_FEEDBACK_SUBMISSION'] = True
+FEATURES['ENABLE_FEEDBACK_SUBMISSION'] = True
 FEEDBACK_SUBMISSION_EMAIL = 'dummy@example.com'
 
 # Include the lettuce app for acceptance testing, including the 'harvest' django-admin command

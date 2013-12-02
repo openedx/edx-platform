@@ -20,7 +20,7 @@ MIDDLEWARE_CLASSES = tuple(e for e in MIDDLEWARE_CLASSES \
 
 
 ########################### LETTUCE TESTING ##########################
-MITX_FEATURES['DISPLAY_TOY_COURSES'] = True
+FEATURES['DISPLAY_TOY_COURSES'] = True
 
 INSTALLED_APPS += ('lettuce.django',)
 # INSTALLED_APPS += ('portal',)
