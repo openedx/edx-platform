@@ -5,10 +5,69 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Blades: Improve calculator's tooltip accessibility. Add possibility to navigate
+  through the hints via arrow keys. BLD-533.
+
+LMS: Add feature for providing background grade report generation via Celery
+  instructor task, with reports uploaded to S3. Feature is visible on the beta
+  instructor dashboard. LMS-58
+
+Blades: Added grading support for LTI module. LTI providers can now grade
+student's work and send edX scores. OAuth1 based authentication
+implemented. BLD-384.
+
+LMS: Beta-tester status is now set on a per-course-run basis, rather than being
+  valid across all runs with the same course name. Old group membership will
+  still work across runs, but new beta-testers will only be added to a single
+  course run.
+
+Blades: Enabled several Video Jasmine tests. BLD-463.
+
+Studio: Continued modification of Studio pages to follow a RESTful framework.
+includes Settings pages, edit page for Subsection and Unit, and interfaces
+for updating xblocks (xmodules) and getting their editing HTML.
+
+Blades: Put 2nd "Hide output" button at top of test box & increase text size for
+code response questions. BLD-126.
+
+Blades: Update the calculator hints tooltip with full information. BLD-400.
+
+Blades: Fix transcripts 500 error in studio (BLD-530)
+
+LMS: Add error recovery when a user loads or switches pages in an
+inline discussion.
+
+Blades: Allow multiple strings as the correct answer to a string response
+question. BLD-474.
+
+Blades: a11y - Videos will alert screenreaders when the video is over.
+
+LMS: Trap focus on the loading element when a user loads more threads
+in the forum sidebar to improve accessibility.
+
+LMS: Add error recovery when a user loads more threads in the forum sidebar.
+
+LMS: Add a user-visible alert modal when a forums AJAX request fails.
+
+Blades: Add template for checkboxes response to studio. BLD-193.
+
+Blades: Video player:
+  - Add spinner;
+  - Improve initialization of modules;
+  - Speed up video resizing during page loading;
+  - Speed up acceptance tests. (BLD-502)
+  - Fix transcripts bug - when show_captions is set to false. BLD-467.
+
+Studio: change create_item, delete_item, and save_item to RESTful API (STUD-847).
+
+Blades: Fix answer choices rearranging if user tries to stylize something in the
+text like with bold or italics. (BLD-449)
+
 LMS: Beta instructor dashboard will only count actively enrolled students for
 course enrollment numbers.
 
-Blades: Blades: Fix speed menu that is not rendered correctly when YouTube is unavailable. (BLD-457).
+Blades: Fix speed menu that is not rendered correctly when YouTube is
+unavailable. (BLD-457).
 
 LMS: Users with is_staff=True no longer have the STAFF label appear on
 their forum posts.
@@ -26,6 +85,9 @@ key in course settings. (BLD-426)
 
 Blades: Fix bug when the speed can only be changed when the video is playing.
 
+LMS: The dialogs on the wiki "changes" page are now accessible to screen
+readers.  Now all wiki pages have been made accessible. (LMS-1337)
+
 LMS: Change bulk email implementation to use less memory, and to better handle
 duplicate tasks in celery.
 
@@ -42,8 +104,8 @@ client error are correctly passed through to the client.
 LMS: Improve performance of page load and thread list load for
 discussion tab
 
-LMS: The wiki markup cheatsheet dialog is now accessible to people with
-disabilites.  (LMS-1303)
+LMS: The wiki markup cheatsheet dialog is now accessible to screen readers.
+(LMS-1303)
 
 Common: Add skip links for accessibility to CMS and LMS. (LMS-1311)
 

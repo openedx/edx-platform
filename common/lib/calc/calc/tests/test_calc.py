@@ -370,7 +370,7 @@ class EvaluatorTest(unittest.TestCase):
             ('pi', 3.1416, 1e-4),
             ('k', 1.3806488e-23, 1e-26),  # Boltzmann constant (Joules/Kelvin)
             ('c', 2.998e8, 1e5),  # Light Speed in (m/s)
-            ('T', 298.15, 0.01),  # 0 deg C = T Kelvin
+            ('T', 298.15, 0.01),  # Typical room temperature (Kelvin)
             ('q', 1.602176565e-19, 1e-22)  # Fund. Charge (Coulombs)
         ]
         for (variable, value, tolerance) in default_variables:

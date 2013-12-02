@@ -95,12 +95,12 @@ require(["domReady!", "gettext", "js/views/feedback_prompt"], function(doc, gett
         <div class="copy">
           ## Translators: ".tar.gz" is a file extension, and should not be translated
 
-          <p>${_("You can export this course to edit it outside of Studio. Select the Export Course Content button below to download a .{em_start}tar.gz{em_end} file that contains the course content.").format(em_start='<strong>', em_end="</strong>")}</p>
+          <p>${_("You can export courses and edit them outside of Studio. The exported file is a .tar.gz file (that is, a .tar file compressed with GNU Zip) that contains the course structure and content. You can also re-import courses that you've exported.").format(em_start='<strong>', em_end="</strong>")}</p>
         </div>
       </div>
 
       <div class="export-controls">
-        <h2 class="title">${_("Export a Copy of My Course Data")}</h2>
+        <h2 class="title">${_("Export My Course Content")}</h2>
 
         <ul class="list-actions">
           <li class="item-action">
@@ -139,26 +139,20 @@ require(["domReady!", "gettext", "js/views/feedback_prompt"], function(doc, gett
 
     <aside class="content-supplementary" role="complimentary">
       <div class="bit">
-        <h3 class="title-3">${_("Why export my course?")}</h3>
+        <h3 class="title-3">${_("Why export a course?")}</h3>
+        <p>${_("You may want to edit the XML in your course directly, outside of Studio. You may want to create a backup copy of your course. Or, you may want to create a copy of your course that you can later import into another course instance and customize.")}</p>
+      </div>
 
-        <ul class="list-details">
-          <li class="item-detail">${_("Edit the course XML directly, then import the modified course.")}</li>
-          <li class="item-detail">${_("Store a backup of your course in its current state.")}</li>
-          <li class="item-detail">${_("Import the course into another course instance, to create a customized version of your course.")}</li>
-        </ul>
+      <div class="bit">
+        <h3 class="title-3">${_("What content is exported?")}</h3>
+
+        <p>${_("Only the course content and structure (including sections, subsections, and units) are exported. Other data, including student data, grading information, discussion forum data, course settings, and course team information, is not exported.")}</p>
       </div>
 
       <div class="bit">
         <h3 class="title-3">${_("Opening the downloaded file")}</h3>
-
-        <p>${_("Extract the .tar.gz with an archive program on your computer.  Extracted data includes the course.xml file, as well as subfolders containing course content.")}</p>
-      </div>
-
-      <div class="bit">
         ## Translators: ".tar.gz" is a file extension, and should not be translated
-        <h3 class="title-3">${_("Course Team Data")}</h3>
-
-        <p>${_("Note that course team data is not exported, and that course team data is not changed when importing a course.")}</p>
+        <p>${_("Use an archive program to extract the data from the .tar.gz file. Extracted data includes the course.xml file, as well as subfolders that contain course content.")}</p>
       </div>
     </aside>
   </section>

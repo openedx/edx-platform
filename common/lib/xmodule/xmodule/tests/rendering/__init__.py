@@ -1,2 +1,1 @@
 import core
-import xmodule_asserts

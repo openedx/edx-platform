@@ -196,3 +196,22 @@ define ["js/views/course_info_handout", "js/views/course_info_update", "js/model
             @handoutsEdit.$el.find('.edit-button').click()
             expect(@handoutsEdit.$codeMirror.getValue().trim()).toEqual('/static/fromServer.jpg')
 
+        it "can open course handouts with bad html on edit", ->
+            # Enter some bad html in handouts section, verifying that the
+            # model/handoutform opens when "Edit" is clicked
+
+            @model = new ModuleInfo({
+                id: 'handouts-id',
+                data: '<p><a href="[URL OF FILE]>[LINK TEXT]</a></p>'
+            })
+            @handoutsEdit = new CourseInfoHandoutsView({
+                el: $('#course-handouts-view'),
+                model: @model,
+                base_asset_url: 'base-asset-url/'
+            });
+            @handoutsEdit.render()
+
+            expect($('.edit-handouts-form').is(':hidden')).toEqual(true)
+            @handoutsEdit.$el.find('.edit-button').click()
+            expect(@handoutsEdit.$codeMirror.getValue()).toEqual('<p><a href="[URL OF FILE]>[LINK TEXT]</a></p>')
+            expect($('.edit-handouts-form').is(':hidden')).toEqual(false)

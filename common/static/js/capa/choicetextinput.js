@@ -1,13 +1,13 @@
 (function () {
     var update = function () {
         // Whenever a value changes create a new serialized version of this
-        // problem's inputs and set the hidden input fields value to equal it.
-        var parent = $(this).closest('.problems-wrapper');
+        // problem's inputs and set the hidden input field's value to equal it.
+        var parent = $(this).closest('section.choicetextinput');
         // find the closest parent problems-wrapper and use that as the problem
         // grab the input id from the input
         // real_input is the hidden input field
         var real_input = $('input.choicetextvalue', parent);
-        var all_inputs = $('.choicetextinput .ctinput', parent);
+        var all_inputs = $('input.ctinput', parent);
         var user_inputs = {};
         $(all_inputs).each(function (index, elt) {
             var node = $(elt);

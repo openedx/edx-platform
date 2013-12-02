@@ -317,7 +317,6 @@ class CourseFields(object):
     discussion_blackouts = List(help="List of pairs of start/end dates for discussion blackouts", scope=Scope.settings)
     discussion_topics = Dict(help="Map of topics names to ids", scope=Scope.settings)
     discussion_sort_alpha = Boolean(scope=Scope.settings, default=False, help="Sort forum categories and subcategories alphabetically.")
-    testcenter_info = Dict(help="Dictionary of Test Center info", scope=Scope.settings)
     announcement = Date(help="Date this course is announced", scope=Scope.settings)
     cohort_config = Dict(help="Dictionary defining cohort configuration", scope=Scope.settings)
     is_new = Boolean(help="Whether this course should be flagged as new", scope=Scope.settings)
@@ -530,20 +529,6 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         if self.discussion_topics == {}:
             self.discussion_topics = {'General': {'id': self.location.html_id()}}
 
-        self.test_center_exams = []
-        test_center_info = self.testcenter_info
-        if test_center_info is not None:
-            for exam_name in test_center_info:
-                try:
-                    exam_info = test_center_info[exam_name]
-                    self.test_center_exams.append(self.TestCenterExam(self.id, exam_name, exam_info))
-                except Exception as err:
-                    # If we can't parse the test center exam info, don't break
-                    # the rest of the courseware.
-                    msg = 'Error %s: Unable to load test-center exam info for exam "%s" of course "%s"' % (err, exam_name, self.id)
-                    log.error(msg)
-                    continue
-
         # TODO check that this is still needed here and can't be by defaults.
         if not self.tabs:
             # When calling the various _tab methods, can omit the 'type':'blah' from the
@@ -715,6 +700,9 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
 
     @property
     def raw_grader(self):
+        # force the caching of the xblock value so that it can detect the change
+        # pylint: disable=pointless-statement
+        self.grading_policy['GRADER']
         return self._grading_policy['RAW_GRADER']
 
     @raw_grader.setter
@@ -990,93 +978,6 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             log.exception("Error parsing discussion_blackouts for course {0}".format(self.id))
 
         return True
-
-    class TestCenterExam(object):
-        def __init__(self, course_id, exam_name, exam_info):
-            self.course_id = course_id
-            self.exam_name = exam_name
-            self.exam_info = exam_info
-            self.exam_series_code = exam_info.get('Exam_Series_Code') or exam_name
-            self.display_name = exam_info.get('Exam_Display_Name') or self.exam_series_code
-            self.first_eligible_appointment_date = self._try_parse_time('First_Eligible_Appointment_Date')
-            if self.first_eligible_appointment_date is None:
-                raise ValueError("First appointment date must be specified")
-            # TODO: If defaulting the last appointment date, it should be the
-            # *end* of the same day, not the same time.  It's going to be used as the
-            # end of the exam overall, so we don't want the exam to disappear too soon.
-            # It's also used optionally as the registration end date, so time matters there too.
-            self.last_eligible_appointment_date = self._try_parse_time('Last_Eligible_Appointment_Date')  # or self.first_eligible_appointment_date
-            if self.last_eligible_appointment_date is None:
-                raise ValueError("Last appointment date must be specified")
-            self.registration_start_date = (self._try_parse_time('Registration_Start_Date') or
-                datetime.fromtimestamp(0, UTC()))
-            self.registration_end_date = self._try_parse_time('Registration_End_Date') or self.last_eligible_appointment_date
-            # do validation within the exam info:
-            if self.registration_start_date > self.registration_end_date:
-                raise ValueError("Registration start date must be before registration end date")
-            if self.first_eligible_appointment_date > self.last_eligible_appointment_date:
-                raise ValueError("First appointment date must be before last appointment date")
-            if self.registration_end_date > self.last_eligible_appointment_date:
-                raise ValueError("Registration end date must be before last appointment date")
-            self.exam_url = exam_info.get('Exam_URL')
-
-        def _try_parse_time(self, key):
-            """
-            Parse an optional metadata key containing a time: if present, complain
-            if it doesn't parse.
-            Return None if not present or invalid.
-            """
-            if key in self.exam_info:
-                try:
-                    return Date().from_json(self.exam_info[key])
-                except ValueError as e:
-                    msg = "Exam {0} in course {1} loaded with a bad exam_info key '{2}': '{3}'".format(self.exam_name, self.course_id, self.exam_info[key], e)
-                    log.warning(msg)
-                return None
-
-        def has_started(self):
-            return datetime.now(UTC()) > self.first_eligible_appointment_date
-
-        def has_ended(self):
-            return datetime.now(UTC()) > self.last_eligible_appointment_date
-
-        def has_started_registration(self):
-            return datetime.now(UTC()) > self.registration_start_date
-
-        def has_ended_registration(self):
-            return datetime.now(UTC()) > self.registration_end_date
-
-        def is_registering(self):
-            now = datetime.now(UTC())
-            return now >= self.registration_start_date and now <= self.registration_end_date
-
-        @property
-        def first_eligible_appointment_date_text(self):
-            return self.first_eligible_appointment_date.strftime("%b %d, %Y")
-
-        @property
-        def last_eligible_appointment_date_text(self):
-            return self.last_eligible_appointment_date.strftime("%b %d, %Y")
-
-        @property
-        def registration_end_date_text(self):
-            return date_utils.get_default_time_display(self.registration_end_date)
-
-    @property
-    def current_test_center_exam(self):
-        exams = [exam for exam in self.test_center_exams if exam.has_started_registration() and not exam.has_ended()]
-        if len(exams) > 1:
-            # TODO: output some kind of warning.  This should already be
-            # caught if we decide to do validation at load time.
-            return exams[0]
-        elif len(exams) == 1:
-            return exams[0]
-        else:
-            return None
-
-    def get_test_center_exam(self, exam_series_code):
-        exams = [exam for exam in self.test_center_exams if exam.exam_series_code == exam_series_code]
-        return exams[0] if len(exams) == 1 else None
 
     @property
     def number(self):

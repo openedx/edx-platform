@@ -134,8 +134,8 @@ class Migration(SchemaMigration):
             'student': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
             'value': ('django.db.models.fields.TextField', [], {'default': "'null'"})
         },
-        'courseware.xmoduleuserstatesummary': {
-            'Meta': {'unique_together': "(('usage_id', 'field_name'),)", 'object_name': 'XModuleUserStateSummary'},
+        'courseware.xmoduleuserstatesummaryfield': {
+            'Meta': {'unique_together': "(('usage_id', 'field_name'),)", 'object_name': 'XModuleUserStateSummaryField'},
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'db_index': 'True', 'blank': 'True'}),
             'usage_id': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
             'field_name': ('django.db.models.fields.CharField', [], {'max_length': '64', 'db_index': 'True'}),

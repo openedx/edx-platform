@@ -655,6 +655,7 @@ class ChoiceResponse(LoncapaResponse):
     response_tag = 'choiceresponse'
     max_inputfields = 1
     allowed_inputfields = ['checkboxgroup', 'radiogroup']
+    correct_choices = None
 
     def setup_response(self):
 
@@ -706,6 +707,7 @@ class MultipleChoiceResponse(LoncapaResponse):
     response_tag = 'multiplechoiceresponse'
     max_inputfields = 1
     allowed_inputfields = ['choicegroup']
+    correct_choices = None
 
     def setup_response(self):
         # call secondary setup for MultipleChoice questions, to set name
@@ -791,6 +793,7 @@ class OptionResponse(LoncapaResponse):
     response_tag = 'optionresponse'
     hint_tag = 'optionhint'
     allowed_inputfields = ['optioninput']
+    answer_fields = None
 
     def setup_response(self):
         self.answer_fields = self.inputfields
@@ -943,16 +946,34 @@ class NumericalResponse(LoncapaResponse):
 
 
 class StringResponse(LoncapaResponse):
+    '''
+    This response type allows one or more answers. Use `_or_` separator to set
+    more than 1 answer.
 
+    Example:
+
+        # One answer
+        <stringresponse answer="Michigan">
+          <textline size="20" />
+        </stringresponse >
+
+        # Multiple answers
+        <stringresponse answer="Martin Luther King_or_Dr. Martin Luther King Jr.">
+          <textline size="20" />
+        </stringresponse >
+
+    '''
     response_tag = 'stringresponse'
     hint_tag = 'stringhint'
     allowed_inputfields = ['textline']
     required_attributes = ['answer']
     max_inputfields = 1
+    correct_answer = []
+    SEPARATOR = '_or_'
 
     def setup_response(self):
-        self.correct_answer = contextualize_text(
-            self.xml.get('answer'), self.context).strip()
+        self.correct_answer = [contextualize_text(answer, self.context).strip()
+            for answer in self.xml.get('answer').split(self.SEPARATOR)]
 
     def get_score(self, student_answers):
         '''Grade a string response '''
@@ -962,23 +983,25 @@ class StringResponse(LoncapaResponse):
 
     def check_string(self, expected, given):
         if self.xml.get('type') == 'ci':
-            return given.lower() == expected.lower()
-        return given == expected
+            return given.lower() in [i.lower() for i in expected]
+        return given in expected
 
     def check_hint_condition(self, hxml_set, student_answers):
         given = student_answers[self.answer_id].strip()
         hints_to_show = []
         for hxml in hxml_set:
             name = hxml.get('name')
-            correct_answer = contextualize_text(
-                hxml.get('answer'), self.context).strip()
+
+            correct_answer = [contextualize_text(answer, self.context).strip()
+            for answer in hxml.get('answer').split(self.SEPARATOR)]
+
             if self.check_string(correct_answer, given):
                 hints_to_show.append(name)
-        log.debug('hints_to_show = %s' % hints_to_show)
+        log.debug('hints_to_show = %s', hints_to_show)
         return hints_to_show
 
     def get_answers(self):
-        return {self.answer_id: self.correct_answer}
+        return {self.answer_id: ' <b>or</b> '.join(self.correct_answer)}
 
 #-----------------------------------------------------------------------------
 
@@ -996,6 +1019,8 @@ class CustomResponse(LoncapaResponse):
                            'drag_and_drop_input', 'editamoleculeinput',
                            'designprotein2dinput', 'editageneinput',
                            'annotationinput', 'jsinput', 'formulaequationinput']
+    code = None
+    expect = None
 
     def setup_response(self):
         xml = self.xml
@@ -1004,7 +1029,7 @@ class CustomResponse(LoncapaResponse):
         # that
         self.expect = xml.get('expect') or xml.get('answer')
 
-        log.debug('answer_ids=%s' % self.answer_ids)
+        log.debug('answer_ids=%s', self.answer_ids)
 
         # the <answer>...</answer> stanza should be local to the current <customresponse>.
         # So try looking there first.
@@ -1020,7 +1045,7 @@ class CustomResponse(LoncapaResponse):
             # <script>...</script> stanza instead
             cfn = xml.get('cfn')
             if cfn:
-                log.debug("cfn = %s" % cfn)
+                log.debug("cfn = %s", cfn)
 
                 # This is a bit twisty.  We used to grab the cfn function from
                 # the context, but now that we sandbox Python execution, we
@@ -1055,7 +1080,7 @@ class CustomResponse(LoncapaResponse):
         if not self.code:
             if answer is None:
                 log.error("[courseware.capa.responsetypes.customresponse] missing"
-                          " code checking script! id=%s" % self.id)
+                          " code checking script! id=%s", self.id)
                 self.code = ''
             else:
                 answer_src = answer.get('src')
@@ -1071,7 +1096,7 @@ class CustomResponse(LoncapaResponse):
         of each key removed (the string before the first "_").
         '''
 
-        log.debug('%s: student_answers=%s' % (unicode(self), student_answers))
+        log.debug('%s: student_answers=%s', unicode(self), student_answers)
 
         # ordered list of answer id's
         idset = sorted(self.answer_ids)
@@ -1182,10 +1207,10 @@ class CustomResponse(LoncapaResponse):
             answer_given = submission[0] if (len(idset) == 1) else submission
             kwnames = self.xml.get("cfn_extra_args", "").split()
             kwargs = {n: self.context.get(n) for n in kwnames}
-            log.debug(" submission = %s" % submission)
+            log.debug(" submission = %s", submission)
             try:
                 ret = fn(self.expect, answer_given, **kwargs)
-            except Exception as err:
+            except Exception as err:  # pylint: disable=broad-except
                 self._handle_exec_exception(err)
             log.debug(
                 "[courseware.capa.responsetypes.customresponse.get_score] ret = %s",
@@ -1340,22 +1365,21 @@ class SymbolicResponse(CustomResponse):
                 debug=self.context.get('debug'),
             )
         except Exception as err:
-            log.error("oops in symbolicresponse (cfn) error %s" % err)
+            log.error("oops in symbolicresponse (cfn) error %s", err)
             log.error(traceback.format_exc())
-            raise Exception("oops in symbolicresponse (cfn) error %s" % err)
+            raise Exception("oops in symbolicresponse (cfn) error %s", err)
         self.context['messages'][0] = self.clean_message_html(ret['msg'])
         self.context['correct'] = ['correct' if ret['ok'] else 'incorrect'] * len(idset)
 
 #-----------------------------------------------------------------------------
 
-"""
-valid:       Flag indicating valid score_msg format (Boolean)
-correct:     Correctness of submission (Boolean)
-score:       Points to be assigned (numeric, can be float)
-msg:         Message from grader to display to student (string)
-"""
-ScoreMessage = namedtuple('ScoreMessage',
-                          ['valid', 'correct', 'points', 'msg'])
+## ScoreMessage named tuple ##
+## valid:       Flag indicating valid score_msg format (Boolean)
+## correct:     Correctness of submission (Boolean)
+## score:       Points to be assigned (numeric, can be float)
+## msg:         Message from grader to display to student (string)
+
+ScoreMessage = namedtuple('ScoreMessage', ['valid', 'correct', 'points', 'msg'])  # pylint: disable=invalid-name
 
 
 class CodeResponse(LoncapaResponse):
@@ -1377,6 +1401,11 @@ class CodeResponse(LoncapaResponse):
     response_tag = 'coderesponse'
     allowed_inputfields = ['textbox', 'filesubmission', 'matlabinput']
     max_inputfields = 1
+    payload = None
+    initial_display = None
+    url = None
+    answer = None
+    queue_name = None
 
     def setup_response(self):
         '''
@@ -1427,8 +1456,8 @@ class CodeResponse(LoncapaResponse):
         except Exception as err:
             log.error(
                 'Error in CodeResponse %s: cannot get student answer for %s;'
-                ' student_answers=%s' %
-                (err, self.answer_id, convert_files_to_filenames(student_answers))
+                ' student_answers=%s',
+                err, self.answer_id, convert_files_to_filenames(student_answers)
             )
             raise Exception(err)
 
@@ -1511,9 +1540,8 @@ class CodeResponse(LoncapaResponse):
         return cmap
 
     def update_score(self, score_msg, oldcmap, queuekey):
-
-        (valid_score_msg, correct, points,
-         msg) = self._parse_score_msg(score_msg)
+        """Updates the user's score based on the returned message from the grader."""
+        (valid_score_msg, correct, points, msg) = self._parse_score_msg(score_msg)
         if not valid_score_msg:
             oldcmap.set(self.answer_id,
                         msg='Invalid grader reply. Please contact the course staff.')
@@ -1536,8 +1564,11 @@ class CodeResponse(LoncapaResponse):
                 self.answer_id, npoints=points, correctness=correctness,
                 msg=msg.replace('&nbsp;', '&#160;'), queuestate=None)
         else:
-            log.debug('CodeResponse: queuekey %s does not match for answer_id=%s.' %
-                      (queuekey, self.answer_id))
+            log.debug(
+                'CodeResponse: queuekey %s does not match for answer_id=%s.',
+                queuekey,
+                self.answer_id
+            )
 
         return oldcmap
 
@@ -1546,6 +1577,10 @@ class CodeResponse(LoncapaResponse):
         return {self.answer_id: anshtml}
 
     def get_initial_display(self):
+        """
+        The course author can specify an initial display
+        to be displayed the code response box.
+        """
         return {self.answer_id: self.initial_display}
 
     def _parse_score_msg(self, score_msg):
@@ -1566,11 +1601,11 @@ class CodeResponse(LoncapaResponse):
             score_result = json.loads(score_msg)
         except (TypeError, ValueError):
             log.error("External grader message should be a JSON-serialized dict."
-                      " Received score_msg = %s" % score_msg)
+                      " Received score_msg = %s", score_msg)
             return fail
         if not isinstance(score_result, dict):
             log.error("External grader message should be a JSON-serialized dict."
-                      " Received score_result = %s" % score_result)
+                      " Received score_result = %s", score_result)
             return fail
         for tag in ['correct', 'score', 'msg']:
             if tag not in score_result:
@@ -1585,9 +1620,9 @@ class CodeResponse(LoncapaResponse):
         msg = score_result['msg']
         try:
             etree.fromstring(msg)
-        except etree.XMLSyntaxError as err:
+        except etree.XMLSyntaxError as _err:
             log.error("Unable to parse external grader message as valid"
-                      " XML: score_msg['msg']=%s" % msg)
+                      " XML: score_msg['msg']=%s", msg)
             return fail
 
         return (True, score_result['correct'], score_result['score'], msg)
@@ -1805,7 +1840,10 @@ class FormulaResponse(LoncapaResponse):
     def get_score(self, student_answers):
         given = student_answers[self.answer_id]
         correctness = self.check_formula(
-            self.correct_answer, given, self.samples)
+            self.correct_answer,
+            given,
+            self.samples
+        )
         return CorrectMap(self.answer_id, correctness)
 
     def tupleize_answers(self, answer, var_dict_list):

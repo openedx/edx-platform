@@ -141,14 +141,15 @@
 
     <aside class="content-supplementary" role="complimentary">
       <div class="bit">
-        <h3 class="title-3">${_("About Roles within Your Course Team")}</h3>
-        <p>${_("Course team members are co-authors (staff). They have full access to all the content in the course and all the same editing privileges. Admins have the unique ability to add and remove course team members.")}</p>
+        <h3 class="title-3">${_("Course Team Roles")}</h3>
+        <p>${_("Course team members, or staff, are course co-authors. They have full writing and editing privileges on all course content.")}</p>
+        <p>${_("Admins are course team members who can add and remove other course team members.")}</p>      
       </div>
 
       % if user_is_instuctor and len(instructors) == 1:
       <div class="bit">
-        <h3 class="title-3">${_("Tranferring Ownership")}</h3>
-        <p>${_("There must always be an Admin assigned to every course. To transfer your ownership of the course, add Admin access to another user and request they remove you from the Course Team list.")}</p>
+        <h3 class="title-3">${_("Transferring Ownership")}</h3>
+        <p>${_("Every course must have an Admin. If you're the Admin and you want transfer ownership of the course, click Add admin access to make another user the Admin, then ask that user to remove you from the Course Team list.")}</p>
       </div>
       % endif
     </aside>

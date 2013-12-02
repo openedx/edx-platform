@@ -641,6 +641,7 @@ Feature: Video Component Editor
 
         And I save changes
         Then when I view the video it does show the captions
+        And I see "好 各位同学" text in the captions
         And I edit the component
 
         And I open tab "Advanced"

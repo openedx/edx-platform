@@ -20,7 +20,6 @@ XMODULES = [
     "section = xmodule.backcompat_module:SemanticSectionDescriptor",
     "sequential = xmodule.seq_module:SequenceDescriptor",
     "slides = xmodule.backcompat_module:TranslateCustomTagDescriptor",
-    "timelimit = xmodule.timelimit_module:TimeLimitDescriptor",
     "vertical = xmodule.vertical_module:VerticalDescriptor",
     "video = xmodule.video_module:VideoDescriptor",
     "videoalpha = xmodule.video_module:VideoDescriptor",
@@ -39,7 +38,7 @@ XMODULES = [
     "hidden = xmodule.hidden_module:HiddenDescriptor",
     "raw = xmodule.raw_module:RawDescriptor",
     "crowdsource_hinter = xmodule.crowdsource_hinter:CrowdsourceHinterDescriptor",
-    "lti = xmodule.lti_module:LTIModuleDescriptor",
+    "lti = xmodule.lti_module:LTIDescriptor",
 ]
 
 setup(

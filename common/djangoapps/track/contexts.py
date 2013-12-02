@@ -43,15 +43,17 @@ def course_context_from_course_id(course_id):
         'course_id': course_id,
         'org_id': ''
     }
-    try:
-        location = CourseDescriptor.id_to_location(course_id)
-        context['org_id'] = location.org
-    except ValueError:
-        log.warning(
-            'Unable to parse course_id "{course_id}"'.format(
-                course_id=course_id
-            ),
-            exc_info=True
-        )
+
+    if course_id:
+        try:
+            location = CourseDescriptor.id_to_location(course_id)
+            context['org_id'] = location.org
+        except ValueError:
+            log.warning(
+                'Unable to parse course_id "{course_id}"'.format(
+                    course_id=course_id
+                ),
+                exc_info=True
+            )
 
     return context

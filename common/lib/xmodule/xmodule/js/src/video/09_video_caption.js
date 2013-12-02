@@ -21,11 +21,16 @@ function () {
      * @returns {undefined}
      */
     return function (state) {
+        var dfd = $.Deferred();
+
         state.videoCaption = {};
 
         _makeFunctionsPublic(state);
 
         state.videoCaption.renderElements();
+
+        dfd.resolve();
+        return dfd.promise();
     };
 
     // ***************************************************************
@@ -725,7 +730,7 @@ function () {
             });
         }
 
-        if (this.resizer) {
+        if (this.resizer && !this.isFullScreen) {
             this.resizer.alignByWidthOnly();
         }
 

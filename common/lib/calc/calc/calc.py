@@ -57,7 +57,7 @@ DEFAULT_VARIABLES = {
     'pi': numpy.pi,
     'k': scipy.constants.k,  # Boltzmann: 1.3806488e-23 (Joules/Kelvin)
     'c': scipy.constants.c,  # Light Speed: 2.998e8 (m/s)
-    'T': 298.15,  # 0 deg C = T Kelvin
+    'T': 298.15,  # Typical room temperature: 298.15 (Kelvin), same as 25C/77F
     'q': scipy.constants.e  # Fund. Charge: 1.602176565e-19 (Coulombs)
 }
 
