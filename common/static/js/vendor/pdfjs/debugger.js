@@ -46,7 +46,7 @@ var FontInspector = (function FontInspectorClosure() {
     }
   }
   function textLayerClick(e) {
-    if (!e.target.dataset.fontName || e.target.tagName != 'DIV')
+    if (!e.target.dataset.fontName || e.target.tagName.toUpperCase() !== 'DIV')
       return;
     var fontName = e.target.dataset.fontName;
     var selects = document.getElementsByTagName('input');
@@ -220,26 +220,47 @@ var StepperManager = (function StepperManagerClosure() {
 
 // The stepper for each page's IRQueue.
 var Stepper = (function StepperClosure() {
+  // Shorter way to create element and optionally set textContent.
+  function c(tag, textContent) {
+    var d = document.createElement(tag);
+    if (textContent)
+      d.textContent = textContent;
+    return d;
+  }
+
+  function glyphsToString(glyphs) {
+    var out = '';
+    for (var i = 0; i < glyphs.length; i++) {
+      if (glyphs[i] === null) {
+        out += ' ';
+      } else {
+        out += glyphs[i].fontChar;
+      }
+    }
+    return out;
+  }
+
+  var opMap = null;
+
+  var glyphCommands = {
+    'showText': 0,
+    'showSpacedText': 0,
+    'nextLineShowText': 0,
+    'nextLineSetSpacingShowText': 2
+  };
+
   function Stepper(panel, pageIndex, initialBreakPoints) {
     this.panel = panel;
-    this.len = 0;
     this.breakPoint = 0;
     this.nextBreakPoint = null;
     this.pageIndex = pageIndex;
     this.breakPoints = initialBreakPoints;
     this.currentIdx = -1;
+    this.operatorListIdx = 0;
   }
   Stepper.prototype = {
-    init: function init(IRQueue) {
-      // Shorter way to create element and optionally set textContent.
-      function c(tag, textContent) {
-        var d = document.createElement(tag);
-        if (textContent)
-          d.textContent = textContent;
-        return d;
-      }
+    init: function init() {
       var panel = this.panel;
-      this.len = IRQueue.fnArray.length;
       var content = c('div', 'c=continue, s=step');
       var table = c('table');
       content.appendChild(table);
@@ -250,15 +271,24 @@ var Stepper = (function StepperClosure() {
       headerRow.appendChild(c('th', 'Idx'));
       headerRow.appendChild(c('th', 'fn'));
       headerRow.appendChild(c('th', 'args'));
-
+      panel.appendChild(content);
+      this.table = table;
+      if (!opMap) {
+        opMap = Object.create(null);
+        for (var key in PDFJS.OPS) {
+          opMap[PDFJS.OPS[key]] = key;
+        }
+      }
+    },
+    updateOperatorList: function updateOperatorList(operatorList) {
       var self = this;
-      for (var i = 0; i < IRQueue.fnArray.length; i++) {
+      for (var i = this.operatorListIdx; i < operatorList.fnArray.length; i++) {
         var line = c('tr');
         line.className = 'line';
         line.dataset.idx = i;
-        table.appendChild(line);
+        this.table.appendChild(line);
         var checked = this.breakPoints.indexOf(i) != -1;
-        var args = IRQueue.argsArray[i] ? IRQueue.argsArray[i] : [];
+        var args = operatorList.argsArray[i] ? operatorList.argsArray[i] : [];
 
         var breakCell = c('td');
         var cbox = c('input');
@@ -278,11 +308,30 @@ var Stepper = (function StepperClosure() {
         breakCell.appendChild(cbox);
         line.appendChild(breakCell);
         line.appendChild(c('td', i.toString()));
-        line.appendChild(c('td', IRQueue.fnArray[i]));
-        line.appendChild(c('td', args.join(', ')));
+        var fn = opMap[operatorList.fnArray[i]];
+        var decArgs = args;
+        if (fn in glyphCommands) {
+          var glyphIndex = glyphCommands[fn];
+          var glyphs = args[glyphIndex];
+          var decArgs = args.slice();
+          var newArg;
+          if (fn === 'showSpacedText') {
+            newArg = [];
+            for (var j = 0; j < glyphs.length; j++) {
+              if (typeof glyphs[j] === 'number') {
+                newArg.push(glyphs[j]);
+              } else {
+                newArg.push(glyphsToString(glyphs[j]));
+              }
+            }
+          } else {
+            newArg = glyphsToString(glyphs);
+          }
+          decArgs[glyphIndex] = newArg;
+        }
+        line.appendChild(c('td', fn));
+        line.appendChild(c('td', JSON.stringify(decArgs)));
       }
-      panel.appendChild(content);
-      var self = this;
     },
     getNextBreakPoint: function getNextBreakPoint() {
       this.breakPoints.sort(function(a, b) { return a - b; });
