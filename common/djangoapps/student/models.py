@@ -702,7 +702,7 @@ def update_user_information(sender, instance, created, **kwargs):
         cc_user = cc.User.from_django_user(instance)
         cc_user.save()
     except Exception as e:
-        log = logging.getLogger("mitx.discussion")
+        log = logging.getLogger("edx.discussion")
         log.error(unicode(e))
         log.error("update user info to discussion failed for user with id: " + str(instance.id))
 
