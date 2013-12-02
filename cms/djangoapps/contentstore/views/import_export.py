@@ -21,7 +21,7 @@ from django.http import HttpResponseNotFound
 from django.views.decorators.http import require_http_methods, require_GET
 from django.utils.translation import ugettext as _
 
-from mitxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response
 from auth.authz import create_all_course_groups
 
 from xmodule.modulestore.xml_importer import import_from_xml

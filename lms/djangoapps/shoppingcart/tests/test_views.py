@@ -18,7 +18,7 @@ from shoppingcart.models import Order, CertificateItem, PaidCourseRegistration, 
 from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
 from course_modes.models import CourseMode
-from mitxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response
 from shoppingcart.processors import render_purchase_form_html
 from mock import patch, Mock
 

@@ -8,7 +8,7 @@ from course_creators.views import update_course_creator_group
 from ratelimitbackend import admin
 from django.conf import settings
 from django.dispatch import receiver
-from mitxmako.shortcuts import render_to_string
+from edxmako.shortcuts import render_to_string
 from django.core.mail import send_mail
 from smtplib import SMTPException
 

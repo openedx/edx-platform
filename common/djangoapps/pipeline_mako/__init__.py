@@ -1,4 +1,4 @@
-from mitxmako.shortcuts import render_to_string
+from edxmako.shortcuts import render_to_string
 
 from pipeline.conf import settings
 from pipeline.packager import Packager

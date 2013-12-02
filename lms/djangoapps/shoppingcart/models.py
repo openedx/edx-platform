@@ -23,7 +23,7 @@ from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from course_modes.models import CourseMode
-from mitxmako.shortcuts import render_to_string
+from edxmako.shortcuts import render_to_string
 from student.views import course_from_id
 from student.models import CourseEnrollment, unenroll_done
 

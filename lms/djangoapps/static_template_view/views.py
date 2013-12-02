@@ -3,7 +3,7 @@
 # List of valid templates is explicitly managed for (short-term)
 # security reasons.
 
-from mitxmako.shortcuts import render_to_response, render_to_string
+from edxmako.shortcuts import render_to_response, render_to_string
 from mako.exceptions import TopLevelLookupException
 from django.shortcuts import redirect
 from django.conf import settings

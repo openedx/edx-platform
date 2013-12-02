@@ -17,7 +17,7 @@ from django.core.urlresolvers import reverse
 
 from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory
-from mitxmako.middleware import MakoMiddleware
+from edxmako.middleware import MakoMiddleware
 
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore

@@ -3,12 +3,12 @@ from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.shortcuts import redirect
 from django_future.csrf import ensure_csrf_cookie
-from mitxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response
 
 import student.views
 import branding
 import courseware.views
-from mitxmako.shortcuts import marketing_link
+from edxmako.shortcuts import marketing_link
 from util.cache import cache_if_anonymous
 
 

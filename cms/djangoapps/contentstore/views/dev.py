@@ -4,7 +4,7 @@ These views will NOT be shown on production: trying to access them will result
 in a 404 error.
 """
 # pylint: disable=W0613
-from mitxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response
 
 
 def dev_mode(request):

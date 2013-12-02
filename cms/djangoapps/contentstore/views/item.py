@@ -30,7 +30,7 @@ from student.models import CourseEnrollment
 from django.http import HttpResponseBadRequest
 from xblock.fields import Scope
 from preview import handler_prefix, get_preview_html
-from mitxmako.shortcuts import render_to_response, render_to_string
+from edxmako.shortcuts import render_to_response, render_to_string
 from models.settings.course_grading import CourseGradingModel
 
 __all__ = ['orphan_handler', 'xblock_handler']
