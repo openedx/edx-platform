@@ -5,21 +5,21 @@ define(["backbone", "underscore", "js/models/topic", "js/collections/topic", "ba
         defaults: function() {
             return {
                 name: "",
-                sections: new TopicCollection([{}]),
-                showTopcis: false,
+                topics: new TopicCollection([{}]),
+                showTopics: false,
                 editing: false
             };
         },
         relations: [{
             type: Backbone.Many,
-            key: "sections",
+            key: "topics",
             relatedModel: TopicModel,
             collectionType: TopicCollection
         }],
         initialize: function() {
             this.setOriginalAttributes();
-            return this
-|        },
+            return this;
+        },
         setOriginalAttributes: function() {
             this._originalAttributes = this.parse(this.toJSON());
         },
@@ -30,7 +30,7 @@ define(["backbone", "underscore", "js/models/topic", "js/collections/topic", "ba
             return !_.isEqual(this._originalAttributes, this.parse(this.toJSON()));
         },
         isEmpty: function() {
-            return !this.get('name') && this.get('sections').isEmpty();
+            return !this.get('name') && this.get('topics').isEmpty();
         },
         url: function() {
             if(this.isNew()) {
@@ -45,19 +45,19 @@ define(["backbone", "underscore", "js/models/topic", "js/collections/topic", "ba
                 ret.name = ret.tab_title;
                 delete ret.tab_title;
             }
-            if("url" in ret && !("sections" in ret)) {
-                ret.sections = {"url": ret.url};
+            if("url" in ret && !("topics" in ret)) {
+                ret.topics = {"url": ret.url};
                 delete ret.url;
             }
-            _.each(ret.sections, function(section, i) {
-                section.order = section.order || i+1;
+            _.each(ret.topics, function(topic, i) {
+                topic.order = topic.order || i+1;
             });
             return ret;
         },
         toJSON: function() {
             return {
                 tab_title: this.get('name'),
-                sections: this.get('sections').toJSON()
+                topics: this.get('topics').toJSON()
             };
         },
         // NOTE: validation functions should return non-internationalized error
@@ -69,15 +69,15 @@ define(["backbone", "underscore", "js/models/topic", "js/collections/topic", "ba
                     attributes: {name: true}
                 };
             }
-            if (attrs.sections.length === 0) {
+            if (attrs.topics.length === 0) {
                 return {
                     message: "Please add at least one topic",
-                    attributes: {sections: true}
+                    attributes: {topics: true}
                 };
             } else {
                 // validate all chapters
                 var invalidSections = [];
-                attrs.sections.each(function(section) {
+                attrs.topics.each(function(section) {
                     if(!section.isValid()) {
                         invalidSections.push(section);
                     }
@@ -85,7 +85,7 @@ define(["backbone", "underscore", "js/models/topic", "js/collections/topic", "ba
                 if(!_.isEmpty(invalidSections)) {
                     return {
                         message: "All topic must have a name and description",
-                        attributes: {sections: invalidSections}
+                        attributes: {topics: invalidSections}
                     };
                 }
             }
