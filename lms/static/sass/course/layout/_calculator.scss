@@ -112,15 +112,20 @@ div.calc-main {
           right: 0;
           top: 0;
 
-          a {
+          #calculator_hint {
             background: url("../images/info-icon.png") center center no-repeat;
             height: 35px;
             @include hide-text;
             width: 35px;
-             display: block;
+            display: block;
+
+            &:focus {
+              outline: 5px auto #5b9dd9;
+            }
           }
 
           .help {
+            @include transition(none);
             background: #fff;
             border-radius: 3px;
             box-shadow: 0 0 3px #999;
@@ -129,11 +134,12 @@ div.calc-main {
             position: absolute;
             right: -40px;
             bottom: 57px;
-            @include transition(none);
             width: 600px;
             overflow: hidden;
             pointer-events: none;
             display: none;
+            margin: 0;
+            list-style: none;
 
             &.shown {
               display: block;
