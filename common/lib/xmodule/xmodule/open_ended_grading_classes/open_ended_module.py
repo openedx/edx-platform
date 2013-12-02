@@ -741,7 +741,6 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
     def normalize_attempt_scores(self, attempt, system):
         """
         Return true if attempt score has been updated to be equal to sum of rubric scores.
-
         In the ML grades returned from ORA the aggregate score is not always equal to the
         sum of the rubric scores. This method makes them consistent.
         """
