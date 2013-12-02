@@ -98,7 +98,7 @@ nosexcover==1.0.7
 pep8==1.4.5
 pylint==0.28
 rednose==0.3
-selenium==2.34.0
+selenium==2.37.0
 splinter==0.5.4
 django_nose==1.1
 django_debug_toolbar

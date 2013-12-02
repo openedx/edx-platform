@@ -101,7 +101,7 @@ def update_course_updates(location, update, passed_id=None):
         idx = len(course_html_parsed)
 
     # update db record
-    course_updates.data = html.tostring(course_html_parsed)
+    course_updates.data = html.tostring(course_html_parsed, encoding=unicode)
     modulestore('direct').update_item(location, course_updates.data)
 
     return {
@@ -120,7 +120,7 @@ def _course_info_content(html_parsed):
         content = html_parsed[0].tail
     else:
         content = html_parsed[0].tail if html_parsed[0].tail is not None else ""
-        content += "\n".join([html.tostring(ele) for ele in html_parsed[1:]])
+        content += "\n".join([html.tostring(ele, encoding=unicode) for ele in html_parsed[1:]])
     return content
 
 
@@ -156,7 +156,7 @@ def delete_course_update(location, update, passed_id):
             course_html_parsed.remove(element_to_delete)
 
         # update db record
-        course_updates.data = html.tostring(course_html_parsed)
+        course_updates.data = html.tostring(course_html_parsed, encoding=unicode)
         store = modulestore('direct')
         store.update_item(location, course_updates.data)
 
