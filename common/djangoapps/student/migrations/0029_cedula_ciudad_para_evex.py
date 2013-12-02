@@ -57,6 +57,13 @@ class Migration(SchemaMigration):
             'user_permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'}),
             'username': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'})
         },
+        'cities.state': {
+            'Meta': {'object_name': 'State'},
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'code': ('django.db.models.fields.CharField', [], {'max_length': '8'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
+            'country': ('django.db.models.fields.CharField', [], {'max_length': '2'}),
+        },
         'cities.city': {
             'Meta': {'object_name': 'City'},
             'code': ('django.db.models.fields.CharField', [], {'max_length': '64'}),
