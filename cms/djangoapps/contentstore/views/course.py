@@ -58,8 +58,14 @@ __all__ = ['course_info_handler', 'course_handler', 'course_info_update_handler'
            'settings_handler',
            'grading_handler',
            'advanced_settings_handler',
+<<<<<<< HEAD
            'syllabus','textbook_index', 'textbook_by_id','syllabus_by_id',
            'create_textbook', 'create_syllabus']
+=======
+           'textbook_index', 'textbook_by_id',
+           'create_textbook']
+
+>>>>>>> 70a548e45d54649bfb16452c7771a74eca010555
 
 # pylint: disable=unused-argument
 @login_required

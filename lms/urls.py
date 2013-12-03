@@ -458,7 +458,7 @@ if settings.MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING'):
 
 #ajax call cites
 urlpatterns += (
-    url(r'^lookup/$', 'cities.views.lookup_handler', name='lookup_handler'),
+    url(r'^city_lookup/$', 'cities.views.lookup_handler', name='lookup_handler'),
 )
 
 urlpatterns = patterns(*urlpatterns)

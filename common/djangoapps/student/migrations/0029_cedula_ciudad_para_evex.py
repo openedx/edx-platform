@@ -57,11 +57,19 @@ class Migration(SchemaMigration):
             'user_permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'}),
             'username': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'})
         },
+        'cities.state': {
+            'Meta': {'object_name': 'State'},
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'code': ('django.db.models.fields.CharField', [], {'max_length': '8'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
+            'country': ('django.db.models.fields.CharField', [], {'max_length': '2'}),
+        },
         'cities.city': {
             'Meta': {'object_name': 'City'},
             'code': ('django.db.models.fields.CharField', [], {'max_length': '64'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '64'})
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '64'}),
+            'state': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'to': "orm['cities.State']", 'null': 'True', 'blank': 'True'}),            
         },
         'contenttypes.contenttype': {
             'Meta': {'ordering': "('name',)", 'unique_together': "(('app_label', 'model'),)", 'object_name': 'ContentType', 'db_table': "'django_content_type'"},
