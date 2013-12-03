@@ -526,18 +526,23 @@ class LoncapaProblem(object):
 
             # Grab the first choicegroup (there should only be one within each <multiplechoiceresponse> tag)
             choicegroup = multChoiceResponse.xpath('./choicegroup[@type="MultipleChoice"]')[0]
-            choicegroupID = choicegroup.get('id')
             choicesList = list(choicegroup.iter('choice'))
             
-            studentAnswer = None
             explanationIDForStudentAnswer = None
+            
+            # import ipdb
+            # ipdb.set_trace()
 
             # Find the student answer key that matches our <choicegroup> id
-            keysOfStudentAnswers = self.student_answers.keys()
-            for key in keysOfStudentAnswers:
-                if key == choicegroupID:
-                    studentAnswer = self.student_answers[key]
-                    break
+            studentAnswer = self.student_answers.get(choicegroup.get('id'))
+
+            # keysOfStudentAnswers = self.student_answers.keys()
+            # for key in keysOfStudentAnswers:
+            #     if key == choicegroupID:
+            #         studentAnswer = self.student_answers[key]
+            #         break
+
+            print "\n\nStudent Answer:%s\n\n" % (studentAnswer)
 
             # Keep track of the explanation-id that corresponds to the student's answer
             # Also, keep track of the solution-id
