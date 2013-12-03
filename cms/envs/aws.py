@@ -138,7 +138,8 @@ COURSES_WITH_UNSAFE_CODE = ENV_TOKENS.get("COURSES_WITH_UNSAFE_CODE", [])
 TIME_ZONE = ENV_TOKENS.get('TIME_ZONE', TIME_ZONE)
 
 
-for feature, value in ENV_TOKENS.get('FEATURES', {}).items():
+ENV_FEATURES = ENV_TOKENS.get('FEATURES', ENV_TOKENS.get('MITX_FEATURES', {}))
+for feature, value in ENV_FEATURES.items():
     FEATURES[feature] = value
 
 LOGGING = get_logger_config(LOG_DIR,
