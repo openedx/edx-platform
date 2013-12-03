@@ -43,7 +43,7 @@ describe 'CombinedOpenEnded', ->
       expect(@combined.el).toEqual @element
 
     it 'get the correct values from data fields', ->
-      expect(@combined.ajax_url).toEqual '/courses/MITx/6.002x/2012_Fall/modx/i4x://MITx/6.002x/combinedopenended/CombinedOE'
+      expect(@combined.ajax_url).toEqual '/courses/edX/6.002x/2012_Fall/modx/i4x://edX/6.002x/combinedopenended/CombinedOE'
       expect(@combined.state).toEqual 'assessing'
       expect(@combined.task_count).toEqual 2
       expect(@combined.task_number).toEqual 1

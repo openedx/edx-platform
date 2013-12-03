@@ -10,9 +10,9 @@ logger = getLogger(__name__)
 
 @step('I navigate to an openended question$')
 def navigate_to_an_openended_question(step):
-    world.register_by_course_id('MITx/3.091x/2012_Fall')
+    world.register_by_course_id('edX/3.091x/2012_Fall')
     world.log_in(email='robot@edx.org', password='test')
-    problem = '/courses/MITx/3.091x/2012_Fall/courseware/Week_10/Polymer_Synthesis/'
+    problem = '/courses/edX/3.091x/2012_Fall/courseware/Week_10/Polymer_Synthesis/'
     world.browser.visit(django_url(problem))
     tab_css = 'ol#sequence-list > li > a[data-element="5"]'
     world.css_click(tab_css)
@@ -20,9 +20,9 @@ def navigate_to_an_openended_question(step):
 
 @step('I navigate to an openended question as staff$')
 def navigate_to_an_openended_question_as_staff(step):
-    world.register_by_course_id('MITx/3.091x/2012_Fall', True)
+    world.register_by_course_id('edX/3.091x/2012_Fall', True)
     world.log_in(email='robot@edx.org', password='test')
-    problem = '/courses/MITx/3.091x/2012_Fall/courseware/Week_10/Polymer_Synthesis/'
+    problem = '/courses/edX/3.091x/2012_Fall/courseware/Week_10/Polymer_Synthesis/'
     world.browser.visit(django_url(problem))
     tab_css = 'ol#sequence-list > li > a[data-element="5"]'
     world.css_click(tab_css)

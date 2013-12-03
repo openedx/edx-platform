@@ -12,10 +12,10 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 import student.views
 
-MITX_FEATURES_WITH_STARTDATE = settings.MITX_FEATURES.copy()
-MITX_FEATURES_WITH_STARTDATE['DISABLE_START_DATES'] = False
-MITX_FEATURES_WO_STARTDATE = settings.MITX_FEATURES.copy()
-MITX_FEATURES_WO_STARTDATE['DISABLE_START_DATES'] = True
+FEATURES_WITH_STARTDATE = settings.FEATURES.copy()
+FEATURES_WITH_STARTDATE['DISABLE_START_DATES'] = False
+FEATURES_WO_STARTDATE = settings.FEATURES.copy()
+FEATURES_WO_STARTDATE['DISABLE_START_DATES'] = True
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
@@ -31,7 +31,7 @@ class AnonymousIndexPageTest(ModuleStoreTestCase):
         self.course.enrollment_start = datetime.datetime.now(UTC) + datetime.timedelta(days=3)
         self.store.save_xmodule(self.course)
 
-    @override_settings(MITX_FEATURES=MITX_FEATURES_WITH_STARTDATE)
+    @override_settings(FEATURES=FEATURES_WITH_STARTDATE)
     def test_none_user_index_access_with_startdate_fails(self):
         """
         This was a "before" test for a bugfix.  If someone fixes the bug another way in the future
@@ -40,12 +40,12 @@ class AnonymousIndexPageTest(ModuleStoreTestCase):
         with self.assertRaisesRegexp(AttributeError, "'NoneType' object has no attribute 'is_authenticated'"):
             student.views.index(self.factory.get('/'), user=None)  # pylint: disable=E1101
 
-    @override_settings(MITX_FEATURES=MITX_FEATURES_WITH_STARTDATE)
+    @override_settings(FEATURES=FEATURES_WITH_STARTDATE)
     def test_anon_user_with_startdate_index(self):
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
 
-    @override_settings(MITX_FEATURES=MITX_FEATURES_WO_STARTDATE)
+    @override_settings(FEATURES=FEATURES_WO_STARTDATE)
     def test_anon_user_no_startdate_index(self):
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)

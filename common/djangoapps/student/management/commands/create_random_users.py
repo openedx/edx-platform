@@ -22,7 +22,7 @@ Usage: create_random_users.py N [course_id_to_enroll_in].
 
 Examples:
   create_random_users.py 1
-  create_random_users.py 10 MITx/6.002x/2012_Fall
+  create_random_users.py 10 edX/6.002x/2012_Fall
   create_random_users.py 100 HarvardX/CS50x/2012
 """
 

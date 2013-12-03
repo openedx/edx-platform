@@ -6,7 +6,7 @@ from django.core.context_processors import csrf
 from django.shortcuts import redirect
 from django.conf import settings
 
-from mitxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response
 
 from external_auth.views import ssl_login_shortcut
 

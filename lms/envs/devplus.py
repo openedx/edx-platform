@@ -9,7 +9,7 @@ Assumptions:
 
 Dir structure:
 /envroot/
-        /mitx # The location of this repo
+        /edX # The location of this repo
         /log  # Where we're going to write log files
 
 """

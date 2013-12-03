@@ -9,7 +9,7 @@ from django.core.exceptions import PermissionDenied
 from django_future.csrf import ensure_csrf_cookie
 from django.conf import settings
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from mitxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response
 
 from xmodule.modulestore.django import modulestore
 from xmodule.util.date_utils import get_default_time_display
@@ -256,7 +256,7 @@ def unit_handler(request, tag=None, course_id=None, branch=None, version_guid=No
                 break
             index = index + 1
 
-        preview_lms_base = settings.MITX_FEATURES.get('PREVIEW_LMS_BASE')
+        preview_lms_base = settings.FEATURES.get('PREVIEW_LMS_BASE')
 
         preview_lms_link = (
             '//{preview_lms_base}/courses/{org}/{course}/'

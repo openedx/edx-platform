@@ -1,8 +1,8 @@
 """
 
 
-verify_student/start?course_id=MITx/6.002x/2013_Spring # create
-              /upload_face?course_id=MITx/6.002x/2013_Spring
+verify_student/start?course_id=edX/6.002x/2013_Spring # create
+              /upload_face?course_id=edX/6.002x/2013_Spring
               /upload_photo_id
               /confirm # mark_ready()
 
@@ -99,7 +99,7 @@ class TestReverifyView(TestCase):
         self.assertIn('photo_reverification', template)
         self.assertTrue(context['error'])
 
-    @patch.dict(settings.MITX_FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
+    @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
     def test_reverify_post_success(self):
         url = reverse('verify_student_reverify')
         response = self.client.post(url, {'face_image': ',',

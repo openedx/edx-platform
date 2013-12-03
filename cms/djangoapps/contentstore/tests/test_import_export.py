@@ -252,7 +252,7 @@ class ExportTestCase(CourseTestCase):
         Export failure.
         """
         ItemFactory.create(parent_location=self.course.location, category='aawefawef')
-        self._verify_export_failure('/course/MITx.999.Robot_Super_Course/branch/draft/block/Robot_Super_Course')
+        self._verify_export_failure('/course/edX.999.Robot_Super_Course/branch/draft/block/Robot_Super_Course')
 
     def test_export_failure_subsection_level(self):
         """
@@ -263,7 +263,7 @@ class ExportTestCase(CourseTestCase):
             parent_location=vertical.location,
             category='aawefawef'
         )
-        self._verify_export_failure(u'/unit/MITx.999.Robot_Super_Course/branch/draft/block/foo')
+        self._verify_export_failure(u'/unit/edX.999.Robot_Super_Course/branch/draft/block/foo')
 
     def _verify_export_failure(self, expectedText):
         """ Export failure helper method. """

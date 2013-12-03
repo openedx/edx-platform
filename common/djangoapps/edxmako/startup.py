@@ -6,7 +6,7 @@ import tempdir
 from django.conf import settings
 from mako.lookup import TemplateLookup
 
-import mitxmako
+import edxmako
 
 
 def run():
@@ -30,4 +30,4 @@ def run():
             encoding_errors='replace',
         )
 
-    mitxmako.lookup = lookup
+    edxmako.lookup = lookup

@@ -447,7 +447,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
     def _get_tab_locator(self, course, tab):
         """ Returns the locator for a given tab. """
-        tab_location = 'i4x://MITx/999/static_tab/{0}'.format(tab['url_slug'])
+        tab_location = 'i4x://edX/999/static_tab/{0}'.format(tab['url_slug'])
         return loc_mapper().translate_location(
             course.location.course_id, Location(tab_location), False, True
         )
@@ -724,7 +724,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
     def test_clone_course(self):
 
         course_data = {
-            'org': 'MITx',
+            'org': 'edX',
             'number': '999',
             'display_name': 'Robot Super Course',
             'run': '2013_Spring'
@@ -735,7 +735,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         import_from_xml(module_store, 'common/test/data/', ['toy'])
 
         source_course_id = 'edX/toy/2012_Fall'
-        dest_course_id = 'MITx/999/2013_Spring'
+        dest_course_id = 'edX/999/2013_Spring'
         source_location = CourseDescriptor.id_to_location(source_course_id)
         dest_location = CourseDescriptor.id_to_location(dest_course_id)
 
@@ -807,7 +807,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
     def test_portable_link_rewrites_during_clone_course(self):
         course_data = {
-            'org': 'MITx',
+            'org': 'edX',
             'number': '999',
             'display_name': 'Robot Super Course',
             'run': '2013_Spring'
@@ -819,7 +819,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         import_from_xml(module_store, 'common/test/data/', ['toy'])
 
         source_course_id = 'edX/toy/2012_Fall'
-        dest_course_id = 'MITx/999/2013_Spring'
+        dest_course_id = 'edX/999/2013_Spring'
         source_location = CourseDescriptor.id_to_location(source_course_id)
         dest_location = CourseDescriptor.id_to_location(dest_course_id)
 
@@ -854,9 +854,9 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         draft_store = modulestore('draft')
         direct_store = modulestore('direct')
 
-        CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
+        CourseFactory.create(org='edX', course='999', display_name='Robot Super Course')
 
-        location = Location('i4x://MITx/999/chapter/neuvo')
+        location = Location('i4x://edX/999/chapter/neuvo')
         # Ensure draft mongo store does not allow us to create chapters either directly or via convert to draft
         self.assertRaises(InvalidVersionError, draft_store.create_and_save_xmodule, location)
         direct_store.create_and_save_xmodule(location)
@@ -866,7 +866,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         # taking advantage of update_children and other functions never checking that the ids are valid
         self.assertRaises(InvalidVersionError, draft_store.update_children, location,
-                          ['i4x://MITx/999/problem/doesntexist'])
+                          ['i4x://edX/999/problem/doesntexist'])
 
         self.assertRaises(InvalidVersionError, draft_store.update_metadata, location,
                           {'due': datetime.datetime.now(UTC)})
@@ -906,7 +906,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         import_from_xml(module_store, 'common/test/data/', ['toy'], static_content_store=content_store)
 
-        location = CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course').location
+        location = CourseFactory.create(org='edX', course='999', display_name='Robot Super Course').location
 
         # get a vertical (and components in it) to put into 'draft'
         vertical = module_store.get_item(Location(['i4x', 'edX', 'toy',
@@ -1389,7 +1389,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         self.client.login(username=uname, password=password)
 
         self.course_data = {
-            'org': 'MITx',
+            'org': 'edX',
             'number': '999',
             'display_name': 'Robot Super Course',
             'run': '2013_Spring'
@@ -1506,31 +1506,31 @@ class ContentStoreTest(ModuleStoreTestCase):
 
     def test_create_course_with_course_creation_disabled_staff(self):
         """Test new course creation -- course creation disabled, but staff access."""
-        with mock.patch.dict('django.conf.settings.MITX_FEATURES', {'DISABLE_COURSE_CREATION': True}):
+        with mock.patch.dict('django.conf.settings.FEATURES', {'DISABLE_COURSE_CREATION': True}):
             self.assert_created_course()
 
     def test_create_course_with_course_creation_disabled_not_staff(self):
         """Test new course creation -- error path for course creation disabled, not staff access."""
-        with mock.patch.dict('django.conf.settings.MITX_FEATURES', {'DISABLE_COURSE_CREATION': True}):
+        with mock.patch.dict('django.conf.settings.FEATURES', {'DISABLE_COURSE_CREATION': True}):
             self.user.is_staff = False
             self.user.save()
             self.assert_course_permission_denied()
 
     def test_create_course_no_course_creators_staff(self):
         """Test new course creation -- course creation group enabled, staff, group is empty."""
-        with mock.patch.dict('django.conf.settings.MITX_FEATURES', {'ENABLE_CREATOR_GROUP': True}):
+        with mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_CREATOR_GROUP': True}):
             self.assert_created_course()
 
     def test_create_course_no_course_creators_not_staff(self):
         """Test new course creation -- error path for course creator group enabled, not staff, group is empty."""
-        with mock.patch.dict('django.conf.settings.MITX_FEATURES', {"ENABLE_CREATOR_GROUP": True}):
+        with mock.patch.dict('django.conf.settings.FEATURES', {"ENABLE_CREATOR_GROUP": True}):
             self.user.is_staff = False
             self.user.save()
             self.assert_course_permission_denied()
 
     def test_create_course_with_course_creator(self):
         """Test new course creation -- use course creator group"""
-        with mock.patch.dict('django.conf.settings.MITX_FEATURES', {"ENABLE_CREATOR_GROUP": True}):
+        with mock.patch.dict('django.conf.settings.FEATURES', {"ENABLE_CREATOR_GROUP": True}):
             add_user_to_creator_group(self.user, self.user)
             self.assert_created_course()
 
@@ -1578,13 +1578,13 @@ class ContentStoreTest(ModuleStoreTestCase):
 
     def test_course_overview_view_with_course(self):
         """Test viewing the course overview page with an existing course"""
-        CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
+        CourseFactory.create(org='edX', course='999', display_name='Robot Super Course')
 
-        loc = Location(['i4x', 'MITx', '999', 'course', Location.clean('Robot Super Course'), None])
+        loc = Location(['i4x', 'edX', '999', 'course', Location.clean('Robot Super Course'), None])
         resp = self._show_course_overview(loc)
         self.assertContains(
             resp,
-            '<article class="courseware-overview" data-locator="MITx.999.Robot_Super_Course/branch/draft/block/Robot_Super_Course">',
+            '<article class="courseware-overview" data-locator="edX.999.Robot_Super_Course/branch/draft/block/Robot_Super_Course">',
             status_code=200,
             html=True
         )
@@ -1606,7 +1606,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         data = parse_json(resp)
         self.assertRegexpMatches(
             data['locator'],
-            r"^MITx.999.Robot_Super_Course/branch/draft/block/chapter([0-9]|[a-f]){3}$"
+            r"^edX.999.Robot_Super_Course/branch/draft/block/chapter([0-9]|[a-f]){3}$"
         )
 
     def test_capa_module(self):
@@ -1707,7 +1707,7 @@ class ContentStoreTest(ModuleStoreTestCase):
 
     def test_import_into_new_course_id(self):
         module_store = modulestore('direct')
-        target_location = Location(['i4x', 'MITx', '999', 'course', '2013_Spring'])
+        target_location = Location(['i4x', 'edX', '999', 'course', '2013_Spring'])
 
         course_data = {
             'org': target_location.org,
@@ -1738,8 +1738,8 @@ class ContentStoreTest(ModuleStoreTestCase):
 
         self.assertEquals(len(course_module.pdf_textbooks), 1)
         self.assertEquals(len(course_module.pdf_textbooks[0]["chapters"]), 2)
-        self.assertEquals(course_module.pdf_textbooks[0]["chapters"][0]["url"], '/c4x/MITx/999/asset/Chapter1.pdf')
-        self.assertEquals(course_module.pdf_textbooks[0]["chapters"][1]["url"], '/c4x/MITx/999/asset/Chapter2.pdf')
+        self.assertEquals(course_module.pdf_textbooks[0]["chapters"][0]["url"], '/c4x/edX/999/asset/Chapter1.pdf')
+        self.assertEquals(course_module.pdf_textbooks[0]["chapters"][1]["url"], '/c4x/edX/999/asset/Chapter2.pdf')
 
         # check that URL slug got updated to new course slug
         self.assertEquals(course_module.wiki_slug, '999')
@@ -2004,7 +2004,7 @@ def _course_factory_create_course():
     """
     Creates a course via the CourseFactory and returns the locator for it.
     """
-    course = CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
+    course = CourseFactory.create(org='edX', course='999', display_name='Robot Super Course')
     return loc_mapper().translate_location(course.location.course_id, course.location, False, True)
 
 

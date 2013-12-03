@@ -2,7 +2,7 @@
 This is the common settings file, intended to set sane defaults. If you have a
 piece of configuration that's dependent on a set of feature flags being set,
 then create a function that returns the calculated value based on the value of
-MITX_FEATURES[...]. Modules that extend this one can change the feature
+FEATURES[...]. Modules that extend this one can change the feature
 configuration in an environment specific config file and re-calculate those
 values.
 
@@ -14,7 +14,7 @@ Longer TODO:
 1. Right now our treatment of static content in general and in particular
    course-specific static content is haphazard.
 2. We should have a more disciplined approach to feature flagging, even if it
-   just means that we stick them in a dict called MITX_FEATURES.
+   just means that we stick them in a dict called FEATURES.
 3. We need to handle configuration for multiple courses. This could be as
    multiple sites, but we do need a way to map their data assets.
 """
@@ -50,7 +50,7 @@ DISCUSSION_SETTINGS = {
 
 
 # Features
-MITX_FEATURES = {
+FEATURES = {
     'SAMPLE': False,
     'USE_DJANGO_PIPELINE': True,
     'DISPLAY_HISTOGRAMS_TO_STAFF': True,
@@ -216,7 +216,7 @@ XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5  # seconds
 PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /edx-platform/lms
 REPO_ROOT = PROJECT_ROOT.dirname()
 COMMON_ROOT = REPO_ROOT / "common"
-ENV_ROOT = REPO_ROOT.dirname()  # virtualenv dir /mitx is in
+ENV_ROOT = REPO_ROOT.dirname()  # virtualenv dir /edX is in
 COURSES_ROOT = ENV_ROOT / "data"
 
 DATA_DIR = COURSES_ROOT
@@ -245,7 +245,7 @@ STATUS_MESSAGE_PATH = ENV_ROOT / "status_message.json"
 ############################ OpenID Provider  ##################################
 OPENID_PROVIDER_TRUSTED_ROOTS = ['cs50.net', '*.cs50.net']
 
-################################## MITXWEB #####################################
+################################## EDX WEB #####################################
 # This is where we stick our compiled template files. Most of the app uses Mako
 # templates
 from tempdir import mkdtemp_clean
@@ -281,7 +281,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'course_wiki.course_nav.context_processor',
 
     # Hack to get required link URLs to password reset templates
-    'mitxmako.shortcuts.marketing_link_context_processor',
+    'edxmako.shortcuts.marketing_link_context_processor',
 
     # Shoppingcart processor (detects if request.user has a cart)
     'shoppingcart.context_processor.user_has_cart_context_processor',
@@ -310,10 +310,10 @@ RSS_TIMEOUT = 600
 STATIC_GRAB = False
 DEV_CONTENT = True
 
-MITX_ROOT_URL = ''
+EDX_ROOT_URL = ''
 
-LOGIN_REDIRECT_URL = MITX_ROOT_URL + '/accounts/login'
-LOGIN_URL = MITX_ROOT_URL + '/accounts/login'
+LOGIN_REDIRECT_URL = EDX_ROOT_URL + '/accounts/login'
+LOGIN_URL = EDX_ROOT_URL + '/accounts/login'
 
 COURSE_NAME = "6.002_Spring_2012"
 COURSE_NUMBER = "6.002x"
@@ -321,7 +321,7 @@ COURSE_TITLE = "Circuits and Electronics"
 
 ### Dark code. Should be enabled in local settings for devel.
 
-ENABLE_MULTICOURSE = False  # set to False to disable multicourse display (see lib.util.views.mitxhome)
+ENABLE_MULTICOURSE = False  # set to False to disable multicourse display (see lib.util.views.edXhome)
 
 WIKI_ENABLED = False
 
@@ -360,7 +360,7 @@ TRACKING_BACKENDS = {
 
 # Backwards compatibility with ENABLE_SQL_TRACKING_LOGS feature flag.
 # In the future, adding the backend to TRACKING_BACKENDS enough.
-if MITX_FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):
+if FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):
     TRACKING_BACKENDS.update({
         'sql': {
             'ENGINE': 'track.backends.django.DjangoBackend'
@@ -490,7 +490,7 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 # gitreload is used in LMS-workflow to pull content from github
 # gitreload requests are only allowed from these IP addresses, which are
 # the advertised public IPs of the github WebHook servers.
-# These are listed, eg at https://github.com/MITx/mitx/admin/hooks
+# These are listed, eg at https://github.com/edX/edx-platform/admin/hooks
 
 ALLOWED_GITRELOAD_IPS = ['207.97.227.253', '50.57.128.197', '108.171.174.178']
 
@@ -592,8 +592,8 @@ STATICFILES_FINDERS = (
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
-    'mitxmako.makoloader.MakoFilesystemLoader',
-    'mitxmako.makoloader.MakoAppDirectoriesLoader',
+    'edxmako.makoloader.MakoFilesystemLoader',
+    'edxmako.makoloader.MakoAppDirectoriesLoader',
 
     # 'django.template.loaders.filesystem.Loader',
     # 'django.template.loaders.app_directories.Loader',
@@ -615,7 +615,7 @@ MIDDLEWARE_CLASSES = (
 
     'django.contrib.messages.middleware.MessageMiddleware',
     'track.middleware.TrackMiddleware',
-    'mitxmako.middleware.MakoMiddleware',
+    'edxmako.middleware.MakoMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
 
     'course_wiki.course_nav.Middleware',
@@ -821,7 +821,7 @@ STATICFILES_IGNORE_PATTERNS = (
 
 PIPELINE_YUI_BINARY = 'yui-compressor'
 
-# Setting that will only affect the MITx version of django-pipeline until our changes are merged upstream
+# Setting that will only affect the edX version of django-pipeline until our changes are merged upstream
 PIPELINE_COMPILE_INPLACE = True
 
 ################################# CELERY ######################################
@@ -928,7 +928,7 @@ INSTALLED_APPS = (
     'service_status',
 
     # For asset pipelining
-    'mitxmako',
+    'edxmako',
     'pipeline',
     'staticfiles',
     'static_replace',
@@ -1034,7 +1034,7 @@ def enable_theme(theme_name):
     THEME_NAME = "stanford"
     enable_theme(THEME_NAME)
     """
-    MITX_FEATURES['USE_CUSTOM_THEME'] = True
+    FEATURES['USE_CUSTOM_THEME'] = True
 
     # Calculate the location of the theme's files
     theme_root = ENV_ROOT / "themes" / theme_name
@@ -1055,7 +1055,7 @@ VERIFY_STUDENT = {
 
 ######################## CAS authentication ###########################
 
-if MITX_FEATURES.get('AUTH_USE_CAS'):
+if FEATURES.get('AUTH_USE_CAS'):
     CAS_SERVER_URL = 'https://provide_your_cas_url_here'
     AUTHENTICATION_BACKENDS = (
         'django.contrib.auth.backends.ModelBackend',

@@ -162,9 +162,9 @@ def test_html_id():
 
 
 def test_course_id():
-    loc = Location('i4x', 'mitX', '103', 'course', 'test2')
-    assert_equals('mitX/103/test2', loc.course_id)
+    loc = Location('i4x', 'edX', '103', 'course', 'test2')
+    assert_equals('edX/103/test2', loc.course_id)
 
-    loc = Location('i4x', 'mitX', '103', '_not_a_course', 'test2')
+    loc = Location('i4x', 'edX', '103', '_not_a_course', 'test2')
     with assert_raises(InvalidLocationError):
         loc.course_id

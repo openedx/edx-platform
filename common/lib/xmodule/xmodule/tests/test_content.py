@@ -26,13 +26,13 @@ class ContentTest(unittest.TestCase):
 
     def test_generate_thumbnail_image(self):
         contentStore = ContentStore()
-        content = Content(Location(u'c4x', u'mitX', u'800', u'asset', u'monsters__.jpg'), None)
+        content = Content(Location(u'c4x', u'edX', u'800', u'asset', u'monsters__.jpg'), None)
         (thumbnail_content, thumbnail_file_location) = contentStore.generate_thumbnail(content)
         self.assertIsNone(thumbnail_content)
-        self.assertEqual(Location(u'c4x', u'mitX', u'800', u'thumbnail', u'monsters__.jpg'), thumbnail_file_location)
+        self.assertEqual(Location(u'c4x', u'edX', u'800', u'thumbnail', u'monsters__.jpg'), thumbnail_file_location)
 
     def test_compute_location(self):
         # We had a bug that __ got converted into a single _. Make sure that substitution of INVALID_CHARS (like space)
         # still happen.
-        asset_location = StaticContent.compute_location('mitX', '400', 'subs__1eo_jXvZnE .srt.sjson')
-        self.assertEqual(Location(u'c4x', u'mitX', u'400', u'asset', u'subs__1eo_jXvZnE_.srt.sjson', None), asset_location)
+        asset_location = StaticContent.compute_location('edX', '400', 'subs__1eo_jXvZnE .srt.sjson')
+        self.assertEqual(Location(u'c4x', u'edX', u'400', u'asset', u'subs__1eo_jXvZnE_.srt.sjson', None), asset_location)

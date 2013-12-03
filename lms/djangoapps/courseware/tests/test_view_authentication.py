@@ -253,7 +253,7 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         for url in urls:
             check_for_get_code(self, 200, url)
 
-    @patch.dict('courseware.access.settings.MITX_FEATURES', {'DISABLE_START_DATES': False})
+    @patch.dict('courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_dark_launch_enrolled_student(self):
         """
         Make sure that before course start, students can't access course
@@ -280,7 +280,7 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self._check_non_staff_light(self.test_course)
         self._check_non_staff_dark(self.test_course)
 
-    @patch.dict('courseware.access.settings.MITX_FEATURES', {'DISABLE_START_DATES': False})
+    @patch.dict('courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_dark_launch_instructor(self):
         """
         Make sure that before course start instructors can access the
@@ -303,7 +303,7 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self._check_non_staff_dark(self.test_course)
         self._check_staff(self.course)
 
-    @patch.dict('courseware.access.settings.MITX_FEATURES', {'DISABLE_START_DATES': False})
+    @patch.dict('courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_dark_launch_global_staff(self):
         """
         Make sure that before course start staff can access
@@ -324,7 +324,7 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self._check_staff(self.course)
         self._check_staff(self.test_course)
 
-    @patch.dict('courseware.access.settings.MITX_FEATURES', {'DISABLE_START_DATES': False})
+    @patch.dict('courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_enrollment_period(self):
         """
         Check that enrollment periods work.
@@ -371,7 +371,7 @@ class TestBetatesterAccess(ModuleStoreTestCase):
         self.normal_student = UserFactory()
         self.beta_tester = BetaTesterFactory(course=self.course.location)
 
-    @patch.dict('courseware.access.settings.MITX_FEATURES', {'DISABLE_START_DATES': False})
+    @patch.dict('courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_course_beta_period(self):
         """
         Check that beta-test access works for courses.
@@ -384,7 +384,7 @@ class TestBetatesterAccess(ModuleStoreTestCase):
         # now the student should see it
         self.assertTrue(has_access(self.beta_tester, self.course, 'load'))
 
-    @patch.dict('courseware.access.settings.MITX_FEATURES', {'DISABLE_START_DATES': False})
+    @patch.dict('courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_content_beta_period(self):
         """
         Check that beta-test access works for content.

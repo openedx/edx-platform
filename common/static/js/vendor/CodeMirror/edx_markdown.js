@@ -9,7 +9,7 @@ var schematic_editor_width = 500;
 $(function(){
   $(document).ready(function() {
 	  //$("a[rel*=leanModal]").leanModal(); //TODO: Make this work with the new modal library. Try and integrate this with the "slices"
-    
+
     $("body").append('\
     <div id="circuit_editor_modal" class="modal hide fade"> \
       <div class="modal-body"> \
@@ -21,39 +21,39 @@ $(function(){
         </button> \
       </div> \
     </div>');
-    
+
     //This is the editor that pops up as a modal
     var editorCircuit = $("#schematic_editor").get(0);
     //This is the circuit that they last clicked. The one being edited.
     var editingCircuit = null;
-    //Notice we use live, because new circuits can be inserted  
+    //Notice we use live, because new circuits can be inserted
     $(".schematic_open").live("click", function() {
       //Find the new editingCircuit. Transfer its contents to the editorCircuit
       editingCircuit = $(this).children("input.schematic").get(0);
-        
+
       editingCircuit.schematic.update_value();
       var circuit_so_far = $(editingCircuit).val();
-        
+
 	    var n = editorCircuit.schematic.components.length;
 	    for (var i = 0; i < n; i++)
 		    editorCircuit.schematic.components[n - 1 - i].remove();
-        
+
       editorCircuit.schematic.load_schematic(circuit_so_far, "");
       editorCircuit.schematic.zoomall();
     });
-    
+
     $("#circuit_save_btn").click(function () {
-      //Take the circuit from the editor and put it back into editingCircuit 
+      //Take the circuit from the editor and put it back into editingCircuit
       editorCircuit.schematic.update_value();
       var saving_circuit = $(editorCircuit).val();
-        
+
 	    var n = editingCircuit.schematic.components.length;
 	    for (var i = 0; i < n; i++)
 		    editingCircuit.schematic.components[n - 1 - i].remove();
-        
+
       editingCircuit.schematic.load_schematic(saving_circuit, "");
       editingCircuit.schematic.zoomall();
-      
+
       if (editingCircuit.codeMirrorLine) {
         editingCircuit.codeMirrorLine.replace(0, null, "circuit-schematic:" + saving_circuit);
       }
@@ -62,7 +62,7 @@ $(function(){
 });
 
 
-CodeMirror.defineMode("mitx_markdown", function(cmCfg, modeCfg) {
+CodeMirror.defineMode("edx_markdown", function(cmCfg, modeCfg) {
 
   var htmlFound = CodeMirror.mimeModes.hasOwnProperty("text/html");
   var htmlMode = CodeMirror.getMode(cmCfg, htmlFound ? "text/html" : "text/plain");
@@ -109,7 +109,7 @@ CodeMirror.defineMode("mitx_markdown", function(cmCfg, modeCfg) {
     }
     return null;
   }
-  
+
   function escapeHtml(unsafe) {
       return unsafe
            .replace(/&/g, "&amp;")
@@ -118,16 +118,16 @@ CodeMirror.defineMode("mitx_markdown", function(cmCfg, modeCfg) {
            .replace(/"/g, "&quot;")
            .replace(/'/g, "&#039;");
    }
-  
+
   var circuit_formatter = {
     creator: function(text) {
       var circuit_value = text.match(circuitRE)[1]
-      
+
       circuit_value = escapeHtml(circuit_value);
-      
-      var html = "<div style='display:block;line-height:0;' class='schematic_container'><a href='#circuit_editor_modal' data-toggle='modal' class='schematic_open' style='display:inline-block;'>" + 
+
+      var html = "<div style='display:block;line-height:0;' class='schematic_container'><a href='#circuit_editor_modal' data-toggle='modal' class='schematic_open' style='display:inline-block;'>" +
                   "<input type='hidden' parts='' value='" + circuit_value + "' width='" + schematic_width + "' height='" + schematic_height + "' analyses='' class='schematic ctrls'/></a></div>";
-                   
+
       return html;
     },
     size: function(text) {
@@ -144,7 +144,7 @@ CodeMirror.defineMode("mitx_markdown", function(cmCfg, modeCfg) {
           schmInput.schematic.redraw_background();
         }
       } catch (err) {
-        console.log("Error in mitx_markdown callback: " + err);
+        console.log("Error in edx_markdown callback: " + err);
       }
 
     }
@@ -174,7 +174,7 @@ CodeMirror.defineMode("mitx_markdown", function(cmCfg, modeCfg) {
       state.indentation += match[0].length;
       return list;
     }
-    
+
     return switchInline(stream, state, state.inline);
   }
 
@@ -196,10 +196,10 @@ CodeMirror.defineMode("mitx_markdown", function(cmCfg, modeCfg) {
   // Inline
   function getType(state) {
     var styles = [];
-    
+
     if (state.strong) { styles.push(state.em ? emstrong : strong); }
     else if (state.em) { styles.push(em); }
-    
+
     if (state.header) { styles.push(header); }
     if (state.quote) { styles.push(quote); }
 
@@ -210,16 +210,16 @@ CodeMirror.defineMode("mitx_markdown", function(cmCfg, modeCfg) {
     if (stream.match(textRE, true)) {
       return getType(state);
     }
-    return undefined;        
+    return undefined;
   }
 
   function inlineNormal(stream, state) {
     var style = state.text(stream, state)
     if (typeof style !== 'undefined')
       return style;
-    
+
     var ch = stream.next();
-    
+
     if (ch === '\\') {
       stream.next();
       return getType(state);
@@ -241,12 +241,12 @@ CodeMirror.defineMode("mitx_markdown", function(cmCfg, modeCfg) {
       stream.backUp(1);
       return switchBlock(stream, state, htmlBlock);
     }
-      
+
     if (ch === '<' && stream.match(/^\/\w*?>/)) {
       state.md_inside = false;
       return "tag";
     }
-      
+
     var t = getType(state);
     if (ch === '*' || ch === '_') {
       if (stream.eat(ch)) {
@@ -254,7 +254,7 @@ CodeMirror.defineMode("mitx_markdown", function(cmCfg, modeCfg) {
       }
       return (state.em = !state.em) ? getType(state) : t;
     }
-    
+
     return getType(state);
   }
 
@@ -316,11 +316,11 @@ CodeMirror.defineMode("mitx_markdown", function(cmCfg, modeCfg) {
     startState: function() {
       return {
         f: blockNormal,
-        
+
         block: blockNormal,
         htmlState: CodeMirror.startState(htmlMode),
         indentation: 0,
-        
+
         inline: inlineNormal,
         text: handleText,
         em: false,
@@ -333,11 +333,11 @@ CodeMirror.defineMode("mitx_markdown", function(cmCfg, modeCfg) {
     copyState: function(s) {
       return {
         f: s.f,
-        
+
         block: s.block,
         htmlState: CodeMirror.copyState(htmlMode, s.htmlState),
         indentation: s.indentation,
-          
+
         inline: s.inline,
         text: s.text,
         em: s.em,

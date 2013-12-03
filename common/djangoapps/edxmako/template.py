@@ -14,10 +14,10 @@
 
 from django.conf import settings
 from mako.template import Template as MakoTemplate
-from mitxmako.shortcuts import marketing_link
+from edxmako.shortcuts import marketing_link
 
-import mitxmako
-import mitxmako.middleware
+import edxmako
+import edxmako.middleware
 
 django_variables = ['lookup', 'output_encoding', 'encoding_errors']
 
@@ -34,7 +34,7 @@ class Template(MakoTemplate):
     def __init__(self, *args, **kwargs):
         """Overrides base __init__ to provide django variable overrides"""
         if not kwargs.get('no_django', False):
-            overrides = dict([(k, getattr(mitxmako, k, None),) for k in django_variables])
+            overrides = dict([(k, getattr(edxmako, k, None),) for k in django_variables])
             overrides['lookup'] = overrides['lookup']['main']
             kwargs.update(overrides)
         super(Template, self).__init__(*args, **kwargs)
@@ -48,13 +48,13 @@ class Template(MakoTemplate):
         context_dictionary = {}
 
         # In various testing contexts, there might not be a current request context.
-        if mitxmako.middleware.requestcontext is not None:
-            for d in mitxmako.middleware.requestcontext:
+        if edxmako.middleware.requestcontext is not None:
+            for d in edxmako.middleware.requestcontext:
                 context_dictionary.update(d)
         for d in context_instance:
             context_dictionary.update(d)
         context_dictionary['settings'] = settings
-        context_dictionary['MITX_ROOT_URL'] = settings.MITX_ROOT_URL
+        context_dictionary['EDX_ROOT_URL'] = settings.EDX_ROOT_URL
         context_dictionary['django_context'] = context_instance
         context_dictionary['marketing_link'] = marketing_link
 

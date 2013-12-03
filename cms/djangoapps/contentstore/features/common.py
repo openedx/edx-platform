@@ -132,7 +132,7 @@ def create_studio_user(
 
 def fill_in_course_info(
         name='Robot Super Course',
-        org='MITx',
+        org='edX',
         num='101',
         run='2013_Spring'):
     world.css_fill('.new-course-name', name)
@@ -166,7 +166,7 @@ def add_course_author(user, course):
 
 
 def create_a_course():
-    course = world.CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
+    course = world.CourseFactory.create(org='edX', course='999', display_name='Robot Super Course')
     world.scenario_dict['COURSE'] = course
 
     user = world.scenario_dict.get("USER")

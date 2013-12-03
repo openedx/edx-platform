@@ -1,5 +1,5 @@
 # Notes on using mongodb backed LMS and CMS
-  
+
 These are some random notes for developers, on how things are stored in mongodb, and how to debug mongodb data.
 
 ## Databases
@@ -22,7 +22,7 @@ Here is an example showing the fields available in problem documents:
     {
 	"_id" : {
 		"tag" : "i4x",
-		"org" : "MITx",
+		"org" : "edX",
 		"course" : "6.00x",
 		"category" : "problem",
 		"name" : "ps03:ps03-Hangman_part_2_The_Game",
@@ -45,8 +45,8 @@ Here is an example showing the fields available in problem documents:
 1. "mongo"
 2. "use xmodule"
 3. "show collections" should give "modulestore" and "system.indexes"
-4. 'db.modulestore.find( {"_id.org": "MITx"} )' will produce a list of all MITx course documents
-5. 'db.modulestore.find( {"_id.org": "MITx", "_id.category": "problem"} )' will produce a list of all problems in MITx courses
+4. 'db.modulestore.find( {"_id.org": "edX"} )' will produce a list of all edX course documents
+5. 'db.modulestore.find( {"_id.org": "edX", "_id.category": "problem"} )' will produce a list of all problems in edX courses
 
 Example query for finding all files with "image" in the filename:
 
@@ -62,7 +62,7 @@ Under ubuntu, do:
 
   - apt-get install php5-fpm php-pear
   - pecl install mongo
-  - edit /etc/php5/fpm/php.ini to add "extension=mongo.so" 
+  - edit /etc/php5/fpm/php.ini to add "extension=mongo.so"
   - /etc/init.d/php5-fpm restart
 
 and also setup nginx to run php through fastcgi.
@@ -71,8 +71,8 @@ and also setup nginx to run php through fastcgi.
 
 - mogodump  (dumps all dbs)
 - mongodump --collection modulestore --db xmodule (dumps just xmodule/modulestore)
-- mongodump  -d xmodule -q '{"_id.org": "MITx"}' (dumps just MITx documents in xmodule)
-- mongodump -q '{"_id.org": "MITx"}' (dumps all MITx documents)
+- mongodump  -d xmodule -q '{"_id.org": "edX"}' (dumps just edX documents in xmodule)
+- mongodump -q '{"_id.org": "edX"}' (dumps all edX documents)
 
 ## Deleting course content
 

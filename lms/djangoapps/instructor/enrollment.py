@@ -12,7 +12,7 @@ from django.core.mail import send_mail
 
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from courseware.models import StudentModule
-from mitxmako.shortcuts import render_to_string
+from edxmako.shortcuts import render_to_string
 
 # For determining if a shibboleth course
 SHIBBOLETH_DOMAIN_PREFIX = 'shib:'

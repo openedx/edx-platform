@@ -101,7 +101,7 @@ urlpatterns += patterns('',
     url(r'^i18n.js$', 'django.views.i18n.javascript_catalog', js_info_dict),
 )
 
-if settings.MITX_FEATURES.get('ENABLE_SERVICE_STATUS'):
+if settings.FEATURES.get('ENABLE_SERVICE_STATUS'):
     urlpatterns += patterns('',
         url(r'^status/', include('service_status.urls')),
     )
@@ -109,7 +109,7 @@ if settings.MITX_FEATURES.get('ENABLE_SERVICE_STATUS'):
 urlpatterns += patterns('', url(r'^admin/', include(admin.site.urls)),)
 
 # enable automatic login
-if settings.MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING'):
+if settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING'):
     urlpatterns += (
         url(r'^auto_auth$', 'student.views.auto_auth'),
     )

@@ -5,7 +5,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseBadRequest
 from django.contrib.auth.decorators import login_required
-from mitxmako.shortcuts import render_to_response, render_to_string
+from edxmako.shortcuts import render_to_response, render_to_string
 
 from xmodule_modifiers import replace_static_urls, wrap_xblock
 from xmodule.error_module import ErrorDescriptor

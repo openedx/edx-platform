@@ -137,7 +137,7 @@ class UserProfile(models.Model):
         * All fields are replicated into relevant Course databases
 
     Some of the fields are legacy ones that were captured during the initial
-    MITx fall prototype.
+    edX fall prototype.
     """
 
     class Meta:
@@ -675,9 +675,9 @@ def remove_user_from_group(user, group):
     utg.users.remove(User.objects.get(username=user))
     utg.save()
 
-default_groups = {'email_future_courses': 'Receive e-mails about future MITx courses',
-                  'email_helpers': 'Receive e-mails about how to help with MITx',
-                  'mitx_unenroll': 'Fully unenrolled -- no further communications',
+default_groups = {'email_future_courses': 'Receive e-mails about future edX courses',
+                  'email_helpers': 'Receive e-mails about how to help with edX',
+                  'edX_unenroll': 'Fully unenrolled -- no further communications',
                   '6002x_unenroll': 'Took and dropped 6002x'}
 
 
@@ -695,14 +695,14 @@ def add_user_to_default_group(user, group):
 
 @receiver(post_save, sender=User)
 def update_user_information(sender, instance, created, **kwargs):
-    if not settings.MITX_FEATURES['ENABLE_DISCUSSION_SERVICE']:
+    if not settings.FEATURES['ENABLE_DISCUSSION_SERVICE']:
         # Don't try--it won't work, and it will fill the logs with lots of errors
         return
     try:
         cc_user = cc.User.from_django_user(instance)
         cc_user.save()
     except Exception as e:
-        log = logging.getLogger("mitx.discussion")
+        log = logging.getLogger("edx.discussion")
         log.error(unicode(e))
         log.error("update user info to discussion failed for user with id: " + str(instance.id))
 

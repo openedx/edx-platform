@@ -82,15 +82,15 @@ If you have created users in the edx-platform django apps when the comment servi
 
 Now initialize roles and permissions, providing a course id. See the example below. Note that you do not need to do this for Studio-created courses, as the Studio application does this for you.
 
-    ./manage.py lms seed_permissions_roles "MITx/6.002x/2012_Fall"
+    ./manage.py lms seed_permissions_roles "edX/6.002x/2012_Fall"
 
-To assign yourself as a moderator, use the following command (assuming your username is "test", and the course id is "MITx/6.002x/2012_Fall"):
+To assign yourself as a moderator, use the following command (assuming your username is "test", and the course id is "edX/6.002x/2012_Fall"):
 
-    ./manage.py lms assign_role test Moderator "MITx/6.002x/2012_Fall"
+    ./manage.py lms assign_role test Moderator "edX/6.002x/2012_Fall"
 
 To assign yourself as an administrator, use the following command
 
-    ./manage.py lms assign_role test Administrator "MITx/6.002x/2012_Fall"
+    ./manage.py lms assign_role test Administrator "edX/6.002x/2012_Fall"
 
 ## Some other useful commands
 

@@ -4,12 +4,12 @@
  See https://edx-wiki.atlassian.net/wiki/display/ENG/PO+File+workflow
 
 
- This task merges and compiles the human-readable .pofiles on the 
+ This task merges and compiles the human-readable .pofiles on the
  local filesystem into machine-readable .mofiles. This is typically
  necessary as part of the build process since these .mofiles are
  needed by Django when serving the web app.
 
- The configuration file (in mitx/conf/locale/config) specifies which
+ The configuration file (in edX/conf/locale/config) specifies which
  languages to generate.
 """
 

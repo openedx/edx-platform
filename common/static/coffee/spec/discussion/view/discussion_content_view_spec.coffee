@@ -10,7 +10,7 @@ describe "DiscussionContentView", ->
                     <span class="plus-icon">+</span> <span class="votes-count-number">0</span></a>
                     <h1>Post Title</h1>
                     <p class="posted-details">
-                        <a class="username" href="/courses/MITx/999/Robot_Super_Course/discussion/forum/users/1">robot</a>
+                        <a class="username" href="/courses/edX/999/Robot_Super_Course/discussion/forum/users/1">robot</a>
                         <span title="2013-05-08T17:34:07Z" class="timeago">less than a minute ago</span>
                     </p>
                 </header>
@@ -26,7 +26,7 @@ describe "DiscussionContentView", ->
         @thread = new Thread {
                 id: '01234567',
                 user_id: '567',
-                course_id: 'mitX/999/test',
+                course_id: 'edX/999/test',
                 body: 'this is a thread',
                 created_at: '2013-04-03T20:08:39Z',
                 abuse_flaggers: ['123']

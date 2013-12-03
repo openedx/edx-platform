@@ -35,7 +35,7 @@ class CourseFactory(XModuleFactory):
     """
     Factory for XModule courses.
     """
-    org = 'MITx'
+    org = 'edX'
     number = '999'
     display_name = 'Robot Super Course'
 
@@ -89,7 +89,7 @@ class ItemFactory(XModuleFactory):
 
     @lazy_attribute
     def parent_location(self):
-        default_location = Location('i4x://MITx/999/course/Robot_Super_Course')
+        default_location = Location('i4x://edX/999/course/Robot_Super_Course')
         try:
             parent = self.parent
         # This error is raised if the caller hasn't provided either parent or parent_location

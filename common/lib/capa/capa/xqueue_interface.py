@@ -27,7 +27,7 @@ def make_xheader(lms_callback_url, lms_key, queue_name):
     Xqueue header is a JSON-serialized dict:
         { 'lms_callback_url': url to which xqueue will return the request (string),
           'lms_key': secret key used by LMS to protect its state (string),
-          'queue_name': designate a specific queue within xqueue server, e.g. 'MITx-6.00x' (string)
+          'queue_name': designate a specific queue within xqueue server, e.g. 'edX-6.00x' (string)
         }
     """
     return json.dumps({

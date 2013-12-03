@@ -17,7 +17,7 @@ def mixed_store_config(data_dir, mappings):
     `mappings` is a dictionary mapping course IDs to modulestores, for example:
 
         {
-            'MITx/2.01x/2013_Spring': 'xml',
+            'edX/2.01x/2013_Spring': 'xml',
             'edx/999/2013_Spring': 'default'
         }
 
@@ -60,7 +60,7 @@ def mongo_store_config(data_dir):
             'OPTIONS': {
                 'default_class': 'xmodule.raw_module.RawDescriptor',
                 'fs_root': data_dir,
-                'render_template': 'mitxmako.shortcuts.render_to_string'
+                'render_template': 'edxmako.shortcuts.render_to_string'
             }
         }
     }
@@ -77,7 +77,7 @@ def draft_mongo_store_config(data_dir):
     modulestore_options = {
         'default_class': 'xmodule.raw_module.RawDescriptor',
         'fs_root': data_dir,
-        'render_template': 'mitxmako.shortcuts.render_to_string'
+        'render_template': 'edxmako.shortcuts.render_to_string'
     }
 
     store = {
@@ -126,7 +126,7 @@ def studio_store_config(data_dir):
     options = {
         'default_class': 'xmodule.raw_module.RawDescriptor',
         'fs_root': data_dir,
-        'render_template': 'mitxmako.shortcuts.render_to_string',
+        'render_template': 'edxmako.shortcuts.render_to_string',
     }
 
     store = {

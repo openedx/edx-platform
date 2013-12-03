@@ -4,7 +4,7 @@ from django.db import models, transaction
 
 from student.models import User
 
-log = logging.getLogger("mitx.licenses")
+log = logging.getLogger("edx.licenses")
 
 
 class CourseSoftware(models.Model):

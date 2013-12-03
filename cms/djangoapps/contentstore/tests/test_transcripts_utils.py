@@ -77,7 +77,7 @@ class TestGenerateSubs(unittest.TestCase):
 class TestSaveSubsToStore(ModuleStoreTestCase):
     """Tests for `save_subs_to_store` function."""
 
-    org = 'MITx'
+    org = 'edX'
     number = '999'
     display_name = 'Test course'
 
@@ -161,7 +161,7 @@ class TestSaveSubsToStore(ModuleStoreTestCase):
 class TestDownloadYoutubeSubs(ModuleStoreTestCase):
     """Tests for `download_youtube_subs` function."""
 
-    org = 'MITx'
+    org = 'edX'
     number = '999'
     display_name = 'Test course'
 

@@ -6,7 +6,7 @@ from factory import DjangoModelFactory
 class CourseModeFactory(DjangoModelFactory):
     FACTORY_FOR = CourseMode
 
-    course_id = u'MITx/999/Robot_Super_Course'
+    course_id = u'edX/999/Robot_Super_Course'
     mode_slug = 'audit'
     mode_display_name = 'audit course'
     min_price = 0
