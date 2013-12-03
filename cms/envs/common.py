@@ -457,7 +457,7 @@ YOUTUBE_API = {
 
 #sentry config
 RAVEN_CONFIG = {
-    'dsn': 'https://59734eda618a43afa2179d781549edeb:311de1f2e01247f284f3f72fbcd5844f@sentry.iaen.edu.ec/3',
+    'dsn': 'http://59734eda618a43afa2179d781549edeb:311de1f2e01247f284f3f72fbcd5844f@sentry.iaen.edu.ec:9000/3',
 }
 
 INSTALLED_APPS = INSTALLED_APPS + (
