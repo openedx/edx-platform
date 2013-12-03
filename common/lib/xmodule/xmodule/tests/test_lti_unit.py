@@ -194,6 +194,7 @@ class LTIModuleTest(LogicTest):
         Response from Tool Provider is correct.
         """
         self.xmodule.verify_oauth_body_sign = Mock()
+        self.xmodule.has_score = True
         request = Request(self.environ)
         request.body = self.get_request_body()
         response = self.xmodule.grade_handler(request, '')
