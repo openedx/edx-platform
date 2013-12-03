@@ -249,3 +249,13 @@ class LTIModuleTest(LogicTest):
     def test_client_key_secret(self):
         pass
 
+    def test_max_score(self):
+        self.xmodule.weight = 100.0
+
+        self.xmodule.graded = True
+        self.assertEqual(self.xmodule.max_score(), 100)
+
+        self.xmodule.graded = False
+        self.assertEqual(self.xmodule.max_score(), 0)
+
+
