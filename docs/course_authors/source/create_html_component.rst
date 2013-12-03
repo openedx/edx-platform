@@ -12,6 +12,8 @@ Overview
 You use an HTML component to add and format text for your course. 
 You can add text, lists, links and images in an HTML component. 
 
+See the following topics:
+
 * :ref:`Create an HTML Component`
 * :ref:`Work with the Visual and HTML Editors`
 * :ref:`Use the Announcement Template`
@@ -65,7 +67,7 @@ For more information, see:
 * :ref:`Add a Link in an HTML Component`
 * :ref:`Add an Image to an HTML Component`
 
-ADD LINKS 
+
 
 .. _Work with the Visual and HTML Editors:
 

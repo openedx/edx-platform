@@ -10,6 +10,8 @@ Overview
 
 You can add a Discussion component to a Unit, to pose a question related to the Unit and give students a chance to respond and interact.
 
+See the following topics:
+
 * :ref:`Create a Discussion Component`
 * :ref:`A Student's View of the Discussion`
 * :ref:`Seed a Discussion Space in Your Course`

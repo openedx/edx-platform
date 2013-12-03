@@ -182,12 +182,11 @@ your code into the LaTeX editor, you'll only need to make a few minor
 adjustments. Note that **this problem type is still a prototype and may
 not be supported in the future**, so you should use it with caution.
 
-***Note** If you want to use LaTeX to typeset mathematical expressions
-in problems that you haven't yet written, use any of the other problem
-templates together with `MathJax <http://www.mathjax.org>`_. For more
-information about how to create mathematical expressions in Studio using
-MathJax, see *A Brief Introduction to MathJax in
-Studio*.
+.. note:: If you want to use LaTeX to typeset mathematical expressions
+          in problems that you haven't yet written, use any of the other problem
+          templates together with `MathJax <http://www.mathjax.org>`_. For more
+          information about how to create mathematical expressions in Studio using
+          MathJax, see *A Brief Introduction to MathJax in Studio*.
 
 .. image:: Images/ProblemWrittenInLaTeX.gif
 

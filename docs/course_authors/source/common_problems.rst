@@ -1,7 +1,8 @@
 .. _Common Problems:
 
+#############################
 Common Problems
-===============
+#############################
 
 *Common problems* are typical problems such as multiple choice problems
 and other problems whose answers are simple for students to select or
@@ -31,8 +32,9 @@ create a checkbox problem, you'll click **Blank Common Problem**.)
 
 .. _Checkbox:
 
+*******************
 Checkbox
---------
+*******************
 
 In checkbox problems, the student selects one or more options from a
 list of possible answers. The student must select all the options that
@@ -41,8 +43,9 @@ at least one correct answer.
 
 .. image:: Images/CheckboxExample.gif
 
+==========================
 Create a Checkbox Problem
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+==========================
 
 #. Under **Add New Component**, click **Problem**.
 #. In the **Select Problem Component Type** screen, click **Blank Common
@@ -90,8 +93,9 @@ following.
 
 .. _Dropdown:
 
+*******************
 Dropdown
---------
+*******************
 
 Dropdown problems allow the student to choose from a collection of
 answer options, presented as a dropdown list. Unlike multiple choice
@@ -101,8 +105,9 @@ the dropdown arrow.
 
 .. image:: Images/DropdownExample.gif
 
+==========================
 Create a Dropdown Problem
-~~~~~~~~~~~~~~~~~~~~~~~~~
+==========================
 
 To create a dropdown problem, follow these steps.
 
@@ -145,8 +150,9 @@ following.
 
 .. _Multiple Choice:
 
+*******************
 Multiple Choice
----------------
+*******************
 
 In multiple choice problems, students select one option from a list of
 answer options. Unlike with dropdown problems, whose answer choices
@@ -156,8 +162,9 @@ the question.
 
 .. image:: Images/MultipleChoiceExample.gif
 
+==================================
 Create a Multiple Choice Problem
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+==================================
 
 #. Under **Add New Component**, click **Problem**.
 #. In the **Select Problem Component Type** screen, click **Multiple
@@ -210,8 +217,9 @@ following.
 
 .. _Numerical Input:
 
+*******************
 Numerical Input
----------------
+*******************
 
 In numerical input problems, students enter numbers or specific and
 relatively simple mathematical expressions to answer a question. 
@@ -232,8 +240,9 @@ numerical input problems. To see more examples, scroll down to **Examples**.
 
 .. image:: Images/Math5.gif
 
+==================================
 Create a Numerical Input Problem
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+==================================
 
 #. Under **Add New Component**, click **Problem**.
 #. In the **Select Problem Component Type** screen, click **Numerical
@@ -286,8 +295,9 @@ For more information, see `Formula Equation Input
 
 .. _Text input:
 
+*******************
 Text Input
-----------
+*******************
 
 In text input problems, students enter text into a response field. The
 response can include numbers, letters, and special characters such as
@@ -298,8 +308,9 @@ text input problems to allow for typographical errors.
 
 .. image:: Images/TextInputExample.gif
 
+==================================
 Create a Text Input Problem
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+==================================
 
 To create a text input problem, follow these steps.
 
@@ -338,3 +349,57 @@ following.
     This can fall to such a low probability that malaria is effectively eradicated 
     from the group (even when the group does not have 100% bednet coverage).
     [explanation]
+    
+=========================================
+Case Sensitivity and Text Input Problems
+=========================================
+
+By default, text input problems do not require a case sensitive response. You can change this
+and require a case sensitive answer.
+
+To make a text input response case sensitive, you must use the :ref:`Advanced Editor`.
+
+In the advanced editor, you see that the **type** attribute of the **stringresponse** 
+element equals **ci**, for *case insensitive*. For example:
+
+::
+
+    <stringresponse answer="Michigan" type="ci">
+      <textline size="20"/>
+    </stringresponse>
+
+To make the response case sensitive, change the value of the **type** attribute to **cs**.
+
+::
+
+    <stringresponse answer="Michigan" type="cs">
+      <textline size="20"/>
+    </stringresponse>
+    
+=========================================
+Response Field Length of Text Input Problems
+=========================================
+
+By default, the response field for text input problems is 20 characters long. 
+
+You should preview the unit to ensure that the length of the response input field
+accommodates the correct answer, and provides extra space for possible incorrect answers.
+
+If the default response field length is not sufficient, you can change it using the :ref:`Advanced Editor`.
+
+In the advanced editor, in the XML block for the answer, you see that the **size** attribute of the **textline** 
+element equals **20**:
+
+::
+
+    <stringresponse answer="Democratic Republic of the Congo" type="ci">
+      <textline size="20"/>
+    </stringresponse>
+
+To change the response field length, change the value of the **size** attribute:
+
+::
+
+    <stringresponse answer="Democratic Republic of the Congo" type="ci">
+      <textline size="40"/>
+    </stringresponse>

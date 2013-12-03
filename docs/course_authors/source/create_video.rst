@@ -14,6 +14,8 @@ You can also associate a timed transcript with your video, which students can re
 
 When you add a video to your course, you first post the video online, and then create a link to that video in the body of your course. 
 
+See the following topics:
+
 * :ref:`Video Formats`
 * :ref:`Video Hosting`
 * :ref:`Create a Video Component`

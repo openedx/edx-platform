@@ -17,6 +17,14 @@ toward a student's grade. If you want the problems to count toward the
 student's grade, change the assignment type of the subsection that contains the 
 problems.
 
+See the following topics:
+
+* :ref:`Components and the User Interface`
+* :ref:`Problem Settings`
+* :ref:`Multiple Problems in One Component`
+* :ref:`Modifying a Released Problem`
+
+
 .. _Components and the User Interface:
 
 ************************************
@@ -92,10 +100,10 @@ All problems on the edX platform have several component parts.
    past due does not have a **Check** button. It also does not accept
    answers or provide feedback.
 
-**Note** Problems can be **open** or **closed.** Closed problems do not
-have a **Check** button. Students can still see questions, solutions,
-and revealed explanations, but they cannot check their work, submit
-responses, or change their stored score.
+.. note::  Problems can be **open** or **closed.** Closed problems do not
+           have a **Check** button. Students can still see questions, solutions,
+           and revealed explanations, but they cannot check their work, submit
+           responses, or change their stored score.
 
 There are also some attributes of problems that are not immediately
 visible.
@@ -118,10 +126,10 @@ Editor and the Advanced Editor.
 -  The **Advanced Editor** converts the problem to edX’s XML standard
    and allows you to edit that XML directly. 
 
-**Note** You can switch at any time from the Simple Editor to the
-Advanced Editor by clicking **Advanced Editor** in the top right corner
-of the Simple Editor interface. However, it is not possible to switch from
-the Advanced Editor to the Simple Editor.
+.. note:: You can switch at any time from the Simple Editor to the
+          Advanced Editor by clicking **Advanced Editor** in the top right corner
+          of the Simple Editor interface. However, it is not possible to switch from
+          the Advanced Editor to the Simple Editor.
 
 The Simple Editor
 ~~~~~~~~~~~~~~~~~
@@ -145,6 +153,8 @@ the text for you automatically. The toolbar buttons are the following:
 The following image shows a multiple choice problem in the Simple Editor.
 
 .. image:: Images/MultipleChoice_SimpleEditor.gif 
+
+.. _Advanced Editor: 
 
 The Advanced Editor
 ~~~~~~~~~~~~~~~~~~~
@@ -198,9 +208,9 @@ the problem. By default, a student has an unlimited number of attempts.
 Problem Weight
 ==============================
 
-**Note** Studio stores scores for all problems, but scores only count
-toward a student’s final grade if they are in a subsection that is
-graded.
+.. note:: Studio stores scores for all problems, but scores only count
+          toward a student’s final grade if they are in a subsection that is
+          graded.
 
 This setting specifies the maximum number of points possible for the
 problem. The problem weight appears next to the problem title.
@@ -333,6 +343,8 @@ page for the problem type.
    students in your course, or a computer algorithm to grade responses in the form 
    of essays, files such as computer code, and images.
 
+.. _Multiple Problems in One Component:
+
 ************************************
 Multiple Problems in One Component
 ************************************
@@ -360,12 +372,13 @@ attempts to answer each problem individually. If a student clicks
 If a student clicks **Show Answer**, the answers for all the problems in
 the component appear.
 
+.. _Modifying a Released Problem:
+
 ************************************
 Modifying a Released Problem
 ************************************
 
-**WARNING: Be careful when you modify problems after they have been
-released!**
+.. warning:: Be careful when you modify problems after they have been released!
 
 After a student submits a response to a problem, Studio stores the
 student’s response, the score that the student received, and the maximum
