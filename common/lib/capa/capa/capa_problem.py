@@ -34,6 +34,8 @@ from capa.safe_exec import safe_exec
 
 from pytz import UTC
 
+from random import Random
+
 # dict of tagname, Response Class -- this should come from auto-registering
 response_tag_dict = dict([(x.response_tag, x) for x in responsetypes.__all__])
 
@@ -381,11 +383,128 @@ class LoncapaProblem(object):
             answer_ids.append(results.keys())
         return answer_ids
 
+    def sample_from_answer_pool(self, choices, rnd, num_choices):
+        """
+        Takes in:
+            1. list of choices
+            2. random number generator
+            3. max number of total choices to return
+
+        Returns a list with 2 items:
+            1. the solution_id corresponding with the chosen correct answer
+            2. (subset) list of choice nodes with 3 incorrect and 1 correct
+        """
+
+        correct_choices = []
+        incorrect_choices = []
+        subset_choices = []
+
+        for choice in choices:
+            if choice.get('correct') == 'true':
+                correct_choices.append(choice)
+            elif choice.get('correct') == 'false':
+                incorrect_choices.append(choice)
+
+        # Always 1 correct and num_choices at least as large as this; if not, return list with no choices
+        num_correct = 1
+        if len(correct_choices) < num_correct or num_choices < num_correct:
+            return []
+
+        # Ensure number of incorrect choices is no more than the number of incorrect choices to choose from
+        num_incorrect = num_choices - num_correct
+        num_incorrect = min(num_incorrect, len(incorrect_choices))
+
+        # Use rnd given to us to generate a random number (see details in tree_using_answer_pool method)
+        index = rnd.randint(0, len(correct_choices) - 1)
+        correct_choice = correct_choices[index]
+        subset_choices.append(correct_choice)
+        solution_id = correct_choice.get('explanation-id')
+
+        # Add incorrect choices
+        to_add = num_incorrect
+        while to_add > 0:
+            index = rnd.randint(0, len(incorrect_choices) - 1)
+            choice = incorrect_choices[index]
+            subset_choices.append(choice)
+            incorrect_choices.remove(choice)
+            to_add = to_add - 1
+
+        # Randomize correct answer position
+        index = rnd.randint(0, num_incorrect)
+        if index != 0:
+            tmp = subset_choices[index]
+            subset_choices[index] = subset_choices[0]  # where we put the correct answer
+            subset_choices[0] = tmp
+
+        return [solution_id, subset_choices]
+
+    def tree_using_answer_pool(self, tree):
+        """
+        Allows for problem questions with a pool of answers, from which answer options shown to the student
+        and randomly selected so that there is always 1 correct answer and n-1 incorrect answers,
+        where the user specifies n as the value of the attribute "answer-pool" within <multiplechoiceresponse>
+
+        The <multiplechoiceresponse> tag must have an attribute 'answer-pool' with integer value of n
+          - if so, this method will modify the tree
+          - if not, this method will not modify the tree
+
+        These problems are colloquially known as "Gradiance" problems.
+        """
+
+        query = '//multiplechoiceresponse[@answer-pool]'
+
+        # There are no questions with an answer pool
+        if not tree.xpath(query):
+            return
+
+        # Uses self.seed -- but want to randomize every time reaches this problem,
+        # so problem's "randomization" should be set to "always"
+        rnd = Random(self.seed)
+
+        for mult_choice_response in tree.xpath(query):
+            # Determine number of choices to display; if invalid number of choices, skip over
+            num_choices = mult_choice_response.get('answer-pool')
+            if not num_choices.isdigit():
+                continue
+            num_choices = int(num_choices)
+            if num_choices < 1:
+                continue
+
+            # Grab the first choicegroup (there should only be one within each <multiplechoiceresponse> tag)
+            choicegroup = mult_choice_response.xpath('./choicegroup[@type="MultipleChoice"]')[0]
+            choices_list = list(choicegroup.iter('choice'))
+
+            # Remove all choices in the choices_list (we will add some back in later)
+            for choice in choices_list:
+                choicegroup.remove(choice)
+
+            # Sample from the answer pool to get the subset choices and solution id
+            [solution_id, subset_choices] = self.sample_from_answer_pool(choices_list, rnd, num_choices)
+
+            # Add back in randomly selected choices
+            for choice in subset_choices:
+                choicegroup.append(choice)
+
+            # Filter out solutions that don't correspond to the correct answer we selected to show
+            # Note that this means that if the user simply provides a <solution> tag, nothing is filtered
+            solutionset = mult_choice_response.xpath('./following-sibling::solutionset')
+            if len(solutionset) != 0:
+                solutionset = solutionset[0]
+                solutions = solutionset.xpath('./solution')
+                for solution in solutions:
+                    if solution.get('explanation-id') != solution_id:
+                        solutionset.remove(solution)
+
+        return
+
     def get_html(self):
         '''
         Main method called externally to get the HTML to be rendered for this capa Problem.
         '''
+
+        self.tree_using_answer_pool(self.tree)
         html = contextualize_text(etree.tostring(self._extract_html(self.tree)), self.context)
+
         return html
 
     def handle_input_ajax(self, data):
@@ -562,8 +681,7 @@ class LoncapaProblem(object):
             # other than to examine .tag to see if it's a string. :(
             return
 
-        if (problemtree.tag == 'script' and problemtree.get('type')
-            and 'javascript' in problemtree.get('type')):
+        if (problemtree.tag == 'script' and problemtree.get('type') and 'javascript' in problemtree.get('type')):
             # leave javascript intact.
             return deepcopy(problemtree)
 
