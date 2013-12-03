@@ -34,9 +34,9 @@ define(["backbone", "underscore", "js/models/topic", "js/collections/topic", "ba
         },
         url: function() {
             if(this.isNew()) {
-                return CMS.URL.SYLLABUS + "/new";
+                return CMS.URL.SYLLABUSES + "/new";
             } else {
-                return CMS.URL.SYLLABUS + "/" + this.id;
+                return CMS.URL.SYLLABUSES + "/" + this.id;
             }
         },
         parse: function(response) {
@@ -76,16 +76,16 @@ define(["backbone", "underscore", "js/models/topic", "js/collections/topic", "ba
                 };
             } else {
                 // validate all chapters
-                var invalidSections = [];
-                attrs.topics.each(function(section) {
-                    if(!section.isValid()) {
-                        invalidSections.push(section);
+                var invalidTopics= [];
+                attrs.topics.each(function(topic) {
+                    if(!topic.isValid()) {
+                        invalidTopics.push(topic);
                     }
                 });
-                if(!_.isEmpty(invalidSections)) {
+                if(!_.isEmpty(invalidTopics)) {
                     return {
                         message: "All topic must have a name and description",
-                        attributes: {topics: invalidSections}
+                        attributes: {topics: invalidTopics}
                     };
                 }
             }

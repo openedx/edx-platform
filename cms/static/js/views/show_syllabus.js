@@ -5,7 +5,7 @@ define(["backbone", "underscore", "gettext", "js/views/feedback_notification", "
             this.template = _.template($("#show-syllabus-tpl").text());
             this.listenTo(this.model, "change", this.render);
         },
-        tagName: "topics",
+        tagName: "section",
         className: "syllabus",
         events: {
             "click .edit": "editSyllabus",
@@ -30,7 +30,7 @@ define(["backbone", "underscore", "gettext", "js/views/feedback_notification", "
             var msg = new PromptView.Warning({
                 title: _.template(gettext("Delete “<%= name %>”?"),
                     {name: syllabus.escape('name')}),
-                message: gettext("Deleting a section cannot be undone and once deleted any reference to it in your courseware's navigation will also be removed."),
+                message: gettext("Deleting a syllabus cannot be undone and once deleted any reference to it in your courseware's navigation will also be removed."),
                 actions: {
                     primary: {
                         text: gettext("Delete"),

@@ -9,7 +9,7 @@
     <p><a href="#" class="topic-toggle
         <% if(showTopics){ print('hide'); } else { print('show'); } %>-topics">
         <i class="ui-toggle-expansion icon-caret-<% if(showTopics){ print('down'); } else { print('right'); } %>"></i>
-        <%= topics.length %> PDF Chapters
+        <%= topics.length %> Temas
     </a></p>
 <% } else if(topics.length === 1) { %>
     <p>

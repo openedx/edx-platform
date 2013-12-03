@@ -58,14 +58,8 @@ __all__ = ['course_info_handler', 'course_handler', 'course_info_update_handler'
            'settings_handler',
            'grading_handler',
            'advanced_settings_handler',
-<<<<<<< HEAD
-           'syllabus','textbook_index', 'textbook_by_id','syllabus_by_id',
+           'syllabus_index','textbook_index', 'textbook_by_id','syllabus_by_id',
            'create_textbook', 'create_syllabus']
-=======
-           'textbook_index', 'textbook_by_id',
-           'create_textbook']
-
->>>>>>> 70a548e45d54649bfb16452c7771a74eca010555
 
 # pylint: disable=unused-argument
 @login_required
@@ -609,7 +603,7 @@ class TextbookValidationError(Exception):
     pass
 
 class SyllabusValidationError(Exception):
-    "An error thrown when a textbook input is invalid"
+    "An error thrown when a syllabus input is invalid"
     pass
 
 def validate_textbooks_json(text):
@@ -650,6 +644,25 @@ def validate_textbook_json(textbook):
         raise TextbookValidationError("textbook ID must start with a digit")
     return textbook
 
+def validate_syllabuses_json(text):
+    """
+    Validate the given text as representing a single topic syllabus
+    """
+    try:
+        syllabuses = json.loads(text)
+    except ValueError:
+        raise SyllabusValidationError("invalid JSON")
+    if not isinstance(syllabuses, (list, tuple)):
+        raise SyllabusValidationError("must be JSON list")
+    for syllabus in syllabuses:
+        validate_syllabus_json(syllabus)
+    # check specified IDs for uniqueness
+    all_ids = [syllabus["id"] for syllabus in syllabuses if "id" in syllabus]
+    unique_ids = set(all_ids)
+    if len(all_ids) > len(unique_ids):
+        raise SyllabusValidationError("IDs must be unique")
+    return syllabuses
+
 def validate_syllabus_json(syllabus):
     """
     Validate the given text as representing a list of PDF textbooks
@@ -685,7 +698,7 @@ def assign_textbook_id(textbook, used_ids=()):
 
 def assign_syllabus_id(syllabus, used_ids=()):
     """
-    Return an ID that can be assigned to a textbook
+    Return an ID that can be assigned to a syllabus
     and doesn't match the used_ids
     """
     tid = Location.clean(syllabus["tab_title"])
@@ -699,9 +712,9 @@ def assign_syllabus_id(syllabus, used_ids=()):
 
 @login_required
 @ensure_csrf_cookie
-def syllabus(request, org, course, name):
+def syllabus_index(request, org, course, name):
     """
-    Display an editable syllabus.
+    Display an editable syllabus overview.
 
     org, course, name: Attributes of the Location for the item to edit
     """
@@ -709,19 +722,45 @@ def syllabus(request, org, course, name):
     store = get_modulestore(location)
     course_module = store.get_item(location, depth=3)
 
-    
-    new_loc = loc_mapper().translate_location(location.course_id, location, False, True)
-    upload_asset_url = new_loc.url_reverse('assets/', '')
-    syllabus_url = reverse('syllabus', kwargs={
-        'org': org,
-        'course': course,
-        'name': name,
-    })
-    return render_to_response('syllabus.html', {
-        'context_course': course_module,
-        'course': course_module,
-        'syllabus_url': syllabus_url,
-    })
+    if request.is_ajax():
+        if request.method == 'GET':
+            return JsonResponse(course_module.topic_syllabuses)
+        # can be either and sometimes django is rewriting one to the other:
+        elif request.method in ('POST', 'PUT'):
+            try:
+                syllabuses = validate_syllabuses_json(request.body)
+            except SyllabusValidationError as err:
+                return JsonResponse({"error": err.message}, status=400)
+
+            tids = set(t["id"] for t in syllabuses if "id" in t)
+            for syllabus in syllabuses:
+                if not "id" in syllabus:
+                    tid = assign_syllabus_id(syllabus, tids)
+                    syllabus["id"] = tid
+                    tids.add(tid)
+
+            if not any(tab['type'] == 'topic_syllabuses' for tab in course_module.tabs):
+                course_module.tabs.append({"type": "topic_syllabuses"})
+            course_module.topic_syllabuses = syllabuses            # Save the data that we've just changed to the underlying
+            # MongoKeyValueStore before we update the mongo datastore.
+            course_module.save()
+            store.update_metadata(
+                course_module.location,
+                own_metadata(course_module)
+            )
+            return JsonResponse(course_module.topic_syllabuses)
+    else:
+        new_loc = loc_mapper().translate_location(location.course_id, location, False, True)
+        syllabus_url = reverse('syllabus_index', kwargs={
+            'org': org,
+            'course': course,
+            'name': name,
+        })
+        return render_to_response('syllabuses.html', {
+            'context_course': course_module,
+            'course': course_module,
+            'syllabus_url': syllabus_url,
+        })
 
 @login_required
 @ensure_csrf_cookie
@@ -793,6 +832,7 @@ def create_textbook(request, org, course, name):
 
     try:
         textbook = validate_textbook_json(request.body)
+        pdb.set_trace()
     except TextbookValidationError as err:
         return JsonResponse({"error": err.message}, status=400)
     if not textbook.get("id"):
@@ -820,7 +860,7 @@ def create_textbook(request, org, course, name):
 
 def create_syllabus(request, org, course, name):
     """
-    JSON API endpoint for creating a textbook. Used by the Backbone application.
+    JSON API endpoint for creating a syllabus. Used by the Backbone application.
     """
     pdb.set_trace()
     location = get_location_and_verify_access(request, org, course, name)
@@ -832,13 +872,13 @@ def create_syllabus(request, org, course, name):
     except SyllabusValidationError as err:
         return JsonResponse({"error": err.message}, status=400)
     if not syllabus.get("id"):
-        tids = set(t["id"] for t in course_module.syllabus if "id" in t)
+        tids = set(t["id"] for t in course_module.topic_syllabuses if "id" in t)
         syllabus["id"] = assign_syllabus_id(syllabus, tids)
-    existing = course_module.syllabus
+    existing = course_module.topic_syllabuses
     existing.append(syllabus)
-    if not any(tab['type'] == 'syllabus' for tab in course_module.tabs):
+    if not any(tab['type'] == 'topic_syllabuses' for tab in course_module.tabs):
         tabs = course_module.tabs
-        tabs.append({"type": "syllabus"})
+        tabs.append({"type": "topic_syllabuses"})
         course_module.tabs = tabs
     # Save the data that we've just changed to the underlying
     # MongoKeyValueStore before we update the mongo datastore.
@@ -918,38 +958,38 @@ def textbook_by_id(request, org, course, name, tid):
 @require_http_methods(("GET", "POST", "PUT", "DELETE"))
 def syllabus_by_id(request, org, course, name, tid):
     """
-    JSON API endpoint for manipulating a textbook via its internal ID.
+    JSON API endpoint for manipulating a syllabus via its internal ID.
     Used by the Backbone application.
     """
     location = get_location_and_verify_access(request, org, course, name)
     store = get_modulestore(location)
     course_module = store.get_item(location, depth=3)
-    matching_id = [tb for tb in course_module.syllabus
+    matching_id = [tb for tb in course_module.topic_syllabuses
                    if str(tb.get("id")) == str(tid)]
     if matching_id:
-        topic = matching_id[0]
+        syllabus = matching_id[0]
     else:
-        topic = None
+        syllabus = None
 
     if request.method == 'GET':
-        if not topic:
+        if not syllabus:
             return JsonResponse(status=404)
-        return JsonResponse(topic)
+        return JsonResponse(syllabus)
     elif request.method in ('POST', 'PUT'):  # can be either and sometimes
-        pdb.set_trace()                                   # django is rewriting one to the other
+                                    # django is rewriting one to the other
         try:
             new_syllabus = validate_syllabus_json(request.body)
         except SyllabusValidationError as err:
             return JsonResponse({"error": err.message}, status=400)
         new_syllabus["id"] = tid
-        if topic:
-            i = course_module.syllabus.index(topic)
-            new_syllabus = course_module.topic[0:i]
-            new_syllabus.append(new_syllabus)
-            new_syllabus.extend(course_module.syllabus[i + 1:])
-            course_module.syllabus = new_syllabus
+        if syllabus:
+            i = course_module.topic_syllabuses.index(syllabus)
+            new_syllabuses = course_module.topic_syllabuses[0:i]
+            new_syllabuses.append(new_syllabus)
+            new_syllabuses.extend(course_module.topic_syllabuses[i + 1:])
+            course_module.topic_syllabuses = new_syllabuses
         else:
-            course_module.syllabus.append(new_syllabus)
+            course_module.topic_syllabuses.append(new_syllabus)
         # Save the data that we've just changed to the underlying
         # MongoKeyValueStore before we update the mongo datastore.
         course_module.save()
@@ -959,12 +999,12 @@ def syllabus_by_id(request, org, course, name, tid):
         )
         return JsonResponse(new_syllabus, status=201)
     elif request.method == 'DELETE':
-        if not topic:
+        if not syllabus:
             return JsonResponse(status=404)
-        i = course_module.syllabus.index(topic)
-        new_syllabus = course_module.syllabus[0:i]
-        new_syllabus.extend(course_module.syllabus[i + 1:])
-        course_module.syllabus = new_syllabus
+        i = course_module.topic_syllabuses.index(syllabus)
+        new_syllabuses = course_module.syllabuses[0:i]
+        new_syllabuses.extend(course_module.topic_syllabuses[i + 1:])
+        course_module.topic_syllabuses = new_syllabuses
         course_module.save()
         store.update_metadata(
             course_module.location,

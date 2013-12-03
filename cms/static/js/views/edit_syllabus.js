@@ -25,8 +25,8 @@ define(["backbone", "underscore", "jquery", "js/views/edit_topic", "js/views/fee
             "click .action-cancel": "cancel",
             "click .action-add-topic": "createTopic"
         },
-        addOne: function(topics) {
-            var view = new EditTopicView({model: topics});
+        addOne: function(topic) {
+            var view = new EditTopicView({model: topic});
             this.$("ol.topics").append(view.render().el);
             return this;
         },
@@ -79,11 +79,11 @@ define(["backbone", "underscore", "jquery", "js/views/edit_topic", "js/views/fee
             return this.close();
         },
         close: function() {
-            var syllabus = this.model.collection;
+            var syllabuses = this.model.collection;
             this.remove();
             if(this.model.isNew()) {
                 // if the textbook has never been saved, remove it
-                syllabus.remove(this.model);
+                syllabuses.remove(this.model);
             }
             // don't forget to tell the model that it's no longer being edited
             this.model.set("editing", false);
