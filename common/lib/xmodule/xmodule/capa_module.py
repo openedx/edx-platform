@@ -264,6 +264,9 @@ class CapaModule(CapaFields, XModule):
             # number of possibilities, cap the number of different random seeds.
             self.seed %= MAX_RANDOMIZATION_BINS
 
+        # self.seed = 56
+        print "\n\nSEED is %i\n\n" % (self.seed)
+
     def new_lcp(self, state, text=None):
         """
         Generate a new Loncapa Problem
