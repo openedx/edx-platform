@@ -5,6 +5,8 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Blades: Fix Numerical input to support mathematical operations. BLD-525.
+
 Blades: Improve calculator's tooltip accessibility. Add possibility to navigate
   through the hints via arrow keys. BLD-533.
 
