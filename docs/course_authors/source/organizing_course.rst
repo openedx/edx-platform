@@ -57,7 +57,7 @@ The new, empty Section is placed at the bottom of the course outline.
 You must now add Subsections to the Section.
 
 Whether or not students see the new Section depends on the release date. 
-See LINK for more information on releasing your course.
+See :ref:`Publishing Your Course` for more information.
 
 .. _Subsections:
 

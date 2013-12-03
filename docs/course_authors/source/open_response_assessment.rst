@@ -631,8 +631,8 @@ graders.
 If you want to see the full rubric for either an AI or peer assessment,
 click **Toggle Full Rubric**.
 
-**Note** For a peer assessment, if you haven't yet graded enough
-problems to see your score, you receive a message that lets you know how
-many problems you still need to grade.
+.. note:: For a peer assessment, if you haven't yet graded enough
+          problems to see your score, you receive a message that lets you know how
+          many problems you still need to grade.
 
 .. image:: Images/FeedbackNotAvailable.gif

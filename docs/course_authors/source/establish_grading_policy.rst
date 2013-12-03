@@ -160,6 +160,7 @@ See :ref:`Working with Problem Components` for instructions on creating problems
 **************************
 The Student View of Grades
 **************************
-Once a grading policy is in place, students can view both their problem scores and the percent completed and current grade at the top of their  **Progress** tab for the course.
+Once a grading policy is in place, students can view both their problem scores and the percent completed and current grade in the **Progress** tab for the course.
   
-ADD IMAGE
+  .. image:: Images/Progress_tab.png
+    :width: 800

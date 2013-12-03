@@ -137,6 +137,10 @@ Modifying Public Units
 *************************
 
 To make revisions to a unit that has been published, you create and edit a draft of that unit. 
+
+.. warning:: There are additional implications to modifying the public unit that has graded problem 
+            components students may have already completed.  See :ref:`Modifying a Released Problem` for more information.
+
 To create a draft, go to the unit's page, and then click **edit a draft** in the right pane.
 
 .. image:: Images/Viz_Revise_EditDraft.png
