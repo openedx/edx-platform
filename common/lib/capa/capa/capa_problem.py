@@ -385,36 +385,6 @@ class LoncapaProblem(object):
             answer_ids.append(results.keys())
         return answer_ids
 
-    def shuffle_choices(self, choices):
-        """
-        Returns a list of choice nodes with the shuffling done.
-        Uses the self.seed for the randomness of the shuffle.
-        Choices with 'fixed'='true' are held back from the shuffle.
-        """
-        # Separate the list with the middle of stuff to be shuffled
-        # and the head/tail the choices to be held back from the shuffle.
-        # We're not supporting that an element "island" in the middle
-        # can be held back from the shuffle, only at the head and tail ends.
-        # Slightly tricky implementation using a state machine
-        head = []
-        middle = []  # only this one gets shuffled
-        tail = []
-        at_head = True
-        for choice in choices:
-            if at_head and choice.get('fixed') == 'true':
-                head.append(choice)
-                continue
-            at_head = False
-            if choice.get('fixed') == 'true':
-                tail.append(choice)
-            else:
-                middle.append(choice)
-        
-        rng = Random(self.seed)  # we'll make our own vs. messing with the global one
-        rng.shuffle(middle)
-
-        return head + middle + tail
-
     def sample_from_answer_pool(self, choices, rnd, numChoices):
         """
         Takes in:
