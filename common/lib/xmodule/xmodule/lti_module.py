@@ -375,7 +375,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         return params
 
     def max_score(self):
-        return self.weight
+        return self.weight if self.graded else 0
 
 
     @XBlock.handler
