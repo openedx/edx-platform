@@ -3,11 +3,11 @@
 <%! import json %>
 <%! from django.utils.translation import ugettext as _ %>
 
-<%block name="title">${_("Syllabus")}</%block>
-<%block name="bodyclass">is-signedin course view-syllabus feature-upload</%block>
+<%block name="title">${_("Syllabuses")}</%block>
+<%block name="bodyclass">is-signedin course view-syllabuses feature-upload</%block>
 
 <%block name="header_extras">
-% for template_name in ["edit-syllabus", "show-syllabus", "edit-topic", "no-syllabus" ]:
+% for template_name in ["edit-syllabus", "show-syllabus", "edit-topic", "no-syllabuses" ]:
   <script type="text/template" id="${template_name}-tpl">
     <%static:include path="js/${template_name}.underscore" />
   </script>
@@ -18,10 +18,10 @@
 <script type="text/javascript">
 window.CMS = window.CMS || {};
 CMS.URL = CMS.URL || {};
-CMS.URL.SYLLABUS = "${syllabus_url}"
+CMS.URL.SYLLABUSES = "${syllabus_url}"
 CMS.URL.LMS_BASE = "${settings.LMS_BASE}"
-require(["js/models/section", "js/collections/syllabus", "js/views/list_syllabus"],
-        function(Section, SyllabusCollection, ListSyllabusView) {
+require(["js/models/section", "js/collections/syllabus", "js/views/list_syllabuses"],
+        function(Section, SyllabusCollection, ListSyllabusesView) {
   window.section = new Section({
       id: "${course.id}",
       name: "${course.display_name_with_default | h}",
@@ -30,8 +30,8 @@ require(["js/models/section", "js/collections/syllabus", "js/views/list_syllabus
       num: "${course.location.course | h}",
       revision: "${course.location.revision | h}"
   });
-  var syllabus = new SyllabusCollection(${json.dumps(course.syllabus)}, {parse: true});
-  var tbView = new ListSyllabusView({collection: syllabus});
+  var syllabuses = new SyllabusCollection(${json.dumps(course.topic_syllabuses)}, {parse: true});
+  var tbView = new ListSyllabusesView({collection: syllabuses});
 
   $(function() {
       $(".content-primary").append(tbView.render().el);
@@ -39,7 +39,7 @@ require(["js/models/section", "js/collections/syllabus", "js/views/list_syllabus
           tbView.addOne(e);
       })
       $(window).on("beforeunload", function() {
-          var dirty = syllabus.find(function(syllabus) { return syllabus.isDirty(); });
+          var dirty = syllabuses.find(function(syllabus) { return syllabus.isDirty(); });
           if(dirty) {
               return gettext("You have unsaved changes. Do you really want to leave this page?");
           }
@@ -54,7 +54,7 @@ require(["js/models/section", "js/collections/syllabus", "js/views/list_syllabus
     <header class="mast has-actions has-subtitle">
       <h1 class="page-header">
         <small class="subtitle">${_("Content")}</small>
-        <span class="sr">&gt; </span>${_("Syllabus")}
+        <span class="sr">&gt; </span>${_("Syllabuses")}
       </h1>
 
       <nav class="nav-actions">

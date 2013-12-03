@@ -1,22 +1,22 @@
 define(["backbone", "underscore", "jquery", "js/views/edit_syllabus", "js/views/show_syllabus"],
         function(Backbone, _, $, EditSyllabusView, ShowSyllabusView) {
-    var ListSyllabus = Backbone.View.extend({
+    var ListSyllabuses = Backbone.View.extend({
         initialize: function() {
-            this.emptyTemplate = _.template($("#no-syllabus-tpl").text());
+            this.emptyTemplate = _.template($("#no-syllabuses-tpl").text());
             this.listenTo(this.collection, 'all', this.render);
             this.listenTo(this.collection, 'destroy', this.handleDestroy);
         },
         tagName: "div",
-        className: "syllabus-list",
+        className: "syllabuses-list",
         render: function() {
-            var syllabus = this.collection;
-            if(syllabus.length === 0) {
+            var syllabuses = this.collection;
+            if(syllabuses.length === 0) {
                 this.$el.html(this.emptyTemplate());
             }
             else {
                 this.$el.empty();
                 var that = this;
-                syllabus.each(function(syllabus) {
+                syllabuses.each(function(syllabus) {
                    var view;
                   if (syllabus.get("editing")) {
                         view = new EditSyllabusView({model: syllabus});
@@ -39,5 +39,5 @@ define(["backbone", "underscore", "jquery", "js/views/edit_syllabus", "js/views/
             collection.remove(model);
         }
     });
-    return ListSyllabus;
+    return ListSyllabuses;
 });
