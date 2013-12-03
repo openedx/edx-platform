@@ -1,14 +1,14 @@
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
-from mitxmako.shortcuts import marketing_link
+from edxmako.shortcuts import marketing_link
 from mock import patch
 from util.testing import UrlResetMixin
 
 
 class ShortcutsTests(UrlResetMixin, TestCase):
     """
-    Test the mitxmako shortcuts file
+    Test the edxmako shortcuts file
     """
     @override_settings(MKTG_URLS={'ROOT': 'dummy-root', 'ABOUT': '/about-us'})
     @override_settings(MKTG_URL_LINK_MAP={'ABOUT': 'login'})

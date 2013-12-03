@@ -10,7 +10,7 @@ from django.views.decorators.http import require_POST
 from django.core.urlresolvers import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
-from mitxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response
 from .models import Order, PaidCourseRegistration, OrderItem
 from .processors import process_postpay_callback, render_purchase_form_html
 from .exceptions import ItemAlreadyInCartException, AlreadyEnrolledInCourseException, CourseDoesNotExistException

@@ -9,7 +9,7 @@ from django.core.exceptions import PermissionDenied
 from django_future.csrf import ensure_csrf_cookie
 from django.conf import settings
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from mitxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response
 
 from xmodule.modulestore.django import modulestore
 from xmodule.util.date_utils import get_default_time_display

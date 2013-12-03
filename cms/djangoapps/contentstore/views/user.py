@@ -6,7 +6,7 @@ from django.views.decorators.http import require_http_methods
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
 from django_future.csrf import ensure_csrf_cookie
-from mitxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response
 
 from xmodule.modulestore.django import modulestore, loc_mapper
 from util.json_request import JsonResponse, expect_json

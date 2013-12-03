@@ -9,7 +9,7 @@ from django.views.defaults import server_error
 from django.http import (Http404, HttpResponse, HttpResponseNotAllowed,
                          HttpResponseServerError)
 from dogapi import dog_stats_api
-from mitxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response
 import zendesk
 
 import calc

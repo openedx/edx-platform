@@ -50,7 +50,7 @@ from instructor_task.api import (get_running_instructor_tasks,
                                  submit_reset_problem_attempts_for_all_students,
                                  submit_bulk_course_email)
 from instructor_task.views import get_task_completion_info
-from mitxmako.shortcuts import render_to_response, render_to_string
+from edxmako.shortcuts import render_to_response, render_to_string
 from psychometrics import psychoanalyze
 from student.models import CourseEnrollment, CourseEnrollmentAllowed, unique_id_for_user
 from student.views import course_from_id

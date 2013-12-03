@@ -1,6 +1,6 @@
 from django.http import HttpResponse
 from django.shortcuts import redirect
-from mitxmako.shortcuts import render_to_string, render_to_response
+from edxmako.shortcuts import render_to_string, render_to_response
 
 __all__ = ['edge', 'event', 'landing']
 
