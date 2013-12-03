@@ -88,7 +88,12 @@ class LTIFields(object):
     custom_parameters = List(help="Custom parameters (vbid, book_location, etc..)", scope=Scope.settings)
     open_in_a_new_page = Boolean(help="Should LTI be opened in new page?", default=True, scope=Scope.settings)
     graded = Boolean(help="Grades will be considered in overall score.", default=False, scope=Scope.settings)
-    weight = Float(help="Weight for student grades.", default=1.0, scope=Scope.settings)
+    weight = Float(
+        help="Weight for student grades.",
+        default=1.0,
+        scope=Scope.settings,
+        values={"min": 0},
+    )
 
 
 class LTIModule(LTIFields, XModule):
