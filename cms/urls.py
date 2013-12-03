@@ -26,13 +26,21 @@ urlpatterns = patterns('',  # nopep8
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/textbooks/(?P<name>[^/]+)$',
         'contentstore.views.textbook_index', name='textbook_index'),
 
-    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/syllabus/(?P<name>[^/]+)$',
-        'contentstore.views.syllabus', name='syllabus'),
+    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/syllabuses/(?P<name>[^/]+)$',
+        'contentstore.views.syllabus_index', name='syllabus_index'),
+
 
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/textbooks/(?P<name>[^/]+)/new$',
         'contentstore.views.create_textbook', name='create_textbook'),
+
+    url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/syllabuses/(?P<name>[^/]+)/new$',
+        'contentstore.views.create_syllabus', name='create_syllabus'),
+
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/textbooks/(?P<name>[^/]+)/(?P<tid>\d[^/]*)$',
         'contentstore.views.textbook_by_id', name='textbook_by_id'),
+    
+     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/syllabuses/(?P<name>[^/]+)/(?P<tid>\d[^/]*)$',
+        'contentstore.views.syllabus_by_id', name='syllabus_by_id'),
 
     # temporary landing page for a course
     url(r'^edge/(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)$',
@@ -117,6 +125,11 @@ if settings.MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING'):
     urlpatterns += (
         url(r'^auto_auth$', 'student.views.auto_auth'),
     )
+
+#ajax call cites
+urlpatterns += (
+    url(r'^city_lookup/$', 'cities.views.lookup_handler', name='lookup_handler'),
+)
 
 if settings.DEBUG:
     try:

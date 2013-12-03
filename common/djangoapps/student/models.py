@@ -35,6 +35,7 @@ import crum
 from track import contexts
 from track.views import server_track
 from eventtracking import tracker
+from django.utils.translation import ugettext as _
 
 
 unenroll_done = Signal(providing_args=["course_enrollment"])

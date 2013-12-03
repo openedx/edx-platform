@@ -478,7 +478,7 @@ LANGUAGE_CODE = 'es_419'
 # localization files, if the user's browser is set to a language other than us-en,
 # strings like "login" and "password" will be translated and the rest of the page will be
 # in English, which is confusing.
-USE_I18N = False
+USE_I18N = True
 USE_L10N = True
 
 # Localization strings (e.g. django.po) are under this directory

@@ -1,27 +1,28 @@
 """
-This config file runs the simplest dev environment using sqlite, and db-based
-sessions. Assumes structure:
-
-/envroot/
-        /db   # This is where it'll write the database file
-        /mitx # The location of this repo
-        /log  # Where we're going to write log files
+Archivo de configuracion para staging
+Esta configuracion es lo mas parecida al ambiente de produccion
+/log  # Where we're going to write log files
 """
 
 # We intentionally define lots of variables that aren't used, and
 # want to import all variables from base settings files
 # pylint: disable=W0401, W0614
 
+from os import environ
+
 from .common import *
+from .dev import SECRET_KEY
 from logsettings import get_logger_config
 
 DEBUG = True
+
 USE_I18N = True
-LANGUAGES = ( ('es_419', 'Spanish'), )
+LANGUAGES = (('es_419', 'Spanish'), )
 TIME_ZONE = 'America/Guayaquil'
 LANGUAGE_CODE = 'es_419'
+
 TEMPLATE_DEBUG = True
-SITE_NAME = "iaen.edu.ec"
+
 
 MITX_FEATURES['DISABLE_START_DATES'] = False
 MITX_FEATURES['ENABLE_SQL_TRACKING_LOGS'] = True
@@ -32,15 +33,12 @@ MITX_FEATURES['ENABLE_MANUAL_GIT_RELOAD'] = True
 MITX_FEATURES['ENABLE_PSYCHOMETRICS'] = False    # real-time psychometrics (eg item response theory analysis in instructor dashboard)
 MITX_FEATURES['ENABLE_INSTRUCTOR_ANALYTICS'] = True
 MITX_FEATURES['ENABLE_SERVICE_STATUS'] = True
-MITX_FEATURES['ENABLE_INSTRUCTOR_EMAIL'] = True     # Enable email for all Studio courses
-MITX_FEATURES['REQUIRE_COURSE_EMAIL_AUTH'] = False  # Give all courses email (don't require django-admin perms)
+MITX_FEATURES['ENABLE_INSTRUCTOR_EMAIL'] = True
 MITX_FEATURES['ENABLE_HINTER_INSTRUCTOR_VIEW'] = True
 MITX_FEATURES['ENABLE_INSTRUCTOR_BETA_DASHBOARD'] = True
 MITX_FEATURES['MULTIPLE_ENROLLMENT_ROLES'] = True
 MITX_FEATURES['ENABLE_SHOPPING_CART'] = True
-MITX_FEATURES['ENABLE_PAYMENT_FAKE'] = True
 MITX_FEATURES['AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'] = True
-MITX_FEATURES['ENABLE_S3_GRADE_DOWNLOADS'] = True
 
 FEEDBACK_SUBMISSION_EMAIL = "dummy@example.com"
 
@@ -106,7 +104,7 @@ XQUEUE_INTERFACE = {
 CACHE_TIMEOUT = 0
 
 # Dummy secret key for dev
-SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
+SECRET_KEY = environ.get('SECRET_KEY', SECRET_KEY)
 
 
 COURSE_LISTINGS = {
@@ -130,6 +128,7 @@ SUBDOMAIN_BRANDING = {
     'mit': 'MITx',
     'berkeley': 'BerkeleyX',
     'harvard': 'HarvardX',
+    'iaen': 'IAEN',
 }
 
 # List of `university` landing pages to display, even though they may not
@@ -257,6 +256,9 @@ MITX_FEATURES['RESTRICT_ENROLL_BY_REG_METHOD'] = True
 ########################### PIPELINE #################################
 
 PIPELINE_SASS_ARGUMENTS = '--debug-info --require {proj_dir}/static/sass/bourbon/lib/bourbon.rb'.format(proj_dir=PROJECT_ROOT)
+
+########################## PEARSON TESTING ###########################
+MITX_FEATURES['ENABLE_PEARSON_LOGIN'] = False
 
 ########################## ANALYTICS TESTING ########################
 

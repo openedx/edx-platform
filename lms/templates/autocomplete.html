@@ -10,7 +10,7 @@
       $("#city").autocomplete({
         source: function(request, response){
             $.ajax({
-                url: "/lookup/",
+                url: "/city_lookup/",
                 dataType: 'json',
                 data: {
                     query: request.term

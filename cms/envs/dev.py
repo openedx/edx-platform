@@ -10,10 +10,12 @@ from logsettings import get_logger_config
 
 DEBUG = True
 USE_I18N = True
+# Locale/Internationalization
+LANGUAGES = ( ('es_419', 'Spanish'), ('eo', 'Esperanto'),)
+TIME_ZONE = 'America/Guayaquil'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
+LANGUAGE_CODE = 'es_419'  # http://www.i18nguy.com/unicode/language-identifiers.html
 # For displaying the dummy text, we need to provide a language mapping.
-LANGUAGES = (
-    ('eo', 'Esperanto'),
-)
+
 TEMPLATE_DEBUG = DEBUG
 LOGGING = get_logger_config(ENV_ROOT / "log",
                             logging_env="dev",
@@ -78,6 +80,12 @@ DATABASES = {
         'PORT': '3306',
     }
 }
+## DATABASES = {
+##     'default': {
+##         'ENGINE': 'django.db.backends.sqlite3',
+##         'NAME': ENV_ROOT / "db" / "mitx.db",
+##     }
+## }
 
 LMS_BASE = "localhost:8000"
 MITX_FEATURES['PREVIEW_LMS_BASE'] = "localhost:8000"
