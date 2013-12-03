@@ -173,6 +173,31 @@ class CombinedOpenEndedV1Module():
         self.fix_invalid_state()
         self.setup_next_task()
 
+    def normalize_task_scores(self, tasks_xml, task_states):
+        """
+        Update task state if task scores are normalized.
+        """
+        #Loop through each task state and make sure it matches the xml definition
+        for task_index, (task_xml, task_state) in enumerate(zip(tasks_xml, task_states)):
+            tag_name = self.get_tag_name(task_xml)
+            children = self.child_modules()
+            task_descriptor = children['descriptors'][tag_name](self.system)
+            task_parsed_xml = task_descriptor.definition_from_xml(etree.fromstring(task_xml), self.system)
+            try:
+                task = children['modules'][tag_name](
+                    self.system,
+                    self.location,
+                    task_parsed_xml,
+                    task_descriptor,
+                    self.static_data,
+                    instance_state=task_state,
+                )
+                scores_normalized = task.normalize_scores()
+                if scores_normalized:
+                    task_states[task_index] = task.get_instance_state()
+            except Exception:
+                break
+
     def validate_task_states(self, tasks_xml, task_states):
         """
         Check whether the provided task_states are valid for the supplied task_xml.
@@ -213,14 +238,6 @@ class CombinedOpenEndedV1Module():
                     elif tag_name == "selfassessment" and not isinstance(post_assessment, list):
                         msgs.append("Type is self assessment and post assessment is not a list.")
                         break
-                    # In the case of ML grading check if aggregate score is consistent with rubric scores.
-                    if tag_name == "openended":
-                        attempt_score_normalized = task.normalize_attempt_scores(attempt, self.system)
-                        task_scores_normalized = attempt_score_normalized or task_scores_normalized
-
-                if task_scores_normalized:
-                    task_states[task_index] = task.get_instance_state()
-
                 #See if we can properly render the task.  Will go into the exception clause below if not.
                 task.get_html(self.system)
             except Exception:
@@ -300,6 +317,10 @@ class CombinedOpenEndedV1Module():
         if not self.old_task_states and not self.task_states:
             # No validation needed when a student first looks at the problem
             return
+
+        # Normalize task scores with sum of rubric scores.
+        for task_states in self.old_task_states + [self.task_states]:
+            self.normalize_task_scores(self.task_xml, task_states)
 
         # Pick out of self.task_states and self.old_task_states the state that is
         # a) valid for the current task definition
