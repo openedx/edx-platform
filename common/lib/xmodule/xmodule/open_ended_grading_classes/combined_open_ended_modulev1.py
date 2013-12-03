@@ -175,9 +175,8 @@ class CombinedOpenEndedV1Module():
 
     def normalize_task_scores(self, tasks_xml, task_states):
         """
-        Update task state if task scores are normalized.
+        Make sure the scores in the task_states are consistent.
         """
-        #Loop through each task state and make sure it matches the xml definition
         for task_index, (task_xml, task_state) in enumerate(zip(tasks_xml, task_states)):
             tag_name = self.get_tag_name(task_xml)
             children = self.child_modules()
@@ -222,7 +221,6 @@ class CombinedOpenEndedV1Module():
                     instance_state=task_state,
                 )
                 #Loop through each attempt of the task and see if it is valid.
-                task_scores_normalized = False
                 for attempt in task.child_history:
                     if "post_assessment" not in attempt:
                         continue
