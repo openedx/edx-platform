@@ -253,9 +253,12 @@ class LTIModuleTest(LogicTest):
         self.xmodule.weight = 100.0
 
         self.xmodule.graded = True
-        self.assertEqual(self.xmodule.max_score(), 100)
+        self.assertEqual(self.xmodule.max_score(), None)
+
+        self.xmodule.has_score = True
+        self.assertEqual(self.xmodule.max_score(), 100.0)
 
         self.xmodule.graded = False
-        self.assertEqual(self.xmodule.max_score(), 0)
+        self.assertEqual(self.xmodule.max_score(), 100.0)
 
 

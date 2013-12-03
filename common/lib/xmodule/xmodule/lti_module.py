@@ -94,6 +94,7 @@ class LTIFields(object):
         scope=Scope.settings,
         values={"min": 0},
     )
+    has_score = Boolean(help="Does this LTI module have score?", default=False, scope=Scope.settings)
 
 
 class LTIModule(LTIFields, XModule):
@@ -380,7 +381,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         return params
 
     def max_score(self):
-        return self.weight if self.graded else 0
+        return self.weight if self.has_score else None
 
 
     @XBlock.handler
@@ -586,6 +587,5 @@ class LTIDescriptor(LTIFields, MetadataOnlyEditingDescriptor, EmptyDataRawDescri
     """
     Descriptor for LTI Xmodule.
     """
-    has_score = True
     module_class = LTIModule
     grade_handler = module_attr('grade_handler')
