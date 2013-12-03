@@ -234,6 +234,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
             floatValue = parseFloat(answersList[0]);
 
         if(!isNaN(floatValue)) {
+          // Tries to extract parameters from string like 'expr +- tolerance'
           var params = /(.*?)\+\-\s*(.*?$)/.exec(answersList[0]),
               answer = answersList[0].replace(/\s+/g, '');
           if(params) {
