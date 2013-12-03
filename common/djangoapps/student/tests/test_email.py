@@ -11,6 +11,8 @@ from mock import Mock, patch
 from django.http import Http404, HttpResponse
 from django.conf import settings
 from nose.plugins.skip import SkipTest
+from edxmako.shortcuts import render_to_string
+from util.request import safe_get_host
 
 
 class TestException(Exception):
@@ -50,6 +52,11 @@ class EmailTestMixin(object):
             settings.DEFAULT_FROM_EMAIL
         )
 
+    def append_allowed_hosts(self, hostname):
+        """ Append hostname to settings.ALLOWED_HOSTS """
+        settings.ALLOWED_HOSTS.append(hostname)
+        self.addCleanup(settings.ALLOWED_HOSTS.pop)
+
 
 @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
 @patch('django.contrib.auth.models.User.email_user')
@@ -82,6 +89,16 @@ class ReactivationEmailTests(EmailTestMixin, TestCase):
             'emails/activation_email.txt',
             context
         )
+
+        # Thorough tests for safe_get_host are elsewhere; here we just want a quick URL sanity check
+        request = RequestFactory().post('unused_url')
+        request.META['HTTP_HOST'] = "aGenericValidHostName"
+        self.append_allowed_hosts("aGenericValidHostName")
+
+        body = render_to_string('emails/activation_email.txt', context)
+        host = safe_get_host(request)
+
+        self.assertIn(host, body)
 
     def test_reactivation_email_failure(self, email_user):
         self.user.email_user.side_effect = Exception
@@ -226,6 +243,16 @@ class EmailChangeConfirmationTests(EmailTestMixin, TransactionTestCase):
             'emails/confirm_email_change.txt',
             context
         )
+
+        # Thorough tests for safe_get_host are elsewhere; here we just want a quick URL sanity check
+        request = RequestFactory().post('unused_url')
+        request.META['HTTP_HOST'] = "aGenericValidHostName"
+        self.append_allowed_hosts("aGenericValidHostName")
+
+        body = render_to_string('emails/confirm_email_change.txt', context)
+        url = safe_get_host(request)
+
+        self.assertIn(url, body)
 
     def test_not_pending(self, email_user):
         self.key = 'not_a_key'
