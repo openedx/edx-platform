@@ -74,3 +74,5 @@ def clear_courses():
     # $ mongo test_xmodule --eval "db.dropDatabase()"
     editable_modulestore().collection.drop()
     contentstore().fs_files.drop()
+    editable_modulestore().metadata_inheritance_cache_subsystem.clear()
+    editable_modulestore().metadata_inheritance_cache_subsystem = None
