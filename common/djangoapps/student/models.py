@@ -52,7 +52,7 @@ class AnonymousUserId(models.Model):
     http://docs.python.org/2/library/md5.html#md5.digest_size
     """
     user = models.ForeignKey(User, db_index=True)
-    anonymous_user_id = models.CharField(unique=True, max_length=16)
+    anonymous_user_id = models.CharField(unique=True, max_length=32)
     course_id = models.CharField(db_index=True, max_length=255)
     unique_together = (user, course_id)
 
