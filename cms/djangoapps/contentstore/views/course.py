@@ -423,7 +423,7 @@ def settings_handler(request, tag=None, course_id=None, branch=None, version_gui
             'lms_link_for_about_page': utils.get_lms_link_for_about_page(course_old_location),
             'course_image_url': utils.course_image_url(course_module),
             'details_url': locator.url_reverse('/settings/details/'),
-            'about_page_editable': not settings.MITX_FEATURES.get(
+            'about_page_editable': not settings.FEATURES.get(
                 'ENABLE_MKTG_SITE', False
             ),
             'upload_asset_url': upload_asset_url
@@ -822,9 +822,9 @@ def _get_course_creator_status(user):
     """
     if user.is_staff:
         course_creator_status = 'granted'
-    elif settings.MITX_FEATURES.get('DISABLE_COURSE_CREATION', False):
+    elif settings.FEATURES.get('DISABLE_COURSE_CREATION', False):
         course_creator_status = 'disallowed_for_this_site'
-    elif settings.MITX_FEATURES.get('ENABLE_CREATOR_GROUP', False):
+    elif settings.FEATURES.get('ENABLE_CREATOR_GROUP', False):
         course_creator_status = get_course_creator_status(user)
         if course_creator_status is None:
             # User not grandfathered in as an existing user, has not previously visited the dashboard page.

@@ -261,11 +261,11 @@ def is_user_in_creator_group(user):
         return True
 
     # On edx, we only allow edX staff to create courses. This may be relaxed in the future.
-    if settings.MITX_FEATURES.get('DISABLE_COURSE_CREATION', False):
+    if settings.FEATURES.get('DISABLE_COURSE_CREATION', False):
         return False
 
     # Feature flag for using the creator group setting. Will be removed once the feature is complete.
-    if settings.MITX_FEATURES.get('ENABLE_CREATOR_GROUP', False):
+    if settings.FEATURES.get('ENABLE_CREATOR_GROUP', False):
         return user.groups.filter(name=COURSE_CREATOR_GROUP_NAME).count() > 0
 
     return True

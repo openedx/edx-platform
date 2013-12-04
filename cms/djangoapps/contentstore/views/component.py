@@ -252,7 +252,7 @@ def unit_handler(request, tag=None, course_id=None, branch=None, version_guid=No
                 break
             index = index + 1
 
-        preview_lms_base = settings.MITX_FEATURES.get('PREVIEW_LMS_BASE')
+        preview_lms_base = settings.FEATURES.get('PREVIEW_LMS_BASE')
 
         preview_lms_link = (
             '//{preview_lms_base}/courses/{org}/{course}/'

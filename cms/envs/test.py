@@ -109,7 +109,7 @@ DATABASES = {
 }
 
 LMS_BASE = "localhost:8000"
-MITX_FEATURES['PREVIEW_LMS_BASE'] = "preview"
+FEATURES['PREVIEW_LMS_BASE'] = "preview"
 
 CACHES = {
     # This is the cache used for most things. Askbot will not work without a
@@ -161,9 +161,9 @@ PASSWORD_HASHERS = (
 SEGMENT_IO_KEY = '***REMOVED***'
 
 # disable NPS survey in test mode
-MITX_FEATURES['STUDIO_NPS_SURVEY'] = False
+FEATURES['STUDIO_NPS_SURVEY'] = False
 
-MITX_FEATURES['ENABLE_SERVICE_STATUS'] = True
+FEATURES['ENABLE_SERVICE_STATUS'] = True
 
 # This is to disable a test under the common directory that will not pass when run under CMS
-MITX_FEATURES['DISABLE_PASSWORD_RESET_EMAIL_TEST'] = True
+FEATURES['DISABLE_PASSWORD_RESET_EMAIL_TEST'] = True

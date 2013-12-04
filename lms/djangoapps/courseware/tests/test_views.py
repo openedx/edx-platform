@@ -86,8 +86,8 @@ class ViewsTestCase(TestCase):
         chapter = 'Overview'
         self.chapter_url = '%s/%s/%s' % ('/courses', self.course_id, chapter)
 
-    @unittest.skipUnless(settings.MITX_FEATURES.get('ENABLE_SHOPPING_CART'), "Shopping Cart not enabled in settings")
-    @patch.dict(settings.MITX_FEATURES, {'ENABLE_PAID_COURSE_REGISTRATION': True})
+    @unittest.skipUnless(settings.FEATURES.get('ENABLE_SHOPPING_CART'), "Shopping Cart not enabled in settings")
+    @patch.dict(settings.FEATURES, {'ENABLE_PAID_COURSE_REGISTRATION': True})
     def test_course_about_in_cart(self):
         in_cart_span = '<span class="add-to-cart">'
         # don't mock this course due to shopping cart existence checking

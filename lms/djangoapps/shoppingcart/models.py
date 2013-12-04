@@ -143,7 +143,7 @@ class Order(models.Model):
         self.bill_to_state = state
         self.bill_to_country = country
         self.bill_to_postalcode = postalcode
-        if settings.MITX_FEATURES['STORE_BILLING_INFO']:
+        if settings.FEATURES['STORE_BILLING_INFO']:
             self.bill_to_street1 = street1
             self.bill_to_street2 = street2
             self.bill_to_ccnum = ccnum
@@ -164,7 +164,7 @@ class Order(models.Model):
         message = render_to_string('emails/order_confirmation_email.txt', {
             'order': self,
             'order_items': orderitems,
-            'has_billing_info': settings.MITX_FEATURES['STORE_BILLING_INFO']
+            'has_billing_info': settings.FEATURES['STORE_BILLING_INFO']
         })
         try:
             send_mail(subject, message,

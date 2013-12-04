@@ -5,6 +5,10 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Common: Switch over from MITX_FEATURES to just FEATURES. To override items in
+  the FEATURES dict, the environment variable you must set to do so is also
+  now called FEATURES instead of MITX_FEATURES.
+
 Blades: Fix Numerical input to support mathematical operations. BLD-525.
 
 Blades: Improve calculator's tooltip accessibility. Add possibility to navigate

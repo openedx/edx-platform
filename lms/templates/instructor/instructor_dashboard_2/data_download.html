@@ -23,12 +23,12 @@
   <p><input type="button" name="list-anon-ids" value="${_("Get Student Anonymized IDs CSV")}" data-csv="true" class="csv" data-endpoint="${ section_data['get_anon_ids_url'] }" class="${'is-disabled' if disable_buttons else ''}"></p>
 </div>
 
-%if settings.MITX_FEATURES.get('ENABLE_S3_GRADE_DOWNLOADS'):
+%if settings.FEATURES.get('ENABLE_S3_GRADE_DOWNLOADS'):
   <div class="grades-download-container action-type-container">
     <hr>
     <h2> ${_("Grade Reports")}</h2>
 
-  %if settings.MITX_FEATURES.get('ALLOW_COURSE_STAFF_GRADE_DOWNLOADS') or section_data['access']['admin']:
+  %if settings.FEATURES.get('ALLOW_COURSE_STAFF_GRADE_DOWNLOADS') or section_data['access']['admin']:
     <p>${_("The following button will generate a CSV grade report for all currently enrolled students. For large courses, generating this report may take a few hours.")}</p>
 
     <p>${_("The report is generated in the background, meaning it is OK to navigate away from this page while your report is generating. Generated reports appear in a table below and can be downloaded.")}</p>
@@ -46,7 +46,7 @@
   </div>
 %endif
 
-%if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
+%if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
   <div class="running-tasks-container action-type-container">
     <hr>
     <h2> ${_("Pending Instructor Tasks")} </h2>

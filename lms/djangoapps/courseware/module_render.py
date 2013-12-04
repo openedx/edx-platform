@@ -363,7 +363,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
         reverse('jump_to_id', kwargs={'course_id': course_id, 'module_id': ''}),
     ))
 
-    if settings.MITX_FEATURES.get('DISPLAY_HISTOGRAMS_TO_STAFF'):
+    if settings.FEATURES.get('DISPLAY_HISTOGRAMS_TO_STAFF'):
         if has_access(user, descriptor, 'staff', course_id):
             block_wrappers.append(partial(add_histogram, user))
 
@@ -423,7 +423,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
 
     # pass position specified in URL to module through ModuleSystem
     system.set('position', position)
-    if settings.MITX_FEATURES.get('ENABLE_PSYCHOMETRICS'):
+    if settings.FEATURES.get('ENABLE_PSYCHOMETRICS'):
         system.set(
             'psychometrics_handler',  # set callback for updating PsychometricsData
             make_psychometrics_data_update_handler(course_id, user, descriptor.location.url())

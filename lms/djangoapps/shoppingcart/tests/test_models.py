@@ -161,7 +161,7 @@ class OrderTest(ModuleStoreTestCase):
         )
 
     @patch('shoppingcart.models.render_to_string')
-    @patch.dict(settings.MITX_FEATURES, {'STORE_BILLING_INFO': True})
+    @patch.dict(settings.FEATURES, {'STORE_BILLING_INFO': True})
     def test_billing_info_storage_on(self, render):
         cart = Order.get_cart_for_user(self.user)
         self.purchase_with_data(cart)
@@ -179,7 +179,7 @@ class OrderTest(ModuleStoreTestCase):
         self.assertTrue(context['has_billing_info'])
 
     @patch('shoppingcart.models.render_to_string')
-    @patch.dict(settings.MITX_FEATURES, {'STORE_BILLING_INFO': False})
+    @patch.dict(settings.FEATURES, {'STORE_BILLING_INFO': False})
     def test_billing_info_storage_off(self, render):
         cart = Order.get_cart_for_user(self.user)
         self.purchase_with_data(cart)

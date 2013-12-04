@@ -91,7 +91,7 @@ def send_user_notification_callback(sender, **kwargs):
     user = kwargs['user']
     updated_state = kwargs['state']
 
-    studio_request_email = settings.MITX_FEATURES.get('STUDIO_REQUEST_EMAIL', '')
+    studio_request_email = settings.FEATURES.get('STUDIO_REQUEST_EMAIL', '')
     context = {'studio_request_email': studio_request_email}
 
     subject = render_to_string('emails/course_creator_subject.txt', context)
@@ -118,7 +118,7 @@ def send_admin_notification_callback(sender, **kwargs):
     """
     user = kwargs['user']
 
-    studio_request_email = settings.MITX_FEATURES.get('STUDIO_REQUEST_EMAIL', '')
+    studio_request_email = settings.FEATURES.get('STUDIO_REQUEST_EMAIL', '')
     context = {'user_name': user.username, 'user_email': user.email}
 
     subject = render_to_string('emails/course_creator_admin_subject.txt', context)

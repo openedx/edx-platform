@@ -1504,31 +1504,31 @@ class ContentStoreTest(ModuleStoreTestCase):
 
     def test_create_course_with_course_creation_disabled_staff(self):
         """Test new course creation -- course creation disabled, but staff access."""
-        with mock.patch.dict('django.conf.settings.MITX_FEATURES', {'DISABLE_COURSE_CREATION': True}):
+        with mock.patch.dict('django.conf.settings.FEATURES', {'DISABLE_COURSE_CREATION': True}):
             self.assert_created_course()
 
     def test_create_course_with_course_creation_disabled_not_staff(self):
         """Test new course creation -- error path for course creation disabled, not staff access."""
-        with mock.patch.dict('django.conf.settings.MITX_FEATURES', {'DISABLE_COURSE_CREATION': True}):
+        with mock.patch.dict('django.conf.settings.FEATURES', {'DISABLE_COURSE_CREATION': True}):
             self.user.is_staff = False
             self.user.save()
             self.assert_course_permission_denied()
 
     def test_create_course_no_course_creators_staff(self):
         """Test new course creation -- course creation group enabled, staff, group is empty."""
-        with mock.patch.dict('django.conf.settings.MITX_FEATURES', {'ENABLE_CREATOR_GROUP': True}):
+        with mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_CREATOR_GROUP': True}):
             self.assert_created_course()
 
     def test_create_course_no_course_creators_not_staff(self):
         """Test new course creation -- error path for course creator group enabled, not staff, group is empty."""
-        with mock.patch.dict('django.conf.settings.MITX_FEATURES', {"ENABLE_CREATOR_GROUP": True}):
+        with mock.patch.dict('django.conf.settings.FEATURES', {"ENABLE_CREATOR_GROUP": True}):
             self.user.is_staff = False
             self.user.save()
             self.assert_course_permission_denied()
 
     def test_create_course_with_course_creator(self):
         """Test new course creation -- use course creator group"""
-        with mock.patch.dict('django.conf.settings.MITX_FEATURES', {"ENABLE_CREATOR_GROUP": True}):
+        with mock.patch.dict('django.conf.settings.FEATURES', {"ENABLE_CREATOR_GROUP": True}):
             add_user_to_creator_group(self.user, self.user)
             self.assert_created_course()
 

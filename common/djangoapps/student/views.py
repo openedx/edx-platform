@@ -100,7 +100,7 @@ def index(request, extra_context={}, user=None):
     """
 
     # The course selection work is done in courseware.courses.
-    domain = settings.MITX_FEATURES.get('FORCE_UNIVERSITY_DOMAIN')  # normally False
+    domain = settings.FEATURES.get('FORCE_UNIVERSITY_DOMAIN')  # normally False
     # do explicit check, because domain=None is valid
     if domain is False:
         domain = request.META.get('HTTP_HOST')
@@ -331,7 +331,7 @@ def dashboard(request):
     # only show email settings for Mongo course and when bulk email is turned on
     show_email_settings_for = frozenset(
         course.id for course, _enrollment in course_enrollment_pairs if (
-            settings.MITX_FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and
+            settings.FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and
             modulestore().get_modulestore_type(course.id) == MONGO_MODULESTORE_TYPE and
             CourseAuthorization.instructor_email_enabled(course.id)
         )
@@ -516,7 +516,7 @@ def accounts_login(request):
     This view is mainly used as the redirect from the @login_required decorator.  I don't believe that
     the login path linked from the homepage uses it.
     """
-    if settings.MITX_FEATURES.get('AUTH_USE_CAS'):
+    if settings.FEATURES.get('AUTH_USE_CAS'):
         return redirect(reverse('cas-login'))
     # see if the "next" parameter has been set, whether it has a course context, and if so, whether
     # there is a course-specific place to redirect
@@ -547,7 +547,7 @@ def login_user(request, error=""):
     # check if the user has a linked shibboleth account, if so, redirect the user to shib-login
     # This behavior is pretty much like what gmail does for shibboleth.  Try entering some @stanford.edu
     # address into the Gmail login.
-    if settings.MITX_FEATURES.get('AUTH_USE_SHIB') and user:
+    if settings.FEATURES.get('AUTH_USE_SHIB') and user:
         try:
             eamap = ExternalAuthMap.objects.get(user=user)
             if eamap.external_domain.startswith(external_auth.views.SHIBBOLETH_DOMAIN_PREFIX):
@@ -634,7 +634,7 @@ def logout_user(request):
     # We do not log here, because we have a handler registered
     # to perform logging on successful logouts.
     logout(request)
-    if settings.MITX_FEATURES.get('AUTH_USE_CAS'):
+    if settings.FEATURES.get('AUTH_USE_CAS'):
         target = reverse('cas-logout')
     else:
         target = '/'
@@ -832,8 +832,8 @@ def create_account(request, post_override=None):
         return HttpResponse(json.dumps(js))
 
     # Can't have terms of service for certain SHIB users, like at Stanford
-    tos_not_required = (settings.MITX_FEATURES.get("AUTH_USE_SHIB") and
-                        settings.MITX_FEATURES.get('SHIB_DISABLE_TOS') and
+    tos_not_required = (settings.FEATURES.get("AUTH_USE_SHIB") and
+                        settings.FEATURES.get('SHIB_DISABLE_TOS') and
                         DoExternalAuth and
                         eamap.external_domain.startswith(external_auth.views.SHIBBOLETH_DOMAIN_PREFIX))
 
@@ -896,10 +896,10 @@ def create_account(request, post_override=None):
     message = render_to_string('emails/activation_email.txt', d)
 
     # don't send email if we are doing load testing or random user generation for some reason
-    if not (settings.MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING')):
+    if not (settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING')):
         try:
-            if settings.MITX_FEATURES.get('REROUTE_ACTIVATION_EMAIL'):
-                dest_addr = settings.MITX_FEATURES['REROUTE_ACTIVATION_EMAIL']
+            if settings.FEATURES.get('REROUTE_ACTIVATION_EMAIL'):
+                dest_addr = settings.FEATURES['REROUTE_ACTIVATION_EMAIL']
                 message = ("Activation for %s (%s): %s\n" % (user, user.email, profile.name) +
                            '-' * 80 + '\n\n' + message)
                 send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [dest_addr], fail_silently=False)
@@ -929,7 +929,7 @@ def create_account(request, post_override=None):
         AUDIT_LOG.info("User registered with external_auth %s", post_vars['username'])
         AUDIT_LOG.info('Updated ExternalAuthMap for %s to be %s', post_vars['username'], eamap)
 
-        if settings.MITX_FEATURES.get('BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH'):
+        if settings.FEATURES.get('BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH'):
             log.info('bypassing activation email')
             login_user.is_active = True
             login_user.save()
@@ -969,7 +969,7 @@ def auto_auth(request):
     """
     Automatically logs the user in with a generated random credentials
     This view is only accessible when
-    settings.MITX_SETTINGS['AUTOMATIC_AUTH_FOR_TESTING'] is true.
+    settings.FEATURES['AUTOMATIC_AUTH_FOR_TESTING'] is true.
     """
 
     def get_dummy_post_data(username, password, email, name):
@@ -988,7 +988,7 @@ def auto_auth(request):
     name_base = 'USER_'
     pass_base = 'PASS_'
 
-    max_users = settings.MITX_FEATURES.get('MAX_AUTO_AUTH_USERS', 200)
+    max_users = settings.FEATURES.get('MAX_AUTO_AUTH_USERS', 200)
     number = random.randint(1, max_users)
 
     # Get the params from the request to override default user attributes if specified

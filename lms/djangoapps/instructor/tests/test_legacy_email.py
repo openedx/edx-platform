@@ -42,7 +42,7 @@ class TestInstructorDashboardEmailView(ModuleStoreTestCase):
         """
         patch.stopall()
 
-    @patch.dict(settings.MITX_FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
+    @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
     def test_email_flag_true(self):
         # Assert that the URL for the email view is in the response
         response = self.client.get(self.url)
@@ -60,14 +60,14 @@ class TestInstructorDashboardEmailView(ModuleStoreTestCase):
         send_to_label = '<label for="id_to">Send to:</label>'
         self.assertTrue(send_to_label in response.content)
 
-    @patch.dict(settings.MITX_FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': True})
+    @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': True})
     def test_email_flag_unauthorized(self):
         # Assert that the URL for the email view is not in the response
         # email is enabled, but this course is not authorized to send email
         response = self.client.get(self.url)
         self.assertFalse(self.email_link in response.content)
 
-    @patch.dict(settings.MITX_FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': True})
+    @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': True})
     def test_email_flag_authorized(self):
         # Assert that the URL for the email view is in the response
         # email is enabled, and this course is authorized to send email
@@ -86,13 +86,13 @@ class TestInstructorDashboardEmailView(ModuleStoreTestCase):
         response = self.client.get(self.url)
         self.assertTrue(self.email_link in response.content)
 
-    @patch.dict(settings.MITX_FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': False})
+    @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': False})
     def test_email_flag_false(self):
         # Assert that the URL for the email view is not in the response
         response = self.client.get(self.url)
         self.assertFalse(self.email_link in response.content)
 
-    @patch.dict(settings.MITX_FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True})
+    @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True})
     def test_email_flag_true_xml_store(self):
         # If the enable email setting is enabled, but this is an XML backed course,
         # the email view shouldn't be available on the instructor dashboard.

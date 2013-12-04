@@ -17,13 +17,13 @@ from django.test.utils import override_settings
 from external_auth.models import ExternalAuthMap
 import external_auth.views
 
-MITX_FEATURES_WITH_SSL_AUTH = settings.MITX_FEATURES.copy()
-MITX_FEATURES_WITH_SSL_AUTH['AUTH_USE_MIT_CERTIFICATES'] = True
-MITX_FEATURES_WITH_SSL_AUTH_IMMEDIATE_SIGNUP = MITX_FEATURES_WITH_SSL_AUTH.copy()
-MITX_FEATURES_WITH_SSL_AUTH_IMMEDIATE_SIGNUP['AUTH_USE_MIT_CERTIFICATES_IMMEDIATE_SIGNUP'] = True
+FEATURES_WITH_SSL_AUTH = settings.FEATURES.copy()
+FEATURES_WITH_SSL_AUTH['AUTH_USE_MIT_CERTIFICATES'] = True
+FEATURES_WITH_SSL_AUTH_IMMEDIATE_SIGNUP = FEATURES_WITH_SSL_AUTH.copy()
+FEATURES_WITH_SSL_AUTH_IMMEDIATE_SIGNUP['AUTH_USE_MIT_CERTIFICATES_IMMEDIATE_SIGNUP'] = True
 
 
-@override_settings(MITX_FEATURES=MITX_FEATURES_WITH_SSL_AUTH)
+@override_settings(FEATURES=FEATURES_WITH_SSL_AUTH)
 class SSLClientTest(TestCase):
     """
     Tests SSL Authentication code sections of external_auth
@@ -94,7 +94,7 @@ class SSLClientTest(TestCase):
             User.objects.get(email=self.USER_EMAIL)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-    @override_settings(MITX_FEATURES=MITX_FEATURES_WITH_SSL_AUTH_IMMEDIATE_SIGNUP)
+    @override_settings(FEATURES=FEATURES_WITH_SSL_AUTH_IMMEDIATE_SIGNUP)
     def test_ssl_login_without_signup_lms(self):
         """
         Test IMMEDIATE_SIGNUP feature flag and ensure the user account is automatically created
@@ -114,7 +114,7 @@ class SSLClientTest(TestCase):
             self.fail('User did not get properly added to internal users, exception was {0}'.format(str(ex)))
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'cms.urls', 'Test only valid in cms')
-    @override_settings(MITX_FEATURES=MITX_FEATURES_WITH_SSL_AUTH_IMMEDIATE_SIGNUP)
+    @override_settings(FEATURES=FEATURES_WITH_SSL_AUTH_IMMEDIATE_SIGNUP)
     @unittest.skip
     def test_ssl_login_without_signup_cms(self):
         """

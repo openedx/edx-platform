@@ -56,19 +56,19 @@ class TestStudentDashboardEmailView(ModuleStoreTestCase):
         """
         patch.stopall()
 
-    @patch.dict(settings.MITX_FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
+    @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
     def test_email_flag_true(self):
         # Assert that the URL for the email view is in the response
         response = self.client.get(self.url)
         self.assertTrue(self.email_modal_link in response.content)
 
-    @patch.dict(settings.MITX_FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': False})
+    @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': False})
     def test_email_flag_false(self):
         # Assert that the URL for the email view is not in the response
         response = self.client.get(self.url)
         self.assertFalse(self.email_modal_link in response.content)
 
-    @patch.dict(settings.MITX_FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': True})
+    @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': True})
     def test_email_unauthorized(self):
         # Assert that instructor email is not enabled for this course
         self.assertFalse(CourseAuthorization.instructor_email_enabled(self.course.id))
@@ -77,7 +77,7 @@ class TestStudentDashboardEmailView(ModuleStoreTestCase):
         response = self.client.get(self.url)
         self.assertFalse(self.email_modal_link in response.content)
 
-    @patch.dict(settings.MITX_FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': True})
+    @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': True})
     def test_email_authorized(self):
         # Authorize the course to use email
         cauth = CourseAuthorization(course_id=self.course.id, email_enabled=True)
@@ -120,14 +120,14 @@ class TestStudentDashboardEmailViewXMLBacked(ModuleStoreTestCase):
              )
         )
 
-    @patch.dict(settings.MITX_FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
+    @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
     def test_email_flag_true_xml_store(self):
         # The flag is enabled, and since REQUIRE_COURSE_EMAIL_AUTH is False, all courses should
         # be authorized to use email. But the course is not Mongo-backed (should not work)
         response = self.client.get(self.url)
         self.assertFalse(self.email_modal_link in response.content)
 
-    @patch.dict(settings.MITX_FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': False, 'REQUIRE_COURSE_EMAIL_AUTH': False})
+    @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': False, 'REQUIRE_COURSE_EMAIL_AUTH': False})
     def test_email_flag_false_xml_store(self):
         # Email disabled, shouldn't see link.
         response = self.client.get(self.url)
