@@ -1,0 +1,29 @@
+
+<form class="edit-syllabus" id="edit_syllabus_form">
+  <div class="wrapper-form">
+  <% if (error && error.message) { %>
+    <div id="edit_syllabus_error" class="message message-status message-status error is-shown" name="edit_syllabus_error">
+      <%= gettext(error.message) %>
+    </div>
+  <% } %>
+
+  <fieldset class="syllabus-fields">
+    <legend class="sr"><%= gettext("Syllabus information") %></legend>
+        <div class="input-wrap field text required add-syllabus-name <% if(error && error.attributes && error.attributes.name) { print('error'); } %>">
+          <label for="syllabus-name-input"><%= gettext("Syllabus Name") %></label>
+          <input id="syllabus-name-input" name="syllabus-name" type="text" placeholder="<%= gettext("Introduction to Cookie Baking") %>" value="<%= name %>">
+          <span class="tip tip-stacked"><%= gettext("provide the title/name of the text book as you would like your students to see it") %></span>
+        </div>
+  </fieldset>
+  <fieldset class="topics-fields">
+    <legend class="sr"><%= gettext("Topic(s) information") %></legend>
+      <ol class="topics list-input enum"></ol>
+
+    <button class="action action-add-topic"><i class="icon-plus"></i> <%= gettext("Add a Topic") %></button>
+  </fieldset>
+  </div>
+  <div class="actions">
+    <button class="action action-primary" type="submit"><%= gettext("Save") %></button>
+    <button class="action action-secondary action-cancel"><%= gettext("Cancel") %></button>
+  </div>
+</form>

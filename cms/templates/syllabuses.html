@@ -3,11 +3,11 @@
 <%! import json %>
 <%! from django.utils.translation import ugettext as _ %>
 
-<%block name="title">${_("Syllabus")}</%block>
-<%block name="bodyclass">is-signedin course view-textbooks feature-upload</%block>
+<%block name="title">${_("Syllabuses")}</%block>
+<%block name="bodyclass">is-signedin course view-syllabuses feature-upload</%block>
 
 <%block name="header_extras">
-% for template_name in ["edit-syllabus"]:
+% for template_name in ["edit-syllabus", "show-syllabus", "edit-topic", "no-syllabuses" ]:
   <script type="text/template" id="${template_name}-tpl">
     <%static:include path="js/${template_name}.underscore" />
   </script>
@@ -18,11 +18,10 @@
 <script type="text/javascript">
 window.CMS = window.CMS || {};
 CMS.URL = CMS.URL || {};
-CMS.URL.UPLOAD_ASSET = "${upload_asset_url}"
-CMS.URL.TEXTBOOKS = "${syllabus_url}"
+CMS.URL.SYLLABUSES = "${syllabus_url}"
 CMS.URL.LMS_BASE = "${settings.LMS_BASE}"
-require(["js/models/section", "js/collections/textbook", "js/views/list_textbooks"],
-        function(Section, TextbookCollection, ListTextbooksView) {
+require(["js/models/section", "js/collections/syllabus", "js/views/list_syllabuses"],
+        function(Section, SyllabusCollection, ListSyllabusesView) {
   window.section = new Section({
       id: "${course.id}",
       name: "${course.display_name_with_default | h}",
@@ -31,8 +30,8 @@ require(["js/models/section", "js/collections/textbook", "js/views/list_textbook
       num: "${course.location.course | h}",
       revision: "${course.location.revision | h}"
   });
-  var textbooks = new TextbookCollection(${json.dumps(course.pdf_textbooks)}, {parse: true});
-  var tbView = new ListTextbooksView({collection: textbooks});
+  var syllabuses = new SyllabusCollection(${json.dumps(course.topic_syllabuses)}, {parse: true});
+  var tbView = new ListSyllabusesView({collection: syllabuses});
 
   $(function() {
       $(".content-primary").append(tbView.render().el);
@@ -40,7 +39,7 @@ require(["js/models/section", "js/collections/textbook", "js/views/list_textbook
           tbView.addOne(e);
       })
       $(window).on("beforeunload", function() {
-          var dirty = textbooks.find(function(textbook) { return textbook.isDirty(); });
+          var dirty = syllabuses.find(function(syllabus) { return syllabus.isDirty(); });
           if(dirty) {
               return gettext("You have unsaved changes. Do you really want to leave this page?");
           }
@@ -55,7 +54,7 @@ require(["js/models/section", "js/collections/textbook", "js/views/list_textbook
     <header class="mast has-actions has-subtitle">
       <h1 class="page-header">
         <small class="subtitle">${_("Content")}</small>
-        <span class="sr">&gt; </span>${_("Syllabus")}
+        <span class="sr">&gt; </span>${_("Syllabuses")}
       </h1>
 
       <nav class="nav-actions">

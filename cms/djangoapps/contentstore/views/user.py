@@ -1,5 +1,4 @@
 import json
-from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.decorators import login_required
@@ -10,9 +9,11 @@ from django_future.csrf import ensure_csrf_cookie
 from mitxmako.shortcuts import render_to_response
 
 from xmodule.modulestore.django import modulestore, loc_mapper
-from util.json_request import JsonResponse
+from util.json_request import JsonResponse, expect_json
 from auth.authz import (
-    STAFF_ROLE_NAME, INSTRUCTOR_ROLE_NAME, get_course_groupname_for_role)
+    STAFF_ROLE_NAME, INSTRUCTOR_ROLE_NAME, get_course_groupname_for_role,
+    get_course_role_users
+)
 from course_creators.views import user_requested_access
 
 from .access import has_access
@@ -35,6 +36,7 @@ def request_course_creator(request):
     return JsonResponse({"Status": "OK"})
 
 
+# pylint: disable=unused-argument
 @login_required
 @ensure_csrf_cookie
 @require_http_methods(("GET", "POST", "PUT", "DELETE"))
@@ -62,38 +64,39 @@ def course_team_handler(request, tag=None, course_id=None, branch=None, version_
         return HttpResponseNotFound()
 
 
-def _manage_users(request, location):
+def _manage_users(request, locator):
     """
     This view will return all CMS users who are editors for the specified course
     """
-    old_location = loc_mapper().translate_locator_to_location(location)
+    old_location = loc_mapper().translate_locator_to_location(locator)
 
     # check that logged in user has permissions to this item
-    if not has_access(request.user, location, role=INSTRUCTOR_ROLE_NAME) and not has_access(request.user, location, role=STAFF_ROLE_NAME):
+    if not has_access(request.user, locator):
         raise PermissionDenied()
 
     course_module = modulestore().get_item(old_location)
-
-    staff_groupname = get_course_groupname_for_role(location, "staff")
-    staff_group, __ = Group.objects.get_or_create(name=staff_groupname)
-    inst_groupname = get_course_groupname_for_role(location, "instructor")
-    inst_group, __ = Group.objects.get_or_create(name=inst_groupname)
+    instructors = get_course_role_users(locator, INSTRUCTOR_ROLE_NAME)
+    # the page only lists staff and assumes they're a superset of instructors. Do a union to ensure.
+    staff = set(get_course_role_users(locator, STAFF_ROLE_NAME)).union(instructors)
 
     return render_to_response('manage_users.html', {
         'context_course': course_module,
-        'staff': staff_group.user_set.all(),
-        'instructors': inst_group.user_set.all(),
-        'allow_actions': has_access(request.user, location, role=INSTRUCTOR_ROLE_NAME),
+        'staff': staff,
+        'instructors': instructors,
+        'allow_actions': has_access(request.user, locator, role=INSTRUCTOR_ROLE_NAME),
     })
 
 
-def _course_team_user(request, location, email):
-    old_location = loc_mapper().translate_locator_to_location(location)
+@expect_json
+def _course_team_user(request, locator, email):
+    """
+    Handle the add, remove, promote, demote requests ensuring the requester has authority
+    """
     # check that logged in user has permissions to this item
-    if has_access(request.user, location, role=INSTRUCTOR_ROLE_NAME):
+    if has_access(request.user, locator, role=INSTRUCTOR_ROLE_NAME):
         # instructors have full permissions
         pass
-    elif has_access(request.user, location, role=STAFF_ROLE_NAME) and email == request.user.email:
+    elif has_access(request.user, locator, role=STAFF_ROLE_NAME) and email == request.user.email:
         # staff can only affect themselves
         pass
     else:
@@ -123,7 +126,7 @@ def _course_team_user(request, location, email):
         # what's the highest role that this user has?
         groupnames = set(g.name for g in user.groups.all())
         for role in roles:
-            role_groupname = get_course_groupname_for_role(old_location, role)
+            role_groupname = get_course_groupname_for_role(locator, role)
             if role_groupname in groupnames:
                 msg["role"] = role
                 break
@@ -139,7 +142,7 @@ def _course_team_user(request, location, email):
     # make sure that the role groups exist
     groups = {}
     for role in roles:
-        groupname = get_course_groupname_for_role(old_location, role)
+        groupname = get_course_groupname_for_role(locator, role)
         group, __ = Group.objects.get_or_create(name=groupname)
         groups[role] = group
 
@@ -162,22 +165,13 @@ def _course_team_user(request, location, email):
         return JsonResponse()
 
     # all other operations require the requesting user to specify a role
-    if request.META.get("CONTENT_TYPE", "").startswith("application/json") and request.body:
-        try:
-            payload = json.loads(request.body)
-        except:
-            return JsonResponse({"error": _("malformed JSON")}, 400)
-        try:
-            role = payload["role"]
-        except KeyError:
-            return JsonResponse({"error": _("`role` is required")}, 400)
-    else:
-        if not "role" in request.POST:
-            return JsonResponse({"error": _("`role` is required")}, 400)
-        role = request.POST["role"]
+    role = request.json.get("role", request.POST.get("role"))
+    if role is None:
+        return JsonResponse({"error": _("`role` is required")}, 400)
 
+    old_location = loc_mapper().translate_locator_to_location(locator)
     if role == "instructor":
-        if not has_access(request.user, location, role=INSTRUCTOR_ROLE_NAME):
+        if not has_access(request.user, locator, role=INSTRUCTOR_ROLE_NAME):
             msg = {
                 "error": _("Only instructors may create other instructors")
             }
@@ -203,4 +197,3 @@ def _course_team_user(request, location, email):
         CourseEnrollment.enroll(user, old_location.course_id)
 
     return JsonResponse()
-

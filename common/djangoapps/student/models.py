@@ -26,7 +26,6 @@ from django.dispatch import receiver, Signal
 import django.dispatch
 from django.forms import ModelForm, forms
 from django.core.exceptions import ObjectDoesNotExist
-from django.utils.translation import ugettext as _
 
 from course_modes.models import CourseMode
 import lms.lib.comment_client as cc
@@ -36,6 +35,7 @@ import crum
 from track import contexts
 from track.views import server_track
 from eventtracking import tracker
+from django.utils.translation import ugettext as _
 
 
 unenroll_done = Signal(providing_args=["course_enrollment"])
