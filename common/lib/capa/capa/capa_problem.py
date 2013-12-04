@@ -566,16 +566,16 @@ class LoncapaProblem(object):
 
             # The next element should either be <solution> or <solutionset>
             next_element = targetedfeedbackset.getnext()
-            theParent = tree
-            theSolution = None
+            parent_element = tree
+            solution_element = None
             if next_element.tag == 'solution':
-                theSolution = next_element
+                solution_element = next_element
             elif next_element.tag == 'solutionset':
                 solutions = next_element.xpath('./solution')
                 for solution in solutions:
                     if solution.get('explanation-id') == solution_id:
-                        theParent = next_element
-                        theSolution = solution
+                        parent_element = next_element
+                        solution_element = solution
                         # next_element.remove(solution)
                         # tree.remove(solution)
                         # solution.tag = 'targetedfeedback'
@@ -584,10 +584,10 @@ class LoncapaProblem(object):
             # Change our correct-choice explanation from a "solution explanation" to within
             # the set of targeted feedback, which means the explanation will render on the page
             # without the student clicking "Show Answer" or seeing a checkmark next to the correct choice
-            theParent.remove(theSolution)
+            parent_element.remove(solution_element)
             # Add our solution instead to the targetedfeedbackset and change its tag name
-            theSolution.tag = 'targetedfeedback'
-            targetedfeedbackset.append(theSolution)
+            solution_element.tag = 'targetedfeedback'
+            targetedfeedbackset.append(solution_element)
 
         return tree
 
