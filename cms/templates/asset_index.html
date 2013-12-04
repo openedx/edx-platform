@@ -144,28 +144,59 @@ require(["domReady", "jquery", "gettext", "js/models/asset", "js/collections/ass
 <div class="wrapper-content wrapper">
     <section class="content">
         <article class="asset-library content-primary" role="main">
-            <table>
-                <caption class="sr">${_("List of uploaded files and assets in this course")}</caption>
-                <colgroup>
-                  <col class="thumb-cols" />
-                  <col class="name-cols" />
-                  <col class="date-cols" />
-                  <col class="embed-cols" />
-                  <col class="actions-cols" />
-                </colgroup>
-                <thead>
-                <tr>
-                    <th class="thumb-col">${_("Preview")}</th>
-                    <th class="name-col">${_("Name")}</th>
-                    <th class="date-col">${_("Date Added")}</th>
-                    <th class="embed-col">${_("URL")}</th>
-                    <th class="actions-col"><span class="sr">${_("Actions")}</span></th>
-                </tr>
-                </thead>
-                <tbody id="asset_table_body" >
 
-                </tbody>
-            </table>
+          <div class="meta-wrap">
+            <div class="meta">
+              <p>Showing <span class="count-current-shown">101-200</span> out of <span class="count-total">1250 total</span>, sorted by <span class="sort-order">Date Added</span></p>
+            </div>
+            <nav class="pagination pagination-compact top">
+              <ol>
+                <li class="nav-item previous"><a class="nav-link" href=""><i class="icon-angle-left"></i> <span class="nav-label">Previous</span></a></li>
+                <li class="nav-item next"><a class="nav-link" href=""><span class="nav-label">Next</span> <i class="icon-angle-right"></i></a></li>
+              </ol>
+            </nav>
+           </div>
+          <table>
+              <caption class="sr">${_("List of uploaded files and assets in this course")}</caption>
+              <colgroup>
+                <col class="thumb-cols" />
+                <col class="name-cols" />
+                <col class="date-cols" />
+                <col class="embed-cols" />
+                <col class="actions-cols" />
+              </colgroup>
+              <thead>
+              <tr>
+                  <th class="thumb-col">${_("Preview")}</th>
+                  <th class="name-col">${_("Name")}</th>
+                  <th class="date-col"><span class="current-sort" href="">${_("Date Added")}</span></th>
+                  <th class="embed-col">${_("URL")}</th>
+                  <th class="actions-col"><span class="sr">${_("Actions")}</span></th>
+              </tr>
+              </thead>
+              <tbody id="asset_table_body" >
+
+              </tbody>
+          </table>
+
+          <nav class="pagination pagination-full bottom">
+            <ol>
+              <li class="nav-item previous"><a class="nav-link" href=""><i class="icon-angle-left"></i> <span class="nav-label">Previous</span></a></li>
+              <li class="nav-item page">
+                <form class="pagination-form">
+                  <label class="page-number-label" for="page-number">Page number</label>
+                  <input class="page-number-input" name="page-number" type="text" size="4" />
+                  <input class="submit-pagination-form" name="go-to-page" type="submit" value="Go">
+                </form>
+
+                <span class="current-page">2</span>
+                <span class="page-divider">/</span>
+                <span class="total-pages">12</span>
+              </li>
+              <li class="nav-item next"><a class="nav-link" href=""><span class="nav-label">Next</span> <i class="icon-angle-right"></i></a></li>
+            </ol>
+          </nav>
+
         </article>
 
         <aside class="content-supplementary" role="complimentary">
