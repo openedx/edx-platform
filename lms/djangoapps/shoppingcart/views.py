@@ -11,8 +11,8 @@ from django.core.urlresolvers import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from edxmako.shortcuts import render_to_response
-from .models import Order, PaidCourseRegistration, OrderItem
 from student.models import CourseEnrollment
+from .models import Order, PaidCourseRegistration, OrderItem, Report
 from .processors import process_postpay_callback, render_purchase_form_html
 from .exceptions import ItemAlreadyInCartException, AlreadyEnrolledInCourseException, CourseDoesNotExistException
 
@@ -174,6 +174,9 @@ def csv_report(request):
     """
     Downloads csv reporting of orderitems
     """
+    # TODO: change this to something modular later
+    report_type = "itemized_purchase_report"
+
     if not _can_download_report(request.user):
         return HttpResponseForbidden(_('You do not have permission to view this page.'))
 
@@ -187,7 +190,8 @@ def csv_report(request):
             # Error case: there was a badly formatted user-input date string
             return _render_report_form(start_str, end_str, date_fmt_error=True)
 
-        items = OrderItem.purchased_items_btw_dates(start_date, end_date)
+        report = Report.initialize_report(report_type)
+        items = report.get_query(start_date, end_date)
         if items.count() > settings.PAYMENT_REPORT_MAX_ITEMS:
             # Error case: too many items would be generated in the report and we're at risk of timeout
             return _render_report_form(start_str, end_str, total_count_error=True)
@@ -195,7 +199,8 @@ def csv_report(request):
         response = HttpResponse(mimetype='text/csv')
         filename = "purchases_report_{}.csv".format(datetime.datetime.now(pytz.UTC).strftime("%Y-%m-%d-%H-%M-%S"))
         response['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
-        OrderItem.csv_purchase_report_btw_dates(response, start_date, end_date)
+        # this flos is a little odd; what's up with report_type being called twice? check later
+        report.make_report(report_type, response, start_date, end_date)
         return response
 
     elif request.method == 'GET':

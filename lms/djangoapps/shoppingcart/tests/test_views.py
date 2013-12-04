@@ -14,7 +14,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from shoppingcart.views import _can_download_report, _get_date_from_str
-from shoppingcart.models import Order, CertificateItem, PaidCourseRegistration, OrderItem
+from shoppingcart.models import Order, CertificateItem, PaidCourseRegistration, OrderItem, Report
 from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
 from course_modes.models import CourseMode
@@ -379,6 +379,9 @@ class CSVReportViewsTest(ModuleStoreTestCase):
     CORRECT_CSV_NO_DATE = ",1,purchased,1,40,40,usd,Registration for Course: Robot Super Course,"
 
     def test_report_csv(self):
+        # TODO test multiple types
+        report_type = "itemized_purchase_report"
+
         PaidCourseRegistration.add_to_order(self.cart, self.course_id)
         self.cart.purchase()
         self.login_user()
@@ -386,7 +389,8 @@ class CSVReportViewsTest(ModuleStoreTestCase):
         response = self.client.post(reverse('payment_csv_report'), {'start_date': '1970-01-01',
                                                                     'end_date': '2100-01-01'})
         self.assertEqual(response['Content-Type'], 'text/csv')
-        self.assertIn(",".join(OrderItem.csv_report_header_row()), response.content)
+        report = Report.initialize_report(report_type)
+        self.assertIn(",".join(report.csv_report_header_row()), response.content)
         self.assertIn(self.CORRECT_CSV_NO_DATE, response.content)
 
 

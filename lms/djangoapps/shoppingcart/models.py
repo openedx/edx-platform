@@ -23,6 +23,7 @@ from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from course_modes.models import CourseMode
+from courseware.courses import get_course_by_id
 from edxmako.shortcuts import render_to_string
 from student.views import course_from_id
 from student.models import CourseEnrollment, unenroll_done
@@ -258,66 +259,6 @@ class OrderItem(models.Model):
         Default implementation is to return an empty set
         """
         return self.pk_with_subclass, set([])
-
-    @classmethod
-    def purchased_items_btw_dates(cls, start_date, end_date):
-        """
-        Returns a QuerySet of the purchased items between start_date and end_date inclusive.
-        """
-        return cls.objects.filter(
-            status="purchased",
-            fulfilled_time__gte=start_date,
-            fulfilled_time__lt=end_date,
-        )
-
-    @classmethod
-    def csv_purchase_report_btw_dates(cls, filelike, start_date, end_date):
-        """
-        Outputs a CSV report into "filelike" (a file-like python object, such as an actual file, an HttpRequest,
-        or sys.stdout) of purchased items between start_date and end_date inclusive.
-        Opening and closing filelike (if applicable) should be taken care of by the caller
-        """
-        items = cls.purchased_items_btw_dates(start_date, end_date).order_by("fulfilled_time")
-
-        writer = unicodecsv.writer(filelike, encoding="utf-8")
-        writer.writerow(OrderItem.csv_report_header_row())
-
-        for item in items:
-            writer.writerow(item.csv_report_row)
-
-    @classmethod
-    def csv_report_header_row(cls):
-        """
-        Returns the "header" row for a csv report of purchases
-        """
-        return [
-            "Purchase Time",
-            "Order ID",
-            "Status",
-            "Quantity",
-            "Unit Cost",
-            "Total Cost",
-            "Currency",
-            "Description",
-            "Comments"
-        ]
-
-    @property
-    def csv_report_row(self):
-        """
-        Returns an array which can be fed into csv.writer to write out one csv row
-        """
-        return [
-            self.fulfilled_time,
-            self.order_id,  # pylint: disable=no-member
-            self.status,
-            self.qty,
-            self.unit_cost,
-            self.line_cost,
-            self.currency,
-            self.line_desc,
-            self.report_comments,
-        ]
 
     @property
     def pk_with_subclass(self):
@@ -625,3 +566,204 @@ class CertificateItem(OrderItem):
                  "Please include your order number in your e-mail. "
                  "Please do NOT include your credit card information.").format(
                      billing_email=settings.PAYMENT_SUPPORT_EMAIL)
+
+class Report(models.Model):
+    """
+    Base class for making CSV reports related to revenue, enrollments, etc
+
+    To make a different type of report, write a new subclass that implements
+    the methods get_query, csv_report_header_row, and csv_report_row.
+    """
+
+    @classmethod
+    def initialize_report(cls, report_type):
+        if report_type == "refund_report":
+            return RefundReport()
+        elif report_type == "itemized_purchase_report":
+            return ItemizedPurchaseReport()
+        elif report_type == "university_revenue_share":
+            return UniversityRevenueShareReport()
+        elif report_type == "certificate_status":
+            return CertificateStatusReport()
+        else:
+            return  # TODO return an error
+
+    def get_query(self, start_date, end_date):
+        raise NotImplementedError
+
+    def csv_report_header_row(self, start_date, end_date):
+        raise NotImplementedError
+
+    def csv_report_row(self):
+        raise NotImplementedError
+
+    @classmethod
+    def make_report(cls, report_type, filelike, start_date, end_date):
+        report = cls.initialize_report(report_type)
+        items = report.get_query(start_date, end_date)
+        writer = unicodecsv.writer(filelike, encoding="utf-8")
+        writer.writerow(report.csv_report_header_row())
+        for item in items:
+            writer.writerow(report.csv_report_row(item))
+
+
+class RefundReport(Report):
+    def get_query(self, start_date, end_date):
+        return CertificateItem.objects.filter(
+                status="refunded",
+            )
+
+    def csv_report_header_row(self):
+        return [
+            "Order Number",
+            "Customer Name",
+            "Date of Original Transaction",
+            "Date of Refund",
+            "Amount of Refund",
+            "Service Fees (if any)",
+        ]
+
+    def csv_report_row(self, item):
+        return [
+            item.order_id,
+            item.user.get_full_name(),
+            item.fulfilled_time,
+            item.refund_requested_time, # actually may need to use refund_fulfilled here
+            item.line_cost,
+            0, # TODO: determine if service_fees field is necessary; if so, add
+        ]
+
+class ItemizedPurchaseReport(Report):
+    def get_query(self, start_date, end_date):
+        return OrderItem.objects.filter(
+                status="purchased",
+                fulfilled_time__gte=start_date,
+                fulfilled_time__lt=end_date,
+            ).order_by("fulfilled_time")
+
+    def csv_report_header_row(self):
+        return [
+            "Purchase Time",
+            "Order ID",
+            "Status",
+            "Quantity",
+            "Unit Cost",
+            "Total Cost",
+            "Currency",
+            "Description",
+            "Comments"
+        ]
+
+    def csv_report_row(self, item):
+        return [
+            item.fulfilled_time,
+            item.order_id,  # pylint: disable=no-member
+            item.status,
+            item.qty,
+            item.unit_cost,
+            item.line_cost,
+            item.currency,
+            item.line_desc,
+            item.report_comments,
+        ]
+
+
+class CertificateStatusReport(Report):
+    def get_query(self, start_date, send_date):
+        results = []
+        for course_id in settings.COURSE_LISTINGS:
+            cur_course = get_course_by_id(course)
+            university = cur_course.org
+            course = cur_course.number + " " + course.display_name #TODO add term (i.e. Fall 2013)?
+            enrollments =  CourseEnrollment.objects.filter(course_id=course_id)
+            total_enrolled = enrollments.objects.count()
+            audit_enrolled = enrollments.objects.filter(mode="audit").count()
+            honor_enrolled = enrollments.objects.filter(mode="honor").count()
+            verified_enrollments = enrollments.objects.filter(mode="verified")
+            verified_enrolled = verified_enrollments.objects.count()
+            gross_rev = CertificateItem.objects.filter(course_id=course_id, mode="verified").aggregate(Sum('unit_cost'))
+            gross_rev_over_min = gross_rev - (CourseMode.objects.get('course_id').min_price * verified_enrollments)
+            num_verified_over_min = 0 # TODO clarify with billing what exactly this means
+            refunded_enrollments = CertificateItem.objects.filter(course_id='course_id', mode="refunded")
+            number_of_refunds = refunded_enrollments.objects.count()
+            dollars_refunded = refunded_enrollments.objects.aggregate(Sum('unit_cost'))
+
+            result = [
+                university, 
+                course, 
+                total_enrolled, 
+                audit_enrolled, 
+                honor_enrolled,
+                verified_enrolled,
+                gross_rev,
+                gross_rev_over_min,
+                num_verified_over_min,
+                number_of_refunds,
+                dollars_refunded
+            ]
+
+            results.append(result)
+        return results
+
+    def csv_report_header_row(self):
+        return [
+            "University",
+            "Course",
+            "Total Enrolled",
+            "Audit Enrollment",
+            "Honor Code Enrollment",
+            "Verified Enrollment",
+            "Gross Revenue",
+            "Gross Revenue over the Minimum",
+            "Number of Verified over the Minimum",
+            "Number of Refunds",
+            "Dollars Refunded",
+        ]
+
+    def csv_report_row(self, item):
+        return item
+
+
+class UniversityRevenueShareReport(Report):
+    def get_query(self, start_date, end_date):
+        results = []
+        for course_id in settings.COURSE_LISTINGS:
+            cur_course = get_course_by_id(course)
+            university = cur_course.org
+            course = cur_course.number + " " + course.display_name
+            num_transactions = 0 # TODO clarify with building what transactions are included in this (purchases? refunds? etc)
+            total_payments_collected = CertificateItem.objects.filter(course_id=course_id, mode="verified").aggregate(Sum('unit_cost')) 
+                #note: we're assuming certitems are the only way to make money right now
+            service_fees = 0 # TODO add an actual service fees field, in case needed in future
+            refunded_enrollments = CertificateItem.objects.filter(course_id='course_id', mode="refunded")
+            num_refunds = refunded_enrollments.objects.count()
+            amount_refunds = refunded_enrollments.objects.aggregate(Sum('unit_cost'))
+
+            result = [
+                university,
+                course,
+                num_transactions,
+                total_payments_collected,
+                service_fees,
+                refunded_enrollments,
+                num_refunds,
+                amount_refunds
+            ]
+            results.append(result)
+
+        return results
+
+    def csv_report_header_row(self):
+        return [
+            "University",
+            "Course",
+            "Number of Transactions", 
+            "Total Payments Collected",
+            "Service Fees (if any)",
+            "Number of Successful Refunds",
+            "Total Amount of Refunds",
+            # note this is restricted by a date range
+        ]
+
+    def csv_report_row(self, item):
+        return item
