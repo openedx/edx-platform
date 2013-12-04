@@ -6,24 +6,25 @@ import unittest
 import os
 import shutil
 
-from django.test.client import Client
-from django.test.utils import override_settings
 from django.conf import settings
+from django.contrib.auth.hashers import check_password
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
+from django.test.client import Client
+from django.test.utils import override_settings
+from django.utils.html import escape
 from django.utils.translation import ugettext as _
+import mongoengine
+
+from courseware.roles import CourseStaffRole, GlobalStaff
+from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
+from dashboard.models import CourseImportLog
 from dashboard.sysadmin import Users
 from external_auth.models import ExternalAuthMap
-from django.contrib.auth.hashers import check_password
 from xmodule.modulestore.django import modulestore
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from django.utils.html import escape
-from courseware.roles import CourseStaffRole, GlobalStaff
-from dashboard.models import CourseImportLog
 from xmodule.modulestore.xml import XMLModuleStore
 
-import mongoengine
 
 TEST_MONGODB_LOG = {
     'host': 'localhost',
@@ -81,6 +82,7 @@ class SysadminBaseTestCase(ModuleStoreTestCase):
 
 @unittest.skipUnless(settings.MITX_FEATURES.get('ENABLE_SYSADMIN_DASHBOARD'),
                      "ENABLE_SYSADMIN_DASHBOARD not set")
+@override_settings(GIT_IMPORT_WITH_XMLMODULESTORE=True)
 class TestSysadmin(SysadminBaseTestCase):
     """
     Test sysadmin dashboard features using XMLModuleStore
@@ -234,6 +236,19 @@ class TestSysadmin(SysadminBaseTestCase):
         self.assertIsNotNone(course)
 
         response = self._rm_edx4edx()
+        course = def_ms.courses.get('{0}/edx4edx_lite'.format(
+            os.path.abspath(settings.DATA_DIR)), None)
+        self.assertIsNone(course)
+
+    @override_settings(GIT_IMPORT_WITH_XMLMODULESTORE=False)
+    def test_xml_safety_flag(self):
+        """Make sure the settings flag to disable xml imports is working"""
+
+        self._setstaff_login()
+        response = self._add_edx4edx()
+        self.assertIn('GIT_IMPORT_WITH_XMLMODULESTORE', response.content)
+
+        def_ms = modulestore()
         course = def_ms.courses.get('{0}/edx4edx_lite'.format(
             os.path.abspath(settings.DATA_DIR)), None)
         self.assertIsNone(course)

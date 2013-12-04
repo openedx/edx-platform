@@ -12,36 +12,36 @@ import StringIO
 from datetime import datetime
 
 from django.conf import settings
+from django.contrib.auth import authenticate
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.core.exceptions import PermissionDenied
+from django.db import IntegrityError
+from django.http import HttpResponse, Http404
+from django.utils.decorators import method_decorator
+from django.utils.html import escape
 from django.utils.translation import ugettext as _
-from student.models import CourseEnrollment, UserProfile, Registration
+from django.views.decorators.cache import cache_control
+from django.views.generic.base import TemplateView
+from django.views.decorators.http import condition
+from django_future.csrf import ensure_csrf_cookie
+from mitxmako.shortcuts import render_to_response
+import mongoengine
+
+from courseware.courses import get_course_by_id
+from courseware.roles import CourseStaffRole, CourseInstructorRole
+import dashboard.management.commands.git_add_course as git_add_course
+from dashboard.models import CourseImportLog
 from external_auth.models import ExternalAuthMap
 from external_auth.views import generate_password
-from django.contrib.auth import authenticate
-from django.core.exceptions import PermissionDenied
-from django_future.csrf import ensure_csrf_cookie
-from django.views.decorators.cache import cache_control
-from django.utils.decorators import method_decorator
-from django.views.decorators.http import condition
-from django.db import IntegrityError
-from django.http import HttpResponse
-from django.utils.html import escape
-from django.contrib.auth.decorators import login_required
-from django.http import Http404
-from django.views.generic.base import TemplateView
-from mitxmako.shortcuts import render_to_response
-from xmodule.modulestore.django import modulestore
-from xmodule.contentstore.django import contentstore
-from xmodule.modulestore.xml import XMLModuleStore
-from xmodule.modulestore.store_utilities import delete_course
-from courseware.roles import CourseStaffRole, CourseInstructorRole
-from courseware.courses import get_course_by_id
-
-import mongoengine
-from dashboard.models import CourseImportLog
-import dashboard.management.commands.git_add_course as git_add_course
-
+from student.models import CourseEnrollment, UserProfile, Registration
 import track.views
+from xmodule.contentstore.django import contentstore
+from xmodule.modulestore import MONGO_MODULESTORE_TYPE
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.store_utilities import delete_course
+from xmodule.modulestore.xml import XMLModuleStore
+
 
 log = logging.getLogger(__name__)
 
@@ -52,7 +52,10 @@ class SysadminDashboardView(TemplateView):
     template_name = 'sysadmin_dashboard.html'
 
     def __init__(self, **kwargs):
-        """Determine modulestore type"""
+        """
+        Initialize base sysadmin dashboard class with modulestore,
+        modulestore_type and return msg
+        """
 
         self.def_ms = modulestore()
         self.is_using_mongo = True
@@ -71,13 +74,11 @@ class SysadminDashboardView(TemplateView):
         return super(SysadminDashboardView, self).dispatch(*args, **kwargs)
 
     def get_courses(self):
-        """ Get an iterable list of courses regardless of module store type."""
+        """ Get an iterable list of courses."""
 
-        if self.is_using_mongo:
-            courses = self.def_ms.get_courses()
-            courses = {c.id: c for c in courses}  # no course directory
-        else:
-            courses = self.def_ms.courses.items()
+        courses = self.def_ms.get_courses()
+        courses = dict([c.id, c] for c in courses)  # no course directory
+
         return courses
 
     def return_csv(self, filename, header, data):
@@ -169,8 +170,8 @@ class Users(SysadminDashboardView):
             mit_domain = 'ssl:MIT'
             if ExternalAuthMap.objects.filter(external_id=email,
                                               external_domain=mit_domain):
-                msg += _('Failed - email {0} already exists as external_id'
-                         ).format(email)
+                msg += _('Failed - email {0} already exists as '
+                         'external_id').format(email)
                 return msg
             new_password = generate_password()
         else:
@@ -189,8 +190,8 @@ class Users(SysadminDashboardView):
         try:
             user.save()
         except IntegrityError:
-            msg += _('Oops, failed to create user {0}, IntegrityError'
-                     ).format(user)
+            msg += _('Oops, failed to create user {0}, '
+                     'IntegrityError').format(user)
             return msg
 
         reg = Registration()
@@ -251,15 +252,10 @@ class Users(SysadminDashboardView):
         self.datatable['data'] = [[_('Total number of users'),
                                    User.objects.all().count()]]
 
-        if hasattr(courses, 'items'):
-            course_iter = courses.items()
-        else:
-            course_iter = courses
-
         self.msg += u'<h2>{0}</h2>'.format(
             _('Courses loaded in the modulestore'))
         self.msg += u'<ol>'
-        for (cdir, course) in course_iter:
+        for (cdir, course) in courses.items():
             self.msg += u'<li>{0} ({1})</li>'.format(
                 escape(cdir), course.location.url())
         self.msg += u'</ol>'
@@ -292,8 +288,8 @@ class Users(SysadminDashboardView):
 
         if action == 'download_users':
             header = [_('username'), _('email'), ]
-            data = [[u.username, u.email] for u in
-                    User.objects.all().iterator()]
+            data = ([u.username, u.email] for u in
+                    (User.objects.all().iterator()))
             return self.return_csv('users_{0}.csv'.format(
                 request.META['SERVER_NAME']), header, data)
         elif action == 'repair_eamap':
@@ -408,6 +404,12 @@ class Courses(SysadminDashboardView):
         """Imports a git course into the XMLModuleStore"""
 
         msg = u''
+        if not getattr(settings, 'GIT_IMPORT_WITH_XMLMODULESTORE', False):
+            return _('Refusing to import. GIT_IMPORT_WITH_XMLMODULESTORE is '
+                     'not turned on, and it is generally not safe to import '
+                     'into an XMLModuleStore with multithreaded. We '
+                     'recommend you enable the MongoDB based module store '
+                     'instead, unless this is a development environment.')
         cdir = (gitloc.rsplit('/', 1)[1])[:-4]
         gdir = settings.DATA_DIR / cdir
         if os.path.exists(gdir):
@@ -451,11 +453,8 @@ class Courses(SysadminDashboardView):
 
         data = []
         courses = self.get_courses()
-        if hasattr(courses, 'items'):
-            course_iter = courses.items()
-        else:
-            course_iter = courses
-        for (cdir, course) in course_iter:
+
+        for (cdir, course) in courses.items():
             gdir = cdir
             if '/' in cdir:
                 gdir = cdir.rsplit('/', 1)[1]
@@ -495,8 +494,7 @@ class Courses(SysadminDashboardView):
 
         courses = self.get_courses()
         if action == 'add_course':
-            gitloc = request.POST.get('repo_location', '').strip().replace(
-                ' ', '').replace(';', '')
+            gitloc = request.POST.get('repo_location', '').strip().replace(' ', '').replace(';', '')
             datatable = self.make_datatable()
             self.msg += self.get_course_from_git(gitloc, datatable)
 
@@ -516,7 +514,8 @@ class Courses(SysadminDashboardView):
                                       course_id, escape(str(err))
                                   )
 
-            if course_found and not self.is_using_mongo:
+            is_mongo_course = (modulestore().get_modulestore_type(course_id) == MONGO_MODULESTORE_TYPE)
+            if course_found and not is_mongo_course:
                 cdir = course.data_dir
                 self.def_ms.courses.pop(cdir)
 
@@ -528,7 +527,7 @@ class Courses(SysadminDashboardView):
                              u"{0} = {1} ({2})</font>".format(
                                  cdir, course.id, course.display_name))
 
-            elif course_found and self.is_using_mongo:
+            elif course_found and is_mongo_course:
                 # delete course that is stored with mongodb backend
                 loc = course.location
                 content_store = contentstore()
@@ -565,11 +564,7 @@ class Staffing(SysadminDashboardView):
 
         courses = self.get_courses()
 
-        if hasattr(courses, 'items'):
-            course_iter = courses.items()
-        else:
-            course_iter = courses
-        for (cdir, course) in course_iter:
+        for (cdir, course) in courses.items():
             datum = [course.display_name, course.id]
             datum += [CourseEnrollment.objects.filter(
                 course_id=course.id).count()]
@@ -604,11 +599,8 @@ class Staffing(SysadminDashboardView):
             roles = [CourseInstructorRole, CourseStaffRole, ]
 
             courses = self.get_courses()
-            if hasattr(courses, 'items'):
-                course_iter = courses.items()
-            else:
-                course_iter = courses
-            for (cdir, course) in course_iter:
+
+            for (cdir, course) in courses.items():
                 for role in roles:
                     for user in role(course.location).users_with_role():
                         datum = [course.id, role, user.username, user.email,
@@ -652,8 +644,9 @@ class GitLogs(TemplateView):
         # Allow overrides
         if hasattr(settings, 'MONGODB_LOG'):
             for config_item in ['host', 'user', 'password', 'db', ]:
-                mongo_db[config_item] = settings.MONGODB_LOG.get(
-                    config_item, mongo_db[config_item])
+                if hasattr(settings.MONGODB_LOG, config_item):
+                    mongo_db[config_item] = settings.MONGODB_LOG.get(
+                        config_item, mongo_db[config_item])
 
         mongouri = 'mongodb://{0}:{1}@{2}/{3}'.format(
             mongo_db['user'], mongo_db['password'],

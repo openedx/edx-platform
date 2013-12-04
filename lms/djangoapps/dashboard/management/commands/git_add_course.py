@@ -9,16 +9,15 @@ import StringIO
 import subprocess
 import logging
 
-from django.utils.translation import ugettext as _
 from django.conf import settings
 from django.core import management
 from django.core.management.base import BaseCommand, CommandError
+from django.utils.translation import ugettext as _
+import mongoengine
 
+from dashboard.models import CourseImportLog
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.xml import XMLModuleStore
-
-import mongoengine
-from dashboard.models import CourseImportLog
 
 log = logging.getLogger(__name__)
 
@@ -41,8 +40,9 @@ def add_repo(repo, rdir_in):
     # Allow overrides
     if hasattr(settings, 'MONGODB_LOG'):
         for config_item in ['host', 'user', 'password', 'db', ]:
-            mongo_db[config_item] = settings.MONGODB_LOG.get(
-                config_item, mongo_db[config_item])
+            if hasattr(settings.MONGODB_LOG, config_item):
+                mongo_db[config_item] = settings.MONGODB_LOG.get(
+                    config_item, mongo_db[config_item])
 
     if not os.path.isdir(GIT_REPO_DIR):
         log.critical(_("Path {0} doesn't exist, please create it, "
@@ -118,6 +118,9 @@ def add_repo(repo, rdir_in):
                                 nostatic=not GIT_IMPORT_STATIC)
     except CommandError:
         log.exception(_('Unable to run import command.'))
+        return -1
+    except NotImplementedError, ex:
+        log.critical(_('The underlying module store does not support import.'))
         return -1
 
     ret_import = output.getvalue()
