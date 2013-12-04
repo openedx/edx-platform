@@ -61,13 +61,17 @@
       <%include file='_dashboard_certificate_information.html' args='cert_status=cert_status,course=course, enrollment=enrollment'/>
       % endif
 
-      %if course_mode_info['show_upsell']:
+      % if course_mode_info['show_upsell']:
         <div class="message message-upsell has-actions is-expandable is-shown">
 
             <div class="wrapper-tip">
               <h4 class="message-title">
                 <i class="icon-caret-down ui-toggle-expansion"></i>
-                <span class="value">${_("Challenge Yourself!")}</span>
+                % if waffle.flag_is_active(request, 'alternate_upsell_copy'):
+                  <span class="value">${_("Document your accomplishment!")}</span>
+                % else:
+                  <span class="value">${_("Challenge Yourself!")}</span>
+                % endif
               </h4>
               <p class="message-copy">${_("Take this course as an ID-verified student.")}</p>
             </div>
