@@ -182,20 +182,17 @@ class CombinedOpenEndedV1Module():
             children = self.child_modules()
             task_descriptor = children['descriptors'][tag_name](self.system)
             task_parsed_xml = task_descriptor.definition_from_xml(etree.fromstring(task_xml), self.system)
-            try:
-                task = children['modules'][tag_name](
-                    self.system,
-                    self.location,
-                    task_parsed_xml,
-                    task_descriptor,
-                    self.static_data,
-                    instance_state=task_state,
-                )
-                scores_normalized = task.normalize_scores()
-                if scores_normalized:
-                    task_states[task_index] = task.get_instance_state()
-            except Exception:
-                break
+            task = children['modules'][tag_name](
+                self.system,
+                self.location,
+                task_parsed_xml,
+                task_descriptor,
+                self.static_data,
+                instance_state=task_state,
+            )
+            scores_normalized = task.normalize_scores()
+            if scores_normalized:
+                task_states[task_index] = task.get_instance_state()
 
     def validate_task_states(self, tasks_xml, task_states):
         """
@@ -206,7 +203,7 @@ class CombinedOpenEndedV1Module():
         """
         msgs = []
         #Loop through each task state and make sure it matches the xml definition
-        for task_index, (task_xml, task_state) in enumerate(zip(tasks_xml, task_states)):
+        for task_xml, task_state in zip(tasks_xml, task_states):
             tag_name = self.get_tag_name(task_xml)
             children = self.child_modules()
             task_descriptor = children['descriptors'][tag_name](self.system)
@@ -316,10 +313,6 @@ class CombinedOpenEndedV1Module():
             # No validation needed when a student first looks at the problem
             return
 
-        # Normalize task scores with sum of rubric scores.
-        for task_states in self.old_task_states + [self.task_states]:
-            self.normalize_task_scores(self.task_xml, task_states)
-
         # Pick out of self.task_states and self.old_task_states the state that is
         # a) valid for the current task definition
         # b) not the result of a reset due to not having a valid task state
@@ -335,6 +328,10 @@ class CombinedOpenEndedV1Module():
                 not self.is_reset_task_states(task_states)
             )
         ]
+
+        # Normalize task scores with sum of rubric scores.
+        for task_states in valid_states:
+            self.normalize_task_scores(self.task_xml, task_states)
 
         # If there are no valid states, don't try and use an old state
         if len(valid_states) == 0:

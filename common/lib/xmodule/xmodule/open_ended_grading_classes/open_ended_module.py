@@ -756,10 +756,18 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
 
                 # Similarly there should be only one list of rubric scores.
                 if len(rubric_scores) == 1:
+                    old_score = attempt.get('score')
                     rubric_scores_sum = sum(rubric_scores[0])
-                    if attempt.get('score') != rubric_scores_sum:
+                    if old_score != rubric_scores_sum:
                         attempt["score"] = rubric_scores_sum
                         scores_normalized = True
+                        log.debug("""Score normalized for location={loc}, old_score={old_score},
+                        new_score={new_score}, rubric_score={rubric_score}""".format(
+                            loc=self.location_string,
+                            old_score=old_score,
+                            new_score=rubric_scores_sum,
+                            rubric_score=rubric_scores
+                        ))
         return scores_normalized
 
 
