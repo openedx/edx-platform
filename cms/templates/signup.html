@@ -35,13 +35,20 @@
               <label for="password">${_("Password")}</label>
               <input id="password" type="password" name="password" />
             </li>
-
-            <li class="field text required" id="field-username">
+            
+            <div class="field text required" id="field-username">
               <label for="username">${_("Public Username")}</label>
               <input id="username" type="text" name="username" placeholder="e.g. janedoe" />
               <span class="tip tip-stacked">${_("This will be used in public discussions with your courses and in our edX101 support forums")}</span>
-            </li>
+            </div>
 
+            <div class="field required select" id="type-id">
+              <label for="type_id">${_("TYPE ID")}</label>
+              <select id="type-id" name="type_id">
+                <option value="cedula">CEDULA</option>
+                <option value="pasaporte">PASAPORTE</option>
+              </select>
+            </div>
             <li class="field required text" id="field-cedula">
               <label for="name">${_('Cedula / Pasaporte')}</label>
               <input id="cedula" type="text" name="cedula" value="" placeholder="${_('example: 0102030405')}" required aria-required="true" aria-describedby="cedula-tip"/>

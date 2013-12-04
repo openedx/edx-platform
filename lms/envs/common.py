@@ -662,7 +662,9 @@ main_vendor_js = [
     'js/vendor/jquery.ba-bbq.min.js',
     'js/vendor/annotator.min.js',
     'js/vendor/annotator.store.min.js',
-    'js/vendor/annotator.tags.min.js'
+    'js/vendor/annotator.tags.min.js',
+    'js/vendor/tinymce/tinymce.min.js',
+    'js/vendor/tinymce/jquery.tinymce.min.js'
 ]
 
 discussion_js = sorted(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/discussion/**/*.js'))
@@ -1082,6 +1084,7 @@ REGISTRATION_OPTIONAL_FIELDS = set([
 # Years allowed range
 DELTA_YEAR = 12
 MAX_YEAR_ALLOWED = 70
+
 ###################### Grade Downloads ######################
 GRADES_DOWNLOAD_ROUTING_KEY = HIGH_MEM_QUEUE
 

@@ -70,8 +70,8 @@
             "underscore.string": "js/vendor/underscore.string.min",
             "backbone": "js/vendor/backbone-min",
             "backbone.associations": "js/vendor/backbone-associations-min",
-            "tinymce": "js/vendor/tiny_mce/tiny_mce",
-            "jquery.tinymce": "js/vendor/tiny_mce/jquery.tinymce",
+            "tinymce": "js/vendor/tinymce/tinymce.min",
+            "jquery.tinymce": "js/vendor/tinymce/jquery.tinymce.min",
             "xmodule": "/xmodule/xmodule",
             "xblock": "coffee/src/xblock",
             "utility": "js/src/utility",
@@ -150,6 +150,10 @@
                 deps: ["jquery"],
                 exports: "jQuery.fn.inputNumber"
             },
+            "tinymce": {
+                deps: ["jquery"],
+                exports: "tinymce"
+            },
             "jquery.tinymce": {
                 deps: ["jquery", "tinymce"],
                 exports: "jQuery.fn.tinymce"
@@ -176,9 +180,6 @@
             },
             "codemirror/stex": {
                 deps: ["codemirror"]
-            },
-            "tinymce": {
-                exports: "tinymce"
             },
             "mathjax": {
                 exports: "MathJax",

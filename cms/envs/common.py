@@ -463,3 +463,7 @@ RAVEN_CONFIG = {
 INSTALLED_APPS = INSTALLED_APPS + (
     'raven.contrib.django.raven_compat',
 )
+
+# Years allowed range
+DELTA_YEAR = 12
+MAX_YEAR_ALLOWED = 70 
