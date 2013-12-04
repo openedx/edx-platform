@@ -310,10 +310,10 @@ RSS_TIMEOUT = 600
 STATIC_GRAB = False
 DEV_CONTENT = True
 
-MITX_ROOT_URL = ''
+EDX_ROOT_URL = ''
 
-LOGIN_REDIRECT_URL = MITX_ROOT_URL + '/accounts/login'
-LOGIN_URL = MITX_ROOT_URL + '/accounts/login'
+LOGIN_REDIRECT_URL = EDX_ROOT_URL + '/accounts/login'
+LOGIN_URL = EDX_ROOT_URL + '/accounts/login'
 
 COURSE_NAME = "6.002_Spring_2012"
 COURSE_NUMBER = "6.002x"
@@ -321,7 +321,7 @@ COURSE_TITLE = "Circuits and Electronics"
 
 ### Dark code. Should be enabled in local settings for devel.
 
-ENABLE_MULTICOURSE = False  # set to False to disable multicourse display (see lib.util.views.mitxhome)
+ENABLE_MULTICOURSE = False  # set to False to disable multicourse display (see lib.util.views.edXhome)
 
 WIKI_ENABLED = False
 
