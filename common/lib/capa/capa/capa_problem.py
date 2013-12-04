@@ -521,63 +521,73 @@ class LoncapaProblem(object):
         if not tree.xpath(query):
             return tree
 
-        for multChoiceResponse in tree.xpath(query):
-            showExplanation = multChoiceResponse.get('targeted-feedback') == 'alwaysShowCorrectChoiceExplanation'
+        for mult_choice_response in tree.xpath(query):
+            show_explanation = mult_choice_response.get('targeted-feedback') == 'alwaysShowCorrectChoiceExplanation'
 
             # Grab the first choicegroup (there should only be one within each <multiplechoiceresponse> tag)
-            choicegroup = multChoiceResponse.xpath('./choicegroup[@type="MultipleChoice"]')[0]
-            choicesList = list(choicegroup.iter('choice'))
+            choicegroup = mult_choice_response.xpath('./choicegroup[@type="MultipleChoice"]')[0]
+            choicegroup_id = choicegroup.get('id')
+            choices_list = list(choicegroup.iter('choice'))
             
-            explanationIDForStudentAnswer = None
-            
-            # import ipdb
-            # ipdb.set_trace()
+            studentAnswer = None
+            explanation_id_for_student_answer = None
 
             # Find the student answer key that matches our <choicegroup> id
-            studentAnswer = self.student_answers.get(choicegroup.get('id'))
-
-            # keysOfStudentAnswers = self.student_answers.keys()
-            # for key in keysOfStudentAnswers:
-            #     if key == choicegroupID:
-            #         studentAnswer = self.student_answers[key]
-            #         break
-
-            print "\n\nStudent Answer:%s\n\n" % (studentAnswer)
+            keysOfStudentAnswers = self.student_answers.keys()
+            for key in keysOfStudentAnswers:
+                if key == choicegroup_id:
+                    studentAnswer = self.student_answers[key]
+                    break
 
             # Keep track of the explanation-id that corresponds to the student's answer
             # Also, keep track of the solution-id
-            solutionID = None
-            for choice in choicesList:
+            solution_id = None
+            for choice in choices_list:
                 if choice.get('name') == studentAnswer:
-                    explanationIDForStudentAnswer = choice.get('explanation-id')
+                    explanation_id_for_student_answer = choice.get('explanation-id')
                 if choice.get('correct') == 'true':
-                    solutionID = choice.get('explanation-id')
+                    solution_id = choice.get('explanation-id')
 
             # Filter out targetedfeedback that doesn't correspond to the answer the student selected
             # Note: following-sibling will grab all following siblings, so we just want the first in the list
-            targetedfeedbackset = multChoiceResponse.xpath('./following-sibling::targetedfeedbackset')
+            targetedfeedbackset = mult_choice_response.xpath('./following-sibling::targetedfeedbackset')
             if len(targetedfeedbackset) != 0:
                 targetedfeedbackset = targetedfeedbackset[0]
                 targetedfeedbacks = targetedfeedbackset.xpath('./targetedfeedback')
                 for targetedfeedback in targetedfeedbacks:
                     # Don't show targeted feedback if the student hasn't answer the problem
                     # or if the target feedback doesn't match the student's (incorrect) answer
-                    if not self.done or targetedfeedback.get('explanation-id') != explanationIDForStudentAnswer:
+                    if not self.done or targetedfeedback.get('explanation-id') != explanation_id_for_student_answer:
                         targetedfeedbackset.remove(targetedfeedback)
+
+            # Do not displace the solution under these circumstances
+            if not show_explanation or not self.done:
+                continue
+
+            # The next element should either be <solution> or <solutionset>
+            next_element = targetedfeedbackset.getnext()
+            theParent = tree
+            theSolution = None
+            if next_element.tag == 'solution':
+                theSolution = next_element
+            elif next_element.tag == 'solutionset':
+                solutions = next_element.xpath('./solution')
+                for solution in solutions:
+                    if solution.get('explanation-id') == solution_id:
+                        theParent = next_element
+                        theSolution = solution
+                        # next_element.remove(solution)
+                        # tree.remove(solution)
+                        # solution.tag = 'targetedfeedback'
+                        # targetedfeedbackset.append(solution)
 
             # Change our correct-choice explanation from a "solution explanation" to within
             # the set of targeted feedback, which means the explanation will render on the page
             # without the student clicking "Show Answer" or seeing a checkmark next to the correct choice
-            solutionset = multChoiceResponse.xpath('./following-sibling::solutionset')
-            if showExplanation and self.done and len(solutionset) != 0:
-                solutionset = solutionset[0]
-                solutions = solutionset.xpath('./solution')
-                for solution in solutions:
-                    # Add our solution instead to the targetedfeedbackset and change its tag name
-                    if solution.get('explanation-id') == solutionID:
-                        solutionset.remove(solution)
-                        solution.tag = 'targetedfeedback'
-                        targetedfeedbackset.append(solution)
+            theParent.remove(theSolution)
+            # Add our solution instead to the targetedfeedbackset and change its tag name
+            theSolution.tag = 'targetedfeedback'
+            targetedfeedbackset.append(theSolution)
 
         return tree
 
