@@ -1166,20 +1166,21 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             if not all(parent in destination_blocks for parent in parents):
                 raise ItemNotFoundError(parents)
             for parent_loc in parents:
-                orphans.union(
+                orphans.update(
                     self._sync_children(
                         source_structure['blocks'][parent_loc],
                         destination_blocks[parent_loc],
                         subtree_root
                 ))
             # update/create the subtree and its children in destination (skipping blacklist)
-            orphans.union(
+            orphans.update(
                 self._publish_subdag(
                     user_id, subtree_root, source_structure['blocks'], destination_blocks, blacklist or []
                 )
             )
         # remove any remaining orphans
         for orphan in orphans:
+            # orphans will include moved as well as deleted xblocks. Only delete the deleted ones.
             self._delete_if_true_orphan(orphan, destination_structure)
 
         # update the db
@@ -1610,7 +1611,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             )
         for child in destination_block['fields'].get('children', []):
             if child not in blacklist:
-                orphans.union(self._publish_subdag(user_id, child, source_blocks, destination_blocks, blacklist))
+                orphans.update(self._publish_subdag(user_id, child, source_blocks, destination_blocks, blacklist))
         destination_blocks[block_id] = destination_block
         return orphans
 
@@ -1624,7 +1625,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
 
     def _delete_if_true_orphan(self, orphan, structure):
         """
-        Delete the orphan and any of its descendants which no longer have parents
+        Delete the orphan and any of its descendants which no longer have parents.
         """
         if not self._get_parents_from_structure(orphan, structure):
             for child in structure['blocks'][orphan]['fields'].get('children', []):

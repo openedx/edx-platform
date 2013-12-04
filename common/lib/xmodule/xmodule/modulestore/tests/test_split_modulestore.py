@@ -1174,7 +1174,7 @@ class TestPublish(SplitModuleTest):
         modulestore().delete_item(self._usage(source_course, "problem3_2"), self.user)
         modulestore().xblock_publish(self.user, source_course, dest_course, ["head12345"], ["chapter2"])
         expected = ["head12345", "chapter1", "chapter3", "problem1"]
-        self._check_course(source_course, dest_course, expected, ["chapter2"])
+        self._check_course(source_course, dest_course, expected, ["chapter2", "problem3_2"])
 
     def _check_course(self, source_course_loc, dest_course_loc, expected_blocks, unexpected_blocks):
         """
