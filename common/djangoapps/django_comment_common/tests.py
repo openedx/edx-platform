@@ -10,6 +10,7 @@ class RoleAssignmentTest(TestCase):
     """
 
     def setUp(self):
+        # Check a staff account because those used to get the Moderator role
         self.staff_user = User.objects.create_user(
             "patty",
             "patty@fake.edx.org",
@@ -25,18 +26,13 @@ class RoleAssignmentTest(TestCase):
         CourseEnrollment.enroll(self.student_user, self.course_id)
 
     def test_enrollment_auto_role_creation(self):
-        moderator_role = Role.objects.get(
-            course_id=self.course_id,
-            name="Moderator"
-        )
         student_role = Role.objects.get(
             course_id=self.course_id,
             name="Student"
         )
-        self.assertIn(moderator_role, self.staff_user.roles.all())
 
-        self.assertIn(student_role, self.student_user.roles.all())
-        self.assertNotIn(moderator_role, self.student_user.roles.all())
+        self.assertEqual([student_role], list(self.staff_user.roles.all()))
+        self.assertEqual([student_role], list(self.student_user.roles.all()))
 
     # The following was written on the assumption that unenrolling from a course
     # should remove all forum Roles for that student for that course. This is
