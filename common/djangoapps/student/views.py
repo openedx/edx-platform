@@ -872,7 +872,8 @@ def create_account(request, post_override=None):
             return HttpResponse(json.dumps(js))
     
     city = City.objects.get(id=post_vars['city_id'])
-    if city.state.country.code == 'EC':
+    type_id = post_vars['type_id']
+    if type_id == 'cedula':
         try:
             validate_cedula(post_vars['cedula'])
         except ValidationError:
