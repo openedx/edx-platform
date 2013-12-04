@@ -18,7 +18,6 @@ from .fields import Date
 from xmodule.modulestore.locator import CourseLocator
 from django.utils.timezone import UTC
 from xmodule.util import date_utils
-import pdb
 
 
 

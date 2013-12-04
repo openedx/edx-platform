@@ -51,7 +51,6 @@ from student.models import CourseEnrollment
 from xmodule.html_module import AboutDescriptor
 from xmodule.modulestore.locator import BlockUsageLocator
 from course_creators.views import get_course_creator_status, add_user_with_status_unrequested
-import pdb
 from contentstore import utils
 
 __all__ = ['course_info_handler', 'course_handler', 'course_info_update_handler',
@@ -832,7 +831,6 @@ def create_textbook(request, org, course, name):
 
     try:
         textbook = validate_textbook_json(request.body)
-        pdb.set_trace()
     except TextbookValidationError as err:
         return JsonResponse({"error": err.message}, status=400)
     if not textbook.get("id"):
@@ -862,7 +860,6 @@ def create_syllabus(request, org, course, name):
     """
     JSON API endpoint for creating a syllabus. Used by the Backbone application.
     """
-    pdb.set_trace()
     location = get_location_and_verify_access(request, org, course, name)
     store = get_modulestore(location)
     course_module = store.get_item(location, depth=0)
