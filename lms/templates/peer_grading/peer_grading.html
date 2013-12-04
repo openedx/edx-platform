@@ -15,6 +15,17 @@ criteria.{end_li_tag}
 <section class="container peer-grading-container">
     <div class="peer-grading" data-ajax-url="${ajax_url}" data-use-single-location="${use_single_location}">
         <div class="error-container">${error_text}</div>
+        <br>
+        <div style="color:red;">
+            <b>
+                ${_("We're sorry, some student responses have been temporarily "
+                    "hidden. We appreciate your patience as we work hard "
+                    "to restore their visibility. Rest assured, no student "
+                    "data has been lost.")}
+            </b>
+        </div>
+        <br>
+        <hr>
         <div class="peer-grading-tools">
             <h1 class="peer-grading-title">${_("Peer Grading")}</h1>
             <h2 class="peer-grading-instructions">${_("Instructions")}</h2>
