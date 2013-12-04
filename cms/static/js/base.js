@@ -243,17 +243,17 @@ function createNewUnit(e) {
 
 function deleteUnit(e) {
     e.preventDefault();
-    _deleteItem($(this).parents('li.leaf'), 'Unit');
+    _deleteItem($(this).parents('li.courseware-unit'), 'Unit');
 }
 
 function deleteSubsection(e) {
     e.preventDefault();
-    _deleteItem($(this).parents('li.branch'), 'Subsection');
+    _deleteItem($(this).parents('li.courseware-subsection'), 'Subsection');
 }
 
 function deleteSection(e) {
     e.preventDefault();
-    _deleteItem($(this).parents('section.branch'), 'Section');
+    _deleteItem($(this).parents('section.courseware-section'), 'Section');
 }
 
 function _deleteItem($el, type) {

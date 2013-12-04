@@ -1,0 +1,18 @@
+    <li class="collapsed">
+      <div class="section-item editing">
+        <form class="new-subsection-form">
+          <span class="subsection-name">
+            <input type="text" value="${_('New Subsection')}" class="new-subsection-name-input" />
+          </span>
+          <input type="submit" value="${_('Save')}" class="new-subsection-name-save" />
+          <input type="button" value="${_('Cancel')}" class="new-subsection-name-cancel" />
+        </form>
+      </div>
+      <ol>
+        <li>
+          <a href="unit.html" class="new-unit-item">
+            <i class="icon-plus"></i> ${_('New Unit')}
+          </a>
+        </li>
+      </ol>
+    </li>
