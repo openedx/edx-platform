@@ -15,12 +15,11 @@ from django.utils.translation import ugettext as _
 from dashboard.sysadmin import Users
 from external_auth.models import ExternalAuthMap
 from django.contrib.auth.hashers import check_password
-from django.contrib.auth.models import Group
 from xmodule.modulestore.django import modulestore
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from django.utils.html import escape
-from courseware.roles import CourseStaffRole
+from courseware.roles import CourseStaffRole, GlobalStaff
 from dashboard.models import CourseImportLog
 from xmodule.modulestore.xml import XMLModuleStore
 
@@ -52,8 +51,7 @@ class SysadminBaseTestCase(ModuleStoreTestCase):
     def _setstaff_login(self):
         """Makes the test user staff and logs them in"""
 
-        self.user.is_staff = True
-        self.user.save()
+        GlobalStaff().add_users(self.user)
         self.client.login(username=self.user.username, password='foo')
 
     def _add_edx4edx(self):

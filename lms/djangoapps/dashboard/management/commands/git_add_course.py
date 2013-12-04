@@ -6,6 +6,7 @@ import os
 import re
 import datetime
 import StringIO
+import subprocess
 import logging
 
 from django.utils.translation import ugettext as _
@@ -70,12 +71,15 @@ def add_repo(repo, rdir_in):
     if os.path.exists(rdirp):
         log.info(_('directory already exists, doing a git pull instead '
                    'of git clone'))
-        cmd = 'cd {0}/{1}; git pull'.format(GIT_REPO_DIR, rdir)
+        cmd = ['git', 'pull', ]
+        cwd = '{0}/{1}'.format(GIT_REPO_DIR, rdir)
     else:
-        cmd = 'cd {0}; git clone "{1}"'.format(GIT_REPO_DIR, repo)
+        cmd = ['git', 'clone', repo, ]
+        cwd = GIT_REPO_DIR
 
     log.debug(cmd)
-    ret_git = os.popen(cmd).read()
+    cwd = os.path.abspath(cwd)
+    ret_git = subprocess.check_output(cmd, cwd=cwd)
     log.debug(ret_git)
 
     if not os.path.exists('{0}/{1}'.format(GIT_REPO_DIR, rdir)):
@@ -83,46 +87,43 @@ def add_repo(repo, rdir_in):
         return -1
 
     # get commit id
-    commit_id = os.popen('cd {0}; git log -n 1 | head -1'.format(
-        rdirp)).read().strip().split(' ')[1]
+    cmd = ['git', 'log', '-1', '--format=%H', ]
+    commit_id = subprocess.check_output(cmd, cwd=rdirp)
 
     ret_git += _('\nCommit ID: {0}').format(commit_id)
 
     # get branch
-    branch = ''
-    for k in os.popen('cd {0}; git branch'.format(rdirp)).readlines():
-        if k[0] == '*':
-            branch = k[2:].strip()
-
+    cmd = ['git', 'rev-parse', '--abbrev-ref', 'HEAD', ]
+    branch = subprocess.check_output(cmd, cwd=rdirp)
     ret_git += '   \nBranch: {0}'.format(branch)
 
     # Get XML logging logger and capture debug to parse results
     output = StringIO.StringIO()
-    import_logger = logging.getLogger('xmodule.modulestore.xml_importer')
-    git_logger = logging.getLogger('git_add_script')
-    xml_logger = logging.getLogger('xmodule.modulestore.xml')
-    xml_seq_logger = logging.getLogger('xmodule.seq_module')
-
     import_log_handler = logging.StreamHandler(output)
     import_log_handler.setLevel(logging.DEBUG)
 
-    for logger in [import_logger, git_logger, xml_logger, xml_seq_logger, ]:
+    logger_names = ['xmodule.modulestore.xml_importer', 'git_add_course',
+                    'xmodule.modulestore.xml', 'xmodule.seq_module', ]
+    loggers = []
+
+    for logger_name in logger_names:
+        logger = logging.getLogger(logger_name)
         logger.old_level = logger.level
         logger.setLevel(logging.DEBUG)
         logger.addHandler(import_log_handler)
+        loggers.append(logger)
 
     try:
         management.call_command('import', GIT_REPO_DIR, rdir,
                                 nostatic=not GIT_IMPORT_STATIC)
-    except CommandError, ex:
-        log.critical(_('Unable to run import command.'))
-        log.critical(_('Error was {0}').format(str(ex)))
+    except CommandError:
+        log.exception(_('Unable to run import command.'))
         return -1
 
     ret_import = output.getvalue()
 
     # Remove handler hijacks
-    for logger in [import_logger, git_logger, xml_logger, xml_seq_logger, ]:
+    for logger in loggers:
         logger.setLevel(logger.old_level)
         logger.removeHandler(import_log_handler)
 
@@ -144,14 +145,21 @@ def add_repo(repo, rdir_in):
 
         if os.path.exists(cdir) and not os.path.islink(cdir):
             log.debug(_('   -> exists, but is not symlink'))
-            log.debug(os.popen('ls -l {0}'.format(cdir)).read())
-            log.debug(os.popen('rmdir {0}'.format(cdir)).read())
+            log.debug(subprocess.check_output(['ls', 'l', ],
+                                              cwd=os.path.abspath(cdir)))
+            try:
+                os.rmdir(os.path.abspath(cdir))
+            except OSError:
+                log.exception(_('Failed to remove course directory'))
 
         if not os.path.exists(cdir):
-            log.debug(_('   -> creating symlink'))
-            log.debug(os.popen('ln -s {0} {1}'.format(rdirp,
-                      cdir)).read())
-            log.debug(os.popen('ls -l {0}'.format(cdir)).read())
+            log.debug(_('   -> creating symlink between {0} and {1}').format(rdirp, cdir))
+            try:
+                os.symlink(os.path.abspath(rdirp), os.path.abspath(cdir))
+            except OSError:
+                log.exception(_('Unable to create course symlink'))
+            log.debug(subprocess.check_output(['ls', '-l', ],
+                                              cwd=os.path.abspath(cdir)))
 
     # store import-command-run output in mongo
     mongouri = 'mongodb://{0}:{1}@{2}/{3}'.format(
@@ -163,10 +171,9 @@ def add_repo(repo, rdir_in):
             mdb = mongoengine.connect(mongo_db['db'], host=mongouri)
         else:
             mdb = mongoengine.connect(mongo_db['db'], host=mongo_db['host'])
-    except mongoengine.connection.ConnectionError, ex:
-        log.critical(_('Unable to connect to mongodb to save log, please '
-                       'check MONGODB_LOG settings'))
-        log.critical(_('Error was: {0}').format(str(ex)))
+    except mongoengine.connection.ConnectionError:
+        log.exception(_('Unable to connect to mongodb to save log, please '
+                        'check MONGODB_LOG settings'))
         return -1
     cil = CourseImportLog(
         course_id=course_id,
