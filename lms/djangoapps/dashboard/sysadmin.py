@@ -74,7 +74,7 @@ class SysadminDashboardView(TemplateView):
         return super(SysadminDashboardView, self).dispatch(*args, **kwargs)
 
     def get_courses(self):
-        """ Get an iterable list of courses regardless of module store type."""
+        """ Get an iterable list of courses."""
 
         courses = self.def_ms.get_courses()
         courses = dict([c.id, c] for c in courses)  # no course directory
@@ -372,27 +372,29 @@ class Courses(SysadminDashboardView):
 
         # Grab logging output for debugging imports
         output = StringIO.StringIO()
-
-        import_logger = logging.getLogger('xmodule.modulestore.xml_importer')
-        git_logger = logging.getLogger('dashboard.management.commands.git_add_course')
-        xml_logger = logging.getLogger('xmodule.modulestore.xml')
-        xml_seq_logger = logging.getLogger('xmodule.seq_module')
-
         import_log_handler = logging.StreamHandler(output)
         import_log_handler.setLevel(logging.DEBUG)
 
-        for logger in [import_logger, git_logger, xml_logger, xml_seq_logger, ]:
+        logger_names = ['xmodule.modulestore.xml_importer',
+                        'dashboard.management.commands.git_add_course',
+                        'xmodule.modulestore.xml', 'xmodule.seq_module', ]
+        loggers = []
+
+        for logger_name in logger_names:
+            logger = logging.getLogger(logger_name)
             logger.old_level = logger.level
             logger.setLevel(logging.DEBUG)
             logger.addHandler(import_log_handler)
+            loggers.append(logger)
 
         git_add_course.add_repo(gitloc, None)
         ret = output.getvalue()
 
         # Remove handler hijacks
-        for logger in [import_logger, git_logger, xml_logger, xml_seq_logger, ]:
+        for logger in loggers:
             logger.setLevel(logger.old_level)
             logger.removeHandler(import_log_handler)
+
         msg = u"<h4 style='color:blue'>{0} {1}</h4>".format(
             _('Added course from'), gitloc)
         msg += _("<pre>{0}</pre>").format(escape(ret))
@@ -413,10 +415,14 @@ class Courses(SysadminDashboardView):
         if os.path.exists(gdir):
             msg += _("The course {0} already exists in the data directory! "
                      "(reloading anyway)").format(cdir)
-            cmd = 'cd {0}; git pull'.format(settings.DATA_DIR, gitloc)
+            cmd = ['git', 'pull', ]
+            cwd = gdir
         else:
-            cmd = 'cd {0}; git clone {1}'.format(settings.DATA_DIR, gitloc)
-            msg += u'<pre>%s</pre>' % escape(os.popen(cmd).read())
+            cmd = ['git', 'clone', gitloc, ]
+            cwd = settings.DATA_DIR
+        cmd_output = escape(subprocess.check_output(cmd, cwd=os.path.abspath(cwd)))
+        msg += u'<pre>{0}</pre>'.format(cmd_output)
+
         if not os.path.exists(gdir):
             msg += _('Failed to clone repository to {0}').format(gdir)
             return msg
@@ -487,7 +493,7 @@ class Courses(SysadminDashboardView):
                                  page='courses_sysdashboard')
 
         courses = self.get_courses()
-        if action == _('add_course'):
+        if action == 'add_course':
             gitloc = request.POST.get('repo_location', '').strip().replace(' ', '').replace(';', '')
             datatable = self.make_datatable()
             self.msg += self.get_course_from_git(gitloc, datatable)
@@ -619,8 +625,13 @@ class GitLogs(TemplateView):
     template_name = 'sysadmin_dashboard_gitlogs.html'
 
     @method_decorator(login_required)
-    def get(self, request, course_id=None):
+    def get(self, request, *args, **kwargs):
         """Shows logs of imports that happened as a result of a git import"""
+
+        if 'course_id' in kwargs:
+            course_id = kwargs['course_id']
+        else:
+            course_id = None
 
         # Set mongodb defaults even if it isn't defined in settings
         mongo_db = {

@@ -16,7 +16,7 @@ from django.utils.html import escape
 from django.utils.translation import ugettext as _
 import mongoengine
 
-from courseware.roles import CourseStaffRole
+from courseware.roles import CourseStaffRole, GlobalStaff
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from dashboard.models import CourseImportLog
 from dashboard.sysadmin import Users
@@ -52,8 +52,7 @@ class SysadminBaseTestCase(ModuleStoreTestCase):
     def _setstaff_login(self):
         """Makes the test user staff and logs them in"""
 
-        self.user.is_staff = True
-        self.user.save()
+        GlobalStaff().add_users(self.user)
         self.client.login(username=self.user.username, password='foo')
 
     def _add_edx4edx(self):
