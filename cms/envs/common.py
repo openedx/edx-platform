@@ -414,14 +414,7 @@ INSTALLED_APPS = (
 EDXMKTG_COOKIE_NAME = 'edxloggedin'
 MKTG_URLS = {}
 MKTG_URL_LINK_MAP = {
-    'ABOUT': 'about_edx',
-    'CONTACT': 'contact',
-    'FAQ': 'help_edx',
-    'COURSES': 'courses',
-    'ROOT': 'root',
-    'TOS': 'tos',
-    'HONOR': 'honor',
-    'PRIVACY': 'privacy_edx',
+
 }
 
 COURSES_WITH_UNSAFE_CODE = []
