@@ -118,6 +118,13 @@ client error are correctly passed through to the client.
 LMS: Improve performance of page load and thread list load for
 discussion tab
 
+Studio: Added feature to allow instructors to specify wait time between attempts
+of the same quiz. In a problem's settings, instructors can specify how many
+seconds student's are locked out of submitting another attempt of the same quiz.
+The timer starts as soon as they submit an attempt for grading. Note that this
+does not prevent a student from starting to work on another quiz attempt. It only
+prevents the students from submitting a bunch of attempts in rapid succession.
+
 LMS: The wiki markup cheatsheet dialog is now accessible to screen readers.
 (LMS-1303)
 

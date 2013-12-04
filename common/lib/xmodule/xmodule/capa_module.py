@@ -141,6 +141,11 @@ class CapaFields(object):
     student_answers = Dict(help="Dictionary with the current student responses", scope=Scope.user_state)
     done = Boolean(help="Whether the student has answered the problem", scope=Scope.user_state)
     seed = Integer(help="Random seed for this student", scope=Scope.user_state)
+
+    last_submission_time = Date(help="Last submission time", scope=Scope.user_state)
+    submission_wait_seconds = Integer(display_name="Seconds Between Submissions", help="Seconds to wait between submissions", 
+        scope=Scope.settings, default=0)
+
     weight = Float(
         display_name="Problem Weight",
         help=("Defines the number of points each problem is worth. "
@@ -302,6 +307,12 @@ class CapaModule(CapaFields, XModule):
         self.input_state = lcp_state['input_state']
         self.student_answers = lcp_state['student_answers']
         self.seed = lcp_state['seed']
+
+    def set_last_submission_time(self):
+        """
+        Set the module's last submission time (when the problem was checked)
+        """
+        self.last_submission_time = datetime.datetime.now(UTC())
 
     def get_score(self):
         """
@@ -925,10 +936,20 @@ class CapaModule(CapaFields, XModule):
         if self.lcp.is_queued():
             current_time = datetime.datetime.now(UTC())
             prev_submit_time = self.lcp.get_recentmost_queuetime()
+
             waittime_between_requests = self.system.xqueue['waittime']
             if (current_time - prev_submit_time).total_seconds() < waittime_between_requests:
                 msg = u'You must wait at least {wait} seconds between submissions'.format(
                     wait=waittime_between_requests)
+                return {'success': msg, 'html': ''}  # Prompts a modal dialog in ajax callback
+
+        # Wait time between resets
+        current_time = datetime.datetime.now(UTC())
+        if self.last_submission_time is not None:
+            if (current_time - self.last_submission_time).total_seconds() < self.submission_wait_seconds:
+                seconds_left = int(self.submission_wait_seconds - (current_time - self.last_submission_time).total_seconds()) + 1
+                msg = u'You must wait at least {w} between submissions. {s} remaining.'.format(
+                    w=self.pretty_print_seconds(self.submission_wait_seconds), s=self.pretty_print_seconds(seconds_left))
                 return {'success': msg, 'html': ''}  # Prompts a modal dialog in ajax callback
 
         try:
@@ -936,6 +957,7 @@ class CapaModule(CapaFields, XModule):
             self.attempts = self.attempts + 1
             self.lcp.done = True
             self.set_state_from_lcp()
+            self.set_last_submission_time()
 
         except (StudentInputError, ResponseError, LoncapaProblemError) as inst:
             log.warning("StudentInputError in capa_module:problem_check",
@@ -993,6 +1015,18 @@ class CapaModule(CapaFields, XModule):
         return {'success': success,
                 'contents': html,
                 }
+
+    def pretty_print_seconds(self, num_seconds):
+        """
+        Returns time formatted nicely.
+        """
+        if(num_seconds < 60):
+            plural = "s" if num_seconds > 1 else ""
+            return "%i second%s" % (num_seconds, plural)
+        elif(num_seconds < 60*60):
+            return "%i min, %i sec" % (int(num_seconds / 60), num_seconds % 60)
+        else:
+            return "%i hrs, %i min, %i sec" % (int(num_seconds / 3600), int((num_seconds % 3600) / 60), (num_seconds % 60))
 
     def rescore_problem(self):
         """
