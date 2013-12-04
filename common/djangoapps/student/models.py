@@ -20,7 +20,7 @@ import uuid
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth.signals import user_logged_in, user_logged_out
-from django.db import models
+from django.db import models, IntegrityError
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 import django.dispatch
@@ -74,12 +74,30 @@ def anonymous_id_for_user(user, course_id):
     hasher.update(settings.SECRET_KEY)
     hasher.update(str(user.id))
     hasher.update(course_id)
+    digest = hasher.hexdigest()
 
-    return AnonymousUserId.objects.get_or_create(
-        defaults={'anonymous_user_id': hasher.hexdigest()},
-        user=user,
-        course_id=course_id
-    )[0].anonymous_user_id
+    try:
+        anonymous_user_id, created = AnonymousUserId.objects.get_or_create(
+            defaults={'anonymous_user_id': digest},
+            user=user,
+            course_id=course_id
+        )
+        if anonymous_user_id.anonymous_user_id != digest:
+            log.error(
+                "Stored anonymous user id {stored!r} for user {user!r} "
+                "in course {course!r} doesn't match computed id {digest!r}".format(
+                    user=user,
+                    course=course_id,
+                    stored=anonymous_user_id.anonymous_user_id,
+                    digest=digest
+                )
+            )
+    except IntegrityError:
+        # Another thread has already created this entry, so
+        # continue
+        pass
+
+    return digest
 
 
 def user_by_anonymous_id(id):
