@@ -27,6 +27,8 @@ class Migration(SchemaMigration):
         # Changing field 'AnonymousUserId.anonymous_user_id'
         db.alter_column('student_anonymoususerid', 'anonymous_user_id', self.gf('django.db.models.fields.CharField')(max_length=16, unique=True))
 
+        db.execute("DROP TABLE student_anonymoususerid_temp_archive")
+
     models = {
         'auth.group': {
             'Meta': {'object_name': 'Group'},
