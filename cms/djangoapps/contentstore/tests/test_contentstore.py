@@ -137,8 +137,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         locator = loc_mapper().translate_location(course.location.course_id, descriptor.location, False, True)
         resp = self.client.get_html(locator.url_reverse('unit'))
         self.assertEqual(resp.status_code, 200)
-        # TODO: uncomment when video transcripts no longer require IDs.
-        # _test_no_locations(self, resp)
+        _test_no_locations(self, resp)
 
         for expected in expected_types:
             self.assertIn(expected, resp.content)
@@ -1354,8 +1353,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             unit_locator = loc_mapper().translate_location(course_id, descriptor.location, False, True)
             resp = self.client.get_html(unit_locator.url_reverse('unit'))
             self.assertEqual(resp.status_code, 200)
-            # TODO: uncomment when video transcripts no longer require IDs.
-            # _test_no_locations(self, resp)
+            _test_no_locations(self, resp)
 
 
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE, MODULESTORE=TEST_MODULESTORE)
@@ -1682,8 +1680,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         unit_locator = loc_mapper().translate_location(loc.course_id, unit_location, False, True)
         resp = self.client.get_html(unit_locator.url_reverse('unit'))
         self.assertEqual(resp.status_code, 200)
-        # TODO: uncomment when video transcripts no longer require IDs.
-        # _test_no_locations(self, resp)
+        _test_no_locations(self, resp)
 
         def delete_item(category, name):
             """ Helper method for testing the deletion of an xblock item. """

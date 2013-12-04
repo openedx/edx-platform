@@ -11,7 +11,7 @@ function ($, _, Utils, VideoList, MetadataView, MetadataModel, AbstractEditor, s
                 'transcripts/metadata-videolist-entry.underscore'
             ),
             abstractEditor = AbstractEditor.prototype,
-            component_id = 'component_id',
+            component_locator = 'component_locator',
             videoList = [
                 {
                     mode: "youtube",
@@ -62,7 +62,7 @@ function ($, _, Utils, VideoList, MetadataView, MetadataModel, AbstractEditor, s
 
             var tpl = sandbox({
                     'class': 'component',
-                    'data-id': component_id
+                    'data-locator': component_locator
                 }),
                 model = new MetadataModel(modelStub),
                 videoList, $el;
@@ -157,7 +157,7 @@ function ($, _, Utils, VideoList, MetadataView, MetadataModel, AbstractEditor, s
             waitsForResponse(function () {
                 expect(abstractEditor.initialize).toHaveBeenCalled();
                 expect(messenger.initialize).toHaveBeenCalled();
-                expect(view.component_id).toBe(component_id);
+                expect(view.component_locator).toBe(component_locator);
                 expect(view.$el).toHandle('input');
             });
         });
@@ -167,7 +167,7 @@ function ($, _, Utils, VideoList, MetadataView, MetadataModel, AbstractEditor, s
                     expect(abstractEditor.render).toHaveBeenCalled();
                     expect(Utils.command).toHaveBeenCalledWith(
                         'check',
-                        component_id,
+                        component_locator,
                         videoList
                     );
 

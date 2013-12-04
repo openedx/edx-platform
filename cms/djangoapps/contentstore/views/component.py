@@ -223,13 +223,9 @@ def unit_handler(request, tag=None, course_id=None, branch=None, version_guid=No
             )
 
         components = [
-            [
-                # TODO: old location needed for video transcripts.
-                component.location.url(),
-                loc_mapper().translate_location(
-                    course.location.course_id, component.location, False, True
-                )
-            ]
+            loc_mapper().translate_location(
+                course.location.course_id, component.location, False, True
+            )
             for component
             in item.get_children()
         ]
