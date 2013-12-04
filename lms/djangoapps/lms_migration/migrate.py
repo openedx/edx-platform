@@ -17,7 +17,7 @@ try:
 except ImportError:
     from django.contrib.csrf.middleware import csrf_exempt
 
-log = logging.getLogger("mitx.lms_migrate")
+log = logging.getLogger("edx.lms_migrate")
 LOCAL_DEBUG = True
 ALLOWED_IPS = settings.LMS_MIGRATION_ALLOWED_IPS
 
