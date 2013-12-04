@@ -1,60 +1,112 @@
+.. _Working with Video Components:
 
-**************
-Create a Video
-**************
+#############################
+Working with Video Components
+#############################
 
-Many instructors use videos to take the place of in-class lectures. You can create a video of your lecture, and interweave other components—such as discussions and problems—to promote active learning.
 
-To add a video to the unit, you must upload your video to YouTube, and then create a video component. You can also add a transcript to your video.
+*******************
+Overview
+*******************
+You can create a video of your lecture, and add it to your course with other components—such as discussions and problems—to promote active learning.
+
+You can also associate a timed transcript with your video, which students can read and download.
+
+When you add a video to your course, you first post the video online, and then create a link to that video in the body of your course. 
+
+See the following topics:
+
+* :ref:`Video Formats`
+* :ref:`Video Hosting`
+* :ref:`Create a Video Component`
+
+
+
+.. _Video Formats:
+
+*******************
+Video Formats
+*******************
+
+The edX video player supports videos in .mp4, .ogg, and .mpeg format.
+
+
+.. _Video Hosting:
+
+*******************
+Video Hosting
+*******************
+
+All course videos should be posted to YouTube. 
+By default, the edX video player accesses your YouTube videos. 
+However, because YouTube is not available in all locations, we recommend that you also post copies of your videos on a third-party site such as Amazon S3. 
+When a student views a video in your course, if YouTube is not available in that student's location or if the YouTube video doesn't play, the video on the backup site starts playing automatically. 
+The student can also click a link to download the video from the backup site.
+
+You can use any video backup site that you want. Keep in mind, however, that the site where you post the videos may have to handle a lot of traffic.
+
+
+.. _Create a Video Component:
+
+*************************
+Create a Video Component
+*************************
+
+To add a video to the unit, you must obtain the YouTube ID for the video, obtain the URL for the backup video, and then create a video component.
+
+To determine the YouTube ID for a video, locate the video on YouTube and make a note of the code that appears between **watch?v =** and **&feature** in the URL. 
+This code appears circled below.
+
+.. note:: If **&feature** does not appear in the URL, just use the code that follows **watch?v=** in the URL.
+
+.. image:: Images/VideoComponent_YouTubeCode.png
+
 
 You can include videos that run at 0.75 speed, 1.25 speed, and 1.50 speed as well as at normal speed. To do this, you must upload each of these videos to YouTube separately.
 
-.. note::
-
-  YouTube only hosts videos of up to 15 minutes. If you encode a 0.75 speed option, you must make
+.. note:: YouTube only hosts videos of up to 15 minutes. If you encode a 0.75 speed option, you must make
   sure that source video segments are only 11.25 minutes long so that YouTube can host all speeds.
   YouTube offers paid accounts that relax this restriction.
 
+After you have uploaded the video to YouTube:
 
-1. Upload the video that you want to YouTube. Make note of the code that appears between **watch?v**
-= and **&feature** in the URL. This code appears in the green box below.
+#. Under **Add New Component**, click the **video** icon.
 
-.. image:: Images/image053.png
-  :width: 800 px
+   .. image:: Images/NewComponent_Discussion.png
+  
+   The Video component is added:
 
-2. In Studio, go to the unit that you want.
+   .. image:: Images/VideoComponent_Default.png
 
-3. Under **Add New Component,** click **Video.**
 
-4. In the screen that appears, click **default.**
+2. When the new video component appears, click **edit**. The video editor opens and displays the Basic settings.
 
-5. When the new video component appears, click **edit**.** A video component opens, and a sample video
-begins playing automatically.
+   .. image:: Images/video-edit.png
+   
+3. In the **Display Name** field, enter the name you want students to see when they hover the mouse over the icon unit icon in the course accordian. This text also appears as a header for the video.
 
-6. In the **display_name** box, type the text that you want the student to see when the student hovers
-the mouse over the icon in the bar at the top of the page. This text also appears as a headerfor the video.
+#. Enter the URL of the YouTube video. 	
 
-7. Change the codes in the green boxes to the YouTube codes that you noted in step 1. The first
-code (immediately to the right of "0.75:") corresponds to the video at 0.75 speed, the next
-corresponds to 1.0 speed, etc.
+   When you enter a video URL, Studio checks to see if a timed transcript for that video exists on edX. 
+   If the transcript exists, Studio automatically associates the transcript with the video.  
 
-.. image:: Images/image055.png
-  :width: 800
+   If your video is on YouTube, you can import a timed transcript from YouTube. This YouTube transcript overwrites the edX version of the transcript.
+   
+#. If no transcript exists, click **Upload New Timed Transcript** to upload a transcript file from your computer.
 
-8. Click **Save.**
+#. If you want to modify the transcript, click **Download to Edit**. You can then make your changes and upload the new file.
 
-.. note::
+#. To specify additional sources for the video, click **Add more video sources**, and enter the URL and file type for the video.
 
-  All videos embedded using the edX player begin playing automatically. 
-  There is currently no way to turn off the autoplay feature.
+#. Optionally, click **Advanced** to set the following for the video:
+
+   * **Download Transcript**: the external URL for non-YouTube video transcripts.
+   * **Download Video**:  the external URL to download the video.
+   * **Start Time** and **End Time** for the video
+   * **Video Sources**:  URLs and filenames for other sources of the video.
+   * **Youtube ID**:  IDs for different speed videos on YouTube.
+
+#. Click **Save.**
   
 
-**To add a transcript for your video:**
-
-1. Save your srt.sjson file as **subs_YOUTUBEID.srt.sjson,** where **YOUTUBEID** is the YouTube ID of your video.
-
-2. Upload the **subs_YOUTUBEID.srt.sjson** file to the **Files & Uploads** page.
-
-3. Create a link to this file by following the steps in the Add Items to the Handouts Sidebar
-section.
 
