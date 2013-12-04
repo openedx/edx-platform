@@ -375,7 +375,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         return params
 
     def max_score(self):
-        return self.weight
+        return self.weight if self.has_score else None
 
 
     @XBlock.handler
@@ -581,6 +581,5 @@ class LTIDescriptor(LTIFields, MetadataOnlyEditingDescriptor, EmptyDataRawDescri
     """
     Descriptor for LTI Xmodule.
     """
-    has_score = True
     module_class = LTIModule
     grade_handler = module_attr('grade_handler')
