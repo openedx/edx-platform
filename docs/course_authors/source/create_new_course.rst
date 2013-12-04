@@ -63,7 +63,7 @@ Edit Your Course
 ************************
 When you create a new course, the course opens in Studio automatically and you can begin editing.
 
-If you come back to Studio later, your courses are listed on the Studio log in page. 
+If you come back to Studio later, your courses are listed on the Studio login page. 
 
  .. image:: Images/open_course.png
   :width: 800

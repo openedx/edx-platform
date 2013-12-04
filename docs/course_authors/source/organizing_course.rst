@@ -85,7 +85,7 @@ See LINK for more information on releasing your course.
 
 
 ==================
-Edit a subsection
+Edit a Subsection
 ==================
 
 You can add and delete Subsections, and select the grading policy, directly from the Course Outline.
@@ -167,6 +167,7 @@ To create a Unit from the Course Outline or the Subsection page:
 #. Within the Subsection, click **New Unit**.  
 #. Enter the Display Name that students will see.
 #. Click a Component type to add a the first Component in the Unit.
+
    .. image:: Images/Unit_DisplayName_Studio.png
 
 #. Follow the instructions for the type of Component, listed below.

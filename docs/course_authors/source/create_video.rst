@@ -79,7 +79,7 @@ After you have uploaded the video to YouTube:
    .. image:: Images/VideoComponent_Default.png
 
 
-2. When the new video component appears, click **edit**.** The video editor opens and displays the Basic settings.
+2. When the new video component appears, click **edit**. The video editor opens and displays the Basic settings.
 
    .. image:: Images/video-edit.png
    
