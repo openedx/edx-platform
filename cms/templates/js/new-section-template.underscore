@@ -1,0 +1,14 @@
+    <section class="courseware-section branch new-section">
+      <header>
+      <a href="#"  data-tooltip="Collapse/expand this section" class="expand-collapse-icon collapse"></a>
+        <div class="item-details">
+          <h3 class="section-name">
+          <form class="section-name-form">
+            <input type="text" value="New Section Name" class="new-section-name" />
+            <input type="submit" class="new-section-name-save" data-parent="${parent_locator}"
+                   data-category="${new_section_category}" value="Save" />
+            <input type="button" class="new-section-name-cancel" value="Cancel" /></h3>
+          </form>
+        </div>
+      </header>
+    </section>

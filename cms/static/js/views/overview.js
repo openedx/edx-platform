@@ -21,11 +21,11 @@ define(["domReady", "jquery", "jquery.ui", "underscore", "gettext", "js/views/fe
             if ($button.hasClass('is-activated')) {
                 $section.addClass('collapsed');
                 // first child in order to avoid the icons on the subsection lists which are not in the first child
-                $section.find('header .expand-collapse-icon').removeClass('collapse').addClass('expand');
+                $section.find('header .expand-collapse').removeClass('collapse').addClass('expand');
             } else {
                 $section.removeClass('collapsed');
                 // first child in order to avoid the icons on the subsection lists which are not in the first child
-                $section.find('header .expand-collapse-icon').removeClass('expand').addClass('collapse');
+                $section.find('header .expand-collapse').removeClass('expand').addClass('collapse');
             }
         };
 
@@ -92,7 +92,7 @@ define(["domReady", "jquery", "jquery.ui", "underscore", "gettext", "js/views/fe
                             '<strong>' + gettext("Will Release:") + '&nbsp;</strong>' +
                             gettext("{month}/{day}/{year} at {hour}:{minute} UTC") +
                             '</span>' +
-                            '<a href="#" class="edit-button" data-date="{month}/{day}/{year}" data-time="{hour}:{minute}" data-locator="{locator}">' +
+                            '<a href="#" class="edit" data-date="{month}/{day}/{year}" data-time="{hour}:{minute}" data-locator="{locator}">' +
                             gettext("Edit") +
                             '</a>',
                         {year: datetime.getUTCFullYear(), month: pad2(datetime.getUTCMonth() + 1), day: pad2(datetime.getUTCDate()),
@@ -310,7 +310,7 @@ define(["domReady", "jquery", "jquery.ui", "underscore", "gettext", "js/views/fe
                 };
                 if (!ele.hasClass('collapsed')) {
                     ele.addClass('collapsed');
-                    ele.find('.expand-collapse-icon').first().addClass('expand').removeClass('collapse');
+                    ele.find('.expand-collapse').first().addClass('expand').removeClass('collapse');
                     // onDragStart gets called again after the collapse, so we can't just store a variable in the dragState.
                     ele.addClass(this.expandOnDropClass);
                 }
@@ -406,7 +406,7 @@ define(["domReady", "jquery", "jquery.ui", "underscore", "gettext", "js/views/fe
 
             expandElement: function (ele) {
                 ele.removeClass('collapsed');
-                ele.find('.expand-collapse-icon').first().removeClass('expand').addClass('collapse');
+                ele.find('.expand-collapse').first().removeClass('expand').addClass('collapse');
             },
 
             /*
@@ -500,10 +500,10 @@ define(["domReady", "jquery", "jquery.ui", "underscore", "gettext", "js/views/fe
                 }
             });
             $('.toggle-button-sections').bind('click', toggleSections);
-            $('.expand-collapse-icon').bind('click', toggleSubmodules);
+            $('.expand-collapse').bind('click', toggleSubmodules);
 
             var $body = $('body');
-            $body.on('click', '.section-published-date .edit-button', editSectionPublishDate);
+            $body.on('click', '.section-published-date .edit', editSectionPublishDate);
             $body.on('click', '.section-published-date .schedule-button', editSectionPublishDate);
             $body.on('click', '.edit-subsection-publish-settings .save-button', saveSetSectionScheduleDate);
             $body.on('click', '.edit-subsection-publish-settings .cancel-button', ModalUtils.hideModal);

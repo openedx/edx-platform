@@ -1,0 +1,3 @@
+<div class="no-outline-content">
+    <p><%= gettext("You haven't added any sections to your course outline.") %><a href="#" class="button new-button"><i class="icon-plus"></i><%= gettext("Add your first section") %></a></p>
+</div>

@@ -37,8 +37,7 @@ This def will enumerate through a passed in subsection and list all of the units
       </a>
       % if actions:
       <div class="item-actions">
-	<a href="#" data-tooltip="Delete this unit" class="delete-button" data-locator="${unit_locator}">
-        <span class="delete-icon"></span></a>
+	<a href="#" data-tooltip="Delete this unit" class="delete-button" data-locator="${unit_locator}"><i class="icon-trash"></i></a>
 	<span data-tooltip="Drag to sort" class="drag-handle unit-drag-handle"></span>
       </div>
       % endif
@@ -51,7 +50,7 @@ This def will enumerate through a passed in subsection and list all of the units
     <%include file="_ui-dnd-indicator-initial.html" />
 
     <a href="#" class="new-unit-item" data-category="${new_unit_category}" data-parent="${subsection_locator}">
-      <span class="new-unit-icon"></span>New Unit
+      <i class="icon-plus"></i> New Unit
     </a>
   </li>
 </ol>
