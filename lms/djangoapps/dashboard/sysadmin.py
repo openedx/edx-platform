@@ -25,7 +25,7 @@ from django.views.decorators.cache import cache_control
 from django.views.generic.base import TemplateView
 from django.views.decorators.http import condition
 from django_future.csrf import ensure_csrf_cookie
-from mitxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response
 import mongoengine
 
 from courseware.courses import get_course_by_id
@@ -159,7 +159,7 @@ class Users(SysadminDashboardView):
         email_domain = getattr(settings, 'SSL_AUTH_EMAIL_DOMAIN', 'MIT.EDU')
 
         msg = u''
-        if settings.MITX_FEATURES['AUTH_USE_MIT_CERTIFICATES']:
+        if settings.FEATURES['AUTH_USE_MIT_CERTIFICATES']:
             if not '@' in uname:
                 email = '{0}@{1}'.format(uname, email_domain)
             else:
@@ -201,7 +201,7 @@ class Users(SysadminDashboardView):
         profile.name = name
         profile.save()
 
-        if settings.MITX_FEATURES['AUTH_USE_MIT_CERTIFICATES']:
+        if settings.FEATURES['AUTH_USE_MIT_CERTIFICATES']:
             credential_string = getattr(settings, 'SSL_AUTH_DN_FORMAT_STRING',
                                         '/C=US/ST=Massachusetts/O=Massachusetts Institute of Technology/OU=Client CA v1/CN={0}/emailAddress={1}')
             credentials = credential_string.format(name, email)
@@ -271,7 +271,7 @@ class Users(SysadminDashboardView):
             'msg': self.msg,
             'djangopid': os.getpid(),
             'modeflag': {'users': 'active-section'},
-            'mitx_version': getattr(settings, 'MITX_VERSION_STRING', ''),
+            'mitx_version': getattr(settings, 'VERSION_STRING', ''),
         }
         return render_to_response(self.template_name, context)
 
@@ -315,7 +315,7 @@ class Users(SysadminDashboardView):
             'msg': self.msg,
             'djangopid': os.getpid(),
             'modeflag': {'users': 'active-section'},
-            'mitx_version': getattr(settings, 'MITX_VERSION_STRING', ''),
+            'mitx_version': getattr(settings, 'VERSION_STRING', ''),
         }
         return render_to_response(self.template_name, context)
 
@@ -478,7 +478,7 @@ class Courses(SysadminDashboardView):
             'msg': self.msg,
             'djangopid': os.getpid(),
             'modeflag': {'courses': 'active-section'},
-            'mitx_version': getattr(settings, 'MITX_VERSION_STRING', ''),
+            'mitx_version': getattr(settings, 'VERSION_STRING', ''),
         }
         return render_to_response(self.template_name, context)
 
@@ -544,7 +544,7 @@ class Courses(SysadminDashboardView):
             'msg': self.msg,
             'djangopid': os.getpid(),
             'modeflag': {'courses': 'active-section'},
-            'mitx_version': getattr(settings, 'MITX_VERSION_STRING', ''),
+            'mitx_version': getattr(settings, 'VERSION_STRING', ''),
         }
         return render_to_response(self.template_name, context)
 
@@ -583,7 +583,7 @@ class Staffing(SysadminDashboardView):
             'msg': self.msg,
             'djangopid': os.getpid(),
             'modeflag': {'staffing': 'active-section'},
-            'mitx_version': getattr(settings, 'MITX_VERSION_STRING', ''),
+            'mitx_version': getattr(settings, 'VERSION_STRING', ''),
         }
         return render_to_response(self.template_name, context)
 
