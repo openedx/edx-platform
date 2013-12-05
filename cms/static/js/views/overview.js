@@ -267,11 +267,21 @@ define(["domReady", "jquery", "jquery.ui", "underscore", "gettext", "js/views/fe
                                         attachMethod: 'after'
                                     };
                                 }
-                                // Dragging down into beginning of list.
-                                else if (j == 0 && yChange > 0 && Math.abs(eleY - siblingY) <= fudge) {
+                                // Dragging up or down into beginning of list.
+                                else if (j == 0 && Math.abs(eleY - siblingY) <= fudge) {
                                     return {
                                         ele: $sibling,
                                         attachMethod: 'before'
+                                    };
+                                }
+                                // Dragging down into end of list. Special handling required because
+                                // the element being dragged may be taller then the element being dragged over
+                                // (if eleY can never be >= siblingY, general case at the end does not work).
+                                else if (j == siblings.length - 1 && yChange > 0 &&
+                                    Math.abs(eleY + ele.height() - siblingYEnd) <= fudge) {
+                                    return {
+                                        ele: $sibling,
+                                        attachMethod: 'after'
                                     };
                                 }
                                 else if (eleY >= siblingY && eleY <= siblingYEnd) {
