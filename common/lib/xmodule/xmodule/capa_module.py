@@ -143,8 +143,11 @@ class CapaFields(object):
     seed = Integer(help="Random seed for this student", scope=Scope.user_state)
 
     last_submission_time = Date(help="Last submission time", scope=Scope.user_state)
-    submission_wait_seconds = Integer(display_name="Seconds Between Submissions", help="Seconds to wait between submissions", 
-        scope=Scope.settings, default=0)
+    submission_wait_seconds = Integer(
+        display_name="Timer Between Attempts",
+        help="Seconds a student must wait between submissions for a problem with multiple attempts.",
+        scope=Scope.settings,
+        default=0)
 
     weight = Float(
         display_name="Problem Weight",
