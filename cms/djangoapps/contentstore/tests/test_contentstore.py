@@ -176,7 +176,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         Lock an arbitrary asset in the course
         :param course_location:
         """
-        course_assets,__ = content_store.get_all_content_for_course(course_location)
+        course_assets, __ = content_store.get_all_content_for_course(course_location)
         self.assertGreater(len(course_assets), 0, "No assets to lock")
         content_store.set_attr(course_assets[0]['_id'], 'locked', True)
         return course_assets[0]['_id']
@@ -585,7 +585,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.assertIsNotNone(course)
 
         # make sure we have some assets in our contentstore
-        all_assets,__ = content_store.get_all_content_for_course(course_location)
+        all_assets, __ = content_store.get_all_content_for_course(course_location)
         self.assertGreater(len(all_assets), 0)
 
         # make sure we have some thumbnails in our contentstore
@@ -698,7 +698,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         # make sure there's something in the trashcan
         course_location = CourseDescriptor.id_to_location('edX/toy/6.002_Spring_2012')
-        all_assets,__ = trash_store.get_all_content_for_course(course_location)
+        all_assets, __ = trash_store.get_all_content_for_course(course_location)
         self.assertGreater(len(all_assets), 0)
 
         # make sure we have some thumbnails in our trashcan
@@ -713,7 +713,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         empty_asset_trashcan([course_location])
 
         # make sure trashcan is empty
-        all_assets,count = trash_store.get_all_content_for_course(course_location)
+        all_assets, count = trash_store.get_all_content_for_course(course_location)
         self.assertEqual(len(all_assets), 0)
         self.assertEqual(count, 0)
 
@@ -924,7 +924,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.assertEqual(len(items), 0)
 
         # assert that all content in the asset library is also deleted
-        assets,count = content_store.get_all_content_for_course(location)
+        assets, count = content_store.get_all_content_for_course(location)
         self.assertEqual(len(assets), 0)
         self.assertEqual(count, 0)
 

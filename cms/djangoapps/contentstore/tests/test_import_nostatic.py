@@ -84,7 +84,7 @@ class ContentStoreImportNoStaticTest(ModuleStoreTestCase):
         _, content_store, course, course_location = self.load_test_import_course()
 
         # make sure we have ONE asset in our contentstore ("should_be_imported.html")
-        all_assets,count = content_store.get_all_content_for_course(course_location)
+        all_assets, count = content_store.get_all_content_for_course(course_location)
         print "len(all_assets)=%d" % len(all_assets)
         self.assertEqual(len(all_assets), 1)
         self.assertEqual(count, 1)
@@ -115,8 +115,7 @@ class ContentStoreImportNoStaticTest(ModuleStoreTestCase):
         module_store.get_item(course_location)
 
         # make sure we have NO assets in our contentstore
-        all_assets,count = content_store.get_all_content_for_course(course_location)
-        print "len(all_assets)=%d" % len(all_assets)
+        all_assets, count = content_store.get_all_content_for_course(course_location)
         self.assertEqual(len(all_assets), 0)
         self.assertEqual(count, 0)
 
