@@ -2,7 +2,7 @@
 This is the common settings file, intended to set sane defaults. If you have a
 piece of configuration that's dependent on a set of feature flags being set,
 then create a function that returns the calculated value based on the value of
-MITX_FEATURES[...]. Modules that extend this one can change the feature
+FEATURES[...]. Modules that extend this one can change the feature
 configuration in an environment specific config file and re-calculate those
 values.
 
@@ -14,7 +14,7 @@ Longer TODO:
 1. Right now our treatment of static content in general and in particular
    course-specific static content is haphazard.
 2. We should have a more disciplined approach to feature flagging, even if it
-   just means that we stick them in a dict called MITX_FEATURES.
+   just means that we stick them in a dict called FEATURES.
 3. We need to handle configuration for multiple courses. This could be as
    multiple sites, but we do need a way to map their data assets.
 """
@@ -36,7 +36,7 @@ from dealer.git import git
 
 ############################ FEATURE CONFIGURATION #############################
 
-MITX_FEATURES = {
+FEATURES = {
     'USE_DJANGO_PIPELINE': True,
 
     'GITHUB_PUSH': False,
@@ -99,10 +99,10 @@ for namespace, template_dirs in lms.envs.common.MAKO_TEMPLATES.iteritems():
 
 TEMPLATE_DIRS = MAKO_TEMPLATES['main']
 
-MITX_ROOT_URL = ''
+EDX_ROOT_URL = ''
 
-LOGIN_REDIRECT_URL = MITX_ROOT_URL + '/signin'
-LOGIN_URL = MITX_ROOT_URL + '/signin'
+LOGIN_REDIRECT_URL = EDX_ROOT_URL + '/signin'
+LOGIN_URL = EDX_ROOT_URL + '/signin'
 
 
 TEMPLATE_CONTEXT_PROCESSORS = (
@@ -161,7 +161,7 @@ MIDDLEWARE_CLASSES = (
 
     'django.contrib.messages.middleware.MessageMiddleware',
     'track.middleware.TrackMiddleware',
-    'mitxmako.middleware.MakoMiddleware',
+    'edxmako.middleware.MakoMiddleware',
 
     # Detects user-requested locale from 'accept-language' header in http request
     'django.middleware.locale.LocaleMiddleware',
@@ -393,7 +393,7 @@ INSTALLED_APPS = (
     'datadog',
 
     # For asset pipelining
-    'mitxmako',
+    'edxmako',
     'pipeline',
     'staticfiles',
     'static_replace',
@@ -414,14 +414,7 @@ INSTALLED_APPS = (
 EDXMKTG_COOKIE_NAME = 'edxloggedin'
 MKTG_URLS = {}
 MKTG_URL_LINK_MAP = {
-    'ABOUT': 'about_edx',
-    'CONTACT': 'contact',
-    'FAQ': 'help_edx',
-    'COURSES': 'courses',
-    'ROOT': 'root',
-    'TOS': 'tos',
-    'HONOR': 'honor',
-    'PRIVACY': 'privacy_edx',
+
 }
 
 COURSES_WITH_UNSAFE_CODE = []

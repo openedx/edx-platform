@@ -112,47 +112,62 @@ div.calc-main {
           right: 0;
           top: 0;
 
-          a {
+          #calculator_hint {
             background: url("../images/info-icon.png") center center no-repeat;
             height: 35px;
             @include hide-text;
             width: 35px;
-             display: block;
+            display: block;
+
+            &:focus {
+              outline: 5px auto #5b9dd9;
+            }
           }
 
-          dl {
+          .help {
+            @include transition(none);
             background: #fff;
             border-radius: 3px;
             box-shadow: 0 0 3px #999;
             color: #333;
-            opacity: 0;
             padding: 10px;
             position: absolute;
             right: -40px;
-            top: -122px;
-            @include transition(none);
+            bottom: 57px;
             width: 600px;
-            height: 0;
             overflow: hidden;
             pointer-events: none;
+            display: none;
+            margin: 0;
+            list-style: none;
 
             &.shown {
-              height: auto;
-              opacity: 1;
-              overflow: visible;
+              display: block;
               pointer-events: auto;
             }
 
-            dt {
-              clear: both;
-              float: left;
+            .bold {
               font-weight: bold;
-              padding-right: 12px;
             }
 
-            dd {
-              float: left;
-              margin-left: 0;
+            p, p+p {
+              margin: 0;
+            }
+
+            table {
+              margin: 10px 0;
+
+              td, th {
+                padding: 2px 5px;
+              }
+            }
+
+            .calc-postfixes {
+              margin: 10px auto;
+
+              td, th {
+                padding: 2px 15px;
+              }
             }
           }
         }

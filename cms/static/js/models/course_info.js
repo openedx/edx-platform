@@ -5,12 +5,9 @@ define(["backbone"], function(Backbone) {
         url: '',
 
         defaults: {
-            "courseId": "", // the location url
             "updates" : null,   // UpdateCollection
             "handouts": null    // HandoutCollection
-            },
-
-        idAttribute : "courseId"
+            }
     });
     return CourseInfo;
 });

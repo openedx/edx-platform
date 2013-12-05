@@ -1,7 +1,7 @@
 class @Collapsible
 
   # Set of library functions that provide a simple way to add collapsible
-  # functionality to elements. 
+  # functionality to elements.
 
   # setCollapsibles:
   #   Scan element's content for generic collapsible containers
@@ -9,12 +9,15 @@ class @Collapsible
     ###
     el: container
     ###
+    linkTop = '<a href="#" class="full full-top">See full output</a>'
+    linkBottom = '<a href="#" class="full full-bottom">See full output</a>'
+
     # standard longform + shortfom pattern
     el.find('.longform').hide()
-    el.find('.shortform').append('<a href="#" class="full">See full output</a>')
+    el.find('.shortform').append(linkTop, linkBottom)
 
     # custom longform + shortform text pattern
-    short_custom = el.find('.shortform-custom') 
+    short_custom = el.find('.shortform-custom')
     # set up each one individually
     short_custom.each (index, elt) =>
       open_text = $(elt).data('open-text')
@@ -31,13 +34,18 @@ class @Collapsible
 
   @toggleFull: (event, open_text, close_text) =>
     event.preventDefault()
-    $(event.target).parent().siblings().slideToggle()
-    $(event.target).parent().parent().toggleClass('open')
+    parent =  $(event.target).parent()
+    parent.siblings().slideToggle()
+    parent.parent().toggleClass('open')
     if $(event.target).text() == open_text
       new_text = close_text
     else
       new_text = open_text
-    $(event.target).text(new_text)
+    if $(event.target).hasClass('full')
+      el = parent.find('.full')
+    else
+      el = $(event.target)
+    el.text(new_text)
 
   @toggleHint: (event) =>
     event.preventDefault()

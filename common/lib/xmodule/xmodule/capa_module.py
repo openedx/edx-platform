@@ -24,7 +24,7 @@ from .fields import Timedelta, Date
 from django.utils.timezone import UTC
 from django.utils.translation import ugettext as _
 
-log = logging.getLogger("mitx.courseware")
+log = logging.getLogger("edx.courseware")
 
 
 # Generate this many different variants of problems with rerandomize=per_student
@@ -190,7 +190,7 @@ class CapaModule(CapaFields, XModule):
         """
         Accepts the same arguments as xmodule.x_module:XModule.__init__
         """
-        XModule.__init__(self, *args, **kwargs)
+        super(CapaModule, self).__init__(*args, **kwargs)
 
         due_date = self.due
 

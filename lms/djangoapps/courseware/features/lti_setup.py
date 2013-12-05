@@ -30,6 +30,7 @@ def setup_mock_lti_server():
     server_thread.daemon = True
     server_thread.start()
 
+    server.server_host = server_host
     server.oauth_settings = {
         'client_key': 'test_client_key',
         'client_secret': 'test_client_secret',

@@ -46,7 +46,7 @@ class TestEmailSendFromDashboard(ModuleStoreTestCase):
     Test that emails send correctly.
     """
 
-    @patch.dict(settings.MITX_FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
+    @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
     def setUp(self):
         self.course = CourseFactory.create()
 

@@ -219,7 +219,7 @@ class ExportTestCase(CourseTestCase):
         """
         resp = self.client.get_html(self.url)
         self.assertEquals(resp.status_code, 200)
-        self.assertContains(resp, "Export a Copy of My Course Data")
+        self.assertContains(resp, "Export My Course Content")
 
     def test_export_json_unsupported(self):
         """
@@ -263,7 +263,7 @@ class ExportTestCase(CourseTestCase):
             parent_location=vertical.location,
             category='aawefawef'
         )
-        self._verify_export_failure('/edit/i4x://MITx/999/vertical/foo')
+        self._verify_export_failure(u'/unit/MITx.999.Robot_Super_Course/branch/draft/block/foo')
 
     def _verify_export_failure(self, expectedText):
         """ Export failure helper method. """

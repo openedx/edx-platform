@@ -21,7 +21,7 @@ define(["backbone", "underscore", "gettext", "js/models/assignment_grade", "js/v
                         '<li><a class="gradable-status-notgraded" href="#">Not Graded</a></li>' +
                     '</ul>');
             this.assignmentGrade = new AssignmentGrade({
-                assignmentUrl : this.$el.closest('.id-holder').data('id'),
+                locator : this.$el.closest('.id-holder').data('locator'),
                 graderType : this.$el.data('initial-status')});
             // TODO throw exception if graders is null
             this.graders = this.options['graders'];

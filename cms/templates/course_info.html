@@ -33,7 +33,6 @@ require(["domReady!", "jquery", "js/collections/course_update", "js/models/modul
     var editor = new CourseInfoEditView({
       el: $('.main-wrapper'),
       model : new CourseInfoModel({
-        courseId : '${context_course.location}',
         updates : course_updates,
         base_asset_url : '${base_asset_url}',
         handouts : course_handouts
@@ -66,7 +65,7 @@ require(["domReady!", "jquery", "js/collections/course_update", "js/models/modul
   <div class="wrapper-content wrapper">
     <section class="content">
       <div class="introduction">
-        <p clas="copy">${_('Course updates are announcements or notifications you want to share with your class. Other course authors have used them for important exam/date reminders, change in schedules, and to call out any important steps students need to be aware of.')}</p>
+        <p clas="copy">${_('Use course updates to notify students of important dates or exams, highlight particular discussions in the forums, announce schedule changes, and respond to student questions. You add or edit updates in HTML.')}</p>
       </div>
     </section>
   </div>

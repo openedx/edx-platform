@@ -2,7 +2,7 @@ import logging
 
 from django.conf import settings
 from django.views.decorators.cache import cache_control
-from mitxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
 
 from student.models import unique_id_for_user
@@ -19,7 +19,7 @@ from xmodule.modulestore import search
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 
 from django.http import HttpResponse, Http404, HttpResponseRedirect
-from mitxmako.shortcuts import render_to_string
+from edxmako.shortcuts import render_to_string
 from django.utils.translation import ugettext as _
 
 from open_ended_grading.utils import (STAFF_ERROR_MESSAGE, STUDENT_ERROR_MESSAGE,

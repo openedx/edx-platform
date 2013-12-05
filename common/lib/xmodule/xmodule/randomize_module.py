@@ -9,7 +9,7 @@ from lxml import etree
 from xblock.fields import Scope, Integer
 from xblock.fragment import Fragment
 
-log = logging.getLogger('mitx.' + __name__)
+log = logging.getLogger('edx.' + __name__)
 
 
 class RandomizeFields(object):
@@ -39,7 +39,7 @@ class RandomizeModule(RandomizeFields, XModule):
         modules.
 """
     def __init__(self, *args, **kwargs):
-        XModule.__init__(self, *args, **kwargs)
+        super(RandomizeModule, self).__init__(*args, **kwargs)
 
         # NOTE: calling self.get_children() creates a circular reference--
         # it calls get_child_descriptors() internally, but that doesn't work until

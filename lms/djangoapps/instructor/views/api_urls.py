@@ -37,4 +37,10 @@ urlpatterns = patterns('',  # nopep8
         'instructor.views.api.proxy_legacy_analytics', name="proxy_legacy_analytics"),
     url(r'^send_email$',
         'instructor.views.api.send_email', name="send_email"),
+
+    # Grade downloads...
+    url(r'^list_grade_downloads$',
+        'instructor.views.api.list_grade_downloads', name="list_grade_downloads"),
+    url(r'calculate_grades_csv$',
+        'instructor.views.api.calculate_grades_csv', name="calculate_grades_csv"),
 )

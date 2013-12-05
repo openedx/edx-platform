@@ -32,7 +32,7 @@ class CourseAuthorizationFormTest(ModuleStoreTestCase):
         """
         patch.stopall()
 
-    @patch.dict(settings.MITX_FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': True})
+    @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': True})
     def test_authorize_mongo_course(self):
         # Initially course shouldn't be authorized
         self.assertFalse(CourseAuthorization.instructor_email_enabled(self.course.id))
@@ -45,7 +45,7 @@ class CourseAuthorizationFormTest(ModuleStoreTestCase):
         # Check that this course is authorized
         self.assertTrue(CourseAuthorization.instructor_email_enabled(self.course.id))
 
-    @patch.dict(settings.MITX_FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': True})
+    @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': True})
     def test_form_typo(self):
         # Munge course id
         bad_id = self.course.id + '_typo'
@@ -63,7 +63,7 @@ class CourseAuthorizationFormTest(ModuleStoreTestCase):
         with self.assertRaisesRegexp(ValueError, "The CourseAuthorization could not be created because the data didn't validate."):
             form.save()
 
-    @patch.dict(settings.MITX_FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': True})
+    @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': True})
     def test_course_name_only(self):
         # Munge course id - common
         bad_id = self.course.id.split('/')[-1]
@@ -86,7 +86,7 @@ class CourseAuthorizationFormTest(ModuleStoreTestCase):
 class CourseAuthorizationXMLFormTest(ModuleStoreTestCase):
     """Check that XML courses cannot be authorized for email."""
 
-    @patch.dict(settings.MITX_FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': True})
+    @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': True})
     def test_xml_course_authorization(self):
         course_id = 'edX/toy/2012_Fall'
         # Assert this is an XML course

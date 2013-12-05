@@ -184,8 +184,8 @@
   % if course and course.display_name_with_default:
   <h1 class="home-title">${course.display_name_with_default}</h1>
   </section>
-  
-  % if settings.MITX_FEATURES.get('ENABLE_DISCUSSION_HOME_PANEL'):
+
+  % if settings.FEATURES.get('ENABLE_DISCUSSION_HOME_PANEL'):
   <span class="label label-settings">HOW TO USE EDX DISCUSSIONS</span>
   <table class="home-helpgrid">
   <tr class="helpgrid-row helpgrid-row-navigation">

@@ -6,11 +6,11 @@ from django.core.context_processors import csrf
 from django.shortcuts import redirect
 from django.conf import settings
 
-from mitxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response
 
 from external_auth.views import ssl_login_shortcut
 
-__all__ = ['signup', 'old_login_redirect', 'login_page', 'howitworks']
+__all__ = ['signup', 'login_page', 'howitworks']
 
 
 @ensure_csrf_cookie
@@ -20,13 +20,6 @@ def signup(request):
     """
     csrf_token = csrf(request)['csrf_token']
     return render_to_response('signup.html', {'csrf': csrf_token})
-
-
-def old_login_redirect(request):
-    '''
-    Redirect to the active login url.
-    '''
-    return redirect('login', permanent=True)
 
 
 @ssl_login_shortcut

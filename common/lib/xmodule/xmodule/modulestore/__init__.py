@@ -13,7 +13,7 @@ from abc import ABCMeta, abstractmethod
 from .exceptions import InvalidLocationError, InsufficientSpecificationError
 from xmodule.errortracker import make_error_tracker
 
-log = logging.getLogger('mitx.' + 'modulestore')
+log = logging.getLogger('edx.modulestore')
 
 SPLIT_MONGO_MODULESTORE_TYPE = 'split'
 MONGO_MODULESTORE_TYPE = 'mongo'

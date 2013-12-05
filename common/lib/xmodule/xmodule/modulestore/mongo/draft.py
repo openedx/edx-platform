@@ -81,7 +81,7 @@ class DraftModuleStore(MongoModuleStore):
         try:
             return wrap_draft(super(DraftModuleStore, self).get_item(as_draft(location), depth=depth))
         except ItemNotFoundError:
-            return wrap_draft(super(DraftModuleStore, self).get_item(as_published(location), depth=depth))
+            return wrap_draft(super(DraftModuleStore, self).get_item(location, depth=depth))
 
     def get_instance(self, course_id, location, depth=0):
         """
@@ -169,7 +169,7 @@ class DraftModuleStore(MongoModuleStore):
         try:
             draft_item = self.get_item(location)
             if not getattr(draft_item, 'is_draft', False):
-                self.convert_to_draft(as_published(location))
+                self.convert_to_draft(location)
         except ItemNotFoundError, e:
             if not allow_not_found:
                 raise e
@@ -184,17 +184,12 @@ class DraftModuleStore(MongoModuleStore):
         location: Something that can be passed to Location
         children: A list of child item identifiers
         """
-
-        # We expect the children IDs to always be the non-draft version. With view refactoring
-        # for split, we are now passing the draft version in some cases.
-        children_ids = [as_published(child).url() for child in children]
-
         draft_loc = as_draft(location)
         draft_item = self.get_item(location)
         if not getattr(draft_item, 'is_draft', False):
-            self.convert_to_draft(as_published(location))
+            self.convert_to_draft(location)
 
-        return super(DraftModuleStore, self).update_children(draft_loc, children_ids)
+        return super(DraftModuleStore, self).update_children(draft_loc, children)
 
     def update_metadata(self, location, metadata):
         """
@@ -208,7 +203,7 @@ class DraftModuleStore(MongoModuleStore):
         draft_item = self.get_item(location)
 
         if not getattr(draft_item, 'is_draft', False):
-            self.convert_to_draft(as_published(location))
+            self.convert_to_draft(location)
 
         if 'is_draft' in metadata:
             del metadata['is_draft']
@@ -267,7 +262,7 @@ class DraftModuleStore(MongoModuleStore):
         """
         Turn the published version into a draft, removing the published version
         """
-        self.convert_to_draft(as_published(location))
+        self.convert_to_draft(location)
         super(DraftModuleStore, self).delete_item(location)
 
     def _query_children_for_cache_children(self, items):

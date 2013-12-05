@@ -48,7 +48,7 @@ function ($, _, Utils, FileUploader) {
                 el: $container,
                 messenger: messenger,
                 videoListObject: videoListObject,
-                component_id: 'component_id'
+                component_locator: 'component_locator'
             });
         });
 

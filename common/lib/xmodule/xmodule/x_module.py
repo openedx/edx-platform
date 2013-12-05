@@ -8,6 +8,7 @@ from lxml import etree
 from collections import namedtuple
 from pkg_resources import resource_listdir, resource_string, resource_isdir
 from webob import Response
+from webob.multidict import MultiDict
 
 from xmodule.modulestore import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError, InsufficientSpecificationError, InvalidLocationError
@@ -370,7 +371,6 @@ class XModule(XModuleMixin, HTMLSnippet, XBlock):  # pylint: disable=abstract-me
         See the HTML module for a simple example.
     """
 
-
     has_score = descriptor_attr('has_score')
     _field_data_cache = descriptor_attr('_field_data_cache')
     _field_data = descriptor_attr('_field_data')
@@ -392,6 +392,7 @@ class XModule(XModuleMixin, HTMLSnippet, XBlock):  # pylint: disable=abstract-me
         super(XModule, self).__init__(*args, **kwargs)
         self._loaded_children = None
         self.system = self.runtime
+        self.runtime.xmodule_instance = self
 
     def __unicode__(self):
         return u'<x_module(id={0})>'.format(self.id)
@@ -401,11 +402,36 @@ class XModule(XModuleMixin, HTMLSnippet, XBlock):  # pylint: disable=abstract-me
             data is a dictionary-like object with the content of the request"""
         return u""
 
+    @XBlock.handler
     def xmodule_handler(self, request, suffix=None):
         """
         XBlock handler that wraps `handle_ajax`
         """
-        response_data = self.handle_ajax(suffix, request.POST)
+        class FileObjForWebobFiles(object):
+            """
+            Turn Webob cgi.FieldStorage uploaded files into pure file objects.
+
+            Webob represents uploaded files as cgi.FieldStorage objects, which
+            have a .file attribute.  We wrap the FieldStorage object, delegating
+            attribute access to the .file attribute.  But the files have no
+            name, so we carry the FieldStorage .filename attribute as the .name.
+
+            """
+            def __init__(self, webob_file):
+                self.file = webob_file.file
+                self.name = webob_file.filename
+
+            def __getattr__(self, name):
+                return getattr(self.file, name)
+
+        # WebOb requests have multiple entries for uploaded files.  handle_ajax
+        # expects a single entry as a list.
+        request_post = MultiDict(request.POST)
+        for key in set(request.POST.iterkeys()):
+            if hasattr(request.POST[key], "file"):
+                request_post[key] = map(FileObjForWebobFiles, request.POST.getall(key))
+
+        response_data = self.handle_ajax(suffix, request_post)
         return Response(response_data, content_type='application/json')
 
     def get_children(self):
@@ -737,7 +763,7 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
         assert self.xmodule_runtime.error_descriptor_class is not None
         if self.xmodule_runtime.xmodule_instance is None:
             try:
-                self.xmodule_runtime.xmodule_instance = self.xmodule_runtime.construct_xblock_from_class(
+                self.xmodule_runtime.construct_xblock_from_class(
                     self.module_class,
                     descriptor=self,
                     scope_ids=self.scope_ids,
@@ -745,6 +771,10 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
                 )
                 self.xmodule_runtime.xmodule_instance.save()
             except Exception:  # pylint: disable=broad-except
+                # xmodule_instance is set by the XModule.__init__. If we had an error after that,
+                # we need to clean it out so that we can set up the ErrorModule instead
+                self.xmodule_runtime.xmodule_instance = None
+
                 if isinstance(self, self.xmodule_runtime.error_descriptor_class):
                     log.exception('Error creating an ErrorModule from an ErrorDescriptor')
                     raise
@@ -937,7 +967,7 @@ class ModuleSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abs
             anonymous_student_id='', course_id=None,
             open_ended_grading_interface=None, s3_interface=None,
             cache=None, can_execute_unsafe_code=None, replace_course_urls=None,
-            replace_jump_to_id_urls=None, error_descriptor_class=None, **kwargs):
+            replace_jump_to_id_urls=None, error_descriptor_class=None, get_real_user=None, **kwargs):
         """
         Create a closure around the system environment.
 
@@ -1022,6 +1052,8 @@ class ModuleSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abs
         self.error_descriptor_class = error_descriptor_class
         self.xmodule_instance = None
 
+        self.get_real_user = get_real_user
+
     def get(self, attr):
         """	provide uniform access to attributes (like etree)."""
         return self.__dict__.get(attr)
@@ -1041,6 +1073,7 @@ class ModuleSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abs
         """
         The url prefix to be used by XModules to call into handle_ajax
         """
+        assert self.xmodule_instance is not None
         return self.handler_url(self.xmodule_instance, 'xmodule_handler', '', '').rstrip('/?')
 
 
