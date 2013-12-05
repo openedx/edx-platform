@@ -257,28 +257,69 @@ define(["domReady", "jquery", "jquery.ui", "underscore", "gettext", "js/views/fe
                                 var siblingHeight = $sibling.height();
                                 var siblingYEnd = siblingY + siblingHeight;
 
+                                var eleYEnd = eleY + ele.height();
+
                                 // Facilitate dropping into the beginning or end of a list
                                 // (coming from opposite direction) via a "fudge factor". Math.min is for Jasmine test.
                                 var fudge = Math.min(Math.ceil(siblingHeight / 2), 20);
-                                // Dragging up into end of list.
-                                if (j == siblings.length - 1 && yChange < 0 && Math.abs(eleY - siblingYEnd) <= fudge) {
-                                    return {
-                                        ele: $sibling,
-                                        attachMethod: 'after'
-                                    };
+
+                                // Dragging to top or bottom of a list with only one element is tricky
+                                // because the element being dragged may be the same size as the sibling.
+                                if (siblings.length == 1) {
+                                    // Element being dragged is within the drop target. Use the direction
+                                    // of the drag (yChange) to determine before or after.
+                                    if (eleY + fudge >= siblingY && eleYEnd - fudge <= siblingYEnd) {
+                                        return {
+                                            ele: $sibling,
+                                            attachMethod: yChange > 0 ? 'after' : 'before'
+                                        };
+                                    }
+                                    // Element being dragged is before the drop target.
+                                    else if (Math.abs(eleYEnd - siblingY) <= fudge) {
+                                        return {
+                                            ele: $sibling,
+                                            attachMethod: 'before'
+                                        };
+                                    }
+                                    // Element being dragged is after the drop target.
+                                    else if (Math.abs(eleY - siblingYEnd) <= fudge) {
+                                        return {
+                                            ele: $sibling,
+                                            attachMethod: 'after'
+                                        };
+                                    }
                                 }
-                                // Dragging down into beginning of list.
-                                else if (j == 0 && yChange > 0 && Math.abs(eleY - siblingY) <= fudge) {
-                                    return {
-                                        ele: $sibling,
-                                        attachMethod: 'before'
-                                    };
-                                }
-                                else if (eleY >= siblingY && eleY <= siblingYEnd) {
-                                    return {
-                                        ele: $sibling,
-                                        attachMethod: eleY - siblingY <= siblingHeight / 2 ? 'before' : 'after'
-                                    };
+                                else {
+                                    // Dragging up into end of list.
+                                    if (j == siblings.length - 1 && yChange < 0 && Math.abs(eleY - siblingYEnd) <= fudge) {
+                                        return {
+                                                ele: $sibling,
+                                                attachMethod: 'after'
+                                            };
+                                    }
+                                    // Dragging up or down into beginning of list.
+                                    else if (j == 0 && Math.abs(eleY - siblingY) <= fudge) {
+                                        return {
+                                            ele: $sibling,
+                                            attachMethod: 'before'
+                                        };
+                                    }
+                                    // Dragging down into end of list. Special handling required because
+                                    // the element being dragged may be taller then the element being dragged over
+                                    // (if eleY can never be >= siblingY, general case at the end does not work).
+                                    else if (j == siblings.length - 1 && yChange > 0 &&
+                                        Math.abs(eleYEnd - siblingYEnd) <= fudge) {
+                                        return {
+                                            ele: $sibling,
+                                            attachMethod: 'after'
+                                        };
+                                    }
+                                    else if (eleY >= siblingY && eleY <= siblingYEnd) {
+                                        return {
+                                            ele: $sibling,
+                                            attachMethod: eleY - siblingY <= siblingHeight / 2 ? 'before' : 'after'
+                                        };
+                                    }
                                 }
                             }
                         }

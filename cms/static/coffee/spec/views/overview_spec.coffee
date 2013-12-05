@@ -43,23 +43,36 @@ define ["js/views/overview", "js/views/feedback_notification", "sinon", "js/base
                               """
     
             appendSetFixtures """
-                              <ol>
-                                  <li class="subsection-list branch" id="subsection-1" data-locator="subsection-1-id">
-                                      <ol class="sortable-unit-list" id="subsection-list-1">
-                                          <li class="unit" id="unit-1" data-parent="subsection-1-id" data-locator="first-unit-id"></li>
-                                          <li class="unit" id="unit-2" data-parent="subsection-1-id" data-locator="second-unit-id"></li>
-                                          <li class="unit" id="unit-3" data-parent="subsection-1-id" data-locator="third-unit-id"></li>
-                                      </ol>
-                                  </li>
-                                  <li class="subsection-list branch" id="subsection-2" data-locator="subsection-2-id">
-                                      <ol class="sortable-unit-list" id="subsection-list-2">
-                                        <li class="unit" id="unit-4" data-parent="subsection-2" data-locator="fourth-unit-id"></li>
-                                      </ol>
-                                  </li>
-                                  <li class="subsection-list branch" id="subsection-3" data-locator="subsection-3-id">
-                                      <ol class="sortable-unit-list" id="subsection-list-3">
-                                  </li>
-                              </ol>
+                              <section>
+                                  <ol class="section-list">
+                                      <li class="subsection-list branch" id="subsection-0" data-locator="subsection-0-id" style="margin:5px">
+                                          <ol class="sortable-unit-list" id="subsection-list-0">
+                                            <li class="unit" id="unit-0" data-parent="subsection-0-id" data-locator="zero-unit-id"></li>
+                                          </ol>
+                                      </li>
+                                      <li class="subsection-list branch" id="subsection-1" data-locator="subsection-1-id" style="margin:5px">
+                                          <ol class="sortable-unit-list" id="subsection-list-1">
+                                              <li class="unit" id="unit-1" data-parent="subsection-1-id" data-locator="first-unit-id"></li>
+                                              <li class="unit" id="unit-2" data-parent="subsection-1-id" data-locator="second-unit-id"></li>
+                                              <li class="unit" id="unit-3" data-parent="subsection-1-id" data-locator="third-unit-id"></li>
+                                          </ol>
+                                      </li>
+                                      <li class="subsection-list branch" id="subsection-2" data-locator="subsection-2-id" style="margin:5px">
+                                          <ol class="sortable-unit-list" id="subsection-list-2">
+                                              <li class="unit" id="unit-4" data-parent="subsection-2-id" data-locator="fourth-unit-id"></li>
+                                          </ol>
+                                      </li>
+                                      <li class="subsection-list branch" id="subsection-3" data-locator="subsection-3-id style="margin:5px"">
+                                          <ol class="sortable-unit-list" id="subsection-list-3">
+                                          </ol>
+                                      </li>
+                                      <li class="subsection-list branch" id="subsection-4" data-locator="subsection-4-id" style="margin:5px">
+                                          <ol class="sortable-unit-list" id="subsection-list-4">
+                                              <li class="unit" id="unit-5" data-parent="subsection-4-id" data-locator="fifth-unit-id"></li>
+                                          </ol>
+                                      </li>
+                                  </ol>
+                              </section>
                               """
     
             spyOn(Overview, 'saveSetSectionScheduleDate').andCallThrough()
@@ -78,8 +91,15 @@ define ["js/views/overview", "js/views/feedback_notification", "sinon", "js/base
             Overview.overviewDragger.makeDraggable(
                 '.unit',
                 '.unit-drag-handle',
-                'ol.sortable-unit-list',
+                '.sortable-unit-list',
                 'li.branch, article.subsection-body'
+            )
+
+            Overview.overviewDragger.makeDraggable(
+                '.subsection-list',
+                '.subsection-drag-handle',
+                '.section-list',
+                'section'
             )
     
         afterEach ->
@@ -113,7 +133,7 @@ define ["js/views/overview", "js/views/feedback_notification", "sinon", "js/base
 #            $('a.delete-section-button').click()
 #            $('a.action-primary').click()
 #            expect(@notificationSpy).toHaveBeenCalled()
-    
+
         describe "findDestination", ->
             it "correctly finds the drop target of a drag", ->
                 $ele = $('#unit-1')
@@ -123,26 +143,54 @@ define ["js/views/overview", "js/views/feedback_notification", "sinon", "js/base
                 destination = Overview.overviewDragger.findDestination($ele, 1)
                 expect(destination.ele).toBe($('#unit-2'))
                 expect(destination.attachMethod).toBe('before')
-    
-            it "can drag and drop across section boundaries, with special handling for first element", ->
+
+            it "can drag and drop across section boundaries, with special handling for single sibling", ->
                 $ele = $('#unit-1')
+                $unit4 = $('#unit-4')
                 $ele.offset(
-                    top: $('#unit-4').offset().top + 8
+                    top: $unit4.offset().top + 8
                     left: $ele.offset().left
                 )
+                # Dragging down, we will insert after.
                 destination = Overview.overviewDragger.findDestination($ele, 1)
-                expect(destination.ele).toBe($('#unit-4'))
-                # Dragging down into first element, we have a fudge factor makes it easier to drag at beginning.
-                expect(destination.attachMethod).toBe('before')
-                # Now past the "fudge factor".
-                $ele.offset(
-                    top: $('#unit-4').offset().top + 12
-                    left: $ele.offset().left
-                )
-                destination = Overview.overviewDragger.findDestination($ele, 1)
-                expect(destination.ele).toBe($('#unit-4'))
+                expect(destination.ele).toBe($unit4)
                 expect(destination.attachMethod).toBe('after')
-    
+
+                # Dragging up, we will insert before.
+                destination = Overview.overviewDragger.findDestination($ele, -1)
+                expect(destination.ele).toBe($unit4)
+                expect(destination.attachMethod).toBe('before')
+
+                # If past the end the drop target, will attach after.
+                $ele.offset(
+                    top: $unit4.offset().top + $unit4.height() + 1
+                    left: $ele.offset().left
+                )
+                destination = Overview.overviewDragger.findDestination($ele, 0)
+                expect(destination.ele).toBe($unit4)
+                expect(destination.attachMethod).toBe('after')
+
+                $unit0 = $('#unit-0')
+                # If before the start the drop target, will attach before.
+                $ele.offset(
+                    top: $unit0.offset().top - 16
+                    left: $ele.offset().left
+                )
+                destination = Overview.overviewDragger.findDestination($ele, 0)
+                expect(destination.ele).toBe($unit0)
+                expect(destination.attachMethod).toBe('before')
+
+            it """can drop before the first element, even if element being dragged is
+               slightly before the first element""", ->
+                $ele = $('#subsection-2')
+                $ele.offset(
+                    top: $('#subsection-0').offset().top - 5
+                    left: $ele.offset().left
+                )
+                destination = Overview.overviewDragger.findDestination($ele, -1)
+                expect(destination.ele).toBe($('#subsection-0'))
+                expect(destination.attachMethod).toBe('before')
+
             it "can drag and drop across section boundaries, with special handling for last element", ->
                 $ele = $('#unit-4')
                 $ele.offset(
@@ -161,7 +209,21 @@ define ["js/views/overview", "js/views/feedback_notification", "sinon", "js/base
                 destination = Overview.overviewDragger.findDestination($ele, -1)
                 expect(destination.ele).toBe($('#unit-3'))
                 expect(destination.attachMethod).toBe('before')
-    
+
+            it """can drop past the last element, even if element being dragged is
+               slightly before/taller then the last element""", ->
+                $ele = $('#subsection-2')
+                $ele.offset(
+                    # Make the top 1 before the top of the last element in the list.
+                    # This mimics the problem when the element being dropped is taller then then
+                    # the last element in the list.
+                    top: $('#subsection-4').offset().top - 1
+                    left: $ele.offset().left
+                )
+                destination = Overview.overviewDragger.findDestination($ele, 1)
+                expect(destination.ele).toBe($('#subsection-4'))
+                expect(destination.attachMethod).toBe('after')
+
             it "can drag into an empty list", ->
                 $ele = $('#unit-1')
                 $ele.offset(
@@ -171,7 +233,7 @@ define ["js/views/overview", "js/views/feedback_notification", "sinon", "js/base
                 destination = Overview.overviewDragger.findDestination($ele, 1)
                 expect(destination.ele).toBe($('#subsection-list-3'))
                 expect(destination.attachMethod).toBe('prepend')
-    
+
             it "reports a null destination on a failed drag", ->
                 $ele = $('#unit-1')
                 $ele.offset(
@@ -182,7 +244,7 @@ define ["js/views/overview", "js/views/feedback_notification", "sinon", "js/base
                     ele: null
                     attachMethod: ""
                 )
-    
+
             it "can drag into a collapsed list", ->
                 $('#subsection-2').addClass('collapsed')
                 $ele = $('#unit-2')
@@ -194,7 +256,7 @@ define ["js/views/overview", "js/views/feedback_notification", "sinon", "js/base
                 expect(destination.ele).toBe($('#subsection-list-2'))
                 expect(destination.parentList).toBe($('#subsection-2'))
                 expect(destination.attachMethod).toBe('prepend')
-    
+
         describe "onDragStart", ->
             it "sets the dragState to its default values", ->
                 expect(Overview.overviewDragger.dragState).toEqual({})
@@ -211,7 +273,7 @@ define ["js/views/overview", "js/views/feedback_notification", "sinon", "js/base
                     lastY: 0,
                     dragDirection: 0
                 )
-    
+
             it "collapses expanded elements", ->
                 expect($('#subsection-1')).not.toHaveClass('collapsed')
                 Overview.overviewDragger.onDragStart(
@@ -221,7 +283,7 @@ define ["js/views/overview", "js/views/feedback_notification", "sinon", "js/base
                 )
                 expect($('#subsection-1')).toHaveClass('collapsed')
                 expect($('#subsection-1')).toHaveClass('expand-on-drop')
-    
+
         describe "onDragMove", ->
             beforeEach ->
                 @scrollSpy = spyOn(window, 'scrollBy').andCallThrough()
@@ -239,7 +301,7 @@ define ["js/views/overview", "js/views/feedback_notification", "sinon", "js/base
                 )
                 expect($('#unit-2')).toHaveClass('drop-target drop-target-before')
                 expect($ele).toHaveClass('valid-drop')
-    
+
             it "does not add CSS class to the drop destination if out of bounds", ->
                 $ele = $('#unit-1')
                 dragY = $ele.offset().top + 10
@@ -252,19 +314,19 @@ define ["js/views/overview", "js/views/feedback_notification", "sinon", "js/base
                 )
                 expect($('#unit-2')).not.toHaveClass('drop-target drop-target-before')
                 expect($ele).not.toHaveClass('valid-drop')
-    
+
             it "scrolls up if necessary", ->
                 Overview.overviewDragger.onDragMove(
                     {element: $('#unit-1')}, '', {clientY: 2}
                 )
                 expect(@scrollSpy).toHaveBeenCalledWith(0, -10)
-    
+
             it "scrolls down if necessary", ->
                 Overview.overviewDragger.onDragMove(
                     {element: $('#unit-1')}, '', {clientY: (window.innerHeight - 5)}
                 )
                 expect(@scrollSpy).toHaveBeenCalledWith(0, 10)
-    
+
         describe "onDragEnd", ->
             beforeEach ->
                 @reorderSpy = spyOn(Overview.overviewDragger, 'handleReorder')
