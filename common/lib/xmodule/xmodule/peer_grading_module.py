@@ -96,13 +96,9 @@ class PeerGradingModule(PeerGradingFields, XModule):
     _VERSION = 1
 
     js = {
-        'js': [
-            resource_string(__name__, 'js/src/peergrading/ice.min.js'),
-        ],
         'coffee': [
             resource_string(__name__, 'js/src/peergrading/peer_grading.coffee'),
             resource_string(__name__, 'js/src/peergrading/peer_grading_problem.coffee'),
-            resource_string(__name__, 'js/src/peergrading/track_changes.coffee'),
             resource_string(__name__, 'js/src/collapsible.coffee'),
             resource_string(__name__, 'js/src/javascript_loader.coffee'),
         ]
@@ -624,7 +620,6 @@ class PeerGradingModule(PeerGradingFields, XModule):
             'ajax_url': ajax_url,
             # Checked above
             'staff_access': False,
-            'track_changes': getattr(module, 'track_changes', False),
             'use_single_location': self.use_for_single_location_local,
         })
 

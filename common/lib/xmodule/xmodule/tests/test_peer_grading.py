@@ -382,38 +382,3 @@ class PeerGradingModuleLinkedTest(unittest.TestCase, DummyModulestore):
 
         data = peer_grading.handle_ajax('get_next_submission', {'location': self.coe_location})
         self.assertEqual(json.loads(data)['submission_id'], 1)
-
-
-class PeerGradingModuleTrackChangesTest(unittest.TestCase, DummyModulestore):
-    """
-    Test peer grading with the track changes modification
-    """
-    class MockedTrackChangesProblem(object):
-        track_changes = True
-
-    mock_track_changes_problem = Mock(side_effect=[MockedTrackChangesProblem()])
-    pgm_location = Location(["i4x", "edX", "open_ended", "peergrading", "PeerGradingSample"])
-
-    def get_module_system(self, descriptor):
-        test_system = get_test_system()
-        test_system.open_ended_grading_interface = None
-        return test_system
-
-    def setUp(self):
-        """
-        Create a peer grading module from a test system
-        @return:
-        """
-        self.setup_modulestore(COURSE)
-        self.peer_grading = self.get_module_from_location(self.pgm_location, COURSE)
-
-    def test_tracking_peer_eval_problem(self):
-        """
-        Tests rendering of peer eval problem with track changes set.  With the test_system render_template
-        this test becomes a bit tautological, but oh well.
-        @return:
-        """
-        self.peer_grading._find_corresponding_module_for_location = self.mock_track_changes_problem
-        response = self.peer_grading.peer_grading_problem({'location': 'i4x://mock_org/mock_course/mock_cat/mock_name'})
-        self.assertTrue(response['success'])
-        self.assertIn("'track_changes': True", response['html'])
