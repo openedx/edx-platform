@@ -363,10 +363,14 @@ class LTIModule(LTIFields, XModule):
 
             # Parameters required for grading:
             u'resource_link_id': self.get_resource_link_id(),
-            u'lis_outcome_service_url': self.get_outcome_service_url(),
             u'lis_result_sourcedid': self.get_lis_result_sourcedid(),
 
         }
+
+        if self.has_score:
+            body.update({
+                u'lis_outcome_service_url': self.get_outcome_service_url()
+            })
 
         # Appending custom parameter for signing.
         body.update(custom_parameters)
