@@ -32,8 +32,12 @@ def main(argv):
     if words[0].endswith(':'):
         del words[0]
 
-    test_method = words[0]
-    test_path = words[1].split('.')
+    if len(words) == 1:
+        test_path, test_method = words[0].rsplit('.', 1)
+        test_path = test_path.split('.')
+    else:
+        test_method = words[0]
+        test_path = words[1].split('.')
     if test_path[0] == 'mitx':
         del test_path[0]
     test_class = test_path[-1]

@@ -46,7 +46,7 @@ function($, Backbone, _, AbstractEditor, Utils, MessageManager, MetadataView) {
                 _.debounce(_.bind(this.inputHandler, this), this.inputDelay)
             );
 
-            this.component_id = this.$el.closest('.component').data('id');
+            this.component_locator = this.$el.closest('.component').data('locator');
         },
 
         render: function () {
@@ -55,7 +55,7 @@ function($, Backbone, _, AbstractEditor, Utils, MessageManager, MetadataView) {
                 .apply(this, arguments);
 
             var self = this,
-                component_id =  this.$el.closest('.component').data('id'),
+                component_locator =  this.$el.closest('.component').data('locator'),
                 videoList = this.getVideoObjectsList(),
 
                 showServerError = function (response) {
@@ -82,7 +82,7 @@ function($, Backbone, _, AbstractEditor, Utils, MessageManager, MetadataView) {
             }
 
             // Check current state of Timed Transcripts.
-            Utils.command('check', component_id, videoList)
+            Utils.command('check', component_locator, videoList)
                 .done(function (resp) {
                     var params = resp,
                         len = videoList.length,

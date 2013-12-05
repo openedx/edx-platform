@@ -17,7 +17,7 @@ def user_has_cart_context_processor(request):
     """
     return {'display_shopping_cart': (
         request.user.is_authenticated() and                                # user is logged in and
-        settings.MITX_FEATURES.get('ENABLE_PAID_COURSE_REGISTRATION') and  # settings enable paid course reg and
-        settings.MITX_FEATURES.get('ENABLE_SHOPPING_CART') and             # settings enable shopping cart and
+        settings.FEATURES.get('ENABLE_PAID_COURSE_REGISTRATION') and  # settings enable paid course reg and
+        settings.FEATURES.get('ENABLE_SHOPPING_CART') and             # settings enable shopping cart and
         shoppingcart.models.Order.user_cart_has_items(request.user)        # user's cart has items
     )}

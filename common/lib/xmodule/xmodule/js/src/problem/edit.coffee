@@ -228,24 +228,35 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       });
 
       // replace string and numerical
-      xml = xml.replace(/^\=\s*(.*?$)/gm, function(match, p) {
-        var string;
-        var floatValue = parseFloat(p);
+      xml = xml.replace(/(^\=\s*(.*?$)(\n*or\=\s*(.*?$))*)+/gm, function(match, p) {
+        var string,
+            answersList = p.replace(/^(or)?=\s*/gm, '').split('\n'),
+            floatValue = parseFloat(answersList[0]);
+
         if(!isNaN(floatValue)) {
-          var params = /(.*?)\+\-\s*(.*?$)/.exec(p);
+          // Tries to extract parameters from string like 'expr +- tolerance'
+          var params = /(.*?)\+\-\s*(.*?$)/.exec(answersList[0]),
+              answer = answersList[0].replace(/\s+/g, '');
           if(params) {
-            string = '<numericalresponse answer="' + floatValue + '">\n';
+            answer = params[1].replace(/\s+/g, '');
+            string = '<numericalresponse answer="' + answer + '">\n';
             string += '  <responseparam type="tolerance" default="' + params[2] + '" />\n';
           } else {
-            string = '<numericalresponse answer="' + floatValue + '">\n';
+            string = '<numericalresponse answer="' + answer + '">\n';
           }
           string += '  <formulaequationinput />\n';
           string += '</numericalresponse>\n\n';
         } else {
-          string = '<stringresponse answer="' + p + '" type="ci">\n  <textline size="20"/>\n</stringresponse>\n\n';
+            var answers = [];
+
+            for(var i = 0; i < answersList.length; i++) {
+                answers.push(answersList[i])
+            }
+
+            string = '<stringresponse answer="' + answers.join('_or_') + '" type="ci">\n  <textline size="20"/>\n</stringresponse>\n\n';
         }
         return string;
-      });
+    });
 
       // replace selects
       xml = xml.replace(/\[\[(.+?)\]\]/g, function(match, p) {
@@ -262,13 +273,13 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
         selectString += '</optionresponse>\n\n';
         return selectString;
       });
-      
+
       // replace explanations
       xml = xml.replace(/\[explanation\]\n?([^\]]*)\[\/?explanation\]/gmi, function(match, p1) {
           var selectString = '<solution>\n<div class="detailed-solution">\nExplanation\n\n' + p1 + '\n</div>\n</solution>';
           return selectString;
       });
-      
+
       // replace code blocks
       xml = xml.replace(/\[code\]\n?([^\]]*)\[\/?code\]/gmi, function(match, p1) {
           var selectString = '<pre><code>\n' + p1 + '</code></pre>';
@@ -293,7 +304,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
       // rid white space
       xml = xml.replace(/\n\n\n/g, '\n');
-      
+
       // surround w/ problem tag
       xml = '<problem>\n' + xml + '\n</problem>';
 

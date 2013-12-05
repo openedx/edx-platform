@@ -33,7 +33,6 @@ require(["domReady!", "jquery", "js/collections/course_update", "js/models/modul
     var editor = new CourseInfoEditView({
       el: $('.main-wrapper'),
       model : new CourseInfoModel({
-        courseId : '${context_course.location}',
         updates : course_updates,
         base_asset_url : '${base_asset_url}',
         handouts : course_handouts

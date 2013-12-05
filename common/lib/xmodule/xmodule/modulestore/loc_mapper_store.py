@@ -204,21 +204,16 @@ class LocMapperStore(object):
                                 self._decode_from_mongo(old_name),
                                 None)
                     elif usage_id == locator.usage_id:
-                        # figure out revision
-                        # enforce the draft only if category in [..] logic
-                        if category in draft.DIRECT_ONLY_CATEGORIES:
-                            revision = None
-                        elif locator.branch == candidate['draft_branch']:
-                            revision = draft.DRAFT
-                        else:
-                            revision = None
+                        # Always return revision=None because the
+                        # old draft module store wraps locations as draft before
+                        # trying to access things.
                         return Location(
                             'i4x',
                             candidate['_id']['org'],
                             candidate['_id']['course'],
                             category,
                             self._decode_from_mongo(old_name),
-                            revision)
+                            None)
         return None
 
     def add_block_location_translator(self, location, old_course_id=None, usage_id=None):

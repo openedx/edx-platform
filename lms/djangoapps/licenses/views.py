@@ -5,7 +5,7 @@ from urlparse import urlparse
 from collections import namedtuple, defaultdict
 
 
-from mitxmako.shortcuts import render_to_string
+from edxmako.shortcuts import render_to_string
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -16,7 +16,7 @@ from licenses.models import CourseSoftware
 from licenses.models import get_courses_licenses, get_or_create_license, get_license
 
 
-log = logging.getLogger("mitx.licenses")
+log = logging.getLogger("edx.licenses")
 
 
 License = namedtuple('License', 'software serial')

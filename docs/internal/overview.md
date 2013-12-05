@@ -120,7 +120,7 @@ environments, defined in `cms/envs`.
 
 - javascript -- we use coffeescript, which compiles to js, and is much nicer to work with.  Look for `*.coffee` files.  We use _jasmine_ for testing js.
 
-- _mako_  -- we use this for templates, and have wrapper called mitxmako that makes mako look like the django templating calls.
+- _mako_  -- we use this for templates, and have wrapper called edxmako that makes mako look like the django templating calls.
 
 We use a fork of django-pipeline to make sure that the js and css always reflect the latest `*.coffee` and `*.sass` files (We're hoping to get our changes merged in the official version soon).  This works differently in development and production.  Test uses the production settings.
 

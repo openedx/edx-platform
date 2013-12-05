@@ -10,6 +10,10 @@
     &.is-shown {
       bottom: 0;
     }
+
+    &.is-hiding {
+      bottom: -($ui-notification-height);
+    }
   }
 }
 

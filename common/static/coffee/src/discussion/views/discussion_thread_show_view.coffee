@@ -4,10 +4,12 @@ if Backbone?
     events:
       "click .discussion-vote": "toggleVote"
       "click .discussion-flag-abuse": "toggleFlagAbuse"
-      "keypress .discussion-flag-abuse": "toggleFlagAbuseKeypress"
+      "keypress .discussion-flag-abuse":
+        (event) -> DiscussionUtil.activateOnEnter(event, toggleFlagAbuse)
       "click .admin-pin": "togglePin"
       "click .action-follow": "toggleFollowing"
-      "keypress .action-follow": "toggleFollowingKeypress"
+      "keypress .action-follow":
+        (event) -> DiscussionUtil.activateOnEnter(event, toggleFollowing)
       "click .action-edit": "edit"
       "click .action-delete": "_delete"
       "click .action-openclose": "toggleClosed"

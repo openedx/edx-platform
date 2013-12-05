@@ -90,6 +90,35 @@ def check_handout(_step, handout):
     assert handout in world.css_html(handout_css)
 
 
+@step(u'I see the handout error text')
+def check_handout_error(_step):
+    handout_error_css = 'div#handout_error'
+    assert world.css_has_class(handout_error_css, 'is-shown')
+
+
+@step(u'I see handout save button disabled')
+def check_handout_error(_step):
+    handout_save_button = 'form.edit-handouts-form a.save-button'
+    assert world.css_has_class(handout_save_button, 'is-disabled')
+
+
+@step(u'I edit the handout to "([^"]*)"$')
+def edit_handouts(_step, text):
+    type_in_codemirror(0, text)
+
+
+@step(u'I see handout save button re-enabled')
+def check_handout_error(_step):
+    handout_save_button = 'form.edit-handouts-form a.save-button'
+    assert not world.css_has_class(handout_save_button, 'is-disabled')
+
+
+@step(u'I save handout edit')
+def check_handout_error(_step):
+    save_css = 'a.save-button'
+    world.css_click(save_css)
+
+
 def change_text(text):
     type_in_codemirror(0, text)
     save_css = 'a.save-button'

@@ -13,7 +13,7 @@ from xmodule.open_ended_grading_classes.grading_service_module import GradingSer
 
 from courseware.access import has_access
 from lms.lib.xblock.runtime import LmsModuleSystem
-from mitxmako.shortcuts import render_to_string
+from edxmako.shortcuts import render_to_string
 from student.models import unique_id_for_user
 from util.json_request import expect_json
 

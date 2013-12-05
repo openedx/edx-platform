@@ -10,7 +10,7 @@ An "xserver" is a web-based server that is part of the MITx eco system.  There a
 
 The remote gradebook xserver should be specified in the lms.envs configuration using
 
-    MITX_FEATURES[REMOTE_GRADEBOOK_URL]
+    FEATURES[REMOTE_GRADEBOOK_URL]
 
 Each course, in addition, should define the name of the gradebook being used.  A class "section" may also be specified.  This goes in the policy.json file, eg:
 

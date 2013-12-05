@@ -12,7 +12,7 @@ from django.utils import simplejson
 from django_comment_common.models import Role, FORUM_ROLE_STUDENT
 from django_comment_client.permissions import check_permissions_by_view
 
-import mitxmako
+import edxmako
 import pystache_custom as pystache
 
 from xmodule.modulestore.django import modulestore
@@ -310,7 +310,7 @@ def url_for_tags(course_id, tags):
 
 
 def render_mustache(template_name, dictionary, *args, **kwargs):
-    template = mitxmako.lookup['main'].get_template(template_name).source
+    template = edxmako.lookup['main'].get_template(template_name).source
     return pystache.render(template, dictionary)
 
 

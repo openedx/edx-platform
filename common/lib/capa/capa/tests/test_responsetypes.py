@@ -29,6 +29,9 @@ class ResponseTest(unittest.TestCase):
 
     xml_factory_class = None
 
+    # If something is wrong, show it to us.
+    maxDiff = None
+
     def setUp(self):
         if self.xml_factory_class:
             self.xml_factory = self.xml_factory_class()
@@ -500,6 +503,7 @@ class StringResponseTest(ResponseTest):
     xml_factory_class = StringResponseXMLFactory
 
     def test_case_sensitive(self):
+        # Test single answer
         problem = self.build_problem(answer="Second", case_sensitive=True)
 
         # Exact string should be correct
@@ -509,7 +513,20 @@ class StringResponseTest(ResponseTest):
         self.assert_grade(problem, "Other String", "incorrect")
         self.assert_grade(problem, "second", "incorrect")
 
+        # Test multiple answers
+        answers = ["Second", "Third", "Fourth"]
+        problem = self.build_problem(answer="_or_".join(answers), case_sensitive=True)
+
+        for answer in answers:
+            # Exact string should be correct
+            self.assert_grade(problem, answer, "correct")
+
+        # Other strings and the lowercase version of the string are incorrect
+        self.assert_grade(problem, "Other String", "incorrect")
+        self.assert_grade(problem, "second", "incorrect")
+
     def test_case_insensitive(self):
+        # Test single answer
         problem = self.build_problem(answer="Second", case_sensitive=False)
 
         # Both versions of the string should be allowed, regardless
@@ -520,9 +537,28 @@ class StringResponseTest(ResponseTest):
         # Other strings are not allowed
         self.assert_grade(problem, "Other String", "incorrect")
 
+        # Test multiple answers
+        answers = ["Second", "Third", "Fourth"]
+        problem = self.build_problem(answer="_or_".join(answers), case_sensitive=False)
+
+        for answer in answers:
+            # Exact string should be correct
+            self.assert_grade(problem, answer, "correct")
+            self.assert_grade(problem, answer.lower(), "correct")
+
+        # Other strings and the lowercase version of the string are incorrect
+        self.assert_grade(problem, "Other String", "incorrect")
+
     def test_hints(self):
+        multiple_answers = [
+            "Martin Luther King Junior",
+            "Doctor Martin Luther King Junior",
+            "Dr. Martin Luther King Jr.",
+            "Martin Luther King"
+        ]
         hints = [("wisconsin", "wisc", "The state capital of Wisconsin is Madison"),
-                 ("minnesota", "minn", "The state capital of Minnesota is St. Paul")]
+                 ("minnesota", "minn", "The state capital of Minnesota is St. Paul"),
+                 ("_or_".join(multiple_answers), "mlk", "He lead the civil right movement in the United States of America.")]
 
         problem = self.build_problem(answer="Michigan",
                                      case_sensitive=False,
@@ -549,6 +585,14 @@ class StringResponseTest(ResponseTest):
         input_dict = {'1_2_1': 'California'}
         correct_map = problem.grade_answers(input_dict)
         self.assertEquals(correct_map.get_hint('1_2_1'), "")
+
+        # We should get the same hint for each answer
+        for answer in multiple_answers:
+            input_dict = {'1_2_1': answer}
+            correct_map = problem.grade_answers(input_dict)
+            self.assertEquals(correct_map.get_hint('1_2_1'),
+                              "He lead the civil right movement in the United States of America.")
+
 
     def test_computed_hints(self):
         problem = self.build_problem(

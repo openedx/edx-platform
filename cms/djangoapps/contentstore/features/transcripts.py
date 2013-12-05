@@ -9,7 +9,7 @@ from django.conf import settings
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
-
+from splinter.request_handler.request_handler import RequestHandler
 
 TEST_ROOT = settings.COMMON_TEST_DATA_ROOT
 
@@ -49,6 +49,13 @@ TRANSCRIPTS_BUTTONS = {
 }
 
 
+def _clear_field(index):
+    world.css_fill(SELECTORS['url_inputs'], '', index)
+    # In some reason chromeDriver doesn't trigger 'input' event after filling
+    # field by an empty value. That's why we trigger it manually via jQuery.
+    world.trigger_event(SELECTORS['url_inputs'], event='input', index=index)
+
+
 @step('I clear fields$')
 def clear_fields(_step):
     js_str = '''
@@ -60,16 +67,18 @@ def clear_fields(_step):
     for index in range(1, 4):
         js = js_str.format(selector=SELECTORS['url_inputs'], index=index - 1)
         world.browser.execute_script(js)
-        _step.given('I clear field number {0}'.format(index))
+        _clear_field(index)
+
+    world.wait(DELAY)
+    world.wait_for_ajax_complete()
 
 
 @step('I clear field number (.+)$')
 def clear_field(_step, index):
     index = int(index) - 1
-    world.css_fill(SELECTORS['url_inputs'], '', index)
-    # In some reason chromeDriver doesn't trigger 'input' event after filling
-    # field by an empty value. That's why we trigger it manually via jQuery.
-    world.trigger_event(SELECTORS['url_inputs'], event='input', index=index)
+    _clear_field(index)
+    world.wait(DELAY)
+    world.wait_for_ajax_complete()
 
 
 @step('I expect (.+) inputs are disabled$')
@@ -91,39 +100,32 @@ def inputs_are_enabled(_step):
 
 @step('I do not see error message$')
 def i_do_not_see_error_message(_step):
-    world.wait(DELAY)
-
     assert not world.css_visible(SELECTORS['error_bar'])
 
 
 @step('I see error message "([^"]*)"$')
 def i_see_error_message(_step, error):
-    world.wait(DELAY)
-
     assert world.css_has_text(SELECTORS['error_bar'], ERROR_MESSAGES[error.strip()])
 
 
 @step('I do not see status message$')
 def i_do_not_see_status_message(_step):
-    world.wait(DELAY)
-    world.wait_for_ajax_complete()
-
     assert not world.css_visible(SELECTORS['status_bar'])
 
 
 @step('I see status message "([^"]*)"$')
 def i_see_status_message(_step, status):
-    world.wait(DELAY)
-    world.wait_for_ajax_complete()
-
+    assert not world.css_visible(SELECTORS['error_bar'])
     assert world.css_has_text(SELECTORS['status_bar'], STATUSES[status.strip()])
+
+    DOWNLOAD_BUTTON = TRANSCRIPTS_BUTTONS["download_to_edit"][0]
+    if world.is_css_present(DOWNLOAD_BUTTON, wait_time=1) \
+    and not world.css_find(DOWNLOAD_BUTTON)[0].has_class('is-disabled'):
+        assert _transcripts_are_downloaded()
 
 
 @step('I (.*)see button "([^"]*)"$')
 def i_see_button(_step, not_see, button_type):
-    world.wait(DELAY)
-    world.wait_for_ajax_complete()
-
     button = button_type.strip()
 
     if not_see.strip():
@@ -134,9 +136,6 @@ def i_see_button(_step, not_see, button_type):
 
 @step('I (.*)see (.*)button "([^"]*)" number (\d+)$')
 def i_see_button_with_custom_text(_step, not_see, button_type, custom_text, index):
-    world.wait(DELAY)
-    world.wait_for_ajax_complete()
-
     button = button_type.strip()
     custom_text = custom_text.strip()
     index = int(index.strip()) - 1
@@ -149,22 +148,18 @@ def i_see_button_with_custom_text(_step, not_see, button_type, custom_text, inde
 
 @step('I click transcript button "([^"]*)"$')
 def click_button_transcripts_variant(_step, button_type):
-    world.wait(DELAY)
-    world.wait_for_ajax_complete()
-
     button = button_type.strip()
     world.css_click(TRANSCRIPTS_BUTTONS[button][0])
+    world.wait_for_ajax_complete()
 
 
 @step('I click transcript button "([^"]*)" number (\d+)$')
 def click_button_index(_step, button_type, index):
-    world.wait(DELAY)
-    world.wait_for_ajax_complete()
-
     button = button_type.strip()
     index = int(index.strip()) - 1
 
     world.css_click(TRANSCRIPTS_BUTTONS[button][0], index)
+    world.wait_for_ajax_complete()
 
 
 @step('I remove "([^"]+)" transcripts id from store')
@@ -186,9 +181,6 @@ def remove_transcripts_from_store(_step, subs_id):
 
 @step('I enter a "([^"]+)" source to field number (\d+)$')
 def i_enter_a_source(_step, link, index):
-    world.wait(DELAY)
-    world.wait_for_ajax_complete()
-
     index = int(index) - 1
 
     if index is not 0 and not world.css_visible(SELECTORS['collapse_bar']):
@@ -197,6 +189,8 @@ def i_enter_a_source(_step, link, index):
         assert world.css_visible(SELECTORS['collapse_bar'])
 
     world.css_fill(SELECTORS['url_inputs'], link, index)
+    world.wait(DELAY)
+    world.wait_for_ajax_complete()
 
 
 @step('I upload the transcripts file "([^"]*)"$')
@@ -204,6 +198,7 @@ def upload_file(_step, file_name):
     path = os.path.join(TEST_ROOT, 'uploads/', file_name.strip())
     world.browser.execute_script("$('form.file-chooser').show()")
     world.browser.attach_file('file', os.path.abspath(path))
+    world.wait_for_ajax_complete()
 
 
 @step('I see "([^"]*)" text in the captions')
@@ -213,9 +208,6 @@ def check_text_in_the_captions(_step, text):
 
 @step('I see value "([^"]*)" in the field "([^"]*)"$')
 def check_transcripts_field(_step, values, field_name):
-    world.wait(DELAY)
-    world.wait_for_ajax_complete()
-
     world.click_link_by_text('Advanced')
     field_id = '#' + world.browser.find_by_xpath('//label[text()="%s"]' % field_name.strip())[0]['for']
     values_list = [i.strip() == world.css_value(field_id) for i in values.split('|')]
@@ -225,22 +217,34 @@ def check_transcripts_field(_step, values, field_name):
 
 @step('I save changes$')
 def save_changes(_step):
-    world.wait(DELAY)
-    world.wait_for_ajax_complete()
-
     save_css = 'a.save-button'
     world.css_click(save_css)
+    world.wait_for_ajax_complete()
 
 
 @step('I open tab "([^"]*)"$')
 def open_tab(_step, tab_name):
     world.click_link_by_text(tab_name.strip())
+    world.wait_for_ajax_complete()
 
 
 @step('I set value "([^"]*)" to the field "([^"]*)"$')
 def set_value_transcripts_field(_step, value, field_name):
-    world.wait(DELAY)
-    world.wait_for_ajax_complete()
-
     field_id = '#' + world.browser.find_by_xpath('//label[text()="%s"]' % field_name.strip())[0]['for']
     world.css_fill(field_id, value.strip())
+    world.wait_for_ajax_complete()
+
+
+@step('I revert the transcript field "([^"]*)"$')
+def revert_transcripts_field(_step, field_name):
+    world.revert_setting_entry(field_name)
+
+
+def _transcripts_are_downloaded():
+    world.wait_for_ajax_complete()
+    request = RequestHandler()
+    DOWNLOAD_BUTTON = world.css_find(TRANSCRIPTS_BUTTONS["download_to_edit"][0]).first
+    url = DOWNLOAD_BUTTON['href']
+    request.connect(url)
+
+    return request.status_code.is_success()

@@ -523,7 +523,8 @@ def push_grades_to_s3(_xmodule_instance_args, _entry_id, course_id, _task_input,
             # We were able to successfully grade this student for this course.
             num_succeeded += 1
             if not header:
-                header = [section['label'] for section in gradeset[u'section_breakdown']]
+                # Encode the header row in utf-8 encoding in case there are unicode characters
+                header = [section['label'].encode('utf-8') for section in gradeset[u'section_breakdown']]
                 rows.append(["id", "email", "username", "grade"] + header)
 
             percents = {

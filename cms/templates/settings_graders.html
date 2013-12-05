@@ -7,7 +7,6 @@
   from contentstore import utils
   from django.utils.translation import ugettext as _
   from xmodule.modulestore.django import loc_mapper
-  from django.core.urlresolvers import reverse
 %>
 
 <%block name="header_extras">
@@ -28,9 +27,11 @@ require(["domReady!", "jquery", "js/views/settings/grading", "js/models/settings
       $("label").removeClass("is-focused");
     });
 
+    var model = new CourseGradingPolicyModel(${course_details|n},{parse:true});
+    model.urlRoot = '${grading_url}';
     var editor = new GradingView({
         el: $('.settings-grading'),
-        model : new CourseGradingPolicyModel(${course_details|n},{parse:true})
+        model : model
     });
 
     editor.render();
@@ -137,16 +138,16 @@ require(["domReady!", "jquery", "js/views/settings/grading", "js/models/settings
       <div class="bit">
       % if context_course:
         <%
-          ctx_loc = context_course.location
-          location = loc_mapper().translate_location(ctx_loc.course_id, ctx_loc, False, True)
-          course_team_url = location.url_reverse('course_team/', '')
+          course_team_url = course_locator.url_reverse('course_team/')
+          advanced_settings_url = course_locator.url_reverse('settings/advanced/')
+          detailed_settings_url = course_locator.url_reverse('settings/details/')
         %>
         <h3 class="title-3">${_("Other Course Settings")}</h3>
         <nav class="nav-related">
           <ul>
-            <li class="nav-item"><a href="${reverse('contentstore.views.get_course_settings', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">${_("Details &amp; Schedule")}</a></li>
+            <li class="nav-item"><a href="${detailed_settings_url}">${_("Details &amp; Schedule")}</a></li>
             <li class="nav-item"><a href="${course_team_url}">${_("Course Team")}</a></li>
-            <li class="nav-item"><a href="${reverse('course_advanced_settings', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">${_("Advanced Settings")}</a></li>
+            <li class="nav-item"><a href="${advanced_settings_url}">${_("Advanced Settings")}</a></li>
           </ul>
         </nav>
       % endif

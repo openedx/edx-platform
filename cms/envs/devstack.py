@@ -23,7 +23,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 ################################# LMS INTEGRATION #############################
 
-MITX_FEATURES['PREVIEW_LMS_BASE'] = "preview.localhost:8000"
+LMS_BASE = "localhost:8000"
+FEATURES['PREVIEW_LMS_BASE'] = "preview." + LMS_BASE
 
 ################################# CELERY ######################################
 

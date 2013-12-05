@@ -22,7 +22,7 @@ from xmodule.graders import Score
 from .models import StudentModule
 from .module_render import get_module, get_module_for_descriptor
 
-log = logging.getLogger("mitx.courseware")
+log = logging.getLogger("edx.courseware")
 
 
 def yield_module_descendents(module):
@@ -335,7 +335,6 @@ def _progress_summary(student, request, course):
                 module_creator = section_module.xmodule_runtime.get_module
 
                 for module_descriptor in yield_dynamic_descriptor_descendents(section_module, module_creator):
-
                     course_id = course.id
                     (correct, total) = get_score(course_id, student, module_descriptor, module_creator)
                     if correct is None and total is None:
