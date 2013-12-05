@@ -33,8 +33,8 @@ TEST_MONGODB_LOG = {
     'db': 'test_xlog',
 }
 
-MITX_FEATURES_WITH_SSL_AUTH = settings.MITX_FEATURES.copy()
-MITX_FEATURES_WITH_SSL_AUTH['AUTH_USE_MIT_CERTIFICATES'] = True
+FEATURES_WITH_SSL_AUTH = settings.FEATURES.copy()
+FEATURES_WITH_SSL_AUTH['AUTH_USE_MIT_CERTIFICATES'] = True
 
 
 class SysadminBaseTestCase(ModuleStoreTestCase):
@@ -80,7 +80,7 @@ class SysadminBaseTestCase(ModuleStoreTestCase):
                                  'action': 'del_course', })
 
 
-@unittest.skipUnless(settings.MITX_FEATURES.get('ENABLE_SYSADMIN_DASHBOARD'),
+@unittest.skipUnless(settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD'),
                      "ENABLE_SYSADMIN_DASHBOARD not set")
 @override_settings(GIT_IMPORT_WITH_XMLMODULESTORE=True)
 class TestSysadmin(SysadminBaseTestCase):
@@ -180,7 +180,7 @@ class TestSysadmin(SysadminBaseTestCase):
         User.objects.filter(
             username__startswith='testingman_with_long_name').delete()
 
-    @override_settings(MITX_FEATURES=MITX_FEATURES_WITH_SSL_AUTH)
+    @override_settings(FEATURES=FEATURES_WITH_SSL_AUTH)
     def test_authmap_repair(self):
         """Run authmap check and repair"""
 
@@ -298,7 +298,7 @@ class TestSysadmin(SysadminBaseTestCase):
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 @override_settings(MONGODB_LOG=TEST_MONGODB_LOG)
-@unittest.skipUnless(settings.MITX_FEATURES.get('ENABLE_SYSADMIN_DASHBOARD'),
+@unittest.skipUnless(settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD'),
                      "ENABLE_SYSADMIN_DASHBOARD not set")
 class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
     """

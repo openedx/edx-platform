@@ -204,7 +204,7 @@ CC_PROCESSOR['CyberSource']['SERIAL_NUMBER'] = "0123456789012345678901"
 CC_PROCESSOR['CyberSource']['PURCHASE_ENDPOINT'] = "/shoppingcart/payment_fake"
 
 ########################### SYSADMIN DASHBOARD ################################
-MITX_FEATURES['ENABLE_SYSADMIN_DASHBOARD'] = True
+FEATURES['ENABLE_SYSADMIN_DASHBOARD'] = True
 GIT_REPO_DIR = TEST_ROOT / "course_repos"
 
 ################################# CELERY ######################################

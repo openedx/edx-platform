@@ -81,7 +81,7 @@ urlpatterns += (
 )
 
 # sysadmin dashboard, to see what courses are loaded, to delete & load courses
-if settings.MITX_FEATURES["ENABLE_SYSADMIN_DASHBOARD"]:
+if settings.FEATURES["ENABLE_SYSADMIN_DASHBOARD"]:
     urlpatterns += (
         url(r'^sysadmin/', include('dashboard.sysadmin_urls')),
     )
