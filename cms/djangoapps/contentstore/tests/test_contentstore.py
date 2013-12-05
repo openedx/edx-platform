@@ -1659,14 +1659,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         test_get_html('settings/details')
         test_get_html('settings/grading')
         test_get_html('settings/advanced')
-
-        # textbook index
-        resp = self.client.get_html(reverse('textbook_index',
-                                            kwargs={'org': loc.org,
-                                                    'course': loc.course,
-                                                    'name': loc.name}))
-        self.assertEqual(resp.status_code, 200)
-        _test_no_locations(self, resp)
+        test_get_html('textbooks')
 
         # go look at a subsection page
         subsection_location = loc.replace(category='sequential', name='test_sequence')
