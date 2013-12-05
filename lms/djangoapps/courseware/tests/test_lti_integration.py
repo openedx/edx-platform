@@ -93,6 +93,7 @@ class TestLTI(BaseTestXmodule):
             'element_id': self.item_module.location.html_id(),
             'launch_url': 'http://www.example.com',  # default value
             'open_in_a_new_page': True,
+            'ajax_url': self.item_descriptor.xmodule_runtime.ajax_url,
         }
 
         self.assertEqual(
