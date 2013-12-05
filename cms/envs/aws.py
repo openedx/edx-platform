@@ -90,7 +90,10 @@ with open(CONFIG_ROOT / CONFIG_PREFIX + "env.json") as env_file:
 STATIC_URL_BASE = ENV_TOKENS.get('STATIC_URL_BASE', None)
 if STATIC_URL_BASE:
     # collectstatic will fail if STATIC_URL is a unicode string
-    STATIC_URL = STATIC_URL_BASE.encode('ascii') + "/" + git.revision + "/"
+    STATIC_URL = STATIC_URL_BASE.encode('ascii')
+    if not STATIC_URL.endswith("/"):
+        STATIC_URL += "/"
+    STATIC_URL += git.revision + "/"
 
 # GITHUB_REPO_ROOT is the base directory
 # for course data
