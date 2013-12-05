@@ -11,6 +11,10 @@ Common: Switch over from MITX_FEATURES to just FEATURES. To override items in
   the FEATURES dict, the environment variable you must set to do so is also
   now called FEATURES instead of MITX_FEATURES.
 
+LMS: Change the forum role granted to global staff on enrollment in a
+course. Previously, staff were given the Moderator role; now, they are
+given the Student role.
+
 Blades: Fix Numerical input to support mathematical operations. BLD-525.
 
 Blades: Improve calculator's tooltip accessibility. Add possibility to navigate
