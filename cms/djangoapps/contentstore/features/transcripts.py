@@ -230,8 +230,18 @@ def open_tab(_step, tab_name):
 
 @step('I set value "([^"]*)" to the field "([^"]*)"$')
 def set_value_transcripts_field(_step, value, field_name):
-    field_id = '#' + world.browser.find_by_xpath('//label[text()="%s"]' % field_name.strip())[0]['for']
-    world.css_fill(field_id, value.strip())
+    XPATH = '//label[text()="{name}"]'.format(name=field_name)
+    SELECTOR = '#' + world.browser.find_by_xpath(XPATH)[0]['for']
+    element = world.css_find(SELECTOR).first
+    if element['type'] == 'text':
+        SCRIPT = '$("{selector}").val("{value}").change()'.format(
+                selector=SELECTOR,
+                value=value
+            )
+        world.browser.execute_script(SCRIPT)
+        assert world.css_has_value(SELECTOR, value)
+    else:
+        assert False, 'Incorrect element type.';
     world.wait_for_ajax_complete()
 
 
