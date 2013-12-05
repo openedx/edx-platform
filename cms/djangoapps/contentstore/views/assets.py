@@ -1,4 +1,5 @@
 import logging
+import math
 from functools import partial
 
 from django.http import HttpResponseBadRequest
@@ -55,15 +56,31 @@ def assets_handler(request, tag=None, package_id=None, branch=None, version_guid
     if not has_access(request.user, location):
         raise PermissionDenied()
 
-    if 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
+    format = request.REQUEST.get('format', 'html')
+    if format == 'json' or 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
         if request.method == 'GET':
-            raise NotImplementedError('coming soon')
+            return _assets_json(request, location)
         else:
             return _update_asset(request, location, asset_id)
     elif request.method == 'GET':  # assume html
         return _asset_index(request, location)
     else:
         return HttpResponseNotFound()
+
+
+def _current_page(request):
+    current_page = request.REQUEST.get('page', None)
+    return int(current_page) if current_page else 0
+
+
+def _paging_start(request):
+    start = request.REQUEST.get('start', None)
+    return int(start) if start else 0
+
+
+def _paging_max_results(request):
+    max_results = request.REQUEST.get('max', None)
+    return int(max_results) if max_results else None
 
 
 def _asset_index(request, location):
@@ -73,22 +90,48 @@ def _asset_index(request, location):
     Supports start (0-based index into the list of assets) and max query parameters.
     """
     old_location = loc_mapper().translate_locator_to_location(location)
-
     course_module = modulestore().get_item(old_location)
-    maxresults = request.REQUEST.get('max', None)
-    start = request.REQUEST.get('start', None)
+    current_page = _current_page(request)
+    max_results = _paging_max_results(request)
+
+    return render_to_response('asset_index.html', {
+        'context_course': course_module,
+        'asset_callback_url': location.url_reverse('assets/', ''),
+        'current_page': current_page,
+        'max_results': max_results
+    })
+
+
+def _assets_json(request, location):
+    """
+    Display an editable asset library.
+
+    Supports start (0-based index into the list of assets) and max query parameters.
+    """
+    old_location = loc_mapper().translate_locator_to_location(location)
+
+    start = _paging_max_results(request)
+    max_results = _paging_max_results(request)
     course_reference = StaticContent.compute_location(old_location.org, old_location.course, old_location.name)
-    if maxresults is not None:
-        maxresults = int(maxresults)
-        start = int(start) if start else 0
-        assets = contentstore().get_all_content_for_course(
-            course_reference, start=start, maxresults=maxresults,
-            sort=[('uploadDate', DESCENDING)]
-        )
-    else:
-        assets = contentstore().get_all_content_for_course(
-            course_reference, sort=[('uploadDate', DESCENDING)]
-        )
+#    if maxresults is not None:
+#        maxresults = int(maxresults)
+#        start = int(start) if start else 0
+#        assets = contentstore().get_all_content_for_course(
+#            course_reference, start=start, maxresults=maxresults,
+#            sort=[('uploadDate', DESCENDING)]
+#        )
+#    else:
+#        assets = contentstore().get_all_content_for_course(
+#            course_reference, sort=[('uploadDate', DESCENDING)]
+#        )
+    # TODO can I determine the count without fetching all the assets?
+    assets = contentstore().get_all_content_for_course(
+        course_reference, sort=[('uploadDate', DESCENDING)]
+    )
+    total_count = len(assets)
+    if max_results is not None:
+        end = min(total_count, start + max_results)
+        assets = assets[start : end]
 
     asset_json = []
     for asset in assets:
@@ -101,10 +144,9 @@ def _asset_index(request, location):
         asset_locked = asset.get('locked', False)
         asset_json.append(_get_asset_json(asset['displayname'], asset['uploadDate'], asset_location, thumbnail_location, asset_locked))
 
-    return render_to_response('asset_index.html', {
-        'context_course': course_module,
-        'asset_list': json.dumps(asset_json),
-        'asset_callback_url': location.url_reverse('assets/', '')
+    return JsonResponse({
+        'assets': asset_json,
+        'totalCount': total_count
     })
 
 

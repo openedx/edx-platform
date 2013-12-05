@@ -5,13 +5,11 @@ var AssetsView = BaseView.extend({
 
     initialize : function() {
         this.listenTo(this.collection, 'destroy', this.handleDestroy);
-        this.render();
     },
 
     render: function() {
-        this.$el.empty();
-
         var self = this;
+        self.$el.empty();
         this.collection.each(
             function(asset) {
                 var view = new AssetView({model: asset});
@@ -32,17 +30,24 @@ var AssetsView = BaseView.extend({
     },
 
     addAsset: function (model) {
-        // If asset is not already being shown, add it.
-        if (this.collection.findWhere({'url': model.get('url')}) === undefined) {
-            this.collection.add(model, {at: 0});
-            var view = new AssetView({model: model});
-            this.$el.prepend(view.render().el);
+        this.refreshAssets();
 
-            analytics.track('Uploaded a File', {
-                'course': course_location_analytics,
-                'asset_url': model.get('url')
-            });
-        }
+        analytics.track('Uploaded a File', {
+            'course': course_location_analytics,
+            'asset_url': model.get('url')
+        });
+    },
+
+    setPage: function(page) {
+        var self = this;
+        this.collection.goTo(page, {
+            success: function(collection, response) {
+                self.render();
+            },
+            error: function(collection, response, options) {
+                window.alert("Error: " + response);
+            }
+        });
     }
 });
 

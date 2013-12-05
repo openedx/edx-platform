@@ -21,9 +21,10 @@ require(["domReady", "jquery", "gettext", "js/models/asset", "js/collections/ass
          "js/views/feedback_notification", "js/utils/modal", "jquery.fileupload"],
         function(domReady, $, gettext, AssetModel, AssetCollection, AssetsView, PromptView, NotificationView, ModalUtils) {
 
-    var assets = new AssetCollection(${asset_list});
+    var assets = new AssetCollection();
     assets.url = "${asset_callback_url}";
     var assetsView = new AssetsView({collection: assets, el: $('#asset_table_body')});
+    assetsView.setPage(${current_page});
 
     var hideModal = function (e) {
         if (e) {
