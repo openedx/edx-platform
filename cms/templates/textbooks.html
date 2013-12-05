@@ -23,7 +23,7 @@ CMS.URL.TEXTBOOKS = "${textbook_url}"
 CMS.URL.LMS_BASE = "${settings.LMS_BASE}"
 require(["js/models/section", "js/collections/textbook", "js/views/list_textbooks"],
         function(Section, TextbookCollection, ListTextbooksView) {
-  var textbooks = new TextbookCollection(${json.dumps(course.pdf_textbooks)}, {parse: true});
+  var textbooks = new TextbookCollection(${json.dumps(textbooks)}, {parse: true});
   var tbView = new ListTextbooksView({collection: textbooks});
 
   $(function() {

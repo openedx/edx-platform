@@ -674,7 +674,7 @@ def textbooks_list_handler(request, tag=None, course_id=None, branch=None, versi
         textbook_url = locator.url_reverse('/textbooks')
         return render_to_response('textbooks.html', {
             'context_course': course,
-            'course': course,
+            'textbooks': course.pdf_textbooks,
             'upload_asset_url': upload_asset_url,
             'textbook_url': textbook_url,
         })
