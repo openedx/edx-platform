@@ -1,0 +1,16 @@
+<nav class="pagination pagination-full bottom">
+<ol>
+    <li class="nav-item previous"><a class="nav-link previous-page-link" href="#"><i class="icon-angle-left"></i> <span class="nav-label"><%= gettext("Previous") %></span></a></li>
+    <li class="nav-item page">
+        <div class="pagination-form">
+            <label class="page-number-label" for="page-number"><%= gettext("Page number") %></label>
+            <input id="page-number-input" class="page-number-input" name="page-number" type="text" size="4" />
+        </div>
+
+        <span class="current-page"><%= current_page + 1 %></span>
+        <span class="page-divider">/</span>
+        <span class="total-pages"><%= total_pages %></span>
+    </li>
+    <li class="nav-item next"><a class="nav-link next-page-link" href="#"><span class="nav-label"><%= gettext("Next") %></span> <i class="icon-angle-right"></i></a></li>
+</ol>
+</nav>
