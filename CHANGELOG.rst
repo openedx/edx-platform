@@ -11,6 +11,10 @@ See mongo_indexes.md for new indices that should be added.
 Studio: Newly-created courses default to being published on Jan 1, 2030
 
 Studio: Added pagination to the Files & Uploads page.
+CMS: Added unicode support with Arabic CMS view (sass/css).
+
+Common: Added unicode support.
+Studio: Added pagination to the Files & Uploads page.
 
 Blades: Video player improvements:
   - Disable edX controls on iPhone/iPod (native controls are used).
