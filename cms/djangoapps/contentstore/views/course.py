@@ -698,9 +698,6 @@ def textbooks_list_handler(request, tag=None, course_id=None, branch=None, versi
         if not any(tab['type'] == 'pdf_textbooks' for tab in course.tabs):
             course.tabs.append({"type": "pdf_textbooks"})
         course.pdf_textbooks = textbooks
-        # Save the data that we've just changed to the underlying
-        # MongoKeyValueStore before we update the mongo datastore.
-        course.save()
         store.update_metadata(
             course.location,
             own_metadata(course)
@@ -722,9 +719,6 @@ def textbooks_list_handler(request, tag=None, course_id=None, branch=None, versi
             tabs = course.tabs
             tabs.append({"type": "pdf_textbooks"})
             course.tabs = tabs
-        # Save the data that we've just changed to the underlying
-        # MongoKeyValueStore before we update the mongo datastore.
-        course.save()
         store.update_metadata(course.location, own_metadata(course))
         resp = JsonResponse(textbook, status=201)
         resp["Location"] = locator.url_reverse('textbooks', textbook["id"])
@@ -776,9 +770,6 @@ def textbooks_detail_handler(request, tid, tag=None, course_id=None, branch=None
             course.pdf_textbooks = new_textbooks
         else:
             course.pdf_textbooks.append(new_textbook)
-        # Save the data that we've just changed to the underlying
-        # MongoKeyValueStore before we update the mongo datastore.
-        course.save()
         store.update_metadata(
             course.location,
             own_metadata(course)
@@ -791,7 +782,6 @@ def textbooks_detail_handler(request, tid, tag=None, course_id=None, branch=None
         new_textbooks = course.pdf_textbooks[0:i]
         new_textbooks.extend(course.pdf_textbooks[i + 1:])
         course.pdf_textbooks = new_textbooks
-        course.save()
         store.update_metadata(
             course.location,
             own_metadata(course)
