@@ -246,7 +246,7 @@ def _signup(request, eamap, retfun=None):
 
     eamap is an ExternalAuthMap object, specifying the external user
     for which to complete the signup.
-    
+
     retfun is a function to execute for the return value, if immediate
     signup is used.  That allows @ssl_login_shortcut() to work.
     """
@@ -263,7 +263,11 @@ def _signup(request, eamap, retfun=None):
                          terms_of_service=u'true')
         log.info('doing immediate signup for %s, params=%s', username, post_vars)
         student.views.create_account(request, post_vars)
-        return redirect('/')
+        # should check return content for successful completion before
+        if retfun is not None:
+            return retfun()
+        else:
+            return redirect('/')
 
     # default conjoin name, no spaces, flattened to ascii b/c django can't handle unicode usernames, sadly
     # but this only affects username, not fullname
@@ -352,11 +356,17 @@ def ssl_login_shortcut(fn):
     based on existing ExternalAuth record and MIT ssl certificate.
     """
     def wrapped(*args, **kwargs):
+        """
+        This manages the function wrapping, by determining whether to inject
+        the _external signup or just continuing to the internal function
+        call.
+        """
+
         if not settings.FEATURES['AUTH_USE_MIT_CERTIFICATES']:
             return fn(*args, **kwargs)
         request = args[0]
 
-        if request.user and request.user.is_authenticated():	# don't re-authenticate
+        if request.user and request.user.is_authenticated():  # don't re-authenticate
             return fn(*args, **kwargs)
 
         cert = _ssl_get_cert_from_request(request)
@@ -364,6 +374,7 @@ def ssl_login_shortcut(fn):
             return fn(*args, **kwargs)
 
         def retfun():
+            """Wrap function again for call by _external_login_or_signup"""
             return fn(*args, **kwargs)
 
         (_user, email, fullname) = _ssl_dn_extract_info(cert)
