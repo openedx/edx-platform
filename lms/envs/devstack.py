@@ -53,6 +53,11 @@ DEBUG_TOOLBAR_CONFIG = {
 
 PIPELINE_SASS_ARGUMENTS = '--debug-info --require {proj_dir}/static/sass/bourbon/lib/bourbon.rb'.format(proj_dir=PROJECT_ROOT)
 
+########################### VERIFIED CERTIFICATES #################################
+
+FEATURES['AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'] = True
+FEATURES['ENABLE_PAYMENT_FAKE'] = True
+CC_PROCESSOR['CyberSource']['PURCHASE_ENDPOINT'] = '/shoppingcart/payment_fake/'
 
 #####################################################################
 # Lastly, see if the developer has any local overrides.
