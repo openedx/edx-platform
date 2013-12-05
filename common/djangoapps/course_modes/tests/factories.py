@@ -1,5 +1,6 @@
 from course_modes.models import CourseMode
-from factory import DjangoModelFactory
+from factory.django import DjangoModelFactory
+
 
 # Factories don't have __init__ methods, and are self documenting
 # pylint: disable=W0232
