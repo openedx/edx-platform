@@ -15,7 +15,7 @@
 var hasUnit = ${json.dumps(bool(unit))},
     editUnitUrl = "${edit_unit_url or ""}",
     courseHomeUrl = "${course_home_url or ""}",
-    errMsg = "${raw_err_msg or ""}";
+    errMsg = ${json.dumps(raw_err_msg or "")};
 
 require(["domReady!", "gettext", "js/views/feedback_prompt"], function(doc, gettext, PromptView) {
   var dialog;
