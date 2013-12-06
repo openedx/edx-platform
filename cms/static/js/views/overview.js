@@ -31,8 +31,8 @@ define(["domReady", "jquery", "jquery.ui", "underscore", "gettext", "js/views/fe
 
         var toggleSubmodules = function(e) {
             e.preventDefault();
-            $(this).toggleClass('expand').toggleClass('collapse');
-            $(this).closest('.branch, .window').toggleClass('collapsed');
+            $(this).toggleClass('expand');
+            $(this).closest('.is-collapsible, .window').toggleClass('collapsed');
         };
 
         var editSectionPublishDate = function (e) {

@@ -1,7 +1,6 @@
-    <li class="branch collapsed">
+    <li class="collapsed">
       <div class="section-item editing">
         <form class="new-subsection-form">
-          <span class="folder-icon"></span>
           <span class="subsection-name">
             <input type="text" value="${_('New Subsection')}" class="new-subsection-name-input" />
           </span>
@@ -12,7 +11,7 @@
       <ol>
         <li>
           <a href="unit.html" class="new-unit-item">
-            <span class="new-unit-icon"></span>${_('New Unit')}
+            <i class="icon-plus"></i> ${_('New Unit')}
           </a>
         </li>
       </ol>

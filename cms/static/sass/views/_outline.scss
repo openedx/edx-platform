@@ -66,7 +66,7 @@
   }
 
 
-  // new section and subsection forms
+  // new section, subsection, unit
   .new-section-name,
   .new-subsection-name-input {
     width: 515px;
@@ -87,6 +87,76 @@
     color: #8891a1 !important;
   }
 
+  .new-subsection-item,
+  .new-unit-item {
+    @extend %ui-btn-flat-outline;
+    width: 100%;
+    margin: 0 0 ($baseline/2) 0;
+    border: 1px solid $gray-l3;
+    padding: ($baseline/2) 0;
+    color: $gray-l2;
+
+
+    &:hover {
+      box-shadow: none;
+      background-image: none;
+    }
+  }
+
+  .courseware-unit-new {
+    margin-right: ($baseline*1.5);
+  }
+
+
+  // general action list styles (section and subsection)
+  .expand-collapse {
+    @include transition(all $tmg-f2 linear 0s);
+    display: inline-block;
+    vertical-align: top;
+    margin: 0 ($baseline/4);
+    padding: 0;
+    color: $gray-l2;
+
+    &:hover {
+      color: $blue;
+    }
+
+    &.expand {
+      @include transform(rotate(-90deg));
+      @include transform-origin(50% 50%);
+    }
+  }
+  .actions-list {
+    display: inline-block;
+    margin-bottom: 0;
+  }
+
+  .actions-item {
+    @include font-size(13);
+    display: inline-block;
+    padding: 0 4px;
+    vertical-align: middle;
+
+    .action {
+      min-width: ($baseline*.75);
+      color: $gray-l2;
+
+      &:hover,
+      &.isset {
+        color: $blue;
+        visibility: visible;
+      }
+
+      //reset old drag handle style
+      &.drag-handle {
+        float: none;
+        margin: 0;
+        background: none;
+        text-align: center;
+      }
+
+    }
+  }
 
 
   // section styles
@@ -94,31 +164,16 @@
     @extend %ui-window;
     @include transition(background $tmg-avg ease-in-out 0);
     position: relative;
-    padding: $baseline;
+    padding: ($baseline*1.5) $baseline $baseline $baseline;
 
     &.collapsed {
       padding-bottom: 0;
     }
 
-    &.collapsed .subsection-list-wrap,
-    .collapsed .subsection-list-wrap,
+    &.collapsed .subsection-list,
+    .collapsed .subsection-list,
     .collapsed > ol {
         display: none !important;
-    }
-
-    .section {
-      @include clearfix();
-      min-height: 75px; // needed to align with edit input
-      margin-bottom: 0;
-      border: 0;
-      padding: 0;
-
-      .expand-collapse {
-        display: inline-block;
-        vertical-align: top;
-        margin: ($baseline/4);
-        padding: $baseline;
-      }
     }
 
     &.new-section {
@@ -129,7 +184,7 @@
         border-bottom: 0;
       }
 
-      .expand-collapse-icon {
+      .expand-collapse {
         visibility: hidden;
       }
 
@@ -143,105 +198,114 @@
       }
     }
 
-    // section name area
-    .item-details {
+    .section {
       @include clearfix();
-      display: inline-block;
-      padding: 0 0 ($baseline/2) 0;
-
-      .section-name {
-        @include font-size(19);
-        float: left;
-        width: 400px;
-        margin-right: 10px;
-      }
-
-      .section-name-span {
-        @include transition(color $tmg-f2 linear 0s);
-        cursor: pointer;
-
-        &:hover {
-          color: $blue;
-        }
-      }
-
-      .section-name-edit {
-        position: relative;
-        width: 400px;
-        background: $white;
-
-        input {
-          @include font-size(16);
-        }
-
-        .save-button {
-          @include blue-button;
-          padding: 7px 20px 7px;
-          margin-right: 5px;
-        }
-
-        .cancel-button {
-          @include white-button;
-          padding: 7px 20px 7px;
-        }
-      }
-    }
-
-
-    // section actions
-    .actions-list {
-      display: inline-block;
+      min-height: 65px; // needed to align with edit input
       margin-bottom: 0;
-    }
+      border: 0;
+      padding: 0;
 
-    .actions-item {
-      @include font-size(13);
-      display: inline-block;
-      padding: 0 8px;
+      // section name area
+      .item-details {
+        @include clearfix();
+        display: inline-block;
+        float: none;
+        padding: 0 0 ($baseline/2) 0;
 
-      &.pubdate {
-        padding-right: 0;
-      }
-
-      .action {
-        min-width: ($baseline*.75);
-        color: $gray-l2;
-
-        &.pubdate {
-          visibility: hidden;
+        .section-name {
+          @include font-size(19);
+          float: left;
+          width: 400px;
+          margin-right: 10px;
         }
 
-        &:hover,
-        &.isset {
-          color: $blue;
-          visibility: visible;
-        }
-      }
+        .section-name-span {
+          @include transition(color $tmg-f2 linear 0s);
+          cursor: pointer;
 
-      .section-published-date {
-        padding: 4px 10px;
-        border-radius: 3px;
-        background: $lightGrey;
-        text-align: right;
-
-        .published-status {
-          @include font-size(12);
-          margin-right: 15px;
-
-          strong {
-            font-weight: bold;
+          &:hover {
+            color: $blue;
           }
         }
 
-        &.released .section-published-date {
-          background-color: transparent;
-          color: $gray-l1;
+        .section-name-edit {
+          position: relative;
+          width: 400px;
+          background: $white;
 
-          a {
-            color: $gray-l2;
+          input {
+            @include font-size(16);
+          }
 
-            &:hover {
-              color: $blue;
+          .save-button {
+            @include blue-button;
+            padding: 7px 20px 7px;
+            margin-right: 5px;
+          }
+
+          .cancel-button {
+            @include white-button;
+            padding: 7px 20px 7px;
+          }
+        }
+      }
+
+
+      // section specific action styles
+
+      .item-actions {
+        top: 0;
+      }
+
+      .actions-item {
+        padding: 0 0 0 8px;
+
+        &:last-child {
+          padding-right: 4px;
+        }
+
+        &.pubdate {
+          padding-right: 0;
+        }
+
+        .action {
+
+          &.pubdate {
+            visibility: hidden;
+          }
+
+          &:hover,
+          &.isset {
+            color: $blue;
+            visibility: visible;
+          }
+        }
+
+        .section-published-date {
+          padding: 4px 10px;
+          border-radius: 3px;
+          background: $lightGrey;
+          text-align: right;
+
+          .published-status {
+            @include font-size(12);
+            margin-right: 15px;
+
+            strong {
+              font-weight: bold;
+            }
+          }
+
+          &.released .section-published-date {
+            background-color: transparent;
+            color: $gray-l1;
+
+            a {
+              color: $gray-l2;
+
+              &:hover {
+                color: $blue;
+              }
             }
           }
         }
@@ -250,17 +314,10 @@
   }
 
 
-
-
-
-
-
-
   // subsection styles
   .courseware-subsection {
     @include clearfix();
     margin-bottom: 5px;
-    border-left: 5px solid $gray-l2;
 
     &.visible {
       border-left: 5px solid $green;
@@ -276,11 +333,12 @@
 
     .section-item {
       @include transition(background $tmg-avg ease-in-out 0);
+      @include font-size(13);
       position: relative;
       display: block;
-      font-size: 13px;
-      padding: 6px 8px 8px 16px;
+      border-left: 5px solid $gray-l2;
       background-color: $gray-l6;
+      padding: 6px 8px 8px 16px;
 
       &:hover {
         background: $blue-l5;
@@ -300,33 +358,6 @@
       margin-bottom: 0;
       width: 600px;
 
-      .draft-item:after,
-      .public-item:after,
-      .private-item:after {
-        margin-left: 3px;
-        font-size: 9px;
-        font-weight: 600;
-        text-transform: uppercase;
-      }
-
-      .draft-item:after {
-        content: "- draft";
-      }
-
-      .private-item:after {
-        content: "- private";
-      }
-
-      .private-item {
-        color: $gray-l1;
-      }
-
-      .draft-item {
-        color: $yellow-d1;
-      }
-
-
-
       a {
         color: $baseFontColor;
 
@@ -336,8 +367,6 @@
       }
     }
   }
-
-
 
   // gradable drop down
   .gradable-status {
@@ -349,7 +378,7 @@
       width: 110px;
       padding: 5px 40px 5px 10px;
       border-radius: 3px;
-      color: $lightGrey;
+      color: transparent;
       text-align: right;
       font-weight: bold;
       line-height: 16px;
@@ -360,12 +389,16 @@
       position: absolute;
       top: 0;
       right: 5px;
-      padding: 5px;
+      padding: 2px 5px;
       color: $mediumGrey;
 
       &:hover,
       &.is-active {
         color: $blue;
+      }
+
+      &:focus {
+        outline: 0;
       }
 
       [class^="icon-"] {
@@ -384,7 +417,7 @@
       opacity: 0.0;
       z-index: 1;
       position: absolute;
-      top: -1px;
+      top: -4px;
       right: 0;
       margin: 0;
       box-shadow: 0 1px 2px rgba(0, 0, 0, .2);
@@ -447,8 +480,47 @@
     }
   }
 
+  // unit styles
+  .courseware-unit {
+    margin: ($baseline/4) ($baseline*1.75) 0 ($baseline*1.75);
 
-  // actually this is edit section pub settings modal
+    .section-item {
+      border: 0;
+      background-color: $white;
+    }
+
+    .public-item {
+      color: $black;
+    }
+
+    .private-item {
+      color: $gray-l1;
+    }
+
+    .draft-item {
+      color: $yellow-d1;
+    }
+
+    .draft-item:after,
+    .public-item:after,
+    .private-item:after {
+      margin-left: 3px;
+      font-size: 9px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .draft-item:after {
+      content: "- draft";
+    }
+
+    .private-item:after {
+      content: "- private";
+    }
+  }
+
+
+  // modal to edit section publish settings
   .edit-subsection-publish-settings {
     display: none;
     position: fixed;
