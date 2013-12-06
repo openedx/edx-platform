@@ -194,6 +194,7 @@ class LTIModuleTest(LogicTest):
         Response from Tool Provider is correct.
         """
         self.xmodule.verify_oauth_body_sign = Mock()
+        self.xmodule.has_score = True
         request = Request(self.environ)
         request.body = self.get_request_body()
         response = self.xmodule.grade_handler(request, '')
@@ -248,4 +249,17 @@ class LTIModuleTest(LogicTest):
 
     def test_client_key_secret(self):
         pass
+
+    def test_max_score(self):
+        self.xmodule.weight = 100.0
+
+        self.xmodule.graded = True
+        self.assertEqual(self.xmodule.max_score(), None)
+
+        self.xmodule.has_score = True
+        self.assertEqual(self.xmodule.max_score(), 100.0)
+
+        self.xmodule.graded = False
+        self.assertEqual(self.xmodule.max_score(), 100.0)
+
 
