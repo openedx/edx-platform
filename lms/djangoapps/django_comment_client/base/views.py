@@ -508,41 +508,6 @@ def unfollow_user(request, course_id, followed_user_id):
     return JsonResponse({})
 
 
-@require_POST
-@login_required
-@permitted
-def update_moderator_status(request, course_id, user_id):
-    """
-    given a course id and user id, check if the user has moderator
-    and send back a user profile
-    """
-    is_moderator = request.POST.get('is_moderator', '').lower()
-    if is_moderator not in ["true", "false"]:
-        return JsonError("Must provide is_moderator as boolean value")
-    is_moderator = is_moderator == "true"
-    user = User.objects.get(id=user_id)
-    role = Role.objects.get(course_id=course_id, name="Moderator")
-    if is_moderator:
-        user.roles.add(role)
-    else:
-        user.roles.remove(role)
-    if request.is_ajax():
-        course = get_course_with_access(request.user, course_id, 'load')
-        discussion_user = cc.User(id=user_id, course_id=course_id)
-        context = {
-            'course': course,
-            'course_id': course_id,
-            'user': request.user,
-            'django_user': user,
-            'profiled_user': discussion_user.to_dict(),
-        }
-        return JsonResponse({
-            'html': render_to_string('discussion/ajax_user_profile.html', context)
-        })
-    else:
-        return JsonResponse({})
-
-
 @require_GET
 def search_similar_threads(request, course_id, commentable_id):
     """
