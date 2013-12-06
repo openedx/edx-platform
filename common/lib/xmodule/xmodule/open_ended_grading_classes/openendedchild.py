@@ -17,6 +17,8 @@ import requests
 from boto.s3.connection import S3Connection
 from boto.s3.key import Key
 
+from django.utils.translation import ugettext as _
+
 from pytils.translit import slugify
 
 log = logging.getLogger("mitx.courseware")
@@ -184,14 +186,14 @@ class OpenEndedChild(object):
             return True, {
                 'success': False,
                 # This is a student_facing_error
-                'error': 'The problem close date has passed, and this problem is now closed.'
+                'error': _('The problem close date has passed, and this problem is now closed.')
             }
         elif self.child_attempts > self.max_attempts:
             return True, {
                 'success': False,
                 # This is a student_facing_error
-                'error': 'You have attempted this problem {0} times.  You are allowed {1} attempts.'.format(
-                    self.child_attempts, self.max_attempts
+                'error': _('You have attempted this problem {attempts} times.  You are allowed {max} attempts.').format(
+                    attempts = self.child_attempts, max = self.max_attempts
                 )
             }
         else:
