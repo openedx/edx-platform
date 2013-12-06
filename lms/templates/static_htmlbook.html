@@ -12,6 +12,9 @@
 </%block>
 
 <%block name="js_extra">
+% if notes_enabled:
+  <%static:js group='notes'/>
+% endif
   <script type="text/javascript">
 (function($) {
     $.fn.myHTMLViewer = function(options) {
@@ -108,10 +111,7 @@
             options.anchor_id = ${anchor_id};
         %endif
 
-        options.notesEnabled = false;
-        %if notes_enabled is not UNDEFINED and notes_enabled:
-            options.notesEnabled = true;
-        %endif
+        options.notesEnabled = ${'true' if notes_enabled else 'false'};
 
         $('#outerContainer').myHTMLViewer(options);
     });
