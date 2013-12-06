@@ -69,7 +69,11 @@
   // new section, subsection, unit
   .new-section-name,
   .new-subsection-name-input {
+    @include font-size(16);
+    display: inline-block;
+    vertical-align: top;
     width: 515px;
+    padding: ($baseline/4);
   }
 
   .new-section-name-save,
@@ -121,11 +125,22 @@
       color: $blue;
     }
 
-    &.expand {
+    .ui-toggle-expansion {
+      @include transition(all $tmg-f2 ease-in-out 0s);
+      @include font-size(18);
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: ($baseline/4);
+      color: $gray-l3;
+    }
+
+    &.expand .ui-toggle-expansion {
       @include transform(rotate(-90deg));
       @include transform-origin(50% 50%);
     }
+
   }
+
   .actions-list {
     display: inline-block;
     margin-bottom: 0;
@@ -252,7 +267,6 @@
 
 
       // section specific action styles
-
       .item-actions {
         top: 0;
       }
@@ -336,8 +350,7 @@
       @include font-size(13);
       position: relative;
       display: block;
-      border-left: 5px solid $gray-l2;
-      background-color: $gray-l6;
+      background-color: $gray-l5;
       padding: 6px 8px 8px 16px;
 
       &:hover {
@@ -360,10 +373,6 @@
 
       a {
         color: $baseFontColor;
-
-        &.new-unit-item {
-          color: #6d788b;
-        }
       }
     }
   }
@@ -482,7 +491,11 @@
 
   // unit styles
   .courseware-unit {
-    margin: ($baseline/4) ($baseline*1.75) 0 ($baseline*1.75);
+    margin: ($baseline/4) 0 0 ($baseline*1.75);
+
+    &.add-new-unit {
+      margin-right: ($baseline*1.75);
+    }
 
     .section-item {
       border: 0;
@@ -521,41 +534,15 @@
 
 
   // modal to edit section publish settings
-  .edit-subsection-publish-settings {
-    display: none;
-    position: fixed;
-    top: 100px;
-    left: 50%;
-    z-index: 99999;
-    width: 600px;
-    margin-left: -300px;
-    background: #fff;
-    text-align: center;
-
-    .settings {
-      padding: 40px;
-    }
-
-    h3 {
-      @include font-size(34);
-      font-weight: 300;
-    }
+  .edit-section-publish-settings {
 
     .picker {
       @include clearfix();
-      margin: 30px 0 65px;
+
 
       .field {
         float: left;
         margin-right: ($baseline/2);
-
-        &:first-child {
-          margin-left: ($baseline*5);
-        }
-
-        &:last-child {
-          margin-right: 0;
-        }
 
         label, input {
           display: block;

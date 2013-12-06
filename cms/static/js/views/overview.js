@@ -3,7 +3,7 @@ define(["domReady", "jquery", "jquery.ui", "underscore", "gettext", "js/views/fe
     function (domReady, $, ui, _, gettext, NotificationView, Draggabilly, ModalUtils, CancelOnEscape,
               DateUtils, ModuleUtils) {
 
-        var modalSelector = '.edit-subsection-publish-settings';
+        var modalSelector = '.edit-section-publish-settings';
 
         var toggleSections = function(e) {
             e.preventDefault();
@@ -35,6 +35,12 @@ define(["domReady", "jquery", "jquery.ui", "underscore", "gettext", "js/views/fe
             $(this).closest('.is-collapsible, .window').toggleClass('collapsed');
         };
 
+
+        var closeModalNew = function (e) {
+            $('body').removeClass('dialog-is-shown');
+            $('.edit-section-publish-settings').removeClass('is-shown');
+        }
+
         var editSectionPublishDate = function (e) {
             e.preventDefault();
             var $modal = $(modalSelector);
@@ -45,15 +51,17 @@ define(["domReady", "jquery", "jquery.ui", "underscore", "gettext", "js/views/fe
                 $modal.find('.save-button').hide();
             }
             $modal.find('.section-name').html('"' + $(this).closest('.courseware-section').find('.section-name-span').text() + '"');
-            ModalUtils.showModal();
+            //ModalUtils.showModal();
+            $('body').addClass('dialog-is-shown');
+            $('.edit-section-publish-settings').addClass('is-shown');
         };
 
         var saveSetSectionScheduleDate = function (e) {
             e.preventDefault();
 
             var datetime = DateUtils(
-                $('.edit-subsection-publish-settings .start-date'),
-                $('.edit-subsection-publish-settings .start-time')
+                $('.edit-section-publish-settings .start-date'),
+                $('.edit-section-publish-settings .start-time')
             );
 
             var locator = $(modalSelector).attr('data-locator');
@@ -89,10 +97,10 @@ define(["domReady", "jquery", "jquery.ui", "underscore", "gettext", "js/views/fe
                     var $thisSection = $('.courseware-section[data-locator="' + locator + '"]');
                     var html = _.template(
                         '<span class="published-status">' +
-                            '<strong>' + gettext("Will Release:") + '&nbsp;</strong>' +
+                            '<strong>' + gettext("Release date:") + '&nbsp;</strong>' +
                             gettext("{month}/{day}/{year} at {hour}:{minute} UTC") +
                             '</span>' +
-                            '<a href="#" class="edit" data-date="{month}/{day}/{year}" data-time="{hour}:{minute}" data-locator="{locator}">' +
+                            '<a href="#" class="edit-release-date action" data-date="{month}/{day}/{year}" data-time="{hour}:{minute}" data-locator="{locator}">' +
                             gettext("Edit") +
                             '</a>',
                         {year: datetime.getUTCFullYear(), month: pad2(datetime.getUTCMonth() + 1), day: pad2(datetime.getUTCDate()),
@@ -100,8 +108,9 @@ define(["domReady", "jquery", "jquery.ui", "underscore", "gettext", "js/views/fe
                             locator: locator},
                         {interpolate: /\{(.+?)\}/g});
                     $thisSection.find('.section-published-date').html(html);
-                    ModalUtils.hideModal();
+                    //ModalUtils.hideModal();
                     saving.hide();
+                    closeModalNew();
                 });
         };
 
@@ -159,7 +168,7 @@ define(["domReady", "jquery", "jquery.ui", "underscore", "gettext", "js/views/fe
             var $saveButton = $newSubsection.find('.new-subsection-name-save');
             var $cancelButton = $newSubsection.find('.new-subsection-name-cancel');
 
-            var parent = $(this).parents("section.branch").data("locator");
+            var parent = $(this).parents("section.courseware-section").data("locator");
 
             $saveButton.data('parent', parent);
             $saveButton.data('category', $(this).data('category'));
@@ -197,7 +206,7 @@ define(["domReady", "jquery", "jquery.ui", "underscore", "gettext", "js/views/fe
 
         var cancelNewSubsection = function (e) {
             e.preventDefault();
-            $(this).parents('li.branch').remove();
+            $(this).parents('li.courseware-subsection').remove();
         };
 
         var overviewDragger = {
@@ -503,10 +512,9 @@ define(["domReady", "jquery", "jquery.ui", "underscore", "gettext", "js/views/fe
             $('.expand-collapse').bind('click', toggleSubmodules);
 
             var $body = $('body');
-            $body.on('click', '.section-published-date .edit', editSectionPublishDate);
-            $body.on('click', '.section-published-date .schedule-button', editSectionPublishDate);
-            $body.on('click', '.edit-subsection-publish-settings .save-button', saveSetSectionScheduleDate);
-            $body.on('click', '.edit-subsection-publish-settings .cancel-button', ModalUtils.hideModal);
+            $body.on('click', '.section-published-date .edit-release-date', editSectionPublishDate);
+            $body.on('click', '.edit-section-publish-settings .action-save', saveSetSectionScheduleDate);
+            $body.on('click', '.edit-section-publish-settings .action-cancel', closeModalNew);
 
             $('.new-courseware-section-button').bind('click', addNewSection);
             $('.new-subsection-item').bind('click', addNewSubsection);
@@ -530,7 +538,7 @@ define(["domReady", "jquery", "jquery.ui", "underscore", "gettext", "js/views/fe
                 '.unit',
                 '.unit-drag-handle',
                 'ol.sortable-unit-list',
-                'li.branch, article.subsection-body'
+                'li.courseware-subsection, article.subsection-body'
             );
         });
 

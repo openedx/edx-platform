@@ -1,14 +1,15 @@
-    <section class="courseware-section branch new-section">
+    <section class="courseware-section new-section is-collapsible is-draggable">
       <header>
-      <a href="#"  data-tooltip="Collapse/expand this section" class="expand-collapse-icon collapse"></a>
+      <a href="#" data-tooltip="${_('Expand/collapse this section')}" class="action expand-collapse"><i class="icon-caret-down ui-toggle-dd"></i><span class="sr">${_('Expand/collapse this section')}</span></a>
         <div class="item-details">
           <h3 class="section-name">
-          <form class="section-name-form">
-            <input type="text" value="New Section Name" class="new-section-name" />
-            <input type="submit" class="new-section-name-save" data-parent="${parent_locator}"
-                   data-category="${new_section_category}" value="Save" />
-            <input type="button" class="new-section-name-cancel" value="Cancel" /></h3>
-          </form>
+            <form class="section-name-form">
+              <input type="text" value="New Section Name" class="new-section-name" />
+              <input type="submit" class="new-section-name-save" data-parent="${parent_locator}"
+                     data-category="${new_section_category}" value="Save" />
+              <input type="button" class="new-section-name-cancel" value="Cancel" />
+            </form>
+          </h3>
         </div>
       </header>
     </section>

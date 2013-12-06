@@ -7,7 +7,7 @@
   from xmodule.modulestore.django import loc_mapper
 %>
 <%block name="title">${_("Course Outline")}</%block>
-<%block name="bodyclass">is-signedin course view-outline</%block>
+<%block name="bodyclass">is-signedin course view-outline feature-edit-dialog</%block>
 
 <%namespace name='static' file='static_content.html'/>
 <%namespace name="units" file="widgets/units.html" />
@@ -49,11 +49,73 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
 </%block>
 
 <%block name="header_extras">
-% for template_name in ["new-section-template", "blank-slate-template", "new-subsection-template", "no-outline-content"]:
-  <script type="text/template" id="${template_name}">
-    <%static:include path="js/${template_name}.underscore" />
+  <script type="text/template" id="new-section-template">
+    <section class="courseware-section new-section is-collapsible is-draggable">
+      <header>
+      <a href="#" data-tooltip="${_('Expand/collapse this section')}" class="action expand-collapse"><i class="icon-caret-down ui-toggle-dd"></i><span class="sr">${_('Expand/collapse this section')}</span></a>
+        <div class="item-details">
+          <h3 class="section-name">
+            <form class="section-name-form">
+              <input type="text" value="${_('New Section Name')}" class="new-section-name" />
+              <input type="submit" class="new-section-name-save" data-parent="${parent_locator}"
+                     data-category="${new_section_category}" value="${_('Save')}" />
+              <input type="button" class="new-section-name-cancel" value="${_('Cancel')}" />
+            </form>
+          </h3>
+        </div>
+      </header>
+    </section>
   </script>
-% endfor
+
+
+  <script type="text/template" id="blank-slate-template">
+  <section class="courseware-section new-section">
+    <header>
+      <a href="#" data-tooltip="${_('Expand/collapse this section')}" class="action expand-collapse"><i class="icon-caret-down ui-toggle-dd"></i><span class="sr">${_('Expand/collapse this section')}</span></a>
+      <div class="item-details">
+        <h3 class="section-name">
+        <span class="section-name-span">Click here to set the section name</span>
+        <form class="section-name-form">
+          <input type="text" value="${_('New Section Name')}" class="new-section-name" />
+          <input type="submit" class="new-section-name-save" data-parent="${parent_locator}"
+                 data-category="${new_section_category}" value="${_('Save')}" />
+          <input type="button" class="new-section-name-cancel" value="$(_('Cancel')}" /></h3>
+        </form>
+      </div>
+      <div class="item-actions">
+        <a href="#" data-tooltip="${_('Delete this section')}" class="delete-button delete-section-button"><span class="delete-icon"></span></a>
+        <span data-tooltip="${_('Drag to re-order')}" class="drag-handle"></span>
+      </div>
+    </header>
+  </section>
+  </script>
+
+  <script type="text/template" id="new-subsection-template">
+  <li class="collapsed">
+    <div class="section-item editing">
+      <form class="new-subsection-form">
+        <span class="subsection-name">
+          <input type="text" value="${_('New Subsection')}" class="new-subsection-name-input" />
+        </span>
+        <input type="submit" value="${_('Save')}" class="new-subsection-name-save" />
+        <input type="button" value="${_('Cancel')}" class="new-subsection-name-cancel" />
+      </form>
+    </div>
+    <ol>
+      <li>
+        <a href="unit.html" class="new-unit-item">
+          <i class="icon-plus"></i> ${_('New Unit')}
+        </a>
+      </li>
+    </ol>
+  </li>
+  </script>
+
+  <script type="text/template" id="no-outline-content">
+  <div class="no-outline-content">
+      <p>${_("You haven't added any sections to your course outline yet.")} <a href="#" class="button new-button"><i class="icon-plus"></i>${_("Add your first section")}</a></p>
+  </div>
+  </script>
 </%block>
 
 <%block name="content">
@@ -103,7 +165,7 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
                 <%include file="widgets/_ui-dnd-indicator-before.html" />
 
                 <header class="section">
-                  <a href="#" data-tooltip="${_('Expand/collapse this section')}" class="action expand-collapse"><i class="icon-caret-down ui-toggle-dd"></i><span class="sr">${_('Expand/collapse this section')}</span></a>
+                  <a href="#" data-tooltip="${_('Expand/collapse this section')}" class="action expand-collapse"><i class="icon-caret-down ui-toggle-expansion"></i><span class="sr">${_('Expand/collapse this section')}</span></a>
 
                   <div class="item-details" data-locator="${section_locator}">
                     <h3 class="section-name" data-name="${section.display_name_with_default | h}"></h3>
@@ -157,7 +219,7 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
 
                       <div class="section-item">
                         <div class="details">
-                        <a href="#" data-tooltip="${_('Expand/collapse this subsection')}" class="action expand-collapse"><i class="icon-caret-down ui-toggle"></i><span class="sr">${_('Expand/collapse this subsection')}</span></a>
+                        <a href="#" data-tooltip="${_('Expand/collapse this subsection')}" class="action expand-collapse"><i class="icon-caret-down ui-toggle-expansion"></i><span class="sr">${_('Expand/collapse this subsection')}</span></a>
                           <a href="${reverse('edit_subsection', args=[subsection.location])}">
                             <span class="subsection-name"><span class="subsection-name-value">${subsection.display_name_with_default}</span></span>
                           </a>
@@ -206,31 +268,57 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
       <aside class="content-supplementary" role="complimentary">
         <div class="bit">
           <h3 class="title-3">${_("What can I do on this page?")}</h3>
-          <p>${_("This is where you create the structure and content for your course. You can create new sections and subsections for organization, and new units for content. You can also set what subsections are graded. ")}</p>
+          <p>${_("You can create new sections and subsections, set the release date for sections, and create new units in existing subsections.  You can set the assignment type for subsections that are to be graded, and you can open a subsection for further editing.")}</p>
+
+            <p>${_("In addition, you can drag and drop sections, subsections, and units to reorganize your course.")}</p>
         </div>
       </aside>
     </section>
   </div>
   <footer></footer>
 
-  <div class="edit-subsection-publish-settings showAsModal">
-    <div class="settings">
-      <h3>${_("Section Release Date")}</h3>
-      <div class="picker datepair">
-        <div class="field field-start-date">
-          <label for="">${_("Release Day")}</label>
-          <input class="start-date date" type="text" name="start_date" value="" placeholder="MM/DD/YYYY" class="date" size='15' autocomplete="off"/>
-        </div>
-        <div class="field field-start-time">
-          <label for="">${_("Release Time")} (<abbr title="${_("Coordinated Universal Time")}">UTC</abbr>)</label>
-          <input class="start-time time" type="text" name="start_time" value="" placeholder="HH:MM" class="time" size='10' autocomplete="off"/>
-        </div>
+    <div
+      class="wrapper wrapper-dialog wrapper-dialog-edit-sectionrelease edit-section-publish-settings"
+      aria-describedby="dialog-edit-sectionrelease-description"
+      aria-labelledby="dialog-edit-sectionrelease-title"
+      aria-hidden=""
+      role="dialog">
+      <div class="dialog confirm">
 
-        <div class="description">
-          <p>${_('On the date set above, this section - {name} - will be released to students. Any units marked private will only be visible to admins.').format(name='<strong class="section-name"></strong>')}</p>
-        </div>
+        <form class="edit-sectionrelease-dialog" method="POST" action="#" enctype="multipart/form-data">
+          <div class="form-content">
+          <h2 class="title dialog-edit-sectionrelease-title">${_("Section Release Date")}</h2>
+          <p id="dialog-edit-sectionrelease-description" class="message">${_('On the date set below, this section - {name} - will be released to students. Any units marked private will only be visible to admins.').format(name='<strong class="section-name"></strong>')}</p>
+
+            <ul class="list-input picker datepair">
+              <li class="field field-start-date">
+                <label for="start_date">${_("Release Day")}</label>
+                <input class="start-date date" type="text" name="start_date" value="" placeholder="MM/DD/YYYY" class="date" size='15' autocomplete="off"/>
+              </li>
+              <li class="field field-start-time">
+                <label for="start_time">${_("Release Time")} (<abbr title="${_("Coordinated Universal Time")}">UTC</abbr>)</label>
+                <input class="start-time time" type="text" name="start_time" value="" placeholder="HH:MM" class="time" size='10' autocomplete="off"/>
+              </li>
+            </ul>
+
+          </div>
+
+          <div class="actions">
+            <h3 class="sr">${_("Form Actions")}</h3>
+          <ul>
+          <li class="action-item">
+            <a href="#" class="button action-primary action-save">${_("Save")}</a>
+          </li>
+          <li class="action-item">
+            <a href="#" class="button action-secondary action-cancel">${_("Cancel")}</a>
+          </li>
+          </ul>
+          </div>
+        </form>
+
       </div>
-      <a href="#" class="save-button">${_("Save")}</a><a href="#" class="cancel-button">${_("Cancel")}</a>
-    </div>
   </div>
+
+
+
 </%block>

@@ -1,4 +1,4 @@
-    <section class="courseware-section branch new-section">
+    <section class="courseware-section new-section">
       <header>
       <a href="#"  data-tooltip="${_('Collapse/expand this section')}" class="expand-collapse-icon collapse"></a>
         <div class="item-details">
