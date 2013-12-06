@@ -20,7 +20,7 @@ from xmodule.modulestore.xml_importer import import_from_xml, perform_xlint
 from xmodule.contentstore.mongo import MongoContentStore
 
 from xmodule.modulestore.tests.test_modulestore import check_path_to_location
-from IPython.testing.nose_assert_methods import assert_in, assert_not_in
+from IPython.testing.nose_assert_methods import assert_in
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.exceptions import InsufficientSpecificationError
 
@@ -39,7 +39,11 @@ class TestMongoModuleStore(object):
     '''Tests!'''
     @classmethod
     def setupClass(cls):
-        cls.connection = pymongo.connection.Connection(HOST, PORT)
+        cls.connection = pymongo.MongoClient(
+            host=HOST,
+            port=PORT,
+            tz_aware=True,
+        )
         cls.connection.drop_database(DB)
 
         # NOTE: Creating a single db for all the tests to save time.  This
@@ -50,8 +54,8 @@ class TestMongoModuleStore(object):
 
     @classmethod
     def teardownClass(cls):
-        cls.connection = pymongo.connection.Connection(HOST, PORT)
-        cls.connection.drop_database(DB)
+        if cls.connection:
+            cls.connection.drop_database(DB)
 
     @staticmethod
     def initdb():

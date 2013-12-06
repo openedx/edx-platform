@@ -1604,7 +1604,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         data = parse_json(resp)
         self.assertRegexpMatches(
             data['locator'],
-            r"^MITx.999.Robot_Super_Course/branch/draft/block/chapter([0-9]|[a-f]){3}$"
+            r"^MITx.999.Robot_Super_Course/branch/draft/block/chapter([0-9]|[a-f]){3,}$"
         )
 
     def test_capa_module(self):

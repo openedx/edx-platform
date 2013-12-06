@@ -69,7 +69,11 @@ class TestMixedModuleStore(object):
         """
         Set up the database for testing
         """
-        cls.connection = pymongo.connection.Connection(HOST, PORT)
+        cls.connection = pymongo.MongoClient(
+            host=HOST,
+            port=PORT,
+            tz_aware=True,
+        )
         cls.connection.drop_database(DB)
         cls.fake_location = Location(['i4x', 'foo', 'bar', 'vertical', 'baz'])
         cls.import_org, cls.import_course, cls.import_run = IMPORT_COURSEID.split('/')

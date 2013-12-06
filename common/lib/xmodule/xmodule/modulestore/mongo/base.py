@@ -274,25 +274,30 @@ class MongoModuleStore(ModuleStoreWriteBase):
             """
             Create & open the connection, authenticate, and provide pointers to the collection
             """
-            self.collection = pymongo.connection.Connection(
-                host=host,
-                port=port,
-                tz_aware=tz_aware,
-                **kwargs
-            )[db][collection]
+            self.database = pymongo.database.Database(
+                pymongo.MongoClient(
+                    host=host,
+                    port=port,
+                    tz_aware=tz_aware,
+                    **kwargs
+                ),
+                db
+            )
+            self.collection = self.database[collection]
 
             if user is not None and password is not None:
-                self.collection.database.authenticate(user, password)
+                self.database.authenticate(user, password)
 
         do_connection(**doc_store_config)
 
         # Force mongo to report errors, at the expense of performance
-        self.collection.safe = True
+        self.collection.write_concern = {'w': 1}
 
         # Force mongo to maintain an index over _id.* that is in the same order
         # that is used when querying by a location
         self.collection.ensure_index(
-            zip(('_id.' + field for field in Location._fields), repeat(1))
+            zip(('_id.' + field for field in Location._fields), repeat(1)),
+            name="location_index"
         )
 
         if default_class is not None:
