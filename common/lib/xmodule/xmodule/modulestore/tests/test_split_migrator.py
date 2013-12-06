@@ -31,7 +31,7 @@ class TestMigration(unittest.TestCase):
     db_config = {
         'host': 'localhost',
         'db': 'test_xmodule',
-        'collection': 'modulestore{0}'.format(uuid.uuid4().hex),
+        'collection': 'modulestore{0}'.format(uuid.uuid4().hex[:5]),
     }
 
     modulestore_options = {
