@@ -1,16 +1,14 @@
 .. _Open Response Assessment Problems:
 
-Open Response Assessments
+Open Response Assessment Problems
 ---------------------------------
 
 Introduction to Open Response Assessments
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. note:: 
-
-   Open response assessments are still in beta. We recommend that
-   you test them thoroughly in a practice course and only add them to
-   courses that are **not** already running. Contact your edX Program Manager for more information.
+.. note:: Open response assessments are still in beta. We recommend that
+          you test them thoroughly in a practice course and only add them to
+          courses that are **not** already running.
 
 Open response assessments allow instructors to assess student learning
 through questions that may not have definite answers. Tens of thousands
@@ -140,25 +138,27 @@ Creating an open response assessment is a multi-step process.
 
 Each of these steps is described in detail below.
 
-1. Create the Component
-~~~~~~~~~~~~~~~~~~~~~~~
+Step 1. Create the Component
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 #. Add the advanced component for open response assessments. To do this,
    add the "peergrading","combinedopenended" key value to the **Advanced
    Settings** page. (For more information, see the instructions in
-   Specialized Problems.)
+   :ref:`Specialized Problems`.)
 #. In Studio, open the unit where you want to create the ORA.
 #. Under **Add New Component**, click **Advanced**, and then click
    **Open Response Assessment**.
 #. In the problem component that appears, click **Edit**, and then click
    **OK** in the dialog box that appears.
 #. The component editor opens. The component editor contains a sample
-   question ("prompt"), rubric, assessment type specification, and
+   question ("prompt"), rubric, and the code for the assessment type and
    scoring. You'll replace this sample content with the content for your
    problem. 
  
-2. Add the Question
-~~~~~~~~~~~~~~~~~~~
+.. image:: Images/ORAComponentEditor.gif
+  
+Step 2. Add the Question
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 -  In the component editor, locate the [prompt] tags.
 
@@ -171,8 +171,12 @@ these guidelines to avoid common formatting mistakes.
 -  Leave the **[prompt]** tags in place.
 -  Enclose all text in HTML tags.
 
-3. Add the Rubric
-~~~~~~~~~~~~~~~~~
+Step 3. Add the Rubric
+~~~~~~~~~~~~~~~~~~~~~~
+
+**Note** *After you release your problem to students in your live course, make sure
+you don't make any changes to the rubric that affect scoring, such as adding or removing an option
+in a category. Changing the rubric can cause errors in live courses.*
 
 #. In the component editor, locate the [rubric] tags. (The sample rubric
    is long, so you'll have to scroll down to locate the second tag.)
@@ -205,13 +209,16 @@ these guidelines to avoid common formatting mistakes.
 
     [rubric]
 
-4. Set the Assessment Type and Scoring
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Step 4. Set the Assessment Type and Scoring
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To set the assessment type and scoring for your open response
-assessment, you'll enter code that specifies the type and order of
-assessments to use along with the scoring thresholds for each
-assessment. The code uses the following format.
+**Note** *After you release your problem to students in your live course, make sure
+you don't make any changes to the code for the assessment type and scoring. Changing 
+this code can cause errors in live courses.*
+
+To set the assessment type and scoring for your open response assessment, you'll 
+enter code that specifies the type and order of assessments to use along with 
+the scoring thresholds for each assessment. The code uses the following format.
 
 ::
 
@@ -257,8 +264,17 @@ Set the Type and Scoring
 
 #. Replace the sample code with the code for your problem.
 
-5. Set the Problem Name
-~~~~~~~~~~~~~~~~~~~~~~~
+Step 5. Set the Problem Name
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Note** *After you release your problem to students in your live course, make sure
+you don't change the name of the problem. Changing the display name when the problem
+is live can cause a loss of student data.*
+
+*You can change the display name of a problem while you're still testing the problem.
+However, note that all the test responses and scores associated with the problem 
+will be lost when you change the name. To update the problem name on the 
+instructor dashboard, submit a new test response to the problem.*
 
 The name of the problem appears as a heading above the problem in the
 courseware. It also appears in the list of problems on the **Staff
@@ -273,8 +289,8 @@ To change the name:
 #. In the **Display Name** field, replace **Open Response Assessment**
    with the name of your problem.
 
-6. Set Other Options
-~~~~~~~~~~~~~~~~~~~~
+Step 6. Set Other Options
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you want to change the problem settings, which include the number of
 responses a student has to peer grade and whether students can upload
@@ -304,7 +320,7 @@ Open response assessments include the following settings.
 |                                             | responses that are very short or that have many spelling or        |
 |                                             | grammatical errors) to be peer graded. For example, you may        |
 |                                             | disable the quality filter if you want students to include URLs to |
-|                                             | external content—otherwise Studio sees a URL, which may contain a  |
+|                                             | external content - otherwise Studio sees a URL, which may contain a|
 |                                             | long string of seemingly random characters, as a misspelled word.  |
 |                                             | When the quality filter is enabled (when this value is set to      |
 |                                             | False), Studio does not allow poor-quality submissions to be peer  |
@@ -358,6 +374,10 @@ Open response assessments include the following settings.
 +---------------------------------------------+--------------------------------------------------------------------+
 | **Problem Weight**                          | This setting specifies the number of points the problem is worth.  |
 |                                             | By default, each problem is worth one point.                       |
+|                                             |                                                                    |
+|                                             | **Note** *Every problem must have a problem weight of at least     |
+|                                             | one point. Problems that have a problem weight of zero points      |
+|                                             | don't appear on the instructor dashboard.                          |
 +---------------------------------------------+--------------------------------------------------------------------+
 | **Required Peer Grading**                   | This setting specifies the number of responses that each student   |
 |                                             | who submits a response has to grade before the student receives a  |
@@ -371,8 +391,8 @@ Open response assessments include the following settings.
 |                                             | previously graded responses.)                                      |
 +---------------------------------------------+--------------------------------------------------------------------+
 
-7. Save the Problem
-~~~~~~~~~~~~~~~~~~~
+Step 7. Save the Problem
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 -  After you have created the prompt and the rubric, set the assessment
    type and scoring, changed the name of the problem, and specified any
@@ -383,8 +403,8 @@ Open response assessments include the following settings.
 
 .. image:: Images/ORA_Component.gif
 
-8. Add the Peer Grading Interface (for peer assessments only)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Step 8. Add the Peer Grading Interface (for peer assessments only)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You can add just one peer grading interface for the whole course, or you
 can add a separate peer grading interface for each individual problem.
@@ -457,8 +477,8 @@ week).
 
 #. Click **Save** to close the component editor.
 
-9. Test the Problem
-~~~~~~~~~~~~~~~~~~~
+Step 9. Test the Problem
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 Test your problem by adding and grading a response.
 
@@ -494,6 +514,16 @@ that you use as an instructor.
    and then sign back in using a different account. Note that if you do
    this, you can't make changes to your course without signing out and
    signing back in as an instructor.
+
+When you test your problem, you may want to submit test responses that contain little
+text, random characters, or other content that doesn't resemble the responses that you
+expect from your students. Open response assessments include a quality filter that
+prevents instructors and other students from seeing these "low-quality" responses. 
+This quality filter is enabled by default. If you want to see all of your test 
+responses, including the "low-quality" responses, disable the quality filter. 
+
+To disable the quality filter, open the problem component, click the **Settings** tab,
+and then set the **Disable Quality Filter** setting to **True**.
 
 Grade an Open Response Assessment Problem
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -564,8 +594,7 @@ Grade Responses
    describes the response.
 #. If applicable, add additional feedback.
 
-   -  You can provide comments for the student in the **Written
-      Feedback** field.
+   -  You can provide comments for the student in the **Written Feedback** field.
    -  If you do not feel that you can grade the response (for example,
       if you're a member of course staff but you would rather have the
       instructor grade the response), you can click **Skip** to skip it.
@@ -592,6 +621,26 @@ submissions to grade** appears on the page.
 Click **Back to problem list** to return to the list of problems. You
 can also wait for a few minutes and click **Re-check for submissions**
 to see if any other students have submitted responses.
+
+**Note**
+
+When a response opens for you to grade, it leaves the current "grading pool" 
+that other instructors or students are grading from, which prevents other 
+instructors or students from 
+grading the response while you are working on it. If you do not submit a score 
+for this response within 30 minutes, the response returns to the grading pool 
+(so that it again becomes available for others to grade), even if you still have
+the response open on your screen.
+ 
+If the response returns to the grading pool (because the 30 minutes have passed), 
+but the response is still open on your screen, you can still submit feedback for 
+that response. If another instructor or student grades the response after it returns to the 
+grading pool but before you submit your feedback, the response receives two grades.
+ 
+If you click your browser's **Back** button to return to the problem list before you 
+click **Submit** to submit your feedback for a response, the response stays outside 
+the grading pool until 30 minutes have passed. When the response returns to the 
+grading pool, you can grade it. 
 
 Access Scores and Feedback
 ~~~~~~~~~~~~~~~~~~~~~~~~~~

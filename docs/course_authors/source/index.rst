@@ -30,6 +30,7 @@ Contents
    view_course_content
    export_import_course
    checking_student_progress
+   ora_students
    change_log
 
 
