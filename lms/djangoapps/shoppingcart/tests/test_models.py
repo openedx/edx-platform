@@ -434,7 +434,7 @@ class CertificateItemTest(ModuleStoreTestCase):
         self.mock_get_current_request.return_value = sentinel.request
 
     def test_existing_enrollment(self):
-        enrollment = CourseEnrollment.enroll(self.user, self.course_id)
+        CourseEnrollment.enroll(self.user, self.course_id)
         cart = Order.get_cart_for_user(user=self.user)
         CertificateItem.add_to_order(cart, self.course_id, self.cost, 'verified')
         # verify that we are still enrolled
@@ -443,19 +443,6 @@ class CertificateItemTest(ModuleStoreTestCase):
         cart.purchase()
         enrollment = CourseEnrollment.objects.get(user=self.user, course_id=self.course_id)
         self.assertEquals(enrollment.mode, u'verified')
-
-    def assert_upgrade_event_was_emitted(self, user, course_id):
-        """ Helper function; checks that a particular was called only once """
-        self.mock_server_track.assert_called_once_with(
-            sentinel.request,
-            'edx.course.enrollment.upgrade.succeeded',
-            {
-                'course_id': course_id,
-                'user_id': user.pk,
-                'mode': 'honor'
-            }
-        )
-        self.mock_server_track.reset_mock()
 
     def test_single_item_template(self):
         cart = Order.get_cart_for_user(user=self.user)

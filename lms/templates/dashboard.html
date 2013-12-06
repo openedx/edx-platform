@@ -29,13 +29,11 @@
       Logger.log('edx.course.enrollment.upgrade.clicked', [user, course], null);
       % if waffle.flag_is_active(request, 'alternate_upsell_copy'):
       analytics.track("Clicked on Alternate Upsell Copy", {
-        course: course,
-        user: user
+        course: course
       });
       % else:
       analytics.track("Clicked on Regular Upsell Copy", {
-        course: course,
-        user: user
+        course: course
       });
       % endif
     });

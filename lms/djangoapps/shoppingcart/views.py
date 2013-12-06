@@ -102,7 +102,6 @@ def show_receipt(request, ordernum):
     Displays a receipt for a particular order.
     404 if order is not yet purchased or request.user != order.user
     """
-
     try:
         order = Order.objects.get(id=ordernum)
     except Order.DoesNotExist:
@@ -128,9 +127,10 @@ def show_receipt(request, ordernum):
         receipt_template = order_items[0].single_item_receipt_template
         context.update(order_items[0].single_item_receipt_context)
 
+    # Only orders where order_items.count() == 1 might be attempting to upgrade
     attempting_upgrade = request.session.get('attempting_upgrade', False)
     if attempting_upgrade:
-        course_enrollment = CourseEnrollment.get_or_create_enrollment(request.user, context['course_id'])
+        course_enrollment = CourseEnrollment.get_or_create_enrollment(request.user, order_items[0].course_id)
         course_enrollment.emit_event(EVENT_NAME_USER_UPGRADED)
         request.session['attempting_upgrade'] = False
 

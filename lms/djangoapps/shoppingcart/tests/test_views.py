@@ -20,7 +20,7 @@ from student.models import CourseEnrollment
 from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_response
 from shoppingcart.processors import render_purchase_form_html
-from mock import patch, Mock
+from mock import patch, Mock, sentinel
 
 
 def mock_render_purchase_form_html(*args, **kwargs):
@@ -39,6 +39,8 @@ postpay_mock = Mock()
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class ShoppingCartViewsTests(ModuleStoreTestCase):
     def setUp(self):
+        patcher = patch('student.models.server_track')
+        self.mock_server_track = patcher.start()
         self.user = UserFactory.create()
         self.user.set_password('password')
         self.user.save()
@@ -202,6 +204,56 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertIn(reg_item, context['order_items'])
         self.assertIn(cert_item, context['order_items'])
         self.assertFalse(context['any_refunds'])
+
+    @patch('shoppingcart.views.render_to_response', render_mock)
+    def test_show_receipt_success_with_upgrade(self):
+
+        reg_item = PaidCourseRegistration.add_to_order(self.cart, self.course_id)
+        cert_item = CertificateItem.add_to_order(self.cart, self.verified_course_id, self.cost, 'honor')
+        self.cart.purchase(first='FirstNameTesting123', street1='StreetTesting123')
+
+        self.login_user()
+
+        # When we come from the upgrade flow, we'll have a session variable showing that
+        s = self.client.session
+        s['attempting_upgrade'] = True
+        s.save()
+
+        self.mock_server_track.reset_mock()
+        resp = self.client.get(reverse('shoppingcart.views.show_receipt', args=[self.cart.id]))
+
+        # Once they've upgraded, they're no longer *attempting* to upgrade
+        attempting_upgrade = self.client.session.get('attempting_upgrade', False)
+        self.assertFalse(attempting_upgrade)
+        
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn('FirstNameTesting123', resp.content)
+        self.assertIn('80.00', resp.content)
+
+
+        ((template, context), _) = render_mock.call_args
+
+        # When we come from the upgrade flow, we get these context variables
+
+
+        self.assertEqual(template, 'shoppingcart/receipt.html')
+        self.assertEqual(context['order'], self.cart)
+        self.assertIn(reg_item, context['order_items'])
+        self.assertIn(cert_item, context['order_items'])
+        self.assertFalse(context['any_refunds'])
+
+        course_enrollment = CourseEnrollment.get_or_create_enrollment(self.user, self.course_id)
+        course_enrollment.emit_event('edx.course.enrollment.upgrade.succeeded')
+        self.mock_server_track.assert_any_call(
+            None,
+            'edx.course.enrollment.upgrade.succeeded',
+            {
+                'user_id': course_enrollment.user.id,
+                'course_id': course_enrollment.course_id,
+                'mode': course_enrollment.mode
+            }
+        )
+        self.mock_server_track.reset_mock()
 
     @patch('shoppingcart.views.render_to_response', render_mock)
     def test_show_receipt_success_refund(self):

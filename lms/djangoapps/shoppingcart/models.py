@@ -212,7 +212,6 @@ class OrderItem(models.Model):
     refund_requested_time = models.DateTimeField(null=True)
     # general purpose field, not user-visible.  Used for reporting
     report_comments = models.TextField(default="")
-    refund_requested_time = models.DateTimeField(null=True)
 
     @property
     def line_cost(self):
