@@ -34,7 +34,7 @@ class TestPublish(unittest.TestCase):
     }
 
     def setUp(self):
-        self.db_config['collection'] = 'modulestore{0}'.format(uuid.uuid4().hex)
+        self.db_config['collection'] = 'modulestore{0}'.format(uuid.uuid4().hex[:5])
 
         self.old_mongo = MongoModuleStore(self.db_config, **self.modulestore_options)
         self.draft_mongo = DraftMongoModuleStore(self.db_config, **self.modulestore_options)

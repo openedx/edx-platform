@@ -21,7 +21,7 @@ from xmodule.modulestore.mixed import MixedModuleStore
 
 HOST = 'localhost'
 PORT = 27017
-DB = 'test_mongo_%s' % uuid4().hex
+DB = 'test_mongo_%s' % uuid4().hex[:5]
 COLLECTION = 'modulestore'
 FS_ROOT = DATA_DIR
 DEFAULT_CLASS = 'xmodule.raw_module.RawDescriptor'

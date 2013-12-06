@@ -55,7 +55,7 @@ def mongo_store_config(data_dir):
             'DOC_STORE_CONFIG': {
                 'host': 'localhost',
                 'db': 'test_xmodule',
-                'collection': 'modulestore_%s' % uuid4().hex,
+                'collection': 'modulestore{0}'.format(uuid4().hex[:5]),
             },
             'OPTIONS': {
                 'default_class': 'xmodule.raw_module.RawDescriptor',
@@ -86,7 +86,7 @@ def draft_mongo_store_config(data_dir):
             'DOC_STORE_CONFIG': {
                 'host': 'localhost',
                 'db': 'test_xmodule',
-                'collection': 'modulestore_%s' % uuid4().hex,
+                'collection': 'modulestore{0}'.format(uuid4().hex[:5]),
             },
             'OPTIONS': modulestore_options
         }
@@ -121,7 +121,7 @@ def studio_store_config(data_dir):
     store_config = {
         'host': 'localhost',
         'db': 'test_xmodule',
-        'collection': 'modulestore_%s' % uuid4().hex,
+        'collection': 'modulestore{0}'.format(uuid4().hex[:5]),
     }
     options = {
         'default_class': 'xmodule.raw_module.RawDescriptor',

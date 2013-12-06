@@ -297,7 +297,6 @@ class MongoModuleStore(ModuleStoreWriteBase):
         # that is used when querying by a location
         self.collection.ensure_index(
             zip(('_id.' + field for field in Location._fields), repeat(1)),
-            name="location_index"
         )
 
         if default_class is not None:
