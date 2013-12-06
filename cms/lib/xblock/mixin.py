@@ -1,5 +1,5 @@
 """
-Namespace defining common fields used by Studio for all blocks
+Mixin defining common Studio functionality
 """
 
 import datetime

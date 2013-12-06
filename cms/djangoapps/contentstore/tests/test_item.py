@@ -2,9 +2,20 @@
 
 import json
 import datetime
+import ddt
+
+from mock import Mock, patch
 from pytz import UTC
+from webob import Response
+
+from django.http import Http404
+from django.test import TestCase
+from django.test.client import RequestFactory
+
+from contentstore.views.component import component_handler
 
 from contentstore.tests.utils import CourseTestCase
+from student.tests.factories import UserFactory
 from xmodule.capa_module import CapaDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.django import loc_mapper
@@ -354,3 +365,53 @@ class TestEditItem(ItemTest):
         self.assertIsNone(published.due)
         draft = self.get_item_from_modulestore(self.problem_locator, True)
         self.assertEqual(draft.due, datetime.datetime(2077, 10, 10, 4, 0, tzinfo=UTC))
+
+
+@ddt.ddt
+class TestComponentHandler(TestCase):
+    def setUp(self):
+        self.request_factory = RequestFactory()
+
+        patcher = patch('contentstore.views.component.modulestore')
+        self.modulestore = patcher.start()
+        self.addCleanup(patcher.stop)
+
+        self.descriptor = self.modulestore.return_value.get_item.return_value
+
+        self.usage_id = 'dummy_usage_id'
+
+        self.user = UserFactory()
+
+        self.request = self.request_factory.get('/dummy-url')
+        self.request.user = self.user
+
+    def test_invalid_handler(self):
+        self.descriptor.handle.side_effect = Http404
+
+        with self.assertRaises(Http404):
+            component_handler(self.request, self.usage_id, 'invalid_handler')
+
+    @ddt.data('GET', 'POST', 'PUT', 'DELETE')
+    def test_request_method(self, method):
+
+        def check_handler(handler, request, suffix):
+            self.assertEquals(request.method, method)
+            return Response()
+
+        self.descriptor.handle = check_handler
+
+        # Have to use the right method to create the request to get the HTTP method that we want
+        req_factory_method = getattr(self.request_factory, method.lower())
+        request = req_factory_method('/dummy-url')
+        request.user = self.user
+
+        component_handler(request, self.usage_id, 'dummy_handler')
+
+    @ddt.data(200, 404, 500)
+    def test_response_code(self, status_code):
+        def create_response(handler, request, suffix):
+            return Response(status_code=status_code)
+
+        self.descriptor.handle = create_response
+
+        self.assertEquals(component_handler(self.request, self.usage_id, 'dummy_handler').status_code, status_code)
