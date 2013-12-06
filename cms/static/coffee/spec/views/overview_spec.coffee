@@ -328,7 +328,7 @@ define ["js/views/overview", "js/views/feedback_notification", "sinon", "js/base
                 )
                 expect($('#subsection-2')).not.toHaveClass('collapsed')
 
-        describe "AJAX", ->
+        xdescribe "AJAX", ->
             beforeEach ->
                 @requests = requests = []
                 @xhr = sinon.useFakeXMLHttpRequest()
