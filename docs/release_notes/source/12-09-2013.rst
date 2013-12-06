@@ -1,0 +1,49 @@
+###################################
+December 9, 2013
+###################################
+
+*************
+edX Studio
+*************
+
+=============
+New Features
+=============
+
+* 
+
+==========================
+Changes and Updates
+==========================
+
+The following changes are included in this release: 
+
+* 
+==========================
+Technical Changes
+==========================
+
+
+***************************************
+edX Learning Management System 
+***************************************
+==========================
+New Features
+==========================
+
+* 
+  
+==========================
+Changes and Updates
+==========================
+
+The following changes are included in this release: 
+
+* 
+******************
+Analytics 
+******************
+
+The following changes are included in this release: 
+
+* 
