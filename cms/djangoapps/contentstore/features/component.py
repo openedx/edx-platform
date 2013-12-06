@@ -57,6 +57,8 @@ def see_a_multi_step_component(step, category):
                     '\n    \n',
                 'Announcement':
                     '<p> Words of encouragement! This is a short note that most students will read. </p>',
+                'Zooming Image':
+                    '<h2>ZOOMING DIAGRAMS</h2>',
                 'E-text Written in LaTeX':
                     '<h2>Example: E-text page</h2>',
             }
