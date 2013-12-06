@@ -1,6 +1,6 @@
 .. _Open Response Assessment Problems:
 
-Open Response Assessment Problems
+Open Response Assessments
 ---------------------------------
 
 Introduction to Open Response Assessments
