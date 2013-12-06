@@ -2,11 +2,13 @@
 Read Me
 *******
 
-The edX *Building a course with Studio* documentation is created
-using RST_ files and Sphinx_. You, the user community, can help update and revise
+The edX *Release Notes for Course Staff* documentation provides a cumulative list of changes
+that affect course authoring in edX Studio and the edX Learning Management System.
+
+This document is created using RST_ files and Sphinx_. You, the user community, can help update and revise
 this documentation project on GitHub::
 
-  https://github.com/edx/edx-platform/tree/master/docs/course_authors/source
+  https://github.com/edx/edx-platform/tree/master/docs/release_notes/source
 
 To suggest a revision, fork the project, make changes in your fork, and submit
 a pull request back to the original project: this is known as the `GitHub Flow`_.
