@@ -34,21 +34,24 @@ from bulk_email.models import CourseEmail, CourseAuthorization
 from courseware import grades
 from courseware.access import has_access
 from courseware.courses import get_course_with_access, get_cms_course_link
-from courseware.roles import CourseStaffRole, CourseInstructorRole, CourseBetaTesterRole
+from courseware.roles import (
+    CourseStaffRole, CourseInstructorRole, CourseBetaTesterRole, GlobalStaff
+)
 from courseware.models import StudentModule
-from django_comment_common.models import (Role,
-                                          FORUM_ROLE_ADMINISTRATOR,
-                                          FORUM_ROLE_MODERATOR,
-                                          FORUM_ROLE_COMMUNITY_TA)
+from django_comment_common.models import (
+    Role, FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA
+)
 from django_comment_client.utils import has_forum_access
 from instructor.offline_gradecalc import student_grades, offline_grades_available
 from instructor.views.tools import strip_if_string
-from instructor_task.api import (get_running_instructor_tasks,
-                                 get_instructor_task_history,
-                                 submit_rescore_problem_for_all_students,
-                                 submit_rescore_problem_for_student,
-                                 submit_reset_problem_attempts_for_all_students,
-                                 submit_bulk_course_email)
+from instructor_task.api import (
+    get_running_instructor_tasks,
+    get_instructor_task_history,
+    submit_rescore_problem_for_all_students,
+    submit_rescore_problem_for_student,
+    submit_reset_problem_attempts_for_all_students,
+    submit_bulk_course_email
+)
 from instructor_task.views import get_task_completion_info
 from edxmako.shortcuts import render_to_response, render_to_string
 from psychometrics import psychoanalyze
