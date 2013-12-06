@@ -34,7 +34,7 @@ from bulk_email.models import CourseEmail, CourseAuthorization
 from courseware import grades
 from courseware.access import has_access
 from courseware.courses import get_course_with_access, get_cms_course_link
-from courseware.roles import CourseStaffRole, CourseInstructorRole, CourseBetaTesterRole
+from courseware.roles import CourseStaffRole, CourseInstructorRole, CourseBetaTesterRole, GlobalStaff
 from courseware.models import StudentModule
 from django_comment_common.models import (Role,
                                           FORUM_ROLE_ADMINISTRATOR,
