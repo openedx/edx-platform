@@ -43,9 +43,9 @@ def i_confirm_with_ok(_step):
 @step(u'I press the "([^"]*)" delete icon$')
 def i_press_the_category_delete_icon(_step, category):
     if category == 'section':
-        css = 'a.delete-button.delete-section-button span.delete-icon'
+        css = 'a.action.delete-section-button'
     elif category == 'subsection':
-        css = 'a.delete-button.delete-subsection-button  span.delete-icon'
+        css = 'a.action.delete-subsection-button'
     else:
         assert False, 'Invalid category: %s' % category
     world.css_click(css)
@@ -254,7 +254,7 @@ def create_course_with_unit():
 
     world.wait_for_js_to_load()
     css_selectors = [
-        'div.section-item a.expand-collapse-icon', 'a.new-unit-item'
+        'div.section-item a.expand-collapse', 'a.new-unit-item'
     ]
     for selector in css_selectors:
         world.css_click(selector)

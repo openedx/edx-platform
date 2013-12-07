@@ -76,6 +76,9 @@
     padding: ($baseline/4);
   }
 
+  .new-subsection-name-input {
+    @include font-size(14);
+  }
   .new-section-name-save,
   .new-subsection-name-save {
     @include blue-button;
@@ -166,7 +169,7 @@
       &.drag-handle {
         float: none;
         margin: 0;
-        background: none;
+        background: transparent url(../img/drag-handles.png) right 5px no-repeat;
         text-align: center;
       }
 

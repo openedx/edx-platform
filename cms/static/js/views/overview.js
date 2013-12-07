@@ -31,7 +31,7 @@ define(["domReady", "jquery", "jquery.ui", "underscore", "gettext", "js/views/fe
 
         var toggleSubmodules = function(e) {
             e.preventDefault();
-            $(this).toggleClass('expand');
+            $(this).toggleClass('expand').toggleClass('collapse');
             $(this).closest('.is-collapsible, .window').toggleClass('collapsed');
         };
 
@@ -100,9 +100,9 @@ define(["domReady", "jquery", "jquery.ui", "underscore", "gettext", "js/views/fe
                             '<strong>' + gettext("Release date:") + '&nbsp;</strong>' +
                             gettext("{month}/{day}/{year} at {hour}:{minute} UTC") +
                             '</span>' +
-                            '<a href="#" class="edit-release-date action" data-date="{month}/{day}/{year}" data-time="{hour}:{minute}" data-locator="{locator}">' +
-                            gettext("Edit") +
-                            '</a>',
+                            '<a href="#" class="edit-release-date action" data-date="{month}/{day}/{year}" data-time="{hour}:{minute}" data-locator="{locator}"><i class="icon-time"></i> <span class="sr">' +
+                            gettext("Edit section release date") +
+                            '</span></a>',
                         {year: datetime.getUTCFullYear(), month: pad2(datetime.getUTCMonth() + 1), day: pad2(datetime.getUTCDate()),
                             hour: pad2(datetime.getUTCHours()), minute: pad2(datetime.getUTCMinutes()),
                             locator: locator},
