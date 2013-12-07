@@ -29,7 +29,7 @@ def i_have_added_new_section(_step):
 
 @step('I click the Edit link for the release date$')
 def i_click_the_edit_link_for_the_release_date(_step):
-    button_css = 'div.section-published-date a.edit-button'
+    button_css = 'div.section-published-date a.edit-release-date'
     world.css_click(button_css)
 
 
@@ -88,7 +88,7 @@ def i_see_a_release_date_for_my_section(_step):
     status_text = world.css_text(css)
 
     # e.g. 11/06/2012 at 16:25
-    msg = 'Will Release:'
+    msg = 'Release Date:'
     date_regex = r'(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d\d?, \d{4}'
     if not re.search(date_regex, status_text):
         print status_text, date_regex
@@ -117,7 +117,7 @@ def the_section_release_date_picker_not_visible(_step):
 def the_section_release_date_is_updated(_step):
     css = 'span.published-status'
     status_text = world.css_text(css)
-    assert_equal(status_text, 'Will Release: 12/25/2013 at 00:00 UTC')
+    assert_equal(status_text, 'Release Date: 12/25/2013 at 00:00 UTC')
 
 
 def save_section_name(name):

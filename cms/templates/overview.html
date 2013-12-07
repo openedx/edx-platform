@@ -190,7 +190,7 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
                           %else:
                             <span class="published-status"><strong>${_("Release date:")}</strong>
                             ${date_utils.get_default_time_display(section.start)}</span>
-                            <a href="#" class="edit-release-date action" data-date="${start_date_str}" data-time="${start_time_str}" data-id="${section.location}"><i class="icon-time"></i> <span class="sr">${_("Edit section release date")}</span></a>
+                            <a href="#" class="edit-release-date action" data-date="${start_date_str}" data-time="${start_time_str}" data-locator="${section_locator}" data-id="${section.location}"><i class="icon-time"></i> <span class="sr">${_("Edit section release date")}</span></a>
                           %endif
                         </div>
                       </li>
@@ -198,7 +198,7 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
                         <a href="#" data-tooltip="${_('Delete this section')}" class="action delete-section-button"><i class="icon-trash"></i> <span class="sr">Delete section</span></a>
                       </li>
                       <li class="actions-item drag">
-                        <span data-tooltip="${_('Drag to reorder')}" class="drag-handle section-drag-handle action"><i class="icon-ellipsis-vertical"></i><span class="sr"> ${_("Drag to reorder section")}</span></span>
+                        <span data-tooltip="${_('Drag to reorder')}" class="drag-handle section-drag-handle action"><span class="sr"> ${_("Drag to reorder section")}</span></span>
                       </li>
                     </ul>
                   </div>
@@ -219,7 +219,7 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
 
                       <div class="section-item">
                         <div class="details">
-                        <a href="#" data-tooltip="${_('Expand/collapse this subsection')}" class="action expand-collapse"><i class="icon-caret-down ui-toggle-expansion"></i><span class="sr">${_('Expand/collapse this subsection')}</span></a>
+                        <a href="#" data-tooltip="${_('Expand/collapse this subsection')}" class="action expand-collapse expand"><i class="icon-caret-down ui-toggle-expansion"></i><span class="sr">${_('Expand/collapse this subsection')}</span></a>
                           <a href="${reverse('edit_subsection', args=[subsection.location])}">
                             <span class="subsection-name"><span class="subsection-name-value">${subsection.display_name_with_default}</span></span>
                           </a>
@@ -235,7 +235,7 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
                               <a href="#" data-tooltip="${_('Delete this subsection')}" class="action delete-subsection-button"><i class="icon-trash"></i> <span class="sr">${_("Delete subsection")}</span></a>
                             </li>
                             <li class="actions-item drag">
-                              <span data-tooltip="${_('Drag to reorder')}" class="drag-handle subsection-drag-handle action"><i class="icon-ellipsis-vertical"></i></span>
+                              <span data-tooltip="${_('Drag to reorder')}" class="drag-handle subsection-drag-handle action"></span>
                             </li>
                           </ul>
                         </div>
@@ -285,7 +285,7 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
       role="dialog">
       <div class="dialog confirm">
 
-        <form class="edit-sectionrelease-dialog" method="POST" action="#" enctype="multipart/form-data">
+        <form class="edit-sectionrelease-dialog" action="#">
           <div class="form-content">
           <h2 class="title dialog-edit-sectionrelease-title">${_("Section Release Date")}</h2>
           <p id="dialog-edit-sectionrelease-description" class="message">${_('On the date set below, this section - {name} - will be released to students. Any units marked private will only be visible to admins.').format(name='<strong class="section-name"></strong>')}</p>
