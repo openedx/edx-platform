@@ -31,7 +31,7 @@ define(["domReady", "jquery", "jquery.ui", "underscore", "gettext", "js/views/fe
 
         var toggleSubmodules = function(e) {
             e.preventDefault();
-            $(this).toggleClass('expand');
+            $(this).toggleClass('expand').toggleClass('collapse');
             $(this).closest('.is-collapsible, .window').toggleClass('collapsed');
         };
 

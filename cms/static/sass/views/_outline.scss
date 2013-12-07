@@ -76,6 +76,9 @@
     padding: ($baseline/4);
   }
 
+  .new-subsection-name-input {
+    @include font-size(14);
+  }
   .new-section-name-save,
   .new-subsection-name-save {
     @include blue-button;
