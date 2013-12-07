@@ -43,9 +43,9 @@ def i_confirm_with_ok(_step):
 @step(u'I press the "([^"]*)" delete icon$')
 def i_press_the_category_delete_icon(_step, category):
     if category == 'section':
-        css = 'a.delete-button.delete-section-button'
+        css = 'a.action.delete-section-button'
     elif category == 'subsection':
-        css = 'a.delete-button.delete-subsection-button'
+        css = 'a.action.delete-subsection-button'
     else:
         assert False, 'Invalid category: %s' % category
     world.css_click(css)
