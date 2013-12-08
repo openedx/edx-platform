@@ -6,11 +6,15 @@ December 9, 2013
 edX Studio
 *************
 
+.. note:: You can now access the public edX roadmap_ for details about the currently planned product direction.
+
+.. _roadmap: https://edx-wiki.atlassian.net/wiki/display/OPENPROD/OpenEdX+Public+Product+Roadmap
+
 =============
 New Features
 =============
 
-* 
+* You can now allow multiple strings as correct answers to text response problems. (BLD-474)
 
 ==========================
 Changes and Updates
@@ -18,32 +22,48 @@ Changes and Updates
 
 The following changes are included in this release: 
 
-* 
-==========================
-Technical Changes
-==========================
+* If you entered invalid HTML in the Course Handouts, you were not able to edit the Course Handouts to fix the HTML. This problem is resolved (STUD-293)
+
+* When you created a new video, you received a 500 error and could not import a timed transcript. This problem is resolved. (BLD-530)
+
+* In Internet Explorer 9.x, when you locked and unlocked assets, the Save notification was not displayed. This problem is resolved. (STUD-815)
+
+* In Firefox, when viewing a unit, you could not select and copy the unit identifier. This problem is resolved. (STUD-863)
+
+* When you viewed problems within Studio, italics did not render properly. This problem is resolved. (STUD-963)
 
 
 ***************************************
 edX Learning Management System 
 ***************************************
-==========================
-New Features
-==========================
 
-* 
+
+The following changes are included in this release: 
+
+* All dialog boxes in the Wiki are now fully accessible to screen readers. (LMS-1337)
+
+* The reset password function allowed others to determine valid usersnames. This problem is resolved. [DETAILS] (LMS-1507)
+
+* If a user registered for a verified certificate, then switched to the audit the course, the student
+  remained listed as signed up for a verified certificate. This problem is resolved. (LMS-1526)
   
-==========================
-Changes and Updates
-==========================
+* In code response questions, the button to hide the output is now shown for each test case, so students do
+  not need to scroll through all test cases to get to the button to hide all output. (BLD-126)
+  
+* The calculator tooltips now show all options for inputing numbers. (BLD-400)
+
+* The video player now alerts screen readers when the video is over. (BLD-488)
+
+* Numerical input problems now support mathematical operations. (BLD-525)
+
+* The calculator tooltips are now fully accessible to screen readers. (BLD-533)
+
+******************
+Forums 
+******************
 
 The following changes are included in this release: 
 
-* 
-******************
-Analytics 
-******************
+* An update to enhance accessibility was made so that when users load additional forum threads,
+  focus remains on the loading element. (FOR-238)
 
-The following changes are included in this release: 
-
-* 
