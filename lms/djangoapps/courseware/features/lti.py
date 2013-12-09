@@ -7,7 +7,7 @@ from lettuce import world, step
 from lettuce.django import django_url
 from common import course_id
 
-from student.models import CourseEnrollment
+from courseware.tests.factories import InstructorFactory
 
 
 @step('I view the LTI and error is shown$')
@@ -195,15 +195,12 @@ def i_am_registered_for_the_course(course, metadata):
     # Create the course
     create_course(course, metadata)
 
-    # Create the user
-    world.create_user('robot', 'test')
-    usr = User.objects.get(username='robot')
+    # Create an instructor
+    instructor = InstructorFactory(course=world.scenario_dict['COURSE'].location)
 
-    # If the user is not already enrolled, enroll the user.
-    CourseEnrollment.enroll(usr, course_id(course))
-
-    world.add_to_course_staff('robot', world.scenario_dict['COURSE'].number)
-    world.log_in(username='robot', password='test')
+    # Enroll the user in the course and log them in
+    world.enroll_user(instructor, course_id(course))
+    world.log_in(username=instructor.username, password='test')
 
 
 def check_lti_popup():
