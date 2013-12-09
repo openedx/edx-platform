@@ -334,6 +334,11 @@ class @Problem
     @el.find('.capa_alert').css(opacity: 0).animate(opacity: 1, 700)
 
   save: =>
+    # JSInput sets a 'data-waitfor' attribute for the input field, containing a 
+    # reference to its 'update' function. There, it will update the value of the
+    # input field with the value returned by its 'get_statefn' attribute.
+    # If we want the state to be saved, we have to call @check_waitfor()
+    @check_waitfor()
     Logger.log 'problem_save', @answers
     $.postWithPrefix "#{@url}/problem_save", @answers, (response) =>
       saveMessage = response.msg
