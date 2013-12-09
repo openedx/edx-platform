@@ -5,6 +5,9 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Blades: Add template that displays the most up-to-date features of
+drag-and-drop. BLD-479.
+
 Blades: LTI additional Python tests. LTI fix bug e-reader error when popping
 out window. BLD-465.
 
