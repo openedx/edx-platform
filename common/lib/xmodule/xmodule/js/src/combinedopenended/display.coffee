@@ -632,7 +632,7 @@ class @CombinedOpenEnded
     if @prompt_container.is(":visible")==true
       @prompt_container.slideToggle()
       @prompt_container.toggleClass('open')
-      @question_header.text("Show Question")
+      @question_header.text(gettext("Show Question"))
 
   log_feedback_click: (event) ->
     link_text = @$(event.target).html()
