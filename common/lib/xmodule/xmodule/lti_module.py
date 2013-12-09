@@ -292,21 +292,6 @@ class LTIModule(LTIFields, XModule):
         """
         return Response(self.get_form(), content_type='text/html')
 
-    def handle_ajax(self, dispatch, __):
-        """
-        Ajax handler.
-
-        Args:
-            dispatch: string request slug
-
-        Returns:
-            json string
-        """
-        if dispatch == 'regenerate_signature':
-            return json.dumps({ 'input_fields': self.get_input_fields() })
-        else: # return error message
-            return json.dumps({ 'error': '[handle_ajax]: Unknown Command!' })
-
     def get_user_id(self):
         user_id = self.runtime.anonymous_student_id
         assert user_id is not None

@@ -12,7 +12,7 @@
             <h3 class="title">
                 ${display_name} (${_('External resource')})
             </h3>
-            <p class="lti-link external"><a target="_blank" class='link_lti_new_window' href="${form_url}" class=''>
+            <p class="lti-link external"><a target="_blank" class='link_lti_new_window' href="${form_url}">
                 ${_('View resource in a new window')}
                  <i class="icon-external-link"></i>
             </a></p>
@@ -21,6 +21,7 @@
         ## The result of the form submit will be rendered here.
         <iframe
             class="ltiLaunchFrame"
+            name="ltiFrame-${element_id}"
             src="${form_url}"
         ></iframe>
     % endif
