@@ -707,17 +707,18 @@ class CertificateStatusReport(Report):
             cur_course = get_course_by_id(course_id)
             university = cur_course.org
             course = cur_course.number + " " + cur_course.display_name  # TODO add term (i.e. Fall 2013)?
-            enrollments = CourseEnrollment.objects.filter(course_id=course_id)
+            enrollments = CourseEnrollment.objects.filter(course_id=course_id,is_active=True)
             total_enrolled = enrollments.count()
             audit_enrolled = enrollments.filter(mode="audit").count()
             honor_enrolled = enrollments.filter(mode="honor").count()
-            verified_enrollments = enrollments.filter(mode="verified")
+            # Since every verified enrollment has 1 and only 1 cert item, let's just query those
+            verified_enrollments = CertificateItem.objects.filter(course_id=course_id, mode="verified", status="purchased")
             verified_enrolled = verified_enrollments.count()
-            gross_rev_temp = CertificateItem.objects.filter(course_id=course_id, mode="verified").aggregate(Sum('unit_cost'))
+            gross_rev_temp = CertificateItem.objects.filter(course_id=course_id, mode="verified", status="purchased").aggregate(Sum('unit_cost'))
             gross_rev = gross_rev_temp['unit_cost__sum']
             gross_rev_over_min = gross_rev - (CourseMode.objects.get(course_id=course_id, mode_slug="verified").min_price * verified_enrolled)
             num_verified_over_min = 0  # TODO clarify with billing what exactly this means
-            refunded_enrollments = CertificateItem.objects.filter(course_id='course_id', mode="refunded")
+            refunded_enrollments = CertificateItem.objects.filter(course_id='course_id', mode="verified", status="refunded")
             number_of_refunds = refunded_enrollments.count()
             dollars_refunded_temp = refunded_enrollments.aggregate(Sum('unit_cost'))
             if dollars_refunded_temp['unit_cost__sum'] is None:
