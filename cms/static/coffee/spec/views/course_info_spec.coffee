@@ -28,10 +28,9 @@ define ["js/views/course_info_handout", "js/views/course_info_update", "js/model
             setFixtures($("<script>", {id: "course_info_update-tpl", type: "text/template"}).text(courseInfoTemplate))
             appendSetFixtures courseInfoPage
 
-            courseUpdatesXhr = sinon.useFakeXMLHttpRequest()
-            @courseUpdatesRequests = requests = []
-            courseUpdatesXhr.onCreate = (xhr) -> requests.push(xhr)
-            @xhrRestore = courseUpdatesXhr.restore
+            @requests = requests = []
+            @xhr = sinon.useFakeXMLHttpRequest()
+            @xhr.onCreate = (xhr) -> requests.push(xhr)
 
             @collection = new CourseUpdateCollection()
             @collection.url = 'course_info_update/'
@@ -92,7 +91,7 @@ define ["js/views/course_info_handout", "js/views/course_info_update", "js/model
                     modalCover.click()
 
         afterEach ->
-            @xhrRestore()
+            @xhr.restore()
 
         it "does not rewrite links on save", ->
             # Create a new update, verifying that the model is created
@@ -109,7 +108,7 @@ define ["js/views/course_info_handout", "js/views/course_info_update", "js/model
             expect(model.save).toHaveBeenCalled()
 
             # Verify content sent to server does not have rewritten links.
-            contentSaved = JSON.parse(@courseUpdatesRequests[@courseUpdatesRequests.length - 1].requestBody).content
+            contentSaved = JSON.parse(@requests[@requests.length - 1].requestBody).content
             expect(contentSaved).toEqual('/static/image.jpg')
 
         it "does rewrite links for preview", ->
@@ -146,10 +145,9 @@ define ["js/views/course_info_handout", "js/views/course_info_update", "js/model
             setFixtures($("<script>", {id: "course_info_handouts-tpl", type: "text/template"}).text(handoutsTemplate))
             appendSetFixtures courseInfoPage
 
-            courseHandoutsXhr = sinon.useFakeXMLHttpRequest()
-            @handoutsRequests = requests = []
-            courseHandoutsXhr.onCreate = (xhr) -> requests.push(xhr)
-            @handoutsXhrRestore = courseHandoutsXhr.restore
+            @requests = requests = []
+            @xhr = sinon.useFakeXMLHttpRequest()
+            @xhr.onCreate = (xhr) -> requests.push(xhr)
 
             @model = new ModuleInfo({
                 id: 'handouts-id',
@@ -165,7 +163,7 @@ define ["js/views/course_info_handout", "js/views/course_info_update", "js/model
             @handoutsEdit.render()
 
         afterEach ->
-            @handoutsXhrRestore()
+            @xhr.restore()
 
         it "does not rewrite links on save", ->
             # Enter something in the handouts section, verifying that the model is saved
@@ -176,7 +174,7 @@ define ["js/views/course_info_handout", "js/views/course_info_update", "js/model
             @handoutsEdit.$el.find('.save-button').click()
             expect(@model.save).toHaveBeenCalled()
 
-            contentSaved = JSON.parse(@handoutsRequests[@handoutsRequests.length - 1].requestBody).data
+            contentSaved = JSON.parse(@requests[@requests.length - 1].requestBody).data
             expect(contentSaved).toEqual('/static/image.jpg')
 
         it "does rewrite links in initial content", ->
