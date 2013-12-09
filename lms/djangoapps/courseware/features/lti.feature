@@ -45,7 +45,7 @@ Feature: LMS.LTI component
   Given the course has correct LTI credentials
   And the course has an LTI component with correct fields:
   | open_in_a_new_page | weight | is_graded | has_score |
-  | False              | 10     | True      | True |
+  | False              | 10     | True      | True      |
   And I submit answer to LTI question
   And I click on the "Progress" tab
   Then I see text "Problem Scores: 5/10"

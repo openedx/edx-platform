@@ -3,6 +3,7 @@
 
 from mock import Mock, patch, PropertyMock
 import textwrap
+import json
 from lxml import etree
 from webob.request import Request
 from copy import copy
@@ -249,6 +250,28 @@ class LTIModuleTest(LogicTest):
 
     def test_client_key_secret(self):
         pass
+
+    def test_handle_ajax(self):
+        dispatch = 'regenerate_signature'
+        data = ''
+        self.xmodule.get_input_fields = Mock(return_value={'test_input_field_key': 'test_input_field_value'})
+        json_dump = self.xmodule.handle_ajax(dispatch, data)
+        expected_json_dump = '{"input_fields": {"test_input_field_key": "test_input_field_value"}}'
+        self.assertEqual(
+            json.loads(json_dump),
+            json.loads(expected_json_dump)
+        )
+
+    def test_handle_ajax_bad_dispatch(self):
+        dispatch = 'bad_dispatch'
+        data = ''
+        self.xmodule.get_input_fields = Mock(return_value={'test_input_field_key': 'test_input_field_value'})
+        json_dump = self.xmodule.handle_ajax(dispatch, data)
+        expected_json_dump = '{"error": "[handle_ajax]: Unknown Command!"}'
+        self.assertEqual(
+            json.loads(json_dump),
+            json.loads(expected_json_dump)
+        )
 
     def test_max_score(self):
         self.xmodule.weight = 100.0

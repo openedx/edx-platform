@@ -5,6 +5,9 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Blades: LTI additional Python tests. LTI fix bug e-reader error when popping
+out window. BLD-465.
+
 Common: Switch from mitx.db to edx.db for sqlite databases. This will effectively
   reset state for local instances of the code, unless you manually rename your
   mitx.db file to edx.db.
