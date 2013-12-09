@@ -58,7 +58,7 @@ def instructor_dashboard_2(request, course_id):
         _section_analytics(course_id, access),
     ]
 
-    if (settings.MITX_FEATURES.get('INDIVIDUAL_DUE_DATES')
+    if (settings.FEATURES.get('INDIVIDUAL_DUE_DATES')
         and access['instructor']):
         sections.insert(3, _section_extensions(course))
 

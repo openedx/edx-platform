@@ -23,7 +23,7 @@ LANGUAGES = (
 )
 TEMPLATE_DEBUG = True
 
-MITX_FEATURES['INDIVIDUAL_DUE_DATES'] = True # crossi dev, delete if checked in
+FEATURES['INDIVIDUAL_DUE_DATES'] = True # crossi dev, delete if checked in
 
 FEATURES['DISABLE_START_DATES'] = False
 FEATURES['ENABLE_SQL_TRACKING_LOGS'] = True

@@ -320,7 +320,7 @@ function goto( mode)
 
 ##-----------------------------------------------------------------------------
 %if modeflag.get('Extensions'):
-  %if settings.MITX_FEATURES.get('INDIVIDUAL_DUE_DATES'):
+  %if settings.FEATURES.get('INDIVIDUAL_DUE_DATES'):
     <H2>${_("Individual due date extensions")}</h2>
 
     <p>
