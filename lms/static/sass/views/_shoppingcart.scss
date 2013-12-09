@@ -5,6 +5,14 @@
   padding: 30px 30px 0 30px;
 }
 
+.error_msg {
+  margin: 20px;
+  padding: 5px;
+  color: $red;
+  border: 1px solid $red;
+
+}
+
 .cart-list {
   padding: 30px;
   margin-top: 40px;

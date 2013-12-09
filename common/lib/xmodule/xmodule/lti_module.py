@@ -83,6 +83,7 @@ class LTIFields(object):
 
     https://github.com/idan/oauthlib/blob/master/oauthlib/oauth1/rfc5849/signature.py#L136
     """
+    display_name = String(display_name="Display Name", help="Display name for this module", scope=Scope.settings, default="LTI")
     lti_id = String(help="Id of the tool", default='', scope=Scope.settings)
     launch_url = String(help="URL of the tool", default='http://www.example.com', scope=Scope.settings)
     custom_parameters = List(help="Custom parameters (vbid, book_location, etc..)", scope=Scope.settings)

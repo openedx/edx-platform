@@ -2,9 +2,12 @@ $ ->
   if !window.$$contents
     window.$$contents = {}
   $.fn.extend
-    loading: ->
-      @$_loading = $("<div class='loading-animation'><span class='sr'>Loading content</span></div>")
+    loading: (takeFocus) ->
+      @$_loading = $("<div class='loading-animation' tabindex='0'><span class='sr'>Loading content</span></div>")
       $(this).after(@$_loading)
+      if takeFocus
+        DiscussionUtil.makeFocusTrap(@$_loading)
+        @$_loading.focus()
     loaded: ->
       @$_loading.remove()
 
@@ -87,6 +90,18 @@ class @DiscussionUtil
       "notifications_status" : "/notification_prefs/status"
     }[name]
 
+  @activateOnEnter: (event, func) ->
+    if event.which == 13
+      e.preventDefault()
+      func(event)
+
+  @makeFocusTrap: (elem) ->
+    elem.keydown(
+      (event) ->
+        if event.which == 9 # Tab
+          event.preventDefault()
+    )
+
   @discussionAlert: (header, body) ->
     if $("#discussion-alert").length == 0
       alertDiv = $("<div class='modal' role='alertdialog' id='discussion-alert' aria-describedby='discussion-alert-message'/>").css("display", "none")
@@ -99,12 +114,7 @@ class @DiscussionUtil
         "  <button class='dismiss'>OK</button>" +
         "</div>"
       )
-      # Capture focus
-      alertDiv.find("button").keydown(
-        (event) ->
-          if event.which == 9 # Tab
-            event.preventDefault()
-      )
+      @makeFocusTrap(alertDiv.find("button"))
       alertTrigger = $("<a href='#discussion-alert' id='discussion-alert-trigger'/>").css("display", "none")
       alertTrigger.leanModal({closeButton: "#discussion-alert .dismiss", overlay: 1, top: 200})
       $("body").append(alertDiv).append(alertTrigger)
@@ -125,7 +135,7 @@ class @DiscussionUtil
         if params["loadingCallback"]?
           params["loadingCallback"].apply(params["$loading"])
         else
-          params["$loading"].loading()
+          params["$loading"].loading(params["takeFocus"])
     if !params["error"]
       params["error"] = =>
         @discussionAlert(

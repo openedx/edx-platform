@@ -508,5 +508,5 @@ class CombinedOpenEndedDescriptor(CombinedOpenEndedFields, RawDescriptor):
     def non_editable_metadata_fields(self):
         non_editable_fields = super(CombinedOpenEndedDescriptor, self).non_editable_metadata_fields
         non_editable_fields.extend([CombinedOpenEndedDescriptor.due, CombinedOpenEndedDescriptor.graceperiod,
-                                    CombinedOpenEndedDescriptor.markdown, CombinedOpenEndedDescriptor.version])
+                                    CombinedOpenEndedDescriptor.markdown, CombinedOpenEndedDescriptor.version, CombinedOpenEndedDescriptor.track_changes])
         return non_editable_fields

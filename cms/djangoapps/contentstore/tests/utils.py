@@ -10,8 +10,9 @@ from django.test.client import Client
 from django.test.utils import override_settings
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from contentstore.tests.modulestore_config import TEST_MODULESTORE
+from xmodule.modulestore.django import loc_mapper
 
 
 def parse_json(response):
@@ -41,6 +42,7 @@ class AjaxEnabledTestClient(Client):
         if not isinstance(data, basestring):
             data = json.dumps(data or {})
         kwargs.setdefault("HTTP_X_REQUESTED_WITH", "XMLHttpRequest")
+        kwargs.setdefault("HTTP_ACCEPT", "application/json")
         return self.post(path=path, data=data, content_type=content_type, **kwargs)
 
     def get_html(self, path, data=None, follow=False, **extra):
@@ -88,6 +90,9 @@ class CourseTestCase(ModuleStoreTestCase):
             display_name='Robot Super Course',
         )
         self.course_location = self.course.location
+        self.course_locator = loc_mapper().translate_location(
+            self.course.location.course_id, self.course.location, False, True
+        )
 
     def createNonStaffAuthedUserClient(self):
         """
@@ -106,3 +111,16 @@ class CourseTestCase(ModuleStoreTestCase):
         client = Client()
         client.login(username=uname, password=password)
         return client, nonstaff
+    
+    def populateCourse(self):
+        """
+        Add 2 chapters, 4 sections, 8 verticals, 16 problems to self.course (branching 2)
+        """
+        def descend(parent, stack):
+            xblock_type = stack.pop(0)
+            for _ in range(2):
+                child = ItemFactory.create(category=xblock_type, parent_location=parent.location)
+                if stack:
+                    descend(child, stack)
+
+        descend(self.course, ['chapter', 'sequential', 'vertical', 'problem'])

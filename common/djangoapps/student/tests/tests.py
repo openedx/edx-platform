@@ -59,23 +59,28 @@ class ResetPasswordTests(TestCase):
         self.user_bad_passwd.password = UNUSABLE_PASSWORD
         self.user_bad_passwd.save()
 
+    @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
     def test_user_bad_password_reset(self):
         """Tests password reset behavior for user with password marked UNUSABLE_PASSWORD"""
 
         bad_pwd_req = self.request_factory.post('/password_reset/', {'email': self.user_bad_passwd.email})
         bad_pwd_resp = password_reset(bad_pwd_req)
+        # If they've got an unusable password, we return a successful response code
         self.assertEquals(bad_pwd_resp.status_code, 200)
-        self.assertEquals(bad_pwd_resp.content, json.dumps({'success': False,
-                                                            'error': 'Invalid e-mail or user'}))
+        self.assertEquals(bad_pwd_resp.content, json.dumps({'success': True,
+                                                            'value': "('registration/password_reset_done.html', [])"}))
 
+    @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
     def test_nonexist_email_password_reset(self):
         """Now test the exception cases with of reset_password called with invalid email."""
 
         bad_email_req = self.request_factory.post('/password_reset/', {'email': self.user.email+"makeItFail"})
         bad_email_resp = password_reset(bad_email_req)
+        # Note: even if the email is bad, we return a successful response code
+        # This prevents someone potentially trying to "brute-force" find out which emails are and aren't registered with edX
         self.assertEquals(bad_email_resp.status_code, 200)
-        self.assertEquals(bad_email_resp.content, json.dumps({'success': False,
-                                                              'error': 'Invalid e-mail or user'}))
+        self.assertEquals(bad_email_resp.content, json.dumps({'success': True,
+                                                              'value': "('registration/password_reset_done.html', [])"}))
 
     @unittest.skipUnless(not settings.MITX_FEATURES.get('DISABLE_PASSWORD_RESET_EMAIL_TEST', False),
                          dedent("""Skipping Test because CMS has not provided necessary templates for password reset.
@@ -152,38 +157,43 @@ class CourseEndingTest(TestCase):
                          {'status': 'processing',
                           'show_disabled_download_button': False,
                           'show_download_url': False,
-                          'show_survey_button': False, })
+                          'show_survey_button': False,
+                          })
 
         cert_status = {'status': 'unavailable'}
         self.assertEqual(_cert_info(user, course, cert_status),
                          {'status': 'processing',
                           'show_disabled_download_button': False,
                           'show_download_url': False,
-                          'show_survey_button': False})
-
-        cert_status = {'status': 'generating', 'grade': '67'}
-        self.assertEqual(_cert_info(user, course, cert_status),
-                         {'status': 'generating',
-                          'show_disabled_download_button': True,
-                          'show_download_url': False,
-                          'show_survey_button': True,
-                          'survey_url': survey_url,
-                          'grade': '67'
+                          'show_survey_button': False,
+                          'mode': None
                           })
 
-        cert_status = {'status': 'regenerating', 'grade': '67'}
+        cert_status = {'status': 'generating', 'grade': '67', 'mode': 'honor'}
         self.assertEqual(_cert_info(user, course, cert_status),
                          {'status': 'generating',
                           'show_disabled_download_button': True,
                           'show_download_url': False,
                           'show_survey_button': True,
                           'survey_url': survey_url,
-                          'grade': '67'
+                          'grade': '67',
+                          'mode': 'honor'
+                          })
+
+        cert_status = {'status': 'regenerating', 'grade': '67', 'mode': 'verified'}
+        self.assertEqual(_cert_info(user, course, cert_status),
+                         {'status': 'generating',
+                          'show_disabled_download_button': True,
+                          'show_download_url': False,
+                          'show_survey_button': True,
+                          'survey_url': survey_url,
+                          'grade': '67',
+                          'mode': 'verified'
                           })
 
         download_url = 'http://s3.edx/cert'
         cert_status = {'status': 'downloadable', 'grade': '67',
-                       'download_url': download_url}
+                       'download_url': download_url, 'mode': 'honor'}
         self.assertEqual(_cert_info(user, course, cert_status),
                          {'status': 'ready',
                           'show_disabled_download_button': False,
@@ -191,30 +201,33 @@ class CourseEndingTest(TestCase):
                           'download_url': download_url,
                           'show_survey_button': True,
                           'survey_url': survey_url,
-                          'grade': '67'
+                          'grade': '67',
+                          'mode': 'honor'
                           })
 
         cert_status = {'status': 'notpassing', 'grade': '67',
-                       'download_url': download_url}
+                       'download_url': download_url, 'mode': 'honor'}
         self.assertEqual(_cert_info(user, course, cert_status),
                          {'status': 'notpassing',
                           'show_disabled_download_button': False,
                           'show_download_url': False,
                           'show_survey_button': True,
                           'survey_url': survey_url,
-                          'grade': '67'
+                          'grade': '67',
+                          'mode': 'honor'
                           })
 
         # Test a course that doesn't have a survey specified
         course2 = Mock(end_of_course_survey_url=None)
         cert_status = {'status': 'notpassing', 'grade': '67',
-                       'download_url': download_url}
+                       'download_url': download_url, 'mode': 'honor'}
         self.assertEqual(_cert_info(user, course2, cert_status),
                          {'status': 'notpassing',
                           'show_disabled_download_button': False,
                           'show_download_url': False,
                           'show_survey_button': False,
-                          'grade': '67'
+                          'grade': '67',
+                          'mode': 'honor'
                           })
 
 
@@ -328,6 +341,14 @@ class EnrollInCourseTest(TestCase):
             course_id=course_id
         )
         self.assertFalse(enrollment_record.is_active)
+
+        # Make sure mode is updated properly if user unenrolls & re-enrolls
+        enrollment = CourseEnrollment.enroll(user, course_id, "verified")
+        self.assertEquals(enrollment.mode, "verified")
+        CourseEnrollment.unenroll(user, course_id)
+        enrollment = CourseEnrollment.enroll(user, course_id, "audit")
+        self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
+        self.assertEquals(enrollment.mode, "audit")
 
     def assert_no_events_were_emitted(self):
         """Ensures no events were emitted since the last event related assertion"""

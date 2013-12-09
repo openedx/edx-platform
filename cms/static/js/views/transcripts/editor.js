@@ -72,7 +72,7 @@ function($, Backbone, _, Utils, MetadataView, MetadataCollection) {
         syncBasicTab: function (metadataCollection, metadataView) {
             var result = [],
                 getField = Utils.getField,
-                component_id = this.$el.closest('.component').data('id'),
+                component_locator = this.$el.closest('.component').data('locator'),
                 subs = getField(metadataCollection, 'sub'),
                 values = {},
                 videoUrl, metadata, modifiedValues;
@@ -99,7 +99,7 @@ function($, Backbone, _, Utils, MetadataView, MetadataCollection) {
             if (isSubsModified) {
                 metadata = $.extend(true, {}, modifiedValues);
                 // Save module state
-                Utils.command('save', component_id, null, {
+                Utils.command('save', component_locator, null, {
                     metadata: metadata,
                     current_subs: _.pluck(
                         Utils.getVideoList(videoUrl.getDisplayValue()),
@@ -110,18 +110,16 @@ function($, Backbone, _, Utils, MetadataView, MetadataCollection) {
 
             // Get values from `Advanced` tab fields (`html5_sources`,
             // `youtube_id_1_0`) that should be synchronized.
-            html5Sources = getField(metadataCollection, 'html5_sources')
-                                    .getDisplayValue();
+            var html5Sources = getField(metadataCollection, 'html5_sources').getDisplayValue();
 
-            values.youtube = getField(metadataCollection, 'youtube_id_1_0')
-                                    .getDisplayValue();
+            values.youtube = getField(metadataCollection, 'youtube_id_1_0').getDisplayValue();
 
-            values.html5Sources = _.filter(html5Sources, function (value) {
-                var link = Utils.parseLink(value),
+            values.html5Sources = _.filter(html5Sources, function (value) {
+                var link = Utils.parseLink(value),
                     mode = link && link.mode;
 
-                return mode === 'html5' && mode;
-            });
+                return mode === 'html5' && mode;
+            });
 
 
             // The length of youtube video_id should be 11 characters.

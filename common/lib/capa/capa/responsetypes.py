@@ -946,17 +946,34 @@ class NumericalResponse(LoncapaResponse):
 
 
 class StringResponse(LoncapaResponse):
+    '''
+    This response type allows one or more answers. Use `_or_` separator to set
+    more than 1 answer.
 
+    Example:
+
+        # One answer
+        <stringresponse answer="Michigan">
+          <textline size="20" />
+        </stringresponse >
+
+        # Multiple answers
+        <stringresponse answer="Martin Luther King_or_Dr. Martin Luther King Jr.">
+          <textline size="20" />
+        </stringresponse >
+
+    '''
     response_tag = 'stringresponse'
     hint_tag = 'stringhint'
     allowed_inputfields = ['textline']
     required_attributes = ['answer']
     max_inputfields = 1
-    correct_answer = None
+    correct_answer = []
+    SEPARATOR = '_or_'
 
     def setup_response(self):
-        self.correct_answer = contextualize_text(
-            self.xml.get('answer'), self.context).strip()
+        self.correct_answer = [contextualize_text(answer, self.context).strip()
+            for answer in self.xml.get('answer').split(self.SEPARATOR)]
 
     def get_score(self, student_answers):
         '''Grade a string response '''
@@ -966,23 +983,25 @@ class StringResponse(LoncapaResponse):
 
     def check_string(self, expected, given):
         if self.xml.get('type') == 'ci':
-            return given.lower() == expected.lower()
-        return given == expected
+            return given.lower() in [i.lower() for i in expected]
+        return given in expected
 
     def check_hint_condition(self, hxml_set, student_answers):
         given = student_answers[self.answer_id].strip()
         hints_to_show = []
         for hxml in hxml_set:
             name = hxml.get('name')
-            correct_answer = contextualize_text(
-                hxml.get('answer'), self.context).strip()
+
+            correct_answer = [contextualize_text(answer, self.context).strip()
+            for answer in hxml.get('answer').split(self.SEPARATOR)]
+
             if self.check_string(correct_answer, given):
                 hints_to_show.append(name)
         log.debug('hints_to_show = %s', hints_to_show)
         return hints_to_show
 
     def get_answers(self):
-        return {self.answer_id: self.correct_answer}
+        return {self.answer_id: ' <b>or</b> '.join(self.correct_answer)}
 
 #-----------------------------------------------------------------------------
 

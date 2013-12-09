@@ -29,8 +29,8 @@ class UsersTestCase(CourseTestCase):
         self.detail_url = self.location.url_reverse('course_team', self.ext_user.email)
         self.inactive_detail_url = self.location.url_reverse('course_team', self.inactive_user.email)
         self.invalid_detail_url = self.location.url_reverse('course_team', "nonexistent@user.com")
-        self.staff_groupname = get_course_groupname_for_role(self.course.location, "staff")
-        self.inst_groupname = get_course_groupname_for_role(self.course.location, "instructor")
+        self.staff_groupname = get_course_groupname_for_role(self.course_locator, "staff")
+        self.inst_groupname = get_course_groupname_for_role(self.course_locator, "instructor")
 
     def test_index(self):
         resp = self.client.get(self.index_url, HTTP_ACCEPT='text/html')
@@ -137,18 +137,6 @@ class UsersTestCase(CourseTestCase):
         resp = self.client.post(
             self.detail_url,
             data=json.dumps({"toys": "fun"}),
-            content_type="application/json",
-            HTTP_ACCEPT="application/json",
-        )
-        self.assertEqual(resp.status_code, 400)
-        result = json.loads(resp.content)
-        self.assertIn("error", result)
-        self.assert_not_enrolled()
-
-    def test_detail_post_bad_json(self):
-        resp = self.client.post(
-            self.detail_url,
-            data="{foo}",
             content_type="application/json",
             HTTP_ACCEPT="application/json",
         )

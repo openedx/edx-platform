@@ -4,7 +4,8 @@ if Backbone?
     events:
       "click .discussion-vote": "toggleVote"
       "click .action-follow": "toggleFollowing"
-      "keypress .action-follow": "toggleFollowingKeypress"
+      "keypress .action-follow":
+        (event) -> DiscussionUtil.activateOnEnter(event, toggleFollowing)
       "click .expand-post": "expandPost"
       "click .collapse-post": "collapsePost"
 
