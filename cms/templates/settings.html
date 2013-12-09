@@ -40,26 +40,11 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
             model: model
         });
         editor.render();
-      },
+       },
       reset: true
     });
 });
-require(["jquery", "js/vendor/tinymce/tinymce.min","js/vendor/tinymce/jquery.tinymce.min"], function($){
-  tinymce.init({
-     selector: "textarea",
-     language: "es",
-     plugins: ["table"],
-     menu: { 
-        edit: {title: 'Edit', items: 'undo redo | cut copy paste | selectall'}, 
-        insert: {title: 'Insert', items: '|'}, 
-        view: {title: 'View', items: 'visualaid'}, 
-        format: {title: 'Format', items: 'bold italic underline strikethrough superscript subscript | formats | removeformat'}, 
-        table: {title: 'Table'}, 
-        tools: {title: 'Tools', items: 'inserttable'} 
-     },
-     toolbar1: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | table",
-  });
-});
+
   </script>
 </%block>
 
@@ -217,7 +202,7 @@ require(["jquery", "js/vendor/tinymce/tinymce.min","js/vendor/tinymce/jquery.tin
                 % if about_page_editable:
                 <li class="field text" id="field-course-overview">
                   <label for="course-overview">${_("Course Overview")}</label>
-                  <textarea id="course-overview2"></textarea>
+                  <textarea id="course-overview"></textarea>
                   <span class="tip tip-stacked"></span>
                 </li>
                 % endif

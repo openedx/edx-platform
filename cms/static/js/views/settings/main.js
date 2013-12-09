@@ -1,4 +1,4 @@
-define(["js/views/validation", "codemirror", "underscore", "jquery", "jquery.ui", "tzAbbr", "js/models/uploads", "js/views/uploads", "jquery.timepicker", "date"],
+define(["js/views/validation", "codemirror", "underscore", "jquery", "jquery.ui", "tzAbbr", "js/models/uploads", "js/views/uploads", "jquery.timepicker", "date", "tinymce", "jquery.tinymce"],
     function(ValidatingView, CodeMirror, _, $, ui, tzAbbr, FileUploadModel, FileUploadDialog) {
 
 var DetailsView = ValidatingView.extend({
@@ -39,6 +39,20 @@ var DetailsView = ValidatingView.extend({
         this.listenTo(this.model, 'invalid', this.handleValidationError);
         this.listenTo(this.model, 'change', this.showNotificationBar);
         this.selectorToField = _.invert(this.fieldToSelectorMap);
+        tinymce.init({
+            selector: "textarea#course-overview",
+            language: "es",
+            plugins: ["table"],
+            menu: { 
+                edit: {title: 'Edit', items: 'undo redo | cut copy paste | selectall'}, 
+                insert: {title: 'Insert', items: '|'}, 
+                view: {title: 'View', items: 'visualaid'}, 
+                format: {title: 'Format', items: 'bold italic underline strikethrough superscript subscript | formats | removeformat'}, 
+                table: {title: 'Table'}, 
+                tools: {title: 'Tools', items: 'inserttable'} 
+            },
+            toolbar1: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | table",
+        });
     },
 
     render: function() {
@@ -48,7 +62,7 @@ var DetailsView = ValidatingView.extend({
         this.setupDatePicker('enrollment_end');
 
         this.$el.find('#' + this.fieldToSelectorMap['overview']).val(this.model.get('overview'));
-        this.codeMirrorize(null, $('#course-overview')[0]);
+//        this.codeMirrorize(null, $('#course-overview')[0]);
 
         this.$el.find('.current-course-introduction-video iframe').attr('src', this.model.videosourceSample());
         this.$el.find('#' + this.fieldToSelectorMap['intro_video']).val(this.model.get('intro_video') || '');
