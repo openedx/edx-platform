@@ -47,7 +47,7 @@ class FolditModule(FolditFields, XModule):
             required_sublevel_half_credit="3"
             show_leaderboard="false"/>
         """
-        XModule.__init__(self, *args, **kwargs)
+        super(FolditModule, self).__init__(*args, **kwargs)
         self.due_time = get_extended_due_date(self)
 
     def is_complete(self):

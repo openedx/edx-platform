@@ -18,6 +18,7 @@ requirejs.config({
         "jquery.iframe-transport": "xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.iframe-transport",
         "jquery.inputnumber": "xmodule_js/common_static/js/vendor/html5-input-polyfills/number-polyfill",
         "jquery.immediateDescendents": "xmodule_js/common_static/coffee/src/jquery.immediateDescendents",
+        "jquery.maskedinput": "xmodule_js/common_static/js/vendor/jquery.maskedinput.min",
         "datepair": "xmodule_js/common_static/js/vendor/timepicker/datepair",
         "date": "xmodule_js/common_static/js/vendor/date",
         "underscore": "xmodule_js/common_static/js/vendor/underscore-min",
@@ -29,6 +30,7 @@ requirejs.config({
         "xmodule": "xmodule_js/src/xmodule",
         "xblock": "xmodule_js/common_static/coffee/src/xblock",
         "utility": "xmodule_js/common_static/js/src/utility",
+        "accessibility": "xmodule_js/common_static/js/src/accessibility_tools",
         "sinon": "xmodule_js/common_static/js/vendor/sinon-1.7.1",
         "squire": "xmodule_js/common_static/js/vendor/Squire",
         "jasmine-jquery": "xmodule_js/common_static/js/vendor/jasmine-jquery",
@@ -93,6 +95,10 @@ requirejs.config({
         "jquery.inputnumber": {
             deps: ["jquery"],
             exports: "jQuery.fn.inputNumber"
+        },
+        "jquery.maskedinput": {
+            deps: ["jquery"],
+            exports: "jQuery.fn.mask"
         },
         "jquery.tinymce": {
             deps: ["jquery", "tinymce"],
@@ -176,7 +182,7 @@ define([
     "coffee/spec/main_spec",
 
     "coffee/spec/models/course_spec", "coffee/spec/models/metadata_spec",
-    "coffee/spec/models/module_spec", "coffee/spec/models/section_spec",
+    "coffee/spec/models/section_spec",
     "coffee/spec/models/settings_course_grader_spec",
     "coffee/spec/models/settings_grading_spec", "coffee/spec/models/textbook_spec",
     "coffee/spec/models/upload_spec",
@@ -187,9 +193,12 @@ define([
     "coffee/spec/views/overview_spec",
     "coffee/spec/views/textbook_spec", "coffee/spec/views/upload_spec",
 
-    "js_spec/transcripts/utils_spec", "js_spec/transcripts/editor_spec",
-    "js_spec/transcripts/videolist_spec", "js_spec/transcripts/message_manager_spec",
-    "js_spec/transcripts/file_uploader_spec"
+    "js/spec/transcripts/utils_spec", "js/spec/transcripts/editor_spec",
+    "js/spec/transcripts/videolist_spec", "js/spec/transcripts/message_manager_spec",
+    "js/spec/transcripts/file_uploader_spec",
+
+    "js/spec/utils/module_spec",
+    "js/spec/models/explicit_url_spec"
 
     # these tests are run separate in the cms-squire suite, due to process
     # isolation issues with Squire.js

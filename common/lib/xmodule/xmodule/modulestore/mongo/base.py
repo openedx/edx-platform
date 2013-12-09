@@ -31,7 +31,7 @@ from xblock.runtime import DbModel
 from xblock.exceptions import InvalidScopeError
 from xblock.fields import Scope, ScopeIds
 
-from xmodule.modulestore import ModuleStoreBase, Location, MONGO_MODULESTORE_TYPE
+from xmodule.modulestore import ModuleStoreWriteBase, Location, MONGO_MODULESTORE_TYPE
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.inheritance import own_metadata, InheritanceMixin, inherit_metadata, InheritanceKeyValueStore
 
@@ -250,7 +250,7 @@ def metadata_cache_key(location):
     return u"{0.org}/{0.course}".format(location)
 
 
-class MongoModuleStore(ModuleStoreBase):
+class MongoModuleStore(ModuleStoreWriteBase):
     """
     A Mongodb backed ModuleStore
     """
@@ -274,25 +274,29 @@ class MongoModuleStore(ModuleStoreBase):
             """
             Create & open the connection, authenticate, and provide pointers to the collection
             """
-            self.collection = pymongo.connection.Connection(
-                host=host,
-                port=port,
-                tz_aware=tz_aware,
-                **kwargs
-            )[db][collection]
+            self.database = pymongo.database.Database(
+                pymongo.MongoClient(
+                    host=host,
+                    port=port,
+                    tz_aware=tz_aware,
+                    **kwargs
+                ),
+                db
+            )
+            self.collection = self.database[collection]
 
             if user is not None and password is not None:
-                self.collection.database.authenticate(user, password)
+                self.database.authenticate(user, password)
 
         do_connection(**doc_store_config)
 
         # Force mongo to report errors, at the expense of performance
-        self.collection.safe = True
+        self.collection.write_concern = {'w': 1}
 
         # Force mongo to maintain an index over _id.* that is in the same order
         # that is used when querying by a location
         self.collection.ensure_index(
-            zip(('_id.' + field for field in Location._fields), repeat(1))
+            zip(('_id.' + field for field in Location._fields), repeat(1)),
         )
 
         if default_class is not None:
@@ -697,7 +701,7 @@ class MongoModuleStore(ModuleStoreBase):
             course.tabs = existing_tabs
             # Save any changes to the course to the MongoKeyValueStore
             course.save()
-            self.update_metadata(course.location, course.xblock_kvs._metadata)
+            self.update_metadata(course.location, course.get_explicitly_set_fields_by_scope(Scope.settings))
 
     def fire_updated_modulestore_signal(self, course_id, location):
         """
@@ -849,10 +853,31 @@ class MongoModuleStore(ModuleStoreBase):
 
     def get_modulestore_type(self, course_id):
         """
-        Returns a type which identifies which modulestore is servicing the given
-        course_id. The return can be either "xml" (for XML based courses) or "mongo" for MongoDB backed courses
+        Returns an enumeration-like type reflecting the type of this modulestore
+        The return can be one of:
+        "xml" (for XML based courses),
+        "mongo" for old-style MongoDB backed courses,
+        "split" for new-style split MongoDB backed courses.
         """
         return MONGO_MODULESTORE_TYPE
+
+    def get_orphans(self, course_location, detached_categories, _branch):
+        """
+        Return an array all of the locations for orphans in the course.
+        """
+        all_items = self.collection.find({
+            '_id.org': course_location.org,
+            '_id.course': course_location.course,
+            '_id.category': {'$nin': detached_categories}
+        })
+        all_reachable = set()
+        item_locs = set()
+        for item in all_items:
+            if item['_id']['category'] != 'course':
+                item_locs.add(Location(item['_id']).replace(revision=None).url())
+            all_reachable = all_reachable.union(item.get('definition', {}).get('children', []))
+        item_locs -= all_reachable
+        return list(item_locs)
 
     def _create_new_field_data(self, category, location, definition_data, metadata):
         """

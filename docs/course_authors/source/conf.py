@@ -23,3 +23,11 @@ templates_path.append('source/_templates')
 html_static_path.append('source/_static')
 
 
+# General information about the project.
+project = u'Building a Course with edX Studio'
+copyright = u'2013, edX Documentation Team'
+
+# The short X.Y version.
+version = ''
+# The full version, including alpha/beta/rc tags.
+release = ''

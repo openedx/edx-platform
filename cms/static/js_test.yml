@@ -48,6 +48,7 @@ lib_paths:
     - xmodule_js/common_static/js/vendor/jasmine-jquery.js
     - xmodule_js/common_static/js/vendor/jasmine-stealth.js
     - xmodule_js/common_static/js/vendor/jasmine.async.js
+    - xmodule_js/common_static/js/vendor/jquery.maskedinput.min.js
     - xmodule_js/common_static/js/vendor/CodeMirror/codemirror.js
     - xmodule_js/src/xmodule.js
     - xmodule_js/common_static/js/test/i18n.js
@@ -67,7 +68,7 @@ src_paths:
 spec_paths:
     - coffee/spec/main.js
     - coffee/spec
-    - js_spec
+    - js/spec
 
 # Paths to fixture files (optional)
 # The fixture path will be set automatically when using jasmine-jquery.

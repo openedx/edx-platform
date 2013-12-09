@@ -18,10 +18,10 @@ log = logging.getLogger(__name__)
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
-@patch('comment_client.utils.requests.request')
+@patch('lms.lib.comment_client.utils.requests.request')
 class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
 
-    @patch.dict("django.conf.settings.MITX_FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
 
         # Patching the ENABLE_DISCUSSION_SERVICE value affects the contents of urls.py,

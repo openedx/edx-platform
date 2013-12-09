@@ -1,4 +1,4 @@
-from pymongo import Connection
+import pymongo
 import gridfs
 from gridfs.errors import NoFile
 
@@ -24,8 +24,14 @@ class MongoContentStore(ContentStore):
         :param collection: ignores but provided for consistency w/ other doc_store_config patterns
         """
         logging.debug('Using MongoDB for static content serving at host={0} db={1}'.format(host, db))
-
-        _db = Connection(host=host, port=port, **kwargs)[db]
+        _db = pymongo.database.Database(
+            pymongo.MongoClient(
+                host=host,
+                port=port,
+                **kwargs
+            ),
+            db
+        )
 
         if user is not None and password is not None:
             _db.authenticate(user, password)

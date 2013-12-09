@@ -1,82 +1,167 @@
+.. _Publishing Your Course:
 
-*****************************************
-Set Content Release Dates and Visibility
-*****************************************
+###########################
+Publishing Your Course
+###########################
 
-The release schedule for course material is determined by setting release dates
-for sections and subsections.
+When you have set up your course, established a grading system, and organized your course content,
+you are ready to publish your course and make it available to students.
 
-Section
-*******
+Understanding the content your students can view, and knowing how to change what students can view, is complex.
+Read the following sections carefully:
 
-    To set the release date for a section:
+* :ref:`Understanding Content Students Can View`
+* :ref:`Release Dates`
+* :ref:`Public and Private Units`
+* :ref:`Modifying Public Units`
 
-    1. On the **Course Content** menu, click **Course Outline**.
 
-    2. Find the section you are looking for in the course outline.
+.. _Understanding Content Students Can View:
 
-    3. Under **Will Release**, click **Edit**, and then change the date.
- .. image:: Images/image280.png
+******************************************
+Understanding Content Students Can View
+******************************************
 
-Subsection
-**********
+When you create a course on Studio, students cannot see any of your course content until the course start date has passed. 
+After the course start date has passed, whether a student can see your course materials depends on two settings that you can control: release dates and visibility.
+
+* The **Release Date**. Sections and subsections have release dates. If the current date
+  of a section or subsection is before the release date, the content of that course element is
+  not yet published, and not visible to students. 
+  
+  For a student to view a subsection, both it and its containing section must be have a release date
+  earlier than the current date.  It is possible that a section is released, but a subsection within it
+  is not released. In this case, students cannot view that subsection.
+  
+  Course staff can see sections and subsections before the release date in the LMS.
+  
+* The unit must be **Public**.  All units have a **Visibility** setting that is **Public** or **Private**.
+  When you create a unit, it is **Private** by default. 
+  
+  Students cannot view a **Private** unit, even if the containing section and subsection are released.
+  
+  Students cannot view a **Public** unit if the containing section and subsection are *not* released.
+  
+  Course staff *cannot* see Private units in the LMS.
+  
+In summary, for students to see content, the unit must be **Public**, and the containing section and
+subsection must be released. If all these criteria are not met, students do not see that unit.
+
+Continue reading this chapter for more details.
+
+
+.. _Release Dates:
+
+*******************
+Release Dates
+*******************
+
+Release dates specify the dates when content is available to students. 
+Release dates are set at the section and subsection levels. 
+Neither a section nor its contents are visible to students until the release date passes. 
+However, course staff can see content in the LMS regardless of its release date.
+
+========================================
+Set the Release Date for a Section
+========================================
+
+You can set release date and time for each section.
+Before the release date and time, students are not able to view any content in that section. 
+
+To set a release date for a section:
+
+#. In the **Will Release:** field next to the section title, click **Edit**.
+#. Enter the release date in MM/DD/YYYY format, and the UTC time.
+#. Click **Save**.
+
+
+========================================
+Set the Release Date for a Subsection
+========================================
 
 Subsections inherit the release date of the section they are in, but you can
 change this date so that different subsections are released at different times.
 
 Note that if the release date for a subsection falls before the release date for
 the section that contains it, students will not be able to see the subsection
-until the release date for the *section *has passed. Section release dates
+until the release date for the *section* has passed. Section release dates
 override subsection release dates.
 
-   To set the release date for a subsection:
+To set the release date for a subsection:
 
-    1. Click to open the subsection.
+#. Open the subsection.
+#. Locate the **Subsection Settings** box in the top right corner.
+#. Enter the release date in MM/DD/YYYY format, and the UTC time.
 
-    2. Locate the **Subsection Settings** box in the top right corner.
 
-    3. Under **Release Date**, change the date.
+================================================
+Synch the Release Date for a Subsection
+================================================
 
-Unit
-****
-     
-Individual units inherit the release date of the subsection they are in, but
-have an additional **Visibility** setting that can be set to **Public** or
-**Private**. Private units are never visible to students.
+You or other course staff could inadvertantly set the release date for a subsection 
+earlier than the release date for the containing section. In this situation, the subsection is 
+not released until the section is released.
 
-.. note::
+To help you keep your course and release dates organized, Studio flags subsections with earlier release dates
+than their containing section.  In this situation, when you open the subsection, in the Subsection Settings,
+you see the following message:
 
-You can modify private units directly. To modify a unit that is marked
-Public you must create a draft.
+``The date above differs from the release date of <Section Name> - <Section release date and time>. Sync to <Section Name>.``
 
-For more information, see :doc:`modify_published_content` .
+Click **Sync to <Section Name>** to have the subsection inherit the later section release date.
 
-    
-       
-    To change the **Visibility** setting for a private unit:
-  
-  
-    1. Click to open the unit.
-  
-  
-    2. Locate the **Unit Settings** box in the top right corner.
-  
-  
-    3. For **Visibility**, select **Public**.
-  
-  
-    To change the **Visibility** setting for a public unit:
-  
-  
-    1. Click to open the unit.
-  
-  
-    2. Locate the **Unit Settings** box in the top right corner.
-  
-  
-    3. Under **Unit Settings**, click **edit a draft**.
-  
-  
-    4. For **Visibility**, select **Private**.
+.. _Public and Private Units:
+
+*************************
+Public and Private Units
+*************************
+
+Units are released at the release date of the subsection they are in.
+
+In addition, unites have a **Visibility** setting that you can set to **Public** or
+**Private**. 
+
+When you create a unit, it is Private by default. 
+A Private unit is never visible to students, even if it is contained by a subsection that has been released.
+
+When you change the visibility setting of a unit from Private to Public, you publish the unit and its contents. 
+You must set the Visibility to Public for students to be able to see the unit.
+
+Course staff cannot see Private units in the LMS.
+
+
+.. _Modifying Public Units:
+
+*************************
+Modifying Public Units
+*************************
+
+To make revisions to a unit that has been published, you create and edit a draft of that unit. 
+
+.. warning:: There are additional implications to modifying the public unit that has graded problem 
+            components students may have already completed.  See :ref:`Modifying a Released Problem` for more information.
+
+To create a draft, go to the unit's page, and then click **edit a draft** in the right pane.
+
+.. image:: Images/Viz_Revise_EditDraft.png
+ :width: 800
+
+When you edit a draft of a unit, you can view the unit's contents in two ways.
+
+* To view the already-published content as it appears in the live course, click **View the Live Version** in the upper-right corner of the page.
+* To view the unpublished content as you're working on it, click **Preview**.
+
+.. image:: Images/Viz_Revise_ViewLiveandPreview.png
+ :width: 800
+
+When you're ready to publish the draft of your revised content, 
+click **replace it with this draft** in the right pane. 
+
+If you decide you don't want to keep the revised content, click **Delete Draft**.
+
+.. image:: Images/Viz_Revise_ReplaceorDelete.png
+
+.. Warning:: Historical versions of units are not stored by Studio. After you replace the live version with a new draft, you cannot revert the unit to the previous version. 
+
   
   

@@ -86,14 +86,30 @@ CELERY_QUEUES = {
 with open(CONFIG_ROOT / CONFIG_PREFIX + "env.json") as env_file:
     ENV_TOKENS = json.load(env_file)
 
+# STATIC_URL_BASE specifies the base url to use for static files
+STATIC_URL_BASE = ENV_TOKENS.get('STATIC_URL_BASE', None)
+if STATIC_URL_BASE:
+    # collectstatic will fail if STATIC_URL is a unicode string
+    STATIC_URL = STATIC_URL_BASE.encode('ascii')
+    if not STATIC_URL.endswith("/"):
+        STATIC_URL += "/"
+    STATIC_URL += git.revision + "/"
+
+# GITHUB_REPO_ROOT is the base directory
+# for course data
+GITHUB_REPO_ROOT = ENV_TOKENS.get('GITHUB_REPO_ROOT', GITHUB_REPO_ROOT)
+
 # STATIC_ROOT specifies the directory where static files are
 # collected
-STATIC_ROOT = path(ENV_TOKENS.get('STATIC_ROOT', STATIC_ROOT)) / git.revision
+
+STATIC_ROOT_BASE = ENV_TOKENS.get('STATIC_ROOT_BASE', None)
+if STATIC_ROOT_BASE:
+    STATIC_ROOT = path(STATIC_ROOT_BASE) / git.revision
 
 EMAIL_BACKEND = ENV_TOKENS.get('EMAIL_BACKEND', EMAIL_BACKEND)
 EMAIL_FILE_PATH = ENV_TOKENS.get('EMAIL_FILE_PATH', None)
 LMS_BASE = ENV_TOKENS.get('LMS_BASE')
-# Note that MITX_FEATURES['PREVIEW_LMS_BASE'] gets read in from the environment file.
+# Note that FEATURES['PREVIEW_LMS_BASE'] gets read in from the environment file.
 
 SITE_NAME = ENV_TOKENS['SITE_NAME']
 
@@ -125,8 +141,9 @@ COURSES_WITH_UNSAFE_CODE = ENV_TOKENS.get("COURSES_WITH_UNSAFE_CODE", [])
 TIME_ZONE = ENV_TOKENS.get('TIME_ZONE', TIME_ZONE)
 
 
-for feature, value in ENV_TOKENS.get('MITX_FEATURES', {}).items():
-    MITX_FEATURES[feature] = value
+ENV_FEATURES = ENV_TOKENS.get('FEATURES', ENV_TOKENS.get('MITX_FEATURES', {}))
+for feature, value in ENV_FEATURES.items():
+    FEATURES[feature] = value
 
 LOGGING = get_logger_config(LOG_DIR,
                             logging_env=ENV_TOKENS['LOGGING_ENV'],
@@ -151,11 +168,16 @@ with open(CONFIG_ROOT / CONFIG_PREFIX + "auth.json") as auth_file:
 # Note that this is the Studio key. There is a separate key for the LMS.
 SEGMENT_IO_KEY = AUTH_TOKENS.get('SEGMENT_IO_KEY')
 if SEGMENT_IO_KEY:
-    MITX_FEATURES['SEGMENT_IO'] = ENV_TOKENS.get('SEGMENT_IO', False)
-
+    FEATURES['SEGMENT_IO'] = ENV_TOKENS.get('SEGMENT_IO', False)
 
 AWS_ACCESS_KEY_ID = AUTH_TOKENS["AWS_ACCESS_KEY_ID"]
+if AWS_ACCESS_KEY_ID == "":
+    AWS_ACCESS_KEY_ID = None
+
 AWS_SECRET_ACCESS_KEY = AUTH_TOKENS["AWS_SECRET_ACCESS_KEY"]
+if AWS_SECRET_ACCESS_KEY == "":
+    AWS_SECRET_ACCESS_KEY = None
+
 DATABASES = AUTH_TOKENS['DATABASES']
 MODULESTORE = AUTH_TOKENS['MODULESTORE']
 CONTENTSTORE = AUTH_TOKENS['CONTENTSTORE']

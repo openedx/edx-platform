@@ -32,15 +32,15 @@ require(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape"],
                 'run': run
             });
 
-            $.post('/create_new_course', {
+            $.postJSON('/course', {
                     'org': org,
                     'number': number,
                     'display_name': display_name,
                     'run': run
                 },
                 function (data) {
-                    if (data.id !== undefined) {
-                        window.location = '/' + data.id.replace(/.*:\/\//, '');
+                    if (data.url !== undefined) {
+                        window.location = data.url;
                     } else if (data.ErrMsg !== undefined) {
                         $('.wrap-error').addClass('is-shown');
                         $('#course_creation_error').html('<p>' + data.ErrMsg + '</p>');

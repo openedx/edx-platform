@@ -5,6 +5,7 @@ Unit tests for instructor.api methods.
 import unittest
 import json
 import requests
+import datetime
 from urllib import quote
 from django.test import TestCase
 from nose.tools import raises
@@ -12,24 +13,25 @@ from mock import Mock, patch
 from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
 from django.http import HttpRequest, HttpResponse
+from django_comment_common.models import FORUM_ROLE_COMMUNITY_TA
+from django.core import mail
 
 from django.contrib.auth.models import User
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from student.tests.factories import UserFactory, AdminFactory
+from student.tests.factories import UserFactory
+from courseware.tests.factories import StaffFactory, InstructorFactory
 
-from student.models import CourseEnrollment
+from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from courseware.models import StudentModule
 
 # modules which are mocked in test cases.
 import instructor_task.api
-
 from instructor.access import allow_access
 import instructor.views.api
-from instructor.views.api import (
-    _split_input_list, _msk_from_problem_urlname, common_exceptions_400)
+from instructor.views.api import _split_input_list, _msk_from_problem_urlname, common_exceptions_400
 from instructor_task.api_helper import AlreadyRunningError
 
 
@@ -96,56 +98,147 @@ class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
     Ensure that users cannot access endpoints they shouldn't be able to.
     """
     def setUp(self):
-        self.user = UserFactory.create()
         self.course = CourseFactory.create()
+        self.user = UserFactory.create()
         CourseEnrollment.enroll(self.user, self.course.id)
-        self.client.login(username=self.user.username, password='test')
 
-    def test_deny_students_update_enrollment(self):
-        url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id})
-        response = self.client.get(url, {})
-        self.assertEqual(response.status_code, 403)
+        self.problem_urlname = 'robot-some-problem-urlname'
+        _module = StudentModule.objects.create(
+            student=self.user,
+            course_id=self.course.id,
+            module_state_key=_msk_from_problem_urlname(
+                self.course.id,
+                self.problem_urlname
+            ),
+            state=json.dumps({'attempts': 10}),
+        )
 
-    def test_staff_level(self):
+        # Endpoints that only Staff or Instructors can access
+        self.staff_level_endpoints = [
+            ('students_update_enrollment', {'emails': 'foo@example.org', 'action': 'enroll'}),
+            ('get_grading_config', {}),
+            ('get_students_features', {}),
+            ('get_distribution', {}),
+            ('get_student_progress_url', {'unique_student_identifier': self.user.username}),
+            ('reset_student_attempts', {'problem_to_reset': self.problem_urlname, 'unique_student_identifier': self.user.email}),
+            ('update_forum_role_membership', {'email': self.user.email, 'rolename': 'Moderator', 'action': 'allow'}),
+            ('list_forum_members', {'rolename': FORUM_ROLE_COMMUNITY_TA}),
+            ('proxy_legacy_analytics', {'aname': 'ProblemGradeDistribution'}),
+            ('send_email', {'send_to': 'staff', 'subject': 'test', 'message': 'asdf'}),
+            ('list_instructor_tasks', {}),
+            ('list_background_email_tasks', {}),
+            ('list_grade_downloads', {}),
+            ('calculate_grades_csv', {}),
+        ]
+        # Endpoints that only Instructors can access
+        self.instructor_level_endpoints = [
+            ('modify_access', {'email': self.user.email, 'rolename': 'beta', 'action': 'allow'}),
+            ('list_course_role_members', {'rolename': 'beta'}),
+            ('rescore_problem', {'problem_to_reset': self.problem_urlname, 'unique_student_identifier': self.user.email}),
+        ]
+
+    def _access_endpoint(self, endpoint, args, status_code, msg):
+        """
+        Asserts that accessing the given `endpoint` gets a response of `status_code`.
+
+        endpoint: string, endpoint for instructor dash API
+        args: dict, kwargs for `reverse` call
+        status_code: expected HTTP status code response
+        msg: message to display if assertion fails.
+        """
+        url = reverse(endpoint, kwargs={'course_id': self.course.id})
+        if endpoint in 'send_email':
+            response = self.client.post(url, args)
+        else:
+            response = self.client.get(url, args)
+        print endpoint
+        print response
+        self.assertEqual(
+            response.status_code,
+            status_code,
+            msg=msg
+        )
+
+    def test_student_level(self):
         """
         Ensure that an enrolled student can't access staff or instructor endpoints.
         """
-        staff_level_endpoints = [
-            'students_update_enrollment',
-            'modify_access',
-            'list_course_role_members',
-            'get_grading_config',
-            'get_students_features',
-            'get_distribution',
-            'get_student_progress_url',
-            'reset_student_attempts',
-            'rescore_problem',
-            'list_instructor_tasks',
-            'list_forum_members',
-            'update_forum_role_membership',
-            'proxy_legacy_analytics',
-            'send_email',
-        ]
-        for endpoint in staff_level_endpoints:
-            url = reverse(endpoint, kwargs={'course_id': self.course.id})
-            response = self.client.get(url, {})
-            self.assertEqual(response.status_code, 403)
+        self.client.login(username=self.user.username, password='test')
 
-    def test_instructor_level(self):
+        for endpoint, args in self.staff_level_endpoints:
+            self._access_endpoint(
+                endpoint,
+                args,
+                403,
+                "Student should not be allowed to access endpoint " + endpoint
+            )
+
+        for endpoint, args in self.instructor_level_endpoints:
+            self._access_endpoint(
+                endpoint,
+                args,
+                403,
+                "Student should not be allowed to access endpoint " + endpoint
+            )
+
+    def test_staff_level(self):
         """
         Ensure that a staff member can't access instructor endpoints.
         """
-        instructor_level_endpoints = [
-            'modify_access',
-            'list_course_role_members',
-            'reset_student_attempts',
-            'list_instructor_tasks',
-            'update_forum_role_membership',
-        ]
-        for endpoint in instructor_level_endpoints:
-            url = reverse(endpoint, kwargs={'course_id': self.course.id})
-            response = self.client.get(url, {})
-            self.assertEqual(response.status_code, 403)
+        staff_member = StaffFactory(course=self.course.location)
+        CourseEnrollment.enroll(staff_member, self.course.id)
+        self.client.login(username=staff_member.username, password='test')
+        # Try to promote to forums admin - not working
+        # update_forum_role(self.course.id, staff_member, FORUM_ROLE_ADMINISTRATOR, 'allow')
+
+        for endpoint, args in self.staff_level_endpoints:
+            # TODO: make these work
+            if endpoint in ['update_forum_role_membership', 'proxy_legacy_analytics', 'list_forum_members']:
+                continue
+            self._access_endpoint(
+                endpoint,
+                args,
+                200,
+                "Staff member should be allowed to access endpoint " + endpoint
+            )
+
+        for endpoint, args in self.instructor_level_endpoints:
+            self._access_endpoint(
+                endpoint,
+                args,
+                403,
+                "Staff member should not be allowed to access endpoint " + endpoint
+            )
+
+    def test_instructor_level(self):
+        """
+        Ensure that an instructor member can access all endpoints.
+        """
+        inst = InstructorFactory(course=self.course.location)
+        CourseEnrollment.enroll(inst, self.course.id)
+        self.client.login(username=inst.username, password='test')
+
+        for endpoint, args in self.staff_level_endpoints:
+            # TODO: make these work
+            if endpoint in ['update_forum_role_membership', 'proxy_legacy_analytics']:
+                continue
+            self._access_endpoint(
+                endpoint,
+                args,
+                200,
+                "Instructor should be allowed to access endpoint " + endpoint
+            )
+
+        for endpoint, args in self.instructor_level_endpoints:
+            # TODO: make this work
+            if endpoint in ['rescore_problem']:
+                continue
+            self._access_endpoint(
+                endpoint,
+                args,
+                200,
+                "Instructor should be allowed to access endpoint " + endpoint
+            )
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -157,16 +250,21 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
     job of test_enrollment. This tests the response and action switch.
     """
     def setUp(self):
-        self.instructor = AdminFactory.create()
         self.course = CourseFactory.create()
+        self.instructor = InstructorFactory(course=self.course.location)
         self.client.login(username=self.instructor.username, password='test')
 
-        self.enrolled_student = UserFactory()
+        self.enrolled_student = UserFactory(username='EnrolledStudent', first_name='Enrolled', last_name='Student')
         CourseEnrollment.enroll(
             self.enrolled_student,
             self.course.id
         )
-        self.notenrolled_student = UserFactory()
+        self.notenrolled_student = UserFactory(username='NotEnrolledStudent', first_name='NotEnrolled', last_name='Student')
+
+        # Create invited, but not registered, user
+        cea = CourseEnrollmentAllowed(email='robot-allowed@robot.org', course_id=self.course.id)
+        cea.save()
+        self.allowed_email = 'robot-allowed@robot.org'
 
         self.notregistered_email = 'robot-not-an-email-yet@robot.org'
         self.assertEqual(User.objects.filter(email=self.notregistered_email).count(), 0)
@@ -189,19 +287,15 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         response = self.client.get(url, {'emails': self.enrolled_student.email, 'action': action})
         self.assertEqual(response.status_code, 400)
 
-    def test_enroll(self):
+    def test_enroll_without_email(self):
         url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id})
-        response = self.client.get(url, {'emails': self.notenrolled_student.email, 'action': 'enroll'})
+        response = self.client.get(url, {'emails': self.notenrolled_student.email, 'action': 'enroll', 'email_students': False})
         print "type(self.notenrolled_student.email): {}".format(type(self.notenrolled_student.email))
         self.assertEqual(response.status_code, 200)
-        # test that the user is now enrolled
 
-        self.assertEqual(
-            self.notenrolled_student.courseenrollment_set.filter(
-                course_id=self.course.id
-            ).count(),
-            1
-        )
+        # test that the user is now enrolled
+        user = User.objects.get(email=self.notenrolled_student.email)
+        self.assertTrue(CourseEnrollment.is_enrolled(user, self.course.id))
 
         # test the response data
         expected = {
@@ -229,20 +323,113 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         res_json = json.loads(response.content)
         self.assertEqual(res_json, expected)
 
-    def test_unenroll(self):
+        # Check the outbox
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_enroll_with_email(self):
         url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id})
-        response = self.client.get(url, {'emails': self.enrolled_student.email, 'action': 'unenroll'})
+        response = self.client.get(url, {'emails': self.notenrolled_student.email, 'action': 'enroll', 'email_students': True})
+        print "type(self.notenrolled_student.email): {}".format(type(self.notenrolled_student.email))
+        self.assertEqual(response.status_code, 200)
+
+        # test that the user is now enrolled
+        user = User.objects.get(email=self.notenrolled_student.email)
+        self.assertTrue(CourseEnrollment.is_enrolled(user, self.course.id))
+
+        # test the response data
+        expected = {
+            "action": "enroll",
+            "auto_enroll": False,
+            "results": [
+                {
+                    "email": self.notenrolled_student.email,
+                    "before": {
+                        "enrollment": False,
+                        "auto_enroll": False,
+                        "user": True,
+                        "allowed": False,
+                    },
+                    "after": {
+                        "enrollment": True,
+                        "auto_enroll": False,
+                        "user": True,
+                        "allowed": False,
+                    }
+                }
+            ]
+        }
+
+        res_json = json.loads(response.content)
+        self.assertEqual(res_json, expected)
+
+        # Check the outbox
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(
+            mail.outbox[0].subject,
+            'You have been enrolled in Robot Super Course'
+        )
+        self.assertEqual(
+            mail.outbox[0].body,
+            "Dear NotEnrolled Student\n\nYou have been enrolled in Robot Super Course "
+            "at edx.org by a member of the course staff. "
+            "The course should now appear on your edx.org dashboard.\n\n"
+            "To start accessing course materials, please visit "
+            "https://edx.org/courses/MITx/999/Robot_Super_Course\n\n----\n"
+            "This email was automatically sent from edx.org to NotEnrolled Student"
+        )
+
+    def test_enroll_with_email_not_registered(self):
+        url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id})
+        response = self.client.get(url, {'emails': self.notregistered_email, 'action': 'enroll', 'email_students': True})
+        print "type(self.notregistered_email): {}".format(type(self.notregistered_email))
+        self.assertEqual(response.status_code, 200)
+
+        # Check the outbox
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(
+            mail.outbox[0].subject,
+            'You have been invited to register for Robot Super Course'
+        )
+        self.assertEqual(
+            mail.outbox[0].body,
+            "Dear student,\n\nYou have been invited to join Robot Super Course at edx.org by a member of the course staff.\n\n"
+            "To finish your registration, please visit https://edx.org/register and fill out the registration form "
+            "making sure to use robot-not-an-email-yet@robot.org in the E-mail field.\n"
+            "Once you have registered and activated your account, "
+            "visit https://edx.org/courses/MITx/999/Robot_Super_Course/about to join the course.\n\n----\n"
+            "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org"
+        )
+
+    def test_enroll_with_email_not_registered_autoenroll(self):
+        url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id})
+        response = self.client.get(url, {'emails': self.notregistered_email, 'action': 'enroll', 'email_students': True, 'auto_enroll': True})
+        print "type(self.notregistered_email): {}".format(type(self.notregistered_email))
+        self.assertEqual(response.status_code, 200)
+
+        # Check the outbox
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(
+            mail.outbox[0].subject,
+            'You have been invited to register for Robot Super Course'
+        )
+        self.assertEqual(
+            mail.outbox[0].body,
+            "Dear student,\n\nYou have been invited to join Robot Super Course at edx.org by a member of the course staff.\n\n"
+            "To finish your registration, please visit https://edx.org/register and fill out the registration form "
+            "making sure to use robot-not-an-email-yet@robot.org in the E-mail field.\n"
+            "Once you have registered and activated your account, you will see Robot Super Course listed on your dashboard.\n\n----\n"
+            "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org"
+        )
+
+    def test_unenroll_without_email(self):
+        url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id})
+        response = self.client.get(url, {'emails': self.enrolled_student.email, 'action': 'unenroll', 'email_students': False})
         print "type(self.enrolled_student.email): {}".format(type(self.enrolled_student.email))
         self.assertEqual(response.status_code, 200)
-        # test that the user is now unenrolled
 
-        self.assertEqual(
-            self.enrolled_student.courseenrollment_set.filter(
-                course_id=self.course.id,
-                is_active=1,
-            ).count(),
-            0
-        )
+        # test that the user is now unenrolled
+        user = User.objects.get(email=self.enrolled_student.email)
+        self.assertFalse(CourseEnrollment.is_enrolled(user, self.course.id))
 
         # test the response data
         expected = {
@@ -270,6 +457,151 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         res_json = json.loads(response.content)
         self.assertEqual(res_json, expected)
 
+        # Check the outbox
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_unenroll_with_email(self):
+        url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id})
+        response = self.client.get(url, {'emails': self.enrolled_student.email, 'action': 'unenroll', 'email_students': True})
+        print "type(self.enrolled_student.email): {}".format(type(self.enrolled_student.email))
+        self.assertEqual(response.status_code, 200)
+
+        # test that the user is now unenrolled
+        user = User.objects.get(email=self.enrolled_student.email)
+        self.assertFalse(CourseEnrollment.is_enrolled(user, self.course.id))
+
+        # test the response data
+        expected = {
+            "action": "unenroll",
+            "auto_enroll": False,
+            "results": [
+                {
+                    "email": self.enrolled_student.email,
+                    "before": {
+                        "enrollment": True,
+                        "auto_enroll": False,
+                        "user": True,
+                        "allowed": False,
+                    },
+                    "after": {
+                        "enrollment": False,
+                        "auto_enroll": False,
+                        "user": True,
+                        "allowed": False,
+                    }
+                }
+            ]
+        }
+
+        res_json = json.loads(response.content)
+        self.assertEqual(res_json, expected)
+
+        # Check the outbox
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(
+            mail.outbox[0].subject,
+            'You have been un-enrolled from Robot Super Course'
+        )
+        self.assertEqual(
+            mail.outbox[0].body,
+            "Dear Enrolled Student\n\nYou have been un-enrolled in Robot Super Course "
+            "at edx.org by a member of the course staff. "
+            "The course will no longer appear on your edx.org dashboard.\n\n"
+            "Your other courses have not been affected.\n\n----\n"
+            "This email was automatically sent from edx.org to Enrolled Student"
+        )
+
+    def test_unenroll_with_email_allowed_student(self):
+        url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id})
+        response = self.client.get(url, {'emails': self.allowed_email, 'action': 'unenroll', 'email_students': True})
+        print "type(self.allowed_email): {}".format(type(self.allowed_email))
+        self.assertEqual(response.status_code, 200)
+
+        # test the response data
+        expected = {
+            "action": "unenroll",
+            "auto_enroll": False,
+            "results": [
+                {
+                    "email": self.allowed_email,
+                    "before": {
+                        "enrollment": False,
+                        "auto_enroll": False,
+                        "user": False,
+                        "allowed": True,
+                    },
+                    "after": {
+                        "enrollment": False,
+                        "auto_enroll": False,
+                        "user": False,
+                        "allowed": False,
+                    }
+                }
+            ]
+        }
+
+        res_json = json.loads(response.content)
+        self.assertEqual(res_json, expected)
+
+        # Check the outbox
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(
+            mail.outbox[0].subject,
+            'You have been un-enrolled from Robot Super Course'
+        )
+        self.assertEqual(
+            mail.outbox[0].body,
+            "Dear Student,\n\nYou have been un-enrolled from course Robot Super Course by a member of the course staff. "
+            "Please disregard the invitation previously sent.\n\n----\n"
+            "This email was automatically sent from edx.org to robot-allowed@robot.org"
+        )
+
+    @patch('instructor.enrollment.uses_shib')
+    def test_enroll_with_email_not_registered_with_shib(self, mock_uses_shib):
+
+        mock_uses_shib.return_value = True
+
+        url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id})
+        response = self.client.get(url, {'emails': self.notregistered_email, 'action': 'enroll', 'email_students': True})
+        print "type(self.notregistered_email): {}".format(type(self.notregistered_email))
+        self.assertEqual(response.status_code, 200)
+
+        # Check the outbox
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(
+            mail.outbox[0].subject,
+            'You have been invited to register for Robot Super Course'
+        )
+        self.assertEqual(
+            mail.outbox[0].body,
+            "Dear student,\n\nYou have been invited to join Robot Super Course at edx.org by a member of the course staff.\n\n"
+            "To access the course visit https://edx.org/courses/MITx/999/Robot_Super_Course/about and register for the course.\n\n----\n"
+            "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org"
+        )
+
+    @patch('instructor.enrollment.uses_shib')
+    def test_enroll_with_email_not_registered_with_shib_autoenroll(self, mock_uses_shib):
+
+        mock_uses_shib.return_value = True
+
+        url = reverse('students_update_enrollment', kwargs={'course_id': self.course.id})
+        response = self.client.get(url, {'emails': self.notregistered_email, 'action': 'enroll', 'email_students': True, 'auto_enroll': True})
+        print "type(self.notregistered_email): {}".format(type(self.notregistered_email))
+        self.assertEqual(response.status_code, 200)
+
+        # Check the outbox
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(
+            mail.outbox[0].subject,
+            'You have been invited to register for Robot Super Course'
+        )
+        self.assertEqual(
+            mail.outbox[0].body,
+            "Dear student,\n\nYou have been invited to join Robot Super Course at edx.org by a member of the course staff.\n\n"
+            "To access the course visit https://edx.org/courses/MITx/999/Robot_Super_Course and login.\n\n----\n"
+            "This email was automatically sent from edx.org to robot-not-an-email-yet@robot.org"
+        )
+
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestInstructorAPILevelsAccess(ModuleStoreTestCase, LoginEnrollmentTestCase):
@@ -284,8 +616,8 @@ class TestInstructorAPILevelsAccess(ModuleStoreTestCase, LoginEnrollmentTestCase
     response yet, so only the status code is tested.
     """
     def setUp(self):
-        self.instructor = AdminFactory.create()
         self.course = CourseFactory.create()
+        self.instructor = InstructorFactory(course=self.course.location)
         self.client.login(username=self.instructor.username, password='test')
 
         self.other_instructor = UserFactory()
@@ -421,8 +753,8 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
     Test endpoints that show data without side effects.
     """
     def setUp(self):
-        self.instructor = AdminFactory.create()
         self.course = CourseFactory.create()
+        self.instructor = InstructorFactory(course=self.course.location)
         self.client.login(username=self.instructor.username, password='test')
 
         self.students = [UserFactory() for _ in xrange(6)]
@@ -459,6 +791,50 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         self.assertTrue(body.startswith('"User ID","Anonymized user ID"\n"2","42"\n'))
         self.assertTrue(body.endswith('"7","42"\n'))
 
+    def test_list_grade_downloads(self):
+        url = reverse('list_grade_downloads', kwargs={'course_id': self.course.id})
+        with patch('instructor_task.models.LocalFSGradesStore.links_for') as mock_links_for:
+            mock_links_for.return_value = [
+                ('mock_file_name_1', 'https://1.mock.url'),
+                ('mock_file_name_2', 'https://2.mock.url'),
+            ]
+            response = self.client.get(url, {})
+
+        expected_response = {
+            "downloads": [
+                {
+                    "url": "https://1.mock.url",
+                    "link": "<a href=\"https://1.mock.url\">mock_file_name_1</a>",
+                    "name": "mock_file_name_1"
+                },
+                {
+                    "url": "https://2.mock.url",
+                    "link": "<a href=\"https://2.mock.url\">mock_file_name_2</a>",
+                    "name": "mock_file_name_2"
+                }
+            ]
+        }
+        res_json = json.loads(response.content)
+        self.assertEqual(res_json, expected_response)
+
+    def test_calculate_grades_csv_success(self):
+        url = reverse('calculate_grades_csv', kwargs={'course_id': self.course.id})
+
+        with patch('instructor_task.api.submit_calculate_grades_csv') as mock_cal_grades:
+            mock_cal_grades.return_value = True
+            response = self.client.get(url, {})
+        success_status = "Your grade report is being generated! You can view the status of the generation task in the 'Pending Instructor Tasks' section."
+        self.assertIn(success_status, response.content)
+
+    def test_calculate_grades_csv_already_running(self):
+        url = reverse('calculate_grades_csv', kwargs={'course_id': self.course.id})
+
+        with patch('instructor_task.api.submit_calculate_grades_csv') as mock_cal_grades:
+            mock_cal_grades.side_effect = AlreadyRunningError()
+            response = self.client.get(url, {})
+        already_running_status = "A grade report generation task is already in progress. Check the 'Pending Instructor Tasks' table for the status of the task. When completed, the report will be available for download in the table below."
+        self.assertIn(already_running_status, response.content)
+
     def test_get_students_features_csv(self):
         """
         Test that some minimum of information is formatted
@@ -471,7 +847,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
     def test_get_distribution_no_feature(self):
         """
         Test that get_distribution lists available features
-        when supplied no feature quparameter.
+        when supplied no feature parameter.
         """
         url = reverse('get_distribution', kwargs={'course_id': self.course.id})
         response = self.client.get(url)
@@ -558,8 +934,8 @@ class TestInstructorAPIRegradeTask(ModuleStoreTestCase, LoginEnrollmentTestCase)
     database, that is the job of task tests and test_enrollment.
     """
     def setUp(self):
-        self.instructor = AdminFactory.create()
         self.course = CourseFactory.create()
+        self.instructor = InstructorFactory(course=self.course.location)
         self.client.login(username=self.instructor.username, password='test')
 
         self.student = UserFactory()
@@ -691,6 +1067,7 @@ class TestInstructorAPIRegradeTask(ModuleStoreTestCase, LoginEnrollmentTestCase)
         })
         print response.content
         self.assertEqual(response.status_code, 200)
+        self.assertTrue(act.called)
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -701,8 +1078,8 @@ class TestInstructorSendEmail(ModuleStoreTestCase, LoginEnrollmentTestCase):
     only with valid email messages.
     """
     def setUp(self):
-        self.instructor = AdminFactory.create()
         self.course = CourseFactory.create()
+        self.instructor = InstructorFactory(course=self.course.location)
         self.client.login(username=self.instructor.username, password='test')
         test_subject = u'\u1234 test subject'
         test_message = u'\u6824 test message'
@@ -761,6 +1138,18 @@ class TestInstructorSendEmail(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(response.status_code, 400)
 
 
+class MockCompletionInfo(object):
+    """Mock for get_task_completion_info"""
+    times_called = 0
+
+    def mock_get_task_completion_info(self, *args):  # pylint: disable=unused-argument
+        """Mock for get_task_completion_info"""
+        self.times_called += 1
+        if self.times_called % 2 == 0:
+            return True, 'Task Completed'
+        return False, 'Task Errored In Some Way'
+
+
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestInstructorAPITaskLists(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
@@ -769,19 +1158,50 @@ class TestInstructorAPITaskLists(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
     class FakeTask(object):
         """ Fake task object """
-        FEATURES = ['task_type', 'task_input', 'task_id', 'requester', 'created', 'task_state']
+        FEATURES = [
+            'task_type',
+            'task_input',
+            'task_id',
+            'requester',
+            'task_state',
+            'created',
+            'status',
+            'task_message',
+            'duration_sec'
+        ]
 
-        def __init__(self):
+        def __init__(self, completion):
             for feature in self.FEATURES:
                 setattr(self, feature, 'expected')
+            # created needs to be a datetime
+            self.created = datetime.datetime(2013, 10, 25, 11, 42, 35)
+            # set 'status' and 'task_message' attrs
+            success, task_message = completion()
+            if success:
+                self.status = "Complete"
+            else:
+                self.status = "Incomplete"
+            self.task_message = task_message
+            # Set 'task_output' attr, which will be parsed to the 'duration_sec' attr.
+            self.task_output = '{"duration_ms": 1035000}'
+            self.duration_sec = 1035000 / 1000.0
+
+        def make_invalid_output(self):
+            """Munge task_output to be invalid json"""
+            self.task_output = 'HI MY NAME IS INVALID JSON'
+            # This should be given the value of 'unknown' if the task output
+            # can't be properly parsed
+            self.duration_sec = 'unknown'
 
         def to_dict(self):
             """ Convert fake task to dictionary representation. """
-            return {key: 'expected' for key in self.FEATURES}
+            attr_dict = {key: getattr(self, key) for key in self.FEATURES}
+            attr_dict['created'] = attr_dict['created'].isoformat()
+            return attr_dict
 
     def setUp(self):
-        self.instructor = AdminFactory.create()
         self.course = CourseFactory.create()
+        self.instructor = InstructorFactory(course=self.course.location)
         self.client.login(username=self.instructor.username, password='test')
 
         self.student = UserFactory()
@@ -797,58 +1217,97 @@ class TestInstructorAPITaskLists(ModuleStoreTestCase, LoginEnrollmentTestCase):
             ),
             state=json.dumps({'attempts': 10}),
         )
+        mock_factory = MockCompletionInfo()
+        self.tasks = [self.FakeTask(mock_factory.mock_get_task_completion_info) for _ in xrange(7)]
+        self.tasks[-1].make_invalid_output()
 
-        self.tasks = [self.FakeTask() for _ in xrange(6)]
+    def tearDown(self):
+        """
+        Undo all patches.
+        """
+        patch.stopall()
 
     @patch.object(instructor_task.api, 'get_running_instructor_tasks')
     def test_list_instructor_tasks_running(self, act):
         """ Test list of all running tasks. """
         act.return_value = self.tasks
         url = reverse('list_instructor_tasks', kwargs={'course_id': self.course.id})
-        response = self.client.get(url, {})
-        print response.content
+        mock_factory = MockCompletionInfo()
+        with patch('instructor.views.api.get_task_completion_info') as mock_completion_info:
+            mock_completion_info.side_effect = mock_factory.mock_get_task_completion_info
+            response = self.client.get(url, {})
         self.assertEqual(response.status_code, 200)
 
         # check response
         self.assertTrue(act.called)
         expected_tasks = [ftask.to_dict() for ftask in self.tasks]
-        expected_res = {'tasks': expected_tasks}
-        self.assertEqual(json.loads(response.content), expected_res)
+        actual_tasks = json.loads(response.content)['tasks']
+        for exp_task, act_task in zip(expected_tasks, actual_tasks):
+            self.assertDictEqual(exp_task, act_task)
+        self.assertEqual(actual_tasks, expected_tasks)
+
+    @patch.object(instructor_task.api, 'get_instructor_task_history')
+    def test_list_background_email_tasks(self, act):
+        """Test list of background email tasks."""
+        act.return_value = self.tasks
+        url = reverse('list_background_email_tasks', kwargs={'course_id': self.course.id})
+        mock_factory = MockCompletionInfo()
+        with patch('instructor.views.api.get_task_completion_info') as mock_completion_info:
+            mock_completion_info.side_effect = mock_factory.mock_get_task_completion_info
+            response = self.client.get(url, {})
+        self.assertEqual(response.status_code, 200)
+
+        # check response
+        self.assertTrue(act.called)
+        expected_tasks = [ftask.to_dict() for ftask in self.tasks]
+        actual_tasks = json.loads(response.content)['tasks']
+        for exp_task, act_task in zip(expected_tasks, actual_tasks):
+            self.assertDictEqual(exp_task, act_task)
+        self.assertEqual(actual_tasks, expected_tasks)
 
     @patch.object(instructor_task.api, 'get_instructor_task_history')
     def test_list_instructor_tasks_problem(self, act):
         """ Test list task history for problem. """
         act.return_value = self.tasks
         url = reverse('list_instructor_tasks', kwargs={'course_id': self.course.id})
-        response = self.client.get(url, {
-            'problem_urlname': self.problem_urlname,
-        })
-        print response.content
+        mock_factory = MockCompletionInfo()
+        with patch('instructor.views.api.get_task_completion_info') as mock_completion_info:
+            mock_completion_info.side_effect = mock_factory.mock_get_task_completion_info
+            response = self.client.get(url, {
+                'problem_urlname': self.problem_urlname,
+            })
         self.assertEqual(response.status_code, 200)
 
         # check response
         self.assertTrue(act.called)
         expected_tasks = [ftask.to_dict() for ftask in self.tasks]
-        expected_res = {'tasks': expected_tasks}
-        self.assertEqual(json.loads(response.content), expected_res)
+        actual_tasks = json.loads(response.content)['tasks']
+        for exp_task, act_task in zip(expected_tasks, actual_tasks):
+            self.assertDictEqual(exp_task, act_task)
+        self.assertEqual(actual_tasks, expected_tasks)
 
     @patch.object(instructor_task.api, 'get_instructor_task_history')
     def test_list_instructor_tasks_problem_student(self, act):
         """ Test list task history for problem AND student. """
         act.return_value = self.tasks
         url = reverse('list_instructor_tasks', kwargs={'course_id': self.course.id})
-        response = self.client.get(url, {
-            'problem_urlname': self.problem_urlname,
-            'unique_student_identifier': self.student.email,
-        })
-        print response.content
+        mock_factory = MockCompletionInfo()
+        with patch('instructor.views.api.get_task_completion_info') as mock_completion_info:
+            mock_completion_info.side_effect = mock_factory.mock_get_task_completion_info
+            response = self.client.get(url, {
+                'problem_urlname': self.problem_urlname,
+                'unique_student_identifier': self.student.email,
+            })
         self.assertEqual(response.status_code, 200)
 
         # check response
         self.assertTrue(act.called)
         expected_tasks = [ftask.to_dict() for ftask in self.tasks]
-        expected_res = {'tasks': expected_tasks}
-        self.assertEqual(json.loads(response.content), expected_res)
+        actual_tasks = json.loads(response.content)['tasks']
+        for exp_task, act_task in zip(expected_tasks, actual_tasks):
+            self.assertDictEqual(exp_task, act_task)
+
+        self.assertEqual(actual_tasks, expected_tasks)
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -872,8 +1331,8 @@ class TestInstructorAPIAnalyticsProxy(ModuleStoreTestCase, LoginEnrollmentTestCa
             self.content = '{"test_content": "robot test content"}'
 
     def setUp(self):
-        self.instructor = AdminFactory.create()
         self.course = CourseFactory.create()
+        self.instructor = InstructorFactory(course=self.course.location)
         self.client.login(username=self.instructor.username, password='test')
 
     @patch.object(instructor.views.api.requests, 'get')

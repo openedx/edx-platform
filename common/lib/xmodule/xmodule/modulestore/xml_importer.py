@@ -128,7 +128,9 @@ def import_from_xml(store, data_dir, course_dirs=None,
 
         try:
             # turn off all write signalling while importing as this is a high volume operation
-            if pseudo_course_id not in store.ignore_write_events_on_courses:
+            # on stores that need it
+            if (hasattr(store, 'ignore_write_events_on_courses') and
+                    pseudo_course_id not in store.ignore_write_events_on_courses):
                 store.ignore_write_events_on_courses.append(pseudo_course_id)
 
             course_data_path = None
@@ -226,8 +228,9 @@ def import_from_xml(store, data_dir, course_dirs=None,
                 )
 
         finally:
-            # turn back on all write signalling
-            if pseudo_course_id in store.ignore_write_events_on_courses:
+            # turn back on all write signalling on stores that need it
+            if (hasattr(store, 'ignore_write_events_on_courses') and
+                    pseudo_course_id in store.ignore_write_events_on_courses):
                 store.ignore_write_events_on_courses.remove(pseudo_course_id)
                 store.refresh_cached_metadata_inheritance_tree(
                     target_location_namespace if target_location_namespace is not None else course_location

@@ -12,6 +12,8 @@ function () {
                 containerRatio: null,
                 elementRatio: null
             },
+            callbacksList = [],
+            module = {},
             mode = null,
             config;
 
@@ -23,10 +25,12 @@ function () {
             }
 
             if (!config.element) {
-                console.log('Required parameter `element` is not passed.');
+                console.log(
+                    '[Video info]: Required parameter `element` is not passed.'
+                );
             }
 
-            return this;
+            return module;
         };
 
         var getData = function () {
@@ -55,7 +59,7 @@ function () {
             };
         };
 
-        var align = function() {
+        var align = function () {
             var data = getData();
 
             switch (mode) {
@@ -77,7 +81,9 @@ function () {
                     break;
             }
 
-            return this;
+            fireCallbacks();
+
+            return module;
         };
 
         var alignByWidthOnly = function () {
@@ -91,7 +97,7 @@ function () {
                 'left': 0
             });
 
-            return this;
+            return module;
         };
 
         var alignByHeightOnly = function () {
@@ -105,7 +111,7 @@ function () {
                 'left': 0.5*(data.containerWidth - width)
             });
 
-            return this;
+            return module;
         };
 
         var setMode = function (param) {
@@ -114,18 +120,69 @@ function () {
                 align();
             }
 
-            return this;
+            return module;
         };
 
-        initialize.apply(this, arguments);
+        var addCallback = function (func) {
+            if ($.isFunction(func)) {
+                callbacksList.push(func);
+            } else {
+                console.error('TypeError: Argument is not a function.');
+            }
 
-        return {
+            return module;
+        };
+
+        var addOnceCallback = function (func) {
+            if ($.isFunction(func)) {
+                var decorator = function () {
+                    func();
+                    removeCallback(func);
+                };
+
+                addCallback(decorator);
+            } else {
+                console.error('TypeError: Argument is not a function.');
+            }
+
+            return module;
+        };
+
+        var fireCallbacks = function () {
+            $.each(callbacksList, function(index, callback) {
+                 callback();
+            });
+        };
+
+        var removeCallbacks = function () {
+            callbacksList.length = 0;
+
+            return module;
+        };
+
+        var removeCallback = function (func) {
+            var index = $.inArray(func, callbacksList);
+
+            if (index !== -1) {
+                return callbacksList.splice(index, 1);
+            }
+        };
+
+        initialize.apply(module, arguments);
+
+        return $.extend(true, module, {
             align: align,
             alignByWidthOnly: alignByWidthOnly,
             alignByHeightOnly: alignByHeightOnly,
             setParams: initialize,
-            setMode: setMode
-        };
+            setMode: setMode,
+            callbacks: {
+                add: addCallback,
+                once: addOnceCallback,
+                remove: removeCallback,
+                removeAll: removeCallbacks
+            }
+        });
     };
 
     return Resizer;

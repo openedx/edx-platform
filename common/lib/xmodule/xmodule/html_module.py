@@ -7,7 +7,7 @@ from lxml import etree
 from path import path
 
 from pkg_resources import resource_string
-from xblock.fields import Scope, String
+from xblock.fields import Scope, String, Boolean
 from xmodule.editing_module import EditingDescriptor
 from xmodule.html_checker import check_html
 from xmodule.stringify import stringify_children
@@ -16,7 +16,7 @@ from xmodule.xml_module import XmlDescriptor, name_to_pathname
 import textwrap
 from xmodule.contentstore.content import StaticContent
 
-log = logging.getLogger("mitx.courseware")
+log = logging.getLogger("edx.courseware")
 
 
 class HtmlFields(object):
@@ -30,6 +30,11 @@ class HtmlFields(object):
     )
     data = String(help="Html contents to display for this module", default=u"", scope=Scope.content)
     source_code = String(help="Source code for LaTeX documents. This feature is not well-supported.", scope=Scope.settings)
+    use_latex_compiler = Boolean(
+        help="Enable LaTeX templates?",
+        default=False,
+        scope=Scope.settings
+    )
 
 
 class HtmlModule(HtmlFields, XModule):
@@ -82,6 +87,16 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
                 nc.append(candidate[:-4] + '.html')
         return candidates + nc
 
+    @classmethod
+    def filter_templates(cls, template, course):
+        """
+        Filter template that contains 'latex' from templates.
+
+        Show them only if use_latex_compiler is set to True in
+        course settings.
+        """
+        return (not 'latex' in template['template_id'] or course.use_latex_compiler)
+
     def get_context(self):
         """
         an override to add in specific rendering context, in this case we need to
@@ -90,7 +105,10 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
         _context = EditingDescriptor.get_context(self)
         # Add some specific HTML rendering context when editing HTML modules where we pass
         # the root /c4x/ url for assets. This allows client-side substitutions to occur.
-        _context.update({'base_asset_url': StaticContent.get_base_url_path_for_course_assets(self.location) + '/'})
+        _context.update({
+            'base_asset_url': StaticContent.get_base_url_path_for_course_assets(self.location) + '/',
+            'enable_latex_compiler': self.use_latex_compiler,
+        })
         return _context
 
     # NOTE: html descriptors are special.  We do not want to parse and
@@ -190,6 +208,12 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
         elt = etree.Element('html')
         elt.set("filename", relname)
         return elt
+
+    @property
+    def non_editable_metadata_fields(self):
+        non_editable_fields = super(HtmlDescriptor, self).non_editable_metadata_fields
+        non_editable_fields.append(HtmlDescriptor.use_latex_compiler)
+        return non_editable_fields
 
 
 class AboutFields(object):

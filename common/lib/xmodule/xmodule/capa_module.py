@@ -1,3 +1,4 @@
+"""Implements basics of Capa, including class CapaModule."""
 import cgi
 import datetime
 import hashlib
@@ -24,7 +25,7 @@ from django.utils.timezone import UTC
 from django.utils.translation import ugettext as _
 from .utils import get_extended_due_date
 
-log = logging.getLogger("mitx.courseware")
+log = logging.getLogger("edx.courseware")
 
 
 # Generate this many different variants of problems with rerandomize=per_student
@@ -41,11 +42,11 @@ def randomization_bin(seed, problem_id):
     interesting.  To avoid having sets of students that always get the same problems,
     we'll combine the system's per-student seed with the problem id in picking the bin.
     """
-    h = hashlib.sha1()
-    h.update(str(seed))
-    h.update(str(problem_id))
+    r_hash = hashlib.sha1()
+    r_hash.update(str(seed))
+    r_hash.update(str(problem_id))
     # get the first few digits of the hash, convert to an int, then mod.
-    return int(h.hexdigest()[:7], 16) % NUM_RANDOMIZATION_BINS
+    return int(r_hash.hexdigest()[:7], 16) % NUM_RANDOMIZATION_BINS
 
 
 class Randomization(String):
@@ -166,6 +167,11 @@ class CapaFields(object):
         # TODO: someday it should be possible to not duplicate this definition here
         # and in inheritance.py
     )
+    use_latex_compiler = Boolean(
+        help="Enable LaTeX templates?",
+        default=False,
+        scope=Scope.settings
+    )
 
 
 class CapaModule(CapaFields, XModule):
@@ -192,7 +198,7 @@ class CapaModule(CapaFields, XModule):
         """
         Accepts the same arguments as xmodule.x_module:XModule.__init__
         """
-        XModule.__init__(self, *args, **kwargs)
+        super(CapaModule, self).__init__(*args, **kwargs)
 
         due_date = get_extended_due_date(self)
 
@@ -223,7 +229,7 @@ class CapaModule(CapaFields, XModule):
             if self.seed is None:
                 self.seed = self.lcp.seed
 
-        except Exception as err:
+        except Exception as err:  # pylint: disable=broad-except
             msg = u'cannot create LoncapaProblem {loc}: {err}'.format(
                 loc=self.location.url(), err=err)
             # TODO (vshnayder): do modules need error handlers too?
@@ -321,9 +327,9 @@ class CapaModule(CapaFields, XModule):
         """
         For now, just return score / max_score
         """
-        d = self.get_score()
-        score = d['score']
-        total = d['total']
+        score_dict = self.get_score()
+        score = score_dict['score']
+        total = score_dict['total']
 
         if total > 0:
             if self.weight is not None:
@@ -528,7 +534,7 @@ class CapaModule(CapaFields, XModule):
 
         # If we cannot construct the problem HTML,
         # then generate an error message instead.
-        except Exception as err:
+        except Exception as err:  # pylint: disable=broad-except
             html = self.handle_problem_html_error(err)
 
         # The convention is to pass the name of the check button
@@ -605,7 +611,7 @@ class CapaModule(CapaFields, XModule):
         )
 
         if dispatch not in handlers:
-            return 'Error'
+            return 'Error: {} is not a known capa action'.format(dispatch)
 
         before = self.get_progress()
 
@@ -613,11 +619,11 @@ class CapaModule(CapaFields, XModule):
             result = handlers[dispatch](data)
 
         except NotFoundError as err:
-            _, _, traceback_obj = sys.exc_info()
+            _, _, traceback_obj = sys.exc_info()  # pylint: disable=redefined-outer-name
             raise ProcessingError, (not_found_error_message, err), traceback_obj
 
         except Exception as err:
-            _, _, traceback_obj = sys.exc_info()
+            _, _, traceback_obj = sys.exc_info()  # pylint: disable=redefined-outer-name
             raise ProcessingError, (generic_error_message, err), traceback_obj
 
         after = self.get_progress()
@@ -671,8 +677,8 @@ class CapaModule(CapaFields, XModule):
         """
         True iff full points
         """
-        d = self.get_score()
-        return d['score'] == d['total']
+        score_dict = self.get_score()
+        return score_dict['score'] == score_dict['total']
 
     def answer_available(self):
         """
@@ -760,7 +766,7 @@ class CapaModule(CapaFields, XModule):
         self.set_state_from_lcp()
         return response
 
-    def get_answer(self, data):
+    def get_answer(self, _data):
         """
         For the "show answer" button.
 
@@ -800,13 +806,12 @@ class CapaModule(CapaFields, XModule):
         """
         return {'html': self.get_problem_html(encapsulate=False)}
 
-
     @staticmethod
     def make_dict_of_responses(data):
         """
         Make dictionary of student responses (aka "answers")
 
-        `data` is POST dictionary (Django QueryDict).
+        `data` is POST dictionary (webob.multidict.MultiDict).
 
         The `data` dict has keys of the form 'x_y', which are mapped
         to key 'y' in the returned dict.  For example,
@@ -838,9 +843,12 @@ class CapaModule(CapaFields, XModule):
         """
         answers = dict()
 
-        for key in data:
+        # webob.multidict.MultiDict is a view of a list of tuples,
+        # so it will return a multi-value key once for each value.
+        # We only want to consider each key a single time, so we use set(data.keys())
+        for key in set(data.keys()):
             # e.g. input_resistor_1 ==> resistor_1
-            _, _, name = key.partition('_')
+            _, _, name = key.partition('_')  # pylint: disable=redefined-outer-name
 
             # If key has no underscores, then partition
             # will return (key, '', '')
@@ -860,7 +868,7 @@ class CapaModule(CapaFields, XModule):
                 name = name[:-2] if is_list_key or is_dict_key else name
 
                 if is_list_key:
-                    val = data.getlist(key)
+                    val = data.getall(key)
                 elif is_dict_key:
                     try:
                         val = json.loads(data[key])
@@ -941,6 +949,9 @@ class CapaModule(CapaFields, XModule):
             log.warning("StudentInputError in capa_module:problem_check",
                         exc_info=True)
 
+            # Save the user's state before failing
+            self.set_state_from_lcp()
+
             # If the user is a staff member, include
             # the full exception, including traceback,
             # in the response
@@ -955,6 +966,9 @@ class CapaModule(CapaFields, XModule):
             return {'success': msg}
 
         except Exception as err:
+            # Save the user's state before failing
+            self.set_state_from_lcp()
+
             if self.system.DEBUG:
                 msg = u"Error checking problem: {}".format(err.message)
                 msg += u'\nTraceback:\n{}'.format(traceback.format_exc())
@@ -1182,10 +1196,23 @@ class CapaDescriptor(CapaFields, RawDescriptor):
     metadata_translations = dict(RawDescriptor.metadata_translations)
     metadata_translations['attempts'] = 'max_attempts'
 
+    @classmethod
+    def filter_templates(cls, template, course):
+        """
+        Filter template that contains 'latex' from templates.
+
+        Show them only if use_latex_compiler is set to True in
+        course settings.
+        """
+        return (not 'latex' in template['template_id'] or course.use_latex_compiler)
+
     def get_context(self):
         _context = RawDescriptor.get_context(self)
-        _context.update({'markdown': self.markdown,
-                         'enable_markdown': self.markdown is not None})
+        _context.update({
+            'markdown': self.markdown,
+            'enable_markdown': self.markdown is not None,
+            'enable_latex_compiler': self.use_latex_compiler,
+        })
         return _context
 
     # VS[compat]
@@ -1201,9 +1228,14 @@ class CapaDescriptor(CapaFields, RawDescriptor):
     @property
     def non_editable_metadata_fields(self):
         non_editable_fields = super(CapaDescriptor, self).non_editable_metadata_fields
-        non_editable_fields.extend([CapaDescriptor.due, CapaDescriptor.graceperiod,
-                                    CapaDescriptor.force_save_button, CapaDescriptor.markdown,
-                                    CapaDescriptor.text_customization])
+        non_editable_fields.extend([
+            CapaDescriptor.due,
+            CapaDescriptor.graceperiod,
+            CapaDescriptor.force_save_button,
+            CapaDescriptor.markdown,
+            CapaDescriptor.text_customization,
+            CapaDescriptor.use_latex_compiler,
+        ])
         return non_editable_fields
 
     # Proxy to CapaModule for access to any of its attributes

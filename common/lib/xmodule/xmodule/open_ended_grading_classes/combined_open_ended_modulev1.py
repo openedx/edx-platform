@@ -1,5 +1,6 @@
 import json
 import logging
+import traceback
 from lxml import etree
 from xmodule.timeinfo import TimeInfo
 from xmodule.capa_module import ComplexEncoder
@@ -10,8 +11,9 @@ from  xmodule.open_ended_grading_classes import open_ended_module
 from functools import partial
 from .combined_open_ended_rubric import CombinedOpenEndedRubric, GRADER_TYPE_IMAGE_DICT, HUMAN_GRADER_TYPE, LEGEND_LIST
 from xmodule.open_ended_grading_classes.peer_grading_service import PeerGradingService, MockPeerGradingService, GradingServiceError
+from xmodule.open_ended_grading_classes.openendedchild import OpenEndedChild
 
-log = logging.getLogger("mitx.courseware")
+log = logging.getLogger("edx.courseware")
 
 # Set the default number of max attempts.  Should be 1 for production
 # Set higher for debugging/testing
@@ -91,7 +93,6 @@ class CombinedOpenEndedV1Module():
         Definition file should have one or many task blocks, a rubric block, and a prompt block.  See DEFAULT_DATA in combined_open_ended_module for a sample.
 
         """
-
         self.instance_state = instance_state
         self.display_name = instance_state.get('display_name', "Open Ended")
 
@@ -174,6 +175,104 @@ class CombinedOpenEndedV1Module():
         self.fix_invalid_state()
         self.setup_next_task()
 
+    def validate_task_states(self, tasks_xml, task_states):
+        """
+        Check whether the provided task_states are valid for the supplied task_xml.
+
+        Returns a list of messages indicating what is invalid about the state.
+        If the list is empty, then the state is valid
+        """
+        msgs = []
+        #Loop through each task state and make sure it matches the xml definition
+        for task_xml, task_state in zip(tasks_xml, task_states):
+            tag_name = self.get_tag_name(task_xml)
+            children = self.child_modules()
+            task_descriptor = children['descriptors'][tag_name](self.system)
+            task_parsed_xml = task_descriptor.definition_from_xml(etree.fromstring(task_xml), self.system)
+            try:
+                task = children['modules'][tag_name](
+                    self.system,
+                    self.location,
+                    task_parsed_xml,
+                    task_descriptor,
+                    self.static_data,
+                    instance_state=task_state,
+                )
+                #Loop through each attempt of the task and see if it is valid.
+                for attempt in task.child_history:
+                    if "post_assessment" not in attempt:
+                        continue
+                    post_assessment = attempt['post_assessment']
+                    try:
+                        post_assessment = json.loads(post_assessment)
+                    except ValueError:
+                        #This is okay, the value may or may not be json encoded.
+                        pass
+                    if tag_name == "openended" and isinstance(post_assessment, list):
+                        msgs.append("Type is open ended and post assessment is a list.")
+                        break
+                    elif tag_name == "selfassessment" and not isinstance(post_assessment, list):
+                        msgs.append("Type is self assessment and post assessment is not a list.")
+                        break
+                #See if we can properly render the task.  Will go into the exception clause below if not.
+                task.get_html(self.system)
+            except Exception:
+                #If one task doesn't match, the state is invalid.
+                msgs.append("Could not parse task with xml {xml!r} and states {state!r}: {err}".format(
+                    xml=task_xml,
+                    state=task_state,
+                    err=traceback.format_exc()
+                ))
+                break
+        return msgs
+
+    def is_initial_child_state(self, task_child):
+        """
+        Returns true if this is a child task in an initial configuration
+        """
+        task_child = json.loads(task_child)
+        return (
+            task_child['child_state'] == self.INITIAL and
+            task_child['child_history'] == []
+        )
+
+    def is_reset_task_states(self, task_state):
+        """
+        Returns True if this task_state is from something that was just reset
+        """
+        return all(self.is_initial_child_state(child) for child in task_state)
+
+
+    def states_sort_key(self, idx_task_states):
+        """
+        Return a key for sorting a list of indexed task_states, by how far the student got
+        through the tasks, what their highest score was, and then the index of the submission.
+        """
+        idx, task_states = idx_task_states
+
+        state_values = {
+            OpenEndedChild.INITIAL: 0,
+            OpenEndedChild.ASSESSING: 1,
+            OpenEndedChild.POST_ASSESSMENT: 2,
+            OpenEndedChild.DONE: 3
+        }
+
+        if not task_states:
+            return (0, 0, state_values[OpenEndedChild.INITIAL], idx)
+
+        final_child_state = json.loads(task_states[-1])
+        scores = [attempt.get('score', 0) for attempt in final_child_state.get('child_history', [])]
+        if scores:
+            best_score = max(scores)
+        else:
+            best_score = 0
+        return (
+            len(task_states),
+            best_score,
+            state_values.get(final_child_state.get('child_state', OpenEndedChild.INITIAL), 0),
+            idx
+        )
+
     def fix_invalid_state(self):
         """
         Sometimes a teacher will change the xml definition of a problem in Studio.
@@ -190,44 +289,67 @@ class CombinedOpenEndedV1Module():
         if len(self.task_xml) < len(self.task_states):
             self.current_task_number = len(self.task_xml) - 1
             self.task_states = self.task_states[:len(self.task_xml)]
-        #Loop through each task state and make sure it matches the xml definition
-        for (i, t) in enumerate(self.task_states):
-            tag_name = self.get_tag_name(self.task_xml[i])
-            children = self.child_modules()
-            task_xml = self.task_xml[i]
-            task_descriptor = children['descriptors'][tag_name](self.system)
-            task_parsed_xml = task_descriptor.definition_from_xml(etree.fromstring(task_xml), self.system)
-            try:
-                task = children['modules'][tag_name](
-                    self.system,
-                    self.location,
-                    task_parsed_xml,
-                    task_descriptor,
-                    self.static_data,
-                    instance_state=t,
-                )
-                #Loop through each attempt of the task and see if it is valid.
-                for att in task.child_history:
-                    if "post_assessment" not in att:
-                        continue
-                    pa = att['post_assessment']
-                    try:
-                        pa = json.loads(pa)
-                    except ValueError:
-                        #This is okay, the value may or may not be json encoded.
-                        pass
-                    if tag_name == "openended" and isinstance(pa, list):
-                        self.reset_task_state("Type is open ended and post assessment is a list.")
-                        break
-                    elif tag_name == "selfassessment" and not isinstance(pa, list):
-                        self.reset_task_state("Type is self assessment and post assessment is not a list.")
-                        break
-                #See if we can properly render the task.  Will go into the exception clause below if not.
-                task.get_html(self.system)
-            except Exception as err:
-                #If one task doesn't match, the state is invalid.
-                self.reset_task_state("Could not parse task. {0}".format(err))
-                break
+
+        if not self.old_task_states and not self.task_states:
+            # No validation needed when a student first looks at the problem
+            return
+
+        # Pick out of self.task_states and self.old_task_states the state that is
+        # a) valid for the current task definition
+        # b) not the result of a reset due to not having a valid task state
+        # c) has the highest total score
+        # d) is the most recent (if the other two conditions are met)
+
+        valid_states = [
+            task_states
+            for task_states
+            in self.old_task_states + [self.task_states]
+            if (
+                len(self.validate_task_states(self.task_xml, task_states)) == 0 and
+                not self.is_reset_task_states(task_states)
+            )
+        ]
+
+        # If there are no valid states, don't try and use an old state
+        if len(valid_states) == 0:
+            # If this isn't an initial task state, then reset to an initial state
+            if not self.is_reset_task_states(self.task_states):
+                self.reset_task_state('\n'.join(self.validate_task_states(self.task_xml, self.task_states)))
+
+            return
+
+        sorted_states = sorted(enumerate(valid_states), key=self.states_sort_key, reverse=True)
+        idx, best_task_states = sorted_states[0]
+
+        if best_task_states == self.task_states:
+            return
+
+        log.warning(
+            "Updating current task state for %s to %r for student with anonymous id %r",
+            self.system.location,
+            best_task_states,
+            self.system.anonymous_student_id
+        )
+
+        self.old_task_states.remove(best_task_states)
+        self.old_task_states.append(self.task_states)
+        self.task_states = best_task_states
+
+        # The state is ASSESSING unless all of the children are done, or all
+        # of the children haven't been started yet
+        children = [json.loads(child) for child in best_task_states]
+        if all(child['child_state'] == self.DONE for child in children):
+            self.state = self.DONE
+        elif all(child['child_state'] == self.INITIAL for child in children):
+            self.state = self.INITIAL
+        else:
+            self.state = self.ASSESSING
+
+        # The current task number is the index of the last completed child + 1,
+        # limited by the number of tasks
+        last_completed_child = next((i for i, child in reversed(list(enumerate(children))) if child['child_state'] == self.DONE), 0)
+        self.current_task_number = min(last_completed_child + 1, len(best_task_states) - 1)
+
 
     def reset_task_state(self, message=""):
         """

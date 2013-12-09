@@ -1,11 +1,12 @@
 """
 Instructor Dashboard Views
 """
+from functools import partial
 
 from django.utils.translation import ugettext as _
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
-from mitxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
 from django.utils.html import escape
 from django.http import Http404
@@ -18,11 +19,13 @@ from xmodule.modulestore.django import modulestore
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 from courseware.access import has_access
-from courseware.courses import get_course_by_id
+from courseware.courses import get_course_by_id, get_cms_course_link
 from django_comment_client.utils import has_forum_access
 from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from student.models import CourseEnrollment
 from bulk_email.models import CourseAuthorization
+from lms.lib.xblock.runtime import handler_prefix
+
 
 from .extensions import get_units_with_due_date_options
 
@@ -30,7 +33,7 @@ from .extensions import get_units_with_due_date_options
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def instructor_dashboard_2(request, course_id):
-    """ Display the instructor dashboard for a course. """
+    """Display the instructor dashboard for a course."""
 
     course = get_course_by_id(course_id, depth=None)
     is_studio_course = (modulestore().get_modulestore_type(course_id) == MONGO_MODULESTORE_TYPE)
@@ -51,28 +54,33 @@ def instructor_dashboard_2(request, course_id):
         _section_course_info(course_id, access),
         _section_membership(course_id, access),
         _section_student_admin(course_id, access),
-        _section_data_download(course_id),
-        _section_analytics(course_id),
+        _section_data_download(course_id, access),
+        _section_analytics(course_id, access),
     ]
 
     if (settings.MITX_FEATURES.get('INDIVIDUAL_DUE_DATES')
         and access['instructor']):
         sections.insert(3, _section_extensions(course))
 
-    enrollment_count = sections[0]['enrollment_count']
-    disable_buttons = False
-    max_enrollment_for_buttons = settings.MITX_FEATURES.get("MAX_ENROLLMENT_INSTR_BUTTONS")
-    if max_enrollment_for_buttons is not None:
-        disable_buttons = enrollment_count > max_enrollment_for_buttons
-
-    # Gate access by feature flag & by course-specific authorization
-    if settings.MITX_FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and \
+    # Gate access to course email by feature flag & by course-specific authorization
+    if settings.FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and \
        is_studio_course and CourseAuthorization.instructor_email_enabled(course_id):
         sections.append(_section_send_email(course_id, access, course))
+
+    studio_url = None
+    if is_studio_course:
+        studio_url = get_cms_course_link(course)
+
+    enrollment_count = sections[0]['enrollment_count']
+    disable_buttons = False
+    max_enrollment_for_buttons = settings.FEATURES.get("MAX_ENROLLMENT_INSTR_BUTTONS")
+    if max_enrollment_for_buttons is not None:
+        disable_buttons = enrollment_count > max_enrollment_for_buttons
 
     context = {
         'course': course,
         'old_dashboard_url': reverse('instructor_dashboard', kwargs={'course_id': course_id}),
+        'studio_url': studio_url,
         'sections': sections,
         'disable_buttons': disable_buttons,
     }
@@ -97,13 +105,18 @@ def _section_course_info(course_id, access):
     """ Provide data for the corresponding dashboard section """
     course = get_course_by_id(course_id, depth=None)
 
+    course_org, course_num, course_name = course_id.split('/')
+
     section_data = {
         'section_key': 'course_info',
         'section_display_name': _('Course Info'),
-        'course_id': course_id,
         'access': access,
+        'course_id': course_id,
+        'course_org': course_org,
+        'course_num': course_num,
+        'course_name': course_name,
         'course_display_name': course.display_name,
-        'enrollment_count': CourseEnrollment.objects.filter(course_id=course_id).count(),
+        'enrollment_count': CourseEnrollment.objects.filter(course_id=course_id, is_active=1).count(),
         'has_started': course.has_started(),
         'has_ended': course.has_ended(),
         'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': course_id}),
@@ -169,39 +182,50 @@ def _section_extensions(course):
     return section_data
 
 
-def _section_data_download(course_id):
+def _section_data_download(course_id, access):
     """ Provide data for the corresponding dashboard section """
     section_data = {
         'section_key': 'data_download',
         'section_display_name': _('Data Download'),
+        'access': access,
         'get_grading_config_url': reverse('get_grading_config', kwargs={'course_id': course_id}),
         'get_students_features_url': reverse('get_students_features', kwargs={'course_id': course_id}),
         'get_anon_ids_url': reverse('get_anon_ids', kwargs={'course_id': course_id}),
+        'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': course_id}),
+        'list_grade_downloads_url': reverse('list_grade_downloads', kwargs={'course_id': course_id}),
+        'calculate_grades_csv_url': reverse('calculate_grades_csv', kwargs={'course_id': course_id}),
     }
     return section_data
 
 
 def _section_send_email(course_id, access, course):
     """ Provide data for the corresponding bulk email section """
-    html_module = HtmlDescriptor(course.system, DictFieldData({'data': ''}), ScopeIds(None, None, None, None))
+    html_module = HtmlDescriptor(
+        course.system,
+        DictFieldData({'data': ''}),
+        ScopeIds(None, None, None, 'i4x://dummy_org/dummy_course/html/dummy_name')
+    )
     fragment = course.system.render(html_module, 'studio_view')
-    fragment = wrap_xblock(html_module, 'studio_view', fragment, None)
+    fragment = wrap_xblock(partial(handler_prefix, course_id), html_module, 'studio_view', fragment, None)
     email_editor = fragment.content
     section_data = {
         'section_key': 'send_email',
         'section_display_name': _('Email'),
         'access': access,
         'send_email': reverse('send_email', kwargs={'course_id': course_id}),
-        'editor': email_editor
+        'editor': email_editor,
+        'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': course_id}),
+        'email_background_tasks_url': reverse('list_background_email_tasks', kwargs={'course_id': course_id}),
     }
     return section_data
 
 
-def _section_analytics(course_id):
+def _section_analytics(course_id, access):
     """ Provide data for the corresponding dashboard section """
     section_data = {
         'section_key': 'analytics',
         'section_display_name': _('Analytics'),
+        'access': access,
         'get_distribution_url': reverse('get_distribution', kwargs={'course_id': course_id}),
         'proxy_legacy_analytics_url': reverse('proxy_legacy_analytics', kwargs={'course_id': course_id}),
     }

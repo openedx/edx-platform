@@ -28,7 +28,8 @@ from xmodule.editing_module import TabsEditingDescriptor
 from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.xml_module import is_pointer_tag, name_to_pathname, deserialize_field
 from xmodule.modulestore import Location
-from xblock.fields import Scope, String, Boolean, Float, List, Integer, ScopeIds
+from xblock.fields import Scope, String, Boolean, List, Integer, ScopeIds
+from xmodule.fields import RelativeTime
 
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore
 from xblock.runtime import DbModel
@@ -79,18 +80,20 @@ class VideoFields(object):
         scope=Scope.settings,
         default=""
     )
-    start_time = Float(
-        help="Start time for the video.",
+    start_time = RelativeTime(  # datetime.timedelta object
+        help="Start time for the video (HH:MM:SS).",
         display_name="Start Time",
         scope=Scope.settings,
-        default=0.0
+        default=datetime.timedelta(seconds=0)
     )
-    end_time = Float(
-        help="End time for the video.",
+    end_time = RelativeTime(  # datetime.timedelta object
+        help="End time for the video (HH:MM:SS).",
         display_name="End Time",
         scope=Scope.settings,
-        default=0.0
+        default=datetime.timedelta(seconds=0)
     )
+    #front-end code of video player checks logical validity of (start_time, end_time) pair.
+
     source = String(
         help="The external URL to download the video. This appears as a link beneath the video.",
         display_name="Download Video",
@@ -182,9 +185,9 @@ class VideoModule(VideoFields, XModule):
             'data_dir': getattr(self, 'data_dir', None),
             'caption_asset_path': caption_asset_path,
             'show_captions': json.dumps(self.show_captions),
-            'start': self.start_time,
-            'end': self.end_time,
-            'autoplay': settings.MITX_FEATURES.get('AUTOPLAY_VIDEOS', False),
+            'start': self.start_time.total_seconds(),
+            'end': self.end_time.total_seconds(),
+            'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', False),
             # TODO: Later on the value 1500 should be taken from some global
             # configuration setting field.
             'yt_test_timeout': 1500,
@@ -265,8 +268,8 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
         attrs = {
             'display_name': self.display_name,
             'show_captions': json.dumps(self.show_captions),
-            'start_time': datetime.timedelta(seconds=self.start_time),
-            'end_time': datetime.timedelta(seconds=self.end_time),
+            'start_time': self.start_time,
+            'end_time': self.end_time,
             'sub': self.sub,
         }
         for key, value in attrs.items():
@@ -359,9 +362,10 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
         xml = etree.fromstring(xml_data)
         field_data = {}
 
+        # Convert between key types for certain attributes --
+        # necessary for backwards compatibility.
         conversions = {
-            'start_time': cls._parse_time,
-            'end_time': cls._parse_time
+            # example: 'start_time': cls._example_convert_start_time
         }
 
         # Convert between key names for certain attributes --
@@ -405,24 +409,6 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
                 field_data[attr] = value
 
         return field_data
-
-    @classmethod
-    def _parse_time(cls, str_time):
-        """Converts s in '12:34:45' format to seconds. If s is
-        None, returns empty string"""
-        if not str_time:
-            return ''
-        else:
-            try:
-                obj_time = time.strptime(str_time, '%H:%M:%S')
-                return datetime.timedelta(
-                    hours=obj_time.tm_hour,
-                    minutes=obj_time.tm_min,
-                    seconds=obj_time.tm_sec
-                ).total_seconds()
-            except ValueError:
-                # We've seen serialized versions of float in this field
-                return float(str_time)
 
 
 def _create_youtube_string(module):

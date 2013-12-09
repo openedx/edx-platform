@@ -1,8 +1,7 @@
-
 define(
     [
         "backbone", "underscore", "js/models/metadata", "js/views/abstract_editor",
-        "js/views/transcripts/metadata_videolist"
+        "js/views/transcripts/metadata_videolist", "jquery.maskedinput"
     ],
 function(Backbone, _, MetadataModel, AbstractEditor, VideoList) {
     var Metadata = {};
@@ -39,6 +38,9 @@ function(Backbone, _, MetadataModel, AbstractEditor, VideoList) {
                     }
                     else if(model.getType() === MetadataModel.VIDEO_LIST_TYPE) {
                         new VideoList(data);
+                    }
+                    else if(model.getType() === MetadataModel.RELATIVE_TIME_TYPE) {
+                        new Metadata.RelativeTime(data);
                     }
                     else {
                         // Everything else is treated as GENERIC_TYPE, which uses String editor.
@@ -289,6 +291,62 @@ function(Backbone, _, MetadataModel, AbstractEditor, VideoList) {
 
         enableAdd: function() {
             this.$el.find('.create-setting').removeClass('is-disabled');
+        }
+    });
+
+    Metadata.RelativeTime = AbstractEditor.extend({
+
+        events : {
+            "change input" : "updateModel",
+            "keypress .setting-input" : "showClearButton"  ,
+            "click .setting-clear" : "clear"
+        },
+
+        templateName: "metadata-string-entry",
+
+        initialize: function () {
+            AbstractEditor.prototype.initialize.apply(this);
+
+            // This list of definitions is used for creating appropriate
+            // time format mask;
+            //
+            // For example, mask 'hH:mM:sS':
+            // min value: 00:00:00
+            // max value: 23:59:59
+            //
+            // With this mask user cannot set following values:
+            // 93:23:23, 23:60:60, 77:77:77, etc.
+            var definitions = {
+                h: '[0-2]',
+                H: '[0-3]',
+                m: '[0-5]',
+                s: '[0-5]',
+                M: '[0-9]',
+                S: '[0-9]'
+            };
+
+            $.each(definitions, function(key, value) {
+                $.mask.definitions[key] = value;
+            });
+
+            this.$el
+                .find('#' + this.uniqueId)
+                .mask('hH:mM:sS', { placeholder: '0' });
+        },
+
+        getValueFromEditor : function () {
+            var $input = this.$el.find('#' + this.uniqueId),
+                value = $input.val();
+
+            return value;
+        },
+
+        setValueInEditor : function (value) {
+            if (!value) {
+                value = '00:00:00';
+            }
+
+            this.$el.find('input').val(value);
         }
     });
 

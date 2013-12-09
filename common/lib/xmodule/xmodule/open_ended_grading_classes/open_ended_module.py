@@ -23,7 +23,7 @@ from pytz import UTC
 
 from .combined_open_ended_rubric import CombinedOpenEndedRubric
 
-log = logging.getLogger("mitx.courseware")
+log = logging.getLogger("edx.courseware")
 
 
 class OpenEndedModule(openendedchild.OpenEndedChild):
@@ -281,9 +281,27 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         if not new_score_msg['valid']:
             new_score_msg['feedback'] = 'Invalid grader reply. Please contact the course staff.'
 
-        self.record_latest_score(new_score_msg['score'])
-        self.record_latest_post_assessment(score_msg)
-        self.child_state = self.POST_ASSESSMENT
+        # self.child_history is initialized as [].  record_latest_score() and record_latest_post_assessment()
+        # operate on self.child_history[-1].  Thus we have to make sure child_history is not [].
+        # Handle at this level instead of in record_*() because this is a good place to reduce the number of conditions
+        # and also keep the persistent state from changing.
+        if self.child_history:
+            self.record_latest_score(new_score_msg['score'])
+            self.record_latest_post_assessment(score_msg)
+            self.child_state = self.POST_ASSESSMENT
+        else:
+            log.error((
+                "Trying to update score without existing studentmodule child_history:\n"
+                "   location: {location}\n"
+                "   score: {score}\n"
+                "   grader_ids: {grader_ids}\n"
+                "   submission_ids: {submission_ids}").format(
+                    location=self.location_string,
+                    score=new_score_msg['score'],
+                    grader_ids=new_score_msg['grader_ids'],
+                    submission_ids=new_score_msg['submission_ids']
+                )
+            )
 
         return True
 

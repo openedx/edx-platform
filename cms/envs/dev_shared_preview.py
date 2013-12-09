@@ -9,4 +9,4 @@ the same process between preview and published
 
 from .dev import *
 
-MITX_FEATURES['PREVIEW_LMS_BASE'] = "preview.localhost:8000"
+FEATURES['PREVIEW_LMS_BASE'] = "preview.localhost:8000"

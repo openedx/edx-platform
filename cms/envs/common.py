@@ -2,7 +2,7 @@
 This is the common settings file, intended to set sane defaults. If you have a
 piece of configuration that's dependent on a set of feature flags being set,
 then create a function that returns the calculated value based on the value of
-MITX_FEATURES[...]. Modules that extend this one can change the feature
+FEATURES[...]. Modules that extend this one can change the feature
 configuration in an environment specific config file and re-calculate those
 values.
 
@@ -14,7 +14,7 @@ Longer TODO:
 1. Right now our treatment of static content in general and in particular
    course-specific static content is haphazard.
 2. We should have a more disciplined approach to feature flagging, even if it
-   just means that we stick them in a dict called MITX_FEATURES.
+   just means that we stick them in a dict called FEATURES.
 3. We need to handle configuration for multiple courses. This could be as
    multiple sites, but we do need a way to map their data assets.
 """
@@ -28,7 +28,7 @@ import lms.envs.common
 from lms.envs.common import USE_TZ, TECH_SUPPORT_EMAIL, PLATFORM_NAME, BUGS_EMAIL
 from path import path
 
-from lms.xblock.mixin import LmsBlockMixin
+from lms.lib.xblock.mixin import LmsBlockMixin
 from cms.xmodule_namespace import CmsBlockMixin
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.x_module import XModuleMixin
@@ -36,7 +36,7 @@ from dealer.git import git
 
 ############################ FEATURE CONFIGURATION #############################
 
-MITX_FEATURES = {
+FEATURES = {
     'USE_DJANGO_PIPELINE': True,
 
     'GITHUB_PUSH': False,
@@ -99,10 +99,10 @@ for namespace, template_dirs in lms.envs.common.MAKO_TEMPLATES.iteritems():
 
 TEMPLATE_DIRS = MAKO_TEMPLATES['main']
 
-MITX_ROOT_URL = ''
+EDX_ROOT_URL = ''
 
-LOGIN_REDIRECT_URL = MITX_ROOT_URL + '/signin'
-LOGIN_URL = MITX_ROOT_URL + '/signin'
+LOGIN_REDIRECT_URL = EDX_ROOT_URL + '/signin'
+LOGIN_URL = EDX_ROOT_URL + '/signin'
 
 
 TEMPLATE_CONTEXT_PROCESSORS = (
@@ -136,6 +136,7 @@ XQUEUE_INTERFACE = {
 STATICFILES_FINDERS = (
     'staticfiles.finders.FileSystemFinder',
     'staticfiles.finders.AppDirectoriesFinder',
+    'pipeline.finders.PipelineFinder',
 )
 
 # List of callables that know how to import templates from various sources.
@@ -156,10 +157,11 @@ MIDDLEWARE_CLASSES = (
     'cache_toolbox.middleware.CacheBackedAuthenticationMiddleware',
     'student.middleware.UserStandingMiddleware',
     'contentserver.middleware.StaticContentServer',
+    'crum.CurrentRequestUserMiddleware',
 
     'django.contrib.messages.middleware.MessageMiddleware',
     'track.middleware.TrackMiddleware',
-    'mitxmako.middleware.MakoMiddleware',
+    'edxmako.middleware.MakoMiddleware',
 
     # Detects user-requested locale from 'accept-language' header in http request
     'django.middleware.locale.LocaleMiddleware',
@@ -195,9 +197,9 @@ IGNORABLE_404_ENDS = ('favicon.ico')
 
 # Email
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-DEFAULT_FROM_EMAIL = 'registration@edx.org'
-DEFAULT_FEEDBACK_EMAIL = 'feedback@edx.org'
-SERVER_EMAIL = 'devops@edx.org'
+DEFAULT_FROM_EMAIL = 'registration@example.com'
+DEFAULT_FEEDBACK_EMAIL = 'feedback@example.com'
+SERVER_EMAIL = 'devops@example.com'
 ADMINS = ()
 MANAGERS = ADMINS
 
@@ -240,16 +242,35 @@ STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
 from rooted_paths import rooted_glob
 
 PIPELINE_CSS = {
-    'base-style': {
+    'style-vendor': {
         'source_filenames': [
+            'css/vendor/normalize.css',
+            'css/vendor/font-awesome.css',
             'js/vendor/CodeMirror/codemirror.css',
             'css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css',
             'css/vendor/jquery.qtip.min.css',
-            'sass/base-style.css',
-            'xmodule/modules.css',
-            'xmodule/descriptor.css',
+            'js/vendor/markitup/skins/simple/style.css',
+            'js/vendor/markitup/sets/wiki/style.css',
         ],
-        'output_filename': 'css/cms-base-style.css',
+        'output_filename': 'css/cms-style-vendor.css',
+    },
+    'style-app': {
+        'source_filenames': [
+            'sass/style-app.css',
+        ],
+        'output_filename': 'css/cms-style-app.css',
+    },
+    'style-app-extend1': {
+        'source_filenames': [
+            'sass/style-app-extend1.css',
+        ],
+        'output_filename': 'css/cms-style-app-extend1.css',
+    },
+    'style-xmodule': {
+        'source_filenames': [
+            'sass/style-xmodule.css',
+        ],
+        'output_filename': 'css/cms-style-xmodule.css',
     },
 }
 
@@ -372,7 +393,7 @@ INSTALLED_APPS = (
     'datadog',
 
     # For asset pipelining
-    'mitxmako',
+    'edxmako',
     'pipeline',
     'staticfiles',
     'static_replace',
@@ -393,14 +414,7 @@ INSTALLED_APPS = (
 EDXMKTG_COOKIE_NAME = 'edxloggedin'
 MKTG_URLS = {}
 MKTG_URL_LINK_MAP = {
-    'ABOUT': 'about_edx',
-    'CONTACT': 'contact',
-    'FAQ': 'help_edx',
-    'COURSES': 'courses',
-    'ROOT': 'root',
-    'TOS': 'tos',
-    'HONOR': 'honor',
-    'PRIVACY': 'privacy_edx',
+
 }
 
 COURSES_WITH_UNSAFE_CODE = []

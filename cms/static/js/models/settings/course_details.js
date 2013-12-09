@@ -1,8 +1,10 @@
-define(["backbone", "underscore", "gettext", "js/models/location"], function(Backbone, _, gettext, Location) {
+define(["backbone", "underscore", "gettext"], function(Backbone, _, gettext) {
 
 var CourseDetails = Backbone.Model.extend({
     defaults: {
-        location : null,	// the course's Location model, required
+        org : '',
+        course_id: '',
+        run: '',
         start_date: null,	// maps to 'start'
         end_date: null,		// maps to 'end'
         enrollment_start: null,
@@ -17,9 +19,6 @@ var CourseDetails = Backbone.Model.extend({
 
     // When init'g from html script, ensure you pass {parse: true} as an option (2nd arg to reset)
     parse: function(attributes) {
-        if (attributes['course_location']) {
-            attributes.location = new Location(attributes.course_location, {parse:true});
-        }
         if (attributes['start_date']) {
             attributes.start_date = new Date(attributes.start_date);
         }

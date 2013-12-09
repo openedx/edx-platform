@@ -32,7 +32,7 @@ class SplitModuleTest(unittest.TestCase):
     DOC_STORE_CONFIG = {
         'host': 'localhost',
         'db': 'test_xmodule',
-        'collection': 'modulestore{0}'.format(uuid.uuid4().hex),
+        'collection': 'modulestore{0}'.format(uuid.uuid4().hex[:5]),
     }
     modulestore_options = {
         'default_class': 'xmodule.raw_module.RawDescriptor',
@@ -829,7 +829,7 @@ class TestItemCrud(SplitModuleTest):
         # delete a leaf
         problems = modulestore().get_items(reusable_location, {'category': 'problem'})
         locn_to_del = problems[0].location
-        new_course_loc = modulestore().delete_item(locn_to_del, 'deleting_user', delete_children=True)
+        new_course_loc = modulestore().delete_item(locn_to_del, 'deleting_user', delete_children=False)
         deleted = BlockUsageLocator(course_id=reusable_location.course_id,
                                     branch=reusable_location.branch,
                                     usage_id=locn_to_del.usage_id)
@@ -1018,41 +1018,29 @@ class TestCourseCreation(SplitModuleTest):
         Test changing the org, pretty id, etc of a course. Test that it doesn't allow changing the id, etc.
         """
         locator = CourseLocator(course_id="GreekHero", branch='draft')
-        modulestore().update_course_index(locator, {'org': 'funkyU'})
+        course_info = modulestore().get_course_index_info(locator)
+        course_info['org'] = 'funkyU'
+        modulestore().update_course_index(course_info)
         course_info = modulestore().get_course_index_info(locator)
         self.assertEqual(course_info['org'], 'funkyU')
 
-        modulestore().update_course_index(locator, {'org': 'moreFunky', 'prettyid': 'Ancient Greek Demagods'})
+        course_info['org'] = 'moreFunky'
+        course_info['prettyid'] = 'Ancient Greek Demagods'
+        modulestore().update_course_index(course_info)
         course_info = modulestore().get_course_index_info(locator)
         self.assertEqual(course_info['org'], 'moreFunky')
         self.assertEqual(course_info['prettyid'], 'Ancient Greek Demagods')
 
-        self.assertRaises(ValueError, modulestore().update_course_index, locator, {'_id': 'funkygreeks'})
-
-        with self.assertRaises(ValueError):
-            modulestore().update_course_index(
-                locator,
-                {'edited_on': datetime.datetime.now(UTC)}
-            )
-        with self.assertRaises(ValueError):
-            modulestore().update_course_index(
-                locator,
-                {'edited_by': 'sneak'}
-            )
-
-        self.assertRaises(ValueError, modulestore().update_course_index, locator,
-                          {'versions': {'draft': self.GUID_D1}})
-
         # an allowed but not necessarily recommended way to revert the draft version
         versions = course_info['versions']
         versions['draft'] = self.GUID_D1
-        modulestore().update_course_index(locator, {'versions': versions}, update_versions=True)
+        modulestore().update_course_index(course_info)
         course = modulestore().get_course(locator)
         self.assertEqual(str(course.location.version_guid), self.GUID_D1)
 
         # an allowed but not recommended way to publish a course
         versions['published'] = self.GUID_D1
-        modulestore().update_course_index(locator, {'versions': versions}, update_versions=True)
+        modulestore().update_course_index(course_info)
         course = modulestore().get_course(CourseLocator(course_id=locator.course_id, branch="published"))
         self.assertEqual(str(course.location.version_guid), self.GUID_D1)
 
@@ -1068,9 +1056,9 @@ class TestCourseCreation(SplitModuleTest):
         self.assertEqual(new_course.location.usage_id, 'top')
         self.assertEqual(new_course.category, 'chapter')
         # look at db to verify
-        db_structure = modulestore().structures.find_one({
-            '_id': new_course.location.as_object_id(new_course.location.version_guid)
-        })
+        db_structure = modulestore().db_connection.get_structure(
+            new_course.location.as_object_id(new_course.location.version_guid)
+        )
         self.assertIsNotNone(db_structure, "Didn't find course")
         self.assertNotIn('course', db_structure['blocks'])
         self.assertIn('top', db_structure['blocks'])
@@ -1097,7 +1085,135 @@ class TestInheritance(SplitModuleTest):
         # overridden
         self.assertEqual(node.graceperiod, datetime.timedelta(hours=4))
 
-    # TODO test inheritance after set and delete of attrs
+
+class TestPublish(SplitModuleTest):
+    """
+    Test the publishing api
+    """
+    def setUp(self):
+        SplitModuleTest.setUp(self)
+        self.user = random.getrandbits(32)
+
+    def tearDown(self):
+        SplitModuleTest.tearDownClass()
+
+    def test_publish_safe(self):
+        """
+        Test the standard patterns: publish to new branch, revise and publish
+        """
+        source_course = CourseLocator(course_id="GreekHero", branch='draft')
+        dest_course = CourseLocator(course_id="GreekHero", branch="published")
+        modulestore().xblock_publish(self.user, source_course, dest_course, ["head12345"], ["chapter2", "chapter3"])
+        expected = ["head12345", "chapter1"]
+        self._check_course(
+            source_course, dest_course, expected, ["chapter2", "chapter3", "problem1", "problem3_2"]
+        )
+        # add a child under chapter1
+        new_module = modulestore().create_item(
+            self._usage(source_course, "chapter1"), "sequential", self.user,
+            fields={'display_name': 'new sequential'},
+        )
+        # remove chapter1 from expected b/c its pub'd version != the source anymore since source changed
+        expected.remove("chapter1")
+        # check that it's not in published course
+        with self.assertRaises(ItemNotFoundError):
+            modulestore().get_item(self._usage(dest_course, new_module.location.usage_id))
+        # publish it
+        modulestore().xblock_publish(self.user, source_course, dest_course, [new_module.location.usage_id], None)
+        expected.append(new_module.location.usage_id)
+        # check that it is in the published course and that its parent is the chapter
+        pub_module = modulestore().get_item(self._usage(dest_course, new_module.location.usage_id))
+        self.assertEqual(
+            modulestore().get_parent_locations(pub_module.location)[0].usage_id, "chapter1"
+        )
+        # ensure intentionally orphaned blocks work (e.g., course_info)
+        new_module = modulestore().create_item(
+            source_course, "course_info", self.user, usage_id="handouts"
+        )
+        # publish it
+        modulestore().xblock_publish(self.user, source_course, dest_course, [new_module.location.usage_id], None)
+        expected.append(new_module.location.usage_id)
+        # check that it is in the published course (no error means it worked)
+        pub_module = modulestore().get_item(self._usage(dest_course, new_module.location.usage_id))
+        self._check_course(
+            source_course, dest_course, expected, ["chapter2", "chapter3", "problem1", "problem3_2"]
+        )
+
+    def test_exceptions(self):
+        """
+        Test the exceptions which preclude successful publication
+        """
+        source_course = CourseLocator(course_id="GreekHero", branch='draft')
+        # destination does not exist
+        destination_course = CourseLocator(course_id="Unknown", branch="published")
+        with self.assertRaises(ItemNotFoundError):
+            modulestore().xblock_publish(self.user, source_course, destination_course, ["chapter3"], None)
+        # publishing into a new branch w/o publishing the root
+        destination_course = CourseLocator(course_id="GreekHero", branch="published")
+        with self.assertRaises(ItemNotFoundError):
+            modulestore().xblock_publish(self.user, source_course, destination_course, ["chapter3"], None)
+        # publishing a subdag w/o the parent already in course
+        modulestore().xblock_publish(self.user, source_course, destination_course, ["head12345"], ["chapter3"])
+        with self.assertRaises(ItemNotFoundError):
+            modulestore().xblock_publish(self.user, source_course, destination_course, ["problem1"], [])
+
+    def test_move_delete(self):
+        """
+        Test publishing moves and deletes.
+        """
+        source_course = CourseLocator(course_id="GreekHero", branch='draft')
+        dest_course = CourseLocator(course_id="GreekHero", branch="published")
+        modulestore().xblock_publish(self.user, source_course, dest_course, ["head12345"], ["chapter2"])
+        expected = ["head12345", "chapter1", "chapter3", "problem1", "problem3_2"]
+        self._check_course(source_course, dest_course, expected, ["chapter2"])
+        # now move problem1 and delete problem3_2
+        chapter1 = modulestore().get_item(self._usage(source_course, "chapter1"))
+        chapter3 = modulestore().get_item(self._usage(source_course, "chapter3"))
+        chapter1.children.append("problem1")
+        chapter3.children.remove("problem1")
+        modulestore().delete_item(self._usage(source_course, "problem3_2"), self.user)
+        modulestore().xblock_publish(self.user, source_course, dest_course, ["head12345"], ["chapter2"])
+        expected = ["head12345", "chapter1", "chapter3", "problem1"]
+        self._check_course(source_course, dest_course, expected, ["chapter2", "problem3_2"])
+
+    def _check_course(self, source_course_loc, dest_course_loc, expected_blocks, unexpected_blocks):
+        """
+        Check that the course has the expected blocks and does not have the unexpected blocks
+        """
+        for expected in expected_blocks:
+            source = modulestore().get_item(self._usage(source_course_loc, expected))
+            pub_copy = modulestore().get_item(self._usage(dest_course_loc, expected))
+            # everything except previous_version & children should be the same
+            self.assertEqual(source.category, pub_copy.category)
+            self.assertEqual(source.update_version, pub_copy.update_version)
+            self.assertEqual(self.user, pub_copy.edited_by)
+            for field in source.fields.values():
+                if field.name == 'children':
+                    self._compare_children(field.read_from(source), field.read_from(pub_copy), unexpected_blocks)
+                else:
+                    self.assertEqual(field.read_from(source), field.read_from(pub_copy))
+        for unexp in unexpected_blocks:
+            with self.assertRaises(ItemNotFoundError):
+                modulestore().get_item(self._usage(dest_course_loc, unexp))
+
+    def _usage(self, course_loc, block_id):
+        """
+        Generate a BlockUsageLocator for the combo of the course location and block id
+        """
+        return BlockUsageLocator(course_id=course_loc.course_id, branch=course_loc.branch, usage_id=block_id)
+
+    def _compare_children(self, source_children, dest_children, unexpected):
+        """
+        Ensure dest_children == source_children minus unexpected
+        """
+        dest_cursor = 0
+        for child in source_children:
+            if child in unexpected:
+                self.assertNotIn(child, dest_children)
+            else:
+                self.assertEqual(child, dest_children[dest_cursor])
+                dest_cursor += 1
+        self.assertEqual(dest_cursor, len(dest_children))
 
 
 #===========================================

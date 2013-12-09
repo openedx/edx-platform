@@ -9,7 +9,7 @@ import static_replace
 
 from django.conf import settings
 from django.utils.timezone import UTC
-from mitxmako.shortcuts import render_to_string
+from edxmako.shortcuts import render_to_string
 from xblock.fragment import Fragment
 
 from xmodule.seq_module import SequenceModule
@@ -29,11 +29,14 @@ def wrap_fragment(fragment, new_content):
     return wrapper_frag
 
 
-def wrap_xblock(block, view, frag, context, display_name_only=False):  # pylint: disable=unused-argument
+def wrap_xblock(handler_prefix, block, view, frag, context, display_name_only=False):  # pylint: disable=unused-argument
     """
     Wraps the results of rendering an XBlock view in a standard <section> with identifying
     data so that the appropriate javascript module can be loaded onto it.
 
+    :param handler_prefix: A function that takes a block and returns the url prefix for
+        the javascript handler_url. This prefix should be able to have {handler_name}/{suffix}?{query}
+        appended to it to return a valid handler_url
     :param block: An XBlock (that may be an XModule or XModuleDescriptor)
     :param view: The name of the view that rendered the fragment being wrapped
     :param frag: The :class:`Fragment` to be wrapped
@@ -63,7 +66,7 @@ def wrap_xblock(block, view, frag, context, display_name_only=False):  # pylint:
     if frag.js_init_fn:
         data['init'] = frag.js_init_fn
         data['runtime-version'] = frag.js_init_version
-        data['usage-id'] = block.scope_ids.usage_id
+        data['handler-prefix'] = handler_prefix(block)
         data['block-type'] = block.scope_ids.block_type
 
     template_context = {
@@ -160,7 +163,7 @@ def add_histogram(user, block, view, frag, context):  # pylint: disable=unused-a
         histogram = None
         render_histogram = False
 
-    if settings.MITX_FEATURES.get('ENABLE_LMS_MIGRATION'):
+    if settings.FEATURES.get('ENABLE_LMS_MIGRATION'):
         [filepath, filename] = getattr(block, 'xml_attributes', {}).get('filename', ['', None])
         osfs = block.system.filestore
         if filename is not None and osfs.exists(filename):
@@ -198,7 +201,7 @@ def add_histogram(user, block, view, frag, context):  # pylint: disable=unused-a
                      'element_id': block.location.html_id().replace('-', '_'),
                      'edit_link': edit_link,
                      'user': user,
-                     'xqa_server': settings.MITX_FEATURES.get('USE_XQA_SERVER', 'http://xqa:server@content-qa.mitx.mit.edu/xqa'),
+                     'xqa_server': settings.FEATURES.get('USE_XQA_SERVER', 'http://xqa:server@content-qa.mitx.mit.edu/xqa'),
                      'histogram': json.dumps(histogram),
                      'render_histogram': render_histogram,
                      'block_content': frag.content,

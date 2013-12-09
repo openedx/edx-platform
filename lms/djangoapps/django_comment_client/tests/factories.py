@@ -1,4 +1,4 @@
-from factory import DjangoModelFactory
+from factory.django import DjangoModelFactory
 from django_comment_common.models import Role, Permission
 
 

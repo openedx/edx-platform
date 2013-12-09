@@ -4,9 +4,12 @@ if Backbone?
     events:
       "click .discussion-vote": "toggleVote"
       "click .discussion-flag-abuse": "toggleFlagAbuse"
-      "keypress .discussion-flag-abuse": "toggleFlagAbuseKeypress"
+      "keypress .discussion-flag-abuse":
+        (event) -> DiscussionUtil.activateOnEnter(event, toggleFlagAbuse)
       "click .admin-pin": "togglePin"
       "click .action-follow": "toggleFollowing"
+      "keypress .action-follow":
+        (event) -> DiscussionUtil.activateOnEnter(event, toggleFollowing)
       "click .action-edit": "edit"
       "click .action-delete": "_delete"
       "click .action-openclose": "toggleClosed"
@@ -25,7 +28,6 @@ if Backbone?
     render: ->
       @$el.html(@renderTemplate())
       @delegateEvents()
-      @renderDogear()
       @renderVoted()
       @renderFlagged()
       @renderPinned()
@@ -35,10 +37,6 @@ if Backbone?
       @highlight @$(".post-body")
       @highlight @$("h1,h3")
       @
-
-    renderDogear: ->
-      if window.user.following(@model)
-        @$(".dogear").addClass("is-followed")
 
     renderVoted: =>
       if window.user.voted(@model)
@@ -93,20 +91,6 @@ if Backbone?
         @unvote()
       else
         @vote()
-
-    toggleFollowing: (event) ->
-      $elem = $(event.target)
-      url = null
-      if not @model.get('subscribed')
-        @model.follow()
-        url = @model.urlFor("follow")
-      else
-        @model.unfollow()
-        url = @model.urlFor("unfollow")
-      DiscussionUtil.safeAjax
-        $elem: $elem
-        url: url
-        type: "POST"
 
     vote: ->
       window.user.vote(@model)

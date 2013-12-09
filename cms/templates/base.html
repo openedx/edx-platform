@@ -1,8 +1,12 @@
 ## -*- coding: utf-8 -*-
+<%! from django.utils.translation import ugettext as _ %>
 <%namespace name='static' file='static_content.html'/>
 
 <!doctype html>
-<html>
+<!--[if IE 7]><html class="ie7 lte9 lte8 lte7"><![endif]-->
+<!--[if IE 8]><html class="ie8 lte9 lte8"><![endif]-->
+<!--[if IE 9]><html class="ie9 lte9"><![endif]-->
+<!--[if gt IE 9]><!--><html><!--<![endif]-->
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
@@ -16,12 +20,12 @@
     </title>
 
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="path_prefix" content="${MITX_ROOT_URL}">
+    <meta name="path_prefix" content="${EDX_ROOT_URL}">
 
-    <%static:css group='base-style'/>
-    <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/markitup/skins/simple/style.css')}" />
-    <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/markitup/sets/wiki/style.css')}" />
-    <link rel="stylesheet" href="${static.url('js/vendor/CodeMirror/codemirror.css')}" type="text/css" media="all" />
+    <%static:css group='style-vendor'/>
+    <%static:css group='style-app'/>
+    <%static:css group='style-app-extend1'/>
+    <%static:css group='style-xmodule'/>
 
     <%include file="widgets/segment-io.html" />
 
@@ -29,206 +33,219 @@
   </head>
 
   <body class="<%block name='bodyclass'></%block> hide-wip">
-<script type="text/javascript">
-window.baseUrl = "${settings.STATIC_URL}";
-var require = {
-    baseUrl: baseUrl,
-    waitSeconds: 60,
-    paths: {
-        "domReady": "js/vendor/domReady",
-        "gettext": "/i18n",
-        "mustache": "js/vendor/mustache",
-        "codemirror": "js/vendor/codemirror-compressed",
-        "codemirror/stex": "js/vendor/CodeMirror/stex",
-        "jquery": "js/vendor/jquery.min",
-        "jquery.ui": "js/vendor/jquery-ui.min",
-        "jquery.form": "js/vendor/jquery.form",
-        "jquery.markitup": "js/vendor/markitup/jquery.markitup",
-        "jquery.leanModal": "js/vendor/jquery.leanModal.min",
-        "jquery.ajaxQueue": "js/vendor/jquery.ajaxQueue",
-        "jquery.smoothScroll": "js/vendor/jquery.smooth-scroll.min",
-        "jquery.timepicker": "js/vendor/timepicker/jquery.timepicker",
-        "jquery.cookie": "js/vendor/jquery.cookie",
-        "jquery.qtip": "js/vendor/jquery.qtip.min",
-        "jquery.scrollTo": "js/vendor/jquery.scrollTo-1.4.2-min",
-        "jquery.flot": "js/vendor/flot/jquery.flot.min",
-        "jquery.fileupload": "js/vendor/jQuery-File-Upload/js/jquery.fileupload",
-        "jquery.iframe-transport": "js/vendor/jQuery-File-Upload/js/jquery.iframe-transport",
-        "jquery.inputnumber": "js/vendor/html5-input-polyfills/number-polyfill",
-        "jquery.immediateDescendents": "coffee/src/jquery.immediateDescendents",
-        "datepair": "js/vendor/timepicker/datepair",
-        "date": "js/vendor/date",
-        "tzAbbr": "js/vendor/tzAbbr",
-        "underscore": "js/vendor/underscore-min",
-        "underscore.string": "js/vendor/underscore.string.min",
-        "backbone": "js/vendor/backbone-min",
-        "backbone.associations": "js/vendor/backbone-associations-min",
-        "tinymce": "js/vendor/tiny_mce/tiny_mce",
-        "jquery.tinymce": "js/vendor/tiny_mce/jquery.tinymce",
-        "xmodule": "/xmodule/xmodule",
-        "xblock": "coffee/src/xblock",
-        "utility": "js/src/utility",
-        "draggabilly": "js/vendor/draggabilly.pkgd",
+    <a class="nav-skip" href="#content">${_("Skip to this view's content")}</a>
 
-        // externally hosted files
-        "tender": "//edxedge.tenderapp.com/tender_widget",
-        "mathjax": "//edx-static.s3.amazonaws.com/mathjax-MathJax-727332c/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&delayStartupUntil=configured",
-        // youtube URL does not end in ".js". We add "?noext" to the path so
-        // that require.js adds the ".js" to the query component of the URL,
-        // and leaves the path component intact.
-        "youtube": "//www.youtube.com/player_api?noext"
-    },
-    shim: {
-        "gettext": {
-            exports: "gettext"
+    <script type="text/javascript">
+    window.baseUrl = "${settings.STATIC_URL}";
+    var require = {
+        baseUrl: baseUrl,
+        waitSeconds: 60,
+        paths: {
+            "domReady": "js/vendor/domReady",
+            "gettext": "/i18n",
+            "mustache": "js/vendor/mustache",
+            "codemirror": "js/vendor/codemirror-compressed",
+            "codemirror/stex": "js/vendor/CodeMirror/stex",
+            "jquery": "js/vendor/jquery.min",
+            "jquery.ui": "js/vendor/jquery-ui.min",
+            "jquery.form": "js/vendor/jquery.form",
+            "jquery.markitup": "js/vendor/markitup/jquery.markitup",
+            "jquery.leanModal": "js/vendor/jquery.leanModal.min",
+            "jquery.ajaxQueue": "js/vendor/jquery.ajaxQueue",
+            "jquery.smoothScroll": "js/vendor/jquery.smooth-scroll.min",
+            "jquery.timepicker": "js/vendor/timepicker/jquery.timepicker",
+            "jquery.cookie": "js/vendor/jquery.cookie",
+            "jquery.qtip": "js/vendor/jquery.qtip.min",
+            "jquery.scrollTo": "js/vendor/jquery.scrollTo-1.4.2-min",
+            "jquery.flot": "js/vendor/flot/jquery.flot.min",
+            "jquery.maskedinput": "js/vendor/jquery.maskedinput.min",
+            "jquery.fileupload": "js/vendor/jQuery-File-Upload/js/jquery.fileupload",
+            "jquery.iframe-transport": "js/vendor/jQuery-File-Upload/js/jquery.iframe-transport",
+            "jquery.inputnumber": "js/vendor/html5-input-polyfills/number-polyfill",
+            "jquery.immediateDescendents": "coffee/src/jquery.immediateDescendents",
+            "datepair": "js/vendor/timepicker/datepair",
+            "date": "js/vendor/date",
+            "tzAbbr": "js/vendor/tzAbbr",
+            "underscore": "js/vendor/underscore-min",
+            "underscore.string": "js/vendor/underscore.string.min",
+            "backbone": "js/vendor/backbone-min",
+            "backbone.associations": "js/vendor/backbone-associations-min",
+            "tinymce": "js/vendor/tiny_mce/tiny_mce",
+            "jquery.tinymce": "js/vendor/tiny_mce/jquery.tinymce",
+            "xmodule": "/xmodule/xmodule",
+            "xblock": "coffee/src/xblock",
+            "utility": "js/src/utility",
+            "accessibility": "js/src/accessibility_tools",
+            "draggabilly": "js/vendor/draggabilly.pkgd",
+
+            // externally hosted files
+            "tender": "//edxedge.tenderapp.com/tender_widget",
+            "mathjax": "//edx-static.s3.amazonaws.com/mathjax-MathJax-727332c/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&delayStartupUntil=configured",
+            "youtube": [
+                // youtube URL does not end in ".js". We add "?noext" to the path so
+                // that require.js adds the ".js" to the query component of the URL,
+                // and leaves the path component intact.
+                "//www.youtube.com/player_api?noext",
+                // if youtube fails to load, fallback on a local file
+                // so that require doesn't fall over
+                "js/src/youtube_fallback"
+            ]
         },
-        "date": {
-            exports: "Date"
-        },
-        "jquery.ui": {
-            deps: ["jquery"],
-            exports: "jQuery.ui"
-        },
-        "jquery.form": {
-            deps: ["jquery"],
-            exports: "jQuery.fn.ajaxForm"
-        },
-        "jquery.markitup": {
-            deps: ["jquery"],
-            exports: "jQuery.fn.markitup"
-        },
-        "jquery.leanmodal": {
-            deps: ["jquery"],
-            exports: "jQuery.fn.leanModal"
-        },
-        "jquery.ajaxQueue": {
-            deps: ["jquery"],
-            exports: "jQuery.fn.ajaxQueue"
-        },
-        "jquery.smoothScroll": {
-            deps: ["jquery"],
-            exports: "jQuery.fn.smoothScroll"
-        },
-        "jquery.cookie": {
-            deps: ["jquery"],
-            exports: "jQuery.fn.cookie"
-        },
-        "jquery.qtip": {
-            deps: ["jquery"],
-            exports: "jQuery.fn.qtip"
-        },
-        "jquery.scrollTo": {
-            deps: ["jquery"],
-            exports: "jQuery.fn.scrollTo",
-        },
-        "jquery.flot": {
-            deps: ["jquery"],
-            exports: "jQuery.fn.plot"
-        },
-        "jquery.fileupload": {
-            deps: ["jquery.iframe-transport"],
-            exports: "jQuery.fn.fileupload"
-        },
-        "jquery.inputnumber": {
-            deps: ["jquery"],
-            exports: "jQuery.fn.inputNumber"
-        },
-        "jquery.tinymce": {
-            deps: ["jquery", "tinymce"],
-            exports: "jQuery.fn.tinymce"
-        },
-        "datepair": {
-            deps: ["jquery.ui", "jquery.timepicker"]
-        },
-        "underscore": {
-            exports: "_"
-        },
-        "backbone": {
-            deps: ["underscore", "jquery"],
-            exports: "Backbone"
-        },
-        "backbone.associations": {
-            deps: ["backbone"],
-            exports: "Backbone.Associations"
-        },
-        "youtube": {
-            exports: "YT"
-        },
-        "codemirror": {
-            exports: "CodeMirror"
-        },
-        "codemirror/stex": {
-            deps: ["codemirror"]
-        },
-        "tinymce": {
-            exports: "tinymce"
-        },
-        "mathjax": {
-            exports: "MathJax",
-            init: function() {
-              MathJax.Hub.Config({
-                tex2jax: {
-                  inlineMath: [
-                    ["\\(","\\)"],
-                    ['[mathjaxinline]','[/mathjaxinline]']
-                  ],
-                  displayMath: [
-                    ["\\[","\\]"],
-                    ['[mathjax]','[/mathjax]']
-                  ]
+        shim: {
+            "gettext": {
+                exports: "gettext"
+            },
+            "date": {
+                exports: "Date"
+            },
+            "jquery.ui": {
+                deps: ["jquery"],
+                exports: "jQuery.ui"
+            },
+            "jquery.form": {
+                deps: ["jquery"],
+                exports: "jQuery.fn.ajaxForm"
+            },
+            "jquery.markitup": {
+                deps: ["jquery"],
+                exports: "jQuery.fn.markitup"
+            },
+            "jquery.leanmodal": {
+                deps: ["jquery"],
+                exports: "jQuery.fn.leanModal"
+            },
+            "jquery.ajaxQueue": {
+                deps: ["jquery"],
+                exports: "jQuery.fn.ajaxQueue"
+            },
+            "jquery.smoothScroll": {
+                deps: ["jquery"],
+                exports: "jQuery.fn.smoothScroll"
+            },
+            "jquery.cookie": {
+                deps: ["jquery"],
+                exports: "jQuery.fn.cookie"
+            },
+            "jquery.qtip": {
+                deps: ["jquery"],
+                exports: "jQuery.fn.qtip"
+            },
+            "jquery.scrollTo": {
+                deps: ["jquery"],
+                exports: "jQuery.fn.scrollTo",
+            },
+            "jquery.flot": {
+                deps: ["jquery"],
+                exports: "jQuery.fn.plot"
+            },
+            "jquery.maskedinput": {
+                deps: ["jquery"],
+                exports: "jQuery.fn.mask"
+            },
+            "jquery.fileupload": {
+                deps: ["jquery.iframe-transport"],
+                exports: "jQuery.fn.fileupload"
+            },
+            "jquery.inputnumber": {
+                deps: ["jquery"],
+                exports: "jQuery.fn.inputNumber"
+            },
+            "jquery.tinymce": {
+                deps: ["jquery", "tinymce"],
+                exports: "jQuery.fn.tinymce"
+            },
+            "datepair": {
+                deps: ["jquery.ui", "jquery.timepicker"]
+            },
+            "underscore": {
+                exports: "_"
+            },
+            "backbone": {
+                deps: ["underscore", "jquery"],
+                exports: "Backbone"
+            },
+            "backbone.associations": {
+                deps: ["backbone"],
+                exports: "Backbone.Associations"
+            },
+            "youtube": {
+                exports: "YT"
+            },
+            "codemirror": {
+                exports: "CodeMirror"
+            },
+            "codemirror/stex": {
+                deps: ["codemirror"]
+            },
+            "tinymce": {
+                exports: "tinymce"
+            },
+            "mathjax": {
+                exports: "MathJax",
+                init: function() {
+                  MathJax.Hub.Config({
+                    tex2jax: {
+                      inlineMath: [
+                        ["\\(","\\)"],
+                        ['[mathjaxinline]','[/mathjaxinline]']
+                      ],
+                      displayMath: [
+                        ["\\[","\\]"],
+                        ['[mathjax]','[/mathjax]']
+                      ]
+                    }
+                  });
+                  MathJax.Hub.Configured();
                 }
-              });
-              MathJax.Hub.Configured();
+            },
+            "xblock/core": {
+                exports: "XBlock",
+                deps: ["jquery", "jquery.immediateDescendents"]
+            },
+            "xblock/runtime.v1": {
+                exports: "XBlock",
+                deps: ["xblock/core"]
+            },
+
+            "coffee/src/main": {
+                deps: ["coffee/src/ajax_prefix"]
+            },
+            "coffee/src/logger": {
+                exports: "Logger",
+                deps: ["coffee/src/ajax_prefix"]
             }
         },
-        "xblock/core": {
-            exports: "XBlock",
-            deps: ["jquery", "jquery.immediateDescendents"]
-        },
-        "xblock/runtime.v1": {
-            exports: "XBlock",
-            deps: ["xblock/core"]
-        },
-
-        "coffee/src/main": {
-            deps: ["coffee/src/ajax_prefix"]
-        },
-        "coffee/src/logger": {
-            exports: "Logger",
-            deps: ["coffee/src/ajax_prefix"]
+        // load jquery and gettext automatically
+        deps: ["jquery", "gettext"],
+        callback: function() {
+            // load other scripts on every page, after jquery loads
+            require(["js/base", "coffee/src/main", "coffee/src/logger", "datepair", "accessibility"]);
+            // we need "datepair" because it dynamically modifies the page
+            // when it is loaded -- yuck!
         }
-    },
-    // load jquery and gettext automatically
-    deps: ["jquery", "gettext"],
-    callback: function() {
-        // load other scripts on every page, after jquery loads
-        require(["js/base", "coffee/src/main", "coffee/src/logger", "datepair"]);
-        // we need "datepair" because it dynamically modifies the page
-        // when it is loaded -- yuck!
-    }
-};
-</script>
-<script type="text/javascript" src="${static.url("js/vendor/require.js")}"></script>
+    };
+    </script>
+    <script type="text/javascript" src="${static.url("js/vendor/require.js")}"></script>
 
-## js templates
-<script id="system-feedback-tpl" type="text/template">
-  <%static:include path="js/system-feedback.underscore" />
-</script>
+    ## js templates
+    <script id="system-feedback-tpl" type="text/template">
+      <%static:include path="js/system-feedback.underscore" />
+    </script>
 
 
     % if context_course:
-    <script type="text/javascript">
-require(['js/models/course'], function(Course) {
-  window.course = new Course({
-    id: "${context_course.id}",
-    name: "${context_course.display_name_with_default | h}",
-    url_name: "${context_course.location.name | h}",
-    org: "${context_course.location.org | h}",
-    num: "${context_course.location.course | h}",
-    revision: "${context_course.location.revision | h}"
+      <script type="text/javascript">
+  require(['js/models/course'], function(Course) {
+    window.course = new Course({
+      id: "${context_course.id}",
+      name: "${context_course.display_name_with_default | h}",
+      url_name: "${context_course.location.name | h}",
+      org: "${context_course.location.org | h}",
+      num: "${context_course.location.course | h}",
+      revision: "${context_course.location.revision | h}"
+    });
   });
-});
-    </script>
+      </script>
     % endif
 
     <!-- view -->
@@ -237,7 +254,9 @@ require(['js/models/course'], function(Course) {
 
       <div id="page-alert"></div>
 
+      <div id="content">
       <%block name="content"></%block>
+      </div>
 
       % if user.is_authenticated():
       <script type="text/javascript">

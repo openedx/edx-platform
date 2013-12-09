@@ -295,7 +295,7 @@ define(["jquery", "underscore", "jquery.ajaxQueue"], function($, _) {
         *
         * @param {string} action Action that will be invoked on server. Is a part
         *                        of url.
-        * @param {string} component_id Id of component.
+        * @param {string} component_locator the locator of component.
         * @param {array} videoList List of object with information about inserted
         *                          urls.
         * @param {object} extraParams Extra parameters that can be send to the
@@ -314,7 +314,7 @@ define(["jquery", "underscore", "jquery.ajaxQueue"], function($, _) {
             // _command() function.
             var xhr = null;
 
-            return function (action, component_id, videoList, extraParams) {
+            return function (action, component_locator, videoList, extraParams) {
                 var params, data;
 
                 if (extraParams) {
@@ -326,7 +326,7 @@ define(["jquery", "underscore", "jquery.ajaxQueue"], function($, _) {
                 }
 
                 data = $.extend(
-                    { id: component_id },
+                    { locator: component_locator },
                     { videos: videoList },
                     params
                 );

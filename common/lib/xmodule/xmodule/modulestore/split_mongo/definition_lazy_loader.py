@@ -22,5 +22,4 @@ class DefinitionLazyLoader(object):
         Fetch the definition. Note, the caller should replace this lazy
         loader pointer with the result so as not to fetch more than once
         """
-        return self.modulestore.definitions.find_one(
-            {'_id': self.definition_locator.definition_id})
+        return self.modulestore.db_connection.get_definition(self.definition_locator.definition_id)

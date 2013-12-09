@@ -1,4 +1,8 @@
 import logging
+import datetime
+import pytz
+from django.conf import settings
+from django.contrib.auth.models import Group
 from django.http import (HttpResponse, HttpResponseRedirect, HttpResponseNotFound,
     HttpResponseBadRequest, HttpResponseForbidden, Http404)
 from django.utils.translation import ugettext as _
@@ -6,7 +10,7 @@ from django.views.decorators.http import require_POST
 from django.core.urlresolvers import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
-from mitxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response
 from .models import Order, PaidCourseRegistration, OrderItem
 from .processors import process_postpay_callback, render_purchase_form_html
 from .exceptions import ItemAlreadyInCartException, AlreadyEnrolledInCourseException, CourseDoesNotExistException
@@ -121,3 +125,73 @@ def show_receipt(request, ordernum):
         context.update(order_items[0].single_item_receipt_context)
 
     return render_to_response(receipt_template, context)
+
+
+def _can_download_report(user):
+    """
+    Tests if the user can download the payments report, based on membership in a group whose name is determined
+     in settings.  If the group does not exist, denies all access
+    """
+    try:
+        access_group = Group.objects.get(name=settings.PAYMENT_REPORT_GENERATOR_GROUP)
+    except Group.DoesNotExist:
+        return False
+    return access_group in user.groups.all()
+
+
+def _get_date_from_str(date_input):
+    """
+    Gets date from the date input string.  Lets the ValueError raised by invalid strings be processed by the caller
+    """
+    return datetime.datetime.strptime(date_input.strip(), "%Y-%m-%d").replace(tzinfo=pytz.UTC)
+
+
+def _render_report_form(start_str, end_str, total_count_error=False, date_fmt_error=False):
+    """
+    Helper function that renders the purchase form.  Reduces repetition
+    """
+    context = {
+        'total_count_error': total_count_error,
+        'date_fmt_error': date_fmt_error,
+        'start_date': start_str,
+        'end_date': end_str,
+    }
+    return render_to_response('shoppingcart/download_report.html', context)
+
+
+@login_required
+def csv_report(request):
+    """
+    Downloads csv reporting of orderitems
+    """
+    if not _can_download_report(request.user):
+        return HttpResponseForbidden(_('You do not have permission to view this page.'))
+
+    if request.method == 'POST':
+        start_str = request.POST.get('start_date', '')
+        end_str = request.POST.get('end_date', '')
+        try:
+            start_date = _get_date_from_str(start_str)
+            end_date = _get_date_from_str(end_str) + datetime.timedelta(days=1)
+        except ValueError:
+            # Error case: there was a badly formatted user-input date string
+            return _render_report_form(start_str, end_str, date_fmt_error=True)
+
+        items = OrderItem.purchased_items_btw_dates(start_date, end_date)
+        if items.count() > settings.PAYMENT_REPORT_MAX_ITEMS:
+            # Error case: too many items would be generated in the report and we're at risk of timeout
+            return _render_report_form(start_str, end_str, total_count_error=True)
+
+        response = HttpResponse(mimetype='text/csv')
+        filename = "purchases_report_{}.csv".format(datetime.datetime.now(pytz.UTC).strftime("%Y-%m-%d-%H-%M-%S"))
+        response['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
+        OrderItem.csv_purchase_report_btw_dates(response, start_date, end_date)
+        return response
+
+    elif request.method == 'GET':
+        end_date = datetime.datetime.now(pytz.UTC)
+        start_date = end_date - datetime.timedelta(days=30)
+        return _render_report_form(start_date.strftime("%Y-%m-%d"), end_date.strftime("%Y-%m-%d"))
+
+    else:
+        return HttpResponseBadRequest("HTTP Method Not Supported")

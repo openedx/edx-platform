@@ -18,29 +18,25 @@
 <script type="text/javascript">
 require(["domReady", "jquery", "gettext", "js/models/asset", "js/collections/asset",
          "js/views/assets", "js/views/feedback_prompt",
-         "js/views/feedback_notification", "jquery.fileupload"],
-        function(domReady, $, gettext, AssetModel, AssetCollection, AssetsView, PromptView, NotificationView) {
+         "js/views/feedback_notification", "js/utils/modal", "jquery.fileupload"],
+        function(domReady, $, gettext, AssetModel, AssetCollection, AssetsView, PromptView, NotificationView, ModalUtils) {
 
     var assets = new AssetCollection(${asset_list});
-    assets.url = "${update_asset_callback_url}";
+    assets.url = "${asset_callback_url}";
     var assetsView = new AssetsView({collection: assets, el: $('#asset_table_body')});
-    var $modal = $(".upload-modal");
-    var $modalCover = $(".modal-cover");
-
 
     var hideModal = function (e) {
         if (e) {
             e.preventDefault();
         }
         $('.file-input').unbind('change.startUpload');
-        $modal.hide();
-        $modalCover.hide();
-    }
+        ModalUtils.hideModal();
+    };
 
     var showUploadModal = function (e) {
         e.preventDefault();
         resetUploadModal();
-        $modal.show();
+        ModalUtils.showModal();
         $('.file-input').bind('change', startUpload);
         $('.upload-modal .file-chooser').fileupload({
             dataType: 'json',
@@ -63,8 +59,6 @@ require(["domReady", "jquery", "gettext", "js/models/asset", "js/collections/ass
             }
 
         });
-
-        $modalCover.show();
     };
 
     var showFileSelectionMenu = function(e) {
@@ -175,12 +169,15 @@ require(["domReady", "jquery", "gettext", "js/models/asset", "js/collections/ass
 
         <aside class="content-supplementary" role="complimentary">
             <div class="bit">
-                <h3 class="title-3">${_("What files are included here?")}</h3>
-                <p>${_("Any file you upload to the course will be listed here, including your course image, textbook chapters, and any files you add directly to this page.")}</p>
+                <h3 class="title-3">${_("What files are listed here?")}</h3>
+            	<p>${_("In addition to the files you upload on this page, any files that you add to the course appear in this list. These files include your course image, textbook chapters, and files that appear on your Course Handouts sidebar.")}</p>
             </div>
             <div class="bit">
                 <h3 class="title-3">${_("What can I do on this page?")}</h3>
-                <p>${_("You can click the file name to view or download the file, upload a new file, delete a file, and lock a file to prevent people who are not enrolled from accessing that specific file. You can also copy the location (URL) of a file to use elsewhere in your course.")}</p>
+                 <ul class="list-details">
+          			<li class="item-detail">${_("You can upload new files or view, download, or delete existing files. You can lock a file so that people who are not enrolled in your course cannot access that file.")}</li>
+          			<li class="item-detail">${_("Use the URL listed for a file to create a link to that file in the Course Handouts sidebar or in the body of the course.")}</li>
+        		</ul>
             </div>
         </aside>
     </section>
@@ -190,7 +187,7 @@ require(["domReady", "jquery", "gettext", "js/models/asset", "js/collections/ass
     <a href="#" class="close-button"><i class="icon-remove-sign"></i> <span class="sr">${_('close')}</span></a>
     <div class="modal-body">
         <h1 class="title">${_("Upload New File")}</h1>
-        <p class="file-name"></a>
+        <p class="file-name">
         <div class="progress-bar">
             <div class="progress-fill"></div>
         </div>
@@ -198,7 +195,7 @@ require(["domReady", "jquery", "gettext", "js/models/asset", "js/collections/ass
             <label>URL:</label>
             <input type="text" class="embeddable-xml-input" value='' readonly>
         </div>
-        <form class="file-chooser" action="${upload_asset_callback_url}"
+        <form class="file-chooser" action="${asset_callback_url}"
               method="post" enctype="multipart/form-data">
             <a href="#" class="choose-file-button">${_("Choose File")}</a>
             <input type="file" class="file-input" name="file" multiple>

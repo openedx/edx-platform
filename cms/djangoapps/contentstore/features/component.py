@@ -1,6 +1,10 @@
 #pylint: disable=C0111
 #pylint: disable=W0621
 
+# Lettuce formats proposed definitions for unimplemented steps with the
+# argument name "step" instead of "_step" and pylint does not like that.
+#pylint: disable=W0613
+
 from lettuce import world, step
 from nose.tools import assert_true, assert_in  # pylint: disable=E0611
 
@@ -63,6 +67,17 @@ def see_a_multi_step_component(step, category):
             assert_in(step_hash['Component'].upper(), actual_text)
 
 
+@step(u'I see a "([^"]*)" Problem component$')
+def see_a_problem_component(step, category):
+    component_css = 'section.xmodule_CapaModule'
+    assert_true(world.is_css_present(component_css),
+                'No problem was added to the unit.')
+
+    problem_css = 'li.component section.xblock-student_view'
+    actual_text = world.css_text(problem_css)
+    assert_in(category.upper(), actual_text)
+
+
 @step(u'I add a "([^"]*)" "([^"]*)" component$')
 def add_component_category(step, component, category):
     assert category in ('single step', 'HTML', 'Problem', 'Advanced Problem')
@@ -72,13 +87,18 @@ def add_component_category(step, component, category):
 
 @step(u'I delete all components$')
 def delete_all_components(step):
+    count = len(world.css_find('ol.components li.component'))
+    step.given('I delete "' + str(count) + '" component')
+
+
+@step(u'I delete "([^"]*)" component$')
+def delete_components(step, number):
     world.wait_for_xmodule()
     delete_btn_css = 'a.delete-button'
     prompt_css = 'div#prompt-warning'
     btn_css = '{} a.button.action-primary'.format(prompt_css)
     saving_mini_css = 'div#page-notification .wrapper-notification-mini'
-    count = len(world.css_find('ol.components li.component'))
-    for _ in range(int(count)):
+    for _ in range(int(number)):
         world.css_click(delete_btn_css)
         assert_true(
             world.is_css_present('{}.is-shown'.format(prompt_css)),

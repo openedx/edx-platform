@@ -27,6 +27,8 @@ urlpatterns = patterns('',  # nopep8
         'instructor.views.api.rescore_problem', name="rescore_problem"),
     url(r'^list_instructor_tasks$',
         'instructor.views.api.list_instructor_tasks', name="list_instructor_tasks"),
+    url(r'^list_background_email_tasks$',
+        'instructor.views.api.list_background_email_tasks', name="list_background_email_tasks"),
     url(r'^list_forum_members$',
         'instructor.views.api.list_forum_members', name="list_forum_members"),
     url(r'^update_forum_role_membership$',
@@ -43,4 +45,10 @@ urlpatterns = patterns('',  # nopep8
         name='show_unit_extensions'),
     url(r'^show_student_extensions$', 'instructor.views.api.show_student_extensions',
         name='show_student_extensions'),
+
+    # Grade downloads...
+    url(r'^list_grade_downloads$',
+        'instructor.views.api.list_grade_downloads', name="list_grade_downloads"),
+    url(r'calculate_grades_csv$',
+        'instructor.views.api.calculate_grades_csv', name="calculate_grades_csv"),
 )

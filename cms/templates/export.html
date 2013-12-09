@@ -15,7 +15,7 @@
 var hasUnit = ${json.dumps(bool(unit))},
     editUnitUrl = "${edit_unit_url or ""}",
     courseHomeUrl = "${course_home_url or ""}",
-    errMsg = "${raw_err_msg or ""}";
+    errMsg = ${json.dumps(raw_err_msg or "")};
 
 require(["domReady!", "gettext", "js/views/feedback_prompt"], function(doc, gettext, PromptView) {
   var dialog;
@@ -63,7 +63,14 @@ require(["domReady!", "gettext", "js/views/feedback_prompt"], function(doc, gett
       }
     });
   }
+
+  // The CSS animation for the dialog relies on the 'js' class
+  // being on the body. This happens after this JavaScript is executed,
+  // causing a "bouncing" of the dialog after it is initially shown.
+  // As a workaround, add this class first.
+  $('body').addClass('js');
   dialog.show();
+
 });
   </script>
   %endif
@@ -79,51 +86,75 @@ require(["domReady!", "gettext", "js/views/feedback_prompt"], function(doc, gett
   </header>
 </div>
 
-<div class="main-wrapper">
-  <div class="inner-wrapper">
+<div class="wrapper-content wrapper">
+  <section class="content">
+    <article class="content-primary" role="main">
 
-    <article class="export-overview">
-      <div class="description">
-        <h2>${_("About Exporting Courses")}</h2>
-        ## Translators: ".tar.gz" is a file extension, and should not be translated
-        <p>${_("When exporting your course, you will receive a .tar.gz formatted file that contains the following course data:")}</p>
+      <div class="introduction">
+        <h2 class="title">${_("About Exporting Courses")}</h2>
+        <div class="copy">
+          ## Translators: ".tar.gz" is a file extension, and should not be translated
 
-        <ul>
-          <li>${_("Course Structure (Sections and sub-section ordering)")}</li>
-          <li>${_("Individual Units")}</li>
-          <li>${_("Individual Problems")}</li>
-          <li>${_("Static Pages")}</li>
-          <li>${_("Course Assets")}</li>
+          <p>${_("You can export courses and edit them outside of Studio. The exported file is a .tar.gz file (that is, a .tar file compressed with GNU Zip) that contains the course structure and content. You can also re-import courses that you've exported.").format(em_start='<strong>', em_end="</strong>")}</p>
+        </div>
+      </div>
+
+      <div class="export-controls">
+        <h2 class="title">${_("Export My Course Content")}</h2>
+
+        <ul class="list-actions">
+          <li class="item-action">
+            <a class="action action-export action-primary" href="${export_url}">
+              <i class="icon-download"></i>
+              <span class="copy">${_("Export Course Content")}</span>
+            </a>
+          </li>
         </ul>
-
-        <p>${_("Your course export <strong>will not include</strong>: student data, forum/discussion data, course settings, certificates, grading information, or user data.")}</p>
       </div>
 
-      <!-- default state -->
-      <div class="export-form-wrapper">
-        <form action="${reverse('generate_export_course', kwargs=dict(org=context_course.location.org, course=context_course.location.course, name=context_course.location.name))}" method="post" enctype="multipart/form-data" class="export-form">
-          <h2>${_("Export Course:")}</h2>
+      <div class="export-contents">
+        <div class="export-includes">
+          <h3 class="title-3">${_("Data {em_start}exported with{em_end} your course:").format(em_start='<strong>', em_end="</strong>")}</h3>
+          <ul class="list-details list-export-includes">
+            <li class="item-detail">${_("Course Content (all Sections, Sub-sections, and Units)")}</li>
+            <li class="item-detail">${_("Course Structure")}</li>
+            <li class="item-detail">${_("Individual Problems")}</li>
+            <li class="item-detail">${_("Static Pages")}</li>
+            <li class="item-detail">${_("Course Assets")}</li>
+            <li class="item-detail">${_("Course Settings")}</li>
+          </ul>
+        </div>
 
-          <p class="error-block"></p>
-
-          <a href="${reverse('generate_export_course', kwargs=dict(org=context_course.location.org, course=context_course.location.course, name=context_course.location.name))}" class="button-export">${_("Download Files")}</a>
-        </form>
+        <div class="export-excludes">
+          <h3 class="title-3">${_("Data {em_start}not exported{em_end} with your course:").format(em_start='<strong>', em_end="</strong>")}</h3>
+          <ul class="list-details list-export-excludes">
+            <li class="item-detail">${_("User Data")}</li>
+            <li class="item-detail">${_("Course Team Data")}</li>
+            <li class="item-detail">${_("Forum/discussion Data")}</li>
+            <li class="item-detail">${_("Certificates")}</li>
+          </ul>
+        </div>
       </div>
-
-      <!-- download state: after user clicks download buttons -->
-      <%doc>
-      <div class="export-form-wrapper is-downloading">
-        <form action="${reverse('export_course', kwargs=dict(org=context_course.location.org, course=context_course.location.course, name=context_course.location.name))}" method="post" enctype="multipart/form-data" class="export-form">
-          <h2>${_("Export Course:")}</h2>
-
-          <p class="error-block"></p>
-
-          <a href="#" class="button-export disabled">Files Downloading</a>
-          <p class="message-status">${_("Download not start?")} <a href="#" class="text-export">${_("Try again")}</a></p>
-        </form>
-      </div>
-      </%doc>
     </article>
-  </div>
+
+    <aside class="content-supplementary" role="complimentary">
+      <div class="bit">
+        <h3 class="title-3">${_("Why export a course?")}</h3>
+        <p>${_("You may want to edit the XML in your course directly, outside of Studio. You may want to create a backup copy of your course. Or, you may want to create a copy of your course that you can later import into another course instance and customize.")}</p>
+      </div>
+
+      <div class="bit">
+        <h3 class="title-3">${_("What content is exported?")}</h3>
+
+        <p>${_("Only the course content and structure (including sections, subsections, and units) are exported. Other data, including student data, grading information, discussion forum data, course settings, and course team information, is not exported.")}</p>
+      </div>
+
+      <div class="bit">
+        <h3 class="title-3">${_("Opening the downloaded file")}</h3>
+        ## Translators: ".tar.gz" is a file extension, and should not be translated
+        <p>${_("Use an archive program to extract the data from the .tar.gz file. Extracted data includes the course.xml file, as well as subfolders that contain course content.")}</p>
+      </div>
+    </aside>
+  </section>
 </div>
 </%block>

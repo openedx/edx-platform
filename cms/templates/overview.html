@@ -4,6 +4,7 @@
   from xmodule.util import date_utils
   from django.utils.translation import ugettext as _
   from django.core.urlresolvers import reverse
+  from xmodule.modulestore.django import loc_mapper
 %>
 <%block name="title">${_("Course Outline")}</%block>
 <%block name="bodyclass">is-signedin course view-outline</%block>
@@ -26,7 +27,6 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
   // but we really should change that behavior.
   if (!window.graderTypes) {
     window.graderTypes = new CourseGraderCollection(${course_graders|n}, {parse:true});
-    window.graderTypes.course_location = new Location('${parent_location}');
   }
 
   $(".gradable-status").each(function(index, ele) {
@@ -38,7 +38,7 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
 
   $(".section-name").each(function() {
       var model = new SectionModel({
-          id: $(this).parent(".item-details").data("id"),
+          id: $(this).parent(".item-details").data("locator"),
           name: $(this).data("name")
       });
       new SectionShowView({model: model, el: this}).render();
@@ -56,7 +56,7 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
           <h3 class="section-name">
           <form class="section-name-form">
             <input type="text" value="${_('New Section Name')}" class="new-section-name" />
-            <input type="submit" class="new-section-name-save" data-parent="${parent_location}"
+            <input type="submit" class="new-section-name-save" data-parent="${parent_locator}"
                    data-category="${new_section_category}" value="${_('Save')}" />
             <input type="button" class="new-section-name-cancel" value="${_('Cancel')}" /></h3>
           </form>
@@ -74,7 +74,7 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
           <span class="section-name-span">Click here to set the section name</span>
           <form class="section-name-form">
             <input type="text" value="${_('New Section Name')}" class="new-section-name" />
-            <input type="submit" class="new-section-name-save" data-parent="${parent_location}"
+            <input type="submit" class="new-section-name-save" data-parent="${parent_locator}"
                    data-category="${new_section_category}" value="${_('Save')}" />
             <input type="button" class="new-section-name-cancel" value="$(_('Cancel')}" /></h3>
           </form>
@@ -139,16 +139,26 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
     <div class="inner-wrapper">
 
       <div class="wrapper-dnd">
-        <article class="courseware-overview" data-id="${context_course.location.url()}">
+        <%
+          course_locator = loc_mapper().translate_location(
+            context_course.location.course_id, context_course.location, False, True
+          )
+        %>
+        <article class="courseware-overview" data-locator="${course_locator}">
           % for section in sections:
-          <section class="courseware-section branch is-draggable" data-id="${section.location}" data-parent-id="${context_course.location.url()}">
-
+          <%
+            section_locator = loc_mapper().translate_location(
+              context_course.location.course_id, section.location, False, True
+            )
+          %>
+          <section class="courseware-section branch is-draggable" data-parent="${course_locator}"
+                   data-locator="${section_locator}">
             <%include file="widgets/_ui-dnd-indicator-before.html" />
 
             <header>
             <a href="#" data-tooltip="${_('Expand/collapse this section')}" class="expand-collapse-icon collapse"></a>
 
-              <div class="item-details" data-id="${section.location}">
+              <div class="item-details" data-locator="${section_locator}">
                 <h3 class="section-name" data-name="${section.display_name_with_default | h}"></h3>
                 <div class="section-published-date">
                   <%
@@ -161,12 +171,12 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
                   %>
                   %if section.start is None:
                     <span class="published-status">${_("This section has not been released.")}</span>
-                    <a href="#" class="schedule-button" data-date="" data-time="" data-id="${section.location}">${_("Schedule")}</a>
+                    <a href="#" class="schedule-button" data-date="" data-time="" data-locator="${section_locator}">${_("Schedule")}</a>
                   %else:
                     <span class="published-status"><strong>${_("Will Release:")}</strong>
                     ${date_utils.get_default_time_display(section.start)}</span>
                     <a href="#" class="edit-button" data-date="${start_date_str}"
-                      data-time="${start_time_str}" data-id="${section.location}">${_("Edit")}</a>
+                      data-time="${start_time_str}" data-locator="${section_locator}">${_("Edit")}</a>
                   %endif
                 </div>
               </div>
@@ -182,16 +192,22 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
                   <span class="new-folder-icon"></span>${_("New Subsection")}
                 </a>
               </div>
-              <ol class="sortable-subsection-list" data-id="${section.location.url()}">
+              <ol class="sortable-subsection-list">
                 % for subsection in section.get_children():
-                <li class="courseware-subsection branch collapsed id-holder is-draggable" data-id="${subsection.location}" data-parent-id="${section.location.url()}">
+                  <%
+                    subsection_locator = loc_mapper().translate_location(
+                      context_course.location.course_id, subsection.location, False, True
+                    )
+                  %>
+                <li class="courseware-subsection branch collapsed id-holder is-draggable"
+                    data-parent="${section_locator}" data-locator="${subsection_locator}">
 
                   <%include file="widgets/_ui-dnd-indicator-before.html" />
 
                   <div class="section-item">
                     <div class="details">
                       <a href="#" data-tooltip="${_('Expand/collapse this subsection')}" class="expand-collapse-icon expand"></a>
-                      <a href="${reverse('edit_subsection', args=[subsection.location])}">
+                      <a href="${subsection_locator.url_reverse('subsection')}">
                         <span class="folder-icon"></span>
                         <span class="subsection-name"><span class="subsection-name-value">${subsection.display_name_with_default}</span></span>
                       </a>
@@ -225,7 +241,7 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
   </div>
   <footer></footer>
 
-  <div class="edit-subsection-publish-settings">
+  <div class="edit-subsection-publish-settings showAsModal">
     <div class="settings">
       <h3>${_("Section Release Date")}</h3>
       <div class="picker datepair">

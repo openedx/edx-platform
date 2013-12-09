@@ -42,7 +42,7 @@ class ChecklistTestCase(CourseTestCase):
         response = self.client.get(self.checklists_url)
         self.assertContains(response, "Getting Started With Studio")
         # Verify expansion of action URL happened.
-        self.assertContains(response, '/mitX/333/team/Checklists_Course')
+        self.assertContains(response, 'course_team/mitX.333.Checklists_Course')
         # Verify persisted checklist does NOT have expanded URL.
         checklist_0 = self.get_persisted_checklists()[0]
         self.assertEqual('ManageUsers', get_action_url(checklist_0, 0))
@@ -105,7 +105,7 @@ class ChecklistTestCase(CourseTestCase):
         self.assertEqual('CourseOutline', get_first_item(payload).get('action_url'))
         get_first_item(payload)['is_checked'] = True
 
-        returned_checklist = json.loads(self.client.post(update_url, json.dumps(payload), "application/json").content)
+        returned_checklist = json.loads(self.client.ajax_post(update_url, payload).content)
         self.assertTrue(get_first_item(returned_checklist).get('is_checked'))
         persisted_checklist = self.get_persisted_checklists()[1]
         # Verify that persisted checklist does not have expanded action URLs.
@@ -137,7 +137,7 @@ class ChecklistTestCase(CourseTestCase):
             # Verify no side effect in the original list.
             self.assertEqual(get_action_url(checklist, index), stored)
 
-        test_expansion(self.course.checklists[0], 0, 'ManageUsers', '/mitX/333/team/Checklists_Course')
+        test_expansion(self.course.checklists[0], 0, 'ManageUsers', '/course_team/mitX.333.Checklists_Course/branch/draft/block/Checklists_Course')
         test_expansion(self.course.checklists[1], 1, 'CourseOutline', '/course/mitX.333.Checklists_Course/branch/draft/block/Checklists_Course')
         test_expansion(self.course.checklists[2], 0, 'http://help.edge.edx.org/', 'http://help.edge.edx.org/')
 

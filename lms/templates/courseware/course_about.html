@@ -5,7 +5,7 @@
   from courseware.access import has_access
   from django.conf import settings
 
-  if settings.MITX_FEATURES.get('ENABLE_SHOPPING_CART'):
+  if settings.FEATURES.get('ENABLE_SHOPPING_CART'):
       cart_link = reverse('shoppingcart.views.show_cart')
   else:
       cart_link = ""
@@ -31,7 +31,7 @@
       event.preventDefault();
     });
 
-    % if settings.MITX_FEATURES.get('ENABLE_SHOPPING_CART') and settings.MITX_FEATURES.get('ENABLE_PAID_COURSE_REGISTRATION'):
+    % if settings.FEATURES.get('ENABLE_SHOPPING_CART') and settings.FEATURES.get('ENABLE_PAID_COURSE_REGISTRATION'):
       add_course_complete_handler = function(jqXHR, textStatus) {
         if (jqXHR.status == 200) {
           location.href = "${cart_link}";
@@ -57,7 +57,7 @@
     % endif
 
     ## making the conditional around this entire JS block for sanity
-    %if settings.MITX_FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
+    %if settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
     $('#class_enroll_form').on('ajax:complete', function(event, xhr) {
       if(xhr.status == 200) {
         location.href = "${reverse('dashboard')}";
@@ -135,7 +135,7 @@
           <span class="add-to-cart">
             ${_('This course is in your <a href="{cart_link}">cart</a>.').format(cart_link=cart_link)}
           </span>
-        %elif settings.MITX_FEATURES.get('ENABLE_PAID_COURSE_REGISTRATION') and registration_price:
+        %elif settings.FEATURES.get('ENABLE_PAID_COURSE_REGISTRATION') and registration_price:
           <%
           if user.is_authenticated():
             reg_href = "#"
@@ -162,14 +162,14 @@
       % if get_course_about_section(course, "video"):
       <a href="#video-modal" class="media" rel="leanModal">
         <div class="hero">
-          <img src="${course_image_url(course)}" />
+          <img src="${course_image_url(course)}" alt="" />
           <div class="play-intro"></div>
         </div>
       </a>
       %else:
       <div class="media">
         <div class="hero">
-          <img src="${course_image_url(course)}" />
+          <img src="${course_image_url(course)}" alt="" />
         </div>
       </div>
       % endif
@@ -203,19 +203,20 @@
             ##       want here (and on this whole page, really).
             % if self.stanford_theme_enabled():
               <a href="http://twitter.com/intent/tweet?text=I+just+registered+for+${course.number}+${get_course_about_section(course, 'title')}!+(http://class.stanford.edu)" class="share">
-                <img src="${static.url('images/social/twitter-sharing.png')}">
+                <img src="${static.url('images/social/twitter-sharing.png')}" alt="Tweet that you've registered for this course">
               </a>
               <a href="mailto:?subject=Take%20a%20course%20at%20Stanford%20online!&body=I%20just%20registered%20for%20${course.number}%20${get_course_about_section(course, 'title')}+(http://class.stanford.edu)" class="share">
-                <img src="${static.url('images/social/email-sharing.png')}">
+                <img src="${static.url('images/social/email-sharing.png')}" alt="Email someone to say you've registered for this course">
               </a>
             % else:
               <a href="http://twitter.com/intent/tweet?text=I+just+registered+for+${course.number}+${get_course_about_section(course, 'title')}+through+@edxonline:+http://www.edx.org${reverse('about_course', args=[course.id])}" class="share">
-                <img src="${static.url('images/social/twitter-sharing.png')}">
+                <img src="${static.url('images/social/twitter-sharing.png')}" alt="Tweet that you've registered for this course">
               </a>
-              <a href="http://www.facebook.com/EdxOnline" class="share"> <img src="${static.url('images/social/facebook-sharing.png')}">
+              <a href="http://www.facebook.com/EdxOnline" class="share">
+                <img src="${static.url('images/social/facebook-sharing.png')}" alt="Post a Facebook message to say you've registered for this course">
               </a>
               <a href="mailto:?subject=Take%20a%20course%20with%20edX%20online&body=I%20just%20registered%20for%20${course.number}%20${get_course_about_section(course, 'title')}%20through%20edX:+http://edx.org/${reverse('about_course', args=[course.id])}" class="share">
-                <img src="${static.url('images/social/email-sharing.png')}">
+                <img src="${static.url('images/social/email-sharing.png')}" alt="Email someone to say you've registered for this course">
               </a>
             % endif
           </div>

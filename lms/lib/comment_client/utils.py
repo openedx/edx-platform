@@ -55,35 +55,30 @@ def perform_request(method, url, data_or_params=None, *args, **kwargs):
     headers = {'X-Edx-Api-Key': settings.API_KEY}
     request_id = uuid4()
     request_id_dict = {'request_id': request_id}
-    try:
-        if method in ['post', 'put', 'patch']:
-            data = data_or_params
-            params = request_id_dict
-        else:
-            data = None
-            params = merge_dict(data_or_params, request_id_dict)
-        with request_timer(request_id, method, url):
-            response = requests.request(
-                method,
-                url,
-                data=data,
-                params=params,
-                headers=headers,
-                timeout=5
-            )
-    except Exception as err:
-        log.exception("Trying to call {method} on {url} with params {params}".format(
-            method=method, url=url, params=data_or_params))
-        # Reraise with a single exception type
-        raise CommentClientError(str(err))
+
+    if method in ['post', 'put', 'patch']:
+        data = data_or_params
+        params = request_id_dict
+    else:
+        data = None
+        params = merge_dict(data_or_params, request_id_dict)
+    with request_timer(request_id, method, url):
+        response = requests.request(
+            method,
+            url,
+            data=data,
+            params=params,
+            headers=headers,
+            timeout=5
+        )
 
     if 200 < response.status_code < 500:
-        raise CommentClientError(response.text)
+        raise CommentClientRequestError(response.text, response.status_code)
     # Heroku returns a 503 when an application is in maintenance mode
     elif response.status_code == 503:
         raise CommentClientMaintenanceError(response.text)
     elif response.status_code == 500:
-        raise CommentClientUnknownError(response.text)
+        raise CommentClient500Error(response.text)
     else:
         if kwargs.get("raw", False):
             return response.text
@@ -99,9 +94,15 @@ class CommentClientError(Exception):
         return repr(self.message)
 
 
-class CommentClientMaintenanceError(CommentClientError):
+class CommentClientRequestError(CommentClientError):
+    def __init__(self, msg, status_code=400):
+        super(CommentClientRequestError, self).__init__(msg)
+        self.status_code = status_code
+
+
+class CommentClient500Error(CommentClientError):
     pass
 
 
-class CommentClientUnknownError(CommentClientError):
+class CommentClientMaintenanceError(CommentClientError):
     pass

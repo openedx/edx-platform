@@ -113,7 +113,7 @@ function goto( mode)
 <section class="container">
 <div class="instructor-dashboard-wrapper">
 
-  %if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BETA_DASHBOARD'):
+  %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BETA_DASHBOARD'):
     <div class="beta-button-wrapper"><a href="${ beta_dashboard_url }">${_("Try New Beta Dashboard")}</a></div>
   %endif
   %if studio_url:
@@ -126,10 +126,10 @@ function goto( mode)
     <h1>${_("Instructor Dashboard")}</h1>
 
     <h2 class="navbar">[ <a href="#" onclick="goto('Grades');" class="${modeflag.get('Grades')}">Grades</a> |
-          %if settings.MITX_FEATURES.get('INDIVIDUAL_DUE_DATES'):
+          %if settings.FEATURES.get('INDIVIDUAL_DUE_DATES'):
             <a href="#" onclick="goto('Extensions');" class="${modeflag.get('Extensions')}">${_("Extensions")}</a> |
           %endif
-          %if settings.MITX_FEATURES.get('ENABLE_PSYCHOMETRICS'):
+          %if settings.FEATURES.get('ENABLE_PSYCHOMETRICS'):
             <a href="#" onclick="goto('Psychometrics');" class="${modeflag.get('Psychometrics')}">${_("Psychometrics")}</a> |
           %endif
           <a href="#" onclick="goto('Admin');" class="${modeflag.get('Admin')}">${_("Admin")}</a> |
@@ -140,7 +140,7 @@ function goto( mode)
           %if show_email_tab:
              | <a href="#" onclick="goto('Email')" class="${modeflag.get('Email')}">${_("Email")}</a>
           %endif
-          %if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_ANALYTICS'):
+          %if settings.FEATURES.get('ENABLE_INSTRUCTOR_ANALYTICS'):
              | <a href="#" onclick="goto('Analytics');" class="${modeflag.get('Analytics')}">${_("Analytics")}</a>
           %endif
 	  ]
@@ -175,7 +175,7 @@ function goto( mode)
               "with more than {max_enrollment} students. We are urgently working on "
               "fixing this issue. Thank you for your patience as we continue "
               "working to improve the platform!").format(
-              max_enrollment=settings.MITX_FEATURES['MAX_ENROLLMENT_INSTR_BUTTONS']
+              max_enrollment=settings.FEATURES['MAX_ENROLLMENT_INSTR_BUTTONS']
             )}
         </p>
       </div>
@@ -210,7 +210,7 @@ function goto( mode)
     </p>
     <hr width="40%" style="align:left">
 
-  %if settings.MITX_FEATURES.get('REMOTE_GRADEBOOK_URL','') and instructor_access:
+  %if settings.FEATURES.get('REMOTE_GRADEBOOK_URL','') and instructor_access:
 
     <%
         rg = course.remote_gradebook
@@ -243,8 +243,7 @@ function goto( mode)
     <hr width="40%" style="align:left">
 
   %endif
-
-  %if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
+  %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
     <H2>${_("Course-specific grade adjustment")}</h2>
 
     <p>
@@ -296,7 +295,7 @@ function goto( mode)
     <p>
       ${_("Then select an action:")}
       <input type="submit" name="action" value="Reset student's attempts">
-      %if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
+      %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
       <input type="submit" name="action" value="Rescore student's problem submission">
       %endif
     </p>
@@ -307,7 +306,7 @@ function goto( mode)
       <input type="submit" name="action" value="Delete student state for module">
     </p>
     %endif
-    %if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
+    %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
     <p>${_("Rescoring runs in the background, and status for active tasks will appear in a table below. "
            "To see status for all tasks submitted for this problem and student, click on this button:")}
     </p>
@@ -400,7 +399,7 @@ function goto( mode)
     <hr width="40%" style="align:left">
   %endif
 
-  %if settings.MITX_FEATURES['ENABLE_MANUAL_GIT_RELOAD'] and admin_access:
+  %if settings.FEATURES['ENABLE_MANUAL_GIT_RELOAD'] and admin_access:
     <p>
     <input type="submit" name="action" value="Reload course from XML files">
     <input type="submit" name="action" value="GIT pull and Reload course">
@@ -450,7 +449,7 @@ function goto( mode)
               "with more than {max_enrollment} students. We are urgently working on "
               "fixing this issue. Thank you for your patience as we continue "
               "working to improve the platform!").format(
-              max_enrollment=settings.MITX_FEATURES['MAX_ENROLLMENT_INSTR_BUTTONS']
+              max_enrollment=settings.FEATURES['MAX_ENROLLMENT_INSTR_BUTTONS']
             )}
         </p>
       </div>
@@ -461,7 +460,7 @@ function goto( mode)
     <input type="submit" name="action" value="List students who may enroll but may not have yet signed up" class="${'is-disabled' if disable_buttons else ''}">
     <hr width="40%" style="align:left">
 
-  %if settings.MITX_FEATURES.get('REMOTE_GRADEBOOK_URL','') and instructor_access:
+  %if settings.FEATURES.get('REMOTE_GRADEBOOK_URL','') and instructor_access:
 
     <%
         rg = course.remote_gradebook
@@ -563,10 +562,11 @@ function goto( mode)
       <li class="field">
         <label for="id_subject">${_("Subject: ")}</label>
         %if subject:
-          <input type="text" id="id_subject" name="subject" maxlength="100" size="75" value="${subject}">
+          <input type="text" id="id_subject" name="subject" maxlength="128" size="75" value="${subject}">
         %else:
-          <input type="text" id="id_subject" name="subject" maxlength="100" size="75">
+          <input type="text" id="id_subject" name="subject" maxlength="128" size="75">
         %endif
+        <span class="tip">${_("(Max 128 characters)")}</span>
       </li>
 
       <li class="field">
@@ -579,11 +579,17 @@ function goto( mode)
     </ul>
 
     <div class="submit-email-action">
-      ${_("Please try not to email students more than once a day. Important things to consider before sending:")}
+      <p class="copy">${_("Please try not to email students more than once per week. Important things to consider before sending:")}</p>
       <ul class="list-advice">
         <li class="item">${_("Have you read over the email to make sure it says everything you want to say?")}</li>
-        <li class="item">${_("Have you sent the email to yourself first to make sure you're happy with how it's displayed?")}</li>
+        <li class="item">${_("Have you sent the email to yourself first to make sure you're happy with how it's displayed, and that embedded links and images work properly?")}</li>
       </ul>
+      <div class="submit-email-warning">
+	<p class="copy"><span style="color: red;"><b>${_("CAUTION!")}</b></span>
+	  ${_("Once the 'Send Email' button is clicked, your email will be queued for sending.")}
+	<b>${_("A queued email CANNOT be cancelled.")}</b></p>
+      </div>
+      <br />
       <input type="submit" name="action" value="Send email">
     </div>
     <script type="text/javascript">
@@ -596,6 +602,7 @@ function goto( mode)
       });
     </script>
 
+    <br />
     <p>These email actions run in the background, and status for active email tasks will appear in a table below.
        To see status for all bulk email tasks submitted for this course, click on this button:
     </p>

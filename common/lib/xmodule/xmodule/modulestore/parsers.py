@@ -7,7 +7,7 @@ BLOCK_PREFIX = r"block/"
 # Prefix for the version portion of a locator URL, when it is preceded by a course ID
 VERSION_PREFIX = r"version/"
 
-ALLOWED_ID_CHARS = r'[a-zA-Z0-9_\-~.]'
+ALLOWED_ID_CHARS = r'[a-zA-Z0-9_\-~.:]'
 
 URL_RE_SOURCE = r"""
     (?P<tag>edx://)?

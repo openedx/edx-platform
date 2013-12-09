@@ -18,6 +18,23 @@ function initVideoCapture() {
   return !(navigator.getUserMedia == undefined);
 }
 
+var submitReverificationPhotos = function() {
+    // add photos to the form
+    $('<input>').attr({
+        type: 'hidden',
+        name: 'face_image',
+        value: $("#face_image")[0].src,
+    }).appendTo("#reverify_form");
+    $('<input>').attr({
+        type: 'hidden',
+        name: 'photo_id_image',
+        value: $("#photo_id_image")[0].src,
+    }).appendTo("#reverify_form");
+
+    $("#reverify_form").submit();
+
+}
+
 var submitToPaymentProcessing = function() {
   var contribution_input = $("input[name='contribution']:checked")
   var contribution = 0;
@@ -255,10 +272,15 @@ $(document).ready(function() {
       submitToPaymentProcessing();
   });
 
+  $("#reverify_button").click(function() {
+      submitReverificationPhotos();
+  });
+
   // prevent browsers from keeping this button checked
   $("#confirm_pics_good").prop("checked", false)
   $("#confirm_pics_good").change(function() {
       $("#pay_button").toggleClass('disabled');
+      $("#reverify_button").toggleClass('disabled');
   });
 
 

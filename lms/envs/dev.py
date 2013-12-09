@@ -17,25 +17,31 @@ from logsettings import get_logger_config
 
 DEBUG = True
 USE_I18N = True
+# For displaying the dummy text, we need to provide a language mapping.
+LANGUAGES = (
+    ('eo', 'Esperanto'),
+)
 TEMPLATE_DEBUG = True
 
 MITX_FEATURES['INDIVIDUAL_DUE_DATES'] = True # crossi dev, delete if checked in
 
-MITX_FEATURES['DISABLE_START_DATES'] = False
-MITX_FEATURES['ENABLE_SQL_TRACKING_LOGS'] = True
-MITX_FEATURES['SUBDOMAIN_COURSE_LISTINGS'] = False  # Enable to test subdomains--otherwise, want all courses to show up
-MITX_FEATURES['SUBDOMAIN_BRANDING'] = True
-MITX_FEATURES['FORCE_UNIVERSITY_DOMAIN'] = None		# show all university courses if in dev (ie don't use HTTP_HOST)
-MITX_FEATURES['ENABLE_MANUAL_GIT_RELOAD'] = True
-MITX_FEATURES['ENABLE_PSYCHOMETRICS'] = False    # real-time psychometrics (eg item response theory analysis in instructor dashboard)
-MITX_FEATURES['ENABLE_INSTRUCTOR_ANALYTICS'] = True
-MITX_FEATURES['ENABLE_SERVICE_STATUS'] = True
-MITX_FEATURES['ENABLE_INSTRUCTOR_EMAIL'] = True
-MITX_FEATURES['ENABLE_HINTER_INSTRUCTOR_VIEW'] = True
-MITX_FEATURES['ENABLE_INSTRUCTOR_BETA_DASHBOARD'] = True
-MITX_FEATURES['MULTIPLE_ENROLLMENT_ROLES'] = True
-MITX_FEATURES['ENABLE_SHOPPING_CART'] = True
-MITX_FEATURES['AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'] = True
+FEATURES['DISABLE_START_DATES'] = False
+FEATURES['ENABLE_SQL_TRACKING_LOGS'] = True
+FEATURES['SUBDOMAIN_COURSE_LISTINGS'] = False  # Enable to test subdomains--otherwise, want all courses to show up
+FEATURES['SUBDOMAIN_BRANDING'] = True
+FEATURES['FORCE_UNIVERSITY_DOMAIN'] = None		# show all university courses if in dev (ie don't use HTTP_HOST)
+FEATURES['ENABLE_MANUAL_GIT_RELOAD'] = True
+FEATURES['ENABLE_PSYCHOMETRICS'] = False    # real-time psychometrics (eg item response theory analysis in instructor dashboard)
+FEATURES['ENABLE_INSTRUCTOR_ANALYTICS'] = True
+FEATURES['ENABLE_SERVICE_STATUS'] = True
+FEATURES['ENABLE_INSTRUCTOR_EMAIL'] = True     # Enable email for all Studio courses
+FEATURES['REQUIRE_COURSE_EMAIL_AUTH'] = False  # Give all courses email (don't require django-admin perms)
+FEATURES['ENABLE_HINTER_INSTRUCTOR_VIEW'] = True
+FEATURES['ENABLE_INSTRUCTOR_BETA_DASHBOARD'] = True
+FEATURES['MULTIPLE_ENROLLMENT_ROLES'] = True
+FEATURES['ENABLE_SHOPPING_CART'] = True
+FEATURES['AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'] = True
+FEATURES['ENABLE_S3_GRADE_DOWNLOADS'] = True
 
 FEEDBACK_SUBMISSION_EMAIL = "dummy@example.com"
 
@@ -50,7 +56,7 @@ LOGGING = get_logger_config(ENV_ROOT / "log",
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': ENV_ROOT / "db" / "mitx.db",
+        'NAME': ENV_ROOT / "db" / "edx.db",
     }
 }
 
@@ -59,7 +65,7 @@ CACHES = {
     # In staging/prod envs, the sessions also live here.
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'mitx_loc_mem_cache',
+        'LOCATION': 'edx_loc_mem_cache',
         'KEY_FUNCTION': 'util.memcache.safe_key',
     },
 
@@ -169,9 +175,9 @@ OPEN_ENDED_GRADING_INTERFACE = {
 }
 
 ############################## LMS Migration ##################################
-MITX_FEATURES['ENABLE_LMS_MIGRATION'] = True
-MITX_FEATURES['ACCESS_REQUIRE_STAFF_FOR_COURSE'] = False   # require that user be in the staff_* group to be able to enroll
-MITX_FEATURES['USE_XQA_SERVER'] = 'http://xqa:server@content-qa.mitx.mit.edu/xqa'
+FEATURES['ENABLE_LMS_MIGRATION'] = True
+FEATURES['ACCESS_REQUIRE_STAFF_FOR_COURSE'] = False   # require that user be in the staff_* group to be able to enroll
+FEATURES['USE_XQA_SERVER'] = 'http://xqa:server@content-qa.edX.mit.edu/xqa'
 
 INSTALLED_APPS += ('lms_migration',)
 
@@ -179,9 +185,9 @@ LMS_MIGRATION_ALLOWED_IPS = ['127.0.0.1']
 
 ################################ OpenID Auth #################################
 
-MITX_FEATURES['AUTH_USE_OPENID'] = True
-MITX_FEATURES['AUTH_USE_OPENID_PROVIDER'] = True
-MITX_FEATURES['BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH'] = True
+FEATURES['AUTH_USE_OPENID'] = True
+FEATURES['AUTH_USE_OPENID_PROVIDER'] = True
+FEATURES['BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH'] = True
 
 INSTALLED_APPS += ('external_auth',)
 INSTALLED_APPS += ('django_openid_auth',)
@@ -195,7 +201,7 @@ OPENID_PROVIDER_TRUSTED_ROOTS = ['*']
 
 ######################## MIT Certificates SSL Auth ############################
 
-MITX_FEATURES['AUTH_USE_MIT_CERTIFICATES'] = True
+FEATURES['AUTH_USE_MIT_CERTIFICATES'] = True
 
 ################################# CELERY ######################################
 
@@ -242,15 +248,12 @@ FILE_UPLOAD_HANDLERS = (
     'django.core.files.uploadhandler.TemporaryFileUploadHandler',
 )
 
-MITX_FEATURES['AUTH_USE_SHIB'] = True
-MITX_FEATURES['RESTRICT_ENROLL_BY_REG_METHOD'] = True
+FEATURES['AUTH_USE_SHIB'] = True
+FEATURES['RESTRICT_ENROLL_BY_REG_METHOD'] = True
 
 ########################### PIPELINE #################################
 
 PIPELINE_SASS_ARGUMENTS = '--debug-info --require {proj_dir}/static/sass/bourbon/lib/bourbon.rb'.format(proj_dir=PROJECT_ROOT)
-
-########################## PEARSON TESTING ###########################
-MITX_FEATURES['ENABLE_PEARSON_LOGIN'] = False
 
 ########################## ANALYTICS TESTING ########################
 
@@ -262,7 +265,7 @@ ANALYTICS_API_KEY = ""
 # If there's an environment variable set, grab it and turn on Segment.io
 SEGMENT_IO_LMS_KEY = os.environ.get('SEGMENT_IO_LMS_KEY')
 if SEGMENT_IO_LMS_KEY:
-    MITX_FEATURES['SEGMENT_IO_LMS'] = True
+    FEATURES['SEGMENT_IO_LMS'] = True
 
 ###################### Payment ##############################3
 
@@ -277,7 +280,7 @@ EDX_API_KEY = None
 
 
 ####################### Shoppingcart ###########################
-MITX_FEATURES['ENABLE_SHOPPING_CART'] = True
+FEATURES['ENABLE_SHOPPING_CART'] = True
 
 #####################################################################
 # Lastly, see if the developer has any local overrides.

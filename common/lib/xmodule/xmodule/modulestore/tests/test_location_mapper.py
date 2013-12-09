@@ -20,7 +20,7 @@ class TestLocationMapper(unittest.TestCase):
         modulestore_options = {
             'host': 'localhost',
             'db': 'test_xmodule',
-            'collection': 'modulestore{0}'.format(uuid.uuid4().hex),
+            'collection': 'modulestore{0}'.format(uuid.uuid4().hex[:5]),
         }
 
         # pylint: disable=W0142
@@ -258,19 +258,25 @@ class TestLocationMapper(unittest.TestCase):
             new_style_course_id,
             block_map={
                 'abc123': {'problem': 'problem2'},
-                '48f23a10395384929234': {'chapter': 'chapter48f'}
+                '48f23a10395384929234': {'chapter': 'chapter48f'},
+                'baz_run': {'course': 'root'},
             }
         )
         # only one course matches
         prob_location = loc_mapper().translate_locator_to_location(prob_locator)
         # default branch
         self.assertEqual(prob_location, Location('i4x', org, course, 'problem', 'abc123', None))
+        # test get_course keyword
+        prob_location = loc_mapper().translate_locator_to_location(prob_locator, get_course=True)
+        self.assertEqual(prob_location, Location('i4x', org, course, 'course', 'baz_run', None))
         # explicit branch
         prob_locator = BlockUsageLocator(
             course_id=prob_locator.course_id, branch='draft', usage_id=prob_locator.usage_id
         )
         prob_location = loc_mapper().translate_locator_to_location(prob_locator)
-        self.assertEqual(prob_location, Location('i4x', org, course, 'problem', 'abc123', 'draft'))
+        # Even though the problem was set as draft, we always return revision=None to work
+        # with old mongo/draft modulestores.
+        self.assertEqual(prob_location, Location('i4x', org, course, 'problem', 'abc123', None))
         prob_locator = BlockUsageLocator(
             course_id=new_style_course_id, usage_id='problem2', branch='production'
         )

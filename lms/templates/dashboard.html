@@ -14,6 +14,14 @@
   <script type="text/javascript">
   (function() {
 
+    $('.message.is-expandable .wrapper-tip').bind('click', toggleExpandMessage);
+
+    function toggleExpandMessage(e) {
+        (e).preventDefault();
+
+        $(this).closest('.message.is-expandable').toggleClass('is-expanded');
+    }
+
     $(".email-settings").click(function(event) {
       $("#email_settings_course_id").val( $(event.target).data("course-id") );
       $("#email_settings_course_number").text( $(event.target).data("course-number") );
@@ -101,7 +109,9 @@
       });
       return false;
     });
+  })(this);
 
+  $(function(){
     accessible_modal(".edit-name", "#apply_name_change .close-modal", "#apply_name_change", "#dashboard-main");
 
     accessible_modal(".edit-email", "#change_email .close-modal", "#change_email", "#dashboard-main");
@@ -122,8 +132,7 @@
       var trigger = "#" + $(this).attr("id");
       accessible_modal(trigger, "#unenroll-modal .close-modal", "#unenroll-modal", "#dashboard-main");
     });
-
-  })(this)
+  });
   </script>
 </%block>
 
@@ -141,10 +150,10 @@
     </header>
     <section class="user-info">
       <ul>
-        <li>
+        <li class="info--username">
           <span class="title"><div class="icon name-icon"></div>${_("Full Name")} (<a href="#apply_name_change" rel="leanModal" class="edit-name">${_("edit")}</a>)</span> <span class="data">${ user.profile.name | h }</span>
         </li>
-        <li>
+        <li class="info--email">
           <span class="title"><div class="icon email-icon"></div>${_("Email")}
             % if external_auth_map is None or 'shib' not in external_auth_map.external_domain:
             (<a href="#change_email" rel="leanModal" class="edit-email">${_("edit")}</a>)
@@ -153,14 +162,16 @@
         </li>
 
         % if external_auth_map is None or 'shib' not in external_auth_map.external_domain:
-        <li>
-          <span class="title"><a href="#password_reset_complete" rel="leanModal" id="pwd_reset_button">${_("Reset Password")}</a></span>
+        <li class="controls--account">
+          <span class="title"><div class="icon"></div><a href="#password_reset_complete" rel="leanModal" id="pwd_reset_button">${_("Reset Password")}</a></span>
           <form id="password_reset_form" method="post" data-remote="true" action="${reverse('password_reset')}">
             <input id="id_email" type="hidden" name="email" maxlength="75" value="${user.email}" />
             <!-- <input type="submit" id="pwd_reset_button" value="${_('Reset Password')}" /> -->
           </form>
         </li>
         % endif
+
+        <%include file='dashboard/_dashboard_status_verification.html' />
 
       </ul>
     </section>
@@ -172,19 +183,21 @@
       <h2>${_("Current Courses")}</h2>
     </header>
 
-    % if len(courses) > 0:
+    % if len(course_enrollment_pairs) > 0:
       <ul class="listing-courses">
-        % for course, enrollment in courses:
+        % for course, enrollment in course_enrollment_pairs:
             <% show_courseware_link = (course.id in show_courseware_links_for) %>
             <% cert_status = cert_statuses.get(course.id) %>
             <% show_email_settings = (course.id in show_email_settings_for) %>
-            <%include file='dashboard/dashboard_course_listing.html' args="course=course, enrollment=enrollment, show_courseware_link=show_courseware_link, cert_status=cert_status, show_email_settings=show_email_settings" />
+            <% course_mode_info = all_course_modes.get(course.id) %>
+            <% show_refund_option = (course.id in show_refund_option_for) %>
+            <%include file='dashboard/_dashboard_course_listing.html' args="course=course, enrollment=enrollment, show_courseware_link=show_courseware_link, cert_status=cert_status, show_email_settings=show_email_settings, course_mode_info=course_mode_info, show_refund_option = show_refund_option" />
       % endfor
 
       </ul>
     % else:
       <section class="empty-dashboard-message">
-        % if settings.MITX_FEATURES.get('COURSES_ARE_BROWSABLE'):
+        % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
           <p>${_("Looks like you haven't registered for any courses yet.")}</p>
           <a href="${marketing_link('COURSES')}">
             ${_("Find courses now!")}
@@ -232,26 +245,7 @@
   </div>
 </section>
 
-<section id="unenroll-modal" class="modal unenroll-modal" aria-hidden="true">
-  <div class="inner-wrapper" role="alertdialog" aria-labelledy="unenrollment-modal-title">
-    <button class="close-modal">&#10005; <span class="sr">${_('Close Modal')}</span></button>
 
-    <header>
-      <h2 id="unenrollment-modal-title">${_('Are you sure you want to unregister from {course_number}?').format(course_number='<span id="unenroll_course_number"></span>')}<span class="sr">, ${_("modal open")}</span></h2>
-      <hr/>
-    </header>
-
-    <div id="unenroll_error" class="modal-form-error"></div>
-
-    <form id="unenroll_form" method="post" data-remote="true" action="${reverse('change_enrollment')}">
-      <input name="course_id" id="unenroll_course_id" type="hidden" />
-      <input name="enrollment_action" type="hidden" value="unenroll" />
-      <div class="submit">
-        <input name="submit" type="submit" value="${_('Unregister')}" />
-      </div>
-    </form>
-  </div>
-</section>
 
 <section id="password_reset_complete" class="modal" aria-hidden="true">
   <div class="inner-wrapper" role="dialog" aria-labelledby="password-reset-email">
@@ -327,5 +321,24 @@
         </fieldset>
       </form>
     </div>
+  </div>
+</section>
+
+<section id="unenroll-modal" class="modal unenroll-modal" aria-hidden="true">
+  <div class="inner-wrapper" role="alertdialog" aria-labelledy="unenrollment-modal-title">
+    <button class="close-modal">&#10005; <span class="sr">${_('Close Modal')}</span></button>
+    <header>
+      <h2 id="unenrollment-modal-title">${_('<span id="track-info"></span> {course_number}?  <span id="refund-info"></span>').format(course_number='<span id="unenroll_course_number"></span>')}<span class="sr">, ${_("modal open")}</span></h2>
+      refund
+      <hr/>
+    </header>
+    <div id="unenroll_error" class="modal-form-error"></div>
+    <form id="unenroll_form" method="post" data-remote="true" action="${reverse('change_enrollment')}">
+      <input name="course_id" id="unenroll_course_id" type="hidden" />
+      <input name="enrollment_action" type="hidden" value="unenroll" />
+      <div class="submit">
+        <input name="submit" type="submit" value="${_('Unregister')}" />
+      </div>
+    </form>
   </div>
 </section>

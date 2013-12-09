@@ -46,12 +46,8 @@ def export_to_xml(modulestore, contentstore, course_location, root_dir, course_d
         alongside the public content in the course.
     """
 
-    # we use get_instance instead of get_item to support modulestores
-    # that can't guarantee that definitions are unique
-    course = modulestore.get_instance(
-        course_location.course_id,
-        course_location
-    )
+    course_id = course_location.course_id
+    course = modulestore.get_course(course_id)
 
     fs = OSFS(root_dir)
     export_fs = fs.makeopendir(course_dir)
@@ -70,16 +66,16 @@ def export_to_xml(modulestore, contentstore, course_location, root_dir, course_d
         )
 
     # export the static tabs
-    export_extra_content(export_fs, modulestore, course_location, 'static_tab', 'tabs', '.html')
+    export_extra_content(export_fs, modulestore, course_id, course_location, 'static_tab', 'tabs', '.html')
 
     # export the custom tags
-    export_extra_content(export_fs, modulestore, course_location, 'custom_tag_template', 'custom_tags')
+    export_extra_content(export_fs, modulestore, course_id, course_location, 'custom_tag_template', 'custom_tags')
 
     # export the course updates
-    export_extra_content(export_fs, modulestore, course_location, 'course_info', 'info', '.html')
+    export_extra_content(export_fs, modulestore, course_id, course_location, 'course_info', 'info', '.html')
 
     # export the 'about' data (e.g. overview, etc.)
-    export_extra_content(export_fs, modulestore, course_location, 'about', 'about', '.html')
+    export_extra_content(export_fs, modulestore, course_id, course_location, 'about', 'about', '.html')
 
     # export the grading policy
     course_run_policy_dir = policies_dir.makeopendir(course.location.name)
@@ -112,9 +108,9 @@ def export_to_xml(modulestore, contentstore, course_location, root_dir, course_d
                     draft_vertical.export_to_xml(draft_course_dir)
 
 
-def export_extra_content(export_fs, modulestore, course_location, category_type, dirname, file_suffix=''):
+def export_extra_content(export_fs, modulestore, course_id, course_location, category_type, dirname, file_suffix=''):
     query_loc = Location('i4x', course_location.org, course_location.course, category_type, None)
-    items = modulestore.get_items(query_loc)
+    items = modulestore.get_items(query_loc, course_id)
 
     if len(items) > 0:
         item_dir = export_fs.makeopendir(dirname)

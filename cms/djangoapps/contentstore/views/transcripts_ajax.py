@@ -18,11 +18,12 @@ from django.conf import settings
 
 from xmodule.contentstore.content import StaticContent
 from xmodule.exceptions import NotFoundError
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore, loc_mapper
 from xmodule.contentstore.django import contentstore
-from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
+from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError, InsufficientSpecificationError
 
 from util.json_request import JsonResponse
+from xmodule.modulestore.locator import BlockUsageLocator
 
 from ..transcripts_utils import (
     generate_subs_from_source,
@@ -77,20 +78,14 @@ def upload_transcripts(request):
         'subs': '',
     }
 
-    item_location = request.POST.get('id')
-    if not item_location:
-        return error_response(response, 'POST data without "id" form data.')
+    locator = request.POST.get('locator')
+    if not locator:
+        return error_response(response, 'POST data without "locator" form data.')
 
-    # This is placed before has_access() to validate item_location,
-    # because has_access() raises InvalidLocationError if location is invalid.
     try:
-        item = modulestore().get_item(item_location)
-    except (ItemNotFoundError, InvalidLocationError):
-        return error_response(response, "Can't find item by location.")
-
-    # Check permissions for this user within this course.
-    if not has_access(request.user, item_location):
-        raise PermissionDenied()
+        item = _get_item(request, request.POST)
+    except (ItemNotFoundError, InvalidLocationError, InsufficientSpecificationError):
+        return error_response(response, "Can't find item by locator.")
 
     if 'file' not in request.FILES:
         return error_response(response, 'POST data without "file" form data.')
@@ -156,22 +151,16 @@ def download_transcripts(request):
 
     Raises Http404 if unsuccessful.
     """
-    item_location = request.GET.get('id')
-    if not item_location:
-        log.debug('GET data without "id" property.')
+    locator = request.GET.get('locator')
+    if not locator:
+        log.debug('GET data without "locator" property.')
         raise Http404
 
-    # This is placed before has_access() to validate item_location,
-    # because has_access() raises InvalidLocationError if location is invalid.
     try:
-        item = modulestore().get_item(item_location)
-    except (ItemNotFoundError, InvalidLocationError):
-        log.debug("Can't find item by location.")
+        item = _get_item(request, request.GET)
+    except (ItemNotFoundError, InvalidLocationError, InsufficientSpecificationError):
+        log.debug("Can't find item by locator.")
         raise Http404
-
-    # Check permissions for this user within this course.
-    if not has_access(request.user, item_location):
-        raise PermissionDenied()
 
     subs_id = request.GET.get('subs_id')
     if not subs_id:
@@ -240,7 +229,7 @@ def check_transcripts(request):
         'status': 'Error',
     }
     try:
-        __, videos, item = validate_transcripts_data(request)
+        __, videos, item = _validate_transcripts_data(request)
     except TranscriptsRequestValidationException as e:
         return error_response(transcripts_presence, e.message)
 
@@ -303,7 +292,7 @@ def check_transcripts(request):
         if len(html5_subs) == 2:  # check html5 transcripts for equality
             transcripts_presence['html5_equal'] = json.loads(html5_subs[0]) == json.loads(html5_subs[1])
 
-    command, subs_to_use = transcripts_logic(transcripts_presence, videos)
+    command, subs_to_use = _transcripts_logic(transcripts_presence, videos)
     transcripts_presence.update({
         'command': command,
         'subs': subs_to_use,
@@ -311,7 +300,7 @@ def check_transcripts(request):
     return JsonResponse(transcripts_presence)
 
 
-def transcripts_logic(transcripts_presence, videos):
+def _transcripts_logic(transcripts_presence, videos):
     """
     By `transcripts_presence` content, figure what show to user:
 
@@ -386,7 +375,7 @@ def choose_transcripts(request):
     }
 
     try:
-        data, videos, item = validate_transcripts_data(request)
+        data, videos, item = _validate_transcripts_data(request)
     except TranscriptsRequestValidationException as e:
         return error_response(response, e.message)
 
@@ -416,7 +405,7 @@ def replace_transcripts(request):
     response = {'status': 'Error', 'subs': ''}
 
     try:
-        __, videos, item = validate_transcripts_data(request)
+        __, videos, item = _validate_transcripts_data(request)
     except TranscriptsRequestValidationException as e:
         return error_response(response, e.message)
 
@@ -435,7 +424,7 @@ def replace_transcripts(request):
     return JsonResponse(response)
 
 
-def validate_transcripts_data(request):
+def _validate_transcripts_data(request):
     """
     Validates, that request contains all proper data for transcripts processing.
 
@@ -452,18 +441,10 @@ def validate_transcripts_data(request):
     if not data:
         raise TranscriptsRequestValidationException('Incoming video data is empty.')
 
-    item_location = data.get('id')
-
-    # This is placed before has_access() to validate item_location,
-    # because has_access() raises InvalidLocationError if location is invalid.
     try:
-        item = modulestore().get_item(item_location)
-    except (ItemNotFoundError, InvalidLocationError):
-        raise TranscriptsRequestValidationException("Can't find item by location.")
-
-    # Check permissions for this user within this course.
-    if not has_access(request.user, item_location):
-        raise PermissionDenied()
+        item = _get_item(request, data)
+    except (ItemNotFoundError, InvalidLocationError, InsufficientSpecificationError):
+        raise TranscriptsRequestValidationException("Can't find item by locator.")
 
     if item.category != 'video':
         raise TranscriptsRequestValidationException('Transcripts are supported only for "video" modules.')
@@ -492,7 +473,7 @@ def rename_transcripts(request):
     response = {'status': 'Error', 'subs': ''}
 
     try:
-        __, videos, item = validate_transcripts_data(request)
+        __, videos, item = _validate_transcripts_data(request)
     except TranscriptsRequestValidationException as e:
         return error_response(response, e.message)
 
@@ -525,11 +506,10 @@ def save_transcripts(request):
     if not data:
         return error_response(response, 'Incoming video data is empty.')
 
-    item_location = data.get('id')
     try:
-        item = modulestore().get_item(item_location)
-    except (ItemNotFoundError, InvalidLocationError):
-        return error_response(response, "Can't find item by location.")
+        item = _get_item(request, data)
+    except (ItemNotFoundError, InvalidLocationError, InsufficientSpecificationError):
+        return error_response(response, "Can't find item by locator.")
 
     metadata = data.get('metadata')
     if metadata is not None:
@@ -553,3 +533,24 @@ def save_transcripts(request):
         response['status'] = 'Success'
 
     return JsonResponse(response)
+
+
+def _get_item(request, data):
+    """
+    Obtains from 'data' the locator for an item.
+    Next, gets that item from the modulestore (allowing any errors to raise up).
+    Finally, verifies that the user has access to the item.
+
+    Returns the item.
+    """
+    locator = BlockUsageLocator(data.get('locator'))
+    old_location = loc_mapper().translate_locator_to_location(locator)
+
+    # This is placed before has_access() to validate the location,
+    # because has_access() raises InvalidLocationError if location is invalid.
+    item = modulestore().get_item(old_location)
+
+    if not has_access(request.user, locator):
+        raise PermissionDenied()
+
+    return item

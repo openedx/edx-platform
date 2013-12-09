@@ -6,16 +6,16 @@ Unit tests for instructor dashboard forum administration
 from django.test.utils import override_settings
 
 # Need access to internal func to put users in the right group
-from django.contrib.auth.models import Group, User
+from django.contrib.auth.models import User
 
 from django.core.urlresolvers import reverse
 from django_comment_common.models import Role, FORUM_ROLE_ADMINISTRATOR, \
     FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA, FORUM_ROLE_STUDENT
 from django_comment_client.utils import has_forum_access
 
-from courseware.access import _course_staff_group_name
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from courseware.roles import CourseStaffRole
 from xmodule.modulestore.django import modulestore, clear_existing_modulestores
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
@@ -54,9 +54,7 @@ class TestInstructorDashboardForumAdmin(ModuleStoreTestCase, LoginEnrollmentTest
         self.activate_user(self.student)
         self.activate_user(self.instructor)
 
-        group_name = _course_staff_group_name(self.toy.location)
-        g = Group.objects.create(name=group_name)
-        g.user_set.add(User.objects.get(email=self.instructor))
+        CourseStaffRole(self.toy.location).add_users(User.objects.get(email=self.instructor))
 
         self.logout()
         self.login(self.instructor, self.password)

@@ -1,3 +1,6 @@
+"""
+Studio authorization functions primarily for course creators, instructors, and staff
+"""
 #=======================================================================================================================
 #
 # This code is somewhat duplicative of access.py in the LMS. We will unify the code as a separate story
@@ -11,6 +14,8 @@ from django.conf import settings
 from xmodule.modulestore import Location
 from xmodule.modulestore.locator import CourseLocator, Locator
 from xmodule.modulestore.django import loc_mapper
+from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError
+import itertools
 
 
 # define a couple of simple roles, we just need ADMIN and EDITOR now for our purposes
@@ -25,31 +30,62 @@ COURSE_CREATOR_GROUP_NAME = "course_creator_group"
 # of those two variables
 
 
-def get_course_groupname_for_role(location, role):
+def get_all_course_role_groupnames(location, role, use_filter=True):
+    '''
+    Get all of the possible groupnames for this role location pair. If use_filter==True,
+    only return the ones defined in the groups collection.
+    '''
     location = Locator.to_locator_or_location(location)
 
     # hack: check for existence of a group name in the legacy LMS format <role>_<course>
     # if it exists, then use that one, otherwise use a <role>_<course_id> which contains
     # more information
     groupnames = []
-    groupnames.append('{0}_{1}'.format(role, location.course_id))
+    try:
+        groupnames.append('{0}_{1}'.format(role, location.course_id))
+    except InvalidLocationError:  # will occur on old locations where location is not of category course
+        pass
     if isinstance(location, Location):
+        # least preferred role_course format
         groupnames.append('{0}_{1}'.format(role, location.course))
+        try:
+            locator = loc_mapper().translate_location(location.course_id, location, False, False)
+            groupnames.append('{0}_{1}'.format(role, locator.course_id))
+        except (InvalidLocationError, ItemNotFoundError):
+            pass
     elif isinstance(location, CourseLocator):
-        old_location = loc_mapper().translate_locator_to_location(location)
+        old_location = loc_mapper().translate_locator_to_location(location, get_course=True)
         if old_location:
+            # the slashified version of the course_id (myu/mycourse/myrun)
             groupnames.append('{0}_{1}'.format(role, old_location.course_id))
+            # add the least desirable but sometimes occurring format.
+            groupnames.append('{0}_{1}'.format(role, old_location.course))
+    # filter to the ones which exist
+    default = groupnames[0]
+    if use_filter:
+        groupnames = [group for group in groupnames if Group.objects.filter(name=group).exists()]
+    return groupnames, default
 
-    for groupname in groupnames:
-        if Group.objects.filter(name=groupname).exists():
-            return groupname
-    return groupnames[0]
+
+def get_course_groupname_for_role(location, role):
+    '''
+    Get the preferred used groupname for this role, location combo.
+    Preference order: 
+    * role_course_id (e.g., staff_myu.mycourse.myrun)
+    * role_old_course_id (e.g., staff_myu/mycourse/myrun)
+    * role_old_course (e.g., staff_mycourse)
+    '''
+    groupnames, default = get_all_course_role_groupnames(location, role)
+    return groupnames[0] if groupnames else default
 
 
-def get_users_in_course_group_by_role(location, role):
-    groupname = get_course_groupname_for_role(location, role)
-    (group, _created) = Group.objects.get_or_create(name=groupname)
-    return group.user_set.all()
+def get_course_role_users(course_locator, role):
+    '''
+    Get all of the users with the given role in the given course.
+    '''
+    groupnames, _ = get_all_course_role_groupnames(course_locator, role)
+    groups = [Group.objects.get(name=groupname) for groupname in groupnames]
+    return list(itertools.chain.from_iterable(group.user_set.all() for group in groups))
 
 
 def create_all_course_groups(creator, location):
@@ -61,11 +97,11 @@ def create_all_course_groups(creator, location):
 
 
 def create_new_course_group(creator, location, role):
-    groupname = get_course_groupname_for_role(location, role)
-    (group, created) = Group.objects.get_or_create(name=groupname)
-    if created:
-        group.save()
-
+    '''
+    Create the new course group always using the preferred name even if another form already exists.
+    '''
+    groupnames, __ = get_all_course_role_groupnames(location, role, use_filter=False)
+    group, __ = Group.objects.get_or_create(name=groupnames[0])
     creator.groups.add(group)
     creator.save()
 
@@ -78,15 +114,13 @@ def _delete_course_group(location):
     asserted permissions
     """
     # remove all memberships
-    instructors = Group.objects.get(name=get_course_groupname_for_role(location, INSTRUCTOR_ROLE_NAME))
-    for user in instructors.user_set.all():
-        user.groups.remove(instructors)
-        user.save()
-
-    staff = Group.objects.get(name=get_course_groupname_for_role(location, STAFF_ROLE_NAME))
-    for user in staff.user_set.all():
-        user.groups.remove(staff)
-        user.save()
+    for role in [INSTRUCTOR_ROLE_NAME, STAFF_ROLE_NAME]:
+        groupnames, _ = get_all_course_role_groupnames(location, role)
+        for groupname in groupnames:
+            group = Group.objects.get(name=groupname)
+            for user in group.user_set.all():
+                user.groups.remove(group)
+                user.save()
 
 
 def _copy_course_group(source, dest):
@@ -94,25 +128,25 @@ def _copy_course_group(source, dest):
     This is to be called only by either a command line code path or through an app which has already
     asserted permissions to do this action
     """
-    instructors = Group.objects.get(name=get_course_groupname_for_role(source, INSTRUCTOR_ROLE_NAME))
-    new_instructors_group = Group.objects.get(name=get_course_groupname_for_role(dest, INSTRUCTOR_ROLE_NAME))
-    for user in instructors.user_set.all():
-        user.groups.add(new_instructors_group)
-        user.save()
-
-    staff = Group.objects.get(name=get_course_groupname_for_role(source, STAFF_ROLE_NAME))
-    new_staff_group = Group.objects.get(name=get_course_groupname_for_role(dest, STAFF_ROLE_NAME))
-    for user in staff.user_set.all():
-        user.groups.add(new_staff_group)
-        user.save()
+    for role in [INSTRUCTOR_ROLE_NAME, STAFF_ROLE_NAME]:
+        groupnames, _ = get_all_course_role_groupnames(source, role)
+        for groupname in groupnames:
+            group = Group.objects.get(name=groupname)
+            new_group, _ = Group.objects.get_or_create(name=get_course_groupname_for_role(dest, INSTRUCTOR_ROLE_NAME))
+            for user in group.user_set.all():
+                user.groups.add(new_group)
+                user.save()
 
 
 def add_user_to_course_group(caller, user, location, role):
+    """
+    If caller is authorized, add the given user to the given course's role
+    """
     # only admins can add/remove other users
     if not is_user_in_course_group_role(caller, location, INSTRUCTOR_ROLE_NAME):
         raise PermissionDenied
 
-    group = Group.objects.get(name=get_course_groupname_for_role(location, role))
+    group, _ = Group.objects.get_or_create(name=get_course_groupname_for_role(location, role))
     return _add_user_to_group(user, group)
 
 
@@ -128,9 +162,7 @@ def add_user_to_creator_group(caller, user):
     if not caller.is_active or not caller.is_authenticated or not caller.is_staff:
         raise PermissionDenied
 
-    (group, created) = Group.objects.get_or_create(name=COURSE_CREATOR_GROUP_NAME)
-    if created:
-        group.save()
+    (group, _) = Group.objects.get_or_create(name=COURSE_CREATOR_GROUP_NAME)
     return _add_user_to_group(user, group)
 
 
@@ -148,6 +180,9 @@ def _add_user_to_group(user, group):
 
 
 def get_user_by_email(email):
+    """
+    Get the user whose email is the arg. Return None if no such user exists.
+    """
     user = None
     # try to look up user, return None if not found
     try:
@@ -159,13 +194,21 @@ def get_user_by_email(email):
 
 
 def remove_user_from_course_group(caller, user, location, role):
+    """
+    If caller is authorized, remove the given course x role authorization for user
+    """
     # only admins can add/remove other users
     if not is_user_in_course_group_role(caller, location, INSTRUCTOR_ROLE_NAME):
         raise PermissionDenied
 
     # see if the user is actually in that role, if not then we don't have to do anything
-    if is_user_in_course_group_role(user, location, role):
-        _remove_user_from_group(user, get_course_groupname_for_role(location, role))
+    groupnames, _ = get_all_course_role_groupnames(location, role)
+    for groupname in groupnames:
+        groups = user.groups.filter(name=groupname)
+        if groups:
+            # will only be one with that name
+            user.groups.remove(groups[0])
+            user.save()
 
 
 def remove_user_from_creator_group(caller, user):
@@ -191,11 +234,16 @@ def _remove_user_from_group(user, group_name):
 
 
 def is_user_in_course_group_role(user, location, role, check_staff=True):
+    """
+    Check whether the given user has the given role in this course. If check_staff
+    then give permission if the user is staff without doing a course-role query.
+    """
     if user.is_active and user.is_authenticated:
         # all "is_staff" flagged accounts belong to all groups
         if check_staff and user.is_staff:
             return True
-        return user.groups.filter(name=get_course_groupname_for_role(location, role)).count() > 0
+        groupnames, _ = get_all_course_role_groupnames(location, role)
+        return any(user.groups.filter(name=groupname).exists() for groupname in groupnames)
 
     return False
 
@@ -213,11 +261,11 @@ def is_user_in_creator_group(user):
         return True
 
     # On edx, we only allow edX staff to create courses. This may be relaxed in the future.
-    if settings.MITX_FEATURES.get('DISABLE_COURSE_CREATION', False):
+    if settings.FEATURES.get('DISABLE_COURSE_CREATION', False):
         return False
 
     # Feature flag for using the creator group setting. Will be removed once the feature is complete.
-    if settings.MITX_FEATURES.get('ENABLE_CREATOR_GROUP', False):
+    if settings.FEATURES.get('ENABLE_CREATOR_GROUP', False):
         return user.groups.filter(name=COURSE_CREATOR_GROUP_NAME).count() > 0
 
     return True

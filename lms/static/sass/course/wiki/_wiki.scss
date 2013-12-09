@@ -87,7 +87,7 @@ section.wiki {
     font-size: 0.72em;
     font-weight: 600;
 
-    &:hover {
+    &:hover, &:focus {
       text-decoration: none;
     }
   }
@@ -260,7 +260,7 @@ section.wiki {
         font-size: 0.9em;
         line-height: 25px;
 
-        &:hover {
+        &:hover, &:focus {
           background-color: #f6f6f6;
           text-decoration: none;
         }
@@ -302,7 +302,7 @@ section.wiki {
             background-position: -25px -99px;
           }
 
-          &:hover {
+          &:hover, &:focus {
             background: none;
           }
         }
@@ -349,7 +349,7 @@ section.wiki {
         background-position: 0 -99px;
       }
 
-      &:hover {
+      &:hover, &:focus {
         background-color: #f6f6f6;
         text-decoration: none;
       }
@@ -465,7 +465,7 @@ section.wiki {
     text-transform: none !important;
     letter-spacing: 0 !important;
 
-    &:hover {
+    &:hover, &:focus {
       color: $base-font-color;
       text-decoration: none;
     }
@@ -536,8 +536,12 @@ section.wiki {
     }
 
     .modal-header {
+      border: 1px solid $danger-red;
+      padding: ($baseline/2) ($baseline/2) 0 ($baseline/2);
+      margin-bottom: ($baseline/2);
+
       h1, p {
-        color: #fff;
+        color: $base-font-color;
       }
 
       h1 {
@@ -586,9 +590,7 @@ section.wiki {
   }
 
   #cheatsheetModal {
-    width: 950px;
-    margin-left: -450px;
-    margin-top: -100px;
+    width: 972px;
 
     .left-column {
       margin-right: 10px;
@@ -598,23 +600,6 @@ section.wiki {
     .right-column {
       float: left;
       width: 450px;
-    }
-
-    .close-btn {
-      display: block;
-      position: absolute;
-      top: -8px;
-      right: -8px;
-      width: 30px;
-      height: 30px;
-      border-radius: 30px;
-      border: 1px solid #ccc;
-      @include linear-gradient(top, #eee, #d2d2d2);
-      font-size: 22px;
-      line-height: 28px;
-      color: #333;
-      text-align: center;
-      box-shadow: 0 1px 0 #fff inset, 0 1px 2px rgba(0, 0, 0, .2);
     }
   }
 
@@ -662,7 +647,7 @@ section.wiki {
       background: #f9f9f9;
       border-radius: 5px;
 
-      a:hover {
+      a:hover, a:focus {
         text-decoration: none;
       }
     }
@@ -823,7 +808,7 @@ section.wiki {
     a {
       color: #aaa;
 
-      &:hover {
+      &:hover, &:focus {
         color: #777;
       }
     }
@@ -1007,7 +992,7 @@ section.wiki {
         text-align: center;
         -webkit-font-smoothing: antialiased;
 
-        &:hover {
+        &:hover, &:focus {
           background: darken($pink, 12%);
         }
       }
@@ -1078,7 +1063,7 @@ section.wiki {
     text-transform: none !important;
     letter-spacing: 0 !important;
 
-    &:hover {
+    &:hover, &:focus {
       color: $base-font-color;
       text-decoration: none;
     }

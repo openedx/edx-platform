@@ -52,6 +52,7 @@ from chem import chemcalc
 from calc.preview import latex_preview
 import xqueue_interface
 from datetime import datetime
+from xmodule.stringify import stringify_children
 
 log = logging.getLogger(__name__)
 
@@ -309,13 +310,13 @@ class OptionInput(InputTypeBase):
         id==description for now.  TODO: make it possible to specify different id and descriptions.
         """
         # parse the set of possible options
-        lexer = shlex.shlex(options[1:-1])
+        lexer = shlex.shlex(options[1:-1].encode('utf8'))
         lexer.quotes = "'"
         # Allow options to be separated by whitespace as well as commas
         lexer.whitespace = ", "
 
         # remove quotes
-        tokens = [x[1:-1] for x in list(lexer)]
+        tokens = [x[1:-1].decode('utf8') for x in lexer]
 
         # make list of (option_id, option_description), with description=id
         return [(t, t) for t in tokens]
@@ -406,13 +407,7 @@ class ChoiceGroup(InputTypeBase):
                 raise Exception(
                     "[capa.inputtypes.extract_choices] Expected a <choice> tag; got %s instead"
                     % choice.tag)
-            choice_text = ''.join([etree.tostring(x) for x in choice])
-            if choice.text is not None:
-                # TODO: fix order?
-                choice_text += choice.text
-
-            choices.append((choice.get("name"), choice_text))
-
+            choices.append((choice.get("name"), stringify_children(choice)))
         return choices
 
 

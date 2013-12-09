@@ -5,8 +5,8 @@
 
   return {
     handlerUrl: (handlerName) ->
-      usageId = $(element).data("usage-id")
-      "/xblock/handler/#{usageId}/#{handlerName}"
+      handlerPrefix = $(element).data("handler-prefix")
+      "#{handlerPrefix}/#{handlerName}"
     children: children
     childMap: childMap
   }

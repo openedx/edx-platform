@@ -5,6 +5,7 @@ import json
 from lettuce import world, step
 from nose.tools import assert_equal, assert_true  # pylint: disable=E0611
 from common import type_in_codemirror, open_new_course
+from advanced_settings import change_value
 from course_import import import_file, go_to_import
 from selenium.webdriver.common.keys import Keys
 
@@ -18,6 +19,11 @@ SHOW_ANSWER = "Show Answer"
 @step('I have created a Blank Common Problem$')
 def i_created_blank_common_problem(step):
     world.create_course_with_unit()
+    step.given("I have created another Blank Common Problem")
+
+
+@step('I have created another Blank Common Problem$')
+def i_create_new_common_problem(step):
     world.create_component_instance(
         step=step,
         category='problem',
@@ -159,9 +165,19 @@ def cancel_does_not_save_changes(step):
     step.given("I see the advanced settings and their expected values")
 
 
+@step('I have enabled latex compiler')
+def enable_latex_compiler(step):
+    url = world.browser.url
+    step.given("I select the Advanced Settings")
+    change_value(step, 'use_latex_compiler', True)
+    world.visit(url)
+    world.wait_for_xmodule()
+
+
 @step('I have created a LaTeX Problem')
 def create_latex_problem(step):
     world.create_course_with_unit()
+    step.given('I have enabled latex compiler')
     world.create_component_instance(
         step=step,
         category='problem',
@@ -205,11 +221,6 @@ def i_go_to_import(_step):
 @step(u'I import the file "([^"]*)"$')
 def i_import_the_file(_step, filename):
     import_file(filename)
-
-
-@step(u'I click on "edit a draft"$')
-def i_edit_a_draft(_step):
-    world.css_click("a.create-draft")
 
 
 @step(u'I go to the vertical "([^"]*)"$')

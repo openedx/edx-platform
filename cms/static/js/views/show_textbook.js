@@ -16,7 +16,7 @@ define(["backbone", "underscore", "gettext", "js/views/feedback_notification", "
         render: function() {
             var attrs = $.extend({}, this.model.attributes);
             attrs.bookindex = this.model.collection.indexOf(this.model);
-            attrs.course = window.section.attributes;
+            attrs.course = window.course.attributes;
             this.$el.html(this.template(attrs));
             return this;
         },

@@ -11,11 +11,10 @@ import controller_query_service
 
 from datetime import datetime
 from pytz import UTC
-import requests
 from boto.s3.connection import S3Connection
 from boto.s3.key import Key
 
-log = logging.getLogger("mitx.courseware")
+log = logging.getLogger("edx.courseware")
 
 # Set the default number of max attempts.  Should be 1 for production
 # Set higher for debugging/testing
@@ -39,7 +38,9 @@ def upload_to_s3(file_to_upload, keyname, s3_interface):
 
     conn = S3Connection(s3_interface['access_key'], s3_interface['secret_access_key'])
     bucketname = str(s3_interface['storage_bucket_name'])
-    bucket = conn.create_bucket(bucketname.lower())
+    bucket = conn.lookup(bucketname.lower())
+    if not bucket:
+        bucket = conn.create_bucket(bucketname.lower())
 
     k = Key(bucket)
     k.key = keyname

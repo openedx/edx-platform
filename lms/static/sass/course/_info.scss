@@ -105,7 +105,7 @@ div.info-wrapper {
           display: block;
           padding: 0;
 
-          &:hover {
+          &:hover, &:focus {
             background: transparent;
           }
         }
@@ -140,7 +140,7 @@ div.info-wrapper {
             @include inline-block;
             padding: 0;
 
-            &:hover {
+            &:hover, &:focus {
               background: transparent;
             }
           }
@@ -161,7 +161,7 @@ div.info-wrapper {
               @include inline-block;
               padding: 0;
 
-              &:hover {
+              &:hover, &:focus {
                 background: transparent;
               }
             }
@@ -177,7 +177,7 @@ div.info-wrapper {
           position: absolute;
           width: 100%;
 
-          &:hover {
+          &:hover, &:focus {
             opacity: 0.6;
             filter: alpha(opacity=60);
 

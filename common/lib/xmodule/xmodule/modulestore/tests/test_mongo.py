@@ -13,14 +13,14 @@ from xblock.runtime import KeyValueStore
 from xblock.exceptions import InvalidScopeError
 
 from xmodule.tests import DATA_DIR
-from xmodule.modulestore import Location
+from xmodule.modulestore import Location, MONGO_MODULESTORE_TYPE
 from xmodule.modulestore.mongo import MongoModuleStore, MongoKeyValueStore
 from xmodule.modulestore.draft import DraftModuleStore
 from xmodule.modulestore.xml_importer import import_from_xml, perform_xlint
 from xmodule.contentstore.mongo import MongoContentStore
 
 from xmodule.modulestore.tests.test_modulestore import check_path_to_location
-from IPython.testing.nose_assert_methods import assert_in, assert_not_in
+from IPython.testing.nose_assert_methods import assert_in
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.exceptions import InsufficientSpecificationError
 
@@ -28,7 +28,7 @@ log = logging.getLogger(__name__)
 
 HOST = 'localhost'
 PORT = 27017
-DB = 'test_mongo_%s' % uuid4().hex
+DB = 'test_mongo_%s' % uuid4().hex[:5]
 COLLECTION = 'modulestore'
 FS_ROOT = DATA_DIR  # TODO (vshnayder): will need a real fs_root for testing load_item
 DEFAULT_CLASS = 'xmodule.raw_module.RawDescriptor'
@@ -39,7 +39,11 @@ class TestMongoModuleStore(object):
     '''Tests!'''
     @classmethod
     def setupClass(cls):
-        cls.connection = pymongo.connection.Connection(HOST, PORT)
+        cls.connection = pymongo.MongoClient(
+            host=HOST,
+            port=PORT,
+            tz_aware=True,
+        )
         cls.connection.drop_database(DB)
 
         # NOTE: Creating a single db for all the tests to save time.  This
@@ -50,8 +54,8 @@ class TestMongoModuleStore(object):
 
     @classmethod
     def teardownClass(cls):
-        cls.connection = pymongo.connection.Connection(HOST, PORT)
-        cls.connection.drop_database(DB)
+        if cls.connection:
+            cls.connection.drop_database(DB)
 
     @staticmethod
     def initdb():
@@ -122,7 +126,7 @@ class TestMongoModuleStore(object):
             {'host': HOST, 'db': DB, 'collection': COLLECTION},
             FS_ROOT, RENDER_TEMPLATE, default_class=DEFAULT_CLASS
         )
-        assert_equals(store.get_modulestore_type('foo/bar/baz'), 'mongo')
+        assert_equals(store.get_modulestore_type('foo/bar/baz'), MONGO_MODULESTORE_TYPE)
 
     def test_get_courses(self):
         '''Make sure the course objects loaded properly'''

@@ -11,7 +11,7 @@ from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
 from django.test.client import Client
 
-from mitxmako.shortcuts import render_to_string
+from edxmako.shortcuts import render_to_string
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from xblock.field_data import DictFieldData
@@ -21,7 +21,8 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from lms.xblock.field_data import lms_field_data
+from lms.lib.xblock.field_data import LmsFieldData
+from lms.lib.xblock.runtime import quote_slashes
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -45,7 +46,7 @@ class BaseTestXmodule(ModuleStoreTestCase):
     COURSE_DATA = {}
 
     # Data from YAML common/lib/xmodule/xmodule/templates/NAME/default.yaml
-    CATEGORY = ""
+    CATEGORY = "vertical"
     DATA = ''
     MODEL_DATA = {'data': '<some_module></some_module>'}
 
@@ -107,7 +108,7 @@ class BaseTestXmodule(ModuleStoreTestCase):
         field_data = {}
         field_data.update(self.MODEL_DATA)
         student_data = DictFieldData(field_data)
-        self.item_descriptor._field_data = lms_field_data(self.item_descriptor._field_data, student_data)
+        self.item_descriptor._field_data = LmsFieldData(self.item_descriptor._field_data, student_data)
 
         self.item_descriptor.xmodule_runtime = self.new_module_runtime()
         self.item_module = self.item_descriptor
@@ -127,8 +128,8 @@ class BaseTestXmodule(ModuleStoreTestCase):
     def get_url(self, dispatch):
         """Return item url with dispatch."""
         return reverse(
-            'modx_dispatch',
-            args=(self.course.id, self.item_url, dispatch)
+            'xblock_handler',
+            args=(self.course.id, quote_slashes(self.item_url), 'xmodule_handler', dispatch)
         )
 
 

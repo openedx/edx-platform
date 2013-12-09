@@ -2,6 +2,8 @@
   
       \newpage %
 
+.. _Appendix E:
+
 
 ==========================
 APPENDIX E: Problem Types

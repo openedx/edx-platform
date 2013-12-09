@@ -31,7 +31,7 @@ class TestMigration(unittest.TestCase):
     db_config = {
         'host': 'localhost',
         'db': 'test_xmodule',
-        'collection': 'modulestore{0}'.format(uuid.uuid4().hex),
+        'collection': 'modulestore{0}'.format(uuid.uuid4().hex[:5]),
     }
 
     modulestore_options = {
@@ -59,9 +59,9 @@ class TestMigration(unittest.TestCase):
         dbref = self.loc_mapper.db
         dbref.drop_collection(self.loc_mapper.location_map)
         split_db = self.split_mongo.db
-        split_db.drop_collection(split_db.course_index)
-        split_db.drop_collection(split_db.structures)
-        split_db.drop_collection(split_db.definitions)
+        split_db.drop_collection(self.split_mongo.db_connection.course_index)
+        split_db.drop_collection(self.split_mongo.db_connection.structures)
+        split_db.drop_collection(self.split_mongo.db_connection.definitions)
         # old_mongo doesn't give a db attr, but all of the dbs are the same
         dbref.drop_collection(self.old_mongo.collection)
 

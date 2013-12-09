@@ -34,7 +34,7 @@ DOC_STORE_CONFIG = {
 MODULESTORE_OPTIONS = {
     'default_class': 'xmodule.raw_module.RawDescriptor',
     'fs_root': TEST_ROOT / "data",
-    'render_template': 'mitxmako.shortcuts.render_to_string',
+    'render_template': 'edxmako.shortcuts.render_to_string',
 }
 
 MODULESTORE = {
@@ -80,8 +80,14 @@ DATABASES = {
     }
 }
 
+# Enable asset pipeline
+# Our fork of django-pipeline uses `PIPELINE` instead of `PIPELINE_ENABLED`
+# PipelineFinder is explained here: http://django-pipeline.readthedocs.org/en/1.1.24/storages.html
+PIPELINE = True
+STATICFILES_FINDERS += ('pipeline.finders.PipelineFinder', )
+
 # Use the auto_auth workflow for creating users and logging them in
-MITX_FEATURES['AUTOMATIC_AUTH_FOR_TESTING'] = True
+FEATURES['AUTOMATIC_AUTH_FOR_TESTING'] = True
 
 # HACK
 # Setting this flag to false causes imports to not load correctly in the lettuce python files

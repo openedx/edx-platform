@@ -9,8 +9,8 @@
 from .common import *
 from .dev import *
 
-MITX_FEATURES['AUTH_USE_MIT_CERTIFICATES'] = True
+FEATURES['AUTH_USE_MIT_CERTIFICATES'] = True
 
-MITX_FEATURES['USE_DJANGO_PIPELINE'] = False      # don't recompile scss
+FEATURES['USE_DJANGO_PIPELINE'] = False      # don't recompile scss
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')  	# django 1.4 for nginx ssl proxy
