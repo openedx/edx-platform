@@ -52,18 +52,19 @@ class ExtensionsTests(unittest.TestCase):
 
     def test_dump_students_with_due_date_extensions(self):
         from ..extensions import dump_students_with_due_date_extensions as fut
+        class DummyProfile(object):
+            def __init__(self, name):
+                self.name = name
         self.StudentModule.objects.filter.return_value = [
             mock.Mock(
                 student=mock.Mock(
                     username='fred',
-                    first_name='Fred',
-                    last_name='Flintstone'),
+                    profile=DummyProfile('Fred Flintstone')),
                 state=json.dumps({'extended_due': u'2013-10-12T10:30:00Z'})),
             mock.Mock(
                 student=mock.Mock(
                     username='barney',
-                    first_name='Barney',
-                    last_name='Rubble'),
+                    profile=DummyProfile('Barney Rubble')),
                 state=json.dumps({'extended_due': u'2013-10-13T10:30:00Z'})),
             mock.Mock(
                 student=mock.Mock(
