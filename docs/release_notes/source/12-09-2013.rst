@@ -44,7 +44,7 @@ The following changes are included in this release:
 
 * The reset password function allowed others to determine valid usersnames. This problem is resolved. [DETAILS] (LMS-1507)
 
-* If a user registered for a verified certificate, then switched to the audit the course, the student
+* If a user registered for a verified certificate, then switched to audit the course, the student
   remained listed as signed up for a verified certificate. This problem is resolved. (LMS-1526)
   
 * In code response questions, the button to hide the output is now shown for each test case, so students do
