@@ -477,7 +477,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         # developing and aren't interested in working on student identity
         # verification functionality. If you do want to work on it, you have to
         # explicitly enable these in your private settings.
-        if settings.MITX_FEATURES.get('AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'):
+        if settings.FEATURES.get('AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'):
             return
 
         aes_key_str = settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["FACE_IMAGE_AES_KEY"]
