@@ -10,6 +10,7 @@ from boto.exception import BotoServerError  # this is a super-class of SESError 
 
 from django.dispatch import receiver
 from django.db import models
+from django.db.models import Sum
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import send_mail
@@ -17,6 +18,8 @@ from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 from django.db import transaction
 from django.core.urlresolvers import reverse
+
+from decimal import Decimal
 
 from xmodule.modulestore.django import modulestore
 from xmodule.course_module import CourseDescriptor
@@ -671,22 +674,27 @@ class ItemizedPurchaseReport(Report):
 class CertificateStatusReport(Report):
     def get_query(self, start_date, send_date):
         results = []
-        for course_id in settings.COURSE_LISTINGS:
-            cur_course = get_course_by_id(course)
+        for course_id in settings.COURSE_LISTINGS['default']:
+            cur_course = get_course_by_id(course_id)
             university = cur_course.org
-            course = cur_course.number + " " + course.display_name #TODO add term (i.e. Fall 2013)?
+            course = cur_course.number + " " + cur_course.display_name #TODO add term (i.e. Fall 2013)?
             enrollments =  CourseEnrollment.objects.filter(course_id=course_id)
-            total_enrolled = enrollments.objects.count()
-            audit_enrolled = enrollments.objects.filter(mode="audit").count()
-            honor_enrolled = enrollments.objects.filter(mode="honor").count()
-            verified_enrollments = enrollments.objects.filter(mode="verified")
-            verified_enrolled = verified_enrollments.objects.count()
-            gross_rev = CertificateItem.objects.filter(course_id=course_id, mode="verified").aggregate(Sum('unit_cost'))
-            gross_rev_over_min = gross_rev - (CourseMode.objects.get('course_id').min_price * verified_enrollments)
+            total_enrolled = enrollments.count()
+            audit_enrolled = enrollments.filter(mode="audit").count()
+            honor_enrolled = enrollments.filter(mode="honor").count()
+            verified_enrollments = enrollments.filter(mode="verified")
+            verified_enrolled = verified_enrollments.count()
+            gross_rev_temp = CertificateItem.objects.filter(course_id=course_id, mode="verified").aggregate(Sum('unit_cost'))
+            gross_rev = gross_rev_temp['unit_cost__sum']
+            gross_rev_over_min = gross_rev - (CourseMode.objects.get(course_id=course_id,mode_slug="verified").min_price * verified_enrolled)
             num_verified_over_min = 0 # TODO clarify with billing what exactly this means
             refunded_enrollments = CertificateItem.objects.filter(course_id='course_id', mode="refunded")
-            number_of_refunds = refunded_enrollments.objects.count()
-            dollars_refunded = refunded_enrollments.objects.aggregate(Sum('unit_cost'))
+            number_of_refunds = refunded_enrollments.count()
+            dollars_refunded_temp = refunded_enrollments.aggregate(Sum('unit_cost'))
+            if dollars_refunded_temp['unit_cost__sum'] is None:
+                dollars_refunded = Decimal(0.00)
+            else:
+                dollars_refunded = dollars_refunded_temp['unit_cost__sum']
 
             result = [
                 university, 
@@ -727,8 +735,8 @@ class CertificateStatusReport(Report):
 class UniversityRevenueShareReport(Report):
     def get_query(self, start_date, end_date):
         results = []
-        for course_id in settings.COURSE_LISTINGS:
-            cur_course = get_course_by_id(course)
+        for course_id in settings.COURSE_LISTINGS['default']:
+            cur_course = get_course_by_id(course_id)
             university = cur_course.org
             course = cur_course.number + " " + course.display_name
             num_transactions = 0 # TODO clarify with building what transactions are included in this (purchases? refunds? etc)

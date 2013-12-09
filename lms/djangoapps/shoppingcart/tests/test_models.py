@@ -490,11 +490,41 @@ class CertificateStatusReportTest(ModuleStoreTestCase):
     FIVE_MINS = datetime.timedelta(minutes=5)
 
     def setUp(self):
-        self.user = UserFactory.create()
-        self.user.first_name = "John"
-        self.user.last_name = "Doe"
-        self.user.save()
+        # Need to make a *lot* of users for this one
+        self.user1 = UserFactory.create()
+        self.user1.first_name = "John"
+        self.user1.last_name = "Doe"
+        self.user1.save()
+
+        self.user2 = UserFactory.create()
+        self.user2.first_name = "Jane"
+        self.user2.last_name = "Deer"
+        self.user2.save()
+
+        self.user3 = UserFactory.create()
+        self.user3.first_name = "Joe"
+        self.user3.last_name = "Miller"
+        self.user3.save()
+
+        self.user4 = UserFactory.create()
+        self.user4.first_name = "Simon"
+        self.user4.last_name = "Blackquill"
+        self.user4.save()
+
+        self.user5 = UserFactory.create()
+        self.user5.first_name = "Super"
+        self.user5.last_name = "Mario"
+        self.user5.save()
+
+        self.user6 = UserFactory.create()
+        self.user6.first_name = "Princess"
+        self.user6.last_name = "Peach"
+        self.user6.save()
+
+        # Two are verified, three are audit, one honor
+
         self.course_id = "MITx/999/Robot_Super_Course"
+        settings.COURSE_LISTINGS['default'] = [self.course_id]
         self.cost = 40
         self.course = CourseFactory.create(org='MITx', number='999', display_name=u'Robot Super Course')
         course_mode = CourseMode(course_id=self.course_id,
@@ -509,11 +539,32 @@ class CertificateStatusReportTest(ModuleStoreTestCase):
                                   min_price=self.cost)
         course_mode2.save()
 
-        self.cart = Order.get_cart_for_user(self.user)
-        CertificateItem.add_to_order(self.cart, self.course_id, self.cost, 'verified')
-        self.cart.purchase()
+        # User 1 & 2 will be verified
+        self.cart1 = Order.get_cart_for_user(self.user1)
+        CertificateItem.add_to_order(self.cart1, self.course_id, self.cost, 'verified')
+        self.cart1.purchase()
+
+        self.cart2 = Order.get_cart_for_user(self.user2)
+        CertificateItem.add_to_order(self.cart2, self.course_id, self.cost, 'verified')
+        self.cart2.purchase()
+
+        # Users 3, 4, and 5 are audit
+        CourseEnrollment.get_or_create_enrollment(self.user3, self.course_id).update_enrollment(mode="audit")
+        CourseEnrollment.get_or_create_enrollment(self.user4, self.course_id).update_enrollment(mode="audit")
+        CourseEnrollment.get_or_create_enrollment(self.user5, self.course_id).update_enrollment(mode="audit")
+
+        # User 6 is honor
+        CourseEnrollment.get_or_create_enrollment(self.user6, self.course_id).update_enrollment(mode="honor")
 
         self.now = datetime.datetime.now(pytz.UTC)
+
+        # bluh need to test some refunds
+
+    test_time = datetime.datetime.now(pytz.UTC)
+    CORRECT_CSV = dedent("""
+        University,Course,Total Enrolled,Audit Enrollment,Honor Code Enrollment,Verified Enrollment,Gross Revenue,Gross Revenue over the Minimum,Number of Verified over the Minimum,Number of Refunds,Dollars Refunded
+        MITx,999 Robot Super Course,6,3,1,2,80.00,0.00,0,0,0
+        """.format(time_str=str(test_time)))
 
     # TODO finish these tests. This is just a basic test to start with, making sure the regular
     # flow doesn't throw any strange errors while running
@@ -523,7 +574,9 @@ class CertificateStatusReportTest(ModuleStoreTestCase):
         refunded_certs = report.get_query(self.now - self.FIVE_MINS, self.now + self.FIVE_MINS)
         csv_file = StringIO.StringIO()
         report.make_report(report_type, csv_file, self.now - self.FIVE_MINS, self.now + self.FIVE_MINS)
-        # TODO no time restrictions yet
+        csv = csv_file.getvalue()
+        self.assertEqual(csv.replace('\r\n', '\n').strip(), self.CORRECT_CSV.strip())
+        # TODO no time restrictions ye
 
 # TODO: finish this test class
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
