@@ -14,7 +14,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from shoppingcart.views import _can_download_report, _get_date_from_str
-from shoppingcart.models import Order, CertificateItem, PaidCourseRegistration, OrderItem, Report
+from shoppingcart.models import Order, CertificateItem, PaidCourseRegistration, Report
 from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
 from course_modes.models import CourseMode

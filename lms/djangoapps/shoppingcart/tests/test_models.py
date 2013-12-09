@@ -364,7 +364,6 @@ class RefundReportTest(ModuleStoreTestCase):
         refunded_certs = report.get_query(self.now - self.FIVE_MINS, self.now + self.FIVE_MINS)
         self.assertEqual(len(refunded_certs), 1)
         self.assertIn(self.cert_item, refunded_certs)
-        # TODO no time restrictions yet
 
     test_time = datetime.datetime.now(pytz.UTC)
 
@@ -377,18 +376,13 @@ class RefundReportTest(ModuleStoreTestCase):
         """
         Tests that a generated purchase report CSV is as we expect
         """
-        # coerce the purchase times to self.test_time so that the test can match.
-        # It's pretty hard to patch datetime.datetime b/c it's a python built-in, which is immutable, so we
-        # make the times match this way
-        # TODO test multiple report types
         report_type = "refund_report"
         report = Report.initialize_report(report_type)
         for item in report.get_query(self.now - self.FIVE_MINS, self.now + self.FIVE_MINS):
             item.fulfilled_time = self.test_time
-            item.refund_requested_time = self.test_time #hm do we want to make these different
+            item.refund_requested_time = self.test_time  # hm do we want to make these different
             item.save()
 
-        # add annotation to the
         csv_file = StringIO.StringIO()
         Report.make_report(report_type, csv_file, self.now - self.FIVE_MINS, self.now + self.FIVE_MINS)
         csv = csv_file.getvalue()
@@ -397,10 +391,11 @@ class RefundReportTest(ModuleStoreTestCase):
         self.assertEqual(csv.replace('\r\n', '\n').strip(), self.CORRECT_CSV.strip())
 
 
-
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class ItemizedPurchaseReportTest(ModuleStoreTestCase):
-
+    """
+    Tests for the models used to generate itemized purchase reports
+    """
     FIVE_MINS = datetime.timedelta(minutes=5)
     TEST_ANNOTATION = u'Ba\xfc\u5305'
 
@@ -428,15 +423,13 @@ class ItemizedPurchaseReportTest(ModuleStoreTestCase):
         self.now = datetime.datetime.now(pytz.UTC)
 
     def test_purchased_items_btw_dates(self):
-        # TODO test multiple report types
         report_type = "itemized_purchase_report"
         report = Report.initialize_report(report_type)
         purchases = report.get_query(self.now - self.FIVE_MINS, self.now + self.FIVE_MINS)
         self.assertEqual(len(purchases), 2)
         self.assertIn(self.reg.orderitem_ptr, purchases)
         self.assertIn(self.cert_item.orderitem_ptr, purchases)
-        no_purchases = report.get_query(self.now + self.FIVE_MINS,
-                                                           self.now + self.FIVE_MINS + self.FIVE_MINS)
+        no_purchases = report.get_query(self.now + self.FIVE_MINS, self.now + self.FIVE_MINS + self.FIVE_MINS)
         self.assertFalse(no_purchases)
 
     test_time = datetime.datetime.now(pytz.UTC)
@@ -451,17 +444,12 @@ class ItemizedPurchaseReportTest(ModuleStoreTestCase):
         """
         Tests that a generated purchase report CSV is as we expect
         """
-        # coerce the purchase times to self.test_time so that the test can match.
-        # It's pretty hard to patch datetime.datetime b/c it's a python built-in, which is immutable, so we
-        # make the times match this way
-        # TODO test multiple report types
         report_type = "itemized_purchase_report"
         report = Report.initialize_report(report_type)
         for item in report.get_query(self.now - self.FIVE_MINS, self.now + self.FIVE_MINS):
             item.fulfilled_time = self.test_time
             item.save()
 
-        # add annotation to the
         csv_file = StringIO.StringIO()
         Report.make_report(report_type, csv_file, self.now - self.FIVE_MINS, self.now + self.FIVE_MINS)
         csv = csv_file.getvalue()
@@ -484,9 +472,12 @@ class ItemizedPurchaseReportTest(ModuleStoreTestCase):
         """
         self.assertEqual(unicode(self.annotation), u'{} : {}'.format(self.course_id, self.TEST_ANNOTATION))
 
-# TODO: finish this test class
+
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class CertificateStatusReportTest(ModuleStoreTestCase):
+    """
+    Tests for the models used to generate certificate status reports
+    """
     FIVE_MINS = datetime.timedelta(minutes=5)
 
     def setUp(self):
@@ -566,28 +557,38 @@ class CertificateStatusReportTest(ModuleStoreTestCase):
         MITx,999 Robot Super Course,6,3,1,2,80.00,0.00,0,0,0
         """.format(time_str=str(test_time)))
 
-    # TODO finish these tests. This is just a basic test to start with, making sure the regular
-    # flow doesn't throw any strange errors while running
     def test_basic(self):
         report_type = "certificate_status"
         report = Report.initialize_report(report_type)
-        refunded_certs = report.get_query(self.now - self.FIVE_MINS, self.now + self.FIVE_MINS)
         csv_file = StringIO.StringIO()
         report.make_report(report_type, csv_file, self.now - self.FIVE_MINS, self.now + self.FIVE_MINS)
         csv = csv_file.getvalue()
         self.assertEqual(csv.replace('\r\n', '\n').strip(), self.CORRECT_CSV.strip())
-        # TODO no time restrictions ye
 
-# TODO: finish this test class
+
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class UniversityRevenueShareReportTest(ModuleStoreTestCase):
+    """
+    Tests for the models used to generate university revenue share reports
+    """
     FIVE_MINS = datetime.timedelta(minutes=5)
 
     def setUp(self):
-        self.user = UserFactory.create()
-        self.user.first_name = "John"
-        self.user.last_name = "Doe"
-        self.user.save()
+        self.user1 = UserFactory.create()
+        self.user1.first_name = "John"
+        self.user1.last_name = "Doe"
+        self.user1.save()
+
+        self.user2 = UserFactory.create()
+        self.user2.first_name = "Jane"
+        self.user2.last_name = "Deer"
+        self.user2.save()
+
+        self.user3 = UserFactory.create()
+        self.user3.first_name = "Simon"
+        self.user3.last_name = "Blackquill"
+        self.user3.save()
+
         self.course_id = "MITx/999/Robot_Super_Course"
         self.cost = 40
         self.course = CourseFactory.create(org='MITx', number='999', display_name=u'Robot Super Course')
@@ -603,21 +604,37 @@ class UniversityRevenueShareReportTest(ModuleStoreTestCase):
                                   min_price=self.cost)
         course_mode2.save()
 
-        self.cart = Order.get_cart_for_user(self.user)
+        # user1 is a verified purchase
+        self.cart = Order.get_cart_for_user(self.user1)
         CertificateItem.add_to_order(self.cart, self.course_id, self.cost, 'verified')
         self.cart.purchase()
 
+        # user2 & user3 are refunded purchases
+        self.cart = Order.get_cart_for_user(self.user2)
+        CertificateItem.add_to_order(self.cart, self.course_id, self.cost, 'verified')
+        self.cart.purchase()
+        CourseEnrollment.unenroll(self.user2, self.course_id)
+
+        self.cart = Order.get_cart_for_user(self.user3)
+        CertificateItem.add_to_order(self.cart, self.course_id, self.cost, 'verified')
+        self.cart.purchase()
+        CourseEnrollment.unenroll(self.user3, self.course_id)
+
         self.now = datetime.datetime.now(pytz.UTC)
 
-    # TODO finish these tests. This is just a basic test to start with, making sure the regular
-    # flow doesn't throw any strange errors while running
+    test_time = datetime.datetime.now(pytz.UTC)
+    CORRECT_CSV = dedent("""
+        University,Course,Number of Transactions,Total Payments Collected,Service Fees (if any),Number of Successful Refunds,Total Amount of Refunds
+        MITx,999 Robot Super Course,0,40.00,0,2,80.00
+        """.format(time_str=str(test_time)))
+
     def test_basic(self):
         report_type = "university_revenue_share"
         report = Report.initialize_report(report_type)
-        refunded_certs = report.get_query(self.now - self.FIVE_MINS, self.now + self.FIVE_MINS)
         csv_file = StringIO.StringIO()
         report.make_report(report_type, csv_file, self.now - self.FIVE_MINS, self.now + self.FIVE_MINS)
-        # TODO no time restrictions yet
+        csv = csv_file.getvalue()
+        self.assertEqual(csv.replace('\r\n', '\n').strip(), self.CORRECT_CSV.strip())
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)

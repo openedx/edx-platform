@@ -132,7 +132,6 @@ def create_order(request):
     """
     Submit PhotoVerification and create a new Order for this verified cert
     """
-    from nose.tools import set_trace; set_trace()
     if not SoftwareSecurePhotoVerification.user_has_valid_or_pending(request.user):
         attempt = SoftwareSecurePhotoVerification(user=request.user)
         b64_face_image = request.POST['face_image'].split(",")[1]
