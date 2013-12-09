@@ -13,13 +13,20 @@ define(["backbone", "backbone.paginator", "js/models/asset"], function(Backbone,
             perPage: 5
         },
         server_api: {
-            'start': function() { return this.currentPage },
+            'page': function() { return this.currentPage },
             'max': function() { return this.perPage },
             'format': 'json'  // TODO determine how to pass 'accepts' through...
         },
 
         parse: function(response) {
-            this.totalPages = Math.ceil(response.totalCount / this.perPage);
+            var totalCount = response.totalCount,
+                start = response.start,
+                currentPage = response.page,
+                totalPages = Math.ceil(totalCount / this.perPage);
+            this.totalCount = totalCount;
+            this.totalPages = totalPages;
+            this.currentPage = currentPage;
+            this.start = start;
             return response.assets;
         }
     });

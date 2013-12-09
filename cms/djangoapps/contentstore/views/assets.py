@@ -68,19 +68,19 @@ def assets_handler(request, tag=None, package_id=None, branch=None, version_guid
         return HttpResponseNotFound()
 
 
-def _current_page(request):
-    current_page = request.REQUEST.get('page', None)
-    return int(current_page) if current_page else 0
+def _requested_page(request):
+    requested_page = request.REQUEST.get('page', 0)
+    return int(requested_page)
 
 
-def _paging_start(request):
-    start = request.REQUEST.get('start', None)
-    return int(start) if start else 0
+def _paging_start(request, defaultStart):
+    start = request.REQUEST.get('start', defaultStart)
+    return int(start)
 
 
 def _paging_max_results(request):
-    max_results = request.REQUEST.get('max', None)
-    return int(max_results) if max_results else None
+    max_results = request.REQUEST.get('max', 100)
+    return int(max_results)
 
 
 def _asset_index(request, location):
@@ -91,13 +91,13 @@ def _asset_index(request, location):
     """
     old_location = loc_mapper().translate_locator_to_location(location)
     course_module = modulestore().get_item(old_location)
-    current_page = _current_page(request)
+    requested_page = _requested_page(request)
     max_results = _paging_max_results(request)
 
     return render_to_response('asset_index.html', {
         'context_course': course_module,
         'asset_callback_url': location.url_reverse('assets/', ''),
-        'current_page': current_page,
+        'current_page': requested_page,
         'max_results': max_results
     })
 
@@ -110,8 +110,9 @@ def _assets_json(request, location):
     """
     old_location = loc_mapper().translate_locator_to_location(location)
 
-    start = _paging_max_results(request)
+    requested_page = _requested_page(request)
     max_results = _paging_max_results(request)
+
     course_reference = StaticContent.compute_location(old_location.org, old_location.course, old_location.name)
 #    if maxresults is not None:
 #        maxresults = int(maxresults)
@@ -129,6 +130,13 @@ def _assets_json(request, location):
         course_reference, sort=[('uploadDate', DESCENDING)]
     )
     total_count = len(assets)
+    final_page = int(total_count / max_results)
+    current_page = requested_page
+    if current_page > final_page:
+        current_page = final_page
+    elif current_page < 0:
+        current_page = 0
+    start = _paging_start(request, current_page * max_results)
     if max_results is not None:
         end = min(total_count, start + max_results)
         assets = assets[start : end]
@@ -145,8 +153,13 @@ def _assets_json(request, location):
         asset_json.append(_get_asset_json(asset['displayname'], asset['uploadDate'], asset_location, thumbnail_location, asset_locked))
 
     return JsonResponse({
-        'assets': asset_json,
-        'totalCount': total_count
+        'start': start,
+        'end': end,
+        'page': current_page,
+        'requestedPage': requested_page,
+        'maxResults': max_results,
+        'totalCount': total_count,
+        'assets': asset_json
     })
 
 
