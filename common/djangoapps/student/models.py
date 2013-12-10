@@ -35,9 +35,7 @@ from track import contexts
 from track.views import server_track
 from eventtracking import tracker
 
-
 unenroll_done = Signal(providing_args=["course_enrollment"])
-
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
 

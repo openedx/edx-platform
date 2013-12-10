@@ -37,6 +37,7 @@ class ChooseModeView(View):
 
         enrollment_mode = CourseEnrollment.enrollment_mode_for_user(request.user, course_id)
         upgrade = request.GET.get('upgrade', False)
+        request.session['attempting_upgrade'] = upgrade
 
         # verified users do not need to register or upgrade
         if enrollment_mode == 'verified':

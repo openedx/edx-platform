@@ -557,6 +557,7 @@ class CertificateItem(OrderItem):
 
         """
         super(CertificateItem, cls).add_to_order(order, course_id, cost, currency=currency)
+
         course_enrollment = CourseEnrollment.get_or_create_enrollment(order.user, course_id)
 
         # do some validation on the enrollment mode
@@ -570,7 +571,7 @@ class CertificateItem(OrderItem):
             user=order.user,
             course_id=course_id,
             course_enrollment=course_enrollment,
-            mode=mode
+            mode=mode,
         )
         item.status = order.status
         item.qty = 1
@@ -595,7 +596,6 @@ class CertificateItem(OrderItem):
             log.exception(
                 "Could not submit verification attempt for enrollment {}".format(self.course_enrollment)
             )
-
         self.course_enrollment.change_mode(self.mode)
         self.course_enrollment.activate()
 

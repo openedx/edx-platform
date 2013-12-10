@@ -12,10 +12,13 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from edxmako.shortcuts import render_to_response
 from .models import Order, PaidCourseRegistration, OrderItem
+from student.models import CourseEnrollment
 from .processors import process_postpay_callback, render_purchase_form_html
 from .exceptions import ItemAlreadyInCartException, AlreadyEnrolledInCourseException, CourseDoesNotExistException
 
 log = logging.getLogger("shoppingcart")
+
+EVENT_NAME_USER_UPGRADED = 'edx.course.enrollment.upgrade.succeeded'
 
 
 @require_POST
@@ -123,6 +126,13 @@ def show_receipt(request, ordernum):
     if order_items.count() == 1:
         receipt_template = order_items[0].single_item_receipt_template
         context.update(order_items[0].single_item_receipt_context)
+
+    # Only orders where order_items.count() == 1 might be attempting to upgrade
+    attempting_upgrade = request.session.get('attempting_upgrade', False)
+    if attempting_upgrade:
+        course_enrollment = CourseEnrollment.get_or_create_enrollment(request.user, order_items[0].course_id)
+        course_enrollment.emit_event(EVENT_NAME_USER_UPGRADED)
+        request.session['attempting_upgrade'] = False
 
     return render_to_response(receipt_template, context)
 
