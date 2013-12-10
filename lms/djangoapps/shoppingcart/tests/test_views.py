@@ -254,7 +254,6 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
                 'mode': course_enrollment.mode
             }
         )
-        self.mock_server_track.reset_mock()
 
     @patch('shoppingcart.views.render_to_response', render_mock)
     def test_show_receipt_success_refund(self):
