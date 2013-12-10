@@ -4,9 +4,15 @@
 <%namespace name='static' file='../static_content.html'/>
 
 <%block name="title"><title>${_("Courses")}</title></%block>
+<%! from microsite_configuration.middleware import MicrositeConfiguration %>
 
 <section class="find-courses">
-  <header class="search">
+
+  <%
+    microsite_background_image_path = MicrositeConfiguration.get_microsite_configuration_value('background_image_path')
+  %>
+
+  <header class="search" ${'' if not microsite_background_image_path else 'style="background-image: url(\'' + microsite_background_image_path + '\')"'}>
     <div class="inner-wrapper main-search">
       <hgroup>
         <div class="logo">

@@ -149,7 +149,9 @@ MICROSITE_CONFIGURATION = {
         # what logo file to display, note that we shouldn't check in trademarked logos
         # into the repository, so these images will have to be deployed/managed outside of
         # code pushes
-        'logo_image_file': 'open_edX_logo.png',          
+        'logo_image_file': 'open_edX_logo.png',    
+        # what background image to display on Course Index and Course About page
+        'background_image_path': '/static/images/homepage-bg.jpg',    
         # what filter to use when displaying the course catalog on the landing page     
         'course_org_filter': 'CDX',
         # email from field on outbound emails
