@@ -179,7 +179,9 @@ MICROSITE_CONFIGURATION = {
         # this control whether the home header (the overlay) shows on the homepage
         # for example the overlay which says "The Future of Online Education", has the background image, as well as
         # the top-level promo video
-        'show_home_header': False
+        'show_home_header': False,
+        # This controls whether the social sharing links of the course about page should be displayed
+        'course_about_show_social_links': True
     },
     'Edge': {
         # if set will render to different template in the index page
