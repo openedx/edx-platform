@@ -105,6 +105,7 @@ def xblock_handler(request, tag=None, course_id=None, branch=None, version_guid=
                 # dungeon and surface as uneditable, unsaveable, and undeletable
                 # component-goblins.
                 except Exception as exc:                          # pylint: disable=W0703
+                    log.debug("Unable to render studio_view for %r", component, exc_info=True)
                     content = render_to_string('html_error.html', {'message': str(exc)})
 
                 return render_to_response('component.html', {

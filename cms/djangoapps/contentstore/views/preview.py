@@ -159,5 +159,6 @@ def get_preview_html(request, descriptor):
     try:
         content = module.render("student_view").content
     except Exception as exc:                          # pylint: disable=W0703
+        log.debug("Unable to render student_view for %r", module, exc_info=True)
         content = render_to_string('html_error.html', {'message': str(exc)})
     return content
