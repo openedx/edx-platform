@@ -272,3 +272,20 @@ section.foldit {
 
    }
 }
+
+section.unauth-tos {
+  position: relative;
+  margin: 30px auto 0 auto;
+  background-color: $black;
+  color: $white;
+  border-radius: 5px;
+  padding: 15px;
+  font-weight: bold;
+  text-align: center;
+}
+section.unauth-tos a {
+  padding: 5px;
+  background-color: $white;
+  border-radius: 5px;
+  font-weight: bold;
+}
