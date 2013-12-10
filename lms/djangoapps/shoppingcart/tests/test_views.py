@@ -55,6 +55,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.verified_course_id = 'org/test/Test_Course'
         CourseFactory.create(org='org', number='test', run='course1', display_name='Test Course')
         self.cart = Order.get_cart_for_user(self.user)
+        self.addCleanup(patcher.stop)
 
     def login_user(self):
         self.client.login(username=self.user.username, password="password")
