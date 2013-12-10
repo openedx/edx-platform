@@ -137,6 +137,11 @@ class CourseRole(GroupBasedRole):
     A named role in a particular course
     """
     def __init__(self, role, location, course_context=None):
+        """
+        Location may be either a Location, a string, dict, or tuple which Location will accept
+        in its constructor, or a CourseLocator. Handle all these giving some preference to
+        the preferred naming.
+        """
         # TODO: figure out how to make the group name generation lazy so it doesn't force the
         # loc mapping?
         if not hasattr(location, 'course_id'):
@@ -153,14 +158,14 @@ class CourseRole(GroupBasedRole):
 
         # pylint: disable=no-member
         if isinstance(location, Location):
-            # least preferred legacy role_course format
-            groupnames.append('{0}_{1}'.format(role, location.course))
             try:
                 locator = loc_mapper().translate_location(location.course_id, location, False, False)
                 groupnames.append('{0}_{1}'.format(role, locator.course_id))
             except (InvalidLocationError, ItemNotFoundError):
                 # if it's never been mapped, the auth won't be via the Locator syntax
                 pass
+            # least preferred legacy role_course format
+            groupnames.append('{0}_{1}'.format(role, location.course))
         elif isinstance(location, CourseLocator):
             # handle old Location syntax
             old_location = loc_mapper().translate_locator_to_location(location, get_course=True)
