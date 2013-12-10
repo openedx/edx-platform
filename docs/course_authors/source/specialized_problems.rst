@@ -20,6 +20,7 @@ unit.
 -  :ref:`Word Cloud` Word cloud problems show a colorful graphic of the
    words that students enter as responses to a prompt.
 
+.. _ Add Advanced Component:
 
 **Add the Advanced Component to Your Course**
 
