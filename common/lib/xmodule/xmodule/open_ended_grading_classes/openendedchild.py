@@ -287,6 +287,12 @@ class OpenEndedChild(object):
             }
         return json.dumps(state)
 
+    def normalize_scores(self):
+        """
+        Normalize any scores. Called on init.
+        """
+        pass
+
     def _allow_reset(self):
         """Can the module be reset?"""
         return (self.child_state == self.DONE and self.child_attempts < self.max_attempts)

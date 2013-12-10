@@ -679,7 +679,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         return {
             'success': success,
             'error': error_message,
-            'student_response': data['student_answer'].replace("\n","<br/>")
+            'student_response': data['student_answer'].replace("\n", "<br/>")
         }
 
     def update_score(self, data, system):
@@ -737,6 +737,38 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         }
         html = system.render_template('{0}/open_ended.html'.format(self.TEMPLATE_DIR), context)
         return html
+
+    def normalize_scores(self):
+        """
+        Return true if attempt scores in child history have been updated to be equal to
+        sum of rubric scores. In the ML grades returned from ORA the aggregate score is
+        not always equal to the sum of the rubric scores.
+        This method makes them consistent.
+        """
+        scores_normalized = False
+        for attempt in self.child_history:
+            post_assessment_data = self._parse_score_msg(attempt.get('post_assessment'), self.system)
+            grader_types = post_assessment_data.get('grader_types')
+
+            # According to _parse_score_msg in ML grading there should be only one grader type.
+            if len(grader_types) == 1 and grader_types[0] == 'ML':
+                rubric_scores = post_assessment_data.get("rubric_scores")
+
+                # Similarly there should be only one list of rubric scores.
+                if len(rubric_scores) == 1:
+                    old_score = attempt.get('score')
+                    rubric_scores_sum = sum(rubric_scores[0])
+                    if old_score != rubric_scores_sum:
+                        attempt["score"] = rubric_scores_sum
+                        scores_normalized = True
+                        log.debug("""Score normalized for location={loc}, old_score={old_score},
+                        new_score={new_score}, rubric_score={rubric_score}""".format(
+                            loc=self.location_string,
+                            old_score=old_score,
+                            new_score=rubric_scores_sum,
+                            rubric_score=rubric_scores
+                        ))
+        return scores_normalized
 
 
 class OpenEndedDescriptor():
