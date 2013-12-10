@@ -1,4 +1,5 @@
 <%! from django.utils.translation import ugettext as _ %>
+<%! from microsite_configuration.middleware import MicrositeConfiguration %>
 
 <%namespace name='static' file='static_content.html'/>
 <%! from django.utils import html %>
@@ -8,11 +9,26 @@
 ## templates have access to these functions, and we can import these
 ## into non-inheriting templates via the %namespace tag.
 <%def name="theme_enabled()">
-  <% return settings.FEATURES["USE_CUSTOM_THEME"] %>
+  <% 
+
+    theme_enabled = MicrositeConfiguration.get_microsite_configuration_value('USE_CUSTOM_THEME') or settings.FEATURES["USE_CUSTOM_THEME"] 
+    return theme_enabled
+
+  %>
 </%def>
 
 <%def name="stanford_theme_enabled()">
-  <% return theme_enabled() and getattr(settings, "THEME_NAME") == "stanford" %>
+  <% 
+    if not theme_enabled():
+      return False
+
+    theme_name = MicrositeConfiguration.get_microsite_configuration_value('THEME_NAME')
+
+    if hasattr(settings, "THEME_NAME"):
+      theme_name = getattr(settings, "THEME_NAME")
+
+    return theme_enabled and theme_name == "stanford" 
+  %>
 </%def>
 
 <!DOCTYPE html>
@@ -54,8 +70,22 @@
   <%static:js group='main_vendor'/>
 
   <%block name="headextra"/>
-  % if theme_enabled():
-    <%include file="theme-head-extra.html" />
+
+<%
+  if theme_enabled():
+    header_extra_file = MicrositeConfiguration.get_microsite_configuration_value('header_extra_file', 'theme-head-extra.html')
+    header_file = MicrositeConfiguration.get_microsite_configuration_value('header_file', 'navigation.html')
+    google_analytics_file = MicrositeConfiguration.get_microsite_configuration_value('google_analytics_file', 'theme-google-analytics.html')
+    footer_file = MicrositeConfiguration.get_microsite_configuration_value('footer_file', 'theme-footer.html')
+  else:
+    header_extra_file = None
+    header_file = "navigation.html"
+    google_analytics_file = "google_analytics.html"
+    footer_file = "footer.html"  
+%>
+
+  % if header_extra_file:
+    <%include file="${header_extra_file}" />
   % endif
 
   <!--[if lt IE 9]>
@@ -66,11 +96,7 @@
   <meta name="google-site-verification" content="_mipQ4AtZQDNmbtOkwehQDOgCxUUV2fb_C0b6wbiRHY" />
 
   % if not course:
-    % if theme_enabled():
-      <%include file="theme-google-analytics.html" />
-    % else:
-      <%include file="google_analytics.html" />
-    % endif
+    <%include file="${google_analytics_file}" />
   % endif
 
   <%include file="widgets/segment-io.html" />
@@ -82,21 +108,17 @@
 
   <%include file="mathjax_accessible.html" />
 
-% if theme_enabled():
-  <%include file="theme-header.html" />
-% elif not suppress_toplevel_navigation:
-  <%include file="navigation.html" />
-% endif
+% if not suppress_toplevel_navigation:
+  <%include file="${header_file}" />
+%endif
 
   <section class="content-wrapper" id="content">
     ${self.body()}
     <%block name="bodyextra"/>
   </section>
 
-% if theme_enabled():
-  <%include file="theme-footer.html" />
-% elif not suppress_toplevel_navigation:
-  <%include file="footer.html" />
+% if not suppress_toplevel_navigation:
+  <%include file="${footer_file}" />
 % endif
 
   <script>window.baseUrl = "${settings.STATIC_URL}";</script>

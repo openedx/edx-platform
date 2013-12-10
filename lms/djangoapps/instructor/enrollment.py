@@ -14,6 +14,8 @@ from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from courseware.models import StudentModule
 from edxmako.shortcuts import render_to_string
 
+from microsite_configuration.middleware import MicrositeConfiguration
+
 # For determining if a shibboleth course
 SHIBBOLETH_DOMAIN_PREFIX = 'shib:'
 
@@ -223,10 +225,14 @@ def send_mail_to_student(student, param_dict):
     Returns a boolean indicating whether the email was sent successfully.
     """
 
-    email_template_dict = {'allowed_enroll': ('emails/enroll_email_allowedsubject.txt', 'emails/enroll_email_allowedmessage.txt'),
-                           'enrolled_enroll': ('emails/enroll_email_enrolledsubject.txt', 'emails/enroll_email_enrolledmessage.txt'),
-                           'allowed_unenroll': ('emails/unenroll_email_subject.txt', 'emails/unenroll_email_allowedmessage.txt'),
-                           'enrolled_unenroll': ('emails/unenroll_email_subject.txt', 'emails/unenroll_email_enrolledmessage.txt')}
+    email_template_dict_default = {'allowed_enroll': ('emails/enroll_email_allowedsubject.txt', 'emails/enroll_email_allowedmessage.txt'),
+       'enrolled_enroll': ('emails/enroll_email_enrolledsubject.txt', 'emails/enroll_email_enrolledmessage.txt'),
+       'allowed_unenroll': ('emails/unenroll_email_subject.txt', 'emails/unenroll_email_allowedmessage.txt'),
+       'enrolled_unenroll': ('emails/unenroll_email_subject.txt', 'emails/unenroll_email_enrolledmessage.txt')
+    }
+
+    email_template_dict = MicrositeConfiguration.get_microsite_configuration_value('email_templates',
+        email_template_dict_default)
 
     subject_template, message_template = email_template_dict.get(param_dict['message'], (None, None))
     if subject_template is not None and message_template is not None:
@@ -238,7 +244,10 @@ def send_mail_to_student(student, param_dict):
 
         # Email subject *must not* contain newlines
         subject = ''.join(subject.splitlines())
-        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [student], fail_silently=False)
+        from_address = MicrositeConfiguration.get_microsite_configuration_value('email_from_address',
+            settings.DEFAULT_FROM_EMAIL)
+
+        send_mail(subject, message, from_address, [student], fail_silently=False)
 
 
 def uses_shib(course):

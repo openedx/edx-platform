@@ -71,6 +71,7 @@ from pytz import UTC
 
 from util.json_request import JsonResponse
 
+from microsite_configuration.middleware import MicrositeConfiguration
 
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
@@ -903,22 +904,37 @@ def create_account(request, post_override=None):
          'key': registration.activation_key,
          }
 
+    # see if there are email templates defined for this microsite
+    email_templates  = MicrositeConfiguration.get_microsite_configuration_value(
+        'email_templates'
+    )
+
+    if email_templates:
+        subject_template, message_template = email_templates['activation_email']
+    else:
+        # fallback to default system templates
+        subject_template = 'emails/activation_email_subject.txt'
+        message_template = 'emails/activation_email.txt'
+
     # composes activation email
-    subject = render_to_string('emails/activation_email_subject.txt', d)
+    subject = render_to_string(subject_template, d)
     # Email subject *must not* contain newlines
     subject = ''.join(subject.splitlines())
-    message = render_to_string('emails/activation_email.txt', d)
+
+    message = render_to_string(message_template, d)
 
     # don't send email if we are doing load testing or random user generation for some reason
     if not (settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING')):
+        from_address = MicrositeConfiguration.get_microsite_configuration_value('email_from_address',
+            settings.DEFAULT_FROM_EMAIL)
         try:
             if settings.FEATURES.get('REROUTE_ACTIVATION_EMAIL'):
                 dest_addr = settings.FEATURES['REROUTE_ACTIVATION_EMAIL']
                 message = ("Activation for %s (%s): %s\n" % (user, user.email, profile.name) +
                            '-' * 80 + '\n\n' + message)
-                send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [dest_addr], fail_silently=False)
+                send_mail(subject, message, from_address, [dest_addr], fail_silently=False)
             else:
-                _res = user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
+                _res = user.email_user(subject, message, from_address)
         except:
             log.warning('Unable to send activation email to user', exc_info=True)
             js['value'] = _('Could not send activation e-mail.')
@@ -1175,11 +1191,27 @@ def change_email_request(request):
          'old_email': user.email,
          'new_email': pec.new_email}
 
-    subject = render_to_string('emails/email_change_subject.txt', d)
-    subject = ''.join(subject.splitlines())
-    message = render_to_string('emails/email_change.txt', d)
+    # see if there are email templates defined for this microsite
+    email_templates  = MicrositeConfiguration.get_microsite_configuration_value(
+        'email_templates'
+    )
 
-    _res = send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [pec.new_email])
+    if email_templates:
+        subject_template, message_template = email_templates['email_change']
+    else:
+        # fallback to default system templates
+        subject_template = 'emails/email_change_subject.txt'
+        message_template = 'emails/email_change.txt'
+
+    subject = render_to_string(subject_template, d)
+    subject = ''.join(subject.splitlines())
+
+    message = render_to_string(message_template, d)
+
+    from_address = MicrositeConfiguration.get_microsite_configuration_value('email_from_address',
+        settings.DEFAULT_FROM_EMAIL)
+
+    _res = send_mail(subject, message, from_address, [pec.new_email])
 
     return HttpResponse(json.dumps({'success': True}))
 
