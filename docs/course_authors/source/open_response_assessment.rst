@@ -160,23 +160,23 @@ Step 1. Create the Component
 Step 2. Add the Question
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
--  In the component editor, locate the [prompt] tags.
+#. In the component editor, locate the [prompt] tags.
 
    .. image:: Images/ORA_Prompt.gif
 
-Replace the sample text between the **[prompt]** tags with the text of
-your question. When you replace the sample text, make sure you follow
-these guidelines to avoid common formatting mistakes.
+#. Replace the sample text between the **[prompt]** tags with the text of
+   your question. When you replace the sample text, make sure you follow
+   these guidelines to avoid common formatting mistakes.
 
--  Leave the **[prompt]** tags in place.
--  Enclose all text in HTML tags.
+   -  Leave the **[prompt]** tags in place.
+   -  Enclose all text in HTML tags.
 
 Step 3. Add the Rubric
 ~~~~~~~~~~~~~~~~~~~~~~
 
-**Note** *After you release your problem to students in your live course, make sure
-you don't make any changes to the rubric that affect scoring, such as adding or removing an option
-in a category. Changing the rubric can cause errors in live courses.*
+.. note:: After you release your problem to students in your live course, make sure
+          you don't make any changes to the rubric that affect scoring, such as adding or removing an option
+          in a category. Changing the rubric can cause errors in live courses.*
 
 #. In the component editor, locate the [rubric] tags. (The sample rubric
    is long, so you'll have to scroll down to locate the second tag.)
@@ -186,14 +186,12 @@ in a category. Changing the rubric can cause errors in live courses.*
 #. Replace the sample rubric with the text of your rubric. Make sure to
    do the following.
 
--  Include the beginning and ending [rubric] tags.
--  Precede the categories with a plus (+) sign.
--  Precede the options with a minus (-) sign.
+   -  Include the beginning and ending [rubric] tags.
+   -  Precede the categories with a plus (+) sign.
+   -  Precede the options with a minus (-) sign.
+   -  List the option that scores zero points first, followed by the option that scores one point, and so on.
 
-- List the option that scores zero points first, followed by the option
-    that scores one point, and so on.
-
-    For example, your rubric might resemble the following rubric.
+   For example, your rubric might resemble the following rubric.
 
 ::
 
@@ -212,9 +210,9 @@ in a category. Changing the rubric can cause errors in live courses.*
 Step 4. Set the Assessment Type and Scoring
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-**Note** *After you release your problem to students in your live course, make sure
-you don't make any changes to the code for the assessment type and scoring. Changing 
-this code can cause errors in live courses.*
+.. note:: After you release your problem to students in your live course, make sure
+          you don't make any changes to the code for the assessment type and scoring. Changing 
+          this code can cause errors in live courses.*
 
 To set the assessment type and scoring for your open response assessment, you'll 
 enter code that specifies the type and order of assessments to use along with 
@@ -267,14 +265,14 @@ Set the Type and Scoring
 Step 5. Set the Problem Name
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-**Note** *After you release your problem to students in your live course, make sure
-you don't change the name of the problem. Changing the display name when the problem
-is live can cause a loss of student data.*
+.. note::   After you release your problem to students in your live course, make sure
+            you don't change the name of the problem. Changing the display name when the problem
+            is live can cause a loss of student data.
 
-*You can change the display name of a problem while you're still testing the problem.
-However, note that all the test responses and scores associated with the problem 
-will be lost when you change the name. To update the problem name on the 
-instructor dashboard, submit a new test response to the problem.*
+            You can change the display name of a problem while you're still testing the problem.
+            However, note that all the test responses and scores associated with the problem 
+            will be lost when you change the name. To update the problem name on the 
+            instructor dashboard, submit a new test response to the problem.
 
 The name of the problem appears as a heading above the problem in the
 courseware. It also appears in the list of problems on the **Staff
@@ -401,7 +399,7 @@ Step 7. Save the Problem
    The component appears in Studio. In the upper right corner, you can
    see the type of assessments that you have set for this problem.
 
-.. image:: Images/ORA_Component.gif
+   .. image:: Images/ORA_Component.gif
 
 Step 8. Add the Peer Grading Interface (for peer assessments only)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -622,25 +620,27 @@ Click **Back to problem list** to return to the list of problems. You
 can also wait for a few minutes and click **Re-check for submissions**
 to see if any other students have submitted responses.
 
-**Note**
+.. note:: After you've graded enough responses for AI assessments to start, the number
+          of responses in the **Available to grade** column decreases rapidly as
+          the algorithm grades responses and returns them to your students in just 
+          a few seconds. No student data is lost. 
 
-When a response opens for you to grade, it leaves the current "grading pool" 
-that other instructors or students are grading from, which prevents other 
-instructors or students from 
-grading the response while you are working on it. If you do not submit a score 
-for this response within 30 minutes, the response returns to the grading pool 
-(so that it again becomes available for others to grade), even if you still have
-the response open on your screen.
+.. note:: When a response opens for you to grade, it leaves the current "grading pool" 
+          that other instructors or students are grading from, which prevents other 
+          instructors or students from grading the response while you are working on 
+          it. If you do not submit a score for this response within 30 minutes, 
+          the response returns to the grading pool (so that it again becomes available 
+          for others to grade), even if you still have the response open on your screen.
  
-If the response returns to the grading pool (because the 30 minutes have passed), 
-but the response is still open on your screen, you can still submit feedback for 
-that response. If another instructor or student grades the response after it returns to the 
-grading pool but before you submit your feedback, the response receives two grades.
+          If the response returns to the grading pool (because the 30 minutes have passed), 
+          but the response is still open on your screen, you can still submit feedback for 
+          that response. If another instructor or student grades the response after it returns to the 
+          grading pool but before you submit your feedback, the response receives two grades.
  
-If you click your browser's **Back** button to return to the problem list before you 
-click **Submit** to submit your feedback for a response, the response stays outside 
-the grading pool until 30 minutes have passed. When the response returns to the 
-grading pool, you can grade it. 
+          If you click your browser's **Back** button to return to the problem list before you 
+          click **Submit** to submit your feedback for a response, the response stays outside 
+          the grading pool until 30 minutes have passed. When the response returns to the 
+          grading pool, you can grade it. 
 
 Access Scores and Feedback
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
