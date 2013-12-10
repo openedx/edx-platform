@@ -39,25 +39,15 @@
 
   // page header bits
   .toggle-button-sections {
-    @include font-size(12);
-    display: none;
+    @extend %t-copy-sub2;
     position: relative;
+    display: none;
     float: right;
     margin-top: ($baseline/4);
-    color: $darkGrey;
+    color: $gray-l1;
 
     &.is-shown {
       display: block;
-    }
-
-    [class^="icon-"] {
-      @include font-size(11);
-      border-radius: 20px;
-      position: relative;
-      top: -1px;
-      display: inline-block;
-      margin-right: 2px;
-      line-height: 5px;
     }
 
     .label {
@@ -71,9 +61,9 @@
   .new-subsection-name-input {
     @include font-size(16);
     display: inline-block;
-    vertical-align: top;
     width: 515px;
     padding: ($baseline/4);
+    vertical-align: top;
   }
 
   .new-subsection-name-input {
@@ -82,16 +72,16 @@
   .new-section-name-save,
   .new-subsection-name-save {
     @include blue-button;
-    padding: 4px 20px 7px;
     margin: 0 5px;
-    color: #fff !important;
+    padding: 4px 20px 7px;
+    color: $white;
   }
 
   .new-section-name-cancel,
   .new-subsection-name-cancel {
     @include white-button;
     padding: 4px 20px 7px;
-    color: #8891a1 !important;
+    color: $gray-l1;
   }
 
   .new-subsection-item,
@@ -121,7 +111,6 @@
     display: inline-block;
     vertical-align: top;
     margin: 0 ($baseline/4);
-    padding: 0;
     color: $gray-l2;
 
     &:hover {
@@ -160,7 +149,7 @@
       color: $gray-l2;
 
       &:hover,
-      &.isset {
+      &.is-set {
         color: $blue;
         visibility: visible;
       }
@@ -195,23 +184,24 @@
     }
 
     &.new-section {
+      padding: ($baseline*1.5) $baseline 0 $baseline;
 
       header {
         @include clearfix();
         height: auto;
         border-bottom: 0;
-      }
 
-      .expand-collapse {
-        visibility: hidden;
-      }
+        .expand-collapse {
+          display: none;
+        }
 
-      .item-details {
-        padding: 25px 0 0 0;
+        .item-details {
+          width: auto;
 
-        .section-name {
-          float: none;
-          width: 100%;
+          .section-name {
+            float: none;
+            width: 100%;
+          }
         }
       }
     }
@@ -226,15 +216,14 @@
       // section name area
       .item-details {
         @include clearfix();
-        display: inline-block;
+        width: 400px;
         float: none;
+        display: inline-block;
         padding: 0 0 ($baseline/2) 0;
 
         .section-name {
           @include font-size(19);
-          float: left;
-          width: 400px;
-          margin-right: 10px;
+          margin-right: ($baseline/2);
         }
 
         .section-name-span {
@@ -248,7 +237,7 @@
 
         .section-name-edit {
           position: relative;
-          width: 400px;
+          width: ($baseline*20);
           background: $white;
 
           input {
@@ -257,13 +246,13 @@
 
           .save-button {
             @include blue-button;
-            padding: 7px 20px 7px;
-            margin-right: 5px;
+            padding: 7px $baseline 7px;
+            margin-right: ($baseline/4);
           }
 
           .cancel-button {
             @include white-button;
-            padding: 7px 20px 7px;
+            padding: 7px $baseline 7px;
           }
         }
       }
@@ -271,6 +260,10 @@
 
       // section specific action styles
       .item-actions {
+        position: relative;
+        display: inline-block;
+        float: right;
+        margin-bottom: ($baseline/2);
         top: 0;
       }
 
@@ -292,16 +285,16 @@
           }
 
           &:hover,
-          &.isset {
+          &.is-set {
             color: $blue;
             visibility: visible;
           }
         }
 
         .section-published-date {
-          padding: 4px 10px;
+          padding: ($baseline/5) ($baseline/2);
           border-radius: 3px;
-          background: $lightGrey;
+          background: $gray-l5;
           text-align: right;
 
           .published-status {
@@ -334,7 +327,7 @@
   // subsection styles
   .courseware-subsection {
     @include clearfix();
-    margin-bottom: 5px;
+    padding: 3px 0;
 
     &.visible {
       border-left: 5px solid $green;
@@ -397,12 +390,12 @@
     }
 
     .menu-toggle {
-      z-index: 10;
+      @extend %ui-depth1;
       position: absolute;
       top: 0;
       right: 5px;
       padding: 2px 5px;
-      color: $mediumGrey;
+      color: $gray-l2;
 
       &:hover,
       &.is-active {
@@ -411,12 +404,6 @@
 
       &:focus {
         outline: 0;
-      }
-
-      [class^="icon-"] {
-        vertical-align: middle;
-        margin-top: -5px;
-        display: inline-block;
       }
     }
 
@@ -433,7 +420,7 @@
       right: 0;
       margin: 0;
       box-shadow: 0 1px 2px rgba(0, 0, 0, .2);
-      border: 1px solid $mediumGrey;
+      border: 1px solid $gray-l2;
       border-radius: 4px;
       padding: 8px 12px;
       background: $white;
@@ -441,16 +428,16 @@
       li {
         width: 115px;
         margin-bottom: 3px;
+        border-bottom: 1px solid $gray-l4;
         padding-bottom: 3px;
-        border-bottom: 1px solid $lightGrey;
 
         &:last-child {
           margin-bottom: 0;
-          padding-bottom: 0;
           border: none;
+          padding-bottom: 0;
 
           .gradable-status-notgraded {
-            color: $darkGrey;
+            color: $gray;
           }
         }
       }
@@ -468,13 +455,13 @@
     &.is-active {
 
       .menu {
-        z-index: 1000;
+        @extend %ui-depth3;
         display: block;
         opacity: 1.0;
       }
 
       .menu-toggle {
-        z-index: 10000;
+        @extend %ui-depth4;
       }
     }
 
@@ -520,8 +507,8 @@
     .draft-item:after,
     .public-item:after,
     .private-item:after {
+      @include font-size(9);
       margin-left: 3px;
-      font-size: 9px;
       font-weight: 600;
       text-transform: uppercase;
     }
@@ -558,37 +545,6 @@
         }
       }
     }
-
-    .description {
-      @include font-size(14);
-      float: left;
-      margin-top: 30px;
-      line-height: 20px;
-      width: 100%;
-    }
-
-    strong {
-      font-weight: 700;
-    }
-
-    .start-date,
-    .start-time {
-      @include font-size(19);
-    }
-
-    .save-button {
-      @include blue-button;
-      margin-right: 10px;
-    }
-
-    .cancel-button {
-      @include white-button;
-    }
-
-    .save-button,
-    .cancel-button {
-      @include font-size(16);
-    }
   }
 
 
@@ -598,10 +554,12 @@
 
     .draggable-drop-indicator-before {
       top: -($baseline/2);
+      left: 0;
     }
 
     .draggable-drop-indicator-after {
       bottom: -13px;
+      left: 0;
     }
 
     // CASE: DnD - empty subsection with unit dropping

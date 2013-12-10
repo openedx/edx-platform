@@ -25,7 +25,7 @@ domReady(function() {
 
     $('body').addClass('js');
 
-    $('.unit .item-actions .delete-button').bind('click', deleteUnit);
+    $('.unit .item-actions .delete-unit-button').bind('click', deleteUnit);
     $('.new-unit-item').bind('click', createNewUnit);
 
     // lean/simple modal

@@ -46,7 +46,7 @@ require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit"
       </div>
       <div class="main-column">
         <article class="unit-body window">
-        <p class="unit-name-input"><label>${_("Display Name:")}</label><input type="text" value="${unit.display_name_with_default | h}" class="unit-display-name-input" /></p>
+        <p class="unit-name-input"><label for="unit-display-name-input">${_("Display Name:")}</label><input type="text" value="${unit.display_name_with_default | h}" id="unit-display-name-input" class="unit-display-name-input" /></p>
           <ol class="components">
             % for locator in components:
             <li class="component" data-locator="${locator}"/>
@@ -147,8 +147,8 @@ require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit"
           <h4 class="header">${_("Unit Settings")}</h4>
           <div class="window-contents">
             <div class="row visibility">
-              <label class="inline-label">${_("Visibility:")}</label>
-              <select name="visibility-select" class='visibility-select'>
+              <label for="visibility-select" class="inline-label">${_("Visibility:")}</label>
+              <select name="visibility-select" id="visibility-select" class='visibility-select'>
                 <option value="public">${_("Public")}</option>
                 <option value="private">${_("Private")}</option>
               </select>
@@ -181,23 +181,27 @@ require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit"
           <div class="window-contents">
             <div class="row wrapper-unit-id">
               <p class="unit-id">
-                <span class="label">${_("Unit Identifier:")}</span>
-                <input type="text" class="url value" value="${unit.location.name}" readonly />
+                <label for="unit-location-id-input">${_("Unit Identifier:")}</label>
+                <input type="text" class="url value" id="unit-location-id-input" value="${unit.location.name}" readonly />
               </p>
             </div>
-            <ol>
-              <li>
-                <a href="${index_url}" class="section-item">${section.display_name_with_default}</a>
-                <ol>
-                  <li>
-                    <a href="${subsection_url}" class="section-item">
-                      <span class="subsection-name"><span class="subsection-name-value">${subsection.display_name_with_default}</span></span>
-                    </a>
-                    ${units.enum_units(subsection, actions=False, selected=unit.location)}
-                  </li>
-                </ol>
-              </li>
-            </ol>
+            <div class="unit-tree-location">
+              <ol>
+                <li class="section">
+                  <a href="${index_url}" class="section-item section-name">
+                    <span class="section-name">${section.display_name_with_default}</span>
+                  </a>
+                  <ol>
+                    <li class="subsection">
+                      <a href="${subsection_url}" class="section-item">
+                        <span class="subsection-name"><span class="subsection-name-value">${subsection.display_name_with_default}</span></span>
+                      </a>
+                      ${units.enum_units(subsection, actions=False, selected=unit.location)}
+                    </li>
+                  </ol>
+                </li>
+              </ol>
+             </div>
           </div>
         </div>
       </div>

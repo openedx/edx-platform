@@ -55,23 +55,35 @@ define ["js/views/overview", "js/views/feedback_notification", "sinon", "js/base
                               """
 
             appendSetFixtures """
-                              <ol class="sortable-subsection-list">
-                                  <li class="courseware-subsection is-collapsible id-holder is-draggable" id="subsection-1" data-locator="subsection-1-id" data-parent="a-aprent-locator-goes-here" data-id="a-data-id-goes-here">
+                              <section>
+                                <ol class="sortable-subsection-list">
+                                  <li class="courseware-subsection is-collapsible id-holder is-draggable" id="subsection-0" data-locator="subsection-0-id" style="margin:5px">
+                                      <ol class="sortable-unit-list" id="subsection-list-0">
+                                          <li class="courseware-unit unit is-draggable" id="unit-0" data-parent="subsection-0-id" data-locator="zero-unit-id"></li>
+                                      </ol>
+                                  </li>
+                                  <li class="courseware-subsection is-collapsible id-holder is-draggable" id="subsection-1" data-locator="subsection-1-id" style="margin:5px">
                                       <ol class="sortable-unit-list" id="subsection-list-1">
                                           <li class="courseware-unit unit is-draggable" id="unit-1" data-parent="subsection-1-id" data-locator="first-unit-id"></li>
                                           <li class="courseware-unit unit is-draggable" id="unit-2" data-parent="subsection-1-id" data-locator="second-unit-id"></li>
                                           <li class="courseware-unit unit is-draggable" id="unit-3" data-parent="subsection-1-id" data-locator="third-unit-id"></li>
                                       </ol>
                                   </li>
-                                  <li class="courseware-subsection is-collapsible id-holder is-draggable" id="subsection-2" data-locator="subsection-2-id" data-parent="a-aprent-locator-goes-here" data-id="a-data-id-goes-here">
+                                  <li class="courseware-subsection is-collapsible id-holder is-draggable" id="subsection-2" data-locator="subsection-2-id" style="margin:5px">
                                       <ol class="sortable-unit-list" id="subsection-list-2">
                                         <li class="courseware-unit unit is-draggable" id="unit-4" data-parent="subsection-2" data-locator="fourth-unit-id"></li>
                                       </ol>
                                   </li>
-                                  <li class="courseware-subsection is-collapsible id-holder is-draggable" id="subsection-3" data-locator="subsection-3-id" data-parent="a-aprent-locator-goes-here" data-id="a-data-id-goes-here">
-                                      <ol class="sortable-unit-list" id="subsection-list-3">
+                                  <li class="courseware-subsection is-collapsible id-holder is-draggable" id="subsection-3" data-locator="subsection-3-id" style="margin:5px">
+                                      <ol class="sortable-unit-list" id="subsection-list-3"></ol>
                                   </li>
-                              </ol>
+                                  <li class="courseware-subsection is-collapsible id-holder is-draggable" id="subsection-4" data-locator="subsection-4-id" style="margin:5px">
+                                      <ol class="sortable-unit-list" id="subsection-list-4">
+                                          <li class="courseware-unit unit is-draggable" id="unit-5" data-parent="subsection-4-id" data-locator="fifth-unit-id"></li>
+                                      </ol>
+                                  </li>
+                                </ol>
+                              </section>
                               """
 
             spyOn(Overview, 'saveSetSectionScheduleDate').andCallThrough()
@@ -92,6 +104,13 @@ define ["js/views/overview", "js/views/feedback_notification", "sinon", "js/base
                 '.unit-drag-handle',
                 'ol.sortable-unit-list',
                 'li.courseware-subsection, article.subsection-body'
+            )
+
+            Overview.overviewDragger.makeDraggable(
+                '.courseware-subsection',
+                '.subsection-drag-handle',
+                '.sortable-subsection-list',
+                'section'
             )
 
         afterEach ->
@@ -136,24 +155,53 @@ define ["js/views/overview", "js/views/feedback_notification", "sinon", "js/base
                 expect(destination.ele).toBe($('#unit-2'))
                 expect(destination.attachMethod).toBe('before')
 
-            it "can drag and drop across section boundaries, with special handling for first element", ->
+            it "can drag and drop across section boundaries, with special handling for single sibling", ->
                 $ele = $('#unit-1')
+                $unit4 = $('#unit-4')
                 $ele.offset(
-                    top: $('#unit-4').offset().top + 8
+                    top: $unit4.offset().top + 8
                     left: $ele.offset().left
                 )
+                # Dragging down, we will insert after.
                 destination = Overview.overviewDragger.findDestination($ele, 1)
-                expect(destination.ele).toBe($('#unit-4'))
-                # Dragging down into first element, we have a fudge factor makes it easier to drag at beginning.
-                expect(destination.attachMethod).toBe('before')
-                # Now past the "fudge factor".
-                $ele.offset(
-                    top: $('#unit-4').offset().top + 12
-                    left: $ele.offset().left
-                )
-                destination = Overview.overviewDragger.findDestination($ele, 1)
-                expect(destination.ele).toBe($('#unit-4'))
+                expect(destination.ele).toBe($unit4)
                 expect(destination.attachMethod).toBe('after')
+
+                # Dragging up, we will insert before.
+                destination = Overview.overviewDragger.findDestination($ele, -1)
+                expect(destination.ele).toBe($unit4)
+                expect(destination.attachMethod).toBe('before')
+
+                # If past the end the drop target, will attach after.
+                $ele.offset(
+                    top: $unit4.offset().top + $unit4.height() + 1
+                    left: $ele.offset().left
+                )
+                destination = Overview.overviewDragger.findDestination($ele, 0)
+                expect(destination.ele).toBe($unit4)
+                expect(destination.attachMethod).toBe('after')
+
+
+                $unit0 = $('#unit-0')
+                # If before the start the drop target, will attach before.
+                $ele.offset(
+                    top: $unit0.offset().top - 16
+                    left: $ele.offset().left
+                )
+                destination = Overview.overviewDragger.findDestination($ele, 0)
+                expect(destination.ele).toBe($unit0)
+                expect(destination.attachMethod).toBe('before')
+
+            it """can drop before the first element, even if element being dragged is
+               slightly before the first element""", ->
+                $ele = $('#subsection-2')
+                $ele.offset(
+                    top: $('#subsection-0').offset().top - 5
+                    left: $ele.offset().left
+                )
+                destination = Overview.overviewDragger.findDestination($ele, -1)
+                expect(destination.ele).toBe($('#subsection-0'))
+                expect(destination.attachMethod).toBe('before')
 
             it "can drag and drop across section boundaries, with special handling for last element", ->
                 $ele = $('#unit-4')
@@ -173,6 +221,20 @@ define ["js/views/overview", "js/views/feedback_notification", "sinon", "js/base
                 destination = Overview.overviewDragger.findDestination($ele, -1)
                 expect(destination.ele).toBe($('#unit-3'))
                 expect(destination.attachMethod).toBe('before')
+
+            it """can drop past the last element, even if element being dragged is
+               slightly before/taller then the last element""", ->
+                $ele = $('#subsection-2')
+                $ele.offset(
+                    # Make the top 1 before the top of the last element in the list.
+                    # This mimics the problem when the element being dropped is taller then then
+                    # the last element in the list.
+                    top: $('#subsection-4').offset().top - 1
+                    left: $ele.offset().left
+                )
+                destination = Overview.overviewDragger.findDestination($ele, 1)
+                expect(destination.ele).toBe($('#subsection-4'))
+                expect(destination.attachMethod).toBe('after')
 
             it "can drag into an empty list", ->
                 $ele = $('#unit-1')
@@ -322,8 +384,8 @@ define ["js/views/overview", "js/views/feedback_notification", "sinon", "js/base
                 $('#subsection-1').addClass('expand-on-drop')
                 Overview.overviewDragger.onDragEnd(
                     {element: $('#subsection-1')},
-                null,
-                null
+                    null,
+                    null
                 )
                 expect($('#subsection-1')).not.toHaveClass('collapsed')
                 expect($('#subsection-1')).not.toHaveClass('expand-on-drop')
@@ -335,7 +397,7 @@ define ["js/views/overview", "js/views/feedback_notification", "sinon", "js/base
                 Overview.overviewDragger.dragState.parentList = $('#subsection-2')
                 Overview.overviewDragger.onDragEnd(
                     {element: $('#unit-1')},
-                null,
+                    null,
                     {clientX: $('#unit-1').offset().left}
                 )
                 expect($('#subsection-2')).not.toHaveClass('collapsed')
