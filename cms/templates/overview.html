@@ -90,7 +90,7 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
   </script>
 
   <script type="text/template" id="new-subsection-template">
-  <li class="collapsed">
+  <li class="collapsed courseware-subsection">
     <div class="section-item editing">
       <form class="new-subsection-form">
         <span class="subsection-name">
@@ -276,42 +276,41 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
   </div>
   <footer></footer>
 
-    <div
-      class="wrapper wrapper-dialog wrapper-dialog-edit-sectionrelease edit-section-publish-settings"
-      aria-describedby="dialog-edit-sectionrelease-description"
-      aria-labelledby="dialog-edit-sectionrelease-title"
-      aria-hidden=""
-      role="dialog">
-      <div class="dialog confirm">
-        <form class="edit-sectionrelease-dialog" action="#">
-          <div class="form-content">
+  <div
+    class="wrapper wrapper-dialog wrapper-dialog-edit-sectionrelease edit-section-publish-settings"
+    aria-describedby="dialog-edit-sectionrelease-description"
+    aria-labelledby="dialog-edit-sectionrelease-title"
+    aria-hidden=""
+    role="dialog">
+    <div class="dialog confirm">
+      <form class="edit-sectionrelease-dialog" action="#">
+        <div class="form-content">
           <h2 class="title dialog-edit-sectionrelease-title">${_("Section Release Date")}</h2>
           <p id="dialog-edit-sectionrelease-description" class="message">${_('On the date set below, this section - {name} - will be released to students. Any units marked private will only be visible to admins.').format(name='<strong class="section-name"></strong>')}</p>
-            <ul class="list-input picker datepair">
-              <li class="field field-start-date">
-                <label for="start_date">${_("Release Day")}</label>
-                <input class="start-date date" type="text" name="start_date" value="" placeholder="MM/DD/YYYY" class="date" size='15' autocomplete="off"/>
-              </li>
-              <li class="field field-start-time">
-                <label for="start_time">${_("Release Time")} (<abbr title="${_("Coordinated Universal Time")}">UTC</abbr>)</label>
-                <input class="start-time time" type="text" name="start_time" value="" placeholder="HH:MM" class="time" size='10' autocomplete="off"/>
-              </li>
-            </ul>
-          </div>
-          <div class="actions">
-            <h3 class="sr">${_("Form Actions")}</h3>
-          <ul>
-          <li class="action-item">
-            <a href="#" class="button action-primary action-save">${_("Save")}</a>
-          </li>
-          <li class="action-item">
-            <a href="#" class="button action-secondary action-cancel">${_("Cancel")}</a>
-          </li>
+          <ul class="list-input picker datepair">
+            <li class="field field-start-date">
+              <label for="start_date">${_("Release Day")}</label>
+              <input class="start-date date" type="text" name="start_date" value="" placeholder="MM/DD/YYYY" class="date" size='15' autocomplete="off"/>
+            </li>
+            <li class="field field-start-time">
+              <label for="start_time">${_("Release Time")} (<abbr title="${_("Coordinated Universal Time")}">UTC</abbr>)</label>
+              <input class="start-time time" type="text" name="start_time" value="" placeholder="HH:MM" class="time" size='10' autocomplete="off"/>
+            </li>
           </ul>
-          </div>
-        </form>
-
-      </div>
+        </div>
+        <div class="actions">
+          <h3 class="sr">${_("Form Actions")}</h3>
+          <ul>
+            <li class="action-item">
+              <a href="#" class="button action-primary action-save">${_("Save")}</a>
+            </li>
+            <li class="action-item">
+              <a href="#" class="button action-secondary action-cancel">${_("Cancel")}</a>
+            </li>
+          </ul>
+        </div>
+      </form>
+    </div>
   </div>
 
 

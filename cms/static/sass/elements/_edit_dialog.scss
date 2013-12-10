@@ -1,4 +1,4 @@
-// studio - elements - uploads
+// studio - elements - editing dialog
 // ========================
 
 body.course.feature-edit-dialog {
@@ -6,7 +6,7 @@ body.course.feature-edit-dialog {
   // dialog
   .wrapper-dialog {
     @extend %ui-depth5;
-    @include transition(all 0.05s ease-in-out);
+    @include transition(all $tmg-f2 ease-in-out);
     position: fixed;
     top: 0;
     background: $black-t2;
@@ -24,12 +24,12 @@ body.course.feature-edit-dialog {
 
     .dialog  {
       @include box-sizing(border-box);
-      box-shadow: 0px 0px 7px $shadow-d1;
-      border-radius: ($baseline/5);
-      background-color: $gray-l4;
       display: inline-block;
       vertical-align: middle;
       width: $baseline*23;
+      box-shadow: 0px 0px 7px $shadow-d1;
+      border-radius: ($baseline/5);
+      background-color: $gray-l4;
       padding: 7px;
       text-align: left;
 
@@ -72,43 +72,8 @@ body.course.feature-edit-dialog {
           @extend %t-copy-sub2;
         }
 
-          .message-status {
-            @include border-top-radius(2px);
-            @include box-sizing(border-box);
-            @include font-size(14);
-            display: none;
-            border-bottom: 2px solid $yellow;
-            margin: 0 0 20px 0;
-            padding: 10px 20px;
-            font-weight: 500;
-            background: $paleYellow;
-
-            .text {
-              display: inline-block;
-            }
-
-            &.error {
-              border-color: $red-d2;
-              background: $red-l1;
-              color: $white;
-            }
-
-            &.confirm {
-              border-color: $green-d2;
-              background: $green-l1;
-              color: $white;
-            }
-
-            &.is-shown {
-              display: block;
-            }
-          }
-
-
         .actions {
           padding: ($baseline*0.75) $baseline ($baseline/2) $baseline;
-
-
 
           .action-item {
             @extend %t-action4;
@@ -134,46 +99,31 @@ body.course.feature-edit-dialog {
               color: $blue-s2;
             }
           }
-
         }
-
       }
-
     }
-
   }
 
-  // ====================
+  // dialog set-up
+  .wrapper-dialog {
+    visibility: hidden;
+    pointer-events: none;
 
+    .dialog {
+      opacity: 0;
+    }
+  }
 
+  // dialog showing/hiding
+  &.dialog-is-shown {
 
-    // dialog set-up
-    .wrapper-dialog {
-      visibility: hidden;
-      pointer-events: none;
+    .wrapper-dialog.is-shown {
+      visibility: visible;
+      pointer-events: auto;
 
       .dialog {
-        opacity: 0;
+        opacity: 1.0;
       }
     }
-
-    // dialog showing/hiding
-    &.dialog-is-shown {
-
-      .wrapper-dialog {
-        -webkit-filter: blur(2px) grayscale(25%);
-        filter: blur(2px) grayscale(25%);
-      }
-
-      .wrapper-dialog.is-shown {
-        visibility: visible;
-        pointer-events: auto;
-
-        .dialog {
-          opacity: 1.0;
-        }
-      }
-    }
-
-
+  }
 }
