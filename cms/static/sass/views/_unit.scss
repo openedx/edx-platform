@@ -885,6 +885,14 @@ body.unit {
 // ====================
 
 // Unit Page Sidebar
+
+.sidebar {
+
+  label {
+    @extend %t-title8;
+  }
+}
+
 .unit-settings {
 
   .window-contents {
@@ -910,12 +918,14 @@ body.unit {
     }
   }
 
+
+
   input[type="radio"] {
       margin-right: 7px;
   }
 
   .status {
-    font-size: 12px;
+    @extend %t-copy-sub2;
 
     strong {
       font-weight: 700;
@@ -1025,37 +1035,93 @@ body.unit {
     font-size: 8px;
   }
 
-  .window-contents > ol {
-    @include tree-view;
+  .unit-tree-location {
+
+    .section-name {
+      @extend %t-title8;
+    }
+
+    .section-name,
+    .subsection-name,
+    .unit-name {
+      color: $gray;
+
+      &:hover {
+        color: $blue;
+      }
+    }
+
+    .subsection,
+    .courseware-unit {
+      margin-left: ($baseline);
+    }
 
     .section-item {
+      @include transition(background $tmg-avg ease-in-out 0);
       @include box-sizing(border-box);
+      @extend %t-copy-sub2;
       display: inline-block;
       width: 100%;
-      font-size: 11px;
-      padding: 2px 8px 4px;
+      background: $gray-l5;
+      padding: 6px 8px 8px 16px;
       text-overflow: ellipsis;
       white-space: nowrap;
       overflow: hidden;
+
+      &:hover {
+        background: $blue-l5;
+      }
+
+      &.editing {
+        background-color: $orange-l3;
+      }
+
+      .public-item {
+        color: $black;
+      }
+
+      .private-item {
+        color: $gray-l1;
+      }
+
+      .draft-item {
+        color: $yellow-d1;
+      }
+
+      .draft-item:after,
+      .public-item:after,
+      .private-item:after {
+        @include font-size(9);
+        margin-left: 3px;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+
+      .draft-item:after {
+        content: "- draft";
+      }
+
+      .private-item:after {
+        content: "- private";
+      }
     }
 
-    ol {
-      .section-item {
-        padding-left: $baseline;
-      }
 
-      .new-unit-item {
-        margin-left: $baseline;
-      }
-    }
 
-    ol ol {
-      .section-item {
-        padding-left: 34px;
-      }
+    .new-unit-item {
+      @extend %ui-btn-flat-outline;
+      @extend %t-action4;
+      width: 90%;
+      margin: 0 0 ($baseline/2) 0;
+      border: 1px solid $gray-l3;
+      padding: ($baseline/4) ($baseline/2);
+      font-weight: normal;
+      color: $gray-l2;
+      text-align: left;
 
-      .new-unit-item {
-        margin: 0 0 $baseline 41px;
+      &:hover {
+        box-shadow: none;
+        background-image: none;
       }
     }
   }
