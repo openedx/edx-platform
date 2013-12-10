@@ -1,60 +1,76 @@
-<span>
-    <input
-        type="hidden"
-        class="imageinput"
-        src="${src}"
-        name="input_${id}"
-        id="input_${id}"
-        value="${value}"
-    />
-
+<div class="imageinput capa_inputtype" id="inputtype_${id}">
+  <input
+    type="hidden"
+    class="imageinput"
+    src="${src}"
+    name="input_${id}"
+    id="input_${id}"
+    value="${value}"
+  />
+  <div style="position:relative;">
     <div
-        id="imageinput_${id}"
-        style="background-image: url('${src}'); width: ${width}px; height: ${height}px; position: relative; left: 0; top: 0;"
+      id="imageinput_${id}"
+      style="
+        background-image: url('${src}');
+        width: ${width}px;
+        height: ${height}px;
+        position: relative;
+        left: 0;
+        top: 0;"
     >
-        <img
-            src="${STATIC_URL}green-pointer.png"
-            id="cross_${id}"
-            style="position: absolute; top: ${gy}px; left: ${gx}px;"
-        />
+      <img
+        src="${STATIC_URL}green-pointer.png"
+        id="cross_${id}"
+        style="position: absolute; top: ${gy}px; left: ${gx}px;"
+      />
     </div>
+    <div
+      data-width="${width}"
+      data-height="${height}"
+      id="answer_${id}"
+      style="
+        position: absolute;
+        left: 0;
+        top: 0;"
+    ></div>
+  </div>
 
-    <script type="text/javascript" charset="utf-8">
-        (new ImageInput('${id}'));
-    </script>
+  <script type="text/javascript" charset="utf-8">
+    (new ImageInput('${id}'));
+  </script>
 
-    % if status == 'unsubmitted':
-        <span
-            class="unanswered"
-            style="display: inline-block;"
-            id="status_${id}"
-            aria-describedby="input_${id}"
-        >
-            <span class="sr">Status: unanswered</span>
-        </span>
-    % elif status == 'correct':
-        <span
-            class="correct"
-            id="status_${id}"
-            aria-describedby="input_${id}"
-        >
-            <span class="sr">Status: correct</span>
-        </span>
-    % elif status == 'incorrect':
-        <span
-            class="incorrect"
-            id="status_${id}"
-            aria-describedby="input_${id}"
-        >
-            <span class="sr">Status: incorrect</span>
-        </span>
-    % elif status == 'incomplete':
-        <span
-            class="incorrect"
-            id="status_${id}"
-            aria-describedby="input_${id}"
-        >
-            <span class="sr">Status: incorrect</span>
-        </span>
-    % endif
-</span>
+  % if status == 'unsubmitted':
+      <span
+        class="unanswered"
+        style="display: inline-block;"
+        id="status_${id}"
+        aria-describedby="input_${id}"
+      >
+        <span class="sr">Status: unanswered</span>
+      </span>
+  % elif status == 'correct':
+      <span
+        class="correct"
+        id="status_${id}"
+        aria-describedby="input_${id}"
+      >
+        <span class="sr">Status: correct</span>
+      </span>
+  % elif status == 'incorrect':
+      <span
+        class="incorrect"
+        id="status_${id}"
+        aria-describedby="input_${id}"
+      >
+        <span class="sr">Status: incorrect</span>
+      </span>
+  % elif status == 'incomplete':
+      <span
+        class="incorrect"
+        id="status_${id}"
+        aria-describedby="input_${id}"
+      >
+        <span class="sr">Status: incorrect</span>
+      </span>
+  % endif
+</div>
