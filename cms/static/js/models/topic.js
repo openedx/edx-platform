@@ -15,9 +15,9 @@ define(["backbone", "backbone.associations"], function(Backbone){
                 response.name = response.title;
                 delete response.title;
             }
-            if("description" in response && !("description" in response)) {
-                response.description = response.description;
-                delete response.description;
+            if("topic" in response && !("description" in response)) {
+                response.description = response.topic;
+                delete response.topic;
             }
             return response;
         },
