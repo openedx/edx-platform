@@ -9,7 +9,7 @@
  necessary as part of the build process since these .mofiles are
  needed by Django when serving the web app.
 
- The configuration file (in mitx/conf/locale/config) specifies which
+ The configuration file (in edx-platform/conf/locale/config) specifies which
  languages to generate.
 """
 

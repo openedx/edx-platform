@@ -7,7 +7,7 @@ from contentstore.utils import delete_course_and_groups
 
 
 #
-# To run from command line: rake cms:delete_course LOC=MITx/111/Foo1
+# To run from command line: rake cms:delete_course LOC=edX/111/Foo1
 #
 class Command(BaseCommand):
     help = '''Delete a MongoDB backed course'''
@@ -23,7 +23,7 @@ class Command(BaseCommand):
             commit = args[1] == 'commit'
 
         if commit:
-            print 'Actually going to delete the course from DB....'
+            print('Actually going to delete the course from DB....')
 
         if query_yes_no("Deleting course {0}. Confirm?".format(course_id), default="no"):
             if query_yes_no("Are you sure. This action cannot be undone!", default="no"):

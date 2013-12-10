@@ -20,7 +20,7 @@
 # $ ./make_dummy.py ../conf/locale/en/LC_MESSAGES/django.po
 #
 # generates output to
-#    mitx/conf/locale/eo/LC_MESSAGES/django.po
+#    edx-platform/conf/locale/eo/LC_MESSAGES/django.po
 
 import os, sys
 import polib

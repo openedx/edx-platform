@@ -4,7 +4,7 @@ sessions. Assumes structure:
 
 /envroot/
         /db   # This is where it'll write the database file
-        /mitx # The location of this repo
+        /edx-platform  # The location of this repo
         /log  # Where we're going to write log files
 """
 
@@ -221,7 +221,7 @@ STATICFILES_DIRS.append(("uploads", MEDIA_ROOT))
 
 new_staticfiles_dirs = []
 # Strip out any static files that aren't in the repository root
-# so that the tests can run with only the mitx directory checked out
+# so that the tests can run with only the edx-platform directory checked out
 for static_dir in STATICFILES_DIRS:
     # Handle both tuples and non-tuple directory definitions
     try:
