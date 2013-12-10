@@ -140,3 +140,47 @@ class SSLClientTest(TestCase):
             User.objects.get(email=self.USER_EMAIL)
         except ExternalAuthMap.DoesNotExist, ex:
             self.fail('User did not get properly added to internal users, exception was {0}'.format(str(ex)))
+
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @override_settings(FEATURES=FEATURES_WITH_SSL_AUTH_IMMEDIATE_SIGNUP)
+    def test_default_login_decorator_ssl(self):
+        """
+        Make sure that SSL login happens if it is enabled on protected
+        views instead of showing the login form.
+        """
+        response = self.client.get(reverse('dashboard'), follows=True)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse('accounts_login'), response['location'])
+
+        response = self.client.get(
+            reverse('dashboard'), follow=True,
+            SSL_CLIENT_S_DN=self.AUTH_DN.format(self.USER_NAME, self.USER_EMAIL))
+        self.assertIn(reverse('dashboard'), response['location'])
+        self.assertIn('_auth_user_id', self.client.session)
+
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @override_settings(FEATURES=FEATURES_WITH_SSL_AUTH_IMMEDIATE_SIGNUP)
+    def test_registration_page_bypass(self):
+        """
+        This tests to make sure when immediate signup is on that
+        the user doesn't get presented with the registration page.
+        """
+        response = self.client.get(
+            reverse('register_user'), follow=True,
+            SSL_CLIENT_S_DN=self.AUTH_DN.format(self.USER_NAME, self.USER_EMAIL))
+        self.assertIn(reverse('dashboard'), response['location'])
+        self.assertIn('_auth_user_id', self.client.session)
+
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+    @override_settings(FEATURES=FEATURES_WITH_SSL_AUTH_IMMEDIATE_SIGNUP)
+    def test_signin_page_bypass(self):
+        """
+        This tests to make sure when ssl authentication is on
+        that user doesn't get presented with the login page if they
+        have a certificate.
+        """
+        response = self.client.get(
+            reverse('signin_user'), follow=True,
+            SSL_CLIENT_S_DN=self.AUTH_DN.format(self.USER_NAME, self.USER_EMAIL))
+        self.assertIn(reverse('dashboard'), response['location'])
+        self.assertIn('_auth_user_id', self.client.session)

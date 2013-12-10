@@ -239,6 +239,10 @@ def signin_user(request):
     """
     This view will display the non-modal login form
     """
+    if settings.FEATURES['AUTH_USE_MIT_CERTIFICATES']:
+        # SSL login doesn't require a view, so redirect
+        # branding and allow that to process the login.
+        return redirect(reverse('root'))
     if request.user.is_authenticated():
         return redirect(reverse('dashboard'))
 
@@ -256,6 +260,10 @@ def register_user(request, extra_context=None):
     """
     if request.user.is_authenticated():
         return redirect(reverse('dashboard'))
+    if settings.FEATURES.get('AUTH_USE_MIT_CERTIFICATES_IMMEDIATE_SIGNUP'):
+        # Redirect to branding to process their certificate if SSL is enabled
+        # and registration is disabled.
+        return redirect(reverse('root'))
 
     context = {
         'course_id': request.GET.get('course_id'),
@@ -518,6 +526,10 @@ def accounts_login(request):
     """
     if settings.FEATURES.get('AUTH_USE_CAS'):
         return redirect(reverse('cas-login'))
+    if settings.FEATURES['AUTH_USE_MIT_CERTIFICATES']:
+        # SSL login doesn't require a view, so redirect
+        # to branding and allow that to process the login.
+        return redirect(reverse('root'))
     # see if the "next" parameter has been set, whether it has a course context, and if so, whether
     # there is a course-specific place to redirect
     redirect_to = request.GET.get('next')
