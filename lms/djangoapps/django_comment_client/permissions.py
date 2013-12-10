@@ -102,7 +102,6 @@ VIEW_PERMISSIONS = {
     'unfollow_commentable': ['unfollow_commentable'],
     'unfollow_user': ['unfollow_user'],
     'create_thread': ['create_thread'],
-    'update_moderator_status': ['manage_moderator'],
 }
 
 
