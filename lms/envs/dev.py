@@ -130,6 +130,8 @@ SUBDOMAIN_BRANDING = {
     'mit': 'MITx',
     'berkeley': 'BerkeleyX',
     'harvard': 'HarvardX',
+    'openedx': 'OpenedX',
+    'edge': 'Edge'
 }
 
 # List of `university` landing pages to display, even though they may not
@@ -138,6 +140,51 @@ VIRTUAL_UNIVERSITIES = []
 
 # Organization that contain other organizations
 META_UNIVERSITIES = {'UTx': ['UTAustinX']}
+
+# Configuration data to support 'microsites' that are bound - in middleware - 
+# based on incoming hostname domain
+# For local test purposes, let's define a "OpenedX" subdomain brand
+MICROSITE_CONFIGURATION = {
+    'OpenedX': {
+        # what logo file to display, note that we shouldn't check in trademarked logos
+        # into the repository, so these images will have to be deployed/managed outside of
+        # code pushes
+        'logo_image_file': 'open_edX_logo.png',          
+        # what filter to use when displaying the course catalog on the landing page     
+        'course_org_filter': 'CDX',
+        # email from field on outbound emails
+        'email_from_address': 'openedx@edx.org',
+        'payment_support_email': 'openedx@edx.org',
+        'email_templates': {
+            'allowed_enroll': ('emails/enroll_email_allowedsubject.txt', 'emails/enroll_email_allowedmessage.txt'),
+            'enrolled_enroll': ('emails/enroll_email_enrolledsubject.txt', 'emails/enroll_email_enrolledmessage.txt'),
+            'allowed_unenroll': ('emails/unenroll_email_subject.txt', 'emails/unenroll_email_allowedmessage.txt'),
+            'enrolled_unenroll': ('emails/unenroll_email_subject.txt', 'emails/unenroll_email_enrolledmessage.txt')
+        },
+        # override for ENABLE_MKTG_SITE set otherwhere in config
+        'ENABLE_MKTG_SITE':  False,
+        # setting to hide the "university partner" list on the landing page
+        'show_university_partners': False,
+        # override for USE_CUSTOM_THEME set otherwhere in config
+        'USE_CUSTOM_THEME': True,
+        # override for THEME_NAME set otherwhere in config
+        'THEME_NAME': 'openedx',
+        # These 4 following items define the template substitutions to use in the courseware pages
+        'header_extra_file': None,
+        'header_file': 'navigation.html',
+        'google_analytics_file': 'google_analytics.html',
+        'footer_file': 'openedx-footer.html',
+        # this control whether the home header (the overlay) shows on the homepage
+        # for example the overlay which says "The Future of Online Education", has the background image, as well as
+        # the top-level promo video
+        'show_home_header': False
+    },
+    'Edge': {
+        # if set will render to different template in the index page
+        # if not set, then the default index page will be rendered
+        'university_profile_template': 'university_profile/edge.html',
+    }
+}
 
 COMMENTS_SERVICE_KEY = "PUT_YOUR_API_KEY_HERE"
 

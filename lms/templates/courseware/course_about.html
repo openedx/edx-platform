@@ -11,15 +11,20 @@
       cart_link = ""
 %>
 <%namespace name='static' file='../static_content.html'/>
+<%! from microsite_configuration.middleware import MicrositeConfiguration %>
 
 <%inherit file="../main.html" />
 
 <%block name="headextra">
-  % if self.theme_enabled():
-    <%include file="../theme-google-analytics.html" />
-  % else:
-    <%include file="../google_analytics.html" />
-  % endif
+
+  <%
+    if self.theme_enabled():
+      google_analytics_file = u'../' + MicrositeConfiguration.get_microsite_configuration_value('google_analytics_file', 'theme-google-analytics.html')
+    else:
+      google_analytics_file = '../google_analytics.html'
+  %>
+
+  <%include file="${google_analytics_file}" />
 </%block>
 
 <%block name="js_extra">

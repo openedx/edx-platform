@@ -5,7 +5,15 @@
 <%inherit file="main.html" />
 <%namespace name='static' file='static_content.html'/>
 
+<%! from microsite_configuration.middleware import MicrositeConfiguration %>
+
+<%
+  show_home_header = MicrositeConfiguration.get_microsite_configuration_value('show_home_header', True)
+%>
+
+
 <section class="home">
+  % if show_home_header:
   <header>
     <div class="outer-wrapper">
       <div class="title">
@@ -51,7 +59,7 @@
 
     </div>
   </header>
-
+  % endif
   <section class="container">
     <section class="highlighted-courses">
       ## Disable university partner logos and sites for non-edX sites

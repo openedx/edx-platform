@@ -610,6 +610,7 @@ TEMPLATE_LOADERS = (
 MIDDLEWARE_CLASSES = (
     'request_cache.middleware.RequestCache',
     'django_comment_client.middleware.AjaxExceptionMiddleware',
+    'microsite_configuration.middleware.MicrositeConfiguration',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
 
