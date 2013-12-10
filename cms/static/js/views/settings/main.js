@@ -36,16 +36,8 @@ var DetailsView = ValidatingView.extend({
 
         this.$el.find('#timezone').html("(" + tzAbbr() + ")");
 
-        this.listenTo(this.model, 'invalid', this.handleValidationError);
-        this.listenTo(this.model, 'change', this.showNotificationBar);
-        this.selectorToField = _.invert(this.fieldToSelectorMap);
-        tinymce.init({
-            selector: "textarea#course-overview",
-            setup: function(editor){
-                editor.on("change", function(e){
-                    console.log("eventchange fired", e);
-                });
-            },
+        // Editor tinymce
+        this.editor = new tinymce.Editor('course-overview', {
             language: "es",
             plugins: ["table"],
             menu: {
@@ -58,21 +50,29 @@ var DetailsView = ValidatingView.extend({
                 tools: {title: 'Tools', items: 'inserttable'} 
             },
             toolbar1: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | table",
-        });
-    },
+        }, tinymce.EditorManager);
 
-    changeOverview: function(editor){
-        console.log("editor changed: ");
+        this.listenTo(this.model, 'invalid', this.handleValidationError);
+        this.listenTo(this.model, 'change', this.showNotificationBar);
+        this.selectorToField = _.invert(this.fieldToSelectorMap);
     },
 
     render: function() {
+        var cachethis = this;
         this.setupDatePicker('start_date');
         this.setupDatePicker('end_date');
         this.setupDatePicker('enrollment_start');
         this.setupDatePicker('enrollment_end');
+        this.editor.render();
+        //this code can be moved out to funct
+        this.editor.on('change', function(e){
+            var newVal = tinymce.activeEditor.getContent();
+            if (cachethis.model.get('overview') != newVal){
+                cachethis.setAndValidate('overview', newVal);
+            }
+        });
         this.$el.find('#' + this.fieldToSelectorMap['overview']).val(this.model.get('overview'));
-//        this.codeMirrorize(null, $('#course-overview')[0]);
-
+//        this.codeMirrorize(null, $('#course-overview')[0]); #replaced by tinymce
         this.$el.find('.current-course-introduction-video iframe').attr('src', this.model.videosourceSample());
         this.$el.find('#' + this.fieldToSelectorMap['intro_video']).val(this.model.get('intro_video') || '');
         if (this.model.has('intro_video')) {
