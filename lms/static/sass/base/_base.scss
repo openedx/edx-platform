@@ -305,3 +305,16 @@ mark {
     height: auto;
   }
 }
+
+// ui - messages
+.ui-msg-warning {
+  @extend %x-ui-msg-warning;
+}
+
+.ui-msg-confirm {
+  @extend %x-ui-msg-confirm;
+}
+
+.ui-msg-error {
+  @extend %x-ui-msg-confirm;
+}
