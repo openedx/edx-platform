@@ -151,8 +151,7 @@ symbolic expressions.
 When you create a math expression input problem for your students in
 Studio, you'll use `MathJax <http://www.mathjax.org>`_ to change your
 plain text into "beautiful math." For more information about how to use
-MathJax in Studio, see *A Brief Introduction to MathJax in
-Studio*.
+MathJax in Studio, see :ref:`MathJax in Studio`.
 
 .. image:: Images/MathExpressionInputExample.gif
 
