@@ -2,7 +2,7 @@ Grades can be pushed to a remote gradebook, and course enrollment membership can
 
 1. Definitions
 
-An "xserver" is a web-based server that is part of the MITx eco system.  There are a number of "xserver" programs, including one which does python code grading, an xqueue server, and graders for other coding languages.
+An "xserver" is a web-based server that is part of the edX ecosystem.  There are a number of "xserver" programs, including one which does python code grading, an xqueue server, and graders for other coding languages.
 
 "Stellar" is the MIT on-campus gradebook system.
 
@@ -14,10 +14,10 @@ The remote gradebook xserver should be specified in the lms.envs configuration u
 
 Each course, in addition, should define the name of the gradebook being used.  A class "section" may also be specified.  This goes in the policy.json file, eg:
 
-    "remote_gradebook": {                                                                                                          
-       "name" : "STELLAR:/project/mitxdemosite",                                                                                  
-       "section" : "r01"                                                                                                          
-        },     
+    "remote_gradebook": {
+       "name" : "STELLAR:/project/edxdemosite",
+       "section" : "r01"
+        },
 
 3. The API for the remote gradebook xserver is an almost RESTful service model, which only employs POSTs, to the xserver url, with form data for the fields:
 

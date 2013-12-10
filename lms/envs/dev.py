@@ -4,7 +4,7 @@ sessions. Assumes structure:
 
 /envroot/
         /db   # This is where it'll write the database file
-        /mitx # The location of this repo
+        /edx-platform  # The location of this repo
         /log  # Where we're going to write log files
 """
 
@@ -158,9 +158,9 @@ if os.path.isdir(DATA_DIR):
     ]
 
 
-################################# mitx revision string  #####################
+################################# edx-platform revision string  #####################
 
-MITX_VERSION_STRING = os.popen('cd %s; git describe' % REPO_ROOT).read().strip()
+EDX_PLATFORM_VERSION_STRING = os.popen('cd %s; git describe' % REPO_ROOT).read().strip()
 
 ############################ Open ended grading config  #####################
 
