@@ -21,13 +21,20 @@ def run_tests(system, report_dir, test_id=nil, stop_on_failure=true)
     # If no test id is provided, we need to limit the test runner
     # to the Djangoapps we want to test.  Otherwise, it will
     # run tests on all installed packages.
+
+    default_test_id = "#{system}/djangoapps common/djangoapps"
+
+    if system == :lms
+        default_test_id += " #{system}/lib"
+    end
+
     if test_id.nil?
-        test_id = "#{system}/djangoapps common/djangoapps"
+        test_id = default_test_id
 
     # Handle "--failed" as a special case: we want to re-run only
     # the tests that failed within our Django apps
     elsif test_id == '--failed'
-        test_id = "#{system}/djangoapps common/djangoapps --failed"
+        test_id = "#{default_test_id} --failed"
     end
 
     cmd = django_admin(system, :test, 'test', test_id)
