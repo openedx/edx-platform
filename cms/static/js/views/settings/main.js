@@ -41,9 +41,15 @@ var DetailsView = ValidatingView.extend({
         this.selectorToField = _.invert(this.fieldToSelectorMap);
         tinymce.init({
             selector: "textarea#course-overview",
+            setup: function(editor){
+                editor.on("change", function(e){
+                    console.log("eventchange fired", e);
+                });
+            },
             language: "es",
             plugins: ["table"],
-            menu: { 
+            menu: {
+                file: {title: 'File', items: 'save'},
                 edit: {title: 'Edit', items: 'undo redo | cut copy paste | selectall'}, 
                 insert: {title: 'Insert', items: '|'}, 
                 view: {title: 'View', items: 'visualaid'}, 
@@ -55,12 +61,15 @@ var DetailsView = ValidatingView.extend({
         });
     },
 
+    changeOverview: function(editor){
+        console.log("editor changed: ");
+    },
+
     render: function() {
         this.setupDatePicker('start_date');
         this.setupDatePicker('end_date');
         this.setupDatePicker('enrollment_start');
         this.setupDatePicker('enrollment_end');
-
         this.$el.find('#' + this.fieldToSelectorMap['overview']).val(this.model.get('overview'));
 //        this.codeMirrorize(null, $('#course-overview')[0]);
 
