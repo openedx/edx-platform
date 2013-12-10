@@ -238,6 +238,9 @@ class SSLClientTest(TestCase):
         dec_mock = external_auth.views.ssl_login_shortcut(self.mock)
         request = self._create_normal_request(self.MOCK_URL)
         request.user = AnonymousUser()
+        # Call decorated mock function to make sure it passes
+        # the call through without hitting the external_auth functions and
+        # thereby creating an external auth map object.
         dec_mock(request)
         self.assertTrue(self.mock.called)
         self.assertEqual(0, len(ExternalAuthMap.objects.all()))
