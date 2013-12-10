@@ -11,6 +11,7 @@ from django.core.urlresolvers import reverse
 from django.core.mail import send_mail
 
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
+from student.microsites import get_microsite_config
 from courseware.models import StudentModule
 from edxmako.shortcuts import render_to_string
 
@@ -202,7 +203,7 @@ def get_email_params(course, auto_enroll):
     return email_params
 
 
-def send_mail_to_student(student, param_dict):
+def send_mail_to_student(student, param_dict, microsite=None):
     """
     Construct the email using templates and then send it.
     `student` is the student's email address (a `str`),
@@ -222,23 +223,41 @@ def send_mail_to_student(student, param_dict):
 
     Returns a boolean indicating whether the email was sent successfully.
     """
+    microsite = microsite or {}
+
+    # add some helpers and microconfig subsitutions
+    if 'course' in param_dict:
+        param_dict['course_name'] = param_dict['course'].display_name_with_default
+
+    param_dict['site_name'] = microsite.get("SITE_NAME", param_dict['site_name'])
+
+    subject = None
+    message = None
+
+    # see if we are running in a microsite and that there is an
+    # activation email template definition available as configuration, if so, then render that
+    message_type = param_dict['message']
 
     email_template_dict = {'allowed_enroll': ('emails/enroll_email_allowedsubject.txt', 'emails/enroll_email_allowedmessage.txt'),
-                           'enrolled_enroll': ('emails/enroll_email_enrolledsubject.txt', 'emails/enroll_email_enrolledmessage.txt'),
-                           'allowed_unenroll': ('emails/unenroll_email_subject.txt', 'emails/unenroll_email_allowedmessage.txt'),
-                           'enrolled_unenroll': ('emails/unenroll_email_subject.txt', 'emails/unenroll_email_enrolledmessage.txt')}
+       'enrolled_enroll': ('emails/enroll_email_enrolledsubject.txt', 'emails/enroll_email_enrolledmessage.txt'),
+       'allowed_unenroll': ('emails/unenroll_email_subject.txt', 'emails/unenroll_email_allowedmessage.txt'),
+       'enrolled_unenroll': ('emails/unenroll_email_subject.txt', 'emails/unenroll_email_enrolledmessage.txt')
+    }
 
-    subject_template, message_template = email_template_dict.get(param_dict['message'], (None, None))
+    subject_template, message_template = email_template_dict.get(message_type, (None, None))
     if subject_template is not None and message_template is not None:
         subject = render_to_string(subject_template, param_dict)
         message = render_to_string(message_template, param_dict)
 
+    if subject and message:
         # Remove leading and trailing whitespace from body
         message = message.strip()
 
         # Email subject *must not* contain newlines
         subject = ''.join(subject.splitlines())
-        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [student], fail_silently=False)
+        from_address = microsite.get("email_from_address", settings.DEFAULT_FROM_EMAIL)
+
+        send_mail(subject, message, from_address, [student], fail_silently=False)
 
 
 def uses_shib(course):

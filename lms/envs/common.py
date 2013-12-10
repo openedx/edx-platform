@@ -25,6 +25,7 @@ Longer TODO:
 
 import sys
 import os
+import json
 
 from path import path
 
@@ -377,7 +378,6 @@ TRACKING_ENABLED = True
 ######################## subdomain specific settings ###########################
 COURSE_LISTINGS = {}
 SUBDOMAIN_BRANDING = {}
-
 
 ############################### XModule Store ##################################
 MODULESTORE = {

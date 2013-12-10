@@ -9,6 +9,7 @@ settings.INSTALLED_APPS  # pylint: disable=W0104
 
 from django_startup import autostartup
 from xmodule.modulestore.django import modulestore
+import edxmako
 
 
 def run():
@@ -25,6 +26,8 @@ def run():
 
     if settings.FEATURES.get('USE_CUSTOM_THEME', False):
         enable_theme()
+    if settings.FEATURES.get('MICROSITES', False):
+        enable_microsites()
 
 
 def enable_theme():
@@ -56,3 +59,22 @@ def enable_theme():
     settings.STATICFILES_DIRS.append(
         (u'themes/{}'.format(settings.THEME_NAME), theme_root / 'static')
     )
+
+
+def enable_microsites():
+    assert settings.FEATURES["MICROSITES"]
+    # add the microsite directory to the staticfiles directory
+    msdir = settings.ENV_ROOT / "microsites"
+    settings.STATICFILES_DIRS.append(msdir)
+    settings.MAKO_TEMPLATES['main'].append(msdir)
+    edxmako.lookup['main'].directories.append(msdir)
+    settings.TEMPLATE_CONTEXT_PROCESSORS += (
+        "student.context_processors.microsite_processor",
+    )
+
+    for subdomain, config in settings.MICROSITES.items():
+        dirname = config.get("directory", subdomain)
+        subdir = settings.ENV_ROOT / "microsites" / dirname
+        if not subdir.isdir():
+            raise RuntimeError("Microsite {name} does not have directory {dir}".format(
+                name=subdomain, dir=subdir))
