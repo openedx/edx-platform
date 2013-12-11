@@ -6,8 +6,10 @@ Working with LTI Components
 Overview
 ---------
 
-You may have a digital copy of your textbook that uses a format other than PDF. If so, you
-can add that textbook to Studio by using a Learning Tools Interoperability (LTI) XModule (**SP: OK 
+You may have discovered or developed an external learning application that you want to add
+to your online course. Or, you may have a digital copy of your textbook that uses 
+a format other than PDF. You can add external learning applications or
+textbooks to Studio by using a Learning Tools Interoperability (LTI) XModule (**SP: OK 
 to say "component" instead of "XModule"? Our docs haven't talked about 
 XModules yet, so users may not know what they are.**).
 The LTI XModule is based on the 
@@ -16,8 +18,10 @@ version 1.1.1 specifications.
 
 You can use an LTI component in two ways.
 
-- You can show external LTI content. This content is displayed only.
-- You can show LTI content that will be graded by an external provider.
+- You can add external LTI content that is displayed only, such as textbook
+  content that doesn't require a student response.
+- You can add external LTI content that requires a student response. An 
+  external provider will grade student responses.
 
 Before you create an LTI component from an external LTI provider in a unit, you must
 have the following information so that you can register that provider.
@@ -27,20 +31,18 @@ have the following information so that you can register that provider.
   Does it have to be a certain length?**)
   
   The LTI ID can contain uppercase and lowercase alphanumeric characters, 
-  as well as underscore characters (_). For example, your LTI ID may be (**SP: Need
-  example**). 
+  as well as underscore characters (_). For example, your LTI ID may be (**SP: Can
+  you provide an example LTI ID?**). 
 
 - The **client key**. This value is a string that is used for OAuth authentication. 
-  You can obtain this value from the external LTI provider. (**SP: What is OAuth
-  authentication? Do end users need to know what it is, or can we just say "that
-  Studio uses to verify that the LTI provider is safe" [or similar]? Does the key have to
+  You can obtain this value from the external LTI provider. (**SP: Does the key have to
   have a specific number of characters? Are all types of characters allowed?**) For 
-  example, your client key may be (**SP: Need example**).
+  example, your client key may be (**SP: Can you provide an example?**).
 
 - The **client secret**. This value is a string that is used for OAuth authentication. 
-  You can obtain this value from the external LTI provider. (**Does the key have to
+  You can obtain this value from the external LTI provider. (SP: **Does the secret have to
   have a specific number of characters? Are all types of characters allowed?** For 
-  example, your client key may be (**SP: Need example**).
+  example, your client key may be (**SP: Can you provide an example?**).
 
 
 Create an LTI Component
@@ -52,8 +54,8 @@ Creating an LTI component in your course has three steps.
 #. Register the LTI provider.
 #. Create the LTI component in an individual unit.
 
-Add LTI to the Advanced Modules Policy Key
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Step 1. Add LTI to the Advanced Modules Policy Key
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #. On the **Settings** menu, click **Advanced Settings**.
 
 #. On the **Advanced Settings** page, locate the **Manual Policy
@@ -68,23 +70,22 @@ Add LTI to the Advanced Modules Policy Key
    
    .. image:: Images/LTI_Policy_Key.gif
 
-   **Note** *If the **Policy Value** field already contains text, place your cursor directly after the
+   **Note** If the **Policy Value** field already contains text, place your cursor directly after the
    closing quotation mark for the final item, and then enter a comma followed by **"lti"** (make sure that you 
-   include the quotation marks).*
+   include the quotation marks).
 
 #. At the bottom of the page, click **Save Changes**.
 
    The page refreshes automatically. At the top of the page, you see a
    notification that your changes have been saved.
 
-Register the External LTI Provider
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Step 2. Register the External LTI Provider
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To regiser the external LTI provider, you'll add the LIT ID, the client key, and 
 the client secret in the **lti_passports** policy key.
 
-#. On the **Advanced Settings** page, locate the **lti_passports**
-   policy key.
+#. On the **Advanced Settings** page, locate the **lti_passports** policy key.
 
 #. Under **Policy Value**, place your cursor between the brackets, and
    then enter the LTI ID, client key, and client secret in the following format. 
@@ -93,7 +94,7 @@ the client secret in the **lti_passports** policy key.
    
    For example, the value in the lti_passports field may be the following.
    
-   "(**SP: Need an example.**)"
+   "(**SP: Can you provide an example?**)"
    
    If you have multiple LTI providers, separate the values with a comma.
 
@@ -108,63 +109,83 @@ the client secret in the **lti_passports** policy key.
    The page refreshes automatically. At the top of the page, you see a
    notification that your changes have been saved.
 
-Add the LTI Component to a Unit
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Step 3. Add the LTI Component to a Unit
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 #. In the unit where you want to create the problem, click **Advanced**
    under **Add New Component**.
 #. In the list of problem types, click **LTI**.
 #. In the component that appears, click **Edit**.
-#. In the component editor, set the options that you want.
+#. In the component editor, set the options that you want. See the table below
+   for a description of each option.
 #. Click **Save**.
 
-(**SP: It would be great to clean up the text of the UI for this component. I'm happy
-to suggest text.**)
 
-.. list-table::
-   :widths: 10 80
-   :header-rows: 1
+  .. list-table::
+     :widths: 10 80
+     :header-rows: 1
 
-* - **Display Name**
-  - Specifies the name of the problem.
-
-* - **custom_parameters** [string] 
-  - With the "+ Add" button, multiple custom parameters can be
-    added. Basically, each individual external LTI provider can have a separate
-    format custom parameters. For example::
-
-        key=value
+     * - `Setting`
+       - Description     
+     * - `Display Name`
+       - Specifies the name of the problem. This name appears above the problem and in 
+         the course ribbon at the top of the page in the courseware.       
+     * - `custom_parameters` [string] 
+       - Enables you to add one or more custom parameters. Basically, 
+         each individual external LTI provider can have a separate format custom 
+         parameters. For example:       
+         key=value                
+         To add a custom parameter, click **Add**.                     
+     * - `graded` 
+       - Indicates whether the grade for the problem counts towards student's total grade. By
+         default, this value is set to **False**.        
+     * - `has_score`
+       - Specifies whether the problem has a numerical score. By default, this value 
+         is set to **False**. (**SP: Is this accurate?**)        
+     * - `launch_url`
+       - Lists the URL that Studio sends to the external LTI provider so that the provider
+         can send back students' grades. This setting is only used if **graded** is set to 
+         **True**. (**SP: Is this accurate? How does the user find the launch URL?**)        
+     * - `lti_id` 
+       - Specifies the LTI ID for the external LTI provider. This value must be the same 
+         LTI ID that you entered on the **Advanced Settings** page.        
+     * - `open_in_a_new_page` 
+       - Indicates whether the problem opens in a new page. If you set this value to **True**, 
+         the student clicks a link that opens the LTI content in a new window. If you set
+         this value to **False**, the LTI content opens in an IFrame in the current page.        
+     * - `weight` [float]
+       - If the problem will be graded by an external LTI provider, 
+         the raw grade will be in the range [0.0, 1.0]. In order to change this range, 
+         set the `weight`. The grade that will be stored is calculated by the formula:        
+         stored_grade = raw_grade * weight        
+            
+.. note:: **SP: I'm not clear on what a custom parameter would be used for. Based on
+          the Studio UI, I'm guessing that one example would be the location of an
+          e-book, but I'm not sure what "vbid" would be. What else can custom parameters
+          be used for? Can we provide a specific example?**  
+                   
+          **The following is an attempt at text for this description. Can you let
+          me know if it's accurate?**     
+                 
+          Enables you to add one or more custom parameters. For
+          example, a custom parameter may include the location (**SP: Would it be
+          correct to say "URL" instead of "location"?**) of your e-book. 
+                             
+          Every custom parameter has a key and a value. You must add the key and
+          value in the following format.  
+                            
+          key=value
         
-    (**SP: I'm not clear on what these are. What would a custom parameter be used for? 
-    Can we provide a specific example?**)
+          For example, a custom parameter that specifies the location of your e-book may 
+          resemble the following.
+        
+          **(SP: Can you provide a specific example of a custom parameter?)** 
 
-* - **graded** 
-  - Indicates whether the grade for the problem counts towards student's total grade. By
-    default, this value is set to **False**.
 
-* - **has_score**
-  - Specifies whether the problem has a numerical score. By default, this value 
-    is set to **False**.
-
-* - **launch_url**
-  - Lists the URL that Studio sends to the external LTI provider so that the provider
-    can send back students' grades. This setting is only used if **graded** is set to 
-    **True**.
-
-* - **lti_id** 
-  - Specifies the LTI ID for the external LTI provider. This value must be one of the
-    LTI IDs that you entered on the **Advanced Settings** page.
-
-* - **open_in_a_new_page** [boolean]
-  - Indicates whether the problem opens in a new page. If you set this value to True, 
-    the student clicks a link that opens the LTI content in a new window. If you set
-    this value to False, the LTI content opens in an IFrame in the current page.
-
-* - **weight** [float]
-  - If the problem will be graded by an external LTI provider,
-    the raw grade will be in the range [0.0, 1.0]. In order to change this range,
-    set the `weight`. The grade that will be stored is calculated by the formula:
-
-        stored_grade = raw_grade * weight
-
-    (**SP: Raw grade means points earned?**)
+.. note:: **SP: Would it be correct to say the following?**
+            
+          Specifies the number of points possible for the problem. By default, if
+          an external LTI provider grades the problem, the problem is worth 1 point,
+          and a student's score can be 0 or 1. 
+        
+          For more information about problem weights and computing point scores, see :ref:`Problem Weight`.
