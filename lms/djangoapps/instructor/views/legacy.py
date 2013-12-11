@@ -597,7 +597,7 @@ def instructor_dashboard(request, course_id):
 
     elif 'List beta testers' in action:
         role = CourseBetaTesterRole(course.location)
-        datatable = _role_members_table(role, _("List of Beta Testers"), course_id)
+        datatable = _role_members_table(role, _u("List of Beta Testers"), course_id)
         track.views.server_track(request, "list-beta-testers", {}, page="idashboard")
 
     elif action == 'Add beta testers':
