@@ -29,6 +29,7 @@ This chapter describes how to create and set up your course:
 Also see the chapters :ref:`Establish a Grading Policy`, :ref:`Organizing Your Course Content`, and :ref:`Guidelines for Creating Accessible Content`.
 
 
+
 .. _Create a New Course:
   
 *******************

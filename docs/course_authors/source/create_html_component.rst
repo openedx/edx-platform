@@ -23,6 +23,8 @@ See the following topics:
 
 .. note:: Ensure you understand the chapter :ref:`Organizing Your Course Content` before working with HTML components.
 
+.. note:: Review :ref:`Best Practices for HTML Markup` before adding HTML components to your course.
+
 
 .. _Create an HTML Component:
 
@@ -227,6 +229,8 @@ You can add an any image that you have uploaded for the course to an HTML compon
 Find any copy the URL of the image in the Files & Uploads page.
 
 See :ref:`Add Files to a Course` for more information.
+
+.. note::  Review :ref:`Best Practices for Describing Images` when adding images to HTML components.
 
 While editing the HTML component:
 

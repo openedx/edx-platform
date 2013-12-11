@@ -1,4 +1,4 @@
-.. _Guidelines for Creating Accessible Content
+.. _Guidelines for Creating Accessible Content:
 
 ###################################################
 Guidelines for Creating Accessible Content
@@ -178,7 +178,7 @@ This early step helps minimize issues that may be difficult or impossible to add
   Don’t add unnecessary indents, rules, columns, blank lines, and typographic variation. The simpler the formatting, the easier it will be to make an accessible PDF document.
 
 * Use styles for formatting your text, such as Normal, Heading 1, and Heading 2, rather than manually formatting text using bold and indents. 
-  Add alternative text to images (see “:ref:`Best Practices for Describing Images`) using Word’s picture formatting options.
+  Add alternative text to images (see :ref:`Best Practices for Describing Images`) using Word’s picture formatting options.
 
 **Preparing PowerPoint documents**
 
@@ -287,9 +287,9 @@ The following are best practices for making information graphics accessible to v
 * Provide a text alternative that describes the information in the graphic. For charts and graphs, a text alternative could be a table displaying the same data. 
   See :ref:`Best Practices for Describing Images` for details about providing text alternatives for images.
 
-++++++++++++++++++++++++++++++++++++++++++++
++++++++++++++++++++++++++++++++++++++++++++
 Math content
-++++++++++++++++++++++++++++++++++++++++++++
++++++++++++++++++++++++++++++++++++++++++++
 
 Math in online courses has been challenging to deliver in a way that is accessible to people with vision impairments. 
 Instructors frequently create images of equations rather than including text equations. 
@@ -297,7 +297,7 @@ Math images cannot be modified by people who need a high-contrast display and ca
 EdX uses MathJax to render math content in a format that is clear, readable, and accessible to people who use screen readers. 
 MathJax works together with math notation, like LaTeX and MathML, to render mathematical equations as text instead of images. 
 We recommend that you use MathJax to display your math content. 
-You can learn more about using MathJax in the edX101 course, the Studio support documentation and in the MathJax documentation on accessibility (see the link in “Resources” below). 
+You can learn more about using MathJax in the MathJax documentation on accessibility (see the link in “Resources” below). 
 We will update these guidelines as improvements to MathJax are developed.
 
 ++++++++++++++++++++++++++++++++++++++++++++
@@ -360,9 +360,9 @@ Third-party content
 When including links to third-party content in your course, be mindful as to the accessibility of such third party resources, 
 which may not be readily accessible to learners with disabilities. We recommend that you test any links prior to sharing them with users.
 
-You can use the eReader tool or the “Files and Uploads” option in edX Studio to incorporate third-party textbooks and other 
+You can use the eReader tool or :ref:`Add Files to a Course` to incorporate third-party textbooks and other 
 publications in PDF format into your course. You can also incorporate such materials into your course in HTML format. 
-See “Best Practices for Accessible PDFs,” above, for guidance on working with third- party supplied PDFs, and “Best Practices for HTML Markup,” below, 
+See :ref:`Best Practices for Accessible PDFs` for guidance on working with third- party supplied PDFs, and :ref:`Best Practices for HTML Markup` 
 for guidance on creating accessible HTML.
 
 
@@ -382,7 +382,7 @@ for guidance on creating accessible HTML.
   http://www.cehd.umn.edu/nceo/onlinepubs/Synthesis40.html
 
 * MathJax provides guidance on creating accessible pages with the display engine: 
-  http://www.mathjax.org/resources/articles-and-presentations/accessible- pages-with-mathjax/
+  http://www.mathjax.org/resources/articles-and-presentations/accessible-pages-with-mathjax/
 
 .. _Best Practices for Describing Images:
 
@@ -413,36 +413,21 @@ Use the following guidelines when you include images in your course:
 
   * Images that don’t provide information don’t need text descriptions. For example, a PDF icon that is followed by link text reading “Course Syllabus (PDF)” does not need a description. Another example is a banner graphic whose function is purely aesthetic.
   
-* Include the short description in the alt attribute of the HTML image element, as follows (see “Getting Started with Studio” or the “Add an Image to a Unit” in the edX101 training course for more information about adding images):
+* Include the short description in the alt attribute of the HTML image element, as follows (see :ref:`Add an Image to an HTML Component` for more information about adding images):
 
-  ::
+  ``<img src="image.jpg" alt="Photo of Ponte Vecchio">``
 
-    <img src="image.jpg" alt="Photo of Ponte Vecchio">
+* Include an empty alt attribute for non-informative images. When image elements do not include an alt attribute, screen reader software may skip the image, announce the image filename, or, in the case of a linked image, announce the link URL. An empty alt attribute tells screen reader software to skip the image.
 
-* Include an empty alt attribute for non-informative images. When image elements do not include an alt attribute, 
-  screen reader software may skip the image, announce the image filename, or, in the case of a linked image, 
-  announce the link URL. An empty alt attribute tells screen reader software to skip the image.
-
-  ::
- ￼
-    <img src="image.jpg" alt="">
-
-* Consider using a caption to display long descriptions so that the information is available to all users. 
-  In the following example, the image element includes the short description as the alt attribute and the paragraph element includes the long description.
+  ``<img src="image.jpg" alt="">``
   
-  ::
-
-￼
-    <img src="image.jpg" alt="Photo of Ponte Vecchio"><p>Photo of Ponte Vecchio showing its three stone arches and the Arno river</p>
-￼
-￼
+* Consider using a caption to display long descriptions so that the information is available to all users. In the following example, the image element includes the short description as the alt attribute and the paragraph element includes the long description.
   
-* Alternatively, provide long descriptions by creating an additional unit or downloadable file that contains the descriptive text and 
-  providing a link to the unit or file below the image.
+  ``<img src="image.jpg" alt="Photo of Ponte Vecchio"><p>Photo of Ponte Vecchio showing its three stone arches and the Arno river</p>``
+    
+* Alternatively, provide long descriptions by creating an additional unit or downloadable file that contains the descriptive text and providing a link to the unit or file below the image.
   
-  ::
-
-     <img src="image.jpg" alt="Diagram of Ponte Vecchio"> <p><a href="description.html">Description of Ponte Vecchio Diagram</a></p>
+  ``<img src="image.jpg" alt="Diagram of Ponte Vecchio"> <p><a href="description.html">Description of Ponte Vecchio Diagram</a></p>``
 
 **Resources**
 
@@ -482,7 +467,7 @@ There are many companies that will create timed video transcripts (i.e., transcr
 
 The edX platform supports the use of transcripts in .srt format. 
 When you integrate a video file into the platform, you should also upload the .srt file of the timed transcript for such video. 
-Consult the edX Studio support guides for details on how to add timed transcripts.
+See :ref:`Working with Video Components` for details on how to add timed transcripts.
 
 
 ++++++++++++++++++++++++++++++++++++++++++++
@@ -501,7 +486,8 @@ For both audio and video transcripts, consider including a text file that studen
 The downloadable transcript should be text only, without time codes.
 
 **Resources**
-• Accessible Digital Media Guidelines provides detailed advice on creating online video and audio with accessibility in mind: 
+
+* Accessible Digital Media Guidelines provides detailed advice on creating online video and audio with accessibility in mind: 
   http://ncam.wgbh.org/invent_build/web_multimedia/accessible-digital-media-guide
 
 
@@ -520,7 +506,7 @@ Depending on the type of component you are adding to your course in edX Studio, 
 
 Keep the following guidelines in mind when you create HTML content:
 
-* Use HTML to describe your content’s *meaning* rather than its a*ppearance*. A phrase marked as a level 1 heading (<h1>) clearly indicates the topic of the page, 
+* Use HTML to describe your content’s *meaning* rather than its *appearance*. A phrase marked as a level 1 heading (<h1>) clearly indicates the topic of the page, 
   while a phrase marked as bold text (<bold> or <strong>) may be a heading or may just be text that the instructor wants to emphasize. 
   A group of items marked up as a list are related in the code, without relying on visual cues such as bullets and indents. 
   Coding meaning into content is particularly useful for students using screen readers, which, for example, can read through headings or announce the number of items in a list.

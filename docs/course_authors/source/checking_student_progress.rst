@@ -12,6 +12,7 @@ students during the run of the course and what you will need to do at the
 end of the course to give out grades.
  
 .. _A Student's View:
+
 ******************************
 A Student's View
 ******************************

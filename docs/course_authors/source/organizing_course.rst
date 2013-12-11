@@ -23,6 +23,7 @@ A common course model is for Sections to correspond to weeks, and for Subsection
 
 .. note::  We recommend that you review :ref:`Guidelines for Creating Accessible Content` before developing content for your course.
 
+
 ==================
 The Course Outline
 ==================
