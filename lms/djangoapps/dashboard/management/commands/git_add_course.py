@@ -40,9 +40,8 @@ def add_repo(repo, rdir_in):
     # Allow overrides
     if hasattr(settings, 'MONGODB_LOG'):
         for config_item in ['host', 'user', 'password', 'db', ]:
-            if hasattr(settings.MONGODB_LOG, config_item):
-                mongo_db[config_item] = settings.MONGODB_LOG.get(
-                    config_item, mongo_db[config_item])
+            mongo_db[config_item] = settings.MONGODB_LOG.get(
+                config_item, mongo_db[config_item])
 
     if not os.path.isdir(GIT_REPO_DIR):
         log.critical(_("Path {0} doesn't exist, please create it, "
@@ -119,8 +118,8 @@ def add_repo(repo, rdir_in):
     except CommandError:
         log.exception(_('Unable to run import command.'))
         return -1
-    except NotImplementedError, ex:
-        log.critical(_('The underlying module store does not support import.'))
+    except NotImplementedError:
+        log.exception(_('The underlying module store does not support import.'))
         return -1
 
     ret_import = output.getvalue()
@@ -148,7 +147,7 @@ def add_repo(repo, rdir_in):
 
         if os.path.exists(cdir) and not os.path.islink(cdir):
             log.debug(_('   -> exists, but is not symlink'))
-            log.debug(subprocess.check_output(['ls', 'l', ],
+            log.debug(subprocess.check_output(['ls', '-l', ],
                                               cwd=os.path.abspath(cdir)))
             try:
                 os.rmdir(os.path.abspath(cdir))
@@ -165,9 +164,7 @@ def add_repo(repo, rdir_in):
                                               cwd=os.path.abspath(cdir)))
 
     # store import-command-run output in mongo
-    mongouri = 'mongodb://{0}:{1}@{2}/{3}'.format(
-        mongo_db['user'], mongo_db['password'],
-        mongo_db['host'], mongo_db['db'])
+    mongouri = 'mongodb://{user}:{password}@{host}/{db}'.format(**mongo_db)
 
     try:
         if mongo_db['user'] and mongo_db['password']:
