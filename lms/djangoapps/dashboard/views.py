@@ -24,6 +24,7 @@ def SQL_query_to_list(cursor, query_string):
     raw_result=dictfetchall(cursor)
     return raw_result
 
+# TODO exciting things!
 def dashboard(request):
     """
     Slightly less hackish hack to show staff enrollment numbers and other
