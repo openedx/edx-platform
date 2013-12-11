@@ -47,8 +47,8 @@ import csv
 from bulk_email.models import CourseEmail
 
 from .extensions import (
-    dump_due_date_extensions_for_student,
-    dump_students_with_due_date_extensions,
+    dump_student_extensions,
+    dump_module_extensions,
     set_due_date_extension)
 
 log = logging.getLogger(__name__)
@@ -998,19 +998,18 @@ def proxy_legacy_analytics(request, course_id):
         )
 
 
-def parse_datetime(s):
+def parse_datetime(timestamp):
     """
     Constructs a datetime object in UTC from user input.
     """
-    dt = None
     try:
-        d, t = s.split()
-        mm, dd, yy = map(int, d.split('/'))
-        h, m = map(int, t.split(':'))
-        dt = datetime.datetime(yy, mm, dd, h, m, tzinfo=timezone.utc)
-        return dt
+        date, time = timestamp.split()
+        month, day, year = map(int, date.split('/'))
+        hour, minute = map(int, time.split(':'))
+        return datetime.datetime(year, month, day, hour, minute,
+                                 tzinfo=timezone.utc)
     except:
-        error = _("Unable to parse date: ") + s
+        error = _("Unable to parse date: ") + timestamp
         return HttpResponseBadRequest(json.dumps({'error': error}))
 
 
@@ -1019,6 +1018,9 @@ def parse_datetime(s):
 @require_level('staff')
 @require_query_params('student', 'url', 'due_datetime')
 def change_due_date(request, course_id):
+    """
+    Grants a due date extension to a student for a particular unit.
+    """
     course = get_course_by_id(course_id)
     student = get_student_from_identifier(request.GET.get('student'))
     url = request.GET.get('url')
@@ -1046,6 +1048,9 @@ def change_due_date(request, course_id):
 @require_level('staff')
 @require_query_params('student', 'url')
 def reset_due_date(request, course_id):
+    """
+    Rescinds a due date extension for a student on a particular unit.
+    """
     course = get_course_by_id(course_id)
     student = get_student_from_identifier(request.GET.get('student'))
     url = request.GET.get('url')
@@ -1071,9 +1076,12 @@ def reset_due_date(request, course_id):
 @require_level('staff')
 @require_query_params('url')
 def show_unit_extensions(request, course_id):
+    """
+    Shows all of the students which have due date extensions for the given unit.
+    """
     course = get_course_by_id(course_id)
     url = request.GET.get('url')
-    error, data = dump_students_with_due_date_extensions(course, url)
+    error, data = dump_module_extensions(course, url)
     if error:
         return HttpResponseBadRequest(json.dumps({'error': error}))
     header = data['header']
@@ -1086,11 +1094,13 @@ def show_unit_extensions(request, course_id):
 @require_level('staff')
 @require_query_params('student')
 def show_student_extensions(request, course_id):
+    """
+    Shows all of the due date extensions granted to a particular student in a
+    particular course.
+    """
     student = get_student_from_identifier(request.GET.get('student'))
     course = get_course_by_id(course_id)
-    error, data = dump_due_date_extensions_for_student(course, student)
-    if error:
-        return HttpResponseBadRequest(json.dumps({'error': error}))
+    data = dump_student_extensions(course, student)
     header = data['header']
     data['data'] = [dict(zip(header, row)) for row in data['data']]
     return JsonResponse(data)

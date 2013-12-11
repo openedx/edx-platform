@@ -1,8 +1,13 @@
+"""
+Common library for working with individual due date extensions that can be used
+by either the legacy or the beta instructor dashboard.
+"""
+
 import json
 from courseware.models import StudentModule
 from xmodule.fields import Date
 
-date_field = Date()
+DATE_FIELD = Date()
 
 
 def set_due_date_extension(course, url, student, due_date):
@@ -10,11 +15,14 @@ def set_due_date_extension(course, url, student, due_date):
     Sets a due date extension.  Factored to be usable in both legacy and beta
     instructor dashboards.
     """
-    unit = find_unit(course, url)
+    unit = _find_unit(course, url)
     if not unit:
         return "Couldn't find module for url: {0}".format(url), None
 
     def set_due_date(node):
+        """
+        Recursively set the due date on a node and all of its children.
+        """
         try:
             student_module = StudentModule.objects.get(
                 student_id=student.id,
@@ -23,7 +31,7 @@ def set_due_date_extension(course, url, student, due_date):
             )
 
             state = json.loads(student_module.state)
-            state['extended_due'] = date_field.to_json(due_date)
+            state['extended_due'] = DATE_FIELD.to_json(due_date)
             student_module.state = json.dumps(state)
             student_module.save()
         except StudentModule.DoesNotExist:
@@ -37,48 +45,75 @@ def set_due_date_extension(course, url, student, due_date):
     return None, unit  # no error
 
 
-def find_unit(node, url):
+def _find_unit(node, url):
     """
     Find node in course tree for url.
     """
     if node.location.url() == url:
         return node
     for child in node.get_children():
-        found = find_unit(child, url)
+        found = _find_unit(child, url)
         if found:
             return found
     return None
 
 
-def get_units_with_due_date(course):
+def _get_units_with_due_date(course):
+    """
+    Returns all top level units which have due dates.  Does not return
+    descendents of those nodes.
+    """
     units = []
 
-    def visit(node, level=0):
+    def visit(node):
+        """
+        Visit a node.  Checks to see if node has a due date and appends to
+        `units` if it does.  Otherwise recurses into children to search for
+        nodes with due dates.
+        """
         if getattr(node, 'due', None):
             units.append(node)
         else:
             for child in node.get_children():
-                visit(child, level + 1)
+                visit(child)
     visit(course)
-    units.sort(key=title_or_url)
+    units.sort(key=_title_or_url)
     return units
 
 
 def get_units_with_due_date_options(course):
+    """
+    Finds all top level units that have a due date and returns them as a
+    sequence of (title, url) tuples suitable for populating the pull down to
+    select a unit in the 'Extensions' tab.
+    """
     def make_option(node):
-        return title_or_url(node), node.location.url()
-    return map(make_option, get_units_with_due_date(course))
+        "Returns (title, url) tuple for a node."
+        return _title_or_url(node), node.location.url()
+    return map(make_option, _get_units_with_due_date(course))
 
 
-def title_or_url(node):
+def _title_or_url(node):
+    """
+    Returns the `display_name` attribute of the passed in node of the course
+    tree, if it has one.  Otherwise returns the node's url.
+    """
     title = getattr(node, 'display_name', None)
     if not title:
         title = node.location.url()
     return title
 
 
-def dump_students_with_due_date_extensions(course, url):
-    unit = find_unit(course, url)
+def dump_module_extensions(course, url):
+    """
+    Dumps data about students with due date extensions for a particular module,
+    specified by 'url', in a particular course.  Returns a tuple of (error,
+    data).  If there is an error, `error` will be a strong suitable for
+    displaying to the user and `data` will be None.  Otherwise `error` will be
+    None, and `data` will be a data structure formatted for use by the legacy
+    instructor dashboard's 'datatable'.
+    """
+    unit = _find_unit(course, url)
     if not unit:
         return "Couldn't find module for url: {0}".format(url), {}
 
@@ -86,43 +121,48 @@ def dump_students_with_due_date_extensions(course, url):
     query = StudentModule.objects.filter(
         course_id=course.id,
         module_state_key=url)
-    for sm in query:
-        state = json.loads(sm.state)
+    for module in query:
+        state = json.loads(module.state)
         extended_due = state.get("extended_due")
         if not extended_due:
             continue
-        extended_due = date_field.from_json(extended_due)
+        extended_due = DATE_FIELD.from_json(extended_due)
         extended_due = extended_due.strftime("%Y-%m-%d %H:%M")
-        fullname = sm.student.profile.name
-        data.append((sm.student.username, fullname, extended_due))
+        fullname = module.student.profile.name
+        data.append((module.student.username, fullname, extended_due))
     data.sort(key=lambda x: x[0])
     return None, {
         "header": ["Username", "Full Name", "Extended Due Date"],
         "title": "Users with due date extensions for {0}".format(
-            title_or_url(unit)),
+            _title_or_url(unit)),
         "data": data
     }
 
 
-def dump_due_date_extensions_for_student(course, student):
+def dump_student_extensions(course, student):
+    """
+    Dumps data about the due date extensions granted for a particular student
+    in a particular course.  Returns a data structure formatted for use by the
+    legacy instructor dashboard's 'datatable'.
+    """
     data = []
-    units = get_units_with_due_date(course)
+    units = _get_units_with_due_date(course)
     units = dict([(u.location.url(), u) for u in units])
     query = StudentModule.objects.filter(
         course_id=course.id,
         student_id=student.id)
-    for sm in query:
-        state = json.loads(sm.state)
-        if sm.module_state_key not in units:
+    for module in query:
+        state = json.loads(module.state)
+        if module.module_state_key not in units:
             continue
         extended_due = state.get("extended_due")
         if not extended_due:
             continue
-        extended_due = date_field.from_json(extended_due)
+        extended_due = DATE_FIELD.from_json(extended_due)
         extended_due = extended_due.strftime("%Y-%m-%d %H:%M")
-        title = title_or_url(units[sm.module_state_key])
+        title = _title_or_url(units[module.module_state_key])
         data.append((title, extended_due))
-    return None, {
+    return {
         "header": ["Unit", "Extended Due Date"],
         "title": "Due date extensions for {0} {1} ({2})".format(
             student.first_name, student.last_name, student.username),

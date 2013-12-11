@@ -65,8 +65,8 @@ from django.utils.translation import ugettext as _u
 from lms.lib.xblock.runtime import handler_prefix
 
 from .extensions import (
-    dump_students_with_due_date_extensions,
-    dump_due_date_extensions_for_student,
+    dump_module_extensions,
+    dump_student_extensions,
     get_units_with_due_date_options,
     set_due_date_extension)
 
@@ -189,21 +189,22 @@ def instructor_dashboard(request, course_id):
             msg += "<font color='red'>Couldn't find student with that email or username.  </font>"
         return msg, student
 
-    def parse_datetime(s):
+    def parse_datetime(datestr):
         """
         Constructs a datetime object in UTC from user input.
         """
         msg = ""
-        dt = None
+        timestamp = None
         try:
-            d, t = s.split()
-            mm, dd, yy = map(int, d.split('/'))
-            h, m = map(int, t.split(':'))
-            dt = datetime.datetime(yy, mm, dd, h, m, tzinfo=timezone.utc)
-            return msg, dt
-        except:
-            msg = "<font color='red'>Unable to parse date: {0} </font>".format(s)
-        return msg, dt
+            date, time = datestr.split()
+            month, day, year = map(int, date.split('/'))
+            hour, minute = map(int, time.split(':'))
+            timestamp = datetime.datetime(year, month, day, hour, minute,
+                                          tzinfo=timezone.utc)
+        except ValueError:
+            msg = "<font color='red'>Unable to parse date: {0} </font>".format(
+                datestr)
+        return msg, timestamp
 
     # process actions from form POST
     action = request.POST.get('action', '')
@@ -562,7 +563,7 @@ def instructor_dashboard(request, course_id):
         if not url:
             msg += '<font color="red">Must choose a unit. </font> '
         else:
-            error, datatable = dump_students_with_due_date_extensions(course, url)
+            error, datatable = dump_module_extensions(course, url)
             if error:
                 msg += '<font color="red">{0}</font> '.format(error)
 
@@ -573,10 +574,8 @@ def instructor_dashboard(request, course_id):
         msg += message
 
         if student:
-            error, datatable = dump_due_date_extensions_for_student(
+            datatable = dump_student_extensions(
                 course, student)
-            if error:
-                msg += '<font color="red">{0}</font> '.format(error)
 
     #----------------------------------------
     # Admin
