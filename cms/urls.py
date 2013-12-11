@@ -1,10 +1,6 @@
 from django.conf import settings
 from django.conf.urls import patterns, include, url
-
-# TODO: This should be removed once the CMS is running via wsgi on all production servers
-import cms.startup as startup
 from xmodule.modulestore import parsers
-startup.run()
 
 # There is a course creators admin table.
 from ratelimitbackend import admin
