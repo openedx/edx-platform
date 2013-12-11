@@ -184,24 +184,24 @@
     }
 
     &.new-section {
-      padding: ($baseline/4) $baseline 0 $baseline;
+      padding: ($baseline*1.5) $baseline 0 $baseline;
 
       header {
         @include clearfix();
         height: auto;
         border-bottom: 0;
-      }
 
-      .expand-collapse {
-        visibility: hidden;
-      }
+        .expand-collapse {
+          display: none;
+        }
 
-      .item-details {
-        padding: ($baseline*1.25) 0 0 0;
+        .item-details {
+          width: auto;
 
-        .section-name {
-          float: none;
-          width: 100%;
+          .section-name {
+            float: none;
+            width: 100%;
+          }
         }
       }
     }
