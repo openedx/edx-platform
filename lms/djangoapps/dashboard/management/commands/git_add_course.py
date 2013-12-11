@@ -147,7 +147,7 @@ def add_repo(repo, rdir_in):
 
         if os.path.exists(cdir) and not os.path.islink(cdir):
             log.debug(_('   -> exists, but is not symlink'))
-            log.debug(subprocess.check_output(['ls', 'l', ],
+            log.debug(subprocess.check_output(['ls', '-l', ],
                                               cwd=os.path.abspath(cdir)))
             try:
                 os.rmdir(os.path.abspath(cdir))
