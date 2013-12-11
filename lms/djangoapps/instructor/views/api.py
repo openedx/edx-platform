@@ -1035,7 +1035,7 @@ def change_due_date(request, course_id):
     unitname = getattr(unit, 'display_name', None)
     if unitname:
         unitname = '{0} ({1})'.format(unitname, unit.location.url())
-    msg = (
+    msg = _(
         'Successfully changed due date for student {0} for {1} '
         'to {2}').format(studentname, unitname,
                          due_date.strftime('%Y-%m-%d %H:%M'))
@@ -1063,7 +1063,7 @@ def reset_due_date(request, course_id):
     if unitname:
         unitname = '{0} ({1})'.format(unitname, unit.location.url())
     due_date = unit.due
-    msg = (
+    msg = _(
         'Successfully reset due date for student {0} for {1} '
         'to {2}').format(studentname, unitname,
                          due_date.strftime('%Y-%m-%d %H:%M'))

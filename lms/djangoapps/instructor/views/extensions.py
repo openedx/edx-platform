@@ -5,6 +5,7 @@ by either the legacy or the beta instructor dashboard.
 
 import json
 from courseware.models import StudentModule
+from django.utils.translation import ugettext as _
 from xmodule.fields import Date
 
 DATE_FIELD = Date()
@@ -17,7 +18,7 @@ def set_due_date_extension(course, url, student, due_date):
     """
     unit = _find_unit(course, url)
     if not unit:
-        return "Couldn't find module for url: {0}".format(url), None
+        return _("Couldn't find module for url: {0}").format(url), None
 
     def set_due_date(node):
         """
@@ -115,7 +116,7 @@ def dump_module_extensions(course, url):
     """
     unit = _find_unit(course, url)
     if not unit:
-        return "Couldn't find module for url: {0}".format(url), {}
+        return _("Couldn't find module for url: {0}").format(url), {}
 
     data = []
     query = StudentModule.objects.filter(
@@ -132,8 +133,8 @@ def dump_module_extensions(course, url):
         data.append((module.student.username, fullname, extended_due))
     data.sort(key=lambda x: x[0])
     return None, {
-        "header": ["Username", "Full Name", "Extended Due Date"],
-        "title": "Users with due date extensions for {0}".format(
+        "header": [_("Username"), _("Full Name"), _("Extended Due Date")],
+        "title": _("Users with due date extensions for {0}").format(
             _title_or_url(unit)),
         "data": data
     }
@@ -163,7 +164,7 @@ def dump_student_extensions(course, student):
         title = _title_or_url(units[module.module_state_key])
         data.append((title, extended_due))
     return {
-        "header": ["Unit", "Extended Due Date"],
-        "title": "Due date extensions for {0} {1} ({2})".format(
+        "header": [_("Unit"), _("Extended Due Date")],
+        "title": _("Due date extensions for {0} {1} ({2})").format(
             student.first_name, student.last_name, student.username),
         "data": data}
