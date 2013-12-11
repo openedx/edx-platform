@@ -50,8 +50,8 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
 <%block name="header_extras">
   <script type="text/template" id="new-section-template">
     <section class="courseware-section new-section is-collapsible is-draggable">
-      <header>
-      <a href="#" data-tooltip="${_('Expand/collapse this section')}" class="action expand-collapse"><i class="icon-caret-down ui-toggle-dd"></i><span class="sr">${_('Expand/collapse this section')}</span></a>
+      <header class="section">
+      <a href="#" data-tooltip="${_('Expand/collapse this section')}" class="action expand-collapse collapse"><i class="icon-caret-down ui-toggle-expansion"></i><span class="sr">${_('Expand/collapse this section')}</span></a>
         <div class="item-details">
           <h3 class="section-name">
             <form class="section-name-form">
@@ -73,7 +73,7 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
       <a href="#" data-tooltip="${_('Expand/collapse this section')}" class="action expand-collapse"><i class="icon-caret-down ui-toggle-dd"></i><span class="sr">${_('Expand/collapse this section')}</span></a>
       <div class="item-details">
         <h3 class="section-name">
-        <span class="section-name-span">Click here to set the section name</span>
+        <span class="section-name-span">${_('Add a new section name')}</span>
         <form class="section-name-form">
           <input type="text" value="${_('New Section Name')}" class="new-section-name" />
           <input type="submit" class="new-section-name-save" data-parent="${parent_locator}"
@@ -90,7 +90,7 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
   </script>
 
   <script type="text/template" id="new-subsection-template">
-  <li class="collapsed courseware-subsection">
+  <li class="courseware-subsection collapsed is-draggable is-collapsible">
     <div class="section-item editing">
       <form class="new-subsection-form">
         <span class="subsection-name">

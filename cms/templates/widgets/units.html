@@ -1,3 +1,4 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
 <%! from contentstore.utils import compute_unit_state %>
 <%! from xmodule.modulestore.django import loc_mapper %>
@@ -38,10 +39,10 @@ This def will enumerate through a passed in subsection and list all of the units
       <div class="item-actions">
         <ul class="actions-list">
           <li class="actions-item delete">
-            <a href="#" data-tooltip="Delete this unit" class="delete-unit-button action" data-locator="${unit_locator}"><i class="icon-trash"></i><span class="sr">Delete unit</span></a>
+            <a href="#" data-tooltip="${_("Delete this unit")}" class="delete-unit-button action" data-locator="${unit_locator}"><i class="icon-trash"></i><span class="sr">${_("Delete unit")}</span></a>
           </li>
           <li class="actions-item drag">
-            <span data-tooltip="Drag to sort" class="drag-handle unit-drag-handle action"></span>
+            <span data-tooltip="${_("Drag to sort")}" class="drag-handle unit-drag-handle action"><span class="sr"> ${_("Drag to reorder unit")}</span></span>
           </li>
         </ul>
       </div>
@@ -55,7 +56,7 @@ This def will enumerate through a passed in subsection and list all of the units
     <%include file="_ui-dnd-indicator-initial.html" />
 
     <a href="#" class="new-unit-item" data-category="${new_unit_category}" data-parent="${subsection_locator}">
-      <i class="icon-plus"></i> New Unit
+      <i class="icon-plus"></i> ${_("New Unit")}
     </a>
   </li>
 </ol>

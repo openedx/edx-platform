@@ -1,6 +1,6 @@
 define(["domReady", "jquery", "jquery.ui", "underscore", "gettext", "js/views/feedback_notification", "draggabilly",
-    "js/utils/modal", "js/utils/cancel_on_escape", "js/utils/get_date", "js/utils/module"],
-    function (domReady, $, ui, _, gettext, NotificationView, Draggabilly, ModalUtils, CancelOnEscape,
+    "js/utils/cancel_on_escape", "js/utils/get_date", "js/utils/module"],
+    function (domReady, $, ui, _, gettext, NotificationView, Draggabilly, CancelOnEscape,
               DateUtils, ModuleUtils) {
 
         var modalSelector = '.edit-section-publish-settings';
@@ -36,10 +36,10 @@ define(["domReady", "jquery", "jquery.ui", "underscore", "gettext", "js/views/fe
         };
 
 
-        var closeModalNew = function (e) {
+        var closeModalNew = function () {
             $('body').removeClass('dialog-is-shown');
             $('.edit-section-publish-settings').removeClass('is-shown');
-        }
+        };
 
         var editSectionPublishDate = function (e) {
             e.preventDefault();
@@ -51,7 +51,6 @@ define(["domReady", "jquery", "jquery.ui", "underscore", "gettext", "js/views/fe
                 $modal.find('.save-button').hide();
             }
             $modal.find('.section-name').html('"' + $(this).closest('.courseware-section').find('.section-name-span').text() + '"');
-            //ModalUtils.showModal();
             $('body').addClass('dialog-is-shown');
             $('.edit-section-publish-settings').addClass('is-shown');
         };
@@ -108,7 +107,6 @@ define(["domReady", "jquery", "jquery.ui", "underscore", "gettext", "js/views/fe
                             locator: locator},
                         {interpolate: /\{(.+?)\}/g});
                     $thisSection.find('.section-published-date').html(html);
-                    //ModalUtils.hideModal();
                     saving.hide();
                     closeModalNew();
                 });
