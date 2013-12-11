@@ -354,9 +354,7 @@ describe 'Problem', ->
                 abs = Math.abs
                 points = reg.exec(rect)
                 if points
-                  # width
                   width = abs(points[3] - points[1])
-                  # height
                   height = abs(points[4] - points[2])
 
                   ctx.rect(points[1], points[2], width, height)

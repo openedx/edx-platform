@@ -483,6 +483,13 @@ class @Problem
         element.find("section#forinput#{choice}").addClass 'choicetextgroup_show_correct'
 
     imageinput: (element, display, answers) =>
+      # answers is a dict of (answer_id, answer_text) for each answer for this
+      # question.
+      # @Examples:
+      # {'anwser_id': {
+      #   'rectangle': '(10,10)-(20,30);(12,12)-(40,60)',
+      #   'regions': '[[10,10], [30,30], [10, 30], [30, 10]]'
+      # } }
       types =
         rectangle: (coords) =>
           reg = /^\(([0-9]+),([0-9]+)\)-\(([0-9]+),([0-9]+)\)$/
@@ -492,9 +499,7 @@ class @Problem
             abs = Math.abs
             points = reg.exec(rect)
             if points
-              # width
               width = abs(points[3] - points[1])
-              # height
               height = abs(points[4] - points[2])
 
               ctx.rect(points[1], points[2], width, height)
@@ -506,7 +511,15 @@ class @Problem
           parseCoords = (coords) =>
             reg = JSON.parse(coords)
 
+            # Regions is list of lists [region1, region2, region3, ...] where regionN
+            # is disordered list of points: [[1,1], [100,100], [50,50], [20, 70]].
+            # If there is only one region in the list, simpler notation can be used:
+            # regions="[[10,10], [30,30], [10, 30], [30, 10]]" (without explicitly
+            # setting outer list)
             if typeof reg[0][0][0] == "undefined"
+              # we have [[1,2],[3,4],[5,6]] - single region
+              # instead of [[[1,2],[3,4],[5,6], [[1,2],[3,4],[5,6]]]
+              # or [[[1,2],[3,4],[5,6]]] - multiple regions syntax
               reg = [reg]
 
             return reg
