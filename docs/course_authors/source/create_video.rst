@@ -20,7 +20,7 @@ See the following topics:
 * :ref:`Video Hosting`
 * :ref:`Create a Video Component`
 
-
+.. note:: Review :ref:`Best Practices for Accessible Media` before adding videos to your course.
 
 .. _Video Formats:
 

@@ -29,6 +29,7 @@ Contents
    set_content_releasedates
    view_course_content
    export_import_course
+   accessibility
    checking_student_progress
    ora_students
    change_log

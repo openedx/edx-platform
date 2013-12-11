@@ -21,6 +21,9 @@ You organize your course in the following hierarchy:
 Studio provides you with flexibility when organizing your course.  
 A common course model is for Sections to correspond to weeks, and for Subsections to correspond to lessons.
 
+.. note::  We recommend that you review :ref:`Guidelines for Creating Accessible Content` before developing content for your course.
+
+
 ==================
 The Course Outline
 ==================

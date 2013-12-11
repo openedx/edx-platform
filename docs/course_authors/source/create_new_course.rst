@@ -26,7 +26,8 @@ This chapter describes how to create and set up your course:
 #. :ref:`Add Course Handouts`
 #. :ref:`Add Textbooks`
 
-Also see the chapters :ref:`Establish a Grading Policy` and :ref:`Organizing Your Course Content`.
+Also see the chapters :ref:`Establish a Grading Policy`, :ref:`Organizing Your Course Content`, and :ref:`Guidelines for Creating Accessible Content`.
+
 
 
 .. _Create a New Course:
