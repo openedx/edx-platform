@@ -29,7 +29,6 @@ urlpatterns = patterns('',  # nopep8
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/syllabuses/(?P<name>[^/]+)$',
         'contentstore.views.syllabus_index', name='syllabus_index'),
 
-
     url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/textbooks/(?P<name>[^/]+)/new$',
         'contentstore.views.create_textbook', name='create_textbook'),
 
@@ -72,6 +71,7 @@ urlpatterns += patterns(
 
 # restful api
 urlpatterns += patterns(
+
     'contentstore.views',
 
     url(r'^$', 'howitworks', name='homepage'),
@@ -87,6 +87,7 @@ urlpatterns += patterns(
         r'(?ix)^course_info_update/{}(/)?(?P<provided_id>\d+)?$'.format(parsers.URL_RE_SOURCE),
         'course_info_update_handler'
         ),
+    url(r'(?ix)^syllabuses($|/){}$'.format(parsers.URL_RE_SOURCE), 'syllabus_handler'),
     url(r'(?ix)^course($|/){}$'.format(parsers.URL_RE_SOURCE), 'course_handler'),
     url(r'(?ix)^subsection($|/){}$'.format(parsers.URL_RE_SOURCE), 'subsection_handler'),
     url(r'(?ix)^unit($|/){}$'.format(parsers.URL_RE_SOURCE), 'unit_handler'),

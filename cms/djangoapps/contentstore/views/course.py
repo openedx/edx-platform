@@ -57,7 +57,7 @@ __all__ = ['course_info_handler', 'course_handler', 'course_info_update_handler'
            'settings_handler',
            'grading_handler',
            'advanced_settings_handler',
-           'syllabus_index','textbook_index', 'textbook_by_id','syllabus_by_id',
+           'syllabus_index', 'syllabus_handler','textbook_index', 'textbook_by_id','syllabus_by_id',
            'create_textbook', 'create_syllabus']
 
 # pylint: disable=unused-argument
@@ -709,9 +709,18 @@ def assign_syllabus_id(syllabus, used_ids=()):
         tid = tid + random.choice(string.ascii_lowercase)
     return tid
 
+def syllabus_handler(request, tag=None, course_id=None, branch=None, version_guid=None, block=None):
+    options =request.META["PATH_INFO"].split("/")[2].split(".")
+    syllabus_org = options[0]
+    syllabus_course = options[1]
+    syllabus_name = options[2]
+
+    return syllabus_index(request, syllabus_org, syllabus_course, syllabus_name )
+
 @login_required
 @ensure_csrf_cookie
 def syllabus_index(request, org, course, name):
+    
     """
     Display an editable syllabus overview.
 

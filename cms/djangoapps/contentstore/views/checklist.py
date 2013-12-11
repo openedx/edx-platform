@@ -120,8 +120,8 @@ def expand_checklist_action_url(course_module, checklist):
         "CourseOutline": "course",
         "SettingsDetails": "settings/details",
         "SettingsGrading": "settings/grading",
+        "Syllabus": "syllabuses",
     }
-
     for item in expanded_checklist.get('items'):
         action_url = item.get('action_url')
         if action_url in urlconf_map:
