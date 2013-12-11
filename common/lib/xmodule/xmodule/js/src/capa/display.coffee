@@ -506,18 +506,18 @@ class @Problem
           parseCoords = (coords) =>
             reg = JSON.parse(coords)
 
-            if typeof reg[0][0] is undefined
+            if typeof reg[0][0][0] == "undefined"
               reg = [reg]
 
             return reg
 
-          $.each parseCoords(coords), (index, regions) =>
+          $.each parseCoords(coords), (index, region) =>
             ctx.beginPath()
-            $.each regions, (index, points) =>
+            $.each region, (index, point) =>
               if index is 0
-                ctx.moveTo(points[0], points[1])
+                ctx.moveTo(point[0], point[1])
               else
-                ctx.lineTo(points[0], points[1]);
+                ctx.lineTo(point[0], point[1]);
 
             ctx.closePath()
             ctx.stroke()
