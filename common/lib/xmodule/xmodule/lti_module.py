@@ -181,7 +181,6 @@ class LTIModule(LTIFields, XModule):
     """
 
     css = {'scss': [resource_string(__name__, 'css/lti/lti.scss')]}
-    js_module_name = "LTI"
 
     def get_input_fields(self):
         # LTI provides a list of default parameters that might be passed as
