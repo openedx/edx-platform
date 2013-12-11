@@ -13,7 +13,7 @@ class ExtensionsTests(unittest.TestCase):
     def setUp(self):
         self.course = DummyCourseNode(
             'Dummy Course', 'i4x://dummy',
-            children = [
+            children=[
                 DummyCourseNode(
                     'Homework 1', 'i4x://dummy/homework',
                     due=due_date,
@@ -52,6 +52,7 @@ class ExtensionsTests(unittest.TestCase):
 
     def test_dump_students_with_due_date_extensions(self):
         from ..extensions import dump_students_with_due_date_extensions as fut
+
         class DummyProfile(object):
             def __init__(self, name):
                 self.name = name
@@ -78,9 +79,10 @@ class ExtensionsTests(unittest.TestCase):
                          ["Username", "Full Name", "Extended Due Date"])
         self.assertEqual(table['title'],
                          "Users with due date extensions for Homework 1")
-        self.assertEqual(table['data'],
-          [('barney', 'Barney Rubble', '2013-10-13 10:30'),
-           ('fred', 'Fred Flintstone', '2013-10-12 10:30')])
+        self.assertEqual(
+            table['data'],
+            [('barney', 'Barney Rubble', '2013-10-13 10:30'),
+             ('fred', 'Fred Flintstone', '2013-10-12 10:30')])
 
     def test_dump_students_with_due_date_extensions_bad_url(self):
         from ..extensions import dump_students_with_due_date_extensions as fut
@@ -124,4 +126,3 @@ class DummyCourseNode(object):
 
     def get_children(self):
         return self.children
-

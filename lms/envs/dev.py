@@ -23,8 +23,6 @@ LANGUAGES = (
 )
 TEMPLATE_DEBUG = True
 
-FEATURES['INDIVIDUAL_DUE_DATES'] = True # crossi dev, delete if checked in
-
 FEATURES['DISABLE_START_DATES'] = False
 FEATURES['ENABLE_SQL_TRACKING_LOGS'] = True
 FEATURES['SUBDOMAIN_COURSE_LISTINGS'] = False  # Enable to test subdomains--otherwise, want all courses to show up

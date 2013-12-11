@@ -34,7 +34,7 @@ def set_due_date_extension(course, url, student, due_date):
 
     set_due_date(unit)
 
-    return None, unit # no error
+    return None, unit  # no error
 
 
 def find_unit(node, url):
@@ -52,12 +52,13 @@ def find_unit(node, url):
 
 def get_units_with_due_date(course):
     units = []
+
     def visit(node, level=0):
         if getattr(node, 'due', None):
             units.append(node)
         else:
             for child in node.get_children():
-                visit(child, level+1)
+                visit(child, level + 1)
     visit(course)
     units.sort(key=title_or_url)
     return units

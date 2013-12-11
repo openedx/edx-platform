@@ -58,8 +58,7 @@ def instructor_dashboard_2(request, course_id):
         _section_analytics(course_id, access),
     ]
 
-    if (settings.FEATURES.get('INDIVIDUAL_DUE_DATES')
-        and access['instructor']):
+    if (settings.FEATURES.get('INDIVIDUAL_DUE_DATES') and access['instructor']):
         sections.insert(3, _section_extensions(course))
 
     # Gate access to course email by feature flag & by course-specific authorization

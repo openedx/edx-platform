@@ -1013,6 +1013,7 @@ def parse_datetime(s):
         error = _("Unable to parse date: ") + s
         return HttpResponseBadRequest(json.dumps({'error': error}))
 
+
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -1023,7 +1024,7 @@ def change_due_date(request, course_id):
     url = request.GET.get('url')
     due_date = parse_datetime(request.GET.get('due_datetime'))
     if isinstance(due_date, HttpResponse):
-        return due_date # error
+        return due_date  # error
     error, unit = set_due_date_extension(course, url, student, due_date)
     if error:
         return HttpResponseBadRequest(json.dumps({'error': error}))
