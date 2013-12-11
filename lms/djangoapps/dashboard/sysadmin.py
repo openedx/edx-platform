@@ -644,13 +644,10 @@ class GitLogs(TemplateView):
         # Allow overrides
         if hasattr(settings, 'MONGODB_LOG'):
             for config_item in ['host', 'user', 'password', 'db', ]:
-                if hasattr(settings.MONGODB_LOG, config_item):
-                    mongo_db[config_item] = settings.MONGODB_LOG.get(
-                        config_item, mongo_db[config_item])
+                mongo_db[config_item] = settings.MONGODB_LOG.get(
+                    config_item, mongo_db[config_item])
 
-        mongouri = 'mongodb://{0}:{1}@{2}/{3}'.format(
-            mongo_db['user'], mongo_db['password'],
-            mongo_db['host'], mongo_db['db'])
+        mongouri = 'mongodb://{user}:{password}@{host}/{db}'.format(**mongo_db)
 
         error_msg = ''
 
@@ -659,10 +656,9 @@ class GitLogs(TemplateView):
                 mdb = mongoengine.connect(mongo_db['db'], host=mongouri)
             else:
                 mdb = mongoengine.connect(mongo_db['db'], host=mongo_db['host'])
-        except mongoengine.connection.ConnectionError, ex:
-            logging.critical(_('Unable to connect to mongodb to save log, '
-                               'please check MONGODB_LOG settings. '
-                               'error: {0}').format(str(ex)))
+        except mongoengine.connection.ConnectionError:
+            logging.exception(_('Unable to connect to mongodb to save log, '
+                               'please check MONGODB_LOG settings.'))
 
         if course_id is None:
             # Require staff if not going to specific course
