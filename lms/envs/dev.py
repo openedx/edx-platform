@@ -200,7 +200,7 @@ OPENID_PROVIDER_TRUSTED_ROOTS = ['*']
 
 ######################## MIT Certificates SSL Auth ############################
 
-FEATURES['AUTH_USE_MIT_CERTIFICATES'] = True
+FEATURES['AUTH_USE_MIT_CERTIFICATES'] = False
 
 ################################# CELERY ######################################
 
