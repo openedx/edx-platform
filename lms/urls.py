@@ -356,6 +356,13 @@ if settings.COURSEWARE_ENABLED and settings.FEATURES.get('ENABLE_INSTRUCTOR_BETA
             include('instructor.views.api_urls'))
     )
 
+# TODO set these settings before merge
+# if settings.COURSEWARE_ENABLED and settings.FEATURES.get('ENABLE_STUDENT_GROUPS'):
+    urlpatterns += (
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/groups$',
+            'groups.views.groups', name="groups"),
+    )
+
 if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
     ## Jasmine and admin
     urlpatterns += (url(r'^admin/', include(admin.site.urls)),)
