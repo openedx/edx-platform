@@ -142,6 +142,9 @@ META_UNIVERSITIES = {'UTx': ['UTAustinX']}
 # For local test purposes, let's define a "OpenedX" subdomain brand
 MICROSITE_CONFIGURATION = {
     'OpenedX': {
+        # A display string that will be displayed when user visits the microsite. Given that we are handling this
+        # in configuration, it will not be localizable
+        'platform_name': 'Open edX',
         # override for USE_CUSTOM_THEME set otherwhere in config
         'USE_CUSTOM_THEME': True,
         # override for THEME_NAME set otherwhere in config
@@ -173,6 +176,25 @@ MICROSITE_CONFIGURATION = {
         'header_file': 'navigation.html',
         'google_analytics_file': 'google_analytics.html',
         'footer_file': 'openedx-footer.html',
+        # This override is a HTML literal to put as the page footer, unfortunately this HTML becomes
+        # non-localizable if we define in configuration. NOTE: This will take presendence over 'footer_file'
+        'footer_html': '''
+            <div class="wrapper wrapper-footer">
+                <footer>
+                    <div class="colophon">
+                        <div class="colophon-about">
+                            <p>Open edX is a non-profit created by founding partners Harvard and MIT whose mission is to bring the best of higher education to students of all ages anywhere in the world, wherever there is Internet access. Open edX's free online MOOCs are interactive and subjects include computer science, public health, and artificial intelligence.</p>
+                        </div>
+                    </div>
+                    <div class="references">
+                        <p class="copyright">&#169; 2013 edX, some rights reserved.</p>
+                        <nav class="nav-legal">
+                            <ul>
+                        </nav>
+                    </div>
+                </footer>
+            </div>
+        ''',
         # this control whether the home header (the overlay) shows on the homepage
         # for example the overlay which says "The Future of Online Education", has the background image, as well as
         # the top-level promo video
