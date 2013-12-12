@@ -11,3 +11,4 @@ class LinkedIn(models.Model):
     """
     user = models.OneToOneField(User, primary_key=True)
     has_linkedin_account = models.NullBooleanField(default=None)
+    emailed_courses = models.TextField(default="[]")  # JSON list of course ids
