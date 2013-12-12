@@ -419,7 +419,7 @@ def ssl_login(request):
 
     (_user, email, fullname) = _ssl_dn_extract_info(cert)
 
-    retfun = functools.partial(student.views.index, request)
+    retfun = functools.partial(redirect, '/')
     return _external_login_or_signup(
         request,
         external_id=email,
