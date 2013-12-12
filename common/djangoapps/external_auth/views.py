@@ -330,7 +330,7 @@ def _ssl_dn_extract_info(dn_string):
     return (user, email, fullname)
 
 
-def _ssl_get_cert_from_request(request):
+def ssl_get_cert_from_request(request):
     """
     Extract user information from certificate, if it exists, returning (user, email, fullname).
     Else return None.
@@ -369,7 +369,7 @@ def ssl_login_shortcut(fn):
         if request.user and request.user.is_authenticated():  # don't re-authenticate
             return fn(*args, **kwargs)
 
-        cert = _ssl_get_cert_from_request(request)
+        cert = ssl_get_cert_from_request(request)
         if not cert:		# no certificate information - show normal login window
             return fn(*args, **kwargs)
 
@@ -411,7 +411,7 @@ def ssl_login(request):
     if not settings.FEATURES['AUTH_USE_MIT_CERTIFICATES']:
         return HttpResponseForbidden()
 
-    cert = _ssl_get_cert_from_request(request)
+    cert = ssl_get_cert_from_request(request)
 
     if not cert:
         # no certificate information - go onward to main index

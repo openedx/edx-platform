@@ -239,9 +239,11 @@ def signin_user(request):
     """
     This view will display the non-modal login form
     """
-    if settings.FEATURES['AUTH_USE_MIT_CERTIFICATES']:
+    if (settings.FEATURES['AUTH_USE_MIT_CERTIFICATES'] and
+            external_auth.views.ssl_get_cert_from_request(request)):
         # SSL login doesn't require a view, so redirect
-        # branding and allow that to process the login.
+        # branding and allow that to process the login if it
+        # is enabled and the header is in the request.
         return redirect(reverse('root'))
     if request.user.is_authenticated():
         return redirect(reverse('dashboard'))

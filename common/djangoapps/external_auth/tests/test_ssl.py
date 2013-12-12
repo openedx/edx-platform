@@ -199,6 +199,13 @@ class SSLClientTest(TestCase):
         that user doesn't get presented with the login page if they
         have a certificate.
         """
+        # Test that they do signin if they don't have a cert
+        response = self.client.get(reverse('signin_user'))
+        self.assertEqual(200, response.status_code)
+        self.assertTrue('login_form' in response.content
+                        or 'login-form' in response.content)
+
+        # And get directly logged in otherwise
         response = self.client.get(
             reverse('signin_user'), follow=True,
             SSL_CLIENT_S_DN=self.AUTH_DN.format(self.USER_NAME, self.USER_EMAIL))
