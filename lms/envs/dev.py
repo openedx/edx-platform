@@ -148,7 +148,7 @@ MICROSITE_CONFIGURATION = {
         'THEME_NAME': 'openedx',
         # allow for microsite to load in an additional .css file that can override
         # the platform's default CSS definitions. For example, swap out the background image.
-        'css_overrides_file': 'microsites/css/openedx.css',
+        'css_overrides_file': 'microsites/openedx/css/openedx.css',
         # what logo file to display, note that we shouldn't check in trademarked logos
         # into the repository, so these images will have to be deployed/managed outside of
         # code pushes
