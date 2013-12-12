@@ -16,6 +16,7 @@ import edxmako
 import pystache_custom as pystache
 
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore import Location
 from django.utils.timezone import UTC
 
 log = logging.getLogger(__name__)
@@ -56,7 +57,7 @@ def has_forum_access(uname, course_id, rolename):
 
 def _get_discussion_modules(course):
     all_modules = modulestore().get_items(
-        ['i4x', course.location.org, course.location.course, 'discussion', None],
+        Location('i4x', course.location.org, course.location.course, 'discussion', None),
         course_id=course.id
     )
 

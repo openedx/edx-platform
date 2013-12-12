@@ -388,7 +388,7 @@ def jump_to_id(request, course_id, module_id):
     course_location = CourseDescriptor.id_to_location(course_id)
 
     items = modulestore().get_items(
-        ['i4x', course_location.org, course_location.course, None, module_id],
+        Location('i4x', course_location.org, course_location.course, None, module_id),
         course_id=course_id
     )
 

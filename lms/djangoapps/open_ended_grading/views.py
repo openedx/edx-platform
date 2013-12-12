@@ -16,7 +16,8 @@ import open_ended_notifications
 
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import search
-from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
+from xmodule.modulestore import Location
+from xmodule.modulestore.exceptions import NoPathToItem
 
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from edxmako.shortcuts import render_to_string
@@ -92,7 +93,7 @@ def find_peer_grading_module(course):
     # Get the course id and split it.
     course_id_parts = course.id.split("/")
     # Get the peer grading modules currently in the course.  Explicitly specify the course id to avoid issues with different runs.
-    items = modulestore().get_items(['i4x', course_id_parts[0], course_id_parts[1], 'peergrading', None],
+    items = modulestore().get_items(Location('i4x', course_id_parts[0], course_id_parts[1], 'peergrading', None),
                                     course_id=course.id)
     #See if any of the modules are centralized modules (ie display info from multiple problems)
     items = [i for i in items if not getattr(i, "use_for_single_location", True)]
