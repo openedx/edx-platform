@@ -14,6 +14,7 @@ MAXIMUM_ATTEMPTS = "Maximum Attempts"
 PROBLEM_WEIGHT = "Problem Weight"
 RANDOMIZATION = 'Randomization'
 SHOW_ANSWER = "Show Answer"
+TIMER_BETWEEN_ATTEMPTS = "Timer Between Attempts"
 
 
 @step('I have created a Blank Common Problem$')
@@ -45,6 +46,7 @@ def i_see_advanced_settings_with_values(step):
             [PROBLEM_WEIGHT, "", False],
             [RANDOMIZATION, "Never", False],
             [SHOW_ANSWER, "Finished", False],
+            [TIMER_BETWEEN_ATTEMPTS, "0", False]
         ])
 
 
