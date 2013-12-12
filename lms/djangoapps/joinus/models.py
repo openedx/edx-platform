@@ -1,4 +1,6 @@
-def Group(models.Model):
+from django.contrib.auth.models import Group
+
+class JoinUs(models.Model):
 	"""
 	Models a user-created study group.
 	"""
@@ -7,11 +9,17 @@ def Group(models.Model):
 	invite_code = models.CharField()
 	# todo probably we want to do this with role/access control instead
 	leader = models.ForeignKey(User, db_index=True)
+	JOINUS_GROUP_PREFIX = "joinus_"
 
-	def join_group(self, user):
-		# adds user to group (self)
-		pass
+	@classmethod
+	def join_group(cls, user, gname):
+		""" Adds user to the JoinUs Group with name gname. """
+		gname = JOINUS_GROUP_PREFIX + gname
+		group = Group.objects.get(name='gname')
+		g.user_set.add(user)
+		return
 
+	# Invite codes are future TODO; not in scope for datajam
 	@classmethod
 	def process_invite_code(cls, code, user):
 		# if invite_code is valid
@@ -19,15 +27,30 @@ def Group(models.Model):
 		# else, return error
 		pass
 
-	def remove_user_from_group(self, user):
-		# remove user from group (self)
-		pass
+	@classmethod
+	def remove_user_from_group(cls, user, gname):
+		""" 
+		Removes user from the JoinUs Group with name gname.
+		If that user is the group leader, this also deletes the group.
+		"""
+		gname = JOINUS_GROUP_PREFIX + gname
+		group = Group.objects.get(name='gname')
+		g.user_set.remove(user)
+		# TODO if user is group leader, delete group
+		return
 
 	def get_group_info(self, user):
 		# lets a user see the code they have access to
 		pass
 
 	@classmethod
-	def create_group(cls, user, name):
+	def create_group(cls, user, gname):
 		# creates a new group led by user with name
-		pass
+		# TODO check that name is valid, not taken, etc
+		gname = JOINUS_GROUP_PREFIX + gname
+		if Group.objects.filter(name=gname):
+			# return an error
+			pass
+		group = Group(name=gname)
+		group.save()
+		return
