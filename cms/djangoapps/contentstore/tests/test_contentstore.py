@@ -7,7 +7,6 @@ from textwrap import dedent
 
 from django.test.utils import override_settings
 from django.conf import settings
-from django.core.urlresolvers import reverse
 from path import path
 from tempdir import mkdtemp_clean
 from fs.osfs import OSFS
@@ -427,7 +426,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         course = module_store.get_item(course_location)
         num_tabs = len(course.tabs)
-        last_tab = course.tabs[num_tabs - 1]
+        last_tab = course.tabs[-1]
         url_slug = last_tab['url_slug']
         delete_url = self._get_tab_locator(course, last_tab).url_reverse('xblock')
 
@@ -446,7 +445,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
     def _get_tab_locator(self, course, tab):
         """ Returns the locator for a given tab. """
-        tab_location = 'i4x://MITx/999/static_tab/{0}'.format(tab['url_slug'])
+        tab_location = 'i4x://edX/999/static_tab/{0}'.format(tab['url_slug'])
         return loc_mapper().translate_location(
             course.location.course_id, Location(tab_location), False, True
         )
