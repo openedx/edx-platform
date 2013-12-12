@@ -510,12 +510,12 @@ def instructor_dashboard(request, course_id):
 
     elif 'List course staff' in action:
         role = CourseStaffRole(course.location)
-        datatable = _role_members_table(role, _("List of Staff"), course_id)
+        datatable = _role_members_table(role, _u("List of Staff"), course_id)
         track.views.server_track(request, "list-staff", {}, page="idashboard")
 
     elif 'List course instructors' in action and GlobalStaff().has_user(request.user):
         role = CourseInstructorRole(course.location)
-        datatable = _role_members_table(role, _("List of Instructors"), course_id)
+        datatable = _role_members_table(role, _u("List of Instructors"), course_id)
         track.views.server_track(request, "list-instructors", {}, page="idashboard")
 
     elif action == 'Add course staff':
@@ -597,7 +597,7 @@ def instructor_dashboard(request, course_id):
 
     elif 'List beta testers' in action:
         role = CourseBetaTesterRole(course.location)
-        datatable = _role_members_table(role, _("List of Beta Testers"), course_id)
+        datatable = _role_members_table(role, _u("List of Beta Testers"), course_id)
         track.views.server_track(request, "list-beta-testers", {}, page="idashboard")
 
     elif action == 'Add beta testers':
