@@ -1,6 +1,7 @@
 # Compute grades using real division, with no integer truncation
 from __future__ import division
 from collections import defaultdict
+import json
 import random
 import logging
 
@@ -17,22 +18,13 @@ from courseware import courses
 from courseware.model_data import FieldDataCache
 from xblock.fields import Scope
 from xmodule import graders
-from xmodule.capa_module import CapaModule
 from xmodule.graders import Score
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError
 from .models import StudentModule
 from .module_render import get_module, get_module_for_descriptor
 
 log = logging.getLogger("edx.courseware")
-
-
-def yield_module_descendents(module):
-    stack = module.get_display_items()
-    stack.reverse()
-
-    while len(stack) > 0:
-        next_module = stack.pop()
-        stack.extend(next_module.get_display_items())
-        yield next_module
 
 
 def yield_dynamic_descriptor_descendents(descriptor, module_creator):
@@ -58,74 +50,101 @@ def yield_dynamic_descriptor_descendents(descriptor, module_creator):
         yield next_descriptor
 
 
-def yield_problems(request, course, student):
+def answer_distributions(course_id):
     """
-    Return an iterator over capa_modules that this student has
-    potentially answered.  (all that student has answered will definitely be in
-    the list, but there may be others as well).
+    Given a course_id, return answer distributions in the form of a dictionary
+    mapping:
+
+      (problem url_name, problem display_name, problem_id) -> {dict: answer -> count}
+
+    Answer distributions are found by iterating through all StudentModule
+    entries for a given course with type="problem" and a grade that is not null.
+    This means that we only count LoncapaProblems that people have submitted.
+    Other types of items like ORA or sequences will not be collected. Empty
+    Loncapa problem state that gets created from runnig the progress page is
+    also not counted.
+
+    This method accesses the StudentModule table directly instead of using the
+    CapaModule abstraction. The main reason for this is so that we can generate
+    the report without any side-effects -- we don't have to worry about answer
+    distribution potentially causing re-evaluation of the student answer. This
+    also allows us to use the read-replica database, which reduces risk of bad
+    locking behavior. And quite frankly, it makes this a lot less confusing.
+
+    Also, we're pulling all available records from the database for this course
+    rather than crawling through a student's course-tree -- the latter could
+    potentially cause us trouble with A/B testing. The distribution report may
+    not be aware of problems that are not visible to the user being used to
+    generate the report.
+
+    This method will try to use a read-replica database if one is available.
     """
-    grading_context = course.grading_context
+    # dict: { module.module_state_key : (url_name, display_name) }
+    state_keys_to_problem_info = {}  # For caching, used by url_and_display_name
 
-    descriptor_locations = (descriptor.location.url() for descriptor in grading_context['all_descriptors'])
-    existing_student_modules = set(StudentModule.objects.filter(
-        module_state_key__in=descriptor_locations
-    ).values_list('module_state_key', flat=True))
+    def url_and_display_name(module_state_key):
+        """
+        For a given module_state_key, return the problem's url and display_name.
+        Handle modulestore access and caching. This method ignores permissions.
+        May throw an ItemNotFoundError if there is no content that corresponds
+        to this module_state_key.
+        """
+        problem_store = modulestore()
+        if module_state_key not in state_keys_to_problem_info:
+            problems = problem_store.get_items(module_state_key, course_id=course_id, depth=1)
+            if not problems:
+                # Likely means that the problem was deleted from the course
+                # after the student had answered. We log this suspicion where
+                # this exception is caught.
+                raise ItemNotFoundError(
+                    "Answer Distribution: Module {} not found for course {}"
+                    .format(module_state_key, course_id)
+                )
+            problem = problems[0]
+            problem_info = (problem.url_name, problem.display_name_with_default)
+            state_keys_to_problem_info[module_state_key] = problem_info
 
-    sections_to_list = []
-    for _, sections in grading_context['graded_sections'].iteritems():
-        for section in sections:
+        return state_keys_to_problem_info[module_state_key]
 
-            section_descriptor = section['section_descriptor']
-
-            # If the student hasn't seen a single problem in the section, skip it.
-            for moduledescriptor in section['xmoduledescriptors']:
-                if moduledescriptor.location.url() in existing_student_modules:
-                    sections_to_list.append(section_descriptor)
-                    break
-
-    field_data_cache = FieldDataCache(sections_to_list, course.id, student)
-    for section_descriptor in sections_to_list:
-        section_module = get_module(student, request,
-                                    section_descriptor.location, field_data_cache,
-                                    course.id)
-        if section_module is None:
-            # student doesn't have access to this module, or something else
-            # went wrong.
-            # log.debug("couldn't get module for student {0} for section location {1}"
-            #           .format(student.username, section_descriptor.location))
+    # Iterate through all problems submitted for this course in no particular
+    # order, and build up our answer_counts dict that we will eventually return
+    answer_counts = defaultdict(lambda: defaultdict(int))
+    for module in StudentModule.all_submitted_problems_read_only(course_id):
+        try:
+            state_dict = json.loads(module.state) if module.state else {}
+            raw_answers = state_dict.get("student_answers", {})
+        except ValueError:
+            log.error(
+                "Answer Distribution: Could not parse module state for " +
+                "StudentModule id={}, course={}".format(module.id, course_id)
+            )
             continue
 
-        for problem in yield_module_descendents(section_module):
-            if isinstance(problem, CapaModule):
-                yield problem
+        # Each problem part has an ID that is derived from the
+        # module.module_state_key (with some suffix appended)
+        for problem_part_id, raw_answer in raw_answers.items():
+            # Convert whatever raw answers we have (numbers, unicode, None, etc.)
+            # to be unicode values. Note that if we get a string, it's always
+            # unicode and not str -- state comes from the json decoder, and that
+            # always returns unicode for strings.
+            answer = unicode(raw_answer)
 
+            try:
+                url, display_name = url_and_display_name(module.module_state_key)
+            except ItemNotFoundError:
+                msg = "Answer Distribution: Item {} referenced in StudentModule {} " + \
+                      "for user {} in course {} not found; " + \
+                      "This can happen if a student answered a question that " + \
+                      "was later deleted from the course. This answer will be " + \
+                      "omitted from the answer distribution CSV."
+                log.warning(
+                    msg.format(module.module_state_key, module.id, module.student_id, course_id)
+                )
+                continue
 
-def answer_distributions(request, course):
-    """
-    Given a course_descriptor, compute frequencies of answers for each problem:
+            answer_counts[(url, display_name, problem_part_id)][answer] += 1
 
-    Format is:
-
-    dict: (problem url_name, problem display_name, problem_id) -> (dict : answer ->  count)
-
-    TODO (vshnayder): this is currently doing a full linear pass through all
-    students and all problems.  This will be just a little slow.
-    """
-
-    counts = defaultdict(lambda: defaultdict(int))
-
-    enrolled_students = User.objects.filter(courseenrollment__course_id=course.id)
-
-    for student in enrolled_students:
-        for capa_module in yield_problems(request, course, student):
-            for problem_id in capa_module.lcp.student_answers:
-                # Answer can be a list or some other unhashable element.  Convert to string.
-                answer = str(capa_module.lcp.student_answers[problem_id])
-                key = (capa_module.url_name, capa_module.display_name_with_default, problem_id)
-                counts[key][answer] += 1
-
-    return counts
-
+    return answer_counts
 
 @transaction.commit_manually
 def grade(student, request, course, keep_raw_scores=False):

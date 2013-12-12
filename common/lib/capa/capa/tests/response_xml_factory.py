@@ -640,8 +640,8 @@ class OptionResponseXMLFactory(ResponseXMLFactory):
 
         # Set the "options" attribute
         # Format: "('first', 'second', 'third')"
-        options_attr_string = ",".join(["'%s'" % str(o) for o in options_list])
-        options_attr_string = "(%s)" % options_attr_string
+        options_attr_string = u",".join([u"'{}'".format(o) for o in options_list])
+        options_attr_string = u"({})".format(options_attr_string)
         optioninput_element.set('options', options_attr_string)
 
         # Set the "correct" attribute
