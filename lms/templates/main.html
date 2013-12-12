@@ -101,6 +101,15 @@
 
   <%include file="widgets/segment-io.html" />
 
+<%
+  style_overrides_file = MicrositeConfiguration.get_microsite_configuration_value(
+    'css_overrides_file')
+%>
+
+% if style_overrides_file:
+  <link rel="stylesheet" type="text/css" href="${static.url(style_overrides_file)}" />
+% endif
+
 </head>
 
 <body class="<%block name='bodyclass'/>">
@@ -135,3 +144,5 @@
     html.escape(enrollment_action)
   ) if course_id and enrollment_action else ""
 }</%def>
+
+

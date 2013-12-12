@@ -146,12 +146,17 @@ META_UNIVERSITIES = {'UTx': ['UTAustinX']}
 # For local test purposes, let's define a "OpenedX" subdomain brand
 MICROSITE_CONFIGURATION = {
     'OpenedX': {
+        # override for USE_CUSTOM_THEME set otherwhere in config
+        'USE_CUSTOM_THEME': True,
+        # override for THEME_NAME set otherwhere in config
+        'THEME_NAME': 'openedx',
+        # allow for microsite to load in an additional .css file that can override
+        # the platform's default CSS definitions. For example, swap out the background image.
+        'css_overrides_file': 'microsites/css/openedx.css',
         # what logo file to display, note that we shouldn't check in trademarked logos
         # into the repository, so these images will have to be deployed/managed outside of
         # code pushes
-        'logo_image_file': 'open_edX_logo.png',    
-        # what background image to display on Course Index and Course About page
-        'background_image_path': '/static/images/homepage-bg.jpg',    
+        'logo_image_file': 'open_edX_logo.png',       
         # what filter to use when displaying the course catalog on the landing page     
         'course_org_filter': 'CDX',
         # email from field on outbound emails
@@ -167,10 +172,6 @@ MICROSITE_CONFIGURATION = {
         'ENABLE_MKTG_SITE':  False,
         # setting to hide the "university partner" list on the landing page
         'show_university_partners': False,
-        # override for USE_CUSTOM_THEME set otherwhere in config
-        'USE_CUSTOM_THEME': True,
-        # override for THEME_NAME set otherwhere in config
-        'THEME_NAME': 'openedx',
         # These 4 following items define the template substitutions to use in the courseware pages
         'header_extra_file': None,
         'header_file': 'navigation.html',
@@ -181,7 +182,11 @@ MICROSITE_CONFIGURATION = {
         # the top-level promo video
         'show_home_header': False,
         # This controls whether the social sharing links of the course about page should be displayed
-        'course_about_show_social_links': True
+        'course_about_show_social_links': True,
+        # This is the text on the course index page which is overlaid on top of the background image
+        'course_index_overlay_text': 'Explore free courses from leading universities.',
+        # This is the logo that displays in the overlay on top of the backgroundimage
+        'course_index_overlay_logo_file': '/static/images/edx_bw.png'
     },
     'Edge': {
         # if set will render to different template in the index page
