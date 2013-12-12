@@ -13,6 +13,10 @@ from ...models import LinkedIn
 
 
 class Command(BaseCommand):
+    """
+    Django command for inviting users to add their course certificates to their
+    LinkedIn profiles.
+    """
     args = ''
     help = ('Sends emails to edX users that are on LinkedIn who have completed '
             'course certificates, inviting them to add their certificates to '
