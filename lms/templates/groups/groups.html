@@ -18,8 +18,11 @@
       <h1>${_("Groups")}</h1>
       <h2>Join a Group</h2>
       <p>If you have an invitation code for a group, please enter it here:</p>
-      <p><input type="text" /></p>
-      <p><input type="submit" /></p>
+      <form action="" method="post">
+          <p><input type="text" /></p>
+          <p><input type="submit" /></p>
+          <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }" />
+      </form>
     </section>
     <section aria-label="Handout Navigation" class="handouts">
       <h1>Your Groups</h1>
