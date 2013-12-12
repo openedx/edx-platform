@@ -26,13 +26,28 @@ class MicrositeConfiguration(object):
         return _microsite_configuration_threadlocal.data
 
     @classmethod
-    def get_microsite_configuration_value(cls, name, default=None):
+    def get_microsite_configuration_value(cls, val_name, default=None):
         """
         Returns a value associated with the request's microsite, if present
         """
         configuration = cls.get_microsite_configuration()
-        return configuration.get(name, default)
+        return configuration.get(val_name, default)
+
+    @classmethod
+    def get_microsite_configuration_value_for_org(cls, org, val_name, default=None):
+        """
+        This returns a configuration value for a microsite which has an org_filter that matches
+        what is passed in
+        """
+        if not hasattr(settings, "MICROSITE_CONFIGURATION"):
+            return default
             
+        for key in settings.MICROSITE_CONFIGURATION.keys():
+            org_filter = settings.MICROSITE_CONFIGURATION[key].get('course_org_filter', None)
+            if org_filter == org:
+                return settings.MICROSITE_CONFIGURATION[key].get(val_name, default)
+        return default
+
     def clear_microsite_configuration(self):
         """
         Clears out any microsite configuration from the current request/thread

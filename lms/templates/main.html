@@ -72,11 +72,13 @@
   <%block name="headextra"/>
 
 <%
+  footer_html = None
   if theme_enabled():
     header_extra_file = MicrositeConfiguration.get_microsite_configuration_value('header_extra_file', 'theme-head-extra.html')
     header_file = MicrositeConfiguration.get_microsite_configuration_value('header_file', 'navigation.html')
     google_analytics_file = MicrositeConfiguration.get_microsite_configuration_value('google_analytics_file', 'theme-google-analytics.html')
     footer_file = MicrositeConfiguration.get_microsite_configuration_value('footer_file', 'theme-footer.html')
+    footer_html = MicrositeConfiguration.get_microsite_configuration_value('footer_html')
   else:
     header_extra_file = None
     header_file = "navigation.html"
@@ -127,7 +129,11 @@
   </section>
 
 % if not suppress_toplevel_navigation:
-  <%include file="${footer_file}" />
+  % if footer_html:
+    ${footer_html}
+  % else:
+    <%include file="${footer_file}" />
+  % endif
 % endif
 
   <script>window.baseUrl = "${settings.STATIC_URL}";</script>

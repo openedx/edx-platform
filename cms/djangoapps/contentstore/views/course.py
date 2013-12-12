@@ -53,6 +53,8 @@ from xmodule.modulestore.locator import BlockUsageLocator
 from course_creators.views import get_course_creator_status, add_user_with_status_unrequested
 from contentstore import utils
 
+from microsite_configuration.middleware import MicrositeConfiguration
+
 __all__ = ['course_info_handler', 'course_handler', 'course_info_update_handler',
            'settings_handler',
            'grading_handler',
@@ -413,15 +415,19 @@ def settings_handler(request, tag=None, package_id=None, branch=None, version_gu
     if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
         upload_asset_url = locator.url_reverse('assets/')
 
+        # see if the ORG of this course can be attributed to a 'Microsite'. In that case, the
+        # course about page should be editable in Studio
+        about_page_editable = not MicrositeConfiguration.get_microsite_configuration_value_for_org(
+            course_module.location.org, 'ENABLE_MKTG_SITE', settings.FEATURES.get(
+            'ENABLE_MKTG_SITE', False))
+
         return render_to_response('settings.html', {
             'context_course': course_module,
             'course_locator': locator,
             'lms_link_for_about_page': utils.get_lms_link_for_about_page(course_module.location),
             'course_image_url': utils.course_image_url(course_module),
             'details_url': locator.url_reverse('/settings/details/'),
-            'about_page_editable': not settings.FEATURES.get(
-                'ENABLE_MKTG_SITE', False
-            ),
+            'about_page_editable': about_page_editable,
             'upload_asset_url': upload_asset_url
         })
     elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):
