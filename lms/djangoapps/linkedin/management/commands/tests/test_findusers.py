@@ -173,3 +173,14 @@ class FindUsersTests(unittest.TestCase):
                          [i % 2 == 0 for i in xrange(9)])
         self.assertEqual(users[9].linkedin.has_linkedin_account, None)
         self.assertTrue(command.stderr.getvalue().startswith("WARNING"))
+
+    @mock.patch('linkedin.management.commands.findusers.get_call_limits')
+    def test_command_no_api_calls(self, get_call_limits):
+        """
+        Test rechecking all users with no API limits.
+        """
+        from django.core.management.base import CommandError
+        fut = findusers.Command().handle
+        get_call_limits.return_value = (0, 0, 0)
+        with self.assertRaises(CommandError):
+            fut(recheck=True)
