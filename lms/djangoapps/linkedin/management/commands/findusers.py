@@ -1,3 +1,7 @@
+"""
+Provides a command to use with Django's `manage.py` that uses LinkedIn's API to
+find edX users that are also users on LinkedIn.
+"""
 import datetime
 import pytz
 import time
@@ -8,8 +12,8 @@ from django.utils import timezone
 
 from optparse import make_option
 
-
 FRIDAY = 4
+
 
 def get_call_limits():
     """
@@ -42,18 +46,25 @@ def get_call_limits():
 
 
 class Command(BaseCommand):
+    """
+    Provides a command to use with Django's `manage.py` that uses LinkedIn's
+    API to find edX users that are also users on LinkedIn.
+    """
     args = ''
     help = 'Checks LinkedIn for students that are on LinkedIn'
     option_list = BaseCommand.option_list + (
-        make_option('--recheck',
+        make_option(
+            '--recheck',
             action='store_true',
             dest='recheck',
             default=False,
             help='Check users that have been checked in the past to see if '
-                 'they have joined or left LinkedIn since the last check'),
-        )
+                 'they have joined or left LinkedIn since the last check'),)
 
     def handle(self, *args, **options):
+        """
+        Check users.
+        """
         api = LinkedinAPI()
         recheck = options.pop('recheck', False)
         max_checks, checks_per_call, time_between_calls = get_call_limits()
@@ -76,6 +87,7 @@ class Command(BaseCommand):
                    for i in xrange(0, len(check_users), checks_per_call)]
 
         def do_batch(batch):
+            "Process a batch of users."
             emails = [u.email for u in batch]
             for user, has_account in zip(batch, api.batch(emails)):
                 user.linkedin.has_linkedin_account = has_account
@@ -88,7 +100,12 @@ class Command(BaseCommand):
 
 
 class LinkedinAPI(object):
+    """
+    Encapsulates the LinkedIn API.
+    """
 
     def batch(self, emails):
+        """
+        Get the LinkedIn status for a batch of emails.
+        """
         pass
-
