@@ -9,18 +9,14 @@ def groups(request, course_id):
 
     course = get_course_by_id(course_id, depth=None)
 
-    context = {
-        'course': course,
-    }
-
-    return render_to_response('joinus/groups.html', context)
-
-def join_group(request, course_id):
-    """Join a group, given an invitation code."""
-    course = get_course_by_id(course_id, depth=None)
-
-    context = {
-        'course': course,
-    }
+    if request.POST:
+        context = {
+            'course': course,
+            'invitation_code': request.POST['invitation_code'],
+        }
+    else:
+        context = {
+            'course': course,
+        }
 
     return render_to_response('joinus/groups.html', context)
