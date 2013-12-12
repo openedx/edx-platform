@@ -1,24 +1,19 @@
 #!/usr/bin/python
 #
-# django management command: dump grades to csv files
-# for use by batch processes
+# Admin command for open ended problems.
 
-from instructor.offline_gradecalc import offline_grade_calculation
-from courseware.courses import get_course_by_id
-from xmodule.modulestore.django import modulestore
-from courseware.models import StudentModule
-from courseware.model_data import FieldDataCache
-from courseware.module_render import get_module, get_module_for_descriptor
-from django.contrib.auth.models import User
-from ...utils import create_module, get_descriptor, DummyRequest
-
+from xmodule.open_ended_grading_classes.openendedchild import OpenEndedChild
+from ...utils import get_descriptor, get_module_for_student, get_enrolled_students
 from django.core.management.base import BaseCommand
 
 
 class Command(BaseCommand):
+    """Admin command for open ended problems."""
+
     help = "Usage: openended_stats course_id location \n"
 
     def handle(self, *args, **options):
+        """Handler for command."""
 
         print "args = ", args
 
@@ -29,33 +24,32 @@ class Command(BaseCommand):
             print self.help
             return
 
-        request = DummyRequest()
-        course = get_course_by_id(course_id)
-        descriptor = get_descriptor(course, location)
+        descriptor = get_descriptor(course_id, location)
         if descriptor is None:
             print "Location not found in course"
             return
 
-        enrolled_students = User.objects.filter(
-            courseenrollment__course_id=course_id,
-            courseenrollment__is_active=1
-        ).prefetch_related("groups").order_by('username')
+        enrolled_students = get_enrolled_students(course_id)
+        print "Total students enrolled: {0}".format(enrolled_students.count())
 
-        for student in enrolled_students:
-            request.user = student
-            request.session = {}
-            module = create_module(descriptor, course, student, request)
-            tasks = len(module.task_states)
-            # if tasks>0:
-            print tasks
+        self.get_state_counts(enrolled_students, course_id, location)
 
-            try:
-                student_module = StudentModule.objects.get(
-                    student=student,
-                    course_id=course_id,
-                    module_state_key=descriptor.id
-                )
-                # print student_module
+    def get_state_counts(self, students, course_id, location):
+        """Print stats of students."""
 
-            except StudentModule.DoesNotExist:
-                student_module = None
+        stats = {
+            OpenEndedChild.INITIAL: 0,
+            OpenEndedChild.ASSESSING: 0,
+            OpenEndedChild.POST_ASSESSMENT: 0,
+            OpenEndedChild.DONE: 0
+        }
+
+        for index, student in enumerate(students):
+            if index % 100 == 0:
+                print "{0} students processed".format(index)
+
+            module = get_module_for_student(student, course_id, location)
+            latest_task = module._xmodule.child_module.get_latest_task()
+            stats[latest_task.child_state] += 1
+
+        print stats

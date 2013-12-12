@@ -348,6 +348,29 @@ class CombinedOpenEndedV1Module():
         last_completed_child = next((i for i, child in reversed(list(enumerate(children))) if child['child_state'] == self.DONE), 0)
         self.current_task_number = min(last_completed_child + 1, len(best_task_states) - 1)
 
+    def create_task(self, task_state, task_xml):
+        """Create task object for given task state and task xml."""
+
+        tag_name = self.get_tag_name(task_xml)
+        children = self.child_modules()
+        task_descriptor = children['descriptors'][tag_name](self.system)
+        task_parsed_xml = task_descriptor.definition_from_xml(etree.fromstring(task_xml), self.system)
+        task = children['modules'][tag_name](
+            self.system,
+            self.location,
+            task_parsed_xml,
+            task_descriptor,
+            self.static_data,
+            instance_state=task_state,
+        )
+        return task
+
+    def get_latest_task(self):
+        """Return latest task object."""
+
+        last_task_state = self.task_states[-1]
+        last_task_xml = self.task_xml[-1]
+        return self.create_task(last_task_state, last_task_xml)
 
     def reset_task_state(self, message=""):
         """
