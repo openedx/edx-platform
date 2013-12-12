@@ -31,6 +31,16 @@
     </section>
     <section aria-label="Handout Navigation" class="handouts">
       <h1>Your Groups</h1>
+        <ol>
+       
+        % for group in groups:
+         <li>
+          ${group}
+        % endfor
+        </li>
+        <hr></hr>
+        
+        </ul>
     </section>
   </div>
 </section>

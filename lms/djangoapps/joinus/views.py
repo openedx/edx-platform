@@ -18,5 +18,6 @@ def groups(request, course_id):
         context = {
             'course': course,
         }
+    context['groups']=['UQ class: John Z instructor', 'My study group']
 
     return render_to_response('joinus/groups.html', context)
