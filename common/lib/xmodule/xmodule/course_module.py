@@ -307,7 +307,7 @@ class CourseFields(object):
                                      {"short_description": _("Enroll in edX 101"),
                                       "long_description": _("Register for edX 101, edX's primer for course creation."),
                                       "is_checked": False,
-                                      "action_url": _("https://edge.edx.org/courses/edX/edX101/How_to_Create_an_edX_Course/about"),
+                                      "action_url": "https://edge.edx.org/courses/edX/edX101/How_to_Create_an_edX_Course/about",
                                       "action_text": _("Register for edX 101"),
                                       "action_external": True},
                                      {"short_description": _("Download the Studio Documentation"),
