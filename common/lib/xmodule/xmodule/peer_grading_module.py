@@ -87,12 +87,12 @@ class PeerGradingModule(PeerGradingFields, XModule):
 
     js = {
         'js': [
-            resource_string(__name__, 'js/src/peergrading/ice.min.js'),
+            # resource_string(__name__, 'js/src/peergrading/ice.min.js'), This was removed because the ICE library has a somewhat incompatible license to be hosted directly in this code repo.
         ],
         'coffee': [
             resource_string(__name__, 'js/src/peergrading/peer_grading.coffee'),
             resource_string(__name__, 'js/src/peergrading/peer_grading_problem.coffee'),
-            resource_string(__name__, 'js/src/peergrading/track_changes.coffee'),
+            # resource_string(__name__, 'js/src/peergrading/track_changes.coffee'), Enable this code only if you also download the ICE library
             resource_string(__name__, 'js/src/collapsible.coffee'),
             resource_string(__name__, 'js/src/javascript_loader.coffee'),
         ]

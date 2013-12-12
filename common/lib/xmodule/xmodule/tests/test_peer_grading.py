@@ -407,13 +407,17 @@ class PeerGradingModuleTrackChangesTest(unittest.TestCase, DummyModulestore):
         self.setup_modulestore(COURSE)
         self.peer_grading = self.get_module_from_location(self.pgm_location, COURSE)
 
-    def test_tracking_peer_eval_problem(self):
-        """
-        Tests rendering of peer eval problem with track changes set.  With the test_system render_template
-        this test becomes a bit tautological, but oh well.
-        @return:
-        """
-        self.peer_grading._find_corresponding_module_for_location = self.mock_track_changes_problem
-        response = self.peer_grading.peer_grading_problem({'location': 'mocked'})
-        self.assertTrue(response['success'])
-        self.assertIn("'track_changes': True", response['html'])
+###
+# Commented out because Track Changes feature is disabled and the ICE library has been removed for license issues.
+# Before you re-enable this test make sure you re-install the ICE library and re-enable the Track Changes feature.
+#
+#     def test_tracking_peer_eval_problem(self):
+#         """
+#         Tests rendering of peer eval problem with track changes set.  With the test_system render_template
+#         this test becomes a bit tautological, but oh well.
+#         @return:
+#         """
+#         self.peer_grading._find_corresponding_module_for_location = self.mock_track_changes_problem
+#         response = self.peer_grading.peer_grading_problem({'location': 'mocked'})
+#         self.assertTrue(response['success'])
+#         self.assertIn("'track_changes': True", response['html'])
