@@ -180,14 +180,7 @@ class LTIModule(LTIFields, XModule):
         Otherwise error message from LTI provider is generated.
     """
 
-    js = {
-        'js': [
-            resource_string(__name__, 'js/src/lti/01_lti.js'),
-            resource_string(__name__, 'js/src/lti/02_main.js')
-        ]
-    }
     css = {'scss': [resource_string(__name__, 'css/lti/lti.scss')]}
-    js_module_name = "LTI"
 
     def get_input_fields(self):
         # LTI provides a list of default parameters that might be passed as
@@ -253,12 +246,11 @@ class LTIModule(LTIFields, XModule):
             client_secret,
         )
 
-    def get_html(self):
+    def get_context(self):
         """
-        Renders parameters to template.
+        Returns a context.
         """
-
-        context = {
+        return {
             'input_fields': self.get_input_fields(),
 
             # These parameters do not participate in OAuth signing.
@@ -267,12 +259,27 @@ class LTIModule(LTIFields, XModule):
             'element_class': self.category,
             'open_in_a_new_page': self.open_in_a_new_page,
             'display_name': self.display_name,
-            'ajax_url': self.system.ajax_url,
+            'form_url': self.get_form_path(),
         }
 
-        return self.system.render_template('lti.html', context)
 
-    def handle_ajax(self, dispatch, __):
+    def get_form_path(self):
+        return  self.runtime.handler_url(self, 'preview_handler').rstrip('/?')
+
+    def get_html(self):
+        """
+        Renders parameters to template.
+        """
+        return self.system.render_template('lti.html', self.get_context())
+
+    def get_form(self):
+        """
+        Renders parameters to form template.
+        """
+        return self.system.render_template('lti_form.html', self.get_context())
+
+    @XBlock.handler
+    def preview_handler(self, request, dispatch):
         """
         Ajax handler.
 
@@ -282,10 +289,7 @@ class LTIModule(LTIFields, XModule):
         Returns:
             json string
         """
-        if dispatch == 'regenerate_signature':
-            return json.dumps({ 'input_fields': self.get_input_fields() })
-        else: # return error message
-            return json.dumps({ 'error': '[handle_ajax]: Unknown Command!' })
+        return Response(self.get_form(), content_type='text/html')
 
     def get_user_id(self):
         user_id = self.runtime.anonymous_student_id
@@ -614,3 +618,4 @@ class LTIDescriptor(LTIFields, MetadataOnlyEditingDescriptor, EmptyDataRawDescri
     """
     module_class = LTIModule
     grade_handler = module_attr('grade_handler')
+    preview_handler = module_attr('preview_handler')

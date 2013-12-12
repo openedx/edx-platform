@@ -4,32 +4,7 @@
 <div
     id="${element_id}"
     class="${element_class}"
-    data-open_in_a_new_page="${json.dumps(open_in_a_new_page)}"
-    data-ajax_url="${ajax_url}"
 >
-
-    ## This form will be hidden.
-    ## If open_in_a_new_page is false then, once available on the client, the
-    ## LTI module JavaScript will trigger a "submit" on the form, and the
-    ## result will be rendered to the below iFrame.
-    ## If open_in_a_new_page is true, then link will be shown, and by clicking
-    ## on it, LTI will pop up in new window.
-    <form
-        action="${launch_url}"
-        name="ltiLaunchForm-${element_id}"
-        class="ltiLaunchForm"
-        method="post"
-        target=${"_blank" if open_in_a_new_page else "ltiLaunchFrame-{0}".format(element_id)}
-        encType="application/x-www-form-urlencoded"
-    >
-
-        % for param_name, param_value in input_fields.items():
-            <input name="${param_name}" value="${param_value}" />
-        %endfor
-
-        <input type="submit" value="Press to Launch" />
-    </form>
-
 
 % if launch_url and launch_url !=  'http://www.example.com':
     % if open_in_a_new_page:
@@ -37,7 +12,7 @@
             <h3 class="title">
                 ${display_name} (${_('External resource')})
             </h3>
-            <p class="lti-link external"><a href="#" class='link_lti_new_window'>
+            <p class="lti-link external"><a target="_blank" class="link_lti_new_window" href="${form_url}">
                 ${_('View resource in a new window')}
                  <i class="icon-external-link"></i>
             </a></p>
@@ -45,9 +20,9 @@
     % else:
         ## The result of the form submit will be rendered here.
         <iframe
-            name="ltiLaunchFrame-${element_id}"
             class="ltiLaunchFrame"
-            src=""
+            name="ltiFrame-${element_id}"
+            src="${form_url}"
         ></iframe>
     % endif
 % else:
