@@ -450,6 +450,8 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
 
             if not self.hide_progress_tab:
                 tabs.append({'type': 'progress', 'name': 'Progress'})
+            # TODO does this need access control
+            tabs.append({'type': 'groups', 'name': 'Groups'})
 
             self.tabs = tabs
 
