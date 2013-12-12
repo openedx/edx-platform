@@ -3,212 +3,178 @@
 
 .view-outline {
 
-  input.courseware-unit-search-input {
-      float: left;
-      width: 260px;
-      background-color: #fff;
+  // page structure
+  .content-primary,
+  .content-supplementary {
+    @include box-sizing(border-box);
+    float: left;
   }
 
-  .branch {
+  .content-primary {
+    width: flex-grid(9, 12);
+    margin-right: flex-gutter();
 
-      .section-item {
-        @include clearfix();
+    .no-outline-content {
+      @extend %ui-well;
+      padding: ($baseline*2);
+      background-color: $gray-l4;
+      text-align: center;
+      color: $gray;
 
-        .details {
-          display: block;
-          float: left;
-          margin-bottom: 0;
-          width: 650px;
-        }
+      .new-button {
+        @include font-size(14);
+        margin-left: $baseline;
 
-        .gradable-status {
-          float: right;
-          position: relative;
-          top: -4px;
-          right: 50px;
-          width: 100px;
-
-          .status-label {
-            @include font-size(12);
-            position: absolute;
-            top: 2px;
-            right: -5px;
-            display: none;
-            width: 110px;
-            padding: 5px 40px 5px 10px;
-            border-radius: 3px;
-            color: $lightGrey;
-            text-align: right;
-            font-weight: bold;
-            line-height: 16px;
-          }
-
-          .menu-toggle {
-                z-index: 10;
-                position: absolute;
-                top: 0;
-                right: 5px;
-                padding: 5px;
-                color: $mediumGrey;
-
-                &:hover, &.is-active {
-                  color: $blue;
-                }
-              }
-
-              [class^="icon-"] {
-                  vertical-align: middle;
-                  margin-top: -5px;
-                  display: inline-block;
-                }
-
-              .menu {
-                @include font-size(12);
-                @include transition(opacity $tmg-f2 linear 0s);
-                border-radius: 4px;
-                box-shadow: 0 1px 2px rgba(0, 0, 0, .2);
-                z-index: 1;
-                display: none;
-                opacity: 0.0;
-                position: absolute;
-                top: -1px;
-                right: 0;
-                margin: 0;
-                padding: 8px 12px;
-                background: $white;
-                border: 1px solid $mediumGrey;
-
-
-                li {
-                  width: 115px;
-                  margin-bottom: 3px;
-                  padding-bottom: 3px;
-                  border-bottom: 1px solid $lightGrey;
-
-                  &:last-child {
-                    margin-bottom: 0;
-                    padding-bottom: 0;
-                    border: none;
-
-                    a {
-                      color: $darkGrey;
-                    }
-                  }
-                }
-
-            a {
-              color: $blue;
-
-              &.is-selected {
-                font-weight: bold;
-              }
-            }
-          }
-
-          // dropdown state
-          &.is-active {
-
-            .menu {
-              z-index: 1000;
-              display: block;
-              opacity: 1.0;
-            }
-
-            .menu-toggle {
-              z-index: 10000;
-            }
-          }
-
-          // set state
-          &.is-set {
-
-            .menu-toggle {
-              color: $blue;
-            }
-
-            .status-label {
-              display: block;
-              color: $blue;
-            }
-          }
+        [class^="icon-"] {
+          margin-right: ($baseline/2);
         }
       }
     }
+  }
+
+  .content-supplementary {
+    width: flex-grid(3, 12);
+  }
 
 
+  // page header bits
+  .toggle-button-sections {
+    @extend %t-copy-sub2;
+    position: relative;
+    display: none;
+    float: right;
+    margin-top: ($baseline/4);
+    color: $gray-l1;
+
+    &.is-shown {
+      display: block;
+    }
+
+    .label {
+      display: inline-block;
+    }
+  }
+
+
+  // new section, subsection, unit
+  .new-section-name,
+  .new-subsection-name-input {
+    @include font-size(16);
+    display: inline-block;
+    width: 515px;
+    padding: ($baseline/4);
+    vertical-align: top;
+  }
+
+  .new-subsection-name-input {
+    @include font-size(14);
+  }
+  .new-section-name-save,
+  .new-subsection-name-save {
+    @include blue-button;
+    margin: 0 5px;
+    padding: 4px 20px 7px;
+    color: $white;
+  }
+
+  .new-section-name-cancel,
+  .new-subsection-name-cancel {
+    @include white-button;
+    padding: 4px 20px 7px;
+    color: $gray-l1;
+  }
+
+  .new-subsection-item,
+  .new-unit-item {
+    @extend %ui-btn-flat-outline;
+    width: 100%;
+    margin: 0 0 ($baseline/2) 0;
+    border: 1px solid $gray-l3;
+    padding: ($baseline/2) 0;
+    color: $gray-l2;
+
+
+    &:hover {
+      box-shadow: none;
+      background-image: none;
+    }
+  }
+
+  .courseware-unit-new {
+    margin-right: ($baseline*1.5);
+  }
+
+
+  // general action list styles (section and subsection)
+  .expand-collapse {
+    @include transition(all $tmg-f2 linear 0s);
+    display: inline-block;
+    vertical-align: top;
+    margin: 0 ($baseline/4);
+    color: $gray-l2;
+
+    &:hover {
+      color: $blue;
+    }
+
+    .ui-toggle-expansion {
+      @include transition(all $tmg-f2 ease-in-out 0s);
+      @include font-size(18);
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: ($baseline/4);
+      color: $gray-l3;
+    }
+
+    &.expand .ui-toggle-expansion {
+      @include transform(rotate(-90deg));
+      @include transform-origin(50% 50%);
+    }
+
+  }
+
+  .actions-list {
+    display: inline-block;
+    margin-bottom: 0;
+  }
+
+  .actions-item {
+    @include font-size(13);
+    display: inline-block;
+    padding: 0 4px;
+    vertical-align: middle;
+
+    .action {
+      min-width: ($baseline*.75);
+      color: $gray-l2;
+
+      &:hover,
+      &.is-set {
+        color: $blue;
+        visibility: visible;
+      }
+
+      //reset old drag handle style
+      &.drag-handle {
+        float: none;
+        margin: 0;
+        background: transparent url(../img/drag-handles.png) right 5px no-repeat;
+        text-align: center;
+      }
+
+    }
+  }
+
+
+  // section styles
   .courseware-section {
     @extend %ui-window;
     @include transition(background $tmg-avg ease-in-out 0);
     position: relative;
-    margin-top: ($baseline);
-    padding-bottom: ($baseline/2);
+    padding: ($baseline*1.5) $baseline $baseline $baseline;
 
     &.collapsed {
-        padding-bottom: 0;
-    }
-
-    label {
-        float: left;
-        line-height: 29px;
-    }
-
-    .datepair {
-        float: left;
-        margin-left: 10px;
-    }
-
-    .section-published-date {
-        position: absolute;
-        top: 19px;
-        right: 80px;
-        padding: 4px 10px;
-        border-radius: 3px;
-        background: $lightGrey;
-        text-align: right;
-
-        .published-status {
-            @include font-size(12);
-            margin-right: 15px;
-
-            strong {
-                font-weight: bold;
-            }
-        }
-
-        .schedule-button {
-            @include blue-button;
-        }
-
-        .edit-button {
-            @include blue-button;
-        }
-
-        .schedule-button,
-        .edit-button {
-            @include font-size(11);
-            padding: 3px 15px 5px;
-        }
-    }
-
-    .datepair .date,
-    .datepair .time {
-        @include font-size(13);
-        box-shadow: none;
-        padding-left: 0;
-        padding-right: 0;
-        border: none;
-        background: none;
-        font-weight: bold;
-        color: $blue;
-        cursor: pointer;
-    }
-
-    .datepair .date {
-        width: 80px;
-    }
-
-    .datepair .time {
-        width: 65px;
+      padding-bottom: 0;
     }
 
     &.collapsed .subsection-list,
@@ -217,62 +183,119 @@
         display: none !important;
     }
 
-    header {
-        min-height: 75px;
+    &.new-section {
+      padding: ($baseline*1.5) $baseline 0 $baseline;
+
+      header {
         @include clearfix();
+        height: auto;
+        border-bottom: 0;
 
-        .item-details, .section-published-date {
-
+        .expand-collapse {
+          display: none;
         }
 
         .item-details {
-            display: inline-block;
-            padding: 20px 0 10px 0;
-            @include clearfix();
+          width: auto;
 
-            .section-name {
-              @include font-size(19);
-              float: left;
-              margin-right: 10px;
-              width: 350px;
-              font-weight: bold;
-              color: $blue;
-            }
+          .section-name {
+            float: none;
+            width: 100%;
+          }
+        }
+      }
+    }
 
-            .section-name-span {
-              @include transition(color $tmg-f2 linear 0s);
-              cursor: pointer;
+    .section {
+      @include clearfix();
+      min-height: 65px; // needed to align with edit input
+      margin-bottom: 0;
+      border: 0;
+      padding: 0;
 
-              &:hover {
-                color: $orange;
-              }
-            }
+      // section name area
+      .item-details {
+        @include clearfix();
+        width: 400px;
+        float: none;
+        display: inline-block;
+        padding: 0 0 ($baseline/2) 0;
 
-            .section-name-edit {
-              position: relative;
-              width: 400px;
-              background: $white;
+        .section-name {
+          @include font-size(19);
+          margin-right: ($baseline/2);
+        }
 
-              input {
-              @include font-size(16);
+        .section-name-span {
+          @include transition(color $tmg-f2 linear 0s);
+          cursor: pointer;
+
+          &:hover {
+            color: $blue;
+          }
+        }
+
+        .section-name-edit {
+          position: relative;
+          width: ($baseline*20);
+          background: $white;
+
+          input {
+            @include font-size(16);
           }
 
           .save-button {
             @include blue-button;
-            padding: 7px 20px 7px;
-            margin-right: 5px;
+            padding: 7px $baseline 7px;
+            margin-right: ($baseline/4);
           }
 
           .cancel-button {
             @include white-button;
-            padding: 7px 20px 7px;
+            padding: 7px $baseline 7px;
+          }
+        }
+      }
+
+
+      // section specific action styles
+      .item-actions {
+        position: relative;
+        display: inline-block;
+        float: right;
+        margin-bottom: ($baseline/2);
+        top: 0;
+      }
+
+      .actions-item {
+        padding: 0 0 0 8px;
+
+        &:last-child {
+          padding-right: 4px;
+        }
+
+        &.pubdate {
+          padding-right: 0;
+        }
+
+        .action {
+
+          &.pubdate {
+            visibility: hidden;
+          }
+
+          &:hover,
+          &.is-set {
+            color: $blue;
+            visibility: visible;
           }
         }
 
         .section-published-date {
-          float: right;
+          padding: ($baseline/5) ($baseline/2);
           border-radius: 3px;
-          background: $lightGrey;
+          background: $gray-l5;
+          text-align: right;
 
           .published-status {
             @include font-size(12);
@@ -283,391 +306,248 @@
             }
           }
 
-          .schedule-button {
-            @include blue-button;
-          }
+          &.released .section-published-date {
+            background-color: transparent;
+            color: $gray-l1;
 
-          .edit-button {
-            @include blue-button;
-          }
+            a {
+              color: $gray-l2;
 
-          .schedule-button,
-          .edit-button {
-            @include font-size(11);
-            padding: 0 15px 2px 15px;
-            }
-          }
-
-          .gradable-status {
-            position: absolute;
-            top: 20px;
-            right: 70px;
-            width: 145px;
-
-            .status-label {
-              @include font-size(12);
-              border-radius: 3px;
-              position: absolute;
-              top: 0;
-              right: 2px;
-              display: none;
-              width: 100px;
-              padding: 10px 35px 10px 10px;
-              background: $lightGrey;
-              color: $lightGrey;
-              text-align: right;
-              font-weight: bold;
-              line-height: 16px;
-            }
-
-            .menu-toggle {
-              z-index: 10;
-              position: absolute;
-              top: 2px;
-              right: 5px;
-              padding: 5px;
-              color: $lightGrey;
-
-              &:hover, &.is-active {
+              &:hover {
                 color: $blue;
               }
-
             }
-
-            .menu {
-              @include font-size(12);
-              @include transition(opacity $tmg-f2 linear 0s, display $tmg-f2 linear 0s);
-              border-radius: 4px;
-              box-shadow: 0 1px 2px rgba(0, 0, 0, .2);
-              z-index: 1;
-              display: none;
-              opacity: 0.0;
-              position: absolute;
-              top: -1px;
-              left: 2px;
-              margin: 0;
-              padding: 8px 12px;
-              background: $white;
-              border: 1px solid $mediumGrey;
-
-
-
-              li {
-                width: 115px;
-                margin-bottom: 3px;
-                padding-bottom: 3px;
-                border-bottom: 1px solid $lightGrey;
-
-                &:last-child {
-                  margin-bottom: 0;
-                  padding-bottom: 0;
-                  border: none;
-
-                  a {
-                    color: $darkGrey;
-                  }
-                }
-              }
-
-              a {
-
-                &.is-selected {
-                  font-weight: bold;
-                }
-              }
-          }
-
-          // dropdown state
-          &.is-active {
-
-            .menu {
-              z-index: 1000;
-              display: block;
-              opacity: 1.0;
-            }
-
-
-          .menu-toggle {
-            z-index: 10000;
           }
         }
-
-        // set state
-        &.is-set {
-
-          .menu-toggle {
-            color: $blue;
-          }
-
-          .status-label {
-            display: block;
-            color: $blue;
-          }
-        }
-
-        float: left;
-        padding: 21px 0 0;
       }
     }
+  }
+
+
+  // subsection styles
+  .courseware-subsection {
+    @include clearfix();
+    margin-bottom: ($baseline/4);
+
+    &.visible {
+      border-left: 5px solid $green;
+    }
+
+    &.mixed {
+      border-left: 5px solid $yellow-s1;
+    }
+
+    .status {
+      @extend %cont-text-sr;
+    }
+
+    .section-item {
+      @include transition(background $tmg-avg ease-in-out 0);
+      @include font-size(13);
+      position: relative;
+      display: block;
+      background-color: $gray-l5;
+      padding: 6px 8px 8px 16px;
+
+      &:hover {
+        background: $blue-l5;
 
         .item-actions {
-            margin-top: 21px;
-            margin-right: 12px;
-
-            .edit-button,
-            .delete-button {
-                margin-top: -3px;
-            }
-        }
-
-        .expand-collapse-icon {
-            @include transition(none);
-            float: left;
-            margin: 25px 6px 16px 16px;
-
-            &.expand {
-                background-position: 0 0;
-            }
-
-            &.collapsed {
-
-            }
-        }
-
-        .drag-handle {
-            margin-left: 11px;
-        }
-    }
-
-    h3 {
-        @include font-size(19);
-        font-weight: 700;
-        color: $blue;
-    }
-
-    .section-name-span {
-        @include transition(color $tmg-f2 linear 0s);
-        cursor: pointer;
-
-        &:hover {
-            color: $orange;
-        }
-    }
-
-    .section-name-form {
-        margin-bottom: 15px;
-    }
-
-    .section-name-edit {
-        input {
-          @include font-size(16);
-        }
-
-        .save-button {
-            @include blue-button;
-            padding: 7px 20px 7px;
-            margin-right: 5px;
-        }
-
-        .cancel-button {
-            @include white-button;
-            padding: 7px 20px 7px;
-        }
-    }
-
-    h4 {
-        @include font-size(12);
-        color: #878e9d;
-
-        strong {
-            font-weight: bold;
-        }
-    }
-
-    .list-header {
-        @include linear-gradient(top, transparent, rgba(0, 0, 0, .1));
-        background-color: #ced2db;
-        border-radius: 3px 3px 0 0;
-    }
-
-    .subsection-list {
-        margin: 0 12px;
-
-        > ol {
-            @include tree-view;
-            border-top-width: 0;
-        }
-    }
-
-    &.new-section {
-
-        header {
-            @include clearfix();
-            height: auto;
-        }
-
-        .expand-collapse-icon {
-            visibility: hidden;
-        }
-
-        .item-details {
-          padding: 25px 0 0 0;
-
-          .section-name {
-            float: none;
-            width: 100%;
-          }
-        }
-    }
-  }
-
-  .toggle-button-sections {
-      @include font-size(12);
-      display: none;
-      position: relative;
-      float: right;
-      margin-top: ($baseline/4);
-      color: $darkGrey;
-
-      &.is-shown {
           display: block;
+        }
       }
 
-      [class^="icon-"] {
-          @include font-size(11);
-          border-radius: 20px;
-          position: relative;
-          top: -1px;
-          display: inline-block;
-          margin-right: 2px;
-          line-height: 5px;
+      &.editing {
+        background: $orange-l4;
       }
+    }
 
-      .label {
-          display: inline-block;
-      }
-  }
-
-  .new-section-name,
-  .new-subsection-name-input {
-      width: 515px;
-  }
-
-  .new-section-name-save,
-  .new-subsection-name-save {
-      @include blue-button;
-      padding: 4px 20px 7px;
-      margin: 0 5px;
-      color: #fff !important;
-  }
-
-  .new-section-name-cancel,
-  .new-subsection-name-cancel {
-      @include white-button;
-      padding: 4px 20px 7px;
-      color: #8891a1 !important;
-  }
-
-  .dummy-calendar {
-      display: none;
-      position: absolute;
-      top: 55px;
-      left: 110px;
-      z-index: 9999;
-      border: 1px solid #3C3C3C;
-      box-shadow: 0 1px 15px rgba(0, 0, 0, .2);
-  }
-
-  .preview {
-      background: url(../img/preview.jpg) center top no-repeat;
-  }
-
-  .edit-subsection-publish-settings {
-      display: none;
-      position: fixed;
-      top: 100px;
-      left: 50%;
-      z-index: 99999;
+    .details {
+      display: block;
+      margin-bottom: 0;
       width: 600px;
-      margin-left: -300px;
-      background: #fff;
-      text-align: center;
 
-      .settings {
-          padding: 40px;
+      a {
+        color: $baseFontColor;
+      }
+    }
+  }
+
+  // gradable drop down
+  .gradable-status {
+    display: inline-block;
+    position: relative;
+
+    .status-label {
+      @include font-size(12);
+      width: 110px;
+      padding: 5px 40px 5px 10px;
+      border-radius: 3px;
+      color: transparent;
+      text-align: right;
+      font-weight: bold;
+      line-height: 16px;
+    }
+
+    .menu-toggle {
+      @extend %ui-depth1;
+      position: absolute;
+      top: 0;
+      right: 5px;
+      padding: 2px 5px;
+      color: $gray-l2;
+
+      &:hover,
+      &.is-active {
+        color: $blue;
       }
 
-      h3 {
-          @include font-size(34);
-          font-weight: 300;
+      &:focus {
+        outline: 0;
       }
+    }
 
-      .picker {
-          @include clearfix();
-          margin: 30px 0 65px;
 
-          .field {
-            float: left;
-            margin-right: ($baseline/2);
+    // gradable dropdown menu default
+    .menu {
+      @include font-size(12);
+      @include transition(opacity $tmg-f2 linear 0s);
+      display: none;
+      opacity: 0.0;
+      z-index: 1;
+      position: absolute;
+      top: -4px;
+      right: 0;
+      margin: 0;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, .2);
+      border: 1px solid $gray-l2;
+      border-radius: 4px;
+      padding: 8px 12px;
+      background: $white;
 
-            &:first-child {
-              margin-left: ($baseline*5);
-            }
+      li {
+        width: 115px;
+        margin-bottom: 3px;
+        border-bottom: 1px solid $gray-l4;
+        padding-bottom: 3px;
 
-            &:last-child {
-              margin-right: 0;
-            }
+        &:last-child {
+          margin-bottom: 0;
+          border: none;
+          padding-bottom: 0;
 
-            label, input {
-              display: block;
-              text-align: left;
-            }
-
-            label {
-              @extend %t-copy-sub1;
-              margin-bottom: ($baseline/4);
-            }
+          .gradable-status-notgraded {
+            color: $gray;
           }
+        }
       }
 
-      .description {
-          @include font-size(14);
-          float: left;
-          margin-top: 30px;
-          line-height: 20px;
-          width: 100%;
+      a {
+        color: $blue;
+
+        &.is-selected {
+          font-weight: bold;
+        }
+      }
+    }
+
+    // gradable dropdown state
+    &.is-active {
+
+      .menu {
+        @extend %ui-depth3;
+        display: block;
+        opacity: 1.0;
       }
 
-      strong {
-          font-weight: 700;
+      .menu-toggle {
+        @extend %ui-depth4;
+      }
+    }
+
+    // set state
+    &.is-set {
+
+      .menu-toggle {
+        color: $blue;
       }
 
-      .start-date,
-      .start-time {
-          @include font-size(19);
+      .status-label {
+        display: block;
+        color: $blue;
       }
-
-      .save-button {
-          @include blue-button;
-          margin-right: 10px;
-      }
-
-      .cancel-button {
-          @include white-button;
-      }
-
-      .save-button,
-      .cancel-button {
-        @include font-size(16);
-      }
+    }
   }
 
-  .collapse-all-button {
-      @include font-size(13);
-      float: right;
-      margin-top: 10px;
-      color: $darkGrey;
+  // unit styles
+  .courseware-unit {
+    margin: ($baseline/4) 0 0 ($baseline*1.75);
+
+    &.add-new-unit {
+      margin-right: ($baseline*1.75);
+    }
+
+    .section-item {
+      border: 0;
+      background-color: $white;
+    }
+
+    .public-item {
+      color: $black;
+    }
+
+    .private-item {
+      color: $gray-l1;
+    }
+
+    .draft-item {
+      color: $yellow-d1;
+    }
+
+    .draft-item:after,
+    .public-item:after,
+    .private-item:after {
+      @include font-size(9);
+      margin-left: 3px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .draft-item:after {
+      content: "- draft";
+    }
+
+    .private-item:after {
+      content: "- private";
+    }
   }
+
+
+  // modal to edit section publish settings
+  .edit-section-publish-settings {
+
+    .picker {
+      @include clearfix();
+
+
+      .field {
+        float: left;
+        margin-right: ($baseline/2);
+
+        label, input {
+          display: block;
+          text-align: left;
+        }
+
+        label {
+          @extend %t-copy-sub1;
+          margin-bottom: ($baseline/4);
+        }
+      }
+    }
+  }
+
+
 
   // UI: DnD - specific elems/cases - section
   .courseware-section {
