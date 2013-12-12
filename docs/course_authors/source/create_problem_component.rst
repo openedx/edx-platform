@@ -114,6 +114,8 @@ visible.
 -  **Weight.** Different problems in a particular problem set may be
    given different weights.
 
+.. _Studio UI:
+
 ==============================
 The Studio User Interface
 ==============================
