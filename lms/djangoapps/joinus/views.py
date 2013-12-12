@@ -13,7 +13,7 @@ def groups(request, course_id):
         'course': course,
     }
 
-    return render_to_response('groups/groups.html', context)
+    return render_to_response('joinus/groups.html', context)
 
 def join_group(request, course_id):
     """Join a group, given an invitation code."""
