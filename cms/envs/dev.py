@@ -198,3 +198,17 @@ try:
     from .private import *  # pylint: disable=F0401
 except ImportError:
     pass
+
+
+# Configuration data to support 'microsites' that are bound - in middleware - 
+# based on incoming hostname domain
+# For local test purposes, let's define a "OpenedX" subdomain brand
+MICROSITE_CONFIGURATION = {
+    'OpenedX': {
+        # what filter to use when displaying the course catalog on the landing page     
+        'course_org_filter': 'CDX',
+        # override for ENABLE_MKTG_SITE set otherwhere in config
+        'ENABLE_MKTG_SITE':  False,
+    }
+}
+
