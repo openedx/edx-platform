@@ -1,0 +1,46 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%inherit file="/main.html" />
+<%block name="bodyclass">${course.css_class}</%block>
+<%namespace name='static' file='/static_content.html'/>
+
+<%block name="headextra">
+<%static:css group='style-course-vendor'/>
+<%static:css group='style-course'/>
+</%block>
+
+<%block name="title"><title>${_("{course.display_number_with_default} Course Info").format(course=course) | h}</title></%block>
+
+<%include file="/courseware/course_navigation.html" args="active_page='groups'" />
+
+<section class="container">
+  <div class="info-wrapper">
+    <section class="updates">
+      <h1>${_("Groups")}</h1>
+      <h2>Join a Group</h2>
+
+      % if invitation_code:
+      <p>Received <em>${invitation_code}</em></p>
+      % else:
+      <p>If you have an invitation code for a group, please enter it here:</p>
+      <form action="" method="post">
+          <p><input type="text" name="invitation_code" /></p>
+          <p><input type="submit" /></p>
+          <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }" />
+      </form>
+      % endif
+    </section>
+    <section aria-label="Handout Navigation" class="handouts">
+      <h1>Your Groups</h1>
+        <ol>
+       
+        % for group in groups:
+         <li>
+          ${group}
+        % endfor
+        </li>
+        <hr></hr>
+        
+        </ul>
+    </section>
+  </div>
+</section>

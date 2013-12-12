@@ -182,6 +182,12 @@ def _syllabus(tab, user, course, active_page, request):
     return [CourseTab('Syllabus', link, active_page == 'syllabus')]
 
 
+def _groups(tab, user, course, active_page, request):
+    """Display the groups tab"""
+    link = reverse('groups', args=[course.id])
+    return [CourseTab('Groups', link, active_page == 'groups')]
+
+
 def _peer_grading(tab, user, course, active_page, request):
     if user.is_authenticated():
         link = reverse('peer_grading', args=[course.id])
@@ -258,7 +264,8 @@ VALID_TAB_TYPES = {
     'staff_grading': TabImpl(null_validator, _staff_grading),
     'open_ended': TabImpl(null_validator, _combined_open_ended_grading),
     'notes': TabImpl(null_validator, _notes_tab),
-    'syllabus': TabImpl(null_validator, _syllabus)
+    'syllabus': TabImpl(null_validator, _syllabus),
+    'groups': TabImpl(null_validator, _groups),
     }
 
 
@@ -326,6 +333,10 @@ def get_course_tabs(user, course, active_page, request):
         # multiple tabs.
         gen = VALID_TAB_TYPES[tab['type']].generator
         tabs.extend(gen(tab, user, course, active_page, request))
+
+    tabs.append(CourseTab('Groups',
+                          reverse('groups', args=[course.id]),
+                          active_page == 'groups')),
 
     # Instructor tab is special--automatically added if user is staff for the course
     if has_access(user, course, 'staff'):
