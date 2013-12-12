@@ -335,7 +335,8 @@ def get_course_tabs(user, course, active_page, request):
         tabs.extend(gen(tab, user, course, active_page, request))
 
     tabs.append(CourseTab('Groups',
-                          reverse('groups', args=[course.id]))),
+                          reverse('groups', args=[course.id]),
+                          active_page == 'groups')),
 
     # Instructor tab is special--automatically added if user is staff for the course
     if has_access(user, course, 'staff'):
