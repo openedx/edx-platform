@@ -8,24 +8,32 @@
 
 <section class="find-courses">
 
-  <%
-    microsite_background_image_path = MicrositeConfiguration.get_microsite_configuration_value('background_image_path')
-  %>
+<%
+  microsite_background_image_path = MicrositeConfiguration.get_microsite_configuration_value('background_image_path')
 
-  <header class="search" ${'' if not microsite_background_image_path else 'style="background-image: url(\'' + microsite_background_image_path + '\')"'}>
+  course_index_overlay_text = MicrositeConfiguration.get_microsite_configuration_value('course_index_overlay_text', _("Explore free courses from leading universities."))
+
+  # not sure why this is, but if I use static.url('images/edx_bw.png') then the HTML rendering
+  # of this template goes wonky
+
+  logo_file = MicrositeConfiguration.get_microsite_configuration_value(
+    'course_index_overlay_logo_file', settings.STATIC_URL + 'images/edx_bw.png')
+%>
+
+  <header class="search">
     <div class="inner-wrapper main-search">
       <hgroup>
         <div class="logo">
           % if self.stanford_theme_enabled():
             <img src="${static.url('themes/stanford/images/seal.png')}" alt="Stanford Seal Logo" />
           % else:
-            <img src="${static.url('images/edx_bw.png')}" alt="Black and White edX Logo" />
+            <img src='${logo_file}' alt="Black and White edX Logo" />
           % endif
         </div>
         % if self.stanford_theme_enabled():
           <h2>${_("Explore free courses from {university_name}.").format(university_name="Stanford University")}</h2>
         % else:
-          <h2>${_("Explore free courses from leading universities.")}</h2>
+          <h2>${course_index_overlay_text}</h2>
         % endif
       </hgroup>
     </div>

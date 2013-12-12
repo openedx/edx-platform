@@ -109,10 +109,7 @@
 <%block name="title"><title>${_("About {course.display_number_with_default}").format(course=course) | h}</title></%block>
 
 <section class="course-info">
-  <%
-    microsite_background_image_path = MicrositeConfiguration.get_microsite_configuration_value('background_image_path')
-  %>
-  <header class="course-profile" ${'' if not microsite_background_image_path else 'style="background-image: url(\'' + microsite_background_image_path + '\')"'}>
+  <header class="course-profile">
     <div class="intro-inner-wrapper">
       <div class="table">
       <section class="intro">

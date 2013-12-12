@@ -312,9 +312,20 @@ def dashboard(request):
     # longer exist (because the course IDs have changed). Still, we don't delete those
     # enrollments, because it could have been a data push snafu.
     course_enrollment_pairs = []
+
+    # for microsites, we want to filter and only show enrollments for courses within
+    # the microsites 'ORG'
+
+    course_org_filter = MicrositeConfiguration.get_microsite_configuration_value('course_org_filter')
+
     for enrollment in CourseEnrollment.enrollments_for_user(user):
         try:
-            course_enrollment_pairs.append((course_from_id(enrollment.course_id), enrollment))
+            course = course_from_id(enrollment.course_id)
+
+            if course_org_filter and course_org_filter != course.location.org:
+                continue
+
+            course_enrollment_pairs.append((course, enrollment))
         except ItemNotFoundError:
             log.error("User {0} enrolled in non-existent course {1}"
                       .format(user.username, enrollment.course_id))
