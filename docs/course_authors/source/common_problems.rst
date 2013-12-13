@@ -1,8 +1,8 @@
 .. _Common Problems:
 
-#############################
+############################
 Common Problems
-#############################
+############################
 
 *Common problems* are typical problems such as multiple choice problems
 and other problems whose answers are simple for students to select or

@@ -114,6 +114,8 @@ visible.
 -  **Weight.** Different problems in a particular problem set may be
    given different weights.
 
+.. _Studio UI:
+
 ==============================
 The Studio User Interface
 ==============================
@@ -203,6 +205,8 @@ Maximum Attempts
 
 This setting specifies the number of times a student can try to answer
 the problem. By default, a student has an unlimited number of attempts.
+
+.. _Problem Weight:
 
 ==============================
 Problem Weight

@@ -529,6 +529,7 @@ We urge usage of <formulaequationinput />. See the opening paragraphs of the
 
   .. image:: ../Images/numericalresponse5.png
 
+.. _Math Expression Syntax:
 
 Math Expression Syntax
 ----------------------
@@ -788,6 +789,7 @@ XML Attribute Information
   
       \newpage %
 
+.. _Custom Response:
 
 Custom Response
 ===============
@@ -915,6 +917,8 @@ Sample Problem:
 .. raw:: latex
   
       \newpage %
+
+.. _Chemical Equation Response:
 
 Chemical Equation Response
 ==========================

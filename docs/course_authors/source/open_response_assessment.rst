@@ -103,6 +103,8 @@ upload and submit their files. You can let students know what to expect
 after they submit responses. You can also mention the number of times
 that a student will be able to submit a response for the problem.
 
+.. _Rubrics:
+
 Rubrics
 ~~~~~~~
 

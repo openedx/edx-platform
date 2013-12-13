@@ -32,8 +32,8 @@ See the following topics:
 Create an HTML Component
 *****************************
 
-To create a new HTML component in an existing Unit, ensure the Unit is Private.  
-For more information on Public and Private Units, see :ref:`Public and Private Units`.
+To create a new HTML component in an existing unit, ensure the unit is private.  
+For more information on public and private units, see :ref:`Public and Private Units`.
 
 #. Under **Add New Component**, click the **html** icon.
 
