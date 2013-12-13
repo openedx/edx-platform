@@ -13,6 +13,13 @@ from django.conf import settings
 _microsite_configuration_threadlocal = threading.local()
 _microsite_configuration_threadlocal.data = {}
 
+def has_microsite_configuration_set():
+    """
+    Returns whether the MICROSITE_CONFIGURATION has been set in the configuration files
+    """
+    return hasattr(settings, "MICROSITE_CONFIGURATION") and settings.MICROSITE_CONFIGURATION
+
+
 class MicrositeConfiguration(object):
     """
     Middleware class which will bind configuration information regarding 'microsites' on a per request basis.
@@ -39,7 +46,7 @@ class MicrositeConfiguration(object):
         This returns a configuration value for a microsite which has an org_filter that matches
         what is passed in
         """
-        if not hasattr(settings, "MICROSITE_CONFIGURATION"):
+        if not has_microsite_configuration_set():
             return default
             
         for key in settings.MICROSITE_CONFIGURATION.keys():
@@ -91,7 +98,7 @@ class MicrositeConfiguration(object):
         if not university:
             return None
 
-        if not hasattr(settings, 'MICROSITE_CONFIGURATION'):
+        if not has_microsite_configuration_set():
             return None
 
         configuration = settings.MICROSITE_CONFIGURATION.get(university, None)
