@@ -74,7 +74,7 @@ class OpenIdProviderTest(TestCase):
     Tests of the OpenId login
     """
 
-    @skipUnless(settings.FEATURES.get('AUTH_USE_OPENID') or
+    @skipUnless(settings.FEATURES.get('AUTH_USE_OPENID') and
                 settings.FEATURES.get('AUTH_USE_OPENID_PROVIDER'),
                 'OpenID not enabled')
     def test_begin_login_with_xrds_url(self):
@@ -104,7 +104,7 @@ class OpenIdProviderTest(TestCase):
                              "got code {0} for url '{1}'. Expected code {2}"
                              .format(resp.status_code, url, code))
 
-    @skipUnless(settings.FEATURES.get('AUTH_USE_OPENID') or
+    @skipUnless(settings.FEATURES.get('AUTH_USE_OPENID') and
                 settings.FEATURES.get('AUTH_USE_OPENID_PROVIDER'),
                 'OpenID not enabled')
     def test_begin_login_with_login_url(self):
@@ -188,14 +188,14 @@ class OpenIdProviderTest(TestCase):
                          "got code {0} for url '{1}'. Expected code {2}"
                          .format(resp.status_code, url, code))
 
-    @skipUnless(settings.FEATURES.get('AUTH_USE_OPENID') or
+    @skipUnless(settings.FEATURES.get('AUTH_USE_OPENID') and
                 settings.FEATURES.get('AUTH_USE_OPENID_PROVIDER'),
                 'OpenID not enabled')
     def test_open_id_setup(self):
         """ Attempt a standard successful login """
         self.attempt_login(200)
 
-    @skipUnless(settings.FEATURES.get('AUTH_USE_OPENID') or
+    @skipUnless(settings.FEATURES.get('AUTH_USE_OPENID') and
                 settings.FEATURES.get('AUTH_USE_OPENID_PROVIDER'),
                 'OpenID not enabled')
     def test_invalid_namespace(self):
@@ -203,7 +203,7 @@ class OpenIdProviderTest(TestCase):
         self.attempt_login(403, ns="http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0")
 
     @override_settings(OPENID_PROVIDER_TRUSTED_ROOTS=['http://apps.cs50.edx.org'])
-    @skipUnless(settings.FEATURES.get('AUTH_USE_OPENID') or
+    @skipUnless(settings.FEATURES.get('AUTH_USE_OPENID') and
                 settings.FEATURES.get('AUTH_USE_OPENID_PROVIDER'),
                 'OpenID not enabled')
     def test_invalid_return_url(self):
@@ -232,7 +232,7 @@ class OpenIdProviderTest(TestCase):
         response = provider_login(request)
         return response
 
-    @skipUnless(settings.FEATURES.get('AUTH_USE_OPENID') or
+    @skipUnless(settings.FEATURES.get('AUTH_USE_OPENID') and
                 settings.FEATURES.get('AUTH_USE_OPENID_PROVIDER'),
                 'OpenID not enabled')
     def test_login_openid_handle_redirection(self):
@@ -240,7 +240,7 @@ class OpenIdProviderTest(TestCase):
         response = self._send_bad_redirection_login()
         self.assertEquals(response.status_code, 302)
 
-    @skipUnless(settings.FEATURES.get('AUTH_USE_OPENID') or
+    @skipUnless(settings.FEATURES.get('AUTH_USE_OPENID') and
                 settings.FEATURES.get('AUTH_USE_OPENID_PROVIDER'),
                 'OpenID not enabled')
     def test_login_openid_handle_redirection_ratelimited(self):
@@ -255,8 +255,7 @@ class OpenIdProviderTest(TestCase):
         # clear the ratelimit cache so that we don't fail other logins
         cache.clear()
 
-    @skipUnless(settings.FEATURES.get('AUTH_USE_OPENID') or
-                settings.FEATURES.get('AUTH_USE_OPENID_PROVIDER'),
+    @skipUnless(settings.FEATURES.get('AUTH_USE_OPENID_PROVIDER'),
                 'OpenID not enabled')
     def test_openid_final_response(self):
 
@@ -296,7 +295,7 @@ class OpenIdProviderLiveServerTest(LiveServerTestCase):
     Here we do the former.
     """
 
-    @skipUnless(settings.FEATURES.get('AUTH_USE_OPENID') or
+    @skipUnless(settings.FEATURES.get('AUTH_USE_OPENID') and
                 settings.FEATURES.get('AUTH_USE_OPENID_PROVIDER'),
                 'OpenID not enabled')
     def test_begin_login(self):
