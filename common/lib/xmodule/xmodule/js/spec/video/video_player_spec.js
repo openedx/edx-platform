@@ -57,7 +57,7 @@
         beforeEach(function () {
             oldOTBD = window.onTouchBasedDevice;
             window.onTouchBasedDevice = jasmine.createSpy('onTouchBasedDevice')
-                .andReturn(false);
+                .andReturn(null);
         });
 
         afterEach(function () {
@@ -119,8 +119,8 @@
                 window.YT = {
                     Player: function () { },
                     PlayerState: oldYT.PlayerState,
-                    ready: function (f) {
-                        f();
+                    ready: function (callback) {
+                        callback();
                     }
                 };
 
@@ -156,19 +156,19 @@
             // available globally. It is defined within the scope of Require
             // JS.
 
-            describe('when not on a touch based device', function () {
+            describe('when on a touch based device', function () {
                 beforeEach(function () {
-                    window.onTouchBasedDevice.andReturn(true);
+                    window.onTouchBasedDevice.andReturn(['iPad']);
                     initialize();
                 });
 
                 it('create video volume control', function () {
-                    expect(videoVolumeControl).toBeDefined();
-                    expect(videoVolumeControl.el).toHaveClass('volume');
+                    expect(videoVolumeControl).toBeUndefined();
+                    expect(state.el.find('div.volume')).not.toExist();
                 });
             });
 
-            describe('when on a touch based device', function () {
+            describe('when not on a touch based device', function () {
                 var oldOTBD;
 
                 beforeEach(function () {
@@ -343,16 +343,8 @@
                 state.videoPlayer.play();
 
                 waitsFor(function () {
-                    var duration = videoPlayer.duration(),
-                        currentTime = videoPlayer.currentTime;
-
-                    return (
-                        isFinite(currentTime) &&
-                        currentTime > 0 &&
-                        isFinite(duration) &&
-                        duration > 0
-                    );
-                }, 'video begins playing', 10000);
+                    return videoPlayer.isPlaying();
+                }, 'video begins playing', WAIT_TIMEOUT);
             });
 
             it('Slider event causes log update', function () {
@@ -555,33 +547,23 @@
             });
 
             it('video is paused on first endTime, start & end time are reset', function () {
-                var checkForStartEndTimeSet = true;
+                var duration;
 
                 videoProgressSlider.notifyThroughHandleEnd.reset();
                 videoPlayer.pause.reset();
                 videoPlayer.play();
 
                 waitsFor(function () {
-                    if (
-                        !isFinite(videoPlayer.currentTime) ||
-                        videoPlayer.currentTime <= 0
-                    ) {
-                        return false;
-                    }
+                    duration = Math.round(videoPlayer.currentTime);
 
-                    if (checkForStartEndTimeSet) {
-                        checkForStartEndTimeSet = false;
-
-                        expect(videoPlayer.startTime).toBe(START_TIME);
-                        expect(videoPlayer.endTime).toBe(END_TIME);
-                    }
-
-                    return videoPlayer.pause.calls.length === 1
-                }, 5000, 'pause() has been called');
+                    return videoPlayer.pause.calls.length === 1;
+                }, 'pause() has been called', WAIT_TIMEOUT);
 
                 runs(function () {
                     expect(videoPlayer.startTime).toBe(0);
                     expect(videoPlayer.endTime).toBe(null);
+
+                    expect(duration).toBe(END_TIME);
 
                     expect(videoProgressSlider.notifyThroughHandleEnd)
                         .toHaveBeenCalledWith({end: true});
@@ -608,7 +590,7 @@
                     }
 
                     return false;
-                }, 'Video is fully loaded.', 1000);
+                }, 'Video is fully loaded.', WAIT_TIMEOUT);
 
                 runs(function () {
                     var htmlStr;
@@ -637,7 +619,7 @@
             it('update the playback time on caption', function () {
                 waitsFor(function () {
                     return videoPlayer.duration() > 0;
-                }, 'Video is fully loaded.', 1000);
+                }, 'Video is fully loaded.', WAIT_TIMEOUT);
 
                 runs(function () {
                     videoPlayer.updatePlayTime(60);
@@ -654,7 +636,7 @@
                     duration = videoPlayer.duration();
 
                     return duration > 0;
-                }, 'Video is fully loaded.', 1000);
+                }, 'Video is fully loaded.', WAIT_TIMEOUT);
 
                 runs(function () {
                     videoPlayer.updatePlayTime(60);
@@ -692,9 +674,9 @@
                 waitsFor(function () {
                     duration = videoPlayer.duration();
 
-                    return duration > 0 &&
+                    return videoPlayer.isPlaying() &&
                         videoPlayer.initialSeekToStartTime === false;
-                }, 'duration becomes available', 1000);
+                }, 'duration becomes available', WAIT_TIMEOUT);
 
                 runs(function () {
                     expect(videoPlayer.startTime).toBe(START_TIME);
@@ -724,11 +706,9 @@
                 videoPlayer.play();
 
                 waitsFor(function () {
-                    duration = videoPlayer.duration();
-
-                    return duration > 0 &&
+                    return videoPlayer.isPlaying() &&
                         videoPlayer.initialSeekToStartTime === false;
-                }, 'updatePlayTime was invoked and duration is set', 5000);
+                }, 'updatePlayTime was invoked and duration is set', WAIT_TIMEOUT);
 
                 runs(function () {
                     expect(videoPlayer.endTime).toBe(null);
@@ -894,6 +874,54 @@
                 realValue = Math.round(player.getVolume()*100);
 
                 expect(realValue).toEqual(expectedValue);
+            });
+        });
+
+        describe('on Touch devices', function () {
+            it('`is-touch` class name is added to container', function () {
+                window.onTouchBasedDevice.andReturn(['iPad']);
+                initialize();
+
+                expect(state.el).toHaveClass('is-touch');
+            });
+
+            it('modules are not initialized on iPhone', function () {
+                window.onTouchBasedDevice.andReturn(['iPhone']);
+                initialize();
+
+                var modules = [
+                    videoControl, videoCaption, videoProgressSlider,
+                    videoSpeedControl, videoVolumeControl
+                ];
+
+                $.each(modules, function (index, module) {
+                    expect(module).toBeUndefined();
+                });
+            });
+
+            it('controls become visible after playing starts on iPad', function () {
+                window.onTouchBasedDevice.andReturn(['iPad']);
+                initialize();
+
+                var controls = state.el.find('.video-controls');
+
+                waitsFor(function () {
+                    return state.el.hasClass('is-initialized');
+                },'Video is not initialized.' , WAIT_TIMEOUT);
+
+                runs(function () {
+                    expect(controls).toHaveClass('is-hidden');
+                    videoPlayer.play();
+                });
+
+                waitsFor(function () {
+                    return videoPlayer.isPlaying();
+                },'Video does not play.' , WAIT_TIMEOUT);
+
+                runs(function () {
+                    expect(controls).not.toHaveClass('is-hidden');
+                });
+
             });
         });
     });

@@ -12,7 +12,7 @@
         beforeEach(function() {
             oldOTBD = window.onTouchBasedDevice;
             window.onTouchBasedDevice = jasmine.createSpy('onTouchBasedDevice')
-                .andReturn(false);
+                .andReturn(null);
         });
 
         afterEach(function() {
@@ -44,17 +44,21 @@
             });
 
             describe('on a touch-based device', function() {
-                beforeEach(function() {
-                    window.onTouchBasedDevice.andReturn(true);
-                    spyOn($.fn, 'slider').andCallThrough();
-                    initialize();
-                });
+                it('does not build the slider on iPhone', function() {
 
-                it('does not build the slider', function() {
-                    expect(videoProgressSlider.slider).toBeUndefined();
+                    window.onTouchBasedDevice.andReturn(['iPhone']);
+                    initialize();
+
+                    expect(videoProgressSlider).toBeUndefined();
 
                     // We can't expect $.fn.slider not to have been called,
                     // because sliders are used in other parts of Video.
+                });
+                it('build the slider on iPad', function() {
+                    window.onTouchBasedDevice.andReturn(['iPad']);
+                    initialize();
+
+                    expect(videoProgressSlider.slider).toBeDefined();
                 });
             });
         });
@@ -127,45 +131,22 @@
                 initialize();
                 spyOn($.fn, 'slider').andCallThrough();
                 spyOn(videoPlayer, 'onSlideSeek').andCallThrough();
-
-                state.videoPlayer.play();
-
-                waitsFor(function () {
-                    var duration = videoPlayer.duration(),
-                        currentTime = videoPlayer.currentTime;
-
-                    return (
-                        isFinite(currentTime) &&
-                        currentTime > 0 &&
-                        isFinite(duration) &&
-                        duration > 0
-                    );
-                }, 'video begins playing', 10000);
             });
 
             it('freeze the slider', function() {
-                runs(function () {
-                    videoProgressSlider.onSlide(
-                        jQuery.Event('slide'), { value: 20 }
-                    );
+                videoProgressSlider.onSlide(
+                    jQuery.Event('slide'), { value: 20 }
+                );
 
-                    expect(videoProgressSlider.frozen).toBeTruthy();
-                });
+                expect(videoProgressSlider.frozen).toBeTruthy();
             });
 
-            // Turned off test due to flakiness (11/25/13)
-            xit('trigger seek event', function() {
-                runs(function () {
-                    videoProgressSlider.onSlide(
-                        jQuery.Event('slide'), { value: 20 }
-                    );
+            it('trigger seek event', function() {
+                videoProgressSlider.onSlide(
+                    jQuery.Event('slide'), { value: 20 }
+                );
 
-                    expect(videoPlayer.onSlideSeek).toHaveBeenCalled();
-
-                    waitsFor(function () {
-                        return Math.round(videoPlayer.currentTime) === 20;
-                    }, 'currentTime got updated', 10000);
-                });
+                expect(videoPlayer.onSlideSeek).toHaveBeenCalled();
             });
         });
 
@@ -179,27 +160,10 @@
                 // window.setTimeout() function might (and probably will) fail.
                 oldSetTimeout = window.setTimeout;
                 // Redefine window.setTimeout() function as a spy.
-                window.setTimeout = jasmine.createSpy()
-                    .andCallFake(function (callback, timeout) {
-                        return 5;
-                    });
-                window.setTimeout.andReturn(100);
+                window.setTimeout = jasmine.createSpy().andReturn(100);
 
                 initialize();
                 spyOn(videoPlayer, 'onSlideSeek').andCallThrough();
-                videoPlayer.play();
-
-                waitsFor(function () {
-                    var duration = videoPlayer.duration(),
-                        currentTime = videoPlayer.currentTime;
-
-                    return (
-                        isFinite(currentTime) &&
-                        currentTime > 0 &&
-                        isFinite(duration) &&
-                        duration > 0
-                    );
-                }, 'video begins playing', 10000);
             });
 
             afterEach(function () {
@@ -210,42 +174,31 @@
             });
 
             it('freeze the slider', function() {
-                runs(function () {
-                    videoProgressSlider.onStop(
-                        jQuery.Event('stop'), { value: 20 }
-                    );
+                videoProgressSlider.onStop(
+                    jQuery.Event('stop'), { value: 20 }
+                );
 
-                    expect(videoProgressSlider.frozen).toBeTruthy();
-                });
+                expect(videoProgressSlider.frozen).toBeTruthy();
             });
 
-            // Turned off test due to flakiness (11/25/13)
-            xit('trigger seek event', function() {
-                runs(function () {
-                    videoProgressSlider.onStop(
-                        jQuery.Event('stop'), { value: 20 }
-                    );
+            it('trigger seek event', function() {
+                videoProgressSlider.onStop(
+                    jQuery.Event('stop'), { value: 20 }
+                );
 
-                    expect(videoPlayer.onSlideSeek).toHaveBeenCalled();
-
-                    waitsFor(function () {
-                        return Math.round(videoPlayer.currentTime) === 20;
-                    }, 'currentTime got updated', 10000);
-                });
+                expect(videoPlayer.onSlideSeek).toHaveBeenCalled();
             });
 
             it('set timeout to unfreeze the slider', function() {
-                runs(function () {
-                    videoProgressSlider.onStop(
-                        jQuery.Event('stop'), { value: 20 }
-                    );
+                videoProgressSlider.onStop(
+                    jQuery.Event('stop'), { value: 20 }
+                );
 
-                    expect(window.setTimeout).toHaveBeenCalledWith(
-                        jasmine.any(Function), 200
-                    );
-                    window.setTimeout.mostRecentCall.args[0]();
-                    expect(videoProgressSlider.frozen).toBeFalsy();
-                });
+                expect(window.setTimeout).toHaveBeenCalledWith(
+                    jasmine.any(Function), 200
+                );
+                window.setTimeout.mostRecentCall.args[0]();
+                expect(videoProgressSlider.frozen).toBeFalsy();
             });
         });
 
@@ -317,15 +270,7 @@
                 videoPlayer.play();
 
                 waitsFor(function () {
-                    var duration = videoPlayer.duration(),
-                        currentTime = videoPlayer.currentTime;
-
-                    return (
-                        isFinite(duration) &&
-                        duration > 0 &&
-                        isFinite(currentTime) &&
-                        currentTime > 0
-                    );
+                    return videoPlayer.isPlaying();
                 }, 'duration is set, video is playing', 5000);
 
                 runs(function () {

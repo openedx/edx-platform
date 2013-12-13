@@ -15,7 +15,7 @@
         beforeEach(function () {
             oldOTBD = window.onTouchBasedDevice;
             window.onTouchBasedDevice = jasmine.createSpy('onTouchBasedDevice')
-                .andReturn(false);
+                .andReturn(null);
             initialize();
         });
 
@@ -175,7 +175,7 @@
 
             describe('when on a touch-based device', function () {
                 beforeEach(function () {
-                    window.onTouchBasedDevice.andReturn(true);
+                    window.onTouchBasedDevice.andReturn(['iPad']);
                     initialize();
                 });
 
@@ -337,7 +337,7 @@
         describe('play', function () {
             describe('when the caption was not rendered', function () {
                 beforeEach(function () {
-                    window.onTouchBasedDevice.andReturn(true);
+                    window.onTouchBasedDevice.andReturn(['iPad']);
                     initialize();
                     videoCaption.play();
                 });
