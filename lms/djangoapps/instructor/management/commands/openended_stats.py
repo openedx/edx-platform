@@ -1,6 +1,6 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 #
-# Admin command for open ended problems.
+# Command to get statistics about an openended problem.
 
 from xmodule.open_ended_grading_classes.openendedchild import OpenEndedChild
 from ...utils import get_descriptor, get_module_for_student, get_enrolled_students
@@ -10,14 +10,14 @@ from django.core.management.base import BaseCommand
 class Command(BaseCommand):
     """Admin command for open ended problems."""
 
-    help = "Usage: openended_stats course_id location \n"
+    help = "Usage: openended_stats <course_id> <problem_location> \n"
 
     def handle(self, *args, **options):
         """Handler for command."""
 
         print "args = ", args
 
-        if len(args) > 0:
+        if len(args) == 2:
             course_id = args[0]
             location = args[1]
         else:

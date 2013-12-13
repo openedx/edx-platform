@@ -1,7 +1,6 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 #
-# django management command: dump grades to csv files
-# for use by batch processes
+# Command to post student submissions to ORA
 
 from xmodule.open_ended_grading_classes.openendedchild import OpenEndedChild
 from ...utils import get_descriptor, create_list_from_csv, get_users_from_ids, get_module_for_student
@@ -9,11 +8,11 @@ from django.core.management.base import BaseCommand
 
 
 class Command(BaseCommand):
+    """ """
+
     help = "Usage: openended_post <course_id> <problem_location> <student_ids.csv> \n"
 
     def handle(self, *args, **options):
-
-        print "args = ", args
 
         if len(args) == 3:
             course_id = args[0]
