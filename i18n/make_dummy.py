@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # Generate test translation files from human-readable po files.
-# 
+#
 # Dummy language is specified in configuration file (see config.py)
 # two letter language codes reference:
 # see http://www.loc.gov/standards/iso639-2/php/code_list.php
@@ -28,6 +28,7 @@ from dummy import Dummy
 from config import CONFIGURATION
 from execute import create_dir_if_necessary
 
+
 def main(file, locale):
     """
     Takes a source po file, reads it, and writes out a new po file
@@ -44,6 +45,7 @@ def main(file, locale):
     create_dir_if_necessary(new_file)
     pofile.save(new_file)
 
+
 def new_filename(original_filename, new_locale):
     """Returns a filename derived from original_filename, using new_locale as the locale"""
     orig_dir = os.path.dirname(original_filename)
@@ -57,10 +59,10 @@ def new_filename(original_filename, new_locale):
 
 if __name__ == '__main__':
     # required arg: file
-    if len(sys.argv)<2:
+    if len(sys.argv) < 2:
         raise Exception("missing file argument")
     # optional arg: locale
-    if len(sys.argv)<3:
+    if len(sys.argv) < 3:
         locale = CONFIGURATION.get_dummy_locale()
     else:
         locale = sys.argv[2]

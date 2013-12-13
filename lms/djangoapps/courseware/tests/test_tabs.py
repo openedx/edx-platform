@@ -35,13 +35,13 @@ class ProgressTestCase(TestCase):
         self.assertEqual(tab_constructor(self.stagnation_page, self.course, self.anonymous_user), [])
 
         self.assertEqual(tab_constructor(self.progress_page, self.course, self.user)[0].name, 'same')
-        
+
         tab_list = tab_constructor(self.progress_page, self.course, self.user)
         expected_link = reverse('progress', args=[self.course.id])
         self.assertEqual(tab_list[0].link, expected_link)
-        
+
         self.assertEqual(tab_constructor(self.stagnation_page, self.course, self.user)[0].is_active, False)
-        
+
         self.assertEqual(tab_constructor(self.progress_page, self.course, self.user)[0].is_active, True)
 
 

@@ -26,13 +26,13 @@ Each course, in addition, should define the name of the gradebook being used.  A
  - user: username of staff person initiating the request (for logging)
  - section: (optional) name of section
 
-The return body content should be a JSON string, of the format {'msg': message, 'data': data}.  The message is displayed in the instructor dashboard.  
+The return body content should be a JSON string, of the format {'msg': message, 'data': data}.  The message is displayed in the instructor dashboard.
 
 The data is a list of dicts (associative arrays).  Each dict should be key:value.
 
 ## For submit=post-grades:
 
-A file is also posted, with the field name "datafile".  This file is CSV format, with two columns, one being "External email" and the other being the name of the assignment (that column contains the grades for the assignment).  
+A file is also posted, with the field name "datafile".  This file is CSV format, with two columns, one being "External email" and the other being the name of the assignment (that column contains the grades for the assignment).
 
 ## For submit=get-assignments
 

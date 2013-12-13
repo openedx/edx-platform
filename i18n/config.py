@@ -52,7 +52,7 @@ class Configuration:
     def dummy_locale(self):
         """
         Returns a locale to use for the dummy text, e.g. 'eo'.
-        Throws exception if no dummy-locale is declared. 
+        Throws exception if no dummy-locale is declared.
         The locale is a string.
         """
         dummy = self._config.get('dummy-locale', None)

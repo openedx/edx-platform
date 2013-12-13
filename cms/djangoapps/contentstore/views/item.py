@@ -67,7 +67,7 @@ def xblock_handler(request, tag=None, course_id=None, branch=None, version_guid=
                        to None! Absent ones will be left alone.
                 :nullout: which metadata fields to set to None
                 :graderType: change how this unit is graded
-                :publish: can be one of three values, 'make_public, 'make_private', or 'create_draft'         
+                :publish: can be one of three values, 'make_public, 'make_private', or 'create_draft'
               The JSON representation on the updated xblock (minus children) is returned.
 
               if xblock locator is not specified, create a new xblock instance. The json playload can contain

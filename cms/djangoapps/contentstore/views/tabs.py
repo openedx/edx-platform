@@ -40,7 +40,7 @@ def initialize_course_tabs(course):
         {"type": "discussion", "name": _("Discussion")},
         {"type": "wiki", "name": _("Wiki")},
         {"type": "progress", "name": _("Progress")},
-    ] 
+    ]
 
     modulestore('direct').update_metadata(course.location.url(), own_metadata(course))
 
