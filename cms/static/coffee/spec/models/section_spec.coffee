@@ -1,4 +1,4 @@
-define ["js/models/section", "sinon", "js/utils/module"], (Section, sinon, ModuleUtils) ->
+define ["js/models/section", "js/spec/create_sinon", "js/utils/module"], (Section, create_sinon, ModuleUtils) ->
     describe "Section", ->
         describe "basic", ->
             beforeEach ->
@@ -32,21 +32,19 @@ define ["js/models/section", "sinon", "js/utils/module"], (Section, sinon, Modul
                     id: 42
                     name: "Life, the Universe, and Everything"
                 })
-                @requests = requests = []
-                @xhr = sinon.useFakeXMLHttpRequest()
-                @xhr.onCreate = (xhr) -> requests.push(xhr)
-
-            afterEach ->
-                @xhr.restore()
 
             it "show/hide a notification when it saves to the server", ->
+                server = create_sinon['server'](200, this)
+
                 @model.save()
                 expect(Section.prototype.showNotification).toHaveBeenCalled()
-                @requests[0].respond(200)
+                server.respond()
                 expect(Section.prototype.hideNotification).toHaveBeenCalled()
 
             it "don't hide notification when saving fails", ->
                 # this is handled by the global AJAX error handler
+                server = create_sinon['server'](500, this)
+
                 @model.save()
-                @requests[0].respond(500)
+                server.respond()
                 expect(Section.prototype.hideNotification).not.toHaveBeenCalled()

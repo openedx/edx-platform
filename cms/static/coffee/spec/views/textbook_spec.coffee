@@ -1,8 +1,8 @@
 define ["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js/models/course",
     "js/collections/textbook", "js/views/show_textbook", "js/views/edit_textbook", "js/views/list_textbooks",
     "js/views/edit_chapter", "js/views/feedback_prompt", "js/views/feedback_notification",
-    "sinon", "jasmine-stealth"],
-(Textbook, Chapter, ChapterSet, Course, TextbookSet, ShowTextbook, EditTextbook, ListTexbook, EditChapter, Prompt, Notification, sinon) ->
+    "js/spec/create_sinon", "jasmine-stealth"],
+(Textbook, Chapter, ChapterSet, Course, TextbookSet, ShowTextbook, EditTextbook, ListTexbook, EditChapter, Prompt, Notification, create_sinon) ->
     feedbackTpl = readFixtures('system-feedback.underscore')
 
     beforeEach ->
@@ -74,34 +74,31 @@ define ["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
 
         describe "AJAX", ->
             beforeEach ->
-                @requests = requests = []
-                @xhr = sinon.useFakeXMLHttpRequest()
-                @xhr.onCreate = (xhr) -> requests.push(xhr)
-
                 @savingSpies = spyOnConstructor(Notification, "Mini",
                     ["show", "hide"])
                 @savingSpies.show.andReturn(@savingSpies)
                 CMS.URL.TEXTBOOKS = "/textbooks"
 
             afterEach ->
-                @xhr.restore()
                 delete CMS.URL.TEXTBOOKS
 
             it "should destroy itself on confirmation", ->
+                requests = create_sinon["requests"](this)
+
                 @view.render().$(".delete").click()
                 ctorOptions = @promptSpies.constructor.mostRecentCall.args[0]
                 # run the primary function to indicate confirmation
                 ctorOptions.actions.primary.click(@promptSpies)
                 # AJAX request has been sent, but not yet returned
                 expect(@model.destroy).toHaveBeenCalled()
-                expect(@requests.length).toEqual(1)
+                expect(requests.length).toEqual(1)
                 expect(@savingSpies.constructor).toHaveBeenCalled()
                 expect(@savingSpies.show).toHaveBeenCalled()
                 expect(@savingSpies.hide).not.toHaveBeenCalled()
                 savingOptions = @savingSpies.constructor.mostRecentCall.args[0]
                 expect(savingOptions.title).toMatch(/Deleting/)
                 # return a success response
-                @requests[0].respond(200)
+                requests[0].respond(200)
                 expect(@savingSpies.hide).toHaveBeenCalled()
                 expect(@collection.contains(@model)).toBeFalsy()
 

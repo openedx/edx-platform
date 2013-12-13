@@ -1,5 +1,5 @@
-define ["jasmine", "sinon", "squire"],
-(jasmine, sinon, Squire) ->
+define ["jasmine", "js/spec/create_sinon", "squire"],
+(jasmine, create_sinon, Squire) ->
 
     feedbackTpl = readFixtures('system-feedback.underscore')
     assetTpl = readFixtures('asset.underscore')
@@ -68,26 +68,20 @@ define ["jasmine", "sinon", "squire"],
                 expect(@collection).toContain(@model)
 
         describe "AJAX", ->
-            beforeEach ->
-                @requests = requests = []
-                @xhr = sinon.useFakeXMLHttpRequest()
-                @xhr.onCreate = (xhr) -> requests.push(xhr)
-
-            afterEach ->
-                @xhr.restore()
-
             it "should destroy itself on confirmation", ->
+                requests = create_sinon["requests"](this)
+
                 @view.render().$(".remove-asset-button").click()
                 ctorOptions = @promptSpies.constructor.mostRecentCall.args[0]
                 # run the primary function to indicate confirmation
                 ctorOptions.actions.primary.click(@promptSpies)
                 # AJAX request has been sent, but not yet returned
                 expect(@model.destroy).toHaveBeenCalled()
-                expect(@requests.length).toEqual(1)
+                expect(requests.length).toEqual(1)
                 expect(@confirmationSpies.constructor).not.toHaveBeenCalled()
                 expect(@collection.contains(@model)).toBeTruthy()
                 # return a success response
-                @requests[0].respond(200)
+                requests[0].respond(200)
                 expect(@confirmationSpies.constructor).toHaveBeenCalled()
                 expect(@confirmationSpies.show).toHaveBeenCalled()
                 savingOptions = @confirmationSpies.constructor.mostRecentCall.args[0]
@@ -95,6 +89,8 @@ define ["jasmine", "sinon", "squire"],
                 expect(@collection.contains(@model)).toBeFalsy()
 
             it "should not destroy itself if server errors", ->
+                requests = create_sinon["requests"](this)
+
                 @view.render().$(".remove-asset-button").click()
                 ctorOptions = @promptSpies.constructor.mostRecentCall.args[0]
                 # run the primary function to indicate confirmation
@@ -102,29 +98,33 @@ define ["jasmine", "sinon", "squire"],
                 # AJAX request has been sent, but not yet returned
                 expect(@model.destroy).toHaveBeenCalled()
                 # return an error response
-                @requests[0].respond(404)
+                requests[0].respond(404)
                 expect(@confirmationSpies.constructor).not.toHaveBeenCalled()
                 expect(@collection.contains(@model)).toBeTruthy()
 
             it "should lock the asset on confirmation", ->
+                requests = create_sinon["requests"](this)
+
                 @view.render().$(".lock-checkbox").click()
                 # AJAX request has been sent, but not yet returned
                 expect(@model.save).toHaveBeenCalled()
-                expect(@requests.length).toEqual(1)
+                expect(requests.length).toEqual(1)
                 expect(@savingSpies.constructor).toHaveBeenCalled()
                 expect(@savingSpies.show).toHaveBeenCalled()
                 savingOptions = @savingSpies.constructor.mostRecentCall.args[0]
                 expect(savingOptions.title).toMatch("Saving...")
                 expect(@model.get("locked")).toBeFalsy()
                 # return a success response
-                @requests[0].respond(200)
+                requests[0].respond(200)
                 expect(@savingSpies.hide).toHaveBeenCalled()
                 expect(@model.get("locked")).toBeTruthy()
 
             it "should not lock the asset if server errors", ->
+                requests = create_sinon["requests"](this)
+
                 @view.render().$(".lock-checkbox").click()
                 # return an error response
-                @requests[0].respond(404)
+                requests[0].respond(404)
                 # Don't call hide because that closes the notification showing the server error.
                 expect(@savingSpies.hide).not.toHaveBeenCalled()
                 expect(@model.get("locked")).toBeFalsy()
@@ -172,9 +172,6 @@ define ["jasmine", "sinon", "squire"],
             waitsFor (=> @view), "AssetView was not created", 1000
 
             $.ajax()
-            @requests = requests = []
-            @xhr = sinon.useFakeXMLHttpRequest()
-            @xhr.onCreate = (xhr) -> requests.push(xhr)
 
         afterEach ->
             delete window.analytics
@@ -190,18 +187,22 @@ define ["jasmine", "sinon", "squire"],
                 expect(@view.$el).toContainText("test asset 2")
 
             it "should remove the deleted asset from the view", ->
+                requests = create_sinon["requests"](this)
+
                 # Delete the 2nd asset with success from server.
                 @view.render().$(".remove-asset-button")[1].click()
                 @promptSpies.constructor.mostRecentCall.args[0].actions.primary.click(@promptSpies)
-                req.respond(200) for req in @requests
+                req.respond(200) for req in requests
                 expect(@view.$el).toContainText("test asset 1")
                 expect(@view.$el).not.toContainText("test asset 2")
 
             it "does not remove asset if deletion failed", ->
+                requests = create_sinon["requests"](this)
+
                 # Delete the 2nd asset, but mimic a failure from the server.
                 @view.render().$(".remove-asset-button")[1].click()
                 @promptSpies.constructor.mostRecentCall.args[0].actions.primary.click(@promptSpies)
-                req.respond(404) for req in @requests
+                req.respond(404) for req in requests
                 expect(@view.$el).toContainText("test asset 1")
                 expect(@view.$el).toContainText("test asset 2")
 

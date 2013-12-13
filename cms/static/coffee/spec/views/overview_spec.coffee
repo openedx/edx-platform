@@ -1,5 +1,5 @@
-define ["js/views/overview", "js/views/feedback_notification", "sinon", "js/base", "date", "jquery.timepicker"],
-(Overview, Notification, sinon) ->
+define ["js/views/overview", "js/views/feedback_notification", "js/spec/create_sinon", "js/base", "date", "jquery.timepicker"],
+(Overview, Notification, create_sinon) ->
 
     describe "Course Overview", ->
         beforeEach ->
@@ -71,9 +71,6 @@ define ["js/views/overview", "js/views/feedback_notification", "sinon", "js/base
             @notificationSpy = spyOn(Notification.Mini.prototype, 'show').andCallThrough()
             window.analytics = jasmine.createSpyObj('analytics', ['track'])
             window.course_location_analytics = jasmine.createSpy()
-            @xhr = sinon.useFakeXMLHttpRequest()
-            requests = @requests = []
-            @xhr.onCreate = (req) -> requests.push(req)
 
             Overview.overviewDragger.makeDraggable(
                 '.unit',
@@ -104,9 +101,11 @@ define ["js/views/overview", "js/views/feedback_notification", "sinon", "js/base
 #            expect(@requests[0].url).toEqual('/delete_item')
 
         it "should not delete model when cancel is clicked", ->
+            requests = create_sinon["requests"](this)
+
             $('a.delete-section-button').click()
             $('a.action-secondary').click()
-            expect(@requests.length).toEqual(0)
+            expect(requests.length).toEqual(0)
 
         # Fails sporadically in Jenkins.
 #        it "should show a confirmation on delete", ->
@@ -328,22 +327,19 @@ define ["js/views/overview", "js/views/feedback_notification", "sinon", "js/base
                 )
                 expect($('#subsection-2')).not.toHaveClass('collapsed')
 
-        xdescribe "AJAX", ->
+        describe "AJAX", ->
             beforeEach ->
-                @requests = requests = []
-                @xhr = sinon.useFakeXMLHttpRequest()
-                @xhr.onCreate = (xhr) -> requests.push(xhr)
-
                 @savingSpies = spyOnConstructor(Notification, "Mini",
                     ["show", "hide"])
                 @savingSpies.show.andReturn(@savingSpies)
                 @clock = sinon.useFakeTimers()
 
             afterEach ->
-                @xhr.restore()
                 @clock.restore()
 
             it "should send an update on reorder", ->
+                requests = create_sinon["requests"](this)
+
                 Overview.overviewDragger.dragState.dropDestination = $('#unit-4')
                 Overview.overviewDragger.dragState.attachMethod = "after"
                 Overview.overviewDragger.dragState.parentList = $('#subsection-2')
@@ -357,7 +353,7 @@ define ["js/views/overview", "js/views/feedback_notification", "sinon", "js/base
                     null,
                     {clientX: $('#unit-1').offset().left}
                 )
-                expect(@requests.length).toEqual(2)
+                expect(requests.length).toEqual(2)
                 expect(@savingSpies.constructor).toHaveBeenCalled()
                 expect(@savingSpies.show).toHaveBeenCalled()
                 expect(@savingSpies.hide).not.toHaveBeenCalled()
@@ -366,11 +362,11 @@ define ["js/views/overview", "js/views/feedback_notification", "sinon", "js/base
                 expect($('#unit-1')).toHaveClass('was-dropped')
                 # We expect 2 requests to be sent-- the first for removing Unit 1 from Subsection 1,
                 # and the second for adding Unit 1 to the end of Subsection 2.
-                expect(@requests[0].requestBody).toEqual('{"children":["second-unit-id","third-unit-id"]}')
-                @requests[0].respond(200)
+                expect(requests[0].requestBody).toEqual('{"children":["second-unit-id","third-unit-id"]}')
+                requests[0].respond(200)
                 expect(@savingSpies.hide).not.toHaveBeenCalled()
-                expect(@requests[1].requestBody).toEqual('{"children":["fourth-unit-id","first-unit-id"]}')
-                @requests[1].respond(200)
+                expect(requests[1].requestBody).toEqual('{"children":["fourth-unit-id","first-unit-id"]}')
+                requests[1].respond(200)
                 expect(@savingSpies.hide).toHaveBeenCalled()
                 # Class is removed in a timeout.
                 @clock.tick(1001)

@@ -1,217 +1,206 @@
-define ["js/views/course_info_handout", "js/views/course_info_update", "js/models/module_info", "js/collections/course_update", "sinon"],
-(CourseInfoHandoutsView, CourseInfoUpdateView, ModuleInfo, CourseUpdateCollection, sinon) ->
+define ["js/views/course_info_handout", "js/views/course_info_update", "js/models/module_info", "js/collections/course_update", "js/spec/create_sinon"],
+(CourseInfoHandoutsView, CourseInfoUpdateView, ModuleInfo, CourseUpdateCollection, create_sinon) ->
 
-    courseInfoPage = """
-                     <div class="course-info-wrapper">
-                     <div class="main-column window">
-                     <article class="course-updates" id="course-update-view">
-                     <ol class="update-list" id="course-update-list"></ol>
-                     </article>
-                     </div>
-                     <div class="sidebar window course-handouts" id="course-handouts-view"></div>
-                     </div>
-                     <div class="modal-cover"></div>
-                     """
-
-    beforeEach ->
-        window.analytics = jasmine.createSpyObj('analytics', ['track'])
-        window.course_location_analytics = jasmine.createSpy()
-
-    afterEach ->
-        delete window.analytics
-        delete window.course_location_analytics
-
-    xdescribe "Course Updates", ->
-        courseInfoTemplate = readFixtures('course_info_update.underscore')
+    describe "Course Updates and Handouts", ->
+        courseInfoPage = """
+                         <div class="course-info-wrapper">
+                         <div class="main-column window">
+                         <article class="course-updates" id="course-update-view">
+                         <ol class="update-list" id="course-update-list"></ol>
+                         </article>
+                         </div>
+                         <div class="sidebar window course-handouts" id="course-handouts-view"></div>
+                         </div>
+                         <div class="modal-cover"></div>
+                         """
 
         beforeEach ->
-            setFixtures($("<script>", {id: "course_info_update-tpl", type: "text/template"}).text(courseInfoTemplate))
-            appendSetFixtures courseInfoPage
+            window.analytics = jasmine.createSpyObj('analytics', ['track'])
+            window.course_location_analytics = jasmine.createSpy()
 
-            courseUpdatesXhr = sinon.useFakeXMLHttpRequest()
-            @courseUpdatesRequests = requests = []
-            courseUpdatesXhr.onCreate = (xhr) -> requests.push(xhr)
-            @xhrRestore = courseUpdatesXhr.restore
+        afterEach ->
+            delete window.analytics
+            delete window.course_location_analytics
 
-            @collection = new CourseUpdateCollection()
-            @collection.url = 'course_info_update/'
-            @courseInfoEdit = new CourseInfoUpdateView({
-                el: $('.course-updates'),
-                collection: @collection,
-                base_asset_url : 'base-asset-url/'
-            })
+        describe "Course Updates", ->
+            courseInfoTemplate = readFixtures('course_info_update.underscore')
 
-            @courseInfoEdit.render()
+            beforeEach ->
+                setFixtures($("<script>", {id: "course_info_update-tpl", type: "text/template"}).text(courseInfoTemplate))
+                appendSetFixtures courseInfoPage
 
-            @event = {
-                preventDefault : () -> 'no op'
-            }
+                @collection = new CourseUpdateCollection()
+                @collection.url = 'course_info_update/'
+                @courseInfoEdit = new CourseInfoUpdateView({
+                    el: $('.course-updates'),
+                    collection: @collection,
+                    base_asset_url : 'base-asset-url/'
+                })
 
-            @createNewUpdate = (text) ->
-                # Edit button is not in the template under test (it is in parent HTML).
-                # Therefore call onNew directly.
+                @courseInfoEdit.render()
+
+                @event = {
+                    preventDefault : () -> 'no op'
+                }
+
+                @createNewUpdate = (text) ->
+                    # Edit button is not in the template under test (it is in parent HTML).
+                    # Therefore call onNew directly.
+                    @courseInfoEdit.onNew(@event)
+                    spyOn(@courseInfoEdit.$codeMirror, 'getValue').andReturn(text)
+                    @courseInfoEdit.$el.find('.save-button').click()
+
+                @cancelNewCourseInfo = (useCancelButton) ->
+                    @courseInfoEdit.onNew(@event)
+                    spyOn(@courseInfoEdit.$modalCover, 'hide').andCallThrough()
+
+                    spyOn(@courseInfoEdit.$codeMirror, 'getValue').andReturn('unsaved changes')
+                    model = @collection.at(0)
+                    spyOn(model, "save").andCallThrough()
+
+                    cancelEditingUpdate(@courseInfoEdit, @courseInfoEdit.$modalCover, useCancelButton)
+
+                    expect(@courseInfoEdit.$modalCover.hide).toHaveBeenCalled()
+                    expect(model.save).not.toHaveBeenCalled()
+                    previewContents = @courseInfoEdit.$el.find('.update-contents').html()
+                    expect(previewContents).not.toEqual('unsaved changes')
+
+                @cancelExistingCourseInfo = (useCancelButton) ->
+                    @createNewUpdate('existing update')
+                    @courseInfoEdit.$el.find('.edit-button').click()
+                    spyOn(@courseInfoEdit.$modalCover, 'hide').andCallThrough()
+
+                    spyOn(@courseInfoEdit.$codeMirror, 'getValue').andReturn('modification')
+                    model = @collection.at(0)
+                    spyOn(model, "save").andCallThrough()
+                    model.id = "saved_to_server"
+                    cancelEditingUpdate(@courseInfoEdit, @courseInfoEdit.$modalCover, useCancelButton)
+
+                    expect(@courseInfoEdit.$modalCover.hide).toHaveBeenCalled()
+                    expect(model.save).not.toHaveBeenCalled()
+                    previewContents = @courseInfoEdit.$el.find('.update-contents').html()
+                    expect(previewContents).toEqual('existing update')
+
+                cancelEditingUpdate = (update, modalCover, useCancelButton) ->
+                    if useCancelButton
+                        update.$el.find('.cancel-button').click()
+                    else
+                        modalCover.click()
+
+            it "does not rewrite links on save", ->
+                requests = create_sinon["requests"](this)
+
+                # Create a new update, verifying that the model is created
+                # in the collection and save is called.
+                expect(@collection.isEmpty()).toBeTruthy()
                 @courseInfoEdit.onNew(@event)
-                spyOn(@courseInfoEdit.$codeMirror, 'getValue').andReturn(text)
+                expect(@collection.length).toEqual(1)
+                model = @collection.at(0)
+                spyOn(model, "save").andCallThrough()
+                spyOn(@courseInfoEdit.$codeMirror, 'getValue').andReturn('/static/image.jpg')
+
+                # Click the "Save button."
                 @courseInfoEdit.$el.find('.save-button').click()
+                expect(model.save).toHaveBeenCalled()
 
-            @cancelNewCourseInfo = (useCancelButton) ->
-                @courseInfoEdit.onNew(@event)
-                spyOn(@courseInfoEdit.$modalCover, 'hide').andCallThrough()
+                # Verify content sent to server does not have rewritten links.
+                contentSaved = JSON.parse(requests[requests.length - 1].requestBody).content
+                expect(contentSaved).toEqual('/static/image.jpg')
 
-                spyOn(@courseInfoEdit.$codeMirror, 'getValue').andReturn('unsaved changes')
-                model = @collection.at(0)
-                spyOn(model, "save").andCallThrough()
+            it "does rewrite links for preview", ->
+                # Create a new update.
+                @createNewUpdate('/static/image.jpg')
 
-                cancelEditingUpdate(@courseInfoEdit, @courseInfoEdit.$modalCover, useCancelButton)
-
-                expect(@courseInfoEdit.$modalCover.hide).toHaveBeenCalled()
-                expect(model.save).not.toHaveBeenCalled()
+                # Verify the link is rewritten for preview purposes.
                 previewContents = @courseInfoEdit.$el.find('.update-contents').html()
-                expect(previewContents).not.toEqual('unsaved changes')
+                expect(previewContents).toEqual('base-asset-url/image.jpg')
 
-            @cancelExistingCourseInfo = (useCancelButton) ->
-                @createNewUpdate('existing update')
+            it "shows static links in edit mode", ->
+                @createNewUpdate('/static/image.jpg')
+
+                # Click edit and verify CodeMirror contents.
                 @courseInfoEdit.$el.find('.edit-button').click()
-                spyOn(@courseInfoEdit.$modalCover, 'hide').andCallThrough()
+                expect(@courseInfoEdit.$codeMirror.getValue()).toEqual('/static/image.jpg')
 
-                spyOn(@courseInfoEdit.$codeMirror, 'getValue').andReturn('modification')
-                model = @collection.at(0)
-                spyOn(model, "save").andCallThrough()
-                model.id = "saved_to_server"
-                cancelEditingUpdate(@courseInfoEdit, @courseInfoEdit.$modalCover, useCancelButton)
+            it "removes newly created course info on cancel", ->
+                @cancelNewCourseInfo(true)
 
-                expect(@courseInfoEdit.$modalCover.hide).toHaveBeenCalled()
-                expect(model.save).not.toHaveBeenCalled()
-                previewContents = @courseInfoEdit.$el.find('.update-contents').html()
-                expect(previewContents).toEqual('existing update')
+            it "removes newly created course info on click outside modal", ->
+                @cancelNewCourseInfo(false)
 
-            cancelEditingUpdate = (update, modalCover, useCancelButton) ->
-                if useCancelButton
-                    update.$el.find('.cancel-button').click()
-                else
-                    modalCover.click()
+            it "does not remove existing course info on cancel", ->
+                @cancelExistingCourseInfo(true)
 
-        afterEach ->
-            @xhrRestore()
+            it "does not remove existing course info on click outside modal", ->
+                @cancelExistingCourseInfo(false)
 
-        it "does not rewrite links on save", ->
-            # Create a new update, verifying that the model is created
-            # in the collection and save is called.
-            expect(@collection.isEmpty()).toBeTruthy()
-            @courseInfoEdit.onNew(@event)
-            expect(@collection.length).toEqual(1)
-            model = @collection.at(0)
-            spyOn(model, "save").andCallThrough()
-            spyOn(@courseInfoEdit.$codeMirror, 'getValue').andReturn('/static/image.jpg')
+        describe "Course Handouts", ->
+            handoutsTemplate = readFixtures('course_info_handouts.underscore')
 
-            # Click the "Save button."
-            @courseInfoEdit.$el.find('.save-button').click()
-            expect(model.save).toHaveBeenCalled()
+            beforeEach ->
+                setFixtures($("<script>", {id: "course_info_handouts-tpl", type: "text/template"}).text(handoutsTemplate))
+                appendSetFixtures courseInfoPage
 
-            # Verify content sent to server does not have rewritten links.
-            contentSaved = JSON.parse(@courseUpdatesRequests[@courseUpdatesRequests.length - 1].requestBody).content
-            expect(contentSaved).toEqual('/static/image.jpg')
+                @model = new ModuleInfo({
+                    id: 'handouts-id',
+                    data: '/static/fromServer.jpg'
+                })
 
-        it "does rewrite links for preview", ->
-            # Create a new update.
-            @createNewUpdate('/static/image.jpg')
+                @handoutsEdit = new CourseInfoHandoutsView({
+                    el: $('#course-handouts-view'),
+                    model: @model,
+                    base_asset_url: 'base-asset-url/'
+                });
 
-            # Verify the link is rewritten for preview purposes.
-            previewContents = @courseInfoEdit.$el.find('.update-contents').html()
-            expect(previewContents).toEqual('base-asset-url/image.jpg')
+                @handoutsEdit.render()
 
-        it "shows static links in edit mode", ->
-            @createNewUpdate('/static/image.jpg')
+            it "does not rewrite links on save", ->
+                requests = create_sinon["requests"](this)
 
-            # Click edit and verify CodeMirror contents.
-            @courseInfoEdit.$el.find('.edit-button').click()
-            expect(@courseInfoEdit.$codeMirror.getValue()).toEqual('/static/image.jpg')
+                # Enter something in the handouts section, verifying that the model is saved
+                # when "Save" is clicked.
+                @handoutsEdit.$el.find('.edit-button').click()
+                spyOn(@handoutsEdit.$codeMirror, 'getValue').andReturn('/static/image.jpg')
+                spyOn(@model, "save").andCallThrough()
+                @handoutsEdit.$el.find('.save-button').click()
+                expect(@model.save).toHaveBeenCalled()
 
-        it "removes newly created course info on cancel", ->
-            @cancelNewCourseInfo(true)
+                contentSaved = JSON.parse(requests[requests.length - 1].requestBody).data
+                expect(contentSaved).toEqual('/static/image.jpg')
 
-        it "removes newly created course info on click outside modal", ->
-            @cancelNewCourseInfo(false)
+            it "does rewrite links in initial content", ->
+                expect(@handoutsEdit.$preview.html().trim()).toBe('base-asset-url/fromServer.jpg')
 
-        it "does not remove existing course info on cancel", ->
-            @cancelExistingCourseInfo(true)
+            it "does rewrite links after edit", ->
+                # Edit handouts and save.
+                @handoutsEdit.$el.find('.edit-button').click()
+                spyOn(@handoutsEdit.$codeMirror, 'getValue').andReturn('/static/image.jpg')
+                @handoutsEdit.$el.find('.save-button').click()
 
-        it "does not remove existing course info on click outside modal", ->
-            @cancelExistingCourseInfo(false)
+                # Verify preview text.
+                expect(@handoutsEdit.$preview.html().trim()).toBe('base-asset-url/image.jpg')
 
-    xdescribe "Course Handouts", ->
-        handoutsTemplate = readFixtures('course_info_handouts.underscore')
+            it "shows static links in edit mode", ->
+                # Click edit and verify CodeMirror contents.
+                @handoutsEdit.$el.find('.edit-button').click()
+                expect(@handoutsEdit.$codeMirror.getValue().trim()).toEqual('/static/fromServer.jpg')
 
-        beforeEach ->
-            setFixtures($("<script>", {id: "course_info_handouts-tpl", type: "text/template"}).text(handoutsTemplate))
-            appendSetFixtures courseInfoPage
+            it "can open course handouts with bad html on edit", ->
+                # Enter some bad html in handouts section, verifying that the
+                # model/handoutform opens when "Edit" is clicked
 
-            courseHandoutsXhr = sinon.useFakeXMLHttpRequest()
-            @handoutsRequests = requests = []
-            courseHandoutsXhr.onCreate = (xhr) -> requests.push(xhr)
-            @handoutsXhrRestore = courseHandoutsXhr.restore
+                @model = new ModuleInfo({
+                    id: 'handouts-id',
+                    data: '<p><a href="[URL OF FILE]>[LINK TEXT]</a></p>'
+                })
+                @handoutsEdit = new CourseInfoHandoutsView({
+                    el: $('#course-handouts-view'),
+                    model: @model,
+                    base_asset_url: 'base-asset-url/'
+                });
+                @handoutsEdit.render()
 
-            @model = new ModuleInfo({
-                id: 'handouts-id',
-                data: '/static/fromServer.jpg'
-            })
-
-            @handoutsEdit = new CourseInfoHandoutsView({
-                el: $('#course-handouts-view'),
-                model: @model,
-                base_asset_url: 'base-asset-url/'
-            });
-
-            @handoutsEdit.render()
-
-        afterEach ->
-            @handoutsXhrRestore()
-
-        it "does not rewrite links on save", ->
-            # Enter something in the handouts section, verifying that the model is saved
-            # when "Save" is clicked.
-            @handoutsEdit.$el.find('.edit-button').click()
-            spyOn(@handoutsEdit.$codeMirror, 'getValue').andReturn('/static/image.jpg')
-            spyOn(@model, "save").andCallThrough()
-            @handoutsEdit.$el.find('.save-button').click()
-            expect(@model.save).toHaveBeenCalled()
-
-            contentSaved = JSON.parse(@handoutsRequests[@handoutsRequests.length - 1].requestBody).data
-            expect(contentSaved).toEqual('/static/image.jpg')
-
-        it "does rewrite links in initial content", ->
-            expect(@handoutsEdit.$preview.html().trim()).toBe('base-asset-url/fromServer.jpg')
-
-        it "does rewrite links after edit", ->
-            # Edit handouts and save.
-            @handoutsEdit.$el.find('.edit-button').click()
-            spyOn(@handoutsEdit.$codeMirror, 'getValue').andReturn('/static/image.jpg')
-            @handoutsEdit.$el.find('.save-button').click()
-
-            # Verify preview text.
-            expect(@handoutsEdit.$preview.html().trim()).toBe('base-asset-url/image.jpg')
-
-        it "shows static links in edit mode", ->
-            # Click edit and verify CodeMirror contents.
-            @handoutsEdit.$el.find('.edit-button').click()
-            expect(@handoutsEdit.$codeMirror.getValue().trim()).toEqual('/static/fromServer.jpg')
-
-        it "can open course handouts with bad html on edit", ->
-            # Enter some bad html in handouts section, verifying that the
-            # model/handoutform opens when "Edit" is clicked
-
-            @model = new ModuleInfo({
-                id: 'handouts-id',
-                data: '<p><a href="[URL OF FILE]>[LINK TEXT]</a></p>'
-            })
-            @handoutsEdit = new CourseInfoHandoutsView({
-                el: $('#course-handouts-view'),
-                model: @model,
-                base_asset_url: 'base-asset-url/'
-            });
-            @handoutsEdit.render()
-
-            expect($('.edit-handouts-form').is(':hidden')).toEqual(true)
-            @handoutsEdit.$el.find('.edit-button').click()
-            expect(@handoutsEdit.$codeMirror.getValue()).toEqual('<p><a href="[URL OF FILE]>[LINK TEXT]</a></p>')
-            expect($('.edit-handouts-form').is(':hidden')).toEqual(false)
+                expect($('.edit-handouts-form').is(':hidden')).toEqual(true)
+                @handoutsEdit.$el.find('.edit-button').click()
+                expect(@handoutsEdit.$codeMirror.getValue()).toEqual('<p><a href="[URL OF FILE]>[LINK TEXT]</a></p>')
+                expect($('.edit-handouts-form').is(':hidden')).toEqual(false)
