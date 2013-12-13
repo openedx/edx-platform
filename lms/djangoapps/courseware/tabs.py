@@ -258,7 +258,8 @@ VALID_TAB_TYPES = {
     'staff_grading': TabImpl(null_validator, _staff_grading),
     'open_ended': TabImpl(null_validator, _combined_open_ended_grading),
     'notes': TabImpl(null_validator, _notes_tab),
-    'syllabus': TabImpl(null_validator, _syllabus)
+    'syllabus': TabImpl(null_validator, _syllabus),
+    'topic_syllabuses': TabImpl(null_validator, _pdf_textbooks)
     }
 
 

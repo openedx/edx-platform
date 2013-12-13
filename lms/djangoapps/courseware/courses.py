@@ -17,6 +17,7 @@ from courseware.model_data import FieldDataCache
 from static_replace import replace_static_urls
 from courseware.access import has_access
 import branding
+import pdb
 
 log = logging.getLogger(__name__)
 
@@ -252,7 +253,7 @@ def get_course_syllabus_section(course, section_key):
     # Many of these are stored as html files instead of some semantic
     # markup. This can change without effecting this interface when we find a
     # good format for defining so many snippets of text/html.
-
+    pdb.set_trace()
     if section_key in ['syllabus', 'guest_syllabus']:
         try:
             filesys = course.system.resources_fs
