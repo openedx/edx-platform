@@ -231,7 +231,7 @@ def send_mail_to_student(student, param_dict):
        'enrolled_unenroll': ('emails/unenroll_email_subject.txt', 'emails/unenroll_email_enrolledmessage.txt')
     }
 
-    email_template_dict = MicrositeConfiguration.get_microsite_configuration_value('email_templates',
+    email_template_dict = MicrositeConfiguration.get_microsite_configuration_value('email_template_files',
         email_template_dict_default)
 
     subject_template, message_template = email_template_dict.get(param_dict['message'], (None, None))

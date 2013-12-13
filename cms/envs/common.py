@@ -26,6 +26,7 @@ Longer TODO:
 import sys
 import lms.envs.common
 from lms.envs.common import USE_TZ, TECH_SUPPORT_EMAIL, PLATFORM_NAME, BUGS_EMAIL
+from lms.envs.common import MICROSITE_CONFIGURATION as _MICROSITE_CONFIGURATION
 from path import path
 
 from lms.lib.xblock.mixin import LmsBlockMixin
@@ -448,3 +449,6 @@ YOUTUBE_API = {
     'url': "http://video.google.com/timedtext",
     'params': {'lang': 'en', 'v': 'set_youtube_id_of_11_symbols_here'}
 }
+
+# pull in the Microsite definitions which are in a separate file
+MICROSITE_CONFIGURATION = _MICROSITE_CONFIGURATION
