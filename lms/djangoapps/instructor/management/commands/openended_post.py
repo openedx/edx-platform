@@ -31,27 +31,25 @@ class Command(BaseCommand):
             try:
                 module = get_module_for_student(student, course_id, location)
                 if module is None:
-                    print "No state found."
+                    print "WARNING: No state found."
                     continue
 
                 latest_task = module._xmodule.child_module.get_current_task()
                 if latest_task is None:
-                    print "State is invalid."
+                    print "WARNING: No state found."
                     continue
 
                 latest_task_state = latest_task.child_state
 
                 if latest_task_state == OpenEndedChild.INITIAL:
-                    print "No submission."
+                    print "WARNING: No submission."
                 elif latest_task_state == OpenEndedChild.POST_ASSESSMENT or latest_task_state == OpenEndedChild.DONE:
-                    print "Submission already graded."
+                    print "WARNING: Submission already graded."
                 elif latest_task_state == OpenEndedChild.ASSESSING:
                     latest_answer = latest_task.latest_answer()
-                    print "Sending submission to grader."
                     latest_task.send_to_grader(latest_answer, latest_task.system)
+                    print "Successfully sent to grader."
                 else:
-                    print "Invalid task_state: {0}".format(latest_task_state)
+                    print "WARNING: Invalid task_state: {0}".format(latest_task_state)
             except Exception as err:
                 print err
-            else:
-                print "Successfully sent to grader."
