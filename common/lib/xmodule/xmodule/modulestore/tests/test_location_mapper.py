@@ -36,8 +36,9 @@ class TestLocationMapper(unittest.TestCase):
         org = 'foo_org'
         course = 'bar_course'
         loc_mapper().create_map_entry(Location('i4x', org, course, 'course', 'baz_run'))
+        # pylint: disable=protected-access
         entry = loc_mapper().location_map.find_one({
-            '_id': {'org': org, 'course': course, 'name': 'baz_run'}
+            '_id': loc_mapper()._construct_location_son(org, course, 'baz_run')
         })
         self.assertIsNotNone(entry, "Didn't find entry")
         self.assertEqual(entry['course_id'], '{}.{}.baz_run'.format(org, course))
@@ -48,8 +49,9 @@ class TestLocationMapper(unittest.TestCase):
         # ensure create_entry does the right thing when not given a course (creates org/course
         # rather than org/course/run course_id)
         loc_mapper().create_map_entry(Location('i4x', org, course, 'vertical', 'baz_vert'))
+        # find the one which has no name
         entry = loc_mapper().location_map.find_one({
-            '_id': {'org': org, 'course': course}
+            '_id' : loc_mapper()._construct_location_son(org, course, None)
         })
         self.assertIsNotNone(entry, "Didn't find entry")
         self.assertEqual(entry['course_id'], '{}.{}'.format(org, course))
@@ -63,9 +65,7 @@ class TestLocationMapper(unittest.TestCase):
             'wip',
             'live',
             block_map)
-        entry = loc_mapper().location_map.find_one({
-            '_id': {'org': org, 'course': course}
-        })
+        entry = loc_mapper().location_map.find_one({'_id.org': org, '_id.course': course})
         self.assertIsNotNone(entry, "Didn't find entry")
         self.assertEqual(entry['course_id'], 'foo_org.geek_dept.quux_course.baz_run')
         self.assertEqual(entry['draft_branch'], 'wip')
