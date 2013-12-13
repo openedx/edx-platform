@@ -183,16 +183,16 @@
     border-left: 1px solid $mediumGrey;
     border-right: 1px solid $mediumGrey;
 
-    .xmodule_display {
+    .xblock-student_view {
       display: none;
     }
   }
 
-  .new .xmodule_display {
+  .new .xblock-student_view {
     background: $yellow;
   }
 
-  .xmodule_display {
+  .xblock-student_view {
     @include transition(background-color $tmg-s3 linear 0s);
     padding: 20px 20px 22px;
     font-size: 24px;

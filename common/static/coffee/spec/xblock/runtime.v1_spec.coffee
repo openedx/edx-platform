@@ -1,4 +1,4 @@
-describe "XBlock.runtime.v1", ->
+describe "XBlock.Runtime.v1", ->
   beforeEach ->
     setFixtures """
       <div class='xblock' data-handler-prefix='/xblock/fake-usage-id/handler'/>
@@ -10,9 +10,7 @@ describe "XBlock.runtime.v1", ->
 
     @element = $('.xblock')[0]
 
-    @runtime = XBlock.runtime.v1(@element, @children)
-  it "provides a handler url", ->
-    expect(@runtime.handlerUrl(@element, 'foo')).toBe('/xblock/fake-usage-id/handler/foo')
+    @runtime = new XBlock.Runtime.v1(@element, @children)
 
   it "provides a list of children", ->
     expect(@runtime.children).toBe(@children)

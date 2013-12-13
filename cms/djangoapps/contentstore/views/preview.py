@@ -1,11 +1,12 @@
 import logging
+import hashlib
 from functools import partial
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseBadRequest
 from django.contrib.auth.decorators import login_required
-from edxmako.shortcuts import render_to_response, render_to_string
+from edxmako.shortcuts import render_to_string
 
 from xmodule_modifiers import replace_static_urls, wrap_xblock
 from xmodule.error_module import ErrorDescriptor
@@ -15,6 +16,7 @@ from xmodule.x_module import ModuleSystem
 from xblock.runtime import KvsFieldData
 from xblock.django.request import webob_to_django_response, django_to_webob_request
 from xblock.exceptions import NoSuchHandlerError
+from xblock.fragment import Fragment
 
 from lms.lib.xblock.field_data import LmsFieldData
 from lms.lib.xblock.runtime import quote_slashes, unquote_slashes
@@ -143,15 +145,15 @@ def _load_preview_module(request, descriptor):
     return descriptor
 
 
-def get_preview_html(request, descriptor):
+def get_preview_fragment(request, descriptor):
     """
     Returns the HTML returned by the XModule's student_view,
     specified by the descriptor and idx.
     """
     module = _load_preview_module(request, descriptor)
     try:
-        content = module.render("student_view").content
+        fragment = module.render("student_view")
     except Exception as exc:                          # pylint: disable=W0703
         log.debug("Unable to render student_view for %r", module, exc_info=True)
-        content = render_to_string('html_error.html', {'message': str(exc)})
-    return content
+        fragment = Fragment(render_to_string('html_error.html', {'message': str(exc)}))
+    return fragment
