@@ -84,6 +84,16 @@ def get_enrolled_students(course_id):
     return enrolled_students
 
 
+def get_affected_students_from_ids(affected_students_ids):
+    """Return affected students form ids list."""
+
+    affected_students = User.objects.filter(
+        id__in=affected_students_ids,
+        courseenrollment__is_active=1
+    ).prefetch_related("groups").order_by('username')
+    return affected_students
+
+
 def read_csv(path_to_csv):
     """
     reads a csv and returns a list
