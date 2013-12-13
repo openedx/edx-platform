@@ -485,6 +485,10 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             'grader_ids': [0],
             'submission_ids': [0],
         }
+
+        if score_msg == "":
+            return fail
+
         try:
             score_result = json.loads(score_msg)
         except (TypeError, ValueError):
