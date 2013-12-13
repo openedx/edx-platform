@@ -66,6 +66,10 @@ def anonymous_id_for_user(user, course_id):
     if user.is_anonymous():
         return None
 
+    cached_id = getattr(user, '_anonymous_id', {}).get(course_id)
+    if cached_id is not None:
+        return cached_id
+
     # include the secret key as a salt, and to make the ids unique across different LMS installs.
     hasher = hashlib.md5()
     hasher.update(settings.SECRET_KEY)
@@ -93,6 +97,11 @@ def anonymous_id_for_user(user, course_id):
         # Another thread has already created this entry, so
         # continue
         pass
+
+    if not hasattr(user, '_anonymous_id'):
+        user._anonymous_id = {}
+
+    user._anonymous_id[course_id] = digest
 
     return digest
 
