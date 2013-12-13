@@ -38,9 +38,11 @@ class Command(BaseCommand):
                     print "No state found."
                     continue
 
-                latest_task = module._xmodule.child_module.get_latest_task()
+                latest_task = module._xmodule.child_module.get_current_task()
                 if latest_task is None:
                     print "State is invalid."
+                    continue
+
                 latest_task_state = latest_task.child_state
 
                 if latest_task_state == OpenEndedChild.INITIAL:
@@ -48,8 +50,9 @@ class Command(BaseCommand):
                 elif latest_task_state == OpenEndedChild.POST_ASSESSMENT or latest_task_state == OpenEndedChild.DONE:
                     print "Submission already graded."
                 elif latest_task_state == OpenEndedChild.ASSESSING:
+                    latest_answer = latest_task.latest_answer()
                     print "Sending submission to grader."
-                    latest_task.send_to_grader(latest_task.latest_answer(), latest_task.system)
+                    latest_task.send_to_grader(latest_answer, latest_task.system)
                 else:
                     print "Invalid task_state: {0}".format(latest_task_state)
             except Exception as err:

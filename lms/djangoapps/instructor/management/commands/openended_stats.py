@@ -49,7 +49,7 @@ class Command(BaseCommand):
                 print "{0} students processed".format(index)
 
             module = get_module_for_student(student, course_id, location)
-            latest_task = module._xmodule.child_module.get_latest_task()
+            latest_task = module._xmodule.child_module.get_current_task()
             stats[latest_task.child_state] += 1
 
         print stats

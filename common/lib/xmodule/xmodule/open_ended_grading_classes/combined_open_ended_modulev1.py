@@ -365,12 +365,15 @@ class CombinedOpenEndedV1Module():
         )
         return task
 
-    def get_latest_task(self):
-        """Return latest task object."""
+    def get_current_task(self):
+        """Return current task object."""
 
-        last_task_state = self.task_states[-1]
-        last_task_xml = self.task_xml[-1]
-        return self.create_task(last_task_state, last_task_xml)
+        if len(self.task_states) > 0:
+            current_task_index = len(self.task_states) - 1
+            current_task_state = self.task_states[current_task_index]
+            current_task_xml = self.task_xml[current_task_index]
+            return self.create_task(current_task_state, current_task_xml)
+        return None
 
     def reset_task_state(self, message=""):
         """
