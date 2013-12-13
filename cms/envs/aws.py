@@ -112,8 +112,6 @@ EMAIL_FILE_PATH = ENV_TOKENS.get('EMAIL_FILE_PATH', None)
 EMAIL_HOST = ENV_TOKENS.get('EMAIL_HOST', EMAIL_HOST)
 EMAIL_PORT = ENV_TOKENS.get('EMAIL_PORT', EMAIL_PORT)
 EMAIL_USE_TLS = ENV_TOKENS.get('EMAIL_USE_TLS', EMAIL_USE_TLS)
-EMAIL_HOST_USER = AUTH_TOKENS.get('EMAIL_HOST_USER', EMAIL_HOST_USER)
-EMAIL_HOST_PASSWORD = AUTH_TOKENS.get('EMAIL_HOST_PASSWORD', EMAIL_HOST_PASSWORD)
 
 LMS_BASE = ENV_TOKENS.get('LMS_BASE')
 # Note that FEATURES['PREVIEW_LMS_BASE'] gets read in from the environment file.
@@ -170,6 +168,9 @@ if "TRACKING_IGNORE_URL_PATTERNS" in ENV_TOKENS:
 # Secret things: passwords, access keys, etc.
 with open(CONFIG_ROOT / CONFIG_PREFIX + "auth.json") as auth_file:
     AUTH_TOKENS = json.load(auth_file)
+
+EMAIL_HOST_USER = AUTH_TOKENS.get('EMAIL_HOST_USER', EMAIL_HOST_USER)
+EMAIL_HOST_PASSWORD = AUTH_TOKENS.get('EMAIL_HOST_PASSWORD', EMAIL_HOST_PASSWORD)
 
 # If Segment.io key specified, load it and turn on Segment.io if the feature flag is set
 # Note that this is the Studio key. There is a separate key for the LMS.
