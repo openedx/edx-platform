@@ -4,7 +4,6 @@ XBlock runtime implementations for edX Studio
 
 from django.core.urlresolvers import reverse
 
-import xmodule.x_module
 from lms.lib.xblock.runtime import quote_slashes
 
 
@@ -27,4 +26,3 @@ def handler_url(block, handler_name, suffix='', query='', thirdparty=False):
 
     return url
 
-xmodule.x_module.descriptor_global_handler_url = handler_url

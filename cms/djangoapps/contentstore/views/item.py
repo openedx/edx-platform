@@ -10,6 +10,7 @@ from xmodule_modifiers import wrap_xblock
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseBadRequest
+from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_http_methods
 
 from xblock.fields import Scope
@@ -34,13 +35,19 @@ from .helpers import _xmodule_recurse
 from preview import handler_prefix, get_preview_html
 from edxmako.shortcuts import render_to_response, render_to_string
 from models.settings.course_grading import CourseGradingModel
-from django.utils.translation import ugettext as _
+from cms.lib.xblock.runtime import handler_url
 
 __all__ = ['orphan_handler', 'xblock_handler']
 
 log = logging.getLogger(__name__)
 
 CREATE_IF_NOT_FOUND = ['course_info']
+
+
+# In order to allow descriptors to use a handler url, we need to
+# monkey-patch the x_module library.
+# TODO: Remove this code when Runtimes are no longer created by modulestores
+xmodule.x_module.descriptor_global_handler_url = handler_url
 
 
 # pylint: disable=unused-argument

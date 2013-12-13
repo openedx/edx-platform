@@ -61,7 +61,6 @@ import track.views
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 from django.utils.translation import ugettext as _u
-from lms.lib.xblock.runtime import handler_prefix
 
 from microsite_configuration.middleware import MicrositeConfiguration
 
@@ -848,7 +847,7 @@ def instructor_dashboard(request, course_id):
             ScopeIds(None, None, None, 'i4x://dummy_org/dummy_course/html/dummy_name')
         )
         fragment = html_module.render('studio_view')
-        fragment = wrap_xblock(partial(handler_prefix, course_id), html_module, 'studio_view', fragment, None)
+        fragment = wrap_xblock('LmsRuntime', html_module, 'studio_view', fragment, None, extra_data={"course-id": course_id})
         email_editor = fragment.content
 
     # Enable instructor email only if the following conditions are met:

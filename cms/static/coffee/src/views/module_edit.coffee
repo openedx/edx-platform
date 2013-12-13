@@ -1,6 +1,6 @@
 define ["backbone", "jquery", "underscore", "gettext", "xblock/runtime.v1",
         "js/views/feedback_notification", "js/views/metadata", "js/collections/metadata"
-        "js/utils/modal", "jquery.inputnumber", "xmodule", "coffee/src/main"],
+        "js/utils/modal", "jquery.inputnumber", "xmodule", "coffee/src/main", "xblock/cms.runtime.v1"],
 (Backbone, $, _, gettext, XBlock, NotificationView, MetadataView, MetadataCollection, ModalUtils) ->
   class ModuleEdit extends Backbone.View
     tagName: 'li'

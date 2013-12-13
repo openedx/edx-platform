@@ -754,6 +754,7 @@ main_vendor_js = [
     'js/vendor/ova/ova.js',
     'js/vendor/ova/catch/js/catch.js',
     'js/vendor/ova/catch/js/handlebars-1.1.2.js'
+    'js/vendor/URI.min.js'
 ]
 
 discussion_js = sorted(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/discussion/**/*.js'))
@@ -819,17 +820,18 @@ PIPELINE_CSS = {
 }
 
 
+common_js = set(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/**/*.js')) - set(courseware_js + discussion_js + staff_grading_js + open_ended_js + notes_js + instructor_dash_js)
+project_js = set(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/**/*.js')) - set(courseware_js + discussion_js + staff_grading_js + open_ended_js + notes_js + instructor_dash_js)
+
+
+
 # test_order: Determines the position of this chunk of javascript on
 # the jasmine test page
 PIPELINE_JS = {
     'application': {
 
         # Application will contain all paths not in courseware_only_js
-        'source_filenames': sorted(
-            set(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/**/*.js') +
-                rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/**/*.js')) -
-            set(courseware_js + discussion_js + staff_grading_js + open_ended_js + notes_js + instructor_dash_js)
-        ) + [
+        'source_filenames': sorted(common_js) + sorted(project_js) + [
             'js/form.ext.js',
             'js/my_courses_dropdown.js',
             'js/toggle_login_modal.js',

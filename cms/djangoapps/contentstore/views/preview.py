@@ -33,20 +33,6 @@ __all__ = ['preview_handler']
 log = logging.getLogger(__name__)
 
 
-def handler_prefix(block, handler='', suffix=''):
-    """
-    Return a url prefix for XBlock handler_url. The full handler_url
-    should be '{prefix}/{handler}/{suffix}?{query}'.
-
-    Trailing `/`s are removed from the returned url.
-    """
-    return reverse('preview_handler', kwargs={
-        'usage_id': quote_slashes(unicode(block.scope_ids.usage_id).encode('utf-8')),
-        'handler': handler,
-        'suffix': suffix,
-    }).rstrip('/?')
-
-
 @login_required
 def preview_handler(request, usage_id, handler, suffix=''):
     """
@@ -91,7 +77,11 @@ class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
     An XModule ModuleSystem for use in Studio previews
     """
     def handler_url(self, block, handler_name, suffix='', query='', thirdparty=False):
-        return handler_prefix(block, handler_name, suffix) + '?' + query
+        return reverse('preview_handler', kwargs={
+            'usage_id': quote_slashes(unicode(block.scope_ids.usage_id).encode('utf-8')),
+            'handler': handler_name,
+            'suffix': suffix,
+        }) + '?' + query
 
 
 def _preview_module_system(request, descriptor):
@@ -123,7 +113,7 @@ def _preview_module_system(request, descriptor):
         # Set up functions to modify the fragment produced by student_view
         wrappers=(
             # This wrapper wraps the module in the template specified above
-            partial(wrap_xblock, handler_prefix, display_name_only=descriptor.location.category == 'static_tab'),
+            partial(wrap_xblock, 'PreviewRuntime', display_name_only=descriptor.location.category == 'static_tab'),
 
             # This wrapper replaces urls in the output that start with /static
             # with the correct course-specific url for the static content
