@@ -225,20 +225,36 @@ def send_mail_to_student(student, param_dict):
     Returns a boolean indicating whether the email was sent successfully.
     """
 
-    email_template_dict_default = {'allowed_enroll': ('emails/enroll_email_allowedsubject.txt', 'emails/enroll_email_allowedmessage.txt'),
-       'enrolled_enroll': ('emails/enroll_email_enrolledsubject.txt', 'emails/enroll_email_enrolledmessage.txt'),
-       'allowed_unenroll': ('emails/unenroll_email_subject.txt', 'emails/unenroll_email_allowedmessage.txt'),
-       'enrolled_unenroll': ('emails/unenroll_email_subject.txt', 'emails/unenroll_email_enrolledmessage.txt')
-    }
+    # add some helpers and microconfig subsitutions
+    param_dict['course_name'] = param_dict['course'].display_name_with_default
+    param_dict['site_name'] = MicrositeConfiguration.get_microsite_configuration_value('SITE_NAME',
+        param_dict['site_name'])
 
-    email_template_dict = MicrositeConfiguration.get_microsite_configuration_value('email_template_files',
-        email_template_dict_default)
+    subject = None
+    message = None
 
-    subject_template, message_template = email_template_dict.get(param_dict['message'], (None, None))
-    if subject_template is not None and message_template is not None:
-        subject = render_to_string(subject_template, param_dict)
-        message = render_to_string(message_template, param_dict)
+    # see if we are running in a microsite and that there is an
+    # activation email template definition available as configuration, if so, then render that
+    message_type = param_dict['message']
+    print '*************'
+    print message_type
+    if MicrositeConfiguration.has_microsite_email_template_definition(message_type):
+        print 'has email template!'
+        subject, message = MicrositeConfiguration.render_microsite_email_template(message_type, 
+            param_dict)
+    else:   # use the on-disk email templates in lms/templates/email
+        email_template_dict = {'allowed_enroll': ('emails/enroll_email_allowedsubject.txt', 'emails/enroll_email_allowedmessage.txt'),
+           'enrolled_enroll': ('emails/enroll_email_enrolledsubject.txt', 'emails/enroll_email_enrolledmessage.txt'),
+           'allowed_unenroll': ('emails/unenroll_email_subject.txt', 'emails/unenroll_email_allowedmessage.txt'),
+           'enrolled_unenroll': ('emails/unenroll_email_subject.txt', 'emails/unenroll_email_enrolledmessage.txt')
+        }
 
+        subject_template, message_template = email_template_dict.get(message_type, (None, None))
+        if subject_template is not None and message_template is not None:
+            subject = render_to_string(subject_template, param_dict)
+            message = render_to_string(message_template, param_dict)
+
+    if subject and message:
         # Remove leading and trailing whitespace from body
         message = message.strip()
 

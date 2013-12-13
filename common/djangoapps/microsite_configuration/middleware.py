@@ -10,6 +10,10 @@ import threading
 
 from django.conf import settings
 
+from mako.template import Template
+from mako.runtime import Context
+from StringIO import StringIO
+
 _microsite_configuration_threadlocal = threading.local()
 _microsite_configuration_threadlocal.data = {}
 
@@ -25,6 +29,21 @@ class MicrositeConfiguration(object):
     Middleware class which will bind configuration information regarding 'microsites' on a per request basis.
     The actual configuration information is taken from Django settings information
     """
+
+    @classmethod
+    def is_request_in_microsite(cls):
+        """
+        This will return if current request is a request within a microsite
+        """
+        return cls.get_microsite_configuration() != None
+
+    @classmethod
+    def has_microsite_email_template_definition(cls, template_name):
+        """
+        """
+        return cls.is_request_in_microsite() and cls.get_microsite_email_template_definitions(
+            template_name) != None
+
     @classmethod
     def get_microsite_configuration(cls):
         """
@@ -39,6 +58,50 @@ class MicrositeConfiguration(object):
         """
         configuration = cls.get_microsite_configuration()
         return configuration.get(val_name, default)
+
+    @classmethod
+    def get_microsite_email_template_definitions(cls, template_name):
+        """
+        Returns the template definitions associated with a Microsite
+        """
+        configuration = cls.get_microsite_configuration()
+        if configuration and 'email_templates' in configuration:
+            return configuration['email_templates'].get(template_name, None)
+
+        return None        
+
+    @classmethod
+    def render_microsite_email_template(cls, template_name, params):
+        """
+        Returns a string pair which is a rendered version of an email template of a given name
+        """
+        subject = None
+        message = None
+
+        email_template_definitions = cls.get_microsite_email_template_definitions(template_name)
+
+        if email_template_definitions:
+            # inject a few additional parameters that should be available to all
+            # email templates
+            p = params.copy()
+            p['site_domain'] = cls.get_microsite_configuration_value('site_domain')   
+            p['platform_name'] = cls.get_microsite_configuration_value('platform_name')
+
+            buf = StringIO()
+            ctx = Context(buf, **p)
+
+            subject_template = Template(email_template_definitions.get('subject', None))
+            if subject_template:
+                subject_template.render_context(ctx)
+                subject = buf.getvalue()
+
+            buf.truncate(0)
+            message_template = Template(email_template_definitions.get('body', None))
+            if message_template:
+                message_template.render_context(ctx)
+                message = buf.getvalue()
+
+        return subject, message
 
     @classmethod
     def get_microsite_configuration_value_for_org(cls, org, val_name, default=None):
@@ -77,6 +140,7 @@ class MicrositeConfiguration(object):
             if microsite_configuration:
                 microsite_configuration['university'] = university
                 microsite_configuration['subdomain'] = subdomain
+                microsite_configuration['site_domain'] = domain
                 _microsite_configuration_threadlocal.data = microsite_configuration
 
         # also put the configuration on the request itself to make it easier to dereference

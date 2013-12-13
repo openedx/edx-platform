@@ -918,22 +918,10 @@ def create_account(request, post_override=None):
          'key': registration.activation_key,
          }
 
-    # see if there are email templates defined for this microsite
-    email_templates  = MicrositeConfiguration.get_microsite_configuration_value(
-        'email_templates'
-    )
-
-    if email_templates and 'activation_email' in email_templates:
-        buf = StringIO()
-        ctx = Context(buf, name=d['name'], key=d['key'], site=request.META['HTTP_HOST'])
-
-        subject_template = Template(email_templates['activation_email']['subject'])
-        subject_template.render_context(ctx)
-        subject = buf.getvalue()
-
-        message_template = Template(email_templates['activation_email']['body'])
-        message_template.render_context(ctx)
-        message = buf.getvalue()
+    # see if we are running in a microsite and that there is an
+    # activation email template definition available as configuration, if so, then render that
+    if MicrositeConfiguration.has_microsite_email_template_definition('activation_email'):
+        subject, message = MicrositeConfiguration.render_microsite_email_template('activation_email', d)
     else:
         # composes activation email
         subject = render_to_string('emails/activation_email_subject.txt', d)
