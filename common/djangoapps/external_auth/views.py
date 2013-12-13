@@ -840,23 +840,12 @@ def provider_login(request):
             url = endpoint + urlquote(user.username)
             response = openid_request.answer(True, None, url)
 
-            # TODO: for CS50 we are forcibly returning the username
-            # instead of fullname. In the OpenID simple registration
-            # extension, we don't have to return any fields we don't
-            # want to, even if they were marked as required by the
-            # Consumer. The behavior of what to do when there are
-            # missing fields is up to the Consumer. The proper change
-            # should only return the username, however this will likely
-            # break the CS50 client. Temporarily we will be returning
-            # username filling in for fullname in addition to username
-            # as sreg nickname.
-
             # Note too that this is hardcoded, and not really responding to
             # the extensions that were registered in the first place.
             results = {
                 'nickname': user.username,
                 'email': user.email,
-                'fullname': user.username
+                'fullname': user.profile.name,
             }
 
             # the request succeeded:
