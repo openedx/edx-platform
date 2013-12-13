@@ -209,6 +209,7 @@ def create_new_course(request):
     number = request.json.get('number')
     display_name = request.json.get('display_name')
     run = request.json.get('run')
+    level_of_education = request.json.get('level_of_education')
 
     try:
         dest_location = Location('i4x', org, number, 'course', run)
@@ -270,7 +271,7 @@ def create_new_course(request):
     if display_name is None:
         metadata = {}
     else:
-        metadata = {'display_name': display_name}
+        metadata = {'display_name': display_name, 'level_of_education': level_of_education}
     modulestore('direct').create_and_save_xmodule(
         dest_location,
         metadata=metadata
