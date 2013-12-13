@@ -27,7 +27,10 @@ window.ImageInput = (function ($, undefined) {
         var _this = this;
 
         this.elementId = elementId;
-        this.el = $('#imageinput_' + elementId);
+
+        this.el = $('#imageinput_' + this.elementId);
+        this.crossEl = $('#cross_' + this.elementId);
+        this.inputEl = $('#input_' + this.elementId);
 
         this.el.on('click', function (event) {
             _this.clickHandler(event);
@@ -35,14 +38,10 @@ window.ImageInput = (function ($, undefined) {
     }
 
     function clickHandler(event) {
-        var iiDiv = document.getElementById('imageinput_' + this.elementId),
-
-            posX = event.offsetX ?
-                event.offsetX : event.pageX - iiDiv.offsetLeft,
+        var posX = event.offsetX ?
+                event.offsetX : event.pageX - this.el[0].offsetLeft,
             posY = event.offsetY ?
-                event.offsetY : event.pageY - iiDiv.offsetTop,
-
-            cross = document.getElementById('cross_' + this.elementId),
+                event.offsetY : event.pageY - this.el[0].offsetTop,
 
             // To reduce differences between values returned by different kinds
             // of browsers, we round `posX` and `posY`.
@@ -51,12 +50,12 @@ window.ImageInput = (function ($, undefined) {
             // Chrome, FF: `posX` and `posY` - integers.
             result = '[' + Math.round(posX) + ',' + Math.round(posY) + ']';
 
-        console.log('[image_input_click]: event = ', event);
+        this.crossEl.css({
+            left: posX - 15,
+            top: posY - 15,
+            visibility: 'visible'
+        });
 
-        cross.style.left = (posX - 15) + 'px';
-        cross.style.top = (posY - 15) + 'px';
-        cross.style.visibility = 'visible';
-
-        document.getElementById('input_' + this.elementId).value = result;
+        this.inputEl.val(result);
     }
 }).call(this, window.jQuery);
