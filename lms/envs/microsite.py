@@ -29,6 +29,8 @@ _MICROSITE_CONFIGURATION = {
         # this is to indicate that the LMS is 'behind' a separate marketing website which
         # is a different web application
         "ENABLE_MKTG_SITE":  False,
+        # override the SITE_NAME setting
+        "SITE_NAME": 'openedx.localhost',
         # setting to indicate whether to show the "university partner" list on the landing page
         "show_university_partners": False,
         # These 4 following items define the template substitutions to use in the courseware pages
@@ -76,9 +78,9 @@ _MICROSITE_CONFIGURATION = {
                 "body":
                     "Thank you for signing up for Open edX! To activate\n"
                     "your account, please copy and paste this address into your web\n"
-                    " browser's address bar:\n"
+                    "browser's address bar:\n"
                     "\n"
-                    "https://${ site }/activate/${ key }"
+                    "https://${ site_domain }/activate/${ key }\n"
                     "\n"
                     "If you didn't request this, you don't need to do anything; you won't\n"
                     "receive any more email from us. Please do not reply to this e-mail;\n"
@@ -93,37 +95,67 @@ _MICROSITE_CONFIGURATION = {
                     "did not make this request, please contact us immediately. Contact\n"
                     "information is listed at:\n"
                     "\n"
-                    "https://${ site }${reverse('contact')}\n"
+                    "https://${ site_domain }${reverse('contact')}\n"
                     "\n"
                     "We keep a log of old e-mails, so if this request was unintentional, we\n"
                     "can investigate."
             },
-            "enroll_email_allowed": {
+            "allowed_enroll": {
                 "subject": "You have been invited to register for ${course_name}",
                 "body": 
                     "To finish your registration, please visit ${registration_url} and fill\n"
                     "out the registration form making sure to use ${email_address} in the E-mail field.\n"
-                    "% if auto_enroll:"
-                    "   Once you have registered and activated your account, you will see\n"
-                    "   ${course.display_name_with_default} listed on your dashboard.\n"
-                    "% else:"
-                    "   Once you have registered and activated your account, visit ${course_about_url}\n"
-                    "   to join the course.\n"
-                    "% endif"
+                    "% if auto_enroll:\n"
+                    "Once you have registered and activated your account, you will see\n"
+                    "${course_name} listed on your dashboard.\n"
+                    "% else:\n"
+                    "Once you have registered and activated your account, visit ${course_about_url}\n"
+                    "to join the course.\n"
+                    "% endif\n"
                     "\n----\nThis email was automatically sent from ${site_name} to\n"
                     "${email_address}"
             },
-            "enroll_email_enrolled": {
+            "enrolled_enroll": {
                 "subject": "You have been enrolled in ${course_name}",
                 "body": 
                     "Dear ${full_name}\n"
                     "\n"
-                    "You have been enrolled in {course_name} at ${site_name} by a member\n"
+                    "You have been enrolled in {course_name} at ${platform_name} by a member\n"
                     "of the course staff. The course should now appear on your ${site_name}\n"
                     "dashboard.\n"
                     "\n"
                     "To start accessing course materials, please visit ${course_url}"
                     "\n"
+                    "\n"
+                    "----\n"
+                    "This email was automatically sent from ${site_name} to\n"
+                    "${full_name}"
+            },
+            "allowed_unenroll": {
+                "subject": "You have been un-enrolled from ${course_name}",
+                "body": 
+                    "\n"
+                    "Dear Student,\n"
+                    "\n"
+                    "You have been un-enrolled from course ${course_name} by a member\n"
+                    "of the course staff. Please disregard the invitation\n"
+                    "previously sent.\n"
+                    "\n"
+                    "----\n"
+                    "This email was automatically sent from ${site_name}\n"
+                    "to ${email_address}"
+            },
+            "enrolled_unenroll": {
+                "subject": "You have been un-enrolled from ${course_name}",
+                "body":
+                    "\n"             
+                    "Dear ${full_name}\n"
+                    "\n"
+                    "You have been un-enrolled in ${course_name} at ${site_name} by a member\n"
+                    "of the course staff. The course will no longer appear on your\n"
+                    "${site_name} dashboard.\n"
+                    "\n"
+                    "Your other courses have not been affected.\n"
                     "\n"
                     "----\n"
                     "This email was automatically sent from ${site_name} to\n"
@@ -144,54 +176,24 @@ _MICROSITE_CONFIGURATION = {
                     "The items in your order are:\n"
                     "\n"
                     "Quantity - Description - Price\n"
-                    "%for order_item in order_items:"
-                        "${order_item.qty} - ${order_item.line_desc} - ${'$'' if order_item.currency == 'usd' else ''}${order_item.line_cost}\n" 
-                    "%endfor"
+                    "%for order_item in order_items:\n"
+                    "${order_item.qty} - ${order_item.line_desc} - ${'$'' if order_item.currency == 'usd' else ''}${order_item.line_cost}\n" 
+                    "%endfor\n"
                     "\n"
                     "Total billed to credit/debit card: ${order.total_cost}${'$'' if order.currency == 'usd' else '')}\n"
                     "\n"
                     "% if has_billing_info:"
-                    "   ${order.bill_to_cardtype} ${_('#:'')} ${order.bill_to_ccnum}"
-                    "   ${order.bill_to_first} ${order.bill_to_last}"
-                    "   ${order.bill_to_street1}"
-                    "   ${order.bill_to_street2}"
-                    "   ${order.bill_to_city}, ${order.bill_to_state} ${order.bill_to_postalcode}"
-                    "   ${order.bill_to_country.upper()}"
+                    "${order.bill_to_cardtype} ${_('#:'')} ${order.bill_to_ccnum}"
+                    "${order.bill_to_first} ${order.bill_to_last}"
+                    "${order.bill_to_street1}"
+                    "${order.bill_to_street2}"
+                    "${order.bill_to_city}, ${order.bill_to_state} ${order.bill_to_postalcode}"
+                    "${order.bill_to_country.upper()}"
                     "% endif"
                     "\n"
-                    "%for order_item in order_items:"
-                    "   ${order_item.additional_instruction_text}"
-                    "%endfor"
-            },
-            "unenroll_email_allowed": {
-                "subject": "You have been un-enrolled from ${course_name}",
-                "body": 
-                    "\n"
-                    "Dear Student,\n"
-                    "\n"
-                    "You have been un-enrolled from course ${course.display_name_with_default} by a member\n"
-                    "of the course staff. Please disregard the invitation\n"
-                    "previously sent.\n"
-                    "\n"
-                    "----\n"
-                    "This email was automatically sent from ${site_name}n"
-                    "to ${email_address}"
-            },
-            "unenroll_email_enrolled": {
-                "subject": "You have been un-enrolled from ${course_name}",
-                "body":
-                    "\n"             
-                    "Dear ${full_name}\n"
-                    "\n"
-                    "You have been un-enrolled in ${course_name} at ${site_name} by a member\n"
-                    "of the course staff. The course will no longer appear on your\n"
-                    "${site_name} dashboard.\n"
-                    "\n"
-                    "Your other courses have not been affected.\n"
-                    "\n"
-                    "----\n"
-                    "This email was automatically sent from ${site_name} to\n"
-                    "${full_name}"
+                    "%for order_item in order_items:\n"
+                    "${order_item.additional_instruction_text}\n"
+                    "%endfor\n"
             }
         },
     },
