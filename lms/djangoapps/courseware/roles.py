@@ -4,7 +4,6 @@ adding users, removing users, and listing members
 """
 
 from abc import ABCMeta, abstractmethod
-from functools import partial
 
 from django.contrib.auth.models import User, Group
 
