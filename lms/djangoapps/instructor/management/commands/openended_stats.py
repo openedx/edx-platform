@@ -1,7 +1,3 @@
-#!/usr/bin/env python
-#
-# Command to get statistics about an openended problem.
-
 from xmodule.open_ended_grading_classes.openendedchild import OpenEndedChild
 from ...utils import get_descriptor, get_module_for_student, get_enrolled_students
 from django.core.management.base import BaseCommand

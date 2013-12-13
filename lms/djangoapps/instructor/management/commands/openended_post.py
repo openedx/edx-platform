@@ -1,7 +1,3 @@
-#!/usr/bin/env python
-#
-# Command to post student submissions to ORA
-
 from xmodule.open_ended_grading_classes.openendedchild import OpenEndedChild
 from ...utils import get_descriptor, create_list_from_csv, get_users_from_ids, get_module_for_student
 from django.core.management.base import BaseCommand
