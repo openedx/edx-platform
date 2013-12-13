@@ -17,6 +17,7 @@ See the following topics:
 * :ref:`Create an HTML Component`
 * :ref:`Work with the Visual and HTML Editors`
 * :ref:`Use the Announcement Template`
+* :ref:`Use the Anonymous User ID Template`
 * :ref:`Import Content from LaTex`
 * :ref:`Add a Link in an HTML Component`
 * :ref:`Add an Image to an HTML Component`
@@ -118,13 +119,40 @@ When you create a new HTML component, you can select to use a built-in Announcem
 When creating the new HTML component, select **Announcement**.
 
 .. image:: Images/HTML_Component_Type.png
- :width: 800
+ :width: 600
  
 The following screen opens.
 
 .. image:: Images/image073.png
 
 Edit the content of the announcement just as you would any HTML component.
+
+
+.. _Use the Anonymous User ID Template:
+
+************************************
+Use the Anonymous User ID Template
+************************************
+
+When you create a new HTML component, you can select to use a built-in Anonymous User ID template.
+
+The Anonymous User ID template contains HTML set up for you to use a Qualtrics survey in your course.
+
+When creating the new HTML component, select **Anonymous User ID**.
+
+.. image:: Images/HTML_Component_Type.png
+ :width: 600
+
+Edit the content just as you would any HTML component.
+
+To use your survey, you must edit the link in the template to include your university and survey ID.  
+
+You can also embed the survey in an iframe in the HTML component.
+
+For more details, read the instructions in the HTML view of the component. 
+
+
+
 
 .. _Import Content from LaTeX:
 
