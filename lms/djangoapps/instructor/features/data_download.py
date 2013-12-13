@@ -15,6 +15,10 @@ from terrain.steps import reload_the_page
 def find_student_profile_table(step):  # pylint: disable=unused-argument
     # Find the grading configuration display
     world.wait_for_visible('#data-student-profiles-table')
+
+    # Wait for the data table to be populated
+    world.wait_for(lambda _: world.css_text('#data-student-profiles-table') not in [u'', u'Loading...'])
+
     if world.role == 'instructor':
         expected_data = [
             world.instructor.username,
