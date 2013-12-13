@@ -32,6 +32,7 @@ Contents
    accessibility
    checking_student_progress
    ora_students
+   glossary
    change_log
 
 
