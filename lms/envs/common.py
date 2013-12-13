@@ -34,6 +34,8 @@ from lms.lib.xblock.mixin import LmsBlockMixin
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.x_module import XModuleMixin
 
+from .microsite import _MICROSITE_CONFIGURATION
+
 ################################### FEATURES ###################################
 # The display name of the platform to be used in templates/emails/etc.
 PLATFORM_NAME = "edX"
@@ -1101,3 +1103,6 @@ GRADES_DOWNLOAD = {
     'BUCKET': 'edx-grades',
     'ROOT_PATH': '/tmp/edx-s3/grades',
 }
+
+# pull in the Microsite definitions which are in a separate file
+MICROSITE_CONFIGURATION = _MICROSITE_CONFIGURATION

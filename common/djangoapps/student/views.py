@@ -36,6 +36,9 @@ from django.contrib.admin.views.decorators import staff_member_required
 from ratelimitbackend.exceptions import RateLimitException
 
 from edxmako.shortcuts import render_to_response, render_to_string
+from edxmako.template import Template
+from mako.runtime import Context
+from StringIO import StringIO
 
 from course_modes.models import CourseMode
 from student.models import (
@@ -920,19 +923,23 @@ def create_account(request, post_override=None):
         'email_templates'
     )
 
-    if email_templates:
-        subject_template, message_template = email_templates['activation_email']
+    if email_templates and 'activation_email' in email_templates:
+        buf = StringIO()
+        ctx = Context(buf, name=d['name'], key=d['key'], site=request.META['HTTP_HOST'])
+
+        subject_template = Template(email_templates['activation_email']['subject'])
+        subject_template.render_context(ctx)
+        subject = buf.getvalue()
+
+        message_template = Template(email_templates['activation_email']['body'])
+        message_template.render_context(ctx)
+        message = buf.getvalue()
     else:
-        # fallback to default system templates
-        subject_template = 'emails/activation_email_subject.txt'
-        message_template = 'emails/activation_email.txt'
-
-    # composes activation email
-    subject = render_to_string(subject_template, d)
-    # Email subject *must not* contain newlines
-    subject = ''.join(subject.splitlines())
-
-    message = render_to_string(message_template, d)
+        # composes activation email
+        subject = render_to_string('emails/activation_email_subject.txt', d)
+        # Email subject *must not* contain newlines
+        subject = ''.join(subject.splitlines())
+        message = render_to_string('emails/activation_email.txt', d)
 
     # don't send email if we are doing load testing or random user generation for some reason
     if not (settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING')):
@@ -1204,7 +1211,7 @@ def change_email_request(request):
 
     # see if there are email templates defined for this microsite
     email_templates  = MicrositeConfiguration.get_microsite_configuration_value(
-        'email_templates'
+        'email_template_files'
     )
 
     if email_templates:
