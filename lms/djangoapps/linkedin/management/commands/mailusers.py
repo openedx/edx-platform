@@ -5,7 +5,10 @@ LinkedIn profiles.
 
 import json
 
+from courseware.courses import get_course_by_id
 from django.core.management.base import BaseCommand
+from django.template import Context
+from django.template.loader import get_template
 from optparse import make_option
 
 from certificates.models import GeneratedCertificate
@@ -69,4 +72,10 @@ def send_email(user, certificate):
     Email a user that recently earned a certificate, inviting them to post their
     certificate on their LinkedIn profile.
     """
-    print "EMAIL: ", user, certificate
+    template = get_template("linkedin_email.html")
+    course = get_course_by_id(certificate.course_id)
+    context = Context({
+        'student_name': user.profile.name,
+        'course_name': 'XXX',
+        'url': '#'})
+    print template.render(context)
