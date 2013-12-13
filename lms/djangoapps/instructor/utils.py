@@ -61,14 +61,16 @@ def get_module_for_student(student, course, location, request=None):
         except User.DoesNotExist:
             return None
 
-    if request is None:
-        request = DummyRequest()
-        request.user = student
-        request.session = {}
     if isinstance(course, str):
         course = get_course_by_id(course)
         if course is None:
             return None
+
+    if request is None:
+        request = DummyRequest()
+        request.user = student
+        request.session = {}
+
     descriptor = get_descriptor(course.id, location)
     module = create_module(student, course, descriptor, request)
     return module
@@ -84,28 +86,24 @@ def get_enrolled_students(course_id):
     return enrolled_students
 
 
-def get_affected_students_from_ids(affected_students_ids):
-    """Return affected students form ids list."""
+def get_users_from_ids(ids):
+    """Return students from a list of ids."""
 
-    affected_students = User.objects.filter(
-        id__in=affected_students_ids,
-        courseenrollment__is_active=1
-    ).prefetch_related("groups").order_by('username')
-    return affected_students
+    users = User.objects.filter(
+        id__in=ids,
+    ).order_by('username')
+    return users
 
+def create_list_from_csv(path_to_csv):
+    """Read a csv and return items in a list."""
 
-def read_csv(path_to_csv):
-    """
-    reads a csv and returns a list
-    """
-
-    affected_students_ids = []
+    items = []
     with open(path_to_csv) as csv_file:
         csv_reader = csv.reader(csv_file)
         for row in csv_reader:
-            affected_students_ids.append(row[0])
+            items.append(row[0])
 
-    return affected_students_ids
+    return items
 
 
 class DummyRequest(object):
