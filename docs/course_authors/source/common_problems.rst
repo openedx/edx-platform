@@ -376,9 +376,9 @@ To make the response case sensitive, change the value of the **type** attribute 
       <textline size="20"/>
     </stringresponse>
     
-============================================
+=============================================
 Response Field Length of Text Input Problems
-============================================
+=============================================
 
 By default, the response field for text input problems is 20 characters long. 
 
