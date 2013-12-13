@@ -2,6 +2,7 @@
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor
 from courseware.courses import get_course_by_id
+import csv
 from django.contrib.auth.models import User
 
 
@@ -81,6 +82,20 @@ def get_enrolled_students(course_id):
         courseenrollment__is_active=1
     ).prefetch_related("groups").order_by('username')
     return enrolled_students
+
+
+def read_csv(path_to_csv):
+    """
+    reads a csv and returns a list
+    """
+
+    affected_students_ids = []
+    with open(path_to_csv) as csv_file:
+        csv_reader = csv.reader(csv_file)
+        for row in csv_reader:
+            affected_students_ids.append(row[0])
+
+    return affected_students_ids
 
 
 class DummyRequest(object):
