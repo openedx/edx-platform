@@ -128,7 +128,7 @@ def course_listing(request):
     """
     List all courses available to the logged in user
     """
-    courses = modulestore('direct').get_items(['i4x', None, None, 'course', None])
+    courses = modulestore('direct').get_items(Location('i4x', None, None, 'course', None))
 
     # filter out courses that we don't have access too
     def course_filter(course):

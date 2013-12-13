@@ -202,20 +202,20 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         draft_store = modulestore('draft')
         import_from_xml(store, 'common/test/data/', ['simple'])
 
-        html_module = draft_store.get_item(['i4x', 'edX', 'simple', 'html', 'test_html', None])
+        html_module = draft_store.get_item(Location('i4x', 'edX', 'simple', 'html', 'test_html', None))
 
         draft_store.convert_to_draft(html_module.location)
 
         # now query get_items() to get this location with revision=None, this should just
         # return back a single item (not 2)
 
-        items = store.get_items(['i4x', 'edX', 'simple', 'html', 'test_html', None])
+        items = store.get_items(Location('i4x', 'edX', 'simple', 'html', 'test_html', None))
         self.assertEqual(len(items), 1)
         self.assertFalse(getattr(items[0], 'is_draft', False))
 
         # now refetch from the draft store. Note that even though we pass
         # None in the revision field, the draft store will replace that with 'draft'
-        items = draft_store.get_items(['i4x', 'edX', 'simple', 'html', 'test_html', None])
+        items = draft_store.get_items(Location('i4x', 'edX', 'simple', 'html', 'test_html', None))
         self.assertEqual(len(items), 1)
         self.assertTrue(getattr(items[0], 'is_draft', False))
 
@@ -229,9 +229,9 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         draft_store = modulestore('draft')
         import_from_xml(store, 'common/test/data/', ['simple'])
 
-        course = draft_store.get_item(Location(['i4x', 'edX', 'simple',
-                                               'course', '2012_Fall', None]), depth=None)
-        html_module = draft_store.get_item(['i4x', 'edX', 'simple', 'html', 'test_html', None])
+        course = draft_store.get_item(Location('i4x', 'edX', 'simple',
+                                               'course', '2012_Fall', None), depth=None)
+        html_module = draft_store.get_item(Location('i4x', 'edX', 'simple', 'html', 'test_html', None))
 
         self.assertEqual(html_module.graceperiod, course.graceperiod)
         self.assertNotIn('graceperiod', own_metadata(html_module))
@@ -239,7 +239,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         draft_store.convert_to_draft(html_module.location)
 
         # refetch to check metadata
-        html_module = draft_store.get_item(['i4x', 'edX', 'simple', 'html', 'test_html', None])
+        html_module = draft_store.get_item(Location('i4x', 'edX', 'simple', 'html', 'test_html', None))
 
         self.assertEqual(html_module.graceperiod, course.graceperiod)
         self.assertNotIn('graceperiod', own_metadata(html_module))
@@ -248,14 +248,14 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         draft_store.publish(html_module.location, 0)
 
         # refetch to check metadata
-        html_module = draft_store.get_item(['i4x', 'edX', 'simple', 'html', 'test_html', None])
+        html_module = draft_store.get_item(Location('i4x', 'edX', 'simple', 'html', 'test_html', None))
 
         self.assertEqual(html_module.graceperiod, course.graceperiod)
         self.assertNotIn('graceperiod', own_metadata(html_module))
 
         # put back in draft and change metadata and see if it's now marked as 'own_metadata'
         draft_store.convert_to_draft(html_module.location)
-        html_module = draft_store.get_item(['i4x', 'edX', 'simple', 'html', 'test_html', None])
+        html_module = draft_store.get_item(Location('i4x', 'edX', 'simple', 'html', 'test_html', None))
 
         new_graceperiod = timedelta(hours=1)
 
@@ -270,7 +270,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         draft_store.update_metadata(html_module.location, own_metadata(html_module))
 
         # read back to make sure it reads as 'own-metadata'
-        html_module = draft_store.get_item(['i4x', 'edX', 'simple', 'html', 'test_html', None])
+        html_module = draft_store.get_item(Location('i4x', 'edX', 'simple', 'html', 'test_html', None))
 
         self.assertIn('graceperiod', own_metadata(html_module))
         self.assertEqual(html_module.graceperiod, new_graceperiod)
@@ -280,7 +280,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         # and re-read and verify 'own-metadata'
         draft_store.convert_to_draft(html_module.location)
-        html_module = draft_store.get_item(['i4x', 'edX', 'simple', 'html', 'test_html', None])
+        html_module = draft_store.get_item(Location('i4x', 'edX', 'simple', 'html', 'test_html', None))
 
         self.assertIn('graceperiod', own_metadata(html_module))
         self.assertEqual(html_module.graceperiod, new_graceperiod)
@@ -289,7 +289,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         import_from_xml(modulestore('direct'), 'common/test/data/', ['simple'])
 
         course = modulestore('draft').get_item(
-            Location(['i4x', 'edX', 'simple', 'course', '2012_Fall', None]),
+            Location('i4x', 'edX', 'simple', 'course', '2012_Fall', None),
             depth=None
         )
 
@@ -298,7 +298,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.assertEqual(num_drafts, 0)
 
         problem = modulestore('draft').get_item(
-            Location(['i4x', 'edX', 'simple', 'problem', 'ps01-simple', None])
+            Location('i4x', 'edX', 'simple', 'problem', 'ps01-simple', None)
         )
 
         # put into draft
@@ -306,13 +306,13 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         # make sure we can query that item and verify that it is a draft
         draft_problem = modulestore('draft').get_item(
-            Location(['i4x', 'edX', 'simple', 'problem', 'ps01-simple', None])
+            Location('i4x', 'edX', 'simple', 'problem', 'ps01-simple', None)
         )
         self.assertTrue(getattr(draft_problem, 'is_draft', False))
 
         # now requery with depth
         course = modulestore('draft').get_item(
-            Location(['i4x', 'edX', 'simple', 'course', '2012_Fall', None]),
+            Location('i4x', 'edX', 'simple', 'course', '2012_Fall', None),
             depth=None
         )
 
@@ -324,10 +324,10 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         module_store = modulestore('direct')
         import_from_xml(module_store, 'common/test/data/', ['toy'])
 
-        handouts = module_store.get_item(Location(['i4x', 'edX', 'toy', 'course_info', 'handouts', None]))
+        handouts = module_store.get_item(Location('i4x', 'edX', 'toy', 'course_info', 'handouts', None))
         self.assertIn('/static/', handouts.data)
 
-        handouts = module_store.get_item(Location(['i4x', 'edX', 'toy', 'html', 'toyhtml', None]))
+        handouts = module_store.get_item(Location('i4x', 'edX', 'toy', 'html', 'toyhtml', None))
         self.assertIn('/static/', handouts.data)
 
     @mock.patch('xmodule.course_module.requests.get')
@@ -341,14 +341,14 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         module_store = modulestore('direct')
         import_from_xml(module_store, 'common/test/data/', ['toy'])
 
-        course = module_store.get_item(Location(['i4x', 'edX', 'toy', 'course', '2012_Fall', None]))
+        course = module_store.get_item(Location('i4x', 'edX', 'toy', 'course', '2012_Fall', None))
 
         self.assertGreater(len(course.textbooks), 0)
 
     def test_default_tabs_on_create_course(self):
         module_store = modulestore('direct')
         CourseFactory.create(org='edX', course='999', display_name='Robot Super Course')
-        course_location = Location(['i4x', 'edX', '999', 'course', 'Robot_Super_Course', None])
+        course_location = Location('i4x', 'edX', '999', 'course', 'Robot_Super_Course', None)
 
         course = module_store.get_item(course_location)
 
@@ -365,7 +365,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
     def test_create_static_tab_and_rename(self):
         module_store = modulestore('direct')
         CourseFactory.create(org='edX', course='999', display_name='Robot Super Course')
-        course_location = Location(['i4x', 'edX', '999', 'course', 'Robot_Super_Course', None])
+        course_location = Location('i4x', 'edX', '999', 'course', 'Robot_Super_Course', None)
 
         item = ItemFactory.create(parent_location=course_location, category='static_tab', display_name="My Tab")
 
@@ -455,7 +455,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         """ Creates two static tabs in a dummy course. """
         module_store = modulestore('direct')
         CourseFactory.create(org='edX', course='999', display_name='Robot Super Course')
-        course_location = Location(['i4x', 'edX', '999', 'course', 'Robot_Super_Course', None])
+        course_location = Location('i4x', 'edX', '999', 'course', 'Robot_Super_Course', None)
         new_location = loc_mapper().translate_location(course_location.course_id, course_location, False, True)
 
         ItemFactory.create(
@@ -473,7 +473,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         module_store = modulestore('direct')
         import_from_xml(module_store, 'common/test/data/', ['toy'])
 
-        items = module_store.get_items(['i4x', 'edX', 'toy', 'poll_question', None, None])
+        items = module_store.get_items(Location('i4x', 'edX', 'toy', 'poll_question', None, None))
         found = len(items) > 0
 
         self.assertTrue(found)
@@ -489,7 +489,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         """
         Tests the ajax callback to render an XModule
         """
-        resp = self._test_preview(Location(['i4x', 'edX', 'toy', 'vertical', 'vertical_test', None]))
+        resp = self._test_preview(Location('i4x', 'edX', 'toy', 'vertical', 'vertical_test', None))
         # These are the data-ids of the xblocks contained in the vertical.
         # Ultimately, these must be converted to new locators.
         self.assertContains(resp, 'i4x://edX/toy/video/sample_video')
@@ -501,7 +501,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         """
         This verifies that a video caption url is as we expect it to be
         """
-        resp = self._test_preview(Location(['i4x', 'edX', 'toy', 'video', 'sample_video', None]))
+        resp = self._test_preview(Location('i4x', 'edX', 'toy', 'video', 'sample_video', None))
         self.assertContains(resp, 'data-caption-asset-path="/c4x/edX/toy/asset/subs_"')
 
     def _test_preview(self, location):
@@ -522,13 +522,13 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
     def test_delete(self):
         direct_store = modulestore('direct')
         CourseFactory.create(org='edX', course='999', display_name='Robot Super Course')
-        course_location = Location(['i4x', 'edX', '999', 'course', 'Robot_Super_Course', None])
+        course_location = Location('i4x', 'edX', '999', 'course', 'Robot_Super_Course', None)
 
         chapterloc = ItemFactory.create(parent_location=course_location, display_name="Chapter").location
         ItemFactory.create(parent_location=chapterloc, category='sequential', display_name="Sequential")
 
-        sequential = direct_store.get_item(Location(['i4x', 'edX', '999', 'sequential', 'Sequential', None]))
-        chapter = direct_store.get_item(Location(['i4x', 'edX', '999', 'chapter', 'Chapter', None]))
+        sequential = direct_store.get_item(Location('i4x', 'edX', '999', 'sequential', 'Sequential', None))
+        chapter = direct_store.get_item(Location('i4x', 'edX', '999', 'chapter', 'Chapter', None))
 
         # make sure the parent points to the child object which is to be deleted
         self.assertTrue(sequential.location.url() in chapter.children)
@@ -1124,7 +1124,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # create a new video module and add it as a child to a vertical
         # this re-creates a bug whereby since the video template doesn't have
         # anything in 'data' field, the export was blowing up
-        verticals = module_store.get_items(['i4x', 'edX', 'toy', 'vertical', None, None])
+        verticals = module_store.get_items(Location('i4x', 'edX', 'toy', 'vertical', None, None))
 
         self.assertGreater(len(verticals), 0)
 
@@ -1152,7 +1152,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         import_from_xml(module_store, 'common/test/data/', ['word_cloud'])
         location = CourseDescriptor.id_to_location('HarvardX/ER22x/2013_Spring')
 
-        verticals = module_store.get_items(['i4x', 'HarvardX', 'ER22x', 'vertical', None, None])
+        verticals = module_store.get_items(Location('i4x', 'HarvardX', 'ER22x', 'vertical', None, None))
 
         self.assertGreater(len(verticals), 0)
 
@@ -1181,7 +1181,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         import_from_xml(module_store, 'common/test/data/', ['toy'])
         location = CourseDescriptor.id_to_location('edX/toy/2012_Fall')
 
-        verticals = module_store.get_items(['i4x', 'edX', 'toy', 'vertical', None, None])
+        verticals = module_store.get_items(Location('i4x', 'edX', 'toy', 'vertical', None, None))
 
         self.assertGreater(len(verticals), 0)
 
@@ -1198,7 +1198,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         # Reimport and get the video back
         import_from_xml(module_store, root_dir)
-        imported_word_cloud = module_store.get_item(Location(['i4x', 'edX', 'toy', 'word_cloud', 'untitled', None]))
+        imported_word_cloud = module_store.get_item(Location('i4x', 'edX', 'toy', 'word_cloud', 'untitled', None))
 
         # It should now contain empty data
         self.assertEquals(imported_word_cloud.data, '')
@@ -1224,14 +1224,14 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # get the sample HTML with styling information
         html_module = module_store.get_instance(
             'edX/toy/2012_Fall',
-            Location(['i4x', 'edX', 'toy', 'html', 'with_styling'])
+            Location('i4x', 'edX', 'toy', 'html', 'with_styling')
         )
         self.assertIn('<p style="font:italic bold 72px/30px Georgia, serif; color: red; ">', html_module.data)
 
         # get the sample HTML with just a simple <img> tag information
         html_module = module_store.get_instance(
             'edX/toy/2012_Fall',
-            Location(['i4x', 'edX', 'toy', 'html', 'just_img'])
+            Location('i4x', 'edX', 'toy', 'html', 'just_img')
         )
         self.assertIn('<img src="/static/foo_bar.jpg" />', html_module.data)
 
@@ -1790,7 +1790,7 @@ class ContentStoreTest(ModuleStoreTestCase):
 
         course = module_store.get_item(Location(['i4x', 'edX', 'toy', 'course', '2012_Fall', None]))
 
-        verticals = module_store.get_items(['i4x', 'edX', 'toy', 'vertical', None, None])
+        verticals = module_store.get_items(Location('i4x', 'edX', 'toy', 'vertical', None, None))
 
         # let's assert on the metadata_inheritance on an existing vertical
         for vertical in verticals:
