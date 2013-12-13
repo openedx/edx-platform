@@ -3,7 +3,7 @@ Send emails to users inviting them to add their course certificates to their
 LinkedIn profiles.
 """
 
-from itertools import imap
+import json
 
 from django.core.management.base import BaseCommand
 from optparse import make_option
@@ -37,16 +37,23 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         grandfather = options.get('grandfather', False)
         accounts = LinkedIn.objects.filter(has_linkedin_account=True)
-        for user in imap(lambda account: account.user, accounts):   # lazy
+        for account in accounts:
+            emailed = json.loads(account.emailed_courses)
+            user = account.user
             certificates = GeneratedCertificate.objects.filter(user=user)
             certificates = certificates.filter(status='downloadable')
+            certificates = [cert for cert in certificates
+                            if cert.course_id not in emailed]
             if not certificates:
                 continue
             if grandfather:
                 send_grandfather_email(user, certificates)
+                emailed.extend([cert.course_id for cert in certificates])
             else:
                 for certificate in certificates:
                     send_email(user, certificate)
+                    emailed.append(certificate.course_id)
+            account.emailed_courses = json.dumps(emailed)
 
 
 def send_grandfather_email(user, certificates):
