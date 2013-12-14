@@ -320,12 +320,14 @@ def dashboard(request):
     # the microsites 'ORG'
 
     course_org_filter = MicrositeConfiguration.get_microsite_configuration_value('course_org_filter')
+    show_only_org_on_student_dashboard = MicrositeConfiguration.get_microsite_configuration_value(
+        'show_only_org_on_student_dashboard')
 
     for enrollment in CourseEnrollment.enrollments_for_user(user):
         try:
             course = course_from_id(enrollment.course_id)
 
-            if course_org_filter and course_org_filter != course.location.org:
+            if course_org_filter and show_only_org_on_student_dashboard and course_org_filter != course.location.org:
                 continue
 
             course_enrollment_pairs.append((course, enrollment))
