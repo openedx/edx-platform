@@ -22,6 +22,8 @@ _MICROSITE_CONFIGURATION = {
         "logo_image_file": "open_edX_logo.png",
         # what filter to use when displaying the course catalog on the landing page     
         "course_org_filter": "CDX",
+        # filter dashboard to only show this ORG's courses?
+        "show_only_org_on_student_dashboard": True,
         # email from field on outbound emails
         "email_from_address": "openedx@edx.org",
         "payment_support_email": "openedx@edx.org",
