@@ -37,6 +37,10 @@ STATIC_ROOT = TEST_ROOT / "staticfiles"
 GITHUB_REPO_ROOT = TEST_ROOT / "data"
 COMMON_TEST_DATA_ROOT = COMMON_ROOT / "test" / "data"
 
+# For testing "push to lms"
+FEATURES['ENABLE_PUSH_TO_LMS'] = True
+GIT_REPO_EXPORT_DIR = TEST_ROOT / "export_course_repos"
+
 # Makes the tests run much faster...
 SOUTH_TESTS_MIGRATE = False  # To disable migrations and use syncdb instead
 

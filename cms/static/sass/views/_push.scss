@@ -1,0 +1,93 @@
+// studio - views - push to lms
+// ====================
+
+.view-push {
+
+  // UI: basic layout
+  .content-primary, .content-supplementary {
+    @include box-sizing(border-box);
+    float: left;
+  }
+
+  .content-primary {
+    width: flex-grid(9,12);
+    margin-right: flex-gutter();
+  }
+
+  .content-supplementary {
+    width: flex-grid(3,12);
+  }
+
+  .error-text {
+    color: $error-red;
+  }
+
+  h3 {
+      font-size: 19px;
+      font-weight: 700;    
+  }
+
+  .push-info-block {
+
+    dt {
+      font-size: 19px;
+      font-weight: 700;
+	  margin-top: 12px;
+    }
+
+    dd {
+      font-size: 17px;
+	  margin-bottom: 20px;
+    }
+	
+    .course_text {
+		color: $green;
+    }
+    .giturl_text {
+      color: $blue;
+    }
+  }
+
+   // UI: introduction
+  .introduction {
+
+    .title {
+      @extend %cont-text-sr;
+    }
+  }
+
+ // UI: export controls
+  .push-controls {
+    @include box-sizing(border-box);
+    @extend %ui-window;
+    padding: $baseline ($baseline*1.5) ($baseline*1.5) ($baseline*1.5);
+
+    .title {
+      @extend %t-title4;
+    }
+
+    .action-push {
+      @extend %btn-primary-blue;
+      @extend %t-action1;
+      display: block;
+      margin: $baseline 0;
+      padding: ($baseline*0.75) $baseline;
+    }
+
+    .action {
+
+      [class^="icon"] {
+        @extend %t-icon2;
+        display: inline-block;
+        vertical-align: middle;
+        margin-right: ($baseline/4);
+      }
+
+      .copy {
+        display: inline-block;
+        vertical-align: middle;
+      }
+	}
+  }
+}
+

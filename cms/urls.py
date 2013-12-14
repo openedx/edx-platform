@@ -99,13 +99,10 @@ urlpatterns += patterns('',
 
 if settings.FEATURES.get('ENABLE_PUSH_TO_LMS'):
     urlpatterns += (url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/push/(?P<name>[^/]+)$',
-                       'contentstore.views.push_to_lms', name='push_to_lms'),)
+                        'contentstore.views.push_to_lms', name='push_to_lms'),)
 
-if settings.ENABLE_JASMINE:
-    urlpatterns += (url(r'^_jasmine/', include('django_jasmine.urls')),)
-
-if settings.MITX_FEATURES.get('ENABLE_SERVICE_STATUS'):
-    urlpatterns += (
+if settings.FEATURES.get('ENABLE_SERVICE_STATUS'):
+    urlpatterns += patterns('',
         url(r'^status/', include('service_status.urls')),
     )
 

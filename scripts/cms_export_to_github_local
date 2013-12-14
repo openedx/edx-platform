@@ -1,7 +1,0 @@
-#!/bin/bash
-
-cd ~/mitx_all
-source STARTUP
-cd edx-platform
-
-python scripts/cms_export_to_github $*
