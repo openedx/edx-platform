@@ -136,7 +136,6 @@ class LocMapperStore(object):
         if cached_value:
             return cached_value
 
-
         maps = self.location_map.find(location_id)
         maps = list(maps)
         if len(maps) == 0:
