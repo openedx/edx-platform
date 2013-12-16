@@ -1,4 +1,4 @@
-<article class="asset-library content-primary" role="main">
+<div class="asset-library">
 
     <div id="asset-paging-header"></div>
 
@@ -26,4 +26,7 @@
 
     <div id="asset-paging-footer"></div>
 
-</article>
+</div>
+<div class="no-asset-content">
+    <p><%= gettext("You haven't added any assets to this course yet.") %> <a href="#" class="button upload-button new-button"><i class="icon-plus"></i><%= gettext("Upload your first asset") %></a></p>
+</div>

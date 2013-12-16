@@ -9,7 +9,6 @@
 <%namespace name='static' file='static_content.html'/>
 
 <%block name="header_extras">
-<link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
 % for template_name in ["asset-library", "asset", "paging-header", "paging-footer"]:
 <script type="text/template" id="${template_name}-tpl">
     <%static:include path="js/${template_name}.underscore" />
@@ -25,13 +24,9 @@ require(["domReady", "jquery", "gettext", "js/models/asset", "js/collections/ass
          "js/utils/modal", "jquery.fileupload"],
         function(domReady, $, gettext, AssetModel, AssetCollection, AssetsView, PromptView, NotificationView,
                  PagingHeader, PagingFooter, ModalUtils) {
-
     var assets = new AssetCollection();
     assets.url = "${asset_callback_url}";
     var assetsView = new AssetsView({collection: assets, el: $('#asset-library')});
-    assetsView.setPage(${current_page});
-    var pagingHeader = new PagingHeader({view: assetsView, el: $('#asset-paging-header')});
-    var pagingFooter = new PagingFooter({view: assetsView, el: $('#asset-paging-footer')});
 
     var hideModal = function (e) {
         if (e) {
@@ -150,7 +145,7 @@ require(["domReady", "jquery", "gettext", "js/models/asset", "js/collections/ass
 
 <div class="wrapper-content wrapper">
     <section class="content">
-        <div id="asset-library"></div>
+        <article id="asset-library" class="content-primary" role="main"></article>
 
         <aside class="content-supplementary" role="complimentary">
             <div class="bit">

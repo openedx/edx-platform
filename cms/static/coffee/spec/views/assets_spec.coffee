@@ -2,7 +2,10 @@ define ["jasmine", "js/spec/create_sinon", "squire"],
 (jasmine, create_sinon, Squire) ->
 
     feedbackTpl = readFixtures('system-feedback.underscore')
+    assetLibraryTpl = readFixtures('asset-library.underscore')
     assetTpl = readFixtures('asset.underscore')
+    pagingHeaderTpl = readFixtures('paging-header.underscore')
+    pagingFooterTpl = readFixtures('paging-footer.underscore')
 
     describe "Asset view", ->
         beforeEach ->
@@ -131,7 +134,10 @@ define ["jasmine", "js/spec/create_sinon", "squire"],
 
     describe "Assets view", ->
         beforeEach ->
+            setFixtures($("<script>", {id: "asset-library-tpl", type: "text/template"}).text(assetLibraryTpl))
             setFixtures($("<script>", {id: "asset-tpl", type: "text/template"}).text(assetTpl))
+            setFixtures($("<script>", {id: "paging-header-tpl", type: "text/template"}).text(pagingHeaderTpl))
+            setFixtures($("<script>", {id: "paging-footer-tpl", type: "text/template"}).text(pagingFooterTpl))
             window.analytics = jasmine.createSpyObj('analytics', ['track'])
             window.course_location_analytics = jasmine.createSpy()
             appendSetFixtures(sandbox({id: "asset_table_body"}))
@@ -169,7 +175,7 @@ define ["jasmine", "js/spec/create_sinon", "squire"],
                         collection: @collection
                         el: $('#asset_table_body')
 
-            waitsFor (=> @view), "AssetView was not created", 1000
+            waitsFor (=> @view), "AssetsView was not created", 1000
 
             $.ajax()
 

@@ -1,4 +1,4 @@
-define(["backbone"], function(Backbone, AssetView) {
+define(["backbone", "js/views/feedback_alert"], function(Backbone, AlertView) {
 
     var PagingView = Backbone.View.extend({
         // takes a Backbone Paginator as a model
@@ -9,24 +9,43 @@ define(["backbone"], function(Backbone, AssetView) {
             "change .page-number-input": "changePage"
         },
 
-        initialize : function() {
+        initialize: function() {
             Backbone.View.prototype.initialize.call(this);
-            var collection = this.collection;
-            collection.bind('add', _.bind(this.renderPageItems, this));
-            collection.bind('remove', _.bind(this.renderPageItems, this));
-            collection.bind('reset', _.bind(this.renderPageItems, this));
+            var assets = this.collection;
+            assets.bind('add', _.bind(this.onRefresh, this));
+            assets.bind('remove', _.bind(this.onRefresh, this));
+            assets.bind('reset', _.bind(this.onRefresh, this));
+        },
+
+        onRefresh: function() {
+            var assets = this.collection,
+                currentPage = assets.currentPage,
+                lastPage = assets.totalPages - 1;
+            this.renderPageItems();
+            $(".previous-page-link").toggleClass("is-disabled", currentPage == 0)
+            $(".next-page-link").toggleClass("is-disabled", currentPage == lastPage)
         },
 
         changePage: function() {
-            var pageNumber = parseInt(this.$("#page-number-input").val());
-            if (pageNumber) {
+            var assets = this.collection,
+                currentPage = assets.currentPage + 1,
+                pageNumber = parseInt(this.$("#page-number-input").val());
+            if (pageNumber && pageNumber !== currentPage) {
                 this.setPage(pageNumber - 1);
+            } else if (!pageNumber) {
+                // Remove the invalid page number so that the current page number shows through
+                $("#page-number-input").val("")
             }
         },
 
         setPage: function(page) {
-            var self = this;
-            this.collection.goTo(page, {
+            var self = this,
+                assets = self.collection;
+            assets.goTo(page, {
+                reset: true,
+                success: function() {
+                    window.scrollTo(0, 0);
+                },
                 error: function(collection, response, options) {
                     self.showPagingError(response);
                 }
@@ -34,28 +53,27 @@ define(["backbone"], function(Backbone, AssetView) {
         },
 
         nextPage: function() {
-            var self = this,
-                collection = self.collection;
-            collection.nextPage({
-                error: function(collection, response, options) {
-                    self.showPagingError(response);
-                }
-            });
+            var assets = this.collection,
+                currentPage = assets.currentPage,
+                lastPage = assets.totalPages - 1;
+            if (currentPage < lastPage) {
+                this.setPage(currentPage + 1);
+            }
         },
 
         previousPage: function() {
-            var self = this,
-                collection = self.collection;
-            collection.prevPage({
-                error: function(collection, response, options) {
-                    self.showPagingError(response);
-                }
-            });
+            var assets = this.collection,
+                currentPage = assets.currentPage;
+            if (currentPage > 0) {
+                this.setPage(currentPage - 1);
+            }
         },
 
         showPagingError: function(response) {
-            // TODO how should errors really be shown (andya)
-            window.alert("Error: " + response);
+            AlertView.Error({
+                title: gettext("Unexpected Error"),
+                closeIcon: false
+            });
         }
     });
 

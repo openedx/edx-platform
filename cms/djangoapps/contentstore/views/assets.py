@@ -1,5 +1,4 @@
 import logging
-import math
 from functools import partial
 
 from django.http import HttpResponseBadRequest
@@ -56,8 +55,8 @@ def assets_handler(request, tag=None, package_id=None, branch=None, version_guid
     if not has_access(request.user, location):
         raise PermissionDenied()
 
-    format = request.REQUEST.get('format', 'html')
-    if format == 'json' or 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
+    response_format = request.REQUEST.get('format', 'html')
+    if response_format == 'json' or 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
         if request.method == 'GET':
             return _assets_json(request, location)
         else:
@@ -68,21 +67,6 @@ def assets_handler(request, tag=None, package_id=None, branch=None, version_guid
         return HttpResponseNotFound()
 
 
-def _requested_page(request):
-    requested_page = request.REQUEST.get('page', 0)
-    return int(requested_page)
-
-
-def _paging_start(request, defaultStart):
-    start = request.REQUEST.get('start', defaultStart)
-    return int(start)
-
-
-def _paging_max_results(request):
-    max_results = request.REQUEST.get('max', 100)
-    return int(max_results)
-
-
 def _asset_index(request, location):
     """
     Display an editable asset library.
@@ -91,15 +75,31 @@ def _asset_index(request, location):
     """
     old_location = loc_mapper().translate_locator_to_location(location)
     course_module = modulestore().get_item(old_location)
-    requested_page = _requested_page(request)
-    max_results = _paging_max_results(request)
 
     return render_to_response('asset_index.html', {
         'context_course': course_module,
-        'asset_callback_url': location.url_reverse('assets/', ''),
-        'current_page': requested_page,
-        'max_results': max_results
+        'asset_callback_url': location.url_reverse('assets/', '')
     })
+
+
+def _paging_settings(request, total_count):
+    """
+    Returns the user requested settings for pagination of asset results
+    """
+    requested_page = int(request.REQUEST.get('page', 0))
+    requested_page_size = int(request.REQUEST.get('page_size', 50))
+
+    final_page = int(total_count / requested_page_size)
+    current_page = min(max(requested_page, 0), final_page)
+    start = current_page * requested_page_size
+    end = min(total_count, start + requested_page_size)
+    return {
+        'total_count': total_count,
+        'page': current_page,
+        'page_size': requested_page_size,
+        'start': start,
+        'end': end
+    }
 
 
 def _assets_json(request, location):
@@ -110,36 +110,14 @@ def _assets_json(request, location):
     """
     old_location = loc_mapper().translate_locator_to_location(location)
 
-    requested_page = _requested_page(request)
-    max_results = _paging_max_results(request)
-
     course_reference = StaticContent.compute_location(old_location.org, old_location.course, old_location.name)
-#    if maxresults is not None:
-#        maxresults = int(maxresults)
-#        start = int(start) if start else 0
-#        assets = contentstore().get_all_content_for_course(
-#            course_reference, start=start, maxresults=maxresults,
-#            sort=[('uploadDate', DESCENDING)]
-#        )
-#    else:
-#        assets = contentstore().get_all_content_for_course(
-#            course_reference, sort=[('uploadDate', DESCENDING)]
-#        )
-    # TODO can I determine the count without fetching all the assets?
     assets = contentstore().get_all_content_for_course(
         course_reference, sort=[('uploadDate', DESCENDING)]
     )
     total_count = len(assets)
-    final_page = int(total_count / max_results)
-    current_page = requested_page
-    if current_page > final_page:
-        current_page = final_page
-    elif current_page < 0:
-        current_page = 0
-    start = _paging_start(request, current_page * max_results)
-    if max_results is not None:
-        end = min(total_count, start + max_results)
-        assets = assets[start : end]
+    settings = _paging_settings(request, total_count)
+
+    assets = assets[settings['start']: settings['end']]
 
     asset_json = []
     for asset in assets:
@@ -153,12 +131,11 @@ def _assets_json(request, location):
         asset_json.append(_get_asset_json(asset['displayname'], asset['uploadDate'], asset_location, thumbnail_location, asset_locked))
 
     return JsonResponse({
-        'start': start,
-        'end': end,
-        'page': current_page,
-        'requestedPage': requested_page,
-        'maxResults': max_results,
-        'totalCount': total_count,
+        'start': settings['start'],
+        'end': settings['end'],
+        'page': settings['page'],
+        'page_size': settings['page_size'],
+        'totalCount': settings['total_count'],
         'assets': asset_json
     })
 

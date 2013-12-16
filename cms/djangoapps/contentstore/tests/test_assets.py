@@ -41,7 +41,7 @@ class AssetsTestCase(CourseTestCase):
 
 class AssetsToyCourseTestCase(CourseTestCase):
     """
-    Tests the assets returned from assets_handler (full page content) for the toy test course.
+    Tests the assets returned from assets_handler for the toy test course.
     """
     def test_toy_assets(self):
         module_store = modulestore('direct')
@@ -56,10 +56,26 @@ class AssetsToyCourseTestCase(CourseTestCase):
         location = loc_mapper().translate_location(course.location.course_id, course.location, False, True)
         url = location.url_reverse('assets/', '')
 
-        resp = self.client.get(url, HTTP_ACCEPT='text/html')
-        # Test a small portion of the asset data passed to the client.
-        self.assertContains(resp, "new AssetCollection([{")
-        self.assertContains(resp, "/c4x/edX/toy/asset/handouts_sample_handout.txt")
+        resp = self.client.get(url, HTTP_ACCEPT='application/json')
+        json_response = json.loads(resp.content)
+        assets = json_response['assets']
+        self.assertEquals(json_response['start'], 0)
+        self.assertEquals(json_response['totalCount'], 3)
+        self.assertEquals(len(assets), 3)
+
+        resp = self.client.get(url + "?page_size=2", HTTP_ACCEPT='application/json')
+        json_response = json.loads(resp.content)
+        assets = json_response['assets']
+        self.assertEquals(json_response['start'], 0)
+        self.assertEquals(json_response['totalCount'], 3)
+        self.assertEquals(len(assets), 2)
+
+        resp = self.client.get(url + "?page_size=2&page=1", HTTP_ACCEPT='application/json')
+        json_response = json.loads(resp.content)
+        assets = json_response['assets']
+        self.assertEquals(json_response['start'], 2)
+        self.assertEquals(json_response['totalCount'], 3)
+        self.assertEquals(len(assets), 1)
 
 
 class UploadTestCase(CourseTestCase):
@@ -81,10 +97,6 @@ class UploadTestCase(CourseTestCase):
     def test_no_file(self):
         resp = self.client.post(self.url, {"name": "file.txt"}, "application/json")
         self.assertEquals(resp.status_code, 400)
-
-    def test_get(self):
-        with self.assertRaises(NotImplementedError):
-            self.client.get(self.url)
 
 
 class AssetToJsonTestCase(TestCase):
@@ -209,34 +221,3 @@ class TestAssetIndex(CourseTestCase):
         return course_filter.dict()
 
     ASSET_LIST_RE = re.compile(r'AssetCollection\((.*)\);$', re.MULTILINE)
-
-    def check_page_content(self, resp_content, entry_count, last_date=None):
-        """
-        :param entry_count:
-        :param last_date:
-        """
-        match = self.ASSET_LIST_RE.search(resp_content)
-        asset_list = json.loads(match.group(1))
-        self.assertEqual(len(asset_list), entry_count)
-        for row in asset_list:
-            datetext = row['date_added']
-            parsed_date = datetime.strptime(datetext, "%b %d, %Y at %H:%M UTC")
-            if last_date is None:
-                last_date = parsed_date
-            else:
-                self.assertGreaterEqual(last_date, parsed_date)
-        return last_date
-
-    def test_query_assets(self):
-        """
-        The actual test
-        """
-        # get all
-        resp = self.client.get(self.url, HTTP_ACCEPT='text/html')
-        self.check_page_content(resp.content, 100)
-        # get first page of 10
-        resp = self.client.get(self.url + "?max=10", HTTP_ACCEPT='text/html')
-        last_date = self.check_page_content(resp.content, 10)
-        # get next of 20
-        resp = self.client.get(self.url + "?start=10&max=20", HTTP_ACCEPT='text/html')
-        self.check_page_content(resp.content, 20, last_date)

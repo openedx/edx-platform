@@ -1,5 +1,5 @@
-define(["backbone", "js/views/paging", "js/views/asset", "js/views/paging_header", "js/views/paging_footer"],
-    function(Backbone, PagingView, AssetView, PagingHeader, PagingFooter) {
+define(["js/views/paging", "js/views/asset", "js/views/paging_header", "js/views/paging_footer"],
+    function(PagingView, AssetView, PagingHeader, PagingFooter) {
 
 var AssetsView = PagingView.extend({
     // takes AssetCollection as model
@@ -7,28 +7,36 @@ var AssetsView = PagingView.extend({
     initialize : function() {
         PagingView.prototype.initialize.call(this);
         var collection = this.collection;
+        this.emptyTemplate = _.template($("#no-assets-tpl").text());
         this.template = _.template($("#asset-library-tpl").text());
-        this.render();
         this.listenTo(collection, 'destroy', this.handleDestroy);
+        this.render();
+        this.setPage(0);
     },
 
     render: function() {
         var self = this;
         self.$el.html(self.template());
         self.tableBody = $('#asset-table-body');
-        new PagingHeader({view: self, el: $('#asset-paging-header')});
-        new PagingFooter({view: self, el: $('#asset-paging-footer')});
+        self.pagingHeader = new PagingHeader({view: self, el: $('#asset-paging-header')});
+        self.pagingFooter = new PagingFooter({view: self, el: $('#asset-paging-footer')});
         return this;
     },
 
     renderPageItems: function() {
-        var self = this;
-        self.tableBody.empty();
-        this.collection.each(
-            function(asset) {
-                var view = new AssetView({model: asset});
-                self.tableBody.append(view.render().el);
-            });
+        var self = this,
+            assets = this.collection,
+            hasAssets = assets.length > 0;
+        if (hasAssets) {
+            self.tableBody.empty();
+            assets.each(
+                function(asset) {
+                    var view = new AssetView({model: asset});
+                    self.tableBody.append(view.render().el);
+                });
+        }
+        $('.asset-library').toggle(hasAssets);
+        $('.no-asset-content').toggle(!hasAssets);
         return this;
     },
 

@@ -9,6 +9,7 @@ define(["backbone"], function(Backbone, AssetView) {
             collection.bind('add', _.bind(this.render, this));
             collection.bind('remove', _.bind(this.render, this));
             collection.bind('reset', _.bind(this.render, this));
+            this.render();
         },
 
         render: function() {

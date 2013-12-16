@@ -9,6 +9,7 @@ define(["backbone", "underscore", "gettext"], function(Backbone, _, gettext) {
             collection.bind('add', _.bind(this.render, this));
             collection.bind('remove', _.bind(this.render, this));
             collection.bind('reset', _.bind(this.render, this));
+            this.render();
         },
 
         render: function() {
@@ -29,14 +30,18 @@ define(["backbone", "underscore", "gettext"], function(Backbone, _, gettext) {
                 start = collection.start,
                 count = collection.size(),
                 total = collection.totalCount,
-                fmts = gettext('<p>Showing <span class="count-current-shown">%(start)s-%(end)s</span> out of <span class="count-total">%(total)s total</span>, sorted by <span class="sort-order">%(sort_order)s</span></p>');
+                fmts = gettext('Showing %(current_span)s%(start)s-%(end)s%(end_span)s out of %(total_span)s%(total)s total%(end_span)s, sorted by %(order_span)s%(sort_order)s%(end_span)s');
 
-            return interpolate(fmts, {
+            return '<p>' + interpolate(fmts, {
                     start: start + 1,
                     end: start + count,
                     total: total,
-                    sort_order: gettext('Date Added')
-                }, true);
+                    sort_order: gettext('Date Added'),
+                    current_span: '<span class="count-current-shown">',
+                    total_span: '<span class="count-total">',
+                    order_span: '<span class="sort-order">',
+                    end_span: '</span>'
+                }, true) + "</p>";
         }
     });
 
