@@ -83,7 +83,7 @@
       $('select#professional_designation').change(function() {
         var dependentRequiredFields = 'li#license-number_container, li#license-country_container, li#physician_status_container, li#patient_population_container, li#specialty-container';
         
-        if ($(this).children("option:selected").val() === 'MD' || $(this).children("option:selected").val() === 'MD, PhD' || $(this).children("option:selected").val() === 'DO' || $(this).children("option:selected").val() === 'MBBS') {
+        if ($(this).children("option:selected").val() === 'MD' || $(this).children("option:selected").val() === 'MD,PhD' || $(this).children("option:selected").val() === 'DO' || $(this).children("option:selected").val() === 'MBBS') {
           $(this).parent().siblings(dependentRequiredFields).addClass('required');
         } else {
           $(this).parent().siblings(dependentRequiredFields).removeClass('required');

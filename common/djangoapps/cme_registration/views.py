@@ -354,7 +354,7 @@ def validate_professional_fields(post_vars):
                             ]
 
     error = {}
-    if post_vars.get('professional_designation') in ['DO', 'MD', 'MD, PhD', 'MBBS']:
+    if post_vars.get('professional_designation') in ['DO', 'MD', 'MD,PhD', 'MBBS']:
         for required_field in required_fields_list:
             for key, val in required_field.iteritems():
                 if len(post_vars.get(key)) < 2:

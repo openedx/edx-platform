@@ -23,12 +23,16 @@ class CmeUserProfile(UserProfile):
     middle_initial = models.CharField(max_length=1, blank=True, null=True)
     birth_date = models.CharField(max_length=5, blank=True, null=True)
 
-    PROFESSIONAL_DESIGNATION_CHOICES = (('DO', 'DO'),
+    PROFESSIONAL_DESIGNATION_CHOICES = (('AuD', 'AuD'),
+                                        ('DDS', 'DDS'),
+                                        ('DO', 'DO'),
                                         ('MD', 'MD'),
-                                        ('MD, PhD', 'MD, PhD'),
+                                        ('MD,PhD', 'MD,PhD'),
                                         ('MBBS', 'MBBS'),
                                         ('NP', 'NP'),
                                         ('PA', 'PA'),
+                                        ('PharmD', 'PharmD'),
+                                        ('PhD', 'PhD'),
                                         ('RN', 'RN'),
                                         ('Other', 'Other'),
                                         ('None', 'None'))
