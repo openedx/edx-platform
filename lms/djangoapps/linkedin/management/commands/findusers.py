@@ -12,6 +12,8 @@ from django.utils import timezone
 
 from optparse import make_option
 
+from ...models import LinkedIn
+
 FRIDAY = 4
 
 
@@ -71,32 +73,45 @@ class Command(BaseCommand):
         if not max_checks:
             raise CommandError("No checks allowed during this time.")
 
-        check_users = []
-        for user in User.objects.all():
-            checked = (hasattr(user, 'linkedin') and
-                       user.linkedin.has_linkedin_account is not None)
-            if recheck or not checked:
-                check_users.append(user)
-
-        if max_checks != -1 and len(check_users) > max_checks:
-            self.stderr.write(
-                "WARNING: limited to checking only %d users today." %
-                max_checks)
-            check_users = check_users[:max_checks]
-        batches = [check_users[i:i + checks_per_call]
-                   for i in xrange(0, len(check_users), checks_per_call)]
+        def batch_users():
+            "Generator to lazily generate batches of users to query."
+            count = 0
+            batch = []
+            for user in User.objects.all():
+                if not hasattr(user, 'linkedin'):
+                    LinkedIn(user=user).save()
+                checked = user.linkedin.has_linkedin_account is not None
+                if recheck or not checked:
+                    batch.append(user)
+                    if len(batch) == checks_per_call:
+                        yield batch
+                        batch = []
+                    count += 1
+                    if max_checks != 1 and count == max_checks:
+                        self.stderr.write(
+                            "WARNING: limited to checking only %d users today."
+                            % max_checks)
+                        break
+            if batch:
+                yield batch
 
         def do_batch(batch):
             "Process a batch of users."
-            emails = [u.email for u in batch]
+            emails = (u.email for u in batch)
             for user, has_account in zip(batch, api.batch(emails)):
-                user.linkedin.has_linkedin_account = has_account
+                linkedin = user.linkedin
+                if linkedin.has_linkedin_account != has_account:
+                    linkedin.has_linkedin_account = has_account
+                    linkedin.save()
 
-        if batches:
-            do_batch(batches.pop(0))
+        batches = batch_users()
+        try:
+            do_batch(batches.next())  # may raise StopIteration
             for batch in batches:
                 time.sleep(time_between_calls)
                 do_batch(batch)
+        except StopIteration:
+            pass
 
 
 class LinkedinAPI(object):
@@ -108,4 +123,4 @@ class LinkedinAPI(object):
         """
         Get the LinkedIn status for a batch of emails.
         """
-        pass
+        return (True for email in emails)

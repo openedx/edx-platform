@@ -110,6 +110,7 @@ class FindUsersTests(unittest.TestCase):
 
         def dummy_batch(emails):
             "Mock LinkedIn API."
+            emails = list(emails)
             self.assertEqual(len(emails), 4)
             return [email % 2 == 0 for email in emails]
         api.batch = dummy_batch
