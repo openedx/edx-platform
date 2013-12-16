@@ -13,7 +13,7 @@ from xmodule.seq_module import SequenceDescriptor, SequenceModule
 from xmodule.graders import grader_from_conf
 import json
 
-from xblock.fields import Scope, List, String, Dict, Boolean
+from xblock.fields import Scope, List, String, Dict, Boolean, Integer
 from .fields import Date
 from xmodule.modulestore.locator import CourseLocator
 from django.utils.timezone import UTC
@@ -383,6 +383,9 @@ class CourseFields(object):
 
     display_coursenumber = String(help="An optional display string for the course number that will get rendered in the LMS",
                                   scope=Scope.settings)
+
+    max_student_enrollments_allowed = Integer(help="Limit the number of students allowed to enroll in this course.",
+                                              scope=Scope.settings)
 
 class CourseDescriptor(CourseFields, SequenceDescriptor):
     module_class = SequenceModule

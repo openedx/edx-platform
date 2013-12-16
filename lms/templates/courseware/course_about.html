@@ -166,6 +166,10 @@
                       cost=registration_price)}
           </a>
           <div id="register_error"></div>
+        % elif is_course_full:
+          <span class="register disabled">
+            ${_("Course is full")}
+          </span>          
         %else:
           <a href="#" class="register">
             ${_("Register for {course.display_number_with_default}").format(course=course) | h}

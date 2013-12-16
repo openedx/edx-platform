@@ -193,6 +193,8 @@ it pauses on the end time.
 
 Blades: Disallow users to enter video url's in http.
 
+Studio/LMS: Ability to cap the max number of active enrollments in a course
+
 LMS: Improve the acessibility of the forum follow post buttons.
 
 Blades: Latex problems are now enabled via use_latex_compiler
