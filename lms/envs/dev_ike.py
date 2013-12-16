@@ -24,13 +24,13 @@ FEATURES['SUBDOMAIN_BRANDING'] = False
 FEATURES['FORCE_UNIVERSITY_DOMAIN'] = None		# show all university courses if in dev (ie don't use HTTP_HOST)
 
 FEATURES['DISABLE_START_DATES'] = True
-# FEATURES['USE_DJANGO_PIPELINE']=False      # don't recompile scss
+# PIPELINE_ENABLED = False  # don't recompile scss
 
 myhost = socket.gethostname()
 if ('edxvm' in myhost) or ('ocw' in myhost):
     FEATURES['DISABLE_LOGIN_BUTTON'] = True  	# auto-login with MIT certificate
     FEATURES['USE_XQA_SERVER'] = 'https://qisx.mit.edu/xqa'  	# needs to be ssl or browser blocks it
-    FEATURES['USE_DJANGO_PIPELINE'] = False      # don't recompile scss
+    PIPELINE_ENABLED = False  # don't recompile scss
 
 if ('ocw' in myhost):
     FEATURES['ACCESS_REQUIRE_STAFF_FOR_COURSE'] = False
@@ -38,7 +38,7 @@ if ('ocw' in myhost):
 if ('domU' in myhost):
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
     FEATURES['REROUTE_ACTIVATION_EMAIL'] = 'ichuang@edX.mit.edu'  	# nonempty string = address for all activation emails
-    FEATURES['USE_DJANGO_PIPELINE'] = False      # don't recompile scss
+    PIPELINE_ENABLED = False  # don't recompile scss
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')  	# django 1.4 for nginx ssl proxy
 

@@ -37,8 +37,6 @@ from dealer.git import git
 ############################ FEATURE CONFIGURATION #############################
 
 FEATURES = {
-    'USE_DJANGO_PIPELINE': True,
-
     'GITHUB_PUSH': False,
 
     'ENABLE_DISCUSSION_SERVICE': False,
@@ -243,6 +241,7 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 ############################### Pipeline #######################################
 
 STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
+PIPELINE_ENABLED = True
 
 from rooted_paths import rooted_glob
 

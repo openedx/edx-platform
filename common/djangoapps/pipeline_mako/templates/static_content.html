@@ -11,7 +11,7 @@ except:
 %>${url}</%def>
 
 <%def name='css(group)'>
-  % if settings.FEATURES['USE_DJANGO_PIPELINE']:
+  % if getattr(settings, "PIPELINE_ENABLED", False):
     ${compressed_css(group)}
   % else:
     % for filename in settings.PIPELINE_CSS[group]['source_filenames']:
@@ -20,7 +20,7 @@ except:
   %endif
 </%def>
 <%def name='js(group)'>
-  % if settings.FEATURES['USE_DJANGO_PIPELINE']:
+  % if getattr(settings, "PIPELINE_ENABLED", False):
     ${compressed_js(group)}
   % else:
     % for filename in settings.PIPELINE_JS[group]['source_filenames']:

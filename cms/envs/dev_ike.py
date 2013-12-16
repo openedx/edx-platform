@@ -11,6 +11,6 @@ from .dev import *
 
 FEATURES['AUTH_USE_MIT_CERTIFICATES'] = True
 
-FEATURES['USE_DJANGO_PIPELINE'] = False      # don't recompile scss
+PIPELINE_ENABLED = False  # don't recompile scss
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')  	# django 1.4 for nginx ssl proxy

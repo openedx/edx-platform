@@ -52,7 +52,6 @@ DISCUSSION_SETTINGS = {
 # Features
 FEATURES = {
     'SAMPLE': False,
-    'USE_DJANGO_PIPELINE': True,
     'DISPLAY_HISTOGRAMS_TO_STAFF': True,
     'REROUTE_ACTIVATION_EMAIL': False,  # nonempty string = address for all activation emails
     'DEBUG_LEVEL': 0,  # 0 = lowest level, least verbose, 255 = max level, most verbose
@@ -203,6 +202,7 @@ FEATURES = {
     # only edX superusers can perform the downloads)
     'ALLOW_COURSE_STAFF_GRADE_DOWNLOADS': False,
 }
+PIPELINE_ENABLED = True
 
 # Used for A/B testing
 DEFAULT_GROUPS = []

@@ -84,9 +84,8 @@ TRACKING_BACKENDS.update({
 
 
 # Enable asset pipeline
-# Our fork of django-pipeline uses `PIPELINE` instead of `PIPELINE_ENABLED`
-# PipelineFinder is explained here: http://django-pipeline.readthedocs.org/en/1.1.24/storages.html
-PIPELINE = True
+# PipelineFinder is explained here: http://django-pipeline.readthedocs.org/en/1.3.16/storages.html
+PIPELINE_ENABLED = True
 STATICFILES_FINDERS += ('pipeline.finders.PipelineFinder', )
 
 BULK_EMAIL_DEFAULT_FROM_EMAIL = "test@test.org"
