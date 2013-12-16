@@ -129,8 +129,12 @@ def loc_mapper():
     global _loc_singleton
     # pylint: disable=W0212
     if _loc_singleton is None:
+        try:
+            loc_cache = get_cache('loc_cache')
+        except InvalidCacheBackendError:
+            loc_cache = get_cache('default')
         # instantiate
-        _loc_singleton = LocMapperStore(get_cache('default'), **settings.DOC_STORE_CONFIG)
+        _loc_singleton = LocMapperStore(loc_cache, **settings.DOC_STORE_CONFIG)
     # inject into split mongo modulestore
     if 'split' in _MODULESTORES:
         _MODULESTORES['split'].loc_mapper = _loc_singleton

@@ -203,8 +203,7 @@ def remove_user_from_course_group(caller, user, location, role):
 
     # see if the user is actually in that role, if not then we don't have to do anything
     groupnames, _ = get_all_course_role_groupnames(location, role)
-    for group in user.groups.filter(name__in=groupnames):
-        user.groups.remove(group)
+    user.groups.remove(*user.groups.filter(name__in=groupnames))
     user.save()
 
 
