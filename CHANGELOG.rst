@@ -14,6 +14,9 @@ Blades: Show answer for imageresponse. BLD-21.
 Blades: LTI additional Python tests. LTI must use HTTPS for
 lis_outcome_service_url. BLD-564.
 
+Studio: Enable Terms of Service and Privacy Policy links to be served by
+  an alternate site. STUD-151.
+
 Blades: Fix bug when Image mapping problems are not working for students in IE. BLD-413.
 
 Blades: Add template that displays the most up-to-date features of
