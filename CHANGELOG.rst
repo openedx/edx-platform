@@ -17,6 +17,11 @@ Common: Switch from mitx.db to edx.db for sqlite databases. This will effectivel
   reset state for local instances of the code, unless you manually rename your
   mitx.db file to edx.db.
 
+Common: significant performance improvement for authorization checks and location translations.
+  Ensure all auth checks, check all possible permutations of the auth key (Instructor dashboard
+  now shows when it should for all courses in lms).
+  Made queries for Studio dashboard 2 orders of magnitude faster (and fewer).
+
 Blades: Video Transcripts: Fix clear and download buttons. BLD-438.
 
 Common: Switch over from MITX_FEATURES to just FEATURES. To override items in
