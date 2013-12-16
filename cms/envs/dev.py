@@ -80,12 +80,6 @@ DATABASES = {
         'PORT': '3306',
     }
 }
-## DATABASES = {
-##     'default': {
-##         'ENGINE': 'django.db.backends.sqlite3',
-##         'NAME': ENV_ROOT / "db" / "mitx.db",
-##     }
-## }
 
 LMS_BASE = "localhost:8000"
 MITX_FEATURES['PREVIEW_LMS_BASE'] = "localhost:8000"

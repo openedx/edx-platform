@@ -453,7 +453,11 @@ def change_enrollment(request):
                   "course:{0}".format(course_num),
                   "run:{0}".format(run)]
         )
-
+        #Validate level_of_education
+        levels = {'p':8, 'm': 7, 'b': 6, 'a': 5, 'hs': 4, 'jhs': 3, 'el': 2, 'none': 1, 'other': 0}
+        profile = UserProfile.objects.get(user=user)
+        if not levels[profile.level_of_education] >= levels[course.level_of_education]:
+            return HttpResponseBadRequest(_("Your level of education is not accepted for this course."))
         CourseEnrollment.enroll(user, course.id, mode=current_mode.slug)
 
         return HttpResponse()
