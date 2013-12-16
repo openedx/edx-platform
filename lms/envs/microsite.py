@@ -22,7 +22,7 @@ _MICROSITE_CONFIGURATION = {
         "logo_image_file": "open_edX_logo.png",
         # also allow for a specification of a separate URL for the logo image so that we don't
         # need to check it into the repo
-        "logo_image_url": "https://class.stanford.edu/static/themes/stanford/images/stanford-S-logo.ac1a37d62c92.png",
+        "logo_image_url": None,
         # what filter to use when displaying the course catalog on the landing page     
         "course_org_filter": "CDX",
         # filter dashboard to only show this ORG's courses?
