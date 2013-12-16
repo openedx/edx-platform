@@ -126,8 +126,8 @@ SUBDOMAIN_BRANDING = {
     'mit': 'MITx',
     'berkeley': 'BerkeleyX',
     'harvard': 'HarvardX',
-    'openedx': 'Open_edX',
-    'edge': 'Edge'
+    'openedx': 'openedx',
+    'edge': 'edge'
 }
 
 # List of `university` landing pages to display, even though they may not
