@@ -479,12 +479,16 @@
     }
   }
 
+  .courseware-subsection .sortable-unit-list {
+    margin: ($baseline/4) 0 0 0;
+  }
+
   // unit styles
   .courseware-unit {
-    margin: ($baseline/4) 0 0 ($baseline*1.75);
+    margin: -1px 0 0 ($baseline*1.75);
 
     &.add-new-unit {
-      margin-right: ($baseline*1.75);
+      margin: 5px ($baseline*1.75) 0 ($baseline*1.75);
     }
 
     .section-item {

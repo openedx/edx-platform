@@ -295,7 +295,7 @@
     .courseware-unit {
       @include font-size(13);
       @include clearfix();
-      margin: ($baseline/4) 0 0 0;
+      margin: -1px 0 0 0;
 
       .section-item {
         @include transition(background $tmg-avg ease-in-out 0);
