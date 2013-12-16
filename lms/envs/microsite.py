@@ -2,7 +2,7 @@
 # based on incoming hostname domain
 # For local test purposes, let's define a "OpenedX" subdomain brand
 _MICROSITE_CONFIGURATION = {
-    "Open_edX": {
+    "openedx": {
         # A display string that will be displayed when user visits the microsite. Given that we are handling this
         # in configuration, it will not be localizable
         "platform_name": "Open edX",
@@ -20,6 +20,9 @@ _MICROSITE_CONFIGURATION = {
         # into the repository, so these images will have to be deployed/managed outside of
         # code pushes
         "logo_image_file": "open_edX_logo.png",
+        # also allow for a specification of a separate URL for the logo image so that we don't
+        # need to check it into the repo
+        "logo_image_url": "https://class.stanford.edu/static/themes/stanford/images/stanford-S-logo.ac1a37d62c92.png",
         # what filter to use when displaying the course catalog on the landing page     
         "course_org_filter": "CDX",
         # filter dashboard to only show this ORG's courses?
@@ -35,6 +38,8 @@ _MICROSITE_CONFIGURATION = {
         "SITE_NAME": 'openedx.localhost',
         # setting to indicate whether to show the "university partner" list on the landing page
         "show_university_partners": False,
+        # setting to hide the promo video on the homepage
+        "show_homepage_promo_video": False,
         # These 4 following items define the template substitutions to use in the courseware pages
         # these templates reside in lms/templates
         "header_extra_file": None,
@@ -199,7 +204,7 @@ _MICROSITE_CONFIGURATION = {
             }
         },
     },
-    "Edge": {
+    "edge": {
         # if set will render to different template in the index page
         # if not set, then the default index page will be rendered
         "university_profile_template": "university_profile/edge.html",

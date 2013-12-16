@@ -47,7 +47,13 @@ def get_logo_url():
     Return the url for the branded logo image to be used
     """
 
-    # see if a logo file has been specified 
+    # if the MicrositeConfiguration has a value for the logo_image_url
+    # let's use that
+    image_url = MicrositeConfiguration.get_microsite_configuration_value('logo_image_url')
+    if image_url:
+        return image_url
+
+    # else, see if a logo file (in our repo) has been specified, if so, use that
     image_file = MicrositeConfiguration.get_microsite_configuration_value('logo_image_file')
 
     if image_file:
@@ -56,6 +62,7 @@ def get_logo_url():
             image_file=image_file
         )
 
+    # otherwise, use the legacy means to configure this
     university = MicrositeConfiguration.get_microsite_configuration_value('university')
 
     if university is None:

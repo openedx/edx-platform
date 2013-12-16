@@ -8,22 +8,27 @@
 <%! from microsite_configuration.middleware import MicrositeConfiguration %>
 
 <%
-  show_home_header = MicrositeConfiguration.get_microsite_configuration_value('show_home_header', True)
+  homepage_overlay_html = MicrositeConfiguration.get_microsite_configuration_value('homepage_overlay_html')
+
+  show_homepage_promo_video = MicrositeConfiguration.get_microsite_configuration_value('show_homepage_promo_video', True)
+
 %>
 
-
 <section class="home">
-  % if show_home_header:
   <header>
     <div class="outer-wrapper">
       <div class="title">
         <hgroup>
-          % if self.stanford_theme_enabled():
-            <h1>${_("Free courses from <strong>{university_name}</strong>").format(university_name="Stanford")}</h1>
+          % if homepage_overlay_html:
+            ${homepage_overlay_html}
           % else:
-            <h1>${_("The Future of Online Education")}</h1>
+            % if self.stanford_theme_enabled():
+              <h1>${_("Free courses from <strong>{university_name}</strong>").format(university_name="Stanford")}</h1>
+            % else:
+              <h1>${_("The Future of Online Education")}</h1>
+            % endif
+            <h2>${_("For anyone, anywhere, anytime")}</h2>
           % endif
-          <h2>${_("For anyone, anywhere, anytime")}</h2>
         </hgroup>
 
         ## Disable social buttons for non-edX sites
@@ -48,18 +53,18 @@
               </div>
             </div>
           </section>
-        % endif
+          % endif
       </div>
 
+      % if show_homepage_promo_video:
         <a href="#video-modal" class="media" rel="leanModal">
           <div class="hero">
             <div class="play-intro"></div>
           </div>
         </a>
-
+      % endif
     </div>
   </header>
-  % endif
   <section class="container">
     <section class="highlighted-courses">
       ## Disable university partner logos and sites for non-edX sites

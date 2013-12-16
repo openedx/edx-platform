@@ -226,7 +226,9 @@ def send_mail_to_student(student, param_dict):
     """
 
     # add some helpers and microconfig subsitutions
-    param_dict['course_name'] = param_dict['course'].display_name_with_default
+    if 'course' in param_dict:
+        param_dict['course_name'] = param_dict['course'].display_name_with_default
+
     param_dict['site_name'] = MicrositeConfiguration.get_microsite_configuration_value('SITE_NAME',
         param_dict['site_name'])
 
@@ -236,10 +238,7 @@ def send_mail_to_student(student, param_dict):
     # see if we are running in a microsite and that there is an
     # activation email template definition available as configuration, if so, then render that
     message_type = param_dict['message']
-    print '*************'
-    print message_type
     if MicrositeConfiguration.has_microsite_email_template_definition(message_type):
-        print 'has email template!'
         subject, message = MicrositeConfiguration.render_microsite_email_template(message_type, 
             param_dict)
     else:   # use the on-disk email templates in lms/templates/email
