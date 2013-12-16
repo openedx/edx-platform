@@ -1,5 +1,5 @@
 ###
-### Script for cloning a course
+### Script for deleting a course
 ###
 from django.core.management.base import BaseCommand, CommandError
 from .prompt import query_yes_no

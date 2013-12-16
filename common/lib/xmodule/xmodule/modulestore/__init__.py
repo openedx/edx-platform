@@ -30,7 +30,7 @@ URL_RE = re.compile("""
 
 # TODO (cpennington): We should decide whether we want to expand the
 # list of valid characters in a location
-INVALID_CHARS = re.compile(r"[^\w.-]")
+INVALID_CHARS = re.compile(r"[^\w.-/]")
 # Names are allowed to have colons.
 INVALID_CHARS_NAME = re.compile(r"[^\w.:-]")
 
