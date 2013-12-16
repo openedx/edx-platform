@@ -304,17 +304,7 @@ describe 'Problem', ->
           expect($('input#1_2_1').attr('disabled')).not.toEqual('disabled')
 
       describe 'imageinput', ->
-        imageinput_html='''
-  <section class="problem">
-    <div class="imageinput capa_inputtype" id="inputtype_1_2_1">
-      <input class="imageinput" type="hidden" name="input_1_2_1" id="input_1_2_1">
-      <div style="position:relative;">
-        <div id="imageinput_1_2_1">test</div>
-        <div id="answer_1_2_1" data-width="100" data-height="100"></div>
-      </div>
-    </div>
-  </section>
-  '''
+        imageinput_html = readFixtures('imageinput.html')
         states = [
           {
             desc: 'rectangle is drawn correctly',
@@ -342,7 +332,7 @@ describe 'Problem', ->
 
         stubRequest = (data) =>
           spyOn($, 'postWithPrefix').andCallFake (url, callback) ->
-              callback answers: "1_2_1": data
+              callback answers: "12345": data
 
         getImage = (coords, c_width, c_height) =>
           types =
