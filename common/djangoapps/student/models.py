@@ -46,8 +46,8 @@ class AnonymousUserId(models.Model):
 
     Purpose of this table is to provide user by anonymous_user_id.
 
-    We are generating anonymous_user_id using md5 algorithm, so resulting length will always be 16 bytes.
-    http://docs.python.org/2/library/md5.html#md5.digest_size
+    We generate anonymous_user_id using md5 algorithm,
+    and use result in hex form, so its length is equal to 32 bytes.
     """
     user = models.ForeignKey(User, db_index=True)
     anonymous_user_id = models.CharField(unique=True, max_length=32)
