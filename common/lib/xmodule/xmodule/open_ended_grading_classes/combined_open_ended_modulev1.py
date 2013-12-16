@@ -258,8 +258,23 @@ class CombinedOpenEndedV1Module():
         if not task_states:
             return (0, 0, state_values[OpenEndedChild.INITIAL], idx)
 
-        final_child_state = json.loads(task_states[-1])
-        scores = [attempt.get('score', 0) for attempt in final_child_state.get('child_history', [])]
+        final_task_xml = self.task_xml[-1]
+        final_child_state_json = task_states[-1]
+        final_child_state = json.loads(final_child_state_json)
+
+        tag_name = self.get_tag_name(final_task_xml)
+        children = self.child_modules()
+        task_descriptor = children['descriptors'][tag_name](self.system)
+        task_parsed_xml = task_descriptor.definition_from_xml(etree.fromstring(final_task_xml), self.system)
+        task = children['modules'][tag_name](
+            self.system,
+            self.location,
+            task_parsed_xml,
+            task_descriptor,
+            self.static_data,
+            instance_state=final_child_state_json,
+        )
+        scores = task.all_scores()
         if scores:
             best_score = max(scores)
         else:
