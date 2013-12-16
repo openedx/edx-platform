@@ -30,10 +30,10 @@ class Command(BaseCommand):
             raise CommandError("LINKEDIN_API is not configured")
 
         state = str(uuid.uuid4())
-        url= ("https://www.linkedin.com/uas/oauth2/authorization"
-              "?response_type=code"
-              "&client_id=%s&state=%s&redirect_uri=%s" % (
-              api['CLIENT_ID'], state, api['REDIRECT_URI']))
+        url = ("https://www.linkedin.com/uas/oauth2/authorization"
+               "?response_type=code"
+               "&client_id=%s&state=%s&redirect_uri=%s" % (
+               api['CLIENT_ID'], state, api['REDIRECT_URI']))
 
         print "Let's log into your LinkedIn account."
         print "Start by visiting this url:"
@@ -54,13 +54,13 @@ class Command(BaseCommand):
 
         try:
             response = urllib2.urlopen(url).read()
-        except urllib2.HTTPError, e:
+        except urllib2.HTTPError, error:
             print "!!ERROR!!"
-            print e
-            print e.read()
+            print error
+            print error.read()
             raise CommandError("Unable to retrieve access token")
 
-        access_token =  json.loads(response)['access_token']
+        access_token = json.loads(response)['access_token']
         try:
             tokens = LinkedInTokens.objects.get()
             tokens.access_token = access_token
