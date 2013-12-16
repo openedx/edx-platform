@@ -819,6 +819,10 @@ PIPELINE_JS_COMPRESSOR = None
 STATICFILES_IGNORE_PATTERNS = (
     "sass/*",
     "coffee/*",
+
+    # Symlinks used by js-test-tool
+    "xmodule_js",
+    "common_static",
 )
 
 PIPELINE_YUI_BINARY = 'yui-compressor'
