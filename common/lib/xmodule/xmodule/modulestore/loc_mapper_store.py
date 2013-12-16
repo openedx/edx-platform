@@ -4,10 +4,10 @@ Method for converting among our differing Location/Locator whatever reprs
 from random import randint
 import re
 import pymongo
+import bson.son
 
 from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError, DuplicateItemError
 from xmodule.modulestore.locator import BlockUsageLocator
-from xmodule.modulestore.mongo import draft
 from xmodule.modulestore import Location
 import urllib
 
@@ -91,9 +91,10 @@ class LocMapperStore(object):
             else:
                 course_id = "{0.org}.{0.course}".format(course_location)
         # very like _interpret_location_id but w/o the _id
-        location_id = {'org': course_location.org, 'course': course_location.course}
-        if course_location.category == 'course':
-            location_id['name'] = course_location.name
+        location_id = self._construct_location_son(
+            course_location.org, course_location.course, 
+            course_location.name if course_location.category == 'course' else None
+        )
 
         self.location_map.insert({
             '_id': location_id,
@@ -128,20 +129,25 @@ class LocMapperStore(object):
         """
         location_id = self._interpret_location_course_id(old_style_course_id, location)
 
-        maps = self.location_map.find(location_id).sort('_id.name', pymongo.ASCENDING)
-        if maps.count() == 0:
+        maps = self.location_map.find(location_id)
+        maps = list(maps)
+        if len(maps) == 0:
             if add_entry_if_missing:
                 # create a new map
-                course_location = location.replace(category='course', name=location_id['_id.name'])
+                course_location = location.replace(category='course', name=location_id['_id']['name'])
                 self.create_map_entry(course_location)
                 entry = self.location_map.find_one(location_id)
             else:
                 raise ItemNotFoundError()
-        elif maps.count() > 1:
-            # if more than one, prefer the one w/o a name if that exists. Otherwise, choose the first (alphabetically)
+        elif len(maps) == 1:
             entry = maps[0]
         else:
+            # find entry w/o name, if any; otherwise, pick arbitrary
             entry = maps[0]
+            for item in maps:
+                if 'name' not in item['_id']:
+                    entry = item
+                    break
 
         if published:
             branch = entry['prod_branch']
@@ -242,11 +248,11 @@ class LocMapperStore(object):
         location_id = self._interpret_location_course_id(old_course_id, location)
 
         maps = self.location_map.find(location_id)
-        if maps.count() == 0:
-            raise ItemNotFoundError()
-
         # turn maps from cursor to list
         map_list = list(maps)
+        if len(map_list) == 0:
+            raise ItemNotFoundError()
+
         encoded_location_name = self._encode_for_mongo(location.name)
         # check whether there's already a usage_id for this location (and it agrees w/ any passed in or found)
         for map_entry in map_list:
@@ -279,7 +285,10 @@ class LocMapperStore(object):
                         )
 
                 map_entry['block_map'].setdefault(encoded_location_name, {})[location.category] = computed_usage_id
-                self.location_map.update({'_id': map_entry['_id']}, {'$set': {'block_map': map_entry['block_map']}})
+                self.location_map.update(
+                    {'_id': self._construct_location_son(**map_entry['_id'])}, 
+                    {'$set': {'block_map': map_entry['block_map']}}
+                )
 
         return computed_usage_id
 
@@ -317,7 +326,10 @@ class LocMapperStore(object):
 
             if location.category in map_entry['block_map'].setdefault(encoded_location_name, {}):
                 map_entry['block_map'][encoded_location_name][location.category] = usage_id
-                self.location_map.update({'_id': map_entry['_id']}, {'$set': {'block_map': map_entry['block_map']}})
+                self.location_map.update(
+                    {'_id': self._construct_location_son(**map_entry['_id'])}, 
+                    {'$set': {'block_map': map_entry['block_map']}}
+                )
 
         return usage_id
 
@@ -338,7 +350,10 @@ class LocMapperStore(object):
                     del map_entry['block_map'][encoded_location_name]
                 else:
                     del map_entry['block_map'][encoded_location_name][location.category]
-                self.location_map.update({'_id': map_entry['_id']}, {'$set': {'block_map': map_entry['block_map']}})
+                self.location_map.update(
+                    {'_id': self._construct_location_son(**map_entry['_id'])},
+                    {'$set': {'block_map': map_entry['block_map']}}
+                )
 
     def _add_to_block_map(self, location, location_id, block_map):
         '''add the given location to the block_map and persist it'''
@@ -357,7 +372,7 @@ class LocMapperStore(object):
 
     def _interpret_location_course_id(self, course_id, location):
         """
-        Take the old style course id (org/course/run) and return a dict for querying the mapping table.
+        Take the old style course id (org/course/run) and return a dict w/ a SON for querying the mapping table.
         If the course_id is empty, it uses location, but this may result in an inadequate id.
 
         :param course_id: old style 'org/course/run' id from Location.course_id where Location.category = 'course'
@@ -367,12 +382,21 @@ class LocMapperStore(object):
         if course_id:
             # re doesn't allow ?P<_id.org> and ilk
             matched = re.match(r'([^/]+)/([^/]+)/([^/]+)', course_id)
-            return dict(zip(['_id.org', '_id.course', '_id.name'], matched.groups()))
+            return {'_id': self._construct_location_son(*matched.groups())}
 
-        location_id = {'_id.org': location.org, '_id.course': location.course}
         if location.category == 'course':
-            location_id['_id.name'] = location.name
-        return location_id
+            return {'_id': self._construct_location_son(location.org, location.course, location.name)}
+        else:
+            return bson.son.SON([('_id.org', location.org), ('_id.course', location.course)])
+    
+    def _construct_location_son(self, org, course, name=None):
+        """
+        Construct the SON needed to repr the location for either a query or an insertion
+        """
+        if name:
+            return bson.son.SON([('org', org), ('course', course), ('name', name)])
+        else:
+            return bson.son.SON([('org', org), ('course', course)])
 
     def _block_id_is_guid(self, name):
         """
