@@ -34,22 +34,32 @@ def delete_course_and_groups(course_id, commit=False):
     """
     module_store = modulestore('direct')
     content_store = contentstore()
+    org, course_num, run = None, None, None
+    split_course_id = course_id.split("/")
+    if len(split_course_id) == 3:
+        org, course_num, run = split_course_id
+    else:
+        split_course_id = course_id.split(".")
+        if len(split_course_id) == 3:
+            org, course_num, run = split_course_id
 
-    org, course_num, run = course_id.split("/")
-    module_store.ignore_write_events_on_courses.append('{0}/{1}'.format(org, course_num))
+    if org and course_num and run:
+        module_store.ignore_write_events_on_courses.append('{0}/{1}'.format(org, course_num))
 
-    loc = CourseDescriptor.id_to_location(course_id)
-    if delete_course(module_store, content_store, loc, commit):
-        print 'removing forums permissions and roles...'
-        unseed_permissions_roles(course_id)
+        loc = CourseDescriptor.id_to_location(course_id)
+        if delete_course(module_store, content_store, loc, commit):
+            print 'removing forums permissions and roles...'
+            unseed_permissions_roles(course_id)
 
-        print 'removing User permissions from course....'
-        # in the django layer, we need to remove all the user permissions groups associated with this course
-        if commit:
-            try:
-                _delete_course_group(loc)
-            except Exception as err:
-                log.error("Error in deleting course groups for {0}: {1}".format(loc, err))
+            print 'removing User permissions from course....'
+            # in the django layer, we need to remove all the user permissions groups associated with this course
+            if commit:
+                try:
+                    _delete_course_group(loc)
+                except Exception as err:
+                    log.error("Error in deleting course groups for {0}: {1}".format(loc, err))
+    else:
+        log.error("Error invalid course_id format for {0}".format(course_id))
 
 
 def get_modulestore(category_or_location):
