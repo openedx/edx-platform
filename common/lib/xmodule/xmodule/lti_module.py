@@ -504,8 +504,11 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
             failure_values['imsx_messageIdentifier'] = escape(imsx_messageIdentifier)
             return Response(response_xml_template.format(**failure_values), content_type="application/xml")
 
-
         real_user = self.system.get_real_user(urllib.unquote(sourcedId.split(':')[-1]))
+        if not real_user:  # that means we can't save to database, as we do not have real user id.
+            failure_values['imsx_messageIdentifier'] = escape(imsx_messageIdentifier)
+            return Response(response_xml_template.format(**failure_values), content_type="application/xml")
+
         if action == 'replaceResultRequest':
             self.system.publish(
                 event={

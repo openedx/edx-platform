@@ -132,6 +132,26 @@ class LTIModuleTest(LogicTest):
         self.assertEqual(response.status_code, 200)
         self.assertDictEqual(expected_response, real_response)
 
+    def test_real_user_is_none(self):
+        """
+        If we have no real user, we should send back failure response.
+        """
+        self.xmodule.verify_oauth_body_sign = Mock()
+        self.xmodule.has_score = True
+        self.system.get_real_user = Mock(return_value=None)
+        request = Request(self.environ)
+        request.body = self.get_request_body()
+        response = self.xmodule.grade_handler(request, '')
+        real_response = self.get_response_values(response)
+        expected_response = {
+            'action': None,
+            'code_major': 'failure',
+            'description': 'The request has failed.',
+            'messageIdentifier': self.DEFAULTS['messageIdentifier'],
+        }
+        self.assertEqual(response.status_code, 200)
+        self.assertDictEqual(expected_response, real_response)
+
     def test_grade_not_in_range(self):
         """
         Grade returned from Tool Provider is outside the range 0.0-1.0.
