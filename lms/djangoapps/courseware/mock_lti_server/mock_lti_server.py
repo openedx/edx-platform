@@ -76,7 +76,10 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
         '''
         Send the response code and MIME headers
         '''
-        self.send_response(200)
+        if self._is_correct_lti_request():
+            self.send_response(200)
+        else:
+            self.send_response(500)
         self.send_header('Content-type', 'text/html')
         self.end_headers()
 
@@ -108,6 +111,9 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
         return post_dict
 
     def _send_graded_result(self):
+        """
+        Send grade request.
+        """
         values = {
             'textString': 0.5,
             'sourcedId': self.server.grade_data['sourcedId'],
@@ -161,26 +167,41 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
         '''
         Send message back to the client
         '''
+        # if lti can be graded
         if getattr(self.server, 'grade_data', False):
-            response_str = """<html><head><title>TEST TITLE</title></head>
-                <body>
-                <div><h2>Graded IFrame loaded</h2> \
-                <h3>Server response is:</h3>\
-                <h3 class="result">{}</h3></div>
-                <form action="{url}/grade" method="post">
-                <input type="submit" name="submit-button" value="Submit">
-                </form>
+            response_str = textwrap.dedent("""
+                <html>
+                    <head>
+                        <title>TEST TITLE</title>
+                    </head>
+                    <body>
+                        <div>
+                            <h2>Graded IFrame loaded</h2>
+                            <h3>Server response is:</h3>
+                            <h3 class="result">{}</h3>
+                        </div>
+                        <form action="{url}/grade" method="post">
+                            <input type="submit" name="submit-button" value="Submit">
+                        </form>
+                    </body>
+                </html>
+            """).format(message, url="http://%s:%s" % self.server.server_address)
+        else: # lti can't be graded
+            response_str = textwrap.dedent("""
+                <html>
+                    <head>
+                        <title>TEST TITLE</title>
+                    </head>
+                    <body>
+                        <div>
+                            <h2>IFrame loaded</h2>
+                            <h3>Server response is:</h3>
+                            <h3 class="result">{}</h3>
+                        </div>
+                    </body>
+                </html>
+            """).format(message)
 
-                </body></html>""".format(message, url="http://%s:%s" % self.server.server_address)
-        else:
-            response_str = """<html><head><title>TEST TITLE</title></head>
-                <body>
-                <div><h2>IFrame loaded</h2> \
-                <h3>Server response is:</h3>\
-                <h3 class="result">{}</h3></div>
-                </body></html>""".format(message)
-
-        # Log the response
         logger.debug("LTI: sent response {}".format(response_str))
         self.wfile.write(response_str)
 
