@@ -4,7 +4,7 @@ class @Sequence
     @contents = @$('.seq_contents')
     @num_contents = @contents.length
     @id = @el.data('id')
-    @modx_url = @el.data('course_modx_root')
+    @ajaxUrl = @el.data('ajax-url')
     @initProgress()
     @bind()
     @render parseInt(@el.data('position'))
@@ -84,7 +84,7 @@ class @Sequence
     if @position != new_position
       if @position != undefined
         @mark_visited @position
-        modx_full_url = @modx_url + '/' + @id + '/goto_position'
+        modx_full_url = '#{@ajaxUrl}/goto_position'
         $.postWithPrefix modx_full_url, position: new_position
 
       # On Sequence change, fire custom event "sequence:change" on element.

@@ -9,7 +9,8 @@ from capa.xqueue_interface import XQueueInterface
 from capa.xqueue_interface import make_xheader, make_hashkey
 from django.conf import settings
 from requests.auth import HTTPBasicAuth
-from student.models import UserProfile
+from student.models import UserProfile, CourseEnrollment
+from verify_student.models import SoftwareSecurePhotoVerification
 
 import json
 import random
@@ -57,7 +58,7 @@ class XQueueCertInterface(object):
 
         if settings.XQUEUE_INTERFACE.get('basic_auth') is not None:
             requests_auth = HTTPBasicAuth(
-                    *settings.XQUEUE_INTERFACE['basic_auth'])
+                *settings.XQUEUE_INTERFACE['basic_auth'])
         else:
             requests_auth = None
 
@@ -68,12 +69,13 @@ class XQueueCertInterface(object):
             self.request = request
 
         self.xqueue_interface = XQueueInterface(
-                settings.XQUEUE_INTERFACE['url'],
-                settings.XQUEUE_INTERFACE['django_auth'],
-                requests_auth,
-                )
+            settings.XQUEUE_INTERFACE['url'],
+            settings.XQUEUE_INTERFACE['django_auth'],
+            requests_auth,
+        )
         self.whitelist = CertificateWhitelist.objects.all()
         self.restricted = UserProfile.objects.filter(allow_certificate=False)
+        self.use_https = True
 
     def regen_cert(self, student, course_id, course=None):
         """(Re-)Make certificate for a particular student in a particular course
@@ -83,7 +85,7 @@ class XQueueCertInterface(object):
           course_id - courseenrollment.course_id (string)
 
         WARNING: this command will leave the old certificate, if one exists,
-                 laying around in AWS taking up space. If this is a problem, 
+                 laying around in AWS taking up space. If this is a problem,
                  take pains to clean up storage before running this command.
 
         Change the certificate status to unavailable (if it exists) and request
@@ -91,7 +93,7 @@ class XQueueCertInterface(object):
 
         Return the status object.
         """
-        # TODO: when del_cert is implemented and plumbed through certificates 
+        # TODO: when del_cert is implemented and plumbed through certificates
         #       repo also, do a deletion followed by a creation r/t a simple
         #       recreation. XXX: this leaves orphan cert files laying around in
         #       AWS. See note in the docstring too.
@@ -148,12 +150,14 @@ class XQueueCertInterface(object):
         """
 
         VALID_STATUSES = [status.generating,
-                          status.unavailable, 
-                          status.deleted, 
+                          status.unavailable,
+                          status.deleted,
                           status.error,
                           status.notpassing]
 
         cert_status = certificate_status_for_student(student, course_id)['status']
+
+        new_status = cert_status
 
         if cert_status in VALID_STATUSES:
             # grade the student
@@ -164,9 +168,6 @@ class XQueueCertInterface(object):
                 course = courses.get_course_by_id(course_id)
             profile = UserProfile.objects.get(user=student)
 
-            cert, created = GeneratedCertificate.objects.get_or_create(
-                   user=student, course_id=course_id)
-
             # Needed
             self.request.user = student
             self.request.session = {}
@@ -174,54 +175,78 @@ class XQueueCertInterface(object):
             grade = grades.grade(student, self.request, course)
             is_whitelisted = self.whitelist.filter(
                 user=student, course_id=course_id, whitelist=True).exists()
+            enrollment_mode = CourseEnrollment.enrollment_mode_for_user(student, course_id)
+            org = course_id.split('/')[0]
+            course_num = course_id.split('/')[1]
+            cert_mode = enrollment_mode
+            if enrollment_mode == GeneratedCertificate.MODES.verified and SoftwareSecurePhotoVerification.user_is_verified(student):
+                template_pdf = "certificate-template-{0}-{1}-verified.pdf".format(
+                    org, course_num)
+            elif (enrollment_mode == GeneratedCertificate.MODES.verified and not
+                    SoftwareSecurePhotoVerification.user_is_verified(student)):
+                template_pdf = "certificate-template-{0}-{1}.pdf".format(
+                    org, course_num)
+                cert_mode = GeneratedCertificate.MODES.honor
+            else:
+                # honor code and audit students
+                template_pdf = "certificate-template-{0}-{1}.pdf".format(
+                    org, course_num)
+
+            cert, created = GeneratedCertificate.objects.get_or_create(
+                user=student, course_id=course_id)
+
+            cert.mode = cert_mode
+            cert.user = student
+            cert.grade = grade['percent']
+            cert.course_id = course_id
+            cert.name = profile.name
 
             if is_whitelisted or grade['grade'] is not None:
-
-                key = make_hashkey(random.random())
-
-                cert.grade = grade['percent']
-                cert.user = student
-                cert.course_id = course_id
-                cert.key = key
-                cert.name = profile.name
 
                 # check to see whether the student is on the
                 # the embargoed country restricted list
                 # otherwise, put a new certificate request
                 # on the queue
+
                 if self.restricted.filter(user=student).exists():
-                    cert.status = status.restricted
+                    new_status = status.restricted
+                    cert.status = new_status
                     cert.save()
                 else:
+                    key = make_hashkey(random.random())
+                    cert.key = key
                     contents = {
                         'action': 'create',
                         'username': student.username,
                         'course_id': course_id,
                         'name': profile.name,
                         'grade': grade['grade'],
+                        'template_pdf': template_pdf,
                     }
-                    cert.status = status.generating
+                    new_status = status.generating
+                    cert.status = new_status
                     cert.save()
                     self._send_to_xqueue(contents, key)
             else:
-                cert_status = status.notpassing
-                cert.grade = grade['percent']
-                cert.user = student
-                cert.course_id = course_id
-                cert.name = profile.name
-                cert.status = cert_status
+                new_status = status.notpassing
+                cert.status = new_status
                 cert.save()
 
-        return cert_status
+        return new_status
 
     def _send_to_xqueue(self, contents, key):
 
+        if self.use_https:
+            proto = "https"
+        else:
+            proto = "http"
+
         xheader = make_xheader(
-            'https://{0}/update_certificate?{1}'.format(
-                settings.SITE_NAME, key), key, settings.CERT_QUEUE)
+            '{0}://{1}/update_certificate?{2}'.format(
+                proto, settings.SITE_NAME, key), key, settings.CERT_QUEUE)
 
         (error, msg) = self.xqueue_interface.send_to_queue(
-                header=xheader, body=json.dumps(contents))
+            header=xheader, body=json.dumps(contents))
         if error:
             logger.critical('Unable to add a request to the queue: {} {}'.format(error, msg))
             raise Exception('Unable to send queue message')

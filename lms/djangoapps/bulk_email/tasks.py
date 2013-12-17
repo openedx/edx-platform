@@ -28,7 +28,7 @@ from celery.states import SUCCESS, FAILURE, RETRY
 from celery.exceptions import RetryTaskError
 
 from django.conf import settings
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User
 from django.core.mail import EmailMultiAlternatives, get_connection
 from django.core.urlresolvers import reverse
 
@@ -36,8 +36,8 @@ from bulk_email.models import (
     CourseEmail, Optout, CourseEmailTemplate,
     SEND_TO_MYSELF, SEND_TO_ALL, TO_OPTIONS,
 )
-from courseware.access import _course_staff_group_name, _course_instructor_group_name
 from courseware.courses import get_course, course_image_url
+from courseware.roles import CourseStaffRole, CourseInstructorRole
 from instructor_task.models import InstructorTask
 from instructor_task.subtasks import (
     SubtaskStatus,
@@ -106,12 +106,8 @@ def _get_recipient_queryset(user_id, to_option, course_id, course_location):
     if to_option == SEND_TO_MYSELF:
         recipient_qset = User.objects.filter(id=user_id)
     else:
-        staff_grpname = _course_staff_group_name(course_location)
-        staff_group, _ = Group.objects.get_or_create(name=staff_grpname)
-        staff_qset = staff_group.user_set.all()
-        instructor_grpname = _course_instructor_group_name(course_location)
-        instructor_group, _ = Group.objects.get_or_create(name=instructor_grpname)
-        instructor_qset = instructor_group.user_set.all()
+        staff_qset = CourseStaffRole(course_location).users_with_role()
+        instructor_qset = CourseInstructorRole(course_location).users_with_role()
         recipient_qset = staff_qset | instructor_qset
         if to_option == SEND_TO_ALL:
             # We also require students to have activated their accounts to

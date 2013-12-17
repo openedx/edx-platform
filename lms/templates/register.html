@@ -100,6 +100,7 @@
 <section class="register container">
   <section role="main" class="content">
     <form role="form" id="register-form" method="post" data-remote="true" action="/create_account" novalidate>
+      <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
 
       <!-- status messages -->
       <div role="alert" class="status message">
@@ -131,7 +132,7 @@
             <input id="password" type="password" name="password" value="" required aria-required="true" />
           </li>
           <li class="field required text" id="field-username">
-            <label for="username">${_('Public Display Name')}</label>
+            <label for="username">${_('Public Username')}</label>
             <input id="username" type="text" name="username" value="" placeholder="${_('example: JaneDoe')}" required aria-required="true" aria-describedby="username-tip"/>
             <span class="tip tip-input" id="username-tip">${_('Will be shown in any discussions or forums you participate in')} <strong>(${_('cannot be changed later')})</strong></span>
           </li>
@@ -191,6 +192,7 @@
         <h2 class="sr">${_("Optional Personal Information")}</h2>
 
         <ol class="list-input">
+          % if 'level_of_education' in settings.REGISTRATION_OPTIONAL_FIELDS:
           <li class="field-group">
             <div class="field select" id="field-education-level">
               <label for="education-level">${_("Highest Level of Education Completed")}</label>
@@ -201,7 +203,10 @@
                 %endfor
               </select>
             </div>
-
+          </li>
+          % endif
+          % if 'gender' in settings.REGISTRATION_OPTIONAL_FIELDS:
+          <li class="field-group">
             <div class="field select" id="field-gender">
               <label for="gender">${_("Gender")}</label>
               <select id="gender" name="gender">
@@ -211,7 +216,10 @@
                 %endfor
               </select>
             </div>
-
+          </li>
+          % endif
+          % if 'year_of_birth' in settings.REGISTRATION_OPTIONAL_FIELDS:
+          <li class="field-group">
             <div class="field select" id="field-yob">
               <label for="yob">${_("Year of Birth")}</label>
               <select id="yob" name="year_of_birth">
@@ -221,6 +229,7 @@
                 %endfor
               </select>
             </div>
+            % endif
           </li>
         </ol>
       </div>
@@ -229,15 +238,19 @@
         <h2 class="sr">${_("Optional Personal Information")}</h2>
 
         <ol class="list-input">
+          % if 'mailing_address' in settings.REGISTRATION_OPTIONAL_FIELDS:
           <li class="field text" id="field-address-mailing">
             <label for="address-mailing">${_("Mailing Address")}</label>
             <textarea id="address-mailing" name="mailing_address" value=""></textarea>
           </li>
+          % endif
 
+          % if 'goals' in settings.REGISTRATION_OPTIONAL_FIELDS:
           <li class="field text" id="field-goals">
             <label for="goals">${_("Please share with us your reasons for registering with {platform_name}").format(platform_name=settings.PLATFORM_NAME)}</label>
             <textarea id="goals" name="goals" value=""></textarea>
           </li>
+          % endif
         </ol>
       </div>
 

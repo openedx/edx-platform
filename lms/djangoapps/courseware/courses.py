@@ -327,7 +327,6 @@ def registered_for_course(course, user):
       return False
 
 def get_cms_course_link(course):
-
     """
     Returns a link to course_index for editing the course in cms,
     assuming that the course is actually cms-backed.

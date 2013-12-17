@@ -82,9 +82,7 @@ class ChooseModeView(View):
 
         upgrade = request.GET.get('upgrade', False)
 
-        requested_mode = self.get_requested_mode(request.POST.get("mode"))
-        if requested_mode == "verified" and request.POST.get("honor-code"):
-            requested_mode = "honor"
+        requested_mode = self.get_requested_mode(request.POST)
 
         allowed_modes = CourseMode.modes_for_course_dict(course_id)
         if requested_mode not in allowed_modes:
@@ -125,14 +123,14 @@ class ChooseModeView(View):
                 reverse('verify_student_show_requirements',
                         kwargs={'course_id': course_id}) + "?upgrade={}".format(upgrade))
 
-    def get_requested_mode(self, user_choice):
+    def get_requested_mode(self, request_dict):
         """
-        Given the text of `user_choice`, return the
+        Given the request object of `user_choice`, return the
         corresponding course mode slug
         """
-        choices = {
-            "Select Audit": "audit",
-            "Select Certificate": "verified",
-            "Upgrade Your Registration": "verified"
-        }
-        return choices.get(user_choice)
+        if 'audit_mode' in request_dict:
+            return 'audit'
+        if 'certificate_mode' and request_dict.get("honor-code"):
+            return 'honor'
+        if 'certificate_mode' in request_dict:
+            return 'verified'

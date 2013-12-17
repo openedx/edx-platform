@@ -527,9 +527,7 @@ class Membership
 
 # export for use
 # create parent namespaces if they do not already exist.
-# abort if underscore can not be found.
-if _?
-  _.defaults window, InstructorDashboard: {}
-  _.defaults window.InstructorDashboard, sections: {}
-  _.defaults window.InstructorDashboard.sections,
-    Membership: Membership
+_.defaults window, InstructorDashboard: {}
+_.defaults window.InstructorDashboard, sections: {}
+_.defaults window.InstructorDashboard.sections,
+  Membership: Membership

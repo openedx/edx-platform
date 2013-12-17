@@ -10,7 +10,8 @@
 
         beforeEach(function () {
             oldOTBD = window.onTouchBasedDevice;
-            window.onTouchBasedDevice = jasmine.createSpy('onTouchBasedDevice').andReturn(false);
+            window.onTouchBasedDevice = jasmine
+                .createSpy('onTouchBasedDevice').andReturn(false);
             initialize();
             player.config.events.onReady = jasmine.createSpy('onReady');
         });
@@ -46,17 +47,22 @@
                         }, 'Player state should be changed', WAIT_TIMEOUT);
 
                         runs(function () {
-                            expect(player.getPlayerState()).toBe(STATUS.PLAYING);
+                            expect(player.getPlayerState())
+                                .toBe(STATUS.PLAYING);
                         });
                     });
 
                     it('callback was called', function () {
                         waitsFor(function () {
-                            return state.videoPlayer.player.getPlayerState() !== STATUS.PAUSED;
+                            var stateStatus = state.videoPlayer.player
+                                .getPlayerState();
+
+                            return stateStatus !== STATUS.PAUSED;
                         }, 'Player state should be changed', WAIT_TIMEOUT);
 
                         runs(function () {
-                            expect(player.callStateChangeCallback).toHaveBeenCalled();
+                            expect(player.callStateChangeCallback)
+                                .toHaveBeenCalled();
                         });
                     });
                 });
@@ -78,7 +84,8 @@
                         }, 'Player state should be changed', WAIT_TIMEOUT);
 
                         runs(function () {
-                            expect(player.getPlayerState()).toBe(STATUS.PAUSED);
+                            expect(player.getPlayerState())
+                                .toBe(STATUS.PAUSED);
                         });
                     });
 
@@ -88,7 +95,8 @@
                         }, 'Player state should be changed', WAIT_TIMEOUT);
 
                         runs(function () {
-                            expect(player.callStateChangeCallback).toHaveBeenCalled();
+                            expect(player.callStateChangeCallback)
+                                .toHaveBeenCalled();
                         });
                     });
                 });
@@ -121,7 +129,8 @@
                     }, 'Player state should be changed', WAIT_TIMEOUT);
 
                     runs(function () {
-                        expect(player.callStateChangeCallback).toHaveBeenCalled();
+                        expect(player.callStateChangeCallback)
+                            .toHaveBeenCalled();
                     });
                 });
             });
@@ -156,39 +165,26 @@
                         return player.getPlayerState() !== STATUS.PLAYING;
                     }, 'Player state should be changed', WAIT_TIMEOUT);
                     runs(function () {
-                        expect(player.callStateChangeCallback).toHaveBeenCalled();
+                        expect(player.callStateChangeCallback)
+                            .toHaveBeenCalled();
                     });
                 });
             });
 
             describe('[canplay]', function () {
-                beforeEach(function () {
+                it(
+                    'player state was changed, start/end was defined, ' +
+                    'onReady called', function ()
+                {
                     waitsFor(function () {
                         return player.getPlayerState() !== STATUS.UNSTARTED;
                     }, 'Video cannot be played', WAIT_TIMEOUT);
-                });
 
-                it('player state was changed', function () {
                     runs(function () {
                         expect(player.getPlayerState()).toBe(STATUS.PAUSED);
-                    });
-                });
-
-                it('end property was defined', function () {
-                    runs(function () {
-                        expect(player.end).not.toBeNull();
-                    });
-                });
-
-                it('start position was defined', function () {
-                    runs(function () {
-                        expect(player.video.currentTime).toBe(player.start);
-                    });
-                });
-
-                it('onReady callback was called', function () {
-                    runs(function () {
-                        expect(player.config.events.onReady).toHaveBeenCalled();
+                        expect(player.video.currentTime).toBe(0);
+                        expect(player.config.events.onReady)
+                            .toHaveBeenCalled();
                     });
                 });
             });
@@ -276,7 +272,8 @@
             it('getCurrentTime', function () {
                 runs(function () {
                     player.video.currentTime = 3;
-                    expect(player.getCurrentTime()).toBe(player.video.currentTime);
+                    expect(player.getCurrentTime())
+                        .toBe(player.video.currentTime);
                 });
             });
 
@@ -330,7 +327,8 @@
             });
 
             it('getAvailablePlaybackRates', function () {
-                expect(player.getAvailablePlaybackRates()).toEqual(playbackRates);
+                expect(player.getAvailablePlaybackRates())
+                    .toEqual(playbackRates);
             });
         });
     });

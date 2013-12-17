@@ -1,7 +1,5 @@
 import json
-from django.conf import settings
 from django.core.exceptions import PermissionDenied
-from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
@@ -9,17 +7,14 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
 from django_future.csrf import ensure_csrf_cookie
 from mitxmako.shortcuts import render_to_response
-from django.core.context_processors import csrf
 
 from xmodule.modulestore.django import modulestore, loc_mapper
-from xmodule.error_module import ErrorDescriptor
-from contentstore.utils import get_lms_link_for_item
-from util.json_request import JsonResponse
+from util.json_request import JsonResponse, expect_json
 from auth.authz import (
-    STAFF_ROLE_NAME, INSTRUCTOR_ROLE_NAME, get_course_groupname_for_role)
-from course_creators.views import (
-    get_course_creator_status, add_user_with_status_unrequested,
-    user_requested_access)
+    STAFF_ROLE_NAME, INSTRUCTOR_ROLE_NAME, get_course_groupname_for_role,
+    get_course_role_users
+)
+from course_creators.views import user_requested_access
 
 from .access import has_access
 
@@ -28,51 +23,7 @@ from xmodule.modulestore.locator import BlockUsageLocator
 from django.http import HttpResponseNotFound
 
 
-__all__ = ['index', 'request_course_creator', 'course_team_handler']
-
-
-@login_required
-@ensure_csrf_cookie
-def index(request):
-    """
-    List all courses available to the logged in user
-    """
-    courses = modulestore('direct').get_items(['i4x', None, None, 'course', None])
-
-    # filter out courses that we don't have access too
-    def course_filter(course):
-        return (has_access(request.user, course.location)
-                # TODO remove this condition when templates purged from db
-                and course.location.course != 'templates'
-                and course.location.org != ''
-                and course.location.course != ''
-                and course.location.name != '')
-    courses = filter(course_filter, courses)
-
-    def format_course_for_view(course):
-        # published = false b/c studio manipulates draft versions not b/c the course isn't pub'd
-        course_loc = loc_mapper().translate_location(
-            course.location.course_id, course.location, published=False, add_entry_if_missing=True
-        )
-        return (
-            course.display_name,
-            # note, couldn't get django reverse to work; so, wrote workaround
-            course_loc.url_reverse('course/', ''),
-            get_lms_link_for_item(
-                course.location
-            ),
-            course.display_org_with_default,
-            course.display_number_with_default,
-            course.location.name
-        )
-
-    return render_to_response('index.html', {
-        'courses': [format_course_for_view(c) for c in courses if not isinstance(c, ErrorDescriptor)],
-        'user': request.user,
-        'request_course_creator_url': reverse('contentstore.views.request_course_creator'),
-        'course_creator_status': _get_course_creator_status(request.user),
-        'csrf': csrf(request)['csrf_token']
-    })
+__all__ = ['request_course_creator', 'course_team_handler']
 
 
 @require_POST
@@ -85,6 +36,7 @@ def request_course_creator(request):
     return JsonResponse({"Status": "OK"})
 
 
+# pylint: disable=unused-argument
 @login_required
 @ensure_csrf_cookie
 @require_http_methods(("GET", "POST", "PUT", "DELETE"))
@@ -112,38 +64,39 @@ def course_team_handler(request, tag=None, course_id=None, branch=None, version_
         return HttpResponseNotFound()
 
 
-def _manage_users(request, location):
+def _manage_users(request, locator):
     """
     This view will return all CMS users who are editors for the specified course
     """
-    old_location = loc_mapper().translate_locator_to_location(location)
+    old_location = loc_mapper().translate_locator_to_location(locator)
 
     # check that logged in user has permissions to this item
-    if not has_access(request.user, location, role=INSTRUCTOR_ROLE_NAME) and not has_access(request.user, location, role=STAFF_ROLE_NAME):
+    if not has_access(request.user, locator):
         raise PermissionDenied()
 
     course_module = modulestore().get_item(old_location)
-
-    staff_groupname = get_course_groupname_for_role(location, "staff")
-    staff_group, __ = Group.objects.get_or_create(name=staff_groupname)
-    inst_groupname = get_course_groupname_for_role(location, "instructor")
-    inst_group, __ = Group.objects.get_or_create(name=inst_groupname)
+    instructors = get_course_role_users(locator, INSTRUCTOR_ROLE_NAME)
+    # the page only lists staff and assumes they're a superset of instructors. Do a union to ensure.
+    staff = set(get_course_role_users(locator, STAFF_ROLE_NAME)).union(instructors)
 
     return render_to_response('manage_users.html', {
         'context_course': course_module,
-        'staff': staff_group.user_set.all(),
-        'instructors': inst_group.user_set.all(),
-        'allow_actions': has_access(request.user, location, role=INSTRUCTOR_ROLE_NAME),
+        'staff': staff,
+        'instructors': instructors,
+        'allow_actions': has_access(request.user, locator, role=INSTRUCTOR_ROLE_NAME),
     })
 
 
-def _course_team_user(request, location, email):
-    old_location = loc_mapper().translate_locator_to_location(location)
+@expect_json
+def _course_team_user(request, locator, email):
+    """
+    Handle the add, remove, promote, demote requests ensuring the requester has authority
+    """
     # check that logged in user has permissions to this item
-    if has_access(request.user, location, role=INSTRUCTOR_ROLE_NAME):
+    if has_access(request.user, locator, role=INSTRUCTOR_ROLE_NAME):
         # instructors have full permissions
         pass
-    elif has_access(request.user, location, role=STAFF_ROLE_NAME) and email == request.user.email:
+    elif has_access(request.user, locator, role=STAFF_ROLE_NAME) and email == request.user.email:
         # staff can only affect themselves
         pass
     else:
@@ -173,7 +126,7 @@ def _course_team_user(request, location, email):
         # what's the highest role that this user has?
         groupnames = set(g.name for g in user.groups.all())
         for role in roles:
-            role_groupname = get_course_groupname_for_role(old_location, role)
+            role_groupname = get_course_groupname_for_role(locator, role)
             if role_groupname in groupnames:
                 msg["role"] = role
                 break
@@ -189,7 +142,7 @@ def _course_team_user(request, location, email):
     # make sure that the role groups exist
     groups = {}
     for role in roles:
-        groupname = get_course_groupname_for_role(old_location, role)
+        groupname = get_course_groupname_for_role(locator, role)
         group, __ = Group.objects.get_or_create(name=groupname)
         groups[role] = group
 
@@ -212,22 +165,13 @@ def _course_team_user(request, location, email):
         return JsonResponse()
 
     # all other operations require the requesting user to specify a role
-    if request.META.get("CONTENT_TYPE", "").startswith("application/json") and request.body:
-        try:
-            payload = json.loads(request.body)
-        except:
-            return JsonResponse({"error": _("malformed JSON")}, 400)
-        try:
-            role = payload["role"]
-        except KeyError:
-            return JsonResponse({"error": _("`role` is required")}, 400)
-    else:
-        if not "role" in request.POST:
-            return JsonResponse({"error": _("`role` is required")}, 400)
-        role = request.POST["role"]
+    role = request.json.get("role", request.POST.get("role"))
+    if role is None:
+        return JsonResponse({"error": _("`role` is required")}, 400)
 
+    old_location = loc_mapper().translate_locator_to_location(locator)
     if role == "instructor":
-        if not has_access(request.user, location, role=INSTRUCTOR_ROLE_NAME):
+        if not has_access(request.user, locator, role=INSTRUCTOR_ROLE_NAME):
             msg = {
                 "error": _("Only instructors may create other instructors")
             }
@@ -253,28 +197,3 @@ def _course_team_user(request, location, email):
         CourseEnrollment.enroll(user, old_location.course_id)
 
     return JsonResponse()
-
-
-def _get_course_creator_status(user):
-    """
-    Helper method for returning the course creator status for a particular user,
-    taking into account the values of DISABLE_COURSE_CREATION and ENABLE_CREATOR_GROUP.
-
-    If the user passed in has not previously visited the index page, it will be
-    added with status 'unrequested' if the course creator group is in use.
-    """
-    if user.is_staff:
-        course_creator_status = 'granted'
-    elif settings.MITX_FEATURES.get('DISABLE_COURSE_CREATION', False):
-        course_creator_status = 'disallowed_for_this_site'
-    elif settings.MITX_FEATURES.get('ENABLE_CREATOR_GROUP', False):
-        course_creator_status = get_course_creator_status(user)
-        if course_creator_status is None:
-            # User not grandfathered in as an existing user, has not previously visited the dashboard page.
-            # Add the user to the course creator admin table with status 'unrequested'.
-            add_user_with_status_unrequested(user)
-            course_creator_status = get_course_creator_status(user)
-    else:
-        course_creator_status = 'granted'
-
-    return course_creator_status

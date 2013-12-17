@@ -29,6 +29,11 @@ class Command(BaseCommand):
                     dest='noop',
                     default=False,
                     help="Don't add certificate requests to the queue"),
+        make_option('--insecure',
+                    action='store_true',
+                    dest='insecure',
+                    default=False,
+                    help="Don't use https for the callback url to the LMS, useful in http test environments"),
         make_option('-c', '--course',
                     metavar='COURSE_ID',
                     dest='course',
@@ -83,9 +88,12 @@ class Command(BaseCommand):
                     "groups").order_by('username')
 
             xq = XQueueCertInterface()
+            if options['insecure']:
+                xq.use_https = False
             total = enrolled_students.count()
             count = 0
             start = datetime.datetime.now(UTC)
+
             for student in enrolled_students:
                 count += 1
                 if count % STATUS_INTERVAL == 0:

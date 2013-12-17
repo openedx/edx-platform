@@ -5,7 +5,7 @@ import datetime
 from pytz import UTC
 from django.conf import settings
 from django.test.utils import override_settings
-
+from django.test.client import RequestFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.django import editable_modulestore
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -25,6 +25,7 @@ class AnonymousIndexPageTest(ModuleStoreTestCase):
     """
     def setUp(self):
         self.store = editable_modulestore()
+        self.factory = RequestFactory()
         self.course = CourseFactory.create()
         self.course.days_early_for_beta = 5
         self.course.enrollment_start = datetime.datetime.now(UTC) + datetime.timedelta(days=3)
@@ -32,7 +33,11 @@ class AnonymousIndexPageTest(ModuleStoreTestCase):
 
     @override_settings(MITX_FEATURES=MITX_FEATURES_WITH_STARTDATE)
     def test_none_user_index_access_with_startdate_fails(self):
-        with self.assertRaises(Exception):
+        """
+        This was a "before" test for a bugfix.  If someone fixes the bug another way in the future
+        and this test begins failing (but the other two pass), then feel free to delete this test.
+        """
+        with self.assertRaisesRegexp(AttributeError, "'NoneType' object has no attribute 'is_authenticated'"):
             student.views.index(self.factory.get('/'), user=None)  # pylint: disable=E1101
 
     @override_settings(MITX_FEATURES=MITX_FEATURES_WITH_STARTDATE)

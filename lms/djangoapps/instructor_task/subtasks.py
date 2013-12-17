@@ -8,8 +8,9 @@ import math
 
 from celery.utils.log import get_task_logger
 from celery.states import SUCCESS, READY_STATES, RETRY
+from dogapi import dog_stats_api
 
-from django.db import transaction
+from django.db import transaction, DatabaseError
 from django.core.cache import cache
 
 from instructor_task.models import InstructorTask, PROGRESS, QUEUING
@@ -18,6 +19,9 @@ TASK_LOG = get_task_logger(__name__)
 
 # Lock expiration should be long enough to allow a subtask to complete.
 SUBTASK_LOCK_EXPIRE = 60 * 10  # Lock expires in 10 minutes
+# Number of times to retry if a subtask update encounters a lock on the InstructorTask.
+# (These are recursive retries, so don't make this number too large.)
+MAX_DATABASE_LOCK_RETRIES = 5
 
 
 class DuplicateTaskException(Exception):
@@ -361,6 +365,7 @@ def check_subtask_is_valid(entry_id, current_task_id, new_subtask_status):
         format_str = "Unexpected task_id '{}': unable to find subtasks of instructor task '{}': rejecting task {}"
         msg = format_str.format(current_task_id, entry, new_subtask_status)
         TASK_LOG.warning(msg)
+        dog_stats_api.increment('instructor_task.subtask.duplicate.nosubtasks', tags=[entry.course_id])
         raise DuplicateTaskException(msg)
 
     # Confirm that the InstructorTask knows about this particular subtask.
@@ -370,6 +375,7 @@ def check_subtask_is_valid(entry_id, current_task_id, new_subtask_status):
         format_str = "Unexpected task_id '{}': unable to find status for subtask of instructor task '{}': rejecting task {}"
         msg = format_str.format(current_task_id, entry, new_subtask_status)
         TASK_LOG.warning(msg)
+        dog_stats_api.increment('instructor_task.subtask.duplicate.unknown', tags=[entry.course_id])
         raise DuplicateTaskException(msg)
 
     # Confirm that the InstructorTask doesn't think that this subtask has already been
@@ -380,6 +386,7 @@ def check_subtask_is_valid(entry_id, current_task_id, new_subtask_status):
         format_str = "Unexpected task_id '{}': already completed - status {} for subtask of instructor task '{}': rejecting task {}"
         msg = format_str.format(current_task_id, subtask_status, entry, new_subtask_status)
         TASK_LOG.warning(msg)
+        dog_stats_api.increment('instructor_task.subtask.duplicate.completed', tags=[entry.course_id])
         raise DuplicateTaskException(msg)
 
     # Confirm that the InstructorTask doesn't think that this subtask is already being
@@ -393,6 +400,7 @@ def check_subtask_is_valid(entry_id, current_task_id, new_subtask_status):
             format_str = "Unexpected task_id '{}': already retried - status {} for subtask of instructor task '{}': rejecting task {}"
             msg = format_str.format(current_task_id, subtask_status, entry, new_subtask_status)
             TASK_LOG.warning(msg)
+            dog_stats_api.increment('instructor_task.subtask.duplicate.retried', tags=[entry.course_id])
             raise DuplicateTaskException(msg)
 
     # Now we are ready to start working on this.  Try to lock it.
@@ -402,11 +410,46 @@ def check_subtask_is_valid(entry_id, current_task_id, new_subtask_status):
         format_str = "Unexpected task_id '{}': already being executed - for subtask of instructor task '{}'"
         msg = format_str.format(current_task_id, entry)
         TASK_LOG.warning(msg)
+        dog_stats_api.increment('instructor_task.subtask.duplicate.locked', tags=[entry.course_id])
         raise DuplicateTaskException(msg)
 
 
+def update_subtask_status(entry_id, current_task_id, new_subtask_status, retry_count=0):
+    """
+    Update the status of the subtask in the parent InstructorTask object tracking its progress.
+
+    Because select_for_update is used to lock the InstructorTask object while it is being updated,
+    multiple subtasks updating at the same time may time out while waiting for the lock.
+    The actual update operation is surrounded by a try/except/else that permits the update to be
+    retried if the transaction times out.
+
+    The subtask lock acquired in the call to check_subtask_is_valid() is released here, only when
+    the attempting of retries has concluded.
+    """
+    try:
+        _update_subtask_status(entry_id, current_task_id, new_subtask_status)
+    except DatabaseError:
+        # If we fail, try again recursively.
+        retry_count += 1
+        if retry_count < MAX_DATABASE_LOCK_RETRIES:
+            TASK_LOG.info("Retrying to update status for subtask %s of instructor task %d with status %s:  retry %d",
+                          current_task_id, entry_id, new_subtask_status, retry_count)
+            dog_stats_api.increment('instructor_task.subtask.retry_after_failed_update')
+            update_subtask_status(entry_id, current_task_id, new_subtask_status, retry_count)
+        else:
+            TASK_LOG.info("Failed to update status after %d retries for subtask %s of instructor task %d with status %s",
+                          retry_count, current_task_id, entry_id, new_subtask_status)
+            dog_stats_api.increment('instructor_task.subtask.failed_after_update_retries')
+            raise
+    finally:
+        # Only release the lock on the subtask when we're done trying to update it.
+        # Note that this will be called each time a recursive call to update_subtask_status()
+        # returns.  Fortunately, it's okay to release a lock that has already been released.
+        _release_subtask_lock(current_task_id)
+
+
 @transaction.commit_manually
-def update_subtask_status(entry_id, current_task_id, new_subtask_status):
+def _update_subtask_status(entry_id, current_task_id, new_subtask_status):
     """
     Update the status of the subtask in the parent InstructorTask object tracking its progress.
 
@@ -487,16 +530,15 @@ def update_subtask_status(entry_id, current_task_id, new_subtask_status):
         entry.subtasks = json.dumps(subtask_dict)
         entry.task_output = InstructorTask.create_output_for_success(task_progress)
 
-        TASK_LOG.info("Task output updated to %s for subtask %s of instructor task %d",
-                      entry.task_output, current_task_id, entry_id)
         TASK_LOG.debug("about to save....")
         entry.save()
+        TASK_LOG.info("Task output updated to %s for subtask %s of instructor task %d",
+                      entry.task_output, current_task_id, entry_id)
     except Exception:
         TASK_LOG.exception("Unexpected error while updating InstructorTask.")
         transaction.rollback()
+        dog_stats_api.increment('instructor_task.subtask.update_exception')
         raise
     else:
         TASK_LOG.debug("about to commit....")
         transaction.commit()
-    finally:
-        _release_subtask_lock(current_task_id)

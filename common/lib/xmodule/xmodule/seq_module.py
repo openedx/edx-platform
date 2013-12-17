@@ -38,7 +38,7 @@ class SequenceModule(SequenceFields, XModule):
 
 
     def __init__(self, *args, **kwargs):
-        XModule.__init__(self, *args, **kwargs)
+        super(SequenceModule, self).__init__(*args, **kwargs)
 
         # if position is specified in system, then use that instead
         if getattr(self.system, 'position', None) is not None:
@@ -98,6 +98,7 @@ class SequenceModule(SequenceFields, XModule):
                   'item_id': self.id,
                   'position': self.position,
                   'tag': self.location.category,
+                  'ajax_url': self.system.ajax_url,
                   }
 
         fragment.add_content(self.system.render_template('seq_module.html', params))

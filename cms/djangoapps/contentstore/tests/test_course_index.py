@@ -3,7 +3,6 @@ Unit tests for getting the list of courses and the course outline.
 """
 import json
 import lxml
-from django.core.urlresolvers import reverse
 
 from contentstore.tests.utils import CourseTestCase
 from xmodule.modulestore.django import loc_mapper
@@ -31,7 +30,7 @@ class TestCourseIndex(CourseTestCase):
         """
         Test getting the list of courses and then pulling up their outlines
         """
-        index_url = reverse('contentstore.views.index')
+        index_url = '/course'
         index_response = authed_client.get(index_url, {}, HTTP_ACCEPT='text/html')
         parsed_html = lxml.html.fromstring(index_response.content)
         course_link_eles = parsed_html.find_class('course-link')
@@ -60,8 +59,7 @@ class TestCourseIndex(CourseTestCase):
         """
         Test the error conditions for the access
         """
-        locator = loc_mapper().translate_location(self.course.location.course_id, self.course.location, False, True)
-        outline_url = locator.url_reverse('course/', '')
+        outline_url = self.course_locator.url_reverse('course/', '')
         # register a non-staff member and try to delete the course branch
         non_staff_client, _ = self.createNonStaffAuthedUserClient()
         response = non_staff_client.delete(outline_url, {}, HTTP_ACCEPT='application/json')

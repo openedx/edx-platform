@@ -33,21 +33,29 @@ define(
 [],
 function () {
     return function (state) {
+        var dfd = $.Deferred();
+
         state.focusGrabber = {};
 
         _makeFunctionsPublic(state);
         _renderElements(state);
         _bindHandlers(state);
+
+        dfd.resolve();
+        return dfd.promise();
     };
 
 
     // Private functions.
 
     function _makeFunctionsPublic(state) {
-        state.focusGrabber.enableFocusGrabber  = _.bind(enableFocusGrabber, state);
-        state.focusGrabber.disableFocusGrabber = _.bind(disableFocusGrabber, state);
+        var methodsDict = {
+            disableFocusGrabber: disableFocusGrabber,
+            enableFocusGrabber: enableFocusGrabber,
+            onFocus: onFocus
+        };
 
-        state.focusGrabber.onFocus = _.bind(onFocus, state);
+        state.bindTo(methodsDict, state.focusGrabber, state);
     }
 
     function _renderElements(state) {

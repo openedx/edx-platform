@@ -9,8 +9,7 @@ from collections import namedtuple
 from django.utils.translation import ugettext as _
 from django.db.models import Q
 
-Mode = namedtuple('Mode', ['slug', 'name', 'min_price', 'suggested_prices', 'currency', 'expiration_date'])
-
+Mode = namedtuple('Mode', ['slug', 'name', 'min_price', 'suggested_prices', 'currency', 'expiration_datetime'])
 
 class CourseMode(models.Model):
     """
@@ -39,6 +38,8 @@ class CourseMode(models.Model):
     # turn this mode off after the given expiration date
     expiration_date = models.DateField(default=None, null=True, blank=True)
 
+    expiration_datetime = models.DateTimeField(default=None, null=True, blank=True)
+
     DEFAULT_MODE = Mode('honor', _('Honor Code Certificate'), 0, '', 'usd', None)
     DEFAULT_MODE_SLUG = 'honor'
 
@@ -55,15 +56,15 @@ class CourseMode(models.Model):
         """
         now = datetime.now(pytz.UTC)
         found_course_modes = cls.objects.filter(Q(course_id=course_id) &
-                                                (Q(expiration_date__isnull=True) |
-                                                Q(expiration_date__gte=now)))
+                                                (Q(expiration_datetime__isnull=True) |
+                                                Q(expiration_datetime__gte=now)))
         modes = ([Mode(
             mode.mode_slug,
             mode.mode_display_name,
             mode.min_price,
             mode.suggested_prices,
             mode.currency,
-            mode.expiration_date
+            mode.expiration_datetime
         ) for mode in found_course_modes])
         if not modes:
             modes = [cls.DEFAULT_MODE]
@@ -72,8 +73,8 @@ class CourseMode(models.Model):
     @classmethod
     def modes_for_course_dict(cls, course_id):
         """
-        Returns the modes for a particular course as a dictionary with
-        the mode slug as the key
+        Returns the non-expired modes for a particular course as a
+        dictionary with the mode slug as the key
         """
         return {mode.slug: mode for mode in cls.modes_for_course(course_id)}
 
@@ -81,6 +82,8 @@ class CourseMode(models.Model):
     def mode_for_course(cls, course_id, mode_slug):
         """
         Returns the mode for the course corresponding to mode_slug.
+
+        Returns only non-expired modes.
 
         If this particular mode is not set for the course, returns None
         """
@@ -95,7 +98,8 @@ class CourseMode(models.Model):
     @classmethod
     def min_course_price_for_currency(cls, course_id, currency):
         """
-        Returns the minimum price of the course in the appropriate currency over all the course's modes.
+        Returns the minimum price of the course in the appropriate currency over all the course's
+        non-expired modes.
         If there is no mode found, will return the price of DEFAULT_MODE, which is 0
         """
         modes = cls.modes_for_course(course_id)

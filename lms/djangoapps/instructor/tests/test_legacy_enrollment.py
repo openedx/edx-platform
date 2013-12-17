@@ -197,7 +197,7 @@ class TestInstructorEnrollsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
         course = self.course
 
         # Create activated, but not enrolled, user
-        UserFactory.create(username="student3_0", email="student3_0@test.com")
+        UserFactory.create(username="student3_0", email="student3_0@test.com", first_name='Autoenrolled')
 
         url = reverse('instructor_dashboard', kwargs={'course_id': course.id})
         response = self.client.post(url, {'action': 'Enroll multiple students', 'multiple_students': 'student3_0@test.com, student3_1@test.com, student3_2@test.com', 'auto_enroll': 'on', 'email_students': 'on'})
@@ -217,12 +217,12 @@ class TestInstructorEnrollsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
         )
         self.assertEqual(
             mail.outbox[0].body,
-            "Dear Robot Test\n\nYou have been enrolled in Robot Super Course "
+            "Dear Autoenrolled Test\n\nYou have been enrolled in Robot Super Course "
             "at edx.org by a member of the course staff. "
             "The course should now appear on your edx.org dashboard.\n\n"
             "To start accessing course materials, please visit "
             "https://edx.org/courses/MITx/999/Robot_Super_Course\n\n"
-            "----\nThis email was automatically sent from edx.org to Robot Test"
+            "----\nThis email was automatically sent from edx.org to Autoenrolled Test"
         )
 
         self.assertEqual(

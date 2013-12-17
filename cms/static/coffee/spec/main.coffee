@@ -182,7 +182,7 @@ define([
     "coffee/spec/main_spec",
 
     "coffee/spec/models/course_spec", "coffee/spec/models/metadata_spec",
-    "coffee/spec/models/module_spec", "coffee/spec/models/section_spec",
+    "coffee/spec/models/section_spec",
     "coffee/spec/models/settings_course_grader_spec",
     "coffee/spec/models/settings_grading_spec", "coffee/spec/models/textbook_spec",
     "coffee/spec/models/upload_spec",
@@ -193,9 +193,12 @@ define([
     "coffee/spec/views/overview_spec",
     "coffee/spec/views/textbook_spec", "coffee/spec/views/upload_spec",
 
-    "js_spec/transcripts/utils_spec", "js_spec/transcripts/editor_spec",
-    "js_spec/transcripts/videolist_spec", "js_spec/transcripts/message_manager_spec",
-    "js_spec/transcripts/file_uploader_spec"
+    "js/spec/transcripts/utils_spec", "js/spec/transcripts/editor_spec",
+    "js/spec/transcripts/videolist_spec", "js/spec/transcripts/message_manager_spec",
+    "js/spec/transcripts/file_uploader_spec",
+
+    "js/spec/utils/module_spec",
+    "js/spec/models/explicit_url_spec"
 
     # these tests are run separate in the cms-squire suite, due to process
     # isolation issues with Squire.js

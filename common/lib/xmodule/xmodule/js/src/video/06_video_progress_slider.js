@@ -12,14 +12,18 @@ define(
 'video/06_video_progress_slider.js',
 [],
 function () {
-
     // VideoProgressSlider() function - what this module "exports".
     return function (state) {
+        var dfd = $.Deferred();
+
         state.videoProgressSlider = {};
 
         _makeFunctionsPublic(state);
         _renderElements(state);
         // No callbacks to DOM events (click, mousemove, etc.).
+
+        dfd.resolve();
+        return dfd.promise();
     };
 
     // ***************************************************************
@@ -31,18 +35,17 @@ function () {
     //     Functions which will be accessible via 'state' object. When called,
     //     these functions will get the 'state' object as a context.
     function _makeFunctionsPublic(state) {
-        state.videoProgressSlider.onSlide        = _.bind(onSlide, state);
-        state.videoProgressSlider.onStop         = _.bind(onStop, state);
-        state.videoProgressSlider.updatePlayTime = _.bind(
-            updatePlayTime, state
-        );
+        var methodsDict = {
+            buildSlider: buildSlider,
+            getRangeParams: getRangeParams,
+            onSlide: onSlide,
+            onStop: onStop,
+            updatePlayTime: updatePlayTime,
+            updateStartEndTimeRegion: updateStartEndTimeRegion,
+            notifyThroughHandleEnd: notifyThroughHandleEnd
+        };
 
-        //Added for tests -- JM
-        state.videoProgressSlider.buildSlider = _.bind(buildSlider, state);
-
-        state.videoProgressSlider.updateStartEndTimeRegion = _.bind(
-            updateStartEndTimeRegion, state
-        );
+        state.bindTo(methodsDict, state.videoProgressSlider, state);
     }
 
     // function _renderElements(state)
@@ -50,7 +53,7 @@ function () {
     //     Create any necessary DOM elements, attach them, and set their
     //     initial configuration. Also make the created DOM elements available
     //     via the 'state' object. Much easier to work this way - you don't
-    // have to do repeated jQuery element selects.
+    //     have to do repeated jQuery element selects.
     function _renderElements(state) {
         if (!onTouchBasedDevice()) {
             state.videoProgressSlider.el = state.videoControl.sliderEl;
@@ -99,28 +102,31 @@ function () {
     }
 
     function updateStartEndTimeRegion(params) {
-        var left, width, start, end;
+        var left, width, start, end, duration, rangeParams;
 
         // We must have a duration in order to determine the area of range.
         // It also must be non-zero.
         if (!params.duration) {
             return;
+        } else {
+            duration = params.duration;
         }
 
-        // If the range spans the entire length of video, we don't do anything.
-        if (!this.config.start && !this.config.end) {
-            return;
-        }
-
-        start = this.config.start;
+        start = this.videoPlayer.startTime;
 
         // If end is set to null, then we set it to the end of the video. We
         // know that start is not a the beginning, therefore we must build a
         // range.
-        end = this.config.end || params.duration;
+        end = this.videoPlayer.endTime || duration;
 
-        left = (100 * (start / params.duration)).toFixed(1);
-        width = (100 * ((end - start) / params.duration)).toFixed(1);
+        // Because JavaScript has weird rounding rules when a series of
+        // mathematical operations are performed in a single statement, we will
+        // split everything up into smaller statements.
+        //
+        // This will ensure that visually, the start-end range aligns nicely
+        // with actual starting and ending point of the video.
+
+        rangeParams = getRangeParams(start, end, duration);
 
         if (!this.videoProgressSlider.sliderRange) {
             this.videoProgressSlider.sliderRange = $('<div />', {
@@ -129,8 +135,8 @@ function () {
                        'ui-corner-all ' +
                        'slider-range'
             }).css({
-                left: left + '%',
-                width: width + '%'
+                left: rangeParams.left,
+                width: rangeParams.width
             });
 
             this.videoProgressSlider.sliderProgress
@@ -138,10 +144,21 @@ function () {
         } else {
             this.videoProgressSlider.sliderRange
                 .css({
-                    left: left + '%',
-                    width: width + '%'
+                    left: rangeParams.left,
+                    width: rangeParams.width
                 });
         }
+    }
+
+    function getRangeParams(startTime, endTime, duration) {
+        var step = 100 / duration,
+            left = startTime * step,
+            width = endTime * step - left;
+
+        return {
+            left: left + '%',
+            width: width + '%'
+        };
     }
 
     function onSlide(event, ui) {
@@ -178,16 +195,44 @@ function () {
         }, 200);
     }
 
-    // Changed for tests -- JM: Check if it is the cause of Chrome Bug Valera
-    // noticed
     function updatePlayTime(params) {
+        var time = Math.floor(params.time),
+            duration = Math.floor(params.duration);
+
         if (
             (this.videoProgressSlider.slider) &&
             (!this.videoProgressSlider.frozen)
         ) {
             this.videoProgressSlider.slider
-                .slider('option', 'max', params.duration)
-                .slider('option', 'value', params.time);
+                .slider('option', 'max', duration)
+                .slider('option', 'value', time);
+        }
+    }
+
+    // When the video stops playing (either because the end was reached, or
+    // because endTime was reached), the screen reader must be notified that
+    // the video is no longer playing. We do this by a little trick. Setting
+    // the title attribute of the slider know to "video ended", and focusing
+    // on it. The screen reader will read the attr text.
+    //
+    // The user can then tab his way forward, landing on the next control
+    // element, the Play button.
+    //
+    // @param params  -  object with property `end`. If set to true, the
+    //                   function must set the title attribute to
+    //                   `video ended`;
+    //                   if set to false, the function must reset the attr to
+    //                   it's original state.
+    //
+    // This function will be triggered from VideoPlayer methods onEnded(),
+    // onPlay(), and update() (update method handles endTime).
+    function notifyThroughHandleEnd(params) {
+        if (params.end) {
+            this.videoProgressSlider.handle
+                .attr('title', 'video ended')
+                .focus();
+        } else {
+            this.videoProgressSlider.handle.attr('title', 'video position');
         }
     }
 

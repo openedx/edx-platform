@@ -6,7 +6,10 @@ define(["codemirror", "utility"],
             var $codeMirror = CodeMirror.fromTextArea(textArea, {
                 mode: "text/html",
                 lineNumbers: true,
-                lineWrapping: true
+                lineWrapping: true,
+                onChange: function () {
+                    $('.save-button').removeClass('is-disabled');
+                }
             });
             $codeMirror.setValue(content);
             $codeMirror.clearHistory();

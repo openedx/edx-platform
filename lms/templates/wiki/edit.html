@@ -1,30 +1,57 @@
 {% extends "wiki/article.html" %}
-{% load wiki_tags i18n %}
+{% load wiki_tags i18n sekizai_tags %}
 {% load url from future %}
 
 {% block pagetitle %}{% trans "Edit" %}: {{ article.current_revision.title }}{% endblock %}
 
 {% block wiki_contents_tab %}
 
-<form method="POST" class="form-horizontal" id="article_edit_form" enctype="multipart/form-data">
+{% addtoblock "js" %}
+<script type="text/javascript">
+  $(document).ready(
+    function ($) {
+      accessible_modal("#cheatsheetLink", "#cheatsheetModal .close-modal", "#cheatsheetModal", ".content-wrapper");
+      accessible_modal("#previewButton", "#previewModal .close-modal", "#previewModal", ".content-wrapper");
+      $("#previewModalBackToEditor").click(function (e) {
+        $("#previewModal .close-modal").click();
+        e.preventDefault();
+      });
+    }
+  );
+</script>
+{% endaddtoblock %}
+
+<form method="POST" class="form-horizontal" id="article_edit_form" name="article_edit_form" enctype="multipart/form-data">
   {% include "wiki/includes/editor.html" %}
   <div class="form-actions">
       <button type="submit" name="save" value="1" class="btn btn-large btn-primary" onclick="this.form.target=''; this.form.action='{% url 'wiki:edit' path=urlpath.path article_id=article.id %}'">
         <span class="icon-ok"></span>
         {% trans "Save changes" %}
       </button>
-      <button type="submit" name="preview" value="1" class="btn btn-large" onclick="$('#previewModal').modal('show'); this.form.target = 'previewWindow'; this.form.action = '{% url 'wiki:preview' path=urlpath.path article_id=article.id %}';">
+      <a class="btn btn-large" id="previewButton" href="#previewModal" rel="leanModal"
+        onclick="
+          document.article_edit_form.target='previewWindow';
+          document.article_edit_form.action='{% url 'wiki:preview' path=urlpath.path article_id=article.id %}';
+          document.article_edit_form.submit();">
         <span class="icon-eye-open"></span>
         {% trans "Preview" %}
-      </button>
-      
+      </a>
+
       <a href="{% url 'wiki:delete' path=urlpath.path article_id=article.id %}" class="pull-right btn btn-danger">
         <span class="icon-trash"></span>
         {% trans "Delete article" %}
       </a>
-      
+
   </div>
-  <div class="modal hide fade" id="previewModal">
+  <section id="previewModal" class="modal" aria-hidden="true">
+    <div class="inner-wrapper" role="dialog" aria-labelledby="preview-title">
+      <button class="close-modal">&#10005; <span class="sr">{% trans 'Close Modal' %}</span></button>
+
+      <header>
+        <h2 id="preview-title">{% trans "Wiki Preview" %}<span class="sr">, {% trans "modal open" %}</span></h2>
+        <hr/>
+      </header>
+
     <div class="modal-body">
       <iframe name="previewWindow" frameborder="0"></iframe>
     </div>
@@ -34,16 +61,13 @@
         {% trans "Save changes" %}
       </button>
 
-      <a href="#" class="btn btn-large" data-dismiss="modal">
+      <a id="previewModalBackToEditor" href="#" class="btn btn-large">
         <span class="icon-circle-arrow-left"></span>
         {% trans "Back to editor" %}
       </a>
     </div>
-  </div>
+  </section>
   {% include "wiki/includes/cheatsheet.html" %}
 </form>
 
 {% endblock %}
-
-
-

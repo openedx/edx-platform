@@ -25,6 +25,7 @@ Specific Problem Types
    course_data_formats/drag_and_drop/drag_and_drop_input.rst
    course_data_formats/graphical_slider_tool/graphical_slider_tool.rst
    course_data_formats/poll_module/poll_module.rst
+   course_data_formats/lti_module/lti.rst
    course_data_formats/conditional_module/conditional_module.rst
    course_data_formats/word_cloud/word_cloud.rst
    course_data_formats/custom_response.rst

@@ -84,6 +84,23 @@
   }
 }
 
+// blue primary error color
+%btn-primary-error {
+  @extend %btn-primary;
+  box-shadow: 0 2px 1px 0 shade($error-color, 25%);
+  background: shade($error-color, 25%);
+  color: $white;
+
+  &:hover, &:active {
+    background: $error-color;
+    color: $white;
+  }
+
+  &.disabled, &[disabled] {
+    box-shadow: none;
+  }
+}
+
 // blue primary button
 %btn-primary-blue {
   @extend %btn-primary;

@@ -115,10 +115,7 @@ def when_i_send_an_email(step, recipient):
         editor.fill('test message')
 
     # Click send
-    world.css_click('input[name="send"]')
-
-    # Confirm the alert
-    world.browser.get_alert().accept()
+    world.css_click('input[name="send"]', dismiss_alert=True)
 
     # Expect to see a message that the email was sent
     expected_msg = "Your email was successfully queued for sending."

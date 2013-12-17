@@ -1,10 +1,10 @@
 import json
-from mock import Mock, MagicMock
 import unittest
+from mock import Mock, MagicMock
+from webob.multidict import MultiDict
 
 from xmodule.open_ended_grading_classes.self_assessment_module import SelfAssessmentModule
 from xmodule.modulestore import Location
-from xmodule.tests.test_util_open_ended import MockQueryDict
 from lxml import etree
 
 from . import get_test_system
@@ -21,10 +21,11 @@ class SelfAssessmentTest(unittest.TestCase):
          </rubric></rubric>'''
 
     prompt = etree.XML("<prompt>This is sample prompt text.</prompt>")
-    definition = {'rubric': rubric,
-                  'prompt': prompt,
-                  'submitmessage': 'Shall we submit now?',
-                  'hintprompt': 'Consider this...',
+    definition = {
+        'rubric': rubric,
+        'prompt': prompt,
+        'submitmessage': 'Shall we submit now?',
+        'hintprompt': 'Consider this...',
     }
 
     location = Location(["i4x", "edX", "sa_test", "selfassessment",
@@ -33,12 +34,6 @@ class SelfAssessmentTest(unittest.TestCase):
     descriptor = Mock()
 
     def setUp(self):
-        state = json.dumps({'student_answers': ["Answer 1", "answer 2", "answer 3"],
-                            'scores': [0, 1],
-                            'hints': ['o hai'],
-                            'state': SelfAssessmentModule.INITIAL,
-                            'attempts': 2})
-
         self.static_data = {
             'max_attempts': 10,
             'rubric': etree.XML(self.rubric),
@@ -56,13 +51,18 @@ class SelfAssessmentTest(unittest.TestCase):
                 'min_to_calibrate': 3,
                 'max_to_calibrate': 6,
                 'peer_grade_finished_submissions_when_none_pending': False,
-                }
+            }
         }
 
-        self.module = SelfAssessmentModule(get_test_system(), self.location,
-                                           self.definition,
-                                           self.descriptor,
-                                           self.static_data)
+        system = get_test_system()
+        system.xmodule_instance = Mock(scope_ids=Mock(usage_id='dummy-usage-id'))
+        self.module = SelfAssessmentModule(
+            system,
+            self.location,
+            self.definition,
+            self.descriptor,
+            self.static_data
+        )
 
     def test_get_html(self):
         html = self.module.get_html(self.module.system)
@@ -83,7 +83,7 @@ class SelfAssessmentTest(unittest.TestCase):
 
         mock_query_dict = MagicMock()
         mock_query_dict.__getitem__.side_effect = get_fake_item
-        mock_query_dict.getlist = get_fake_item
+        mock_query_dict.getall = get_fake_item
 
         self.module.peer_gs.get_data_for_location = get_data_for_location
 
@@ -140,8 +140,7 @@ class SelfAssessmentTest(unittest.TestCase):
         self.assertEqual(test_module.latest_answer(), submitted_response)
 
         # Mock saving an assessment.
-        assessment = [0]
-        assessment_dict = MockQueryDict({'assessment': sum(assessment), 'score_list[]': assessment})
+        assessment_dict = MultiDict({'assessment': 0, 'score_list[]': 0})
         data = test_module.handle_ajax("save_assessment", assessment_dict, get_test_system())
         self.assertTrue(json.loads(data)['success'])
 

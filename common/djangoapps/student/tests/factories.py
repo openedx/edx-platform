@@ -1,22 +1,34 @@
+"""Provides factories for student models."""
 from student.models import (User, UserProfile, Registration,
                             CourseEnrollmentAllowed, CourseEnrollment,
                             PendingEmailChange, UserStanding,
                             )
 from course_modes.models import CourseMode
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, AnonymousUser
 from datetime import datetime
-from factory import DjangoModelFactory, SubFactory, PostGenerationMethodCall, post_generation, Sequence
+from factory import (
+    DjangoModelFactory,
+    Factory,
+    LazyAttribute,
+    post_generation,
+    PostGenerationMethodCall,
+    Sequence,
+    SubFactory,
+)
 from uuid import uuid4
 from pytz import UTC
 
 # Factories don't have __init__ methods, and are self documenting
-# pylint: disable=W0232
+# pylint: disable=W0232, C0111
 
 
 class GroupFactory(DjangoModelFactory):
     FACTORY_FOR = Group
+    FACTORY_DJANGO_GET_OR_CREATE = ('name', )
 
-    name = u'staff_MITx/999/Robot_Super_Course'
+    name = Sequence(u'group{0}'.format)
+
+
 
 class UserStandingFactory(DjangoModelFactory):
     FACTORY_FOR = UserStanding
@@ -28,9 +40,10 @@ class UserStandingFactory(DjangoModelFactory):
 
 class UserProfileFactory(DjangoModelFactory):
     FACTORY_FOR = UserProfile
+    FACTORY_DJANGO_GET_OR_CREATE = ('user', )
 
     user = None
-    name = u'Robot Test'
+    name = LazyAttribute(u'{0.user.first_name} {0.user.last_name}'.format)
     level_of_education = None
     gender = u'm'
     mailing_address = None
@@ -47,6 +60,7 @@ class CourseModeFactory(DjangoModelFactory):
     suggested_prices = ''
     currency = 'usd'
 
+
 class RegistrationFactory(DjangoModelFactory):
     FACTORY_FOR = Registration
 
@@ -56,6 +70,7 @@ class RegistrationFactory(DjangoModelFactory):
 
 class UserFactory(DjangoModelFactory):
     FACTORY_FOR = User
+    FACTORY_DJANGO_GET_OR_CREATE = ('email', 'username')
 
     username = Sequence(u'robot{0}'.format)
     email = Sequence(u'robot+test+{0}@edx.org'.format)
@@ -70,7 +85,7 @@ class UserFactory(DjangoModelFactory):
     date_joined = datetime(2011, 1, 1, tzinfo=UTC)
 
     @post_generation
-    def profile(obj, create, extracted, **kwargs):
+    def profile(obj, create, extracted, **kwargs):  # pylint: disable=unused-argument, no-self-argument
         if create:
             obj.save()
             return UserProfileFactory.create(user=obj, **kwargs)

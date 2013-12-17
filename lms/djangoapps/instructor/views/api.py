@@ -8,6 +8,7 @@ Many of these GETs may become PUTs in the future.
 
 import re
 import logging
+import json
 import requests
 from django.conf import settings
 from django_future.csrf import ensure_csrf_cookie
@@ -30,10 +31,12 @@ from courseware.models import StudentModule
 from student.models import unique_id_for_user
 import instructor_task.api
 from instructor_task.api_helper import AlreadyRunningError
+from instructor_task.views import get_task_completion_info
+from instructor_task.models import GradesStore
 import instructor.enrollment as enrollment
 from instructor.enrollment import enroll_email, unenroll_email, get_email_params
 from instructor.views.tools import strip_if_string, get_student_from_identifier
-import instructor.access as access
+from instructor.access import list_with_level, allow_access, revoke_access, update_forum_role
 import analytics.basic
 import analytics.distributions
 import analytics.csvs
@@ -155,7 +158,7 @@ def require_level(level):
 
     `level` is in ['instructor', 'staff']
     if `level` is 'staff', instructors will also be allowed, even
-        if they are not int he staff group.
+        if they are not in the staff group.
     """
     if level not in ['instructor', 'staff']:
         raise ValueError("unrecognized level '{}'".format(level))
@@ -302,9 +305,9 @@ def modify_access(request, course_id):
         )
 
     if action == 'allow':
-        access.allow_access(course, user, rolename)
+        allow_access(course, user, rolename)
     elif action == 'revoke':
-        access.revoke_access(course, user, rolename)
+        revoke_access(course, user, rolename)
     else:
         return HttpResponseBadRequest("unrecognized action '{}'".format(action))
 
@@ -360,7 +363,7 @@ def list_course_role_members(request, course_id):
 
     response_payload = {
         'course_id': course_id,
-        rolename: map(extract_user_info, access.list_with_level(
+        rolename: map(extract_user_info, list_with_level(
             course, rolename
         )),
     }
@@ -389,7 +392,7 @@ def get_grading_config(request, course_id):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-def get_students_features(request, course_id, csv=False):  # pylint: disable=W0613
+def get_students_features(request, course_id, csv=False):  # pylint: disable=W0613, W0621
     """
     Respond with json which contains a summary of all enrolled students profile information.
 
@@ -651,13 +654,68 @@ def rescore_problem(request, course_id):
     return JsonResponse(response_payload)
 
 
+def extract_task_features(task):
+    """
+    Convert task to dict for json rendering.
+    Expects tasks have the following features:
+    * task_type (str, type of task)
+    * task_input (dict, input(s) to the task)
+    * task_id (str, celery id of the task)
+    * requester (str, username who submitted the task)
+    * task_state (str, state of task eg PROGRESS, COMPLETED)
+    * created (datetime, when the task was completed)
+    * task_output (optional)
+    """
+    # Pull out information from the task
+    features = ['task_type', 'task_input', 'task_id', 'requester', 'task_state']
+    task_feature_dict = {feature: str(getattr(task, feature)) for feature in features}
+    # Some information (created, duration, status, task message) require additional formatting
+    task_feature_dict['created'] = task.created.isoformat()
+
+    # Get duration info, if known
+    duration_sec = 'unknown'
+    if hasattr(task, 'task_output') and task.task_output is not None:
+        try:
+            task_output = json.loads(task.task_output)
+        except ValueError:
+            log.error("Could not parse task output as valid json; task output: %s", task.task_output)
+        else:
+            if 'duration_ms' in task_output:
+                duration_sec = int(task_output['duration_ms'] / 1000.0)
+    task_feature_dict['duration_sec'] = duration_sec
+
+    # Get progress status message & success information
+    success, task_message = get_task_completion_info(task)
+    status = _("Complete") if success else _("Incomplete")
+    task_feature_dict['status'] = status
+    task_feature_dict['task_message'] = task_message
+
+    return task_feature_dict
+
+
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_level('instructor')
+@require_level('staff')
+def list_background_email_tasks(request, course_id):  # pylint: disable=unused-argument
+    """
+    List background email tasks.
+    """
+    task_type = 'bulk_course_email'
+    # Specifying for the history of a single task type
+    tasks = instructor_task.api.get_instructor_task_history(course_id, task_type=task_type)
+
+    response_payload = {
+        'tasks': map(extract_task_features, tasks),
+    }
+    return JsonResponse(response_payload)
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
 def list_instructor_tasks(request, course_id):
     """
     List instructor tasks.
-    Limited to instructor access.
 
     Takes optional query paremeters.
         - With no arguments, lists running tasks.
@@ -678,21 +736,55 @@ def list_instructor_tasks(request, course_id):
     if problem_urlname:
         module_state_key = _msk_from_problem_urlname(course_id, problem_urlname)
         if student:
+            # Specifying for a single student's history on this problem
             tasks = instructor_task.api.get_instructor_task_history(course_id, module_state_key, student)
         else:
+            # Specifying for single problem's history
             tasks = instructor_task.api.get_instructor_task_history(course_id, module_state_key)
     else:
+        # If no problem or student, just get currently running tasks
         tasks = instructor_task.api.get_running_instructor_tasks(course_id)
-
-    def extract_task_features(task):
-        """ Convert task to dict for json rendering """
-        features = ['task_type', 'task_input', 'task_id', 'requester', 'created', 'task_state']
-        return dict((feature, str(getattr(task, feature))) for feature in features)
 
     response_payload = {
         'tasks': map(extract_task_features, tasks),
     }
     return JsonResponse(response_payload)
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+def list_grade_downloads(_request, course_id):
+    """
+    List grade CSV files that are available for download for this course.
+    """
+    grades_store = GradesStore.from_config()
+
+    response_payload = {
+        'downloads': [
+            dict(name=name, url=url, link='<a href="{}">{}</a>'.format(url, name))
+            for name, url in grades_store.links_for(course_id)
+        ]
+    }
+    return JsonResponse(response_payload)
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+def calculate_grades_csv(request, course_id):
+    """
+    AlreadyRunningError is raised if the course's grades are already being updated.
+    """
+    try:
+        instructor_task.api.submit_calculate_grades_csv(request, course_id)
+        success_status = _("Your grade report is being generated! You can view the status of the generation task in the 'Pending Instructor Tasks' section.")
+        return JsonResponse({"status": success_status})
+    except AlreadyRunningError:
+        already_running_status = _("A grade report generation task is already in progress. Check the 'Pending Instructor Tasks' table for the status of the task. When completed, the report will be available for download in the table below.")
+        return JsonResponse({
+            "status": already_running_status
+        })
 
 
 @ensure_csrf_cookie
@@ -837,7 +929,7 @@ def update_forum_role_membership(request, course_id):
         return HttpResponseBadRequest("Cannot revoke instructor forum admin privelages.")
 
     try:
-        access.update_forum_role_membership(course_id, user, rolename, action)
+        update_forum_role(course_id, user, rolename, action)
     except Role.DoesNotExist:
         return HttpResponseBadRequest("Role does not exist.")
 
@@ -876,7 +968,7 @@ def proxy_legacy_analytics(request, course_id):
 
     try:
         res = requests.get(url)
-    except Exception:
+    except Exception:  # pylint: disable=broad-except
         log.exception("Error requesting from analytics server at %s", url)
         return HttpResponse("Error requesting from analytics server.", status=500)
 

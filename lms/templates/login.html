@@ -16,6 +16,11 @@
       // adding js class for styling with accessibility in mind
       $('body').addClass('js').addClass(view_name);
 
+      // show forgot password modal UI if URL contains matching DOM ID
+      if ($.deparam.fragment()['forgot-password-modal'] !== undefined) {
+        $('.pwd-reset').click();
+      }
+
       // new window/tab opening
       $('a[rel="external"], a[class="new-vp"]')
       .click( function() {

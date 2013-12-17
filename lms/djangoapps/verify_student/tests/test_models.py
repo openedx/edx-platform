@@ -17,11 +17,11 @@ from util.testing import UrlResetMixin
 import verify_student.models
 
 FAKE_SETTINGS = {
-    "SOFTWARE_SECURE" : {
+    "SOFTWARE_SECURE": {
         "FACE_IMAGE_AES_KEY" : "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-        "API_ACCESS_KEY" : "BBBBBBBBBBBBBBBBBBBB",
-        "API_SECRET_KEY" : "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC",
-        "RSA_PUBLIC_KEY" : """-----BEGIN PUBLIC KEY-----
+        "API_ACCESS_KEY": "BBBBBBBBBBBBBBBBBBBB",
+        "API_SECRET_KEY": "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC",
+        "RSA_PUBLIC_KEY": """-----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAu2fUn20ZQtDpa1TKeCA/
 rDA2cEeFARjEr41AP6jqP/k3O7TeqFX6DgCBkxcjojRCs5IfE8TimBHtv/bcSx9o
 7PANTq/62ZLM9xAMpfCcU6aAd4+CVqQkXSYjj5TUqamzDFBkp67US8IPmw7I2Gaa
@@ -30,10 +30,10 @@ dyZCM9pBcvcH+60ma+nNg8GVGBAW/oLxILBtg+T3PuXSUvcu/r6lUFMHk55pU94d
 9A/T8ySJm379qU24ligMEetPk1o9CUasdaI96xfXVDyFhrzrntAmdD+HYCSPOQHz
 iwIDAQAB
 -----END PUBLIC KEY-----""",
-        "API_URL" : "http://localhost/verify_student/fake_endpoint",
-        "AWS_ACCESS_KEY" : "FAKEACCESSKEY",
-        "AWS_SECRET_KEY" : "FAKESECRETKEY",
-        "S3_BUCKET" : "fake-bucket"
+        "API_URL": "http://localhost/verify_student/fake_endpoint",
+        "AWS_ACCESS_KEY": "FAKEACCESSKEY",
+        "AWS_SECRET_KEY": "FAKESECRETKEY",
+        "S3_BUCKET": "fake-bucket"
     }
 }
 
@@ -57,10 +57,12 @@ class MockKey(object):
     def generate_url(self, duration):
         return "http://fake-edx-s3.edx.org/"
 
+
 class MockBucket(object):
     """Mocking a boto S3 Bucket object."""
     def __init__(self, name):
         self.name = name
+
 
 class MockS3Connection(object):
     """Mocking a boto S3 Connection"""
@@ -165,14 +167,14 @@ class TestPhotoVerification(TestCase):
 
         # approved
         assert_raises(VerificationException, attempt.submit)
-        attempt.approve() # no-op
-        attempt.system_error("System error") # no-op, something processed it without error
+        attempt.approve()  # no-op
+        attempt.system_error("System error")  # no-op, something processed it without error
         attempt.deny(DENY_ERROR_MSG)
 
         # denied
         assert_raises(VerificationException, attempt.submit)
-        attempt.deny(DENY_ERROR_MSG) # no-op
-        attempt.system_error("System error") # no-op, something processed it without error
+        attempt.deny(DENY_ERROR_MSG)  # no-op
+        attempt.system_error("System error")  # no-op, something processed it without error
         attempt.approve()
 
     def test_name_freezing(self):
@@ -307,3 +309,56 @@ class TestPhotoVerification(TestCase):
             attempt.save()
             assert_true(SoftwareSecurePhotoVerification.user_has_valid_or_pending(user), status)
 
+    def test_user_status(self):
+        # test for correct status when no error returned
+        user = UserFactory.create()
+        status = SoftwareSecurePhotoVerification.user_status(user)
+        self.assertEquals(status, ('none', ''))
+
+        # test for when one has been created
+        attempt = SoftwareSecurePhotoVerification(user=user)
+        attempt.status = 'approved'
+        attempt.save()
+
+        status = SoftwareSecurePhotoVerification.user_status(user)
+        self.assertEquals(status, ('approved', ''))
+
+        # create another one for the same user, make sure the right one is
+        # returned
+        attempt2 = SoftwareSecurePhotoVerification(user=user)
+        attempt2.status = 'denied'
+        attempt2.error_msg = '[{"photoIdReasons": ["Not provided"]}]'
+        attempt2.save()
+
+        status = SoftwareSecurePhotoVerification.user_status(user)
+        self.assertEquals(status, ('approved', ''))
+
+        # now delete the first one and verify that the denial is being handled
+        # properly
+        attempt.delete()
+        status = SoftwareSecurePhotoVerification.user_status(user)
+        self.assertEquals(status, ('must_reverify', "No photo ID was provided."))
+
+    def test_parse_error_msg_success(self):
+        user = UserFactory.create()
+        attempt = SoftwareSecurePhotoVerification(user=user)
+        attempt.status = 'denied'
+        attempt.error_msg = '[{"photoIdReasons": ["Not provided"]}]'
+        parsed_error_msg = attempt.parsed_error_msg()
+        self.assertEquals("No photo ID was provided.", parsed_error_msg)
+
+    def test_parse_error_msg_failure(self):
+        user = UserFactory.create()
+        attempt = SoftwareSecurePhotoVerification(user=user)
+        attempt.status = 'denied'
+        # when we can't parse into json
+        bad_messages = {
+            'Not Provided',
+            '[{"IdReasons": ["Not provided"]}]',
+            '{"IdReasons": ["Not provided"]}',
+            u'[{"ïḋṚëäṡöṅṡ": ["Ⓝⓞⓣ ⓟⓡⓞⓥⓘⓓⓔⓓ "]}]',
+        }
+        for msg in bad_messages:
+            attempt.error_msg = msg
+            parsed_error_msg = attempt.parsed_error_msg()
+            self.assertEquals(parsed_error_msg, "There was an error verifying your ID photos.")

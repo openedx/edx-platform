@@ -267,3 +267,66 @@ def show_requirements(request, course_id):
         "upgrade": upgrade,
     }
     return render_to_response("verify_student/show_requirements.html", context)
+
+
+class ReverifyView(View):
+    """
+    The main reverification view. Under similar constraints as the main verification view.
+    Has to perform these functions:
+        - take new face photo
+        - take new id photo
+        - submit photos to photo verification service
+
+    Does not need to be attached to a particular course.
+    Does not need to worry about pricing
+    """
+    @method_decorator(login_required)
+    def get(self, request):
+        """
+        display this view
+        """
+        context = {
+            "user_full_name": request.user.profile.name,
+            "error": False,
+        }
+
+        return render_to_response("verify_student/photo_reverification.html", context)
+
+    @method_decorator(login_required)
+    def post(self, request):
+        """
+        submits the reverification to SoftwareSecure
+        """
+
+        try:
+            attempt = SoftwareSecurePhotoVerification(user=request.user)
+            b64_face_image = request.POST['face_image'].split(",")[1]
+            b64_photo_id_image = request.POST['photo_id_image'].split(",")[1]
+
+            attempt.upload_face_image(b64_face_image.decode('base64'))
+            attempt.upload_photo_id_image(b64_photo_id_image.decode('base64'))
+            attempt.mark_ready()
+
+            # save this attempt
+            attempt.save()
+            # then submit it across
+            attempt.submit()
+            return HttpResponseRedirect(reverse('verify_student_reverification_confirmation'))
+        except Exception:
+            log.exception(
+                "Could not submit verification attempt for user {}".format(request.user.id)
+            )
+            context = {
+                "user_full_name": request.user.profile.name,
+                "error": True,
+            }
+            return render_to_response("verify_student/photo_reverification.html", context)
+
+
+@login_required
+def reverification_submission_confirmation(_request):
+    """
+    Shows the user a confirmation page if the submission to SoftwareSecure was successful
+    """
+
+    return render_to_response("verify_student/reverification_confirmation.html")

@@ -118,7 +118,7 @@ setup_instructor_dashboard = (idash_content) =>
       location.hash = "#{HASH_LINK_PREFIX}#{section_name}"
 
       sections_have_loaded.after ->
-        $section.data('wrapper')?.onClickTitle?()
+        $section.data('wrapper').onClickTitle()
 
       # call onExit handler if exiting a section to a different section.
       unless $section.is $active_section

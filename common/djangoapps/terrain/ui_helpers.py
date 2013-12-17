@@ -31,7 +31,7 @@ REQUIREJS_WAIT = {
 
     # Individual Unit (editing)
     re.compile('^Individual Unit \|'): [
-        "js/base", "coffee/src/models/module", "coffee/src/views/unit",
+        "js/base", "coffee/src/views/unit",
         "coffee/src/views/module_edit"],
 
     # Content - Outline
@@ -44,6 +44,12 @@ REQUIREJS_WAIT = {
     re.compile('^My Courses \|'): [
         "js/sock", "gettext", "js/base",
         "jquery.ui", "coffee/src/main", "underscore"],
+
+    # Upload
+    re.compile(r'^\s*Files & Uploads'): [
+        'js/base', 'jquery.ui', 'coffee/src/main', 'underscore',
+        'js/views/assets', 'js/views/asset'
+    ]
 }
 
 
@@ -389,12 +395,14 @@ def css_find(css, wait_time=30):
 
 
 @world.absorb
-def css_click(css_selector, index=0, wait_time=30):
+def css_click(css_selector, index=0, wait_time=30, dismiss_alert=False):
     """
     Perform a click on a CSS selector, first waiting for the element
     to be present and clickable.
 
     This method will return True if the click worked.
+
+    If `dismiss_alert` is true, dismiss any alerts that appear.
     """
     wait_for_clickable(css_selector, timeout=wait_time)
     wait_for_visible(css_selector, index=index, timeout=wait_time)
@@ -403,10 +411,16 @@ def css_click(css_selector, index=0, wait_time=30):
         msg="Element {}[{}] is present but not visible".format(css_selector, index)
     )
 
-    result = retry_on_exception(lambda: css_find(css_selector)[index].click())
-    if result:
-        wait_for_js_to_load()
-    return result
+    retry_on_exception(lambda: css_find(css_selector)[index].click())
+
+    # Dismiss any alerts that occur.
+    # We need to do this before calling `wait_for_js_to_load()`
+    # to avoid getting an unexpected alert exception
+    if dismiss_alert:
+        world.browser.get_alert().accept()
+
+    wait_for_js_to_load()
+    return True
 
 
 @world.absorb
@@ -532,18 +546,21 @@ def save_the_html(path='/tmp'):
 
 @world.absorb
 def click_course_content():
+    world.wait_for_js_to_load()
     course_content_css = 'li.nav-course-courseware'
     css_click(course_content_css)
 
 
 @world.absorb
 def click_course_settings():
+    world.wait_for_js_to_load()
     course_settings_css = 'li.nav-course-settings'
     css_click(course_settings_css)
 
 
 @world.absorb
 def click_tools():
+    world.wait_for_js_to_load()
     tools_css = 'li.nav-course-tools'
     css_click(tools_css)
 

@@ -771,21 +771,24 @@ section.problem {
       }
 
       a.full {
-        @include position(absolute, 0 0 1px 0);
+        @include position(absolute, 0 0px 1px 0px);
         @include box-sizing(border-box);
         display: block;
         padding: 4px;
-        width: 100%;
         background: #f3f3f3;
         text-align: right;
-        font-size: .8em;
+        font-size: 1em;
+
+        &.full-top{
+          @include position(absolute, 1px 0px auto 0px);
+        }
       }
     }
   }
 
   .external-grader-message {
     section {
-      padding-top: $baseline/2;
+      padding-top: ($baseline*1.5);
       padding-left: $baseline;
       background-color: #fafafa;
       color: #2c2c2c;

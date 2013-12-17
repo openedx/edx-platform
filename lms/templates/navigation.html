@@ -73,12 +73,12 @@ site_status_msg = get_site_status_msg(course_id)
         </a>
       </li>
       <li class="primary">
-        <a href="#" class="dropdown"><span class="sr">${_("More options dropdown")}</span> &#9662;</a>
-        <ul class="dropdown-menu">
+        <a href="#" class="dropdown" aria-haspopup="true" aria-expanded="false"><span class="sr">${_("More options dropdown")}</span> &#9662;</a>
+        <ul class="dropdown-menu" aria-label="More Options" role="menu">
           <%block name="navigation_dropdown_menu_links" >
             <li><a href="${marketing_link('FAQ')}">${_("Help")}</a></li>
           </%block>
-          <li><a href="${reverse('logout')}">${_("Log Out")}</a></li>
+          <li role="presentation"><a href="${reverse('logout')}" role="menuitem">${_("Log Out")}</a></li>
         </ul>
       </li>
     </ol>

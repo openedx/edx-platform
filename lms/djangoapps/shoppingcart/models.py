@@ -8,6 +8,7 @@ from model_utils.managers import InheritanceManager
 from collections import namedtuple
 from boto.exception import BotoServerError  # this is a super-class of SESError and catches connection errors
 
+from django.dispatch import receiver
 from django.db import models
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
@@ -24,7 +25,8 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from course_modes.models import CourseMode
 from mitxmako.shortcuts import render_to_string
 from student.views import course_from_id
-from student.models import CourseEnrollment
+from student.models import CourseEnrollment, unenroll_done
+
 from verify_student.models import SoftwareSecurePhotoVerification
 
 from .exceptions import (InvalidCartItem, PurchasedCallbackException, ItemAlreadyInCartException,
@@ -35,7 +37,7 @@ log = logging.getLogger("shoppingcart")
 ORDER_STATUSES = (
     ('cart', 'cart'),
     ('purchased', 'purchased'),
-    ('refunded', 'refunded'),  # Not used for now
+    ('refunded', 'refunded'),
 )
 
 # we need a tuple to represent the primary key of various OrderItem subclasses
@@ -52,6 +54,7 @@ class Order(models.Model):
     currency = models.CharField(default="usd", max_length=8)  # lower case ISO currency codes
     status = models.CharField(max_length=32, default='cart', choices=ORDER_STATUSES)
     purchase_time = models.DateTimeField(null=True, blank=True)
+    refunded_time = models.DateTimeField(null=True, blank=True)
     # Now we store data needed to generate a reasonable receipt
     # These fields only make sense after the purchase
     bill_to_first = models.CharField(max_length=64, blank=True)
@@ -206,6 +209,7 @@ class OrderItem(models.Model):
     line_desc = models.CharField(default="Misc. Item", max_length=1024)
     currency = models.CharField(default="usd", max_length=8)  # lower case ISO currency codes
     fulfilled_time = models.DateTimeField(null=True)
+    refund_requested_time = models.DateTimeField(null=True)
     # general purpose field, not user-visible.  Used for reporting
     report_comments = models.TextField(default="")
 
@@ -486,6 +490,52 @@ class CertificateItem(OrderItem):
     course_enrollment = models.ForeignKey(CourseEnrollment)
     mode = models.SlugField()
 
+    @receiver(unenroll_done)
+    def refund_cert_callback(sender, course_enrollment=None, **kwargs):
+        """
+        When a CourseEnrollment object calls its unenroll method, this function checks to see if that unenrollment
+        occurred in a verified certificate that was within the refund deadline.  If so, it actually performs the
+        refund.
+
+        Returns the refunded certificate on a successful refund; else, it returns nothing.
+        """
+
+        # Only refund verified cert unenrollments that are within bounds of the expiration date
+        if not course_enrollment.refundable():
+            return
+
+        target_certs = CertificateItem.objects.filter(course_id=course_enrollment.course_id, user_id=course_enrollment.user, status='purchased', mode='verified')
+        try:
+            target_cert = target_certs[0]
+        except IndexError:
+            log.error("Matching CertificateItem not found while trying to refund.  User %s, Course %s", course_enrollment.user, course_enrollment.course_id)
+            return
+        target_cert.status = 'refunded'
+        target_cert.refund_requested_time = datetime.now(pytz.utc)
+        target_cert.save()
+        target_cert.order.status = 'refunded'
+        target_cert.order.save()
+
+        order_number = target_cert.order_id
+        # send billing an email so they can handle refunding
+        subject = _("[Refund] User-Requested Refund")
+        message = "User {user} ({user_email}) has requested a refund on Order #{order_number}.".format(user=course_enrollment.user,
+                                                                                                       user_email=course_enrollment.user.email,
+                                                                                                       order_number=order_number)
+        to_email = [settings.PAYMENT_SUPPORT_EMAIL]
+        from_email = [settings.PAYMENT_SUPPORT_EMAIL]
+        try:
+            send_mail(subject, message, from_email, to_email, fail_silently=False)
+        except (smtplib.SMTPException, BotoServerError):
+            err_str = 'Failed sending email to billing request a refund for verified certiciate (User {user}, Course {course}, CourseEnrollmentID {ce_id}, Order #{order})'
+            log.error(err_str.format(
+                user=course_enrollment.user,
+                course=course_enrollment.course_id,
+                ce_id=course_enrollment.id,
+                order=order_number))
+
+        return target_cert
+
     @classmethod
     @transaction.commit_on_success
     def add_to_order(cls, order, course_id, cost, mode, currency='usd'):
@@ -507,10 +557,7 @@ class CertificateItem(OrderItem):
 
         """
         super(CertificateItem, cls).add_to_order(order, course_id, cost, currency=currency)
-        try:
-            course_enrollment = CourseEnrollment.objects.get(user=order.user, course_id=course_id)
-        except ObjectDoesNotExist:
-            course_enrollment = CourseEnrollment.create_enrollment(order.user, course_id, mode=mode)
+        course_enrollment = CourseEnrollment.get_or_create_enrollment(order.user, course_id)
 
         # do some validation on the enrollment mode
         valid_modes = CourseMode.modes_for_course_dict(course_id)
@@ -549,8 +596,7 @@ class CertificateItem(OrderItem):
                 "Could not submit verification attempt for enrollment {}".format(self.course_enrollment)
             )
 
-        self.course_enrollment.mode = self.mode
-        self.course_enrollment.save()
+        self.course_enrollment.change_mode(self.mode)
         self.course_enrollment.activate()
 
     @property

@@ -4,7 +4,7 @@ Reload forum (comment client) users from existing users.
 from django.core.management.base import BaseCommand
 
 from django.contrib.auth.models import User
-import comment_client as cc
+import lms.lib.comment_client as cc
 
 
 class Command(BaseCommand):

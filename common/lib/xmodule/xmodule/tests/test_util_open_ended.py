@@ -74,25 +74,13 @@ class MockUploadedFile(object):
         return self.mock_file.read()
 
 
-class MockQueryDict(dict):
-    """
-    Mock a query dict so that it can be used in test classes.  This will only work with the combinedopenended tests,
-    and does not mock the full query dict, only the behavior that is needed there (namely get_list).
-    """
-    def getlist(self, key, default=None):
-        try:
-            return super(MockQueryDict, self).__getitem__(key)
-        except KeyError:
-            if default is None:
-                return []
-        return default
-
-
 class DummyModulestore(object):
     """
     A mixin that allows test classes to have convenience functions to get a module given a location
     """
-    get_test_system = get_test_system()
+
+    def get_module_system(self, descriptor):
+        raise NotImplementedError("Sub-tests must specify how to generate a module-system")
 
     def setup_modulestore(self, name):
         self.modulestore = XMLModuleStore(DATA_DIR, course_dirs=[name])
@@ -107,7 +95,7 @@ class DummyModulestore(object):
         if not isinstance(location, Location):
             location = Location(location)
         descriptor = self.modulestore.get_instance(course.id, location, depth=None)
-        descriptor.xmodule_runtime = self.test_system
+        descriptor.xmodule_runtime = self.get_module_system(descriptor)
         return descriptor
 
 # Task state for a module with self assessment then instructor assessment.

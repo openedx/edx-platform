@@ -7,7 +7,6 @@ from mock import MagicMock
 import mock
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-
 from django.http import Http404
 from django.contrib.auth.models import User
 from django.test.client import RequestFactory
@@ -26,7 +25,6 @@ from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 CMS_BASE_TEST = 'testcms'
 
 class CoursesTest(ModuleStoreTestCase):
-
     """Test methods related to fetching courses."""
 
     def test_get_course_by_id_invalid_chars(self):
