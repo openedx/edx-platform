@@ -4,6 +4,7 @@ LinkedIn profiles.
 """
 
 import json
+import urllib
 
 from courseware.courses import get_course_by_id
 from django.core.management.base import BaseCommand
@@ -13,6 +14,8 @@ from optparse import make_option
 
 from certificates.models import GeneratedCertificate
 from ...models import LinkedIn
+
+from . import LinkedinAPI
 
 
 class Command(BaseCommand):
@@ -58,6 +61,32 @@ class Command(BaseCommand):
                     emailed.append(certificate.course_id)
             account.emailed_courses = json.dumps(emailed)
 
+def certificate_url(api, course, certificate, grandfather=False):
+    """
+    Generates a certificate URL based on LinkedIn's documentation.  The
+    documentation is from a Word document: DAT_DOCUMENTATION_v3.12.docx
+    """
+    tracking_code = '-'.join([
+        'eml',
+        'prof',  # the 'product'--no idea what that's supposed to mean
+        course.org,  # Partner's name
+        course.number,  # Certificate's name
+        'gf' if grandfather else 'T'])
+    query = {
+        'pfCertificationName': certificate.name,
+        'pfAuthorityName': api.config['COMPANY_NAME'],
+        'pfAuthorityId': api.config['COMPANY_ID'],
+        'pfCertificationUrl': certificate.download_url,
+        'pfLicenseNo': certificate.course_id,
+        'pfCertStartDate': course.start.strftime('%Y%mI'),
+        'pfCertFuture': certificate.created_date.strftime('%Y%m'),
+        '_mSplash': '1',
+        'trk': tracking_code,
+        'startTask': 'CERTIFICATION_name',
+        'force': 'true',
+    }
+    return 'http://www.linkedin.com/profile/guided?' + urllib.urlencode(query)
+
 
 def send_grandfather_email(user, certificates):
     """
@@ -72,10 +101,13 @@ def send_email(user, certificate):
     Email a user that recently earned a certificate, inviting them to post their
     certificate on their LinkedIn profile.
     """
+    api = LinkedinAPI()
     template = get_template("linkedin_email.html")
     course = get_course_by_id(certificate.course_id)
+    url = certificate_url(api, course, certificate)
     context = Context({
         'student_name': user.profile.name,
-        'course_name': 'XXX',
-        'url': '#'})
+        'course_name': certificate.name,
+        'url': url})
     print template.render(context)
+    print url
