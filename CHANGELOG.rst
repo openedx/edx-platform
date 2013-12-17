@@ -5,13 +5,16 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Blades: Make LTI module not send grade_back_url if has_score=False. BLD-561.
+Blades: LTI additional Python tests. LTI must use HTTPS for
+lis_outcome_service_url. BLD-564.
+
 Blades: Fix bug when Image mapping problems are not working for students in IE. BLD-413.
 
 Blades: Add template that displays the most up-to-date features of
 drag-and-drop. BLD-479.
 
-Blades: LTI additional Python tests. LTI fix bug e-reader error when popping
-out window. BLD-465.
+Blades: LTI fix bug e-reader error when popping out window. BLD-465.
 
 Common: Switch from mitx.db to edx.db for sqlite databases. This will effectively
   reset state for local instances of the code, unless you manually rename your

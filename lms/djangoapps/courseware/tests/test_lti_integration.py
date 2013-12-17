@@ -33,7 +33,7 @@ class TestLTI(BaseTestXmodule):
 
         sourcedId = u':'.join(urllib.quote(i) for i in (lti_id, module_id, user_id))
 
-        lis_outcome_service_url = 'http://{host}{path}'.format(
+        lis_outcome_service_url = 'https://{host}{path}'.format(
                 host=self.item_descriptor.xmodule_runtime.hostname,
                 path=self.item_descriptor.xmodule_runtime.handler_url(self.item_module, 'grade_handler', thirdparty=True).rstrip('/?')
             )
@@ -46,7 +46,6 @@ class TestLTI(BaseTestXmodule):
             u'role': u'student',
 
             u'resource_link_id': module_id,
-            u'lis_outcome_service_url': lis_outcome_service_url,
             u'lis_result_sourcedid': sourcedId,
 
             u'oauth_nonce': mocked_nonce,
@@ -58,6 +57,16 @@ class TestLTI(BaseTestXmodule):
         }
 
         saved_sign = oauthlib.oauth1.Client.sign
+
+        self.expected_context = {
+            'display_name': self.item_module.display_name,
+            'input_fields': self.correct_headers,
+            'element_class': self.item_module.category,
+            'element_id': self.item_module.location.html_id(),
+            'launch_url': 'http://www.example.com',  # default value
+            'open_in_a_new_page': True,
+            'form_url': self.item_descriptor.xmodule_runtime.handler_url(self.item_module, 'preview_handler').rstrip('/?'),
+        }
 
         def mocked_sign(self, *args, **kwargs):
             """
@@ -79,21 +88,11 @@ class TestLTI(BaseTestXmodule):
         self.addCleanup(patcher.stop)
 
     def test_lti_constructor(self):
-        """
-        Makes sure that all parameters extracted.
-        """
-        generated_context = self.item_module.render('student_view').content
-        expected_context = {
-            'display_name': self.item_module.display_name,
-            'input_fields': self.correct_headers,
-            'element_class': self.item_module.category,
-            'element_id': self.item_module.location.html_id(),
-            'launch_url': 'http://www.example.com',  # default value
-            'open_in_a_new_page': True,
-            'form_url': self.item_descriptor.xmodule_runtime.handler_url(self.item_module, 'preview_handler').rstrip('/?'),
-        }
+        generated_content = self.item_module.render('student_view').content
+        expected_content =  self.runtime.render_template('lti.html', self.expected_context)
+        self.assertEqual(generated_content, expected_content)
 
-        self.assertEqual(
-            generated_context,
-            self.runtime.render_template('lti.html', expected_context),
-        )
+    def test_lti_preview_handler(self):
+        generated_content = self.item_module.preview_handler(None, None).body
+        expected_content = self.runtime.render_template('lti_form.html', self.expected_context)
+        self.assertEqual(generated_content, expected_content)

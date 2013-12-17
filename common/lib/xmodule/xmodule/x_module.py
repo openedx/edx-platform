@@ -1016,6 +1016,9 @@ class ModuleSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abs
 
         error_descriptor_class - The class to use to render XModules with errors
 
+        get_real_user - function that takes `anonymous_student_id` and returns real user_id,
+        associated with `anonymous_student_id`.
+
         """
 
         # Right now, usage_store is unused, and field_data is always supplanted
