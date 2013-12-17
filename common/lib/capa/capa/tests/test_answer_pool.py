@@ -1,11 +1,13 @@
 """
-Tests the logic of the "answer-pool" attribute for MultipleChoice questions,
-i.e. those with the <multiplechoiceresponse> element
+Tests the logic of the "answer-pool" attribute, e.g.
+  <choicegroup answer-pool="4"
 """
 
 import unittest
 import textwrap
 from . import test_system, new_loncapa_problem
+from capa.responsetypes import LoncapaProblemError
+
 
 
 class CapaAnswerPoolTest(unittest.TestCase):
@@ -22,8 +24,8 @@ class CapaAnswerPoolTest(unittest.TestCase):
             <problem>
 
             <p>What is the correct answer?</p>
-            <multiplechoiceresponse answer-pool="4">
-              <choicegroup type="MultipleChoice">
+            <multiplechoiceresponse>
+              <choicegroup type="MultipleChoice" answer-pool="4">
                 <choice correct="false">wrong-1</choice>
                 <choice correct="false">wrong-2</choice>
                 <choice correct="true" explanation-id="solution1">correct-1</choice>
@@ -57,16 +59,20 @@ class CapaAnswerPoolTest(unittest.TestCase):
         problem = new_loncapa_problem(xml_str)
         problem.seed = 723
         the_html = problem.get_html()
-        self.assertRegexpMatches(the_html, r"<div>.*\[.*'wrong-3'.*'wrong-1'.*'wrong-2'.*'correct-2'.*\].*</div>")
+        # [('choice_3', u'wrong-3'), ('choice_5', u'correct-2'), ('choice_1', u'wrong-2'), ('choice_4', u'wrong-4')]
+        self.assertRegexpMatches(the_html, r"<div>.*\[.*'wrong-3'.*'correct-2'.*'wrong-2'.*'wrong-4'.*\].*</div>")
         self.assertRegexpMatches(the_html, r"<div>\{.*'1_solution_2'.*\}</div>")
+        # Calling get_html multiple times should yield the same thing
+        the_html2 = problem.get_html()
+        self.assertEquals(the_html, the_html2)
 
     def test_answer_pool_4_choices_1_multiplechoiceresponse_seed2(self):
         xml_str = textwrap.dedent("""
             <problem>
 
             <p>What is the correct answer?</p>
-            <multiplechoiceresponse answer-pool="4">
-              <choicegroup type="MultipleChoice">
+            <multiplechoiceresponse>
+              <choicegroup type="MultipleChoice" answer-pool="4">
                 <choice correct="false">wrong-1</choice>
                 <choice correct="false">wrong-2</choice>
                 <choice correct="true" explanation-id="solution1">correct-1</choice>
@@ -100,7 +106,8 @@ class CapaAnswerPoolTest(unittest.TestCase):
         problem = new_loncapa_problem(xml_str)
         problem.seed = 9
         the_html = problem.get_html()
-        self.assertRegexpMatches(the_html, r"<div>.*\[.*'correct-1'.*'wrong-2'.*'wrong-1'.*'wrong-4'.*\].*</div>")
+        # [('choice_0', u'wrong-1'), ('choice_4', u'wrong-4'), ('choice_3', u'wrong-3'), ('choice_2', u'correct-1')]
+        self.assertRegexpMatches(the_html, r"<div>.*\[.*'wrong-1'.*'wrong-4'.*'wrong-3'.*'correct-1'.*\].*</div>")
         self.assertRegexpMatches(the_html, r"<div>\{.*'1_solution_1'.*\}</div>")
 
     def test_no_answer_pool_4_choices_1_multiplechoiceresponse(self):
@@ -150,8 +157,8 @@ class CapaAnswerPoolTest(unittest.TestCase):
             <problem>
 
             <p>What is the correct answer?</p>
-            <multiplechoiceresponse answer-pool="0">
-              <choicegroup type="MultipleChoice">
+            <multiplechoiceresponse>
+              <choicegroup type="MultipleChoice" answer-pool="0">
                 <choice correct="false">wrong-1</choice>
                 <choice correct="false">wrong-2</choice>
                 <choice correct="true" explanation-id="solution1">correct-1</choice>
@@ -187,13 +194,13 @@ class CapaAnswerPoolTest(unittest.TestCase):
         self.assertRegexpMatches(the_html, r"<div>.*\[.*'wrong-1'.*'wrong-2'.*'correct-1'.*'wrong-3'.*'wrong-4'.*'correct-2'.*\].*</div>")
         self.assertRegexpMatches(the_html, r"<div>\{.*'1_solution_1'.*'1_solution_2'.*\}</div>")
 
-    def test_invalid_answer_pool_4_choices_1_multiplechoiceresponse(self):
+    def test_invalid_answer_pool(self):
         xml_str = textwrap.dedent("""
             <problem>
 
             <p>What is the correct answer?</p>
-            <multiplechoiceresponse answer-pool="2.3">
-              <choicegroup type="MultipleChoice">
+            <multiplechoiceresponse>
+              <choicegroup type="MultipleChoice" answer-pool="2.3">
                 <choice correct="false">wrong-1</choice>
                 <choice correct="false">wrong-2</choice>
                 <choice correct="true" explanation-id="solution1">correct-1</choice>
@@ -225,17 +232,16 @@ class CapaAnswerPoolTest(unittest.TestCase):
         """)
 
         problem = new_loncapa_problem(xml_str)
-        the_html = problem.get_html()
-        self.assertRegexpMatches(the_html, r"<div>.*\[.*'wrong-1'.*'wrong-2'.*'correct-1'.*'wrong-3'.*'wrong-4'.*'correct-2'.*\].*</div>")
-        self.assertRegexpMatches(the_html, r"<div>\{.*'1_solution_1'.*'1_solution_2'.*\}</div>")
+        with self.assertRaises(LoncapaProblemError):
+            the_html = problem.get_html()
 
     def test_answer_pool_5_choices_1_multiplechoiceresponse_seed1(self):
         xml_str = textwrap.dedent("""
             <problem>
 
             <p>What is the correct answer?</p>
-            <multiplechoiceresponse answer-pool="5">
-              <choicegroup type="MultipleChoice">
+            <multiplechoiceresponse>
+              <choicegroup type="MultipleChoice" answer-pool="5">
                 <choice correct="false">wrong-1</choice>
                 <choice correct="false">wrong-2</choice>
                 <choice correct="true" explanation-id="solution1">correct-1</choice>
@@ -269,7 +275,7 @@ class CapaAnswerPoolTest(unittest.TestCase):
         problem = new_loncapa_problem(xml_str)
         problem.seed = 723
         the_html = problem.get_html()
-        self.assertRegexpMatches(the_html, r"<div>.*\[.*'wrong-2'.*'wrong-1'.*'correct-2'.*'wrong-3'.*'wrong-4'.*\].*</div>")
+        self.assertRegexpMatches(the_html, r"<div>.*\[.*'correct-2'.*'wrong-1'.*'wrong-2'.*.*'wrong-3'.*'wrong-4'.*\].*</div>")
         self.assertRegexpMatches(the_html, r"<div>\{.*'1_solution_2'.*\}</div>")
 
     def test_answer_pool_2_multiplechoiceresponses_seed1(self):
@@ -277,8 +283,8 @@ class CapaAnswerPoolTest(unittest.TestCase):
             <problem>
 
             <p>What is the correct answer?</p>
-            <multiplechoiceresponse answer-pool="4">
-              <choicegroup type="MultipleChoice">
+            <multiplechoiceresponse>
+              <choicegroup type="MultipleChoice" answer-pool="4">
                 <choice correct="false">wrong-1</choice>
                 <choice correct="false">wrong-2</choice>
                 <choice correct="true" explanation-id="solution1">correct-1</choice>
@@ -306,8 +312,8 @@ class CapaAnswerPoolTest(unittest.TestCase):
             </solutionset>
 
             <p>What is the correct answer?</p>
-            <multiplechoiceresponse answer-pool="3">
-              <choicegroup type="MultipleChoice">
+            <multiplechoiceresponse>
+              <choicegroup type="MultipleChoice" answer-pool="3">
                 <choice correct="false">wrong-1</choice>
                 <choice correct="false">wrong-2</choice>
                 <choice correct="true" explanation-id="solution1">correct-1</choice>
@@ -342,8 +348,8 @@ class CapaAnswerPoolTest(unittest.TestCase):
         problem.seed = 723
         the_html = problem.get_html()
 
-        str1 = r"<div>.*\[.*'wrong-3'.*'wrong-1'.*'wrong-2'.*'correct-2'.*\].*</div>"
-        str2 = r"<div>.*\[.*'wrong-4'.*'wrong-2'.*'correct-2'.*\].*</div>"
+        str1 = r"<div>.*\[.*'wrong-3'.*'correct-2'.*'wrong-2'.*'wrong-4'.*\].*</div>"
+        str2 = r"<div>.*\[.*'wrong-2'.*'wrong-1'.*'correct-2'.*\].*</div>"
         str3 = r"<div>\{.*'1_solution_2'.*\}</div>"
         str4 = r"<div>\{.*'1_solution_4'.*\}</div>"
 
@@ -362,8 +368,8 @@ class CapaAnswerPoolTest(unittest.TestCase):
             <problem>
 
             <p>What is the correct answer?</p>
-            <multiplechoiceresponse answer-pool="3">
-              <choicegroup type="MultipleChoice">
+            <multiplechoiceresponse>
+              <choicegroup type="MultipleChoice" answer-pool="3">
                 <choice correct="false">wrong-1</choice>
                 <choice correct="false">wrong-2</choice>
                 <choice correct="true" explanation-id="solution1">correct-1</choice>
@@ -391,8 +397,8 @@ class CapaAnswerPoolTest(unittest.TestCase):
             </solutionset>
 
             <p>What is the correct answer?</p>
-            <multiplechoiceresponse answer-pool="4">
-              <choicegroup type="MultipleChoice">
+            <multiplechoiceresponse>
+              <choicegroup type="MultipleChoice" answer-pool="4">
                 <choice correct="false">wrong-1</choice>
                 <choice correct="false">wrong-2</choice>
                 <choice correct="true" explanation-id="solution1">correct-1</choice>
@@ -427,10 +433,10 @@ class CapaAnswerPoolTest(unittest.TestCase):
         problem.seed = 9
         the_html = problem.get_html()
 
-        str1 = r"<div>.*\[.*'wrong-1'.*'wrong-2'.*'correct-1'.*\].*</div>"
-        str2 = r"<div>.*\[.*'wrong-4'.*'wrong-3'.*'correct-1'.*'wrong-1'.*\].*</div>"
+        str1 = r"<div>.*\[.*'wrong-4'.*'wrong-3'.*'correct-1'.*\].*</div>"
+        str2 = r"<div>.*\[.*'wrong-2'.*'wrong-3'.*'wrong-4'.*'correct-2'.*\].*</div>"
         str3 = r"<div>\{.*'1_solution_1'.*\}</div>"
-        str4 = r"<div>\{.*'1_solution_3'.*\}</div>"
+        str4 = r"<div>\{.*'1_solution_4'.*\}</div>"
 
         self.assertRegexpMatches(the_html, str1)
         self.assertRegexpMatches(the_html, str2)
@@ -466,8 +472,8 @@ class CapaAnswerPoolTest(unittest.TestCase):
             </solution>
 
             <p>What is the correct answer?</p>
-            <multiplechoiceresponse answer-pool="4">
-              <choicegroup type="MultipleChoice">
+            <multiplechoiceresponse>
+              <choicegroup type="MultipleChoice" answer-pool="4">
                 <choice correct="false">wrong-1</choice>
                 <choice correct="false">wrong-2</choice>
                 <choice correct="true" explanation-id="solution1">correct-1</choice>
@@ -503,7 +509,7 @@ class CapaAnswerPoolTest(unittest.TestCase):
         the_html = problem.get_html()
 
         str1 = r"<div>.*\[.*'wrong-1'.*'wrong-2'.*'correct-1'.*'wrong-3'.*'wrong-4'.*\].*</div>"
-        str2 = r"<div>.*\[.*'wrong-3'.*'wrong-1'.*'wrong-2'.*'correct-2'.*\].*</div>"
+        str2 = r"<div>.*\[.*'wrong-3'.*'correct-2'.*'wrong-2'.*'wrong-4'.*\].*</div>"
         str3 = r"<div>\{.*'1_solution_1'.*\}</div>"
         str4 = r"<div>\{.*'1_solution_3'.*\}</div>"
 
@@ -522,8 +528,8 @@ class CapaAnswerPoolTest(unittest.TestCase):
             <problem>
 
             <p>What is the correct answer?</p>
-            <multiplechoiceresponse answer-pool="4">
-              <choicegroup type="MultipleChoice">
+            <multiplechoiceresponse>
+              <choicegroup type="MultipleChoice" answer-pool="4">
                 <choice correct="false">wrong-1</choice>
                 <choice correct="false">wrong-2</choice>
                 <choice correct="true">correct-1</choice>
@@ -549,5 +555,5 @@ class CapaAnswerPoolTest(unittest.TestCase):
         problem.seed = 723
         the_html = problem.get_html()
 
-        self.assertRegexpMatches(the_html, r"<div>.*\[.*'wrong-3'.*'wrong-1'.*'wrong-2'.*'correct-2'.*\].*</div>")
+        self.assertRegexpMatches(the_html, r"<div>.*\[.*'wrong-3'.*'correct-2'.*'wrong-2'.*'wrong-4'.*\].*</div>")
         self.assertRegexpMatches(the_html, r"<div>\{.*'1_solution_1'.*\}</div>")
