@@ -203,8 +203,7 @@ def remove_user_from_course_group(caller, user, location, role):
 
     # see if the user is actually in that role, if not then we don't have to do anything
     groupnames, _ = get_all_course_role_groupnames(location, role)
-    for group in user.groups.filter(name__in=groupnames):
-        user.groups.remove(group)
+    user.groups.remove(*user.groups.filter(name__in=groupnames))
     user.save()
 
 
@@ -258,11 +257,11 @@ def is_user_in_creator_group(user):
         return True
 
     # On edx, we only allow edX staff to create courses. This may be relaxed in the future.
-    if settings.MITX_FEATURES.get('DISABLE_COURSE_CREATION', False):
+    if settings.FEATURES.get('DISABLE_COURSE_CREATION', False):
         return False
 
     # Feature flag for using the creator group setting. Will be removed once the feature is complete.
-    if settings.MITX_FEATURES.get('ENABLE_CREATOR_GROUP', False):
+    if settings.FEATURES.get('ENABLE_CREATOR_GROUP', False):
         return user.groups.filter(name=COURSE_CREATOR_GROUP_NAME).exists()
 
     return True

@@ -34,9 +34,9 @@
         <span>${_('Not enrolled?')} <a href="#signup-modal" class="close-login" rel="leanModal">${_('Sign up.')}</a></span>
         <a href="#forgot-password-modal" rel="leanModal" class="pwd-reset">${_('Forgot password?')}</a>
       </p>
-% if settings.MITX_FEATURES.get('AUTH_USE_OPENID'):
+% if settings.FEATURES.get('AUTH_USE_OPENID'):
       <p>
-      <a href="${MITX_ROOT_URL}/openid/login/">${_('login via openid')}</a>
+      <a href="${EDX_ROOT_URL}/openid/login/">${_('login via openid')}</a>
       </p>
 % endif
     </section>

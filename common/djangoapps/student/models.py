@@ -35,9 +35,7 @@ from track import contexts
 from track.views import server_track
 from eventtracking import tracker
 
-
 unenroll_done = Signal(providing_args=["course_enrollment"])
-
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
 
@@ -68,6 +66,10 @@ def anonymous_id_for_user(user, course_id):
     if user.is_anonymous():
         return None
 
+    cached_id = getattr(user, '_anonymous_id', {}).get(course_id)
+    if cached_id is not None:
+        return cached_id
+
     # include the secret key as a salt, and to make the ids unique across different LMS installs.
     hasher = hashlib.md5()
     hasher.update(settings.SECRET_KEY)
@@ -95,6 +97,11 @@ def anonymous_id_for_user(user, course_id):
         # Another thread has already created this entry, so
         # continue
         pass
+
+    if not hasattr(user, '_anonymous_id'):
+        user._anonymous_id = {}
+
+    user._anonymous_id[course_id] = digest
 
     return digest
 
@@ -713,14 +720,14 @@ def add_user_to_default_group(user, group):
 
 @receiver(post_save, sender=User)
 def update_user_information(sender, instance, created, **kwargs):
-    if not settings.MITX_FEATURES['ENABLE_DISCUSSION_SERVICE']:
+    if not settings.FEATURES['ENABLE_DISCUSSION_SERVICE']:
         # Don't try--it won't work, and it will fill the logs with lots of errors
         return
     try:
         cc_user = cc.User.from_django_user(instance)
         cc_user.save()
     except Exception as e:
-        log = logging.getLogger("mitx.discussion")
+        log = logging.getLogger("edx.discussion")
         log.error(unicode(e))
         log.error("update user info to discussion failed for user with id: " + str(instance.id))
 

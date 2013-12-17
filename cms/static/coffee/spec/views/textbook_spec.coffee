@@ -1,8 +1,8 @@
-define ["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js/models/section",
+define ["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js/models/course",
     "js/collections/textbook", "js/views/show_textbook", "js/views/edit_textbook", "js/views/list_textbooks",
     "js/views/edit_chapter", "js/views/feedback_prompt", "js/views/feedback_notification",
     "sinon", "jasmine-stealth"],
-(Textbook, Chapter, ChapterSet, Section, TextbookSet, ShowTextbook, EditTextbook, ListTexbook, EditChapter, Prompt, Notification, sinon) ->
+(Textbook, Chapter, ChapterSet, Course, TextbookSet, ShowTextbook, EditTextbook, ListTexbook, EditChapter, Prompt, Notification, sinon) ->
     feedbackTpl = readFixtures('system-feedback.underscore')
 
     beforeEach ->
@@ -30,7 +30,7 @@ define ["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
 
             @promptSpies = spyOnConstructor(Prompt, "Warning", ["show", "hide"])
             @promptSpies.show.andReturn(@promptSpies)
-            window.section = new Section({
+            window.course = new Course({
                 id: "5",
                 name: "Course Name",
                 url_name: "course_name",
@@ -40,7 +40,7 @@ define ["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
             });
 
         afterEach ->
-            delete window.section
+            delete window.course
 
         describe "Basic", ->
             it "should render properly", ->
@@ -81,9 +81,11 @@ define ["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
                 @savingSpies = spyOnConstructor(Notification, "Mini",
                     ["show", "hide"])
                 @savingSpies.show.andReturn(@savingSpies)
+                CMS.URL.TEXTBOOKS = "/textbooks"
 
             afterEach ->
                 @xhr.restore()
+                delete CMS.URL.TEXTBOOKS
 
             it "should destroy itself on confirmation", ->
                 @view.render().$(".delete").click()
@@ -283,11 +285,11 @@ define ["js/models/textbook", "js/models/chapter", "js/collections/chapter", "js
             @view = new EditChapter({model: @model})
             spyOn(@view, "remove").andCallThrough()
             CMS.URL.UPLOAD_ASSET = "/upload"
-            window.section = new Section({name: "abcde"})
+            window.course = new Course({name: "abcde"})
 
         afterEach ->
             delete CMS.URL.UPLOAD_ASSET
-            delete window.section
+            delete window.course
 
         it "can render", ->
             @view.render()

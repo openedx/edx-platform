@@ -1,0 +1,112 @@
+###################################
+November 6, 2013
+###################################
+
+*************
+edX Studio
+*************
+
+=============
+New Features
+=============
+
+* **Improved Course Export page**
+  
+  The Course Export page has a new layout, with enhanced help text.
+
+==========================
+Changes and Updates
+==========================
+
+The following changes are included in this release: 
+
+* The Forgot Password link on the Studio Sign In page now works correctly. (STUD-689)
+
+* In the Create a New Course page Organization field, text now suggests the generic UniversityX, instead of MITx. (STUD-885)
+
+* The Create a New Course page Course Run field, text now suggests the using the year and trimester (for example, 2014_T1), instead
+  of the year and season. (STUD-916)
+
+* Studio now continues working correctly when a YouTube video in the page fails to load. (STUD-472)
+ 
+* To avoid potential problems with browser security, you can no longer enter video URLs with http://. You must use https://. (BLD-408)
+
+* By default, the options to add a Problem Written in LaTex and a Problem with Adaptive Hint in Latex are no longer included in the
+  Advanced tab of the Problems component. In addition, the option to add E-text Written in LaTeX is no longer included in the HTML component.
+
+  To enable these options, open the Advanced Settings page and set the value of the use_latex_compiler policy key to true. (BLD-426)
+
+==========================
+Technical Changes
+==========================
+
+Contributors to the open source edX Platform should note the following change:
+
+The Course Export page is updated to use a RESTFul interface. (STUD-846)
+
+***************************************
+edX Learning Management System 
+***************************************
+==========================
+New Features
+==========================
+
+* **Upgrading the Course Track**
+
+  A student in the Honor Code or Audit track can now upgrade to the Verified Certificate track. (LMS-1127)
+  
+==========================
+Changes and Updates
+==========================
+
+The following changes are included in this release: 
+
+* After registering for a course, a student could use the browser's Back button to return to the Registration page and change the
+  registration type. Now, if the user tries to go back to the Registration page, the Learning Management System redirects the student to the
+  courseware, where the student must unregister first to change the course mode. (LMS-1062)
+ 
+* When a student fails verification for the Verified track, the Learning Management System now notifies the user through the Student
+  Dashboard, and prompts them to retry. The student must send another set of photos, but does not have to pay again. If the student does
+  not retry, they can get a refund. (LMS-1133)
+
+* In the Beta Instructor Dashboard, the layout is improved and the Pending Instructor Tasks section now functions correctly. (LMS-1242)
+ 
+* You can now tab through the Wiki pages without getting stuck in the content area. (LMS-1307)
+ 
+* Default settings now include the generic email address @example.com instead of @edx.org. (LMS-1363)
+ 
+* The user experience and help text during course registration and upgrading are enhanced, and the last day to register for verified certificates is more clear. (LMS-1384)
+ 
+* Keyboard navigation is now updated in the Wiki to skip repetitive content, allowing users to go directly to unique content on a page. (LMS-1387)
+ 
+* Errors that prevented the Progress page from successfully loading are fixed. (LMS-1388)
+ 
+* In the Sign Up page, the Public Display Name field was renamed to Public Username. (LMS-1393)
+ 
+* Errors when creating a new account are resolved. (LMS-1418)
+ 
+* A typo was removed from the course registration email template. (LMS-1419)
+ 
+* The Saving a Word Cloud component generated an error message. This problem no longer occurs. (BLD-205)
+ 
+* When viewing a video, if a student clicked on the video timeline before or after the specified end time, the video jumped to the beginning. This problem is resolved. (BLD-392)
+ 
+* Students can now change the video speed when the video is paused. (BLD-424)
+ 
+* Several problems with the video player are resolved:
+  * The Start time did not work in Flash mode.
+  * Students could not change the speed before the video started.
+  * The end point in the video slider was inaccurate for short videos.
+  * The video slider showed the incorrect position after the video stopped. (BLD-468)
+ 
+* Sorting of the forums thread list now works correctly when a topic is selected from the drop-down menu. (FOR-224)
+ 
+* Forum follow buttons are now accessible to screen readers, have the ARIA checkbox role, and activate with the space or Enter key.(FOR-240)
+
+******************
+Analytics 
+******************
+
+The following changes are included in this release: 
+
+* The user_id field is added to tracking events. (AN-213)

@@ -78,7 +78,6 @@ class @DiscussionUtil
       tags_autocomplete       : "/courses/#{$$course_id}/discussion/threads/tags/autocomplete"
       retrieve_discussion     : "/courses/#{$$course_id}/discussion/forum/#{param}/inline"
       retrieve_single_thread  : "/courses/#{$$course_id}/discussion/forum/#{param}/threads/#{param1}"
-      update_moderator_status : "/courses/#{$$course_id}/discussion/users/#{param}/update_moderator_status"
       openclose_thread        : "/courses/#{$$course_id}/discussion/threads/#{param}/close"
       permanent_link_thread   : "/courses/#{$$course_id}/discussion/forum/#{param}/threads/#{param1}"
       permanent_link_comment  : "/courses/#{$$course_id}/discussion/forum/#{param}/threads/#{param1}##{param2}"

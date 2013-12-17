@@ -1,11 +1,13 @@
+#-*- encoding=utf-8 -*-
 '''
 Created on Jan 18, 2013
 
 @author: brian
 '''
 import openid
+import json
 from openid.fetchers import HTTPFetcher, HTTPResponse
-from urlparse import parse_qs
+from urlparse import parse_qs, urlparse
 
 from django.conf import settings
 from django.test import TestCase, LiveServerTestCase
@@ -72,8 +74,9 @@ class OpenIdProviderTest(TestCase):
     Tests of the OpenId login
     """
 
-    @skipUnless(settings.MITX_FEATURES.get('AUTH_USE_OPENID') or
-                settings.MITX_FEATURES.get('AUTH_USE_OPENID_PROVIDER'), True)
+    @skipUnless(settings.FEATURES.get('AUTH_USE_OPENID') and
+                settings.FEATURES.get('AUTH_USE_OPENID_PROVIDER'),
+                'OpenID not enabled')
     def test_begin_login_with_xrds_url(self):
 
         # the provider URL must be converted to an absolute URL in order to be
@@ -93,6 +96,7 @@ class OpenIdProviderTest(TestCase):
         # now we can begin the login process by invoking a local openid client,
         # with a pointer to the (also-local) openid provider:
         with self.settings(OPENID_SSO_SERVER_URL=abs_provider_url):
+
             url = reverse('openid-login')
             resp = self.client.post(url)
             code = 200
@@ -100,8 +104,9 @@ class OpenIdProviderTest(TestCase):
                              "got code {0} for url '{1}'. Expected code {2}"
                              .format(resp.status_code, url, code))
 
-    @skipUnless(settings.MITX_FEATURES.get('AUTH_USE_OPENID') or
-                settings.MITX_FEATURES.get('AUTH_USE_OPENID_PROVIDER'), True)
+    @skipUnless(settings.FEATURES.get('AUTH_USE_OPENID') and
+                settings.FEATURES.get('AUTH_USE_OPENID_PROVIDER'),
+                'OpenID not enabled')
     def test_begin_login_with_login_url(self):
 
         # the provider URL must be converted to an absolute URL in order to be
@@ -183,21 +188,24 @@ class OpenIdProviderTest(TestCase):
                          "got code {0} for url '{1}'. Expected code {2}"
                          .format(resp.status_code, url, code))
 
-    @skipUnless(settings.MITX_FEATURES.get('AUTH_USE_OPENID') or
-                settings.MITX_FEATURES.get('AUTH_USE_OPENID_PROVIDER'), True)
+    @skipUnless(settings.FEATURES.get('AUTH_USE_OPENID') and
+                settings.FEATURES.get('AUTH_USE_OPENID_PROVIDER'),
+                'OpenID not enabled')
     def test_open_id_setup(self):
         """ Attempt a standard successful login """
         self.attempt_login(200)
 
-    @skipUnless(settings.MITX_FEATURES.get('AUTH_USE_OPENID') or
-                settings.MITX_FEATURES.get('AUTH_USE_OPENID_PROVIDER'), True)
+    @skipUnless(settings.FEATURES.get('AUTH_USE_OPENID') and
+                settings.FEATURES.get('AUTH_USE_OPENID_PROVIDER'),
+                'OpenID not enabled')
     def test_invalid_namespace(self):
         """ Test for 403 error code when the namespace of the request is invalid"""
         self.attempt_login(403, ns="http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0")
 
     @override_settings(OPENID_PROVIDER_TRUSTED_ROOTS=['http://apps.cs50.edx.org'])
-    @skipUnless(settings.MITX_FEATURES.get('AUTH_USE_OPENID') or
-                settings.MITX_FEATURES.get('AUTH_USE_OPENID_PROVIDER'), True)
+    @skipUnless(settings.FEATURES.get('AUTH_USE_OPENID') and
+                settings.FEATURES.get('AUTH_USE_OPENID_PROVIDER'),
+                'OpenID not enabled')
     def test_invalid_return_url(self):
         """ Test for 403 error code when the url"""
         self.attempt_login(403, return_to="http://apps.cs50.edx.or")
@@ -224,15 +232,17 @@ class OpenIdProviderTest(TestCase):
         response = provider_login(request)
         return response
 
-    @skipUnless(settings.MITX_FEATURES.get('AUTH_USE_OPENID') or
-                settings.MITX_FEATURES.get('AUTH_USE_OPENID_PROVIDER'), True)
+    @skipUnless(settings.FEATURES.get('AUTH_USE_OPENID') and
+                settings.FEATURES.get('AUTH_USE_OPENID_PROVIDER'),
+                'OpenID not enabled')
     def test_login_openid_handle_redirection(self):
         """ Test to see that we can handle login redirection properly"""
         response = self._send_bad_redirection_login()
         self.assertEquals(response.status_code, 302)
 
-    @skipUnless(settings.MITX_FEATURES.get('AUTH_USE_OPENID') or
-                settings.MITX_FEATURES.get('AUTH_USE_OPENID_PROVIDER'), True)
+    @skipUnless(settings.FEATURES.get('AUTH_USE_OPENID') and
+                settings.FEATURES.get('AUTH_USE_OPENID_PROVIDER'),
+                'OpenID not enabled')
     def test_login_openid_handle_redirection_ratelimited(self):
         # try logging in 30 times, the default limit in the number of failed
         # log in attempts before the rate gets limited
@@ -245,6 +255,37 @@ class OpenIdProviderTest(TestCase):
         # clear the ratelimit cache so that we don't fail other logins
         cache.clear()
 
+    @skipUnless(settings.FEATURES.get('AUTH_USE_OPENID_PROVIDER'),
+                'OpenID not enabled')
+    def test_openid_final_response(self):
+
+        url = reverse('openid-provider-login')
+        user = UserFactory()
+
+        # login to the client so that we can persist session information
+        for name in ['Robot 33', '☃']:
+            user.profile.name = name
+            user.profile.save()
+            self.client.login(username=user.username, password='test')
+            # login once to get the right session information
+            self.attempt_login(200)
+            post_args = {
+                'email': user.email,
+                'password': 'test',
+            }
+
+            # call url again, this time with username and password
+            resp = self.client.post(url, post_args)
+            # all information is embedded in the redirect url
+            location = resp['Location']
+            # parse the url
+            parsed_url = urlparse(location)
+            parsed_qs = parse_qs(parsed_url.query)
+            self.assertEquals(parsed_qs['openid.ax.type.ext1'][0], 'http://axschema.org/contact/email')
+            self.assertEquals(parsed_qs['openid.ax.type.ext0'][0], 'http://axschema.org/namePerson')
+            self.assertEquals(parsed_qs['openid.ax.value.ext1.1'][0], user.email)
+            self.assertEquals(parsed_qs['openid.ax.value.ext0.1'][0], user.profile.name)
+
 
 class OpenIdProviderLiveServerTest(LiveServerTestCase):
     """
@@ -254,8 +295,9 @@ class OpenIdProviderLiveServerTest(LiveServerTestCase):
     Here we do the former.
     """
 
-    @skipUnless(settings.MITX_FEATURES.get('AUTH_USE_OPENID') or
-                settings.MITX_FEATURES.get('AUTH_USE_OPENID_PROVIDER'), True)
+    @skipUnless(settings.FEATURES.get('AUTH_USE_OPENID') and
+                settings.FEATURES.get('AUTH_USE_OPENID_PROVIDER'),
+                'OpenID not enabled')
     def test_begin_login(self):
         # the provider URL must be converted to an absolute URL in order to be
         # used as an openid provider.
@@ -289,4 +331,3 @@ class OpenIdProviderLiveServerTest(LiveServerTestCase):
             super(OpenIdProviderLiveServerTest, cls).tearDownClass()
         except RuntimeError:
             print "Warning: Could not shut down test server."
-            pass

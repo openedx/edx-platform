@@ -22,7 +22,7 @@ from xmodule.graders import Score
 from .models import StudentModule
 from .module_render import get_module, get_module_for_descriptor
 
-log = logging.getLogger("mitx.courseware")
+log = logging.getLogger("edx.courseware")
 
 
 def yield_module_descendents(module):

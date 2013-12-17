@@ -3,6 +3,7 @@
 
 from mock import Mock, patch, PropertyMock
 import textwrap
+import json
 from lxml import etree
 from webob.request import Request
 from copy import copy
@@ -227,6 +228,12 @@ class LTIModuleTest(LogicTest):
 
         real_outcome_service_url = self.xmodule.get_outcome_service_url()
         self.assertEqual(real_outcome_service_url, expected_outcome_service_url)
+
+    def test_get_form_path(self):
+        expected_form_path = self.xmodule.runtime.handler_url(self.xmodule, 'preview_handler').rstrip('/?')
+
+        real_form_path = self.xmodule.get_form_path()
+        self.assertEqual(real_form_path, expected_form_path)
 
     def test_resource_link_id(self):
         with patch('xmodule.lti_module.LTIModule.id', new_callable=PropertyMock) as mock_id:

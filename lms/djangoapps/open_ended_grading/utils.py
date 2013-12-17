@@ -11,7 +11,7 @@ from django.utils.translation import ugettext as _
 from django.conf import settings
 
 from lms.lib.xblock.runtime import LmsModuleSystem
-from mitxmako.shortcuts import render_to_string
+from edxmako.shortcuts import render_to_string
 
 
 log = logging.getLogger(__name__)

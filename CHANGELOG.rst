@@ -5,6 +5,33 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Blades: Fix bug when Image mapping problems are not working for students in IE. BLD-413.
+
+Blades: Add template that displays the most up-to-date features of
+drag-and-drop. BLD-479.
+
+Blades: LTI additional Python tests. LTI fix bug e-reader error when popping
+out window. BLD-465.
+
+Common: Switch from mitx.db to edx.db for sqlite databases. This will effectively
+  reset state for local instances of the code, unless you manually rename your
+  mitx.db file to edx.db.
+
+Common: significant performance improvement for authorization checks and location translations.
+  Ensure all auth checks, check all possible permutations of the auth key (Instructor dashboard
+  now shows when it should for all courses in lms).
+  Made queries for Studio dashboard 2 orders of magnitude faster (and fewer).
+
+Blades: Video Transcripts: Fix clear and download buttons. BLD-438.
+
+Common: Switch over from MITX_FEATURES to just FEATURES. To override items in
+  the FEATURES dict, the environment variable you must set to do so is also
+  now called FEATURES instead of MITX_FEATURES.
+
+LMS: Change the forum role granted to global staff on enrollment in a
+course. Previously, staff were given the Moderator role; now, they are
+given the Student role.
+
 Blades: Fix Numerical input to support mathematical operations. BLD-525.
 
 Blades: Improve calculator's tooltip accessibility. Add possibility to navigate

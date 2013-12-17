@@ -9,7 +9,7 @@ import logging
 import re
 
 from courseware.courses import get_course_with_access
-from mitxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response
 
 from . import cohorts
 

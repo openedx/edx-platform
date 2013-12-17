@@ -5,7 +5,8 @@ import json
 from uuid import uuid4
 from random import shuffle
 from tempfile import NamedTemporaryFile
-from factory import DjangoModelFactory, SubFactory
+import factory
+from factory.django import DjangoModelFactory
 
 from django.test import TestCase
 from django.test.client import Client
@@ -51,7 +52,7 @@ class UserLicenseFactory(DjangoModelFactory):
     FACTORY_FOR = UserLicense
 
     user = None
-    software = SubFactory(CourseSoftwareFactory)
+    software = factory.SubFactory(CourseSoftwareFactory)
     serial = SERIAL_1
 
 

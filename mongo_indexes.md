@@ -16,6 +16,6 @@ location_map:
 =============
 
 ```
-ensureIndex({​'_id.org': 1, '_id.course': 1})
-ensureIndex({​'course_id': 1})
+ensureIndex({'_id.org': 1, '_id.course': 1})
+ensureIndex({'course_id': 1})
 ```

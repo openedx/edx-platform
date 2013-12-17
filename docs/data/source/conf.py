@@ -22,4 +22,10 @@ templates_path.append('source/_templates')
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path.append('source/_static')
 
+project = u'edX Data Documentation'
+copyright = u'2013, edX Documentation Team'
 
+# The short X.Y version.
+version = ''
+# The full version, including alpha/beta/rc tags.
+release = ''

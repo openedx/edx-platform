@@ -5,8 +5,6 @@ from . import BaseTestXmodule
 from collections import OrderedDict
 import mock
 import urllib
-from xmodule.lti_module import LTIModule
-from mock import Mock
 
 
 class TestLTI(BaseTestXmodule):
@@ -85,7 +83,6 @@ class TestLTI(BaseTestXmodule):
         Makes sure that all parameters extracted.
         """
         generated_context = self.item_module.render('student_view').content
-
         expected_context = {
             'display_name': self.item_module.display_name,
             'input_fields': self.correct_headers,
@@ -93,6 +90,7 @@ class TestLTI(BaseTestXmodule):
             'element_id': self.item_module.location.html_id(),
             'launch_url': 'http://www.example.com',  # default value
             'open_in_a_new_page': True,
+            'form_url': self.item_descriptor.xmodule_runtime.handler_url(self.item_module, 'preview_handler').rstrip('/?'),
         }
 
         self.assertEqual(

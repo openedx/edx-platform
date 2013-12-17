@@ -15,7 +15,7 @@ from xblock.fields import Scope, List
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 
-log = logging.getLogger('mitx.' + __name__)
+log = logging.getLogger('edx.' + __name__)
 
 
 class ConditionalFields(object):
