@@ -26,11 +26,12 @@ class TestInstructorDashboardEmailView(ModuleStoreTestCase):
         instructor = AdminFactory.create()
         self.client.login(username=instructor.username, password="test")
 
-    @patch.dict(settings.MITX_FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True})
+    @patch.dict(settings.MITX_FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
     def test_email_flag_true(self):
         response = self.client.get(reverse('instructor_dashboard',
                                    kwargs={'course_id': self.course.id}))
         email_link = '<a href="#" onclick="goto(\'Email\')" class="None">Email</a>'
+        print(response.content)
         self.assertTrue(email_link in response.content)
 
         session = self.client.session

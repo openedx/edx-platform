@@ -32,15 +32,6 @@ class AnonymousIndexPageTest(ModuleStoreTestCase):
         self.store.save_xmodule(self.course)
 
     @override_settings(MITX_FEATURES=MITX_FEATURES_WITH_STARTDATE)
-    def test_none_user_index_access_with_startdate_fails(self):
-        """
-        This was a "before" test for a bugfix.  If someone fixes the bug another way in the future
-        and this test begins failing (but the other two pass), then feel free to delete this test.
-        """
-        with self.assertRaisesRegexp(AttributeError, "'NoneType' object has no attribute 'is_authenticated'"):
-            student.views.index(self.factory.get('/'), user=None)  # pylint: disable=E1101
-
-    @override_settings(MITX_FEATURES=MITX_FEATURES_WITH_STARTDATE)
     def test_anon_user_with_startdate_index(self):
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
