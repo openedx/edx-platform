@@ -2167,7 +2167,7 @@ class ImageResponse(LoncapaResponse):
         answers = {}
         for ielt in self.ielements:
             ie_id = ielt.get('id')
-            answers[ie_id] = (ielt.get('rectangle'), ielt.get('regions'))
+            answers[ie_id] = {'rectangle': ielt.get('rectangle'), 'regions': ielt.get('regions')}
 
         return answers
 

@@ -5,6 +5,8 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Blades: Show answer for imageresponse. BLD-21.
+
 Blades: LTI additional Python tests. LTI must use HTTPS for
 lis_outcome_service_url. BLD-564.
 
