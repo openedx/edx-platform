@@ -42,7 +42,7 @@ edX Learning Management System
 
 The following changes are included in this release: 
 
-* Grade reports is .csv files that you download form the Instructor Dashboard can now handle Unicode characters. (LMS-197)
+* Grade reports in .csv files that you download form the Instructor Dashboard can now handle Unicode characters. (LMS-197)
 * For courses using OpenID, the user's Full Name is now returned in the Full Name field, not the username. (LMS-750)
 * A problem that prevented the listing of course staff in the Instructor Dashboard is fixed. (LMS-1599)
 * Image mapping problems now work correctly in Internet Explorer. (BLD-413)
