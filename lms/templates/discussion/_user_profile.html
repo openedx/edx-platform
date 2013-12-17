@@ -14,11 +14,4 @@
   </div>
   <div class="sidebar-threads-count"><span>${profiled_user['threads_count'] | h}</span> ${pluralize('discussion', profiled_user['threads_count']) | h} started</div>
   <div class="sidebar-comments-count"><span>${profiled_user['comments_count'] | h}</span> ${pluralize('comment', profiled_user['comments_count']) | h}</div>
-  % if check_permissions_by_view(user, course.id, content=None, name='update_moderator_status'):
-    % if "Moderator" in role_names:
-      <a href="javascript:void(0)" class="sidebar-toggle-moderator-button sidebar-revoke-moderator-button">${_("Revoke Moderator rights")}</a>
-    % else:
-      <a href="javascript:void(0)" class="sidebar-toggle-moderator-button sidebar-promote-moderator-button">${_("Promote to Moderator")}</a>
-    % endif
-  % endif
 </div>

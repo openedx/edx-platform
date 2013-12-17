@@ -52,7 +52,7 @@ function ($, _, Utils, MessageManager, FileUploader, sinon) {
             view = new MessageManager({
                 el: $container,
                 parent: videoList,
-                component_id: 'component_id'
+                component_locator: 'component_locator'
             });
         });
 
@@ -60,7 +60,7 @@ function ($, _, Utils, MessageManager, FileUploader, sinon) {
             expect(fileUploader.initialize).toHaveBeenCalledWith({
                 el: view.$el,
                 messenger: view,
-                component_id: view.component_id,
+                component_locator: view.component_locator,
                 videoListObject: view.options.parent
             });
         });
@@ -215,7 +215,7 @@ function ($, _, Utils, MessageManager, FileUploader, sinon) {
                     function() {
                         expect(Utils.command).toHaveBeenCalledWith(
                             action,
-                            view.component_id,
+                            view.component_locator,
                             videoList,
                             void(0)
                         );
@@ -245,7 +245,7 @@ function ($, _, Utils, MessageManager, FileUploader, sinon) {
                     function () {
                         expect(Utils.command).toHaveBeenCalledWith(
                             action,
-                            view.component_id,
+                            view.component_locator,
                             videoList,
                             {
                                 html5_id: extraParamas
@@ -268,7 +268,7 @@ function ($, _, Utils, MessageManager, FileUploader, sinon) {
                     function () {
                         expect(Utils.command).toHaveBeenCalledWith(
                             action,
-                            view.component_id,
+                            view.component_locator,
                             videoList,
                             void(0)
                         );

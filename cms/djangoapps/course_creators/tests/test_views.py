@@ -46,7 +46,7 @@ class CourseCreatorView(TestCase):
         self.assertEqual('unrequested', get_course_creator_status(self.user))
 
     def test_add_granted(self):
-        with mock.patch.dict('django.conf.settings.MITX_FEATURES', {"ENABLE_CREATOR_GROUP": True}):
+        with mock.patch.dict('django.conf.settings.FEATURES', {"ENABLE_CREATOR_GROUP": True}):
             # Calling add_user_with_status_granted impacts is_user_in_course_group_role.
             self.assertFalse(is_user_in_creator_group(self.user))
 
@@ -60,7 +60,7 @@ class CourseCreatorView(TestCase):
             self.assertTrue(is_user_in_creator_group(self.user))
 
     def test_update_creator_group(self):
-        with mock.patch.dict('django.conf.settings.MITX_FEATURES', {"ENABLE_CREATOR_GROUP": True}):
+        with mock.patch.dict('django.conf.settings.FEATURES', {"ENABLE_CREATOR_GROUP": True}):
             self.assertFalse(is_user_in_creator_group(self.user))
             update_course_creator_group(self.admin, self.user, True)
             self.assertTrue(is_user_in_creator_group(self.user))

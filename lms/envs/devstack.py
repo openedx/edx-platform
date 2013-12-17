@@ -23,8 +23,8 @@ for pkg_name in ['track.contexts', 'track.middleware', 'dd.dogapi']:
 ################################ EMAIL ########################################
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-MITX_FEATURES['ENABLE_INSTRUCTOR_EMAIL'] = True     # Enable email for all Studio courses
-MITX_FEATURES['REQUIRE_COURSE_EMAIL_AUTH'] = False  # Give all courses email (don't require django-admin perms)
+FEATURES['ENABLE_INSTRUCTOR_EMAIL'] = True     # Enable email for all Studio courses
+FEATURES['REQUIRE_COURSE_EMAIL_AUTH'] = False  # Give all courses email (don't require django-admin perms)
 
 
 ################################ DEBUG TOOLBAR ################################
@@ -53,6 +53,11 @@ DEBUG_TOOLBAR_CONFIG = {
 
 PIPELINE_SASS_ARGUMENTS = '--debug-info --require {proj_dir}/static/sass/bourbon/lib/bourbon.rb'.format(proj_dir=PROJECT_ROOT)
 
+########################### VERIFIED CERTIFICATES #################################
+
+FEATURES['AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'] = True
+FEATURES['ENABLE_PAYMENT_FAKE'] = True
+CC_PROCESSOR['CyberSource']['PURCHASE_ENDPOINT'] = '/shoppingcart/payment_fake/'
 
 #####################################################################
 # Lastly, see if the developer has any local overrides.

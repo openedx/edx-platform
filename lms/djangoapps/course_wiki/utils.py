@@ -9,14 +9,14 @@ def user_is_article_course_staff(user, article):
     """
     The root of a course wiki is /<course_number>. This means in case there
     are two courses which have the same course_number they will end up with
-    the same course wiki root e.g. MITX/Phy101/Spring and HarvardX/Phy101/Fall
+    the same course wiki root e.g. MITx/Phy101/Spring and HarvardX/Phy101/Fall
     will share /Phy101.
 
     This looks at the course wiki root of the article and returns True if
     the user belongs to a group whose name starts with 'instructor_' or
     'staff_' and contains '/<course_wiki_root_slug>/'. So if the user is
-    staff on course MITX/Phy101/Spring they will be in
-    'instructor_MITX/Phy101/Spring' or 'staff_MITX/Phy101/Spring' groups and
+    staff on course MITx/Phy101/Spring they will be in
+    'instructor_MITx/Phy101/Spring' or 'staff_MITx/Phy101/Spring' groups and
     so this will return True.
     """
 

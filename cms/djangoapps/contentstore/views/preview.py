@@ -5,7 +5,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseBadRequest
 from django.contrib.auth.decorators import login_required
-from mitxmako.shortcuts import render_to_response, render_to_string
+from edxmako.shortcuts import render_to_response, render_to_string
 
 from xmodule_modifiers import replace_static_urls, wrap_xblock
 from xmodule.error_module import ErrorDescriptor
@@ -159,5 +159,6 @@ def get_preview_html(request, descriptor):
     try:
         content = module.render("student_view").content
     except Exception as exc:                          # pylint: disable=W0703
+        log.debug("Unable to render student_view for %r", module, exc_info=True)
         content = render_to_string('html_error.html', {'message': str(exc)})
     return content

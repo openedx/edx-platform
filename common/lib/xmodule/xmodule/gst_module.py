@@ -128,7 +128,7 @@ class GraphicalSliderToolModule(GraphicalSliderToolFields, XModule):
         html_string with their divs. Html_string is content of <render> tag
         inside <graphical_slider_tool> tag. Documentation on how information in
         <render> tag is organized and processed is located in:
-        mitx/docs/build/html/graphical_slider_tool.html.
+        edx-platform/docs/build/html/graphical_slider_tool.html.
 
         Args:
             html_string: content of <render> tag, with controls as xml tags,

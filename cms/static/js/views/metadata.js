@@ -189,14 +189,19 @@ function(Backbone, _, MetadataModel, AbstractEditor, VideoList) {
 
         changed: function () {
             // Limit value to the range specified by min and max (necessary for browsers that aren't using polyfill).
+            // Prevent integer/float fields value to be empty (set them to their defaults)
             var value = this.getValueFromEditor();
-            if ((this.max !== undefined) && value > this.max) {
-                value = this.max;
-            } else if ((this.min != undefined) && value < this.min) {
-                value = this.min;
+            if (value) {
+                if ((this.max !== undefined) && value > this.max) {
+                    value = this.max;
+                } else if ((this.min != undefined) && value < this.min) {
+                    value = this.min;
+                }
+                this.setValueInEditor(value);
+                this.updateModel();
+            } else {
+                this.clear();
             }
-            this.setValueInEditor(value);
-            this.updateModel();
         }
 
     });

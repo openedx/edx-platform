@@ -44,7 +44,7 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
 
 # Enable Berkeley forums
-MITX_FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
+FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
 
 # IMPORTANT: With this enabled, the server must always be behind a proxy that
 # strips the header HTTP_X_FORWARDED_PROTO from client requests. Otherwise,
@@ -124,7 +124,9 @@ if STATIC_ROOT_BASE:
 STATIC_URL_BASE = ENV_TOKENS.get('STATIC_URL_BASE', None)
 if STATIC_URL_BASE:
     # collectstatic will fail if STATIC_URL is a unicode string
-    STATIC_URL = STATIC_URL_BASE.encode('ascii') + "/"
+    STATIC_URL = STATIC_URL_BASE.encode('ascii')
+    if not STATIC_URL.endswith("/"):
+        STATIC_URL += "/"
 
 PLATFORM_NAME = ENV_TOKENS.get('PLATFORM_NAME', PLATFORM_NAME)
 # For displaying on the receipt. At Stanford PLATFORM_NAME != MERCHANT_NAME, but PLATFORM_NAME is a fine default
@@ -210,8 +212,9 @@ USE_I18N = ENV_TOKENS.get('USE_I18N', USE_I18N)
 for app in ENV_TOKENS.get('ADDL_INSTALLED_APPS', []):
     INSTALLED_APPS += (app,)
 
-for feature, value in ENV_TOKENS.get('MITX_FEATURES', {}).items():
-    MITX_FEATURES[feature] = value
+ENV_FEATURES = ENV_TOKENS.get('FEATURES', ENV_TOKENS.get('MITX_FEATURES', {}))
+for feature, value in ENV_FEATURES.items():
+    FEATURES[feature] = value
 
 WIKI_ENABLED = ENV_TOKENS.get('WIKI_ENABLED', WIKI_ENABLED)
 local_loglevel = ENV_TOKENS.get('LOCAL_LOGLEVEL', 'INFO')
@@ -234,6 +237,10 @@ ZENDESK_URL = ENV_TOKENS.get("ZENDESK_URL")
 FEEDBACK_SUBMISSION_EMAIL = ENV_TOKENS.get("FEEDBACK_SUBMISSION_EMAIL")
 MKTG_URLS = ENV_TOKENS.get('MKTG_URLS', MKTG_URLS)
 
+# git repo loading  environment
+GIT_REPO_DIR = ENV_TOKENS.get('GIT_REPO_DIR', '/edx/var/edxapp/course_repos')
+GIT_IMPORT_STATIC = ENV_TOKENS.get('GIT_IMPORT_STATIC', True)
+
 for name, value in ENV_TOKENS.get("CODE_JAIL", {}).items():
     oldvalue = CODE_JAIL.get(name)
     if isinstance(oldvalue, dict):
@@ -248,6 +255,11 @@ COURSES_WITH_UNSAFE_CODE = ENV_TOKENS.get("COURSES_WITH_UNSAFE_CODE", [])
 if "TRACKING_IGNORE_URL_PATTERNS" in ENV_TOKENS:
     TRACKING_IGNORE_URL_PATTERNS = ENV_TOKENS.get("TRACKING_IGNORE_URL_PATTERNS")
 
+# SSL external authentication settings
+SSL_AUTH_EMAIL_DOMAIN = ENV_TOKENS.get("SSL_AUTH_EMAIL_DOMAIN", "MIT.EDU")
+SSL_AUTH_DN_FORMAT_STRING = ENV_TOKENS.get("SSL_AUTH_DN_FORMAT_STRING",
+                                           "/C=US/ST=Massachusetts/O=Massachusetts Institute of Technology/OU=Client CA v1/CN={0}/emailAddress={1}")
+
 ############################## SECURE AUTH ITEMS ###############
 # Secret things: passwords, access keys, etc.
 
@@ -258,7 +270,7 @@ with open(CONFIG_ROOT / CONFIG_PREFIX + "auth.json") as auth_file:
 # If Segment.io key specified, load it and enable Segment.io if the feature flag is set
 SEGMENT_IO_LMS_KEY = AUTH_TOKENS.get('SEGMENT_IO_LMS_KEY')
 if SEGMENT_IO_LMS_KEY:
-    MITX_FEATURES['SEGMENT_IO_LMS'] = ENV_TOKENS.get('SEGMENT_IO_LMS', False)
+    FEATURES['SEGMENT_IO_LMS'] = ENV_TOKENS.get('SEGMENT_IO_LMS', False)
 
 CC_PROCESSOR = AUTH_TOKENS.get('CC_PROCESSOR', CC_PROCESSOR)
 
@@ -283,6 +295,7 @@ XQUEUE_INTERFACE = AUTH_TOKENS['XQUEUE_INTERFACE']
 MODULESTORE = AUTH_TOKENS.get('MODULESTORE', MODULESTORE)
 CONTENTSTORE = AUTH_TOKENS.get('CONTENTSTORE', CONTENTSTORE)
 DOC_STORE_CONFIG = AUTH_TOKENS.get('DOC_STORE_CONFIG',DOC_STORE_CONFIG)
+MONGODB_LOG = AUTH_TOKENS.get('MONGODB_LOG', {})
 
 OPEN_ENDED_GRADING_INTERFACE = AUTH_TOKENS.get('OPEN_ENDED_GRADING_INTERFACE',
                                                OPEN_ENDED_GRADING_INTERFACE)

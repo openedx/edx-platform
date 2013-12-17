@@ -1,5 +1,5 @@
 # Notes on using mongodb backed LMS and CMS
-  
+
 These are some random notes for developers, on how things are stored in mongodb, and how to debug mongodb data.
 
 ## Databases
@@ -62,7 +62,7 @@ Under ubuntu, do:
 
   - apt-get install php5-fpm php-pear
   - pecl install mongo
-  - edit /etc/php5/fpm/php.ini to add "extension=mongo.so" 
+  - edit /etc/php5/fpm/php.ini to add "extension=mongo.so"
   - /etc/init.d/php5-fpm restart
 
 and also setup nginx to run php through fastcgi.

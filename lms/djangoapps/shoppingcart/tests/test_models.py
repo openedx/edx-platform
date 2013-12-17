@@ -6,7 +6,7 @@ import StringIO
 from textwrap import dedent
 from boto.exception import BotoServerError  # this is a super-class of SESError and catches connection errors
 
-from mock import patch, MagicMock
+from mock import patch, MagicMock, sentinel
 from django.core import mail
 from django.conf import settings
 from django.db import DatabaseError
@@ -161,7 +161,7 @@ class OrderTest(ModuleStoreTestCase):
         )
 
     @patch('shoppingcart.models.render_to_string')
-    @patch.dict(settings.MITX_FEATURES, {'STORE_BILLING_INFO': True})
+    @patch.dict(settings.FEATURES, {'STORE_BILLING_INFO': True})
     def test_billing_info_storage_on(self, render):
         cart = Order.get_cart_for_user(self.user)
         self.purchase_with_data(cart)
@@ -179,7 +179,7 @@ class OrderTest(ModuleStoreTestCase):
         self.assertTrue(context['has_billing_info'])
 
     @patch('shoppingcart.models.render_to_string')
-    @patch.dict(settings.MITX_FEATURES, {'STORE_BILLING_INFO': False})
+    @patch.dict(settings.FEATURES, {'STORE_BILLING_INFO': False})
     def test_billing_info_storage_off(self, render):
         cart = Order.get_cart_for_user(self.user)
         self.purchase_with_data(cart)
@@ -425,12 +425,21 @@ class CertificateItemTest(ModuleStoreTestCase):
                                  min_price=self.cost)
         course_mode.save()
 
+        patcher = patch('student.models.server_track')
+        self.mock_server_track = patcher.start()
+        self.addCleanup(patcher.stop)
+        crum_patcher = patch('student.models.crum.get_current_request')
+        self.mock_get_current_request = crum_patcher.start()
+        self.addCleanup(crum_patcher.stop)
+        self.mock_get_current_request.return_value = sentinel.request
+
     def test_existing_enrollment(self):
         CourseEnrollment.enroll(self.user, self.course_id)
         cart = Order.get_cart_for_user(user=self.user)
         CertificateItem.add_to_order(cart, self.course_id, self.cost, 'verified')
         # verify that we are still enrolled
         self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course_id))
+        self.mock_server_track.reset_mock()
         cart.purchase()
         enrollment = CourseEnrollment.objects.get(user=self.user, course_id=self.course_id)
         self.assertEquals(enrollment.mode, u'verified')

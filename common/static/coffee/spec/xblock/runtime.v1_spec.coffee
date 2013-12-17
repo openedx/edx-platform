@@ -12,7 +12,7 @@ describe "XBlock.runtime.v1", ->
 
     @runtime = XBlock.runtime.v1(@element, @children)
   it "provides a handler url", ->
-    expect(@runtime.handlerUrl('foo')).toBe('/xblock/fake-usage-id/handler/foo')
+    expect(@runtime.handlerUrl(@element, 'foo')).toBe('/xblock/fake-usage-id/handler/foo')
 
   it "provides a list of children", ->
     expect(@runtime.children).toBe(@children)

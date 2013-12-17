@@ -11,9 +11,9 @@ class AutoAuthEnabledTestCase(UrlResetMixin, TestCase):
     Tests for the Auto auth view that we have for load testing.
     """
 
-    @patch.dict("django.conf.settings.MITX_FEATURES", {"AUTOMATIC_AUTH_FOR_TESTING": True})
+    @patch.dict("django.conf.settings.FEATURES", {"AUTOMATIC_AUTH_FOR_TESTING": True})
     def setUp(self):
-        # Patching the settings.MITX_FEATURES['AUTOMATIC_AUTH_FOR_TESTING']
+        # Patching the settings.FEATURES['AUTOMATIC_AUTH_FOR_TESTING']
         # value affects the contents of urls.py,
         # so we need to call super.setUp() which reloads urls.py (because
         # of the UrlResetMixin)
@@ -78,7 +78,7 @@ class AutoAuthEnabledTestCase(UrlResetMixin, TestCase):
         self.assertEqual(user1.email, 'USER_1_dummy_test@mitx.mit.edu')
         self.assertEqual(qset[1].username, 'USER_2')
 
-    @patch.dict("django.conf.settings.MITX_FEATURES", {"MAX_AUTO_AUTH_USERS": 1})
+    @patch.dict("django.conf.settings.FEATURES", {"MAX_AUTO_AUTH_USERS": 1})
     def test_login_already_created_user(self):
         """
         Test that when we have reached the limit for automatic users
@@ -102,9 +102,9 @@ class AutoAuthDisabledTestCase(UrlResetMixin, TestCase):
     Test that the page is inaccessible with default settings
     """
 
-    @patch.dict("django.conf.settings.MITX_FEATURES", {"AUTOMATIC_AUTH_FOR_TESTING": False})
+    @patch.dict("django.conf.settings.FEATURES", {"AUTOMATIC_AUTH_FOR_TESTING": False})
     def setUp(self):
-        # Patching the settings.MITX_FEATURES['AUTOMATIC_AUTH_FOR_TESTING']
+        # Patching the settings.FEATURES['AUTOMATIC_AUTH_FOR_TESTING']
         # value affects the contents of urls.py,
         # so we need to call super.setUp() which reloads urls.py (because
         # of the UrlResetMixin)

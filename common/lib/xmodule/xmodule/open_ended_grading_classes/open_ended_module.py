@@ -23,7 +23,7 @@ from pytz import UTC
 
 from .combined_open_ended_rubric import CombinedOpenEndedRubric
 
-log = logging.getLogger("mitx.courseware")
+log = logging.getLogger("edx.courseware")
 
 
 class OpenEndedModule(openendedchild.OpenEndedChild):
@@ -679,7 +679,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         return {
             'success': success,
             'error': error_message,
-            'student_response': data['student_answer'].replace("\n","<br/>")
+            'student_response': data['student_answer'].replace("\n", "<br/>")
         }
 
     def update_score(self, data, system):
@@ -737,6 +737,44 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         }
         html = system.render_template('{0}/open_ended.html'.format(self.TEMPLATE_DIR), context)
         return html
+
+    def latest_score(self):
+        """None if not available"""
+        if not self.child_history:
+            return None
+        return self.score_for_attempt(-1)
+
+    def all_scores(self):
+        """None if not available"""
+        if not self.child_history:
+            return None
+        return [self.score_for_attempt(index) for index in xrange(0, len(self.child_history))]
+
+    def score_for_attempt(self, index):
+        """
+        Return sum of rubric scores for ML grading otherwise return attempt["score"].
+        """
+        attempt = self.child_history[index]
+        score = attempt.get('score')
+        post_assessment_data = self._parse_score_msg(attempt.get('post_assessment'), self.system)
+        grader_types = post_assessment_data.get('grader_types')
+
+        # According to _parse_score_msg in ML grading there should be only one grader type.
+        if len(grader_types) == 1 and grader_types[0] == 'ML':
+            rubric_scores = post_assessment_data.get("rubric_scores")
+
+            # Similarly there should be only one list of rubric scores.
+            if len(rubric_scores) == 1:
+                rubric_scores_sum = sum(rubric_scores[0])
+                log.debug("""Score normalized for location={loc}, old_score={old_score},
+                new_score={new_score}, rubric_score={rubric_score}""".format(
+                    loc=self.location_string,
+                    old_score=score,
+                    new_score=rubric_scores_sum,
+                    rubric_score=rubric_scores
+                ))
+                return rubric_scores_sum
+        return score
 
 
 class OpenEndedDescriptor():

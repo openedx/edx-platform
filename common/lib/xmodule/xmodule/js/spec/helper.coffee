@@ -162,6 +162,8 @@ beforeEach ->
     toBeInArray: (array) ->
       return $.inArray(@.actual, array) > -1
 
+  @addMatchers imagediff.jasmine
+
 # Stub jQuery.cookie
 $.cookie = jasmine.createSpy('jQuery.cookie').andReturn '1.0'
 
