@@ -69,12 +69,14 @@ class Command(BaseCommand):
                     self.send_email(user, certificate)
                     emailed.append(certificate.course_id)
             account.emailed_courses = json.dumps(emailed)
+            account.save()
 
-    def certificate_url(self, course, certificate, grandfather=False):
+    def certificate_url(self, certificate, grandfather=False):
         """
         Generates a certificate URL based on LinkedIn's documentation.  The
         documentation is from a Word document: DAT_DOCUMENTATION_v3.12.docx
         """
+        course = get_course_by_id(certificate.course_id)
         tracking_code = '-'.join([
             'eml',
             'prof',  # the 'product'--no idea what that's supposed to mean
@@ -101,23 +103,37 @@ class Command(BaseCommand):
         Send the 'grandfathered' email informing historical students that they
         may now post their certificates on their LinkedIn profiles.
         """
-        print "GRANDFATHER: ", user, certificates
+        template = get_template("linkedin_grandfather_email.html")
+        links = [
+            {'course_name': certificate.name,
+             'url': self.certificate_url(certificate, grandfather=True)}
+            for certificate in certificates]
+        context = Context({
+            'student_name': user.profile.name,
+            'certificates': links})
+        body = template.render(context)
+        subject = 'Congratulations! Put your certificates on LinkedIn'
+        self.send_email(user, subject, body)
 
-    def send_email(self, user, certificate):
+    def send_triggered_email(self, user, certificate):
         """
         Email a user that recently earned a certificate, inviting them to post
         their certificate on their LinkedIn profile.
         """
         template = get_template("linkedin_email.html")
-        course = get_course_by_id(certificate.course_id)
-        url = self.certificate_url(course, certificate)
+        url = self.certificate_url(certificate)
         context = Context({
             'student_name': user.profile.name,
             'course_name': certificate.name,
             'url': url})
-
-        subject = 'Congratulations! Put your certificate on LinkedIn'
         body = template.render(context)
+        subject = 'Congratulations! Put your certificate on LinkedIn'
+        self.send_email(user, subject, body)
+
+    def send_email(self, user, subject, body):
+        """
+        Send an email.
+        """
         fromaddr = self.api.config['EMAIL_FROM']
         toaddr = '%s <%s>' % (user.profile.name, user.email)
         send_mail(subject, body, fromaddr, (toaddr,))
