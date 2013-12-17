@@ -355,10 +355,14 @@ class LTIModule(LTIFields, XModule):
 
             # Parameters required for grading:
             u'resource_link_id': self.get_resource_link_id(),
-            u'lis_outcome_service_url': self.get_outcome_service_url(),
             u'lis_result_sourcedid': self.get_lis_result_sourcedid(),
 
         }
+
+        if self.has_score:
+            body.update({
+                u'lis_outcome_service_url': self.get_outcome_service_url()
+            })
 
         # Appending custom parameter for signing.
         body.update(custom_parameters)
@@ -483,6 +487,8 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         try:
             imsx_messageIdentifier, sourcedId, score, action = self.parse_grade_xml_body(request.body)
         except Exception:
+            log.debug("[LTI]: Request body XML parsing error.")
+            failure_values['imsx_description'] = 'Request body XML parsing error.'
             return Response(response_xml_template.format(**failure_values), content_type="application/xml")
 
         # Verify OAuth signing.
@@ -490,10 +496,15 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
             self.verify_oauth_body_sign(request)
         except (ValueError, LTIError):
             failure_values['imsx_messageIdentifier'] = escape(imsx_messageIdentifier)
+            failure_values['imsx_description'] = 'OAuth verification error.'
             return Response(response_xml_template.format(**failure_values), content_type="application/xml")
 
-
         real_user = self.system.get_real_user(urllib.unquote(sourcedId.split(':')[-1]))
+        if not real_user:  # that means we can't save to database, as we do not have real user id.
+            failure_values['imsx_messageIdentifier'] = escape(imsx_messageIdentifier)
+            failure_values['imsx_description'] = 'User not found.'
+            return Response(response_xml_template.format(**failure_values), content_type="application/xml")
+
         if action == 'replaceResultRequest':
             self.system.publish(
                 event={
@@ -510,9 +521,11 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
                 'imsx_messageIdentifier': escape(imsx_messageIdentifier),
                 'response': '<replaceResultResponse/>'
             }
+            log.debug("[LTI]: Grade is saved.")
             return Response(response_xml_template.format(**values), content_type="application/xml")
 
         unsupported_values['imsx_messageIdentifier'] = escape(imsx_messageIdentifier)
+        log.debug("[LTI]: Incorrect action.")
         return Response(response_xml_template.format(**unsupported_values), content_type='application/xml')
 
 
@@ -541,6 +554,7 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
         # Raise exception if score is not float or not in range 0.0-1.0 regarding spec.
         score = float(score)
         if not 0 <= score <= 1:
+            log.debug("[LTI]: Score not in range.")
             raise LTIError
 
         return imsx_messageIdentifier, sourcedId, score, action
@@ -582,8 +596,11 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
             params=oauth_headers.items(),
             signature=oauth_signature
         )
-        if (oauth_body_hash != oauth_headers.get('oauth_body_hash') or
-            not signature.verify_hmac_sha1(mock_request, client_secret)):
+        if oauth_body_hash != oauth_headers.get('oauth_body_hash'):
+            log.debug("[LTI]: OAuth body hash verification is failed.")
+            raise LTIError
+        if not signature.verify_hmac_sha1(mock_request, client_secret):
+            log.debug("[LTI]: OAuth signature verification is failed.")
             raise LTIError
 
     def get_client_key_secret(self):

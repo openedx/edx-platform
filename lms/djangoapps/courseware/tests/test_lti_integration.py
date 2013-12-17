@@ -46,7 +46,6 @@ class TestLTI(BaseTestXmodule):
             u'role': u'student',
 
             u'resource_link_id': module_id,
-            u'lis_outcome_service_url': lis_outcome_service_url,
             u'lis_result_sourcedid': sourcedId,
 
             u'oauth_nonce': mocked_nonce,

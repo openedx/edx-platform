@@ -49,10 +49,9 @@ class MockLTIServerTest(unittest.TestCase):
 
     def test_wrong_header(self):
         """
-        Tests that LTI server processes request with right program
-        path and responses with wrong header.
+        Tests that LTI server processes request with right program path but with wrong header.
         """
-        #wrong number of params
+        #wrong number of params and no signature
         payload = {
             'user_id': 'default_user_id',
             'role': 'student',
@@ -62,7 +61,7 @@ class MockLTIServerTest(unittest.TestCase):
         uri = self.server.oauth_settings['lti_base'] + self.server.oauth_settings['lti_endpoint']
         headers = {'referer': 'http://localhost:8000/'}
         response = requests.post(uri, data=payload, headers=headers)
-        self.assertIn('Incorrect LTI header', response.content)
+        self.assertIn('Wrong LTI signature', response.content)
 
     def test_wrong_signature(self):
         """
@@ -74,7 +73,7 @@ class MockLTIServerTest(unittest.TestCase):
             'role': 'student',
             'oauth_nonce': '',
             'oauth_timestamp': '',
-            'oauth_consumer_key': 'client_key',
+            'oauth_consumer_key': 'test_client_key',
             'lti_version': 'LTI-1p0',
             'oauth_signature_method': 'HMAC-SHA1',
             'oauth_version': '1.0',
@@ -101,7 +100,7 @@ class MockLTIServerTest(unittest.TestCase):
             'role': 'student',
             'oauth_nonce': '',
             'oauth_timestamp': '',
-            'oauth_consumer_key': 'client_key',
+            'oauth_consumer_key': 'test_client_key',
             'lti_version': 'LTI-1p0',
             'oauth_signature_method': 'HMAC-SHA1',
             'oauth_version': '1.0',
@@ -112,7 +111,6 @@ class MockLTIServerTest(unittest.TestCase):
             'lis_outcome_service_url': '',
             'lis_result_sourcedid': '',
             'resource_link_id':'',
-            "lis_outcome_service_url": '',
         }
         self.server.check_oauth_signature = Mock(return_value=True)
 
@@ -128,7 +126,7 @@ class MockLTIServerTest(unittest.TestCase):
             'role': 'student',
             'oauth_nonce': '',
             'oauth_timestamp': '',
-            'oauth_consumer_key': 'client_key',
+            'oauth_consumer_key': 'test_client_key',
             'lti_version': 'LTI-1p0',
             'oauth_signature_method': 'HMAC-SHA1',
             'oauth_version': '1.0',
@@ -139,7 +137,6 @@ class MockLTIServerTest(unittest.TestCase):
             'lis_outcome_service_url': '',
             'lis_result_sourcedid': '',
             'resource_link_id':'',
-            "lis_outcome_service_url": '',
         }
         self.server.check_oauth_signature = Mock(return_value=True)
 
@@ -147,8 +144,8 @@ class MockLTIServerTest(unittest.TestCase):
         #this is the uri for sending grade from lti
         headers = {'referer': 'http://localhost:8000/'}
         response = requests.post(uri, data=payload, headers=headers)
+        self.assertIn('This is LTI tool. Success.', response.content)
 
-        self.assertTrue('This is LTI tool. Success.' in response.content)
         self.server.grade_data['TC answer'] = "Test response"
         graded_response = requests.post('http://127.0.0.1:8034/grade')
         self.assertIn('Test response', graded_response.content)

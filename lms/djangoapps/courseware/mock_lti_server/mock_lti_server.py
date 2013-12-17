@@ -33,7 +33,6 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
     protocol = "HTTP/1.0"
     callback_url = None
 
-
     def log_message(self, format, *args):
         """Log an arbitrary message."""
         # Code copied from BaseHTTPServer.py. Changed to write to sys.stdout
@@ -49,17 +48,12 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
 
         Used for checking LTI Provider started correctly.
         '''
-
         self.send_response(200, 'OK')
         self.send_header('Content-type', 'html')
         self.end_headers()
-
         response_str = """<html><head><title>TEST TITLE</title></head>
             <body>This is LTI Provider.</body></html>"""
-
         self.wfile.write(response_str)
-
-
 
     def do_POST(self):
         '''
@@ -72,38 +66,17 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
         # Respond to request with correct lti endpoint:
         elif self._is_correct_lti_request():
             self.post_dict = self._post_dict()
-            correct_keys = [
-                'user_id',
-                'role',
-                'oauth_nonce',
-                'oauth_timestamp',
-                'oauth_consumer_key',
-                'lti_version',
-                'oauth_signature_method',
-                'oauth_version',
-                'oauth_signature',
-                'lti_message_type',
-                'oauth_callback',
-                'lis_outcome_service_url',
-                'lis_result_sourcedid',
-                'launch_presentation_return_url',
-                # 'lis_person_sourcedid',  optional, not used now.
-                'resource_link_id',
-            ]
-            if sorted(correct_keys) != sorted(self.post_dict.keys()):
-                status_message = "Incorrect LTI header"
+            params = {k: v for k, v in self.post_dict.items() if k != 'oauth_signature'}
+            if self.server.check_oauth_signature(params, self.post_dict.get('oauth_signature', "")):
+                status_message = "This is LTI tool. Success."
+                # set data for grades what need to be stored as server data
+                if 'lis_outcome_service_url' in self.post_dict:
+                    self.server.grade_data = {
+                        'callback_url': self.post_dict.get('lis_outcome_service_url'),
+                        'sourcedId': self.post_dict.get('lis_result_sourcedid')
+                    }
             else:
-                params = {k: v for k, v in self.post_dict.items() if k != 'oauth_signature'}
-                if self.server.check_oauth_signature(params, self.post_dict['oauth_signature']):
-                    status_message = "This is LTI tool. Success."
-                else:
-                    status_message = "Wrong LTI signature"
-            # set data for grades
-            # what need to be stored as server data
-            self.server.grade_data = {
-                'callback_url': self.post_dict.get('lis_outcome_service_url'),
-                'sourcedId': self.post_dict.get('lis_result_sourcedid')
-            }
+                status_message = "Wrong LTI signature"
             self._send_response(status_message, 200)
         else:
             status_message = "Invalid request URL"
@@ -141,17 +114,17 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
             self.server.cookie = {}
         referer = urlparse.urlparse(self.headers.getheader('referer'))
         self.server.referer_host = "{}://{}".format(referer.scheme, referer.netloc)
-        self.server.referer_netloc = referer.netloc
         return post_dict
 
     def _send_graded_result(self):
-
+        """
+        Send grade request.
+        """
         values = {
             'textString': 0.5,
             'sourcedId': self.server.grade_data['sourcedId'],
             'imsx_messageIdentifier': uuid4().hex,
         }
-
         payload = textwrap.dedent("""
             <?xml version = "1.0" encoding = "UTF-8"?>
                 <imsx_POXEnvelopeRequest  xmlns="http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
@@ -208,40 +181,53 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
         Send message back to the client
         '''
         self._send_head(status_code)
-        if self.server.grade_data['callback_url']:
-            response_str = """<html><head><title>TEST TITLE</title></head>
-                <body>
-                <div><h2>Graded IFrame loaded</h2> \
-                <h3>Server response is:</h3>\
-                <h3 class="result">{}</h3></div>
-                <form action="{url}/grade" method="post">
-                <input type="submit" name="submit-button" value="Submit">
-                </form>
+        if getattr(self.server, 'grade_data', False):  # lti can be graded
+            response_str = textwrap.dedent("""
+                <html>
+                    <head>
+                        <title>TEST TITLE</title>
+                    </head>
+                    <body>
+                        <div>
+                            <h2>Graded IFrame loaded</h2>
+                            <h3>Server response is:</h3>
+                            <h3 class="result">{}</h3>
+                        </div>
+                        <form action="{url}/grade" method="post">
+                            <input type="submit" name="submit-button" value="Submit">
+                        </form>
+                    </body>
+                </html>
+            """).format(message, url="http://%s:%s" % self.server.server_address)
+        else: # lti can't be graded
+            response_str = textwrap.dedent("""
+                <html>
+                    <head>
+                        <title>TEST TITLE</title>
+                    </head>
+                    <body>
+                        <div>
+                            <h2>IFrame loaded</h2>
+                            <h3>Server response is:</h3>
+                            <h3 class="result">{}</h3>
+                        </div>
+                    </body>
+                </html>
+            """).format(message)
 
-                </body></html>""".format(message, url="http://%s:%s" % self.server.server_address)
-        else:
-            response_str = """<html><head><title>TEST TITLE</title></head>
-                <body>
-                <div><h2>IFrame loaded</h2> \
-                <h3>Server response is:</h3>\
-                <h3 class="result">{}</h3></div>
-                </body></html>""".format(message)
-
-        # Log the response
         logger.debug("LTI: sent response {}".format(response_str))
-
         self.wfile.write(response_str)
 
     def _is_correct_lti_request(self):
-        '''If url to LTI tool is correct.'''
+        '''
+        If url to LTI tool is correct.
+        '''
         return self.server.oauth_settings['lti_endpoint'] in self.path
 
     def oauth_sign(self, url, body):
         """
         Signs request and returns signed body and headers.
-
         """
-
         client = oauthlib.oauth1.Client(
             client_key=unicode(self.server.oauth_settings['client_key']),
             client_secret=unicode(self.server.oauth_settings['client_secret'])
