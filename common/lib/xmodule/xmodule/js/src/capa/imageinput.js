@@ -13,24 +13,49 @@
  * ~ Chinese Proverb
  */
 
-window.image_input_click = function (id, event) {
-    var iiDiv = document.getElementById('imageinput_' + id),
+window.ImageInput = (function ($, undefined) {
+    var ImageInput = ImageInputConstructor;
 
-        posX = event.offsetX ? event.offsetX : event.pageX - iiDiv.offsetLeft,
-        posY = event.offsetY ? event.offsetY : event.pageY - iiDiv.offsetTop,
+    ImageInput.prototype = {
+        constructor: ImageInputConstructor,
+        clickHandler: clickHandler
+    };
 
-        cross = document.getElementById('cross_' + id),
+    return ImageInput;
 
-        // To reduce differences between values returned by different kinds of
-        // browsers, we round `posX` and `posY`.
-        //
-        // IE10: `posX` and `posY` - float.
-        // Chrome, FF: `posX` and `posY` - integers.
-        result = '[' + Math.round(posX) + ',' + Math.round(posY) + ']';
+    function ImageInputConstructor(elementId) {
+        var _this = this;
 
-    cross.style.left = (posX - 15) + 'px';
-    cross.style.top = (posY - 15) + 'px';
-    cross.style.visibility = 'visible';
+        this.elementId = elementId;
 
-    document.getElementById('input_' + id).value = result;
-};
+        this.el = $('#imageinput_' + this.elementId);
+        this.crossEl = $('#cross_' + this.elementId);
+        this.inputEl = $('#input_' + this.elementId);
+
+        this.el.on('click', function (event) {
+            _this.clickHandler(event);
+        });
+    }
+
+    function clickHandler(event) {
+        var posX = event.offsetX ?
+                event.offsetX : event.pageX - this.el[0].offsetLeft,
+            posY = event.offsetY ?
+                event.offsetY : event.pageY - this.el[0].offsetTop,
+
+            // To reduce differences between values returned by different kinds
+            // of browsers, we round `posX` and `posY`.
+            //
+            // IE10: `posX` and `posY` - float.
+            // Chrome, FF: `posX` and `posY` - integers.
+            result = '[' + Math.round(posX) + ',' + Math.round(posY) + ']';
+
+        this.crossEl.css({
+            left: posX - 15,
+            top: posY - 15,
+            visibility: 'visible'
+        });
+
+        this.inputEl.val(result);
+    }
+}).call(this, window.jQuery);
