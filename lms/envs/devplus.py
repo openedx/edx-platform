@@ -73,4 +73,4 @@ DEBUG_TOOLBAR_PANELS = (
   'debug_toolbar.panels.profiling.ProfilingDebugPanel',
 )
 
-#PIPELINE = True
+#PIPELINE_ENABLED = True

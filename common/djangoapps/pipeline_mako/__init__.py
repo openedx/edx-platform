@@ -14,7 +14,7 @@ def compressed_css(package_name):
 
     package = packager.package_for('css', package_name)
 
-    if settings.PIPELINE:
+    if getattr(settings, "PIPELINE_ENABLED", False):
         return render_css(package, package.output_filename)
     else:
         paths = packager.compile(package.paths)
@@ -46,7 +46,7 @@ def compressed_js(package_name):
 
     package = packager.package_for('js', package_name)
 
-    if settings.PIPELINE:
+    if getattr(settings, "PIPELINE_ENABLED", False):
         return render_js(package, package.output_filename)
     else:
         paths = packager.compile(package.paths)

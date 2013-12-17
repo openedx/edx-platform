@@ -37,8 +37,6 @@ from dealer.git import git
 ############################ FEATURE CONFIGURATION #############################
 
 FEATURES = {
-    'USE_DJANGO_PIPELINE': True,
-
     'GITHUB_PUSH': False,
 
     'ENABLE_DISCUSSION_SERVICE': False,
@@ -134,8 +132,8 @@ XQUEUE_INTERFACE = {
 # List of finder classes that know how to find static files in
 # various locations.
 STATICFILES_FINDERS = (
-    'staticfiles.finders.FileSystemFinder',
-    'staticfiles.finders.AppDirectoriesFinder',
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     'pipeline.finders.PipelineFinder',
 )
 
@@ -243,6 +241,7 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 ############################### Pipeline #######################################
 
 STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
+PIPELINE_ENABLED = True
 
 from rooted_paths import rooted_glob
 
@@ -404,7 +403,7 @@ INSTALLED_APPS = (
     # For asset pipelining
     'edxmako',
     'pipeline',
-    'staticfiles',
+    'django.contrib.staticfiles',
     'static_replace',
 
     # comment common
