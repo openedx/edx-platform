@@ -1,4 +1,4 @@
-define ["js/models/section", "js/views/section_show", "js/views/section_edit", "sinon"], (Section, SectionShow, SectionEdit, sinon) ->
+define ["js/models/section", "js/views/section_show", "js/views/section_edit", "js/spec/create_sinon"], (Section, SectionShow, SectionEdit, create_sinon) ->
 
     describe "SectionShow", ->
         describe "Basic", ->
@@ -39,9 +39,6 @@ define ["js/models/section", "js/views/section_show", "js/views/section_edit", "
                     .andCallThrough()
                 window.analytics = jasmine.createSpyObj('analytics', ['track'])
                 window.course_location_analytics = jasmine.createSpy()
-                @requests = requests = []
-                @xhr = sinon.useFakeXMLHttpRequest()
-                @xhr.onCreate = (xhr) -> requests.push(xhr)
 
                 @model = new Section({
                     id: 42
@@ -51,7 +48,6 @@ define ["js/models/section", "js/views/section_show", "js/views/section_edit", "
                 @view.render()
 
             afterEach ->
-                @xhr.restore()
                 delete window.analytics
                 delete window.course_location_analytics
 
@@ -68,8 +64,10 @@ define ["js/models/section", "js/views/section_show", "js/views/section_edit", "
                 expect(@model.save).toHaveBeenCalled()
 
             it "should call switchToShowView when save() is successful", ->
+                requests = create_sinon["requests"](this)
+
                 @view.$("input[type=submit]").click()
-                @requests[0].respond(200)
+                requests[0].respond(200)
                 expect(@view.switchToShowView).toHaveBeenCalled()
 
             it "should call showInvalidMessage when validation is unsuccessful", ->
