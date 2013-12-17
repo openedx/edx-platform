@@ -6,15 +6,16 @@ LinkedIn profiles.
 import json
 import urllib
 
-from courseware.courses import get_course_by_id
+from django.core.mail import send_mail
 from django.core.management.base import BaseCommand
 from django.template import Context
 from django.template.loader import get_template
 from optparse import make_option
 
 from certificates.models import GeneratedCertificate
-from ...models import LinkedIn
+from courseware.courses import get_course_by_id
 
+from ...models import LinkedIn
 from . import LinkedinAPI
 
 
@@ -40,6 +41,10 @@ class Command(BaseCommand):
                  "certificates.  Afterwards the default, one email per "
                  "certificate mail form will be used."),)
 
+    def __init__(self):
+        super(BaseCommand, self).__init__()
+        self.api = LinkedinAPI()
+
     def handle(self, *args, **options):
         grandfather = options.get('grandfather', False)
         accounts = LinkedIn.objects.filter(has_linkedin_account=True)
@@ -53,61 +58,62 @@ class Command(BaseCommand):
             if not certificates:
                 continue
             if grandfather:
-                send_grandfather_email(user, certificates)
+                self.send_grandfather_email(user, certificates)
                 emailed.extend([cert.course_id for cert in certificates])
             else:
                 for certificate in certificates:
-                    send_email(user, certificate)
+                    self.send_email(user, certificate)
                     emailed.append(certificate.course_id)
             account.emailed_courses = json.dumps(emailed)
 
-def certificate_url(api, course, certificate, grandfather=False):
-    """
-    Generates a certificate URL based on LinkedIn's documentation.  The
-    documentation is from a Word document: DAT_DOCUMENTATION_v3.12.docx
-    """
-    tracking_code = '-'.join([
-        'eml',
-        'prof',  # the 'product'--no idea what that's supposed to mean
-        course.org,  # Partner's name
-        course.number,  # Certificate's name
-        'gf' if grandfather else 'T'])
-    query = {
-        'pfCertificationName': certificate.name,
-        'pfAuthorityName': api.config['COMPANY_NAME'],
-        'pfAuthorityId': api.config['COMPANY_ID'],
-        'pfCertificationUrl': certificate.download_url,
-        'pfLicenseNo': certificate.course_id,
-        'pfCertStartDate': course.start.strftime('%Y%mI'),
-        'pfCertFuture': certificate.created_date.strftime('%Y%m'),
-        '_mSplash': '1',
-        'trk': tracking_code,
-        'startTask': 'CERTIFICATION_name',
-        'force': 'true',
-    }
-    return 'http://www.linkedin.com/profile/guided?' + urllib.urlencode(query)
+    def certificate_url(self, course, certificate, grandfather=False):
+        """
+        Generates a certificate URL based on LinkedIn's documentation.  The
+        documentation is from a Word document: DAT_DOCUMENTATION_v3.12.docx
+        """
+        tracking_code = '-'.join([
+            'eml',
+            'prof',  # the 'product'--no idea what that's supposed to mean
+            course.org,  # Partner's name
+            course.number,  # Certificate's name
+            'gf' if grandfather else 'T'])
+        query = {
+            'pfCertificationName': certificate.name,
+            'pfAuthorityName': self.api.config['COMPANY_NAME'],
+            'pfAuthorityId': self.api.config['COMPANY_ID'],
+            'pfCertificationUrl': certificate.download_url,
+            'pfLicenseNo': certificate.course_id,
+            'pfCertStartDate': course.start.strftime('%Y%mI'),
+            'pfCertFuture': certificate.created_date.strftime('%Y%m'),
+            '_mSplash': '1',
+            'trk': tracking_code,
+            'startTask': 'CERTIFICATION_name',
+            'force': 'true',
+        }
+        return 'http://www.linkedin.com/profile/guided?' + urllib.urlencode(query)
 
+    def send_grandfather_email(self, user, certificates):
+        """
+        Send the 'grandfathered' email informing historical students that they
+        may now post their certificates on their LinkedIn profiles.
+        """
+        print "GRANDFATHER: ", user, certificates
 
-def send_grandfather_email(user, certificates):
-    """
-    Send the 'grandfathered' email informing historical students that they may
-    now post their certificates on their LinkedIn profiles.
-    """
-    print "GRANDFATHER: ", user, certificates
+    def send_email(self, user, certificate):
+        """
+        Email a user that recently earned a certificate, inviting them to post
+        their certificate on their LinkedIn profile.
+        """
+        template = get_template("linkedin_email.html")
+        course = get_course_by_id(certificate.course_id)
+        url = self.certificate_url(course, certificate)
+        context = Context({
+            'student_name': user.profile.name,
+            'course_name': certificate.name,
+            'url': url})
 
-
-def send_email(user, certificate):
-    """
-    Email a user that recently earned a certificate, inviting them to post their
-    certificate on their LinkedIn profile.
-    """
-    api = LinkedinAPI()
-    template = get_template("linkedin_email.html")
-    course = get_course_by_id(certificate.course_id)
-    url = certificate_url(api, course, certificate)
-    context = Context({
-        'student_name': user.profile.name,
-        'course_name': certificate.name,
-        'url': url})
-    print template.render(context)
-    print url
+        subject = 'Congratulations! Put your certificate on LinkedIn'
+        body = template.render(context)
+        fromaddr = self.api.config['EMAIL_FROM']
+        toaddr = '%s <%s>' % (user.profile.name, user.email)
+        send_mail(subject, body, fromaddr, (toaddr,))
