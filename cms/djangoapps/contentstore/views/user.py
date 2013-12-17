@@ -52,7 +52,7 @@ def course_team_handler(request, tag=None, course_id=None, branch=None, version_
     DELETE:
         json: remove a particular course team member from the course team (email is required).
     """
-    location = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
+    location = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, block_id=block)
     if not has_access(request.user, location):
         raise PermissionDenied()
 

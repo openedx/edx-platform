@@ -105,7 +105,7 @@ class SplitModuleTest(unittest.TestCase):
         matches the _id.
         """
         for element in collection:
-            if element.location.usage_id == _id:
+            if element.location.block_id == _id:
                 return element
 
 
@@ -267,11 +267,11 @@ class SplitModuleItemTests(SplitModuleTest):
         '''
         course_id = 'GreekHero'
         # positive tests of various forms
-        locator = BlockUsageLocator(version_guid=self.GUID_D1, usage_id='head12345')
+        locator = BlockUsageLocator(version_guid=self.GUID_D1, block_id='head12345')
         self.assertTrue(modulestore().has_item(course_id, locator),
                         "couldn't find in %s" % self.GUID_D1)
 
-        locator = BlockUsageLocator(course_id='GreekHero', usage_id='head12345', branch='draft')
+        locator = BlockUsageLocator(course_id='GreekHero', block_id='head12345', branch='draft')
         self.assertTrue(
             modulestore().has_item(locator.course_id, locator),
             "couldn't find in 12345"
@@ -280,7 +280,7 @@ class SplitModuleItemTests(SplitModuleTest):
             modulestore().has_item(locator.course_id, BlockUsageLocator(
                 course_id=locator.course_id,
                 branch='draft',
-                usage_id=locator.usage_id
+                block_id=locator.block_id
             )),
             "couldn't find in draft 12345"
         )
@@ -288,7 +288,7 @@ class SplitModuleItemTests(SplitModuleTest):
             modulestore().has_item(locator.course_id, BlockUsageLocator(
                 course_id=locator.course_id,
                 branch='published',
-                usage_id=locator.usage_id)),
+                block_id=locator.block_id)),
             "found in published 12345"
         )
         locator.branch = 'draft'
@@ -298,18 +298,18 @@ class SplitModuleItemTests(SplitModuleTest):
         )
 
         # not a course obj
-        locator = BlockUsageLocator(course_id='GreekHero', usage_id='chapter1', branch='draft')
+        locator = BlockUsageLocator(course_id='GreekHero', block_id='chapter1', branch='draft')
         self.assertTrue(
             modulestore().has_item(locator.course_id, locator),
             "couldn't find chapter1"
         )
 
         # in published course
-        locator = BlockUsageLocator(course_id="wonderful", usage_id="head23456", branch='draft')
+        locator = BlockUsageLocator(course_id="wonderful", block_id="head23456", branch='draft')
         self.assertTrue(
             modulestore().has_item(
                 locator.course_id,
-                BlockUsageLocator(course_id=locator.course_id, usage_id=locator.usage_id, branch='published')
+                BlockUsageLocator(course_id=locator.course_id, block_id=locator.block_id, branch='published')
             ), "couldn't find in 23456"
         )
         locator.branch = 'published'
@@ -319,9 +319,9 @@ class SplitModuleItemTests(SplitModuleTest):
         # negative tests--not found
         # no such course or block
         course_id = 'GreekHero'
-        locator = BlockUsageLocator(course_id="doesnotexist", usage_id="head23456", branch='draft')
+        locator = BlockUsageLocator(course_id="doesnotexist", block_id="head23456", branch='draft')
         self.assertFalse(modulestore().has_item(course_id, locator))
-        locator = BlockUsageLocator(course_id="wonderful", usage_id="doesnotexist", branch='draft')
+        locator = BlockUsageLocator(course_id="wonderful", block_id="doesnotexist", branch='draft')
         self.assertFalse(modulestore().has_item(course_id, locator))
 
         # negative tests--insufficient specification
@@ -336,7 +336,7 @@ class SplitModuleItemTests(SplitModuleTest):
         get_item(blocklocator)
         '''
         # positive tests of various forms
-        locator = BlockUsageLocator(version_guid=self.GUID_D1, usage_id='head12345')
+        locator = BlockUsageLocator(version_guid=self.GUID_D1, block_id='head12345')
         block = modulestore().get_item(locator)
         self.assertIsInstance(block, CourseDescriptor)
         # get_instance just redirects to get_item, ignores course_id
@@ -355,7 +355,7 @@ class SplitModuleItemTests(SplitModuleTest):
                 block.grade_cutoffs, {"Pass": 0.45},
             )
 
-        locator = BlockUsageLocator(course_id='GreekHero', usage_id='head12345', branch='draft')
+        locator = BlockUsageLocator(course_id='GreekHero', block_id='head12345', branch='draft')
         verify_greek_hero(modulestore().get_item(locator))
         # get_instance just redirects to get_item, ignores course_id
         verify_greek_hero(modulestore().get_instance("course_id", locator))
@@ -364,7 +364,7 @@ class SplitModuleItemTests(SplitModuleTest):
         self.assertRaises(ItemNotFoundError,
                           modulestore().get_item,
                           BlockUsageLocator(course_id=locator.as_course_locator(),
-                                            usage_id=locator.usage_id,
+                                            block_id=locator.block_id,
                                             branch='published'))
         locator.branch = 'draft'
         self.assertIsInstance(
@@ -374,7 +374,7 @@ class SplitModuleItemTests(SplitModuleTest):
 
     def test_get_non_root(self):
         # not a course obj
-        locator = BlockUsageLocator(course_id='GreekHero', usage_id='chapter1', branch='draft')
+        locator = BlockUsageLocator(course_id='GreekHero', block_id='chapter1', branch='draft')
         block = modulestore().get_item(locator)
         self.assertEqual(block.location.course_id, "GreekHero")
         self.assertEqual(block.category, 'chapter')
@@ -383,7 +383,7 @@ class SplitModuleItemTests(SplitModuleTest):
         self.assertEqual(block.edited_by, "testassist@edx.org")
 
         # in published course
-        locator = BlockUsageLocator(course_id="wonderful", usage_id="head23456", branch='published')
+        locator = BlockUsageLocator(course_id="wonderful", block_id="head23456", branch='published')
         self.assertIsInstance(
             modulestore().get_item(locator),
             CourseDescriptor
@@ -391,10 +391,10 @@ class SplitModuleItemTests(SplitModuleTest):
 
         # negative tests--not found
         # no such course or block
-        locator = BlockUsageLocator(course_id="doesnotexist", usage_id="head23456", branch='draft')
+        locator = BlockUsageLocator(course_id="doesnotexist", block_id="head23456", branch='draft')
         with self.assertRaises(ItemNotFoundError):
             modulestore().get_item(locator)
-        locator = BlockUsageLocator(course_id="wonderful", usage_id="doesnotexist", branch='draft')
+        locator = BlockUsageLocator(course_id="wonderful", block_id="doesnotexist", branch='draft')
         with self.assertRaises(ItemNotFoundError):
             modulestore().get_item(locator)
 
@@ -457,22 +457,22 @@ class SplitModuleItemTests(SplitModuleTest):
 
         matches = modulestore().get_items(locator, qualifiers={'fields': {'children': 'chapter2'}})
         self.assertEqual(len(matches), 1)
-        self.assertEqual(matches[0].location.usage_id, 'head12345')
+        self.assertEqual(matches[0].location.block_id, 'head12345')
 
     def test_get_parents(self):
         '''
-        get_parent_locations(locator, [usage_id], [branch]): [BlockUsageLocator]
+        get_parent_locations(locator, [block_id], [branch]): [BlockUsageLocator]
         '''
-        locator = BlockUsageLocator(course_id="GreekHero", branch='draft', usage_id='chapter1')
+        locator = BlockUsageLocator(course_id="GreekHero", branch='draft', block_id='chapter1')
         parents = modulestore().get_parent_locations(locator)
         self.assertEqual(len(parents), 1)
-        self.assertEqual(parents[0].usage_id, 'head12345')
+        self.assertEqual(parents[0].block_id, 'head12345')
         self.assertEqual(parents[0].course_id, "GreekHero")
-        locator.usage_id = 'chapter2'
+        locator.block_id = 'chapter2'
         parents = modulestore().get_parent_locations(locator)
         self.assertEqual(len(parents), 1)
-        self.assertEqual(parents[0].usage_id, 'head12345')
-        locator.usage_id = 'nosuchblock'
+        self.assertEqual(parents[0].block_id, 'head12345')
+        locator.block_id = 'nosuchblock'
         parents = modulestore().get_parent_locations(locator)
         self.assertEqual(len(parents), 0)
 
@@ -480,7 +480,7 @@ class SplitModuleItemTests(SplitModuleTest):
         """
         Test the existing get_children method on xdescriptors
         """
-        locator = BlockUsageLocator(course_id="GreekHero", usage_id="head12345", branch='draft')
+        locator = BlockUsageLocator(course_id="GreekHero", block_id="head12345", branch='draft')
         block = modulestore().get_item(locator)
         children = block.get_children()
         expected_ids = [
@@ -488,8 +488,8 @@ class SplitModuleItemTests(SplitModuleTest):
         ]
         for child in children:
             self.assertEqual(child.category, "chapter")
-            self.assertIn(child.location.usage_id, expected_ids)
-            expected_ids.remove(child.location.usage_id)
+            self.assertIn(child.location.block_id, expected_ids)
+            expected_ids.remove(child.location.block_id)
         self.assertEqual(len(expected_ids), 0)
 
 
@@ -551,7 +551,7 @@ class TestItemCrud(SplitModuleTest):
         # check that block does not exist in previous version
         locator = BlockUsageLocator(
             version_guid=premod_course.location.version_guid,
-            usage_id=new_module.location.usage_id
+            block_id=new_module.location.block_id
         )
         self.assertRaises(ItemNotFoundError, modulestore().get_item, locator)
 
@@ -559,7 +559,7 @@ class TestItemCrud(SplitModuleTest):
         """
         Test create_item w/ specifying the parent of the new item
         """
-        locator = BlockUsageLocator(course_id="wonderful", usage_id="head23456", branch='draft')
+        locator = BlockUsageLocator(course_id="wonderful", block_id="head23456", branch='draft')
         premod_course = modulestore().get_course(locator)
         category = 'chapter'
         new_module = modulestore().create_item(
@@ -570,16 +570,16 @@ class TestItemCrud(SplitModuleTest):
         # check that course version changed and course's previous is the other one
         self.assertNotEqual(new_module.location.version_guid, premod_course.location.version_guid)
         parent = modulestore().get_item(locator)
-        self.assertIn(new_module.location.usage_id, parent.children)
+        self.assertIn(new_module.location.block_id, parent.children)
         self.assertEqual(str(new_module.definition_locator.definition_id), "cd00000000000000dddd0022")
 
     def test_unique_naming(self):
         """
-        Check that 2 modules of same type get unique usage_ids. Also check that if creation provides
+        Check that 2 modules of same type get unique block_ids. Also check that if creation provides
         a definition id and new def data that it branches the definition in the db.
         Actually, this tries to test all create_item features not tested above.
         """
-        locator = BlockUsageLocator(course_id="contender", usage_id="head345679", branch='draft')
+        locator = BlockUsageLocator(course_id="contender", block_id="head345679", branch='draft')
         category = 'problem'
         premod_time = datetime.datetime.now(UTC) - datetime.timedelta(seconds=1)
         new_payload = "<problem>empty</problem>"
@@ -595,9 +595,9 @@ class TestItemCrud(SplitModuleTest):
         )
         # check that course version changed and course's previous is the other one
         parent = modulestore().get_item(locator)
-        self.assertNotEqual(new_module.location.usage_id, another_module.location.usage_id)
-        self.assertIn(new_module.location.usage_id, parent.children)
-        self.assertIn(another_module.location.usage_id, parent.children)
+        self.assertNotEqual(new_module.location.block_id, another_module.location.block_id)
+        self.assertIn(new_module.location.block_id, parent.children)
+        self.assertIn(another_module.location.block_id, parent.children)
         self.assertEqual(new_module.data, new_payload)
         self.assertEqual(another_module.data, another_payload)
         # check definition histories
@@ -641,13 +641,13 @@ class TestItemCrud(SplitModuleTest):
         self.assertEqual(refetch_course.update_version, course_block_update_version)
         refetch_index_history_info = modulestore().get_course_history_info(refetch_course.location)
         self.assertEqual(refetch_index_history_info, index_history_info)
-        self.assertIn(new_ele.location.usage_id, refetch_course.children)
+        self.assertIn(new_ele.location.block_id, refetch_course.children)
 
         # try to create existing item
         with self.assertRaises(DuplicateItemError):
             _fail = modulestore().create_item(
                 new_course.location, 'chapter', user,
-                usage_id=new_ele.location.usage_id,
+                block_id=new_ele.location.block_id,
                 fields={'display_name': 'chapter 2'},
                 continue_version=True
             )
@@ -678,7 +678,7 @@ class TestItemCrud(SplitModuleTest):
         # add new child to old parent in continued (leave off version_guid)
         course_module_locator = BlockUsageLocator(
             course_id=new_course.location.course_id,
-            usage_id=new_course.location.usage_id,
+            block_id=new_course.location.block_id,
             branch=new_course.location.branch
         )
         new_ele = modulestore().create_item(
@@ -691,7 +691,7 @@ class TestItemCrud(SplitModuleTest):
 
         # check children, previous_version
         refetch_course = modulestore().get_course(versionless_course_locator)
-        self.assertIn(new_ele.location.usage_id, refetch_course.children)
+        self.assertIn(new_ele.location.block_id, refetch_course.children)
         self.assertEqual(refetch_course.previous_version, course_block_update_version)
         self.assertEqual(refetch_course.update_version, transaction_guid)
 
@@ -699,7 +699,7 @@ class TestItemCrud(SplitModuleTest):
         """
         test updating an items metadata ensuring the definition doesn't version but the course does if it should
         """
-        locator = BlockUsageLocator(course_id="GreekHero", usage_id="problem3_2", branch='draft')
+        locator = BlockUsageLocator(course_id="GreekHero", block_id="problem3_2", branch='draft')
         problem = modulestore().get_item(locator)
         pre_def_id = problem.definition_locator.definition_id
         pre_version_guid = problem.location.version_guid
@@ -718,7 +718,7 @@ class TestItemCrud(SplitModuleTest):
         # refetch to ensure original didn't change
         original_location = BlockUsageLocator(
             version_guid=pre_version_guid,
-            usage_id=problem.location.usage_id
+            block_id=problem.location.block_id
         )
         problem = modulestore().get_item(original_location)
         self.assertNotEqual(problem.max_attempts, 4, "original changed")
@@ -737,7 +737,7 @@ class TestItemCrud(SplitModuleTest):
         """
         test updating an item's children ensuring the definition doesn't version but the course does if it should
         """
-        locator = BlockUsageLocator(course_id="GreekHero", usage_id="chapter3", branch='draft')
+        locator = BlockUsageLocator(course_id="GreekHero", block_id="chapter3", branch='draft')
         block = modulestore().get_item(locator)
         pre_def_id = block.definition_locator.definition_id
         pre_version_guid = block.location.version_guid
@@ -752,7 +752,7 @@ class TestItemCrud(SplitModuleTest):
         self.assertNotEqual(updated_problem.location.version_guid, pre_version_guid)
         self.assertEqual(updated_problem.children, block.children)
         self.assertNotIn(moved_child, updated_problem.children)
-        locator.usage_id = "chapter1"
+        locator.block_id = "chapter1"
         other_block = modulestore().get_item(locator)
         other_block.children.append(moved_child)
         other_block.save()  # decache model changes
@@ -763,7 +763,7 @@ class TestItemCrud(SplitModuleTest):
         """
         test updating an item's definition: ensure it gets versioned as well as the course getting versioned
         """
-        locator = BlockUsageLocator(course_id="GreekHero", usage_id="head12345", branch='draft')
+        locator = BlockUsageLocator(course_id="GreekHero", block_id="head12345", branch='draft')
         block = modulestore().get_item(locator)
         pre_def_id = block.definition_locator.definition_id
         pre_version_guid = block.location.version_guid
@@ -781,7 +781,7 @@ class TestItemCrud(SplitModuleTest):
         Test updating metadata, children, and definition in a single call ensuring all the versioning occurs
         """
         # first add 2 children to the course for the update to manipulate
-        locator = BlockUsageLocator(course_id="contender", usage_id="head345679", branch='draft')
+        locator = BlockUsageLocator(course_id="contender", block_id="head345679", branch='draft')
         category = 'problem'
         new_payload = "<problem>empty</problem>"
         modulestore().create_item(
@@ -823,7 +823,7 @@ class TestItemCrud(SplitModuleTest):
                           'deleting_user')
         reusable_location = BlockUsageLocator(
             course_id=course.location.course_id,
-            usage_id=course.location.usage_id,
+            block_id=course.location.block_id,
             branch='draft')
 
         # delete a leaf
@@ -832,12 +832,12 @@ class TestItemCrud(SplitModuleTest):
         new_course_loc = modulestore().delete_item(locn_to_del, 'deleting_user', delete_children=False)
         deleted = BlockUsageLocator(course_id=reusable_location.course_id,
                                     branch=reusable_location.branch,
-                                    usage_id=locn_to_del.usage_id)
+                                    block_id=locn_to_del.block_id)
         self.assertFalse(modulestore().has_item(reusable_location.course_id, deleted))
         self.assertRaises(VersionConflictError, modulestore().has_item, reusable_location.course_id, locn_to_del)
         locator = BlockUsageLocator(
             version_guid=locn_to_del.version_guid,
-            usage_id=locn_to_del.usage_id
+            block_id=locn_to_del.block_id
         )
         self.assertTrue(modulestore().has_item(reusable_location.course_id, locator))
         self.assertNotEqual(new_course_loc.version_guid, course.location.version_guid)
@@ -854,10 +854,10 @@ class TestItemCrud(SplitModuleTest):
                     BlockUsageLocator(
                         course_id=node_loc.course_id,
                         branch=node_loc.branch,
-                        usage_id=node.location.usage_id)))
+                        block_id=node.location.block_id)))
                 locator = BlockUsageLocator(
                     version_guid=node.location.version_guid,
-                    usage_id=node.location.usage_id)
+                    block_id=node.location.block_id)
                 self.assertTrue(modulestore().has_item(reusable_location.course_id, locator))
                 if node.has_children:
                     for sub in node.get_children():
@@ -868,7 +868,7 @@ class TestItemCrud(SplitModuleTest):
         course = modulestore().create_course('nihilx', 'deletion', 'deleting_user')
         root = BlockUsageLocator(
             course_id=course.location.course_id,
-            usage_id=course.location.usage_id,
+            block_id=course.location.block_id,
             branch='draft')
         for _ in range(4):
             self.create_subtree_for_deletion(root, ['chapter', 'vertical', 'problem'])
@@ -878,7 +878,7 @@ class TestItemCrud(SplitModuleTest):
         if not category_queue:
             return
         node = modulestore().create_item(parent, category_queue[0], 'deleting_user')
-        node_loc = BlockUsageLocator(parent.as_course_locator(), usage_id=node.location.usage_id)
+        node_loc = BlockUsageLocator(parent.as_course_locator(), block_id=node.location.block_id)
         for _ in range(4):
             self.create_subtree_for_deletion(node_loc, category_queue[1:])
 
@@ -971,7 +971,7 @@ class TestCourseCreation(SplitModuleTest):
         self.assertFalse(
             modulestore().has_item(new_draft_locator.course_id, BlockUsageLocator(
                 original_locator,
-                usage_id=new_item.location.usage_id
+                block_id=new_item.location.block_id
             ))
         )
 
@@ -1051,9 +1051,9 @@ class TestCourseCreation(SplitModuleTest):
         user = random.getrandbits(32)
         new_course = modulestore().create_course(
             'test_org', 'test_transaction', user,
-            root_usage_id='top', root_category='chapter'
+            root_block_id='top', root_category='chapter'
         )
-        self.assertEqual(new_course.location.usage_id, 'top')
+        self.assertEqual(new_course.location.block_id, 'top')
         self.assertEqual(new_course.category, 'chapter')
         # look at db to verify
         db_structure = modulestore().db_connection.get_structure(
@@ -1076,11 +1076,11 @@ class TestInheritance(SplitModuleTest):
         """
         # Note, not testing value where defined (course) b/c there's no
         # defined accessor for it on CourseDescriptor.
-        locator = BlockUsageLocator(course_id="GreekHero", usage_id="problem3_2", branch='draft')
+        locator = BlockUsageLocator(course_id="GreekHero", block_id="problem3_2", branch='draft')
         node = modulestore().get_item(locator)
         # inherited
         self.assertEqual(node.graceperiod, datetime.timedelta(hours=2))
-        locator = BlockUsageLocator(course_id="GreekHero", usage_id="problem1", branch='draft')
+        locator = BlockUsageLocator(course_id="GreekHero", block_id="problem1", branch='draft')
         node = modulestore().get_item(locator)
         # overridden
         self.assertEqual(node.graceperiod, datetime.timedelta(hours=4))
@@ -1117,24 +1117,24 @@ class TestPublish(SplitModuleTest):
         expected.remove("chapter1")
         # check that it's not in published course
         with self.assertRaises(ItemNotFoundError):
-            modulestore().get_item(self._usage(dest_course, new_module.location.usage_id))
+            modulestore().get_item(self._usage(dest_course, new_module.location.block_id))
         # publish it
-        modulestore().xblock_publish(self.user, source_course, dest_course, [new_module.location.usage_id], None)
-        expected.append(new_module.location.usage_id)
+        modulestore().xblock_publish(self.user, source_course, dest_course, [new_module.location.block_id], None)
+        expected.append(new_module.location.block_id)
         # check that it is in the published course and that its parent is the chapter
-        pub_module = modulestore().get_item(self._usage(dest_course, new_module.location.usage_id))
+        pub_module = modulestore().get_item(self._usage(dest_course, new_module.location.block_id))
         self.assertEqual(
-            modulestore().get_parent_locations(pub_module.location)[0].usage_id, "chapter1"
+            modulestore().get_parent_locations(pub_module.location)[0].block_id, "chapter1"
         )
         # ensure intentionally orphaned blocks work (e.g., course_info)
         new_module = modulestore().create_item(
-            source_course, "course_info", self.user, usage_id="handouts"
+            source_course, "course_info", self.user, block_id="handouts"
         )
         # publish it
-        modulestore().xblock_publish(self.user, source_course, dest_course, [new_module.location.usage_id], None)
-        expected.append(new_module.location.usage_id)
+        modulestore().xblock_publish(self.user, source_course, dest_course, [new_module.location.block_id], None)
+        expected.append(new_module.location.block_id)
         # check that it is in the published course (no error means it worked)
-        pub_module = modulestore().get_item(self._usage(dest_course, new_module.location.usage_id))
+        pub_module = modulestore().get_item(self._usage(dest_course, new_module.location.block_id))
         self._check_course(
             source_course, dest_course, expected, ["chapter2", "chapter3", "problem1", "problem3_2"]
         )
@@ -1200,7 +1200,7 @@ class TestPublish(SplitModuleTest):
         """
         Generate a BlockUsageLocator for the combo of the course location and block id
         """
-        return BlockUsageLocator(course_id=course_loc.course_id, branch=course_loc.branch, usage_id=block_id)
+        return BlockUsageLocator(course_id=course_loc.course_id, branch=course_loc.branch, block_id=block_id)
 
     def _compare_children(self, source_children, dest_children, unexpected):
         """

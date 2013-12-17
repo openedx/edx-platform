@@ -64,7 +64,7 @@ class TemplateTests(unittest.TestCase):
         self.assertIsInstance(test_chapter, SequenceDescriptor)
         # refetch parent which should now point to child
         test_course = modulestore('split').get_course(test_chapter.location)
-        self.assertIn(test_chapter.location.usage_id, test_course.children)
+        self.assertIn(test_chapter.location.block_id, test_course.children)
 
     def test_temporary_xblocks(self):
         """
@@ -166,7 +166,7 @@ class TemplateTests(unittest.TestCase):
 
         second_problem = persistent_factories.ItemFactory.create(
             display_name='problem 2',
-            parent_location=BlockUsageLocator(updated_loc, usage_id=sub.location.usage_id),
+            parent_location=BlockUsageLocator(updated_loc, block_id=sub.location.block_id),
             user_id='testbot', category='problem',
             data="<problem></problem>"
         )

@@ -168,7 +168,7 @@ class XModuleMixin(XBlockMixin):
         if isinstance(self.location, Location):
             return self.location.name
         elif isinstance(self.location, BlockUsageLocator):
-            return self.location.usage_id
+            return self.location.block_id
         else:
             raise InsufficientSpecificationError()
 

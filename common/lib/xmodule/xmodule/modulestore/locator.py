@@ -257,7 +257,7 @@ class CourseLocator(Locator):
         Returns a copy of itself (downcasting) as a CourseLocator.
         The copy has the same CourseLocator fields as the original.
         The copy does not include subclass information, such as
-        a usage_id (a property of BlockUsageLocator).
+        a block_id (a property of BlockUsageLocator).
         """
         return CourseLocator(course_id=self.course_id,
                              version_guid=self.version_guid,
@@ -390,23 +390,23 @@ class BlockUsageLocator(CourseLocator):
     """
 
     # Default value
-    usage_id = None
+    block_id = None
 
     def __init__(self, url=None, version_guid=None, course_id=None,
-                 branch=None, usage_id=None):
+                 branch=None, block_id=None):
         """
         Construct a BlockUsageLocator
         Caller may provide url, version_guid, or course_id, and optionally provide branch.
 
-        The usage_id may be specified, either explictly or as part of
+        The block_id may be specified, either explictly or as part of
         the url or course_id. If omitted, the locator is created but it
         has not yet been initialized.
 
-        Resulting BlockUsageLocator will have a usage_id property.
+        Resulting BlockUsageLocator will have a block_id property.
         It will have either a version_guid property or a course_id (with optional branch) property, or both.
 
         version_guid must be an instance of bson.objectid.ObjectId or None
-        url, course_id, branch, and usage_id must be strings or None
+        url, course_id, branch, and block_id must be strings or None
 
         """
         self._validate_args(url, version_guid, course_id)
@@ -414,8 +414,8 @@ class BlockUsageLocator(CourseLocator):
             self.init_block_ref_from_str(url)
         if course_id:
             self.init_block_ref_from_course_id(course_id)
-        if usage_id:
-            self.init_block_ref(usage_id)
+        if block_id:
+            self.init_block_ref(block_id)
         super(BlockUsageLocator, self).__init__(
             url=url,
             version_guid=version_guid,
@@ -425,9 +425,9 @@ class BlockUsageLocator(CourseLocator):
 
     def is_initialized(self):
         """
-        Returns True if usage_id has been initialized, else returns False
+        Returns True if block_id has been initialized, else returns False
         """
-        return self.usage_id is not None
+        return self.block_id is not None
 
     def version_agnostic(self):
         """
@@ -442,18 +442,18 @@ class BlockUsageLocator(CourseLocator):
         if self.version_guid:
             return BlockUsageLocator(version_guid=self.version_guid,
                                      branch=self.branch,
-                                     usage_id=self.usage_id)
+                                     block_id=self.block_id)
         else:
             return BlockUsageLocator(course_id=self.course_id,
                                      branch=self.branch,
-                                     usage_id=self.usage_id)
+                                     block_id=self.block_id)
 
     def set_usage_id(self, new):
         """
-        Initialize usage_id to new value.
-        If usage_id has already been initialized to a different value, raise an exception.
+        Initialize block_id to new value.
+        If block_id has already been initialized to a different value, raise an exception.
         """
-        self.set_property('usage_id', new)
+        self.set_property('block_id', new)
 
     def init_block_ref(self, block_ref):
         if isinstance(block_ref, LocalId):
@@ -468,8 +468,8 @@ class BlockUsageLocator(CourseLocator):
         """
         Create a block locator from the given string which may be a url or just the repr (no tag)
         """
-        if hasattr(value, 'usage_id'):
-            self.init_block_ref(value.usage_id)
+        if hasattr(value, 'block_id'):
+            self.init_block_ref(value.block_id)
             return
         if not isinstance(value, basestring):
             return None
@@ -493,7 +493,7 @@ class BlockUsageLocator(CourseLocator):
         Return a string representing this location.
         """
         rep = super(BlockUsageLocator, self).__unicode__()
-        return rep + '/' + BLOCK_PREFIX + unicode(self.usage_id)
+        return rep + '/' + BLOCK_PREFIX + unicode(self.block_id)
 
 
 class DefinitionLocator(Locator):

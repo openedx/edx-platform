@@ -255,9 +255,9 @@ class LocatorTest(TestCase):
         """
         course_id = 'mit.eecs-1'
         branch = 'foo'
-        usage_id = 'problem:with-colon~2'
-        testobj = BlockUsageLocator(course_id=course_id, branch=branch, usage_id=usage_id)
-        self.check_block_locn_fields(testobj, 'Cannot handle colon', course_id=course_id, branch=branch, block=usage_id)
+        block_id = 'problem:with-colon~2'
+        testobj = BlockUsageLocator(course_id=course_id, branch=branch, block_id=block_id)
+        self.check_block_locn_fields(testobj, 'Cannot handle colon', course_id=course_id, branch=branch, block=block_id)
 
     def test_repr(self):
         testurn = 'mit.eecs.6002x/' + BRANCH_PREFIX + 'published/' + BLOCK_PREFIX + 'HW3'
@@ -275,7 +275,7 @@ class LocatorTest(TestCase):
         self.assertEqual(location, Locator.to_locator_or_location(list(location_tuple)))
         self.assertEqual(location, Locator.to_locator_or_location(location.dict()))
 
-        locator = BlockUsageLocator(course_id='foo.bar', branch='alpha', usage_id='deep')
+        locator = BlockUsageLocator(course_id='foo.bar', branch='alpha', block_id='deep')
         self.assertEqual(locator, Locator.to_locator_or_location(locator))
         self.assertEqual(locator.as_course_locator(), Locator.to_locator_or_location(locator.as_course_locator()))
         self.assertEqual(location, Locator.to_locator_or_location(location.url()))
@@ -347,4 +347,4 @@ class LocatorTest(TestCase):
         """
         self.check_course_locn_fields(testobj, msg, version_guid, course_id,
                                       branch)
-        self.assertEqual(testobj.usage_id, block)
+        self.assertEqual(testobj.block_id, block)

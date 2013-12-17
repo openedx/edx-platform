@@ -60,7 +60,7 @@ def import_handler(request, tag=None, course_id=None, branch=None, version_guid=
     POST or PUT
         json: import a course via the .tar.gz file specified in request.FILES
     """
-    location = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
+    location = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, block_id=block)
     if not has_access(request.user, location):
         raise PermissionDenied()
 
@@ -271,7 +271,7 @@ def import_status_handler(request, tag=None, course_id=None, branch=None, versio
         3 : Importing to mongo
 
     """
-    location = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
+    location = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, block_id=block)
     if not has_access(request.user, location):
         raise PermissionDenied()
 
@@ -302,7 +302,7 @@ def export_handler(request, tag=None, course_id=None, branch=None, version_guid=
     If the tar.gz file has been requested but the export operation fails, an HTML page will be returned
     which describes the error.
     """
-    location = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
+    location = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, block_id=block)
     if not has_access(request.user, location):
         raise PermissionDenied()
 

@@ -47,26 +47,26 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         self.default_class = default_class
         self.local_modules = {}
 
-    def _load_item(self, usage_id, course_entry_override=None):
-        if isinstance(usage_id, BlockUsageLocator) and isinstance(usage_id.usage_id, LocalId):
+    def _load_item(self, block_id, course_entry_override=None):
+        if isinstance(block_id, BlockUsageLocator) and isinstance(block_id.block_id, LocalId):
             try:
-                return self.local_modules[usage_id]
+                return self.local_modules[block_id]
             except KeyError:
                 raise ItemNotFoundError
 
-        json_data = self.module_data.get(usage_id)
+        json_data = self.module_data.get(block_id)
         if json_data is None:
             # deeper than initial descendant fetch or doesn't exist
-            self.modulestore.cache_items(self, [usage_id], lazy=self.lazy)
-            json_data = self.module_data.get(usage_id)
+            self.modulestore.cache_items(self, [block_id], lazy=self.lazy)
+            json_data = self.module_data.get(block_id)
             if json_data is None:
-                raise ItemNotFoundError(usage_id)
+                raise ItemNotFoundError(block_id)
 
         class_ = XModuleDescriptor.load_class(
             json_data.get('category'),
             self.default_class
         )
-        return self.xblock_from_json(class_, usage_id, json_data, course_entry_override)
+        return self.xblock_from_json(class_, block_id, json_data, course_entry_override)
 
     # xblock's runtime does not always pass enough contextual information to figure out
     # which named container (course x branch) or which parent is requesting an item. Because split allows
@@ -79,7 +79,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
     # low; thus, the course_entry is most likely correct. If the thread is looking at > 1 named container
     # pointing to the same structure, the access is likely to be chunky enough that the last known container
     # is the intended one when not given a course_entry_override; thus, the caching of the last branch/course_id.
-    def xblock_from_json(self, class_, usage_id, json_data, course_entry_override=None):
+    def xblock_from_json(self, class_, block_id, json_data, course_entry_override=None):
         if course_entry_override is None:
             course_entry_override = self.course_entry
         else:
@@ -91,12 +91,12 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         definition_id = self.modulestore.definition_locator(definition)
 
         # If no usage id is provided, generate an in-memory id
-        if usage_id is None:
-            usage_id = LocalId()
+        if block_id is None:
+            block_id = LocalId()
 
         block_locator = BlockUsageLocator(
             version_guid=course_entry_override['structure']['_id'],
-            usage_id=usage_id,
+            block_id=block_id,
             course_id=course_entry_override.get('course_id'),
             branch=course_entry_override.get('branch')
         )
@@ -121,7 +121,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                 self,
                 BlockUsageLocator(
                     version_guid=course_entry_override['structure']['_id'],
-                    usage_id=usage_id
+                    block_id=block_id
                 ),
                 error_msg=exc_info_to_str(sys.exc_info())
             )
@@ -136,7 +136,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         module.save()
 
         # If this is an in-memory block, store it in this system
-        if isinstance(block_locator.usage_id, LocalId):
+        if isinstance(block_locator.block_id, LocalId):
             self.local_modules[block_locator] = module
 
         return module

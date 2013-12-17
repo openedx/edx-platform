@@ -87,14 +87,14 @@ class TestOrphan(unittest.TestCase):
             course_or_parent_locator = BlockUsageLocator(
                 course_id=self.split_course_id,
                 branch='draft',
-                usage_id=parent_name
+                block_id=parent_name
             )
         else:
             course_or_parent_locator = CourseLocator(
                 course_id='test_org.test_course.runid',
                 branch='draft',
             )
-        self.split_mongo.create_item(course_or_parent_locator, category, self.userid, usage_id=name, fields=fields)
+        self.split_mongo.create_item(course_or_parent_locator, category, self.userid, block_id=name, fields=fields)
 
     def _create_course(self):
         """
@@ -114,7 +114,7 @@ class TestOrphan(unittest.TestCase):
         fields.update(data)
         # split requires the course to be created separately from creating items
         self.split_mongo.create_course(
-            'test_org', 'my course', self.userid, self.split_course_id, fields=fields, root_usage_id='runid'
+            'test_org', 'my course', self.userid, self.split_course_id, fields=fields, root_block_id='runid'
         )
         self.course_location = Location('i4x', 'test_org', 'test_course', 'course', 'runid')
         self.old_mongo.create_and_save_xmodule(self.course_location, data, metadata)
@@ -150,9 +150,9 @@ class TestOrphan(unittest.TestCase):
         """
         orphans = self.split_mongo.get_orphans(self.split_course_id, ['static_tab', 'about', 'course_info'], 'draft')
         self.assertEqual(len(orphans), 3, "Wrong # {}".format(orphans))
-        location = BlockUsageLocator(course_id=self.split_course_id, branch='draft', usage_id='OrphanChapter')
+        location = BlockUsageLocator(course_id=self.split_course_id, branch='draft', block_id='OrphanChapter')
         self.assertIn(location, orphans)
-        location = BlockUsageLocator(course_id=self.split_course_id, branch='draft', usage_id='OrphanVert')
+        location = BlockUsageLocator(course_id=self.split_course_id, branch='draft', block_id='OrphanVert')
         self.assertIn(location, orphans)
-        location = BlockUsageLocator(course_id=self.split_course_id, branch='draft', usage_id='OrphanHtml')
+        location = BlockUsageLocator(course_id=self.split_course_id, branch='draft', block_id='OrphanHtml')
         self.assertIn(location, orphans)

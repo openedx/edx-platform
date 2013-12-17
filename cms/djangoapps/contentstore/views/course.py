@@ -11,7 +11,7 @@ from django.utils.translation import ugettext as _
 from django.contrib.auth.decorators import login_required
 from django_future.csrf import ensure_csrf_cookie
 from django.conf import settings
-from django.views.decorators.http import require_http_methods, require_POST
+from django.views.decorators.http import require_http_methods
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseBadRequest, HttpResponseNotFound
@@ -60,12 +60,12 @@ __all__ = ['course_info_handler', 'course_handler', 'course_info_update_handler'
            'textbooks_list_handler', 'textbooks_detail_handler']
 
 
-def _get_locator_and_course(course_id, branch, version_guid, usage_id, user, depth=0):
+def _get_locator_and_course(course_id, branch, version_guid, block_id, user, depth=0):
     """
     Internal method used to calculate and return the locator and course module
     for the view functions in this file.
     """
-    locator = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=usage_id)
+    locator = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, block_id=block_id)
     if not has_access(user, locator):
         raise PermissionDenied()
     course_location = loc_mapper().translate_locator_to_location(locator)
@@ -104,7 +104,7 @@ def course_handler(request, tag=None, course_id=None, branch=None, version_guid=
             return create_new_course(request)
         elif not has_access(
             request.user,
-            BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
+            BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, block_id=block)
         ):
             raise PermissionDenied()
         elif request.method == 'PUT':
@@ -366,7 +366,7 @@ def course_info_update_handler(request, tag=None, course_id=None, branch=None, v
     """
     if 'application/json' not in request.META.get('HTTP_ACCEPT', 'application/json'):
         return HttpResponseBadRequest("Only supports json requests")
-    updates_locator = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
+    updates_locator = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, block_id=block)
     updates_location = loc_mapper().translate_locator_to_location(updates_locator)
     if provided_id == '':
         provided_id = None
