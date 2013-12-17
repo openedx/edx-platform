@@ -3,9 +3,9 @@ from student.models import (User, UserProfile, Registration,
                             PendingEmailChange, UserStanding,
                             )
 from course_modes.models import CourseMode
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, AnonymousUser
 from datetime import datetime
-from factory import DjangoModelFactory, SubFactory, PostGenerationMethodCall, post_generation, Sequence
+from factory import Factory, DjangoModelFactory, SubFactory, PostGenerationMethodCall, post_generation, Sequence
 from uuid import uuid4
 from pytz import UTC
 
