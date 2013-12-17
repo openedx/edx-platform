@@ -1,0 +1,60 @@
+###################################
+December 18, 2013
+###################################
+
+You can now access the public edX roadmap_ for details about the currently planned product direction.
+
+.. _roadmap: https://edx-wiki.atlassian.net/wiki/display/OPENPROD/OpenEdX+Public+Product+Roadmap
+
+
+*************
+edX Studio
+*************
+
+New documentation, *Building a Course with edX Studio* is available online_. You can also download the new guide as a PDF from the edX Studio user interface. 
+
+.. _online: http://edx.readthedocs.org/projects/ca/en/latest/
+
+
+==========================
+Changes and Updates
+==========================
+
+The following changes are included in this release: 
+
+* The Terms of Service are now available from a link in edX Studio. (STUD-151)
+* When a course export fails due to a problem in the course XML, an error message is now displayed that points you to the source of the problem. (STUD-1013)
+* Studio Dashboard performance on Edge is improved. (STUD-1039)
+* In the Video component editor Advanced tab, the **Clear** button next the the **HTML 5 Transcript** field, shown below, now correctly removes the transcript. (BLD-438)
+
+  .. image::  Images/Video_Advanced_tab.png
+
+
+* The Drag and Drop problem template, available in the Advanced list when you are creating a new problem, is updated to demonstrate the updated drag and drop functionality. (BLD-479)
+* You can now rearrange LTI components as expected. (BLD-543) 
+
+
+
+***************************************
+edX Learning Management System 
+***************************************
+
+
+The following changes are included in this release: 
+
+* Grade reports is .csv files that you download form the Instructor Dashboard can now handle Unicode characters. (LMS-197)
+* For courses using OpenID, the user's Full Name is now returned in the Full Name field, not the username. (LMS-750)
+* A problem that prevented the listing of course staff in the Instructor Dashboard is fixed. (LMS-1599)
+* Image mapping problems now work correctly in Internet Explorer. (BLD-413)
+* A problem that sometimes prevented students from opening an e-reader in another browser window is resolved. (BLD-465)
+
+
+******************
+Forums 
+******************
+
+The following changes are included in this release: 
+
+* The text formatting buttons in the forum post editor are now keyboard accessible. 
+  Students and staff can tab through the buttons and activate a button with the Enter or space key.
+
