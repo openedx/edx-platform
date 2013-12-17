@@ -107,7 +107,7 @@ class CourseEmailTemplateTest(TestCase):
 class CourseAuthorizationTest(TestCase):
     """Test the CourseAuthorization model."""
 
-    @patch.dict(settings.MITX_FEATURES, {'REQUIRE_COURSE_EMAIL_AUTH': True})
+    @patch.dict(settings.FEATURES, {'REQUIRE_COURSE_EMAIL_AUTH': True})
     def test_creation_auth_on(self):
         course_id = 'abc/123/doremi'
         # Test that course is not authorized by default
@@ -133,7 +133,7 @@ class CourseAuthorizationTest(TestCase):
             "Course 'abc/123/doremi': Instructor Email Not Enabled"
         )
 
-    @patch.dict(settings.MITX_FEATURES, {'REQUIRE_COURSE_EMAIL_AUTH': False})
+    @patch.dict(settings.FEATURES, {'REQUIRE_COURSE_EMAIL_AUTH': False})
     def test_creation_auth_off(self):
         course_id = 'blahx/blah101/ehhhhhhh'
         # Test that course is authorized by default, since auth is turned off

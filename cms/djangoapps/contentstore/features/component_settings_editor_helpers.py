@@ -161,9 +161,14 @@ def verify_all_setting_entries(expected_entries):
 
 
 @world.absorb
-def save_component_and_reopen(step):
+def save_component(step):
     world.css_click("a.save-button")
     world.wait_for_ajax_complete()
+
+
+@world.absorb
+def save_component_and_reopen(step):
+    save_component(step)
     # We have a known issue that modifications are still shown within the edit window after cancel (though)
     # they are not persisted. Refresh the browser to make sure the changes WERE persisted after Save.
     reload_the_page(step)

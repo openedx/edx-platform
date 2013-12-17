@@ -46,6 +46,7 @@ def sass_cmd(watch=false, debug=false)
     end
 
     "sass #{debug ? '' : '--style compressed'} " +
+          "--cache-location /tmp/sass-cache " +
           "--load-path #{sass_load_paths.join(' ')} " +
           "#{watch ? '--watch' : '--update'} -E utf-8 #{sass_watch_paths.join(' ')}"
 end

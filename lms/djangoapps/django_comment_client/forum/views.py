@@ -8,7 +8,7 @@ from django.core.context_processors import csrf
 from django.contrib.auth.models import User
 import newrelic.agent
 
-from mitxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response
 from courseware.courses import get_course_with_access
 from course_groups.cohorts import (is_course_cohorted, get_cohort_id, is_commentable_cohorted,
                                    get_cohorted_commentables, get_course_cohorts, get_cohort_by_id)

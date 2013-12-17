@@ -19,7 +19,7 @@ import uuid
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth.signals import user_logged_in, user_logged_out
-from django.db import models
+from django.db import models, IntegrityError
 from django.db.models.signals import post_save
 from django.dispatch import receiver, Signal
 import django.dispatch
@@ -35,9 +35,7 @@ from track import contexts
 from track.views import server_track
 from eventtracking import tracker
 
-
 unenroll_done = Signal(providing_args=["course_enrollment"])
-
 log = logging.getLogger(__name__)
 AUDIT_LOG = logging.getLogger("audit")
 
@@ -48,11 +46,11 @@ class AnonymousUserId(models.Model):
 
     Purpose of this table is to provide user by anonymous_user_id.
 
-    We are generating anonymous_user_id using md5 algorithm, so resulting length will always be 16 bytes.
-    http://docs.python.org/2/library/md5.html#md5.digest_size
+    We generate anonymous_user_id using md5 algorithm,
+    and use result in hex form, so its length is equal to 32 bytes.
     """
     user = models.ForeignKey(User, db_index=True)
-    anonymous_user_id = models.CharField(unique=True, max_length=16)
+    anonymous_user_id = models.CharField(unique=True, max_length=32)
     course_id = models.CharField(db_index=True, max_length=255)
     unique_together = (user, course_id)
 
@@ -68,17 +66,44 @@ def anonymous_id_for_user(user, course_id):
     if user.is_anonymous():
         return None
 
+    cached_id = getattr(user, '_anonymous_id', {}).get(course_id)
+    if cached_id is not None:
+        return cached_id
+
     # include the secret key as a salt, and to make the ids unique across different LMS installs.
     hasher = hashlib.md5()
     hasher.update(settings.SECRET_KEY)
     hasher.update(str(user.id))
     hasher.update(course_id)
+    digest = hasher.hexdigest()
 
-    return AnonymousUserId.objects.get_or_create(
-        defaults={'anonymous_user_id': hasher.hexdigest()},
-        user=user,
-        course_id=course_id
-    )[0].anonymous_user_id
+    try:
+        anonymous_user_id, created = AnonymousUserId.objects.get_or_create(
+            defaults={'anonymous_user_id': digest},
+            user=user,
+            course_id=course_id
+        )
+        if anonymous_user_id.anonymous_user_id != digest:
+            log.error(
+                "Stored anonymous user id {stored!r} for user {user!r} "
+                "in course {course!r} doesn't match computed id {digest!r}".format(
+                    user=user,
+                    course=course_id,
+                    stored=anonymous_user_id.anonymous_user_id,
+                    digest=digest
+                )
+            )
+    except IntegrityError:
+        # Another thread has already created this entry, so
+        # continue
+        pass
+
+    if not hasattr(user, '_anonymous_id'):
+        user._anonymous_id = {}
+
+    user._anonymous_id[course_id] = digest
+
+    return digest
 
 
 def user_by_anonymous_id(id):
@@ -695,14 +720,14 @@ def add_user_to_default_group(user, group):
 
 @receiver(post_save, sender=User)
 def update_user_information(sender, instance, created, **kwargs):
-    if not settings.MITX_FEATURES['ENABLE_DISCUSSION_SERVICE']:
+    if not settings.FEATURES['ENABLE_DISCUSSION_SERVICE']:
         # Don't try--it won't work, and it will fill the logs with lots of errors
         return
     try:
         cc_user = cc.User.from_django_user(instance)
         cc_user.save()
     except Exception as e:
-        log = logging.getLogger("mitx.discussion")
+        log = logging.getLogger("edx.discussion")
         log.error(unicode(e))
         log.error("update user info to discussion failed for user with id: " + str(instance.id))
 

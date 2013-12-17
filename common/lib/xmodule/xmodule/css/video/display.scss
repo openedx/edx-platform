@@ -307,9 +307,10 @@ div.video {
             padding-left: 15px;
             position: relative;
             -webkit-font-smoothing: antialiased;
-            width: 116px;
+            min-width: 116px;
 
             @media (max-width: 1024px) {
+              min-width: 0;
               width: 86px;
             }
 

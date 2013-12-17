@@ -2,7 +2,7 @@
 
 from django.http import (HttpResponse, HttpResponseServerError,
                          HttpResponseNotFound)
-from mitxmako.shortcuts import render_to_string, render_to_response
+from edxmako.shortcuts import render_to_string, render_to_response
 import functools
 import json
 

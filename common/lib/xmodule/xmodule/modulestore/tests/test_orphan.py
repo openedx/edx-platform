@@ -33,7 +33,7 @@ class TestOrphan(unittest.TestCase):
     split_course_id = 'test_org.test_course.runid'
 
     def setUp(self):
-        self.db_config['collection'] = 'modulestore{0}'.format(uuid.uuid4().hex)
+        self.db_config['collection'] = 'modulestore{0}'.format(uuid.uuid4().hex[:5])
 
         self.userid = random.getrandbits(32)
         super(TestOrphan, self).setUp()

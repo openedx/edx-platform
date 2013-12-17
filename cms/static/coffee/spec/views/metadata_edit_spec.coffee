@@ -49,7 +49,7 @@ define ["js/models/metadata", "js/collections/metadata", "js/views/metadata", "c
       }
 
       integerEntry = {
-          default_value: 5,
+          default_value: 6,
           display_name: "Inputs",
           explicitly_set: false,
           field_name: "num_inputs",
@@ -247,6 +247,11 @@ define ["js/models/metadata", "js/collections/metadata", "js/views/metadata", "c
               expect(@view.getValueFromEditor()).toBe('always')
 
       describe "MetadataView.Number supports integer or float type and has clear functionality", ->
+          verifyValueAfterChanged = (view, value, expectedResult) ->
+              view.setValueInEditor(value)
+              view.changed()
+              expect(view.getValueFromEditor()).toBe(expectedResult)
+
           beforeEach ->
               integerModel = new MetadataModel(integerEntry)
               @integerView = new MetadataView.Number({model: integerModel})
@@ -267,7 +272,7 @@ define ["js/models/metadata", "js/collections/metadata", "js/views/metadata", "c
               assertCanUpdateView(@floatView, "-2.4")
 
           it "has a clear method to revert to the model default", ->
-              assertClear(@integerView, 5, '5')
+              assertClear(@integerView, 6, '6')
               assertClear(@floatView, 2.7, '2.7')
 
           it "has an update model method", ->
@@ -290,11 +295,6 @@ define ["js/models/metadata", "js/collections/metadata", "js/views/metadata", "c
               verifyAttributes(@floatView, 1.3, .1, 100.2)
 
           it "corrects values that are out of range", ->
-              verifyValueAfterChanged = (view, value, expectedResult) ->
-                  view.setValueInEditor(value)
-                  view.changed()
-                  expect(view.getValueFromEditor()).toBe(expectedResult)
-
               verifyValueAfterChanged(@integerView, '-4', '1')
               verifyValueAfterChanged(@integerView, '1', '1')
               verifyValueAfterChanged(@integerView, '0', '1')
@@ -305,6 +305,10 @@ define ["js/models/metadata", "js/collections/metadata", "js/views/metadata", "c
               verifyValueAfterChanged(@floatView, '1.2', '1.3')
               verifyValueAfterChanged(@floatView, '100.2', '100.2')
               verifyValueAfterChanged(@floatView, '100.3', '100.2')
+
+          it "sets default values for integer and float fields that are empty", ->
+              verifyValueAfterChanged(@integerView, '', '6')
+              verifyValueAfterChanged(@floatView, '', '2.7')
 
           it "disallows invalid characters", ->
               verifyValueAfterKeyPressed = (view, character, reject) ->

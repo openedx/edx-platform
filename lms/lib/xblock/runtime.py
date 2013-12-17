@@ -82,12 +82,22 @@ def handler_url(course_id, block, handler, suffix='', query='', thirdparty=False
     if thirdparty:
         view_name = 'xblock_handler_noauth'
 
-    return reverse(view_name, kwargs={
+    url = reverse(view_name, kwargs={
         'course_id': course_id,
         'usage_id': quote_slashes(str(block.scope_ids.usage_id)),
         'handler': handler,
         'suffix': suffix,
-    }) + '?' + query
+    })
+
+    # If suffix is an empty string, remove the trailing '/'
+    if not suffix:
+        url = url.rstrip('/')
+
+    # If there is a query string, append it
+    if query:
+        url += '?' + query
+
+    return url
 
 
 def handler_prefix(course_id, block):
@@ -96,9 +106,13 @@ def handler_prefix(course_id, block):
 
     The prefix is a valid handler url after the handler name is slash-appended
     to it.
-
     """
-    return handler_url(course_id, block, '').rstrip('/')
+    # This depends on handler url having the handler_name as the final piece of the url
+    # so that leaving an empty handler_name really does leave the opportunity to append
+    # the handler_name on the frontend
+
+    # This is relied on by the xblock/runtime.v1.coffee frontend handlerUrl function
+    return handler_url(course_id, block, '').rstrip('/?')
 
 
 class LmsHandlerUrls(object):

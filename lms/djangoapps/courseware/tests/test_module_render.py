@@ -79,7 +79,7 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
         module = render.get_module(
             self.mock_user,
             mock_request,
-            ['i4x', 'edX', 'toy', 'html', 'toyjumpto'],
+            Location('i4x', 'edX', 'toy', 'html', 'toyjumpto'),
             field_data_cache,
             self.course_id
         )

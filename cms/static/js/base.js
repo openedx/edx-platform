@@ -25,7 +25,7 @@ domReady(function() {
 
     $('body').addClass('js');
 
-    $('.unit .item-actions .delete-button').bind('click', deleteUnit);
+    $('.unit .item-actions .delete-unit-button').bind('click', deleteUnit);
     $('.new-unit-item').bind('click', createNewUnit);
 
     // lean/simple modal
@@ -243,17 +243,17 @@ function createNewUnit(e) {
 
 function deleteUnit(e) {
     e.preventDefault();
-    _deleteItem($(this).parents('li.leaf'), 'Unit');
+    _deleteItem($(this).parents('li.courseware-unit'), 'Unit');
 }
 
 function deleteSubsection(e) {
     e.preventDefault();
-    _deleteItem($(this).parents('li.branch'), 'Subsection');
+    _deleteItem($(this).parents('li.courseware-subsection'), 'Subsection');
 }
 
 function deleteSection(e) {
     e.preventDefault();
-    _deleteItem($(this).parents('section.branch'), 'Section');
+    _deleteItem($(this).parents('section.courseware-section'), 'Section');
 }
 
 function _deleteItem($el, type) {

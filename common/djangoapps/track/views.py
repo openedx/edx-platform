@@ -9,7 +9,7 @@ from django.shortcuts import redirect
 
 from django_future.csrf import ensure_csrf_cookie
 
-from mitxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response
 
 from track import tracker
 from track import contexts

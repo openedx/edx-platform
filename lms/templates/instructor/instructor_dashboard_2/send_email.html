@@ -33,8 +33,8 @@
   </li>
   <li class="field">
     <label>Message:</label>
-      <div class="email-editor"> 
-      ${ section_data['editor'] } 
+      <div class="email-editor">
+      ${ section_data['editor'] }
       </div>
     <input type="hidden" name="message" value="">
   </li>
@@ -55,7 +55,7 @@
   <input type="button" name="send" value="${_("Send Email")}" data-endpoint="${ section_data['send_email'] }" >
   <div class="request-response-error"></div>
 
-%if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
+%if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
   <div class="running-tasks-container action-type-container">
     <hr>
     <h2> ${_("Pending Instructor Tasks")} </h2>

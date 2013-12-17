@@ -34,6 +34,7 @@ requirejs.config({
         "sinon": "xmodule_js/common_static/js/vendor/sinon-1.7.1",
         "squire": "xmodule_js/common_static/js/vendor/Squire",
         "jasmine-jquery": "xmodule_js/common_static/js/vendor/jasmine-jquery",
+        "jasmine-imagediff": "xmodule_js/common_static/js/vendor/jasmine-imagediff",
         "jasmine-stealth": "xmodule_js/common_static/js/vendor/jasmine-stealth",
         "jasmine.async": "xmodule_js/common_static/js/vendor/jasmine.async",
         "draggabilly": "xmodule_js/common_static/js/vendor/draggabilly.pkgd",
@@ -41,9 +42,10 @@ requirejs.config({
 
         "mathjax": "//edx-static.s3.amazonaws.com/mathjax-MathJax-727332c/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&delayStartupUntil=configured",
         "youtube": "//www.youtube.com/player_api?noext",
-        "tender": "//edxedge.tenderapp.com/tender_widget"
+        "tender": "//edxedge.tenderapp.com/tender_widget",
 
-        "coffee/src/ajax_prefix": "xmodule_js/common_static/coffee/src/ajax_prefix"
+        "coffee/src/ajax_prefix": "xmodule_js/common_static/coffee/src/ajax_prefix",
+        "js/spec/test_utils": "js/spec/test_utils",
     }
     shim: {
         "gettext": {
@@ -149,6 +151,9 @@ requirejs.config({
             exports: "sinon"
         },
         "jasmine-jquery": {
+            deps: ["jasmine"]
+        },
+        "jasmine-imagediff": {
             deps: ["jasmine"]
         },
         "jasmine-stealth": {

@@ -30,7 +30,7 @@ DOC_STORE_CONFIG = {
 modulestore_options = {
     'default_class': 'xmodule.raw_module.RawDescriptor',
     'fs_root': GITHUB_REPO_ROOT,
-    'render_template': 'mitxmako.shortcuts.render_to_string',
+    'render_template': 'edxmako.shortcuts.render_to_string',
 }
 
 MODULESTORE = {
@@ -80,7 +80,7 @@ DATABASES = {
 }
 
 LMS_BASE = "localhost:8000"
-MITX_FEATURES['PREVIEW_LMS_BASE'] = "localhost:8000"
+FEATURES['PREVIEW_LMS_BASE'] = "localhost:8000"
 
 REPOS = {
     'edx4edx': {
@@ -112,7 +112,7 @@ CACHES = {
     # In staging/prod envs, the sessions also live here.
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'mitx_loc_mem_cache',
+        'LOCATION': 'edx_loc_mem_cache',
         'KEY_FUNCTION': 'util.memcache.safe_key',
     },
 
@@ -133,7 +133,12 @@ CACHES = {
         'LOCATION': '/var/tmp/mongo_metadata_inheritance',
         'TIMEOUT': 300,
         'KEY_FUNCTION': 'util.memcache.safe_key',
-    }
+    },
+    'loc_cache': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'edx_location_mem_cache',
+    },
+
 }
 
 # Make the keyedcache startup warnings go away
@@ -182,10 +187,10 @@ DEBUG_TOOLBAR_CONFIG = {
 DEBUG_TOOLBAR_MONGO_STACKTRACES = False
 
 # disable NPS survey in dev mode
-MITX_FEATURES['STUDIO_NPS_SURVEY'] = False
+FEATURES['STUDIO_NPS_SURVEY'] = False
 
 # Enable URL that shows information about the status of variuous services
-MITX_FEATURES['ENABLE_SERVICE_STATUS'] = True
+FEATURES['ENABLE_SERVICE_STATUS'] = True
 
 ############################# SEGMENT-IO ##################################
 
@@ -194,7 +199,7 @@ MITX_FEATURES['ENABLE_SERVICE_STATUS'] = True
 import os
 SEGMENT_IO_KEY = os.environ.get('SEGMENT_IO_KEY')
 if SEGMENT_IO_KEY:
-    MITX_FEATURES['SEGMENT_IO'] = True
+    FEATURES['SEGMENT_IO'] = True
 
 
 #####################################################################

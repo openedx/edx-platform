@@ -4,11 +4,13 @@ adding users, removing users, and listing members
 """
 
 from abc import ABCMeta, abstractmethod
-from functools import partial
 
 from django.contrib.auth.models import User, Group
 
 from xmodule.modulestore import Location
+from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError
+from xmodule.modulestore.django import loc_mapper
+from xmodule.modulestore.locator import CourseLocator
 
 
 class CourseContextRequired(Exception):
@@ -135,20 +137,45 @@ class CourseRole(GroupBasedRole):
     A named role in a particular course
     """
     def __init__(self, role, location, course_context=None):
-        # pylint: disable=no-member
-        loc = Location(location)
-        legacy_group_name = '{0}_{1}'.format(role, loc.course)
-
-        if loc.category.lower() == 'course':
-            course_id = loc.course_id
-        else:
+        """
+        Location may be either a Location, a string, dict, or tuple which Location will accept
+        in its constructor, or a CourseLocator. Handle all these giving some preference to
+        the preferred naming.
+        """
+        # TODO: figure out how to make the group name generation lazy so it doesn't force the
+        # loc mapping?
+        if not hasattr(location, 'course_id'):
+            location = Location(location)
+        # direct copy from auth.authz.get_all_course_role_groupnames will refactor to one impl asap
+        groupnames = []
+        try:
+            groupnames.append('{0}_{1}'.format(role, location.course_id))
+        except InvalidLocationError:  # will occur on old locations where location is not of category course
             if course_context is None:
                 raise CourseContextRequired()
-            course_id = course_context
+            else:
+                groupnames.append('{0}_{1}'.format(role, course_context))
 
-        group_name = '{0}_{1}'.format(role, course_id)
+        # pylint: disable=no-member
+        if isinstance(location, Location):
+            try:
+                locator = loc_mapper().translate_location(location.course_id, location, False, False)
+                groupnames.append('{0}_{1}'.format(role, locator.course_id))
+            except (InvalidLocationError, ItemNotFoundError):
+                # if it's never been mapped, the auth won't be via the Locator syntax
+                pass
+            # least preferred legacy role_course format
+            groupnames.append('{0}_{1}'.format(role, location.course))
+        elif isinstance(location, CourseLocator):
+            # handle old Location syntax
+            old_location = loc_mapper().translate_locator_to_location(location, get_course=True)
+            if old_location:
+                # the slashified version of the course_id (myu/mycourse/myrun)
+                groupnames.append('{0}_{1}'.format(role, old_location.course_id))
+                # add the least desirable but sometimes occurring format.
+                groupnames.append('{0}_{1}'.format(role, old_location.course))
 
-        super(CourseRole, self).__init__([group_name, legacy_group_name])
+        super(CourseRole, self).__init__(groupnames)
 
 
 class OrgRole(GroupBasedRole):

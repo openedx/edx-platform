@@ -12,10 +12,11 @@ from django.utils import simplejson
 from django_comment_common.models import Role, FORUM_ROLE_STUDENT
 from django_comment_client.permissions import check_permissions_by_view
 
-import mitxmako
+import edxmako
 import pystache_custom as pystache
 
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore import Location
 from django.utils.timezone import UTC
 
 log = logging.getLogger(__name__)
@@ -56,7 +57,7 @@ def has_forum_access(uname, course_id, rolename):
 
 def _get_discussion_modules(course):
     all_modules = modulestore().get_items(
-        ['i4x', course.location.org, course.location.course, 'discussion', None],
+        Location('i4x', course.location.org, course.location.course, 'discussion', None),
         course_id=course.id
     )
 
@@ -117,7 +118,7 @@ def _filter_unstarted_categories(category_map):
 
     return result_map
 
-    
+
 def _sort_map_entries(category_map, sort_alpha):
     things = []
     for title, entry in category_map["entries"].items():
@@ -310,7 +311,7 @@ def url_for_tags(course_id, tags):
 
 
 def render_mustache(template_name, dictionary, *args, **kwargs):
-    template = mitxmako.lookup['main'].get_template(template_name).source
+    template = edxmako.lookup['main'].get_template(template_name).source
     return pystache.render(template, dictionary)
 
 

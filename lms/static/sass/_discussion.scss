@@ -519,12 +519,6 @@ body.discussion {
     .sidebar-comments-count span {
       font-weight: 700;
     }
-
-    .sidebar-toggle-moderator-button {
-      @include blue-button;
-      margin-top: $baseline;
-      text-align: center;
-    }
   }
 
 

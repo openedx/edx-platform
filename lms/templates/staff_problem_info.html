@@ -18,7 +18,7 @@ ${block_content}
 %  endif
 <div><a href="#${element_id}_debug" id="${element_id}_trig">${_("Staff Debug Info")}</a></div>
 
-%  if settings.MITX_FEATURES.get('ENABLE_STUDENT_HISTORY_VIEW') and \
+%  if settings.FEATURES.get('ENABLE_STUDENT_HISTORY_VIEW') and \
       location.category == 'problem':
 <div><a href="#${element_id}_history" id="${element_id}_history_trig">${_("Submission history")}</a></div>
 %  endif

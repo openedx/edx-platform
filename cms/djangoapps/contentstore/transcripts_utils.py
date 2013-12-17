@@ -196,6 +196,7 @@ def remove_subs_from_store(subs_id, item):
     try:
         content = contentstore().find(content_location)
         contentstore().delete(content.get_id())
+        del_cached_content(content.location)
         log.info("Removed subs %s from store", subs_id)
     except NotFoundError:
         pass
@@ -310,7 +311,9 @@ def manage_video_subtitles_save(old_item, new_item):
 
     Video player item has some video fields: HTML5 ones and Youtube one.
 
-    1. If value of `sub` field of `new_item` is different from values of video fields of `new_item`,
+    If value of `sub` field of `new_item` is cleared, transcripts should be removed.
+
+    If value of `sub` field of `new_item` is different from values of video fields of `new_item`,
     and `new_item.sub` file is present, then code in this function creates copies of
     `new_item.sub` file with new names. That names are equal to values of video fields of `new_item`
     After that `sub` field of `new_item` is changed to one of values of video fields.
@@ -327,6 +330,9 @@ def manage_video_subtitles_save(old_item, new_item):
     sub_name = new_item.sub
     for video_id in possible_video_id_list:
         if not video_id:
+            continue
+        if not sub_name:
+            remove_subs_from_store(video_id, new_item)
             continue
         # copy_or_rename_transcript changes item.sub of module
         try:

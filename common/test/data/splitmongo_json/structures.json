@@ -68,7 +68,7 @@
                 "definition":{ "$oid" : "cd00000000000000dddd0020"},
                 "fields":{
                     "children":[
-                        
+
                     ],
                     "display_name":"Hercules"
                 },
@@ -86,7 +86,7 @@
                 "definition":{ "$oid" : "cd00000000000000dddd0022"},
                 "fields":{
                     "children":[
-                        
+
                     ],
                     "display_name":"Hera heckles Hercules"
                 },
@@ -123,7 +123,7 @@
                 "definition":{ "$oid" : "0d00000040000000dddd0031"},
                 "fields":{
                     "children":[
-                        
+
                     ],
                     "display_name":"Problem 3.1",
                     "graceperiod":"4 hours 0 minutes 0 seconds"
@@ -142,7 +142,7 @@
                 "definition":{ "$oid" : "0d00000040000000dddd0032"},
                 "fields":{
                     "children":[
-                        
+
                     ],
                     "display_name":"Problem 3.2"
                 },
@@ -172,7 +172,7 @@
                 "definition":{ "$oid" : "ad00000000000000dddd0001"},
                 "fields":{
                     "children":[
-                        
+
                     ],
                     "end":"2013-04-13T04:30",
                     "tabs":[
@@ -236,7 +236,7 @@
                 "definition":{ "$oid" : "ad00000000000000dddd0010"},
                 "fields":{
                     "children":[
-                        
+
                     ],
                     "end":null,
                     "tabs":[
@@ -290,7 +290,7 @@
                 "definition":{ "$oid" : "ad00000000000000dddd0020"},
                 "fields":{
                     "children":[
-                        
+
                     ],
                     "end":null,
                     "tabs":[
@@ -326,7 +326,7 @@
                         "$date":1364481313238
                     }
                 }
-                
+
             }
         }
     },
@@ -345,7 +345,7 @@
                 "definition":{ "$oid" : "2d00000000000000dddd0020"},
                 "fields":{
                     "children":[
-                        
+
                     ],
                     "end":null,
                     "tabs":[
@@ -399,7 +399,7 @@
                 "definition":{ "$oid" : "ad00000000000000dddd0020"},
                 "fields":{
                     "children":[
-                        
+
                     ],
                     "end":null,
                     "tabs":[
@@ -453,7 +453,7 @@
                 "definition":{ "$oid" : "3d00000000000000dddd0020"},
                 "fields":{
                     "children":[
-                        
+
                     ],
                     "end":null,
                     "tabs":[

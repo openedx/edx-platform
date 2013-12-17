@@ -13,7 +13,7 @@ from django.utils.translation import ugettext as _
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 
-from mitxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response
 
 from course_modes.models import CourseMode
 from courseware.access import has_access
@@ -37,6 +37,7 @@ class ChooseModeView(View):
 
         enrollment_mode = CourseEnrollment.enrollment_mode_for_user(request.user, course_id)
         upgrade = request.GET.get('upgrade', False)
+        request.session['attempting_upgrade'] = upgrade
 
         # verified users do not need to register or upgrade
         if enrollment_mode == 'verified':

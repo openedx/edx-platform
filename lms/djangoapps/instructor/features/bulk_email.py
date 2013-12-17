@@ -11,12 +11,14 @@ from nose.tools import assert_in, assert_true, assert_equal  # pylint: disable=E
 from django.core.management import call_command
 from django.conf import settings
 
+from courseware.tests.factories import StaffFactory, InstructorFactory
 
-@step(u'Given I am "([^"]*)" for a course')
-def i_am_an_instructor(step, role):  # pylint: disable=W0613
 
-    # Store the role
-    assert_in(role, ['instructor', 'staff'])
+@step(u'Given there is a course with a staff, instructor and student')
+def make_populated_course(step):  # pylint: disable=unused-argument
+    ## This is different than the function defined in common.py because it enrolls
+    ## a staff, instructor, and student member regardless of what `role` is, then
+    ## logs `role` in. This is to ensure we have 3 class participants to email.
 
     # Clear existing courses to avoid conflicts
     world.clear_courses()
@@ -24,50 +26,37 @@ def i_am_an_instructor(step, role):  # pylint: disable=W0613
     # Create a new course
     course = world.CourseFactory.create(
         org='edx',
-        number='999',
-        display_name='Test Course'
+        number='888',
+        display_name='Bulk Email Test Course'
     )
+    world.bulk_email_course_id = 'edx/888/Bulk_Email_Test_Course'
 
-    # Register the instructor as staff for the course
-    world.register_by_course_id(
-        'edx/999/Test_Course',
-        username='instructor',
-        password='password',
-        is_staff=True
-    )
-    world.add_to_course_staff('instructor', '999')
+    try:
+        # See if we've defined the instructor & staff user yet
+        world.bulk_email_instructor
+    except AttributeError:
+        # Make & register an instructor for the course
+        world.bulk_email_instructor = InstructorFactory(course=course.location)
+        world.enroll_user(world.bulk_email_instructor, world.bulk_email_course_id)
 
-    # Register another staff member
-    world.register_by_course_id(
-        'edx/999/Test_Course',
-        username='staff',
-        password='password',
-        is_staff=True
-    )
-    world.add_to_course_staff('staff', '999')
+        # Make & register a staff member
+        world.bulk_email_staff = StaffFactory(course=course.location)
+        world.enroll_user(world.bulk_email_staff, world.bulk_email_course_id)
 
-    # Register a student
+    # Make & register a student
     world.register_by_course_id(
-        'edx/999/Test_Course',
+        'edx/888/Bulk_Email_Test_Course',
         username='student',
-        password='password',
+        password='test',
         is_staff=False
-    )
-
-    # Log in as the an instructor or staff for the course
-    world.log_in(
-        username=role,
-        password='password',
-        email="instructor@edx.org",
-        name="Instructor"
     )
 
     # Store the expected recipients
     # given each "send to" option
+    staff_emails = [world.bulk_email_staff.email, world.bulk_email_instructor.email]
     world.expected_addresses = {
-        'myself': [role + '@edx.org'],
-        'course staff': ['instructor@edx.org', 'staff@edx.org'],
-        'students, staff, and instructors': ['instructor@edx.org', 'staff@edx.org', 'student@edx.org']
+        'course staff': staff_emails,
+        'students, staff, and instructors': staff_emails + ['student@edx.org']
     }
 
 
@@ -80,8 +69,35 @@ SEND_TO_OPTIONS = {
 }
 
 
+@step(u'I am logged in to the course as "([^"]*)"')
+def log_into_the_course(step, role):  # pylint: disable=unused-argument
+    # Store the role
+    assert_in(role, ['instructor', 'staff'])
+
+    # Log in as the an instructor or staff for the course
+    my_email = world.bulk_email_instructor.email
+    if role == 'instructor':
+        world.log_in(
+            username=world.bulk_email_instructor.username,
+            password='test',
+            email=my_email,
+            name=world.bulk_email_instructor.profile.name
+        )
+    else:
+        my_email = world.bulk_email_staff.email
+        world.log_in(
+            username=world.bulk_email_staff.username,
+            password='test',
+            email=my_email,
+            name=world.bulk_email_staff.profile.name
+        )
+
+    # Store the "myself" send to option
+    world.expected_addresses['myself'] = [my_email]
+
+
 @step(u'I send email to "([^"]*)"')
-def when_i_send_an_email(step, recipient):
+def when_i_send_an_email(step, recipient):  # pylint: disable=unused-argument
 
     # Check that the recipient is valid
     assert_in(
@@ -99,8 +115,8 @@ def when_i_send_an_email(step, recipient):
     call_command('loaddata', 'course_email_template.json')
 
     # Go to the email section of the instructor dash
-    world.visit('/courses/edx/999/Test_Course')
-    world.css_click('a[href="/courses/edx/999/Test_Course/instructor"]')
+    world.visit('/courses/edx/888/Bulk_Email_Test_Course')
+    world.css_click('a[href="/courses/edx/888/Bulk_Email_Test_Course/instructor"]')
     world.css_click('div.beta-button-wrapper>a')
     world.css_click('a[data-section="send_email"]')
 
@@ -130,8 +146,7 @@ UNSUBSCRIBE_MSG = 'To stop receiving email like this'
 
 
 @step(u'Email is sent to "([^"]*)"')
-def then_the_email_is_sent(step, recipient):
-
+def then_the_email_is_sent(step, recipient):  # pylint: disable=unused-argument
     # Check that the recipient is valid
     assert_in(
         recipient, SEND_TO_OPTIONS,

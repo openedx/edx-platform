@@ -1,3 +1,4 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
 <%! from contentstore.utils import compute_unit_state %>
 <%! from xmodule.modulestore.django import loc_mapper %>
@@ -18,7 +19,7 @@ This def will enumerate through a passed in subsection and list all of the units
   <%
     unit_locator = loc_mapper().translate_location(context_course.location.course_id, unit.location, False, True)
   %>
-  <li class="courseware-unit leaf unit is-draggable" data-locator="${unit_locator}"
+  <li class="courseware-unit unit is-draggable" data-locator="${unit_locator}"
       data-parent="${subsection_locator}">
 
     <%include file="_ui-dnd-indicator-before.html" />
@@ -32,14 +33,18 @@ This def will enumerate through a passed in subsection and list all of the units
     %>
     <div class="section-item ${selected_class}">
       <a href="${unit_locator.url_reverse('unit')}" class="${unit_state}-item">
-        <span class="${unit.scope_ids.block_type}-icon"></span>
         <span class="unit-name">${unit.display_name_with_default}</span>
       </a>
       % if actions:
       <div class="item-actions">
-	<a href="#" data-tooltip="Delete this unit" class="delete-button" data-locator="${unit_locator}">
-        <span class="delete-icon"></span></a>
-	<span data-tooltip="Drag to sort" class="drag-handle unit-drag-handle"></span>
+        <ul class="actions-list">
+          <li class="actions-item delete">
+            <a href="#" data-tooltip="${_("Delete this unit")}" class="delete-unit-button action" data-locator="${unit_locator}"><i class="icon-trash"></i><span class="sr">${_("Delete unit")}</span></a>
+          </li>
+          <li class="actions-item drag">
+            <span data-tooltip="${_("Drag to sort")}" class="drag-handle unit-drag-handle action"><span class="sr"> ${_("Drag to reorder unit")}</span></span>
+          </li>
+        </ul>
       </div>
       % endif
     </div>
@@ -47,11 +52,11 @@ This def will enumerate through a passed in subsection and list all of the units
     <%include file="_ui-dnd-indicator-after.html" />
   </li>
   % endfor
-  <li>
+  <li class="courseware-unit add-new-unit">
     <%include file="_ui-dnd-indicator-initial.html" />
 
     <a href="#" class="new-unit-item" data-category="${new_unit_category}" data-parent="${subsection_locator}">
-      <span class="new-unit-icon"></span>New Unit
+      <i class="icon-plus"></i> ${_("New Unit")}
     </a>
   </li>
 </ol>
