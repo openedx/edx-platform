@@ -3,7 +3,7 @@ from paver.setuputils import setup
 
 import os
 import psutil
-from pavelib import prereqs, assets
+from pavelib import prereqs
 
 default_options = {"lms": '8000', "cms": '8001'}
 
@@ -17,8 +17,8 @@ setup(
 )
 
 
-def kill_process(pid):
-    p1_group = psutil.Process(p1.pid)
+def kill_process(proc):
+    p1_group = psutil.Process(proc.pid)
 
     child_pids = p1_group.get_children(recursive=True)
 
@@ -41,7 +41,17 @@ def fast_lms():
     """
       runs lms without running prereqs
     """
-    sh("django-admin.py runserver --traceback --settings=lms.envs.dev --pythonpath=.")
+    sh("python manage.py lms runserver --traceback --settings=dev --pythonpath=. %s" % default_options['lms'])
+
+
+@task
+@cmdopts([
+    ("env=", "e", "Environment settings"),
+])
+def cms(options):
+
+    setattr(options,'system','cms')
+    run_server(options)
 
 
 @task
@@ -49,19 +59,15 @@ def fast_lms():
     ("system=", "s", "System to act on"),
     ("env=", "e", "Environment settings"),
 ])
-def run_server():
+def run_server(options):
     """
       runs server specified by system using a supplied environment
     """
     system = getattr(options, 'system', 'lms')
     env = getattr(options, 'env', 'dev')
 
-    prereqs.install_prereqs()
-    pre_django()
-    assets.compile_assets()
-
     try:
-        sh('django-admin.py runserver --traceback ' + ('--settings=%s.envs.%s' % (system, env)) + ' --pythonpath=. ' + default_options[system])
+        sh('python manage.py %s runserver --traceback --settings=%s' % (system, env) + ' --pythonpath=. ' + default_options[system])
     except:
         print("Failed to runserver")
         return
@@ -76,29 +82,58 @@ def resetdb():
       runs syncdb and then migrate
     """
     env = getattr(options, 'env', 'dev')
-    pre_django()
 
-    sh('django-admin.py syncdb --traceback ' + ('--settings=lms.envs.%s' % (env)) + ' --pythonpath=. ')
-    sh('django-admin.py migrate --traceback ' + ('--settings=lms.envs.%s' % (env)) + ' --pythonpath=. ')
+    sh('python manage.py lms syncdb --traceback --settings=%s' % (env) + ' --pythonpath=. ')
+    sh('python manage.py lms migrate --traceback --settings=%s' % (env) + ' --pythonpath=. ')
 
 
 @task
 @cmdopts([
+    ("system=", "s", "System to act on"),
     ("env=", "e", "Environment settings"),
 ])
 def check_settings():
     """
        checks settings files
     """
+    system = getattr(options, 'system', 'lms')
     env = getattr(options, 'env', 'dev')
-    pre_django()
 
     try:
-        sh(("echo 'import cms.envs.%s'" % env) + " | django-admin.py shell " + (' --settings=cms.envs.%s' % (env)) + ' --pythonpath=. ')
-        sh(("echo 'import lms.envs.%s'" % env) + " | django-admin.py shell " + (' --settings=lms.envs.%s' % (env)) + ' --pythonpath=. ')
+        sh(("echo 'import %s.envs.%s'" % (system, env)) + ' | python manage.py %s shell --plain --settings=%s' % (system, env) + ' --pythonpath=. ')
     except:
         print("Failed to import settings")
         return
+
+
+@task
+@cmdopts([
+    ("system=", "s", "System to act on"),
+])
+def run_celery():
+    """
+      runs celery for the specified system
+    """
+    system = getattr(options, 'system', 'lms')
+
+    kwargs = {'shell': True, 'cwd': None}
+
+    p1 = 0
+
+    try:
+        p1 = subprocess.Popen('python manage.py %s celery worker --loglevel=INFO --settings=dev_with_worker --pythonpath=. ' % (system), **kwargs)
+
+        input("Enter CTL-C to end")
+    except KeyboardInterrupt:
+        print("\nrun_celery ending")
+    except:
+        print("Failed to run celery")
+        pass
+    finally:
+        try:
+            kill_process(p1)
+        except KeyboardInterrupt:
+            pass
 
 
 @task
@@ -111,10 +146,6 @@ def run_all_servers():
     """
     env = getattr(options, 'env', 'dev')
 
-    prereqs.install_prereqs()
-    pre_django()
-    assets.compile_assets()
-
     kwargs = {'shell': True, 'cwd': None}
 
     p1 = 0
@@ -123,10 +154,10 @@ def run_all_servers():
     p4 = 0
 
     try:
-        p1 = subprocess.Popen('django-admin.py runserver --traceback ' + ('--settings=lms.envs.%s' % (env)) + ' --pythonpath=. ' + default_options['lms'], **kwargs)
-        p2 = subprocess.Popen('django-admin.py runserver --traceback ' + ('--settings=cms.envs.%s' % (env)) + ' --pythonpath=. ' + default_options['cms'], **kwargs)
-        p3 = subprocess.Popen("django-admin.py celery worker --loglevel=INFO --settings=lms.envs.dev_with_worker --pythonpath=. ", **kwargs)
-        p4 = subprocess.Popen("django-admin.py celery worker --loglevel=INFO --settings=lms.envs.dev_with_worker --pythonpath=. ", **kwargs)
+        p1 = subprocess.Popen('python manage.py lms runserver --traceback --settings=%s' % (env) + ' --pythonpath=. ' + default_options['lms'], **kwargs)
+        p2 = subprocess.Popen('python manage.py cms runserver --traceback --settings=%s' % (env) + ' --pythonpath=. ' + default_options['cms'], **kwargs)
+        p3 = subprocess.Popen('python manage.py lms celery worker --loglevel=INFO --settings=%s_with_worker --pythonpath=. ' % (env), **kwargs)
+        p4 = subprocess.Popen('python manage.py cms celery worker --loglevel=INFO --settings=%s_with_worker --pythonpath=. ' % (env), **kwargs)
 
         input("Enter to end")
     except:

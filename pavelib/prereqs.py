@@ -29,7 +29,7 @@ def install_ruby_prereqs():
     """
       installs ruby prereqs
     """
-    sh('bundle install')
+    sh('bundle install --quiet')
 
 
 @task
@@ -45,10 +45,10 @@ def install_python_prereqs():
     """
       installs python prerequisites
     """
-    sh('pip install --exists-action w -r requirements/edx/pre.txt')
-    sh('pip install --exists-action w -r requirements/edx/base.txt')
-    sh('pip install --exists-action w -r requirements/edx/post.txt')
+    sh('pip install -q --exists-action w -r requirements/edx/pre.txt')
+    sh('pip install -q --exists-action w -r requirements/edx/base.txt')
+    sh('pip install -q --exists-action w -r requirements/edx/post.txt')
     # requirements/private.txt is used to install our libs as
     # working dirs, or for personal-use tools.
     if os.path.exists("requirements/private.txt"):
-        sh('pip install -r requirements/private.txt')
+        sh('pip install -q -r requirements/private.txt')

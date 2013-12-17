@@ -1,7 +1,15 @@
-
 from paver.easy import *
 from paver.setuputils import setup
 from pavelib import prereqs
+
+import json
+import glob
+import os
+import platform
+import subprocess
+import signal
+import psutil
+
 
 setup(
     name="OpenEdX",
@@ -82,17 +90,78 @@ def sass_cmd(watch=False, debug=False):
            (' --watch' if watch else ' --update') + ' -E utf-8 ' + ' '.join(sass_watch_paths)
 
 
-# This task takes arguments purely to pass them via dependencies to the preprocess task
+ # This task takes arguments purely to pass them via dependencies to the preprocess task
 @task
 @cmdopts([
     ("system=", "s", "System to act on"),
     ("env=", "e", "Environment settings"),
     ("watch", "w", "Run with watch"),
-    ("debug", "d", "Run with debug")
+    ("debug", "d", "Run with debug"),
+    ("clobber", "c", "Remove compiled Coffeescript files"),
 ])
-def compile_assets(options):
+def compile_coffeescript(options):
     """
-       Runs coffeescript, sass and xmodule_cmd and then collectstatic
+       Runs coffeescript
+    """
+
+    system = getattr(options, 'system', 'lms')
+    env = getattr(options, 'env', 'dev')
+    run_watch = getattr(options, 'watch', False)
+    run_debug = getattr(options, 'debug', False)
+    clobber = getattr(options, 'clobber', False)
+
+    print ("Compile Coffeescript")
+
+    coffee_clean()
+
+    if clobber:
+        print("Coffeescript files removed")
+        return
+
+    try:
+        sh('python manage.py %s preprocess_assets --settings=%s --traceback ' % (system, env))
+    except:
+        print("Asset preprocessing failed!")
+        return
+
+    kwargs = {'shell': True, 'cwd': None}
+
+    sh(coffee_cmd(False, run_debug))
+
+    p1 = 0
+
+    try:
+        if run_watch:
+            p1 = subprocess.Popen(coffee_cmd(run_watch, run_debug), **kwargs)
+
+            input("Enter CTL-C to end")
+    except KeyboardInterrupt:
+        print("Compile Coffescript ending")
+    except:
+        pass
+    finally:
+        if run_watch:
+            try:
+                p1_group = psutil.Process(p1.pid)
+
+                child_pid = p1_group.get_children(recursive=True)
+
+                for pid in child_pid:
+                    os.kill(pid.pid, signal.SIGKILL)
+            except KeyboardInterrupt:
+                pass
+
+
+@task
+@cmdopts([
+    ("system=", "s", "System to act on"),
+    ("env=", "e", "Environment settings"),
+    ("watch", "w", "Run with watch"),
+    ("debug", "d", "Run with debug"),
+])
+def compile_xmodule(options):
+    """
+       Runs xmodule_cmd
     """
 
     system = getattr(options, 'system', 'lms')
@@ -100,10 +169,137 @@ def compile_assets(options):
     run_watch = getattr(options, 'watch', False)
     run_debug = getattr(options, 'debug', False)
 
+    print ("Compile xmodule assets")
+
+    try:
+        sh('python manage.py %s preprocess_assets --settings=%s --traceback ' % (system, env))
+    except:
+        print("asset preprocessing failed!")
+        return
+
+    kwargs = {'shell': True, 'cwd': None}
+
+    sh(xmodule_cmd(False, run_debug))
+
+    p1 = 0
+
+    try:
+        if run_watch:
+            p1 = subprocess.Popen(xmodule_cmd(run_watch, run_debug), **kwargs)
+
+            input("Enter CTL-C to end")
+    except KeyboardInterrupt:
+        print("compile_assets ending")
+    except:
+        pass
+    finally:
+        if run_watch:
+            try:
+                p1.terminate()
+            except KeyboardInterrupt:
+                pass
+
+
+@task
+@cmdopts([
+    ("system=", "s", "System to act on"),
+    ("env=", "e", "Environment settings"),
+    ("watch", "w", "Run with watch"),
+    ("debug", "d", "Run with debug"),
+])
+def compile_sass(options):
+    """
+       Runs sass
+    """
+
+    system = getattr(options, 'system', 'lms')
+    env = getattr(options, 'env', 'dev')
+    run_watch = getattr(options, 'watch', False)
+    run_debug = getattr(options, 'debug', False)
+
+    print ("Compile sass")
+
+    try:
+        sh('python manage.py %s preprocess_assets --settings=%s --traceback ' % (system, env))
+    except:
+        print("asset preprocessing failed!")
+        return
+
+    kwargs = {'shell': True, 'cwd': None}
+
+    sh(sass_cmd(False, run_debug))
+
+    p1 = 0
+
+    try:
+        if run_watch:
+            p1 = subprocess.Popen(sass_cmd(run_watch, run_debug), **kwargs)
+
+            input("Enter CTL-C to end")
+    except KeyboardInterrupt:
+        print("compile_sass ending")
+    except:
+        pass
+
+    finally:
+        if run_watch:
+            try:
+                os.kill(p1.pid, signal.SIGKILL)
+            except KeyboardInterrupt:
+                pass
+
+
+@task
+@cmdopts([
+    ("system=", "s", "System to act on"),
+    ("env=", "e", "Environment settings"),
+])
+def collectstatic(options):
+    """
+       Runs collectstatic
+    """
+
+    system = getattr(options, 'system', 'lms')
+    env = getattr(options, 'env', 'dev')
+
+    print ("Run collectstatic")
+
+    try:
+        sh('python manage.py %s preprocess_assets --settings=%s --traceback ' % (system, env))
+    except:
+        print("asset preprocessing failed!")
+        return
+
+    try:
+        sh('python manage.py %s collectstatic --traceback --settings=%s' % (system, env) + ' --noinput > /dev/null')
+    except:
+        pass
+
+
+# This task takes arguments purely to pass them via dependencies to the preprocess task
+@task
+@cmdopts([
+    ("system=", "s", "System to act on"),
+    ("env=", "e", "Environment settings"),
+    ("watch", "w", "Run with watch"),
+    ("debug", "d", "Run with debug"),
+    ("collectstatic", "c", "Collect Static"),
+])
+def compile_assets(options):
+    """
+       Runs coffeescript, sass and xmodule_cmd and then optionally collectstatic
+    """
+
+    system = getattr(options, 'system', 'lms')
+    env = getattr(options, 'env', 'dev')
+    run_watch = getattr(options, 'watch', False)
+    run_debug = getattr(options, 'debug', False)
+    collectstatic = getattr(options, 'collectstatic', False)
+
     print ("Compile all assets")
 
     try:
-        sh('django-admin.py preprocess_assets --traceback ' + ('--settings=%s.envs.%s' % (system, env)))
+        sh('python manage.py %s preprocess_assets --settings=%s --traceback ' % (system, env))
     except:
         print("asset preprocessing failed!")
         return
@@ -122,8 +318,9 @@ def compile_assets(options):
     p3 = 0
 
     try:
-        print("collecting static")
-        sh('django-admin.py collectstatic --traceback --settings=' + ('%s.envs.%s' % (system, env)) + ' --noinput > /dev/null')
+        if collectstatic:
+            print("collecting static")
+            sh('python manage.py %s collectstatic --traceback --settings=%s' % (system, env) + ' --noinput > /dev/null')
 
         if run_watch:
             p1 = subprocess.Popen(coffee_cmd(run_watch, run_debug), **kwargs)
@@ -135,6 +332,7 @@ def compile_assets(options):
         print("compile_assets ending")
     except:
         pass
+
     finally:
         if run_watch:
             try:
