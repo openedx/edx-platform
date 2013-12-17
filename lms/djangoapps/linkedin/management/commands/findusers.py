@@ -13,6 +13,7 @@ from django.utils import timezone
 from optparse import make_option
 
 from ...models import LinkedIn
+from .api import LinkedinAPI
 
 FRIDAY = 4
 
@@ -112,15 +113,3 @@ class Command(BaseCommand):
                 do_batch(batch)
         except StopIteration:
             pass
-
-
-class LinkedinAPI(object):
-    """
-    Encapsulates the LinkedIn API.
-    """
-
-    def batch(self, emails):
-        """
-        Get the LinkedIn status for a batch of emails.
-        """
-        return (True for email in emails)
