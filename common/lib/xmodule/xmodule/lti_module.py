@@ -363,10 +363,14 @@ class LTIModule(LTIFields, XModule):
 
             # Parameters required for grading:
             u'resource_link_id': self.get_resource_link_id(),
-            u'lis_outcome_service_url': self.get_outcome_service_url(),
             u'lis_result_sourcedid': self.get_lis_result_sourcedid(),
 
         }
+
+        if self.has_score:
+            body.update({
+                u'lis_outcome_service_url': self.get_outcome_service_url()
+            })
 
         # Appending custom parameter for signing.
         body.update(custom_parameters)
@@ -500,8 +504,11 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
             failure_values['imsx_messageIdentifier'] = escape(imsx_messageIdentifier)
             return Response(response_xml_template.format(**failure_values), content_type="application/xml")
 
-
         real_user = self.system.get_real_user(urllib.unquote(sourcedId.split(':')[-1]))
+        if not real_user:  # that means we can't save to database, as we do not have real user id.
+            failure_values['imsx_messageIdentifier'] = escape(imsx_messageIdentifier)
+            return Response(response_xml_template.format(**failure_values), content_type="application/xml")
+
         if action == 'replaceResultRequest':
             self.system.publish(
                 event={
