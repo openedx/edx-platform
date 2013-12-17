@@ -198,7 +198,16 @@ SEGMENT_IO_KEY = os.environ.get('SEGMENT_IO_KEY')
 if SEGMENT_IO_KEY:
     MITX_FEATURES['SEGMENT_IO'] = True
 
+CERT_QUEUE = 'certificates'
 
+XQUEUE_INTERFACE = {
+    "url": "http://127.0.0.1:3032",
+    "django_auth": {
+        "username": "lms",
+        "password": "abcd"
+    },
+    "basic_auth": ('anant', 'agarwal'),
+}
 #####################################################################
 # Lastly, see if the developer has any local overrides.
 try:
