@@ -46,11 +46,15 @@ class Command(BaseCommand):
         self.api = LinkedinAPI()
 
     def handle(self, *args, **options):
+        whitelist = self.api.config.get('EMAIL_WHITELIST')
         grandfather = options.get('grandfather', False)
         accounts = LinkedIn.objects.filter(has_linkedin_account=True)
         for account in accounts:
-            emailed = json.loads(account.emailed_courses)
             user = account.user
+            if whitelist is not None and user.email not in whitelist:
+                # Whitelist only certain addresses for testing purposes
+                continue
+            emailed = json.loads(account.emailed_courses)
             certificates = GeneratedCertificate.objects.filter(user=user)
             certificates = certificates.filter(status='downloadable')
             certificates = [cert for cert in certificates
