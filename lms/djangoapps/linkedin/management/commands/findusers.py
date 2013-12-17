@@ -13,7 +13,7 @@ from django.utils import timezone
 from optparse import make_option
 
 from ...models import LinkedIn
-from .api import LinkedinAPI
+from . import LinkedinAPI
 
 FRIDAY = 4
 
