@@ -27,10 +27,18 @@ REPORT_DIR = PROJECT_ROOT / "reports"   # /project_dir/reports
 COMMON_ROOT = PROJECT_ROOT / "common"   # /project_dir/common
 COURSES_ROOT = PROJECT_ROOT / "data"    # /project_dir/data
 
+# Environment constants
+try:
+    CONFIG_PREFIX = os.environ['SERVICE_VARIANT'] + '.'
+except KeyError:
+    CONFIG_PREFIX = ''
+
+ENV_FILE = os.path.join(PROJECT_ROOT, CONFIG_PREFIX + "env.json")
+
 env_data = None
 
 try:
-    with open('env.json') as env_file:
+    with open(ENV_FILE) as env_file:
         env_data = json.load(env_file)
 except IOError:
     print("Warning: File env.json not found - some configuration requires this")
