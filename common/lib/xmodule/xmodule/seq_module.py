@@ -30,8 +30,9 @@ class SequenceFields(object):
     due = Date(help="Date that this problem is due by", scope=Scope.settings)
     extended_due = Date(
         help="Date that this problem is due by for a particular student. This "
-             "may differ from the global due date if an instructor has granted "
-             "an extension to the student.",
+             "can be set by an instructor, and will override the global due "
+             "date if it is set to a date that is later than the global due "
+             "date.",
         default=None,
         scope=Scope.user_state,
     )
