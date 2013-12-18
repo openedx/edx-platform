@@ -27,7 +27,7 @@ The following changes are included in this release:
 * Studio Dashboard performance on Edge is improved. (STUD-1039)
 * In the Video component editor Advanced tab, the **Clear** button next the the **HTML 5 Transcript** field, shown below, now correctly removes the transcript. (BLD-438)
 
-  .. image::  Images/Video_Advanced_tab.png
+  .. image::  images/Video_Advanced_tab.png
 
 
 * The Drag and Drop problem template, available in the Advanced list when you are creating a new problem, is updated to demonstrate the updated drag and drop functionality. (BLD-479)
