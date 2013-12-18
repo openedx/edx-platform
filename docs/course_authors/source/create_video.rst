@@ -5,45 +5,124 @@ Working with Video Components
 #############################
 
 
-*******************
-Overview
-*******************
-You can create a video of your lecture, and add it to your course with other components—such as discussions and problems—to promote active learning.
+**********************
+Introduction to Videos
+**********************
+You can create a video of your lecture and add it to your course with other components—such 
+as discussions and problems—to promote active learning. Adding a video to your course has several steps.
 
-You can also associate a timed transcript with your video, which students can read and download.
-
-When you add a video to your course, you first post the video online, and then create a link to that video in the body of your course. 
-
-See the following topics:
-
-* :ref:`Video Formats`
-* :ref:`Video Hosting`
-* :ref:`Create a Video Component`
+#. Create the video.
+#. Create or obtain a transcript for the video.
+#. Post the video online.
+#. In Studio, create a Video component.
 
 .. note:: Review :ref:`Best Practices for Accessible Media` before adding videos to your course.
 
+************************
+Step 1. Create the Video
+************************
+
+Your video can contain whatever content you want. The `Producing Videos <https://edge.edx.org/courses/edX/edX101/How_to_Create_an_edX_Course/courseware/93451eee15ed47b0a310c19020e8dc64/a1b0835e986b4283b0f8871d97babb9a/>`_ 
+section of our `edX101 <https://edge.edx.org/courses/edX/edX101/How_to_Create_an_edX_Course/about>`_ 
+course has some helpful pointers for creating good video content.
+
+
+Compression Specifications
+--------------------------
+
+When you create your video, edX recommends the following compression specs. (Note that 
+these are recommended but not required.)
+
+.. list-table::
+   :widths: 10 20 20 20
+   :header-rows: 0
+   :stub-columns: 1
+
+   * - Output
+     - Edited Files
+     - Publish to YouTube
+     - Publish downloadable file to AWS S3
+   * - Codec
+     - H.264 .mp4
+     - H.264 "main concept" .mp4
+     - H.264 "x264" .mp4
+   * - Resolution and Frame Rate
+     - 1920x1080, progressive, 29.97 fps
+     - 1920x1080, progressive, 29.97 fps 
+     - 1280x720, progressive, 29.97 fps
+   * - Aspect
+     - 1.0
+     - 1.0
+     - 1.0
+   * - Bit Rate
+     - VBR, 2 pass 
+     - VBR, 2 pass 
+     - VBR, 2 pass  
+   * - Target VBR
+     - 32 mbps
+     - 5 mbps
+     - 1 mbps
+   * - Max VBS
+     - 40 vbs
+     - 7.5 mbps
+     - 1.5 mbps
+   * - Audio
+     - Linear AAC 48kHz / 256 kbps
+     - AAC 44.1 / 192 kbps
+     - AAC 44.1 / 192 kbps
+
 .. _Video Formats:
 
-*******************
 Video Formats
-*******************
+-------------
 
 The edX video player supports videos in .mp4, .ogg, and .mpeg format.
 
+*********************************************
+Step 2. Create or Obtain a Video Transcript
+*********************************************
 
-.. _Video Hosting:
+We strongly recommend that you associate a timed transcript with your video. Transcripts can be helpful for students whose first language isn't English, or who can't watch the video or want to review the video's content. The transcript scrolls automatically while your video plays. When a student clicks a word in the transcript, the video opens to that word. You can also allow your students to download the transcript so that they can read it offline. You'll associate the transcript with the video when you create the Video component.
 
-*******************
-Video Hosting
-*******************
+To create or obtain a transcript, you can work with a company that provides captioning services. EdX works with `3Play Media <http://www.3playmedia.com>`_. `YouTube <http://www.youtube.com/>`_ also provides captioning services. 
 
-All course videos should be posted to YouTube. 
-By default, the edX video player accesses your YouTube videos. 
-However, because YouTube is not available in all locations, we recommend that you also post copies of your videos on a third-party site such as Amazon S3. 
-When a student views a video in your course, if YouTube is not available in that student's location or if the YouTube video doesn't play, the video on the backup site starts playing automatically. 
+Transcript Format
+-----------------
+
+Your transcript must be an .srt file.
+
+
+*****************************
+Step 3. Post the Video Online
+*****************************
+
+All course videos should be posted to YouTube. By default, the edX video player accesses your YouTube videos. 
+
+Because YouTube is not available in all locations, however, we recommend that you also post 
+copies of your videos on a third-party site such as `Amazon S3 <http://aws.amazon.com/s3/>`_. When a student views 
+a video in your course, if YouTube is not available in that student’s location or if 
+the YouTube video doesn’t play, the video on the backup site starts playing automatically. 
 The student can also click a link to download the video from the backup site.
 
-You can use any video backup site that you want. Keep in mind, however, that the site where you post the videos may have to handle a lot of traffic.
+After you post your video online, make sure you have the URL for the video. If you host copies of your video in more than one place, make sure you have the URL for each video location.
+
+
+YouTube
+-------
+
+After you've created your video, upload the video to `YouTube <http://www.youtube.com/>`_. 
+
+.. note:: YouTube only hosts videos of up to 15 minutes. If you create a 0.75-speed option, you must make sure that your 1.0-speed video segments are only 11.25 minutes long so that YouTube can host all speeds. YouTube offers paid accounts that relax this restriction.
+
+Other Sites
+-----------
+
+You can use any video backup site that you want. However, keep in mind that the site where you 
+post the videos may have to handle a lot of traffic.
+
+.. note:: The URL for the video that you post on a third-party site must end in .mp4, .ogg, or 
+.mpeg. EdX can't support videos that you post on sites such as Vimeo. 
+
 
 
 .. _Create a Video Component:
@@ -52,61 +131,57 @@ You can use any video backup site that you want. Keep in mind, however, that the
 Create a Video Component
 *************************
 
-To add a video to the unit, you must obtain the YouTube ID for the video, obtain the URL for the backup video, and then create a video component.
+#. Under **Add New Component**, click **Video**.
 
-To determine the YouTube ID for a video, locate the video on YouTube and make a note of the code that appears between **watch?v =** and **&feature** in the URL. 
-This code appears circled below.
-
-.. note:: If **&feature** does not appear in the URL, just use the code that follows **watch?v=** in the URL.
-
-.. image:: Images/VideoComponent_YouTubeCode.png
-
-
-You can include videos that run at 0.75 speed, 1.25 speed, and 1.50 speed as well as at normal speed. To do this, you must upload each of these videos to YouTube separately.
-
-.. note:: YouTube only hosts videos of up to 15 minutes. If you encode a 0.75 speed option, you must make
-  sure that source video segments are only 11.25 minutes long so that YouTube can host all speeds.
-  YouTube offers paid accounts that relax this restriction.
-
-After you have uploaded the video to YouTube:
-
-#. Under **Add New Component**, click the **video** icon.
-
-   .. image:: Images/NewComponent_Discussion.png
-  
-   The Video component is added:
-
-   .. image:: Images/VideoComponent_Default.png
-
-
-2. When the new video component appears, click **edit**. The video editor opens and displays the Basic settings.
-
-   .. image:: Images/video-edit.png
+#. When the new video component appears, click **Edit**. The video editor opens to the **Basic** tab.
    
-3. In the **Display Name** field, enter the name you want students to see when they hover the mouse over the icon unit icon in the course accordian. This text also appears as a header for the video.
+#. In the **Display Name** field, enter the name you want students to see when they hover the mouse 
+   over the unit in the course accordion. This text also appears as a header for the video.
 
-#. Enter the URL of the YouTube video. 	
+#. In the **Video URL** field, enter the URL of the video. For example, the URL may resemble one of the following.
 
-   When you enter a video URL, Studio checks to see if a timed transcript for that video exists on edX. 
-   If the transcript exists, Studio automatically associates the transcript with the video.  
-
-   If your video is on YouTube, you can import a timed transcript from YouTube. This YouTube transcript overwrites the edX version of the transcript.
+   ::
    
-#. If no transcript exists, click **Upload New Timed Transcript** to upload a transcript file from your computer.
+      http://youtu.be/OEoXaMPEzfM
+      http://www.youtube.com/watch?v=OEoXaMPEzfM
+      https://s3.amazonaws.com/edx-course-videos/edx-edx101/EDXSPCPJSP13-G030300.mp4	
 
-#. If you want to modify the transcript, click **Download to Edit**. You can then make your changes and upload the new file.
 
-#. To specify additional sources for the video, click **Add more video sources**, and enter the URL and file type for the video.
+#. Next to **Timed Transcript**, select an option.
 
-#. Optionally, click **Advanced** to set the following for the video:
+   - If edX has a transcript for your video, Studio automatically finds the transcript and associates the transcript with the video. (If you want to modify the transcript, click **Download to Edit**. You can then make your changes and upload the new file by clicking **Upload New Timed Transcript**.)
 
-   * **Download Transcript**: the external URL for non-YouTube video transcripts.
-   * **Download Video**:  the external URL to download the video.
-   * **Start Time** and **End Time** for the video
-   * **Video Sources**:  URLs and filenames for other sources of the video.
-   * **Youtube ID**:  IDs for different speed videos on YouTube.
+   - If your video has a transcript on YouTube, Studio automatically finds the transcript and asks if you want to import it. To use this YouTube transcript, click **Import from YouTube**. (If you want to modify the YouTube transcript, click **Download to Edit**. You can then make your changes and upload the new file by clicking **Upload New Timed Transcript**.)
+
+   - If neither edX nor YouTube has a transcript for your video, click **Upload New Timed Transcript** to upload a transcript file from your computer.
+
+#. Optionally, click **Advanced** to set more options for the video. For a description of each option, see the table below.
 
 #. Click **Save.**
   
+Advanced Options
+----------------
+
+.. list-table::
+   :widths: 20 80
+   :header-rows: 0
+
+   * - **Download Transcript**
+     - If you've uploaded a transcript for your video to a backup website such as Amazon S3, enter the external URL for this transcript. 
+   * - **Download Video**
+     - If you've uploaded a copy of your video to a backup website such as Amazon S3, enter the external URL for this video. Note this URL must end in .mpeg, .mp4, or .ogg.
+   * - **End Time**
+     - The time, formatted as hours, minutes, and seconds (HH:MM:SS), when you want the video to end.
+   * - **HTML5 Transcript**
+     - The name of the timed transcript track (for non-YouTube videos).
+   * - **Show Transcript**
+     - Specifies whether you want the transcript to show by default. Students can always turn transcripts on or off while they watch the video.
+   * - **Start Time**
+     - The time, formatted as hours, minutes, and seconds (HH:MM:SS), when you want the video to begin. 
+   * - **Video Sources**
+     - Additional locations where you've posted the video. This field must contain a URL that ends in .mpeg, .mp4, or .ogg.
+   * - **YouTube ID, YouTube ID for .75x speed, YouTube ID for 1.25x speed, YouTube ID for 1.5x speed**
+     - If you have uploaded separate videos to YouTube for different speeds of your video, enter the YouTube IDs for these videos in these fields.
+
 
 
