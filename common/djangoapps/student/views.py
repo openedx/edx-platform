@@ -72,7 +72,6 @@ from dogapi import dog_stats_api
 from pytz import UTC
 
 from util.json_request import JsonResponse
-import pdb
 
 
 log = logging.getLogger("edx.student")
@@ -203,7 +202,6 @@ def _cert_info(user, course, cert_status):
         CertificateStatuses.notpassing: 'notpassing',
         CertificateStatuses.restricted: 'restricted',
     }
-    pdb.set_trace()
     status = template_state.get(cert_status['status'], default_status)
 
     d = {'status': status,

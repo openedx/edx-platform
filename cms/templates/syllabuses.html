@@ -22,15 +22,7 @@ CMS.URL.SYLLABUSES = "${syllabus_url}"
 CMS.URL.LMS_BASE = "${settings.LMS_BASE}"
 require(["js/models/section", "js/collections/syllabus", "js/views/list_syllabuses"],
         function(Section, SyllabusCollection, ListSyllabusesView) {
-  window.section = new Section({
-      id: "${course.id}",
-      name: "${course.display_name_with_default | h}",
-      url_name: "${course.location.name | h}",
-      org: "${course.location.org | h}",
-      num: "${course.location.course | h}",
-      revision: "${course.location.revision | h}"
-  });
-  var syllabuses = new SyllabusCollection(${json.dumps(course.topic_syllabuses)}, {parse: true});
+  var syllabuses = new SyllabusCollection(${json.dumps(syllabuses)}, {parse: true});
   var tbView = new ListSyllabusesView({collection: syllabuses});
 
   $(function() {
