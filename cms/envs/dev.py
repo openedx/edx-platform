@@ -21,12 +21,6 @@ LOGGING = get_logger_config(ENV_ROOT / "log",
                             dev_env=True,
                             debug=True)
 
-DOC_STORE_CONFIG = {
-    'host': 'localhost',
-    'db': 'xmodule',
-    'collection': 'modulestore',
-}
-
 modulestore_options = {
     'default_class': 'xmodule.raw_module.RawDescriptor',
     'fs_root': GITHUB_REPO_ROOT,

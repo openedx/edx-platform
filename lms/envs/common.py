@@ -390,7 +390,11 @@ MODULESTORE = {
     }
 }
 CONTENTSTORE = None
-DOC_STORE_CONFIG = None
+DOC_STORE_CONFIG = {
+    'host': 'localhost',
+    'db': 'xmodule',
+    'collection': 'modulestore',
+}
 
 # Should we initialize the modulestores at startup, or wait until they are
 # needed?
