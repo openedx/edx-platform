@@ -2,7 +2,6 @@
 Instructor Views
 """
 import csv
-import datetime
 import json
 import logging
 import os
@@ -10,6 +9,7 @@ import re
 import requests
 
 from collections import defaultdict, OrderedDict
+from dateutil.parser import parse as parse_datetime
 from functools import partial
 from markupsafe import escape
 from requests.status_codes import codes
@@ -188,23 +188,6 @@ def instructor_dashboard(request, course_id):
             student = None
             msg += "<font color='red'>Couldn't find student with that email or username.  </font>"
         return msg, student
-
-    def parse_datetime(datestr):
-        """
-        Constructs a datetime object in UTC from user input.
-        """
-        msg = ""
-        timestamp = None
-        try:
-            date, time = datestr.split()
-            month, day, year = map(int, date.split('/'))
-            hour, minute = map(int, time.split(':'))
-            timestamp = datetime.datetime(year, month, day, hour, minute,
-                                          tzinfo=timezone.utc)
-        except ValueError:
-            msg = "<font color='red'>Unable to parse date: {0} </font>".format(
-                datestr)
-        return msg, timestamp
 
     # process actions from form POST
     action = request.POST.get('action', '')
@@ -511,8 +494,13 @@ def instructor_dashboard(request, course_id):
         msg += message
 
         # parse datetime
-        message, due_date = parse_datetime(request.POST.get('due_datetime'))
-        msg += message
+        datestr = request.POST.get('due_datetime')
+        try:
+            due_date = parse_datetime(datestr).replace(tzinfo=timezone.utc)
+        except ValueError:
+            due_date = None
+            msg += "<font color='red'>Unable to parse date: {0} </font>".format(
+                datestr)
 
         if url and student and due_date:
             error, unit = set_due_date_extension(

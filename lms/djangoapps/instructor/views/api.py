@@ -6,16 +6,16 @@ JSON views which the instructor dashboard requests.
 Many of these GETs may become PUTs in the future.
 """
 
-import datetime
 import json
 import logging
 import re
 import requests
+from dateutil.parser import parse as parse_datetime
 from django.conf import settings
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 from django.core.urlresolvers import reverse
-from django.utils import timezone
+from django.utils.timezone import utc
 from django.utils.translation import ugettext as _
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from util.json_request import JsonResponse
@@ -998,21 +998,6 @@ def proxy_legacy_analytics(request, course_id):
         )
 
 
-def parse_datetime(timestamp):
-    """
-    Constructs a datetime object in UTC from user input.
-    """
-    try:
-        date, time = timestamp.split()
-        month, day, year = map(int, date.split('/'))
-        hour, minute = map(int, time.split(':'))
-        return datetime.datetime(year, month, day, hour, minute,
-                                 tzinfo=timezone.utc)
-    except:
-        error = _("Unable to parse date: ") + timestamp
-        return HttpResponseBadRequest(json.dumps({'error': error}))
-
-
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -1024,9 +1009,12 @@ def change_due_date(request, course_id):
     course = get_course_by_id(course_id)
     student = get_student_from_identifier(request.GET.get('student'))
     url = request.GET.get('url')
-    due_date = parse_datetime(request.GET.get('due_datetime'))
-    if isinstance(due_date, HttpResponse):
-        return due_date  # error
+    datestr = request.GET.get('due_datetime')
+    try:
+        due_date = parse_datetime(datestr).replace(tzinfo=utc)
+    except ValueError:
+        error = _("Unable to parse date: ") + datestr
+        return HttpResponseBadRequest(json.dumps({'error': error}))
     error, unit = set_due_date_extension(course, url, student, due_date)
     if error:
         return HttpResponseBadRequest(json.dumps({'error': error}))
