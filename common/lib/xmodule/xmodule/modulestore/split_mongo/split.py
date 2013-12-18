@@ -945,9 +945,9 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             descriptor.definition_locator, descriptor.get_explicitly_set_fields_by_scope(Scope.content), user_id)
         # check children
         original_entry = original_structure['blocks'][descriptor.location.block_id]
-        if (not is_updated and descriptor.has_children
-            and not self._xblock_lists_equal(original_entry['fields']['children'], descriptor.children)):
-            is_updated = True
+        is_updated = is_updated or (
+            descriptor.has_children and original_entry['fields']['children'] != descriptor.children
+        )
         # check metadata
         if not is_updated:
             is_updated = self._compare_settings(
@@ -963,7 +963,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             block_data["definition"] = descriptor.definition_locator.definition_id
             block_data["fields"] = descriptor.get_explicitly_set_fields_by_scope(Scope.settings)
             if descriptor.has_children:
-                block_data['fields']["children"] = [self._block_id(child) for child in descriptor.children]
+                block_data['fields']["children"] = descriptor.children
 
             new_id = new_structure['_id']
             block_data['edit_info'] = {
@@ -1048,9 +1048,9 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         else:
             is_new = False
             block_id = xblock.location.block_id
-            if (not is_updated and xblock.has_children
-                and not self._xblock_lists_equal(structure_blocks[block_id]['fields']['children'], xblock.children)):
-                is_updated = True
+            is_updated = is_updated or (
+                xblock.has_children and structure_blocks[block_id]['fields']['children'] != xblock.children
+            )
 
         children = []
         if xblock.has_children:
@@ -1229,8 +1229,10 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             parent_block['edit_info']['previous_version'] = parent_block['edit_info']['update_version']
             parent_block['edit_info']['update_version'] = new_id
 
-        # remove subtree
         def remove_subtree(block_id):
+            """
+            Remove the subtree rooted at block_id
+            """
             for child in new_blocks[block_id]['fields'].get('children', []):
                 remove_subtree(child)
             del new_blocks[block_id]
@@ -1389,32 +1391,6 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
                         self._block_matches(target, criteria))
         else:
             return criteria == target
-
-    def _xblock_lists_equal(self, lista, listb):
-        """
-        Do the 2 lists refer to the same xblocks in the same order (presumes they're from the
-        same course)
-
-        :param lista:
-        :param listb:
-        """
-        if len(lista) != len(listb):
-            return False
-        for ele_a, ele_b in zip(lista, listb):
-            if ele_a != ele_b:
-                if self._block_id(ele_a) != self._block_id(ele_b):
-                    return False
-        return True
-
-    def _block_id(self, xblock_or_id):
-        """
-        arg is either an xblock or an id. If an xblock, get the block_id from its location. Otherwise, return itself.
-        :param xblock_or_id:
-        """
-        if isinstance(xblock_or_id, XModuleDescriptor):
-            return xblock_or_id.location.block_id
-        else:
-            return xblock_or_id
 
     def _get_index_if_valid(self, locator, force=False, continue_version=False):
         """

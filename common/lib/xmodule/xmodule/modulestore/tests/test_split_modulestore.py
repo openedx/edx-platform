@@ -235,6 +235,16 @@ class SplitModuleCourseTests(SplitModuleTest):
                           modulestore().get_course,
                           CourseLocator(course_id='GreekHero', branch='published'))
 
+    def test_cache(self):
+        """
+        Test that the mechanics of caching work.
+        """
+        locator = CourseLocator(version_guid=self.GUID_D0)
+        course = modulestore().get_course(locator)
+        block_map = modulestore().cache_items(course.system, course.children, depth=3)
+        self.assertIn('chapter1', block_map)
+        self.assertIn('problem3_2', block_map)
+
     def test_course_successors(self):
         """
         get_course_successors(course_locator, version_history_depth=1)

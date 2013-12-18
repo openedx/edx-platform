@@ -75,7 +75,6 @@ class TestLocationMapper(unittest.TestCase):
         self.assertEqual(entry['prod_branch'], 'live')
         self.assertEqual(entry['block_map'], block_map)
 
-
     def translate_n_check(self, location, old_style_course_id, new_style_course_id, block_id, branch, add_entry=False):
         """
         Request translation, check course_id, block_id, and branch
@@ -347,6 +346,25 @@ class TestLocationMapper(unittest.TestCase):
         )
         reverted_location = loc_mapper().translate_locator_to_location(prob_locator)
         self.assertEqual(location, reverted_location)
+
+    def test_name_collision(self):
+        """
+        Test dwim translation when the old name was not unique
+        """
+        org = "myorg"
+        course = "another_course"
+        name = "running_again"
+        course_location = Location('i4x', org, course, 'course', name)
+        course_xlate = loc_mapper().translate_location(None, course_location, add_entry_if_missing=True)
+        self.assertEqual(course_location, loc_mapper().translate_locator_to_location(course_xlate))
+        eponymous_block = course_location.replace(category='chapter')
+        chapter_xlate = loc_mapper().translate_location(None, eponymous_block, add_entry_if_missing=True)
+        self.assertEqual(course_location, loc_mapper().translate_locator_to_location(course_xlate))
+        self.assertEqual(eponymous_block, loc_mapper().translate_locator_to_location(chapter_xlate))
+        # and a non-existent one w/o add
+        eponymous_block = course_location.replace(category='problem')
+        with self.assertRaises(ItemNotFoundError):
+            chapter_xlate = loc_mapper().translate_location(None, eponymous_block, add_entry_if_missing=False)
 
 
 #==================================

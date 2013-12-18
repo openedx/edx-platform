@@ -298,8 +298,8 @@ class CourseLocator(Locator):
         self._set_value(
             parse, 'version_guid', lambda (new_guid): self.set_version_guid(self.as_object_id(new_guid))
         )
-        self._set_value(parse, 'course_id', lambda (new_id): self.set_course_id(new_id))
-        self._set_value(parse, 'branch', lambda (new_branch): self.set_branch(new_branch))
+        self._set_value(parse, 'course_id', self.set_course_id)
+        self._set_value(parse, 'branch', self.set_branch)
 
     def init_from_version_guid(self, version_guid):
         """
@@ -448,7 +448,7 @@ class BlockUsageLocator(CourseLocator):
                                      branch=self.branch,
                                      block_id=self.block_id)
 
-    def set_usage_id(self, new):
+    def set_block_id(self, new):
         """
         Initialize block_id to new value.
         If block_id has already been initialized to a different value, raise an exception.
@@ -457,12 +457,12 @@ class BlockUsageLocator(CourseLocator):
 
     def init_block_ref(self, block_ref):
         if isinstance(block_ref, LocalId):
-            self.set_usage_id(block_ref)
+            self.set_block_id(block_ref)
         else:
             parse = parse_block_ref(block_ref)
             if not parse:
                 raise ValueError('Could not parse "%s" as a block_ref' % block_ref)
-            self.set_usage_id(parse['block'])
+            self.set_block_id(parse['block'])
 
     def init_block_ref_from_str(self, value):
         """
@@ -476,17 +476,16 @@ class BlockUsageLocator(CourseLocator):
         parse = parse_url(value, tag_optional=True)
         if parse is None:
             raise ValueError('Could not parse "%s" as a url' % value)
-        self._set_value(parse, 'block', lambda(new_block): self.set_usage_id(new_block))
+        self._set_value(parse, 'block', self.set_block_id)
 
     def init_block_ref_from_course_id(self, course_id):
         if isinstance(course_id, CourseLocator):
-            # FIXME the parsed course_id should never contain a block ref
             course_id = course_id.course_id
             assert course_id, "%s does not have a valid course_id"
         parse = parse_course_id(course_id)
         if parse is None:
             raise ValueError('Could not parse "%s" as a course_id' % course_id)
-        self._set_value(parse, 'block', lambda(new_block): self.set_usage_id(new_block))
+        self._set_value(parse, 'block', self.set_block_id)
 
     def __unicode__(self):
         """

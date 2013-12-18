@@ -95,15 +95,20 @@ class TemplateTests(unittest.TestCase):
         """
         try saving temporary xblocks
         """
-        test_course = persistent_factories.PersistentCourseFactory.create(org='testx', prettyid='tempcourse',
+        test_course = persistent_factories.PersistentCourseFactory.create(
+            org='testx', prettyid='tempcourse',
             display_name='fun test course', user_id='testbot')
         test_chapter = self.load_from_json({'category': 'chapter',
             'fields': {'display_name': 'chapter n'}},
             test_course.system, parent_xblock=test_course)
         test_def_content = '<problem>boo</problem>'
         # create child
-        _ = self.load_from_json({'category': 'problem',
-            'fields': {'data': test_def_content}},
+        self.load_from_json({
+            'category': 'problem',
+            'fields': {
+                'data': test_def_content,
+                'display_name': 'problem'
+            }},
             test_course.system, parent_xblock=test_chapter)
         # better to pass in persisted parent over the subdag so
         # subdag gets the parent pointer (otherwise 2 ops, persist dag, update parent children,
@@ -117,6 +122,10 @@ class TemplateTests(unittest.TestCase):
         persisted_problem = persisted_chapter.get_children()[0]
         self.assertEqual(persisted_problem.category, 'problem')
         self.assertEqual(persisted_problem.data, test_def_content)
+        # update it
+        persisted_problem.display_name = 'altered problem'
+        persisted_problem = modulestore('split').persist_xblock_dag(persisted_problem, 'testbot')
+        self.assertEqual(persisted_problem.display_name, 'altered problem')
 
     def test_delete_course(self):
         test_course = persistent_factories.PersistentCourseFactory.create(

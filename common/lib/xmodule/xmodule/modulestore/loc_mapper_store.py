@@ -259,7 +259,9 @@ class LocMapperStore(object):
             # if there are few == org/course roots or their content is unrelated, this will work well.
             block_id = self._verify_uniqueness(location.category + location.name[:3], block_map)
         else:
-            block_id = location.name
+            # if 2 different category locations had same name, then they'll collide. Make the later
+            # mapped ones unique
+            block_id = self._verify_uniqueness(location.name, block_map)
         encoded_location_name = self._encode_for_mongo(location.name)
         block_map.setdefault(encoded_location_name, {})[location.category] = block_id
         self.location_map.update(location_id, {'$set': {'block_map': block_map}})
