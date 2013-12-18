@@ -61,7 +61,7 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
         '''
         if 'grade' in self.path and self._send_graded_result().status_code == 200:
             status_message = 'LTI consumer (edX) responded with XML content:<br>' + self.server.grade_data['TC answer']
-            self.server.grade_data['callback_url'] = None
+            self.server.grade_data = None
             self._send_response(status_message, 200)
         # Respond to request with correct lti endpoint:
         elif self._is_correct_lti_request():
@@ -152,12 +152,14 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
                 </imsx_POXEnvelopeRequest>
         """)
         data = payload.format(**values)
-        # get relative part, because host name is different in a) manual tests b) acceptance tests c) demos
-        if getattr(self.server, 'test_mode', None):
+        if getattr(self.server, 'use_real_callback_url', None):
+            # Use exact URL that was sent from TC when using this Stub LTI server
+            # as TP in real standalone environment.
+            url = self.server.grade_data['callback_url']
+        else:
+            # Use relative URL when using TP locally for manual testing or jenkins.
             relative_url = urlparse.urlparse(self.server.grade_data['callback_url']).path
             url = self.server.referer_host + relative_url
-        else:
-            url = self.server.grade_data['callback_url']
 
         headers = {'Content-Type': 'application/xml', 'X-Requested-With': 'XMLHttpRequest'}
         headers['Authorization'] = self.oauth_sign(url, data)
@@ -167,11 +169,12 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
         if getattr(self.server, 'run_inside_unittest_flag', None):
             response = mock.Mock(status_code=200, url=url, data=data, headers=headers)
             return response
-
+        # Send request ignoring verification of SSL certificate
         response = requests.post(
             url,
             data=data,
-            headers=headers
+            headers=headers,
+            verify=False
         )
         self.server.grade_data['TC answer'] = response.content
         return response
@@ -182,6 +185,7 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
         '''
         self._send_head(status_code)
         if getattr(self.server, 'grade_data', False):  # lti can be graded
+            url = "//{}:{}".format(self.server.server_host, self.server.server_port)
             response_str = textwrap.dedent("""
                 <html>
                     <head>
@@ -198,7 +202,7 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
                         </form>
                     </body>
                 </html>
-            """).format(message, url="http://%s:%s" % self.server.server_address)
+            """).format(message, url=url)
         else: # lti can't be graded
             response_str = textwrap.dedent("""
                 <html>
