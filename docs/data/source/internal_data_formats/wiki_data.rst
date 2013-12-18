@@ -9,7 +9,7 @@ EdX currently uses an external application called Django Wiki for Wiki functiona
 
 
 ****************
-article
+wiki_article
 ****************
 
   .. list-table::
@@ -24,10 +24,10 @@ article
        - int(11) 
        - NO
        - PRI
-     * - current_revision
+     * - current_revision_id
        - int(11)
        - NO
-       - 
+       - UNI
      * - created
        - datetime
        - NO
@@ -38,22 +38,26 @@ article
        -
      * - owner_id
        - int(11)
-       - NO
-       - Foreign
+       - YES
+       - MUL
+     * - group_id
+       - int(11)
+       - YES
+       - MUL
      * - group_read
-       - boolean
+       - tinyint(1)
        - NO
        - 
      * - group_write
-       - boolean
+       - tinyint(1)
        - NO
        - 
      * - other_read
-       - boolean
+       - tinyint(1)
        - NO
        - 
      * - other_write
-       - boolean
+       - tinyint(1)
        - NO
        - 
 
@@ -64,7 +68,7 @@ article
   
 
 `current_revision_id`
-----------
+------------------------------
    The ID of the revision that is displayed for this article.
 
 
@@ -75,18 +79,23 @@ article
 
 `modified`
 ------------
-    The date the article was last modified.
+    The date the article properties were last modified.
     
 `owner_id`
 ------------
-    The user ID of the article owner.
+    The owner of the article, usually the creator. The owner always has both read and write access.
+    
+`group_id`
+------------
+    As in a UNIX file system, permissions can be given to a user according to group membership. 
+    Groups are handled through the Django auth system.
     
 `group_read`
 ------------
     Whether the group has read access to the article.
 
 `group_write`
-------------
+--------------
     Whether the group has write access to the article.
 
 `other_read`
@@ -94,16 +103,16 @@ article
     Whether others have read access to the article.
 
 `other_write`
-------------
+----------------------
     Whether others have read access to the article.
 
 
 
 
 
-****************
-article_revision
-****************
+**********************
+wiki_articlerevision
+**********************
 
   .. list-table::
      :widths: 15 15 15 15
@@ -122,19 +131,23 @@ article_revision
        - NO
        - 
      * - user_message
-       - varchar(255)
-       - YES
+       - longtext
+       - NO
        -
      * - automatic_log
-       - varchar(255)
-       - YES
+       - longtext
+       - NO
        -
      * - ip_address
-       - ??
+       - char(15)
        - YES
        - 
-     * - user_id_modified
+     * - user_id
        - int(11)
+       - YES
+       - MUL
+     * - modified
+       - datetime
        - NO
        - 
      * - created
@@ -143,20 +156,20 @@ article_revision
        - 
      * - previous_revision_id
        - int(11)
-       - NO
-       - Foreign
+       - YES
+       - MUL
      * - deleted
-       - boolean
+       - tinyint(1)
        - NO
        - 
      * - locked
-       - boolean
+       - tinyint(1)
        - NO
        - 
      * - article_id
        - int(11)
        - NO
-       - Foreign
+       - MUL
      * - content
        - longtext
        - NO
@@ -174,20 +187,20 @@ article_revision
 
 
 `revision_number`
-----------
+--------------------
    The ID of the revision.
 
 
 `user_message`
-------------
+----------------------
     The message the user added when saving the revision.
 
 
 `automatic_log`
-------------
-    ???
+----------------------
+
     
-`user`
+`user_id`
 ------------
     The ID of the user who made the revision.
 
@@ -202,8 +215,8 @@ article_revision
     The date the article was created.
 
 
-`previous_revision`
-------------
+`previous_revision_id`
+----------------------
     The ID of the revision previous to this one.
 
 `deleted`
@@ -216,7 +229,7 @@ article_revision
     Whether or not the revision is locked.
     
 `article_id`
-----------
+--------------------
    The ID of the revision that is displayed for this article.
 
 
