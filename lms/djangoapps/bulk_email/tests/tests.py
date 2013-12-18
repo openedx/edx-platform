@@ -31,7 +31,6 @@ class TestInstructorDashboardEmailView(ModuleStoreTestCase):
         response = self.client.get(reverse('instructor_dashboard',
                                    kwargs={'course_id': self.course.id}))
         email_link = '<a href="#" onclick="goto(\'Email\')" class="None">Email</a>'
-        print(response.content)
         self.assertTrue(email_link in response.content)
 
         session = self.client.session

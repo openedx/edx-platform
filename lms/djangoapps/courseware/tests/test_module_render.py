@@ -114,8 +114,8 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
             field_data_cache,
             self.course_id
         )
-        self.assertTrue(module.system.send_users_emailaddr_with_coderesponse)
-        self.assertEqual(module.system.deanonymized_user_email, self.mock_user.email)
+        self.assertTrue(module.xmodule_runtime.send_users_emailaddr_with_coderesponse)
+        self.assertEqual(module.xmodule_runtime.deanonymized_user_email, self.mock_user.email)
 
     def test_module_not_populated_with_user_email(self):
         """
@@ -136,8 +136,8 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
             field_data_cache,
             self.course_id
         )
-        self.assertFalse(hasattr(module.system, 'send_users_emailaddr_with_coderesponse'))
-        self.assertFalse(hasattr(module.system, 'deanonymized_user_email'))
+        self.assertFalse(hasattr(module.xmodule_runtime, 'send_users_emailaddr_with_coderesponse'))
+        self.assertFalse(hasattr(module.xmodule_runtime, 'deanonymized_user_email'))
 
     def test_xqueue_callback_success(self):
         """
