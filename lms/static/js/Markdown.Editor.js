@@ -1377,6 +1377,18 @@
                         doClick(this);
                         return false;
                     }
+                    util.addEvent(button, "keydown", function(event) {
+                        var keyCode = event.charCode || event.keyCode;
+                        if (keyCode == 32 || keyCode == 13) {
+                            if (event.preventDefault) {
+                                event.preventDefault();
+                            }
+                            if (window.event) {
+                                window.event.returnValue = false;
+                            }
+                            doClick(button);
+                        }
+                    })
                 }
             }
             else {

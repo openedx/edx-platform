@@ -18,7 +18,7 @@
         "publication": "The New York Times",
 	    "publish_date": "April 29, 2013"
     },
- 
+
     {
         "title": "Online Education Lifts Pass Rates at University",
         "url": "http://online.wsj.com/article/SB10001424127887323741004578414861572832182.html?mod=googlenews_wsj",
@@ -80,7 +80,7 @@
 	    "publish_date": "February 20, 2013"
     },
 
- 
+
     {
         "title": "Georgetown to offer free online courses",
         "url": "http://www.washingtonpost.com/local/education/georgetown-to-offer-free-online-courses/2012/12/09/365c4612-3fd3-11e2-bca3-aadc9b7e29c5_story.html",
@@ -90,7 +90,7 @@
         "publication": "The Washington Post",
 	    "publish_date": "December 9, 2012"
     },
- 
+
     {
         "title": "Wellesley College teams up with online provider edX",
         "url": "http://bostonglobe.com/2012/12/04/edx/AqnQ808q4IEcaUa8KuZuBO/story.html",
@@ -136,7 +136,7 @@
         "deck": null,
         "publication": "BBC",
 	"publish_date": "October 31, 2012"
-    },    
+    },
     {
         "title": "VMware to provide software for HarvardX CS50x",
         "url": "http://tech.mit.edu/V132/N48/edxvmware.html",

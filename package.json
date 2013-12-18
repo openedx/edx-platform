@@ -1,5 +1,5 @@
 {
-    "name": "mitx",
+    "name": "edx",
     "version": "0.1.0",
     "dependencies": {
       "coffee-script": "1.6.X"

@@ -12,7 +12,7 @@ import json
 import mock
 
 
-@mock.patch.dict("django.conf.settings.MITX_FEATURES", {"ENABLE_FEEDBACK_SUBMISSION": True})
+@mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_FEEDBACK_SUBMISSION": True})
 @override_settings(ZENDESK_URL="dummy", ZENDESK_USER="dummy", ZENDESK_API_KEY="dummy")
 @mock.patch("util.views.dog_stats_api")
 @mock.patch("util.views._ZendeskApi", autospec=True)
@@ -282,7 +282,7 @@ class SubmitFeedbackTest(TestCase):
         self.assertEqual(resp.status_code, 200)
         self._assert_datadog_called(datadog_mock, with_tags=True)
 
-    @mock.patch.dict("django.conf.settings.MITX_FEATURES", {"ENABLE_FEEDBACK_SUBMISSION": False})
+    @mock.patch.dict("django.conf.settings.FEATURES", {"ENABLE_FEEDBACK_SUBMISSION": False})
     def test_not_enabled(self, zendesk_mock_class, datadog_mock):
         """
         Test for Zendesk submission not enabled in `settings`.

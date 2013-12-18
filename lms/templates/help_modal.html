@@ -6,7 +6,7 @@
 <%! from django.conf import settings %>
 <%! from courseware.tabs import get_discussion_link %>
 
-% if settings.MITX_FEATURES.get('ENABLE_FEEDBACK_SUBMISSION', False):
+% if settings.FEATURES.get('ENABLE_FEEDBACK_SUBMISSION', False):
 
 <div class="help-tab">
   <a href="#help-modal" rel="leanModal" role="button">${_("Help")}</a>

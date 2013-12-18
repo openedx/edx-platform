@@ -10,7 +10,7 @@
     <button class="action setting-upload" type="button" name="setting-upload" value="<%= gettext("Upload New Timed Transcript") %>" data-tooltip="<%= gettext("Upload New Timed Transcript") %>">
         <span><%= gettext("Upload New Timed Transcript") %></span>
     </button>
-    <a class="action setting-download" href="/transcripts/download?locator=<%= component_locator %>" data-tooltip="<%= gettext("Download to Edit") %>">
+    <a class="action setting-download" href="/transcripts/download?locator=<%= component_locator %>&subs_id=<%= subs_id %>" data-tooltip="<%= gettext("Download to Edit") %>">
         <span><%= gettext("Download to Edit") %></span>
     </a>
 </div>

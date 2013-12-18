@@ -231,9 +231,9 @@ class CourseAuthorization(models.Model):
 
         If email has not been explicitly enabled, returns False.
         """
-        # If settings.MITX_FEATURES['REQUIRE_COURSE_EMAIL_AUTH'] is
+        # If settings.FEATURES['REQUIRE_COURSE_EMAIL_AUTH'] is
         # set to False, then we enable email for every course.
-        if not settings.MITX_FEATURES['REQUIRE_COURSE_EMAIL_AUTH']:
+        if not settings.FEATURES['REQUIRE_COURSE_EMAIL_AUTH']:
             return True
 
         try:

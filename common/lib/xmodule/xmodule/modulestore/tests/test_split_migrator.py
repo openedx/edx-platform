@@ -31,7 +31,7 @@ class TestMigration(unittest.TestCase):
     db_config = {
         'host': 'localhost',
         'db': 'test_xmodule',
-        'collection': 'modulestore{0}'.format(uuid.uuid4().hex),
+        'collection': 'modulestore{0}'.format(uuid.uuid4().hex[:5]),
     }
 
     modulestore_options = {
@@ -43,7 +43,10 @@ class TestMigration(unittest.TestCase):
 
     def setUp(self):
         super(TestMigration, self).setUp()
-        self.loc_mapper = LocMapperStore(**self.db_config)
+        noop_cache = mock.Mock(spec=['get', 'set_many'])
+        noop_cache.configure_mock(**{'get.return_value': None})
+        # pylint: disable=W0142
+        self.loc_mapper = LocMapperStore(noop_cache, **self.db_config)
         self.old_mongo = MongoModuleStore(self.db_config, **self.modulestore_options)
         self.draft_mongo = DraftModuleStore(self.db_config, **self.modulestore_options)
         self.split_mongo = SplitMongoModuleStore(

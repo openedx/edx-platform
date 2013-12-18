@@ -11,6 +11,10 @@ define ["backbone", "js/models/textbook", "js/collections/textbook", "js/models/
         beforeEach ->
             main()
             @model = new Textbook()
+            CMS.URL.TEXTBOOKS = "/textbooks"
+
+        afterEach ->
+            delete CMS.URL.TEXTBOOKS
 
         describe "Basic", ->
             it "should have an empty name by default", ->
@@ -28,8 +32,9 @@ define ["backbone", "js/models/textbook", "js/collections/textbook", "js/models/
             it "should be empty by default", ->
                 expect(@model.isEmpty()).toBeTruthy()
 
-            it "should have a URL set", ->
-                expect(@model.url()).toBeTruthy()
+            it "should have a URL root", ->
+                urlRoot = _.result(@model, 'urlRoot')
+                expect(urlRoot).toBeTruthy()
 
             it "should be able to reset itself", ->
                 @model.set("name", "foobar")
@@ -135,12 +140,8 @@ define ["backbone", "js/models/textbook", "js/collections/textbook", "js/models/
             delete CMS.URL.TEXTBOOKS
 
         it "should have a url set", ->
-            expect(@collection.url()).toEqual("/textbooks")
-
-        it "can call save", ->
-            spyOn(@collection, "sync")
-            @collection.save()
-            expect(@collection.sync).toHaveBeenCalledWith("update", @collection, undefined)
+            url = _.result(@collection, 'url')
+            expect(url).toEqual("/textbooks")
 
 
     describe "Chapter model", ->

@@ -15,7 +15,7 @@ set to "success" or "failure".  The view defaults to payment success.
 from django.views.generic.base import View
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse, HttpResponseBadRequest
-from mitxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response
 
 
 # We use the same hashing function as the software under test,

@@ -79,7 +79,7 @@ def get_course_location_for_item(location):
         # @hack! We need to find the course location however, we don't
         # know the 'name' parameter in this context, so we have
         # to assume there's only one item in this query even though we are not specifying a name
-        course_search_location = ['i4x', item_loc.org, item_loc.course, 'course', None]
+        course_search_location = Location('i4x', item_loc.org, item_loc.course, 'course', None)
         courses = modulestore().get_items(course_search_location)
 
         # make sure we found exactly one match on this above course search
@@ -107,7 +107,7 @@ def get_course_for_item(location):
     # @hack! We need to find the course location however, we don't
     # know the 'name' parameter in this context, so we have
     # to assume there's only one item in this query even though we are not specifying a name
-    course_search_location = ['i4x', item_loc.org, item_loc.course, 'course', None]
+    course_search_location = Location('i4x', item_loc.org, item_loc.course, 'course', None)
     courses = modulestore().get_items(course_search_location)
 
     # make sure we found exactly one match on this above course search
@@ -136,7 +136,7 @@ def get_lms_link_for_item(location, preview=False, course_id=None):
 
     if settings.LMS_BASE is not None:
         if preview:
-            lms_base = settings.MITX_FEATURES.get('PREVIEW_LMS_BASE')
+            lms_base = settings.FEATURES.get('PREVIEW_LMS_BASE')
         else:
             lms_base = settings.LMS_BASE
 
@@ -155,7 +155,7 @@ def get_lms_link_for_about_page(location):
     """
     Returns the url to the course about page from the location tuple.
     """
-    if settings.MITX_FEATURES.get('ENABLE_MKTG_SITE', False):
+    if settings.FEATURES.get('ENABLE_MKTG_SITE', False):
         if not hasattr(settings, 'MKTG_URLS'):
             log.exception("ENABLE_MKTG_SITE is True, but MKTG_URLS is not defined.")
             about_base = None

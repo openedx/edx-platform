@@ -1,0 +1,56 @@
+###################################
+December 3, 2013
+###################################
+
+*************
+edX Studio
+*************
+
+
+The following Studio changes are included in this release: 
+
+* As part of a database architecture change and the implementation of a RESTful interface, URLs in Studio are changing to use a new
+  period-separated locator syntax. This change currently affects a subset of pages in Studio. In future releases, the other pages in Studio
+  will be changed to use the new URL syntax. 
+
+* Video transcripts now load correctly even if any part of https is in capital letters. (BLD-496)
+ 
+* The Problem component now includes a template for creating checkbox problems. (BLD-193)
+ 
+* In Internet Explorer 9, Save notifications now appear correctly when a user locks or unlocks assets. (STUD-815)
+
+
+
+*******************************
+edX Learning Management System
+*******************************
+
+
+
+The following changes are included in this release: 
+
+* Discrepancies in how the number of enrolled students were calculated in the Instructor Dashboard and the Beta Instructor Dashboard are
+  fixed. Now, in all cases, the number represents the currently enrolled students. (AN-115) 
+ 
+* Incorrect student responses to problems are now saved after the student clicks Check. (LMS-469)
+ 
+* JavaScript errors are now fixed in the Reset Password pages. (LMS-1265)
+  The Wiki Changes page is now accessible to screen readers. (LMS-1309)
+ 
+* Course staff can now set granular permissions for Wiki articles. In the main Wiki page, you can click Settings to see and set
+  permissions. (LMS-1355)
+ 
+* In the Instructor Dashboard, the Edit Course in Studio link now correctly opens the course in Studio. (LMS-1455)
+ 
+* Taking a photograph for a verified certificate now works correctly. (LMS-1487)
+  
+* Links within videos no longer have a white background or obscure part of the video content. (BLD-521)
+ 
+* In checkbox problems, using bold and italics no longer causes display problems. (BLD-449)
+ 
+* The speed change option now works correctly in all video configurations. (BLD-457)
+ 
+* A spinning icon now shows users with slow connections when a video is loading. (BLD-502)
+
+* In the Forums, an AJAX request that results in a 500 error now informs the user to try again, instead of silently timing out. (FOR-37)
+

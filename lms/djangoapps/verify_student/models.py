@@ -477,7 +477,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         # developing and aren't interested in working on student identity
         # verification functionality. If you do want to work on it, you have to
         # explicitly enable these in your private settings.
-        if settings.MITX_FEATURES.get('AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'):
+        if settings.FEATURES.get('AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'):
             return
 
         aes_key_str = settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["FACE_IMAGE_AES_KEY"]
@@ -502,7 +502,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         # developing and aren't interested in working on student identity
         # verification functionality. If you do want to work on it, you have to
         # explicitly enable these in your private settings.
-        if settings.MITX_FEATURES.get('AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'):
+        if settings.FEATURES.get('AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'):
             return
 
         aes_key = random_aes_key()
@@ -670,7 +670,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         # create the message because that would require encryption and message
         # signing that rely on settings.VERIFY_STUDENT values that aren't set
         # in dev. So we just pretend like we successfully posted
-        if settings.MITX_FEATURES.get('AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'):
+        if settings.FEATURES.get('AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'):
             fake_response = requests.Response()
             fake_response.status_code = 200
             return fake_response

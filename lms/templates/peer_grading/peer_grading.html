@@ -2,7 +2,7 @@
 <%
 nothing_to_grade_message = _(
 """
-{p_tag}You currently do not having any peer grading to do.  In order to have peer grading to do:
+{p_tag}You currently do not have any peer grading to do.  In order to have peer grading to do:
 {ul_tag}
 {li_tag}You need to have submitted a response to a peer grading problem.{end_li_tag}
 {li_tag}The instructor needs to score the essays that are used to help you better understand the grading
@@ -15,17 +15,6 @@ criteria.{end_li_tag}
 <section class="container peer-grading-container">
     <div class="peer-grading" data-ajax-url="${ajax_url}" data-use-single-location="${use_single_location}">
         <div class="error-container">${error_text}</div>
-        <br>
-        <div style="color:red;">
-            <b>
-                The issue we had between Dec 3 and Dec 5 with the visibility
-                of student responses has now been resolved. All responses
-                should now be visible. Thank you for your patience!
-                --the edX team
-            </b>
-        </div>
-        <br>
-        <hr>
         <div class="peer-grading-tools">
             <h1 class="peer-grading-title">${_("Peer Grading")}</h1>
             <h2 class="peer-grading-instructions">${_("Instructions")}</h2>
