@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Instructor Views
 """
@@ -1219,13 +1220,13 @@ def get_student_grade_summary_data(request, course, course_id, get_grades=True, 
             datarow.append('')
 
         if get_grades:
-            gradeset = student_grades(student, request, course, keep_raw_scores=get_raw_scores, use_offline=use_offline)
             field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
                 course_id, student, course, depth=None)
-            courseware_summary = grades.progress_summary(enrolled_students[0], request, course,
+            courseware_summary = grades.progress_summary(student, request, course,
                                                  field_data_cache);
             log.debug('student={0}, gradeset={1}'.format(student, gradeset))
             if get_raw_scores:
+                gradeset = student_grades(student, request, course, keep_raw_scores=get_raw_scores, use_offline=use_offline)
                 # TODO (ichuang) encode Score as dict instead of as list, so score[0] -> score['earned']
                 sgrades = [(getattr(score, 'earned', '') or score[0]) for score in gradeset['raw_scores']]
             elif course.new_progress:
@@ -1239,6 +1240,7 @@ def get_student_grade_summary_data(request, course, course_id, get_grades=True, 
                         total += ((section['section_total'].earned / section['section_total'].possible) if section['section_total'].possible else 0) * category_weights.get(section['format'], 0.0)
                     sgrades += [total]
             else:
+                gradeset = student_grades(student, request, course, keep_raw_scores=get_raw_scores, use_offline=use_offline)
                 sgrades = [x['percent'] for x in gradeset['section_breakdown']]
             datarow += sgrades
             student.grades = sgrades  	# store in student object
