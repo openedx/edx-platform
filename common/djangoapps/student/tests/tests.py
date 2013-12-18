@@ -82,7 +82,7 @@ class ResetPasswordTests(TestCase):
         self.assertEquals(bad_email_resp.content, json.dumps({'success': True,
                                                               'value': "('registration/password_reset_done.html', [])"}))
 
-    @unittest.skipUnless(not settings.FEATURES.get('DISABLE_PASSWORD_RESET_EMAIL_TEST', False),
+    @unittest.skipIf(settings.FEATURES.get('DISABLE_RESET_EMAIL_TEST', True),
                          dedent("""Skipping Test because CMS has not provided necessary templates for password reset.
                                 If LMS tests print this message, that needs to be fixed."""))
     @patch('django.core.mail.send_mail')
