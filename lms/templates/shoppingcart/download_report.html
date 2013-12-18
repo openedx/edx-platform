@@ -23,6 +23,10 @@
     <input id="start_date" type="text" value="${start_date}" name="start_date"/>
     <label for="end_date">${_("End Date: ")}</label>
     <input id="end_date" type="text" value="${end_date}" name="end_date"/>
+    <label for="start_letter">${_("Start Letter: ")}</label>
+    <input id="start_letter" type="text" value="${start_letter}" name="start_letter"/>
+    <label for="end_letter">${_("End Letter: ")}</label>
+    <input id="end_letter" type="text" value="${end_letter}" name="end_letter"/>
     <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}" />
     <br/>
     <button type = "submit" name="requested_report" value="itemized_purchase_report">Itemized Purchase Report</button>

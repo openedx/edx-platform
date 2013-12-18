@@ -12,14 +12,31 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from edxmako.shortcuts import render_to_response
 from student.models import CourseEnrollment
-from .models import Order, PaidCourseRegistration, OrderItem, Report
+from shoppingcart.reports import RefundReport, ItemizedPurchaseReport, UniversityRevenueShareReport, CertificateStatusReport
+from .models import Order, PaidCourseRegistration, OrderItem
 from .processors import process_postpay_callback, render_purchase_form_html
-from .exceptions import ItemAlreadyInCartException, AlreadyEnrolledInCourseException, CourseDoesNotExistException
+from .exceptions import ItemAlreadyInCartException, AlreadyEnrolledInCourseException, CourseDoesNotExistException, ReportTypeDoesNotExistException
 
 log = logging.getLogger("shoppingcart")
 
 EVENT_NAME_USER_UPGRADED = 'edx.course.enrollment.upgrade.succeeded'
 
+REPORT_TYPES = [
+    ("refund_report", RefundReport),
+    ("itemized_purchase_report", ItemizedPurchaseReport),
+    ("university_revenue_share", UniversityRevenueShareReport),
+    ("certificate_status", CertificateStatusReport),
+]
+
+
+def initialize_report(report_type):
+    """
+    Creates the appropriate type of Report object based on the string report_type.
+    """
+    for item in REPORT_TYPES:
+        if report_type in item:
+            return item[1]()
+    raise ReportTypeDoesNotExistException
 
 @require_POST
 def add_course_to_cart(request, course_id):
@@ -155,7 +172,7 @@ def _get_date_from_str(date_input):
     return datetime.datetime.strptime(date_input.strip(), "%Y-%m-%d").replace(tzinfo=pytz.UTC)
 
 
-def _render_report_form(start_str, end_str, report_type, total_count_error=False, date_fmt_error=False):
+def _render_report_form(start_str, end_str, start_letter, end_letter, report_type, total_count_error=False, date_fmt_error=False):
     """
     Helper function that renders the purchase form.  Reduces repetition
     """
@@ -164,6 +181,8 @@ def _render_report_form(start_str, end_str, report_type, total_count_error=False
         'date_fmt_error': date_fmt_error,
         'start_date': start_str,
         'end_date': end_str,
+        'start_letter': start_letter,
+        'end_letter': end_letter,
         'requested_report': report_type,
     }
     return render_to_response('shoppingcart/download_report.html', context)
@@ -178,34 +197,44 @@ def csv_report(request):
     if not _can_download_report(request.user):
         return HttpResponseForbidden(_('You do not have permission to view this page.'))
 
+    # TODO temp filler for start letter, end letter
+
     if request.method == 'POST':
         start_str = request.POST.get('start_date', '')
         end_str = request.POST.get('end_date', '')
+        start_letter = request.POST.get('start_letter', '')
+        end_letter = request.POST.get('end_letter', '')
         report_type = request.POST.get('requested_report', '')
         try:
-            start_date = _get_date_from_str(start_str)
+            start_date = _get_date_from_str(start_str) + datetime.timedelta(days=0)
             end_date = _get_date_from_str(end_str) + datetime.timedelta(days=1)
         except ValueError:
             # Error case: there was a badly formatted user-input date string
-            return _render_report_form(start_str, end_str, report_type, date_fmt_error=True)
+            return _render_report_form(start_str, end_str, start_letter, end_letter, report_type, date_fmt_error=True)
 
-        report = Report.initialize_report(report_type)
-        items = report.get_query(start_date, end_date)
-        if items.count() > settings.PAYMENT_REPORT_MAX_ITEMS:
+        report = initialize_report(report_type)
+        items = report.get_report_data(start_date, end_date, start_letter, end_letter)
+
+        # TODO add this back later as a query-est function or something
+        try:
+            if items.count() > settings.PAYMENT_REPORT_MAX_ITEMS:
             # Error case: too many items would be generated in the report and we're at risk of timeout
-            return _render_report_form(start_str, end_str, report_type, total_count_error=True)
+                return _render_report_form(start_str, end_str, start_letter, end_letter, report_type, total_count_error=True)
+        except:
+            pass
 
         response = HttpResponse(mimetype='text/csv')
         filename = "purchases_report_{}.csv".format(datetime.datetime.now(pytz.UTC).strftime("%Y-%m-%d-%H-%M-%S"))
         response['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
-        # this flos is a little odd; what's up with report_type being called twice? check later
-        report.make_report(report_type, response, start_date, end_date)
+        report.make_report(response, start_date, end_date, start_letter, end_letter)
         return response
 
     elif request.method == 'GET':
         end_date = datetime.datetime.now(pytz.UTC)
         start_date = end_date - datetime.timedelta(days=30)
-        return _render_report_form(start_date.strftime("%Y-%m-%d"), end_date.strftime("%Y-%m-%d"), report_type="")
+        start_letter = ""
+        end_letter = ""
+        return _render_report_form(start_date.strftime("%Y-%m-%d"), end_date.strftime("%Y-%m-%d"), start_letter, end_letter, report_type="")
 
     else:
         return HttpResponseBadRequest("HTTP Method Not Supported")

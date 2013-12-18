@@ -10,7 +10,6 @@ from boto.exception import BotoServerError  # this is a super-class of SESError 
 
 from django.dispatch import receiver
 from django.db import models
-from django.db.models import Sum
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import send_mail
@@ -19,14 +18,11 @@ from django.utils.translation import ugettext as _
 from django.db import transaction
 from django.core.urlresolvers import reverse
 
-from decimal import Decimal
-
 from xmodule.modulestore.django import modulestore
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from course_modes.models import CourseMode
-from courseware.courses import get_course_by_id
 from edxmako.shortcuts import render_to_string
 from student.views import course_from_id
 from student.models import CourseEnrollment, unenroll_done
@@ -34,8 +30,7 @@ from student.models import CourseEnrollment, unenroll_done
 from verify_student.models import SoftwareSecurePhotoVerification
 
 from .exceptions import (InvalidCartItem, PurchasedCallbackException, ItemAlreadyInCartException,
-                         AlreadyEnrolledInCourseException, CourseDoesNotExistException, ReportException,
-                         ReportTypeDoesNotExistException)
+                         AlreadyEnrolledInCourseException, CourseDoesNotExistException, ReportException)
 
 log = logging.getLogger("shoppingcart")
 
@@ -44,6 +39,8 @@ ORDER_STATUSES = (
     ('purchased', 'purchased'),
     ('refunded', 'refunded'),
 )
+
+
 
 # we need a tuple to represent the primary key of various OrderItem subclasses
 OrderItemSubclassPK = namedtuple('OrderItemSubclassPK', ['cls', 'pk'])  # pylint: disable=C0103
@@ -571,255 +568,3 @@ class CertificateItem(OrderItem):
                  "Please include your order number in your e-mail. "
                  "Please do NOT include your credit card information.").format(
                      billing_email=settings.PAYMENT_SUPPORT_EMAIL)
-
-
-class Report(models.Model):
-    """
-    Base class for making CSV reports related to revenue, enrollments, etc
-
-    To make a different type of report, write a new subclass that implements
-    the methods get_query, csv_report_header_row, and csv_report_row.
-    """
-
-    @classmethod
-    def initialize_report(cls, report_type):
-        """
-        Creates the appropriate type of Report object based on the string report_type.
-        """
-        if report_type == "refund_report":
-            return RefundReport()
-        elif report_type == "itemized_purchase_report":
-            return ItemizedPurchaseReport()
-        elif report_type == "university_revenue_share":
-            return UniversityRevenueShareReport()
-        elif report_type == "certificate_status":
-            return CertificateStatusReport()
-        else:
-            raise ReportTypeDoesNotExistException
-
-    def get_query(self, start_date, end_date):
-        """
-        Performs any database queries necessary to obtain the data for the report.
-        """
-        raise NotImplementedError
-
-    def csv_report_header_row(self):
-        """
-        Returns the appropriate header based on the report type.
-        """
-        raise NotImplementedError
-
-    def csv_report_row(self, item):
-        """
-        Given the results of the query from get_query, this function generates a single row of a csv.
-        """
-        raise NotImplementedError
-
-    @classmethod
-    def make_report(cls, report_type, filelike, start_date, end_date):
-        """
-        Given the string report_type, a file object to write to, and start/end date bounds,
-        generates a CSV report of the appropriate type.
-        """
-        report = cls.initialize_report(report_type)
-        items = report.get_query(start_date, end_date)
-        writer = unicodecsv.writer(filelike, encoding="utf-8")
-        writer.writerow(report.csv_report_header_row())
-        for item in items:
-            writer.writerow(report.csv_report_row(item))
-
-
-class RefundReport(Report):
-    """
-    Subclass of Report, used to generate Refund Reports for finance purposes.
-    """
-    def get_query(self, start_date, end_date):
-        return CertificateItem.objects.filter(
-            status="refunded",
-            refund_requested_time__gte=start_date,
-            refund_requested_time__lt=end_date,
-        )
-
-    def csv_report_header_row(self):
-        return [
-            "Order Number",
-            "Customer Name",
-            "Date of Original Transaction",
-            "Date of Refund",
-            "Amount of Refund",
-            "Service Fees (if any)",
-        ]
-
-    def csv_report_row(self, item):
-        return [
-            item.order_id,
-            item.user.get_full_name(),
-            item.fulfilled_time,
-            item.refund_requested_time,  # TODO Change this torefund_fulfilled once we start recording that value
-            item.line_cost,
-            item.service_fee,
-        ]
-
-
-class ItemizedPurchaseReport(Report):
-    """
-    Subclass of Report, used to generate itemized purchase reports.
-    """
-    def get_query(self, start_date, end_date):
-        return OrderItem.objects.filter(
-            status="purchased",
-            fulfilled_time__gte=start_date,
-            fulfilled_time__lt=end_date,
-        ).order_by("fulfilled_time")
-
-    def csv_report_header_row(self):
-        return [
-            "Purchase Time",
-            "Order ID",
-            "Status",
-            "Quantity",
-            "Unit Cost",
-            "Total Cost",
-            "Currency",
-            "Description",
-            "Comments"
-        ]
-
-    def csv_report_row(self, item):
-        return [
-            item.fulfilled_time,
-            item.order_id,  # pylint: disable=no-member
-            item.status,
-            item.qty,
-            item.unit_cost,
-            item.line_cost,
-            item.currency,
-            item.line_desc,
-            item.report_comments,
-        ]
-
-
-class CertificateStatusReport(Report):
-    """
-    Subclass of Report, used to generate Certificate Status Reports for ed services.
-    """
-    def get_query(self, start_date, end_date):
-        results = []
-        for course_id in settings.COURSE_LISTINGS['default']:
-            cur_course = get_course_by_id(course_id)
-            university = cur_course.org
-            course = cur_course.number + " " + cur_course.display_name  # TODO add term (i.e. Fall 2013)?
-            enrollments = CourseEnrollment.objects.filter(course_id=course_id, 
-                                                          is_active=True,)
-            total_enrolled = enrollments.count()
-            audit_enrolled = enrollments.filter(mode="audit").count()
-            honor_enrolled = enrollments.filter(mode="honor").count()
-            # Since every verified enrollment has 1 and only 1 cert item, let's just query those
-            verified_enrollments = CertificateItem.objects.filter(course_id=course_id, mode="verified", status="purchased")
-            verified_enrolled = verified_enrollments.count()
-            gross_rev_temp = CertificateItem.objects.filter(course_id=course_id, mode="verified", status="purchased").aggregate(Sum('unit_cost'))
-            gross_rev = gross_rev_temp['unit_cost__sum']
-            gross_rev_over_min = gross_rev - (CourseMode.objects.get(course_id=course_id, mode_slug="verified").min_price * verified_enrolled)
-            refunded_enrollments = CertificateItem.objects.filter(course_id='course_id', mode="verified", status="refunded")
-            number_of_refunds = refunded_enrollments.count()
-            dollars_refunded_temp = refunded_enrollments.aggregate(Sum('unit_cost'))
-            if dollars_refunded_temp['unit_cost__sum'] is None:
-                dollars_refunded = Decimal(0.00)
-            else:
-                dollars_refunded = dollars_refunded_temp['unit_cost__sum']
-
-            result = [
-                university,
-                course,
-                total_enrolled,
-                audit_enrolled,
-                honor_enrolled,
-                verified_enrolled,
-                gross_rev,
-                gross_rev_over_min,
-                number_of_refunds,
-                dollars_refunded
-            ]
-
-            results.append(result)
-        return results
-
-    def csv_report_header_row(self):
-        return [
-            "University",
-            "Course",
-            "Total Enrolled",
-            "Audit Enrollment",
-            "Honor Code Enrollment",
-            "Verified Enrollment",
-            "Gross Revenue",
-            "Gross Revenue over the Minimum",
-            "Number of Refunds",
-            "Dollars Refunded",
-        ]
-
-    def csv_report_row(self, item):
-        return item
-
-
-class UniversityRevenueShareReport(Report):
-    """
-    Subclass of Report, used to generate University Revenue Share Reports for finance purposes.
-    """
-    def get_query(self, start_date, end_date):
-        results = []
-        for course_id in settings.COURSE_LISTINGS['default']:
-            cur_course = get_course_by_id(course_id)
-            university = cur_course.org
-            course = cur_course.number + " " + cur_course.display_name
-            num_transactions = 0  # TODO clarify with billing what transactions are included in this (purchases? refunds? etc)
-
-            all_paid_certs = CertificateItem.objects.filter(course_id=course_id, status="purchased")
-
-            total_payments_collected_temp = all_paid_certs.aggregate(Sum('unit_cost'))
-            if total_payments_collected_temp['unit_cost__sum'] is None:
-                total_payments_collected = Decimal(0.00)
-            else:
-                total_payments_collected = total_payments_collected_temp['unit_cost__sum']
-
-            total_service_fees_temp = all_paid_certs.aggregate(Sum('service_fee'))
-            if total_service_fees_temp['service_fee__sum'] is None:
-                service_fees = Decimal(0.00)
-            else:
-                service_fees = total_service_fees_temp['service_fee__sum']
-
-            refunded_enrollments = CertificateItem.objects.filter(course_id=course_id, status="refunded")
-            num_refunds = refunded_enrollments.count()
-
-            amount_refunds_temp = refunded_enrollments.aggregate(Sum('unit_cost'))
-            if amount_refunds_temp['unit_cost__sum'] is None:
-                amount_refunds = Decimal(0.00)
-            else:
-                amount_refunds = amount_refunds_temp['unit_cost__sum']
-
-            result = [
-                university,
-                course,
-                num_transactions,
-                total_payments_collected,
-                service_fees,
-                num_refunds,
-                amount_refunds
-            ]
-            results.append(result)
-
-        return results
-
-    def csv_report_header_row(self):
-        return [
-            "University",
-            "Course",
-            "Number of Transactions",
-            "Total Payments Collected",
-            "Service Fees (if any)",
-            "Number of Successful Refunds",
-            "Total Amount of Refunds",
-        ]
-
-    def csv_report_row(self, item):
-        return item
