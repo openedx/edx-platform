@@ -49,7 +49,6 @@ lib_paths:
     - xmodule_js/common_static/js/vendor/jasmine-stealth.js
     - xmodule_js/common_static/js/vendor/jasmine-imagediff.js
     - xmodule_js/common_static/js/vendor/jasmine.async.js
-    - xmodule_js/common_static/js/vendor/jquery.maskedinput.min.js
     - xmodule_js/common_static/js/vendor/CodeMirror/codemirror.js
     - xmodule_js/src/xmodule.js
     - xmodule_js/common_static/js/test/i18n.js
