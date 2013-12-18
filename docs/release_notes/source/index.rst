@@ -8,7 +8,6 @@ Contents
 ========
 
 .. toctree::
-   :numbered:
    :maxdepth: 5
 
    read_me
