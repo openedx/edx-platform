@@ -104,8 +104,9 @@ class LinkedinAPI(object):
         hashes = ','.join(("email-hash=" + md5(email) for email in emails))
         url = "https://api.linkedin.com/v1/people::(%s):(id)" % hashes
         url += "?oauth2_access_token=%s" % self.tokens.access_token
+        request = urllib2.Request(url, headers={'x-li-format': 'json'})
         try:
-            response = urllib2.urlopen(url).read()
+            response = urllib2.urlopen(request).read()
             print "GOT IT!", response
         except urllib2.HTTPError, error:
             self.http_error(error, "Unable to access People API")
