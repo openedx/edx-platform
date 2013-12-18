@@ -1,4 +1,20 @@
 <%! from django.utils.translation import ugettext as _ %>
+<style type="text/css">
+  .syllabus {
+        @extend %ui-window;
+        position: relative;
+
+          header {
+            margin-bottom: 0;
+            border-bottom: 0;
+          }
+          .syllabus-title {
+            @extend %t-title4;
+            margin-right: ($baseline*14);
+            font-weight: bold;
+          }
+  }
+</style>
 <%inherit file="/main.html" />
 <%namespace name='static' file='/static_content.html'/>
 
@@ -16,22 +32,28 @@
 %>
 
 <section class="container">
-  <div class="syllabus_wrapper">
-    <div class="syllabus">
-        <h1>${_("Syllabus")}</h1>
+  <div class="syllabus">
+    <div class="syllabus_wrapper">
+
         % if len(course.topic_syllabuses)>0:
             <div class="view-syllabus">
               <div class="wrap-syllabus">
-              ${get_course_syllabus_section(course, 'syllabus')}
-                <header>
-                    <h3 class="syllabus-title">${course.topic_syllabuses[0]["tab_title"]}</h3>
-                </header>
-                <h2>${course.topic_syllabuses[0]["topics"][0]['title']}</h2>
-        % else:
-
-        % endif
+                % for syllabo in course.topic_syllabuses:
+                  <header>
+                    <h1 class="syllabus-title">${syllabo["tab_title"]}</h1>
+                  </header>
+                  % for items in syllabo["topics"]:
+                      <h2>${items['title']}</h2>
+                      <p>${items['description']}</p>
+                  % endfor
+                  <br/>
+                % endfor
               </div>
-            </div> 
+            </div>  
+        % else:
+                <p>! Syllabus missing !</p>
+        % endif
+
     </div>
-  </div>
+  </div> 
 </section>
