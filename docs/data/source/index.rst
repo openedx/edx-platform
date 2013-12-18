@@ -43,6 +43,7 @@ These document describe how we store course structure, student state/progress, a
 
    internal_data_formats/sql_schema.rst
    internal_data_formats/discussion_data.rst
+   internal_data_formats/wiki_data.rst
    internal_data_formats/tracking_logs.rst
 
 Indices and tables

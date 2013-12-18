@@ -5,7 +5,7 @@ urlpatterns = patterns('shoppingcart.views',  # nopep8
     url(r'^postpay_callback/$', 'postpay_callback'),  # Both the ~accept and ~reject callback pages are handled here
     url(r'^receipt/(?P<ordernum>[0-9]*)/$', 'show_receipt'),
 )
-if settings.MITX_FEATURES['ENABLE_SHOPPING_CART']:
+if settings.FEATURES['ENABLE_SHOPPING_CART']:
     urlpatterns += patterns(
         'shoppingcart.views',
         url(r'^$', 'show_cart'),
@@ -15,7 +15,7 @@ if settings.MITX_FEATURES['ENABLE_SHOPPING_CART']:
         url(r'^csv_report/$', 'csv_report', name='payment_csv_report'),
     )
 
-if settings.MITX_FEATURES.get('ENABLE_PAYMENT_FAKE'):
+if settings.FEATURES.get('ENABLE_PAYMENT_FAKE'):
     from shoppingcart.tests.payment_fake import PaymentFakeView
     urlpatterns += patterns(
         'shoppingcart.tests.payment_fake',

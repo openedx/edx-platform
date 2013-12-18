@@ -1,7 +1,7 @@
 import json
 from functools import partial
-
-from factory import DjangoModelFactory, SubFactory, post_generation
+import factory
+from factory.django import DjangoModelFactory
 
 # Imported to re-export
 # pylint: disable=unused-import
@@ -40,7 +40,7 @@ class InstructorFactory(UserFactory):
     """
     last_name = "Instructor"
 
-    @post_generation
+    @factory.post_generation
     def course(self, create, extracted, **kwargs):
         if extracted is None:
             raise ValueError("Must specify a course location for a course instructor user")
@@ -54,7 +54,7 @@ class StaffFactory(UserFactory):
     """
     last_name = "Staff"
 
-    @post_generation
+    @factory.post_generation
     def course(self, create, extracted, **kwargs):
         if extracted is None:
             raise ValueError("Must specify a course location for a course staff user")
@@ -68,7 +68,7 @@ class BetaTesterFactory(UserFactory):
     """
     last_name = "Beta-Tester"
 
-    @post_generation
+    @factory.post_generation
     def course(self, create, extracted, **kwargs):
         if extracted is None:
             raise ValueError("Must specify a course location for a beta-tester user")
@@ -82,7 +82,7 @@ class OrgStaffFactory(UserFactory):
     """
     last_name = "Org-Staff"
 
-    @post_generation
+    @factory.post_generation
     def course(self, create, extracted, **kwargs):
         if extracted is None:
             raise ValueError("Must specify a course location for an org-staff user")
@@ -96,7 +96,7 @@ class OrgInstructorFactory(UserFactory):
     """
     last_name = "Org-Instructor"
 
-    @post_generation
+    @factory.post_generation
     def course(self, create, extracted, **kwargs):
         if extracted is None:
             raise ValueError("Must specify a course location for an org-instructor user")
@@ -109,7 +109,7 @@ class GlobalStaffFactory(UserFactory):
     """
     last_name = "GlobalStaff"
 
-    @post_generation
+    @factory.post_generation
     def set_staff(self, create, extracted, **kwargs):
         GlobalStaff().add_users(self)
 
@@ -118,7 +118,7 @@ class StudentModuleFactory(DjangoModelFactory):
     FACTORY_FOR = StudentModule
 
     module_type = "problem"
-    student = SubFactory(UserFactory)
+    student = factory.SubFactory(UserFactory)
     course_id = "MITx/999/Robot_Super_Course"
     state = None
     grade = None
@@ -139,7 +139,7 @@ class StudentPrefsFactory(DjangoModelFactory):
 
     field_name = 'existing_field'
     value = json.dumps('old_value')
-    student = SubFactory(UserFactory)
+    student = factory.SubFactory(UserFactory)
     module_type = 'MockProblemModule'
 
 
@@ -148,4 +148,4 @@ class StudentInfoFactory(DjangoModelFactory):
 
     field_name = 'existing_field'
     value = json.dumps('old_value')
-    student = SubFactory(UserFactory)
+    student = factory.SubFactory(UserFactory)

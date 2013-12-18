@@ -5,6 +5,7 @@ import mock
 
 from django.test import TestCase
 from django.contrib.auth.models import User
+from xmodule.modulestore import Location
 from django.core.exceptions import PermissionDenied
 
 from auth.authz import add_user_to_creator_group, remove_user_from_creator_group, is_user_in_creator_group,\
@@ -33,7 +34,7 @@ class CreatorGroupTest(TestCase):
 
     def test_creator_group_enabled_but_empty(self):
         """ Tests creator group feature on, but group empty. """
-        with mock.patch.dict('django.conf.settings.MITX_FEATURES', {"ENABLE_CREATOR_GROUP": True}):
+        with mock.patch.dict('django.conf.settings.FEATURES', {"ENABLE_CREATOR_GROUP": True}):
             self.assertFalse(is_user_in_creator_group(self.user))
 
             # Make user staff. This will cause is_user_in_creator_group to return True.
@@ -42,7 +43,7 @@ class CreatorGroupTest(TestCase):
 
     def test_creator_group_enabled_nonempty(self):
         """ Tests creator group feature on, user added. """
-        with mock.patch.dict('django.conf.settings.MITX_FEATURES', {"ENABLE_CREATOR_GROUP": True}):
+        with mock.patch.dict('django.conf.settings.FEATURES', {"ENABLE_CREATOR_GROUP": True}):
             self.assertTrue(add_user_to_creator_group(self.admin, self.user))
             self.assertTrue(is_user_in_creator_group(self.user))
 
@@ -70,7 +71,7 @@ class CreatorGroupTest(TestCase):
 
     def test_course_creation_disabled(self):
         """ Tests that the COURSE_CREATION_DISABLED flag overrides course creator group settings. """
-        with mock.patch.dict('django.conf.settings.MITX_FEATURES',
+        with mock.patch.dict('django.conf.settings.FEATURES',
                              {'DISABLE_COURSE_CREATION': True, "ENABLE_CREATOR_GROUP": True}):
             # Add user to creator group.
             self.assertTrue(add_user_to_creator_group(self.admin, self.user))
@@ -129,7 +130,7 @@ class CourseGroupTest(TestCase):
         """ Test case setup """
         self.creator = User.objects.create_user('testcreator', 'testcreator+courses@edx.org', 'foo')
         self.staff = User.objects.create_user('teststaff', 'teststaff+courses@edx.org', 'foo')
-        self.location = 'i4x', 'mitX', '101', 'course', 'test'
+        self.location = Location('i4x', 'mitX', '101', 'course', 'test')
 
     def test_add_user_to_course_group(self):
         """
@@ -181,7 +182,7 @@ class CourseGroupTest(TestCase):
         create_all_course_groups(self.creator, self.location)
         add_user_to_course_group(self.creator, self.staff, self.location, STAFF_ROLE_NAME)
 
-        location2 = 'i4x', 'mitX', '103', 'course', 'test2'
+        location2 = Location('i4x', 'mitX', '103', 'course', 'test2')
         staff2 = User.objects.create_user('teststaff2', 'teststaff2+courses@edx.org', 'foo')
         create_all_course_groups(self.creator, location2)
         add_user_to_course_group(self.creator, staff2, location2, STAFF_ROLE_NAME)
@@ -193,7 +194,7 @@ class CourseGroupTest(TestCase):
         create_all_course_groups(self.creator, self.location)
         add_user_to_course_group(self.creator, self.staff, self.location, STAFF_ROLE_NAME)
 
-        location2 = 'i4x', 'mitX', '103', 'course', 'test2'
+        location2 = Location('i4x', 'mitX', '103', 'course', 'test2')
         creator2 = User.objects.create_user('testcreator2', 'testcreator2+courses@edx.org', 'foo')
         staff2 = User.objects.create_user('teststaff2', 'teststaff2+courses@edx.org', 'foo')
         create_all_course_groups(creator2, location2)

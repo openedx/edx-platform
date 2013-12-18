@@ -11,7 +11,7 @@ from collections import namedtuple
 from .fields import Date, Timedelta
 import textwrap
 
-log = logging.getLogger("mitx.courseware")
+log = logging.getLogger("edx.courseware")
 
 V1_SETTINGS_ATTRIBUTES = [
     "display_name",
@@ -322,7 +322,7 @@ class CombinedOpenEndedFields(object):
                         </p>
 
                         <p>
-                        Write a persuasive essay to a newspaper reflecting your vies on censorship in libraries. Do you believe that certain materials, such as books, music, movies, magazines, etc., should be removed from the shelves if they are found offensive? Support your position with convincing arguments from your own experience, observations, and/or reading.
+                        Write a persuasive essay to a newspaper reflecting your views on censorship in libraries. Do you believe that certain materials, such as books, music, movies, magazines, etc., should be removed from the shelves if they are found offensive? Support your position with convincing arguments from your own experience, observations, and/or reading.
                         </p>
                     [prompt]
                     [rubric]
@@ -508,5 +508,5 @@ class CombinedOpenEndedDescriptor(CombinedOpenEndedFields, RawDescriptor):
     def non_editable_metadata_fields(self):
         non_editable_fields = super(CombinedOpenEndedDescriptor, self).non_editable_metadata_fields
         non_editable_fields.extend([CombinedOpenEndedDescriptor.due, CombinedOpenEndedDescriptor.graceperiod,
-                                    CombinedOpenEndedDescriptor.markdown, CombinedOpenEndedDescriptor.version])
+                                    CombinedOpenEndedDescriptor.markdown, CombinedOpenEndedDescriptor.version, CombinedOpenEndedDescriptor.track_changes])
         return non_editable_fields

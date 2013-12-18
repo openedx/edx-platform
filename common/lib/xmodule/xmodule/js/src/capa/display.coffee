@@ -300,11 +300,11 @@ class @Problem
         # inputtype functions.
 
         @el.find(".capa_inputtype").each (index, inputtype) =>
-            classes = $(inputtype).attr('class').split(' ')
-            for cls in classes
-              display = @inputtypeDisplays[$(inputtype).attr('id')]
-              showMethod = @inputtypeShowAnswerMethods[cls]
-              showMethod(inputtype, display, answers) if showMethod?
+          classes = $(inputtype).attr('class').split(' ')
+          for cls in classes
+            display = @inputtypeDisplays[$(inputtype).attr('id')]
+            showMethod = @inputtypeShowAnswerMethods[cls]
+            showMethod(inputtype, display, answers) if showMethod?
 
         if MathJax?
           @el.find('.problem > div').each (index, element) =>
@@ -481,6 +481,82 @@ class @Problem
       answer = answers[input_id]
       for choice in answer
         element.find("section#forinput#{choice}").addClass 'choicetextgroup_show_correct'
+
+    imageinput: (element, display, answers) =>
+      # answers is a dict of (answer_id, answer_text) for each answer for this
+      # question.
+      # @Examples:
+      # {'anwser_id': {
+      #   'rectangle': '(10,10)-(20,30);(12,12)-(40,60)',
+      #   'regions': '[[10,10], [30,30], [10, 30], [30, 10]]'
+      # } }
+      types =
+        rectangle: (coords) =>
+          reg = /^\(([0-9]+),([0-9]+)\)-\(([0-9]+),([0-9]+)\)$/
+          rects = coords.replace(/\s*/g, '').split(/;/)
+
+          $.each rects, (index, rect) =>
+            abs = Math.abs
+            points = reg.exec(rect)
+            if points
+              width = abs(points[3] - points[1])
+              height = abs(points[4] - points[2])
+
+              ctx.rect(points[1], points[2], width, height)
+
+          ctx.stroke()
+          ctx.fill()
+
+        regions: (coords) =>
+          parseCoords = (coords) =>
+            reg = JSON.parse(coords)
+
+            # Regions is list of lists [region1, region2, region3, ...] where regionN
+            # is disordered list of points: [[1,1], [100,100], [50,50], [20, 70]].
+            # If there is only one region in the list, simpler notation can be used:
+            # regions="[[10,10], [30,30], [10, 30], [30, 10]]" (without explicitly
+            # setting outer list)
+            if typeof reg[0][0][0] == "undefined"
+              # we have [[1,2],[3,4],[5,6]] - single region
+              # instead of [[[1,2],[3,4],[5,6], [[1,2],[3,4],[5,6]]]
+              # or [[[1,2],[3,4],[5,6]]] - multiple regions syntax
+              reg = [reg]
+
+            return reg
+
+          $.each parseCoords(coords), (index, region) =>
+            ctx.beginPath()
+            $.each region, (index, point) =>
+              if index is 0
+                ctx.moveTo(point[0], point[1])
+              else
+                ctx.lineTo(point[0], point[1]);
+
+            ctx.closePath()
+            ctx.stroke()
+            ctx.fill()
+
+      element = $(element)
+      id = element.attr('id').replace(/inputtype_/,'')
+      container = element.find("#answer_#{id}")
+      canvas = document.createElement('canvas')
+      canvas.width = container.data('width')
+      canvas.height = container.data('height')
+
+      if canvas.getContext
+        ctx = canvas.getContext('2d')
+      else
+        return console.log 'Canvas is not supported.'
+
+      ctx.fillStyle = 'rgba(255,255,255,.3)';
+      ctx.strokeStyle = "#FF0000";
+      ctx.lineWidth = "2";
+
+      $.each answers, (key, answer) =>
+        $.each answer, (key, value) =>
+          types[key](value) if types[key]?
+
+      container.html(canvas)
 
   inputtypeHideAnswerMethods:
     choicegroup: (element, display) =>

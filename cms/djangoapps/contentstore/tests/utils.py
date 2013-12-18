@@ -57,6 +57,7 @@ class AjaxEnabledTestClient(Client):
         """
         return self.get(path, data or {}, follow, HTTP_ACCEPT="application/json", **extra)
 
+
 @override_settings(MODULESTORE=TEST_MODULESTORE)
 class CourseTestCase(ModuleStoreTestCase):
     def setUp(self):
@@ -111,7 +112,7 @@ class CourseTestCase(ModuleStoreTestCase):
         client = Client()
         client.login(username=uname, password=password)
         return client, nonstaff
-    
+
     def populateCourse(self):
         """
         Add 2 chapters, 4 sections, 8 verticals, 16 problems to self.course (branching 2)

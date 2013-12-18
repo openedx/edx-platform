@@ -187,7 +187,7 @@ class VideoModule(VideoFields, XModule):
             'show_captions': json.dumps(self.show_captions),
             'start': self.start_time.total_seconds(),
             'end': self.end_time.total_seconds(),
-            'autoplay': settings.MITX_FEATURES.get('AUTOPLAY_VIDEOS', False),
+            'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', False),
             # TODO: Later on the value 1500 should be taken from some global
             # configuration setting field.
             'yt_test_timeout': 1500,

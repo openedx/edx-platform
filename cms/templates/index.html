@@ -1,4 +1,5 @@
 <%! from django.utils.translation import ugettext as _ %>
+<%! from student.models import UserProfile %>
 
 <%inherit file="base.html" />
 
@@ -45,8 +46,8 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
           % if course_creator_status=='granted':
           <a href="#" class="button new-button new-course-button"><i class="icon-plus icon-inline"></i>
               ${_("New Course")}</a>
-          % elif course_creator_status=='disallowed_for_this_site' and settings.MITX_FEATURES.get('STUDIO_REQUEST_EMAIL',''):
-          <a href="mailto:${settings.MITX_FEATURES.get('STUDIO_REQUEST_EMAIL','')}">${_("Email staff to create course")}</a>
+          % elif course_creator_status=='disallowed_for_this_site' and settings.FEATURES.get('STUDIO_REQUEST_EMAIL',''):
+          <a href="mailto:${settings.FEATURES.get('STUDIO_REQUEST_EMAIL','')}">${_("Email staff to create course")}</a>
           % endif
         </li>
       </ul>
@@ -61,7 +62,7 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
     <article class="content-primary" role="main">
 
       <div class="introduction">
-        <h2 class="title">${_("Welcome, {0}!".format(user.username))}</h2>
+        <h2 class="title">${_("Welcome, {0}!").format(user.username)}</h2>
 
         %if len(courses) > 0:
         <div class="copy">
@@ -116,6 +117,18 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
                   <input class="new-course-run" id="new-course-run" type="text" name="new-course-run" aria-required="true"placeholder="${_('e.g. 2014_T1')}" />
                   <span class="tip">${_("The term in which your course will run.")} <strong>${_("Note: This is part of your course URL, so no spaces or special characters are allowed and it cannot be changed.")}</strong></span>
                   <span class="tip tip-error is-hiding"></span>
+                </li>
+
+                <li class="field-group" id="field-course-education">
+                  <div class="field select required" id="field-education-level">
+                    <label for="new-course-education">${_("Highest Level of Education Required")}</label>
+                    <select id="new-course-education" name="new-course-education" value="">
+                      <option value="">--</option>
+                      %for code, ed_level in UserProfile.LEVEL_OF_EDUCATION_CHOICES:
+                      <option value="${code}">${ed_level}</option>
+                      %endfor
+                    </select>
+                  </div>
                 </li>
               </ol>
 
@@ -290,10 +303,10 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
         </ol>
       </div>
 
-      % if course_creator_status=='disallowed_for_this_site' and settings.MITX_FEATURES.get('STUDIO_REQUEST_EMAIL',''):
+      % if course_creator_status=='disallowed_for_this_site' and settings.FEATURES.get('STUDIO_REQUEST_EMAIL',''):
       <div class="bit">
         <h3 class="title title-3">${_('Can I create courses in Studio?')}</h3>
-        <p>${_('In order to create courses in Studio, you must')} <a href="mailto:${settings.MITX_FEATURES.get('STUDIO_REQUEST_EMAIL','')}">${_("contact edX staff to help you create a course")}</a></p>
+        <p>${_('In order to create courses in Studio, you must')} <a href="mailto:${settings.FEATURES.get('STUDIO_REQUEST_EMAIL','')}">${_("contact edX staff to help you create a course")}</a></p>
       </div>
       % endif
 

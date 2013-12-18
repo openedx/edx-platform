@@ -1,4 +1,5 @@
 <%! from django.utils.translation import ugettext as _ %>
+<%! from django.utils.translation import ungettext%>
 <% from random import randint %>
 <form class="rubric-template" id="inputtype_${id}" xmlns="http://www.w3.org/1999/html">
     <div class="visibility-control visibility-control-rubric">
@@ -6,7 +7,7 @@
         </div>
         <span class="section-header section-header-rubric">${_("Rubric")}</span>
     </div>
-    <p>Select the criteria you feel best represents this submission in each category.</p>
+    <p>${_("Select the criteria you feel best represents this submission in each category.")}</p>
     <div class="rubric">
         % for i in range(len(categories)):
         <% category = categories[i] %>
@@ -22,7 +23,14 @@
                     % endif
                     <label class="rubric-label" for="score-${i}-${j}-${m}">
                         <span class="wrapper-score-selection"><input type="radio" class="score-selection" data-category="${i}" name="score-selection-${i}" id="score-${i}-${j}-${m}" value="${option['points']}"/></span>
-                        <span class="wrappable"> ${option['points']} points : ${option['text']}</span>
+                        <span class="wrappable">${ungettext(
+                            "{num} point: {text}",
+                            "{num} points: {text}",
+                            option['points']
+                        ).format(
+                            num=option['points'],
+                            text=option['text']
+                        )}</span>
                     </label>
                     </li>
                 % endfor

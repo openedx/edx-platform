@@ -2,9 +2,12 @@ $ ->
   if !window.$$contents
     window.$$contents = {}
   $.fn.extend
-    loading: ->
-      @$_loading = $("<div class='loading-animation'><span class='sr'>Loading content</span></div>")
+    loading: (takeFocus) ->
+      @$_loading = $("<div class='loading-animation' tabindex='0'><span class='sr'>Loading content</span></div>")
       $(this).after(@$_loading)
+      if takeFocus
+        DiscussionUtil.makeFocusTrap(@$_loading)
+        @$_loading.focus()
     loaded: ->
       @$_loading.remove()
 
@@ -75,7 +78,6 @@ class @DiscussionUtil
       tags_autocomplete       : "/courses/#{$$course_id}/discussion/threads/tags/autocomplete"
       retrieve_discussion     : "/courses/#{$$course_id}/discussion/forum/#{param}/inline"
       retrieve_single_thread  : "/courses/#{$$course_id}/discussion/forum/#{param}/threads/#{param1}"
-      update_moderator_status : "/courses/#{$$course_id}/discussion/users/#{param}/update_moderator_status"
       openclose_thread        : "/courses/#{$$course_id}/discussion/threads/#{param}/close"
       permanent_link_thread   : "/courses/#{$$course_id}/discussion/forum/#{param}/threads/#{param1}"
       permanent_link_comment  : "/courses/#{$$course_id}/discussion/forum/#{param}/threads/#{param1}##{param2}"
@@ -86,6 +88,11 @@ class @DiscussionUtil
       "disable_notifications" : "/notification_prefs/disable/"
       "notifications_status" : "/notification_prefs/status"
     }[name]
+
+  @activateOnEnter: (event, func) ->
+    if event.which == 13
+      e.preventDefault()
+      func(event)
 
   @makeFocusTrap: (elem) ->
     elem.keydown(
@@ -127,7 +134,7 @@ class @DiscussionUtil
         if params["loadingCallback"]?
           params["loadingCallback"].apply(params["$loading"])
         else
-          params["$loading"].loading()
+          params["$loading"].loading(params["takeFocus"])
     if !params["error"]
       params["error"] = =>
         @discussionAlert(

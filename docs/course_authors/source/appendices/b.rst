@@ -2,6 +2,7 @@
   
       \newpage %
       
+.. _Appendix B:
 
 ===========================================
 APPENDIX B: Code for Dynamic HTML Schedule

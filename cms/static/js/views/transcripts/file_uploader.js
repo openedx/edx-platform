@@ -39,7 +39,7 @@ function($, Backbone, _, Utils) {
 
                 tplContainer.html(this.template({
                     ext: this.validFileExtensions,
-                    component_id: this.options.component_id,
+                    component_locator: this.options.component_locator,
                     video_list: videoList
                 }));
 

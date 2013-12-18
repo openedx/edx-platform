@@ -31,12 +31,12 @@ function($, Backbone, _, Utils, FileUploader, gettext) {
         initialize: function () {
             _.bindAll(this);
 
-            this.component_id = this.$el.closest('.component').data('id');
+            this.component_locator = this.$el.closest('.component').data('locator');
 
             this.fileUploader = new FileUploader({
                 el: this.$el,
                 messenger: this,
-                component_id: this.component_id,
+                component_locator: this.component_locator,
                 videoListObject: this.options.parent
             });
         },
@@ -76,7 +76,7 @@ function($, Backbone, _, Utils, FileUploader, gettext) {
             this.$el.find('.transcripts-status')
                 .removeClass('is-invisible')
                 .find(this.elClass).html(template({
-                    component_id: encodeURIComponent(this.component_id),
+                    component_locator: encodeURIComponent(this.component_locator),
                     html5_list: html5List,
                     grouped_list: groupedList,
                     subs_id: (params) ? params.subs: ''
@@ -204,7 +204,7 @@ function($, Backbone, _, Utils, FileUploader, gettext) {
         */
         processCommand: function (action, errorMessage, videoId) {
             var self = this,
-                component_id = this.component_id,
+                component_locator = this.component_locator,
                 videoList = this.options.parent.getVideoObjectsList(),
                 extraParam, xhr;
 
@@ -212,7 +212,7 @@ function($, Backbone, _, Utils, FileUploader, gettext) {
                 extraParam = { html5_id: videoId };
             }
 
-            xhr = Utils.command(action, component_id, videoList, extraParam)
+            xhr = Utils.command(action, component_locator, videoList, extraParam)
                 .done(function (resp) {
                         var sub = resp.subs;
 

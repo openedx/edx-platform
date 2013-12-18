@@ -216,7 +216,7 @@ class ExternalAuthShibTest(ModuleStoreTestCase):
         self.user_wo_map = UserFactory.create(email='womap@gmail.com')
         self.user_wo_map.save()
 
-    @unittest.skipUnless(settings.MITX_FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
+    @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
     def test_login_page_redirect(self):
         """
         Tests that when a shib user types their email address into the login page, they get redirected
@@ -226,7 +226,7 @@ class ExternalAuthShibTest(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, json.dumps({'success': False, 'redirect': reverse('shib-login')}))
 
-    @unittest.skipUnless(settings.MITX_FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
+    @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
     def test__get_course_enrollment_domain(self):
         """
         Tests the _get_course_enrollment_domain utility function
@@ -235,7 +235,7 @@ class ExternalAuthShibTest(ModuleStoreTestCase):
         self.assertIsNone(_get_course_enrollment_domain(self.course.id))
         self.assertEqual(self.shib_course.enrollment_domain, _get_course_enrollment_domain(self.shib_course.id))
 
-    @unittest.skipUnless(settings.MITX_FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
+    @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
     def test_login_required_dashboard(self):
         """
         Tests redirects to when @login_required to dashboard, which should always be the normal login,
@@ -245,7 +245,7 @@ class ExternalAuthShibTest(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['Location'], 'http://testserver/accounts/login?next=/dashboard')
 
-    @unittest.skipUnless(settings.MITX_FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
+    @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
     def test_externalauth_login_required_course_context(self):
         """
         Tests the redirects when visiting course-specific URL with @login_required.

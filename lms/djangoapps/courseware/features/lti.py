@@ -7,28 +7,28 @@ from lettuce import world, step
 from lettuce.django import django_url
 from common import course_id
 
-from student.models import CourseEnrollment
+from courseware.tests.factories import InstructorFactory
 
 
 @step('I view the LTI and error is shown$')
 def lti_is_not_rendered(_step):
     # error is shown
-    assert world.is_css_present('.error_message')
+    assert world.is_css_present('.error_message', wait_time=0)
 
     # iframe is not presented
-    assert not world.is_css_present('iframe')
+    assert not world.is_css_present('iframe', wait_time=0)
 
     # link is not presented
-    assert not world.is_css_present('.link_lti_new_window')
+    assert not world.is_css_present('.link_lti_new_window', wait_time=0)
 
 
 def check_lti_iframe_content(text):
     #inside iframe test content is presented
     location = world.scenario_dict['LTI'].location.html_id()
-    iframe_name = 'ltiLaunchFrame-' + location
+    iframe_name = 'ltiFrame-' + location
     with world.browser.get_iframe(iframe_name) as iframe:
         # iframe does not contain functions from terrain/ui_helpers.py
-        assert iframe.is_element_present_by_css('.result', wait_time=5)
+        assert iframe.is_element_present_by_css('.result', wait_time=0)
         assert (text == world.retry_on_exception(
             lambda: iframe.find_by_css('.result')[0].text,
             max_attempts=5
@@ -38,18 +38,18 @@ def check_lti_iframe_content(text):
 @step('I view the LTI and it is rendered in (.*)$')
 def lti_is_rendered(_step, rendered_in):
     if rendered_in.strip() == 'iframe':
-        assert world.is_css_present('iframe')
-        assert not world.is_css_present('.link_lti_new_window')
-        assert not world.is_css_present('.error_message')
+        assert world.is_css_present('iframe', wait_time=2)
+        assert not world.is_css_present('.link_lti_new_window', wait_time=0)
+        assert not world.is_css_present('.error_message', wait_time=0)
 
         # iframe is visible
         assert world.css_visible('iframe')
         check_lti_iframe_content("This is LTI tool. Success.")
 
     elif rendered_in.strip() == 'new page':
-        assert not world.is_css_present('iframe')
-        assert world.is_css_present('.link_lti_new_window')
-        assert not world.is_css_present('.error_message')
+        assert not world.is_css_present('iframe', wait_time=2)
+        assert world.is_css_present('.link_lti_new_window', wait_time=0)
+        assert not world.is_css_present('.error_message', wait_time=0)
         check_lti_popup()
     else:  # incorrent rendered_in parameter
         assert False
@@ -57,9 +57,9 @@ def lti_is_rendered(_step, rendered_in):
 
 @step('I view the LTI but incorrect_signature warning is rendered$')
 def incorrect_lti_is_rendered(_step):
-    assert world.is_css_present('iframe')
-    assert not world.is_css_present('.link_lti_new_window')
-    assert not world.is_css_present('.error_message')
+    assert world.is_css_present('iframe', wait_time=2)
+    assert not world.is_css_present('.link_lti_new_window', wait_time=0)
+    assert not world.is_css_present('.error_message', wait_time=0)
     #inside iframe test content is presented
     check_lti_iframe_content("Wrong LTI signature")
 
@@ -195,15 +195,12 @@ def i_am_registered_for_the_course(course, metadata):
     # Create the course
     create_course(course, metadata)
 
-    # Create the user
-    world.create_user('robot', 'test')
-    usr = User.objects.get(username='robot')
+    # Create an instructor
+    instructor = InstructorFactory(course=world.scenario_dict['COURSE'].location)
 
-    # If the user is not already enrolled, enroll the user.
-    CourseEnrollment.enroll(usr, course_id(course))
-
-    world.add_to_course_staff('robot', world.scenario_dict['COURSE'].number)
-    world.log_in(username='robot', password='test')
+    # Enroll the user in the course and log them in
+    world.enroll_user(instructor, course_id(course))
+    world.log_in(username=instructor.username, password='test')
 
 
 def check_lti_popup():
@@ -237,10 +234,11 @@ def check_progress(_step, text):
 @step('I see graph with total progress "([^"]*)"$')
 def see_graph(_step, progress):
     SELECTOR = 'grade-detail-graph'
-    node = world.browser.find_by_xpath('//div[@id="{parent}"]//div[text()="{progress}"]'.format(
+    XPATH = '//div[@id="{parent}"]//div[text()="{progress}"]'.format(
         parent=SELECTOR,
         progress=progress,
-    ))
+    )
+    node = world.browser.find_by_xpath(XPATH)
 
     assert node
 
@@ -262,7 +260,7 @@ def see_value_in_the_gradebook(_step, label, text):
 @step('I submit answer to LTI question$')
 def click_grade(_step):
     location = world.scenario_dict['LTI'].location.html_id()
-    iframe_name = 'ltiLaunchFrame-' + location
+    iframe_name = 'ltiFrame-' + location
     with world.browser.get_iframe(iframe_name) as iframe:
         iframe.find_by_name('submit-button').first.click()
         assert iframe.is_text_present('LTI consumer (edX) responded with XML content')

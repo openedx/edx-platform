@@ -17,7 +17,7 @@ try:
 except ImportError:
     from django.contrib.csrf.middleware import csrf_exempt
 
-log = logging.getLogger("mitx.lms_migrate")
+log = logging.getLogger("edx.lms_migrate")
 LOCAL_DEBUG = True
 ALLOWED_IPS = settings.LMS_MIGRATION_ALLOWED_IPS
 
@@ -118,7 +118,7 @@ def manage_modulestores(request, reload_dir=None, commit_id=None):
     html += '<ol>'
     for cdir, course in def_ms.courses.items():
         html += '<li><a href="%s/migrate/reload/%s">%s</a> (%s)</li>' % (
-            settings.MITX_ROOT_URL,
+            settings.EDX_ROOT_URL,
             escape(cdir),
             escape(cdir),
             course.location.url()

@@ -6,7 +6,8 @@ if Backbone?
         "click .action-delete": "_delete"
         "click .action-edit": "edit"
         "click .discussion-flag-abuse": "toggleFlagAbuse"
-        "keypress .discussion-flag-abuse": "toggleFlagAbuseKeypress"
+        "keypress .discussion-flag-abuse":
+          (event) -> DiscussionUtil.activateOnEnter(event, toggleFlagAbuse)
 
     $: (selector) ->
         @$el.find(selector)

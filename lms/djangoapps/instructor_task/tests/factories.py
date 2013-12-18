@@ -1,6 +1,7 @@
 import json
 
-from factory import DjangoModelFactory, SubFactory
+import factory
+from factory.django import DjangoModelFactory
 from student.tests.factories import UserFactory as StudentUserFactory
 from instructor_task.models import InstructorTask
 from celery.states import PENDING
@@ -16,4 +17,4 @@ class InstructorTaskFactory(DjangoModelFactory):
     task_id = None
     task_state = PENDING
     task_output = None
-    requester = SubFactory(StudentUserFactory)
+    requester = factory.SubFactory(StudentUserFactory)

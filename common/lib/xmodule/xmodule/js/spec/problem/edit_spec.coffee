@@ -100,7 +100,7 @@ describe 'MarkdownEditingDescriptor', ->
         = 3.14159 +- .02
 
         Enter the approximate value of 502*9:
-        = 4518 +- 15%
+        = 502*9 +- 15%
 
         Enter the number of fingers on a human hand:
         = 5
@@ -125,7 +125,7 @@ describe 'MarkdownEditingDescriptor', ->
         </numericalresponse>
 
         <p>Enter the approximate value of 502*9:</p>
-        <numericalresponse answer="4518">
+        <numericalresponse answer="502*9">
           <responseparam type="tolerance" default="15%" />
           <formulaequationinput />
         </numericalresponse>

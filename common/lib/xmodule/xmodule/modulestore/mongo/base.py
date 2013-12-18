@@ -34,7 +34,6 @@ from xblock.fields import Scope, ScopeIds
 from xmodule.modulestore import ModuleStoreWriteBase, Location, MONGO_MODULESTORE_TYPE
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.inheritance import own_metadata, InheritanceMixin, inherit_metadata, InheritanceKeyValueStore
-import re
 
 log = logging.getLogger(__name__)
 
@@ -275,25 +274,29 @@ class MongoModuleStore(ModuleStoreWriteBase):
             """
             Create & open the connection, authenticate, and provide pointers to the collection
             """
-            self.collection = pymongo.connection.Connection(
-                host=host,
-                port=port,
-                tz_aware=tz_aware,
-                **kwargs
-            )[db][collection]
+            self.database = pymongo.database.Database(
+                pymongo.MongoClient(
+                    host=host,
+                    port=port,
+                    tz_aware=tz_aware,
+                    **kwargs
+                ),
+                db
+            )
+            self.collection = self.database[collection]
 
             if user is not None and password is not None:
-                self.collection.database.authenticate(user, password)
+                self.database.authenticate(user, password)
 
         do_connection(**doc_store_config)
 
         # Force mongo to report errors, at the expense of performance
-        self.collection.safe = True
+        self.collection.write_concern = {'w': 1}
 
         # Force mongo to maintain an index over _id.* that is in the same order
         # that is used when querying by a location
         self.collection.ensure_index(
-            zip(('_id.' + field for field in Location._fields), repeat(1))
+            zip(('_id.' + field for field in Location._fields), repeat(1)),
         )
 
         if default_class is not None:
@@ -721,7 +724,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         # @hack! We need to find the course location however, we don't
         # know the 'name' parameter in this context, so we have
         # to assume there's only one item in this query even though we are not specifying a name
-        course_search_location = ['i4x', location.org, location.course, 'course', None]
+        course_search_location = Location('i4x', location.org, location.course, 'course', None)
         courses = self.get_items(course_search_location, depth=depth)
 
         # make sure we found exactly one match on this above course search

@@ -23,7 +23,7 @@ from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from course_modes.models import CourseMode
-from mitxmako.shortcuts import render_to_string
+from edxmako.shortcuts import render_to_string
 from student.views import course_from_id
 from student.models import CourseEnrollment, unenroll_done
 
@@ -143,7 +143,7 @@ class Order(models.Model):
         self.bill_to_state = state
         self.bill_to_country = country
         self.bill_to_postalcode = postalcode
-        if settings.MITX_FEATURES['STORE_BILLING_INFO']:
+        if settings.FEATURES['STORE_BILLING_INFO']:
             self.bill_to_street1 = street1
             self.bill_to_street2 = street2
             self.bill_to_ccnum = ccnum
@@ -164,7 +164,7 @@ class Order(models.Model):
         message = render_to_string('emails/order_confirmation_email.txt', {
             'order': self,
             'order_items': orderitems,
-            'has_billing_info': settings.MITX_FEATURES['STORE_BILLING_INFO']
+            'has_billing_info': settings.FEATURES['STORE_BILLING_INFO']
         })
         try:
             send_mail(subject, message,
@@ -560,6 +560,7 @@ class CertificateItem(OrderItem):
 
         """
         super(CertificateItem, cls).add_to_order(order, course_id, cost, currency=currency)
+
         course_enrollment = CourseEnrollment.get_or_create_enrollment(order.user, course_id)
 
         # do some validation on the enrollment mode
@@ -573,7 +574,7 @@ class CertificateItem(OrderItem):
             user=order.user,
             course_id=course_id,
             course_enrollment=course_enrollment,
-            mode=mode
+            mode=mode,
         )
         item.status = order.status
         item.qty = 1
@@ -598,7 +599,6 @@ class CertificateItem(OrderItem):
             log.exception(
                 "Could not submit verification attempt for enrollment {}".format(self.course_enrollment)
             )
-
         self.course_enrollment.change_mode(self.mode)
         self.course_enrollment.activate()
 

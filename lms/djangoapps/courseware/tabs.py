@@ -27,6 +27,7 @@ from open_ended_grading import open_ended_notifications
 
 import waffle
 
+
 log = logging.getLogger(__name__)
 
 
@@ -100,7 +101,7 @@ def _discussion(tab, user, course, active_page, request):
     """
     This tab format only supports the new Berkeley discussion forums.
     """
-    if settings.MITX_FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
+    if settings.FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
         link = reverse('django_comment_client.forum.views.forum_form_discussion',
                               args=[course.id])
         return [CourseTab(tab['name'], link, active_page == 'discussion')]
@@ -129,7 +130,7 @@ def _textbooks(tab, user, course, active_page, request):
     """
     Generates one tab per textbook.  Only displays if user is authenticated.
     """
-    if user.is_authenticated() and settings.MITX_FEATURES.get('ENABLE_TEXTBOOK'):
+    if user.is_authenticated() and settings.FEATURES.get('ENABLE_TEXTBOOK'):
         # since there can be more than one textbook, active_page is e.g. "book/0".
         return [CourseTab(textbook.title, reverse('book', args=[course.id, index]),
                           active_page == "textbook/{0}".format(index))
@@ -211,7 +212,7 @@ def _combined_open_ended_grading(tab, user, course, active_page, request):
 
 
 def _notes_tab(tab, user, course, active_page, request):
-    if user.is_authenticated() and settings.MITX_FEATURES.get('ENABLE_STUDENT_NOTES'):
+    if user.is_authenticated() and settings.FEATURES.get('ENABLE_STUDENT_NOTES'):
         link = reverse('notes', args=[course.id])
         return [CourseTab(tab['name'], link, active_page == 'notes')]
     return []
@@ -259,7 +260,7 @@ VALID_TAB_TYPES = {
     'open_ended': TabImpl(null_validator, _combined_open_ended_grading),
     'notes': TabImpl(null_validator, _notes_tab),
     'syllabus': TabImpl(null_validator, _syllabus),
-    'topic_syllabuses': TabImpl(null_validator, _pdf_textbooks)
+    'topic_syllabuses':TabImpl(null_validator, _pdf_textbooks)
     }
 
 
@@ -350,7 +351,7 @@ def get_discussion_link(course):
     """
     if course.discussion_link:
         return course.discussion_link
-    elif not settings.MITX_FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
+    elif not settings.FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
         return None
     elif hasattr(course, 'tabs') and course.tabs and not any([tab['type'] == 'discussion' for tab in course.tabs]):
         return None

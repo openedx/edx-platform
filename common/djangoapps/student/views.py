@@ -14,7 +14,7 @@ import time
 
 from django.conf import settings
 from django.contrib.auth import logout, authenticate, login
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AnonymousUser
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import password_reset_confirm
 # from django.contrib.sessions.models import Session
@@ -36,7 +36,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 
 from ratelimitbackend.exceptions import RateLimitException
 
-from mitxmako.shortcuts import render_to_response, render_to_string
+from edxmako.shortcuts import render_to_response, render_to_string
 
 from course_modes.models import CourseMode
 from student.models import (
@@ -75,7 +75,7 @@ from util.json_request import JsonResponse
 import pdb
 
 
-log = logging.getLogger("mitx.student")
+log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
 
 Article = namedtuple('Article', 'title url author image deck publication publish_date')
@@ -94,7 +94,7 @@ def csrf_token(context):
 # branding/views.py:index(), which is cached for anonymous users.
 # This means that it should always return the same thing for anon
 # users. (in particular, no switching based on query params allowed)
-def index(request, extra_context={}, user=None):
+def index(request, extra_context={}, user=AnonymousUser()):
     """
     Render the edX main page.
 
@@ -103,7 +103,7 @@ def index(request, extra_context={}, user=None):
     """
 
     # The course selection work is done in courseware.courses.
-    domain = settings.MITX_FEATURES.get('FORCE_UNIVERSITY_DOMAIN')  # normally False
+    domain = settings.FEATURES.get('FORCE_UNIVERSITY_DOMAIN')  # normally False
     # do explicit check, because domain=None is valid
     if domain is False:
         domain = request.META.get('HTTP_HOST')
@@ -244,6 +244,12 @@ def signin_user(request):
     """
     This view will display the non-modal login form
     """
+    if (settings.FEATURES['AUTH_USE_MIT_CERTIFICATES'] and
+            external_auth.views.ssl_get_cert_from_request(request)):
+        # SSL login doesn't require a view, so redirect
+        # branding and allow that to process the login if it
+        # is enabled and the header is in the request.
+        return redirect(reverse('root'))
     if request.user.is_authenticated():
         return redirect(reverse('dashboard'))
 
@@ -261,6 +267,10 @@ def register_user(request, extra_context=None):
     """
     if request.user.is_authenticated():
         return redirect(reverse('dashboard'))
+    if settings.FEATURES.get('AUTH_USE_MIT_CERTIFICATES_IMMEDIATE_SIGNUP'):
+        # Redirect to branding to process their certificate if SSL is enabled
+        # and registration is disabled.
+        return redirect(reverse('root'))
 
     context = {
         'course_id': request.GET.get('course_id'),
@@ -336,7 +346,7 @@ def dashboard(request):
     # only show email settings for Mongo course and when bulk email is turned on
     show_email_settings_for = frozenset(
         course.id for course, _enrollment in course_enrollment_pairs if (
-            settings.MITX_FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and
+            settings.FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and
             modulestore().get_modulestore_type(course.id) == MONGO_MODULESTORE_TYPE and
             CourseAuthorization.instructor_email_enabled(course.id)
         )
@@ -456,7 +466,11 @@ def change_enrollment(request):
                   "course:{0}".format(course_num),
                   "run:{0}".format(run)]
         )
-
+        #Validate level_of_education
+        levels = {'p':8, 'm': 7, 'b': 6, 'a': 5, 'hs': 4, 'jhs': 3, 'el': 2, 'none': 1, 'other': 0}
+        profile = UserProfile.objects.get(user=user)
+        if not levels[profile.level_of_education] >= levels[course.level_of_education]:
+            return HttpResponseBadRequest(_("Your level of education is not accepted for this course."))
         CourseEnrollment.enroll(user, course.id, mode=current_mode.slug)
 
         return HttpResponse()
@@ -521,8 +535,12 @@ def accounts_login(request):
     This view is mainly used as the redirect from the @login_required decorator.  I don't believe that
     the login path linked from the homepage uses it.
     """
-    if settings.MITX_FEATURES.get('AUTH_USE_CAS'):
+    if settings.FEATURES.get('AUTH_USE_CAS'):
         return redirect(reverse('cas-login'))
+    if settings.FEATURES['AUTH_USE_MIT_CERTIFICATES']:
+        # SSL login doesn't require a view, so redirect
+        # to branding and allow that to process the login.
+        return redirect(reverse('root'))
     # see if the "next" parameter has been set, whether it has a course context, and if so, whether
     # there is a course-specific place to redirect
     redirect_to = request.GET.get('next')
@@ -552,7 +570,7 @@ def login_user(request, error=""):
     # check if the user has a linked shibboleth account, if so, redirect the user to shib-login
     # This behavior is pretty much like what gmail does for shibboleth.  Try entering some @stanford.edu
     # address into the Gmail login.
-    if settings.MITX_FEATURES.get('AUTH_USE_SHIB') and user:
+    if settings.FEATURES.get('AUTH_USE_SHIB') and user:
         try:
             eamap = ExternalAuthMap.objects.get(user=user)
             if eamap.external_domain.startswith(external_auth.views.SHIBBOLETH_DOMAIN_PREFIX):
@@ -639,7 +657,7 @@ def logout_user(request):
     # We do not log here, because we have a handler registered
     # to perform logging on successful logouts.
     logout(request)
-    if settings.MITX_FEATURES.get('AUTH_USE_CAS'):
+    if settings.FEATURES.get('AUTH_USE_CAS'):
         target = reverse('cas-logout')
     else:
         target = '/'
@@ -840,8 +858,8 @@ def create_account(request, post_override=None):
         return HttpResponse(json.dumps(js))
 
     # Can't have terms of service for certain SHIB users, like at Stanford
-    tos_not_required = (settings.MITX_FEATURES.get("AUTH_USE_SHIB") and
-                        settings.MITX_FEATURES.get('SHIB_DISABLE_TOS') and
+    tos_not_required = (settings.FEATURES.get("AUTH_USE_SHIB") and
+                        settings.FEATURES.get('SHIB_DISABLE_TOS') and
                         DoExternalAuth and
                         eamap.external_domain.startswith(external_auth.views.SHIBBOLETH_DOMAIN_PREFIX))
 
@@ -915,10 +933,10 @@ def create_account(request, post_override=None):
     message = render_to_string('emails/activation_email.txt', d)
 
     # don't send email if we are doing load testing or random user generation for some reason
-    if not (settings.MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING')):
+    if not (settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING')):
         try:
-            if settings.MITX_FEATURES.get('REROUTE_ACTIVATION_EMAIL'):
-                dest_addr = settings.MITX_FEATURES['REROUTE_ACTIVATION_EMAIL']
+            if settings.FEATURES.get('REROUTE_ACTIVATION_EMAIL'):
+                dest_addr = settings.FEATURES['REROUTE_ACTIVATION_EMAIL']
                 message = ("Activation for %s (%s): %s\n" % (user, user.email, profile.name) +
                            '-' * 80 + '\n\n' + message)
                 send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [dest_addr], fail_silently=False)
@@ -948,7 +966,7 @@ def create_account(request, post_override=None):
         AUDIT_LOG.info("User registered with external_auth %s", post_vars['username'])
         AUDIT_LOG.info('Updated ExternalAuthMap for %s to be %s', post_vars['username'], eamap)
 
-        if settings.MITX_FEATURES.get('BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH'):
+        if settings.FEATURES.get('BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH'):
             log.info('bypassing activation email')
             login_user.is_active = True
             login_user.save()
@@ -988,7 +1006,7 @@ def auto_auth(request):
     """
     Automatically logs the user in with a generated random credentials
     This view is only accessible when
-    settings.MITX_SETTINGS['AUTOMATIC_AUTH_FOR_TESTING'] is true.
+    settings.FEATURES['AUTOMATIC_AUTH_FOR_TESTING'] is true.
     """
 
     def get_dummy_post_data(username, password, email, name):
@@ -1007,7 +1025,7 @@ def auto_auth(request):
     name_base = 'USER_'
     pass_base = 'PASS_'
 
-    max_users = settings.MITX_FEATURES.get('MAX_AUTO_AUTH_USERS', 200)
+    max_users = settings.FEATURES.get('MAX_AUTO_AUTH_USERS', 200)
     number = random.randint(1, max_users)
 
     # Get the params from the request to override default user attributes if specified
