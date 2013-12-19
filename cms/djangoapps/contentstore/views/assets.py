@@ -124,7 +124,7 @@ def _upload_asset(request, location):
         modulestore().get_item(old_location)
     except:
         # no return it as a Bad Request response
-        logging.error('Could not find course' + old_location)
+        logging.error("Could not find course: %s", old_location)
         return HttpResponseBadRequest()
 
     # compute a 'filename' which is similar to the location formatting, we're
@@ -214,7 +214,7 @@ def _update_asset(request, location, asset_id):
                 # remove from any caching
                 del_cached_content(thumbnail_content.location)
             except:
-                logging.warning('Could not delete thumbnail: ' + content.thumbnail_location)
+                logging.warning('Could not delete thumbnail: %s', content.thumbnail_location)
 
         # delete the original
         contentstore().delete(content.get_id())
