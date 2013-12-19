@@ -351,6 +351,20 @@ following.
     [explanation]
     
 =========================================
+Multiple Responses in Text Input Problems
+=========================================
+
+You can specify more than one correct response for text input problems. 
+For example, instead of requiring students to enter exactly "Dr. Martin Luther 
+King, Junior," you can allow answers of "Martin Luther King," "Doctor Martin 
+Luther King," and other variations.
+
+To do this, include "or=" (without the quotation marks) before each additional
+correct response.
+
+.. image:: Images/TextInput_MultipleAnswer.gif
+
+=========================================
 Case Sensitivity and Text Input Problems
 =========================================
 
