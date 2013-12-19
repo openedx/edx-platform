@@ -5,7 +5,9 @@ import json
 import mock
 import unittest
 
-from linkedin.management.commands import mailusers
+from linkedin.management.commands import linkedin_mailusers as mailusers
+
+MODULE = 'linkedin.management.commands.linkedin_mailusers.'
 
 
 class MailusersTests(unittest.TestCase):
@@ -13,9 +15,9 @@ class MailusersTests(unittest.TestCase):
     Test mail users command.
     """
 
-    @mock.patch('linkedin.management.commands.mailusers.send_email')
-    @mock.patch('linkedin.management.commands.mailusers.GeneratedCertificate')
-    @mock.patch('linkedin.management.commands.mailusers.LinkedIn')
+    @mock.patch(MODULE + 'send_triggered_email')
+    @mock.patch(MODULE + 'GeneratedCertificate')
+    @mock.patch(MODULE + 'LinkedIn')
     def test_mail_users(self, linkedin, certificates, send_email):
         """
         Test emailing users.
@@ -48,9 +50,9 @@ class MailusersTests(unittest.TestCase):
         self.assertEqual(json.loads(fred.emailed_courses), [1, 2])
         self.assertEqual(json.loads(barney.emailed_courses), [3])
 
-    @mock.patch('linkedin.management.commands.mailusers.send_grandfather_email')
-    @mock.patch('linkedin.management.commands.mailusers.GeneratedCertificate')
-    @mock.patch('linkedin.management.commands.mailusers.LinkedIn')
+    @mock.patch(MODULE + 'send_grandfather_email')
+    @mock.patch(MODULE + 'GeneratedCertificate')
+    @mock.patch(MODULE + 'LinkedIn')
     def test_mail_users_grandfather(self, linkedin, certificates, send_email):
         """
         Test sending grandfather emails.
@@ -82,9 +84,9 @@ class MailusersTests(unittest.TestCase):
         self.assertEqual(json.loads(fred.emailed_courses), [1, 2])
         self.assertEqual(json.loads(barney.emailed_courses), [3])
 
-    @mock.patch('linkedin.management.commands.mailusers.send_email')
-    @mock.patch('linkedin.management.commands.mailusers.GeneratedCertificate')
-    @mock.patch('linkedin.management.commands.mailusers.LinkedIn')
+    @mock.patch(MODULE + 'send_triggered_email')
+    @mock.patch(MODULE + 'GeneratedCertificate')
+    @mock.patch(MODULE + 'LinkedIn')
     def test_mail_users_only_new_courses(self, linkedin, certificates,
                                          send_email):
         """

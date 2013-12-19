@@ -7,8 +7,9 @@ import pytz
 import StringIO
 import unittest
 
+from linkedin.management.commands import linkedin_findusers as findusers
 
-from linkedin.management.commands import findusers
+MODULE = 'linkedin.management.commands.linkedin_findusers.'
 
 
 class FindUsersTests(unittest.TestCase):
@@ -16,7 +17,7 @@ class FindUsersTests(unittest.TestCase):
     Tests for the findusers script.
     """
 
-    @mock.patch('linkedin.management.commands.findusers.timezone')
+    @mock.patch(MODULE + 'timezone')
     def test_get_call_limits_in_safe_harbor(self, timezone):
         """
         We should be able to perform unlimited API calls during "safe harbor".
@@ -33,7 +34,7 @@ class FindUsersTests(unittest.TestCase):
             2013, 12, 15, 7, 59, tzinfo=tzinfo)
         self.assertEqual(fut(), (-1, 80, 1))
 
-    @mock.patch('linkedin.management.commands.findusers.timezone')
+    @mock.patch(MODULE + 'timezone')
     def test_get_call_limits_in_business_hours(self, timezone):
         """
         During business hours we shouldn't be able to make any API calls.
@@ -50,7 +51,7 @@ class FindUsersTests(unittest.TestCase):
             2013, 12, 16, 8, 1, tzinfo=tzinfo)
         self.assertEqual(fut(), (0, 0, 0))
 
-    @mock.patch('linkedin.management.commands.findusers.timezone')
+    @mock.patch(MODULE + 'timezone')
     def test_get_call_limits_on_weeknights(self, timezone):
         """
         On weeknights outside of "safe harbor" we can only make limited API
@@ -65,10 +66,10 @@ class FindUsersTests(unittest.TestCase):
             2013, 12, 11, 7, 59, tzinfo=tzinfo)
         self.assertEqual(fut(), (500, 80, 1))
 
-    @mock.patch('linkedin.management.commands.findusers.time')
-    @mock.patch('linkedin.management.commands.findusers.User')
-    @mock.patch('linkedin.management.commands.findusers.LinkedinAPI')
-    @mock.patch('linkedin.management.commands.findusers.get_call_limits')
+    @mock.patch(MODULE + 'time')
+    @mock.patch(MODULE + 'User')
+    @mock.patch(MODULE + 'LinkedinAPI')
+    @mock.patch(MODULE + 'get_call_limits')
     def test_command_success_recheck_no_limits(self, get_call_limits, apicls,
                                                usercls, time):
         """
@@ -89,10 +90,10 @@ class FindUsersTests(unittest.TestCase):
         self.assertEqual([u.linkedin.has_linkedin_account for u in users],
                          [i % 2 == 0 for i in xrange(10)])
 
-    @mock.patch('linkedin.management.commands.findusers.time')
-    @mock.patch('linkedin.management.commands.findusers.User')
-    @mock.patch('linkedin.management.commands.findusers.LinkedinAPI')
-    @mock.patch('linkedin.management.commands.findusers.get_call_limits')
+    @mock.patch(MODULE + 'time')
+    @mock.patch(MODULE + 'User')
+    @mock.patch(MODULE + 'LinkedinAPI')
+    @mock.patch(MODULE + 'get_call_limits')
     def test_command_success_no_recheck_no_limits(self, get_call_limits, apicls,
                                                   usercls, time):
         """
@@ -119,10 +120,10 @@ class FindUsersTests(unittest.TestCase):
         self.assertEqual([u.linkedin.has_linkedin_account for u in users],
                          [i % 2 == 0 for i in xrange(10)])
 
-    @mock.patch('linkedin.management.commands.findusers.time')
-    @mock.patch('linkedin.management.commands.findusers.User')
-    @mock.patch('linkedin.management.commands.findusers.LinkedinAPI')
-    @mock.patch('linkedin.management.commands.findusers.get_call_limits')
+    @mock.patch(MODULE + 'time')
+    @mock.patch(MODULE + 'User')
+    @mock.patch(MODULE + 'LinkedinAPI')
+    @mock.patch(MODULE + 'get_call_limits')
     def test_command_success_no_recheck_no_users(self, get_call_limits, apicls,
                                                  usercls, time):
         """
@@ -145,10 +146,10 @@ class FindUsersTests(unittest.TestCase):
         self.assertEqual([u.linkedin.has_linkedin_account for u in users],
                          [i % 2 == 0 for i in xrange(10)])
 
-    @mock.patch('linkedin.management.commands.findusers.time')
-    @mock.patch('linkedin.management.commands.findusers.User')
-    @mock.patch('linkedin.management.commands.findusers.LinkedinAPI')
-    @mock.patch('linkedin.management.commands.findusers.get_call_limits')
+    @mock.patch(MODULE + 'time')
+    @mock.patch(MODULE + 'User')
+    @mock.patch(MODULE + 'LinkedinAPI')
+    @mock.patch(MODULE + 'get_call_limits')
     def test_command_success_recheck_with_limit(self, get_call_limits, apicls,
                                                 usercls, time):
         """
@@ -175,7 +176,7 @@ class FindUsersTests(unittest.TestCase):
         self.assertEqual(users[9].linkedin.has_linkedin_account, None)
         self.assertTrue(command.stderr.getvalue().startswith("WARNING"))
 
-    @mock.patch('linkedin.management.commands.findusers.get_call_limits')
+    @mock.patch(MODULE + 'get_call_limits')
     def test_command_no_api_calls(self, get_call_limits):
         """
         Test rechecking all users with no API limits.
