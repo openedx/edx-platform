@@ -105,7 +105,7 @@ def generate_table(commit_range, include_merge=False):
         for i, commit in enumerate(commits):
             rows.append("| {author} | {summary} | {commit} | {jira} | {verified} |".format(
                 author=email if i == 0 else "",
-                summary=commit.summary.replace("|", "\|"),
+                summary=commit.summary.replace("|", "\|").encode('ascii',errors='ignore'),
                 commit=commit_link.format(sha=commit.hexsha),
                 jira=", ".join(parse_ticket_references(commit.message)),
                 verified="",
