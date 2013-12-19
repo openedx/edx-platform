@@ -121,7 +121,7 @@ You can use any video backup site that you want. However, keep in mind that the 
 post the videos may have to handle a lot of traffic.
 
 .. note:: The URL for the video that you post on a third-party site must end in .mp4, .ogg, or 
-.mpeg. EdX can't support videos that you post on sites such as Vimeo. 
+          .mpeg. EdX can't support videos that you post on sites such as Vimeo. 
 
 
 
