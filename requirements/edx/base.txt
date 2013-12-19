@@ -16,6 +16,7 @@ dealer==0.2.3
 distribute>=0.6.28, <0.7
 django-celery==3.0.17
 django-countries==1.5
+django-extensions==1.2.5
 django-filter==0.6.0
 django-followit==0.0.3
 django-keyedcache==1.4-6

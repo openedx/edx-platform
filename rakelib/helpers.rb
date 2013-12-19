@@ -2,6 +2,7 @@ require 'digest/md5'
 require 'sys/proctable'
 require 'colorize'
 require 'timeout'
+require 'net/http'
 
 def find_executable(exec)
     path = %x(which #{exec}).strip
@@ -55,38 +56,28 @@ end
 def background_process(command, logfile=nil)
     spawn_opts = {:pgroup => true}
     if !logfile.nil?
-        puts "Running '#{command.join(' ')}', redirecting output to #{logfile}".red
+        puts "Running '#{command.join(' ')}', redirecting output to #{logfile}"
         spawn_opts[[:err, :out]] = [logfile, 'a']
     end
     pid = Process.spawn({}, *command, spawn_opts)
     command = [*command]
 
     at_exit do
-        puts "Ending process and children"
         pgid = Process.getpgid(pid)
         begin
             Timeout.timeout(5) do
-                puts "Interrupting process group #{pgid}"
                 Process.kill(:SIGINT, -pgid)
-                puts "Waiting on process group #{pgid}"
                 Process.wait(-pgid)
-                puts "Done waiting on process group #{pgid}"
             end
         rescue Timeout::Error
             begin
                 Timeout.timeout(5) do
-                    puts "Terminating process group #{pgid}"
                     Process.kill(:SIGTERM, -pgid)
-                    puts "Waiting on process group #{pgid}"
                     Process.wait(-pgid)
-                    puts "Done waiting on process group #{pgid}"
                 end
             rescue Timeout::Error
-                puts "Killing process group #{pgid}"
                 Process.kill(:SIGKILL, -pgid)
-                puts "Waiting on process group #{pgid}"
                 Process.wait(-pgid)
-                puts "Done waiting on process group #{pgid}"
             end
         end
     end
@@ -100,6 +91,25 @@ def singleton_process(command, logfile=nil)
         background_process(command, logfile)
     else
         puts "Process '#{command.join(' ')} already running, skipping".blue
+    end
+end
+
+# Wait for a server to respond with status 200 at "/"
+def wait_for_server(server, port)
+    attempts = 0
+    begin
+        http = Net::HTTP.start(server, port, {open_timeout: 10, read_timeout: 10})
+        response = http.head("/")
+        response.code == "200"
+        true
+    rescue
+        sleep(1)
+        attempts += 1
+        if attempts < 5
+            retry
+        else
+            false
+        end
     end
 end
 
@@ -135,4 +145,3 @@ if !ENV['TESTS_FAIL_FAST']
 
     Rake.application.top_level_tasks << :fail_tests
 end
-
