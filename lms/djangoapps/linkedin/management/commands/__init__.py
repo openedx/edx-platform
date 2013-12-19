@@ -1,7 +1,6 @@
 """
 Class for accessing LinkedIn's API.
 """
-import hashlib
 import json
 import urllib2
 import urlparse
@@ -95,19 +94,16 @@ class LinkedinAPI(object):
                 "You must log in to LinkedIn in order to use this script. "
                 "Please use the 'login' command to log in to LinkedIn.")
 
-        def md5(email):
-            "Compute md5 hash for an email address."
-            md5hash = hashlib.md5()
-            md5hash.update(email)
-            return md5hash.hexdigest()
-
-        hashes = ','.join(("email-hash=" + md5(email) for email in emails))
-        url = "https://api.linkedin.com/v1/people::(%s):(id)" % hashes
+        emails = list(emails)  # realize generator since we traverse twice
+        queries = ','.join(("email=" + email for email in emails))
+        url = "https://api.linkedin.com/v1/people::(%s):(id)" % queries
         url += "?oauth2_access_token=%s" % self.tokens.access_token
         request = urllib2.Request(url, headers={'x-li-format': 'json'})
         try:
             response = urllib2.urlopen(request).read()
-            print "GOT IT!", response
+            values = json.loads(response)['values']
+            accounts = set(value['_key'][6:] for value in values)
+            return (email in accounts for email in emails)
         except urllib2.HTTPError, error:
             self.http_error(error, "Unable to access People API")
         return (True for email in emails)

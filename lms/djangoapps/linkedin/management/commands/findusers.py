@@ -34,6 +34,7 @@ def get_call_limits():
 
     Use 80 emails per API call and 1 call per second.
     """
+    return -1, 80, 1
     now = timezone.now().astimezone(pytz.timezone('US/Pacific'))
     lastfriday = now
     while lastfriday.weekday() != FRIDAY:
