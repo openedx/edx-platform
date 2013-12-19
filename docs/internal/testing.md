@@ -264,26 +264,33 @@ When you connect to the LMS, you need to use the public ip.  Use `ifconfig` to f
 
 ## Acceptance Test Techniques
 
-1. Do not assert not if possible for css.  Use world.is_css_present and is_css_not_present
-    Errors can arise if checks for the css are performed before the page finishes loading.
-    To get around this, there are functions that will wait a period of time for the css to appear
-    before returning and return immediately if they are there.  There is a reverse to this function as well.
-    It will wait for the css to not appear and returns if it isn't there.
+1. Element existence on the page<br />
+    Do not use splinter's built-in browser methods directly for determining if elements exist.
+    Use the world.is_css_present and world.is_css_not_present wrapper functions instead.
+    Otherwise errors can arise if checks for the css are performed before the page finishes loading.
+    Also these wrapper functions are optimized for the amount of wait time spent in both cases of positive
+    and negative expectation.
 
-    All css functions can utilize this timeout to ensure that the page is fully loaded
-
-2. Dealing with alerts
+2. Dealing with alerts<br />
     Chrome can hang on javascripts alerts.  If a javascript alert/prompt/confirmation is expected, use the step
     'I will confirm all alerts', 'I will cancel all alerts' or 'I will anser all prompts with "(.*)"' before the step
     that causes the alert in order to properly deal with it.
 
-3. Dealing with stale element reference exceptions
+3. Dealing with stale element reference exceptions<br />
     These exceptions happen if any part of the page is refreshed in between finding an element and accessing the element.
     When possible, use any of the css functions in common/djangoapps/terrain/ui_helpers.py as they will retry the action
     in case of this exception.  If the functionality is not there, wrap the function with world.retry_on_exception.  This function takes in a function and will retry and return the result of the function if there was an exception
 
-4. Scenario Level Constants
+4. Scenario Level Constants<br />
     If you want an object to be available for the entire scenario, it can be stored in world.scenario_dict.  This object
     is a dictionary that gets refreshed at the beginning on the scenario.  Currently, the current logged in user and the current created course are stored under 'COURSE' and 'USER'.  This will help prevent strings from being hard coded so the
     acceptance tests can become more flexible.
 
+5. Internal edX Jenkins considerations<br />
+    Acceptance tests are run in Jenkins as part of the edX development workflow. They are broken into shards and split across
+    workers. Therefore if you add a new .feature file, you need to define what shard they should be run in or else they
+    will not get executed. See someone from TestEng to help you determine where they should go.
+
+    Also, the test results are rolled up in Jenkins for ease of understanding, with the acceptance tests under the top level
+    of "CMS" and "LMS" when they follow this convention: name your feature in the .feature file CMS or LMS with a single
+    period and then no other periods in the name. The name can contain spaces. E.g. "CMS.Sign Up"
