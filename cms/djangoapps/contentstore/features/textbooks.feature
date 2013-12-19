@@ -1,4 +1,4 @@
-@shard_3
+@shard_2
 Feature: CMS.Textbooks
 
   Scenario: No textbooks
