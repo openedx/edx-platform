@@ -293,6 +293,3 @@ try:
     from .private import *      # pylint: disable=F0401
 except ImportError:
     pass
-
-####################### Linkedin ###########################
-INSTALLED_APPS += ('linkedin',)
