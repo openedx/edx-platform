@@ -235,6 +235,14 @@ FILE_UPLOAD_HANDLERS = (
     'django.core.files.uploadhandler.TemporaryFileUploadHandler',
 )
 
+############################ LinkedIn Integration #############################
+INSTALLED_APPS += ('linkedin',)
+LINKEDIN_API = {
+    'COMPANY_NAME': 'edX',
+    'COMPANY_ID': '0000000',
+    'EMAIL_FROM': 'The Team <team@test.foo>',
+}
+
 ################### Make tests faster
 
 #http://slacy.com/blog/2012/04/make-your-tests-faster-in-django-1-4/

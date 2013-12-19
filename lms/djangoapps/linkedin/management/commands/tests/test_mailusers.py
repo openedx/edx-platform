@@ -3,119 +3,93 @@ Test email scripts.
 """
 import json
 import mock
-import unittest
 
+from certificates.models import GeneratedCertificate
+from django.contrib.auth.models import User
+from django.test import TestCase
+
+from student.models import UserProfile
+from linkedin.models import LinkedIn
 from linkedin.management.commands import linkedin_mailusers as mailusers
 
 MODULE = 'linkedin.management.commands.linkedin_mailusers.'
 
 
-class MailusersTests(unittest.TestCase):
+class MailusersTests(TestCase):
     """
     Test mail users command.
     """
 
-    @mock.patch(MODULE + 'send_triggered_email')
-    @mock.patch(MODULE + 'GeneratedCertificate')
-    @mock.patch(MODULE + 'LinkedIn')
-    def test_mail_users(self, linkedin, certificates, send_email):
+    def setUp(self):
+        courses = {
+            'TEST1': mock.Mock(org='TestX', number='1'),
+            'TEST2': mock.Mock(org='TestX', number='2'),
+            'TEST3': mock.Mock(org='TestX', number='3'),
+        }
+        def get_course_by_id(id):
+            return courses.get(id)
+        patcher = mock.patch(MODULE + 'get_course_by_id', get_course_by_id)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+        self.fred = fred = User(username='fred')
+        fred.save()
+        UserProfile(user=fred, name='Fred Flintstone').save()
+        LinkedIn(user=fred, has_linkedin_account=True).save()
+        self.barney = barney = User(username='barney')
+        barney.save()
+        LinkedIn(user=barney, has_linkedin_account=True).save()
+        UserProfile(user=barney, name='Barney Rubble').save()
+
+        cert1 = GeneratedCertificate(
+            status='downloadable',
+            user=fred,
+            course_id='TEST1')
+        cert1.save()
+        cert2 = GeneratedCertificate(
+            status='downloadable',
+            user=fred,
+            course_id='TEST2')
+        cert2.save()
+        cert3 = GeneratedCertificate(
+            status='downloadable',
+            user=barney,
+            course_id='TEST3')
+        cert3.save()
+
+    def test_mail_users(self):
         """
         Test emailing users.
         """
         fut = mailusers.Command().handle
-        cert1 = mock.Mock(course_id=1)
-        cert2 = mock.Mock(course_id=2)
-        cert3 = mock.Mock(course_id=3)
-        fred = mock.Mock(
-            emailed_courses="[]",
-            user=mock.Mock(certificates=[cert1, cert2]))
-        barney = mock.Mock(
-            emailed_courses="[]",
-            user=mock.Mock(certificates=[cert3]))
-        linkedin.objects.filter.return_value = [fred, barney]
-
-        def filter_user(user):
-            "Mock querying the database."
-            queryset = mock.Mock()
-            queryset.filter.return_value = user.certificates
-            return queryset
-
-        certificates.objects.filter = filter_user
         fut()
         self.assertEqual(
-            send_email.call_args_list,
-            [((fred.user, cert1),),
-             ((fred.user, cert2),),
-             ((barney.user, cert3),)])
-        self.assertEqual(json.loads(fred.emailed_courses), [1, 2])
-        self.assertEqual(json.loads(barney.emailed_courses), [3])
+            json.loads(self.fred.linkedin.emailed_courses), ['TEST1', 'TEST2'])
+        self.assertEqual(
+            json.loads(self.barney.linkedin.emailed_courses), ['TEST3'])
 
-    @mock.patch(MODULE + 'send_grandfather_email')
-    @mock.patch(MODULE + 'GeneratedCertificate')
-    @mock.patch(MODULE + 'LinkedIn')
-    def test_mail_users_grandfather(self, linkedin, certificates, send_email):
+    def test_mail_users_grandfather(self):
         """
         Test sending grandfather emails.
         """
         fut = mailusers.Command().handle
-        cert1 = mock.Mock(course_id=1)
-        cert2 = mock.Mock(course_id=2)
-        cert3 = mock.Mock(course_id=3)
-        fred = mock.Mock(
-            emailed_courses="[]",
-            user=mock.Mock(certificates=[cert1, cert2]))
-        barney = mock.Mock(
-            emailed_courses="[]",
-            user=mock.Mock(certificates=[cert3]))
-        linkedin.objects.filter.return_value = [fred, barney]
-
-        def filter_user(user):
-            "Mock querying the database."
-            queryset = mock.Mock()
-            queryset.filter.return_value = user.certificates
-            return queryset
-
-        certificates.objects.filter = filter_user
         fut(grandfather=True)
         self.assertEqual(
-            send_email.call_args_list,
-            [((fred.user, [cert1, cert2]),),
-             ((barney.user, [cert3]),)])
-        self.assertEqual(json.loads(fred.emailed_courses), [1, 2])
-        self.assertEqual(json.loads(barney.emailed_courses), [3])
+            json.loads(self.fred.linkedin.emailed_courses), ['TEST1', 'TEST2'])
+        self.assertEqual(
+            json.loads(self.barney.linkedin.emailed_courses), ['TEST3'])
 
-    @mock.patch(MODULE + 'send_triggered_email')
-    @mock.patch(MODULE + 'GeneratedCertificate')
-    @mock.patch(MODULE + 'LinkedIn')
-    def test_mail_users_only_new_courses(self, linkedin, certificates,
-                                         send_email):
+    def test_mail_users_only_new_courses(self):
         """
         Test emailing users, making sure they are only emailed about new
         certificates.
         """
+        self.fred.linkedin.emailed_courses = json.dumps(['TEST1'])
+        self.fred.linkedin.save()
         fut = mailusers.Command().handle
-        cert1 = mock.Mock(course_id=1)
-        cert2 = mock.Mock(course_id=2)
-        cert3 = mock.Mock(course_id=3)
-        fred = mock.Mock(
-            emailed_courses="[1]",
-            user=mock.Mock(certificates=[cert1, cert2]))
-        barney = mock.Mock(
-            emailed_courses="[]",
-            user=mock.Mock(certificates=[cert3]))
-        linkedin.objects.filter.return_value = [fred, barney]
-
-        def filter_user(user):
-            "Mock querying the database."
-            queryset = mock.Mock()
-            queryset.filter.return_value = user.certificates
-            return queryset
-
-        certificates.objects.filter = filter_user
         fut()
+        fred = User.objects.get(username='fred')
         self.assertEqual(
-            send_email.call_args_list,
-            [((fred.user, cert2),),
-             ((barney.user, cert3),)])
-        self.assertEqual(json.loads(fred.emailed_courses), [1, 2])
-        self.assertEqual(json.loads(barney.emailed_courses), [3])
+            json.loads(fred.linkedin.emailed_courses), ['TEST1', 'TEST2'])
+        self.assertEqual(
+            json.loads(self.barney.linkedin.emailed_courses), ['TEST3'])
