@@ -257,6 +257,13 @@ XQUEUE_PORT = 8040
 YOUTUBE_PORT = 8031
 LTI_PORT = 8765
 
+############################ LinkedIn Integration #############################
+INSTALLED_APPS += ('linkedin',)
+LINKEDIN_API = {
+    'COMPANY_NAME': 'edX',
+    'COMPANY_ID': '0000000',
+    'EMAIL_FROM': 'The Team <team@test.foo>',
+}
 
 ################### Make tests faster
 

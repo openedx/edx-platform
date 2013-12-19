@@ -57,16 +57,19 @@ class Command(BaseCommand):
             emailed = json.loads(account.emailed_courses)
             certificates = GeneratedCertificate.objects.filter(user=user)
             certificates = certificates.filter(status='downloadable')
+            print 'HUH?', certificates
             certificates = [cert for cert in certificates
                             if cert.course_id not in emailed]
+            print 'DUH?', certificates
             if not certificates:
                 continue
+            print 'WTF?', emailed
             if grandfather:
                 self.send_grandfather_email(user, certificates)
                 emailed.extend([cert.course_id for cert in certificates])
             else:
                 for certificate in certificates:
-                    self.send_email(user, certificate)
+                    self.send_triggered_email(user, certificate)
                     emailed.append(certificate.course_id)
             account.emailed_courses = json.dumps(emailed)
             account.save()
