@@ -34,7 +34,6 @@ def get_call_limits():
 
     Use 80 emails per API call and 1 call per second.
     """
-    return -1, 80, 1
     now = timezone.now().astimezone(pytz.timezone('US/Pacific'))
     lastfriday = now
     while lastfriday.weekday() != FRIDAY:
@@ -63,7 +62,14 @@ class Command(BaseCommand):
             dest='recheck',
             default=False,
             help='Check users that have been checked in the past to see if '
-                 'they have joined or left LinkedIn since the last check'),)
+                 'they have joined or left LinkedIn since the last check'),
+        make_option(
+            '--force',
+            action='store_true',
+            dest='force',
+            default=False,
+            help='Disregard the parameters provided by LinkedIn about when it '
+                 'is appropriate to make API calls.'))
 
     def handle(self, *args, **options):
         """
@@ -71,9 +77,13 @@ class Command(BaseCommand):
         """
         api = LinkedinAPI()
         recheck = options.pop('recheck', False)
-        max_checks, checks_per_call, time_between_calls = get_call_limits()
-        if not max_checks:
-            raise CommandError("No checks allowed during this time.")
+        force = options.pop('force', False)
+        if force:
+            max_checks, checks_per_call, time_between_calls = -1, 80, 1
+        else:
+            max_checks, checks_per_call, time_between_calls = get_call_limits()
+            if not max_checks:
+                raise CommandError("No checks allowed during this time.")
 
         def batch_users():
             "Generator to lazily generate batches of users to query."
