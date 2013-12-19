@@ -14,16 +14,9 @@ from shoppingcart.reports import ItemizedPurchaseReport, CertificateStatusReport
 from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
 from course_modes.models import CourseMode
-from shoppingcart.views import initialize_report
+from shoppingcart.views import initialize_report, REPORT_TYPES
 import pytz
 import datetime
-
-REPORT_TYPES = [
-    ("refund_report", RefundReport),
-    ("itemized_purchase_report", ItemizedPurchaseReport),
-    ("university_revenue_share", UniversityRevenueShareReport),
-    ("certificate_status", CertificateStatusReport),
-]
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)

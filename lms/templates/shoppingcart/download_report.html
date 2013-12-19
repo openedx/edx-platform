@@ -19,19 +19,24 @@
     </section>
   % endif
   <form method="post">
+    <p>${_("These reports are delimited by start and end dates.")}</p>
     <label for="start_date">${_("Start Date: ")}</label>
     <input id="start_date" type="text" value="${start_date}" name="start_date"/>
     <label for="end_date">${_("End Date: ")}</label>
     <input id="end_date" type="text" value="${end_date}" name="end_date"/>
+    <br/>
+    <button type = "submit" name="requested_report" value="itemized_purchase_report">Itemized Purchase Report</button>
+    <br/>
+    <button type = "submit" name="requested_report" value="refund_report">Refund Report</button>
+
+    <br/><br/>
+    <p>${_("These reports are delimited alphabetically by university name.  i.e., generating a report with 'Start Letter' A and 'End Letter' C will generate reports for all universities starting with A, B, and C.")}</p>
     <label for="start_letter">${_("Start Letter: ")}</label>
     <input id="start_letter" type="text" value="${start_letter}" name="start_letter"/>
     <label for="end_letter">${_("End Letter: ")}</label>
     <input id="end_letter" type="text" value="${end_letter}" name="end_letter"/>
     <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}" />
-    <br/>
-    <button type = "submit" name="requested_report" value="itemized_purchase_report">Itemized Purchase Report</button>
-    <br/>
-    <button type = "submit" name="requested_report" value="refund_report">Refund Report</button>
+
     <br/>
     <button type = "submit" name="requested_report" value="university_revenue_share">University Revenue Share</button>
     <br/>

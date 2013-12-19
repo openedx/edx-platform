@@ -18,6 +18,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from shoppingcart.models import (Order, OrderItem, CertificateItem, InvalidCartItem, PaidCourseRegistration,
                                  OrderItemSubclassPK, PaidCourseRegistrationAnnotation)
+from shoppingcart.views import initialize_report, REPORT_TYPES
 from shoppingcart.reports import ItemizedPurchaseReport, CertificateStatusReport, UniversityRevenueShareReport, RefundReport
 from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
@@ -26,22 +27,6 @@ from shoppingcart.exceptions import PurchasedCallbackException, ReportTypeDoesNo
 import pytz
 import datetime
 
-REPORT_TYPES = [
-    ("refund_report", RefundReport),
-    ("itemized_purchase_report", ItemizedPurchaseReport),
-    ("university_revenue_share", UniversityRevenueShareReport),
-    ("certificate_status", CertificateStatusReport),
-]
-
-
-def initialize_report(report_type):
-    """
-    Creates the appropriate type of Report object based on the string report_type.
-    """
-    for item in REPORT_TYPES:
-        if report_type in item:
-            return item[1]()
-    raise ReportTypeDoesNotExistException
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class OrderTest(ModuleStoreTestCase):
