@@ -248,6 +248,16 @@ FILE_UPLOAD_HANDLERS = (
     'django.core.files.uploadhandler.TemporaryFileUploadHandler',
 )
 
+########################### Server Ports ###################################
+
+# These ports are carefully chosen so that if the browser needs to
+# access them, they will be available through the SauceLabs SSH tunnel
+LETTUCE_SERVER_PORT = 8003
+XQUEUE_PORT = 8040
+YOUTUBE_PORT = 8031
+LTI_PORT = 8765
+
+
 ################### Make tests faster
 
 #http://slacy.com/blog/2012/04/make-your-tests-faster-in-django-1-4/

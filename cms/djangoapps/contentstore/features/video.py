@@ -34,7 +34,7 @@ def i_created_a_video_component(step):
 
     world.wait_for_present('.is-initialized')
     world.wait(DELAY)
-    assert not world.css_visible(SELECTORS['spinner'])
+    world.wait_for_invisible(SELECTORS['spinner'])
 
 
 @step('I have created a Video component with subtitles$')
@@ -59,8 +59,7 @@ def i_created_a_video_with_subs_with_name(_step, sub_id):
     world.disable_jquery_animations()
 
     world.wait_for_present('.is-initialized')
-    world.wait(DELAY)
-    assert not world.css_visible(SELECTORS['spinner'])
+    world.wait_for_invisible(SELECTORS['spinner'])
 
 
 @step('I have uploaded subtitles "([^"]*)"$')

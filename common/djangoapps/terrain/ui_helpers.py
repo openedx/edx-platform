@@ -10,7 +10,7 @@ from textwrap import dedent
 from urllib import quote_plus
 from selenium.common.exceptions import (
     WebDriverException, TimeoutException,
-    StaleElementReferenceException)
+    StaleElementReferenceException, InvalidElementStateException)
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -581,7 +581,7 @@ def trigger_event(css_selector, event='change', index=0):
 
 
 @world.absorb
-def retry_on_exception(func, max_attempts=5, ignored_exceptions=StaleElementReferenceException):
+def retry_on_exception(func, max_attempts=5, ignored_exceptions=(StaleElementReferenceException, InvalidElementStateException)):
     """
     Retry the interaction, ignoring the passed exceptions.
     By default ignore StaleElementReferenceException, which happens often in our application
