@@ -1,8 +1,8 @@
 define(["backbone"], function(Backbone, AssetView) {
 
     var PagingFooter = Backbone.View.extend({
-        initialize: function(arguments) {
-            var view = arguments.view,
+        initialize: function(options) {
+            var view = options.view,
                 collection = view.collection;
             this.view = view;
             this.template = _.template($("#paging-footer-tpl").text());
@@ -14,11 +14,15 @@ define(["backbone"], function(Backbone, AssetView) {
 
         render: function() {
             var view = this.view,
-                collection = view.collection;
+                collection = view.collection,
+                currentPage = collection.currentPage,
+                lastPage = collection.totalPages - 1;
             this.$el.html(this.template({
                 current_page: collection.currentPage,
                 total_pages: collection.totalPages
             }));
+            $(".previous-page-link").toggleClass("is-disabled", currentPage === 0);
+            $(".next-page-link").toggleClass("is-disabled", currentPage === lastPage);
             return this;
         }
     });

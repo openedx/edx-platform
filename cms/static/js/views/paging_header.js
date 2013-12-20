@@ -1,8 +1,8 @@
 define(["backbone", "underscore", "gettext"], function(Backbone, _, gettext) {
 
     var PagingHeader = Backbone.View.extend({
-        initialize: function(arguments) {
-            var view = arguments.view,
+        initialize: function(options) {
+            var view = options.view,
                 collection = view.collection;
             this.view = view;
             this.template = _.template($("#paging-header-tpl").text());
@@ -15,10 +15,14 @@ define(["backbone", "underscore", "gettext"], function(Backbone, _, gettext) {
         render: function() {
             var view = this.view,
                 collection = view.collection,
+                currentPage = collection.currentPage,
+                lastPage = collection.totalPages - 1,
                 messageHtml = this.messageHtml();
             this.$el.html(this.template({
                 messageHtml: messageHtml
             }));
+            $(".previous-page-link").toggleClass("is-disabled", currentPage === 0);
+            $(".next-page-link").toggleClass("is-disabled", currentPage === lastPage);
             return this;
         },
 

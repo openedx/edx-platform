@@ -12,18 +12,9 @@ define(["backbone", "js/views/feedback_alert"], function(Backbone, AlertView) {
         initialize: function() {
             Backbone.View.prototype.initialize.call(this);
             var assets = this.collection;
-            assets.bind('add', _.bind(this.onRefresh, this));
-            assets.bind('remove', _.bind(this.onRefresh, this));
-            assets.bind('reset', _.bind(this.onRefresh, this));
-        },
-
-        onRefresh: function() {
-            var assets = this.collection,
-                currentPage = assets.currentPage,
-                lastPage = assets.totalPages - 1;
-            this.renderPageItems();
-            $(".previous-page-link").toggleClass("is-disabled", currentPage == 0)
-            $(".next-page-link").toggleClass("is-disabled", currentPage == lastPage)
+            assets.bind('add', _.bind(this.renderPageItems, this));
+            assets.bind('remove', _.bind(this.renderPageItems, this));
+            assets.bind('reset', _.bind(this.renderPageItems, this));
         },
 
         changePage: function() {
@@ -34,7 +25,7 @@ define(["backbone", "js/views/feedback_alert"], function(Backbone, AlertView) {
                 this.setPage(pageNumber - 1);
             } else if (!pageNumber) {
                 // Remove the invalid page number so that the current page number shows through
-                $("#page-number-input").val("")
+                $("#page-number-input").val("");
             }
         },
 
