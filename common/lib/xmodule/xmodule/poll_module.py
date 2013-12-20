@@ -40,8 +40,7 @@ class PollModule(PollFields, XModule):
     """Poll Module"""
     js = {
       'coffee': [resource_string(__name__, 'js/src/javascript_loader.coffee')],
-      'js': [resource_string(__name__, 'js/src/poll/logme.js'),
-             resource_string(__name__, 'js/src/poll/poll.js'),
+      'js': [resource_string(__name__, 'js/src/poll/poll.js'),
              resource_string(__name__, 'js/src/poll/poll_main.js')]
          }
     css = {'scss': [resource_string(__name__, 'css/poll/display.scss')]}
