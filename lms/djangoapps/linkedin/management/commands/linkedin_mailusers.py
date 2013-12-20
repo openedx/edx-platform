@@ -43,7 +43,7 @@ class Command(BaseCommand):
 
     def __init__(self):
         super(BaseCommand, self).__init__()
-        self.api = LinkedinAPI()
+        self.api = LinkedinAPI(self)
 
     def handle(self, *args, **options):
         whitelist = self.api.config.get('EMAIL_WHITELIST')
