@@ -7,8 +7,7 @@ from lettuce.django import django_url
 
 @step('I register for the course "([^"]*)"$')
 def i_register_for_the_course(_step, course):
-    cleaned_name = world.scenario_dict['COURSE'].display_name.replace(' ', '_')
-    url = django_url('courses/%s/%s/%s/about' % (world.scenario_dict['COURSE'].org, course, cleaned_name))
+    url = django_url('courses/%s/about' % world.scenario_dict['COURSE'].id)
     world.browser.visit(url)
     world.css_click('section.intro a.register')
 

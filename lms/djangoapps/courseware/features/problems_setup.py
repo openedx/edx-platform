@@ -307,7 +307,7 @@ def problem_has_answer(problem_type, answer_class):
         pass
 
 
-def add_problem_to_course(course, problem_type, extraMeta=None):
+def add_problem_to_course(course, problem_type, extra_meta=None):
     '''
     Add a problem to the course we have created using factories.
     '''
@@ -318,8 +318,8 @@ def add_problem_to_course(course, problem_type, extraMeta=None):
     factory_dict = PROBLEM_DICT[problem_type]
     problem_xml = factory_dict['factory'].build_xml(**factory_dict['kwargs'])
     metadata = {'rerandomize': 'always'} if not 'metadata' in factory_dict else factory_dict['metadata']
-    if extraMeta:
-        metadata = dict(metadata, **extraMeta)
+    if extra_meta:
+        metadata = dict(metadata, **extra_meta)
 
     # Create a problem item using our generated XML
     # We set rerandomize=always in the metadata so that the "Reset" button
