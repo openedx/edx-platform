@@ -42,11 +42,13 @@ lib_paths:
 src_paths:
     - coffee/src
     - js/src
+    - js/capa/src
 
 # Paths to spec (test) JavaScript files
 spec_paths:
     - coffee/spec
     - js/spec
+    - js/capa/spec
 
 # Regular expressions used to exclude *.js files from
 # appearing in the test runner page.
@@ -72,4 +74,5 @@ spec_paths:
 # plus the path to the file (relative to this YAML file)
 fixture_paths:
     - js/fixtures
+    - js/capa/fixtures
 
