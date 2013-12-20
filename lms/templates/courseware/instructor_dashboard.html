@@ -126,6 +126,9 @@ function goto( mode)
     <h1>${_("Instructor Dashboard")}</h1>
 
     <h2 class="navbar">[ <a href="#" onclick="goto('Grades');" class="${modeflag.get('Grades')}">Grades</a> |
+          %if settings.FEATURES.get('INDIVIDUAL_DUE_DATES'):
+            <a href="#" onclick="goto('Extensions');" class="${modeflag.get('Extensions')}">${_("Extensions")}</a> |
+          %endif
           %if settings.FEATURES.get('ENABLE_PSYCHOMETRICS'):
             <a href="#" onclick="goto('Psychometrics');" class="${modeflag.get('Psychometrics')}">${_("Psychometrics")}</a> |
           %endif
@@ -313,6 +316,43 @@ function goto( mode)
     %endif
 
  %endif
+
+
+##-----------------------------------------------------------------------------
+%if modeflag.get('Extensions'):
+  %if settings.FEATURES.get('INDIVIDUAL_DUE_DATES'):
+    <H2>${_("Individual due date extensions")}</h2>
+
+    <p>
+      ${_("Specify the {platform_name} email address or username of a student here:").format(platform_name=settings.PLATFORM_NAME)}
+      <input type="text" name="unique_student_identifier">
+    </p>
+    <p>
+      ${_("Choose the graded unit:")}
+      <select name="url">
+        <option value="">Choose one</option>
+        %for title, url in units_with_due_dates:
+        <option value="${url}">${title}</option>
+        %endfor
+      </select>
+    </p>
+    <p>
+      ${_("Specify the individual due date and time in UTC:")}
+      <input type="text" name="due_datetime" 
+             placeholder="MM/DD/YYYY HH:MM"/>
+    </p>
+    <p>
+      <input type="submit" name="action" value="${_("Change due date for student")}">
+      <input type="submit" name="action" value="${_("Reset due date for student")}">
+    </p>
+    <p>
+      <input type="submit" name="action" value="${_("Dump list of students with due date extensions")}">
+      <input type="submit" name="action" value="${_("Dump due date extensions for student")}">
+    </p>
+    <hr width="40%" style="align:left">
+  %endif
+%endif
+
 
 ##-----------------------------------------------------------------------------
 %if modeflag.get('Psychometrics'):

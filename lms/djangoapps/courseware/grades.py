@@ -19,6 +19,7 @@ from xblock.fields import Scope
 from xmodule import graders
 from xmodule.capa_module import CapaModule
 from xmodule.graders import Score
+from xmodule.utils import get_extended_due_date
 from .models import StudentModule
 from .module_render import get_module, get_module_for_descriptor
 
@@ -353,7 +354,7 @@ def _progress_summary(student, request, course):
                     'scores': scores,
                     'section_total': section_total,
                     'format': module_format,
-                    'due': section_module.due,
+                    'due': get_extended_due_date(section_module),
                     'graded': graded,
                 })
 
