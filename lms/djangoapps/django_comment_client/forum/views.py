@@ -248,13 +248,10 @@ def single_thread(request, course_id, discussion_id, thread_id):
         with newrelic.agent.FunctionTrace(nr_transaction, "get_annotated_content_infos"):
             annotated_content_info = utils.get_annotated_content_infos(course_id, thread, request.user, user_info=user_info)
         context = {'thread': thread.to_dict(), 'course_id': course_id}
-        # TODO: Remove completely or switch back to server side rendering
-        # html = render_to_string('discussion/_ajax_single_thread.html', context)
         content = utils.safe_content(thread.to_dict())
         with newrelic.agent.FunctionTrace(nr_transaction, "add_courseware_context"):
             add_courseware_context([content], course)
         return utils.JsonResponse({
-            #'html': html,
             'content': content,
             'annotated_content_info': annotated_content_info,
         })

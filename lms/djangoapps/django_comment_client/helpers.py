@@ -31,22 +31,3 @@ def include_mustache_templates():
 
     file_contents = map(read_file, filter(valid_file_name, os.listdir(mustache_dir)))
     return '\n'.join(map(wrap_in_tag, map(strip_file_name, file_contents)))
-
-
-def render_content(content, additional_context={}):
-
-    context = {
-        'content': extend_content(content),
-        content['type']: True,
-    }
-    if cc_settings.MAX_COMMENT_DEPTH is not None:
-        if content['type'] == 'thread':
-            if cc_settings.MAX_COMMENT_DEPTH < 0:
-                context['max_depth'] = True
-        elif content['type'] == 'comment':
-            if cc_settings.MAX_COMMENT_DEPTH <= content['depth']:
-                context['max_depth'] = True
-    context = merge_dict(context, additional_context)
-    partial_mustache_helpers = {k: partial(v, content) for k, v in mustache_helpers.items()}
-    context = merge_dict(context, partial_mustache_helpers)
-    return render_mustache('discussion/mustache/_content.mustache', context)
