@@ -1,5 +1,5 @@
 (function (requirejs, require, define) {
-define(['js/capa/drag_and_drop/logme', 'js/capa/drag_and_drop/update_input', 'js/capa/drag_and_drop/targets'], function (logme, updateInput, Targets) {
+define(['js/capa/drag_and_drop/update_input', 'js/capa/drag_and_drop/targets'], function (updateInput, Targets) {
 return {
     'moveDraggableTo': function (moveType, target, funcCallback) {
         var self, offset;
@@ -383,5 +383,5 @@ return {
         this.inContainer = true;
     }
 }; // End-of: return {
-}); // End-of: define(['logme', 'update_input', 'targets'], function (logme, updateInput, Targets) {
+}); // End-of: define(['update_input', 'targets'], function (updateInput, Targets) {
 }(RequireJS.requirejs, RequireJS.require, RequireJS.define)); // End-of: (function (requirejs, require, define) {
