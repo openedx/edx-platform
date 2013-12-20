@@ -2,8 +2,12 @@
 
 # text processing dependancies
 import json
+import os
 from textwrap import dedent
 
+from mock import patch
+
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.test.client import RequestFactory
 from django.core.urlresolvers import reverse
@@ -18,7 +22,10 @@ from xmodule.modulestore.django import modulestore, editable_modulestore
 #import factories and parent testcase modules
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from capa.tests.response_xml_factory import OptionResponseXMLFactory, CustomResponseXMLFactory, SchematicResponseXMLFactory
+from capa.tests.response_xml_factory import (
+    OptionResponseXMLFactory, CustomResponseXMLFactory, SchematicResponseXMLFactory,
+    CodeResponseXMLFactory,
+)
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from lms.lib.xblock.runtime import quote_slashes
@@ -545,6 +552,58 @@ class TestCourseGrader(TestSubmittingProblems):
         self.check_grade_percent(1.0)
         self.assertEqual(self.earned_hw_scores(), [1.0, 2.0, 2.0])  # Order matters
         self.assertEqual(self.score_for_hw('homework3'), [1.0, 1.0])
+
+
+class ProblemWithUploadedFilesTest(TestSubmittingProblems):
+    """Tests of problems with uploaded files."""
+
+    def setUp(self):
+        super(ProblemWithUploadedFilesTest, self).setUp()
+        self.section = self.add_graded_section_to_course('section')
+
+    def problem_setup(self, name, files):
+        """
+        Create a CodeResponse problem with files to upload.
+        """
+
+        xmldata = CodeResponseXMLFactory().build_xml(
+            allowed_files=files, required_files=files,
+        )
+        ItemFactory.create(
+            parent_location=self.section.location,
+            category='problem',
+            display_name=name,
+            data=xmldata
+        )
+
+        # re-fetch the course from the database so the object is up to date
+        self.refresh_course()
+
+    def test_three_files(self):
+        # Open the test files, and arrange to close them later.
+        filenames = "prog1.py prog2.py prog3.py"
+        fileobjs = [
+            open(os.path.join(settings.COMMON_TEST_DATA_ROOT, "capa", filename))
+            for filename in filenames.split()
+        ]
+        for fileobj in fileobjs:
+            self.addCleanup(fileobj.close)
+
+        self.problem_setup("the_problem", filenames)
+        with patch('courseware.module_render.xqueue_interface.session') as mock_session:
+            resp = self.submit_question_answer("the_problem", {'2_1': fileobjs})
+
+        self.assertEqual(resp.status_code, 200)
+        json_resp = json.loads(resp.content)
+        self.assertEqual(json_resp['success'], "incorrect")
+
+        # See how post got called.
+        name, args, kwargs = mock_session.mock_calls[0]
+        self.assertEqual(name, "post")
+        self.assertEqual(len(args), 1)
+        self.assertTrue(args[0].endswith("/submit/"))
+        self.assertItemsEqual(kwargs.keys(), ["files", "data"])
+        self.assertItemsEqual(kwargs['files'].keys(), filenames.split())
 
 
 class TestPythonGradedResponse(TestSubmittingProblems):

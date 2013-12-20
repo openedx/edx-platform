@@ -314,24 +314,43 @@ class CodeResponseXMLFactory(ResponseXMLFactory):
         return super(CodeResponseXMLFactory, self).build_xml(**kwargs)
 
     def create_response_element(self, **kwargs):
-        """ Create a <coderesponse> XML element:
+        """
+        Create a <coderesponse> XML element.
 
-            Uses **kwargs:
+        Uses **kwargs:
 
-            *initial_display*: The code that initially appears in the textbox
-                                [DEFAULT: "Enter code here"]
-            *answer_display*: The answer to display to the student
-                                [DEFAULT: "This is the correct answer!"]
-            *grader_payload*: A JSON-encoded string sent to the grader
-                                [DEFAULT: empty dict string]
+        *initial_display*: The code that initially appears in the textbox
+                            [DEFAULT: "Enter code here"]
+        *answer_display*: The answer to display to the student
+                            [DEFAULT: "This is the correct answer!"]
+        *grader_payload*: A JSON-encoded string sent to the grader
+                            [DEFAULT: empty dict string]
+        *allowed_files*: A space-separated string of file names.
+                            [DEFAULT: None]
+        *required_files*: A space-separated string of file names.
+                            [DEFAULT: None]
+
         """
         # Get **kwargs
         initial_display = kwargs.get("initial_display", "Enter code here")
         answer_display = kwargs.get("answer_display", "This is the correct answer!")
         grader_payload = kwargs.get("grader_payload", '{}')
+        allowed_files = kwargs.get("allowed_files", None)
+        required_files = kwargs.get("required_files", None)
 
         # Create the <coderesponse> element
         response_element = etree.Element("coderesponse")
+
+        # If files are involved, create the <filesubmission> element.
+        has_files = allowed_files or required_files
+        if has_files:
+            filesubmission_element = etree.SubElement(response_element, "filesubmission")
+            if allowed_files:
+                filesubmission_element.set("allowed_files", allowed_files)
+            if required_files:
+                filesubmission_element.set("required_files", required_files)
+
+        # Create the <codeparam> element.
         codeparam_element = etree.SubElement(response_element, "codeparam")
 
         # Set the initial display text
@@ -347,8 +366,9 @@ class CodeResponseXMLFactory(ResponseXMLFactory):
         grader_element.text = str(grader_payload)
 
         # Create the input within the response
-        input_element = etree.SubElement(response_element, "textbox")
-        input_element.set("mode", "python")
+        if not has_files:
+            input_element = etree.SubElement(response_element, "textbox")
+            input_element.set("mode", "python")
 
         return response_element
 
