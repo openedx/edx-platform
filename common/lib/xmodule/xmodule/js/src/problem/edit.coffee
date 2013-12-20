@@ -3,7 +3,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
   @multipleChoiceTemplate : "( ) incorrect\n( ) incorrect\n(x) correct\n"
   @checkboxChoiceTemplate: "[x] correct\n[ ] incorrect\n[x] correct\n"
   @stringInputTemplate: "= answer\n"
-  @numberInputTemplate: "= answer +- x%\n"
+  @numberInputTemplate: "= answer +- 0.001%\n"
   @selectTemplate: "[[incorrect, (correct), incorrect]]\n"
   @headerTemplate: "Header\n=====\n"
   @explanationTemplate: "[explanation]\nShort explanation\n[explanation]\n"
