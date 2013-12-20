@@ -34,8 +34,11 @@ TABLE = {'A': u'\xC0',
          'I': U'\xCC',
          'i': u'\xEF',
          'O': u'\xD8',
-         'o': u'\xF6',
-         'u': u'\xFC'
+         'o': u'\xF8',
+         'U': u'\xDB',
+         'u': u'\xFC',
+         'Y': u'\xDD',
+         'y': u'\xFD',
          }
 
 
