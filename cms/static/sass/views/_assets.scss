@@ -27,6 +27,23 @@
 
   }
 
+  .no-asset-content {
+    @extend %ui-well;
+    padding: ($baseline*2);
+    background-color: $gray-l4;
+    text-align: center;
+    color: $gray;
+
+    .new-button {
+      @include font-size(14);
+      margin-left: $baseline;
+
+      [class^="icon-"] {
+        margin-right: ($baseline/2);
+      }
+    }
+  }
+
   .asset-library {
     @include clearfix;
 
@@ -84,6 +101,12 @@
           background-color: $blue;
           border-radius: 3px;
           color: $white;
+        }
+
+        &.is-disabled {
+          background-color: transparent;
+          color: $gray-l2;
+          pointer-events: none;
         }
       }
 
@@ -149,7 +172,7 @@
           &:focus {
             // borrowing the base input focus styles to match overall app
             @include linear-gradient($paleYellow, tint($paleYellow, 90%));
-            //border: 1px solid $gray-l2;
+            opacity: 1;
             box-shadow: 0 0 3px $shadow-d1 inset;
             background-color: $white;
             border: 1px solid transparent;
