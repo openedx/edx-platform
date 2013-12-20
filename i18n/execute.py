@@ -11,7 +11,7 @@ def execute(command, working_directory=BASE_DIR):
     Output is ignored.
     """
     LOG.info(command)
-    subprocess.call(command.split(' '), cwd=working_directory)
+    subprocess.check_output(command.split(' '), cwd=working_directory, stderr=subprocess.STDOUT)
 
 
 def call(command, working_directory=BASE_DIR):
