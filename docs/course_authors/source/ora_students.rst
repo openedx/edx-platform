@@ -1,13 +1,26 @@
 .. _ORA for Students:
 
 Open Response Assessments for Students
-======================================
+======================================          
 
 .. _ORA Introduction:
 
 Introduction to Open Response Assessments
 -----------------------------------------
 
+.. list-table::
+     :widths: 80
+     :header-rows: 1
+
+     * - To instructors:
+     
+     * - Modify this section according to your course. For example, you
+         can delete sentences such as "For more information, see :ref:`ORA Peer Assessment`"
+         and "For more information, see :ref:`ORA AI Assessment`" if your ORA problem doesn't 
+         contain peer assessments or AI assessments and you want to delete these sections from
+         this document.
+         
+                             
 Open response assessments allow you to submit a short written answer, 
 an essay, or a file such as an image or computer code file. 
 
@@ -37,8 +50,8 @@ assessment types run in the order in which they appear in the problem.
   see :ref:`ORA AI Assessment`.
 
 An open response assessment problem doesn't have to use all assessment types. For example, one problem
-may use self assessment and AI assessment, while another problem uses self assessment
-and peer assessment, and another problem uses only peer assessment.
+may use self assessment and AI assessment, while another problem may use self assessment
+and peer assessment, and another problem may use only peer assessment.
 
 You'll answer open response assessment problems in much the same way that you answer other
 problems. For more information about how to submit responses, see :ref:`ORA Submit a Response`.
@@ -79,9 +92,9 @@ or uploading a file.
 
 #. Click **Submit**, and then click **OK** in the dialog box to continue.
 
-   **Note** If you want to save your response and work on it again later, click **Save**. 
-   An "Answer saved, but not yet submitted" message appears directly under the **Save** and 
-   **Submit** buttons.
+   .. note:: If you want to save your response and work on it again later, click **Save**. 
+             An "Answer saved, but not yet submitted" message appears directly under the **Save** and 
+             **Submit** buttons.
    
 After you submit your response, the assessment types start running in the order in which they
 appear in the problem. For more information,
@@ -92,6 +105,15 @@ see :ref:`ORA Self Assessment`, :ref:`ORA Peer Assessment`, or :ref:`ORA AI Asse
 Self Assessment
 ---------------
 
+.. list-table::
+     :widths: 80
+     :header-rows: 1
+
+     * - To instructors:
+     
+     * - You can delete this section if your ORA problem doesn't use self assessments.
+          
+          
 In a self assessment, the rubric for the problem appears below your response immediately
 after you submit the response. You then assess your response based on the rubric.
 
@@ -111,10 +133,19 @@ Perform a Self Assessment
    yourself.
 
 .. _ORA Peer Assessment:
-
+          
 Peer Assessment
 ---------------
 
+.. list-table::
+     :widths: 80
+     :header-rows: 1
+
+     * - To instructors:
+     
+     * - You can delete this section if your ORA problem doesn't use peer assessments.
+   
+          
 In a peer assessment, several students in the course grade your response while you grade
 other students' responses. You have to grade a number of your peers' responses before 
 you receive your score. (After you grade the minimum number of responses required to 
@@ -154,13 +185,26 @@ below.
 Step 1: Access responses from other students
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+.. list-table::
+     :widths: 80
+     :header-rows: 1
+
+     * - To instructors:
+     
+     * - Modify the content in this section according to
+         your course. For example, if your students can only grade by using the **Open
+         Ended Console** page, change the introductory sentence below, and delete the
+         second and third bullets.
+
+
 **Note** *You can only grade a response if you've submitted a response to the
 question, an instructor has already graded at least 20 responses, and
 there are more essays from other students left to grade. If you haven't submitted 
 a response or no responses are available for grading, you see a yellow message in the
 interface.*
 
-.. image:: /Images/PAStudent_NoSubmissions.gif
+   .. image:: /Images/PAStudent_NoSubmissions.gif
+             
 
 There are several ways to access other students' responses, depending on
 the way that the course is set up. 
@@ -265,30 +309,37 @@ If you want to grade additional responses at any time, you can go back
 to the **Peer Grading** page and click the name of the problem that you want
 to continue grading.
 
-**Note**
-
-When a response opens for you to grade, it leaves the current "grading pool"
-that other instructors or students are grading from, which prevents other 
-instructors or students from 
-grading the response while you are working on it. If you do not submit a score
-for this response within 30 minutes, the response returns to the grading pool 
-(so that it again becomes available for others to grade), even if you still have
-the response open on your screen.
- 
-If the response returns to the grading pool (because the 30 minutes have passed), 
-but the response is still open on your screen, you can still submit feedback for 
-that response. If another instructor or student grades the response after it returns to the 
-grading pool but before you submit your feedback, the response receives two grades.
- 
-If you click your browser’s **Back** button to return to the problem list before you 
-click **Submit** to submit your feedback for a response, the response stays outside 
-the grading pool until 30 minutes have passed. When the response returns to the 
-grading pool, you can grade it. 
+.. note:: When a response opens for you to grade, it leaves the current "grading pool"
+          that other instructors or students are grading from, which prevents other 
+          instructors or students from 
+          grading the response while you are working on it. If you do not submit a score
+          for this response within 30 minutes, the response returns to the grading pool 
+          (so that it again becomes available for others to grade), even if you still have
+          the response open on your screen.
+         
+          If the response returns to the grading pool (because the 30 minutes have passed), 
+          but the response is still open on your screen, you can still submit feedback for 
+          that response. If another instructor or student grades the response after it returns to the 
+          grading pool but before you submit your feedback, the response receives two grades.
+         
+          If you click your browser's **Back** button to return to the problem list before you 
+          click **Submit** to submit your feedback for a response, the response stays outside 
+          the grading pool until 30 minutes have passed. When the response returns to the 
+          grading pool, you can grade it. 
 
 .. _ORA AI Assessment:
 
 Artificial Intelligence (AI) Assessment
 ---------------------------------------
+
+.. list-table::
+     :widths: 80
+     :header-rows: 1
+
+     * - To instructors:
+     
+     * - You can delete this section if your ORA problem doesn't use AI assessments.
+   
 
 In an AI assessment, an instructor grades a sample set of student responses to the 
 open response assessment problem. A machine learning algorithm then creates a model 
@@ -310,6 +361,15 @@ For more information about accessing your scores, see :ref:`ORA Access Scores`.
 
 Access Scores and Feedback
 --------------------------
+
+.. list-table::
+     :widths: 80
+     :header-rows: 1
+
+     * - To instructors:
+     
+     * - Modify the text in this section to apply to your course. 
+         
 
 For *self assessments*, the score that you give yourself appears as soon as you submit
 the score. 
@@ -344,9 +404,9 @@ graders.
 If you want to see the full rubric for either an AI or peer assessment,
 click **Toggle Full Rubric**.
 
-**Note** *For a peer assessment, if you haven't yet graded enough
-problems to see your score, you receive a message that lets you know how
-many problems you still need to grade.*
+.. note:: For a peer assessment, if you haven't yet graded enough
+          problems to see your score, you receive a message that lets you know how
+          many problems you still need to grade.
 
 .. image:: /Images/FeedbackNotAvailable.gif
 
@@ -355,6 +415,14 @@ For more information about grading peer assessments, see :ref:`ORA Peer Assessme
 Resubmitting a Response
 -----------------------
 
+.. list-table::
+     :widths: 80
+     :header-rows: 1
+
+     * - To instructors:
+     
+     * - You can delete this section if you don't allow students to submit multiple responses.
+   
 Some open response assessments allow multiple attempts. For these
 problems, a **New Submission** button appears below your original
 response.
