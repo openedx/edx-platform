@@ -97,20 +97,20 @@ def generate_table(commit_range, include_merge=False):
     """
     Return a string corresponding to a commit table to embed in Confluence
     """
-    header = "||Author||Summary||Commit||JIRA||Verified?||"
+    header = u"||Author||Summary||Commit||JIRA||Verified?||"
     commit_link = "[commit|https://github.com/edx/edx-platform/commit/{sha}]"
     rows = [header]
     cbe = commits_by_email(commit_range, include_merge)
     for email, commits in cbe.items():
         for i, commit in enumerate(commits):
-            rows.append("| {author} | {summary} | {commit} | {jira} | {verified} |".format(
+            rows.append(u"| {author} | {summary} | {commit} | {jira} | {verified} |".format(
                 author=email if i == 0 else "",
-                summary=commit.summary.replace("|", "\|").encode('ascii',errors='ignore'),
+                summary=commit.summary.replace("|", "\|"),
                 commit=commit_link.format(sha=commit.hexsha),
                 jira=", ".join(parse_ticket_references(commit.message)),
                 verified="",
             ))
-    return "\n".join(rows)
+    return u"\n".join(rows)
 
 
 def generate_email(commit_range, release_date=None):
