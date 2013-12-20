@@ -29,7 +29,7 @@ from lms.envs.common import USE_TZ, TECH_SUPPORT_EMAIL, PLATFORM_NAME, BUGS_EMAI
 from path import path
 
 from lms.lib.xblock.mixin import LmsBlockMixin
-from cms.xmodule_namespace import CmsBlockMixin
+from cms.lib.xblock.mixin import CmsBlockMixin
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.x_module import XModuleMixin
 from dealer.git import git
