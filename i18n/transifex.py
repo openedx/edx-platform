@@ -27,7 +27,7 @@ def clean_translated_locales():
     for locale in CONFIGURATION.locales:
         if locale != CONFIGURATION.source_locale:
             clean_locale(locale)
-        
+
 def clean_locale(locale):
     """
     Strips out the warning from all of a locale's translated po files
@@ -58,7 +58,7 @@ def get_new_header(po):
         return TRANSIFEX_HEADER % team
 
 if __name__ == '__main__':
-    if len(sys.argv)<2:
+    if len(sys.argv) < 2:
         raise Exception("missing argument: push or pull")
     arg = sys.argv[1]
     if arg == 'push':
@@ -67,4 +67,3 @@ if __name__ == '__main__':
         pull()
     else:
         raise Exception("unknown argument: (%s)" % arg)
-        
