@@ -72,7 +72,7 @@ def input_problem_answer(_, problem_type, correctness):
     """
     assert(correctness in ['correct', 'incorrect'])
     assert(problem_type in PROBLEM_DICT)
-    answer_problem(problem_type, correctness)
+    answer_problem(world.scenario_dict['COURSE'].number, problem_type, correctness)
 
 
 @step(u'I check a problem')
@@ -98,7 +98,7 @@ def assert_problem_has_answer(step, problem_type, answer_class):
     '''
     assert answer_class in ['correct', 'incorrect', 'blank']
     assert problem_type in PROBLEM_DICT
-    problem_has_answer(problem_type, answer_class)
+    problem_has_answer(world.scenario_dict['COURSE'].number, problem_type, answer_class)
 
 
 @step(u'I reset the problem')
