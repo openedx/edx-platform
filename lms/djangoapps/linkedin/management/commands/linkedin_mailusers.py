@@ -94,7 +94,7 @@ class Command(BaseCommand):
             ('_mSplash', '1'),
             ('trk', tracking_code),
             ('startTask', 'CERTIFICATION_NAME'),
-            ('force', 'true'),]
+            ('force', 'true')]
         return 'http://www.linkedin.com/profile/guided?' + urllib.urlencode(query)
 
     def send_grandfather_email(self, user, certificates):
