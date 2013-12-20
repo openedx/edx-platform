@@ -1,6 +1,6 @@
-define(["backbone", "underscore", "gettext", "js/views/feedback_notification", "js/views/feedback_prompt"],
-        function(Backbone, _, gettext, NotificationView, PromptView) {
-    var ShowTextbook = Backbone.View.extend({
+define(["js/views/baseview", "underscore", "gettext", "js/views/feedback_notification", "js/views/feedback_prompt"],
+        function(BaseView, _, gettext, NotificationView, PromptView) {
+    var ShowTextbook = BaseView.extend({
         initialize: function() {
             this.template = _.template($("#show-textbook-tpl").text());
             this.listenTo(this.model, "change", this.render);
