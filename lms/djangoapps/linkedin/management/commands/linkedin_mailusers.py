@@ -57,13 +57,10 @@ class Command(BaseCommand):
             emailed = json.loads(account.emailed_courses)
             certificates = GeneratedCertificate.objects.filter(user=user)
             certificates = certificates.filter(status='downloadable')
-            print 'HUH?', certificates
             certificates = [cert for cert in certificates
                             if cert.course_id not in emailed]
-            print 'DUH?', certificates
             if not certificates:
                 continue
-            print 'WTF?', emailed
             if grandfather:
                 self.send_grandfather_email(user, certificates)
                 emailed.extend([cert.course_id for cert in certificates])
@@ -86,19 +83,18 @@ class Command(BaseCommand):
             course.org,  # Partner's name
             course.number,  # Certificate's name
             'gf' if grandfather else 'T'])
-        query = {
-            'pfCertificationName': certificate.name,
-            'pfAuthorityName': self.api.config['COMPANY_NAME'],
-            'pfAuthorityId': self.api.config['COMPANY_ID'],
-            'pfCertificationUrl': certificate.download_url,
-            'pfLicenseNo': certificate.course_id,
-            'pfCertStartDate': course.start.strftime('%Y%mI'),
-            'pfCertFuture': certificate.created_date.strftime('%Y%m'),
-            '_mSplash': '1',
-            'trk': tracking_code,
-            'startTask': 'CERTIFICATION_name',
-            'force': 'true',
-        }
+        query = [
+            ('pfCertificationName', certificate.name),
+            ('pfAuthorityName', self.api.config['COMPANY_NAME']),
+            ('pfAuthorityId', self.api.config['COMPANY_ID']),
+            ('pfCertificationUrl', certificate.download_url),
+            ('pfLicenseNo', certificate.course_id),
+            ('pfCertStartDate', course.start.strftime('%Y%mI')),
+            ('pfCertFuture', certificate.created_date.strftime('%Y%m')),
+            ('_mSplash', '1'),
+            ('trk', tracking_code),
+            ('startTask', 'CERTIFICATION_NAME'),
+            ('force', 'true'),]
         return 'http://www.linkedin.com/profile/guided?' + urllib.urlencode(query)
 
     def send_grandfather_email(self, user, certificates):
