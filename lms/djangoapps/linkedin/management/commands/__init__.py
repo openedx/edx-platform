@@ -60,6 +60,9 @@ class LinkedinAPI(object):
         return query['code'][0]
 
     def access_token_url(self, code):
+        """
+        Construct URL for retreiving access token, given authorization code.
+        """
         config = self.config
         return ("https://www.linkedin.com/uas/oauth2/accessToken"
                 "?grant_type=authorization_code"
@@ -68,6 +71,9 @@ class LinkedinAPI(object):
                     config['CLIENT_SECRET']))
 
     def call_json_api(self, url):
+        """
+        Make an HTTP call to the LinkedIn JSON API.
+        """
         try:
             request = urllib2.Request(url, headers={'x-li-format': 'json'})
             response = urllib2.urlopen(request).read()
@@ -92,12 +98,18 @@ class LinkedinAPI(object):
         return access_token
 
     def require_token(self):
+        """
+        Raise CommandError if user has not yet obtained an access token.
+        """
         if self.token is None:
             raise CommandError(
                 "You must log in to LinkedIn in order to use this script. "
                 "Please use the 'login' command to log in to LinkedIn.")
 
     def batch_url(self, emails):
+        """
+        Construct URL for querying a batch of email addresses.
+        """
         self.require_token()
         queries = ','.join(("email=" + email for email in emails))
         url = "https://api.linkedin.com/v1/people::(%s):(id)" % queries
