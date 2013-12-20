@@ -53,7 +53,7 @@ ADVANCED_COMPONENT_POLICY_KEY = 'advanced_modules'
 
 @require_http_methods(["GET"])
 @login_required
-def subsection_handler(request, tag=None, course_id=None, branch=None, version_guid=None, block=None):
+def subsection_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None):
     """
     The restful handler for subsection-specific requests.
 
@@ -62,7 +62,7 @@ def subsection_handler(request, tag=None, course_id=None, branch=None, version_g
         json: not currently supported
     """
     if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
-        locator = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, block_id=block)
+        locator = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
         try:
             old_location, course, item, lms_link = _get_item_in_course(request, locator)
         except ItemNotFoundError:
@@ -142,7 +142,7 @@ def _load_mixed_class(category):
 
 @require_http_methods(["GET"])
 @login_required
-def unit_handler(request, tag=None, course_id=None, branch=None, version_guid=None, block=None):
+def unit_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None):
     """
     The restful handler for unit-specific requests.
 
@@ -151,7 +151,7 @@ def unit_handler(request, tag=None, course_id=None, branch=None, version_guid=No
         json: not currently supported
     """
     if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
-        locator = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, block_id=block)
+        locator = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
         try:
             old_location, course, item, lms_link = _get_item_in_course(request, locator)
         except ItemNotFoundError:

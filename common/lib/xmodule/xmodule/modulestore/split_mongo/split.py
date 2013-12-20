@@ -3,7 +3,7 @@ Provides full versioning CRUD and representation for collections of xblocks (e.g
 
 Representation:
 * course_index: a dictionary:
-    ** '_id': course_id (e.g., myu.mydept.mycourse.myrun),
+    ** '_id': package_id (e.g., myu.mydept.mycourse.myrun),
     ** 'org': the org's id. Only used for searching not identity,
     ** 'prettyid': a vague to-be-determined field probably more useful to storing searchable tags,
     ** 'edited_by': user_id of user who created the original entry,
@@ -227,7 +227,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         return the CourseDescriptor! It returns the actual db json from
         structures.
 
-        Semantics: if course_id and branch given, then it will get that branch. If
+        Semantics: if package_id and branch given, then it will get that branch. If
         also give a version_guid, it will see if the current head of that branch == that guid. If not
         it raises VersionConflictError (the version now differs from what it was when you got your
         reference)
@@ -239,9 +239,9 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         if not course_locator.is_fully_specified():
             raise InsufficientSpecificationError('Not fully specified: %s' % course_locator)
 
-        if course_locator.course_id is not None and course_locator.branch is not None:
-            # use the course_id
-            index = self.db_connection.get_course_index(course_locator.course_id)
+        if course_locator.package_id is not None and course_locator.branch is not None:
+            # use the package_id
+            index = self.db_connection.get_course_index(course_locator.package_id)
             if index is None:
                 raise ItemNotFoundError(course_locator)
             if course_locator.branch not in index['versions']:
@@ -258,11 +258,11 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         version_guid = course_locator.as_object_id(version_guid)
         entry = self.db_connection.get_structure(version_guid)
 
-        # b/c more than one course can use same structure, the 'course_id' and 'branch' are not intrinsic to structure
+        # b/c more than one course can use same structure, the 'package_id' and 'branch' are not intrinsic to structure
         # and the one assoc'd w/ it by another fetch may not be the one relevant to this fetch; so,
         # add it in the envelope for the structure.
         envelope = {
-            'course_id': course_locator.course_id,
+            'package_id': course_locator.package_id,
             'branch': course_locator.branch,
             'structure': entry,
         }
@@ -300,7 +300,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         result = []
         for entry in course_entries:
             envelope = {
-                'course_id': id_version_map[entry['_id']],
+                'package_id': id_version_map[entry['_id']],
                 'branch': branch,
                 'structure': entry,
             }
@@ -327,7 +327,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         '''
         return self.get_course(location)
 
-    def has_item(self, course_id, block_location):
+    def has_item(self, package_id, block_location):
         """
         Returns True if location exists in its course. Returns false if
         the course or the block w/in the course do not exist for the given version.
@@ -433,13 +433,13 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         return [BlockUsageLocator(url=locator.as_course_locator(), block_id=parent_id)
                 for parent_id in items]
 
-    def get_orphans(self, course_id, detached_categories, branch):
+    def get_orphans(self, package_id, detached_categories, branch):
         """
         Return a dict of all of the orphans in the course.
 
-        :param course_id:
+        :param package_id:
         """
-        course = self._lookup_course(CourseLocator(course_id=course_id, branch=branch))
+        course = self._lookup_course(CourseLocator(package_id=package_id, branch=branch))
         items = set(course['structure']['blocks'].keys())
         items.remove(course['structure']['root'])
         for block_id, block_data in course['structure']['blocks'].iteritems():
@@ -447,7 +447,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             if block_data['category'] in detached_categories:
                 items.discard(block_id)
         return [
-            BlockUsageLocator(course_id=course_id, branch=branch, block_id=block_id)
+            BlockUsageLocator(package_id=package_id, branch=branch, block_id=block_id)
             for block_id in items
         ]
 
@@ -456,7 +456,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         The index records the initial creation of the indexed course and tracks the current version
         heads. This function is primarily for test verification but may serve some
         more general purpose.
-        :param course_locator: must have a course_id set
+        :param course_locator: must have a package_id set
         :return {'org': , 'prettyid': ,
             versions: {'draft': the head draft version id,
                 'published': the head published version id if any,
@@ -465,9 +465,9 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             'edited_on': when the course was originally created
         }
         """
-        if course_locator.course_id is None:
+        if course_locator.package_id is None:
             return None
-        index = self.db_connection.get_course_index(course_locator.course_id)
+        index = self.db_connection.get_course_index(course_locator.package_id)
         return index
 
     # TODO figure out a way to make this info accessible from the course descriptor
@@ -662,7 +662,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             serial += 1
         return category + str(serial)
 
-    def _generate_course_id(self, id_root):
+    def _generate_package_id(self, id_root):
         """
         Generate a somewhat readable course id unique w/in this db using the id_root
         :param course_blocks: the current list of blocks.
@@ -699,7 +699,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         merely the containing course.
 
         raises InsufficientSpecificationError if there is no course locator.
-        raises VersionConflictError if course_id and version_guid given and the current version head != version_guid
+        raises VersionConflictError if package_id and version_guid given and the current version head != version_guid
             and force is not True.
         :param force: fork the structure and don't update the course draftVersion if the above
         :param continue_revision: for multistep transactions, continue revising the given version rather than creating
@@ -724,11 +724,11 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
 
         Rules for course locator:
 
-        * If the course locator specifies a course_id and either it doesn't
+        * If the course locator specifies a package_id and either it doesn't
           specify version_guid or the one it specifies == the current head of the branch,
           it progresses the course to point
           to the new head and sets the active version to point to the new head
-        * If the locator has a course_id but its version_guid != current head, it raises VersionConflictError.
+        * If the locator has a package_id but its version_guid != current head, it raises VersionConflictError.
 
         NOTE: using a version_guid will end up creating a new version of the course. Your new item won't be in
         the course id'd by version_guid but instead in one w/ a new version_guid. Ensure in this case that you get
@@ -805,7 +805,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             course_parent = None
 
         # reconstruct the new_item from the cache
-        return self.get_item(BlockUsageLocator(course_id=course_parent,
+        return self.get_item(BlockUsageLocator(package_id=course_parent,
                                                block_id=new_block_id,
                                                version_guid=new_id))
 
@@ -818,7 +818,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         Create a new entry in the active courses index which points to an existing or new structure. Returns
         the course root of the resulting entry (the location has the course id)
 
-        id_root: allows the caller to specify the course_id. It's a root in that, if it's already taken,
+        id_root: allows the caller to specify the package_id. It's a root in that, if it's already taken,
         this method will append things to the root to make it unique. (defaults to org)
 
         fields: if scope.settings fields provided, will set the fields of the root course object in the
@@ -911,7 +911,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         # create the index entry
         if id_root is None:
             id_root = org
-        new_id = self._generate_course_id(id_root)
+        new_id = self._generate_package_id(id_root)
 
         index_entry = {
             '_id': new_id,
@@ -921,7 +921,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             'edited_on': datetime.datetime.now(UTC),
             'versions': versions_dict}
         self.db_connection.insert_course_index(index_entry)
-        return self.get_course(CourseLocator(course_id=new_id, branch=master_branch))
+        return self.get_course(CourseLocator(package_id=new_id, branch=master_branch))
 
     def update_item(self, descriptor, user_id, force=False):
         """
@@ -930,7 +930,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
 
         raises ItemNotFoundError if the location does not exist.
 
-        Creates a new course version. If the descriptor's location has a course_id, it moves the course head
+        Creates a new course version. If the descriptor's location has a package_id, it moves the course head
         pointer. If the version_guid of the descriptor points to a non-head version and there's been an intervening
         change to this item, it raises a VersionConflictError unless force is True. In the force case, it forks
         the course but leaves the head pointer where it is (this change will not be in the course head).
@@ -1019,7 +1019,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             # fetch and return the new item--fetching is unnecessary but a good qc step
             return self.get_item(
                 BlockUsageLocator(
-                    course_id=xblock.location.course_id,
+                    package_id=xblock.location.package_id,
                     block_id=xblock.location.block_id,
                     branch=xblock.location.branch,
                     version_guid=new_id
@@ -1143,7 +1143,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         """
         # get the destination's index, and source and destination structures.
         source_structure = self._lookup_course(source_course)['structure']
-        index_entry = self.db_connection.get_course_index(destination_course.course_id)
+        index_entry = self.db_connection.get_course_index(destination_course.package_id)
         if index_entry is None:
             # brand new course
             raise ItemNotFoundError(destination_course)
@@ -1207,7 +1207,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         raises ItemNotFoundError if the location does not exist.
         raises ValueError if usage_locator points to the structure root
 
-        Creates a new course version. If the descriptor's location has a course_id, it moves the course head
+        Creates a new course version. If the descriptor's location has a package_id, it moves the course head
         pointer. If the version_guid of the descriptor points to a non-head version and there's been an intervening
         change to this item, it raises a VersionConflictError unless force is True. In the force case, it forks
         the course but leaves the head pointer where it is (this change will not be in the course head).
@@ -1249,12 +1249,12 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         # update the index entry if appropriate
         if index_entry is not None:
             self._update_head(index_entry, usage_locator.branch, new_id)
-            result.course_id = usage_locator.course_id
+            result.package_id = usage_locator.package_id
             result.branch = usage_locator.branch
 
         return result
 
-    def delete_course(self, course_id):
+    def delete_course(self, package_id):
         """
         Remove the given course from the course index.
 
@@ -1262,11 +1262,11 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         with a versions hash to restore the course; however, the edited_on and
         edited_by won't reflect the originals, of course.
 
-        :param course_id: uses course_id rather than locator to emphasize its global effect
+        :param package_id: uses package_id rather than locator to emphasize its global effect
         """
-        index = self.db_connection.get_course_index(course_id)
+        index = self.db_connection.get_course_index(package_id)
         if index is None:
-            raise ItemNotFoundError(course_id)
+            raise ItemNotFoundError(package_id)
         # this is the only real delete in the system. should it do something else?
         self.db_connection.delete_course_index(index['_id'])
 
@@ -1405,7 +1405,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         :param continue_version: if True, assumes this operation requires a head version and will not create a new
         version but instead continue an existing transaction on this version. This flag cannot be True if force is True.
         """
-        if locator.course_id is None or locator.branch is None:
+        if locator.package_id is None or locator.branch is None:
             if continue_version:
                 raise InsufficientSpecificationError(
                     "To continue a version, the locator must point to one ({}).".format(locator)
@@ -1413,7 +1413,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
             else:
                 return None
         else:
-            index_entry = self.db_connection.get_course_index(locator.course_id)
+            index_entry = self.db_connection.get_course_index(locator.package_id)
             is_head = (
                 locator.version_guid is None or
                 index_entry['versions'][locator.branch] == locator.version_guid

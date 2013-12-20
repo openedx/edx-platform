@@ -37,23 +37,21 @@ def get_all_course_role_groupnames(location, role, use_filter=True):
     '''
     location = Locator.to_locator_or_location(location)
 
-    # hack: check for existence of a group name in the legacy LMS format <role>_<course>
-    # if it exists, then use that one, otherwise use a <role>_<course_id> which contains
-    # more information
     groupnames = []
-    try:
-        groupnames.append('{0}_{1}'.format(role, location.course_id))
-    except InvalidLocationError:  # will occur on old locations where location is not of category course
-        pass
     if isinstance(location, Location):
-        # least preferred role_course format
-        groupnames.append('{0}_{1}'.format(role, location.course))
+        try:
+            groupnames.append('{0}_{1}'.format(role, location.course_id))
+        except InvalidLocationError:  # will occur on old locations where location is not of category course
+            pass
         try:
             locator = loc_mapper().translate_location(location.course_id, location, False, False)
-            groupnames.append('{0}_{1}'.format(role, locator.course_id))
+            groupnames.append('{0}_{1}'.format(role, locator.package_id))
         except (InvalidLocationError, ItemNotFoundError):
             pass
+        # least preferred role_course format for legacy reasons
+        groupnames.append('{0}_{1}'.format(role, location.course))
     elif isinstance(location, CourseLocator):
+        groupnames.append('{0}_{1}'.format(role, location.package_id))
         old_location = loc_mapper().translate_locator_to_location(location, get_course=True)
         if old_location:
             # the slashified version of the course_id (myu/mycourse/myrun)

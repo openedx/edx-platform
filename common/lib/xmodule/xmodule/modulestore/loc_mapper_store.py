@@ -51,21 +51,21 @@ class LocMapperStore(object):
         self.cache = cache
 
     # location_map functions
-    def create_map_entry(self, course_location, course_id=None, draft_branch='draft', prod_branch='published',
+    def create_map_entry(self, course_location, package_id=None, draft_branch='draft', prod_branch='published',
                          block_map=None):
         """
-        Add a new entry to map this course_location to the new style CourseLocator.course_id. If course_id is not
-        provided, it creates the default map of using org.course.name from the location (just like course_id) if
+        Add a new entry to map this course_location to the new style CourseLocator.package_id. If package_id is not
+        provided, it creates the default map of using org.course.name from the location if
         the location.category = 'course'; otherwise, it uses org.course.
 
         You can create more than one mapping to the
-        same course_id target. In that case, the reverse translate will be arbitrary (no guarantee of which wins).
+        same package_id target. In that case, the reverse translate will be arbitrary (no guarantee of which wins).
         The use
-        case for more than one mapping is to map both org/course/run and org/course to the same new course_id thus
+        case for more than one mapping is to map both org/course/run and org/course to the same new package_id thus
         making a default for org/course. When querying for just org/course, the translator will prefer any entry
         which does not have a name in the _id; otherwise, it will return an arbitrary match.
 
-        Note: the opposite is not true. That is, it never makes sense to use 2 different CourseLocator.course_id
+        Note: the opposite is not true. That is, it never makes sense to use 2 different CourseLocator.package_id
         keys to index the same old Locator org/course/.. pattern. There's no checking to ensure you don't do this.
 
         NOTE: if there's already an entry w the given course_location, this may either overwrite that entry or
@@ -74,8 +74,8 @@ class LocMapperStore(object):
         :param course_location: a Location preferably whose category is 'course'. Unlike the other
         map methods, this one doesn't take the old-style course_id.  It should be called with
         a course location not a block location; however, if called w/ a non-course Location, it creates
-        a "default" map for the org/course pair to a new course_id.
-        :param course_id: the CourseLocator style course_id
+        a "default" map for the org/course pair to a new package_id.
+        :param package_id: the CourseLocator style package_id
         :param draft_branch: the branch name to assign for drafts. This is hardcoded because old mongo had
         a fixed notion that there was 2 and only 2 versions for modules: draft and production. The old mongo
         did not, however, require that a draft version exist. The new one, however, does require a draft to
@@ -86,11 +86,11 @@ class LocMapperStore(object):
         :param block_map: an optional map to specify preferred names for blocks where the keys are the
         Location block names and the values are the BlockUsageLocator.block_id.
         """
-        if course_id is None:
+        if package_id is None:
             if course_location.category == 'course':
-                course_id = "{0.org}.{0.course}.{0.name}".format(course_location)
+                package_id = "{0.org}.{0.course}.{0.name}".format(course_location)
             else:
-                course_id = "{0.org}.{0.course}".format(course_location)
+                package_id = "{0.org}.{0.course}".format(course_location)
         # very like _interpret_location_id but w/o the _id
         location_id = self._construct_location_son(
             course_location.org, course_location.course, 
@@ -99,12 +99,12 @@ class LocMapperStore(object):
 
         self.location_map.insert({
             '_id': location_id,
-            'course_id': course_id,
+            'course_id': package_id,
             'draft_branch': draft_branch,
             'prod_branch': prod_branch,
             'block_map': block_map or {},
         })
-        return course_id
+        return package_id
 
     def translate_location(self, old_style_course_id, location, published=True, add_entry_if_missing=True):
         """
@@ -174,9 +174,9 @@ class LocMapperStore(object):
             raise InvalidLocationError()
 
         published_usage = BlockUsageLocator(
-            course_id=entry['course_id'], branch=entry['prod_branch'], block_id=block_id)
+            package_id=entry['course_id'], branch=entry['prod_branch'], block_id=block_id)
         draft_usage = BlockUsageLocator(
-            course_id=entry['course_id'], branch=entry['draft_branch'], block_id=block_id)
+            package_id=entry['course_id'], branch=entry['draft_branch'], block_id=block_id)
         if published:
             result = published_usage
         else:
@@ -199,13 +199,13 @@ class LocMapperStore(object):
 
         If there are no matches, it returns None.
 
-        If there's more than one location to locator mapping to the same course_id, it looks for the first
+        If there's more than one location to locator mapping to the same package_id, it looks for the first
         one with a mapping for the block block_id and picks that arbitrary course location.
 
         :param locator: a BlockUsageLocator
         """
         if get_course:
-            cached_value = self._get_course_location_from_cache(locator.course_id)
+            cached_value = self._get_course_location_from_cache(locator.package_id)
         else:
             cached_value = self._get_location_from_cache(locator)
         if cached_value:
@@ -213,7 +213,7 @@ class LocMapperStore(object):
 
         # This does not require that the course exist in any modulestore
         # only that it has a mapping entry.
-        maps = self.location_map.find({'course_id': locator.course_id})
+        maps = self.location_map.find({'course_id': locator.package_id})
         # look for one which maps to this block block_id
         if maps.count() == 0:
             return None
@@ -365,12 +365,12 @@ class LocMapperStore(object):
         """
         return self.cache.get(unicode(locator))
 
-    def _get_course_location_from_cache(self, locator_course_id):
+    def _get_course_location_from_cache(self, locator_package_id):
         """
-        See if the course_id is in the cache. If so, return the mapped location to the
+        See if the package_id is in the cache. If so, return the mapped location to the
         course root.
         """
-        return self.cache.get('courseId+{}'.format(locator_course_id))
+        return self.cache.get('courseId+{}'.format(locator_package_id))
 
     def _cache_location_map_entry(self, old_course_id, location, published_usage, draft_usage):
         """
@@ -380,7 +380,7 @@ class LocMapperStore(object):
         """
         setmany = {}
         if location.category == 'course':
-            setmany['courseId+{}'.format(published_usage.course_id)] = location
+            setmany['courseId+{}'.format(published_usage.package_id)] = location
         setmany[unicode(published_usage)] = location
         setmany[unicode(draft_usage)] = location
         setmany['{}+{}'.format(old_course_id, location.url())] = (published_usage, draft_usage)

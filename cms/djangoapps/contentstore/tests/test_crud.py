@@ -136,13 +136,13 @@ class TemplateTests(unittest.TestCase):
         persistent_factories.ItemFactory.create(display_name='chapter 1',
             parent_location=test_course.location)
 
-        id_locator = CourseLocator(course_id=test_course.location.course_id, branch='draft')
+        id_locator = CourseLocator(package_id=test_course.location.package_id, branch='draft')
         guid_locator = CourseLocator(version_guid=test_course.location.version_guid)
         # verify it can be retireved by id
         self.assertIsInstance(modulestore('split').get_course(id_locator), CourseDescriptor)
         # and by guid
         self.assertIsInstance(modulestore('split').get_course(guid_locator), CourseDescriptor)
-        modulestore('split').delete_course(id_locator.course_id)
+        modulestore('split').delete_course(id_locator.package_id)
         # test can no longer retrieve by id
         self.assertRaises(ItemNotFoundError, modulestore('split').get_course, id_locator)
         # but can by guid
