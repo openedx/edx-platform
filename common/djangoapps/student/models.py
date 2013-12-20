@@ -25,6 +25,7 @@ from django.dispatch import receiver, Signal
 import django.dispatch
 from django.forms import ModelForm, forms
 from django.core.exceptions import ObjectDoesNotExist
+from django.utils.translation import ugettext as _
 
 from course_modes.models import CourseMode
 import lms.lib.comment_client as cc
@@ -196,15 +197,15 @@ class UserProfile(models.Model):
     # ('p_se', 'Doctorate in science or engineering'),
     # ('p_oth', 'Doctorate in another field'),
     LEVEL_OF_EDUCATION_CHOICES = (
-        ('p', 'Doctorate'),
-        ('m', "Master's or professional degree"),
-        ('b', "Bachelor's degree"),
-        ('a', "Associate's degree"),
-        ('hs', "Secondary/high school"),
-        ('jhs', "Junior secondary/junior high/middle school"),
-        ('el', "Elementary/primary school"),
-        ('none', "None"),
-        ('other', "Other")
+        ('p', _('Doctorate')),
+        ('m', _("Master's or professional degree")),
+        ('b', _("Bachelor's degree")),
+        ('a', _("Associate's degree")),
+        ('hs', _("Secondary/high school")),
+        ('jhs', _("Junior secondary/junior high/middle school")),
+        ('el', _("Elementary/primary school")),
+        ('none', _("None")),
+        ('other', _("Other"))
     )
     level_of_education = models.CharField(
         blank=True, null=True, max_length=6, db_index=True,
