@@ -8,6 +8,7 @@ import mock
 from certificates.models import GeneratedCertificate
 from django.contrib.auth.models import User
 from django.core import mail
+from django.utils.timezone import utc
 from django.test import TestCase
 
 from student.models import UserProfile
@@ -24,8 +25,9 @@ class MailusersTests(TestCase):
 
     def setUp(self):
         courses = {
-            'TEST1': mock.Mock(org='TestX', number='1',
-                               start=datetime.datetime(2010, 5, 12, 2, 42)),
+            'TEST1': mock.Mock(
+                org='TestX', number='1',
+                start=datetime.datetime(2010, 5, 12, 2, 42, tzinfo=utc)),
             'TEST2': mock.Mock(org='TestX', number='2'),
             'TEST3': mock.Mock(org='TestX', number='3'),
         }
@@ -153,7 +155,8 @@ class MailusersTests(TestCase):
             mail.outbox[1].to, ['Fred Flintstone <fred@bedrock.gov>'])
 
     def test_certificate_url(self):
-        self.cert1.created_date = datetime.datetime(2010, 8, 15, 0, 0)
+        self.cert1.created_date = datetime.datetime(
+            2010, 8, 15, 0, 0, tzinfo=utc)
         self.cert1.save()
         fut = mailusers.Command().certificate_url
         self.assertEqual(fut(self.cert1),
