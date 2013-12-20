@@ -21,37 +21,34 @@ Runs following commands:
 
 **pre_django**  (Installs requirements and cleans previous python compiled files)
 
-**compile_coffeescript**
+**compile_coffeescript** (Compiles Coffeescript files)
     "--system=" "System to act on e.g. lms, cms"
     "--env=" "Environment settings e.g. aws, dev"
     "--watch" "Run with watch"
     "--debug" "Run with debug"
     "--clobber" "Remove compiled Coffeescript files"
 
-**compile_sass**
+**compile_sass** (Compiles Sass files)
     "--system=" "System to act on e.g. lms, cms"
     "--env=" "Environment settings e.g. aws, dev"
     "--watch" "Run with watch"
     "--debug" "Run with debug"
 
-**compile_xmodule**
+**compile_xmodule** (Compiles Xmodule)
     "--system=" "System to act on e.g. lms, cms"
     "--env=" "Environment settings e.g. aws, dev"
     "--watch" "Run with watch"
     "--debug" "Run with debug"
 
-**compile_assets**
+**compile_assets** (Compiles Coffeescript, Sass, Xmodule and optionally runs collectstatic)
     "--system=" "System to act on e.g. lms, cms"
     "--env=" "Environment settings e.g. aws, dev"
     "--watch" "Run with watch"
     "--debug" "Run with debug"
     "--collectstatic" "Runs collectstatic
 
-
-**pre_django** (installs python rereqs)
-
-
-**fast_lms** (runs lms without running prereqs)
+**lms** (runs lms)
+    "--env=" "Environment settings e.g. aws, dev"
 
 **cms** (runs cms)
     "--env=" "Environment settings e.g. aws, dev"
@@ -68,6 +65,9 @@ Runs following commands:
 
 **run_all_servers** (runs lms and cms)
     "--env=" "Environment settings e.g. aws, dev"
+    "--worker_env=" "Environment settings for celery workers"
+    "--logfile=" "File to log output to"
 
 **run_celery** (runs celery for specified system)
     "--system=" "System to act on e.g. lms, cms"
+    "--env=" "Environment settings e.g. aws, dev"

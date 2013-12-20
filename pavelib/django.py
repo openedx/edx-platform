@@ -3,6 +3,7 @@ from paver.setuputils import setup
 
 import os
 import psutil
+import signal
 from pavelib import prereqs
 
 default_options = {"lms": '8000', "cms": '8001'}
@@ -50,7 +51,17 @@ def fast_lms():
 ])
 def cms(options):
 
-    setattr(options,'system','cms')
+    setattr(options,'system', 'cms')
+    run_server(options)
+
+
+@task
+@cmdopts([
+    ("env=", "e", "Environment settings"),
+])
+def lms(options):
+
+    setattr(options,'system', 'lms')
     run_server(options)
 
 
@@ -109,19 +120,21 @@ def check_settings():
 @task
 @cmdopts([
     ("system=", "s", "System to act on"),
+    ("env=", "e", "Environment settings"),
 ])
 def run_celery():
     """
       runs celery for the specified system
     """
     system = getattr(options, 'system', 'lms')
+    env = getattr(options, 'env', 'dev_with_worker')
 
     kwargs = {'shell': True, 'cwd': None}
 
     p1 = 0
 
     try:
-        p1 = subprocess.Popen('python manage.py %s celery worker --loglevel=INFO --settings=dev_with_worker --pythonpath=. ' % (system), **kwargs)
+        p1 = subprocess.Popen('python manage.py %s celery worker --loglevel=INFO --settings=%s --pythonpath=. ' % (system, env), **kwargs)
 
         input("Enter CTL-C to end")
     except KeyboardInterrupt:
@@ -139,12 +152,20 @@ def run_celery():
 @task
 @cmdopts([
     ("env=", "e", "Environment settings"),
+    ("worker_env=", "w", "Celery Worker Environment settings"),
+    ("logfile=", "l", "File to log output to"),
 ])
 def run_all_servers():
     """
       runs cms, lms and celery workers
     """
     env = getattr(options, 'env', 'dev')
+    worker_env = getattr(options, 'env', 'dev_with_worker')
+    logfile = getattr(options, 'logfile', '')
+
+    if logfile:
+        logfile = " &> " + logfile
+
 
     kwargs = {'shell': True, 'cwd': None}
 
@@ -154,10 +175,10 @@ def run_all_servers():
     p4 = 0
 
     try:
-        p1 = subprocess.Popen('python manage.py lms runserver --traceback --settings=%s' % (env) + ' --pythonpath=. ' + default_options['lms'], **kwargs)
-        p2 = subprocess.Popen('python manage.py cms runserver --traceback --settings=%s' % (env) + ' --pythonpath=. ' + default_options['cms'], **kwargs)
-        p3 = subprocess.Popen('python manage.py lms celery worker --loglevel=INFO --settings=%s_with_worker --pythonpath=. ' % (env), **kwargs)
-        p4 = subprocess.Popen('python manage.py cms celery worker --loglevel=INFO --settings=%s_with_worker --pythonpath=. ' % (env), **kwargs)
+        p1 = subprocess.Popen('python manage.py lms runserver --traceback --settings=%s' % (env) + ' --pythonpath=. %s' % (logfile) + default_options['lms'], **kwargs)
+        p2 = subprocess.Popen('python manage.py cms runserver --traceback --settings=%s' % (env) + ' --pythonpath=. %s' % (logfile) + default_options['cms'], **kwargs)
+        p3 = subprocess.Popen('python manage.py lms celery worker --loglevel=INFO --settings=%s --pythonpath=. %s' % (worker_env, logfile), **kwargs)
+        p4 = subprocess.Popen('python manage.py cms celery worker --loglevel=INFO --settings=%s --pythonpath=. %s' % (worker_env, logfile), **kwargs)
 
         input("Enter to end")
     except:

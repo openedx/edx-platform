@@ -1,3 +1,5 @@
+import sys
+sys.path.append('.')
 from paver.setuputils import setup
 from pavelib import prereqs, assets, django
 
