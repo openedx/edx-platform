@@ -84,7 +84,8 @@ urlpatterns += patterns(
 
 js_info_dict = {
     'domain': 'djangojs',
-    'packages': ('cms',),
+    # No packages needed, we get LOCALE_PATHS anyway.
+    'packages': (),
 }
 
 urlpatterns += patterns('',
