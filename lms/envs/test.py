@@ -238,6 +238,9 @@ FILE_UPLOAD_HANDLERS = (
 ############################ LinkedIn Integration #############################
 INSTALLED_APPS += ('linkedin',)
 LINKEDIN_API = {
+    'CLIENT_ID': '12345',
+    'CLIENT_SECRET': 'SECRET',
+    'REDIRECT_URI': 'http://bar.foo',
     'COMPANY_NAME': 'edX',
     'COMPANY_ID': '0000000',
     'EMAIL_FROM': 'The Team <team@test.foo>',

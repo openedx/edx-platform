@@ -19,7 +19,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         """
         """
-        api = LinkedinAPI()
+        api = LinkedinAPI(self)
         print "Let's log into your LinkedIn account."
         print "Start by visiting this url:"
         print api.authorization_url()

@@ -75,7 +75,7 @@ class Command(BaseCommand):
         """
         Check users.
         """
-        api = LinkedinAPI()
+        api = LinkedinAPI(self)
         recheck = options.pop('recheck', False)
         force = options.pop('force', False)
         if force:

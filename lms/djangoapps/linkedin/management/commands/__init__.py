@@ -16,26 +16,28 @@ class LinkedinAPI(object):
     """
     Encapsulates the LinkedIn API.
     """
-    def __init__(self):
+    def __init__(self, command):
         config = getattr(settings, "LINKEDIN_API", None)
         if not config:
             raise CommandError("LINKEDIN_API is not configured")
         self.config = config
 
         try:
-            self.tokens = LinkedInToken.objects.get()
+            self.token = LinkedInToken.objects.get()
         except LinkedInToken.DoesNotExist:
-            self.tokens = None
+            self.token = None
 
+        self.command = command
         self.state = str(uuid.uuid4())
 
     def http_error(self, error, message):
         """
         Handle an unexpected HTTP response.
         """
-        print "!!ERROR!!"
-        print error
-        print error.read()
+        stderr = self.command.stderr
+        stderr.write("!!ERROR!!")
+        stderr.write(error)
+        stderr.write(error.read())
         raise CommandError(message)
 
     def authorization_url(self):
@@ -57,53 +59,56 @@ class LinkedinAPI(object):
         assert query['state'][0] == self.state, (query['state'][0], self.state)
         return query['code'][0]
 
+    def access_token_url(self, code):
+        config = self.config
+        return ("https://www.linkedin.com/uas/oauth2/accessToken"
+                "?grant_type=authorization_code"
+                "&code=%s&redirect_uri=%s&client_id=%s&client_secret=%s" % (
+                    code, config['REDIRECT_URI'], config['CLIENT_ID'],
+                    config['CLIENT_SECRET']))
+
+    def call_json_api(self, url):
+        try:
+            request = urllib2.Request(url, headers={'x-li-format': 'json'})
+            response = urllib2.urlopen(request).read()
+            return json.loads(response)
+        except urllib2.HTTPError, error:
+            self.http_error(error, "Error calling LinkedIn API")
+
     def get_access_token(self, code):
         """
         Given an authorization code, get an access token.
         """
-        config = self.config
-        url = ("https://www.linkedin.com/uas/oauth2/accessToken"
-               "?grant_type=authorization_code"
-               "&code=%s&redirect_uri=%s&client_id=%s&client_secret=%s" % (
-                   code, config['REDIRECT_URI'], config['CLIENT_ID'],
-                   config['CLIENT_SECRET']))
-
+        response = self.call_json_api(self.access_token_url(code))
+        access_token = response['access_token']
         try:
-            response = urllib2.urlopen(url).read()
-        except urllib2.HTTPError, error:
-            self.http_error(error, "Unable to retrieve access token")
-
-        access_token = json.loads(response)['access_token']
-        try:
-            tokens = LinkedInToken.objects.get()
-            tokens.access_token = access_token
-            tokens.authorization_code = code
+            token = LinkedInToken.objects.get()
+            token.access_token = access_token
         except LinkedInToken.DoesNotExist:
-            tokens = LinkedInToken(access_token=access_token)
-        tokens.save()
-        self.tokens = tokens
+            token = LinkedInToken(access_token=access_token)
+        token.save()
+        self.token = token
 
         return access_token
+
+    def require_token(self):
+        if self.token is None:
+            raise CommandError(
+                "You must log in to LinkedIn in order to use this script. "
+                "Please use the 'login' command to log in to LinkedIn.")
+
+    def batch_url(self, emails):
+        self.require_token()
+        queries = ','.join(("email=" + email for email in emails))
+        url = "https://api.linkedin.com/v1/people::(%s):(id)" % queries
+        url += "?oauth2_access_token=%s" % self.token.access_token
+        return url
 
     def batch(self, emails):
         """
         Get the LinkedIn status for a batch of emails.
         """
-        if self.tokens is None:
-            raise CommandError(
-                "You must log in to LinkedIn in order to use this script. "
-                "Please use the 'login' command to log in to LinkedIn.")
-
         emails = list(emails)  # realize generator since we traverse twice
-        queries = ','.join(("email=" + email for email in emails))
-        url = "https://api.linkedin.com/v1/people::(%s):(id)" % queries
-        url += "?oauth2_access_token=%s" % self.tokens.access_token
-        request = urllib2.Request(url, headers={'x-li-format': 'json'})
-        try:
-            response = urllib2.urlopen(request).read()
-            values = json.loads(response)['values']
-            accounts = set(value['_key'][6:] for value in values)
-            return (email in accounts for email in emails)
-        except urllib2.HTTPError, error:
-            self.http_error(error, "Unable to access People API")
-        return (True for email in emails)
+        response = self.call_json_api(self.batch_url(emails))
+        accounts = set(value['_key'][6:] for value in response['values'])
+        return (email in accounts for email in emails)
