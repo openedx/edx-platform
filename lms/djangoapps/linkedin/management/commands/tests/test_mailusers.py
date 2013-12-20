@@ -31,6 +31,7 @@ class MailusersTests(TestCase):
             'TEST2': mock.Mock(org='TestX', number='2'),
             'TEST3': mock.Mock(org='TestX', number='3'),
         }
+
         def get_course_by_id(id):
             return courses.get(id)
         patcher = mock.patch(MODULE + 'get_course_by_id', get_course_by_id)
@@ -159,7 +160,8 @@ class MailusersTests(TestCase):
             2010, 8, 15, 0, 0, tzinfo=utc)
         self.cert1.save()
         fut = mailusers.Command().certificate_url
-        self.assertEqual(fut(self.cert1),
+        self.assertEqual(
+            fut(self.cert1),
             'http://www.linkedin.com/profile/guided?'
             'pfCertificationName=TestX%2FIntro101&pfAuthorityName=edX&'
             'pfAuthorityId=0000000&'
