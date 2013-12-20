@@ -54,49 +54,47 @@ LOREM = ' Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed ' \
 PAD_FACTOR = 1.3
 
 
-class Dummy (Converter):
+class Dummy(Converter):
     """
     A string converter that generates dummy strings with fake accents
     and lorem ipsum padding.
-    """
 
+    """
     def convert(self, string):
         result = Converter.convert(self, string)
         return self.pad(result)
 
     def inner_convert_string(self, string):
-        for (k,v) in TABLE.items():
+        for k, v in TABLE.items():
             string = string.replace(k, v)
         return string
-
 
     def pad(self, string):
         """add some lorem ipsum text to the end of string"""
         size = len(string)
         if size < 7:
-            target = size*3
+            target = size * 3
         else:
             target = int(size*PAD_FACTOR)
         return string + self.terminate(LOREM[:(target-size)])
 
     def terminate(self, string):
         """replaces the final char of string with #"""
-        return string[:-1]+'#'
+        return string[:-1] + '#'
 
     def init_msgs(self, msgs):
         """
         Make sure the first msg in msgs has a plural property.
         msgs is list of instances of polib.POEntry
         """
-        if len(msgs)==0:
+        if not msgs:
             return
         headers = msgs[0].get_property('msgstr')
-        has_plural = len([header for header in headers if header.find('Plural-Forms:') == 0])>0
+        has_plural = any(header.startswith('Plural-Forms:') for header in headers)
         if not has_plural:
             # Apply declaration for English pluralization rules
             plural = "Plural-Forms: nplurals=2; plural=(n != 1);\\n"
             headers.append(plural)
-        
 
     def convert_msg(self, msg):
         """
@@ -104,19 +102,18 @@ class Dummy (Converter):
         msg is an instance of polib.POEntry
         """
         source = msg.msgid
-        if len(source)==0:
+        if not source:
             # don't translate empty string
             return
 
         plural = msg.msgid_plural
-        if len(plural)>0:
+        if plural:
             # translate singular and plural
             foreign_single = self.convert(source)
             foreign_plural = self.convert(plural)
             plural = {'0': self.final_newline(source, foreign_single),
                       '1': self.final_newline(plural, foreign_plural)}
             msg.msgstr_plural = plural
-            return
         else:
             foreign = self.convert(source)
             msg.msgstr = self.final_newline(source, foreign)
@@ -126,7 +123,7 @@ class Dummy (Converter):
             If last char of original is a newline, make sure translation
             has a newline too.
         """
-        if len(original)>1:
-            if original[-1]=='\n' and translated[-1]!='\n':
-                return translated + '\n'
+        if original:
+            if original[-1] == '\n' and translated[-1] != '\n':
+                translated += '\n'
         return translated

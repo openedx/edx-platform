@@ -17,7 +17,7 @@ class TestConfiguration(TestCase):
         config_filename = os.path.normpath(os.path.join(LOCALE_DIR, 'no_such_file'))
         with self.assertRaises(Exception):
             Configuration(config_filename)
-            
+
     def test_valid_configuration(self):
         """
         Make sure we have a valid configuration file,

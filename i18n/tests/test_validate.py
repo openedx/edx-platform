@@ -4,14 +4,14 @@ from nose.plugins.skip import SkipTest
 
 from config import LOCALE_DIR
 from execute import call
-        
+
 def test_po_files(root=LOCALE_DIR):
     """
     This is a generator. It yields all of the .po files under root, and tests each one.
     """
     log = logging.getLogger(__name__)
     logging.basicConfig(stream=sys.stdout, level=logging.INFO)
-    
+
     for (dirpath, dirnames, filenames) in os.walk(root):
         for name in filenames:
             (base, ext) = os.path.splitext(name)

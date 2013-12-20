@@ -3,7 +3,7 @@ from unittest import TestCase
 
 import converter
 
-class UpcaseConverter (converter.Converter):
+class UpcaseConverter(converter.Converter):
     """
     Converts a string to uppercase. Just used for testing.
     """

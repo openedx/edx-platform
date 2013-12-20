@@ -51,11 +51,7 @@ def new_filename(original_filename, new_locale):
     orig_dir = os.path.dirname(original_filename)
     msgs_dir = os.path.basename(orig_dir)
     orig_file = os.path.basename(original_filename)
-    return os.path.abspath(os.path.join(orig_dir,
-                                        '../..',
-                                        new_locale,
-                                        msgs_dir,
-                                        orig_file))
+    return os.path.abspath(os.path.join(orig_dir, '../..', new_locale, msgs_dir, orig_file))
 
 if __name__ == '__main__':
     # required arg: file
