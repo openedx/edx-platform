@@ -832,7 +832,7 @@ class NumericalResponse(LoncapaResponse):
 
     def __init__(self, *args, **kwargs):
         self.correct_answer = ''
-        self.tolerance = '0'  # Default value
+        self.tolerance = '1e-3'  # Default value
         super(NumericalResponse, self).__init__(*args, **kwargs)
 
     def setup_response(self):
@@ -2360,7 +2360,7 @@ class ChoiceTextResponse(LoncapaResponse):
                 input_name = child.get('name')
                 # Contextualize the tolerance to value.
                 tolerance = contextualize_text(
-                    child.get('tolerance', '0'),
+                    child.get('tolerance', '1e-3'),
                     context
                 )
                 # Add the answer and tolerance information for the current
@@ -2589,7 +2589,7 @@ class ChoiceTextResponse(LoncapaResponse):
 
             correct_ans = params['answer']
             # Set the tolerance to '0' if it was not specified in the xml
-            tolerance = params.get('tolerance', '0')
+            tolerance = params.get('tolerance', '1e-3')
             # Make sure that the staff answer is a valid number
             try:
                 correct_ans = complex(correct_ans)
