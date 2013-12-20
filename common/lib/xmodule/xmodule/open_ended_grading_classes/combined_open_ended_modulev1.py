@@ -1122,7 +1122,7 @@ class CombinedOpenEndedV1Descriptor():
             if len(xml_object.xpath(child)) == 0:
                 # This is a staff_facing_error
                 raise ValueError(
-                    "Combined Open Ended definition must include at least one '{0}' tag. Contact the learning sciences group for assistance. {1}".format(
+                    u"Combined Open Ended definition must include at least one '{0}' tag. Contact the learning sciences group for assistance. {1}".format(
                         child, xml_object))
 
         def parse_task(k):
@@ -1141,7 +1141,7 @@ class CombinedOpenEndedV1Descriptor():
         elt = etree.Element('combinedopenended')
 
         def add_child(k):
-            child_str = '<{tag}>{body}</{tag}>'.format(tag=k, body=self.definition[k])
+            child_str = u'<{tag}>{body}</{tag}>'.format(tag=k, body=self.definition[k])
             child_node = etree.fromstring(child_str)
             elt.append(child_node)
 

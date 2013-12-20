@@ -241,7 +241,7 @@ class ConditionalDescriptor(ConditionalFields, SequenceDescriptor):
         for child in self.get_children():
             location = str(child.location)
             if location in self.show_tag_list:
-                show_str = '<{tag_name} sources="{sources}" />'.format(
+                show_str = u'<{tag_name} sources="{sources}" />'.format(
                     tag_name='show', sources=location)
                 xml_object.append(etree.fromstring(show_str))
             else:
