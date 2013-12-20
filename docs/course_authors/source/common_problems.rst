@@ -48,13 +48,14 @@ Create a Checkbox Problem
 ==========================
 
 #. Under **Add New Component**, click **Problem**.
-#. In the **Select Problem Component Type** screen, click **Blank Common
-   Problem** on the **Common Problem Types** tab.
+#. In the **Select Problem Component Type** screen, click **Checkboxes** on the **Common Problem Types** tab.
 #. In the Problem component that appears, click **Edit**.
 #. In the component editor, replace the default text with the text of your 
    problem. Enter each answer option on its own line.
 #. Select all the answer options, and then click the checkbox button. 
-           
+
+   .. image:: Images/ProbComponent_CheckboxIcon.gif
+   
    When you do this, brackets appear next to each answer choice.
 
 #. Add an **x** between the brackets for the correct answer or answers.
