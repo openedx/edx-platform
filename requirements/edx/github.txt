@@ -21,3 +21,4 @@
 -e git+https://github.com/edx/js-test-tool.git@v0.1.4#egg=js_test_tool
 -e git+https://github.com/edx/django-waffle.git@823a102e48#egg=django-waffle
 -e git+https://github.com/edx/event-tracking.git@f0211d702d#egg=event-tracking
+-e git+https://github.com/edx/bok-choy.git@bc6f1adbe439618162079f1004b2b3db3b6f8916#egg=bok_choy
