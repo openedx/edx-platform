@@ -42,7 +42,7 @@ class Command(BaseCommand):
                  "certificate mail form will be used."),)
 
     def __init__(self):
-        super(BaseCommand, self).__init__()
+        super(Command, self).__init__()
         self.api = LinkedinAPI(self)
 
     def handle(self, *args, **options):
