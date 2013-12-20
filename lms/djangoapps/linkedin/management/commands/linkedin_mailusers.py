@@ -90,7 +90,6 @@ class Command(BaseCommand):
             ('pfCertificationUrl', certificate.download_url),
             ('pfLicenseNo', certificate.course_id),
             ('pfCertStartDate', course.start.strftime('%Y%mI')),
-            ('pfCertFuture', certificate.created_date.strftime('%Y%m')),
             ('_mSplash', '1'),
             ('trk', tracking_code),
             ('startTask', 'CERTIFICATION_NAME'),
