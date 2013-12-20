@@ -5,14 +5,15 @@ import datetime
 import mock
 import pytz
 import StringIO
-import unittest
+
+from django.test import TestCase
 
 from linkedin.management.commands import linkedin_findusers as findusers
 
 MODULE = 'linkedin.management.commands.linkedin_findusers.'
 
 
-class FindUsersTests(unittest.TestCase):
+class FindUsersTests(TestCase):
     """
     Tests for the findusers script.
     """
@@ -175,6 +176,32 @@ class FindUsersTests(unittest.TestCase):
                          [i % 2 == 0 for i in xrange(9)])
         self.assertEqual(users[9].linkedin.has_linkedin_account, None)
         self.assertTrue(command.stderr.getvalue().startswith("WARNING"))
+
+    @mock.patch(MODULE + 'User')
+    @mock.patch(MODULE + 'LinkedinAPI')
+    @mock.patch(MODULE + 'get_call_limits')
+    def test_command_success_recheck_with_force(self, get_call_limits, apicls,
+                                                usercls):
+        """
+        Test recheck all users with API limit.
+        """
+        command = findusers.Command()
+        command.stderr = StringIO.StringIO()
+        fut = command.handle
+        get_call_limits.return_value = (9, 6, 42)
+        api = apicls.return_value
+        users = [mock.Mock(email=i) for i in xrange(10)]
+        for user in users:
+            user.linkedin.has_linkedin_account = None
+        usercls.objects.all.return_value = users
+
+        def dummy_batch(emails):
+            "Mock LinkedIn API."
+            return [email % 2 == 0 for email in emails]
+        api.batch = dummy_batch
+        fut(force=True)
+        self.assertEqual([u.linkedin.has_linkedin_account for u in users],
+                         [i % 2 == 0 for i in xrange(10)])
 
     @mock.patch(MODULE + 'get_call_limits')
     def test_command_no_api_calls(self, get_call_limits):
