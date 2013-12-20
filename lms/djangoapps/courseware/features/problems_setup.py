@@ -14,11 +14,18 @@ from lettuce import world
 import random
 import textwrap
 from common import section_location
-from capa.tests.response_xml_factory import OptionResponseXMLFactory, \
-    ChoiceResponseXMLFactory, MultipleChoiceResponseXMLFactory, \
-    StringResponseXMLFactory, NumericalResponseXMLFactory, \
-    FormulaResponseXMLFactory, CustomResponseXMLFactory, \
-    CodeResponseXMLFactory, ChoiceTextResponseXMLFactory
+from capa.tests.response_xml_factory import (
+    ChoiceResponseXMLFactory,
+    ChoiceTextResponseXMLFactory,
+    CodeResponseXMLFactory,
+    CustomResponseXMLFactory,
+    FormulaResponseXMLFactory,
+    ImageResponseXMLFactory,
+    MultipleChoiceResponseXMLFactory,
+    NumericalResponseXMLFactory,
+    OptionResponseXMLFactory,
+    StringResponseXMLFactory,
+)
 
 
 # Factories from capa.tests.response_xml_factory that we will use
@@ -158,6 +165,16 @@ PROBLEM_DICT = {
         },
         'correct': ['span.correct'],
         'incorrect': ['span.incorrect'],
+        'unanswered': ['span.unanswered']},
+
+    'image': {
+        'factory': ImageResponseXMLFactory(),
+        'kwargs': {
+            'src': '/static/images/mit_dome.jpg',
+            'rectangle': '(50,50)-(100,100)'
+        },
+        'correct': ['span.correct'],
+        'incorrect': ['span.incorrect'],
         'unanswered': ['span.unanswered']}
 }
 
@@ -242,6 +259,27 @@ def answer_problem(course, problem_type, correctness):
             input_value
         )
         world.css_check(inputfield(course, problem_type, choice=choice))
+    elif problem_type == 'image':
+        offset = 25 if correctness == "correct" else -25
+
+        def try_click():
+            image_selector = "#imageinput_i4x-{0.org}-{0.course}-problem-image_2_1".format(section_loc)
+            input_selector = "#input_i4x-{0.org}-{0.course}-problem-image_2_1".format(section_loc)
+
+            world.browser.execute_script('$("body").on("click", function(event) {console.log(event);})')
+
+            initial_input = world.css_value(input_selector)
+            world.wait_for_visible(image_selector)
+            image = world.css_find(image_selector).first
+            (image.action_chains
+                .move_to_element(image._element)
+                .move_by_offset(offset, offset)
+                .click()
+                .perform())
+
+            world.wait_for(lambda _: world.css_value(input_selector) != initial_input)
+
+        world.retry_on_exception(try_click)
 
 
 def problem_has_answer(course, problem_type, answer_class):
