@@ -227,7 +227,7 @@ relatively simple mathematical expressions to answer a question.
 .. image:: Images/NumericalInputExample.gif
 
 Note that students' responses don't have to be exact for these problems. You can 
-specify a margin of error. For more information, see the instructions below.
+specify a margin of error, or tolerance. For more information, see the instructions below.
 
 Responses for numerical input problems can include integers, fractions,
 and constants such as *pi* and *g*. Responses can also include text
@@ -256,8 +256,11 @@ Create a Numerical Input Problem
    
    When you do this, an equal sign appears next to the answer.
         
-#. (Optional) If you want to include a margin of error, add **+-NUMBER** after the answer. For
-   example, if you want to include a 2% margin of error, add **+-2%**.
+#. (Optional) If you want to include a margin of error, or tolerance, add **+-NUMBER** after the answer. 
+   
+   You can add a percentage or number.  
+   For example, if you want to include a 2% tolerance, add **+-2%**. To add
+   a tolerance of 5, add **+-5**.
 
 #. In the component editor, select the text of the explanation, and then click the 
    explanation button to add explanation tags around the text.
