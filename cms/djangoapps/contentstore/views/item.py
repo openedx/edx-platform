@@ -79,7 +79,7 @@ def xblock_handler(request, tag=None, course_id=None, branch=None, version_guid=
               The locator (and old-style id) for the created xblock (minus children) is returned.
     """
     if course_id is not None:
-        locator = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
+        locator = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, block_id=block)
         if not has_access(request.user, locator):
             raise PermissionDenied()
         old_location = loc_mapper().translate_locator_to_location(locator)
@@ -330,7 +330,7 @@ def orphan_handler(request, tag=None, course_id=None, branch=None, version_guid=
     :param request:
     :param course_id: Locator syntax course_id
     """
-    location = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
+    location = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, block_id=block)
     # DHM: when split becomes back-end, move or conditionalize this conversion
     old_location = loc_mapper().translate_locator_to_location(location)
     if request.method == 'GET':

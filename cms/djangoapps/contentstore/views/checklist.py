@@ -36,7 +36,7 @@ def checklists_handler(request, tag=None, course_id=None, branch=None, version_g
     POST or PUT
         json: updates the checked state for items within a particular checklist. checklist_index is required.
     """
-    location = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
+    location = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, block_id=block)
     if not has_access(request.user, location):
         raise PermissionDenied()
 

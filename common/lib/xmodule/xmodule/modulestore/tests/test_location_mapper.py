@@ -75,10 +75,9 @@ class TestLocationMapper(unittest.TestCase):
         self.assertEqual(entry['prod_branch'], 'live')
         self.assertEqual(entry['block_map'], block_map)
 
-
-    def translate_n_check(self, location, old_style_course_id, new_style_course_id, usage_id, branch, add_entry=False):
+    def translate_n_check(self, location, old_style_course_id, new_style_course_id, block_id, branch, add_entry=False):
         """
-        Request translation, check course_id, usage_id, and branch
+        Request translation, check course_id, block_id, and branch
         """
         prob_locator = loc_mapper().translate_location(
             old_style_course_id, 
@@ -87,7 +86,7 @@ class TestLocationMapper(unittest.TestCase):
             add_entry_if_missing=add_entry
         )
         self.assertEqual(prob_locator.course_id, new_style_course_id)
-        self.assertEqual(prob_locator.usage_id, usage_id)
+        self.assertEqual(prob_locator.block_id, block_id)
         self.assertEqual(prob_locator.branch, branch)
 
     def test_translate_location_read_only(self):
@@ -243,7 +242,7 @@ class TestLocationMapper(unittest.TestCase):
         new_style_course_id = '{}.geek_dept.{}.baz_run'.format(org, course)
         prob_locator = BlockUsageLocator(
             course_id=new_style_course_id,
-            usage_id='problem2',
+            block_id='problem2',
             branch='published'
         )
         prob_location = loc_mapper().translate_locator_to_location(prob_locator)
@@ -267,21 +266,21 @@ class TestLocationMapper(unittest.TestCase):
         self.assertEqual(prob_location, Location('i4x', org, course, 'course', 'baz_run', None))
         # explicit branch
         prob_locator = BlockUsageLocator(
-            course_id=prob_locator.course_id, branch='draft', usage_id=prob_locator.usage_id
+            course_id=prob_locator.course_id, branch='draft', block_id=prob_locator.block_id
         )
         prob_location = loc_mapper().translate_locator_to_location(prob_locator)
         # Even though the problem was set as draft, we always return revision=None to work
         # with old mongo/draft modulestores.
         self.assertEqual(prob_location, Location('i4x', org, course, 'problem', 'abc123', None))
         prob_locator = BlockUsageLocator(
-            course_id=new_style_course_id, usage_id='problem2', branch='production'
+            course_id=new_style_course_id, block_id='problem2', branch='production'
         )
         prob_location = loc_mapper().translate_locator_to_location(prob_locator)
         self.assertEqual(prob_location, Location('i4x', org, course, 'problem', 'abc123', None))
         # same for chapter except chapter cannot be draft in old system
         chap_locator = BlockUsageLocator(
             course_id=new_style_course_id,
-            usage_id='chapter48f',
+            block_id='chapter48f',
             branch='production'
         )
         chap_location = loc_mapper().translate_locator_to_location(chap_locator)
@@ -291,7 +290,7 @@ class TestLocationMapper(unittest.TestCase):
         chap_location = loc_mapper().translate_locator_to_location(chap_locator)
         self.assertEqual(chap_location, Location('i4x', org, course, 'chapter', '48f23a10395384929234'))
         chap_locator = BlockUsageLocator(
-            course_id=new_style_course_id, usage_id='chapter48f', branch='production'
+            course_id=new_style_course_id, block_id='chapter48f', branch='production'
         )
         chap_location = loc_mapper().translate_locator_to_location(chap_locator)
         self.assertEqual(chap_location, Location('i4x', org, course, 'chapter', '48f23a10395384929234'))
@@ -300,7 +299,7 @@ class TestLocationMapper(unittest.TestCase):
         prob_locator2 = BlockUsageLocator(
             course_id=new_style_course_id,
             branch='draft',
-            usage_id='problem3'
+            block_id='problem3'
         )
         prob_location = loc_mapper().translate_locator_to_location(prob_locator2)
         self.assertIsNone(prob_location, 'Found non-existent problem')
@@ -325,7 +324,7 @@ class TestLocationMapper(unittest.TestCase):
         prob_locator = BlockUsageLocator(
             course_id=new_style_course_id,
             branch='production',
-            usage_id='problem3'
+            block_id='problem3'
         )
         prob_location = loc_mapper().translate_locator_to_location(prob_locator)
         self.assertEqual(prob_location, Location('i4x', org, course, 'problem', 'abc123'))
@@ -347,6 +346,25 @@ class TestLocationMapper(unittest.TestCase):
         )
         reverted_location = loc_mapper().translate_locator_to_location(prob_locator)
         self.assertEqual(location, reverted_location)
+
+    def test_name_collision(self):
+        """
+        Test dwim translation when the old name was not unique
+        """
+        org = "myorg"
+        course = "another_course"
+        name = "running_again"
+        course_location = Location('i4x', org, course, 'course', name)
+        course_xlate = loc_mapper().translate_location(None, course_location, add_entry_if_missing=True)
+        self.assertEqual(course_location, loc_mapper().translate_locator_to_location(course_xlate))
+        eponymous_block = course_location.replace(category='chapter')
+        chapter_xlate = loc_mapper().translate_location(None, eponymous_block, add_entry_if_missing=True)
+        self.assertEqual(course_location, loc_mapper().translate_locator_to_location(course_xlate))
+        self.assertEqual(eponymous_block, loc_mapper().translate_locator_to_location(chapter_xlate))
+        # and a non-existent one w/o add
+        eponymous_block = course_location.replace(category='problem')
+        with self.assertRaises(ItemNotFoundError):
+            chapter_xlate = loc_mapper().translate_location(None, eponymous_block, add_entry_if_missing=False)
 
 
 #==================================
