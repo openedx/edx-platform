@@ -1,16 +1,16 @@
 #!/usr/bin/env python
 
 """
-Install Selenium page objects for acceptance and end-to-end tests.
+Install bok-choy page objects for acceptance and end-to-end tests.
 """
 
 from setuptools import setup
 
 VERSION = '0.0.1'
-DESCRIPTION = "Selenium page objects for edx-platform"
+DESCRIPTION = "Bok-choy page objects for edx-platform"
 
 setup(
-    name='edx-selenium-pages',
+    name='edxapp-pages',
     version=VERSION,
     author='edX',
     url='http://github.com/edx/edx-platform',
@@ -25,5 +25,5 @@ setup(
         'Topic :: Software Development :: Testing',
         'Topic :: Software Development :: Quality Assurance'
     ],
-    packages=['edxapp_selenium_pages']
+    packages=['edxapp_pages.lms', 'edxapp_pages.studio']
 )
