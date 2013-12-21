@@ -329,7 +329,7 @@ clone_repos
 # Sanity check to make sure the repo layout hasn't changed
 if [[ -d $BASE/edx-platform/scripts ]]; then
     output "Installing system-level dependencies"
-    bash $BASE/edx-platform/scripts/install-system-req.sh
+    #bash $BASE/edx-platform/scripts/install-system-req.sh
 else
     error "It appears that our directory structure has changed and somebody failed to update this script.
             raise an issue on Github and someone should fix it."
@@ -364,7 +364,7 @@ if ! hash bundle 2>/dev/null; then
     output "Installing gem bundler"
     gem install bundler
 fi
-rbenv rehash
+#rbenv rehash
 
 output "Installing ruby packages"
 bundle install --gemfile $BASE/edx-platform/Gemfile
@@ -482,7 +482,7 @@ pip install -r $BASE/edx-platform/requirements/edx/pre.txt
 output "Installing edX requirements"
 # Install prereqs
 cd $BASE/edx-platform
-rake install_prereqs
+bundle exec rake install_prereqs
 
 # Final dependecy
 output "Finishing Touches"
@@ -490,7 +490,7 @@ cd $BASE
 pip install argcomplete
 cd $BASE/edx-platform
 bundle install
-rake install_prereqs
+bundle exec rake install_prereqs
 
 mkdir -p "$BASE/log"
 mkdir -p "$BASE/db"

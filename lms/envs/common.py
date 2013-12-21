@@ -7,7 +7,7 @@ configuration in an environment specific config file and re-calculate those
 values.
 
 We should make a method that calls all these config methods so that you just
-make one call at the end of your site-specific dev file to reset all the
+make one call at the end of your site-specific dev file to reset all th
 dependent variables (like INSTALLED_APPS) for you.
 
 Longer TODO:
@@ -667,15 +667,22 @@ main_vendor_js = [
     'js/vendor/jquery.qtip.min.js',
     'js/vendor/swfobject/swfobject.js',
     'js/vendor/jquery.ba-bbq.min.js',
-    'js/vendor/annotator.min.js',
-    'js/vendor/annotator.store.min.js',
-    'js/vendor/annotator.tags.min.js'
+    #'js/vendor/annotator.min.js',
+    #'js/vendor/annotator.store.min.js',
+    #'js/vendor/annotator.tags.min.js',
+    #'js/vendor/ova/vjs.youtube.js',
+  #'js/vendor/ova/rangeslider.min.js',
+  #'js/vendor/ova/share-annotator.min.js',
+  #'js/vendor/ova/geolocation-annotator.min.js',
+  #'js/vendor/ova/richText-annotator.min.js',
+  #'js/vendor/ova/tinymce.min.js',
+  #'js/vendor/ova/ova.min.js',
 ]
 
 discussion_js = sorted(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/discussion/**/*.js'))
 staff_grading_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/staff_grading/**/*.js'))
 open_ended_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/open_ended/**/*.js'))
-notes_js = ['coffee/src/notes.js']
+notes_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/notes/**/*.coffee'))
 instructor_dash_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/instructor_dashboard/**/*.js'))
 
 PIPELINE_CSS = {
@@ -712,7 +719,7 @@ PIPELINE_CSS = {
             'js/vendor/CodeMirror/codemirror.css',
             'css/vendor/jquery.treeview.css',
             'css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css',
-            'css/vendor/annotator.min.css',
+            #'css/vendor/annotator.min.css',
         ],
         'output_filename': 'css/lms-style-course-vendor.css',
     },

@@ -1,83 +1,71 @@
-<%! from django.utils.translation import ugettext as _ %>
+<div class="annotatable-wrapper">
+	<div class="annotatable-header">
+		% if display_name is not UNDEFINED and display_name is not None:
+			<div class="annotatable-title">${display_name}</div>
+		% endif
+	</div>
+	% if instructions_html is not UNDEFINED and instructions_html is not None:
+	<div class="annotatable-section shaded">
+		<div class="annotatable-section-title">
+		    Instructions
+		    <a class="annotatable-toggle annotatable-toggle-instructions expanded" href="javascript:void(0)">Collapse Instructions</a>
+		</div>
+		<div class="annotatable-section-body annotatable-instructions">
+		    ${instructions_html}
+		</div>
+	</div>
+	% endif
+	<div class="annotatable-section">
+		<div class="annotatable-section-title">
+		    Guided Discussion
+		    <!--<a class="annotatable-toggle annotatable-toggle-annotations" href="javascript:void(0)">Hide Annotations</a>-->
+		</div>
+		<div class="annotatable-section-body annotatable-content">
+		    <div id="textHolder">${content_html}</div>
+			<div id="sourceCitation">Source: ${source}</div>
+			<div id="catchDIV">
+				<div class="annotationListContainer">You do not have any notes.</div>
+			</div>
+		</div>
+	</div>
+</div>
 
-<%namespace name='static' file='static_content.html'/>
-<%inherit file="main.html" />
-<%!
-    from django.core.urlresolvers import reverse
-%>
 
-<%block name="headextra">
-<%static:css group='style-course-vendor'/>
-<%static:css group='style-course'/>
-<%static:js group='courseware'/>
+<script>
 
-<style type="text/css">
-    blockquote {
-        background:#f9f9f9;
-        border-left:10px solid #ccc;
-        margin:1.5em 10px;
-        padding:.5em 10px;
-    }
-    blockquote:before {
-        color:#ccc;
-        content:'“';
-        font-size:4em;
-        line-height:.1em;
-        margin-right:.25em;
-        vertical-align:-.4em;
-    }
-    blockquote p {
-        display:inline;
-    }
-    .notes-wrapper {
-        padding: 32px 40px;
-    }
-    .note {
-        border-bottom: 1px solid #ccc;
-        padding: 0 0 1em 0;
-    }
-    .note .text {
-        margin-bottom: 1em;
-    }
-    .note ul.meta {
-        margin: .5em 0;
-    }
-    .note ul.meta li {
-        font-size: .9em;
-        margin-bottom: .5em;
-    }
-</style>
+	function onClickHideInstructions(){
+		//Reset function if there is more than one event handler
+		$(this).off();
+		$(this).on('click',onClickHideInstructions);
+		var hide = $(this).html()=='Collapse Instructions'?true:false,
+			cls, txt,slideMethod;
+		txt = (hide ? 'Expand' : 'Collapse') + ' Instructions';
+		cls = (hide ? ['expanded', 'collapsed'] : ['collapsed', 'expanded']);
+		slideMethod = (hide ? 'slideUp' : 'slideDown');
+		$(this).text(txt).removeClass(cls[0]).addClass(cls[1]);
+		$(this).parents('.annotatable-section:first').find('.annotatable-instructions')[slideMethod]();
+	}
+	$('.annotatable-toggle-instructions').on('click', onClickHideInstructions);
+	
+	//Grab uri of the course
+    var parts = window.location.href.split("/"), 
+    	uri = '';
+	for (var index = 0; index <= 9; index += 1) uri += parts[index]+"/"; //Get the unit url
+	//Change uri in cms
+	var lms_location = $('.sidebar .preview-button').attr('href');
+	if (typeof lms_location!='undefined'){
+		uri = window.location.protocol;
+		for (var index = 0; index <= 9; index += 1) uri += lms_location.split("/")[index]+"/"; //Get the unit url
+	}
 
-</%block>
-
-<%block name="js_extra">
-  <script type="text/javascript">
-  </script>
-</%block>
-
-<%include file="/courseware/course_navigation.html" args="active_page='notes'" />
-
-<section class="container">
-    <div class="notes-wrapper">
-    	<h1>My Notes</h1>
-    	<div id="notesHolder"></div>
-        <section id="catchDIV">
-        	<div class="annotationListContainer">You do not have any notes.</div>
-        </section>
-    	<script>
-
-    	//Grab uri of the course
-    	var parts = window.location.href.split("/"), 
-    		uri = '';
-		for (var index = 0; index <= 6; index += 1) uri += parts[index]+"/"; //Get the unit url
-        var pagination = 100,
-		is_staff = false,
+	var pagination = 100,
+		is_staff = !('${user.is_staff}'=='False'),
         options = {
         optionsAnnotator: {
             permissions:{
                 user: {
-                    id:"${student.email}", 
-                    name:"${student.username}"
+                    id:"${user.email}", 
+                    name:"${user.username}"
                 },
                 userString: function (user) {
                     if (user && user.name) 
@@ -91,12 +79,17 @@
                 },
                 permissions: {
                         'read':   [],
-                        'update': ["${student.email}"],
-                        'delete': ["${student.email}"],
-                        'admin':  ["${student.email}"]
+                        'update': ["${user.email}"],
+                        'delete': ["${user.email}"],
+                        'admin':  ["${user.email}"]
                 },
                 showViewPermissionsCheckbox: true,
                 showEditPermissionsCheckbox: false,
+                /*groups: {
+                  world: 'group:__world__',
+                  authenticated: 'group:__authenticated__',
+                  consumer: 'group:__consumer__'
+                },*/
                 userAuthorize: function(action, annotation, user) {
                     var token, tokens, _i, _len;
                     if (annotation.permissions) {
@@ -132,10 +125,11 @@
             },
             store: {
                 // The endpoint of the store on your server.
-                prefix: "${storage}",
+                prefix: "${annotation_storage}",
 
                 annotationData: {
                     uri: uri,
+                    citation: "${source}"
                 },
 
                 urls: {
@@ -150,9 +144,17 @@
                 loadFromSearch:{
                     limit:pagination,
                     offset:0,
-                    uri:uri
+                    uri:uri,
+                    media:'text'
+                    //media:'video',
+//                    uri:'http://herx-dev01.chs.harvard.edu/',
+                   // user:"<?php echo Yii::app()->user->id; ?>",
+                    //source:"<?php echo $v->source?>"
                 }
             },
+            highlightTags:{
+                tag: "${tag}",
+            }
         },
         optionsVideoJS: {techOrder: ["html5","flash","youtube"]},
         optionsRS: {},
@@ -174,26 +176,23 @@
 	
 	//remove old instances
     if (Annotator._instances.length !== 0) {
-      $('#notesHolder').annotator("destroy");
+      $('#textHolder').annotator("destroy");
     }
     delete ova;
     //Load the plugin Video/Text Annotation
-    var ova = new OpenVideoAnnotation.Annotator($('#notesHolder'),options);
+    var ova = new OpenVideoAnnotation.Annotator($('#textHolder'),options);
     
     
     //Catch
     var annotator = ova.annotator,
         catchOptions = {
             media:'text',
-            externalLink:true,
+            externalLink:false,
             imageUrlRoot:imgURLRoot,
-            showMediaSelector: true,
+            showMediaSelector: false,
             showPublicPrivate: true,
             pagination:pagination,//Number of Annotations per load in the pagination,
             flags:is_staff
         },
         Catch = new CatchAnnotation($('#catchDIV'),catchOptions);
-        </script>
-    </div>
-</section>
-
+</script>
