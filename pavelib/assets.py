@@ -2,6 +2,7 @@ from paver.easy import *
 from paver.setuputils import setup
 from pavelib import prereqs
 
+import sys
 import json
 import glob
 import os
@@ -41,7 +42,8 @@ try:
     with open(ENV_FILE) as env_file:
         env_data = json.load(env_file)
 except IOError:
-    print("Warning: File env.json not found - some configuration requires this")
+    sys.stderr.write("Warning: File env.json not found - some configuration requires this\n")
+    sys.stderr.flush()
 
 USE_CUSTOM_THEME = False
 
@@ -54,6 +56,19 @@ if env_data:
         THEME_SASS = THEME_ROOT / "static" / "sass"
 
 MINIMAL_DARWIN_NOFILE_LIMIT = 8000
+
+
+def signal_handler(signal, frame):
+    print("Ending...")
+
+
+def kill_process(proc):
+    p1_group = psutil.Process(proc.pid)
+
+    child_pids = p1_group.get_children(recursive=True)
+
+    for child_pid in child_pids:
+        os.kill(child_pid.pid, signal.SIGKILL)
 
 
 def xmodule_cmd(watch=False, debug=False):
@@ -129,7 +144,8 @@ def compile_coffeescript(options):
     try:
         sh('python manage.py %s preprocess_assets --settings=%s --traceback ' % (system, env))
     except:
-        print("Asset preprocessing failed!")
+        sys.stderr.write("asset preprocessing failed")
+        sys.stderr.flush()
         return
 
     kwargs = {'shell': True, 'cwd': None}
@@ -142,21 +158,20 @@ def compile_coffeescript(options):
         if run_watch:
             p1 = subprocess.Popen(coffee_cmd(run_watch, run_debug), **kwargs)
 
-            input("Enter CTL-C to end")
-    except KeyboardInterrupt:
-        print("Compile Coffescript ending")
+            signal.signal(signal.SIGINT, signal_handler)
+            print("Enter CTL-C to end")
+            signal.pause()
+            print("Compile Coffescript ending")
     except:
-        pass
+        sys.stderr.write("Error running watch Coffeescript")
+        sys.stderr.flush()
     finally:
         if run_watch:
             try:
-                p1_group = psutil.Process(p1.pid)
-
-                child_pid = p1_group.get_children(recursive=True)
-
-                for pid in child_pid:
-                    os.kill(pid.pid, signal.SIGKILL)
+                kill_process(p1)
             except KeyboardInterrupt:
+                pass
+            except:
                 pass
 
 
@@ -182,7 +197,8 @@ def compile_xmodule(options):
     try:
         sh('python manage.py %s preprocess_assets --settings=%s --traceback ' % (system, env))
     except:
-        print("asset preprocessing failed!")
+        sys.stderr.write("asset preprocessing failed")
+        sys.stderr.flush()
         return
 
     kwargs = {'shell': True, 'cwd': None}
@@ -195,16 +211,20 @@ def compile_xmodule(options):
         if run_watch:
             p1 = subprocess.Popen(xmodule_cmd(run_watch, run_debug), **kwargs)
 
-            input("Enter CTL-C to end")
-    except KeyboardInterrupt:
-        print("compile_assets ending")
+            signal.signal(signal.SIGINT, signal_handler)
+            print("Enter CTL-C to end")
+            signal.pause()
+            print("Compile Xmodule ending")
     except:
-        pass
+        sys.stderr.write("Error running watch Xmodule")
+        sys.stderr.flush()
     finally:
         if run_watch:
             try:
                 p1.terminate()
             except KeyboardInterrupt:
+                pass
+            except:
                 pass
 
 
@@ -230,7 +250,8 @@ def compile_sass(options):
     try:
         sh('python manage.py %s preprocess_assets --settings=%s --traceback ' % (system, env))
     except:
-        print("asset preprocessing failed!")
+        sys.stderr.write("asset preprocessing failed")
+        sys.stderr.flush()
         return
 
     kwargs = {'shell': True, 'cwd': None}
@@ -243,17 +264,20 @@ def compile_sass(options):
         if run_watch:
             p1 = subprocess.Popen(sass_cmd(run_watch, run_debug), **kwargs)
 
-            input("Enter CTL-C to end")
-    except KeyboardInterrupt:
-        print("compile_sass ending")
+            signal.signal(signal.SIGINT, signal_handler)
+            print("Enter CTL-C to end")
+            signal.pause()
+            print("Compile Sass ending")
     except:
-        pass
-
+        sys.stderr.write("Error running compile Sass")
+        sys.stderr.flush()
     finally:
         if run_watch:
             try:
-                os.kill(p1.pid, signal.SIGKILL)
+                kill_process(p1)
             except KeyboardInterrupt:
+                pass
+            except:
                 pass
 
 
@@ -275,7 +299,8 @@ def collectstatic(options):
     try:
         sh('python manage.py %s preprocess_assets --settings=%s --traceback ' % (system, env))
     except:
-        print("asset preprocessing failed!")
+        sys.stderr.write("asset preprocessing failed")
+        sys.stderr.flush()
         return
 
     try:
@@ -309,7 +334,8 @@ def compile_assets(options):
     try:
         sh('python manage.py %s preprocess_assets --settings=%s --traceback ' % (system, env))
     except:
-        print("asset preprocessing failed!")
+        sys.stderr.write("asset preprocessing failed")
+        sys.stderr.flush()
         return
 
     prereqs.install_prereqs()
@@ -335,23 +361,24 @@ def compile_assets(options):
             p2 = subprocess.Popen(xmodule_cmd(run_watch, run_debug), **kwargs)
             p3 = subprocess.Popen(sass_cmd(run_watch, run_debug), **kwargs)
 
-            input("Enter CTL-C to end")
-    except KeyboardInterrupt:
-        print("compile_assets ending")
+            signal.signal(signal.SIGINT, signal_handler)
+            print("Enter CTL-C to end")
+            signal.pause()
+            print("compile_assets ending")
     except:
-        pass
-
+        sys.stderr.write("Error running compile_assets")
+        sys.stderr.flush()
     finally:
         if run_watch:
             try:
                 p2.terminate()
-                os.kill(p3.pid, signal.SIGKILL)
-
-                p1_group = psutil.Process(p1.pid)
-
-                child_pid = p1_group.get_children(recursive=True)
-
-                for pid in child_pid:
-                    os.kill(pid.pid, signal.SIGKILL)
             except KeyboardInterrupt:
+                pass
+
+            try:
+                kill_process(p3)
+                kill_process(p1)
+            except KeyboardInterrupt:
+                pass
+            except:
                 pass

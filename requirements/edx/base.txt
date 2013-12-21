@@ -52,7 +52,7 @@ Paver==1.2.1
 Pillow==1.7.8
 pip>=1.4
 polib==1.0.3
-psutil==1.1.1
+psutil==1.2.1
 pycrypto>=2.6
 pygments==1.6
 pygraphviz==1.1

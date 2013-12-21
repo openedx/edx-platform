@@ -18,6 +18,10 @@ setup(
 )
 
 
+def signal_handler(signal, frame):
+    print("Ending...")
+
+
 def kill_process(proc):
     p1_group = psutil.Process(proc.pid)
 
@@ -51,7 +55,7 @@ def fast_lms():
 ])
 def cms(options):
 
-    setattr(options,'system', 'cms')
+    setattr(options, 'system', 'cms')
     run_server(options)
 
 
@@ -61,7 +65,7 @@ def cms(options):
 ])
 def lms(options):
 
-    setattr(options,'system', 'lms')
+    setattr(options, 'system', 'lms')
     run_server(options)
 
 
@@ -80,7 +84,8 @@ def run_server(options):
     try:
         sh('python manage.py %s runserver --traceback --settings=%s' % (system, env) + ' --pythonpath=. ' + default_options[system])
     except:
-        print("Failed to runserver")
+        sys.stderr.write("Failed to runserver")
+        sys.stderr.flush()
         return
 
 
@@ -113,7 +118,8 @@ def check_settings():
     try:
         sh(("echo 'import %s.envs.%s'" % (system, env)) + ' | python manage.py %s shell --plain --settings=%s' % (system, env) + ' --pythonpath=. ')
     except:
-        print("Failed to import settings")
+        sys.stderr.write("Failed to import settings")
+        sys.stderr.flush()
         return
 
 
@@ -136,12 +142,13 @@ def run_celery():
     try:
         p1 = subprocess.Popen('python manage.py %s celery worker --loglevel=INFO --settings=%s --pythonpath=. ' % (system, env), **kwargs)
 
-        input("Enter CTL-C to end")
-    except KeyboardInterrupt:
+        signal.signal(signal.SIGINT, signal_handler)
+        print("Enter CTL-C to end")
+        signal.pause()
         print("\nrun_celery ending")
     except:
-        print("Failed to run celery")
-        pass
+        sys.stderr.write("Failed to run celery")
+        sys.stderr.flush()
     finally:
         try:
             kill_process(p1)
@@ -153,7 +160,6 @@ def run_celery():
 @cmdopts([
     ("env=", "e", "Environment settings"),
     ("worker_env=", "w", "Celery Worker Environment settings"),
-    ("logfile=", "l", "File to log output to"),
 ])
 def run_all_servers():
     """
@@ -161,11 +167,6 @@ def run_all_servers():
     """
     env = getattr(options, 'env', 'dev')
     worker_env = getattr(options, 'env', 'dev_with_worker')
-    logfile = getattr(options, 'logfile', '')
-
-    if logfile:
-        logfile = " &> " + logfile
-
 
     kwargs = {'shell': True, 'cwd': None}
 
@@ -175,17 +176,22 @@ def run_all_servers():
     p4 = 0
 
     try:
-        p1 = subprocess.Popen('python manage.py lms runserver --traceback --settings=%s' % (env) + ' --pythonpath=. %s' % (logfile) + default_options['lms'], **kwargs)
-        p2 = subprocess.Popen('python manage.py cms runserver --traceback --settings=%s' % (env) + ' --pythonpath=. %s' % (logfile) + default_options['cms'], **kwargs)
-        p3 = subprocess.Popen('python manage.py lms celery worker --loglevel=INFO --settings=%s --pythonpath=. %s' % (worker_env, logfile), **kwargs)
-        p4 = subprocess.Popen('python manage.py cms celery worker --loglevel=INFO --settings=%s --pythonpath=. %s' % (worker_env, logfile), **kwargs)
+        p1 = subprocess.Popen('python manage.py lms runserver --traceback --settings=%s' % (env) + ' --pythonpath=. ' + default_options['lms'], **kwargs)
+        p2 = subprocess.Popen('python manage.py cms runserver --traceback --settings=%s' % (env) + ' --pythonpath=. ' + default_options['cms'], **kwargs)
+        p3 = subprocess.Popen('python manage.py lms celery worker --loglevel=INFO --settings=%s --pythonpath=. ' % (worker_env), **kwargs)
+        p4 = subprocess.Popen('python manage.py cms celery worker --loglevel=INFO --settings=%s --pythonpath=. ' % (worker_env), **kwargs)
 
-        input("Enter to end")
+        signal.signal(signal.SIGINT, signal_handler)
+        print("Enter CTL-C to end")
+        signal.pause()
     except:
-        print("Failed to runserver")
-        return
+        sys.stderr.write("Failed to run_all_servers")
+        sys.stderr.flush()
     finally:
-        kill_process(p1)
-        kill_process(p2)
-        kill_process(p3)
-        kill_process(p4)
+        try:
+            kill_process(p1)
+            kill_process(p2)
+            kill_process(p3)
+            kill_process(p4)
+        except KeyboardInterrupt:
+            pass
