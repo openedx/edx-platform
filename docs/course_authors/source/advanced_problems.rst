@@ -12,6 +12,9 @@ templates for these problems, but the problems open directly in the
 -  :ref:`Circuit Schematic Builder` In circuit schematic problems, students
    create and modify circuits on an interactive grid and submit
    computer-generated analyses of the circuits for grading.
+-  :ref:`Custom JavaScript Display and Grading` With custom JavaScript display
+   and grading problems, you can incorporate problem types that you've created
+   in HTML into Studio via an IFrame.
 -  :ref:`Write-Your-Own-Grader` Write-your-own-grader problems
    evaluate students' responses using an embedded Python script that you
    create. These problems can be any type.
@@ -19,8 +22,6 @@ templates for these problems, but the problems open directly in the
    or objects to a specific location on an image.
 -  :ref:`Image Mapped Input` Image mapped input problems require students to
    click a specific location on an image.
--  :ref:`JavaScript Input` JavaScript input problems allow you to incorporate
-   problem types that you've created in HTML into Studio via an IFrame.
 -  :ref:`Math Expression Input` Math expression input problems require
    students to enter a mathematical expression as text, such as
    e=m\*c^2.
@@ -58,6 +59,130 @@ Create a Circuit Schematic Builder Problem
 #. In the component editor, replace the example code with your own code.
 #. Click **Save**.
 
+.. _Custom JavaScript Display and Grading:
+
+Custom JavaScript Display and Grading
+-------------------------------------
+
+Custom JavaScript display and grading problems allow you to create your own learning tool
+using HTML and other standard Internet languages and then add the tool directly
+into Studio. When you use this problem type, Studio embeds your tool in an
+inline frame (IFrame) so that your students can interact with it in the LMS. You can grade
+your students' work using JavaScript and some basic Python, and the grading
+is integrated into the edX grading system.
+
+This problem type doesn't appear in the menu of advanced problems in Studio. To
+create a JavaScript input problem type, you'll create a blank advanced problem,
+and then enter your code into the component editor.
+
+.. image:: /Images/JavaScriptInputExample.gif
+
+Create a Custom JavaScript Display and Grading Problem
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+#. Create your JavaScript application, and then upload all files associated with
+   that application to the **Files & Uploads** page.
+#. In the unit where you want to create the problem, click **Problem**
+   under **Add New Component**, and then click the **Advanced** tab.
+#. Click **Custom JavaScript Display and Grading**.
+#. In the component that appears, click **Edit**.
+#. In the component editor, modify the example code according to your problem.
+
+   - If some elements of your problem are located in different places, you need to
+     bypass the same-origin policy (SOP). To do this, change **sop="false"**
+     in line 8 to **sop="true"**. For more information, see
+     `same-origin policy <https://developer.mozilla.org/en-US/docs/Web/JavaScript/Same_origin_policy_for_JavaScript>`_.
+
+#. Click the **Settings** tab.
+#. Set **Maximum Attempts** to a number larger than zero.
+#. Click **Save**.
+
+To re-create the example problem above, follow these steps.
+
+#. Go to :ref:`Appendix F` and use the code samples to create the following files.
+
+   - webGLDemo.html
+   - webGLDemo.js
+   - webGLDemo.css
+   - three.min.js
+
+   **Note** *If you need to bypass the SOP, you'll also create a jschannel.js file.*
+
+#. On the **Files & Uploads** page, upload the files you just created.
+#. Create a new custom JavaScript display and grading problem component.
+#. On the **Settings** tab, set **Maximum Attempts** to a number larger than
+   zero.
+#. In the problem component editor, paste the code below.
+#. Click **Save.**
+
+
+
+JavaScript Input Problem Code
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+::
+
+    <problem display_name="webGLDemo">
+    In the image below, click the cone.
+
+    <script type="loncapa/python">
+    import json
+    def vglcfn(e, ans):
+        '''
+        par is a dictionary containing two keys, "answer" and "state"
+        The value of answer is the JSON string returned by getGrade
+        The value of state is the JSON string returned by getState
+        '''
+        par = json.loads(ans)
+        # We can use either the value of the answer key to grade
+        answer = json.loads(par["answer"])
+        return answer["cylinder"]  and not answer["cube"]
+        # Or we can use the value of the state key
+        '''
+        state = json.loads(par["state"])
+        selectedObjects = state["selectedObjects"]
+        return selectedObjects["cylinder"] and not selectedObjects["cube"]
+        '''
+    </script>
+    <customresponse cfn="vglcfn">
+        <jsinput
+            gradefn="WebGLDemo.getGrade"
+            get_statefn="WebGLDemo.getState"
+            set_statefn="WebGLDemo.setState"
+            width="400"
+            height="400"
+            html_file="/static/webGLDemo.html"
+        />
+    </customresponse>
+    </problem>
+
+
+.. note::    When you create a JavaScript Input problem, keep the following in mind.
+
+             - The webGLDemo.js file defines the three JavaScript functions (**WebGLDemo.getGrade**,
+               **WebGLDemo.getState**, and **WebGLDemo.setState**).
+
+             - The JavaScript input problem code uses **WebGLDemo.getGrade**, **WebGLDemo.getState**,
+               and **WebGLDemo.setState** to grade, save, or restore a problem. These functions must
+               be global in scope.
+
+             - **WebGLDemo.getState** and **WebGLDemo.setState** are optional. You only have to define
+               these functions if you want to conserve the state of the problem.
+
+             - **Width** and **height** represent the dimensions of the IFrame that holds the
+               application.
+
+             - When the problem opens, the cone and the cube are both blue, or "unselected." When
+               you click either shape once, the shape becomes yellow, or "selected." To unselect
+               the shape, click it again. Continue clicking the shape to select and unselect it.
+
+             - The response is graded as correct if the cone is selected (yellow) when the user
+               clicks **Check**.
+
+             - Clicking **Check** or **Save** registers the problem's current state.
+
+
+
 .. _Write-Your-Own-Grader:
 
 Write-Your-Own-Grader ("Custom Python-Evaluated Input")
@@ -85,7 +210,7 @@ To create a write-your-own-grader problem:
 #. Click **Save**.
 
 For more information about write-your-own-grader problems, see `CustomResponse XML and Python
-Script <https://edx.readthedocs.org/en/latest/course_data_formats/custom_response.html>`_. 
+Script <https://edx.readthedocs.org/en/latest/course_data_formats/custom_response.html>`_.
 
 .. _Drag and Drop:
 
@@ -136,119 +261,7 @@ To create a image mapped input problem:
 #. In the component editor, replace the example code with your own code.
 #. Click **Save**.
 
-.. _JavaScript Input:
 
-JavaScript Input
-----------------
-
-The JavaScript Input problem type allows you to create your own learning tool 
-using HTML and other standard Internet languages and then add the tool directly 
-into Studio. When you use this problem type, Studio embeds your tool in an 
-IFrame so that your students can interact with it in the LMS. You can grade
-your students' work using JavaScript and some basic Python, and the grading
-is integrated into the edX grading system.
-
-This problem type doesn't appear in the menu of advanced problems in Studio. To
-create a JavaScript input problem type, you'll create a blank advanced problem,
-and then enter your code into the component editor.
-
-.. image:: /Images/JavaScriptInputExample.gif
-
-Create a JavaScript Input Problem
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-#. Create your JavaScript application, and then upload all files associated with
-   that application to the **Files & Uploads** page.
-#. In the unit where you want to create the problem, click **Problem**
-   under **Add New Component**, and then click the **Advanced** tab.
-#. Click **Blank Advanced Problem**.
-#. In the component that appears, click **Edit**.
-#. Click the **Settings** tab.
-#. Set **Maximum Attempts** to a number larger than zero.
-#. In the component editor, enter your code.
-#. Click **Save**.
-
-To re-create the example problem above, follow these steps.
-
-#. Go to :ref:`Appendix F` and use the code samples to create the following files:
-
-   - webGLDemo.html
-   - webGLDemo.js
-   - webGLDemo.css
-   - three.min.js
-
-#. On the **Files & Uploads** page, upload the four files you just created.
-#. Create a new blank advanced problem component.
-#. On the **Settings** tab, set **Maximum Attempts** to a number larger than 
-   zero.
-#. In the problem component editor, paste the code below.
-#. Click **Save.**
-
-
-
-JavaScript Input Problem Code
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-:: 
-
-    <problem display_name="webGLDemo">
-    In the image below, click the cone.  
-    
-    <script type="loncapa/python">
-    import json
-    def vglcfn(e, ans):
-        '''
-        par is a dictionary containing two keys, "answer" and "state"
-        The value of answer is the JSON string returned by getGrade
-        The value of state is the JSON string returned by getState
-        '''
-        par = json.loads(ans)
-        # We can use either the value of the answer key to grade
-        answer = json.loads(par["answer"])
-        return answer["cylinder"]  and not answer["cube"]
-        # Or we can use the value of the state key
-        '''
-        state = json.loads(par["state"])
-        selectedObjects = state["selectedObjects"]
-        return selectedObjects["cylinder"] and not selectedObjects["cube"]
-        '''
-    </script>
-    <customresponse cfn="vglcfn">
-        <jsinput
-            gradefn="WebGLDemo.getGrade"
-            get_statefn="WebGLDemo.getState"
-            set_statefn="WebGLDemo.setState"
-            width="400"
-            height="400"
-            html_file="/static/webGLDemo.html"
-        />
-    </customresponse>
-    </problem>
-  
-
-.. notes::    When you create a JavaScript Input problem, keep the following in mind.
-
-              - The webGLDemo.js file defines the three JavaScript functions (**WebGLDemo.getGrade**, 
-              **WebGLDemo.getState**, and **WebGLDemo.setState**).
-                
-              - The JavaScript input problem code uses **WebGLDemo.getGrade**, **WebGLDemo.getState**, 
-              and **WebGLDemo.setState** to grade, save, or restore a problem. These functions must 
-              be global in scope. 
-                
-              - **WebGLDemo.getState** and **WebGLDemo.setState** are optional. You only have to define
-              these functions if you want to conserve the state of the problem.
-                
-              - **Width** and **height** represent the dimensions of the IFrame that holds the
-              application.
-                
-              - When the problem opens, the cone and the cube are both blue, or "unselected." When
-              you click either shape once, the shape becomes yellow, or "selected." To unselect
-              the shape, click it again. Continue clicking the shape to select and unselect it.
-                
-              - The response is graded as correct if the cone is selected (yellow) when the user 
-              clicks **Check**.
-                
-              - Clicking **Check** or **Save** registers the problem's current state.
 
 .. _Math Expression Input:
 
@@ -341,5 +354,3 @@ To create a problem with an adaptive hint:
 #. In the component that appears, click **Edit**.
 #. In the component editor, replace the example code with your own code.
 #. Click **Save**.
-
-
