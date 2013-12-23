@@ -13,6 +13,7 @@
 #   limitations under the License.
 
 from django.template import RequestContext
+from util.request import safe_get_host
 requestcontext = None
 
 
@@ -22,4 +23,4 @@ class MakoMiddleware(object):
         global requestcontext
         requestcontext = RequestContext(request)
         requestcontext['is_secure'] = request.is_secure()
-        requestcontext['site'] = request.get_host()
+        requestcontext['site'] = safe_get_host(request)

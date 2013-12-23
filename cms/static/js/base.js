@@ -1,6 +1,6 @@
 require(["domReady", "jquery", "underscore", "gettext", "js/views/feedback_notification", "js/views/feedback_prompt",
-    "js/utils/get_date", "js/utils/module", "jquery.ui", "jquery.leanModal", "jquery.form", "jquery.smoothScroll"],
-    function(domReady, $, _, gettext, NotificationView, PromptView, DateUtils, ModuleUtils) {
+    "js/utils/get_date", "js/utils/module", "js/utils/handle_iframe_binding", "jquery.ui", "jquery.leanModal", "jquery.form", "jquery.smoothScroll"],
+    function(domReady, $, _, gettext, NotificationView, PromptView, DateUtils, ModuleUtils, IframeUtils) {
 
 var $body;
 var $newComponentItem;
@@ -113,6 +113,8 @@ domReady(function() {
     $('.edit-subsection-publish-settings').on('change', '.start-date, .start-time', function() {
         $('.edit-subsection-publish-settings').find('.save-button').show();
     });
+
+    IframeUtils.iframeBinding();
 });
 
 function smoothScrollLink(e) {

@@ -79,7 +79,6 @@ class GraphicalSliderToolModule(GraphicalSliderToolFields, XModule):
             # TODO - where to store them - outside xmodule?
             resource_string(__name__, 'js/src/graphical_slider_tool/gst_main.js'),
             resource_string(__name__, 'js/src/graphical_slider_tool/state.js'),
-            resource_string(__name__, 'js/src/graphical_slider_tool/logme.js'),
             resource_string(__name__, 'js/src/graphical_slider_tool/general_methods.js'),
             resource_string(__name__, 'js/src/graphical_slider_tool/sliders.js'),
             resource_string(__name__, 'js/src/graphical_slider_tool/inputs.js'),

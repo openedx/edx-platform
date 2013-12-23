@@ -1,6 +1,6 @@
 
-define(["backbone", "underscore"], function(Backbone, _) {
-    var AbstractEditor = Backbone.View.extend({
+define(["js/views/baseview", "underscore"], function(BaseView, _) {
+    var AbstractEditor = BaseView.extend({
 
         // Model is MetadataModel
         initialize : function() {

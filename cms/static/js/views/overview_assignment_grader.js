@@ -1,6 +1,6 @@
-define(["backbone", "underscore", "gettext", "js/models/assignment_grade", "js/views/feedback_notification"],
-        function(Backbone, _, gettext, AssignmentGrade, NotificationView) {
-    var OverviewAssignmentGrader = Backbone.View.extend({
+define(["js/views/baseview", "underscore", "gettext", "js/models/assignment_grade", "js/views/feedback_notification"],
+        function(BaseView, _, gettext, AssignmentGrade, NotificationView) {
+    var OverviewAssignmentGrader = BaseView.extend({
         // instantiate w/ { graders : CourseGraderCollection, el : <the gradable-status div> }
         events : {
             "click .menu-toggle" : "showGradeMenu",

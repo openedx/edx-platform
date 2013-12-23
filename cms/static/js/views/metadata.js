@@ -1,12 +1,12 @@
 define(
     [
-        "backbone", "underscore", "js/models/metadata", "js/views/abstract_editor",
+        "js/views/baseview", "underscore", "js/models/metadata", "js/views/abstract_editor",
         "js/views/transcripts/metadata_videolist"
     ],
-function(Backbone, _, MetadataModel, AbstractEditor, VideoList) {
+function(BaseView, _, MetadataModel, AbstractEditor, VideoList) {
     var Metadata = {};
 
-    Metadata.Editor = Backbone.View.extend({
+    Metadata.Editor = BaseView.extend({
 
         // Model is CMS.Models.MetadataCollection,
         initialize : function() {

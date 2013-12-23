@@ -1,6 +1,6 @@
-define(["backbone", "js/views/asset"], function(Backbone, AssetView) {
+define(["js/views/baseview", "js/views/asset"], function(BaseView, AssetView) {
 
-var AssetsView = Backbone.View.extend({
+var AssetsView = BaseView.extend({
     // takes AssetCollection as model
 
     initialize : function() {

@@ -34,7 +34,7 @@ __all__ = ['assets_handler']
 
 @login_required
 @ensure_csrf_cookie
-def assets_handler(request, tag=None, course_id=None, branch=None, version_guid=None, block=None, asset_id=None):
+def assets_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None, asset_id=None):
     """
     The restful handler for assets.
     It allows retrieval of all the assets (as an HTML page), as well as uploading new assets,
@@ -51,7 +51,7 @@ def assets_handler(request, tag=None, course_id=None, branch=None, version_guid=
     DELETE
         json: delete an asset
     """
-    location = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
+    location = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
     if not has_access(request.user, location):
         raise PermissionDenied()
 
@@ -124,7 +124,7 @@ def _upload_asset(request, location):
         modulestore().get_item(old_location)
     except:
         # no return it as a Bad Request response
-        logging.error('Could not find course' + old_location)
+        logging.error("Could not find course: %s", old_location)
         return HttpResponseBadRequest()
 
     # compute a 'filename' which is similar to the location formatting, we're
@@ -214,7 +214,7 @@ def _update_asset(request, location, asset_id):
                 # remove from any caching
                 del_cached_content(thumbnail_content.location)
             except:
-                logging.warning('Could not delete thumbnail: ' + content.thumbnail_location)
+                logging.warning('Could not delete thumbnail: %s', content.thumbnail_location)
 
         # delete the original
         contentstore().delete(content.get_id())

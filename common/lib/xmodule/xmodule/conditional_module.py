@@ -96,7 +96,11 @@ class ConditionalModule(ConditionalFields, XModule):
             xml_value = self.descriptor.xml_attributes.get(xml_attr)
             if xml_value:
                 return xml_value, attr_name
-        raise Exception('Error in conditional module: unknown condition "%s"' % xml_attr)
+        raise Exception(
+            'Error in conditional module: no known conditional found in {!r}'.format(
+                self.descriptor.xml_attributes.keys()
+            )
+        )
 
     @lazy
     def required_modules(self):

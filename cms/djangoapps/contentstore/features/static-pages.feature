@@ -1,4 +1,4 @@
-@shard_3
+@shard_2
 Feature: CMS.Static Pages
     As a course author, I want to be able to add static pages
 

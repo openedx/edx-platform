@@ -5,6 +5,10 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+LMS: Fix answer distribution download for small courses. LMS-922, LMS-811
+
+Blades: Add template for the zooming image in studio. BLD-206.
+
 Blades: Update behavior of start/end time fields. BLD-506.
 
 Blades: Make LTI module not send grade_back_url if has_score=False. BLD-561.

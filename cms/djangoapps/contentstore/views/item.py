@@ -47,7 +47,7 @@ CREATE_IF_NOT_FOUND = ['course_info']
 @require_http_methods(("DELETE", "GET", "PUT", "POST"))
 @login_required
 @expect_json
-def xblock_handler(request, tag=None, course_id=None, branch=None, version_guid=None, block=None):
+def xblock_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None):
     """
     The restful handler for xblock requests.
 
@@ -78,8 +78,8 @@ def xblock_handler(request, tag=None, course_id=None, branch=None, version_guid=
                 :boilerplate: template name for populating fields, optional
               The locator (and old-style id) for the created xblock (minus children) is returned.
     """
-    if course_id is not None:
-        locator = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
+    if package_id is not None:
+        locator = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
         if not has_access(request.user, locator):
             raise PermissionDenied()
         old_location = loc_mapper().translate_locator_to_location(locator)
@@ -117,7 +117,7 @@ def xblock_handler(request, tag=None, course_id=None, branch=None, version_guid=
             delete_all_versions = str_to_bool(request.REQUEST.get('all_versions', 'False'))
 
             return _delete_item_at_location(old_location, delete_children, delete_all_versions)
-        else:  # Since we have a course_id, we are updating an existing xblock.
+        else:  # Since we have a package_id, we are updating an existing xblock.
             return _save_item(
                 request,
                 locator,
@@ -133,7 +133,7 @@ def xblock_handler(request, tag=None, course_id=None, branch=None, version_guid=
         return _create_item(request)
     else:
         return HttpResponseBadRequest(
-            "Only instance creation is supported without a course_id.",
+            "Only instance creation is supported without a package_id.",
             content_type="text/plain"
         )
 
@@ -319,7 +319,7 @@ def _delete_item_at_location(item_location, delete_children=False, delete_all_ve
 # pylint: disable=W0613
 @login_required
 @require_http_methods(("GET", "DELETE"))
-def orphan_handler(request, tag=None, course_id=None, branch=None, version_guid=None, block=None):
+def orphan_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None):
     """
     View for handling orphan related requests. GET gets all of the current orphans.
     DELETE removes all orphans (requires is_staff access)
@@ -328,9 +328,9 @@ def orphan_handler(request, tag=None, course_id=None, branch=None, version_guid=
     from the root via children
 
     :param request:
-    :param course_id: Locator syntax course_id
+    :param package_id: Locator syntax package_id
     """
-    location = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
+    location = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
     # DHM: when split becomes back-end, move or conditionalize this conversion
     old_location = loc_mapper().translate_locator_to_location(location)
     if request.method == 'GET':

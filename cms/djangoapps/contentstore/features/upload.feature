@@ -1,4 +1,4 @@
-@shard_3
+@shard_2
 Feature: CMS.Upload Files
     As a course author, I want to be able to upload files for my students
 

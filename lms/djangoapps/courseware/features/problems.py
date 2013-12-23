@@ -7,60 +7,35 @@ Steps for problem.feature lettuce tests
 
 from lettuce import world, step
 from lettuce.django import django_url
-from common import i_am_registered_for_the_course
+from common import i_am_registered_for_the_course, visit_scenario_item
 from problems_setup import PROBLEM_DICT, answer_problem, problem_has_answer, add_problem_to_course
 from nose.tools import assert_equal
 
 
-@step(u'I am viewing a "([^"]*)" problem with "([^"]*)" attempt')
-def view_problem_with_attempts(step, problem_type, attempts):
+def _view_problem(step, problem_type, problem_settings=None):
     i_am_registered_for_the_course(step, 'model_course')
 
     # Ensure that the course has this problem type
-    add_problem_to_course(world.scenario_dict['COURSE'].number, problem_type, {'max_attempts': attempts})
+    add_problem_to_course(world.scenario_dict['COURSE'].number, problem_type, problem_settings)
 
     # Go to the one section in the factory-created course
     # which should be loaded with the correct problem
-    chapter_name = world.scenario_dict['SECTION'].display_name.replace(" ", "_")
-    section_name = chapter_name
-    url = django_url('/courses/%s/%s/%s/courseware/%s/%s' %
-                    (world.scenario_dict['COURSE'].org, world.scenario_dict['COURSE'].number, world.scenario_dict['COURSE'].display_name.replace(' ', '_'),
-                        chapter_name, section_name,))
-    world.browser.visit(url)
+    visit_scenario_item('SECTION')
+
+
+@step(u'I am viewing a "([^"]*)" problem with "([^"]*)" attempt')
+def view_problem_with_attempts(step, problem_type, attempts):
+    _view_problem(step, problem_type, {'max_attempts': attempts})
 
 
 @step(u'I am viewing a "([^"]*)" that shows the answer "([^"]*)"')
 def view_problem_with_show_answer(step, problem_type, answer):
-    i_am_registered_for_the_course(step, 'model_course')
-
-    # Ensure that the course has this problem type
-    add_problem_to_course('model_course', problem_type, {'showanswer': answer})
-
-    # Go to the one section in the factory-created course
-    # which should be loaded with the correct problem
-    chapter_name = world.scenario_dict['SECTION'].display_name.replace(" ", "_")
-    section_name = chapter_name
-    url = django_url('/courses/%s/%s/%s/courseware/%s/%s' %
-                    (world.scenario_dict['COURSE'].org, world.scenario_dict['COURSE'].number, world.scenario_dict['COURSE'].display_name.replace(' ', '_'),
-                        chapter_name, section_name,))
-    world.browser.visit(url)
+    _view_problem(step, problem_type, {'showanswer': answer})
 
 
 @step(u'I am viewing a "([^"]*)" problem')
 def view_problem(step, problem_type):
-    i_am_registered_for_the_course(step, 'model_course')
-
-    # Ensure that the course has this problem type
-    add_problem_to_course('model_course', problem_type)
-
-    # Go to the one section in the factory-created course
-    # which should be loaded with the correct problem
-    chapter_name = world.scenario_dict['SECTION'].display_name.replace(" ", "_")
-    section_name = chapter_name
-    url = django_url('/courses/%s/%s/%s/courseware/%s/%s' %
-                    (world.scenario_dict['COURSE'].org, world.scenario_dict['COURSE'].number, world.scenario_dict['COURSE'].display_name.replace(' ', '_'),
-                        chapter_name, section_name,))
-    world.browser.visit(url)
+    _view_problem(step, problem_type)
 
 
 @step(u'External graders respond "([^"]*)"')
@@ -97,7 +72,7 @@ def input_problem_answer(_, problem_type, correctness):
     """
     assert(correctness in ['correct', 'incorrect'])
     assert(problem_type in PROBLEM_DICT)
-    answer_problem(problem_type, correctness)
+    answer_problem(world.scenario_dict['COURSE'].number, problem_type, correctness)
 
 
 @step(u'I check a problem')
@@ -123,7 +98,7 @@ def assert_problem_has_answer(step, problem_type, answer_class):
     '''
     assert answer_class in ['correct', 'incorrect', 'blank']
     assert problem_type in PROBLEM_DICT
-    problem_has_answer(problem_type, answer_class)
+    problem_has_answer(world.scenario_dict['COURSE'].number, problem_type, answer_class)
 
 
 @step(u'I reset the problem')

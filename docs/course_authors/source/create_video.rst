@@ -182,7 +182,3 @@ Advanced Options
      - Additional locations where you've posted the video. This field must contain a URL that ends in .mpeg, .mp4, or .ogg.
    * - **YouTube ID, YouTube ID for .75x speed, YouTube ID for 1.25x speed, YouTube ID for 1.5x speed**
      - If you have uploaded separate videos to YouTube for different speeds of your video, enter the YouTube IDs for these videos in these fields.
-
-
-
-ƒf
