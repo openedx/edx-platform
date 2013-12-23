@@ -562,7 +562,7 @@ def instructor_dashboard(request, course_id):
             return [u.username, u.email] + [getattr(p, x, '') for x in profkeys]
 
         datatable['data'] = [getdat(u) for u in enrolled_students]
-        datatable['title'] = _u('Student profile data for course {couse_id}').format(course_id = course_id)
+        datatable['title'] = _u('Student profile data for course {course_id}').format(course_id = course_id)
         return return_csv('profiledata_{course_id}.csv'.format(course_id = course_id), datatable)
 
     elif 'Download CSV of all responses to problem' in action:
