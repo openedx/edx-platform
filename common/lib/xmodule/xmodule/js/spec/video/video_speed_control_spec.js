@@ -57,13 +57,12 @@
       });
 
       describe('when running on touch based device', function() {
-        beforeEach(function() {
-          window.onTouchBasedDevice.andReturn(['iPad']);
-          initialize();
-        });
-
-        it('is not rendered', function() {
+        $.each(['iPad', 'Android'], function(index, device) {
+          it('is not rendered on' + device, function() {
+            window.onTouchBasedDevice.andReturn([device]);
+            initialize();
             expect(state.el.find('div.speeds')).not.toExist();
+          });
         });
       });
 

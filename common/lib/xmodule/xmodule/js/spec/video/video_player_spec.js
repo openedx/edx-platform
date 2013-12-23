@@ -157,14 +157,13 @@
             // JS.
 
             describe('when on a touch based device', function () {
-                beforeEach(function () {
-                    window.onTouchBasedDevice.andReturn(['iPad']);
-                    initialize();
-                });
-
-                it('create video volume control', function () {
-                    expect(videoVolumeControl).toBeUndefined();
-                    expect(state.el.find('div.volume')).not.toExist();
+                $.each(['iPad', 'Android'], function(index, device) {
+                    it('create video volume control on' + device, function() {
+                        window.onTouchBasedDevice.andReturn([device]);
+                        initialize();
+                        expect(videoVolumeControl).toBeUndefined();
+                        expect(state.el.find('div.volume')).not.toExist();
+                    });
                 });
             });
 
@@ -879,10 +878,12 @@
 
         describe('on Touch devices', function () {
             it('`is-touch` class name is added to container', function () {
-                window.onTouchBasedDevice.andReturn(['iPad']);
-                initialize();
+                $.each(['iPad', 'Android', 'iPhone'], function(index, device) {
+                    window.onTouchBasedDevice.andReturn([device]);
+                    initialize();
 
-                expect(state.el).toHaveClass('is-touch');
+                    expect(state.el).toHaveClass('is-touch');
+                });
             });
 
             it('modules are not initialized on iPhone', function () {
@@ -899,11 +900,17 @@
                 });
             });
 
-            it('controls become visible after playing starts on iPad', function () {
-                window.onTouchBasedDevice.andReturn(['iPad']);
-                initialize();
+            $.each(['iPad', 'Android'], function(index, device) {
+              var message = 'controls become visible after playing starts on ' +
+                            device;
+              it(message, function() {
+                var controls;
+                window.onTouchBasedDevice.andReturn([device]);
 
-                var controls = state.el.find('.video-controls');
+                runs(function () {
+                    initialize();
+                    controls = state.el.find('.video-controls');
+                });
 
                 waitsFor(function () {
                     return state.el.hasClass('is-initialized');
@@ -921,7 +928,7 @@
                 runs(function () {
                     expect(controls).not.toHaveClass('is-hidden');
                 });
-
+              });
             });
         });
     });

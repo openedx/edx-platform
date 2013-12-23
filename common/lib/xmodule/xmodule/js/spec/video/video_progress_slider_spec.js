@@ -54,11 +54,12 @@
                     // We can't expect $.fn.slider not to have been called,
                     // because sliders are used in other parts of Video.
                 });
-                it('build the slider on iPad', function() {
-                    window.onTouchBasedDevice.andReturn(['iPad']);
-                    initialize();
-
-                    expect(videoProgressSlider.slider).toBeDefined();
+                $.each(['iPad', 'Android'], function(index, device) {
+                    it('build the slider on ' + device, function() {
+                        window.onTouchBasedDevice.andReturn([device]);
+                        initialize();
+                        expect(videoProgressSlider.slider).toBeDefined();
+                    });
                 });
             });
         });

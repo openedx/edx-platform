@@ -211,6 +211,11 @@
           isTouch: ['iPad']
         },
         {
+          name: 'Android',
+          isShown: true,
+          isTouch: ['Android']
+        },
+        {
           name: 'iPhone',
           isShown: false,
           isTouch: ['iPhone']
@@ -237,38 +242,39 @@
         });
       });
 
-      it('is shown on paused video on iPad in HTML5 player', function () {
-        window.onTouchBasedDevice.andReturn(['iPad']);
-        initialize();
-        var btnPlay = state.el.find('.btn-play');
+      $.each(['iPad', 'Android'], function(index, device) {
+        it('is shown on paused video on '+ device +' in HTML5 player', function () {
+          window.onTouchBasedDevice.andReturn([device]);
+          initialize();
+          var btnPlay = state.el.find('.btn-play');
 
-        videoControl.play();
-        videoControl.pause();
+          videoControl.play();
+          videoControl.pause();
 
-        expect(btnPlay).not.toHaveClass('is-hidden');
+          expect(btnPlay).not.toHaveClass('is-hidden');
+        });
+
+        it('is hidden on playing video on '+ device +' in HTML5 player', function () {
+          window.onTouchBasedDevice.andReturn([device]);
+          initialize();
+          var btnPlay = state.el.find('.btn-play');
+
+          videoControl.play();
+
+          expect(btnPlay).toHaveClass('is-hidden');
+        });
+
+        it('is hidden on paused video on '+ device +' in YouTube player', function () {
+          window.onTouchBasedDevice.andReturn([device]);
+          initializeYouTube();
+          var btnPlay = state.el.find('.btn-play');
+
+          videoControl.play();
+          videoControl.pause();
+
+          expect(btnPlay).toHaveClass('is-hidden');
+        });
       });
-
-      it('is hidden on playing video on iPad in HTML5 player', function () {
-        window.onTouchBasedDevice.andReturn(['iPad']);
-        initialize();
-        var btnPlay = state.el.find('.btn-play');
-
-        videoControl.play();
-
-        expect(btnPlay).toHaveClass('is-hidden');
-      });
-
-      it('is hidden on paused video on iPad in YouTube player', function () {
-        window.onTouchBasedDevice.andReturn(['iPad']);
-        initializeYouTube();
-        var btnPlay = state.el.find('.btn-play');
-
-        videoControl.play();
-        videoControl.pause();
-
-        expect(btnPlay).toHaveClass('is-hidden');
-      });
-
     });
 
     it('show', function () {
