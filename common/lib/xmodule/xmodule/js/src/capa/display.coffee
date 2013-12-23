@@ -405,7 +405,7 @@ class @Problem
     formulaequationinput: (element) ->
       $(element).find('input').on 'input', ->
         $p = $(element).find('p.status')
-        `// Translators: the word Answer here is about answering a problem the student must solve.`
+        `// Translators: the word unanswered here is about answering a problem the student must solve.`
         $p.text gettext("unanswered")
         $p.parent().removeClass().addClass "unanswered"
 
@@ -434,7 +434,7 @@ class @Problem
     textline: (element) ->
       $(element).find('input').on 'input', ->
         $p = $(element).find('p.status')
-        `// Translators: the word Answer here is about answering a problem the student must solve.`
+        `// Translators: the word unanswered here is about answering a problem the student must solve.`
         $p.text gettext("unanswered")
         $p.parent().removeClass().addClass "unanswered"
 
