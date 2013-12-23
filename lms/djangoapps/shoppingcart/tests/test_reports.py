@@ -29,44 +29,36 @@ class ReportTypeTests(ModuleStoreTestCase):
     def setUp(self):
         # Need to make a *lot* of users for this one
         self.user1 = UserFactory.create()
-        self.user1.first_name = "John"
-        self.user1.last_name = "Doe"
-        self.user1.save()
+        self.user1.profile.name = "John Doe"
+        self.user1.profile.save()
 
         self.user2 = UserFactory.create()
-        self.user2.first_name = "Jane"
-        self.user2.last_name = "Deer"
-        self.user2.save()
+        self.user2.profile.name = "Jane Deer"
+        self.user2.profile.save()
 
         self.user3 = UserFactory.create()
-        self.user3.first_name = "Joe"
-        self.user3.last_name = "Miller"
-        self.user3.save()
+        self.user3.profile.name = "Joe Miller"
+        self.user3.profile.save()
 
         self.user4 = UserFactory.create()
-        self.user4.first_name = "Simon"
-        self.user4.last_name = "Blackquill"
-        self.user4.save()
+        self.user4.profile.name = "Simon Blackquill"
+        self.user4.profile.save()
 
         self.user5 = UserFactory.create()
-        self.user5.first_name = "Super"
-        self.user5.last_name = "Mario"
-        self.user5.save()
+        self.user5.profile.name = "Super Mario"
+        self.user5.profile.save()
 
         self.user6 = UserFactory.create()
-        self.user6.first_name = "Princess"
-        self.user6.last_name = "Peach"
-        self.user6.save()
+        self.user6.profile.name = "Princess Peach"
+        self.user6.profile.save()
 
         self.user7 = UserFactory.create()
-        self.user7.first_name = "King"
-        self.user7.last_name = "Bowser"
-        self.user7.save()
+        self.user7.profile.name = "King Bowser"
+        self.user7.profile.save()
 
         self.user8 = UserFactory.create()
-        self.user8.first_name = "Susan"
-        self.user8.last_name = "Smith"
-        self.user8.save()
+        self.user8.profile.name = "Susan Smith"
+        self.user8.profile.save()
 
         # Two are verified, three are audit, one honor
 
@@ -116,16 +108,29 @@ class ReportTypeTests(ModuleStoreTestCase):
         self.cart.purchase(self.user8, self.course_id)
         CourseEnrollment.unenroll(self.user8, self.course_id)
 
-        self.test_time = datetime.datetime.now(pytz.UTC)
+        # We can't modify the values returned by report_row_generator directly, since it's a generator, but
+        # we need the times on CORRECT_CSV and the generated report to match.  So, we extract the times from
+        # the report_row_generator and place them in CORRECT_CSV.
+        self.time_str = {}
+        report = initialize_report("refund_report")
+        refunds = report.report_row_generator(self.now - self.FIVE_MINS, self.now + self.FIVE_MINS)
+        time_index = 0
+        for item in refunds:
+            self.time_str[time_index] = item[2]
+            time_index += 1
+            self.time_str[time_index] = item[3]
+            time_index += 1
         self.CORRECT_REFUND_REPORT_CSV = dedent("""
             Order Number,Customer Name,Date of Original Transaction,Date of Refund,Amount of Refund,Service Fees (if any)
-            3,King Bowser,{time_str},{time_str},40,0
-            4,Susan Smith,{time_str},{time_str},40,0
-            """.format(time_str=str(self.test_time)))
+            3,King Bowser,{time_str0},{time_str1},40,0
+            4,Susan Smith,{time_str2},{time_str3},40,0
+            """.format(time_str0=str(self.time_str[0]), time_str1=str(self.time_str[1]), time_str2=str(self.time_str[2]), time_str3=str(self.time_str[3])))
+
+        self.test_time = datetime.datetime.now(pytz.UTC)
 
         self.CORRECT_CERT_STATUS_CSV = dedent("""
             University,Course,Total Enrolled,Audit Enrollment,Honor Code Enrollment,Verified Enrollment,Gross Revenue,Gross Revenue over the Minimum,Number of Refunds,Dollars Refunded
-            MITx,999 Robot Super Course,6,3,1,2,80.00,0.00,0,0
+            MITx,999 Robot Super Course,6,3,1,2,80.00,0.00,2,80.00
             """.format(time_str=str(self.test_time)))
 
         self.CORRECT_UNI_REVENUE_SHARE_CSV = dedent("""
@@ -133,10 +138,16 @@ class ReportTypeTests(ModuleStoreTestCase):
             MITx,999 Robot Super Course,0,80.00,0.00,2,80.00
             """.format(time_str=str(self.test_time)))
 
-    def test_refund_report_get_report_data(self):
+    def test_refund_report_report_row_generator(self):
         report = initialize_report("refund_report")
-        refunded_certs = report.get_report_data(self.now - self.FIVE_MINS, self.now + self.FIVE_MINS)
-        self.assertEqual(len(refunded_certs), 2)
+        refunded_certs = report.report_row_generator(self.now - self.FIVE_MINS, self.now + self.FIVE_MINS)
+
+        # check that we have the right number
+        num_certs = 0
+        for cert in refunded_certs:
+            num_certs += 1
+        self.assertEqual(num_certs, 2)
+
         self.assertTrue(CertificateItem.objects.get(user=self.user7, course_id=self.course_id))
         self.assertTrue(CertificateItem.objects.get(user=self.user8, course_id=self.course_id))
 
@@ -145,11 +156,6 @@ class ReportTypeTests(ModuleStoreTestCase):
         Tests that a generated purchase report CSV is as we expect
         """
         report = initialize_report("refund_report")
-        for item in report.get_report_data(self.now - self.FIVE_MINS, self.now + self.FIVE_MINS):
-            item.fulfilled_time = self.test_time
-            item.refund_requested_time = self.test_time  # hm do we want to make these different
-            item.save()
-
         csv_file = StringIO.StringIO()
         report.make_report(csv_file, self.now - self.FIVE_MINS, self.now + self.FIVE_MINS)
         csv = csv_file.getvalue()

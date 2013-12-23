@@ -581,9 +581,15 @@ class CourseEnrollment(models.Model):
         )
 
     @classmethod
-    def enrollments_in(cls, course_id):
-        """Return a queryset of CourseEnrollment for every active enrollment in the course."""
-        return cls.objects.filter(course_id=course_id, is_active=True,)
+    def enrollments_in(cls, course_id, mode=None):
+        """
+        Return a queryset of CourseEnrollment for every active enrollment in the course course_id.
+        Returns only CourseEnrollments with the given mode, if a mode is supplied by the caller.
+        """
+        if mode is None:
+            return cls.objects.filter(course_id=course_id, is_active=True,)
+        else:
+            return cls.objects.filter(course_id=course_id, is_active=True, mode=mode)
 
     def activate(self):
         """Makes this `CourseEnrollment` record active. Saves immediately."""

@@ -213,7 +213,7 @@ def csv_report(request):
             return _render_report_form(start_str, end_str, start_letter, end_letter, report_type, date_fmt_error=True)
 
         report = initialize_report(report_type)
-        items = report.get_report_data(start_date, end_date, start_letter, end_letter)
+        items = report.report_row_generator(start_date, end_date, start_letter, end_letter)
 
         # TODO add this back later as a query-est function or something
         try:

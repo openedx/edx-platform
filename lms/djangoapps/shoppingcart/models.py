@@ -205,13 +205,13 @@ class OrderItem(models.Model):
     # this is denormalized, but convenient for SQL queries for reports, etc. user should always be = order.user
     user = models.ForeignKey(User, db_index=True)
     # this is denormalized, but convenient for SQL queries for reports, etc. status should always be = order.status
-    status = models.CharField(max_length=32, default='cart', choices=ORDER_STATUSES)
+    status = models.CharField(max_length=32, default='cart', choices=ORDER_STATUSES, db_index=True)
     qty = models.IntegerField(default=1)
     unit_cost = models.DecimalField(default=0.0, decimal_places=2, max_digits=30)
     line_desc = models.CharField(default="Misc. Item", max_length=1024)
     currency = models.CharField(default="usd", max_length=8)  # lower case ISO currency codes
-    fulfilled_time = models.DateTimeField(null=True)
-    refund_requested_time = models.DateTimeField(null=True)
+    fulfilled_time = models.DateTimeField(null=True, db_index=True)
+    refund_requested_time = models.DateTimeField(null=True, db_index=True)
     service_fee = models.DecimalField(default=0.0, decimal_places=2, max_digits=30)
     # general purpose field, not user-visible.  Used for reporting
     report_comments = models.TextField(default="")
@@ -568,3 +568,8 @@ class CertificateItem(OrderItem):
                  "Please include your order number in your e-mail. "
                  "Please do NOT include your credit card information.").format(
                      billing_email=settings.PAYMENT_SUPPORT_EMAIL)
+
+    @classmethod
+    def verified_certificates_in(cls, course_id, status):
+        """Return a queryset of CertificateItem for every verified enrollment in course_id with the given status."""
+        return CertificateItem.objects.filter(course_id=course_id, mode='verified', status=status)
