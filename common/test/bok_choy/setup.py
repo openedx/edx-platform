@@ -25,5 +25,5 @@ setup(
         'Topic :: Software Development :: Testing',
         'Topic :: Software Development :: Quality Assurance'
     ],
-    packages=['edxapp_pages.lms', 'edxapp_pages.studio']
+    packages=['edxapp_pages', 'edxapp_pages.lms', 'edxapp_pages.studio']
 )
