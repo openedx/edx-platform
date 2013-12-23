@@ -11,10 +11,8 @@ from django.utils.translation import ugettext as _
 from django.conf import settings
 
 from lms.lib.xblock.runtime import LmsModuleSystem
-from mitxmako.shortcuts import render_to_string
-from xmodule.course_module import CourseDescriptor
 from edxmako.shortcuts import render_to_string
-
+from xmodule.course_module import CourseDescriptor
 log = logging.getLogger(__name__)
 
 GRADER_DISPLAY_NAMES = {
