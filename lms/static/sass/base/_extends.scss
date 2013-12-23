@@ -1,3 +1,6 @@
+// LMS - mixins and extends
+// ====================
+
 %faded-hr-divider {
   @include background-image($faded-hr-image-1);
   height: 1px;
@@ -87,7 +90,7 @@
 
 // ====================
 
-// needed utility extend for resetting poor basic <button> elem styling
+// extends - needed utility extend for resetting poor basic <button> elem styling
 %ui-reset-button  {
   border: none !important;
   box-shadow: none !important;
@@ -101,7 +104,7 @@
   }
 }
 
-// removes list styling/spacing when using uls, ols for navigation and less content-centric cases
+// extends - removes list styling/spacing when using uls, ols for navigation and less content-centric cases
 %ui-no-list {
   list-style: none;
   margin: 0;
@@ -111,5 +114,72 @@
   li {
     margin: 0;
     padding: 0;
+  }
+}
+
+// ====================
+
+// extends - basic UI messages
+%x-ui-msg {
+  border-radius: 1px;
+  padding: 20px;
+  margin: 20px 0;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  .msg-title {
+    font-weight: 600;
+    margin-bottom: 15px;
+  }
+
+  .msg-copy {
+
+  }
+}
+
+// message - warning
+%x-ui-msg-warning {
+  @extend %x-ui-msg;
+  border-top: 2px solid $warning-color;
+  background: tint($warning-color,97%);
+
+  .msg-title {
+    color: $warning-color;
+  }
+
+  .msg-copy {
+
+  }
+}
+
+// message - confirm
+%x-ui-msg-confirm {
+  @extend %x-ui-msg;
+  border-top: 2px solid $confirm-color;
+  background: tint($confirm-color,97%);
+
+  .msg-title {
+    color: $confirm-color;
+  }
+
+  .msg-copy {
+
+  }
+}
+
+// message - error
+%x-ui-msg-error {
+  @extend %x-ui-msg;
+  border-top: 2px solid $error-color;
+  background: tint($error-color,97%);
+
+  .msg-title {
+    color: $error-color;
+  }
+
+  .msg-copy {
+
   }
 }

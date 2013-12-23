@@ -56,9 +56,26 @@
         <div class="result-container">
         </div>
     </div>
+    <!-- if a problem allows for more than one attempt, and a student has
+    already submitted an attempt, alert the student that
+    only their highest-scoring attempt will be counted -->
+    % if max_attempts > 1 and student_attempts > 0:
+        <div class="staff-info ui-msg-warning">
+            <h3 class="msg-title">${_("Please Note")}</h3>
+            <div class="msg-copy">
+                <p>${_("If you have submitted more than one response, only "
+                "your highest scoring response will be counted toward your "
+                "final grade and only that response's score will appear on "
+                "your progress page.")}</p>
+            </div>
+        </div>
+    % endif
     % if is_staff:
-        <div class="staff-info">
-            ${_("Staff Warning: Please note that if you submit a duplicate of text that has already been submitted for grading, it will not show up in the staff grading view.  It will be given the same grade that the original received automatically, and will be returned within 30 minutes if the original is already graded, or when the original is graded if not.")}
+        <div class="staff-info ui-msg-warning">
+            <h3 class="msg-title">${_("Staff Warning")}</h3>
+            <div class="msg-copy">
+                <p>${_("Please note that if you submit a duplicate of text that has already been submitted for grading, it will not show up in the staff grading view.  It will be given the same grade that the original received automatically, and will be returned within 30 minutes if the original is already graded, or when the original is graded if not.")}</p>
+            </div>
         </div>
     % endif
 </section>
