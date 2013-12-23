@@ -40,7 +40,7 @@ def request_course_creator(request):
 @login_required
 @ensure_csrf_cookie
 @require_http_methods(("GET", "POST", "PUT", "DELETE"))
-def course_team_handler(request, tag=None, course_id=None, branch=None, version_guid=None, block=None, email=None):
+def course_team_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None, email=None):
     """
     The restful handler for course team users.
 
@@ -52,7 +52,7 @@ def course_team_handler(request, tag=None, course_id=None, branch=None, version_
     DELETE:
         json: remove a particular course team member from the course team (email is required).
     """
-    location = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, block_id=block)
+    location = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
     if not has_access(request.user, location):
         raise PermissionDenied()
 

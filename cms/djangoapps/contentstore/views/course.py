@@ -60,12 +60,12 @@ __all__ = ['course_info_handler', 'course_handler', 'course_info_update_handler'
            'textbooks_list_handler', 'textbooks_detail_handler']
 
 
-def _get_locator_and_course(course_id, branch, version_guid, block_id, user, depth=0):
+def _get_locator_and_course(package_id, branch, version_guid, block_id, user, depth=0):
     """
     Internal method used to calculate and return the locator and course module
     for the view functions in this file.
     """
-    locator = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, block_id=block_id)
+    locator = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block_id)
     if not has_access(user, locator):
         raise PermissionDenied()
     course_location = loc_mapper().translate_locator_to_location(locator)
@@ -75,7 +75,7 @@ def _get_locator_and_course(course_id, branch, version_guid, block_id, user, dep
 
 # pylint: disable=unused-argument
 @login_required
-def course_handler(request, tag=None, course_id=None, branch=None, version_guid=None, block=None):
+def course_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None):
     """
     The restful handler for course specific requests.
     It provides the course tree with the necessary information for identifying and labeling the parts. The root
@@ -93,7 +93,7 @@ def course_handler(request, tag=None, course_id=None, branch=None, version_guid=
         index entry.
     PUT
         json: update this course (index entry not xblock) such as repointing head, changing display name, org,
-        course_id, prettyid. Return same json as above.
+        package_id, prettyid. Return same json as above.
     DELETE
         json: delete this branch from this course (leaving off /branch/draft would imply delete the course)
     """
@@ -104,7 +104,7 @@ def course_handler(request, tag=None, course_id=None, branch=None, version_guid=
             return create_new_course(request)
         elif not has_access(
             request.user,
-            BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, block_id=block)
+            BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
         ):
             raise PermissionDenied()
         elif request.method == 'PUT':
@@ -114,10 +114,10 @@ def course_handler(request, tag=None, course_id=None, branch=None, version_guid=
         else:
             return HttpResponseBadRequest()
     elif request.method == 'GET':  # assume html
-        if course_id is None:
+        if package_id is None:
             return course_listing(request)
         else:
-            return course_index(request, course_id, branch, version_guid, block)
+            return course_index(request, package_id, branch, version_guid, block)
     else:
         return HttpResponseNotFound()
 
@@ -157,9 +157,7 @@ def course_listing(request):
             course.display_name,
             # note, couldn't get django reverse to work; so, wrote workaround
             course_loc.url_reverse('course/', ''),
-            get_lms_link_for_item(
-                course.location
-            ),
+            get_lms_link_for_item(course.location),
             course.display_org_with_default,
             course.display_number_with_default,
             course.location.name
@@ -175,14 +173,14 @@ def course_listing(request):
 
 @login_required
 @ensure_csrf_cookie
-def course_index(request, course_id, branch, version_guid, block):
+def course_index(request, package_id, branch, version_guid, block):
     """
     Display an editable course overview.
 
     org, course, name: Attributes of the Location for the item to edit
     """
     locator, course = _get_locator_and_course(
-        course_id, branch, version_guid, block, request.user, depth=3
+        package_id, branch, version_guid, block, request.user, depth=3
     )
     lms_link = get_lms_link_for_item(course.location)
     sections = course.get_children()
@@ -315,13 +313,13 @@ def create_new_course(request):
 @login_required
 @ensure_csrf_cookie
 @require_http_methods(["GET"])
-def course_info_handler(request, tag=None, course_id=None, branch=None, version_guid=None, block=None):
+def course_info_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None):
     """
     GET
         html: return html for editing the course info handouts and updates.
     """
     __, course_module = _get_locator_and_course(
-        course_id, branch, version_guid, block, request.user
+        package_id, branch, version_guid, block, request.user
     )
     if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
         handouts_old_location = course_module.location.replace(category='course_info', name='handouts')
@@ -352,7 +350,7 @@ def course_info_handler(request, tag=None, course_id=None, branch=None, version_
 @ensure_csrf_cookie
 @require_http_methods(("GET", "POST", "PUT", "DELETE"))
 @expect_json
-def course_info_update_handler(request, tag=None, course_id=None, branch=None, version_guid=None, block=None,
+def course_info_update_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None,
                                provided_id=None):
     """
     restful CRUD operations on course_info updates.
@@ -366,7 +364,7 @@ def course_info_update_handler(request, tag=None, course_id=None, branch=None, v
     """
     if 'application/json' not in request.META.get('HTTP_ACCEPT', 'application/json'):
         return HttpResponseBadRequest("Only supports json requests")
-    updates_locator = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, block_id=block)
+    updates_locator = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
     updates_location = loc_mapper().translate_locator_to_location(updates_locator)
     if provided_id == '':
         provided_id = None
@@ -400,7 +398,7 @@ def course_info_update_handler(request, tag=None, course_id=None, branch=None, v
 @ensure_csrf_cookie
 @require_http_methods(("GET", "PUT", "POST"))
 @expect_json
-def settings_handler(request, tag=None, course_id=None, branch=None, version_guid=None, block=None):
+def settings_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None):
     """
     Course settings for dates and about pages
     GET
@@ -410,7 +408,7 @@ def settings_handler(request, tag=None, course_id=None, branch=None, version_gui
         json: update the Course and About xblocks through the CourseDetails model
     """
     locator, course_module = _get_locator_and_course(
-        course_id, branch, version_guid, block, request.user
+        package_id, branch, version_guid, block, request.user
     )
     if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
         upload_asset_url = locator.url_reverse('assets/')
@@ -444,7 +442,7 @@ def settings_handler(request, tag=None, course_id=None, branch=None, version_gui
 @ensure_csrf_cookie
 @require_http_methods(("GET", "POST", "PUT", "DELETE"))
 @expect_json
-def grading_handler(request, tag=None, course_id=None, branch=None, version_guid=None, block=None, grader_index=None):
+def grading_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None, grader_index=None):
     """
     Course Grading policy configuration
     GET
@@ -456,7 +454,7 @@ def grading_handler(request, tag=None, course_id=None, branch=None, version_guid
         json w/ grader_index: create or update the specific grader (create if index out of range)
     """
     locator, course_module = _get_locator_and_course(
-        course_id, branch, version_guid, block, request.user
+        package_id, branch, version_guid, block, request.user
     )
 
     if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
@@ -550,7 +548,7 @@ def _config_course_advanced_components(request, course_module):
 @ensure_csrf_cookie
 @require_http_methods(("GET", "POST", "PUT"))
 @expect_json
-def advanced_settings_handler(request, course_id=None, branch=None, version_guid=None, block=None, tag=None):
+def advanced_settings_handler(request, package_id=None, branch=None, version_guid=None, block=None, tag=None):
     """
     Course settings configuration
     GET
@@ -562,7 +560,7 @@ def advanced_settings_handler(request, course_id=None, branch=None, version_guid
             of keys whose values to unset: i.e., revert to default
     """
     locator, course_module = _get_locator_and_course(
-        course_id, branch, version_guid, block, request.user
+        package_id, branch, version_guid, block, request.user
     )
     if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
 
@@ -652,7 +650,7 @@ def assign_textbook_id(textbook, used_ids=()):
 @require_http_methods(("GET", "POST", "PUT"))
 @login_required
 @ensure_csrf_cookie
-def textbooks_list_handler(request, tag=None, course_id=None, branch=None, version_guid=None, block=None):
+def textbooks_list_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None):
     """
     A RESTful handler for textbook collections.
 
@@ -665,7 +663,7 @@ def textbooks_list_handler(request, tag=None, course_id=None, branch=None, versi
         json: overwrite all textbooks in the course with the given list
     """
     locator, course = _get_locator_and_course(
-        course_id, branch, version_guid, block, request.user
+        package_id, branch, version_guid, block, request.user
     )
     store = get_modulestore(course.location)
 
@@ -729,7 +727,7 @@ def textbooks_list_handler(request, tag=None, course_id=None, branch=None, versi
 @login_required
 @ensure_csrf_cookie
 @require_http_methods(("GET", "POST", "PUT", "DELETE"))
-def textbooks_detail_handler(request, tid, tag=None, course_id=None, branch=None, version_guid=None, block=None):
+def textbooks_detail_handler(request, tid, tag=None, package_id=None, branch=None, version_guid=None, block=None):
     """
     JSON API endpoint for manipulating a textbook via its internal ID.
     Used by the Backbone application.
@@ -742,7 +740,7 @@ def textbooks_detail_handler(request, tid, tag=None, course_id=None, branch=None
         json: remove textbook
     """
     __, course = _get_locator_and_course(
-        course_id, branch, version_guid, block, request.user
+        package_id, branch, version_guid, block, request.user
     )
     store = get_modulestore(course.location)
     matching_id = [tb for tb in course.pdf_textbooks

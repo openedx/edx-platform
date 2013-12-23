@@ -50,7 +50,7 @@ CONTENT_RE = re.compile(r"(?P<start>\d{1,11})-(?P<stop>\d{1,11})/(?P<end>\d{1,11
 @login_required
 @ensure_csrf_cookie
 @require_http_methods(("GET", "POST", "PUT"))
-def import_handler(request, tag=None, course_id=None, branch=None, version_guid=None, block=None):
+def import_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None):
     """
     The restful handler for importing a course.
 
@@ -60,7 +60,7 @@ def import_handler(request, tag=None, course_id=None, branch=None, version_guid=
     POST or PUT
         json: import a course via the .tar.gz file specified in request.FILES
     """
-    location = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, block_id=block)
+    location = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
     if not has_access(request.user, location):
         raise PermissionDenied()
 
@@ -148,7 +148,7 @@ def import_handler(request, tag=None, course_id=None, branch=None, version_guid=
 
                 # Use sessions to keep info about import progress
                 session_status = request.session.setdefault("import_status", {})
-                key = location.course_id + filename
+                key = location.package_id + filename
                 session_status[key] = 1
                 request.session.modified = True
 
@@ -261,7 +261,7 @@ def import_handler(request, tag=None, course_id=None, branch=None, version_guid=
 @require_GET
 @ensure_csrf_cookie
 @login_required
-def import_status_handler(request, tag=None, course_id=None, branch=None, version_guid=None, block=None, filename=None):
+def import_status_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None, filename=None):
     """
     Returns an integer corresponding to the status of a file import. These are:
 
@@ -271,13 +271,13 @@ def import_status_handler(request, tag=None, course_id=None, branch=None, versio
         3 : Importing to mongo
 
     """
-    location = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, block_id=block)
+    location = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
     if not has_access(request.user, location):
         raise PermissionDenied()
 
     try:
         session_status = request.session["import_status"]
-        status = session_status[location.course_id + filename]
+        status = session_status[location.package_id + filename]
     except KeyError:
         status = 0
 
@@ -287,7 +287,7 @@ def import_status_handler(request, tag=None, course_id=None, branch=None, versio
 @ensure_csrf_cookie
 @login_required
 @require_http_methods(("GET",))
-def export_handler(request, tag=None, course_id=None, branch=None, version_guid=None, block=None):
+def export_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None):
     """
     The restful handler for exporting a course.
 
@@ -302,7 +302,7 @@ def export_handler(request, tag=None, course_id=None, branch=None, version_guid=
     If the tar.gz file has been requested but the export operation fails, an HTML page will be returned
     which describes the error.
     """
-    location = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, block_id=block)
+    location = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
     if not has_access(request.user, location):
         raise PermissionDenied()
 

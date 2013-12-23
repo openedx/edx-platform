@@ -26,7 +26,7 @@ __all__ = ['checklists_handler']
 @require_http_methods(("GET", "POST", "PUT"))
 @login_required
 @ensure_csrf_cookie
-def checklists_handler(request, tag=None, course_id=None, branch=None, version_guid=None, block=None, checklist_index=None):
+def checklists_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None, checklist_index=None):
     """
     The restful handler for checklists.
 
@@ -36,7 +36,7 @@ def checklists_handler(request, tag=None, course_id=None, branch=None, version_g
     POST or PUT
         json: updates the checked state for items within a particular checklist. checklist_index is required.
     """
-    location = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, block_id=block)
+    location = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
     if not has_access(request.user, location):
         raise PermissionDenied()
 

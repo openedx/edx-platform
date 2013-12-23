@@ -90,7 +90,7 @@ class TestCourseAccess(ModuleStoreTestCase):
         # first check the groupname for the course creator.
         self.assertTrue(
             self.user.groups.filter(
-                name="{}_{}".format(INSTRUCTOR_ROLE_NAME, self.course_locator.course_id)
+                name="{}_{}".format(INSTRUCTOR_ROLE_NAME, self.course_locator.package_id)
             ).exists(),
             "Didn't add creator as instructor."
         )

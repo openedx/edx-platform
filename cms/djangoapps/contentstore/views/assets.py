@@ -34,7 +34,7 @@ __all__ = ['assets_handler']
 
 @login_required
 @ensure_csrf_cookie
-def assets_handler(request, tag=None, course_id=None, branch=None, version_guid=None, block=None, asset_id=None):
+def assets_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None, asset_id=None):
     """
     The restful handler for assets.
     It allows retrieval of all the assets (as an HTML page), as well as uploading new assets,
@@ -51,7 +51,7 @@ def assets_handler(request, tag=None, course_id=None, branch=None, version_guid=
     DELETE
         json: delete an asset
     """
-    location = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, block_id=block)
+    location = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
     if not has_access(request.user, location):
         raise PermissionDenied()
 
