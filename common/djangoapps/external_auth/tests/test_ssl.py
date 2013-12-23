@@ -90,15 +90,10 @@ class SSLClientTest(TestCase):
             User.objects.get(email=self.USER_EMAIL)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'cms.urls', 'Test only valid in cms')
-    @unittest.skip
     def test_ssl_login_with_signup_cms(self):
         """
         Validate that an SSL login creates an eamap user and
         redirects them to the signup page on CMS.
-
-        This currently is failing and should be resolved to passing at
-        some point.  using skip here instead of expectFailure because
-        of an issue with nose.
         """
         self.client.get(
             reverse('contentstore.views.login_page'),
@@ -135,21 +130,19 @@ class SSLClientTest(TestCase):
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'cms.urls', 'Test only valid in cms')
     @override_settings(FEATURES=FEATURES_WITH_SSL_AUTH_IMMEDIATE_SIGNUP)
-    @unittest.skip
     def test_ssl_login_without_signup_cms(self):
         """
         Test IMMEDIATE_SIGNUP feature flag and ensure the user account is
-        automatically created on CMS.
-
-        This currently is failing and should be resolved to passing at
-        some point.  using skip here instead of expectFailure because
-        of an issue with nose.
+        automatically created on CMS, and that we are redirected
+        to courses.
         """
 
-        self.client.get(
+        response = self.client.get(
             reverse('contentstore.views.login_page'),
             SSL_CLIENT_S_DN=self.AUTH_DN.format(self.USER_NAME, self.USER_EMAIL)
         )
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/course', response['location'])
 
         # Assert our user exists in both eamap and Users, and that we are logged in
         try:
@@ -191,6 +184,25 @@ class SSLClientTest(TestCase):
         self.assertIn(reverse('dashboard'), response['location'])
         self.assertIn('_auth_user_id', self.client.session)
 
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'cms.urls', 'Test only valid in cms')
+    @override_settings(FEATURES=FEATURES_WITH_SSL_AUTH_IMMEDIATE_SIGNUP)
+    def test_cms_registration_page_bypass(self):
+        """
+        This tests to make sure when immediate signup is on that
+        the user doesn't get presented with the registration page.
+        """
+        # Expect a NotImplementError from course page as we don't have anything else built
+        with self.assertRaisesRegexp(NotImplementedError, 'coming soon'):
+            self.client.get(
+                reverse('signup'), follow=True,
+                SSL_CLIENT_S_DN=self.AUTH_DN.format(self.USER_NAME, self.USER_EMAIL))
+        # assert that we are logged in
+        self.assertIn('_auth_user_id', self.client.session)
+
+        # Now that we are logged in, make sure we don't see the registration page
+        with self.assertRaisesRegexp(NotImplementedError, 'coming soon'):
+            self.client.get(reverse('signup'), follow=True)
+
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     @override_settings(FEATURES=FEATURES_WITH_SSL_AUTH_IMMEDIATE_SIGNUP)
     def test_signin_page_bypass(self):
@@ -211,6 +223,7 @@ class SSLClientTest(TestCase):
             SSL_CLIENT_S_DN=self.AUTH_DN.format(self.USER_NAME, self.USER_EMAIL))
         self.assertIn(reverse('dashboard'), response['location'])
         self.assertIn('_auth_user_id', self.client.session)
+
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     @override_settings(FEATURES=FEATURES_WITH_SSL_AUTH_IMMEDIATE_SIGNUP)
