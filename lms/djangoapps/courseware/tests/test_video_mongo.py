@@ -47,7 +47,7 @@ class TestVideoYouTube(TestVideo):
     METADATA = {}
 
     def test_video_constructor(self):
-        """Make sure that all parameters extracted correclty from xml"""
+        """Make sure that all parameters extracted correctly from xml"""
         context = self.item_module.render('student_view').content
 
         sources = {
@@ -70,7 +70,7 @@ class TestVideoYouTube(TestVideo):
             'youtube_streams': _create_youtube_string(self.item_module),
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', False),
             'yt_test_timeout': 1500,
-            'yt_test_url': 'https://gdata.youtube.com/feeds/api/videos/'
+            'yt_test_url': 'https://gdata.youtube.com/feeds/api/videos/',
         }
 
         self.assertEqual(
@@ -81,11 +81,11 @@ class TestVideoYouTube(TestVideo):
 
 class TestVideoNonYouTube(TestVideo):
     """Integration tests: web client + mongo."""
-
     DATA = """
         <video show_captions="true"
         display_name="A Name"
         sub="a_sub_file.srt.sjson"
+        download_video="true"
         start_time="01:00:03" end_time="01:00:10"
         >
             <source src="example.mp4"/>
@@ -96,7 +96,6 @@ class TestVideoNonYouTube(TestVideo):
         'data': DATA
     }
     METADATA = {}
-
     def test_video_constructor(self):
         """Make sure that if the 'youtube' attribute is omitted in XML, then
             the template generates an empty string for the YouTube streams.
@@ -123,13 +122,393 @@ class TestVideoNonYouTube(TestVideo):
             'youtube_streams': '1.00:OEoXaMPEzfM',
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', True),
             'yt_test_timeout': 1500,
-            'yt_test_url': 'https://gdata.youtube.com/feeds/api/videos/'
+            'yt_test_url': 'https://gdata.youtube.com/feeds/api/videos/',
         }
 
         self.assertEqual(
             context,
             self.item_module.xmodule_runtime.render_template('video.html', expected_context)
         )
+
+
+class TestGetHtmlMethod(BaseTestXmodule):
+    '''
+    Make sure that `get_html` works correctly.
+    '''
+    CATEGORY = "video"
+    DATA = SOURCE_XML
+    METADATA = {}
+
+    def setUp(self):
+        self.setup_course();
+
+    def test_get_html_track(self):
+        SOURCE_XML = """
+            <video show_captions="true"
+            display_name="A Name"
+                sub="{sub}" download_track="{download_track}"
+            start_time="01:00:03" end_time="01:00:10"
+            >
+                <source src="example.mp4"/>
+                <source src="example.webm"/>
+                {track}
+            </video>
+        """
+
+        cases = [
+            {
+                'download_track': u'true',
+                'track': u'<track src="http://www.example.com/track"/>',
+                'sub': u'a_sub_file.srt.sjson',
+                'expected_track_url': u'http://www.example.com/track',
+            },
+            {
+                'download_track': u'true',
+                'track': u'',
+                'sub': u'a_sub_file.srt.sjson',
+                'expected_track_url': u'a_sub_file.srt.sjson',
+            },
+            {
+                'download_track': u'true',
+                'track': u'',
+                'sub': u'',
+                'expected_track_url': None
+            },
+            {
+                'download_track': u'false',
+                'track': u'<track src="http://www.example.com/track"/>',
+                'sub': u'a_sub_file.srt.sjson',
+                'expected_track_url': None,
+            },
+        ]
+
+        expected_context = {
+            'data_dir': getattr(self, 'data_dir', None),
+            'caption_asset_path': '/static/subs/',
+            'show_captions': 'true',
+            'display_name': u'A Name',
+            'end': 3610.0,
+            'id': None,
+            'sources': {
+                u'mp4': u'example.mp4',
+                u'webm': u'example.webm'
+            },
+            'start': 3603.0,
+            'sub': u'a_sub_file.srt.sjson',
+            'track': '',
+            'youtube_streams': '1.00:OEoXaMPEzfM',
+            'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', True),
+            'yt_test_timeout': 1500,
+            'yt_test_url': 'https://gdata.youtube.com/feeds/api/videos/',
+        }
+
+        for data in cases:
+            DATA = SOURCE_XML.format(
+                download_track=data['download_track'],
+                track=data['track'],
+                sub=data['sub']
+            )
+
+            self.initialize_module(data=DATA)
+            track_url = self.item_descriptor.xmodule_runtime.handler_url(self.item_module, 'download_transcript')
+
+            expected_context.update({
+                'track': track_url if data['expected_track_url'] == u'a_sub_file.srt.sjson' else data['expected_track_url'],
+                'sub': data['sub'],
+                'id': self.item_module.location.html_id(),
+            })
+
+            context = self.item_module.render('student_view').content
+            self.assertEqual(
+                context,
+                self.item_module.xmodule_runtime.render_template('video.html', expected_context)
+            )
+
+    def test_get_html_source(self):
+        SOURCE_XML = """
+            <video show_captions="true"
+            display_name="A Name"
+            sub="a_sub_file.srt.sjson" source="{source}"
+            download_video="{download_video}"
+            start_time="01:00:03" end_time="01:00:10"
+            >
+                {sources}
+            </video>
+        """
+        cases = [
+            # self.download_video == True
+            {
+                'download_video': 'true',
+                'source': 'example_source.mp4',
+                'sources': """
+                    <source src="example.mp4"/>
+                    <source src="example.webm"/>
+                """,
+                'result': {
+                    'main': u'example_source.mp4',
+                    u'mp4': u'example.mp4',
+                    u'webm': u'example.webm',
+                },
+            },
+            {
+                'download_video': 'true',
+                'source': '',
+                'sources': """
+                    <source src="example.mp4"/>
+                    <source src="example.webm"/>
+                """,
+                'result': {
+                    'main': u'example.mp4',
+                    u'mp4': u'example.mp4',
+                    u'webm': u'example.webm',
+                },
+            },
+            {
+                'download_video': 'true',
+                'source': '',
+                'sources': [],
+                'result': {},
+            },
+
+            # self.download_video == False
+            {
+                'download_video': 'false',
+                'source': 'example_source.mp4',
+                'sources': """
+                    <source src="example.mp4"/>
+                    <source src="example.webm"/>
+                """,
+                'result': {
+                    u'mp4': u'example.mp4',
+                    u'webm': u'example.webm',
+                },
+            },
+        ]
+
+        expected_context = {
+            'data_dir': getattr(self, 'data_dir', None),
+            'caption_asset_path': '/static/subs/',
+            'show_captions': 'true',
+            'display_name': u'A Name',
+            'end': 3610.0,
+            'id': None,
+            'sources': None,
+            'start': 3603.0,
+            'sub': u'a_sub_file.srt.sjson',
+            'track': None,
+            'youtube_streams': '1.00:OEoXaMPEzfM',
+            'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', True),
+            'yt_test_timeout': 1500,
+            'yt_test_url': 'https://gdata.youtube.com/feeds/api/videos/',
+        }
+
+        for data in cases:
+            DATA = SOURCE_XML.format(
+                download_video=data['download_video'],
+                source=data['source'],
+                sources=data['sources']
+            )
+            self.initialize_module(data=DATA)
+
+            expected_context.update({
+                'sources': data['result'],
+                'id': self.item_module.location.html_id(),
+            })
+
+            context = self.item_module.render('student_view').content
+
+            self.assertEqual(
+                context,
+                self.item_module.xmodule_runtime.render_template('video.html', expected_context)
+            )
+
+
+class TestVideoDescriptorInitialization(BaseTestXmodule):
+    """
+    Make sure that module initialization works correctly.
+    """
+    CATEGORY = "video"
+    DATA = SOURCE_XML
+    METADATA = {}
+
+    def setUp(self):
+        self.setup_course();
+
+    def test_source_not_in_html5sources(self):
+        metadata = {
+            'source': 'http://example.org/video.mp4',
+            'html5_sources': ['http://youtu.be/OEoXaMPEzfM.mp4'],
+        }
+
+        self.initialize_module(metadata=metadata)
+        fields = self.item_descriptor.editable_metadata_fields
+
+        self.assertIn('source', fields)
+        self.assertEqual(self.item_module.source, 'http://example.org/video.mp4')
+        self.assertTrue(self.item_module.download_video)
+        self.assertTrue(self.item_module.source_visible)
+
+    def test_source_in_html5sources(self):
+        metadata = {
+            'source': 'http://example.org/video.mp4',
+            'html5_sources': ['http://example.org/video.mp4'],
+        }
+
+        self.initialize_module(metadata=metadata)
+        fields = self.item_descriptor.editable_metadata_fields
+
+        self.assertNotIn('source', fields)
+        self.assertTrue(self.item_module.download_video)
+        self.assertFalse(self.item_module.source_visible)
+
+    @patch('xmodule.x_module.XModuleDescriptor.editable_metadata_fields', new_callable=PropertyMock)
+    def test_download_video_is_explicitly_set(self, mock_editable_fields):
+        mock_editable_fields.return_value = {
+            'download_video': {
+                'default_value': False,
+                'explicitly_set': True,
+                'display_name': 'Video Download Allowed',
+                'help': 'Show a link beneath the video to allow students to download the video.',
+                'type': 'Boolean',
+                'value': False,
+                'field_name': 'download_video',
+                'options': [
+                    {'display_name': "True", "value": True},
+                    {'display_name': "False", "value": False}
+                ],
+            },
+            'html5_sources': {
+                'default_value': [],
+                'explicitly_set': False,
+                'display_name': 'Video Sources',
+                'help': 'A list of filenames to be used with HTML5 video.',
+                'type': 'List',
+                'value': [u'http://youtu.be/OEoXaMPEzfM.mp4'],
+                'field_name': 'html5_sources',
+                'options': [],
+            },
+            'source': {
+                'default_value': '',
+                'explicitly_set': False,
+                'display_name': 'Download Video',
+                'help': 'The external URL to download the video.',
+                'type': 'Generic',
+                'value': u'http://example.org/video.mp4',
+                'field_name': 'source',
+                'options': [],
+            },
+            'track': {
+                'default_value': '',
+                'explicitly_set': False,
+                'display_name': 'Download Transcript',
+                'help': 'The external URL to download the timed transcript track.',
+                'type': 'Generic',
+                'value': u'',
+                'field_name': 'track',
+                'options': [],
+            },
+        }
+        metadata = {
+            'track': '',
+            'source': 'http://example.org/video.mp4',
+            'html5_sources': ['http://youtu.be/OEoXaMPEzfM.mp4'],
+        }
+
+        self.initialize_module(metadata=metadata)
+        fields = self.item_descriptor.editable_metadata_fields
+
+        self.assertIn('source', fields)
+        self.assertFalse(self.item_module.download_video)
+        self.assertTrue(self.item_module.source_visible)
+
+    def test_source_is_empty(self):
+        metadata = {
+            'source': '',
+            'html5_sources': ['http://youtu.be/OEoXaMPEzfM.mp4'],
+        }
+
+        self.initialize_module(metadata=metadata)
+        fields = self.item_descriptor.editable_metadata_fields
+
+        self.assertNotIn('source', fields)
+        self.assertFalse(self.item_module.download_video)
+
+    def test_track_is_not_empty(self):
+        metatdata = {
+            'track': 'http://example.org/track',
+        }
+
+        self.initialize_module(metadata=metatdata)
+        fields = self.item_descriptor.editable_metadata_fields
+
+        self.assertIn('track', fields)
+        self.assertEqual(self.item_module.track, 'http://example.org/track')
+        self.assertTrue(self.item_module.download_track)
+        self.assertTrue(self.item_module.track_visible)
+
+    @patch('xmodule.x_module.XModuleDescriptor.editable_metadata_fields', new_callable=PropertyMock)
+    def test_download_track_is_explicitly_set(self, mock_editable_fields):
+        mock_editable_fields.return_value = {
+            'download_track': {
+                'default_value': False,
+                'explicitly_set': True,
+                'display_name': 'Transcript Download Allowed',
+                'help': 'Show a link beneath the video to allow students to download the transcript.',
+                'type': 'Boolean',
+                'value': False,
+                'field_name': 'download_track',
+                'options': [
+                    {'display_name': "True", "value": True},
+                    {'display_name': "False", "value": False}
+                ],
+            },
+            'track': {
+                'default_value': '',
+                'explicitly_set': False,
+                'display_name': 'Download Transcript',
+                'help': 'The external URL to download the timed transcript track.',
+                'type': 'Generic',
+                'value': u'http://example.org/track',
+                'field_name': 'track',
+                'options': [],
+            },
+            'source': {
+                'default_value': '',
+                'explicitly_set': False,
+                'display_name': 'Download Video',
+                'help': 'The external URL to download the video.',
+                'type': 'Generic',
+                'value': u'',
+                'field_name': 'source',
+                'options': [],
+            },
+        }
+        metadata = {
+            'source': '',
+            'track': 'http://example.org/track',
+        }
+
+        self.initialize_module(metadata=metadata)
+        fields = self.item_descriptor.editable_metadata_fields
+
+        self.assertIn('track', fields)
+        self.assertEqual(self.item_module.track, 'http://example.org/track')
+        self.assertFalse(self.item_module.download_track)
+        self.assertTrue(self.item_module.track_visible)
+
+
+    def test_track_is_empty(self):
+        metatdata = {
+            'track': '',
+        }
+
+        self.initialize_module(metadata=metatdata)
+        fields = self.item_descriptor.editable_metadata_fields
+
+        self.assertNotIn('track', fields)
+        self.assertEqual(self.item_module.track, '')
+        self.assertFalse(self.item_module.download_track)
+        self.assertFalse(self.item_module.track_visible)
 
 
 class TestVideoGetTranscriptsMethod(TestVideo):
@@ -177,9 +556,7 @@ class TestVideoGetTranscriptsMethod(TestVideo):
         text = item.get_transcript(subs_id)
         expected_text = "Hi, welcome to Edx.\nLet's start with what is on your screen right now."
 
-        self.assertEqual(
-            text, expected_text
-        )
+        self.assertEqual(text, expected_text)
 
     def test_not_found_error(self):
         self.item_module.render('student_view')
@@ -192,9 +569,7 @@ class TestVideoGetTranscriptsMethod(TestVideo):
         self.item_module.render('student_view')
         item = self.item_descriptor.xmodule_runtime.xmodule_instance
 
-        good_sjson = _create_file(content="""
-                bad content
-            """)
+        good_sjson = _create_file(content='bad content')
 
         _upload_file(good_sjson, self.item_module.location)
         subs_id = _get_subs_id(good_sjson.name)
@@ -224,179 +599,6 @@ class TestVideoGetTranscriptsMethod(TestVideo):
 
         with self.assertRaises(KeyError):
             item.get_transcript(subs_id)
-
-
-class TestGetHtmlMethod(BaseTestXmodule):
-    """
-    Make sure that `get_html` works correctly.
-    """
-    CATEGORY = "video"
-    DATA = SOURCE_XML
-    METADATA = {}
-
-    def setUp(self):
-        self.setup_course();
-
-    def test_get_html_track(self):
-        SOURCE_XML = """
-            <video show_captions="true"
-            display_name="A Name"
-                sub="{sub}" download_track="{download_track}"
-            start_time="01:00:03" end_time="01:00:10"
-            >
-                <source src="example.mp4"/>
-                <source src="example.webm"/>
-                {track}
-            </video>
-        """
-
-        cases = [
-            {
-                'download_track': u'true',
-                'track': u'<track src="http://www.example.com/track"/>',
-                'sub': u'a_sub_file.srt.sjson',
-                'expected_track_url': u'http://www.example.com/track',
-            },
-            {
-                'download_track': u'true',
-                'track': u'',
-                'sub': u'a_sub_file.srt.sjson',
-                'expected_track_url': u'a_sub_file.srt.sjson',
-            },
-            {
-                'download_track': u'true',
-                'track': u'',
-                'sub': u'',
-                'expected_track_url': None
-            },
-            {
-                'download_track': u'false',
-                'track': u'<track src="http://www.example.com/track"/>',
-                'sub': u'a_sub_file.srt.sjson',
-                'expected_track_url': None,
-            }
-        ]
-
-        expected_context = {
-            'data_dir': getattr(self, 'data_dir', None),
-            'caption_asset_path': '/static/subs/',
-            'show_captions': 'true',
-            'display_name': u'A Name',
-            'end': 3610.0,
-            'id': None,
-            'sources': {
-                'main': u'example.mp4',
-                u'mp4': u'example.mp4',
-                u'webm': u'example.webm'
-            },
-            'start': 3603.0,
-            'sub': u'a_sub_file.srt.sjson',
-            'track': '',
-            'youtube_streams': '1.00:OEoXaMPEzfM',
-            'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', True),
-            'yt_test_timeout': 1500,
-            'yt_test_url': 'https://gdata.youtube.com/feeds/api/videos/'
-        }
-
-        for data in cases:
-            DATA = SOURCE_XML.format(
-                download_track=data['download_track'],
-                track=data['track'],
-                sub=data['sub'],
-            )
-
-            self.initialize_module(data=DATA)
-            track_url = self.item_descriptor.xmodule_runtime.handler_url(self.item_module, 'download_transcript')
-
-            expected_context.update({
-                'track': track_url if data['expected_track_url'] == u'a_sub_file.srt.sjson' else data['expected_track_url'],
-                'sub': data['sub'],
-                'id': self.item_module.location.html_id(),
-            })
-
-            context = self.item_module.render('student_view').content
-            self.assertEqual(
-                context,
-                self.item_module.xmodule_runtime.render_template('video.html', expected_context)
-            )
-
-
-class TestVideoDescriptorInitialization(BaseTestXmodule):
-    """
-    Make sure that module initialization works correctly.
-    """
-    CATEGORY = "video"
-    DATA = SOURCE_XML
-    METADATA = {}
-
-    def setUp(self):
-        self.setup_course();
-
-    def test_track_is_not_empty(self):
-        metatdata = {
-            'track': 'http://example.org/track',
-        }
-
-        self.initialize_module(metadata=metatdata)
-        fields = self.item_descriptor.editable_metadata_fields
-
-        self.assertIn('track', fields)
-        self.assertEqual(self.item_module.track, 'http://example.org/track')
-        self.assertTrue(self.item_module.download_track)
-        self.assertTrue(self.item_module.track_visible)
-
-    @patch('xmodule.x_module.XModuleDescriptor.editable_metadata_fields', new_callable=PropertyMock)
-    def test_download_track_is_explicitly_set(self, mock_editable_fields):
-        mock_editable_fields.return_value = {
-            'download_track': {
-                'default_value': False,
-                'explicitly_set': True,
-                'display_name': 'Transcript Download Allowed',
-                'help': 'Show a link beneath the video to allow students to download the transcript.',
-                'type': 'Boolean',
-                'value': False,
-                'field_name': 'download_track',
-                'options': [
-                    {'display_name': "True", "value": True},
-                    {'display_name': "False", "value": False}
-                ]
-            },
-            'track': {
-                'default_value': '',
-                'explicitly_set': False,
-                'display_name': 'Download Transcript',
-                'help': 'The external URL to download the timed transcript track.',
-                'type': 'Generic',
-                'value': u'http://example.org/track',
-                'field_name': 'track',
-                'options': []
-            },
-        }
-        metadata = {
-            'track': 'http://example.org/track',
-        }
-
-        self.initialize_module(metadata=metadata)
-        fields = self.item_descriptor.editable_metadata_fields
-
-        self.assertIn('track', fields)
-        self.assertEqual(self.item_module.track, 'http://example.org/track')
-        self.assertFalse(self.item_module.download_track)
-        self.assertTrue(self.item_module.track_visible)
-
-
-    def test_track_is_empty(self):
-        metatdata = {
-            'track': '',
-        }
-
-        self.initialize_module(metadata=metatdata)
-        fields = self.item_descriptor.editable_metadata_fields
-
-        self.assertNotIn('track', fields)
-        self.assertEqual(self.item_module.track, '')
-        self.assertFalse(self.item_module.download_track)
-        self.assertFalse(self.item_module.track_visible)
 
 
 def _clear_assets(location):

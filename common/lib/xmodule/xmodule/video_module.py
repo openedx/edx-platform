@@ -98,11 +98,19 @@ class VideoFields(object):
     )
     #front-end code of video player checks logical validity of (start_time, end_time) pair.
 
+    # `source` is deprecated field and should not be used in future.
+    # `download_video` is used instead.
     source = String(
-        help="The external URL to download the video. This appears as a link beneath the video.",
+        help="The external URL to download the video.",
         display_name="Download Video",
         scope=Scope.settings,
         default=""
+    )
+    download_video = Boolean(
+        help="Show a link beneath the video to allow students to download the video. Note: You must add at least one video source below.",
+        display_name="Video Download Allowed",
+        scope=Scope.settings,
+        default=False
     )
     html5_sources = List(
         help="A list of filenames to be used with HTML5 video. The first supported filetype will be displayed.",
@@ -181,7 +189,12 @@ class VideoModule(VideoFields, XModule):
 
         get_ext = lambda filename: filename.rpartition('.')[-1]
         sources = {get_ext(src): src for src in self.html5_sources}
-        sources['main'] = self.source
+
+        if self.download_video:
+            if self.source:
+                sources['main'] = self.source
+            elif self.html5_sources:
+                sources['main'] = self.html5_sources[0]
 
         if self.download_track:
             if self.track:
@@ -281,6 +294,14 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
         If `track` field exists show `track` field on front-end as not-editable
         but clearable. Dropdown `download_track` is a new field and it has value
         True.
+
+        `source` is deprecated field.
+        a) If `source` exists and `source` is not `html5_sources`: show `source`
+            field on front-end as not-editable but clearable. Dropdown is a new
+            field `download_video` and it has value True.
+        b) If `source` is cleared it is not shown anymore.
+        c) If `source` exists and `source` in `html5_sources`, do not show `source`
+            field. `download_video` field has value True.
         '''
         super(VideoDescriptor, self).__init__(*args, **kwargs)
         # For backwards compatibility -- if we've got XML data, parse
@@ -290,21 +311,43 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
             self._field_data.set_many(self, field_data)
             del self.data
 
+        editable_fields = self.editable_metadata_fields
+
         self.track_visible = False
         if self.track:
             self.track_visible = True
-            download_track = self.editable_metadata_fields['download_track']
+            download_track = editable_fields['download_track']
             if not download_track['explicitly_set']:
                 self.download_track = True
+
+        self.source_visible = False
+        if self.source:
+            # If `source` field value exist in the `html5_sources` field values,
+            # then delete `source` field value and use value from `html5_sources` field.
+            if self.source in self.html5_sources:
+                self.source = ''  # Delete source field value.
+                self.download_video = True
+            else:  # Otherwise, `source` field value will be used.
+                self.source_visible = True
+                download_video = editable_fields['download_video']
+                if not download_video['explicitly_set']:
+                    self.download_video = True
 
     @property
     def editable_metadata_fields(self):
         editable_fields = super(VideoDescriptor, self).editable_metadata_fields
 
-        if self.track_visible:
-            editable_fields['track']['non_editable'] = True
-        else:
-            editable_fields.pop('track')
+        if hasattr(self, 'track_visible'):
+            if self.track_visible:
+                editable_fields['track']['non_editable'] = True
+            else:
+                editable_fields.pop('track')
+
+        if hasattr(self, 'source_visible'):
+            if self.source_visible:
+                editable_fields['source']['non_editable'] = True
+            else:
+                editable_fields.pop('source')
 
         return editable_fields
 
@@ -359,6 +402,7 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
             'end_time': self.end_time,
             'sub': self.sub,
             'download_track': json.dumps(self.download_track),
+            'download_video': json.dumps(self.download_video),
         }
         for key, value in attrs.items():
             # Mild workaround to ensure that tests pass -- if a field
@@ -468,7 +512,6 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
         sources = xml.findall('source')
         if sources:
             field_data['html5_sources'] = [ele.get('src') for ele in sources]
-            field_data['source'] = field_data['html5_sources'][0]
 
         track = xml.find('track')
         if track is not None:
