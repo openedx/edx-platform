@@ -1,6 +1,11 @@
 define(["backbone", "underscore", "gettext"], function(Backbone, _, gettext) {
 
     var PagingHeader = Backbone.View.extend({
+        events : {
+            "click .next-page-link": "nextPage",
+            "click .previous-page-link": "previousPage"
+        },
+
         initialize: function(options) {
             var view = options.view,
                 collection = view.collection;
@@ -9,7 +14,6 @@ define(["backbone", "underscore", "gettext"], function(Backbone, _, gettext) {
             collection.bind('add', _.bind(this.render, this));
             collection.bind('remove', _.bind(this.render, this));
             collection.bind('reset', _.bind(this.render, this));
-            this.render();
         },
 
         render: function() {
@@ -21,8 +25,8 @@ define(["backbone", "underscore", "gettext"], function(Backbone, _, gettext) {
             this.$el.html(this.template({
                 messageHtml: messageHtml
             }));
-            $(".previous-page-link").toggleClass("is-disabled", currentPage === 0);
-            $(".next-page-link").toggleClass("is-disabled", currentPage === lastPage);
+            this.$(".previous-page-link").toggleClass("is-disabled", currentPage === 0);
+            this.$(".next-page-link").toggleClass("is-disabled", currentPage === lastPage);
             return this;
         },
 
@@ -33,12 +37,13 @@ define(["backbone", "underscore", "gettext"], function(Backbone, _, gettext) {
                 pageSize = collection.perPage,
                 start = collection.start,
                 count = collection.size(),
+                end = start + count,
                 total = collection.totalCount,
                 fmts = gettext('Showing %(current_span)s%(start)s-%(end)s%(end_span)s out of %(total_span)s%(total)s total%(end_span)s, sorted by %(order_span)s%(sort_order)s%(end_span)s');
 
             return '<p>' + interpolate(fmts, {
-                    start: start + 1,
-                    end: start + count,
+                    start: Math.min(start + 1, end),
+                    end: end,
                     total: total,
                     sort_order: gettext('Date Added'),
                     current_span: '<span class="count-current-shown">',
@@ -46,6 +51,14 @@ define(["backbone", "underscore", "gettext"], function(Backbone, _, gettext) {
                     order_span: '<span class="sort-order">',
                     end_span: '</span>'
                 }, true) + "</p>";
+        },
+
+        nextPage: function() {
+            this.view.nextPage();
+        },
+
+        previousPage: function() {
+            this.view.previousPage();
         }
     });
 

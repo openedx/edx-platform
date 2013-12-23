@@ -134,7 +134,7 @@ def _assets_json(request, location):
         'start': settings['start'],
         'end': settings['end'],
         'page': settings['page'],
-        'page_size': settings['page_size'],
+        'pageSize': settings['page_size'],
         'totalCount': settings['total_count'],
         'assets': asset_json
     })

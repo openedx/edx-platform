@@ -39,6 +39,7 @@ requirejs.config({
         "jasmine.async": "xmodule_js/common_static/js/vendor/jasmine.async",
         "draggabilly": "xmodule_js/common_static/js/vendor/draggabilly.pkgd",
         "domReady": "xmodule_js/common_static/js/vendor/domReady",
+        "URI": "xmodule_js/common_static/js/vendor/URI.min",
 
         "mathjax": "//edx-static.s3.amazonaws.com/mathjax-MathJax-727332c/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&delayStartupUntil=configured",
         "youtube": "//www.youtube.com/player_api?noext",
@@ -144,6 +145,9 @@ requirejs.config({
                   ]
               MathJax.Hub.Configured()
         },
+        "URI": {
+            exports: "URI"
+        },
         "xmodule": {
             exports: "XModule"
         },
@@ -202,10 +206,13 @@ define([
     "js/spec/transcripts/videolist_spec", "js/spec/transcripts/message_manager_spec",
     "js/spec/transcripts/file_uploader_spec",
 
-    "js/spec/utils/module_spec",
     "js/spec/models/explicit_url_spec"
-    "js/spec/views/baseview_spec",
+
     "js/spec/utils/handle_iframe_binding_spec",
+    "js/spec/utils/module_spec",
+
+    "js/spec/views/baseview_spec",
+    "js/spec/views/paging_spec",
 
     # these tests are run separate in the cms-squire suite, due to process
     # isolation issues with Squire.js

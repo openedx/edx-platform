@@ -3,58 +3,42 @@ define(["backbone", "js/views/feedback_alert"], function(Backbone, AlertView) {
     var PagingView = Backbone.View.extend({
         // takes a Backbone Paginator as a model
 
-        events : {
-            "click .next-page-link": "nextPage",
-            "click .previous-page-link": "previousPage",
-            "change .page-number-input": "changePage"
-        },
-
         initialize: function() {
             Backbone.View.prototype.initialize.call(this);
-            var assets = this.collection;
-            assets.bind('add', _.bind(this.renderPageItems, this));
-            assets.bind('remove', _.bind(this.renderPageItems, this));
-            assets.bind('reset', _.bind(this.renderPageItems, this));
-        },
-
-        changePage: function() {
-            var assets = this.collection,
-                currentPage = assets.currentPage + 1,
-                pageNumber = parseInt(this.$("#page-number-input").val());
-            if (pageNumber && pageNumber !== currentPage) {
-                this.setPage(pageNumber - 1);
-            } else if (!pageNumber) {
-                // Remove the invalid page number so that the current page number shows through
-                $("#page-number-input").val("");
-            }
+            var collection = this.collection;
+            collection.bind('add', _.bind(this.renderPageItems, this));
+            collection.bind('remove', _.bind(this.renderPageItems, this));
+            collection.bind('reset', _.bind(this.renderPageItems, this));
         },
 
         setPage: function(page) {
             var self = this,
-                assets = self.collection;
-            assets.goTo(page, {
+                collection = self.collection,
+                oldPage = collection.currentPage;
+            collection.goTo(page, {
                 reset: true,
                 success: function() {
                     window.scrollTo(0, 0);
                 },
                 error: function(collection, response, options) {
+                    collection.currentPage = oldPage;
                     self.showPagingError(response);
                 }
             });
         },
 
         nextPage: function() {
-            var assets = this.collection,
-                currentPage = assets.currentPage,
-                lastPage = assets.totalPages - 1;
+            var collection = this.collection,
+                currentPage = collection.currentPage,
+                lastPage = collection.totalPages - 1;
             if (currentPage < lastPage) {
                 this.setPage(currentPage + 1);
             }
         },
 
         previousPage: function() {
-            var assets = this.collection,
-                currentPage = assets.currentPage;
+            var collection = this.collection,
+                currentPage = collection.currentPage;
             if (currentPage > 0) {
                 this.setPage(currentPage - 1);
             }

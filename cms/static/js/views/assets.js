@@ -7,19 +7,22 @@ var AssetsView = PagingView.extend({
     initialize : function() {
         PagingView.prototype.initialize.call(this);
         var collection = this.collection;
-        this.emptyTemplate = _.template($("#no-assets-tpl").text());
         this.template = _.template($("#asset-library-tpl").text());
         this.listenTo(collection, 'destroy', this.handleDestroy);
-        this.render();
-        this.setPage(0);
     },
 
     render: function() {
-        var self = this;
-        self.$el.html(self.template());
-        self.tableBody = $('#asset-table-body');
-        self.pagingHeader = new PagingHeader({view: self, el: $('#asset-paging-header')});
-        self.pagingFooter = new PagingFooter({view: self, el: $('#asset-paging-footer')});
+        this.$el.html(this.template());
+        this.tableBody = this.$('#asset-table-body');
+        this.pagingHeader = new PagingHeader({view: this, el: $('#asset-paging-header')});
+        this.pagingFooter = new PagingFooter({view: this, el: $('#asset-paging-footer')});
+        this.pagingHeader.render();
+        this.pagingFooter.render();
+
+        // Hide the contents until the collection has loaded the first time
+        this.$('.asset-library').hide();
+        this.$('.no-asset-content').hide();
+
         return this;
     },
 
@@ -35,8 +38,8 @@ var AssetsView = PagingView.extend({
                     self.tableBody.append(view.render().el);
                 });
         }
-        $('.asset-library').toggle(hasAssets);
-        $('.no-asset-content').toggle(!hasAssets);
+        self.$('.asset-library').toggle(hasAssets);
+        self.$('.no-asset-content').toggle(!hasAssets);
         return this;
     },
 

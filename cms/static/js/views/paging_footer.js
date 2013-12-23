@@ -1,6 +1,12 @@
 define(["backbone"], function(Backbone, AssetView) {
 
     var PagingFooter = Backbone.View.extend({
+        events : {
+            "click .next-page-link": "nextPage",
+            "click .previous-page-link": "previousPage",
+            "change .page-number-input": "changePage"
+        },
+
         initialize: function(options) {
             var view = options.view,
                 collection = view.collection;
@@ -21,9 +27,29 @@ define(["backbone"], function(Backbone, AssetView) {
                 current_page: collection.currentPage,
                 total_pages: collection.totalPages
             }));
-            $(".previous-page-link").toggleClass("is-disabled", currentPage === 0);
-            $(".next-page-link").toggleClass("is-disabled", currentPage === lastPage);
+            this.$(".previous-page-link").toggleClass("is-disabled", currentPage === 0);
+            this.$(".next-page-link").toggleClass("is-disabled", currentPage === lastPage);
             return this;
+        },
+
+        changePage: function() {
+            var view = this.view,
+                collection = view.collection,
+                currentPage = collection.currentPage + 1,
+                pageInput = this.$("#page-number-input"),
+                pageNumber = parseInt(pageInput.val(), 10);
+            if (pageNumber && pageNumber !== currentPage) {
+                view.setPage(pageNumber - 1);
+            }
+            pageInput.val(""); // Clear the value as the label will show beneath it
+        },
+
+        nextPage: function() {
+            this.view.nextPage();
+        },
+
+        previousPage: function() {
+            this.view.previousPage();
         }
     });
 

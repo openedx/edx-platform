@@ -27,6 +27,8 @@ require(["domReady", "jquery", "gettext", "js/models/asset", "js/collections/ass
     var assets = new AssetCollection();
     assets.url = "${asset_callback_url}";
     var assetsView = new AssetsView({collection: assets, el: $('#asset-library')});
+    assetsView.render();
+    assetsView.setPage(0);
 
     var hideModal = function (e) {
         if (e) {

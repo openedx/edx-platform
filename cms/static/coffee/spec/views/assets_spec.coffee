@@ -47,7 +47,7 @@ define ["jasmine", "js/spec/create_sinon", "squire"],
                     spyOn(@model, "save").andCallThrough()
 
                     @collection = new AssetCollection([@model])
-                    @collection.url = "update-asset-url"
+                    @collection.url = "assets-url"
                     @view = new AssetView({model: @model})
 
             waitsFor (=> @view), "AssetView was not created", 1000
@@ -135,9 +135,9 @@ define ["jasmine", "js/spec/create_sinon", "squire"],
     describe "Assets view", ->
         beforeEach ->
             setFixtures($("<script>", {id: "asset-library-tpl", type: "text/template"}).text(assetLibraryTpl))
-            setFixtures($("<script>", {id: "asset-tpl", type: "text/template"}).text(assetTpl))
-            setFixtures($("<script>", {id: "paging-header-tpl", type: "text/template"}).text(pagingHeaderTpl))
-            setFixtures($("<script>", {id: "paging-footer-tpl", type: "text/template"}).text(pagingFooterTpl))
+            appendSetFixtures($("<script>", {id: "asset-tpl", type: "text/template"}).text(assetTpl))
+            appendSetFixtures($("<script>", {id: "paging-header-tpl", type: "text/template"}).text(pagingHeaderTpl))
+            appendSetFixtures($("<script>", {id: "paging-footer-tpl", type: "text/template"}).text(pagingFooterTpl))
             window.analytics = jasmine.createSpyObj('analytics', ['track'])
             window.course_location_analytics = jasmine.createSpy()
             appendSetFixtures(sandbox({id: "asset_table_body"}))
@@ -151,29 +151,44 @@ define ["jasmine", "js/spec/create_sinon", "squire"],
                 "Warning": @promptSpies.constructor
             })
 
+            @mockAsset1 = {
+                display_name: "test asset 1"
+                url: 'actual_asset_url_1'
+                portable_url: 'portable_url_1'
+                date_added: 'date_1'
+                thumbnail: null
+                id: 'id_1'
+            }
+            @mockAsset2 = {
+                display_name: "test asset 2"
+                url: 'actual_asset_url_2'
+                portable_url: 'portable_url_2'
+                date_added: 'date_2'
+                thumbnail: null
+                id: 'id_2'
+            }
+
             runs =>
                 @injector.require ["js/models/asset", "js/collections/asset", "js/views/assets"],
                 (AssetModel, AssetCollection, AssetsView) =>
                     @AssetModel = AssetModel
-                    @collection = new AssetCollection [
-                            display_name: "test asset 1"
-                            url: 'actual_asset_url_1'
-                            portable_url: 'portable_url_1'
-                            date_added: 'date_1'
-                            thumbnail: null
-                            id: 'id_1'
-                        ,
-                            display_name: "test asset 2"
-                            url: 'actual_asset_url_2'
-                            portable_url: 'portable_url_2'
-                            date_added: 'date_2'
-                            thumbnail: null
-                            id: 'id_2'
-                        ]
-                    @collection.url = "update-asset-url"
+                    @collection = new AssetCollection();
+                    @collection.url = "assets-url"
                     @view = new AssetsView
                         collection: @collection
                         el: $('#asset_table_body')
+                    @requests = create_sinon["requests"](this)
+                    @view.render()
+                    @view.setPage(0)
+                    create_sinon.respondWithJson(@requests,
+                        {
+                        assets: [ @mockAsset1, @mockAsset2 ],
+                        start: 0,
+                        end: 1,
+                        page: 0,
+                        pageSize: 5,
+                        totalCount: 2
+                        })
 
             waitsFor (=> @view), "AssetsView was not created", 1000
 
@@ -188,32 +203,26 @@ define ["jasmine", "js/spec/create_sinon", "squire"],
 
         describe "Basic", ->
             it "should render both assets", ->
-                @view.render()
                 expect(@view.$el).toContainText("test asset 1")
                 expect(@view.$el).toContainText("test asset 2")
 
             it "should remove the deleted asset from the view", ->
-                requests = create_sinon["requests"](this)
-
                 # Delete the 2nd asset with success from server.
-                @view.render().$(".remove-asset-button")[1].click()
+                @view.$(".remove-asset-button")[1].click()
                 @promptSpies.constructor.mostRecentCall.args[0].actions.primary.click(@promptSpies)
-                req.respond(200) for req in requests
+                req.respond(200) for req in @requests
                 expect(@view.$el).toContainText("test asset 1")
                 expect(@view.$el).not.toContainText("test asset 2")
 
             it "does not remove asset if deletion failed", ->
-                requests = create_sinon["requests"](this)
-
                 # Delete the 2nd asset, but mimic a failure from the server.
-                @view.render().$(".remove-asset-button")[1].click()
+                @view.$(".remove-asset-button")[1].click()
                 @promptSpies.constructor.mostRecentCall.args[0].actions.primary.click(@promptSpies)
-                req.respond(404) for req in requests
+                req.respond(404) for req in @requests
                 expect(@view.$el).toContainText("test asset 1")
                 expect(@view.$el).toContainText("test asset 2")
 
             it "adds an asset if asset does not already exist", ->
-                @view.render()
                 model = new @AssetModel
                     display_name: "new asset"
                     url: 'new_actual_asset_url'
@@ -222,12 +231,28 @@ define ["jasmine", "js/spec/create_sinon", "squire"],
                     thumbnail: null
                     id: 'idx'
                 @view.addAsset(model)
+                create_sinon.respondWithJson(@requests,
+                    {
+                    assets: [ @mockAsset1, @mockAsset2,
+                        {
+                            display_name: "new asset"
+                            url: 'new_actual_asset_url'
+                            portable_url: 'portable_url'
+                            date_added: 'date'
+                            thumbnail: null
+                            id: 'idx'
+                        }
+                    ],
+                    start: 0,
+                    end: 2,
+                    page: 0,
+                    pageSize: 5,
+                    totalCount: 3
+                    })
                 expect(@view.$el).toContainText("new asset")
-                expect(@collection.models.indexOf(model)).toBe(0)
                 expect(@collection.models.length).toBe(3)
 
             it "does not add an asset if asset already exists", ->
-                @view.render()
                 spyOn(@collection, "add").andCallThrough()
                 model = @collection.models[1]
                 @view.addAsset(model)

@@ -33,7 +33,7 @@ define(["sinon"], function(sinon) {
         var requests = [];
         var xhr = sinon.useFakeXMLHttpRequest();
         xhr.onCreate = function(request) {
-            requests.push(request)
+            requests.push(request);
         };
 
         that.after(function() {
@@ -43,8 +43,16 @@ define(["sinon"], function(sinon) {
         return requests;
     };
 
+    var respondWithJson = function(requests, jsonResponse, requestIndex) {
+        requestIndex = requestIndex || requests.length - 1;
+        requests[requestIndex].respond(200,
+            { "Content-Type": "application/json" },
+            JSON.stringify(jsonResponse));
+    }
+
     return {
         "server": fakeServer,
-        "requests": fakeRequests
+        "requests": fakeRequests,
+        "respondWithJson": respondWithJson
     };
 });

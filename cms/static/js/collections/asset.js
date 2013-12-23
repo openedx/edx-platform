@@ -22,9 +22,10 @@ define(["backbone.paginator", "js/models/asset"], function(BackbonePaginator, As
             var totalCount = response.totalCount,
                 start = response.start,
                 currentPage = response.page,
-                totalPages = Math.ceil(totalCount / this.perPage);
+                pageSize = response.pageSize,
+                totalPages = Math.ceil(totalCount / pageSize);
             this.totalCount = totalCount;
-            this.totalPages = totalPages;
+            this.totalPages = Math.max(totalPages, 1); // Treat an empty collection as having 1 page...
             this.currentPage = currentPage;
             this.start = start;
             return response.assets;
