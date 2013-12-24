@@ -62,7 +62,7 @@
     <div class="row gradable">
       <label>${_("Graded as:")}</label>
 
-    <div class="gradable-status" data-initial-status="${subsection.format if subsection.format is not None else _('Not Graded')}">
+    <div class="gradable-status" data-initial-status="${subsection.format if subsection.format is not None else u'Not Graded'}" data-display-status="${_('Not Graded')}">
     </div>
 
     <div class="due-date-input row">

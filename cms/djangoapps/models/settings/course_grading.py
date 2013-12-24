@@ -173,7 +173,7 @@ class CourseGradingModel(object):
         old_location = loc_mapper().translate_locator_to_location(location)
         descriptor = get_modulestore(old_location).get_item(old_location)
         return {
-            "graderType": descriptor.format if descriptor.format is not None else 'Not Graded',
+            "graderType": descriptor.format if descriptor.format is not None else u"Not Graded",
             "location": unicode(location),
         }
 
