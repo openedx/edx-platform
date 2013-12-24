@@ -2,14 +2,14 @@ from bok_choy.page_object import PageObject
 from ..studio import BASE_URL
 
 
-class SignupPage(PageObject):
+class SubsectionPage(PageObject):
     """
-    Signup page for Studio.
+    Edit Subsection page in Studio
     """
 
     @property
     def name(self):
-        return "studio.signup"
+        return "studio.subsection"
 
     @property
     def requirejs(self):
@@ -20,7 +20,7 @@ class SignupPage(PageObject):
         return []
 
     def url(self):
-        return BASE_URL + "/signup"
+        raise NotImplemented
 
     def is_browser_on_page(self):
-        return self.is_css_present('body.view-signup')
+        return self.is_css_present('body.view-subsection')
