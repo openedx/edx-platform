@@ -133,9 +133,9 @@ class MicrositeConfiguration(object):
 
         domain = request.META.get('HTTP_HOST', None)
 
-        if settings.FEATURES['SUBDOMAIN_BRANDING'] and domain:
-            subdomain = self.pick_subdomain(domain, settings.SUBDOMAIN_BRANDING.keys())
-            university = self.match_university(subdomain)
+        if domain:
+            subdomain = MicrositeConfiguration.pick_subdomain(domain, settings.SUBDOMAIN_BRANDING.keys())
+            university = MicrositeConfiguration.match_university(subdomain)
             microsite_configuration = self.get_microsite_configuration_for_university(university)
             if microsite_configuration:
                 microsite_configuration['university'] = university
@@ -168,7 +168,8 @@ class MicrositeConfiguration(object):
         configuration = settings.MICROSITE_CONFIGURATION.get(university, None)
         return configuration
 
-    def match_university(self, domain):
+    @classmethod
+    def match_university(cls, domain):
         """
         Return the university name specified for the domain, or None
         if no university was specified
@@ -176,10 +177,11 @@ class MicrositeConfiguration(object):
         if not settings.FEATURES['SUBDOMAIN_BRANDING'] or domain is None:
             return None
 
-        subdomain = self.pick_subdomain(domain, settings.SUBDOMAIN_BRANDING.keys())
+        subdomain = cls.pick_subdomain(domain, settings.SUBDOMAIN_BRANDING.keys())
         return settings.SUBDOMAIN_BRANDING.get(subdomain)
 
-    def pick_subdomain(self, domain, options, default='default'):
+    @classmethod
+    def pick_subdomain(cls, domain, options, default='default'):
         """
         Attempt to match the incoming request's HOST domain with a configuration map
         to see what subdomains are supported in Microsites.

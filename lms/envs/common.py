@@ -25,6 +25,7 @@ Longer TODO:
 
 import sys
 import os
+import json
 
 from path import path
 
@@ -33,8 +34,6 @@ from .discussionsettings import *
 from lms.lib.xblock.mixin import LmsBlockMixin
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.x_module import XModuleMixin
-
-from .microsite import _MICROSITE_CONFIGURATION
 
 ################################### FEATURES ###################################
 # The display name of the platform to be used in templates/emails/etc.
@@ -379,7 +378,7 @@ TRACKING_ENABLED = True
 ######################## subdomain specific settings ###########################
 COURSE_LISTINGS = {}
 SUBDOMAIN_BRANDING = {}
-
+VIRTUAL_UNIVERSITIES = []
 
 ############################### XModule Store ##################################
 MODULESTORE = {
@@ -1068,6 +1067,63 @@ def enable_theme(theme_name):
     STATICFILES_DIRS.append((u'themes/%s' % theme_name,
                              theme_root / 'static'))
 
+
+############################### MICROSITES ################################
+def enable_microsites(microsite_names, microsite_config_dict):
+    """
+    Enable the use of microsites, which are websites that allow
+    for subdomains for the edX platform, e.g. foo.edx.org
+    """
+    FEATURES['USE_MICROSITES'] = True
+
+    for microsite_name in microsite_names:
+        # Calculate the location of the microsite's files
+        microsite_root = ENV_ROOT / "microsites" / microsite_name
+
+        # pull in configuration information from each
+        # microsite root
+
+        try:
+            with open(microsite_root / "config.json") as microsite_config_file:
+                microsite_config = json.load(microsite_config_file)
+
+                # store the path on disk for later use
+                microsite_config['microsite_root'] = microsite_root
+                
+                # get the domain that this should reside
+                domain = microsite_config['domain_prefix']
+
+                # get the virtual university that this should use
+                university = microsite_config['university']
+
+                # add to the existing maps in our settings
+                SUBDOMAIN_BRANDING[domain] = university
+                VIRTUAL_UNIVERSITIES.append(university)
+
+                # store the rest of the configuration
+                microsite_config_dict[university] = microsite_config
+
+                # Include the microsite templates in the template search paths
+                # note that due to the multi-tenancy aspect, template
+                # names should be unique across all installable microsites
+                TEMPLATE_DIRS.append(microsite_root / 'templates')
+                MAKO_TEMPLATES['main'].append(microsite_root / 'templates')
+
+                # Namespace the theme's static files to 'themes/<theme_name>' to
+                # avoid collisions with default edX static files
+                STATICFILES_DIRS.append(microsite_root / 'static')
+        except Exception as error:
+            # not sure if we have application logging at this stage of
+            # startup
+            print '**** Error loading microsite {0}. Details {1}'.format(microsite_root, str(error))
+            # catch and continue
+            pass
+
+    # if we have microsites, then let's turn on SUBDOMAIN_BRANDING
+    if len(microsite_config_dict.keys()):
+        FEATURES['SUBDOMAIN_BRANDING'] = True
+
+
 ################# Student Verification #################
 VERIFY_STUDENT = {
     "DAYS_GOOD_FOR": 365,  # How many days is a verficiation good for?
@@ -1104,5 +1160,3 @@ GRADES_DOWNLOAD = {
     'ROOT_PATH': '/tmp/edx-s3/grades',
 }
 
-# pull in the Microsite definitions which are in a separate file
-MICROSITE_CONFIGURATION = _MICROSITE_CONFIGURATION

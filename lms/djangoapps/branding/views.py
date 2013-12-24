@@ -28,14 +28,16 @@ def index(request):
         return ssl_login(request)
 
     enable_mktg_site = settings.FEATURES.get('ENABLE_MKTG_SITE') or MicrositeConfiguration.get_microsite_configuration_value('ENABLE_MKTG_SITE', False)
-    
+
     if enable_mktg_site:
         return redirect(settings.MKTG_URLS.get('ROOT'))
 
-    custom_landing_page_template = MicrositeConfiguration.get_microsite_configuration_value('university_profile_template')
+    university = MicrositeConfiguration.match_university(request.META.get('HTTP_HOST'))
 
-    if custom_landing_page_template:
-        return render_to_response(custom_landing_page_template, {})
+    # keep specialized logic for Edge until we can migrate over Edge to fully use
+    # microsite definitions
+    if university == 'edge':
+        return render_to_response('university_profile/edge.html', {})
 
     #  we do not expect this case to be reached in cases where
     #  marketing and edge are enabled

@@ -10,10 +10,7 @@
 ## into non-inheriting templates via the %namespace tag.
 <%def name="theme_enabled()">
   <% 
-
-    theme_enabled = MicrositeConfiguration.get_microsite_configuration_value('USE_CUSTOM_THEME') or settings.FEATURES["USE_CUSTOM_THEME"] 
-    return theme_enabled
-
+    return settings.FEATURES["USE_CUSTOM_THEME"]
   %>
 </%def>
 
@@ -72,18 +69,18 @@
   <%block name="headextra"/>
 
 <%
-  footer_html = None
   if theme_enabled():
-    header_extra_file = MicrositeConfiguration.get_microsite_configuration_value('header_extra_file', 'theme-head-extra.html')
-    header_file = MicrositeConfiguration.get_microsite_configuration_value('header_file', 'navigation.html')
-    google_analytics_file = MicrositeConfiguration.get_microsite_configuration_value('google_analytics_file', 'theme-google-analytics.html')
-    footer_file = MicrositeConfiguration.get_microsite_configuration_value('footer_file', 'theme-footer.html')
-    footer_html = MicrositeConfiguration.get_microsite_configuration_value('footer_html')
+    header_extra_file = 'theme-head-extra.html'
+    header_file = 'theme-header.html'
+    google_analytics_file = 'theme-google-analytics.html'
+    footer_file = 'theme-footer.html'
   else:
-    header_extra_file = None
-    header_file = "navigation.html"
-    google_analytics_file = "google_analytics.html"
-    footer_file = "footer.html"  
+    header_extra_file = MicrositeConfiguration.get_microsite_configuration_value('header_extra_file')
+    header_file = MicrositeConfiguration.get_microsite_configuration_value('header_file', 'navigation.html')
+    google_analytics_file = MicrositeConfiguration.get_microsite_configuration_value('google_analytics_file', 
+      "google_analytics.html")
+    footer_file = MicrositeConfiguration.get_microsite_configuration_value('footer_file', "footer.html" )
+    style_overrides_file = MicrositeConfiguration.get_microsite_configuration_value('css_overrides_file')
 %>
 
   % if header_extra_file:
@@ -103,10 +100,6 @@
 
   <%include file="widgets/segment-io.html" />
 
-<%
-  style_overrides_file = MicrositeConfiguration.get_microsite_configuration_value(
-    'css_overrides_file')
-%>
 
 % if style_overrides_file:
   <link rel="stylesheet" type="text/css" href="${static.url(style_overrides_file)}" />
@@ -129,11 +122,7 @@
   </section>
 
 % if not suppress_toplevel_navigation:
-  % if footer_html:
-    ${footer_html}
-  % else:
-    <%include file="${footer_file}" />
-  % endif
+  <%include file="${footer_file}" />
 % endif
 
   <script>window.baseUrl = "${settings.STATIC_URL}";</script>
