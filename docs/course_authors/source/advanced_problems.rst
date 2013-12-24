@@ -64,16 +64,13 @@ Create a Circuit Schematic Builder Problem
 Custom JavaScript Display and Grading
 -------------------------------------
 
-Custom JavaScript display and grading problems allow you to create your own learning tool
+Custom JavaScript display and grading problems (also called custom JavaScript problems or
+JS Input problems) allow you to create your own learning tool
 using HTML and other standard Internet languages and then add the tool directly
 into Studio. When you use this problem type, Studio embeds your tool in an
 inline frame (IFrame) so that your students can interact with it in the LMS. You can grade
 your students' work using JavaScript and some basic Python, and the grading
 is integrated into the edX grading system.
-
-This problem type doesn't appear in the menu of advanced problems in Studio. To
-create a JavaScript input problem type, you'll create a blank advanced problem,
-and then enter your code into the component editor.
 
 .. image:: /Images/JavaScriptInputExample.gif
 
@@ -97,28 +94,42 @@ Create a Custom JavaScript Display and Grading Problem
 #. Set **Maximum Attempts** to a number larger than zero.
 #. Click **Save**.
 
-To re-create the example problem above, follow these steps.
+Re-create the Example Problem
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-#. Go to :ref:`Appendix F` and use the code samples to create the following files.
+To re-create the example problem above, you'll need the following files.
 
    - webGLDemo.html
    - webGLDemo.js
    - webGLDemo.css
    - three.min.js
 
-   **Note** *If you need to bypass the SOP, you'll also create a jschannel.js file.*
+#. Go to :ref:`Appendix F` and use the code samples to create the following files.
 
-#. On the **Files & Uploads** page, upload the files you just created.
+   - webGLDemo.html
+   - webGLDemo.js
+   - webGLDemo.css
+
+#. Download the **three.min.js** file. To do this, go to the `three.js home page <http://threejs.org>`_,
+   and then click **Download** in
+   the left pane. After the .zip file has finished downloading, open the .zip file, and then
+   open the **build** folder to access the three.min.js file.
+
+    **Note** If you need to bypass the SOP, you'll also need the **jschannel.js** file. To do
+    this, go to the `jschannel.js <https://github.com/mozilla/jschannel/blob/master/src/jschannel.js>`_
+    page, copy the code for the file into a text editor, and then save the file as jschannel.js.
+
+#. On the **Files & Uploads** page, upload all the files you just created or downloaded.
 #. Create a new custom JavaScript display and grading problem component.
 #. On the **Settings** tab, set **Maximum Attempts** to a number larger than
    zero.
-#. In the problem component editor, paste the code below.
+#. In the problem component editor, replace the example code with the code below.
 #. Click **Save.**
 
 
 
 JavaScript Input Problem Code
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#############################
 
 ::
 
@@ -157,7 +168,7 @@ JavaScript Input Problem Code
     </problem>
 
 
-.. note::    When you create a JavaScript Input problem, keep the following in mind.
+.. note::    When you create this problem, keep the following in mind.
 
              - The webGLDemo.js file defines the three JavaScript functions (**WebGLDemo.getGrade**,
                **WebGLDemo.getState**, and **WebGLDemo.setState**).

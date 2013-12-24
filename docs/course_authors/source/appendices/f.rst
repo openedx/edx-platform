@@ -3,38 +3,35 @@
 Appendix F - Files for the Example Custom JavaScript Display and Grading Problem
 ================================================================================
 
-For the example custom JavaScript display and grading problem, you need the `three.min.js <http://threejs.org>`_
-library file.
-
-- On the `three.js home page <http://threejs.org>`_ page, click **Download** in
-  the left pane. After the .zip file has finished downloading, open it, and then
-  open the **build** folder to access the three.min.js file.
-
-Additionally, you need the following files. You can find the code to create each
-of these files below.
+For the example :ref:`Custom JavaScript Display and Grading` problem, you need the following files. You can find
+instructions for obtaining each
+of these files below. After you obtain the files, add all of them to the **Files & Uploads** page in Studio.
 
 - :ref:`webGLDemo.html`
 - :ref:`webGLDemo.css`
 - :ref:`webGLDemo.js`
+- `three.min.js <http://threejs.org>`_
 
-To create these files, copy the code for each file into a text editor, and
-then save each file. Make sure to use the correct file name extension when you save
-each file.
+For the **webGLDemo.html**, **webGLDemo.js**, and **webGLDemo.css** files, copy the code provided
+for each file into a text editor, and then save each file. Make sure to use the correct
+file name extension when you save each file.
 
-After you create these files, add them to the **Files & Uploads** page in Studio.
+For the **three.min.js** library file, go to the `three.js home page <http://threejs.org>`_ page,
+and then click **Download** in
+the left pane. After the .zip file has finished downloading, open the .zip file, and then
+open the **build** folder to access the **three.min.js** file.
 
 .. note:: If you need to bypass the same-origin policy (SOP), you also need the
-          `jschannel.js <https://github.com/mozilla/jschannel/blob/master/src/jschannel.js>`_ file.
-
-          - On the `jschannel.js <https://github.com/mozilla/jschannel/blob/master/src/jschannel.js>`_
-            web page, copy the code for the file into a text editor, and then save the file as **jschannel.js**.
+          `jschannel.js <https://github.com/mozilla/jschannel/blob/master/src/jschannel.js>`_ file. On
+          the `jschannel.js <https://github.com/mozilla/jschannel/blob/master/src/jschannel.js>`_
+          web page, copy the code for the file into a text editor, and then save the file as **jschannel.js**.
 
 .. _webGLDemo.html:
 
 webGLDemo.html
 --------------
 
-If you don't need to bypass the SOP, use the following code.
+If you **don't** need to bypass the SOP, use the following code.
 
 ::
 
