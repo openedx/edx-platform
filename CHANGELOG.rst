@@ -6,12 +6,12 @@ in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
 Blades: Video player improvements:
-  - Disable edX controls for iPhone (native controls are used).
-  - Disable volume and speed controls for iPad.
-  - controls becomes visible after click on video or play placeholder to avoid
-    issues with YouTube API.
+  - Disable edX controls on iPhone/iPod (native controls are used).
+  - Disable unsupported controls (volume, playback rate) on iPad/Android.
+  - Controls becomes visible after click on video or play placeholder to avoid
+    issues with YouTube API on iPad/Android.
   - Captions becomes visible just after full initialization of video player.
-  - Fix blinking of captions after video player initialization. BLD-206.
+  - Fix blinking of captions after initialization of video player. BLD-206.
 
 LMS: Fix answer distribution download for small courses. LMS-922, LMS-811
 

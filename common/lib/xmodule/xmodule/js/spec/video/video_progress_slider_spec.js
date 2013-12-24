@@ -152,26 +152,12 @@
         });
 
         describe('onStop', function() {
-            // We will store default window.setTimeout() function here.
-            var oldSetTimeout = null;
 
             beforeEach(function() {
-                // Store original window.setTimeout() function. If we do not do
-                // this, then all other tests that rely on code which uses
-                // window.setTimeout() function might (and probably will) fail.
-                oldSetTimeout = window.setTimeout;
-                // Redefine window.setTimeout() function as a spy.
-                window.setTimeout = jasmine.createSpy().andReturn(100);
+                jasmine.Clock.useMock();
 
                 initialize();
                 spyOn(videoPlayer, 'onSlideSeek').andCallThrough();
-            });
-
-            afterEach(function () {
-                // Reset the default window.setTimeout() function. If we do not
-                // do this, then all other tests that rely on code which uses
-                // window.setTimeout() function might (and probably will) fail.
-                window.setTimeout = oldSetTimeout;
             });
 
             it('freeze the slider', function() {
@@ -195,10 +181,8 @@
                     jQuery.Event('stop'), { value: 20 }
                 );
 
-                expect(window.setTimeout).toHaveBeenCalledWith(
-                    jasmine.any(Function), 200
-                );
-                window.setTimeout.mostRecentCall.args[0]();
+                jasmine.Clock.tick(200);
+
                 expect(videoProgressSlider.frozen).toBeFalsy();
             });
         });
