@@ -920,16 +920,17 @@ def create_account(request, post_override=None):
          'key': registration.activation_key,
          }
 
-    # see if we are running in a microsite and that there is an
-    # activation email template definition available as configuration, if so, then render that
-    if MicrositeConfiguration.has_microsite_email_template_definition('activation_email'):
-        subject, message = MicrositeConfiguration.render_microsite_email_template('activation_email', d)
-    else:
-        # composes activation email
-        subject = render_to_string('emails/activation_email_subject.txt', d)
-        # Email subject *must not* contain newlines
-        subject = ''.join(subject.splitlines())
-        message = render_to_string('emails/activation_email.txt', d)
+    # composes activation email
+    subject = render_to_string(
+        MicrositeConfiguration.get_microsite_template_path('emails/activation_email_subject.txt'),
+        d
+    )
+    # Email subject *must not* contain newlines
+    subject = ''.join(subject.splitlines())
+    message = render_to_string(
+        MicrositeConfiguration.get_microsite_template_path('emails/activation_email.txt'),
+        d
+    )
 
     # don't send email if we are doing load testing or random user generation for some reason
     if not (settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING')):
@@ -1199,17 +1200,8 @@ def change_email_request(request):
          'old_email': user.email,
          'new_email': pec.new_email}
 
-    # see if there are email templates defined for this microsite
-    email_templates  = MicrositeConfiguration.get_microsite_configuration_value(
-        'email_template_files'
-    )
-
-    if email_templates:
-        subject_template, message_template = email_templates['email_change']
-    else:
-        # fallback to default system templates
-        subject_template = 'emails/email_change_subject.txt'
-        message_template = 'emails/email_change.txt'
+    subject_template = MicrositeConfiguration.get_microsite_template_path('emails/email_change_subject.txt')
+    message_template = MicrositeConfiguration.get_microsite_template_path('emails/email_change.txt')
 
     subject = render_to_string(subject_template, d)
     subject = ''.join(subject.splitlines())

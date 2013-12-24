@@ -1074,11 +1074,17 @@ def enable_microsites(microsite_names, microsite_config_dict):
     Enable the use of microsites, which are websites that allow
     for subdomains for the edX platform, e.g. foo.edx.org
     """
+
+    if not microsite_names or len(microsite_names) == 0:
+        return
+
     FEATURES['USE_MICROSITES'] = True
+
+    microsites_root = ENV_ROOT / "microsites"
 
     for microsite_name in microsite_names:
         # Calculate the location of the microsite's files
-        microsite_root = ENV_ROOT / "microsites" / microsite_name
+        microsite_root =  microsites_root / microsite_name
 
         # pull in configuration information from each
         # microsite root
@@ -1100,18 +1106,25 @@ def enable_microsites(microsite_names, microsite_config_dict):
                 SUBDOMAIN_BRANDING[domain] = university
                 VIRTUAL_UNIVERSITIES.append(university)
 
-                # store the rest of the configuration
-                microsite_config_dict[university] = microsite_config
+                template_dir = microsite_root / 'templates'
+                microsite_config['template_dir'] = template_dir
+
+                microsite_config['microsite_name'] = microsite_name
 
                 # Include the microsite templates in the template search paths
                 # note that due to the multi-tenancy aspect, template
                 # names should be unique across all installable microsites
-                TEMPLATE_DIRS.append(microsite_root / 'templates')
-                MAKO_TEMPLATES['main'].append(microsite_root / 'templates')
+
+                #TEMPLATE_DIRS.append(template_dir)
+                #MAKO_TEMPLATES['main'].append(template_dir)
+                
 
                 # Namespace the theme's static files to 'themes/<theme_name>' to
                 # avoid collisions with default edX static files
-                STATICFILES_DIRS.append(microsite_root / 'static')
+                #STATICFILES_DIRS.append(microsite_root / 'static')
+
+                # store the rest of the configuration
+                microsite_config_dict[university] = microsite_config
         except Exception as error:
             # not sure if we have application logging at this stage of
             # startup
@@ -1120,8 +1133,13 @@ def enable_microsites(microsite_names, microsite_config_dict):
             pass
 
     # if we have microsites, then let's turn on SUBDOMAIN_BRANDING
-    if len(microsite_config_dict.keys()):
+    if len(microsite_config_dict.keys()) > 0:
         FEATURES['SUBDOMAIN_BRANDING'] = True
+
+        TEMPLATE_DIRS.append(microsites_root)
+        MAKO_TEMPLATES['main'].append(microsites_root)
+
+        STATICFILES_DIRS.append(microsites_root)
 
 
 ################# Student Verification #################

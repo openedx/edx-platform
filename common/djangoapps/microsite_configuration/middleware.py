@@ -7,6 +7,7 @@ A microsite enables the following features:
 3) Ability to swap out some branding elements in the website
 """
 import threading
+import os.path
 
 from django.conf import settings
 
@@ -38,13 +39,6 @@ class MicrositeConfiguration(object):
         return cls.get_microsite_configuration() != None
 
     @classmethod
-    def has_microsite_email_template_definition(cls, template_name):
-        """
-        """
-        return cls.is_request_in_microsite() and cls.get_microsite_email_template_definitions(
-            template_name) != None
-
-    @classmethod
     def get_microsite_configuration(cls):
         """
         Returns the current request's microsite configuration
@@ -60,48 +54,24 @@ class MicrositeConfiguration(object):
         return configuration.get(val_name, default)
 
     @classmethod
-    def get_microsite_email_template_definitions(cls, template_name):
+    def get_microsite_template_path(cls, relative_path):
         """
-        Returns the template definitions associated with a Microsite
+        Returns a path to a Mako template, which can either be in
+        a microsite directory (as an override) or will just return what is passed in
         """
-        configuration = cls.get_microsite_configuration()
-        if configuration and 'email_templates' in configuration:
-            return configuration['email_templates'].get(template_name, None)
+        microsite_template_path = cls.get_microsite_configuration_value('template_dir')
 
-        return None        
+        if microsite_template_path:
+            search_path = microsite_template_path / relative_path
 
-    @classmethod
-    def render_microsite_email_template(cls, template_name, params):
-        """
-        Returns a string pair which is a rendered version of an email template of a given name
-        """
-        subject = None
-        message = None
+            if os.path.isfile(search_path):
+                path = '{0}/templates/{1}'.format(
+                    cls.get_microsite_configuration_value('microsite_name'),
+                    relative_path
+                )                
+                return path
 
-        email_template_definitions = cls.get_microsite_email_template_definitions(template_name)
-
-        if email_template_definitions:
-            # inject a few additional parameters that should be available to all
-            # email templates
-            p = params.copy()
-            p['site_domain'] = cls.get_microsite_configuration_value('site_domain')   
-            p['platform_name'] = cls.get_microsite_configuration_value('platform_name')
-
-            buf = StringIO()
-            ctx = Context(buf, **p)
-
-            subject_template = Template(email_template_definitions.get('subject', None))
-            if subject_template:
-                subject_template.render_context(ctx)
-                subject = buf.getvalue()
-
-            buf.truncate(0)
-            message_template = Template(email_template_definitions.get('body', None))
-            if message_template:
-                message_template.render_context(ctx)
-                message = buf.getvalue()
-
-        return subject, message
+        return relative_path
 
     @classmethod
     def get_microsite_configuration_value_for_org(cls, org, val_name, default=None):

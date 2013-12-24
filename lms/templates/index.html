@@ -12,6 +12,8 @@
 
   show_homepage_promo_video = MicrositeConfiguration.get_microsite_configuration_value('show_homepage_promo_video', True)
 
+  show_partners = MicrositeConfiguration.get_microsite_configuration_value('show_partners', True)
+
 %>
 
 <section class="home">
@@ -68,7 +70,7 @@
   <section class="container">
     <section class="highlighted-courses">
       ## Disable university partner logos and sites for non-edX sites
-      % if not self.theme_enabled():
+      % if not self.theme_enabled() and show_partners:
         <h2>${_('Explore free courses from {span_start}{platform_name}{span_end} universities').format(platform_name="edX", span_start='<span class="edx">', span_end='</span>')}</h2>
 
         <section class="university-partners university-partners2x6">
