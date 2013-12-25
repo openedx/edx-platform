@@ -9,7 +9,7 @@ define ["domReady", "jquery", "underscore.string", "backbone", "gettext",
     window.CMS = window.CMS or {}
     CMS.URL = CMS.URL or {}
     window.onTouchBasedDevice = ->
-      navigator.userAgent.match /iPhone|iPod|iPad/i
+      navigator.userAgent.match /iPhone|iPod|iPad|Android/i
 
     _.extend CMS, Backbone.Events
     Backbone.emulateHTTP = true

@@ -141,12 +141,13 @@ def the_youtube_video_is_shown(_step):
 @step('Make sure captions are (.+)$')
 def set_captions_visibility_state(_step, captions_state):
     SELECTOR = '.closed .subtitles'
+    world.wait_for_visible('.hide-subtitles')
     if captions_state == 'closed':
         if not world.is_css_present(SELECTOR):
-            world.browser.find_by_css('.hide-subtitles').click()
+            world.css_find('.hide-subtitles').click()
     else:
         if world.is_css_present(SELECTOR):
-            world.browser.find_by_css('.hide-subtitles').click()
+            world.css_find('.hide-subtitles').click()
 
 
 @step('I hover over button "([^"]*)"$')

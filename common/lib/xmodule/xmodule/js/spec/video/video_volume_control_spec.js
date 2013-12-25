@@ -11,7 +11,7 @@
 
     beforeEach(function() {
       oldOTBD = window.onTouchBasedDevice;
-      window.onTouchBasedDevice = jasmine.createSpy('onTouchBasedDevice').andReturn(false);
+      window.onTouchBasedDevice = jasmine.createSpy('onTouchBasedDevice').andReturn(null);
     });
 
     afterEach(function() {
@@ -58,9 +58,9 @@
         });
         expect(sliderHandle.attr('aria-valuenow')).toBeInRange(0, 100);
         expect(sliderHandle.attr('aria-valuetext')).toBeInArray(arr);
-        
+
       });
- 
+
       it('add ARIA attributes to volume control', function () {
         var volumeControl = $('div.volume>a');
         expect(volumeControl).toHaveAttrs({
@@ -121,38 +121,38 @@
         {
           range: 'muted',
           value: 0,
-          expectation: 'muted' 
+          expectation: 'muted'
         },
         {
           range: 'in ]0,20]',
           value: 10,
-          expectation: 'very low' 
+          expectation: 'very low'
         },
         {
           range: 'in ]20,40]',
           value: 30,
-          expectation: 'low' 
+          expectation: 'low'
         },
         {
           range: 'in ]40,60]',
           value: 50,
-          expectation: 'average' 
+          expectation: 'average'
         },
         {
           range: 'in ]60,80]',
           value: 70,
-          expectation: 'loud' 
+          expectation: 'loud'
         },
         {
           range: 'in ]80,100[',
           value: 90,
-          expectation: 'very loud' 
+          expectation: 'very loud'
         },
         {
           range: 'maximum',
           value: 100,
-          expectation: 'maximum' 
-        } 
+          expectation: 'maximum'
+        }
       ];
 
       $.each(initialData, function(index, data) {
@@ -162,7 +162,7 @@
               value: data.value
             });
           });
-      
+
           it('changes ARIA attributes', function () {
             var sliderHandle = $('div.volume-slider>a.ui-slider-handle');
             expect(sliderHandle).toHaveAttrs({
