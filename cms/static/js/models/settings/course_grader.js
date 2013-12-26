@@ -50,16 +50,18 @@ var CourseGrader = Backbone.Model.extend({
                 }
             }}
         if (_.has(attrs, 'min_count')) {
-            if (!isFinite(attrs.min_count) || /\D+/.test(attrs.min_count)) {
-                errors.min_count = gettext("Please enter an integer.");
+            var intMinCount = parseInt(attrs.min_count, 10);
+            if (!isFinite(intMinCount) || /\D+/.test(intMinCount) || intMinCount < 1) {
+                errors.min_count = gettext("Please enter an integer greater than 0.");
             }
-            else attrs.min_count = parseInt(attrs.min_count, 10);
+            else attrs.min_count = intMinCount;
         }
         if (_.has(attrs, 'drop_count')) {
-            if (!isFinite(attrs.drop_count) || /\D+/.test(attrs.drop_count)) {
+            var intDropCount = parseInt(attrs.drop_count, 10);
+            if (!isFinite(intDropCount) || /\D+/.test(intDropCount) || isNaN(intDropCount)) {
                 errors.drop_count = gettext("Please enter an integer.");
             }
-            else attrs.drop_count = parseInt(attrs.drop_count, 10);
+            else attrs.drop_count = intDropCount;
         }
         if (_.has(attrs, 'min_count') && _.has(attrs, 'drop_count') && attrs.drop_count > attrs.min_count) {
             errors.drop_count = _.template(
