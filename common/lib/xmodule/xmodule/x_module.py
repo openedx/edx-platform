@@ -16,10 +16,10 @@ from webob import Response
 from webob.multidict import MultiDict
 
 from xblock.core import XBlock
-from xblock.fields import Scope, Integer, Float, List, XBlockMixin, String, Dict
+from xblock.fields import Scope, Integer, Float, List, XBlockMixin, String, Dict, Boolean
+from xmodule.fields import RelativeTime
 from xblock.fragment import Fragment
 from xblock.runtime import Runtime, IdReader
-from xmodule.fields import RelativeTime
 
 from xmodule.errortracker import exc_info_to_str
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -872,8 +872,11 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
         editor_type = "Generic"
         values = field.values
         if isinstance(values, (tuple, list)) and len(values) > 0:
-            editor_type = "Select"
             values = [jsonify_value(field, json_choice) for json_choice in values]
+            if isinstance(field, Boolean):
+                editor_type = "Boolean"
+            else:
+                editor_type = "Select"
         elif isinstance(field, Integer):
             editor_type = "Integer"
         elif isinstance(field, Float):

@@ -102,6 +102,7 @@ define(["backbone"], function(Backbone) {
         }
     });
 
+    Metadata.BOOLEAN_TYPE = "Boolean";
     Metadata.SELECT_TYPE = "Select";
     Metadata.INTEGER_TYPE = "Integer";
     Metadata.FLOAT_TYPE = "Float";
