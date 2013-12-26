@@ -5,6 +5,9 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Blades: Change the track field to a dropdown that will allow students
+to download the transcript of the video without timecodes. BLD-368.
+
 Blades: Video player start-end time range is now shown even before Play is
 clicked. Video player VCR time shows correct non-zero total time for YouTube
 videos even before Play is clicked. BLD-529.
