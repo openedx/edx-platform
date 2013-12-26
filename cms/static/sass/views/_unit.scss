@@ -855,6 +855,65 @@ body.course.unit,.view-unit {
           }
         }
       }
+
+
+      .metadata-checkboxes {
+
+        // label
+        .setting-label {
+          vertical-align: top;
+        }
+
+        // inputs and labels
+        .wrapper-checkbox-settings {
+          @include size(45%,100%);
+          display: inline-block;
+          min-width: ($baseline*5);
+
+          // enumerated fields
+          .checkbox-settings {
+            margin: 0;
+
+            .checkbox-settings-item {
+              margin-bottom: ($baseline/2);
+
+              &.a-center {
+                text-align: center;
+
+                .input-wrapper {
+                  width: auto;
+                }
+              }
+
+            }
+
+            // inputs
+            .input {
+              height: auto;
+              width: auto;
+              display: block;
+            }
+
+            .input-wrapper {
+              vertical-align: baseline;
+              display: inline-block;
+              width: 10%;
+            }
+
+            .input-label {
+              display: inline-block;
+              vertical-align: top;
+              font-weight: 400;
+              font-size: .8em;
+              width: 80%;
+            }
+          }
+        }
+
+        .setting-clear {
+          vertical-align: top;
+        }
+      }
     }
   }
 }
