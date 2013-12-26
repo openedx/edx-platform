@@ -1,6 +1,6 @@
 from ..utils import get_course_location_for_item
 from xmodule.modulestore.locator import CourseLocator
-from student.roles import CourseStaffRole, GlobalStaff
+from student.roles import CourseStaffRole, GlobalStaff, CourseInstructorRole
 from student import auth
 
 
@@ -20,3 +20,17 @@ def has_course_access(user, location, role=CourseStaffRole):
         # this can be expensive if location is not category=='course'
         location = get_course_location_for_item(location)
     return auth.has_access(user, role(location))
+
+
+def get_user_role(user, location, context):
+    """
+    Return corresponding string if user has staff or instructor role in Studio.
+    This will not return student role because its purpose for using in Studio.
+
+    :param location: a descriptor.location
+    :param context: a course_id
+    """
+    if auth.has_access(user, CourseInstructorRole(location, context)):
+        return 'instructor'
+    else:
+        return 'staff'

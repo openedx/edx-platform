@@ -17,7 +17,7 @@ import django.utils
 from django.views.decorators.csrf import csrf_exempt
 
 from capa.xqueue_interface import XQueueInterface
-from courseware.access import has_access
+from courseware.access import has_access, get_user_role
 from courseware.masquerade import setup_masquerade
 from courseware.model_data import FieldDataCache, DjangoKeyValueStore
 from lms.lib.xblock.field_data import LmsFieldData
@@ -432,6 +432,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
             # directly as the runtime i18n service.
             'i18n': django.utils.translation,
         },
+        get_user_role=lambda: get_user_role(user, course_id),
     )
 
     # pass position specified in URL to module through ModuleSystem
