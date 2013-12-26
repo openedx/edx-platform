@@ -9,7 +9,6 @@ import re
 import requests
 
 from collections import defaultdict, OrderedDict
-from dateutil.parser import parse as parse_datetime
 from functools import partial
 from markupsafe import escape
 from requests.status_codes import codes
@@ -63,13 +62,6 @@ from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 from django.utils.translation import ugettext as _u
 from lms.lib.xblock.runtime import handler_prefix
-
-from .extensions import (
-    dump_module_extensions,
-    dump_student_extensions,
-    get_units_with_due_date_options,
-    set_due_date_extension)
-
 
 log = logging.getLogger(__name__)
 
@@ -479,93 +471,6 @@ def instructor_dashboard(request, course_id):
                     msg += msg2
 
     #----------------------------------------
-    # Extensions
-
-    elif "Change due date for student" in action:
-        # get the form data
-        unique_student_identifier = request.POST.get(
-            'unique_student_identifier', '')
-        url = request.POST.get('url')
-        if not url:
-            msg += '<font color="red">Must choose a unit. </font> '
-
-        # try to uniquely id student by email address or username
-        message, student = get_student_from_identifier(unique_student_identifier)
-        msg += message
-
-        # parse datetime
-        datestr = request.POST.get('due_datetime')
-        try:
-            due_date = parse_datetime(datestr).replace(tzinfo=timezone.utc)
-        except ValueError:
-            due_date = None
-            msg += "<font color='red'>Unable to parse date: {0} </font>".format(
-                datestr)
-
-        if url and student and due_date:
-            error, unit = set_due_date_extension(
-                course, url, student, due_date)
-            if error:
-                msg += '<font color="red">{0}</font> '.format(error)
-                log.debug(error)
-            else:
-                studentname = student.profile.name
-                unitname = getattr(unit, 'display_name', None)
-                if unitname:
-                    unitname = '{0} ({1})'.format(unitname, unit.location.url())
-                msg += (
-                    'Successfully changed due date for student {0} for {1} '
-                    'to {2}').format(studentname, unitname,
-                                     due_date.strftime('%Y-%m-%d %H:%M'))
-
-    elif "Reset due date for student" in action:
-        # get the form data
-        unique_student_identifier = request.POST.get(
-            'unique_student_identifier', '')
-        url = request.POST.get('url')
-        if not url:
-            msg += '<font color="red">Must choose a unit.</font> '
-
-        # try to uniquely id student by email address or username
-        message, student = get_student_from_identifier(unique_student_identifier)
-        msg += message
-
-        if url and student:
-            error, unit = set_due_date_extension(
-                course, url, student, None)
-            if error:
-                msg += '<font color="red">{0}</font> '.format(error)
-                log.debug(error)
-            else:
-                studentname = student.profile.name
-                unitname = getattr(unit, 'display_name', None)
-                if unitname:
-                    unitname = '{0} ({1})'.format(unitname, unit.location.url())
-                msg += (
-                    'Successfully reset due date for student {0} for {1} '
-                    'to {2}').format(studentname, unitname,
-                                     unit.due.strftime('%Y-%m-%d %H:%M'))
-
-    elif "Dump list of students with due date extensions" in action:
-        url = request.POST.get('url')
-        if not url:
-            msg += '<font color="red">Must choose a unit. </font> '
-        else:
-            error, datatable = dump_module_extensions(course, url)
-            if error:
-                msg += '<font color="red">{0}</font> '.format(error)
-
-    elif "Dump due date extensions for student" in action:
-        unique_student_identifier = request.POST.get(
-            'unique_student_identifier', '')
-        message, student = get_student_from_identifier(unique_student_identifier)
-        msg += message
-
-        if student:
-            datatable = dump_student_extensions(
-                course, student)
-
-    #----------------------------------------
     # Admin
 
     elif 'List course staff' in action:
@@ -941,8 +846,6 @@ def instructor_dashboard(request, course_id):
         'disable_buttons': disable_buttons
     }
 
-    if settings.FEATURES.get('INDIVIDUAL_DUE_DATES'):
-        context['units_with_due_dates'] = get_units_with_due_date_options(course)
     if settings.FEATURES.get('ENABLE_INSTRUCTOR_BETA_DASHBOARD'):
         context['beta_dashboard_url'] = reverse('instructor_dashboard_2', kwargs={'course_id': course_id})
 
