@@ -1,5 +1,9 @@
+from sys import float_info
+from math import fabs
+
 from calc import evaluator
 from cmath import isinf
+
 
 #-----------------------------------------------------------------------------
 #
@@ -28,7 +32,33 @@ def compare_with_tolerance(v1, v2, tol):
         # `inf <= inf` which is a fail. Instead, compare directly.
         return v1 == v2
     else:
+        # if tolerance:
         return abs(v1 - v2) <= tolerance
+
+        return float_compare(v1, v2)
+
+def float_compare(v1, v2):
+    """
+    Compares two floats.
+
+    Handles machine rounding errors.
+
+    Some useful references:
+    http://en.wikipedia.org/wiki/Machine_epsilon#Approximation_using_Python
+    http://www.cygnus-software.com/papers/comparingfloats/comparingfloats.htm
+
+    Examples:
+    In [183]: 0.000016 - 1.6*10**-5
+    Out[183]: -3.3881317890172014e-21
+    In [212]: 1.9e24 - 1.9*10**24
+    Out[212]: 268435456.0
+    """
+    if v1 == v2:  # try simple stuff
+        return True
+
+    epsilon =  float_info.epsilon  #  2.220446049250313e-16
+    return fabs(v1-v2)  <= max(fabs(v1), fabs(v2)) * epsilon
+
 
 
 def contextualize_text(text, context):  # private
