@@ -1,56 +1,70 @@
+# -*- coding: utf-8 -*-
+r"""
+Creates new localization properties files in a dummy language.
+
+Each property file is derived from the equivalent en_US file, with these
+transformations applied:
+
+1. Every vowel is replaced with an equivalent with extra accent marks.
+
+2. Every string is padded out to +30% length to simulate verbose languages
+   (such as German) to see if layout and flows work properly.
+
+3. Every string is terminated with a '#' character to make it easier to detect
+   truncation.
+
+Example use::
+
+    >>> from dummy import Dummy
+    >>> c = Dummy()
+    >>> c.convert("My name is Bond, James Bond")
+    u'M\xfd n\xe4m\xe9 \xefs B\xf8nd, J\xe4m\xe9s B\xf8nd \u2360\u03c3\u044f\u0454\u043c \u03b9\u03c1#'
+    >>> print c.convert("My name is Bond, James Bond")
+    Mý nämé ïs Bønd, Jämés Bønd Ⱡσяєм ιρ#
+    >>> print c.convert("don't convert <a href='href'>tag ids</a>")
+    døn't çønvért <a href='href'>täg ïds</a> Ⱡσяєм ιρѕυ#
+    >>> print c.convert("don't convert %(name)s tags on %(date)s")
+    døn't çønvért %(name)s tägs øn %(date)s Ⱡσяєм ιρѕ#
+
+"""
+
 from converter import Converter
-
-# Creates new localization properties files in a dummy language
-# Each property file is derived from the equivalent en_US file, except
-# 1. Every vowel is replaced with an equivalent with extra accent marks
-# 2. Every string is padded out to +30% length to simulate verbose languages (e.g. German)
-#    to see if layout and flows work properly
-# 3. Every string is terminated with a '#' character to make it easier to detect truncation
-
-
-# --------------------------------
-# Example use:
-# >>> from dummy import Dummy
-# >>> c = Dummy()
-# >>> c.convert("hello my name is Bond, James Bond")
-# u'h\xe9ll\xf6 my n\xe4m\xe9 \xefs B\xf6nd, J\xe4m\xe9s B\xf6nd Lorem i#'
-#
-# >>> c.convert('don\'t convert <a href="href">tag ids</a>')
-# u'd\xf6n\'t \xe7\xf6nv\xe9rt <a href="href">t\xe4g \xefds</a> Lorem ipsu#'
-#
-# >>> c.convert('don\'t convert %(name)s tags on %(date)s')
-# u"d\xf6n't \xe7\xf6nv\xe9rt %(name)s t\xe4gs \xf6n %(date)s Lorem ips#"
-
 
 # Substitute plain characters with accented lookalikes.
 # http://tlt.its.psu.edu/suggestions/international/web/codehtml.html#accent
-TABLE = {'A': u'\xC0',
-         'a': u'\xE4',
-         'b': u'\xDF',
-         'C': u'\xc7',
-         'c': u'\xE7',
-         'E': u'\xC9',
-         'e': u'\xE9',
-         'I': U'\xCC',
-         'i': u'\xEF',
-         'O': u'\xD8',
-         'o': u'\xF8',
-         'U': u'\xDB',
-         'u': u'\xFC',
-         'Y': u'\xDD',
-         'y': u'\xFD',
-         }
-
+TABLE = {
+    'A': u'À',
+    'a': u'ä',
+    'b': u'ß',
+    'C': u'Ç',
+    'c': u'ç',
+    'E': u'É',
+    'e': u'é',
+    'I': u'Ì',
+    'i': u'ï',
+    'O': u'Ø',
+    'o': u'ø',
+    'U': u'Û',
+    'u': u'ü',
+    'Y': u'Ý',
+    'y': u'ý',
+}
 
 
 # The print industry's standard dummy text, in use since the 1500s
-# see http://www.lipsum.com/
-LOREM = ' Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed ' \
-        'do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad ' \
-        'minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ' \
-        'ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate ' \
-        'velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat ' \
-        'cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. '
+# see http://www.lipsum.com/, then fed through a "fancy-text" converter.
+# The string should start with a space.
+LOREM = " " + " ".join(     # join and split just make the string easier here.
+    u"""
+    Ⱡσяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂
+    тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм
+    νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα
+    ¢σммσ∂σ ¢σηѕєqυαт.  ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє
+    νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт
+    ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂
+    єѕт łαвσяυм.
+    """.split()
+)
 
 # To simulate more verbose languages (like German), pad the length of a string
 # by a multiple of PAD_FACTOR

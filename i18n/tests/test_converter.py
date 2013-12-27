@@ -29,6 +29,9 @@ class TestConverter(TestCase):
             ('big <strong>bad</strong> wolf', 'BIG <strong>BAD</strong> WOLF'),
             # two html tags
             ('big <b>bad</b> <i>wolf</i>', 'BIG <b>BAD</b> <i>WOLF</i>'),
+            # html tags with attributes
+            ('<a href="foo">bar</a> baz', '<a href="foo">BAR</a> BAZ'),
+            ("<a href='foo'>bar</a> baz", "<a href='foo'>BAR</a> BAZ"),
             # one python tag
             ('big %(adjective)s wolf', 'BIG %(adjective)s WOLF'),
             # two python tags
