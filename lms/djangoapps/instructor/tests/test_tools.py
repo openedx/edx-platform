@@ -3,6 +3,7 @@ Tests for views/tools.py.
 """
 
 import datetime
+import functools
 import mock
 import json
 import unittest
@@ -10,12 +11,16 @@ import unittest
 from django.utils.timezone import utc
 from django.test.utils import override_settings
 
+from courseware.models import StudentModule
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from student.tests.factories import UserFactory
+from xmodule.fields import Date
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from ..views import tools
+
+DATE_FIELD = Date()
 
 
 class TestDashboardError(unittest.TestCase):
@@ -135,17 +140,42 @@ class TestSetDueDateExtension(ModuleStoreTestCase):
         week1.children = [homework.location.url()]
 
         user = UserFactory.create()
+        StudentModule(
+            state='{}',
+            student_id=user.id,
+            course_id=course.id,
+            module_state_key=week1.location.url()).save()
+        StudentModule(
+            state='{}',
+            student_id=user.id,
+            course_id=course.id,
+            module_state_key=homework.location.url()).save()
 
         self.course = course
         self.week1 = week1
-        self.homeowrk = homework
+        self.homework = homework
         self.week2 = week2
         self.user = user
+
+        self.extended_due = functools.partial(
+            get_extended_due, course, student=user)
 
     def test_set_due_date_extension(self):
         extended = datetime.datetime(2013, 12, 25, 0, 0, tzinfo=utc)
         tools.set_due_date_extension(self.course, self.week1, self.user,
                                      extended)
-        import pdb; pdb.set_trace()
-        self.assertEqual(self.week1.extended_due, extended)
-        self.assertEqual(self.homework.extended_due, extended)
+        self.assertEqual(self.extended_due(self.week1), extended)
+        self.assertEqual(self.extended_due(self.homework), extended)
+
+
+def get_extended_due(course, unit, student):
+    student_module = StudentModule.objects.get(
+        student_id=student.id,
+        course_id=course.id,
+        module_state_key=unit.location.url()
+    )
+
+    state = json.loads(student_module.state)
+    extended = state.get('extended_due', None)
+    if extended:
+        return DATE_FIELD.from_json(extended)
