@@ -14,7 +14,7 @@ class FloatCompareTest(unittest.TestCase):
     eq = lambda self, x, y:  self.assertTrue(fcmp(x, y))
     neq = lambda self, x, y:  self.assertFalse(fcmp(x, y))
 
-    def test_true(self):
+    def test_examples(self):
         self.eq(0,0)
         self.eq(0.000016, 1.6*10**-5)
         self.eq(1.9e24, 1.9*10**24)
