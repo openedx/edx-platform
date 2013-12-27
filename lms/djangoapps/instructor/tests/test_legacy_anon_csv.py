@@ -44,11 +44,7 @@ class TestInstructorDashboardAnonCSV(ModuleStoreTestCase, LoginEnrollmentTestCas
         self.activate_user(self.student)
         self.activate_user(self.instructor)
 
-        def make_instructor(course):
-            """ Create an instructor for the course."""
-            CourseStaffRole(course.location).add_users(User.objects.get(email=self.instructor))
-
-        make_instructor(self.toy)
+        CourseStaffRole(self.toy.location).add_users(User.objects.get(email=self.instructor))
 
         self.logout()
         self.login(self.instructor, self.password)

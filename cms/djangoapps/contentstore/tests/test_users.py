@@ -4,9 +4,10 @@ Tests for contentstore/views/user.py.
 import json
 from .utils import CourseTestCase
 from django.contrib.auth.models import User, Group
-from auth.authz import get_course_groupname_for_role
 from student.models import CourseEnrollment
 from xmodule.modulestore.django import loc_mapper
+from student.roles import CourseStaffRole, CourseInstructorRole
+from student import auth
 
 
 class UsersTestCase(CourseTestCase):
@@ -29,8 +30,6 @@ class UsersTestCase(CourseTestCase):
         self.detail_url = self.location.url_reverse('course_team', self.ext_user.email)
         self.inactive_detail_url = self.location.url_reverse('course_team', self.inactive_user.email)
         self.invalid_detail_url = self.location.url_reverse('course_team', "nonexistent@user.com")
-        self.staff_groupname = get_course_groupname_for_role(self.course_locator, "staff")
-        self.inst_groupname = get_course_groupname_for_role(self.course_locator, "instructor")
 
     def test_index(self):
         resp = self.client.get(self.index_url, HTTP_ACCEPT='text/html')
@@ -39,9 +38,7 @@ class UsersTestCase(CourseTestCase):
         self.assertNotContains(resp, self.ext_user.email)
 
     def test_index_member(self):
-        group, _ = Group.objects.get_or_create(name=self.staff_groupname)
-        self.ext_user.groups.add(group)
-        self.ext_user.save()
+        auth.add_users(self.user, CourseStaffRole(self.course_locator), self.ext_user)
 
         resp = self.client.get(self.index_url, HTTP_ACCEPT='text/html')
         self.assertContains(resp, self.ext_user.email)
@@ -73,10 +70,9 @@ class UsersTestCase(CourseTestCase):
         self.assertEqual(resp.status_code, 204)
         # reload user from DB
         ext_user = User.objects.get(email=self.ext_user.email)
-        groups = [g.name for g in ext_user.groups.all()]
         # no content: should not be in any roles
-        self.assertNotIn(self.staff_groupname, groups)
-        self.assertNotIn(self.inst_groupname, groups)
+        self.assertFalse(auth.has_access(ext_user, CourseStaffRole(self.course_locator)))
+        self.assertFalse(auth.has_access(ext_user, CourseInstructorRole(self.course_locator)))
         self.assert_not_enrolled()
 
     def test_detail_post_staff(self):
@@ -89,15 +85,12 @@ class UsersTestCase(CourseTestCase):
         self.assertEqual(resp.status_code, 204)
         # reload user from DB
         ext_user = User.objects.get(email=self.ext_user.email)
-        groups = [g.name for g in ext_user.groups.all()]
-        self.assertIn(self.staff_groupname, groups)
-        self.assertNotIn(self.inst_groupname, groups)
+        self.assertTrue(auth.has_access(ext_user, CourseStaffRole(self.course_locator)))
+        self.assertFalse(auth.has_access(ext_user, CourseInstructorRole(self.course_locator)))
         self.assert_enrolled()
 
     def test_detail_post_staff_other_inst(self):
-        inst_group, _ = Group.objects.get_or_create(name=self.inst_groupname)
-        self.user.groups.add(inst_group)
-        self.user.save()
+        auth.add_users(self.user, CourseInstructorRole(self.course_locator), self.user)
 
         resp = self.client.post(
             self.detail_url,
@@ -108,15 +101,13 @@ class UsersTestCase(CourseTestCase):
         self.assertEqual(resp.status_code, 204)
         # reload user from DB
         ext_user = User.objects.get(email=self.ext_user.email)
-        groups = [g.name for g in ext_user.groups.all()]
-        self.assertIn(self.staff_groupname, groups)
-        self.assertNotIn(self.inst_groupname, groups)
+        self.assertTrue(auth.has_access(ext_user, CourseStaffRole(self.course_locator)))
+        self.assertFalse(auth.has_access(ext_user, CourseInstructorRole(self.course_locator)))
         self.assert_enrolled()
         # check that other user is unchanged
         user = User.objects.get(email=self.user.email)
-        groups = [g.name for g in user.groups.all()]
-        self.assertNotIn(self.staff_groupname, groups)
-        self.assertIn(self.inst_groupname, groups)
+        self.assertTrue(auth.has_access(user, CourseInstructorRole(self.course_locator)))
+        self.assertFalse(CourseStaffRole(self.course_locator).has_user(user))
 
     def test_detail_post_instructor(self):
         resp = self.client.post(
@@ -128,9 +119,8 @@ class UsersTestCase(CourseTestCase):
         self.assertEqual(resp.status_code, 204)
         # reload user from DB
         ext_user = User.objects.get(email=self.ext_user.email)
-        groups = [g.name for g in ext_user.groups.all()]
-        self.assertNotIn(self.staff_groupname, groups)
-        self.assertIn(self.inst_groupname, groups)
+        self.assertTrue(auth.has_access(ext_user, CourseInstructorRole(self.course_locator)))
+        self.assertFalse(CourseStaffRole(self.course_locator).has_user(ext_user))
         self.assert_enrolled()
 
     def test_detail_post_missing_role(self):
@@ -154,15 +144,12 @@ class UsersTestCase(CourseTestCase):
         self.assertEqual(resp.status_code, 204)
         # reload user from DB
         ext_user = User.objects.get(email=self.ext_user.email)
-        groups = [g.name for g in ext_user.groups.all()]
-        self.assertIn(self.staff_groupname, groups)
-        self.assertNotIn(self.inst_groupname, groups)
+        self.assertTrue(auth.has_access(ext_user, CourseStaffRole(self.course_locator)))
+        self.assertFalse(auth.has_access(ext_user, CourseInstructorRole(self.course_locator)))
         self.assert_enrolled()
 
     def test_detail_delete_staff(self):
-        group, _ = Group.objects.get_or_create(name=self.staff_groupname)
-        self.ext_user.groups.add(group)
-        self.ext_user.save()
+        auth.add_users(self.user, CourseStaffRole(self.course_locator), self.ext_user)
 
         resp = self.client.delete(
             self.detail_url,
@@ -171,15 +158,10 @@ class UsersTestCase(CourseTestCase):
         self.assertEqual(resp.status_code, 204)
         # reload user from DB
         ext_user = User.objects.get(email=self.ext_user.email)
-        groups = [g.name for g in ext_user.groups.all()]
-        self.assertNotIn(self.staff_groupname, groups)
+        self.assertFalse(auth.has_access(ext_user, CourseStaffRole(self.course_locator)))
 
     def test_detail_delete_instructor(self):
-        group, _ = Group.objects.get_or_create(name=self.inst_groupname)
-        self.user.groups.add(group)
-        self.ext_user.groups.add(group)
-        self.user.save()
-        self.ext_user.save()
+        auth.add_users(self.user, CourseInstructorRole(self.course_locator), self.ext_user, self.user)
 
         resp = self.client.delete(
             self.detail_url,
@@ -188,13 +170,10 @@ class UsersTestCase(CourseTestCase):
         self.assertEqual(resp.status_code, 204)
         # reload user from DB
         ext_user = User.objects.get(email=self.ext_user.email)
-        groups = [g.name for g in ext_user.groups.all()]
-        self.assertNotIn(self.inst_groupname, groups)
+        self.assertFalse(auth.has_access(ext_user, CourseInstructorRole(self.course_locator)))
 
     def test_delete_last_instructor(self):
-        group, _ = Group.objects.get_or_create(name=self.inst_groupname)
-        self.ext_user.groups.add(group)
-        self.ext_user.save()
+        auth.add_users(self.user, CourseInstructorRole(self.course_locator), self.ext_user)
 
         resp = self.client.delete(
             self.detail_url,
@@ -205,13 +184,10 @@ class UsersTestCase(CourseTestCase):
         self.assertIn("error", result)
         # reload user from DB
         ext_user = User.objects.get(email=self.ext_user.email)
-        groups = [g.name for g in ext_user.groups.all()]
-        self.assertIn(self.inst_groupname, groups)
+        self.assertTrue(auth.has_access(ext_user, CourseInstructorRole(self.course_locator)))
 
     def test_post_last_instructor(self):
-        group, _ = Group.objects.get_or_create(name=self.inst_groupname)
-        self.ext_user.groups.add(group)
-        self.ext_user.save()
+        auth.add_users(self.user, CourseInstructorRole(self.course_locator), self.ext_user)
 
         resp = self.client.post(
             self.detail_url,
@@ -223,12 +199,10 @@ class UsersTestCase(CourseTestCase):
         self.assertIn("error", result)
         # reload user from DB
         ext_user = User.objects.get(email=self.ext_user.email)
-        groups = [g.name for g in ext_user.groups.all()]
-        self.assertIn(self.inst_groupname, groups)
+        self.assertTrue(auth.has_access(ext_user, CourseInstructorRole(self.course_locator)))
 
     def test_permission_denied_self(self):
-        group, _ = Group.objects.get_or_create(name=self.staff_groupname)
-        self.user.groups.add(group)
+        auth.add_users(self.user, CourseStaffRole(self.course_locator), self.user)
         self.user.is_staff = False
         self.user.save()
 
@@ -244,8 +218,7 @@ class UsersTestCase(CourseTestCase):
         self.assertIn("error", result)
 
     def test_permission_denied_other(self):
-        group, _ = Group.objects.get_or_create(name=self.staff_groupname)
-        self.user.groups.add(group)
+        auth.add_users(self.user, CourseStaffRole(self.course_locator), self.user)
         self.user.is_staff = False
         self.user.save()
 
@@ -259,8 +232,7 @@ class UsersTestCase(CourseTestCase):
         self.assertIn("error", result)
 
     def test_staff_can_delete_self(self):
-        group, _ = Group.objects.get_or_create(name=self.staff_groupname)
-        self.user.groups.add(group)
+        auth.add_users(self.user, CourseStaffRole(self.course_locator), self.user)
         self.user.is_staff = False
         self.user.save()
 
@@ -270,16 +242,12 @@ class UsersTestCase(CourseTestCase):
         self.assertEqual(resp.status_code, 204)
         # reload user from DB
         user = User.objects.get(email=self.user.email)
-        groups = [g.name for g in user.groups.all()]
-        self.assertNotIn(self.staff_groupname, groups)
+        self.assertFalse(auth.has_access(user, CourseStaffRole(self.course_locator)))
 
     def test_staff_cannot_delete_other(self):
-        group, _ = Group.objects.get_or_create(name=self.staff_groupname)
-        self.user.groups.add(group)
+        auth.add_users(self.user, CourseStaffRole(self.course_locator), self.user, self.ext_user)
         self.user.is_staff = False
         self.user.save()
-        self.ext_user.groups.add(group)
-        self.ext_user.save()
 
         resp = self.client.delete(self.detail_url)
         self.assertEqual(resp.status_code, 400)
@@ -287,8 +255,7 @@ class UsersTestCase(CourseTestCase):
         self.assertIn("error", result)
         # reload user from DB
         ext_user = User.objects.get(email=self.ext_user.email)
-        groups = [g.name for g in ext_user.groups.all()]
-        self.assertIn(self.staff_groupname, groups)
+        self.assertTrue(auth.has_access(ext_user, CourseStaffRole(self.course_locator)))
 
     def test_user_not_initially_enrolled(self):
         # Verify that ext_user is not enrolled in the new course before being added as a staff member.

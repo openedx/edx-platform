@@ -28,7 +28,7 @@ from ..transcripts_utils import manage_video_subtitles_save
 
 from ..utils import get_modulestore
 
-from .access import has_access
+from .access import has_course_access
 from .helpers import _xmodule_recurse
 from preview import handler_prefix, get_preview_html
 from edxmako.shortcuts import render_to_response, render_to_string
@@ -81,7 +81,7 @@ def xblock_handler(request, tag=None, package_id=None, branch=None, version_guid
     """
     if package_id is not None:
         locator = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
-        if not has_access(request.user, locator):
+        if not has_course_access(request.user, locator):
             raise PermissionDenied()
         old_location = loc_mapper().translate_locator_to_location(locator)
 
@@ -250,7 +250,7 @@ def _create_item(request):
 
     display_name = request.json.get('display_name')
 
-    if not has_access(request.user, parent_location):
+    if not has_course_access(request.user, parent_location):
         raise PermissionDenied()
 
     parent = get_modulestore(category).get_item(parent_location)
@@ -335,7 +335,7 @@ def orphan_handler(request, tag=None, package_id=None, branch=None, version_guid
     # DHM: when split becomes back-end, move or conditionalize this conversion
     old_location = loc_mapper().translate_locator_to_location(location)
     if request.method == 'GET':
-        if has_access(request.user, old_location):
+        if has_course_access(request.user, old_location):
             return JsonResponse(modulestore().get_orphans(old_location, DETACHED_CATEGORIES, 'draft'))
         else:
             raise PermissionDenied()

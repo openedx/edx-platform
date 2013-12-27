@@ -1,7 +1,8 @@
+<%! import json %>
 <%! from django.utils.translation import ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
-<%! from auth.authz import is_user_in_course_group_role %>
-<%! import json %>
+<%! from student.roles import CourseInstructorRole %>
+<%! from student.auth import has_access %>
 <%! from xmodule.modulestore.django import loc_mapper %>
 <%inherit file="base.html" />
 <%block name="title">${_("Course Team Settings")}</%block>
@@ -65,7 +66,7 @@
 
         <li class="user-item" data-email="${user.email}" data-url="${new_location.url_reverse('course_team/', user.email) }">
 
-        <% is_instuctor = is_user_in_course_group_role(user, context_course.location, 'instructor', check_staff=False) %>
+        <% is_instuctor = has_access(user, CourseInstructorRole(context_course.location)) %>
           % if is_instuctor:
           <span class="wrapper-ui-badge">
             <span class="flag flag-role flag-role-admin is-hanging">
@@ -120,7 +121,7 @@
         % endfor
       </ol>
 
-      <% user_is_instuctor = is_user_in_course_group_role(request.user, context_course.location, 'instructor', check_staff=False) %>
+      <% user_is_instuctor = has_access(request.user, CourseInstructorRole(context_course.location)) %>
       % if user_is_instuctor and len(staff) == 1:
       <div class="notice notice-incontext notice-create has-actions">
         <div class="msg">
