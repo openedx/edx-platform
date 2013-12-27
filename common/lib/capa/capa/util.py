@@ -32,16 +32,14 @@ def compare_with_tolerance(v1, v2, tol):
         # `inf <= inf` which is a fail. Instead, compare directly.
         return v1 == v2
     else:
-        # if tolerance:
-        return abs(v1 - v2) <= tolerance
+        if tolerance:
+            return abs(v1 - v2) <= tolerance
 
         return float_compare(v1, v2)
 
 def float_compare(v1, v2):
     """
-    Compares two floats.
-
-    Handles machine rounding errors.
+    Compares two floats. Handles machine representation errors.
 
     Some useful references:
     http://en.wikipedia.org/wiki/Machine_epsilon#Approximation_using_Python
