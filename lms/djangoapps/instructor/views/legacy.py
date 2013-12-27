@@ -34,7 +34,7 @@ from bulk_email.models import CourseEmail, CourseAuthorization
 from courseware import grades
 from courseware.access import has_access
 from courseware.courses import get_course_with_access, get_cms_course_link
-from courseware.roles import (
+from student.roles import (
     CourseStaffRole, CourseInstructorRole, CourseBetaTesterRole, GlobalStaff
 )
 from courseware.models import StudentModule
@@ -1029,7 +1029,7 @@ def _role_members_table(role, title, course_id):
     Return a data table of usernames and names of users in group_name.
 
     Arguments:
-        role -- a courseware.roles.AccessRole
+        role -- a student.roles.AccessRole
         title -- a descriptive title to show the user
 
     Returns:
@@ -1107,7 +1107,7 @@ def remove_user_from_role(request, username_or_email, role, group_title, event_n
     Arguments:
        request: django request--used for tracking log
        username_or_email: who to remove.  Decide if it's an email by presense of an '@'
-       role: A courseware.roles.AccessRole
+       role: A student.roles.AccessRole
        group_title: what to call this group in messages to user--e.g. "beta-testers".
        event_name: what to call this event when logging to tracking logs.
 

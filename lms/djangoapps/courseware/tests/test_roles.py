@@ -1,5 +1,5 @@
 """
-Tests of courseware.roles
+Tests of student.roles
 """
 
 from django.test import TestCase
@@ -8,12 +8,12 @@ from xmodule.modulestore import Location
 from courseware.tests.factories import UserFactory, StaffFactory, InstructorFactory
 from student.tests.factories import AnonymousUserFactory
 
-from courseware.roles import GlobalStaff, CourseRole
+from student.roles import GlobalStaff, CourseRole
 
 
 class RolesTestCase(TestCase):
     """
-    Tests of courseware.roles
+    Tests of student.roles
     """
 
     def setUp(self):

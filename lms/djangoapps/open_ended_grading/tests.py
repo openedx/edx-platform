@@ -26,7 +26,7 @@ from courseware.tests import factories
 from courseware.tests.helpers import LoginEnrollmentTestCase, check_for_get_code, check_for_post_code
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from lms.lib.xblock.runtime import LmsModuleSystem
-from courseware.roles import CourseStaffRole
+from student.roles import CourseStaffRole
 from edxmako.shortcuts import render_to_string
 from student.models import unique_id_for_user
 
