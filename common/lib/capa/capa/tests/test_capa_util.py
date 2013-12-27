@@ -1,5 +1,5 @@
 """
-Tests cor capa/util.py
+Tests for capa/util.py
 """
 import unittest
 
