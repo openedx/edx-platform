@@ -13,12 +13,11 @@ DATE_FIELD = Date()
 
 def set_due_date_extension(course, url, student, due_date):
     """
-    Sets a due date extension.  Factored to be usable in both legacy and beta
-    instructor dashboards.
+    Sets a due date extension.
     """
     unit = _find_unit(course, url)
     if not unit:
-        return _("Couldn't find module for url: {0}").format(url), None
+        raise ValueError(_("Couldn't find module for url: {0}").format(url))
 
     def set_due_date(node):
         """
@@ -42,8 +41,6 @@ def set_due_date_extension(course, url, student, due_date):
             set_due_date(child)
 
     set_due_date(unit)
-
-    return None, unit  # no error
 
 
 def _find_unit(node, url):
@@ -108,15 +105,11 @@ def _title_or_url(node):
 def dump_module_extensions(course, url):
     """
     Dumps data about students with due date extensions for a particular module,
-    specified by 'url', in a particular course.  Returns a tuple of (error,
-    data).  If there is an error, `error` will be a strong suitable for
-    displaying to the user and `data` will be None.  Otherwise `error` will be
-    None, and `data` will be a data structure formatted for use by the legacy
-    instructor dashboard's 'datatable'.
+    specified by 'url', in a particular course.
     """
     unit = _find_unit(course, url)
     if not unit:
-        return _("Couldn't find module for url: {0}").format(url), {}
+        raise ValueError(_("Couldn't find module for url: {0}").format(url))
 
     data = []
     query = StudentModule.objects.filter(
@@ -132,7 +125,7 @@ def dump_module_extensions(course, url):
         fullname = module.student.profile.name
         data.append((module.student.username, fullname, extended_due))
     data.sort(key=lambda x: x[0])
-    return None, {
+    return {
         "header": [_("Username"), _("Full Name"), _("Extended Due Date")],
         "title": _("Users with due date extensions for {0}").format(
             _title_or_url(unit)),

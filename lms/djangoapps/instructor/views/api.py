@@ -1010,19 +1010,22 @@ def change_due_date(request, course_id):
     student = get_student_from_identifier(request.GET.get('student'))
     url = request.GET.get('url')
     datestr = request.GET.get('due_datetime')
+
     try:
         due_date = parse_datetime(datestr).replace(tzinfo=utc)
     except ValueError:
         error = _("Unable to parse date: ") + datestr
         return HttpResponseBadRequest(json.dumps({'error': error}))
-    error, unit = set_due_date_extension(course, url, student, due_date)
-    if error:
-        return HttpResponseBadRequest(json.dumps({'error': error}))
+
+    try:
+        unit = set_due_date_extension(course, url, student, due_date)
+    except ValueError, error:
+        return HttpResponseBadRequest(json.dumps({'error': unicode(error)}))
 
     studentname = student.profile.name
     unitname = getattr(unit, 'display_name', None)
     if unitname:
-        unitname = '{0} ({1})'.format(unitname, unit.location.url())
+        unitname = u'{0} ({1})'.format(unitname, unit.location.url())
     msg = _(
         'Successfully changed due date for student {0} for {1} '
         'to {2}').format(studentname, unitname,
@@ -1042,14 +1045,16 @@ def reset_due_date(request, course_id):
     course = get_course_by_id(course_id)
     student = get_student_from_identifier(request.GET.get('student'))
     url = request.GET.get('url')
-    error, unit = set_due_date_extension(course, url, student, None)
-    if error:
-        return HttpResponseBadRequest(json.dumps({'error': error}))
+
+    try:
+        unit = set_due_date_extension(course, url, student, None)
+    except ValueError, error:
+        return HttpResponseBadRequest(json.dumps({'error': unicode(error)}))
 
     studentname = student.profile.name
     unitname = getattr(unit, 'display_name', None)
     if unitname:
-        unitname = '{0} ({1})'.format(unitname, unit.location.url())
+        unitname = u'{0} ({1})'.format(unitname, unit.location.url())
     due_date = unit.due
     msg = _(
         'Successfully reset due date for student {0} for {1} '
@@ -1069,8 +1074,9 @@ def show_unit_extensions(request, course_id):
     """
     course = get_course_by_id(course_id)
     url = request.GET.get('url')
-    error, data = dump_module_extensions(course, url)
-    if error:
+    try:
+        data = dump_module_extensions(course, url)
+    except ValueError, error:
         return HttpResponseBadRequest(json.dumps({'error': error}))
     header = data['header']
     data['data'] = [dict(zip(header, row)) for row in data['data']]
