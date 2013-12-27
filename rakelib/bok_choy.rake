@@ -45,7 +45,7 @@ end
 
 
 def nose_cmd(test_spec)
-    cmd = ["PYTHONPATH='#{BOK_CHOY_DIR}:$PYTHONPATH'", "SCREENSHOT_DIR='#{BOK_CHOY_LOG_DIR}'", "nosetests", test_spec]
+    cmd = ["PYTHONPATH='#{BOK_CHOY_DIR}:.'", "SCREENSHOT_DIR='#{BOK_CHOY_LOG_DIR}'", "nosetests", test_spec]
     if BOK_CHOY_NUM_PARALLEL > 1
         cmd += ["--processes=#{BOK_CHOY_NUM_PARALLEL}", "--process-timeout=#{BOK_CHOY_TEST_TIMEOUT}"]
     end

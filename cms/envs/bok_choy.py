@@ -1,6 +1,6 @@
 # Settings for bok choy tests
 
-import os 
+import os
 from path import path
 
 
@@ -33,6 +33,9 @@ for store in ["default", "direct"]:
 # Enable django-pipeline and staticfiles
 STATIC_ROOT = (TEST_ROOT / "staticfiles").abspath()
 PIPELINE = True
+
+# Use the auto_auth workflow for creating users and logging them in
+FEATURES['AUTOMATIC_AUTH_FOR_TESTING'] = True
 
 # Unfortunately, we need to use debug mode to serve staticfiles
 DEBUG = True
