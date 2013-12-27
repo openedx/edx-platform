@@ -42,7 +42,7 @@
 	$(function() {
 		var form = $("#disable-form");
 		$("#submit-form").click(function(){
-			$("#account-change-status").html(gettext("working..."));
+			$("#account-change-status").text("${_('working...')}");
 			$.ajax({
 				type: "POST",
 				url: form.attr('action'),
