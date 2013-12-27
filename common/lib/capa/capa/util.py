@@ -38,7 +38,7 @@ def compare_with_tolerance(v1, v2, tol):
         if  tolerance :
             return abs(v1 - v2) <= tolerance
 
-        return float_compare(v1.real, v2.real) && float_compare(v1.imag, v2.imag)
+        return float_compare(v1.real, v2.real) and float_compare(v1.imag, v2.imag)
 
 def float_compare(v1, v2):
     """
