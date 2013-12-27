@@ -218,13 +218,13 @@ class GraphicalSliderToolDescriptor(GraphicalSliderToolFields, XMLEditingDescrip
         expected_children_level_0 = ['render', 'configuration']
         for child in expected_children_level_0:
             if len(xml_object.xpath(child)) != 1:
-                raise ValueError("Graphical Slider Tool definition must include \
+                raise ValueError(u"Graphical Slider Tool definition must include \
                     exactly one '{0}' tag".format(child))
 
         expected_children_level_1 = ['functions']
         for child in expected_children_level_1:
             if len(xml_object.xpath('configuration')[0].xpath(child)) != 1:
-                raise ValueError("Graphical Slider Tool definition must include \
+                raise ValueError(u"Graphical Slider Tool definition must include \
                     exactly one '{0}' tag".format(child))
         # finished
 
@@ -234,7 +234,7 @@ class GraphicalSliderToolDescriptor(GraphicalSliderToolFields, XMLEditingDescrip
 
     def definition_to_xml(self, resource_fs):
         '''Return an xml element representing this definition.'''
-        data = '<{tag}>{body}</{tag}>'.format(
+        data = u'<{tag}>{body}</{tag}>'.format(
             tag='graphical_slider_tool',
             body=self.data)
         xml_object = etree.fromstring(data)
