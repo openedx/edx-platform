@@ -11,10 +11,6 @@ import os.path
 
 from django.conf import settings
 
-from mako.template import Template
-from mako.runtime import Context
-from StringIO import StringIO
-
 _microsite_configuration_threadlocal = threading.local()
 _microsite_configuration_threadlocal.data = {}
 
@@ -59,6 +55,10 @@ class MicrositeConfiguration(object):
         Returns a path to a Mako template, which can either be in
         a microsite directory (as an override) or will just return what is passed in
         """
+
+        if not cls.is_request_in_microsite():
+            return relative_path
+
         microsite_template_path = cls.get_microsite_configuration_value('template_dir')
 
         if microsite_template_path:

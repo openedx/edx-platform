@@ -163,8 +163,7 @@ class Order(models.Model):
 
         # send confirmation e-mail
         subject = _("Order Payment Confirmation")
-        message = render_to_string(
-            MicrositeConfiguration.get_microsite_template_path('emails/order_confirmation_email.txt'), {
+        message = render_to_string('emails/order_confirmation_email.txt', {
                 'order': self,
                 'order_items': orderitems,
                 'has_billing_info': settings.FEATURES['STORE_BILLING_INFO']

@@ -1461,7 +1461,7 @@ def send_mail_to_student(student, param_dict):
     message = None
 
     message_type = param_dict['message']
-    
+
     email_template_dict = {'allowed_enroll': ('emails/enroll_email_allowedsubject.txt', 'emails/enroll_email_allowedmessage.txt'),
        'enrolled_enroll': ('emails/enroll_email_enrolledsubject.txt', 'emails/enroll_email_enrolledmessage.txt'),
        'allowed_unenroll': ('emails/unenroll_email_subject.txt', 'emails/unenroll_email_allowedmessage.txt'),
@@ -1470,14 +1470,8 @@ def send_mail_to_student(student, param_dict):
 
     subject_template, message_template = email_template_dict.get(message_type, (None, None))
     if subject_template is not None and message_template is not None:
-        subject = render_to_string(
-            MicrositeConfiguration.get_microsite_template_path(subject_template),
-            param_dict
-        )
-        message = render_to_string(
-            MicrositeConfiguration.get_microsite_template_path(message_template),
-            param_dict
-        )
+        subject = render_to_string(subject_template, param_dict)
+        message = render_to_string(message_template, param_dict)
 
     if subject and message:
         # Remove leading and trailing whitespace from body

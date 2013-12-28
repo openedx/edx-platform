@@ -921,16 +921,10 @@ def create_account(request, post_override=None):
          }
 
     # composes activation email
-    subject = render_to_string(
-        MicrositeConfiguration.get_microsite_template_path('emails/activation_email_subject.txt'),
-        d
-    )
+    subject = render_to_string('emails/activation_email_subject.txt', d)
     # Email subject *must not* contain newlines
     subject = ''.join(subject.splitlines())
-    message = render_to_string(
-        MicrositeConfiguration.get_microsite_template_path('emails/activation_email.txt'),
-        d
-    )
+    message = render_to_string('emails/activation_email.txt', d)
 
     # don't send email if we are doing load testing or random user generation for some reason
     if not (settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING')):
@@ -1200,13 +1194,10 @@ def change_email_request(request):
          'old_email': user.email,
          'new_email': pec.new_email}
 
-    subject_template = MicrositeConfiguration.get_microsite_template_path('emails/email_change_subject.txt')
-    message_template = MicrositeConfiguration.get_microsite_template_path('emails/email_change.txt')
-
-    subject = render_to_string(subject_template, d)
+    subject = render_to_string('emails/email_change_subject.txt', d)
     subject = ''.join(subject.splitlines())
 
-    message = render_to_string(message_template, d)
+    message = render_to_string('emails/email_change.txt', d)
 
     from_address = MicrositeConfiguration.get_microsite_configuration_value('email_from_address',
         settings.DEFAULT_FROM_EMAIL)
