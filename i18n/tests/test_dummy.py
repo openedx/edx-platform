@@ -1,11 +1,16 @@
 # -*- coding: utf-8 -*-
+"""Tests of i18n/dummy.py"""
+
 import os, string, random
 from unittest import TestCase
+
+import ddt
 from polib import POEntry
 
 import dummy
 
 
+@ddt.ddt
 class TestDummy(TestCase):
     """
     Tests functionality of i18n/dummy.py
@@ -27,24 +32,24 @@ class TestDummy(TestCase):
             "Mismatch: %r != %r" % (str1, str2),
         )
 
-    def test_dummy(self):
+    @ddt.data(
+        (u"hello my name is Bond, James Bond",
+         u"héllø mý nämé ïs Bønd, Jämés Bønd Ⱡσяєм ι#"),
+
+        (u"don't convert <a href='href'>tag ids</a>",
+         u"døn't çønvért <a href='href'>täg ïds</a> Ⱡσяєм ιρѕυ#"),
+
+        (u"don't convert %(name)s tags on %(date)s",
+         u"døn't çønvért %(name)s tägs øn %(date)s Ⱡσяєм ιρѕ#"),
+    )
+    def test_dummy(self, data):
         """
         Tests with a dummy converter (adds spurious accents to strings).
         Assert that embedded HTML and python tags are not converted.
         """
-        test_cases = [
-            (u"hello my name is Bond, James Bond",
-             u"héllø mý nämé ïs Bønd, Jämés Bønd Ⱡσяєм ι#"),
-
-            (u"don't convert <a href='href'>tag ids</a>",
-             u"døn't çønvért <a href='href'>täg ïds</a> Ⱡσяєм ιρѕυ#"),
-
-            (u"don't convert %(name)s tags on %(date)s",
-             u"døn't çønvért %(name)s tägs øn %(date)s Ⱡσяєм ιρѕ#"),
-        ]
-        for source, expected in test_cases:
-            result = self.converter.convert(source)
-            self.assertUnicodeEquals(result, expected)
+        source, expected = data
+        result = self.converter.convert(source)
+        self.assertUnicodeEquals(result, expected)
 
     def test_singular(self):
         entry = POEntry()
