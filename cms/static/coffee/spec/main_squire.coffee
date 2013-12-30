@@ -136,6 +136,9 @@ requirejs.config({
                   ]
               MathJax.Hub.Configured();
         },
+        "URI": {
+            exports: "URI"
+        },
         "xmodule": {
             exports: "XModule"
         },

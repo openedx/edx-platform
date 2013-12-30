@@ -56,26 +56,17 @@ class AssetsToyCourseTestCase(CourseTestCase):
         location = loc_mapper().translate_location(course.location.course_id, course.location, False, True)
         url = location.url_reverse('assets/', '')
 
+        self.assert_correct_asset_response(url, 0, 3, 3)
+        self.assert_correct_asset_response(url + "?page_size=2", 0, 2, 3)
+        self.assert_correct_asset_response(url + "?page_size=2&page=1", 2, 1, 3)
+
+    def assert_correct_asset_response(self, url, expectedStart, expectedLength, expectedTotal):
         resp = self.client.get(url, HTTP_ACCEPT='application/json')
         json_response = json.loads(resp.content)
         assets = json_response['assets']
-        self.assertEquals(json_response['start'], 0)
-        self.assertEquals(json_response['totalCount'], 3)
-        self.assertEquals(len(assets), 3)
-
-        resp = self.client.get(url + "?page_size=2", HTTP_ACCEPT='application/json')
-        json_response = json.loads(resp.content)
-        assets = json_response['assets']
-        self.assertEquals(json_response['start'], 0)
-        self.assertEquals(json_response['totalCount'], 3)
-        self.assertEquals(len(assets), 2)
-
-        resp = self.client.get(url + "?page_size=2&page=1", HTTP_ACCEPT='application/json')
-        json_response = json.loads(resp.content)
-        assets = json_response['assets']
-        self.assertEquals(json_response['start'], 2)
-        self.assertEquals(json_response['totalCount'], 3)
-        self.assertEquals(len(assets), 1)
+        self.assertEquals(json_response['start'], expectedStart)
+        self.assertEquals(len(assets), expectedLength)
+        self.assertEquals(json_response['totalCount'], expectedTotal)
 
 
 class UploadTestCase(CourseTestCase):
@@ -175,49 +166,3 @@ class LockAssetTestCase(CourseTestCase):
         resp_asset = post_asset_update(False)
         self.assertFalse(resp_asset['locked'])
         verify_asset_locked_state(False)
-
-
-class TestAssetIndex(CourseTestCase):
-    """
-    Test getting asset lists via http (Note, the assets don't actually exist)
-    """
-    def setUp(self):
-        """
-        Create fake asset entries for the other tests to use
-        """
-        super(TestAssetIndex, self).setUp()
-        self.entry_filter = self.create_asset_entries(contentstore(), 100)
-        location = loc_mapper().translate_location(self.course.location.course_id, self.course.location, False, True)
-        self.url = location.url_reverse('assets/', '')
-
-    def tearDown(self):
-        """
-        Get rid of the entries
-        """
-        contentstore().fs_files.remove(self.entry_filter)
-
-    def create_asset_entries(self, cstore, number):
-        """
-        Create the fake entries
-        """
-        course_filter = Location(
-            XASSET_LOCATION_TAG, category='asset', course=self.course.location.course, org=self.course.location.org
-        )
-        # purge existing entries (a bit brutal but hopefully tests are independent enuf to not trip on this)
-        cstore.fs_files.remove(location_to_query(course_filter))
-        base_entry = {
-            'displayname': 'foo.jpg',
-            'chunkSize': 262144,
-            'length': 0,
-            'uploadDate': datetime(2012, 1, 2, 0, 0),
-            'contentType': 'image/jpeg',
-        }
-        for i in range(number):
-            base_entry['displayname'] = '{:03x}.jpeg'.format(i)
-            base_entry['uploadDate'] += timedelta(hours=i)
-            base_entry['_id'] = course_filter.replace(name=base_entry['displayname']).dict()
-            cstore.fs_files.insert(base_entry)
-
-        return course_filter.dict()
-
-    ASSET_LIST_RE = re.compile(r'AssetCollection\((.*)\);$', re.MULTILINE)

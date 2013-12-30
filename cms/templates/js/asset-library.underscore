@@ -3,7 +3,7 @@
     <div id="asset-paging-header"></div>
 
     <table>
-        <caption class="sr">${_("List of uploaded files and assets in this course")}</caption>
+        <caption class="sr"><%= gettext("List of uploaded files and assets in this course") %></caption>
         <colgroup>
             <col class="thumb-cols" />
             <col class="name-cols" />

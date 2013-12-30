@@ -48,7 +48,7 @@ define(["sinon"], function(sinon) {
         requests[requestIndex].respond(200,
             { "Content-Type": "application/json" },
             JSON.stringify(jsonResponse));
-    }
+    };
 
     return {
         "server": fakeServer,

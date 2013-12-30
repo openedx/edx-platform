@@ -33,8 +33,6 @@ define(["backbone", "underscore", "gettext"], function(Backbone, _, gettext) {
         messageHtml: function() {
             var view = this.view,
                 collection = view.collection,
-                currentPage = collection.currentPage,
-                pageSize = collection.perPage,
                 start = collection.start,
                 count = collection.size(),
                 end = start + count,

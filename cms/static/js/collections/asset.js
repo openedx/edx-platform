@@ -13,9 +13,9 @@ define(["backbone.paginator", "js/models/asset"], function(BackbonePaginator, As
             perPage: 50
         },
         server_api: {
-            'page': function() { return this.currentPage },
-            'page_size': function() { return this.perPage },
-            'format': 'json'  // TODO determine how to pass 'accepts' through...
+            'page': function() { return this.currentPage; },
+            'page_size': function() { return this.perPage; },
+            'format': 'json'
         },
 
         parse: function(response) {

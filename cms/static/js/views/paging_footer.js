@@ -1,4 +1,4 @@
-define(["backbone"], function(Backbone, AssetView) {
+define(["backbone", "underscore"], function(Backbone, _) {
 
     var PagingFooter = Backbone.View.extend({
         events : {

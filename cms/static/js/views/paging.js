@@ -22,7 +22,7 @@ define(["backbone", "js/views/feedback_alert"], function(Backbone, AlertView) {
                 },
                 error: function(collection, response, options) {
                     collection.currentPage = oldPage;
-                    self.showPagingError(response);
+                    self.showPagingError();
                 }
             });
         },
@@ -44,7 +44,7 @@ define(["backbone", "js/views/feedback_alert"], function(Backbone, AlertView) {
             }
         },
 
-        showPagingError: function(response) {
+        showPagingError: function() {
             AlertView.Error({
                 title: gettext("Unexpected Error"),
                 closeIcon: false
