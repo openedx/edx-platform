@@ -2,6 +2,7 @@ Change Log
 ----------
 
 # This is my fork
+# and this is "theme" branch
 
 These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
