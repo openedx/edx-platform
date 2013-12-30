@@ -126,6 +126,17 @@ def enter_xml_in_advanced_problem(step, text):
 
 
 @world.absorb
+def enter_xml_in_advanced_problem(step, text):
+    """
+    Edits an advanced problem (assumes only on page),
+    types the provided XML, and saves the component.
+    """
+    world.edit_component()
+    type_in_codemirror(0, text)
+    world.save_component(step)
+
+
+@world.absorb
 def verify_setting_entry(setting, display_name, value, explicitly_set):
     """
     Verify the capa module fields are set as expected in the
