@@ -1,4 +1,4 @@
-define(["backbone", "js/views/feedback_alert"], function(Backbone, AlertView) {
+define(["backbone", "js/views/feedback_alert", "gettext"], function(Backbone, AlertView, gettext) {
 
     var PagingView = Backbone.View.extend({
         // takes a Backbone Paginator as a model

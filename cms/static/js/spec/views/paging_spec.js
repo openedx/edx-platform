@@ -66,7 +66,6 @@ define([ "jquery", "js/spec/create_sinon", "URI",
                 var feedbackTpl = readFixtures('system-feedback.underscore');
                 setFixtures($("<script>", { id: "system-feedback-tpl", type: "text/template" }).text(feedbackTpl));
                 pagingView = new MockPagingView({collection: assets});
-                spyOn(pagingView, 'showPagingError');
             });
 
 
@@ -361,7 +360,6 @@ define([ "jquery", "js/spec/create_sinon", "URI",
                         var requests = create_sinon.requests(this);
                         pagingView.setPage(1);
                         respondWithMockAssets(requests);
-                        // Verify that 500 errors don't cause the page to move
                         pagingFooter.$('.previous-page-link').click();
                         requests[1].respond(500);
                         expect(pagingView.collection.currentPage).toBe(1);

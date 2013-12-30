@@ -167,6 +167,14 @@ define ["jasmine", "js/spec/create_sinon", "squire"],
                 thumbnail: null
                 id: 'id_2'
             }
+            @mockAssetsResponse = {
+                assets: [ @mockAsset1, @mockAsset2 ],
+                start: 0,
+                end: 1,
+                page: 0,
+                pageSize: 5,
+                totalCount: 2
+            }
 
             runs =>
                 @injector.require ["js/models/asset", "js/collections/asset", "js/views/assets"],
@@ -177,18 +185,7 @@ define ["jasmine", "js/spec/create_sinon", "squire"],
                     @view = new AssetsView
                         collection: @collection
                         el: $('#asset_table_body')
-                    @requests = create_sinon["requests"](this)
                     @view.render()
-                    @view.setPage(0)
-                    create_sinon.respondWithJson(@requests,
-                        {
-                        assets: [ @mockAsset1, @mockAsset2 ],
-                        start: 0,
-                        end: 1,
-                        page: 0,
-                        pageSize: 5,
-                        totalCount: 2
-                        })
 
             waitsFor (=> @view), "AssetsView was not created", 1000
 
@@ -203,10 +200,16 @@ define ["jasmine", "js/spec/create_sinon", "squire"],
 
         describe "Basic", ->
             it "should render both assets", ->
+                @requests = create_sinon["requests"](this)
+                @view.setPage(0)
+                create_sinon.respondWithJson(@requests, @mockAssetsResponse)
                 expect(@view.$el).toContainText("test asset 1")
                 expect(@view.$el).toContainText("test asset 2")
 
             it "should remove the deleted asset from the view", ->
+                @requests = create_sinon["requests"](this)
+                @view.setPage(0)
+                create_sinon.respondWithJson(@requests, @mockAssetsResponse)
                 # Delete the 2nd asset with success from server.
                 @view.$(".remove-asset-button")[1].click()
                 @promptSpies.constructor.mostRecentCall.args[0].actions.primary.click(@promptSpies)
@@ -215,6 +218,9 @@ define ["jasmine", "js/spec/create_sinon", "squire"],
                 expect(@view.$el).not.toContainText("test asset 2")
 
             it "does not remove asset if deletion failed", ->
+                @requests = create_sinon["requests"](this)
+                @view.setPage(0)
+                create_sinon.respondWithJson(@requests, @mockAssetsResponse)
                 # Delete the 2nd asset, but mimic a failure from the server.
                 @view.$(".remove-asset-button")[1].click()
                 @promptSpies.constructor.mostRecentCall.args[0].actions.primary.click(@promptSpies)
@@ -223,6 +229,10 @@ define ["jasmine", "js/spec/create_sinon", "squire"],
                 expect(@view.$el).toContainText("test asset 2")
 
             it "adds an asset if asset does not already exist", ->
+                @requests = create_sinon["requests"](this)
+                @view.render()
+                @view.setPage(0)
+                create_sinon.respondWithJson(@requests, @mockAssetsResponse)
                 model = new @AssetModel
                     display_name: "new asset"
                     url: 'new_actual_asset_url'
@@ -233,26 +243,30 @@ define ["jasmine", "js/spec/create_sinon", "squire"],
                 @view.addAsset(model)
                 create_sinon.respondWithJson(@requests,
                     {
-                    assets: [ @mockAsset1, @mockAsset2,
-                        {
-                            display_name: "new asset"
-                            url: 'new_actual_asset_url'
-                            portable_url: 'portable_url'
-                            date_added: 'date'
-                            thumbnail: null
-                            id: 'idx'
-                        }
-                    ],
-                    start: 0,
-                    end: 2,
-                    page: 0,
-                    pageSize: 5,
-                    totalCount: 3
+                        assets: [ @mockAsset1, @mockAsset2,
+                            {
+                                display_name: "new asset"
+                                url: 'new_actual_asset_url'
+                                portable_url: 'portable_url'
+                                date_added: 'date'
+                                thumbnail: null
+                                id: 'idx'
+                            }
+                        ],
+                        start: 0,
+                        end: 2,
+                        page: 0,
+                        pageSize: 5,
+                        totalCount: 3
                     })
                 expect(@view.$el).toContainText("new asset")
                 expect(@collection.models.length).toBe(3)
 
             it "does not add an asset if asset already exists", ->
+                @requests = create_sinon["requests"](this)
+                @view.render()
+                @view.setPage(0)
+                create_sinon.respondWithJson(@requests, @mockAssetsResponse)
                 spyOn(@collection, "add").andCallThrough()
                 model = @collection.models[1]
                 @view.addAsset(model)
