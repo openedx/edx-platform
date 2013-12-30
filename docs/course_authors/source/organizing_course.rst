@@ -72,19 +72,19 @@ Sections are divided into Subsections. A Subsection may represent a topic in you
 
 You can set a Subsection to an assignment type that you created when
 you set up grading. You can then include assignments in the body of that
-Subsection. For more information on grading, see LINK.
+Subsection. See :ref:`Establish a Grading Policy` for more information on grading.
 
 To create a Subsection:
 
-#. Within the Section, click **New Subsection**.  
-#. In the field that opens at the bottom of the section, enter the new Subsection name.
+#. At the bottom of the Section, click **New Subsection**.  
+#. In the field that opens, enter the new Subsection name.
 #. Click **Save**.
 
 The new, empty Subsection is placed at the bottom of the Section.
 You must now add Units to the Subsection.
 
 Whether or not students see the new Subsection depends on its release date. 
-See LINK for more information on releasing your course.
+See :ref:`Publishing Your Course` for more information.
 
 
 ==================
