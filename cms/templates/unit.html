@@ -208,4 +208,21 @@ require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit"
     </div>
   </div>
 
+    ## Added to avoid changing code in view. Better solution to be found!!
+    % if get_language() == 'ar':
+        <!--<script>-->
+            <!--require(["jquery", "underscore", "gettext", "js/views/feedback_prompt"],-->
+    <!--function($, _, gettext, PromptView) {-->
+            <!--$(document).ready(function(){-->
+                <!--$('.large-video-icon').siblings('.name').html('فيديو');-->
+                <!--$('.large-problem-icon').siblings('.name').html('مسألة');-->
+                <!--$('.large-html-icon').siblings('.name').html('أتش تي أم أل');-->
+                <!--$('.large-discussion-icon').siblings('.name').html('مناقشة');-->
+                <!--$('.editor-manual > a[edata-boilerplate="None"] > span').html('مسألة متقدمة فارغة')-->
+            <!--})-->
+    <!--})-->
+
+        <!--</script>-->
+    % endif
+
 </%block>
