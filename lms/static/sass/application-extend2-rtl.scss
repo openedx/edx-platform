@@ -1,0 +1,45 @@
+/*
+ * This file is dynamically generated and ignored by Git.
+ * DO NOT MAKE CHANGES HERE. Instead, go edit its template:
+ * /home/abdallah/edx-project-1-0/edx-platform/lms/static/sass/application-extend2-rtl.scss.mako
+ */
+
+
+// lms - css application architecture (platform)
+// ====================
+
+// libs and resets *do not edit*
+@import 'bourbon/bourbon'; // lib - bourbon
+
+// BASE  *default edX offerings*
+// ====================
+
+// base - utilities
+@import 'base/reset';
+@import 'base/mixins';
+@import 'base/variables';
+
+
+@import 'base/base_rtl';
+
+// base - assets
+@import 'base/font_face';
+@import 'base/extends';
+@import 'base/animations';
+
+// base - starter
+@import 'base/base_rtl';
+
+// base - elements
+@import 'elements/typography';
+@import 'elements/controls';
+
+// base - specific views
+@import 'views/verification';
+@import 'views/shoppingcart';
+
+// applications
+@import 'discussion_rtl';
+@import 'news';
+
+@import 'shame'; // shame file - used for any bad-form/orphaned scss that knowingly violate edX FED architecture/standards (see - http://csswizardry.com/2013/04/shame-css/)

@@ -65,7 +65,7 @@ class StaticContent(object):
         """
         Returns a boolean if a path is believed to be a c4x link based on the leading element
         """
-        return path_string.startswith('/{0}/'.format(XASSET_LOCATION_TAG))
+        return path_string.startswith(u'/{0}/'.format(XASSET_LOCATION_TAG))
 
     @staticmethod
     def renamespace_c4x_path(path_string, target_location):
@@ -87,14 +87,14 @@ class StaticContent(object):
         the actual /c4x/... path which the client needs to reference static content
         """
         if location is not None:
-            return "/static/{name}".format(**location.dict())
+            return u"/static/{name}".format(**location.dict())
         else:
             return None
 
     @staticmethod
     def get_base_url_path_for_course_assets(loc):
         if loc is not None:
-            return "/c4x/{org}/{course}/asset".format(**loc.dict())
+            return u"/c4x/{org}/{course}/asset".format(**loc.dict())
 
     @staticmethod
     def get_id_from_location(location):
@@ -238,6 +238,6 @@ class ContentStore(object):
 
             except Exception, e:
                 # log and continue as thumbnails are generally considered as optional
-                logging.exception("Failed to generate thumbnail for {0}. Exception: {1}".format(content.location, str(e)))
+                logging.exception(u"Failed to generate thumbnail for {0}. Exception: {1}".format(content.location, str(e)))
 
         return thumbnail_content, thumbnail_file_location

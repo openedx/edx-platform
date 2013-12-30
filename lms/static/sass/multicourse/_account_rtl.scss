@@ -1,0 +1,11 @@
+@import "account";
+
+.login, .register, .passwordreset, #forgot-password-modal #password-reset {
+  form {
+    .field-group {
+      .field {
+        float: right;
+      }
+    }
+  }
+}

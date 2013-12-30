@@ -1,0 +1,158 @@
+.wrapper-footer {
+  box-shadow: 0 -1px 5px 0 rgba(0,0,0, 0.1);
+  border-top: 1px solid tint($m-gray,50%);
+  padding: 25px ($baseline/2) ($baseline*1.5) ($baseline/2);
+  background: $footer-bg;
+
+  footer {
+    @include clearfix();
+    max-width: grid-width(12);
+    min-width: 760px;
+    width: flex-grid(12);
+    margin: 0 auto;
+
+    p, ol, ul {
+      font-family: $sans-serif;
+    }
+
+    a {
+      @include transition(link-color 0.15s ease-in-out 0s, border 0.15s ease-in-out 0s);
+
+      &:link, &:visited, &:hover, &:active {
+        border-bottom: none;
+        color: $link-color;
+        text-decoration: none !important;
+        font-family: $sans-serif;
+      }
+
+      &:hover, &:active {
+        border-bottom: 1px dotted $link-color;
+        color: $link-color;
+      }
+    }
+
+    // colophon
+    .colophon {
+      margin-left: flex-gutter();
+      width: flex-grid(8,12);
+      float: right;
+
+      .nav-colophon {
+        @include clearfix();
+        margin: $footer_margin;
+
+        li {
+          float: right;
+          margin-left: ($baseline*0.75);
+
+          a {
+            color: tint($black, 20%);
+
+            &:hover, &:active {
+              color: $link-color;
+            }
+          }
+
+          &:last-child {
+            margin-right: 0;
+          }
+        }
+      }
+
+      .colophon-about {
+        @include clearfix();
+
+        img {
+          width: 68px;
+          height: 34px;
+          margin-right: 0;
+          float: right;
+        }
+
+        p {
+          float: right;
+          width: flex-grid(6,8);
+          margin-right: $baseline;
+          padding-right: $baseline;
+          font-size: em(13);
+          background: transparent url(/static/images/bg-footer-divider.jpg) 598px -15px no-repeat;
+          text-align: right;
+        }
+      }
+    }
+
+    // references
+    .references {
+      margin: -10px 0 0 0;
+      width: flex-grid(4,12);
+      float: left;
+
+      .nav-social {
+        margin: 0;
+        text-align: left;
+
+        li {
+          display: inline-block;
+
+          &:last-child {
+            margin-right: 0;
+          }
+
+          a {
+            display: block;
+
+            &:hover, &:active {
+              border: none;
+            }
+          }
+
+          img {
+            display: block;
+          }
+        }
+      }
+
+      .copyright {
+        margin: -2px 0 8px 0;
+        font-size: em(11);
+        color: tint($m-gray,50%);
+        text-align: left;
+      }
+
+      .nav-legal {
+        @include clearfix();
+        text-align: left;
+
+        li {
+          display: inline-block;
+          font-size: em(11);
+
+          a {
+            display: block;
+          }
+        }
+
+        .nav-legal-01 a {
+
+          &:after {
+            margin-left: 5px;
+            content: "-";
+          }
+        }
+      }
+    }
+
+  }
+}
+
+// marketing site design syncing
+.view-register, .view-login {
+
+  .wrapper-footer footer {
+    width: 960px;
+
+    .colophon-about img {
+      margin-top: ($baseline*1.5);
+    }
+  }
+}

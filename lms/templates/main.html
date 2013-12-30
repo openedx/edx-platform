@@ -1,4 +1,5 @@
 <%! from django.utils.translation import ugettext as _ %>
+<%! from django.utils.translation import get_language_bidi %>
 
 <%namespace name='static' file='static_content.html'/>
 <%! from django.utils import html %>
@@ -46,10 +47,17 @@
 
   <link rel="icon" type="image/x-icon" href="${static.url(settings.FAVICON_PATH)}" />
 
+% if get_language_bidi():
+  <%static:css group='style-vendor'/>
+  <%static:css group='style-app-rtl'/>
+  <%static:css group='style-app-extend1-rtl'/>
+  <%static:css group='style-app-extend2-rtl'/>
+% else:
   <%static:css group='style-vendor'/>
   <%static:css group='style-app'/>
   <%static:css group='style-app-extend1'/>
   <%static:css group='style-app-extend2'/>
+% endif
 
   <%static:js group='main_vendor'/>
 

@@ -63,13 +63,13 @@ class Locator(object):
         '''
         str(self) returns something like this: "mit.eecs.6002x"
         '''
-        return unicode(self).encode('utf8')
+        return unicode(self).encode('utf-8')
 
     def __unicode__(self):
         '''
         unicode(self) returns something like this: "mit.eecs.6002x"
         '''
-        return self.url()
+        return unicode(self).encode('utf-8')
 
     @abstractmethod
     def version(self):
@@ -198,12 +198,12 @@ class CourseLocator(Locator):
         Return a string representing this location.
         """
         if self.package_id:
-            result = self.package_id
+            result = u'' + self.package_id
             if self.branch:
                 result += '/' + BRANCH_PREFIX + self.branch
             return result
         elif self.version_guid:
-            return VERSION_PREFIX + str(self.version_guid)
+            return u'' + VERSION_PREFIX + str(self.version_guid)
         else:
             # raise InsufficientSpecificationError("missing package_id or version_guid")
             return '<InsufficientSpecificationError: missing package_id or version_guid>'
@@ -212,7 +212,7 @@ class CourseLocator(Locator):
         """
         Return a string containing the URL for this location.
         """
-        return 'edx://' + unicode(self)
+        return u'edx://' + unicode(self)
 
     def _validate_args(self, url, version_guid, package_id):
         """
@@ -520,7 +520,7 @@ class DefinitionLocator(Locator):
         Return a string containing the URL for this location.
         url(self) returns something like this: 'defx://version/519665f6223ebd6980884f2b'
         """
-        return 'defx://' + unicode(self)
+        return u'defx://' + unicode(self)
 
     def version(self):
         """

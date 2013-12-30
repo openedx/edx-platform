@@ -1,12 +1,19 @@
 <%! from django.utils.translation import ugettext as _ %>
+<%! from django.utils.translation import get_language_bidi %>
+
 <%inherit file="/main.html" />
 <%namespace name='static' file='../static_content.html'/>
 <%block name="bodyclass">courseware</%block>
 <%block name="title"><title>${_("Courseware")} - ${settings.PLATFORM_NAME}</title></%block>
 
 <%block name="headextra">
-<%static:css group='style-course-vendor'/>
-<%static:css group='style-course'/>
+    % if get_language_bidi():
+        <%static:css group='style-course-vendor'/>
+        <%static:css group='style-course-rtl'/>
+    % else:
+        <%static:css group='style-course-vendor'/>
+        <%static:css group='style-course'/>
+    % endif
 </%block>
 
 <%include file="/courseware/course_navigation.html" args="active_page='courseware'" />

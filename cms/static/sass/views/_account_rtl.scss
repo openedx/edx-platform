@@ -1,0 +1,28 @@
+// studio - views - sign up/in
+// ====================
+
+@import "account";
+
+.view-signup, .view-signin {
+  .content-primary {
+    margin-right: 0;
+    margin-left: flex-gutter();
+  }
+  .content-primary, .content-supplementary {
+    float: right;
+  }
+  .content {
+    header {
+      .action {
+        right: auto;
+        left: 0;
+      }
+    }
+  }
+  #field-password {
+    .action-forgotpassword {
+      right: auto;
+      left: 0;
+    }
+  }
+}

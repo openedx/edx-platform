@@ -6,8 +6,9 @@ import random
 import string  # pylint: disable=W0402
 import re
 import bson
+import os
 
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext as _, get_language
 from django.contrib.auth.decorators import login_required
 from django_future.csrf import ensure_csrf_cookie
 from django.conf import settings
@@ -216,7 +217,7 @@ def create_new_course(request):
     run = request.json.get('run')
 
     try:
-        dest_location = Location('i4x', org, number, 'course', run)
+        dest_location = Location(u'i4x', org, number, u'course', run)
     except InvalidLocationError as error:
         return JsonResponse({
             "ErrMsg": _("Unable to create course '{name}'.\n\n{err}").format(
@@ -251,8 +252,8 @@ def create_new_course(request):
     course_search_location = bson.son.SON({
         '_id.tag': 'i4x',
         # cannot pass regex to Location constructor; thus this hack
-        '_id.org': re.compile('^{}$'.format(dest_location.org), re.IGNORECASE),
-        '_id.course': re.compile('^{}$'.format(dest_location.course), re.IGNORECASE),
+        '_id.org': re.compile(u'^{}$'.format(dest_location.org), re.IGNORECASE | re.UNICODE),
+        '_id.course': re.compile(u'^{}$'.format(dest_location.course), re.IGNORECASE | re.UNICODE),
         '_id.category': 'course',
     })
     courses = modulestore().collection.find(course_search_location, fields=('_id'))
@@ -288,6 +289,14 @@ def create_new_course(request):
         name='overview'
     )
     overview_template = AboutDescriptor.get_template('overview.yaml')
+    # check overview.yaml file in the language the course was created in
+    language_in_use = get_language()
+    if language_in_use != 'en':
+        overview_template_file = 'overview_' + language_in_use + '.yaml'
+        overview_template = AboutDescriptor.get_template(overview_template_file)
+        if overview_template is None:
+            #if None is returned reset to the original overview file
+            overview_template = AboutDescriptor.get_template('overview.yaml')
     modulestore('direct').create_and_save_xmodule(
         dest_about_location,
         system=new_course.system,

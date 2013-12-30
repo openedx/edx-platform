@@ -1,7 +1,7 @@
 <%inherit file="base.html" />
 <%!
 from django.core.urlresolvers import reverse
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext as _, get_language
 from xmodule.modulestore.django import loc_mapper
 %>
 <%namespace name="units" file="widgets/units.html" />
@@ -164,7 +164,7 @@ require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit"
               % endif
               ${_("with the subsection {link_start}{name}{link_end}").format(
                   name=subsection.display_name_with_default,
-                  link_start='<a href="{url}">'.format(url=subsection_url),
+                  link_start=u'<a href="{url}">'.format(url=subsection_url),
                   link_end='</a>',
                 )}
               </p>
@@ -207,5 +207,22 @@ require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit"
       </div>
     </div>
   </div>
+
+    ## Added to avoid changing code in view. Better solution to be found!!
+    % if get_language() == 'ar':
+        <!--<script>-->
+            <!--require(["jquery", "underscore", "gettext", "js/views/feedback_prompt"],-->
+    <!--function($, _, gettext, PromptView) {-->
+            <!--$(document).ready(function(){-->
+                <!--$('.large-video-icon').siblings('.name').html('فيديو');-->
+                <!--$('.large-problem-icon').siblings('.name').html('مسألة');-->
+                <!--$('.large-html-icon').siblings('.name').html('أتش تي أم أل');-->
+                <!--$('.large-discussion-icon').siblings('.name').html('مناقشة');-->
+                <!--$('.editor-manual > a[edata-boilerplate="None"] > span').html('مسألة متقدمة فارغة')-->
+            <!--})-->
+    <!--})-->
+
+        <!--</script>-->
+    % endif
 
 </%block>
