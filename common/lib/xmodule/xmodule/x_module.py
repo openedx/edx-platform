@@ -20,6 +20,7 @@ from xblock.fragment import Fragment
 from xblock.runtime import Runtime
 from xmodule.errortracker import exc_info_to_str
 from xmodule.modulestore.locator import BlockUsageLocator
+from django.utils.translation import get_language
 
 log = logging.getLogger(__name__)
 
@@ -216,7 +217,7 @@ class XModuleMixin(XBlockMixin):
                 try:
                     child = self.runtime.get_block(child_loc)
                 except ItemNotFoundError:
-                    log.exception('Unable to load item {loc}, skipping'.format(loc=child_loc))
+                    log.exception(u'Unable to load item {loc}, skipping'.format(loc=child_loc))
                     continue
                 self._child_instances.append(child)
 
@@ -517,9 +518,13 @@ class ResourceTemplates(object):
         templates = []
         dirname = cls.get_template_dir()
         if dirname is not None:
+            # Check language in use to load correct yaml files. English is a special case since its default
+            language_in_use = get_language()
+            if language_in_use != 'en' and os.path.isdir(os.path.join(os.path.dirname(os.path.abspath(__file__)), dirname, str(language_in_use))):
+                dirname = os.path.join(dirname, str(language_in_use))
             for template_file in resource_listdir(__name__, dirname):
                 if not template_file.endswith('.yaml'):
-                    log.warning("Skipping unknown template file %s", template_file)
+                    log.warning(u"Skipping unknown template file %s", template_file)
                     continue
                 template_content = resource_string(__name__, os.path.join(dirname, template_file))
                 template = yaml.safe_load(template_content)
@@ -532,8 +537,12 @@ class ResourceTemplates(object):
     def get_template_dir(cls):
         if getattr(cls, 'template_dir_name', None):
             dirname = os.path.join('templates', cls.template_dir_name)
+            # Check language in use to load correct yaml files. English is a special case since its default
+            language_in_use = get_language()
+            if language_in_use != 'en' and os.path.isdir(os.path.join(os.path.dirname(os.path.abspath(__file__)), dirname, str(language_in_use))):
+                dirname = os.path.join(dirname, str(language_in_use))
             if not resource_isdir(__name__, dirname):
-                log.warning("No resource directory {dir} found when loading {cls_name} templates".format(
+                log.warning(u"No resource directory {dir} found when loading {cls_name} templates".format(
                     dir=dirname,
                     cls_name=cls.__name__,
                 ))

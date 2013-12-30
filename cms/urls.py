@@ -109,6 +109,11 @@ if settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING'):
         url(r'^auto_auth$', 'student.views.auto_auth'),
     )
 
+if settings.FEATURES.get('ENABLE_QRF_SETTINGS'):
+    urlpatterns += (
+        url(r'^i18n/', include('django.conf.urls.i18n')),
+    )
+
 if settings.DEBUG:
     try:
         from .urls_dev import urlpatterns as dev_urlpatterns

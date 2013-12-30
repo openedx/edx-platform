@@ -315,7 +315,7 @@ def dashboard(request):
         try:
             course_enrollment_pairs.append((course_from_id(enrollment.course_id), enrollment))
         except ItemNotFoundError:
-            log.error("User {0} enrolled in non-existent course {1}"
+            log.error(u"User {0} enrolled in non-existent course {1}"
                       .format(user.username, enrollment.course_id))
 
     course_optouts = Optout.objects.filter(user=user).values_list('course_id', flat=True)
@@ -457,9 +457,9 @@ def change_enrollment(request):
         org, course_num, run = course_id.split("/")
         dog_stats_api.increment(
             "common.student.enrollment",
-            tags=["org:{0}".format(org),
-                  "course:{0}".format(course_num),
-                  "run:{0}".format(run)]
+            tags=[u"org:{0}".format(org),
+                  u"course:{0}".format(course_num),
+                  u"run:{0}".format(run)]
         )
 
         CourseEnrollment.enroll(user, course.id, mode=current_mode.slug)

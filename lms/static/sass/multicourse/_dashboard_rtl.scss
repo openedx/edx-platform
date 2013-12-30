@@ -1,0 +1,40 @@
+// lms - views - user/student dashboard
+// ====================
+
+@import "_dashboard.scss";
+
+.dashboard {
+  .profile-sidebar {
+    float: right;
+    margin-left: 1.69492%;
+    margin-right: 0;
+  }
+  .my-courses {
+    .course {
+      .cover {
+        float: right;
+      }
+      .info {
+        padding: 0 230px 0 10px;
+      }
+      .info > hgroup {
+        .date-block {
+          left: 0;
+          right: auto;
+        }
+      }
+      .info .enter-course {
+        float: right;
+      }
+    }
+    a.email-settings {
+      float: left;
+      margin-left: 10px;
+      margin-right: 0;
+    }
+    a.unenroll, .dashboard .my-courses a.email-settings {
+      float: left;
+    }
+  }
+
+}

@@ -236,7 +236,7 @@ def index(request, course_id, chapter=None, section=None,
     registered = registered_for_course(course, user)
     if not registered:
         # TODO (vshnayder): do course instructors need to be registered to see course?
-        log.debug('User %s tried to view course %s but is not enrolled' % (user, course.location.url()))
+        log.debug(u'User %s tried to view course %s but is not enrolled' % (user, course.location.url()))
         return redirect(reverse('about_course', args=[course.id]))
 
     masq = setup_masquerade(request, staff_access)
@@ -247,8 +247,7 @@ def index(request, course_id, chapter=None, section=None,
 
         course_module = get_module_for_descriptor(user, request, course, field_data_cache, course.id)
         if course_module is None:
-            log.warning('If you see this, something went wrong: if we got this'
-                        ' far, should have gotten a course module for this user')
+            log.warning(u'If you see this, something went wrong: if we got this far, should have gotten a course module for this user')
             return redirect(reverse('about_course', args=[course.id]))
 
         if chapter is None:
@@ -422,9 +421,9 @@ def jump_to(request, course_id, location):
     try:
         (course_id, chapter, section, position) = path_to_location(modulestore(), course_id, location)
     except ItemNotFoundError:
-        raise Http404("No data at this location: {0}".format(location))
+        raise Http404(u"No data at this location: {0}".format(location))
     except NoPathToItem:
-        raise Http404("This location is not in any class: {0}".format(location))
+        raise Http404(u"This location is not in any class: {0}".format(location))
 
     # choose the appropriate view (and provide the necessary args) based on the
     # args provided by the redirect.

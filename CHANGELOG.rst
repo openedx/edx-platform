@@ -5,6 +5,10 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+LMS: Added unicode support with Arabic LMS view (sass/css).
+CMS: Added unicode support with Arabic CMS view (sass/css).
+Common: Added unicode support.
+
 Studio: Add sorting by column to the Files & Uploads page.
 See mongo_indexes.md for new indices that should be added.
 

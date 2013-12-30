@@ -316,10 +316,10 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
         org, course_num, run = course_id.split("/")
 
         tags = [
-            "org:{0}".format(org),
-            "course:{0}".format(course_num),
-            "run:{0}".format(run),
-            "score_bucket:{0}".format(score_bucket)
+            u"org:{0}".format(org),
+            u"course:{0}".format(course_num),
+            u"run:{0}".format(run),
+            u"score_bucket:{0}".format(score_bucket)
         ]
 
         if grade_bucket_type is not None:
@@ -429,7 +429,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
             make_psychometrics_data_update_handler(course_id, user, descriptor.location.url())
         )
 
-    system.set('user_is_staff', has_access(user, descriptor.location, 'staff', course_id))
+    system.set(u'user_is_staff', has_access(user, descriptor.location, u'staff', course_id))
 
     # make an ErrorDescriptor -- assuming that the descriptor's system is ok
     if has_access(user, descriptor.location, 'staff', course_id):

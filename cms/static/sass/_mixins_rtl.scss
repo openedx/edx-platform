@@ -1,0 +1,14 @@
+@import "mixins";
+
+%cont-no-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  text-indent: 0;
+  text-align: right;
+
+  li {
+    margin: 0;
+    padding: 0;
+  }
+}

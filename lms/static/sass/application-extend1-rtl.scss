@@ -1,0 +1,52 @@
+/*
+ * This file is dynamically generated and ignored by Git.
+ * DO NOT MAKE CHANGES HERE. Instead, go edit its template:
+ * /home/abdallah/edx-rtl-fork/edx-platform/lms/static/sass/application-extend1-rtl.scss.mako
+ */
+
+
+// lms - css application architecture (platform)
+// ====================
+
+// libs and resets *do not edit*
+@import 'bourbon/bourbon'; // lib - bourbon
+
+// BASE  *default edX offerings*
+// ====================
+
+// base - utilities
+@import 'base/reset';
+@import 'base/mixins';
+@import 'base/variables';
+
+
+@import 'base/base_rtl';
+
+// base - assets
+@import 'base/font_face';
+@import 'base/extends';
+@import 'base/animations';
+
+// base - starter
+@import 'base/base_rtl';
+
+// base - elements
+@import 'elements/typography';
+@import 'elements/controls';
+
+// shared - platform
+@import 'multicourse/home';
+@import 'multicourse/dashboard_rtl';
+@import 'multicourse/account_rtl';
+@import 'multicourse/courses';
+@import 'multicourse/course_about';
+@import 'multicourse/jobs';
+@import 'multicourse/media-kit';
+@import 'multicourse/about_pages';
+@import 'multicourse/press_release';
+@import 'multicourse/password_reset';
+@import 'multicourse/error-pages';
+@import 'multicourse/help';
+@import 'multicourse/edge';
+
+@import 'shame'; // shame file - used for any bad-form/orphaned scss that knowingly violate edX FED architecture/standards (see - http://csswizardry.com/2013/04/shame-css/)

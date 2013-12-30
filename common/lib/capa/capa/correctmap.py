@@ -50,7 +50,7 @@ class CorrectMap(object):
     ):
 
         if answer_id is not None:
-            self.cmap[str(answer_id)] = {
+            self.cmap[answer_id] = {
                 'correctness': correctness,
                 'npoints': npoints,
                 'msg': msg,
