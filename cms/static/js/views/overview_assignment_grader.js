@@ -18,11 +18,13 @@ define(["js/views/baseview", "underscore", "gettext", "js/models/assignment_grad
                         '<% graders.each(function(option) { %>' +
                             '<li><a <% if (option.get("type") == assignmentType) {%>class="is-selected" <%}%> href="#"><%= option.get("type") %></a></li>' +
                         '<% }) %>' +
-                        '<li><a class="gradable-status-notgraded" href="#">Not Graded</a></li>' +
+                        '<li><a class="gradable-status-notgraded" href="#">' +
+                        gettext('Not Graded') +
+                        '</a></li>' +
                     '</ul>');
             this.assignmentGrade = new AssignmentGrade({
                 locator : this.$el.closest('.id-holder').data('locator'),
-                graderType : this.$el.data('initial-status')});
+                graderType : this.$el.data('display-status')});
             // TODO throw exception if graders is null
             this.graders = this.options['graders'];
             var cachethis = this;

@@ -228,7 +228,7 @@ require(["domReady!", "jquery", "js/models/location", "js/models/section", "js/v
 
                           <ul class="actions-list">
                             <li class="actions-item grades">
-                              <div class="gradable-status" data-initial-status="${subsection.format if subsection.format is not None else _('Not Graded')}"></div>
+                              <div class="gradable-status" data-initial-status="${subsection.format if subsection.format is not None else u'Not Graded'}" data-display-status="${_('Not Graded')}"></div>
                             </li>
                             <li class="actions-item delete">
                               <a href="#" data-tooltip="${_('Delete this subsection')}" class="action delete-subsection-button"><i class="icon-trash"></i> <span class="sr">${_("Delete subsection")}</span></a>
