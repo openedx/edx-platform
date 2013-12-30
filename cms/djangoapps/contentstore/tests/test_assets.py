@@ -60,13 +60,13 @@ class AssetsToyCourseTestCase(CourseTestCase):
         self.assert_correct_asset_response(url + "?page_size=2", 0, 2, 3)
         self.assert_correct_asset_response(url + "?page_size=2&page=1", 2, 1, 3)
 
-    def assert_correct_asset_response(self, url, expectedStart, expectedLength, expectedTotal):
+    def assert_correct_asset_response(self, url, expected_start, expected_length, expected_total):
         resp = self.client.get(url, HTTP_ACCEPT='application/json')
         json_response = json.loads(resp.content)
         assets = json_response['assets']
-        self.assertEquals(json_response['start'], expectedStart)
-        self.assertEquals(len(assets), expectedLength)
-        self.assertEquals(json_response['totalCount'], expectedTotal)
+        self.assertEquals(json_response['start'], expected_start)
+        self.assertEquals(len(assets), expected_length)
+        self.assertEquals(json_response['totalCount'], expected_total)
 
 
 class UploadTestCase(CourseTestCase):
