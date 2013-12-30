@@ -10,6 +10,7 @@ from path import path
 
 from django.core.management import call_command
 from django.test.utils import override_settings
+from django.test.testcases import TestCase
 
 from courseware.tests.modulestore_config import TEST_DATA_XML_MODULESTORE
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
@@ -24,7 +25,7 @@ DATA_DIR = 'common/test/data/'
 TEST_COURSE_ID = 'edX/simple/2012_Fall'
 
 
-class CommandsTestBase(object):
+class CommandsTestBase(TestCase):
     """
     Base class for testing different django commands.
 
@@ -66,6 +67,15 @@ class CommandsTestBase(object):
 
         dump = json.loads(output)
 
+        # check that all elements in the course structure have metadata,
+        # but not inherited metadata:
+        for element_name in dump:
+            element = dump[element_name]
+            self.assertIn('metadata', element)
+            self.assertIn('children', element)
+            self.assertIn('category', element)
+            self.assertNotIn('inherited_metadata', element)
+
         # Check a few elements in the course dump
 
         parent_id = 'i4x://edX/simple/chapter/Overview'
@@ -81,9 +91,43 @@ class CommandsTestBase(object):
         self.assertEqual(len(dump[video_id]['metadata']), 4)
         self.assertIn('youtube_id_1_0', dump[video_id]['metadata'])
 
-        # Check if there is the right number of elements
+        # Check if there are the right number of elements
 
         self.assertEqual(len(dump), 16)
+
+    def test_dump_inherited_course_structure(self):
+        args = [TEST_COURSE_ID]
+        kwargs = {'modulestore': 'default', 'inherited': True}
+        output = self.call_command('dump_course_structure', *args, **kwargs)
+        dump = json.loads(output)
+        # check that all elements in the course structure have inherited metadata,
+        # and that it contains a particular value as well:
+        for element_name in dump:
+            element = dump[element_name]
+            self.assertIn('metadata', element)
+            self.assertIn('children', element)
+            self.assertIn('category', element)
+            self.assertIn('inherited_metadata', element)
+            self.assertIsNone(element['inherited_metadata']['ispublic'])
+            # ... but does not contain inherited metadata containing a default value:
+            self.assertNotIn('due', element['inherited_metadata'])
+
+    def test_dump_inherited_course_structure_with_defaults(self):
+        args = [TEST_COURSE_ID]
+        kwargs = {'modulestore': 'default', 'inherited': True, 'inherited_defaults': True}
+        output = self.call_command('dump_course_structure', *args, **kwargs)
+        dump = json.loads(output)
+        # check that all elements in the course structure have inherited metadata,
+        # and that it contains a particular value as well:
+        for element_name in dump:
+            element = dump[element_name]
+            self.assertIn('metadata', element)
+            self.assertIn('children', element)
+            self.assertIn('category', element)
+            self.assertIn('inherited_metadata', element)
+            self.assertIsNone(element['inherited_metadata']['ispublic'])
+            # ... and contains inherited metadata containing a default value:
+            self.assertIsNone(element['inherited_metadata']['due'])
 
     def test_export_course(self):
         tmp_dir = path(mkdtemp())
