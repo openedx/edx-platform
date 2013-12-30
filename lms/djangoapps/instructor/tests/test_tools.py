@@ -8,8 +8,8 @@ import mock
 import json
 import unittest
 
-from django.utils.timezone import utc
 from django.test.utils import override_settings
+from django.utils.timezone import utc
 
 from courseware.models import StudentModule
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
@@ -31,6 +31,46 @@ class TestDashboardError(unittest.TestCase):
         error = tools.DashboardError(u'Oh noes!')
         response = json.loads(error.response().content)
         self.assertEqual(response, {'error': 'Oh noes!'})
+
+
+class TestHandleDashboardError(unittest.TestCase):
+    """
+    Test handle_dashboard_error decorator.
+    """
+    def test_error(self):
+        @tools.handle_dashboard_error
+        def view(request, course_id):
+            """
+            Raises DashboardError.
+            """
+            raise tools.DashboardError("Oh noes!")
+
+        response = json.loads(view(None, None).content)
+        self.assertEqual(response, {'error': 'Oh noes!'})
+
+    def test_no_error(self):
+        @tools.handle_dashboard_error
+        def view(request, course_id):
+            """
+            Returns "Oh yes!"
+            """
+            return "Oh yes!"
+
+        self.assertEqual(view(None, None), "Oh yes!")
+
+
+class TestParseDatetime(unittest.TestCase):
+    """
+    Test date parsing.
+    """
+    def test_parse_no_error(self):
+        self.assertEqual(
+            tools.parse_datetime('5/12/2010 2:42'),
+            datetime.datetime(2010, 5, 12, 2, 42, tzinfo=utc))
+
+    def test_parse_error(self):
+        with self.assertRaises(tools.DashboardError):
+            tools.parse_datetime('foo')
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -166,6 +206,127 @@ class TestSetDueDateExtension(ModuleStoreTestCase):
                                      extended)
         self.assertEqual(self.extended_due(self.week1), extended)
         self.assertEqual(self.extended_due(self.homework), extended)
+
+    def test_reset_due_date_extension(self):
+        tools.set_due_date_extension(self.course, self.week1, self.user, None)
+        self.assertEqual(self.extended_due(self.week1), None)
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class TestDataDumps(ModuleStoreTestCase):
+    """
+    Test data dumps for reporting.
+    """
+
+    def setUp(self):
+        """
+        Fixtures.
+        """
+        due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=utc)
+        course = CourseFactory.create()
+        week1 = ItemFactory.create(due=due)
+        week2 = ItemFactory.create(due=due)
+        week3 = ItemFactory.create(due=due)
+        course.children = [week1.location.url(), week2.location.url(),
+                           week3.location.url()]
+
+        homework = ItemFactory.create(
+            parent_location=week1.location,
+            due=due
+        )
+        week1.children = [homework.location.url()]
+
+        user1 = UserFactory.create()
+        StudentModule(
+            state='{}',
+            student_id=user1.id,
+            course_id=course.id,
+            module_state_key=week1.location.url()).save()
+        StudentModule(
+            state='{}',
+            student_id=user1.id,
+            course_id=course.id,
+            module_state_key=week2.location.url()).save()
+        StudentModule(
+            state='{}',
+            student_id=user1.id,
+            course_id=course.id,
+            module_state_key=week3.location.url()).save()
+        StudentModule(
+            state='{}',
+            student_id=user1.id,
+            course_id=course.id,
+            module_state_key=homework.location.url()).save()
+
+        user2 = UserFactory.create()
+        StudentModule(
+            state='{}',
+            student_id=user2.id,
+            course_id=course.id,
+            module_state_key=week1.location.url()).save()
+        StudentModule(
+            state='{}',
+            student_id=user2.id,
+            course_id=course.id,
+            module_state_key=homework.location.url()).save()
+
+        user3 = UserFactory.create()
+        StudentModule(
+            state='{}',
+            student_id=user3.id,
+            course_id=course.id,
+            module_state_key=week1.location.url()).save()
+        StudentModule(
+            state='{}',
+            student_id=user3.id,
+            course_id=course.id,
+            module_state_key=homework.location.url()).save()
+
+
+        self.course = course
+        self.week1 = week1
+        self.homework = homework
+        self.week2 = week2
+        self.user1 = user1
+        self.user2 = user2
+
+    def test_dump_module_extensions(self):
+        extended = datetime.datetime(2013, 12, 25, 0, 0, tzinfo=utc)
+        tools.set_due_date_extension(self.course, self.week1, self.user1,
+                                     extended)
+        tools.set_due_date_extension(self.course, self.week1, self.user2,
+                                     extended)
+        report = tools.dump_module_extensions(self.course, self.week1)
+        self.assertEqual(
+            report['title'], u'Users with due date extensions for ' +
+            self.week1.display_name)
+        self.assertEqual(
+            report['header'], ["Username", "Full Name", "Extended Due Date"])
+        self.assertEqual(report['data'], [
+            {"Username": self.user1.username,
+             "Full Name": self.user1.profile.name,
+             "Extended Due Date": "2013-12-25 00:00"},
+            {"Username": self.user2.username,
+             "Full Name": self.user2.profile.name,
+             "Extended Due Date": "2013-12-25 00:00"}])
+
+    def test_dump_student_extensions(self):
+        extended = datetime.datetime(2013, 12, 25, 0, 0, tzinfo=utc)
+        tools.set_due_date_extension(self.course, self.week1, self.user1,
+                                     extended)
+        tools.set_due_date_extension(self.course, self.week2, self.user1,
+                                     extended)
+        report = tools.dump_student_extensions(self.course, self.user1)
+        self.assertEqual(
+            report['title'], u'Due date extensions for %s (%s)' %
+            (self.user1.profile.name, self.user1.username))
+        self.assertEqual(
+            report['header'], ["Unit", "Extended Due Date"])
+        self.assertEqual(report['data'], [
+            {"Unit": self.week1.display_name,
+             "Extended Due Date": "2013-12-25 00:00"},
+            {"Unit": self.week2.display_name,
+             "Extended Due Date": "2013-12-25 00:00"}])
 
 
 def get_extended_due(course, unit, student):

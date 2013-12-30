@@ -10,12 +10,10 @@ import json
 import logging
 import re
 import requests
-from dateutil.parser import parse as parse_datetime
 from django.conf import settings
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 from django.core.urlresolvers import reverse
-from django.utils.timezone import utc
 from django.utils.translation import ugettext as _
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from util.json_request import JsonResponse
@@ -37,7 +35,6 @@ from instructor_task.views import get_task_completion_info
 from instructor_task.models import GradesStore
 import instructor.enrollment as enrollment
 from instructor.enrollment import enroll_email, unenroll_email, get_email_params
-from instructor.views.tools import strip_if_string, get_student_from_identifier
 from instructor.access import list_with_level, allow_access, revoke_access, update_forum_role
 import analytics.basic
 import analytics.distributions
@@ -46,10 +43,16 @@ import csv
 
 from bulk_email.models import CourseEmail
 
-from .extensions import (
+from .tools import (
     dump_student_extensions,
     dump_module_extensions,
-    set_due_date_extension)
+    find_unit,
+    get_student_from_identifier,
+    handle_dashboard_error,
+    parse_datetime,
+    set_due_date_extension,
+    strip_if_string,
+)
 
 log = logging.getLogger(__name__)
 
@@ -998,6 +1001,18 @@ def proxy_legacy_analytics(request, course_id):
         )
 
 
+def _display_unit(unit):
+    """
+    Gets string for displaying unit to user.
+    """
+    name = getattr(unit, 'display_name', None)
+    if name:
+        return u'{0} ({1})'.format(name, unit.location.url())
+    else:
+        return unit.location.url()
+
+
+@handle_dashboard_error
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -1008,32 +1023,17 @@ def change_due_date(request, course_id):
     """
     course = get_course_by_id(course_id)
     student = get_student_from_identifier(request.GET.get('student'))
-    url = request.GET.get('url')
-    datestr = request.GET.get('due_datetime')
+    unit = find_unit(course, request.GET.get('url'))
+    due_date = parse_datetime(request.GET.get('due_datetime'))
+    set_due_date_extension(course, unit, student, due_date)
 
-    try:
-        due_date = parse_datetime(datestr).replace(tzinfo=utc)
-    except ValueError:
-        error = _("Unable to parse date: ") + datestr
-        return HttpResponseBadRequest(json.dumps({'error': error}))
-
-    try:
-        unit = set_due_date_extension(course, url, student, due_date)
-    except ValueError, error:
-        return HttpResponseBadRequest(json.dumps({'error': unicode(error)}))
-
-    studentname = student.profile.name
-    unitname = getattr(unit, 'display_name', None)
-    if unitname:
-        unitname = u'{0} ({1})'.format(unitname, unit.location.url())
-    msg = _(
+    return JsonResponse(_(
         'Successfully changed due date for student {0} for {1} '
-        'to {2}').format(studentname, unitname,
-                         due_date.strftime('%Y-%m-%d %H:%M'))
-
-    return JsonResponse(msg)
+        'to {2}').format(student.profile.name, _display_unit(unit),
+                         due_date.strftime('%Y-%m-%d %H:%M')))
 
 
+@handle_dashboard_error
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -1044,26 +1044,16 @@ def reset_due_date(request, course_id):
     """
     course = get_course_by_id(course_id)
     student = get_student_from_identifier(request.GET.get('student'))
-    url = request.GET.get('url')
+    unit = find_unit(course, request.GET.get('url'))
+    set_due_date_extension(course, unit, student, None)
 
-    try:
-        unit = set_due_date_extension(course, url, student, None)
-    except ValueError, error:
-        return HttpResponseBadRequest(json.dumps({'error': unicode(error)}))
-
-    studentname = student.profile.name
-    unitname = getattr(unit, 'display_name', None)
-    if unitname:
-        unitname = u'{0} ({1})'.format(unitname, unit.location.url())
-    due_date = unit.due
-    msg = _(
+    return JsonResponse(_(
         'Successfully reset due date for student {0} for {1} '
-        'to {2}').format(studentname, unitname,
-                         due_date.strftime('%Y-%m-%d %H:%M'))
-
-    return JsonResponse(msg)
+        'to {2}').format(student.profile.name, _display_unit(unit),
+                         unit.due.strftime('%Y-%m-%d %H:%M')))
 
 
+@handle_dashboard_error
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -1073,16 +1063,11 @@ def show_unit_extensions(request, course_id):
     Shows all of the students which have due date extensions for the given unit.
     """
     course = get_course_by_id(course_id)
-    url = request.GET.get('url')
-    try:
-        data = dump_module_extensions(course, url)
-    except ValueError, error:
-        return HttpResponseBadRequest(json.dumps({'error': error}))
-    header = data['header']
-    data['data'] = [dict(zip(header, row)) for row in data['data']]
-    return JsonResponse(data)
+    unit = find_unit(course, request.GET.get('url'))
+    return JsonResponse(dump_module_extensions(course, unit))
 
 
+@handle_dashboard_error
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -1094,10 +1079,7 @@ def show_student_extensions(request, course_id):
     """
     student = get_student_from_identifier(request.GET.get('student'))
     course = get_course_by_id(course_id)
-    data = dump_student_extensions(course, student)
-    header = data['header']
-    data['data'] = [dict(zip(header, row)) for row in data['data']]
-    return JsonResponse(data)
+    return JsonResponse(dump_student_extensions(course, student))
 
 
 def _split_input_list(str_list):

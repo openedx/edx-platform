@@ -27,7 +27,7 @@ from bulk_email.models import CourseAuthorization
 from lms.lib.xblock.runtime import handler_prefix
 
 
-from .extensions import get_units_with_due_date_options
+from .tools import get_units_with_due_date, title_or_url
 
 
 @ensure_csrf_cookie
@@ -172,7 +172,8 @@ def _section_extensions(course):
     section_data = {
         'section_key': 'extensions',
         'section_display_name': _('Extensions'),
-        'units_with_due_dates': get_units_with_due_date_options(course),
+        'units_with_due_dates': ((title_or_url(unit), unit.location.url())
+                                 for unit in get_units_with_due_date(course)),
         'change_due_date_url': reverse('change_due_date', kwargs={'course_id': course.id}),
         'reset_due_date_url': reverse('reset_due_date', kwargs={'course_id': course.id}),
         'show_unit_extensions_url': reverse('show_unit_extensions', kwargs={'course_id': course.id}),

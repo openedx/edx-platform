@@ -1,10 +1,12 @@
 """
 Tools for the instructor dashboard
 """
+import dateutil
 import json
 
 from django.contrib.auth.models import User
 from django.http import HttpResponseBadRequest
+from django.utils.timezone import utc
 from django.utils.translation import ugettext as _
 
 from courseware.models import StudentModule
@@ -20,6 +22,23 @@ class DashboardError(Exception):
     def response(self):
         error = unicode(self)
         return HttpResponseBadRequest(json.dumps({'error': error}))
+
+
+def handle_dashboard_error(view):
+    """
+    Decorator which adds seamless DashboardError handling to a view.  If a
+    DashboardError is raised during view processing, an HttpResponseBadRequest
+    is sent back to the client with JSON data about the error.
+    """
+    def wrapper(request, course_id):
+        """
+        """
+        try:
+            return view(request, course_id=course_id)
+        except DashboardError, error:
+            return error.response()
+
+    return wrapper
 
 
 def strip_if_string(value):
@@ -42,6 +61,13 @@ def get_student_from_identifier(unique_student_identifier):
     else:
         student = User.objects.get(username=unique_student_identifier)
     return student
+
+
+def parse_datetime(datestr):
+    try:
+        return dateutil.parser.parse(datestr).replace(tzinfo=utc)
+    except ValueError:
+        raise DashboardError(_("Unable to parse date: ") + datestr)
 
 
 def find_unit(course, url):
@@ -128,3 +154,63 @@ def set_due_date_extension(course, unit, student, due_date):
             set_due_date(child)
 
     set_due_date(unit)
+
+
+def dump_module_extensions(course, unit):
+    """
+    Dumps data about students with due date extensions for a particular module,
+    specified by 'url', in a particular course.
+    """
+    data = []
+    header = [_("Username"), _("Full Name"), _("Extended Due Date")]
+    query = StudentModule.objects.filter(
+        course_id=course.id,
+        module_state_key=unit.location.url())
+    for module in query:
+        state = json.loads(module.state)
+        extended_due = state.get("extended_due")
+        if not extended_due:
+            continue
+        extended_due = DATE_FIELD.from_json(extended_due)
+        extended_due = extended_due.strftime("%Y-%m-%d %H:%M")
+        fullname = module.student.profile.name
+        data.append(dict(zip(
+            header,
+            (module.student.username, fullname, extended_due))))
+    data.sort(key=lambda x: x[header[0]])
+    return {
+        "header": header,
+        "title": _("Users with due date extensions for {0}").format(
+            title_or_url(unit)),
+        "data": data
+    }
+
+
+def dump_student_extensions(course, student):
+    """
+    Dumps data about the due date extensions granted for a particular student
+    in a particular course.
+    """
+    data = []
+    header = [_("Unit"), _("Extended Due Date")]
+    units = get_units_with_due_date(course)
+    units = dict([(u.location.url(), u) for u in units])
+    query = StudentModule.objects.filter(
+        course_id=course.id,
+        student_id=student.id)
+    for module in query:
+        state = json.loads(module.state)
+        if module.module_state_key not in units:
+            continue
+        extended_due = state.get("extended_due")
+        if not extended_due:
+            continue
+        extended_due = DATE_FIELD.from_json(extended_due)
+        extended_due = extended_due.strftime("%Y-%m-%d %H:%M")
+        title = title_or_url(units[module.module_state_key])
+        data.append(dict(zip(header, (title, extended_due))))
+    return {
+        "header": header,
+        "title": _("Due date extensions for {0} {1} ({2})").format(
+            student.first_name, student.last_name, student.username),
+        "data": data}
