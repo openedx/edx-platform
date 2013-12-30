@@ -232,6 +232,25 @@ To add a file:
 #. To close the dialog box, click the **x** in the top right corner. 
 
 When you close the dialog box, the new files appear on the **Files & Uploads** page.
+
+==================
+Find Files
+==================
+Files are sorted by the Date Added column, with the most recently added first.  
+
+The **Files & Uploads** page lists up to 50 files.  If your course has more the 50 files, additional files are listed in other pages.
+
+The files your are viewing, and the total number of files, are listed at the top of the page.
+
+You can navigate through the pages listing files in two ways:
+
+* Use the **<** and **>** buttons at the top and bottom of the list to navigate to the previous and next pages.
+
+* At the bottom of the page, enter the page number to skip to, then tab out of the field:
+
+  
+  .. image:: Images/file_pagination.png
+
   
 ==================
 Get the File URL
