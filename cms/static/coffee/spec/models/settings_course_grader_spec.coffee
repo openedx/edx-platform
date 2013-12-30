@@ -23,5 +23,13 @@ define ["js/models/settings/course_grader"], (CourseGrader) ->
                 model = new CourseGrader()
                 errors = model.validate({min_count: 0, drop_count: ''}, {validate:true})
                 expect(errors.min_count).toBe('Please enter an integer greater than 0.')
-                expect(errors.drop_count).toBe('Please enter an integer.')
+                expect(errors.drop_count).toBe('Please enter non-negative integer.')
+                # don't allow negative integers
+                errors = model.validate({min_count: -12, drop_count: -1}, {validate:true})
+                expect(errors.min_count).toBe('Please enter an integer greater than 0.')
+                expect(errors.drop_count).toBe('Please enter non-negative integer.')
+                # don't allow floats
+                errors = model.validate({min_count: 12.2, drop_count: 1.5}, {validate:true})
+                expect(errors.min_count).toBe('Please enter an integer greater than 0.')
+                expect(errors.drop_count).toBe('Please enter non-negative integer.')
 
