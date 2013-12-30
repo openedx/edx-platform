@@ -30,8 +30,8 @@ var AssetsView = PagingView.extend({
         var self = this,
             assets = this.collection,
             hasAssets = assets.length > 0;
+        self.tableBody.empty();
         if (hasAssets) {
-            self.tableBody.empty();
             assets.each(
                 function(asset) {
                     var view = new AssetView({model: asset});
