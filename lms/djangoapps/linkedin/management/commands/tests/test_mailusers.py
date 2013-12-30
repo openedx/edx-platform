@@ -166,5 +166,5 @@ class MailusersTests(TestCase):
             'pfCertificationName=TestX%2FIntro101&pfAuthorityName=edX&'
             'pfAuthorityId=0000000&'
             'pfCertificationUrl=http%3A%2F%2Ftest.foo%2Ftest&pfLicenseNo=TEST1&'
-            'pfCertStartDate=201005I&_mSplash=1&'
+            'pfCertStartDate=201005&_mSplash=1&'
             'trk=eml-prof-TestX-1-T&startTask=CERTIFICATION_NAME&force=true')
