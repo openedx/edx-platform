@@ -196,20 +196,25 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             'student_info': json.dumps(student_info),
         }
 
-        (error, msg) = qinterface.send_to_queue(
+        error, error_message = qinterface.send_to_queue(
             header=xheader,
             body=json.dumps(contents)
         )
 
         # Convert error to a success value
         success = True
+        message = "Successfully saved your feedback."
         if error:
             success = False
-
-        self.child_state = self.DONE
+            message = "Unable to save your feedback. Please try again later."
+            log.error("Unable to send feedback to grader. location: {0}, error_message: {1}".format(
+                self.location_string, error_message
+            ))
+        else:
+            self.child_state = self.DONE
 
         # This is a student_facing_message
-        return {'success': success, 'msg': "Successfully submitted your feedback."}
+        return {'success': success, 'msg': message}
 
     def send_to_grader(self, submission, system):
         """
@@ -257,7 +262,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         })
 
         # Submit request. When successful, 'msg' is the prior length of the queue
-        qinterface.send_to_queue(
+        error, error_message = qinterface.send_to_queue(
             header=xheader,
             body=json.dumps(contents)
         )
@@ -267,7 +272,17 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             'key': queuekey,
             'time': qtime,
         }
-        return True
+
+        success = True
+        message = "Successfully saved your submission."
+        if error:
+            success = False
+            message = 'Unable to send your submission to grader. Please try again later.'
+            log.error("Unable to submit to grader. location: {0}, error_message: {1}".format(
+                self.location_string, error_message
+            ))
+
+        return (success, message)
 
     def _update_score(self, score_msg, queuekey, system):
         """
@@ -668,17 +683,24 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         if self.child_state != self.INITIAL:
             return self.out_of_sync_error(data)
 
+        message = "Successfully saved your submission."
+
         # add new history element with answer and empty score and hint.
         success, error_message, data = self.append_file_link_to_student_answer(data)
-        if success:
+        if not success:
+            message = error_message
+        else:
             data['student_answer'] = OpenEndedModule.sanitize_html(data['student_answer'])
-            self.new_history_entry(data['student_answer'])
-            self.send_to_grader(data['student_answer'], system)
-            self.change_state(self.ASSESSING)
+            success, error_message = self.send_to_grader(data['student_answer'], system)
+            if not success:
+                message = error_message
+            else:
+                self.new_history_entry(data['student_answer'])
+                self.change_state(self.ASSESSING)
 
         return {
             'success': success,
-            'error': error_message,
+            'error': message,
             'student_response': data['student_answer'].replace("\n", "<br/>")
         }
 
