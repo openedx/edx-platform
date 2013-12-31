@@ -7,13 +7,12 @@
 </%block>
 
 <%block name="headextra">
-% if get_language_bidi():
     <%static:css group='style-course-vendor'/>
+    % if get_language_bidi():
     <%static:css group='style-course-rtl'/>
-% else:
-    <%static:css group='style-course-vendor'/>
+    % else:
     <%static:css group='style-course'/>
-% endif
+    % endif
 <%static:js group='courseware'/>
 </%block>
 

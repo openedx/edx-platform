@@ -6,12 +6,11 @@
 <%block name="title"><title>${_("{course_number} Courseware").format(course_number=course.display_number_with_default) | h}</title></%block>
 
 <%block name="headextra">
+    <%static:css group='style-course-vendor'/>
     % if get_language_bidi():
-        <%static:css group='style-course-vendor'/>
-        <%static:css group='style-course-rtl'/>
+    <%static:css group='style-course-rtl'/>
     % else:
-        <%static:css group='style-course-vendor'/>
-        <%static:css group='style-course'/>
+    <%static:css group='style-course'/>
     % endif
 
 <%include file="../discussion/_js_head_dependencies.html" />

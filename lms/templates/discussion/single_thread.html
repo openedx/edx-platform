@@ -11,14 +11,12 @@
 <%block name="title"><title>${_("Discussion - {course_number}").format(course_number=course.display_number_with_default) | h}</title></%block>
 
 <%block name="headextra">
-% if get_language_bidi():
     <%static:css group='style-course-vendor'/>
+    % if get_language_bidi():
     <%static:css group='style-course-rtl'/>
-% else:
-    <%static:css group='style-course-vendor'/>
+    % else:
     <%static:css group='style-course'/>
-% endif
-
+    % endif
 
 <%include file="_js_head_dependencies.html" />
 </%block>

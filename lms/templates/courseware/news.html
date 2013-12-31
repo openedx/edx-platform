@@ -6,13 +6,12 @@
 <%block name="title"><title>${_("News - MITx 6.002x")}</title></%block>
 
 <%block name="headextra">
-% if get_language_bidi():
     <%static:css group='style-course-vendor'/>
+    % if get_language_bidi():
     <%static:css group='style-course-rtl'/>
-% else:
-    <%static:css group='style-course-vendor'/>
+    % else:
     <%static:css group='style-course'/>
-% endif
+    % endif
 </%block>
 
 <%block name="js_extra">

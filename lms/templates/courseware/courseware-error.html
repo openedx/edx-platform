@@ -7,12 +7,11 @@
 <%block name="title"><title>${_("Courseware")} - ${settings.PLATFORM_NAME}</title></%block>
 
 <%block name="headextra">
+    <%static:css group='style-course-vendor'/>
     % if get_language_bidi():
-        <%static:css group='style-course-vendor'/>
-        <%static:css group='style-course-rtl'/>
+    <%static:css group='style-course-rtl'/>
     % else:
-        <%static:css group='style-course-vendor'/>
-        <%static:css group='style-course'/>
+    <%static:css group='style-course'/>
     % endif
 </%block>
 

@@ -335,12 +335,11 @@ def _dispatch(table, action, user, obj):
     """
     if action in table:
         result = table[action]()
-
-        # debug(u"%s user %s, object %s, action %s",
-        #       'ALLOWED' if result else 'DENIED',
-        #       user,
-        #       obj.location.url() if isinstance(obj, XModuleDescriptor) else unicode(obj).encode('utf-8')[:60],
-        #       action)
+        debug(u"%s user %s, object %s, action %s",
+               'ALLOWED' if result else 'DENIED',
+               user,
+               obj.location.url() if isinstance(obj, XModuleDescriptor) else unicode(obj).encode('utf-8')[:60],
+               action)
         return result
 
     raise ValueError(u"Unknown action for object type '{0}': '{1}'".format(

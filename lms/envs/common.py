@@ -75,7 +75,7 @@ FEATURES = {
                                         # set to None to do no university selection
 
     'ENABLE_TEXTBOOK': True,
-    'ENABLE_DISCUSSION_SERVICE': True,
+    'ENABLE_DISCUSSION_SERVICE': False,
     # discussion home panel, which includes a subscription on/off setting for discussion digest emails.
     # this should remain off in production until digest notifications are online.
     'ENABLE_DISCUSSION_HOME_PANEL': False,
@@ -441,7 +441,7 @@ import monitoring.exceptions  # noqa
 
 ############################### DJANGO BUILT-INS ###############################
 # Change DEBUG/TEMPLATE_DEBUG in your environment settings files, not here
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = False
 USE_TZ = True
 
@@ -1131,18 +1131,3 @@ GRADES_DOWNLOAD = {
     'BUCKET': 'edx-grades',
     'ROOT_PATH': '/tmp/edx-s3/grades',
 }
-
-############### Language Support #################
-if FEATURES['ENABLE_LANGUAGE_CHANGE']:
-    TEMPLATE_CONTEXT_PROCESSORS += (
-        'django.core.context_processors.i18n',
-    )
-    USE_I18N = True
-    TIME_ZONE = 'Asia/Amman'
-    LANGUAGE_CODE = 'en-us'
-
-    ugettext = lambda s: s
-    LANGUAGES = (
-        ('ar', ugettext('Arabic')),
-        ('en', ugettext('English')),
-    )

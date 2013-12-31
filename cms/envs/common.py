@@ -41,7 +41,7 @@ FEATURES = {
 
     'GITHUB_PUSH': False,
 
-    'ENABLE_DISCUSSION_SERVICE': True,
+    'ENABLE_DISCUSSION_SERVICE': False,
 
     'AUTH_USE_MIT_CERTIFICATES': False,
 
@@ -63,8 +63,7 @@ FEATURES = {
     # edX has explicitly added them to the course creator group.
     'ENABLE_CREATOR_GROUP': False,
 
-    # Added for enabling and disabling Arabic language change. (A better
-    # solution to be implemented)
+    # Added for enabling and disabling Arabic language change.
     'ENABLE_LANGUAGE_CHANGE': False,
 }
 ENABLE_JASMINE = False
@@ -189,7 +188,7 @@ import monitoring.exceptions  # noqa
 
 ############################ DJANGO_BUILTINS ################################
 # Change DEBUG/TEMPLATE_DEBUG in your environment settings files, not here
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = False
 
 # Site info
@@ -481,18 +480,3 @@ YOUTUBE_API = {
     'url': "http://video.google.com/timedtext",
     'params': {'lang': 'en', 'v': 'set_youtube_id_of_11_symbols_here'}
 }
-
-############### Language Support #################
-if FEATURES['ENABLE_LANGUAGE_CHANGE']:
-    TEMPLATE_CONTEXT_PROCESSORS += (
-        'django.core.context_processors.i18n',
-    )
-    USE_I18N = True
-    TIME_ZONE = 'Asia/Amman'
-    LANGUAGE_CODE = 'en-us'
-
-    ugettext = lambda s: s
-    LANGUAGES = (
-        ('ar', ugettext('Arabic')),
-        ('en', ugettext('English')),
-    )

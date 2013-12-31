@@ -5,13 +5,12 @@
 <%namespace name='static' file='/static_content.html'/>
 
 <%block name="headextra">
-% if get_language_bidi():
     <%static:css group='style-course-vendor'/>
+    % if get_language_bidi():
     <%static:css group='style-course-rtl'/>
-% else:
-    <%static:css group='style-course-vendor'/>
+    % else:
     <%static:css group='style-course'/>
-% endif
+    % endif
 
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.axislabels.js')}"></script>

@@ -46,18 +46,16 @@
   <script type="text/javascript" src="/jsi18n/"></script>
 
   <link rel="icon" type="image/x-icon" href="${static.url(settings.FAVICON_PATH)}" />
-
-% if get_language_bidi():
-  <%static:css group='style-vendor'/>
-  <%static:css group='style-app-rtl'/>
-  <%static:css group='style-app-extend1-rtl'/>
-  <%static:css group='style-app-extend2-rtl'/>
-% else:
-  <%static:css group='style-vendor'/>
-  <%static:css group='style-app'/>
-  <%static:css group='style-app-extend1'/>
-  <%static:css group='style-app-extend2'/>
-% endif
+    <%static:css group='style-vendor'/>
+    % if get_language_bidi():
+    <%static:css group='style-app-rtl'/>
+    <%static:css group='style-app-extend1-rtl'/>
+    <%static:css group='style-app-extend2-rtl'/>
+    % else:
+    <%static:css group='style-app'/>
+    <%static:css group='style-app-extend1'/>
+    <%static:css group='style-app-extend2'/>
+    % endif
 
   <%static:js group='main_vendor'/>
 

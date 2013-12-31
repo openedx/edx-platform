@@ -86,11 +86,7 @@ require(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape"],
                 }
                 // this is checking the value against the encoded value of the field.
                 // in languages other than english this will not work, unless we check
-                // encoded against encoded which is useless. A check has been added to filter for white spaces alone A better solution
-                // to be found.
-//                if (item !== encodeURIComponent(item)) {
-//                    return gettext('Please do not use any spaces or special characters in this field.');
-//                }
+                // encoded against encoded which is useless. A check has been added to filter for white spaces alone.
                 if (/\s/g.test(item)) {
                     return gettext('Please do not use any spaces or special characters in this field.');
                 }

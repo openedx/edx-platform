@@ -40,6 +40,7 @@
       </h2>
 
       <nav class="nav-course nav-dd ui-left">
+        <h2 class="sr">${_(u"{course_name}'s Navigation:").format(course_name=context_course.display_name_with_default)}</h2>
         <ol>
           <li class="nav-item nav-course-courseware">
             <h3 class="title"><span class="label"><span class="label-prefix sr">${_("Course")} </span>${_("Content")}</span> <i class="icon-caret-down ui-toggle-dd"></i></h3>
@@ -127,12 +128,14 @@
         </form>
       % if user.is_authenticated():
       <nav class="nav-account nav-is-signedin nav-dd ui-right">
-        % if translation.get_language() == 'ar':
-          <a class="change_to_ar" style="display: none">عربي</a>
-          <a class="change_to_en" style="float: left; color: #646464; margin-top: 10px; margin-left: 20px; cursor: pointer">English</a>
-          % else:
-          <a class="change_to_ar" style="float: right; color: #646464; margin-top: 8px; margin-right: 20px; cursor: pointer">عربي</a>
-          <a class="change_to_en" style="display: none">English</a>
+        % if settings.FEATURES['ENABLE_LANGUAGE_CHANGE']:
+            % if translation.get_language() == 'ar':
+              <a class="change_to_ar" style="display: none">عربي</a>
+              <a class="change_to_en" style="float: left; color: #646464; margin-top: 10px; margin-left: 20px; cursor: pointer">English</a>
+              % else:
+              <a class="change_to_ar" style="float: right; color: #646464; margin-top: 8px; margin-right: 20px; cursor: pointer">عربي</a>
+              <a class="change_to_en" style="display: none">English</a>
+            % endif
         % endif
         <h2 class="sr">${_("Help &amp; Account Navigation")}</h2>
 

@@ -295,7 +295,7 @@ def create_new_course(request):
         overview_template_file = 'overview_' + language_in_use + '.yaml'
         overview_template = AboutDescriptor.get_template(overview_template_file)
         if overview_template is None:
-            #if None is returned reset to the original overview file
+            # if None is returned reset to the original overview file
             overview_template = AboutDescriptor.get_template('overview.yaml')
     modulestore('direct').create_and_save_xmodule(
         dest_about_location,
