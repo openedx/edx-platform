@@ -51,19 +51,19 @@ var CourseGrader = Backbone.Model.extend({
             }}
         if (_.has(attrs, 'min_count')) {
             var intMinCount = parseInt(attrs.min_count, 10);
-            if (!isFinite(intMinCount) || /\D+/.test(intMinCount) || intMinCount < 1) {
+            if (!isFinite(intMinCount) || /\D+/.test(attrs.min_count) || intMinCount < 1) {
                 errors.min_count = gettext("Please enter an integer greater than 0.");
             }
             else attrs.min_count = intMinCount;
         }
         if (_.has(attrs, 'drop_count')) {
             var intDropCount = parseInt(attrs.drop_count, 10);
-            if (!isFinite(intDropCount) || /\D+/.test(intDropCount) || isNaN(intDropCount)) {
-                errors.drop_count = gettext("Please enter an integer.");
+            if (!isFinite(intDropCount) || /\D+/.test(attrs.drop_count) || isNaN(intDropCount) || intDropCount < 0) {
+                errors.drop_count = gettext("Please enter non-negative integer.");
             }
             else attrs.drop_count = intDropCount;
         }
-        if (_.has(attrs, 'min_count') && _.has(attrs, 'drop_count') && attrs.drop_count > attrs.min_count) {
+        if (_.has(attrs, 'min_count') && _.has(attrs, 'drop_count') && !_.has(errors, 'min_count') && !_.has(errors, 'drop_count') && attrs.drop_count > attrs.min_count) {
             errors.drop_count = _.template(
                 gettext("Cannot drop more <% attrs.types %> than will assigned."),
                 attrs, {variable: 'attrs'});
