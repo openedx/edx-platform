@@ -41,9 +41,10 @@ def assets_handler(request, tag=None, package_id=None, branch=None, version_guid
     deleting assets, and changing the "locked" state of an asset.
 
     GET
-        html: return html page of all course assets. Note that pages of assets are fetched client-side.
+        html: return html page which will show all course assets. Note that only the asset container
+            is returned and that the actual assets are filled in with a client-side request.
         json: returns a page of assets. A page parameter specifies the desired page, and the
-        optional page_size parameter indicates the number of items per page (defaults to 50).
+            optional page_size parameter indicates the number of items per page (defaults to 50).
     POST
         json: create (or update?) an asset. The only updating that can be done is changing the lock state.
     PUT
