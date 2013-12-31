@@ -19,7 +19,7 @@ You organize your course in the following hierarchy:
 
 
 Studio provides you with flexibility when organizing your course.  
-A common course model is for Sections to correspond to weeks, and for Subsections to correspond to lessons.
+A common course model is for sections to correspond to weeks, and for subsections to correspond to lessons.
 
 .. note::  We recommend that you review :ref:`Guidelines for Creating Accessible Content` before developing content for your course.
 
@@ -48,18 +48,18 @@ The following example shows how a student would view this course content:
 Sections
 ********
 
-A Section is the topmost category in your course. A Section can represent a time-period in your course, or another organizing principle.
+A section is the topmost category in your course. A Section can represent a time-period in your course, or another organizing principle.
 
-To create a Section:
+To create a section:
 
 #. In the Course Outline, click **New Section**.  
 #. In the field that opens at the top of the outline, enter the new Section name.
 #. Click **Save**.
 
-The new, empty Section is placed at the bottom of the course outline.
-You must now add Subsections to the Section.
+The new, empty section is placed at the bottom of the course outline.
+You must now add subsections to the section.
 
-Whether or not students see the new Section depends on the release date. 
+Whether or not students see the new section depends on the release date. 
 See :ref:`Publishing Your Course` for more information.
 
 .. _Subsections:
@@ -68,22 +68,22 @@ See :ref:`Publishing Your Course` for more information.
 Subsections
 ****************
 
-Sections are divided into Subsections. A Subsection may represent a topic in your course, or another organizing principle.
+Sections are divided into subsections. A subsection may represent a topic in your course, or another organizing principle.
 
-You can set a Subsection to an assignment type that you created when
+You can set a subsection to an assignment type that you created when
 you set up grading. You can then include assignments in the body of that
-Subsection. See :ref:`Establish a Grading Policy` for more information on grading.
+subsection. See :ref:`Establish a Grading Policy` for more information on grading.
 
 To create a Subsection:
 
-#. At the bottom of the Section, click **New Subsection**.  
+#. At the bottom of the section, click **New Subsection**.  
 #. In the field that opens, enter the new Subsection name.
 #. Click **Save**.
 
-The new, empty Subsection is placed at the bottom of the Section.
-You must now add Units to the Subsection.
+The new, empty subsection is placed at the bottom of the section.
+You must now add Units to the subsection.
 
-Whether or not students see the new Subsection depends on its release date. 
+Whether or not students see the new subsection depends on its release date. 
 See :ref:`Publishing Your Course` for more information.
 
 
@@ -91,31 +91,31 @@ See :ref:`Publishing Your Course` for more information.
 Edit a Subsection
 ==================
 
-You can add and delete Subsections, and select the grading policy, directly from the Course Outline.
+You can add and delete subsections, and select the grading policy, directly from the Course Outline.
 
-You can also open the Subsection in its own page, to perform those tasks as well as to 
-set the Subsection release date, set a due date, preview a draft of the Subsection, or view the live course.
+You can also open the subsection in its own page, to perform those tasks as well as to 
+set the subsection release date, set a due date, preview a draft of the subsection, or view the live course.
 
-Click on the Subsection title. The Subsection opens in its own page:
+Click on the subsection title. The subsection opens in its own page:
 
     .. image:: Images/subsection.png
        :width: 800
 
 
 =======================
-Set the Grading Policy
+Add a Graded Assignment
 =======================
 
-You can designate a Subsection as one of the assignment types that you specified in the grading policy.
+You can make a subsection a graded assignment. You select one of the assignment types that you specified in the grading policy.
 
-You set the grading policy for the Subsection from the Course Outline or from the Subsection page.
+You select the assignment type for the Subsection from the Course Outline or from the Subsection page.
 
-From the Course Outline, click the checkmark next to the Subsection.  Then select a grading policy from the popup menu:
+From the Course Outline, click the checkmark next to the subsection.  Then select the assignment type from the popup menu:
 
     .. image:: Images/course_outline_set_grade.png
        :width: 800
 
-From the Subsection page, click the text next to the **Graded as** label, then select a grading policy from the popup menu:
+From the Subsection page, click the text next to the **Graded as** label, then select the assignment type from the popup menu:
 
     .. image:: Images/subsection_set_grade.png
        :width: 800
@@ -127,9 +127,9 @@ See :ref:`Establish a Grading Policy` for more information.
 Set the Due Date
 ==================
 
-For Subsections that contain graded problems, you can set a due date. Students must complete the problems in the Subsection before the due date to get credit.
+For subsections that contain graded problems, you can set a due date. Students must complete the problems in the subsection before the due date to get credit.
   
-#. From the Subsection page, click **SET A DUE DATE**. The Due Day and Due Time fields appear.
+#. From the subsection page, click **SET A DUE DATE**. The Due Day and Due Time fields appear.
 #. Place the cursor in the Due Date field, and pick a day from the popup calendar.
 #. Place the cursor in the Due Time field and pick a time.
 
@@ -145,10 +145,10 @@ For more information, see :ref:`Establish a Grading Policy`.
 Units
 ******
 
-Subsections are divided into Units. A Unit contains one or more Components.
+Subsections are divided into units. A unit contains one or more components.
 
-For students, each Unit in the Subsection is represented as a link on the accordian at the top of the page.
-The following page shows a Subsection that has nine Units:
+For students, each unit in the subsection is represented as a link on the accordian at the top of the page.
+The following page shows a subsection that has nine Units:
 
 .. image:: Images/units_students.png
  :width: 800
@@ -165,18 +165,18 @@ The following page shows a Subsection that has nine Units:
 	you work with a private unit or edit a draft of a public unit.
 
 
-To create a Unit from the Course Outline or the Subsection page:
+To create a unit from the Course Outline or the subsection page:
 
-#. Within the Subsection, click **New Unit**.  
+#. Within the subsection, click **New Unit**.  
 #. Enter the Display Name that students will see.
-#. Click a Component type to add a the first Component in the Unit.
+#. Click a component type to add a the first component in the Unit.
 
    .. image:: Images/Unit_DisplayName_Studio.png
 
-#. Follow the instructions for the type of Component, listed below.
-#. By default, the Unit visibility is **Private**, meaning students will not be able to see the Unit. Unless you want to publish the Unit to students immediately, leave this setting. See LINK for more information on releasing your course.
+#. Follow the instructions for the type of component, listed below.
+#. By default, the Unit visibility is **Private**, meaning students will not be able to see the Unit. Unless you want to publish the Unit to students immediately, leave this setting. See :ref:`Publishing Your Course` for more information on releasing your course.
 
-The Unit with the single Component is placed at the bottom of the Subsection. 
+The unit with the single component is placed at the bottom of the subsection. 
 
 .. _Components:
 
@@ -192,10 +192,10 @@ You add the first component when creating the unit.
 
 To add another component to the unit:
 
-#. If the Unit is Public, change the **Visibility** setting to **Private**. You cannot modify a Public Unit.
-#. In the **Add New Component** panel at the bottom of the Unit, click the type of Component to add.
+#. If the unit is public, change the **Visibility** setting to **Private**. You cannot modify a Public unit.
+#. In the **Add New Component** panel at the bottom of the unit, click the type of component to add.
     .. image:: Images/Unit_DisplayName_Studio.png
-#. Follow the instructions for the type of Component:
+#. Follow the instructions for the type of component:
 
   * :ref:`Working with HTML Components` 
   * :ref:`Working with Video Components`
@@ -212,12 +212,12 @@ Reorganize Your Course
 
 You can reorganize your course by dragging and dropping elements in the Course Outline.
 
-To move a Section, Subsection, or Unit, click the mouse on the element's handle on the right side of the outline, then move the element to the new location. 
+To move a section, subsection, or unit, click the mouse on the element's handle on the right side of the outline, then move the element to the new location. 
 Element handles are highlighed in the following image: 
 
     .. image:: Images/drag_drop.png
        :width: 800
 
-When you move a course element, a blue line indicates the new position. You can move a Subsection to a new Section, and a Unit to a new Subsection.
+When you move a course element, a blue line indicates the new position. You can move a subsection to a new section, and a unit to a new subsection.
 
-You can reorganize Components within a Unit in the same way.
+You can reorganize components within a unit in the same way.
