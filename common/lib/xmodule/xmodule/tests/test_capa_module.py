@@ -78,17 +78,10 @@ class CapaFactory(object):
 
     @classmethod
     def create(cls,
-               graceperiod=None,
-               due=None,
-               max_attempts=None,
-               showanswer=None,
-               rerandomize=None,
-               force_save_button=None,
                attempts=None,
                problem_state=None,
                correct=False,
-               done=None,
-               text_customization=None
+               **kwargs
                ):
         """
         All parameters are optional, and are added to the created problem if specified.
@@ -109,24 +102,7 @@ class CapaFactory(object):
         location = Location(["i4x", "edX", "capa_test", "problem",
                              "SampleProblem{0}".format(cls.next_num())])
         field_data = {'data': cls.sample_problem_xml}
-
-        if graceperiod is not None:
-            field_data['graceperiod'] = graceperiod
-        if due is not None:
-            field_data['due'] = due
-        if max_attempts is not None:
-            field_data['max_attempts'] = max_attempts
-        if showanswer is not None:
-            field_data['showanswer'] = showanswer
-        if force_save_button is not None:
-            field_data['force_save_button'] = force_save_button
-        if rerandomize is not None:
-            field_data['rerandomize'] = rerandomize
-        if done is not None:
-            field_data['done'] = done
-        if text_customization is not None:
-            field_data['text_customization'] = text_customization
-
+        field_data.update(kwargs)
         descriptor = Mock(weight="1")
         if problem_state is not None:
             field_data.update(problem_state)
@@ -378,6 +354,13 @@ class CapaModuleTest(unittest.TestCase):
         module = CapaFactory.create(max_attempts="1", attempts="0",
                                     due=self.yesterday_str)
         self.assertTrue(module.closed())
+
+    def test_due_date_extension(self):
+
+        module = CapaFactory.create(
+            max_attempts="1", attempts="0", due=self.yesterday_str,
+            extended_due=self.tomorrow_str)
+        self.assertFalse(module.closed())
 
     def test_parse_get_params(self):
 

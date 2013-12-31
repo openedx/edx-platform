@@ -7,9 +7,10 @@ from datetime import datetime
 from pkg_resources import resource_string
 from .capa_module import ComplexEncoder
 from .x_module import XModule, module_attr
-from xmodule.raw_module import RawDescriptor
-from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
+from .raw_module import RawDescriptor
+from .modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from .timeinfo import TimeInfo
+from .util.duedate import get_extended_due_date
 from xblock.fields import Dict, String, Scope, Boolean, Float
 from xmodule.fields import Date, Timedelta
 
@@ -46,6 +47,14 @@ class PeerGradingFields(object):
     due = Date(
         help="Due date that should be displayed.",
         scope=Scope.settings)
+    extended_due = Date(
+        help="Date that this problem is due by for a particular student. This "
+             "can be set by an instructor, and will override the global due "
+             "date if it is set to a date that is later than the global due "
+             "date.",
+        default=None,
+        scope=Scope.user_state,
+    )
     graceperiod = Timedelta(
         help="Amount of grace to give on the due date.",
         scope=Scope.settings
@@ -128,7 +137,8 @@ class PeerGradingModule(PeerGradingFields, XModule):
                 self.linked_problem = self.system.get_module(linked_descriptors[0])
 
         try:
-            self.timeinfo = TimeInfo(self.due, self.graceperiod)
+            self.timeinfo = TimeInfo(
+                get_extended_due_date(self), self.graceperiod)
         except Exception:
             log.error("Error parsing due date information in location {0}".format(self.location))
             raise
@@ -556,7 +566,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
             except (NoPathToItem, ItemNotFoundError):
                 continue
             if descriptor:
-                problem['due'] = descriptor.due
+                problem['due'] = get_extended_due_date(descriptor)
                 grace_period = descriptor.graceperiod
                 try:
                     problem_timeinfo = TimeInfo(problem['due'], grace_period)
