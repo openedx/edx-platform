@@ -8,57 +8,30 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding model 'RefundReport'
-        db.create_table('shoppingcart_refundreport', (
-            ('report_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['shoppingcart.Report'], unique=True, primary_key=True)),
-        ))
-        db.send_create_signal('shoppingcart', ['RefundReport'])
-
-        # Adding model 'Report'
-        db.create_table('shoppingcart_report', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-        ))
-        db.send_create_signal('shoppingcart', ['Report'])
-
-        # Adding model 'CertificateStatusReport'
-        db.create_table('shoppingcart_certificatestatusreport', (
-            ('report_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['shoppingcart.Report'], unique=True, primary_key=True)),
-        ))
-        db.send_create_signal('shoppingcart', ['CertificateStatusReport'])
-
-        # Adding model 'ItemizedPurchaseReport'
-        db.create_table('shoppingcart_itemizedpurchasereport', (
-            ('report_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['shoppingcart.Report'], unique=True, primary_key=True)),
-        ))
-        db.send_create_signal('shoppingcart', ['ItemizedPurchaseReport'])
-
-        # Adding model 'UniversityRevenueShareReport'
-        db.create_table('shoppingcart_universityrevenuesharereport', (
-            ('report_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['shoppingcart.Report'], unique=True, primary_key=True)),
-        ))
-        db.send_create_signal('shoppingcart', ['UniversityRevenueShareReport'])
-
         # Adding field 'OrderItem.service_fee'
         db.add_column('shoppingcart_orderitem', 'service_fee',
                       self.gf('django.db.models.fields.DecimalField')(default=0.0, max_digits=30, decimal_places=2),
                       keep_default=False)
 
+        # Adding index on 'OrderItem', fields ['status']
+        db.create_index('shoppingcart_orderitem', ['status'])
+
+        # Adding index on 'OrderItem', fields ['fulfilled_time']
+        db.create_index('shoppingcart_orderitem', ['fulfilled_time'])
+
+        # Adding index on 'OrderItem', fields ['refund_requested_time']
+        db.create_index('shoppingcart_orderitem', ['refund_requested_time'])
+
 
     def backwards(self, orm):
-        # Deleting model 'RefundReport'
-        db.delete_table('shoppingcart_refundreport')
+        # Removing index on 'OrderItem', fields ['refund_requested_time']
+        db.delete_index('shoppingcart_orderitem', ['refund_requested_time'])
 
-        # Deleting model 'Report'
-        db.delete_table('shoppingcart_report')
+        # Removing index on 'OrderItem', fields ['fulfilled_time']
+        db.delete_index('shoppingcart_orderitem', ['fulfilled_time'])
 
-        # Deleting model 'CertificateStatusReport'
-        db.delete_table('shoppingcart_certificatestatusreport')
-
-        # Deleting model 'ItemizedPurchaseReport'
-        db.delete_table('shoppingcart_itemizedpurchasereport')
-
-        # Deleting model 'UniversityRevenueShareReport'
-        db.delete_table('shoppingcart_universityrevenuesharereport')
+        # Removing index on 'OrderItem', fields ['status']
+        db.delete_index('shoppingcart_orderitem', ['status'])
 
         # Deleting field 'OrderItem.service_fee'
         db.delete_column('shoppingcart_orderitem', 'service_fee')
@@ -108,14 +81,6 @@ class Migration(SchemaMigration):
             'mode': ('django.db.models.fields.SlugField', [], {'max_length': '50'}),
             'orderitem_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['shoppingcart.OrderItem']", 'unique': 'True', 'primary_key': 'True'})
         },
-        'shoppingcart.certificatestatusreport': {
-            'Meta': {'object_name': 'CertificateStatusReport', '_ormbases': ['shoppingcart.Report']},
-            'report_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['shoppingcart.Report']", 'unique': 'True', 'primary_key': 'True'})
-        },
-        'shoppingcart.itemizedpurchasereport': {
-            'Meta': {'object_name': 'ItemizedPurchaseReport', '_ormbases': ['shoppingcart.Report']},
-            'report_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['shoppingcart.Report']", 'unique': 'True', 'primary_key': 'True'})
-        },
         'shoppingcart.order': {
             'Meta': {'object_name': 'Order'},
             'bill_to_cardtype': ('django.db.models.fields.CharField', [], {'max_length': '32', 'blank': 'True'}),
@@ -139,15 +104,15 @@ class Migration(SchemaMigration):
         'shoppingcart.orderitem': {
             'Meta': {'object_name': 'OrderItem'},
             'currency': ('django.db.models.fields.CharField', [], {'default': "'usd'", 'max_length': '8'}),
-            'fulfilled_time': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
+            'fulfilled_time': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'db_index': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'line_desc': ('django.db.models.fields.CharField', [], {'default': "'Misc. Item'", 'max_length': '1024'}),
             'order': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['shoppingcart.Order']"}),
             'qty': ('django.db.models.fields.IntegerField', [], {'default': '1'}),
-            'refund_requested_time': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
+            'refund_requested_time': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'db_index': 'True'}),
             'report_comments': ('django.db.models.fields.TextField', [], {'default': "''"}),
             'service_fee': ('django.db.models.fields.DecimalField', [], {'default': '0.0', 'max_digits': '30', 'decimal_places': '2'}),
-            'status': ('django.db.models.fields.CharField', [], {'default': "'cart'", 'max_length': '32'}),
+            'status': ('django.db.models.fields.CharField', [], {'default': "'cart'", 'max_length': '32', 'db_index': 'True'}),
             'unit_cost': ('django.db.models.fields.DecimalField', [], {'default': '0.0', 'max_digits': '30', 'decimal_places': '2'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"})
         },
@@ -162,18 +127,6 @@ class Migration(SchemaMigration):
             'annotation': ('django.db.models.fields.TextField', [], {'null': 'True'}),
             'course_id': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '128', 'db_index': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
-        },
-        'shoppingcart.refundreport': {
-            'Meta': {'object_name': 'RefundReport', '_ormbases': ['shoppingcart.Report']},
-            'report_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['shoppingcart.Report']", 'unique': 'True', 'primary_key': 'True'})
-        },
-        'shoppingcart.report': {
-            'Meta': {'object_name': 'Report'},
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
-        },
-        'shoppingcart.universityrevenuesharereport': {
-            'Meta': {'object_name': 'UniversityRevenueShareReport', '_ormbases': ['shoppingcart.Report']},
-            'report_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['shoppingcart.Report']", 'unique': 'True', 'primary_key': 'True'})
         },
         'student.courseenrollment': {
             'Meta': {'ordering': "('user', 'course_id')", 'unique_together': "(('user', 'course_id'),)", 'object_name': 'CourseEnrollment'},

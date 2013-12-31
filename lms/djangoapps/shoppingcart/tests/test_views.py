@@ -365,26 +365,6 @@ class CSVReportViewsTest(ModuleStoreTestCase):
         self.assertIn(_("There was an error in your date input.  It should be formatted as YYYY-MM-DD"),
                       response.content)
 
-    @patch('shoppingcart.views.render_to_response', render_mock)
-    @override_settings(PAYMENT_REPORT_MAX_ITEMS=0)
-    def test_report_csv_too_long(self):
-        PaidCourseRegistration.add_to_order(self.cart, self.course_id)
-        self.cart.purchase()
-        self.login_user()
-        self.add_to_download_group(self.user)
-        response = self.client.post(reverse('payment_csv_report'), {'start_date': '1970-01-01',
-                                                                    'end_date': '2100-01-01',
-                                                                    'requested_report': 'itemized_purchase_report'})
-
-        ((template, context), unused_kwargs) = render_mock.call_args
-        self.assertEqual(template, 'shoppingcart/download_report.html')
-        self.assertTrue(context['total_count_error'])
-        self.assertFalse(context['date_fmt_error'])
-        self.assertIn(_("There are too many results in your report.") + " (>0)", response.content)
-
-    # just going to ignored the date in this test, since we already deal with date testing
-    # in test_models.py
-
     CORRECT_CSV_NO_DATE_ITEMIZED_PURCHASE = ",1,purchased,1,40,40,usd,Registration for Course: Robot Super Course,"
 
     def test_report_csv_itemized(self):
@@ -398,7 +378,7 @@ class CSVReportViewsTest(ModuleStoreTestCase):
                                                                     'requested_report': report_type})
         self.assertEqual(response['Content-Type'], 'text/csv')
         report = initialize_report(report_type)
-        self.assertIn(",".join(report.csv_report_header_row()), response.content)
+        self.assertIn(",".join(report.header()), response.content)
         self.assertIn(self.CORRECT_CSV_NO_DATE_ITEMIZED_PURCHASE, response.content)
 
     def test_report_csv_university_revenue_share(self):
@@ -412,7 +392,7 @@ class CSVReportViewsTest(ModuleStoreTestCase):
                                                                     'requested_report': report_type})
         self.assertEqual(response['Content-Type'], 'text/csv')
         report = initialize_report(report_type)
-        self.assertIn(",".join(report.csv_report_header_row()), response.content)
+        self.assertIn(",".join(report.header()), response.content)
         # TODO add another test here
 
 

@@ -12,12 +12,6 @@
       ${_("There was an error in your date input.  It should be formatted as YYYY-MM-DD")}
     </section>
   % endif
-  % if total_count_error:
-    <section class="error_msg">
-      ${_("There are too many results in your report.")} (>${settings.PAYMENT_REPORT_MAX_ITEMS}).
-      ${_("Try making the date range smaller.")}
-    </section>
-  % endif
   <form method="post">
     <p>${_("These reports are delimited by start and end dates.")}</p>
     <label for="start_date">${_("Start Date: ")}</label>

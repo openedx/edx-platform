@@ -356,26 +356,25 @@ class ItemizedPurchaseReportTest(ModuleStoreTestCase):
         self.cart.purchase()
         self.now = datetime.datetime.now(pytz.UTC)
 
-        # We can't modify the values returned by report_row_generator directly, since it's a generator, but
-        # we need the times on CORRECT_CSV and the generated report to match.  So, we extract the times from
-        # the report_row_generator and place them in CORRECT_CSV.
-        self.time_str = {}
-        report = initialize_report("itemized_purchase_report")
-        purchases = report.report_row_generator(self.now - self.FIVE_MINS, self.now + self.FIVE_MINS)
-        num_of_item = 0
-        for item in purchases:
-            num_of_item += 1
-            self.time_str[num_of_item] = item[0]
+        paid_reg = PaidCourseRegistration.objects.get(course_id=self.course_id, user=self.user)
+        paid_reg.fulfilled_time = self.now
+        paid_reg.refund_requested_time = self.now
+        paid_reg.save()
+
+        cert = CertificateItem.objects.get(course_id=self.course_id, user=self.user)
+        cert.fulfilled_time = self.now
+        cert.refund_requested_time = self.now
+        cert.save()
 
         self.CORRECT_CSV = dedent("""
             Purchase Time,Order ID,Status,Quantity,Unit Cost,Total Cost,Currency,Description,Comments
-            {time_str1},1,purchased,1,40,40,usd,Registration for Course: Robot Super Course,Ba\xc3\xbc\xe5\x8c\x85
-            {time_str2},1,purchased,1,40,40,usd,"Certificate of Achievement, verified cert for course Robot Super Course",
-            """.format(time_str1=str(self.time_str[1]), time_str2=str(self.time_str[2])))
+            {time_str},1,purchased,1,40,40,usd,Registration for Course: Robot Super Course,Ba\xc3\xbc\xe5\x8c\x85
+            {time_str},1,purchased,1,40,40,usd,"Certificate of Achievement, verified cert for course Robot Super Course",
+            """.format(time_str=str(self.now)))
 
     def test_purchased_items_btw_dates(self):
         report = initialize_report("itemized_purchase_report")
-        purchases = report.report_row_generator(self.now - self.FIVE_MINS, self.now + self.FIVE_MINS)
+        purchases = report.rows(self.now - self.FIVE_MINS, self.now + self.FIVE_MINS)
 
         # since there's not many purchases, just run through the generator to make sure we've got the right number
         num_purchases = 0
@@ -385,7 +384,7 @@ class ItemizedPurchaseReportTest(ModuleStoreTestCase):
         #self.assertIn(self.reg.orderitem_ptr, purchases)
         #self.assertIn(self.cert_item.orderitem_ptr, purchases)
 
-        no_purchases = report.report_row_generator(self.now + self.FIVE_MINS, self.now + self.FIVE_MINS + self.FIVE_MINS)
+        no_purchases = report.rows(self.now + self.FIVE_MINS, self.now + self.FIVE_MINS + self.FIVE_MINS)
 
         num_purchases = 0
         for item in no_purchases:
@@ -398,7 +397,7 @@ class ItemizedPurchaseReportTest(ModuleStoreTestCase):
         """
         report = initialize_report("itemized_purchase_report")
         csv_file = StringIO.StringIO()
-        report.make_report(csv_file, self.now - self.FIVE_MINS, self.now + self.FIVE_MINS)
+        report.write_csv(csv_file, self.now - self.FIVE_MINS, self.now + self.FIVE_MINS)
         csv = csv_file.getvalue()
         csv_file.close()
         # Using excel mode csv, which automatically ends lines with \r\n, so need to convert to \n

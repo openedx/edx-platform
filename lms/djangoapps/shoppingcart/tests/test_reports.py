@@ -3,20 +3,21 @@ Tests for the Shopping Cart Models
 """
 import StringIO
 from textwrap import dedent
+import pytz
+import datetime
 
 from django.conf import settings
 from django.test.utils import override_settings
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+
+from course_modes.models import CourseMode
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from shoppingcart.models import (Order, CertificateItem)
 from shoppingcart.reports import ItemizedPurchaseReport, CertificateStatusReport, UniversityRevenueShareReport, RefundReport
+from shoppingcart.views import initialize_report, REPORT_TYPES
 from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
-from course_modes.models import CourseMode
-from shoppingcart.views import initialize_report, REPORT_TYPES
-import pytz
-import datetime
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
@@ -28,37 +29,37 @@ class ReportTypeTests(ModuleStoreTestCase):
 
     def setUp(self):
         # Need to make a *lot* of users for this one
-        self.user1 = UserFactory.create()
-        self.user1.profile.name = "John Doe"
-        self.user1.profile.save()
+        self.first_verified_user = UserFactory.create()
+        self.first_verified_user.profile.name = "John Doe"
+        self.first_verified_user.profile.save()
 
-        self.user2 = UserFactory.create()
-        self.user2.profile.name = "Jane Deer"
-        self.user2.profile.save()
+        self.second_verified_user = UserFactory.create()
+        self.second_verified_user.profile.name = "Jane Deer"
+        self.second_verified_user.profile.save()
 
-        self.user3 = UserFactory.create()
-        self.user3.profile.name = "Joe Miller"
-        self.user3.profile.save()
+        self.first_audit_user = UserFactory.create()
+        self.first_audit_user.profile.name = "Joe Miller"
+        self.first_audit_user.profile.save()
 
-        self.user4 = UserFactory.create()
-        self.user4.profile.name = "Simon Blackquill"
-        self.user4.profile.save()
+        self.second_audit_user = UserFactory.create()
+        self.second_audit_user.profile.name = "Simon Blackquill"
+        self.second_audit_user.profile.save()
 
-        self.user5 = UserFactory.create()
-        self.user5.profile.name = "Super Mario"
-        self.user5.profile.save()
+        self.third_audit_user = UserFactory.create()
+        self.third_audit_user.profile.name = "Super Mario"
+        self.third_audit_user.profile.save()
 
-        self.user6 = UserFactory.create()
-        self.user6.profile.name = "Princess Peach"
-        self.user6.profile.save()
+        self.honor_user = UserFactory.create()
+        self.honor_user.profile.name = "Princess Peach"
+        self.honor_user.profile.save()
 
-        self.user7 = UserFactory.create()
-        self.user7.profile.name = "King Bowser"
-        self.user7.profile.save()
+        self.first_refund_user = UserFactory.create()
+        self.first_refund_user.profile.name = "King Bowser"
+        self.first_refund_user.profile.save()
 
-        self.user8 = UserFactory.create()
-        self.user8.profile.name = "Susan Smith"
-        self.user8.profile.save()
+        self.second_refund_user = UserFactory.create()
+        self.second_refund_user.profile.name = "Susan Smith"
+        self.second_refund_user.profile.save()
 
         # Two are verified, three are audit, one honor
 
@@ -79,54 +80,52 @@ class ReportTypeTests(ModuleStoreTestCase):
         course_mode2.save()
 
         # User 1 & 2 will be verified
-        self.cart1 = Order.get_cart_for_user(self.user1)
+        self.cart1 = Order.get_cart_for_user(self.first_verified_user)
         CertificateItem.add_to_order(self.cart1, self.course_id, self.cost, 'verified')
         self.cart1.purchase()
 
-        self.cart2 = Order.get_cart_for_user(self.user2)
+        self.cart2 = Order.get_cart_for_user(self.second_verified_user)
         CertificateItem.add_to_order(self.cart2, self.course_id, self.cost, 'verified')
         self.cart2.purchase()
 
         # Users 3, 4, and 5 are audit
-        CourseEnrollment.enroll(self.user3, self.course_id, "audit")
-        CourseEnrollment.enroll(self.user4, self.course_id, "audit")
-        CourseEnrollment.enroll(self.user5, self.course_id, "audit")
+        CourseEnrollment.enroll(self.first_audit_user, self.course_id, "audit")
+        CourseEnrollment.enroll(self.second_audit_user, self.course_id, "audit")
+        CourseEnrollment.enroll(self.third_audit_user, self.course_id, "audit")
 
         # User 6 is honor
-        CourseEnrollment.enroll(self.user6, self.course_id, "honor")
+        CourseEnrollment.enroll(self.honor_user, self.course_id, "honor")
 
         self.now = datetime.datetime.now(pytz.UTC)
 
         # Users 7 & 8 are refunds
-        self.cart = Order.get_cart_for_user(self.user7)
+        self.cart = Order.get_cart_for_user(self.first_refund_user)
         CertificateItem.add_to_order(self.cart, self.course_id, self.cost, 'verified')
         self.cart.purchase()
-        CourseEnrollment.unenroll(self.user7, self.course_id)
+        CourseEnrollment.unenroll(self.first_refund_user, self.course_id)
 
-        self.cart = Order.get_cart_for_user(self.user8)
+        self.cart = Order.get_cart_for_user(self.second_refund_user)
         CertificateItem.add_to_order(self.cart, self.course_id, self.cost, 'verified')
-        self.cart.purchase(self.user8, self.course_id)
-        CourseEnrollment.unenroll(self.user8, self.course_id)
-
-        # We can't modify the values returned by report_row_generator directly, since it's a generator, but
-        # we need the times on CORRECT_CSV and the generated report to match.  So, we extract the times from
-        # the report_row_generator and place them in CORRECT_CSV.
-        self.time_str = {}
-        report = initialize_report("refund_report")
-        refunds = report.report_row_generator(self.now - self.FIVE_MINS, self.now + self.FIVE_MINS)
-        time_index = 0
-        for item in refunds:
-            self.time_str[time_index] = item[2]
-            time_index += 1
-            self.time_str[time_index] = item[3]
-            time_index += 1
-        self.CORRECT_REFUND_REPORT_CSV = dedent("""
-            Order Number,Customer Name,Date of Original Transaction,Date of Refund,Amount of Refund,Service Fees (if any)
-            3,King Bowser,{time_str0},{time_str1},40,0
-            4,Susan Smith,{time_str2},{time_str3},40,0
-            """.format(time_str0=str(self.time_str[0]), time_str1=str(self.time_str[1]), time_str2=str(self.time_str[2]), time_str3=str(self.time_str[3])))
+        self.cart.purchase(self.second_refund_user, self.course_id)
+        CourseEnrollment.unenroll(self.second_refund_user, self.course_id)
 
         self.test_time = datetime.datetime.now(pytz.UTC)
+
+        first_refund = CertificateItem.objects.get(id=3)
+        first_refund.fulfilled_time = self.test_time
+        first_refund.refund_requested_time = self.test_time
+        first_refund.save()
+
+        second_refund = CertificateItem.objects.get(id=4)
+        second_refund.fulfilled_time = self.test_time
+        second_refund.refund_requested_time = self.test_time
+        second_refund.save()
+
+        self.CORRECT_REFUND_REPORT_CSV = dedent("""
+            Order Number,Customer Name,Date of Original Transaction,Date of Refund,Amount of Refund,Service Fees (if any)
+            3,King Bowser,{time_str},{time_str},40,0
+            4,Susan Smith,{time_str},{time_str},40,0
+            """.format(time_str=str(self.test_time)))
 
         self.CORRECT_CERT_STATUS_CSV = dedent("""
             University,Course,Total Enrolled,Audit Enrollment,Honor Code Enrollment,Verified Enrollment,Gross Revenue,Gross Revenue over the Minimum,Number of Refunds,Dollars Refunded
@@ -138,9 +137,9 @@ class ReportTypeTests(ModuleStoreTestCase):
             MITx,999 Robot Super Course,0,80.00,0.00,2,80.00
             """.format(time_str=str(self.test_time)))
 
-    def test_refund_report_report_row_generator(self):
+    def test_refund_report_rows(self):
         report = initialize_report("refund_report")
-        refunded_certs = report.report_row_generator(self.now - self.FIVE_MINS, self.now + self.FIVE_MINS)
+        refunded_certs = report.rows(self.now - self.FIVE_MINS, self.now + self.FIVE_MINS)
 
         # check that we have the right number
         num_certs = 0
@@ -148,8 +147,8 @@ class ReportTypeTests(ModuleStoreTestCase):
             num_certs += 1
         self.assertEqual(num_certs, 2)
 
-        self.assertTrue(CertificateItem.objects.get(user=self.user7, course_id=self.course_id))
-        self.assertTrue(CertificateItem.objects.get(user=self.user8, course_id=self.course_id))
+        self.assertTrue(CertificateItem.objects.get(user=self.first_refund_user, course_id=self.course_id))
+        self.assertTrue(CertificateItem.objects.get(user=self.second_refund_user, course_id=self.course_id))
 
     def test_refund_report_purchased_csv(self):
         """
@@ -157,7 +156,7 @@ class ReportTypeTests(ModuleStoreTestCase):
         """
         report = initialize_report("refund_report")
         csv_file = StringIO.StringIO()
-        report.make_report(csv_file, self.now - self.FIVE_MINS, self.now + self.FIVE_MINS)
+        report.write_csv(csv_file, self.now - self.FIVE_MINS, self.now + self.FIVE_MINS)
         csv = csv_file.getvalue()
         csv_file.close()
         # Using excel mode csv, which automatically ends lines with \r\n, so need to convert to \n
@@ -166,13 +165,13 @@ class ReportTypeTests(ModuleStoreTestCase):
     def test_basic_cert_status_csv(self):
         report = initialize_report("certificate_status")
         csv_file = StringIO.StringIO()
-        report.make_report(csv_file, self.now - self.FIVE_MINS, self.now + self.FIVE_MINS, 'A', 'Z')
+        report.write_csv(csv_file, self.now - self.FIVE_MINS, self.now + self.FIVE_MINS, 'A', 'Z')
         csv = csv_file.getvalue()
         self.assertEqual(csv.replace('\r\n', '\n').strip(), self.CORRECT_CERT_STATUS_CSV.strip())
 
     def test_basic_uni_revenue_share_csv(self):
         report = initialize_report("university_revenue_share")
         csv_file = StringIO.StringIO()
-        report.make_report(csv_file, self.now - self.FIVE_MINS, self.now + self.FIVE_MINS, 'A', 'Z')
+        report.write_csv(csv_file, self.now - self.FIVE_MINS, self.now + self.FIVE_MINS, 'A', 'Z')
         csv = csv_file.getvalue()
         self.assertEqual(csv.replace('\r\n', '\n').strip(), self.CORRECT_UNI_REVENUE_SHARE_CSV.strip())

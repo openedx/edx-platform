@@ -1,13 +1,12 @@
+from collections import namedtuple
 from datetime import datetime
+from decimal import Decimal
 import pytz
 import logging
 import smtplib
 import unicodecsv
 
-from model_utils.managers import InheritanceManager
-from collections import namedtuple
 from boto.exception import BotoServerError  # this is a super-class of SESError and catches connection errors
-
 from django.dispatch import receiver
 from django.db import models
 from django.conf import settings
@@ -16,7 +15,9 @@ from django.core.mail import send_mail
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 from django.db import transaction
+from django.db.models import Sum
 from django.core.urlresolvers import reverse
+from model_utils.managers import InheritanceManager
 
 from xmodule.modulestore.django import modulestore
 from xmodule.course_module import CourseDescriptor
@@ -26,6 +27,7 @@ from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_string
 from student.views import course_from_id
 from student.models import CourseEnrollment, unenroll_done
+from util.query import use_read_replica_if_available
 
 from verify_student.models import SoftwareSecurePhotoVerification
 
@@ -39,8 +41,6 @@ ORDER_STATUSES = (
     ('purchased', 'purchased'),
     ('refunded', 'refunded'),
 )
-
-
 
 # we need a tuple to represent the primary key of various OrderItem subclasses
 OrderItemSubclassPK = namedtuple('OrderItemSubclassPK', ['cls', 'pk'])  # pylint: disable=C0103
@@ -570,6 +570,25 @@ class CertificateItem(OrderItem):
                      billing_email=settings.PAYMENT_SUPPORT_EMAIL)
 
     @classmethod
-    def verified_certificates_in(cls, course_id, status):
+    def verified_certificates_count(cls, course_id, status):
         """Return a queryset of CertificateItem for every verified enrollment in course_id with the given status."""
-        return CertificateItem.objects.filter(course_id=course_id, mode='verified', status=status)
+        return use_read_replica_if_available(
+            CertificateItem.objects.filter(course_id=course_id, mode='verified', status=status).count())
+
+    # TODO combine these three methods into one
+    @classmethod
+    def verified_certificates_monetary_field_sum(cls, course_id, status, field_to_aggregate):
+        """
+        Returns a Decimal indicating the total sum of field_to_aggregate for all verified certificates with a particular status.
+
+        Sample usages: 
+        - status 'refunded' and field_to_aggregate 'unit_cost' will give the total amount of money refunded for course_id
+        - status 'purchased' and field_to_aggregate 'service_fees' gives the sum of all service fees for purchased certificates
+        etc
+        """
+        query = use_read_replica_if_available(
+            CertificateItem.objects.filter(course_id=course_id, mode='verified', status='purchased').aggregate(Sum(field_to_aggregate)))[field_to_aggregate + '__sum']
+        if query is None:
+            return Decimal(0.00)
+        else:
+            return query

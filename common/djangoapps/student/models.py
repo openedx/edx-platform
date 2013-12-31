@@ -10,10 +10,12 @@ file and check it in at the same time as your model changes. To do that,
 2. ./manage.py lms schemamigration student --auto description_of_your_change
 3. Add the migration file created in edx-platform/common/djangoapps/student/migrations/
 """
+import crum
 from datetime import datetime
 import hashlib
 import json
 import logging
+from pytz import UTC
 import uuid
 
 from django.conf import settings
@@ -25,15 +27,12 @@ from django.dispatch import receiver, Signal
 import django.dispatch
 from django.forms import ModelForm, forms
 from django.core.exceptions import ObjectDoesNotExist
-
-from course_modes.models import CourseMode
-import lms.lib.comment_client as cc
-from pytz import UTC
-import crum
-
 from track import contexts
 from track.views import server_track
 from eventtracking import tracker
+
+from course_modes.models import CourseMode
+import lms.lib.comment_client as cc
 
 unenroll_done = Signal(providing_args=["course_enrollment"])
 log = logging.getLogger(__name__)
@@ -581,15 +580,17 @@ class CourseEnrollment(models.Model):
         )
 
     @classmethod
-    def enrollments_in(cls, course_id, mode=None):
+    def enrollment_counts(cls, course_id):
         """
-        Return a queryset of CourseEnrollment for every active enrollment in the course course_id.
-        Returns only CourseEnrollments with the given mode, if a mode is supplied by the caller.
+        Returns a dictionary that stores the total enrollment count for a course, as well as the
+        enrollment count for each individual mode.
         """
-        if mode is None:
-            return cls.objects.filter(course_id=course_id, is_active=True,)
-        else:
-            return cls.objects.filter(course_id=course_id, is_active=True, mode=mode)
+        d = {}
+        d['total'] = cls.objects.filter(course_id=course_id, is_active=True).count()
+        d['honor'] = cls.objects.filter(course_id=course_id, is_active=True, mode='honor').count()
+        d['audit'] = cls.objects.filter(course_id=course_id, is_active=True, mode='audit').count()
+        d['verified'] = cls.objects.filter(course_id=course_id, is_active=True, mode='verified').count()
+        return d
 
     def activate(self):
         """Makes this `CourseEnrollment` record active. Saves immediately."""

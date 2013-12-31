@@ -555,8 +555,6 @@ PAID_COURSE_REGISTRATION_CURRENCY = ['usd', '$']
 
 # Members of this group are allowed to generate payment reports
 PAYMENT_REPORT_GENERATOR_GROUP = 'shoppingcart_report_access'
-# Maximum number of rows the report can contain
-PAYMENT_REPORT_MAX_ITEMS = 10000
 
 ################################# open ended grading config  #####################
 

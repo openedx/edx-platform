@@ -11,11 +11,11 @@ from django.core.urlresolvers import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from edxmako.shortcuts import render_to_response
-from student.models import CourseEnrollment
 from shoppingcart.reports import RefundReport, ItemizedPurchaseReport, UniversityRevenueShareReport, CertificateStatusReport
+from student.models import CourseEnrollment
+from .exceptions import ItemAlreadyInCartException, AlreadyEnrolledInCourseException, CourseDoesNotExistException, ReportTypeDoesNotExistException
 from .models import Order, PaidCourseRegistration, OrderItem
 from .processors import process_postpay_callback, render_purchase_form_html
-from .exceptions import ItemAlreadyInCartException, AlreadyEnrolledInCourseException, CourseDoesNotExistException, ReportTypeDoesNotExistException
 
 log = logging.getLogger("shoppingcart")
 
@@ -213,20 +213,12 @@ def csv_report(request):
             return _render_report_form(start_str, end_str, start_letter, end_letter, report_type, date_fmt_error=True)
 
         report = initialize_report(report_type)
-        items = report.report_row_generator(start_date, end_date, start_letter, end_letter)
-
-        # TODO add this back later as a query-est function or something
-        try:
-            if items.count() > settings.PAYMENT_REPORT_MAX_ITEMS:
-            # Error case: too many items would be generated in the report and we're at risk of timeout
-                return _render_report_form(start_str, end_str, start_letter, end_letter, report_type, total_count_error=True)
-        except:
-            pass
+        items = report.rows(start_date, end_date, start_letter, end_letter)
 
         response = HttpResponse(mimetype='text/csv')
         filename = "purchases_report_{}.csv".format(datetime.datetime.now(pytz.UTC).strftime("%Y-%m-%d-%H-%M-%S"))
         response['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
-        report.make_report(response, start_date, end_date, start_letter, end_letter)
+        report.write_csv(response, start_date, end_date, start_letter, end_letter)
         return response
 
     elif request.method == 'GET':
