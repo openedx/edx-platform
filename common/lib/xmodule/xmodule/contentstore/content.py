@@ -35,7 +35,7 @@ class StaticContent(object):
 
     @staticmethod
     def generate_thumbnail_name(original_name):
-        return ('{0}' + XASSET_THUMBNAIL_TAIL_NAME).format(os.path.splitext(original_name)[0])
+        return (u'{0}' + XASSET_THUMBNAIL_TAIL_NAME).format(os.path.splitext(original_name)[0])
 
     @staticmethod
     def compute_location(org, course, name, revision=None, is_thumbnail=False):

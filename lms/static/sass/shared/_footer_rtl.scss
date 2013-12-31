@@ -18,14 +18,14 @@
     a {
       @include transition(link-color 0.15s ease-in-out 0s, border 0.15s ease-in-out 0s);
 
-      &:link, &:visited, &:hover, &:active {
+      &:link, &:visited, &:hover, &:focus, &:active {
         border-bottom: none;
         color: $link-color;
         text-decoration: none !important;
         font-family: $sans-serif;
       }
 
-      &:hover, &:active {
+      &:hover, &:focus, &:active {
         border-bottom: 1px dotted $link-color;
         color: $link-color;
       }
@@ -48,7 +48,7 @@
           a {
             color: tint($black, 20%);
 
-            &:hover, &:active {
+            &:hover, &:focus, &:active {
               color: $link-color;
             }
           }
@@ -101,7 +101,7 @@
           a {
             display: block;
 
-            &:hover, &:active {
+            &:hover, &:focus, &:active {
               border: none;
             }
           }
