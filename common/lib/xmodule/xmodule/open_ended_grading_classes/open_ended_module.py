@@ -503,6 +503,9 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             fail['feedback'] = error_message
             return fail
 
+        if not score_result:
+            return fail
+
         for tag in ['score', 'feedback', 'grader_type', 'success', 'grader_id', 'submission_id']:
             if tag not in score_result:
                 # This is a dev_facing_error
@@ -586,7 +589,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             return ""
 
         feedback_dict = self._parse_score_msg(
-            self.child_history[-1].get('post_assessment', ""),
+            self.child_history[-1].get('post_assessment', "{}"),
             system,
             join_feedback=join_feedback
         )
@@ -756,7 +759,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         """
         attempt = self.child_history[index]
         score = attempt.get('score')
-        post_assessment_data = self._parse_score_msg(attempt.get('post_assessment'), self.system)
+        post_assessment_data = self._parse_score_msg(attempt.get('post_assessment', "{}"), self.system)
         grader_types = post_assessment_data.get('grader_types')
 
         # According to _parse_score_msg in ML grading there should be only one grader type.
