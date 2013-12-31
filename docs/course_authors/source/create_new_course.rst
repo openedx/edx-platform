@@ -240,7 +240,7 @@ Files are sorted by the Date Added column, with the most recently added first.
 
 The **Files & Uploads** page lists up to 50 files.  If your course has more the 50 files, additional files are listed in other pages.
 
-The files your are viewing, and the total number of files, are listed at the top of the page.
+The range of the files listed on the page, and the total number of files, are shown at the top of the page.
 
 You can navigate through the pages listing files in two ways:
 
