@@ -3,12 +3,21 @@ define(["backbone", "js/views/feedback_alert", "gettext"], function(Backbone, Al
     var PagingView = Backbone.View.extend({
         // takes a Backbone Paginator as a model
 
+        sortableColumns: {},
+
         initialize: function() {
             Backbone.View.prototype.initialize.call(this);
             var collection = this.collection;
-            collection.bind('add', _.bind(this.renderPageItems, this));
-            collection.bind('remove', _.bind(this.renderPageItems, this));
-            collection.bind('reset', _.bind(this.renderPageItems, this));
+            collection.bind('add', _.bind(this.onPageRefresh, this));
+            collection.bind('remove', _.bind(this.onPageRefresh, this));
+            collection.bind('reset', _.bind(this.onPageRefresh, this));
+        },
+
+        onPageRefresh: function() {
+            var sortColumn = this.sortColumn;
+            this.renderPageItems();
+            this.$('.column-sort-link').removeClass('current-sort');
+            this.$('#' + sortColumn).addClass('current-sort');
         },
 
         setPage: function(page) {
@@ -41,6 +50,53 @@ define(["backbone", "js/views/feedback_alert", "gettext"], function(Backbone, Al
             if (currentPage > 0) {
                 this.setPage(currentPage - 1);
             }
+        },
+
+        registerSortableColumn: function(columnName, displayName, fieldName, sortDirection) {
+            this.sortableColumns[columnName] = {
+                displayName: displayName,
+                fieldName: fieldName,
+                sortDirection: sortDirection
+            };
+        },
+
+        sortableColumnInfo: function(sortColumn) {
+            var sortInfo = this.sortableColumns[sortColumn];
+            if (!sortInfo) {
+                throw "Unregistered sort column '" + sortColumn + '"';
+            }
+            return sortInfo;
+        },
+
+        sortDisplayName: function() {
+            var sortColumn = this.sortColumn,
+                sortInfo = this.sortableColumnInfo(sortColumn);
+            return sortInfo.displayName;
+        },
+
+        setDefaultSortColumn: function(sortColumn) {
+            var collection = this.collection,
+                sortInfo = this.sortableColumns[sortColumn],
+                sortField = sortInfo.fieldName,
+                defaultSortDirection = sortInfo.sortDirection;
+            collection.sortField = sortField;
+            collection.sortDirection = defaultSortDirection;
+            this.sortColumn = sortColumn;
+        },
+
+        toggleSortOrder: function(sortColumn) {
+            var collection = this.collection,
+                sortInfo = this.sortableColumnInfo(sortColumn),
+                sortField = sortInfo.fieldName,
+                defaultSortDirection = sortInfo.sortDirection;
+            if (collection.sortField === sortField) {
+                collection.sortDirection = collection.sortDirection === 'ascending' ? 'descending' : 'ascending';
+            } else {
+                collection.sortField = sortField;
+                collection.sortDirection = defaultSortDirection;
+            }
+            this.sortColumn = sortColumn;
+            this.setPage(0);
         }
     });
 

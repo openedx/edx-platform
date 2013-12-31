@@ -4,11 +4,18 @@ define(["js/views/paging", "js/views/asset", "js/views/paging_header", "js/views
 var AssetsView = PagingView.extend({
     // takes AssetCollection as model
 
+    events : {
+        "click .sortable-column": "onToggleColumn"
+    },
+
     initialize : function() {
         PagingView.prototype.initialize.call(this);
         var collection = this.collection;
         this.template = _.template($("#asset-library-tpl").text());
         this.listenTo(collection, 'destroy', this.handleDestroy);
+        this.registerSortableColumn('js-asset-name-col', gettext('Name'), 'displayname', 'ascending');
+        this.registerSortableColumn('js-asset-date-col', gettext('Date Added'), 'uploadDate', 'descending');
+        this.setDefaultSortColumn('js-asset-date-col');
     },
 
     render: function() {
@@ -58,6 +65,11 @@ var AssetsView = PagingView.extend({
             'course': course_location_analytics,
             'asset_url': model.get('url')
         });
+    },
+
+    onToggleColumn: function(event) {
+        var columnName = event.target.id;
+        this.toggleSortOrder(columnName);
     }
 });
 

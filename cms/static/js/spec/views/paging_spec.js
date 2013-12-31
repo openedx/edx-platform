@@ -54,7 +54,12 @@ define([ "jquery", "js/spec/create_sinon", "URI",
         };
 
         var MockPagingView = PagingView.extend({
-            renderPageItems: function() {}
+            renderPageItems: function() {},
+            initialize : function() {
+                this.registerSortableColumn('name-col', 'Name', 'name', 'ascending');
+                this.registerSortableColumn('date-col', 'Date', 'date', 'descending');
+                this.setDefaultSortColumn('date-col');
+            }
         });
 
         describe("Paging", function() {
@@ -70,75 +75,108 @@ define([ "jquery", "js/spec/create_sinon", "URI",
 
 
             describe("PagingView", function () {
-                it('can set the current page', function () {
-                    var requests = create_sinon.requests(this);
-                    pagingView.setPage(0);
-                    respondWithMockAssets(requests);
-                    expect(pagingView.collection.currentPage).toBe(0);
-                    pagingView.setPage(1);
-                    respondWithMockAssets(requests);
-                    expect(pagingView.collection.currentPage).toBe(1);
+                describe("setPage", function () {
+                    it('can set the current page', function () {
+                        var requests = create_sinon.requests(this);
+                        pagingView.setPage(0);
+                        respondWithMockAssets(requests);
+                        expect(pagingView.collection.currentPage).toBe(0);
+                        pagingView.setPage(1);
+                        respondWithMockAssets(requests);
+                        expect(pagingView.collection.currentPage).toBe(1);
+                    });
+
+                    it('should not change page after a server error', function () {
+                        var requests = create_sinon.requests(this);
+                        pagingView.setPage(0);
+                        respondWithMockAssets(requests);
+                        pagingView.setPage(1);
+                        requests[1].respond(500);
+                        expect(pagingView.collection.currentPage).toBe(0);
+                    });
                 });
 
-                it('should not change page after a server error', function () {
-                    var requests = create_sinon.requests(this);
-                    pagingView.setPage(0);
-                    respondWithMockAssets(requests);
-                    pagingView.setPage(1);
-                    requests[1].respond(500);
-                    expect(pagingView.collection.currentPage).toBe(0);
+                describe("nextPage", function () {
+                    it('does not move forward after a server error', function () {
+                        var requests = create_sinon.requests(this);
+                        pagingView.setPage(0);
+                        respondWithMockAssets(requests);
+                        pagingView.nextPage();
+                        requests[1].respond(500);
+                        expect(pagingView.collection.currentPage).toBe(0);
+                    });
+
+                    it('can move to the next page', function () {
+                        var requests = create_sinon.requests(this);
+                        pagingView.setPage(0);
+                        respondWithMockAssets(requests);
+                        pagingView.nextPage();
+                        respondWithMockAssets(requests);
+                        expect(pagingView.collection.currentPage).toBe(1);
+                    });
+
+                    it('can not move forward from the final page', function () {
+                        var requests = create_sinon.requests(this);
+                        pagingView.setPage(1);
+                        respondWithMockAssets(requests);
+                        pagingView.nextPage();
+                        expect(requests.length).toBe(1);
+                    });
                 });
 
-                it('does not move forward after a server error', function () {
-                    var requests = create_sinon.requests(this);
-                    pagingView.setPage(0);
-                    respondWithMockAssets(requests);
-                    pagingView.nextPage();
-                    requests[1].respond(500);
-                    expect(pagingView.collection.currentPage).toBe(0);
+                describe("previousPage", function () {
+
+                    it('can move back a page', function () {
+                        var requests = create_sinon.requests(this);
+                        pagingView.setPage(1);
+                        respondWithMockAssets(requests);
+                        pagingView.previousPage();
+                        respondWithMockAssets(requests);
+                        expect(pagingView.collection.currentPage).toBe(0);
+                    });
+
+                    it('can not move back from the first page', function () {
+                        var requests = create_sinon.requests(this);
+                        pagingView.setPage(0);
+                        respondWithMockAssets(requests);
+                        pagingView.previousPage();
+                        expect(requests.length).toBe(1);
+                    });
+
+                    it('does not move back after a server error', function () {
+                        var requests = create_sinon.requests(this);
+                        pagingView.setPage(1);
+                        respondWithMockAssets(requests);
+                        pagingView.previousPage();
+                        requests[1].respond(500);
+                        expect(pagingView.collection.currentPage).toBe(1);
+                    });
                 });
 
-                it('can move to the next page', function () {
-                    var requests = create_sinon.requests(this);
-                    pagingView.setPage(0);
-                    respondWithMockAssets(requests);
-                    pagingView.nextPage();
-                    respondWithMockAssets(requests);
-                    expect(pagingView.collection.currentPage).toBe(1);
-                });
+                describe("toggleSortOrder", function () {
 
-                it('can not move forward from the final page', function () {
-                    var requests = create_sinon.requests(this);
-                    pagingView.setPage(1);
-                    respondWithMockAssets(requests);
-                    pagingView.nextPage();
-                    expect(requests.length).toBe(1);
-                });
+                    it('can toggle direction of the current sort', function () {
+                        var requests = create_sinon.requests(this);
+                        expect(pagingView.collection.sortDirection).toBe('descending');
+                        pagingView.toggleSortOrder('date-col');
+                        respondWithMockAssets(requests);
+                        expect(pagingView.collection.sortDirection).toBe('ascending');
+                        pagingView.toggleSortOrder('date-col');
+                        respondWithMockAssets(requests);
+                        expect(pagingView.collection.sortDirection).toBe('descending');
+                    });
 
-                it('can move back a page', function () {
-                    var requests = create_sinon.requests(this);
-                    pagingView.setPage(1);
-                    respondWithMockAssets(requests);
-                    pagingView.previousPage();
-                    respondWithMockAssets(requests);
-                    expect(pagingView.collection.currentPage).toBe(0);
-                });
-
-                it('can not move back from the first page', function () {
-                    var requests = create_sinon.requests(this);
-                    pagingView.setPage(0);
-                    respondWithMockAssets(requests);
-                    pagingView.previousPage();
-                    expect(requests.length).toBe(1);
-                });
-
-                it('does not move back after a server error', function () {
-                    var requests = create_sinon.requests(this);
-                    pagingView.setPage(1);
-                    respondWithMockAssets(requests);
-                    pagingView.previousPage();
-                    requests[1].respond(500);
-                    expect(pagingView.collection.currentPage).toBe(1);
+                    it('sets the correct default sort direction for a column', function () {
+                        var requests = create_sinon.requests(this);
+                        pagingView.toggleSortOrder('name-col');
+                        respondWithMockAssets(requests);
+                        expect(pagingView.sortDisplayName()).toBe('Name');
+                        expect(pagingView.collection.sortDirection).toBe('ascending');
+                        pagingView.toggleSortOrder('date-col');
+                        respondWithMockAssets(requests);
+                        expect(pagingView.sortDisplayName()).toBe('Date');
+                        expect(pagingView.collection.sortDirection).toBe('descending');
+                    });
                 });
             });
 
@@ -291,6 +329,23 @@ define([ "jquery", "js/spec/create_sinon", "URI",
                         expect(pagingHeader.$('.count-total')).toHaveText('0 total');
                     });
                 });
+
+
+                describe("Sort order label", function () {
+                    it('should show correct initial sort order', function () {
+                        var requests = create_sinon.requests(this);
+                        pagingView.setPage(0);
+                        respondWithMockAssets(requests);
+                        expect(pagingHeader.$('.sort-order')).toHaveText('Date');
+                    });
+
+                    it('should show updated sort order', function () {
+                        var requests = create_sinon.requests(this);
+                        pagingView.toggleSortOrder('name-col');
+                        respondWithMockAssets(requests);
+                        expect(pagingHeader.$('.sort-order')).toHaveText('Name');
+                    });
+                });
             });
 
             describe("PagingFooter", function () {
@@ -396,7 +451,7 @@ define([ "jquery", "js/spec/create_sinon", "URI",
                     });
                 });
 
-                describe("Page total label", function () {
+                describe("Current page label", function () {
                     it('should show 1 on the first page', function () {
                         var requests = create_sinon.requests(this);
                         pagingView.setPage(0);

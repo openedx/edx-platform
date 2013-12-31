@@ -26,7 +26,7 @@ from util.json_request import JsonResponse
 from django.http import HttpResponseNotFound
 import json
 from django.utils.translation import ugettext as _
-from pymongo import DESCENDING
+from pymongo import ASCENDING, DESCENDING
 
 
 __all__ = ['assets_handler']
@@ -95,10 +95,14 @@ def _assets_json(request, location):
     start = current_page * requested_page_size
 
     old_location = loc_mapper().translate_locator_to_location(location)
+    requested_sort = request.REQUEST.get('sort', 'uploadDate')
+    sort_direction = ASCENDING
+    if request.REQUEST.get('sort_direction', 'descending').lower() == 'descending':
+        sort_direction = DESCENDING
 
     course_reference = StaticContent.compute_location(old_location.org, old_location.course, old_location.name)
     assets, total_count = contentstore().get_all_content_for_course(
-        course_reference, start=start, maxresults=requested_page_size, sort=[('uploadDate', DESCENDING)]
+        course_reference, start=start, maxresults=requested_page_size, sort=[(requested_sort, sort_direction)]
     )
     end = start + len(assets)
 
