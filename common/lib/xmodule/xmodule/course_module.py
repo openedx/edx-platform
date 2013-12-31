@@ -9,6 +9,7 @@ import dateutil.parser
 from lazy import lazy
 
 from xmodule.modulestore import Location
+from xmodule.partitions.partitions import UserPartition
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
 from xmodule.graders import grader_from_conf
 import json
@@ -156,10 +157,30 @@ class TextbookList(List):
         return json_data
 
 
+class UserPartitionList(List):
+    def from_json(self, values):
+        return [UserPartition.from_json(v) for v in values]
+
+    def to_json(self, values):
+        return [user_partition.to_json()
+                for user_partition in values]
+
+
+
+
+
 class CourseFields(object):
     lti_passports = List(help="LTI tools passports as id:client_key:client_secret", scope=Scope.settings)
     textbooks = TextbookList(help="List of pairs of (title, url) for textbooks used in this course",
                              default=[], scope=Scope.content)
+
+    # This field is intended for Studio to update, not to be exposed directly via
+    # advanced_settings.
+    user_partitions = UserPartitionList(
+        help="List of user partitions of this course into groups, used e.g. for experiments",
+        default=[], scope=Scope.content)
+
+
     wiki_slug = String(help="Slug that points to the wiki for this course", scope=Scope.content)
     enrollment_start = Date(help="Date that enrollment for this class is opened", scope=Scope.settings)
     enrollment_end = Date(help="Date that enrollment for this class is closed", scope=Scope.settings)

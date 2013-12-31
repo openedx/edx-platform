@@ -14,6 +14,7 @@ Contents:
    overview.rst
    common-lib.rst
    djangoapps.rst
+   experiments.rst
 
 Indices and tables
 ==================
