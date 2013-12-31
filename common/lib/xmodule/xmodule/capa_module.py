@@ -23,7 +23,7 @@ from xblock.fields import Scope, String, Boolean, Dict, Integer, Float
 from .fields import Timedelta, Date
 from django.utils.timezone import UTC
 from django.utils.translation import ugettext as _
-from .utils import get_extended_due_date
+from .util.duedate import get_extended_due_date
 
 log = logging.getLogger("edx.courseware")
 

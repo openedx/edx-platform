@@ -8,7 +8,7 @@ from xmodule.x_module import XModule
 from xmodule.xml_module import XmlDescriptor
 from xblock.fields import Scope, Integer, String
 from .fields import Date
-from .utils import get_extended_due_date
+from .util.duedate import get_extended_due_date
 
 
 log = logging.getLogger(__name__)

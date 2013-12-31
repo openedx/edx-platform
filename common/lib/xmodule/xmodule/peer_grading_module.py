@@ -10,7 +10,7 @@ from .x_module import XModule, module_attr
 from .raw_module import RawDescriptor
 from .modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from .timeinfo import TimeInfo
-from .utils import get_extended_due_date
+from .util.duedate import get_extended_due_date
 from xblock.fields import Dict, String, Scope, Boolean, Float
 from xmodule.fields import Date, Timedelta
 
