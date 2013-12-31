@@ -219,6 +219,10 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
             score_list[]: A multivalue key containing all the individual scores
         """
 
+        closed, msg = self.check_if_closed()
+        if closed:
+            return msg
+
         if self.child_state != self.ASSESSING:
             return self.out_of_sync_error(data)
 

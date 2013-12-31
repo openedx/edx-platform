@@ -1,8 +1,9 @@
+from datetime import datetime
 import json
 import unittest
 from mock import Mock, MagicMock
 from webob.multidict import MultiDict
-
+from pytz import UTC
 from xmodule.open_ended_grading_classes.self_assessment_module import SelfAssessmentModule
 from xmodule.modulestore import Location
 from lxml import etree
@@ -113,10 +114,13 @@ class SelfAssessmentTest(unittest.TestCase):
         """
 
         # Create a module with no state yet.  Important that this start off as a blank slate.
-        test_module = SelfAssessmentModule(get_test_system(), self.location,
-                                            self.definition,
-                                            self.descriptor,
-                                            self.static_data)
+        test_module = SelfAssessmentModule(
+            get_test_system(),
+            self.location,
+            self.definition,
+            self.descriptor,
+            self.static_data
+        )
 
         saved_response = "Saved response."
         submitted_response = "Submitted response."
@@ -127,7 +131,7 @@ class SelfAssessmentTest(unittest.TestCase):
         self.assertEqual(test_module.get_display_answer(), "")
 
         # Now, store an answer in the module.
-        test_module.handle_ajax("store_answer", {'student_answer' : saved_response}, get_test_system())
+        test_module.handle_ajax("store_answer", {'student_answer': saved_response}, get_test_system())
         # The stored answer should now equal our response.
         self.assertEqual(test_module.stored_answer, saved_response)
         self.assertEqual(test_module.get_display_answer(), saved_response)
@@ -150,4 +154,19 @@ class SelfAssessmentTest(unittest.TestCase):
         # Confirm that the right response is loaded.
         self.assertEqual(test_module.get_display_answer(), submitted_response)
 
+    def test_save_assessment_after_closing(self):
+        """
+        Test storing assessment when close date is passed.
+        """
 
+        responses = {'assessment': '0', 'score_list[]': ['0', '0']}
+
+        self.module.save_answer({'student_answer': "I am an answer"}, self.module.system)
+        self.assertEqual(self.module.child_state, self.module.ASSESSING)
+
+        #Set close date to current datetime.
+        self.module.close_date = datetime.now(UTC)
+
+        #Save assessment when close date is passed.
+        self.module.save_assessment(responses, self.module.system)
+        self.assertNotEqual(self.module.child_state, self.module.DONE)
