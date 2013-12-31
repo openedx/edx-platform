@@ -141,7 +141,7 @@ class MongoContentStore(ContentStore):
             json.dump(policy, f)
 
     def get_all_content_thumbnails_for_course(self, location):
-        return self._get_all_content_for_course(location, get_thumbnails=True)
+        return self._get_all_content_for_course(location, get_thumbnails=True)[0]
 
     def get_all_content_for_course(self, location, start=0, maxresults=-1, sort=None):
         return self._get_all_content_for_course(
@@ -178,7 +178,8 @@ class MongoContentStore(ContentStore):
             )
         else:
             items = self.fs_files.find(location_to_query(course_filter), sort=sort)
-        return list(items)
+        count = items.count()
+        return list(items), count
 
     def set_attr(self, location, attr, value=True):
         """

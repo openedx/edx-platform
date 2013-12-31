@@ -82,42 +82,24 @@ def _asset_index(request, location):
     })
 
 
-def _paging_settings(request, total_count):
-    """
-    Returns the user requested settings for pagination of asset results
-    """
-    requested_page = int(request.REQUEST.get('page', 0))
-    requested_page_size = int(request.REQUEST.get('page_size', 50))
-
-    final_page = int(total_count / requested_page_size)
-    current_page = min(max(requested_page, 0), final_page)
-    start = current_page * requested_page_size
-    end = min(total_count, start + requested_page_size)
-    return {
-        'total_count': total_count,
-        'page': current_page,
-        'page_size': requested_page_size,
-        'start': start,
-        'end': end
-    }
-
-
 def _assets_json(request, location):
     """
     Display an editable asset library.
 
     Supports start (0-based index into the list of assets) and max query parameters.
     """
+    requested_page = int(request.REQUEST.get('page', 0))
+    requested_page_size = int(request.REQUEST.get('page_size', 50))
+    current_page = max(requested_page, 0)
+    start = current_page * requested_page_size
+
     old_location = loc_mapper().translate_locator_to_location(location)
 
     course_reference = StaticContent.compute_location(old_location.org, old_location.course, old_location.name)
-    assets = contentstore().get_all_content_for_course(
-        course_reference, sort=[('uploadDate', DESCENDING)]
+    assets, total_count = contentstore().get_all_content_for_course(
+        course_reference, start=start, maxresults=requested_page_size, sort=[('uploadDate', DESCENDING)]
     )
-    total_count = len(assets)
-    settings = _paging_settings(request, total_count)
-
-    assets = assets[settings['start']: settings['end']]
+    end = start + len(assets)
 
     asset_json = []
     for asset in assets:
@@ -131,11 +113,11 @@ def _assets_json(request, location):
         asset_json.append(_get_asset_json(asset['displayname'], asset['uploadDate'], asset_location, thumbnail_location, asset_locked))
 
     return JsonResponse({
-        'start': settings['start'],
-        'end': settings['end'],
-        'page': settings['page'],
-        'pageSize': settings['page_size'],
-        'totalCount': settings['total_count'],
+        'start': start,
+        'end': end,
+        'page': current_page,
+        'pageSize': requested_page_size,
+        'totalCount': total_count,
         'assets': asset_json
     })
 

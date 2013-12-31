@@ -223,7 +223,7 @@ class TestMongoModuleStore(object):
         Test getting, setting, and defaulting the locked attr and arbitrary attrs.
         """
         location = Location('i4x', 'edX', 'toy', 'course', '2012_Fall')
-        course_content = TestMongoModuleStore.content_store.get_all_content_for_course(location)
+        course_content,__ = TestMongoModuleStore.content_store.get_all_content_for_course(location)
         assert len(course_content) > 0
         # a bit overkill, could just do for content[0]
         for content in course_content:
