@@ -56,8 +56,8 @@ define([ "jquery", "js/spec/create_sinon", "URI",
         var MockPagingView = PagingView.extend({
             renderPageItems: function() {},
             initialize : function() {
-                this.registerSortableColumn('name-col', 'Name', 'name', 'ascending');
-                this.registerSortableColumn('date-col', 'Date', 'date', 'descending');
+                this.registerSortableColumn('name-col', 'Name', 'name', 'asc');
+                this.registerSortableColumn('date-col', 'Date', 'date', 'desc');
                 this.setDefaultSortColumn('date-col');
             }
         });
@@ -157,13 +157,13 @@ define([ "jquery", "js/spec/create_sinon", "URI",
 
                     it('can toggle direction of the current sort', function () {
                         var requests = create_sinon.requests(this);
-                        expect(pagingView.collection.sortDirection).toBe('descending');
+                        expect(pagingView.collection.sortDirection).toBe('desc');
                         pagingView.toggleSortOrder('date-col');
                         respondWithMockAssets(requests);
-                        expect(pagingView.collection.sortDirection).toBe('ascending');
+                        expect(pagingView.collection.sortDirection).toBe('asc');
                         pagingView.toggleSortOrder('date-col');
                         respondWithMockAssets(requests);
-                        expect(pagingView.collection.sortDirection).toBe('descending');
+                        expect(pagingView.collection.sortDirection).toBe('desc');
                     });
 
                     it('sets the correct default sort direction for a column', function () {
@@ -171,11 +171,11 @@ define([ "jquery", "js/spec/create_sinon", "URI",
                         pagingView.toggleSortOrder('name-col');
                         respondWithMockAssets(requests);
                         expect(pagingView.sortDisplayName()).toBe('Name');
-                        expect(pagingView.collection.sortDirection).toBe('ascending');
+                        expect(pagingView.collection.sortDirection).toBe('asc');
                         pagingView.toggleSortOrder('date-col');
                         respondWithMockAssets(requests);
                         expect(pagingView.sortDisplayName()).toBe('Date');
-                        expect(pagingView.collection.sortDirection).toBe('descending');
+                        expect(pagingView.collection.sortDirection).toBe('desc');
                     });
                 });
             });

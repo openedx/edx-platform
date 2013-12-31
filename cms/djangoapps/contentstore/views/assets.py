@@ -97,7 +97,7 @@ def _assets_json(request, location):
     old_location = loc_mapper().translate_locator_to_location(location)
     requested_sort = request.REQUEST.get('sort', 'uploadDate')
     sort_direction = ASCENDING
-    if request.REQUEST.get('sort_direction', 'descending').lower() == 'descending':
+    if request.REQUEST.get('direction', 'desc').lower() == 'desc':
         sort_direction = DESCENDING
 
     course_reference = StaticContent.compute_location(old_location.org, old_location.course, old_location.name)

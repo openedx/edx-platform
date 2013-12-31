@@ -16,11 +16,11 @@ define(["backbone.paginator", "js/models/asset", "gettext"], function(BackbonePa
             'page': function() { return this.currentPage; },
             'page_size': function() { return this.perPage; },
             'sort': function() { return this.sortField; },
-            'sort_direction': function() { return this.sortDirection; },
+            'direction': function() { return this.sortDirection; },
             'format': 'json'
         },
         sortField: 'displayname', // 'uploadDate',
-        sortDirection: 'descending',
+        sortDirection: 'desc',
 
         parse: function(response) {
             var totalCount = response.totalCount,

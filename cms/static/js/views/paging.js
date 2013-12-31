@@ -90,7 +90,7 @@ define(["backbone", "js/views/feedback_alert", "gettext"], function(Backbone, Al
                 sortField = sortInfo.fieldName,
                 defaultSortDirection = sortInfo.sortDirection;
             if (collection.sortField === sortField) {
-                collection.sortDirection = collection.sortDirection === 'ascending' ? 'descending' : 'ascending';
+                collection.sortDirection = collection.sortDirection === 'asc' ? 'desc' : 'asc';
             } else {
                 collection.sortField = sortField;
                 collection.sortDirection = defaultSortDirection;
