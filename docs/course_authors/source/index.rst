@@ -12,6 +12,7 @@ Contents
    :maxdepth: 5
 
    read_me
+   change_log
    get_started
    create_new_course
    establish_grading_policy
@@ -33,7 +34,7 @@ Contents
    checking_student_progress
    ora_students
    glossary
-   change_log
+
 
 
 
