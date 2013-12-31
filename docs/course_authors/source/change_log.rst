@@ -15,7 +15,7 @@ Change Log
 12/10/2013      Added the appendix :ref:`MathJax in Studio`.  
 12/11/2013      Added the chapter :ref:`Guidelines for Creating Accessible Content` 
 12/12/2013      Added the edX :ref:`Glossary`    
-12/05/2013	    Complete revision of edX Studio documentation and integration 
+12/05/2013      Complete revision of edX Studio documentation and integration 
                 of edX101 content.
 ==============  ================================================================
 

@@ -151,6 +151,10 @@ Describe Your Course
 
 The description of your course appears on the Course Summary page that students see, and includes a course summary, prerequisites, staff information and FAQs.
 
+For courses on edX.org, the description is shown in the course catalog. 
+
+On Edge, there is no course catalog and users will not find your course description. You must explicitly invite students to participate in your course for them to find the description.
+
 #. From the **Settings** menu, select **Schedule & Details**.
 #. Scroll down to the **Introducing Your Course** section, then locate the **Course Overview** field.
 
