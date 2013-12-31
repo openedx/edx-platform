@@ -72,6 +72,7 @@ class XmlImportFactory(Factory):
     url_name = Sequence(str)
     attribs = {}
     policy = {}
+    inline_xml = True
     tag = 'unknown'
 
     @classmethod
@@ -95,9 +96,25 @@ class XmlImportFactory(Factory):
         kwargs['xml_node'].text = kwargs.pop('text', None)
 
         kwargs['xml_node'].attrib.update(kwargs.pop('attribs', {}))
+
+        # Make sure that the xml_module doesn't try and open a file to find the contents
+        # of this node.
+        inline_xml = kwargs.pop('inline_xml')
+
+        if inline_xml:
+            kwargs['xml_node'].set('not_a_pointer', 'true')
+
         for key in kwargs.keys():
             if key not in XML_IMPORT_ARGS:
                 kwargs['xml_node'].set(key, kwargs.pop(key))
+
+        if not inline_xml:
+            kwargs['xml_node'].write(
+                kwargs['filesystem'].open(
+                    '{}/{}.xml'.format(kwargs['tag'], kwargs['url_name'])
+                ),
+                encoding='utf-8'
+            )
 
         return kwargs
 
@@ -134,3 +151,8 @@ class ProblemFactory(XmlImportFactory):
     """Factory for <problem> nodes"""
     tag = 'problem'
     text = '<h1>Empty Problem!</h1>'
+
+
+class HtmlFactory(XmlImportFactory):
+    """Factory for <problem> nodes"""
+    tag = 'html'

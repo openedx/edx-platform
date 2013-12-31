@@ -1,0 +1,13 @@
+<div class="split-test-view">
+    <select class="split-test-select">
+        % for idx, item in enumerate(items):
+        <option value="${item['group_id']}">Group ${item['group_id']}</option>
+        %endfor
+    </select>
+
+    % for idx, item in enumerate(items):
+    <div class="split-test-child" data-group-id="${item['group_id']}"data-id="${item['id']}">
+        ${item['content']}
+    </div>
+    % endfor
+</div>

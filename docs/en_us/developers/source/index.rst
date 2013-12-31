@@ -24,6 +24,7 @@ APIs
 
     djangoapps.rst
     common-lib.rst
+    experiments.rst
 
 Internationalization
 ---------------------
