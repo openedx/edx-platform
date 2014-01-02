@@ -42,7 +42,9 @@ def compare_with_tolerance(v1, v2, tol):
 
 def float_compare(v1, v2):
     """
-    Compares two float numbers. Handles machine representation errors.
+    Compares two floats for near-equality. Handles machine representation errors.
+
+    Keep in mind that the acceptable difference between two floats depends on the magnitude of the floats.
 
     Some useful references:
     http://en.wikipedia.org/wiki/Machine_epsilon#Approximation_using_Python
