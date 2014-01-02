@@ -185,7 +185,7 @@ class PollDescriptor(PollFields, MakoModuleDescriptor, XmlDescriptor):
     def definition_to_xml(self, resource_fs):
         """Return an xml element representing to this definition."""
         poll_str = u'<{tag_name}>{text}</{tag_name}>'.format(
-            tag_name=unicode(self._tag_name).encode('utf-8'), text=unicode(self.question).encode('utf-8'))
+            tag_name=self._tag_name, text=self.question)
         xml_object = etree.fromstring(poll_str)
         xml_object.set('display_name', self.display_name)
 
