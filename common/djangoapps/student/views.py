@@ -254,7 +254,9 @@ def signin_user(request):
 
     context = {
         'course_id': request.GET.get('course_id'),
-        'enrollment_action': request.GET.get('enrollment_action')
+        'enrollment_action': request.GET.get('enrollment_action'),
+        'platform_name': MicrositeConfiguration.get_microsite_configuration_value('platform_name', 
+            settings.PLATFORM_NAME),
     }
     return render_to_response('login.html', context)
 
@@ -273,7 +275,9 @@ def register_user(request, extra_context=None):
 
     context = {
         'course_id': request.GET.get('course_id'),
-        'enrollment_action': request.GET.get('enrollment_action')
+        'enrollment_action': request.GET.get('enrollment_action'),
+        'platform_name': MicrositeConfiguration.get_microsite_configuration_value('platform_name', 
+            settings.PLATFORM_NAME),
     }
     if extra_context is not None:
         context.update(extra_context)

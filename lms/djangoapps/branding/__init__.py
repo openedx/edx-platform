@@ -51,16 +51,8 @@ def get_logo_url():
     # let's use that
     image_url = MicrositeConfiguration.get_microsite_configuration_value('logo_image_url')
     if image_url:
-        return image_url
-
-    # else, see if a logo file (in our repo) has been specified, if so, use that
-    image_file = MicrositeConfiguration.get_microsite_configuration_value('logo_image_file')
-
-    if image_file:
-        return '{static_url}images/{image_file}'.format(
-            static_url=settings.STATIC_URL,
-            image_file=image_file
-        )
+        return '{static_url}{image_url}'.format(static_url=settings.STATIC_URL,
+            image_url=image_url)
 
     # otherwise, use the legacy means to configure this
     university = MicrositeConfiguration.get_microsite_configuration_value('university')

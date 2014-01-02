@@ -13,7 +13,7 @@
 <%! from datetime import date %>
 <%! import calendar %>
 
-<%block name="title"><title>${_("Register for {platform_name}").format(platform_name=settings.PLATFORM_NAME)}</title></%block>
+<%block name="title"><title>${_("Register for {platform_name}").format(platform_name=platform_name)}</title></%block>
 
 <%block name="js_extra">
   <script type="text/javascript">
@@ -76,7 +76,7 @@
         $submitButton.
           removeClass('is-disabled').
           removeProp('disabled').
-          html("${_('Create My {platform_name} Account').format(platform_name=settings.PLATFORM_NAME)}");
+          html("${_('Create My {platform_name} Account').format(platform_name=platform_name)}");
       }
       else {
         $submitButton.
@@ -92,7 +92,7 @@
   <header>
     <h1 class="title">
       <span class="title-super">${_("Welcome!")}</span>
-      <span class="title-sub">${_("Register below to create your {platform_name} account").format(platform_name=settings.PLATFORM_NAME)}</span>
+      <span class="title-sub">${_("Register below to create your {platform_name} account").format(platform_name=platform_name)}</span>
     </h1>
   </header>
 </section>
@@ -104,7 +104,7 @@
 
       <!-- status messages -->
       <div role="alert" class="status message">
-        <h3 class="message-title">${_("We're sorry, {platform_name} enrollment is not available in your region").format(platform_name=settings.PLATFORM_NAME)}</h3>
+        <h3 class="message-title">${_("We're sorry, {platform_name} enrollment is not available in your region").format(platform_name=platform_name)}</h3>
       </div>
 
       <div role="alert" class="status message submission-error" tabindex="-1">
@@ -241,7 +241,7 @@
 
           % if 'goals' in settings.REGISTRATION_OPTIONAL_FIELDS:
           <li class="field text" id="field-goals">
-            <label for="goals">${_("Please share with us your reasons for registering with {platform_name}").format(platform_name=settings.PLATFORM_NAME)}</label>
+            <label for="goals">${_("Please share with us your reasons for registering with {platform_name}").format(platform_name=platform_name)}</label>
             <textarea id="goals" name="goals" value=""></textarea>
           </li>
           % endif
@@ -315,8 +315,8 @@
     ##       override in a more generalizable fashion.
     % if not self.stanford_theme_enabled():
       <div class="cta cta-welcome">
-        <h3>${_("Welcome to {platform_name}").format(platform_name=settings.PLATFORM_NAME)}</h3>
-        <p>${_("Registering with {platform_name} gives you access to all of our current and future free courses. Not ready to take a course just yet? Registering puts you on our mailing list - we will update you as courses are added.").format(platform_name=settings.PLATFORM_NAME)}</p>
+        <h3>${_("Welcome to {platform_name}").format(platform_name=platform_name)}</h3>
+        <p>${_("Registering with {platform_name} gives you access to all of our current and future free courses. Not ready to take a course just yet? Registering puts you on our mailing list - we will update you as courses are added.").format(platform_name=platform_name)}</p>
       </div>
     % endif
 
@@ -325,14 +325,14 @@
       % if self.stanford_theme_enabled():
         <p>${_("You will receive an activation email.  You must click on the activation link to complete the process.  Don't see the email?  Check your spam folder and mark emails from class.stanford.edu as 'not spam', since you'll want to be able to receive email from your courses.")}</p>
       % else:
-      <p>${_("As part of joining {platform_name}, you will receive an activation email.  You must click on the activation link to complete the process.  Don't see the email?  Check your spam folder and mark {platform_name} emails as 'not spam'.  At {platform_name}, we communicate mostly through email.").format(platform_name=settings.PLATFORM_NAME)}</p>
+      <p>${_("As part of joining {platform_name}, you will receive an activation email.  You must click on the activation link to complete the process.  Don't see the email?  Check your spam folder and mark {platform_name} emails as 'not spam'.  At {platform_name}, we communicate mostly through email.").format(platform_name=platform_name)}</p>
       % endif
     </div>
 
     % if settings.MKTG_URL_LINK_MAP.get('FAQ'):
       <div class="cta cta-help">
         <h3>${_("Need Help?")}</h3>
-        <p>${_("Need help in registering with {platform_name}?").format(platform_name=settings.PLATFORM_NAME)}
+        <p>${_("Need help in registering with {platform_name}?").format(platform_name=platform_name)}
           <a href="${marketing_link('FAQ')}">
               ${_("View our FAQs for answers to commonly asked questions.")}
           </a>

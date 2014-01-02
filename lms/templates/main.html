@@ -75,16 +75,11 @@
     google_analytics_file = 'theme-google-analytics.html'
     footer_file = 'theme-footer.html'
   else:
-    #header_extra_file = MicrositeConfiguration.get_microsite_configuration_value('header_extra_file')
-    #header_file = MicrositeConfiguration.get_microsite_configuration_value('header_file', 'navigation.html')
-    #google_analytics_file = MicrositeConfiguration.get_microsite_configuration_value('google_analytics_file', 
-    #  "google_analytics.html")
-    #footer_file = MicrositeConfiguration.get_microsite_configuration_value('footer_file', "footer.html" )
     header_extra_file = None
     header_file = MicrositeConfiguration.get_microsite_template_path('navigation.html')
     google_analytics_file = MicrositeConfiguration.get_microsite_template_path('google_analytics.html')
     footer_file = MicrositeConfiguration.get_microsite_template_path('footer.html')
-    
+
     style_overrides_file = MicrositeConfiguration.get_microsite_configuration_value('css_overrides_file')
 %>
 

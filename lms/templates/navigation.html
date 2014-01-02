@@ -46,17 +46,7 @@ site_status_msg = get_site_status_msg(course_id)
   <h1 class="logo">
     <a href="${marketing_link('ROOT')}">
       <%block name="navigation_logo">
-        <%
-          # see if the Microsite has an external URL to load for the logo
-          # (mainly to prevent from having to commit trademarked images to the repository)
-          logo_image_url = MicrositeConfiguration.get_microsite_configuration_value('logo_image_url')
-        %>
-
-        % if logo_image_url:
-          <img src="${logo_image_url}" alt="${_('Home')}" />
-        % else:
           <img src="${static.url(branding.get_logo_url())}" alt="${settings.PLATFORM_NAME} ${_('Home')}" />
-        % endif
       </%block>
     </a>
   </h1>
