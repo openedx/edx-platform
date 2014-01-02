@@ -46,7 +46,7 @@ def float_compare(v1, v2):
 
     Some useful references:
     http://en.wikipedia.org/wiki/Machine_epsilon#Approximation_using_Python
-    http://www.cygnus-software.com/papers/comparingfloats/comparingfloats.htm
+    http://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/
 
     Examples:
     In [183]: 0.000016 - 1.6*10**-5
