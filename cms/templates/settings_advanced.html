@@ -6,7 +6,8 @@
   from xmodule.modulestore.django import loc_mapper
 %>
 <%block name="title">${_("Advanced Settings")}</%block>
-<%block name="bodyclass">is-signedin course advanced view-settings</%block>
+<%block name="bodyclass">is-signedin course advanced view-settings view-settings-advanced</%block>
+<%block name='dataview'>view-settings-advanced</%block>
 
 <%block name="jsextra">
 % for template_name in ["advanced_entry"]:
