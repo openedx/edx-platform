@@ -33,6 +33,7 @@ def import_static_content(
         policy = {}
 
     verbose = True
+    mimetypes_list = mimetypes.types_map.values()
 
     for dirname, _, filenames in os.walk(static_dir):
         for filename in filenames:
@@ -64,10 +65,11 @@ def import_static_content(
             policy_ele = policy.get(content_loc.name, {})
             displayname = policy_ele.get('displayname', filename)
             locked = policy_ele.get('locked', False)
-            mime_type = policy_ele.get(
-                'contentType',
-                mimetypes.guess_type(filename)[0]
-            )
+            mime_type = policy_ele.get('contentType')
+
+            # Check extracted contentType in list of all valid mimetypes
+            if not mime_type or mime_type not in mimetypes_list:
+                mime_type = mimetypes.guess_type(filename)[0]   # Assign guessed mimetype
             content = StaticContent(
                 content_loc, displayname, mime_type, data,
                 import_path=fullname_with_subpath, locked=locked
