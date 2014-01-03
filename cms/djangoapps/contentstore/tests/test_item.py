@@ -65,6 +65,20 @@ class ItemTest(CourseTestCase):
         return self.client.ajax_post('/xblock', json.dumps(data))
 
 
+class GetItem(ItemTest):
+    """Tests for '/xblock' GET url."""
+
+    def test_get_vertical(self):
+        # Add a vertical
+        resp = self.create_xblock(category='vertical')
+        self.assertEqual(resp.status_code, 200)
+
+        # Retrieve it
+        resp_content = json.loads(resp.content)
+        resp = self.client.get('/xblock/' + resp_content['locator'])
+        self.assertEqual(resp.status_code, 200)
+
+
 class DeleteItem(ItemTest):
     """Tests for '/xblock' DELETE url."""
     def test_delete_static_page(self):
