@@ -667,16 +667,6 @@ main_vendor_js = [
     'js/vendor/jquery.qtip.min.js',
     'js/vendor/swfobject/swfobject.js',
     'js/vendor/jquery.ba-bbq.min.js',
-    #'js/vendor/annotator.min.js',
-    #'js/vendor/annotator.store.min.js',
-    #'js/vendor/annotator.tags.min.js',
-    #'js/vendor/ova/vjs.youtube.js',
-  #'js/vendor/ova/rangeslider.min.js',
-  #'js/vendor/ova/share-annotator.min.js',
-  #'js/vendor/ova/geolocation-annotator.min.js',
-  #'js/vendor/ova/richText-annotator.min.js',
-  #'js/vendor/ova/tinymce.min.js',
-  #'js/vendor/ova/ova.min.js',
 ]
 
 discussion_js = sorted(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/discussion/**/*.js'))
@@ -719,7 +709,6 @@ PIPELINE_CSS = {
             'js/vendor/CodeMirror/codemirror.css',
             'css/vendor/jquery.treeview.css',
             'css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css',
-            #'css/vendor/annotator.min.css',
         ],
         'output_filename': 'css/lms-style-course-vendor.css',
     },
