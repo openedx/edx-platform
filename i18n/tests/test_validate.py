@@ -1,9 +1,17 @@
-import os, sys, logging
-from unittest import TestCase
-from nose.plugins.skip import SkipTest
+"""Tests that validate .po files."""
+
+import codecs
+import logging
+import os
+import sys
+import textwrap
+
+import polib
 
 from config import LOCALE_DIR
 from execute import call
+from converter import Converter
+
 
 def test_po_files(root=LOCALE_DIR):
     """
@@ -16,10 +24,12 @@ def test_po_files(root=LOCALE_DIR):
         for name in filenames:
             __, ext = os.path.splitext(name)
             if ext.lower() == '.po':
-                yield validate_po_file, os.path.join(dirpath, name), log
+                filename = os.path.join(dirpath, name)
+                yield msgfmt_check_po_file, filename, log
+                yield check_messages, filename
 
 
-def validate_po_file(filename, log):
+def msgfmt_check_po_file(filename, log):
     """
     Call GNU msgfmt -c on each .po file to validate its format.
     Any errors caught by msgfmt are logged to log.
@@ -31,3 +41,91 @@ def validate_po_file(filename, log):
         log.info('\n' + out)
         log.warn('\n' + err)
     assert not err
+
+
+def tags_in_string(msg):
+    """
+    Return the set of tags in a message string.
+
+    Tags includes HTML tags, data placeholders, etc.
+
+    Skips tags that might change due to translations: HTML entities, <abbr>,
+    and so on.
+
+    """
+    def is_linguistic_tag(tag):
+        """Is this tag one that can change with the language?"""
+        if tag.startswith("&"):
+            return True
+        if any(x in tag for x in ["<abbr>", "<abbr ", "</abbr>"]):
+            return True
+        return False
+
+    __, tags = Converter().detag_string(msg)
+    return set(t for t in tags if not is_linguistic_tag(t))
+
+
+def astral(msg):
+    """Does `msg` have characters outside the Basic Multilingual Plane?"""
+    return any(ord(c) > 0xFFFF for c in msg)
+
+
+def check_messages(filename):
+    """
+    Checks messages in various ways:
+
+    Translations must have the same slots as the English.  The translation
+    must not be empty. Messages can't have astral characters in them.
+
+    """
+    # Don't check English files.
+    if "/locale/en/" in filename:
+        return
+
+    # problems will be a list of tuples.  Each is a description, and a msgid,
+    # and then zero or more translations.
+    problems = []
+    pomsgs = polib.pofile(filename)
+    for msg in pomsgs:
+        # Check for characters Javascript can't support.
+        # https://code.djangoproject.com/ticket/21725
+        if astral(msg.msgstr):
+            problems.append(("Non-BMP char", msg.msgid, msg.msgstr))
+
+        if msg.msgid_plural:
+            # Skip plurals, I don't know how the tags relate.
+            continue
+        if not msg.msgstr:
+            problems.append(("Empty translation", msg.msgid))
+        else:
+            id_tags = tags_in_string(msg.msgid)
+            tx_tags = tags_in_string(msg.msgstr)
+            if id_tags != tx_tags:
+                id_has = u", ".join(u'"{}"'.format(t) for t in id_tags - tx_tags)
+                tx_has = u", ".join(u'"{}"'.format(t) for t in tx_tags - id_tags)
+                if id_has and tx_has:
+                    diff = u"{} vs {}".format(id_has, tx_has)
+                elif id_has:
+                    diff = u"{} missing".format(id_has)
+                else:
+                    diff = u"{} added".format(tx_has)
+                problems.append((
+                    "Different tags in source and translation",
+                    msg.msgid,
+                    msg.msgstr,
+                    diff
+                ))
+
+    if problems:
+        problem_file = filename.replace(".po", ".prob")
+        id_filler = textwrap.TextWrapper(width=79, initial_indent="  msgid: ", subsequent_indent=" " * 9)
+        tx_filler = textwrap.TextWrapper(width=79, initial_indent="  -----> ", subsequent_indent=" " * 9)
+        with codecs.open(problem_file, "w", encoding="utf8") as prob_file:
+            for problem in problems:
+                desc, msgid = problem[:2]
+                prob_file.write(u"{}\n{}\n".format(desc, id_filler.fill(msgid)))
+                for translation in problem[2:]:
+                    prob_file.write(u"{}\n".format(tx_filler.fill(translation)))
+                prob_file.write(u"\n")
+
+    assert not problems, "Found %d problems in %s, details in .prob file" % (len(problems), filename)
