@@ -35,7 +35,8 @@ from calc import evaluator, UndefinedVariable
 from . import correctmap
 from datetime import datetime
 from pytz import UTC
-from .util import compare_with_tolerance, contextualize_text, convert_files_to_filenames, is_list_of_files, find_with_default
+from .util import (compare_with_tolerance, contextualize_text,  convert_files_to_filenames,
+                           is_list_of_files, find_with_default, default_tolerance)
 from lxml import etree
 from lxml.html.soupparser import fromstring as fromstring_bs     # uses Beautiful Soup!!! FIXME?
 import capa.xqueue_interface as xqueue_interface
@@ -832,7 +833,7 @@ class NumericalResponse(LoncapaResponse):
 
     def __init__(self, *args, **kwargs):
         self.correct_answer = ''
-        self.tolerance = '0'  # Default value
+        self.tolerance = default_tolerance
         super(NumericalResponse, self).__init__(*args, **kwargs)
 
     def setup_response(self):
@@ -1804,7 +1805,7 @@ class FormulaResponse(LoncapaResponse):
     def __init__(self, *args, **kwargs):
         self.correct_answer = ''
         self.samples = ''
-        self.tolerance = '1e-5'  # Default value
+        self.tolerance = default_tolerance
         self.case_sensitive = False
         super(FormulaResponse, self).__init__(*args, **kwargs)
 
@@ -2360,7 +2361,7 @@ class ChoiceTextResponse(LoncapaResponse):
                 input_name = child.get('name')
                 # Contextualize the tolerance to value.
                 tolerance = contextualize_text(
-                    child.get('tolerance', '0'),
+                    child.get('tolerance', default_tolerance),
                     context
                 )
                 # Add the answer and tolerance information for the current
@@ -2589,7 +2590,7 @@ class ChoiceTextResponse(LoncapaResponse):
 
             correct_ans = params['answer']
             # Set the tolerance to '0' if it was not specified in the xml
-            tolerance = params.get('tolerance', '0')
+            tolerance = params.get('tolerance', default_tolerance)
             # Make sure that the staff answer is a valid number
             try:
                 correct_ans = complex(correct_ans)

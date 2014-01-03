@@ -11,6 +11,7 @@ import unittest
 import textwrap
 import requests
 import mock
+from sys import float_info
 
 from . import new_loncapa_problem, test_system
 import calc
@@ -56,12 +57,12 @@ class ResponseTest(unittest.TestCase):
         for input_str in correct_answers:
             result = problem.grade_answers({'1_2_1': input_str}).get_correctness('1_2_1')
             self.assertEqual(result, 'correct',
-                             msg="%s should be marked correct" % str(input_str))
+                             msg="%s should be marked incorrect" % str(input_str))
 
         for input_str in incorrect_answers:
             result = problem.grade_answers({'1_2_1': input_str}).get_correctness('1_2_1')
             self.assertEqual(result, 'incorrect',
-                             msg="%s should be marked incorrect" % str(input_str))
+                             msg="%s should be marked correct" % str(input_str))
 
     def _get_random_number_code(self):
         """Returns code to be used to generate a random result."""
@@ -865,11 +866,43 @@ class NumericalResponseTest(ResponseTest):
         incorrect_responses = ["", "4.5", "3.5", "0"]
         self.assert_multiple_grade(problem, correct_responses, incorrect_responses)
 
+    def test_floats(self):
+        problem_setup = [
+            [1, ["1"], ["1.1"],],
+            [4, ["4.0", "4.00004"],  ["4.00005"]],
+            [0.00016, ["1.6*10^-4"], [""]],
+            [0.000016, ["1.6*10^-5"], [""]],
+            [1.9e24, ["1.9*10^24"], [""]],
+            [2e-15, ["2*10^-15"], [""]],
+            [3141592653589793238., ["3141592653589793115."], [""]],
+            # [0.1234567890123457,  ["0.1234567890123457"], ["0.1234567890123451"]],
+            #ipdb> format(v2.real, "1.15f")
+            #'0.123456789012000'
+            # this tests breaks precisions...
+            # self.neq(0.1234567890123457,   0.1234567890123456)
+            # investigate and fix..
+        ]
+        for given_answer, correct_responses, incorrect_responses in problem_setup:
+            problem = self.build_problem(answer=given_answer)
+            # import ipdb; ipdb.set_trace()
+            self.assert_multiple_grade(problem, correct_responses, incorrect_responses)
+
+        # self.neq(0.1234567890123457,   0.1234567890123456)
+        # self.eq(  0.1234567890123457,   0.1234567890123457)
+        # self.eq(  0.12345678901234577, 0.12345678901234579)
+
+        # self.neq(1.0, 2.0)
+        # self.neq(float_info.epsilon, -float_info.epsilon)
+        # self.neq(float_info.epsilon, 2 * float_info.epsilon)
+
+        # self.neq(0.00001600000000000001,   1.6*10**-5)
+        # self.eq(  0.000016000000000000001, 1.6*10**-5)
+
     def test_grade_with_script(self):
         script_text = "computed_response = math.sqrt(4)"
         problem = self.build_problem(answer="$computed_response", script=script_text)
         correct_responses = ["2", "2.0"]
-        incorrect_responses = ["", "2.01", "1.99", "0"]
+        incorrect_responses =   ["", "2.01", "1.99", "0"]
         self.assert_multiple_grade(problem, correct_responses, incorrect_responses)
 
     def test_raises_zero_division_err(self):
