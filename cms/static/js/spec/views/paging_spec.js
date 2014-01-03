@@ -58,7 +58,7 @@ define([ "jquery", "js/spec/create_sinon", "URI",
             initialize : function() {
                 this.registerSortableColumn('name-col', 'Name', 'name', 'asc');
                 this.registerSortableColumn('date-col', 'Date', 'date', 'desc');
-                this.setDefaultSortColumn('date-col');
+                this.setInitialSortColumn('date-col');
             }
         });
 
@@ -176,6 +176,23 @@ define([ "jquery", "js/spec/create_sinon", "URI",
                         respondWithMockAssets(requests);
                         expect(pagingView.sortDisplayName()).toBe('Date');
                         expect(pagingView.collection.sortDirection).toBe('desc');
+                    });
+                });
+
+                describe("sortableColumnInfo", function () {
+
+                    it('returns the registered info for a column', function () {
+                        pagingView.registerSortableColumn('test-col', 'Test Column', 'testField', 'asc');
+                        var sortInfo = pagingView.sortableColumnInfo('test-col');
+                        expect(sortInfo.displayName).toBe('Test Column');
+                        expect(sortInfo.fieldName).toBe('testField');
+                        expect(sortInfo.defaultSortDirection).toBe('asc');
+                    });
+
+                    it('throws an exception for an unregistered column', function () {
+                        expect(function() {
+                            pagingView.sortableColumnInfo('no-such-column');
+                        }).toThrow();
                     });
                 });
             });

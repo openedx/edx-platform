@@ -57,8 +57,12 @@ class AssetsToyCourseTestCase(CourseTestCase):
         url = location.url_reverse('assets/', '')
 
         self.assert_correct_asset_response(url, 0, 3, 3)
-        self.assert_correct_asset_response(url + "?page_size=2", 0, 2, 3)
-        self.assert_correct_asset_response(url + "?page_size=2&page=1", 2, 1, 3)
+        self.assert_correct_asset_response(url + '?page_size=2', 0, 2, 3)
+        self.assert_correct_asset_response(url + '?page_size=2&page=1', 2, 1, 3)
+        self.assert_correct_sort_response(url, 'date_added', 'asc')
+        self.assert_correct_sort_response(url, 'date_added', 'desc')
+        self.assert_correct_sort_response(url, 'display_name', 'asc')
+        self.assert_correct_sort_response(url, 'display_name', 'desc')
 
     def assert_correct_asset_response(self, url, expected_start, expected_length, expected_total):
         resp = self.client.get(url, HTTP_ACCEPT='application/json')
@@ -67,6 +71,20 @@ class AssetsToyCourseTestCase(CourseTestCase):
         self.assertEquals(json_response['start'], expected_start)
         self.assertEquals(len(assets), expected_length)
         self.assertEquals(json_response['totalCount'], expected_total)
+
+    def assert_correct_sort_response(self, url, sort, direction):
+        resp = self.client.get(url + '?sort=' + sort + '&direction=' + direction, HTTP_ACCEPT='application/json')
+        json_response = json.loads(resp.content)
+        assets = json_response['assets']
+        name1 = assets[0][sort]
+        name2 = assets[1][sort]
+        name3 = assets[2][sort]
+        if direction == 'asc':
+            self.assertLessEqual(name1, name2)
+            self.assertLessEqual(name2, name3)
+        else:
+            self.assertGreaterEqual(name1, name2)
+            self.assertGreaterEqual(name2, name3)
 
 
 class UploadTestCase(CourseTestCase):

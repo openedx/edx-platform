@@ -13,9 +13,9 @@ var AssetsView = PagingView.extend({
         var collection = this.collection;
         this.template = _.template($("#asset-library-tpl").text());
         this.listenTo(collection, 'destroy', this.handleDestroy);
-        this.registerSortableColumn('js-asset-name-col', gettext('Name'), 'displayname', 'asc');
-        this.registerSortableColumn('js-asset-date-col', gettext('Date Added'), 'uploadDate', 'desc');
-        this.setDefaultSortColumn('js-asset-date-col');
+        this.registerSortableColumn('js-asset-name-col', gettext('Name'), 'display_name', 'asc');
+        this.registerSortableColumn('js-asset-date-col', gettext('Date Added'), 'date_added', 'desc');
+        this.setInitialSortColumn('js-asset-date-col');
     },
 
     render: function() {

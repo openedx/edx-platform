@@ -52,11 +52,18 @@ define(["backbone", "js/views/feedback_alert", "gettext"], function(Backbone, Al
             }
         },
 
-        registerSortableColumn: function(columnName, displayName, fieldName, sortDirection) {
+        /**
+         * Registers information about a column that can be sorted.
+         * @param columnName The element name of the column.
+         * @param displayName The display name for the column in the current locale.
+         * @param fieldName The database field name that is represented by this column.
+         * @param defaultSortDirection The default sort direction for the column
+         */
+        registerSortableColumn: function(columnName, displayName, fieldName, defaultSortDirection) {
             this.sortableColumns[columnName] = {
                 displayName: displayName,
                 fieldName: fieldName,
-                sortDirection: sortDirection
+                defaultSortDirection: defaultSortDirection
             };
         },
 
@@ -74,13 +81,11 @@ define(["backbone", "js/views/feedback_alert", "gettext"], function(Backbone, Al
             return sortInfo.displayName;
         },
 
-        setDefaultSortColumn: function(sortColumn) {
+        setInitialSortColumn: function(sortColumn) {
             var collection = this.collection,
-                sortInfo = this.sortableColumns[sortColumn],
-                sortField = sortInfo.fieldName,
-                defaultSortDirection = sortInfo.sortDirection;
-            collection.sortField = sortField;
-            collection.sortDirection = defaultSortDirection;
+                sortInfo = this.sortableColumns[sortColumn];
+            collection.sortField = sortInfo.fieldName;
+            collection.sortDirection = sortInfo.defaultSortDirection;
             this.sortColumn = sortColumn;
         },
 
@@ -88,7 +93,7 @@ define(["backbone", "js/views/feedback_alert", "gettext"], function(Backbone, Al
             var collection = this.collection,
                 sortInfo = this.sortableColumnInfo(sortColumn),
                 sortField = sortInfo.fieldName,
-                defaultSortDirection = sortInfo.sortDirection;
+                defaultSortDirection = sortInfo.defaultSortDirection;
             if (collection.sortField === sortField) {
                 collection.sortDirection = collection.sortDirection === 'asc' ? 'desc' : 'asc';
             } else {

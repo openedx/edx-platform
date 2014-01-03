@@ -41,10 +41,13 @@ def assets_handler(request, tag=None, package_id=None, branch=None, version_guid
     deleting assets, and changing the "locked" state of an asset.
 
     GET
-        html: return html page which will show all course assets. Note that only the asset container
+        html: return an html page which will show all course assets. Note that only the asset container
             is returned and that the actual assets are filled in with a client-side request.
-        json: returns a page of assets. A page parameter specifies the desired page, and the
-            optional page_size parameter indicates the number of items per page (defaults to 50).
+        json: returns a page of assets. The following parameters are supported:
+            page: the desired page of results (defaults to 0)
+            page_size: the number of items per page (defaults to 50)
+            sort: the asset field to sort by (defaults to "date_added")
+            direction: the sort direction (defaults to "descending")
     POST
         json: create (or update?) an asset. The only updating that can be done is changing the lock state.
     PUT
@@ -95,10 +98,16 @@ def _assets_json(request, location):
     start = current_page * requested_page_size
 
     old_location = loc_mapper().translate_locator_to_location(location)
-    requested_sort = request.REQUEST.get('sort', 'uploadDate')
-    sort_direction = ASCENDING
-    if request.REQUEST.get('direction', 'desc').lower() == 'desc':
-        sort_direction = DESCENDING
+    requested_sort = request.REQUEST.get('sort', 'date_added')
+    sort_direction = DESCENDING
+    if request.REQUEST.get('direction', 'asc').lower() == 'asc':
+        sort_direction = ASCENDING
+
+    # Convert the field name to the Mongo name
+    if requested_sort == 'date_added':
+        requested_sort = 'dateadded';
+    elif requested_sort == 'display_name':
+        requested_sort = 'displayname'
 
     course_reference = StaticContent.compute_location(old_location.org, old_location.course, old_location.name)
     assets, total_count = contentstore().get_all_content_for_course(

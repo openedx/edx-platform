@@ -33,15 +33,6 @@ define(["backbone.paginator", "js/models/asset", "gettext"], function(BackbonePa
             this.currentPage = currentPage;
             this.start = start;
             return response.assets;
-        },
-
-        sortDisplayName: function() {
-            var sortField = this.sortField;
-            if (sortField === 'uploadDate') {
-                return gettext('Date Added');
-            } else if (sortField === 'displayname') {
-                return gettext('Name');
-            }
         }
     });
     return AssetCollection;
