@@ -68,31 +68,49 @@ def user_track(request):
 
 
 def server_track(request, event_type, event, page=None):
-    """Log events related to server requests."""
-    try:
-        username = request.user.username
-    except:
-        username = "anonymous"
+    """
+    Log events related to server requests.
 
-    try:
-        agent = request.META['HTTP_USER_AGENT']
-    except:
-        agent = ''
+    Handle the situation where the request may be NULL, as may happen with management commands.
+    """
+    username = 'anonymous'
+    agent = ''
+    host = ''
+    ip = ''
+    if request is not None:
+        try:
+            username = request.user.username
+        except:
+            pass
+        if hasattr(request, META):
+            try:
+                agent = request.META['HTTP_USER_AGENT']
+            except:
+                pass
+            try:
+                host = request.META['SERVER_NAME']
+            except:
+                pass
+            try:
+                ip = request.META['REMOTE_ADDR']
+            except:
+                pass
 
+    # define output:
     event = {
         "username": username,
-        "ip": request.META['REMOTE_ADDR'],
+        "ip": ip,
         "event_source": "server",
         "event_type": event_type,
         "event": event,
         "agent": agent,
         "page": page,
         "time": datetime.datetime.now(UTC),
-        "host": request.META['SERVER_NAME'],
+        "host": host,
         "context": eventtracker.get_tracker().resolve_context(),
     }
 
-    if event_type.startswith("/event_logs") and request.user.is_staff:
+    if event_type.startswith("/event_logs") and request and request.user.is_staff:
         return  # don't log
 
     log_event(event)

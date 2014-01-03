@@ -3,6 +3,7 @@ from django.core.management.base import BaseCommand
 from student.models import CourseEnrollment, Registration
 from student.views import _do_create_account
 from django.contrib.auth.models import User
+from eventtracking import tracker
 
 
 class Command(BaseCommand):
@@ -64,25 +65,29 @@ class Command(BaseCommand):
         if not name:
             name = options['email'].split('@')[0]
 
-        post_data = {
-            'username': username,
-            'email': options['email'],
-            'password': options['password'],
-            'name': name,
-            'honor_code': u'true',
-            'terms_of_service': u'true',
-        }
-        create_account = _do_create_account(post_data)
-        if isinstance(create_account, tuple):
-            user = create_account[0]
-            if options['staff']:
-                user.is_staff = True
-                user.save()
-            reg = Registration.objects.get(user=user)
-            reg.activate()
-            reg.save()
-        else:
-            print create_account
-            user = User.objects.get(email=options['email'])
-        if options['course']:
-            CourseEnrollment.enroll(user, options['course'], mode=options['mode'])
+        CONTEXT_NAME = 'edx.mgmt.command'
+        context = {'command': 'create_user'}
+        with tracker.get_tracker().context(CONTEXT_NAME, context):
+
+            post_data = {
+                'username': username,
+                'email': options['email'],
+                'password': options['password'],
+                'name': name,
+                'honor_code': u'true',
+                'terms_of_service': u'true',
+            }
+            create_account = _do_create_account(post_data)
+            if isinstance(create_account, tuple):
+                user = create_account[0]
+                if options['staff']:
+                    user.is_staff = True
+                    user.save()
+                reg = Registration.objects.get(user=user)
+                reg.activate()
+                reg.save()
+            else:
+                print create_account
+                user = User.objects.get(email=options['email'])
+            if options['course']:
+                CourseEnrollment.enroll(user, options['course'], mode=options['mode'])
