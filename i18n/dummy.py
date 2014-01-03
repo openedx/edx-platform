@@ -99,20 +99,6 @@ class Dummy(Converter):
         """replaces the final char of string with #"""
         return string[:-1] + '#'
 
-    def init_msgs(self, msgs):
-        """
-        Make sure the first msg in msgs has a plural property.
-        msgs is list of instances of polib.POEntry
-        """
-        if not msgs:
-            return
-        headers = msgs[0].get_property('msgstr')
-        has_plural = any(header.startswith('Plural-Forms:') for header in headers)
-        if not has_plural:
-            # Apply declaration for English pluralization rules
-            plural = "Plural-Forms: nplurals=2; plural=(n != 1);\\n"
-            headers.append(plural)
-
     def convert_msg(self, msg):
         """
         Takes one POEntry object and converts it (adds a dummy translation to it)
@@ -128,8 +114,10 @@ class Dummy(Converter):
             # translate singular and plural
             foreign_single = self.convert(source)
             foreign_plural = self.convert(plural)
-            plural = {'0': self.final_newline(source, foreign_single),
-                      '1': self.final_newline(plural, foreign_plural)}
+            plural = {
+                '0': self.final_newline(source, foreign_single),
+                '1': self.final_newline(plural, foreign_plural),
+            }
             msg.msgstr_plural = plural
         else:
             foreign = self.convert(source)
