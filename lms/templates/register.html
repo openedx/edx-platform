@@ -298,10 +298,10 @@
 
 <%
   # allow for microsite overrides on the registration sidebars, otherwise default to pre-existing ones
-  register_sidebar_file = MicrositeConfiguration.get_microsite_template_path('register-sidebar.html')
+  sidebar_file = MicrositeConfiguration.get_microsite_template_path('register-sidebar.html')
 %>
 
-    <%include file="${register_sidebar_file}" />
+    <%include file="${sidebar_file}" />
 
   </aside>
 </section>
