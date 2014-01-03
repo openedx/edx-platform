@@ -31,7 +31,7 @@ class MicrositeConfiguration(object):
     def is_request_in_microsite(cls):
         """
         This will return if current request is a request within a microsite
-        """
+        """     
         return cls.get_microsite_configuration() != None
 
     @classmethod
@@ -39,6 +39,9 @@ class MicrositeConfiguration(object):
         """
         Returns the current request's microsite configuration
         """
+        if not hasattr(_microsite_configuration_threadlocal, 'data'):
+            return {}
+            
         return _microsite_configuration_threadlocal.data
 
     @classmethod
