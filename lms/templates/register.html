@@ -1,4 +1,5 @@
 <%! from django.utils.translation import ugettext as _ %>
+<%! from microsite_configuration.middleware import MicrositeConfiguration %>
 
 <%inherit file="main.html" />
 
@@ -294,50 +295,13 @@
   </section>
 
   <aside role="complementary">
-    <header>
-      <h3 class="sr">${_("Registration Help")}</h3>
-    </header>
 
-    % if has_extauth_info is UNDEFINED:
+<%
+  # allow for microsite overrides on the registration sidebars, otherwise default to pre-existing ones
+  register_sidebar_file = MicrositeConfiguration.get_microsite_template_path('register-sidebar.html')
+%>
 
-    <div class="cta">
-      <h3>${_("Already registered?")}</h3>
-      <p class="instructions">
-        <a href="${reverse('signin_user')}${login_query()}">
-          ${_("Click here to log in.")}
-        </a>
-      </p>
-    </div>
+    <%include file="${register_sidebar_file}" />
 
-    % endif
-
-    ## TODO: Use a %block tag or something to allow themes to
-    ##       override in a more generalizable fashion.
-    % if not self.stanford_theme_enabled():
-      <div class="cta cta-welcome">
-        <h3>${_("Welcome to {platform_name}").format(platform_name=platform_name)}</h3>
-        <p>${_("Registering with {platform_name} gives you access to all of our current and future free courses. Not ready to take a course just yet? Registering puts you on our mailing list - we will update you as courses are added.").format(platform_name=platform_name)}</p>
-      </div>
-    % endif
-
-    <div class="cta cta-nextsteps">
-      <h3>${_("Next Steps")}</h3>
-      % if self.stanford_theme_enabled():
-        <p>${_("You will receive an activation email.  You must click on the activation link to complete the process.  Don't see the email?  Check your spam folder and mark emails from class.stanford.edu as 'not spam', since you'll want to be able to receive email from your courses.")}</p>
-      % else:
-      <p>${_("As part of joining {platform_name}, you will receive an activation email.  You must click on the activation link to complete the process.  Don't see the email?  Check your spam folder and mark {platform_name} emails as 'not spam'.  At {platform_name}, we communicate mostly through email.").format(platform_name=platform_name)}</p>
-      % endif
-    </div>
-
-    % if settings.MKTG_URL_LINK_MAP.get('FAQ'):
-      <div class="cta cta-help">
-        <h3>${_("Need Help?")}</h3>
-        <p>${_("Need help in registering with {platform_name}?").format(platform_name=platform_name)}
-          <a href="${marketing_link('FAQ')}">
-              ${_("View our FAQs for answers to commonly asked questions.")}
-          </a>
-          ${_("Once registered, most questions can be answered in the course specific discussion forums or through the FAQs.")}</p>
-      </div>
-    % endif
   </aside>
 </section>
