@@ -64,13 +64,16 @@ Create a Circuit Schematic Builder Problem
 Custom JavaScript Display and Grading
 -------------------------------------
 
-Custom JavaScript display and grading problems (also called custom JavaScript problems or
-JS Input problems) allow you to create your own learning tool
-using HTML and other standard Internet languages and then add the tool directly
-into Studio. When you use this problem type, Studio embeds your tool in an
-inline frame (IFrame) so that your students can interact with it in the LMS. You can grade
-your students' work using JavaScript and some basic Python, and the grading
-is integrated into the edX grading system.
+Custom JavaScript display and grading problems (also called custom JavaScript problems
+or JS Input problems) allow you to create a custom problem or tool that uses JavaScript
+and then add the problem or tool directly into Studio. When you create a JS Input problem,
+Studio embeds the problem in an inline frame (IFrame) so that your students can interact with
+it in the LMS. You can grade your students’ work using JavaScript and some basic Python, and
+the grading is integrated into the edX grading system.
+
+The JS Input problem that you create must use HTML, JavaScript, and cascading style sheets
+(CSS). You can use any application creation tool, such as the Google Web Toolkit (GWT), to
+create your JS Input problem.
 
 .. image:: /Images/JavaScriptInputExample.gif
 
@@ -85,13 +88,20 @@ Create a Custom JavaScript Display and Grading Problem
 #. In the component that appears, click **Edit**.
 #. In the component editor, modify the example code according to your problem.
 
-   - If some elements of your problem are located in different places, you need to
-     bypass the same-origin policy (SOP). To do this, change **sop="false"**
-     in line 8 to **sop="true"**. For more information, see
-     `same-origin policy <https://developer.mozilla.org/en-US/docs/Web/JavaScript/Same_origin_policy_for_JavaScript>`_.
+   - All problems have more than one element. Most problems conform to the same-origin
+     policy (SOP), meaning that all elements have the same protocol, host, and port.
+     For example, **http**://**store.company.com**:**81**/subdirectory_1/JSInputElement.html and
+     **http**://**store.company.com**:**81**/subdirectory_2/JSInputElement.js have the same protocol
+     (http), host (store.company.com), and port (81).
 
-#. Click the **Settings** tab.
-#. Set **Maximum Attempts** to a number larger than zero.
+     If any elements of your problem use a different protocol, host, or port, you need to
+     bypass the SOP. For example, **https**://**info.company.com**/JSInputElement2.html
+     uses a different protocol, host, and port. To bypass the SOP, change
+     **sop="false"** in line 8 of the example code to **sop="true"**. For more information, see the same-origin policy
+     page on the `Mozilla Developer Network <https://developer.mozilla.org/en-US/docs/Web/JavaScript/Same_origin_policy_for_JavaScript>`_
+     or on `Wikipedia <http://en.wikipedia.org/wiki/Same_origin_policy>`_.
+#. If you want your problem to have a **Save** button, click the **Settings** tab, and then set
+   **Maximum Attempts** to a number larger than zero.
 #. Click **Save**.
 
 Re-create the Example Problem
@@ -103,6 +113,9 @@ To re-create the example problem above, you'll need the following files.
    - webGLDemo.js
    - webGLDemo.css
    - three.min.js
+
+You'll create the first three files using the code in :ref:`Appendix F`. The three.min.js file is a library
+file that you'll download.
 
 #. Go to :ref:`Appendix F` and use the code samples to create the following files.
 
