@@ -100,7 +100,7 @@ class MongoContentStore(ContentStore):
     def close_stream(self, handle):
         try:
             handle.close()
-        except:
+        except Exception:
             pass
 
     def export(self, location, output_directory):
