@@ -15,12 +15,26 @@ New documentation, *Building a Course with edX Studio* is available online_. You
 
 .. _online: http://edx.readthedocs.org/projects/ca/en/latest/
 
+=============
+New Features
+=============
+
+* The **Files & Uploads** page is updated to show a long list of files in multiple pages. Only 50 files are now shown on a page. If your course has more than 50 files, additional files are listed in separate pages. You can navigate to other pages through pagination controls at the top and bottom of the file list.  This change improves the page performance for courses with a large number of files.
+
+  For more information, see the `updated documentation for adding files <http://edx.readthedocs.org/projects/ca/en/latest/create_new_course.html#add-files-to-a-course>`_. 
+
+.. note::  The workaround previously included in release notes on :ref:`October 29 2013` is no longer needed and will no longer work.
+
+
+* The **Course Outline** page is updated to include several design improvements. To view the changes, view your course in Studio or see the `updated documentation for Organizing Your Course Content <http://edx.readthedocs.org/projects/ca/en/latest/organizing_course.html>`_.
 
 ==========================
 Changes and Updates
 ==========================
 
+* The Course Export now supports non-ASCII characters. (STUD-868)
 
+* In the Course Outline, you can now drag a section to the end when the last section is collapsed. (STUD-868)
 
 
 
@@ -28,7 +42,15 @@ Changes and Updates
 edX Learning Management System 
 ***************************************
 
+==========================
+Changes and Updates
+==========================
 
+* In the Instructor Dashboard, an issue was fixed with downloading grade distributions. You can now download grade distributions for all courses. (LMS-811, LMS-922)
+
+* In the course Wiki, the **Preview this Revision** and the **Merge selected with Current** dialog boxes are now keyboard accessible in Internet Explorer. (LMS-1539)
+
+* An error in downloading student profile data is fixed. (LMS-1675)
 
 
 

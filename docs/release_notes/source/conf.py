@@ -25,7 +25,7 @@ html_static_path.append('source/_static')
 
 # General information about the project.
 project = u'Release Notes for edX Course Staff'
-copyright = u'2013, edX Documentation Team'
+copyright = u'2013, edX'
 
 # The short X.Y version.
 version = ''
