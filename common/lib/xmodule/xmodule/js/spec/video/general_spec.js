@@ -60,7 +60,6 @@
 
                 beforeEach(function () {
                     loadFixtures('video_html5.html');
-                    this.stubVideoPlayer = jasmine.createSpy('VideoPlayer');
                     $.cookie.andReturn('0.75');
                 });
 

@@ -32,7 +32,7 @@ What is Studio?
 
 Studio is the edX tool you use to build your courses. 
 
-You use Studio to create course content, problems, videos, and other resoruces for students.
+You use Studio to create course content, problems, videos, and other resources for students.
 
 With Studio, you can also manage your schedule and course team, set grading policies, publish your course, and more.
 
@@ -94,7 +94,7 @@ Go to: https://studio.edge.edx.org. Sign in with the account you created on Edge
 
 You must then request access to create courses:  
 
-#. Click the **+** sign to expland the field labeled **Becoming a Course Creator in Studio**.
+#. Click the **+** sign to expand the field labeled **Becoming a Course Creator in Studio**.
 
 #. Click **Request the Ability to Create Courses**.
 

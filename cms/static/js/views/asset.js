@@ -1,6 +1,6 @@
-define(["backbone", "underscore", "gettext", "js/views/feedback_prompt", "js/views/feedback_notification"],
-    function(Backbone, _, gettext, PromptView, NotificationView) {
-var AssetView = Backbone.View.extend({
+define(["js/views/baseview", "underscore", "gettext", "js/views/feedback_prompt", "js/views/feedback_notification"],
+    function(BaseView, _, gettext, PromptView, NotificationView) {
+var AssetView = BaseView.extend({
   initialize: function() {
     this.template = _.template($("#asset-tpl").text());
     this.listenTo(this.model, "change:locked", this.updateLockState);

@@ -1,5 +1,5 @@
 (function (requirejs, require, define) {
-define(['js/capa/drag_and_drop/logme'], function (logme) {
+define([], function () {
     return configParser;
 
     function configParser(state, config) {
@@ -32,7 +32,7 @@ define(['js/capa/drag_and_drop/logme'], function (logme) {
 
     function getDraggables(state, config) {
         if (config.hasOwnProperty('draggables') === false) {
-            logme('ERROR: "config" does not have a property "draggables".');
+            console.log('ERROR: "config" does not have a property "draggables".');
             state.config.foundErrors = true;
         } else if ($.isArray(config.draggables) === true) {
             config.draggables.every(function (draggable) {
@@ -47,19 +47,19 @@ define(['js/capa/drag_and_drop/logme'], function (logme) {
                 return true;
             });
         } else {
-            logme('ERROR: The type of config.draggables is no supported.');
+            console.log('ERROR: The type of config.draggables is no supported.');
             state.config.foundErrors = true;
         }
     }
 
     function getBaseImage(state, config) {
         if (config.hasOwnProperty('base_image') === false) {
-            logme('ERROR: "config" does not have a property "base_image".');
+            console.log('ERROR: "config" does not have a property "base_image".');
             state.config.foundErrors = true;
         } else if (typeof config.base_image === 'string') {
             state.config.baseImage = config.base_image;
         } else {
-            logme('ERROR: Property config.base_image is not of type "string".');
+            console.log('ERROR: Property config.base_image is not of type "string".');
             state.config.foundErrors = true;
         }
     }
@@ -83,14 +83,14 @@ define(['js/capa/drag_and_drop/logme'], function (logme) {
                 return true;
             });
         } else {
-            logme('ERROR: Property config.targets is not of a supported type.');
+            console.log('ERROR: Property config.targets is not of a supported type.');
             state.config.foundErrors = true;
         }
     }
 
     function getOnePerTarget(state, config) {
         if (config.hasOwnProperty('one_per_target') === false) {
-            logme('ERROR: "config" does not have a property "one_per_target".');
+            console.log('ERROR: "config" does not have a property "one_per_target".');
             state.config.foundErrors = true;
         } else if (typeof config.one_per_target === 'string') {
             if (config.one_per_target.toLowerCase() === 'true') {
@@ -98,11 +98,11 @@ define(['js/capa/drag_and_drop/logme'], function (logme) {
             } else if (config.one_per_target.toLowerCase() === 'false') {
                 state.config.onePerTarget = false;
             } else {
-                logme('ERROR: Property config.one_per_target can either be "true", or "false".');
+                console.log('ERROR: Property config.one_per_target can either be "true", or "false".');
                 state.config.foundErrors = true;
             }
         } else {
-            logme('ERROR: Property config.one_per_target is not of a supported type.');
+            console.log('ERROR: Property config.one_per_target is not of a supported type.');
             state.config.foundErrors = true;
         }
     }
@@ -118,11 +118,11 @@ define(['js/capa/drag_and_drop/logme'], function (logme) {
                 } else if (config.target_outline.toLowerCase() === 'false') {
                     state.config.targetOutline = false;
                 } else {
-                    logme('ERROR: Property config.target_outline can either be "true", or "false".');
+                    console.log('ERROR: Property config.target_outline can either be "true", or "false".');
                     state.config.foundErrors = true;
                 }
             } else {
-                logme('ERROR: Property config.target_outline is not of a supported type.');
+                console.log('ERROR: Property config.target_outline is not of a supported type.');
                 state.config.foundErrors = true;
             }
         }
@@ -136,7 +136,7 @@ define(['js/capa/drag_and_drop/logme'], function (logme) {
             if (typeof config.label_bg_color === 'string') {
                 state.config.labelBgColor = config.label_bg_color;
             } else {
-                logme('ERROR: Property config.label_bg_color is not of a supported type.');
+                console.log('ERROR: Property config.label_bg_color is not of a supported type.');
             }
         }
     }
@@ -206,11 +206,11 @@ define(['js/capa/drag_and_drop/logme'], function (logme) {
 
     function attrIsString(obj, attr) {
         if (obj.hasOwnProperty(attr) === false) {
-            logme('ERROR: Attribute "obj.' + attr + '" is not present.');
+            console.log('ERROR: Attribute "obj.' + attr + '" is not present.');
 
             return false;
         } else if (typeof obj[attr] !== 'string') {
-            logme('ERROR: Attribute "obj.' + attr + '" is not a string.');
+            console.log('ERROR: Attribute "obj.' + attr + '" is not a string.');
 
             return false;
         }
@@ -222,7 +222,7 @@ define(['js/capa/drag_and_drop/logme'], function (logme) {
         var tempInt;
 
         if (obj.hasOwnProperty(attr) === false) {
-            logme('ERROR: Attribute "obj.' + attr + '" is not present.');
+            console.log('ERROR: Attribute "obj.' + attr + '" is not present.');
 
             return false;
         }
@@ -230,7 +230,7 @@ define(['js/capa/drag_and_drop/logme'], function (logme) {
         tempInt = parseInt(obj[attr], 10);
 
         if (isFinite(tempInt) === false) {
-            logme('ERROR: Attribute "obj.' + attr + '" is not an integer.');
+            console.log('ERROR: Attribute "obj.' + attr + '" is not an integer.');
 
             return false;
         }
@@ -243,7 +243,7 @@ define(['js/capa/drag_and_drop/logme'], function (logme) {
     function attrIsBoolean(obj, attr, defaultVal) {
         if (obj.hasOwnProperty(attr) === false) {
             if (defaultVal === undefined) {
-                logme('ERROR: Attribute "obj.' + attr + '" is not present.');
+                console.log('ERROR: Attribute "obj.' + attr + '" is not present.');
 
                 return false;
             } else {
@@ -260,12 +260,12 @@ define(['js/capa/drag_and_drop/logme'], function (logme) {
         } else if ((obj[attr] === 'true') || (obj[attr] === true)) {
             obj[attr] = true;
         } else {
-            logme('ERROR: Attribute "obj.' + attr + '" is not a boolean.');
+            console.log('ERROR: Attribute "obj.' + attr + '" is not a boolean.');
 
             return false;
         }
 
         return true;
     }
-}); // End-of: define(['logme'], function (logme) {
+}); // End-of: define([], function () {
 }(RequireJS.requirejs, RequireJS.require, RequireJS.define)); // End-of: (function (requirejs, require, define) {

@@ -378,21 +378,40 @@ A row in this table represents a student's enrollment for a particular course ru
 ==========================
 A row in this table maps a student's real user ID to an anonymous ID generated to obfuscate the student's identity.
 
-`id`
+
+ .. list-table::
+     :widths: 15 15 15 15
+     :header-rows: 1
+
+     * - Field
+       - Type
+       - Null
+       - Key
+     * - hashid
+       - int(11) 
+       - NO
+       - PRI
+     * - id
+       - int(11)
+       - NO
+       -
+     * - username
+       - varchar(30)
+       - NO
+       -
+
+
+`hash_id`
 ----
-  Primary key.
+   The user ID generated to obfuscate the student's identity.
 
 `user_id`
 ---------
-  Student's ID in `auth_user.id`
+  The student's ID in `auth_user.id`.
 
-`anonymous_user_id`
+`username`
 -----------
- The user ID generated to obfuscate the student's identity.
-
-`course_id`
------------
-  The ID of the course run the student is enrolled in.
+  The student's username in `auth_user.id`. 
 
 
 

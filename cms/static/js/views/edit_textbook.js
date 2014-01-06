@@ -1,6 +1,6 @@
-define(["backbone", "underscore", "jquery", "js/views/edit_chapter", "js/views/feedback_notification"],
-        function(Backbone, _, $, EditChapterView, NotificationView) {
-    var EditTextbook = Backbone.View.extend({
+define(["js/views/baseview", "underscore", "jquery", "js/views/edit_chapter", "js/views/feedback_notification"],
+        function(BaseView, _, $, EditChapterView, NotificationView) {
+    var EditTextbook = BaseView.extend({
         initialize: function() {
             this.template = _.template($("#edit-textbook-tpl").text());
             this.listenTo(this.model, "invalid", this.render);

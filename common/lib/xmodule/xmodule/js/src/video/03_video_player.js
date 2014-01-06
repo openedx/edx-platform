@@ -60,7 +60,7 @@ function (HTML5Video, Resizer) {
     //     via the 'state' object. Much easier to work this way - you don't
     //     have to do repeated jQuery element selects.
     function _initialize(state) {
-        var youTubeId, player, videoWidth, videoHeight;
+        var youTubeId, player;
 
         // The function is called just once to apply pre-defined configurations
         // by student before video starts playing. Waits until the video's
@@ -124,6 +124,24 @@ function (HTML5Video, Resizer) {
                     onStateChange: state.videoPlayer.onStateChange
                 }
             });
+
+            player = state.videoEl = state.videoPlayer.player.videoEl;
+
+            player[0].addEventListener('loadedmetadata', function () {
+                var videoWidth = player[0].videoWidth || player.width(),
+                    videoHeight = player[0].videoHeight || player.height();
+
+                _resize(state, videoWidth, videoHeight);
+
+                state.trigger(
+                    'videoControl.updateVcrVidTime',
+                    {
+                        time: 0,
+                        duration: state.videoPlayer.duration()
+                    }
+                );
+            }, false);
+
         } else { // if (state.videoType === 'youtube') {
             if (state.currentPlayerMode === 'flash') {
                 youTubeId = state.youtubeId();
@@ -140,11 +158,18 @@ function (HTML5Video, Resizer) {
                         .onPlaybackQualityChange
                 }
             });
-            player = state.videoEl = state.el.find('iframe');
-            videoWidth = player.attr('width') || player.width();
-            videoHeight = player.attr('height') || player.height();
 
-            _resize(state, videoWidth, videoHeight);
+            state.el.on('initialize', function () {
+                var player = state.videoEl = state.el.find('iframe'),
+                    videoWidth = player.attr('width') || player.width(),
+                    videoHeight = player.attr('height') || player.height();
+
+                _resize(state, videoWidth, videoHeight);
+            });
+        }
+
+        if (state.isTouch) {
+            dfd.resolve();
         }
     }
 
@@ -154,10 +179,17 @@ function (HTML5Video, Resizer) {
                 elementRatio: videoWidth/videoHeight,
                 container: state.videoEl.parent()
             })
-            .setMode('width')
             .callbacks.once(function() {
                 state.trigger('videoCaption.resize', null);
+            })
+            .setMode('width');
+
+        // Update captions size when controls becomes visible on iPad or Android
+        if (/iPad|Android/i.test(state.isTouch[0])) {
+            state.el.on('controls:show', function () {
+                state.trigger('videoCaption.resize', null);
             });
+        }
 
         $(window).bind('resize', _.debounce(state.resizer.align, 100));
     }
@@ -229,7 +261,7 @@ function (HTML5Video, Resizer) {
             // video. `endTime` will be set to `null`, and this if statement
             // will not be executed on next runs.
             if (
-                this.videoPlayer.endTime != null &&
+                this.videoPlayer.endTime !== null &&
                 this.videoPlayer.endTime <= this.videoPlayer.currentTime
             ) {
                 this.videoPlayer.pause();
@@ -297,6 +329,8 @@ function (HTML5Video, Resizer) {
             this.videoPlayer.player[methodName](youtubeId, time);
             this.videoPlayer.updatePlayTime(time);
         }
+
+        this.el.trigger('speedchange', arguments);
     }
 
     // Every 200 ms, if the video is playing, we call the function update, via
@@ -343,6 +377,8 @@ function (HTML5Video, Resizer) {
         }
 
         this.videoPlayer.updatePlayTime(newTime);
+
+        this.el.trigger('seek', arguments);
     }
 
     function onEnded() {
@@ -368,6 +404,8 @@ function (HTML5Video, Resizer) {
         // `duration`. In this case, slider doesn't reach the end point of
         // timeline.
         this.videoPlayer.updatePlayTime(time);
+
+        this.el.trigger('ended', arguments);
     }
 
     function onPause() {
@@ -386,6 +424,8 @@ function (HTML5Video, Resizer) {
         if (this.config.show_captions) {
             this.trigger('videoCaption.pause', null);
         }
+
+        this.el.trigger('pause', arguments);
     }
 
     function onPlay() {
@@ -415,6 +455,8 @@ function (HTML5Video, Resizer) {
         }
 
         this.videoPlayer.ready();
+
+        this.el.trigger('play', arguments);
     }
 
     function onUnstarted() { }
@@ -429,21 +471,16 @@ function (HTML5Video, Resizer) {
         quality = this.videoPlayer.player.getPlaybackQuality();
 
         this.trigger('videoQualityControl.onQualityChange', quality);
+
+        this.el.trigger('qualitychange', arguments);
     }
 
     function onReady() {
-        var availablePlaybackRates, baseSpeedSubs, _this,
+        var _this = this,
+            availablePlaybackRates, baseSpeedSubs,
             player, videoWidth, videoHeight;
 
         dfd.resolve();
-
-        if (this.videoType === 'html5') {
-            player = this.videoEl = this.videoPlayer.player.videoEl;
-            videoWidth = player[0].videoWidth || player.width();
-            videoHeight = player[0].videoHeight || player.height();
-
-            _resize(this, videoWidth, videoHeight);
-        }
 
         this.videoPlayer.log('load_video');
 
@@ -469,7 +506,7 @@ function (HTML5Video, Resizer) {
             this.currentPlayerMode === 'html5' &&
             this.videoType === 'youtube'
         ) {
-            if (availablePlaybackRates.length === 1) {
+            if (availablePlaybackRates.length === 1 && !this.isTouch) {
                 // This condition is needed in cases when Firefox version is
                 // less than 20. In those versions HTML5 playback could only
                 // happen at 1 speed (no speed changing). Therefore, in this
@@ -479,14 +516,11 @@ function (HTML5Video, Resizer) {
                 // have 1 speed available, we fall back to Flash.
 
                 _restartUsingFlash(this);
-
-                return;
             } else if (availablePlaybackRates.length > 1) {
                 // We need to synchronize available frame rates with the ones
                 // that the user specified.
 
                 baseSpeedSubs = this.videos['1.0'];
-                _this = this;
                 // this.videos is a dictionary containing various frame rates
                 // and their associated subs.
 
@@ -520,10 +554,11 @@ function (HTML5Video, Resizer) {
             this.videoPlayer.player.setPlaybackRate(this.speed);
         }
 
+        this.el.trigger('ready', arguments);
         /* The following has been commented out to make sure autoplay is
            disabled for students.
         if (
-            !onTouchBasedDevice() &&
+            !this.isTouch &&
             $('.video:first').data('autoplay') === 'True'
         ) {
             this.videoPlayer.play();
@@ -735,6 +770,7 @@ function (HTML5Video, Resizer) {
 
     function onVolumeChange(volume) {
         this.videoPlayer.player.setVolume(volume);
+        this.el.trigger('volumechange', arguments);
     }
 });
 

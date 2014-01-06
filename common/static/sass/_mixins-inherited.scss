@@ -354,8 +354,8 @@
 }
 
 @mixin tree-view {
-  border: 1px solid $mediumGrey;
-  background: $lightGrey;
+  border: 0;
+  background: $white;
 
   .branch {
     margin-bottom: 0;
@@ -374,7 +374,7 @@
     font-size: 13px;
 
     &:hover {
-      background: $orange-l4;
+      background: $blue-l5;
 
       .item-actions {
         display: block;
@@ -403,11 +403,11 @@
     }
 
     .private-item {
-      color: #a4aab7;
+      color: $gray-l1;
     }
 
     .draft-item {
-      color: #9f7d10;
+      color: $yellow-d1;
     }
   }
 
