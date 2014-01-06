@@ -194,8 +194,10 @@ ${fragment.foot_html()}
   </div>
   % if course and user.is_authenticated() and not UserProfile.has_registered(user):
     <section class="unauth-tos">
-      ${_("By exploring and using these course materials, you are implicitly agreeing to our")}
-      <a href="${marketing_link('TOS')}">${_("Terms of Service and Honor Code")}</a> .
+      ${_("By exploring the course, you are agreeing to our")}
+      <a href="${marketing_link('TOS')}">${_("Terms of Service")}</a> and
+      <a href="${marketing_link('TOS')}#privacy">${_("Privacy Policy")}</a> .
+      ${_("Please read them carefully.")}
     </section>
   % endif
 </section>

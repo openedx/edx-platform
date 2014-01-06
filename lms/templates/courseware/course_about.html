@@ -189,7 +189,7 @@
           </a>
           % if sneakpeek_allowed and not regularly_registered:
             <a href="#" class="course_sneakpeek"</a>
-              <span class="sneakpeek">${_("Explore Course")}</span>
+              <span class="sneakpeek" title="${_("By exploring the course, you are agreeing to our Terms of Service. Please read them carefully.")}">${_("Explore Course")} *</span>
             </a>
           % endif
           <div id="register_error"></div>
@@ -233,6 +233,15 @@
       <div class="inner-wrapper">
         ${get_course_about_section(course, "overview")}
       </div>
+      % if sneakpeek_allowed and not regularly_registered:
+        <section class="unauth-tos" id="unauth-tos">
+          <p>
+            * ${_("By exploring the course, you are agreeing to our")}
+            <a href="${marketing_link('TOS')}">${_("Terms of Service")}</a> and <a href="${marketing_link('TOS')}#privacy">${_("Privacy Policy")}</a>.
+            ${_("Please read them carefully.")}
+          </p>
+        </section>
+      % endif
     </section>
 
     % if not self.carnegie_theme_enabled():
@@ -311,10 +320,8 @@
             </section>
           </section>
         %endif
-
       </section>
     % endif
-
   </section>
 </section>
 

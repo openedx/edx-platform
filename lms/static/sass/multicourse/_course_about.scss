@@ -354,6 +354,19 @@
         }
       }
     }
+    
+    section.unauth-tos p {
+      font-weight: bold;
+      
+      a {
+        font-weight: bold;
+        text-decoration: underline;
+        
+        &:hover {
+          text-decoration: none;
+        }
+      }
+    }
   }
 
   .course-sidebar {
