@@ -18,7 +18,9 @@ from webob.multidict import MultiDict
 
 from xmodule.open_ended_grading_classes.openendedchild import OpenEndedChild
 from xmodule.open_ended_grading_classes.open_ended_module import OpenEndedModule
-from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import CombinedOpenEndedV1Module
+from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import (
+    CombinedOpenEndedV1Module, STAFF_DEFAULT_FOR_AI_GRADING, STAFF_DEFAULT_FOR_PEER_GRADING
+)
 from xmodule.open_ended_grading_classes.grading_service_module import GradingServiceError
 from xmodule.combined_open_ended_module import CombinedOpenEndedModule
 from xmodule.modulestore import Location
@@ -78,6 +80,8 @@ class OpenEndedChildTest(unittest.TestCase):
             'min_to_calibrate': 3,
             'max_to_calibrate': 6,
             'peer_grade_finished_submissions_when_none_pending': False,
+            'staff_minimum_for_peer_grading': STAFF_DEFAULT_FOR_PEER_GRADING,
+            'staff_minimum_for_ai_grading': STAFF_DEFAULT_FOR_AI_GRADING,
         }
     }
     definition = Mock()
