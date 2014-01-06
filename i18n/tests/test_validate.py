@@ -93,13 +93,21 @@ def check_messages(filename):
             problems.append(("Non-BMP char", msg.msgid, msg.msgstr))
 
         if msg.msgid_plural:
-            # Skip plurals, I don't know how the tags relate.
-            continue
-        if not msg.msgstr:
-            problems.append(("Empty translation", msg.msgid))
+            # Plurals: two strings in, N strings out.
+            source = msg.msgid + " | " + msg.msgid_plural
+            translation = " | ".join(v for k,v in sorted(msg.msgstr_plural.items()))
+            empty = any(not t.strip() for t in msg.msgstr_plural.values())
         else:
-            id_tags = tags_in_string(msg.msgid)
-            tx_tags = tags_in_string(msg.msgstr)
+            # Singular: just one string in and one string out.
+            source = msg.msgid
+            translation = msg.msgstr
+            empty = not msg.msgstr.strip()
+
+        if empty:
+            problems.append(("Empty translation", source))
+        else:
+            id_tags = tags_in_string(source)
+            tx_tags = tags_in_string(translation)
             if id_tags != tx_tags:
                 id_has = u", ".join(u'"{}"'.format(t) for t in id_tags - tx_tags)
                 tx_has = u", ".join(u'"{}"'.format(t) for t in tx_tags - id_tags)
@@ -111,8 +119,8 @@ def check_messages(filename):
                     diff = u"{} added".format(tx_has)
                 problems.append((
                     "Different tags in source and translation",
-                    msg.msgid,
-                    msg.msgstr,
+                    source,
+                    translation,
                     diff
                 ))
 
