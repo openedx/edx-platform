@@ -1069,7 +1069,7 @@ def enable_theme(theme_name):
 
 
 ############################### MICROSITES ################################
-def enable_microsites(microsite_names, microsite_config_dict):
+def enable_microsites(microsite_names, microsite_config_dict, subdomain_branding, virtual_universities, env_root = ENV_ROOT):
     """
     Enable the use of microsites, which are websites that allow
     for subdomains for the edX platform, e.g. foo.edx.org
@@ -1080,7 +1080,7 @@ def enable_microsites(microsite_names, microsite_config_dict):
 
     FEATURES['USE_MICROSITES'] = True
 
-    microsites_root = ENV_ROOT / "microsites"
+    microsites_root = env_root / "microsites"
 
     for microsite_name in microsite_names:
         # Calculate the location of the microsite's files
@@ -1103,27 +1103,14 @@ def enable_microsites(microsite_names, microsite_config_dict):
                 university = microsite_config['university']
 
                 # add to the existing maps in our settings
-                SUBDOMAIN_BRANDING[domain] = university
-                VIRTUAL_UNIVERSITIES.append(university)
+                subdomain_branding[domain] = university
+                virtual_universities.append(university)
 
                 template_dir = microsite_root / 'templates'
                 microsite_config['template_dir'] = template_dir
 
                 microsite_config['microsite_name'] = microsite_name
 
-                # Include the microsite templates in the template search paths
-                # note that due to the multi-tenancy aspect, template
-                # names should be unique across all installable microsites
-
-                #TEMPLATE_DIRS.append(template_dir)
-                #MAKO_TEMPLATES['main'].append(template_dir)
-                
-
-                # Namespace the theme's static files to 'themes/<theme_name>' to
-                # avoid collisions with default edX static files
-                #STATICFILES_DIRS.append(microsite_root / 'static')
-
-                # store the rest of the configuration
                 microsite_config_dict[university] = microsite_config
         except Exception as error:
             # not sure if we have application logging at this stage of

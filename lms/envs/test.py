@@ -277,3 +277,10 @@ PASSWORD_HASHERS = (
 
 import openid.oidutil
 openid.oidutil.log = lambda message, level = 0: None
+
+# set up some testing for microsites
+MICROSITE_NAMES = ['openedx']
+MICROSITE_CONFIGURATION = {}
+
+if MICROSITE_NAMES and len(MICROSITE_NAMES) > 0:
+    enable_microsites(MICROSITE_NAMES, MICROSITE_CONFIGURATION, SUBDOMAIN_BRANDING, VIRTUAL_UNIVERSITIES, ENV_ROOT / 'edx-platform' / 'test_root')

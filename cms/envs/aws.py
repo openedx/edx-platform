@@ -9,6 +9,8 @@ This is the default template for our main set of AWS servers.
 import json
 
 from .common import *
+from .common import SUBDOMAIN_BRANDING, VIRTUAL_UNIVERSITIES
+
 from logsettings import get_logger_config
 import os
 
@@ -214,5 +216,6 @@ BROKER_URL = "{0}://{1}:{2}@{3}/{4}".format(CELERY_BROKER_TRANSPORT,
 TRACKING_BACKENDS.update(AUTH_TOKENS.get("TRACKING_BACKENDS", {}))
 
 MICROSITE_NAMES = ENV_TOKENS.get('MICROSITE_NAMES', None)
+MICROSITE_CONFIGURATION = {}
 if MICROSITE_NAMES and len(MICROSITE_NAMES) > 0:
-    enable_microsites(MICROSITE_NAMES)
+    enable_microsites(MICROSITE_NAMES, MICROSITE_CONFIGURATION, SUBDOMAIN_BRANDING, VIRTUAL_UNIVERSITIES)

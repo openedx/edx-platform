@@ -41,7 +41,7 @@ class MicrositeConfiguration(object):
         """
         if not hasattr(_microsite_configuration_threadlocal, 'data'):
             return {}
-            
+
         return _microsite_configuration_threadlocal.data
 
     @classmethod
