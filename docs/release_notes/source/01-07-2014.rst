@@ -28,13 +28,21 @@ New Features
 
 * The **Course Outline** page is updated to include several design improvements. To view the changes, view your course in Studio or see the `updated documentation for Organizing Your Course Content <http://edx.readthedocs.org/projects/ca/en/latest/organizing_course.html>`_.
 
+* A new JSInput Template is now available.  DOC LINK (BLD-523) (BLD-556)
+
+* A new Zooming Image template is now available. DOC LINK (BLD-206)
+
 ==========================
 Changes and Updates
 ==========================
 
 * The Course Export now supports non-ASCII characters. (STUD-868)
 
-* In the Course Outline, you can now drag a section to the end when the last section is collapsed. (STUD-868)
+* In the Course Outline, you can now drag a section to the end when the last section is collapsed. (STUD-879)
+
+* In Video components, Start and End times are now displayed in the format you enter them and not converted to the standard format (HH:MM:SS) until you tab out of the field. (BLD-506)
+
+* The **Save** button for JSInput components now works as expected. (BLD-568)
 
 
 
@@ -52,11 +60,8 @@ Changes and Updates
 
 * An error in downloading student profile data is fixed. (LMS-1675)
 
+* Students can now show the answer for Image Response problems. When a student clicks **Show Answer**, the part of the image that would have earned full credit is highlighted. (BLD-21)
 
-
-******************
-Forums 
-******************
-
+* The video player controls now work on iPads. [DETAILS ABOUT IPHONE NATIVE CONTROLS?] (BLD-541)
 
 
