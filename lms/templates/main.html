@@ -39,7 +39,7 @@
       <title>${_("Home")} | class.stanford.edu</title>
     % else:
       ## "edX" should not be translated
-      <title>edX</title>
+      <title>${MicrositeConfiguration.get_microsite_configuration_value('platform_name', settings.PLATFORM_NAME)}</title>
 
       <meta http-equiv="X-UA-Compatible" content="IE=edge">
       <meta name="viewport" content="width=device-width, initial-scale=1">
