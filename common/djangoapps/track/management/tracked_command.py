@@ -9,19 +9,11 @@ class TrackedCommand(BaseCommand):
     """
     Provides management command calling info to tracking context.
 
-    Information provided to context includes three values:
+    Information provided to context includes the following value:
 
     'command': the program name and the subcommand used to run a management command.
-    'command_args': the argument list passed to the command.
-    'command_options': the option dict passed to the command.  This includes options
-         that were not explicitly specified, and receive default values.
 
-         Special treatment are provided for several options, including obfuscation and filtering.
-
-         The values for the following options are filtered entirely:
-             'settings', 'pythonpath', 'verbosity', 'traceback', 'stdout', 'stderr'.
-         The values for the following options are replaced with eight asterisks:
-             'password'.
+    In future, other values (such as args and options) could be added as needed.
 
     An example tracking log entry resulting from running the 'create_user' management command:
 
@@ -33,17 +25,7 @@ class TrackedCommand(BaseCommand):
         "context": {
             "course_id": "edX/Open_DemoX/edx_demo_course",
             "org_id": "edX",
-            "command_options": {
-                "username": null,
-                "name": null,
-                "course": "edX/Open_DemoX/edx_demo_course",
-                "mode": "verified",
-                "password": "********",
-                "email": "rando9c@example.com",
-                "staff": false
-            },
             "command": "./manage.py create_user",
-            "command_args": []
         },
         "time": "2014-01-06T15:59:49.599522+00:00",
         "ip": "",
@@ -69,25 +51,8 @@ class TrackedCommand(BaseCommand):
 
     def execute(self, *args, **options):
         """Wraps base execute() to add command line to tracking context."""
-        # Make a copy of options, and obfuscate or filter particular values.
-        options_dict = dict(options)
-
-        # Stuff to obfuscate:
-        censored_opts = ['password']
-        for opt in censored_opts:
-            if opt in options_dict:
-                options_dict[opt] = '*' * 8
-
-        # Stuff to filter:
-        removed_opts = ['settings', 'pythonpath', 'verbosity', 'traceback', 'stdout', 'stderr']
-        for opt in removed_opts:
-            if opt in options_dict:
-                del options_dict[opt]
-
         context = {
             'command': self.prog_name,
-            'command_args': args,
-            'command_options': options_dict,
         }
         COMMAND_CONTEXT_NAME = 'edx.mgmt.command'
         with tracker.get_tracker().context(COMMAND_CONTEXT_NAME, context):
