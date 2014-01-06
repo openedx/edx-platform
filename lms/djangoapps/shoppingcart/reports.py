@@ -1,14 +1,18 @@
 from decimal import Decimal
 import unicodecsv
+import logging
 
 from django.db import models
 from django.conf import settings
+from django.utils.translation import ugettext as _
 
 from courseware.courses import get_course_by_id
 from course_modes.models import CourseMode
 from shoppingcart.models import CertificateItem, OrderItem
 from student.models import CourseEnrollment
 from util.query import use_read_replica_if_available
+from xmodule.error_module import ErrorDescriptor
+from xmodule.modulestore.django import modulestore
 
 
 class Report(object):
@@ -18,8 +22,13 @@ class Report(object):
     To make a different type of report, write a new subclass that implements
     the methods rows and header.
     """
+    def __init__(self, start_date, end_date, start_word=None, end_word=None):
+        self.start_date = start_date
+        self.end_date = end_date
+        self.start_word = start_word
+        self.end_word = end_word
 
-    def rows(self, start_date, end_date, start_word=None, end_word=None):
+    def rows(self):
         """
         Performs database queries necessary for the report and eturns an generator of
         lists, in which each list is a separate row of the report.
@@ -36,12 +45,12 @@ class Report(object):
         """
         raise NotImplementedError
 
-    def write_csv(self, filelike, start_date, end_date, start_word=None, end_word=None):
+    def write_csv(self, filelike):
         """
         Given a file object to write to and {start/end date, start/end letter} bounds,
         generates a CSV report of the appropriate type.
         """
-        items = self.rows(start_date, end_date, start_word, end_word)
+        items = self.rows()
         writer = unicodecsv.writer(filelike, encoding="utf-8")
         writer.writerow(self.header())
         for item in items:
@@ -56,13 +65,20 @@ class RefundReport(Report):
     order number, customer name, date of transaction, date of refund, and any service
     fees.
     """
-    def rows(self, start_date, end_date, start_word=None, end_word=None):
-        query = use_read_replica_if_available(
+    def rows(self):
+        query1 = use_read_replica_if_available(
             CertificateItem.objects.select_related('user__profile').filter(
                 status="refunded",
-                refund_requested_time__gte=start_date,
-                refund_requested_time__lt=end_date,
+                refund_requested_time__gte=self.start_date,
+                refund_requested_time__lt=self.end_date,
             ).order_by('refund_requested_time'))
+        query2 = use_read_replica_if_available(
+            CertificateItem.objects.select_related('user__profile').filter(
+                status="refunded",
+                refund_requested_time=None,
+            ))
+
+        query = query1 | query2
 
         for item in query:
             yield [
@@ -76,12 +92,12 @@ class RefundReport(Report):
 
     def header(self):
         return [
-            "Order Number",
-            "Customer Name",
-            "Date of Original Transaction",
-            "Date of Refund",
-            "Amount of Refund",
-            "Service Fees (if any)",
+            _("Order Number"),
+            _("Customer Name"),
+            _("Date of Original Transaction"),
+            _("Date of Refund"),
+            _("Amount of Refund"),
+            _("Service Fees (if any)"),
         ]
 
 
@@ -93,12 +109,12 @@ class ItemizedPurchaseReport(Report):
     a given start_date and end_date, we find that purchase's time, order ID, status,
     quantity, unit cost, total cost, currency, description, and related comments.
     """
-    def rows(self, start_date, end_date, start_word=None, end_word=None):
+    def rows(self):
         query = use_read_replica_if_available(
             OrderItem.objects.filter(
                 status="purchased",
-                fulfilled_time__gte=start_date,
-                fulfilled_time__lt=end_date,
+                fulfilled_time__gte=self.start_date,
+                fulfilled_time__lt=self.end_date,
             ).order_by("fulfilled_time"))
 
         for item in query:
@@ -116,15 +132,15 @@ class ItemizedPurchaseReport(Report):
 
     def header(self):
         return [
-            "Purchase Time",
-            "Order ID",
-            "Status",
-            "Quantity",
-            "Unit Cost",
-            "Total Cost",
-            "Currency",
-            "Description",
-            "Comments"
+            _("Purchase Time"),
+            _("Order ID"),
+            _("Status"),
+            _("Quantity"),
+            _("Unit Cost"),
+            _("Total Cost"),
+            _("Currency"),
+            _("Description"),
+            _("Comments")
         ]
 
 
@@ -137,9 +153,8 @@ class CertificateStatusReport(Report):
     calculate the total enrollment, audit enrollment, honor enrollment, verified enrollment, total
     gross revenue, gross revenue over the minimum, and total dollars refunded.
     """
-    def rows(self, start_date, end_date, start_word=None, end_word=None):
-        results = []
-        for course_id in course_ids_between(start_word, end_word):
+    def rows(self):
+        for course_id in course_ids_between(self.start_word, self.end_word):
             # If the first letter of the university is between start_word and end_word, then we include
             # it in the report.  These comparisons are unicode-safe.
             cur_course = get_course_by_id(course_id)
@@ -157,7 +172,9 @@ class CertificateStatusReport(Report):
             else:
                 verified_enrolled = counts['verified']
                 gross_rev = CertificateItem.verified_certificates_monetary_field_sum(course_id, 'purchased', 'unit_cost')
-                gross_rev_over_min = gross_rev - (CourseMode.min_course_price_for_currency(course_id, 'usd') * verified_enrolled)
+                gross_rev_over_min = gross_rev - (CourseMode.min_course_price_for_verified_for_currency(course_id, 'usd') * verified_enrolled)
+
+            num_verified_over_the_minimum = CertificateItem.verified_certificates_contributing_more_than_minimum(course_id)
 
             # should I be worried about is_active here?
             number_of_refunds = CertificateItem.verified_certificates_count(course_id, 'refunded')
@@ -166,32 +183,46 @@ class CertificateStatusReport(Report):
             else:
                 dollars_refunded = CertificateItem.verified_certificates_monetary_field_sum(course_id, 'refunded', 'unit_cost')
 
-            result = [
+            course_announce_date = ""
+            course_reg_start_date = ""
+            course_reg_close_date = ""
+            registration_period = ""
+
+            yield [
                 university,
                 course,
+                "",
+                "",
+                "",
+                "",
                 total_enrolled,
                 audit_enrolled,
                 honor_enrolled,
                 verified_enrolled,
                 gross_rev,
                 gross_rev_over_min,
+                num_verified_over_the_minimum,
                 number_of_refunds,
                 dollars_refunded
             ]
-            yield result
 
     def header(self):
         return [
-            "University",
-            "Course",
-            "Total Enrolled",
-            "Audit Enrollment",
-            "Honor Code Enrollment",
-            "Verified Enrollment",
-            "Gross Revenue",
-            "Gross Revenue over the Minimum",
-            "Number of Refunds",
-            "Dollars Refunded",
+            _("University"),
+            _("Course"),
+            _("Course Announce Date"),
+            _("Course Start Date"),
+            _("Course Registration Close Date"),
+            _("Course Registration Period"),
+            _("Total Enrolled"),
+            _("Audit Enrollment"),
+            _("Honor Code Enrollment"),
+            _("Verified Enrollment"),
+            _("Gross Revenue"),
+            _("Gross Revenue over the Minimum"),
+            _("Number of Verified Students Contributing More than the Minimum"),
+            _("Number of Refunds"),
+            _("Dollars Refunded"),
         ]
 
 
@@ -204,19 +235,18 @@ class UniversityRevenueShareReport(Report):
     the total revenue generated by that particular course.  This includes the number of transactions,
     total payments collected, service fees, number of refunds, and total amount of refunds.
     """
-    def rows(self, start_date, end_date, start_word=None, end_word=None):
-        results = []
-        for course_id in course_ids_between(start_word, end_word):
+    def rows(self):
+        for course_id in course_ids_between(self.start_word, self.end_word):
             cur_course = get_course_by_id(course_id)
             university = cur_course.org
             course = cur_course.number + " " + cur_course.display_name_with_default
-            num_transactions = 0  # TODO clarify with billing what transactions are included in this (purchases? refunds? etc)
             total_payments_collected = CertificateItem.verified_certificates_monetary_field_sum(course_id, 'purchased', 'unit_cost')
             service_fees = CertificateItem.verified_certificates_monetary_field_sum(course_id, 'purchased', 'service_fee')
             num_refunds = CertificateItem.verified_certificates_count(course_id, "refunded")
             amount_refunds = CertificateItem.verified_certificates_monetary_field_sum(course_id, 'refunded', 'unit_cost')
+            num_transactions = (num_refunds * 2) + CertificateItem.verified_certificates_count(course_id, "purchased")
 
-            result = [
+            yield [
                 university,
                 course,
                 num_transactions,
@@ -225,17 +255,16 @@ class UniversityRevenueShareReport(Report):
                 num_refunds,
                 amount_refunds
             ]
-            yield result
 
     def header(self):
         return [
-            "University",
-            "Course",
-            "Number of Transactions",
-            "Total Payments Collected",
-            "Service Fees (if any)",
-            "Number of Successful Refunds",
-            "Total Amount of Refunds",
+            _("University"),
+            _("Course"),
+            _("Number of Transactions"),
+            _("Total Payments Collected"),
+            _("Service Fees (if any)"),
+            _("Number of Successful Refunds"),
+            _("Total Amount of Refunds"),
         ]
 
 def course_ids_between(start_word, end_word):
@@ -243,8 +272,9 @@ def course_ids_between(start_word, end_word):
     Returns a list of all valid course_ids that fall alphabetically between start_word and end_word.
     These comparisons are unicode-safe. 
     """
+
     valid_courses = []
-    for course_id in settings.COURSE_LISTINGS['default']:
-        if (start_word.lower() <= course_id.lower()) and (end_word.lower() >= course_id.lower()) and (get_course_by_id(course_id) is not None):
-            valid_courses.append(course_id)
+    for course in modulestore().get_courses():
+        if (start_word.lower() <= course.id.lower() <= course.id.lower()) and (get_course_by_id(course.id) is not None):
+            valid_courses.append(course.id)
     return valid_courses

@@ -373,8 +373,8 @@ class ItemizedPurchaseReportTest(ModuleStoreTestCase):
             """.format(time_str=str(self.now)))
 
     def test_purchased_items_btw_dates(self):
-        report = initialize_report("itemized_purchase_report")
-        purchases = report.rows(self.now - self.FIVE_MINS, self.now + self.FIVE_MINS)
+        report = initialize_report("itemized_purchase_report", self.now - self.FIVE_MINS, self.now + self.FIVE_MINS)
+        purchases = report.rows()
 
         # since there's not many purchases, just run through the generator to make sure we've got the right number
         num_purchases = 0
@@ -384,7 +384,8 @@ class ItemizedPurchaseReportTest(ModuleStoreTestCase):
         #self.assertIn(self.reg.orderitem_ptr, purchases)
         #self.assertIn(self.cert_item.orderitem_ptr, purchases)
 
-        no_purchases = report.rows(self.now + self.FIVE_MINS, self.now + self.FIVE_MINS + self.FIVE_MINS)
+        report = initialize_report("itemized_purchase_report", self.now + self.FIVE_MINS, self.now + self.FIVE_MINS + self.FIVE_MINS)
+        no_purchases = report.rows()
 
         num_purchases = 0
         for item in no_purchases:
@@ -395,9 +396,9 @@ class ItemizedPurchaseReportTest(ModuleStoreTestCase):
         """
         Tests that a generated purchase report CSV is as we expect
         """
-        report = initialize_report("itemized_purchase_report")
+        report = initialize_report("itemized_purchase_report", self.now - self.FIVE_MINS, self.now + self.FIVE_MINS)
         csv_file = StringIO.StringIO()
-        report.write_csv(csv_file, self.now - self.FIVE_MINS, self.now + self.FIVE_MINS)
+        report.write_csv(csv_file)
         csv = csv_file.getvalue()
         csv_file.close()
         # Using excel mode csv, which automatically ends lines with \r\n, so need to convert to \n

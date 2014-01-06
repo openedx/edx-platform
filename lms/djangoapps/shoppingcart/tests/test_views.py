@@ -369,29 +369,35 @@ class CSVReportViewsTest(ModuleStoreTestCase):
 
     def test_report_csv_itemized(self):
         report_type = 'itemized_purchase_report'
+        start_date = '1970-01-01'
+        end_date = '2100-01-01'
         PaidCourseRegistration.add_to_order(self.cart, self.course_id)
         self.cart.purchase()
         self.login_user()
         self.add_to_download_group(self.user)
-        response = self.client.post(reverse('payment_csv_report'), {'start_date': '1970-01-01',
-                                                                    'end_date': '2100-01-01',
+        response = self.client.post(reverse('payment_csv_report'), {'start_date': start_date,
+                                                                    'end_date': end_date,
                                                                     'requested_report': report_type})
         self.assertEqual(response['Content-Type'], 'text/csv')
-        report = initialize_report(report_type)
+        report = initialize_report(report_type, start_date, end_date)
         self.assertIn(",".join(report.header()), response.content)
         self.assertIn(self.CORRECT_CSV_NO_DATE_ITEMIZED_PURCHASE, response.content)
 
     def test_report_csv_university_revenue_share(self):
         report_type = 'university_revenue_share'
+        start_date = '1970-01-01'
+        end_date = '2100-01-01'
+        start_letter = 'A'
+        end_letter = 'Z'
         self.login_user()
         self.add_to_download_group(self.user)
-        response = self.client.post(reverse('payment_csv_report'), {'start_date': '1970-01-01',
-                                                                    'end_date': '2100-01-01',
-                                                                    'start_letter': 'A',
-                                                                    'end_letter': 'Z',
+        response = self.client.post(reverse('payment_csv_report'), {'start_date': start_date,
+                                                                    'end_date': end_date,
+                                                                    'start_letter': start_letter,
+                                                                    'end_letter': end_letter,
                                                                     'requested_report': report_type})
         self.assertEqual(response['Content-Type'], 'text/csv')
-        report = initialize_report(report_type)
+        report = initialize_report(report_type, start_date, end_date, start_letter, end_letter)
         self.assertIn(",".join(report.header()), response.content)
         # TODO add another test here
 

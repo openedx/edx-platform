@@ -29,13 +29,13 @@ REPORT_TYPES = [
 ]
 
 
-def initialize_report(report_type):
+def initialize_report(report_type, start_date, end_date, start_letter=None, end_letter=None):
     """
     Creates the appropriate type of Report object based on the string report_type.
     """
     for item in REPORT_TYPES:
         if report_type in item:
-            return item[1]()
+            return item[1](start_date, end_date, start_letter, end_letter)
     raise ReportTypeDoesNotExistException
 
 @require_POST
@@ -193,32 +193,31 @@ def csv_report(request):
     """
     Downloads csv reporting of orderitems
     """
-
     if not _can_download_report(request.user):
         return HttpResponseForbidden(_('You do not have permission to view this page.'))
 
     # TODO temp filler for start letter, end letter
 
     if request.method == 'POST':
-        start_str = request.POST.get('start_date', '')
-        end_str = request.POST.get('end_date', '')
+        start_date = request.POST.get('start_date', '')
+        end_date = request.POST.get('end_date', '')
         start_letter = request.POST.get('start_letter', '')
         end_letter = request.POST.get('end_letter', '')
         report_type = request.POST.get('requested_report', '')
         try:
-            start_date = _get_date_from_str(start_str) + datetime.timedelta(days=0)
-            end_date = _get_date_from_str(end_str) + datetime.timedelta(days=1)
+            start_date = _get_date_from_str(start_date) + datetime.timedelta(days=0)
+            end_date = _get_date_from_str(end_date) + datetime.timedelta(days=1)
         except ValueError:
             # Error case: there was a badly formatted user-input date string
-            return _render_report_form(start_str, end_str, start_letter, end_letter, report_type, date_fmt_error=True)
+            return _render_report_form(start_date, end_date, start_letter, end_letter, report_type, date_fmt_error=True)
 
-        report = initialize_report(report_type)
-        items = report.rows(start_date, end_date, start_letter, end_letter)
+        report = initialize_report(report_type, start_date, end_date, start_letter, end_letter)
+        items = report.rows()
 
         response = HttpResponse(mimetype='text/csv')
         filename = "purchases_report_{}.csv".format(datetime.datetime.now(pytz.UTC).strftime("%Y-%m-%d-%H-%M-%S"))
         response['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
-        report.write_csv(response, start_date, end_date, start_letter, end_letter)
+        report.write_csv(response)
         return response
 
     elif request.method == 'GET':

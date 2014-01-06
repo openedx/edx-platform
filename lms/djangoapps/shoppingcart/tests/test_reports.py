@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 """
 Tests for the Shopping Cart Models
 """
@@ -128,18 +130,18 @@ class ReportTypeTests(ModuleStoreTestCase):
             """.format(time_str=str(self.test_time)))
 
         self.CORRECT_CERT_STATUS_CSV = dedent("""
-            University,Course,Total Enrolled,Audit Enrollment,Honor Code Enrollment,Verified Enrollment,Gross Revenue,Gross Revenue over the Minimum,Number of Refunds,Dollars Refunded
-            MITx,999 Robot Super Course,6,3,1,2,80.00,0.00,2,80.00
+            University,Course,Course Announce Date,Course Start Date,Course Registration Close Date,Course Registration Period,Total Enrolled,Audit Enrollment,Honor Code Enrollment,Verified Enrollment,Gross Revenue,Gross Revenue over the Minimum,Number of Verified Students Contributing More than the Minimum,Number of Refunds,Dollars Refunded
+            MITx,999 Robot Super Course,,,,,6,3,1,2,80.00,0.00,0,2,80.00
             """.format(time_str=str(self.test_time)))
 
         self.CORRECT_UNI_REVENUE_SHARE_CSV = dedent("""
             University,Course,Number of Transactions,Total Payments Collected,Service Fees (if any),Number of Successful Refunds,Total Amount of Refunds
-            MITx,999 Robot Super Course,0,80.00,0.00,2,80.00
+            MITx,999 Robot Super Course,6,80.00,0.00,2,80.00
             """.format(time_str=str(self.test_time)))
 
     def test_refund_report_rows(self):
-        report = initialize_report("refund_report")
-        refunded_certs = report.rows(self.now - self.FIVE_MINS, self.now + self.FIVE_MINS)
+        report = initialize_report("refund_report", self.now - self.FIVE_MINS, self.now + self.FIVE_MINS)
+        refunded_certs = report.rows()
 
         # check that we have the right number
         num_certs = 0
@@ -154,24 +156,24 @@ class ReportTypeTests(ModuleStoreTestCase):
         """
         Tests that a generated purchase report CSV is as we expect
         """
-        report = initialize_report("refund_report")
+        report = initialize_report("refund_report", self.now - self.FIVE_MINS, self.now + self.FIVE_MINS)
         csv_file = StringIO.StringIO()
-        report.write_csv(csv_file, self.now - self.FIVE_MINS, self.now + self.FIVE_MINS)
+        report.write_csv(csv_file)
         csv = csv_file.getvalue()
         csv_file.close()
         # Using excel mode csv, which automatically ends lines with \r\n, so need to convert to \n
         self.assertEqual(csv.replace('\r\n', '\n').strip(), self.CORRECT_REFUND_REPORT_CSV.strip())
 
     def test_basic_cert_status_csv(self):
-        report = initialize_report("certificate_status")
+        report = initialize_report("certificate_status", self.now - self.FIVE_MINS, self.now + self.FIVE_MINS, 'A', 'Z')
         csv_file = StringIO.StringIO()
-        report.write_csv(csv_file, self.now - self.FIVE_MINS, self.now + self.FIVE_MINS, 'A', 'Z')
+        report.write_csv(csv_file)
         csv = csv_file.getvalue()
         self.assertEqual(csv.replace('\r\n', '\n').strip(), self.CORRECT_CERT_STATUS_CSV.strip())
 
     def test_basic_uni_revenue_share_csv(self):
-        report = initialize_report("university_revenue_share")
+        report = initialize_report("university_revenue_share", self.now - self.FIVE_MINS, self.now + self.FIVE_MINS, 'A', 'Z')
         csv_file = StringIO.StringIO()
-        report.write_csv(csv_file, self.now - self.FIVE_MINS, self.now + self.FIVE_MINS, 'A', 'Z')
+        report.write_csv(csv_file)
         csv = csv_file.getvalue()
         self.assertEqual(csv.replace('\r\n', '\n').strip(), self.CORRECT_UNI_REVENUE_SHARE_CSV.strip())

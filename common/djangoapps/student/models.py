@@ -17,11 +17,13 @@ import json
 import logging
 from pytz import UTC
 import uuid
+from collections import defaultdict
 
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.db import models, IntegrityError
+from django.db.models import Sum, Count
 from django.db.models.signals import post_save
 from django.dispatch import receiver, Signal
 import django.dispatch
@@ -585,11 +587,14 @@ class CourseEnrollment(models.Model):
         Returns a dictionary that stores the total enrollment count for a course, as well as the
         enrollment count for each individual mode.
         """
-        d = {}
-        d['total'] = cls.objects.filter(course_id=course_id, is_active=True).count()
-        d['honor'] = cls.objects.filter(course_id=course_id, is_active=True, mode='honor').count()
-        d['audit'] = cls.objects.filter(course_id=course_id, is_active=True, mode='audit').count()
-        d['verified'] = cls.objects.filter(course_id=course_id, is_active=True, mode='verified').count()
+        # Unfortunately, Django's "group by"-style queries look super-awkward
+        query = cls.objects.filter(course_id=course_id, is_active=True).values('mode').order_by().annotate(Count('mode'))
+        total = 0
+        d = defaultdict(int)
+        for item in query:
+            d[item['mode']] = item['mode__count']
+            total += item['mode__count']
+        d['total'] = total
         return d
 
     def activate(self):

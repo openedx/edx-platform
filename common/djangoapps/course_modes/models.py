@@ -96,6 +96,14 @@ class CourseMode(models.Model):
             return None
 
     @classmethod
+    def min_course_price_for_verified_for_currency(cls, course_id, currency):
+        modes = cls.modes_for_course(course_id)
+        for mode in modes:
+            if (mode.currency == currency) and (mode.slug == 'verified'):
+                return mode.min_price
+        return 0
+
+    @classmethod
     def min_course_price_for_currency(cls, course_id, currency):
         """
         Returns the minimum price of the course in the appropriate currency over all the course's
