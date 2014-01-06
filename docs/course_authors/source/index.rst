@@ -22,10 +22,9 @@ Contents
    create_problem_component
    common_problems
    advanced_problems
-   javascript_input
-   create_lti
    specialized_problems
    open_response_assessment
+   tools
    set_content_releasedates
    view_course_content
    export_import_course
@@ -45,10 +44,3 @@ Appendices
    :glob:
 
    appendices/*
-
-
-
-
-
-
-
