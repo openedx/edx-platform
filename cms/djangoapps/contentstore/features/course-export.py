@@ -2,6 +2,7 @@
 #pylint: disable=C0111
 
 from lettuce import world, step
+from component_settings_editor_helpers import enter_xml_in_advanced_problem
 from nose.tools import assert_true, assert_equal
 
 
@@ -15,7 +16,7 @@ def i_export_the_course(step):
 
 @step('I edit and enter bad XML$')
 def i_enter_bad_xml(step):
-    world.enter_xml_in_advanced_problem(step,
+    enter_xml_in_advanced_problem(step,
         """<problem><h1>Smallest Canvas</h1>
             <p>You want to make the smallest canvas you can.</p>
             <multiplechoiceresponse>
@@ -30,7 +31,7 @@ def i_enter_bad_xml(step):
 
 @step('I edit and enter an ampersand$')
 def i_enter_bad_xml(step):
-    world.enter_xml_in_advanced_problem(step, "<problem>&</problem>")
+    enter_xml_in_advanced_problem(step, "<problem>&</problem>")
 
 
 @step('I get an error dialog$')

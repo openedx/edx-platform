@@ -115,7 +115,6 @@ def edit_component():
     world.css_click('a.edit-button')
 
 
-@world.absorb
 def enter_xml_in_advanced_problem(step, text):
     """
     Edits an advanced problem (assumes only on page),
