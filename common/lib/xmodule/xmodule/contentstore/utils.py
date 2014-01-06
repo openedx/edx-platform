@@ -45,5 +45,5 @@ def restore_asset_from_trashcan(location):
         try:
             thumbnail_content = trash.find(content.thumbnail_location)
             store.save(thumbnail_content)
-        except:
+        except Exception:
             pass  # OK if this is left dangling
