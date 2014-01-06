@@ -27,7 +27,7 @@ from django.http import HttpResponseNotFound
 import json
 from django.utils.translation import ugettext as _
 from pymongo import DESCENDING
-
+import math
 
 __all__ = ['assets_handler']
 
@@ -91,16 +91,19 @@ def _assets_json(request, location):
     """
     requested_page = int(request.REQUEST.get('page', 0))
     requested_page_size = int(request.REQUEST.get('page_size', 50))
+    sort = [('uploadDate', DESCENDING)]
+
     current_page = max(requested_page, 0)
     start = current_page * requested_page_size
-
-    old_location = loc_mapper().translate_locator_to_location(location)
-
-    course_reference = StaticContent.compute_location(old_location.org, old_location.course, old_location.name)
-    assets, total_count = contentstore().get_all_content_for_course(
-        course_reference, start=start, maxresults=requested_page_size, sort=[('uploadDate', DESCENDING)]
-    )
+    assets, total_count = _get_assets_for_page(request, location, current_page, requested_page_size, sort)
     end = start + len(assets)
+
+    # If the query is beyond the final page, then re-query the final page so that at least one asset is returned
+    if requested_page > 0 and start >= total_count:
+        current_page = int(math.floor((total_count - 1) / requested_page_size))
+        start = current_page * requested_page_size
+        assets, total_count = _get_assets_for_page(request, location, current_page, requested_page_size, sort)
+        end = start + len(assets)
 
     asset_json = []
     for asset in assets:
@@ -121,6 +124,20 @@ def _assets_json(request, location):
         'totalCount': total_count,
         'assets': asset_json
     })
+
+
+def _get_assets_for_page(request, location, current_page, page_size, sort):
+    """
+    Returns the list of assets for the specified page and page size.
+    """
+    start = current_page * page_size
+
+    old_location = loc_mapper().translate_locator_to_location(location)
+
+    course_reference = StaticContent.compute_location(old_location.org, old_location.course, old_location.name)
+    return contentstore().get_all_content_for_course(
+        course_reference, start=start, maxresults=page_size, sort=sort
+    )
 
 
 @require_POST

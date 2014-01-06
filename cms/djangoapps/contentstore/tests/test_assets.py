@@ -60,6 +60,11 @@ class AssetsToyCourseTestCase(CourseTestCase):
         self.assert_correct_asset_response(url + "?page_size=2", 0, 2, 3)
         self.assert_correct_asset_response(url + "?page_size=2&page=1", 2, 1, 3)
 
+        # Verify querying outside the range of valid pages
+        self.assert_correct_asset_response(url + "?page_size=2&page=-1", 0, 2, 3)
+        self.assert_correct_asset_response(url + "?page_size=2&page=2", 2, 1, 3)
+        self.assert_correct_asset_response(url + "?page_size=3&page=1", 0, 3, 3)
+
     def assert_correct_asset_response(self, url, expected_start, expected_length, expected_total):
         resp = self.client.get(url, HTTP_ACCEPT='application/json')
         json_response = json.loads(resp.content)
