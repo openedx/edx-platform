@@ -132,7 +132,7 @@ site_status_msg = get_site_status_msg(course_id)
     </ol>
     % endif
 
-    % if settings.FEATURES['ENABLE_LANGUAGE_CHANGE']:
+    % if settings.FEATURES['ENABLE_QRF_SETTINGS']:
         % if translation.get_language() == 'ar':
             <a class="change_to_ar" style="display: none">عربي</a>
             <a class="change_to_en" style="float: left; color: #646464; margin-top: 10px; margin-left: 20px; cursor: pointer">English</a>

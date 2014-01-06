@@ -64,7 +64,7 @@ FEATURES = {
     'ENABLE_CREATOR_GROUP': False,
 
     # Added for enabling and disabling Arabic language change.
-    'ENABLE_LANGUAGE_CHANGE': False,
+    'ENABLE_QRF_SETTINGS': False,
 }
 ENABLE_JASMINE = False
 

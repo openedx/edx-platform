@@ -128,7 +128,7 @@
         </form>
       % if user.is_authenticated():
       <nav class="nav-account nav-is-signedin nav-dd ui-right">
-        % if settings.FEATURES['ENABLE_LANGUAGE_CHANGE']:
+        % if settings.FEATURES['ENABLE_QRF_SETTINGS']:
             % if translation.get_language() == 'ar':
               <a class="change_to_ar" style="display: none">عربي</a>
               <a class="change_to_en" style="float: left; color: #646464; margin-top: 10px; margin-left: 20px; cursor: pointer">English</a>
@@ -185,7 +185,7 @@
 
       % else:
       <nav class="nav-not-signedin nav-pitch">
-        % if settings.FEATURES['ENABLE_LANGUAGE_CHANGE']:
+        % if settings.FEATURES['ENABLE_QRF_SETTINGS']:
             % if translation.get_language() == 'ar':
               <a class="change_to_ar" style="display: none">عربي</a>
               <a class="change_to_en" style="float: left; color: #646464; margin-top: 10px; margin-left: 20px; cursor: pointer">English</a>

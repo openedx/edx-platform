@@ -473,7 +473,7 @@ if settings.DEBUG:
 handler404 = 'static_template_view.views.render_404'
 handler500 = 'static_template_view.views.render_500'
 
-if settings.FEATURES.get("ENABLE_LANGUAGE_CHANGE"):
+if settings.FEATURES.get("ENABLE_QRF_SETTINGS"):
     urlpatterns += (
         url(r'^i18n/', include('django.conf.urls.i18n')),
     )

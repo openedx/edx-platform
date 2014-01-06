@@ -205,7 +205,7 @@ FEATURES = {
 
     # Added for enabling and disabling Arabic language change. (A better
     # solution to be implemented)
-    'ENABLE_LANGUAGE_CHANGE': False,
+    'ENABLE_QRF_SETTINGS': False,
 }
 
 # Used for A/B testing

@@ -12,6 +12,7 @@ from edxmako.shortcuts import marketing_link
 from util.cache import cache_if_anonymous
 
 
+@cache_if_anonymous
 @ensure_csrf_cookie
 def index(request):
     '''
@@ -36,7 +37,7 @@ def index(request):
     return student.views.index(request, user=request.user)
 
 
-
+@cache_if_anonymous
 @ensure_csrf_cookie
 def courses(request):
     """
