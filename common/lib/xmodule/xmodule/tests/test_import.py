@@ -228,9 +228,11 @@ class ImportTestCase(BaseCourseTestCase):
         # Check that the child does not inherit a value for due
         child = descriptor.get_children()[0]
         self.assertEqual(child.due, None)
+
+        # Check that the child hasn't started yet
         self.assertLessEqual(
-            child.start,
-            datetime.datetime.now(UTC())
+            datetime.datetime.now(UTC()),
+            child.start
         )
 
     def test_metadata_override_default(self):

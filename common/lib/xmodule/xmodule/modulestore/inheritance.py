@@ -17,7 +17,7 @@ class InheritanceMixin(XBlockMixin):
 
     start = Date(
         help="Start time when this module is visible",
-        default=datetime.fromtimestamp(0, UTC),
+        default=datetime(2030, 1, 1, tzinfo=UTC),
         scope=Scope.settings
     )
     due = Date(help="Date that this problem is due by", scope=Scope.settings)
