@@ -266,3 +266,40 @@ define ["jasmine", "js/spec/create_sinon", "squire"],
                 model = @collection.models[1]
                 @view.addAsset(model)
                 expect(@collection.add).not.toHaveBeenCalled()
+
+        describe "Sorting", ->
+            # Separate setup method to work-around mis-parenting of beforeEach methods
+            setup = ->
+                requests = create_sinon.requests(this)
+                @view.setPage(0)
+                create_sinon.respondWithJson(requests, @mockAssetsResponse)
+                return requests
+
+            it "should have the correct default sort order", ->
+                requests = setup.call(this)
+                expect(@view.sortDisplayName()).toBe("Date Added")
+                expect(@view.collection.sortDirection).toBe("desc")
+
+            it "should toggle the sort order when clicking on the currently sorted column", ->
+                requests = setup.call(this)
+                expect(@view.sortDisplayName()).toBe("Date Added")
+                expect(@view.collection.sortDirection).toBe("desc")
+                @view.$("#js-asset-date-col").click()
+                create_sinon.respondWithJson(requests, @mockAssetsResponse)
+                expect(@view.sortDisplayName()).toBe("Date Added")
+                expect(@view.collection.sortDirection).toBe("asc")
+                @view.$("#js-asset-date-col").click()
+                create_sinon.respondWithJson(requests, @mockAssetsResponse)
+                expect(@view.sortDisplayName()).toBe("Date Added")
+                expect(@view.collection.sortDirection).toBe("desc")
+
+            it "should switch the sort order when clicking on a different column", ->
+                requests = setup.call(this)
+                @view.$("#js-asset-name-col").click()
+                create_sinon.respondWithJson(requests, @mockAssetsResponse)
+                expect(@view.sortDisplayName()).toBe("Name")
+                expect(@view.collection.sortDirection).toBe("asc")
+                @view.$("#js-asset-name-col").click()
+                create_sinon.respondWithJson(requests, @mockAssetsResponse)
+                expect(@view.sortDisplayName()).toBe("Name")
+                expect(@view.collection.sortDirection).toBe("desc")

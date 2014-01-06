@@ -1,4 +1,4 @@
-define(["backbone.paginator", "js/models/asset"], function(BackbonePaginator, AssetModel) {
+define(["backbone.paginator", "js/models/asset", "gettext"], function(BackbonePaginator, AssetModel, gettext) {
     var AssetCollection = BackbonePaginator.requestPager.extend({
         model : AssetModel,
         paginator_core: {
@@ -15,8 +15,12 @@ define(["backbone.paginator", "js/models/asset"], function(BackbonePaginator, As
         server_api: {
             'page': function() { return this.currentPage; },
             'page_size': function() { return this.perPage; },
+            'sort': function() { return this.sortField; },
+            'direction': function() { return this.sortDirection; },
             'format': 'json'
         },
+        sortField: 'displayname', // 'uploadDate',
+        sortDirection: 'desc',
 
         parse: function(response) {
             var totalCount = response.totalCount,

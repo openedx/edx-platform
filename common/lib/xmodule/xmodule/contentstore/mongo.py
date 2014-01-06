@@ -128,7 +128,7 @@ class MongoContentStore(ContentStore):
         directory as the other policy files.
         """
         policy = {}
-        assets,__ = self.get_all_content_for_course(course_location)
+        assets, __ = self.get_all_content_for_course(course_location)
 
         for asset in assets:
             asset_location = Location(asset['_id'])
