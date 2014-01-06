@@ -41,9 +41,10 @@ def assets_handler(request, tag=None, package_id=None, branch=None, version_guid
     deleting assets, and changing the "locked" state of an asset.
 
     GET
-        html: return html page of all course assets (note though that a range of assets can be requested using start
-        and max query parameters)
-        json: not currently supported
+        html: return html page which will show all course assets. Note that only the asset container
+            is returned and that the actual assets are filled in with a client-side request.
+        json: returns a page of assets. A page parameter specifies the desired page, and the
+            optional page_size parameter indicates the number of items per page (defaults to 50).
     POST
         json: create (or update?) an asset. The only updating that can be done is changing the lock state.
     PUT
@@ -55,9 +56,10 @@ def assets_handler(request, tag=None, package_id=None, branch=None, version_guid
     if not has_access(request.user, location):
         raise PermissionDenied()
 
-    if 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
+    response_format = request.REQUEST.get('format', 'html')
+    if response_format == 'json' or 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
         if request.method == 'GET':
-            raise NotImplementedError('coming soon')
+            return _assets_json(request, location)
         else:
             return _update_asset(request, location, asset_id)
     elif request.method == 'GET':  # assume html
@@ -73,22 +75,32 @@ def _asset_index(request, location):
     Supports start (0-based index into the list of assets) and max query parameters.
     """
     old_location = loc_mapper().translate_locator_to_location(location)
-
     course_module = modulestore().get_item(old_location)
-    maxresults = request.REQUEST.get('max', None)
-    start = request.REQUEST.get('start', None)
+
+    return render_to_response('asset_index.html', {
+        'context_course': course_module,
+        'asset_callback_url': location.url_reverse('assets/', '')
+    })
+
+
+def _assets_json(request, location):
+    """
+    Display an editable asset library.
+
+    Supports start (0-based index into the list of assets) and max query parameters.
+    """
+    requested_page = int(request.REQUEST.get('page', 0))
+    requested_page_size = int(request.REQUEST.get('page_size', 50))
+    current_page = max(requested_page, 0)
+    start = current_page * requested_page_size
+
+    old_location = loc_mapper().translate_locator_to_location(location)
+
     course_reference = StaticContent.compute_location(old_location.org, old_location.course, old_location.name)
-    if maxresults is not None:
-        maxresults = int(maxresults)
-        start = int(start) if start else 0
-        assets = contentstore().get_all_content_for_course(
-            course_reference, start=start, maxresults=maxresults,
-            sort=[('uploadDate', DESCENDING)]
-        )
-    else:
-        assets = contentstore().get_all_content_for_course(
-            course_reference, sort=[('uploadDate', DESCENDING)]
-        )
+    assets, total_count = contentstore().get_all_content_for_course(
+        course_reference, start=start, maxresults=requested_page_size, sort=[('uploadDate', DESCENDING)]
+    )
+    end = start + len(assets)
 
     asset_json = []
     for asset in assets:
@@ -101,10 +113,13 @@ def _asset_index(request, location):
         asset_locked = asset.get('locked', False)
         asset_json.append(_get_asset_json(asset['displayname'], asset['uploadDate'], asset_location, thumbnail_location, asset_locked))
 
-    return render_to_response('asset_index.html', {
-        'context_course': course_module,
-        'asset_list': json.dumps(asset_json),
-        'asset_callback_url': location.url_reverse('assets/', '')
+    return JsonResponse({
+        'start': start,
+        'end': end,
+        'page': current_page,
+        'pageSize': requested_page_size,
+        'totalCount': total_count,
+        'assets': asset_json
     })
 
 
