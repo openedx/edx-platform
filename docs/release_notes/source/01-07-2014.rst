@@ -1,0 +1,40 @@
+###################################
+January 7, 2014
+###################################
+
+You can now access the public edX roadmap_ for details about the currently planned product direction.
+
+.. _roadmap: https://edx-wiki.atlassian.net/wiki/display/OPENPROD/OpenEdX+Public+Product+Roadmap
+
+
+*************
+edX Studio
+*************
+
+New documentation, *Building a Course with edX Studio* is available online_. You can also download the new guide as a PDF from the edX Studio user interface. 
+
+.. _online: http://edx.readthedocs.org/projects/ca/en/latest/
+
+
+==========================
+Changes and Updates
+==========================
+
+
+
+
+
+***************************************
+edX Learning Management System 
+***************************************
+
+
+
+
+
+******************
+Forums 
+******************
+
+
+
