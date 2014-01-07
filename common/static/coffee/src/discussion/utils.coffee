@@ -91,7 +91,7 @@ class @DiscussionUtil
 
   @activateOnEnter: (event, func) ->
     if event.which == 13
-      e.preventDefault()
+      event.preventDefault()
       func(event)
 
   @makeFocusTrap: (elem) ->
