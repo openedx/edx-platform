@@ -68,6 +68,14 @@ class AssetsToyCourseTestCase(CourseTestCase):
         self.assertEquals(len(assets), expected_length)
         self.assertEquals(json_response['totalCount'], expected_total)
 
+        # Test valid contentType for pdf asset (textbook.pdf)
+        self.assertContains(resp, "/c4x/edX/toy/asset/textbook.pdf")
+        asset_location = StaticContent.get_location_from_path('/c4x/edX/toy/asset/textbook.pdf')
+        content = contentstore().find(asset_location)
+        # Check after import textbook.pdf has valid contentType ('application/pdf')
+        # Note: Actual contentType for textbook.pdf in asset.json is 'text/pdf'
+        self.assertEqual(content.content_type, 'application/pdf')
+
 
 class UploadTestCase(CourseTestCase):
     """
