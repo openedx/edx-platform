@@ -13,13 +13,14 @@
       <h1 class="branding"><a href="/"><img src="${static.url("img/logo-edx-studio.png")}" alt="edX Studio" /></a></h1>
 
       % if context_course:
-      <% 
+      <%
             ctx_loc = context_course.location
             location = loc_mapper().translate_location(ctx_loc.course_id, ctx_loc, False, True)
             index_url = location.url_reverse('course')
             checklists_url = location.url_reverse('checklists')
             course_team_url = location.url_reverse('course_team')
             assets_url = location.url_reverse('assets')
+            textbooks_url = location.url_reverse('textbooks')
             import_url = location.url_reverse('import')
             course_info_url = location.url_reverse('course_info')
             export_url = location.url_reverse('export')
@@ -58,7 +59,7 @@
                     <a href="${assets_url}">${_("Files &amp; Uploads")}</a>
                   </li>
                   <li class="nav-item nav-course-courseware-textbooks">
-                    <a href="${reverse('textbook_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">${_("Textbooks")}</a>
+                    <a href="${textbooks_url}">${_("Textbooks")}</a>
                   </li>
                 </ul>
               </div>

@@ -10,7 +10,7 @@ from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponse
 from django.views.decorators.http import require_GET, require_POST
 
-from mitxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response
 from notification_prefs import NOTIFICATION_PREF_KEY
 from user_api.models import UserPreference
 

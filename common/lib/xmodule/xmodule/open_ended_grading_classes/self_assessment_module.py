@@ -9,7 +9,7 @@ import openendedchild
 
 from .combined_open_ended_rubric import CombinedOpenEndedRubric
 
-log = logging.getLogger("mitx.courseware")
+log = logging.getLogger("edx.courseware")
 
 
 class SelfAssessmentModule(openendedchild.OpenEndedChild):

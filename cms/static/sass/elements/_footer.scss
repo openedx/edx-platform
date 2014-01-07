@@ -23,10 +23,10 @@
     }
 
     a {
-      color: $gray;
+      color: $ui-link-color;
 
       &:hover, &:active {
-        color: $gray-d2;
+        color: $ui-link-color-focus;
       }
     }
 
@@ -37,7 +37,7 @@
 
       .nav-item {
         display: inline-block;
-        margin-right: ($baseline/2);
+        margin-right: ($baseline/4);
 
         &:last-child {
           margin-right: 0;
@@ -45,7 +45,7 @@
 
         a {
           border-radius: 2px;
-          padding: ($baseline/2) ($baseline*0.75);
+          padding: ($baseline/2) ($baseline/2);
           background: transparent;
 
           [class^="icon-"] {
@@ -54,19 +54,6 @@
             display: inline-block;
             vertical-align: middle;
             margin-right: ($baseline/4);
-            color: $gray-l1;
-          }
-
-          &:hover, &:active {
-            color: $gray-d2;
-
-            [class^="icon-"] {
-              color: $gray-d2;
-            }
-          }
-
-          &.is-active {
-            color: $gray-d2;
           }
         }
       }

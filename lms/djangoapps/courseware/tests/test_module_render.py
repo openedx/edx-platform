@@ -79,7 +79,7 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
         module = render.get_module(
             self.mock_user,
             mock_request,
-            ['i4x', 'edX', 'toy', 'html', 'toyjumpto'],
+            Location('i4x', 'edX', 'toy', 'html', 'toyjumpto'),
             field_data_cache,
             self.course_id
         )
@@ -91,10 +91,10 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
         # note if the URL mapping changes then this assertion will break
         self.assertIn('/courses/' + self.course_id + '/jump_to_id/vertical_test', html)
 
-    FEATURES_WITH_EMAIL = settings.MITX_FEATURES.copy()
+    FEATURES_WITH_EMAIL = settings.FEATURES.copy()
     FEATURES_WITH_EMAIL['SEND_USERS_EMAILADDR_WITH_CODERESPONSE'] = True
 
-    @override_settings(MITX_FEATURES=FEATURES_WITH_EMAIL)
+    @override_settings(FEATURES=FEATURES_WITH_EMAIL)
     def test_module_populated_with_user_email(self):
         """
         This tests that the module's system knows about the user's email when the appropriate flag is

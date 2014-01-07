@@ -21,7 +21,7 @@ define ["js/views/course_info_handout", "js/views/course_info_update", "js/model
         delete window.analytics
         delete window.course_location_analytics
 
-    describe "Course Updates", ->
+    xdescribe "Course Updates", ->
         courseInfoTemplate = readFixtures('course_info_update.underscore')
 
         beforeEach ->
@@ -139,7 +139,7 @@ define ["js/views/course_info_handout", "js/views/course_info_update", "js/model
         it "does not remove existing course info on click outside modal", ->
             @cancelExistingCourseInfo(false)
 
-    describe "Course Handouts", ->
+    xdescribe "Course Handouts", ->
         handoutsTemplate = readFixtures('course_info_handouts.underscore')
 
         beforeEach ->

@@ -2,7 +2,7 @@
 This is the common settings file, intended to set sane defaults. If you have a
 piece of configuration that's dependent on a set of feature flags being set,
 then create a function that returns the calculated value based on the value of
-MITX_FEATURES[...]. Modules that extend this one can change the feature
+FEATURES[...]. Modules that extend this one can change the feature
 configuration in an environment specific config file and re-calculate those
 values.
 
@@ -14,7 +14,7 @@ Longer TODO:
 1. Right now our treatment of static content in general and in particular
    course-specific static content is haphazard.
 2. We should have a more disciplined approach to feature flagging, even if it
-   just means that we stick them in a dict called MITX_FEATURES.
+   just means that we stick them in a dict called FEATURES.
 3. We need to handle configuration for multiple courses. This could be as
    multiple sites, but we do need a way to map their data assets.
 """
@@ -50,7 +50,7 @@ DISCUSSION_SETTINGS = {
 
 
 # Features
-MITX_FEATURES = {
+FEATURES = {
     'SAMPLE': False,
     'USE_DJANGO_PIPELINE': True,
     'DISPLAY_HISTOGRAMS_TO_STAFF': True,
@@ -88,6 +88,8 @@ MITX_FEATURES = {
     'ENABLE_MANUAL_GIT_RELOAD': False,
 
     'ENABLE_MASQUERADE': True,  # allow course staff to change to student view of courseware
+
+    'ENABLE_SYSADMIN_DASHBOARD': False,  # sysadmin dashboard, to see what courses are loaded, to delete & load courses
 
     'DISABLE_LOGIN_BUTTON': False,  # used in systems where login is automatic, eg MIT SSL
 
@@ -232,7 +234,7 @@ ANONYMOUS_USER_EMAIL = 'noreply@example.com'
 PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /edx-platform/lms
 REPO_ROOT = PROJECT_ROOT.dirname()
 COMMON_ROOT = REPO_ROOT / "common"
-ENV_ROOT = REPO_ROOT.dirname()  # virtualenv dir /mitx is in
+ENV_ROOT = REPO_ROOT.dirname()  # virtualenv dir /edx-platform is in
 COURSES_ROOT = ENV_ROOT / "data"
 
 DATA_DIR = COURSES_ROOT
@@ -261,7 +263,7 @@ STATUS_MESSAGE_PATH = ENV_ROOT / "status_message.json"
 ############################ OpenID Provider  ##################################
 OPENID_PROVIDER_TRUSTED_ROOTS = ['cs50.net', '*.cs50.net']
 
-################################## MITXWEB #####################################
+################################## EDX WEB #####################################
 # This is where we stick our compiled template files. Most of the app uses Mako
 # templates
 from tempdir import mkdtemp_clean
@@ -297,7 +299,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'course_wiki.course_nav.context_processor',
 
     # Hack to get required link URLs to password reset templates
-    'mitxmako.shortcuts.marketing_link_context_processor',
+    'edxmako.shortcuts.marketing_link_context_processor',
 
     # Include TEMPLATE_VISIBLE_SETTINGS in templates
     'settings_context_processor.context_processors.settings',
@@ -329,10 +331,10 @@ RSS_TIMEOUT = 600
 STATIC_GRAB = False
 DEV_CONTENT = True
 
-MITX_ROOT_URL = ''
+EDX_ROOT_URL = ''
 
-LOGIN_REDIRECT_URL = MITX_ROOT_URL + '/accounts/login'
-LOGIN_URL = MITX_ROOT_URL + '/accounts/login'
+LOGIN_REDIRECT_URL = EDX_ROOT_URL + '/accounts/login'
+LOGIN_URL = EDX_ROOT_URL + '/accounts/login'
 
 COURSE_NAME = "6.002_Spring_2012"
 COURSE_NUMBER = "6.002x"
@@ -340,7 +342,7 @@ COURSE_TITLE = "Circuits and Electronics"
 
 ### Dark code. Should be enabled in local settings for devel.
 
-ENABLE_MULTICOURSE = False  # set to False to disable multicourse display (see lib.util.views.mitxhome)
+ENABLE_MULTICOURSE = False  # set to False to disable multicourse display (see lib.util.views.edXhome)
 
 WIKI_ENABLED = False
 
@@ -379,7 +381,7 @@ TRACKING_BACKENDS = {
 
 # Backwards compatibility with ENABLE_SQL_TRACKING_LOGS feature flag.
 # In the future, adding the backend to TRACKING_BACKENDS enough.
-if MITX_FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):
+if FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):
     TRACKING_BACKENDS.update({
         'sql': {
             'ENGINE': 'track.backends.django.DjangoBackend'
@@ -463,6 +465,7 @@ SITE_NAME = "edx.org"
 HTTPS = 'on'
 ROOT_URLCONF = 'lms.urls'
 IGNORABLE_404_ENDS = ('favicon.ico')
+# NOTE: Please set ALLOWED_HOSTS to some sane value, as we do not allow the default '*'
 
 # Platform Email
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
@@ -509,7 +512,7 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 # gitreload is used in LMS-workflow to pull content from github
 # gitreload requests are only allowed from these IP addresses, which are
 # the advertised public IPs of the github WebHook servers.
-# These are listed, eg at https://github.com/MITx/mitx/admin/hooks
+# These are listed, eg at https://github.com/edx/edx-platform/admin/hooks
 
 ALLOWED_GITRELOAD_IPS = ['207.97.227.253', '50.57.128.197', '108.171.174.178']
 
@@ -611,8 +614,8 @@ STATICFILES_FINDERS = (
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
-    'mitxmako.makoloader.MakoFilesystemLoader',
-    'mitxmako.makoloader.MakoAppDirectoriesLoader',
+    'edxmako.makoloader.MakoFilesystemLoader',
+    'edxmako.makoloader.MakoAppDirectoriesLoader',
 
     # 'django.template.loaders.filesystem.Loader',
     # 'django.template.loaders.app_directories.Loader',
@@ -634,7 +637,7 @@ MIDDLEWARE_CLASSES = (
 
     'django.contrib.messages.middleware.MessageMiddleware',
     'track.middleware.TrackMiddleware',
-    'mitxmako.middleware.MakoMiddleware',
+    'edxmako.middleware.MakoMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
 
     'course_wiki.course_nav.Middleware',
@@ -836,11 +839,15 @@ PIPELINE_JS_COMPRESSOR = None
 STATICFILES_IGNORE_PATTERNS = (
     "sass/*",
     "coffee/*",
+
+    # Symlinks used by js-test-tool
+    "xmodule_js",
+    "common_static",
 )
 
 PIPELINE_YUI_BINARY = 'yui-compressor'
 
-# Setting that will only affect the MITx version of django-pipeline until our changes are merged upstream
+# Setting that will only affect the edX version of django-pipeline until our changes are merged upstream
 PIPELINE_COMPILE_INPLACE = True
 
 ################################# CELERY ######################################
@@ -948,7 +955,7 @@ INSTALLED_APPS = (
     'service_status',
 
     # For asset pipelining
-    'mitxmako',
+    'edxmako',
     'pipeline',
     'staticfiles',
     'static_replace',
@@ -964,6 +971,7 @@ INSTALLED_APPS = (
     'eventtracking.django',
     'util',
     'certificates',
+    'dashboard',
     'instructor',
     'instructor_task',
     'open_ended_grading',
@@ -1048,7 +1056,7 @@ MKTG_URL_LINK_MAP = {
 # These settings' values will be exposed to all templates
 TEMPLATE_VISIBLE_SETTINGS = [
     "FAVICON_PATH",
-    "MITX_FEATURES",
+    "FEATURES",
     "PLATFORM_NAME",
     "SITE_NAME",
     # TODO: augment me
@@ -1071,7 +1079,7 @@ def enable_theme(theme_name):
     THEME_NAME = "stanford"
     enable_theme(THEME_NAME)
     """
-    MITX_FEATURES['USE_CUSTOM_THEME'] = True
+    FEATURES['USE_CUSTOM_THEME'] = True
 
     # Ensure the theme name is visible in templates
     TEMPLATE_VISIBLE_SETTINGS.append("THEME_NAME")
@@ -1096,11 +1104,11 @@ VERIFY_STUDENT = {
 
 ########################## CLASS DASHBOARD ########################
 INSTALLED_APPS += ('class_dashboard',)
-MITX_FEATURES['CLASS_DASHBOARD'] = False
+FEATURES['CLASS_DASHBOARD'] = False
 
 ######################## CAS authentication ###########################
 
-if MITX_FEATURES.get('AUTH_USE_CAS'):
+if FEATURES.get('AUTH_USE_CAS'):
     CAS_SERVER_URL = 'https://provide_your_cas_url_here'
     AUTHENTICATION_BACKENDS = (
         'django.contrib.auth.backends.ModelBackend',

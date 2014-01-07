@@ -17,7 +17,7 @@ from django.core.urlresolvers import reverse
 
 from student.models import CourseEnrollment
 from student.tests.factories import AdminFactory, NonRegisteredUserFactory
-from mitxmako.middleware import MakoMiddleware
+from edxmako.middleware import MakoMiddleware
 
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
@@ -86,8 +86,8 @@ class ViewsTestCase(TestCase):
         chapter = 'Overview'
         self.chapter_url = '%s/%s/%s' % ('/courses', self.course_id, chapter)
 
-    @unittest.skipUnless(settings.MITX_FEATURES.get('ENABLE_SHOPPING_CART'), "Shopping Cart not enabled in settings")
-    @patch.dict(settings.MITX_FEATURES, {'ENABLE_PAID_COURSE_REGISTRATION': True})
+    @unittest.skipUnless(settings.FEATURES.get('ENABLE_SHOPPING_CART'), "Shopping Cart not enabled in settings")
+    @patch.dict(settings.FEATURES, {'ENABLE_PAID_COURSE_REGISTRATION': True})
     def test_course_about_in_cart(self):
         in_cart_span = '<span class="add-to-cart">'
         # don't mock this course due to shopping cart existence checking

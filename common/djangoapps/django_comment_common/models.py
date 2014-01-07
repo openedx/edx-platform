@@ -32,13 +32,8 @@ def assign_default_role(sender, instance, **kwargs):
     #     instance.user.roles.remove(*course_roles)
     #     return
 
-    # We've enrolled the student, so make sure they have a default role
-    if instance.user.is_staff:
-        role = Role.objects.get_or_create(course_id=instance.course_id, name="Moderator")[0]
-    else:
-        role = Role.objects.get_or_create(course_id=instance.course_id, name="Student")[0]
-
-    logging.info("assign_default_role: adding %s as %s" % (instance.user, role))
+    # We've enrolled the student, so make sure they have the Student role
+    role = Role.objects.get_or_create(course_id=instance.course_id, name="Student")[0]
     instance.user.roles.add(role)
 
 

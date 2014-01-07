@@ -21,7 +21,7 @@ from django.core.mail import send_mail
 from student.models import Registration
 import student
 from cme_registration.models import CmeUserProfile
-from mitxmako.shortcuts import render_to_response, render_to_string
+from edxmako.shortcuts import render_to_response, render_to_string
 
 log = logging.getLogger("mitx.student")
 
@@ -154,8 +154,8 @@ def cme_create_account(request, post_override=None):
     message = render_to_string('emails/activation_email.txt', email_dict)
 
     try:
-        if settings.MITX_FEATURES.get('REROUTE_ACTIVATION_EMAIL'):
-            dest_addr = settings.MITX_FEATURES['REROUTE_ACTIVATION_EMAIL']
+        if settings.FEATURES.get('REROUTE_ACTIVATION_EMAIL'):
+            dest_addr = settings.FEATURES['REROUTE_ACTIVATION_EMAIL']
             message = ("Activation for %s (%s): %s\n" % (user, user.email, cme_user_profile.name) +
                        '-' * 80 + '\n\n' + message)
             send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [dest_addr], fail_silently=False)

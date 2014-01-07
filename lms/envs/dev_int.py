@@ -16,7 +16,7 @@ use *.dev domains instead for local testing.
 
 from .dev import *
 
-MITX_FEATURES['SUBDOMAIN_COURSE_LISTINGS'] = True
+FEATURES['SUBDOMAIN_COURSE_LISTINGS'] = True
 
 COURSE_LISTINGS = {
     'default': ['BerkeleyX/CS169.1x/2012_Fall',

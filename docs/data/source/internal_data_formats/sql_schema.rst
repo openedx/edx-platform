@@ -374,6 +374,29 @@ A row in this table represents a student's enrollment for a particular course ru
   String indicating what kind of enrollment this was. The default is "honor" (honor certificate) and all enrollments prior to 2013-08-20 will be of that type. Other types being considered are "audit" and "verified_id".
 
 
+`user_id_map`
+==========================
+A row in this table maps a student's real user ID to an anonymous ID generated to obfuscate the student's identity.
+
+`id`
+----
+  Primary key.
+
+`user_id`
+---------
+  Student's ID in `auth_user.id`
+
+`anonymous_user_id`
+-----------
+ The user ID generated to obfuscate the student's identity.
+
+`course_id`
+-----------
+  The ID of the course run the student is enrolled in.
+
+
+
+
 *******************
 Courseware Progress
 *******************

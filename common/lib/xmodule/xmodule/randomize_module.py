@@ -9,7 +9,7 @@ from lxml import etree
 from xblock.fields import Scope, Integer
 from xblock.fragment import Fragment
 
-log = logging.getLogger('mitx.' + __name__)
+log = logging.getLogger('edx.' + __name__)
 
 
 class RandomizeFields(object):

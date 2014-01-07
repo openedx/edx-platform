@@ -30,6 +30,9 @@ class ResponseTest(unittest.TestCase):
 
     xml_factory_class = None
 
+    # If something is wrong, show it to us.
+    maxDiff = None
+
     def setUp(self):
         if self.xml_factory_class:
             self.xml_factory = self.xml_factory_class()

@@ -19,11 +19,11 @@ from student.models import Registration, UserProfile
 from cme_registration.models import CmeUserProfile
 from student.tests.factories import UserFactory
 from cme_registration.views import DENIED_COUNTRIES, validate_export_controls, setup_sub_affiliation_field
-TEST_MITX_FEATURES = settings.MITX_FEATURES.copy()
-TEST_MITX_FEATURES['USE_CME_REGISTRATION'] = True
+TEST_FEATURES = settings.FEATURES.copy()
+TEST_FEATURES['USE_CME_REGISTRATION'] = True
 
 
-@override_settings(MITX_FEATURES=TEST_MITX_FEATURES)
+@override_settings(FEATURES=TEST_FEATURES)
 class TestCmeRegistration(TestCase):
     """
     Check registration using CME registration functionality
@@ -63,7 +63,7 @@ class TestCmeRegistration(TestCase):
                           'county_province': 'county_province',
                           }
 
-    @unittest.skipIf(settings.MITX_FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
+    @unittest.skipIf(settings.FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
                      dedent("""Skipping Test because the url is not in CMS"""))
     def test_badly_formed_message(self):
 
@@ -71,7 +71,7 @@ class TestCmeRegistration(TestCase):
         response = self.client.post(url, {})
         self.assertContains(response, '{"field": "username", "value": "Error (401 username). E-mail us.", "success": false}')
 
-    @unittest.skipIf(settings.MITX_FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
+    @unittest.skipIf(settings.FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
                      dedent("""Skipping Test because the url is not in CMS"""))
     def test_last_name_required(self):
 
@@ -81,7 +81,7 @@ class TestCmeRegistration(TestCase):
 
         self.assertContains(response, '{"field": "last_name", "value": "Enter your last name", "success": false}')
 
-    @unittest.skipIf(settings.MITX_FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
+    @unittest.skipIf(settings.FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
                      dedent("""Skipping Test because the url is not in CMS"""))
     def test_first_name_required(self):
 
@@ -91,7 +91,7 @@ class TestCmeRegistration(TestCase):
 
         self.assertContains(response, '{"field": "first_name", "value": "Enter your first name", "success": false}')
 
-    @unittest.skipIf(settings.MITX_FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
+    @unittest.skipIf(settings.FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
                      dedent("""Skipping Test because the url is not in CMS"""))
     def test_middle_initial_length(self):
 
@@ -101,7 +101,7 @@ class TestCmeRegistration(TestCase):
 
         self.assertContains(response, '{"field": "middle_initial", "value": "Enter your middle initial as a single character", "success": false}')
 
-    @unittest.skipIf(settings.MITX_FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
+    @unittest.skipIf(settings.FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
                      dedent("""Skipping Test because the url is not in CMS"""))
     def test_birth_date_required(self):
 
@@ -111,7 +111,7 @@ class TestCmeRegistration(TestCase):
 
         self.assertContains(response, '{"field": "birth_date", "value": "Enter your birth date", "success": false}')
 
-    @unittest.skipIf(settings.MITX_FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
+    @unittest.skipIf(settings.FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
                      dedent("""Skipping Test because the url is not in CMS"""))
     def test_birth_date_format1(self):
 
@@ -121,7 +121,7 @@ class TestCmeRegistration(TestCase):
 
         self.assertContains(response, '{"field": "birth_date", "value": "Enter your birth date as MM/DD", "success": false}')
 
-    @unittest.skipIf(settings.MITX_FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
+    @unittest.skipIf(settings.FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
                      dedent("""Skipping Test because the url is not in CMS"""))
     def test_birth_date_format2(self):
 
@@ -131,7 +131,7 @@ class TestCmeRegistration(TestCase):
 
         self.assertContains(response, '{"field": "birth_date", "value": "month must be in 1..12", "success": false}')
 
-    @unittest.skipIf(settings.MITX_FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
+    @unittest.skipIf(settings.FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
                      dedent("""Skipping Test because the url is not in CMS"""))
     def test_professional_designation_required(self):
 
@@ -141,7 +141,7 @@ class TestCmeRegistration(TestCase):
 
         self.assertContains(response, '{"field": "professional_designation", "value": "Choose your professional designation", "success": false}')
 
-    @unittest.skipIf(settings.MITX_FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
+    @unittest.skipIf(settings.FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
                      dedent("""Skipping Test because the url is not in CMS"""))
     def test_license_number_required(self):
 
@@ -152,7 +152,7 @@ class TestCmeRegistration(TestCase):
 
         self.assertContains(response, '{"field": "license_number", "value": "Enter your license number", "success": false}')
 
-    @unittest.skipIf(settings.MITX_FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
+    @unittest.skipIf(settings.FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
                      dedent("""Skipping Test because the url is not in CMS"""))
     def test_license_country_required(self):
 
@@ -163,7 +163,7 @@ class TestCmeRegistration(TestCase):
 
         self.assertContains(response, '{"field": "license_country", "value": "Choose your license country", "success": false}')
 
-    @unittest.skipIf(settings.MITX_FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
+    @unittest.skipIf(settings.FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
                      dedent("""Skipping Test because the url is not in CMS"""))
     def test_license_state_required(self):
 
@@ -174,7 +174,7 @@ class TestCmeRegistration(TestCase):
 
         self.assertContains(response, '{"field": "license_state", "value": "Choose your license state", "success": false}')
 
-    @unittest.skipIf(settings.MITX_FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
+    @unittest.skipIf(settings.FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
                      dedent("""Skipping Test because the url is not in CMS"""))
     def test_physician_status_required(self):
 
@@ -185,7 +185,7 @@ class TestCmeRegistration(TestCase):
 
         self.assertContains(response, '{"field": "physician_status", "value": "Enter your physician status", "success": false}')
 
-    @unittest.skipIf(settings.MITX_FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
+    @unittest.skipIf(settings.FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
                      dedent("""Skipping Test because the url is not in CMS"""))
     def test_patient_population_required(self):
 
@@ -196,7 +196,7 @@ class TestCmeRegistration(TestCase):
 
         self.assertContains(response, '{"field": "patient_population", "value": "Choose your patient population", "success": false}')
 
-    @unittest.skipIf(settings.MITX_FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
+    @unittest.skipIf(settings.FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
                      dedent("""Skipping Test because the url is not in CMS"""))
     def test_specialty_required(self):
 
@@ -207,7 +207,7 @@ class TestCmeRegistration(TestCase):
 
         self.assertContains(response, '{"field": "specialty", "value": "Choose your specialty", "success": false}')
 
-    @unittest.skipIf(settings.MITX_FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
+    @unittest.skipIf(settings.FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
                      dedent("""Skipping Test because the url is not in CMS"""))
     def test_sub_specialty_not_required(self):
 
@@ -217,7 +217,7 @@ class TestCmeRegistration(TestCase):
 
         self.assertContains(response, '"success": true')
 
-    @unittest.skipIf(settings.MITX_FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
+    @unittest.skipIf(settings.FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
                      dedent("""Skipping Test because the url is not in CMS"""))
     def test_sub_affiliation_field(self):
 
@@ -247,7 +247,7 @@ class TestCmeRegistration(TestCase):
 
         self.assertContains(response, '{"field": "sub_affiliation", "value": "Enter your Packard Children\'s Health Alliance affiliation", "success": false}')
 
-    @unittest.skipIf(settings.MITX_FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
+    @unittest.skipIf(settings.FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
                      dedent("""Skipping Test because the url is not in CMS"""))
     def test_sunet_id_required(self):
 
@@ -258,7 +258,7 @@ class TestCmeRegistration(TestCase):
 
         self.assertContains(response, '{"field": "sunet_id", "value": "Enter your SUNet ID", "success": false}')
 
-    @unittest.skipIf(settings.MITX_FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
+    @unittest.skipIf(settings.FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
                      dedent("""Skipping Test because the url is not in CMS"""))
     def test_stanford_department_required(self):
 
@@ -269,7 +269,7 @@ class TestCmeRegistration(TestCase):
 
         self.assertContains(response, '{"field": "stanford_department", "value": "Choose your Stanford department", "success": false}')
 
-    @unittest.skipIf(settings.MITX_FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
+    @unittest.skipIf(settings.FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
                      dedent("""Skipping Test because the url is not in CMS"""))
     def test_address_1_required(self):
 
@@ -279,7 +279,7 @@ class TestCmeRegistration(TestCase):
 
         self.assertContains(response, '{"field": "address_1", "value": "Enter your Address 1", "success": false}')
 
-    @unittest.skipIf(settings.MITX_FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
+    @unittest.skipIf(settings.FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
                      dedent("""Skipping Test because the url is not in CMS"""))
     def test_city_required(self):
 
@@ -289,7 +289,7 @@ class TestCmeRegistration(TestCase):
 
         self.assertContains(response, '{"field": "city", "value": "Enter your city", "success": false}')
 
-    @unittest.skipIf(settings.MITX_FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
+    @unittest.skipIf(settings.FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
                      dedent("""Skipping Test because the url is not in CMS"""))
     def test_country_required(self):
 
@@ -299,7 +299,7 @@ class TestCmeRegistration(TestCase):
 
         self.assertContains(response, '{"field": "country", "value": "Choose your country", "success": false}')
 
-    @unittest.skipIf(settings.MITX_FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
+    @unittest.skipIf(settings.FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
                      dedent("""Skipping Test because the url is not in CMS"""))
     def test_state_required(self):
 
@@ -310,7 +310,7 @@ class TestCmeRegistration(TestCase):
 
         self.assertContains(response, '{"field": "state", "value": "Choose your state", "success": false}')
 
-    @unittest.skipIf(settings.MITX_FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
+    @unittest.skipIf(settings.FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
                      dedent("""Skipping Test because the url is not in CMS"""))
     def test_postal_code_required(self):
 
@@ -320,7 +320,7 @@ class TestCmeRegistration(TestCase):
 
         self.assertContains(response, '{"field": "postal_code", "value": "Enter your postal code", "success": false}')
 
-    @unittest.skipIf(settings.MITX_FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
+    @unittest.skipIf(settings.FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
                      dedent("""Skipping Test because the url is not in CMS"""))
     def test_specialty_other(self):
 
@@ -331,7 +331,7 @@ class TestCmeRegistration(TestCase):
 
         self.assertContains(response, '{"field": "specialty", "value": "Enter your specialty.", "success": false}')
 
-    @unittest.skipIf(settings.MITX_FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
+    @unittest.skipIf(settings.FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
                      dedent("""Skipping Test because the url is not in CMS"""))
     def test_sub_specialty_other(self):
 
@@ -342,7 +342,7 @@ class TestCmeRegistration(TestCase):
 
         self.assertContains(response, '{"field": "sub_specialty", "value": "Enter your sub-specialty.", "success": false}')
 
-    @unittest.skipIf(settings.MITX_FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
+    @unittest.skipIf(settings.FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
                      dedent("""Skipping Test because the url is not in CMS"""))
     def test_honor_code_required(self):
 
@@ -352,7 +352,7 @@ class TestCmeRegistration(TestCase):
 
         self.assertContains(response, '{"field": "honor_code", "value": "To enroll, you must follow the honor code.", "success": false}')
 
-    @unittest.skipIf(settings.MITX_FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
+    @unittest.skipIf(settings.FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
                      dedent("""Skipping Test because the url is not in CMS"""))
     def test_tos_required(self):
 
@@ -362,7 +362,7 @@ class TestCmeRegistration(TestCase):
 
         self.assertContains(response, '{"field": "terms_of_service", "value": "You must accept the terms of service.", "success": false}')
 
-    @unittest.skipIf(settings.MITX_FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
+    @unittest.skipIf(settings.FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
                      dedent("""Skipping Test because the url is not in CMS"""))
     def test_db_records_created(self):
 
@@ -414,7 +414,7 @@ class TestCmeRegistration(TestCase):
         user_profile = UserProfile.objects.filter(user=user[0])
         self.assertEqual(1, len(user_profile))
 
-    @unittest.skipIf(settings.MITX_FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
+    @unittest.skipIf(settings.FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
                      dedent("""Skipping Test because the url is not in CMS"""))
     def test_db_records_with_others_created(self):
 
@@ -474,7 +474,7 @@ class TestCmeRegistration(TestCase):
         user_profile = UserProfile.objects.filter(user=user[0])
         self.assertEqual(1, len(user_profile))
 
-    @unittest.skipIf(settings.MITX_FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
+    @unittest.skipIf(settings.FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
                      dedent("""Skipping Test because the url is not in CMS"""))
     def test_valid_email(self):
 
@@ -484,7 +484,7 @@ class TestCmeRegistration(TestCase):
 
         self.assertContains(response, '{"field": "email", "value": "Valid e-mail is required.", "success": false}')
 
-    @unittest.skipIf(settings.MITX_FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
+    @unittest.skipIf(settings.FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
                      dedent("""Skipping Test because the url is not in CMS"""))
     def test_valid_username(self):
 
@@ -494,7 +494,7 @@ class TestCmeRegistration(TestCase):
 
         self.assertContains(response, '{"field": "username", "value": "Username should only consist of A-Z and 0-9, with no spaces.", "success": false}')
 
-    @unittest.skipIf(settings.MITX_FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
+    @unittest.skipIf(settings.FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
                      dedent("""Skipping Test because the url is not in CMS"""))
     def test_dupe_username(self):
 
@@ -506,7 +506,7 @@ class TestCmeRegistration(TestCase):
 
         self.assertContains(response, '{"field": "username", "value": "An account with the Public Username  \'student001\' already exists.", "success": false}')
 
-    @unittest.skipIf(settings.MITX_FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
+    @unittest.skipIf(settings.FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
                      dedent("""Skipping Test because the url is not in CMS"""))
     def test_register_when_logged_in(self):
 
@@ -517,7 +517,7 @@ class TestCmeRegistration(TestCase):
         response = self.client.post(url, {})
         self.assertRedirects(response, reverse('dashboard'), status_code=302)
 
-    @unittest.skipIf(settings.MITX_FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
+    @unittest.skipIf(settings.FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
                      dedent("""Skipping Test because the url is not in CMS"""))
     def test_register_page_loads(self):
 
@@ -525,11 +525,11 @@ class TestCmeRegistration(TestCase):
         response = self.client.post(url, {})
         self.assertEqual(response.status_code, 200)
 
-    @unittest.skipIf(settings.MITX_FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
+    @unittest.skipIf(settings.FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
                      dedent("""Skipping Test because the url is not in CMS"""))
     def test_reroute_activation_email(self):
 
-        settings.MITX_FEATURES['REROUTE_ACTIVATION_EMAIL'] = 'a@b.edu'
+        settings.FEATURES['REROUTE_ACTIVATION_EMAIL'] = 'a@b.edu'
 
         url = reverse('create_account')
         response = self.client.post(url, self.post_vars)
@@ -538,7 +538,7 @@ class TestCmeRegistration(TestCase):
         self.assertContains(response, '"success": true')
 
     @patch('cme_registration.models.CmeUserProfile.save', Mock(side_effect=Exception()))
-    @unittest.skipIf(settings.MITX_FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
+    @unittest.skipIf(settings.FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
                      dedent("""Skipping Test because the url is not in CMS"""))
     def test_save_profile_exception(self):
 
@@ -549,7 +549,7 @@ class TestCmeRegistration(TestCase):
         self.assertEqual(0, len(cme_user_profile))
 
     @patch('django.contrib.auth.models.User.email_user', Mock(side_effect=Exception()))
-    @unittest.skipIf(settings.MITX_FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
+    @unittest.skipIf(settings.FEATURES.get('DISABLE_CME_REGISTRATION_TESTS', False),
                      dedent("""Skipping Test because the url is not in CMS"""))
     def test_activation_email_exception(self):
 

@@ -1,4 +1,5 @@
 ## mako
+<%! from django.utils.translation import ugettext as _ %>
 <%page args="active_page=None" />
 
 <%
@@ -22,7 +23,7 @@ def url_class(is_active):
 % if course and user.is_authenticated() and not UserProfile.has_registered(user):
   <p class="unauth-warning">
   <%
-  if settings.MITX_FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD'):
+  if settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD'):
     reg_url = reverse('course-specific-register', args=[course.id])
   else:
     reg_url = reverse('register_user')

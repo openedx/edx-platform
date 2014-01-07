@@ -33,7 +33,7 @@ MODULESTORE = {
                     'OPTIONS': {
                         'default_class': 'xmodule.raw_module.RawDescriptor',
                         'fs_root': DATA_DIR,
-                        'render_template': 'mitxmako.shortcuts.render_to_string',
+                        'render_template': 'edxmako.shortcuts.render_to_string',
                     }
                 }
             },

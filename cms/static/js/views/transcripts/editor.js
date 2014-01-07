@@ -90,7 +90,17 @@ function($, Backbone, _, Utils, MetadataView, MetadataCollection) {
             var isSubsModified = (function (values) {
                 var isSubsChanged = subs.hasChanged("value");
 
-                return Boolean(isSubsChanged && _.isString(values.sub));
+                return Boolean(
+                    isSubsChanged &&
+                    (
+                        // If the user changes the field, `values.sub` contains
+                        // string value;
+                        // If the user clicks `clear` button, the field contains
+                        // null value.
+                        // Otherwise, undefined.
+                        _.isString(values.sub) || _.isNull(subs.getValue())
+                    )
+                );
             }(modifiedValues));
 
             // When we change value of `sub` field in the `Advanced`,

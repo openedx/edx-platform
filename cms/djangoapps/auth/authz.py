@@ -63,7 +63,7 @@ def get_all_course_role_groupnames(location, role, use_filter=True):
     # filter to the ones which exist
     default = groupnames[0]
     if use_filter:
-        groupnames = [group for group in groupnames if Group.objects.filter(name=group).exists()]
+        groupnames = [group.name for group in Group.objects.filter(name__in=groupnames)]
     return groupnames, default
 
 
@@ -203,12 +203,8 @@ def remove_user_from_course_group(caller, user, location, role):
 
     # see if the user is actually in that role, if not then we don't have to do anything
     groupnames, _ = get_all_course_role_groupnames(location, role)
-    for groupname in groupnames:
-        groups = user.groups.filter(name=groupname)
-        if groups:
-            # will only be one with that name
-            user.groups.remove(groups[0])
-            user.save()
+    user.groups.remove(*user.groups.filter(name__in=groupnames))
+    user.save()
 
 
 def remove_user_from_creator_group(caller, user):
@@ -243,7 +239,7 @@ def is_user_in_course_group_role(user, location, role, check_staff=True):
         if check_staff and user.is_staff:
             return True
         groupnames, _ = get_all_course_role_groupnames(location, role)
-        return any(user.groups.filter(name=groupname).exists() for groupname in groupnames)
+        return user.groups.filter(name__in=groupnames).exists()
 
     return False
 
@@ -261,12 +257,12 @@ def is_user_in_creator_group(user):
         return True
 
     # On edx, we only allow edX staff to create courses. This may be relaxed in the future.
-    if settings.MITX_FEATURES.get('DISABLE_COURSE_CREATION', False):
+    if settings.FEATURES.get('DISABLE_COURSE_CREATION', False):
         return False
 
     # Feature flag for using the creator group setting. Will be removed once the feature is complete.
-    if settings.MITX_FEATURES.get('ENABLE_CREATOR_GROUP', False):
-        return user.groups.filter(name=COURSE_CREATOR_GROUP_NAME).count() > 0
+    if settings.FEATURES.get('ENABLE_CREATOR_GROUP', False):
+        return user.groups.filter(name=COURSE_CREATOR_GROUP_NAME).exists()
 
     return True
 

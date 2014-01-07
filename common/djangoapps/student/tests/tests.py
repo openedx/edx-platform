@@ -82,7 +82,7 @@ class ResetPasswordTests(TestCase):
         self.assertEquals(bad_email_resp.content, json.dumps({'success': True,
                                                               'value': "('registration/password_reset_done.html', [])"}))
 
-    @unittest.skipUnless(not settings.MITX_FEATURES.get('DISABLE_PASSWORD_RESET_EMAIL_TEST', False),
+    @unittest.skipIf(settings.FEATURES.get('DISABLE_RESET_EMAIL_TEST', False),
                          dedent("""Skipping Test because CMS has not provided necessary templates for password reset.
                                 If LMS tests print this message, that needs to be fixed."""))
     @patch('django.core.mail.send_mail')
@@ -512,7 +512,7 @@ class PaidRegistrationTest(ModuleStoreTestCase):
         self.assertIsNotNone(self.course)
         self.user = UserFactory(username="jack", email="jack@fake.edx.org")
 
-    @unittest.skipUnless(settings.MITX_FEATURES.get('ENABLE_SHOPPING_CART'), "Shopping Cart not enabled in settings")
+    @unittest.skipUnless(settings.FEATURES.get('ENABLE_SHOPPING_CART'), "Shopping Cart not enabled in settings")
     def test_change_enrollment_add_to_cart(self):
         request = self.req_factory.post(reverse('change_enrollment'), {'course_id': self.course.id,
                                                                        'enrollment_action': 'add_to_cart'})

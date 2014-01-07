@@ -23,7 +23,7 @@
   {% compressed_js 'main_vendor' %}
   {% endblock %}
   {% block headextra %}{% endblock %}
-  {% if MITX_FEATURES.USE_CUSTOM_THEME %}
+  {% if FEATURES.USE_CUSTOM_THEME %}
     {% include "theme-head-extra.html" %}
   {% endif %}
   {% render_block "css" %}
@@ -33,12 +33,12 @@
   <script src="{% static 'js/html5shiv.js' %}"></script>
   <![endif]-->
 
-  <meta name="path_prefix" content="{{MITX_ROOT_URL}}">
+  <meta name="path_prefix" content="{{EDX_ROOT_URL}}">
 </head>
 
 <body class="{% block bodyclass %}{% endblock %}">
   <a class="nav-skip" href="#content">{% trans "Skip to this view's content" %}</a>
-  {% if MITX_FEATURES.USE_CUSTOM_THEME %}
+  {% if FEATURES.USE_CUSTOM_THEME %}
     {% include "theme-header.html" %}
   {% else %}
     {% include "navigation.html" %}
@@ -49,7 +49,7 @@
     {% block bodyextra %}{% endblock %}
   </section>
 
-  {% if MITX_FEATURES.USE_CUSTOM_THEME %}
+  {% if FEATURES.USE_CUSTOM_THEME %}
     {% include "theme-footer.html" %}
   {% else %}
     {% include "footer.html" %}

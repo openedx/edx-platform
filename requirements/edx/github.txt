@@ -7,7 +7,7 @@
 # Python libraries to install directly from github
 
 # Third-party:
--e git+https://github.com/edx/django-staticfiles.git@6d2504e5c8#egg=django-staticfiles
+-e git+https://github.com/edx/django-staticfiles.git@d89aae2a82f2b#egg=django-staticfiles
 -e git+https://github.com/edx/django-pipeline.git@88ec8a011e481918fdc9d2682d4017c835acd8be#egg=django-pipeline
 -e git+https://github.com/edx/django-wiki.git@41815e2ef1b0323f92900f8e60711b0f0c37766b#egg=django-wiki
 -e git+https://github.com/edx/lettuce.git@503fe2d2599290c45b021d6c424ab5ea899e42be#egg=lettuce

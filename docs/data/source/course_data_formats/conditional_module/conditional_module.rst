@@ -23,7 +23,7 @@ be specified for this tag::
 
     sources - location id of required modules, separated by ';'
     [message | ""] - message for case, where one or more are not passed. Here you can use variable {link}, which generate link to required module.
-        
+
     [submitted] - map to `is_submitted` module method.
     (pressing RESET button makes this function to return False.)
 

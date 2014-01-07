@@ -22,7 +22,7 @@ from courseware.masquerade import setup_masquerade
 from courseware.model_data import FieldDataCache, DjangoKeyValueStore
 from lms.lib.xblock.field_data import LmsFieldData
 from lms.lib.xblock.runtime import LmsModuleSystem, handler_prefix, unquote_slashes
-from mitxmako.shortcuts import render_to_string
+from edxmako.shortcuts import render_to_string
 from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
 from student.models import anonymous_id_for_user, user_by_anonymous_id
 from util.json_request import JsonResponse
@@ -363,7 +363,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
         reverse('jump_to_id', kwargs={'course_id': course_id, 'module_id': ''}),
     ))
 
-    if settings.MITX_FEATURES.get('DISPLAY_HISTOGRAMS_TO_STAFF'):
+    if settings.FEATURES.get('DISPLAY_HISTOGRAMS_TO_STAFF'):
         if has_access(user, descriptor, 'staff', course_id):
             block_wrappers.append(partial(add_histogram, user))
 
@@ -420,7 +420,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
         wrappers=block_wrappers,
         get_real_user=user_by_anonymous_id,
     )
-    if settings.MITX_FEATURES.get('SEND_USERS_EMAILADDR_WITH_CODERESPONSE', False):
+    if settings.FEATURES.get('SEND_USERS_EMAILADDR_WITH_CODERESPONSE', False):
         system.set('send_users_emailaddr_with_coderesponse', True)
         if user.is_authenticated():
             system.set('deanonymized_user_email', user.email)
@@ -429,7 +429,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
 
     # pass position specified in URL to module through ModuleSystem
     system.set('position', position)
-    if settings.MITX_FEATURES.get('ENABLE_PSYCHOMETRICS'):
+    if settings.FEATURES.get('ENABLE_PSYCHOMETRICS'):
         system.set(
             'psychometrics_handler',  # set callback for updating PsychometricsData
             make_psychometrics_data_update_handler(course_id, user, descriptor.location.url())

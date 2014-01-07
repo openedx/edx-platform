@@ -1,5 +1,5 @@
 from django.http import Http404
-from mitxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response
 from django.db import connection
 
 from student.models import CourseEnrollment
@@ -12,7 +12,7 @@ def dictfetchall(cursor):
     desc = cursor.description
     table = []
     table.append([col[0] for col in desc])
-    
+
     # ensure response from db is a list, not a tuple (which is returned
     # by MySQL backed django instances)
     rows_from_cursor=cursor.fetchall()
@@ -27,7 +27,7 @@ def SQL_query_to_list(cursor, query_string):
 def dashboard(request):
     """
     Slightly less hackish hack to show staff enrollment numbers and other
-    simple queries.  
+    simple queries.
 
     All queries here should be indexed and simple.  Mostly, this means don't
     touch courseware_studentmodule, as tempting as it may be.
@@ -45,7 +45,7 @@ def dashboard(request):
     # count how many users we have
     results["scalars"]["Unique Usernames"]=User.objects.filter().count()
     results["scalars"]["Activated Usernames"]=User.objects.filter(is_active=1).count()
-    
+
     # count how many enrollments we have
     results["scalars"]["Total Enrollments Across All Courses"] = CourseEnrollment.objects.filter(is_active=1).count()
 

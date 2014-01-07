@@ -3,13 +3,13 @@ from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.shortcuts import redirect
 from django_future.csrf import ensure_csrf_cookie
-from mitxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response
 
 import student.views
 import branding
 import courseware.views
-from student.models  import UserProfile
-from mitxmako.shortcuts import marketing_link
+from student.models import UserProfile
+from edxmako.shortcuts import marketing_link
 from util.cache import cache_if_anonymous
 
 
@@ -23,10 +23,10 @@ def index(request):
     if settings.COURSEWARE_ENABLED and UserProfile.has_registered(request.user):
         return redirect(reverse('dashboard'))
 
-    if settings.MITX_FEATURES.get('AUTH_USE_MIT_CERTIFICATES'):
+    if settings.FEATURES.get('AUTH_USE_MIT_CERTIFICATES'):
         from external_auth.views import ssl_login
         return ssl_login(request)
-    if settings.MITX_FEATURES.get('ENABLE_MKTG_SITE'):
+    if settings.FEATURES.get('ENABLE_MKTG_SITE'):
         return redirect(settings.MKTG_URLS.get('ROOT'))
 
     university = branding.get_university(request.META.get('HTTP_HOST'))
@@ -47,10 +47,10 @@ def courses(request):
     to that. Otherwise, if subdomain branding is on, this is the university
     profile page. Otherwise, it's the edX courseware.views.courses page
     """
-    if settings.MITX_FEATURES.get('ENABLE_MKTG_SITE', False):
+    if settings.FEATURES.get('ENABLE_MKTG_SITE', False):
         return redirect(marketing_link('COURSES'), permanent=True)
 
-    if not settings.MITX_FEATURES.get('COURSES_ARE_BROWSABLE'):        
+    if not settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
         raise Http404
 
     #  we do not expect this case to be reached in cases where
