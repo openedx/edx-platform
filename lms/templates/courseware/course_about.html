@@ -216,11 +216,14 @@
               </a>
             % else:
               <% 
-                tweet_action = MicrositeConfiguration.get_microsite_configuration_value('course_about_twitter_msg', "http://twitter.com/intent/tweet?text=I+just+registered+for+" + course.number + "+"+ get_course_about_section(course, 'title') + "+through+@edxonline:+http://www.edx.org"+reverse('about_course', args=[course.id]))
+                site_domain = MicrositeConfiguration.get_microsite_configuration_value('site_domain', 'www.edx.org')
+                platform_name = MicrositeConfiguration.get_microsite_configuration_value('platform_name', 'edX')
+                
+                tweet_action = "http://twitter.com/intent/tweet?text=I+just+registered+for+"+course.number+"+"+get_course_about_section(course, 'title')+"+through+"+MicrositeConfiguration.get_microsite_configuration_value('course_about_twitter_account', '@edxonline')+":+http://"+site_domain+reverse('about_course', args=[course.id])
 
                 facebook_link = MicrositeConfiguration.get_microsite_configuration_value('course_about_facebook_link', 'http://www.facebook.com/EdxOnline')
 
-                email_subject = MicrositeConfiguration.get_microsite_configuration_value('course_about_share_email_subject', "mailto:?subject=Take%20a%20course%20with%20edX%20online&body=I%20just%20registered%20for%20"+course.number+"%20"+get_course_about_section(course, 'title')+"%20through%20edX:%20http://edx.org/"+reverse('about_course', args=[course.id]))
+                email_subject = "mailto:?subject=Take%20a%20course%20with%20"+platform_name+"%20online&body=I%20just%20registered%20for%20"+course.number+"%20"+get_course_about_section(course, 'title')+"%20through%20"+platform_name+"%20http://"+site_domain+reverse('about_course', args=[course.id])
               %>
               <a href="${tweet_action}" class="share">
                 <img src="${static.url('images/social/twitter-sharing.png')}" alt="Tweet that you've registered for this course">
