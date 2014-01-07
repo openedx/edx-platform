@@ -11,7 +11,7 @@ You can now access the public edX roadmap_ for details about the currently plann
 edX Studio
 *************
 
-New documentation, *Building a Course with edX Studio* is available online_. You can also download the new guide as a PDF from the edX Studio user interface. 
+New documentation, *Building a Course with edX Studio*, is available online_. You can also download the new guide as a PDF from the edX Studio user interface. 
 
 .. _online: http://edx.readthedocs.org/projects/ca/en/latest/
 

@@ -11,7 +11,7 @@ You can now access the public edX roadmap_ for details about the currently plann
 edX Studio
 *************
 
-New documentation, *Building a Course with edX Studio* is available online_. You can also download the new guide as a PDF from the edX Studio user interface. 
+New documentation, *Building a Course with edX Studio*, is available online_. You can also download the new guide as a PDF from the edX Studio user interface. 
 
 .. _online: http://edx.readthedocs.org/projects/ca/en/latest/
 
@@ -19,30 +19,35 @@ New documentation, *Building a Course with edX Studio* is available online_. You
 New Features
 =============
 
-* The **Files & Uploads** page is updated to show a long list of files in multiple pages. Only 50 files are now shown on a page. If your course has more than 50 files, additional files are listed in separate pages. You can navigate to other pages through pagination controls at the top and bottom of the file list.  This change improves the page performance for courses with a large number of files.
+* The **Files & Uploads** page has been updated so that a maximum of 50 files now appear on a single page. If your course has more than 50 files, additional files are listed in separate pages. You can navigate to other pages through pagination controls at the top and bottom of the file list.  This change improves the page performance for courses with a large number of files.
 
   For more information, see the `updated documentation for adding files <http://edx.readthedocs.org/projects/ca/en/latest/create_new_course.html#add-files-to-a-course>`_. 
 
-.. note::  The workaround previously included in release notes on :ref:`October 29 2013` is no longer needed and will no longer work.
+  .. note::  The :ref:`October 29 2013` release notes describe a workaround to limit the number of files that appear on a single page. With the January 7, 2014 release, this method is not necessary and no longer works.
 
 
-* The **Course Outline** page is updated to include several design improvements. To view the changes, view your course in Studio or see the `updated documentation for Organizing Your Course Content <http://edx.readthedocs.org/projects/ca/en/latest/organizing_course.html>`_.
+* The **Course Outline** page is updated to include several design improvements. The new Course Outline appears as in the following example:
 
-* A new JSInput Template is now available.  DOC LINK (BLD-523) (BLD-556)
+  .. image::  images/course_outline.png
+    :alt: The Course Outline
 
-* A new Zooming Image template is now available. DOC LINK (BLD-206)
+  To see the changes, view your course in Studio or see the `updated documentation for organizing your course content <http://edx.readthedocs.org/projects/ca/en/latest/organizing_course.html>`_.
+
+* A template for custom JavaScript display and grading problems (also called JSInput problems) is now available. For more informatoin, see the `updated documentation for Custom JavaScript display and grading problems <http://edx.readthedocs.org/projects/ca/en/latest/advanced_problems.html#custom-javascript-display-and-grading>`_. (BLD-523) (BLD-556)
+
+* A template for the Zooming Image tool is now available. For more informatoin, see the `updated documentation for the zooming image tool <http://edx.readthedocs.org/projects/ca/en/latest/tools.html#zooming-image>`_. (BLD-206)
 
 ==========================
 Changes and Updates
 ==========================
 
-* The Course Export now supports non-ASCII characters. (STUD-868)
+* The Course Export tool now supports non-ASCII characters. (STUD-868)
 
-* In the Course Outline, you can now drag a section to the end when the last section is collapsed. (STUD-879)
+* In the course outline, you can now drag a section to the end of the list of sections when the last section is collapsed. (STUD-879)
 
-* In Video components, Start and End times are now displayed in the format you enter them and not converted to the standard format (HH:MM:SS) until you tab out of the field. (BLD-506)
+* In Video components, when you click inside the **Start Time** or **End Time** field, the existing HH:MM:SS text is selected so that you enter text into an empty field. After you click out of the field, the format of the time changes to HH:MM:SS. For example, if you enter 1:35, the text in the field changes to 00:01:35. (BLD-506 and BLD-581)
 
-* The **Save** button for JSInput components now works as expected. (BLD-568)
+* The **Save** button for JSInput Problem components now works as expected. (BLD-568)
 
 
 
@@ -50,18 +55,15 @@ Changes and Updates
 edX Learning Management System 
 ***************************************
 
-==========================
-Changes and Updates
-==========================
 
-* In the Instructor Dashboard, an issue was fixed with downloading grade distributions. You can now download grade distributions for all courses. (LMS-811, LMS-922)
+* In the Instructor Dashboard, you can now download answer distributions for all courses. (LMS-811, LMS-922)
 
-* In the course Wiki, the **Preview this Revision** and the **Merge selected with Current** dialog boxes are now keyboard accessible in Internet Explorer. (LMS-1539)
+* In the course wiki, the **Preview this Revision** and the **Merge selected with Current** dialog boxes are now keyboard accessible in Internet Explorer. (LMS-1539)
 
 * An error in downloading student profile data is fixed. (LMS-1675)
 
-* Students can now show the answer for Image Response problems. When a student clicks **Show Answer**, the part of the image that would have earned full credit is highlighted. (BLD-21)
+* For Image Response problems, the correct answer now appears when a student clicks **Show Answer**. (BLD-21)
 
-* The video player controls now work on iPads. [DETAILS ABOUT IPHONE NATIVE CONTROLS?] (BLD-541)
+* On iPads, the video player uses edX controls that appear after you click the video or the Play button. On iPhones, the video player uses native controls. (BLD-541)
 
 
