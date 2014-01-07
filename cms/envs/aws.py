@@ -9,7 +9,6 @@ This is the default template for our main set of AWS servers.
 import json
 
 from .common import *
-from .common import SUBDOMAIN_BRANDING, VIRTUAL_UNIVERSITIES
 
 from logsettings import get_logger_config
 import os
@@ -217,5 +216,8 @@ TRACKING_BACKENDS.update(AUTH_TOKENS.get("TRACKING_BACKENDS", {}))
 
 MICROSITE_NAMES = ENV_TOKENS.get('MICROSITE_NAMES', None)
 MICROSITE_CONFIGURATION = {}
+SUBDOMAIN_BRANDING = ENV_TOKENS.get('SUBDOMAIN_BRANDING', {})
+VIRTUAL_UNIVERSITIES = ENV_TOKENS.get('VIRTUAL_UNIVERSITIES', [])
+
 if MICROSITE_NAMES and len(MICROSITE_NAMES) > 0:
     enable_microsites(MICROSITE_NAMES, MICROSITE_CONFIGURATION, SUBDOMAIN_BRANDING, VIRTUAL_UNIVERSITIES)
