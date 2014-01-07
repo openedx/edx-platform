@@ -55,8 +55,6 @@ class CourseFactory(XModuleFactory):
         # Write the data to the mongo datastore
         new_course = store.create_xmodule(location, metadata=kwargs.get('metadata', None))
 
-        new_course.start = datetime.datetime.now(UTC).replace(microsecond=0)
-
         # The rest of kwargs become attributes on the course:
         for k, v in kwargs.iteritems():
             setattr(new_course, k, v)

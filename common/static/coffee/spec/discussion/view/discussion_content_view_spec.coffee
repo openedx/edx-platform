@@ -1,13 +1,12 @@
 describe "DiscussionContentView", ->
     beforeEach ->
 
-        setFixtures
-        (
+        setFixtures(
             """
             <div class="discussion-post">
                 <header>
-                    <a data-tooltip="vote" data-role="discussion-vote" class="vote-btn discussion-vote discussion-vote-up" href="#">
-                    <span class="plus-icon">+</span> <span class="votes-count-number">0</span></a>
+                    <a href="#" class="vote-btn" data-tooltip="vote" role="button" aria-pressed="false">
+                        <span class="plus-icon"/><span class='votes-count-number'>0</span> <span class="sr">votes (click to vote)</span></a>
                     <h1>Post Title</h1>
                     <p class="posted-details">
                         <a class="username" href="/courses/MITx/999/Robot_Super_Course/discussion/forum/users/1">robot</a>
@@ -23,16 +22,21 @@ describe "DiscussionContentView", ->
             """
         )
 
-        @thread = new Thread {
-                id: '01234567',
-                user_id: '567',
-                course_id: 'mitX/999/test',
-                body: 'this is a thread',
-                created_at: '2013-04-03T20:08:39Z',
-                abuse_flaggers: ['123']
-                roles: []
+        @threadData = {
+            id: '01234567',
+            user_id: '567',
+            course_id: 'mitX/999/test',
+            body: 'this is a thread',
+            created_at: '2013-04-03T20:08:39Z',
+            abuse_flaggers: ['123'],
+            votes: {up_count: '42'},
+            type: "thread",
+            roles: []
         }
+        @thread = new Thread(@threadData)
         @view = new DiscussionContentView({ model: @thread })
+        @view.setElement($('.discussion-post'))
+        window.user = new DiscussionUser({id: '567', upvoted_ids: []})
 
     it 'defines the tag', ->
         expect($('#jasmine-fixtures')).toExist
@@ -56,3 +60,15 @@ describe "DiscussionContentView", ->
         @thread.set("abuse_flaggers",temp_array)
         @thread.unflagAbuse()
         expect(@thread.get 'abuse_flaggers').toEqual []
+
+    it 'renders the vote button properly', ->
+        DiscussionViewSpecHelper.checkRenderVote(@view, @thread)
+
+    it 'votes correctly', ->
+        DiscussionViewSpecHelper.checkVote(@view, @thread, @threadData, false)
+
+    it 'unvotes correctly', ->
+        DiscussionViewSpecHelper.checkUnvote(@view, @thread, @threadData, false)
+
+    it 'toggles the vote correctly', ->
+        DiscussionViewSpecHelper.checkToggleVote(@view, @thread)

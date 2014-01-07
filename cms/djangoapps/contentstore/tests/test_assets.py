@@ -24,11 +24,21 @@ from xmodule.modulestore.mongo.base import location_to_query
 
 
 class AssetsTestCase(CourseTestCase):
+    """
+    Parent class for all asset tests.
+    """
     def setUp(self):
         super(AssetsTestCase, self).setUp()
         location = loc_mapper().translate_location(self.course.location.course_id, self.course.location, False, True)
         self.url = location.url_reverse('assets/', '')
 
+    def upload_asset(self, name="asset-1"):
+        f = BytesIO(name)
+        f.name = name + ".txt"
+        return self.client.post(self.url, {"name": name, "file": f})
+
+
+class BasicAssetsTestCase(AssetsTestCase):
     def test_basic(self):
         resp = self.client.get(self.url, HTTP_ACCEPT='text/html')
         self.assertEquals(resp.status_code, 200)
@@ -38,12 +48,7 @@ class AssetsTestCase(CourseTestCase):
         path = StaticContent.get_static_path_from_location(location)
         self.assertEquals(path, '/static/my_file_name.jpg')
 
-
-class AssetsToyCourseTestCase(CourseTestCase):
-    """
-    Tests the assets returned from assets_handler for the toy test course.
-    """
-    def test_toy_assets(self):
+    def test_pdf_asset(self):
         module_store = modulestore('direct')
         _, course_items = import_from_xml(
             module_store,
@@ -56,9 +61,35 @@ class AssetsToyCourseTestCase(CourseTestCase):
         location = loc_mapper().translate_location(course.location.course_id, course.location, False, True)
         url = location.url_reverse('assets/', '')
 
-        self.assert_correct_asset_response(url, 0, 3, 3)
-        self.assert_correct_asset_response(url + "?page_size=2", 0, 2, 3)
-        self.assert_correct_asset_response(url + "?page_size=2&page=1", 2, 1, 3)
+        # Test valid contentType for pdf asset (textbook.pdf)
+        resp = self.client.get(url, HTTP_ACCEPT='application/json')
+        self.assertContains(resp, "/c4x/edX/toy/asset/textbook.pdf")
+        asset_location = StaticContent.get_location_from_path('/c4x/edX/toy/asset/textbook.pdf')
+        content = contentstore().find(asset_location)
+        # Check after import textbook.pdf has valid contentType ('application/pdf')
+
+        # Note: Actual contentType for textbook.pdf in asset.json is 'text/pdf'
+        self.assertEqual(content.content_type, 'application/pdf')
+
+
+class PaginationTestCase(AssetsTestCase):
+    """
+    Tests the pagination of assets returned from the REST API.
+    """
+    def test_json_responses(self):
+        self.upload_asset("asset-1")
+        self.upload_asset("asset-2")
+        self.upload_asset("asset-3")
+
+        # Verify valid page requests
+        self.assert_correct_asset_response(self.url, 0, 3, 3)
+        self.assert_correct_asset_response(self.url + "?page_size=2", 0, 2, 3)
+        self.assert_correct_asset_response(self.url + "?page_size=2&page=1", 2, 1, 3)
+
+        # Verify querying outside the range of valid pages
+        self.assert_correct_asset_response(self.url + "?page_size=2&page=-1", 0, 2, 3)
+        self.assert_correct_asset_response(self.url + "?page_size=2&page=2", 2, 1, 3)
+        self.assert_correct_asset_response(self.url + "?page_size=3&page=1", 0, 3, 3)
 
     def assert_correct_asset_response(self, url, expected_start, expected_length, expected_total):
         resp = self.client.get(url, HTTP_ACCEPT='application/json')
@@ -69,7 +100,7 @@ class AssetsToyCourseTestCase(CourseTestCase):
         self.assertEquals(json_response['totalCount'], expected_total)
 
 
-class UploadTestCase(CourseTestCase):
+class UploadTestCase(AssetsTestCase):
     """
     Unit tests for uploading a file
     """
@@ -78,11 +109,8 @@ class UploadTestCase(CourseTestCase):
         location = loc_mapper().translate_location(self.course.location.course_id, self.course.location, False, True)
         self.url = location.url_reverse('assets/', '')
 
-    @skip("CorruptGridFile error on continuous integration server")
     def test_happy_path(self):
-        f = BytesIO("sample content")
-        f.name = "sample.txt"
-        resp = self.client.post(self.url, {"name": "my-name", "file": f})
+        resp = self.upload_asset()
         self.assertEquals(resp.status_code, 200)
 
     def test_no_file(self):
@@ -90,7 +118,7 @@ class UploadTestCase(CourseTestCase):
         self.assertEquals(resp.status_code, 400)
 
 
-class AssetToJsonTestCase(TestCase):
+class AssetToJsonTestCase(AssetsTestCase):
     """
     Unit test for transforming asset information into something
     we can send out to the client via JSON.
@@ -115,7 +143,7 @@ class AssetToJsonTestCase(TestCase):
         self.assertIsNone(output["thumbnail"])
 
 
-class LockAssetTestCase(CourseTestCase):
+class LockAssetTestCase(AssetsTestCase):
     """
     Unit test for locking and unlocking an asset.
     """

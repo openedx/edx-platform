@@ -45,7 +45,7 @@ def main():
         remove_file(source_msgs_dir.joinpath(filename))
 
     # Extract strings from mako templates.
-    babel_mako_cmd = 'pybabel extract -F %s -c "TRANSLATORS:" . -o %s' % (BABEL_CONFIG, BABEL_OUT)
+    babel_mako_cmd = 'pybabel extract -F %s -c "Translators:" . -o %s' % (BABEL_CONFIG, BABEL_OUT)
 
     # Extract strings from django source files.
     make_django_cmd = (
