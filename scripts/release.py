@@ -153,7 +153,7 @@ def main():
         return
 
     print("EMAIL:")
-    print(generate_email(commit_range, release_date=args.date))
+    print(generate_email(commit_range, release_date=args.date).encode('UTF-8'))
     print("\n")
     print("Wiki Table:")
     print(
@@ -161,7 +161,7 @@ def main():
         "in your release wiki page"
     )
     print("\n")
-    print(generate_table(commit_range, include_merge=args.merge))
+    print(generate_table(commit_range, include_merge=args.merge).encode('UTF-8'))
 
 if __name__ == "__main__":
     main()
