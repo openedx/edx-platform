@@ -309,6 +309,9 @@ class OptionInput(InputTypeBase):
         Given options string, convert it into an ordered list of (option_id, option_description) tuples, where
         id==description for now.  TODO: make it possible to specify different id and descriptions.
         """
+        # convert single quotes inside option values to html encoded string
+        options = re.sub(r"([a-zA-Z])('|\\')([a-zA-Z])", r"\1&#39;\3", options)
+        options = re.sub(r"\\'", r"&#39;", options)  # replace already escaped single quotes
         # parse the set of possible options
         lexer = shlex.shlex(options[1:-1].encode('utf8'))
         lexer.quotes = "'"
@@ -316,7 +319,8 @@ class OptionInput(InputTypeBase):
         lexer.whitespace = ", "
 
         # remove quotes
-        tokens = [x[1:-1].decode('utf8') for x in lexer]
+        # convert escaped single quotes (html encoded string) back to single quotes
+        tokens = [x[1:-1].decode('utf8').replace("&#39;", "'") for x in lexer]
 
         # make list of (option_id, option_description), with description=id
         return [(t, t) for t in tokens]
