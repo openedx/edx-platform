@@ -11,7 +11,7 @@ BASE_DIR = path(__file__).abspath().dirname().joinpath('..').normpath()
 LOCALE_DIR = BASE_DIR.joinpath('conf', 'locale')
 
 
-class Configuration:
+class Configuration(object):
     """
     # Reads localization configuration in json format
 

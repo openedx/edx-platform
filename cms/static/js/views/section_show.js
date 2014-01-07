@@ -1,6 +1,6 @@
-define(["backbone", "underscore", "gettext", "js/views/section_edit", "require"], function(Backbone, _, gettext, SectionEditView, require) {
+define(["js/views/baseview", "underscore", "gettext", "js/views/section_edit", "require"], function(BaseView, _, gettext, SectionEditView, require) {
 
-    var SectionShow = Backbone.View.extend({
+    var SectionShow = BaseView.extend({
         template: _.template('<span data-tooltip="<%= gettext("Edit this section\'s name") %>" class="section-name-span"><%= name %></span>'),
         render: function() {
             var attrs = {

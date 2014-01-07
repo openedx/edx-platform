@@ -1,4 +1,5 @@
-Feature: Video Component Editor
+@shard_3
+Feature: CMS.Transcripts
   As a course author, I want to be able to create video components.
 
     # For transcripts acceptance tests there are 3 available caption
@@ -668,7 +669,7 @@ Feature: Video Component Editor
         And I edit the component
 
         And I open tab "Advanced"
-        And I revert the transcript field"HTML5 Transcript"
+        And I revert the transcript field "HTML5 Transcript"
 
         And I save changes
         Then when I view the video it does not show the captions

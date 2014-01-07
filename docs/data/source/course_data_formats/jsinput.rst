@@ -1,12 +1,6 @@
 ##############################################################################
 JS Input
 ##############################################################################
-
-    **NOTE** 
-    *Do not use this feature yet! Its attributes and behaviors may change
-    without any concern for backwards compatibility. Moreover, it has only been
-    tested in a very limited context. If you absolutely must, contact Julian
-    (julian@edx.org). When the feature stabilizes, this note will be removed.*
      
 This document explains how to write a JSInput input type. JSInput is meant to
 allow problem authors to easily turn working standalone HTML files into

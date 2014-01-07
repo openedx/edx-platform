@@ -1,16 +1,16 @@
 #!/usr/bin/env python
 
 """
- See https://edx-wiki.atlassian.net/wiki/display/ENG/PO+File+workflow
+See https://edx-wiki.atlassian.net/wiki/display/ENG/PO+File+workflow
 
+This task merges and compiles the human-readable .po files on the
+local filesystem into machine-readable .mo files. This is typically
+necessary as part of the build process since these .mo files are
+needed by Django when serving the web app.
 
- This task merges and compiles the human-readable .pofiles on the
- local filesystem into machine-readable .mofiles. This is typically
- necessary as part of the build process since these .mofiles are
- needed by Django when serving the web app.
+The configuration file (in edx-platform/conf/locale/config) specifies which
+languages to generate.
 
- The configuration file (in edx-platform/conf/locale/config) specifies which
- languages to generate.
 """
 
 import os, sys, logging
@@ -26,10 +26,13 @@ def merge(locale, target='django.po', fail_if_missing=True):
     """
     For the given locale, merge django-partial.po, messages.po, mako.po -> django.po
     target is the resulting filename
-    If fail_if_missing is True, and the files to be merged are missing,
-    throw an Exception.
-    If fail_if_missing is False, and the files to be merged are missing,
+
+    If fail_if_missing is true, and the files to be merged are missing,
+    throw an Exception, otherwise return silently.
+
+    If fail_if_missing is false, and the files to be merged are missing,
     just return silently.
+
     """
     LOG.info('Merging locale={0}'.format(locale))
     locale_directory = CONFIGURATION.get_messages_dir(locale)

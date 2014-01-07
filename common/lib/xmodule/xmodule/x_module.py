@@ -168,7 +168,7 @@ class XModuleMixin(XBlockMixin):
         if isinstance(self.location, Location):
             return self.location.name
         elif isinstance(self.location, BlockUsageLocator):
-            return self.location.usage_id
+            return self.location.block_id
         else:
             raise InsufficientSpecificationError()
 
@@ -841,6 +841,13 @@ class ConfigurableFragmentWrapper(object):  # pylint: disable=abstract-method
         return frag
 
 
+# This function exists to give applications (LMS/CMS) a place to monkey-patch until
+# we can refactor modulestore to split out the FieldData half of its interface from
+# the Runtime part of its interface. This function matches the Runtime.handler_url interface
+def descriptor_global_handler_url(block, handler_name, suffix='', query='', thirdparty=False):
+    raise NotImplementedError("Applications must monkey-patch this function before using handler-urls for studio_view")
+
+
 class DescriptorSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abstract-method
     """
     Base class for :class:`Runtime`s to be used with :class:`XModuleDescriptor`s
@@ -891,9 +898,9 @@ class DescriptorSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable
         self.resources_fs = resources_fs
         self.error_tracker = error_tracker
 
-    def get_block(self, block_id):
+    def get_block(self, usage_id):
         """See documentation for `xblock.runtime:Runtime.get_block`"""
-        return self.load_item(block_id)
+        return self.load_item(usage_id)
 
     def get_field_provenance(self, xblock, field):
         """
@@ -932,6 +939,23 @@ class DescriptorSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable
             return block.xmodule_runtime.render(to_render, view_name, context)
         else:
             return super(DescriptorSystem, self).render(block, view_name, context)
+
+    def handler_url(self, block, handler_name, suffix='', query='', thirdparty=False):
+        xmodule_runtime = getattr(block, 'xmodule_runtime', None)
+        if xmodule_runtime is not None:
+            return xmodule_runtime.handler_url(block, handler_name, suffix, query, thirdparty)
+        else:
+            # Currently, Modulestore is responsible for instantiating DescriptorSystems
+            # This means that LMS/CMS don't have a way to define a subclass of DescriptorSystem
+            # that implements the correct handler url. So, for now, instead, we will reference a
+            # global function that the application can override.
+            return descriptor_global_handler_url(block, handler_name, suffix, query, thirdparty)
+
+    def resources_url(self, resource):
+        raise NotImplementedError("edX Platform doesn't currently implement XBlock resource urls")
+
+    def local_resource_url(self, block, uri):
+        raise NotImplementedError("edX Platform doesn't currently implement XBlock resource urls")
 
 
 class XMLParsingSystem(DescriptorSystem):
@@ -1078,6 +1102,15 @@ class ModuleSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abs
         """
         assert self.xmodule_instance is not None
         return self.handler_url(self.xmodule_instance, 'xmodule_handler', '', '').rstrip('/?')
+
+    def get_block(self, block_id):
+        raise NotImplementedError("XModules must use get_module to load other modules")
+
+    def resources_url(self, resource):
+        raise NotImplementedError("edX Platform doesn't currently implement XBlock resource urls")
+
+    def local_resource_url(self, block, uri):
+        raise NotImplementedError("edX Platform doesn't currently implement XBlock resource urls")
 
 
 class DoNothingCache(object):

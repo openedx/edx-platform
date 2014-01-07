@@ -31,6 +31,7 @@ lib_paths:
     - xmodule_js/common_static/coffee/src/ajax_prefix.js
     - xmodule_js/common_static/coffee/src/logger.js
     - xmodule_js/common_static/js/vendor/jasmine-jquery.js
+    - xmodule_js/common_static/js/vendor/jasmine-imagediff.js
     - xmodule_js/common_static/js/vendor/require.js
     - js/RequireJS-namespace-undefine.js
     - xmodule_js/common_static/js/vendor/jquery.min.js

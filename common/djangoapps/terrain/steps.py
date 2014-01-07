@@ -11,10 +11,14 @@
 # Disable the "unused argument" warning because lettuce uses "step"
 #pylint: disable=W0613
 
+# django_url is assigned late in the process of loading lettuce,
+# so we import this as a module, and then read django_url from
+# it to get the correct value
+import lettuce.django
+
 from lettuce import world, step
 from .course_helpers import *
 from .ui_helpers import *
-from lettuce.django import django_url
 from nose.tools import assert_equals  # pylint: disable=E0611
 
 from logging import getLogger
@@ -135,7 +139,7 @@ def should_have_link_with_id_and_text(step, link_id, text):
 def should_have_link_with_path_and_text(step, path, text):
     link = world.browser.find_link_by_text(text)
     assert len(link) > 0
-    assert_equals(link.first["href"], django_url(path))
+    assert_equals(link.first["href"], lettuce.django.django_url(path))
 
 
 @step(r'should( not)? see "(.*)" (?:somewhere|anywhere) (?:in|on) (?:the|this) page')
@@ -154,7 +158,7 @@ def should_see_in_the_page(step, doesnt_appear, text):
 def i_am_logged_in(step):
     world.create_user('robot', 'test')
     world.log_in(username='robot', password='test')
-    world.browser.visit(django_url('/'))
+    world.browser.visit(lettuce.django.django_url('/'))
     dash_css = 'section.container.dashboard'
     assert world.is_css_present(dash_css)
 
@@ -176,7 +180,7 @@ def dialogs_are_closed(step):
 
 @step(u'visit the url "([^"]*)"')
 def visit_url(step, url):
-    world.browser.visit(django_url(url))
+    world.browser.visit(lettuce.django.django_url(url))
 
 
 @step(u'wait for AJAX to (?:finish|complete)')

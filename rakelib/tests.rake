@@ -24,7 +24,7 @@ def run_tests(system, report_dir, test_id=nil, stop_on_failure=true)
 
     default_test_id = "#{system}/djangoapps common/djangoapps"
 
-    if system == :lms
+    if system == :lms || system == :cms
         default_test_id += " #{system}/lib"
     end
 

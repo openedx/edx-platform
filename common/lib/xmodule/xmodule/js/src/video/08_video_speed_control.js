@@ -10,6 +10,13 @@ function () {
     return function (state) {
         var dfd = $.Deferred();
 
+        if (state.isTouch) {
+            // iOS doesn't support speed change
+            state.el.find('div.speeds').remove();
+            dfd.resolve();
+            return dfd.promise();
+        }
+
         state.videoSpeedControl = {};
 
         _initialize(state);
@@ -131,7 +138,7 @@ function () {
         state.videoSpeedControl.videoSpeedsEl.find('a')
             .on('click', state.videoSpeedControl.changeVideoSpeed);
 
-        if (onTouchBasedDevice()) {
+        if (state.isTouch) {
             state.videoSpeedControl.el.on('click', function (event) {
                 // So that you can't highlight this control via a drag
                 // operation, we disable the default browser actions on a

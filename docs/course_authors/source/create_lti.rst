@@ -73,7 +73,7 @@ Step 1. Add LTI to the Advanced Modules Policy Key
    then enter **“lti”**. Make sure to include the quotation marks, but
    not the period.
    
-   .. image:: Images/LTI_Policy_Key.gif
+   .. image:: Images/LTI_policy_key.gif
 
    **Note** If the **Policy Value** field already contains text, place your
    cursor directly after the closing quotation mark for the final item, and

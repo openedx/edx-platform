@@ -38,6 +38,7 @@ lib_paths:
     - xmodule_js/common_static/js/vendor/underscore.string.min.js
     - xmodule_js/common_static/js/vendor/backbone-min.js
     - xmodule_js/common_static/js/vendor/backbone-associations-min.js
+    - xmodule_js/common_static/js/vendor/backbone.paginator.min.js
     - xmodule_js/common_static/js/vendor/timepicker/jquery.timepicker.js
     - xmodule_js/common_static/js/vendor/jquery.leanModal.min.js
     - xmodule_js/common_static/js/vendor/jquery.ajaxQueue.js
@@ -47,14 +48,15 @@ lib_paths:
     - xmodule_js/common_static/js/vendor/Squire.js
     - xmodule_js/common_static/js/vendor/jasmine-jquery.js
     - xmodule_js/common_static/js/vendor/jasmine-stealth.js
+    - xmodule_js/common_static/js/vendor/jasmine-imagediff.js
     - xmodule_js/common_static/js/vendor/jasmine.async.js
-    - xmodule_js/common_static/js/vendor/jquery.maskedinput.min.js
     - xmodule_js/common_static/js/vendor/CodeMirror/codemirror.js
     - xmodule_js/src/xmodule.js
     - xmodule_js/common_static/js/test/i18n.js
     - xmodule_js/common_static/js/vendor/draggabilly.pkgd.js
     - xmodule_js/common_static/js/vendor/date.js
     - xmodule_js/common_static/js/vendor/domReady.js
+    - xmodule_js/common_static/js/vendor/URI.min.js
     - xmodule_js/common_static/js/vendor/jquery.smooth-scroll.min.js
     - xmodule_js/common_static/coffee/src/jquery.immediateDescendents.js
     - xmodule_js/common_static/coffee/src/xblock

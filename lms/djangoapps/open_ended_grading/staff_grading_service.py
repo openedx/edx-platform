@@ -7,6 +7,7 @@ import logging
 
 from django.conf import settings
 from django.http import HttpResponse, Http404
+from django.utils.translation import ugettext as _
 
 from xmodule.course_module import CourseDescriptor
 from xmodule.open_ended_grading_classes.grading_service_module import GradingService, GradingServiceError
@@ -21,7 +22,14 @@ from open_ended_grading.utils import does_location_exist
 
 log = logging.getLogger(__name__)
 
-STAFF_ERROR_MESSAGE = 'Could not contact the external grading server.  Please contact the development team.  If you do not have a point of contact, you can contact Vik at vik@edx.org.'
+STAFF_ERROR_MESSAGE = _(
+    u'Could not contact the external grading server. Please contact the '
+    u'development team at {email}.'
+).format(
+    email=u'<a href="mailto:{tech_support_email}>{tech_support_email}</a>'.format(
+        tech_support_email=settings.TECH_SUPPORT_EMAIL
+    )
+)
 
 
 class MockStaffGradingService(object):

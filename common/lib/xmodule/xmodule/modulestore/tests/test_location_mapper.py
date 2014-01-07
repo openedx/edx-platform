@@ -75,10 +75,9 @@ class TestLocationMapper(unittest.TestCase):
         self.assertEqual(entry['prod_branch'], 'live')
         self.assertEqual(entry['block_map'], block_map)
 
-
-    def translate_n_check(self, location, old_style_course_id, new_style_course_id, usage_id, branch, add_entry=False):
+    def translate_n_check(self, location, old_style_course_id, new_style_package_id, block_id, branch, add_entry=False):
         """
-        Request translation, check course_id, usage_id, and branch
+        Request translation, check package_id, block_id, and branch
         """
         prob_locator = loc_mapper().translate_location(
             old_style_course_id, 
@@ -86,8 +85,8 @@ class TestLocationMapper(unittest.TestCase):
             published= (branch=='published'),
             add_entry_if_missing=add_entry
         )
-        self.assertEqual(prob_locator.course_id, new_style_course_id)
-        self.assertEqual(prob_locator.usage_id, usage_id)
+        self.assertEqual(prob_locator.package_id, new_style_package_id)
+        self.assertEqual(prob_locator.block_id, block_id)
         self.assertEqual(prob_locator.branch, branch)
 
     def test_translate_location_read_only(self):
@@ -105,7 +104,7 @@ class TestLocationMapper(unittest.TestCase):
                 add_entry_if_missing=False
             )
 
-        new_style_course_id = '{}.geek_dept.{}.baz_run'.format(org, course)
+        new_style_package_id = '{}.geek_dept.{}.baz_run'.format(org, course)
         block_map = {
             'abc123': {'problem': 'problem2'}, 
             'def456': {'problem': 'problem4'},
@@ -113,15 +112,15 @@ class TestLocationMapper(unittest.TestCase):
         }
         loc_mapper().create_map_entry(
             Location('i4x', org, course, 'course', 'baz_run'),
-            new_style_course_id,
+            new_style_package_id,
             block_map=block_map
         )
         test_problem_locn = Location('i4x', org, course, 'problem', 'abc123')
         # only one course matches
-        self.translate_n_check(test_problem_locn, old_style_course_id, new_style_course_id, 'problem2', 'published')
+        self.translate_n_check(test_problem_locn, old_style_course_id, new_style_package_id, 'problem2', 'published')
         # look for w/ only the Location (works b/c there's only one possible course match). Will force
         # cache as default translation for this problemid
-        self.translate_n_check(test_problem_locn, None, new_style_course_id, 'problem2', 'published')
+        self.translate_n_check(test_problem_locn, None, new_style_package_id, 'problem2', 'published')
         # look for non-existent problem
         with self.assertRaises(ItemNotFoundError):
             loc_mapper().translate_location(
@@ -144,7 +143,7 @@ class TestLocationMapper(unittest.TestCase):
             block_map=distractor_block_map
         )
         # test that old translation still works
-        self.translate_n_check(test_problem_locn, old_style_course_id, new_style_course_id, 'problem2', 'published')
+        self.translate_n_check(test_problem_locn, old_style_course_id, new_style_package_id, 'problem2', 'published')
         # and new returns new id
         self.translate_n_check(test_problem_locn, test_delta_old_id, test_delta_new_id, 'problem3', 'published')
         # look for default translation of uncached Location (not unique; so, just verify it returns something)
@@ -178,24 +177,24 @@ class TestLocationMapper(unittest.TestCase):
         old_style_course_id = '{}/{}/{}'.format(org, course, 'baz_run')
         problem_name = 'abc123abc123abc123abc123abc123f9'
         location = Location('i4x', org, course, 'problem', problem_name)
-        new_style_course_id = '{}.{}.{}'.format(org, course, 'baz_run')
-        self.translate_n_check(location, old_style_course_id, new_style_course_id, 'problemabc', 'published', True)
+        new_style_package_id = '{}.{}.{}'.format(org, course, 'baz_run')
+        self.translate_n_check(location, old_style_course_id, new_style_package_id, 'problemabc', 'published', True)
         # look for w/ only the Location (works b/c there's only one possible course match): causes cache
-        self.translate_n_check(location, None, new_style_course_id, 'problemabc', 'published', True)
+        self.translate_n_check(location, None, new_style_package_id, 'problemabc', 'published', True)
 
         # create an entry w/o a guid name
         other_location = Location('i4x', org, course, 'chapter', 'intro')
-        self.translate_n_check(other_location, old_style_course_id, new_style_course_id, 'intro', 'published', True)
+        self.translate_n_check(other_location, old_style_course_id, new_style_package_id, 'intro', 'published', True)
 
         # add a distractor course
-        delta_new_course_id = '{}.geek_dept.{}.{}'.format(org, course, 'delta_run')
+        delta_new_package_id = '{}.geek_dept.{}.{}'.format(org, course, 'delta_run')
         delta_course_locn = Location('i4x', org, course, 'course', 'delta_run')
         loc_mapper().create_map_entry(
             delta_course_locn,
-            delta_new_course_id,
+            delta_new_package_id,
             block_map={problem_name: {'problem': 'problem3'}}
         )
-        self.translate_n_check(location, old_style_course_id, new_style_course_id, 'problemabc', 'published', True)
+        self.translate_n_check(location, old_style_course_id, new_style_package_id, 'problemabc', 'published', True)
 
         # add a new one to both courses (ensure name doesn't have same beginning)
         new_prob_name = uuid.uuid4().hex
@@ -203,9 +202,9 @@ class TestLocationMapper(unittest.TestCase):
             new_prob_name = uuid.uuid4().hex
         new_prob_locn = location.replace(name=new_prob_name)
         new_usage_id = 'problem{}'.format(new_prob_name[:3])
-        self.translate_n_check(new_prob_locn, old_style_course_id, new_style_course_id, new_usage_id, 'published', True)
+        self.translate_n_check(new_prob_locn, old_style_course_id, new_style_package_id, new_usage_id, 'published', True)
         self.translate_n_check(
-            new_prob_locn, delta_course_locn.course_id, delta_new_course_id, new_usage_id, 'published', True
+            new_prob_locn, delta_course_locn.course_id, delta_new_package_id, new_usage_id, 'published', True
         )
         # look for w/ only the Location: causes caching and not unique; so, can't check which course
         prob_locator = loc_mapper().translate_location(
@@ -218,7 +217,7 @@ class TestLocationMapper(unittest.TestCase):
         # add a default course pointing to the delta_run
         loc_mapper().create_map_entry(
             Location('i4x', org, course, 'problem', '789abc123efg456'),
-            delta_new_course_id,
+            delta_new_package_id,
             block_map={problem_name: {'problem': 'problem3'}}
         )
         # now the ambiguous query should return delta
@@ -227,11 +226,11 @@ class TestLocationMapper(unittest.TestCase):
             again_prob_name = uuid.uuid4().hex
         again_prob_locn = location.replace(name=again_prob_name)
         again_usage_id = 'problem{}'.format(again_prob_name[:3])
-        self.translate_n_check(again_prob_locn, old_style_course_id, new_style_course_id, again_usage_id, 'published', True)
+        self.translate_n_check(again_prob_locn, old_style_course_id, new_style_package_id, again_usage_id, 'published', True)
         self.translate_n_check(
-            again_prob_locn, delta_course_locn.course_id, delta_new_course_id, again_usage_id, 'published', True
+            again_prob_locn, delta_course_locn.course_id, delta_new_package_id, again_usage_id, 'published', True
         )
-        self.translate_n_check(again_prob_locn, None, delta_new_course_id, again_usage_id, 'published', True)
+        self.translate_n_check(again_prob_locn, None, delta_new_package_id, again_usage_id, 'published', True)
 
     def test_translate_locator(self):
         """
@@ -240,10 +239,10 @@ class TestLocationMapper(unittest.TestCase):
         # lookup for non-existent course
         org = 'foo_org'
         course = 'bar_course'
-        new_style_course_id = '{}.geek_dept.{}.baz_run'.format(org, course)
+        new_style_package_id = '{}.geek_dept.{}.baz_run'.format(org, course)
         prob_locator = BlockUsageLocator(
-            course_id=new_style_course_id,
-            usage_id='problem2',
+            package_id=new_style_package_id,
+            block_id='problem2',
             branch='published'
         )
         prob_location = loc_mapper().translate_locator_to_location(prob_locator)
@@ -251,7 +250,7 @@ class TestLocationMapper(unittest.TestCase):
 
         loc_mapper().create_map_entry(
             Location('i4x', org, course, 'course', 'baz_run'),
-            new_style_course_id,
+            new_style_package_id,
             block_map={
                 'abc123': {'problem': 'problem2'},
                 '48f23a10395384929234': {'chapter': 'chapter48f'},
@@ -267,21 +266,21 @@ class TestLocationMapper(unittest.TestCase):
         self.assertEqual(prob_location, Location('i4x', org, course, 'course', 'baz_run', None))
         # explicit branch
         prob_locator = BlockUsageLocator(
-            course_id=prob_locator.course_id, branch='draft', usage_id=prob_locator.usage_id
+            package_id=prob_locator.package_id, branch='draft', block_id=prob_locator.block_id
         )
         prob_location = loc_mapper().translate_locator_to_location(prob_locator)
         # Even though the problem was set as draft, we always return revision=None to work
         # with old mongo/draft modulestores.
         self.assertEqual(prob_location, Location('i4x', org, course, 'problem', 'abc123', None))
         prob_locator = BlockUsageLocator(
-            course_id=new_style_course_id, usage_id='problem2', branch='production'
+            package_id=new_style_package_id, block_id='problem2', branch='production'
         )
         prob_location = loc_mapper().translate_locator_to_location(prob_locator)
         self.assertEqual(prob_location, Location('i4x', org, course, 'problem', 'abc123', None))
         # same for chapter except chapter cannot be draft in old system
         chap_locator = BlockUsageLocator(
-            course_id=new_style_course_id,
-            usage_id='chapter48f',
+            package_id=new_style_package_id,
+            block_id='chapter48f',
             branch='production'
         )
         chap_location = loc_mapper().translate_locator_to_location(chap_locator)
@@ -291,25 +290,25 @@ class TestLocationMapper(unittest.TestCase):
         chap_location = loc_mapper().translate_locator_to_location(chap_locator)
         self.assertEqual(chap_location, Location('i4x', org, course, 'chapter', '48f23a10395384929234'))
         chap_locator = BlockUsageLocator(
-            course_id=new_style_course_id, usage_id='chapter48f', branch='production'
+            package_id=new_style_package_id, block_id='chapter48f', branch='production'
         )
         chap_location = loc_mapper().translate_locator_to_location(chap_locator)
         self.assertEqual(chap_location, Location('i4x', org, course, 'chapter', '48f23a10395384929234'))
 
         # look for non-existent problem
         prob_locator2 = BlockUsageLocator(
-            course_id=new_style_course_id,
+            package_id=new_style_package_id,
             branch='draft',
-            usage_id='problem3'
+            block_id='problem3'
         )
         prob_location = loc_mapper().translate_locator_to_location(prob_locator2)
         self.assertIsNone(prob_location, 'Found non-existent problem')
 
         # add a distractor course
-        new_style_course_id = '{}.geek_dept.{}.{}'.format(org, course, 'delta_run')
+        new_style_package_id = '{}.geek_dept.{}.{}'.format(org, course, 'delta_run')
         loc_mapper().create_map_entry(
             Location('i4x', org, course, 'course', 'delta_run'),
-            new_style_course_id,
+            new_style_package_id,
             block_map={'abc123': {'problem': 'problem3'}}
         )
         prob_location = loc_mapper().translate_locator_to_location(prob_locator)
@@ -318,14 +317,14 @@ class TestLocationMapper(unittest.TestCase):
         # add a default course pointing to the delta_run
         loc_mapper().create_map_entry(
             Location('i4x', org, course, 'problem', '789abc123efg456'),
-            new_style_course_id,
+            new_style_package_id,
             block_map={'abc123': {'problem': 'problem3'}}
         )
         # now query delta (2 entries point to it)
         prob_locator = BlockUsageLocator(
-            course_id=new_style_course_id,
+            package_id=new_style_package_id,
             branch='production',
-            usage_id='problem3'
+            block_id='problem3'
         )
         prob_location = loc_mapper().translate_locator_to_location(prob_locator)
         self.assertEqual(prob_location, Location('i4x', org, course, 'problem', 'abc123'))
@@ -347,6 +346,25 @@ class TestLocationMapper(unittest.TestCase):
         )
         reverted_location = loc_mapper().translate_locator_to_location(prob_locator)
         self.assertEqual(location, reverted_location)
+
+    def test_name_collision(self):
+        """
+        Test dwim translation when the old name was not unique
+        """
+        org = "myorg"
+        course = "another_course"
+        name = "running_again"
+        course_location = Location('i4x', org, course, 'course', name)
+        course_xlate = loc_mapper().translate_location(None, course_location, add_entry_if_missing=True)
+        self.assertEqual(course_location, loc_mapper().translate_locator_to_location(course_xlate))
+        eponymous_block = course_location.replace(category='chapter')
+        chapter_xlate = loc_mapper().translate_location(None, eponymous_block, add_entry_if_missing=True)
+        self.assertEqual(course_location, loc_mapper().translate_locator_to_location(course_xlate))
+        self.assertEqual(eponymous_block, loc_mapper().translate_locator_to_location(chapter_xlate))
+        # and a non-existent one w/o add
+        eponymous_block = course_location.replace(category='problem')
+        with self.assertRaises(ItemNotFoundError):
+            chapter_xlate = loc_mapper().translate_location(None, eponymous_block, add_entry_if_missing=False)
 
 
 #==================================

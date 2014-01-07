@@ -75,7 +75,7 @@ Feature: LMS.Verified certificates
         Then I should see the course on my dashboard
         And a "edx.course.enrollment.activated" server event is emitted
 
-    Scenario: The upsell offer is on the dashboard if I am auditing.
+    Scenario: The upsell offer is on the dashboard if I am auditing
         Given I am logged in
         When I select the audit track
         And I navigate to my dashboard

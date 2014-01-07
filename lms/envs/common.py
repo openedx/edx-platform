@@ -390,7 +390,11 @@ MODULESTORE = {
     }
 }
 CONTENTSTORE = None
-DOC_STORE_CONFIG = None
+DOC_STORE_CONFIG = {
+    'host': 'localhost',
+    'db': 'xmodule',
+    'collection': 'modulestore',
+}
 
 # Should we initialize the modulestores at startup, or wait until they are
 # needed?
@@ -917,6 +921,11 @@ BULK_EMAIL_LOG_SENT_EMAILS = False
 # parallel, and what the SES rate is.
 BULK_EMAIL_RETRY_DELAY_BETWEEN_SENDS = 0.02
 
+
+############################## Video ##########################################
+
+# URL to test YouTube availability
+YOUTUBE_TEST_URL = 'https://gdata.youtube.com/feeds/api/videos/'
 
 
 ################################### APPS ######################################

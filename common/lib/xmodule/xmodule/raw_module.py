@@ -28,7 +28,7 @@ class RawDescriptor(XmlDescriptor, XMLEditingDescriptor):
             # re-raise
             lines = self.data.split('\n')
             line, offset = err.position
-            msg = ("Unable to create xml for module {loc}. "
+            msg = (u"Unable to create xml for module {loc}. "
                    "Context: '{context}'".format(
                    context=lines[line - 1][offset - 40:offset + 40],
                    loc=self.location))
