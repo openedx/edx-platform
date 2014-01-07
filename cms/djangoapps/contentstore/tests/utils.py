@@ -72,7 +72,7 @@ class CourseTestCase(ModuleStoreTestCase):
         email = 'test+courses@edx.org'
         password = 'foo'
 
-        # Create the use so we can log them in.
+        # Create the user so we can log them in.
         self.user = User.objects.create_user(uname, email, password)
 
         # Note that we do not actually need to do anything
