@@ -1,15 +1,15 @@
 # edX translation file
 # This English source file is machine-generated. Do not check it into github
-# Copyright (C) 2013 edX
+# Copyright (C) 2014 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# EdX Team <info@edx.org>, 2013.
+# EdX Team <info@edx.org>, 2014.
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
-"POT-Creation-Date: 2013-11-29 19:09+0000\n"
-"PO-Revision-Date: 2013-11-29 19:11:55.241062\n"
+"POT-Creation-Date: 2014-01-06 18:55+0000\n"
+"PO-Revision-Date: 2014-01-06 18:58:17.549202\n"
 "Last-Translator: \n"
 "Language-Team: translation team <translation_team@edx.org>\n"
 "MIME-Version: 1.0\n"
@@ -113,25 +113,25 @@ msgid "Contact edX Support"
 msgstr ""
 
 #: cms/templates/asset_index.html:6 cms/templates/asset_index.html:129
-#: cms/templates/widgets/header.html:57
+#: cms/templates/widgets/header.html:63
 msgid "Files &amp; Uploads"
 msgstr ""
 
-#: cms/templates/asset_index.html:128 cms/templates/course_info.html:51
-#: cms/templates/edit-tabs.html:28 cms/templates/overview.html:118
-#: cms/templates/syllabus.html:57 cms/templates/textbooks.html:57
-#: cms/templates/widgets/header.html:39
+#: cms/templates/asset_index.html:128 cms/templates/course_info.html:50
+#: cms/templates/edit-tabs.html:31 cms/templates/overview.html:124
+#: cms/templates/syllabuses.html:48 cms/templates/textbooks.html:49
+#: cms/templates/widgets/header.html:45
 msgid "Content"
 msgstr ""
 
-#: cms/templates/asset_index.html:133 cms/templates/course_info.html:56
-#: cms/templates/edit-tabs.html:33 cms/templates/index.html:42
-#: cms/templates/manage_users.html:20 cms/templates/overview.html:123
-#: cms/templates/syllabus.html:62 cms/templates/textbooks.html:62
+#: cms/templates/asset_index.html:133 cms/templates/course_info.html:55
+#: cms/templates/edit-tabs.html:36 cms/templates/index.html:43
+#: cms/templates/manage_users.html:20 cms/templates/overview.html:129
+#: cms/templates/syllabuses.html:53 cms/templates/textbooks.html:54
 msgid "Page Actions"
 msgstr ""
 
-#: cms/templates/asset_index.html:136 cms/templates/asset_index.html:186
+#: cms/templates/asset_index.html:136 cms/templates/asset_index.html:189
 msgid "Upload New File"
 msgstr ""
 
@@ -139,12 +139,12 @@ msgstr ""
 msgid "List of uploaded files and assets in this course"
 msgstr ""
 
-#: cms/templates/asset_index.html:157 cms/templates/unit.html:167
+#: cms/templates/asset_index.html:157 cms/templates/unit.html:174
 msgid "Preview"
 msgstr ""
 
 #: cms/templates/asset_index.html:158
-#: lms/templates/open_ended_problems/open_ended_flagged_problems.html:33
+#: lms/templates/open_ended_problems/open_ended_flagged_problems.html:34
 msgid "Name"
 msgstr ""
 
@@ -161,51 +161,58 @@ msgid "Actions"
 msgstr ""
 
 #: cms/templates/asset_index.html:172
-msgid "What files are included here?"
+msgid "What files are listed here?"
 msgstr ""
 
 #: cms/templates/asset_index.html:173
 msgid ""
-"Any file you upload to the course will be listed here, including your course"
-" image, textbook chapters, and any files you add directly to this page."
+"In addition to the files you upload on this page, any files that you add to "
+"the course appear in this list. These files include your course image, "
+"textbook chapters, and files that appear on your Course Handouts sidebar."
 msgstr ""
 
-#: cms/templates/asset_index.html:176
+#: cms/templates/asset_index.html:176 cms/templates/overview.html:269
+#: cms/templates/settings_graders.html:130
 msgid "What can I do on this page?"
 msgstr ""
 
-#: cms/templates/asset_index.html:177
+#: cms/templates/asset_index.html:178
 msgid ""
-"You can click the file name to view or download the file, upload a new file,"
-" delete a file, and lock a file to prevent people who are not enrolled from "
-"accessing that specific file. You can also copy the location (URL) of a file"
-" to use elsewhere in your course."
+"You can upload new files or view, download, or delete existing files. You "
+"can lock a file so that people who are not enrolled in your course cannot "
+"access that file."
 msgstr ""
 
-#: cms/templates/asset_index.html:184
+#: cms/templates/asset_index.html:179
+msgid ""
+"Use the URL listed for a file to create a link to that file in the Course "
+"Handouts sidebar or in the body of the course."
+msgstr ""
+
+#: cms/templates/asset_index.html:187
 #: lms/templates/courseware/courseware.html:182
 #: lms/templates/verify_student/_modal_editname.html:32
 msgid "close"
 msgstr ""
 
-#: cms/templates/asset_index.html:197
+#: cms/templates/asset_index.html:200
 msgid "Choose File"
 msgstr ""
 
-#: cms/templates/asset_index.html:213
+#: cms/templates/asset_index.html:216
 msgid "Your file has been deleted."
 msgstr ""
 
-#: cms/templates/asset_index.html:218
+#: cms/templates/asset_index.html:221
 msgid "close alert"
 msgstr ""
 
-#: cms/templates/base.html:35 lms/templates/main.html:81
+#: cms/templates/base.html:36 lms/templates/main.html:81
 msgid "Skip to this view's content"
 msgstr ""
 
 #: cms/templates/checklists.html:40 cms/templates/export.html:83
-#: cms/templates/import.html:13 cms/templates/widgets/header.html:91
+#: cms/templates/import.html:13 cms/templates/widgets/header.html:97
 msgid "Tools"
 msgstr ""
 
@@ -218,21 +225,19 @@ msgid "Current Checklists"
 msgstr ""
 
 #: cms/templates/checklists.html:56
-msgid "What are checklists?"
+msgid "What are course checklists?"
 msgstr ""
 
 #: cms/templates/checklists.html:58
 msgid ""
-"Running a course on edX is a complex undertaking. Course checklists are "
-"designed to help you understand and keep track of all the steps necessary to"
-" get your course ready for students."
+"Course checklists are tools to help you understand and keep track of all the"
+" steps necessary to get your course ready for students."
 msgstr ""
 
 #: cms/templates/checklists.html:61
 msgid ""
-"These checklists are shared among your course team, and any changes you make"
-" are immediately visible to other members of the team and saved "
-"automatically."
+"Any changes you make to these checklists are saved automatically and are "
+"immediately visible to other course team members."
 msgstr ""
 
 #: cms/templates/component.html:10
@@ -240,24 +245,24 @@ msgid "Editor"
 msgstr ""
 
 #: cms/templates/component.html:13 cms/templates/manage_users.html:15
-#: cms/templates/settings.html:53 cms/templates/settings_advanced.html:47
-#: cms/templates/settings_graders.html:45 cms/templates/widgets/header.html:68
+#: cms/templates/settings.html:55 cms/templates/settings_advanced.html:45
+#: cms/templates/settings_graders.html:46 cms/templates/widgets/header.html:74
 #: lms/templates/wiki/includes/article_menu.html:55
 msgid "Settings"
 msgstr ""
 
-#: cms/templates/component.html:24 cms/templates/overview.html:61
-#: cms/templates/overview.html:79 cms/templates/overview.html:99
-#: cms/templates/overview.html:258 lms/templates/problem.html:24
+#: cms/templates/component.html:24 cms/templates/overview.html:60
+#: cms/templates/overview.html:80 cms/templates/overview.html:99
+#: cms/templates/overview.html:305 lms/templates/problem.html:24
 #: lms/templates/combinedopenended/openended/open_ended.html:33
 #: lms/templates/combinedopenended/selfassessment/self_assessment_prompt.html:22
 #: lms/templates/verify_student/face_upload.html:314
 msgid "Save"
 msgstr ""
 
-#: cms/templates/component.html:25 cms/templates/index.html:127
-#: cms/templates/manage_users.html:56 cms/templates/overview.html:62
-#: cms/templates/overview.html:100 cms/templates/overview.html:258
+#: cms/templates/component.html:25 cms/templates/index.html:140
+#: cms/templates/manage_users.html:56 cms/templates/overview.html:61
+#: cms/templates/overview.html:100 cms/templates/overview.html:308
 #: lms/templates/discussion/_inline_new_post.html:51
 #: lms/templates/discussion/_new_post.html:82
 #: lms/templates/discussion/_underscore_templates.html:101
@@ -266,7 +271,7 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
-#: cms/templates/component.html:31 cms/templates/overview.html:176
+#: cms/templates/component.html:31
 #: lms/templates/discussion/_underscore_templates.html:76
 #: lms/templates/discussion/_underscore_templates.html:138
 msgid "Edit"
@@ -278,62 +283,60 @@ msgstr ""
 msgid "Delete"
 msgstr ""
 
-#: cms/templates/component.html:34 cms/templates/overview.html:183
-#: cms/templates/overview.html:218
+#: cms/templates/component.html:34 cms/templates/overview.html:200
+#: cms/templates/overview.html:237
 msgid "Drag to reorder"
 msgstr ""
 
-#: cms/templates/course_info.html:8 cms/templates/course_info.html:52
+#: cms/templates/course_info.html:8 cms/templates/course_info.html:51
 msgid "Course Updates"
 msgstr ""
 
-#: cms/templates/course_info.html:59
+#: cms/templates/course_info.html:58
 msgid "New Update"
 msgstr ""
 
-#: cms/templates/course_info.html:69
+#: cms/templates/course_info.html:68
 msgid ""
-"Course updates are announcements or notifications you want to share with "
-"your class. Other course authors have used them for important exam/date "
-"reminders, change in schedules, and to call out any important steps students"
-" need to be aware of."
+"Use course updates to notify students of important dates or exams, highlight"
+" particular discussions in the forums, announce schedule changes, and "
+"respond to student questions. You add or edit updates in HTML."
 msgstr ""
 
-#: cms/templates/edit-tabs.html:29 cms/templates/export.html:122
-#: cms/templates/widgets/header.html:54
+#: cms/templates/edit-tabs.html:32 cms/templates/export.html:122
+#: cms/templates/widgets/header.html:60
 msgid "Static Pages"
 msgstr ""
 
-#: cms/templates/edit-tabs.html:36
+#: cms/templates/edit-tabs.html:39
 msgid "New Page"
 msgstr ""
 
-#: cms/templates/edit-tabs.html:46
+#: cms/templates/edit-tabs.html:49
 msgid ""
-"Static Pages are additional pages that supplement your Courseware. Other "
-"course authors have used them to share a syllabus, calendar, handouts, and "
-"more."
+"Use Static Pages to share a syllabus, a calendar, handouts, or other "
+"supplements to your courseware."
 msgstr ""
 
-#: cms/templates/edit-tabs.html:50
-msgid "How do Static Pages look to students in my course?"
-msgstr ""
-
-#: cms/templates/edit-tabs.html:78
-msgid "How Static Pages are Used in Your Course"
-msgstr ""
-
-#: cms/templates/edit-tabs.html:80
-msgid "Preview of how Static Pages are used in your course"
+#: cms/templates/edit-tabs.html:53
+msgid "What do static pages look like in my course?"
 msgstr ""
 
 #: cms/templates/edit-tabs.html:81
-msgid ""
-"These pages will be presented in your course's main navigation alongside "
-"Courseware, Course Info, Discussion, etc."
+msgid "Static Pages in Your Course"
 msgstr ""
 
-#: cms/templates/edit-tabs.html:86 cms/templates/howitworks.html:161
+#: cms/templates/edit-tabs.html:83
+msgid "Preview of Static Pages in your course"
+msgstr ""
+
+#: cms/templates/edit-tabs.html:84
+msgid ""
+"The names of your Static Pages appear in your course's main navigation bar, "
+"along with Courseware, Course Info, Discussion, Wiki, and Progress."
+msgstr ""
+
+#: cms/templates/edit-tabs.html:89 cms/templates/howitworks.html:161
 #: cms/templates/howitworks.html:174 cms/templates/howitworks.html:187
 msgid "close modal"
 msgstr ""
@@ -354,16 +357,16 @@ msgstr ""
 msgid "Subsection Settings"
 msgstr ""
 
-#: cms/templates/edit_subsection.html:40 cms/templates/overview.html:246
+#: cms/templates/edit_subsection.html:40 cms/templates/overview.html:292
 msgid "Release Day"
 msgstr ""
 
-#: cms/templates/edit_subsection.html:46 cms/templates/overview.html:250
+#: cms/templates/edit_subsection.html:46 cms/templates/overview.html:296
 msgid "Release Time"
 msgstr ""
 
 #: cms/templates/edit_subsection.html:46 cms/templates/edit_subsection.html:78
-#: cms/templates/overview.html:250
+#: cms/templates/overview.html:296
 msgid "Coordinated Universal Time"
 msgstr ""
 
@@ -388,7 +391,7 @@ msgstr ""
 msgid "Graded as:"
 msgstr ""
 
-#: cms/templates/edit_subsection.html:65 cms/templates/overview.html:213
+#: cms/templates/edit_subsection.html:65 cms/templates/overview.html:231
 msgid "Not Graded"
 msgstr ""
 
@@ -412,8 +415,8 @@ msgstr ""
 msgid "Preview Drafts"
 msgstr ""
 
-#: cms/templates/edit_subsection.html:89 cms/templates/index.html:157
-#: cms/templates/overview.html:132 cms/templates/unit.html:168
+#: cms/templates/edit_subsection.html:89 cms/templates/index.html:170
+#: cms/templates/overview.html:138 cms/templates/unit.html:175
 msgid "View Live"
 msgstr ""
 
@@ -434,7 +437,7 @@ msgid ""
 msgstr ""
 
 #: cms/templates/error.html:18 cms/templates/error.html:24
-#: cms/templates/widgets/footer.html:20 cms/templates/widgets/header.html:133
+#: cms/templates/widgets/footer.html:20 cms/templates/widgets/header.html:139
 #: cms/templates/widgets/sock.html:49
 msgid "Use our feedback tool, Tender, to share your feedback"
 msgstr ""
@@ -466,13 +469,14 @@ msgstr ""
 
 #: cms/templates/export.html:98
 msgid ""
-"You can export this course to edit it outside of Studio. Select the Export "
-"Course Content button below to download a .{em_start}tar.gz{em_end} file "
-"that contains the course content."
+"You can export courses and edit them outside of Studio. The exported file is"
+" a .tar.gz file (that is, a .tar file compressed with GNU Zip) that contains"
+" the course structure and content. You can also re-import courses that "
+"you've exported."
 msgstr ""
 
 #: cms/templates/export.html:103
-msgid "Export a Copy of My Course Data"
+msgid "Export My Course Content"
 msgstr ""
 
 #: cms/templates/export.html:109
@@ -511,7 +515,7 @@ msgstr ""
 msgid "User Data"
 msgstr ""
 
-#: cms/templates/export.html:132 cms/templates/export.html:159
+#: cms/templates/export.html:132
 msgid "Course Team Data"
 msgstr ""
 
@@ -524,38 +528,38 @@ msgid "Certificates"
 msgstr ""
 
 #: cms/templates/export.html:142
-msgid "Why export my course?"
+msgid "Why export a course?"
 msgstr ""
 
-#: cms/templates/export.html:145
-msgid "Edit the course XML directly, then import the modified course."
-msgstr ""
-
-#: cms/templates/export.html:146
-msgid "Store a backup of your course in its current state."
+#: cms/templates/export.html:143
+msgid ""
+"You may want to edit the XML in your course directly, outside of Studio. You"
+" may want to create a backup copy of your course. Or, you may want to create"
+" a copy of your course that you can later import into another course "
+"instance and customize."
 msgstr ""
 
 #: cms/templates/export.html:147
-msgid ""
-"Import the course into another course instance, to create a customized "
-"version of your course."
+msgid "What content is exported?"
 msgstr ""
 
-#: cms/templates/export.html:152
+#: cms/templates/export.html:149
+msgid ""
+"Only the course content and structure (including sections, subsections, and "
+"units) are exported. Other data, including student data, grading "
+"information, discussion forum data, course settings, and course team "
+"information, is not exported."
+msgstr ""
+
+#: cms/templates/export.html:153
 msgid "Opening the downloaded file"
 msgstr ""
 
-#: cms/templates/export.html:154
+#: cms/templates/export.html:155
 msgid ""
-"Extract the .tar.gz with an archive program on your computer.  Extracted "
-"data includes the course.xml file, as well as subfolders containing course "
-"content."
-msgstr ""
-
-#: cms/templates/export.html:161
-msgid ""
-"Note that course team data is not exported, and that course team data is not"
-" changed when importing a course."
+"Use an archive program to extract the data from the .tar.gz file. Extracted "
+"data includes the course.xml file, as well as subfolders that contain course"
+" content."
 msgstr ""
 
 #: cms/templates/howitworks.html:8
@@ -771,24 +775,30 @@ msgid "Course Import"
 msgstr ""
 
 #: cms/templates/import.html:24
-msgid "You may import existing course structure and content into Studio."
+msgid ""
+"Be sure you want to import a course before continuing. Content of the "
+"imported course replaces all the content of this course. {em_start}You "
+"cannot undo a course import{em_end}. We recommend that you first export the "
+"current course, so you have a backup copy of it."
 msgstr ""
 
 #: cms/templates/import.html:26
 msgid ""
-"Importing is not something to take lightly as the course content you "
-"successfully upload will be integrated into your course content and cannot "
-"be reversed."
+"The course that you import must be in a .tar.gz file (that is, a .tar file "
+"compressed with GNU Zip). This .tar.gz file must contain a course.xml file. "
+"It may also contain other files."
 msgstr ""
 
 #: cms/templates/import.html:27
 msgid ""
-"During the initial stages of the import process, please do not navigate away"
-" from this page."
+"The import process has five stages. During the first two stages, you must "
+"stay on this page. You can leave this page after the Unpacking stage has "
+"completed. We recommend, however, that you don't make important changes to "
+"your course until the import operation has completed."
 msgstr ""
 
 #: cms/templates/import.html:33
-msgid "Select a File (.tar.gz format) to Replace Your Course Content"
+msgid "Select a .tar.gz File to Replace Your Course Content"
 msgstr ""
 
 #: cms/templates/import.html:39
@@ -857,34 +867,38 @@ msgid "View Updated Outline"
 msgstr ""
 
 #: cms/templates/import.html:128
-msgid "Gzipped Tar Files (.tar.gz) Only"
+msgid "Why import a course?"
 msgstr ""
 
 #: cms/templates/import.html:130
 msgid ""
-"File uploads must be gzipped tar files (.tar.gz) containing, at a minimum, a"
-" {filename} file."
+"You may want to run a new version of an existing course, or replace an "
+"existing course altogether. Or, you may have developed a course outside "
+"Studio."
 msgstr ""
 
 #: cms/templates/import.html:134
-msgid "Warning: Auto-generated Nodes"
+msgid "What content is imported?"
 msgstr ""
 
 #: cms/templates/import.html:136
 msgid ""
-"Please note that if your course has any problems with auto-generated "
-"{nodename} nodes, re-importing your course could cause the loss of student "
-"data associated with those problems."
+"Only the course content and structure (including sections, subsections, and "
+"units) are imported. Other data, including student data, grading "
+"information, discussion forum data, course settings, and course team "
+"information, remains the same as it was in the existing course."
 msgstr ""
 
 #: cms/templates/import.html:141
-msgid "Course Team Info and Exporting/Importing"
+msgid "Warning: Importing while a course is running"
 msgstr ""
 
 #: cms/templates/import.html:143
 msgid ""
-"Please note that when importing course content, your course team info will "
-"not be changed by the imported course's information."
+"If you perform an import while your course is running, and you change the "
+"URL names (or url_name nodes) of any Problem components, the student data "
+"associated with those Problem components may be lost. This data includes "
+"students' problem scores."
 msgstr ""
 
 #: cms/templates/import.html:170
@@ -915,155 +929,159 @@ msgstr ""
 msgid "Your import is in progress; navigating away will abort it."
 msgstr ""
 
-#: cms/templates/index.html:5 cms/templates/index.html:38
-#: cms/templates/widgets/header.html:147
+#: cms/templates/index.html:6 cms/templates/index.html:39
+#: cms/templates/widgets/header.html:153
 msgid "My Courses"
 msgstr ""
 
-#: cms/templates/index.html:47
+#: cms/templates/index.html:48
 msgid "New Course"
 msgstr ""
 
-#: cms/templates/index.html:49
+#: cms/templates/index.html:50
 msgid "Email staff to create course"
 msgstr ""
 
-#: cms/templates/index.html:64
+#: cms/templates/index.html:65
 msgid "Welcome, {0}!"
 msgstr ""
 
-#: cms/templates/index.html:68
+#: cms/templates/index.html:69
 msgid "Here are all of the courses you currently have access to in Studio:"
 msgstr ""
 
-#: cms/templates/index.html:73
+#: cms/templates/index.html:74
 msgid "You currently aren't associated with any Studio Courses."
 msgstr ""
 
-#: cms/templates/index.html:83
+#: cms/templates/index.html:84
 msgid "Please correct the highlighted fields below."
 msgstr ""
 
-#: cms/templates/index.html:88
+#: cms/templates/index.html:89
 msgid "Create a New Course"
 msgstr ""
 
-#: cms/templates/index.html:91
+#: cms/templates/index.html:92
 msgid "Required Information to Create a New Course"
 msgstr ""
 
-#: cms/templates/index.html:95 cms/templates/settings.html:81
+#: cms/templates/index.html:96 cms/templates/settings.html:85
 msgid "Course Name"
 msgstr ""
 
-#: cms/templates/index.html:96
+#: cms/templates/index.html:97
 msgid "e.g. Introduction to Computer Science"
 msgstr ""
 
-#: cms/templates/index.html:97
+#: cms/templates/index.html:98
 msgid "The public display name for your course."
 msgstr ""
 
-#: cms/templates/index.html:101 cms/templates/settings.html:71
+#: cms/templates/index.html:102 cms/templates/settings.html:73
 #: lms/templates/static_templates/faq.html:21
 #: lms/templates/static_templates/faq.html:130
 msgid "Organization"
 msgstr ""
 
-#: cms/templates/index.html:102
+#: cms/templates/index.html:103
 msgid "e.g. UniversityX or OrganizationX"
 msgstr ""
 
-#: cms/templates/index.html:103
+#: cms/templates/index.html:104
 msgid "The name of the organization sponsoring the course."
 msgstr ""
 
-#: cms/templates/index.html:103
+#: cms/templates/index.html:104
 msgid ""
 "Note: This is part of your course URL, so no spaces or special characters "
 "are allowed."
 msgstr ""
 
-#: cms/templates/index.html:103
+#: cms/templates/index.html:104
 msgid ""
 "This cannot be changed, but you can set a different display name in Advanced"
 " Settings later."
 msgstr ""
 
-#: cms/templates/index.html:108 cms/templates/settings.html:76
+#: cms/templates/index.html:109 cms/templates/settings.html:79
 #: lms/templates/courseware/course_about.html:226
 msgid "Course Number"
 msgstr ""
 
-#: cms/templates/index.html:109
+#: cms/templates/index.html:110
 msgid "e.g. CS101"
 msgstr ""
 
-#: cms/templates/index.html:110
+#: cms/templates/index.html:111
 msgid ""
 "The unique number that identifies your course within your organization."
 msgstr ""
 
-#: cms/templates/index.html:110 cms/templates/index.html:117
+#: cms/templates/index.html:111 cms/templates/index.html:118
 msgid ""
 "Note: This is part of your course URL, so no spaces or special characters "
 "are allowed and it cannot be changed."
 msgstr ""
 
-#: cms/templates/index.html:115
+#: cms/templates/index.html:116
 msgid "Course Run"
 msgstr ""
 
-#: cms/templates/index.html:116
+#: cms/templates/index.html:117
 msgid "e.g. 2014_T1"
 msgstr ""
 
-#: cms/templates/index.html:117
+#: cms/templates/index.html:118
 msgid "The term in which your course will run."
 msgstr ""
 
-#: cms/templates/index.html:126
+#: cms/templates/index.html:124
+msgid "Highest Level of Education Required"
+msgstr ""
+
+#: cms/templates/index.html:139
 msgid "Create"
 msgstr ""
 
-#: cms/templates/index.html:143
+#: cms/templates/index.html:156
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html:18
 msgid "Organization:"
 msgstr ""
 
-#: cms/templates/index.html:146
+#: cms/templates/index.html:159
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html:23
 msgid "Course Number:"
 msgstr ""
 
-#: cms/templates/index.html:150
+#: cms/templates/index.html:163
 msgid "Course Run:"
 msgstr ""
 
-#: cms/templates/index.html:172
+#: cms/templates/index.html:185
 msgid "Are you staff on an existing Studio course?"
 msgstr ""
 
-#: cms/templates/index.html:174
+#: cms/templates/index.html:187
 msgid ""
 "You will need to be added to the course in Studio by the course creator. "
 "Please get in touch with the course creator or administrator for the "
 "specific course you are helping to author."
 msgstr ""
 
-#: cms/templates/index.html:182 cms/templates/index.html:190
+#: cms/templates/index.html:195 cms/templates/index.html:203
 msgid "Create Your First Course"
 msgstr ""
 
-#: cms/templates/index.html:184
+#: cms/templates/index.html:197
 msgid "Your new course is just a click away!"
 msgstr ""
 
-#: cms/templates/index.html:203
+#: cms/templates/index.html:216
 msgid "Becoming a Course Creator in Studio"
 msgstr ""
 
-#: cms/templates/index.html:208
+#: cms/templates/index.html:221
 msgid ""
 "edX Studio is a hosted solution for our xConsortium partners and selected "
 "guests. Courses for which you are a team member appear above for you to "
@@ -1072,20 +1090,20 @@ msgid ""
 "work week."
 msgstr ""
 
-#: cms/templates/index.html:212 cms/templates/index.html:235
-#: cms/templates/index.html:261
+#: cms/templates/index.html:225 cms/templates/index.html:248
+#: cms/templates/index.html:274
 msgid "Your Course Creator Request Status:"
 msgstr ""
 
-#: cms/templates/index.html:216
+#: cms/templates/index.html:229
 msgid "Request the Ability to Create Courses"
 msgstr ""
 
-#: cms/templates/index.html:226 cms/templates/index.html:252
+#: cms/templates/index.html:239 cms/templates/index.html:265
 msgid "Your Course Creator Request Status"
 msgstr ""
 
-#: cms/templates/index.html:231
+#: cms/templates/index.html:244
 msgid ""
 "edX Studio is a hosted solution for our xConsortium partners and selected "
 "guests. Courses for which you are a team member appear above for you to "
@@ -1093,20 +1111,20 @@ msgid ""
 "completed evaluating your request."
 msgstr ""
 
-#: cms/templates/index.html:238 cms/templates/index.html:264
+#: cms/templates/index.html:251 cms/templates/index.html:277
 msgid "Your Course Creator request is:"
 msgstr ""
 
-#: cms/templates/index.html:241
+#: cms/templates/index.html:254
 msgid "Denied"
 msgstr ""
 
-#: cms/templates/index.html:242
+#: cms/templates/index.html:255
 msgid ""
 "Your request did not meet the criteria/guidelines specified by edX Staff."
 msgstr ""
 
-#: cms/templates/index.html:257
+#: cms/templates/index.html:270
 msgid ""
 "edX Studio is a hosted solution for our xConsortium partners and selected "
 "guests. Courses for which you are a team member appear above for you to "
@@ -1114,72 +1132,72 @@ msgid ""
 "currently  evaluating your request."
 msgstr ""
 
-#: cms/templates/index.html:267
+#: cms/templates/index.html:280
 #: lms/templates/dashboard/_dashboard_status_verification.html:29
 msgid "Pending"
 msgstr ""
 
-#: cms/templates/index.html:268
+#: cms/templates/index.html:281
 msgid ""
 "Your request is currently being reviewed by edX staff and should be updated "
 "shortly."
 msgstr ""
 
-#: cms/templates/index.html:280 cms/templates/index.html:336
+#: cms/templates/index.html:293 cms/templates/index.html:349
 msgid "Need help?"
 msgstr ""
 
-#: cms/templates/index.html:281
+#: cms/templates/index.html:294
 msgid ""
 "If you are new to Studio and having trouble getting started, there are a few"
 " things that may be of help:"
 msgstr ""
 
-#: cms/templates/index.html:285
+#: cms/templates/index.html:298
 msgid "Get started by reading Studio's Documentation"
 msgstr ""
 
-#: cms/templates/index.html:288
+#: cms/templates/index.html:301
 msgid "Request help with Studio"
 msgstr ""
 
-#: cms/templates/index.html:295 cms/templates/index.html:302
-#: cms/templates/index.html:308
+#: cms/templates/index.html:308 cms/templates/index.html:315
+#: cms/templates/index.html:321
 msgid "Can I create courses in Studio?"
 msgstr ""
 
-#: cms/templates/index.html:296
+#: cms/templates/index.html:309
 msgid "In order to create courses in Studio, you must"
 msgstr ""
 
-#: cms/templates/index.html:296
+#: cms/templates/index.html:309
 msgid "contact edX staff to help you create a course"
 msgstr ""
 
-#: cms/templates/index.html:303
+#: cms/templates/index.html:316
 msgid ""
 "In order to create courses in Studio, you must have course creator "
 "privileges to create your own course."
 msgstr ""
 
-#: cms/templates/index.html:309
+#: cms/templates/index.html:322
 msgid "Your request to author courses in studio has been denied. Please"
 msgstr ""
 
-#: cms/templates/index.html:309
+#: cms/templates/index.html:322
 msgid "contact edX Staff with further questions"
 msgstr ""
 
-#: cms/templates/index.html:321
+#: cms/templates/index.html:334
 #, python-format
 msgid "Thanks for signing up, %(name)s!"
 msgstr ""
 
-#: cms/templates/index.html:326
+#: cms/templates/index.html:339
 msgid "We need to verify your email address"
 msgstr ""
 
-#: cms/templates/index.html:328
+#: cms/templates/index.html:341
 #, python-format
 msgid ""
 "Almost there! In order to complete your sign up we need you to verify your "
@@ -1187,14 +1205,14 @@ msgid ""
 "waiting for you there."
 msgstr ""
 
-#: cms/templates/index.html:337
+#: cms/templates/index.html:350
 msgid ""
 "Please check your Junk or Spam folders in case our email isn't in your "
 "INBOX. Still can't find the verification email? Request help via the link "
 "below."
 msgstr ""
 
-#: cms/templates/login.html:6 cms/templates/widgets/header.html:173
+#: cms/templates/login.html:6 cms/templates/widgets/header.html:179
 msgid "Sign In"
 msgstr ""
 
@@ -1210,7 +1228,7 @@ msgstr ""
 msgid "Required Information to Sign In to edX Studio"
 msgstr ""
 
-#: cms/templates/login.html:26 cms/templates/signup.html:29
+#: cms/templates/login.html:26 cms/templates/signup.html:30
 msgid "Email Address"
 msgstr ""
 
@@ -1220,10 +1238,10 @@ msgstr ""
 msgid "Forgot password?"
 msgstr ""
 
-#: cms/templates/login.html:32 cms/templates/signup.html:34
+#: cms/templates/login.html:32 cms/templates/signup.html:35
 #: lms/templates/login.html:137 lms/templates/login_modal.html:19
-#: lms/templates/provider_login.html:46 lms/templates/provider_login.html:47
-#: lms/templates/register.html:131
+#: lms/templates/provider_login.html:47 lms/templates/provider_login.html:48
+#: lms/templates/register.html:132 lms/templates/sysadmin_dashboard.html:79
 #: lms/templates/university_profile/edge.html:19
 msgid "Password"
 msgstr ""
@@ -1233,7 +1251,7 @@ msgid "Studio Support"
 msgstr ""
 
 #: cms/templates/login.html:51 lms/templates/login.html:187
-#: lms/templates/register.html:345
+#: lms/templates/register.html:355
 msgid "Need Help?"
 msgstr ""
 
@@ -1248,10 +1266,10 @@ msgstr ""
 msgid "Course Team Settings"
 msgstr ""
 
-#: cms/templates/manage_users.html:16 cms/templates/settings.html:297
+#: cms/templates/manage_users.html:16 cms/templates/settings.html:299
 #: cms/templates/settings_advanced.html:101
-#: cms/templates/settings_graders.html:146
-#: cms/templates/widgets/header.html:80
+#: cms/templates/settings_graders.html:149
+#: cms/templates/widgets/header.html:86
 msgid "Course Team"
 msgstr ""
 
@@ -1337,139 +1355,187 @@ msgid "Add a New Team Member"
 msgstr ""
 
 #: cms/templates/manage_users.html:144
-msgid "About Roles within Your Course Team"
+msgid "Course Team Roles"
 msgstr ""
 
 #: cms/templates/manage_users.html:145
 msgid ""
-"Course team members are co-authors (staff). They have full access to all the"
-" content in the course and all the same editing privileges. Admins have the "
-"unique ability to add and remove course team members."
+"Course team members, or staff, are course co-authors. They have full writing"
+" and editing privileges on all course content."
 msgstr ""
 
-#: cms/templates/manage_users.html:150
-msgid "Tranferring Ownership"
+#: cms/templates/manage_users.html:146
+msgid ""
+"Admins are course team members who can add and remove other course team "
+"members."
 msgstr ""
 
 #: cms/templates/manage_users.html:151
-msgid ""
-"There must always be an Admin assigned to every course. To transfer your "
-"ownership of the course, add Admin access to another user and request they "
-"remove you from the Course Team list."
+msgid "Transferring Ownership"
 msgstr ""
 
-#: cms/templates/overview.html:9 cms/templates/overview.html:119
+#: cms/templates/manage_users.html:152
+msgid ""
+"Every course must have an Admin. If you're the Admin and you want transfer "
+"ownership of the course, click Add admin access to make another user the "
+"Admin, then ask that user to remove you from the Course Team list."
+msgstr ""
+
+#: cms/templates/overview.html:9 cms/templates/overview.html:125
 msgid "Course Outline"
 msgstr ""
 
-#: cms/templates/overview.html:55 cms/templates/overview.html:72
-msgid "Collapse/expand this section"
-msgstr ""
-
-#: cms/templates/overview.html:59 cms/templates/overview.html:77
-msgid "New Section Name"
-msgstr ""
-
-#: cms/templates/overview.html:84 cms/templates/overview.html:182
-msgid "Delete this section"
-msgstr ""
-
-#: cms/templates/overview.html:85
-msgid "Drag to re-order"
-msgstr ""
-
-#: cms/templates/overview.html:97 cms/templates/overview.html:189
-msgid "New Subsection"
-msgstr ""
-
-#: cms/templates/overview.html:106
-msgid "New Unit"
-msgstr ""
-
-#: cms/templates/overview.html:126
-msgid "Collapse All Sections"
-msgstr ""
-
-#: cms/templates/overview.html:129
-msgid "New Section"
-msgstr ""
-
-#: cms/templates/overview.html:156
+#: cms/templates/overview.html:54 cms/templates/overview.html:73
+#: cms/templates/overview.html:167
 msgid "Expand/collapse this section"
 msgstr ""
 
-#: cms/templates/overview.html:170
-msgid "This section has not been released."
+#: cms/templates/overview.html:58 cms/templates/overview.html:78
+msgid "New Section Name"
 msgstr ""
 
-#: cms/templates/overview.html:171
+#: cms/templates/overview.html:76
+msgid "Add a new section name"
+msgstr ""
+
+#: cms/templates/overview.html:85 cms/templates/overview.html:197
+msgid "Delete this section"
+msgstr ""
+
+#: cms/templates/overview.html:86
+msgid "Drag to re-order"
+msgstr ""
+
+#: cms/templates/overview.html:97 cms/templates/overview.html:254
+msgid "New Subsection"
+msgstr ""
+
+#: cms/templates/overview.html:106 cms/templates/widgets/units.html:59
+msgid "New Unit"
+msgstr ""
+
+#: cms/templates/overview.html:115
+msgid "You haven't added any sections to your course outline yet."
+msgstr ""
+
+#: cms/templates/overview.html:115
+msgid "Add your first section"
+msgstr ""
+
+#: cms/templates/overview.html:132
+msgid "Collapse All Sections"
+msgstr ""
+
+#: cms/templates/overview.html:135
+msgid "New Section"
+msgstr ""
+
+#: cms/templates/overview.html:187
+msgid "This section is not scheduled for release"
+msgstr ""
+
+#: cms/templates/overview.html:188
 msgid "Schedule"
 msgstr ""
 
-#: cms/templates/overview.html:173
-msgid "Will Release:"
+#: cms/templates/overview.html:190
+msgid "Release date:"
 msgstr ""
 
-#: cms/templates/overview.html:206
+#: cms/templates/overview.html:192
+msgid "Edit section release date"
+msgstr ""
+
+#: cms/templates/overview.html:197
+msgid "Delete section"
+msgstr ""
+
+#: cms/templates/overview.html:200
+msgid "Drag to reorder section"
+msgstr ""
+
+#: cms/templates/overview.html:221
 msgid "Expand/collapse this subsection"
 msgstr ""
 
-#: cms/templates/overview.html:217
+#: cms/templates/overview.html:234
 msgid "Delete this subsection"
 msgstr ""
 
-#: cms/templates/overview.html:243
+#: cms/templates/overview.html:234
+msgid "Delete subsection"
+msgstr ""
+
+#: cms/templates/overview.html:270
+msgid ""
+"You can create new sections and subsections, set the release date for "
+"sections, and create new units in existing subsections.  You can set the "
+"assignment type for subsections that are to be graded, and you can open a "
+"subsection for further editing."
+msgstr ""
+
+#: cms/templates/overview.html:272
+msgid ""
+"In addition, you can drag and drop sections, subsections, and units to "
+"reorganize your course."
+msgstr ""
+
+#: cms/templates/overview.html:288
 msgid "Section Release Date"
 msgstr ""
 
-#: cms/templates/overview.html:255
+#: cms/templates/overview.html:289
 msgid ""
-"On the date set above, this section - {name} - will be released to students."
+"On the date set below, this section - {name} - will be released to students."
 " Any units marked private will only be visible to admins."
+msgstr ""
+
+#: cms/templates/overview.html:302
+msgid "Form Actions"
 msgstr ""
 
 #: cms/templates/settings.html:2
 msgid "Schedule &amp; Details Settings"
 msgstr ""
 
-#: cms/templates/settings.html:54
+#: cms/templates/settings.html:56
 msgid "Schedule & Details"
 msgstr ""
 
-#: cms/templates/settings.html:65
+#: cms/templates/settings.html:67
 msgid "Basic Information"
 msgstr ""
 
-#: cms/templates/settings.html:66
+#: cms/templates/settings.html:68
 msgid "The nuts and bolts of your course"
 msgstr ""
 
-#: cms/templates/settings.html:72 cms/templates/settings.html:77
-#: cms/templates/settings.html:82
+#: cms/templates/settings.html:74 cms/templates/settings.html:80
+#: cms/templates/settings.html:86
 msgid "This field is disabled: this information cannot be changed."
 msgstr ""
 
-#: cms/templates/settings.html:88
+#: cms/templates/settings.html:93
 msgid "Course Summary Page"
 msgstr ""
 
-#: cms/templates/settings.html:88
+#: cms/templates/settings.html:93
 msgid "(for student enrollment and access)"
 msgstr ""
 
-#: cms/templates/settings.html:95
+#: cms/templates/settings.html:100
 msgid "Send a note to students via email"
 msgstr ""
 
-#: cms/templates/settings.html:95
+#: cms/templates/settings.html:102
 msgid "Invite your students"
 msgstr ""
 
-#: cms/templates/settings.html:103
+#: cms/templates/settings.html:110
 msgid "Promoting Your Course with edX"
 msgstr ""
 
-#: cms/templates/settings.html:105
+#: cms/templates/settings.html:112
 msgid ""
 "Your course summary page will not be viewable until your course has been "
 "announced. To provide content for the page and preview it, follow the "
@@ -1478,67 +1544,67 @@ msgid ""
 "href=\"mailto:conrad@edx.org\">(conrad@edx.org)</a>."
 msgstr ""
 
-#: cms/templates/settings.html:115
+#: cms/templates/settings.html:122
 msgid "Course Schedule"
 msgstr ""
 
-#: cms/templates/settings.html:116
-msgid "Dates that control when your course can be viewed."
+#: cms/templates/settings.html:123
+msgid "Dates that control when your course can be viewed"
 msgstr ""
 
-#: cms/templates/settings.html:122
+#: cms/templates/settings.html:129
 msgid "Course Start Date"
 msgstr ""
 
-#: cms/templates/settings.html:124
+#: cms/templates/settings.html:131
 msgid "First day the course begins"
 msgstr ""
 
-#: cms/templates/settings.html:128
+#: cms/templates/settings.html:135
 msgid "Course Start Time"
 msgstr ""
 
-#: cms/templates/settings.html:136
+#: cms/templates/settings.html:143
 msgid "Course End Date"
 msgstr ""
 
-#: cms/templates/settings.html:138
+#: cms/templates/settings.html:145
 msgid "Last day your course is active"
 msgstr ""
 
-#: cms/templates/settings.html:142
+#: cms/templates/settings.html:149
 msgid "Course End Time"
 msgstr ""
 
-#: cms/templates/settings.html:152
+#: cms/templates/settings.html:159
 msgid "Enrollment Start Date"
 msgstr ""
 
-#: cms/templates/settings.html:154
+#: cms/templates/settings.html:161
 msgid "First day students can enroll"
 msgstr ""
 
-#: cms/templates/settings.html:158
+#: cms/templates/settings.html:165
 msgid "Enrollment Start Time"
 msgstr ""
 
-#: cms/templates/settings.html:166
+#: cms/templates/settings.html:173
 msgid "Enrollment End Date"
 msgstr ""
 
-#: cms/templates/settings.html:168
+#: cms/templates/settings.html:175
 msgid "Last day students can enroll"
 msgstr ""
 
-#: cms/templates/settings.html:172
+#: cms/templates/settings.html:179
 msgid "Enrollment End Time"
 msgstr ""
 
-#: cms/templates/settings.html:181
+#: cms/templates/settings.html:188
 msgid "These Dates Are Not Used When Promoting Your Course"
 msgstr ""
 
-#: cms/templates/settings.html:183
+#: cms/templates/settings.html:190
 msgid ""
 "These dates impact <strong>when your courseware can be viewed</strong>, but "
 "they are <strong>not the dates shown on your course summary page</strong>.  "
@@ -1548,159 +1614,152 @@ msgid ""
 "email\" href=\"mailto:conrad@edx.org\">(conrad@edx.org)</a>."
 msgstr ""
 
-#: cms/templates/settings.html:191
+#: cms/templates/settings.html:198
 msgid "Introducing Your Course"
 msgstr ""
 
-#: cms/templates/settings.html:192
+#: cms/templates/settings.html:199
 msgid "Information for prospective students"
 msgstr ""
 
-#: cms/templates/settings.html:197
+#: cms/templates/settings.html:204
 msgid "Course Overview"
 msgstr ""
 
-#: cms/templates/settings.html:201
-msgid "your course summary page"
-msgstr ""
-
-#: cms/templates/settings.html:203
-#, python-format
-msgid ""
-"Introductions, prerequisites, FAQs that are used on %s (formatted in HTML)"
-msgstr ""
-
-#: cms/templates/settings.html:210 cms/templates/settings.html:214
-#: cms/templates/settings.html:222
+#: cms/templates/settings.html:211 cms/templates/settings.html:215
+#: cms/templates/settings.html:224
 msgid "Course Image"
 msgstr ""
 
-#: cms/templates/settings.html:218
-msgid "You can manage this image along with all of your other"
+#: cms/templates/settings.html:219
+msgid ""
+"You can manage this image along with all of your other <a href='{}'>files "
+"&amp; uploads</a>"
 msgstr ""
 
-#: cms/templates/settings.html:218
-msgid "files &amp; uploads"
-msgstr ""
-
-#: cms/templates/settings.html:224
+#: cms/templates/settings.html:226
 msgid ""
 "Your course currently does not have an image. Please upload one (JPEG or PNG"
 " format, and minimum suggested dimensions are 375px wide by 200px tall)"
 msgstr ""
 
-#: cms/templates/settings.html:231
+#: cms/templates/settings.html:233
 msgid ""
 "Please provide a valid path and name to your course image (Note: only JPEG "
 "or PNG format supported)"
 msgstr ""
 
-#: cms/templates/settings.html:233
+#: cms/templates/settings.html:235
 msgid "Upload Course Image"
 msgstr ""
 
-#: cms/templates/settings.html:239
+#: cms/templates/settings.html:241
 msgid "Course Introduction Video"
 msgstr ""
 
-#: cms/templates/settings.html:245
+#: cms/templates/settings.html:247
 msgid "Delete Current Video"
 msgstr ""
 
-#: cms/templates/settings.html:251
+#: cms/templates/settings.html:253
 msgid "Enter your YouTube video's ID (along with any restriction parameters)"
 msgstr ""
 
-#: cms/templates/settings.html:263
+#: cms/templates/settings.html:265
 msgid "Requirements"
 msgstr ""
 
-#: cms/templates/settings.html:264
+#: cms/templates/settings.html:266
 msgid "Expectations of the students taking this course"
 msgstr ""
 
-#: cms/templates/settings.html:269
+#: cms/templates/settings.html:271
 msgid "Hours of Effort per Week"
 msgstr ""
 
-#: cms/templates/settings.html:271
+#: cms/templates/settings.html:273
 msgid "Time spent on all course work"
 msgstr ""
 
-#: cms/templates/settings.html:280 cms/templates/settings_advanced.html:83
-#: cms/templates/settings_graders.html:129
-msgid "How will these settings be used?"
-msgstr ""
-
-#: cms/templates/settings.html:281
-msgid ""
-"Your course's schedule settings determine when students can enroll in and "
-"begin a course."
+#: cms/templates/settings.html:282
+msgid "How are these settings used?"
 msgstr ""
 
 #: cms/templates/settings.html:283
 msgid ""
-"Additionally, details provided on this page are also used in edX's catalog "
-"of courses, which new and returning students use to choose new courses to "
-"study."
+"Your course's schedule determines when students can enroll in and begin a "
+"course."
 msgstr ""
 
-#: cms/templates/settings.html:293 cms/templates/settings_advanced.html:96
-#: cms/templates/settings_graders.html:142
+#: cms/templates/settings.html:285
+msgid ""
+"Other information from this page appears on the About page for your course. "
+"This information includes the course overview, course image, introduction "
+"video, and estimated time requirements. Students use About pages to choose "
+"new courses to take."
+msgstr ""
+
+#: cms/templates/settings.html:295 cms/templates/settings_advanced.html:96
+#: cms/templates/settings_graders.html:145
 msgid "Other Course Settings"
 msgstr ""
 
-#: cms/templates/settings.html:296 cms/templates/settings_advanced.html:100
-#: cms/templates/settings_graders.html:46 cms/templates/widgets/header.html:77
+#: cms/templates/settings.html:298 cms/templates/settings_advanced.html:100
+#: cms/templates/settings_graders.html:47 cms/templates/widgets/header.html:83
 msgid "Grading"
 msgstr ""
 
-#: cms/templates/settings.html:298 cms/templates/settings_advanced.html:10
-#: cms/templates/settings_advanced.html:48
-#: cms/templates/settings_graders.html:147
-#: cms/templates/widgets/header.html:83
+#: cms/templates/settings.html:300 cms/templates/settings_advanced.html:8
+#: cms/templates/settings_advanced.html:46
+#: cms/templates/settings_graders.html:150
+#: cms/templates/widgets/header.html:89
 msgid "Advanced Settings"
 msgstr ""
 
-#: cms/templates/settings_advanced.html:59
+#: cms/templates/settings_advanced.html:57
 msgid "Your policy changes have been saved."
 msgstr ""
 
-#: cms/templates/settings_advanced.html:63
+#: cms/templates/settings_advanced.html:61
 msgid "There was an error saving your information. Please see below."
 msgstr ""
 
-#: cms/templates/settings_advanced.html:68
+#: cms/templates/settings_advanced.html:66
 msgid "Manual Policy Definition"
 msgstr ""
 
-#: cms/templates/settings_advanced.html:69
-msgid "Manually Edit Course Policy Values (JSON Key / Value pairs)"
+#: cms/templates/settings_advanced.html:67
+msgid ""
+"Manually Edit Course Policy Values (JSON Key / Value pairs, use &quot; not "
+"&apos;)"
 msgstr ""
 
-#: cms/templates/settings_advanced.html:72
+#: cms/templates/settings_advanced.html:70
 msgid ""
 "<strong>Warning</strong>: Do not modify these policies unless you are "
 "familiar with their purpose."
 msgstr ""
 
-#: cms/templates/settings_advanced.html:84
-msgid ""
-"Manual policies are JSON-based key and value pairs that give you control "
-"over specific course settings that edX Studio will use when displaying and "
-"running your course."
+#: cms/templates/settings_advanced.html:81
+msgid "What do advanced settings do?"
 msgstr ""
 
-#: cms/templates/settings_advanced.html:86
+#: cms/templates/settings_advanced.html:82
 msgid ""
-"Any policies you modify here will override any other information you've "
-"defined elsewhere in Studio. With this in mind, please be very careful and "
-"do not edit policies that you are unfamiliar with (both their purpose and "
-"their syntax)"
+"Advanced settings control specific course functionality. On this page, you "
+"can edit manual policies, which are JSON-based key and value pairs that "
+"control specific course settings."
+msgstr ""
+
+#: cms/templates/settings_advanced.html:84
+msgid ""
+"Any policies you modify here override all other information you've defined "
+"elsewhere in Studio. Do not edit policies unless you are familiar with both "
+"their purpose and syntax."
 msgstr ""
 
 #: cms/templates/settings_advanced.html:99
-#: cms/templates/settings_graders.html:145
+#: cms/templates/settings_graders.html:148
 msgid "Details &amp; Schedule"
 msgstr ""
 
@@ -1708,132 +1767,176 @@ msgstr ""
 msgid "Grading Settings"
 msgstr ""
 
-#: cms/templates/settings_graders.html:57
+#: cms/templates/settings_graders.html:58
 msgid "Overall Grade Range"
 msgstr ""
 
-#: cms/templates/settings_graders.html:58
+#: cms/templates/settings_graders.html:59
 msgid "Your overall grading scale for student final grades"
 msgstr ""
 
-#: cms/templates/settings_graders.html:93
+#: cms/templates/settings_graders.html:94
 msgid "Grading Rules &amp; Policies"
 msgstr ""
 
-#: cms/templates/settings_graders.html:94
+#: cms/templates/settings_graders.html:95
 msgid "Deadlines, requirements, and logistics around grading student work"
 msgstr ""
 
-#: cms/templates/settings_graders.html:99
+#: cms/templates/settings_graders.html:100
 msgid "Grace Period on Deadline:"
 msgstr ""
 
-#: cms/templates/settings_graders.html:101
+#: cms/templates/settings_graders.html:102
 msgid "Leeway on due dates"
 msgstr ""
 
-#: cms/templates/settings_graders.html:110
+#: cms/templates/settings_graders.html:111
 msgid "Assignment Types"
 msgstr ""
 
-#: cms/templates/settings_graders.html:111
+#: cms/templates/settings_graders.html:112
 msgid "Categories and labels for any exercises that are gradable"
 msgstr ""
 
-#: cms/templates/settings_graders.html:120
+#: cms/templates/settings_graders.html:121
 msgid "New Assignment Type"
 msgstr ""
 
-#: cms/templates/settings_graders.html:130
+#: cms/templates/settings_graders.html:131
 msgid ""
-"Your grading settings will be used to calculate students grades and "
-"performance."
+"You can use the slider under Overall Grade Range to specify whether your "
+"course is pass/fail or graded by letter, and to establish the thresholds for"
+" each grade."
 msgstr ""
 
-#: cms/templates/settings_graders.html:132
+#: cms/templates/settings_graders.html:133
 msgid ""
-"Overall grade range will be used in students' final grades, which are "
-"calculated by the weighting you determine for each custom assignment type."
+"You can specify whether your course offers students a grace period for late "
+"assignments."
 msgstr ""
 
-#: cms/templates/signup.html:5 cms/templates/widgets/header.html:170
+#: cms/templates/settings_graders.html:134
+msgid ""
+"You can also create assignment types, such as homework, labs, quizzes, and "
+"exams, and specify how much of a student's grade each assignment type is "
+"worth."
+msgstr ""
+
+#: cms/templates/signup.html:6 cms/templates/widgets/header.html:176
 #: lms/templates/index.html:25
 msgid "Sign Up"
 msgstr ""
 
-#: cms/templates/signup.html:13
+#: cms/templates/signup.html:14
 msgid "Sign Up for edX Studio"
 msgstr ""
 
-#: cms/templates/signup.html:14
+#: cms/templates/signup.html:15
 msgid "Already have a Studio Account? Sign in"
 msgstr ""
 
-#: cms/templates/signup.html:17
+#: cms/templates/signup.html:18
 msgid ""
 "Ready to start creating online courses? Sign up below and start creating "
 "your first edX course today."
 msgstr ""
 
-#: cms/templates/signup.html:25
+#: cms/templates/signup.html:26
 msgid "Required Information to Sign Up for edX Studio"
 msgstr ""
 
-#: cms/templates/signup.html:39 lms/templates/register-shib.html:121
-#: lms/templates/register.html:135
+#: cms/templates/signup.html:40 lms/templates/register-shib.html:121
+#: lms/templates/register.html:136
 msgid "Public Username"
 msgstr ""
 
-#: cms/templates/signup.html:41
+#: cms/templates/signup.html:42
 msgid ""
 "This will be used in public discussions with your courses and in our edX101 "
 "support forums"
 msgstr ""
 
-#: cms/templates/signup.html:45 lms/templates/dashboard.html:154
-#: lms/templates/register-shib.html:139 lms/templates/register.html:145
-#: lms/templates/register.html:184
+#: cms/templates/signup.html:46 lms/templates/register.html:142
+msgid "TYPE ID"
+msgstr ""
+
+#: cms/templates/signup.html:53 lms/templates/register.html:149
+msgid "Cedula / Pasaporte"
+msgstr ""
+
+#: cms/templates/signup.html:54 lms/templates/register.html:150
+msgid "example: 0102030405"
+msgstr ""
+
+#: cms/templates/signup.html:55 lms/templates/register.html:151
+msgid "Don't input special characters in your ID"
+msgstr ""
+
+#: cms/templates/signup.html:59 lms/templates/dashboard.html:170
+#: lms/templates/register-shib.html:139 lms/templates/register.html:155
+#: lms/templates/register.html:194 lms/templates/sysadmin_dashboard.html:75
 #: lms/templates/verify_student/_modal_editname.html:19
 #: lms/templates/verify_student/face_upload.html:309
 msgid "Full Name"
 msgstr ""
 
-#: cms/templates/signup.html:51
-msgid "Your Location"
+#: cms/templates/signup.html:65 lms/templates/register.html:160
+msgid "City"
 msgstr ""
 
-#: cms/templates/signup.html:56
+#: cms/templates/signup.html:66 lms/templates/register.html:161
+msgid "example: Quito, Pichincha, Ecuador"
+msgstr ""
+
+#: cms/templates/signup.html:67 lms/templates/register.html:162
+msgid "Debe"
+msgstr ""
+
+#: cms/templates/signup.html:67 lms/templates/register.html:162
+msgid "seleccionar"
+msgstr ""
+
+#: cms/templates/signup.html:67 lms/templates/register.html:162
+msgid "su ciudad de la lista que se desplega"
+msgstr ""
+
+#: cms/templates/signup.html:67 lms/templates/register.html:162
+msgid "cuando digite un texto."
+msgstr ""
+
+#: cms/templates/signup.html:72
 msgid "Preferred Language"
 msgstr ""
 
-#: cms/templates/signup.html:63
-msgid "I agree to the Terms of Service"
+#: cms/templates/signup.html:80
+msgid "I agree to the {a_start} Terms of Service {a_end}"
 msgstr ""
 
-#: cms/templates/signup.html:69
+#: cms/templates/signup.html:87
 msgid "Create My Account &amp; Start Authoring Courses"
 msgstr ""
 
-#: cms/templates/signup.html:78
+#: cms/templates/signup.html:96
 msgid "Common Studio Questions"
 msgstr ""
 
-#: cms/templates/signup.html:81
+#: cms/templates/signup.html:99
 msgid "Who is Studio for?"
 msgstr ""
 
-#: cms/templates/signup.html:82
+#: cms/templates/signup.html:100
 msgid ""
 "Studio is for anyone that wants to create online courses that leverage the "
 "global edX platform. Our users are often faculty members, teaching "
 "assistants and course staff, and members of instructional technology groups."
 msgstr ""
 
-#: cms/templates/signup.html:86
+#: cms/templates/signup.html:104
 msgid "How technically savvy do I need to be to create courses in Studio?"
 msgstr ""
 
-#: cms/templates/signup.html:87
+#: cms/templates/signup.html:105
 msgid ""
 "Studio is designed to be easy to use by almost anyone familiar with common "
 "web-based authoring environments (Wordpress, Moodle, etc.). No programming "
@@ -1842,11 +1945,11 @@ msgid ""
 "don't hesitate to dive right in."
 msgstr ""
 
-#: cms/templates/signup.html:91
+#: cms/templates/signup.html:109
 msgid "I've never authored a course online before. Is there help?"
 msgstr ""
 
-#: cms/templates/signup.html:92
+#: cms/templates/signup.html:110
 msgid ""
 "Absolutely. We have created an online course, edX101, that describes some "
 "best practices: from filming video, creating exercises, to the basics of "
@@ -1854,45 +1957,62 @@ msgid ""
 " us a note."
 msgstr ""
 
-#: cms/templates/syllabus.html:6 cms/templates/syllabus.html:58
-#: cms/templates/widgets/header.html:51
-#: lms/templates/courseware/syllabus.html:20
-msgid "Syllabus"
+#: cms/templates/syllabuses.html:6 cms/templates/syllabuses.html:49
+msgid "Syllabuses"
 msgstr ""
 
-#: cms/templates/syllabus.html:65
+#: cms/templates/syllabuses.html:56
 msgid "New Syllabus"
 msgstr ""
 
-#: cms/templates/syllabus.html:79 cms/templates/textbooks.html:79
+#: cms/templates/syllabuses.html:70
 msgid "Why should I break my text into chapters?"
 msgstr ""
 
-#: cms/templates/syllabus.html:80 cms/templates/textbooks.html:80
+#: cms/templates/syllabuses.html:71
 msgid ""
 "It's best practice to break your course's textbook into multiple chapters to"
 " reduce loading times for students. Breaking up textbooks into chapters can "
 "also help students more easily find topic-based information."
 msgstr ""
 
-#: cms/templates/syllabus.html:83 cms/templates/textbooks.html:83
+#: cms/templates/syllabuses.html:74 cms/templates/textbooks.html:75
 msgid "What if my book isn't divided into chapters?"
 msgstr ""
 
-#: cms/templates/syllabus.html:84 cms/templates/textbooks.html:84
+#: cms/templates/syllabuses.html:75
 msgid ""
 "If you haven't broken your text into chapters, you can upload the entire "
 "text as a single chapter and enter a name of your choice in the Chapter Name"
 " field."
 msgstr ""
 
-#: cms/templates/textbooks.html:6 cms/templates/textbooks.html:58
-#: cms/templates/widgets/header.html:60
+#: cms/templates/textbooks.html:6 cms/templates/textbooks.html:50
+#: cms/templates/widgets/header.html:66
 msgid "Textbooks"
 msgstr ""
 
-#: cms/templates/textbooks.html:65
+#: cms/templates/textbooks.html:57
 msgid "New Textbook"
+msgstr ""
+
+#: cms/templates/textbooks.html:71
+msgid "Why should I break my textbook into chapters?"
+msgstr ""
+
+#: cms/templates/textbooks.html:72
+msgid ""
+"Breaking your textbook into multiple chapters reduces loading times for "
+"students, especially those with slow Internet connections. Breaking up "
+"textbooks into chapters can also help students more easily find topic-based "
+"information."
+msgstr ""
+
+#: cms/templates/textbooks.html:76
+msgid ""
+"If your textbook doesn't have individual chapters, you can upload the entire"
+" text as a single chapter and enter a name of your choice in the Chapter "
+"Name field."
 msgstr ""
 
 #: cms/templates/unit.html:8
@@ -1923,55 +2043,55 @@ msgstr ""
 msgid "Advanced"
 msgstr ""
 
-#: cms/templates/unit.html:140
+#: cms/templates/unit.html:147
 msgid "Unit Settings"
 msgstr ""
 
-#: cms/templates/unit.html:143
+#: cms/templates/unit.html:150
 msgid "Visibility:"
 msgstr ""
 
-#: cms/templates/unit.html:145
+#: cms/templates/unit.html:152
 msgid "Public"
 msgstr ""
 
-#: cms/templates/unit.html:146
+#: cms/templates/unit.html:153
 msgid "Private"
 msgstr ""
 
-#: cms/templates/unit.html:150
+#: cms/templates/unit.html:157
 msgid ""
 "This unit has been published. To make changes, you must {link_start}edit a "
 "draft{link_end}."
 msgstr ""
 
-#: cms/templates/unit.html:151
+#: cms/templates/unit.html:158
 msgid ""
 "This is a draft of the published unit. To update the live version, you must "
 "{link_start}replace it with this draft{link_end}."
 msgstr ""
 
-#: cms/templates/unit.html:154
+#: cms/templates/unit.html:161
 msgid "This unit is scheduled to be released to <strong>students</strong>"
 msgstr ""
 
-#: cms/templates/unit.html:156
+#: cms/templates/unit.html:163
 msgid "on {date}"
 msgstr ""
 
-#: cms/templates/unit.html:158
+#: cms/templates/unit.html:165
 msgid "with the subsection {link_start}{name}{link_end}"
 msgstr ""
 
-#: cms/templates/unit.html:166
+#: cms/templates/unit.html:173
 msgid "Delete Draft"
 msgstr ""
 
-#: cms/templates/unit.html:173
+#: cms/templates/unit.html:180
 msgid "Unit Location"
 msgstr ""
 
-#: cms/templates/unit.html:177
+#: cms/templates/unit.html:184
 msgid "Unit Identifier:"
 msgstr ""
 
@@ -2057,88 +2177,102 @@ msgstr ""
 msgid "All rights reserved."
 msgstr ""
 
-#: cms/templates/widgets/footer.html:20 cms/templates/widgets/header.html:133
+#: cms/templates/widgets/footer.html:13
+msgid "Terms of Service"
+msgstr ""
+
+#: cms/templates/widgets/footer.html:16 lms/templates/footer.html:85
+#: lms/templates/static_templates/privacy.html:7
+#: lms/templates/static_templates/privacy.html:10
+msgid "Privacy Policy"
+msgstr ""
+
+#: cms/templates/widgets/footer.html:20 cms/templates/widgets/header.html:139
 #: cms/templates/widgets/sock.html:49
 msgid "Contact Us"
 msgstr ""
 
-#: cms/templates/widgets/header.html:28
+#: cms/templates/widgets/header.html:34
 msgid "Current Course:"
 msgstr ""
 
-#: cms/templates/widgets/header.html:36
+#: cms/templates/widgets/header.html:42
 msgid "{course_name}'s Navigation:"
 msgstr ""
 
-#: cms/templates/widgets/header.html:39 cms/templates/widgets/header.html:68
+#: cms/templates/widgets/header.html:45 cms/templates/widgets/header.html:74
 #: lms/templates/shoppingcart/verified_cert_receipt.html:101
 msgid "Course"
 msgstr ""
 
-#: cms/templates/widgets/header.html:45
+#: cms/templates/widgets/header.html:51
+msgid "Syllabus"
+msgstr ""
+
+#: cms/templates/widgets/header.html:54
 msgid "Outline"
 msgstr ""
 
-#: cms/templates/widgets/header.html:48
+#: cms/templates/widgets/header.html:57
 msgid "Updates"
 msgstr ""
 
-#: cms/templates/widgets/header.html:74
+#: cms/templates/widgets/header.html:80
 msgid "Schedule &amp; Details"
 msgstr ""
 
-#: cms/templates/widgets/header.html:97
+#: cms/templates/widgets/header.html:103
 msgid "Checklists"
 msgstr ""
 
-#: cms/templates/widgets/header.html:100
+#: cms/templates/widgets/header.html:106
 msgid "Import"
 msgstr ""
 
-#: cms/templates/widgets/header.html:103
+#: cms/templates/widgets/header.html:109
 msgid "Export"
 msgstr ""
 
-#: cms/templates/widgets/header.html:117
+#: cms/templates/widgets/header.html:123
 msgid "Help &amp; Account Navigation"
 msgstr ""
 
-#: cms/templates/widgets/header.html:121 lms/templates/help_modal.html:12
+#: cms/templates/widgets/header.html:127 lms/templates/help_modal.html:12
 #: lms/templates/navigation.html:78
 #: lms/templates/static_templates/help.html:14
 msgid "Help"
 msgstr ""
 
-#: cms/templates/widgets/header.html:127 cms/templates/widgets/sock.html:25
+#: cms/templates/widgets/header.html:133 cms/templates/widgets/sock.html:25
 msgid "This is a PDF Document"
 msgstr ""
 
-#: cms/templates/widgets/header.html:127
+#: cms/templates/widgets/header.html:133
 msgid "Studio Documentation"
 msgstr ""
 
-#: cms/templates/widgets/header.html:130 cms/templates/widgets/sock.html:29
+#: cms/templates/widgets/header.html:136 cms/templates/widgets/sock.html:29
 #: cms/templates/widgets/sock.html:30
 msgid "Studio Help Center"
 msgstr ""
 
-#: cms/templates/widgets/header.html:141
+#: cms/templates/widgets/header.html:147
 msgid "Currently signed in as:"
 msgstr ""
 
-#: cms/templates/widgets/header.html:150
+#: cms/templates/widgets/header.html:156
 msgid "Sign Out"
 msgstr ""
 
-#: cms/templates/widgets/header.html:161
+#: cms/templates/widgets/header.html:167
 msgid "You're not currently signed in"
 msgstr ""
 
-#: cms/templates/widgets/header.html:164
+#: cms/templates/widgets/header.html:170
 msgid "How Studio Works"
 msgstr ""
 
-#: cms/templates/widgets/header.html:167
+#: cms/templates/widgets/header.html:173
 msgid "Studio Help"
 msgstr ""
 
@@ -2177,17 +2311,17 @@ msgid "Text Input"
 msgstr ""
 
 #: cms/templates/widgets/problem-edit.html:18
-#: cms/templates/widgets/problem-edit.html:82
+#: cms/templates/widgets/problem-edit.html:84
 msgid "Numerical Input"
 msgstr ""
 
 #: cms/templates/widgets/problem-edit.html:20
-#: cms/templates/widgets/problem-edit.html:91
+#: cms/templates/widgets/problem-edit.html:93
 msgid "Dropdown"
 msgstr ""
 
 #: cms/templates/widgets/problem-edit.html:22
-#: cms/templates/widgets/problem-edit.html:100
+#: cms/templates/widgets/problem-edit.html:102
 msgid "Explanation"
 msgstr ""
 
@@ -2238,6 +2372,22 @@ msgstr ""
 
 #: cms/templates/widgets/tabs-aggregator.html:8
 msgid "name"
+msgstr ""
+
+#: cms/templates/widgets/units.html:42
+msgid "Delete this unit"
+msgstr ""
+
+#: cms/templates/widgets/units.html:42
+msgid "Delete unit"
+msgstr ""
+
+#: cms/templates/widgets/units.html:45
+msgid "Drag to sort"
+msgstr ""
+
+#: cms/templates/widgets/units.html:45
+msgid "Drag to reorder unit"
 msgstr ""
 
 #: common/templates/course_modes/choose.html:9
@@ -2388,9 +2538,9 @@ msgid "{platform_name}-wide Summary"
 msgstr ""
 
 #: lms/templates/annotatable.html:13
-#: lms/templates/instructor/staff_grading.html:29
-#: lms/templates/open_ended_problems/combined_notifications.html:20
-#: lms/templates/open_ended_problems/open_ended_flagged_problems.html:23
+#: lms/templates/instructor/staff_grading.html:30
+#: lms/templates/open_ended_problems/combined_notifications.html:21
+#: lms/templates/open_ended_problems/open_ended_flagged_problems.html:24
 #: lms/templates/open_ended_problems/open_ended_problems.html:20
 #: lms/templates/peer_grading/peer_grading.html:20
 msgid "Instructions"
@@ -2511,145 +2661,145 @@ msgstr ""
 msgid "New"
 msgstr ""
 
-#: lms/templates/dashboard.html:10
+#: lms/templates/dashboard.html:11
 msgid "Dashboard"
 msgstr ""
 
-#: lms/templates/dashboard.html:46
+#: lms/templates/dashboard.html:62
 #: lms/templates/courseware/course_about.html:41
 #: lms/templates/courseware/mktg_course_about.html:40
 msgid "An error occurred. Please try again later."
 msgstr ""
 
-#: lms/templates/dashboard.html:67
+#: lms/templates/dashboard.html:83
 msgid "Please verify your new email"
 msgstr ""
 
-#: lms/templates/dashboard.html:154 lms/templates/dashboard.html:159
+#: lms/templates/dashboard.html:170 lms/templates/dashboard.html:175
 msgid "edit"
 msgstr ""
 
-#: lms/templates/dashboard.html:157
+#: lms/templates/dashboard.html:173
 #: lms/templates/courseware/instructor_dashboard.html:138
 #: lms/templates/university_profile/edge.html:15
 msgid "Email"
 msgstr ""
 
-#: lms/templates/dashboard.html:166 lms/templates/dashboard.html:169
+#: lms/templates/dashboard.html:182 lms/templates/dashboard.html:185
 msgid "Reset Password"
 msgstr ""
 
-#: lms/templates/dashboard.html:183
+#: lms/templates/dashboard.html:199
 msgid "Current Courses"
 msgstr ""
 
-#: lms/templates/dashboard.html:201
+#: lms/templates/dashboard.html:217
 msgid "Looks like you haven't registered for any courses yet."
 msgstr ""
 
-#: lms/templates/dashboard.html:203
+#: lms/templates/dashboard.html:219
 msgid "Find courses now!"
 msgstr ""
 
-#: lms/templates/dashboard.html:206
+#: lms/templates/dashboard.html:222
 msgid "Looks like you haven't been enrolled in any courses yet."
 msgstr ""
 
-#: lms/templates/dashboard.html:213
+#: lms/templates/dashboard.html:229
 msgid "Course-loading errors"
 msgstr ""
 
-#: lms/templates/dashboard.html:231 lms/templates/dashboard.html:252
-#: lms/templates/dashboard.html:270 lms/templates/dashboard.html:300
-#: lms/templates/dashboard.html:329 lms/templates/forgot_password_modal.html:6
+#: lms/templates/dashboard.html:247 lms/templates/dashboard.html:268
+#: lms/templates/dashboard.html:286 lms/templates/dashboard.html:316
+#: lms/templates/dashboard.html:345 lms/templates/forgot_password_modal.html:6
 #: lms/templates/help_modal.html:18 lms/templates/help_modal.html:56
 #: lms/templates/help_modal.html:84 lms/templates/login_modal.html:8
 #: lms/templates/signup_modal.html:13
 msgid "Close Modal"
 msgstr ""
 
-#: lms/templates/dashboard.html:234
+#: lms/templates/dashboard.html:250
 msgid "Email Settings for {course_number}"
 msgstr ""
 
-#: lms/templates/dashboard.html:234 lms/templates/dashboard.html:255
-#: lms/templates/dashboard.html:273 lms/templates/dashboard.html:303
-#: lms/templates/dashboard.html:331
+#: lms/templates/dashboard.html:250 lms/templates/dashboard.html:271
+#: lms/templates/dashboard.html:289 lms/templates/dashboard.html:319
+#: lms/templates/dashboard.html:347
 msgid "modal open"
 msgstr ""
 
-#: lms/templates/dashboard.html:240
+#: lms/templates/dashboard.html:256
 msgid "Receive course emails"
 msgstr ""
 
-#: lms/templates/dashboard.html:242
+#: lms/templates/dashboard.html:258
 msgid "Save Settings"
 msgstr ""
 
-#: lms/templates/dashboard.html:255
+#: lms/templates/dashboard.html:271
 msgid "Password Reset Email Sent"
 msgstr ""
 
-#: lms/templates/dashboard.html:261
+#: lms/templates/dashboard.html:277
 msgid ""
 "An email has been sent to {email}. Follow the link in the email to change "
 "your password."
 msgstr ""
 
-#: lms/templates/dashboard.html:273 lms/templates/dashboard.html:290
+#: lms/templates/dashboard.html:289 lms/templates/dashboard.html:306
 msgid "Change Email"
 msgstr ""
 
-#: lms/templates/dashboard.html:281
+#: lms/templates/dashboard.html:297
 msgid "Please enter your new email address:"
 msgstr ""
 
-#: lms/templates/dashboard.html:283
+#: lms/templates/dashboard.html:299
 msgid "Please confirm your password:"
 msgstr ""
 
-#: lms/templates/dashboard.html:287
+#: lms/templates/dashboard.html:303
 msgid ""
 "We will send a confirmation to both {email} and your new email as part of "
 "the process."
 msgstr ""
 
-#: lms/templates/dashboard.html:303
+#: lms/templates/dashboard.html:319
 msgid "Change your name"
 msgstr ""
 
-#: lms/templates/dashboard.html:309
+#: lms/templates/dashboard.html:325
 #: lms/templates/verify_student/_modal_editname.html:16
 msgid ""
 "To uphold the credibility of {platform} certificates, all name changes will "
 "be logged and recorded."
 msgstr ""
 
-#: lms/templates/dashboard.html:313
+#: lms/templates/dashboard.html:329
 msgid ""
 "Enter your desired full name, as it will appear on the {platform} "
 "certificates:"
 msgstr ""
 
-#: lms/templates/dashboard.html:315
+#: lms/templates/dashboard.html:331
 #: lms/templates/verify_student/_modal_editname.html:21
 msgid "Reason for name change:"
 msgstr ""
 
-#: lms/templates/dashboard.html:319
+#: lms/templates/dashboard.html:335
 msgid "Change My Name"
 msgstr ""
 
-#: lms/templates/dashboard.html:331
+#: lms/templates/dashboard.html:347
 msgid ""
 "<span id=\"track-info\"></span> {course_number}?  <span id=\"refund-"
 "info\"></span>"
 msgstr ""
 
-#: lms/templates/dashboard.html:340
-#: lms/templates/dashboard/_dashboard_course_listing.html:98
-#: lms/templates/dashboard/_dashboard_course_listing.html:100
-#: lms/templates/dashboard/_dashboard_course_listing.html:102
+#: lms/templates/dashboard.html:355
+#: lms/templates/dashboard/_dashboard_course_listing.html:105
+#: lms/templates/dashboard/_dashboard_course_listing.html:107
+#: lms/templates/dashboard/_dashboard_course_listing.html:109
 msgid "Unregister"
 msgstr ""
 
@@ -2794,11 +2944,6 @@ msgstr ""
 msgid "Terms of Service and Honor Code"
 msgstr ""
 
-#: lms/templates/footer.html:85 lms/templates/static_templates/privacy.html:7
-#: lms/templates/static_templates/privacy.html:10
-msgid "Privacy Policy"
-msgstr ""
-
 #: lms/templates/forgot_password_modal.html:4
 #: lms/templates/forgot_password_modal.html:10
 msgid "Password Reset"
@@ -2811,7 +2956,7 @@ msgid ""
 msgstr ""
 
 #: lms/templates/forgot_password_modal.html:19 lms/templates/login.html:128
-#: lms/templates/register-shib.html:112 lms/templates/register.html:121
+#: lms/templates/register-shib.html:112 lms/templates/register.html:122
 msgid "Required Information"
 msgstr ""
 
@@ -2986,9 +3131,9 @@ msgid ""
 msgstr ""
 
 #: lms/templates/login.html:132 lms/templates/login_modal.html:16
-#: lms/templates/provider_login.html:44 lms/templates/provider_login.html:45
-#: lms/templates/register-shib.html:129 lms/templates/register.html:127
-#: lms/templates/register.html:169
+#: lms/templates/provider_login.html:45 lms/templates/provider_login.html:46
+#: lms/templates/register-shib.html:129 lms/templates/register.html:128
+#: lms/templates/register.html:179
 msgid "E-mail"
 msgstr ""
 
@@ -3047,15 +3192,15 @@ msgstr ""
 msgid "login via openid"
 msgstr ""
 
-#: lms/templates/lti.html:37
+#: lms/templates/lti.html:13
 msgid "External resource"
 msgstr ""
 
-#: lms/templates/lti.html:40
+#: lms/templates/lti.html:16
 msgid "View resource in a new window"
 msgstr ""
 
-#: lms/templates/lti.html:54
+#: lms/templates/lti.html:30
 msgid ""
 "Please provide launch_url. Click \"Edit\", and fill in the required fields."
 msgstr ""
@@ -3086,8 +3231,8 @@ msgstr ""
 #: lms/templates/combinedopenended/selfassessment/self_assessment_prompt.html:23
 #: lms/templates/discussion/_underscore_templates.html:20
 #: lms/templates/discussion/_underscore_templates.html:116
-#: lms/templates/instructor/staff_grading.html:62
-#: lms/templates/instructor/staff_grading.html:85
+#: lms/templates/instructor/staff_grading.html:63
+#: lms/templates/instructor/staff_grading.html:86
 #: lms/templates/peer_grading/peer_grading_problem.html:75
 msgid "Submit"
 msgstr ""
@@ -3139,6 +3284,7 @@ msgid "Accepted"
 msgstr ""
 
 #: lms/templates/name_changes.html:11 lms/templates/name_changes.html:22
+#: lms/templates/sysadmin_dashboard_gitlogs.html:92
 msgid "Error"
 msgstr ""
 
@@ -3182,7 +3328,9 @@ msgstr ""
 msgid "How it Works"
 msgstr ""
 
-#: lms/templates/navigation.html:101 lms/templates/courseware/courses.html:6
+#: lms/templates/navigation.html:101 lms/templates/sysadmin_dashboard.html:57
+#: lms/templates/sysadmin_dashboard_gitlogs.html:56
+#: lms/templates/courseware/courses.html:6
 msgid "Courses"
 msgstr ""
 
@@ -3249,7 +3397,13 @@ msgstr ""
 msgid "Email or password is incorrect."
 msgstr ""
 
-#: lms/templates/provider_login.html:49
+#: lms/templates/provider_login.html:44
+msgid ""
+"Please note that we will be sending your user name, email, and full name to "
+"this third party site."
+msgstr ""
+
+#: lms/templates/provider_login.html:50
 #, python-format
 msgid "Return To %s"
 msgstr ""
@@ -3266,16 +3420,16 @@ msgstr ""
 msgid "Welcome {username}!  Please set your preferences below"
 msgstr ""
 
-#: lms/templates/register-shib.html:99 lms/templates/register.html:107
+#: lms/templates/register-shib.html:99 lms/templates/register.html:108
 msgid ""
 "We're sorry, {platform_name} enrollment is not available in your region"
 msgstr ""
 
-#: lms/templates/register-shib.html:103 lms/templates/register.html:111
+#: lms/templates/register-shib.html:103 lms/templates/register.html:112
 msgid "The following errors occured while processing your registration:"
 msgstr ""
 
-#: lms/templates/register-shib.html:108 lms/templates/register.html:117
+#: lms/templates/register-shib.html:108 lms/templates/register.html:118
 msgid ""
 "Required fields are noted by <strong class=\"indicator\">bold text and an "
 "asterisk (*)</strong>."
@@ -3285,30 +3439,30 @@ msgstr ""
 msgid "Enter a public username:"
 msgstr ""
 
-#: lms/templates/register-shib.html:122 lms/templates/register.html:136
-#: lms/templates/register.html:177
+#: lms/templates/register-shib.html:122 lms/templates/register.html:137
+#: lms/templates/register.html:187
 msgid "example: JaneDoe"
 msgstr ""
 
-#: lms/templates/register-shib.html:123 lms/templates/register.html:137
-#: lms/templates/register.html:178
+#: lms/templates/register-shib.html:123 lms/templates/register.html:138
+#: lms/templates/register.html:188
 msgid "Will be shown in any discussions or forums you participate in"
 msgstr ""
 
-#: lms/templates/register-shib.html:130 lms/templates/register.html:128
-#: lms/templates/register.html:170
+#: lms/templates/register-shib.html:130 lms/templates/register.html:129
+#: lms/templates/register.html:180
 msgid "example: username@domain.com"
 msgstr ""
 
-#: lms/templates/register-shib.html:150 lms/templates/register.html:263
+#: lms/templates/register-shib.html:150 lms/templates/register.html:273
 msgid "Account Acknowledgements"
 msgstr ""
 
-#: lms/templates/register-shib.html:159 lms/templates/register.html:272
+#: lms/templates/register-shib.html:159 lms/templates/register.html:282
 msgid "I agree to the {link_start}Terms of Service{link_end}"
 msgstr ""
 
-#: lms/templates/register-shib.html:175 lms/templates/register.html:288
+#: lms/templates/register-shib.html:175 lms/templates/register.html:298
 msgid "I agree to the {link_start}Honor Code{link_end}"
 msgstr ""
 
@@ -3332,137 +3486,101 @@ msgstr ""
 msgid "Register below to create your {platform_name} account"
 msgstr ""
 
-#: lms/templates/register.html:116
+#: lms/templates/register.html:117
 msgid "Please complete the following fields to register for an account. "
 msgstr ""
 
-#: lms/templates/register.html:137 lms/templates/register.html:178
+#: lms/templates/register.html:138 lms/templates/register.html:188
 msgid "cannot be changed later"
 msgstr ""
 
-#: lms/templates/register.html:137
+#: lms/templates/register.html:138
 msgid "Just letter and numbers allowed"
 msgstr ""
 
-#: lms/templates/register.html:140
-msgid "Cedula / Pasaporte"
-msgstr ""
-
-#: lms/templates/register.html:141
-msgid "example: 0102030405"
-msgstr ""
-
-#: lms/templates/register.html:142
-msgid "Don't input special characters in your ID"
-msgstr ""
-
-#: lms/templates/register.html:146
+#: lms/templates/register.html:156
 #: lms/templates/verify_student/face_upload.html:310
 msgid "example: Jane Doe"
 msgstr ""
 
-#: lms/templates/register.html:147 lms/templates/register.html:186
+#: lms/templates/register.html:157 lms/templates/register.html:196
 msgid "Needed for any certificates you may earn"
 msgstr ""
 
-#: lms/templates/register.html:150 lms/templates/test_center_register.html:225
-msgid "City"
-msgstr ""
-
-#: lms/templates/register.html:151
-msgid "example: Quito, Pichincha, Ecuador"
-msgstr ""
-
-#: lms/templates/register.html:152
-msgid "Debe"
-msgstr ""
-
-#: lms/templates/register.html:152
-msgid "seleccionar"
-msgstr ""
-
-#: lms/templates/register.html:152
-msgid "su ciudad de la lista que se desplega"
-msgstr ""
-
-#: lms/templates/register.html:152
-msgid "cuando digite un texto."
-msgstr ""
-
-#: lms/templates/register.html:160
+#: lms/templates/register.html:170
 msgid "Welcome {username}"
 msgstr ""
 
-#: lms/templates/register.html:161
+#: lms/templates/register.html:171
 msgid "Enter a Public Display Name:"
 msgstr ""
 
-#: lms/templates/register.html:176
+#: lms/templates/register.html:186
 msgid "Public Display Name"
 msgstr ""
 
-#: lms/templates/register.html:197 lms/templates/register.html:243
+#: lms/templates/register.html:207 lms/templates/register.html:253
 msgid "Optional Personal Information"
 msgstr ""
 
-#: lms/templates/register.html:203
+#: lms/templates/register.html:213
 msgid "Highest Level of Education Completed"
 msgstr ""
 
-#: lms/templates/register.html:216 lms/templates/signup_modal.html:78
+#: lms/templates/register.html:226 lms/templates/signup_modal.html:78
 msgid "Gender"
 msgstr ""
 
-#: lms/templates/register.html:229
+#: lms/templates/register.html:239
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html:40
 msgid "Year of Birth"
 msgstr ""
 
-#: lms/templates/register.html:248 lms/templates/test_center_register.html:207
+#: lms/templates/register.html:258
 msgid "Mailing Address"
 msgstr ""
 
-#: lms/templates/register.html:255
+#: lms/templates/register.html:265
 msgid "Please share with us your reasons for registering with {platform_name}"
 msgstr ""
 
-#: lms/templates/register.html:302
+#: lms/templates/register.html:312
 #: lms/templates/university_profile/edge.html:31
 msgid "Register"
 msgstr ""
 
-#: lms/templates/register.html:302 lms/templates/signup_modal.html:134
+#: lms/templates/register.html:312 lms/templates/signup_modal.html:134
 msgid "Create My Account"
 msgstr ""
 
-#: lms/templates/register.html:309
+#: lms/templates/register.html:319
 msgid "Registration Help"
 msgstr ""
 
-#: lms/templates/register.html:315
+#: lms/templates/register.html:325
 msgid "Already registered?"
 msgstr ""
 
-#: lms/templates/register.html:318
+#: lms/templates/register.html:328
 msgid "Click here to log in."
 msgstr ""
 
-#: lms/templates/register.html:329
+#: lms/templates/register.html:339
 msgid "Welcome to {platform_name}"
 msgstr ""
 
-#: lms/templates/register.html:330
+#: lms/templates/register.html:340
 msgid ""
 "Registering with {platform_name} gives you access to all of our current and "
 "future free courses. Not ready to take a course just yet? Registering puts "
 "you on our mailing list - we will update you as courses are added."
 msgstr ""
 
-#: lms/templates/register.html:335
+#: lms/templates/register.html:345
 msgid "Next Steps"
 msgstr ""
 
-#: lms/templates/register.html:337
+#: lms/templates/register.html:347
 msgid ""
 "You will receive an activation email.  You must click on the activation link"
 " to complete the process.  Don't see the email?  Check your spam folder and "
@@ -3470,7 +3588,7 @@ msgid ""
 "able to receive email from your courses."
 msgstr ""
 
-#: lms/templates/register.html:339
+#: lms/templates/register.html:349
 msgid ""
 "As part of joining {platform_name}, you will receive an activation email.  "
 "You must click on the activation link to complete the process.  Don't see "
@@ -3478,15 +3596,15 @@ msgid ""
 "spam'.  At {platform_name}, we communicate mostly through email."
 msgstr ""
 
-#: lms/templates/register.html:346
+#: lms/templates/register.html:356
 msgid "Need help in registering with {platform_name}?"
 msgstr ""
 
-#: lms/templates/register.html:348
+#: lms/templates/register.html:358
 msgid "View our FAQs for answers to commonly asked questions."
 msgstr ""
 
-#: lms/templates/register.html:350
+#: lms/templates/register.html:360
 msgid ""
 "Once registered, most questions can be answered in the course specific "
 "discussion forums or through the FAQs."
@@ -3682,404 +3800,114 @@ msgstr ""
 msgid "Next page"
 msgstr ""
 
-#: lms/templates/test_center_register.html:13
-msgid "Pearson VUE Test Center Proctoring - Registration"
+#: lms/templates/sysadmin_dashboard.html:53
+#: lms/templates/sysadmin_dashboard_gitlogs.html:52
+msgid "Sysadmin Dashboard"
 msgstr ""
 
-#: lms/templates/test_center_register.html:101
-msgid "Your Pearson VUE Proctored Exam Registration"
+#: lms/templates/sysadmin_dashboard.html:56
+#: lms/templates/sysadmin_dashboard_gitlogs.html:55
+msgid "Users"
 msgstr ""
 
-#: lms/templates/test_center_register.html:103
-msgid "Register for a Pearson VUE Proctored Exam"
+#: lms/templates/sysadmin_dashboard.html:58
+#: lms/templates/sysadmin_dashboard_gitlogs.html:57
+msgid "Staffing and Enrollment"
 msgstr ""
 
-#: lms/templates/test_center_register.html:117
-msgid "Your registration for the Pearson exam has been processed"
+#: lms/templates/sysadmin_dashboard.html:59
+#: lms/templates/sysadmin_dashboard_gitlogs.html:58
+#: lms/templates/sysadmin_dashboard_gitlogs.html:66
+msgid "Git Logs"
 msgstr ""
 
-#: lms/templates/test_center_register.html:118
+#: lms/templates/sysadmin_dashboard.html:63
+msgid "User Management"
+msgstr ""
+
+#: lms/templates/sysadmin_dashboard.html:70
+msgid "Email or username"
+msgstr ""
+
+#: lms/templates/sysadmin_dashboard.html:86
+msgid "Delete user"
+msgstr ""
+
+#: lms/templates/sysadmin_dashboard.html:87
+msgid "Create user"
+msgstr ""
+
+#: lms/templates/sysadmin_dashboard.html:94
+msgid "Download list of all users (csv file)"
+msgstr ""
+
+#: lms/templates/sysadmin_dashboard.html:100
+msgid "Check and repair external authentication map"
+msgstr ""
+
+#: lms/templates/sysadmin_dashboard.html:110
 msgid ""
-"Your registration number is <strong>{reg_number}</strong>. (Write this down!"
-" You'll need it to schedule your exam.)"
+"Go to each individual course's Instructor dashboard to manage course "
+"enrollment."
 msgstr ""
 
-#: lms/templates/test_center_register.html:120
-msgid "Schedule Pearson exam"
+#: lms/templates/sysadmin_dashboard.html:113
+msgid "Manage course staff and instructors"
 msgstr ""
 
-#: lms/templates/test_center_register.html:126
-msgid "Your demographic information contained an error and was rejected"
+#: lms/templates/sysadmin_dashboard.html:116
+msgid "Download staff and instructor list (csv file)"
 msgstr ""
 
-#: lms/templates/test_center_register.html:127
-msgid ""
-"Please check the information you provided, and correct the errors noted "
-"below."
+#: lms/templates/sysadmin_dashboard.html:122
+msgid "Administer Courses"
 msgstr ""
 
-#: lms/templates/test_center_register.html:133
-msgid "Your registration for the Pearson exam has been rejected"
+#: lms/templates/sysadmin_dashboard.html:129
+msgid "Repo location"
 msgstr ""
 
-#: lms/templates/test_center_register.html:134
-msgid ""
-"Please see your <strong>registration status</strong> details for more "
-"information."
+#: lms/templates/sysadmin_dashboard.html:135
+msgid "Load new course from github"
 msgstr ""
 
-#: lms/templates/test_center_register.html:140
-msgid "Your registration for the Pearson exam is pending"
+#: lms/templates/sysadmin_dashboard.html:141
+msgid "Course ID or dir"
 msgstr ""
 
-#: lms/templates/test_center_register.html:141
-msgid ""
-"Once your information is processed, it will be forwarded to Pearson and you "
-"will be able to schedule an exam."
+#: lms/templates/sysadmin_dashboard.html:147
+msgid "Delete course from site"
 msgstr ""
 
-#: lms/templates/test_center_register.html:149
-msgid "Registration Form"
+#: lms/templates/sysadmin_dashboard.html:203
+msgid "Django PID"
 msgstr ""
 
-#: lms/templates/test_center_register.html:157
-msgid "Registration for this Pearson exam is closed"
+#: lms/templates/sysadmin_dashboard.html:204
+msgid "Platform Version"
 msgstr ""
 
-#: lms/templates/test_center_register.html:158
-msgid ""
-"Your previous information is available below, however you may not edit any "
-"of the information."
+#: lms/templates/sysadmin_dashboard_gitlogs.html:72
+#: lms/templates/sysadmin_dashboard_gitlogs.html:99
+#: lms/templates/shoppingcart/verified_cert_receipt.html:157
+msgid "Date"
 msgstr ""
 
-#: lms/templates/test_center_register.html:164
-msgid ""
-"Please use the following form if you need to update your demographic "
-"information used in your Pearson VUE Proctored Exam. Required fields are "
-"noted by <strong class=\"indicator\">bold text and an asterisk (*)"
+#: lms/templates/sysadmin_dashboard_gitlogs.html:73
+#: lms/templates/sysadmin_dashboard_gitlogs.html:100
+msgid "Course ID"
 msgstr ""
 
-#: lms/templates/test_center_register.html:168
-msgid ""
-"Please provide the following demographic information to register for a "
-"Pearson VUE Proctored Exam. Required fields are noted by <strong "
-"class=\"indicator\">bold text and an asterisk (*)"
+#: lms/templates/sysadmin_dashboard_gitlogs.html:74
+msgid "Git Action"
 msgstr ""
 
-#: lms/templates/test_center_register.html:180
-msgid "Personal Information"
+#: lms/templates/sysadmin_dashboard_gitlogs.html:90
+msgid "Recent git load activity for"
 msgstr ""
 
-#: lms/templates/test_center_register.html:184
-msgid "Salutation"
-msgstr ""
-
-#: lms/templates/test_center_register.html:185
-msgid "e.g. Mr., Ms., Mrs., Dr."
-msgstr ""
-
-#: lms/templates/test_center_register.html:188
-msgid "First Name"
-msgstr ""
-
-#: lms/templates/test_center_register.html:189
-msgid "e.g. Albert"
-msgstr ""
-
-#: lms/templates/test_center_register.html:192
-msgid "Middle Name"
-msgstr ""
-
-#: lms/templates/test_center_register.html:196
-msgid "Last Name"
-msgstr ""
-
-#: lms/templates/test_center_register.html:197
-msgid "e.g. Einstein"
-msgstr ""
-
-#: lms/templates/test_center_register.html:200
-msgid "Suffix"
-msgstr ""
-
-#: lms/templates/test_center_register.html:201
-msgid "e.g. Jr., Sr. "
-msgstr ""
-
-#: lms/templates/test_center_register.html:211
-msgid "Address Line #1"
-msgstr ""
-
-#: lms/templates/test_center_register.html:212
-msgid "e.g. 112 Mercer Street"
-msgstr ""
-
-#: lms/templates/test_center_register.html:216
-msgid "Address Line #2"
-msgstr ""
-
-#: lms/templates/test_center_register.html:217
-msgid "e.g. Apartment 123"
-msgstr ""
-
-#: lms/templates/test_center_register.html:220
-msgid "Address Line #3"
-msgstr ""
-
-#: lms/templates/test_center_register.html:221
-msgid "e.g. Attention: Albert Einstein"
-msgstr ""
-
-#: lms/templates/test_center_register.html:226
-msgid "e.g. Newark"
-msgstr ""
-
-#: lms/templates/test_center_register.html:230
-msgid "State/Province"
-msgstr ""
-
-#: lms/templates/test_center_register.html:231
-msgid "e.g. NJ"
-msgstr ""
-
-#: lms/templates/test_center_register.html:234
-msgid "Postal Code"
-msgstr ""
-
-#: lms/templates/test_center_register.html:235
-msgid "e.g. 08540"
-msgstr ""
-
-#: lms/templates/test_center_register.html:238
-msgid "Country Code"
-msgstr ""
-
-#: lms/templates/test_center_register.html:239
-msgid "e.g. USA"
-msgstr ""
-
-#: lms/templates/test_center_register.html:246
-msgid "Contact &amp; Other Information"
-msgstr ""
-
-#: lms/templates/test_center_register.html:251
-msgid "Phone Number"
-msgstr ""
-
-#: lms/templates/test_center_register.html:255
-msgid "Extension"
-msgstr ""
-
-#: lms/templates/test_center_register.html:259
-msgid "Phone Country Code"
-msgstr ""
-
-#: lms/templates/test_center_register.html:265
-msgid "Fax Number"
-msgstr ""
-
-#: lms/templates/test_center_register.html:269
-msgid "Fax Country Code"
-msgstr ""
-
-#: lms/templates/test_center_register.html:274
-msgid "Company"
-msgstr ""
-
-#: lms/templates/test_center_register.html:275
-msgid "e.g. American Association of University Professors"
-msgstr ""
-
-#: lms/templates/test_center_register.html:291
-msgid ""
-"<span class=\"title\">Note</span>: Your previous accommodation request below"
-" needs to be reviewed in detail <strong>and will add a significant delay to "
-"your registration process</strong>."
-msgstr ""
-
-#: lms/templates/test_center_register.html:294
-msgid ""
-"<span class=\"title\">Note</span>: Accommodation requests are not part of "
-"your demographic information, <strong>and cannot be changed once "
-"submitted</strong>. Accommodation requests, which are reviewed on a case-by-"
-"case basis, <strong>will add significant delay to the registration "
-"process</strong>."
-msgstr ""
-
-#: lms/templates/test_center_register.html:298
-msgid "Optional Information"
-msgstr ""
-
-#: lms/templates/test_center_register.html:304
-#: lms/templates/test_center_register.html:310
-msgid "Accommodations Requested"
-msgstr ""
-
-#: lms/templates/test_center_register.html:320
-msgid "Update Demographics"
-msgstr ""
-
-#: lms/templates/test_center_register.html:321
-msgid "Cancel Update"
-msgstr ""
-
-#: lms/templates/test_center_register.html:323
-msgid "Register for Pearson VUE Test"
-msgstr ""
-
-#: lms/templates/test_center_register.html:324
-msgid "Cancel Registration"
-msgstr ""
-
-#: lms/templates/test_center_register.html:336
-#: lms/templates/test_center_register.html:339
-msgid ""
-"Special (<abbr title=\"Americans with Disabilities Act\">ADA</abbr>) "
-"Accommodations"
-msgstr ""
-
-#: lms/templates/test_center_register.html:355
-msgid "Pearson Exam Registration Status"
-msgstr ""
-
-#: lms/templates/test_center_register.html:361
-#: lms/templates/test_center_register.html:367
-#: lms/templates/test_center_register.html:373
-msgid "Demographic Information"
-msgstr ""
-
-#: lms/templates/test_center_register.html:362
-msgid ""
-"The demographic information you most recently provided is pending. You may "
-"edit this information at any point before exam registration closes on "
-"<strong>{end_date}</strong>"
-msgstr ""
-
-#: lms/templates/test_center_register.html:368
-msgid ""
-"The demographic information you most recently provided has been processed. "
-"You may edit this information at any point before exam registration closes "
-"on <strong>{end_date}</strong>"
-msgstr ""
-
-#: lms/templates/test_center_register.html:374
-msgid ""
-"The demographic information you most recently provided has been rejected by "
-"Pearson. You can correct and submit it again before the exam registration "
-"closes on <strong>{end_date}</strong>. The error message is:"
-msgstr ""
-
-#: lms/templates/test_center_register.html:380
-msgid ""
-"If the error is not correctable by revising your demographic information, "
-"please {contact_link_start}contact edX at exam-"
-"help@edx.org{contact_link_end}."
-msgstr ""
-
-#: lms/templates/test_center_register.html:387
-#: lms/templates/test_center_register.html:393
-#: lms/templates/test_center_register.html:405
-msgid "Accommodations Request"
-msgstr ""
-
-#: lms/templates/test_center_register.html:388
-msgid ""
-"Your requested accommodations are pending. Within a few days, you should see"
-" confirmation here of granted accommodations."
-msgstr ""
-
-#: lms/templates/test_center_register.html:394
-msgid ""
-"Your requested accommodations have been reviewed and processed. You are "
-"allowed:"
-msgstr ""
-
-#: lms/templates/test_center_register.html:406
-msgid ""
-"Your requested accommodations have been reviewed and processed. You are "
-"allowed no accommodations."
-msgstr ""
-
-#: lms/templates/test_center_register.html:408
-msgid ""
-"Please {contact_link_start}contact {edX} at ${exam_help}{contact_link_end}."
-msgstr ""
-
-#: lms/templates/test_center_register.html:415
-#: lms/templates/test_center_register.html:421
-#: lms/templates/test_center_register.html:427
-msgid "Registration Request"
-msgstr ""
-
-#: lms/templates/test_center_register.html:416
-msgid ""
-"Your exam registration is pending. Once your information is processed, it "
-"will be forwarded to Pearson and you will be able to schedule an exam."
-msgstr ""
-
-#: lms/templates/test_center_register.html:422
-msgid ""
-"Your exam registration has been processed and has been forwarded to Pearson."
-" <strong>You are now able to {exam_link_start}schedule a Pearson "
-"exam{exam_link_end}</strong>."
-msgstr ""
-
-#: lms/templates/test_center_register.html:428
-msgid ""
-"Your exam registration has been rejected by Pearson. <strong>You currently "
-"cannot schedule an exam</strong>. The errors found include:"
-msgstr ""
-
-#: lms/templates/test_center_register.html:434
-msgid ""
-"Please {contact_link_start}contact edX at exam-"
-"help@edx.org{contact_link_end}."
-msgstr ""
-
-#: lms/templates/test_center_register.html:445
-msgid "About {university} {course_number}"
-msgstr ""
-
-#: lms/templates/test_center_register.html:448
-msgid "Course Completed:"
-msgstr ""
-
-#: lms/templates/test_center_register.html:450
-msgid "Course Started:"
-msgstr ""
-
-#: lms/templates/test_center_register.html:452
-msgid "Course Starts:"
-msgstr ""
-
-#: lms/templates/test_center_register.html:458
-msgid "Pearson VUE Test Details"
-msgstr ""
-
-#: lms/templates/test_center_register.html:462
-msgid "Exam Name:"
-msgstr ""
-
-#: lms/templates/test_center_register.html:465
-msgid "First Eligible Appointment Date:"
-msgstr ""
-
-#: lms/templates/test_center_register.html:468
-msgid "Last Eligible Appointment Date:"
-msgstr ""
-
-#: lms/templates/test_center_register.html:471
-msgid "Registration Ends:"
-msgstr ""
-
-#: lms/templates/test_center_register.html:478
-msgid "Questions"
-msgstr ""
-
-#: lms/templates/test_center_register.html:479
-msgid ""
-"If you have a specific question pertaining to your registration, you may "
-"{contact_link_start}contact edX at exam-help@edx.org{contact_link_end}."
+#: lms/templates/sysadmin_dashboard_gitlogs.html:101
+msgid "git action"
 msgstr ""
 
 #: lms/templates/tracking_log.html:4
@@ -4134,61 +3962,65 @@ msgstr ""
 msgid "Skip to a navigable version of this video's transcript."
 msgstr ""
 
+#: lms/templates/video.html:50
+msgid "Loading video player"
+msgstr ""
+
 #: lms/templates/video.html:54
 msgid "ERROR: No playable video sources found!"
 msgstr ""
 
-#: lms/templates/video.html:64
+#: lms/templates/video.html:62
 msgid "Play"
 msgstr ""
 
-#: lms/templates/video.html:69
+#: lms/templates/video.html:67
 msgid "Speeds"
 msgstr ""
 
-#: lms/templates/video.html:70
+#: lms/templates/video.html:68
 msgid "Speed"
 msgstr ""
 
-#: lms/templates/video.html:76
+#: lms/templates/video.html:74
 msgid "Volume"
 msgstr ""
 
-#: lms/templates/video.html:81
+#: lms/templates/video.html:79
 msgid "Fill browser"
 msgstr ""
 
-#: lms/templates/video.html:82
+#: lms/templates/video.html:80
 msgid "HD off"
 msgstr ""
 
-#: lms/templates/video.html:84
+#: lms/templates/video.html:82
 msgid "Turn off captions"
 msgstr ""
 
-#: lms/templates/video.html:88
+#: lms/templates/video.html:86
 msgid "Skip to end of transcript."
 msgstr ""
 
-#: lms/templates/video.html:91
+#: lms/templates/video.html:89
 msgid "Captions"
 msgstr ""
 
-#: lms/templates/video.html:91
+#: lms/templates/video.html:89
 msgid ""
 "Activating an item in this group will spool the video to the corresponding "
 "time point. To skip transcript, go to previous item."
 msgstr ""
 
-#: lms/templates/video.html:96
+#: lms/templates/video.html:94
 msgid "Go back to start of transcript."
 msgstr ""
 
-#: lms/templates/video.html:102
+#: lms/templates/video.html:100
 msgid "Download video"
 msgstr ""
 
-#: lms/templates/video.html:107
+#: lms/templates/video.html:105
 msgid "Download timed transcript"
 msgstr ""
 
@@ -4219,6 +4051,15 @@ msgstr ""
 
 #: lms/templates/combinedopenended/combined_open_ended.html:50
 msgid "Next Step"
+msgstr ""
+
+#: lms/templates/combinedopenended/combined_open_ended.html:61
+msgid ""
+"Staff Warning: Please note that if you submit a duplicate of text that has "
+"already been submitted for grading, it will not show up in the staff grading"
+" view.  It will be given the same grade that the original received "
+"automatically, and will be returned within 30 minutes if the original is "
+"already graded, or when the original is graded if not."
 msgstr ""
 
 #: lms/templates/combinedopenended/combined_open_ended_legend.html:4
@@ -4294,9 +4135,21 @@ msgstr ""
 msgid "There was an error with your submission.  Please contact course staff."
 msgstr ""
 
-#: lms/templates/combinedopenended/openended/open_ended_rubric.html:7
+#: lms/templates/combinedopenended/openended/open_ended_rubric.html:8
 msgid "Rubric"
 msgstr ""
+
+#: lms/templates/combinedopenended/openended/open_ended_rubric.html:10
+msgid ""
+"Select the criteria you feel best represents this submission in each "
+"category."
+msgstr ""
+
+#: lms/templates/combinedopenended/openended/open_ended_rubric.html:26
+msgid "{num} point: {text}"
+msgid_plural "{num} points: {text}"
+msgstr[0] ""
+msgstr[1] ""
 
 #: lms/templates/combinedopenended/selfassessment/self_assessment_hint.html:4
 msgid "Please enter a hint below:"
@@ -4389,12 +4242,12 @@ msgstr ""
 msgid "Additional Resources"
 msgstr ""
 
-#: lms/templates/courseware/course_navigation.html:41
-#: lms/templates/courseware/course_navigation.html:57
+#: lms/templates/courseware/course_navigation.html:42
+#: lms/templates/courseware/course_navigation.html:58
 msgid "Staff view"
 msgstr ""
 
-#: lms/templates/courseware/course_navigation.html:55
+#: lms/templates/courseware/course_navigation.html:56
 msgid "Student view"
 msgstr ""
 
@@ -4444,30 +4297,80 @@ msgid "Calculator Input Field"
 msgstr ""
 
 #: lms/templates/courseware/courseware.html:221
+msgid ""
+"Use the arrow keys to navigate the tips or use the tab key to return to the "
+"calculator"
+msgstr ""
+
+#: lms/templates/courseware/courseware.html:222
 msgid "Hints"
 msgstr ""
 
-#: lms/templates/courseware/courseware.html:223
-msgid "Suffixes:"
+#: lms/templates/courseware/courseware.html:224
+msgid "Integers"
 msgstr ""
 
 #: lms/templates/courseware/courseware.html:225
-msgid "Operations:"
+msgid "Decimals"
+msgstr ""
+
+#: lms/templates/courseware/courseware.html:226
+msgid "Scientific notation"
 msgstr ""
 
 #: lms/templates/courseware/courseware.html:227
-msgid "Functions:"
+msgid "Appending SI postfixes"
 msgstr ""
 
-#: lms/templates/courseware/courseware.html:229
+#: lms/templates/courseware/courseware.html:228
+msgid "Supported SI postfixes"
+msgstr ""
+
+#: lms/templates/courseware/courseware.html:284
+msgid "Operators"
+msgstr ""
+
+#: lms/templates/courseware/courseware.html:284
+msgid "parallel resistors function"
+msgstr ""
+
+#: lms/templates/courseware/courseware.html:285
+msgid "Functions"
+msgstr ""
+
+#: lms/templates/courseware/courseware.html:286
 msgid "Constants"
 msgstr ""
 
-#: lms/templates/courseware/courseware.html:238
+#: lms/templates/courseware/courseware.html:297
+msgid "Euler's number"
+msgstr ""
+
+#: lms/templates/courseware/courseware.html:302
+msgid "ratio of a circle's circumference to it's diameter"
+msgstr ""
+
+#: lms/templates/courseware/courseware.html:307
+msgid "Boltzmann constant"
+msgstr ""
+
+#: lms/templates/courseware/courseware.html:312
+msgid "speed of light"
+msgstr ""
+
+#: lms/templates/courseware/courseware.html:317
+msgid "freezing point of water in degrees Kelvin"
+msgstr ""
+
+#: lms/templates/courseware/courseware.html:322
+msgid "fundamental charge"
+msgstr ""
+
+#: lms/templates/courseware/courseware.html:330
 msgid "Calculate"
 msgstr ""
 
-#: lms/templates/courseware/courseware.html:239
+#: lms/templates/courseware/courseware.html:331
 msgid "Calculator Output Field"
 msgstr ""
 
@@ -4485,8 +4388,12 @@ msgstr ""
 msgid "Gradebook"
 msgstr ""
 
+#: lms/templates/courseware/gradebook.html:48
+msgid "Search students"
+msgstr ""
+
 #: lms/templates/courseware/info.html:11
-#: lms/templates/courseware/syllabus.html:10
+#: lms/templates/courseware/syllabus.html:26
 msgid "{course.display_number_with_default} Course Info"
 msgstr ""
 
@@ -4526,7 +4433,7 @@ msgid "Psychometrics"
 msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html:133
-#: lms/templates/instructor/instructor_dashboard_2/membership.html:110
+#: lms/templates/instructor/instructor_dashboard_2/membership.html:124
 msgid "Forum Admin"
 msgstr ""
 
@@ -4583,14 +4490,14 @@ msgid "Assignment name:"
 msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html:244
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html:82
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html:80
 msgid "Course-specific grade adjustment"
 msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html:247
 #: lms/templates/courseware/instructor_dashboard.html:282
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html:35
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html:86
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html:33
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html:84
 msgid "Specify a particular problem in the course here by its url:"
 msgstr ""
 
@@ -4622,8 +4529,8 @@ msgid "Student-specific grade inspection and adjustment"
 msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html:274
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html:9
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html:30
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html:8
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html:28
 msgid ""
 "Specify the {platform_name} email address or username of a student here:"
 msgstr ""
@@ -4678,6 +4585,7 @@ msgid ""
 msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html:445
+#: lms/templates/instructor/instructor_dashboard_2/membership.html:46
 msgid "Notify students by email"
 msgstr ""
 
@@ -4828,9 +4736,9 @@ msgstr ""
 
 #: lms/templates/courseware/instructor_dashboard.html:782
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html:64
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html:26
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html:52
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html:61
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html:116
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html:114
 msgid "Pending Instructor Tasks"
 msgstr ""
 
@@ -4920,6 +4828,18 @@ msgstr ""
 msgid "Course Progress for Student '{username}' ({email})"
 msgstr ""
 
+#: lms/templates/courseware/progress.html:62
+msgid "{earned:.3n} of {total:.3n} possible points"
+msgstr ""
+
+#: lms/templates/courseware/progress.html:85
+msgid "Problem Scores: "
+msgstr ""
+
+#: lms/templates/courseware/progress.html:85
+msgid "Practice Scores: "
+msgstr ""
+
 #: lms/templates/courseware/progress.html:92
 msgid "No problem scores in this section"
 msgstr ""
@@ -4968,23 +4888,32 @@ msgid "Your Certificate is Generating"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html:45
+#: lms/templates/dashboard/_dashboard_certificate_information.html:51
 msgid "This link will open/download a PDF document"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html:46
+#: lms/templates/dashboard/_dashboard_certificate_information.html:52
 msgid "Download Your Certificate (PDF)"
 msgstr ""
 
-#: lms/templates/dashboard/_dashboard_certificate_information.html:50
+#: lms/templates/dashboard/_dashboard_certificate_information.html:49
+msgid ""
+"Since we did not have a valid set of verification photos from you when "
+"certificates were generated, we could not grant you a verified certificate. "
+"An honor code certificate has been granted instead."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html:56
 msgid ""
 "This link will open/download a PDF document of your verified certificate."
 msgstr ""
 
-#: lms/templates/dashboard/_dashboard_certificate_information.html:51
+#: lms/templates/dashboard/_dashboard_certificate_information.html:57
 msgid "Download Your ID Verified Certificate of Achievement (PDF)"
 msgstr ""
 
-#: lms/templates/dashboard/_dashboard_certificate_information.html:56
+#: lms/templates/dashboard/_dashboard_certificate_information.html:62
 msgid "Complete our course feedback survey"
 msgstr ""
 
@@ -5016,34 +4945,38 @@ msgstr ""
 msgid "Course Starts - {start_date}"
 msgstr ""
 
-#: lms/templates/dashboard/_dashboard_course_listing.html:68
-msgid "Challenge Yourself!"
-msgstr ""
-
-#: lms/templates/dashboard/_dashboard_course_listing.html:69
-msgid "Take this course as an ID-verified student."
+#: lms/templates/dashboard/_dashboard_course_listing.html:71
+msgid "Document your accomplishment!"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html:73
+msgid "Challenge Yourself!"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html:76
+msgid "Take this course as an ID-verified student."
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html:80
 msgid ""
 "You can still sign up for an ID verified certificate for this course. If you"
 " plan to complete the whole course, it is a great way to recognize your "
 "achievement. {a_start}Learn more about verified certificates{a_end}."
 msgstr ""
 
-#: lms/templates/dashboard/_dashboard_course_listing.html:80
+#: lms/templates/dashboard/_dashboard_course_listing.html:87
 msgid "Upgrade to Verified Track"
 msgstr ""
 
-#: lms/templates/dashboard/_dashboard_course_listing.html:91
+#: lms/templates/dashboard/_dashboard_course_listing.html:98
 msgid "View Archived Course"
 msgstr ""
 
-#: lms/templates/dashboard/_dashboard_course_listing.html:93
+#: lms/templates/dashboard/_dashboard_course_listing.html:100
 msgid "View Course"
 msgstr ""
 
-#: lms/templates/dashboard/_dashboard_course_listing.html:106
+#: lms/templates/dashboard/_dashboard_course_listing.html:113
 msgid "Email Settings"
 msgstr ""
 
@@ -5277,14 +5210,6 @@ msgstr ""
 msgid "Toggle Notifications Setting"
 msgstr ""
 
-#: lms/templates/discussion/_user_profile.html:19
-msgid "Revoke Moderator rights"
-msgstr ""
-
-#: lms/templates/discussion/_user_profile.html:21
-msgid "Promote to Moderator"
-msgstr ""
-
 #: lms/templates/discussion/index.html:9
 #: lms/templates/discussion/single_thread.html:10
 #: lms/templates/discussion/user_profile.html:7
@@ -5309,15 +5234,15 @@ msgstr ""
 msgid "Active Threads"
 msgstr ""
 
-#: lms/templates/instructor/staff_grading.html:11
+#: lms/templates/instructor/staff_grading.html:12
 msgid "{course_number} Staff Grading"
 msgstr ""
 
-#: lms/templates/instructor/staff_grading.html:22
+#: lms/templates/instructor/staff_grading.html:23
 msgid "Staff grading"
 msgstr ""
 
-#: lms/templates/instructor/staff_grading.html:31
+#: lms/templates/instructor/staff_grading.html:32
 msgid ""
 "This is the list of problems that currently need to be graded in order to "
 "train AI grading and create calibration essays for peer grading. Each "
@@ -5328,11 +5253,11 @@ msgid ""
 "of AI grading in the problem view."
 msgstr ""
 
-#: lms/templates/instructor/staff_grading.html:34
+#: lms/templates/instructor/staff_grading.html:35
 msgid "Problem List"
 msgstr ""
 
-#: lms/templates/instructor/staff_grading.html:51
+#: lms/templates/instructor/staff_grading.html:52
 msgid ""
 "Please note that when you see a submission here, it has been temporarily "
 "removed from the grading pool.  The submission will return to the grading "
@@ -5341,33 +5266,33 @@ msgid ""
 "again."
 msgstr ""
 
-#: lms/templates/instructor/staff_grading.html:55
+#: lms/templates/instructor/staff_grading.html:56
 msgid "Prompt"
 msgstr ""
 
-#: lms/templates/instructor/staff_grading.html:55
+#: lms/templates/instructor/staff_grading.html:56
 msgid "(Hide)"
 msgstr ""
 
-#: lms/templates/instructor/staff_grading.html:68
+#: lms/templates/instructor/staff_grading.html:69
 #: lms/templates/peer_grading/peer_grading_problem.html:32
 msgid "Student Response"
 msgstr ""
 
-#: lms/templates/instructor/staff_grading.html:77
+#: lms/templates/instructor/staff_grading.html:78
 #: lms/templates/peer_grading/peer_grading_problem.html:50
 msgid "Written Feedback"
 msgstr ""
 
-#: lms/templates/instructor/staff_grading.html:78
+#: lms/templates/instructor/staff_grading.html:79
 msgid "Feedback for student (optional)"
 msgstr ""
 
-#: lms/templates/instructor/staff_grading.html:81
+#: lms/templates/instructor/staff_grading.html:82
 msgid "Flag as inappropriate content for later review"
 msgstr ""
 
-#: lms/templates/instructor/staff_grading.html:86
+#: lms/templates/instructor/staff_grading.html:87
 msgid "Skip"
 msgstr ""
 
@@ -5430,8 +5355,8 @@ msgid "Grade Cutoffs:"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html:65
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html:27
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html:117
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html:53
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html:115
 msgid "The status for any active tasks appears in a table below."
 msgstr ""
 
@@ -5439,20 +5364,77 @@ msgstr ""
 msgid "Course Warnings"
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html:5
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html:6
 msgid "Data Download"
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html:7
-msgid "List enrolled students with profile information"
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html:9
+msgid ""
+"The following button displays a list of all students enrolled in this "
+"course, along with profile information such as email address and username. "
+"The data can also be downloaded as a CSV file."
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/data_download.html:15
-msgid "Grading Configuration"
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html:11
+msgid "List enrolled students' profile information"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html:12
+msgid "Download profile information as a CSV"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html:16
+msgid ""
+"Displays the grading configuration for the course. The grading configuration"
+" is the breakdown of graded subsections of the course (such as exams and "
+"problem sets), and can be changed on the 'Grading' page (under 'Settings') "
+"in Studio."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html:17
+msgid "Grading Configuration"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html:22
+msgid "Download a CSV of anonymized student IDs by clicking this button."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html:23
 msgid "Get Student Anonymized IDs CSV"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html:29
+msgid "Grade Reports"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html:32
+msgid ""
+"The following button will generate a CSV grade report for all currently "
+"enrolled students. For large courses, generating this report may take a few "
+"hours."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html:34
+msgid ""
+"The report is generated in the background, meaning it is OK to navigate away"
+" from this page while your report is generating. Generated reports appear in"
+" a table below and can be downloaded."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html:40
+msgid "Generate Grade Report"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html:43
+msgid "Reports Available for Download"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html:44
+msgid ""
+"File links are generated on demand and expire within 5 minutes due to the "
+"sensitive nature of student grade information. Please note that the report "
+"filename contains a timestamp that represents when your file was generated; "
+"this timestamp is UTC, not your local timezone."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html:53
@@ -5471,54 +5453,64 @@ msgstr ""
 msgid "Student Emails"
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/membership.html:35
-msgid "Enroll"
-msgstr ""
-
 #: lms/templates/instructor/instructor_dashboard_2/membership.html:36
-msgid "Unenroll"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/membership.html:37
 msgid "Auto-Enroll"
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/membership.html:38
+#: lms/templates/instructor/instructor_dashboard_2/membership.html:37
 msgid "Auto Enroll"
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/membership.html:40
+#: lms/templates/instructor/instructor_dashboard_2/membership.html:39
 msgid ""
 "If auto enroll is <em>checked</em>, students who have not yet registered for"
 " edX will be automatically enrolled."
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/membership.html:41
+#: lms/templates/instructor/instructor_dashboard_2/membership.html:40
 msgid ""
 "If auto enroll is left <em>unchecked</em>, students who have not yet "
 "registered for edX will not be enrolled, but will be allowed to enroll."
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/membership.html:49
+#: lms/templates/instructor/instructor_dashboard_2/membership.html:45
+msgid "Notify-students-by-email"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html:48
+msgid ""
+"If email students is <em>checked</em> students will receive an email "
+"notification."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html:54
+msgid "Enroll"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html:55
+msgid "Unenroll"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/membership.html:63
 msgid "Administration List Management"
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/membership.html:52
+#: lms/templates/instructor/instructor_dashboard_2/membership.html:66
 msgid "Getting available lists..."
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/membership.html:59
+#: lms/templates/instructor/instructor_dashboard_2/membership.html:73
 msgid ""
 "Staff cannot modify staff or beta tester lists. To modify these lists, "
 "contact your instructor and ask them to add you as an instructor for staff "
 "and beta lists, or a forum admin for forum management."
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/membership.html:68
+#: lms/templates/instructor/instructor_dashboard_2/membership.html:82
 msgid "Course Staff"
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/membership.html:70
+#: lms/templates/instructor/instructor_dashboard_2/membership.html:84
 msgid ""
 "Course staff can help you manage limited aspects of your course. Staff can "
 "enroll and unenroll students, as well as modify their grades and see all "
@@ -5526,73 +5518,73 @@ msgid ""
 "will not be able to edit your course."
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/membership.html:76
+#: lms/templates/instructor/instructor_dashboard_2/membership.html:90
 msgid "Add Staff"
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/membership.html:81
+#: lms/templates/instructor/instructor_dashboard_2/membership.html:95
 msgid "Instructors"
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/membership.html:83
+#: lms/templates/instructor/instructor_dashboard_2/membership.html:97
 msgid ""
 "Instructors are the core administration of your course. Instructors can add "
 "and remove course staff, as well as administer forum access."
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/membership.html:87
+#: lms/templates/instructor/instructor_dashboard_2/membership.html:101
 msgid "Add Instructor"
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/membership.html:92
+#: lms/templates/instructor/instructor_dashboard_2/membership.html:106
 msgid "Beta Testers"
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/membership.html:94
+#: lms/templates/instructor/instructor_dashboard_2/membership.html:108
 msgid ""
 "Beta testers can see course content before the rest of the students. They "
 "can make sure that the content works, but have no additional privileges."
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/membership.html:99
+#: lms/templates/instructor/instructor_dashboard_2/membership.html:113
 msgid "Beta Tester"
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/membership.html:104
+#: lms/templates/instructor/instructor_dashboard_2/membership.html:118
 msgid "Forum Admins"
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/membership.html:106
+#: lms/templates/instructor/instructor_dashboard_2/membership.html:120
 msgid ""
 "Forum admins can moderate the course forums as well as administer other "
 "forum roles."
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/membership.html:117
+#: lms/templates/instructor/instructor_dashboard_2/membership.html:131
 msgid "Forum Moderators"
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/membership.html:119
+#: lms/templates/instructor/instructor_dashboard_2/membership.html:133
 msgid ""
 "Forum moderators can moderate the course forums. They cannot add other "
 "moderators."
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/membership.html:123
+#: lms/templates/instructor/instructor_dashboard_2/membership.html:137
 msgid "Add Moderator"
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/membership.html:128
+#: lms/templates/instructor/instructor_dashboard_2/membership.html:142
 msgid "Forum Community TAs"
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/membership.html:130
+#: lms/templates/instructor/instructor_dashboard_2/membership.html:144
 msgid ""
 "Community TA's are members of the community whom you deem particularly "
 "helpful on the forums."
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/membership.html:134
+#: lms/templates/instructor/instructor_dashboard_2/membership.html:148
 msgid "Community TA"
 msgstr ""
 
@@ -5631,87 +5623,87 @@ msgstr ""
 msgid "Student-specific grade inspection"
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html:10
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html:31
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html:9
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html:29
 msgid "Student Email or Username"
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html:16
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html:15
 msgid "Click this link to view the student's progress page:"
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html:18
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html:17
 msgid "Student Progress Page"
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html:26
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html:25
 msgid "Student-specific grade adjustment"
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html:36
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html:34
 msgid "Problem urlname"
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html:40
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html:90
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html:38
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html:88
 msgid ""
 "You may use just the \"urlname\" if a problem, or \"modulename/urlname\" if "
 "not. (For example, if the location is {location1}, then just provide the "
 "{urlname1}. If the location is {location2}, then provide {urlname2}.)"
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html:49
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html:47
 msgid "Next, select an action to perform for the given user and problem:"
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html:53
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html:51
 msgid "Reset Student Attempts"
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html:56
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html:54
 msgid "Rescore Student Submission"
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html:62
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html:60
 msgid ""
 "You may also delete the entire state of a student for the specified problem:"
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html:63
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html:61
 msgid "Delete Student State for Problem"
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html:70
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html:68
 msgid ""
 "Rescoring runs in the background, and status for active tasks will appear in"
-" a table on the Course Info tab. To see status for all tasks submitted for "
-"this problem and student, click on this button:"
+" the 'Pending Instructor Tasks' table. To see status for all tasks submitted"
+" for this problem and student, click on this button:"
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html:74
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html:72
 msgid "Show Background Task History for Student"
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html:98
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html:96
 msgid "Then select an action"
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html:99
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html:97
 msgid "Reset ALL students' attempts"
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html:100
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html:98
 msgid "Rescore ALL students' problem submissions"
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html:104
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html:102
 msgid ""
-"These actions run in the background, and status for active tasks will appear"
-" in a table on the Course Info tab. To see status for all tasks submitted "
-"for this problem, click on this button"
+"The above actions run in the background, and status for active tasks will "
+"appear in a table on the Course Info tab. To see status for all tasks "
+"submitted for this problem, click on this button"
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/student_admin.html:107
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html:105
 msgid "Show Background Task History for Problem"
 msgstr ""
 
@@ -5723,15 +5715,15 @@ msgstr ""
 msgid "{course_number} Combined Notifications"
 msgstr ""
 
-#: lms/templates/open_ended_problems/combined_notifications.html:19
+#: lms/templates/open_ended_problems/combined_notifications.html:20
 msgid "Open Ended Console"
 msgstr ""
 
-#: lms/templates/open_ended_problems/combined_notifications.html:21
+#: lms/templates/open_ended_problems/combined_notifications.html:22
 msgid "Here are items that could potentially need your attention."
 msgstr ""
 
-#: lms/templates/open_ended_problems/combined_notifications.html:25
+#: lms/templates/open_ended_problems/combined_notifications.html:26
 msgid "No items require attention at the moment."
 msgstr ""
 
@@ -5739,29 +5731,29 @@ msgstr ""
 msgid "{course_number} Flagged Open Ended Problems"
 msgstr ""
 
-#: lms/templates/open_ended_problems/open_ended_flagged_problems.html:22
+#: lms/templates/open_ended_problems/open_ended_flagged_problems.html:23
 msgid "Flagged Open Ended Problems"
 msgstr ""
 
-#: lms/templates/open_ended_problems/open_ended_flagged_problems.html:24
+#: lms/templates/open_ended_problems/open_ended_flagged_problems.html:25
 msgid ""
 "Here are a list of open ended problems for this course that have been "
 "flagged by students as potentially inappropriate."
 msgstr ""
 
-#: lms/templates/open_ended_problems/open_ended_flagged_problems.html:28
+#: lms/templates/open_ended_problems/open_ended_flagged_problems.html:29
 msgid "No flagged problems exist."
 msgstr ""
 
-#: lms/templates/open_ended_problems/open_ended_flagged_problems.html:34
+#: lms/templates/open_ended_problems/open_ended_flagged_problems.html:35
 msgid "Response"
 msgstr ""
 
-#: lms/templates/open_ended_problems/open_ended_flagged_problems.html:47
+#: lms/templates/open_ended_problems/open_ended_flagged_problems.html:48
 msgid "Unflag"
 msgstr ""
 
-#: lms/templates/open_ended_problems/open_ended_flagged_problems.html:50
+#: lms/templates/open_ended_problems/open_ended_flagged_problems.html:51
 msgid "Ban"
 msgstr ""
 
@@ -5798,7 +5790,7 @@ msgstr ""
 #: lms/templates/peer_grading/peer_grading.html:3
 msgid ""
 "\n"
-"{p_tag}You currently do not having any peer grading to do.  In order to have peer grading to do:\n"
+"{p_tag}You currently do not have any peer grading to do.  In order to have peer grading to do:\n"
 "{ul_tag}\n"
 "{li_tag}You need to have submitted a response to a peer grading problem.{end_li_tag}\n"
 "{li_tag}The instructor needs to score the essays that are used to help you better understand the grading\n"
@@ -6003,6 +5995,35 @@ msgstr ""
 msgid ""
 "We've e-mailed you instructions for setting your password to the e-mail "
 "address you submitted. You should be receiving it shortly."
+msgstr ""
+
+#: lms/templates/shoppingcart/download_report.html:5
+msgid "Download Purchase Report"
+msgstr ""
+
+#: lms/templates/shoppingcart/download_report.html:9
+msgid "Download CSV of purchase data"
+msgstr ""
+
+#: lms/templates/shoppingcart/download_report.html:12
+msgid ""
+"There was an error in your date input.  It should be formatted as YYYY-MM-DD"
+msgstr ""
+
+#: lms/templates/shoppingcart/download_report.html:17
+msgid "There are too many results in your report."
+msgstr ""
+
+#: lms/templates/shoppingcart/download_report.html:18
+msgid "Try making the date range smaller."
+msgstr ""
+
+#: lms/templates/shoppingcart/download_report.html:22
+msgid "Start Date: "
+msgstr ""
+
+#: lms/templates/shoppingcart/download_report.html:24
+msgid "End Date: "
 msgstr ""
 
 #: lms/templates/shoppingcart/error.html:6
@@ -6236,10 +6257,6 @@ msgstr ""
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html:155
 msgid "Order No."
-msgstr ""
-
-#: lms/templates/shoppingcart/verified_cert_receipt.html:157
-msgid "Date"
 msgstr ""
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html:183
