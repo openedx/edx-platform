@@ -505,7 +505,6 @@ def _config_course_advanced_components(request, course_module):
     their course
     """
     # TODO refactor the above into distinct advanced policy settings
-    filter_tabs = True  # Exceptional conditions will pull this to False
     if ADVANCED_COMPONENT_POLICY_KEY in request.json:  # Maps tab types to components
         tab_component_map = {
             'open_ended': OPEN_ENDED_COMPONENT_TYPES,
@@ -525,9 +524,6 @@ def _config_course_advanced_components(request, course_module):
                     if changed:
                         course_module.tabs = new_tabs
                         request.json.update({'tabs': new_tabs})
-                        # Indicate that tabs should not be filtered out of
-                        # the metadata
-                        filter_tabs = False  # Set this flag to avoid the tab removal code below.
                     found_ac_type = True  #break
 
             # If we did not find a module type in the advanced settings,
@@ -537,11 +533,6 @@ def _config_course_advanced_components(request, course_module):
                 if changed:
                     course_module.tabs = new_tabs
                     request.json.update({'tabs':new_tabs})
-                    # Indicate that tabs should *not* be filtered out of
-                    # the metadata
-                    filter_tabs = False
-
-    return filter_tabs
 
 
 @login_required
@@ -573,13 +564,11 @@ def advanced_settings_handler(request, package_id=None, branch=None, version_gui
         if request.method == 'GET':
             return JsonResponse(CourseMetadata.fetch(course_module))
         else:
-            # Whether or not to filter the tabs key out of the settings metadata
-            filter_tabs = _config_course_advanced_components(request, course_module)
+            _config_course_advanced_components(request, course_module)
             try:
                 return JsonResponse(CourseMetadata.update_from_json(
                     course_module,
                     request.json,
-                    filter_tabs=filter_tabs
                 ))
             except (TypeError, ValueError) as err:
                 return HttpResponseBadRequest(

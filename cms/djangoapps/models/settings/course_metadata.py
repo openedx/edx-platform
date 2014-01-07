@@ -17,7 +17,6 @@ class CourseMetadata(object):
                      'end',
                      'enrollment_start',
                      'enrollment_end',
-                     'tabs',
                      'graceperiod',
                      'checklists',
                      'show_timezone',
@@ -48,7 +47,7 @@ class CourseMetadata(object):
         return result
 
     @classmethod
-    def update_from_json(cls, descriptor, jsondict, filter_tabs=True):
+    def update_from_json(cls, descriptor, jsondict):
         """
         Decode the json into CourseMetadata and save any changed attrs to the db.
 
@@ -58,9 +57,6 @@ class CourseMetadata(object):
 
         # Copy the filtered list to avoid permanently changing the class attribute.
         filtered_list = list(cls.FILTERED_LIST)
-        # Don't filter on the tab attribute if filter_tabs is False.
-        if not filter_tabs:
-            filtered_list.remove("tabs")
 
         for key, val in jsondict.iteritems():
             # should it be an error if one of the filtered list items is in the payload?
