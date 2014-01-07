@@ -9,10 +9,14 @@
     % if set_statefn:
     data-setstate="${set_statefn}"
     % endif
+    % if sop:
+    data-sop="${sop}"
+    % endif
+    data-processed="false"
     >
 
-
-  <div class="script_placeholder" data-src="${applet_loader}"/>
+  <div class="script_placeholder" data-src="${jschannel_loader}"/>
+  <div class="script_placeholder" data-src="${jsinput_loader}"/>
   % if status == 'unsubmitted':
   <div class="unanswered" id="status_${id}">
   % elif status == 'correct':

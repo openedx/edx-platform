@@ -363,6 +363,32 @@ class CombinedOpenEndedV1Module():
         last_completed_child = next((i for i, child in reversed(list(enumerate(children))) if child['child_state'] == self.DONE), 0)
         self.current_task_number = min(last_completed_child + 1, len(best_task_states) - 1)
 
+    def create_task(self, task_state, task_xml):
+        """Create task object for given task state and task xml."""
+
+        tag_name = self.get_tag_name(task_xml)
+        children = self.child_modules()
+        task_descriptor = children['descriptors'][tag_name](self.system)
+        task_parsed_xml = task_descriptor.definition_from_xml(etree.fromstring(task_xml), self.system)
+        task = children['modules'][tag_name](
+            self.system,
+            self.location,
+            task_parsed_xml,
+            task_descriptor,
+            self.static_data,
+            instance_state=task_state,
+        )
+        return task
+
+    def get_task_number(self, task_number):
+        """Return task object at task_index."""
+
+        task_states_count = len(self.task_states)
+        if task_states_count > 0 and task_number < task_states_count:
+            task_state = self.task_states[task_number]
+            task_xml = self.task_xml[task_number]
+            return self.create_task(task_state, task_xml)
+        return None
 
     def reset_task_state(self, message=""):
         """
@@ -1122,7 +1148,7 @@ class CombinedOpenEndedV1Descriptor():
             if len(xml_object.xpath(child)) == 0:
                 # This is a staff_facing_error
                 raise ValueError(
-                    "Combined Open Ended definition must include at least one '{0}' tag. Contact the learning sciences group for assistance. {1}".format(
+                    u"Combined Open Ended definition must include at least one '{0}' tag. Contact the learning sciences group for assistance. {1}".format(
                         child, xml_object))
 
         def parse_task(k):
@@ -1141,7 +1167,7 @@ class CombinedOpenEndedV1Descriptor():
         elt = etree.Element('combinedopenended')
 
         def add_child(k):
-            child_str = '<{tag}>{body}</{tag}>'.format(tag=k, body=self.definition[k])
+            child_str = u'<{tag}>{body}</{tag}>'.format(tag=k, body=self.definition[k])
             child_node = etree.fromstring(child_str)
             elt.append(child_node)
 

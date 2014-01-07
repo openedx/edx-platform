@@ -4,20 +4,20 @@
 Working with Problem Components
 ################################
 
-*********
-Overview
-*********
+******************************
+Overview of Problem Components
+******************************
 
 The problem component allows you to add interactive, automatically
 graded exercises to your course content. You can create many different
-types of problems in Studio. 
+types of problems in Studio.
 
 All problems receive a point score, but, by default, problems do not count
 toward a student's grade. If you want the problems to count toward the
-student's grade, change the assignment type of the subsection that contains the 
+student's grade, change the assignment type of the subsection that contains the
 problems.
 
-See the following topics:
+For more information, see the following topics.
 
 * :ref:`Components and the User Interface`
 * :ref:`Problem Settings`
@@ -74,7 +74,7 @@ All problems on the edX platform have several component parts.
 
 #. **Feedback.** After a student clicks **Check**, all problems return a
    green check mark or a red X.
-   
+
    .. image:: Images/AnatomyofaProblem_Feedback.gif
 
 #. **Correct answer.** Most problems require that the instructor specify
@@ -92,8 +92,8 @@ All problems on the edX platform have several component parts.
 
 #. **Grading.** The instructor may specify whether a group of problems
    is graded. If a group of problems is graded, a clock icon appears for
-   that assignment in the course accordion.   
-   
+   that assignment in the course accordion.
+
    .. image:: Images/clock_icon.gif
 
 #. **Due date.** The date that the problem is due. A problem that is
@@ -124,9 +124,9 @@ Studio offers two interfaces for editing problem components: the Simple
 Editor and the Advanced Editor.
 
 -  The **Simple Editor** allows you to edit problems visually, without
-   having to work with XML. 
+   having to work with XML.
 -  The **Advanced Editor** converts the problem to edX’s XML standard
-   and allows you to edit that XML directly. 
+   and allows you to edit that XML directly.
 
 .. note:: You can switch at any time from the Simple Editor to the
           Advanced Editor by clicking **Advanced Editor** in the top right corner
@@ -135,11 +135,11 @@ Editor and the Advanced Editor.
 
 The Simple Editor
 ~~~~~~~~~~~~~~~~~
-The Common Problem templates, including multiple choice, open in the Simple Editor. The 
-following image shows a multiple choice problem in the Simple Editor. 
+The Common Problem templates, including multiple choice, open in the Simple Editor. The
+following image shows a multiple choice problem in the Simple Editor.
 
-The Simple Editor includes a toolbar that helps you format the text of your problem. 
-When you select text and then click the formatting buttons, the Simple Editor formats 
+The Simple Editor includes a toolbar that helps you format the text of your problem.
+When you select text and then click the formatting buttons, the Simple Editor formats
 the text for you automatically. The toolbar buttons are the following:
 
 1. Create a level 1 heading.
@@ -154,17 +154,17 @@ the text for you automatically. The toolbar buttons are the following:
 
 The following image shows a multiple choice problem in the Simple Editor.
 
-.. image:: Images/MultipleChoice_SimpleEditor.gif 
+.. image:: Images/MultipleChoice_SimpleEditor.gif
 
-.. _Advanced Editor: 
+.. _Advanced Editor:
 
 The Advanced Editor
 ~~~~~~~~~~~~~~~~~~~
-The **Advanced Editor** opens a problem in XML. The Advanced Problem templates, 
-such as the circuit schematic builder, open directly in the Advanced Editor. 
+The **Advanced Editor** opens a problem in XML. The Advanced Problem templates,
+such as the circuit schematic builder, open directly in the Advanced Editor.
 
 For more information about the XML for different problem types, see :ref:`Appendix E`.
-   
+
 The following image shows the multiple choice problem above in the Advanced Editor
 instead of the Simple Editor.
 
@@ -328,8 +328,8 @@ Problem Types
 
 Studio includes templates for many different types of problems, from
 simple multiple choice problems to advanced problems that require the
-student to “build” a virtual circuit. Details about each problem type, 
-including information about how to create the problem, appears in the 
+student to “build” a virtual circuit. Details about each problem type,
+including information about how to create the problem, appears in the
 page for the problem type.
 
 -  :ref:`Common Problems` appear on the **Common Problem Types** tab when you
@@ -344,7 +344,7 @@ page for the problem type.
    **Add New Component** in each unit, and these problems are available
    in the Advanced component.
 -  :ref:`Open Response Assessment Problems` are a new kind of problem that allow you, the
-   students in your course, or a computer algorithm to grade responses in the form 
+   students in your course, or a computer algorithm to grade responses in the form
    of essays, files such as computer code, and images.
 
 .. _Multiple Problems in One Component:

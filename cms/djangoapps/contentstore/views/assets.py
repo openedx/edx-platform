@@ -27,23 +27,24 @@ from django.http import HttpResponseNotFound
 import json
 from django.utils.translation import ugettext as _
 from pymongo import DESCENDING
-
+import math
 
 __all__ = ['assets_handler']
 
 
 @login_required
 @ensure_csrf_cookie
-def assets_handler(request, tag=None, course_id=None, branch=None, version_guid=None, block=None, asset_id=None):
+def assets_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None, asset_id=None):
     """
     The restful handler for assets.
     It allows retrieval of all the assets (as an HTML page), as well as uploading new assets,
     deleting assets, and changing the "locked" state of an asset.
 
     GET
-        html: return html page of all course assets (note though that a range of assets can be requested using start
-        and max query parameters)
-        json: not currently supported
+        html: return html page which will show all course assets. Note that only the asset container
+            is returned and that the actual assets are filled in with a client-side request.
+        json: returns a page of assets. A page parameter specifies the desired page, and the
+            optional page_size parameter indicates the number of items per page (defaults to 50).
     POST
         json: create (or update?) an asset. The only updating that can be done is changing the lock state.
     PUT
@@ -51,13 +52,14 @@ def assets_handler(request, tag=None, course_id=None, branch=None, version_guid=
     DELETE
         json: delete an asset
     """
-    location = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
+    location = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
     if not has_access(request.user, location):
         raise PermissionDenied()
 
-    if 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
+    response_format = request.REQUEST.get('format', 'html')
+    if response_format == 'json' or 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
         if request.method == 'GET':
-            raise NotImplementedError('coming soon')
+            return _assets_json(request, location)
         else:
             return _update_asset(request, location, asset_id)
     elif request.method == 'GET':  # assume html
@@ -73,22 +75,35 @@ def _asset_index(request, location):
     Supports start (0-based index into the list of assets) and max query parameters.
     """
     old_location = loc_mapper().translate_locator_to_location(location)
-
     course_module = modulestore().get_item(old_location)
-    maxresults = request.REQUEST.get('max', None)
-    start = request.REQUEST.get('start', None)
-    course_reference = StaticContent.compute_location(old_location.org, old_location.course, old_location.name)
-    if maxresults is not None:
-        maxresults = int(maxresults)
-        start = int(start) if start else 0
-        assets = contentstore().get_all_content_for_course(
-            course_reference, start=start, maxresults=maxresults,
-            sort=[('uploadDate', DESCENDING)]
-        )
-    else:
-        assets = contentstore().get_all_content_for_course(
-            course_reference, sort=[('uploadDate', DESCENDING)]
-        )
+
+    return render_to_response('asset_index.html', {
+        'context_course': course_module,
+        'asset_callback_url': location.url_reverse('assets/', '')
+    })
+
+
+def _assets_json(request, location):
+    """
+    Display an editable asset library.
+
+    Supports start (0-based index into the list of assets) and max query parameters.
+    """
+    requested_page = int(request.REQUEST.get('page', 0))
+    requested_page_size = int(request.REQUEST.get('page_size', 50))
+    sort = [('uploadDate', DESCENDING)]
+
+    current_page = max(requested_page, 0)
+    start = current_page * requested_page_size
+    assets, total_count = _get_assets_for_page(request, location, current_page, requested_page_size, sort)
+    end = start + len(assets)
+
+    # If the query is beyond the final page, then re-query the final page so that at least one asset is returned
+    if requested_page > 0 and start >= total_count:
+        current_page = int(math.floor((total_count - 1) / requested_page_size))
+        start = current_page * requested_page_size
+        assets, total_count = _get_assets_for_page(request, location, current_page, requested_page_size, sort)
+        end = start + len(assets)
 
     asset_json = []
     for asset in assets:
@@ -101,11 +116,28 @@ def _asset_index(request, location):
         asset_locked = asset.get('locked', False)
         asset_json.append(_get_asset_json(asset['displayname'], asset['uploadDate'], asset_location, thumbnail_location, asset_locked))
 
-    return render_to_response('asset_index.html', {
-        'context_course': course_module,
-        'asset_list': json.dumps(asset_json),
-        'asset_callback_url': location.url_reverse('assets/', '')
+    return JsonResponse({
+        'start': start,
+        'end': end,
+        'page': current_page,
+        'pageSize': requested_page_size,
+        'totalCount': total_count,
+        'assets': asset_json
     })
+
+
+def _get_assets_for_page(request, location, current_page, page_size, sort):
+    """
+    Returns the list of assets for the specified page and page size.
+    """
+    start = current_page * page_size
+
+    old_location = loc_mapper().translate_locator_to_location(location)
+
+    course_reference = StaticContent.compute_location(old_location.org, old_location.course, old_location.name)
+    return contentstore().get_all_content_for_course(
+        course_reference, start=start, maxresults=page_size, sort=sort
+    )
 
 
 @require_POST
@@ -124,7 +156,7 @@ def _upload_asset(request, location):
         modulestore().get_item(old_location)
     except:
         # no return it as a Bad Request response
-        logging.error('Could not find course' + old_location)
+        logging.error("Could not find course: %s", old_location)
         return HttpResponseBadRequest()
 
     # compute a 'filename' which is similar to the location formatting, we're
@@ -214,7 +246,7 @@ def _update_asset(request, location, asset_id):
                 # remove from any caching
                 del_cached_content(thumbnail_content.location)
             except:
-                logging.warning('Could not delete thumbnail: ' + content.thumbnail_location)
+                logging.warning('Could not delete thumbnail: %s', content.thumbnail_location)
 
         # delete the original
         contentstore().delete(content.get_id())

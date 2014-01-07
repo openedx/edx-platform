@@ -50,16 +50,14 @@ def permitted(fn):
     return wrapper
 
 
-def ajax_content_response(request, course_id, content, template_name):
+def ajax_content_response(request, course_id, content):
     context = {
         'course_id': course_id,
         'content': content,
     }
-    html = render_to_string(template_name, context)
     user_info = cc.User.from_django_user(request.user).to_dict()
     annotated_content_info = utils.get_annotated_content_info(course_id, content, request.user, user_info)
     return JsonResponse({
-        'html': html,
         'content': utils.safe_content(content),
         'annotated_content_info': annotated_content_info,
     })
@@ -131,7 +129,7 @@ def create_thread(request, course_id, commentable_id):
     data = thread.to_dict()
     add_courseware_context([data], course)
     if request.is_ajax():
-        return ajax_content_response(request, course_id, data, 'discussion/ajax_create_thread.html')
+        return ajax_content_response(request, course_id, data)
     else:
         return JsonResponse(utils.safe_content(data))
 
@@ -147,7 +145,7 @@ def update_thread(request, course_id, thread_id):
     thread.update_attributes(**extract(request.POST, ['body', 'title', 'tags']))
     thread.save()
     if request.is_ajax():
-        return ajax_content_response(request, course_id, thread.to_dict(), 'discussion/ajax_update_thread.html')
+        return ajax_content_response(request, course_id, thread.to_dict())
     else:
         return JsonResponse(utils.safe_content(thread.to_dict()))
 
@@ -184,7 +182,7 @@ def _create_comment(request, course_id, thread_id=None, parent_id=None):
         user = cc.User.from_django_user(request.user)
         user.follow(comment.thread)
     if request.is_ajax():
-        return ajax_content_response(request, course_id, comment.to_dict(), 'discussion/ajax_create_comment.html')
+        return ajax_content_response(request, course_id, comment.to_dict())
     else:
         return JsonResponse(utils.safe_content(comment.to_dict()))
 
@@ -228,7 +226,7 @@ def update_comment(request, course_id, comment_id):
     comment.update_attributes(**extract(request.POST, ['body']))
     comment.save()
     if request.is_ajax():
-        return ajax_content_response(request, course_id, comment.to_dict(), 'discussion/ajax_update_comment.html')
+        return ajax_content_response(request, course_id, comment.to_dict())
     else:
         return JsonResponse(utils.safe_content(comment.to_dict()))
 

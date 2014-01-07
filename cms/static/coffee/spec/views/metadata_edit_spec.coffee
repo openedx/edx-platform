@@ -391,8 +391,95 @@ define ["js/models/metadata", "js/collections/metadata", "js/views/metadata", "c
           it "returns the intial value upon initialization", ->
               assertValueInView(@view, '12:12:12')
 
+          it "value is converted correctly", ->
+            view = @view
+
+            cases = [
+              {
+                input: '23:100:0'
+                output: '23:59:59'
+              },
+              {
+                input: '100000000000000000'
+                output: '23:59:59'
+              },
+              {
+                input: '80000'
+                output: '22:13:20'
+              },
+              {
+                input: '-100'
+                output: '00:00:00'
+              },
+              {
+                input: '-100:-10'
+                output: '00:00:00'
+              },
+              {
+                input: '99:99'
+                output: '01:40:39'
+              },
+              {
+                input: '2'
+                output: '00:00:02'
+              },
+              {
+                input: '1:2'
+                output: '00:01:02'
+              },
+              {
+                input: '1:25'
+                output: '00:01:25'
+              },
+              {
+                input: '3:1:25'
+                output: '03:01:25'
+              },
+              {
+                input: ' 2 3 : 5 9 : 5 9 '
+                output: '23:59:59'
+              },
+              {
+                input: '9:1:25'
+                output: '09:01:25'
+              },
+              {
+                input: '77:72:77'
+                output: '23:59:59'
+              },
+              {
+                input: '22:100:100'
+                output: '23:41:40'
+              },
+              # negative value
+              {
+                input: '-22:22:22'
+                output: '00:22:22'
+              },
+              # simple string
+              {
+                input: 'simple text'
+                output: '00:00:00'
+              },
+              {
+                input: 'a10a:a10a:a10a'
+                output: '00:00:00'
+              },
+              # empty string
+              {
+                input: ''
+                output: '00:00:00'
+              }
+            ]
+
+            $.each cases, (index, data) ->
+                expect(view.parseRelativeTime(data.input)).toBe(data.output)
+
           it "can update its value in the view", ->
               assertCanUpdateView(@view, "23:59:59")
+              @view.setValueInEditor("33:59:59")
+              @view.updateModel()
+              assertValueInView(@view, "23:59:59")
 
           it "has a clear method to revert to the model default", ->
               assertClear(@view, '00:00:00')

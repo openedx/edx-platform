@@ -9,68 +9,11 @@ import course_modes.tests.factories as cmf
 from lettuce import world
 
 
-@world.absorb
-class UserFactory(sf.UserFactory):
-    """
-    User account for lms / cms
-    """
-    FACTORY_DJANGO_GET_OR_CREATE = ('username',)
-    pass
-
-
-@world.absorb
-class UserProfileFactory(sf.UserProfileFactory):
-    """
-    Demographics etc for the User
-    """
-    FACTORY_DJANGO_GET_OR_CREATE = ('user',)
-    pass
-
-
-@world.absorb
-class RegistrationFactory(sf.RegistrationFactory):
-    """
-    Activation key for registering the user account
-    """
-    FACTORY_DJANGO_GET_OR_CREATE = ('user',)
-    pass
-
-
-@world.absorb
-class GroupFactory(sf.GroupFactory):
-    """
-    Groups for user permissions for courses
-    """
-    pass
-
-
-@world.absorb
-class CourseEnrollmentAllowedFactory(sf.CourseEnrollmentAllowedFactory):
-    """
-    Users allowed to enroll in the course outside of the usual window
-    """
-    pass
-
-
-@world.absorb
-class CourseModeFactory(cmf.CourseModeFactory):
-    """
-    Course modes
-    """
-    pass
-
-
-@world.absorb
-class CourseFactory(xf.CourseFactory):
-    """
-    Courseware courses
-    """
-    pass
-
-
-@world.absorb
-class ItemFactory(xf.ItemFactory):
-    """
-    Everything included inside a course
-    """
-    pass
+world.absorb(sf.UserFactory)
+world.absorb(sf.UserProfileFactory)
+world.absorb(sf.RegistrationFactory)
+world.absorb(sf.GroupFactory)
+world.absorb(sf.CourseEnrollmentAllowedFactory)
+world.absorb(cmf.CourseModeFactory)
+world.absorb(xf.CourseFactory)
+world.absorb(xf.ItemFactory)

@@ -29,3 +29,6 @@ copyright = u'2013, edX Documentation Team'
 version = ''
 # The full version, including alpha/beta/rc tags.
 release = ''
+
+#Added to turn off smart quotes so users can copy JSON values without problems.
+html_use_smartypants = False

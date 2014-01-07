@@ -12,6 +12,7 @@ function () {
 
         // Changing quality for now only works for YouTube videos.
         if (state.videoType !== 'youtube') {
+            state.el.find('a.quality_control').remove();
             return;
         }
 

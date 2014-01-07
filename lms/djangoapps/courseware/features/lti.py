@@ -3,9 +3,10 @@
 import os
 
 from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
 from lettuce import world, step
 from lettuce.django import django_url
-from common import course_id
+from common import course_id, visit_scenario_item
 
 from courseware.tests.factories import InstructorFactory
 
@@ -111,7 +112,7 @@ def add_correct_lti_to_course(_step, fields):
         metadata.update(_step.hashes[0])
 
     world.scenario_dict['LTI'] = world.ItemFactory.create(
-        parent_location=world.scenario_dict['SEQUENTIAL'].location,
+        parent_location=world.scenario_dict['SECTION'].location,
         category=category,
         display_name='LTI',
         metadata=metadata,
@@ -122,19 +123,7 @@ def add_correct_lti_to_course(_step, fields):
         port=world.browser.port,
     ))
 
-    course = world.scenario_dict["COURSE"]
-    chapter_name = world.scenario_dict['SECTION'].display_name.replace(
-        " ", "_")
-    section_name = chapter_name
-    path = "/courses/{org}/{num}/{name}/courseware/{chapter}/{section}".format(
-        org=course.org,
-        num=course.number,
-        name=course.display_name.replace(' ', '_'),
-        chapter=chapter_name,
-        section=section_name)
-    url = django_url(path)
-
-    world.browser.visit(url)
+    visit_scenario_item('LTI')
 
 
 def create_course(course, metadata):
@@ -180,12 +169,13 @@ def create_course(course, metadata):
     )
 
     # Add a section to the course to contain problems
-    world.scenario_dict['SECTION'] = world.ItemFactory.create(
+    world.scenario_dict['CHAPTER'] = world.ItemFactory.create(
         parent_location=world.scenario_dict['COURSE'].location,
-        display_name='Test Section',
+        category='chapter',
+        display_name='Test Chapter',
     )
-    world.scenario_dict['SEQUENTIAL'] = world.ItemFactory.create(
-        parent_location=world.scenario_dict['SECTION'].location,
+    world.scenario_dict['SECTION'] = world.ItemFactory.create(
+        parent_location=world.scenario_dict['CHAPTER'].location,
         category='sequential',
         display_name='Test Section',
         metadata={'graded': True, 'format': 'Homework'})

@@ -50,5 +50,7 @@
 @import 'discussion';
 @import 'news';
 
+// temp - shame and developer
+@import 'developer'; // used for any developer-created scss that needs further polish/refactoring
+@import 'shame';     // used for any bad-form/orphaned scss
 ## NOTE: needed here for cascade and dependency purposes, but not a great permanent solution
-@import 'shame'; // shame file - used for any bad-form/orphaned scss that knowingly violate edX FED architecture/standards (see - http://csswizardry.com/2013/04/shame-css/)

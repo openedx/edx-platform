@@ -8,10 +8,11 @@ Contents
 ========
 
 .. toctree::
-   :numbered:
    :maxdepth: 5
 
    read_me
+   01-07-2014
+   12-17-2013
    12-09-2013
    12-03-2013
    11-06-2013

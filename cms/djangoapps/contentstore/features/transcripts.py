@@ -49,25 +49,18 @@ TRANSCRIPTS_BUTTONS = {
 }
 
 
-def _clear_field(index):
-    world.css_fill(SELECTORS['url_inputs'], '', index)
-    # In some reason chromeDriver doesn't trigger 'input' event after filling
-    # field by an empty value. That's why we trigger it manually via jQuery.
-    world.trigger_event(SELECTORS['url_inputs'], event='input', index=index)
-
-
 @step('I clear fields$')
 def clear_fields(_step):
-    js_str = '''
+
+    # Clear the input fields and trigger an 'input' event
+    script = """
         $('{selector}')
-            .eq({index})
             .prop('disabled', false)
-            .removeClass('is-disabled');
-    '''
-    for index in range(1, 4):
-        js = js_str.format(selector=SELECTORS['url_inputs'], index=index - 1)
-        world.browser.execute_script(js)
-        _clear_field(index)
+            .removeClass('is-disabled')
+            .val('')
+            .trigger('input');
+    """.format(selector=SELECTORS['url_inputs'])
+    world.browser.execute_script(script)
 
     world.wait(DELAY)
     world.wait_for_ajax_complete()
@@ -76,7 +69,12 @@ def clear_fields(_step):
 @step('I clear field number (.+)$')
 def clear_field(_step, index):
     index = int(index) - 1
-    _clear_field(index)
+    world.css_fill(SELECTORS['url_inputs'], '', index)
+
+    # For some reason ChromeDriver doesn't trigger an 'input' event after filling
+    # the field with an empty value. That's why we trigger it manually via jQuery.
+    world.trigger_event(SELECTORS['url_inputs'], event='input', index=index)
+
     world.wait(DELAY)
     world.wait_for_ajax_complete()
 
@@ -230,8 +228,18 @@ def open_tab(_step, tab_name):
 
 @step('I set value "([^"]*)" to the field "([^"]*)"$')
 def set_value_transcripts_field(_step, value, field_name):
-    field_id = '#' + world.browser.find_by_xpath('//label[text()="%s"]' % field_name.strip())[0]['for']
-    world.css_fill(field_id, value.strip())
+    XPATH = '//label[text()="{name}"]'.format(name=field_name)
+    SELECTOR = '#' + world.browser.find_by_xpath(XPATH)[0]['for']
+    element = world.css_find(SELECTOR).first
+    if element['type'] == 'text':
+        SCRIPT = '$("{selector}").val("{value}").change()'.format(
+                selector=SELECTOR,
+                value=value
+            )
+        world.browser.execute_script(SCRIPT)
+        assert world.css_has_value(SELECTOR, value)
+    else:
+        assert False, 'Incorrect element type.';
     world.wait_for_ajax_complete()
 
 

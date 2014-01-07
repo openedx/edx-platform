@@ -2,7 +2,10 @@ if Backbone?
   class @DiscussionThreadProfileView extends DiscussionContentView
     expanded = false
     events:
-      "click .discussion-vote": "toggleVote"
+      "click .vote-btn":
+        (event) -> @toggleVote(event)
+      "keydown .vote-btn":
+        (event) -> DiscussionUtil.activateOnEnter(event, @toggleVote)
       "click .action-follow": "toggleFollowing"
       "keypress .action-follow":
         (event) -> DiscussionUtil.activateOnEnter(event, toggleFollowing)
@@ -27,7 +30,7 @@ if Backbone?
       @$el.html(Mustache.render(@template, params))
       @initLocal()
       @delegateEvents()
-      @renderVoted()
+      @renderVote()
       @renderAttrs()
       @$("span.timeago").timeago()
       @convertMath()
@@ -35,15 +38,8 @@ if Backbone?
         @renderResponses()
       @
 
-    renderVoted: =>
-      if window.user.voted(@model)
-        @$("[data-role=discussion-vote]").addClass("is-cast")
-      else
-        @$("[data-role=discussion-vote]").removeClass("is-cast")
-
     updateModelDetails: =>
-      @renderVoted()
-      @$("[data-role=discussion-vote] .votes-count-number").html(@model.get("votes")["up_count"])
+      @renderVote()
 
     convertMath: ->
       element = @$(".post-body")
@@ -70,35 +66,6 @@ if Backbone?
 
     addComment: =>
       @model.comment()
-
-    toggleVote: (event) ->
-      event.preventDefault()
-      if window.user.voted(@model)
-        @unvote()
-      else
-        @vote()
-
-    vote: ->
-      window.user.vote(@model)
-      url = @model.urlFor("upvote")
-      DiscussionUtil.safeAjax
-        $elem: @$(".discussion-vote")
-        url: url
-        type: "POST"
-        success: (response, textStatus) =>
-          if textStatus == 'success'
-            @model.set(response)
-
-    unvote: ->
-      window.user.unvote(@model)
-      url = @model.urlFor("unvote")
-      DiscussionUtil.safeAjax
-        $elem: @$(".discussion-vote")
-        url: url
-        type: "POST"
-        success: (response, textStatus) =>
-          if textStatus == 'success'
-            @model.set(response)
 
     edit: ->
 

@@ -10,6 +10,7 @@ from mock import MagicMock, Mock, patch
 from xblock.runtime import Runtime, UsageStore
 from xblock.field_data import FieldData
 from xblock.fields import ScopeIds
+from xblock.test.tools import unabc
 
 
 class SetupTestErrorModules():
@@ -103,6 +104,11 @@ class TestException(Exception):
     pass
 
 
+@unabc("Tests should not call {}")
+class TestRuntime(Runtime):
+    pass
+
+
 class TestErrorModuleConstruction(unittest.TestCase):
     """
     Test that error module construction happens correctly
@@ -111,11 +117,11 @@ class TestErrorModuleConstruction(unittest.TestCase):
     def setUp(self):
         field_data = Mock(spec=FieldData)
         self.descriptor = BrokenDescriptor(
-            Runtime(Mock(spec=UsageStore), field_data),
+            TestRuntime(Mock(spec=UsageStore), field_data),
             field_data,
             ScopeIds(None, None, None, 'i4x://org/course/broken/name')
         )
-        self.descriptor.xmodule_runtime = Runtime(Mock(spec=UsageStore), field_data)
+        self.descriptor.xmodule_runtime = TestRuntime(Mock(spec=UsageStore), field_data)
         self.descriptor.xmodule_runtime.error_descriptor_class = ErrorDescriptor
         self.descriptor.xmodule_runtime.xmodule_instance = None
 

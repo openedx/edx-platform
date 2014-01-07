@@ -2,7 +2,7 @@
 
 from lettuce import world, step
 from lettuce.django import django_url
-from common import i_am_registered_for_the_course, section_location
+from common import i_am_registered_for_the_course, section_location, visit_scenario_item
 from django.utils.translation import ugettext as _
 
 ############### ACTIONS ####################
@@ -28,12 +28,7 @@ def view_video(_step, player_mode):
 
     # Make sure we have a video
     add_video_to_course(coursenum, player_mode.lower())
-    chapter_name = world.scenario_dict['SECTION'].display_name.replace(" ", "_")
-    section_name = chapter_name
-    url = django_url('/courses/%s/%s/%s/courseware/%s/%s' %
-                    (world.scenario_dict['COURSE'].org, world.scenario_dict['COURSE'].number, world.scenario_dict['COURSE'].display_name.replace(' ', '_'),
-                        chapter_name, section_name,))
-    world.browser.visit(url)
+    visit_scenario_item('SECTION')
 
 
 def add_video_to_course(course, player_mode):
@@ -83,7 +78,7 @@ def add_video_to_course(course, player_mode):
 
 @step('youtube server is up and response time is (.*) seconds$')
 def set_youtube_response_timeout(_step, time):
-    world.youtube_server.time_to_response = time
+    world.youtube.set_config('time_to_response', float(time))
 
 
 @step('when I view the video it has rendered in (.*) mode$')

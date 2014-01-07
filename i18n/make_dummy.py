@@ -38,9 +38,15 @@ def main(file, locale):
         raise IOError('File does not exist: %s' % file)
     pofile = polib.pofile(file)
     converter = Dummy()
-    converter.init_msgs(pofile.translated_entries())
     for msg in pofile:
         converter.convert_msg(msg)
+
+    # If any message has a plural, then the file needs plural information.
+    # Apply declaration for English pluralization rules so that ngettext will
+    # do something reasonable.
+    if any(m.msgid_plural for m in pofile):
+        pofile.metadata['Plural-Forms'] = 'nplurals=2; plural=(n != 1);'
+
     new_file = new_filename(file, locale)
     create_dir_if_necessary(new_file)
     pofile.save(new_file)
@@ -51,11 +57,7 @@ def new_filename(original_filename, new_locale):
     orig_dir = os.path.dirname(original_filename)
     msgs_dir = os.path.basename(orig_dir)
     orig_file = os.path.basename(original_filename)
-    return os.path.abspath(os.path.join(orig_dir,
-                                        '../..',
-                                        new_locale,
-                                        msgs_dir,
-                                        orig_file))
+    return os.path.abspath(os.path.join(orig_dir, '../..', new_locale, msgs_dir, orig_file))
 
 if __name__ == '__main__':
     # required arg: file

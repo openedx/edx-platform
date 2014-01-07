@@ -9,7 +9,7 @@ stringified date as best it can and returns `null` in the few cases
 where no friendly timezone name is found (so far, just Opera).
 
 Device tested & works in:
-* IE 6, 7, 8, and 9 (latest versions of all)
+* IE 6 [through] 11 (latest versions of all)
 * Firefox 3 [through] 16 (16 = latest version to date)
 * Chrome 22 (latest version to date)
 * Safari 6 (latest version to date)
@@ -44,7 +44,19 @@ define([], function() {
     if (tzAbbr) {
       // Old Firefox uses the long timezone name (e.g., "Central
       // Daylight Time" instead of "CDT")
-      tzAbbr = tzAbbr[1].match(/[A-Z]/g).join("");
+      /*
+         If the timezone string does not cotain capital English letters
+         (For example, the timezone string may be a Chinese string),
+         then the following code line will produce a null-reference
+         exception, and the execution of the javascript codes will 
+         be stopped, which may cause some strange behaviors. So a 
+         try-catch is needed here to prevent the execution being stopped.
+      */
+      try {
+          tzAbbr = tzAbbr[1].match(/[A-Z]/g).join("");
+      } catch(err) {
+          tzAbbr = tzAbbr[1];
+      }
     }
 
     // Uncomment these lines to return a GMT offset for browsers

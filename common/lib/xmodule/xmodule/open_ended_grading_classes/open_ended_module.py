@@ -804,7 +804,7 @@ class OpenEndedDescriptor():
             if len(xml_object.xpath(child)) != 1:
                 # This is a staff_facing_error
                 raise ValueError(
-                    "Open Ended definition must include exactly one '{0}' tag. Contact the learning sciences group for assistance.".format(
+                    u"Open Ended definition must include exactly one '{0}' tag. Contact the learning sciences group for assistance.".format(
                         child))
 
         def parse(k):
@@ -820,7 +820,7 @@ class OpenEndedDescriptor():
         elt = etree.Element('openended')
 
         def add_child(k):
-            child_str = '<{tag}>{body}</{tag}>'.format(tag=k, body=self.definition[k])
+            child_str = u'<{tag}>{body}</{tag}>'.format(tag=k, body=self.definition[k])
             child_node = etree.fromstring(child_str)
             elt.append(child_node)
 

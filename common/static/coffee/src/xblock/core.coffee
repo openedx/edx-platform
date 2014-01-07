@@ -18,6 +18,8 @@
     block.element = element
     block.name = $element.data("name")
 
+    $element.trigger("xblock-initialized")
+    $element.data("initialized", true)
     block
 
   initializeBlocks: (element) ->

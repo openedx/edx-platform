@@ -10,4 +10,9 @@ describe('utility.rewriteStaticLinks', function () {
     it('returns "content" if "from" is not found', function () {
         expect(rewriteStaticLinks('<img src="/static/foo.x"/>', '/statix/', 'howdy')).toBe('<img src="/static/foo.x"/>')
     });
+    it('does not replace of "from" to "to" if "from" is part of absolute url', function () {
+        expect(
+            rewriteStaticLinks('<img src="http://www.mysite.org/static/foo.x"/>', '/static/', 'howdy')
+        ).toBe('<img src="http://www.mysite.org/static/foo.x"/>')
+    });
 });
