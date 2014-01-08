@@ -8,6 +8,11 @@ the top.  Include a label indicating the component affected.
 Studio: Add sorting by column to the Files & Uploads page.
 See mongo_indexes.md for new indices that should be added.
 
+Common: Previously, theming was activated by providing a value for the THEME_NAME
+  setting. Now, theming is activated by setting the "USE_CUSTOM_THEME" feature
+  flag to True -- a THEME_NAME setting is still required to determine *which*
+  theme to use.
+
 Studio: Newly-created courses default to being published on Jan 1, 2030
 
 Studio: Added pagination to the Files & Uploads page.
