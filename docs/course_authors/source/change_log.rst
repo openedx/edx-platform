@@ -8,6 +8,10 @@ Change Log
 ==============  ================================================================
      DATE       CHANGE
 ==============  ================================================================
+01/08/2014      Updated the topic :ref:`Set Important Dates for Your Course` to 
+                reflect change to default course start date to 2029.
+01/08/2014      Updated the topic :ref:`Add Files to a Course` to reflect addition of
+                sorting to the Files & Uploads page. 
 01/01/2014      Updated the chapters :ref:`Organizing Your Course Content` and 
                 :ref:`Testing Your Course` to reflect changes in the Course Outline design.
 01/01/2014      Updated the topic :ref:`Add Files to a Course` to reflect addition of
