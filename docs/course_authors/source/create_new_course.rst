@@ -237,12 +237,28 @@ To add a file:
 
 When you close the dialog box, the new files appear on the **Files & Uploads** page.
 
+
+==================
+Sort Files
+==================
+
+By default, files are sorted by the **Date Added** column, with the most recently added first.  
+
+Alternatively, can also sort the list by the **Name** column by clicking on the column header.
+
+For either the the **Date Added** or **Name** column, you can switch the sort order from descending to ascending, and back, by clicking the column header a second time.
+
+The current sort order is shown at the top of the file list, and the active sort column header is underlined:
+
+.. image:: Images/file_sort.png
+  :alt: Sorting files in the Files & Uploads page
+
+
 ==================
 Find Files
 ==================
-Files are sorted by the Date Added column, with the most recently added first.  
 
-The **Files & Uploads** page lists up to 50 files.  If your course has more the 50 files, additional files are listed in other pages.
+The **Files & Uploads** page lists up to 50 files.  If your course has more than 50 files, additional files are listed in other pages.
 
 The range of the files listed on the page, and the total number of files, are shown at the top of the page.
 
@@ -254,6 +270,7 @@ You can navigate through the pages listing files in two ways:
 
   
   .. image:: Images/file_pagination.png
+    :alt: Pagination in the Files & Uploads page
 
   
 ==================
