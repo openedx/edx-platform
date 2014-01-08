@@ -1069,20 +1069,18 @@ def enable_theme(theme_name):
 
 
 ############################### MICROSITES ################################
-def enable_microsites(microsite_names, microsite_config_dict, subdomain_branding, virtual_universities, env_root = ENV_ROOT):
+def enable_microsites(microsite_config_dict, subdomain_branding, virtual_universities, microsites_root = ENV_ROOT / "microsites"):
     """
     Enable the use of microsites, which are websites that allow
     for subdomains for the edX platform, e.g. foo.edx.org
     """
 
-    if not microsite_names or len(microsite_names) == 0:
+    if not microsite_config_dict or len(microsite_config_dict.keys()) == 0:
         return
 
     FEATURES['USE_MICROSITES'] = True
 
-    microsites_root = env_root / "microsites"
-
-    for microsite_name in microsite_names:
+    for microsite_name in microsite_config_dict.keys():
         # Calculate the location of the microsite's files
         microsite_root =  microsites_root / microsite_name
 
