@@ -6,21 +6,18 @@ Unit tests for the asset upload endpoint.
 #pylint: disable=W0621
 #pylint: disable=W0212
 
-from datetime import datetime, timedelta
+from datetime import datetime
 from io import BytesIO
 from pytz import UTC
 import json
-import re
-from unittest import TestCase, skip
 from .utils import CourseTestCase
 from contentstore.views import assets
-from xmodule.contentstore.content import StaticContent, XASSET_LOCATION_TAG
+from xmodule.contentstore.content import StaticContent
 from xmodule.modulestore import Location
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.modulestore.django import loc_mapper
-from xmodule.modulestore.mongo.base import location_to_query
 
 
 class AssetsTestCase(CourseTestCase):
