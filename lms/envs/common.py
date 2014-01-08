@@ -1083,39 +1083,34 @@ def enable_microsites(microsite_config_dict, subdomain_branding, virtual_univers
     for microsite_name in microsite_config_dict.keys():
         # Calculate the location of the microsite's files
         microsite_root =  microsites_root / microsite_name
+        microsite_config = microsite_config_dict[microsite_name]
 
         # pull in configuration information from each
         # microsite root
 
-        try:
-            with open(microsite_root / "config.json") as microsite_config_file:
-                microsite_config = json.load(microsite_config_file)
+        if os.path.isdir(microsite_root):
+            # store the path on disk for later use
+            microsite_config['microsite_root'] = microsite_root
+            
+            # get the domain that this should reside
+            domain = microsite_config['domain_prefix']
 
-                # store the path on disk for later use
-                microsite_config['microsite_root'] = microsite_root
-                
-                # get the domain that this should reside
-                domain = microsite_config['domain_prefix']
+            # get the virtual university that this should use
+            university = microsite_config['university']
 
-                # get the virtual university that this should use
-                university = microsite_config['university']
+            # add to the existing maps in our settings
+            subdomain_branding[domain] = university
+            virtual_universities.append(university)
 
-                # add to the existing maps in our settings
-                subdomain_branding[domain] = university
-                virtual_universities.append(university)
+            template_dir = microsite_root / 'templates'
+            microsite_config['template_dir'] = template_dir
 
-                template_dir = microsite_root / 'templates'
-                microsite_config['template_dir'] = template_dir
+            microsite_config['microsite_name'] = microsite_name
 
-                microsite_config['microsite_name'] = microsite_name
-
-                microsite_config_dict[university] = microsite_config
-        except Exception as error:
+        else:
             # not sure if we have application logging at this stage of
             # startup
-            print '**** Error loading microsite {0}. Details {1}'.format(microsite_root, str(error))
-            # catch and continue
-            pass
+            print '**** Error loading microsite {0}. Directory does not exist'.format(microsite_root)
 
     # if we have microsites, then let's turn on SUBDOMAIN_BRANDING
     if len(microsite_config_dict.keys()) > 0:
