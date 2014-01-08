@@ -1,0 +1,494 @@
+# edX translation file
+# This English source file is machine-generated. Do not check it into github.
+# Copyright (C) 2013 EdX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# 
+# Translators:
+# Bookman <bookman@vip.163.com>, 2013
+# hanwentao <wentao.han@gmail.com>, 2013
+# liuyang <liuyang2011@tsinghua.edu.cn>, 2013
+# thinxer <me@thinxer.com>, 2013
+# hanwentao <wentao.han@gmail.com>, 2013
+# zibuyu <liuliudong@163.com>, 2013
+# liuyang <liuyang2011@tsinghua.edu.cn>, 2013
+# vicapple22 <vicapple22@gmail.com>, 2013
+# xdsnet <xdsnet@gmail.com>, 2013
+msgid ""
+msgstr ""
+"Project-Id-Version: edx-platform\n"
+"Report-Msgid-Bugs-To: translation_team@edx.org\n"
+"POT-Creation-Date: 2013-10-07 17:06-0400\n"
+"PO-Revision-Date: 2013-12-04 20:25+0000\n"
+"Last-Translator: xdsnet <xdsnet@gmail.com>\n"
+"Language-Team: Chinese (China) (http://www.transifex.com/projects/p/edx-platform/language/zh_CN/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: zh_CN\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: cms/static/js/base.js:80 lms/static/js/verify_student/photocapture.js:300
+msgid "This link will open in a new browser window/tab"
+msgstr "该链接将在新的浏览器窗口/标签打开"
+
+#: cms/static/js/base.js:83
+msgid "This link will open in a modal window"
+msgstr "该链接将在一个模式窗口中打开"
+
+#: cms/static/js/base.js:193
+msgid "Collapse All Sections"
+msgstr "折叠所有章节"
+
+#: cms/static/js/base.js:195
+msgid "Expand All Sections"
+msgstr "扩展所有章节"
+
+#: cms/static/js/base.js:234
+msgid ""
+"File format not supported. Please upload a file with a <code>tar.gz</code> "
+"extension."
+msgstr "文件格式不支持。请上传一个后缀名为<code>tar.gz</code>的文件。"
+
+#: cms/static/js/base.js:324
+msgid "There has been an error while saving your changes."
+msgstr "当保存您的更改时，系统出现了一个错误。"
+
+#: cms/static/js/base.js:371
+msgid "Delete this "
+msgstr "删除"
+
+#: cms/static/js/base.js:372
+msgid "Deleting this "
+msgstr "删除中"
+
+#: cms/static/js/base.js:375
+msgid "Yes, delete this "
+msgstr "对，删除"
+
+#: cms/static/js/base.js:387 cms/static/js/views/course_info_update.js:147
+msgid "Deleting&hellip;"
+msgstr "删除中&hellip;"
+
+#: cms/static/js/base.js:403 cms/static/js/views/asset.js:67
+#: cms/static/js/views/course_info_update.js:165
+#: cms/static/js/views/show_textbook.js:50
+#: cms/static/js/views/validation.js:115
+#: lms/static/admin/js/admin/DateTimeShortcuts.js:92
+#: lms/static/admin/js/admin/DateTimeShortcuts.js:204
+msgid "Cancel"
+msgstr "取消"
+
+#: cms/static/js/base.js:445
+msgid "Hide Studio Help"
+msgstr "隐藏Studio帮助"
+
+#: cms/static/js/base.js:447
+msgid "Looking for Help with Studio?"
+msgstr "希望查看关于Studio用法的帮助信息吗？"
+
+#: cms/static/js/base.js:609
+msgid "Please do not use any spaces or special characters in this field."
+msgstr "此字段的内容不能包含空格或特殊字符。"
+
+#: cms/static/js/base.js:624
+msgid ""
+"The combined length of the organization, course number, and course run "
+"fields cannot be more than 65 characters."
+msgstr "组织名称、课程编号和课程学科等描述不能超过65个字符"
+
+#: cms/static/js/base.js:659
+msgid "Required field."
+msgstr "必须填写的字段"
+
+#: cms/static/js/base.js:826 cms/static/js/models/section.js:27
+#: cms/static/js/views/asset.js:79
+#: cms/static/js/views/course_info_handout.js:59
+#: cms/static/js/views/course_info_update.js:81
+#: cms/static/js/views/overview.js:232
+msgid "Saving&hellip;"
+msgstr "保存中&hellip;"
+
+#: cms/static/js/base.js:851
+msgid "Will Release:"
+msgstr "即将发布："
+
+#: cms/static/js/base.js:852
+msgid "{month}/{day}/{year} at {hour}:{minute} UTC"
+msgstr "{月}/{日}/{年} 的 {小时}:{分钟} 标准时"
+
+#: cms/static/js/base.js:855
+msgid "Edit"
+msgstr "编辑"
+
+#: cms/static/js/models/course.js:8 cms/static/js/models/section.js:8
+msgid "You must specify a name"
+msgstr "您必须指定一个名称"
+
+#: cms/static/js/models/uploads.js:18
+msgid ""
+"Only <%= fileTypes %> files can be uploaded. Please select a file ending in "
+"<%= fileExtensions %> to upload."
+msgstr "只有 <%= fileTypes %> 文件可以上传。请选择一个以 <%= fileExtensions %> 结尾的文件上传。"
+
+#: cms/static/js/models/uploads.js:43
+msgid "or"
+msgstr "或者"
+
+#: cms/static/js/models/settings/course_details.js:43
+msgid "The course must have an assigned start date."
+msgstr "课程必须指定开始日期。"
+
+#: cms/static/js/models/settings/course_details.js:46
+msgid "The course end date cannot be before the course start date."
+msgstr "课程的结束日期不能在开始日期之前。"
+
+#: cms/static/js/models/settings/course_details.js:49
+msgid "The course start date cannot be before the enrollment start date."
+msgstr "课程的开始日期应在课程的注册日期之后。"
+
+#: cms/static/js/models/settings/course_details.js:52
+msgid "The enrollment start date cannot be after the enrollment end date."
+msgstr "注册开始日期应该早于注册截止日期。"
+
+#: cms/static/js/models/settings/course_details.js:55
+msgid "The enrollment end date cannot be after the course end date."
+msgstr "注册结束日期应在课程结束日期之前。"
+
+#: cms/static/js/models/settings/course_details.js:59
+msgid "Key should only contain letters, numbers, _, or -"
+msgstr "关键字只能包含字母、数字，下划线和连字符。"
+
+#: cms/static/js/models/settings/course_grader.js:33
+msgid "There's already another assignment type with this name."
+msgstr "已经有另一个任务类型使用了这个名字。"
+
+#: cms/static/js/models/settings/course_grader.js:40
+msgid "Please enter an integer between 0 and 100."
+msgstr "请输入一个0到100之间的整数。"
+
+#: cms/static/js/models/settings/course_grader.js:54
+#: cms/static/js/models/settings/course_grader.js:60
+msgid "Please enter an integer."
+msgstr "请输入一个整数。"
+
+#: cms/static/js/models/settings/course_grader.js:66
+msgid "Cannot drop more <% attrs.types %> than will assigned."
+msgstr "删除的<% attrs.types %>不能超过将分配的数量。"
+
+#: cms/static/js/models/settings/course_grading_policy.js:71
+msgid "Grace period must be specified in HH:MM format."
+msgstr "宽限时间必须指定 HH:MM 格式。"
+
+#: cms/static/js/views/asset.js:47
+msgid "Delete File Confirmation"
+msgstr "删除文件确认"
+
+#: cms/static/js/views/asset.js:48
+msgid ""
+"Are you sure you wish to delete this item. It cannot be reversed!\n"
+"\n"
+"Also any content that links/refers to this item will no longer work (e.g. broken images and/or links)"
+msgstr "删除的项目不能恢复！您确定要删除这个项目吗?\n\n与这个项目相关的一切信息（如相应的图片和链接）都会丢失。"
+
+#: cms/static/js/views/asset.js:51 cms/static/js/views/show_textbook.js:36
+msgid "Delete"
+msgstr "删除"
+
+#: cms/static/js/views/asset.js:58
+msgid "Your file has been deleted."
+msgstr "您的文件已经被删除"
+
+#: cms/static/js/views/course_info_update.js:135
+msgid "Are you sure you want to delete this update?"
+msgstr "你确定要删除这份更新吗？"
+
+#: cms/static/js/views/course_info_update.js:136
+msgid "This action cannot be undone."
+msgstr "这个动作必须被完成。"
+
+#: cms/static/js/views/course_info_update.js:139
+msgid "OK"
+msgstr "是的"
+
+#: cms/static/js/views/edit_chapter.js:55
+msgid "Upload a new PDF to “<%= name %>”"
+msgstr "上传一个新的PDF文件至\"<%= name %>\""
+
+#: cms/static/js/views/edit_textbook.js:63
+#: cms/static/js/views/overview_assignment_grader.js:62
+msgid "Saving"
+msgstr "保存中"
+
+#: cms/static/js/views/import.js:141
+msgid "There was an error with the upload"
+msgstr "上传时发出错误"
+
+#: cms/static/js/views/section_edit.js:50
+msgid "Your change could not be saved"
+msgstr "您做出的更改无法保存"
+
+#: cms/static/js/views/section_edit.js:54
+msgid "Return and resolve this issue"
+msgstr "返回并解决这个问题"
+
+#: cms/static/js/views/show_textbook.js:31
+msgid "Delete “<%= name %>”?"
+msgstr "删除\"<%= name %>\"？"
+
+#: cms/static/js/views/show_textbook.js:33
+msgid ""
+"Deleting a textbook cannot be undone and once deleted any reference to it in"
+" your courseware's navigation will also be removed."
+msgstr "删除教材的操作无法撤销。一旦删除，教材的相关信息会在课件导航中被移除。"
+
+#: cms/static/js/views/show_textbook.js:40
+msgid "Deleting"
+msgstr "删除中"
+
+#: cms/static/js/views/uploads.js:104
+msgid "We're sorry, there was an error"
+msgstr "很抱歉，出现错误"
+
+#: cms/static/js/views/validation.js:15
+msgid "You've made some changes"
+msgstr "您已经做出更改"
+
+#: cms/static/js/views/validation.js:16
+msgid "Your changes will not take effect until you save your progress."
+msgstr "只有保存进度后所做的更改才会生效。"
+
+#: cms/static/js/views/validation.js:17
+msgid "You've made some changes, but there are some errors"
+msgstr "您已作出更改，但出现错误。"
+
+#: cms/static/js/views/validation.js:18
+msgid ""
+"Please address the errors on this page first, and then save your progress."
+msgstr "请先解决本页面出现的错误，然后保存进度。"
+
+#: cms/static/js/views/validation.js:106
+msgid "Save Changes"
+msgstr "保存更改"
+
+#: cms/static/js/views/validation.js:134
+msgid "Your changes have been saved."
+msgstr "您做的更改已被修改。"
+
+#: cms/static/js/views/settings/advanced.js:56
+msgid ""
+"Your changes will not take effect until you save your progress. Take care "
+"with key and value formatting, as validation is not implemented."
+msgstr "您必须保存您的进度，否则这些改变不会生效。由于系统暂时不支持校验功能，请仔细检查关键字和对应的取值。"
+
+#: cms/static/js/views/settings/advanced.js:105
+msgid "Your policy changes have been saved."
+msgstr "您的设置更改已被保存。"
+
+#: cms/static/js/views/settings/advanced.js:106
+msgid ""
+"Please note that validation of your policy key and value pairs is not "
+"currently in place yet. If you are having difficulties, please review your "
+"policy pairs."
+msgstr "请注意：您的设置键值对的验证目前没有生效。如果您遇到问题，请再检查一次。"
+
+#: cms/static/js/views/settings/main.js:256
+msgid "Upload your course image."
+msgstr "上传您的课程图片"
+
+#: cms/static/js/views/settings/main.js:257
+msgid "Files must be in JPEG or PNG format."
+msgstr "文件必须是JPEG或者PNG格式"
+
+#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js:72
+msgid "video slider"
+msgstr "视频序列"
+
+#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js:152
+msgid "Pause"
+msgstr "暂停"
+
+#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js:157
+msgid "Play"
+msgstr "开始"
+
+#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js:179
+#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js:180
+msgid "Fill browser"
+msgstr "填写浏览器"
+
+#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js:185
+#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js:186
+msgid "Exit full browser"
+msgstr "退出填充浏览"
+
+#: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js:72
+#: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js:188
+msgid "Volume muted"
+msgstr "静音中"
+
+#: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js:189
+msgid "Volume"
+msgstr "音量"
+
+#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js:189
+msgid "Caption will be displayed when "
+msgstr "当……将会显示字幕"
+
+#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js:595
+#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js:596
+msgid "Turn on captions"
+msgstr "打开字幕"
+
+#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js:601
+#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js:602
+msgid "Turn off captions"
+msgstr "关闭字幕"
+
+#: lms/static/admin/js/SelectFilter2.js:45
+#, c-format
+msgid "Available %s"
+msgstr "可用 %s"
+
+#: lms/static/admin/js/SelectFilter2.js:46
+#, c-format
+msgid ""
+"This is the list of available %s. You may choose some by selecting them in "
+"the box below and then clicking the \"Choose\" arrow between the two boxes."
+msgstr "这是可用%s的列表。您可以在下面的方框中进行选择，然后点击两个方框中间的“选择”箭头。"
+
+#: lms/static/admin/js/SelectFilter2.js:53
+#, c-format
+msgid "Type into this box to filter down the list of available %s."
+msgstr "在方框中输入信息以过滤可用%s列表。"
+
+#: lms/static/admin/js/SelectFilter2.js:57
+msgid "Filter"
+msgstr "过滤"
+
+#: lms/static/admin/js/SelectFilter2.js:61
+msgid "Choose all"
+msgstr "全部选择"
+
+#: lms/static/admin/js/SelectFilter2.js:61
+#, c-format
+msgid "Click to choose all %s at once."
+msgstr "点击以一次选择全部%s"
+
+#: lms/static/admin/js/SelectFilter2.js:67
+msgid "Choose"
+msgstr "选择"
+
+#: lms/static/admin/js/SelectFilter2.js:69
+msgid "Remove"
+msgstr "移除"
+
+#: lms/static/admin/js/SelectFilter2.js:75
+#, c-format
+msgid "Chosen %s"
+msgstr "%s被选中"
+
+#: lms/static/admin/js/SelectFilter2.js:76
+#, c-format
+msgid ""
+"This is the list of chosen %s. You may remove some by selecting them in the "
+"box below and then clicking the \"Remove\" arrow between the two boxes."
+msgstr "这是被选中的%s的列表。您可以在下面的方框中选择需要移除的项，然后点击两个方框中间的“移除”箭头。"
+
+#: lms/static/admin/js/SelectFilter2.js:80
+msgid "Remove all"
+msgstr "全部移除"
+
+#: lms/static/admin/js/SelectFilter2.js:80
+#, c-format
+msgid "Click to remove all chosen %s at once."
+msgstr "点击以一次移除全部所选的%s"
+
+#: lms/static/admin/js/actions.js:18 lms/static/admin/js/actions.min.js:1
+msgid "%(sel)s of %(cnt)s selected"
+msgid_plural "%(sel)s of %(cnt)s selected"
+msgstr[0] "%(cnt)s的%(sel)s被选中"
+
+#: lms/static/admin/js/actions.js:109 lms/static/admin/js/actions.min.js:5
+msgid ""
+"You have unsaved changes on individual editable fields. If you run an "
+"action, your unsaved changes will be lost."
+msgstr "您在单独可编辑的字段有未保存的更改。如果您执行操作，这些未保存的更改将丢失。"
+
+#: lms/static/admin/js/actions.js:121 lms/static/admin/js/actions.min.js:6
+msgid ""
+"You have selected an action, but you haven't saved your changes to "
+"individual fields yet. Please click OK to save. You'll need to re-run the "
+"action."
+msgstr "您已经选择一个操作，但是并未保存对字段进行的更改。请点击“确定”来保存。您需要再次运行该操作。"
+
+#: lms/static/admin/js/actions.js:123 lms/static/admin/js/actions.min.js:6
+msgid ""
+"You have selected an action, and you haven't made any changes on individual "
+"fields. You're probably looking for the Go button rather than the Save "
+"button."
+msgstr "您已经选择了一个操作并且未对单独的域做任何更改。您可能是在尝试使用“继续”键而不是“保存”键。"
+
+#: lms/static/admin/js/calendar.js:26 lms/static/admin/js/dateparse.js:32
+msgid ""
+"January February March April May June July August September October November"
+" December"
+msgstr "一月 二月 三月 四月 五月 六月 七月 八月 九月 十月 十一月 十二月"
+
+#: lms/static/admin/js/calendar.js:27
+msgid "S M T W T F S"
+msgstr "星期日 星期一 星期二 星期三 星期四 星期五 星期六"
+
+#: lms/static/admin/js/collapse.js:8 lms/static/admin/js/collapse.js.c:19
+#: lms/static/admin/js/collapse.min.js:1
+msgid "Show"
+msgstr "显示"
+
+#: lms/static/admin/js/collapse.js:15 lms/static/admin/js/collapse.min.js:1
+msgid "Hide"
+msgstr "隐藏"
+
+#: lms/static/admin/js/dateparse.js:33
+msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
+msgstr "星期日 星期一 星期二 星期三 星期四 星期五 星期六"
+
+#: lms/static/admin/js/admin/DateTimeShortcuts.js:49
+#: lms/static/admin/js/admin/DateTimeShortcuts.js:85
+msgid "Now"
+msgstr "现在"
+
+#: lms/static/admin/js/admin/DateTimeShortcuts.js:53
+msgid "Clock"
+msgstr "时钟"
+
+#: lms/static/admin/js/admin/DateTimeShortcuts.js:81
+msgid "Choose a time"
+msgstr "选择时间"
+
+#: lms/static/admin/js/admin/DateTimeShortcuts.js:86
+msgid "Midnight"
+msgstr "午夜"
+
+#: lms/static/admin/js/admin/DateTimeShortcuts.js:87
+msgid "6 a.m."
+msgstr "上午六点"
+
+#: lms/static/admin/js/admin/DateTimeShortcuts.js:88
+msgid "Noon"
+msgstr "中午"
+
+#: lms/static/admin/js/admin/DateTimeShortcuts.js:144
+#: lms/static/admin/js/admin/DateTimeShortcuts.js:197
+msgid "Today"
+msgstr "今天"
+
+#: lms/static/admin/js/admin/DateTimeShortcuts.js:148
+msgid "Calendar"
+msgstr "日历"
+
+#: lms/static/admin/js/admin/DateTimeShortcuts.js:195
+msgid "Yesterday"
+msgstr "昨天"
+
+#: lms/static/admin/js/admin/DateTimeShortcuts.js:199
+msgid "Tomorrow"
+msgstr "明天"
