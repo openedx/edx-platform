@@ -318,14 +318,16 @@ class @Problem
           @el.find('.problem > div').each (index, element) =>
             MathJax.Hub.Queue ["Typeset", MathJax.Hub, element]
 
-        @$('.show-label').text 'Hide Answer(s)'
+        `// Translators: the word Answer here refers to the answer to a problem the student must solve.`
+        @$('.show-label').text gettext('Hide Answer(s)')
         @el.addClass 'showed'
         @updateProgress response
     else
       @$('[id^=answer_], [id^=solution_]').text ''
       @$('[correct_answer]').attr correct_answer: null
       @el.removeClass 'showed'
-      @$('.show-label').text 'Show Answer(s)'
+      `// Translators: the word Answer here refers to the answer to a problem the student must solve.`
+      @$('.show-label').text gettext('Show Answer(s)')
 
       @el.find(".capa_inputtype").each (index, inputtype) =>
         display = @inputtypeDisplays[$(inputtype).attr('id')]
@@ -403,6 +405,7 @@ class @Problem
     formulaequationinput: (element) ->
       $(element).find('input').on 'input', ->
         $p = $(element).find('p.status')
+        `// Translators: the word unanswered here is about answering a problem the student must solve.`
         $p.text gettext("unanswered")
         $p.parent().removeClass().addClass "unanswered"
 
@@ -431,7 +434,8 @@ class @Problem
     textline: (element) ->
       $(element).find('input').on 'input', ->
         $p = $(element).find('p.status')
-        $p.text "unanswered"
+        `// Translators: the word unanswered here is about answering a problem the student must solve.`
+        $p.text gettext("unanswered")
         $p.parent().removeClass().addClass "unanswered"
 
   inputtypeSetupMethods:

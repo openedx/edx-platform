@@ -9,3 +9,11 @@ Feature: Course export
     And I export the course
     Then I get an error dialog
     And I can click to go to the unit with the error
+
+  Scenario: User is directed to problem with & in it when export fails
+    Given I am in Studio editing a new unit
+    When I add a "Blank Advanced Problem" "Advanced Problem" component
+    And I edit and enter an ampersand
+    And I export the course
+    Then I get an error dialog
+    And I can click to go to the unit with the error

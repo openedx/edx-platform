@@ -34,6 +34,7 @@ lib_paths:
     - js/vendor/underscore-min.js
     - js/vendor/backbone-min.js
     - js/vendor/jquery.timeago.js
+    - js/vendor/URI.min.js
     - coffee/src/ajax_prefix.js
     - js/test/add_ajax_prefix.js
     - coffee/src/jquery.immediateDescendents.js

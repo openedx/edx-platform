@@ -214,7 +214,7 @@ Step 4. Set the Assessment Type and Scoring
 
 .. note:: After you release your problem to students in your live course, make sure
           you don't make any changes to the code for the assessment type and scoring. Changing 
-          this code can cause errors in live courses.*
+          this code can cause errors in live courses.
 
 To set the assessment type and scoring for your open response assessment, you'll 
 enter code that specifies the type and order of assessments to use along with 
@@ -254,6 +254,9 @@ The problem that includes this code has the following characteristics.
    assessment score of 5 or greater.
 -  To advance to the AI assessment, the response must have a peer
    assessment score of 4 or greater.
+
+.. note:: If a response's score isn't high enough for the response to move to the next
+          assessment, 
 
 Set the Type and Scoring
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -377,7 +380,7 @@ Open response assessments include the following settings.
 |                                             |                                                                    |
 |                                             | **Note** *Every problem must have a problem weight of at least     |
 |                                             | one point. Problems that have a problem weight of zero points      |
-|                                             | don't appear on the instructor dashboard.                          |
+|                                             | don't appear on the instructor dashboard.*                          |
 +---------------------------------------------+--------------------------------------------------------------------+
 | **Required Peer Grading**                   | This setting specifies the number of responses that each student   |
 |                                             | who submits a response has to grade before the student receives a  |

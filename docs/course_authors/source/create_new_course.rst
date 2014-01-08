@@ -151,6 +151,10 @@ Describe Your Course
 
 The description of your course appears on the Course Summary page that students see, and includes a course summary, prerequisites, staff information and FAQs.
 
+For courses on edX.org, the description is shown in the course catalog. 
+
+On Edge, there is no course catalog and users will not find your course description. You must explicitly invite students to participate in your course for them to find the description.
+
 #. From the **Settings** menu, select **Schedule & Details**.
 #. Scroll down to the **Introducing Your Course** section, then locate the **Course Overview** field.
 
@@ -232,6 +236,25 @@ To add a file:
 #. To close the dialog box, click the **x** in the top right corner. 
 
 When you close the dialog box, the new files appear on the **Files & Uploads** page.
+
+==================
+Find Files
+==================
+Files are sorted by the Date Added column, with the most recently added first.  
+
+The **Files & Uploads** page lists up to 50 files.  If your course has more the 50 files, additional files are listed in other pages.
+
+The range of the files listed on the page, and the total number of files, are shown at the top of the page.
+
+You can navigate through the pages listing files in two ways:
+
+* Use the **<** and **>** buttons at the top and bottom of the list to navigate to the previous and next pages.
+
+* At the bottom of the page, enter the page number to skip to, then tab out of the field:
+
+  
+  .. image:: Images/file_pagination.png
+
   
 ==================
 Get the File URL

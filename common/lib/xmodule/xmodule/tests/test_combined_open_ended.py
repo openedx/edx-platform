@@ -18,6 +18,7 @@ from webob.multidict import MultiDict
 
 from xmodule.open_ended_grading_classes.openendedchild import OpenEndedChild
 from xmodule.open_ended_grading_classes.open_ended_module import OpenEndedModule
+from xmodule.open_ended_grading_classes.self_assessment_module import SelfAssessmentModule
 from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import CombinedOpenEndedV1Module
 from xmodule.open_ended_grading_classes.grading_service_module import GradingServiceError
 from xmodule.combined_open_ended_module import CombinedOpenEndedModule
@@ -499,6 +500,27 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
         self.assertEqual(response_dict['type'], "selfassessment")
         self.assertEqual(response_dict['max_score'], self.max_score)
         self.assertEqual(response_dict['state'], CombinedOpenEndedV1Module.INITIAL)
+
+    def test_create_task(self):
+        combinedoe = self.generate_oe_module(TEST_STATE_AI, 1, [self.task_xml1, self.task_xml2])
+
+        first_task = combinedoe.create_task(combinedoe.task_states[0], combinedoe.task_xml[0])
+        self.assertIsInstance(first_task, SelfAssessmentModule)
+
+        second_task = combinedoe.create_task(combinedoe.task_states[1], combinedoe.task_xml[1])
+        self.assertIsInstance(second_task, OpenEndedModule)
+
+    def test_get_task_number(self):
+        combinedoe = self.generate_oe_module(TEST_STATE_AI, 1, [self.task_xml1, self.task_xml2])
+
+        first_task = combinedoe.get_task_number(0)
+        self.assertIsInstance(first_task, SelfAssessmentModule)
+
+        second_task = combinedoe.get_task_number(1)
+        self.assertIsInstance(second_task, OpenEndedModule)
+
+        third_task = combinedoe.get_task_number(2)
+        self.assertIsNone(third_task)
 
     def test_update_task_states(self):
         """
