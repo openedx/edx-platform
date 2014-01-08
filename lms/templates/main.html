@@ -57,7 +57,7 @@
 
   <script type="text/javascript" src="/jsi18n/"></script>
 
-  <link rel="icon" type="image/x-icon" href="${static.url(settings.FAVICON_PATH)}" />
+  <link rel="icon" type="image/x-icon" href="${static.url(MicrositeConfiguration.get_microsite_configuration_value('favicon_path', settings.FAVICON_PATH))}" />
 
   <%static:css group='style-vendor'/>
   <%static:css group='style-app'/>
