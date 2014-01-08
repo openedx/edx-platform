@@ -50,7 +50,7 @@ def main():
     # Extract strings from django source files.
     make_django_cmd = (
         'django-admin.py makemessages -l en --ignore=src/* --ignore=i18n/* '
-        '--extension html'
+        '-d django --extension html'
     )
     # Extract strings from Javascript source files.
     make_djangojs_cmd = (
