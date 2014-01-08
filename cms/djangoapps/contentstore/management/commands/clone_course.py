@@ -10,7 +10,7 @@ from student.roles import CourseInstructorRole, CourseStaffRole
 
 
 #
-# To run from command line: rake cms:clone SOURCE_LOC=edX/111/Foo1 DEST_LOC=edX/135/Foo3
+# To run from command line: ./manage.py cms clone_course --settings=dev master/300/cough edx/111/foo
 #
 class Command(BaseCommand):
     """Clone a MongoDB-backed course to another location"""

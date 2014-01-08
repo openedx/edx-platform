@@ -409,7 +409,6 @@ INSTALLED_APPS = (
 
     # For CMS
     'contentstore',
-    'auth',
     'course_creators',
     'student',  # misleading name due to sharing with lms
     'course_groups',  # not used in cms (yet), but tests run

@@ -133,17 +133,10 @@ def _course_team_user(request, locator, email):
         return JsonResponse(msg, 400)
 
     if request.method == "DELETE":
-        # remove all roles in this course from this user: but fail if the user
-        # is the last instructor in the course team
-        instructors = CourseInstructorRole(locator)
-        if instructors.has_user(user):
-            if instructors.users_with_role().count() == 1:
-                msg = {
-                    "error": _("You may not remove the last instructor from a course")
-                }
-                return JsonResponse(msg, 400)
-            else:
-                instructors.remove_users(request.user, user)
+        try:
+            try_remove_instructor(request, locator, user)
+        except CannotOrphanCourse as oops:
+            return JsonResponse(oops.msg, 400)
 
         auth.remove_users(request.user, CourseStaffRole(locator), user)
         return JsonResponse()
@@ -167,19 +160,33 @@ def _course_team_user(request, locator, email):
         # add to staff regardless (can't do after removing from instructors as will no longer
         # be allowed)
         auth.add_users(request.user, CourseStaffRole(locator), user)
-        # if we're trying to downgrade a user from "instructor" to "staff",
-        # make sure we have at least one other instructor in the course team.
-        instructors = CourseInstructorRole(locator)
-        if instructors.has_user(user):
-            if instructors.users_with_role().count() == 1:
-                msg = {
-                    "error": _("You may not remove the last instructor from a course")
-                }
-                return JsonResponse(msg, 400)
-            else:
-                instructors.remove_users(request.user, user)
+        try:
+            try_remove_instructor(request, locator, user)
+        except CannotOrphanCourse as oops:
+            return JsonResponse(oops.msg, 400)
 
         # auto-enroll the course creator in the course so that "View Live" will work.
         CourseEnrollment.enroll(user, old_location.course_id)
 
     return JsonResponse()
+
+
+class CannotOrphanCourse(Exception):
+    """
+    Exception raised if an attempt is made to remove all responsible instructors from course.
+    """
+    def __init__(self, msg):
+        self.msg = msg
+        Exception.__init__(self)
+
+
+def try_remove_instructor(request, locator, user):
+    # remove all roles in this course from this user: but fail if the user
+    # is the last instructor in the course team
+    instructors = CourseInstructorRole(locator)
+    if instructors.has_user(user):
+        if instructors.users_with_role().count() == 1:
+            msg = {"error":_("You may not remove the last instructor from a course")}
+            raise CannotOrphanCourse(msg)
+        else:
+            auth.remove_users(request.user, instructors, user)
