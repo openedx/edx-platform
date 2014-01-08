@@ -9,13 +9,11 @@
 ## templates have access to these functions, and we can import these
 ## into non-inheriting templates via the %namespace tag.
 <%def name="theme_enabled()">
-  <% 
-    return settings.FEATURES["USE_CUSTOM_THEME"]
-  %>
+  <% return settings.FEATURES.get("USE_CUSTOM_THEME", False) %>
 </%def>
 
 <%def name="stanford_theme_enabled()">
-  <% 
+  <%
     if not theme_enabled():
       return False
 
@@ -24,7 +22,7 @@
     if hasattr(settings, "THEME_NAME"):
       theme_name = getattr(settings, "THEME_NAME")
 
-    return theme_enabled and theme_name == "stanford" 
+    return theme_enabled and theme_name == "stanford"
   %>
 </%def>
 
