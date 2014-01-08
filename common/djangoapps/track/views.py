@@ -1,6 +1,5 @@
 import datetime
 
-import pytz
 from pytz import UTC
 
 from django.contrib.auth.decorators import login_required
@@ -22,6 +21,14 @@ def log_event(event):
     tracker.send(event)
 
 
+def _get_request_header(request, header_name, default=''):
+    """Helper method to get header values from a request's META dict, if present."""
+    if request is not None and hasattr(request, 'META') and header_name in request.META:
+        return request.META[header_name]
+    else:
+        return default
+
+
 def user_track(request):
     """
     Log when POST call to "event" URL is made by a user. Uses request.REQUEST
@@ -40,25 +47,20 @@ def user_track(request):
     except:
         scookie = ""
 
-    try:
-        agent = request.META['HTTP_USER_AGENT']
-    except:
-        agent = ''
-
     page = request.REQUEST['page']
 
     with eventtracker.get_tracker().context('edx.course.browser', contexts.course_context_from_url(page)):
         event = {
             "username": username,
             "session": scookie,
-            "ip": request.META['REMOTE_ADDR'],
+            "ip": _get_request_header(request, 'REMOTE_ADDR'),
             "event_source": "browser",
             "event_type": request.REQUEST['event_type'],
             "event": request.REQUEST['event'],
-            "agent": agent,
+            "agent": _get_request_header(request, 'HTTP_USER_AGENT'),
             "page": page,
             "time": datetime.datetime.now(UTC),
-            "host": request.META['SERVER_NAME'],
+            "host": _get_request_header(request, 'SERVER_NAME'),
             "context": eventtracker.get_tracker().resolve_context(),
         }
 
@@ -68,32 +70,32 @@ def user_track(request):
 
 
 def server_track(request, event_type, event, page=None):
-    """Log events related to server requests."""
+    """
+    Log events related to server requests.
+
+    Handle the situation where the request may be NULL, as may happen with management commands.
+    """
+    if event_type.startswith("/event_logs") and request.user.is_staff:
+        return  # don't log
+
     try:
         username = request.user.username
     except:
         username = "anonymous"
 
-    try:
-        agent = request.META['HTTP_USER_AGENT']
-    except:
-        agent = ''
-
+    # define output:
     event = {
         "username": username,
-        "ip": request.META['REMOTE_ADDR'],
+        "ip": _get_request_header(request, 'REMOTE_ADDR'),
         "event_source": "server",
         "event_type": event_type,
         "event": event,
-        "agent": agent,
+        "agent": _get_request_header(request, 'HTTP_USER_AGENT'),
         "page": page,
         "time": datetime.datetime.now(UTC),
-        "host": request.META['SERVER_NAME'],
+        "host": _get_request_header(request, 'SERVER_NAME'),
         "context": eventtracker.get_tracker().resolve_context(),
     }
-
-    if event_type.startswith("/event_logs") and request.user.is_staff:
-        return  # don't log
 
     log_event(event)
 

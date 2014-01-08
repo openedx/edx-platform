@@ -5,6 +5,10 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Studio: Newly-created courses default to being published on Jan 1, 2030
+
+Studio: Added pagination to the Files & Uploads page.
+
 Blades: Video player improvements:
   - Disable edX controls on iPhone/iPod (native controls are used).
   - Disable unsupported controls (volume, playback rate) on iPad/Android.

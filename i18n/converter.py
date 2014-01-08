@@ -21,9 +21,9 @@ class Converter(object):
     #   HTML:   <B>, </B>, <BR/>, <textformat leading="10">
     #   Python: %(date)s, %(name)s
     tag_pattern = re.compile(r'''
-        (<[-\w" .:?=/]*>)   |       # <tag>
-        ({[^}]*})           |       # {tag}
-        (%\([^)]*\)\w)      |       # %(tag)s
+        (<[^>]+>)           |       # <tag>
+        ({[^}]+})           |       # {tag}
+        (%\([\w]+\)\w)      |       # %(tag)s
         (&\w+;)             |       # &entity;
         (&\#\d+;)           |       # &#1234;
         (&\#x[0-9a-f]+;)            # &#xABCD;

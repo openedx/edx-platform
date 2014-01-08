@@ -31,8 +31,8 @@
       <div class="group-visibility-label">${"<%- obj.group_string%>"}</div>
               ${"<% }  %>"}
 
-          <a href="#" class="vote-btn discussion-vote discussion-vote-up" data-role="discussion-vote" data-tooltip="vote">
-          <span class="plus-icon">+</span> <span class='votes-count-number'>${'<%- votes["up_count"] %>'}<span class="sr">votes (click to vote)</span></span></a>
+          <a href="#" class="vote-btn" data-tooltip="vote" role="button" aria-pressed="false">
+          <span class="plus-icon"/><span class='votes-count-number'>${'<%- votes["up_count"] %>'}</span> <span class="sr">votes (click to vote)</span></a>
           <h1>${'<%- title %>'}</h1>
           <p class="posted-details">
               ${"<% if (obj.username) { %>"}
@@ -123,7 +123,7 @@
 
 <script type="text/template" id="thread-response-show-template">
     <header class="response-local">
-        <a href="javascript:void(0)" class="vote-btn" data-tooltip="vote"><span class="plus-icon"></span><span class="votes-count-number">${"<%- votes['up_count'] %>"}<span class="sr">votes (click to vote)</span></span></a>
+        <a href="#" class="vote-btn" data-tooltip="vote" role="button" aria-pressed="false"><span class="plus-icon"/><span class="votes-count-number">${"<%- votes['up_count'] %>"}</span> <span class="sr">votes (click to vote)</span></a>
         <a href="javascript:void(0)" class="endorse-btn${'<% if (endorsed) { %> is-endorsed<% } %>'} action-endorse" style="cursor: default; display: none;" data-tooltip="endorse"><span class="check-icon" style="pointer-events: none; "></span></a>
         ${"<% if (obj.username) { %>"}
         <a href="${'<%- user_url %>'}" class="posted-by">${'<%- username %>'}</a>

@@ -69,6 +69,7 @@
             "underscore.string": "js/vendor/underscore.string.min",
             "backbone": "js/vendor/backbone-min",
             "backbone.associations": "js/vendor/backbone-associations-min",
+            "backbone.paginator": "js/vendor/backbone.paginator.min",
             "tinymce": "js/vendor/tiny_mce/tiny_mce",
             "jquery.tinymce": "js/vendor/tiny_mce/jquery.tinymce",
             "xmodule": "/xmodule/xmodule",
@@ -76,6 +77,7 @@
             "utility": "js/src/utility",
             "accessibility": "js/src/accessibility_tools",
             "draggabilly": "js/vendor/draggabilly.pkgd",
+            "URI": "js/vendor/URI.min",
 
             // externally hosted files
             "tender": "//edxedge.tenderapp.com/tender_widget",
@@ -163,6 +165,10 @@
                 deps: ["backbone"],
                 exports: "Backbone.Associations"
             },
+            "backbone.paginator": {
+                deps: ["backbone"],
+                exports: "Backbone.Paginator"
+            },
             "youtube": {
                 exports: "YT"
             },
@@ -192,6 +198,9 @@
                   });
                   MathJax.Hub.Configured();
                 }
+            },
+            "URI": {
+                exports: "URI"
             },
             "xblock/core": {
                 exports: "XBlock",

@@ -1,7 +1,7 @@
 """Tests for items views."""
 
 import json
-import datetime
+from datetime import datetime
 import ddt
 
 from mock import Mock, patch
@@ -149,6 +149,13 @@ class TestCreateItem(ItemTest):
         resp = self.create_xblock(category='problem', boilerplate='nosuchboilerplate.yaml')
         self.assertEqual(resp.status_code, 200)
 
+    def test_create_with_future_date(self):
+        self.assertEqual(self.course.start, datetime(2030, 1, 1, tzinfo=UTC))
+        resp = self.create_xblock(category='chapter')
+        locator = self.response_locator(resp)
+        obj = self.get_item_from_modulestore(locator)
+        self.assertEqual(obj.start, datetime(2030, 1, 1, tzinfo=UTC))
+
 
 class TestEditItem(ItemTest):
     """
@@ -214,14 +221,14 @@ class TestEditItem(ItemTest):
             data={'metadata': {'due': '2010-11-22T04:00Z'}}
         )
         sequential = self.get_item_from_modulestore(self.seq_locator)
-        self.assertEqual(sequential.due, datetime.datetime(2010, 11, 22, 4, 0, tzinfo=UTC))
+        self.assertEqual(sequential.due, datetime(2010, 11, 22, 4, 0, tzinfo=UTC))
         self.client.ajax_post(
             self.seq_update_url,
             data={'metadata': {'start': '2010-09-12T14:00Z'}}
         )
         sequential = self.get_item_from_modulestore(self.seq_locator)
-        self.assertEqual(sequential.due, datetime.datetime(2010, 11, 22, 4, 0, tzinfo=UTC))
-        self.assertEqual(sequential.start, datetime.datetime(2010, 9, 12, 14, 0, tzinfo=UTC))
+        self.assertEqual(sequential.due, datetime(2010, 11, 22, 4, 0, tzinfo=UTC))
+        self.assertEqual(sequential.start, datetime(2010, 9, 12, 14, 0, tzinfo=UTC))
 
     def test_delete_child(self):
         """
@@ -326,7 +333,7 @@ class TestEditItem(ItemTest):
         published = self.get_item_from_modulestore(self.problem_locator, False)
         self.assertIsNone(published.due)
         draft = self.get_item_from_modulestore(self.problem_locator, True)
-        self.assertEqual(draft.due, datetime.datetime(2077, 10, 10, 4, 0, tzinfo=UTC))
+        self.assertEqual(draft.due, datetime(2077, 10, 10, 4, 0, tzinfo=UTC))
 
     def test_make_public_with_update(self):
         """ Update a problem and make it public at the same time. """
@@ -338,7 +345,7 @@ class TestEditItem(ItemTest):
             }
         )
         published = self.get_item_from_modulestore(self.problem_locator, False)
-        self.assertEqual(published.due, datetime.datetime(2077, 10, 10, 4, 0, tzinfo=UTC))
+        self.assertEqual(published.due, datetime(2077, 10, 10, 4, 0, tzinfo=UTC))
 
     def test_make_private_with_update(self):
         """ Make a problem private and update it at the same time. """
@@ -357,7 +364,7 @@ class TestEditItem(ItemTest):
         with self.assertRaises(ItemNotFoundError):
             self.get_item_from_modulestore(self.problem_locator, False)
         draft = self.get_item_from_modulestore(self.problem_locator, True)
-        self.assertEqual(draft.due, datetime.datetime(2077, 10, 10, 4, 0, tzinfo=UTC))
+        self.assertEqual(draft.due, datetime(2077, 10, 10, 4, 0, tzinfo=UTC))
 
     def test_create_draft_with_update(self):
         """ Create a draft and update it at the same time. """
@@ -378,7 +385,7 @@ class TestEditItem(ItemTest):
         published = self.get_item_from_modulestore(self.problem_locator, False)
         self.assertIsNone(published.due)
         draft = self.get_item_from_modulestore(self.problem_locator, True)
-        self.assertEqual(draft.due, datetime.datetime(2077, 10, 10, 4, 0, tzinfo=UTC))
+        self.assertEqual(draft.due, datetime(2077, 10, 10, 4, 0, tzinfo=UTC))
 
 
 @ddt.ddt
