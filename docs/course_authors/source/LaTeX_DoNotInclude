@@ -1,0 +1,33 @@
+.. _Import Content from LaTeX:
+
+*************************
+Import Content from LaTeX
+*************************
+
+If LaTeX is enabled for your course, you can create an HTML component from imported LaTeX code.
+
+Studio uses a third-party LaTeX processor to convert LaTeX code to XML. The LaTeX processor must be up and running.
+
+1. When creating the new HTML component, select **E-text Written in LaTeX**.
+
+   The new HTML component opens, with an **upload** link:
+   
+   .. image:: Images/latex_upload.png
+     :width: 800   
+
+2. To upload a LaTeX file from your computer, click **upload**.
+
+   You are prompted to select a file.  The file loads in the LaTeX editor.
+   
+3. In the LaTeX editor, click **Save & Compile to edX XML**.   
+
+   The LaTeX content is added to the HTML component. For example:
+   
+   .. image:: Images/Latex_component.png
+     :width: 800
+
+
+4. Verify that your newly created component looks the way you want it to. 
+
+You can edit the HTML component with LaTeX as you can any other component. 
+In the editor, you can launch the LaTeX source compiler.
