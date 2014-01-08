@@ -23,8 +23,10 @@ def run():
         for store_name in settings.MODULESTORE:
             modulestore(store_name)
 
-    if settings.FEATURES['USE_CUSTOM_THEME']:
+    if settings.FEATURES.get('USE_CUSTOM_THEME', False):
         enable_theme()
+    if settings.FEATURES.get('MICROSITES', False):
+        enable_microsites()
 
 
 def enable_theme():
@@ -56,3 +58,23 @@ def enable_theme():
     settings.STATICFILES_DIRS.append(
         (u'themes/{}'.format(settings.THEME_NAME), theme_root / 'static')
     )
+
+
+def enable_microsites():
+    assert settings.FEATURES["MICROSITES"]
+    # add the microsite directory to the staticfiles directory
+    settings.STATICFILES_DIRS.append(settings.ENV_ROOT / "microsites")
+    settings.MAKO_TEMPLATES['microsites'].setdefault([])
+    settings.TEMPLATE_CONTEXT_PROCESSORS.append(
+        "student.context_processors.microsite_processor"
+    )
+
+    for subdomain, config in settings.MICROSITES.items():
+        dirname = config.get("directory", subdomain)
+        subdir = settings.ENV_ROOT / "microsites" / dirname
+        if not subdir.isdir():
+            raise RuntimeError("Microsite {name} does not have directory {dir}".format(
+                name=subdomain, dir=subdir))
+        template_dir = subdir / "templates"
+        settings.TEMPLATE_DIRS.append(template_dir)
+        settings.MAKO_TEMPLATES['microsites'].append(template_dir)

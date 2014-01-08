@@ -5,15 +5,13 @@
 <%inherit file="main.html" />
 <%namespace name='static' file='static_content.html'/>
 
-<%! from microsite_configuration.middleware import MicrositeConfiguration %>
-
 <%
-  homepage_overlay_html = MicrositeConfiguration.get_microsite_configuration_value('homepage_overlay_html')
+  homepage_overlay_html = microsite.get('homepage_overlay_html')
 
-  show_homepage_promo_video = MicrositeConfiguration.get_microsite_configuration_value('show_homepage_promo_video', True)
-  homepage_promo_video_youtube_id = MicrositeConfiguration.get_microsite_configuration_value('homepage_promo_video_youtube_id', "XNaiOGxWeto")
-  
-  show_partners = MicrositeConfiguration.get_microsite_configuration_value('show_partners', True)
+  show_homepage_promo_video = microsite.get('show_homepage_promo_video', True)
+  homepage_promo_video_youtube_id = microsite.get('homepage_promo_video_youtube_id', "XNaiOGxWeto")
+
+  show_partners = microsite.get('show_partners', True)
 
 %>
 

@@ -378,7 +378,6 @@ TRACKING_ENABLED = True
 ######################## subdomain specific settings ###########################
 COURSE_LISTINGS = {}
 SUBDOMAIN_BRANDING = {}
-VIRTUAL_UNIVERSITIES = []
 
 ############################### XModule Store ##################################
 MODULESTORE = {
@@ -611,7 +610,6 @@ TEMPLATE_LOADERS = (
 MIDDLEWARE_CLASSES = (
     'request_cache.middleware.RequestCache',
     'django_comment_client.middleware.AjaxExceptionMiddleware',
-    'microsite_configuration.middleware.MicrositeConfiguration',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
 
