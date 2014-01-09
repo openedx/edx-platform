@@ -1,0 +1,32 @@
+---
+metadata:
+    display_name: (Grade Me!)  Button
+data: |
+      <p>By clicking the button below, you assert that you have completed the course in its entirety.</p>
+      
+      <!-- <form action=/request_certificate method=POST>
+        <input type=hidden name=student_id value=103 />
+        <input type=hidden name=course_id value="OpenEdX/200/Stanford_Sandbox" />
+        <input type=submit name="hoo" />
+      </form> -->
+      
+      <input type=button value="Yes, I Agree." id="User_Verify_Button" style="margin-bottom: 20px;" />
+      <p class="verify-button-success-text" style="font-weight: bold; color: #008200;"></p>
+      
+      <script type="text/javascript">
+        var success_message = "Your grading and certification request has been received, <br />if you have passed, your certificate should be available in the next 20 minutes.";
+        document.getElementById('User_Verify_Button').addEventListener("click",
+        function(event) {
+          (function(event) {
+            var linkcontents = $('a.user-link').contents();
+            $.ajax({
+              type:     'POST',
+              url:      '/request_certificate',
+              data:     {'course_id': $$course_id},
+              success:  function(data) {
+                $('.verify-button-success-text').html(success_message);
+              }
+            });
+          }).call(document.getElementById('click_me'), event);
+        });
+      </script>
