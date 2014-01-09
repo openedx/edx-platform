@@ -31,7 +31,6 @@ from django_future.csrf import ensure_csrf_cookie
 from django.utils.http import cookie_date, base36_to_int
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST, require_GET
-from django.contrib.admin.views.decorators import staff_member_required
 
 from ratelimitbackend.exceptions import RateLimitException
 
@@ -185,7 +184,7 @@ def cert_info(user, course):
     'survey_url': url, only if show_survey_button is True
     'grade': if status is not 'processing'
     """
-    if not course.has_ended():
+    if not course.may_certify():
         return {}
 
     return _cert_info(user, course, certificate_status_for_student(user, course.id))

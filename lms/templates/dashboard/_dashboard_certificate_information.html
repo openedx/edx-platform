@@ -14,7 +14,9 @@ else:
 %>
 <div class="message message-status ${status_css_class} is-shown">
 
-% if cert_status['status'] == 'processing':
+% if course.may_certify() and cert_status['status'] == 'processing':
+      <p class="message-copy">${_("Your final standing is unrequested or unavailable at this time.")}</p>
+% elif cert_status['status'] == 'processing':
       <p class="message-copy">${_("Final course details are being wrapped up at this time. Your final standing will be available shortly.")}</p>
 % elif cert_status['status'] in ('generating', 'ready', 'notpassing', 'restricted'):
       <p class="message-copy">${_("Your final grade:")}
