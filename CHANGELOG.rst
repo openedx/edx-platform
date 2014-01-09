@@ -12,9 +12,9 @@ Studio: Newly-created courses default to being published on Jan 1, 2030
 
 Studio: Added pagination to the Files & Uploads page.
 
-LMS: Added unicode support with Arabic LMS view (sass/css).
-CMS: Added unicode support with Arabic CMS view (sass/css).
-Common: Added unicode support.
+LMS: Added Unicode support with Arabic LMS view (sass/css).
+CMS: Added Unicode support with Arabic CMS view (sass/css).
+Common: Added Unicode support.
 
 Studio: Added pagination to the Files & Uploads page.
 
