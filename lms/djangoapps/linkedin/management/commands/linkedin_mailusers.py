@@ -6,14 +6,18 @@ LinkedIn profiles.
 import json
 import urllib
 
+from django.conf import settings
 from django.core.mail import send_mail
 from django.core.management.base import BaseCommand
 from django.template import Context
 from django.template.loader import get_template
+from django.core.urlresolvers import reverse
 from optparse import make_option
 
+from edxmako.shortcuts import render_to_string
+
 from certificates.models import GeneratedCertificate
-from courseware.courses import get_course_by_id
+from courseware.courses import get_course_by_id, course_image_url
 
 from ...models import LinkedIn
 from . import LinkedInAPI
@@ -101,15 +105,31 @@ class Command(BaseCommand):
         Send the 'grandfathered' email informing historical students that they
         may now post their certificates on their LinkedIn profiles.
         """
-        template = get_template("linkedin_grandfather_email.html")
-        links = [
-            {'course_name': certificate.name,
-             'url': self.certificate_url(certificate, grandfather=True)}
-            for certificate in certificates]
-        context = Context({
-            'student_name': user.profile.name,
-            'certificates': links})
-        body = template.render(context)
+        courses_list = []
+        for cert in certificates:
+            course = get_course_by_id(cert.course_id)
+            course_url = 'https://{}{}'.format(
+                settings.SITE_NAME,
+                reverse('course_root', kwargs={'course_id': cert.course_id})
+            )
+
+            course_title = course.display_name
+
+            course_img_url = 'https://{}{}'.format(settings.SITE_NAME, course_image_url(course))
+            course_end_date = course.end.strftime('%b %Y')
+            course_org = course.display_organization
+
+            courses_list.append({
+                'course_url': course_url,
+                'course_org': course_org,
+                'course_title': course_title,
+                'course_image_url': course_img_url,
+                'course_end_date': course_end_date,
+                'linkedin_add_url': self.certificate_url(cert),
+            })
+
+        context = {'courses_list': courses_list, 'num_courses': len(courses_list)}
+        body = render_to_string('linkedin/linkedin_email.html', context)
         subject = 'Congratulations! Put your certificates on LinkedIn'
         self.send_email(user, subject, body)
 

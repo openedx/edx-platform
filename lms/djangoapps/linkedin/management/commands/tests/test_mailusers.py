@@ -7,36 +7,39 @@ import mock
 
 from certificates.models import GeneratedCertificate
 from django.contrib.auth.models import User
+from django.conf import settings
+from django.test.utils import override_settings
 from django.core import mail
 from django.utils.timezone import utc
 from django.test import TestCase
 
+from xmodule.modulestore.tests.factories import CourseFactory
 from student.models import UserProfile
 from linkedin.models import LinkedIn
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
 from linkedin.management.commands import linkedin_mailusers as mailusers
 
 MODULE = 'linkedin.management.commands.linkedin_mailusers.'
 
+TEST_DATA_MIXED_MODULESTORE = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {})
 
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class MailusersTests(TestCase):
     """
     Test mail users command.
     """
 
     def setUp(self):
-        courses = {
-            'TEST1': mock.Mock(
-                org='TestX', number='1',
-                start=datetime.datetime(2010, 5, 12, 2, 42, tzinfo=utc)),
-            'TEST2': mock.Mock(org='TestX', number='2'),
-            'TEST3': mock.Mock(org='TestX', number='3'),
-        }
-
-        def get_course_by_id(id):
-            return courses.get(id)
-        patcher = mock.patch(MODULE + 'get_course_by_id', get_course_by_id)
-        patcher.start()
-        self.addCleanup(patcher.stop)
+        CourseFactory.create(org='TESTX', number='1', display_name='TEST1',
+                             start=datetime.datetime(2010, 5, 12, 2, 42, tzinfo=utc),
+                             end=datetime.datetime(2011, 5, 12, 2, 42, tzinfo=utc))
+        CourseFactory.create(org='TESTX', number='2', display_name='TEST2',
+                             start=datetime.datetime(2010, 5, 12, 2, 42, tzinfo=utc),
+                             end=datetime.datetime(2011, 5, 12, 2, 42, tzinfo=utc))
+        CourseFactory.create(org='TESTX', number='3', display_name='TEST3',
+                             start=datetime.datetime(2010, 5, 12, 2, 42, tzinfo=utc),
+                             end=datetime.datetime(2011, 5, 12, 2, 42, tzinfo=utc))
 
         self.fred = fred = User(username='fred', email='fred@bedrock.gov')
         fred.save()
@@ -51,19 +54,19 @@ class MailusersTests(TestCase):
         self.cert1 = cert1 = GeneratedCertificate(
             status='downloadable',
             user=fred,
-            course_id='TEST1',
+            course_id='TESTX/1/TEST1',
             name='TestX/Intro101',
             download_url='http://test.foo/test')
         cert1.save()
         cert2 = GeneratedCertificate(
             status='downloadable',
             user=fred,
-            course_id='TEST2')
+            course_id='TESTX/2/TEST2')
         cert2.save()
         cert3 = GeneratedCertificate(
             status='downloadable',
             user=barney,
-            course_id='TEST3')
+            course_id='TESTX/3/TEST3')
         cert3.save()
 
     def test_mail_users(self):
@@ -73,9 +76,9 @@ class MailusersTests(TestCase):
         fut = mailusers.Command().handle
         fut()
         self.assertEqual(
-            json.loads(self.fred.linkedin.emailed_courses), ['TEST1', 'TEST2'])
+            json.loads(self.fred.linkedin.emailed_courses), ['TESTX/1/TEST1', 'TESTX/2/TEST2'])
         self.assertEqual(
-            json.loads(self.barney.linkedin.emailed_courses), ['TEST3'])
+            json.loads(self.barney.linkedin.emailed_courses), ['TESTX/3/TEST3'])
         self.assertEqual(len(mail.outbox), 3)
         self.assertEqual(mail.outbox[0].from_email, 'The Team <team@test.foo>')
         self.assertEqual(
@@ -94,7 +97,7 @@ class MailusersTests(TestCase):
         fut = mailusers.Command().handle
         fut()
         self.assertEqual(
-            json.loads(self.barney.linkedin.emailed_courses), ['TEST3'])
+            json.loads(self.barney.linkedin.emailed_courses), ['TESTX/3/TEST3'])
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(
             mail.outbox[0].to, ['Barney Rubble <barney@bedrock.gov>'])
@@ -106,9 +109,9 @@ class MailusersTests(TestCase):
         fut = mailusers.Command().handle
         fut(grandfather=True)
         self.assertEqual(
-            json.loads(self.fred.linkedin.emailed_courses), ['TEST1', 'TEST2'])
+            json.loads(self.fred.linkedin.emailed_courses), ['TESTX/1/TEST1', 'TESTX/2/TEST2'])
         self.assertEqual(
-            json.loads(self.barney.linkedin.emailed_courses), ['TEST3'])
+            json.loads(self.barney.linkedin.emailed_courses), ['TESTX/3/TEST3'])
         self.assertEqual(len(mail.outbox), 2)
         self.assertEqual(
             mail.outbox[0].to, ['Fred Flintstone <fred@bedrock.gov>'])
@@ -120,15 +123,15 @@ class MailusersTests(TestCase):
         Test emailing users, making sure they are only emailed about new
         certificates.
         """
-        self.fred.linkedin.emailed_courses = json.dumps(['TEST1'])
+        self.fred.linkedin.emailed_courses = json.dumps(['TESTX/1/TEST1'])
         self.fred.linkedin.save()
         fut = mailusers.Command().handle
         fut()
         fred = User.objects.get(username='fred')
         self.assertEqual(
-            json.loads(fred.linkedin.emailed_courses), ['TEST1', 'TEST2'])
+            json.loads(fred.linkedin.emailed_courses), ['TESTX/1/TEST1', 'TESTX/2/TEST2'])
         self.assertEqual(
-            json.loads(self.barney.linkedin.emailed_courses), ['TEST3'])
+            json.loads(self.barney.linkedin.emailed_courses), ['TESTX/3/TEST3'])
         self.assertEqual(len(mail.outbox), 2)
         self.assertEqual(
             mail.outbox[0].to, ['Fred Flintstone <fred@bedrock.gov>'])
@@ -140,15 +143,15 @@ class MailusersTests(TestCase):
         Test emailing users, making sure they are only emailed about new
         certificates.
         """
-        self.barney.linkedin.emailed_courses = json.dumps(['TEST3'])
+        self.barney.linkedin.emailed_courses = json.dumps(['TESTX/3/TEST3'])
         self.barney.linkedin.save()
         fut = mailusers.Command().handle
         fut()
         fred = User.objects.get(username='fred')
         self.assertEqual(
-            json.loads(fred.linkedin.emailed_courses), ['TEST1', 'TEST2'])
+            json.loads(fred.linkedin.emailed_courses), ['TESTX/1/TEST1', 'TESTX/2/TEST2'])
         self.assertEqual(
-            json.loads(self.barney.linkedin.emailed_courses), ['TEST3'])
+            json.loads(self.barney.linkedin.emailed_courses), ['TESTX/3/TEST3'])
         self.assertEqual(len(mail.outbox), 2)
         self.assertEqual(
             mail.outbox[0].to, ['Fred Flintstone <fred@bedrock.gov>'])
@@ -165,6 +168,6 @@ class MailusersTests(TestCase):
             'http://www.linkedin.com/profile/guided?'
             'pfCertificationName=TestX%2FIntro101&pfAuthorityName=edX&'
             'pfAuthorityId=0000000&'
-            'pfCertificationUrl=http%3A%2F%2Ftest.foo%2Ftest&pfLicenseNo=TEST1&'
+            'pfCertificationUrl=http%3A%2F%2Ftest.foo%2Ftest&pfLicenseNo=TESTX%2F1%2FTEST1&'
             'pfCertStartDate=201005&_mSplash=1&'
-            'trk=eml-prof-TestX-1-T&startTask=CERTIFICATION_NAME&force=true')
+            'trk=eml-prof-TESTX-1-T&startTask=CERTIFICATION_NAME&force=true')
