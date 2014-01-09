@@ -18,13 +18,14 @@
 
 <%block name="jsextra">
 <script type="text/javascript">
-require(["domReady", "jquery", "gettext", "js/models/asset", "js/collections/asset",
+require(["domReady", "jquery", "js/models/asset", "js/collections/asset",
          "js/views/assets", "js/views/feedback_prompt",
          "js/views/feedback_notification", "js/views/paging_header", "js/views/paging_footer",
          "js/utils/modal", "jquery.fileupload"],
-        function(domReady, $, gettext, AssetModel, AssetCollection, AssetsView, PromptView, NotificationView,
+        function(domReady, $, AssetModel, AssetCollection, AssetsView, PromptView, NotificationView,
                  PagingHeader, PagingFooter, ModalUtils) {
     var assets = new AssetCollection();
+
     assets.url = "${asset_callback_url}";
     var assetsView = new AssetsView({collection: assets, el: $('#asset-library')});
     assetsView.render();
@@ -74,7 +75,7 @@ require(["domReady", "jquery", "gettext", "js/models/asset", "js/collections/ass
     var startUpload = function (e) {
         var file = e.target.value;
 
-        $('.upload-modal h1').html(gettext('Uploading…'));
+        $('.upload-modal h1').text("${_(u'Uploading…')}");
         $('.upload-modal .file-name').html(file.substring(file.lastIndexOf("\\") + 1));
         $('.upload-modal .choose-file-button').hide();
         $('.upload-modal .progress-bar').removeClass('loaded').show();
@@ -90,7 +91,7 @@ require(["domReady", "jquery", "gettext", "js/models/asset", "js/collections/ass
 
         $('.upload-modal .file-name').show();
         $('.upload-modal .file-name').html('');
-        $('.upload-modal .choose-file-button').html(gettext('Choose File'));
+        $('.upload-modal .choose-file-button').text("${_('Choose File')}");
         $('.upload-modal .embeddable-xml-input').val('');
         $('.upload-modal .embeddable').hide();
     };
@@ -104,12 +105,12 @@ require(["domReady", "jquery", "gettext", "js/models/asset", "js/collections/ass
     var displayFinishedUpload = function (resp) {
         var asset = resp.asset;
 
-        $('.upload-modal h1').html(gettext('Upload New File'));
+        $('.upload-modal h1').text("${_('Upload New File')}");
         $('.upload-modal .embeddable-xml-input').val(asset.portable_url);
         $('.upload-modal .embeddable').show();
         $('.upload-modal .file-name').hide();
         $('.upload-modal .progress-fill').html(resp.msg);
-        $('.upload-modal .choose-file-button').html(gettext('Load Another File')).show();
+        $('.upload-modal .choose-file-button').text("${_('Load Another File')}").show();
         $('.upload-modal .progress-fill').width('100%');
 
         assetsView.addAsset(new AssetModel(asset));
