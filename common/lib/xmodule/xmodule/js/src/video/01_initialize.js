@@ -295,8 +295,8 @@ function (VideoPlayer) {
 
 
     // function bindTo(methodsDict, obj, context, rewrite)
-    // Creates a new function with specific context and assigns it to the provided
-    // object.
+    // Creates a new function with specific context and assigns it to the
+    // provided object.
     function bindTo(methodsDict, obj, context, rewrite) {
         $.each(methodsDict, function(name, method) {
             if (_.isFunction(method)) {

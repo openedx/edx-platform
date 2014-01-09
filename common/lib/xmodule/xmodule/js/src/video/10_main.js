@@ -63,13 +63,15 @@ function (
         youtubeXhr = null,
         oldVideo = window.Video;
 
-    // Because this constructor can be called multiple times on a single page (when
-    // the user switches verticals, the page doesn't reload, but the content changes), we must
-    // will check each time if there is a previous copy of 'state' object. If there is, we
-    // will make sure that copy exists cleanly. We have to do this because when verticals switch,
-    // the code does not handle any Xmodule JS code that is running - it simply removes DOM
-    // elements from the page. Any functions that were running during this, and that will run
-    // afterwards (expecting the DOM elements to be present) must be stopped by hand.
+    // Because this constructor can be called multiple times on a single page
+    // (when the user switches verticals, the page doesn't reload, but the
+    // content changes), we must will check each time if there is a previous
+    // copy of 'state' object. If there is, we will make sure that copy exists
+    // cleanly. We have to do this because when verticals switch, the code does
+    // not handle any XModule JS code that is running - it simply removes DOM
+    // elements from the page. Any functions that were running during this, and
+    // that will run afterwards (expecting the DOM elements to be present) must
+    // be stopped by hand.
     previousState = null;
 
     window.Video = function (element) {
@@ -77,20 +79,28 @@ function (
 
         // Stop bufferization of previous video on sequence change.
         // Problem: multiple video tags with the same src cannot
-        // play together. The second tag waiting when first video will be fully loaded.
-        // That's why we abort bufferization forcibly.
-        $(element).closest('.sequence').bind('sequence:change', function(e){
-            if (previousState !== null && typeof previousState.videoPlayer !== 'undefined') {
+        // play together. The second tag waiting when first video will be fully
+        // loaded. That's why we abort bufferization forcibly.
+        $(element).closest('.sequence').bind('sequence:change', function (e) {
+            if (
+                previousState !== null &&
+                typeof previousState.videoPlayer !== 'undefined'
+            ) {
                 previousState.stopBuffering();
                 $(e.currentTarget).unbind('sequence:change');
             }
         });
 
-        // Check for existance of previous state, uninitialize it if necessary, and create a new state.
-        // Store new state for future invocation of this module consturctor function.
-        if (previousState !== null && typeof previousState.videoPlayer !== 'undefined') {
+        // Check for existence of previous state, uninitialize it if necessary,
+        // and create a new state. Store new state for future invocation of
+        // this module constructor function.
+        if (
+            previousState !== null &&
+            typeof previousState.videoPlayer !== 'undefined'
+        ) {
             previousState.videoPlayer.onPause();
         }
+
         state = {};
         previousState = state;
 
@@ -110,9 +120,9 @@ function (
             youtubeXhr = state.youtubeXhr;
         }
 
-        // Because the 'state' object is only available inside this closure, we will also make
-        // it available to the caller by returning it. This is necessary so that we can test
-        // Video with Jasmine.
+        // Because the 'state' object is only available inside this closure, we
+        // will also make it available to the caller by returning it. This is
+        // necessary so that we can test Video with Jasmine.
         return state;
     };
 
