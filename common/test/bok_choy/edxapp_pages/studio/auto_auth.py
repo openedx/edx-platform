@@ -2,14 +2,16 @@ from bok_choy.page_object import PageObject
 from ..studio import BASE_URL
 
 
-class SignupPage(PageObject):
+class AutoAuthPage(PageObject):
     """
-    Signup page for Studio.
+    The automatic authorization page.
+    When allowed via the django settings file, visiting
+    this url will create a user and log them in.
     """
 
     @property
     def name(self):
-        return "studio.signup"
+        return "studio.auto_auth"
 
     @property
     def requirejs(self):
@@ -20,7 +22,9 @@ class SignupPage(PageObject):
         return []
 
     def url(self):
-        return BASE_URL + "/signup"
+        return "{0}/auto_auth".format(
+            BASE_URL
+        )
 
     def is_browser_on_page(self):
-        return self.is_css_present('body.view-signup')
+        return True

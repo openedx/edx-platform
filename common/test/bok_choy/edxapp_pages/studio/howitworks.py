@@ -23,4 +23,4 @@ class HowitworksPage(PageObject):
         return BASE_URL + "/howitworks"
 
     def is_browser_on_page(self):
-        return self.browser.title == 'Welcome | edX Studio'
+        return self.is_css_present('body.view-howitworks')

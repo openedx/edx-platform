@@ -23,7 +23,7 @@ class LoginPage(PageObject):
         return BASE_URL + "/signin"
 
     def is_browser_on_page(self):
-        return self.browser.title == 'Sign In | edX Studio'
+        return self.is_css_present('body.view-signin')
 
     def login(self, email, password):
         """

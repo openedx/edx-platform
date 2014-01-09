@@ -2,14 +2,14 @@ from bok_choy.page_object import PageObject
 from ..studio import BASE_URL
 
 
-class SignupPage(PageObject):
+class DashboardPage(PageObject):
     """
-    Signup page for Studio.
+    My Courses page in Studio
     """
 
     @property
     def name(self):
-        return "studio.signup"
+        return "studio.dashboard"
 
     @property
     def requirejs(self):
@@ -19,8 +19,8 @@ class SignupPage(PageObject):
     def js_globals(self):
         return []
 
-    def url(self):
-        return BASE_URL + "/signup"
+    def url(self, course_id=None):
+        return BASE_URL + "/course"
 
     def is_browser_on_page(self):
-        return self.is_css_present('body.view-signup')
+        return self.is_css_present('body.view-dashboard')
