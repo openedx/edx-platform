@@ -16,7 +16,7 @@ from certificates.models import GeneratedCertificate
 from courseware.courses import get_course_by_id
 
 from ...models import LinkedIn
-from . import LinkedinAPI
+from . import LinkedInAPI
 
 
 class Command(BaseCommand):
@@ -43,7 +43,7 @@ class Command(BaseCommand):
 
     def __init__(self):
         super(Command, self).__init__()
-        self.api = LinkedinAPI(self)
+        self.api = LinkedInAPI(self)
 
     def handle(self, *args, **options):
         whitelist = self.api.config.get('EMAIL_WHITELIST')

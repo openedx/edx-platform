@@ -8,11 +8,14 @@ import uuid
 
 from django.conf import settings
 from django.core.management.base import CommandError
+import requests
 
 from ...models import LinkedInToken
 
+class LinkedInError(Exception):
+    pass
 
-class LinkedinAPI(object):
+class LinkedInAPI(object):
     """
     Encapsulates the LinkedIn API.
     """
@@ -74,9 +77,14 @@ class LinkedinAPI(object):
         """
         Make an HTTP call to the LinkedIn JSON API.
         """
+        if settings.LINKEDIN_API.get('TEST_MODE'):
+            raise LinkedInError(
+                "Attempting to make real API call while in test mode - "
+                "Mock LinkedInAPI.call_json_api instead."
+            )
         try:
             request = urllib2.Request(url, headers={'x-li-format': 'json'})
-            response = urllib2.urlopen(request).read()
+            response = urllib2.urlopen(request, timeout=5).read()
             return json.loads(response)
         except urllib2.HTTPError, error:
             self.http_error(error, "Error calling LinkedIn API")

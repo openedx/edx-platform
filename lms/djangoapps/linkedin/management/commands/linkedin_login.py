@@ -3,7 +3,7 @@ Log into LinkedIn API.
 """
 from django.core.management.base import BaseCommand
 
-from . import LinkedinAPI
+from . import LinkedInAPI
 
 
 class Command(BaseCommand):
@@ -19,7 +19,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         """
         """
-        api = LinkedinAPI(self)
+        api = LinkedInAPI(self)
         print "Let's log into your LinkedIn account."
         print "Start by visiting this url:"
         print api.authorization_url()

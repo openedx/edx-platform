@@ -4,11 +4,11 @@ import StringIO
 from django.core.management.base import CommandError
 from django.test import TestCase
 
-from linkedin.management.commands import LinkedinAPI
+from linkedin.management.commands import LinkedInAPI
 from linkedin.models import LinkedInToken
 
 
-class LinkedinAPITests(TestCase):
+class LinkedInAPITests(TestCase):
 
     def setUp(self):
         patcher = mock.patch('linkedin.management.commands.uuid.uuid4')
@@ -17,7 +17,7 @@ class LinkedinAPITests(TestCase):
         self.addCleanup(patcher.stop)
 
     def make_one(self):
-        return LinkedinAPI(DummyCommand())
+        return LinkedInAPI(DummyCommand())
 
     @mock.patch('django.conf.settings.LINKEDIN_API', None)
     def test_ctor_no_api_config(self):

@@ -12,13 +12,14 @@ from django.utils import timezone
 
 from optparse import make_option
 
-from ...models import LinkedIn
-from . import LinkedinAPI
+from util.query import use_read_replica_if_available
+from linkedin.models import LinkedIn
+from . import LinkedInAPI
 
 FRIDAY = 4
 
 
-def get_call_limits():
+def get_call_limits(force_unlimited=False):
     """
     Returns a tuple of: (max_checks, checks_per_call, time_between_calls)
 
@@ -40,7 +41,7 @@ def get_call_limits():
         lastfriday -= datetime.timedelta(days=1)
     safeharbor_begin = lastfriday.replace(hour=18, minute=0)
     safeharbor_end = safeharbor_begin + datetime.timedelta(days=2, hours=11)
-    if safeharbor_begin < now < safeharbor_end:
+    if force_unlimited or (safeharbor_begin < now < safeharbor_end):
         return -1, 80, 1
     elif now.hour >= 18 or now.hour < 5:
         return 500, 80, 1
@@ -62,33 +63,38 @@ class Command(BaseCommand):
             dest='recheck',
             default=False,
             help='Check users that have been checked in the past to see if '
-                 'they have joined or left LinkedIn since the last check'),
+                 'they have joined or left LinkedIn since the last check'
+        ),
         make_option(
             '--force',
             action='store_true',
             dest='force',
             default=False,
             help='Disregard the parameters provided by LinkedIn about when it '
-                 'is appropriate to make API calls.'))
+                 'is appropriate to make API calls.'
+        )
+    )
 
     def handle(self, *args, **options):
         """
         Check users.
         """
-        api = LinkedinAPI(self)
-        recheck = options.pop('recheck', False)
-        force = options.pop('force', False)
-        if force:
-            max_checks, checks_per_call, time_between_calls = -1, 80, 1
-        else:
-            max_checks, checks_per_call, time_between_calls = get_call_limits()
-            if not max_checks:
-                raise CommandError("No checks allowed during this time.")
+        api = LinkedInAPI(self)
+        recheck = options.get('recheck', False)
+        force = options.get('force', False)
+        max_checks, checks_per_call, time_between_calls = get_call_limits(force)
 
-        def batch_users():
-            "Generator to lazily generate batches of users to query."
+        if not max_checks:
+            raise CommandError("No checks allowed during this time.")
+
+        def user_batches_to_check():
+            """Generate batches of users we should query against LinkedIn."""
             count = 0
             batch = []
+
+            users = use_read_replica_if_available(
+                None
+            )
             for user in User.objects.all():
                 if not hasattr(user, 'linkedin'):
                     LinkedIn(user=user).save()
@@ -98,8 +104,9 @@ class Command(BaseCommand):
                     if len(batch) == checks_per_call:
                         yield batch
                         batch = []
+
                     count += 1
-                    if max_checks != 1 and count == max_checks:
+                    if max_checks != -1 and count >= max_checks:
                         self.stderr.write(
                             "WARNING: limited to checking only %d users today."
                             % max_checks)
@@ -107,20 +114,21 @@ class Command(BaseCommand):
             if batch:
                 yield batch
 
-        def do_batch(batch):
-            "Process a batch of users."
-            emails = (u.email for u in batch)
-            for user, has_account in zip(batch, api.batch(emails)):
+        def update_linkedin_account_status(users):
+            """
+            Given a an iterable of User objects, check their email addresses
+            to see if they have LinkedIn email addresses and save that
+            information to our database.
+            """
+            emails = (u.email for u in users)
+            for user, has_account in zip(users, api.batch(emails)):
                 linkedin = user.linkedin
                 if linkedin.has_linkedin_account != has_account:
                     linkedin.has_linkedin_account = has_account
                     linkedin.save()
 
-        batches = batch_users()
-        try:
-            do_batch(batches.next())  # may raise StopIteration
-            for batch in batches:
+        for i, user_batch in enumerate(user_batches_to_check()):
+            if i > 0:
+                # Sleep between LinkedIn API web service calls
                 time.sleep(time_between_calls)
-                do_batch(batch)
-        except StopIteration:
-            pass
+            update_linkedin_account_status(user_batch)

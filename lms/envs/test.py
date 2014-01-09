@@ -266,6 +266,7 @@ LINKEDIN_API = {
     'COMPANY_NAME': 'edX',
     'COMPANY_ID': '0000000',
     'EMAIL_FROM': 'The Team <team@test.foo>',
+    'TEST_MODE': True
 }
 
 ################### Make tests faster

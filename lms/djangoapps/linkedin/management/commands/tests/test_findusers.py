@@ -69,7 +69,7 @@ class FindUsersTests(TestCase):
 
     @mock.patch(MODULE + 'time')
     @mock.patch(MODULE + 'User')
-    @mock.patch(MODULE + 'LinkedinAPI')
+    @mock.patch(MODULE + 'LinkedInAPI')
     @mock.patch(MODULE + 'get_call_limits')
     def test_command_success_recheck_no_limits(self, get_call_limits, apicls,
                                                usercls, time):
@@ -93,7 +93,7 @@ class FindUsersTests(TestCase):
 
     @mock.patch(MODULE + 'time')
     @mock.patch(MODULE + 'User')
-    @mock.patch(MODULE + 'LinkedinAPI')
+    @mock.patch(MODULE + 'LinkedInAPI')
     @mock.patch(MODULE + 'get_call_limits')
     def test_command_success_no_recheck_no_limits(self, get_call_limits, apicls,
                                                   usercls, time):
@@ -123,7 +123,7 @@ class FindUsersTests(TestCase):
 
     @mock.patch(MODULE + 'time')
     @mock.patch(MODULE + 'User')
-    @mock.patch(MODULE + 'LinkedinAPI')
+    @mock.patch(MODULE + 'LinkedInAPI')
     @mock.patch(MODULE + 'get_call_limits')
     def test_command_success_no_recheck_no_users(self, get_call_limits, apicls,
                                                  usercls, time):
@@ -149,7 +149,7 @@ class FindUsersTests(TestCase):
 
     @mock.patch(MODULE + 'time')
     @mock.patch(MODULE + 'User')
-    @mock.patch(MODULE + 'LinkedinAPI')
+    @mock.patch(MODULE + 'LinkedInAPI')
     @mock.patch(MODULE + 'get_call_limits')
     def test_command_success_recheck_with_limit(self, get_call_limits, apicls,
                                                 usercls, time):
@@ -178,7 +178,7 @@ class FindUsersTests(TestCase):
         self.assertTrue(command.stderr.getvalue().startswith("WARNING"))
 
     @mock.patch(MODULE + 'User')
-    @mock.patch(MODULE + 'LinkedinAPI')
+    @mock.patch(MODULE + 'LinkedInAPI')
     @mock.patch(MODULE + 'get_call_limits')
     def test_command_success_recheck_with_force(self, get_call_limits, apicls,
                                                 usercls):
@@ -199,6 +199,7 @@ class FindUsersTests(TestCase):
             "Mock LinkedIn API."
             return [email % 2 == 0 for email in emails]
         api.batch = dummy_batch
+        get_call_limits.return_value = (-1, 80, 1)
         fut(force=True)
         self.assertEqual([u.linkedin.has_linkedin_account for u in users],
                          [i % 2 == 0 for i in xrange(10)])
