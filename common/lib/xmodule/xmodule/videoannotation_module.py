@@ -135,7 +135,16 @@ class VideoAnnotationModule(AnnotatableFields, XModule):
     def get_html(self):
         """ Renders parameters to template. """
         
-        extension = 'video/' + guess_extension(guess_type(self.sourceUrl)[0]).replace('.','')
+        extension = ""
+        if 'youtu' in self.sourceUrl:
+            extension = 'video/youtube'
+        else:
+            spliturl = self.sourceUrl.split(".")
+            extensionPlus1 = spliturl[len(spliturl)-1]
+            spliturl = extensionPlus1.split("?")
+            extensionPlus2 = spliturl[0]
+            spliturl = extensionPlus2.split("#")
+            extension = 'video/' + spliturl[0]
         context = {
             'display_name': self.display_name_with_default,
             'element_id': self.element_id,

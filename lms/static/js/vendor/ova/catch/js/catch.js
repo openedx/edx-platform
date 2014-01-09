@@ -194,9 +194,7 @@ annotationDetail:
         
         '<div class="controlReplies">'+
             '<div class="newReply" style="text-decoration:underline">Reply</div>&nbsp;'+
-             '{{#if hasReplies}}'+
-            '<div class="hideReplies" style="text-decoration:underline">Show Replies</div>&nbsp;'+
-            '{{/if}}'+
+            '<div class="hideReplies" style="text-decoration:underline;display:{{#if hasReplies}}block{{else}}none{{/if}}">Show Replies</div>&nbsp;'+
             '{{#if authToEditButton}}'+
                 '<div class="editAnnotation" style="text-decoration:underline">Edit</div>'+
             '{{/if}}'+
@@ -260,9 +258,7 @@ videoAnnotationDetail:
 
         '<div class="controlReplies">'+
             '<div class="newReply" style="text-decoration:underline">Reply</div>&nbsp;'+
-            '{{#if hasReplies}}'+
-                '<div class="hideReplies" style="text-decoration:underline">Show Replies</div>&nbsp;'+
-            '{{/if}}'+
+            '<div class="hideReplies" style="text-decoration:underline;display:{{#if hasReplies}}block{{else}}none{{/if}}">Show Replies</div>&nbsp;'+
             '{{#if authToEditButton}}'+
                 '<div class="editAnnotation" style="text-decoration:underline">Edit</div>'+
             '{{/if}}'+
@@ -327,8 +323,9 @@ CatchAnnotation = function (element, options) {
     var self = this;
     $( document ).ready(function() {
         self.init();
-        self.loadAnnotations(); //loadAnnotations 
         self.refreshCatch(true);
+	var moreBut = self.element.find('.annotationListButtons .moreButtonCatch');
+	moreBut.hide();	
     });
     
     return this;
@@ -492,26 +489,26 @@ CatchAnnotation.prototype = {
         //Delete Reply Button
         el.on("click", ".replies .replyItem .deleteReply", onDeleteReplyButtonClick);
         
-        //hide or show more button
-        this.checkTotAnnotations();
     },
     changeMedia: function(media) {
         var media = media || 'text';
         this.options.media = media;
+	this._refresh();
         this.refreshCatch(true);
+	this.checkTotAnnotations();
     },
     changeUserId: function(userId) {
         var userId = userId || '';
         this.options.userId = userId;
         this._refresh();
         this.refreshCatch(true);
+	this.checkTotAnnotations();
     },
-    loadAnnotations: function(openMore) {
+    loadAnnotations: function() {
         var annotator = this.annotator,
             loadFromSearch = annotator.plugins.Store.options.loadFromSearch,
-            loadedAn = this.element.find('.annotationList .annotationItem').length,
-            openMore = openMore || false;
-        loadedAn = typeof loadedAn!='undefined' && openMore?loadedAn:0;
+            loadedAn = this.element.find('.annotationList .annotationItem').length;
+        loadedAn = typeof loadedAn!='undefined' ?loadedAn:0;
         
         loadFromSearch.limit = this.options.pagination;
         loadFromSearch.offset = loadedAn;
@@ -523,13 +520,9 @@ CatchAnnotation.prototype = {
         //annotator.plugins['Store'].loadAnnotationsFromSearch(loadFromSearch);
         
         //Make sure to be openned all annotations for this pagination
-        if (openMore){
-            loadFromSearch.limit = this.options.pagination+loadedAn;
-            loadFromSearch.offset = 0;
-            annotator.plugins['Store'].loadAnnotationsFromSearch(loadFromSearch);
-        } else{
-            annotator.plugins['Store'].loadAnnotationsFromSearch(loadFromSearch);
-        }
+	loadFromSearch.limit = this.options.pagination+loadedAn;
+	loadFromSearch.offset = 0;
+	annotator.plugins['Store'].loadAnnotationsFromSearch(loadFromSearch);
         
         //text loading annotations
         var moreBut = this.element.find('.annotationListButtons .moreButtonCatch');
@@ -587,9 +580,12 @@ CatchAnnotation.prototype = {
         //Subscribe to Annotator changes
         annotator.subscribe("annotationsLoaded", function (annotations){
             self.refreshCatch(self.clean);
+            //hide or show more button
+            self.checkTotAnnotations();
         });
         annotator.subscribe("annotationUpdated", function (annotation){
             self.refreshCatch(true);
+            self.checkTotAnnotations();
         });
         annotator.subscribe("annotationDeleted", function (annotation){
             var annotations = annotator.plugins['Store'].annotations,
@@ -601,7 +597,8 @@ CatchAnnotation.prototype = {
                 if (attempts<100)
                     setTimeout(function(){
                         if (new_tot != tot){
-                            self.refreshCatch();
+                            self.refreshCatch(true);
+			    self.checkTotAnnotations();
                         }else{
                             attempts++;
                             ischanged();
@@ -620,6 +617,7 @@ CatchAnnotation.prototype = {
                             self.refreshCatch();
                             if (typeof annotation.parent != 'undefined' && annotation.parent != '0'){
                                 var replies = $("[annotationid="+annotation.parent+"]").find(".controlReplies .hideReplies");
+				replies.show();
                                 replies.click();
                                 replies.click();
                             }
@@ -786,6 +784,7 @@ CatchAnnotation.prototype = {
             uri = quote.find('.uri').html();
         if (typeof id=='undefined' || id==''){
             this.refreshCatch();
+            this.checkTotAnnotations();
             id = quote.find('.idAnnotation').html();
             //clickPlaySelection(evt);
         }
@@ -1029,7 +1028,7 @@ CatchAnnotation.prototype = {
         var moreBut = this.element.find('.annotationListButtons .moreButtonCatch'),
             isLoading = moreBut.html()=='More'?false:true;
         if(!isLoading)
-            this.loadAnnotations(true);
+            this.loadAnnotations();
     },
             
     _refresh:function(searchtype,searchInput){

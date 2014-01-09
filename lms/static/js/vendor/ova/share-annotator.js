@@ -31,6 +31,7 @@ Annotator.Plugin.Share = (function(_super) {
 		if (typeof options!='undefined')
 			this.options.shareIn = typeof options.shareIn!='undefined'?options.shareIn:this.options.shareIn;
 		this.buildHTMLShareButton = __bind(this.buildHTMLShareButton, this);
+		this.runningAPI = __bind(this.runningAPI, this);
 		this.updateViewer = __bind(this.updateViewer, this);
 		_ref = Share.__super__.constructor.apply(this, arguments);
 		return _ref;
@@ -272,155 +273,160 @@ Annotator.Plugin.Share = (function(_super) {
 		}
 		return API;
 	}
-	
-	Share.prototype.runAPI = function(API) {
-		var self = this;
-		this.annotator
-			//-- Finished the Annotator DOM
-			.subscribe("annotationsLoaded", function (annotations){
-				console.log("runningAPI");
-				var wrapper = $('.annotator-wrapper').parent()[0],
-					mplayer,
-					osda;
-					
-				//Set Annotator in wrapper to fix quick DOM
-				$.data(wrapper, 'annotator', self.annotator);//Set the object in the span
-				annotator = window.annotator = $.data(wrapper, 'annotator');
-				mplayer = typeof annotator.mplayer!='undefined'?annotator.mplayer:[];
-				osda = typeof annotator.osda!='undefined'?annotator.osda:[];
+	Share.prototype.runningAPI =  function (annotations,API){
+		console.log("runningAPI");
+		var wrapper = $('.annotator-wrapper').parent()[0],
+			mplayer,
+			osda,
+			self=this;
+			
+		//Set Annotator in wrapper to fix quick DOM
+		$.data(wrapper, 'annotator', self.annotator);//Set the object in the span
+		annotator = window.annotator = $.data(wrapper, 'annotator');
+		mplayer = typeof annotator.mplayer!='undefined'?annotator.mplayer:[];
+		osda = typeof annotator.osda!='undefined'?annotator.osda:[];
+		
+		//Detect if the URL has an API element
+		if (typeof API!='undefined' && typeof API.method!='undefined' && (API.method=='1'||API.method=='2')) {
+			if(API.method=='1'){
+				var allannotations = annotator.plugins['Store'].annotations,
+					ovaId = decodeURIComponent(API.ovaId);
 				
-				//Detect if the URL has an API element
-				if (typeof API!='undefined' && typeof API.method!='undefined' && (API.method=='1'||API.method=='2')) {
-					if(API.method=='1'){
-						var allannotations = annotator.plugins['Store'].annotations,
-							ovaId = decodeURIComponent(API.ovaId);
-						
-						for (var item in allannotations) {
-							var an = allannotations[item];
-							if (typeof an.id!='undefined' && an.id == ovaId){//this is the annotation
-								if(self._isVideo(an)){//It is a video
-									if (typeof mplayer[an.target.container]!='undefined'){
-										var player = mplayer[an.target.container];
-										if (player.id_ == an.target.container){
-											var anFound = an;
-											videojs(player.id_).ready(function(){
-												if (player.techName != 'Youtube'){
-													player.preload('auto');
-												}
-												player.autoPlayAPI = anFound;
-												player.play();
-											});
+				for (var item in allannotations) {
+					var an = allannotations[item];
+					if (typeof an.id!='undefined' && an.id == ovaId){//this is the annotation
+						if(self._isVideo(an)){//It is a video
+							if (typeof mplayer[an.target.container]!='undefined'){
+								var player = mplayer[an.target.container];
+								if (player.id_ == an.target.container){
+									var anFound = an;
+									videojs(player.id_).ready(function(){
+										if (player.techName != 'Youtube'){
+											player.preload('auto');
 										}
-									}
-								}else if(self._isVideo(an)){//It is a OpenSeaDragon Annotation
-									if (typeof mplayer[an.target.container]!='undefined'){
-										var player = mplayer[an.target.container];
-										if (player.id_ == an.target.container){
-											var anFound = an;
-											videojs(player.id_).ready(function(){
-												if (player.techName != 'Youtube'){
-													player.preload('auto');
-												}
-												player.autoPlayAPI = anFound;
-												player.play();
-											});
-										}
-									}
-								}else{//It is a text
-									var hasRanges = typeof an.ranges!='undefined' && typeof an.ranges[0] !='undefined',
-										startOffset = hasRanges?an.ranges[0].startOffset:'',
-										endOffset = hasRanges?an.ranges[0].endOffset:'';
-						
-									if(typeof startOffset!='undefined' && typeof endOffset!='undefined'){ 
-										//change the color
-										$(an.highlights).addClass('api'); 
-										//animate to the annotation
-										$('html,body').animate({
-											scrollTop: $(an.highlights[0]).offset().top},
-											'slow');
-									}
+										player.autoPlayAPI = anFound;
+										player.play();
+									});
 								}
 							}
-						}
-					}else if (API.method=='2'){
-						if (typeof mplayer!='undefined'){
-							//variable for Video
-							var	container = decodeURIComponent(API.container),
-								player = mplayer[container],
-								isVideo = (typeof player!='undefined' && container==player.id_),
-								isNumber = (!isNaN(parseFloat(API.start)) && isFinite(API.start) && !isNaN(parseFloat(API.end)) && isFinite(API.end)),
-								isSource = false;
-								
-							if(isVideo){
-								//Compare without extension
-								var src = decodeURIComponent(API.src),
-									targetSrc = src.substring(0,src.lastIndexOf(".")),
-									playerSrc = player.tech.options_.source.src==''?player.tag.currentSrc:player.tech.options_.source.src;
-								playerSrc = playerSrc.substring(0,playerSrc.lastIndexOf("."))
-								isSource = (targetSrc == playerSrc);
+						}else if(self._isVideo(an)){//It is a OpenSeaDragon Annotation
+							if (typeof mplayer[an.target.container]!='undefined'){
+								var player = mplayer[an.target.container];
+								if (player.id_ == an.target.container){
+									var anFound = an;
+									videojs(player.id_).ready(function(){
+										if (player.techName != 'Youtube'){
+											player.preload('auto');
+										}
+										player.autoPlayAPI = anFound;
+										player.play();
+									});
+								}
 							}
+						}else{//It is a text
+							var hasRanges = typeof an.ranges!='undefined' && typeof an.ranges[0] !='undefined',
+								startOffset = hasRanges?an.ranges[0].startOffset:'',
+								endOffset = hasRanges?an.ranges[0].endOffset:'';
 				
-							//Open Video Annotation
-							if(isVideo && isNumber && isSource){ 
-								var annotation = {
-										rangeTime: {
-											start:API.start,
-											end:API.end
-										},
-										created: new Date().toISOString(),
-										updated: new Date().toISOString(),
-										target:{
-											container: container,
-											src: src
-										},
-										media: 'video',
-										text:decodeURIComponent(API.text),
-										user:decodeURIComponent(API.user)
-									};
-								videojs(player.id_).ready(function(){
-									if (player.techName != 'Youtube'){
-										player.preload('auto');
-									}
-									player.autoPlayAPI = annotation;
-									player.play();
-								});
+							if(typeof startOffset!='undefined' && typeof endOffset!='undefined'){ 
+								//change the color
+								$(an.highlights).addClass('api'); 
+								//animate to the annotation
+								$('html,body').animate({
+									scrollTop: $(an.highlights[0]).offset().top},
+									'slow');
 							}
 						}
-						//variable for text
-						var startOffset = API.startOffset,
-							endOffset = API.endOffset;
+					}
+				}
+			}else if (API.method=='2'){
+				if (typeof mplayer!='undefined'){
+					//variable for Video
+					var	container = decodeURIComponent(API.container),
+						player = mplayer[container],
+						isVideo = (typeof player!='undefined' && container==player.id_),
+						isNumber = (!isNaN(parseFloat(API.start)) && isFinite(API.start) && !isNaN(parseFloat(API.end)) && isFinite(API.end)),
+						isSource = false;
 						
-						//Text Annotation
-						if(!isVideo && typeof startOffset!='undefined' && typeof endOffset!='undefined'){ 
-							var annotation = {
-								ranges: [{
-									start:decodeURIComponent(API.start),
-									end:decodeURIComponent(API.end),
-									startOffset:decodeURIComponent(API.startOffset),
-									endOffset:decodeURIComponent(API.endOffset),
-								}],
+					if(isVideo){
+						//Compare without extension
+						var src = decodeURIComponent(API.src),
+							targetSrc = src.substring(0,src.lastIndexOf(".")),
+							playerSrc = player.tech.options_.source.src==''?player.tag.currentSrc:player.tech.options_.source.src;
+						playerSrc = playerSrc.substring(0,playerSrc.lastIndexOf("."))
+						isSource = (targetSrc == playerSrc);
+					}
+		
+					//Open Video Annotation
+					if(isVideo && isNumber && isSource){ 
+						var annotation = {
+								rangeTime: {
+									start:API.start,
+									end:API.end
+								},
 								created: new Date().toISOString(),
 								updated: new Date().toISOString(),
-								media: 'text',
+								target:{
+									container: container,
+									src: src
+								},
+								media: 'video',
 								text:decodeURIComponent(API.text),
 								user:decodeURIComponent(API.user)
 							};
-							//show the annotation
-							annotator.setupAnnotation(annotation);
-							//to change the color
-							$(annotation.highlights).addClass('api'); 
-							//animate to the annotation
-							$('html,body').animate({
-								scrollTop: $(annotation.highlights[0]).offset().top},
-								'slow');
-						}
-						
+						videojs(player.id_).ready(function(){
+							if (player.techName != 'Youtube'){
+								player.preload('auto');
+							}
+							player.autoPlayAPI = annotation;
+							player.play();
+						});
 					}
 				}
-				//Let know to others API that this plugin is loaded
-				annotator.isShareLoaded = true;
-				annotator.publish('shareloaded');
-			})
+				//variable for text
+				var startOffset = API.startOffset,
+					endOffset = API.endOffset;
+				
+				//Text Annotation
+				if(!isVideo && typeof startOffset!='undefined' && typeof endOffset!='undefined'){ 
+					var annotation = {
+						ranges: [{
+							start:decodeURIComponent(API.start),
+							end:decodeURIComponent(API.end),
+							startOffset:decodeURIComponent(API.startOffset),
+							endOffset:decodeURIComponent(API.endOffset),
+						}],
+						created: new Date().toISOString(),
+						updated: new Date().toISOString(),
+						media: 'text',
+						text:decodeURIComponent(API.text),
+						user:decodeURIComponent(API.user)
+					};
+					//show the annotation
+					annotator.setupAnnotation(annotation);
+					//to change the color
+					$(annotation.highlights).addClass('api'); 
+					//animate to the annotation
+					$('html,body').animate({
+						scrollTop: $(annotation.highlights[0]).offset().top},
+						'slow');
+				}
+				
+			}
+		}
+		//Let know to others API that this plugin is loaded
+		annotator.isShareLoaded = true;
+		annotator.publish('shareloaded');
+	}
+	Share.prototype.runAPI = function(API) {
+		var self = this;
+		var func = function (annotations){
+			self.runningAPI(annotations,API);
+			self.annotator.unsubscribe("annotationsLoaded",func);	
+		};
+		this.annotator
+			//-- Finished the Annotator DOM
+			.subscribe("annotationsLoaded",func);
 	}
 	
 	Share.prototype._isVideo = function(an){

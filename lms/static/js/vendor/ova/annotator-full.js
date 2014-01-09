@@ -1093,17 +1093,19 @@ Annotator = (function(_super) {
         }
       }
     }
-    annotation.quote = [];
-    annotation.ranges = [];
-    annotation.highlights = [];
-    for (_j = 0, _len1 = normedRanges.length; _j < _len1; _j++) {
-      normed = normedRanges[_j];
-      annotation.quote.push($.trim(normed.text()));
-      annotation.ranges.push(normed.serialize(this.wrapper[0], '.annotator-hl'));
-      $.merge(annotation.highlights, this.highlightRange(normed));
+    if (normedRanges.length!=0){
+	    annotation.quote = [];
+	    annotation.ranges = [];
+	    annotation.highlights = [];
+	    for (_j = 0, _len1 = normedRanges.length; _j < _len1; _j++) {
+	      normed = normedRanges[_j];
+	      annotation.quote.push($.trim(normed.text()));
+	      annotation.ranges.push(normed.serialize(this.wrapper[0], '.annotator-hl'));
+	      $.merge(annotation.highlights, this.highlightRange(normed));
+	    }
+	    annotation.quote = annotation.quote.join(' / ');
+	    $(annotation.highlights).data('annotation', annotation);
     }
-    annotation.quote = annotation.quote.join(' / ');
-    $(annotation.highlights).data('annotation', annotation);
     return annotation;
   };
 
