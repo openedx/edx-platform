@@ -51,7 +51,6 @@
 # kuangchong07 <kuangchong07@gmail.com>, 2013
 # happylily <happylily0516@foxmail.com>, 2013
 # xdsnet <xdsnet@gmail.com>, 2013
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
