@@ -58,8 +58,14 @@ Release Dates
 
 Release dates specify the dates when content is available to students. 
 Release dates are set at the section and subsection levels. 
+
 Neither a section nor its contents are visible to students until the release date passes. 
 However, course staff can see content in the LMS regardless of its release date.
+
+.. note:: 
+  For courses created before January 14, 2014, when you create a new section or subsection, the default release date is January 1, 1970. This means that public units are immediately published, and you must change this date to the future to prevent students from viewing the content.  
+
+  For courses created after January 14, 2014, the default release date is January 1, 2030. In this case, you must adjust the release date to the day you want students to be able to view the content.
 
 ========================================
 Set the Release Date for a Section
