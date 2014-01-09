@@ -12,8 +12,8 @@ from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
-from django.http import Http404
-from django.http import HttpResponse
+from django.http import Http404, HttpResponse
+import django.utils
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 
 from capa.xqueue_interface import XQueueInterface
@@ -419,6 +419,12 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
         mixins=descriptor.runtime.mixologist._mixins,  # pylint: disable=protected-access
         wrappers=block_wrappers,
         get_real_user=user_by_anonymous_id,
+        services={
+            # django.utils.translation implements the gettext.Translations
+            # interface (it has ugettext, ungettext, etc), so we can use it
+            # directly as the runtime i18n service.
+            'i18n': django.utils.translation,
+        },
     )
 
     # pass position specified in URL to module through ModuleSystem
