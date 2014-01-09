@@ -706,7 +706,8 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         a new version. Setting force to True conflicts with setting this to True and will cause a VersionConflictError
 
         :param definition_locator: should either be None to indicate this is a brand new definition or
-        a pointer to the existing definition to which this block should point or from which this was derived.
+        a pointer to the existing definition to which this block should point or from which this was derived
+        or a LocalId to indicate that it's new.
         If fields does not contain any Scope.content, then definition_locator must have a value meaning that this
         block points
         to the existing definition. If fields contains Scope.content and definition_locator is not None, then
@@ -741,7 +742,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         partitioned_fields = self._partition_fields_by_scope(category, fields)
         new_def_data = partitioned_fields.get(Scope.content, {})
         # persist the definition if persisted != passed
-        if (definition_locator is None or definition_locator.definition_id is None):
+        if (definition_locator is None or isinstance(definition_locator.definition_id, LocalId)):
             definition_locator = self.create_definition_from_data(new_def_data, category, user_id)
         elif new_def_data is not None:
             definition_locator, _ = self.update_definition_from_data(definition_locator, new_def_data, user_id)
@@ -1031,7 +1032,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
     def _persist_subdag(self, xblock, user_id, structure_blocks, new_id):
         # persist the definition if persisted != passed
         new_def_data = self._filter_special_fields(xblock.get_explicitly_set_fields_by_scope(Scope.content))
-        if (xblock.definition_locator is None or xblock.definition_locator.definition_id is None):
+        if xblock.definition_locator is None or isinstance(xblock.definition_locator.definition_id, LocalId):
             xblock.definition_locator = self.create_definition_from_data(
                 new_def_data, xblock.category, user_id)
             is_updated = True
@@ -1338,7 +1339,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         if isinstance(definition, DefinitionLazyLoader):
             return definition.definition_locator
         elif '_id' not in definition:
-            return None
+            return DefinitionLocator(LocalId())
         else:
             return DefinitionLocator(definition['_id'])
 
