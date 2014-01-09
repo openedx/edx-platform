@@ -63,6 +63,7 @@ from courseware.access import has_access
 
 from external_auth.models import ExternalAuthMap
 import external_auth.views
+from .microsites import get_microsite_config
 
 from bulk_email.models import Optout, CourseAuthorization
 import shoppingcart
@@ -73,8 +74,6 @@ from dogapi import dog_stats_api
 from pytz import UTC
 
 from util.json_request import JsonResponse
-
-from microsite_configuration.middleware import MicrositeConfiguration
 
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
@@ -255,8 +254,6 @@ def signin_user(request):
     context = {
         'course_id': request.GET.get('course_id'),
         'enrollment_action': request.GET.get('enrollment_action'),
-        'platform_name': MicrositeConfiguration.get_microsite_configuration_value('platform_name', 
-            settings.PLATFORM_NAME),
     }
     return render_to_response('login.html', context)
 
@@ -276,8 +273,6 @@ def register_user(request, extra_context=None):
     context = {
         'course_id': request.GET.get('course_id'),
         'enrollment_action': request.GET.get('enrollment_action'),
-        'platform_name': MicrositeConfiguration.get_microsite_configuration_value('platform_name', 
-            settings.PLATFORM_NAME),
     }
     if extra_context is not None:
         context.update(extra_context)
@@ -322,10 +317,10 @@ def dashboard(request):
 
     # for microsites, we want to filter and only show enrollments for courses within
     # the microsites 'ORG'
+    mscfg = get_microsite_config(request)
 
-    course_org_filter = MicrositeConfiguration.get_microsite_configuration_value('course_org_filter')
-    show_only_org_on_student_dashboard = MicrositeConfiguration.get_microsite_configuration_value(
-        'show_only_org_on_student_dashboard')
+    course_org_filter = mscfg.get('course_org_filter')
+    show_only_org_on_student_dashboard = mscfg.get('show_only_org_on_student_dashboard')
 
     for enrollment in CourseEnrollment.enrollments_for_user(user):
         try:
@@ -560,7 +555,7 @@ def accounts_login(request):
         course_id = _parse_course_id_from_string(redirect_to)
         if course_id and _get_course_enrollment_domain(course_id):
             return external_auth.views.course_specific_login(request, course_id)
-            
+
     context = {
         'platform_name': settings.PLATFORM_NAME,
     }
@@ -936,8 +931,8 @@ def create_account(request, post_override=None):
 
     # don't send email if we are doing load testing or random user generation for some reason
     if not (settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING')):
-        from_address = MicrositeConfiguration.get_microsite_configuration_value('email_from_address',
-            settings.DEFAULT_FROM_EMAIL)
+        mscfg = get_microsite_config(request)
+        from_address = mscfg.get("email_from_address", settings.DEFAULT_FROM_EMAIL)
         try:
             if settings.FEATURES.get('REROUTE_ACTIVATION_EMAIL'):
                 dest_addr = settings.FEATURES['REROUTE_ACTIVATION_EMAIL']
@@ -1207,8 +1202,8 @@ def change_email_request(request):
 
     message = render_to_string('emails/email_change.txt', d)
 
-    from_address = MicrositeConfiguration.get_microsite_configuration_value('email_from_address',
-        settings.DEFAULT_FROM_EMAIL)
+    mscfg = get_microsite_config(request)
+    from_address = mscfg.get('email_from_address', settings.DEFAULT_FROM_EMAIL)
 
     _res = send_mail(subject, message, from_address, [pec.new_email])
 

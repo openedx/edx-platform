@@ -279,16 +279,16 @@ import openid.oidutil
 openid.oidutil.log = lambda message, level = 0: None
 
 # set up some testing for microsites
-MICROSITE_CONFIGURATION = {
-    "openedx" : {
-        "domain_prefix":"openedx",
-        "university":"openedx",
+MICROSITES = {
+    "openedx": {
+        "domain_prefix": "openedx",
+        "university": "openedx",
         "platform_name": "Open edX",
         "logo_image_url": "openedx/images/header-logo.png",
         "show_only_org_on_student_dashboard": True,
         "email_from_address": "openedx@edx.org",
         "payment_support_email": "openedx@edx.org",
-        "ENABLE_MKTG_SITE":  False,
+        "ENABLE_MKTG_SITE": False,
         "SITE_NAME": "openedx.localhost",
         "course_org_filter": "CDX",
         "show_only_org_on_student_dashboard": True,
@@ -301,6 +301,3 @@ MICROSITE_CONFIGURATION = {
         "homepage_overlay_html": "<h1>Take an Open edX Course</h1>"
     }
 }
-
-if len(MICROSITE_CONFIGURATION.keys()) > 0:
-    enable_microsites(MICROSITE_CONFIGURATION, SUBDOMAIN_BRANDING, VIRTUAL_UNIVERSITIES, microsites_root = ENV_ROOT / 'edx-platform' / 'test_root' / 'microsites')

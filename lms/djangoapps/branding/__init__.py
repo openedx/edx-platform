@@ -2,8 +2,9 @@ from xmodule.modulestore.django import modulestore
 from xmodule.course_module import CourseDescriptor
 from django.conf import settings
 
-from microsite_configuration.middleware import MicrositeConfiguration
-
+# We can't get the microsite config in this file, because it's not always
+# executed in the context of an HTTP request, so we don't know what microsite
+# (if any) it corresponds to
 
 def get_visible_courses():
     """
@@ -23,7 +24,7 @@ def get_visible_courses():
     # this is legacy format which is outside of the microsite feature
     if hasattr(settings, 'COURSE_LISTINGS') and subdomain in settings.COURSE_LISTINGS:
         filtered_visible_ids = frozenset(settings.COURSE_LISTINGS[subdomain])
-    
+
     filtered_by_org = MicrositeConfiguration.get_microsite_configuration_value('course_org_filter')
 
     if filtered_by_org:

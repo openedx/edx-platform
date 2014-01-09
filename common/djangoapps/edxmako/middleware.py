@@ -14,6 +14,7 @@
 
 from django.template import RequestContext
 from util.request import safe_get_host
+from student.microsites import get_microsite_config, get_microsite_tpl_func
 requestcontext = None
 
 
@@ -24,3 +25,5 @@ class MakoMiddleware(object):
         requestcontext = RequestContext(request)
         requestcontext['is_secure'] = request.is_secure()
         requestcontext['site'] = safe_get_host(request)
+        requestcontext['microsite'] = get_microsite_config(request)
+        requestcontext['microsite_tpl'] = get_microsite_tpl_func(request)

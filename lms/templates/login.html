@@ -1,5 +1,4 @@
 <%inherit file="main.html" />
-<%! from microsite_configuration.middleware import MicrositeConfiguration %>
 <%namespace name='static' file='static_content.html'/>
 
 <%! from django.core.urlresolvers import reverse %>
@@ -169,7 +168,7 @@
 
 <%
   # allow for microsite overrides on the registration sidebars, otherwise default to pre-existing ones
-  sidebar_file = MicrositeConfiguration.get_microsite_template_path('login-sidebar.html')
+  sidebar_file = microsite_tpl("login_sidebar.html")
 %>
 
     <%include file="${sidebar_file}" />

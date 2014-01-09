@@ -11,10 +11,13 @@ from django.core.urlresolvers import reverse
 from django.core.mail import send_mail
 
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
+from student.microsites import get_microsite_config
 from courseware.models import StudentModule
 from edxmako.shortcuts import render_to_string
 
-from microsite_configuration.middleware import MicrositeConfiguration
+# We can't get the microsite config in this file, because it's not always
+# executed in the context of an HTTP request, so we don't know what microsite
+# (if any) it corresponds to
 
 # For determining if a shibboleth course
 SHIBBOLETH_DOMAIN_PREFIX = 'shib:'
@@ -229,6 +232,7 @@ def send_mail_to_student(student, param_dict):
     if 'course' in param_dict:
         param_dict['course_name'] = param_dict['course'].display_name_with_default
 
+    mscfg = get_microsite_config(request)
     param_dict['site_name'] = MicrositeConfiguration.get_microsite_configuration_value('SITE_NAME',
         param_dict['site_name'])
 

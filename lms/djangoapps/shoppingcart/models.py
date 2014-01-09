@@ -32,8 +32,6 @@ from verify_student.models import SoftwareSecurePhotoVerification
 from .exceptions import (InvalidCartItem, PurchasedCallbackException, ItemAlreadyInCartException,
                          AlreadyEnrolledInCourseException, CourseDoesNotExistException)
 
-from microsite_configuration.middleware import MicrositeConfiguration
-
 log = logging.getLogger("shoppingcart")
 
 ORDER_STATUSES = (
@@ -116,8 +114,10 @@ class Order(models.Model):
         """
         self.orderitem_set.all().delete()
 
-    def purchase(self, first='', last='', street1='', street2='', city='', state='', postalcode='',
-                 country='', ccnum='', cardtype='', processor_reply_dump=''):
+    def purchase(
+            self, first='', last='', street1='', street2='', city='', state='',
+            postalcode='', country='', ccnum='', cardtype='',
+            processor_reply_dump='', from_email=settings.DEFAULT_FROM_EMAIL):
         """
         Call to mark this order as purchased.  Iterates through its OrderItems and calls
         their purchased_callback
@@ -170,11 +170,8 @@ class Order(models.Model):
             }
         )
         try:
-            from_address = MicrositeConfiguration.get_microsite_configuration_value('email_from_address',
-                settings.DEFAULT_FROM_EMAIL)
-
             send_mail(subject, message,
-                      from_address, [self.user.email])  # pylint: disable=E1101
+                      from_email, [self.user.email])  # pylint: disable=E1101
         except (smtplib.SMTPException, BotoServerError):  # sadly need to handle diff. mail backends individually
             log.error('Failed sending confirmation e-mail for order %d', self.id)  # pylint: disable=E1101
 
@@ -497,7 +494,9 @@ class CertificateItem(OrderItem):
     mode = models.SlugField()
 
     @receiver(unenroll_done)
-    def refund_cert_callback(sender, course_enrollment=None, **kwargs):
+    def refund_cert_callback(
+            sender, course_enrollment=None,
+            payment_support_email=settings.PAYMENT_SUPPORT_EMAIL,  **kwargs):
         """
         When a CourseEnrollment object calls its unenroll method, this function checks to see if that unenrollment
         occurred in a verified certificate that was within the refund deadline.  If so, it actually performs the
@@ -528,9 +527,8 @@ class CertificateItem(OrderItem):
         message = "User {user} ({user_email}) has requested a refund on Order #{order_number}.".format(user=course_enrollment.user,
                                                                                                        user_email=course_enrollment.user.email,
                                                                                                        order_number=order_number)
-        to_email = [settings.PAYMENT_SUPPORT_EMAIL]
-        from_email = [MicrositeConfiguration.get_microsite_configuration_value('payment_support_email',
-            settings.PAYMENT_SUPPORT_EMAIL)]
+        to_email = [payment_support_email]
+        from_email = [payment_support_email]
         try:
             send_mail(subject, message, from_email, to_email, fail_silently=False)
         except (smtplib.SMTPException, BotoServerError):

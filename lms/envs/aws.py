@@ -188,14 +188,6 @@ BULK_EMAIL_ROUTING_KEY = HIGH_PRIORITY_QUEUE
 
 # Theme overrides
 THEME_NAME = ENV_TOKENS.get('THEME_NAME', None)
-# Workaround for setting THEME_NAME to an empty
-# string which is the default due to this ansible
-# bug: https://github.com/ansible/ansible/issues/4812
-if THEME_NAME == "":
-    THEME_NAME = None
-if not THEME_NAME is None:
-    enable_theme(THEME_NAME)
-    FAVICON_PATH = 'themes/%s/images/favicon.ico' % THEME_NAME
 
 # Marketing link overrides
 MKTG_URL_LINK_MAP.update(ENV_TOKENS.get('MKTG_URL_LINK_MAP', {}))
@@ -345,10 +337,3 @@ VERIFY_STUDENT = AUTH_TOKENS.get("VERIFY_STUDENT", VERIFY_STUDENT)
 GRADES_DOWNLOAD_ROUTING_KEY = HIGH_MEM_QUEUE
 
 GRADES_DOWNLOAD = ENV_TOKENS.get("GRADES_DOWNLOAD", GRADES_DOWNLOAD)
-
-MICROSITE_CONFIGURATION = ENV_TOKENS.get('MICROSITE_CONFIGURATION', {})
-MICROSITE_ROOT_DIR = ENV_TOKENS.get('MICROSITE_ROOT_DIR')
-if len(MICROSITE_CONFIGURATION.keys()) > 0:
-    enable_microsites(MICROSITE_CONFIGURATION, SUBDOMAIN_BRANDING, VIRTUAL_UNIVERSITIES, microsites_root = MICROSITE_ROOT_DIR)
-
-
