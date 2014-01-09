@@ -1362,3 +1362,20 @@ def change_email_settings(request):
         track.views.server_track(request, "change-email-settings", {"receive_emails": "no", "course": course_id}, page='dashboard')
 
     return HttpResponse(json.dumps({'success': True}))
+
+from student.firebase_token_generator import create_token
+from django.http import HttpResponse
+
+@login_required
+def token(request):
+	import datetime
+	dtnow = datetime.datetime.now();dtutcnow = datetime.datetime.utcnow()
+	delta = dtnow - dtutcnow
+	hh,mm = divmod((delta.days * 24*60*60 + delta.seconds + 30) // 60, 60)
+	time = "%s%+02d:%02d" % (dtnow.isoformat(), hh, mm)
+	SECRET = '4c7f4d1c-8ac4-4e9f-84c8-b271c57fcac4'
+	custom_data = { "issuedAt": time, "consumerKey": "4c7f4d1c-8ac4-4e9f-84c8-b271c57fcac4", "userId": "username", "ttl": 86400}
+	token = create_token(SECRET, custom_data)
+	response = HttpResponse(token, mimetype="text/plain")
+	
+	return response

@@ -45,6 +45,8 @@ COMPONENT_TYPES = ['discussion', 'html', 'problem', 'video']
 OPEN_ENDED_COMPONENT_TYPES = ["combinedopenended", "peergrading"]
 NOTE_COMPONENT_TYPES = ['notes']
 ADVANCED_COMPONENT_TYPES = [
+	'textannotation',
+	'videoannotation',
     'annotatable',
     'word_cloud',
     'graphical_slider_tool',
