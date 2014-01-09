@@ -362,6 +362,7 @@ descriptor_attr = partial(ProxyAttribute, 'descriptor')  # pylint: disable=inval
 module_runtime_attr = partial(ProxyAttribute, 'xmodule_runtime')  # pylint: disable=invalid-name
 
 
+@XBlock.needs("i18n")
 class XModule(XModuleMixin, HTMLSnippet, XBlock):  # pylint: disable=abstract-method
     """ Implements a generic learning module.
 
@@ -563,6 +564,7 @@ class ResourceTemplates(object):
             return None
 
 
+@XBlock.needs("i18n")
 class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
     """
     An XModuleDescriptor is a specification for an element of a course. This
