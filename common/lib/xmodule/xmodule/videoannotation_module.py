@@ -41,7 +41,6 @@ class VideoAnnotationModule(AnnotatableFields, XModule):
                      resource_string(__name__, 'js/src/annotatable/display.coffee')],
           'js': []
     }
-#    js_module_name = "VideoAnnotation"
     css = {'scss': [resource_string(__name__, 'css/annotatable/display.scss')]}
     icon_class = 'videoannotation'
 

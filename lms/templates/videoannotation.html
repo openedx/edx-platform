@@ -16,11 +16,7 @@
 	</div>
 	% endif
 	<div class="annotatable-section">
-		<div class="annotatable-section-title">
-		    Guided Discussion
-		    <!--<a class="annotatable-toggle annotatable-toggle-annotations" href="javascript:void(0)">Hide Annotations</a>-->
-		</div>
-		<div class="annotatable-section-body annotatable-content">
+		<div class="annotatable-content">
 		    <div id="videoHolder">
 				<video id="vid1" class="video-js vjs-default-skin" controls preload="none" width="640" height="264"
 				poster="${poster}">
@@ -88,11 +84,6 @@
                 },
                 showViewPermissionsCheckbox: true,
                 showEditPermissionsCheckbox: false,
-                /*groups: {
-                  world: 'group:__world__',
-                  authenticated: 'group:__authenticated__',
-                  consumer: 'group:__consumer__'
-                },*/
                 userAuthorize: function(action, annotation, user) {
                     var token, tokens, _i, _len;
                     if (annotation.permissions) {
@@ -196,27 +187,3 @@
         },
         Catch = new CatchAnnotation($('#catchDIV'),catchOptions);
 </script>
-
-<!--
-% if instructions_html is not UNDEFINED and instructions_html is not None:
-<div class="annotatable-section shaded">
-    <div class="annotatable-section-title">
-        Instructions
-        <a class="annotatable-toggle annotatable-toggle-instructions expanded" href="javascript:void(0)">Collapse Instructions</a>
-    </div>
-    <div class="annotatable-section-body annotatable-instructions">
-        ${instructions_html}
-    </div>
-</div>
-% endif
-
-<div class="annotatable-section">
-    <div class="annotatable-section-title">
-        Guided Discussion pelue
-        <a class="annotatable-toggle annotatable-toggle-annotations" href="javascript:void(0)">Hide Annotations</a>
-    </div>
-    <div class="annotatable-section-body annotatable-content">
-        ${content_html}
-    </div>
-</div>
--->

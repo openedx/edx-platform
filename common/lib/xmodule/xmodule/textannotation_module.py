@@ -53,7 +53,6 @@ class TextAnnotationModule(AnnotatableFields, XModule):
     js = {'coffee': [],
           'js': []
     }
-#    js_module_name = "TextAnnotation"
     css = {'scss': [resource_string(__name__, 'css/annotatable/display.scss')]}
     icon_class = 'textannotation'
 
@@ -64,8 +63,6 @@ class TextAnnotationModule(AnnotatableFields, XModule):
 
         self.instructions = self._extract_instructions(xmltree)
         self.content = etree.tostring(xmltree, encoding='unicode')
-        #settings.LMS_BASE
-        #self.location.org
         self.element_id = self.location.name
         self.highlight_colors = ['yellow', 'orange', 'purple', 'blue', 'green']
 
