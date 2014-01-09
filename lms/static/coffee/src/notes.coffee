@@ -56,7 +56,7 @@ class StudentNotes
                         create:  '/create',
                         read:    '/read/:id',
                         update:  '/update/:id',
-                        destroy: '/destroy/:id',
+                        destroy: '/delete/:id',
                         search:  '/search'
 
                     loadFromSearch:
