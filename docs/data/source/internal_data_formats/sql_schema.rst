@@ -532,7 +532,9 @@ The `courseware_studentmodule` table holds all courseware state for a given user
 
    The problem can be in one of two states, **done** or **assessing**.
 
-   Following is an example of a problem in **done** state::
+   Following is an example of a problem in **done** state:
+
+   ::
 
     {
       "ready_to_reset": false, "state": "done", "task_states": [
@@ -542,13 +544,14 @@ The `courseware_studentmodule` table holds all courseware state for a given user
       "current_task_number": 0, "student_attempts": 0}
     }
 
-   Following is an example of a problem in **assessing** state::
+   Following is an example of a problem in **assessing** state:
+
+   ::
 
     {
-      "ready_to_reset": false, "state": "done", "task_states": [
-      "{"child_created": false, "child_attempts": 1, "version": 1, "child_history": [
-      {"answer": "This is a test.", "post_assessment": "[1, 1]", "score": 2}], 
-      "max_score": 2, "child_state": "done"}"], 
+      "ready_to_reset": false, "state": "assessing", "task_states": [
+      "{"child_created": false, "child_attempts": 0, "version": 1, 
+      "child_history": [], "max_score": 2, "child_state": "initial"}"], 
       "current_task_number": 0, "student_attempts": 0}
     }
 
