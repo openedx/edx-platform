@@ -159,30 +159,30 @@ class CourseRole(GroupBasedRole):
 
         if isinstance(self.location, Location):
             try:
-                groupnames.append('{0}_{1}'.format(role, self.location.course_id))
+                groupnames.append(u'{0}_{1}'.format(role, self.location.course_id))
                 course_context = self.location.course_id  # course_id is valid for translation
             except InvalidLocationError:  # will occur on old locations where location is not of category course
                 if course_context is None:
                     raise CourseContextRequired()
                 else:
-                    groupnames.append('{0}_{1}'.format(role, course_context))
+                    groupnames.append(u'{0}_{1}'.format(role, course_context))
             try:
                 locator = loc_mapper().translate_location_to_course_locator(course_context, self.location)
-                groupnames.append('{0}_{1}'.format(role, locator.package_id))
+                groupnames.append(u'{0}_{1}'.format(role, locator.package_id))
             except (InvalidLocationError, ItemNotFoundError):
                 # if it's never been mapped, the auth won't be via the Locator syntax
                 pass
             # least preferred legacy role_course format
-            groupnames.append('{0}_{1}'.format(role, self.location.course))
+            groupnames.append(u'{0}_{1}'.format(role, self.location.course))  # pylint: disable=E1101, E1103
         elif isinstance(self.location, CourseLocator):
-            groupnames.append('{0}_{1}'.format(role, self.location.package_id))
+            groupnames.append(u'{0}_{1}'.format(role, self.location.package_id))
             # handle old Location syntax
             old_location = loc_mapper().translate_locator_to_location(self.location, get_course=True)
             if old_location:
                 # the slashified version of the course_id (myu/mycourse/myrun)
-                groupnames.append('{0}_{1}'.format(role, old_location.course_id))
+                groupnames.append(u'{0}_{1}'.format(role, old_location.course_id))
                 # add the least desirable but sometimes occurring format.
-                groupnames.append('{0}_{1}'.format(role, old_location.course))
+                groupnames.append(u'{0}_{1}'.format(role, old_location.course))  # pylint: disable=E1101, E1103
 
         super(CourseRole, self).__init__(groupnames)
 
@@ -193,12 +193,13 @@ class OrgRole(GroupBasedRole):
     """
     def __init__(self, role, location):
         location = Location(location)
-        super(OrgRole, self).__init__(['{}_{}'.format(role, location.org)])
+        super(OrgRole, self).__init__([u'{}_{}'.format(role, location.org)])
 
 
 class CourseStaffRole(CourseRole):
     """A Staff member of a course"""
     ROLE = 'staff'
+
     def __init__(self, *args, **kwargs):
         super(CourseStaffRole, self).__init__(self.ROLE, *args, **kwargs)
 

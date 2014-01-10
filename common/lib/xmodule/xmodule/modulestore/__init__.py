@@ -30,12 +30,12 @@ URL_RE = re.compile("""
 
 # TODO (cpennington): We should decide whether we want to expand the
 # list of valid characters in a location
-INVALID_CHARS = re.compile(r"[^\w.-]")
+INVALID_CHARS = re.compile(r"[^\w.%-]", re.UNICODE)
 # Names are allowed to have colons.
-INVALID_CHARS_NAME = re.compile(r"[^\w.:-]")
+INVALID_CHARS_NAME = re.compile(r"[^\w.:%-]", re.UNICODE)
 
 # html ids can contain word chars and dashes
-INVALID_HTML_CHARS = re.compile(r"[^\w-]")
+INVALID_HTML_CHARS = re.compile(r"[^\w-]", re.UNICODE)
 
 _LocationBase = namedtuple('LocationBase', 'tag org course category name revision')
 
@@ -186,14 +186,14 @@ class Location(_LocationBase):
         elif isinstance(location, basestring):
             match = URL_RE.match(location)
             if match is None:
-                log.debug("location %r doesn't match URL", location)
+                log.debug(u"location %r doesn't match URL", location)
                 raise InvalidLocationError(location)
             groups = match.groupdict()
             check_dict(groups)
             return _LocationBase.__new__(_cls, **groups)
         elif isinstance(location, (list, tuple)):
             if len(location) not in (5, 6):
-                log.debug('location has wrong length')
+                log.debug(u'location has wrong length')
                 raise InvalidLocationError(location)
 
             if len(location) == 5:
@@ -216,9 +216,9 @@ class Location(_LocationBase):
         """
         Return a string containing the URL for this location
         """
-        url = "{0.tag}://{0.org}/{0.course}/{0.category}/{0.name}".format(self)
+        url = u"{0.tag}://{0.org}/{0.course}/{0.category}/{0.name}".format(self)
         if self.revision:
-            url += "@" + self.revision
+            url += u"@{rev}".format(rev=self.revision)  # pylint: disable=E1101
         return url
 
     def html_id(self):
@@ -226,7 +226,7 @@ class Location(_LocationBase):
         Return a string with a version of the location that is safe for use in
         html id attributes
         """
-        id_string = "-".join(str(v) for v in self.list() if v is not None)
+        id_string = u"-".join(v for v in self.list() if v is not None)
         return Location.clean_for_html(id_string)
 
     def dict(self):
@@ -240,6 +240,9 @@ class Location(_LocationBase):
         return list(self)
 
     def __str__(self):
+        return str(self.url().encode("utf-8"))
+
+    def __unicode__(self):
         return self.url()
 
     def __repr__(self):
@@ -254,7 +257,7 @@ class Location(_LocationBase):
         Throws an InvalidLocationError is this location does not represent a course.
         """
         if self.category != 'course':
-            raise InvalidLocationError('Cannot call course_id for {0} because it is not of category course'.format(self))
+            raise InvalidLocationError(u'Cannot call course_id for {0} because it is not of category course'.format(self))
 
         return "/".join([self.org, self.course, self.name])
 

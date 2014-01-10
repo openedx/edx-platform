@@ -88,9 +88,9 @@ class LocMapperStore(object):
         """
         if package_id is None:
             if course_location.category == 'course':
-                package_id = "{0.org}.{0.course}.{0.name}".format(course_location)
+                package_id = u"{0.org}.{0.course}.{0.name}".format(course_location)
             else:
-                package_id = "{0.org}.{0.course}".format(course_location)
+                package_id = u"{0.org}.{0.course}".format(course_location)
         # very like _interpret_location_id but w/o the _id
         location_id = self._construct_location_son(
             course_location.org, course_location.course,
@@ -184,7 +184,6 @@ class LocMapperStore(object):
 
         self._cache_location_map_entry(old_style_course_id, location, published_usage, draft_usage)
         return result
-
 
     def translate_locator_to_location(self, locator, get_course=False):
         """
@@ -331,12 +330,12 @@ class LocMapperStore(object):
         # strip id envelope if any
         entry_id = entry_id.get('_id', entry_id)
         if entry_id.get('name', False):
-            return '{0[org]}/{0[course]}/{0[name]}'.format(entry_id)
+            return u'{0[org]}/{0[course]}/{0[name]}'.format(entry_id)
         elif entry_id.get('_id.org', False):
             # the odd format one
-            return '{0[_id.org]}/{0[_id.course]}'.format(entry_id)
+            return u'{0[_id.org]}/{0[_id.course]}'.format(entry_id)
         else:
-            return '{0[org]}/{0[course]}'.format(entry_id)
+            return u'{0[org]}/{0[course]}'.format(entry_id)
 
     def _construct_location_son(self, org, course, name=None):
         """
@@ -392,7 +391,7 @@ class LocMapperStore(object):
         """
         See if the location x published pair is in the cache. If so, return the mapped locator.
         """
-        entry = self.cache.get('{}+{}'.format(old_course_id, location.url()))
+        entry = self.cache.get(u'{}+{}'.format(old_course_id, location.url()))
         if entry is not None:
             if published:
                 return entry[0]
@@ -424,7 +423,7 @@ class LocMapperStore(object):
         See if the package_id is in the cache. If so, return the mapped location to the
         course root.
         """
-        return self.cache.get('courseId+{}'.format(locator_package_id))
+        return self.cache.get(u'courseId+{}'.format(locator_package_id))
 
     def _cache_course_locator(self, old_course_id, published_course_locator, draft_course_locator):
         """
@@ -442,9 +441,9 @@ class LocMapperStore(object):
         """
         setmany = {}
         if location.category == 'course':
-            setmany['courseId+{}'.format(published_usage.package_id)] = location
+            setmany[u'courseId+{}'.format(published_usage.package_id)] = location
         setmany[unicode(published_usage)] = location
         setmany[unicode(draft_usage)] = location
-        setmany['{}+{}'.format(old_course_id, location.url())] = (published_usage, draft_usage)
+        setmany[u'{}+{}'.format(old_course_id, location.url())] = (published_usage, draft_usage)
         setmany[old_course_id] = (published_usage, draft_usage)
         self.cache.set_many(setmany)

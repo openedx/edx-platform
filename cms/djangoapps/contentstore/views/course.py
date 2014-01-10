@@ -251,7 +251,7 @@ def create_new_course(request):
     run = request.json.get('run')
 
     try:
-        dest_location = Location('i4x', org, number, 'course', run)
+        dest_location = Location(u'i4x', org, number, u'course', run)
     except InvalidLocationError as error:
         return JsonResponse({
             "ErrMsg": _("Unable to create course '{name}'.\n\n{err}").format(
@@ -286,8 +286,10 @@ def create_new_course(request):
     course_search_location = bson.son.SON({
         '_id.tag': 'i4x',
         # cannot pass regex to Location constructor; thus this hack
-        '_id.org': re.compile('^{}$'.format(dest_location.org), re.IGNORECASE),
-        '_id.course': re.compile('^{}$'.format(dest_location.course), re.IGNORECASE),
+        # pylint: disable=E1101
+        '_id.org': re.compile(u'^{}$'.format(dest_location.org), re.IGNORECASE | re.UNICODE),
+        # pylint: disable=E1101
+        '_id.course': re.compile(u'^{}$'.format(dest_location.course), re.IGNORECASE | re.UNICODE),
         '_id.category': 'course',
     })
     courses = modulestore().collection.find(course_search_location, fields=('_id'))
