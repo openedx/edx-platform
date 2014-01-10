@@ -260,7 +260,7 @@ class @Problem
 
   check: =>
     if not @check_save_waitfor(@check_internal)
-      @check_internal()  
+      @check_internal()
 
   check_internal: =>
     Logger.log 'problem_check', @answers
@@ -570,7 +570,7 @@ class @Problem
 
       $.each answers, (key, answer) =>
         $.each answer, (key, value) =>
-          types[key](value) if types[key]?
+          types[key](value) if types[key]? and value
 
       container.html(canvas)
 
