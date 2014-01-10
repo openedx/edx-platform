@@ -109,6 +109,7 @@ define(["backbone"], function(Backbone) {
     Metadata.LIST_TYPE = "List";
     Metadata.VIDEO_LIST_TYPE = "VideoList";
     Metadata.RELATIVE_TIME_TYPE = "RelativeTime";
+    Metadata.CHECKBOX_TYPE = "Checkbox";
 
     return Metadata;
 });

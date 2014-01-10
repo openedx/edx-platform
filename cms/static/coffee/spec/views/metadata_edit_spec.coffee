@@ -14,6 +14,7 @@ define ["js/models/metadata", "js/collections/metadata", "js/views/metadata", "c
       stringEntryTemplate = readFixtures('metadata-string-entry.underscore')
       optionEntryTemplate = readFixtures('metadata-option-entry.underscore')
       listEntryTemplate = readFixtures('metadata-list-entry.underscore')
+      checkboxEntryTemplate = readFixtures('metadata-checkbox-entry.underscore')
 
       beforeEach ->
           setFixtures($("<script>", {id: "metadata-editor-tpl", type: "text/template"}).text(editorTemplate))
@@ -21,6 +22,7 @@ define ["js/models/metadata", "js/collections/metadata", "js/views/metadata", "c
           appendSetFixtures($("<script>", {id: "metadata-string-entry", type: "text/template"}).text(stringEntryTemplate))
           appendSetFixtures($("<script>", {id: "metadata-option-entry", type: "text/template"}).text(optionEntryTemplate))
           appendSetFixtures($("<script>", {id: "metadata-list-entry", type: "text/template"}).text(listEntryTemplate))
+          appendSetFixtures($("<script>", {id: "metadata-checkbox-entry", type: "text/template"}).text(checkboxEntryTemplate))
 
       genericEntry = {
           default_value: 'default value',
@@ -92,6 +94,21 @@ define ["js/models/metadata", "js/collections/metadata", "js/views/metadata", "c
           value: "12:12:12"
       }
 
+      checkboxEntry = {
+          default_value: ['bike'],
+          display_name: "Choose Answer",
+          explicitly_set: false,
+          field_name: "choose_answer",
+          help: "Do you have a bike, car, roller-skates?",
+          options: [
+              {"display_name": "I have a bike", "value": "bike"},
+              {"display_name": "I have a car", "value": "car"}
+              {"display_name": "I have a roller-skates", "value": "roller-skates"}
+          ],
+          type: MetadataModel.CHECKBOX_TYPE,
+          value: ['car']
+      }
+
 
       # Test for the editor that creates the individual views.
       describe "MetadataView.Editor creates editors for each field", ->
@@ -116,29 +133,42 @@ define ["js/models/metadata", "js/collections/metadata", "js/views/metadata", "c
                           value: null
                       },
                       listEntry,
-                      timeEntry
+                      timeEntry,
+                      {
+                          default_value: null,
+                          display_name: "Choose Answer",
+                          explicitly_set: true,
+                          field_name: "choose_answer",
+                          help: "Do you have a bike?",
+                          options: [
+                              {"display_name": "I have a bike", "value": "bike"},
+                          ],
+                          type: MetadataModel.CHECKBOX_TYPE,
+                          value: null
+                      }
                   ]
               )
 
           it "creates child views on initialize, and sorts them alphabetically", ->
               view = new MetadataView.Editor({collection: @model})
               childModels = view.collection.models
-              expect(childModels.length).toBe(7)
+              expect(childModels.length).toBe(8)
               # Be sure to check list view as well as other input types
               childViews = view.$el.find('.setting-input, .list-settings')
-              expect(childViews.length).toBe(7)
+              expect(childViews.length).toBe(8)
 
               verifyEntry = (index, display_name, type) ->
                   expect(childModels[index].get('display_name')).toBe(display_name)
                   verifyInputType(childViews[index], type)
 
-              verifyEntry(0, 'Display Name', 'text')
-              verifyEntry(1, 'Inputs', 'number')
-              verifyEntry(2, 'List', '')
-              verifyEntry(3, 'Show Answer', 'select-one')
-              verifyEntry(4, 'Time', 'text')
-              verifyEntry(5, 'Unknown', 'text')
-              verifyEntry(6, 'Weight', 'number')
+              verifyEntry(0, 'Choose Answer', 'checkbox')
+              verifyEntry(1, 'Display Name', 'text')
+              verifyEntry(2, 'Inputs', 'number')
+              verifyEntry(3, 'List', '')
+              verifyEntry(4, 'Show Answer', 'select-one')
+              verifyEntry(5, 'Time', 'text')
+              verifyEntry(6, 'Unknown', 'text')
+              verifyEntry(7, 'Weight', 'number')
 
           it "returns its display name", ->
               view = new MetadataView.Editor({collection: @model})
@@ -170,17 +200,17 @@ define ["js/models/metadata", "js/collections/metadata", "js/views/metadata", "c
           it "returns modified values only", ->
               view = new MetadataView.Editor({collection: @model})
               childModels = view.collection.models
-              childModels[0].setValue('updated display name')
-              childModels[1].setValue(20)
+              childModels[1].setValue('updated display name')
+              childModels[2].setValue(20)
               expect(view.getModifiedMetadataValues()).toEqual({
                   display_name : 'updated display name',
                   num_inputs: 20
               })
 
       # Tests for individual views.
-      assertInputType = (view, expectedType) ->
+      assertInputType = (view, expectedType, length=1) ->
           input = view.$el.find('.setting-input')
-          expect(input.length).toEqual(1)
+          expect(input.length).toEqual(length)
           verifyInputType(input[0], expectedType)
 
       assertValueInView = (view, expectedValue) ->
@@ -210,7 +240,7 @@ define ["js/models/metadata", "js/collections/metadata", "js/views/metadata", "c
           it "uses a text input type", ->
               assertInputType(@view, 'text')
 
-          it "returns the intial value upon initialization", ->
+          it "returns the initial value upon initialization", ->
               assertValueInView(@view, 'Word cloud')
 
           it "can update its value in the view", ->
@@ -486,3 +516,28 @@ define ["js/models/metadata", "js/collections/metadata", "js/views/metadata", "c
 
           it "has an update model method", ->
               assertUpdateModel(@view, '12:12:12', '23:59:59')
+
+      describe "MetadataView.Checkbox is an option input type with clear functionality", ->
+          beforeEach ->
+              model = new MetadataModel(checkboxEntry)
+              @view = new MetadataView.Checkbox({model: model})
+
+          it "uses a checkbox input type", ->
+              assertInputType(@view, 'checkbox', 3)
+
+          it "returns the initial value upon initialization", ->
+              assertValueInView(@view, ['car'])
+
+          it "can update its value in the view", ->
+              assertCanUpdateView(@view, ['bike', 'roller-skates'])
+              assertCanUpdateView(@view, [])
+
+          it "has a clear method to revert to the model default", ->
+              assertClear(@view, ['bike'])
+
+          it "has an update model method", ->
+              assertUpdateModel(@view, null, ['roller-skates'])
+
+          it "does not update to a value that is not an option", ->
+              @view.setValueInEditor(['ship'])
+              expect(@view.getValueFromEditor()).toEqual(['car'])

@@ -15,7 +15,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError, InsufficientSpecif
 
 from xblock.core import XBlock
 from xblock.fields import Scope, Integer, Float, List, XBlockMixin, String
-from xmodule.fields import RelativeTime
+from xmodule.fields import RelativeTime, Checkbox
 from xblock.fragment import Fragment
 from xblock.runtime import Runtime
 from xmodule.errortracker import exc_info_to_str
@@ -739,8 +739,11 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
             editor_type = "Generic"
             values = field.values
             if isinstance(values, (tuple, list)) and len(values) > 0:
-                editor_type = "Select"
                 values = [jsonify_value(field, json_choice) for json_choice in values]
+                if isinstance(field, Checkbox):
+                    editor_type = "Checkbox"
+                else:
+                    editor_type = "Select"
             elif isinstance(field, Integer):
                 editor_type = "Integer"
             elif isinstance(field, Float):

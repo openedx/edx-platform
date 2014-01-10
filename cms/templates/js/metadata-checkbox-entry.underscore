@@ -1,0 +1,40 @@
+<div class="wrapper-comp-setting metadata-checkboxes">
+    <label
+        class="label setting-label"
+        for="<%= uniqueId %>-0">
+            <%= model.get('display_name') %>
+    </label>
+    <div class="wrapper-checkbox-settings" id="<%= uniqueId %>">
+        <ol class="checkbox-settings">
+        <% isSingleOption = model.get('options').length === 1 %>
+        <% _.each(model.get('options'), function(option, index) { %>
+            <% hasDisplayName = option.display_name !== undefined %>
+            <% if (isSingleOption && !hasDisplayName) { %>
+                <li class="checkbox-settings-item a-center">
+            <% } else { %>
+                <li class="checkbox-settings-item">
+            <% } %>
+                <span class="input-wrapper">
+                    <input
+                        id="<%= uniqueId %>-<%= index %>"
+                        name="<%= uniqueId %>"
+                        class="input setting-input"
+                        type="checkbox"
+                        value="<%= option['value'] %>" />
+                </span>
+            <% if (hasDisplayName) { %>
+                <label
+                    for="<%= uniqueId %>-<%= index %>"
+                    class="input-label">
+                        <%= option['display_name'] %>
+                </label>
+            <% } %>
+            </li>
+        <% }) %>
+        </ol>
+    </div>
+    <button class="action setting-clear inactive" type="button" name="setting-clear" value="<%= gettext("Clear") %>" data-tooltip="<%= gettext("Clear") %>">
+        <i class="icon-undo"></i><span class="sr">"<%= gettext("Clear Value") %>"</span>
+    </button>
+</div>
+<span class="tip setting-help"><%= model.get('help') %></span>

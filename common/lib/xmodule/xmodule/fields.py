@@ -2,7 +2,7 @@ import time
 import logging
 import re
 
-from xblock.fields import Field
+from xblock.fields import Field, List
 import datetime
 import dateutil.parser
 
@@ -218,3 +218,8 @@ class RelativeTime(Field):
         if len(stringified) == 7:
             stringified = '0' + stringified
         return stringified
+
+
+class Checkbox(List):
+    pass
+

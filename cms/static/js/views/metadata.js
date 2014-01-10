@@ -42,6 +42,9 @@ function(BaseView, _, MetadataModel, AbstractEditor, VideoList) {
                     else if(model.getType() === MetadataModel.RELATIVE_TIME_TYPE) {
                         new Metadata.RelativeTime(data);
                     }
+                    else if(model.getType() === MetadataModel.CHECKBOX_TYPE) {
+                        new Metadata.Checkbox(data);
+                    }
                     else {
                         // Everything else is treated as GENERIC_TYPE, which uses String editor.
                         new Metadata.String(data);
@@ -373,6 +376,44 @@ function(BaseView, _, MetadataModel, AbstractEditor, VideoList) {
             this.$el.find('input').val(value);
         }
     });
+
+    Metadata.Checkbox = AbstractEditor.extend({
+
+        events : {
+            "change .input" : "updateModel",
+            "click .setting-clear" : "clear"
+        },
+
+        templateName: "metadata-checkbox-entry",
+
+        getValueFromEditor: function () {
+            return _.map(
+                this.$el.find('#' + this.uniqueId + " .input:checked"),
+                function (element) {
+                    return element.value;
+                }
+            );
+        },
+
+        setValueInEditor: function (value) {
+            if (!$.isArray(value)) {
+                return false;
+            }
+
+            var checkboxes = this.$el.find('#' + this.uniqueId + " .input"),
+                matchedCheckboxes = checkboxes.filter(function() {
+                    return $.inArray(this.value, value) !== -1;
+                });
+
+            if (matchedCheckboxes.length || !value.length) {
+                // Reset all checkboxes
+                checkboxes.prop('checked', false);
+                // Mark only matched checkboxes
+                matchedCheckboxes.prop('checked', true);
+            }
+        }
+    });
+
 
     return Metadata;
 });
