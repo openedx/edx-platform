@@ -139,38 +139,6 @@ site_status_msg = get_site_status_msg(course_id)
     </li>
     </ol>
     % endif
-
-    % if settings.FEATURES['ENABLE_QRF_SETTINGS']:
-        % if translation.get_language() == 'ar':
-            <a class="change_to_ar" style="display: none">عربي</a>
-            <a class="change_to_en" style="float: left; color: #646464; margin-top: 10px; margin-left: 20px; cursor: pointer">English</a>
-        % else:
-            <a class="change_to_ar" style="float: right; color: #646464; margin-top: 8px; margin-right: 20px; cursor: pointer">عربي</a>
-            <a class="change_to_en" style="display: none">English</a>
-        % endif
-        <form action="/i18n/setlang/" method="POST" style="display: none" id="language_form">
-            <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }"/>
-            <!--<input name="next" type="hidden" value="/next/page/" />-->
-            <select name="language" id="language_code">
-                % for lang in settings.LANGUAGES:
-                <option value="${ lang[0] }">${ lang[1] }</option>
-                % endfor
-            </select>
-            <input type="submit" value="Go" />
-        </form>
-        <script>
-        $(document).ready(function(){
-            $('.change_to_ar').click(function(){
-                $('#language_code').val('ar');
-                $('#language_form').submit();
-            });
-            $('.change_to_en').click(function(){
-                $('#language_code').val('en');
-                $('#language_form').submit();
-            });
-        });
-        </script>
-    % endif
   </nav>
 </header>
 % if course:

@@ -116,29 +116,9 @@
     </div>
 
     <div class="wrapper wrapper-r">
-        <form action="/i18n/setlang/" method="POST" id="language_form" style="display: none">
-            <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }"/>
-            <!--<input name="next" type="hidden" value="/next/page/" />-->
-            <select name="language" id="language_code">
-            % for lang in settings.LANGUAGES:
-            <option value="${ lang[0] }">${ lang[1] }</option>
-            % endfor
-            </select>
-            <input type="submit" value="Go" />
-        </form>
       % if user.is_authenticated():
       <nav class="nav-account nav-is-signedin nav-dd ui-right">
-        % if settings.FEATURES['ENABLE_QRF_SETTINGS']:
-            % if translation.get_language() == 'ar':
-              <a class="change_to_ar" style="display: none">عربي</a>
-              <a class="change_to_en" style="float: left; color: #646464; margin-top: 10px; margin-left: 20px; cursor: pointer">English</a>
-              % else:
-              <a class="change_to_ar" style="float: right; color: #646464; margin-top: 8px; margin-right: 20px; cursor: pointer">عربي</a>
-              <a class="change_to_en" style="display: none">English</a>
-            % endif
-        % endif
         <h2 class="sr">${_("Help &amp; Account Navigation")}</h2>
-
         % if get_language_bidi():
           <ol style="margin: 0 0 0 90px">
         % else:
@@ -185,15 +165,6 @@
 
       % else:
       <nav class="nav-not-signedin nav-pitch">
-        % if settings.FEATURES['ENABLE_QRF_SETTINGS']:
-            % if translation.get_language() == 'ar':
-              <a class="change_to_ar" style="display: none">عربي</a>
-              <a class="change_to_en" style="float: left; color: #646464; margin-top: 10px; margin-left: 20px; cursor: pointer">English</a>
-              % else:
-              <a class="change_to_ar" style="float: right; color: #646464; margin-top: 8px; margin-right: 20px; cursor: pointer">عربي</a>
-              <a class="change_to_en" style="display: none">English</a>
-            % endif
-        % endif
         <h2 class="sr">${_("You're not currently signed in")}</h2>
         <ol style="float: right; margin-right: 15px; margin-left: 15px">
           <li class="nav-item nav-not-signedin-hiw">
@@ -215,20 +186,4 @@
   </header>
 </div>
 
-<script type="text/javascript">
-    require(["domReady", "jquery", "gettext", "js/models/asset", "js/collections/asset",
-         "js/views/assets", "js/views/feedback_prompt",
-         "js/views/feedback_notification", "js/utils/modal", "jquery.fileupload"],
-        function(domReady, $, gettext, AssetModel, AssetCollection, AssetsView, PromptView, NotificationView, ModalUtils) {
-        $('.change_to_ar').click(function(){
-            $('#language_code').val('ar');
-            $('#language_form').submit();
-        });
-        $('.change_to_en').click(function(){
-            $('#language_code').val('en');
-            $('#language_form').submit();
-        });
-
-    });
-</script>
 
