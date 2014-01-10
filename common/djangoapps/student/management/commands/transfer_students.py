@@ -44,11 +44,14 @@ class Command(BaseCommand):
 
             # Move the Student between the classes.
             mode = enrollment.mode
+            old_is_active = enrollment.is_active
             CourseEnrollment.unenroll(user,source)
             new_enrollment = CourseEnrollment.enroll(user, dest, mode=mode)
 
-            if not enrollment.is_active:
-                CourseEnrollment.unenroll(user,dest)
+            # Unenroll from the new coures if the user had unenrolled
+            # form the old course.
+            if not old_is_active:
+                new_enrollment.update_enrollment(is_active=False)
 
             if mode == 'verified':
                 try:
