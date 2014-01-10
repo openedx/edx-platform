@@ -34,18 +34,21 @@ class Command(BaseCommand):
         dest = options['dest_course']
 
         source_students = User.objects.filter(
-            courseenrollment__course_id=source,
-            courseenrollment__is_active=True)
+            courseenrollment__course_id=source)
 
         for user in source_students:
             print("Moving {}.".format(user.username))
             # Find the old enrollment.
             enrollment = CourseEnrollment.objects.get(user=user,
                 course_id=source)
+
             # Move the Student between the classes.
             mode = enrollment.mode
             CourseEnrollment.unenroll(user,source)
-            CourseEnrollment.enroll(user, dest, mode=mode)
+            new_enrollment = CourseEnrollment.enroll(user, dest, mode=mode)
+
+            if not enrollment.is_active:
+                CourseEnrollment.unenroll(user,dest)
 
             if mode == 'verified':
                 try:
@@ -55,9 +58,6 @@ class Command(BaseCommand):
                 except CertificateItem.DoesNotExist:
                     print("No certificate for {}".format(user))
                     continue
-
-                new_enrollment = CourseEnrollment.objects.get(user=user,
-                    course_id=dest)
 
                 certificate_item.course_id = dest
                 certificate_item.course_enrollment = new_enrollment
