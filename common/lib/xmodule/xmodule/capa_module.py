@@ -497,27 +497,32 @@ class CapaModule(CapaFields, XModule):
                     if answer_id.find(hidden_state_keyword) >= 0:
                         student_answers.pop(answer_id)
 
-            #   Next, generate a fresh LoncapaProblem
+            # Next, generate a fresh LoncapaProblem
             self.lcp = self.new_lcp(None)
             self.set_state_from_lcp()
 
             # Prepend a scary warning to the student
-            warning = '<div class="capa_reset">'\
-                      '<h2>Warning: The problem has been reset to its initial state!</h2>'\
-                      'The problem\'s state was corrupted by an invalid submission. ' \
-                      'The submission consisted of:'\
-                      '<ul>'
+            _ = self.runtime.service(self, "i18n").ugettext
+            warning_msg = _("Warning: The problem has been reset to its initial state!")
+            warning = '<div class="capa_reset"> <h2> ' + warning_msg + '</h2>'
+
+            # Translators: Following this message, there will be a bulleted list of items.
+            warning_msg = _("The problem's state was corrupted by an invalid submission. The submission consisted of:")
+            warning += warning_msg + '<ul>'
+
             for student_answer in student_answers.values():
                 if student_answer != '':
                     warning += '<li>' + cgi.escape(student_answer) + '</li>'
-            warning += '</ul>'\
-                       'If this error persists, please contact the course staff.'\
-                       '</div>'
+
+            warning_msg = _('If this error persists, please contact the course staff.')
+            warning += '</ul>' + warning_msg + '</div>'
 
             html = warning
+
             try:
                 html += self.lcp.get_html()
-            except Exception:  # Couldn't do it. Give up
+            except Exception:  # pylint: disable=broad-except
+                # Couldn't do it. Give up
                 log.exception("Unable to generate html from LoncapaProblem")
                 raise
 
@@ -546,20 +551,22 @@ class CapaModule(CapaFields, XModule):
         else:
             check_button = False
 
-        content = {'name': self.display_name_with_default,
-                   'html': html,
-                   'weight': self.weight,
-                   }
+        content = {
+            'name': self.display_name_with_default,
+            'html': html,
+            'weight': self.weight,
+        }
 
-        context = {'problem': content,
-                   'id': self.id,
-                   'check_button': check_button,
-                   'reset_button': self.should_show_reset_button(),
-                   'save_button': self.should_show_save_button(),
-                   'answer_available': self.answer_available(),
-                   'attempts_used': self.attempts,
-                   'attempts_allowed': self.max_attempts,
-                   }
+        context = {
+            'problem': content,
+            'id': self.id,
+            'check_button': check_button,
+            'reset_button': self.should_show_reset_button(),
+            'save_button': self.should_show_save_button(),
+            'answer_available': self.answer_available(),
+            'attempts_used': self.attempts,
+            'attempts_allowed': self.max_attempts,
+        }
 
         html = self.system.render_template('problem.html', context)
 
@@ -568,7 +575,7 @@ class CapaModule(CapaFields, XModule):
                 id=self.location.html_id(), ajax_url=self.system.ajax_url
             ) + html + "</div>"
 
-        # now do all the substitutions which the LMS module_render normally does, but
+        # Now do all the substitutions which the LMS module_render normally does, but
         # we need to do here explicitly since we can get called for our HTML via AJAX
         html = self.system.replace_urls(html)
         if self.system.replace_course_urls:
@@ -601,12 +608,14 @@ class CapaModule(CapaFields, XModule):
             'ungraded_response': self.handle_ungraded_response
         }
 
-        generic_error_message = (
+        _ = self.runtime.service(self, "i18n").ugettext
+
+        generic_error_message = _(
             "We're sorry, there was an error with processing your request. "
             "Please try reloading your page and trying again."
         )
 
-        not_found_error_message = (
+        not_found_error_message = _(
             "The state of this problem has changed since you loaded this page. "
             "Please refresh your page."
         )
@@ -918,17 +927,19 @@ class CapaModule(CapaFields, XModule):
         answers = self.make_dict_of_responses(data)
         event_info['answers'] = convert_files_to_filenames(answers)
 
+        _ = self.runtime.service(self, "i18n").ugettext
+
         # Too late. Cannot submit
         if self.closed():
             event_info['failure'] = 'closed'
             self.system.track_function('problem_check_fail', event_info)
-            raise NotFoundError('Problem is closed')
+            raise NotFoundError(_("Problem is closed."))
 
         # Problem submitted. Student should reset before checking again
         if self.done and self.rerandomize == "always":
             event_info['failure'] = 'unreset'
             self.system.track_function('problem_check_fail', event_info)
-            raise NotFoundError('Problem must be reset before it can be checked again')
+            raise NotFoundError(_("Problem must be reset before it can be checked again."))
 
         # Problem queued. Students must wait a specified waittime before they are allowed to submit
         if self.lcp.is_queued():
@@ -936,7 +947,7 @@ class CapaModule(CapaFields, XModule):
             prev_submit_time = self.lcp.get_recentmost_queuetime()
             waittime_between_requests = self.system.xqueue['waittime']
             if (current_time - prev_submit_time).total_seconds() < waittime_between_requests:
-                msg = u'You must wait at least {wait} seconds between submissions'.format(
+                msg = _(u"You must wait at least {wait} seconds between submissions").format(
                     wait=waittime_between_requests)
                 return {'success': msg, 'html': ''}  # Prompts a modal dialog in ajax callback
 
@@ -962,7 +973,8 @@ class CapaModule(CapaFields, XModule):
             # Otherwise, display just an error message,
             # without a stack trace
             else:
-                msg = u"Error: {msg}".format(msg=inst.message)
+                # Translators: {msg} will be replaced with a problem's error message.
+                msg = _(u"Error: {msg}").format(msg=inst.message)
 
             return {'success': msg}
 
@@ -999,9 +1011,10 @@ class CapaModule(CapaFields, XModule):
         # render problem into HTML
         html = self.get_problem_html(encapsulate=False)
 
-        return {'success': success,
-                'contents': html,
-                }
+        return {
+            'success': success,
+            'contents': html,
+        }
 
     def rescore_problem(self):
         """
@@ -1021,15 +1034,18 @@ class CapaModule(CapaFields, XModule):
         """
         event_info = {'state': self.lcp.get_state(), 'problem_id': self.location.url()}
 
+        _ = self.runtime.service(self, "i18n").ugettext
+
         if not self.lcp.supports_rescoring():
             event_info['failure'] = 'unsupported'
             self.system.track_function('problem_rescore_fail', event_info)
-            raise NotImplementedError("Problem's definition does not support rescoring")
+            # Translators: 'rescoring' refers to the act of re-submitting a student's solution so it can get a new score.
+            raise NotImplementedError(_("Problem's definition does not support rescoring"))
 
         if not self.done:
             event_info['failure'] = 'unanswered'
             self.system.track_function('problem_rescore_fail', event_info)
-            raise NotFoundError('Problem must be answered before it can be graded again')
+            raise NotFoundError(_("Problem must be answered before it can be graded again."))
 
         # get old score, for comparison:
         orig_score = self.lcp.get_score()
@@ -1095,32 +1111,39 @@ class CapaModule(CapaFields, XModule):
 
         answers = self.make_dict_of_responses(data)
         event_info['answers'] = answers
+        _ = self.runtime.service(self, "i18n").ugettext
 
         # Too late. Cannot submit
         if self.closed() and not self.max_attempts == 0:
             event_info['failure'] = 'closed'
             self.system.track_function('save_problem_fail', event_info)
-            return {'success': False,
-                    'msg': "Problem is closed"}
+            return {
+                'success': False,
+                'msg': _("Problem is closed")
+            }
 
         # Problem submitted. Student should reset before saving
         # again.
         if self.done and self.rerandomize == "always":
             event_info['failure'] = 'done'
             self.system.track_function('save_problem_fail', event_info)
-            return {'success': False,
-                    'msg': "Problem needs to be reset prior to save"}
+            return {
+                'success': False,
+                'msg': _("Problem needs to be reset prior to save")
+            }
 
         self.lcp.student_answers = answers
 
         self.set_state_from_lcp()
 
         self.system.track_function('save_problem_success', event_info)
-        msg = "Your answers have been saved"
+        msg = _("Your answers have been saved")
         if not self.max_attempts == 0:
-            msg += " but not graded. Hit 'Check' to grade them."
-        return {'success': True,
-                'msg': msg}
+            msg = _("Your answers have been saved but not graded. Hit 'Check' to grade them.")
+        return {
+            'success': True,
+            'msg': msg
+        }
 
     def reset_problem(self, _data):
         """
@@ -1137,18 +1160,23 @@ class CapaModule(CapaFields, XModule):
         event_info = dict()
         event_info['old_state'] = self.lcp.get_state()
         event_info['problem_id'] = self.location.url()
+        _ = self.runtime.service(self, "i18n").ugettext
 
         if self.closed():
             event_info['failure'] = 'closed'
             self.system.track_function('reset_problem_fail', event_info)
-            return {'success': False,
-                    'error': "Problem is closed"}
+            return {
+                'success': False,
+                'error': _("Problem is closed")
+            }
 
         if not self.done:
             event_info['failure'] = 'not_done'
             self.system.track_function('reset_problem_fail', event_info)
-            return {'success': False,
-                    'error': "Refresh the page and make an attempt before resetting."}
+            return {
+                'success': False,
+                'error': _("Refresh the page and make an attempt before resetting.")
+            }
 
         if self.rerandomize in ["always", "onreset"]:
             # Reset random number generator seed.
@@ -1163,8 +1191,10 @@ class CapaModule(CapaFields, XModule):
         event_info['new_state'] = self.lcp.get_state()
         self.system.track_function('reset_problem', event_info)
 
-        return {'success': True,
-                'html': self.get_problem_html(encapsulate=False)}
+        return {
+            'success': True,
+            'html': self.get_problem_html(encapsulate=False)
+        }
 
 
 class CapaDescriptor(CapaFields, RawDescriptor):
