@@ -185,8 +185,14 @@ def get_course_about_section(course, section_key):
             html = ''
 
             if about_module is not None:
-                html = about_module.render('student_view').content
-
+                try:
+                    html = about_module.render('student_view').content
+                except Exception:  # pylint: disable=broad-except
+                    html = "Error message"
+                    log.exception("Error rendering course={course}, section_key={section_key}".format(
+                                  course=course,
+                                  section_key=section_key
+                                 ))
             return html
 
         except ItemNotFoundError:
