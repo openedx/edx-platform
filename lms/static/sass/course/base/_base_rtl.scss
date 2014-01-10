@@ -1,0 +1,6 @@
+@import "_base.scss";
+
+body, h1, h2, h3, h4, h5, h6, p, p a:link, p a:visited, a, label {
+  text-align: right;
+  font-family: $sans-serif;
+}

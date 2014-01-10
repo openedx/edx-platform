@@ -1,0 +1,58 @@
+@import "_discussion.scss";
+
+.container .discussion-body {
+  .sidebar {
+    float: right;
+  }
+  .discussion-column {
+    float: left;
+  }
+  .sort-bar {
+    .sort-label {
+      float: right;
+    }
+    li {
+      float: right;
+    }
+  }
+  .browse-search {
+    .home, .browse, .search {
+      float: right;
+    }
+    .home {
+      box-shadow: 1px 0 0 #AAAAAA inset;
+      border-radius: 0;
+      border-top-right-radius: 3px;
+    }
+    .browse {
+      box-shadow: 1px 0 0 #AAAAAA inset;
+      border-radius: 0;
+    }
+    .search {
+      border-top-left-radius: 3px;
+    }
+  }
+}
+
+body.discussion {
+  .course-tabs .right {
+    float: left;
+  }
+  .new-post-article {
+    .left-column {
+      float: right;
+    }
+    .right-column {
+      float: left;
+    }
+  }
+  .new-post-form {
+    .submit {
+      float: right;
+    }
+    .new-post-cancel {
+      float: right;
+      margin: 10px 15px 0 0;
+    }
+  }
+}

@@ -1,0 +1,31 @@
+@import "_courseware_header.scss";
+
+header.global.slim {
+  h1.logo {
+    padding-left: 20px;
+    padding-right: 0;
+  }
+
+  &:before {
+    right: auto;
+    left: 3px;
+  }
+  &:after {
+    right: auto;
+    left: 3px;
+  }
+  h2 {
+    float: right;
+    text-align: right;
+  }
+}
+
+nav.course-material {
+  ol.course-tabs {
+    li {
+      float: right;
+      margin-left: 6px;
+      margin-right: 0;
+    }
+  }
+}

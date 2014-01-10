@@ -1,0 +1,13 @@
+@import "course_object";
+
+.highlighted-courses, .find-courses {
+  .courses {
+    .courses-listing {
+      .courses-listing-item {
+        width: flex-grid(4);
+        margin-left: 1.13%;
+        float: right;
+      }
+    }
+  }
+}

@@ -1,0 +1,21 @@
+// studio - views - user dashboard
+// ====================
+
+@import "dashboard";
+
+.view-dashboard {
+  .content .notice-incontext {
+    &.has-actions, &.list-notices .notice-item.has-actions {
+      .list-actions {
+        text-align: left;
+      }
+    }
+  }
+  .list-courses {
+    .course-item {
+      .course-actions {
+        text-align: left;
+      }
+    }
+  }
+}

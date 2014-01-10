@@ -12,8 +12,8 @@ from edxmako.shortcuts import marketing_link
 from util.cache import cache_if_anonymous
 
 
-@ensure_csrf_cookie
 @cache_if_anonymous
+@ensure_csrf_cookie
 def index(request):
     '''
     Redirects to main page -- info page if user authenticated, or marketing if not
@@ -37,9 +37,8 @@ def index(request):
     return student.views.index(request, user=request.user)
 
 
-
-@ensure_csrf_cookie
 @cache_if_anonymous
+@ensure_csrf_cookie
 def courses(request):
     """
     Render the "find courses" page. If the marketing site is enabled, redirect

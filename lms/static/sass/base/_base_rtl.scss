@@ -1,0 +1,15 @@
+// html {
+//   overflow-y: scroll;
+// }
+
+@import "_base.scss";
+
+html, body {
+  background: $body-bg;
+  font-family: $sans-serif;
+  font-size: 1em;
+  font-style: normal;
+  line-height: 1em;
+  direction: rtl;
+  //-webkit-font-smoothing: antialiased;
+}
