@@ -29,7 +29,7 @@ from util.json_request import JsonResponse
 from util.sandboxing import can_execute_unsafe_code
 from xblock.core import XBlock
 from xblock.fields import Scope
-from xblock.runtime import KvsFieldData
+from xblock.runtime import KvsFieldData, KeyValueStore
 from xblock.exceptions import NoSuchHandlerError
 from xblock.django.request import django_to_webob_request, webob_to_django_response
 from xmodule.error_module import ErrorDescriptor, NonStaffErrorDescriptor

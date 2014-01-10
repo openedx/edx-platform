@@ -1,20 +1,21 @@
 import json
 import logging
 
-from lxml import etree
-
 from datetime import datetime
+from lxml import etree
 from pkg_resources import resource_string
-from .capa_module import ComplexEncoder
-from .x_module import XModule, module_attr
-from .raw_module import RawDescriptor
-from .modulestore.exceptions import ItemNotFoundError, NoPathToItem
-from .timeinfo import TimeInfo
-from .util.duedate import get_extended_due_date
-from xblock.fields import Dict, String, Scope, Boolean, Float
-from xmodule.fields import Date, Timedelta
+from xblock.fields import Dict, String, Scope, Boolean, Float, Reference
 
+from xmodule.capa_module import ComplexEncoder
+from xmodule.fields import Date, Timedelta
+from xmodule.modulestore import Location
+from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
+from xmodule.raw_module import RawDescriptor
+from xmodule.timeinfo import TimeInfo
+from xmodule.util.duedate import get_extended_due_date
+from xmodule.x_module import XModule, module_attr
 from xmodule.open_ended_grading_classes.peer_grading_service import PeerGradingService, GradingServiceError, MockPeerGradingService
+
 from open_ended_grading_classes import combined_open_ended_rubric
 from django.utils.timezone import UTC
 
@@ -32,7 +33,7 @@ class PeerGradingFields(object):
         default=False,
         scope=Scope.settings
     )
-    link_to_location = String(
+    link_to_location = Reference(
         display_name="Link to Problem Location",
         help='The location of the problem being graded. Only used when "Show Single Problem" is True.',
         default="",
@@ -560,7 +561,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
 
         good_problem_list = []
         for problem in problem_list:
-            problem_location = problem['location']
+            problem_location = Location(problem['location'])
             try:
                 descriptor = self._find_corresponding_module_for_location(problem_location)
             except (NoPathToItem, ItemNotFoundError):
@@ -608,10 +609,10 @@ class PeerGradingModule(PeerGradingFields, XModule):
                 log.error(
                     "Peer grading problem in peer_grading_module called with no get parameters, but use_for_single_location is False.")
                 return {'html': "", 'success': False}
-            problem_location = self.link_to_location
+            problem_location = Location(self.link_to_location)
 
         elif data.get('location') is not None:
-            problem_location = data.get('location')
+            problem_location = Location(data.get('location'))
 
         module = self._find_corresponding_module_for_location(problem_location)
 

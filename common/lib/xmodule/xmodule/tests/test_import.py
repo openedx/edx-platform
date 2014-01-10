@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import datetime
+import ddt
 import unittest
 
 from fs.memoryfs import MemoryFS
@@ -11,12 +12,16 @@ from django.utils.timezone import UTC
 
 from xmodule.xml_module import is_pointer_tag
 from xmodule.modulestore import Location
-from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
+from xmodule.modulestore.xml import ImportSystem, XMLModuleStore, LocationReader
 from xmodule.modulestore.inheritance import compute_inherited_metadata
 from xmodule.x_module import XModuleMixin, only_xmodules
 from xmodule.fields import Date
 from xmodule.tests import DATA_DIR
 from xmodule.modulestore.inheritance import InheritanceMixin
+
+from xblock.core import XBlock
+from xblock.fields import Scope, String, Integer
+from xblock.runtime import KvsFieldData, DictKeyValueStore
 
 
 ORG = 'test_org'
@@ -31,7 +36,6 @@ class DummySystem(ImportSystem):
         xmlstore = XMLModuleStore("data_dir", course_dirs=[], load_error_modules=load_error_modules)
         course_id = "/".join([ORG, COURSE, 'test_run'])
         course_dir = "test_dir"
-        policy = {}
         error_tracker = Mock()
         parent_tracker = Mock()
 
@@ -39,11 +43,12 @@ class DummySystem(ImportSystem):
             xmlstore=xmlstore,
             course_id=course_id,
             course_dir=course_dir,
-            policy=policy,
             error_tracker=error_tracker,
             parent_tracker=parent_tracker,
             load_error_modules=load_error_modules,
-            mixins=(InheritanceMixin, XModuleMixin)
+            mixins=(InheritanceMixin, XModuleMixin),
+            field_data=KvsFieldData(DictKeyValueStore()),
+            id_reader=LocationReader(),
         )
 
     def render_template(self, _template, _context):
@@ -70,6 +75,40 @@ class BaseCourseTestCase(unittest.TestCase):
         courses = modulestore.get_courses()
         self.assertEquals(len(courses), 1)
         return courses[0]
+
+
+class GenericXBlock(XBlock):
+    has_children = True
+    field1 = String(default="something", scope=Scope.user_state)
+    field2 = Integer(scope=Scope.user_state)
+
+
+@ddt.ddt
+class PureXBlockImportTest(BaseCourseTestCase):
+
+    def assert_xblocks_are_good(self, block):
+        """Assert a number of conditions that must be true for `block` to be good."""
+        scope_ids = block.scope_ids
+        self.assertIsNotNone(scope_ids.usage_id)
+        self.assertIsNotNone(scope_ids.def_id)
+
+        for child_id in block.children:
+            child = block.runtime.get_block(child_id)
+            self.assert_xblocks_are_good(child)
+
+    @XBlock.register_temp_plugin(GenericXBlock)
+    @ddt.data(
+        "<genericxblock/>",
+        "<genericxblock field1='abc' field2='23' />",
+        "<genericxblock field1='abc' field2='23'><genericxblock/></genericxblock>",
+    )
+    @patch('xmodule.x_module.XModuleMixin.location')
+    def test_parsing_pure_xblock(self, xml, mock_location):
+        system = self.get_system(load_error_modules=False)
+        descriptor = system.process_xml(xml)
+        self.assertIsInstance(descriptor, GenericXBlock)
+        self.assert_xblocks_are_good(descriptor)
+        self.assertFalse(mock_location.called)
 
 
 class ImportTestCase(BaseCourseTestCase):
@@ -407,7 +446,7 @@ class ImportTestCase(BaseCourseTestCase):
         self.assertTrue(any(expect in msg or expect in err
             for msg, err in errors))
         chapters = course.get_children()
-        self.assertEqual(len(chapters), 3)
+        self.assertEqual(len(chapters), 4)
 
     def test_url_name_mangling(self):
         """

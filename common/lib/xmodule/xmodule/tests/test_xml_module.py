@@ -70,13 +70,13 @@ class InheritingFieldDataTest(unittest.TestCase):
     def setUp(self):
         self.system = get_test_descriptor_system()
         self.all_blocks = {}
-        self.system.load_item = self.all_blocks.get
+        self.system.get_block = self.all_blocks.get
         self.field_data = InheritingFieldData(
             inheritable_names=['inherited'],
             kvs=DictKeyValueStore({}),
         )
 
-    def get_block(self, usage_id=None):
+    def get_a_block(self, usage_id=None):
         """Construct an XBlock for testing with."""
         scope_ids = Mock()
         if usage_id is None:
@@ -92,13 +92,13 @@ class InheritingFieldDataTest(unittest.TestCase):
 
     def test_default_value(self):
         # Blocks with nothing set with return the fields' defaults.
-        block = self.get_block()
+        block = self.get_a_block()
         self.assertEqual(block.inherited, "the default")
         self.assertEqual(block.not_inherited, "nothing")
 
     def test_set_value(self):
         # If you set a value, that's what you get back.
-        block = self.get_block()
+        block = self.get_a_block()
         block.inherited = "Changed!"
         block.not_inherited = "New Value!"
         self.assertEqual(block.inherited, "Changed!")
@@ -106,34 +106,34 @@ class InheritingFieldDataTest(unittest.TestCase):
 
     def test_inherited(self):
         # A child with get a value inherited from the parent.
-        parent = self.get_block(usage_id="parent")
+        parent = self.get_a_block(usage_id="parent")
         parent.inherited = "Changed!"
         self.assertEqual(parent.inherited, "Changed!")
 
-        child = self.get_block(usage_id="child")
+        child = self.get_a_block(usage_id="child")
         child.parent = "parent"
         self.assertEqual(child.inherited, "Changed!")
 
     def test_inherited_across_generations(self):
         # A child with get a value inherited from a great-grandparent.
-        parent = self.get_block(usage_id="parent")
+        parent = self.get_a_block(usage_id="parent")
         parent.inherited = "Changed!"
         self.assertEqual(parent.inherited, "Changed!")
         parent_id = "parent"
         for child_num in range(10):
             usage_id = "child_{}".format(child_num)
-            child = self.get_block(usage_id=usage_id)
+            child = self.get_a_block(usage_id=usage_id)
             child.parent = "parent"
             self.assertEqual(child.inherited, "Changed!")
             parent_id = usage_id
 
     def test_not_inherited(self):
         # Fields not in the inherited_names list won't be inherited.
-        parent = self.get_block(usage_id="parent")
+        parent = self.get_a_block(usage_id="parent")
         parent.not_inherited = "Changed!"
         self.assertEqual(parent.not_inherited, "Changed!")
 
-        child = self.get_block(usage_id="child")
+        child = self.get_a_block(usage_id="child")
         child.parent = "parent"
         self.assertEqual(child.not_inherited, "nothing")
 

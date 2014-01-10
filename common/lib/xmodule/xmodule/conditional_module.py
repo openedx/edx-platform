@@ -20,7 +20,7 @@ log = logging.getLogger('edx.' + __name__)
 
 class ConditionalFields(object):
     has_children = True
-    show_tag_list = List(help="Poll answers", scope=Scope.content)
+    show_tag_list = List(help="List of urls of children that are references to external modules", scope=Scope.content)
 
 
 class ConditionalModule(ConditionalFields, XModule):
@@ -196,6 +196,7 @@ class ConditionalDescriptor(ConditionalFields, SequenceDescriptor):
             locations = [location.strip() for location in sources.split(';')]
             for location in locations:
                 if Location.is_valid(location):  # Check valid location url.
+                    location = Location(location)
                     try:
                         if return_descriptor:
                             descriptor = system.load_item(location)
@@ -223,12 +224,11 @@ class ConditionalDescriptor(ConditionalFields, SequenceDescriptor):
             if child.tag == 'show':
                 location = ConditionalDescriptor.parse_sources(child, system)
                 children.extend(location)
-                show_tag_list.extend(location)
+                show_tag_list.extend(location.url())
             else:
                 try:
                     descriptor = system.process_xml(etree.tostring(child))
-                    module_url = descriptor.location.url()
-                    children.append(module_url)
+                    children.append(descriptor.scope_ids.usage_id)
                 except:
                     msg = "Unable to load child when parsing Conditional."
                     log.exception(msg)

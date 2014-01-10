@@ -393,10 +393,10 @@ def import_course_draft(
         xmlstore=xml_module_store,
         course_id=target_location_namespace.course_id,
         course_dir=draft_course_dir,
-        policy={},
         error_tracker=errorlog.tracker,
         parent_tracker=ParentTracker(),
         load_error_modules=False,
+        field_data=None,
     )
 
     # now walk the /vertical directory where each file in there

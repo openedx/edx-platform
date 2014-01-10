@@ -95,7 +95,7 @@ def dump_module(module, destination=None, inherited=False, defaults=False):
 
     destination[module.location.url()] = {
         'category': module.location.category,
-        'children': module.children if hasattr(module, 'children') else [],
+        'children': [str(child) for child in getattr(module, 'children', [])],
         'metadata': filtered_metadata,
     }
 

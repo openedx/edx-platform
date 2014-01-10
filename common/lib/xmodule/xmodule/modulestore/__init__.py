@@ -177,7 +177,7 @@ class Location(_LocationBase):
         elif isinstance(location, basestring):
             match = URL_RE.match(location)
             if match is None:
-                log.debug('location is instance of %s but no URL match' % basestring)
+                log.debug("location %r doesn't match URL" % location)
                 raise InvalidLocationError(location)
             groups = match.groupdict()
             check_dict(groups)

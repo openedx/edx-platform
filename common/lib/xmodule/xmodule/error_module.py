@@ -81,12 +81,10 @@ class ErrorDescriptor(ErrorFields, XModuleDescriptor):
 
     @classmethod
     def _construct(cls, system, contents, error_msg, location):
+        location = Location(location)
 
-        if isinstance(location, dict) and 'course' in location:
-            location = Location(location)
-        if isinstance(location, Location) and location.name is None:
+        if location.category == 'error':
             location = location.replace(
-                category='error',
                 # Pick a unique url_name -- the sha1 hash of the contents.
                 # NOTE: We could try to pull out the url_name of the errored descriptor,
                 # but url_names aren't guaranteed to be unique between descriptor types,
@@ -136,7 +134,7 @@ class ErrorDescriptor(ErrorFields, XModuleDescriptor):
         )
 
     @classmethod
-    def from_xml(cls, xml_data, system, org=None, course=None,
+    def from_xml(cls, xml_data, system, id_generator,
                  error_msg='Error not available'):
         '''Create an instance of this descriptor from the supplied data.
 
@@ -162,7 +160,7 @@ class ErrorDescriptor(ErrorFields, XModuleDescriptor):
             # Save the error to display later--overrides other problems
             error_msg = exc_info_to_str(sys.exc_info())
 
-        return cls._construct(system, xml_data, error_msg, location=Location('i4x', org, course, None, None))
+        return cls._construct(system, xml_data, error_msg, location=id_generator.create_definition('error'))
 
     def export_to_xml(self, resource_fs):
         '''
