@@ -12,7 +12,7 @@
   <a href="#help-modal" rel="leanModal" role="button">${_("Help")}</a>
 </div>
 
-<section id="help-modal" class="modal" aria-hidden="true" role="dialog" aria-label='${_("{platform_name} Help").format(platform_name=settings.PLATFORM_NAME)}'>
+<section id="help-modal" class="modal" aria-hidden="true" role="dialog" aria-label="${_("{platform_name} Help").format(platform_name=settings.PLATFORM_NAME)}">
   <div class="inner-wrapper" id="help_wrapper">
     ## TODO: find a way to refactor this
     <button class="close-modal "tabindex="0">&#10005; <span class="sr">${_('Close Modal')}</span></button>
