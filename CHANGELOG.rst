@@ -17,6 +17,19 @@ Studio: Newly-created courses default to being published on Jan 1, 2030
 
 Studio: Added pagination to the Files & Uploads page.
 
+
+LMS: Added unicode support with Arabic LMS view (sass/css).
+CMS: Added unicode support with Arabic CMS view (sass/css).
+Common: Added unicode support.
+
+Studio: Added pagination to the Files & Uploads page.
+
+LMS: Added unicode support with Arabic LMS view (sass/css).
+CMS: Added unicode support with Arabic CMS view (sass/css).
+Common: Added unicode support.
+
+Studio: Added pagination to the Files & Uploads page.
+
 Blades: Video player improvements:
   - Disable edX controls on iPhone/iPod (native controls are used).
   - Disable unsupported controls (volume, playback rate) on iPad/Android.

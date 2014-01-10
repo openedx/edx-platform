@@ -90,6 +90,7 @@ def render_to_string(template_name, dictionary, context=None, namespace='main'):
         context_dictionary.update(context)
     # fetch and render template
     template = edxmako.lookup[namespace].get_template(template_name)
+
     return template.render_unicode(**context_dictionary)
 
 

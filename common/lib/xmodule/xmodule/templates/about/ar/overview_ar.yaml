@@ -1,0 +1,52 @@
+---
+metadata:
+    display_name: نظرة عامة
+
+data: |
+    <section class="about">
+      <h2>عن هذا المساق</h2>
+      <p>أضف وصف المساق المطول هنا. يجب يتكون الوصف المطول من 150 - 400 كلمة.</p>
+
+      <p>هذه الفقرة رقم 2 من الوصف المطول. أضف ما تشاء من الفقرات. تأكد من احتواء الفقرات في شعار الفقرة</p>
+    </section>
+
+    <section class="prerequisites">
+      <h2>المتطلبات الأساسية</h2>
+      <p>إضافة معلومات حول متطلبات الدورة هنا.</p>
+    </section>
+
+    <section class="course-staff">
+      <h2>فريق العمل في المساق</h2>
+      <article class="teacher">
+        <div class="teacher-image">
+          <img src="/static/images/pl-faculty.png" align="left" style="margin:0 20 px 0">
+        </div>
+
+        <h3>موظف # 1</h3>
+        <p>السيرة الذاتية للمدرب / موظف رقم 1</p>
+      </article>
+
+      <article class="teacher">
+        <div class="teacher-image">
+          <img src="/static/images/pl-faculty.png" align="left" style="margin:0 20 px 0">
+        </div>
+
+        <h3>الموظف رقم 2</h3>
+        <p>السيرة الذاتية للمدرب / موظف رقم 2</p>
+      </article>
+    </section>
+
+    <section class="faq">
+      <section class="responses">
+        <h2>أسئلة وأجوبة</h2>
+        <article class="response">
+          <h3>هل أنا بحاجة لشراء كتاب مدرسي؟</h3>
+          <p>لا. هناك نسخة مجانية متوفرة على الإنترنت من الكيمياء: المبادئ، والأنماط، والتطبيقات، الطبعة الأولى من قبل بروس أفريل] وباتريشيا إلدريدج، و يمكنك أيضاً شراء نسخة مطبوعه إذا كنت تفضل ذلك.</p>
+        </article>
+
+        <article class="response">
+          <h3>السؤال رقم 2</h3>
+          <p>سيتم عرض إجابتك هنا.</p>
+        </article>
+      </section>
+    </section>

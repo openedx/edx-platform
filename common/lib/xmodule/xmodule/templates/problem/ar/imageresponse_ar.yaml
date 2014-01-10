@@ -1,0 +1,20 @@
+---
+metadata:
+    display_name: المدخلات المصورة المعينة
+    markdown: !!null
+data: |
+  <problem>
+    <p>
+      مسألة المدخل المعين الصوري تقدم صورة للطالب. المخل يعطى حسب موقع نقرات الفأرة على الصورة. صحة المدخل تقيم اعتماداً على الأبعاد المحتملة للمستطيل.
+    </p>
+    <p>أي حيوان من الظاهرين في الأسفل هو قطة صغيرة؟</p>
+    <imageresponse>
+      <imageinput src="https://studio.edx.org/c4x/edX/DemoX/asset/Dog-and-Cat.jpg" width="640" height="400" rectangle="(385,98)-(600,337)"/>
+    </imageresponse>
+    <solution>
+      <div class="detailed-solution">
+        <p>التفسير</p>
+        <p>الحيوان على اليمين هو قطة صغيرة. الحيوان إلى اليسار هو كلب صغير و ليس قطة صغيرة.</p>
+      </div>
+    </solution>
+  </problem>

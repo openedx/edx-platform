@@ -1,0 +1,45 @@
+---
+metadata:
+    display_name: إدخال نصي
+    markdown: |
+        A text input problem accepts a line of text from the
+        student, and evaluates the input for correctness based on an expected
+        answer.
+
+        The answer is correct if it matches every character of the expected answer. This can be a problem with
+        international spelling, dates, or anything where the format of the answer is not clear.
+
+        Which US state has Lansing as its capital?
+
+        = Michigan
+
+
+        [explanation]
+        Lansing is the capital of Michigan, although it is not Michgan's largest city,
+        or even the seat of the county in which it resides.
+        [explanation]
+data: |
+
+  <problem>
+
+    <p>
+
+    مسألة المدخل النصي تقبل سطر نصي من الطالب، و تقيم صحة المدخل أعتماداً على الإجابة المتوقعة.
+
+    تكون الإجابة صحيحة إذا كانت تطابق كل حرف من الإجابة المتوقعة. قد تكون هذه المسألة تحتوي على هجاء دولي، تواريخ، أو أي شيء حيث يكون شكل الإجابة غير واضح.
+    </p>
+
+    <p>أي ولاية أمريكية عاصمتها لانسنغ ؟</p>
+
+    <stringresponse answer="Michigan" type="ci">
+      <textline size="20"/>
+    </stringresponse>
+
+    <solution>
+            <div class="detailed-solution">
+                <p>التفسير</p>
+                <p>لانسنغ هي عاصمة ميشيغن، على الرغم من أنها ليست أكبر مدينة في ميشيغن، أو حتى حتى مقر المقاطعة حيث تقع.</p>
+            </div>
+        </solution>
+
+  </problem>

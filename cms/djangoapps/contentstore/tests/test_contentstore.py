@@ -1213,7 +1213,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         import_from_xml(module_store, 'common/test/data/', ['toy'])
 
-        location = CourseDescriptor.id_to_location('edX/toy/2012_Fall')
+        location = CourseDescriptor.id_to_location(u'edX/toy/2012_Fall')
 
         # Export the course
         root_dir = path(mkdtemp_clean())
@@ -1224,14 +1224,14 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         # get the sample HTML with styling information
         html_module = module_store.get_instance(
-            'edX/toy/2012_Fall',
+            u'edX/toy/2012_Fall',
             Location('i4x', 'edX', 'toy', 'html', 'with_styling')
         )
         self.assertIn('<p style="font:italic bold 72px/30px Georgia, serif; color: red; ">', html_module.data)
 
         # get the sample HTML with just a simple <img> tag information
         html_module = module_store.get_instance(
-            'edX/toy/2012_Fall',
+            u'edX/toy/2012_Fall',
             Location('i4x', 'edX', 'toy', 'html', 'just_img')
         )
         self.assertIn('<img src="/static/foo_bar.jpg" />', html_module.data)

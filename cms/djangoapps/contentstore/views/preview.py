@@ -39,7 +39,7 @@ def handler_prefix(block, handler='', suffix=''):
     Trailing `/`s are removed from the returned url.
     """
     return reverse('preview_handler', kwargs={
-        'usage_id': quote_slashes(str(block.scope_ids.usage_id)),
+        'usage_id': quote_slashes(unicode(block.scope_ids.usage_id).encode('utf-8')),
         'handler': handler,
         'suffix': suffix,
     }).rstrip('/?')

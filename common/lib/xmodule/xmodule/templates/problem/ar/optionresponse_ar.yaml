@@ -1,0 +1,40 @@
+---
+metadata:
+    display_name: قائمة منسدلة
+    markdown: |
+        Dropdown problems give a limited set of options for students to respond with, and present those options
+        in a format that encourages them to search for a specific answer rather than being immediately presented
+        with options from which to recognize the correct answer.
+
+        The answer options and the identification of the correct answer is defined in the <b>optioninput</b> tag.
+
+        Translation between Dropdown and __________ is extremely straightforward:
+
+        [[(Multiple Choice), Text Input, Numerical Input, External Response, Image Response]]
+
+        [explanation]
+        Multiple Choice also allows students to select from a variety of pre-written responses, although the
+        format makes it easier for students to read very long response options. Dropdowns also differ
+        slightly because students are more likely to think of an answer and then search for it rather than
+        relying purely on recognition to answer the question.
+        [explanation]
+data: |
+  <problem>
+  <p>مسائل القائمة العامودية تعطي مجموعة من الخيارات المحددة للطلاب للإجابة، و تقدم هذه الخيارات بالطريقة التي تشجعهم على البحث عن إجابة محددة عوضاً عن تقديم الخيارات مباشرة يميزون من خلالها الإجابة الصحيحة.</p>
+
+  <p>
+  خيارات الإجابة و التعرف على الإجابة الصحيحة تعرف بـوسم  <b>optioninput</b>
+  </p>
+  <p>الترجمة بين القائمة العامودية و ـــــــــــــــــــــــــــــ مباشرة لأبعد حد.
+
+  <optionresponse>
+        <optioninput options="(الخيارات المتعددة، إدخال مطبوع، إدخال رقمي، إجابة خارجية، إجابة مصورة)" correct="Multiple Choice"></optioninput>
+  </optionresponse>
+  </p>
+      <solution>
+          <div class="detailed-solution">
+              <p>التفسير</p>
+              <p>الخيار من متعدد يعطي الطلاب الفرصة للاختيار من مجموعة من الإجابات المكتوبة مسبقاً، مع أن طريقة التقديم تجعل من السهل على الطالب قراءة خيارات للإجابة طويلة جداً. خيارات القائمة العامودية تختلف أيضاً بقليل و ذلك لأن الطلاب عادة ما يميلون للتفكير بإجابة و من ثم البحث عنها بدلاً من الاعتماد بشكل كلي على التمييز لإجابة السؤال. </p>
+          </div>
+      </solution>
+  </problem>

@@ -40,24 +40,24 @@ def get_all_course_role_groupnames(location, role, use_filter=True):
     groupnames = []
     if isinstance(location, Location):
         try:
-            groupnames.append('{0}_{1}'.format(role, location.course_id))
+            groupnames.append(u'{0}_{1}'.format(role, location.course_id))
         except InvalidLocationError:  # will occur on old locations where location is not of category course
             pass
         try:
             locator = loc_mapper().translate_location(location.course_id, location, False, False)
-            groupnames.append('{0}_{1}'.format(role, locator.package_id))
+            groupnames.append(u'{0}_{1}'.format(role, locator.package_id))
         except (InvalidLocationError, ItemNotFoundError):
             pass
         # least preferred role_course format for legacy reasons
-        groupnames.append('{0}_{1}'.format(role, location.course))
+        groupnames.append(u'{0}_{1}'.format(role, location.course))
     elif isinstance(location, CourseLocator):
-        groupnames.append('{0}_{1}'.format(role, location.package_id))
+        groupnames.append(u'{0}_{1}'.format(role, location.package_id))
         old_location = loc_mapper().translate_locator_to_location(location, get_course=True)
         if old_location:
             # the slashified version of the course_id (myu/mycourse/myrun)
-            groupnames.append('{0}_{1}'.format(role, old_location.course_id))
+            groupnames.append(u'{0}_{1}'.format(role, old_location.course_id))
             # add the least desirable but sometimes occurring format.
-            groupnames.append('{0}_{1}'.format(role, old_location.course))
+            groupnames.append(u'{0}_{1}'.format(role, old_location.course))
     # filter to the ones which exist
     default = groupnames[0]
     if use_filter:
