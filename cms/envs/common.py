@@ -31,7 +31,7 @@ from path import path
 from lms.lib.xblock.mixin import LmsBlockMixin
 from cms.lib.xblock.mixin import CmsBlockMixin
 from xmodule.modulestore.inheritance import InheritanceMixin
-from xmodule.x_module import XModuleMixin
+from xmodule.x_module import XModuleMixin, only_xmodules
 from dealer.git import git
 
 ############################ FEATURE CONFIGURATION #############################
@@ -62,6 +62,10 @@ FEATURES = {
     # If set to True, new Studio users won't be able to author courses unless
     # edX has explicitly added them to the course creator group.
     'ENABLE_CREATOR_GROUP': False,
+
+    # If set to True, Studio won't restrict the set of advanced components
+    # to just those pre-approved by edX
+    'ALLOW_ALL_ADVANCED_COMPONENTS': False,
 }
 ENABLE_JASMINE = False
 
@@ -178,6 +182,15 @@ MIDDLEWARE_CLASSES = (
 # once the responsibility of XBlock creation is moved out of modulestore - cpennington
 XBLOCK_MIXINS = (LmsBlockMixin, CmsBlockMixin, InheritanceMixin, XModuleMixin)
 
+# Only allow XModules in Studio
+XBLOCK_SELECT_FUNCTION = only_xmodules
+
+# Use the following lines to allow any xblock in Studio,
+# either by uncommenting them here, or adding them to your private.py
+# You should also enable the ALLOW_ALL_ADVANCED_COMPONENTS feature flag, so that
+# xblocks can be added via advanced settings
+# from xmodule.x_module import prefer_xmodules
+# XBLOCK_SELECT_FUNCTION = prefer_xmodules
 
 ############################ SIGNAL HANDLERS ################################
 # This is imported to register the exception signal handling that logs exceptions

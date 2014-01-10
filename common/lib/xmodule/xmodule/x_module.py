@@ -15,9 +15,10 @@ from xmodule.modulestore.exceptions import ItemNotFoundError, InsufficientSpecif
 
 from xblock.core import XBlock
 from xblock.fields import Scope, Integer, Float, List, XBlockMixin, String
-from xmodule.fields import RelativeTime
 from xblock.fragment import Fragment
+from xblock.plugin import default_select
 from xblock.runtime import Runtime
+from xmodule.fields import RelativeTime
 from xmodule.errortracker import exc_info_to_str
 from xmodule.modulestore.locator import BlockUsageLocator
 
@@ -562,6 +563,22 @@ class ResourceTemplates(object):
             return template
         else:
             return None
+
+
+def prefer_xmodules(identifier, entry_points):
+    """Prefer entry_points from the xmodule package"""
+    from_xmodule = [entry_point for entry_point in entry_points if entry_point.dist.key == 'xmodule']
+    if from_xmodule:
+        return default_select(identifier, from_xmodule)
+    else:
+        return default_select(identifier, entry_points)
+
+
+def only_xmodules(identifier, entry_points):
+    """Only use entry_points that are supplied by the xmodule package"""
+    from_xmodule = [entry_point for entry_point in entry_points if entry_point.dist.key == 'xmodule']
+
+    return default_select(identifier, from_xmodule)
 
 
 @XBlock.needs("i18n")

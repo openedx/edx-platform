@@ -14,13 +14,14 @@ from xmodule.modulestore.django import modulestore
 from xmodule.util.date_utils import get_default_time_display
 from xmodule.modulestore.django import loc_mapper
 from xmodule.modulestore.locator import BlockUsageLocator
-from xmodule.x_module import XModuleDescriptor
 
+from xblock.core import XBlock
 from xblock.django.request import webob_to_django_response, django_to_webob_request
 from xblock.exceptions import NoSuchHandlerError
 from xblock.fields import Scope
 from xblock.plugin import PluginMissingError
 from xblock.runtime import Mixologist
+from xmodule.x_module import prefer_xmodules
 
 from lms.lib.xblock.runtime import unquote_slashes
 
@@ -44,12 +45,18 @@ COMPONENT_TYPES = ['discussion', 'html', 'problem', 'video']
 
 OPEN_ENDED_COMPONENT_TYPES = ["combinedopenended", "peergrading"]
 NOTE_COMPONENT_TYPES = ['notes']
-ADVANCED_COMPONENT_TYPES = [
-    'annotatable',
-    'word_cloud',
-    'graphical_slider_tool',
-    'lti',
-] + OPEN_ENDED_COMPONENT_TYPES + NOTE_COMPONENT_TYPES
+
+if settings.FEATURES.get('ALLOW_ALL_ADVANCED_COMPONENTS'):
+    ADVANCED_COMPONENT_TYPES = sorted(set(name for name, class_ in XBlock.load_classes()) - set(COMPONENT_TYPES))
+else:
+
+    ADVANCED_COMPONENT_TYPES = [
+        'annotatable',
+        'word_cloud',
+        'graphical_slider_tool',
+        'lti',
+    ] + OPEN_ENDED_COMPONENT_TYPES + NOTE_COMPONENT_TYPES
+
 ADVANCED_COMPONENT_CATEGORY = 'advanced'
 ADVANCED_COMPONENT_POLICY_KEY = 'advanced_modules'
 
@@ -138,7 +145,7 @@ def _load_mixed_class(category):
     """
     Load an XBlock by category name, and apply all defined mixins
     """
-    component_class = XModuleDescriptor.load_class(category)
+    component_class = XBlock.load_class(category, select=prefer_xmodules)
     mixologist = Mixologist(settings.XBLOCK_MIXINS)
     return mixologist.mix(component_class)
 

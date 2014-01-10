@@ -11,7 +11,9 @@ from django.contrib.auth.models import Group, AnonymousUser
 from xmodule.course_module import CourseDescriptor
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore import Location
-from xmodule.x_module import XModule, XModuleDescriptor
+from xmodule.x_module import XModule
+
+from xblock.core import XBlock
 
 from student.models import CourseEnrollmentAllowed
 from external_auth.models import ExternalAuthMap
@@ -74,12 +76,12 @@ def has_access(user, obj, action, course_context=None):
     if isinstance(obj, ErrorDescriptor):
         return _has_access_error_desc(user, obj, action, course_context)
 
-    # NOTE: any descriptor access checkers need to go above this
-    if isinstance(obj, XModuleDescriptor):
-        return _has_access_descriptor(user, obj, action, course_context)
-
     if isinstance(obj, XModule):
         return _has_access_xmodule(user, obj, action, course_context)
+
+    # NOTE: any descriptor access checkers need to go above this
+    if isinstance(obj, XBlock):
+        return _has_access_descriptor(user, obj, action, course_context)
 
     if isinstance(obj, Location):
         return _has_access_location(user, obj, action, course_context)
@@ -338,7 +340,7 @@ def _dispatch(table, action, user, obj):
         debug("%s user %s, object %s, action %s",
               'ALLOWED' if result else 'DENIED',
               user,
-              obj.location.url() if isinstance(obj, XModuleDescriptor) else str(obj)[:60],
+              obj.location.url() if isinstance(obj, XBlock) else str(obj)[:60],
               action)
         return result
 

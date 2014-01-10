@@ -5,6 +5,13 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Common: Add feature flags to allow developer use of pure XBlocks
+  - ALLOW_ALL_ADVANCED_COMPONENTS disables the hard-coded list of advanced
+    components in Studio, and allows any xblock to be added as an
+    advanced component in Studio settings
+  - XBLOCK_SELECT_FUNCTION allows the insertion of a custom function
+    to limit loading of XBlocks with (including allowing pure xblocks)
+
 Studio: Add sorting by column to the Files & Uploads page.
 See mongo_indexes.md for new indices that should be added.
 
