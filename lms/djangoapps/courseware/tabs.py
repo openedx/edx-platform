@@ -15,14 +15,13 @@ import logging
 from django.conf import settings
 from django.core.urlresolvers import reverse
 
-from courseware.access import has_access
-
-from .module_render import get_module
-from courseware.access import has_access
+from edxmako.shortcuts import render_to_string
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
-from courseware.model_data import FieldDataCache
 
+from courseware.access import has_access
+from courseware.model_data import FieldDataCache
+from courseware.module_render import get_module
 from open_ended_grading import open_ended_notifications
 
 import waffle
@@ -443,6 +442,13 @@ def get_static_tab_contents(request, course, tab):
     html = ''
 
     if tab_module is not None:
-        html = tab_module.render('student_view').content
+        try:
+            html = tab_module.render('student_view').content
+        except Exception:  # pylint: disable=broad-except
+            html = render_to_string('courseware/error-message.html', None)
+            log.exception("Error rendering course={course}, tab={tab_url}".format(
+                course=course,
+                tab_url=tab['url_slug']
+            ))
 
     return html
