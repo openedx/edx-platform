@@ -89,7 +89,7 @@ class Command(BaseCommand):
             'gf' if grandfather else 'T'])
         query = [
             ('pfCertificationName', certificate.name),
-            ('pfAuthorityName', self.api.config['COMPANY_NAME']),
+            ('pfAuthorityName', settings.PLATFORM_NAME),
             ('pfAuthorityId', self.api.config['COMPANY_ID']),
             ('pfCertificationUrl', certificate.download_url),
             ('pfLicenseNo', certificate.course_id),
@@ -152,6 +152,6 @@ class Command(BaseCommand):
         """
         Send an email.
         """
-        fromaddr = self.api.config['EMAIL_FROM']
+        fromaddr = settings.DEFAULT_FROM_EMAIL
         toaddr = '%s <%s>' % (user.profile.name, user.email)
         send_mail(subject, body, fromaddr, (toaddr,))

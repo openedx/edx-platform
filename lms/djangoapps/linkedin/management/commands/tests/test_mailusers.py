@@ -16,7 +16,7 @@ from django.test import TestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from student.models import UserProfile
 from linkedin.models import LinkedIn
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
+from xmodule.modulestore.tests.django_utils import mixed_store_config
 from linkedin.management.commands import linkedin_mailusers as mailusers
 
 MODULE = 'linkedin.management.commands.linkedin_mailusers.'
@@ -80,7 +80,7 @@ class MailusersTests(TestCase):
         self.assertEqual(
             json.loads(self.barney.linkedin.emailed_courses), ['TESTX/3/TEST3'])
         self.assertEqual(len(mail.outbox), 3)
-        self.assertEqual(mail.outbox[0].from_email, 'The Team <team@test.foo>')
+        self.assertEqual(mail.outbox[0].from_email, settings.DEFAULT_FROM_EMAIL)
         self.assertEqual(
             mail.outbox[0].to, ['Fred Flintstone <fred@bedrock.gov>'])
         self.assertEqual(
