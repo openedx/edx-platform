@@ -258,8 +258,7 @@ def unit_handler(request, tag=None, package_id=None, branch=None, version_guid=N
         preview_lms_base = settings.FEATURES.get('PREVIEW_LMS_BASE')
 
         preview_lms_link = (
-            '//{preview_lms_base}/courses/{org}/{course}/'
-            '{course_name}/courseware/{section}/{subsection}/{index}'
+            u'//{preview_lms_base}/courses/{org}/{course}/{course_name}/courseware/{section}/{subsection}/{index}'
         ).format(
             preview_lms_base=preview_lms_base,
             lms_base=settings.LMS_BASE,

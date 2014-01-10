@@ -1,0 +1,217 @@
+---
+metadata:
+    display_name: مسألة مكتوبة بلغة اللاتكس
+    source_code: |
+        % Nearly any kind of edX problem can be authored using Latex as
+        % the source language.  Write latex as usual, including equations.  The
+        % key new feature is the \edXabox{} macro, which specifies an "Answer
+        % Box" that queries students for a response, and specifies what the
+        % epxected (correct) answer is.
+
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        \subsection{Example "option" problem}
+
+        Where is the earth?
+
+        \edXabox{options='up','down' expect='down'}
+
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        \subsection{Example "symbolic" problem}
+
+        What is Einstein's equation for the energy equivalent of a mass $m$?
+
+        \edXabox{type='symbolic' size='90' expect='m*c^2' }
+
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        \subsection{Example "numerical" problem}
+
+        Estimate the energy savings (in J/y) if all the people
+        ($3\times 10^8$) in the U.~S. switched from U.~S. code to low flow
+        shower heads.
+
+        \edXinline{Energy saved = }\edXabox{expect="0.52" type="numerical" tolerance='0.02' inline='1' } %
+        \edXinline{~EJ/year}
+
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        \subsection{Example "multiple choice" problem}
+
+        What color is a banana?
+
+        \edXabox{ type="multichoice" expect="Yellow" options="Red","Green","Yellow","Blue" }
+
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        \subsection{Example "string response" problem}
+
+        In what U.S. state is Detroit located?
+
+        \edXabox{ type="string" expect="Michigan" options="ci" }
+
+        An explanation of the answer can be provided by using the edXsolution
+        macro.  Click on "Show Answer" to see the solution.
+
+        \begin{edXsolution}
+        Detroit is near Canada, but it is actually in the United States.
+        \end{edXsolution}
+
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        \subsection{Example "custom response" problem}
+
+        This problem demonstrates the use of a custom python script used for
+        checking the answer.
+
+        \begin{edXscript}
+        def sumtest(expect,ans):
+            (a1,a2) = map(float,eval(ans))
+            return (a1+a2)==10
+        \end{edXscript}
+
+        Enter a python list of two numbers which sum to 10, eg [9,1]:
+
+        \edXabox{expect="[1,9]" type="custom" cfn="sumtest"}
+
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        \subsection{Example image}
+
+        Include image by using the edXxml macro:
+
+        \edXxml{<img src="http://autoid.mit.edu/images/mit_dome.jpg"/>}
+
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        \subsection{Example show/hide explanation}
+
+        Extra explanations can be tucked away behind a "showhide" toggle flag:
+
+        \edXshowhide{sh1}{More explanation}{This is a hidden explanation.  It
+        can contain equations: $\alpha = \frac{2}{\sqrt{1+\gamma}}$ }
+
+        This is some text after the showhide example.
+    markdown: !!null
+
+data: |
+    <?xml version="1.0"?>
+    <problem>
+      <text>
+        <p>
+          <h4>مثال مسألة "خيار"</h4>
+        </p>
+        <p>
+    أين الأرض؟ </p>
+        <p>
+          <optionresponse>
+            <optioninput options="('up','down')" correct="down"/>
+          </optionresponse>
+        </p>
+        <p>
+          <h4>مثال مسألة "رمزية"</h4>
+        </p>
+        <p>
+    ما هي معادلة آينشتاين لمساواة الطاقة بالكتلة؟ [mathjaxinline]m[/mathjaxinline]? </p>
+        <p>
+          <symbolicresponse expect="m*c^2">
+            <textline size="90" correct_answer="m*c^2" math="1"/>
+          </symbolicresponse>
+        </p>
+        <p>
+          <h4>مثال مسألة "رقمية"</h4>
+        </p>
+        <p>
+    Estimate the energy savings (in J/y) if all the people ([mathjaxinline]3\times 10^8[/mathjaxinline]) in the U.&#xA0;S. switched from U.&#xA0;S. code to low flow shower heads. </p>
+        <p>
+          <p style="display:inline">Energy saved = </p>
+          <numericalresponse inline="1" answer="0.52">
+            <responseparam description="Numerical Tolerance" type="tolerance" default="0.02" name="tol"/>
+            <formulaequationinput/>
+          </numericalresponse>
+          <p style="display:inline">&#xA0;EJ/year</p>
+        </p>
+        <p>
+          <h4>Example "multiple choice" problem</h4>
+        </p>
+        <p>
+    ما لون الموز؟ </p>
+        <p>
+          <choiceresponse>
+            <checkboxgroup>
+              <choice correct="false" name="1">
+                <text>أحمر</text>
+              </choice>
+              <choice correct="false" name="2">
+                <text>أخضر</text>
+              </choice>
+              <choice correct="true" name="3">
+                <text>أصفر</text>
+              </choice>
+              <choice correct="false" name="4">
+                <text>أزرق</text>
+              </choice>
+            </checkboxgroup>
+          </choiceresponse>
+        </p>
+        <p>
+          <h4>مثال على مسألة مع جواب مطبوع</h4>
+        </p>
+        <p>
+    في أي ولاية أمريكية تقع ديترويت؟ </p>
+        <p>
+          <stringresponse answer="Michigan">
+            <textline/>
+          </stringresponse>
+        </p>
+        <p>
+    Aيمكن تزويد توضيح للإجابة عن طريق استخدام حل  edXsolution الكلي </p>
+        <p>
+          <solution>
+            <font color="blue">الجواب: </font>
+            <font color="blue">تقع ديترويت بالقرب من كندا، و لكنها في الولايات المتحدة الأمريكية. </font>
+          </solution>
+        </p>
+        <p>
+          <h4>مثال مسألة " إجابة مخصصة"</h4>
+        </p>
+        <p>
+    هذه المسألة توضح استعمال نص بايثون مخصص لفحص الإجابة  </p>
+        <script type="text/python" system_path="python_lib">
+    def sumtest(expect,ans):
+        (a1,a2) = map(float,eval(ans))
+        return (a1+a2)==10
+    </script>
+        <p>
+    أدخل قائمة بايثون من رقمين مجموعهما 10، مثال [9,1]: </p>
+        <p>
+          <customresponse cfn="sumtest" expect="[1,9]">
+            <textline correct_answer="[1,9]"/>
+          </customresponse>
+        </p>
+        <p>
+          <h4>مثال صورة</h4>
+        </p>
+        <p>
+    أدخل صورة عن طريق استخدام  edXxml الكلي: </p>
+        <p>
+          <img src="/static/images/mit_dome.jpg"/>
+        </p>
+        <p>
+          <h4>مثال توضيح إظهار/ إخفاء</h4>
+        </p>
+        <p>
+    الأجوبة مطوية تحت زر الإخفاء و الإظهار: </p>
+        <p>
+          <table class="wikitable collapsible collapsed">
+            <tbody>
+              <tr>
+                <th> More explanation [<a href="javascript:$('#sh1').toggle()" id="sh1l">show</a>]</th>
+              </tr>
+              <tr id="sh1" style="display:none">
+                <td>
+                  <p>
+    هذا توضيح مخفي. قد يحتوي على معادلات: [mathjaxinline]\alpha = \frac{2}{\sqrt {1+\gamma }}[/mathjaxinline]  </p>
+                  <p>
+                  هذا بعض النص الموجود بموجب زر الإخفاء و الإظهار.
+                  </p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </p>
+      </text>
+    </problem>

@@ -3,6 +3,8 @@
   from django.core.urlresolvers import reverse
   from django.utils.translation import ugettext as _
   from xmodule.modulestore.django import loc_mapper
+  from django.utils import translation
+  from django.utils.translation import get_language_bidi
 %>
 
 <div class="wrapper-header wrapper" id="view-top">
@@ -38,7 +40,7 @@
       </h2>
 
       <nav class="nav-course nav-dd ui-left">
-        <h2 class="sr">${_("{course_name}'s Navigation:").format(course_name=context_course.display_name_with_default)}</h2>
+        <h2 class="sr">${_(u"{course_name}'s Navigation:").format(course_name=context_course.display_name_with_default)}</h2>
         <ol>
           <li class="nav-item nav-course-courseware">
             <h3 class="title"><span class="label"><span class="label-prefix sr">${_("Course")} </span>${_("Content")}</span> <i class="icon-caret-down ui-toggle-dd"></i></h3>
@@ -114,11 +116,34 @@
     </div>
 
     <div class="wrapper wrapper-r">
+        <form action="/i18n/setlang/" method="POST" id="language_form" style="display: none">
+            <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }"/>
+            <!--<input name="next" type="hidden" value="/next/page/" />-->
+            <select name="language" id="language_code">
+            % for lang in settings.LANGUAGES:
+            <option value="${ lang[0] }">${ lang[1] }</option>
+            % endfor
+            </select>
+            <input type="submit" value="Go" />
+        </form>
       % if user.is_authenticated():
       <nav class="nav-account nav-is-signedin nav-dd ui-right">
+        % if settings.FEATURES['ENABLE_QRF_SETTINGS']:
+            % if translation.get_language() == 'ar':
+              <a class="change_to_ar" style="display: none">عربي</a>
+              <a class="change_to_en" style="float: left; color: #646464; margin-top: 10px; margin-left: 20px; cursor: pointer">English</a>
+              % else:
+              <a class="change_to_ar" style="float: right; color: #646464; margin-top: 8px; margin-right: 20px; cursor: pointer">عربي</a>
+              <a class="change_to_en" style="display: none">English</a>
+            % endif
+        % endif
         <h2 class="sr">${_("Help &amp; Account Navigation")}</h2>
 
-        <ol>
+        % if get_language_bidi():
+          <ol style="margin: 0 0 0 90px">
+        % else:
+          <ol style="margin: 0 80px 0 0">
+        % endif
           <li class="nav-item nav-account-help">
             <h3 class="title"><span class="label">${_("Help")}</span> <i class="icon-caret-down ui-toggle-dd"></i></h3>
 
@@ -160,8 +185,17 @@
 
       % else:
       <nav class="nav-not-signedin nav-pitch">
+        % if settings.FEATURES['ENABLE_QRF_SETTINGS']:
+            % if translation.get_language() == 'ar':
+              <a class="change_to_ar" style="display: none">عربي</a>
+              <a class="change_to_en" style="float: left; color: #646464; margin-top: 10px; margin-left: 20px; cursor: pointer">English</a>
+              % else:
+              <a class="change_to_ar" style="float: right; color: #646464; margin-top: 8px; margin-right: 20px; cursor: pointer">عربي</a>
+              <a class="change_to_en" style="display: none">English</a>
+            % endif
+        % endif
         <h2 class="sr">${_("You're not currently signed in")}</h2>
-        <ol>
+        <ol style="float: right; margin-right: 15px; margin-left: 15px">
           <li class="nav-item nav-not-signedin-hiw">
             <a href="/">${_("How Studio Works")}</a>
           </li>
@@ -180,3 +214,21 @@
     </div>
   </header>
 </div>
+
+<script type="text/javascript">
+    require(["domReady", "jquery", "gettext", "js/models/asset", "js/collections/asset",
+         "js/views/assets", "js/views/feedback_prompt",
+         "js/views/feedback_notification", "js/utils/modal", "jquery.fileupload"],
+        function(domReady, $, gettext, AssetModel, AssetCollection, AssetsView, PromptView, NotificationView, ModalUtils) {
+        $('.change_to_ar').click(function(){
+            $('#language_code').val('ar');
+            $('#language_form').submit();
+        });
+        $('.change_to_en').click(function(){
+            $('#language_code').val('en');
+            $('#language_form').submit();
+        });
+
+    });
+</script>
+

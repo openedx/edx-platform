@@ -340,6 +340,7 @@ class CapaModule(CapaFields, XModule):
         Return some html with data about the module
         """
         progress = self.get_progress()
+
         return self.system.render_template('problem_ajax.html', {
             'element_id': self.location.html_id(),
             'id': self.id,
@@ -938,7 +939,7 @@ class CapaModule(CapaFields, XModule):
             self.set_state_from_lcp()
 
         except (StudentInputError, ResponseError, LoncapaProblemError) as inst:
-            log.warning("StudentInputError in capa_module:problem_check",
+            log.warning(u"StudentInputError in capa_module:problem_check",
                         exc_info=True)
 
             # Save the user's state before failing

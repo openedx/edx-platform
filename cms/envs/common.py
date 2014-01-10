@@ -62,6 +62,9 @@ FEATURES = {
     # If set to True, new Studio users won't be able to author courses unless
     # edX has explicitly added them to the course creator group.
     'ENABLE_CREATOR_GROUP': False,
+
+    # Added for enabling and disabling Arabic language change.
+    'ENABLE_QRF_SETTINGS': False,
 }
 ENABLE_JASMINE = False
 
@@ -265,17 +268,35 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/cms-style-app.css',
     },
+    'style-app-rtl': {
+        'source_filenames': [
+            'sass/style-app-rtl.css',
+        ],
+        'output_filename': 'css/cms-style-app-rtl.css',
+    },
     'style-app-extend1': {
         'source_filenames': [
             'sass/style-app-extend1.css',
         ],
         'output_filename': 'css/cms-style-app-extend1.css',
     },
+    'style-app-extend1-rtl': {
+        'source_filenames': [
+            'sass/style-app-extend1-rtl.css',
+        ],
+        'output_filename': 'css/cms-style-app-extend1-rtl.css',
+    },
     'style-xmodule': {
         'source_filenames': [
             'sass/style-xmodule.css',
         ],
         'output_filename': 'css/cms-style-xmodule.css',
+    },
+    'style-xmodule-rtl': {
+        'source_filenames': [
+            'sass/style-xmodule-rtl.css',
+        ],
+        'output_filename': 'css/cms-style-xmodule-rtl.css',
     },
 }
 

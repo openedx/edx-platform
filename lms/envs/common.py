@@ -75,7 +75,7 @@ FEATURES = {
                                         # set to None to do no university selection
 
     'ENABLE_TEXTBOOK': True,
-    'ENABLE_DISCUSSION_SERVICE': True,
+    'ENABLE_DISCUSSION_SERVICE': False,
     # discussion home panel, which includes a subscription on/off setting for discussion digest emails.
     # this should remain off in production until digest notifications are online.
     'ENABLE_DISCUSSION_HOME_PANEL': False,
@@ -202,6 +202,10 @@ FEATURES = {
     # Give course staff unrestricted access to grade downloads (if set to False,
     # only edX superusers can perform the downloads)
     'ALLOW_COURSE_STAFF_GRADE_DOWNLOADS': False,
+
+    # Added for enabling and disabling Arabic language change. (A better
+    # solution to be implemented)
+    'ENABLE_QRF_SETTINGS': False,
 }
 
 # Used for A/B testing
@@ -695,9 +699,22 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/lms-style-app.css',
     },
+    'style-app-rtl': {
+        'source_filenames': [
+            'sass/application-rtl.css',
+            'sass/ie.css'
+        ],
+        'output_filename': 'css/lms-style-app-rtl.css',
+    },
     'style-app-extend1': {
         'source_filenames': [
             'sass/application-extend1.css',
+        ],
+        'output_filename': 'css/lms-style-app-extend1.css',
+    },
+    'style-app-extend1-rtl': {
+        'source_filenames': [
+            'sass/application-extend1-rtl.css',
         ],
         'output_filename': 'css/lms-style-app-extend1.css',
     },
@@ -706,6 +723,12 @@ PIPELINE_CSS = {
             'sass/application-extend2.css',
         ],
         'output_filename': 'css/lms-style-app-extend2.css',
+    },
+    'style-app-extend2-rtl': {
+        'source_filenames': [
+            'sass/application-extend2-rtl.css',
+        ],
+        'output_filename': 'css/lms-style-app-extend2-rtl.css',
     },
     'style-course-vendor': {
         'source_filenames': [
@@ -716,12 +739,20 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/lms-style-course-vendor.css',
     },
+
     'style-course': {
         'source_filenames': [
             'sass/course.css',
             'xmodule/modules.css',
         ],
         'output_filename': 'css/lms-style-course.css',
+    },
+    'style-course-rtl': {
+        'source_filenames': [
+            'sass/course-rtl.css',
+            'xmodule/modules.css',
+        ],
+        'output_filename': 'css/lms-style-course-rtl.css',
     },
 }
 
