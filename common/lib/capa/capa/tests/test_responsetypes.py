@@ -1150,7 +1150,7 @@ class NumericalResponseTest(ResponseTest):
             """A fake gettext.Translations object."""
             def ugettext(self, text):
                 """Return the 'translation' of `text`."""
-                if text == "There was a problem with the staff answer to this problem":
+                if text == "There was a problem with the staff answer to this problem.":
                     text = "TRANSLATED!"
                 return text
         problem.capa_system.i18n = FakeTranslations()
