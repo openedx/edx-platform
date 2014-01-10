@@ -544,13 +544,7 @@ The `courseware_studentmodule` table holds all courseware state for a given user
       "current_task_number": 0, "student_attempts": 0}
     }
 
-
-
-
-  `conditional`
-    Conditionals don't actually store any state, so this value is always an empty JSON dictionary (`'{}'`). We should probably remove these entries altogether.
-
-    Following is an example of a problem in **assessing** state:
+   Following is an example of a problem in **assessing** state:
 
    ::
 
@@ -560,6 +554,10 @@ The `courseware_studentmodule` table holds all courseware state for a given user
       "child_history": [], "max_score": 2, "child_state": "initial"}"], 
       "current_task_number": 0, "student_attempts": 0}
     }
+
+
+  `conditional`
+    Conditionals don't actually store any state, so this value is always an empty JSON dictionary (`'{}'`). We should probably remove these entries altogether.
 
   `problem`
     There are many kinds of problems supported by the system, and they all have different state requirements. Note that one problem can have many different response fields. If a problem generates a random circuit and asks five questions about it, then all of that is stored in one row in `courseware_studentmodule`.
