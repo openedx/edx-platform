@@ -542,7 +542,6 @@ The `courseware_studentmodule` table holds all courseware state for a given user
       "current_task_number": 0, "student_attempts": 0}
     }
 
-   
    Following is an example of a problem in **assessing** state::
 
     {
