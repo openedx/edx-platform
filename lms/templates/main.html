@@ -9,6 +9,7 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%! from microsite_configuration.middleware import MicrositeConfiguration %>
 <%! from microsite_configuration import page_title_breadcrumbs %>
+<%! from django.utils.translation import get_language_bidi %>
 
 <%namespace name='static' file='static_content.html'/>
 <%! from django.utils import html %>
@@ -50,11 +51,16 @@
   <script type="text/javascript" src="/jsi18n/"></script>
 
   <link rel="icon" type="image/x-icon" href="${static.url(MicrositeConfiguration.get_microsite_configuration_value('favicon_path', settings.FAVICON_PATH))}" />
-
-  <%static:css group='style-vendor'/>
-  <%static:css group='style-app'/>
-  <%static:css group='style-app-extend1'/>
-  <%static:css group='style-app-extend2'/>
+    <%static:css group='style-vendor'/>
+    % if get_language_bidi():
+    <%static:css group='style-app-rtl'/>
+    <%static:css group='style-app-extend1-rtl'/>
+    <%static:css group='style-app-extend2-rtl'/>
+    % else:
+    <%static:css group='style-app'/>
+    <%static:css group='style-app-extend1'/>
+    <%static:css group='style-app-extend2'/>
+    % endif
 
   <%static:js group='main_vendor'/>
 

@@ -1,4 +1,5 @@
 <%! from django.utils.translation import ugettext as _ %>
+<%! from django.utils.translation import get_language_bidi %>
 <%inherit file="/main.html" />
 <%! from django.core.urlresolvers import reverse %>
 <%namespace name='static' file='/static_content.html'/>
@@ -11,8 +12,12 @@
 </%block>
 
 <%block name="headextra">
-<%static:css group='style-course-vendor'/>
-<%static:css group='style-course'/>
+    <%static:css group='style-course-vendor'/>
+    % if get_language_bidi():
+    <%static:css group='style-course-rtl'/>
+    % else:
+    <%static:css group='style-course'/>
+    % endif
 
   <style type="text/css">
   % for (grade, _), color in zip(ordered_grades, ['green', 'Chocolate']):

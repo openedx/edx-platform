@@ -1,0 +1,28 @@
+// studio - base styling
+// ====================
+
+@import "base";
+
+.wrapper-mast {
+  .mast {
+    &.has-actions {
+      .page-header{
+        float: right;
+      }
+      .nav-actions {
+        float: left;
+        text-align: left;
+      }
+    }
+  }
+}
+
+.item-details {
+  float: right;
+}
+
+.item-actions {
+  right: auto;
+  left: 5px;
+  float: left!important;
+}

@@ -1,4 +1,5 @@
 <%! from django.utils.translation import ugettext as _ %>
+<%! from django.utils.translation import get_language_bidi %>
 
 <%inherit file="main.html" />
 <%namespace name='static' file='static_content.html'/>
@@ -8,7 +9,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <%static:css group='style-course-vendor'/>
+% if get_language_bidi():
+<%static:css group='style-course-rtl'/>
+% else:
 <%static:css group='style-course'/>
+% endif
 <%static:js group='courseware'/>
 <link rel="stylesheet" href="/static/css/pdfviewer.css"/>
 <script type="text/javascript" src="/static/js/vendor/pdfjs/pdf.js"></script>

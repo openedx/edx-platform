@@ -81,7 +81,7 @@ category = ${category | h}
     <form id="${element_id}_history_form">
       <label for="${element_id}_history_student_username">${_("User:")}</label>
       <input id="${element_id}_history_student_username" type="text" placeholder=""/>
-      <input type="hidden" id="${element_id}_history_location" value="${location}"/>
+      <input type="hidden" id="${element_id}_history_location" value="${location | h}"/>
       <div class="submit">
         <button name="submit" type="submit">${_("View History")}</button>
       </div>
@@ -104,7 +104,7 @@ $(function () {
         null,
         %endif
         {
-            'location': '${location}',
+            'location': '${location | h}',
             'xqa_key': '${xqa_key}',
             'category': '${category}',
             'user': '${user}'

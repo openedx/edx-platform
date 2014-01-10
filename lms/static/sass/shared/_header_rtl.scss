@@ -1,0 +1,22 @@
+@import "header";
+
+header.global {
+  h1.logo {
+    float: right;
+    margin: -2px 0 0px 39px;
+  }
+
+  ol {
+    &.left {
+      float: right;
+    }
+
+    &.user {
+      float: left;
+    }
+  }
+
+  .nav-courseware {
+    float: left;
+  }
+}

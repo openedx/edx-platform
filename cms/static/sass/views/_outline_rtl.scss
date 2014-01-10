@@ -1,0 +1,42 @@
+// studio - views - course outline
+// ====================
+
+@import "outline";
+
+.view-outline {
+  .branch {
+    .section-item {
+      .details {
+        float: right;
+      }
+      .gradable-status {
+        float: left;
+        right: auto;
+        left: 50px;
+      }
+    }
+  }
+  .courseware-section {
+    header {
+      .expand-collapse-icon {
+        float: right;
+        margin: 25px 16px 16px 6px;
+      }
+    }
+    .section-published-date {
+      right: auto;
+      left: 80px;
+    }
+  }
+}
+
+.item-actions {
+  right: auto;
+  left: 5px;
+}
+
+.drag-handle {
+  float: left;
+  margin-left: 0;
+  margin-right: 11px;
+}

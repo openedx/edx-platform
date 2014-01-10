@@ -3,6 +3,7 @@
 
 <%inherit file="/main.html" />
 <%namespace name='static' file='/static_content.html'/>
+<%! from django.utils.translation import get_language_bidi %>
 
 ## ----- Tips on adding something to the new instructor dashboard -----
 ## 1. add your input element, e.g. in instructor_dashboard2/data_download.html
@@ -21,8 +22,12 @@
 <%block name="nav_skip">#instructor-dashboard-content</%block>
 
 <%block name="headextra">
-  <%static:css group='style-course-vendor'/>
-  <%static:css group='style-course'/>
+    <%static:css group='style-course-vendor'/>
+    % if get_language_bidi():
+    <%static:css group='style-course-rtl'/>
+    % else:
+    <%static:css group='style-course'/>
+    % endif
   <script type="text/javascript" src="${static.url('js/vendor/underscore-min.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/mustache.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>

@@ -1,5 +1,6 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%! from courseware.courses import get_course_info_section %>
+<%! from django.utils.translation import get_language_bidi %>
 
 <%inherit file="../main.html" />
 <%namespace name='static' file='../static_content.html'/>
@@ -7,8 +8,12 @@
 <%block name="pagetitle">${_("{course_number} Course Info").format(course_number=course.display_number_with_default)}</%block>
 
 <%block name="headextra">
-<%static:css group='style-course-vendor'/>
-<%static:css group='style-course'/>
+    <%static:css group='style-course-vendor'/>
+    % if get_language_bidi():
+    <%static:css group='style-course-rtl'/>
+    % else:
+    <%static:css group='style-course'/>
+    % endif
 </%block>
 
 <%include file="/dashboard/_dashboard_prompt_midcourse_reverify.html" />
@@ -28,14 +33,31 @@ $(document).ready(function(){
 <section class="container">
   <div class="info-wrapper">
     % if user.is_authenticated():
-    <section class="updates">
-      <h1>${_("Course Updates &amp; News")}</h1>
-      ${get_course_info_section(request, course, 'updates')}
-    </section>
-    <section aria-label="Handout Navigation" class="handouts">
-      <h1>${course.info_sidebar_name}</h1>
-      ${get_course_info_section(request, course, 'handouts')}
-    </section>
+    % if get_language_bidi():
+
+
+        <section class="updates" style="text-align: right">
+          <h1 style="text-align: right">${_("Course Updates &amp; News")}</h1>
+          ${get_course_info_section(request, course, 'updates')}
+        </section>
+
+        <section aria-label="Handout Navigation" class="handouts" style="text-align: right">
+            <h1 style="text-align: right">${_("Course Handouts")}</h1>
+    ##      <h1>${course.info_sidebar_name}</h1>
+          ${get_course_info_section(request, course, 'handouts')}
+        </section>
+
+      % else:
+        <section class="updates">
+          <h1>${_("Course Updates &amp; News")}</h1>
+          ${get_course_info_section(request, course, 'updates')}
+        </section>
+        <section aria-label="Handout Navigation" class="handouts">
+            <h1>${_("Course Handouts")}</h1>
+    ##      <h1>${course.info_sidebar_name}</h1>
+          ${get_course_info_section(request, course, 'handouts')}
+        </section>
+      % endif
     % else:
     <section class="updates">
       <h1>${_("Course Updates &amp; News")}</h1>
