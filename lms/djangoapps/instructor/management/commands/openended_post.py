@@ -19,7 +19,7 @@ class Command(BaseCommand):
     Command to manually re-post open ended submissions to the grader.
     """
 
-    help = ("Usage: openended_post <course_id> <problem_location> <student_ids.txt> --dry-run --task-number=<task_number>\n"
+    help = ("Usage: openended_post <course_id> <problem_location> <student_ids.txt> <hostname> --dry-run --task-number=<task_number>\n"
             "The text file should contain a User.id in each line.")
 
     option_list = BaseCommand.option_list + (
@@ -36,10 +36,11 @@ class Command(BaseCommand):
         dry_run = options['dry_run']
         task_number = options['task_number']
 
-        if len(args) == 3:
+        if len(args) == 4:
             course_id = args[0]
             location = args[1]
             students_ids = [line.strip() for line in open(args[2])]
+            hostname = args[3]
         else:
             print self.help
             return
@@ -62,15 +63,22 @@ class Command(BaseCommand):
         print "Number of students: {0}".format(students.count())
 
         for student in students:
-            post_submission_for_student(student, course, location, task_number, dry_run=dry_run)
+            post_submission_for_student(student, course, location, task_number, dry_run=dry_run, hostname=hostname)
 
 
-def post_submission_for_student(student, course, location, task_number, dry_run=True):
+def post_submission_for_student(student, course, location, task_number, dry_run=True, hostname=None):
     """If the student's task child_state is ASSESSING post submission to grader."""
 
     print "{0}:{1}".format(student.id, student.username)
+
+    request = None
+    if hostname is not None:
+        request = DummyRequest()
+        request.user = student
+        request.host = hostname
+
     try:
-        module = get_module_for_student(student, course, location)
+        module = get_module_for_student(student, course, location, request=request)
         if module is None:
             print "  WARNING: No state found."
             return False
@@ -104,3 +112,23 @@ def post_submission_for_student(student, course, location, task_number, dry_run=
         print err
 
     return False
+
+class DummyRequest(object):
+    """Dummy request"""
+
+    META = {}
+
+    def __init__(self):
+        self.session = {}
+        self.user = None
+        self.host = None
+        self.secure = True
+        return
+
+    def get_host(self):
+        """Return a default host."""
+        return self.host
+
+    def is_secure(self):
+        """Always secure."""
+        return self.secure
