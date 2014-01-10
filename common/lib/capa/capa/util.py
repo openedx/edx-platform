@@ -7,14 +7,15 @@ from cmath import isinf
 
 
 def compare_with_tolerance(v1, v2, tol):
-    ''' Compare v1 to v2 with maximum tolerance tol
-    tol is relative if it ends in %; otherwise, it is absolute
+    """
+    Compare v1 to v2 with maximum tolerance `tol`.
+    `tol` is relative if it ends in %; otherwise, it is absolute.
 
      - v1    :  student result (number)
      - v2    :  instructor result (number)
      - tol   :  tolerance (string representing a number)
 
-    '''
+    """
     relative = tol.endswith('%')
     if relative:
         tolerance_rel = evaluator(dict(), dict(), tol[:-1]) * 0.01
@@ -32,8 +33,10 @@ def compare_with_tolerance(v1, v2, tol):
 
 
 def contextualize_text(text, context):  # private
-    ''' Takes a string with variables. E.g. $a+$b.
-    Does a substitution of those variables from the context '''
+    """
+    Takes a string with variables. E.g. $a+$b.
+    Does a substitution of those variables from the context
+    """
     if not text:
         return text
     for key in sorted(context, lambda x, y: cmp(len(y), len(x))):
@@ -52,10 +55,10 @@ def contextualize_text(text, context):  # private
 
 
 def convert_files_to_filenames(answers):
-    '''
+    """
     Check for File objects in the dict of submitted answers,
         convert File objects to their filename (string)
-    '''
+    """
     new_answers = dict()
     for answer_id in answers.keys():
         answer = answers[answer_id]
@@ -72,9 +75,9 @@ def is_list_of_files(files):
 
 
 def is_file(file_to_test):
-    '''
+    """
     Duck typing to check if 'file_to_test' is a File object
-    '''
+    """
     return all(hasattr(file_to_test, method) for method in ['read', 'name'])
 
 

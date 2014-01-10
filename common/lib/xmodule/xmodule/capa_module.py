@@ -1040,7 +1040,7 @@ class CapaModule(CapaFields, XModule):
             event_info['failure'] = 'unsupported'
             self.system.track_function('problem_rescore_fail', event_info)
             # Translators: 'rescoring' refers to the act of re-submitting a student's solution so it can get a new score.
-            raise NotImplementedError(_("Problem's definition does not support rescoring"))
+            raise NotImplementedError(_("Problem's definition does not support rescoring."))
 
         if not self.done:
             event_info['failure'] = 'unanswered'
@@ -1119,7 +1119,7 @@ class CapaModule(CapaFields, XModule):
             self.system.track_function('save_problem_fail', event_info)
             return {
                 'success': False,
-                'msg': _("Problem is closed")
+                'msg': _("Problem is closed.")
             }
 
         # Problem submitted. Student should reset before saving
@@ -1129,7 +1129,7 @@ class CapaModule(CapaFields, XModule):
             self.system.track_function('save_problem_fail', event_info)
             return {
                 'success': False,
-                'msg': _("Problem needs to be reset prior to save")
+                'msg': _("Problem needs to be reset prior to save.")
             }
 
         self.lcp.student_answers = answers
@@ -1137,9 +1137,9 @@ class CapaModule(CapaFields, XModule):
         self.set_state_from_lcp()
 
         self.system.track_function('save_problem_success', event_info)
-        msg = _("Your answers have been saved")
+        msg = _("Your answers have been saved.")
         if not self.max_attempts == 0:
-            msg = _("Your answers have been saved but not graded. Hit 'Check' to grade them.")
+            msg = _("Your answers have been saved but not graded. Click 'Check' to grade them.")
         return {
             'success': True,
             'msg': msg
@@ -1167,7 +1167,7 @@ class CapaModule(CapaFields, XModule):
             self.system.track_function('reset_problem_fail', event_info)
             return {
                 'success': False,
-                'error': _("Problem is closed")
+                'error': _("Problem is closed.")
             }
 
         if not self.done:
