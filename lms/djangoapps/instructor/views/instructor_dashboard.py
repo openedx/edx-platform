@@ -23,6 +23,7 @@ from courseware.courses import get_course_by_id, get_cms_course_link
 from django_comment_client.utils import has_forum_access
 from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from student.models import CourseEnrollment
+from open_ended_grading.utils import check_if_open_ended_problems_exist
 from bulk_email.models import CourseAuthorization
 from lms.lib.xblock.runtime import handler_prefix
 
@@ -173,6 +174,9 @@ def _section_data_download(course_id, access):
         'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': course_id}),
         'list_grade_downloads_url': reverse('list_grade_downloads', kwargs={'course_id': course_id}),
         'calculate_grades_csv_url': reverse('calculate_grades_csv', kwargs={'course_id': course_id}),
+        'open_ended_problems_exist_in_course': check_if_open_ended_problems_exist(course_id),
+        'get_open_ended_data_url': reverse('get_open_ended_data', kwargs={'course_id': course_id}),
+
     }
     return section_data
 

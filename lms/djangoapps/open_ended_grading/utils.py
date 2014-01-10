@@ -5,15 +5,14 @@ from xmodule.modulestore import search
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from xmodule.open_ended_grading_classes.controller_query_service import ControllerQueryService
-from xmodule.open_ended_grading_classes.grading_service_module import GradingServiceError
+from xmodule.open_ended_grading_classes.grading_service_module import GradingServiceError, GradingService
 
 from django.utils.translation import ugettext as _
 from django.conf import settings
 
 from lms.lib.xblock.runtime import LmsModuleSystem
 from edxmako.shortcuts import render_to_string
-
-
+from xmodule.course_module import CourseDescriptor
 log = logging.getLogger(__name__)
 
 GRADER_DISPLAY_NAMES = {
@@ -172,3 +171,53 @@ class StudentProblemList(object):
             problem['grader_type_display_name'] = grader_type_display_name
             valid_problems.append(problem)
         return valid_problems
+
+
+def check_if_open_ended_problems_exist(course_id):  # pylint: disable=invalid-name
+    """
+    Check to see if there are any open ended problems in the course.
+    """
+
+    try:
+        # Get the course object.
+        course_location = CourseDescriptor.id_to_location(course_id)
+    except ValueError:
+        # If we get a ValueError, the course id is invalid.
+        return False
+
+    # See if we can find any items in the modulestore.
+    items = modulestore().get_items(
+        ['i4x', course_location.org, course_location.course, 'combinedopenended', None],
+        course_id=course_id
+    )
+
+    return len(items) > 0
+
+
+class CourseDataService(GradingService):
+    """
+    A service that queries the ORA server for course data.
+    """
+    def __init__(self, config):
+        config['system'] = SYSTEM
+        super(CourseDataService, self).__init__(config)
+        self.url = config['url'] + config['grading_controller']
+        self.course_data_url = self.url + "/get_course_data/"
+        self.login_url = self.url + '/login/'
+
+    def get_course_data(self, course_id):
+        """
+        Get a url for the course data dump for a given course.
+
+        Args:
+            course_id: course id that we want the data dump for.
+
+        Returns:
+            json string with the response from the service.  Contains a boolean success, and a key 'file_url'
+            if success is True.
+
+        Raises:
+            GradingServiceError: something went wrong with the connection.
+        """
+        params = {'course': course_id}
+        return json.loads(self.get(self.course_data_url, params))
