@@ -177,6 +177,15 @@ client error are correctly passed through to the client.
 LMS: Improve performance of page load and thread list load for
 discussion tab
 
+Studio: Support targeted feedback, which allows for authors to provide explanations for
+incorrect choice selections for multiple choice question choices that will automatically
+display. These are intended to help steer a student to the correct answer. Thus, they are
+best used for quizzes that allow multiple attempts. To provide targeted feedback, add an
+element called <targetedfeedbackset> right before your <solution> or <solutionset>, and in
+this element, provide a <targetedfeedback> for each feedback. Within <targetedfeedback>
+you can specify your text explanation. Both the <targetedfeedback> and <choice> should have
+the same explanation-id attribute.
+
 LMS: The wiki markup cheatsheet dialog is now accessible to screen readers.
 (LMS-1303)
 
