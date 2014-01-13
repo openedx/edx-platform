@@ -13,6 +13,7 @@ Export a Course
 ***************
 There are several reasons you may want to export your course:
 
+* To save your work
 * To edit the XML in your course directly
 * To create a backup copy of your course, which you can import if you want to revert the course back to a previous state
 * To create a copy of your course that you can later import into another course instance and customize

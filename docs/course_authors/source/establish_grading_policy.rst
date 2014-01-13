@@ -155,6 +155,47 @@ Both Subsections can contain other content as well as the actual homework or lab
 
 See :ref:`Working with Problem Components` for instructions on creating problems. 
 
+
+
+=======================
+Set the Grading Policy
+=======================
+
+You can designate a subsection as one of the assignment types that you specified in the grading policy.
+
+You set the grading policy for the subsection from the course outline or from the subsection page.
+
+From the course outline, click the checkmark next to the subsection.  Then select a grading policy from the popup menu:
+
+    .. image:: Images/course_outline_set_grade.png
+       :width: 600
+
+From the Subsection page, click the text next to the **Graded as** label, then select a grading policy from the popup menu:
+
+    .. image:: Images/subsection_set_grade.png
+       :width: 600
+
+See :ref:`Establish a Grading Policy` for more information.
+
+
+==================
+Set the Due Date
+==================
+
+For subsections that contain graded problems, you can set a due date. Students must complete the problems in the subsection before the due date to get credit.
+
+#. From the subsection page, click **SET A DUE DATE**. The Due Day and Due Time fields appear.
+#. Place the cursor in the Due Date field, and pick a day from the popup calendar.
+#. Place the cursor in the Due Time field and pick a time.
+
+.. note:: When you set a due date, keep in mind that students will be in different time zones. By default, the time zone appears as UTC, not the student's local time. If you tell your students an assignment is due at 5:00 PM, make sure to specify that the time is 5:00 PM UTC and point them to a time converter.
+
+Alternatively, you can :ref:`Set the Grace Period` for your assignments to cover any misunderstandings about time. For example, some classes have set a grace period of 1 day, 6 hours, and 1 minute. The grace period applies to all assignments.
+
+For more information, see :ref:`Establish a Grading Policy`.
+
+
+
 .. _student_view:
 
 **************************

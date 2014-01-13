@@ -5,27 +5,60 @@
 Working with HTML Components
 #############################
 
-*******************
-Overview
-*******************
+***********************
+HTML Component Overview
+***********************
 
-You use an HTML component to add and format text for your course. 
-You can add text, lists, links and images in an HTML component. 
+HTML components are the most basic building blocks of your course. You use HTML components to add and format text, links, images, and more. 
 
-See the following topics:
+For more information, see the following topics:
 
+* :ref:`The User Interface`
 * :ref:`Create an HTML Component`
-* :ref:`Work with the Visual and HTML Editors`
-* :ref:`Use the Announcement Template`
-* :ref:`Use the Anonymous User ID Template`
-* :ref:`Import Content from LaTex`
 * :ref:`Add a Link in an HTML Component`
 * :ref:`Add an Image to an HTML Component`
+* :ref:`Import LaTeX Code`
 
-.. note:: Ensure you understand the chapter :ref:`Organizing Your Course Content` before working with HTML components.
+.. note:: Review :ref:`Organizing Your Course Content` and :ref:`Best Practices for HTML Markup` before you start working with HTML components.
 
-.. note:: Review :ref:`Best Practices for HTML Markup` before adding HTML components to your course.
+.. _The User Interface:
 
+*****************************************
+The HTML Component User Interface
+*****************************************
+
+When you create a new HTML component, you work with the HTML component editor. The editor has two views: **Visual view** and **HTML view.** To switch between Visual view and HTML view, click the tab in the upper-right corner of the component editor.
+
+.. image:: Images/HTMLEditorTabs.gif
+
+- **Visual view** provides a “what you see is what you get” (WYSIWYG) editor that allows you to format text by clicking the formatting buttons at the top of the editor. By default, every HTML component opens in Visual view.
+
+  Visual view includes the following formatting buttons.
+
+  .. image:: Images/HTML_VisualView_Toolbar.gif
+
+  #. Select a formatting style, such as heading 1, heading 2, or paragraph.
+  #. Format text in bold.
+  #. Format text in italics.
+  #. Underline text.
+  #. Create a bulleted list.
+  #. Create a numbered list.
+  #. Decrease the indent.
+  #. Indent text.
+  #. Format text as a blockquote.
+  #. Format text as code (i.e., in Courier font).
+  #. Create a link.
+  #. Delete the current link.
+
+  Visual view shows your content the way it will appear in the LMS. The following is the LMS rendition of the HTML component above.
+
+  .. image:: Images/HTMLComponent_VisualView_LMS.gif
+
+- **HTML view** allows you to edit HTML code directly.
+
+  .. image:: Images/HTML_HTMLView.gif
+
+  .. note:: If you're in HTML view, you can always switch to Visual view to make sure your content looks the way you expect. For example, we recommend that you do this if you add an image or a link to an HTML component.
 
 .. _Create an HTML Component:
 
@@ -33,161 +66,37 @@ See the following topics:
 Create an HTML Component
 *****************************
 
-To create a new HTML component in an existing unit, ensure the unit is private.  
-For more information on public and private units, see :ref:`Public and Private Units`.
+To create an HTML component:
 
-#. Under **Add New Component**, click the **html** icon.
+1. Under **Add New Component**, click **html**.
 
-  .. image:: Images/NewComponent_HTML.png
+  .. image:: Images/NewComponent_HTML.gif
 
 2. In the list that appears, click **Text**.
 
-   An empty component appears at the bottom of the Unit.
-   
-  .. image:: Images/HTMLComponent_Edit.png
-   
+   An empty component appears at the bottom of the unit.
+
+  .. image:: Images/HTMLComponent_Edit.gif
+
 3. In the empty component, click **Edit**.
-   
-   The HTML Component Editor opens. 
-  
-  .. image:: Images/HTMLEditor.png
 
-4. Click **Settings** to enter the **Display Name** for the HTML component. 
+   The HTML component editor opens in Visual view.
 
-   A student sees the Display when hovering your mouse over the icon for the Unit in the Subsection accordian. 
+  .. image:: Images/HTMLEditor.gif
 
-   Click **Save** to return to the Component Editor. 
+4. Enter the text and formatting that you want, either by using the formatting buttons in Visual view or by manually adding HTML tags in HTML view.
 
-5. Enter text as needed. 
+5. Enter a display name (the name that you want students to see). To do this, click **Settings** in the upper-right corner of the component editor, and then enter text in the **Display Name** field.
+
+   To return to the text editor, click **Editor** in the upper-right corner.
 
 6. Click **Save** to save the HTML component.
 
-For more information, see:
+You can also add links and images to HTML components. Or, you can import LaTeX code. For more information, see:
 
-* :ref:`Work with the Visual and HTML Editors`
-* :ref:`Use the Announcement Template`
-* :ref:`Import Content from LaTex`
 * :ref:`Add a Link in an HTML Component`
 * :ref:`Add an Image to an HTML Component`
-
-
-
-.. _Work with the Visual and HTML Editors:
-
-*****************************************
-Work with the Visual and HTML Editors
-*****************************************
-
-The HTML Component editor has two views: the **Visual view** and the **HTML view.**
-
-You select the view by clicking the tab in the upper-right of the component Editor.
-
-.. image:: Images/HTMLEditorTabs.png
-
-==============
-Visual Editor
-==============
-
-The Visual view provides a “what you see is what you get” (WYSIWYG) editor for
-editing a pre-formatted version of the text. 
-
-.. image:: Images/HTMLEditor_Visual.png
-
-Use the buttons at the top of the Visual editor to change the formatting as needed. 
-For example, you can enclose the title in heading tags, create bulleted or numbered lists, 
-or apply bold, italic, or underline formatting. 
-
-==============
-HTML Editor
-==============
-The HTML allows you to edit HTML code directly.
-
-.. image:: Images/HTMLEditor_HTML.png
-
-.. note:: Studio processes the HTML code entered when saving it and before rendering
-  it. Make sure that the text you create looks the way you expect if
-  you go back and forth between the Visual and HTML views.
-
-.. _Use the Announcement Template:
-
-************************************
-Use the Announcement Template
-************************************
-
-When you create a new HTML component, you can select to use a built-in Announcement template.
-
-When creating the new HTML component, select **Announcement**.
-
-.. image:: Images/HTML_Component_Type.png
- :width: 600
- 
-The following screen opens.
-
-.. image:: Images/image073.png
-
-Edit the content of the announcement just as you would any HTML component.
-
-
-.. _Use the Anonymous User ID Template:
-
-************************************
-Use the Anonymous User ID Template
-************************************
-
-When you create a new HTML component, you can select to use a built-in Anonymous User ID template.
-
-The Anonymous User ID template contains HTML set up for you to use a Qualtrics survey in your course.
-
-When creating the new HTML component, select **Anonymous User ID**.
-
-.. image:: Images/HTML_Component_Type.png
- :width: 600
-
-Edit the content just as you would any HTML component.
-
-To use your survey, you must edit the link in the template to include your university and survey ID.  
-
-You can also embed the survey in an iframe in the HTML component.
-
-For more details, read the instructions in the HTML view of the component. 
-
-
-
-
-.. _Import Content from LaTeX:
-
-*************************
-Import Content from LaTeX
-*************************
-
-If LaTeX is enabled for your course, you can create an HTML component from imported LaTeX code.
-
-Studio uses a third-party LaTeX processor to convert LaTeX code to XML. The LaTeX processor must be up and running.
-
-1. When creating the new HTML component, select **E-text Written in LaTeX**.
-
-   The new HTML component opens, with an **upload** link:
-   
-   .. image:: Images/latex_upload.png
-     :width: 800   
-
-2. To upload a LaTeX file from your computer, click **upload**.
-
-   You are prompted to select a file.  The file loads in the LaTeX editor.
-   
-3. In the LaTeX editor, click **Save & Compile to edX XML**.   
-
-   The LaTeX content is added to the HTML component. For example:
-   
-   .. image:: Images/Latex_component.png
-     :width: 800
-
-
-4. Verify that your newly created component looks the way you want it to. 
-
-You can edit the HTML component with LaTeX as you can any other component. 
-In the editor, you can launch the LaTeX source compiler.
-
+* :ref:`Import LaTeX Code`
 
 .. _Add a Link in an HTML Component:
 
@@ -195,21 +104,37 @@ In the editor, you can launch the LaTeX source compiler.
 Add a Link in an HTML Component
 ***********************************
 
-You can add a link in an HTML component to any file you uploaded for the course. 
+To add a link to a website, course unit, or file in an HTML component, you'll work with the **Insert/Edit Link** dialog box.
 
-Find any copy the URL of the file in the Files & Uploads page.
+.. image:: /Images/HTML_Insert-EditLink_DBox.gif
 
-See :ref:`Add Files to a Course` for more information.
+For more information, see:
 
-While editing the HTML component:
+* :ref:`Add a Link to a Website`
+* :ref:`Add a Link to a Course Unit`
+* :ref:`Add a Link to a File`
 
-#. Switch to the HTML view.
+.. _Add a Link to a Website:
 
-#. To create a link to a document, enter the following syntax, where URL OF FILE is the URL that you copied from the Files & Uploads Page and LINK TEXT is the text that the user will click. 
-   
-   ``<p><a href="[URL OF FILE]">[LINK TEXT]</a></p>``
+============================
+Add a Link to a Website
+============================
 
+To add a link to a website:
 
+#. Select the text that you want to make into the link.
+
+#. Click the link icon in the toolbar.
+
+#. In the **Insert/Edit Link** dialog box, enter the URL of the website that you want in the **Link URL** field.
+
+   .. image:: Images/HTML_Insert-EditLink_Website.gif
+
+#. If you want the link to open in a new window, click the drop-down arrow next to the **Target** field, and then select **Open Link in a New Window**. If not, you can leave the default value.
+
+#. Click **Insert**.
+
+#. Save the HTML component and test the link.
 
 
 .. _Add a Link to a Course Unit:
@@ -220,10 +145,9 @@ Add a Link to a Course Unit
 
 You can add a link to a course unit in an HTML component.
 
-#. Determine the unit identifier of the unit you're linking to. To do this, open the
-   unit page in Studio, and locate the **Unit Identifier** field under **Unit Location** in the right pane.
-
-#. Copy the unit identifier.
+#. Obtain the unit identifier of the unit you're linking to. To do this, open the unit page in Studio, and copy the unit ID from the **Unit Identifier** field under **Unit Location** in the right pane.
+   
+   .. image:: /Images/UnitIdentifier.gif
 
 #. Open the HTML component where you want to add the link.
 
@@ -231,16 +155,49 @@ You can add a link to a course unit in an HTML component.
 
 #. Click the link icon in the toolbar.
 
-#. In the Insert/Edit Link dialog box, enter the following in the Link URL field.
-   
-   Make sure to replace <unit identifier>(including the brackets) with the unit
-   identifier that you copied in step 2, and make sure to include both forward slashes (/).
-   
+#. In the **Insert/Edit Link** dialog box, enter the following in the **Link URL** field.
+
    ``/jump_to_id/<unit identifier>``
 
+   Make sure to replace <unit identifier> (including the brackets) with the unit
+   identifier that you copied in step 2, and make sure to include both forward slashes (/).
+
+   .. image:: /Images/HTML_Insert-EditLink_CourseUnit.gif
+
 #. If you want the link to open in a new window, click the drop-down arrow next to
-   the Target field, and then select Open Link in a New Window. If not, you can leave the default value.
-   
+   the **Target** field, and then select **Open Link in a New Window**. If not, you can leave the default value.
+
+#. Click **Insert**.
+
+#. Save the HTML component and test the link.
+
+.. _Add a Link to a File:
+
+============================
+Add a Link to a File
+============================
+
+You can add a link in an HTML component to any file you've uploaded for the course. For more information about uploading files, see :ref:`Add Files to a Course`.
+
+#. On the **Files & Uploads** page, copy the URL of the file.
+
+   .. image:: Images/HTML_Link_File.gif
+
+#. Select the text that you want to make into the link.
+
+#. Click the link icon in the toolbar.
+
+#. In the **Insert/Edit Link** dialog box, enter the following in the **Link URL** field.
+
+   ``/static/FileName.type``
+
+   Make sure to include both forward slashes (/).
+
+   .. image:: /Images/HTML_Insert-EditLink_File.gif
+
+#. If you want the link to open in a new window, click the drop-down arrow next to
+   the **Target** field, and then select **Open Link in a New Window**. If not, you can leave the default value.
+
 #. Click **Insert**.
 
 #. Save the HTML component and test the link.
@@ -252,20 +209,70 @@ You can add a link to a course unit in an HTML component.
 Add an Image to an HTML Component
 ***********************************
 
-You can add an any image that you have uploaded for the course to an HTML component. 
-You must upload the image before editing the HTML component. 
+You can add any image that you have uploaded for the course to an HTML component. For more information about uploading images, see :ref:`Add Files to a Course`.
 
-Find and copy the URL of the image in the Files & Uploads page.
+.. note:: Review :ref:`Best Practices for Describing Images` when you add images to HTML components.
 
-See :ref:`Add Files to a Course` for more information.
+To add an image, you'll need the URL of the image that you uploaded to the course. You'll then create a link to the image in the HTML component.
 
-.. note::  Review :ref:`Best Practices for Describing Images` when adding images to HTML components.
+#. On the **Files & Uploads** page, copy the URL of the image that you want.
 
-While editing the HTML component:
+#. In the HTML component, switch to HTML view.
 
-#. Switch to the HTML view.
+#. In the location where you want to add the image, enter an image tag that uses the following syntax.
 
-#. To add the image to a document, enter the following syntax, where URL OF FILE is the URL that you copied from the Files & Uploads Page. 
-   
-   ``<p><img src="[URL OF FILE]"/></p>``
+   ``<p><img src="[URL of file]" alt="[description]"/></p>``
+
+   For example, your image tag may resemble the following.
+
+   ``<p><img src="/static/GreatLakes.gif" alt="Map of the Great Lakes" /></p>``
+
+#. Switch back to Visual view to make sure your image appears.
+
+.. _Import LaTeX Code:
+
+****************************************
+Import LaTeX Code into an HTML Component
+****************************************
+
+You can import LaTeX code into an HTML component. You might do this, for example, if you want to create "beautiful math" such as the following.
+
+.. image:: Images/HTML_LaTeX_LMS.gif
+
+.. warning:: The LaTeX processor that Studio uses to convert LaTeX code to XML is a third-party tool. We recommend that you use this feature with caution. If you do use it, make sure to work with your PM.
+
+This feature is not enabled by default. To enable it, you have to change the advanced settings in your course. 
+
+To create an HTML component that contains LaTeX code:
+
+#. Enable the policy key in your course.
+
+   #. In Studio, click **Settings**, and then click **Advanced Settings**.
+   #. On the **Advanced Settings** page, scroll down to the **use_latex_compiler** policy key.
+   #. In the **Policy Value** field next to the **use_latex_compiler** policy key, change **false** to **true**.
+   #. At the bottom of the page, click **Save Changes**.
+
+#. In the unit where you want to create the component, click **html** under **Add New Component**, and then click **E-text Written in LaTeX**.
+
+#. In the component that appears, click **upload** in the upper-right corner.
+
+   .. image:: Images/HTML_LaTeX.gif
+
+#. In the dialog box that opens, select a file, and then click **Open**.
+
+   The file loads in the LaTeX editor.
+
+   .. image:: Images/HTML_LaTeXEditor.gif
+
+#. If you want to, make changes to the file.
+
+#. In the LaTeX editor, click **Save & Compile to edX XML** in the lower-left corner.
+
+   The component editor closes, and the unit page opens. You can see the way your LaTeX content looks.
+
+   .. image:: Images/HTML_LaTeX_CompEditor.gif
+
+#. On the unit page, click **Preview** to verify that your content looks the way you want it to in the LMS. 
+
+   * If you see errors, go back to the unit page. Click **Edit** to open the component again, and then click **Launch Latex Source Compiler** in the lower-left corner of the component editor to edit the LaTeX code.
 
