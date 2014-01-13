@@ -6,7 +6,7 @@
   cert_name_short = course.cert_name_short
   if cert_name_short == "":
     cert_name_short = settings.CERT_NAME_SHORT
-  
+
   cert_name_long = course.cert_name_long
   if cert_name_long == "":
     cert_name_long = settings.CERT_NAME_LONG
@@ -54,6 +54,14 @@ else:
       <a class="btn" href="${cert_status['download_url']}"
          title="${_('This link will open/download a PDF document')}">
          ${_("Download Your {cert_name_short} (PDF)").format(cert_name_short=cert_name_short,)}</a></li>
+
+      # STATIC PoC: Add Certificate to LinkedIn Profile Button
+      <li class="action action-linkedin">
+        <a class="btn" href="">
+          <i class="ico icon-linkedin-sign"></i>
+         <div class="label">${_("Add to Your LinkedIn Profile")}</div>
+        </a>
+      </li>
     % elif cert_status['show_download_url'] and enrollment.mode == 'verified' and cert_status['mode'] == 'honor':
       <li class="action">
       <p>${_('Since we did not have a valid set of verification photos from you when your {cert_name_long} was generated, we could not grant you a verified {cert_name_short}. An honor code {cert_name_short} has been granted instead.').format(cert_name_short=cert_name_short, cert_name_long=cert_name_long)}</p>
