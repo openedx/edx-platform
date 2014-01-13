@@ -21,19 +21,3 @@ Feature: LMS.Homepage for web users
     | faq     | FAQ    |
     | contact | Contact|
     | press   | Press  |
-
-
-  # TODO: test according to domain or policy
-  Scenario: User can see the partner institutions
-    Given I visit the homepage
-    Then I should see the following Partners in the Partners section
-    | Partner     |
-    | MITx        |
-    | HarvardX    |
-    | BerkeleyX   |
-    | UTx         |
-    | WellesleyX  |
-    | GeorgetownX |
-
-  # # TODO: Add scenario that tests the courses available
-  # # using a policy or a configuration file
