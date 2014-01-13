@@ -51,24 +51,10 @@ def main():
 
     # Extract strings from mako templates.
     babel_mako_cmd = 'pybabel extract -F %s -c "Translators:" . -o %s' % (BABEL_CONFIG, BABEL_OUT)
-<<<<<<< HEAD
-
-    # Extract strings from django source files.
-    make_django_cmd = (
-        'django-admin.py makemessages -l en --ignore=src/* --ignore=i18n/* '
-        '-d django --extension html'
-    )
-    # Extract strings from Javascript source files.
-    make_djangojs_cmd = (
-        'django-admin.py makemessages -l en --ignore=src/* --ignore=i18n/* '
-        '-d djangojs --extension js'
-    )
-=======
->>>>>>> 76f4eaf94719cccdb8f85b0a5871cbfb28947b75
     execute(babel_mako_cmd, working_directory=BASE_DIR)
 
     # Extract strings from django source files, including .py files.
-    make_django_cmd = makemessages + ' --extension html'
+    make_django_cmd = makemessages + ' -d django --extension html'
     execute(make_django_cmd, working_directory=BASE_DIR)
 
     # Extract strings from Javascript source files.
