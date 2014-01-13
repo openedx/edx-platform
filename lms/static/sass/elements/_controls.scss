@@ -30,6 +30,44 @@
   border-radius: ($baseline/10);
 }
 
+// ====================
+
+%btn-inherited {
+  @include transition(background-color 0.15s, box-shadow 0.15s);
+  border-radius: 3px;
+  box-shadow: 0 1px 0 rgba($white, .3) inset, 0 0 0 rgba($black, 0);
+  padding: ($baseline/2) $baseline;
+
+  &:hover, &.active {
+    text-decoration: none;
+  }
+
+  &.disabled, &.is-disabled, &[disabled="disabled"] {
+    box-shadow: none;
+  }
+}
+
+%btn-inherited-primary {
+  @extend %btn-inherited;
+  @include linear-gradient(top, rgba($white, .3), rgba($white, 0));
+  border: 1px solid shade($action-primary-bg, 10%);
+  background-color: $action-primary-bg;
+  color: $action-primary-fg;
+
+  &:hover, &.active {
+    background-color: $action-primary-focused-bg;
+    color: $action-primary-focused-fg;
+  }
+
+  &.disabled, &.is-disabled, &[disabled="disabled"] {
+    border: 1px solid tint($action-primary-disabled-bg, 10%);
+    background: $action-primary-disabled-bg;
+    color: $action-prmary-disabled-fg;
+  }
+}
+
+// ====================
+
 // primary button
 %btn-primary {
   @extend %t-weight3;
