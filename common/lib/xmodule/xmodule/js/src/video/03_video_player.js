@@ -86,7 +86,7 @@ function (HTML5Video, Resizer) {
 
         // At the start, the initial value of the variable
         // `seekToStartTimeOldSpeed` should always differ from the value
-        // returned by the duration function.
+        // of `state.speed` variable.
         state.videoPlayer.seekToStartTimeOldSpeed = 'void';
 
         state.videoPlayer.playerVars = {
@@ -665,20 +665,12 @@ function (HTML5Video, Resizer) {
                 }
             }
 
-            // Rebuild the slider start-end range (if it doesn't take up the
-            // whole slider). Remember that endTime === null means the end time
-            // is set to the end of video by default.
-            if (!(
-                this.videoPlayer.startTime === 0 &&
-                this.videoPlayer.endTime === null
-            )) {
-                this.trigger(
-                    'videoProgressSlider.updateStartEndTimeRegion',
-                    {
-                        duration: duration
-                    }
-                );
-            }
+            this.trigger(
+                'videoProgressSlider.updateStartEndTimeRegion',
+                {
+                    duration: duration
+                }
+            );
 
             // If this is not a duration change (if it is, we continue playing
             // from current time), then we need to seek the video to the start
