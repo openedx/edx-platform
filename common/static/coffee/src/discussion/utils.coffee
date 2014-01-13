@@ -75,7 +75,6 @@ class @DiscussionUtil
       undo_vote_for_comment   : "/courses/#{$$course_id}/discussion/comments/#{param}/unvote"
       upload                  : "/courses/#{$$course_id}/discussion/upload"
       search                  : "/courses/#{$$course_id}/discussion/forum/search"
-      tags_autocomplete       : "/courses/#{$$course_id}/discussion/threads/tags/autocomplete"
       retrieve_discussion     : "/courses/#{$$course_id}/discussion/forum/#{param}/inline"
       retrieve_single_thread  : "/courses/#{$$course_id}/discussion/forum/#{param}/threads/#{param1}"
       openclose_thread        : "/courses/#{$$course_id}/discussion/threads/#{param}/close"
@@ -156,20 +155,6 @@ class @DiscussionUtil
     for eventSelector, handler of eventsHandler
       [event, selector] = eventSelector.split(' ')
       $local(selector).unbind(event)[event] handler
-
-  @processTag: (text) ->
-    text.toLowerCase()
-
-  @tagsInputOptions: ->
-    autocomplete_url: @urlFor('tags_autocomplete')
-    autocomplete:
-      remoteDataType: 'json'
-    interactive: true
-    height: '30px'
-    width: '100%'
-    defaultText: "Tag your post: press enter after each tag"
-    removeWithBackspace: true
-    preprocessTag: @processTag
 
   @formErrorHandler: (errorsField) ->
     (xhr, textStatus, error) ->

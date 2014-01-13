@@ -4,10 +4,6 @@ if Backbone?
     events:
       "click .discussion-submit-post": "submitComment"
 
-      # TODO tags
-      # Until we decide what to do w/ tags, removing them.
-      #"click .thread-tag": "tagSelected"
-
     $: (selector) ->
       @$el.find(selector)
 
@@ -27,10 +23,6 @@ if Backbone?
       @renderShowView()
       @renderAttrs()
 
-      # TODO tags
-      # Until we decide what to do w/ tags, removing them.
-      #@renderTags()
-
       @$("span.timeago").timeago()
       @makeWmdEditor "reply-body"
       @renderResponses()
@@ -39,21 +31,6 @@ if Backbone?
     cleanup: ->
       if @responsesRequest?
         @responsesRequest.abort()
-
-    # TODO tags
-    # Until we decide what to do w/ tags, removing them.
-    #renderTags: ->
-    #  # tags
-    #  for tag in @model.get("tags")
-    #    if !tags
-    #      tags = $('<div class="thread-tags">')
-    #    tags.append("<a href='#' class='thread-tag'>#{tag}</a>")
-    #  @$(".post-body").after(tags)
-
-    # TODO tags
-    # Until we decide what to do w tags, removing them.
-    #tagSelected: (e) ->
-    #  @trigger "tag:selected", $(e.target).html()
 
     renderResponses: ->
       setTimeout(=>
@@ -116,10 +93,6 @@ if Backbone?
       newTitle = @editView.$(".edit-post-title").val()
       newBody  = @editView.$(".edit-post-body textarea").val()
 
-      # TODO tags
-      # Until we decide what to do w/ tags, removing them.
-      #newTags  = @editView.$(".edit-post-tags").val()
-
       url = DiscussionUtil.urlFor('update_thread', @model.id)
 
       DiscussionUtil.safeAjax
@@ -133,30 +106,19 @@ if Backbone?
               title: newTitle
               body: newBody
 
-              # TODO tags
-              # Until we decide what to do w/ tags, removing them.
-              #tags: newTags
-
           error: DiscussionUtil.formErrorHandler(@$(".edit-post-form-errors"))
           success: (response, textStatus) =>
               # TODO: Move this out of the callback, this makes it feel sluggish
               @editView.$(".edit-post-title").val("").attr("prev-text", "")
               @editView.$(".edit-post-body textarea").val("").attr("prev-text", "")
-              @editView.$(".edit-post-tags").val("")
-              @editView.$(".edit-post-tags").importTags("")
               @editView.$(".wmd-preview p").html("")
 
               @model.set
                 title: newTitle
                 body: newBody
-                tags: response.content.tags
 
               @createShowView()
               @renderShowView()
-
-              # TODO tags
-              # Until we decide what to do w/ tags, removing them.
-              #@renderTags()
 
     createEditView: () ->
 

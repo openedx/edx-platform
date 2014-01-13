@@ -71,7 +71,7 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
                                             "user_id":"1","username":"robot",\
                                             "votes":{"count":0,"up_count":0,\
                                             "down_count":0,"point":0},\
-                                            "abuse_flaggers":[],"tags":[],\
+                                            "abuse_flaggers":[],\
                                             "type":"thread","group_id":null,\
                                             "pinned":false,\
                                             "endorsed":false,\
@@ -119,7 +119,7 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
                                             "user_id":"1","username":"robot",\
                                             "votes":{"count":0,"up_count":0,\
                                             "down_count":0,"point":0},\
-                                            "abuse_flaggers":[1],"tags":[],\
+                                            "abuse_flaggers":[1],\
                                             "type":"thread","group_id":null,\
                                             "pinned":false,\
                                             "endorsed":false,\
@@ -179,7 +179,7 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
                                             "user_id":"1","username":"robot",\
                                             "votes":{"count":0,"up_count":0,\
                                             "down_count":0,"point":0},\
-                                            "abuse_flaggers":[],"tags":[],\
+                                            "abuse_flaggers":[],\
                                             "type":"thread","group_id":null,\
                                             "pinned":false,\
                                             "endorsed":false,\

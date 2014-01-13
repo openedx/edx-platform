@@ -38,7 +38,6 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
         'sort_key': 'date',
         'sort_order': 'desc',
         'text': '',
-        'tags': '',
         'commentable_id': discussion_id,
         'course_id': course_id,
         'user_id': request.user.id,
@@ -80,7 +79,7 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
                               strip_none(extract(request.GET,
                                                  ['page', 'sort_key',
                                                   'sort_order', 'text',
-                                                  'tags', 'commentable_ids', 'flagged'])))
+                                                  'commentable_ids', 'flagged'])))
 
     threads, page, num_pages = cc.Thread.search(query_params)
 
@@ -201,9 +200,6 @@ def forum_form_discussion(request, course_id):
         #    query_params={'follower_id': request.user.id},
         #)
 
-        #trending_tags = cc.search_trending_tags(
-        #    course_id,
-        #)
         with newrelic.agent.FunctionTrace(nr_transaction, "get_cohort_info"):
             cohorts = get_course_cohorts(course_id)
             cohorted_commentables = get_cohorted_commentables(course_id)
@@ -214,7 +210,6 @@ def forum_form_discussion(request, course_id):
             'csrf': csrf(request)['csrf_token'],
             'course': course,
             #'recent_active_threads': recent_active_threads,
-            #'trending_tags': trending_tags,
             'staff_access': has_access(request.user, course, 'staff'),
             'threads': saxutils.escape(json.dumps(threads), escapedict),
             'thread_pages': query_params['num_pages'],
@@ -284,10 +279,6 @@ def single_thread(request, course_id, discussion_id, thread_id):
         #    query_params={'follower_id': request.user.id},
         #)
 
-        #trending_tags = cc.search_trending_tags(
-        #    course_id,
-        #)
-
         with newrelic.agent.FunctionTrace(nr_transaction, "get_metadata_for_threads"):
             annotated_content_info = utils.get_metadata_for_threads(course_id, threads, request.user, user_info)
 
@@ -304,7 +295,6 @@ def single_thread(request, course_id, discussion_id, thread_id):
             'annotated_content_info': saxutils.escape(json.dumps(annotated_content_info), escapedict),
             'course': course,
             #'recent_active_threads': recent_active_threads,
-            #'trending_tags': trending_tags,
             'course_id': course.id,   # TODO: Why pass both course and course.id to template?
             'thread_id': thread_id,
             'threads': saxutils.escape(json.dumps(threads), escapedict),

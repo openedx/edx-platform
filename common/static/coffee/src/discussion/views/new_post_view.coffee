@@ -15,8 +15,6 @@ if Backbone?
 
           DiscussionUtil.makeWmdEditor @$el, $.proxy(@$, @), "new-post-body"
           
-          @$(".new-post-tags").tagsInput DiscussionUtil.tagsInputOptions()
-          
           if @$($(".topic_menu li a")[0]).attr('cohorted') != "True"
             $('.choose-cohort').hide();
           
@@ -126,7 +124,6 @@ if Backbone?
           event.preventDefault()
           title   = @$(".new-post-title").val()
           body    = @$(".new-post-body").find(".wmd-input").val()
-          tags    = @$(".new-post-tags").val()
           group = @$(".new-post-group option:selected").attr("value")
 
           anonymous          = false || @$("input.discussion-anonymous").is(":checked")
@@ -145,7 +142,6 @@ if Backbone?
               data:
                   title: title
                   body: body
-                  tags: tags
                   anonymous: anonymous
                   anonymous_to_peers: anonymous_to_peers
                   auto_subscribe: follow
@@ -158,8 +154,6 @@ if Backbone?
                   @$el.hide()
                   @$(".new-post-title").val("").attr("prev-text", "")
                   @$(".new-post-body textarea").val("").attr("prev-text", "")
-                  @$(".new-post-tags").val("")
-                  @$(".new-post-tags").importTags("")
                   @$(".wmd-preview p").html("")
                   @collection.add thread
 
