@@ -1,0 +1,212 @@
+info it worked if it ends with ok
+verbose cli [ 'node',
+verbose cli   '/usr/bin/npm',
+verbose cli   'install',
+verbose cli   '-g',
+verbose cli   '/home/vagrant/coffee-script-1.6.0/' ]
+info using npm@1.1.4
+info using node@v0.6.12
+verbose config file /edx/app/edxapp/.npmrc
+verbose config file /usr/etc/npmrc
+verbose config file /usr/share/npm/npmrc
+verbose cache add [ '/home/vagrant/coffee-script-1.6.0/', null ]
+silly cache add: name, spec, args [ undefined,
+silly cache add: name, spec, args   '/home/vagrant/coffee-script-1.6.0/',
+silly cache add: name, spec, args   [ '/home/vagrant/coffee-script-1.6.0/', null ] ]
+verbose parsed url { pathname: '/home/vagrant/coffee-script-1.6.0/',
+verbose parsed url   path: '/home/vagrant/coffee-script-1.6.0/',
+verbose parsed url   href: '/home/vagrant/coffee-script-1.6.0/' }
+verbose caching /home/vagrant/coffee-script-1.6.0/package.json
+verbose loadDefaults coffee-script@1.6.0
+verbose pack /home/vagrant/coffee-script-1.6.0
+verbose pack /home/vagrant/coffee-script-1.6.0 /tmp/npm-1388403310698/1388403310698-0.38236033427529037/tmp.tgz
+silly makeList /home/vagrant/coffee-script-1.6.0
+silly dir, dirLen [ '/home/vagrant/coffee-script-1.6.0', 34 ]
+verbose tarball /tmp/npm-1388403310698/1388403310698-0.38236033427529037/tmp.tgz
+verbose parent /home/vagrant/coffee-script-1.6.0
+verbose mkdir (expected) error ENOENT, no such file or directory '/tmp/npm-1388403310698/1388403310698-0.38236033427529037/___package.npm'
+verbose mkdir done: /tmp/npm-1388403310698/1388403310698-0.38236033427529037/___package.npm 755
+verbose unpack_ uid, gid [ undefined, undefined ]
+verbose unpackTarget /tmp/npm-1388403310698/1388403310698-0.38236033427529037/package
+silly gunzTarPerm modes [ '755', '644' ]
+silly afterUntar ok
+silly asyncMap in gTP /tmp/npm-1388403310698/1388403310698-0.38236033427529037/___package.npm/coffee-script-1.6.0
+silly asyncMap in gTP /tmp/npm-1388403310698/1388403310698-0.38236033427529037/___package.npm/coffee-script-1.6.0/CONTRIBUTING.md
+silly asyncMap in gTP /tmp/npm-1388403310698/1388403310698-0.38236033427529037/___package.npm/coffee-script-1.6.0/.npmignore
+silly asyncMap in gTP /tmp/npm-1388403310698/1388403310698-0.38236033427529037/___package.npm/coffee-script-1.6.0/README
+silly asyncMap in gTP /tmp/npm-1388403310698/1388403310698-0.38236033427529037/___package.npm/coffee-script-1.6.0/LICENSE
+silly asyncMap in gTP /tmp/npm-1388403310698/1388403310698-0.38236033427529037/___package.npm/coffee-script-1.6.0/Rakefile
+silly asyncMap in gTP /tmp/npm-1388403310698/1388403310698-0.38236033427529037/___package.npm/coffee-script-1.6.0/CNAME
+silly asyncMap in gTP /tmp/npm-1388403310698/1388403310698-0.38236033427529037/___package.npm/coffee-script-1.6.0/package.json
+silly asyncMap in gTP /tmp/npm-1388403310698/1388403310698-0.38236033427529037/___package.npm/coffee-script-1.6.0/extras
+silly asyncMap in gTP /tmp/npm-1388403310698/1388403310698-0.38236033427529037/___package.npm/coffee-script-1.6.0/extras/jsl.conf
+silly asyncMap in gTP /tmp/npm-1388403310698/1388403310698-0.38236033427529037/___package.npm/coffee-script-1.6.0/bin
+silly asyncMap in gTP /tmp/npm-1388403310698/1388403310698-0.38236033427529037/___package.npm/coffee-script-1.6.0/bin/coffee
+silly asyncMap in gTP /tmp/npm-1388403310698/1388403310698-0.38236033427529037/___package.npm/coffee-script-1.6.0/bin/cake
+silly asyncMap in gTP /tmp/npm-1388403310698/1388403310698-0.38236033427529037/___package.npm/coffee-script-1.6.0/lib
+silly asyncMap in gTP /tmp/npm-1388403310698/1388403310698-0.38236033427529037/___package.npm/coffee-script-1.6.0/lib/coffee-script
+silly asyncMap in gTP /tmp/npm-1388403310698/1388403310698-0.38236033427529037/___package.npm/coffee-script-1.6.0/lib/coffee-script/helpers.js
+silly asyncMap in gTP /tmp/npm-1388403310698/1388403310698-0.38236033427529037/___package.npm/coffee-script-1.6.0/lib/coffee-script/optparse.js
+silly asyncMap in gTP /tmp/npm-1388403310698/1388403310698-0.38236033427529037/___package.npm/coffee-script-1.6.0/lib/coffee-script/lexer.js
+silly asyncMap in gTP /tmp/npm-1388403310698/1388403310698-0.38236033427529037/___package.npm/coffee-script-1.6.0/lib/coffee-script/rewriter.js
+silly asyncMap in gTP /tmp/npm-1388403310698/1388403310698-0.38236033427529037/___package.npm/coffee-script-1.6.0/lib/coffee-script/grammar.js
+silly asyncMap in gTP /tmp/npm-1388403310698/1388403310698-0.38236033427529037/___package.npm/coffee-script-1.6.0/lib/coffee-script/parser.js
+silly asyncMap in gTP /tmp/npm-1388403310698/1388403310698-0.38236033427529037/___package.npm/coffee-script-1.6.0/lib/coffee-script/command.js
+silly asyncMap in gTP /tmp/npm-1388403310698/1388403310698-0.38236033427529037/___package.npm/coffee-script-1.6.0/lib/coffee-script/cake.js
+silly asyncMap in gTP /tmp/npm-1388403310698/1388403310698-0.38236033427529037/___package.npm/coffee-script-1.6.0/lib/coffee-script/index.js
+silly asyncMap in gTP /tmp/npm-1388403310698/1388403310698-0.38236033427529037/___package.npm/coffee-script-1.6.0/lib/coffee-script/browser.js
+silly asyncMap in gTP /tmp/npm-1388403310698/1388403310698-0.38236033427529037/___package.npm/coffee-script-1.6.0/lib/coffee-script/coffee-script.js
+silly asyncMap in gTP /tmp/npm-1388403310698/1388403310698-0.38236033427529037/___package.npm/coffee-script-1.6.0/lib/coffee-script/sourcemap.js
+silly asyncMap in gTP /tmp/npm-1388403310698/1388403310698-0.38236033427529037/___package.npm/coffee-script-1.6.0/lib/coffee-script/repl.js
+silly asyncMap in gTP /tmp/npm-1388403310698/1388403310698-0.38236033427529037/___package.npm/coffee-script-1.6.0/lib/coffee-script/scope.js
+silly asyncMap in gTP /tmp/npm-1388403310698/1388403310698-0.38236033427529037/___package.npm/coffee-script-1.6.0/lib/coffee-script/nodes.js
+silly chmod coffee-script-1.6.0 755
+silly chmod CONTRIBUTING.md 644
+silly chmod .npmignore 644
+silly chmod README 644
+silly chmod LICENSE 644
+silly chmod Rakefile 644
+silly chmod CNAME 644
+silly chmod package.json 644
+silly chmod extras 755
+silly chmod jsl.conf 644
+silly chmod bin 755
+silly chmod coffee 755
+silly chmod cake 755
+silly chmod lib 755
+silly chmod coffee-script 755
+silly chmod helpers.js 644
+silly chmod optparse.js 644
+silly chmod lexer.js 644
+silly chmod rewriter.js 644
+silly chmod grammar.js 644
+silly chmod parser.js 755
+silly chmod command.js 644
+silly chmod cake.js 644
+silly chmod index.js 644
+silly chmod browser.js 644
+silly chmod coffee-script.js 644
+silly chmod sourcemap.js 644
+silly chmod repl.js 644
+silly chmod scope.js 644
+silly chmod nodes.js 644
+verbose gunzed /tmp/npm-1388403310698/1388403310698-0.38236033427529037/___package.npm/coffee-script-1.6.0
+verbose rm'ed /tmp/npm-1388403310698/1388403310698-0.38236033427529037/package
+verbose renamed [ '/tmp/npm-1388403310698/1388403310698-0.38236033427529037/___package.npm/coffee-script-1.6.0',
+verbose renamed   '/tmp/npm-1388403310698/1388403310698-0.38236033427529037/package' ]
+verbose caching /tmp/npm-1388403310698/1388403310698-0.38236033427529037/package/package.json
+verbose loadDefaults coffee-script@1.6.0
+verbose tarball contents [ 'package', 'tmp.tgz' ]
+verbose from cache /tmp/npm-1388403310698/1388403310698-0.38236033427529037/package/package.json
+verbose pack /tmp/npm-1388403310698/1388403310698-0.38236033427529037/package
+verbose pack /tmp/npm-1388403310698/1388403310698-0.38236033427529037/package /edx/app/edxapp/.npm/coffee-script/1.6.0/package.tgz
+silly makeList /tmp/npm-1388403310698/1388403310698-0.38236033427529037/package
+silly dir, dirLen [ '/tmp/npm-1388403310698/1388403310698-0.38236033427529037/package',
+silly dir, dirLen   65 ]
+verbose tarball /edx/app/edxapp/.npm/coffee-script/1.6.0/package.tgz
+verbose parent /tmp/npm-1388403310698/1388403310698-0.38236033427529037/package
+verbose mkdir (expected) error ENOENT, no such file or directory '/edx/app/edxapp/.npm/coffee-script/1.6.0/___package.npm'
+verbose mkdir done: /edx/app/edxapp/.npm/coffee-script/1.6.0/___package.npm 755
+verbose unpack_ uid, gid [ undefined, undefined ]
+verbose unpackTarget /edx/app/edxapp/.npm/coffee-script/1.6.0/package
+silly gunzTarPerm modes [ '755', '644' ]
+silly afterUntar ok
+silly asyncMap in gTP /edx/app/edxapp/.npm/coffee-script/1.6.0/___package.npm/package
+silly asyncMap in gTP /edx/app/edxapp/.npm/coffee-script/1.6.0/___package.npm/package/CONTRIBUTING.md
+silly asyncMap in gTP /edx/app/edxapp/.npm/coffee-script/1.6.0/___package.npm/package/.npmignore
+silly asyncMap in gTP /edx/app/edxapp/.npm/coffee-script/1.6.0/___package.npm/package/README
+silly asyncMap in gTP /edx/app/edxapp/.npm/coffee-script/1.6.0/___package.npm/package/LICENSE
+silly asyncMap in gTP /edx/app/edxapp/.npm/coffee-script/1.6.0/___package.npm/package/Rakefile
+silly asyncMap in gTP /edx/app/edxapp/.npm/coffee-script/1.6.0/___package.npm/package/CNAME
+silly asyncMap in gTP /edx/app/edxapp/.npm/coffee-script/1.6.0/___package.npm/package/package.json
+silly asyncMap in gTP /edx/app/edxapp/.npm/coffee-script/1.6.0/___package.npm/package/extras
+silly asyncMap in gTP /edx/app/edxapp/.npm/coffee-script/1.6.0/___package.npm/package/extras/jsl.conf
+silly asyncMap in gTP /edx/app/edxapp/.npm/coffee-script/1.6.0/___package.npm/package/bin
+silly asyncMap in gTP /edx/app/edxapp/.npm/coffee-script/1.6.0/___package.npm/package/bin/coffee
+silly asyncMap in gTP /edx/app/edxapp/.npm/coffee-script/1.6.0/___package.npm/package/bin/cake
+silly asyncMap in gTP /edx/app/edxapp/.npm/coffee-script/1.6.0/___package.npm/package/lib
+silly asyncMap in gTP /edx/app/edxapp/.npm/coffee-script/1.6.0/___package.npm/package/lib/coffee-script
+silly asyncMap in gTP /edx/app/edxapp/.npm/coffee-script/1.6.0/___package.npm/package/lib/coffee-script/helpers.js
+silly asyncMap in gTP /edx/app/edxapp/.npm/coffee-script/1.6.0/___package.npm/package/lib/coffee-script/optparse.js
+silly asyncMap in gTP /edx/app/edxapp/.npm/coffee-script/1.6.0/___package.npm/package/lib/coffee-script/lexer.js
+silly asyncMap in gTP /edx/app/edxapp/.npm/coffee-script/1.6.0/___package.npm/package/lib/coffee-script/rewriter.js
+silly asyncMap in gTP /edx/app/edxapp/.npm/coffee-script/1.6.0/___package.npm/package/lib/coffee-script/grammar.js
+silly asyncMap in gTP /edx/app/edxapp/.npm/coffee-script/1.6.0/___package.npm/package/lib/coffee-script/parser.js
+silly asyncMap in gTP /edx/app/edxapp/.npm/coffee-script/1.6.0/___package.npm/package/lib/coffee-script/command.js
+silly asyncMap in gTP /edx/app/edxapp/.npm/coffee-script/1.6.0/___package.npm/package/lib/coffee-script/cake.js
+silly asyncMap in gTP /edx/app/edxapp/.npm/coffee-script/1.6.0/___package.npm/package/lib/coffee-script/index.js
+silly asyncMap in gTP /edx/app/edxapp/.npm/coffee-script/1.6.0/___package.npm/package/lib/coffee-script/browser.js
+silly asyncMap in gTP /edx/app/edxapp/.npm/coffee-script/1.6.0/___package.npm/package/lib/coffee-script/coffee-script.js
+silly asyncMap in gTP /edx/app/edxapp/.npm/coffee-script/1.6.0/___package.npm/package/lib/coffee-script/sourcemap.js
+silly asyncMap in gTP /edx/app/edxapp/.npm/coffee-script/1.6.0/___package.npm/package/lib/coffee-script/repl.js
+silly asyncMap in gTP /edx/app/edxapp/.npm/coffee-script/1.6.0/___package.npm/package/lib/coffee-script/scope.js
+silly asyncMap in gTP /edx/app/edxapp/.npm/coffee-script/1.6.0/___package.npm/package/lib/coffee-script/nodes.js
+silly chmod package 755
+verbose gunzed /edx/app/edxapp/.npm/coffee-script/1.6.0/___package.npm/package
+verbose rm'ed /edx/app/edxapp/.npm/coffee-script/1.6.0/package
+verbose renamed [ '/edx/app/edxapp/.npm/coffee-script/1.6.0/___package.npm/package',
+verbose renamed   '/edx/app/edxapp/.npm/coffee-script/1.6.0/package' ]
+verbose caching /edx/app/edxapp/.npm/coffee-script/1.6.0/package/package.json
+verbose loadDefaults coffee-script@1.6.0
+silly updated sha bytes 40960
+silly updated sha bytes 32252
+info shasum 490d683f5fd202719b4e3abb41022f6573ca5553
+info shasum /edx/app/edxapp/.npm/coffee-script/1.6.0/package.tgz
+verbose from cache /edx/app/edxapp/.npm/coffee-script/1.6.0/package/package.json
+verbose chmod /edx/app/edxapp/.npm/coffee-script/1.6.0/package.tgz 644
+verbose chown [ '/edx/app/edxapp/.npm/coffee-script/1.6.0/package.tgz',
+verbose chown   1003,
+verbose chown   1005 ]
+silly resolved [ { name: 'coffee-script',
+silly resolved     description: 'Unfancy JavaScript',
+silly resolved     keywords: [ 'javascript', 'language', 'coffeescript', 'compiler' ],
+silly resolved     author: { name: 'Jeremy Ashkenas' },
+silly resolved     version: '1.6.0',
+silly resolved     licenses: 
+silly resolved      [ { type: 'MIT',
+silly resolved          url: 'https://raw.github.com/jashkenas/coffee-script/master/LICENSE' } ],
+silly resolved     engines: { node: '>=0.4.0' },
+silly resolved     directories: { lib: './lib/coffee-script' },
+silly resolved     main: './lib/coffee-script/coffee-script',
+silly resolved     bin: { coffee: './bin/coffee', cake: './bin/cake' },
+silly resolved     scripts: { test: 'node ./bin/cake test' },
+silly resolved     homepage: 'http://coffeescript.org',
+silly resolved     bugs: { name: 'https://github.com/jashkenas/coffee-script/issues' },
+silly resolved     repository: 
+silly resolved      { type: 'git',
+silly resolved        url: 'git://github.com/jashkenas/coffee-script.git' },
+silly resolved     devDependencies: { 'uglify-js': '~2.2', jison: '>=0.2.0' },
+silly resolved     _id: 'coffee-script@1.6.0',
+silly resolved     dependencies: {},
+silly resolved     optionalDependencies: {},
+silly resolved     _engineSupported: true,
+silly resolved     _npmVersion: '1.1.4',
+silly resolved     _nodeVersion: 'v0.6.12',
+silly resolved     _defaultsLoaded: true,
+silly resolved     dist: { shasum: '490d683f5fd202719b4e3abb41022f6573ca5553' },
+silly resolved     _from: '/home/vagrant/coffee-script-1.6.0/' } ]
+info into /usr/local/lib coffee-script@1.6.0
+info installOne coffee-script@1.6.0
+verbose from cache /edx/app/edxapp/.npm/coffee-script/1.6.0/package/package.json
+info unbuild /usr/local/lib/node_modules/coffee-script
+verbose mkdir (expected) error ENOENT, no such file or directory '/usr/local/lib/node_modules'
+verbose unpack_ uid, gid [ undefined, undefined ]
+verbose unpackTarget /usr/local/lib/node_modules/coffee-script
+ERR! Could not create /usr/local/lib/node_modules/___coffee-script.npm
+ERR! error installing coffee-script@1.6.0
+info unbuild /usr/local/lib/node_modules/coffee-script
+verbose installOne cb coffee-script@1.6.0
+ERR! Error: EACCES, permission denied '/usr/local/lib/node_modules'
+ERR! 
+ERR! Please try running this command again as root/Administrator.
+ERR! 
+ERR! System Linux 3.2.0-23-generic
+ERR! command "node" "/usr/bin/npm" "install" "-g" "/home/vagrant/coffee-script-1.6.0/"
+ERR! cwd /edx/app/edxapp/edx-platform
+ERR! node -v v0.6.12
+ERR! npm -v 1.1.4
+ERR! path /usr/local/lib/node_modules
+ERR! code EACCES
+ERR! message EACCES, permission denied '/usr/local/lib/node_modules'
+ERR! errno {}
+verbose exit [ 1, true ]

@@ -8,6 +8,9 @@ DEBUG = True
 USE_I18N = True
 TEMPLATE_DEBUG = DEBUG
 
+LANGUAGES = ( ('zh_CN', 'Chinese'), ('en_US', 'English'))
+TIME_ZONE = 'Asia/Shanghai'
+LANGUAGE_CODE = 'zh_CN'
 ################################ LOGGERS ######################################
 
 import logging
@@ -23,7 +26,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 ################################# LMS INTEGRATION #############################
 
-LMS_BASE = "localhost:8000"
+#LMS_BASE = "localhost:8000"
+LMS_BASE = "192.168.1.130:8000"
 FEATURES['PREVIEW_LMS_BASE'] = "preview." + LMS_BASE
 
 ################################# CELERY ######################################
