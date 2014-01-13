@@ -12,13 +12,13 @@
   <a href="#help-modal" rel="leanModal" role="button">${_("Help")}</a>
 </div>
 
-<section id="help-modal" class="modal" aria-hidden="true" role="dialog" aria-label='${_("{platform_name} Help").format(platform_name=settings.PLATFORM_NAME)}'>
+<section id="help-modal" class="modal" aria-hidden="true" role="dialog" aria-label='${_("{platform_name} Help").format(platform_name=microsite.get("platform_name", settings.PLATFORM_NAME))}'>
   <div class="inner-wrapper" id="help_wrapper">
     ## TODO: find a way to refactor this
     <button class="close-modal "tabindex="0">&#10005; <span class="sr">${_('Close Modal')}</span></button>
 
     <header>
-      <h2>${_('{span_start}{platform_name}{span_end} Help').format(span_start='<span class="edx">', span_end='</span>', platform_name=settings.PLATFORM_NAME)}</h2>
+      <h2>${_('{span_start}{platform_name}{span_end} Help').format(span_start='<span class="edx">', span_end='</span>', platform_name=microsite.get('platform_name', settings.PLATFORM_NAME))}</h2>
       <hr>
     </header>
 
@@ -39,10 +39,10 @@ discussion_link = get_discussion_link(course) if course else None
           url=marketing_link('FAQ')
         ),
         link_end='</a>',
-        platform_name=settings.PLATFORM_NAME)}
+        platform_name=microsite.get('platform_name', settings.PLATFORM_NAME))}
       </p>
 
-    <p>${_('Have a <strong>question about something specific</strong>? You can contact the {platform_name} general support team directly:').format(platform_name=settings.PLATFORM_NAME)}</p>
+    <p>${_('Have a <strong>question about something specific</strong>? You can contact the {platform_name} general support team directly:').format(platform_name=microsite.get('platform_name', settings.PLATFORM_NAME))}</p>
     <hr>
 
     <div class="help-buttons">

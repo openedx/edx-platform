@@ -6,8 +6,9 @@ from django_future.csrf import ensure_csrf_cookie
 from edxmako.shortcuts import render_to_response
 
 import student.views
-import branding
 import courseware.views
+
+from student.microsites import get_microsite_config
 from edxmako.shortcuts import marketing_link
 from util.cache import cache_if_anonymous
 
@@ -25,10 +26,19 @@ def index(request):
     if settings.FEATURES.get('AUTH_USE_MIT_CERTIFICATES'):
         from external_auth.views import ssl_login
         return ssl_login(request)
-    if settings.FEATURES.get('ENABLE_MKTG_SITE'):
+
+    mscfg = get_microsite_config(request)
+
+    enable_mktg_site = (settings.FEATURES.get('ENABLE_MKTG_SITE') or
+                        mscfg.get('ENABLE_MKTG_SITE'))
+
+    if enable_mktg_site:
         return redirect(settings.MKTG_URLS.get('ROOT'))
 
-    university = branding.get_university(request.META.get('HTTP_HOST'))
+    university = mscfg.get("university")
+
+    # keep specialized logic for Edge until we can migrate over Edge to fully use
+    # microsite definitions
     if university == 'edge':
         context = {
             'suppress_toplevel_navigation': True
@@ -49,7 +59,11 @@ def courses(request):
     to that. Otherwise, if subdomain branding is on, this is the university
     profile page. Otherwise, it's the edX courseware.views.courses page
     """
-    if settings.FEATURES.get('ENABLE_MKTG_SITE', False):
+    mscfg = get_microsite_config(request)
+    enable_mktg_site = (settings.FEATURES.get('ENABLE_MKTG_SITE') or
+                        mscfg.get('ENABLE_MKTG_SITE'))
+
+    if enable_mktg_site:
         return redirect(marketing_link('COURSES'), permanent=True)
 
     if not settings.FEATURES.get('COURSES_ARE_BROWSABLE'):

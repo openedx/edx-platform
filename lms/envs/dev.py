@@ -130,6 +130,8 @@ SUBDOMAIN_BRANDING = {
     'mit': 'MITx',
     'berkeley': 'BerkeleyX',
     'harvard': 'HarvardX',
+    'openedx': 'openedx',
+    'edge': 'edge'
 }
 
 # List of `university` landing pages to display, even though they may not
@@ -291,3 +293,5 @@ try:
     from .private import *      # pylint: disable=F0401
 except ImportError:
     pass
+
+

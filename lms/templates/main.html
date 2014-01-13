@@ -12,7 +12,17 @@
 </%def>
 
 <%def name="stanford_theme_enabled()">
-  <% return theme_enabled() and getattr(settings, "THEME_NAME") == "stanford" %>
+  <%
+    if not theme_enabled():
+      return False
+
+    theme_name = microsite.get("THEME_NAME")
+
+    if hasattr(settings, "THEME_NAME"):
+      theme_name = getattr(settings, "THEME_NAME")
+
+    return theme_enabled and theme_name == "stanford"
+  %>
 </%def>
 
 <!DOCTYPE html>
@@ -25,8 +35,7 @@
     % if stanford_theme_enabled():
       <title>${_("Home")} | class.stanford.edu</title>
     % else:
-      ## "edX" should not be translated
-      <title>edX</title>
+      <title>${microsite.get("platform_name", settings.PLATFORM_NAME)}</title>
 
       <meta http-equiv="X-UA-Compatible" content="IE=edge">
       <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -44,7 +53,7 @@
 
   <script type="text/javascript" src="/jsi18n/"></script>
 
-  <link rel="icon" type="image/x-icon" href="${static.url(settings.FAVICON_PATH)}" />
+  <link rel="icon" type="image/x-icon" href="${static.url(microsite.get('favicon_path', settings.FAVICON_PATH))}"/>
 
   <%static:css group='style-vendor'/>
   <%static:css group='style-app'/>
@@ -54,8 +63,27 @@
   <%static:js group='main_vendor'/>
 
   <%block name="headextra"/>
-  % if theme_enabled():
-    <%include file="theme-head-extra.html" />
+
+<%
+  if theme_enabled():
+    header_extra_file = 'theme-head-extra.html'
+    header_file = 'theme-header.html'
+    google_analytics_file = 'theme-google-analytics.html'
+    footer_file = 'theme-footer.html'
+
+    style_overrides_file = None
+
+  else:
+    header_extra_file = None
+    header_file = microsite_tpl('navigation.html')
+    google_analytics_file = microsite_tpl('google_analytics.html')
+    footer_file = microsite_tpl('footer.html')
+
+    style_overrides_file = microsite_tpl('css_overrides_file')
+%>
+
+  % if header_extra_file:
+    <%include file="${header_extra_file}" />
   % endif
 
   <!--[if lt IE 9]>
@@ -66,14 +94,15 @@
   <meta name="google-site-verification" content="_mipQ4AtZQDNmbtOkwehQDOgCxUUV2fb_C0b6wbiRHY" />
 
   % if not course:
-    % if theme_enabled():
-      <%include file="theme-google-analytics.html" />
-    % else:
-      <%include file="google_analytics.html" />
-    % endif
+    <%include file="${google_analytics_file}" />
   % endif
 
   <%include file="widgets/segment-io.html" />
+
+
+% if style_overrides_file:
+  <link rel="stylesheet" type="text/css" href="${static.url(style_overrides_file)}" />
+% endif
 
 </head>
 
@@ -82,21 +111,17 @@
 
   <%include file="mathjax_accessible.html" />
 
-% if theme_enabled():
-  <%include file="theme-header.html" />
-% elif not suppress_toplevel_navigation:
-  <%include file="navigation.html" />
-% endif
+% if not suppress_toplevel_navigation:
+  <%include file="${header_file}" />
+%endif
 
   <section class="content-wrapper" id="content">
     ${self.body()}
     <%block name="bodyextra"/>
   </section>
 
-% if theme_enabled():
-  <%include file="theme-footer.html" />
-% elif not suppress_toplevel_navigation:
-  <%include file="footer.html" />
+% if not suppress_toplevel_navigation:
+  <%include file="${footer_file}" />
 % endif
 
   <script>window.baseUrl = "${settings.STATIC_URL}";</script>
@@ -113,3 +138,5 @@
     html.escape(enrollment_action)
   ) if course_id and enrollment_action else ""
 }</%def>
+
+

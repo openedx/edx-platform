@@ -294,7 +294,11 @@ def get_courses(user, domain=None):
     '''
     Returns a list of courses available, sorted by course.number
     '''
-    courses = branding.get_visible_courses(domain)
+    if settings.FEATURES.get("MICROSITES") and domain in settings.MICROSITES:
+        microsite = settings.MICROSITES[domain]
+    else:
+        microsite = {}
+    courses = branding.get_visible_courses(microsite=microsite)
     courses = [c for c in courses if has_access(user, c, 'see_exists')]
 
     courses = sorted(courses, key=lambda course: course.number)

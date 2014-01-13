@@ -5,17 +5,31 @@
 <%inherit file="main.html" />
 <%namespace name='static' file='static_content.html'/>
 
+<%
+  homepage_overlay_html = microsite.get('homepage_overlay_html')
+
+  show_homepage_promo_video = microsite.get('show_homepage_promo_video', True)
+  homepage_promo_video_youtube_id = microsite.get('homepage_promo_video_youtube_id', "XNaiOGxWeto")
+
+  show_partners = microsite.get('show_partners', True)
+
+%>
+
 <section class="home">
   <header>
     <div class="outer-wrapper">
       <div class="title">
         <hgroup>
-          % if self.stanford_theme_enabled():
-            <h1>${_("Free courses from <strong>{university_name}</strong>").format(university_name="Stanford")}</h1>
+          % if homepage_overlay_html:
+            ${homepage_overlay_html}
           % else:
-            <h1>${_("The Future of Online Education")}</h1>
+            % if self.stanford_theme_enabled():
+              <h1>${_("Free courses from <strong>{university_name}</strong>").format(university_name="Stanford")}</h1>
+            % else:
+              <h1>${_("The Future of Online Education")}</h1>
+            % endif
+            <h2>${_("For anyone, anywhere, anytime")}</h2>
           % endif
-          <h2>${_("For anyone, anywhere, anytime")}</h2>
         </hgroup>
 
         ## Disable social buttons for non-edX sites
@@ -40,22 +54,22 @@
               </div>
             </div>
           </section>
-        % endif
+          % endif
       </div>
 
+      % if show_homepage_promo_video:
         <a href="#video-modal" class="media" rel="leanModal">
           <div class="hero">
             <div class="play-intro"></div>
           </div>
         </a>
-
+      % endif
     </div>
   </header>
-
   <section class="container">
     <section class="highlighted-courses">
       ## Disable university partner logos and sites for non-edX sites
-      % if not self.theme_enabled():
+      % if not self.theme_enabled() and show_partners:
         <h2>${_('Explore free courses from {span_start}{platform_name}{span_end} universities').format(platform_name="edX", span_start='<span class="edx">', span_end='</span>')}</h2>
 
         <section class="university-partners university-partners2x6">
@@ -183,10 +197,9 @@
 <section id="video-modal" class="modal home-page-video-modal video-modal">
   <div class="inner-wrapper">
     <%
+      youtube_video_id = homepage_promo_video_youtube_id
       if self.stanford_theme_enabled():
         youtube_video_id = "2gmreZObCY4"
-      else:
-        youtube_video_id = "XNaiOGxWeto"
     %>
     <iframe width="640" height="360" src="//www.youtube.com/embed/${youtube_video_id}?showinfo=0" frameborder="0" allowfullscreen></iframe>
   </div>
