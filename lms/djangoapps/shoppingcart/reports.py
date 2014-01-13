@@ -275,6 +275,6 @@ def course_ids_between(start_word, end_word):
 
     valid_courses = []
     for course in modulestore().get_courses():
-        if (start_word.lower() <= course.id.lower() <= course.id.lower()) and (get_course_by_id(course.id) is not None):
+        if (start_word.lower() <= course.id.lower() <= end_word.lower()) and (get_course_by_id(course.id) is not None):
             valid_courses.append(course.id)
     return valid_courses
