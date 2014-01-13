@@ -154,6 +154,13 @@
 
 <section class="container dashboard" id="dashboard-main" aria-hidden="false">
 
+  <!-- TODO later will need to make this ping for all courses on the dash -->
+  %if prompt_midcourse_reverify:
+    <section class="dashboard-banner">
+      <%include file='dashboard/_dashboard_prompt_midcourse_reverify.html' />
+    </section>
+  % endif
+
   %if message:
     <section class="dashboard-banner">
       ${message}

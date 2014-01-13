@@ -179,11 +179,18 @@ class XQueueCertInterface(object):
             org = course_id.split('/')[0]
             course_num = course_id.split('/')[1]
             cert_mode = enrollment_mode
-            if enrollment_mode == GeneratedCertificate.MODES.verified and SoftwareSecurePhotoVerification.user_is_verified(student):
+            if (
+                (enrollment_mode == GeneratedCertificate.MODES.verified) and 
+                SoftwareSecurePhotoVerification.user_is_verified(student) and
+                SSPMidcourseReverification.user_is_reverified_for_all(course_id, student)
+            ):
                 template_pdf = "certificate-template-{0}-{1}-verified.pdf".format(
                     org, course_num)
-            elif (enrollment_mode == GeneratedCertificate.MODES.verified and not
-                    SoftwareSecurePhotoVerification.user_is_verified(student)):
+            elif (
+                (enrollment_mode == GeneratedCertificate.MODES.verified) and not
+                (SoftwareSecurePhotoVerification.user_is_verified(student)) and not
+                (SSPMidcourseReverification.user_is_reverified_for_all(course_id, student))
+            ):
                 template_pdf = "certificate-template-{0}-{1}.pdf".format(
                     org, course_num)
                 cert_mode = GeneratedCertificate.MODES.honor

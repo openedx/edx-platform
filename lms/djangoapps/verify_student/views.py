@@ -5,6 +5,8 @@ Views for the verification flow
 import json
 import logging
 import decimal
+import datetime
+from pytz import UTC
 
 from edxmako.shortcuts import render_to_response
 
@@ -27,7 +29,9 @@ from shoppingcart.models import Order, CertificateItem
 from shoppingcart.processors.CyberSource import (
     get_signed_purchase_params, get_purchase_endpoint
 )
-from verify_student.models import SoftwareSecurePhotoVerification
+from verify_student.models import (
+    SoftwareSecurePhotoVerification, MidcourseReverificationWindow, SSPMidcourseReverification
+)
 import ssencrypt
 
 log = logging.getLogger(__name__)
@@ -322,11 +326,94 @@ class ReverifyView(View):
             }
             return render_to_response("verify_student/photo_reverification.html", context)
 
+class MidCourseReverifyView(View):
+    """
+    The mid-course reverification view.
+    Needs to perform these functions:
+        - take new face photo
+        - retrieve the old id photo
+        - submit these photos to photo verification service
+
+    Does not need to worry about pricing
+    """
+    @method_decorator(login_required)
+    def get(self, request, course_id):
+        """
+        display this view
+        """
+        context = {
+            "user_full_name": request.user.profile.name,
+            "error": False,
+            "course_id": course_id,
+        }
+        return render_to_response("verify_student/midcourse_photo_reverification.html", context)
+
+    @method_decorator(login_required)
+    def post(self, request, course_id):
+        """
+        submits the reverification to SoftwareSecure
+        """
+        try:
+            # TODO look at this more carefully! #1 testing candidate
+            now = datetime.datetime.now(UTC)
+            attempt = SSPMidcourseReverification(user=request.user, window=MidcourseReverificationWindow.get_window(course_id, now))
+            b64_face_image = request.POST['face_image'].split(",")[1]
+
+            attempt.upload_face_image(b64_face_image.decode('base64'))
+            attempt.fetch_photo_id_image()
+            attempt.mark_ready()
+
+            attempt.save()
+            attempt.submit()
+            return HttpResponseRedirect(reverse('verify_student_midcourse_reverification_confirmation'))
+        except Exception:
+            log.exception(
+                "Could not submit verification attempt for user {}".format(request.user.id)
+            )
+            context = {
+                "user_full_name": request.user.profile.name,
+                "error": True,
+            }
+            return render_to_response("verify_student/midcourse_photo_reverification.html", context)
+
+def midcourse_reverify_dash(_request):
+    # TODO same comment as in student/views.py: need to factor out this functionality
+    user = _request.user
+    course_enrollment_pairs = []
+    for enrollment in CourseEnrollment.enrollments_for_user(user):
+        try:
+            course_enrollment_pairs.append((course_from_id(enrollment.course_id), enrollment))
+        except ItemNotFoundError:
+            log.error("User {0} enrolled in non-existent course {1}"
+                      .format(user.username, enrollment.course_id))
+    reverify_course_data = []
+    for (course, enrollment) in course_enrollment_pairs:
+        if MidcourseReverificationWindow.window_open_for_course(course.id):
+            reverify_course_data.append(
+                (
+                    course.id,
+                    course.display_name,
+                    MidcourseReverificationWindow.get_window(course.id, datetime.datetime.now(UTC)).end_date,
+                    "must_reverify"
+                )
+            )
+            prompt_midcourse_reverify = True
+    context = {
+        "user_full_name": _request.user.profile.name,
+        "reverify_course_data": reverify_course_data,
+    }
+    return render_to_response("verify_student/midcourse_reverify_dash.html", context)
 
 @login_required
 def reverification_submission_confirmation(_request):
     """
     Shows the user a confirmation page if the submission to SoftwareSecure was successful
     """
-
     return render_to_response("verify_student/reverification_confirmation.html")
+
+@login_required
+def midcourse_reverification_confirmation(_request):
+    """
+    Shows the user a confirmation page if the submission to SoftwareSecure was successful
+    """
+    return render_to_response("verify_student/midcourse_reverification_confirmation.html")

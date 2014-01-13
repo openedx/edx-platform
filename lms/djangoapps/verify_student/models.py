@@ -23,6 +23,7 @@ import pytz
 import requests
 
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.contrib.auth.models import User
@@ -36,6 +37,57 @@ from verify_student.ssencrypt import (
 )
 
 log = logging.getLogger(__name__)
+
+# Evidently South migrations complain a lot if you have a default set to uuid.uuid4, so
+# I had to add this function to make South happy, see this for more:
+#   http://stackoverflow.com/questions/15041265/south-migrate-error-name-uuid-is-not-defined
+# If anyone knows a happier solution, do let me know; otherwise I'll remove this comment
+# after CR
+def generateUUID():
+        return str(uuid.uuid4)
+
+class MidcourseReverificationWindow(models.Model):
+    """
+    Defines the start and end times for midcourse reverification for a particular course.
+
+    There can be many MidcourseReverificationWindows per course, but they should not
+    have overlapping time-ranges (i.e. Window2's start date should not be before Window1's
+    start date) (TODO: should the non-overlap constraint be explicitly enforced by the model?)
+    """
+    # the course that this window is attached to
+    # TODO should this be a foreignkey?
+    course_id = models.CharField(max_length=255, db_index=True)
+    start_date = models.DateTimeField(default=None, null=True, blank=True)
+    end_date = models.DateTimeField(default=None, null=True, blank=True)
+
+    @classmethod
+    def window_open_for_course(cls, course_id):
+        """
+        Returns a boolean, True if the course is currently asking for reverification, else False.
+        """
+        now = datetime.now(pytz.UTC)
+
+        # We are assuming one window per course_id.  TODO find out if this assumption is OK
+        try:
+            window = cls.objects.get(course_id=course_id)
+        except(ObjectDoesNotExist):
+            return False
+
+        if (window.start_date <= now <= window.end_date):
+            return True
+        else:
+            return False
+
+    @classmethod
+    def get_window(cls, course_id, date):
+        """
+        Returns the window that is open for a particular course for a particular date.
+        If no such window is open, or if more than one window is open, returns None.
+        """
+        try:
+            return cls.objects.get(course_id=course_id, start_date__lte=date, end_date__gte=date)
+        except Exception:
+            return None
 
 
 class VerificationException(Exception):
@@ -135,7 +187,7 @@ class PhotoVerification(StatusModel):
     # user IDs or something too easily guessable.
     receipt_id = models.CharField(
         db_index=True,
-        default=uuid.uuid4,
+        default=generateUUID,
         max_length=255,
     )
 
@@ -166,6 +218,8 @@ class PhotoVerification(StatusModel):
     # goes on. We don't try to define an exhuastive list -- this is just
     # capturing it so that we can later query for the common problems.
     error_code = models.CharField(blank=True, max_length=50)
+
+    
 
     class Meta:
         abstract = True
@@ -483,7 +537,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         aes_key_str = settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["FACE_IMAGE_AES_KEY"]
         aes_key = aes_key_str.decode("hex")
 
-        s3_key = self._generate_key("face")
+        s3_key = self._generate_s3_key("face")
         s3_key.set_contents_from_string(encrypt_and_encode(img_data, aes_key))
 
     @status_before_must_be("created")
@@ -510,7 +564,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         rsa_encrypted_aes_key = rsa_encrypt(aes_key, rsa_key_str)
 
         # Upload this to S3
-        s3_key = self._generate_key("photo_id")
+        s3_key = self._generate_s3_key("photo_id")
         s3_key.set_contents_from_string(encrypt_and_encode(img_data, aes_key))
 
         # Update our record fields
@@ -580,11 +634,13 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         We dynamically generate this, since we want it the expiration clock to
         start when the message is created, not when the record is created.
         """
-        s3_key = self._generate_key(name)
+        s3_key = self._generate_s3_key(name)
         return s3_key.generate_url(self.IMAGE_LINK_DURATION)
 
-    def _generate_key(self, prefix):
+    def _generate_s3_key(self, prefix):
         """
+        Generates a key for an s3 bucket location
+
         Example: face/4dd1add9-6719-42f7-bea0-115c008c4fca
         """
         conn = S3Connection(
@@ -689,3 +745,210 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         log.debug("Return message:\n\n{}\n\n".format(response.text))
 
         return response
+
+class SSPMidcourseReverification(SoftwareSecurePhotoVerification):
+    """
+    Model to re-verify identity using a service provided by Software Secure. 
+
+    As of now, it's inheriting a great deal of logic from both `PhotoVerification`
+    and `SoftwareSecurePhotoVerification`, but it might make more sense to just inherit
+    from `PhotoVerification`, or maybe not at all... a lot of classes had to get stomped/
+    rewritten.  Will think about this during CR.
+
+    TODO: another important thing to note during CR: right now we're assuming there's one
+    window per (user, course) combo.  This is UNTRUE in general (there can be many windows
+    per course, user pair), but we only need ONE window per (user, course) to launch.
+    Note the user_status methods in particular make this assumption.
+
+    Fix this if time permits...
+    """
+    window = models.ForeignKey(MidcourseReverificationWindow, db_index=True)
+
+    @classmethod
+    def user_is_reverified_for_all(self, course_id, user):
+        """
+        Checks to see if the student has successfully reverified for all of the
+        mandatory re-verification windows associated with a course.
+
+        This is used primarily by the certificate generation code... if the user is
+        not re-verified for all windows, then they cannot receive a certificate.
+        """
+        all_windows = MidcourseReverificationWindow.objects.filter(course_id=course_id)
+        # TODO check on this
+        # if there are no windows for a course, then return True right off
+        if (not all_windows):
+            return True
+        for window in all_windows:
+            try:
+                # There should be one and only one reverification object per (user, window)
+                # and the status of that object should be approved
+                if cls.objects.get(window=window, user=user).status != "approved":
+                    return False
+            except:
+                return False
+        return True
+
+    # TODO does this actually get the original_verification? pretty sure I need to search by date
+    def original_verification(self):
+        """
+        Returns the most current SoftwareSecurePhotoVerification object associated with the user. 
+        """
+        return (SoftwareSecurePhotoVerification.objects.get(user=self.user))
+
+    # TODO could just call original_verification's _generate_s3_key?
+    def _generate_original_s3_key(self, prefix):
+        
+        #Generates a key into the S3 bucket where the original verification is stored
+
+        #Example: face/4dd1add9-6719-42f7-bea0-115c008c4fca
+        
+        conn = S3Connection(
+            settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["AWS_ACCESS_KEY"],
+            settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["AWS_SECRET_KEY"]
+        )
+        bucket = conn.get_bucket(settings.VERIFY_STUDENT["SOFTWARE_SECURE"]["S3_BUCKET"])
+
+        key = Key(bucket)
+        key.key = "{}/{}".format(prefix, self.original_verification().receipt_id)
+
+        return key
+
+    @status_before_must_be("created")
+    def fetch_photo_id_image(self):
+        
+        #Find the user's photo ID image, which was submitted with their original verification.
+        #The image has already been encrypted and stored in s3, so we just need to find that
+        #location
+        
+
+        if settings.FEATURES.get('AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'):
+            return
+
+        old_s3_key = self._generate_original_s3_key("face")
+        new_s3_key = self._generate_s3_key("face")
+
+        original_photo_id = old_s3_key.get_contents_as_string()
+
+        # Unlike upload_face_image, we don't need to encrypt and encode with AES, since that
+        # was already done when we uploaded it for the initial verification
+        new_s3_key.set_contents_from_string(original_photo_id)
+        self.photo_id_key = self.original_verification().photo_id_key
+        self.save()
+
+    # we replace_photo_id_image with fetch_photo_id_image
+    @status_before_must_be("created")
+    def upload_photo_id_image(self, img_data):
+        raise NotImplementedError
+
+    # TODO right now this does nothing but return must_reverify, fix!!!
+    @classmethod
+    def get_status_for_window(cls, user, window):
+        """
+        Returns the status of the user based on their past verification attempts
+
+        If no such verification exists, returns 'must_reverify'
+        If verification has expired, returns 'expired' --> does this exist for windows?
+        If the verification has been approved, returns 'approved'
+        If the verification process is still ongoing, returns 'pending'
+        If the verification has been denied and the user must resubmit photos, returns 'must_reverify'
+        """
+        reverify_attempt = cls.objects.filter(user=user, window=window)
+        return "must_reverify"
+        #if not reverify_attempt:
+        #    return "must_reverify"
+        #else:
+            #return reverify_attempt.STATUS
+
+    # can't just inherit the old user_status function, because it's insufficiently specific
+    # reverifications are unique for a particular (user, window) pair, not just on user
+    # TODO: Note that a lot of the user_status related stuff is having to get overwritten.
+    # Does it still make sense to inherit from our parent object(s)?
+    @classmethod
+    def user_status(cls, user):
+        raise NotImplementedError
+
+    @classmethod
+    def user_status(cls, user, course_id):
+        """
+        Returns the status of the user based on their past verification attempts
+
+        If no such verification exists, returns 'none'
+        If verification has expired, returns 'expired'
+        If the verification has been approved, returns 'approved'
+        If the verification process is still ongoing, returns 'pending'
+        If the verification has been denied and the user must resubmit photos, returns 'must_reverify'
+        """
+        status = 'none'
+        error_msg = ''
+
+        if cls.user_is_verified(user):
+            status = 'approved'
+        elif cls.user_has_valid_or_pending(user):
+            # user_has_valid_or_pending does include 'approved', but if we are
+            # here, we know that the attempt is still pending
+            status = 'pending'
+        else:
+            # we need to check the most recent attempt to see if we need to ask them to do
+            # a retry
+            try:
+                attempts = cls.objects.filter(user=user).order_by('-updated_at')
+                attempt = attempts[0]
+            # this is the change for SSPMidcoursePhotoVerification objects
+            # if there is no verification, we look up course_id, via window, and find out if the user has a verified enrollment
+            # if verified enrolled in course but no verification: must_reverify
+            # if not verified enrollment: none
+            except IndexError:
+                if CourseEnrollment.objects.filter(user=user, course_id=course_id, mode="verified").exists:
+                    return ('must_reverify', error_msg)
+                else:
+                    return('none', error_msg)
+            if attempt.created_at < cls._earliest_allowed_date():
+                return ('expired', error_msg)
+
+            # right now, this is the only state at which they must reverify. It
+            # may change later
+            if attempt.status == 'denied':
+                status = 'must_reverify'
+            if attempt.error_msg:
+                error_msg = attempt.parsed_error_msg()
+
+        return (status, error_msg)
+
+    # can't inherit
+    @classmethod
+    def user_is_verified(cls, user):
+        raise NotImplementedError
+
+    @classmethod
+    def user_is_verified(cls, user, course_id):
+        return cls.objects.filter(
+            user=user, status="approved", window__course_id=course_id
+        ).exists()
+
+    # can't inherit
+    @classmethod
+    def user_has_valid_or_pending(cls, user):
+        return NotImplementedError
+
+    # changing this method?
+    @classmethod
+    def user_has_valid_or_pending(cls, user, course_id):
+        valid_statuses = ['submitted', 'approved']
+        return cls.objects.filter(
+            user=user,
+            window__course_id=course_id,
+            status__in=valid_statuses,
+        ).exists()
+
+    # can't inherit
+    @classmethod
+    def active_for_user(cls, user):
+        return NotImplementedError
+
+    @classmethod
+    def active_for_user(cls, user, course_id):
+        active_attempts = cls.objects.filter(user=user, status='ready', window__course_id=course_id)
+        if active_attempts:
+            return active_attempts[0]
+        else:
+            return None

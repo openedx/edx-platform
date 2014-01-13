@@ -10,6 +10,8 @@ import string       # pylint: disable=W0402
 import urllib
 import uuid
 import time
+import datetime
+from pytz import UTC
 
 from django.conf import settings
 from django.contrib.auth import logout, authenticate, login
@@ -45,7 +47,7 @@ from student.models import (
 )
 from student.forms import PasswordResetFormNoActive
 
-from verify_student.models import SoftwareSecurePhotoVerification
+from verify_student.models import SoftwareSecurePhotoVerification, MidcourseReverificationWindow, SSPMidcourseReverification
 from certificates.models import CertificateStatuses, certificate_status_for_student
 
 from xmodule.course_module import CourseDescriptor
@@ -205,6 +207,7 @@ def _cert_info(user, course, cert_status):
         CertificateStatuses.restricted: 'restricted',
     }
 
+    # TODO: We need the thing on the sidebar to mention if reverification, as per UI flows.
     status = template_state.get(cert_status['status'], default_status)
 
     d = {'status': status,
@@ -386,7 +389,26 @@ def dashboard(request):
     )
 
     # Verification Attempts
+    # Used to generate the "you must reverify for course x" banner
+    # TODO: make this banner appear at the top of courseware as well
     verification_status, verification_msg = SoftwareSecurePhotoVerification.user_status(user)
+
+    # TODO: Factor this out into a function; I'm pretty sure there's code duplication floating around...
+    prompt_midcourse_reverify = False
+    reverify_course_data = []
+    for (course, enrollment) in course_enrollment_pairs:
+        if MidcourseReverificationWindow.window_open_for_course(course.id) and not SSPMidcourseReverification.user_has_valid_or_pending(user, course.id):
+            window = MidcourseReverificationWindow.get_window(course.id, datetime.datetime.now(UTC))
+            status_for_window = SSPMidcourseReverification.get_status_for_window(user, window)
+            reverify_course_data.append(
+                (
+                    course.id,
+                    course.display_name,
+                    window.end_date,
+                    "must_reverify" # TODO: reflect more states than just "must_reverify" has_valid_or_pending (must show failure)
+                )
+            )
+            prompt_midcourse_reverify = True
 
     show_refund_option_for = frozenset(course.id for course, _enrollment in course_enrollment_pairs
                                        if _enrollment.refundable())
@@ -408,6 +430,8 @@ def dashboard(request):
                'all_course_modes': course_modes,
                'cert_statuses': cert_statuses,
                'show_email_settings_for': show_email_settings_for,
+               'prompt_midcourse_reverify': prompt_midcourse_reverify,
+               'reverify_course_data': reverify_course_data,
                'verification_status': verification_status,
                'verification_msg': verification_msg,
                'show_refund_option_for': show_refund_option_for,

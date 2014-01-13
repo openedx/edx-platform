@@ -1,0 +1,28 @@
+<%! from django.core.urlresolvers import reverse %>
+
+<h1>Re-verify</h1>
+
+<p>You currently need to re-verify for the following course:</p>
+
+% for course_id, course_name, date, status in reverify_course_data:
+	<p>${course_name}: Re-verify by ${date}. 
+		% if status == "must_reverify":
+		  <a href="${reverse('verify_student_midcourse_reverify', kwargs={'course_id': course_id})}">Re-verify</a>
+		% elif status == "completed":
+		  Completed
+		% elif status == "failed":
+		  Failed
+		% endif
+	</p>
+% endfor
+
+<h2>Why do I need to re-verify?</h2>
+<p>At key points in a course, the professor will ask you to re-verify your identity by submitting a new photo of your face. We will send the new photo to be matched up with the photo of the original ID you submitted when you signed up for the course. If you are taking multiple courses, you may need to re-verify multiple times, once for every important point in each course you are taking as a verified student.</p>
+
+<h2>What will I need to re-verify?</h2>
+<p>Because you are just confirming that you are still you, the only thing you will need to do to re-verify is to <b>submit a new photo of your face with your webcam</b>. The process is quick and you will be brought back to where you left off so you can keep on learning.</p>
+
+<p>If you changed your name during the semester and it no longer matches the original ID you submitted, you will need to re-edit your name to match as well.</p>
+
+<h2>What if I have trouble with my re-verification?</h2>
+<p>Because of the short time that re-verification is open, you <b>will not be able to correct a failed verification</b>. If you think there was an error in the review, please contact us at <a href="stuff">support@edx.org</a>.</p>
