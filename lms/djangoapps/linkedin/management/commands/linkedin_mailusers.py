@@ -7,7 +7,7 @@ import json
 import urllib
 
 from django.conf import settings
-from django.core.mail import send_mail
+from django.core.mail import EmailMessage
 from django.core.management.base import BaseCommand
 from django.template import Context
 from django.template.loader import get_template
@@ -43,6 +43,13 @@ class Command(BaseCommand):
                  "all users that have earned certificates to date to add their "
                  "certificates.  Afterwards the default, one email per "
                  "certificate mail form will be used."),)
+    option_list = option_list + (
+        make_option(
+            '--mock',
+            action='store_true',
+            dest='mock_run',
+            default=False,
+            help="Run without sending the final e-mails."),)
 
     def __init__(self):
         super(Command, self).__init__()
@@ -50,6 +57,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         whitelist = settings.LINKEDIN_API['EMAIL_WHITELIST']
         grandfather = options.get('grandfather', False)
+        mock_run = options.get('mock_run', False)
         accounts = LinkedIn.objects.filter(has_linkedin_account=True)
         for account in accounts:
             user = account.user
@@ -65,8 +73,9 @@ class Command(BaseCommand):
             if not certificates:
                 continue
             if grandfather:
-                self.send_grandfather_email(user, certificates)
-                emailed.extend([cert.course_id for cert in certificates])
+                self.send_grandfather_email(user, certificates, mock_run)
+                if not mock_run:
+                    emailed.extend([cert.course_id for cert in certificates])
             else:
                 for certificate in certificates:
                     self.send_triggered_email(user, certificate)
@@ -83,11 +92,11 @@ class Command(BaseCommand):
         tracking_code = '-'.join([
             'eml',
             'prof',  # the 'product'--no idea what that's supposed to mean
-            course.org,  # Partner's name
+            'edX',  # Partner's name
             course.number,  # Certificate's name
             'gf' if grandfather else 'T'])
         query = [
-            ('pfCertificationName', certificate.name),
+            ('pfCertificationName', course.display_name_with_default),
             ('pfAuthorityName', settings.PLATFORM_NAME),
             ('pfAuthorityId', settings.LINKEDIN_API['COMPANY_ID']),
             ('pfCertificationUrl', certificate.download_url),
@@ -99,7 +108,7 @@ class Command(BaseCommand):
             ('force', 'true')]
         return 'http://www.linkedin.com/profile/guided?' + urllib.urlencode(query)
 
-    def send_grandfather_email(self, user, certificates):
+    def send_grandfather_email(self, user, certificates, mock_run=False):
         """
         Send the 'grandfathered' email informing historical students that they
         may now post their certificates on their LinkedIn profiles.
@@ -124,13 +133,14 @@ class Command(BaseCommand):
                 'course_title': course_title,
                 'course_image_url': course_img_url,
                 'course_end_date': course_end_date,
-                'linkedin_add_url': self.certificate_url(cert),
+                'linkedin_add_url': self.certificate_url(cert, True),
             })
 
         context = {'courses_list': courses_list, 'num_courses': len(courses_list)}
         body = render_to_string('linkedin/linkedin_email.html', context)
-        subject = 'Congratulations! Put your certificates on LinkedIn'
-        self.send_email(user, subject, body)
+        subject = '{}, Add your Achievements to your LinkedIn Profile'.format(user.profile.name)
+        if not mock_run:
+            self.send_email(user, subject, body)
 
     def send_triggered_email(self, user, certificate):
         """
@@ -153,4 +163,6 @@ class Command(BaseCommand):
         """
         fromaddr = settings.DEFAULT_FROM_EMAIL
         toaddr = '%s <%s>' % (user.profile.name, user.email)
-        send_mail(subject, body, fromaddr, (toaddr,))
+        msg = EmailMessage(subject, body, fromaddr, (toaddr,))
+        msg.content_subtype = "html"
+        msg.send()

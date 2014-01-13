@@ -1147,10 +1147,6 @@ GRADES_DOWNLOAD = {
 ##################### LinkedIn #####################
 INSTALLED_APPS += ('django_openid_auth',)
 
-LINKEDIN_API = {
-    'COMPANY_NAME': 'edX',
-
-}
 
 ############################ LinkedIn Integration #############################
 INSTALLED_APPS += ('linkedin',)
