@@ -12,11 +12,3 @@ class LinkedIn(models.Model):
     user = models.OneToOneField(User, primary_key=True)
     has_linkedin_account = models.NullBooleanField(default=None)
     emailed_courses = models.TextField(default="[]")  # JSON list of course ids
-
-
-class LinkedInToken(models.Model):
-    """
-    For storing access token and authorization code after logging in to
-    LinkedIn.
-    """
-    access_token = models.CharField(max_length=255)

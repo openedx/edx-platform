@@ -15,8 +15,8 @@ from django.test import TestCase
 
 from xmodule.modulestore.tests.factories import CourseFactory
 from student.models import UserProfile
-from linkedin.models import LinkedIn
 from xmodule.modulestore.tests.django_utils import mixed_store_config
+from linkedin.models import LinkedIn
 from linkedin.management.commands import linkedin_mailusers as mailusers
 
 MODULE = 'linkedin.management.commands.linkedin_mailusers.'

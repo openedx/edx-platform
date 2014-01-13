@@ -1143,3 +1143,18 @@ GRADES_DOWNLOAD = {
     'BUCKET': 'edx-grades',
     'ROOT_PATH': '/tmp/edx-s3/grades',
 }
+
+##################### LinkedIn #####################
+INSTALLED_APPS += ('django_openid_auth',)
+
+LINKEDIN_API = {
+    'COMPANY_NAME': 'edX',
+
+}
+
+############################ LinkedIn Integration #############################
+INSTALLED_APPS += ('linkedin',)
+LINKEDIN_API = {
+    'EMAIL_WHITELIST': [],
+    'COMPANY_ID': '2746406',
+}
