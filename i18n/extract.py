@@ -44,8 +44,14 @@ def main():
     for filename in generated_files:
         remove_file(source_msgs_dir.joinpath(filename))
 
+    # Prepare makemessages command.
+    ignore_dirs = ["docs", "src", "i18n", "test_root"]
+    ignores = " ".join("--ignore={}/*".format(d) for d in ignore_dirs)
+    makemessages = 'django-admin.py makemessages -l en ' + ignores
+
     # Extract strings from mako templates.
     babel_mako_cmd = 'pybabel extract -F %s -c "Translators:" . -o %s' % (BABEL_CONFIG, BABEL_OUT)
+<<<<<<< HEAD
 
     # Extract strings from django source files.
     make_django_cmd = (
@@ -57,8 +63,17 @@ def main():
         'django-admin.py makemessages -l en --ignore=src/* --ignore=i18n/* '
         '-d djangojs --extension js'
     )
+=======
+>>>>>>> 76f4eaf94719cccdb8f85b0a5871cbfb28947b75
     execute(babel_mako_cmd, working_directory=BASE_DIR)
+
+    # Extract strings from django source files, including .py files.
+    make_django_cmd = makemessages + ' --extension html'
     execute(make_django_cmd, working_directory=BASE_DIR)
+
+    # Extract strings from Javascript source files.
+    make_djangojs_cmd = makemessages + ' -d djangojs --extension js'
+    execute(make_djangojs_cmd, working_directory=BASE_DIR)
 
     # makemessages creates 'django.po'. This filename is hardcoded.
     # Rename it to django-partial.po to enable merging into django.po later.
@@ -66,7 +81,6 @@ def main():
         source_msgs_dir.joinpath('django.po'),
         source_msgs_dir.joinpath('django-partial.po')
     )
-    execute(make_djangojs_cmd, working_directory=BASE_DIR)
 
     for filename in generated_files:
         LOG.info('Cleaning %s' % filename)

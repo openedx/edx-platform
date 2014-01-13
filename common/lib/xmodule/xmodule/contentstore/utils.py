@@ -19,7 +19,7 @@ def empty_asset_trashcan(course_locs):
             store.delete(id)
 
         # then delete all of the assets
-        assets,__ = store.get_all_content_for_course(course_loc)
+        assets, __ = store.get_all_content_for_course(course_loc)
         for asset in assets:
             asset_loc = Location(asset["_id"])
             id = StaticContent.get_id_from_location(asset_loc)

@@ -1,0 +1,114 @@
+{
+    "ANALYTICS_API_KEY": "",
+    "AWS_ACCESS_KEY_ID": "",
+    "AWS_SECRET_ACCESS_KEY": "",
+    "CELERY_BROKER_PASSWORD": "celery",
+    "CELERY_BROKER_USER": "celery",
+    "CONTENTSTORE": {
+        "DOC_STORE_CONFIG": {
+            "collection": "modulestore",
+            "db": "edxapp",
+            "host": [
+                "localhost"
+            ],
+            "password": "password",
+            "port": 27017,
+            "user": "edxapp"
+        },
+        "ENGINE": "xmodule.contentstore.mongo.MongoContentStore",
+        "OPTIONS": {
+            "db": "edxapp",
+            "host": [
+                "localhost"
+            ],
+            "password": "password",
+            "port": 27017,
+            "user": "edxapp"
+        }
+    },
+    "DATABASES": {
+        "default": {
+            "ENGINE": "django.db.backends.mysql",
+            "HOST": "localhost",
+            "NAME": "test",
+            "PASSWORD": "",
+            "PORT": "3306",
+            "USER": "root"
+        }
+    },
+    "DOC_STORE_CONFIG": {
+        "collection": "modulestore",
+        "db": "test",
+        "host": [
+            "localhost"
+        ],
+        "password": "password",
+        "port": 27017,
+        "user": "edxapp"
+    },
+    "MODULESTORE": {
+        "default": {
+            "ENGINE": "xmodule.modulestore.mixed.MixedModuleStore",
+            "OPTIONS": {
+                "mappings": {},
+                "stores": {
+                    "default": {
+                        "DOC_STORE_CONFIG": {
+                            "collection": "modulestore",
+                            "db": "test",
+                            "host": [
+                                "localhost"
+                            ],
+                            "password": "password",
+                            "port": 27017,
+                            "user": "edxapp"
+                        },
+                        "ENGINE": "xmodule.modulestore.mongo.MongoModuleStore",
+                        "OPTIONS": {
+                            "collection": "modulestore",
+                            "db": "test",
+                            "default_class": "xmodule.hidden_module.HiddenDescriptor",
+                            "fs_root": "** OVERRIDDEN **",
+                            "host": [
+                                "localhost"
+                            ],
+                            "password": "password",
+                            "port": 27017,
+                            "render_template": "edxmako.shortcuts.render_to_string",
+                            "user": "edxapp"
+                        }
+                    },
+                    "xml": {
+                        "ENGINE": "xmodule.modulestore.xml.XMLModuleStore",
+                        "OPTIONS": {
+                            "data_dir": "** OVERRIDDEN **",
+                            "default_class": "xmodule.hidden_module.HiddenDescriptor"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "OPEN_ENDED_GRADING_INTERFACE": {
+        "grading_controller": "grading_controller",
+        "password": "password",
+        "peer_grading": "peer_grading",
+        "staff_grading": "staff_grading",
+        "url": "http://localhost:18060/",
+        "username": "lms"
+    },
+    "SECRET_KEY": "",
+    "XQUEUE_INTERFACE": {
+        "basic_auth": [
+            "edx",
+            "edx"
+        ],
+        "django_auth": {
+            "password": "password",
+            "username": "lms"
+        },
+        "url": "http://localhost:18040"
+    },
+    "ZENDESK_API_KEY": "",
+    "ZENDESK_USER": ""
+}

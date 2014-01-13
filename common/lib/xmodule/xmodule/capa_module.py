@@ -22,7 +22,6 @@ from xmodule.exceptions import NotFoundError, ProcessingError
 from xblock.fields import Scope, String, Boolean, Dict, Integer, Float
 from .fields import Timedelta, Date
 from django.utils.timezone import UTC
-from django.utils.translation import ugettext as _
 
 log = logging.getLogger("edx.courseware")
 
@@ -359,6 +358,7 @@ class CapaModule(CapaFields, XModule):
         """
         # The logic flow is a little odd so that _('xxx') strings can be found for
         # translation while also running _() just once for each string.
+        _ = self.runtime.service(self, "i18n").ugettext
         check = _('Check')
         final_check = _('Final Check')
 

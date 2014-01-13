@@ -21,7 +21,6 @@ import copy
 
 from django.http import Http404
 from django.conf import settings
-from django.utils.translation import ugettext as _
 
 from xmodule.x_module import XModule
 from xmodule.editing_module import TabsEditingDescriptor
@@ -302,6 +301,7 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
             else:
                 return ''
 
+        _ = self.runtime.service(self, "i18n").ugettext
         video_url.update({
             'help': _('A YouTube URL or a link to a file hosted anywhere on the web.'),
             'display_name': 'Video URL',
