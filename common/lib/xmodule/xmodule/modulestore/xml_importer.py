@@ -132,6 +132,7 @@ def import_from_xml(
         course_dirs=course_dirs,
         load_error_modules=load_error_modules,
         xblock_mixins=store.xblock_mixins,
+        xblock_select=store.xblock_select,
     )
 
     # NOTE: the XmlModuleStore does not implement get_items()

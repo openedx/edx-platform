@@ -5,6 +5,21 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Common: Add feature flags to allow developer use of pure XBlocks
+  - ALLOW_ALL_ADVANCED_COMPONENTS disables the hard-coded list of advanced
+    components in Studio, and allows any xblock to be added as an
+    advanced component in Studio settings
+  - XBLOCK_SELECT_FUNCTION allows the insertion of a custom function
+    to limit loading of XBlocks with (including allowing pure xblocks)
+
+Studio: Add sorting by column to the Files & Uploads page.
+See mongo_indexes.md for new indices that should be added.
+
+Common: Previously, theming was activated by providing a value for the THEME_NAME
+  setting. Now, theming is activated by setting the "USE_CUSTOM_THEME" feature
+  flag to True -- a THEME_NAME setting is still required to determine *which*
+  theme to use.
+
 Studio: Newly-created courses default to being published on Jan 1, 2030
 
 Studio: Added pagination to the Files & Uploads page.

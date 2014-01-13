@@ -20,6 +20,7 @@ set -e
 #             because we couldn't think of a better place to put it)
 #       - "lms-acceptance": Run the acceptance (Selenium) tests for the LMS
 #       - "cms-acceptance": Run the acceptance (Selenium) tests for Studio
+#       - "bok-choy": Run acceptance tests that use the bok-choy framework
 #
 #   `SHARD` is a number (1, 2, or 3) indicating which subset of the tests
 #       to build.  Currently, "lms-acceptance" has two shards (1 and 2),
@@ -93,6 +94,10 @@ END
 
     "cms-acceptance")
         rake test:acceptance:cms["-v 3 --tag shard_${SHARD}"]
+        ;;
+
+    "bok-choy")
+        rake test:bok_choy
         ;;
 
 esac

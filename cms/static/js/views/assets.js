@@ -4,11 +4,18 @@ define(["js/views/paging", "js/views/asset", "js/views/paging_header", "js/views
 var AssetsView = PagingView.extend({
     // takes AssetCollection as model
 
+    events : {
+        "click .column-sort-link": "onToggleColumn"
+    },
+
     initialize : function() {
         PagingView.prototype.initialize.call(this);
         var collection = this.collection;
         this.template = _.template($("#asset-library-tpl").text());
         this.listenTo(collection, 'destroy', this.handleDestroy);
+        this.registerSortableColumn('js-asset-name-col', gettext('Name'), 'display_name', 'asc');
+        this.registerSortableColumn('js-asset-date-col', gettext('Date Added'), 'date_added', 'desc');
+        this.setInitialSortColumn('js-asset-date-col');
     },
 
     render: function() {
@@ -52,12 +59,20 @@ var AssetsView = PagingView.extend({
     },
 
     addAsset: function (model) {
+        // Switch the sort column back to the default (most recent date added) and show the first page
+        // so that the new asset is shown at the top of the page.
+        this.setInitialSortColumn('js-asset-date-col');
         this.setPage(0);
 
         analytics.track('Uploaded a File', {
             'course': course_location_analytics,
             'asset_url': model.get('url')
         });
+    },
+
+    onToggleColumn: function(event) {
+        var columnName = event.target.id;
+        this.toggleSortOrder(columnName);
     }
 });
 

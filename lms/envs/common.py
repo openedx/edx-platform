@@ -32,7 +32,7 @@ from .discussionsettings import *
 
 from lms.lib.xblock.mixin import LmsBlockMixin
 from xmodule.modulestore.inheritance import InheritanceMixin
-from xmodule.x_module import XModuleMixin
+from xmodule.x_module import XModuleMixin, only_xmodules
 
 ################################### FEATURES ###################################
 # The display name of the platform to be used in templates/emails/etc.
@@ -144,7 +144,7 @@ FEATURES = {
     # Enables the student notes API and UI.
     'ENABLE_STUDENT_NOTES': True,
 
-    # Provide a UI to allow users to submit feedback from the LMS
+    # Provide a UI to allow users to submit feedback from the LMS (left-hand help modal)
     'ENABLE_FEEDBACK_SUBMISSION': False,
 
     # Turn on a page that lets staff enter Python code to be run in the
@@ -405,6 +405,14 @@ INIT_MODULESTORE_ON_STARTUP = True
 # This should be moved into an XBlock Runtime/Application object
 # once the responsibility of XBlock creation is moved out of modulestore - cpennington
 XBLOCK_MIXINS = (LmsBlockMixin, InheritanceMixin, XModuleMixin)
+
+# Only allow XModules in the LMS
+XBLOCK_SELECT_FUNCTION = only_xmodules
+
+# Use the following lines to allow any xblock in the LMS,
+# either by uncommenting them here, or adding them to your private.py
+# from xmodule.x_module import prefer_xmodules
+# XBLOCK_SELECT_FUNCTION = prefer_xmodules
 
 #################### Python sandbox ############################################
 
@@ -1032,38 +1040,13 @@ MKTG_URL_LINK_MAP = {
     'TOS': 'tos',
     'HONOR': 'honor',
     'PRIVACY': 'privacy_edx',
+    'JOBS': 'jobs',
+    'PRESS': 'press',
 
     # Verified Certificates
     'WHAT_IS_VERIFIED_CERT': 'verified-certificate',
 }
 
-
-############################### THEME ################################
-def enable_theme(theme_name):
-    """
-    Enable the settings for a custom theme, whose files should be stored
-    in ENV_ROOT/themes/THEME_NAME (e.g., edx_all/themes/stanford).
-
-    The THEME_NAME setting should be configured separately since it can't
-    be set here (this function closes too early). An idiom for doing this
-    is:
-
-    THEME_NAME = "stanford"
-    enable_theme(THEME_NAME)
-    """
-    FEATURES['USE_CUSTOM_THEME'] = True
-
-    # Calculate the location of the theme's files
-    theme_root = ENV_ROOT / "themes" / theme_name
-
-    # Include the theme's templates in the template search paths
-    TEMPLATE_DIRS.append(theme_root / 'templates')
-    MAKO_TEMPLATES['main'].append(theme_root / 'templates')
-
-    # Namespace the theme's static files to 'themes/<theme_name>' to
-    # avoid collisions with default edX static files
-    STATICFILES_DIRS.append((u'themes/%s' % theme_name,
-                             theme_root / 'static'))
 
 ################# Student Verification #################
 VERIFY_STUDENT = {
