@@ -156,7 +156,7 @@ class LocMapperStore(object):
                     entry = item
                     break
 
-        block_id = entry['block_map'].get(self._encode_for_mongo(location.name))
+        block_id = entry['block_map'].get(self.encode_key_for_mongo(location.name))
         if block_id is None:
             if add_entry_if_missing:
                 block_id = self._add_to_block_map(location, location_id, entry['block_map'])
@@ -231,7 +231,7 @@ class LocMapperStore(object):
                         candidate['_id']['org'],
                         candidate['_id']['course'],
                         category,
-                        self._decode_from_mongo(old_name),
+                        self.decode_key_from_mongo(old_name),
                         None)
                     published_locator = BlockUsageLocator(
                         candidate['course_id'], branch=candidate['prod_branch'], block_id=block_id
@@ -261,7 +261,7 @@ class LocMapperStore(object):
             # if 2 different category locations had same name, then they'll collide. Make the later
             # mapped ones unique
             block_id = self._verify_uniqueness(location.name, block_map)
-        encoded_location_name = self._encode_for_mongo(location.name)
+        encoded_location_name = self.encode_key_for_mongo(location.name)
         block_map.setdefault(encoded_location_name, {})[location.category] = block_id
         self.location_map.update(location_id, {'$set': {'block_map': block_map}})
         return block_id
@@ -331,7 +331,8 @@ class LocMapperStore(object):
                 return self._verify_uniqueness(name, block_map)
         return name
 
-    def _encode_for_mongo(self, fieldname):
+    @staticmethod
+    def encode_key_for_mongo(fieldname):
         """
         Fieldnames in mongo cannot have periods nor dollar signs. So encode them.
         :param fieldname: an atomic field name. Note, don't pass structured paths as it will flatten them
@@ -340,9 +341,10 @@ class LocMapperStore(object):
             fieldname = fieldname.replace(char, '%{:02x}'.format(ord(char)))
         return fieldname
 
-    def _decode_from_mongo(self, fieldname):
+    @staticmethod
+    def decode_key_from_mongo(fieldname):
         """
-        The inverse of _encode_for_mongo
+        The inverse of encode_key_for_mongo
         :param fieldname: with period and dollar escaped
         """
         return urllib.unquote(fieldname)
