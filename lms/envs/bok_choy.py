@@ -24,7 +24,7 @@ from .aws import *  # pylint: disable=W0401, W0614
 
 ######################### Testing overrides ####################################
 
-# Needed for the `reset_db` management command
+# Needed for the reset database management command
 INSTALLED_APPS += ('django_extensions',)
 
 # Redirect to the test_root folder within the repo

@@ -132,11 +132,11 @@ Connect to your virtual machine with "vagrant ssh".
 Some examples you can use from your virtual machine:
 
 - Start Learning management system (LMS):
-    $ rake lms[cms.dev,0.0.0.0:8000]
+    $ paver lms --settings=cms.dev
     =>  http://${MY_IP}:8000/
 
 - Start Studio:
-    $ rake cms[dev,0.0.0.0:8001]
+    $ paver studio --settings=dev
     => http://${MY_IP}:8001/
 
 See the README for more.
