@@ -54,7 +54,7 @@ def main():
     execute(babel_mako_cmd, working_directory=BASE_DIR)
 
     # Extract strings from django source files, including .py files.
-    make_django_cmd = makemessages + ' --extension html'
+    make_django_cmd = makemessages + ' -d django --extension html'
     execute(make_django_cmd, working_directory=BASE_DIR)
 
     # Extract strings from Javascript source files.

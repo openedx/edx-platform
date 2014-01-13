@@ -2,26 +2,23 @@
 <%! from django.utils.translation import ugettext as _ %>
 
 <div class="wrapper-footer wrapper">
-  <footer class="primary" role="contentinfo">
+  <footer role="contentinfo" class="primary">
     <div class="colophon">
-      <p>&copy; 2013 <a href="http://www.edx.org" rel="external">edX</a>. ${ _("All rights reserved.")}</p>
+      <p>Copyright&copy;2011 China Education Television. All Rights Reserved.<br />&copy;2011 中国教育电视台 网络视听许可证0108262号 京ICP证101020号 互联网新闻信息服务许可（国新网1012010001）京公网安备:110402120001</p>
     </div>
 
-    <nav class="nav-peripheral">
+    <!--nav class="nav-peripheral">
       <ol>
         <li class="nav-item nav-peripheral-tos">
-          <a data-rel="edx.org" href="${marketing_link('TOS')}">${_("Terms of Service")}</a>
+          <a href="#" data-rel="edx.org">Terms of Service</a>
         </li>
         <li class="nav-item nav-peripheral-pp">
-          <a data-rel="edx.org" href="${marketing_link('PRIVACY')}">${_("Privacy Policy")}</a>
+          <a href="#" data-rel="edx.org">隐私政策</a>
         </li>
-        % if user.is_authenticated():
         <li class="nav-item nav-peripheral-feedback">
-          <a href="http://help.edge.edx.org/discussion/new" class="show-tender" title="${_('Use our feedback tool, Tender, to share your feedback')}">${_("Contact Us")}</a>
+          <a title="请使用工具Tender来分享您的反馈" class="show-tender" href="http://help.edge.edx.org/discussion/new">联系我们</a>
         </li>
-        % endif
       </ol>
-    </nav>
+    </nav-->
   </footer>
 </div>
-

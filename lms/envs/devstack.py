@@ -4,9 +4,16 @@ Specific overrides to the base prod settings to make development easier.
 
 from .aws import * # pylint: disable=wildcard-import, unused-wildcard-import
 
+#from .dev import *
+
+
 DEBUG = True
 USE_I18N = True
 TEMPLATE_DEBUG = True
+
+LANGUAGES = ( ('zh_CN', 'Chinese'), )
+TIME_ZONE = 'Asia/Shanghai'
+LANGUAGE_CODE = 'zh_CN'
 
 # By default don't use a worker, execute tasks as if they were local functions
 CELERY_ALWAYS_EAGER = True
