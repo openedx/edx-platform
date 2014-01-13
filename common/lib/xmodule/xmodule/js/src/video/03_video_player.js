@@ -755,7 +755,9 @@ function (HTML5Video, Resizer) {
         // might differ by one or two seconds against the actual time as will
         // be reported later on by the player.getDuration() API function.
         if (!isFinite(dur) || dur <= 0) {
-            dur = this.getDuration();
+            if (this.videoType === 'youtube') {
+                dur = this.getDuration();
+            }
         }
 
         // Just in case the metadata is garbled, or something went wrong, we
