@@ -381,10 +381,18 @@ def import_course_draft(
 
     # create a new 'System' object which will manage the importing
     errorlog = make_error_tracker()
+
+    # The course_dir as passed to ImportSystem is expected to just be relative, not
+    # the complete path including data_dir. ImportSystem will concatenate the two together.
+    data_dir = xml_module_store.data_dir
+    # Whether or not data_dir ends with a "/" differs in production vs. test.
+    if not data_dir.endswith("/"):
+        data_dir += "/"
+    draft_course_dir = draft_dir.replace(data_dir, '', 1)
     system = ImportSystem(
         xmlstore=xml_module_store,
         course_id=target_location_namespace.course_id,
-        course_dir=draft_dir,
+        course_dir=draft_course_dir,
         policy={},
         error_tracker=errorlog.tracker,
         parent_tracker=ParentTracker(),
@@ -393,6 +401,10 @@ def import_course_draft(
 
     # now walk the /vertical directory where each file in there
     # will be a draft copy of the Vertical
+
+    # First it is necessary to order the draft items by their desired index in the child list
+    # (order os.walk returns them in is not guaranteed).
+    drafts = dict()
     for dirname, dirnames, filenames in os.walk(draft_dir + "/vertical"):
         for filename in filenames:
             module_path = os.path.join(dirname, filename)
@@ -434,6 +446,29 @@ def import_course_draft(
 
                     descriptor = system.process_xml(xml)
 
+                    # HACK: since we are doing partial imports of drafts
+                    # the vertical doesn't have the 'url-name' set in the
+                    # attributes (they are normally in the parent object,
+                    # aka sequential), so we have to replace the location.name
+                    # with the XML filename that is part of the pack
+                    fn, fileExtension = os.path.splitext(filename)
+                    descriptor.location = descriptor.location._replace(name=fn)
+
+                    index = int(descriptor.xml_attributes['index_in_children_list'])
+                    if index in drafts:
+                        drafts[index].append(descriptor)
+                    else:
+                        drafts[index] = [descriptor]
+
+                except Exception, e:
+                    logging.exception('There was an error. {err}'.format(
+                        err=unicode(e)
+                    ))
+
+        # For each index_in_children_list key, there is a list of vertical descriptors.
+        for key in sorted(drafts.iterkeys()):
+            for descriptor in drafts[key]:
+                try:
                     def _import_module(module):
                         module.location = module.location._replace(revision='draft')
                         # make sure our parent has us in its list of children
@@ -466,14 +501,6 @@ def import_course_draft(
                         )
                         for child in module.get_children():
                             _import_module(child)
-
-                    # HACK: since we are doing partial imports of drafts
-                    # the vertical doesn't have the 'url-name' set in the
-                    # attributes (they are normally in the parent object,
-                    # aka sequential), so we have to replace the location.name
-                    # with the XML filename that is part of the pack
-                    fn, fileExtension = os.path.splitext(filename)
-                    descriptor.location = descriptor.location._replace(name=fn)
 
                     _import_module(descriptor)
 
