@@ -202,6 +202,8 @@ FEATURES = {
     # Give course staff unrestricted access to grade downloads (if set to False,
     # only edX superusers can perform the downloads)
     'ALLOW_COURSE_STAFF_GRADE_DOWNLOADS': False,
+
+    'ENABLED_PAYMENT_REPORTS': [ "refund_report", "itemized_purchase_report", "university_revenue_share",  "certificate_status"],
 }
 
 # Used for A/B testing

@@ -1,9 +1,8 @@
+""" Objects and functions related to generating CSV reports """
+
 from decimal import Decimal
 import unicodecsv
-import logging
 
-from django.db import models
-from django.conf import settings
 from django.utils.translation import ugettext as _
 
 from courseware.courses import get_course_by_id
@@ -11,7 +10,6 @@ from course_modes.models import CourseMode
 from shoppingcart.models import CertificateItem, OrderItem
 from student.models import CourseEnrollment
 from util.query import use_read_replica_if_available
-from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
 
 
@@ -191,10 +189,10 @@ class CertificateStatusReport(Report):
             yield [
                 university,
                 course,
-                "",
-                "",
-                "",
-                "",
+                course_announce_date,
+                course_reg_start_date,
+                course_reg_close_date,
+                registration_period,
                 total_enrolled,
                 audit_enrolled,
                 honor_enrolled,
@@ -267,10 +265,11 @@ class UniversityRevenueShareReport(Report):
             _("Total Amount of Refunds"),
         ]
 
+
 def course_ids_between(start_word, end_word):
-    """ 
+    """
     Returns a list of all valid course_ids that fall alphabetically between start_word and end_word.
-    These comparisons are unicode-safe. 
+    These comparisons are unicode-safe.
     """
 
     valid_courses = []

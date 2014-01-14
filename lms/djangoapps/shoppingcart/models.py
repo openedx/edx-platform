@@ -1,3 +1,5 @@
+""" Models for the shopping cart and assorted purchase types """
+
 from collections import namedtuple
 from datetime import datetime
 from decimal import Decimal
@@ -581,7 +583,7 @@ class CertificateItem(OrderItem):
         """
         Returns a Decimal indicating the total sum of field_to_aggregate for all verified certificates with a particular status.
 
-        Sample usages: 
+        Sample usages:
         - status 'refunded' and field_to_aggregate 'unit_cost' will give the total amount of money refunded for course_id
         - status 'purchased' and field_to_aggregate 'service_fees' gives the sum of all service fees for purchased certificates
         etc

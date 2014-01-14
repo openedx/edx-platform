@@ -23,7 +23,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.db import models, IntegrityError
-from django.db.models import Sum, Count
+from django.db.models import Count
 from django.db.models.signals import post_save
 from django.dispatch import receiver, Signal
 import django.dispatch
@@ -35,6 +35,7 @@ from eventtracking import tracker
 
 from course_modes.models import CourseMode
 import lms.lib.comment_client as cc
+from util.query import use_read_replica_if_available
 
 unenroll_done = Signal(providing_args=["course_enrollment"])
 log = logging.getLogger(__name__)
@@ -588,7 +589,7 @@ class CourseEnrollment(models.Model):
         enrollment count for each individual mode.
         """
         # Unfortunately, Django's "group by"-style queries look super-awkward
-        query = cls.objects.filter(course_id=course_id, is_active=True).values('mode').order_by().annotate(Count('mode'))
+        query = use_read_replica_if_available(cls.objects.filter(course_id=course_id, is_active=True).values('mode').order_by().annotate(Count('mode')))
         total = 0
         d = defaultdict(int)
         for item in query:

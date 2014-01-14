@@ -97,6 +97,15 @@ class CourseMode(models.Model):
 
     @classmethod
     def min_course_price_for_verified_for_currency(cls, course_id, currency):
+        """
+        Returns the minimum price of the course int he appropriate currency over all the
+        course's *verified*, non-expired modes.
+
+        Assuming all verified courses have a minimum price of >0, this value should always
+        be >0.
+
+        If no verified mode is found, 0 is returned.
+        """
         modes = cls.modes_for_course(course_id)
         for mode in modes:
             if (mode.currency == currency) and (mode.slug == 'verified'):
