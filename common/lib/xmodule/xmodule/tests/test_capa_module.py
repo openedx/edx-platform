@@ -1335,8 +1335,8 @@ class CapaModuleTest(unittest.TestCase):
                 module = CapaFactory.create(rerandomize=rerandomize)
                 assert 0 <= module.seed < 1000
 
-    @patch('xmodule.capa_module.log')
-    @patch('xmodule.capa_module.Progress')
+    @patch('xmodule.capa_base.log')
+    @patch('xmodule.capa_base.Progress')
     def test_get_progress_error(self, mock_progress, mock_log):
         """
         Check that an exception given in `Progress` produces a `log.exception` call.
@@ -1349,7 +1349,7 @@ class CapaModuleTest(unittest.TestCase):
             mock_log.exception.assert_called_once_with('Got bad progress')
             mock_log.reset_mock()
 
-    @patch('xmodule.capa_module.Progress')
+    @patch('xmodule.capa_base.Progress')
     def test_get_progress_calculate_progress_fraction(self, mock_progress):
         """
         Check that score and total are calculated correctly for the progress fraction.
