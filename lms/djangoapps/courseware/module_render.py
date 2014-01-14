@@ -14,7 +14,7 @@ from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponse
 import django.utils
-from django.views.decorators.csrf import csrf_exempt, csrf_protect
+from django.views.decorators.csrf import csrf_exempt
 
 from capa.xqueue_interface import XQueueInterface
 from courseware.access import has_access
@@ -37,6 +37,7 @@ from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.util.duedate import get_extended_due_date
 from xmodule_modifiers import replace_course_urls, replace_jump_to_id_urls, replace_static_urls, add_histogram, wrap_xblock
 from xmodule.lti_module import LTIModule
 from xmodule.x_module import XModuleDescriptor
@@ -112,7 +113,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
                 sections.append({'display_name': section.display_name_with_default,
                                  'url_name': section.url_name,
                                  'format': section.format if section.format is not None else '',
-                                 'due': section.due,
+                                 'due': get_extended_due_date(section),
                                  'active': active,
                                  'graded': section.graded,
                                  })

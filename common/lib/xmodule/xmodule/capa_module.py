@@ -22,6 +22,7 @@ from xmodule.exceptions import NotFoundError, ProcessingError
 from xblock.fields import Scope, String, Boolean, Dict, Integer, Float
 from .fields import Timedelta, Date
 from django.utils.timezone import UTC
+from .util.duedate import get_extended_due_date
 
 log = logging.getLogger("edx.courseware")
 
@@ -95,6 +96,14 @@ class CapaFields(object):
         values={"min": 0}, scope=Scope.settings
     )
     due = Date(help="Date that this problem is due by", scope=Scope.settings)
+    extended_due = Date(
+        help="Date that this problem is due by for a particular student. This "
+             "can be set by an instructor, and will override the global due "
+             "date if it is set to a date that is later than the global due "
+             "date.",
+        default=None,
+        scope=Scope.user_state,
+    )
     graceperiod = Timedelta(
         help="Amount of time after the due date that submissions will be accepted",
         scope=Scope.settings
@@ -191,7 +200,7 @@ class CapaModule(CapaFields, XModule):
         """
         super(CapaModule, self).__init__(*args, **kwargs)
 
-        due_date = self.due
+        due_date = get_extended_due_date(self)
 
         if self.graceperiod is not None and due_date:
             self.close_date = due_date + self.graceperiod
