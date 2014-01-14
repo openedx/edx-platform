@@ -102,7 +102,8 @@ class Attribute(object):
         val = element.get(self.name)
         if self.default == self._sentinel and val is None:
             raise ValueError(
-                'Missing required attribute {0}.'.format(self.name))
+                'Missing required attribute {0}.'.format(self.name)
+            )
 
         if val is None:
             # not required, so return default
@@ -156,8 +157,9 @@ class InputTypeBase(object):
 
         self.input_id = state.get('id', xml.get('id'))
         if self.input_id is None:
-            raise ValueError("input id state is None. xml is {0}".format(
-                etree.tostring(xml)))
+            raise ValueError(
+                "input id state is None. xml is {0}".format(etree.tostring(xml))
+            )
 
         self.value = state.get('value', '')
 
@@ -259,8 +261,9 @@ class InputTypeBase(object):
             'msg': self.msg,
             'STATIC_URL': self.system.STATIC_URL,
         }
-        context.update((a, v) for (
-            a, v) in self.loaded_attributes.iteritems() if a in self.to_render)
+        context.update(
+            (a, v) for (a, v) in self.loaded_attributes.iteritems() if a in self.to_render
+        )
         context.update(self._extra_context())
         return context
 
@@ -390,7 +393,7 @@ class ChoiceGroup(InputTypeBase):
 
     @staticmethod
     def extract_choices(element):
-        '''
+        """
         Extracts choices for a few input types, such as ChoiceGroup, RadioGroup and
         CheckboxGroup.
 
@@ -398,7 +401,7 @@ class ChoiceGroup(InputTypeBase):
 
         TODO: allow order of choices to be randomized, following lon-capa spec.  Use
         "location" attribute, ie random, top, bottom.
-        '''
+        """
 
         choices = []
 
@@ -575,7 +578,8 @@ class TextLine(InputTypeBase):
             # Preprocessor to insert between raw input and Mathjax
             self.preprocessor = {
                 'class_name': self.loaded_attributes['preprocessorClassName'],
-                'script_src': self.loaded_attributes['preprocessorSrc']}
+                'script_src': self.loaded_attributes['preprocessorSrc'],
+            }
             if None in self.preprocessor.values():
                 self.preprocessor = None
 
@@ -596,9 +600,6 @@ class FileSubmission(InputTypeBase):
     template = "filesubmission.html"
     tags = ['filesubmission']
 
-    # pulled out for testing
-    submitted_msg = ("Your file(s) have been submitted; as soon as your submission is"
-                     " graded, this message will be replaced with the grader's feedback.")
 
     @staticmethod
     def parse_files(files):
@@ -620,6 +621,11 @@ class FileSubmission(InputTypeBase):
         Do some magic to handle queueing status (render as "queued" instead of "incomplete"),
         pull queue_len from the msg field.  (TODO: get rid of the queue_len hack).
         """
+        _ = self.system.service(self, "i18n").ugettext
+        submitted_msg = _("Your file(s) have been submitted. As soon as your submission is"
+                          " graded, this message will be replaced with the grader's feedback.")
+        self.submitted_msg = submitted_msg
+
         # Check if problem has been queued
         self.queue_len = 0
         # Flag indicating that the problem has been queued, 'msg' is length of
@@ -627,7 +633,7 @@ class FileSubmission(InputTypeBase):
         if self.status == 'incomplete':
             self.status = 'queued'
             self.queue_len = self.msg
-            self.msg = FileSubmission.submitted_msg
+            self.msg = self.submitted_msg
 
     def _extra_context(self):
         return {'queue_len': self.queue_len, }
@@ -644,15 +650,13 @@ class CodeInput(InputTypeBase):
     """
 
     template = "codeinput.html"
-    tags = ['codeinput',
-            'textbox',
-            # Another (older) name--at some point we may want to make it use a
-            # non-codemirror editor.
-            ]
+    tags = [
+        'codeinput',
+        'textbox',
+        # Another (older) name--at some point we may want to make it use a
+        # non-codemirror editor.
+    ]
 
-    # pulled out for testing
-    submitted_msg = ("Submitted.  As soon as your submission is"
-                     " graded, this message will be replaced with the grader's feedback.")
 
     @classmethod
     def get_attributes(cls):
@@ -668,7 +672,7 @@ class CodeInput(InputTypeBase):
                 Attribute('linenumbers', 'true'),
                 # Template expects tabsize to be an int it can do math with
                 Attribute('tabsize', 4, transform=int),
-                ]
+        ]
 
     def setup_code_response_rendering(self):
         """
@@ -689,7 +693,12 @@ class CodeInput(InputTypeBase):
             self.msg = self.submitted_msg
 
     def setup(self):
-        ''' setup this input type '''
+        """ setup this input type """
+        _ = self.system.service(self, "i18n").ugettext
+        submitted_msg = _("Your answer has been submitted. As soon as your submission is"
+                          " graded, this message will be replaced with the grader's feedback.")
+        self.submitted_msg = submitted_msg
+
         self.setup_code_response_rendering()
 
     def _extra_context(self):
@@ -703,7 +712,7 @@ registry.register(CodeInput)
 
 
 class MatlabInput(CodeInput):
-    '''
+    """
     InputType for handling Matlab code input
 
     TODO: API_KEY will go away once we have a way to specify it per-course
@@ -714,17 +723,20 @@ class MatlabInput(CodeInput):
           %api_key=API_KEY
         </plot_payload>
     </matlabinput>
-    '''
+    """
     template = "matlabinput.html"
     tags = ['matlabinput']
 
-    plot_submitted_msg = ("Submitted. As soon as a response is returned, "
-                          "this message will be replaced by that feedback.")
 
     def setup(self):
-        '''
+        """
         Handle matlab-specific parsing
-        '''
+        """
+        _ = self.system.service(self, "i18n").ugettext
+        submitted_msg = _("Submitted. As soon as a response is returned, "
+                          "this message will be replaced by that feedback.")
+        self.submitted_msg = submitted_msg
+
         self.setup_code_response_rendering()
 
         xml = self.xml
@@ -740,10 +752,10 @@ class MatlabInput(CodeInput):
         if 'queuestate' in self.input_state and self.input_state['queuestate'] == 'queued':
             self.status = 'queued'
             self.queue_len = 1
-            self.msg = self.plot_submitted_msg
+            self.msg = self.submitted_msg
 
     def handle_ajax(self, dispatch, data):
-        '''
+        """
         Handle AJAX calls directed to this input
 
         Args:
@@ -752,14 +764,14 @@ class MatlabInput(CodeInput):
         Returns:
             dict - 'success' - whether or not we successfully queued this submission
                  - 'message' - message to be rendered in case of error
-        '''
+        """
 
         if dispatch == 'plot':
             return self._plot_data(data)
         return {}
 
     def ungraded_response(self, queue_msg, queuekey):
-        '''
+        """
         Handle the response from the XQueue
         Stores the response in the input_state so it can be rendered later
 
@@ -769,7 +781,7 @@ class MatlabInput(CodeInput):
 
         Returns:
             nothing
-        '''
+        """
         # check the queuekey against the saved queuekey
         if('queuestate' in self.input_state and self.input_state['queuestate'] == 'queued'
                 and self.input_state['queuekey'] == queuekey):
@@ -791,7 +803,7 @@ class MatlabInput(CodeInput):
             return True
 
     def _extra_context(self):
-        ''' Set up additional context variables'''
+        """ Set up additional context variables"""
         extra_context = {
             'queue_len': str(self.queue_len),
             'queue_msg': self.queue_msg,
@@ -800,31 +812,31 @@ class MatlabInput(CodeInput):
         return extra_context
 
     def _parse_data(self, queue_msg):
-        '''
+        """
         Parses the message out of the queue message
         Args:
             queue_msg (str) - a JSON encoded string
         Returns:
             returns the value for the the key 'msg' in queue_msg
-        '''
+        """
         try:
             result = json.loads(queue_msg)
         except (TypeError, ValueError):
             log.error("External message should be a JSON serialized dict."
-                      " Received queue_msg = %s" % queue_msg)
+                      " Received queue_msg = %s", queue_msg)
             raise
         msg = result['msg']
         return msg
 
     def _plot_data(self, data):
-        '''
+        """
         AJAX handler for the plot button
         Args:
             get (dict) - should have key 'submission' which contains the student submission
         Returns:
             dict - 'success' - whether or not we successfully queued this submission
                  - 'message' - message to be rendered in case of error
-        '''
+        """
         # only send data if xqueue exists
         if self.system.xqueue is None:
             return {'success': False, 'message': 'Cannot connect to the queue'}
@@ -846,11 +858,15 @@ class MatlabInput(CodeInput):
             queue_name=self.queuename)
 
         # construct xqueue body
-        student_info = {'anonymous_student_id': anonymous_student_id,
-                        'submission_time': qtime}
-        contents = {'grader_payload': self.plot_payload,
-                    'student_info': json.dumps(student_info),
-                    'student_response': response}
+        student_info = {
+            'anonymous_student_id': anonymous_student_id,
+            'submission_time': qtime
+        }
+        contents = {
+            'grader_payload': self.plot_payload,
+            'student_info': json.dumps(student_info),
+            'student_response': response
+        }
 
         (error, msg) = qinterface.send_to_queue(header=xheader,
                                                 body=json.dumps(contents))
@@ -886,7 +902,8 @@ class Schematic(InputTypeBase):
             Attribute('parts', None),
             Attribute('analyses', None),
             Attribute('initial_value', None),
-            Attribute('submit_analyses', None), ]
+            Attribute('submit_analyses', None),
+        ]
 
 
 registry.register(Schematic)
@@ -1020,10 +1037,10 @@ class ChemicalEquationInput(InputTypeBase):
         }
 
     def handle_ajax(self, dispatch, data):
-        '''
+        """
         Since we only have chemcalc preview this input, check to see if it
         matches the corresponding dispatch and send it through if it does
-        '''
+        """
         if dispatch == 'preview_chemcalc':
             return self.preview_chemcalc(data)
         return {}
@@ -1107,10 +1124,10 @@ class FormulaEquationInput(InputTypeBase):
         }
 
     def handle_ajax(self, dispatch, get):
-        '''
+        """
         Since we only have formcalc preview this input, check to see if it
         matches the corresponding dispatch and send it through if it does
-        '''
+        """
         if dispatch == 'preview_formcalc':
             return self.preview_formcalc(get)
         return {}
@@ -1422,7 +1439,7 @@ class AnnotationInput(InputTypeBase):
         self._validate_options()
 
     def _find_options(self):
-        ''' Returns an array of dicts where each dict represents an option. '''
+        """ Returns an array of dicts where each dict represents an option. """
         elements = self.xml.findall('./options/option')
         return [{
                 'id': index,
@@ -1431,7 +1448,7 @@ class AnnotationInput(InputTypeBase):
                 } for (index, option) in enumerate(elements)]
 
     def _validate_options(self):
-        ''' Raises a ValueError if the choice attribute is missing or invalid. '''
+        """ Raises a ValueError if the choice attribute is missing or invalid. """
         valid_choices = ('correct', 'partially-correct', 'incorrect')
         for option in self.options:
             choice = option['choice']
@@ -1442,7 +1459,7 @@ class AnnotationInput(InputTypeBase):
                     choice, ', '.join(valid_choices)))
 
     def _unpack(self, json_value):
-        ''' Unpacks the json input state into a dict. '''
+        """ Unpacks the json input state into a dict. """
         d = json.loads(json_value)
         if type(d) != dict:
             d = {}

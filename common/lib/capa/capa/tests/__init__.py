@@ -51,6 +51,9 @@ def test_system():
         cache=None,
         can_execute_unsafe_code=lambda: False,
     )
+
+    # Mock out i18n to just return the string that is passed in
+    the_system.service("i18n").ugettext = lambda x: x
     return the_system
 
 
