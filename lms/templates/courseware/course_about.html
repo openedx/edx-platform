@@ -4,6 +4,7 @@
   from courseware.courses import course_image_url, get_course_about_section
   from courseware.access import has_access
   from django.conf import settings
+  from edxmako.shortcuts import marketing_link
 
   if settings.FEATURES.get('ENABLE_SHOPPING_CART'):
       cart_link = reverse('shoppingcart.views.show_cart')
@@ -58,18 +59,24 @@
 
     ## making the conditional around this entire JS block for sanity
     %if settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
+      <%
+        perms_error = _('The currently logged-in user account does not have permission to enroll in this course. '
+                        'You may need to {start_logout_tag}log out{end_tag} then try the register button again. '
+                        'Please visit the {start_help_tag}help page{end_tag} for a possible solution.').format(
+                          start_help_tag="<a href='{url}'>".format(url=marketing_link('FAQ')), end_tag='</a>',
+                          start_logout_tag="<a href='{url}'>".format(url=reverse('logout'))
+                          )
+      %>
     $('#class_enroll_form').on('ajax:complete', function(event, xhr) {
       if(xhr.status == 200) {
         location.href = "${reverse('dashboard')}";
       } else if (xhr.status == 403) {
         location.href = "${reverse('course-specific-register', args=[course.id])}?course_id=${course.id}&enrollment_action=enroll";
       } else if (xhr.status == 400) { //This means the user did not have permission
-        $('#register_error').html('This course has restricted enrollment.  Sorry, you do not have permission to enroll.<br />' +
-                                  'You may need to log out and re-login with a university account, such as WebAuth'
-        ).css("display", "block");
+        $('#register_error').html("${perms_error}").css("display", "block");
       } else {
         $('#register_error').html(
-            (xhr.responseText ? xhr.responseText : 'An error occurred. Please try again later.')
+            (xhr.responseText ? xhr.responseText : "${_("An error occurred. Please try again later.")}")
         ).css("display", "block");
       }
     });
