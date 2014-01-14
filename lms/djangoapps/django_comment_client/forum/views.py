@@ -131,7 +131,7 @@ def inline_discussion(request, course_id, discussion_id):
     cohorts_list = list()
 
     if is_cohorted:
-        cohorts_list.append({'name': 'All Groups', 'id': None})
+        cohorts_list.append({'name': _('All Groups'), 'id': None})
 
         #if you're a mod, send all cohorts and let you pick
 
@@ -309,7 +309,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
             'cohorted_commentables': cohorted_commentables
         }
 
-        return render_to_response('discussion/single_thread.html', context)
+        return render_to_response('discussion/index.html', context)
 
 
 @login_required
