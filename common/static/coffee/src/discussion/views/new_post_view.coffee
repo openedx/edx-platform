@@ -105,17 +105,17 @@ if Backbone?
           path = (x.replace /^\s+|\s+$/g, "" for x in name.split("/"))
           while path.length > 1
               path.shift()
-              partialName = "... / " + path.join(" / ")
+              partialName = gettext("…") + " / " + path.join(" / ")
               if  @getNameWidth(partialName) < @maxNameWidth
                   return partialName
 
           rawName = path[0]
 
-          name = "... / " + rawName
+          name = gettext("…") + " / " + rawName
 
           while @getNameWidth(name) > @maxNameWidth
               rawName = rawName[0...rawName.length-1]
-              name =  "... / " + rawName + " ..."
+              name =  gettext("…") + " / " + rawName + " " + gettext("…")
 
           return name
 

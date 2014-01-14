@@ -165,7 +165,7 @@ if Backbone?
       url = @model.urlFor('_delete')
       if not @model.can('can_delete')
         return
-      if not confirm "Are you sure to delete thread \"#{@model.get('title')}\"?"
+      if not confirm gettext("Are you sure you want to delete this post?")
         return
       @model.remove()
       @showView.undelegateEvents()

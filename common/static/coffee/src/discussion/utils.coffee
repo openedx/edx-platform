@@ -3,7 +3,7 @@ $ ->
     window.$$contents = {}
   $.fn.extend
     loading: (takeFocus) ->
-      @$_loading = $("<div class='loading-animation' tabindex='0'><span class='sr'>Loading content</span></div>")
+      @$_loading = $("<div class='loading-animation' tabindex='0'><span class='sr'>" + gettext("Loading content") + "</span></div>")
       $(this).after(@$_loading)
       if takeFocus
         DiscussionUtil.makeFocusTrap(@$_loading)
@@ -109,7 +109,7 @@ class @DiscussionUtil
         "  <header><h2/><hr/></header>" +
         "  <p id='discussion-alert-message'/>" +
         "  <hr/>" +
-        "  <button class='dismiss'>OK</button>" +
+        "  <button class='dismiss'>" + gettext("OK") + "</button>" +
         "</div>"
       )
       @makeFocusTrap(alertDiv.find("button"))
@@ -137,9 +137,8 @@ class @DiscussionUtil
     if !params["error"]
       params["error"] = =>
         @discussionAlert(
-          "Sorry",
-          "We had some trouble processing your request. Please ensure you" +
-          " have copied any unsaved work and then reload the page."
+          gettext("Sorry"),
+          gettext("We had some trouble processing your request. Please ensure you have copied any unsaved work and then reload the page.")
         )
     request = $.ajax(params).always ->
       if $elem
@@ -290,5 +289,5 @@ class @DiscussionUtil
     else
       while minLength < text.length && text[minLength] != ' '
         minLength++
-      return text.substr(0, minLength) + '...'
+      return text.substr(0, minLength) + gettext('…')
 
