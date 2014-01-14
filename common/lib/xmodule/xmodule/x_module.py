@@ -14,7 +14,7 @@ from xblock.core import XBlock
 from xblock.fields import Scope, Integer, Float, List, XBlockMixin, String
 from xblock.fragment import Fragment
 from xblock.plugin import default_select
-from xblock.runtime import Runtime, MemoryIdManager
+from xblock.runtime import Runtime
 from xmodule.fields import RelativeTime
 
 from xmodule.errortracker import exc_info_to_str

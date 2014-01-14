@@ -224,7 +224,7 @@ class ConditionalDescriptor(ConditionalFields, SequenceDescriptor):
             if child.tag == 'show':
                 location = ConditionalDescriptor.parse_sources(child, system)
                 children.extend(location)
-                show_tag_list.extend(location.url())
+                show_tag_list.extend(location.url())  # pylint: disable=no-member
             else:
                 try:
                     descriptor = system.process_xml(etree.tostring(child))

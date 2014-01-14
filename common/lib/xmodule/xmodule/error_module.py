@@ -134,7 +134,7 @@ class ErrorDescriptor(ErrorFields, XModuleDescriptor):
         )
 
     @classmethod
-    def from_xml(cls, xml_data, system, id_generator,
+    def from_xml(cls, xml_data, system, id_generator,  # pylint: disable=arguments-differ
                  error_msg='Error not available'):
         '''Create an instance of this descriptor from the supplied data.
 

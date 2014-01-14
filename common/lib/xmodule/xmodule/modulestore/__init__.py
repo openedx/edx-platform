@@ -268,7 +268,9 @@ class Location(_LocationBase):
                 _check_location_part(value, INVALID_CHARS_NAME)
             else:
                 _check_location_part(value, INVALID_CHARS)
-        return super(Location, self)._replace(**kwargs)
+
+        # namedtuple is an old-style class, so don't use super
+        return _LocationBase._replace(self, **kwargs)
 
     def replace(self, **kwargs):
         '''
