@@ -1,26 +1,33 @@
+"""
+Support for inheritance of fields down an XBlock hierarchy.
+"""
+
 from datetime import datetime
 from pytz import UTC
 
 from xblock.fields import Scope, Boolean, String, Float, XBlockMixin, Dict
+from xblock.runtime import KeyValueStore, KvsFieldData
+
 from xmodule.fields import Date, Timedelta
-from xblock.runtime import KeyValueStore
 
 
 class InheritanceMixin(XBlockMixin):
-    """Field definitions for inheritable fields"""
+    """Field definitions for inheritable fields."""
 
     graded = Boolean(
         help="Whether this module contributes to the final course grade",
+        scope=Scope.settings,
         default=False,
-        scope=Scope.settings
     )
-
     start = Date(
         help="Start time when this module is visible",
         default=datetime(2030, 1, 1, tzinfo=UTC),
         scope=Scope.settings
     )
-    due = Date(help="Date that this problem is due by", scope=Scope.settings)
+    due = Date(
+        help="Date that this problem is due by",
+        scope=Scope.settings,
+    )
     extended_due = Date(
         help="Date that this problem is due by for a particular student. This "
              "can be set by an instructor, and will override the global due "
@@ -29,31 +36,38 @@ class InheritanceMixin(XBlockMixin):
         default=None,
         scope=Scope.user_state,
     )
-    giturl = String(help="url root for course data git repository", scope=Scope.settings)
+    giturl = String(
+        help="url root for course data git repository",
+        scope=Scope.settings,
+    )
     xqa_key = String(help="DO NOT USE", scope=Scope.settings)
     graceperiod = Timedelta(
         help="Amount of time after the due date that submissions will be accepted",
-        scope=Scope.settings
+        scope=Scope.settings,
     )
     showanswer = String(
         help="When to show the problem answer to the student",
         scope=Scope.settings,
-        default="finished"
+        default="finished",
     )
     rerandomize = String(
         help="When to rerandomize the problem",
+        scope=Scope.settings,
         default="never",
-        scope=Scope.settings
     )
     days_early_for_beta = Float(
         help="Number of days early to show content to beta users",
+        scope=Scope.settings,
         default=None,
-        scope=Scope.settings
     )
-    static_asset_path = String(help="Path to use for static assets - overrides Studio c4x://", scope=Scope.settings, default='')
+    static_asset_path = String(
+        help="Path to use for static assets - overrides Studio c4x://",
+        scope=Scope.settings,
+        default='',
+    )
     text_customization = Dict(
         help="String customization substitutions for particular locations",
-        scope=Scope.settings
+        scope=Scope.settings,
     )
     use_latex_compiler = Boolean(
         help="Enable LaTeX templates?",
@@ -102,6 +116,37 @@ def own_metadata(module):
     mapped to their serialized values
     """
     return module.get_explicitly_set_fields_by_scope(Scope.settings)
+
+
+class InheritingFieldData(KvsFieldData):
+    """A `FieldData` implementation that can inherit value from parents to children."""
+
+    def __init__(self, inheritable_names, **kwargs):
+        """
+        `inheritable_names` is a list of names that can be inherited from
+        parents.
+
+        """
+        super(InheritingFieldData, self).__init__(**kwargs)
+        self.inheritable_names = set(inheritable_names)
+
+    def default(self, block, name):
+        """
+        The default for an inheritable name is found on a parent.
+        """
+        if name in self.inheritable_names and block.parent is not None:
+            parent = block.get_parent()
+            if parent:
+                return getattr(parent, name)
+        super(InheritingFieldData, self).default(block, name)
+
+
+def inheriting_field_data(kvs):
+    """Create an InheritanceFieldData that inherits the names in InheritanceMixin."""
+    return InheritingFieldData(
+        inheritable_names=InheritanceMixin.fields.keys(),
+        kvs=kvs,
+    )
 
 
 class InheritanceKeyValueStore(KeyValueStore):

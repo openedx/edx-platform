@@ -1501,7 +1501,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         """Test new course creation - error path for bad organization name"""
         self.course_data['org'] = 'University of California, Berkeley'
         self.assert_course_creation_failed(
-            "Unable to create course 'Robot Super Course'.\n\nInvalid characters in 'University of California, Berkeley'.")
+            "Unable to create course 'Robot Super Course'.\n\nInvalid characters in u'University of California, Berkeley'.")
 
     def test_create_course_with_course_creation_disabled_staff(self):
         """Test new course creation -- course creation disabled, but staff access."""

@@ -4,9 +4,12 @@ Xml parsing tests for XModules
 import pprint
 from mock import Mock
 
-from xmodule.x_module import XMLParsingSystem
+from xmodule.x_module import XMLParsingSystem, policy_key
 from xmodule.mako_module import MakoDescriptorSystem
-from xmodule.modulestore.xml import create_block_from_xml
+from xmodule.modulestore.xml import create_block_from_xml, LocationReader, CourseLocationGenerator
+from xmodule.modulestore import Location
+
+from xblock.runtime import KvsFieldData, DictKeyValueStore
 
 
 class InMemorySystem(XMLParsingSystem, MakoDescriptorSystem):  # pylint: disable=abstract-method
@@ -18,26 +21,37 @@ class InMemorySystem(XMLParsingSystem, MakoDescriptorSystem):  # pylint: disable
         self.course = xml_import_data.course
         self.default_class = xml_import_data.default_class
         self._descriptors = {}
+
+        def get_policy(usage_id):
+            """Return the policy data for the specified usage"""
+            return xml_import_data.policy.get(policy_key(usage_id), {})
+
         super(InMemorySystem, self).__init__(
-            policy=xml_import_data.policy,
+            get_policy=get_policy,
             process_xml=self.process_xml,
             load_item=self.load_item,
             error_tracker=Mock(),
             resources_fs=xml_import_data.filesystem,
             mixins=xml_import_data.xblock_mixins,
             select=xml_import_data.xblock_select,
-            render_template=lambda template, context: pprint.pformat((template, context))
+            render_template=lambda template, context: pprint.pformat((template, context)),
+            field_data=KvsFieldData(DictKeyValueStore()),
+            id_reader=LocationReader(),
         )
 
     def process_xml(self, xml):  # pylint: disable=method-hidden
         """Parse `xml` as an XBlock, and add it to `self._descriptors`"""
-        descriptor = create_block_from_xml(xml, self, self.org, self.course, self.default_class)
+        descriptor = create_block_from_xml(
+            xml,
+            self,
+            CourseLocationGenerator(self.org, self.course),
+        )
         self._descriptors[descriptor.location.url()] = descriptor
         return descriptor
 
     def load_item(self, location):  # pylint: disable=method-hidden
         """Return the descriptor loaded for `location`"""
-        return self._descriptors[location]
+        return self._descriptors[Location(location).url()]
 
 
 class XModuleXmlImportTest(object):

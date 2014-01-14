@@ -29,7 +29,7 @@ from util.json_request import JsonResponse
 from util.sandboxing import can_execute_unsafe_code
 from xblock.core import XBlock
 from xblock.fields import Scope
-from xblock.runtime import DbModel, KeyValueStore
+from xblock.runtime import KvsFieldData, KeyValueStore
 from xblock.exceptions import NoSuchHandlerError
 from xblock.django.request import django_to_webob_request, webob_to_django_response
 from xmodule.error_module import ErrorDescriptor, NonStaffErrorDescriptor
@@ -222,7 +222,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
     if not has_access(user, descriptor, 'load', course_id):
         return None
 
-    student_data = DbModel(DjangoKeyValueStore(field_data_cache))
+    student_data = KvsFieldData(DjangoKeyValueStore(field_data_cache))
     descriptor._field_data = LmsFieldData(descriptor._field_data, student_data)
 
 

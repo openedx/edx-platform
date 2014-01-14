@@ -4,12 +4,29 @@ from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.modulestore.locator import BlockUsageLocator, LocalId
 from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import exc_info_to_str
-from xblock.runtime import DbModel
+from xblock.runtime import KvsFieldData, IdReader
 from ..exceptions import ItemNotFoundError
 from .split_mongo_kvs import SplitMongoKVS
 from xblock.fields import ScopeIds
 
 log = logging.getLogger(__name__)
+
+
+class SplitMongoIdReader(IdReader):
+    """
+    An :class:`~xblock.runtime.IdReader` associated with a particular
+    :class:`.CachingDescriptorSystem`.
+    """
+    def __init__(self, system):
+        self.system = system
+
+    def get_definition_id(self, usage_id):
+        usage = self.system.load_item(usage_id)
+        return usage.definition_locator
+
+    def get_block_type(self, def_id):
+        definition = self.system.modulestore.db_connection.get_definition(def_id)
+        return definition['category']
 
 
 class CachingDescriptorSystem(MakoDescriptorSystem):
@@ -33,7 +50,12 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         module_data: a dict mapping Location -> json that was cached from the
             underlying modulestore
         """
-        super(CachingDescriptorSystem, self).__init__(load_item=self._load_item, **kwargs)
+        super(CachingDescriptorSystem, self).__init__(
+            id_reader=SplitMongoIdReader(self),
+            field_data=None,
+            load_item=self._load_item,
+            **kwargs
+        )
         self.modulestore = modulestore
         self.course_entry = course_entry
         self.lazy = lazy
@@ -102,7 +124,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
             json_data.get('fields', {}),
             json_data.get('_inherited_settings'),
         )
-        field_data = DbModel(kvs)
+        field_data = KvsFieldData(kvs)
 
         try:
             module = self.construct_xblock_from_class(

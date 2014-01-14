@@ -310,9 +310,7 @@ def import_module(
         source_course_location, dest_course_location, allow_not_found=False,
         do_import_static=True):
 
-    logging.debug('processing import of module {url}...'.format(
-        url=module.location.url()
-    ))
+    logging.debug('processing import of module {}...'.format(module.location.url()))
 
     content = {}
     for field in module.fields.values():
@@ -393,10 +391,10 @@ def import_course_draft(
         xmlstore=xml_module_store,
         course_id=target_location_namespace.course_id,
         course_dir=draft_course_dir,
-        policy={},
         error_tracker=errorlog.tracker,
         parent_tracker=ParentTracker(),
         load_error_modules=False,
+        field_data=None,
     )
 
     # now walk the /vertical directory where each file in there

@@ -317,7 +317,7 @@ class DjangoKeyValueStore(KeyValueStore):
         Provide a bulk save mechanism.
 
         `kv_dict`: A dictionary of dirty fields that maps
-          xblock.DbModel._key : value
+          xblock.KvsFieldData._key : value
 
         """
         saved_fields = []

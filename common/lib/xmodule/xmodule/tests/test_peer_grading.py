@@ -414,6 +414,6 @@ class PeerGradingModuleTrackChangesTest(unittest.TestCase, DummyModulestore):
         @return:
         """
         self.peer_grading._find_corresponding_module_for_location = self.mock_track_changes_problem
-        response = self.peer_grading.peer_grading_problem({'location': 'mocked'})
+        response = self.peer_grading.peer_grading_problem({'location': 'i4x://mock_org/mock_course/mock_cat/mock_name'})
         self.assertTrue(response['success'])
         self.assertIn("'track_changes': True", response['html'])
