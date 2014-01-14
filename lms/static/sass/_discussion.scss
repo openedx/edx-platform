@@ -309,7 +309,7 @@ body.discussion {
       }
     }
 
-    .edit-post-title, .edit-post-tags {
+    .edit-post-title {
       width: 100%;
       height: 40px;
       padding: 0 10px;
@@ -322,21 +322,6 @@ body.discussion {
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) inset;
     }
 
-    .tagsinput {
-      padding: 10px;
-      @include box-sizing(border-box);
-      border: 1px solid #aaa;
-      border-radius: 3px;
-      background: #fff;
-      font-family: 'Monaco', monospace;
-      font-size: 13px;
-      line-height: 1.6;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) inset;
-
-      span.tag {
-        margin-bottom: 0;
-      }
-    }
   }
 
   .new-post-form {
@@ -369,22 +354,6 @@ body.discussion {
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) inset;
     }
 
-    .tagsinput {
-      padding: 10px;
-      @include box-sizing(border-box);
-      border: 1px solid #333;
-      border-radius: 3px;
-      background: #fff;
-      font-family: 'Monaco', monospace;
-      font-size: 13px;
-      line-height: 1.6;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) inset;
-
-      span.tag {
-        margin-bottom: 0;
-      }
-    }
-
     .new-post-body .wmd-preview {
       @include discussion-wmd-preview;
       position: relative;
@@ -409,8 +378,7 @@ body.discussion {
       font-size: 11px;
     }
 
-    .new-post-title,
-    .new-post-tags {
+    .new-post-title {
       width: 100%;
       height: 40px;
       padding: 0 10px;
@@ -418,13 +386,10 @@ body.discussion {
       border-radius: 3px;
       border: 1px solid #333;
       font-size: 16px;
+      font-weight: 700;
       font-family: 'Open Sans', sans-serif;
       color: #333;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) inset;
-    }
-
-    .new-post-title {
-      font-weight: 700;
     }
 
     .submit {
@@ -461,20 +426,6 @@ body.discussion {
   }
 
 
-
-  .thread-tags {
-    margin-top: $baseline;
-  }
-
-  .thread-tag {
-    margin-right: 5px;
-    padding: 3px $baseline/2 6px;
-    border: 1px solid #90c4d7;
-    border-radius: 3px;
-    background: #c5eeff;
-    color: #333;
-    font-size: 13px;
-  }
 
   .thread-title {
     display: block;
@@ -2175,8 +2126,7 @@ body.discussion {
         text-transform: uppercase;
       }
 
-      .new-post-title,
-      .new-post-tags {
+      .new-post-title{
         width: 100%;
         height: 40px;
         padding: 0 $baseline/2;
@@ -2184,29 +2134,10 @@ body.discussion {
         border-radius: 3px;
         border: 1px solid #333;
         font-size: 16px;
+        font-weight: 700;
         font-family: 'Open Sans', sans-serif;
         color: #333;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) inset;
-      }
-
-      .new-post-title {
-        font-weight: 700;
-      }
-
-      .tagsinput {
-        padding: $baseline/2;
-        @include box-sizing(border-box);
-        border: 1px solid #333;
-        border-radius: 3px;
-        background: $white;
-        font-family: 'Monaco', monospace;
-        font-size: 13px;
-        line-height: 1.6;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) inset;
-
-        span.tag {
-          margin-bottom: 0;
-        }
       }
 
       .submit {
@@ -2240,20 +2171,6 @@ body.discussion {
           text-shadow: none;
         }
       }
-    }
-
-    .thread-tags {
-      margin: $baseline 0;
-    }
-
-    .thread-tag {
-      padding: 3px $baseline/2 6px;
-      margin-right: 5px;
-      border-radius: 3px;
-      color: #333;
-      background: #c5eeff;
-      border: 1px solid #90c4d7;
-      font-size: 13px;
     }
 
     .thread-title {
@@ -2519,7 +2436,7 @@ body.discussion {
       }
     }
 
-    .edit-post-title, .edit-post-tags {
+    .edit-post-title {
       width: 100%;
       height: 40px;
       padding: 0 $baseline/2;
@@ -2531,36 +2448,6 @@ body.discussion {
       color: #333;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) inset;
     }
-
-    .tagsinput {
-      padding: $baseline/2;
-      @include box-sizing(border-box);
-      border: 1px solid #aaa;
-      border-radius: 3px;
-      background: $white;
-      font-family: 'Monaco', monospace;
-      font-size: 13px;
-      line-height: 1.6;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) inset;
-
-      span.tag {
-        margin-bottom: 0;
-      }
-    }
-  }
-
-  .thread-tags {
-    margin: $baseline 0;
-  }
-
-  .thread-tag {
-    padding: 3px $baseline/2 6px;
-    margin-right: 5px;
-    border-radius: 3px;
-    color: #333;
-    background: #c5eeff;
-    border: 1px solid #90c4d7;
-    font-size: 13px;
   }
 }
 

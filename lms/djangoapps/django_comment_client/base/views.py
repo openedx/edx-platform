@@ -85,7 +85,7 @@ def create_thread(request, course_id, commentable_id):
     else:
         anonymous_to_peers = False
 
-    thread = cc.Thread(**extract(post, ['body', 'title', 'tags']))
+    thread = cc.Thread(**extract(post, ['body', 'title']))
     thread.update_attributes(**{
         'anonymous': anonymous,
         'anonymous_to_peers': anonymous_to_peers,
@@ -142,7 +142,7 @@ def update_thread(request, course_id, thread_id):
     Given a course id and thread id, update a existing thread, used for both static and ajax submissions
     """
     thread = cc.Thread.find(thread_id)
-    thread.update_attributes(**extract(request.POST, ['body', 'title', 'tags']))
+    thread.update_attributes(**extract(request.POST, ['body', 'title']))
     thread.save()
     if request.is_ajax():
         return ajax_content_response(request, course_id, thread.to_dict())
@@ -525,15 +525,6 @@ def search_similar_threads(request, course_id, commentable_id):
     return JsonResponse({
         'html': render_to_string('discussion/_similar_posts.html', context)
     })
-
-
-@require_GET
-def tags_autocomplete(request, course_id):
-    value = request.GET.get('q', None)
-    results = []
-    if value:
-        results = cc.tags_autocomplete(value)
-    return JsonResponse(results)
 
 
 @require_POST
