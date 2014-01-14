@@ -564,8 +564,13 @@ function (VideoPlayer) {
         this.metadata = {};
 
         $.each(this.videos, function (speed, url) {
+            console.log('[fetchMetadata]: speed = ' + speed);
+            console.log('[fetchMetadata]: url = ' + url);
             _this.getVideoMetadata(url, function (data) {
+                console.log('[fetchMetadata::callback]: data = ', data);
+
                 if (data.data) {
+                    console.log('[fetchMetadata::callback]: data contains data!');
                     _this.metadata[data.data.id] = data.data;
                 }
             });
@@ -605,6 +610,9 @@ function (VideoPlayer) {
             url = this.videos['1.0'] || '';
         }
         successHandler = ($.isFunction(callback)) ? callback : null;
+
+        console.log('[getVideoMetadata]: url = ' + this.config.ytTestUrl + url + '?v=2&alt=jsonc');
+
         xhr = $.ajax({
             url: this.config.ytTestUrl + url + '?v=2&alt=jsonc',
             dataType: 'jsonp',
@@ -632,7 +640,17 @@ function (VideoPlayer) {
     }
 
     function getDuration() {
-        return this.metadata[this.youtubeId()].duration;
+        var res;
+
+        console.log('[01_initialize::getDuration]: .duration');
+        console.log('[01_initialize::getDuration]: this.metadata = ', this.metadata);
+        console.log('[01_initialize::getDuration]: this.youtubeId() = ' + this.youtubeId());
+
+        res = this.metadata[this.youtubeId()].duration;
+
+        console.log('[01_initialize::getDuration]: res = res');
+
+        return res;
     }
 
     /*

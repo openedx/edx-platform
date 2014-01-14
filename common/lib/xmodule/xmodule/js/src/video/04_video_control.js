@@ -271,6 +271,7 @@ function () {
     }
 
     function updateVcrVidTime(params) {
+        console.log('[updateVcrVidTime]: .duration');
         this.videoControl.vidTimeEl.html(Time.format(params.time) + ' / ' + Time.format(params.duration));
     }
 

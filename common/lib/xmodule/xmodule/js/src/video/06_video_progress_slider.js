@@ -105,6 +105,7 @@ function () {
     function updateStartEndTimeRegion(params) {
         var left, width, start, end, duration, rangeParams;
 
+        console.log('[updateStartEndTimeRegion]: .duration');
         // We must have a duration in order to determine the area of range.
         // It also must be non-zero.
         if (!params.duration) {
@@ -195,6 +196,7 @@ function () {
     }
 
     function updatePlayTime(params) {
+        console.log('[progress::updatePlayTime]: .duration');
         var time = Math.floor(params.time),
             duration = Math.floor(params.duration);
 

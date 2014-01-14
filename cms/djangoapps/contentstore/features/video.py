@@ -193,6 +193,7 @@ def see_a_range_slider_with_proper_range(_step):
 
 @step('I click video button "([^"]*)"$')
 def click_button_video(_step, button_type):
+    import ipdb; ipdb.set_trace()
     world.wait(DELAY)
     world.wait_for_ajax_complete()
     button = button_type.strip()

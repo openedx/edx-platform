@@ -879,6 +879,16 @@
             });
         });
 
+        describe('getDuration', function () {
+            beforeEach(function () {
+
+            });
+
+            it('getDuration is called as a fall-back', function () {
+
+            });
+        });
+
         describe('playback rate', function () {
             beforeEach(function () {
                 initialize();

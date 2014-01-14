@@ -134,6 +134,7 @@ function (HTML5Video, Resizer) {
 
                 _resize(state, videoWidth, videoHeight);
 
+                console.log('[_initialize]: (html5) .duration');
                 state.trigger(
                     'videoControl.updateVcrVidTime',
                     {
@@ -170,6 +171,7 @@ function (HTML5Video, Resizer) {
 
                 _resize(state, videoWidth, videoHeight);
 
+                console.log('[_initialize]: (youtube) .duration');
                 // After initialization, update the VCR with total time.
                 // At this point only the metadata duration is available (not
                 // very precise), but it is better than having 00:00:00 for
@@ -355,6 +357,7 @@ function (HTML5Video, Resizer) {
     // It is created on a onPlay event. Cleared on a onPause event.
     // Reinitialized on a onSeek event.
     function onSeek(params) {
+        console.log('[03_video_player::onSeek]: .duration');
         var duration = this.videoPlayer.duration(),
             newTime = params.time;
 
@@ -399,6 +402,7 @@ function (HTML5Video, Resizer) {
     }
 
     function onEnded() {
+        console.log('[03_video_player::onEnded]: .duration');
         var time = this.videoPlayer.duration();
 
         this.trigger('videoControl.pause', null);
@@ -601,6 +605,7 @@ function (HTML5Video, Resizer) {
     }
 
     function updatePlayTime(time) {
+        console.log('[03_video_player::updatePlayTime]: .duration');
         var duration = this.videoPlayer.duration(),
             durationChange, tempStartTime, tempEndTime;
 

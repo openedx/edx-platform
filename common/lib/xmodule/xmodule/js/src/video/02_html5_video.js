@@ -35,6 +35,7 @@ function () {
         };
 
         Player.prototype.seekTo = function (value) {
+            console.log('[seekTo]: .duration');
             if (
                 typeof value === 'number' &&
                 value <= this.video.duration &&
@@ -67,6 +68,7 @@ function () {
         };
 
         Player.prototype.getDuration = function () {
+            console.log('[getDuration]: .duration');
             if (isNaN(this.video.duration)) {
                 return 0;
             }
