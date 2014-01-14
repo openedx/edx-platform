@@ -117,14 +117,20 @@
                 jasmine.stubRequests();
 
                 window.YT = {
-                    Player: function () { },
+                    Player: function () {
+                        return {
+                            getDuration: function () {
+                                return 60;
+                            }
+                        };
+                    },
                     PlayerState: oldYT.PlayerState,
                     ready: function (callback) {
                         callback();
                     }
                 };
 
-                spyOn(window.YT, 'Player');
+                spyOn(window.YT, 'Player').andCallThrough();
 
                 initializeYouTube();
 
@@ -959,5 +965,4 @@
             });
         });
     });
-
 }).call(this);

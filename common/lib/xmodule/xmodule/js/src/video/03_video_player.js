@@ -149,6 +149,9 @@ function (HTML5Video, Resizer) {
             } else {
                 youTubeId = state.youtubeId('1.0');
             }
+
+            // debugger;
+
             state.videoPlayer.player = new YT.Player(state.id, {
                 playerVars: state.videoPlayer.playerVars,
                 videoId: youTubeId,
