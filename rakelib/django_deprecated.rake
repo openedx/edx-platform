@@ -4,27 +4,6 @@ require 'colorize'
 
 def deprecated(deprecated, deprecated_by)
 
-    namespace :cms do
-
-       task deprecated, [:env, :options] do |t,args|
-
-            puts("in cms")
-            args.with_defaults(:env => "dev", :options => "")
-
-            if deprecated == "cms" or deprecated == "lms"
-                port = args.options == "" ? "" : "--port=#{args.options}"
-                new_cmd = deprecated_by + " --env=#{args.env} #{port}"
-            else
-                new_cmd = deprecated_by
-            end
-
-            puts("Task #{deprecated} has been deprecated. Use #{new_cmd} instead. Waiting 5 seconds...".red)
-            sleep(5)
-            sh(new_cmd)
-            exit
-        end
-    end
-
     task deprecated, [:arg1, :arg2, :arg3, :arg4] do |t,args|
 
         puts("#{deprecated}")
@@ -67,6 +46,9 @@ def deprecated(deprecated, deprecated_by)
     end
 end
 
+deprecated('lms','paver lms')
+deprecated("fastlms", "paver lms")
+
 deprecated('cms','paver cms')
 deprecated('cms:clone','paver clone_course')
 deprecated('cms:delete_course','paver delete_course')
@@ -75,19 +57,13 @@ deprecated('cms:import','paver import_course')
 deprecated('cms:xlint', 'paver xlint_course')
 deprecated('set_staff','paver set_staff')
 deprecated("django-admin", "paver django_admin")
+deprecated("resetdb", "paver resetdb")
 
 
 [:lms, :cms].each do |system|
 
-    deprecated("resetdb", "paver resetdb")
     deprecated("#{system}:resetdb", "paver resetdb --system=#{system}")
-
-    deprecated("#{system}", "paver #{system}")
-
-
     deprecated("#{system}_worker", "paver run_celery --system=#{system}")
-
-    deprecated("fastlms", "paver fast_lms")
 
     environments(system).each do |env|
       deprecated("#{system}:resetdb:#{env}", "paver resetdb --system=#{system} --env=#{env}")

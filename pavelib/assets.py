@@ -26,9 +26,9 @@ COMMON_ROOT = PROJECT_ROOT / "common"   # /project_dir/common
 COURSES_ROOT = PROJECT_ROOT / "data"    # /project_dir/data
 
 # Environment constants
-try:
+if 'SERVICE_VARIANT' in os.environ:
     CONFIG_PREFIX = os.environ['SERVICE_VARIANT'] + '.'
-except KeyError:
+else:
     CONFIG_PREFIX = ''
 
 ENV_FILE = os.path.join(PROJECT_ROOT, CONFIG_PREFIX + "env.json")
@@ -76,12 +76,24 @@ def coffee_clean():
 
 
 def coffee_cmd(watch=False):
-    cmd = ''
+    flags = ["--compile"]
 
-    if platform.system() == 'Darwin':
-        cmd = 'ulimit -n 8000; '
+    if watch:
+        flags.append("--watch")
 
-    return ('%s node_modules/.bin/coffee --compile ' % cmd) + ('--watch' if watch else '') + ' .'
+    if platform.system() == "Darwin":
+        precmd = "ulimit -n 8000;"
+    else:
+        precmd = ""
+
+    tpl = "{precmd} {coffee} {flags} {dir}"
+
+    return tpl.format(
+        precmd=precmd,
+        coffee="node_modules/.bin/coffee",
+        flags=" ".join(flags),
+        dir="."
+    )
 
 
 def sass_cmd(watch=False, debug=False):
@@ -259,7 +271,7 @@ def compile_assets(options):
 
     if collectstatic:
         print("collecting static")
-        sh('python manage.py %s collectstatic --traceback --settings=%s' % (system, env) + ' --noinput > /dev/null')
+        sh('python manage.py {system} collectstatic --traceback --settings={env} --noinput > /dev/null'.format(system=system, env=env))
 
     if run_watch:
         proc_utils.run_process([coffee_cmd(run_watch),

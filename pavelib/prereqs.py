@@ -62,9 +62,10 @@ def install_python_prereqs():
     requirements = prereqs_cache.get_files('requirements')
 
     if prereqs_cache.is_changed('requirements_prereqs', requirements, [site_packages_dir]):
-        sh('pip install -q --exists-action w -r requirements/edx/pre.txt')
-        sh('pip install -q --exists-action w -r requirements/edx/base.txt')
-        sh('pip install -q --exists-action w -r requirements/edx/post.txt')
+        req_files = ["requirements/edx/pre.txt", "requirements/edx/base.txt", "requirements/edx/post.txt"]
+        for req_file in req_files:
+            sh("pip install -q -r --exists-action w {req_file}".format(req_file=req_file))
+
         # requirements/private.txt is used to install our libs as
         # working dirs, or for personal-use tools.
         if os.path.exists("requirements/private.txt"):

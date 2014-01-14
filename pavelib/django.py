@@ -66,7 +66,7 @@ def run_server(options):
         port = default_port[system]
 
     try:
-        sh('python manage.py %s runserver --traceback --settings=%s' % (system, env) + ' --pythonpath=. ' + port)
+        sh('python manage.py {system} runserver --traceback --settings={env} --pythonpath=. {port}'.format(system=system, env=env, port=port))
     except:
         write_stderr("Failed to runserver")
         return
@@ -82,8 +82,8 @@ def resetdb():
     """
     env = getattr(options, 'env', 'dev')
 
-    sh('python manage.py lms syncdb --traceback --settings=%s' % (env) + ' --pythonpath=. ')
-    sh('python manage.py lms migrate --traceback --settings=%s' % (env) + ' --pythonpath=. ')
+    sh('python manage.py lms syncdb --traceback --settings={env}  --pythonpath=. '.format(env=env))
+    sh('python manage.py lms migrate --traceback --settings={env}  --pythonpath=. '.format(env=env))
 
 
 @task
@@ -99,7 +99,7 @@ def check_settings():
     env = getattr(options, 'env', 'dev')
 
     try:
-        sh(("echo 'import %s.envs.%s'" % (system, env)) + ' | python manage.py %s shell --plain --settings=%s' % (system, env) + ' --pythonpath=. ')
+        sh(("echo 'import {system}.envs.{env}' | python manage.py {system} shell --plain --settings={env} --pythonpath=. ".format(system=system, env=env)))
     except:
         write_stderr("Failed to import settings")
         return
@@ -132,8 +132,8 @@ def run_all_servers():
     env = getattr(options, 'env', 'dev')
     worker_env = getattr(options, 'env', 'dev_with_worker')
 
-    proc_utils.run_process(['python manage.py lms runserver --traceback --settings=%s' % (env) + ' --pythonpath=. ' + default_options['lms'],
-                            'python manage.py cms runserver --traceback --settings=%s' % (env) + ' --pythonpath=. ' + default_options['cms'],
+    proc_utils.run_process(['python manage.py lms runserver --traceback --settings=%s  --pythonpath=. ' % (env) + default_options['lms'],
+                            'python manage.py cms runserver --traceback --settings=%s  --pythonpath=. ' % (env) + default_options['cms'],
                             'python manage.py lms celery worker --loglevel=INFO --settings=%s --pythonpath=. ' % (worker_env),
                             'python manage.py cms celery worker --loglevel=INFO --settings=%s --pythonpath=. ' % (worker_env)
                             ], True)
@@ -157,7 +157,7 @@ def clone_course():
         print("You must provide a source and destination")
         exit()
 
-    sh('python manage.py cms clone --traceback --settings=%s' % (env) + ' --pythonpath=. %s %s' % (src, dest))
+    sh('python manage.py cms clone --traceback --settings={env} --pythonpath=. {src} {dest}'.format(env=env, src=src, dest=dest))
 
 
 @task
@@ -178,7 +178,9 @@ def delete_course():
         print("You must provide a location")
         exit()
 
-    sh('python manage.py cms delete_course --traceback --settings=%s' % (env) + ' --pythonpath=. %s %s' % (location, commit))
+    sh('python manage.py cms delete_course --traceback --settings={env} --pythonpath=. {location} {commit}'.format(
+        env=env, location=location, commit=commit)
+       )
 
 
 @task
@@ -199,7 +201,9 @@ def import_course():
         print("You must provide a directory")
         exit()
 
-    sh('python manage.py cms import --traceback --settings=%s' % (env) + ' --pythonpath=. %s %s' % (data_dir, course_dir))
+    sh('python manage.py cms import --traceback --settings={env} --pythonpath=. {data_dir} {course_dir}'.format(
+        env=env, data_dir=data_dir, course_dir=course_dir)
+       )
 
 
 @task
@@ -220,7 +224,9 @@ def xlint_course():
         print("You must provide a directory")
         exit()
 
-    sh('python manage.py cms xlint --traceback --settings=%s' % (env) + ' --pythonpath=. %s %s' % (data_dir, course_dir))
+    sh('python manage.py cms xlint --traceback --settings={env} --pythonpath=. {data_dir} {course_dir}'.format(
+        env=env, data_dir=data_dir, course_dir=course_dir)
+       )
 
 
 @task
@@ -241,7 +247,9 @@ def export_course():
         print("You must provide a course id and output path")
         exit()
 
-    sh('python manage.py cms export --traceback --settings=%s' % (env) + ' --pythonpath=. %s %s' % (course_id, output))
+    sh('python manage.py cms export --traceback --settings={env} --pythonpath=. {course_id} {output}'.format(
+        env=env, course_id=course_id, output=output)
+       )
 
 
 @task
@@ -262,7 +270,7 @@ def set_staff():
         print("You must provide a user id")
         exit()
 
-    sh('python manage.py cms set_staff --traceback --settings=%s' % (env) + ' --pythonpath=. %s ' % (user))
+    sh('python manage.py cms set_staff --traceback --settings={env} --pythonpath=. {user}'.format(env=env, user=user))
 
 
 @task
@@ -286,10 +294,15 @@ def django_admin():
         exit()
 
     if system == '' and (arg_options == 'migrate' or arg_options == 'syncdb'):
-        sh('python manage.py cms %s --traceback --settings=%s' % (action, env) + ' --pythonpath=. %s ' % (arg_options))
-        sh('python manage.py lms %s --traceback --settings=%s' % (action, env) + ' --pythonpath=. %s ' % (arg_options))
+        sh('python manage.py cms {action} --traceback --settings={env} --pythonpath=. {arg_options}'.format(
+            action=action, env=env, arg_option=arg_options)
+           )
+        sh('python manage.py lms {action} --traceback --settings={env} --pythonpath=. {arg_options}'.format(
+            action=action, env=env, arg_option=arg_options)
+           )
     else:
-        if system == '':
-            system = 'lms'
+        system = system or 'lms'
 
-        sh('python manage.py %s %s --traceback --settings=%s' % (system, action, env) + ' --pythonpath=. %s ' % (arg_options))
+        sh('python manage.py {system} {action} --traceback --settings={env} --pythonpath=. {arg_options}'.format(
+            system=system, action=action, env=env, arg_option=arg_options)
+           )

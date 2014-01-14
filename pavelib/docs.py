@@ -26,19 +26,17 @@ def build_docs(options):
     type = getattr(options, 'type', 'docs')
     verbose = getattr(options, 'verbose', True)
 
-    if type == 'dev':
-        path = "docs/developers"
-    elif type == 'author':
-        path = "docs/course_authors"
-    elif type == 'data':
-        path = "docs/data"
-    else:
-        path = "docs/developers"
+    paths = {
+        "dev": "docs/developers",
+        "author": "docs/course_authors",
+        "data": "docs/data",
+    }
 
-    if verbose:
-        sh('cd %s;' % (path) + 'make html quiet=false')
-    else:
-        sh('cd %s;' % (path) + 'make html quiet=true')
+    path = paths.get(type, "docs/developers")
+
+    sh("cd {dir}; make html quiet={quiet}".format(
+        dir=path, quiet="false" if verbose else "true")
+       )
 
 
 @task
@@ -52,14 +50,13 @@ def show_docs(options):
 
     type = getattr(options, 'type', 'docs')
 
-    if type == 'dev':
-        path = "docs/developers"
-    elif type == 'author':
-        path = "docs/course_authors"
-    elif type == 'data':
-        path = "docs/data"
-    else:
-        path = "docs/developers"
+    paths = {
+        "dev": "docs/developers",
+        "author": "docs/course_authors",
+        "data": "docs/data",
+    }
+
+    path = paths.get(type, "docs/developers")
 
     webbrowser.open('file://%s/%s' % (assets.REPO_ROOT, path) + '/build/html/index.html')
 

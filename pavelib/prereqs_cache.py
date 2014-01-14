@@ -1,7 +1,6 @@
 import hashlib
 import os
 import errno
-BLOCKSIZE = 65536
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 
@@ -21,6 +20,13 @@ def get_files(dir):
     return files
 
 
+def read_in_chunks(infile, chunk_size=1024 * 64):
+    chunk = infile.read(chunk_size)
+    while chunk:
+        yield chunk
+        chunk = infile.read(chunk_size)
+
+
 def compute_fingerprint(files, dirs):
 
     hasher = hashlib.sha1()
@@ -28,10 +34,8 @@ def compute_fingerprint(files, dirs):
     # get the SHA1 digest of contents of files
     for file in files:
         with open(file, 'rb') as fd:
-            buf = fd.read(BLOCKSIZE)
-            while len(buf) > 0:
-                hasher.update(buf)
-                buf = fd.read(BLOCKSIZE)
+            for chunk in read_in_chunks(fd):
+                hasher.update(chunk)
 
     for dir in dirs:
         for (dirpath, dirnames, filenames) in os.walk(dir):
