@@ -8,7 +8,7 @@ Open Response Assessments for Students
 Introduction to Open Response Assessments
 -----------------------------------------
 
-.. warning::
+.. note::
 
     Modify this section according to your course. For example, you
     can delete sentences such as "For more information, see :ref:`ORA Peer Assessment`"
@@ -101,7 +101,7 @@ see :ref:`ORA Self Assessment`, :ref:`ORA Peer Assessment`, or :ref:`ORA AI Asse
 Self Assessment
 ---------------
 
-.. warning::
+.. note::
 
     You can delete this section if your ORA problem doesn't use self assessments.
 
@@ -129,7 +129,7 @@ Perform a Self Assessment
 Peer Assessment
 ---------------
 
-.. warning::
+.. note::
 
     You can delete this section if your ORA problem doesn't use peer assessments.
 
@@ -143,6 +143,8 @@ After you submit your response for grading, the following
 message appears under your response.
 
     **Your response has been submitted. Please check back later for your grade.**
+
+.. warning:: In peer assessments, the **due date** is the date by which you must not only submit your own response, but finish grading the required number of your peers' responses.
 
 Peer Grading Interface
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -159,6 +161,8 @@ separate peer grading interface.
 Perform a Peer Assessment
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. warning:: In peer assessments, the **due date** is the date by which you must not only submit your own response, but finish grading the required number of your peers' responses.
+
 Performing a peer assessment has several steps. You can find detailed instructions for each step
 below.
 
@@ -173,7 +177,7 @@ below.
 Step 1: Access responses from other students
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. warning::
+.. note::
 
     Modify the content in this section according to
     your course. For example, if your students can only grade by using the **Open
@@ -316,7 +320,7 @@ to continue grading.
 Artificial Intelligence (AI) Assessment
 ---------------------------------------
 
-.. warning::
+.. note::
 
     You can delete this section if your ORA problem doesn't use AI assessments.
 
@@ -342,7 +346,7 @@ For more information about accessing your scores, see :ref:`ORA Access Scores`.
 Access Scores and Feedback
 --------------------------
 
-.. warning::
+.. note::
 
     Modify the text in this section to apply to your course.
 
@@ -391,7 +395,7 @@ For more information about grading peer assessments, see :ref:`ORA Peer Assessme
 Resubmitting a Response
 -----------------------
 
-.. warning::
+.. note::
 
     You can delete this section if you don't allow students to submit multiple responses.
 

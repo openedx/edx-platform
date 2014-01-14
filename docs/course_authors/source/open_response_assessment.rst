@@ -56,12 +56,14 @@ An open response assessment has three elements:
    perform peer assessments, and then an AI assessment runs.
 
    .. image:: Images/CITL_AssmtTypes.gif
+      :alt: Image of ORA with assessment types circled
 
 -  The question that you want your students to answer. This appears near
    the top of the component, followed by a field where the student
    enters a response.
 
    .. image:: Images/CITLsample.gif
+      :alt: Image of ORA question
 
 -  A rubric that you design. After the student enters a response and
    clicks **Submit**, if the assessment is a self assessment, the
@@ -71,6 +73,7 @@ An open response assessment has three elements:
    see the rubric.)
 
    .. image:: Images/CITL_SA_Rubric.gif
+      :alt: Image of ORA with rubric showing below the student's response
 
 Open Response Assessment Types
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -85,6 +88,8 @@ assessment, and peer assessment.
    attempts to grade the rest of the student responses in the same way.
 -  Peer assessment allows students to score each other and provide
    feedback, again using the same rubric.
+
+   .. warning:: In peer assessments, the **due date** that you set for the subsection that contains the ORA problem is the date by which students must not only submit their own responses, but finish grading the required number of peer responses.
 
 You can use one or more of these assessments in any problem. You can
 also set thresholds within the problem for each assessment, so that a
@@ -158,6 +163,7 @@ Step 1. Create the Component
    problem. 
  
 .. image:: Images/ORAComponentEditor.gif
+   :alt: Image of component editor with prompt, rubric, and assessment type highlighted
   
 Step 2. Add the Question
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -165,6 +171,7 @@ Step 2. Add the Question
 #. In the component editor, locate the [prompt] tags.
 
    .. image:: Images/ORA_Prompt.gif
+      :alt: Image of component editor with prompt text highlighted
 
 #. Replace the sample text between the **[prompt]** tags with the text of
    your question. When you replace the sample text, make sure you follow
@@ -184,6 +191,7 @@ Step 3. Add the Rubric
    is long, so you'll have to scroll down to locate the second tag.)
 
    .. image:: Images/ORA_Rubric.gif
+      :alt: Image of component editor with rubric text highlighted
 
 #. Replace the sample rubric with the text of your rubric. Make sure to
    do the following.
@@ -264,6 +272,7 @@ Set the Type and Scoring
 #. In the component editor, locate the [tasks] tags.
 
    .. image:: Images/ORA_Tasks.gif
+      :alt: Image of component editor with tasks tags and text highlighted
 
 #. Replace the sample code with the code for your problem.
 
@@ -284,6 +293,7 @@ courseware. It also appears in the list of problems on the **Staff
 Grading** page.
 
 .. image:: Images/ORA_ProblemName1.gif
+   :alt: Image of Staff Grading page with a problem name circled
 
 To change the name:
 
@@ -301,6 +311,7 @@ files as part of their response, click the **Settings** tab, and then
 specify the options that you want.
 
 .. image:: Images/ORA_Settings.gif
+   :alt: Image of component editor with Settings tab selected
 
 Open response assessments include the following settings.
 
@@ -380,7 +391,7 @@ Open response assessments include the following settings.
 |                                             |                                                                    |
 |                                             | **Note** *Every problem must have a problem weight of at least     |
 |                                             | one point. Problems that have a problem weight of zero points      |
-|                                             | don't appear on the instructor dashboard.*                          |
+|                                             | don't appear on the instructor dashboard.*                         |
 +---------------------------------------------+--------------------------------------------------------------------+
 | **Required Peer Grading**                   | This setting specifies the number of responses that each student   |
 |                                             | who submits a response has to grade before the student receives a  |
@@ -405,12 +416,15 @@ Step 7. Save the Problem
    see the type of assessments that you have set for this problem.
 
    .. image:: Images/ORA_Component.gif
+      :alt: Image of ORA component with assessment types circled
 
 Step 8. Add the Peer Grading Interface (for peer assessments only)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You can add just one peer grading interface for the whole course, or you
 can add a separate peer grading interface for each individual problem.
+
+.. warning:: In peer assessments, the **due date** that you set for the subsection that contains the ORA problem is the date by which students must not only submit their own responses, but finish grading the required number of peer responses.
 
 Add a Single Peer Grading Interface for the Course
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -431,9 +445,10 @@ the ORA problems for the course through this peer grading interface.
 #. To see the peer grading interface in the course, set the visibility
    of the unit to **Public**, and then click **View Live**.
 
-   The following page opens.
+   The **Peer Grading** page opens.
 
    .. image:: Images/PGI_Single.gif
+      :alt: Image of LMS open to the Peer Grading page for the course
 
    When students submit responses for peer assessments in your course,
    the names of the problems appear in this interface.
@@ -460,11 +475,12 @@ week).
    than Student view.
 #. Scroll down to the bottom of the ORA, and then click **Staff Debug
    Info**.
-#. In the image that opens, locate the string of alphanumeric characters
+#. In the page that opens, locate the string of alphanumeric characters
    to the right of the word **location**. Press CTRL+C to copy this
    string, starting with **i4x**.
 
    .. image:: Images/PA_StaffDebug_Location.gif
+      :alt: Image of Staff Debug screen with ORA problem location circled 
 
 #. Switch back to the unit in Studio. If the visibility of the unit is
    set to **Public**, change the visibility to **Private**.
@@ -580,6 +596,8 @@ response assessment appears in several columns.
 
 Grade Responses
 ^^^^^^^^^^^^^^^
+
+.. warning:: In peer assessments, the **due date** that you set for the subsection that contains the ORA problem is the date by which students must not only submit their own responses, but finish grading the required number of peer responses.
 
 #. Go to the **Staff Grading** page.
 #. Under **Problem Name**, click the name of the problem that you want.

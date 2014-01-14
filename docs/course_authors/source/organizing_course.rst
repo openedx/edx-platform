@@ -177,7 +177,7 @@ You can reorganize your course by dragging and dropping sections, subsections, u
 
 To move an element, hover over the element handle on the right side of the screen until the mouse pointer changes to a four-headed arrow. Then, click and drag the element to the location that you want.
 
-.. image:: Images/DragAndDrop.gif
+.. image:: Images/DragAndDropExample.gif
 
 When you move an element, a blue line indicates where the element will land when you release the mouse. 
 
