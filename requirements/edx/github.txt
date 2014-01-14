@@ -24,4 +24,4 @@
 -e git+https://github.com/edx/bok-choy.git@bc6f1adbe439618162079f1004b2b3db3b6f8916#egg=bok_choy
 
 # Move back to upstream release once https://github.com/txels/ddt/pull/13 is merged
--e git+https://github.com/edx/ddt.git@9e8010b8777aa40b848fdb76de6e60081616325a#egg=ddt
+-e git+https://github.com/edx/ddt.git@afef6647edb488afc471b0239ef8c4b0669e5fdf#egg=ddt
