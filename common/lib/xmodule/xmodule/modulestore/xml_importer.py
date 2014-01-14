@@ -310,9 +310,7 @@ def import_module(
         source_course_location, dest_course_location, allow_not_found=False,
         do_import_static=True):
 
-    logging.debug('processing import of module {url}...'.format(
-        url=module.location.url()
-    ))
+    logging.debug('processing import of module {}...'.format(module.location.url()))
 
     content = {}
     for field in module.fields.values():

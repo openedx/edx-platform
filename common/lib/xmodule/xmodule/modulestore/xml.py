@@ -205,11 +205,11 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
 
             descriptor.data_dir = course_dir
 
-            xmlstore.modules[course_id][descriptor.location] = descriptor
+            xmlstore.modules[course_id][descriptor.scope_ids.usage_id] = descriptor
 
             if descriptor.has_children:
                 for child in descriptor.get_children():
-                    parent_tracker.add_parent(child.location, descriptor.location)
+                    parent_tracker.add_parent(child.scope_ids.usage_id, descriptor.scope_ids.usage_id)
 
             # After setting up the descriptor, save any changes that we have
             # made to attributes on the descriptor to the underlying KeyValueStore.
@@ -412,8 +412,8 @@ class XMLModuleStore(ModuleStoreReadBase):
 
         if course_descriptor is not None and not isinstance(course_descriptor, ErrorDescriptor):
             self.courses[course_dir] = course_descriptor
-            self._location_errors[course_descriptor.location] = errorlog
-            self.parent_trackers[course_descriptor.id].make_known(course_descriptor.location)
+            self._location_errors[course_descriptor.scope_ids.usage_id] = errorlog
+            self.parent_trackers[course_descriptor.id].make_known(course_descriptor.scope_ids.usage_id)
         else:
             # Didn't load course.  Instead, save the errors elsewhere.
             self.errored_courses[course_dir] = errorlog
@@ -570,7 +570,7 @@ class XMLModuleStore(ModuleStoreReadBase):
                     html = f.read().decode('utf-8')
                     # tabs are referenced in policy.json through a 'slug' which is just the filename without the .html suffix
                     slug = os.path.splitext(os.path.basename(filepath))[0]
-                    loc = Location('i4x', course_descriptor.location.org, course_descriptor.location.course, category, slug)
+                    loc = course_descriptor.scope_ids.usage_id._replace(category=category, name=slug)
                     module = system.construct_xblock_from_class(
                         HtmlDescriptor,
                         # We're loading a descriptor, so student_id is meaningless
@@ -588,7 +588,7 @@ class XMLModuleStore(ModuleStoreReadBase):
                                 module.display_name = tab['name']
                     module.data_dir = course_dir
                     module.save()
-                    self.modules[course_descriptor.id][module.location] = module
+                    self.modules[course_descriptor.id][module.scope_ids.usage_id] = module
                 except Exception, e:
                     logging.exception("Failed to load %s. Skipping... \
                             Exception: %s", filepath, unicode(e))

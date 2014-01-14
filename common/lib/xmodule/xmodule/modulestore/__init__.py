@@ -40,6 +40,21 @@ INVALID_HTML_CHARS = re.compile(r"[^\w-]")
 _LocationBase = namedtuple('LocationBase', 'tag org course category name revision')
 
 
+def _check_location_part(val, regexp):
+    """
+    Check that `regexp` doesn't match inside `val`. If it does, raise an exception
+
+    Args:
+        val (string): The value to check
+        regexp (re.RegexObject): The regular expression specifying invalid characters
+
+    Raises:
+        InvalidLocationError: Raised if any invalid character is found in `val`
+    """
+    if val is not None and regexp.search(val) is not None:
+        raise InvalidLocationError("Invalid characters in {!r}.".format(val))
+
+
 class Location(_LocationBase):
     '''
     Encodes a location.
@@ -145,7 +160,6 @@ class Location(_LocationBase):
         Components may be set to None, which may be interpreted in some contexts
         to mean wildcard selection.
         """
-
         if (org is None and course is None and category is None and name is None and revision is None):
             location = loc_or_tag
         else:
@@ -161,23 +175,18 @@ class Location(_LocationBase):
             check_list(list_)
 
         def check_list(list_):
-            def check(val, regexp):
-                if val is not None and regexp.search(val) is not None:
-                    log.debug('invalid characters val=%r, list_=%r', val, list_)
-                    raise InvalidLocationError("Invalid characters in {!r}.".format(val))
-
             list_ = list(list_)
             for val in list_[:4] + [list_[5]]:
-                check(val, INVALID_CHARS)
+                _check_location_part(val, INVALID_CHARS)
             # names allow colons
-            check(list_[4], INVALID_CHARS_NAME)
+            _check_location_part(list_[4], INVALID_CHARS_NAME)
 
         if isinstance(location, Location):
             return location
         elif isinstance(location, basestring):
             match = URL_RE.match(location)
             if match is None:
-                log.debug("location %r doesn't match URL" % location)
+                log.debug("location %r doesn't match URL", location)
                 raise InvalidLocationError(location)
             groups = match.groupdict()
             check_dict(groups)
@@ -248,6 +257,18 @@ class Location(_LocationBase):
             raise InvalidLocationError('Cannot call course_id for {0} because it is not of category course'.format(self))
 
         return "/".join([self.org, self.course, self.name])
+
+    def _replace(self, **kwargs):
+        """
+        Return a new :class:`Location` with values replaced
+        by the values specified in `**kwargs`
+        """
+        for name, value in kwargs.iteritems():
+            if name == 'name':
+                _check_location_part(value, INVALID_CHARS_NAME)
+            else:
+                _check_location_part(value, INVALID_CHARS)
+        return super(Location, self)._replace(**kwargs)
 
     def replace(self, **kwargs):
         '''
