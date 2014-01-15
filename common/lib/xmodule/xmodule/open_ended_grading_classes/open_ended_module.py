@@ -71,10 +71,15 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
 
         self._parse(oeparam, self.child_prompt, self.child_rubric, system)
 
+        # If there are multiple tasks (like self-assessment followed by ai), once
+        # the the status of the first task is set to DONE, setup_next_task() will
+        # create the OpenEndedChild with parameter child_created=True so that the
+        # submission can be sent to the grader. Keep trying each time this module
+        # is loaded until it succeeds.
         if self.child_created is True and self.child_state == self.ASSESSING:
-            self.child_created = False
-            self.send_to_grader(self.latest_answer(), system)
-            self.child_created = False
+            success, message = self.send_to_grader(self.latest_answer(), system)
+            if success:
+                self.child_created = False
 
     def _parse(self, oeparam, prompt, rubric, system):
         '''

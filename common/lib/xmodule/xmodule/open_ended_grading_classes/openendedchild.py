@@ -283,7 +283,7 @@ class OpenEndedChild(object):
             'child_state': self.child_state,
             'max_score': self._max_score,
             'child_attempts': self.child_attempts,
-            'child_created': False,
+            'child_created': self.child_created,
             'stored_answer': self.stored_answer,
             }
         return json.dumps(state)

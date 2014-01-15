@@ -871,7 +871,6 @@ class CombinedOpenEndedModuleConsistencyTest(unittest.TestCase):
            </openendedparam>
     </openended>'''
 
-
     static_data = {
         'max_attempts': 20,
         'prompt': prompt,
@@ -990,11 +989,16 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
     hint = "blah"
 
     def get_module_system(self, descriptor):
+
+        def construct_callback(dispatch="score_update"):
+            return dispatch
+
         test_system = get_test_system()
         test_system.open_ended_grading_interface = None
         test_system.xqueue['interface'] = Mock(
             send_to_queue=Mock(return_value=(0, "Queued"))
         )
+        test_system.xqueue['construct_callback'] = construct_callback
 
         return test_system
 
@@ -1065,6 +1069,97 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         self._handle_ajax("reset", {})
         self.assertEqual(self._module().current_task_number, 0)
 
+    def test_open_ended_flow_with_xqueue_failure(self):
+        """
+        Test a two step problem where the student first goes through the self assessment step, and then the
+        open ended step with the xqueue failing in the first step.
+        @return:
+        """
+        assessment = [1, 1]
+
+        # Simulate a student saving an answer
+        self._handle_ajax("save_answer", {"student_answer": self.answer})
+        status = self._handle_ajax("get_status", {})
+        self.assertIsInstance(status, basestring)
+
+        # Mock a student submitting an assessment
+        assessment_dict = MultiDict({'assessment': sum(assessment)})
+        assessment_dict.extend(('score_list[]', val) for val in assessment)
+
+        mock_xqueue_interface = Mock(
+            send_to_queue=Mock(return_value=(1, "Not Queued"))
+        )
+
+        # Call handle_ajax on the module with xqueue down
+        module = self._module()
+        with patch.dict(module.xmodule_runtime.xqueue, {'interface': mock_xqueue_interface}):
+            module.handle_ajax("save_assessment", assessment_dict)
+            self.assertEqual(module.current_task_number, 1)
+            self.assertTrue((module.child_module.get_task_number(1).child_created))
+        module.save()
+
+        # Check that next time the OpenEndedModule is loaded it calls send_to_grader
+        with patch.object(OpenEndedModule, 'send_to_grader') as mock_send_to_grader:
+            mock_send_to_grader.return_value = (False, "Not Queued")
+            module = self._module().child_module.get_score()
+            self.assertTrue(mock_send_to_grader.called)
+            self.assertTrue((self._module().child_module.get_task_number(1).child_created))
+
+        # Loading it this time should send submission to xqueue correctly
+        self.assertFalse((self._module().child_module.get_task_number(1).child_created))
+        self.assertEqual(self._module().current_task_number, 1)
+        self.assertEqual(self._module().state, OpenEndedChild.ASSESSING)
+
+        task_one_json = json.loads(self._module().task_states[0])
+        self.assertEqual(json.loads(task_one_json['child_history'][0]['post_assessment']), assessment)
+
+        # Move to the next step in the problem
+        self._handle_ajax("next_problem", {})
+        self.assertEqual(self._module().current_task_number, 1)
+        self._module().render('student_view')
+
+        # Try to get the rubric from the module
+        self._handle_ajax("get_combined_rubric", {})
+
+        self.assertEqual(self._module().state, OpenEndedChild.ASSESSING)
+
+        # Make a fake reply from the queue
+        queue_reply = {
+            'queuekey': "",
+            'xqueue_body': json.dumps({
+                'score': 0,
+                'feedback': json.dumps({"spelling": "Spelling: Ok.", "grammar": "Grammar: Ok.",
+                                        "markup-text": " all of us can think of a book that we hope none of our children or any other children have taken off the shelf . but if i have the right to remove that book from the shelf that work i abhor then you also have exactly the same right and so does everyone else . and then we <bg>have no books left</bg> on the shelf for any of us . <bs>katherine</bs> <bs>paterson</bs> , author write a persuasive essay to a newspaper reflecting your vies on censorship <bg>in libraries . do</bg> you believe that certain materials , such as books , music , movies , magazines , <bg>etc . , should be</bg> removed from the shelves if they are found <bg>offensive ? support your</bg> position with convincing arguments from your own experience , observations <bg>, and or reading .</bg> "}),
+                'grader_type': "ML",
+                'success': True,
+                'grader_id': 1,
+                'submission_id': 1,
+                'rubric_xml': "<rubric><category><description>Writing Applications</description><score>0</score><option points='0'> The essay loses focus, has little information or supporting details, and the organization makes it difficult to follow.</option><option points='1'> The essay presents a mostly unified theme, includes sufficient information to convey the theme, and is generally organized well.</option></category><category><description> Language Conventions </description><score>0</score><option points='0'> The essay demonstrates a reasonable command of proper spelling and grammar. </option><option points='1'> The essay demonstrates superior command of proper spelling and grammar.</option></category></rubric>",
+                'rubric_scores_complete': True,
+            })
+        }
+
+        self._handle_ajax("check_for_score", {})
+
+        # Update the module with the fake queue reply
+        self._handle_ajax("score_update", queue_reply)
+
+        module = self._module()
+        self.assertFalse(module.ready_to_reset)
+        self.assertEqual(module.current_task_number, 1)
+
+        # Get html and other data client will request
+        module.render('student_view')
+
+        self._handle_ajax("skip_post_assessment", {})
+
+        # Get all results
+        self._handle_ajax("get_combined_rubric", {})
+
+        # reset the problem
+        self._handle_ajax("reset", {})
+        self.assertEqual(self._module().state, "initial")
+
     def test_open_ended_flow_correct(self):
         """
         Test a two step problem where the student first goes through the self assessment step, and then the
@@ -1088,17 +1183,9 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         self.assertEqual(json.loads(task_one_json['child_history'][0]['post_assessment']), assessment)
 
         # Move to the next step in the problem
-        try:
-            self._handle_ajax("next_problem", {})
-        except GradingServiceError:
-            # This error is okay.  We don't have a grading service to connect to!
-            pass
+        self._handle_ajax("next_problem", {})
         self.assertEqual(self._module().current_task_number, 1)
-        try:
-            self._module().render('student_view')
-        except GradingServiceError:
-            # This error is okay.  We don't have a grading service to connect to!
-            pass
+        self._module().render('student_view')
 
         # Try to get the rubric from the module
         self._handle_ajax("get_combined_rubric", {})
