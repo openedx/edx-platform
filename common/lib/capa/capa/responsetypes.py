@@ -329,8 +329,8 @@ class LoncapaResponse(object):
             rephints = hintgroup.findall(self.hint_tag)
             hints_to_show = self.check_hint_condition(
                 rephints, student_answers)
-
             # can be 'on_request' or 'always' (default)
+
             hintmode = hintgroup.get('mode', 'always')
             for hintpart in hintgroup.findall('hintpart'):
                 if hintpart.get('on') in hints_to_show:
@@ -947,21 +947,35 @@ class NumericalResponse(LoncapaResponse):
 
 class StringResponse(LoncapaResponse):
     '''
-    This response type allows one or more answers. Use `_or_` separator to set
-    more than 1 answer.
+    This response type allows one or more answers.
 
-    Example:
+    Additional answers are added by `additional_answer` tag.
+    If `regexp` is in `type` attribute, than answers and hints are treated as regular expressions.
 
-        # One answer
+    Examples:
         <stringresponse answer="Michigan">
-          <textline size="20" />
+            <textline size="20" />
         </stringresponse >
 
-        # Multiple answers
-        <stringresponse answer="Martin Luther King_or_Dr. Martin Luther King Jr.">
-          <textline size="20" />
-        </stringresponse >
-
+        <stringresponse answer="a1" type="ci regexp">
+            <additional_answer>\d5</additional_answer>
+            <additional_answer>a3</additional_answer>
+            <textline size="20"/>
+            <hintgroup>
+                <stringhint answer="a0" type="ci" name="ha0" />
+                <stringhint answer="a4" type="ci" name="ha4" />
+                <stringhint answer="^\d" type="ci" name="re1" />
+                <hintpart on="ha0">
+                    <startouttext />+1<endouttext />
+                </hintpart >
+                <hintpart on="ha4">
+                    <startouttext />-1<endouttext />
+                </hintpart >
+                <hintpart on="re1">
+                    <startouttext />Any number+5<endouttext />
+                </hintpart >
+            </hintgroup>
+        </stringresponse>
     '''
     response_tag = 'stringresponse'
     hint_tag = 'stringhint'
@@ -969,11 +983,30 @@ class StringResponse(LoncapaResponse):
     required_attributes = ['answer']
     max_inputfields = 1
     correct_answer = []
-    SEPARATOR = '_or_'
+
+    def setup_response_backward(self):
+        self.correct_answer = [
+            contextualize_text(answer, self.context).strip() for answer in self.xml.get('answer').split('_or_')
+        ]
 
     def setup_response(self):
-        self.correct_answer = [contextualize_text(answer, self.context).strip()
-            for answer in self.xml.get('answer').split(self.SEPARATOR)]
+
+        self.backward = '_or_' in self.xml.get('answer').lower()
+        self.regexp = 'regexp' in self.xml.get('type').lower().split(' ')
+        self.case_insensitive = 'ci' in self.xml.get('type').lower().split(' ')
+
+        # backward compatibility, can be removed in future, it is up to @Lyla Fisher.
+        if self.backward:
+            self.setup_response_backward()
+            return
+        # end of backward compatibility
+
+        correct_answers = [self.xml.get('answer')] + [el.text for el in self.xml.findall('additional_answer')]
+        self.correct_answer = [contextualize_text(answer, self.context).strip() for answer in correct_answers]
+
+        # remove additional_answer from xml, otherwise they will be displayed
+        for el in self.xml.findall('additional_answer'):
+            self.xml.remove(el)
 
     def get_score(self, student_answers):
         '''Grade a string response '''
@@ -981,10 +1014,51 @@ class StringResponse(LoncapaResponse):
         correct = self.check_string(self.correct_answer, student_answer)
         return CorrectMap(self.answer_id, 'correct' if correct else 'incorrect')
 
-    def check_string(self, expected, given):
-        if self.xml.get('type') == 'ci':
+    def check_string_backward(self, expected, given):
+        if self.case_insensitive:
             return given.lower() in [i.lower() for i in expected]
         return given in expected
+
+    def check_string(self, expected, given):
+        """
+        Find given in expected.
+
+        If self.regexp is true, regular expression search is used.
+        if self.case_insensitive is true, case insensitive search is used, otherwise case sensitive search is used.
+        Spaces around values of attributes are stripped in XML parsing step.
+
+        Args:
+            expected: list.
+            given: str.
+
+        Returns: bool
+
+        Raises: `ResponseError` if it fails to compile regular expression.
+
+        Note: for old code, which supports _or_ separator, we add some  backward compatibility handling.
+        Should be removed soon. When to remove it, is up to Lyla Fisher.
+        """
+        # backward compatibility, should be removed in future.
+        if self.backward:
+            return self.check_string_backward(expected, given)
+        # end of backward compatibility
+
+        if self.regexp:  # regexp match
+            flags = re.IGNORECASE if self.case_insensitive else 0
+            try:
+                regexp = re.compile('^'+ '|'.join(expected) + '$', flags=flags | re.UNICODE)
+                result = re.search(regexp, given)
+            except Exception as err:
+                msg = '[courseware.capa.responsetypes.stringresponse] error: {}'.format(err.message)
+                log.error(msg, exc_info=True)
+                raise ResponseError(msg)
+            return bool(result)
+        else:  # string match
+            if self.case_insensitive:
+                return given.lower() in [i.lower() for i in expected]
+            else:
+                return given in expected
+
 
     def check_hint_condition(self, hxml_set, student_answers):
         given = student_answers[self.answer_id].strip()
@@ -992,10 +1066,9 @@ class StringResponse(LoncapaResponse):
         for hxml in hxml_set:
             name = hxml.get('name')
 
-            correct_answer = [contextualize_text(answer, self.context).strip()
-            for answer in hxml.get('answer').split(self.SEPARATOR)]
+            hinted_answer = contextualize_text(hxml.get('answer'), self.context).strip()
 
-            if self.check_string(correct_answer, given):
+            if self.check_string([hinted_answer], given):
                 hints_to_show.append(name)
         log.debug('hints_to_show = %s', hints_to_show)
         return hints_to_show

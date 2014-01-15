@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Tests of responsetypes
 """
@@ -502,6 +503,135 @@ class StringResponseTest(ResponseTest):
     from capa.tests.response_xml_factory import StringResponseXMLFactory
     xml_factory_class = StringResponseXMLFactory
 
+    def test_backward_compatibility_for_multiple_answers(self):
+        """
+        Remove this test, once support for _or_ separator will be removed.
+        """
+
+        answers = ["Second", "Third", "Fourth"]
+        problem = self.build_problem(answer="_or_".join(answers), case_sensitive=True)
+
+        for answer in answers:
+            # Exact string should be correct
+            self.assert_grade(problem, answer, "correct")
+        # Other strings and the lowercase version of the string are incorrect
+        self.assert_grade(problem, "Other String", "incorrect")
+
+        problem = self.build_problem(answer="_or_".join(answers), case_sensitive=False)
+        for answer in answers:
+            # Exact string should be correct
+            self.assert_grade(problem, answer, "correct")
+            self.assert_grade(problem, answer.lower(), "correct")
+        self.assert_grade(problem, "Other String", "incorrect")
+
+    def test_regexp(self):
+        problem = self.build_problem(answer="Second", case_sensitive=False, regexp=True)
+        self.assert_grade(problem, "Second", "correct")
+
+        problem = self.build_problem(answer="sec", case_sensitive=False, regexp=True)
+        self.assert_grade(problem, "Second", "incorrect")
+
+        problem = self.build_problem(answer="sec.*", case_sensitive=False, regexp=True)
+        self.assert_grade(problem, "Second", "correct")
+
+        problem = self.build_problem(answer="sec.*", case_sensitive=True, regexp=True)
+        self.assert_grade(problem, "Second", "incorrect")
+
+        problem = self.build_problem(answer="Sec.*$", case_sensitive=False, regexp=True)
+        self.assert_grade(problem, "Second", "correct")
+
+        problem = self.build_problem(answer="^sec$", case_sensitive=False, regexp=True)
+        self.assert_grade(problem, "Second", "incorrect")
+
+        problem = self.build_problem(answer="^Sec(ond)?$", case_sensitive=False, regexp=True)
+        self.assert_grade(problem, "Second", "correct")
+
+        problem = self.build_problem(answer="^Sec(ond)?$", case_sensitive=False, regexp=True)
+        self.assert_grade(problem, "Sec", "correct")
+
+        problem = self.build_problem(answer="tre+", case_sensitive=False, regexp=True)
+        self.assert_grade(problem, "There is a tree", "incorrect")
+
+        problem = self.build_problem(answer=".*tre+", case_sensitive=False, regexp=True)
+        self.assert_grade(problem, "There is a tree", "correct")
+
+        answers = [
+            "Martin Luther King Junior",
+            "Doctor Martin Luther King Junior",
+            "Dr. Martin Luther King Jr.",
+            "Martin Luther King"
+        ]
+
+        problem = self.build_problem(answer="\w*\.?.*Luther King\s*.*", case_sensitive=True, regexp=True)
+
+        for answer in answers:
+            self.assert_grade(problem, answer, "correct")
+
+        problem = self.build_problem(answer="^(-\|){2,5}$", case_sensitive=False, regexp=True)
+        self.assert_grade(problem, "-|-|-|", "correct")
+        self.assert_grade(problem, "-|", "incorrect")
+        self.assert_grade(problem, "-|-|-|-|-|-|", "incorrect")
+
+        regexps = [
+            "^One$",
+            "two",
+            "^thre+",
+            "^4|Four$",
+        ]
+        problem = self.build_problem(
+            answer="just_sample",
+            case_sensitive=False,
+            regexp=True,
+            additional_answers=regexps
+        )
+
+        self.assert_grade(problem, "One", "correct")
+        self.assert_grade(problem, "two", "correct")
+        self.assert_grade(problem, "!!two!!", "correct")
+        self.assert_grade(problem, "threeeee", "correct")
+        self.assert_grade(problem, "three", "correct")
+        self.assert_grade(problem, "4", "correct")
+        self.assert_grade(problem, "Four", "correct")
+        self.assert_grade(problem, "Five", "incorrect")
+        self.assert_grade(problem, "|", "incorrect")
+
+        # test unicode
+        problem = self.build_problem(answer=u"æ", case_sensitive=False, regexp=True, additional_answers=[u'ö'])
+        self.assert_grade(problem, u"æ", "correct")
+        self.assert_grade(problem, u"ö", "correct")
+        self.assert_grade(problem, u"î", "incorrect")
+        self.assert_grade(problem, u"o", "incorrect")
+
+    def test_backslash_and_unicode_regexps(self):
+        """
+        Test some special cases of [unicode] regexps.
+
+        One needs to use either r'' strings or write real `repr` of unicode strings, because of the following
+        (from python docs, http://docs.python.org/2/library/re.html):
+
+        'for example, to match a literal backslash, one might have to write '\\\\' as the pattern string,
+        because the regular expression must be \\,
+        and each backslash must be expressed as \\ inside a regular Python string literal.'
+
+        Example of real use case in Studio:
+            a) user inputs regexp in usual regexp language,
+            b) regexp is saved to xml and is read in python as repr of that string
+            So  a\d in front-end editor will become a\\\\d in xml,  so it will match a1 as student answer.
+        """
+        problem = self.build_problem(answer=ur"5\\æ", case_sensitive=False, regexp=True)
+        self.assert_grade(problem, u"5\æ", "correct")
+
+        problem = self.build_problem(answer=u"5\\\\æ", case_sensitive=False, regexp=True)
+        self.assert_grade(problem, u"5\æ", "correct")
+
+    def test_backslash(self):
+        problem = self.build_problem(answer=u"a\\\\c1", case_sensitive=False, regexp=True)
+        self.assert_grade(problem, u"a\c1", "correct")
+
+    def test_special_chars(self):
+        problem = self.build_problem(answer=ur"a \s1", case_sensitive=False, regexp=True)
+        self.assert_grade(problem, u"a  1", "correct")
+
     def test_case_sensitive(self):
         # Test single answer
         problem = self.build_problem(answer="Second", case_sensitive=True)
@@ -515,7 +645,7 @@ class StringResponseTest(ResponseTest):
 
         # Test multiple answers
         answers = ["Second", "Third", "Fourth"]
-        problem = self.build_problem(answer="_or_".join(answers), case_sensitive=True)
+        problem = self.build_problem(answer="sample_answer", case_sensitive=True, additional_answers=answers)
 
         for answer in answers:
             # Exact string should be correct
@@ -524,6 +654,18 @@ class StringResponseTest(ResponseTest):
         # Other strings and the lowercase version of the string are incorrect
         self.assert_grade(problem, "Other String", "incorrect")
         self.assert_grade(problem, "second", "incorrect")
+
+    def test_bogus_escape_not_raised(self):
+        """
+        We now adding ^ and $ around regexp, so no bogus escape error will be raised.
+        """
+        problem = self.build_problem(answer=u"\\", case_sensitive=False, regexp=True)
+
+        self.assert_grade(problem, u"\\", "incorrect")
+
+        # right way to search for \
+        problem = self.build_problem(answer=u"\\\\", case_sensitive=False, regexp=True)
+        self.assert_grade(problem, u"\\", "correct")
 
     def test_case_insensitive(self):
         # Test single answer
@@ -539,7 +681,7 @@ class StringResponseTest(ResponseTest):
 
         # Test multiple answers
         answers = ["Second", "Third", "Fourth"]
-        problem = self.build_problem(answer="_or_".join(answers), case_sensitive=False)
+        problem = self.build_problem(answer="sample_answer", case_sensitive=False, additional_answers=answers)
 
         for answer in answers:
             # Exact string should be correct
@@ -549,20 +691,77 @@ class StringResponseTest(ResponseTest):
         # Other strings and the lowercase version of the string are incorrect
         self.assert_grade(problem, "Other String", "incorrect")
 
-    def test_hints(self):
-        multiple_answers = [
-            "Martin Luther King Junior",
-            "Doctor Martin Luther King Junior",
-            "Dr. Martin Luther King Jr.",
-            "Martin Luther King"
-        ]
-        hints = [("wisconsin", "wisc", "The state capital of Wisconsin is Madison"),
-                 ("minnesota", "minn", "The state capital of Minnesota is St. Paul"),
-                 ("_or_".join(multiple_answers), "mlk", "He lead the civil right movement in the United States of America.")]
+    def test_partial_matching(self):
+        problem = self.build_problem(answer="a2", case_sensitive=False, regexp=True, additional_answers=['.?\\d.?'])
+        self.assert_grade(problem, "a3", "correct")
+        self.assert_grade(problem, "3a", "correct")
 
-        problem = self.build_problem(answer="Michigan",
-                                     case_sensitive=False,
-                                     hints=hints)
+    def test_exception(self):
+        problem = self.build_problem(answer="a2", case_sensitive=False, regexp=True, additional_answers=['?\\d?'])
+        with self.assertRaises(Exception) as cm:
+            self.assert_grade(problem, "a3", "correct")
+        exception_message = cm.exception.message
+        self.assertIn("nothing to repeat", exception_message)
+
+    def test_hints(self):
+
+        hints = [
+            ("wisconsin", "wisc", "The state capital of Wisconsin is Madison"),
+            ("minnesota", "minn", "The state capital of Minnesota is St. Paul"),
+        ]
+        problem = self.build_problem(
+            answer="Michigan",
+            case_sensitive=False,
+            hints=hints,
+        )
+         # We should get a hint for Wisconsin
+        input_dict = {'1_2_1': 'Wisconsin'}
+        correct_map = problem.grade_answers(input_dict)
+        self.assertEquals(correct_map.get_hint('1_2_1'),
+                          "The state capital of Wisconsin is Madison")
+
+        # We should get a hint for Minnesota
+        input_dict = {'1_2_1': 'Minnesota'}
+        correct_map = problem.grade_answers(input_dict)
+        self.assertEquals(correct_map.get_hint('1_2_1'),
+                          "The state capital of Minnesota is St. Paul")
+
+        # We should NOT get a hint for Michigan (the correct answer)
+        input_dict = {'1_2_1': 'Michigan'}
+        correct_map = problem.grade_answers(input_dict)
+        self.assertEquals(correct_map.get_hint('1_2_1'), "")
+
+        # We should NOT get a hint for any other string
+        input_dict = {'1_2_1': 'California'}
+        correct_map = problem.grade_answers(input_dict)
+        self.assertEquals(correct_map.get_hint('1_2_1'), "")
+
+    def test_hints_regexp_and_answer_regexp(self):
+        different_student_answers = [
+            "May be it is Boston",
+            "Boston, really?",
+            "Boston",
+            "OK, I see, this is Boston",
+        ]
+
+        # if problem has regexp = true, it will accept hints written in regexp
+        hints = [
+            ("wisconsin", "wisc", "The state capital of Wisconsin is Madison"),
+            ("minnesota", "minn", "The state capital of Minnesota is St. Paul"),
+            (".*Boston.*", "bst", "First letter of correct answer is M."),
+            ('^\\d9$', "numbers", "Should not end with 9."),
+        ]
+
+        additional_answers = [
+            '^\\d[0-8]$',
+        ]
+        problem = self.build_problem(
+            answer="Michigan",
+            case_sensitive=False,
+            hints=hints,
+            additional_answers=additional_answers,
+            regexp=True
+        )
 
         # We should get a hint for Wisconsin
         input_dict = {'1_2_1': 'Wisconsin'}
@@ -587,12 +786,18 @@ class StringResponseTest(ResponseTest):
         self.assertEquals(correct_map.get_hint('1_2_1'), "")
 
         # We should get the same hint for each answer
-        for answer in multiple_answers:
+        for answer in different_student_answers:
             input_dict = {'1_2_1': answer}
             correct_map = problem.grade_answers(input_dict)
-            self.assertEquals(correct_map.get_hint('1_2_1'),
-                              "He lead the civil right movement in the United States of America.")
+            self.assertEquals(correct_map.get_hint('1_2_1'), "First letter of correct answer is M.")
 
+        input_dict = {'1_2_1': '59'}
+        correct_map = problem.grade_answers(input_dict)
+        self.assertEquals(correct_map.get_hint('1_2_1'), "Should not end with 9.")
+
+        input_dict = {'1_2_1': '57'}
+        correct_map = problem.grade_answers(input_dict)
+        self.assertEquals(correct_map.get_hint('1_2_1'), "")
 
     def test_computed_hints(self):
         problem = self.build_problem(
