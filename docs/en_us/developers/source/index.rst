@@ -8,13 +8,21 @@ Welcome to EdX's Dev documentation!
 
 Contents:
 
-.. toctree::
-   :maxdepth: 2
+.. this is wildly disorganized, and is basically just a dumping ground for
+    .rst files at the moment.
 
-   overview.rst
-   common-lib.rst
-   djangoapps.rst
-   i18n_translators_guide.rst
+.. toctree::
+    :maxdepth: 2
+
+    overview.rst
+    common-lib.rst
+    djangoapps.rst
+
+    overview.rst
+    common-lib.rst
+    djangoapps.rst
+    i18n.rst
+    i18n_translators_guide.rst
 
 Indices and tables
 ==================
@@ -22,4 +30,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-
