@@ -19,6 +19,7 @@ from xmodule.modulestore.django import modulestore, loc_mapper
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.locator import BlockUsageLocator
+from xmodule.modulestore import Location
 from xmodule.x_module import prefer_xmodules
 
 from util.json_request import expect_json, JsonResponse
@@ -138,12 +139,19 @@ def xblock_handler(request, tag=None, package_id=None, branch=None, version_guid
         if 'duplicate_source_locator' in request.json:
             parent_locator = BlockUsageLocator(request.json['parent_locator'])
             duplicate_source_locator = BlockUsageLocator(request.json['duplicate_source_locator'])
-            new_locator = _duplicate_item(
-                parent_locator,
-                duplicate_source_locator,
+
+            # _duplicate_item is dealing with locations to facilitate the recursive call for
+            # duplicating children.
+            parent_location = loc_mapper().translate_locator_to_location(parent_locator)
+            duplicate_source_location = loc_mapper().translate_locator_to_location(duplicate_source_locator)
+            dest_location = _duplicate_item(
+                parent_location,
+                duplicate_source_location,
                 request.json.get('display_name')
             )
-            return JsonResponse({"locator": unicode(new_locator)})
+            course_location = loc_mapper().translate_locator_to_location(BlockUsageLocator(parent_locator), get_course=True)
+            dest_locator = loc_mapper().translate_location(course_location.course_id, dest_location, False, True)
+            return JsonResponse({"locator": unicode(dest_locator)})
         else:
             return _create_item(request)
     else:
@@ -300,13 +308,10 @@ def _create_item(request):
     return JsonResponse({"locator": unicode(locator)})
 
 
-def _duplicate_item(parent_locator, duplicate_source_locator, display_name):
+def _duplicate_item(parent_location, duplicate_source_location, display_name=None):
     """
-    Duplicate an existing xblock as a child of the supplied parent_locator.
+    Duplicate an existing xblock as a child of the supplied parent_location.
     """
-    parent_location = loc_mapper().translate_locator_to_location(parent_locator)
-    duplicate_source_location = loc_mapper().translate_locator_to_location(duplicate_source_locator)
-
     store = get_modulestore(duplicate_source_location)
     source_item = store.get_item(duplicate_source_location)
     # Change the blockID to be unique.
@@ -327,9 +332,13 @@ def _duplicate_item(parent_locator, duplicate_source_locator, display_name):
         system=source_item.system if hasattr(source_item, 'system') else None,
     )
 
-    # Children are not automatically copied over. Not all xblocks have a 'children' attribute.
-    if hasattr(source_item, 'children'):
-        get_modulestore(dest_location).update_children(dest_location, source_item.children)
+    # Children are not automatically copied over (and not all xblocks have a 'children' attribute).
+    # Because DAGs are not fully supported, we need to actually duplicate each child as well.
+    if source_item.has_children:
+        copied_children = []
+        for child in source_item.children:
+            copied_children.append(_duplicate_item(dest_location, Location(child)).url())
+        get_modulestore(dest_location).update_children(dest_location, copied_children)
 
     if category not in DETACHED_CATEGORIES:
         parent = get_modulestore(parent_location).get_item(parent_location)
@@ -337,13 +346,12 @@ def _duplicate_item(parent_locator, duplicate_source_locator, display_name):
         # Otherwise, add child to end.
         if duplicate_source_location.url() in parent.children:
             source_index = parent.children.index(duplicate_source_location.url())
-            parent.children.insert(source_index+1, dest_location.url())
+            parent.children.insert(source_index + 1, dest_location.url())
         else:
             parent.children.append(dest_location.url())
         get_modulestore(parent_location).update_children(parent_location, parent.children)
 
-    course_location = loc_mapper().translate_locator_to_location(BlockUsageLocator(parent_locator), get_course=True)
-    return loc_mapper().translate_location(course_location.course_id, dest_location, False, True)
+    return dest_location
 
 
 def _delete_item_at_location(item_location, delete_children=False, delete_all_versions=False):

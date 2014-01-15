@@ -21,6 +21,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.django import loc_mapper
 from xmodule.modulestore.locator import BlockUsageLocator
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore import Location
 
 
 class ItemTest(CourseTestCase):
@@ -165,8 +166,12 @@ class TestDuplicateItem(ItemTest):
     def setUp(self):
         """ Creates the test course structure and a few components to 'duplicate'. """
         super(TestDuplicateItem, self).setUp()
-        # create a parent sequential
-        resp = self.create_xblock(parent_locator=self.unicode_locator, category='sequential')
+        # Create a parent chapter (for testing children of children).
+        resp = self.create_xblock(parent_locator=self.unicode_locator, category='chapter')
+        self.chapter_locator = self.response_locator(resp)
+
+        # create a sequential containing a problem and an html component
+        resp = self.create_xblock(parent_locator=self.chapter_locator, category='sequential')
         self.seq_locator = self.response_locator(resp)
 
         # create problem and an html component
@@ -176,15 +181,21 @@ class TestDuplicateItem(ItemTest):
         resp = self.create_xblock(parent_locator=self.seq_locator, category='html')
         self.html_locator = self.response_locator(resp)
 
+        # Create a second sequential just (testing children of children)
+        self.create_xblock(parent_locator=self.chapter_locator, category='sequential2')
+
     def test_duplicate_equality(self):
         """
         Tests that a duplicated xblock is identical to the original,
         except for location and display name.
         """
-        def verify_duplicate(source_locator, parent_locator):
+        def duplicate_and_verify(source_locator, parent_locator):
             locator = self._duplicate_item(parent_locator, source_locator)
+            self.assertTrue(check_equality(source_locator, locator), "Duplicated item differs from original")
+
+        def check_equality(source_locator, duplicate_locator):
             original_item = self.get_item_from_modulestore(source_locator, draft=True)
-            duplicated_item = self.get_item_from_modulestore(locator, draft=True)
+            duplicated_item = self.get_item_from_modulestore(duplicate_locator, draft=True)
 
             self.assertNotEqual(
                 original_item.location,
@@ -194,11 +205,32 @@ class TestDuplicateItem(ItemTest):
             # Set the location and display name to be the same so we can make sure the rest of the duplicate is equal.
             duplicated_item.location = original_item.location
             duplicated_item.display_name = original_item.display_name
-            self.assertEqual(original_item, duplicated_item, "Duplicated item differs from original")
 
-        verify_duplicate(self.problem_locator, self.seq_locator)
-        verify_duplicate(self.html_locator, self.seq_locator)
-        verify_duplicate(self.seq_locator, self.unicode_locator)
+            # Children will also be duplicated, so for the purposes of testing equality, we will set
+            # the children to the original after recursively checking the children.
+            if original_item.has_children:
+                self.assertEqual(
+                    len(original_item.children),
+                    len(duplicated_item.children),
+                    "Duplicated item differs in number of children"
+                )
+                for i in xrange(len(original_item.children)):
+                    source_locator = loc_mapper().translate_location(
+                        self.course.location.course_id, Location(original_item.children[i]), False, True
+                    )
+                    duplicate_locator = loc_mapper().translate_location(
+                        self.course.location.course_id, Location(duplicated_item.children[i]), False, True
+                    )
+                    if not check_equality(source_locator, duplicate_locator):
+                        return False
+                duplicated_item.children = original_item.children
+
+            return original_item == duplicated_item
+
+        duplicate_and_verify(self.problem_locator, self.seq_locator)
+        duplicate_and_verify(self.html_locator, self.seq_locator)
+        duplicate_and_verify(self.seq_locator, self.chapter_locator)
+        duplicate_and_verify(self.chapter_locator, self.unicode_locator)
 
     def test_ordering(self):
         """
@@ -224,7 +256,7 @@ class TestDuplicateItem(ItemTest):
                     "source item at wrong position"
                 )
                 self.assertEqual(
-                    children[source_position+1],
+                    children[source_position + 1],
                     self.get_old_id(locator).url(),
                     "duplicated item not ordered after source item"
                 )
@@ -232,7 +264,7 @@ class TestDuplicateItem(ItemTest):
         verify_order(self.problem_locator, self.seq_locator, 0)
         # 2 because duplicate of problem should be located before.
         verify_order(self.html_locator, self.seq_locator, 2)
-        verify_order(self.seq_locator, self.unicode_locator, 0)
+        verify_order(self.seq_locator, self.chapter_locator, 0)
 
         # Test duplicating something into a location that is not the parent of the original item.
         # Duplicated item should appear at the end.
@@ -257,10 +289,10 @@ class TestDuplicateItem(ItemTest):
         verify_name(self.html_locator, self.seq_locator, "Duplicate of 'Text'")
 
         # The sequence does not have a display_name set, so None gets included as the string 'None'.
-        verify_name(self.seq_locator, self.unicode_locator, "Duplicate of 'None'")
+        verify_name(self.seq_locator, self.chapter_locator, "Duplicate of 'None'")
 
         # Now send a custom display name for the duplicate.
-        verify_name(self.seq_locator, self.unicode_locator, "customized name", display_name="customized name")
+        verify_name(self.seq_locator, self.chapter_locator, "customized name", display_name="customized name")
 
     def _duplicate_item(self, parent_locator, source_locator, display_name=None):
         data = {
