@@ -117,14 +117,16 @@
                 jasmine.stubRequests();
 
                 window.YT = {
-                    Player: function () { },
+                    Player: function () {
+                        return { getDuration: function () { return 60; } };
+                    },
                     PlayerState: oldYT.PlayerState,
                     ready: function (callback) {
                         callback();
                     }
                 };
 
-                spyOn(window.YT, 'Player');
+                spyOn(window.YT, 'Player').andCallThrough();
 
                 initializeYouTube();
 
@@ -870,6 +872,16 @@
 
             it('delegate to the player', function () {
                 expect(player.getDuration).toHaveBeenCalled();
+            });
+        });
+
+        describe('getDuration', function () {
+            beforeEach(function () {
+
+            });
+
+            it('getDuration is called as a fall-back', function () {
+
             });
         });
 

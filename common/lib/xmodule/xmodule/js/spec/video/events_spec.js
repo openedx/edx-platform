@@ -64,7 +64,8 @@
             window.YT = {
               Player: function () {
                 return {
-                    getPlaybackQuality: function () {}
+                    getPlaybackQuality: function () {},
+                    getDuration: function () { return 60; }
                 };
               },
               PlayerState: this.oldYT.PlayerState,

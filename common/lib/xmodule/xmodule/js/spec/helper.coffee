@@ -1,6 +1,8 @@
 # Stub Youtube API
 window.YT =
   Player: ->
+    getDuration: ->
+      60
   PlayerState:
     UNSTARTED: -1
     ENDED: 0
@@ -128,6 +130,7 @@ jasmine.stubYoutubePlayer = ->
     obj = jasmine.createSpyObj 'YT.Player', ['cueVideoById', 'getVideoEmbedCode',
     'getCurrentTime', 'getPlayerState', 'getVolume', 'setVolume', 'loadVideoById',
     'playVideo', 'pauseVideo', 'seekTo', 'getDuration', 'getAvailablePlaybackRates', 'setPlaybackRate']
+    obj['getDuration'] = jasmine.createSpy('getDuration').andReturn 60
     obj['getAvailablePlaybackRates'] = jasmine.createSpy('getAvailablePlaybackRates').andReturn [0.75, 1.0, 1.25, 1.5]
     obj
 

@@ -99,6 +99,9 @@ function () {
             .find('.ui-slider-range.ui-widget-header.ui-slider-range-min');
     }
 
+    // Rebuild the slider start-end range (if it doesn't take up the
+    // whole slider). Remember that endTime === null means the end time
+    // is set to the end of video by default.
     function updateStartEndTimeRegion(params) {
         var left, width, start, end, duration, rangeParams;
 
@@ -112,10 +115,13 @@ function () {
 
         start = this.videoPlayer.startTime;
 
-        // If end is set to null, then we set it to the end of the video. We
-        // know that start is not a the beginning, therefore we must build a
-        // range.
+        // If end is set to null, then we set it to the end of the video.
         end = this.videoPlayer.endTime || duration;
+
+        // Don't build a range if it takes up the whole slider.
+        if (start === 0 && end === duration) {
+            return;
+        }
 
         // Because JavaScript has weird rounding rules when a series of
         // mathematical operations are performed in a single statement, we will
