@@ -205,6 +205,8 @@ FEATURES = {
     # Give course staff unrestricted access to grade downloads (if set to False,
     # only edX superusers can perform the downloads)
     'ALLOW_COURSE_STAFF_GRADE_DOWNLOADS': False,
+
+    'ENABLED_PAYMENT_REPORTS': ["refund_report", "itemized_purchase_report", "university_revenue_share", "certificate_status"],
 }
 
 # Used for A/B testing
@@ -566,8 +568,6 @@ PAID_COURSE_REGISTRATION_CURRENCY = ['usd', '$']
 
 # Members of this group are allowed to generate payment reports
 PAYMENT_REPORT_GENERATOR_GROUP = 'shoppingcart_report_access'
-# Maximum number of rows the report can contain
-PAYMENT_REPORT_MAX_ITEMS = 10000
 
 ################################# open ended grading config  #####################
 

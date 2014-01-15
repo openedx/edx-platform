@@ -14,13 +14,14 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from shoppingcart.views import _can_download_report, _get_date_from_str
-from shoppingcart.models import Order, CertificateItem, PaidCourseRegistration, OrderItem
+from shoppingcart.models import Order, CertificateItem, PaidCourseRegistration
 from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
 from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_response
 from shoppingcart.processors import render_purchase_form_html
 from mock import patch, Mock, sentinel
+from shoppingcart.views import initialize_report
 
 
 def mock_render_purchase_form_html(*args, **kwargs):
@@ -304,6 +305,11 @@ class CSVReportViewsTest(ModuleStoreTestCase):
                                       mode_display_name="honor cert",
                                       min_price=self.cost)
         self.course_mode.save()
+        self.course_mode2 = CourseMode(course_id=self.course_id,
+                                       mode_slug="verified",
+                                       mode_display_name="verified cert",
+                                       min_price=self.cost)
+        self.course_mode2.save()
         self.verified_course_id = 'org/test/Test_Course'
         CourseFactory.create(org='org', number='test', run='course1', display_name='Test Course')
         self.cart = Order.get_cart_for_user(self.user)
@@ -343,13 +349,13 @@ class CSVReportViewsTest(ModuleStoreTestCase):
         self.assertEqual(template, 'shoppingcart/download_report.html')
         self.assertFalse(context['total_count_error'])
         self.assertFalse(context['date_fmt_error'])
-        self.assertIn(_("Download Purchase Report"), response.content)
+        self.assertIn(_("Download CSV Reports"), response.content)
 
     @patch('shoppingcart.views.render_to_response', render_mock)
     def test_report_csv_bad_date(self):
         self.login_user()
         self.add_to_download_group(self.user)
-        response = self.client.post(reverse('payment_csv_report'), {'start_date': 'BAD', 'end_date': 'BAD'})
+        response = self.client.post(reverse('payment_csv_report'), {'start_date': 'BAD', 'end_date': 'BAD', 'requested_report': 'itemized_purchase_report'})
 
         ((template, context), unused_kwargs) = render_mock.call_args
         self.assertEqual(template, 'shoppingcart/download_report.html')
@@ -358,36 +364,40 @@ class CSVReportViewsTest(ModuleStoreTestCase):
         self.assertIn(_("There was an error in your date input.  It should be formatted as YYYY-MM-DD"),
                       response.content)
 
-    @patch('shoppingcart.views.render_to_response', render_mock)
-    @override_settings(PAYMENT_REPORT_MAX_ITEMS=0)
-    def test_report_csv_too_long(self):
+    CORRECT_CSV_NO_DATE_ITEMIZED_PURCHASE = ",1,purchased,1,40,40,usd,Registration for Course: Robot Super Course,"
+
+    def test_report_csv_itemized(self):
+        report_type = 'itemized_purchase_report'
+        start_date = '1970-01-01'
+        end_date = '2100-01-01'
         PaidCourseRegistration.add_to_order(self.cart, self.course_id)
         self.cart.purchase()
         self.login_user()
         self.add_to_download_group(self.user)
-        response = self.client.post(reverse('payment_csv_report'), {'start_date': '1970-01-01',
-                                                                    'end_date': '2100-01-01'})
-
-        ((template, context), unused_kwargs) = render_mock.call_args
-        self.assertEqual(template, 'shoppingcart/download_report.html')
-        self.assertTrue(context['total_count_error'])
-        self.assertFalse(context['date_fmt_error'])
-        self.assertIn(_("There are too many results in your report.") + " (>0)", response.content)
-
-    # just going to ignored the date in this test, since we already deal with date testing
-    # in test_models.py
-    CORRECT_CSV_NO_DATE = ",1,purchased,1,40,40,usd,Registration for Course: Robot Super Course,"
-
-    def test_report_csv(self):
-        PaidCourseRegistration.add_to_order(self.cart, self.course_id)
-        self.cart.purchase()
-        self.login_user()
-        self.add_to_download_group(self.user)
-        response = self.client.post(reverse('payment_csv_report'), {'start_date': '1970-01-01',
-                                                                    'end_date': '2100-01-01'})
+        response = self.client.post(reverse('payment_csv_report'), {'start_date': start_date,
+                                                                    'end_date': end_date,
+                                                                    'requested_report': report_type})
         self.assertEqual(response['Content-Type'], 'text/csv')
-        self.assertIn(",".join(OrderItem.csv_report_header_row()), response.content)
-        self.assertIn(self.CORRECT_CSV_NO_DATE, response.content)
+        report = initialize_report(report_type, start_date, end_date)
+        self.assertIn(",".join(report.header()), response.content)
+        self.assertIn(self.CORRECT_CSV_NO_DATE_ITEMIZED_PURCHASE, response.content)
+
+    def test_report_csv_university_revenue_share(self):
+        report_type = 'university_revenue_share'
+        start_date = '1970-01-01'
+        end_date = '2100-01-01'
+        start_letter = 'A'
+        end_letter = 'Z'
+        self.login_user()
+        self.add_to_download_group(self.user)
+        response = self.client.post(reverse('payment_csv_report'), {'start_date': start_date,
+                                                                    'end_date': end_date,
+                                                                    'start_letter': start_letter,
+                                                                    'end_letter': end_letter,
+                                                                    'requested_report': report_type})
+        self.assertEqual(response['Content-Type'], 'text/csv')
+        report = initialize_report(report_type, start_date, end_date, start_letter, end_letter)
+        self.assertIn(",".join(report.header()), response.content)
 
 
 class UtilFnsTest(TestCase):

@@ -1,13 +1,14 @@
+""" Models for the shopping cart and assorted purchase types """
+
+from collections import namedtuple
 from datetime import datetime
+from decimal import Decimal
 import pytz
 import logging
 import smtplib
 import unicodecsv
 
-from model_utils.managers import InheritanceManager
-from collections import namedtuple
 from boto.exception import BotoServerError  # this is a super-class of SESError and catches connection errors
-
 from django.dispatch import receiver
 from django.db import models
 from django.conf import settings
@@ -16,7 +17,9 @@ from django.core.mail import send_mail
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 from django.db import transaction
+from django.db.models import Sum
 from django.core.urlresolvers import reverse
+from model_utils.managers import InheritanceManager
 
 from xmodule.modulestore.django import modulestore
 from xmodule.course_module import CourseDescriptor
@@ -26,11 +29,12 @@ from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_string
 from student.views import course_from_id
 from student.models import CourseEnrollment, unenroll_done
+from util.query import use_read_replica_if_available
 
 from verify_student.models import SoftwareSecurePhotoVerification
 
 from .exceptions import (InvalidCartItem, PurchasedCallbackException, ItemAlreadyInCartException,
-                         AlreadyEnrolledInCourseException, CourseDoesNotExistException)
+                         AlreadyEnrolledInCourseException, CourseDoesNotExistException, ReportException)
 
 log = logging.getLogger("shoppingcart")
 
@@ -203,13 +207,14 @@ class OrderItem(models.Model):
     # this is denormalized, but convenient for SQL queries for reports, etc. user should always be = order.user
     user = models.ForeignKey(User, db_index=True)
     # this is denormalized, but convenient for SQL queries for reports, etc. status should always be = order.status
-    status = models.CharField(max_length=32, default='cart', choices=ORDER_STATUSES)
+    status = models.CharField(max_length=32, default='cart', choices=ORDER_STATUSES, db_index=True)
     qty = models.IntegerField(default=1)
     unit_cost = models.DecimalField(default=0.0, decimal_places=2, max_digits=30)
     line_desc = models.CharField(default="Misc. Item", max_length=1024)
     currency = models.CharField(default="usd", max_length=8)  # lower case ISO currency codes
-    fulfilled_time = models.DateTimeField(null=True)
-    refund_requested_time = models.DateTimeField(null=True)
+    fulfilled_time = models.DateTimeField(null=True, db_index=True)
+    refund_requested_time = models.DateTimeField(null=True, db_index=True)
+    service_fee = models.DecimalField(default=0.0, decimal_places=2, max_digits=30)
     # general purpose field, not user-visible.  Used for reporting
     report_comments = models.TextField(default="")
 
@@ -258,66 +263,6 @@ class OrderItem(models.Model):
         Default implementation is to return an empty set
         """
         return self.pk_with_subclass, set([])
-
-    @classmethod
-    def purchased_items_btw_dates(cls, start_date, end_date):
-        """
-        Returns a QuerySet of the purchased items between start_date and end_date inclusive.
-        """
-        return cls.objects.filter(
-            status="purchased",
-            fulfilled_time__gte=start_date,
-            fulfilled_time__lt=end_date,
-        )
-
-    @classmethod
-    def csv_purchase_report_btw_dates(cls, filelike, start_date, end_date):
-        """
-        Outputs a CSV report into "filelike" (a file-like python object, such as an actual file, an HttpRequest,
-        or sys.stdout) of purchased items between start_date and end_date inclusive.
-        Opening and closing filelike (if applicable) should be taken care of by the caller
-        """
-        items = cls.purchased_items_btw_dates(start_date, end_date).order_by("fulfilled_time")
-
-        writer = unicodecsv.writer(filelike, encoding="utf-8")
-        writer.writerow(OrderItem.csv_report_header_row())
-
-        for item in items:
-            writer.writerow(item.csv_report_row)
-
-    @classmethod
-    def csv_report_header_row(cls):
-        """
-        Returns the "header" row for a csv report of purchases
-        """
-        return [
-            "Purchase Time",
-            "Order ID",
-            "Status",
-            "Quantity",
-            "Unit Cost",
-            "Total Cost",
-            "Currency",
-            "Description",
-            "Comments"
-        ]
-
-    @property
-    def csv_report_row(self):
-        """
-        Returns an array which can be fed into csv.writer to write out one csv row
-        """
-        return [
-            self.fulfilled_time,
-            self.order_id,  # pylint: disable=no-member
-            self.status,
-            self.qty,
-            self.unit_cost,
-            self.line_cost,
-            self.currency,
-            self.line_desc,
-            self.report_comments,
-        ]
 
     @property
     def pk_with_subclass(self):
@@ -625,3 +570,36 @@ class CertificateItem(OrderItem):
                  "Please include your order number in your e-mail. "
                  "Please do NOT include your credit card information.").format(
                      billing_email=settings.PAYMENT_SUPPORT_EMAIL)
+
+    @classmethod
+    def verified_certificates_count(cls, course_id, status):
+        """Return a queryset of CertificateItem for every verified enrollment in course_id with the given status."""
+        return use_read_replica_if_available(
+            CertificateItem.objects.filter(course_id=course_id, mode='verified', status=status).count())
+
+    # TODO combine these three methods into one
+    @classmethod
+    def verified_certificates_monetary_field_sum(cls, course_id, status, field_to_aggregate):
+        """
+        Returns a Decimal indicating the total sum of field_to_aggregate for all verified certificates with a particular status.
+
+        Sample usages:
+        - status 'refunded' and field_to_aggregate 'unit_cost' will give the total amount of money refunded for course_id
+        - status 'purchased' and field_to_aggregate 'service_fees' gives the sum of all service fees for purchased certificates
+        etc
+        """
+        query = use_read_replica_if_available(
+            CertificateItem.objects.filter(course_id=course_id, mode='verified', status=status).aggregate(Sum(field_to_aggregate)))[field_to_aggregate + '__sum']
+        if query is None:
+            return Decimal(0.00)
+        else:
+            return query
+
+    @classmethod
+    def verified_certificates_contributing_more_than_minimum(cls, course_id):
+        return use_read_replica_if_available(
+            CertificateItem.objects.filter(
+                course_id=course_id,
+                mode='verified',
+                status='purchased',
+                unit_cost__gt=(CourseMode.min_course_price_for_verified_for_currency(course_id, 'usd'))).count())
