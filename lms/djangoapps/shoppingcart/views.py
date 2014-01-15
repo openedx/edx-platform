@@ -196,8 +196,6 @@ def csv_report(request):
     if not _can_download_report(request.user):
         return HttpResponseForbidden(_('You do not have permission to view this page.'))
 
-    # TODO temp filler for start letter, end letter
-
     if request.method == 'POST':
         start_date = request.POST.get('start_date', '')
         end_date = request.POST.get('end_date', '')

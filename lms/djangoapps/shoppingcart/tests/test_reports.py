@@ -14,7 +14,7 @@ from django.test.utils import override_settings
 from course_modes.models import CourseMode
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from shoppingcart.models import (Order, CertificateItem, PaidCourseRegistration, PaidCourseRegistrationAnnotation)
-from shoppingcart.views import initialize_report, REPORT_TYPES
+from shoppingcart.views import initialize_report
 from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

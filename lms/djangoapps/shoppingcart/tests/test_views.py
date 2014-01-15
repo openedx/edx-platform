@@ -398,7 +398,6 @@ class CSVReportViewsTest(ModuleStoreTestCase):
         self.assertEqual(response['Content-Type'], 'text/csv')
         report = initialize_report(report_type, start_date, end_date, start_letter, end_letter)
         self.assertIn(",".join(report.header()), response.content)
-        # TODO add another test here
 
 
 class UtilFnsTest(TestCase):
