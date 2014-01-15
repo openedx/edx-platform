@@ -28,6 +28,7 @@ progress through edX101.
  
 .. image:: Images/image245.png
   :width: 800
+  :alt: Image of a student's Course Progress page with the grade cutoffs legend highlighted
  
  
 The student can see from this page that edX101 was graded as a Pass/Fail course with a cutoff
@@ -46,6 +47,7 @@ down view of the example Progress page for the student in the example above:
  
 .. image:: Images/image247.png
    :width: 800
+   :alt: Image of a student's Course Progress page with problems highlighted
  
 Again, note that point scores from graded sections are called "Problem
 Scores", while point scores from ungraded sections are called "Practice
@@ -66,6 +68,7 @@ the Grades page of the Instructor dashboard for edX101:
  
 .. image:: Images/image249.png
   :width: 800
+  :alt: Image of the Grades tab of the Instructor Dashboard
  
 Here you see several options for viewing or downloading student grades,
 viewing individual progress through a course or resetting problem attempts.

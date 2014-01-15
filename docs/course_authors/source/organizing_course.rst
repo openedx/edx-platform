@@ -34,10 +34,12 @@ To open the course outline, on the **Content** menu, click **Outline**.
 The following image shows the different elements of a course outline:
 
 .. image:: Images/Course_Outline.gif
+ :alt: Image of the course outline, with callouts for sections, subsection, and units
 
 The following image shows the way this course content appears in the LMS:
 
 .. image:: Images/Course_Outline_LMS.gif
+  :alt: Image of sections from the student's point of view
 
 .. _Sections:
 
@@ -86,6 +88,7 @@ You add and delete subsections from the **Course Outline** page. You edit a subs
 On the page for the subsection, you can see all the units in the subsection.
 
 .. image:: Images/Subsection.gif
+ :alt: Image of the subsection page
 
 You can also do the following.
 
@@ -114,6 +117,7 @@ Subsections are divided into units. A unit, in turn, contains one or more compon
 In the LMS, each unit in the subsection appears as a link on the course ribbon at the top of the page. The following image shows a subsection that has eight units:
 
 .. image:: Images/Units_LMS.gif
+ :alt: Image of units from a student's point of view
 
 You can create a unit from the course outline or the subsection page. To create a unit, click **New Unit** within the subsection that you want.
 
@@ -148,6 +152,7 @@ A component is the part of a unit that contains your actual course content. A un
 A student can view the name of all components in a unit by hovering over the unit in the ribbon at the top of the page.
 
 .. image:: Images/ComponentNames_CourseRibbon.gif
+:alt: Image of the component list for a unit
 
 By default, Studio includes four types of components.
 
@@ -159,6 +164,7 @@ By default, Studio includes four types of components.
 To add a component to the unit, click the component type that you want under **Add New Component**. 
 
 .. image:: Images/AddNewComponent.gif
+  :alt: Image of adding a new component
 
 For more information, see the documentation for the specific component type that you want:
 
@@ -178,7 +184,9 @@ You can reorganize your course by dragging and dropping sections, subsections, u
 To move an element, hover over the element handle on the right side of the screen until the mouse pointer changes to a four-headed arrow. Then, click and drag the element to the location that you want.
 
 .. image:: Images/DragAndDropExample.gif
+:alt: Image of the course outline, with the handle for a unit selected for drag and drop
 
 When you move an element, a blue line indicates where the element will land when you release the mouse. 
 
 .. image:: Images/DragAndDrop_BlueLine.gif
+:alt: Image of the course outline, with a unit being dragged to a different location

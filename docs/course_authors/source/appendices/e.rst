@@ -26,6 +26,7 @@ Sample Problem:
 
 .. image:: ../Images/image287.png
     :width: 600
+    :alt: Image of an option response problem
 
 **Problem Code:**
 
@@ -115,7 +116,8 @@ differences between the two include the following.
 Sample Problem:
 
 .. image:: ../Images/image289.png
- :width: 600
+ :width: 600:
+ :alt: Image of a multiple choice problem
 
 **Problem Code:**
 
@@ -207,6 +209,7 @@ Sample Problem:
 
 .. image:: ../Images/image290.png
  :width: 600
+  :alt: Image of a checkbox problem
 
 
 **Problem Code:**
@@ -267,6 +270,7 @@ Sample Problem:
 
 .. image:: ../Images/image291.png
  :width: 600
+ :alt: Image of a string response problem
 
 **Problem Code:**
 
@@ -425,6 +429,7 @@ Sample Problem:
 
 .. image:: ../Images/image292.png
  :width: 600
+ :alt: Image of a numerical response problem
 
 
 **Problem Code**:
@@ -737,6 +742,7 @@ Sample Problem:
 
 .. image:: ../Images/image293.png
  :width: 600
+ :alt: Image of a formula response problem
 
 **Problem Code**:
 
@@ -885,6 +891,7 @@ Sample Problem:
 
 .. image:: ../Images/image295.png
  :width: 600
+ :alt: Image of a custom response problem
 
 
 **Problem Code**:
@@ -1015,6 +1022,7 @@ Sample Problem:
 
 .. image:: ../Images/image296.png
  :width: 600
+ :alt: Image of a chemical equation response problem
 
 **Problem Code**:
 
@@ -1056,12 +1064,15 @@ Sample Problem:
 
 .. image:: ../Images/image297.png
  :width: 600
+ :alt: Image of a schematic response problem
 
 .. image:: ../Images/image298.png
  :width: 600
+ :alt: Image of a schematic response problem
 
 .. image:: ../Images/image299.png
  :width: 600
+ :alt: Image of a schematic response explanation
 
 **Problem Code**:
 

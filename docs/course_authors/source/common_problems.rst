@@ -42,6 +42,7 @@ apply to answer the problem correctly. Each checkbox problem must have
 at least one correct answer.
 
 .. image:: Images/CheckboxExample.gif
+ :alt: Image of a checkbox problem
 
 ==========================
 Create a Checkbox Problem
@@ -55,6 +56,7 @@ Create a Checkbox Problem
 #. Select all the answer options, and then click the checkbox button. 
 
    .. image:: Images/ProbComponent_CheckboxIcon.gif
+    :alt: Image of the checkbox button
    
    When you do this, brackets appear next to each answer choice.
 
@@ -63,6 +65,7 @@ Create a Checkbox Problem
    explanation button to add explanation tags around the text.
 
    .. image:: Images/ProbCompButton_Explanation.gif
+    :alt: Image of the explanation button
 
 #. On the **Settings** tab, specify the settings that you want. 
 #. Click **Save**.
@@ -105,6 +108,7 @@ dropdown problems don't show answer choices until the student clicks
 the dropdown arrow.
 
 .. image:: Images/DropdownExample.gif
+ :alt: Image of a dropdown problem
 
 ==========================
 Create a Dropdown Problem
@@ -121,6 +125,7 @@ To create a dropdown problem, follow these steps.
 #. Select all the answer options, and then click the dropdown button. 
       
    .. image:: Images/ProbCompButton_Dropdown.gif
+    :alt: Image of the dropdown button
       
    When you do this, a double set of brackets ([[ ]]) appears and surrounds the 
    answer options.
@@ -130,6 +135,7 @@ To create a dropdown problem, follow these steps.
    explanation button to add explanation tags around the text.
 
    .. image:: Images/ProbCompButton_Explanation.gif
+    :alt: Image of the explanation button
 
 #. On the **Settings** tab, specify the settings that you want. 
 #. Click **Save**.
@@ -162,6 +168,7 @@ choices for multiple choice problems are always visible directly below
 the question.
 
 .. image:: Images/MultipleChoiceExample.gif
+ :alt: Image of a multiple choice problem
 
 ==================================
 Create a Multiple Choice Problem
@@ -176,6 +183,7 @@ Create a Multiple Choice Problem
 #. Select all the answer options, and then click the multiple choice button. 
    
    .. image:: Images/ProbCompButton_MultChoice.gif
+    :alt: Image of the multiple choice button
    
    When you do this, the component editor adds a pair of parentheses next to each 
    possible answer.
@@ -186,6 +194,7 @@ Create a Multiple Choice Problem
    explanation button to add explanation tags around the text.
 
    .. image:: Images/ProbCompButton_Explanation.gif
+    :alt: Image of the explanation button
 
 #. On the **Settings** tab, specify the settings that you want. 
 #. Click **Save**.
@@ -226,6 +235,7 @@ In numerical input problems, students enter numbers or specific and
 relatively simple mathematical expressions to answer a question. 
 
 .. image:: Images/NumericalInputExample.gif
+ :alt: Image of a numerical input problem
 
 Note that students' responses don't have to be exact for these problems. You can 
 specify a margin of error, or tolerance. For more information, see the instructions below.
@@ -240,6 +250,7 @@ example shows the way Studio renders students' text responses in
 numerical input problems. To see more examples, scroll down to **Examples**.
 
 .. image:: Images/Math5.gif
+ :alt: Image of Studio's rendering of numerical input responses
 
 ==================================
 Create a Numerical Input Problem
@@ -254,6 +265,7 @@ Create a Numerical Input Problem
 #. Select the text of the answer, and then click the numerical input button. 
 
    .. image:: Images/ProbCompButton_NumInput.gif
+    :alt: Image of the numerical input button
    
    When you do this, an equal sign appears next to the answer.
         
@@ -267,6 +279,7 @@ Create a Numerical Input Problem
    explanation button to add explanation tags around the text.
 
    .. image:: Images/ProbCompButton_Explanation.gif
+    :alt: Image of athe explanation button
 
 #. On the **Settings** tab, specify the settings that you want. 
 #. Click **Save**.
@@ -290,9 +303,13 @@ The following are a few more examples of the way that Studio renders numerical i
 text that students enter.
 
 .. image:: Images/Math1.gif
+ :alt: Image of a numerical input probem rendered by Studio
 .. image:: Images/Math2.gif
+ :alt: Image of a numerical input probem rendered by Studio
 .. image:: Images/Math3.gif
+ :alt: Image of a numerical input probem rendered by Studio
 .. image:: Images/Math4.gif
+ :alt: Image of a numerical input probem rendered by Studio
 
 For more information, see `Formula Equation Input 
 <https://edx.readthedocs.org/en/latest/course_data_formats/formula_equation_input.html>`_.
@@ -311,6 +328,7 @@ punctuation, we recommend that you specify more than one attempt for
 text input problems to allow for typographical errors.
 
 .. image:: Images/TextInputExample.gif
+ :alt: Image of a text input probem
 
 ==================================
 Create a Text Input Problem
@@ -326,6 +344,7 @@ To create a text input problem, follow these steps.
 #. Select the text of the answer, and then click the text input button. 
    
    .. image:: Images/ProbCompButton_TextInput.gif
+    :alt: Image of the text input button
    
    When you do this, an equal sign appears next to the answer.
   
@@ -334,6 +353,7 @@ To create a text input problem, follow these steps.
    explanation button to add explanation tags around the text.
 
    .. image:: Images/ProbCompButton_Explanation.gif
+    :alt: Image of the explanation button
 
 #. On the **Settings** tab, specify the settings that you want. 
 #. Click **Save**.
@@ -367,6 +387,7 @@ To do this, include "or=" (without the quotation marks) before each additional
 correct response.
 
 .. image:: Images/TextInput_MultipleAnswer.gif
+ :alt: Image of multiple responses in a text input problem
 
 =========================================
 Case Sensitivity and Text Input Problems

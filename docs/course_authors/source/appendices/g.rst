@@ -43,6 +43,7 @@ HTML (Text) Components
 In the HTML component editor, you can use MathJax both in Visual view and in HTML view.
 
 .. image:: ../Images/MathJax_HTML.gif
+ :alt: Image of an HTML component with MathJax in both the Visual and HTML views
 
 Problem Components
 ------------------
@@ -56,3 +57,4 @@ Navier-Stokes equation is enclosed in backslashes and brackets, so it appears on
 own line.
 
 .. image:: ../Images/MathJax_Problem.gif
+:alt: Image of a problem component with MathJax in both the Visual and HTML views

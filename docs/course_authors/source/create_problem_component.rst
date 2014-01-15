@@ -42,6 +42,7 @@ The Student View of a Problem
 All problems on the edX platform have several component parts.
 
 .. image:: Images/AnatomyOfExercise1.gif
+ :alt: Image of a problem from a student's point of view, with callouts for elements of the problem
 
 #. **Problem text.** The problem text can contain any standard HTML formatting.
 
@@ -71,11 +72,13 @@ All problems on the edX platform have several component parts.
    allow unlimited attempts.
 
    .. image:: Images/AnatomyOfExercise2.gif
+    :alt: Image of a problem from a student's point of view, with callouts for attempts and showing the answer
 
 #. **Feedback.** After a student clicks **Check**, all problems return a
    green check mark or a red X.
 
    .. image:: Images/AnatomyofaProblem_Feedback.gif
+    :alt: Image of feedback checkmark and x from a student's point of view
 
 #. **Correct answer.** Most problems require that the instructor specify
    a single correct answer.
@@ -89,6 +92,7 @@ All problems on the edX platform have several component parts.
 #. **Hide Answer button.**
 
    .. image:: Images/AnatomyOfExercise3.gif
+    :alt: Image of a problem in the course accordian
 
 #. **Grading.** The instructor may specify whether a group of problems
    is graded. If a group of problems is graded, a clock icon appears for
@@ -155,6 +159,7 @@ the text for you automatically. The toolbar buttons are the following:
 The following image shows a multiple choice problem in the Simple Editor.
 
 .. image:: Images/MultipleChoice_SimpleEditor.gif
+ :alt: Image of a problem in the simple editor
 
 .. _Advanced Editor:
 
@@ -169,6 +174,7 @@ The following image shows the multiple choice problem above in the Advanced Edit
 instead of the Simple Editor.
 
 .. image:: Images/MultipleChoice_AdvancedEditor.gif
+ :alt: Image of a problem in the advanced editor
 
 .. _Problem Settings:
 
@@ -188,6 +194,7 @@ are listed on the page for those problem types.)
 -  Show Answer
 
 .. image:: Images/ProbComponent_Attributes.gif
+ :alt: Image of the problem settings dialog box
 
 ===============
 Display Name
@@ -198,6 +205,7 @@ appears as a heading over the problem in the LMS and in the course
 ribbon at the top of the page.
 
 .. image:: Images/ProbComponent_LMS_DisplayName.gif
+ :alt: Image of the problem in a unit page from a student's point of view
 
 ==============================
 Maximum Attempts
@@ -220,6 +228,7 @@ This setting specifies the maximum number of points possible for the
 problem. The problem weight appears next to the problem title.
 
 .. image:: Images/ProblemWeight_DD.gif
+ :alt: Image of a problem from a student's point of view, with the possible points circled
 
 By default, each response field, or “answer space,” in a Problem
 component is worth one point. Any Problem component can have multiple
@@ -231,6 +240,7 @@ The following Problem component contains one text input problem,
 and has just one response field.
 
 .. image:: Images/ProblemWeight_TI.gif
+ :alt: Image of a text input problem from a student's point of view
 
 Computing Scores
 ~~~~~~~~~~~~~~~~

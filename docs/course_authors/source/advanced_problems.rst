@@ -39,6 +39,7 @@ then click the name of the problem that you want to create.
 
 .. _Circuit Schematic Builder:
 
+
 Circuit Schematic Builder
 -------------------------
 
@@ -48,6 +49,7 @@ an interactive grid. They then submit a DC, AC, or transient analysis of
 their circuit to the system for grading.
 
 .. image:: /Images/CircuitSchematicExample.gif
+ :alt: Image of a circuit schematic builder
 
 Create a Circuit Schematic Builder Problem
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -76,6 +78,7 @@ The JS Input problem that you create must use HTML, JavaScript, and cascading st
 create your JS Input problem.
 
 .. image:: /Images/JavaScriptInputExample.gif
+ :alt: Image of a JavaScript Input problem
 
 Create a Custom JavaScript Display and Grading Problem
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -220,6 +223,7 @@ can be any type. Numerical input and text input problems are the most
 popular write-your-own-grader.
 
 .. image:: Images/WriteYourOwnGraderExample.gif
+ :alt: Image of a write your own grader problem
 
 Create a Write-Your-Own-Grader Problem
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -245,6 +249,7 @@ In drag and drop problems, students respond to a question by dragging
 text or objects to a specific location on an image.
 
 .. image:: Images/DragAndDropExample.gif
+ :alt: Image of a drag and drop problem
 
 Create a Drag and Drop Problem
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -272,6 +277,7 @@ in an image. You define this area by including coordinates in the body
 of the problem.
 
 .. image:: Images/ImageMappedInputExample.gif
+ :alt: Image of an image mapped input problem
 
 Create an Image Mapped Input Problem
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -305,6 +311,7 @@ plain text into "beautiful math." For more information about how to use
 MathJax in Studio, see :ref:`MathJax in Studio`.
 
 .. image:: Images/MathExpressionInputExample.gif
+ :alt: Image of math expression input problem
 
 Create a Math Expression Input Problem
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -339,6 +346,7 @@ not be supported in the future**, so you should use it with caution.
           MathJax, see *A Brief Introduction to MathJax in Studio*.
 
 .. image:: Images/ProblemWrittenInLaTeX.gif
+ :alt: Image of a problem written in LaTeX
 
 Create a Problem Written in LaTeX
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -366,6 +374,7 @@ student is more likely to answer correctly on the next attempt. These
 problems can be text input or multiple choice problems.
 
 .. image:: Images/ProblemWithAdaptiveHintExample.gif
+ :alt: Image of a problem with an adaptive hint
 
 Create a Problem with an Adaptive Hint
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

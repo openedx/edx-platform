@@ -34,6 +34,7 @@ You can enter Preview mode in two ways.
 
 .. image:: Images/preview_draft.png
   :width: 800
+  :alt: Image of a subsection with the Preview Drafts button circled
  
 * On any Unit page, click **Preview**.
  
@@ -42,6 +43,7 @@ You can enter Preview mode in two ways.
  
   .. image:: Images/preview_public.png
    :width: 800
+   :alt: Image of a public unit with the Preview button circled
  
  
   The following example shows the **Preview** button for a unit that
@@ -49,6 +51,7 @@ You can enter Preview mode in two ways.
  
   .. image:: Images/preview_private.png
    :width: 800
+   :alt: Image of a private unit with the Preview button circled
  
 .. _View Your Live Course:
 
@@ -67,14 +70,17 @@ You can view the live course from three different places in Studio:
 
   .. image:: Images/course_outline_view_live.png
    :width: 800
+   :alt: Image of the course outline with the View Live button circled
  
 * Any Subsection page.
  
   .. image:: Images/subsection_view_live.png
     :width: 800
+    :alt: Image of a subsection with the View Live button circled
  
 * The Unit page, if the Unit is Public.
  
   .. image:: Images/unit_view_live.png
      :width: 800
+     :alt: Image of a unit with the View Live button circled
 

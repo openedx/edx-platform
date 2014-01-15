@@ -151,6 +151,7 @@ To create a draft, go to the unit's page, and then click **edit a draft** in the
 
 .. image:: Images/Viz_Revise_EditDraft.png
  :width: 800
+ :alt: Image of a public unit with the edit a draft link circled
 
 When you edit a draft of a unit, you can view the unit's contents in two ways.
 
@@ -159,6 +160,7 @@ When you edit a draft of a unit, you can view the unit's contents in two ways.
 
 .. image:: Images/Viz_Revise_ViewLiveandPreview.png
  :width: 800
+ :alt: Image of draft unit
 
 When you're ready to publish the draft of your revised content, 
 click **replace it with this draft** in the right pane. 
@@ -166,6 +168,7 @@ click **replace it with this draft** in the right pane.
 If you decide you don't want to keep the revised content, click **Delete Draft**.
 
 .. image:: Images/Viz_Revise_ReplaceorDelete.png
+  :alt: Image of a unit settings panel with the replace it with this draft link circled
 
 .. Warning:: Historical versions of units are not stored by Studio. After you replace the live version with a new draft, you cannot revert the unit to the previous version. 
 
