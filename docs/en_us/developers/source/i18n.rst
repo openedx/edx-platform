@@ -1,0 +1,342 @@
+######################################
+Internationalization coding guidelines
+######################################
+
+
+See also:
+
+* `Django Internationalization <https://docs.djangoproject.com/en/dev/topics/i18n/>`_ (overview)
+* `Django: Internationalizing Python code <https://docs.djangoproject.com/en/dev/topics/i18n/translation/#internationalization-in-python-code>`_
+* `Django Translation guidelines <https://docs.djangoproject.com/en/dev/topics/i18n/translation/>`_
+* `Django Format localization <https://docs.djangoproject.com/en/dev/topics/i18n/formatting/>`_
+
+
+General Internationalization Rules
+**********************************
+
+In order to localize source files, we need to prepare them so that the
+human-readable strings can be extracted by a pre-processing step, and then have
+localized strings used at runtime.  This requires attention to detail, and
+unfortunately limits what you can do with strings in the code.  In general:
+
+1. Always mark complete sentences for translation.  If you combine fragments at
+   runtime, there is no way for the translator to construct a proper sentence
+   in their language.
+
+2. Do not join together strings at runtime to create sentences.
+
+3. Limit the amount of text in strings that is not presented to the user.  HTML
+   markup is better applied after the translation.  If you give HTML to the
+   translators, there's a good chance they will translate your tags or
+   attributes.
+
+See the detailed Style Guidelines at the end for details.
+
+
+Editing source files
+********************
+
+While editing source files (including Python, Javascript, or HTML template
+files), use the appropriate conventions.  There are a few things to know how to
+do:
+
+1. What has to be at the top of the file (if anything) to prepare it for i18n.
+
+2. How are strings marked for internationalization?  This takes the form of a
+   function call with the string as an argument.
+
+3. How are translator comments indicated?  These are comments in the file that
+   will travel with the strings to the translators, giving them context to
+   produce the best translation.  They have a "Translators:" marker. They must
+   appear on the line preceding the text they describe.
+
+The code samples below show how to do each of these things.
+
+Python source code
+==================
+
+.. highlight:: python
+
+In Python source code (read the django docs for more details)::
+
+    from django.utils.translation import ugettext as _
+    
+    # Translators: This will help the translator
+    message = _("Welcome!")
+
+Django template files
+=====================
+
+.. highlight:: django
+
+In Django template files (`templates/*.html`)::
+
+    {% load i18n %}
+    
+    {# Translators: this will help the translator. #}
+    {% trans "Welcome!" %}
+
+Mako template files
+===================
+
+.. highlight:: mako
+
+In Mako template files (`templates/*.html`), you can use all of the tools
+available to python programmers. Just make sure to import the relevant
+functions first. Here's a mako template example::
+
+    <%! from django.utils.translation import ugettext as _ %>
+ 
+    ## Translators: message to the translator
+    ${_("Welcome!")}
+
+Javascript files
+================
+
+.. highlight:: javascript
+
+In order to internationalize Javascript, first the html template (base.html)
+must load a special Javascript library (and Django must be configured to serve
+it)::
+
+    <script type="text/javascript" src="jsi18n/"></script>
+
+Then, in javascript files (`*.js`)::
+
+    // Translators: this will help the translator.
+    var message = gettext('Welcome!');
+
+Coffeescript files
+==================
+
+.. highlight:: coffeescript
+
+Coffeescript files are compiled to Javascript files, so it works mostly like
+Javascript::
+
+    `// Translators: this will help the translator.`
+    message = gettext('Hey there!')
+    # Interpolation has to be done in Javascript, not Coffeescript:
+    message = gettext("Error getting student progress url for '<%= student_id %>'.")
+    full_message = _.template(message, {student_id: unique_student_identifier})
+
+But because we extract strings from the compiled .js files, there are some
+native Coffeescript features that break the extraction from the .js files:
+
+1. You cannot use Coffeescript string interpolation:  This results in string
+   concatenation in the .js file, so string extraction won't work.
+
+2. You cannot use Coffeescript comments for translator comments, since they are
+   not passed through to the Javascript file.
+
+::
+
+    # NO NO not like this:
+    # Translators: this won't get to the translators!
+    message = gettext("Welcome, #{student_name}!")  # This won't work!
+    
+    ###
+    Translators: This will work, but takes three lines :(
+    ###
+    message = gettext("Hey there")
+ 
+.. highlight:: python
+
+Other kinds of code
+===================
+
+We have not yet established guidelines for internationalizing the following.
+See remaining work for more details.
+
+* xblocks (in edx-platform/src/xblock) should not depend on django, so we
+  should use the python gettext library instead.
+
+* course content (such as subtitles for videos)
+
+* documentation (written for Sphinx as .rst files)
+  
+* client-side templates written using Underscore.
+
+
+Building and testing your code
+******************************
+
+These instructions assume you are a developer writing new code to check in to
+github. For other use cases in the translation life cycle (such as translating
+the strings, or checking the translations into github, see use cases).
+
+1. Run the rake i18n:extract command to create human-readable .po files. This
+   command may take a minute or two to complete:
+
+::
+
+       $ cd edx-platform
+       $ rake i18n:extract
+
+2. Generate dummy strings: run rake i18n:dummy to create fake translations. See
+   coverage testing (below) for more details.
+
+   a. By default, these are created in the Esperanto language directory.
+
+      1. This will blow away any actual Esperanto translation files that may be
+         there. You can revert to the github head after you complete testing.
+
+      2. You will need to switch your browser to Esperanto in order to view
+         the dummy text.
+
+      3. Django's implementation requires us to use a real language (like
+         Esperanto..) rather than an invented language (like Esperanto..
+         er Martian) for this testing.
+
+   b. Do not check in to github the dummy text (in conf/locale/eo/LC_MESSAGES). 
+
+::
+
+    $ rake i18n:dummy
+    
+3. Run the rake i18n:generate command to create machine-readable .mo files::
+ 
+    $ rake i18n:generate
+
+4. Django should be ready to go. The next time you run studio or lms with a
+   non-English browser, the non-English strings (from step 3, above) should be
+   displayed.  (But be sure that your settings for USE_I18N and USE_L10N are
+   both set to True.  USE_I18N is currently set to False by default in
+   common.py, but is set to True in lms/envs/dev.py and cms/envs/dev.py) 
+
+5. With your browser set to Esperanto, review the pages affected by your code
+   and verify that you see fake translations. If you see plain English instead,
+   your code is not being properly translated. Review the steps in editing
+   source files (above)
+
+Coverage testing
+****************
+
+This tool is used during the bootstrap phase, when presumably (1) there is a
+lot of EdX source code to be converted, and (2) there are not a lot of
+available translations for externalized EdX strings. At the end of the
+bootstrap phase, we will eventually deprecate this tool in favor of other
+processes. Once most of the EdX source code has been successfully converted,
+and there are several full translations available, it will be easier to detect
+and correct specific gaps in compliance.
+
+Use the coverage tool to generate dummy files::
+
+    $ rake i18n:dummy
+    
+This will create new dummy translations in the Esperanto directory
+(edx-platform/conf/local/eo/LC_MESSAGES).
+
+You can then configure your browser preferences to view Esperanto as your
+preferred language. Instead of plain English strings, you should see something
+like this:
+
+    Thé Fütüré øf Ønlïné Édüçätïøn Ⱡσяєм ι#
+    Før änýøné, änýwhéré, änýtïmé Ⱡσяєм #
+
+This dummy text is distinguished by extra accent characters. If you see plain
+English instead (without these accents), it most likely means the string has
+not been externalized yet. To fix this: 
+
+* Find the string in the source tree (either in python, javascript, or html
+  template code). 
+
+* Refer to the above coding guidelines to make sure it has been externalized
+  properly. 
+
+* Rerun the scripts and confirm that the strings are now properly converted
+  into dummy text.
+
+This dummy text is also distinguished by Lorem ipsum text at the end of each
+string, and is always terminated with "#". The original English string is
+padded by about 30% extra characters, to simulate some language (like German)
+which tend to have longer strings than English. If you see problems with your
+page layout, such as columns that do not fit, or text that is truncated (the #
+character should always be displayed on every string), then you will probably
+need to fix the page layouts accordingly to accommodate the longer strings.
+
+
+Style guidelines
+****************
+
+Don't append strings. Interpolate values instead.
+=================================================
+
+It is harder for translators to provide reasonable translations of small
+sentence fragments. If your code appends sentence fragments, even if it seems
+to work ok for English, the same concatenation is very unlikely to work
+properly for other languages.
+
+Bad::
+
+    message = _("The directory has ") + len(directory.files) + _(" files.")
+
+In this scenario, the translator will have to figure out how to translate these
+two separate strings. It is very difficult to translate a fragment like "The
+directory has." In some languages the fragments will be in different order. For
+example, in Japanese, "files" will come before "has."
+
+It is much easier for a translator to figure out how to translate the entire
+sentence, using the pattern "The directory has %d files."
+
+Good::
+
+    message = _("The directory has %d files.") % len(directory.files)
+
+
+Use named interpolation fields
+==============================
+
+Named fields are better, especially if there are multiple fields, or if some
+fields will be locally formatted (i.e. number, date, or currency).
+
+Bad::
+
+    message = _('Today is %s %d.') % (m, d)
+
+Good::
+
+    message = _('Today is %(month)s %(day)s.') % {'month': m, 'day': d}
+
+Notice that in English, the month comes first, but in Spanish the day comes
+first. This is reflected in the
+edx-platform/conf/locale/es/LC_MESSAGES/django.po file like this::
+
+    # fragment from edx-platform/conf/locale/es/LC_MESSAGES/django.po
+    msgid "Today is %(month)s %(day)s."
+    msgstr "Hoy es %(day) de %(month)s."
+
+The resulting output is correct in each language::
+
+    English output: "Today is November 26."
+    Spanish output: "Hoy es 26 de Noviembre."
+
+
+Singular vs Plural
+==================
+
+It's tempting to improve a message by selecting singular or plural based on a
+count::
+
+    if count == 1:
+        msg = _("There is 1 file.")
+    else:
+        msg = _("There are %d files.") % count
+
+This is not the correct way to choose a string, because other languages have
+different rules for when to use singluar and when plural, and there may be more
+than two choices!
+
+One option is not to use different text for different counts::
+
+    msg = _("Number of files: %d") % count
+
+If you want to choose based on number, you need to use another gettext variant
+to do it::
+
+    from django.utils.translation import ungettext
+    msg = ungettext("There is %d file", "There are %d files", count)
+    msg = msg % count
+
+This will properly use count to find a correct string in the translation file,
+and then you can use that string to format in the count.
