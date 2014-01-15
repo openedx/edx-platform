@@ -981,54 +981,85 @@ def create_account(request, post_override=None):
 
 def auto_auth(request):
     """
-    Automatically logs the user in with a generated random credentials
-    This view is only accessible when
+    Create or configure a user account, then log in as that user.
+
+    Enabled only when
     settings.FEATURES['AUTOMATIC_AUTH_FOR_TESTING'] is true.
+
+    Accepts the following querystring parameters:
+    * `username`, `email`, and `password` for the user account
+    * `full_name` for the user profile (the user's full name; defaults to the username)
+    * `staff`: Set to "true" to make the user global staff.
+    * `course_id`: Enroll the student in the course with `course_id`
+
+    If username, email, or password are not provided, use
+    randomly generated credentials.
     """
 
-    def get_dummy_post_data(username, password, email, name):
-        """
-        Return a dictionary suitable for passing to post_vars of _do_create_account or post_override
-        of create_account, with specified values.
-        """
-        return {'username': username,
-                'email': email,
-                'password': password,
-                'name': name,
-                'honor_code': u'true',
-                'terms_of_service': u'true', }
-
-    # generate random user credentials from a small name space (determined by settings)
-    name_base = 'USER_'
-    pass_base = 'PASS_'
-
-    max_users = settings.FEATURES.get('MAX_AUTO_AUTH_USERS', 200)
-    number = random.randint(1, max_users)
-
-    # Get the params from the request to override default user attributes if specified
-    qdict = request.GET
+    # Generate a unique name to use if none provided
+    unique_name = uuid.uuid4().hex[0:30]
 
     # Use the params from the request, otherwise use these defaults
-    username = qdict.get('username', name_base + str(number))
-    password = qdict.get('password', pass_base + str(number))
-    email = qdict.get('email', '%s_dummy_test@mitx.mit.edu' % username)
-    name = qdict.get('name', '%s Test' % username)
+    username = request.GET.get('username', unique_name)
+    password = request.GET.get('password', unique_name)
+    email = request.GET.get('email', unique_name + "@example.com")
+    full_name = request.GET.get('full_name', username)
+    is_staff = request.GET.get('staff', None)
+    course_id = request.GET.get('course_id', None)
 
-    # if they already are a user, log in
-    try:
+    # Get or create the user object
+    post_data = {
+        'username': username,
+        'email': email,
+        'password': password,
+        'name': full_name,
+        'honor_code': u'true',
+        'terms_of_service': u'true',
+    }
+
+    # Attempt to create the account.
+    # If successful, this will return a tuple containing
+    # the new user object; otherwise it will return an error
+    # message.
+    result = _do_create_account(post_data)
+
+    if isinstance(result, tuple):
+        user = result[0]
+
+    # If we did not create a new account, the user might already
+    # exist.  Attempt to retrieve it.
+    else:
         user = User.objects.get(username=username)
-        user = authenticate(username=username, password=password, request=request)
-        login(request, user)
+        user.email = email
+        user.set_password(password)
+        user.save()
 
-    # else create and activate account info
-    except ObjectDoesNotExist:
-        post_override = get_dummy_post_data(username, password, email, name)
-        create_account(request, post_override=post_override)
-        request.user.is_active = True
-        request.user.save()
+    # Set the user's global staff bit
+    if is_staff is not None:
+        user.is_staff = (is_staff == "true")
+        user.save()
 
-    # return empty success
-    return HttpResponse('')
+    # Activate the user
+    reg = Registration.objects.get(user=user)
+    reg.activate()
+    reg.save()
+
+    # Enroll the user in a course
+    if course_id is not None:
+        CourseEnrollment.enroll(user, course_id)
+
+    # Log in as the user
+    user = authenticate(username=username, password=password)
+    login(request, user)
+
+    # Provide the user with a valid CSRF token
+    # then return a 200 response
+    success_msg = u"Logged in user {0} ({1}) with password {2}".format(
+        username, email, password
+    )
+    response = HttpResponse(success_msg)
+    response.set_cookie('csrftoken', csrf(request)['csrf_token'])
+    return response
 
 
 @ensure_csrf_cookie
