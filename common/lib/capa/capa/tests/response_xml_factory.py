@@ -182,7 +182,10 @@ class NumericalResponseXMLFactory(ResponseXMLFactory):
         response_element = etree.Element('numericalresponse')
 
         if answer:
-            response_element.set('answer', str(answer))
+            if isinstance(answer, float):
+                response_element.set('answer', repr(answer))
+            else:
+                response_element.set('answer', str(answer))
 
         if tolerance:
             responseparam_element = etree.SubElement(response_element, 'responseparam')

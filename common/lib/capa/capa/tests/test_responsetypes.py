@@ -56,13 +56,11 @@ class ResponseTest(unittest.TestCase):
     def assert_multiple_grade(self, problem, correct_answers, incorrect_answers):
         for input_str in correct_answers:
             result = problem.grade_answers({'1_2_1': input_str}).get_correctness('1_2_1')
-            self.assertEqual(result, 'correct',
-                             msg="%s should be marked correct" % str(input_str))
+            self.assertEqual(result, 'correct')
 
         for input_str in incorrect_answers:
             result = problem.grade_answers({'1_2_1': input_str}).get_correctness('1_2_1')
-            self.assertEqual(result, 'incorrect',
-                             msg="%s should be marked incorrect" % str(input_str))
+            self.assertEqual(result, 'incorrect')
 
     def _get_random_number_code(self):
         """Returns code to be used to generate a random result."""
@@ -1069,6 +1067,27 @@ class NumericalResponseTest(ResponseTest):
         correct_responses = ["4.0", "4.3", "3.7", "4.30", "3.70"]
         incorrect_responses = ["", "4.5", "3.5", "0"]
         self.assert_multiple_grade(problem, correct_responses, incorrect_responses)
+
+    def test_floats(self):
+        """
+        Default tolerance for all responsetypes is 1e-3%.
+        """
+        problem_setup = [
+          #[given_asnwer, [list of correct responses], [list of incorrect responses]]
+            [1, ["1"], ["1.1"],],
+            [2.0, ["2.0"], ["1.0"],],
+            [4, ["4.0", "4.00004"],  ["4.00005"]],
+            [0.00016, ["1.6*10^-4"], [""]],
+            [0.000016, ["1.6*10^-5"], ["0.000165"]],
+            [1.9e24, ["1.9*10^24"], ["1.9001*10^24"]],
+            [2e-15, ["2*10^-15"], [""]],
+            [3141592653589793238., ["3141592653589793115."], [""]],
+            [0.1234567,  ["0.123456", "0.1234561"], ["0.123451"]],
+            [1e-5,  ["1e-5", "1.0e-5"], ["-1e-5", "2*1e-5"]],
+        ]
+        for given_answer, correct_responses, incorrect_responses in problem_setup:
+            problem = self.build_problem(answer=given_answer)
+            self.assert_multiple_grade(problem, correct_responses, incorrect_responses)
 
     def test_grade_with_script(self):
         script_text = "computed_response = math.sqrt(4)"

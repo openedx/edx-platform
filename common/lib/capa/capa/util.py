@@ -4,16 +4,28 @@ from cmath import isinf
 #-----------------------------------------------------------------------------
 #
 # Utility functions used in CAPA responsetypes
+default_tolerance = '0.001%'
 
 
-def compare_with_tolerance(v1, v2, tol):
-    ''' Compare v1 to v2 with maximum tolerance tol
+def compare_with_tolerance(v1, v2, tol=default_tolerance):
+    '''
+    Compare v1 to v2 with maximum tolerance tol.
+
     tol is relative if it ends in %; otherwise, it is absolute
 
-     - v1    :  student result (number)
-     - v2    :  instructor result (number)
+     - v1    :  student result (float complex number)
+     - v2    :  instructor result (float complex number)
      - tol   :  tolerance (string representing a number)
 
+     Default tolerance of 1e-3% is added to compare two floats for near-equality
+     (to handle machine representation errors).
+     It is relative, as the acceptable difference between two floats depends on the magnitude of the floats.
+     (http://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/)
+     Examples:
+        In [183]: 0.000016 - 1.6*10**-5
+        Out[183]: -3.3881317890172014e-21
+        In [212]: 1.9e24 - 1.9*10**24
+        Out[212]: 268435456.0
     '''
     relative = tol.endswith('%')
     if relative:
@@ -28,6 +40,8 @@ def compare_with_tolerance(v1, v2, tol):
         # `inf <= inf` which is a fail. Instead, compare directly.
         return v1 == v2
     else:
+        # v1 and v2 are, in general, complex numbers:
+        # there are some notes about backward compatibility issue: see responsetypes.get_staff_ans()).
         return abs(v1 - v2) <= tolerance
 
 
