@@ -71,7 +71,11 @@ class LoncapaSystem(object):
     can provide these resources however make sense for their environment, and
     this code can remain independent.
 
-    See :class:`ModuleSystem` for documentation of these attributes.
+    Attributes:
+        i18n: an object implementing the `gettext.Translations` interface so
+            that we can use `.ugettext` to localize strings.
+
+    See :class:`ModuleSystem` for documentation of other attributes.
 
     """
     def __init__(                                       # pylint: disable=invalid-name
@@ -82,6 +86,7 @@ class LoncapaSystem(object):
         can_execute_unsafe_code,
         DEBUG,                                          # pylint: disable=invalid-name
         filestore,
+        i18n,
         node_path,
         render_template,
         seed,      # Why do we do this if we have self.seed?
@@ -94,6 +99,7 @@ class LoncapaSystem(object):
         self.can_execute_unsafe_code = can_execute_unsafe_code
         self.DEBUG = DEBUG                              # pylint: disable=invalid-name
         self.filestore = filestore
+        self.i18n = i18n
         self.node_path = node_path
         self.render_template = render_template
         self.seed = seed                     # Why do we do this if we have self.seed?

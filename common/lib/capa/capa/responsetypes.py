@@ -875,8 +875,9 @@ class NumericalResponse(LoncapaResponse):
                 correct_ans = evaluator({}, {}, self.correct_answer)
             except Exception:
                 log.debug("Content error--answer '%s' is not a valid number", self.correct_answer)
+                _ = self.capa_system.i18n.ugettext
                 raise StudentInputError(
-                    "There was a problem with the staff answer to this problem"
+                    _("There was a problem with the staff answer to this problem")
                 )
 
         return correct_ans

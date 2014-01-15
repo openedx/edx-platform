@@ -1140,6 +1140,24 @@ class NumericalResponseTest(ResponseTest):
             "Content error--answer '%s' is not a valid number", staff_ans
         )
 
+    @mock.patch('capa.responsetypes.log')
+    def test_responsetype_i18n(self, mock_log):
+        """Test that LoncapaSystem has an i18n that works."""
+        staff_ans = "clearly bad syntax )[+1e"
+        problem = self.build_problem(answer=staff_ans, tolerance=1e-3)
+
+        class FakeTranslations(object):
+            """A fake gettext.Translations object."""
+            def ugettext(self, text):
+                """Return the 'translation' of `text`."""
+                if text == "There was a problem with the staff answer to this problem":
+                    text = "TRANSLATED!"
+                return text
+        problem.capa_system.i18n = FakeTranslations()
+
+        with self.assertRaisesRegexp(StudentInputError, "TRANSLATED!"):
+            self.assert_grade(problem, '1+j', 'correct')
+
     def test_grade_infinity(self):
         """
         Check that infinity doesn't automatically get marked correct.

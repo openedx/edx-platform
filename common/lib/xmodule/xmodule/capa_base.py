@@ -267,6 +267,7 @@ class CapaMixin(CapaFields):
             can_execute_unsafe_code=self.system.can_execute_unsafe_code,
             DEBUG=self.system.DEBUG,
             filestore=self.system.filestore,
+            i18n=self.system.service(self, "i18n"),
             node_path=self.system.node_path,
             render_template=self.system.render_template,
             seed=self.system.seed,      # Why do we do this if we have self.seed?
