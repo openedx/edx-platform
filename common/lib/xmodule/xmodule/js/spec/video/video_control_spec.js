@@ -1,6 +1,6 @@
 (function() {
   describe('VideoControl', function() {
-    var state, videoControl, oldOTBD;
+    var state, oldOTBD;
 
     function initialize(fixture) {
       if (fixture) {
@@ -8,8 +8,10 @@
       } else {
         loadFixtures('video_all.html');
       }
+
+      debugger;
+
       state = new Video('#example');
-      videoControl = state.videoControl;
     }
 
     function initializeYouTube() {
@@ -39,6 +41,8 @@
       });
 
       it('add ARIA attributes to time control', function () {
+
+
         var timeControl = $('div.slider>a');
         expect(timeControl).toHaveAttrs({
           'role': 'slider',
@@ -67,7 +71,13 @@
       });
 
       it('bind the playback button', function() {
-        expect($('.video_control')).toHandleWith('click', videoControl.togglePlayback);
+        waitsFor(function () {
+          return typeof state.videoControl !== 'undefined';
+        }, 'videoControl is defined', 1000);
+
+        runs(function () {
+          expect($('.video_control')).toHandleWith('click', state.videoControl.togglePlayback);
+        });
       });
 
       describe('when on a non-touch based device', function() {
@@ -97,26 +107,40 @@
     describe('play', function() {
       beforeEach(function() {
         initialize();
-        videoControl.play();
       });
 
       it('switch playback button to play state', function() {
-        expect($('.video_control')).not.toHaveClass('play');
-        expect($('.video_control')).toHaveClass('pause');
-        expect($('.video_control')).toHaveAttr('title', 'Pause');
+        waitsFor(function () {
+          return typeof state.videoControl !== 'undefined';
+        }, 'videoControl is defined', 1000);
+
+        runs(function () {
+          state.videoControl.play();
+
+          expect($('.video_control')).not.toHaveClass('play');
+          expect($('.video_control')).toHaveClass('pause');
+          expect($('.video_control')).toHaveAttr('title', 'Pause');
+        });
       });
     });
 
     describe('pause', function() {
       beforeEach(function() {
         initialize();
-        videoControl.pause();
       });
 
       it('switch playback button to pause state', function() {
-        expect($('.video_control')).not.toHaveClass('pause');
-        expect($('.video_control')).toHaveClass('play');
-        expect($('.video_control')).toHaveAttr('title', 'Play');
+        waitsFor(function () {
+          return typeof state.videoControl !== 'undefined';
+        }, 'videoControl is defined', 1000);
+
+        runs(function () {
+          state.videoControl.pause();
+
+          expect($('.video_control')).not.toHaveClass('pause');
+          expect($('.video_control')).toHaveClass('play');
+          expect($('.video_control')).toHaveAttr('title', 'Play');
+        });
       });
     });
 
@@ -157,70 +181,77 @@
     });
 
     describe('Play placeholder', function () {
+      var oldYT,
+        cases = [{
+            name: 'PC',
+            isShown: false,
+            isTouch: null
+          }, {
+            name: 'iPad',
+            isShown: true,
+            isTouch: ['iPad']
+          }, {
+            name: 'Android',
+            isShown: true,
+            isTouch: ['Android']
+          }, {
+            name: 'iPhone',
+            isShown: false,
+            isTouch: ['iPhone']
+        }];
 
       beforeEach(function () {
-        this.oldYT = window.YT;
+        oldYT = window.YT;
 
         jasmine.stubRequests();
         window.YT = {
-          Player: function () { },
-          PlayerState: this.oldYT.PlayerState,
+          Player: function () {
+            return {
+              getDuration: function () {
+                return 60;
+              }
+            };
+          },
+          PlayerState: oldYT.PlayerState,
           ready: function (callback) {
               callback();
           }
         };
 
-        spyOn(window.YT, 'Player');
+        spyOn(window.YT, 'Player').andCallThrough();
       });
 
       afterEach(function () {
-        window.YT = this.oldYT;
+        window.YT = oldYT;
       });
 
-
-      it ('works correctly on calling proper methods', function () {
+      it('works correctly on calling proper methods', function () {
         initialize();
-        var btnPlay = state.el.find('.btn-play');
 
-        videoControl.showPlayPlaceholder();
+        waitsFor(function () {
+          return typeof state.videoControl !== 'undefined';
+        }, 'videoControl is defined', 1000);
 
-        expect(btnPlay).not.toHaveClass('is-hidden');
-        expect(btnPlay).toHaveAttrs({
-          'aria-hidden': 'false',
-          'tabindex': 0
-        });
+        runs(function () {
+          var btnPlay = state.el.find('.btn-play');
 
-        videoControl.hidePlayPlaceholder();
+          state.videoControl.showPlayPlaceholder();
 
-        expect(btnPlay).toHaveClass('is-hidden');
-        expect(btnPlay).toHaveAttrs({
-          'aria-hidden': 'true',
-          'tabindex': -1
+          expect(btnPlay).not.toHaveClass('is-hidden');
+          expect(btnPlay).toHaveAttrs({
+            'aria-hidden': 'false',
+            'tabindex': 0
+          });
+
+          state.videoControl.hidePlayPlaceholder();
+
+          expect(btnPlay).toHaveClass('is-hidden');
+          expect(btnPlay).toHaveAttrs({
+            'aria-hidden': 'true',
+            'tabindex': -1
+          });
         });
       });
-
-      var cases = [
-        {
-          name: 'PC',
-          isShown: false,
-          isTouch: null
-        },
-        {
-          name: 'iPad',
-          isShown: true,
-          isTouch: ['iPad']
-        },
-        {
-          name: 'Android',
-          isShown: true,
-          isTouch: ['Android']
-        },
-        {
-          name: 'iPhone',
-          isShown: false,
-          isTouch: ['iPhone']
-        }
-      ];
 
       $.each(cases, function(index, data) {
         var message = [
@@ -246,44 +277,74 @@
         it('is shown on paused video on '+ device +' in HTML5 player', function () {
           window.onTouchBasedDevice.andReturn([device]);
           initialize();
-          var btnPlay = state.el.find('.btn-play');
 
-          videoControl.play();
-          videoControl.pause();
+          waitsFor(function () {
+            return typeof state.videoControl !== 'undefined';
+          }, 'videoControl is defined', 1000);
 
-          expect(btnPlay).not.toHaveClass('is-hidden');
+          runs(function () {
+            var btnPlay = state.el.find('.btn-play');
+
+            state.videoControl.play();
+            state.videoControl.pause();
+
+            expect(btnPlay).not.toHaveClass('is-hidden');
+          });
         });
 
         it('is hidden on playing video on '+ device +' in HTML5 player', function () {
           window.onTouchBasedDevice.andReturn([device]);
           initialize();
-          var btnPlay = state.el.find('.btn-play');
 
-          videoControl.play();
+          waitsFor(function () {
+            return typeof state.videoControl !== 'undefined';
+          }, 'videoControl is defined', 1000);
 
-          expect(btnPlay).toHaveClass('is-hidden');
+          runs(function () {
+            var btnPlay = state.el.find('.btn-play');
+
+            state.videoControl.play();
+
+            expect(btnPlay).toHaveClass('is-hidden');
+          });
         });
 
         it('is hidden on paused video on '+ device +' in YouTube player', function () {
+          var btnPlay;
+
           window.onTouchBasedDevice.andReturn([device]);
           initializeYouTube();
-          var btnPlay = state.el.find('.btn-play');
 
-          videoControl.play();
-          videoControl.pause();
+          waitsFor(function () {
+            return typeof state.videoControl !== 'undefined';
+          }, 'videoControl is defined', 1000);
 
-          expect(btnPlay).toHaveClass('is-hidden');
+          runs(function () {
+            btnPlay = state.el.find('.btn-play');
+
+            state.videoControl.play();
+            state.videoControl.pause();
+
+            expect(btnPlay).toHaveClass('is-hidden');
+          });
         });
       });
     });
 
     it('show', function () {
       initialize();
-      var controls = state.el.find('.video-controls');
-      controls.addClass('is-hidden');
 
-      videoControl.show();
-      expect(controls).not.toHaveClass('is-hidden');
+      waitsFor(function () {
+        return typeof state.videoControl !== 'undefined';
+      }, 'videoControl is defined', 1000);
+
+      runs(function () {
+        var controls = state.el.find('.video-controls');
+        controls.addClass('is-hidden');
+
+        state.videoControl.show();
+        expect(controls).not.toHaveClass('is-hidden');
+      });
     });
   });
 

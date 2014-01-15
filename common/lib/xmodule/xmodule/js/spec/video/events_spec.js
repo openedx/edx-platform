@@ -2,7 +2,7 @@
     describe('VideoPlayer Events', function () {
         var state, videoPlayer, player, videoControl, videoCaption,
             videoProgressSlider, videoSpeedControl, videoVolumeControl,
-            oldOTBD;
+            oldOTBD, oldYT;
 
         function initialize(fixture, params) {
             if (_.isString(fixture)) {
@@ -58,16 +58,17 @@
             oldOTBD = window.onTouchBasedDevice;
             window.onTouchBasedDevice = jasmine.createSpy('onTouchBasedDevice')
                 .andReturn(null);
-            this.oldYT = window.YT;
+            oldYT = window.YT;
 
             jasmine.stubRequests();
             window.YT = {
               Player: function () {
                 return {
-                    getPlaybackQuality: function () {}
+                    getPlaybackQuality: function () {},
+                    getDuration: function () { return 60; }
                 };
               },
-              PlayerState: this.oldYT.PlayerState,
+              PlayerState: oldYT.PlayerState,
               ready: function (callback) {
                   callback();
               }
@@ -77,7 +78,7 @@
         afterEach(function () {
             $('source').remove();
             window.onTouchBasedDevice = oldOTBD;
-            window.YT = this.oldYT;
+            window.YT = oldYT;
         });
 
         it('initialize', function(){
@@ -158,7 +159,5 @@
 
             expect('ended').not.toHaveBeenTriggeredOn('.video');
         });
-
     });
-
 }).call(this);

@@ -23,8 +23,7 @@ class StubYouTubeServiceTest(unittest.TestCase):
         response = requests.get(
             self.url + 'test_youtube/OEoXaMPEzfM?v=2&alt=jsonc&callback=callback_func'
         )
-
-        self.assertEqual('callback_func({"message": "I\'m youtube."})', response.content)
+        self.assertEqual('callback_func({"data": {"duration": 60, "message": "I\'m youtube.", "id": "OEoXaMPEzfM"}})', response.content)
 
     def test_transcript_url_equal(self):
         response = requests.get(

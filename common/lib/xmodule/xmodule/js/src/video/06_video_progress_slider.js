@@ -57,7 +57,7 @@ function () {
     function _renderElements(state) {
         state.videoProgressSlider.el = state.videoControl.sliderEl;
 
-        buildSlider(state);
+        state.videoProgressSlider.buildSlider();
         _buildHandle(state);
     }
 
@@ -86,22 +86,26 @@ function () {
     // them available and sets up their context is makeFunctionsPublic().
     // ***************************************************************
 
-    function buildSlider(state) {
-        state.videoProgressSlider.slider = state.videoProgressSlider.el
+    function buildSlider() {
+        this.videoProgressSlider.slider = this.videoProgressSlider.el
             .slider({
                 range: 'min',
-                slide: state.videoProgressSlider.onSlide,
-                stop: state.videoProgressSlider.onStop
+                slide: this.videoProgressSlider.onSlide,
+                stop: this.videoProgressSlider.onStop
             });
 
-        state.videoProgressSlider.sliderProgress = state.videoProgressSlider
+        this.videoProgressSlider.sliderProgress = this.videoProgressSlider
             .slider
             .find('.ui-slider-range.ui-widget-header.ui-slider-range-min');
     }
 
+    // Rebuild the slider start-end range (if it doesn't take up the
+    // whole slider). Remember that endTime === null means the end time
+    // is set to the end of video by default.
     function updateStartEndTimeRegion(params) {
         var left, width, start, end, duration, rangeParams;
 
+        console.log('[updateStartEndTimeRegion]: .duration');
         // We must have a duration in order to determine the area of range.
         // It also must be non-zero.
         if (!params.duration) {
@@ -112,10 +116,13 @@ function () {
 
         start = this.videoPlayer.startTime;
 
-        // If end is set to null, then we set it to the end of the video. We
-        // know that start is not a the beginning, therefore we must build a
-        // range.
+        // If end is set to null, then we set it to the end of the video.
         end = this.videoPlayer.endTime || duration;
+
+        // Don't build a range if it takes up the whole slider.
+        if (start === 0 && end === duration) {
+            return;
+        }
 
         // Because JavaScript has weird rounding rules when a series of
         // mathematical operations are performed in a single statement, we will
@@ -124,7 +131,9 @@ function () {
         // This will ensure that visually, the start-end range aligns nicely
         // with actual starting and ending point of the video.
 
-        rangeParams = getRangeParams(start, end, duration);
+        rangeParams = this.videoProgressSlider.getRangeParams(
+            start, end, duration
+        );
 
         if (!this.videoProgressSlider.sliderRange) {
             this.videoProgressSlider.sliderRange = $('<div />', {
@@ -132,19 +141,12 @@ function () {
                        'ui-widget-header ' +
                        'ui-corner-all ' +
                        'slider-range'
-            }).css({
-                left: rangeParams.left,
-                width: rangeParams.width
-            });
+            }).css(rangeParams);
 
             this.videoProgressSlider.sliderProgress
                 .after(this.videoProgressSlider.sliderRange);
         } else {
-            this.videoProgressSlider.sliderRange
-                .css({
-                    left: rangeParams.left,
-                    width: rangeParams.width
-                });
+            this.videoProgressSlider.sliderRange.css(rangeParams);
         }
     }
 
@@ -194,6 +196,7 @@ function () {
     }
 
     function updatePlayTime(params) {
+        console.log('[progress::updatePlayTime]: .duration');
         var time = Math.floor(params.time),
             duration = Math.floor(params.duration);
 

@@ -86,7 +86,7 @@ function (HTML5Video, Resizer) {
 
         // At the start, the initial value of the variable
         // `seekToStartTimeOldSpeed` should always differ from the value
-        // returned by the duration function.
+        // of `state.speed` variable.
         state.videoPlayer.seekToStartTimeOldSpeed = 'void';
 
         state.videoPlayer.playerVars = {
@@ -134,6 +134,7 @@ function (HTML5Video, Resizer) {
 
                 _resize(state, videoWidth, videoHeight);
 
+                console.log('[_initialize]: (html5) .duration');
                 state.trigger(
                     'videoControl.updateVcrVidTime',
                     {
@@ -149,6 +150,9 @@ function (HTML5Video, Resizer) {
             } else {
                 youTubeId = state.youtubeId('1.0');
             }
+
+            // debugger;
+
             state.videoPlayer.player = new YT.Player(state.id, {
                 playerVars: state.videoPlayer.playerVars,
                 videoId: youTubeId,
@@ -166,6 +170,44 @@ function (HTML5Video, Resizer) {
                     videoHeight = player.attr('height') || player.height();
 
                 _resize(state, videoWidth, videoHeight);
+
+                // We wait for metdata to arrive, before we request the update
+                // of the VCR video time. Metadata contains duration of the
+                // video. We wait for 2 seconds, and then abandon our attempts
+                // to update the VCR video time using metadata.
+                (function () {
+                    var checkInterval = window.setInterval(
+                            checkForMetadata, 50
+                        ),
+                        numberOfChecks = 0;
+
+                    return;
+
+                    function checkForMetadata() {
+                        if (state.metadata && state.metadata[state.youtubeId()]) {
+                            console.log('[_initialize]: (youtube) .duration');
+                            // After initialization, update the VCR with total time.
+                            // At this point only the metadata duration is available (not
+                            // very precise), but it is better than having 00:00:00 for
+                            // total time.
+                            state.trigger(
+                                'videoControl.updateVcrVidTime',
+                                {
+                                    time: 0,
+                                    duration: state.videoPlayer.duration()
+                                }
+                            );
+
+                            window.clearInterval(checkInterval);
+                        } else {
+                            numberOfChecks += 1;
+
+                            if (numberOfChecks === 40) {
+                                window.clearInterval(checkInterval);
+                            }
+                        }
+                    }
+                }());
             });
         }
 
@@ -185,7 +227,8 @@ function (HTML5Video, Resizer) {
             })
             .setMode('width');
 
-        // Update captions size when controls becomes visible on iPad or Android
+        // Update captions size when controls becomes visible on iPad or
+        // Android.
         if (/iPad|Android/i.test(state.isTouch[0])) {
             state.el.on('controls:show', function () {
                 state.trigger('videoCaption.resize', null);
@@ -339,6 +382,7 @@ function (HTML5Video, Resizer) {
     // It is created on a onPlay event. Cleared on a onPause event.
     // Reinitialized on a onSeek event.
     function onSeek(params) {
+        console.log('[03_video_player::onSeek]: .duration');
         var duration = this.videoPlayer.duration(),
             newTime = params.time;
 
@@ -383,6 +427,7 @@ function (HTML5Video, Resizer) {
     }
 
     function onEnded() {
+        console.log('[03_video_player::onEnded]: .duration');
         var time = this.videoPlayer.duration();
 
         this.trigger('videoControl.pause', null);
@@ -585,6 +630,7 @@ function (HTML5Video, Resizer) {
     }
 
     function updatePlayTime(time) {
+        console.log('[03_video_player::updatePlayTime]: .duration');
         var duration = this.videoPlayer.duration(),
             durationChange, tempStartTime, tempEndTime;
 
@@ -652,20 +698,12 @@ function (HTML5Video, Resizer) {
                 }
             }
 
-            // Rebuild the slider start-end range (if it doesn't take up the
-            // whole slider). Remember that endTime === null means the end time
-            // is set to the end of video by default.
-            if (!(
-                this.videoPlayer.startTime === 0 &&
-                this.videoPlayer.endTime === null
-            )) {
-                this.trigger(
-                    'videoProgressSlider.updateStartEndTimeRegion',
-                    {
-                        duration: duration
-                    }
-                );
-            }
+            this.trigger(
+                'videoProgressSlider.updateStartEndTimeRegion',
+                {
+                    duration: duration
+                }
+            );
 
             // If this is not a duration change (if it is, we continue playing
             // from current time), then we need to seek the video to the start
@@ -737,8 +775,28 @@ function (HTML5Video, Resizer) {
     function duration() {
         var dur = this.videoPlayer.player.getDuration();
 
-        if (!isFinite(dur)) {
-            dur = this.getDuration();
+        // For YouTube videos, before the video starts playing, the API
+        // function player.getDuration() will return 0. This means that the VCR
+        // will show total time as 0 when the page just loads (before the user
+        // clicks the Play button).
+        //
+        // We can do betterin a case when dur is 0 (or less than 0). We can ask
+        // the getDuration() function for total time, which will query the
+        // metadata for a duration.
+        //
+        // Be careful! Often the metadata duration is not very precise. It
+        // might differ by one or two seconds against the actual time as will
+        // be reported later on by the player.getDuration() API function.
+        if (!isFinite(dur) || dur <= 0) {
+            if (this.videoType === 'youtube') {
+                dur = this.getDuration();
+            }
+        }
+
+        // Just in case the metadata is garbled, or something went wrong, we
+        // have a final check.
+        if (!isFinite(dur) || dur <= 0) {
+            dur = 0;
         }
 
         return Math.floor(dur);

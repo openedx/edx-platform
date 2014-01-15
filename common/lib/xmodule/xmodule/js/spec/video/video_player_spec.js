@@ -117,14 +117,20 @@
                 jasmine.stubRequests();
 
                 window.YT = {
-                    Player: function () { },
+                    Player: function () {
+                        return {
+                            getDuration: function () {
+                                return 60;
+                            }
+                        };
+                    },
                     PlayerState: oldYT.PlayerState,
                     ready: function (callback) {
                         callback();
                     }
                 };
 
-                spyOn(window.YT, 'Player');
+                spyOn(window.YT, 'Player').andCallThrough();
 
                 initializeYouTube();
 
@@ -873,6 +879,16 @@
             });
         });
 
+        describe('getDuration', function () {
+            beforeEach(function () {
+
+            });
+
+            it('getDuration is called as a fall-back', function () {
+
+            });
+        });
+
         describe('playback rate', function () {
             beforeEach(function () {
                 initialize();
@@ -959,5 +975,4 @@
             });
         });
     });
-
 }).call(this);

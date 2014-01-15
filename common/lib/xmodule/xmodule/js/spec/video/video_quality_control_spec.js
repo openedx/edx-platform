@@ -26,7 +26,7 @@
 
       beforeEach(function() {
         window.YT = {
-            Player: function () { },
+            Player: function () { return { getDuration: function () { return 60; } }; },
             PlayerState: oldYT.PlayerState,
             ready: function(f){f();}
         };
@@ -58,5 +58,4 @@
       });
     });
   });
-
 }).call(this);
