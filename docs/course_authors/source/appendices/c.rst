@@ -35,6 +35,7 @@ The above URL should bring you to the course registration page: [REPLACE WITH SC
 
 .. image:: ../Images/image302.png
  :width: 600 
+ :alt: Image of a course registration page
 
 
 
@@ -44,11 +45,13 @@ Click on the blue Register for [NUMBER OF YOUR CLASS] button:
 
 .. image:: ../Images/image303.png
  :width: 600 
+ :alt: Image of the registration button
 
 A pop-up user authentication window will appear. It will ask you to log in or sign up for edX. (If you already have an account with edX, use it to log in. You should now be registered for the course. Skip to Step 5. Otherwise, go on with Step 3.)
 
 .. image:: ../Images/image305.png
  :width: 600 
+ :alt: Image of the registration page
 
 
 **Step 3: Create your account with edX**

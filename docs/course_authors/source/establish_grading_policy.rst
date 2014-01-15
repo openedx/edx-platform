@@ -31,6 +31,7 @@ The control for the grade range is at the top of the Grading page.
 
 .. image:: Images/grade_range.png
   :width: 800
+  :alt: Image of the Grade Range control
 
 The above example shows that you have a pass/fail grade range, with a score of 50 as the cutoff. This is the default setting used when you create a course.
 
@@ -43,6 +44,7 @@ You use the grade range control to change these settings:
 
   .. image:: Images/grade_range_b.png
     :width: 800
+    :alt: Image of an altered Grade Range control
 
 * To change the score range, hover the mouse over the line dividing two grades, click and drag the line left or right.  
 
@@ -169,11 +171,13 @@ From the course outline, click the checkmark next to the subsection.  Then selec
 
     .. image:: Images/course_outline_set_grade.png
        :width: 600
+       :alt: Image of the assignment type for a subsection
 
 From the Subsection page, click the text next to the **Graded as** label, then select a grading policy from the popup menu:
 
     .. image:: Images/subsection_set_grade.png
        :width: 600
+       :alt: Image of the assignment type on the subsection page
 
 See :ref:`Establish a Grading Policy` for more information.
 
@@ -205,3 +209,4 @@ Once a grading policy is in place, students can view both their problem scores a
   
   .. image:: Images/Progress_tab.png
     :width: 800
+    :alt: Image of the student Progress tab

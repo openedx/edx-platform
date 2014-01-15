@@ -116,13 +116,15 @@ When you receive notice that you can create courses, log into Studio_.
 You see the following page:
 
 .. image:: Images/first_course.png
- :width: 600  
+ :width: 600
+ :alt: Image of the Studio home page where you create your first course
 
 #. Click **Create Your First Course**.
 #. Enter course information as needed and click **Create**.
 
   .. image:: Images/new_course_info.png
    :width: 600
+   :alt: Image of the Create New Course page
 
   .. note::  Enter new course information carefully. This information becomes part of the URL for your course. To change the URL after the course is created, you must contact edX through the Help site (http://help.edge.edx.org). Additionally, because this information becomes part of your course URL, the total number of characters in the following three fields must be 65 or fewer.
 
@@ -155,6 +157,7 @@ You can also go directly to Edge_. Log in if prompted. You see the course you ju
 
 .. image:: Images/new_course.png
  :width: 600
+ :alt: Image of the Edge Dashboard
 
 You can view the course and see that there is no content yet.
 
@@ -190,5 +193,4 @@ If your organization has an agreement with edX and you have specific approval, y
    Your course registration page opens in a new tab on the LMS.
 
 #. Click the blue **Register** button to register for your course. After you register for your course, it opens in the LMS.
-#. To continue working on your course, in your browser, switch back to the tab that shows Studio. You will
-   still be on the **Course Outline** page.
+#. To continue working on your course, in your browser, switch back to the tab that shows Studio. You will still be on the **Course Outline** page.

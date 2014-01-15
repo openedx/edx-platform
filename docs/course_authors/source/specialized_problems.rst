@@ -17,8 +17,7 @@ unit.
 -  :ref:`Open Response Assessment` Open response assessment problems allow students
    to enter short answer or essay responses that students or a computer
    algorithm can then grade.
--  :ref:`Word Cloud` Word cloud problems show a colorful graphic of the
-   words that students enter as responses to a prompt.
+
 
 .. _ Add Advanced Component:
 
@@ -28,6 +27,7 @@ By default, when you create a new component in Studio, you see the
 following options.
 
 .. image:: Images/AddNewComponent.gif
+  :alt: Image of the Add a New Component panel
 
 To create a specialized problem, you must first add the Advanced
 component to your course. To do this, follow these steps.
@@ -39,6 +39,7 @@ component to your course. To do this, follow these steps.
    policy key (this key is at the top of the list).
 
    .. image:: Images/AdvancedModulesEmpty.gif
+     :alt: Image of the Manual Policy Definition section of the Advanced Settings page
 
 #. Under **Policy Value**, place your cursor between the brackets, and
    then enter the value for the type of problem that you want to create.
@@ -66,6 +67,7 @@ component to your course. To do this, follow these steps.
        "annotatable","combinedopenended","peergrading","word_cloud"
 
    .. image:: Images/AdvSettings_Before.gif
+     :alt: Image of the Manual Policy Definition section of the Advanced Settings page, with specialized problems added
 
 #. At the bottom of the page, click **Save Changes**.
 
@@ -75,15 +77,18 @@ component to your course. To do this, follow these steps.
    The text in the **Policy Value** field now appears as follows.
 
    .. image:: Images/AdvSettings_After.gif
+     :alt: Image of the Manual Policy Definition section of the Advanced Settings page, with specialized problems added after saving
 
 #. Return to the unit where you want to add the specialized problem. The
    list of possible components now contains an Advanced component.
 
    .. image:: Images/AdvancedComponent.gif
+     :alt: Image of the Add a New Component panel with the Advanced component option
 
 When you click the Advanced component, you see the following list.
 
 .. image:: Images/SpecProbs_List.gif
+  :alt: Image of the Advanced component list
 
 You can now create annotations, open response assessments, and word
 clouds in your course. More information about how to create each problem
@@ -102,6 +107,7 @@ text. The questions also appear in a section below the text block, along
 with space for students' responses.
 
 .. image:: Images/AnnotationExample.gif
+  :alt: Image of an annotation problem
 
 Create an Annotation Problem
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -180,60 +186,3 @@ images, that the students upload.
 Because open response assessments are more complex than most other problem types,
 they have a separate section. For more information about these problems, see 
 :ref:`Open Response Assessment Problems`.
-
-
-
-.. _Word Cloud:
-
-Word Cloud
-----------
-
-
-In a word cloud problem, students enter words into a field in response
-to a question or prompt. The words all the students have entered then
-appear instantly as a colorful graphic, with the most popular responses
-appearing largest. The graphic becomes larger as more students answer.
-Students can both see the way their peers have answered and contribute
-their thoughts to the group.
-
-
-For example, the following word cloud was created from students'
-responses to a question in a HarvardX course.
-
-.. image:: Images/WordCloudExample.gif
-
-Create a Word Cloud Problem
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-To create a word cloud problem:
-
-
-#. Add the Word Cloud advanced component. To do this, add the
-   "word_cloud" key value to the **Advanced Settings** page. (For more
-   information, see the instructions in :ref:`Specialized Problems`.)
-#. In the unit where you want to create the problem, click **Advanced**
-   under **Add New Component**.
-#. In the list of problem types, click **Word Cloud**.
-#. In the component that appears, click **Edit**.
-#. In the component editor, specify the settings that you want. You can
-   leave the default value for everything except **Display Name**.
-
-
-   -  **Display Name**: The name that appears in the course ribbon and
-      as a heading above the problem.
-   -  **Inputs**: The number of text boxes into which students can enter
-      words, phrases, or sentences.
-   -  **Maximum Words**: The maximum number of words that the word cloud
-      displays. If students enter 300 different words but the maximum is
-      set to 250, only the 250 most commonly entered words appear in the
-      word cloud.
-   -  **Show Percents**: The number of times that students have entered
-      a given word as a percentage of all words entered appears near
-      that word.
-
-
-#. Click **Save**.
-
-
-For more information, see `Xml Format of "Word Cloud" Module 
-<https://edx.readthedocs.org/en/latest/course_data_formats/word_cloud/word_cloud.html#>`_.

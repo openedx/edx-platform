@@ -87,12 +87,14 @@ Step 1. Add LTI to the Advanced Modules Policy Key
    policy key (this key is at the top of the list).
 
    .. image:: Images/AdvancedModulesEmpty.gif
+    :alt: Image of the advanced_modules key in the Advanced Settings page
 
 #. Under **Policy Value**, place your cursor between the brackets, and
    then enter **“lti”**. Make sure to include the quotation marks, but
    not the period.
 
    .. image:: Images/LTI_Policy_Key.gif
+    :alt: Image of the advanced_modules key in the Advanced Settings page, with the lti value added
 
    **Note** If the **Policy Value** field already contains text, place your
    cursor directly after the closing quotation mark for the final item, and
@@ -225,6 +227,7 @@ For example, the following word cloud was created from students'
 responses to a question in a HarvardX course.
 
 .. image:: Images/WordCloudExample.gif
+  :alt: Image of a word cloud problem
 
 Create a Word Cloud Exercise
 ----------------------------
@@ -276,6 +279,7 @@ The example below is from 7.00x: Introduction to Biology and shows a subset of t
 biochemical reactions that cells carry out.
 
 .. image:: Images/Zooming_Image.gif
+  :alt: Image of a zooming image
 
 Create a Zooming Image Tool
 ---------------------------
