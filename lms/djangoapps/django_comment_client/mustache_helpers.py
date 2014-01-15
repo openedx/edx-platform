@@ -1,3 +1,4 @@
+from django.utils.translation import ugettext as _
 import django.core.urlresolvers as urlresolvers
 import sys
 import inspect
@@ -21,9 +22,9 @@ def url_for_user(content, user_id):
 
 def close_thread_text(content):
     if content.get('closed'):
-        return 'Re-open thread'
+        return _('Re-open thread')
     else:
-        return 'Close thread'
+        return _('Close thread')
 
 current_module = sys.modules[__name__]
 all_functions = inspect.getmembers(current_module, inspect.isfunction)

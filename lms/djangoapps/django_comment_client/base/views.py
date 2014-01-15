@@ -197,7 +197,7 @@ def create_comment(request, course_id, thread_id):
     """
     if cc_settings.MAX_COMMENT_DEPTH is not None:
         if cc_settings.MAX_COMMENT_DEPTH < 0:
-            return JsonError("Comment level too deep")
+            return JsonError(_("Comment level too deep"))
     return _create_comment(request, course_id, thread_id=thread_id)
 
 
@@ -273,7 +273,7 @@ def create_sub_comment(request, course_id, comment_id):
     """
     if cc_settings.MAX_COMMENT_DEPTH is not None:
         if cc_settings.MAX_COMMENT_DEPTH <= cc.Comment.find(comment_id).depth:
-            return JsonError("Comment level too deep")
+            return JsonError(_("Comment level too deep"))
     return _create_comment(request, course_id, parent_id=comment_id)
 
 
@@ -579,7 +579,7 @@ def upload(request, course_id):  # ajax upload file to a question or answer
         error = _('Error uploading file. Please contact the site administrator. Thank you.')
 
     if error == '':
-        result = 'Good'
+        result = _('Good')
         file_url = file_storage.url(new_file_name)
         parsed_url = urlparse.urlparse(file_url)
         file_url = urlparse.urlunparse(
