@@ -620,6 +620,34 @@ class TestItemCrud(SplitModuleTest):
         another_history = modulestore().get_definition_history_info(another_module.definition_locator)
         self.assertEqual(str(another_history['previous_version']), '0d00000040000000dddd0031')
 
+    def test_encoded_naming(self):
+        """
+        Check that using odd characters in block id don't break ability to add and retrieve block.
+        """
+        parent_locator = BlockUsageLocator(package_id="contender", block_id="head345679", branch='draft')
+        chapter_locator = BlockUsageLocator(package_id="contender", block_id="foo.bar_-~:0", branch='draft')
+        modulestore().create_item(
+            parent_locator, 'chapter', 'anotheruser',
+            block_id=chapter_locator.block_id,
+            fields={'display_name': 'chapter 99'},
+        )
+        # check that course version changed and course's previous is the other one
+        new_module = modulestore().get_item(chapter_locator)
+        self.assertEqual(new_module.location.block_id, "foo.bar_-~:0")  # hardcode to ensure BUL init didn't change
+        # now try making that a parent of something
+        new_payload = "<problem>empty</problem>"
+        problem_locator = BlockUsageLocator(package_id="contender", block_id="prob.bar_-~:99a", branch='draft')
+        modulestore().create_item(
+            chapter_locator, 'problem', 'anotheruser',
+            block_id=problem_locator.block_id,
+            fields={'display_name': 'chapter 99', 'data': new_payload},
+        )
+        # check that course version changed and course's previous is the other one
+        new_module = modulestore().get_item(problem_locator)
+        self.assertEqual(new_module.location.block_id, problem_locator.block_id)
+        chapter = modulestore().get_item(chapter_locator)
+        self.assertIn(problem_locator.block_id, chapter.children)
+
     def test_create_continue_version(self):
         """
         Test create_item using the continue_version flag

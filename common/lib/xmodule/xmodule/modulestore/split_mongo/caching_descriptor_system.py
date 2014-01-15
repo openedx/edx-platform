@@ -8,6 +8,7 @@ from xblock.runtime import KvsFieldData, IdReader
 from ..exceptions import ItemNotFoundError
 from .split_mongo_kvs import SplitMongoKVS
 from xblock.fields import ScopeIds
+from xmodule.modulestore.loc_mapper_store import LocMapperStore
 
 log = logging.getLogger(__name__)
 
@@ -63,7 +64,9 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         # Compute inheritance
         modulestore.inherit_settings(
             course_entry['structure'].get('blocks', {}),
-            course_entry['structure'].get('blocks', {}).get(course_entry['structure'].get('root'))
+            course_entry['structure'].get('blocks', {}).get(
+                LocMapperStore.encode_key_for_mongo(course_entry['structure'].get('root'))
+            )
         )
         self.default_class = default_class
         self.local_modules = {}
