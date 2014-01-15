@@ -53,7 +53,8 @@ class TestEmailSendFromDashboard(ModuleStoreTestCase):
         self.instructor = InstructorFactory(course=self.course.location)
 
         # Create staff
-        self.staff = [StaffFactory(course=self.course.location) for _ in xrange(STAFF_COUNT)]
+        self.staff = [StaffFactory(course=self.course.location)
+                      for _ in xrange(STAFF_COUNT)]
 
         # Create students
         self.students = [UserFactory() for _ in xrange(STUDENT_COUNT)]

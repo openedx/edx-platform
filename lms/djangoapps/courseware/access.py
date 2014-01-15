@@ -20,7 +20,7 @@ from external_auth.models import ExternalAuthMap
 from courseware.masquerade import is_masquerading_as_student
 from django.utils.timezone import UTC
 from student.models import CourseEnrollment
-from courseware.roles import (
+from student.roles import (
     GlobalStaff, CourseStaffRole, CourseInstructorRole,
     OrgStaffRole, OrgInstructorRole, CourseBetaTesterRole
 )

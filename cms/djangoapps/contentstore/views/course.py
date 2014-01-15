@@ -35,10 +35,9 @@ from models.settings.course_details import CourseDetails, CourseSettingsEncoder
 
 from models.settings.course_grading import CourseGradingModel
 from models.settings.course_metadata import CourseMetadata
-from auth.authz import create_all_course_groups, is_user_in_creator_group
 from util.json_request import expect_json
 
-from .access import has_access
+from .access import has_course_access
 from .tabs import initialize_course_tabs
 from .component import (
     OPEN_ENDED_COMPONENT_TYPES, NOTE_COMPONENT_TYPES,
@@ -52,6 +51,8 @@ from xmodule.html_module import AboutDescriptor
 from xmodule.modulestore.locator import BlockUsageLocator
 from course_creators.views import get_course_creator_status, add_user_with_status_unrequested
 from contentstore import utils
+from student.roles import CourseInstructorRole, CourseStaffRole, CourseCreatorRole
+from student import auth
 
 __all__ = ['course_info_handler', 'course_handler', 'course_info_update_handler',
            'settings_handler',
@@ -66,7 +67,7 @@ def _get_locator_and_course(package_id, branch, version_guid, block_id, user, de
     for the view functions in this file.
     """
     locator = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block_id)
-    if not has_access(user, locator):
+    if not has_course_access(user, locator):
         raise PermissionDenied()
     course_location = loc_mapper().translate_locator_to_location(locator)
     course_module = modulestore().get_item(course_location, depth=depth)
@@ -102,7 +103,7 @@ def course_handler(request, tag=None, package_id=None, branch=None, version_guid
             raise NotImplementedError('coming soon')
         elif request.method == 'POST':  # not sure if this is only post. If one will have ids, it goes after access
             return create_new_course(request)
-        elif not has_access(
+        elif not has_course_access(
             request.user,
             BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
         ):
@@ -136,7 +137,7 @@ def course_listing(request):
         """
         Get courses to which this user has access
         """
-        return (has_access(request.user, course.location)
+        return (has_course_access(request.user, course.location)
                 # pylint: disable=fixme
                 # TODO remove this condition when templates purged from db
                 and course.location.course != 'templates'
@@ -207,7 +208,7 @@ def create_new_course(request):
 
     Returns the URL for the course overview page.
     """
-    if not is_user_in_creator_group(request.user):
+    if not auth.has_access(request.user, CourseCreatorRole()):
         raise PermissionDenied()
 
     org = request.json.get('org')
@@ -297,7 +298,10 @@ def create_new_course(request):
     initialize_course_tabs(new_course)
 
     new_location = loc_mapper().translate_location(new_course.location.course_id, new_course.location, False, True)
-    create_all_course_groups(request.user, new_location)
+    # can't use auth.add_users here b/c it requires request.user to already have Instructor perms in this course
+    # however, we can assume that b/c this user had authority to create the course, the user can add themselves
+    CourseInstructorRole(new_location).add_users(request.user)
+    auth.add_users(request.user, CourseStaffRole(new_location), request.user)
 
     # seed the forums
     seed_permissions_roles(new_course.location.course_id)
@@ -370,7 +374,7 @@ def course_info_update_handler(request, tag=None, package_id=None, branch=None, 
         provided_id = None
 
     # check that logged in user has permissions to this item (GET shouldn't require this level?)
-    if not has_access(request.user, updates_location):
+    if not has_course_access(request.user, updates_location):
         raise PermissionDenied()
 
     if request.method == 'GET':

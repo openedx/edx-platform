@@ -37,7 +37,7 @@ from ..transcripts_utils import (
     TranscriptsRequestValidationException
 )
 
-from .access import has_access
+from .access import has_course_access
 
 __all__ = [
     'upload_transcripts',
@@ -546,11 +546,11 @@ def _get_item(request, data):
     locator = BlockUsageLocator(data.get('locator'))
     old_location = loc_mapper().translate_locator_to_location(locator)
 
-    # This is placed before has_access() to validate the location,
-    # because has_access() raises InvalidLocationError if location is invalid.
+    # This is placed before has_course_access() to validate the location,
+    # because has_course_access() raises InvalidLocationError if location is invalid.
     item = modulestore().get_item(old_location)
 
-    if not has_access(request.user, locator):
+    if not has_course_access(request.user, locator):
         raise PermissionDenied()
 
     return item
