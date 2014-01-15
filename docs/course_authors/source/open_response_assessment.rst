@@ -21,6 +21,19 @@ assessments, students learn by comparing their answers to a rubric that
 you create. With peer assessments, students compare their peers' answers
 to the rubric.
 
+For more information, see the following:
+
+* :ref:`ORA Notes`
+* :ref:`ORA Components`
+* :ref:`ORA Types`
+* :ref:`Effective Questions`
+* :ref:`Rubrics`
+* :ref:`Create an ORA Problem`
+* :ref:`Grade an ORA`
+* :ref:`Access Scores`
+
+.. _ORA Notes:
+
 A Few Notes about Open Response Assessments
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -44,6 +57,8 @@ Finally, if you're at an edX consortium university and you plan to
 include open response assessments in a MOOC, make sure to notify your
 edX project manager (PM).
 
+.. _ORA Components:
+
 Components of an Open Response Assessment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -56,12 +71,14 @@ An open response assessment has three elements:
    perform peer assessments, and then an AI assessment runs.
 
    .. image:: Images/CITL_AssmtTypes.gif
+      :alt: Image of ORA with assessment types circled
 
 -  The question that you want your students to answer. This appears near
    the top of the component, followed by a field where the student
    enters a response.
 
    .. image:: Images/CITLsample.gif
+      :alt: Image of ORA question
 
 -  A rubric that you design. After the student enters a response and
    clicks **Submit**, if the assessment is a self assessment, the
@@ -71,6 +88,9 @@ An open response assessment has three elements:
    see the rubric.)
 
    .. image:: Images/CITL_SA_Rubric.gif
+      :alt: Image of ORA with rubric showing below the student's response
+
+.. _ORA Types:
 
 Open Response Assessment Types
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -86,10 +106,14 @@ assessment, and peer assessment.
 -  Peer assessment allows students to score each other and provide
    feedback, again using the same rubric.
 
+   .. warning:: In peer assessments, the **due date** that you set for the subsection that contains the ORA problem is the date by which students must not only submit their own responses, but finish grading the required number of peer responses.
+
 You can use one or more of these assessments in any problem. You can
 also set thresholds within the problem for each assessment, so that a
 response with a low score in one assessment does not move on to the next
 assessment.
+
+.. _Effective Questions:
 
 Effective Questions
 ~~~~~~~~~~~~~~~~~~~
@@ -123,28 +147,32 @@ each category.
 Different categories in the same problem can have different numbers of
 options.
 
+.. _Create an ORA Problem:
+
 Create an Open Response Assessment Problem
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Creating an open response assessment is a multi-step process.
 
-#. Create the component for the open response assessment.
-#. Add the question.
-#. Add the rubric.
-#. Set the assessment type and scoring.
-#. Set the problem name.
-#. Set other options.
-#. Save the problem.
-#. Add the peer grading interface (for peer assessments only).
-#. Test the problem.
+* :ref:`Step 1`
+* :ref:`Step 2`
+* :ref:`Step 3`
+* :ref:`Step 4`
+* :ref:`Step 5`
+* :ref:`Step 6`
+* :ref:`Step 7`
+* :ref:`Step 8`
+* :ref:`Step 9`
 
 Each of these steps is described in detail below.
 
-Step 1. Create the Component
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. _Step 1:
+
+Step 1. Create the ORA Component
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 #. Add the advanced component for open response assessments. To do this,
-   add the "peergrading","combinedopenended" key value to the **Advanced
+   add the "peergrading","combinedopenended" key value to the **advanced_modules** policy key on the **Advanced
    Settings** page. (For more information, see the instructions in
    :ref:`Specialized Problems`.)
 #. In Studio, open the unit where you want to create the ORA.
@@ -158,13 +186,17 @@ Step 1. Create the Component
    problem. 
  
 .. image:: Images/ORAComponentEditor.gif
+   :alt: Image of component editor with prompt, rubric, and assessment type highlighted
   
+.. _Step 2:
+
 Step 2. Add the Question
-~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 #. In the component editor, locate the [prompt] tags.
 
    .. image:: Images/ORA_Prompt.gif
+      :alt: Image of component editor with prompt text highlighted
 
 #. Replace the sample text between the **[prompt]** tags with the text of
    your question. When you replace the sample text, make sure you follow
@@ -173,8 +205,10 @@ Step 2. Add the Question
    -  Leave the **[prompt]** tags in place.
    -  Enclose all text in HTML tags.
 
+.. _Step 3:
+
 Step 3. Add the Rubric
-~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. note:: After you release your problem to students in your live course, make sure
           you don't make any changes to the rubric that affect scoring, such as adding or removing an option
@@ -184,6 +218,7 @@ Step 3. Add the Rubric
    is long, so you'll have to scroll down to locate the second tag.)
 
    .. image:: Images/ORA_Rubric.gif
+      :alt: Image of component editor with rubric text highlighted
 
 #. Replace the sample rubric with the text of your rubric. Make sure to
    do the following.
@@ -209,8 +244,10 @@ Step 3. Add the Rubric
 
     [rubric]
 
+.. _Step 4:
+
 Step 4. Set the Assessment Type and Scoring
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. note:: After you release your problem to students in your live course, make sure
           you don't make any changes to the code for the assessment type and scoring. Changing 
@@ -258,17 +295,20 @@ The problem that includes this code has the following characteristics.
 .. note:: If a response's score isn't high enough for the response to move to the next
           assessment, 
 
-Set the Type and Scoring
-^^^^^^^^^^^^^^^^^^^^^^^^
+Set the Assessment Type and Scoring
+###################################
 
 #. In the component editor, locate the [tasks] tags.
 
    .. image:: Images/ORA_Tasks.gif
+      :alt: Image of component editor with tasks tags and text highlighted
 
 #. Replace the sample code with the code for your problem.
 
+.. _Step 5:
+
 Step 5. Set the Problem Name
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. note::   After you release your problem to students in your live course, make sure
             you don't change the name of the problem. Changing the display name when the problem
@@ -284,6 +324,7 @@ courseware. It also appears in the list of problems on the **Staff
 Grading** page.
 
 .. image:: Images/ORA_ProblemName1.gif
+   :alt: Image of Staff Grading page with a problem name circled
 
 To change the name:
 
@@ -292,8 +333,10 @@ To change the name:
 #. In the **Display Name** field, replace **Open Response Assessment**
    with the name of your problem.
 
+.. _Step 6:
+
 Step 6. Set Other Options
-~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
 If you want to change the problem settings, which include the number of
 responses a student has to peer grade and whether students can upload
@@ -301,6 +344,7 @@ files as part of their response, click the **Settings** tab, and then
 specify the options that you want.
 
 .. image:: Images/ORA_Settings.gif
+   :alt: Image of component editor with Settings tab selected
 
 Open response assessments include the following settings.
 
@@ -380,7 +424,7 @@ Open response assessments include the following settings.
 |                                             |                                                                    |
 |                                             | **Note** *Every problem must have a problem weight of at least     |
 |                                             | one point. Problems that have a problem weight of zero points      |
-|                                             | don't appear on the instructor dashboard.*                          |
+|                                             | don't appear on the instructor dashboard.*                         |
 +---------------------------------------------+--------------------------------------------------------------------+
 | **Required Peer Grading**                   | This setting specifies the number of responses that each student   |
 |                                             | who submits a response has to grade before the student receives a  |
@@ -394,8 +438,10 @@ Open response assessments include the following settings.
 |                                             | previously graded responses.)                                      |
 +---------------------------------------------+--------------------------------------------------------------------+
 
+.. _Step 7:
+
 Step 7. Save the Problem
-~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 -  After you have created the prompt and the rubric, set the assessment
    type and scoring, changed the name of the problem, and specified any
@@ -405,15 +451,22 @@ Step 7. Save the Problem
    see the type of assessments that you have set for this problem.
 
    .. image:: Images/ORA_Component.gif
+      :alt: Image of ORA component with assessment types circled
+
+.. _Step 8:
 
 Step 8. Add the Peer Grading Interface (for peer assessments only)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 You can add just one peer grading interface for the whole course, or you
 can add a separate peer grading interface for each individual problem.
 
+.. warning:: In peer assessments, the **due date** that you set for the subsection that contains the ORA problem is the date by which students must not only submit their own responses, but finish grading the required number of peer responses.
+
+.. _Add a Single PGI:
+
 Add a Single Peer Grading Interface for the Course
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+##################################################
 
 When you add just one peer grading interface for the entire course, we
 recommend that you create that peer grading interface in its own section
@@ -431,15 +484,18 @@ the ORA problems for the course through this peer grading interface.
 #. To see the peer grading interface in the course, set the visibility
    of the unit to **Public**, and then click **View Live**.
 
-   The following page opens.
+   The **Peer Grading** page opens.
 
    .. image:: Images/PGI_Single.gif
+      :alt: Image of LMS open to the Peer Grading page for the course
 
    When students submit responses for peer assessments in your course,
    the names of the problems appear in this interface.
 
+.. _Add an Individual PGI:
+
 Add the Peer Grading Interface to an Individual Problem
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#######################################################
 
 When you add a peer grading interface for an individual problem, you
 must add the identifier for the problem to that peer grading interface.
@@ -460,11 +516,12 @@ week).
    than Student view.
 #. Scroll down to the bottom of the ORA, and then click **Staff Debug
    Info**.
-#. In the image that opens, locate the string of alphanumeric characters
+#. In the page that opens, locate the string of alphanumeric characters
    to the right of the word **location**. Press CTRL+C to copy this
    string, starting with **i4x**.
 
    .. image:: Images/PA_StaffDebug_Location.gif
+      :alt: Image of Staff Debug screen with ORA problem location circled 
 
 #. Switch back to the unit in Studio. If the visibility of the unit is
    set to **Public**, change the visibility to **Private**.
@@ -480,8 +537,10 @@ week).
 
 #. Click **Save** to close the component editor.
 
+.. _Step 9:
+
 Step 9. Test the Problem
-~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 Test your problem by adding and grading a response.
 
@@ -527,6 +586,8 @@ responses, including the "low-quality" responses, disable the quality filter.
 
 To disable the quality filter, open the problem component, click the **Settings** tab,
 and then set the **Disable Quality Filter** setting to **True**.
+
+.. _Grade an ORA:
 
 Grade an Open Response Assessment Problem
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -580,6 +641,8 @@ response assessment appears in several columns.
 
 Grade Responses
 ^^^^^^^^^^^^^^^
+
+.. warning:: In peer assessments, the **due date** that you set for the subsection that contains the ORA problem is the date by which students must not only submit their own responses, but finish grading the required number of peer responses.
 
 #. Go to the **Staff Grading** page.
 #. Under **Problem Name**, click the name of the problem that you want.
@@ -647,11 +710,42 @@ to see if any other students have submitted responses.
           the grading pool until 30 minutes have passed. When the response returns to the 
           grading pool, you can grade it. 
 
+.. _Access Scores:
+
 Access Scores and Feedback
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-You access your scores for your responses to AI and peer assessment
-problems through the **Open Ended Console** page.
+Scoring
+^^^^^^^
+
+Scores for open response assessment problems that have more than one assessment type are not cumulative. That is, if a problem has a value of 10 points and it contains both a self assessment and an AI assessment, the total score is out of 10 points rather than 20.
+
+The final score for an open response assessment is the score that the response receives in the last assessment that it undergoes. If a response doesn't score high enough to move to another assessment, the final score is the score that the response receives in the last assessment that it qualifies for. 
+
+In peer assessment, the final score is the median of the scores that the response receives from each peer grader.
+
+For example:
+
+A 20-point problem includes self assessment, peer assessment, and AI assessment. To move from self assessment to peer assessment, the response must score 10 points. To move from peer assessment to AI assessment, the response must score 12 points.
+
+* Student A gives himself 9 points in the self assessment. Because the minimum score to move from self assessment to peer assessment is 10, the response cannot continue to peer assessment. Student A's final score is 9 out of 20.
+
+* Student B gives herself 16 points in the self assessment. In the peer assessment, the response receives scores of 14, 11, and 10. Because the median is 11, the response cannot continue to AI assessment. Student B's final score is 11 out of 20.
+
+* Student C gives herself 17 points in the self assessment. In the peer assessment, the response receives scores of 10, 18, and 14. Because the median is 14, the response moves to AI assessment. AI assessment gives the response a score of 16. Student C's final score is 16 out of 20.
+
+
+Note that if the same 20-point problem changes the assessment order, the student's final score may be different. For example, suppose the assessment order for the above example changes to self assessment, then AI assessment, and then peer assessment. To move from self assessment to AI assessment, the response must score 10 points. To move from AI assessment to peer assessment, the response must score 12 points.
+
+* Student D gives himself 17 points in the self assessment. AI assessment gives the response a score of 16. In the peer assessment, the response receives scores of 10, 18, and 14; the median is 14. Student D's final score is 14 out of 20.
+
+.. note:: Because the assessment order can affect a student's final score, we recommend that you specify peer assessments as the last assessments for ORA problems. If the last assessment is a self assessment, the student can award herself full points for a response, even if the response received low grades from the AI and peer assessments.
+
+
+Accessing Scores
+^^^^^^^^^^^^^^^^
+
+You access your scores for your responses to AI and peer assessment problems through the **Open Ended Console** page.
 
 #. From any page in the LMS, click the **Open Ended Panel** tab at the
    top of the page.
