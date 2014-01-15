@@ -171,18 +171,43 @@ function (HTML5Video, Resizer) {
 
                 _resize(state, videoWidth, videoHeight);
 
-                console.log('[_initialize]: (youtube) .duration');
-                // After initialization, update the VCR with total time.
-                // At this point only the metadata duration is available (not
-                // very precise), but it is better than having 00:00:00 for
-                // total time.
-                state.trigger(
-                    'videoControl.updateVcrVidTime',
-                    {
-                        time: 0,
-                        duration: state.videoPlayer.duration()
+                // We wait for metdata to arrive, before we request the update
+                // of the VCR video time. Metadata contains duration of the
+                // video. We wait for 2 seconds, and then abandon our attempts
+                // to update the VCR video time using metadata.
+                (function () {
+                    var checkInterval = window.setInterval(
+                            checkForMetadata, 50
+                        ),
+                        numberOfChecks = 0;
+
+                    return;
+
+                    function checkForMetadata() {
+                        if (state.metadata && state.metadata[state.youtubeId()]) {
+                            console.log('[_initialize]: (youtube) .duration');
+                            // After initialization, update the VCR with total time.
+                            // At this point only the metadata duration is available (not
+                            // very precise), but it is better than having 00:00:00 for
+                            // total time.
+                            state.trigger(
+                                'videoControl.updateVcrVidTime',
+                                {
+                                    time: 0,
+                                    duration: state.videoPlayer.duration()
+                                }
+                            );
+
+                            window.clearInterval(checkInterval);
+                        } else {
+                            numberOfChecks += 1;
+
+                            if (numberOfChecks === 40) {
+                                window.clearInterval(checkInterval);
+                            }
+                        }
                     }
-                );
+                }());
             });
         }
 
