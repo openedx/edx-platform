@@ -95,7 +95,7 @@ site_status_msg = get_site_status_msg(course_id)
     % else:
     <ol class="left nav-global">
       <%block name="navigation_global_links">
-        % if settings.FEATURES.get('ENABLE_MKTG_SITE'):
+        % if MicrositeConfiguration.get_microsite_configuration_value('ENABLE_MKTG_SITE', settings.FEATURES.get('ENABLE_MKTG_SITE', False)):
           <li class="nav-global-01">
             <a href="${marketing_link('HOW_IT_WORKS')}">${_("How it Works")}</a>
           </li>
