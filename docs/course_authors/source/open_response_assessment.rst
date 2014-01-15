@@ -718,11 +718,11 @@ Access Scores and Feedback
 Scoring
 ^^^^^^^
 
-Scores for open response assessment problems that have more than one assessment are not cumulative. That is, if a problem has a value of 10 points and it contains both a self assessment and an AI assessment, the total score is out of 10 points rather than 20.
+Scores for open response assessment problems that have more than one assessment type are not cumulative. That is, if a problem has a value of 10 points and it contains both a self assessment and an AI assessment, the total score is out of 10 points rather than 20.
 
-The final score for an open response assessment is the score that the response receives in the final assessment that it undergoes. If a response doesn't score high enough to move to another assessment, the final score is the score that the response receives in the final assessment that it qualifies for. 
+The final score for an open response assessment is the score that the response receives in the last assessment that it undergoes. If a response doesn't score high enough to move to another assessment, the final score is the score that the response receives in the last assessment that it qualifies for. 
 
-In peer assessment, the final score is the average of the scores that each of the peer graders awards.
+In peer assessment, the final score is the median of the scores that the response receives from each peer grader.
 
 For example:
 
@@ -730,14 +730,16 @@ A 20-point problem includes self assessment, peer assessment, and AI assessment.
 
 * Student A gives himself 9 points in the self assessment. Because the minimum score to move from self assessment to peer assessment is 10, the response cannot continue to peer assessment. Student A's final score is 9 out of 20.
 
-* Student B gives herself 16 points in the self assessment. In the peer assessment, the response receives scores of 14, 9, and 10, for an average of 11 (33 total points/3 graders). Because the average is 11, the response cannot continue to AI assessment. Student B's final score is 11 out of 20.
+* Student B gives herself 16 points in the self assessment. In the peer assessment, the response receives scores of 14, 11, and 10. Because the median is 11, the response cannot continue to AI assessment. Student B's final score is 11 out of 20.
 
-* Student C gives herself 17 points in the self assessment. In the peer assessment, the response receives scores of 18, 18, and 14, for an average of 17 (50 total points/3 graders = 16.67, which is rounded up). Because the average is 17, the response moves to AI assessment. AI assessment gives the response a score of 14. Student C's final score is 14 out of 20.
+* Student C gives herself 17 points in the self assessment. In the peer assessment, the response receives scores of 10, 18, and 14. Because the median is 14, the response moves to AI assessment. AI assessment gives the response a score of 16. Student C's final score is 16 out of 20.
 
 
-Another 20-point problem includes all three assessment types, but changes the assessment order: this problem has a self assessment, then an AI assessment, and then a peer assessment. To move from self assessment to AI assessment, the response must score 10 points. To move from AI assessment to peer assessment, the response must score 12 points.
+Note that if the same 20-point problem changes the assessment order, the student's final score may be different. For example, suppose the assessment order for the above example changes to self assessment, then AI assessment, and then peer assessment. To move from self assessment to AI assessment, the response must score 10 points. To move from AI assessment to peer assessment, the response must score 12 points.
 
-* Student D gives himself 17 points in the self assessment. AI assessment gives the response a score of 14. In the peer assessment, the response receives scores of 18, 18, and 14, for an average of 17 (50 total points/3 graders = 16.67, which is rounded up). Student D's final score is 17 out of 20.
+* Student D gives himself 17 points in the self assessment. AI assessment gives the response a score of 16. In the peer assessment, the response receives scores of 10, 18, and 14; the median is 14. Student D's final score is 14 out of 20.
+
+.. note:: Because the assessment order can affect a student's final score, we recommend that you specify peer assessments as the last assessments for ORA problems. If the last assessment is a self assessment, the student can award herself full points for a response, even if the response received low grades from the AI and peer assessments.
 
 
 Accessing Scores
