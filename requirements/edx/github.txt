@@ -22,6 +22,3 @@
 -e git+https://github.com/edx/django-waffle.git@823a102e48#egg=django-waffle
 -e git+https://github.com/edx/event-tracking.git@f0211d702d#egg=event-tracking
 -e git+https://github.com/edx/bok-choy.git@bc6f1adbe439618162079f1004b2b3db3b6f8916#egg=bok_choy
-
-# Move back to upstream release once https://github.com/txels/ddt/pull/13 is merged
--e git+https://github.com/edx/ddt.git@afef6647edb488afc471b0239ef8c4b0669e5fdf#egg=ddt
