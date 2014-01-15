@@ -53,6 +53,12 @@ Create a New Course
 
     *Note: If your course will be open to the world, be sure to include the "x". If it is exclusively an on-campus offering, do not include the "x".* 
 
+  * For **Course Run**, enter the term your course will run. Do not include whitespace or special characters. 
+
+    The Course Run date you enter does not affect the default **Course Start Date**.  See :ref:`Set Important Dates for Your Course` for more information.
+
+
+
 4. Click **Save.**
 
 You then see the empty Course Outline.
@@ -136,6 +142,10 @@ You must set dates and times for enrollment and for the course.
 From the **Settings** menu, select **Schedule and Details**.  
 
 .. image:: Images/schedule.png
+
+.. note:: 
+
+    The default **Course Start Date** is set far into the future, to **12/31/2029**. This is to ensure that your course does not start before you intend it to.  You must change the **Course Start Date** to the date you want students to begin using the course.  
 
 Follow the on-screen text to enter the course and enrollment schedule.
 
