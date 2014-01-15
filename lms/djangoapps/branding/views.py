@@ -59,7 +59,10 @@ def courses(request):
     to that. Otherwise, if subdomain branding is on, this is the university
     profile page. Otherwise, it's the edX courseware.views.courses page
     """
-    enable_mktg_site = settings.FEATURES.get('ENABLE_MKTG_SITE') or MicrositeConfiguration.get_microsite_configuration_value('ENABLE_MKTG_SITE', False)
+    enable_mktg_site = MicrositeConfiguration.get_microsite_configuration_value(
+        'ENABLE_MKTG_SITE',
+        settings.FEATURES.get('ENABLE_MKTG_SITE', False)
+    )
 
     if enable_mktg_site:
         return redirect(marketing_link('COURSES'), permanent=True)
