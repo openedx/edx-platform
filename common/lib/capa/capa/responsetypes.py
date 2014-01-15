@@ -129,20 +129,20 @@ class LoncapaResponse(object):
     allowed_inputfields = []
     required_attributes = []
 
-    def __init__(self, xml, inputfields, context, system=None):
+    def __init__(self, xml, inputfields, context, system):
         '''
         Init is passed the following arguments:
 
           - xml         : ElementTree of this Response
           - inputfields : ordered list of ElementTrees for each input entry field in this Response
           - context     : script processor context
-          - system      : ModuleSystem instance which provides OS, rendering, and user context
+          - system      : LoncapaSystem instance which provides OS, rendering, and user context
 
         '''
         self.xml = xml
         self.inputfields = inputfields
         self.context = context
-        self.system = system
+        self.capa_system = system
 
         self.id = xml.get('id')
 
@@ -298,7 +298,7 @@ class LoncapaResponse(object):
                     python_path=self.context['python_path'],
                     slug=self.id,
                     random_seed=self.context['seed'],
-                    unsafely=self.system.can_execute_unsafe_code(),
+                    unsafely=self.capa_system.can_execute_unsafe_code(),
                 )
             except Exception as err:
                 msg = 'Error %s in evaluating hint function %s' % (err, hintfn)
@@ -444,7 +444,7 @@ class JavascriptResponse(LoncapaResponse):
         # manually being compiled to DATA_DIR/js/compiled.
 
         # latestTimestamp = 0
-        # basepath = self.system.filestore.root_path + '/js/'
+        # basepath = self.capa_system.filestore.root_path + '/js/'
         # for filename in (self.display_dependencies + [self.display]):
         #    filepath = basepath + filename
         #    timestamp = os.stat(filepath).st_mtime
@@ -467,7 +467,7 @@ class JavascriptResponse(LoncapaResponse):
         #    outfile.close()
 
         # TODO this should also be fixed when the above is fixed.
-        filename = self.system.ajax_url.split('/')[-1] + '.js'
+        filename = self.capa_system.ajax_url.split('/')[-1] + '.js'
         self.display_filename = 'compiled/' + filename
 
     def parse_xml(self):
@@ -510,16 +510,16 @@ class JavascriptResponse(LoncapaResponse):
 
     def get_node_env(self):
 
-        js_dir = os.path.join(self.system.filestore.root_path, 'js')
+        js_dir = os.path.join(self.capa_system.filestore.root_path, 'js')
         tmp_env = os.environ.copy()
-        node_path = self.system.node_path + ":" + os.path.normpath(js_dir)
+        node_path = self.capa_system.node_path + ":" + os.path.normpath(js_dir)
         tmp_env["NODE_PATH"] = node_path
         return tmp_env
 
     def call_node(self, args):
-        # Node.js code is un-sandboxed. If the XModuleSystem says we aren't
+        # Node.js code is un-sandboxed. If the LoncapaSystem says we aren't
         # allowed to run unsafe code, then stop now.
-        if not self.system.can_execute_unsafe_code():
+        if not self.capa_system.can_execute_unsafe_code():
             raise LoncapaProblemError("Execution of unsafe Javascript code is not allowed.")
 
         subprocess_args = ["node"]
@@ -1154,7 +1154,7 @@ class CustomResponse(LoncapaResponse):
                             python_path=self.context['python_path'],
                             slug=self.id,
                             random_seed=self.context['seed'],
-                            unsafely=self.system.can_execute_unsafe_code(),
+                            unsafely=self.capa_system.can_execute_unsafe_code(),
                         )
                         return globals_dict['cfn_return']
                     return check_function
@@ -1169,8 +1169,8 @@ class CustomResponse(LoncapaResponse):
             else:
                 answer_src = answer.get('src')
                 if answer_src is not None:
-                    self.code = self.system.filesystem.open(
-                        'src/' + answer_src).read()
+                    # TODO: this code seems not to be used any more since self.capa_system.filesystem doesn't exist.
+                    self.code = self.capa_system.filesystem.open('src/' + answer_src).read()
                 else:
                     self.code = answer.text
 
@@ -1249,8 +1249,8 @@ class CustomResponse(LoncapaResponse):
             'testdat': 'hello world',
         })
 
-        # pass self.system.debug to cfn
-        self.context['debug'] = self.system.DEBUG
+        # Pass DEBUG to the check function.
+        self.context['debug'] = self.capa_system.DEBUG
 
         # Run the check function
         self.execute_check_function(idset, submission)
@@ -1275,10 +1275,10 @@ class CustomResponse(LoncapaResponse):
                 safe_exec.safe_exec(
                     self.code,
                     self.context,
-                    cache=self.system.cache,
+                    cache=self.capa_system.cache,
                     slug=self.id,
                     random_seed=self.context['seed'],
-                    unsafely=self.system.can_execute_unsafe_code(),
+                    unsafely=self.capa_system.can_execute_unsafe_code(),
                 )
             except Exception as err:
                 self._handle_exec_exception(err)
@@ -1470,18 +1470,21 @@ ScoreMessage = namedtuple('ScoreMessage', ['valid', 'correct', 'points', 'msg'])
 @registry.register
 class CodeResponse(LoncapaResponse):
     """
-    Grade student code using an external queueing server, called 'xqueue'
+    Grade student code using an external queueing server, called 'xqueue'.
 
-    Expects 'xqueue' dict in ModuleSystem with the following keys that are needed by CodeResponse:
-        system.xqueue = { 'interface': XqueueInterface object,
-                          'construct_callback': Per-StudentModule callback URL
-                                          constructor, defaults to using 'score_update'
-                                          as the correct dispatch (function),
-                          'default_queuename': Default queuename to submit request (string)
-                        }
+    Expects 'xqueue' dict in LoncapaSystem with the following keys that are
+    needed by CodeResponse::
 
-    External requests are only submitted for student submission grading
-        (i.e. and not for getting reference answers)
+        capa_system.xqueue = {
+            'interface': XQueueInterface object.
+            'construct_callback': Per-StudentModule callback URL constructor,
+                defaults to using 'score_update' as the correct dispatch (function).
+            'default_queuename': Default queue name to submit request (string).
+        }
+
+    External requests are only submitted for student submission grading, not
+    for getting reference answers.
+
     """
 
     tags = ['coderesponse']
@@ -1504,8 +1507,8 @@ class CodeResponse(LoncapaResponse):
         self.url = xml.get('url', None)
 
         # We do not support xqueue within Studio.
-        if self.system.xqueue is not None:
-            default_queuename = self.system.xqueue['default_queuename']
+        if self.capa_system.xqueue is not None:
+            default_queuename = self.capa_system.xqueue['default_queuename']
         else:
             default_queuename = None
         self.queue_name = xml.get('queuename', default_queuename)
@@ -1548,7 +1551,7 @@ class CodeResponse(LoncapaResponse):
             raise Exception(err)
 
         # We do not support xqueue within Studio.
-        if self.system.xqueue is None:
+        if self.capa_system.xqueue is None:
             cmap = CorrectMap()
             cmap.set(self.answer_id, queuestate=None,
                      msg='Error checking problem: no external queueing server is configured.')
@@ -1557,16 +1560,16 @@ class CodeResponse(LoncapaResponse):
         # Prepare xqueue request
         #------------------------------------------------------------
 
-        qinterface = self.system.xqueue['interface']
+        qinterface = self.capa_system.xqueue['interface']
         qtime = datetime.strftime(datetime.now(UTC), xqueue_interface.dateformat)
 
-        anonymous_student_id = self.system.anonymous_student_id
+        anonymous_student_id = self.capa_system.anonymous_student_id
 
         # Generate header
         queuekey = xqueue_interface.make_hashkey(
-            str(self.system.seed) + qtime + anonymous_student_id + self.answer_id
+            str(self.capa_system.seed) + qtime + anonymous_student_id + self.answer_id
         )
-        callback_url = self.system.xqueue['construct_callback']()
+        callback_url = self.capa_system.xqueue['construct_callback']()
         xheader = xqueue_interface.make_xheader(
             lms_callback_url=callback_url,
             lms_key=queuekey,
@@ -1748,8 +1751,8 @@ class ExternalResponse(LoncapaResponse):
         if answer is not None:
             answer_src = answer.get('src')
             if answer_src is not None:
-                self.code = self.system.filesystem.open(
-                    'src/' + answer_src).read()
+                # TODO: this code seems not to be used any more since self.capa_system.filesystem doesn't exist.
+                self.code = self.capa_system.filesystem.open('src/' + answer_src).read()
             else:
                 self.code = answer.text
         else:
@@ -1791,7 +1794,7 @@ class ExternalResponse(LoncapaResponse):
             log.error(msg)
             raise Exception(msg)
 
-        if self.system.DEBUG:
+        if self.capa_system.DEBUG:
             log.info('response = %s', req.text)
 
         if (not req.text) or (not req.text.strip()):
@@ -1830,7 +1833,7 @@ class ExternalResponse(LoncapaResponse):
             rxml = self.do_external_request('get_score', extra_payload)
         except Exception as err:  # pylint: disable=W0703
             log.error('Error %s', err)
-            if self.system.DEBUG:
+            if self.capa_system.DEBUG:
                 cmap.set_dict(dict(zip(sorted(
                     self.answer_ids), ['incorrect'] * len(idset))))
                 cmap.set_property(
@@ -1862,7 +1865,7 @@ class ExternalResponse(LoncapaResponse):
             exans = json.loads(rxml.find('expected').text)
         except Exception as err:  # pylint: disable=W0703
             log.error('Error %s', err)
-            if self.system.DEBUG:
+            if self.capa_system.DEBUG:
                 msg = '<span class="inline-error">%s</span>' % str(
                     err).replace('<', '&lt;')
                 exans = [''] * len(self.answer_ids)
@@ -2100,7 +2103,7 @@ class SchematicResponse(LoncapaResponse):
         answer_src = answer.get('src')
         if answer_src is not None:
             # Untested; never used
-            self.code = self.system.filestore.open('src/' + answer_src).read()
+            self.code = self.capa_system.filestore.open('src/' + answer_src).read()
         else:
             self.code = answer.text
 
@@ -2114,10 +2117,10 @@ class SchematicResponse(LoncapaResponse):
             safe_exec.safe_exec(
                 self.code,
                 self.context,
-                cache=self.system.cache,
+                cache=self.capa_system.cache,
                 slug=self.id,
                 random_seed=self.context['seed'],
-                unsafely=self.system.can_execute_unsafe_code(),
+                unsafely=self.capa_system.can_execute_unsafe_code(),
             )
         except Exception as err:
             msg = 'Error %s in evaluating SchematicResponse' % err

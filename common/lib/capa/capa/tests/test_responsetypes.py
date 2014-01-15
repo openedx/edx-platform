@@ -13,7 +13,7 @@ import textwrap
 import requests
 import mock
 
-from . import new_loncapa_problem, test_system
+from . import new_loncapa_problem, test_capa_system
 import calc
 
 from capa.responsetypes import LoncapaProblemError, \
@@ -37,9 +37,9 @@ class ResponseTest(unittest.TestCase):
         if self.xml_factory_class:
             self.xml_factory = self.xml_factory_class()
 
-    def build_problem(self, system=None, **kwargs):
+    def build_problem(self, capa_system=None, **kwargs):
         xml = self.xml_factory.build_xml(**kwargs)
-        return new_loncapa_problem(xml, system=system)
+        return new_loncapa_problem(xml, capa_system=capa_system)
 
     def assert_grade(self, problem, submission, expected_correctness, msg=None):
         input_dict = {'1_2_1': submission}
@@ -1022,10 +1022,10 @@ class JavascriptResponseTest(ResponseTest):
         coffee_file_path = os.path.dirname(__file__) + "/test_files/js/*.coffee"
         os.system("node_modules/.bin/coffee -c %s" % (coffee_file_path))
 
-        system = test_system()
-        system.can_execute_unsafe_code = lambda: True
+        capa_system = test_capa_system()
+        capa_system.can_execute_unsafe_code = lambda: True
         problem = self.build_problem(
-            system=system,
+            capa_system=capa_system,
             generator_src="test_problem_generator.js",
             grader_src="test_problem_grader.js",
             display_class="TestProblemDisplay",
@@ -1040,12 +1040,12 @@ class JavascriptResponseTest(ResponseTest):
     def test_cant_execute_javascript(self):
         # If the system says to disallow unsafe code execution, then making
         # this problem will raise an exception.
-        system = test_system()
-        system.can_execute_unsafe_code = lambda: False
+        capa_system = test_capa_system()
+        capa_system.can_execute_unsafe_code = lambda: False
 
         with self.assertRaises(LoncapaProblemError):
             self.build_problem(
-                system=system,
+                capa_system=capa_system,
                 generator_src="test_problem_generator.js",
                 grader_src="test_problem_grader.js",
                 display_class="TestProblemDisplay",

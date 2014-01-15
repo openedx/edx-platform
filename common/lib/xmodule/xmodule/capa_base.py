@@ -11,7 +11,7 @@ import sys
 
 from pkg_resources import resource_string
 
-from capa.capa_problem import LoncapaProblem
+from capa.capa_problem import LoncapaProblem, LoncapaSystem
 from capa.responsetypes import StudentInputError, \
     ResponseError, LoncapaProblemError
 from capa.util import convert_files_to_filenames
@@ -260,12 +260,26 @@ class CapaMixin(CapaFields):
         if text is None:
             text = self.data
 
+        capa_system = LoncapaSystem(
+            ajax_url=self.system.ajax_url,
+            anonymous_student_id=self.system.anonymous_student_id,
+            cache=self.system.cache,
+            can_execute_unsafe_code=self.system.can_execute_unsafe_code,
+            DEBUG=self.system.DEBUG,
+            filestore=self.system.filestore,
+            node_path=self.system.node_path,
+            render_template=self.system.render_template,
+            seed=self.system.seed,      # Why do we do this if we have self.seed?
+            STATIC_URL=self.system.STATIC_URL,
+            xqueue=self.system.xqueue,
+        )
+
         return LoncapaProblem(
             problem_text=text,
             id=self.location.html_id(),
             state=state,
             seed=self.seed,
-            system=self.runtime,
+            capa_system=capa_system,
         )
 
     def get_state_for_lcp(self):
