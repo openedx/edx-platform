@@ -876,12 +876,39 @@
         });
 
         describe('getDuration', function () {
-            beforeEach(function () {
+            var oldYT;
 
+            beforeEach(function () {
+                oldYT = window.YT;
+
+                jasmine.stubRequests();
+
+                window.YT = {
+                    Player: function () {
+                        return { getDuration: function () { return 60; } };
+                    },
+                    PlayerState: oldYT.PlayerState,
+                    ready: function (callback) {
+                        callback();
+                    }
+                };
+
+                spyOn(window.YT, 'Player').andCallThrough();
+
+                initializeYouTube();
+
+                spyOn(state, 'getDuration').andCallThrough();
+                spyOn(state.videoPlayer.player, 'getDuration').andReturn(0);
+            });
+
+            afterEach(function () {
+                window.YT = oldYT;
             });
 
             it('getDuration is called as a fall-back', function () {
+                state.videoPlayer.duration();
 
+                expect(state.getDuration).toHaveBeenCalled();
             });
         });
 
