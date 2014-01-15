@@ -69,24 +69,6 @@ class MailusersTests(TestCase):
             course_id='TESTX/3/TEST3')
         cert3.save()
 
-    def test_mail_users(self):
-        """
-        Test emailing users.
-        """
-        fut = mailusers.Command().handle
-        fut()
-        self.assertEqual(
-            json.loads(self.fred.linkedin.emailed_courses), ['TESTX/1/TEST1', 'TESTX/2/TEST2'])
-        self.assertEqual(
-            json.loads(self.barney.linkedin.emailed_courses), ['TESTX/3/TEST3'])
-        self.assertEqual(len(mail.outbox), 3)
-        self.assertEqual(mail.outbox[0].from_email, settings.DEFAULT_FROM_EMAIL)
-        self.assertEqual(
-            mail.outbox[0].to, ['Fred Flintstone <fred@bedrock.gov>'])
-        self.assertEqual(
-            mail.outbox[1].to, ['Fred Flintstone <fred@bedrock.gov>'])
-        self.assertEqual(
-            mail.outbox[2].to, ['Barney Rubble <barney@bedrock.gov>'])
 
     @mock.patch.dict('django.conf.settings.LINKEDIN_API',
                      {'EMAIL_WHITELIST': ['barney@bedrock.gov']})
@@ -107,7 +89,7 @@ class MailusersTests(TestCase):
         Test sending grandfather emails.
         """
         fut = mailusers.Command().handle
-        fut(grandfather=True)
+        fut()
         self.assertEqual(
             json.loads(self.fred.linkedin.emailed_courses), ['TESTX/1/TEST1', 'TESTX/2/TEST2'])
         self.assertEqual(
@@ -127,52 +109,12 @@ class MailusersTests(TestCase):
         test that we aren't sending anything when in mock_run mode
         """
         fut = mailusers.Command().handle
-        fut(grandfather=True, mock_run=True)
+        fut(mock_run=True)
         self.assertEqual(
             json.loads(self.fred.linkedin.emailed_courses), [])
         self.assertEqual(
             json.loads(self.barney.linkedin.emailed_courses), [])
         self.assertEqual(len(mail.outbox), 0)
-
-    def test_mail_users_only_new_courses(self):
-        """
-        Test emailing users, making sure they are only emailed about new
-        certificates.
-        """
-        self.fred.linkedin.emailed_courses = json.dumps(['TESTX/1/TEST1'])
-        self.fred.linkedin.save()
-        fut = mailusers.Command().handle
-        fut()
-        fred = User.objects.get(username='fred')
-        self.assertEqual(
-            json.loads(fred.linkedin.emailed_courses), ['TESTX/1/TEST1', 'TESTX/2/TEST2'])
-        self.assertEqual(
-            json.loads(self.barney.linkedin.emailed_courses), ['TESTX/3/TEST3'])
-        self.assertEqual(len(mail.outbox), 2)
-        self.assertEqual(
-            mail.outbox[0].to, ['Fred Flintstone <fred@bedrock.gov>'])
-        self.assertEqual(
-            mail.outbox[1].to, ['Barney Rubble <barney@bedrock.gov>'])
-
-    def test_mail_users_barney_has_no_new_courses(self):
-        """
-        Test emailing users, making sure they are only emailed about new
-        certificates.
-        """
-        self.barney.linkedin.emailed_courses = json.dumps(['TESTX/3/TEST3'])
-        self.barney.linkedin.save()
-        fut = mailusers.Command().handle
-        fut()
-        fred = User.objects.get(username='fred')
-        self.assertEqual(
-            json.loads(fred.linkedin.emailed_courses), ['TESTX/1/TEST1', 'TESTX/2/TEST2'])
-        self.assertEqual(
-            json.loads(self.barney.linkedin.emailed_courses), ['TESTX/3/TEST3'])
-        self.assertEqual(len(mail.outbox), 2)
-        self.assertEqual(
-            mail.outbox[0].to, ['Fred Flintstone <fred@bedrock.gov>'])
-        self.assertEqual(
-            mail.outbox[1].to, ['Fred Flintstone <fred@bedrock.gov>'])
 
     def test_certificate_url(self):
         self.cert1.created_date = datetime.datetime(
@@ -182,8 +124,8 @@ class MailusersTests(TestCase):
         self.assertEqual(
             fut(self.cert1),
             'http://www.linkedin.com/profile/guided?'
-            'pfCertificationName=TestX%2FIntro101&pfAuthorityName=edX&'
+            'pfCertificationName=TEST1&pfAuthorityName=edX&'
             'pfAuthorityId=0000000&'
             'pfCertificationUrl=http%3A%2F%2Ftest.foo%2Ftest&pfLicenseNo=TESTX%2F1%2FTEST1&'
             'pfCertStartDate=201005&_mSplash=1&'
-            'trk=eml-prof-TESTX-1-T&startTask=CERTIFICATION_NAME&force=true')
+            'trk=eml-prof-edX-1-gf&startTask=CERTIFICATION_NAME&force=true')
