@@ -223,8 +223,8 @@ class Command(BaseCommand):
         msg = EmailMessage(subject, body, fromaddr, (toaddr,))
         msg.content_subtype = "html"
 
-        i = 0
-        while i < num_attempts:
+        i = 1
+        while i <= num_attempts:
             try:
                 msg.send()
                 return True # Happy path!

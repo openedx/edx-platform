@@ -1,10 +1,12 @@
 """
 Test email scripts.
 """
+from smtplib import SMTPDataError, SMTPServerDisconnected
 import datetime
 import json
 import mock
 
+from boto.ses.exceptions import SESIllegalAddressError, SESIdentityNotVerifiedError
 from certificates.models import GeneratedCertificate
 from django.contrib.auth.models import User
 from django.conf import settings
@@ -18,6 +20,7 @@ from student.models import UserProfile
 from xmodule.modulestore.tests.django_utils import mixed_store_config
 from linkedin.models import LinkedIn
 from linkedin.management.commands import linkedin_mailusers as mailusers
+from linkedin.management.commands.linkedin_mailusers import MAX_ATTEMPTS
 
 MODULE = 'linkedin.management.commands.linkedin_mailusers.'
 
@@ -116,6 +119,26 @@ class MailusersTests(TestCase):
             json.loads(self.barney.linkedin.emailed_courses), [])
         self.assertEqual(len(mail.outbox), 0)
 
+    def test_transaction_semantics(self):
+        fut = mailusers.Command().handle
+        with mock.patch('linkedin.management.commands.linkedin_mailusers.Command.send_grandfather_email',
+                        return_value=True, side_effect=[True, KeyboardInterrupt]):
+            try:
+                fut()
+            except KeyboardInterrupt:
+                # expect that this will be uncaught
+
+                # check that fred's emailed_courses were updated
+                self.assertEqual(
+                    json.loads(self.fred.linkedin.emailed_courses), ['TESTX/1/TEST1', 'TESTX/2/TEST2']
+                )
+
+                #check that we did not update barney
+                self.assertEqual(
+                    json.loads(self.barney.linkedin.emailed_courses), []
+                )
+
+
     def test_certificate_url(self):
         self.cert1.created_date = datetime.datetime(
             2010, 8, 15, 0, 0, tzinfo=utc)
@@ -129,3 +152,68 @@ class MailusersTests(TestCase):
             'pfCertificationUrl=http%3A%2F%2Ftest.foo%2Ftest&pfLicenseNo=TESTX%2F1%2FTEST1&'
             'pfCertStartDate=201005&_mSplash=1&'
             'trk=eml-prof-edX-1-gf&startTask=CERTIFICATION_NAME&force=true')
+
+    def assert_fred_worked(self):
+        self.assertEqual(json.loads(self.fred.linkedin.emailed_courses), ['TESTX/1/TEST1', 'TESTX/2/TEST2'])
+
+    def assert_fred_failed(self):
+        self.assertEqual(json.loads(self.fred.linkedin.emailed_courses), [])
+
+    def assert_barney_worked(self):
+        self.assertEqual(json.loads(self.barney.linkedin.emailed_courses), ['TESTX/3/TEST3'])
+
+    def assert_barney_failed(self):
+        self.assertEqual(json.loads(self.barney.linkedin.emailed_courses),[])
+
+    def test_single_email_failure(self):
+        # Test error that will immediately fail a single user, but not the run
+        with mock.patch('django.core.mail.EmailMessage.send', side_effect=[SESIllegalAddressError, None]):
+            mailusers.Command().handle()
+            # Fred should fail with a send error, but we should still run Barney
+            self.assert_fred_failed()
+            self.assert_barney_worked()
+
+    def test_limited_retry_errors_both_succeed(self):
+        errors = [
+            SMTPServerDisconnected, SMTPServerDisconnected, SMTPServerDisconnected, None,
+            SMTPServerDisconnected, None
+        ]
+        with mock.patch('django.core.mail.EmailMessage.send', side_effect=errors):
+            mailusers.Command().handle()
+            self.assert_fred_worked()
+            self.assert_barney_worked()
+
+    def test_limited_retry_errors_first_fails(self):
+        errors = (MAX_ATTEMPTS + 1) * [SMTPServerDisconnected] + [None]
+        with mock.patch('django.core.mail.EmailMessage.send', side_effect=errors):
+            mailusers.Command().handle()
+            self.assert_fred_failed()
+            self.assert_barney_worked()
+
+    def test_limited_retry_errors_both_fail(self):
+        errors = (MAX_ATTEMPTS * 2) * [SMTPServerDisconnected]
+        with mock.patch('django.core.mail.EmailMessage.send', side_effect=errors):
+            mailusers.Command().handle()
+            self.assert_fred_failed()
+            self.assert_barney_failed()
+
+    @mock.patch('time.sleep')
+    def test_infinite_retry_errors(self, sleep):
+
+        def _raise_err():
+            """Need this because SMTPDataError takes args"""
+            raise SMTPDataError("", "")
+
+        errors = (MAX_ATTEMPTS * 2) * [_raise_err] + [None, None]
+        with mock.patch('django.core.mail.EmailMessage.send', side_effect=errors):
+            mailusers.Command().handle()
+            self.assert_fred_worked()
+            self.assert_barney_worked()
+
+    def test_total_failure(self):
+        # If we get this error, we just stop, so neither user gets email.
+        errors = [SESIdentityNotVerifiedError]
+        with mock.patch('django.core.mail.EmailMessage.send', side_effect=errors):
+            mailusers.Command().handle()
+            self.assert_fred_failed()
+            self.assert_barney_failed()
