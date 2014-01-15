@@ -3,11 +3,14 @@ from fs.errors import ResourceNotFoundError
 import logging
 import os
 import sys
+from datetime import datetime
 from lxml import etree
 from path import path
+from pytz import UTC
 
 from pkg_resources import resource_string
 from xblock.fields import Scope, String, Boolean
+from xmodule.fields import Date
 from xmodule.editing_module import EditingDescriptor
 from xmodule.html_checker import check_html
 from xmodule.stringify import stringify_children
@@ -226,6 +229,12 @@ class AboutFields(object):
         help="Html contents to display for this module",
         default="",
         scope=Scope.content
+    )
+    # this exists purely to override the default start date
+    start = Date(
+        help="placeholder to make sure that About is always active",
+        default=datetime.fromtimestamp(0, UTC),
+        scope=Scope.settings,
     )
 
 
