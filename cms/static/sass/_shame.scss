@@ -1,6 +1,7 @@
 // studio - shame
-// // shame file - used for any bad-form/orphaned scss that knowingly violate edX FED architecture/standards (see - http://csswizardry.com/2013/04/shame-css/)
 // ====================
+// NOTE: use for any bad-form/orphaned scss that knowingly violate edX FED architecture/standards
+// see - http://csswizardry.com/2013/04/shame-css/
 
 // view - dashboard
 .view-dashboard {
@@ -45,12 +46,6 @@
 }
 
 // ====================
-
-// needed for poorly scoped margin rules on all content elements
-.branch .sortable-unit-list {
-  margin-bottom: 0;
-}
-
 
 // yes we have no boldness today - need to fix the resets
 body strong,

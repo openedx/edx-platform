@@ -387,7 +387,10 @@ class XmlDescriptor(XModuleDescriptor):
                 try:
                     xml_object.set(attr, val)
                 except Exception, e:
-                    logging.exception('Failed to serialize metadata attribute {0} with value {1}. This could mean data loss!!!  Exception: {2}'.format(attr, val, e))
+                    logging.exception(
+                        u'Failed to serialize metadata attribute %s with value %s in module %s. This could mean data loss!!! Exception: %s',
+                        attr, val, self.url_name, e
+                    )
                     pass
 
         for key, value in self.xml_attributes.items():

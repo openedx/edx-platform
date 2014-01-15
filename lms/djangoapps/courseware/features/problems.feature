@@ -26,6 +26,7 @@ Feature: LMS.Answer problems
         | code              |
         | radio_text        |
         | checkbox_text     |
+        | image             |
 
     Scenario: I can answer a problem incorrectly
         Given External graders respond "incorrect"
@@ -47,6 +48,7 @@ Feature: LMS.Answer problems
         | code              |
         | radio_text        |
         | checkbox_text     |
+        | image             |
 
     Scenario: I can submit a blank answer
         Given I am viewing a "<ProblemType>" problem
@@ -66,6 +68,7 @@ Feature: LMS.Answer problems
         | script            |
         | radio_text        |
         | checkbox_text     |
+        | image             |
 
 
     Scenario: I can reset a problem
@@ -97,6 +100,8 @@ Feature: LMS.Answer problems
         | radio_text        | incorrect     |
         | checkbox_text     | correct       |
         | checkbox_text     | incorrect     |
+        | image             | correct       |
+        | image             | incorrect     |
 
 
     Scenario: I can answer a problem with one attempt correctly and not reset
@@ -157,6 +162,8 @@ Feature: LMS.Answer problems
         | formula           | incorrect     | 1 point possible    | 1 point possible   |
         | script            | correct       | 2/2 points          | 2 points possible  |
         | script            | incorrect     | 2 points possible   | 2 points possible  |
+        | image             | correct       | 1/1 points          | 1 point possible   |
+        | image             | incorrect     | 1 point possible    | 1 point possible   |
 
     Scenario: I can see my score on a problem to which I submit a blank answer
         Given I am viewing a "<ProblemType>" problem
@@ -173,6 +180,7 @@ Feature: LMS.Answer problems
         | numerical         | 1 point possible   |
         | formula           | 1 point possible   |
         | script            | 2 points possible  |
+        | image             | 1 point possible   |
 
 
     Scenario: I can reset the correctness of a problem after changing my answer

@@ -1,5 +1,5 @@
 (function (requirejs, require, define) {
-define(['js/capa/drag_and_drop/logme'], function (logme) {
+define([], function () {
     return Container;
 
     function Container(state) {
@@ -16,5 +16,5 @@ define(['js/capa/drag_and_drop/logme'], function (logme) {
 
         $('#inputtype_' + state.problemId).before(state.containerEl);
     }
-}); // End-of: define(['logme'], function (logme) {
+}); // End-of: define([], function () {
 }(RequireJS.requirejs, RequireJS.require, RequireJS.define)); // End-of: (function (requirejs, require, define) {

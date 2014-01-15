@@ -13,7 +13,7 @@ import time
 
 from django.conf import settings
 from django.contrib.auth import logout, authenticate, login
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AnonymousUser
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import password_reset_confirm
 # from django.contrib.sessions.models import Session
@@ -107,7 +107,7 @@ def superuser_login_as(request, username):
 # branding/views.py:index(), which is cached for anonymous users.
 # This means that it should always return the same thing for anon
 # users. (in particular, no switching based on query params allowed)
-def index(request, extra_context={}, user=None):
+def index(request, extra_context={}, user=AnonymousUser()):
     """
     Render the edX main page.
 

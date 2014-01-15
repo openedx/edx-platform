@@ -55,12 +55,10 @@ function () {
     //     via the 'state' object. Much easier to work this way - you don't
     //     have to do repeated jQuery element selects.
     function _renderElements(state) {
-        if (!onTouchBasedDevice()) {
-            state.videoProgressSlider.el = state.videoControl.sliderEl;
+        state.videoProgressSlider.el = state.videoControl.sliderEl;
 
-            buildSlider(state);
-            _buildHandle(state);
-        }
+        buildSlider(state);
+        _buildHandle(state);
     }
 
     function _buildHandle(state) {

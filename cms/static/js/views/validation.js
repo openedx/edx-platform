@@ -1,7 +1,7 @@
-define(["backbone", "underscore", "jquery", "gettext", "js/views/feedback_notification", "js/views/feedback_alert", "jquery.smoothScroll"],
-    function(Backbone, _, $, gettext, NotificationView, AlertView) {
+define(["js/views/baseview", "underscore", "jquery", "gettext", "js/views/feedback_notification", "js/views/feedback_alert", "js/views/baseview", "jquery.smoothScroll"],
+    function(BaseView, _, $, gettext, NotificationView, AlertView) {
 
-var ValidatingView = Backbone.View.extend({
+var ValidatingView = BaseView.extend({
     // Intended as an abstract class which catches validation errors on the model and
     // decorates the fields. Needs wiring per class, but this initialization shows how
     // either have your init call this one or copy the contents

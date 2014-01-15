@@ -2,7 +2,7 @@ from xblock.fields import Scope
 
 from contentstore.utils import get_modulestore
 from xmodule.modulestore.inheritance import own_metadata
-from cms.xmodule_namespace import CmsBlockMixin
+from cms.lib.xblock.mixin import CmsBlockMixin
 
 
 class CourseMetadata(object):

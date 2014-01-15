@@ -1,4 +1,4 @@
-define ["js/models/uploads", "js/views/uploads", "js/models/chapter", "sinon"], (FileUpload, UploadDialog, Chapter, sinon) ->
+define ["js/models/uploads", "js/views/uploads", "js/models/chapter", "js/spec/create_sinon"], (FileUpload, UploadDialog, Chapter, create_sinon) ->
 
     feedbackTpl = readFixtures('system-feedback.underscore')
 
@@ -78,20 +78,18 @@ define ["js/models/uploads", "js/views/uploads", "js/models/chapter", "sinon"], 
 
         describe "Uploads", ->
             beforeEach ->
-                @requests = requests = []
-                @xhr = sinon.useFakeXMLHttpRequest()
-                @xhr.onCreate = (xhr) -> requests.push(xhr)
                 @clock = sinon.useFakeTimers()
 
             afterEach ->
-                @xhr.restore()
                 @clock.restore()
 
             it "can upload correctly", ->
+                requests = create_sinon["requests"](this)
+
                 @view.upload()
                 expect(@model.get("uploading")).toBeTruthy()
-                expect(@requests.length).toEqual(1)
-                request = @requests[0]
+                expect(requests.length).toEqual(1)
+                request = requests[0]
                 expect(request.url).toEqual("/upload")
                 expect(request.method).toEqual("POST")
 
@@ -102,14 +100,18 @@ define ["js/models/uploads", "js/views/uploads", "js/models/chapter", "sinon"], 
                 expect(@dialogResponse.pop()).toEqual("dummy_response")
 
             it "can handle upload errors", ->
+                requests = create_sinon["requests"](this)
+
                 @view.upload()
-                @requests[0].respond(500)
+                requests[0].respond(500)
                 expect(@model.get("title")).toMatch(/error/)
                 expect(@view.remove).not.toHaveBeenCalled()
 
             it "removes itself after two seconds on successful upload", ->
+                requests = create_sinon["requests"](this)
+
                 @view.upload()
-                @requests[0].respond(200, {"Content-Type": "application/json"},
+                requests[0].respond(200, {"Content-Type": "application/json"},
                         '{"response": "dummy_response"}')
                 expect(@view.remove).not.toHaveBeenCalled()
                 @clock.tick(2001)

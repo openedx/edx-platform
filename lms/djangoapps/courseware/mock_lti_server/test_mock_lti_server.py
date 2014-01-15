@@ -36,6 +36,9 @@ class MockLTIServerTest(unittest.TestCase):
         #flag for creating right callback_url
         self.server.test_mode = True
 
+        self.server.server_host = server_host
+        self.server.server_port = server_port
+
         # Start the server in a separate daemon thread
         server_thread = threading.Thread(target=self.server.serve_forever)
         server_thread.daemon = True

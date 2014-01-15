@@ -148,7 +148,14 @@ def instructor_dashboard(request, course_id):
         writer.writerow(encoded_row)
         for datarow in datatable['data']:
             # 's' here may be an integer, float (eg score) or string (eg student name)
-            encoded_row = [unicode(s).encode('utf-8') for s in datarow]
+            encoded_row = [
+                # If s is already a UTF-8 string, trying to make a unicode
+                # object out of it will fail unless we pass in an encoding to
+                # the constructor. But we can't do that across the board,
+                # because s is often a numeric type. So just do this.
+                s if isinstance(s, str) else unicode(s).encode('utf-8')
+                for s in datarow
+            ]
             writer.writerow(encoded_row)
         return response
 
@@ -563,7 +570,7 @@ def instructor_dashboard(request, course_id):
             return [u.username, u.email] + [getattr(p, x, '') for x in profkeys]
 
         datatable['data'] = [getdat(u) for u in enrolled_students]
-        datatable['title'] = _u('Student profile data for course {couse_id}').format(course_id = course_id)
+        datatable['title'] = _u('Student profile data for course {course_id}').format(course_id = course_id)
         return return_csv('profiledata_{course_id}.csv'.format(course_id = course_id), datatable)
 
     elif 'Download CSV of all responses to problem' in action:
@@ -1510,14 +1517,16 @@ def get_answers_distribution(request, course_id):
     """
     course = get_course_with_access(request.user, course_id, 'staff')
 
-    dist = grades.answer_distributions(request, course)
+    dist = grades.answer_distributions(course.id)
 
     d = {}
     d['header'] = ['url_name', 'display name', 'answer id', 'answer', 'count']
 
-    d['data'] = [[url_name, display_name, answer_id, a, answers[a]]
-                 for (url_name, display_name, answer_id), answers in dist.items()
-                 for a in answers]
+    d['data'] = [
+        [url_name, display_name, answer_id, a, answers[a]]
+        for (url_name, display_name, answer_id), answers in sorted(dist.items())
+        for a in answers
+    ]
     return d
 
 

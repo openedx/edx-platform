@@ -4,7 +4,7 @@ from lxml import etree
 from pkg_resources import resource_string
 
 from xmodule.raw_module import RawDescriptor
-from .x_module import XModule
+from .x_module import XModule, module_attr
 from xblock.fields import Integer, Scope, String, List, Float, Boolean
 from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import CombinedOpenEndedV1Module, CombinedOpenEndedV1Descriptor
 from collections import namedtuple
@@ -510,3 +510,7 @@ class CombinedOpenEndedDescriptor(CombinedOpenEndedFields, RawDescriptor):
         non_editable_fields.extend([CombinedOpenEndedDescriptor.due, CombinedOpenEndedDescriptor.graceperiod,
                                     CombinedOpenEndedDescriptor.markdown, CombinedOpenEndedDescriptor.version, CombinedOpenEndedDescriptor.track_changes])
         return non_editable_fields
+
+    # Proxy to CombinedOpenEndedModule so that external callers don't have to know if they're working
+    # with a module or a descriptor
+    child_module = module_attr('child_module')

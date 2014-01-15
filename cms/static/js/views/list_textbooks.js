@@ -1,6 +1,6 @@
-define(["backbone", "underscore", "jquery", "js/views/edit_textbook", "js/views/show_textbook"],
-        function(Backbone, _, $, EditTextbookView, ShowTextbookView) {
-    var ListTextbooks = Backbone.View.extend({
+define(["js/views/baseview", "underscore", "jquery", "js/views/edit_textbook", "js/views/show_textbook"],
+        function(BaseView, _, $, EditTextbookView, ShowTextbookView) {
+    var ListTextbooks = BaseView.extend({
         initialize: function() {
             this.emptyTemplate = _.template($("#no-textbooks-tpl").text());
             this.listenTo(this.collection, 'all', this.render);

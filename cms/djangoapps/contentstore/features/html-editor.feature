@@ -1,4 +1,4 @@
-@shard_3
+@shard_2
 Feature: CMS.HTML Editor
   As a course author, I want to be able to create HTML blocks.
 

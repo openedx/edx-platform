@@ -129,9 +129,13 @@ and that file is named `{course-url_name}.json`.  As you might expect, this file
         }
     }
 
-The policy specifies metadata about the content elements -- things which are not inherent to the definition of the content, but which describe how the content is presented to the user and used in the course.  See below for a full list of metadata attributes; as the example shows, they include `display_name`, which is what is shown when this piece of content is referenced or shown in the courseware, and various dates and times, like `start`, which specifies when the content becomes visible to students, and various problem-specific parameters like the allowed number of attempts.  One important point is that some metadata is inherited: for example, specifying the start date on the course makes it the default for every element in the course.  See below for more details.
+The policy specifies metadata about the content elements -- things which are not inherent to the definition of the content, but which describe how the content is presented to the user and used in the course.  
+See below for a full list of metadata attributes; as the example shows, they include `display_name`, which is what is shown when this piece of content is referenced or shown in the courseware, and various dates and times, like `start`, which specifies when the content becomes visible to students, and various problem-specific parameters like the allowed number of attempts.  
+One important point is that some metadata is inherited: for example, specifying the start date on the course makes it the default for every element in the course.  
+See below for more details.
 
-It is possible to put metadata directly in the XML, as attributes of the appropriate tag, but using a policy file has two benefits: it puts all the policy in one place, making it easier to check that things like due dates are set properly, and it allows the content definitions to be easily used in another run of the same course, with the same or similar content, but different policy.
+It is possible to put metadata directly in the XML, as attributes of the appropriate tag, but using a policy file has two benefits: 
+it puts all the policy in one place, making it easier to check that things like due dates are set properly, and it allows the content definitions to be easily used in another run of the same course, with the same or similar content, but different policy.
 
 Roots
 =====
@@ -346,7 +350,7 @@ Supported fields at the course level
      * - `tabs`
        - have custom tabs in the courseware.  See below for details on config.
      * - `discussion_blackouts`
-       - An array of time intervals during which you want to disable a student's ability to create or edit posts in the forum. Moderators, Community TAs, and Admins are unaffected. You might use this during exam periods, but please be aware that the forum is often a very good place to catch mistakes and clarify points to students. The better long term solution would be to have better flagging/moderation mechanisms, but this is the hammer we have today. Format by example: `[["2012-10-29T04:00", "2012-11-03T04:00"], ["2012-12-30T04:00", "2013-01-02T04:00"]]`
+       - An array of time intervals during which you want to disable a student's ability to create or edit posts in the forum. Moderators, Community TAs, and Admins are unaffected. You might use this during exam periods, but please be aware that the forum is often a very good place to catch mistakes and clarify points to students. The better long term solution would be to have better flagging/moderation mechanisms, but this is the hammer we have today. Format by example: `[[""2012-10-29T04:00", "2012-11-03T04:00"], ["2012-12-30T04:00", "2013-01-02T04:00"]]`
      * - `show_calculator`
        - (value "Yes" if desired)
      * - `days_early_for_beta`

@@ -99,3 +99,7 @@ class AccessTestCase(TestCase):
 
         # TODO:
         # Non-staff cannot enroll outside the open enrollment period if not specifically allowed
+
+    def test__user_passed_as_none(self):
+        """Ensure has_access handles a user being passed as null"""
+        access.has_access(None, 'global', 'staff', None)

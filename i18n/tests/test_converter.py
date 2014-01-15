@@ -3,7 +3,7 @@ from unittest import TestCase
 
 import converter
 
-class UpcaseConverter (converter.Converter):
+class UpcaseConverter(converter.Converter):
     """
     Converts a string to uppercase. Just used for testing.
     """
@@ -22,7 +22,7 @@ class TestConverter(TestCase):
         Assert that embedded HTML and python tags are not converted.
         """
         c = UpcaseConverter()
-        test_cases = (
+        test_cases = [
             # no tags
             ('big bad wolf', 'BIG BAD WOLF'),
             # one html tag
@@ -36,7 +36,11 @@ class TestConverter(TestCase):
             # both kinds of tags
             ('<strong>big</strong> %(adjective)s %(noun)s',
              '<strong>BIG</strong> %(adjective)s %(noun)s'),
-            )
-        for (source, expected) in test_cases:
+            # .format-style tags
+            ('The {0} barn is {1!r}.', 'THE {0} BARN IS {1!r}.'),
+            # HTML entities
+            ('<b>&copy; 2013 edX, &#xa0;</b>', '<b>&copy; 2013 EDX, &#xa0;</b>'),
+        ]
+        for source, expected in test_cases:
             result = c.convert(source)
             self.assertEquals(result, expected)

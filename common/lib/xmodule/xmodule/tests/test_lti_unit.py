@@ -99,7 +99,8 @@ class LTIModuleTest(LogicTest):
             'action': action
         }
 
-    def test_authorization_header_not_present(self):
+    @patch('xmodule.lti_module.LTIModule.get_client_key_secret', return_value=('test_client_key', u'test_client_secret'))
+    def test_authorization_header_not_present(self, get_key_secret):
         """
         Request has no Authorization header.
 
@@ -112,14 +113,15 @@ class LTIModuleTest(LogicTest):
         expected_response = {
             'action': None,
             'code_major': 'failure',
-            'description': 'OAuth verification error.',
+            'description': 'OAuth verification error: Malformed authorization header',
             'messageIdentifier': self.DEFAULTS['messageIdentifier'],
         }
 
         self.assertEqual(response.status_code, 200)
         self.assertDictEqual(expected_response, real_response)
 
-    def test_authorization_header_empty(self):
+    @patch('xmodule.lti_module.LTIModule.get_client_key_secret', return_value=('test_client_key', u'test_client_secret'))
+    def test_authorization_header_empty(self, get_key_secret):
         """
         Request Authorization header has no value.
 
@@ -133,7 +135,7 @@ class LTIModuleTest(LogicTest):
         expected_response = {
             'action': None,
             'code_major': 'failure',
-            'description': 'OAuth verification error.',
+            'description': 'OAuth verification error: Malformed authorization header',
             'messageIdentifier': self.DEFAULTS['messageIdentifier'],
         }
         self.assertEqual(response.status_code, 200)
@@ -171,7 +173,7 @@ class LTIModuleTest(LogicTest):
         expected_response = {
             'action': None,
             'code_major': 'failure',
-            'description': 'Request body XML parsing error.',
+            'description': 'Request body XML parsing error: score value outside the permitted range of 0-1.',
             'messageIdentifier': 'unknown',
         }
         self.assertEqual(response.status_code, 200)
@@ -189,7 +191,7 @@ class LTIModuleTest(LogicTest):
         expected_response = {
             'action': None,
             'code_major': 'failure',
-            'description': 'Request body XML parsing error.',
+            'description': 'Request body XML parsing error: invalid literal for float(): 0,5',
             'messageIdentifier': 'unknown',
         }
         self.assertEqual(response.status_code, 200)

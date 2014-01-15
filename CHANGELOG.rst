@@ -5,9 +5,31 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Studio: Added pagination to the Files & Uploads page.
+
+Blades: Video player improvements:
+  - Disable edX controls on iPhone/iPod (native controls are used).
+  - Disable unsupported controls (volume, playback rate) on iPad/Android.
+  - Controls becomes visible after click on video or play placeholder to avoid
+    issues with YouTube API on iPad/Android.
+  - Captions becomes visible just after full initialization of video player.
+  - Fix blinking of captions after initialization of video player. BLD-206.
+
+LMS: Fix answer distribution download for small courses. LMS-922, LMS-811
+
+Blades: Add template for the zooming image in studio. BLD-206.
+
+Blades: Update behavior of start/end time fields. BLD-506.
+
 Blades: Make LTI module not send grade_back_url if has_score=False. BLD-561.
+
+Blades: Show answer for imageresponse. BLD-21.
+
 Blades: LTI additional Python tests. LTI must use HTTPS for
 lis_outcome_service_url. BLD-564.
+
+Studio: Enable Terms of Service and Privacy Policy links to be served by
+  an alternate site. STUD-151.
 
 Blades: Fix bug when Image mapping problems are not working for students in IE. BLD-413.
 

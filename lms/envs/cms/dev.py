@@ -22,12 +22,6 @@ FEATURES['ENABLE_LMS_MIGRATION'] = False
 
 META_UNIVERSITIES = {}
 
-DOC_STORE_CONFIG = {
-    'host': 'localhost',
-    'db': 'xmodule',
-    'collection': 'modulestore',
-}
-
 modulestore_options = {
     'default_class': 'xmodule.raw_module.RawDescriptor',
     'fs_root': DATA_DIR,

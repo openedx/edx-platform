@@ -29,9 +29,11 @@
     <h2> ${_("Grade Reports")}</h2>
 
   %if settings.FEATURES.get('ALLOW_COURSE_STAFF_GRADE_DOWNLOADS') or section_data['access']['admin']:
-    <p>${_("The following button will generate a CSV grade report for all currently enrolled students. For large courses, generating this report may take a few hours.")}</p>
+    <p>${_("The following button will generate a CSV grade report for all currently enrolled students.  Generated reports appear in a table below and can be downloaded.")}</p>
 
-    <p>${_("The report is generated in the background, meaning it is OK to navigate away from this page while your report is generating. Generated reports appear in a table below and can be downloaded.")}</p>
+    <p>${_("For large courses, generating this report may take several hours. Please be patient and do not click the button multiple times. Clicking the button multiple times will significantly slow the grade generation process.")}</p>
+
+    <p>${_("The report is generated in the background, meaning it is OK to navigate away from this page while your report is generating.")}</p>
 
     <div class="request-response msg msg-confirm copy" id="grade-request-response"></div>
     <div class="request-response-error msg msg-warning copy" id="grade-request-response-error"></div>
@@ -41,7 +43,7 @@
   %endif
 
     <p><b>${_("Reports Available for Download")}</b></p>
-    <p>${_("File links are generated on demand and expire within 5 minutes due to the sensitive nature of student grade information. Please note that the report filename contains a timestamp that represents when your file was generated; this timestamp is UTC, not your local timezone.")}</p><br>
+    <p>${_("Unique, new file links for the CSV reports are generated on each visit to this page. These unique links expire within 5 minutes, due to the sensitive nature of student grade information. Please note that the report filename contains a timestamp that represents when your file was generated; this timestamp is UTC, not your local timezone.")}</p><br>
     <div class="grade-downloads-table" id="grade-downloads-table" data-endpoint="${ section_data['list_grade_downloads_url'] }" ></div>
   </div>
 %endif
