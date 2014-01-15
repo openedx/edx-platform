@@ -1,4 +1,5 @@
 <%! from django.utils.translation import ugettext as _ %>
+<%! from django.template.defaultfilters import escapejs %>
 <%! from django_comment_client.permissions import has_permission %>
 
 <script type="text/template" id="thread-template">
@@ -6,7 +7,7 @@
         <div class="thread-content-wrapper"></div>
 
         <ol class="responses">
-            <li class="loading"><div class="loading-animation"><span class="sr">Loading content</span></div></li>
+            <li class="loading"><div class="loading-animation"><span class="sr">${_('Loading content')}</span></div></li>
         </ol>
         <div class="post-status-closed bottom-post-status" style="display: none">
           ${_("This thread is closed.")}
@@ -31,20 +32,21 @@
       <div class="group-visibility-label">${"<%- obj.group_string%>"}</div>
               ${"<% }  %>"}
 
-          <a href="#" class="vote-btn" data-tooltip="vote" role="button" aria-pressed="false">
-          <span class="plus-icon"/><span class='votes-count-number'>${'<%- votes["up_count"] %>'}</span> <span class="sr">votes (click to vote)</span></a>
+          <a href="#" class="vote-btn" role="button" aria-pressed="false"><!-- DiscussionContentView.renderVote populates this --></a>
           <h1>${'<%- title %>'}</h1>
           <p class="posted-details">
               ${"<% if (obj.username) { %>"}
-              <a href="${'<%- user_url %>'}" class="username">${'<%- username %>'}</a>
-              ${"<% } else {print('anonymous');} %>"}
+              <a href="${'<%- user_url %>' | u}" class="username">${'<%- username %>'}</a>
+              ${"<% } else { %>"}
+              ${_('anonymous') | h}
+              ${"<% } %>"}
               <span class="timeago" title="${'<%- created_at %>'}">${'<%- created_at %>'}</span>
 
               <span class="post-status-closed top-post-status" style="display: none">
                 ${_("&bull; This thread is closed.")}
               </span>
           </p>
-          <a href="javascript:void(0)" class="dogear action-follow" data-tooltip="follow" role="checkbox" aria-checked="false">
+          <a href="javascript:void(0)" class="dogear action-follow" data-tooltip="${_('follow') | h}" role="checkbox" aria-checked="false">
             <span class="sr">${_("Follow this post")}</span>
           </a>
       </header>
@@ -55,21 +57,26 @@
 
 
       % if course and has_permission(user, 'openclose_thread', course.id):
-      <div class="admin-pin discussion-pin notpinned" data-role="thread-pin" data-tooltip="pin this thread">
+      <div class="admin-pin discussion-pin notpinned" data-role="thread-pin" data-tooltip="${_('pin this thread') | h}">
       <i class="icon icon-pushpin"></i><span class="pin-label">${_("Pin Thread")}</span></div>
 
       %else:
       ${"<% if (pinned) { %>"}
-      <div class="discussion-pin notpinned" data-role="thread-pin" data-tooltip="pin this thread">
+      <div class="discussion-pin notpinned" data-role="thread-pin" data-tooltip="${_('pin this thread') | h}">
       <i class="icon icon-pushpin"></i><span class="pin-label">${_("Pin Thread")}</span></div>
       ${"<% }  %>"}
       % endif
 
-
+      <%  js_block = u"""
+          var courseware_link = interpolate('<a href="%s">%s</a>', [courseware_url, _.escape(courseware_title)]);
+          print(interpolate('{}', {{'courseware_title_linked': courseware_link}}));
+          """.format(
+                  ## Translators: 'courseware_title_linked' is a placeholder for the title of the courseware unit referenced by this discussion thread.
+                  escapejs(_("(this post is about %(courseware_title_linked)s)"))
+              )
+      %>
       ${'<% if (obj.courseware_url) { %>'}
-      <div class="post-context">
-          (this post is about <a href="${'<%- courseware_url%>'}">${'<%- courseware_title %>'}</a>)
-      </div>
+          <div class="post-context">${'<%'}${js_block}${'%>'}</div>
       ${'<% } %>'}
 
       <ul class="moderator-actions">
@@ -86,12 +93,12 @@
     <ul class="edit-post-form-errors"></ul>
     <div class="form-row">
       <label class="sr" for="edit-post-title">${_("Edit post title")}</label>
-      <input type="text" id="edit-post-title" class="edit-post-title" name="title" value="${"<%-title %>"}" placeholder="Title">
+      <input type="text" id="edit-post-title" class="edit-post-title" name="title" value="${"<%-title %>"}" placeholder="${_('Title') | h}">
     </div>
     <div class="form-row">
       <div class="edit-post-body" name="body">${"<%- body %>"}</div>
     </div>
-    <input type="submit" id="edit-post-submit" class="post-update" value="${_("Update post")}">
+    <input type="submit" id="edit-post-submit" class="post-update" value="${_("Update post") | h}">
     <a href="#" class="post-cancel">${_("Cancel")}</a>
   </div>
 </script>
@@ -105,7 +112,7 @@
                 <ul class="discussion-errors"></ul>
                 <label class="sr" for="add-new-comment">${_("Add a comment")}</label>
                 <div class="comment-body" id="add-new-comment" data-id="${'<%- wmdId %>'}"
-                data-placeholder="Add a comment..."></div>
+                data-placeholder="${_('Add a comment...') | h}"></div>
                 <div class="comment-post-control">
                     <a class="discussion-submit-comment control-button" href="#">${_("Submit")}</a>
                 </div>
@@ -117,11 +124,13 @@
 
 <script type="text/template" id="thread-response-show-template">
     <header class="response-local">
-        <a href="#" class="vote-btn" data-tooltip="vote" role="button" aria-pressed="false"><span class="plus-icon"/><span class="votes-count-number">${"<%- votes['up_count'] %>"}</span> <span class="sr">votes (click to vote)</span></a>
-        <a href="javascript:void(0)" class="endorse-btn${'<% if (endorsed) { %> is-endorsed<% } %>'} action-endorse" style="cursor: default; display: none;" data-tooltip="endorse"><span class="check-icon" style="pointer-events: none; "></span></a>
+        <a href="#" class="vote-btn" role="button" aria-pressed="false"><!-- DiscussionContentView.renderVote() populates this --></a>
+        <a href="javascript:void(0)" class="endorse-btn action-endorse" style="cursor: default; display: none;" data-tooltip="${_('endorse') | h}"><span class="check-icon" style="pointer-events: none; "></span></a>
         ${"<% if (obj.username) { %>"}
         <a href="${'<%- user_url %>'}" class="posted-by">${'<%- username %>'}</a>
-        ${"<% } else {print('<span class=\"anonymous\"><em>anonymous</em></span>');} %>"}
+        ${"<% } else { %>"}
+        <span class="anonymous"><em>${_('anonymous')}</em></span>
+        ${"<% } %>"}
         <p class="posted-details" title="${'<%- created_at %>'}">${'<%- created_at %>'}</p>
     </header>
     <div class="response-local"><div class="response-body">${"<%- body %>"}</div>
@@ -142,7 +151,7 @@
     <div class="form-row">
       <div class="edit-post-body" name="body">${"<%- body %>"}</div>
     </div>
-    <input type="submit" id="edit-response-submit"class="post-update" value="${_("Update response")}">
+    <input type="submit" id="edit-response-submit"class="post-update" value="${_("Update response") | h}">
     <a href="#" class="post-cancel">${_("Cancel")}</a>
   </div>
 </script>
@@ -150,12 +159,26 @@
 <script type="text/template" id="response-comment-show-template">
   <div id="comment_${'<%- id %>'}">
     <div class="response-body">${'<%- body %>'}</div>
-    <div class="discussion-flag-abuse notflagged" data-role="thread-flag" data-tooltip="${_('Report Misuse')}" role="button" aria-pressed="false" tabindex="0">
+    <div class="discussion-flag-abuse notflagged" data-role="thread-flag" data-tooltip="${_('Report Misuse') | h}" role="button" aria-pressed="false" tabindex="0">
       <i class="icon icon-flag"></i><span class="sr flag-label">${_("Report Misuse")}</span></div>
-    <p class="posted-details">&ndash;posted <span class="timeago" title="${'<%- created_at %>'}">${'<%- created_at %>'}</span> by
-        ${"<% if (obj.username) { %>"}
-        <a href="${'<%- user_url %>'}" class="profile-link">${'<%- username %>'}</a>
-        ${"<% } else {print('anonymous');} %>"}
+      <% 
+      js_block = u"""
+        interpolate(
+          '{}',
+          {{'time_ago': '<span class=\"timeago\" title=\"' + created_at + '\">' + created_at + '</span>'}},
+          true
+          )""".format(
+                 ## Translators: 'timeago' is a placeholder for a fuzzy, relative timestamp (see: https://github.com/rmm5t/jquery-timeago) 
+                 escapejs(_('-posted %(time_ago)s by'))
+               )
+             %>
+      <p class="posted-details">
+      ${'<%='}${js_block}${'%>'}
+      ${"<% if (obj.username) { %>"}
+      <a href="${'<%- user_url %>'}" class="profile-link">${'<%- username %>'}</a>
+      ${"<% } else { %>"}
+      ${_('anonymous')}
+      ${"<% } %>"}
     </p>
   </div>
 </script>
@@ -163,62 +186,94 @@
 <script type="text/template" id="thread-list-item-template">
     <a href="${'<%- id %>'}" data-id="${'<%- id %>'}">
         <span class="title">${"<%- title %>"}</span>
-        ${"<% if (unread_comments_count > 0) { %>"}
-            <span class="comments-count unread" data-tooltip="${"<%- unread_comments_count %>"} new comment${"<%- unread_comments_count > 1 ? 's' : '' %>"}">${"<%- comments_count %>"} <span class="sr">comments (${"<%- unread_comments_count %>"} unread comments)</span></span>
-        ${"<% } else { %>"}
-            <span class="comments-count">${"<%- comments_count %>"}<span class="sr">comments</span></span>
-        ${"<% } %>"}
-        <span class="votes-count">+${"<%- votes['up_count'] %>"}<span class="sr">votes</span></span>
+        <% 
+        js_block =  u"""
+        var fmt; 
+        var data = {{
+            'span_sr_open': '<span class=\"sr\">',
+            'span_close': '</span>',
+            'unread_comments_count': unread_comments_count,
+            'comments_count': comments_count
+            }};
+        if (unread_comments_count > 0) {{
+            fmt = '{markup_with_unread}';
+        }} else {{
+            fmt = '{markup_none_unread}';
+        }}
+        print(interpolate(fmt, data, true));
+        """.format(
+                ## Translators: 'comments_count' and 'unread_comments_count' are numerical placeholders for a specific discussion thread; 'span_*' placeholders refer to HTML markup.  Please translate the word 'comments'.
+                markup_with_unread=escapejs(_('%(comments_count)s %(span_sr_open)scomments (%(unread_comments_count)s unread comments)%(span_close)s')),
+                ## Translators: 'comments_count' is a numerical placeholder for a specific discussion thread; 'span_*' placeholders refer to HTML markup.  Please translate the word 'comments'.
+                markup_none_unread=escapejs(_('%(comments_count)s %(span_sr_open)scomments %(span_close)s'))
+            )
+        %>
+        <span class="comments-count">
+            ${'<%'}${js_block}${'%>'}
+        </span>
+        <% 
+        js_block = u"""
+            interpolate(
+                '{}',
+                {{'span_sr_open': '<span class=\"sr\">', 'span_close': '</span>', 'votes_up_count': votes['up_count']}},
+                true
+                )
+        """.format(
+                ## Translators: 'votes_up_count' is a numerical placeholder for a specific discussion thread; 'span_*' placeholders refer to HTML markup.  Please translate the word 'votes'.
+                escapejs( _('%(votes_up_count)s%(span_sr_open)s votes %(span_close)s'))
+            )
+        %>
+        <span class="votes-count">+${'<%='}${js_block}${'%>'}</span>
     </a>
 </script>
 <script type="text/template" id="discussion-home">
   <div class="discussion-article blank-slate">
   <section class="home-header">
-  <span class="label">DISCUSSION HOME:</span>
+  <span class="label">${_("DISCUSSION HOME:")}</span>
   % if course and course.display_name_with_default:
   <h1 class="home-title">${course.display_name_with_default}</h1>
   </section>
 
   % if settings.FEATURES.get('ENABLE_DISCUSSION_HOME_PANEL'):
-  <span class="label label-settings">HOW TO USE EDX DISCUSSIONS</span>
+  <span class="label label-settings">${_("HOW TO USE EDX DISCUSSIONS")}</span>
   <table class="home-helpgrid">
   <tr class="helpgrid-row helpgrid-row-navigation">
-  <td class="row-title">Find discussions</td>
+  <td class="row-title">${_("Find discussions")}</td>
   <td class="row-item">
   <i class="icon icon-reorder"></i>
-  <span class="row-description">Focus in on specific topics</span>
+  <span class="row-description">${_("Focus in on specific topics")}</span>
   </td>
   <td class="row-item">
   <i class="icon icon-search"></i>
-  <span class="row-description">Search for specific posts </span>
+  <span class="row-description">${_("Search for specific posts ")}</span>
   </td>
   <td class="row-item">
   <i class="icon icon-sort"></i>
-  <span class="row-description">Sort by date, vote, or comments </span>
+  <span class="row-description">${_("Sort by date, vote, or comments")}</span>
   </td>
   </tr>
   <tr class="helpgrid-row helpgrid-row-participation">
-  <td class="row-title">Engage with posts</td>
+  <td class="row-title">${_("Engage with posts")}</td>
   <td class="row-item">
   <i class="icon icon-plus"></i>
-  <span class="row-description">Upvote posts and good responses</span>
+  <span class="row-description">${_("Upvote posts and good responses")}</span>
   </td>
   <td class="row-item">
   <i class="icon icon-flag"></i>
-  <span class="row-description">Report Forum Misuse</span>
+  <span class="row-description">${_("Report Forum Misuse")}</span>
   </td>
   <td class="row-item">
   <i class="icon icon-star"></i>
-  <span class="row-description">Follow posts for updates</span>
+  <span class="row-description">${_("Follow posts for updates")}</span>
   </td>
   </tr>
   <tr class="helpgrid-row helpgrid-row-notification">
-  <td class="row-title">Receive updates</td>
+  <td class="row-title">${_('Receive updates')}</td>
   <td class="row-item-full" colspan="3">
   <label class="sr" for="email-setting-checkbox">${_("Toggle Notifications Setting")}</label>
   <input type="checkbox" id="email-setting-checkbox" class="email-setting" name="email-notification"/>
   <i class="icon icon-envelope"></i>
-  <span class="row-description"> If enabled, you will receive an email digest once a day notifying you about new, unread activity from posts you are following. </span>
+  <span class="row-description">${_("If enabled, you will receive an email digest once a day notifying you about new, unread activity from posts you are following.")}</span>
   </td>
   </tr>
   </table>
