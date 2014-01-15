@@ -44,7 +44,8 @@ except IOError:
 USE_CUSTOM_THEME = False
 
 if env_data:
-    USE_CUSTOM_THEME = 'THEME_NAME' in env_data and env_data['THEME_NAME'] != ''
+    if 'FEATURES' in env_data and 'USE_CUSTOM_THEME' in env_data['FEATURES']:
+        USE_CUSTOM_THEME = env_data['FEATURES']['USE_CUSTOM_THEME']
 
     if USE_CUSTOM_THEME:
         THEME_NAME = env_data['THEME_NAME']
@@ -56,14 +57,13 @@ MINIMAL_DARWIN_NOFILE_LIMIT = 8000
 
 def xmodule_cmd(watch=False, debug=False):
     xmodule = 'xmodule_assets common/static/xmodule'
-    if watch:
 
-        xmodule = "watchmedo shell-command " + \
-                  " --patterns='*.js;*.coffee;*.sass;*.scss;*.css' " + \
-                  " --recursive " + \
-                  " --command=\'xmodule_assets common/static/xmodule\'" + \
-                  " --wait " + \
-                  " common/lib/xmodule"
+    if watch:
+        xmodule = ("watchmedo shell-command "
+                   " --patterns='*.js;*.coffee;*.sass;*.scss;*.css' "
+                   " --recursive --command=\'xmodule_assets common/static/xmodule\'"
+                   " --wait common/lib/xmodule"
+                   )
 
     return xmodule
 
@@ -97,15 +97,24 @@ def coffee_cmd(watch=False):
 
 
 def sass_cmd(watch=False, debug=False):
-    sass_load_paths = ["./common/static/sass"]
-    sass_watch_paths = ["*/static"]
-    if USE_CUSTOM_THEME:
-        sass_load_paths.append(THEME_SASS)
-        sass_watch_paths.append(THEME_SASS)
+    load_paths = ["./common/static/sass"]
+    watch_paths = ["*/static"]
 
-    return 'sass ' + ('--debug-info' if debug else '--style=compressed ') + \
-           ' --load-path=' + ' '.join(sass_load_paths) + \
-           (' --watch' if watch else ' --update') + ' -E utf-8 ' + ' '.join(sass_watch_paths)
+    if USE_CUSTOM_THEME:
+        load_paths.append(THEME_SASS)
+        watch_paths.append(THEME_SASS)
+
+    load_paths = ' '.join(load_paths)
+    watch_paths = ' '.join(watch_paths)
+
+    debug_info = '--debug-info' if debug else '--style=compressed '
+    watch_or_update = '--watch' if watch else '--update'
+
+    cmd = ('sass {debug_info} --load-path={load_paths} {watch_or_update} -E utf-8 {watch_paths}'.format(
+           debug_info=debug_info, load_paths=load_paths, watch_or_update=watch_or_update, watch_paths=watch_paths)
+           )
+
+    return cmd
 
 
  # This task takes arguments purely to pass them via dependencies to the preprocess task
@@ -119,7 +128,7 @@ def sass_cmd(watch=False, debug=False):
 ])
 def compile_coffeescript(options):
     """
-       Runs coffeescript
+    Runs coffeescript
     """
 
     system = getattr(options, 'system', 'lms')
@@ -157,7 +166,7 @@ def compile_coffeescript(options):
 ])
 def compile_xmodule(options):
     """
-       Runs xmodule_cmd
+    Runs xmodule_cmd
     """
 
     system = getattr(options, 'system', 'lms')
@@ -188,7 +197,7 @@ def compile_xmodule(options):
 ])
 def compile_sass(options):
     """
-       Runs sass
+    Runs sass
     """
 
     system = getattr(options, 'system', 'lms')
@@ -217,7 +226,7 @@ def compile_sass(options):
 ])
 def collectstatic(options):
     """
-       Runs collectstatic
+    Runs collectstatic
     """
 
     system = getattr(options, 'system', 'lms')
@@ -248,7 +257,7 @@ def collectstatic(options):
 ])
 def compile_assets(options):
     """
-       Runs coffeescript, sass and xmodule_cmd and then optionally collectstatic
+    Runs coffeescript, sass and xmodule_cmd and then optionally collectstatic
     """
 
     system = getattr(options, 'system', 'lms')

@@ -58,7 +58,9 @@ def show_docs(options):
 
     path = paths.get(type, "docs/developers")
 
-    webbrowser.open('file://%s/%s' % (assets.REPO_ROOT, path) + '/build/html/index.html')
+    webbrowser.open('file://{root}/{path}/build/html/index.html'.format(
+                    root=assets.REPO_ROOT, path=path)
+                    )
 
 
 @task

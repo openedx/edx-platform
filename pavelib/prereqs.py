@@ -26,7 +26,6 @@ def install_prereqs():
     install_ruby_prereqs()
     install_node_prereqs()
     install_python_prereqs()
-    pass
 
 
 @task
@@ -64,7 +63,7 @@ def install_python_prereqs():
     if prereqs_cache.is_changed('requirements_prereqs', requirements, [site_packages_dir]):
         req_files = ["requirements/edx/pre.txt", "requirements/edx/base.txt", "requirements/edx/post.txt"]
         for req_file in req_files:
-            sh("pip install -q -r --exists-action w {req_file}".format(req_file=req_file))
+            sh("pip install -q --exists-action w -r {req_file}".format(req_file=req_file))
 
         # requirements/private.txt is used to install our libs as
         # working dirs, or for personal-use tools.

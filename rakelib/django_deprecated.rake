@@ -6,7 +6,6 @@ def deprecated(deprecated, deprecated_by)
 
     task deprecated, [:arg1, :arg2, :arg3, :arg4] do |t,args|
 
-        puts("#{deprecated}")
         if deprecated == "cms" or deprecated == "lms"
             args.with_defaults(:arg1 => "dev", :arg2 => "")
             port = args.arg2 == "" ? "" : "--port=#{args.arg2}"

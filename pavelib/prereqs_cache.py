@@ -4,11 +4,7 @@ import errno
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 
-try:
-    PREREQS_MD5_DIR = os.environ['PREREQ_CACHE_DIR']
-except KeyError:
-    PREREQS_MD5_DIR = os.path.join(REPO_ROOT, '.prereqs_cache')
-
+PREREQS_MD5_DIR = os.getenv('PREREQ_CACHE_DIR', os.path.join(REPO_ROOT, '.prereqs_cache'))
 
 def get_files(dir):
 
