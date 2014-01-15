@@ -651,7 +651,7 @@ class CombinedOpenEndedV1Module():
                 last_post_evaluation = task.format_feedback_with_evaluation(self.system, last_post_assessment)
             last_post_assessment = last_post_evaluation
             try:
-                rubric_data = task._parse_score_msg(task.child_history[-1].get('post_assessment', ""), self.system)
+                rubric_data = task._parse_score_msg(task.child_history[-1].get('post_assessment', "{}"), self.system)
             except Exception:
                 log.debug("Could not parse rubric data from child history.  "
                           "Likely we have not yet initialized a previous step, so this is perfectly fine.")
