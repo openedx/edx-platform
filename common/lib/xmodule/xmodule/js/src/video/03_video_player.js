@@ -60,7 +60,7 @@ function (HTML5Video, Resizer) {
     //     via the 'state' object. Much easier to work this way - you don't
     //     have to do repeated jQuery element selects.
     function _initialize(state) {
-        var youTubeId, player;
+        var youTubeId, player, duration;
 
         // The function is called just once to apply pre-defined configurations
         // by student before video starts playing. Waits until the video's
@@ -134,11 +134,20 @@ function (HTML5Video, Resizer) {
 
                 _resize(state, videoWidth, videoHeight);
 
+                duration = state.videoPlayer.duration();
+
                 state.trigger(
                     'videoControl.updateVcrVidTime',
                     {
                         time: 0,
-                        duration: state.videoPlayer.duration()
+                        duration: duration
+                    }
+                );
+
+                state.trigger(
+                    'videoProgressSlider.updateStartEndTimeRegion',
+                    {
+                        duration: duration
                     }
                 );
             }, false);
@@ -167,10 +176,11 @@ function (HTML5Video, Resizer) {
 
                 _resize(state, videoWidth, videoHeight);
 
-                // We wait for metdata to arrive, before we request the update
-                // of the VCR video time. Metadata contains duration of the
-                // video. We wait for 2 seconds, and then abandon our attempts
-                // to update the VCR video time using metadata.
+                // We wait for metadata to arrive, before we request the update
+                // of the VCR video time, and of the start-end time region.
+                // Metadata contains duration of the video. We wait for 2
+                // seconds, and then abandon our attempts to update the VCR
+                // video time (and the start-end time region) using metadata.
                 (function () {
                     var checkInterval = window.setInterval(
                             checkForMetadata, 50
@@ -181,7 +191,8 @@ function (HTML5Video, Resizer) {
 
                     function checkForMetadata() {
                         if (state.metadata && state.metadata[state.youtubeId()]) {
-                            console.log('[_initialize]: (youtube) .duration');
+                            duration = state.videoPlayer.duration();
+
                             // After initialization, update the VCR with total time.
                             // At this point only the metadata duration is available (not
                             // very precise), but it is better than having 00:00:00 for
@@ -190,7 +201,14 @@ function (HTML5Video, Resizer) {
                                 'videoControl.updateVcrVidTime',
                                 {
                                     time: 0,
-                                    duration: state.videoPlayer.duration()
+                                    duration: duration
+                                }
+                            );
+
+                            state.trigger(
+                                'videoProgressSlider.updateStartEndTimeRegion',
+                                {
+                                    duration: duration
                                 }
                             );
 

@@ -113,10 +113,28 @@ function () {
             duration = params.duration;
         }
 
-        start = this.videoPlayer.startTime;
+        start = this.config.startTime;
+        end = this.config.endTime;
 
-        // If end is set to null, then we set it to the end of the video.
-        end = this.videoPlayer.endTime || duration;
+        if (start > duration) {
+            start = 0;
+        } else {
+            if (this.currentPlayerMode === 'flash') {
+                start /= Number(this.speed);
+            }
+        }
+
+        // If end is set to null, or it is greater than the duration of the
+        // video, then we set it to the end of the video.
+        if (
+            end === null || end > duration
+        ) {
+            end = duration;
+        } else if (end !== null) {
+            if (this.currentPlayerMode === 'flash') {
+                end /= Number(this.speed);
+            }
+        }
 
         // Don't build a range if it takes up the whole slider.
         if (start === 0 && end === duration) {
