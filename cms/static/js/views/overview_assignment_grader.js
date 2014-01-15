@@ -1,5 +1,6 @@
 define(["js/views/baseview", "underscore", "gettext", "js/models/assignment_grade", "js/views/feedback_notification"],
         function(BaseView, _, gettext, AssignmentGrade, NotificationView) {
+    var l10nNotGraded = gettext('Not Graded');
     var OverviewAssignmentGrader = BaseView.extend({
         // instantiate w/ { graders : CourseGraderCollection, el : <the gradable-status div> }
         events : {
@@ -18,7 +19,9 @@ define(["js/views/baseview", "underscore", "gettext", "js/models/assignment_grad
                         '<% graders.each(function(option) { %>' +
                             '<li><a <% if (option.get("type") == assignmentType) {%>class="is-selected" <%}%> href="#"><%= option.get("type") %></a></li>' +
                         '<% }) %>' +
-                        '<li><a class="gradable-status-notgraded" href="#">Not Graded</a></li>' +
+                        '<li><a class="gradable-status-notgraded" href="#">' +
+                        l10nNotGraded +
+                        '</a></li>' +
                     '</ul>');
             this.assignmentGrade = new AssignmentGrade({
                 locator : this.$el.closest('.id-holder').data('locator'),
@@ -36,8 +39,14 @@ define(["js/views/baseview", "underscore", "gettext", "js/models/assignment_grad
             this.render();
         },
         render : function() {
-            this.$el.html(this.template({ assignmentType : this.assignmentGrade.get('graderType'), graders : this.graders,
-                hideSymbol : this.hideSymbol }));
+            var graderType = this.assignmentGrade.get('graderType')
+            this.$el.html(this.template(
+                {
+                    assignmentType : (graderType == "Not Graded") ? l10nNotGraded : graderType,
+                    graders : this.graders,
+                    hideSymbol : this.hideSymbol
+                }
+            ));
             if (this.assignmentGrade.has('graderType') && this.assignmentGrade.get('graderType') != "Not Graded") {
                 this.$el.addClass('is-set');
             }
@@ -67,7 +76,7 @@ define(["js/views/baseview", "underscore", "gettext", "js/models/assignment_grad
               // of the CourseGradingPolicy model or null for Not Graded (NOTE, change template's if check for is-selected accordingly)
               this.assignmentGrade.save(
                       'graderType',
-                      $(e.target).text(),
+                      ($(e.target).attr('class') == "gradable-status-notgraded") ? "Not Graded" : $(e.target).text(),
                       {success: function () { saving.hide(); }}
                   );
 
