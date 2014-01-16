@@ -101,3 +101,14 @@ Feature: CMS.Component Adding
         And I add a "Blank Advanced Problem" "Advanced Problem" component
         And I delete all components
         Then I see no components
+
+    Scenario: I can duplicate a component
+        Given I am in Studio editing a new unit
+        And I add a "Blank Common Problem" "Problem" component
+        And I add a "Multiple Choice" "Problem" component
+        And I duplicate the "0" component
+        Then I see a Problem component with display name "Duplicate of 'Blank Common Problem'" in position "1"
+        And I reload the page
+        Then I see a Problem component with display name "Blank Common Problem" in position "0"
+        And I see a Problem component with display name "Duplicate of 'Blank Common Problem'" in position "1"
+        And I see a Problem component with display name "Multiple Choice" in position "2"
