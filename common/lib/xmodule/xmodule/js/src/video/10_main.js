@@ -73,7 +73,16 @@ function (
     previousState = null;
 
     window.Video = function (element) {
-        var state;
+        var state,
+            send = function (url, data) {
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    dataType: 'json',
+                    data: data,
+                });
+                debugger
+            };
 
         // Stop bufferization of previous video on sequence change.
         // Problem: multiple video tags with the same src cannot
@@ -83,6 +92,10 @@ function (
             if (previousState !== null && typeof previousState.videoPlayer !== 'undefined') {
                 previousState.stopBuffering();
                 $(e.currentTarget).unbind('sequence:change');
+
+                send(previousState.config.saveStateUrl, {
+                    position: previousState.videoPlayer.currentTime
+                });
             }
         });
 
@@ -109,6 +122,18 @@ function (
         if (!youtubeXhr) {
             youtubeXhr = state.youtubeXhr;
         }
+
+        $(window).unload(function () {
+
+
+            // if (state && typeof state.videoPlayer) {
+            //     send(state.config.saveStateUrl, {
+            //         position: state.videoPlayer.currentTime
+            //     });
+            // }
+
+
+        });
 
         // Because the 'state' object is only available inside this closure, we will also make
         // it available to the caller by returning it. This is necessary so that we can test
