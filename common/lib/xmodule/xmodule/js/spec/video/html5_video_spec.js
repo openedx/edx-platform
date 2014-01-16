@@ -9,7 +9,7 @@
         });
 
         afterEach(function () {
-            state = undefined;
+            state.storage.clear();
             $.fn.scrollTo.reset();
             $('.subtitles').remove();
             $('source').remove();

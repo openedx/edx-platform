@@ -207,18 +207,17 @@
     beforeEach(function () {
         this.addMatchers({
             toHaveAttrs: function (attrs) {
-                var element = this.actual,
-                    result = true;
+                var element;
 
                 if ($.isEmptyObject(attrs)) {
                     return false;
                 }
 
-                $.each(attrs, function (name, value) {
-                    return result = result && element.attr(name) === value;
-                });
+                element = this.actual;
 
-                return result;
+                return _.every(attrs, function (value, name) {
+                    return element.attr(name) === value;
+                });
             },
             toBeInRange: function (min, max) {
                 return min <= this.actual && this.actual <= max;
