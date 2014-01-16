@@ -5,20 +5,16 @@ Video player in the courseware.
 import time
 from bok_choy.page_object import PageObject
 from bok_choy.promise import EmptyPromise, fulfill_after
+from bok_choy.javascript import wait_for_js, js_defined
 
 
+@js_defined('window.Video')
 class VideoPage(PageObject):
     """
     Video player in the courseware.
     """
 
-    name = "lms.video"
-
-    def url(self):
-        """
-        Video players aren't associated with a particular URL.
-        """
-        raise NotImplementedError
+    url = None
 
     def is_browser_on_page(self):
         return self.is_css_present('section.xmodule_VideoModule')
@@ -53,22 +49,20 @@ class VideoPage(PageObject):
         """
         return self.is_css_present('a.video_control') and self.is_css_present('a.video_control.play')
 
+    @wait_for_js
     def play(self):
         """
         Start playing the video.
         """
-        with fulfill_after(
-            EmptyPromise(lambda: self.is_playing, "Video is playing")
-        ):
+        with fulfill_after(EmptyPromise(lambda: self.is_playing, "Video is playing")):
             self.css_click('a.video_control.play')
 
+    @wait_for_js
     def pause(self):
         """
         Pause the video.
         """
-        with fulfill_after(
-            EmptyPromise(lambda: self.is_paused, "Video is paused")
-        ):
+        with fulfill_after(EmptyPromise(lambda: self.is_paused, "Video is paused")):
             self.css_click('a.video_control.pause')
 
     def _video_time(self):

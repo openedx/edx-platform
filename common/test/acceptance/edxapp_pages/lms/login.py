@@ -12,10 +12,7 @@ class LoginPage(PageObject):
     Login page for the LMS.
     """
 
-    name = "lms.login"
-
-    def url(self):
-        return BASE_URL + "/login"
+    url = BASE_URL + "/login"
 
     def is_browser_on_page(self):
         return any([

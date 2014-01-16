@@ -2,19 +2,15 @@
 Student progress page
 """
 
-from bok_choy.page_object import PageObject
-from . import BASE_URL
+from .course_page import CoursePage
 
 
-class ProgressPage(PageObject):
+class ProgressPage(CoursePage):
     """
     Student progress page.
     """
 
-    name = "lms.progress"
-
-    def url(self, course_id=None):  #pylint: disable=W0221
-        return BASE_URL + "/courses/" + course_id + "/progress"
+    URL_PATH = "progress"
 
     def is_browser_on_page(self):
         has_course_info = self.is_css_present('section.course-info')

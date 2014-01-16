@@ -94,7 +94,7 @@
         "password": "password",
         "peer_grading": "peer_grading",
         "staff_grading": "staff_grading",
-        "url": "http://localhost:18060/",
+        "url": "** OVERRIDDEN **",
         "username": "lms"
     },
     "SECRET_KEY": "",

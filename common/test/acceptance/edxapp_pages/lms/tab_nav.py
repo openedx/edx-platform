@@ -11,14 +11,7 @@ class TabNavPage(PageObject):
     High-level tab navigation.
     """
 
-    name = "lms.tab_nav"
-
-    def url(self, **kwargs):
-        """
-        Since tab navigation appears on multiple pages,
-        it doesn't have a particular URL.
-        """
-        raise NotImplementedError
+    url = None
 
     def is_browser_on_page(self):
         return self.is_css_present('ol.course-tabs')
@@ -40,6 +33,19 @@ class TabNavPage(PageObject):
             else:
                 self.warning("No tabs found for '{0}'".format(tab_name))
 
+    def is_on_tab(self, tab_name):
+        """
+        Return a boolean indicating whether the current tab is `tab_name`.
+        """
+        current_tab_list = self.css_text('ol.course-tabs>li>a.active')
+
+        if len(current_tab_list) == 0:
+            self.warning("Could not find current tab")
+            return False
+
+        else:
+            return (current_tab_list[0].strip().split('\n')[0] == tab_name)
+
     def _tab_css(self, tab_name):
         """
         Return the CSS to click for `tab_name`.
@@ -58,19 +64,6 @@ class TabNavPage(PageObject):
         Return a `Promise` that the user is on the tab `tab_name`.
         """
         return EmptyPromise(
-            lambda: self._is_on_tab(tab_name),
+            lambda: self.is_on_tab(tab_name),
             "{0} is the current tab".format(tab_name)
         )
-
-    def _is_on_tab(self, tab_name):
-        """
-        Return a boolean indicating whether the current tab is `tab_name`.
-        """
-        current_tab_list = self.css_text('ol.course-tabs>li>a.active')
-
-        if len(current_tab_list) == 0:
-            self.warning("Could not find current tab")
-            return False
-
-        else:
-            return (current_tab_list[0].strip().split('\n')[0] == tab_name)

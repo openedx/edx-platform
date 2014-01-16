@@ -23,36 +23,24 @@ class OpenResponseTest(UniqueCourseTest):
     some helper functions used in the ORA tests.
     """
 
-    page_object_classes = [
-        AutoAuthPage, CourseInfoPage, TabNavPage,
-        CourseNavPage, OpenResponsePage, ProgressPage
-    ]
-
     # Grade response (dict) to return from the XQueue stub
     # in response to our unique submission text.
     XQUEUE_GRADE_RESPONSE = None
 
     def setUp(self):
         """
+        Install a test course with ORA problems.
         Always start in the subsection with open response problems.
         """
-        # Create a unique submission
-        self.submission = "Test submission " + self.unique_id
-
-        # Ensure fixtures are installed
         super(OpenResponseTest, self).setUp()
 
-        # Log in and navigate to the essay problems
-        self.ui.visit('studio.auto_auth', course_id=self.course_id)
-        self.ui.visit('lms.course_info', course_id=self.course_id)
-        self.ui['lms.tab_nav'].go_to_tab('Courseware')
-
-    @property
-    def fixtures(self):
-        """
-        Create a test course with open response problems.
-        Configure the XQueue stub to respond to submissions to the open-ended queue.
-        """
+        # Create page objects
+        self.auth_page = AutoAuthPage(self.browser, course_id=self.course_id)
+        self.course_info_page = CourseInfoPage(self.browser, self.course_id)
+        self.tab_nav = TabNavPage(self.browser)
+        self.course_nav = CourseNavPage(self.browser)
+        self.open_response = OpenResponsePage(self.browser)
+        self.progress_page = ProgressPage(self.browser, self.course_id)
 
         # Configure the test course
         course_fix = CourseFixture(
@@ -61,7 +49,6 @@ class OpenResponseTest(UniqueCourseTest):
         )
 
         course_fix.add_children(
-
             XBlockFixtureDesc('chapter', 'Test Section').add_children(
                 XBlockFixtureDesc('sequential', 'Test Subsection').add_children(
 
@@ -73,17 +60,21 @@ class OpenResponseTest(UniqueCourseTest):
 
                     XBlockFixtureDesc('combinedopenended', 'Peer-Assessed',
                         data=load_data_str('ora_peer_problem.xml'), metadata={'graded': True}),
-                )
-            )
-        )
+
+                    XBlockFixtureDesc('peergrading', 'Peer Module'),
+
+        ))).install()
 
         # Configure the XQueue stub's response for the text we will submit
+        # The submission text is unique so we can associate each response with a particular test case.
+        self.submission = "Test submission " + self.unique_id[0:4]
         if self.XQUEUE_GRADE_RESPONSE is not None:
-            xqueue_fix = XQueueResponseFixture(self.submission, self.XQUEUE_GRADE_RESPONSE)
-            return [course_fix, xqueue_fix]
+            XQueueResponseFixture(self.submission, self.XQUEUE_GRADE_RESPONSE).install()
 
-        else:
-            return [course_fix]
+        # Log in and navigate to the essay problems
+        self.auth_page.visit()
+        self.course_info_page.visit()
+        self.tab_nav.go_to_tab('Courseware')
 
     def submit_essay(self, expected_assessment_type, expected_prompt):
         """
@@ -93,21 +84,21 @@ class OpenResponseTest(UniqueCourseTest):
         """
 
         # Check the assessment type and prompt
-        self.assertEqual(self.ui['lms.open_response'].assessment_type, expected_assessment_type)
-        self.assertIn(expected_prompt, self.ui['lms.open_response'].prompt)
+        self.assertEqual(self.open_response.assessment_type, expected_assessment_type)
+        self.assertIn(expected_prompt, self.open_response.prompt)
 
         # Enter a submission, which will trigger a pre-defined response from the XQueue stub.
-        self.ui['lms.open_response'].set_response(self.submission)
+        self.open_response.set_response(self.submission)
 
         # Save the response and expect some UI feedback
-        self.ui['lms.open_response'].save_response()
+        self.open_response.save_response()
         self.assertEqual(
-            self.ui['lms.open_response'].alert_message,
+            self.open_response.alert_message,
             "Answer saved, but not yet submitted."
         )
 
         # Submit the response
-        self.ui['lms.open_response'].submit_response()
+        self.open_response.submit_response()
 
     def get_asynch_feedback(self, assessment_type):
         """
@@ -138,9 +129,9 @@ class OpenResponseTest(UniqueCourseTest):
             raise ValueError('Assessment type not recognized.  Must be either "ai" or "peer"')
 
         def _inner_check():
-            self.ui['lms.course_nav'].go_to_sequential('Self-Assessed')
-            self.ui['lms.course_nav'].go_to_sequential(section_name)
-            feedback = self.ui['lms.open_response'].rubric_feedback
+            self.course_nav.go_to_sequential('Self-Assessed')
+            self.course_nav.go_to_sequential(section_name)
+            feedback = self.open_response.rubric_feedback
 
             # Successful if `feedback` is a non-empty list
             return (bool(feedback), feedback)
@@ -161,27 +152,25 @@ class SelfAssessmentTest(OpenResponseTest):
         And I see my score in the progress page.
         """
         # Navigate to the self-assessment problem and submit an essay
-        self.ui['lms.course_nav'].go_to_sequential('Self-Assessed')
+        self.course_nav.go_to_sequential('Self-Assessed')
         self.submit_essay('self', 'Censorship in the Libraries')
 
         # Check the rubric categories
         self.assertEqual(
-            self.ui['lms.open_response'].rubric_categories,
-            ["Writing Applications", "Language Conventions"]
+            self.open_response.rubric_categories, ["Writing Applications", "Language Conventions"]
         )
 
         # Fill in the self-assessment rubric
-        self.ui['lms.open_response'].submit_self_assessment([0, 1])
+        self.open_response.submit_self_assessment([0, 1])
 
         # Expect that we get feedback
         self.assertEqual(
-            self.ui['lms.open_response'].rubric_feedback,
-            ['incorrect', 'correct']
+            self.open_response.rubric_feedback, ['incorrect', 'correct']
         )
 
         # Verify the progress page
-        self.ui.visit('lms.progress', course_id=self.course_id)
-        scores = self.ui['lms.progress'].scores('Test Section', 'Test Subsection')
+        self.progress_page.visit()
+        scores = self.progress_page.scores('Test Section', 'Test Subsection')
 
         # The first score is self-assessment, which we've answered, so it's 1/2
         # The other scores are AI- and peer-assessment, which we haven't answered so those are 0/2
@@ -213,22 +202,16 @@ class AIAssessmentTest(OpenResponseTest):
         """
 
         # Navigate to the AI-assessment problem and submit an essay
-        self.ui['lms.course_nav'].go_to_sequential('AI-Assessed')
+        self.course_nav.go_to_sequential('AI-Assessed')
         self.submit_essay('ai', 'Censorship in the Libraries')
-
-        # Expect UI feedback that the response was submitted
-        self.assertEqual(
-            self.ui['lms.open_response'].grader_status,
-            "Your response has been submitted. Please check back later for your grade."
-        )
 
         # Refresh the page to get the updated feedback
         # then verify that we get the feedback sent by our stub XQueue implementation
         self.assertEqual(self.get_asynch_feedback('ai'), ['incorrect', 'correct'])
 
         # Verify the progress page
-        self.ui.visit('lms.progress', course_id=self.course_id)
-        scores = self.ui['lms.progress'].scores('Test Section', 'Test Subsection')
+        self.progress_page.visit()
+        scores = self.progress_page.scores('Test Section', 'Test Subsection')
 
         # First score is the self-assessment score, which we haven't answered, so it's 0/2
         # Second score is the AI-assessment score, which we have answered, so it's 1/2
@@ -282,14 +265,8 @@ class PeerFeedbackTest(OpenResponseTest):
         And I see my score in the progress page.
         """
         # Navigate to the peer-assessment problem and submit an essay
-        self.ui['lms.course_nav'].go_to_sequential('Peer-Assessed')
+        self.course_nav.go_to_sequential('Peer-Assessed')
         self.submit_essay('peer', 'Censorship in the Libraries')
-
-        # Expect UI feedback that the response was submitted
-        self.assertEqual(
-            self.ui['lms.open_response'].grader_status,
-            "Your response has been submitted. Please check back later for your grade."
-        )
 
         # Refresh the page to get feedback from the stub XQueue grader.
         # We receive feedback from all three peers, each of which
@@ -297,8 +274,8 @@ class PeerFeedbackTest(OpenResponseTest):
         self.assertEqual(self.get_asynch_feedback('peer'), ['incorrect', 'correct'] * 3)
 
         # Verify the progress page
-        self.ui.visit('lms.progress', course_id=self.course_id)
-        scores = self.ui['lms.progress'].scores('Test Section', 'Test Subsection')
+        self.progress_page.visit()
+        scores = self.progress_page.scores('Test Section', 'Test Subsection')
 
         # First score is the self-assessment score, which we haven't answered, so it's 0/2
         # Second score is the AI-assessment score, which we haven't answered, so it's 0/2

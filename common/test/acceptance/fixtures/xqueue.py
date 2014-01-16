@@ -4,11 +4,10 @@ Fixture to configure XQueue response.
 
 import requests
 import json
-from bok_choy.web_app_fixture import WebAppFixture, WebAppFixtureError
 from . import XQUEUE_STUB_URL
 
 
-class XQueueResponseFixture(WebAppFixture):
+class XQueueResponseFixture(object):
     """
     Configure the XQueue stub's response to submissions.
     """
