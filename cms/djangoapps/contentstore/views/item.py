@@ -19,6 +19,7 @@ from xmodule.modulestore.django import modulestore, loc_mapper
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.locator import BlockUsageLocator
+from xmodule.modulestore import Location
 from xmodule.x_module import prefer_xmodules
 
 from util.json_request import expect_json, JsonResponse
@@ -33,6 +34,7 @@ from .helpers import _xmodule_recurse
 from preview import handler_prefix, get_preview_html
 from edxmako.shortcuts import render_to_response, render_to_string
 from models.settings.course_grading import CourseGradingModel
+from django.utils.translation import ugettext as _
 
 __all__ = ['orphan_handler', 'xblock_handler']
 
@@ -71,12 +73,15 @@ def xblock_handler(request, tag=None, package_id=None, branch=None, version_guid
                 :publish: can be one of three values, 'make_public, 'make_private', or 'create_draft'
               The JSON representation on the updated xblock (minus children) is returned.
 
-              if xblock locator is not specified, create a new xblock instance. The json playload can contain
+              if xblock locator is not specified, create a new xblock instance, either by duplicating
+              an existing xblock, or creating an entirely new one. The json playload can contain
               these fields:
-                :parent_locator: parent for new xblock, required
-                :category: type of xblock, required
+                :parent_locator: parent for new xblock, required for both duplicate and create new instance
+                :duplicate_source_locator: if present, use this as the source for creating a duplicate copy
+                :category: type of xblock, required if duplicate_source_locator is not present.
                 :display_name: name for new xblock, optional
-                :boilerplate: template name for populating fields, optional
+                :boilerplate: template name for populating fields, optional and only used
+                     if duplicate_source_locator is not present
               The locator (and old-style id) for the created xblock (minus children) is returned.
     """
     if package_id is not None:
@@ -131,7 +136,24 @@ def xblock_handler(request, tag=None, package_id=None, branch=None, version_guid
                 publish=request.json.get('publish'),
             )
     elif request.method in ('PUT', 'POST'):
-        return _create_item(request)
+        if 'duplicate_source_locator' in request.json:
+            parent_locator = BlockUsageLocator(request.json['parent_locator'])
+            duplicate_source_locator = BlockUsageLocator(request.json['duplicate_source_locator'])
+
+            # _duplicate_item is dealing with locations to facilitate the recursive call for
+            # duplicating children.
+            parent_location = loc_mapper().translate_locator_to_location(parent_locator)
+            duplicate_source_location = loc_mapper().translate_locator_to_location(duplicate_source_locator)
+            dest_location = _duplicate_item(
+                parent_location,
+                duplicate_source_location,
+                request.json.get('display_name')
+            )
+            course_location = loc_mapper().translate_locator_to_location(BlockUsageLocator(parent_locator), get_course=True)
+            dest_locator = loc_mapper().translate_location(course_location.course_id, dest_location, False, True)
+            return JsonResponse({"locator": unicode(dest_locator)})
+        else:
+            return _create_item(request)
     else:
         return HttpResponseBadRequest(
             "Only instance creation is supported without a package_id.",
@@ -284,6 +306,52 @@ def _create_item(request):
     course_location = loc_mapper().translate_locator_to_location(parent_locator, get_course=True)
     locator = loc_mapper().translate_location(course_location.course_id, dest_location, False, True)
     return JsonResponse({"locator": unicode(locator)})
+
+
+def _duplicate_item(parent_location, duplicate_source_location, display_name=None):
+    """
+    Duplicate an existing xblock as a child of the supplied parent_location.
+    """
+    store = get_modulestore(duplicate_source_location)
+    source_item = store.get_item(duplicate_source_location)
+    # Change the blockID to be unique.
+    dest_location = duplicate_source_location.replace(name=uuid4().hex)
+    category = dest_location.category
+
+    # Update the display name to indicate this is a duplicate (unless display name provided).
+    duplicate_metadata = own_metadata(source_item)
+    if display_name is not None:
+        duplicate_metadata['display_name'] = display_name
+    else:
+        duplicate_metadata['display_name'] = _("Duplicate of '{0}'").format(source_item.display_name)
+
+    get_modulestore(category).create_and_save_xmodule(
+        dest_location,
+        definition_data=source_item.data if hasattr(source_item, 'data') else None,
+        metadata=duplicate_metadata,
+        system=source_item.system if hasattr(source_item, 'system') else None,
+    )
+
+    # Children are not automatically copied over (and not all xblocks have a 'children' attribute).
+    # Because DAGs are not fully supported, we need to actually duplicate each child as well.
+    if source_item.has_children:
+        copied_children = []
+        for child in source_item.children:
+            copied_children.append(_duplicate_item(dest_location, Location(child)).url())
+        get_modulestore(dest_location).update_children(dest_location, copied_children)
+
+    if category not in DETACHED_CATEGORIES:
+        parent = get_modulestore(parent_location).get_item(parent_location)
+        # If source was already a child of the parent, add duplicate immediately afterward.
+        # Otherwise, add child to end.
+        if duplicate_source_location.url() in parent.children:
+            source_index = parent.children.index(duplicate_source_location.url())
+            parent.children.insert(source_index + 1, dest_location.url())
+        else:
+            parent.children.append(dest_location.url())
+        get_modulestore(parent_location).update_children(parent_location, parent.children)
+
+    return dest_location
 
 
 def _delete_item_at_location(item_location, delete_children=False, delete_all_versions=False):
