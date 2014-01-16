@@ -152,7 +152,7 @@ A component is the part of a unit that contains your actual course content. A un
 A student can view the name of all components in a unit by hovering over the unit in the ribbon at the top of the page.
 
 .. image:: Images/ComponentNames_CourseRibbon.gif
-:alt: Image of the component list for a unit
+ :alt: Image of the component list for a unit
 
 By default, Studio includes four types of components.
 
@@ -184,9 +184,9 @@ You can reorganize your course by dragging and dropping sections, subsections, u
 To move an element, hover over the element handle on the right side of the screen until the mouse pointer changes to a four-headed arrow. Then, click and drag the element to the location that you want.
 
 .. image:: Images/DragAndDropExample.gif
-:alt: Image of the course outline, with the handle for a unit selected for drag and drop
+ :alt: Image of the course outline, with the handle for a unit selected for drag and drop
 
 When you move an element, a blue line indicates where the element will land when you release the mouse. 
 
 .. image:: Images/DragAndDrop_BlueLine.gif
-:alt: Image of the course outline, with a unit being dragged to a different location
+ :alt: Image of the course outline, with a unit being dragged to a different location

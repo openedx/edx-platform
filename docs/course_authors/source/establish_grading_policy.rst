@@ -10,14 +10,14 @@ Overview
 
 Establishing a grading policy takes several steps. You must:
 
-#. :ref:`grade`
+#. :ref:`Set the Grade Range`
 #. :ref:`Set the Grace Period`
 #. :ref:`configure`
 #. :ref:`set_assignment`
 #. :ref:`student_view`
 
 
-.. _grade:
+.. _Set the Grade Range:
 
 *******************
 Set the Grade Range

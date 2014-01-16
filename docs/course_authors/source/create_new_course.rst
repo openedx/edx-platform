@@ -145,7 +145,7 @@ From the **Settings** menu, select **Schedule and Details**.
 
 .. note:: 
 
-    The default **Course Start Date** is set far into the future, to **12/31/2029**. This is to ensure that your course does not start before you intend it to.  You must change the **Course Start Date** to the date you want students to begin using the course.  
+    The default **Course Start Date** is set far into the future, to **01/01/2030 GMT**. This is to ensure that your course does not start before you intend it to.  You must change the course start date to the date you want students to begin using the course.  
 
 Follow the on-screen text to enter the course and enrollment schedule.
 

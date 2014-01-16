@@ -116,7 +116,7 @@ differences between the two include the following.
 Sample Problem:
 
 .. image:: ../Images/image289.png
- :width: 600:
+ :width: 600
  :alt: Image of a multiple choice problem
 
 **Problem Code:**
@@ -209,7 +209,7 @@ Sample Problem:
 
 .. image:: ../Images/image290.png
  :width: 600
-  :alt: Image of a checkbox problem
+ :alt: Image of a checkbox problem
 
 
 **Problem Code:**

@@ -57,4 +57,4 @@ Navier-Stokes equation is enclosed in backslashes and brackets, so it appears on
 own line.
 
 .. image:: ../Images/MathJax_Problem.gif
-:alt: Image of a problem component with MathJax in both the Visual and HTML views
+ :alt: Image of a problem component with MathJax in both the Visual and HTML views
