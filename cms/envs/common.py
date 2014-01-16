@@ -65,7 +65,7 @@ FEATURES = {
 
     # If set to True, Studio won't restrict the set of advanced components
     # to just those pre-approved by edX
-    'ALLOW_ALL_ADVANCED_COMPONENTS': False,
+    'ALLOW_ALL_ADVANCED_COMPONENTS': True,
 }
 ENABLE_JASMINE = False
 
@@ -272,6 +272,16 @@ PIPELINE_CSS = {
             'css/vendor/jquery.qtip.min.css',
             'js/vendor/markitup/skins/simple/style.css',
             'js/vendor/markitup/sets/wiki/style.css',
+            'css/vendor/ova/edx-annotator.css',
+            'css/vendor/ova/annotator.css',
+            'css/vendor/ova/video-js.min.css',
+            'css/vendor/ova/rangeslider.css',
+            'css/vendor/ova/share-annotator.css',
+            'css/vendor/ova/richText-annotator.css',
+            'css/vendor/ova/tags-annotator.css',
+            'css/vendor/ova/flagging-annotator.css',
+            'css/vendor/ova/ova.css',
+            'js/vendor/ova/catch/css/main.css'
         ],
         'output_filename': 'css/cms-style-vendor.css',
     },
@@ -306,6 +316,25 @@ PIPELINE_JS = {
         ),
         'output_filename': 'js/cms-modules.js',
         'test_order': 1
+    },
+    'main_vendor': {
+        'source_filenames': [
+            'js/vendor/ova/annotator-full.js',
+            'js/vendor/ova/video.dev.js',
+            'js/vendor/ova/vjs.youtube.js',
+            'js/vendor/ova/rangeslider.js',
+            'js/vendor/ova/share-annotator.js',
+            'js/vendor/ova/tinymce.min.js',
+            'js/vendor/ova/richText-annotator.js',
+            'js/vendor/ova/reply-annotator.js',
+            'js/vendor/ova/tags-annotator.js',
+            'js/vendor/ova/flagging-annotator.js',
+            'js/vendor/ova/jquery-Watch.js',
+            'js/vendor/ova/ova.js',
+            'js/vendor/ova/catch/js/catch.js',
+            'js/vendor/ova/catch/js/handlebars-1.1.2.js'
+        ],
+        'output_filename': 'js/cms-main_vendor.js',
     },
 }
 

@@ -41,6 +41,7 @@ class InheritanceMixin(XBlockMixin):
         scope=Scope.settings,
     )
     xqa_key = String(help="DO NOT USE", scope=Scope.settings)
+    annotation_storage_url = String(help="Location of Annotation backend", scope=Scope.settings, default="http://your_annotation_storage.com", display_name="annotation_storage_url")
     graceperiod = Timedelta(
         help="Amount of time after the due date that submissions will be accepted",
         scope=Scope.settings,
