@@ -41,7 +41,7 @@ class OptionInputTest(unittest.TestCase):
     '''
 
     def test_rendering(self):
-        xml_str = """<optioninput options="('Up','Down')" id="sky_input" correct="Up"/>"""
+        xml_str = """<optioninput options="('Up','Down','Don't know')" id="sky_input" correct="Up"/>"""
         element = etree.fromstring(xml_str)
 
         state = {'value': 'Down',
@@ -54,7 +54,7 @@ class OptionInputTest(unittest.TestCase):
         expected = {
             'STATIC_URL': '/dummy-static/',
             'value': 'Down',
-            'options': [('Up', 'Up'), ('Down', 'Down')],
+            'options': [('Up', 'Up'), ('Down', 'Down'), ('Don\'t know', 'Don\'t know')],
             'status': 'answered',
             'msg': '',
             'inline': False,
@@ -79,6 +79,10 @@ class OptionInputTest(unittest.TestCase):
         check(u"('б', 'в')", [u'б', u'в'])
         check(u"('б в','в')", [u'б в', u'в'])
         check(u"('Мой \"кавыки\"место','в')", [u'Мой \"кавыки\"место', u'в'])
+
+        # check that escaping single quotes with leading backslash (\') properly works
+        # note: actual input by user will be hasn\'t but json parses it as hasn\\'t
+        check(u"('hasnt','hasn't')", [u'hasnt', u'hasn\'t'])
 
 
 class ChoiceGroupTest(unittest.TestCase):

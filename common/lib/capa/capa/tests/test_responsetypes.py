@@ -344,6 +344,17 @@ class OptionResponseTest(ResponseTest):
         # Options not in the list should be marked incorrect
         self.assert_grade(problem, "invalid_option", "incorrect")
 
+    def test_quote_option(self):
+        # Test that option response properly escapes quotes inside options strings
+        problem = self.build_problem(options=["hasnot", "hasn't", "has'nt"],
+                                     correct_option="hasn't")
+
+        # Assert that correct option with a quote inside is marked correctly
+        self.assert_grade(problem, "hasnot", "incorrect")
+        self.assert_grade(problem, "hasn't", "correct")
+        self.assert_grade(problem, "hasn\'t", "correct")
+        self.assert_grade(problem, "has'nt", "incorrect")
+
 
 class FormulaResponseTest(ResponseTest):
     """
