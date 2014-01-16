@@ -14,7 +14,7 @@ from student.tests.factories import RegistrationFactory  # Imported to re-export
 from student.tests.factories import UserProfileFactory as StudentUserProfileFactory
 from courseware.models import StudentModule, XModuleUserStateSummaryField
 from courseware.models import XModuleStudentInfoField, XModuleStudentPrefsField
-from courseware.roles import (
+from student.roles import (
     CourseInstructorRole,
     CourseStaffRole,
     CourseBetaTesterRole,

@@ -230,12 +230,7 @@ class AboutFields(object):
         default="",
         scope=Scope.content
     )
-    # this exists purely to override the default start date
-    start = Date(
-        help="placeholder to make sure that About is always active",
-        default=datetime.fromtimestamp(0, UTC),
-        scope=Scope.settings,
-    )
+    detached = True  # purposely not an xblock field
 
 
 class AboutModule(AboutFields, HtmlModule):
@@ -271,6 +266,7 @@ class StaticTabFields(object):
         scope=Scope.content,
         help="HTML for the additional pages"
     )
+    detached = True  # purposely not an xblock field
 
 
 class StaticTabModule(StaticTabFields, HtmlModule):
@@ -298,6 +294,7 @@ class CourseInfoFields(object):
         default="<ol></ol>",
         scope=Scope.content
     )
+    detached = True  # purposely not an xblock field
 
 
 class CourseInfoModule(CourseInfoFields, HtmlModule):

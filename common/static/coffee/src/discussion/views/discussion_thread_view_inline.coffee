@@ -32,9 +32,6 @@ if Backbone?
       @renderShowView()
       @renderAttrs()
 
-      # TODO tags commenting out til we decide what to do with tags
-      #@renderTags()
-
       @$("span.timeago").timeago()
       @$el.find('.post-extended-content').hide()
       if @expanded

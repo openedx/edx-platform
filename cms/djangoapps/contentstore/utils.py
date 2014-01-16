@@ -13,10 +13,10 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from django_comment_common.utils import unseed_permissions_roles
-from auth.authz import _delete_course_group
 from xmodule.modulestore.store_utilities import delete_course
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.draft import DIRECT_ONLY_CATEGORIES
+from student.roles import CourseInstructorRole, CourseStaffRole
 
 
 log = logging.getLogger(__name__)
@@ -35,7 +35,7 @@ def delete_course_and_groups(course_id, commit=False):
     module_store = modulestore('direct')
     content_store = contentstore()
 
-    org, course_num, run = course_id.split("/")
+    org, course_num, _ = course_id.split("/")
     module_store.ignore_write_events_on_courses.append('{0}/{1}'.format(org, course_num))
 
     loc = CourseDescriptor.id_to_location(course_id)
@@ -47,7 +47,10 @@ def delete_course_and_groups(course_id, commit=False):
         # in the django layer, we need to remove all the user permissions groups associated with this course
         if commit:
             try:
-                _delete_course_group(loc)
+                staff_role = CourseStaffRole(loc)
+                staff_role.remove_users(*staff_role.users_with_role())
+                instructor_role = CourseInstructorRole(loc)
+                instructor_role.remove_users(*instructor_role.users_with_role())
             except Exception as err:
                 log.error("Error in deleting course groups for {0}: {1}".format(loc, err))
 

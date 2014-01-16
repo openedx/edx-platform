@@ -203,7 +203,7 @@ TEMPLATE_DEBUG = False
 
 # Site info
 SITE_ID = 1
-SITE_NAME = "localhost:8000"
+SITE_NAME = "localhost:8001"
 HTTPS = 'on'
 ROOT_URLCONF = 'cms.urls'
 IGNORABLE_404_ENDS = ('favicon.ico')
@@ -409,7 +409,6 @@ INSTALLED_APPS = (
 
     # For CMS
     'contentstore',
-    'auth',
     'course_creators',
     'student',  # misleading name due to sharing with lms
     'course_groups',  # not used in cms (yet), but tests run

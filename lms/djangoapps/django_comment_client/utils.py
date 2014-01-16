@@ -306,10 +306,6 @@ def get_metadata_for_threads(course_id, threads, user, user_info):
 # put this method in utils.py to avoid circular import dependency between helpers and mustache_helpers
 
 
-def url_for_tags(course_id, tags):
-    return reverse('django_comment_client.forum.views.forum_form_discussion', args=[course_id]) + '?' + urllib.urlencode({'tags': tags})
-
-
 def render_mustache(template_name, dictionary, *args, **kwargs):
     template = edxmako.lookup['main'].get_template(template_name).source
     return pystache.render(template, dictionary)
@@ -336,7 +332,6 @@ def extend_content(content):
     content_info = {
         'displayed_title': content.get('highlighted_title') or content.get('title', ''),
         'displayed_body': content.get('highlighted_body') or content.get('body', ''),
-        'raw_tags': ','.join(content.get('tags', [])),
         'permalink': permalink(content),
         'roles': roles,
         'updated': content['created_at'] != content['updated_at'],
@@ -365,7 +360,7 @@ def safe_content(content):
         'endorsed', 'parent_id', 'thread_id', 'votes', 'closed', 'created_at',
         'updated_at', 'depth', 'type', 'commentable_id', 'comments_count',
         'at_position_list', 'children', 'highlighted_title', 'highlighted_body',
-        'courseware_title', 'courseware_url', 'tags', 'unread_comments_count',
+        'courseware_title', 'courseware_url', 'unread_comments_count',
         'read', 'group_id', 'group_name', 'group_string', 'pinned', 'abuse_flaggers',
         'stats'
 

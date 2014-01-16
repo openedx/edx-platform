@@ -97,7 +97,7 @@ if Backbone?
       event.preventDefault()
       if not @model.can('can_delete')
         return
-      if not confirm "Are you sure to delete this response? "
+      if not confirm gettext("Are you sure you want to delete this response?")
         return
       url = @model.urlFor('_delete')
       @model.remove()

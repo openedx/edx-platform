@@ -5,8 +5,10 @@ from fs.memoryfs import MemoryFS
 
 from mock import Mock, patch
 
-from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
+from xblock.runtime import KvsFieldData, DictKeyValueStore
+
 import xmodule.course_module
+from xmodule.modulestore.xml import ImportSystem, XMLModuleStore, LocationReader
 from django.utils.timezone import UTC
 
 
@@ -32,7 +34,6 @@ class DummySystem(ImportSystem):
                                   load_error_modules=load_error_modules)
         course_id = "/".join([ORG, COURSE, 'test_run'])
         course_dir = "test_dir"
-        policy = {}
         error_tracker = Mock()
         parent_tracker = Mock()
 
@@ -40,10 +41,11 @@ class DummySystem(ImportSystem):
             xmlstore=xmlstore,
             course_id=course_id,
             course_dir=course_dir,
-            policy=policy,
             error_tracker=error_tracker,
             parent_tracker=parent_tracker,
             load_error_modules=load_error_modules,
+            field_data=KvsFieldData(DictKeyValueStore()),
+            id_reader=LocationReader(),
         )
 
 

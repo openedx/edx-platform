@@ -556,7 +556,8 @@
             });
         });
 
-        describe('update with start & end time', function () {
+        // Disabled 1/13/14 due to flakiness observed in master
+        xdescribe('update with start & end time', function () {
             var START_TIME = 1, END_TIME = 2;
 
             beforeEach(function () {
@@ -672,7 +673,8 @@
             });
         });
 
-        describe('updatePlayTime when start & end times are defined', function () {
+        // Disabled 1/13/14 due to flakiness observed in master
+        xdescribe('updatePlayTime when start & end times are defined', function () {
             var START_TIME = 1,
                 END_TIME = 2;
 

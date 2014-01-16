@@ -15,7 +15,7 @@ from django_comment_client.utils import has_forum_access
 
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
-from courseware.roles import CourseStaffRole
+from student.roles import CourseStaffRole
 from xmodule.modulestore.django import modulestore, clear_existing_modulestores
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 

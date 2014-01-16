@@ -41,9 +41,6 @@ if Backbone?
       @main.render()
       @main.on "thread:responses:rendered", =>
         @nav.updateSidebar()
-      @main.on "tag:selected", (tag) =>
-        search = "[#{tag}]"
-        @nav.setAndSearchFor(search)
 
     navigateToThread: (thread_id) =>
       thread = @discussion.get(thread_id)
