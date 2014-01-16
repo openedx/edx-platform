@@ -20,7 +20,7 @@ Preview Your Course
 ***********************
  
 When you view your course through Preview mode, you see all the
-Units of your course, regardless of whether they are set to Public or
+units of your course, regardless of whether they are set to Public or
 Private and regardless of whether the release dates have passed.
  
  
@@ -32,23 +32,23 @@ You can enter Preview mode in two ways.
  
 * On any subsection page, click **Preview Drafts**.
 
-.. image:: Images/image205.png
+.. image:: Images/preview_draft.png
   :width: 800
  
 * On any Unit page, click **Preview**.
  
-The following example shows the **Preview** button for a unit that
-is set to Public.
+  The following example shows the **Preview** button for a unit that
+  is set to Public.
  
-.. image:: Images/image207.png
- :width: 800
+  .. image:: Images/preview_public.png
+   :width: 800
  
  
-The following example shows the **Preview** button for a unit that
-is set to Private.
+  The following example shows the **Preview** button for a unit that
+  is set to Private.
  
-.. image:: Images/image209.png
- :width: 800
+  .. image:: Images/preview_private.png
+   :width: 800
  
 .. _View Your Live Course:
 
@@ -65,16 +65,16 @@ You can view the live course from three different places in Studio:
  
 * The **Course Outline** page.
 
-  .. image:: Images/image217.png
+  .. image:: Images/course_outline_view_live.png
    :width: 800
  
 * Any Subsection page.
  
-  .. image:: Images/image219.png
+  .. image:: Images/subsection_view_live.png
     :width: 800
  
 * The Unit page, if the Unit is Public.
  
-  .. image:: Images/image221.png
+  .. image:: Images/unit_view_live.png
      :width: 800
 

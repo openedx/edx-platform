@@ -4,6 +4,7 @@
 from lettuce import world
 from nose.tools import assert_equal, assert_in  # pylint: disable=E0611
 from terrain.steps import reload_the_page
+from common import type_in_codemirror
 
 
 @world.absorb
@@ -112,6 +113,16 @@ def edit_component_and_select_settings():
 def edit_component():
     world.wait_for(lambda _driver: world.css_visible('a.edit-button'))
     world.css_click('a.edit-button')
+
+
+def enter_xml_in_advanced_problem(step, text):
+    """
+    Edits an advanced problem (assumes only on page),
+    types the provided XML, and saves the component.
+    """
+    world.edit_component()
+    type_in_codemirror(0, text)
+    world.save_component(step)
 
 
 @world.absorb

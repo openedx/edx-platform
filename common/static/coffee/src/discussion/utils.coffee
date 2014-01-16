@@ -86,12 +86,12 @@ class @DiscussionUtil
       threads                 : "/courses/#{$$course_id}/discussion/forum"
       "enable_notifications"  : "/notification_prefs/enable/"
       "disable_notifications" : "/notification_prefs/disable/"
-      "notifications_status" : "/notification_prefs/status"
+      "notifications_status" : "/notification_prefs/status/"
     }[name]
 
   @activateOnEnter: (event, func) ->
     if event.which == 13
-      e.preventDefault()
+      event.preventDefault()
       func(event)
 
   @makeFocusTrap: (elem) ->

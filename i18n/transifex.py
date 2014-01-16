@@ -15,6 +15,7 @@ def push():
 def pull():
     for locale in CONFIGURATION.locales:
         if locale != CONFIGURATION.source_locale:
+            print "Pulling %s from transifex..." % locale
             execute('tx pull -l %s' % locale)
     clean_translated_locales()
 

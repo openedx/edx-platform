@@ -70,13 +70,13 @@
         $submitButton.
           removeClass('is-disabled').
           removeProp('disabled').
-          html("${_('Update my {platform_name} Account').format(platform_name=settings.PLATFORM_NAME)}");
+          text("${_('Update my {platform_name} Account').format(platform_name=settings.PLATFORM_NAME)}");
       }
       else {
         $submitButton.
           addClass('is-disabled').
           prop('disabled', true).
-          html(gettext('Processing your account information &hellip;'));
+          text("${_(u'Processing your account information …')}");
       }
     }
   </script>

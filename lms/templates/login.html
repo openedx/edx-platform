@@ -1,11 +1,11 @@
 <%inherit file="main.html" />
-
+<%! from microsite_configuration.middleware import MicrositeConfiguration %>
 <%namespace name='static' file='static_content.html'/>
 
 <%! from django.core.urlresolvers import reverse %>
 <%! from django.utils.translation import ugettext as _ %>
 
-<%block name="title"><title>${_("Log into your {platform_name} Account").format(platform_name=settings.PLATFORM_NAME)}</title></%block>
+<%block name="title"><title>${_("Log into your {platform_name} Account").format(platform_name=platform_name)}</title></%block>
 
 <%block name="js_extra">
   <script type="text/javascript">
@@ -83,13 +83,13 @@
         $submitButton.
           removeClass('is-disabled').
           removeProp('disabled').
-          html("${_('Log into My {platform_name} Account').format(platform_name=settings.PLATFORM_NAME)} <span class='orn-plus'>+</span> ${_('Access My Courses')}");
+          html("${_('Log into My {platform_name} Account').format(platform_name=platform_name)} <span class='orn-plus'>+</span> ${_('Access My Courses')}");
       }
       else {
         $submitButton.
           addClass('is-disabled').
           prop('disabled', true).
-          html(gettext('Processing your account information &hellip;'));
+          text("${_(u'Processing your account information…')}");
       }
     }
   </script>
@@ -110,7 +110,7 @@
 
       <!-- status messages -->
       <div role="alert" class="status message">
-        <h3 class="message-title">${_("We're Sorry, {platform_name} accounts are unavailable currently").format(platform_name=settings.PLATFORM_NAME)}</h3>
+        <h3 class="message-title">${_("We're Sorry, {platform_name} accounts are unavailable currently").format(platform_name=platform_name)}</h3>
       </div>
 
       <div role="alert" class="status message submission-error" tabindex="-1">
@@ -121,7 +121,7 @@
       </div>
 
       <p class="instructions sr">
-        ${_('Please provide the following information to log into your {platform_name} account. Required fields are noted by <strong class="indicator">bold text and an asterisk (*)</strong>.').format(platform_name=settings.PLATFORM_NAME)}
+        ${_('Please provide the following information to log into your {platform_name} account. Required fields are noted by <strong class="indicator">bold text and an asterisk (*)</strong>.').format(platform_name=platform_name)}
       </p>
 
       <div class="group group-form group-form-requiredinformation">
@@ -131,7 +131,7 @@
           <li class="field required text" id="field-email">
             <label for="email">${_('E-mail')}</label>
             <input class="" id="email" type="email" name="email" value="" placeholder="example: username@domain.com" required aria-required="true" aria-described-by="email-tip" />
-            <span class="tip tip-input" id="email-tip">${_("This is the e-mail address you used to register with {platform}").format(platform=settings.PLATFORM_NAME)}</span>
+            <span class="tip tip-input" id="email-tip">${_("This is the e-mail address you used to register with {platform}").format(platform=platform_name)}</span>
           </li>
           <li class="field required password" id="field-password">
             <label for="password">${_('Password')}</label>
@@ -166,31 +166,14 @@
   </section>
 
   <aside role="complementary">
-    <header>
-      <h2 class="sr">${_("Helpful Information")}</h2>
-    </header>
 
-    % if settings.FEATURES.get('AUTH_USE_OPENID'):
-    <!-- <div class="cta cta-login-options-openid">
-      <h3>${_("Login via OpenID")}</h3>
-      <p>${_('You can now start learning with {platform_name} by logging in with your <a rel="external" href="http://openid.net/">OpenID account</a>.').format(platform_name=settings.PLATFORM_NAME)}</p>
-      <a class="action action-login-openid" href="#">${_("Login via OpenID")}</a>
-    </div> -->
-    % endif
+<%
+  # allow for microsite overrides on the registration sidebars, otherwise default to pre-existing ones
+  sidebar_file = MicrositeConfiguration.get_microsite_template_path('login-sidebar.html')
+%>
 
-    <div class="cta cta-help">
-      <h3>${_("Not Enrolled?")}</h3>
-      <p><a href="${reverse('register_user')}">${_("Sign up for {platform_name} today!").format(platform_name=settings.PLATFORM_NAME)}</a></p>
+    <%include file="${sidebar_file}" />
 
-      ## Disable help unless the FAQ marketing link is enabled
-      % if settings.MKTG_URL_LINK_MAP.get('FAQ'):
-        <h3>${_("Need Help?")}</h3>
-        <p>${_("Looking for help in logging in or with your {platform_name} account?").format(platform_name=settings.PLATFORM_NAME)}
-        <a href="${marketing_link('FAQ')}">
-            ${_("View our help section for answers to commonly asked questions.")}
-        </a></p>
-      % endif
-    </div>
   </aside>
   </section>
 

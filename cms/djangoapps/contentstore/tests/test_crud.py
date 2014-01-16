@@ -5,11 +5,12 @@ from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.django import modulestore, loc_mapper, clear_existing_modulestores
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.capa_module import CapaDescriptor
-from xmodule.modulestore.locator import CourseLocator, BlockUsageLocator
+from xmodule.modulestore.locator import CourseLocator, BlockUsageLocator, LocalId
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.html_module import HtmlDescriptor
 from xmodule.modulestore import inheritance
-from xmodule.x_module import XModuleDescriptor
+from xmodule.x_module import prefer_xmodules
+from xblock.core import XBlock
 
 
 class TemplateTests(unittest.TestCase):
@@ -103,13 +104,17 @@ class TemplateTests(unittest.TestCase):
             test_course.system, parent_xblock=test_course)
         test_def_content = '<problem>boo</problem>'
         # create child
-        self.load_from_json({
+        new_block = self.load_from_json({
             'category': 'problem',
             'fields': {
                 'data': test_def_content,
                 'display_name': 'problem'
             }},
-            test_course.system, parent_xblock=test_chapter)
+            test_course.system,
+            parent_xblock=test_chapter
+        )
+        self.assertIsNotNone(new_block.definition_locator)
+        self.assertTrue(isinstance(new_block.definition_locator.definition_id, LocalId))
         # better to pass in persisted parent over the subdag so
         # subdag gets the parent pointer (otherwise 2 ops, persist dag, update parent children,
         # persist parent
@@ -244,9 +249,10 @@ class TemplateTests(unittest.TestCase):
         - 'definition':
         - '_id' (optional): the usage_id of this. Will generate one if not given one.
         """
-        class_ = XModuleDescriptor.load_class(
+        class_ = XBlock.load_class(
             json_data.get('category', json_data.get('location', {}).get('category')),
-            default_class
+            default_class,
+            select=prefer_xmodules
         )
         usage_id = json_data.get('_id', None)
         if not '_inherited_settings' in json_data and parent_xblock is not None:

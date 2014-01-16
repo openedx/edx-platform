@@ -323,6 +323,7 @@ function (VideoPlayer) {
         // element has a CSS class 'fullscreen'.
         this.__dfd__ = $.Deferred();
         this.isFullScreen = false;
+        this.currentVolume = 100;
         this.isTouch = onTouchBasedDevice() || '';
 
         // The parent element of the video, and the ID.

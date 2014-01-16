@@ -1,5 +1,5 @@
 import unittest
-import datetime
+from datetime import datetime
 
 from fs.memoryfs import MemoryFS
 
@@ -13,7 +13,15 @@ from django.utils.timezone import UTC
 ORG = 'test_org'
 COURSE = 'test_course'
 
-NOW = datetime.datetime.strptime('2013-01-01T01:00:00', '%Y-%m-%dT%H:%M:00').replace(tzinfo=UTC())
+NOW = datetime.strptime('2013-01-01T01:00:00', '%Y-%m-%dT%H:%M:00').replace(tzinfo=UTC())
+
+
+class CourseFieldsTestCase(unittest.TestCase):
+    def test_default_start_date(self):
+        self.assertEqual(
+            xmodule.course_module.CourseFields.start.default,
+            datetime(2030, 1, 1, tzinfo=UTC())
+        )
 
 
 class DummySystem(ImportSystem):
@@ -77,7 +85,7 @@ class IsNewCourseTestCase(unittest.TestCase):
         # Needed for test_is_newish
         datetime_patcher = patch.object(
             xmodule.course_module, 'datetime',
-            Mock(wraps=datetime.datetime)
+            Mock(wraps=datetime)
         )
         mocked_datetime = datetime_patcher.start()
         mocked_datetime.now.return_value = NOW

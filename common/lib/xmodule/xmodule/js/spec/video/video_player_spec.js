@@ -335,21 +335,23 @@
             beforeEach(function () {
                 initialize();
 
-                spyOn(videoPlayer, 'updatePlayTime');
-                spyOn(videoPlayer, 'log');
-                spyOn(videoPlayer.player, 'seekTo');
-
-                state.videoPlayer.play();
+                runs(function () {
+                    state.videoPlayer.play();
+                });
 
                 waitsFor(function () {
-                    return videoPlayer.isPlaying();
+                    duration = videoPlayer.duration();
+
+                    return duration > 0 && videoPlayer.isPlaying();
                 }, 'video begins playing', WAIT_TIMEOUT);
             });
 
             it('Slider event causes log update', function () {
+
                 runs(function () {
                     var currentTime = videoPlayer.currentTime;
 
+                    spyOn(videoPlayer, 'log');
                     videoProgressSlider.onSlide(
                         jQuery.Event('slide'), { value: 2 }
                     );
@@ -367,6 +369,7 @@
 
             it('seek the player', function () {
                 runs(function () {
+                    spyOn(videoPlayer.player, 'seekTo');
                     videoProgressSlider.onSlide(
                         jQuery.Event('slide'), { value: 60 }
                     );
@@ -378,6 +381,7 @@
 
             it('call updatePlayTime on player', function () {
                 runs(function () {
+                    spyOn(videoPlayer, 'updatePlayTime');
                     videoProgressSlider.onSlide(
                         jQuery.Event('slide'), { value: 60 }
                     );
@@ -476,19 +480,38 @@
                     videoPlayer.onPlay();
                     expect(videoPlayer.onSpeedChange.calls.length).toEqual(1);
                 });
+
+                it('video has a correct volume', function () {
+                    spyOn(videoPlayer.player, 'setVolume');
+                    state.currentVolume = '0.26';
+                    videoPlayer.onPlay();
+                    expect(videoPlayer.player.setVolume).toHaveBeenCalledWith('0.26');
+                });
             });
         });
 
         describe('onVolumeChange', function () {
             beforeEach(function () {
                 initialize();
-
-                spyOn(videoPlayer.player, 'setVolume');
-                videoPlayer.onVolumeChange(60);
             });
 
             it('set the volume on player', function () {
+                spyOn(videoPlayer.player, 'setVolume');
+                videoPlayer.onVolumeChange(60);
                 expect(videoPlayer.player.setVolume).toHaveBeenCalledWith(60);
+            });
+
+            describe('when the video is not playing', function () {
+                beforeEach(function () {
+                    videoPlayer.player.setVolume('1');
+                });
+
+                it('video has a correct volume', function () {
+                    spyOn(videoPlayer.player, 'setVolume');
+                    state.currentVolume = '0.26';
+                    videoPlayer.onPlay();
+                    expect(videoPlayer.player.setVolume).toHaveBeenCalledWith('0.26');
+                });
             });
         });
 
@@ -922,7 +945,9 @@
                 });
 
                 waitsFor(function () {
-                    return videoPlayer.isPlaying();
+                    duration = videoPlayer.duration();
+
+                    return duration > 0 && videoPlayer.isPlaying();
                 },'Video does not play.' , WAIT_TIMEOUT);
 
                 runs(function () {

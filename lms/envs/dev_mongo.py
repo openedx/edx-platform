@@ -19,7 +19,7 @@ MODULESTORE = {
             'collection': 'modulestore',
         },
         'OPTIONS': {
-            'default_class': 'xmodule.raw_module.RawDescriptor',
+            'default_class': 'xmodule.hidden_module.HiddenDescriptor',
             'fs_root': GITHUB_REPO_ROOT,
             'render_template': 'edxmako.shortcuts.render_to_string',
         }

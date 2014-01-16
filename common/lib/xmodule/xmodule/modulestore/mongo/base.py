@@ -25,7 +25,6 @@ from path import path
 from importlib import import_module
 from xmodule.errortracker import null_error_tracker, exc_info_to_str
 from xmodule.mako_module import MakoDescriptorSystem
-from xmodule.x_module import XModuleDescriptor
 from xmodule.error_module import ErrorDescriptor
 from xblock.runtime import DbModel
 from xblock.exceptions import InvalidScopeError
@@ -173,10 +172,8 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
             # load the module and apply the inherited metadata
             try:
                 category = json_data['location']['category']
-                class_ = XModuleDescriptor.load_class(
-                    category,
-                    self.default_class
-                )
+                class_ = self.load_block_type(category)
+
                 definition = json_data.get('definition', {})
                 metadata = json_data.get('metadata', {})
                 for old_name, new_name in getattr(class_, 'metadata_translations', {}).items():
@@ -506,6 +503,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
             render_template=self.render_template,
             cached_metadata=cached_metadata,
             mixins=self.xblock_mixins,
+            select=self.xblock_select,
         )
         return system.load_item(item['location'])
 
@@ -627,8 +625,9 @@ class MongoModuleStore(ModuleStoreWriteBase):
                 render_template=self.render_template,
                 cached_metadata={},
                 mixins=self.xblock_mixins,
+                select=self.xblock_select,
             )
-        xblock_class = XModuleDescriptor.load_class(location.category, self.default_class)
+        xblock_class = system.load_block_type(location.category)
         if definition_data is None:
             if hasattr(xblock_class, 'data') and xblock_class.data.default is not None:
                 definition_data = xblock_class.data.default

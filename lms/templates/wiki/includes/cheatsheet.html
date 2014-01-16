@@ -21,9 +21,7 @@
           <pre>{% trans "[Article Name](wiki:ArticleName)" %}</pre>
         </section>
         <section>
-          {% comment %}
-              Translators: Do not translate "edX"
-          {% endcomment %}
+          {# Translators: Do not translate "edX" #}
           <h3>{% trans "edX Additions:" %}</h3>
           <pre>circuit-schematic:</pre>
           <pre>$LaTeX Math Expression$</pre>
@@ -34,12 +32,9 @@
           <section>
               <h3>{% trans "Useful examples:" %}</h3>
               <pre>
-{% comment %}
-  Translators: Do not translate "edX" or "Wikipedia"
-{% endcomment %}
-{% trans "http://wikipedia.org" %}
-{% trans "[Wikipedia](http://wikipedia.org)" %}
-{% trans "[edX Wiki](wiki:/edx/)" %}
+http://wikipedia.org
+[Wikipedia](http://wikipedia.org)
+[edX Wiki](wiki:/edx/)
               </pre>
               <pre>
 {% trans "Huge Header" %}
@@ -48,8 +43,10 @@
 {% trans "Smaller Header" %}
 --------------</pre>
               <pre>
+{# Translators: Leave the punctuation, but translate "emphasis" #}
 {% trans "*emphasis* or _emphasis_" %}</pre>
               <pre>
+{# Translators: Leave the punctuation, but translate "strong" #}
 {% trans "**strong** or __strong__" %}</pre>
               <pre>
 - {% trans "Unordered List" %}
