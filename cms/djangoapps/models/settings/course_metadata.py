@@ -1,7 +1,6 @@
 from xblock.fields import Scope
 
 from contentstore.utils import get_modulestore
-from xmodule.modulestore.inheritance import own_metadata
 from cms.lib.xblock.mixin import CmsBlockMixin
 
 
@@ -78,6 +77,6 @@ class CourseMetadata(object):
                 setattr(descriptor, key, value)
 
         if dirty:
-            get_modulestore(descriptor.location).update_metadata(descriptor.location, own_metadata(descriptor))
+            get_modulestore(descriptor.location).update_item(descriptor, 'update_settings')
 
         return cls.fetch(descriptor)

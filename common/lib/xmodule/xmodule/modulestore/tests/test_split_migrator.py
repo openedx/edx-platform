@@ -102,7 +102,7 @@ class TestMigration(unittest.TestCase):
         location = location.replace(category='chapter', name=uuid.uuid4().hex)
         chapter2 = self._create_and_get_item(self.old_mongo, location, {}, {'display_name': 'Chapter 2'}, runtime)
         course_root.children.append(chapter2.location.url())
-        self.old_mongo.update_children(course_root.location, course_root.children)
+        self.old_mongo.update_item(course_root, 'test_split_migrate')
         # vertical in live only
         location = location.replace(category='vertical', name=uuid.uuid4().hex)
         live_vert = self._create_and_get_item(self.old_mongo, location, {}, {'display_name': 'Live vertical'}, runtime)
@@ -140,7 +140,7 @@ class TestMigration(unittest.TestCase):
         self.create_random_units(self.old_mongo, live_vert)
 
         # update the chapter
-        self.old_mongo.update_children(chapter1.location, chapter1.children)
+        self.old_mongo.update_item(chapter1, 'test_split_migrator')
 
         # now the other one w/ the conditional
         # first create some show children
@@ -169,7 +169,7 @@ class TestMigration(unittest.TestCase):
         # add direct children
         self.create_random_units(self.old_mongo, conditional)
         chapter2.children.append(conditional.location.url())
-        self.old_mongo.update_children(chapter2.location, chapter2.children)
+        self.old_mongo.update_item(chapter2, 'test_split_migrator')
 
         # and the ancillary docs (not children)
         location = location.replace(category='static_tab', name=uuid.uuid4().hex)
@@ -207,9 +207,9 @@ class TestMigration(unittest.TestCase):
                     cc_store, location, data, {'display_name': str(uuid.uuid4())}, parent.runtime
                 )
                 cc_parent.children.append(element.location.url())
-        store.update_children(parent.location, parent.children)
+        store.update_item(parent, 'test_split_migrator')
         if cc_store is not None:
-            cc_store.update_children(cc_parent.location, cc_parent.children)
+            cc_store.update_item(cc_parent, 'test_split_migrator')
 
     def compare_courses(self, presplit, published):
         # descend via children to do comparison

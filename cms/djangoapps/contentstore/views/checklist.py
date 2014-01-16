@@ -51,8 +51,7 @@ def checklists_handler(request, tag=None, package_id=None, branch=None, version_
         # from the template.
         if not course_module.checklists:
             course_module.checklists = CourseDescriptor.checklists.default
-            course_module.save()
-            modulestore.update_metadata(old_location, own_metadata(course_module))
+            modulestore.update_item(course_module, request.user.username)
 
         expanded_checklists = expand_all_action_urls(course_module)
         if json_request:
@@ -81,7 +80,7 @@ def checklists_handler(request, tag=None, package_id=None, branch=None, version_
             # not default
             course_module.checklists = course_module.checklists
             course_module.save()
-            modulestore.update_metadata(old_location, own_metadata(course_module))
+            modulestore.update_item(course_module, request.user.username)
             expanded_checklist = expand_checklist_action_url(course_module, persisted_checklist)
             return JsonResponse(expanded_checklist)
         else:

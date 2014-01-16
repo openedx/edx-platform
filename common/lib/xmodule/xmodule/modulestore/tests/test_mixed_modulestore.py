@@ -37,6 +37,7 @@ OPTIONS = {
         XML_COURSEID2: 'xml',
         IMPORT_COURSEID: 'default'
     },
+    'reference_type': 'Location',
     'stores': {
         'xml': {
             'ENGINE': 'xmodule.modulestore.xml.XMLModuleStore',
@@ -182,6 +183,7 @@ class TestMixedModuleStore(object):
             )
 
     def test_get_items(self):
+        # NOTE: use get_course if you just want the course. get_items only allows wildcarding of category and name
         modules = self.store.get_items(Location('i4x', None, None, 'course', None), IMPORT_COURSEID)
         assert_equals(len(modules), 1)
         assert_equals(modules[0].location.course, self.import_course)
@@ -190,21 +192,14 @@ class TestMixedModuleStore(object):
         assert_equals(len(modules), 1)
         assert_equals(modules[0].location.course, 'toy')
 
-        modules = self.store.get_items(Location('i4x', None, None, 'course', None), XML_COURSEID2)
+        modules = self.store.get_items(Location('i4x', 'edX', 'simple', 'course', None), XML_COURSEID2)
         assert_equals(len(modules), 1)
         assert_equals(modules[0].location.course, 'simple')
 
     def test_update_item(self):
+        # FIXME update
         with assert_raises(NotImplementedError):
             self.store.update_item(self.fake_location, None)
-
-    def test_update_children(self):
-        with assert_raises(NotImplementedError):
-            self.store.update_children(self.fake_location, None)
-
-    def test_update_metadata(self):
-        with assert_raises(NotImplementedError):
-            self.store.update_metadata(self.fake_location, None)
 
     def test_delete_item(self):
         with assert_raises(NotImplementedError):

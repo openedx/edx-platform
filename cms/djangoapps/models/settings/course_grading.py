@@ -65,9 +65,7 @@ class CourseGradingModel(object):
         descriptor.raw_grader = graders_parsed
         descriptor.grade_cutoffs = jsondict['grade_cutoffs']
 
-        get_modulestore(course_old_location).update_item(
-            course_old_location, descriptor.get_explicitly_set_fields_by_scope(Scope.content)
-        )
+        get_modulestore(course_old_location).update_item(descriptor, 'course_grading')
 
         CourseGradingModel.update_grace_period_from_json(course_locator, jsondict['grace_period'])
 
@@ -91,9 +89,7 @@ class CourseGradingModel(object):
         else:
             descriptor.raw_grader.append(grader)
 
-        get_modulestore(course_old_location).update_item(
-            course_old_location, descriptor.get_explicitly_set_fields_by_scope(Scope.content)
-        )
+        get_modulestore(course_old_location).update_item(descriptor, 'course_grading')
 
         return CourseGradingModel.jsonize_grader(index, descriptor.raw_grader[index])
 
@@ -107,9 +103,7 @@ class CourseGradingModel(object):
         descriptor = get_modulestore(course_old_location).get_item(course_old_location)
         descriptor.grade_cutoffs = cutoffs
 
-        get_modulestore(course_old_location).update_item(
-            course_old_location, descriptor.get_explicitly_set_fields_by_scope(Scope.content)
-        )
+        get_modulestore(course_old_location).update_item(descriptor, 'course_grading')
 
         return cutoffs
 
@@ -132,9 +126,7 @@ class CourseGradingModel(object):
             grace_timedelta = timedelta(**graceperiodjson)
             descriptor.graceperiod = grace_timedelta
 
-            get_modulestore(course_old_location).update_metadata(
-                course_old_location, descriptor.get_explicitly_set_fields_by_scope(Scope.settings)
-            )
+            get_modulestore(course_old_location).update_item(descriptor, 'update_grace_period')
 
     @staticmethod
     def delete_grader(course_location, index):
@@ -150,9 +142,7 @@ class CourseGradingModel(object):
             # force propagation to definition
             descriptor.raw_grader = descriptor.raw_grader
 
-        get_modulestore(course_old_location).update_item(
-            course_old_location, descriptor.get_explicitly_set_fields_by_scope(Scope.content)
-        )
+        get_modulestore(course_old_location).update_item(descriptor, 'delete_grader')
 
     @staticmethod
     def delete_grace_period(course_location):
@@ -164,9 +154,7 @@ class CourseGradingModel(object):
 
         del descriptor.graceperiod
 
-        get_modulestore(course_old_location).update_metadata(
-            course_old_location, descriptor.get_explicitly_set_fields_by_scope(Scope.settings)
-        )
+        get_modulestore(course_old_location).update_item(descriptor, 'delete_grace_period')
 
     @staticmethod
     def get_section_grader_type(location):
@@ -186,9 +174,7 @@ class CourseGradingModel(object):
             del descriptor.format
             del descriptor.graded
 
-        get_modulestore(descriptor.location).update_metadata(
-            descriptor.location, descriptor.get_explicitly_set_fields_by_scope(Scope.settings)
-        )
+        get_modulestore(descriptor.location).update_item(descriptor, 'update_grader')
         return {'graderType': grader_type}
 
     @staticmethod

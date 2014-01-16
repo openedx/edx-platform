@@ -63,13 +63,13 @@ class Basetranscripts(CourseTestCase):
         self.item_locator, self.item_location = self._get_locator(resp)
         self.assertEqual(resp.status_code, 200)
 
+        self.item = modulestore().get_item(self.item_location)
         # hI10vDNYz4M - valid Youtube ID with transcripts.
         # JMD_ifUUfsU, AKqURZnYqpk, DYpADpL7jAY - valid Youtube IDs without transcripts.
-        data = '<video youtube="0.75:JMD_ifUUfsU,1.0:hI10vDNYz4M,1.25:AKqURZnYqpk,1.50:DYpADpL7jAY" />'
-        modulestore().update_item(self.item_location, data)
+        self.item.data = '<video youtube="0.75:JMD_ifUUfsU,1.0:hI10vDNYz4M,1.25:AKqURZnYqpk,1.50:DYpADpL7jAY" />'
+        modulestore().update_item(self.item, 'test_transcripts')
 
         self.item = modulestore().get_item(self.item_location)
-
         # Remove all transcripts for current module.
         self.clear_subs_content()
 
@@ -130,14 +130,14 @@ class TestUploadtranscripts(Basetranscripts):
         self.bad_name_srt_file.seek(0)
 
     def test_success_video_module_source_subs_uploading(self):
-        data = textwrap.dedent("""
+        self.item.data = textwrap.dedent("""
             <video youtube="">
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.mp4"/>
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.webm"/>
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.ogv"/>
             </video>
         """)
-        modulestore().update_item(self.item_location, data)
+        modulestore().update_item(self.item, 'test_transcripts')
 
         link = reverse('upload_transcripts')
         filename = os.path.splitext(os.path.basename(self.good_srt_file.name))[0]
@@ -212,8 +212,9 @@ class TestUploadtranscripts(Basetranscripts):
         }
         resp = self.client.ajax_post('/xblock', data)
         item_locator, item_location = self._get_locator(resp)
-        data = '<non_video youtube="0.75:JMD_ifUUfsU,1.0:hI10vDNYz4M" />'
-        modulestore().update_item(item_location, data)
+        item = modulestore().get_item(item_location)
+        item.data = '<non_video youtube="0.75:JMD_ifUUfsU,1.0:hI10vDNYz4M" />'
+        modulestore().update_item(item, 'test_transcripts')
 
         # non_video module: testing
 
@@ -232,8 +233,8 @@ class TestUploadtranscripts(Basetranscripts):
         self.assertEqual(json.loads(resp.content).get('status'), 'Transcripts are supported only for "video" modules.')
 
     def test_fail_bad_xml(self):
-        data = '<<<video youtube="0.75:JMD_ifUUfsU,1.25:AKqURZnYqpk,1.50:DYpADpL7jAY" />'
-        modulestore().update_item(self.item_location, data)
+        self.item.data = '<<<video youtube="0.75:JMD_ifUUfsU,1.25:AKqURZnYqpk,1.50:DYpADpL7jAY" />'
+        modulestore().update_item(self.item, 'test_transcripts')
 
         link = reverse('upload_transcripts')
         filename = os.path.splitext(os.path.basename(self.good_srt_file.name))[0]
@@ -344,8 +345,8 @@ class TestDownloadtranscripts(Basetranscripts):
             pass
 
     def test_success_download_youtube(self):
-        data = '<video youtube="1:JMD_ifUUfsU" />'
-        modulestore().update_item(self.item_location, data)
+        self.item.data = '<video youtube="1:JMD_ifUUfsU" />'
+        modulestore().update_item(self.item, 'test_transcripts')
 
         subs = {
             'start': [100, 200, 240],
@@ -365,14 +366,14 @@ class TestDownloadtranscripts(Basetranscripts):
 
     def test_success_download_nonyoutube(self):
         subs_id = str(uuid4())
-        data = textwrap.dedent("""
+        self.item.data = textwrap.dedent("""
             <video youtube="" sub="{}">
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.mp4"/>
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.webm"/>
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.ogv"/>
             </video>
         """.format(subs_id))
-        modulestore().update_item(self.item_location, data)
+        modulestore().update_item(self.item, 'test_transcripts')
 
         subs = {
             'start': [100, 200, 240],
@@ -424,14 +425,15 @@ class TestDownloadtranscripts(Basetranscripts):
         resp = self.client.ajax_post('/xblock', data)
         item_locator, item_location = self._get_locator(resp)
         subs_id = str(uuid4())
-        data = textwrap.dedent("""
+        item = modulestore().get_item(item_location)
+        item.data = textwrap.dedent("""
             <videoalpha youtube="" sub="{}">
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.mp4"/>
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.webm"/>
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.ogv"/>
             </videoalpha>
         """.format(subs_id))
-        modulestore().update_item(item_location, data)
+        modulestore().update_item(item, 'test_transcripts')
 
         subs = {
             'start': [100, 200, 240],
@@ -449,28 +451,28 @@ class TestDownloadtranscripts(Basetranscripts):
         self.assertEqual(resp.status_code, 404)
 
     def test_fail_nonyoutube_subs_dont_exist(self):
-        data = textwrap.dedent("""
+        self.item.data = textwrap.dedent("""
             <video youtube="" sub="UNDEFINED">
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.mp4"/>
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.webm"/>
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.ogv"/>
             </video>
         """)
-        modulestore().update_item(self.item_location, data)
+        modulestore().update_item(self.item, 'test_transcripts')
 
         link = reverse('download_transcripts')
         resp = self.client.get(link, {'locator': self.item_locator})
         self.assertEqual(resp.status_code, 404)
 
     def test_empty_youtube_attr_and_sub_attr(self):
-        data = textwrap.dedent("""
+        self.item.data = textwrap.dedent("""
             <video youtube="">
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.mp4"/>
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.webm"/>
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.ogv"/>
             </video>
         """)
-        modulestore().update_item(self.item_location, data)
+        modulestore().update_item(self.item, 'test_transcripts')
 
         link = reverse('download_transcripts')
         resp = self.client.get(link, {'locator': self.item_locator})
@@ -479,14 +481,14 @@ class TestDownloadtranscripts(Basetranscripts):
 
     def test_fail_bad_sjson_subs(self):
         subs_id = str(uuid4())
-        data = textwrap.dedent("""
+        self.item.data = textwrap.dedent("""
             <video youtube="" sub="{}">
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.mp4"/>
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.webm"/>
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.ogv"/>
             </video>
         """.format(subs_id))
-        modulestore().update_item(self.item_location, data)
+        modulestore().update_item(self.item, 'test_transcripts')
 
         subs = {
             'start': [100, 200, 240],
@@ -532,14 +534,14 @@ class TestChecktranscripts(Basetranscripts):
 
     def test_success_download_nonyoutube(self):
         subs_id = str(uuid4())
-        data = textwrap.dedent("""
+        self.item.data = textwrap.dedent("""
             <video youtube="" sub="{}">
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.mp4"/>
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.webm"/>
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.ogv"/>
             </video>
         """.format(subs_id))
-        modulestore().update_item(self.item_location, data)
+        modulestore().update_item(self.item, 'test_transcripts')
 
         subs = {
             'start': [100, 200, 240],
@@ -582,8 +584,8 @@ class TestChecktranscripts(Basetranscripts):
         transcripts_utils.remove_subs_from_store(subs_id, self.item)
 
     def test_check_youtube(self):
-        data = '<video youtube="1:JMD_ifUUfsU" />'
-        modulestore().update_item(self.item_location, data)
+        self.item.data = '<video youtube="1:JMD_ifUUfsU" />'
+        modulestore().update_item(self.item, 'test_transcripts')
 
         subs = {
             'start': [100, 200, 240],
@@ -674,14 +676,15 @@ class TestChecktranscripts(Basetranscripts):
         resp = self.client.ajax_post('/xblock', data)
         item_locator, item_location = self._get_locator(resp)
         subs_id = str(uuid4())
-        data = textwrap.dedent("""
+        item = modulestore().get_item(item_location)
+        item.data = textwrap.dedent("""
             <not_video youtube="" sub="{}">
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.mp4"/>
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.webm"/>
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.ogv"/>
             </videoalpha>
         """.format(subs_id))
-        modulestore().update_item(item_location, data)
+        modulestore().update_item(item, 'test_transcript')
 
         subs = {
             'start': [100, 200, 240],

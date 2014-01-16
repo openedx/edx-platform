@@ -163,8 +163,7 @@ def course_listing(request):
     """
     List all courses available to the logged in user
     """
-    # there's an index on category which will be used if none of its antecedents are set
-    courses = modulestore('direct').get_items(Location(None, None, None, 'course', None))
+    courses = modulestore('direct').get_courses()
 
     # filter out courses that we don't have access too
     def course_filter(course):
@@ -743,10 +742,7 @@ def textbooks_list_handler(request, tag=None, package_id=None, branch=None, vers
         if not any(tab['type'] == 'pdf_textbooks' for tab in course.tabs):
             course.tabs.append({"type": "pdf_textbooks"})
         course.pdf_textbooks = textbooks
-        store.update_metadata(
-            course.location,
-            own_metadata(course)
-        )
+        store.update_item(course, request.user.username)
         return JsonResponse(course.pdf_textbooks)
     elif request.method == 'POST':
         # create a new textbook for the course
@@ -764,7 +760,7 @@ def textbooks_list_handler(request, tag=None, package_id=None, branch=None, vers
             tabs = course.tabs
             tabs.append({"type": "pdf_textbooks"})
             course.tabs = tabs
-        store.update_metadata(course.location, own_metadata(course))
+        store.update_item(course, request.user.username)
         resp = JsonResponse(textbook, status=201)
         resp["Location"] = locator.url_reverse('textbooks', textbook["id"])
         return resp
@@ -815,10 +811,7 @@ def textbooks_detail_handler(request, tid, tag=None, package_id=None, branch=Non
             course.pdf_textbooks = new_textbooks
         else:
             course.pdf_textbooks.append(new_textbook)
-        store.update_metadata(
-            course.location,
-            own_metadata(course)
-        )
+        store.update_item(course, request.user.username)
         return JsonResponse(new_textbook, status=201)
     elif request.method == 'DELETE':
         if not textbook:
@@ -827,10 +820,7 @@ def textbooks_detail_handler(request, tid, tag=None, package_id=None, branch=Non
         new_textbooks = course.pdf_textbooks[0:i]
         new_textbooks.extend(course.pdf_textbooks[i + 1:])
         course.pdf_textbooks = new_textbooks
-        store.update_metadata(
-            course.location,
-            own_metadata(course)
-        )
+        store.update_item(course, request.user.username)
         return JsonResponse()
 
 

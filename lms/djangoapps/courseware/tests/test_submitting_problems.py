@@ -228,9 +228,9 @@ class TestCourseGrader(TestSubmittingProblems):
         Add a grading policy to the course.
         """
 
-        course_data = {'grading_policy': grading_policy}
+        self.course.grading_policy = grading_policy
         store = editable_modulestore('direct')
-        store.update_item(self.course.location, course_data)
+        store.update_item(self.course, 'add_grading_policy')
         self.refresh_course()
 
     def get_grade_summary(self):
