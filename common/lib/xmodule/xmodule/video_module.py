@@ -20,7 +20,6 @@ import datetime
 import copy
 from webob import Response
 
-from django.http import Http404
 from django.conf import settings
 
 from xmodule.x_module import XModule, module_attr
@@ -36,6 +35,7 @@ from xmodule.fields import RelativeTime
 
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore
 from xblock.runtime import KvsFieldData
+from .exceptions import NotFoundError
 
 log = logging.getLogger(__name__)
 
@@ -47,7 +47,7 @@ class VideoFields(object):
         default="Video",
         scope=Scope.settings
     )
-    position = Integer(
+    position = Float(
         help="Current position in the video",
         scope=Scope.user_state,
         default=0
@@ -170,10 +170,22 @@ class VideoModule(VideoFields, XModule):
     js_module_name = "Video"
 
     def handle_ajax(self, dispatch, data):
-        """This is not being called right now and we raise 404 error."""
+        ''' get = request.POST instance '''
+        ACCEPTED_KEYS = ['position']
+
+        if dispatch == 'save_user_state':
+            for key in data:
+                if hasattr(self, key) and key in ACCEPTED_KEYS:
+                    setattr(self, key, json.loads(data[key]))
+                    if key == 'speed':
+                        self.global_speed = self.speed
+
+            return json.dumps({'success': True})
+
         log.debug(u"GET {0}".format(data))
         log.debug(u"DISPATCH {0}".format(dispatch))
-        raise Http404()
+
+        raise NotFoundError('Unexpected dispatch type')
 
     def get_html(self):
         track_url = None
@@ -196,18 +208,26 @@ class VideoModule(VideoFields, XModule):
             'sources': sources,
             'track': track_url,
             'display_name': self.display_name_with_default,
+            'ajax_url': self.system.ajax_url + '/save_user_state',
+            'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', False),
             # This won't work when we move to data that
             # isn't on the filesystem
             'data_dir': getattr(self, 'data_dir', None),
+            'display_name': self.display_name_with_default,
             'caption_asset_path': caption_asset_path,
-            'show_captions': json.dumps(self.show_captions),
-            'start': self.start_time.total_seconds(),
             'end': self.end_time.total_seconds(),
-            'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', False),
+            'id': self.location.html_id(),
+            'show_captions': json.dumps(self.show_captions),
+            'sources': sources,
+            'position': self.position,
+            'start': self.start_time.total_seconds(),
+            'sub': self.sub,
+            'track': self.track,
+            'youtube_streams': _create_youtube_string(self),
             # TODO: Later on the value 1500 should be taken from some global
             # configuration setting field.
             'yt_test_timeout': 1500,
-            'yt_test_url': settings.YOUTUBE_TEST_URL
+            'yt_test_url': settings.YOUTUBE_TEST_URL,
         })
 
     def get_transcript(self, subs_id):
@@ -256,6 +276,7 @@ class VideoModule(VideoFields, XModule):
         response.content_type="text/plain; charset=utf-8"
 
         return response
+
 
 
 class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor):

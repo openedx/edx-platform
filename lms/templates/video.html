@@ -17,8 +17,10 @@
     ${'data-webm-source="{}"'.format(sources.get('webm')) if sources.get('webm') else ''}
     ${'data-ogg-source="{}"'.format(sources.get('ogv')) if sources.get('ogv') else ''}
 
+    data-save-state-url="${ajax_url}"
     data-caption-data-dir="${data_dir}"
     data-show-captions="${show_captions}"
+    data-position="${position}"
     data-start="${start}"
     data-end="${end}"
     data-caption-asset-path="${caption_asset_path}"
@@ -108,5 +110,3 @@
     % endif
   </ul>
 </div>
-
-
