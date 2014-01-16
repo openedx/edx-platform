@@ -51,7 +51,7 @@ The following changes are included in this release:
 
 
 ******************
-Forums 
+Discussion Forums
 ******************
 
 The following changes are included in this release: 

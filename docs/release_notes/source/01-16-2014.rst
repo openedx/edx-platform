@@ -44,8 +44,8 @@ edX Learning Management System
 
 * For Image Response problems, the correct answer now appears when a student clicks **Show Answer**. (BLD-633)
 
-*********
-Forums
-*********
+******************
+Discussion Forums
+******************
 
 * The Vote button in the forum is now accessible by the keyboard and to screen readers. (FOR-64)

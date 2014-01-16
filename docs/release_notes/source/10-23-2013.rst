@@ -134,7 +134,7 @@ Changes and Updates
 
 
 ******************
-Forums 
+Discussion Forums
 ******************
 
 The following changes are included in this release: 
