@@ -5,10 +5,11 @@
 #pylint: disable=W0613
 
 import sys, os
+from path import path
 
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
-sys.path.append('../../../')
+sys.path.append('../../../../')
 
 from docs.shared.conf import *
 
@@ -26,19 +27,18 @@ html_static_path.append('source/_static')
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-sys.path.insert(0, os.path.abspath('../../..'))
-root = os.path.abspath('../../..')
+root = path('../../../..').abspath()
+sys.path.insert(0, root)
 
-sys.path.append(root)
-sys.path.append(os.path.join(root, "common/djangoapps"))
-sys.path.append(os.path.join(root, "common/lib"))
-sys.path.append(os.path.join(root, "common/lib/sandbox-packages"))
-sys.path.append(os.path.join(root, "lms/djangoapps"))
-sys.path.append(os.path.join(root, "lms/lib"))
-sys.path.append(os.path.join(root, "cms/djangoapps"))
-sys.path.append(os.path.join(root, "cms/lib"))
+sys.path.append(root / "common/djangoapps")
+sys.path.append(root / "common/lib")
+sys.path.append(root / "common/lib/sandbox-packages")
+sys.path.append(root / "lms/djangoapps")
+sys.path.append(root / "lms/lib")
+sys.path.append(root / "cms/djangoapps")
+sys.path.append(root / "cms/lib")
 sys.path.insert(0, os.path.abspath(os.path.normpath(os.path.dirname(__file__)
-    + '/../../')))
+    + '/../../../')))
 sys.path.append('.')
 
 #  django configuration  - careful here
