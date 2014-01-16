@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Test email scripts.
 """
@@ -51,9 +52,16 @@ class MailusersTests(TestCase):
         self.barney = barney = User(
             username='barney', email='barney@bedrock.gov')
         barney.save()
+
         LinkedIn(user=barney, has_linkedin_account=True).save()
         UserProfile(user=barney, name='Barney Rubble').save()
 
+        self.adam = adam = User(
+            username='adam', email='adam@adam.gov')
+        adam.save()
+
+        LinkedIn(user=adam, has_linkedin_account=True).save()
+        UserProfile(user=adam, name='Adam (חיים פּלי)').save()
         self.cert1 = cert1 = GeneratedCertificate(
             status='downloadable',
             user=fred,
@@ -71,7 +79,11 @@ class MailusersTests(TestCase):
             user=barney,
             course_id='TESTX/3/TEST3')
         cert3.save()
-
+        cert5 = GeneratedCertificate(
+            status='downloadable',
+            user=adam,
+            course_id='TESTX/3/TEST3')
+        cert5.save()
 
     @mock.patch.dict('django.conf.settings.LINKEDIN_API',
                      {'EMAIL_WHITELIST': ['barney@bedrock.gov']})
@@ -97,7 +109,9 @@ class MailusersTests(TestCase):
             json.loads(self.fred.linkedin.emailed_courses), ['TESTX/1/TEST1', 'TESTX/2/TEST2'])
         self.assertEqual(
             json.loads(self.barney.linkedin.emailed_courses), ['TESTX/3/TEST3'])
-        self.assertEqual(len(mail.outbox), 2)
+        self.assertEqual(
+            json.loads(self.adam.linkedin.emailed_courses), ['TESTX/3/TEST3'])
+        self.assertEqual(len(mail.outbox), 3)
         self.assertEqual(
             mail.outbox[0].to, ['Fred Flintstone <fred@bedrock.gov>'])
         self.assertEqual(
@@ -106,6 +120,8 @@ class MailusersTests(TestCase):
             mail.outbox[1].to, ['Barney Rubble <barney@bedrock.gov>'])
         self.assertEqual(
             mail.outbox[1].subject, 'Barney Rubble, Add your Achievements to your LinkedIn Profile')
+        self.assertEqual(
+            mail.outbox[2].subject, u'Adam (חיים פּלי), Add your Achievements to your LinkedIn Profile')
 
     def test_mail_users_grandfather_mock(self):
         """
@@ -117,6 +133,8 @@ class MailusersTests(TestCase):
             json.loads(self.fred.linkedin.emailed_courses), [])
         self.assertEqual(
             json.loads(self.barney.linkedin.emailed_courses), [])
+        self.assertEqual(
+            json.loads(self.adam.linkedin.emailed_courses), [])
         self.assertEqual(len(mail.outbox), 0)
 
     def test_transaction_semantics(self):

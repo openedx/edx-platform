@@ -191,11 +191,11 @@ class Command(BaseCommand):
                 reverse('course_root', kwargs={'course_id': cert.course_id})
             )
 
-            course_title = course.display_name
+            course_title = course.display_name_with_default
 
             course_img_url = 'https://{}{}'.format(settings.SITE_NAME, course_image_url(course))
             course_end_date = course.end.strftime('%b %Y')
-            course_org = course.display_organization
+            course_org = course.org
 
             courses_list.append({
                 'course_url': course_url,
@@ -208,7 +208,7 @@ class Command(BaseCommand):
 
         context = {'courses_list': courses_list, 'num_courses': len(courses_list)}
         body = render_to_string('linkedin/linkedin_email.html', context)
-        subject = '{}, Add your Achievements to your LinkedIn Profile'.format(user.profile.name)
+        subject = u'{}, Add your Achievements to your LinkedIn Profile'.format(user.profile.name)
         if mock_run:
             return True
         else:
@@ -219,7 +219,7 @@ class Command(BaseCommand):
         Send an email. Return True if it succeeded, False if it didn't.
         """
         fromaddr = settings.DEFAULT_FROM_EMAIL
-        toaddr = '%s <%s>' % (user.profile.name, user.email)
+        toaddr = u'{} <{}>'.format(user.profile.name, user.email)
         msg = EmailMessage(subject, body, fromaddr, (toaddr,))
         msg.content_subtype = "html"
 
@@ -231,7 +231,7 @@ class Command(BaseCommand):
             except SINGLE_EMAIL_FAILURE_ERRORS:
                 # Something unrecoverable is wrong about the email acct we're sending to
                 log.exception(
-                    "LinkedIn: Email send failed for user {}, email {}"
+                    u"LinkedIn: Email send failed for user {}, email {}"
                     .format(user.username, user.email)
                 )
                 return False
