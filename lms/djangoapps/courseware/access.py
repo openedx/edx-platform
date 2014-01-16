@@ -24,7 +24,6 @@ from student.roles import (
     GlobalStaff, CourseStaffRole, CourseInstructorRole,
     OrgStaffRole, OrgInstructorRole, CourseBetaTesterRole
 )
-
 DEBUG_ACCESS = False
 
 log = logging.getLogger(__name__)
@@ -246,7 +245,7 @@ def _has_access_descriptor(user, descriptor, action, course_context=None):
             return True
 
         # Check start date
-        if descriptor.start is not None:
+        if not getattr(descriptor, 'detached') and descriptor.start is not None:
             now = datetime.now(UTC())
             effective_start = _adjust_start_date_for_beta_testers(
                 user,
