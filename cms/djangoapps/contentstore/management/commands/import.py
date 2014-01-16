@@ -3,6 +3,8 @@ Script for importing courseware from XML format
 """
 
 from django.core.management.base import BaseCommand, CommandError, make_option
+from django_comment_common.utils import (seed_permissions_roles,
+                                         are_permissions_roles_seeded)
 from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.django import contentstore
@@ -42,5 +44,14 @@ class Command(BaseCommand):
                               'default\n')
             mstore = modulestore('default')
 
-        import_from_xml(mstore, data_dir, course_dirs, load_error_modules=False,
-                        static_content_store=contentstore(), verbose=True, do_import_static=do_import_static)
+        _, course_items = import_from_xml(
+            mstore, data_dir, course_dirs, load_error_modules=False,
+            static_content_store=contentstore(), verbose=True,
+            do_import_static=do_import_static
+        )
+
+        for module in course_items:
+            course_id = module.location.course_id
+            if not are_permissions_roles_seeded(course_id):
+                self.stdout.write('Seeding forum roles for course {0}'.format(course_id))
+                seed_permissions_roles(course_id)
