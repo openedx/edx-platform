@@ -176,52 +176,21 @@ function (HTML5Video, Resizer) {
 
                 _resize(state, videoWidth, videoHeight);
 
-                // We wait for metadata to arrive, before we request the update
-                // of the VCR video time, and of the start-end time region.
-                // Metadata contains duration of the video. We wait for 2
-                // seconds, and then abandon our attempts to update the VCR
-                // video time (and the start-end time region) using metadata.
-                (function () {
-                    var checkInterval = window.setInterval(
-                            checkForMetadata, 50
-                        ),
-                        numberOfChecks = 0;
-
-                    return;
-
-                    function checkForMetadata() {
-                        if (state.metadata && state.metadata[state.youtubeId()]) {
-                            duration = state.videoPlayer.duration();
-
-                            // After initialization, update the VCR with total time.
-                            // At this point only the metadata duration is available (not
-                            // very precise), but it is better than having 00:00:00 for
-                            // total time.
-                            state.trigger(
-                                'videoControl.updateVcrVidTime',
-                                {
-                                    time: 0,
-                                    duration: duration
-                                }
-                            );
-
-                            state.trigger(
-                                'videoProgressSlider.updateStartEndTimeRegion',
-                                {
-                                    duration: duration
-                                }
-                            );
-
-                            window.clearInterval(checkInterval);
-                        } else {
-                            numberOfChecks += 1;
-
-                            if (numberOfChecks === 40) {
-                                window.clearInterval(checkInterval);
-                            }
-                        }
-                    }
-                }());
+                // After initialization, update the VCR with total time.
+                // At this point only the metadata duration is available (not
+                // very precise), but it is better than having 00:00:00 for
+                // total time.
+                if (state.youtubeMetadataReceived) {
+                    // Metadata was already received, and is available.
+                    _updateVcrAndRegion(state);
+                } else {
+                    // We wait for metadata to arrive, before we request the update
+                    // of the VCR video time, and of the start-end time region.
+                    // Metadata contains duration of the video.
+                    state.el.on('metadata_received', function () {
+                        _updateVcrAndRegion(state);
+                    });
+                }
             });
         }
 
@@ -230,7 +199,26 @@ function (HTML5Video, Resizer) {
         }
     }
 
-    function _resize (state, videoWidth, videoHeight) {
+    function _updateVcrAndRegion(state) {
+        var duration = state.videoPlayer.duration();
+
+        state.trigger(
+            'videoControl.updateVcrVidTime',
+            {
+                time: 0,
+                duration: duration
+            }
+        );
+
+        state.trigger(
+            'videoProgressSlider.updateStartEndTimeRegion',
+            {
+                duration: duration
+            }
+        );
+    }
+
+    function _resize(state, videoWidth, videoHeight) {
         state.resizer = new Resizer({
                 element: state.videoEl,
                 elementRatio: videoWidth/videoHeight,
@@ -783,7 +771,17 @@ function (HTML5Video, Resizer) {
      * This instability is internal to the player API (or browser internals).
      */
     function duration() {
-        var dur = this.videoPlayer.player.getDuration();
+        var dur;
+
+        // Sometimes the YouTube API doesn't finish instantiating all of it's
+        // methods, but the execution point arrives here.
+        //
+        // This happens when you have start and end times set, and click "Edit"
+        // in Studio, and then "Save". The Video editor dialog closes, the
+        // video reloads, but the start-end range is not visible.
+        if (this.videoPlayer.player.getDuration) {
+            dur = this.videoPlayer.player.getDuration();
+        }
 
         // For YouTube videos, before the video starts playing, the API
         // function player.getDuration() will return 0. This means that the VCR

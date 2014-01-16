@@ -83,7 +83,7 @@ class StubYouTubeHandler(StubHttpRequestHandler):
                 'duration': 60,
             })
         })
-        response = callback + '({})'.format(json.dumps(data))
+        response = "{cb}({data})".format(cb=callback, data=json.dumps(data))
 
         self.send_response(200, content=response, headers={'Content-type': 'text/html'})
         self.log_message("Youtube: sent response {}".format(message))
