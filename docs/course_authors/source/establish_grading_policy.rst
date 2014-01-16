@@ -186,7 +186,7 @@ See :ref:`Establish a Grading Policy` for more information.
 Set the Due Date
 ==================
 
-For subsections that contain graded problems, you can set a due date. Students must complete the problems in the subsection before the due date to get credit.
+For subsections that contain graded problems, you can set a due date. Students must complete the problems in the subsection before the due date to get credit. All problems in a subsection have the same due date.
 
 #. From the subsection page, click **SET A DUE DATE**. The Due Day and Due Time fields appear.
 #. Place the cursor in the Due Date field, and pick a day from the popup calendar.
@@ -195,6 +195,13 @@ For subsections that contain graded problems, you can set a due date. Students m
 .. note:: When you set a due date, keep in mind that students will be in different time zones. By default, the time zone appears as UTC, not the student's local time. If you tell your students an assignment is due at 5:00 PM, make sure to specify that the time is 5:00 PM UTC and point them to a time converter.
 
 Alternatively, you can :ref:`Set the Grace Period` for your assignments to cover any misunderstandings about time. For example, some classes have set a grace period of 1 day, 6 hours, and 1 minute. The grace period applies to all assignments.
+
+Students see the due date in the course accordian under the subsection title. For example:
+
+.. image::  Images/Subsection_due_date.png
+  :alt: Image of subsection due dates in the course accordian
+
+There are several problems in this subsection, all due November 3, 2013 at 23:30 UTC.
 
 
 
