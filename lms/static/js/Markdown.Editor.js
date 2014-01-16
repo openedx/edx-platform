@@ -27,15 +27,15 @@
 
     // The text that appears on the upper part of the dialog box when
     // entering links.
-    var linkDialogText = "<p><b>Insert Hyperlink</b></p><p>http://example.com/ \"optional title\"</p>";
-    var imageDialogText = "<p><b>Insert Image (upload file or type url)</b></p><p>http://example.com/images/diagram.jpg \"optional title\"<br><br></p>";
+    var linkDialogText = gettext("<p><b>Insert Hyperlink</b></p><p>http://example.com/ \"optional title\"</p>");
+    var imageDialogText = gettext("<p><b>Insert Image (upload file or type url)</b></p><p>http://example.com/images/diagram.jpg \"optional title\"<br><br></p>");
 
     // The default text that appears in the dialog input box when entering
     // links.
     var imageDefaultText = "http://";
     var linkDefaultText = "http://";
 
-    var defaultHelpHoverTitle = "Markdown Editing Help";
+    var defaultHelpHoverTitle = gettext("Markdown Editing Help");
 
     // -------------------------------------------------------------------
     //  END OF YOUR CHANGES
@@ -1444,33 +1444,33 @@
                 xPosition += 25;
             }
 
-            buttons.bold = makeButton("wmd-bold-button", "Bold (Ctrl+B)", "0px", bindCommand("doBold"));
-            buttons.italic = makeButton("wmd-italic-button", "Italic (Ctrl+I)", "-20px", bindCommand("doItalic"));
+            buttons.bold = makeButton("wmd-bold-button", gettext("Bold (Ctrl+B)"), "0px", bindCommand("doBold"));
+            buttons.italic = makeButton("wmd-italic-button", gettext("Italic (Ctrl+I)"), "-20px", bindCommand("doItalic"));
             makeSpacer(1);
-            buttons.link = makeButton("wmd-link-button", "Hyperlink (Ctrl+L)", "-40px", bindCommand(function (chunk, postProcessing) {
+            buttons.link = makeButton("wmd-link-button", gettext("Hyperlink (Ctrl+L)"), "-40px", bindCommand(function (chunk, postProcessing) {
                 return this.doLinkOrImage(chunk, postProcessing, false);
             }));
-            buttons.quote = makeButton("wmd-quote-button", "Blockquote (Ctrl+Q)", "-60px", bindCommand("doBlockquote"));
-            buttons.code = makeButton("wmd-code-button", "Code Sample (Ctrl+K)", "-80px", bindCommand("doCode"));
-            buttons.image = makeButton("wmd-image-button", "Image (Ctrl+G)", "-100px", bindCommand(function (chunk, postProcessing) {
+            buttons.quote = makeButton("wmd-quote-button", gettext("Blockquote (Ctrl+Q)"), "-60px", bindCommand("doBlockquote"));
+            buttons.code = makeButton("wmd-code-button", gettext("Code Sample (Ctrl+K)"), "-80px", bindCommand("doCode"));
+            buttons.image = makeButton("wmd-image-button", gettext("Image (Ctrl+G)"), "-100px", bindCommand(function (chunk, postProcessing) {
                 return this.doLinkOrImage(chunk, postProcessing, true, imageUploadHandler);
             }));
             makeSpacer(2);
-            buttons.olist = makeButton("wmd-olist-button", "Numbered List (Ctrl+O)", "-120px", bindCommand(function (chunk, postProcessing) {
+            buttons.olist = makeButton("wmd-olist-button", gettext("Numbered List (Ctrl+O)"), "-120px", bindCommand(function (chunk, postProcessing) {
                 this.doList(chunk, postProcessing, true);
             }));
-            buttons.ulist = makeButton("wmd-ulist-button", "Bulleted List (Ctrl+U)", "-140px", bindCommand(function (chunk, postProcessing) {
+            buttons.ulist = makeButton("wmd-ulist-button", gettext("Bulleted List (Ctrl+U)"), "-140px", bindCommand(function (chunk, postProcessing) {
                 this.doList(chunk, postProcessing, false);
             }));
-            buttons.heading = makeButton("wmd-heading-button", "Heading (Ctrl+H)", "-160px", bindCommand("doHeading"));
-            buttons.hr = makeButton("wmd-hr-button", "Horizontal Rule (Ctrl+R)", "-180px", bindCommand("doHorizontalRule"));
+            buttons.heading = makeButton("wmd-heading-button", gettext("Heading (Ctrl+H)"), "-160px", bindCommand("doHeading"));
+            buttons.hr = makeButton("wmd-hr-button", gettext("Horizontal Rule (Ctrl+R)"), "-180px", bindCommand("doHorizontalRule"));
             makeSpacer(3);
-            buttons.undo = makeButton("wmd-undo-button", "Undo (Ctrl+Z)", "-200px", null);
+            buttons.undo = makeButton("wmd-undo-button", gettext("Undo (Ctrl+Z)"), "-200px", null);
             buttons.undo.execute = function (manager) { if (manager) manager.undo(); };
 
             var redoTitle = /win/.test(nav.platform.toLowerCase()) ?
-                "Redo (Ctrl+Y)" :
-                "Redo (Ctrl+Shift+Z)"; // mac and other non-Windows platforms
+                gettext("Redo (Ctrl+Y)") :
+                gettext("Redo (Ctrl+Shift+Z)"); // mac and other non-Windows platforms
 
             buttons.redo = makeButton("wmd-redo-button", redoTitle, "-220px", null);
             buttons.redo.execute = function (manager) { if (manager) manager.redo(); };
@@ -1537,11 +1537,11 @@
     };
 
     commandProto.doBold = function (chunk, postProcessing) {
-        return this.doBorI(chunk, postProcessing, 2, "strong text");
+        return this.doBorI(chunk, postProcessing, 2, gettext("strong text"));
     };
 
     commandProto.doItalic = function (chunk, postProcessing) {
-        return this.doBorI(chunk, postProcessing, 1, "emphasized text");
+        return this.doBorI(chunk, postProcessing, 1, gettext("emphasized text"));
     };
 
     // chunk: The selected region that will be enclosed with */**
@@ -1744,10 +1744,10 @@
 
                     if (!chunk.selection) {
                         if (isImage) {
-                            chunk.selection = "enter image description here";
+                            chunk.selection = gettext("enter image description here");
                         }
                         else {
-                            chunk.selection = "enter link description here";
+                            chunk.selection = gettext("enter link description here");
                         }
                     }
                 }
@@ -1828,7 +1828,7 @@
             });
 
         chunk.selection = chunk.selection.replace(/^(\s|>)+$/, "");
-        chunk.selection = chunk.selection || "Blockquote";
+        chunk.selection = chunk.selection || gettext("Blockquote");
 
         // The original code uses a regular expression to find out how much of the
         // text *directly before* the selection already was a blockquote:
@@ -1985,7 +1985,7 @@
 
             if (!chunk.selection) {
                 chunk.startTag = "    ";
-                chunk.selection = "enter code here";
+                chunk.selection = gettext("enter code here");
             }
             else {
                 if (/^[ ]{0,3}\S/m.test(chunk.selection)) {
@@ -2008,7 +2008,7 @@
             if (!chunk.startTag && !chunk.endTag) {
                 chunk.startTag = chunk.endTag = "`";
                 if (!chunk.selection) {
-                    chunk.selection = "enter code here";
+                    chunk.selection = gettext("enter code here");
                 }
             }
             else if (chunk.endTag && !chunk.startTag) {
@@ -2102,7 +2102,7 @@
             });
 
         if (!chunk.selection) {
-            chunk.selection = "List item";
+            chunk.selection = gettext("List item");
         }
 
         var prefix = getItemPrefix();
@@ -2134,7 +2134,7 @@
         // make a level 2 hash header around some default text.
         if (!chunk.selection) {
             chunk.startTag = "## ";
-            chunk.selection = "Heading";
+            chunk.selection = gettext("Heading");
             chunk.endTag = " ##";
             return;
         }

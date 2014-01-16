@@ -71,17 +71,35 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) inset;
 }
 
-@mixin discussion-wmd-preview {
+@mixin discussion-wmd-preview-container {
   width: 100%;
-  min-height: 40px;
-  padding: 25px 20px 10px 20px;
   @include box-sizing(border-box);
   border: 1px solid #aaa;
   border-top: none;
   border-radius: 0 0 3px 3px;
   background: #eee;
-  color: #333;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) inset;
+}
+
+@mixin discussion-new-post-wmd-preview-container {
+  @include discussion-wmd-preview-container;
+  border-color: #333;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) inset;
+}
+
+@mixin discussion-wmd-preview-label {
+  width: 100%;
+  padding-top: 3px;
+  padding-left: 5px;
+  color: #bbb;
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+@mixin discussion-wmd-preview {
+  width: 100%;
+  padding: 10px 20px;
+  color: #333;
 }
 
 @-webkit-keyframes fadeIn {
@@ -354,28 +372,16 @@ body.discussion {
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) inset;
     }
 
-    .new-post-body .wmd-preview {
-      @include discussion-wmd-preview;
-      position: relative;
-      width: 100%;
-      //height: 50px;
-      margin-top: -1px;
-      padding: 25px 20px 10px 20px;
-      @include box-sizing(border-box);
-      border: 1px solid #333;
-      border-radius: 0 0 3px 3px;
-      background: #e6e6e6;
-      color: #333;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) inset;
+    .new-post-body .wmd-preview-container {
+      @include discussion-new-post-wmd-preview-container;
     }
 
-    .new-post-preview-label {
-      position: absolute;
-      top: 4px;
-      left: 4px;
-      color: #aaa;
-      text-transform: uppercase;
-      font-size: 11px;
+    .new-post-body .wmd-preview-label {
+      @include discussion-wmd-preview-label;
+    }
+
+    .new-post-body .wmd-preview {
+      @include discussion-wmd-preview;
     }
 
     .new-post-title {
@@ -499,33 +505,6 @@ body.discussion {
     &::-webkit-input-placeholder {
       color: #888;
     }
-  }
-
-  .wmd-preview {
-    @include box-sizing(border-box);
-    @include transition(all .2s ease-out 0s);
-    position: relative;
-    overflow: hidden;
-    margin-bottom: 5px;
-    padding: 25px $baseline $baseline/2 $baseline;
-    border: 1px solid #c8c8c8;
-    border-top-width: 0;
-    border-radius: 0 0 3px 3px;
-    font-family: $sans-serif;
-
-    &:before {
-      content: 'PREVIEW';
-      position: absolute;
-      top: 3px;
-      left: 5px;
-      font-size: 11px;
-      color: #bbb;
-    }
-
-    p {
-      font-family: $sans-serif;
-    }
-    background-color: #fafafa;
   }
 
   .wmd-button-row {
@@ -1822,6 +1801,14 @@ body.discussion {
     @include discussion-wmd-input;
   }
 
+  .wmd-preview-container {
+    @include discussion-wmd-preview-container;
+  }
+
+  .wmd-preview-label {
+    @include discussion-wmd-preview-label;
+  }
+
   .wmd-preview {
     @include discussion-wmd-preview;
   }
@@ -2102,28 +2089,16 @@ body.discussion {
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) inset;
       }
 
-      .new-post-body .wmd-preview {
-        @include discussion-wmd-preview;
-        position: relative;
-        width: 100%;
-        //height: 50px;
-        margin-top: -1px;
-        padding: 25px $baseline $baseline/2 $baseline;
-        @include box-sizing(border-box);
-        border: 1px solid #333;
-        border-radius: 0 0 3px 3px;
-        background: #e6e6e6;
-        color: #333;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) inset;
+      .new-post-body .wmd-preview-container {
+        @include discussion-new-post-wmd-preview-container;
       }
 
-      .new-post-preview-label {
-        position: absolute;
-        top: 4px;
-        left: 4px;
-        font-size: 11px;
-        color: #aaa;
-        text-transform: uppercase;
+      .new-post-body .wmd-preview-label {
+        @include discussion-wmd-preview-label;
+      }
+
+      .new-post-body .wmd-preview {
+        @include discussion-wmd-preview;
       }
 
       .new-post-title{
@@ -2260,33 +2235,6 @@ body.discussion {
       &::-webkit-input-placeholder {
         color: #888;
       }
-    }
-
-    .wmd-preview {
-      position: relative;
-      font-family: $sans-serif;
-      padding: 25px $baseline $baseline/2 $baseline;
-      margin-bottom: 5px;
-      @include box-sizing(border-box);
-      border: 1px solid #c8c8c8;
-      border-top-width: 0;
-      border-radius: 0 0 3px 3px;
-      overflow: hidden;
-      @include transition(all .2s ease-out 0s);
-
-      &:before {
-        content: 'PREVIEW';
-        position: absolute;
-        top: 3px;
-        left: 5px;
-        font-size: 11px;
-        color: #bbb;
-      }
-
-      p {
-        font-family: $sans-serif;
-      }
-      background-color: #fafafa;
     }
 
     .wmd-button-row {
