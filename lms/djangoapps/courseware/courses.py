@@ -237,7 +237,13 @@ def get_course_info_section(request, course, section_key):
     html = ''
 
     if info_module is not None:
-        html = info_module.render('student_view').content
+        try:
+            html = info_module.render('student_view').content
+        except Exception:  # pylint: disable=broad-except
+            log.exception("Error rendering course={course}, section_key={section_key}".format(
+                          course=course,
+                          section_key=section_key
+                         ))
 
     return html
 
