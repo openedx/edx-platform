@@ -5,8 +5,8 @@ import sys, os
 
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
+sys.path.append(os.path.abspath('../../../../'))
 sys.path.append(os.path.abspath('../../../'))
-sys.path.append(os.path.abspath('../../'))
 
 from docs.shared.conf import *
 
@@ -22,10 +22,14 @@ templates_path.append('source/_templates')
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path.append('source/_static')
 
+if not on_rtd:  # only import and set the theme if we're building docs locally
+    import sphinx_rtd_theme
+    html_theme = 'sphinx_rtd_theme'
+    html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
 # General information about the project.
-project = u'Building a Course with edX Studio'
-copyright = u'2013, edX Documentation Team'
+project = u'Release Notes for edX Course Staff'
+copyright = u'2014, edX'
 
 # The short X.Y version.
 version = ''

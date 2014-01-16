@@ -5,13 +5,13 @@ desc "Invoke sphinx 'make build' to generate docs."
 task :builddocs, [:type, :quiet] do |t, args|
     args.with_defaults(:quiet => "quiet")
     if args.type == 'dev'
-        path = "docs/developers"
+        path = "docs/en_us/developers"
     elsif args.type == 'author'
-        path = "docs/course_authors"
+        path = "docs/en_us/course_authors"
     elsif args.type == 'data'
-        path = "docs/data"
+        path = "docs/en_us/data"
     else
-        path = "docs"
+        path = "docs/en_us"
     end
 
     Dir.chdir(path) do
@@ -26,13 +26,13 @@ end
 desc "Show docs in browser (mac and ubuntu)."
 task :showdocs, [:options] do |t, args|
     if args.options == 'dev'
-        path = "docs/developers"
+        path = "docs/en_us/developers"
     elsif args.options == 'author'
-        path = "docs/course_authors"
+        path = "docs/en_us/course_authors"
     elsif args.options == 'data'
-        path = "docs/data"
+        path = "docs/en_us/data"
     else
-        path = "docs/developers"
+        path = "docs/en_us/developers"
     end
 
     Launchy.open("#{path}/build/html/index.html")
