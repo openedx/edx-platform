@@ -10,14 +10,14 @@ Overview
 
 Establishing a grading policy takes several steps. You must:
 
-#. :ref:`grade`
+#. :ref:`Set the Grade Range`
 #. :ref:`Set the Grace Period`
 #. :ref:`configure`
 #. :ref:`set_assignment`
 #. :ref:`student_view`
 
 
-.. _grade:
+.. _Set the Grade Range:
 
 *******************
 Set the Grade Range
@@ -186,7 +186,7 @@ See :ref:`Establish a Grading Policy` for more information.
 Set the Due Date
 ==================
 
-For subsections that contain graded problems, you can set a due date. Students must complete the problems in the subsection before the due date to get credit.
+For subsections that contain graded problems, you can set a due date. Students must complete the problems in the subsection before the due date to get credit. All problems in a subsection have the same due date.
 
 #. From the subsection page, click **SET A DUE DATE**. The Due Day and Due Time fields appear.
 #. Place the cursor in the Due Date field, and pick a day from the popup calendar.
@@ -196,7 +196,13 @@ For subsections that contain graded problems, you can set a due date. Students m
 
 Alternatively, you can :ref:`Set the Grace Period` for your assignments to cover any misunderstandings about time. For example, some classes have set a grace period of 1 day, 6 hours, and 1 minute. The grace period applies to all assignments.
 
-For more information, see :ref:`Establish a Grading Policy`.
+Students see the due date in the course accordian under the subsection title. For example:
+
+.. image::  Images/Subsection_due_date.png
+  :alt: Image of subsection due dates in the course accordian
+
+There are several problems in this subsection, all due November 3, 2013 at 23:30 UTC.
+
 
 
 

@@ -265,7 +265,7 @@ To create a drag and drop problem:
 
 
 For more information about drag and drop problems, see `XML Format of Drag and Drop Input
-<http://data.edx.org/en/latest/course_data_formats/drag_and_drop/drag_and_drop_input.html>`_.
+<https://edx.readthedocs.org/en/latest/course_data_formats/drag_and_drop/drag_and_drop_input.html>`_.
 
 .. _Image Mapped Input:
 

@@ -244,7 +244,6 @@ Thresholds that specify how numerical scores are associated with grades, and the
 See :ref:`Set the Grade Range` for more information.
 
 
-
 .. _Grading Rubric:
  
 **Grading Rubric**
@@ -275,7 +274,7 @@ See :ref:`Working with HTML Components` for more information.
 
 The view in the HTML component editor allows you to enter HTML code directly.
 
-See :ref:`Work with the Visual and HTML Editors` for more information.
+See :ref:`The User Interface` for more information.
 
 
 .. _I:
@@ -319,7 +318,7 @@ L
 
 A document markup language and document preparation system for the TeX typesetting program. 
 
-In edX Studio, you can :ref:`Import Content from LaTex`.
+In edX Studio, you can :ref:`Import LaTeX Code`.
 
 You can also create a :ref:`Problem Written in LaTeX`.
 
@@ -569,7 +568,7 @@ See :ref:`Working with Video Components` for more information.
 
 The view in the HTML component editor that allows you format text without using HTML code.
 
-See :ref:`Work with the Visual and HTML Editors` for more information.
+See :ref:`The User Interface` for more information.
 
 
 .. _W:
