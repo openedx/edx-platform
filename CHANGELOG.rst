@@ -35,6 +35,12 @@ Blades: Fix comparison of float numbers. BLD-434.
 
 Blades: Allow regexp strings as the correct answer to a string response question. BLD-475.
 
+Common: MixedModulestore is now the only approved access to the persistence layer
+  - takes a new parameter 'reference_type' which can be 'Location' or 'Locator'. Mixed
+  then tries to ensure that every reference in any xblock gets converted to that type on
+  retrieval. Because we're moving to Locators, the default is Locator; so, you should change
+  all existing configurations to 'Location' (unless you're using split)
+
 Common: Add feature flags to allow developer use of pure XBlocks
   - ALLOW_ALL_ADVANCED_COMPONENTS disables the hard-coded list of advanced
     components in Studio, and allows any xblock to be added as an

@@ -12,6 +12,7 @@ MODULESTORE = {
     'default': {
         'ENGINE': 'xmodule.modulestore.mixed.MixedModuleStore',
         'OPTIONS': {
+            'reference_type': 'Location',
             'mappings': {
                 'MITx/2.01x/2013_Spring': 'xml'
             },

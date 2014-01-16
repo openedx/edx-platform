@@ -1,7 +1,6 @@
 import re
 from xmodule.contentstore.content import StaticContent
 from xmodule.modulestore import Location
-from xmodule.modulestore.inheritance import own_metadata
 
 import logging
 
@@ -125,13 +124,9 @@ def _clone_modules(modulestore, modules, source_location, dest_location):
 
         print "Cloning module {0} to {1}....".format(original_loc, module.location)
 
-        # NOTE: usage of the the internal module.xblock_kvs._data does not include any 'default' values for the fields
-        data = module.xblock_kvs._data
-        if isinstance(data, basestring):
-            data = rewrite_nonportable_content_links(
-                source_location.course_id, dest_location.course_id, data)
-
-        modulestore.update_item(module.location, data)
+        if 'data' in module.fields and module.fields['data'].is_set_on(module) and isinstance(module.data, basestring):
+            module.data = rewrite_nonportable_content_links(
+                source_location.course_id, dest_location.course_id, module.data)
 
         # repoint children
         if module.has_children:
@@ -145,10 +140,9 @@ def _clone_modules(modulestore, modules, source_location, dest_location):
                 )
                 new_children.append(child_loc.url())
 
-            modulestore.update_children(module.location, new_children)
+            module.children = new_children
 
-        # save metadata
-        modulestore.update_metadata(module.location, own_metadata(module))
+        modulestore.update_item(module, '_clone_modules')
 
 
 def clone_course(modulestore, contentstore, source_location, dest_location, delete_original=False):

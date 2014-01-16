@@ -286,7 +286,7 @@ def save_module(item):
     """
     item.save()
     store = get_modulestore(Location(item.id))
-    store.update_metadata(item.id, own_metadata(item))
+    store.update_item(item, 'save_module')
 
 
 def copy_or_rename_transcript(new_name, old_name, item, delete_old=False):

@@ -192,7 +192,8 @@ def _save_item(request, usage_loc, item_location, data=None, children=None, meta
             modulestore().convert_to_draft(item_location)
 
     if data:
-        store.update_item(item_location, data)
+        # TODO Allow any scope.content fields not just "data" (exactly like the get below this)
+        existing_item.data = data
     else:
         data = existing_item.get_explicitly_set_fields_by_scope(Scope.content)
 
@@ -202,9 +203,9 @@ def _save_item(request, usage_loc, item_location, data=None, children=None, meta
             for child_locator
             in children
         ]
-        store.update_children(item_location, children_ids)
+        existing_item.children = children_ids
 
-    # cdodge: also commit any metadata which might have been passed along
+    # also commit any metadata which might have been passed along
     if nullout is not None or metadata is not None:
         # the postback is not the complete metadata, as there's system metadata which is
         # not presented to the end-user for editing. So let's use the original (existing_item) and
@@ -229,14 +230,11 @@ def _save_item(request, usage_loc, item_location, data=None, children=None, meta
                         return JsonResponse({"error": "Invalid data"}, 400)
                     field.write_to(existing_item, value)
 
-        # Save the data that we've just changed to the underlying
-        # MongoKeyValueStore before we update the mongo datastore.
-        existing_item.save()
-        # commit to datastore
-        store.update_metadata(item_location, own_metadata(existing_item))
-
         if existing_item.category == 'video':
             manage_video_subtitles_save(existing_item, existing_item)
+
+    # commit to datastore
+    store.update_item(existing_item, request.user)
 
     result = {
         'id': unicode(usage_loc),
@@ -299,7 +297,8 @@ def _create_item(request):
 
     # TODO replace w/ nicer accessor
     if not 'detached' in parent.runtime.load_block_type(category)._class_tags:
-        get_modulestore(parent.location).update_children(parent_location, parent.children + [dest_location.url()])
+        parent.children.append(dest_location.url())
+        get_modulestore(parent.location).update_item(parent, request.user)
 
     course_location = loc_mapper().translate_locator_to_location(parent_locator, get_course=True)
     locator = loc_mapper().translate_location(course_location.course_id, dest_location, False, True)
@@ -333,13 +332,14 @@ def _duplicate_item(parent_location, duplicate_source_location, display_name=Non
         system=source_item.runtime,
     )
 
+    dest_module = get_modulestore(category).get_item(dest_location)
     # Children are not automatically copied over (and not all xblocks have a 'children' attribute).
     # Because DAGs are not fully supported, we need to actually duplicate each child as well.
     if source_item.has_children:
-        copied_children = []
+        dest_module.children = []
         for child in source_item.children:
-            copied_children.append(_duplicate_item(dest_location, Location(child)).url())
-        get_modulestore(dest_location).update_children(dest_location, copied_children)
+            dest_module.children.append(_duplicate_item(dest_location, Location(child)).url())
+        get_modulestore(dest_location).update_item(dest_module, 'user')
 
     if not 'detached' in source_item.runtime.load_block_type(category)._class_tags:
         parent = get_modulestore(parent_location).get_item(parent_location)
@@ -350,7 +350,7 @@ def _duplicate_item(parent_location, duplicate_source_location, display_name=Non
             parent.children.insert(source_index + 1, dest_location.url())
         else:
             parent.children.append(dest_location.url())
-        get_modulestore(parent_location).update_children(parent_location, parent.children)
+        get_modulestore(parent_location).update_item(parent, 'user')
 
     return dest_location
 
@@ -366,22 +366,19 @@ def _delete_item_at_location(item_location, delete_children=False, delete_all_ve
     item = store.get_item(item_location)
 
     if delete_children:
-        _xmodule_recurse(item, lambda i: store.delete_item(i.location, delete_all_versions))
+        _xmodule_recurse(item, lambda i: store.delete_item(i.location, delete_all_versions=delete_all_versions))
     else:
-        store.delete_item(item.location, delete_all_versions)
+        store.delete_item(item.location, delete_all_versions=delete_all_versions)
 
     # cdodge: we need to remove our parent's pointer to us so that it is no longer dangling
     if delete_all_versions:
         parent_locs = modulestore('direct').get_parent_locations(item_location, None)
 
+        item_url = item_location.url()
         for parent_loc in parent_locs:
             parent = modulestore('direct').get_item(parent_loc)
-            item_url = item_location.url()
-            if item_url in parent.children:
-                children = parent.children
-                children.remove(item_url)
-                parent.children = children
-                modulestore('direct').update_children(parent.location, parent.children)
+            parent.children.remove(item_url)
+            modulestore('direct').update_item(parent, 'user')
 
     return JsonResponse()
 
@@ -412,7 +409,7 @@ def orphan_handler(request, tag=None, package_id=None, branch=None, version_guid
         if request.user.is_staff:
             items = modulestore().get_orphans(old_location, 'draft')
             for item in items:
-                modulestore('draft').delete_item(item, True)
+                modulestore('draft').delete_item(item, delete_all_versions=True)
             return JsonResponse({'deleted': items})
         else:
             raise PermissionDenied()

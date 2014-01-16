@@ -47,7 +47,7 @@ def initialize_course_tabs(course):
         {"type": "progress", "name": _("Progress")},
     ]
 
-    modulestore('direct').update_metadata(course.location.url(), own_metadata(course))
+    modulestore('direct').update_item(course, 'system')
 
 @expect_json
 @login_required
@@ -123,7 +123,7 @@ def tabs_handler(request, tag=None, package_id=None, branch=None, version_guid=N
 
                 # OK, re-assemble the static tabs in the new order
                 course_item.tabs = reordered_tabs
-                modulestore('direct').update_metadata(course_item.location, own_metadata(course_item))
+                modulestore('direct').update_item(course_item, request.user.username)
                 return JsonResponse()
             else:
                 raise NotImplementedError('Creating or changing tab content is not supported.')
@@ -179,7 +179,7 @@ def primitive_delete(course, num):
     # Note for future implementations: if you delete a static_tab, then Chris Dodge
     # points out that there's other stuff to delete beyond this element.
     # This code happens to not delete static_tab so it doesn't come up.
-    modulestore('direct').update_metadata(course.location, own_metadata(course))
+    modulestore('direct').update_item(course, 'primitive delete')
 
 
 def primitive_insert(course, num, tab_type, name):
@@ -188,5 +188,5 @@ def primitive_insert(course, num, tab_type, name):
     new_tab = {u'type': unicode(tab_type), u'name': unicode(name)}
     tabs = course.tabs
     tabs.insert(num, new_tab)
-    modulestore('direct').update_metadata(course.location, own_metadata(course))
+    modulestore('direct').update_item(course, 'primitive insert')
 

@@ -163,8 +163,14 @@ class LocMapperStore(object):
             else:
                 raise ItemNotFoundError(location)
         elif isinstance(block_id, dict):
-            # name is not unique, look through for the right category
-            if location.category in block_id:
+            # jump_to_id uses a None category.
+            if location.category is None:
+                if len(block_id) == 1:
+                    # unique match (most common case)
+                    block_id = block_id.values()[0]
+                else:
+                    raise InvalidLocationError()
+            elif location.category in block_id:
                 block_id = block_id[location.category]
             elif add_entry_if_missing:
                 block_id = self._add_to_block_map(location, location_id, entry['block_map'])

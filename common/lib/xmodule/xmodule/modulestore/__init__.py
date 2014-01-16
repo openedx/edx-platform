@@ -336,7 +336,7 @@ class ModuleStoreRead(object):
         pass
 
     @abstractmethod
-    def get_items(self, location, course_id=None, depth=0):
+    def get_items(self, location, course_id=None, depth=0, qualifiers=None):
         """
         Returns a list of XModuleDescriptor instances for the items
         that match location. Any element of location that is None is treated
@@ -376,6 +376,15 @@ class ModuleStoreRead(object):
         pass
 
     @abstractmethod
+    def get_orphans(self, course_location, branch):
+        """
+        Get all of the xblocks in the given course which have no parents and are not of types which are
+        usually orphaned. NOTE: may include xblocks which still have references via xblocks which don't
+        use children to point to their dependents.
+        """
+        pass
+
+    @abstractmethod
     def get_errored_courses(self):
         """
         Return a dictionary of course_dir -> [(msg, exception_str)], for each
@@ -401,44 +410,16 @@ class ModuleStoreWrite(ModuleStoreRead):
     __metaclass__ = ABCMeta
 
     @abstractmethod
-    def update_item(self, location, data, allow_not_found=False):
+    def update_item(self, xblock, user, allow_not_found=False):
         """
-        Set the data in the item specified by the location to
-        data
-
-        location: Something that can be passed to Location
-        data: A nested dictionary of problem data
+        Update the given xblock's persisted repr
         """
         pass
 
     @abstractmethod
-    def update_children(self, location, children):
+    def delete_item(self, location, user_id=None, delete_all_versions=False, delete_children=False, force=False):
         """
-        Set the children for the item specified by the location to
-        children
-
-        location: Something that can be passed to Location
-        children: A list of child item identifiers
-        """
-        pass
-
-    @abstractmethod
-    def update_metadata(self, location, metadata):
-        """
-        Set the metadata for the item specified by the location to
-        metadata
-
-        location: Something that can be passed to Location
-        metadata: A nested dictionary of module metadata
-        """
-        pass
-
-    @abstractmethod
-    def delete_item(self, location):
-        """
-        Delete an item from this modulestore
-
-        location: Something that can be passed to Location
+        Delete an item from persistence
         """
         pass
 

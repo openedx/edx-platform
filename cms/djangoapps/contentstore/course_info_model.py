@@ -102,7 +102,7 @@ def update_course_updates(location, update, passed_id=None):
 
     # update db record
     course_updates.data = html.tostring(course_html_parsed)
-    modulestore('direct').update_item(location, course_updates.data)
+    modulestore('direct').update_item(course_updates, 'course_info_model')
 
     return {
         "id": idx,
@@ -158,7 +158,7 @@ def delete_course_update(location, update, passed_id):
         # update db record
         course_updates.data = html.tostring(course_html_parsed)
         store = modulestore('direct')
-        store.update_item(location, course_updates.data)
+        store.update_item(course_updates, 'course_info_model')
 
     return get_course_updates(location, None)
 
