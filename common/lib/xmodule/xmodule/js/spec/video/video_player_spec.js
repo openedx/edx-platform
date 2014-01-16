@@ -11,6 +11,7 @@
         afterEach(function () {
             $('source').remove();
             window.onTouchBasedDevice = oldOTBD;
+            state.storage.clear();
         });
 
         describe('constructor', function () {
@@ -211,10 +212,6 @@
                     expect(state.videoPlayer.log).toHaveBeenCalledWith(
                         'play_video', { currentTime: 0 }
                     );
-                });
-
-                it('pause other video player', function () {
-                    expect(oldState.videoPlayer.onPause).toHaveBeenCalled();
                 });
 
                 it('set update interval', function () {

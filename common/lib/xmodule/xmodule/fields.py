@@ -140,7 +140,8 @@ class RelativeTime(Field):
     # Timedeltas are immutable, see http://docs.python.org/2/library/datetime.html#available-types
     MUTABLE = False
 
-    def _isotime_to_timedelta(self, value):
+    @classmethod
+    def isotime_to_timedelta(cls, value):
         """
         Validate that value in "HH:MM:SS" format and convert to timedelta.
 
@@ -175,7 +176,7 @@ class RelativeTime(Field):
             return datetime.timedelta(seconds=value)
 
         if isinstance(value, basestring):
-            return self._isotime_to_timedelta(value)
+            return self.isotime_to_timedelta(value)
 
         msg = "RelativeTime Field {0} has bad value '{1!r}'".format(self._name, value)
         raise TypeError(msg)
