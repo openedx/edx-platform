@@ -196,7 +196,6 @@ For subsections that contain graded problems, you can set a due date. Students m
 
 Alternatively, you can :ref:`Set the Grace Period` for your assignments to cover any misunderstandings about time. For example, some classes have set a grace period of 1 day, 6 hours, and 1 minute. The grace period applies to all assignments.
 
-For more information, see :ref:`Establish a Grading Policy`.
 
 
 
