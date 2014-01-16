@@ -34,6 +34,7 @@ from xmodule.modulestore import ModuleStoreWriteBase, Location, MONGO_MODULESTOR
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.inheritance import own_metadata, InheritanceMixin, inherit_metadata, InheritanceKeyValueStore
 from xmodule.modulestore.xml import LocationReader
+from xblock.core import XBlock
 
 log = logging.getLogger(__name__)
 
@@ -869,10 +870,11 @@ class MongoModuleStore(ModuleStoreWriteBase):
         """
         return MONGO_MODULESTORE_TYPE
 
-    def get_orphans(self, course_location, detached_categories, _branch):
+    def get_orphans(self, course_location, _branch):
         """
         Return an array all of the locations for orphans in the course.
         """
+        detached_categories = [name for name, __ in XBlock.load_tagged_classes("detached")]
         all_items = self.collection.find({
             '_id.org': course_location.org,
             '_id.course': course_location.course,

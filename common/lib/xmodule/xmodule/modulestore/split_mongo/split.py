@@ -439,12 +439,13 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
                 )
                 for parent_id in items]
 
-    def get_orphans(self, package_id, detached_categories, branch):
+    def get_orphans(self, package_id, branch):
         """
         Return a dict of all of the orphans in the course.
 
         :param package_id:
         """
+        detached_categories = [name for name, __ in XBlock.load_tagged_classes("detached")]
         course = self._lookup_course(CourseLocator(package_id=package_id, branch=branch))
         items = {LocMapperStore.decode_key_from_mongo(block_id) for block_id in course['structure']['blocks'].keys()}
         items.remove(course['structure']['root'])

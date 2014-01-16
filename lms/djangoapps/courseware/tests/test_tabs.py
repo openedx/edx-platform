@@ -8,8 +8,9 @@ from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from .helpers import LoginEnrollmentTestCase
 
 FAKE_REQUEST = None
 
@@ -145,6 +146,29 @@ class StaticTabTestCase(TestCase):
             self.schlug, self.course, self.user, tab=self.tabby, generator=tabs._static_tab
         )
         self.assertEqual(tab_list[0].is_active, False)
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class StaticTabDateTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
+    def setUp(self):
+        self.course = CourseFactory.create()
+        self.page = ItemFactory.create(
+            category="static_tab", parent_location=self.course.location,
+            data="OOGIE BLOOGIE", display_name="new_tab"
+        )
+
+    def test_logged_in(self):
+        self.setup_user()
+        url = reverse('static_tab', args=[self.course.id, 'new_tab'])
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn("OOGIE BLOOGIE", resp.content)
+
+    def test_anonymous_user(self):
+        url = reverse('static_tab', args=[self.course.id, 'new_tab'])
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn("OOGIE BLOOGIE", resp.content)
+
 
 class TextbooksTestCase(TestCase):
 
