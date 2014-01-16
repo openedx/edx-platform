@@ -16,6 +16,8 @@ from django.template import Context
 from django.http import HttpResponse
 import logging
 
+from microsite_configuration.middleware import MicrositeConfiguration
+
 import edxmako
 import edxmako.middleware
 from django.conf import settings
@@ -71,6 +73,10 @@ def marketing_link_context_processor(request):
 
 
 def render_to_string(template_name, dictionary, context=None, namespace='main'):
+
+    # see if there is an override template defined in the microsite
+    template_name = MicrositeConfiguration.get_microsite_template_path(template_name)
+
     context_instance = Context(dictionary)
     # add dictionary to context_instance
     context_instance.update(dictionary or {})
@@ -98,5 +104,9 @@ def render_to_response(template_name, dictionary=None, context_instance=None, na
     Returns a HttpResponse whose content is filled with the result of calling
     lookup.get_template(args[0]).render with the passed arguments.
     """
+
+    # see if there is an override template defined in the microsite
+    template_name = MicrositeConfiguration.get_microsite_template_path(template_name)
+
     dictionary = dictionary or {}
     return HttpResponse(render_to_string(template_name, dictionary, context_instance, namespace), **kwargs)

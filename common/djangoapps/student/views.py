@@ -71,6 +71,7 @@ from pytz import UTC
 
 from util.json_request import JsonResponse
 
+from microsite_configuration.middleware import MicrositeConfiguration
 
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
@@ -250,7 +251,11 @@ def signin_user(request):
 
     context = {
         'course_id': request.GET.get('course_id'),
-        'enrollment_action': request.GET.get('enrollment_action')
+        'enrollment_action': request.GET.get('enrollment_action'),
+        'platform_name': MicrositeConfiguration.get_microsite_configuration_value(
+            'platform_name',
+            settings.PLATFORM_NAME
+        ),
     }
     return render_to_response('login.html', context)
 
@@ -269,7 +274,11 @@ def register_user(request, extra_context=None):
 
     context = {
         'course_id': request.GET.get('course_id'),
-        'enrollment_action': request.GET.get('enrollment_action')
+        'enrollment_action': request.GET.get('enrollment_action'),
+        'platform_name': MicrositeConfiguration.get_microsite_configuration_value(
+            'platform_name',
+            settings.PLATFORM_NAME
+        ),
     }
     if extra_context is not None:
         context.update(extra_context)
@@ -311,9 +320,33 @@ def dashboard(request):
     # longer exist (because the course IDs have changed). Still, we don't delete those
     # enrollments, because it could have been a data push snafu.
     course_enrollment_pairs = []
+
+    # for microsites, we want to filter and only show enrollments for courses within
+    # the microsites 'ORG'
+    course_org_filter = MicrositeConfiguration.get_microsite_configuration_value('course_org_filter')
+
+    # Let's filter out any courses in an "org" that has been declared to be
+    # in a Microsite
+    org_filter_out_set = MicrositeConfiguration.get_all_microsite_orgs()
+
+    # remove our current Microsite from the "filter out" list, if applicable
+    if course_org_filter:
+        org_filter_out_set.remove(course_org_filter)
+
     for enrollment in CourseEnrollment.enrollments_for_user(user):
         try:
-            course_enrollment_pairs.append((course_from_id(enrollment.course_id), enrollment))
+            course = course_from_id(enrollment.course_id)
+
+            # if we are in a Microsite, then filter out anything that is not
+            # attributed (by ORG) to that Microsite
+            if course_org_filter and course_org_filter != course.location.org:
+                continue
+            # Conversely, if we are not in a Microsite, then let's filter out any enrollments
+            # with courses attributed (by ORG) to Microsites
+            elif course.location.org in org_filter_out_set:
+                continue
+
+            course_enrollment_pairs.append((course, enrollment))
         except ItemNotFoundError:
             log.error("User {0} enrolled in non-existent course {1}"
                       .format(user.username, enrollment.course_id))
@@ -539,7 +572,11 @@ def accounts_login(request):
         course_id = _parse_course_id_from_string(redirect_to)
         if course_id and _get_course_enrollment_domain(course_id):
             return external_auth.views.course_specific_login(request, course_id)
-    return render_to_response('login.html')
+
+    context = {
+        'platform_name': settings.PLATFORM_NAME,
+    }
+    return render_to_response('login.html', context)
 
 
 # Need different levels of logging
@@ -899,26 +936,31 @@ def create_account(request, post_override=None):
         return ret
     (user, profile, registration) = ret
 
-    d = {'name': post_vars['name'],
-         'key': registration.activation_key,
-         }
+    context = {
+        'name': post_vars['name'],
+        'key': registration.activation_key,
+    }
 
     # composes activation email
-    subject = render_to_string('emails/activation_email_subject.txt', d)
+    subject = render_to_string('emails/activation_email_subject.txt', context)
     # Email subject *must not* contain newlines
     subject = ''.join(subject.splitlines())
-    message = render_to_string('emails/activation_email.txt', d)
+    message = render_to_string('emails/activation_email.txt', context)
 
     # don't send email if we are doing load testing or random user generation for some reason
     if not (settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING')):
+        from_address = MicrositeConfiguration.get_microsite_configuration_value(
+            'email_from_address',
+            settings.DEFAULT_FROM_EMAIL
+        )
         try:
             if settings.FEATURES.get('REROUTE_ACTIVATION_EMAIL'):
                 dest_addr = settings.FEATURES['REROUTE_ACTIVATION_EMAIL']
                 message = ("Activation for %s (%s): %s\n" % (user, user.email, profile.name) +
                            '-' * 80 + '\n\n' + message)
-                send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [dest_addr], fail_silently=False)
+                send_mail(subject, message, from_address, [dest_addr], fail_silently=False)
             else:
-                _res = user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
+                _res = user.email_user(subject, message, from_address)
         except:
             log.warning('Unable to send activation email to user', exc_info=True)
             js['value'] = _('Could not send activation e-mail.')
@@ -1202,15 +1244,23 @@ def change_email_request(request):
         return HttpResponse(json.dumps({'success': False,
                                         'error': _('Old email is the same as the new email.')}))
 
-    d = {'key': pec.activation_key,
-         'old_email': user.email,
-         'new_email': pec.new_email}
+    context = {
+        'key': pec.activation_key,
+        'old_email': user.email,
+        'new_email': pec.new_email
+    }
 
-    subject = render_to_string('emails/email_change_subject.txt', d)
+    subject = render_to_string('emails/email_change_subject.txt', context)
     subject = ''.join(subject.splitlines())
-    message = render_to_string('emails/email_change.txt', d)
 
-    _res = send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [pec.new_email])
+    message = render_to_string('emails/email_change.txt', context)
+
+    from_address = MicrositeConfiguration.get_microsite_configuration_value(
+        'email_from_address',
+        settings.DEFAULT_FROM_EMAIL
+    )
+
+    _res = send_mail(subject, message, from_address, [pec.new_email])
 
     return HttpResponse(json.dumps({'success': True}))
 

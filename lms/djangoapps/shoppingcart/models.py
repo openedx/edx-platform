@@ -36,6 +36,8 @@ from verify_student.models import SoftwareSecurePhotoVerification
 from .exceptions import (InvalidCartItem, PurchasedCallbackException, ItemAlreadyInCartException,
                          AlreadyEnrolledInCourseException, CourseDoesNotExistException, ReportException)
 
+from microsite_configuration.middleware import MicrositeConfiguration
+
 log = logging.getLogger("shoppingcart")
 
 ORDER_STATUSES = (
@@ -165,14 +167,22 @@ class Order(models.Model):
 
         # send confirmation e-mail
         subject = _("Order Payment Confirmation")
-        message = render_to_string('emails/order_confirmation_email.txt', {
-            'order': self,
-            'order_items': orderitems,
-            'has_billing_info': settings.FEATURES['STORE_BILLING_INFO']
-        })
+        message = render_to_string(
+            'emails/order_confirmation_email.txt',
+            {
+                'order': self,
+                'order_items': orderitems,
+                'has_billing_info': settings.FEATURES['STORE_BILLING_INFO']
+            }
+        )
         try:
+            from_address = MicrositeConfiguration.get_microsite_configuration_value(
+                'email_from_address',
+                settings.DEFAULT_FROM_EMAIL
+            )
+
             send_mail(subject, message,
-                      settings.DEFAULT_FROM_EMAIL, [self.user.email])  # pylint: disable=E1101
+                      from_address, [self.user.email])  # pylint: disable=E1101
         except (smtplib.SMTPException, BotoServerError):  # sadly need to handle diff. mail backends individually
             log.error('Failed sending confirmation e-mail for order %d', self.id)  # pylint: disable=E1101
 
@@ -468,7 +478,10 @@ class CertificateItem(OrderItem):
                                                                                                        user_email=course_enrollment.user.email,
                                                                                                        order_number=order_number)
         to_email = [settings.PAYMENT_SUPPORT_EMAIL]
-        from_email = [settings.PAYMENT_SUPPORT_EMAIL]
+        from_email = [MicrositeConfiguration.get_microsite_configuration_value(
+            'payment_support_email',
+            settings.PAYMENT_SUPPORT_EMAIL
+        )]
         try:
             send_mail(subject, message, from_email, to_email, fail_silently=False)
         except (smtplib.SMTPException, BotoServerError):
