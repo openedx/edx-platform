@@ -9,6 +9,9 @@ from ..pages.lms.course_info import CourseInfoPage
 from ..pages.lms.tab_nav import TabNavPage
 from ..pages.lms.course_nav import CourseNavPage
 from ..pages.lms.open_response import OpenResponsePage
+from ..pages.lms.peer_grade import PeerGradePage
+from ..pages.lms.peer_calibrate import PeerCalibratePage
+from ..pages.lms.peer_confirm import PeerConfirmPage
 from ..pages.lms.progress import ProgressPage
 from ..fixtures.course import XBlockFixtureDesc, CourseFixture
 from ..fixtures.xqueue import XQueueResponseFixture
@@ -40,6 +43,9 @@ class OpenResponseTest(UniqueCourseTest):
         self.tab_nav = TabNavPage(self.browser)
         self.course_nav = CourseNavPage(self.browser)
         self.open_response = OpenResponsePage(self.browser)
+        self.peer_grade = PeerGradePage(self.browser)
+        self.peer_calibrate = PeerCalibratePage(self.browser)
+        self.peer_confirm = PeerConfirmPage(self.browser)
         self.progress_page = ProgressPage(self.browser, self.course_id)
 
         # Configure the test course
@@ -47,6 +53,13 @@ class OpenResponseTest(UniqueCourseTest):
             self.course_info['org'], self.course_info['number'],
             self.course_info['run'], self.course_info['display_name']
         )
+
+        # Create a unique name for the peer assessed problem.  This will show up
+        # in the list of peer problems, which is shared among tests running
+        # in parallel; it needs to be unique so we can find it.
+        # It's also import that the problem has "Peer" in the name; otherwise,
+        # the ORA stub will ignore it.
+        self.peer_problem_name = "Peer-Assessed {}".format(self.unique_id[0:6])
 
         course_fix.add_children(
             XBlockFixtureDesc('chapter', 'Test Section').add_children(
@@ -58,9 +71,10 @@ class OpenResponseTest(UniqueCourseTest):
                     XBlockFixtureDesc('combinedopenended', 'AI-Assessed',
                         data=load_data_str('ora_ai_problem.xml'), metadata={'graded': True}),
 
-                    XBlockFixtureDesc('combinedopenended', 'Peer-Assessed',
+                    XBlockFixtureDesc('combinedopenended', self.peer_problem_name,
                         data=load_data_str('ora_peer_problem.xml'), metadata={'graded': True}),
 
+                    # This is the interface a student can use to grade his/her peers
                     XBlockFixtureDesc('peergrading', 'Peer Module'),
 
         ))).install()
@@ -128,14 +142,14 @@ class OpenResponseTest(UniqueCourseTest):
         if assessment_type == 'ai':
             section_name = 'AI-Assessed'
         elif assessment_type == 'peer':
-            section_name = 'Peer-Assessed'
+            section_name = self.peer_problem_name
         else:
             raise ValueError('Assessment type not recognized.  Must be either "ai" or "peer"')
 
         def _inner_check():
             self.course_nav.go_to_sequential('Self-Assessed')
             self.course_nav.go_to_sequential(section_name)
-            feedback = self.open_response.rubric_feedback
+            feedback = self.open_response.rubric.feedback
 
             # Successful if `feedback` is a non-empty list
             return (bool(feedback), feedback)
@@ -155,22 +169,17 @@ class SelfAssessmentTest(OpenResponseTest):
         Then I see a scored rubric
         And I see my score in the progress page.
         """
+
         # Navigate to the self-assessment problem and submit an essay
         self.course_nav.go_to_sequential('Self-Assessed')
         self.submit_essay('self', 'Censorship in the Libraries')
 
-        # Check the rubric categories
-        self.assertEqual(
-            self.open_response.rubric_categories, ["Writing Applications", "Language Conventions"]
-        )
-
-        # Fill in the self-assessment rubric
-        self.open_response.submit_self_assessment([0, 1])
-
-        # Expect that we get feedback
-        self.assertEqual(
-            self.open_response.rubric_feedback, ['incorrect', 'correct']
-        )
+        # Fill in the rubric and expect that we get feedback
+        rubric = self.open_response.rubric
+        self.assertEqual(rubric.categories, ["Writing Applications", "Language Conventions"])
+        rubric.set_scores([0, 1])
+        rubric.submit()
+        self.assertEqual(rubric.feedback, ['incorrect', 'correct'])
 
         # Verify the progress page
         self.progress_page.visit()
@@ -223,10 +232,10 @@ class AIAssessmentTest(OpenResponseTest):
         self.assertEqual(scores, [(0, 2), (1, 2), (0, 2)])
 
 
-class InstructorAssessmentTest(AIAssessmentTest):
+class InstructorAssessmentTest(OpenResponseTest):
     """
     Test an AI-assessment that has been graded by an instructor.
-    This runs the exact same test as the AI-assessment test, except
+    This runs the same test as the AI-assessment test, except
     that the feedback comes from an instructor instead of the machine grader.
     From the student's perspective, it should look the same.
     """
@@ -242,11 +251,36 @@ class InstructorAssessmentTest(AIAssessmentTest):
         'rubric_xml': load_data_str('ora_rubric.xml')
     }
 
+    def test_instructor_assessment(self):
+        """
+        Given an instructor has graded my submission
+        When I view my submission
+        Then I see a scored rubric
+        And my progress page shows the problem score.
+        """
 
-class PeerFeedbackTest(OpenResponseTest):
+        # Navigate to the AI-assessment problem and submit an essay
+        # We have configured the stub to simulate that this essay will be staff-graded
+        self.course_nav.go_to_sequential('AI-Assessed')
+        self.submit_essay('ai', 'Censorship in the Libraries')
+
+        # Refresh the page to get the updated feedback
+        # then verify that we get the feedback sent by our stub XQueue implementation
+        self.assertEqual(self.get_asynch_feedback('ai'), ['incorrect', 'correct'])
+
+        # Verify the progress page
+        self.progress_page.visit()
+        scores = self.progress_page.scores('Test Section', 'Test Subsection')
+
+        # First score is the self-assessment score, which we haven't answered, so it's 0/2
+        # Second score is the AI-assessment score, which we have answered, so it's 1/2
+        # Third score is peer-assessment, which we haven't answered, so it's 0/2
+        self.assertEqual(scores, [(0, 2), (1, 2), (0, 2)])
+
+
+class PeerAssessmentTest(OpenResponseTest):
     """
-    Test ORA peer-assessment.  Note that this tests only *receiving* feedback,
-    not *giving* feedback -- those tests are located in another module.
+    Test ORA peer-assessment, including calibration and giving/receiving scores.
     """
 
     # Unlike other assessment types, peer assessment has multiple scores
@@ -261,20 +295,58 @@ class PeerFeedbackTest(OpenResponseTest):
         'rubric_xml': [load_data_str('ora_rubric.xml')] * 3
     }
 
-    def test_peer_assessment(self):
+    def test_peer_calibrate_and_grade(self):
         """
+        Given I am viewing a peer-assessment problem
+        And the instructor has submitted enough example essays
+        When I submit submit acceptable scores for enough calibration essays
+        Then I am able to peer-grade other students' essays.
+
         Given I have submitted an essay for peer-assessment
+        And I have peer-graded enough students essays
         And enough other students have scored my essay
         Then I can view the scores and written feedback
         And I see my score in the progress page.
         """
-        # Navigate to the peer-assessment problem and submit an essay
-        self.course_nav.go_to_sequential('Peer-Assessed')
+        # Initially, the student should NOT be able to grade peers,
+        # because he/she hasn't submitted any essays.
+        self.course_nav.go_to_sequential('Peer Module')
+        self.assertIn("You currently do not have any peer grading to do", self.peer_calibrate.message)
+
+        # Submit an essay
+        self.course_nav.go_to_sequential(self.peer_problem_name)
         self.submit_essay('peer', 'Censorship in the Libraries')
 
-        # Refresh the page to get feedback from the stub XQueue grader.
+        # Need to reload the page to update the peer grading module
+        self.course_info_page.visit()
+        self.tab_nav.go_to_tab('Courseware')
+        self.course_nav.go_to_section('Test Section', 'Test Subsection')
+
+        # Select the problem to calibrate
+        self.course_nav.go_to_sequential('Peer Module')
+        self.assertIn(self.peer_problem_name, self.peer_grade.problem_list)
+        self.peer_grade.select_problem(self.peer_problem_name)
+
+        # Calibrate
+        self.peer_confirm.start(is_calibrating=True)
+        rubric = self.peer_calibrate.rubric
+        self.assertEqual(rubric.categories, ["Writing Applications", "Language Conventions"])
+        rubric.set_scores([0, 1])
+        rubric.submit()
+        self.peer_calibrate.continue_to_grading()
+
+        # Grade a peer
+        self.peer_confirm.start()
+        rubric = self.peer_grade.rubric
+        self.assertEqual(rubric.categories, ["Writing Applications", "Language Conventions"])
+        rubric.set_scores([0, 1])
+        rubric.submit()
+
+        # Expect to receive essay feedback
         # We receive feedback from all three peers, each of which
         # provide 2 scores (one for each rubric item)
+        # Written feedback is a dummy value sent by the XQueue stub.
+        self.course_nav.go_to_sequential(self.peer_problem_name)
         self.assertEqual(self.get_asynch_feedback('peer'), ['incorrect', 'correct'] * 3)
 
         # Verify the progress page

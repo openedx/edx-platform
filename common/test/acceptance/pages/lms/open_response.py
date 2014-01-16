@@ -3,7 +3,8 @@ Open-ended response in the courseware.
 """
 
 from bok_choy.page_object import PageObject
-from bok_choy.promise import EmptyPromise, fulfill_after, fulfill_before
+from bok_choy.promise import EmptyPromise, fulfill_after, fulfill
+from .rubric import RubricPage
 
 
 class OpenResponsePage(PageObject):
@@ -57,58 +58,14 @@ class OpenResponsePage(PageObject):
         return prompts[0]
 
     @property
-    def has_rubric(self):
+    def rubric(self):
         """
-        Return a boolean indicating whether the rubric is available.
+        Return a `RubricPage` for a self-assessment problem.
+        If no rubric is available, raises a `BrokenPromise` exception.
         """
-        return self.is_css_present('div.rubric')
-
-    @property
-    def rubric_categories(self):
-        """
-        Return a list of categories available in the essay rubric.
-
-        Example:
-            ["Writing Applications", "Language Conventions"]
-
-        The rubric is not always visible; if it's not available,
-        this will return an empty list.
-        """
-        return self.css_text('span.rubric-category')
-
-    @property
-    def rubric_feedback(self):
-        """
-        Return a list of correct/incorrect feedback for each rubric category (e.g. from self-assessment).
-        Example: ['correct', 'incorrect']
-
-        If no feedback is available, returns an empty list.
-        If feedback could not be interpreted (unexpected CSS class),
-            the list will contain a `None` item.
-        """
-
-        # Get the green checkmark / red x labels
-        # We need to filter out the similar-looking CSS classes
-        # for the rubric items that are NOT marked correct/incorrect
-        feedback_css = 'div.rubric-label>label'
-        labels = [
-            el_class for el_class in
-            self.css_map(feedback_css, lambda el: el['class'])
-            if el_class != 'rubric-elements-info'
-        ]
-
-        def map_feedback(css_class):
-            """
-            Map CSS classes on the labels to correct/incorrect
-            """
-            if 'choicegroup_incorrect' in css_class:
-                return 'incorrect'
-            elif 'choicegroup_correct' in css_class:
-                return 'correct'
-            else:
-                return None
-
-        return map(map_feedback, labels)
+        rubric = RubricPage(self.browser)
+        rubric.wait_for_page()
+        return rubric
 
     @property
     def written_feedback(self):
@@ -175,68 +132,26 @@ class OpenResponsePage(PageObject):
         """
         Submit a response for grading.
         """
-        with fulfill_after(self._submitted_promise(self.assessment_type)):
-            with self.handle_alert():
-                self.css_click('input.submit-button')
+        with self.handle_alert():
+            self.css_click('input.submit-button')
 
-    def submit_self_assessment(self, scores):
+        # Ensure that the submission completes
+        self._wait_for_submitted(self.assessment_type)
+
+    def _wait_for_submitted(self, assessment_type):
         """
-        Submit a self-assessment rubric.
-        `scores` is a list of scores (0 to max score) for each category in the rubric.
-        """
-
-        # Warn if we have the wrong number of scores
-        num_categories = len(self.rubric_categories)
-        if len(scores) != num_categories:
-            msg = "Recieved {0} scores but there are {1} rubric categories".format(
-                len(scores), num_categories
-            )
-            self.warning(msg)
-
-        # Set the score for each category
-        for score_index in range(len(scores)):
-
-            # Check that we have the enough radio buttons
-            category_css = "div.rubric>ul.rubric-list:nth-of-type({0})".format(score_index + 1)
-            if scores[score_index] > self.css_count(category_css + ' input.score-selection'):
-                msg = "Tried to select score {0} but there are only {1} options".format(score_index, len(scores))
-                self.warning(msg)
-
-            # Check the radio button at the correct index
-            else:
-                input_css = (
-                    category_css +
-                    ">li.rubric-list-item:nth-of-type({0}) input.score-selection".format(scores[score_index] + 1)
-                )
-                self.css_check(input_css)
-
-        # Wait for the button to become enabled
-        button_css = 'input.submit-button'
-        button_enabled = EmptyPromise(
-            lambda: all(self.css_map(button_css, lambda el: not el['disabled'])),
-            "Submit button enabled"
-        )
-
-        # Submit the assessment
-        with fulfill_before(button_enabled):
-            self.css_click(button_css)
-
-    def _submitted_promise(self, assessment_type):
-        """
-        Return a `Promise` that the next step is visible after submitting.
-        This will vary based on the type of assessment.
-
+        Wait for the submission to complete.
         `assessment_type` is either 'self', 'ai', or 'peer'
         """
         if assessment_type == 'self':
-            return EmptyPromise(lambda: self.has_rubric, "Rubric has appeared")
+            RubricPage(self.browser).wait_for_page()
 
         elif assessment_type == 'ai' or assessment_type == "peer":
-            return EmptyPromise(
+            fulfill(EmptyPromise(
                 lambda: self.grader_status != 'Unanswered',
                 "Problem status is no longer 'unanswered'"
-            )
+            ))
 
         else:
             self.warning("Unrecognized assessment type '{0}'".format(assessment_type))
-            return EmptyPromise(lambda: True, "Unrecognized assessment type")
+            fulfill(EmptyPromise(lambda: True, "Unrecognized assessment type"))

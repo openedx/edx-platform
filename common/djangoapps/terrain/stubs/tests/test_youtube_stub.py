@@ -4,7 +4,7 @@ Unit test for stub YouTube implementation.
 
 import unittest
 import requests
-from terrain.stubs.youtube import StubYouTubeService
+from ..youtube import StubYouTubeService
 
 
 class StubYouTubeServiceTest(unittest.TestCase):
