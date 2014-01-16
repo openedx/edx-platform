@@ -249,3 +249,13 @@ def root(request, course_id):
     Returns version information about the API.
     '''
     return ApiResponse(http_response=HttpResponse(), data=API_SETTINGS.get('META'))
+
+from django.shortcuts import render
+
+
+@login_required
+def token(request, htmlname=""):
+    '''
+    Return the template for annotation grid
+    '''
+    return render(request, "catch/templates/" + htmlname + '.html', content_type="text/plain")

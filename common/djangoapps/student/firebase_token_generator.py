@@ -16,6 +16,11 @@ try:
     import json
 except ImportError:
     import simplejson as json
+<<<<<<< HEAD
+=======
+import time
+import datetime
+>>>>>>> annotation tools
 
 __all__ = ['create_token']
 
