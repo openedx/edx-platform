@@ -26,6 +26,8 @@ import subprocess
 import textwrap
 import traceback
 import xml.sax.saxutils as saxutils
+from cmath import isnan
+from sys import float_info
 
 from collections import namedtuple
 from shapely.geometry import Point, MultiPoint
@@ -36,8 +38,10 @@ from . import correctmap
 from .registry import TagRegistry
 from datetime import datetime
 from pytz import UTC
-from .util import (compare_with_tolerance, contextualize_text,  convert_files_to_filenames,
-                           is_list_of_files, find_with_default, default_tolerance)
+from .util import (
+    compare_with_tolerance, contextualize_text, convert_files_to_filenames,
+    is_list_of_files, find_with_default, default_tolerance
+)
 from lxml import etree
 from lxml.html.soupparser import fromstring as fromstring_bs     # uses Beautiful Soup!!! FIXME?
 import capa.xqueue_interface as xqueue_interface
@@ -846,39 +850,57 @@ class NumericalResponse(LoncapaResponse):
     def __init__(self, *args, **kwargs):
         self.correct_answer = ''
         self.tolerance = default_tolerance
+        self.range_tolerance = False
+        self.answer_range = self.inclusion = None
         super(NumericalResponse, self).__init__(*args, **kwargs)
 
     def setup_response(self):
         xml = self.xml
         context = self.context
-        self.correct_answer = contextualize_text(xml.get('answer'), context)
+        answer = xml.get('answer')
 
-        # Find the tolerance
-        tolerance_xml = xml.xpath(
-            '//*[@id=$id]//responseparam[@type="tolerance"]/@default',
-            id=xml.get('id')
-        )
-        if tolerance_xml:  # If it isn't an empty list...
-            self.tolerance = contextualize_text(tolerance_xml[0], context)
+        if answer.startswith(('[', '(')) and answer.endswith((']', ')')):  # range tolerance case
+            self.range_tolerance = True
+            self.inclusion = (
+                True if answer.startswith('[') else False, True if answer.endswith(']') else False
+            )
+            try:
+                self.answer_range = [contextualize_text(x, context) for x in answer[1:-1].split(',')]
+                self.correct_answer = answer[0] + self.answer_range[0] + ', ' + self.answer_range[1] + answer[-1]
+            except Exception:
+                log.debug("Content error--answer '%s' is not a valid range tolerance answer", answer)
+                _ = self.capa_system.i18n.ugettext
+                raise StudentInputError(
+                    _("There was a problem with the staff answer to this problem.")
+                )
+        else:
+            self.correct_answer = contextualize_text(answer, context)
 
-    def get_staff_ans(self):
+            # Find the tolerance
+            tolerance_xml = xml.xpath(
+                '//*[@id=$id]//responseparam[@type="tolerance"]/@default',
+                id=xml.get('id')
+            )
+            if tolerance_xml:  # If it isn't an empty list...
+                self.tolerance = contextualize_text(tolerance_xml[0], context)
+
+    def get_staff_ans(self, answer):
         """
         Given the staff answer as a string, find its float value.
 
         Use `evaluator` for this, but for backward compatability, try the
         built-in method `complex` (which used to be the standard).
         """
-
         try:
-            correct_ans = complex(self.correct_answer)
+            correct_ans = complex(answer)
         except ValueError:
             # When `correct_answer` is not of the form X+Yj, it raises a
             # `ValueError`. Then test if instead it is a math expression.
             # `complex` seems to only generate `ValueErrors`, only catch these.
             try:
-                correct_ans = evaluator({}, {}, self.correct_answer)
+                correct_ans = evaluator({}, {}, answer)
             except Exception:
-                log.debug("Content error--answer '%s' is not a valid number", self.correct_answer)
+                log.debug("Content error--answer '%s' is not a valid number", answer)
                 _ = self.capa_system.i18n.ugettext
                 raise StudentInputError(
                     _("There was a problem with the staff answer to this problem.")
@@ -887,10 +909,10 @@ class NumericalResponse(LoncapaResponse):
         return correct_ans
 
     def get_score(self, student_answers):
-        """Grade a numeric response"""
+        """
+        Grade a numeric response.
+        """
         student_answer = student_answers[self.answer_id]
-
-        correct_float = self.get_staff_ans()
 
         _ = self.capa_system.i18n.ugettext
         general_exception = StudentInputError(
@@ -924,10 +946,34 @@ class NumericalResponse(LoncapaResponse):
         except Exception:
             raise general_exception
         # End `evaluator` block -- we figured out the student's answer!
-
-        correct = compare_with_tolerance(
-            student_float, correct_float, self.tolerance
-        )
+        if self.range_tolerance:
+            if isinstance(student_float, complex):
+                raise StudentInputError(_(u"You may not use complex numbers in range tolerance problems"))
+            if isnan(student_float):
+                raise general_exception
+            boundaries = []
+            for inclusion, answer in zip(self.inclusion, self.answer_range):
+                boundary = self.get_staff_ans(answer)
+                if boundary.imag != 0:
+                    raise StudentInputError(_("There was a problem with the staff answer to this problem: complex boundary."))
+                if isnan(boundary):
+                    raise StudentInputError(_("There was a problem with the staff answer to this problem: empty boundary."))
+                boundaries.append(boundary.real)
+                if compare_with_tolerance(
+                        student_float,
+                        boundary,
+                        tolerance=float_info.epsilon,
+                        relative_tolerance=True
+                ):
+                    correct = inclusion
+                    break
+            else:
+                correct = boundaries[0] < student_float < boundaries[1]
+        else:
+            correct_float = self.get_staff_ans(self.correct_answer)
+            correct = compare_with_tolerance(
+                student_float, correct_float, self.tolerance
+            )
         if correct:
             return CorrectMap(self.answer_id, 'correct')
         else:
@@ -1062,7 +1108,7 @@ class StringResponse(LoncapaResponse):
         if self.regexp:  # regexp match
             flags = re.IGNORECASE if self.case_insensitive else 0
             try:
-                regexp = re.compile('^'+ '|'.join(expected) + '$', flags=flags | re.UNICODE)
+                regexp = re.compile('^' + '|'.join(expected) + '$', flags=flags | re.UNICODE)
                 result = re.search(regexp, given)
             except Exception as err:
                 msg = '[courseware.capa.responsetypes.stringresponse] error: {}'.format(err.message)
@@ -1074,7 +1120,6 @@ class StringResponse(LoncapaResponse):
                 return given.lower() in [i.lower() for i in expected]
             else:
                 return given in expected
-
 
     def check_hint_condition(self, hxml_set, student_answers):
         given = student_answers[self.answer_id].strip()
