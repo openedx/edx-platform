@@ -1,0 +1,51 @@
+###################################
+January 16, 2014
+###################################
+
+You can now access the public edX roadmap_ for details about the currently planned product direction.
+
+.. _roadmap: https://edx-wiki.atlassian.net/wiki/display/OPENPROD/OpenEdX+Public+Product+Roadmap
+
+
+*************
+edX Studio
+*************
+
+New documentation, `Building a Course with edX Studio <http://edx.readthedocs.org/projects/ca/en/latest/>`_, is available online_. You can also download the new guide as a PDF from the edX Studio user interface.
+
+.. _online: http://edx.readthedocs.org/projects/ca/en/latest/
+
+==========================
+Changes and Updates
+==========================
+
+
+* In certain situations, PDF files in the course were saved with the wrong content type.  PDF files are now always stored with the content type ``application/pdf``. (STUD-878)
+
+* The **Files & Uploads** page has been updated so that you can sort files on the page by file name or the date the file was uploaded to the course. (STUD-995)
+
+  For more information, see the `updated documentation for adding files to your course <http://edx.readthedocs.org/projects/ca/en/latest/create_new_course.html#add-files-to-a-course>`_. 
+
+* The default **Course Start Date** for new courses is now **01/01/2030 GMT**.  This is to ensure that your course does not start before you intend it to. You must change the course start date to the date you want students to begin using the course. (STUD-1072)
+
+  For more information, see the `updated documentation for setting important dates for your course <http://edx.readthedocs.org/projects/ca/en/latest/create_new_course.html#set-important-dates-for-your-course>`_. 
+
+* For new courses, sections and subsections now have a default release date of **January 1, 2030**. In this case, you must adjust the release date to the day you want students to be able to view the content. (STUD-1072)
+   
+  For more information, see the `updated documentation on release dates <http://edx.readthedocs.org/projects/ca/en/latest/set_content_releasedates.html#release-dates>`_. 
+
+***************************************
+edX Learning Management System
+***************************************
+
+* When a student sets the volume for a video, that volume setting is now saved and used when the student views subsequent videos. (BLD-518)
+ 
+ 
+
+* For Image Response problems, the correct answer now appears when a student clicks **Show Answer**. (BLD-633)
+
+******************
+Discussion Forums
+******************
+
+* The Vote button in the forum is now accessible by the keyboard and to screen readers. (FOR-64)

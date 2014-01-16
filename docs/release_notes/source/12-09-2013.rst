@@ -59,7 +59,7 @@ The following changes are included in this release:
 * The calculator tooltips are now fully accessible to screen readers. (BLD-533)
 
 ******************
-Forums 
+Discussion Forums
 ******************
 
 The following changes are included in this release: 
