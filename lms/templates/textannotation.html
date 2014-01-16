@@ -162,8 +162,9 @@
         },
     };
 	
-	var imgURLRoot = window.location.protocol;
-    imgURLRoot +="//" + uri.replace(imgURLRoot+"//","").split('/')[0] + "/static/js/vendor/ova/catch/img/";
+
+	var imgURLRoot = "${settings.STATIC_URL}" + "js/vendor/ova/catch/img/";
+	tinyMCE.baseURL = "${settings.STATIC_URL}" + "js/vendor/ova";
 	
 	//remove old instances
     if (Annotator._instances.length !== 0) {
