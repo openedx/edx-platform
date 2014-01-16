@@ -22,6 +22,8 @@ from ..edxapp_pages.studio.signup import SignupPage
 from ..edxapp_pages.studio.textbooks import TextbooksPage
 from ..fixtures.course import CourseFixture
 
+from .helpers import UniqueCourseTest
+
 
 class LoggedOutTest(WebAppTest):
     """
@@ -59,26 +61,13 @@ class LoggedInPagesTest(WebAppTest):
         self.ui.visit('studio.dashboard')
 
 
-class CoursePagesTest(WebAppTest):
+class CoursePagesTest(UniqueCourseTest):
     """
     Tests that verify the pages in Studio that you can get to when logged
     in and have a course.
     """
 
-    def setUp(self):
-        """
-        Create a unique identifier for the course used in this test.
-        """
-        # Define a unique course identifier
-        self.course_info = {
-            'org': 'test_org',
-            'number': '101',
-            'run': 'test_' + self.unique_id,
-            'display_name': 'Test Course ' + self.unique_id
-        }
-
-        # Ensure that the superclass sets up
-        super(CoursePagesTest, self).setUp()
+    COURSE_ID_SEPARATOR = "."
 
     @property
     def page_object_classes(self):
@@ -90,14 +79,13 @@ class CoursePagesTest(WebAppTest):
 
     @property
     def fixtures(self):
-        super_fixtures = super(CoursePagesTest, self).fixtures
         course_fix = CourseFixture(
             self.course_info['org'],
             self.course_info['number'],
             self.course_info['run'],
             self.course_info['display_name']
         )
-        return set(super_fixtures + [course_fix])
+        return [course_fix]
 
     def test_page_existence(self):
         """
@@ -113,6 +101,6 @@ class CoursePagesTest(WebAppTest):
         # Log in
         self.ui.visit('studio.auto_auth', staff=True)
 
-        course_id = '{org}.{number}.{run}'.format(**self.course_info)
+        # Verify that each page is available
         for page in pages:
-            self.ui.visit('studio.{0}'.format(page), course_id=course_id)
+            self.ui.visit('studio.{0}'.format(page), course_id=self.course_id)

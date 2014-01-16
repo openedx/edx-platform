@@ -224,14 +224,11 @@ class OpenResponsePage(PageObject):
         if assessment_type == 'self':
             return EmptyPromise(lambda: self.has_rubric, "Rubric has appeared")
 
-        elif assessment_type == 'ai':
+        elif assessment_type == 'ai' or assessment_type == "peer":
             return EmptyPromise(
                 lambda: self.grader_status != 'Unanswered',
                 "Problem status is no longer 'unanswered'"
             )
-
-        elif assessment_type == 'peer':
-            return EmptyPromise(lambda: False, "Peer assessment not yet implemented")
 
         else:
             self.warning("Unrecognized assessment type '{0}'".format(assessment_type))

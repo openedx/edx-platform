@@ -29,22 +29,40 @@ BOK_CHOY_SERVERS = {
     :cms => { :port => 8031, :log => File.join(BOK_CHOY_LOG_DIR, "bok_choy_studio.log") }
 }
 
+BOK_CHOY_STUBS = {
+    :xqueue => { :port => 8040, :log => File.join(BOK_CHOY_LOG_DIR, "bok_choy_xqueue.log") }
+}
+
+# For the time being, stubs are used by both the bok-choy and lettuce acceptance tests
+# For this reason, the stubs package is currently located in the Django app called "terrain"
+# where other lettuce configuration is stored.
+BOK_CHOY_STUB_DIR = File.join(REPO_ROOT, "common", "djangoapps", "terrain")
+
 BOK_CHOY_CACHE = Dalli::Client.new('localhost:11211')
 
 
-# Start the server we will run tests on
+# Start the servers we will run tests on
 def start_servers()
     BOK_CHOY_SERVERS.each do | service, info |
         address = "0.0.0.0:#{info[:port]}"
         cmd = "coverage run --rcfile=#{BOK_CHOY_COVERAGE_RC} -m manage #{service} --settings bok_choy runserver #{address} --traceback --noreload"
         singleton_process(cmd, logfile=info[:log])
     end
+
+    BOK_CHOY_STUBS.each do | service, info |
+        Dir.chdir(BOK_CHOY_STUB_DIR) do
+            singleton_process(
+                "python -m stubs.start #{service} #{info[:port]}",
+                logfile=info[:log]
+            )
+        end
+    end
 end
 
 
 # Wait until we get a successful response from the servers or time out
 def wait_for_test_servers()
-    BOK_CHOY_SERVERS.each do | service, info |
+    BOK_CHOY_SERVERS.merge(BOK_CHOY_STUBS).each do | service, info |
         ready = wait_for_server("0.0.0.0", info[:port])
         if not ready
             fail("Could not contact #{service} test server")

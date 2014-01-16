@@ -12,7 +12,7 @@ class StubYouTubeServiceTest(unittest.TestCase):
     def setUp(self):
         self.server = StubYouTubeService()
         self.url = "http://127.0.0.1:{0}/".format(self.server.port)
-        self.server.set_config('time_to_response', 0.0)
+        self.server.config['time_to_response'] = 0.0
         self.addCleanup(self.server.shutdown)
 
     def test_unused_url(self):

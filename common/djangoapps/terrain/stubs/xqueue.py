@@ -1,10 +1,17 @@
 """
 Stub implementation of XQueue for acceptance tests.
+
+Configuration values:
+    "default" (dict): Default response to be sent to LMS as a grade for a submission
+    "<submission>" (dict): Grade response to return for submissions containing the text <submission>
+
+If no grade response is configured, a default response will be returned.
 """
 
 from .http import StubHttpRequestHandler, StubHttpService
 import json
-import requests
+import copy
+from requests import post
 import threading
 
 
@@ -34,15 +41,13 @@ class StubXQueueHandler(StubHttpRequestHandler):
 
             except KeyError:
                 # If the message doesn't have a header or body,
-                # then it's malformed.
-                # Respond with failure
+                # then it's malformed.  Respond with failure
                 error_msg = "XQueue received invalid grade request"
                 self._send_immediate_response(False, message=error_msg)
 
             except ValueError:
                 # If we could not decode the body or header,
                 # respond with failure
-
                 error_msg = "XQueue could not decode grade request"
                 self._send_immediate_response(False, message=error_msg)
 
@@ -56,19 +61,18 @@ class StubXQueueHandler(StubHttpRequestHandler):
                 # Otherwise, the problem will not realize it's
                 # queued and it will keep waiting for a response indefinitely
                 delayed_grade_func = lambda: self._send_grade_response(
-                    callback_url, xqueue_header
+                    callback_url, xqueue_header, self.post_dict['xqueue_body']
                 )
 
                 threading.Timer(
-                    self.server.config('response_delay', default=self.DEFAULT_RESPONSE_DELAY),
+                    self.server.config.get('response_delay', self.DEFAULT_RESPONSE_DELAY),
                     delayed_grade_func
                 ).start()
 
         # If we get a request that's not to the grading submission
         # URL, return an error
         else:
-            error_message = "Invalid request URL"
-            self._send_immediate_response(False, message=error_message)
+            self._send_immediate_response(False, message="Invalid request URL")
 
     def _send_immediate_response(self, success, message=""):
         """
@@ -90,13 +94,49 @@ class StubXQueueHandler(StubHttpRequestHandler):
         else:
             self.send_response(500)
 
-    def _send_grade_response(self, postback_url, xqueue_header):
+    def _send_grade_response(self, postback_url, xqueue_header, xqueue_body_json):
         """
         POST the grade response back to the client
-        using the response provided by the server configuration
+        using the response provided by the server configuration.
+
+        Uses the server configuration to determine what response to send:
+        1) Specific response for submissions containing matching text in `xqueue_body`
+        2) Default submission configured by client
+        3) Default submission
+
+        `postback_url` is the URL the client told us to post back to
+        `xqueue_header` (dict) is the full header the client sent us, which we will send back
+        to the client so it can authenticate us.
+        `xqueue_body_json` (json-encoded string) is the body of the submission the client sent us.
         """
-        # Get the grade response from the server configuration
-        grade_response = self.server.config('grade_response', default=self.DEFAULT_GRADE_RESPONSE)
+        # First check if we have a configured response that matches the submission body
+        grade_response = None
+
+        # This matches the pattern against the JSON-encoded xqueue_body
+        # This is very simplistic, but sufficient to associate a student response
+        # with a grading response.
+        # There is a danger here that a submission will match multiple response patterns.
+        # Rather than fail silently (which could cause unpredictable behavior in tests)
+        # we abort and log a debugging message.
+        for pattern, response in self.server.config.iteritems():
+
+            if pattern in xqueue_body_json:
+                if grade_response is None:
+                    grade_response = response
+
+                # Multiple matches, so abort and log an error
+                else:
+                    self.log_error(
+                        "Multiple response patterns matched '{0}'".format(xqueue_body_json),
+                    )
+                    return
+
+        # Fall back to the default grade response configured for this queue,
+        # then to the default response.
+        if grade_response is None:
+            grade_response = self.server.config.get(
+                'default', copy.deepcopy(self.DEFAULT_GRADE_RESPONSE)
+            )
 
         # Wrap the message in <div> tags to ensure that it is valid XML
         if isinstance(grade_response, dict) and 'msg' in grade_response:
@@ -107,8 +147,8 @@ class StubXQueueHandler(StubHttpRequestHandler):
             'xqueue_body': json.dumps(grade_response)
         }
 
-        requests.post(postback_url, data=data)
-        self.log_message("XQueue: sent grading response {0}".format(data))
+        post(postback_url, data=data)
+        self.log_message("XQueue: sent grading response {0} to {1}".format(data, postback_url))
 
     def _is_grade_request(self):
         return 'xqueue/submit' in self.path
