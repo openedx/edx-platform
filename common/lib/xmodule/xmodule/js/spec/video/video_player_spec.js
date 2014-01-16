@@ -36,9 +36,9 @@
 
                 it('create video caption', function () {
                     expect(state.videoCaption).toBeDefined();
-                    expect(state.youtubeId()).toEqual('Z5KLxerq05Y');
-                    expect(state.speed).toEqual('1.0');
-                    expect(state.config.caption_asset_path)
+                    expect(state.youtubeId('1.0')).toEqual('Z5KLxerq05Y');
+                    expect(state.speed).toEqual('1.50');
+                    expect(state.config.captionAssetPath)
                         .toEqual('/static/subs/');
                 });
 
@@ -47,7 +47,7 @@
                     expect(state.videoSpeedControl.el).toHaveClass('speeds');
                     expect(state.videoSpeedControl.speeds)
                         .toEqual([ '0.75', '1.0', '1.25', '1.50' ]);
-                    expect(state.speed).toEqual('1.0');
+                    expect(state.speed).toEqual('1.50');
                 });
 
                 it('create video progress slider', function () {
@@ -395,7 +395,7 @@
                         'speed_change_video',
                         {
                             current_time: state.videoPlayer.currentTime,
-                            old_speed: '1.0',
+                            old_speed: '1.50',
                             new_speed: '0.75'
                         }
                     );
@@ -406,7 +406,7 @@
                 });
 
                 it('set video speed to the new speed', function () {
-                    expect(state.setSpeed).toHaveBeenCalledWith('0.75', false);
+                    expect(state.setSpeed).toHaveBeenCalledWith('0.75', true);
                 });
             });
 

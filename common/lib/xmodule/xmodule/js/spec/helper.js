@@ -113,6 +113,10 @@
             id: 'cogebirgzzM',
             duration: 200
         },
+        'abcdefghijkl': {
+            id: 'abcdefghijkl',
+            duration: 400
+        },
         bogus: {
             duration: 100
         }
@@ -189,6 +193,8 @@
                 settings.url.match(/.+\/problem_(check|reset|show|save)$/)
             ) {
                 // Do nothing.
+            } else if (settings.url == '/save_user_state') {
+                return {success: true};
             } else {
                 throw 'External request attempted for ' +
                     settings.url +
