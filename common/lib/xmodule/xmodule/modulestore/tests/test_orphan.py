@@ -82,7 +82,7 @@ class TestOrphan(unittest.TestCase):
             parent_location = Location('i4x', 'test_org', 'test_course', parent_category, parent_name)
             parent = self.old_mongo.get_item(parent_location)
             parent.children.append(location.url())
-            self.old_mongo.update_children(parent_location, parent.children)
+            self.old_mongo.update_item(parent, self.userid)
             # create pointer for split
             course_or_parent_locator = BlockUsageLocator(
                 package_id=self.split_package_id,

@@ -4,7 +4,6 @@ Test finding orphans via the view and django config
 import json
 from contentstore.tests.utils import CourseTestCase
 from xmodule.modulestore.django import editable_modulestore, loc_mapper
-from django.core.urlresolvers import reverse
 from student.models import CourseEnrollment
 
 class TestOrphan(CourseTestCase):
@@ -35,7 +34,7 @@ class TestOrphan(CourseTestCase):
             parent_location = self.course.location.replace(category=parent_category, name=parent_name)
             parent = editable_modulestore('direct').get_item(parent_location)
             parent.children.append(location.url())
-            editable_modulestore('direct').update_children(parent_location, parent.children)
+            editable_modulestore('direct').update_item(parent, self.user.pk)
 
     def test_mongo_orphan(self):
         """

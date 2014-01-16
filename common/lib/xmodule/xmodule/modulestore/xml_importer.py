@@ -312,43 +312,13 @@ def import_module(
 
     logging.debug('processing import of module {}...'.format(module.location.url()))
 
-    content = {}
-    for field in module.fields.values():
-        if field.scope != Scope.content:
-            continue
-        try:
-            content[field.name] = module._field_data.get(module, field.name)
-        except KeyError:
-            # Ignore any missing keys in _field_data
-            pass
-
-    module_data = {}
-    if 'data' in content:
-        module_data = content['data']
-    else:
-        module_data = content
-
-    if isinstance(module_data, basestring) and do_import_static:
+    if 'data' in module.fields and do_import_static:
         # we want to convert all 'non-portable' links in the module_data
         # (if it is a string) to portable strings (e.g. /static/)
-        module_data = rewrite_nonportable_content_links(
+        module.data = rewrite_nonportable_content_links(
             source_course_location.course_id,
-            dest_course_location.course_id, module_data
+            dest_course_location.course_id, module.data
         )
-
-    if allow_not_found:
-        store.update_item(
-            module.location, module_data, allow_not_found=allow_not_found
-        )
-    else:
-        store.update_item(module.location, module_data)
-
-    if hasattr(module, 'children') and module.children != []:
-        store.update_children(module.location, module.children)
-
-    # NOTE: It's important to use own_metadata here to avoid writing
-    # inherited metadata everywhere.
-
     # remove any export/import only xml_attributes
     # which are used to wire together draft imports
     if 'parent_sequential_url' in getattr(module, 'xml_attributes', []):
@@ -356,9 +326,8 @@ def import_module(
 
     if 'index_in_children_list' in getattr(module, 'xml_attributes', []):
         del module.xml_attributes['index_in_children_list']
-    module.save()
 
-    store.update_metadata(module.location, dict(own_metadata(module)))
+    store.update_item(module, None, allow_not_found=allow_not_found)
 
 
 def import_course_draft(
@@ -490,7 +459,7 @@ def import_course_draft(
 
                             if non_draft_location.url() not in sequential.children:
                                 sequential.children.insert(index, non_draft_location.url())
-                                store.update_children(sequential.location, sequential.children)
+                                store.update_item(sequential, 'importer')
 
                         import_module(
                             module, draft_store, course_data_path,

@@ -7,7 +7,7 @@ import unittest
 import uuid
 from xmodule.modulestore import Location
 from xmodule.modulestore.locator import BlockUsageLocator
-from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 from xmodule.modulestore.loc_mapper_store import LocMapperStore
 from mock import Mock
 
@@ -114,7 +114,7 @@ class TestLocationMapper(unittest.TestCase):
 
         new_style_package_id = '{}.geek_dept.{}.baz_run'.format(org, course)
         block_map = {
-            'abc123': {'problem': 'problem2'},
+            'abc123': {'problem': 'problem2', 'vertical': 'vertical2'},
             'def456': {'problem': 'problem4'},
             'ghi789': {'problem': 'problem7'},
         }
@@ -136,6 +136,14 @@ class TestLocationMapper(unittest.TestCase):
                 Location('i4x', org, course, 'problem', '1def23'),
                 add_entry_if_missing=False
             )
+        test_no_cat_locn = test_problem_locn.replace(category=None)
+        with self.assertRaises(InvalidLocationError):
+            loc_mapper().translate_location(
+                old_style_course_id, test_no_cat_locn, False, False
+            )
+        test_no_cat_locn = test_no_cat_locn.replace(name='def456')
+        # only one course matches
+        self.translate_n_check(test_no_cat_locn, old_style_course_id, new_style_package_id, 'problem4', 'published')
 
         # add a distractor course (note that abc123 has a different translation in this one)
         distractor_block_map = {
