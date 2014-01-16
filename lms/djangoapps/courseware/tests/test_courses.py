@@ -7,11 +7,12 @@ import mock
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from django.http import Http404
 from django.test.utils import override_settings
-from courseware.courses import get_course_by_id, get_course, get_cms_course_link
+from courseware.courses import get_course_by_id, get_course, get_cms_course_link, get_course_info_section, get_course_about_section
+from student.tests.factories import UserFactory
 from xmodule.modulestore.django import get_default_store_name_for_current_request
 from xmodule.modulestore.tests.factories import CourseFactory
-from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
-
+from courseware.tests.helpers import get_request_for_user
+from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE, TEST_DATA_MIXED_MODULESTORE
 
 CMS_BASE_TEST = 'testcms'
 
@@ -79,3 +80,43 @@ class CoursesTest(ModuleStoreTestCase):
     )
     def test_default_modulestore_published_mapping(self):
         self.assertEqual(get_default_store_name_for_current_request(), 'default')
+
+
+class CoursesRenderTest(ModuleStoreTestCase):
+    """Test methods related to rendering courses content."""
+
+    @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+    def test_get_course_info_section_render(self):
+        course = get_course_by_id('edX/toy/2012_Fall')
+        request = get_request_for_user(UserFactory.create())
+
+        # Test render works okay
+        course_info = get_course_info_section(request, course, 'handouts')
+        self.assertEqual(course_info, "<a href='/static/toy/handouts/sample_handout.txt'>Sample</a>")
+
+        # Test when render raises an exception
+        with mock.patch('courseware.courses.get_module') as mock_module_render:
+            mock_module_render.return_value = mock.MagicMock(
+                render=mock.Mock(side_effect=Exception('Render failed!'))
+            )
+            course_info = get_course_info_section(request, course, 'handouts')
+            self.assertIsInstance(course_info, basestring)
+
+    @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+    @mock.patch('courseware.courses.get_request_for_thread')
+    def test_get_course_about_section_render(self, mock_get_request):
+        course = get_course_by_id('edX/toy/2012_Fall')
+        request = get_request_for_user(UserFactory.create())
+        mock_get_request.return_value = request
+
+        # Test render works okay
+        course_info = get_course_about_section(course, 'effort')
+        self.assertEqual(course_info, "6 hours")
+
+        # Test when render raises an exception
+        with mock.patch('courseware.courses.get_module') as mock_module_render:
+            mock_module_render.return_value = mock.MagicMock(
+                render=mock.Mock(side_effect=Exception('Render failed!'))
+            )
+            course_info = get_course_about_section(course, 'effort')
+            self.assertIsInstance(course_info, basestring)

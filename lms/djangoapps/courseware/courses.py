@@ -192,7 +192,7 @@ def get_course_about_section(course, section_key):
                     log.exception("Error rendering course={course}, section_key={section_key}".format(
                                   course=course,
                                   section_key=section_key
-                                 ))
+                                  ))
             return html
 
         except ItemNotFoundError:
@@ -243,7 +243,7 @@ def get_course_info_section(request, course, section_key):
             log.exception("Error rendering course={course}, section_key={section_key}".format(
                           course=course,
                           section_key=section_key
-                         ))
+                          ))
 
     return html
 
