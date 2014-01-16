@@ -33,6 +33,7 @@ from shapely.geometry import Point, MultiPoint
 # specific library imports
 from calc import evaluator, UndefinedVariable
 from . import correctmap
+from .registry import TagRegistry
 from datetime import datetime
 from pytz import UTC
 from .util import (compare_with_tolerance, contextualize_text,  convert_files_to_filenames,
@@ -45,6 +46,7 @@ import capa.safe_exec as safe_exec
 
 log = logging.getLogger(__name__)
 
+registry = TagRegistry()
 
 CorrectMap = correctmap.CorrectMap  # pylint: disable=C0103
 CORRECTMAP_PY = None
@@ -92,7 +94,7 @@ class LoncapaResponse(object):
 
     Each subclass must also define the following attributes:
 
-      - response_tag         : xhtml tag identifying this response (used in auto-registering)
+      - tags                : xhtml tags identifying this response (used in auto-registering)
 
     In addition, these methods are optional:
 
@@ -120,7 +122,7 @@ class LoncapaResponse(object):
     """
     __metaclass__ = abc.ABCMeta  # abc = Abstract Base Class
 
-    response_tag = None
+    tags = None
     hint_tag = None
 
     max_inputfields = None
@@ -405,13 +407,14 @@ class LoncapaResponse(object):
 
 #-----------------------------------------------------------------------------
 
+@registry.register
 class JavascriptResponse(LoncapaResponse):
     """
     This response type is used when the student's answer is graded via
     Javascript using Node.js.
     """
 
-    response_tag = 'javascriptresponse'
+    tags = ['javascriptresponse']
     max_inputfields = 1
     allowed_inputfields = ['javascriptinput']
 
@@ -605,6 +608,7 @@ class JavascriptResponse(LoncapaResponse):
 
 
 #-----------------------------------------------------------------------------
+@registry.register
 class ChoiceResponse(LoncapaResponse):
     """
     This response type is used when the student chooses from a discrete set of
@@ -653,7 +657,7 @@ class ChoiceResponse(LoncapaResponse):
 
     """
 
-    response_tag = 'choiceresponse'
+    tags = ['choiceresponse']
     max_inputfields = 1
     allowed_inputfields = ['checkboxgroup', 'radiogroup']
     correct_choices = None
@@ -702,10 +706,11 @@ class ChoiceResponse(LoncapaResponse):
 #-----------------------------------------------------------------------------
 
 
+@registry.register
 class MultipleChoiceResponse(LoncapaResponse):
     # TODO: handle direction and randomize
 
-    response_tag = 'multiplechoiceresponse'
+    tags = ['multiplechoiceresponse']
     max_inputfields = 1
     allowed_inputfields = ['choicegroup']
     correct_choices = None
@@ -759,9 +764,10 @@ class MultipleChoiceResponse(LoncapaResponse):
         return {self.answer_id: self.correct_choices}
 
 
+@registry.register
 class TrueFalseResponse(MultipleChoiceResponse):
 
-    response_tag = 'truefalseresponse'
+    tags = ['truefalseresponse']
 
     def mc_setup_response(self):
         i = 0
@@ -786,12 +792,13 @@ class TrueFalseResponse(MultipleChoiceResponse):
 #-----------------------------------------------------------------------------
 
 
+@registry.register
 class OptionResponse(LoncapaResponse):
     '''
     TODO: handle direction and randomize
     '''
 
-    response_tag = 'optionresponse'
+    tags = ['optionresponse']
     hint_tag = 'optionhint'
     allowed_inputfields = ['optioninput']
     answer_fields = None
@@ -819,13 +826,14 @@ class OptionResponse(LoncapaResponse):
 #-----------------------------------------------------------------------------
 
 
+@registry.register
 class NumericalResponse(LoncapaResponse):
     '''
     This response type expects a number or formulaic expression that evaluates
     to a number (e.g. `4+5/2^2`), and accepts with a tolerance.
     '''
 
-    response_tag = 'numericalresponse'
+    tags = ['numericalresponse']
     hint_tag = 'numericalhint'
     allowed_inputfields = ['textline', 'formulaequationinput']
     required_attributes = ['answer']
@@ -946,6 +954,7 @@ class NumericalResponse(LoncapaResponse):
 #-----------------------------------------------------------------------------
 
 
+@registry.register
 class StringResponse(LoncapaResponse):
     '''
     This response type allows one or more answers.
@@ -978,7 +987,7 @@ class StringResponse(LoncapaResponse):
             </hintgroup>
         </stringresponse>
     '''
-    response_tag = 'stringresponse'
+    tags = ['stringresponse']
     hint_tag = 'stringhint'
     allowed_inputfields = ['textline']
     required_attributes = ['answer']
@@ -1080,13 +1089,14 @@ class StringResponse(LoncapaResponse):
 #-----------------------------------------------------------------------------
 
 
+@registry.register
 class CustomResponse(LoncapaResponse):
     '''
     Custom response.  The python code to be run should be in <answer>...</answer>
     or in a <script>...</script>
     '''
 
-    response_tag = 'customresponse'
+    tags = ['customresponse']
 
     allowed_inputfields = ['textline', 'textbox', 'crystallography',
                            'chemicalequationinput', 'vsepr_input',
@@ -1408,12 +1418,13 @@ class CustomResponse(LoncapaResponse):
 #-----------------------------------------------------------------------------
 
 
+@registry.register
 class SymbolicResponse(CustomResponse):
     """
     Symbolic math response checking, using symmath library.
     """
 
-    response_tag = 'symbolicresponse'
+    tags = ['symbolicresponse']
     max_inputfields = 1
 
     def setup_response(self):
@@ -1456,6 +1467,7 @@ class SymbolicResponse(CustomResponse):
 ScoreMessage = namedtuple('ScoreMessage', ['valid', 'correct', 'points', 'msg'])  # pylint: disable=invalid-name
 
 
+@registry.register
 class CodeResponse(LoncapaResponse):
     """
     Grade student code using an external queueing server, called 'xqueue'
@@ -1472,7 +1484,7 @@ class CodeResponse(LoncapaResponse):
         (i.e. and not for getting reference answers)
     """
 
-    response_tag = 'coderesponse'
+    tags = ['coderesponse']
     allowed_inputfields = ['textbox', 'filesubmission', 'matlabinput']
     max_inputfields = 1
     payload = None
@@ -1705,6 +1717,7 @@ class CodeResponse(LoncapaResponse):
 #-----------------------------------------------------------------------------
 
 
+@registry.register
 class ExternalResponse(LoncapaResponse):
     """
     Grade the students input using an external server.
@@ -1713,7 +1726,7 @@ class ExternalResponse(LoncapaResponse):
 
     """
 
-    response_tag = 'externalresponse'
+    tags = ['externalresponse']
     allowed_inputfields = ['textline', 'textbox']
     awdmap = {
         'EXACT_ANS': 'correct',         # TODO: handle other loncapa responses
@@ -1864,12 +1877,13 @@ class ExternalResponse(LoncapaResponse):
 
 #-----------------------------------------------------------------------------
 
+@registry.register
 class FormulaResponse(LoncapaResponse):
     """
     Checking of symbolic math response using numerical sampling.
     """
 
-    response_tag = 'formularesponse'
+    tags = ['formularesponse']
     hint_tag = 'formulahint'
     allowed_inputfields = ['textline', 'formulaequationinput']
     required_attributes = ['answer', 'samples']
@@ -2068,11 +2082,12 @@ class FormulaResponse(LoncapaResponse):
 #-----------------------------------------------------------------------------
 
 
+@registry.register
 class SchematicResponse(LoncapaResponse):
     """
     Circuit schematic response type.
     """
-    response_tag = 'schematicresponse'
+    tags = ['schematicresponse']
     allowed_inputfields = ['schematic']
 
     def __init__(self, *args, **kwargs):
@@ -2118,6 +2133,7 @@ class SchematicResponse(LoncapaResponse):
 #-----------------------------------------------------------------------------
 
 
+@registry.register
 class ImageResponse(LoncapaResponse):
     """
     Handle student response for image input: the input is a click on an image,
@@ -2145,7 +2161,7 @@ class ImageResponse(LoncapaResponse):
         True, if click is inside any region or rectangle. Otherwise False.
     """
 
-    response_tag = 'imageresponse'
+    tags = ['imageresponse']
     allowed_inputfields = ['imageinput']
 
     def __init__(self, *args, **kwargs):
@@ -2248,6 +2264,7 @@ class ImageResponse(LoncapaResponse):
 #-----------------------------------------------------------------------------
 
 
+@registry.register
 class AnnotationResponse(LoncapaResponse):
     """
     Checking of annotation responses.
@@ -2255,7 +2272,7 @@ class AnnotationResponse(LoncapaResponse):
     The response contains both a comment (student commentary) and an option (student tag).
     Only the tag is currently graded. Answers may be incorrect, partially correct, or correct.
     """
-    response_tag = 'annotationresponse'
+    tags = ['annotationresponse']
     allowed_inputfields = ['annotationinput']
     max_inputfields = 1
     default_scoring = {'incorrect': 0, 'partially-correct': 1, 'correct': 2}
@@ -2371,6 +2388,7 @@ class AnnotationResponse(LoncapaResponse):
         return None
 
 
+@registry.register
 class ChoiceTextResponse(LoncapaResponse):
     """
     Allows for multiple choice responses with text inputs
@@ -2378,7 +2396,7 @@ class ChoiceTextResponse(LoncapaResponse):
     ChoiceResponse.
     """
 
-    response_tag = 'choicetextresponse'
+    tags = ['choicetextresponse']
     max_inputfields = 1
     allowed_inputfields = ['choicetextgroup',
                            'checkboxtextgroup',
