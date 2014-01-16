@@ -103,7 +103,7 @@ rednose==0.3
 selenium==2.34.0
 splinter==0.5.4
 django_nose==1.1
-django_debug_toolbar
+django_debug_toolbar==1.0.1
 django-debug-toolbar-mongo
 nose-ignore-docstring
 nose-exclude
