@@ -25,17 +25,13 @@ from copy import deepcopy
 from capa.correctmap import CorrectMap
 import capa.inputtypes as inputtypes
 import capa.customrender as customrender
+import capa.responsetypes as responsetypes
 from capa.util import contextualize_text, convert_files_to_filenames
 import capa.xqueue_interface as xqueue_interface
 
-# to be replaced with auto-registering
-import capa.responsetypes as responsetypes
 from capa.safe_exec import safe_exec
 
 from pytz import UTC
-
-# dict of tagname, Response Class -- this should come from auto-registering
-response_tag_dict = dict([(x.response_tag, x) for x in responsetypes.__all__])
 
 # extra things displayed after "show answers" is pressed
 solution_tags = ['solution']
@@ -652,7 +648,7 @@ class LoncapaProblem(object):
         '''
         response_id = 1
         self.responders = {}
-        for response in tree.xpath('//' + "|//".join(response_tag_dict)):
+        for response in tree.xpath('//' + "|//".join(responsetypes.registry.registered_tags())):
             response_id_str = self.problem_id + "_" + str(response_id)
             # create and save ID for this response
             response.set('id', response_id_str)
@@ -673,8 +669,8 @@ class LoncapaProblem(object):
                 answer_id = answer_id + 1
 
             # instantiate capa Response
-            responder = response_tag_dict[response.tag](response, inputfields,
-                                                        self.context, self.system)
+            responsetype_cls = responsetypes.registry.get_class_for_tag(response.tag)
+            responder = responsetype_cls(response, inputfields, self.context, self.system)
             # save in list in self
             self.responders[response] = responder
 

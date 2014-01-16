@@ -289,6 +289,7 @@ class InputTypeBase(object):
 #-----------------------------------------------------------------------------
 
 
+@registry.register
 class OptionInput(InputTypeBase):
     """
     Input type for selecting and Select option input type.
@@ -333,14 +334,13 @@ class OptionInput(InputTypeBase):
         return [Attribute('options', transform=cls.parse_options),
                 Attribute('inline', False)]
 
-registry.register(OptionInput)
-
 #-----------------------------------------------------------------------------
 
 
 # TODO: consolidate choicegroup, radiogroup, checkboxgroup after discussion of
 # desired semantics.
 
+@registry.register
 class ChoiceGroup(InputTypeBase):
     """
     Radio button or checkbox inputs: multiple choice or true/false
@@ -415,12 +415,10 @@ class ChoiceGroup(InputTypeBase):
         return choices
 
 
-registry.register(ChoiceGroup)
-
-
 #-----------------------------------------------------------------------------
 
 
+@registry.register
 class JavascriptInput(InputTypeBase):
     """
     Hidden field for javascript to communicate via; also loads the required
@@ -451,13 +449,11 @@ class JavascriptInput(InputTypeBase):
         if self.value == "":
             self.value = 'null'
 
-registry.register(JavascriptInput)
-
-
 
 #-----------------------------------------------------------------------------
 
 
+@registry.register
 class JSInput(InputTypeBase):
     """
     Inputtype for general javascript inputs. Intended to be used with
@@ -480,7 +476,7 @@ class JSInput(InputTypeBase):
                  height="500"
                  width="400"/>
 
-    See the documentation in docs/data/source/course_data_formats/jsinput.rst 
+    See the documentation in docs/data/source/course_data_formats/jsinput.rst
     for more information.
     """
 
@@ -517,11 +513,10 @@ class JSInput(InputTypeBase):
 
         return context
 
-
-registry.register(JSInput)
 #-----------------------------------------------------------------------------
 
 
+@registry.register
 class TextLine(InputTypeBase):
     """
     A text line input.  Can do math preview if "math"="1" is specified.
@@ -587,11 +582,10 @@ class TextLine(InputTypeBase):
         return {'do_math': self.do_math,
                 'preprocessor': self.preprocessor, }
 
-registry.register(TextLine)
-
 #-----------------------------------------------------------------------------
 
 
+@registry.register
 class FileSubmission(InputTypeBase):
     """
     Upload some files (e.g. for programming assignments)
@@ -636,11 +630,10 @@ class FileSubmission(InputTypeBase):
     def _extra_context(self):
         return {'queue_len': self.queue_len, }
 
-registry.register(FileSubmission)
-
 
 #-----------------------------------------------------------------------------
 
+@registry.register
 class CodeInput(InputTypeBase):
     """
     A text area input for code--uses codemirror, does syntax highlighting, special tab handling,
@@ -700,12 +693,11 @@ class CodeInput(InputTypeBase):
         """Defined queue_len, add it """
         return {'queue_len': self.queue_len, }
 
-registry.register(CodeInput)
-
 
 #-----------------------------------------------------------------------------
 
 
+@registry.register
 class MatlabInput(CodeInput):
     '''
     InputType for handling Matlab code input
@@ -866,11 +858,9 @@ class MatlabInput(CodeInput):
         return {'success': error == 0, 'message': msg}
 
 
-registry.register(MatlabInput)
-
-
 #-----------------------------------------------------------------------------
 
+@registry.register
 class Schematic(InputTypeBase):
     """
     InputType for the schematic editor
@@ -893,11 +883,10 @@ class Schematic(InputTypeBase):
             Attribute('submit_analyses', None), ]
 
 
-registry.register(Schematic)
-
 #-----------------------------------------------------------------------------
 
 
+@registry.register
 class ImageInput(InputTypeBase):
     """
     Clickable image as an input field.  Element should specify the image source, height,
@@ -939,11 +928,10 @@ class ImageInput(InputTypeBase):
         return {'gx': self.gx,
                 'gy': self.gy}
 
-registry.register(ImageInput)
-
 #-----------------------------------------------------------------------------
 
 
+@registry.register
 class Crystallography(InputTypeBase):
     """
     An input for crystallography -- user selects 3 points on the axes, and we get a plane.
@@ -963,11 +951,10 @@ class Crystallography(InputTypeBase):
                 Attribute('width'),
                 ]
 
-registry.register(Crystallography)
-
 # -------------------------------------------------------------------------
 
 
+@registry.register
 class VseprInput(InputTypeBase):
     """
     Input for molecular geometry--show possible structures, let student
@@ -988,11 +975,10 @@ class VseprInput(InputTypeBase):
                 Attribute('geometries'),
                 ]
 
-registry.register(VseprInput)
-
 #-------------------------------------------------------------------------
 
 
+@registry.register
 class ChemicalEquationInput(InputTypeBase):
     """
     An input type for entering chemical equations.  Supports live preview.
@@ -1064,11 +1050,10 @@ class ChemicalEquationInput(InputTypeBase):
 
         return result
 
-registry.register(ChemicalEquationInput)
-
 #-------------------------------------------------------------------------
 
 
+@registry.register
 class FormulaEquationInput(InputTypeBase):
     """
     An input type for entering formula equations.  Supports live preview.
@@ -1160,11 +1145,10 @@ class FormulaEquationInput(InputTypeBase):
 
         return result
 
-registry.register(FormulaEquationInput)
-
 #-----------------------------------------------------------------------------
 
 
+@registry.register
 class DragAndDropInput(InputTypeBase):
     """
     Input for drag and drop problems. Allows student to drag and drop images and
@@ -1259,11 +1243,10 @@ class DragAndDropInput(InputTypeBase):
         self.loaded_attributes['drag_and_drop_json'] = json.dumps(to_js)
         self.to_render.add('drag_and_drop_json')
 
-registry.register(DragAndDropInput)
-
 #-------------------------------------------------------------------------
 
 
+@registry.register
 class EditAMoleculeInput(InputTypeBase):
     """
     An input type for edit-a-molecule.  Integrates with the molecule editor java applet.
@@ -1296,11 +1279,10 @@ class EditAMoleculeInput(InputTypeBase):
 
         return context
 
-registry.register(EditAMoleculeInput)
-
 #-----------------------------------------------------------------------------
 
 
+@registry.register
 class DesignProtein2dInput(InputTypeBase):
     """
     An input type for design of a protein in 2D. Integrates with the Protex java applet.
@@ -1333,11 +1315,10 @@ class DesignProtein2dInput(InputTypeBase):
 
         return context
 
-registry.register(DesignProtein2dInput)
-
 #-----------------------------------------------------------------------------
 
 
+@registry.register
 class EditAGeneInput(InputTypeBase):
     """
         An input type for editing a gene.
@@ -1370,11 +1351,10 @@ class EditAGeneInput(InputTypeBase):
 
         return context
 
-registry.register(EditAGeneInput)
-
 #---------------------------------------------------------------------
 
 
+@registry.register
 class AnnotationInput(InputTypeBase):
     """
     Input type for annotations: students can enter some notes or other text
@@ -1481,9 +1461,8 @@ class AnnotationInput(InputTypeBase):
 
         return extra_context
 
-registry.register(AnnotationInput)
 
-
+@registry.register
 class ChoiceTextGroup(InputTypeBase):
     """
     Groups of radiobutton/checkboxes with text inputs.
@@ -1686,5 +1665,3 @@ class ChoiceTextGroup(InputTypeBase):
             # Add the tuple for the current choice to the list of choices
             choices.append((choice.get("name"), components))
         return choices
-
-registry.register(ChoiceTextGroup)
