@@ -5,6 +5,8 @@ if Backbone?
       "keydown .discussion-show":
         (event) -> DiscussionUtil.activateOnSpace(event, @toggleDiscussion)
       "click .new-post-btn": "toggleNewPost"
+      "keydown .new-post-btn":
+        (event) -> DiscussionUtil.activateOnSpace(event, @toggleNewPost)
       "click .new-post-cancel": "hideNewPost"
       "click .discussion-paginator a": "navigateToPage"
 
@@ -19,7 +21,7 @@ if Backbone?
       else
         @page = 1
 
-    toggleNewPost: (event) ->
+    toggleNewPost: (event) =>
       event.preventDefault()
       if !@newPostForm
         @toggleDiscussion()
