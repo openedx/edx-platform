@@ -1,3 +1,4 @@
+''' text annotation module '''
 import logging
 
 from lxml import etree
@@ -7,12 +8,10 @@ from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xblock.core import Scope, String
 
-from django.conf import settings
-
 import textwrap
-import xmodule.x_module
 
 log = logging.getLogger(__name__)
+
 
 class AnnotatableFields(object):
     """Fields for `TextModule` and `TextDescriptor`."""
@@ -22,11 +21,11 @@ class AnnotatableFields(object):
         <annotatable>
             <instructions>
                 <p>
-                	Add the instructions to the assignment here. 
+                    Add the instructions to the assignment here.
                 </p>
             </instructions>
             <p>
-            	Lorem ipsum dolor sit amet, at amet animal petentium nec. Id augue nemore postulant mea. Ex eam dicant noluisse expetenda, alia admodum abhorreant qui et. An ceteros expetenda mea, tale natum ipsum quo no, ut pro paulo alienum noluisse.
+                Lorem ipsum dolor sit amet, at amet animal petentium nec. Id augue nemore postulant mea. Ex eam dicant noluisse expetenda, alia admodum abhorreant qui et. An ceteros expetenda mea, tale natum ipsum quo no, ut pro paulo alienum noluisse.
             </p>
         </annotatable>
         """))
@@ -48,8 +47,11 @@ class AnnotatableFields(object):
         scope=Scope.settings,
         default='None',
     )
+    annotation_storage_url = String(help="Location of Annotation backend", scope=Scope.settings, default="http://your_annotation_storage.com", display_name="Url for Annotation Storage")
+
 
 class TextAnnotationModule(AnnotatableFields, XModule):
+    ''' Text Annotation Module '''
     js = {'coffee': [],
           'js': []
     }
@@ -65,7 +67,6 @@ class TextAnnotationModule(AnnotatableFields, XModule):
         self.content = etree.tostring(xmltree, encoding='unicode')
         self.element_id = self.location.name
         self.highlight_colors = ['yellow', 'orange', 'purple', 'blue', 'green']
-
 
     def _render_content(self):
         """ Renders annotatable content with annotation spans and returns HTML. """
@@ -83,22 +84,23 @@ class TextAnnotationModule(AnnotatableFields, XModule):
             xmltree.remove(instructions)
             return etree.tostring(instructions, encoding='unicode')
         return None
-	
+
     def get_html(self):
         """ Renders parameters to template. """
         context = {
             'display_name': self.display_name_with_default,
             'tag': self.tags,
-            'source':self.source,
+            'source': self.source,
             'element_id': self.element_id,
             'instructions_html': self.instructions,
             'content_html': self._render_content(),
-            'annotation_storage':self.annotation_storage_url
+            'annotation_storage': self.annotation_storage_url
         }
 
         return self.system.render_template('textannotation.html', context)
 
 
 class TextAnnotationDescriptor(AnnotatableFields, RawDescriptor):
+    ''' Text Annotation Descriptor '''
     module_class = TextAnnotationModule
     mako_template = "widgets/raw-edit.html"

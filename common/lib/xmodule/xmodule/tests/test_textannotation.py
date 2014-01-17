@@ -9,22 +9,24 @@ from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
 from xmodule.textannotation_module import TextAnnotationModule
-from xmodule.modulestore import Location
 
 from . import get_test_system
 
+
 class TextAnnotationModuleTestCase(unittest.TestCase):
+    ''' text Annotation Module Test Case '''
     sample_xml = '''
         <annotatable>
             <instructions><p>Test Instructions.</p></instructions>
             <p>
                 One Fish. Two Fish.
                 Red Fish. Blue Fish.
-                
+
                 Oh the places you'll go!
             </p>
         </annotatable>
     '''
+
     def setUp(self):
         self.mod = TextAnnotationModule(
             Mock(),
@@ -32,14 +34,14 @@ class TextAnnotationModuleTestCase(unittest.TestCase):
             DictFieldData({'data':self.sample_xml}),
             ScopeIds(None, None, None, None)
         )
-    
+
     def test_render_content(self):
         content = self.mod._render_content()
         self.assertIsNotNone(content)
-        el = etree.fromstring(content)
-        self.assertIsNotNone(el)
-        self.assertFalse('display_name' in el.attrib, "Display Name should have been deleted from Content")
-    
+        element = etree.fromstring(content)
+        self.assertIsNotNone(element)
+        self.assertFalse('display_name' in element.attrib, "Display Name should have been deleted from Content")
+
     def test_extract_instructions(self):
         xmltree = etree.fromstring(self.sample_xml)
 
@@ -51,8 +53,9 @@ class TextAnnotationModuleTestCase(unittest.TestCase):
         xmltree = etree.fromstring('<annotatable>foo</annotatable>')
         actual = self.mod._extract_instructions(xmltree)
         self.assertIsNone(actual)
-    
+
     def test_get_html(self):
         context = self.mod.get_html()
-        for key in ['display_name', 'tag','source','element_id','instructions_html','content_html','annotation_storage']:
+        for key in ['display_name', 'tag', 'source', 'element_id', 'instructions_html', 'content_html', 'annotation_storage']:
             self.assertIn(key, context)
+

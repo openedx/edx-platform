@@ -65,7 +65,7 @@ FEATURES = {
 
     # If set to True, Studio won't restrict the set of advanced components
     # to just those pre-approved by edX
-    'ALLOW_ALL_ADVANCED_COMPONENTS': True,
+    'ALLOW_ALL_ADVANCED_COMPONENTS': False,
 }
 ENABLE_JASMINE = False
 

@@ -49,7 +49,6 @@ urlpatterns += patterns(
     url(r'^login_post$', 'student.views.login_user', name='login_post'),
     url(r'^logout$', 'student.views.logout_user', name='logout'),
 
-    #added token
     url(r'^token/', 'student.views.token', name="token"),
 )
 
