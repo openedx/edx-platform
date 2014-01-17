@@ -12,8 +12,8 @@
 
 // base - utilities
 @import 'base/reset';
-@import 'base/mixins';
 @import 'base/variables';
+@import 'base/mixins';
 
 ## THEMING
 ## -------
@@ -41,6 +41,7 @@
 // base - elements
 @import 'elements/typography';
 @import 'elements/controls';
+@import 'elements/system-feedback';
 
 // base - specific views
 @import 'views/verification';

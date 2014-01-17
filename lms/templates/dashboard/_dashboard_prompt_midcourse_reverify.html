@@ -2,12 +2,24 @@
 <%! from django.core.urlresolvers import reverse %>
 <!--TODO replace this with something a clever deisgn person approves of-->
 <!--TODO replace this with a shiny loopy thing to actually print out all courses-->
-% if prompt_midcourse_reverify:
-<h2>${_("You need to re-verify to continue")}</h2>
-% for course_id, course_name, date, status in reverify_course_data:
-<p class='activation-message'>
-	${_('To continue in the verified track in {course_name}, you need to re-verify your identity by {date}.').format(course_name=course_name, date=date)}
-	<a href="${reverse('verify_student_midcourse_reverify_dash')}">Click here to re-verify.</a>
-</p>
+% if reverify_course_data:
+<div class="msg msg-reverify has-actions">
+    <div class="msg-content">
+      <h2 class="title">${_("You need to re-verify to continue")}</h2>
+      % for course_id, course_name, date, status in reverify_course_data:
+      <div class="copy">
+        <p class='activation-message'>
+        	${_('To continue in the verified track in <strong>{course_name}</strong>, you need to re-verify your identity by {date}.').format(course_name=course_name, date=date)}
+        </p>
+      </div>
+    </div>
+    <nav class="nav-actions">
+      <h3 class="sr">Notification Actions</h3>
+      <ul>
+        <li class="nav-item"><a class="btn action-primary action-reverify" href="${reverse('verify_student_midcourse_reverify_dash')}">Re-verify</a></li>
+      </ul>
+    </nav>
+  </div>
+</div>
 % endfor
 %endif

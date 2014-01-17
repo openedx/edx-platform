@@ -21,9 +21,11 @@ from django.core.exceptions import ObjectDoesNotExist
 from xmodule.modulestore.tests.factories import CourseFactory
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from student.tests.factories import UserFactory
+from student.models import CourseEnrollment
 from course_modes.models import CourseMode
 from verify_student.views import render_to_response
 from verify_student.models import SoftwareSecurePhotoVerification
+from verify_student.tests.factories import MidcourseReverificationWindowFactory
 
 
 def mock_render_to_response(*args, **kwargs):
@@ -80,6 +82,8 @@ class TestReverifyView(TestCase):
     def setUp(self):
         self.user = UserFactory.create(username="rusty", password="test")
         self.client.login(username="rusty", password="test")
+        self.course_id = "MITx/999/Robot_Super_Course"
+        self.course = CourseFactory.create(org='MITx', number='999', display_name='Robot Super Course')
 
     @patch('verify_student.views.render_to_response', render_mock)
     def test_reverify_get(self):
@@ -110,3 +114,61 @@ class TestReverifyView(TestCase):
             self.assertIsNotNone(verification_attempt)
         except ObjectDoesNotExist:
             self.fail('No verification object generated')
+        self.assertIn('photo_reverification', template)
+        self.assertTrue(context['error'])
+
+    @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
+    def test_reverify_post_success(self):
+        url = reverse('verify_student_reverify')
+        response = self.client.post(url, {'face_image': ',',
+                                          'photo_id_image': ','})
+        self.assertEquals(response.status_code, 302)
+        try:
+            verification_attempt = SoftwareSecurePhotoVerification.objects.get(user=self.user)
+            self.assertIsNotNone(verification_attempt)
+        except ObjectDoesNotExist:
+            self.fail('No verification object generated')
+
+
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+class TestMidCourseReverifyView(TestCase):
+    def setUp(self):
+        self.user = UserFactory.create(username="rusty", password="test")
+        self.client.login(username="rusty", password="test")
+        self.course_id = 'Robot/999/Test_Course'
+        CourseFactory.create(org='Robot', number='999', display_name='Test Course')
+
+    @patch('verify_student.views.render_to_response', render_mock)
+    def test_midcourse_reverify_get(self):
+        url = reverse('verify_student_midcourse_reverify',
+                      kwargs={"course_id": self.course_id})
+        response = self.client.get(url)
+        self.assertEquals(response.status_code, 200)
+        ((_template, context), _kwargs) = render_mock.call_args
+        self.assertFalse(context['error'])
+
+    @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
+    def test_midcourse_reverify_post_success(self):
+        url = reverse('verify_student_midcourse_reverify', kwargs={'course_id': self.course_id})
+        response = self.client.post(url, {'face_image': ','})
+        self.assertEquals(response.status_code, 302)
+        try:
+            verification_attempt = SoftwareSecurePhotoVerification.objects.get(user=self.user)
+            self.assertIsNotNone(verification_attempt)
+        except ObjectDoesNotExist:
+            self.fail('No verification object generated')
+
+    # TODO make this test more detailed
+    @patch('verify_student.views.render_to_response', render_mock)
+    def test_midcourse_reverify_dash(self):
+        url = reverse('verify_student_midcourse_reverify_dash')
+        response = self.client.get(url)
+        # not enrolled in any courses
+        self.assertEquals(response.status_code, 200)
+
+        enrollment = CourseEnrollment.get_or_create_enrollment(self.user, self.course_id)
+        enrollment.update_enrollment(mode="verified", is_active=True)
+        MidcourseReverificationWindowFactory(course_id=self.course_id)
+        response = self.client.get(url)
+        # enrolled in a verified course, and the window is open
+        self.assertEquals(response.status_code, 200)

@@ -1,0 +1,74 @@
+// lms - elements - system feedback
+// ====================
+
+// messages
+
+// UI : message
+.wrapper-msg {
+  box-shadow: 0 0 5px $action-primary-shadow inset;
+  margin-bottom: ($baseline*1.5);
+  padding: $baseline ($baseline*1.5);
+  background: $action-primary-bg;
+
+  .msg {
+    @include clearfix();
+    max-width: grid-width(12);
+    min-width: 760px;
+    width: flex-grid(12);
+    margin: 0 auto;
+  }
+
+  .msg-content,
+  .msg-icon {
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  .msg-content {
+    width: flex-grid(10,12);
+
+    .title {
+      @extend %t-title5;
+      @extend %t-weight4;
+      margin-bottom: ($baseline/4);
+      color: $white;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+
+    .copy {
+      @extend %t-copy-sub1;
+      color: $white;
+
+      p { // nasty reset
+        @extend %t-copy-sub1;
+        color: $white;
+      }
+    }
+  }
+
+  .has-actions {
+
+    .msg-content {
+      width: flex-grid(10,12);
+    }
+
+    .nav-actions {
+      width: flex-grid(2,12);
+      display: inline-block;
+      vertical-align: middle;
+
+      .action-primary {
+        @extend %btn-primary-green;
+      }
+    }
+  }
+
+
+}
+
+// prompts
+
+// notifications
+
+// alerts

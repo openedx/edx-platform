@@ -12,8 +12,8 @@
 
 // base - utilities
 @import 'base/reset';
-@import 'base/mixins';
 @import 'base/variables';
+@import 'base/mixins';
 
 ## THEMING
 ## -------

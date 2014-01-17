@@ -1,28 +1,81 @@
+<%! from django.utils.translation import ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
+<%inherit file="../main.html" />
+<%block name="bodyclass">midcourse-reverification-process step-dash register</%block>
+<%block name="title">
+  <title>
+      ${_("Reverification Status | edX")}
+  </title>
+</%block>
 
-<h1>Re-verify</h1>
+<%block name="content">
+<div class="container">
+  <section class="wrapper">
+    <div class="wrapper-content-main">
+      <article class="content-main">
 
-<p>You currently need to re-verify for the following course:</p>
+        <h2 class="title">You are re-verifying your identity</h2>
 
-% for course_id, course_name, date, status in reverify_course_data:
-	<p>${course_name}: Re-verify by ${date}. 
-		% if status == "must_reverify":
-		  <a href="${reverse('verify_student_midcourse_reverify', kwargs={'course_id': course_id})}">Re-verify</a>
-		% elif status == "completed":
-		  Completed
-		% elif status == "failed":
-		  Failed
-		% endif
-	</p>
-% endfor
+        <div class="copy">
+          <p>You currently need to re-verify for the following course:</p>
 
-<h2>Why do I need to re-verify?</h2>
-<p>At key points in a course, the professor will ask you to re-verify your identity by submitting a new photo of your face. We will send the new photo to be matched up with the photo of the original ID you submitted when you signed up for the course. If you are taking multiple courses, you may need to re-verify multiple times, once for every important point in each course you are taking as a verified student.</p>
+          <table class="reverification-table">
+          <tr>
+          <th>Course and Reverification window</th>
+          <th>Status</th>
+          </tr>
 
-<h2>What will I need to re-verify?</h2>
-<p>Because you are just confirming that you are still you, the only thing you will need to do to re-verify is to <b>submit a new photo of your face with your webcam</b>. The process is quick and you will be brought back to where you left off so you can keep on learning.</p>
+          % for course_id, course_name, date, status in reverify_course_data:
+            <tr>
+            	<td>
+                <span class="course-name">${course_name} (HKS211.1x)</span>
+                <span class="deadline">Re-verify by <strong>${date}</strong></span>
+              </td>
+              <td>
+            		% if status == "must_reverify":
+                  <a class="btn action-primary action-reverify" href="${reverse('verify_student_midcourse_reverify', kwargs={'course_id': course_id})}">Re-verify for HKS211.1x</a>
+            		% elif status == "completed":
+            		  Completed
+            		% elif status == "failed":
+            		  Failed
+            		% endif
+              </td>
+            </tr>
+          % endfor
+          </table>
+        </div>
 
-<p>If you changed your name during the semester and it no longer matches the original ID you submitted, you will need to re-edit your name to match as well.</p>
+        <div class="wrapper-reverification-help list-faq">
 
-<h2>What if I have trouble with my re-verification?</h2>
-<p>Because of the short time that re-verification is open, you <b>will not be able to correct a failed verification</b>. If you think there was an error in the review, please contact us at <a href="stuff">support@edx.org</a>.</p>
+          <div class="faq-item">
+            <h3 class="title faq-question">Why do I need to re-verify?</h3>
+            <div class="copy faq-answer">
+
+              <p>At key points in a course, the professor will ask you to re-verify your identity by submitting a new photo of your face. We will send the new photo to be matched up with the photo of the original ID you submitted when you signed up for the course. If you are taking multiple courses, you may need to re-verify multiple times, once for every important point in each course you are taking as a verified student.</p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <h3 class="title faq-question">What will I need to re-verify?</h3>
+            <div class="copy faq-answer">
+
+              <p>Because you are just confirming that you are still you, the only thing you will need to do to re-verify is to <b>submit a new photo of your face with your webcam</b>. The process is quick and you will be brought back to where you left off so you can keep on learning.</p>
+
+              <p>If you changed your name during the semester and it no longer matches the original ID you submitted, you will need to re-edit your name to match as well.</p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <h3 class="title faq-question">What if I have trouble with my re-verification?</h3>
+            <div class="copy faq-answer">
+              <p>Because of the short time that re-verification is open, you <b>will not be able to correct a failed verification</b>. If you think there was an error in the review, please contact us at <a href="stuff">support@edx.org</a>.</p>
+            </div>
+          </div>
+        </div>
+
+      </article>
+    </div> <!-- /wrapper-content-main -->
+
+  </section>
+</div>
+</%block>

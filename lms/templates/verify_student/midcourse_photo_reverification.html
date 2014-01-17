@@ -3,8 +3,8 @@
 <%inherit file="../main.html" />
 <%namespace name='static' file='/static_content.html'/>
 
-<%block name="bodyclass">register verification-process is-not-verified step-photos</%block>
-<%block name="title"><title>${_("Re-Verification")}</title></%block>
+<%block name="bodyclass">midcourse-reverification-process is-not-verified step-photos register</%block>
+<%block name="title"><title>${_("Re-Verify | edX")}</title></%block>
 
 <%block name="js_extra">
 <script src="${static.url('js/vendor/responsive-carousel/responsive-carousel.js')}"></script>
@@ -56,20 +56,13 @@
 <div class="container">
   <section class="wrapper">
 
-    <div class="wrapper-reverification">
-      <section class="reverification">
-        <div class="message">
-          <h3 class="title">${_("You are re-verifying your identity")}</h3>
-        </div>
-
-        <span class="deco-arrow"></span>
-      </section>
-    </div>
-
     <div class="wrapper-content-main">
       <article class="content-main">
 
-        <section class="wrapper carousel"  data-transition="slide">
+        <section class="wrapper">
+
+          <%include file="_verification_header.html" args="course_name=course_name" />
+
           <div id="wrapper-facephoto" class="wrapper-view block-photo">
             <div class="facephoto view">
               <h3 class="title">${_("Re-Take Your Photo")}</h3>
@@ -78,6 +71,7 @@
               </div>
 
               <div class="wrapper-task">
+
                 <div id="facecam" class="task cam">
                   <div class="placeholder-cam" id="face_capture_div">
 
@@ -144,21 +138,21 @@
               </div>
 
 
-                  <li class="review-task review-task-name">
-                    <h4 class="title">${_("Check Your Name")}</h4>
+              <div class="review-task review-task-name">
 
-                    <div class="copy">
-                        <p>${_("Make sure your full name on your edX account ({full_name}) matches the ID you originally submitted. We will also use this as the name on your certificate.").format(full_name="<span id='full-name'>" + user_full_name + "</span>")}</p>
-                    </div>
+                <h4 class="title">${_("Check Your Name")}</h4>
 
-                    <ul class="list-actions">
-                      <li class="action action-editname">
-                        <a class="edit-name" rel="leanModal" href="#edit-name">${_("Edit your name")}</a>
-                      </li>
-                    </ul>
+                <div class="copy">
+                  <p>${_("Make sure your full name on your edX account ({full_name}) matches the ID you originally submitted. We will also use this as the name on your certificate.").format(full_name="<span id='full-name'>" + user_full_name + "</span>")}</p>
+                </div>
+
+                <ul class="list-actions">
+                  <li class="action action-editname">
+                    <a class="edit-name" rel="leanModal" href="#edit-name">${_("Edit your name")}</a>
                   </li>
-                </ol>
+                </ul>
               </div>
+
 
               <!-- TODO janky -->
               <img id="face_image" src="" style="visibility:hidden;"/>
@@ -182,7 +176,7 @@
                     <form id="reverify_form" method="post">
                       <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
                       <input type="hidden" name="course_id" value="${course_id}">
-                      <input class="action-primary disabled" type="button" id="reverify_button" value="Submit photos & re-verify" name="payment">
+                      <input class="action-primary disabled" type="button" id="reverify_button" value="Submit photos &amp; re-verify" name="payment">
                     </form>
                   </li>
                 </ol>

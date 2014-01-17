@@ -4,6 +4,8 @@
   <h2 class="title">
     %if upgrade:
       <span class="sts-label">${_("You are upgrading your registration for")}</span>
+    %elif reverify:
+      <span class="sts-label">${_("You are re-verifying for")}</span>
     %else:
       <span class="sts-label">${_("You are registering for")}</span>
     %endif
@@ -19,6 +21,8 @@
         <span class="sts-track-value">
           %if upgrade:
             <span class="context">${_("Upgrading to:")}</span> ${_("ID Verified")}
+          %elif reverify:
+            <span class="context">${_("Re-verifying for:")}</span> ${_("ID Verified")}
           %else:
             <span class="context">${_("Registering as: ")}</span> ${_("ID Verified")}
           %endif

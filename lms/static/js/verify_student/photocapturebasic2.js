@@ -1,4 +1,3 @@
-// TODO diff this against photocapture.js, see if I actually needed a whole honking new file
 var onVideoFail = function(e) {
   if(e == 'NO_DEVICES_FOUND') {
       $('#no-webcam').show();
@@ -25,7 +24,7 @@ var submitReverificationPhotos = function() {
         name: 'face_image',
         value: $("#face_image")[0].src,
     }).appendTo("#reverify_form");
-
+    // there is a change here
     $("#reverify_form").submit();
 
 }
@@ -48,6 +47,7 @@ var submitToPaymentProcessing = function() {
       "course_id" : course_id,
       "contribution": contribution,
       "face_image" : $("#face_image")[0].src,
+      // there is a change here
     },
     function(data) {
       for (prop in data) {
