@@ -21,6 +21,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from capa.tests.response_xml_factory import OptionResponseXMLFactory, CustomResponseXMLFactory, SchematicResponseXMLFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from lms.lib.xblock.runtime import quote_slashes
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -71,11 +72,12 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
             example: 'check_problem' for having responses processed
         """
         return reverse(
-            'modx_dispatch',
+            'xblock_handler',
             kwargs={
                 'course_id': self.course.id,
-                'location': problem_location,
-                'dispatch': dispatch,
+                'usage_id': quote_slashes(problem_location),
+                'handler': 'xmodule_handler',
+                'suffix': dispatch,
             }
         )
 

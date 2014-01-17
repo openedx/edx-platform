@@ -803,7 +803,7 @@ class CapaModule(CapaFields, XModule):
         """
         Make dictionary of student responses (aka "answers")
 
-        `data` is POST dictionary (Django QueryDict).
+        `data` is POST dictionary (webob.multidict.MultiDict).
 
         The `data` dict has keys of the form 'x_y', which are mapped
         to key 'y' in the returned dict.  For example,
@@ -835,7 +835,10 @@ class CapaModule(CapaFields, XModule):
         """
         answers = dict()
 
-        for key in data:
+        # webob.multidict.MultiDict is a view of a list of tuples,
+        # so it will return a multi-value key once for each value.
+        # We only want to consider each key a single time, so we use set(data.keys())
+        for key in set(data.keys()):
             # e.g. input_resistor_1 ==> resistor_1
             _, _, name = key.partition('_')
 
@@ -857,7 +860,7 @@ class CapaModule(CapaFields, XModule):
                 name = name[:-2] if is_list_key or is_dict_key else name
 
                 if is_list_key:
-                    val = data.getlist(key)
+                    val = data.getall(key)
                 elif is_dict_key:
                     try:
                         val = json.loads(data[key])

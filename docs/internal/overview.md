@@ -99,7 +99,7 @@ The LMS is a django site, with root in `lms/`.  It runs in many different enviro
 
   - calls the module's `.get_html()` method.  If the module has nested submodules, render_x_module() will be called again for each.
 
-  - ajax calls go to `module_render.py:modx_dispatch()`, which passes it to the module's `handle_ajax()` function, and then updates the grade and state if they changed.
+  - ajax calls go to `module_render.py:handle_xblock_callback()`, which passes it to one of the `XBlock`s handler functions
 
   - [This diagram](https://github.com/MITx/mitx/wiki/MITx-Architecture) visually shows how the clients communicate with problems + modules.
 

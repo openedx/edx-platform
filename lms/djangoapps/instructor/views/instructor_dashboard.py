@@ -1,6 +1,7 @@
 """
 Instructor Dashboard Views
 """
+from functools import partial
 
 from django.utils.translation import ugettext as _
 from django_future.csrf import ensure_csrf_cookie
@@ -23,6 +24,7 @@ from django_comment_client.utils import has_forum_access
 from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from student.models import CourseEnrollment
 from bulk_email.models import CourseAuthorization
+from lms.lib.xblock.runtime import handler_prefix
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
@@ -174,9 +176,13 @@ def _section_data_download(course_id, access):
 
 def _section_send_email(course_id, access, course):
     """ Provide data for the corresponding bulk email section """
-    html_module = HtmlDescriptor(course.system, DictFieldData({'data': ''}), ScopeIds(None, None, None, None))
+    html_module = HtmlDescriptor(
+        course.system,
+        DictFieldData({'data': ''}),
+        ScopeIds(None, None, None, 'i4x://dummy_org/dummy_course/html/dummy_name')
+    )
     fragment = course.system.render(html_module, 'studio_view')
-    fragment = wrap_xblock(html_module, 'studio_view', fragment, None)
+    fragment = wrap_xblock(partial(handler_prefix, course_id), html_module, 'studio_view', fragment, None)
     email_editor = fragment.content
     section_data = {
         'section_key': 'send_email',

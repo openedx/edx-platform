@@ -21,12 +21,12 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.open_ended_grading_classes import peer_grading_service, controller_query_service
 from xmodule.tests import test_util_open_ended
-from xmodule.x_module import ModuleSystem
 
 from courseware.access import _course_staff_group_name
 from courseware.tests import factories
 from courseware.tests.helpers import LoginEnrollmentTestCase, check_for_get_code, check_for_post_code
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from lms.lib.xblock.runtime import LmsModuleSystem
 from mitxmako.shortcuts import render_to_string
 from student.models import unique_id_for_user
 
@@ -243,9 +243,8 @@ class TestPeerGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
         location = "i4x://edX/toy/peergrading/init"
         field_data = DictFieldData({'data': "<peergrading/>", 'location': location, 'category':'peergrading'})
         self.mock_service = peer_grading_service.MockPeerGradingService()
-        self.system = ModuleSystem(
+        self.system = LmsModuleSystem(
             static_url=settings.STATIC_URL,
-            ajax_url=location,
             track_function=None,
             get_module=None,
             render_template=render_to_string,
@@ -400,7 +399,7 @@ class TestPanel(ModuleStoreTestCase):
         Mock(
             return_value=controller_query_service.MockControllerQueryService(
                 settings.OPEN_ENDED_GRADING_INTERFACE,
-                utils.system
+                utils.SYSTEM
             )
         )
     )
