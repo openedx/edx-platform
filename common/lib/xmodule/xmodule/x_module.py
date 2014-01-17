@@ -222,6 +222,7 @@ class XModuleMixin(XBlockMixin):
             for child_loc in self.children:
                 try:
                     child = self.runtime.get_block(child_loc)
+                    child.runtime.export_fs = self.runtime.export_fs
                 except ItemNotFoundError:
                     log.exception(u'Unable to load item {loc}, skipping'.format(loc=child_loc))
                     continue
@@ -685,6 +686,21 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
         """
         raise NotImplementedError('Modules must implement from_xml to be parsable from xml')
 
+    def add_xml_to_node(self, node):
+        """
+        Export this :class:`XModuleDescriptor` as XML, by setting attributes on the provided
+        `node`.
+        """
+        xml_string = self.export_to_xml(self.runtime.export_fs)
+        exported_node = etree.fromstring(xml_string)
+        node.tag = exported_node.tag
+        node.text = exported_node.text
+        node.tail = exported_node.tail
+        for key, value in exported_node.items():
+            node.set(key, value)
+
+        node.extend(list(exported_node))
+
     def export_to_xml(self, resource_fs):
         """
         Returns an xml string representing this module, and all modules
@@ -926,6 +942,9 @@ class DescriptorSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable
         """
         super(DescriptorSystem, self).__init__(**kwargs)
 
+        # This is used by XModules to write out separate files during xml export
+        self.export_fs = None
+
         self.load_item = load_item
         self.resources_fs = resources_fs
         self.error_tracker = error_tracker
@@ -995,6 +1014,11 @@ class DescriptorSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable
 
     def publish(self, block, event):
         raise NotImplementedError("edX Platform doesn't currently implement XBlock publish")
+
+    def add_block_as_child_node(self, block, node):
+        child = etree.SubElement(node, "unknown")
+        child.set('url_name', block.url_name)
+        block.add_xml_to_node(child)
 
 
 class XMLParsingSystem(DescriptorSystem):
