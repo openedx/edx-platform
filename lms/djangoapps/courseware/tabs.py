@@ -409,8 +409,8 @@ def get_static_tab_by_slug(course, tab_slug):
 
 def get_static_tab_contents(request, course, tab):
     loc = Location(course.location.tag, course.location.org, course.location.course, 'static_tab', tab['url_slug'])
-    field_data_cache = FieldDataCache.cache_for_descriptor_descendents(course.id,
-        request.user, modulestore().get_instance(course.id, loc), depth=0)
+    field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+        course.id, request.user, modulestore().get_instance(course.id, loc), depth=0)
     tab_module = get_module(request.user, request, loc, field_data_cache, course.id,
                             static_asset_path=course.static_asset_path)
 
@@ -419,6 +419,13 @@ def get_static_tab_contents(request, course, tab):
     html = ''
 
     if tab_module is not None:
-        html = tab_module.render('student_view').content
+        try:
+            html = tab_module.render('student_view').content
+        except Exception:  # pylint: disable=broad-except
+            html = "Error message"
+            log.exception("Error rendering course={course}, tab={tab_url}".format(
+                          course=course,
+                          tab_url=tab['url_slug']
+                          ))
 
     return html
