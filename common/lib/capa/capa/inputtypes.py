@@ -128,7 +128,7 @@ class InputTypeBase(object):
         """
         Instantiate an InputType class.  Arguments:
 
-        - system    : ModuleSystem instance which provides OS, rendering, and user context.
+        - system    : LoncapaModule instance which provides OS, rendering, and user context.
                       Specifically, must have a render_template function.
         - xml       : Element tree of this Input element
         - state     : a dictionary with optional keys:
@@ -146,7 +146,7 @@ class InputTypeBase(object):
 
         self.xml = xml
         self.tag = xml.tag
-        self.system = system
+        self.capa_system = system
 
         # NOTE: ID should only come from one place.  If it comes from multiple,
         # we use state first, XML second (in case the xml changed, but we have
@@ -257,7 +257,7 @@ class InputTypeBase(object):
             'value': self.value,
             'status': self.status,
             'msg': self.msg,
-            'STATIC_URL': self.system.STATIC_URL,
+            'STATIC_URL': self.capa_system.STATIC_URL,
         }
         context.update((a, v) for (
             a, v) in self.loaded_attributes.iteritems() if a in self.to_render)
@@ -282,7 +282,7 @@ class InputTypeBase(object):
 
         context = self._get_render_context()
 
-        html = self.system.render_template(self.template, context)
+        html = self.capa_system.render_template(self.template, context)
         return etree.XML(html)
 
 
@@ -505,9 +505,9 @@ class JSInput(InputTypeBase):
     def _extra_context(self):
         context = {
             'jschannel_loader': '{static_url}js/capa/src/jschannel.js'.format(
-                static_url=self.system.STATIC_URL),
+                static_url=self.capa_system.STATIC_URL),
             'jsinput_loader': '{static_url}js/capa/src/jsinput.js'.format(
-                static_url=self.system.STATIC_URL),
+                static_url=self.capa_system.STATIC_URL),
             'saved_state': self.value
         }
 
@@ -822,18 +822,19 @@ class MatlabInput(CodeInput):
                  - 'message' - message to be rendered in case of error
         '''
         # only send data if xqueue exists
-        if self.system.xqueue is None:
+        if self.capa_system.xqueue is None:
             return {'success': False, 'message': 'Cannot connect to the queue'}
 
         # pull relevant info out of get
         response = data['submission']
 
         # construct xqueue headers
-        qinterface = self.system.xqueue['interface']
+        qinterface = self.capa_system.xqueue['interface']
         qtime = datetime.utcnow().strftime(xqueue_interface.dateformat)
-        callback_url = self.system.xqueue['construct_callback']('ungraded_response')
-        anonymous_student_id = self.system.anonymous_student_id
-        queuekey = xqueue_interface.make_hashkey(str(self.system.seed) + qtime +
+        callback_url = self.capa_system.xqueue['construct_callback']('ungraded_response')
+        anonymous_student_id = self.capa_system.anonymous_student_id
+        # TODO: Why is this using self.capa_system.seed when we have self.seed???
+        queuekey = xqueue_interface.make_hashkey(str(self.capa_system.seed) + qtime +
                                                  anonymous_student_id +
                                                  self.input_id)
         xheader = xqueue_interface.make_xheader(
@@ -1006,7 +1007,7 @@ class ChemicalEquationInput(InputTypeBase):
         """
         return {
             'previewer': '{static_url}js/capa/chemical_equation_preview.js'.format(
-                static_url=self.system.STATIC_URL),
+                static_url=self.capa_system.STATIC_URL),
         }
 
     def handle_ajax(self, dispatch, data):
@@ -1091,7 +1092,7 @@ class FormulaEquationInput(InputTypeBase):
 
         return {
             'previewer': '{static_url}js/capa/src/formula_equation_preview.js'.format(
-                static_url=self.system.STATIC_URL),
+                static_url=self.capa_system.STATIC_URL),
             'reported_status': reported_status,
         }
 
@@ -1274,7 +1275,7 @@ class EditAMoleculeInput(InputTypeBase):
         """
         context = {
             'applet_loader': '{static_url}js/capa/editamolecule.js'.format(
-                static_url=self.system.STATIC_URL),
+                static_url=self.capa_system.STATIC_URL),
         }
 
         return context
@@ -1310,7 +1311,7 @@ class DesignProtein2dInput(InputTypeBase):
         """
         context = {
             'applet_loader': '{static_url}js/capa/design-protein-2d.js'.format(
-                static_url=self.system.STATIC_URL),
+                static_url=self.capa_system.STATIC_URL),
         }
 
         return context
@@ -1346,7 +1347,7 @@ class EditAGeneInput(InputTypeBase):
             """
         context = {
             'applet_loader': '{static_url}js/capa/edit-a-gene.js'.format(
-                static_url=self.system.STATIC_URL),
+                static_url=self.capa_system.STATIC_URL),
         }
 
         return context

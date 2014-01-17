@@ -63,37 +63,79 @@ log = logging.getLogger(__name__)
 # main class for this module
 
 
+class LoncapaSystem(object):
+    """
+    An encapsulation of resources needed from the outside.
+
+    These interfaces are collected here so that a caller of LoncapaProblem
+    can provide these resources however make sense for their environment, and
+    this code can remain independent.
+
+    Attributes:
+        i18n: an object implementing the `gettext.Translations` interface so
+            that we can use `.ugettext` to localize strings.
+
+    See :class:`ModuleSystem` for documentation of other attributes.
+
+    """
+    def __init__(                                       # pylint: disable=invalid-name
+        self,
+        ajax_url,
+        anonymous_student_id,
+        cache,
+        can_execute_unsafe_code,
+        DEBUG,                                          # pylint: disable=invalid-name
+        filestore,
+        i18n,
+        node_path,
+        render_template,
+        seed,      # Why do we do this if we have self.seed?
+        STATIC_URL,                                     # pylint: disable=invalid-name
+        xqueue,
+    ):
+        self.ajax_url = ajax_url
+        self.anonymous_student_id = anonymous_student_id
+        self.cache = cache
+        self.can_execute_unsafe_code = can_execute_unsafe_code
+        self.DEBUG = DEBUG                              # pylint: disable=invalid-name
+        self.filestore = filestore
+        self.i18n = i18n
+        self.node_path = node_path
+        self.render_template = render_template
+        self.seed = seed                     # Why do we do this if we have self.seed?
+        self.STATIC_URL = STATIC_URL                    # pylint: disable=invalid-name
+        self.xqueue = xqueue
+
+
 class LoncapaProblem(object):
     '''
     Main class for capa Problems.
     '''
 
-    def __init__(self, problem_text, id, state=None, seed=None, system=None):
-        '''
+    def __init__(self, problem_text, id, capa_system, state=None, seed=None):
+        """
         Initializes capa Problem.
 
         Arguments:
 
-         - problem_text (string): xml defining the problem
-         - id           (string): identifier for this problem; often a filename (no spaces)
-         - seed         (int): random number generator seed (int)
-         - state        (dict): containing the following keys:
-                                - 'seed' - (int) random number generator seed
-                                - 'student_answers' - (dict) maps input id to the stored answer for that input
-                                - 'correct_map' (CorrectMap) a map of each input to their 'correctness'
-                                - 'done' - (bool) indicates whether or not this problem is considered done
-                                - 'input_state' - (dict) maps input_id to a dictionary that holds the state for that input
-         - system       (ModuleSystem): ModuleSystem instance which provides OS,
-                                        rendering, and user context
+            problem_text (string): xml defining the problem.
+            id (string): identifier for this problem, often a filename (no spaces).
+            capa_system (LoncapaSystem): LoncapaSystem instance which provides OS,
+                rendering, user context, and other resources.
+            state (dict): containing the following keys:
+                - `seed` (int) random number generator seed
+                - `student_answers` (dict) maps input id to the stored answer for that input
+                - `correct_map` (CorrectMap) a map of each input to their 'correctness'
+                - `done` (bool) indicates whether or not this problem is considered done
+                - `input_state` (dict) maps input_id to a dictionary that holds the state for that input
+            seed (int): random number generator seed.
 
-        '''
+        """
 
         ## Initialize class variables from state
         self.do_reset()
         self.problem_id = id
-        self.system = system
-        if self.system is None:
-            raise Exception()
+        self.capa_system = capa_system
 
         state = state or {}
 
@@ -412,8 +454,8 @@ class LoncapaProblem(object):
             filename = inc.get('file')
             if filename is not None:
                 try:
-                    # open using ModuleSystem OSFS filestore
-                    ifp = self.system.filestore.open(filename)
+                    # open using LoncapaSystem OSFS filestore
+                    ifp = self.capa_system.filestore.open(filename)
                 except Exception as err:
                     log.warning(
                         'Error %s in problem xml include: %s' % (
@@ -422,12 +464,12 @@ class LoncapaProblem(object):
                     )
                     log.warning(
                         'Cannot find file %s in %s' % (
-                            filename, self.system.filestore
+                            filename, self.capa_system.filestore
                         )
                     )
                     # if debugging, don't fail - just log error
                     # TODO (vshnayder): need real error handling, display to users
-                    if not self.system.get('DEBUG'):
+                    if not self.capa_system.DEBUG:
                         raise
                     else:
                         continue
@@ -443,7 +485,7 @@ class LoncapaProblem(object):
                     log.warning('Cannot parse XML in %s' % (filename))
                     # if debugging, don't fail - just log error
                     # TODO (vshnayder): same as above
-                    if not self.system.get('DEBUG'):
+                    if not self.capa_system.DEBUG:
                         raise
                     else:
                         continue
@@ -476,9 +518,9 @@ class LoncapaProblem(object):
                 continue
 
             # path is an absolute path or a path relative to the data dir
-            dir = os.path.join(self.system.filestore.root_path, dir)
+            dir = os.path.join(self.capa_system.filestore.root_path, dir)
             # Check that we are within the filestore tree.
-            reldir = os.path.relpath(dir, self.system.filestore.root_path)
+            reldir = os.path.relpath(dir, self.capa_system.filestore.root_path)
             if ".." in reldir:
                 log.warning("Ignoring Python directory outside of course: %r" % dir)
                 continue
@@ -527,9 +569,9 @@ class LoncapaProblem(object):
                     context,
                     random_seed=self.seed,
                     python_path=python_path,
-                    cache=self.system.cache,
+                    cache=self.capa_system.cache,
                     slug=self.problem_id,
-                    unsafely=self.system.can_execute_unsafe_code(),
+                    unsafely=self.capa_system.can_execute_unsafe_code(),
                 )
             except Exception as err:
                 log.exception("Error while execing script code: " + all_code)
@@ -600,7 +642,7 @@ class LoncapaProblem(object):
 
             input_type_cls = inputtypes.registry.get_class_for_tag(problemtree.tag)
             # save the input type so that we can make ajax calls on it if we need to
-            self.inputs[input_id] = input_type_cls(self.system, problemtree, state)
+            self.inputs[input_id] = input_type_cls(self.capa_system, problemtree, state)
             return self.inputs[input_id].get_html()
 
         # let each Response render itself
@@ -613,7 +655,7 @@ class LoncapaProblem(object):
         # let each custom renderer render itself:
         if problemtree.tag in customrender.registry.registered_tags():
             renderer_class = customrender.registry.get_class_for_tag(problemtree.tag)
-            renderer = renderer_class(self.system, problemtree)
+            renderer = renderer_class(self.capa_system, problemtree)
             return renderer.get_html()
 
         # otherwise, render children recursively, and copy over attributes
@@ -670,7 +712,7 @@ class LoncapaProblem(object):
 
             # instantiate capa Response
             responsetype_cls = responsetypes.registry.get_class_for_tag(response.tag)
-            responder = responsetype_cls(response, inputfields, self.context, self.system)
+            responder = responsetype_cls(response, inputfields, self.context, self.capa_system)
             # save in list in self
             self.responders[response] = responder
 
