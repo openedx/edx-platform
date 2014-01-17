@@ -281,13 +281,44 @@ biochemical reactions that cells carry out.
 .. image:: Images/Zooming_Image.gif
   :alt: Image of a zooming image
 
+Components of a Zooming Image Tool
+----------------------------------
+
+To create a zooming image tool, you need the following files.
+
+* A regular-sized image. This is the image that appears in the LMS by default.
+* A smaller image. This is the image that appears zoomed when a student clicks the regular image.
+* The jquery.loupeAndLightbox.js file. Every zooming image tool uses this JavaScript file. You can download this file on the `GitHub loupeAndLightbox <https://github.com/mdbiscan/loupeAndLightbox>`_ page. You won't make any changes to this file.
+
 Create a Zooming Image Tool
 ---------------------------
 
+#. Upload both image files and the jquery.loupeAndLightbox.js file to the **Files & Uploads** page. For more information about how to do this, see :ref:`Add Files to a Course`.
+
 #. Under **Add New Component**, click **html**, and then click **Zooming Image**.
 
-#. In the empty component that appears, click **Edit**.
+#. In the new component that appears, click **Edit**.
 
-#. When the component editor opens, replace the example content with your own content.
+#. In the component editor, switch to the **HTML** tab.
+
+#. Replace the following placeholders with your own content.
+
+   * Replace the first file name and path (**https://studio.edx.org/c4x/edX/DemoX/asset/pathways_detail_01.png**) with 
 
 #. Click **Save** to save the HTML component.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
