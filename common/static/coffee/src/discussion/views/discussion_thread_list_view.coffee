@@ -5,6 +5,7 @@ if Backbone?
       "click .home": "goHome"
       "click .browse": "toggleTopicDrop"
       "keydown .post-search-field": "performSearch"
+      "focus .post-search-field": "showSearch"
       "click .sort-bar a": "sortThreads"
       "click .browse-topic-drop-menu": "filterTopic"
       "click .browse-topic-drop-search-input": "ignoreClick"
@@ -209,7 +210,7 @@ if Backbone?
 
       @$(".search").addClass('is-open')
       @$(".browse").removeClass('is-open')
-      setTimeout (-> @$(".post-search-field").focus()), 200
+      setTimeout (-> @$(".post-search-field").focus()), 200 unless @$(".post-search-field").is(":focus")
 
     goHome: ->
       @template = _.template($("#discussion-home").html())
