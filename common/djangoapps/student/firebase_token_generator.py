@@ -16,7 +16,6 @@ TOKEN_SEP = '.'
 
 def create_token(secret, data):
     claims = data
-
     return _encode_token(secret, claims)
 
 

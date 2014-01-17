@@ -33,6 +33,7 @@ from student.views import (process_survey_link, _cert_info, password_reset, pass
                            change_enrollment, complete_course_mode_info)
 from student.tests.factories import UserFactory, CourseModeFactory
 from student.tests.test_email import mock_render_to_string
+from firebase_token_generator import _encode, _encode_json, _sign, _encode_token, create_token
 
 import shoppingcart
 
@@ -556,3 +557,24 @@ class AnonymousLookupTable(TestCase):
         anonymous_id = anonymous_id_for_user(self.user, self.course.id)
         real_user = user_by_anonymous_id(anonymous_id)
         self.assertEqual(self.user, real_user)
+
+class TokenGenerator(TestCase):
+    """
+    Tests for the Token Generator
+    """
+    def test_encode(self):
+        expected = "dGVzdDE"
+        result = _encode("test1")
+        self.assertEqual(expected, result)
+    
+    def test_encode_json(self):
+        expected = "eyJ0d28iOiAidGVzdDIiLCAib25lIjogInRlc3QxIn0"
+        result - _encode_json({'one':'test1','two':'test2'})
+        self.assertEqual(expected, result)
+        
+    def test_create_token(self):
+        expected = "eyJhbGciOiAiSFMyNTYiLCAidHlwIjogIkpXVCJ9.eyJ1c2VySWQiOiAidXNlcm5hbWUiLCAidHRsIjogODY0MDB9.-p1sr7uwCapidTQ0qB7DdU2dbF-hViKpPNN_5vD10t8"
+        result1 = _encode_token('4c7f4d1c-8ac4-4e9f-84c8-b271c57fcac4',{"userId": "username", "ttl": 86400})
+        result2 = create_token('4c7f4d1c-8ac4-4e9f-84c8-b271c57fcac4',{"userId": "username", "ttl": 86400})
+        self.assertEqual(expected, result1)
+        self.assertEqual(expected, result2)
