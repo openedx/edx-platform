@@ -960,7 +960,8 @@ class DescriptorSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable
 
     def render(self, block, view_name, context=None):
         if view_name == 'student_view':
-            assert block.xmodule_runtime is not None
+            assert block.xmodule_runtime is not None, \
+                "{block} xmodule runtime must not be None".format(block=block)
             if isinstance(block, (XModule, XModuleDescriptor)):
                 to_render = block._xmodule
             else:
