@@ -271,6 +271,12 @@ class StaticTabFields(object):
         scope=Scope.content,
         help="HTML for the additional pages"
     )
+    # this exists purely to override the default start date
+    start = Date(
+        help="placeholder to make sure that Static Tabs are always active",
+        default=datetime.fromtimestamp(0, UTC),
+        scope=Scope.settings,
+    )
 
 
 class StaticTabModule(StaticTabFields, HtmlModule):
@@ -297,6 +303,12 @@ class CourseInfoFields(object):
         help="Html contents to display for this module",
         default="<ol></ol>",
         scope=Scope.content
+    )
+    # this exists purely to override the default start date
+    start = Date(
+        help="placeholder to make sure that Course Info is always active",
+        default=datetime.fromtimestamp(0, UTC),
+        scope=Scope.settings,
     )
 
 
