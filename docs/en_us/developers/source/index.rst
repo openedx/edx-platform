@@ -14,6 +14,7 @@ Contents:
    overview.rst
    common-lib.rst
    djangoapps.rst
+   i18n_translators_guide.rst
 
 Indices and tables
 ==================
