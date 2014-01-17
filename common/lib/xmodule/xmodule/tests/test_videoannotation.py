@@ -8,7 +8,7 @@ from lxml import etree
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
-from xmodule.textannotation_module import VideoAnnotationModule
+from xmodule.videoannotation_module import VideoAnnotationModule
 from xmodule.modulestore import Location
 
 from . import get_test_system

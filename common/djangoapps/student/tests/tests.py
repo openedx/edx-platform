@@ -33,7 +33,7 @@ from student.views import (process_survey_link, _cert_info, password_reset, pass
                            change_enrollment, complete_course_mode_info)
 from student.tests.factories import UserFactory, CourseModeFactory
 from student.tests.test_email import mock_render_to_string
-from firebase_token_generator import _encode, _encode_json, _sign, _encode_token, create_token
+from student.firebase_token_generator import _encode, _encode_json, _sign, _encode_token, create_token
 
 import shoppingcart
 
