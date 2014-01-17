@@ -108,7 +108,7 @@ class LTIModule(LTIFields, XModule):
 
     1. Get credentials from course settings.
 
-    2.  There is minimal set of parameters need to be signed (presented for Vitalsource)::
+    2.  There is minimal set of parameters or "basic launch data" need to be signed (presented for Vitalsource)::
 
             user_id
             oauth_callback
@@ -117,11 +117,14 @@ class LTIModule(LTIFields, XModule):
             launch_presentation_return_url
             lti_message_type
             lti_version
-            role
+            roles 
             *+ all custom parameters*
 
         These parameters should be encoded and signed by *OAuth1* together with
         `launch_url` and *POST* request type.
+
+        for a reference to all standard "basic launch data" see 
+        http://www.imsglobal.org/LTI/v1p1p1/ltiIMGv1p1p1.html#_Toc330273026
 
     3. Signing proceeds with client key/secret pair obtained from course settings.
         That pair should be obtained from LTI provider and set into course settings by course author.
@@ -162,7 +165,7 @@ class LTIModule(LTIFields, XModule):
                 <input name="oauth_timestamp" value="${oauth_timestamp}" />
                 <input name="oauth_version" value="1.0" />
                 <input name="user_id" value="${user_id}" />
-                <input name="role" value="student" />
+                <input name="roles" value="Student" />
                 <input name="oauth_signature" value="${oauth_signature}" />
 
                 <input name="custom_1" value="${custom_param_1_value}" />
@@ -351,7 +354,11 @@ class LTIModule(LTIFields, XModule):
             u'launch_presentation_return_url': '',
             u'lti_message_type': u'basic-lti-launch-request',
             u'lti_version': 'LTI-1p0',
-            u'role': u'student',
+
+            # TODO: do a check to see if the user is a course staff or a TA and so on
+            # in case use u'roles': u'Instructor' which give more privileges inside the 
+            # Tool Provider side
+            u'roles': u'Student',
 
             # Parameters required for grading:
             u'resource_link_id': self.get_resource_link_id(),
