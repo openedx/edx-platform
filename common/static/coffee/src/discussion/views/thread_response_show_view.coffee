@@ -4,13 +4,13 @@ if Backbone?
         "click .vote-btn":
           (event) -> @toggleVote(event)
         "keydown .vote-btn":
-          (event) -> DiscussionUtil.activateOnEnter(event, @toggleVote)
+          (event) -> DiscussionUtil.activateOnSpace(event, @toggleVote)
         "click .action-endorse": "toggleEndorse"
         "click .action-delete": "_delete"
         "click .action-edit": "edit"
         "click .discussion-flag-abuse": "toggleFlagAbuse"
-        "keypress .discussion-flag-abuse":
-          (event) -> DiscussionUtil.activateOnEnter(event, toggleFlagAbuse)
+        "keydown .discussion-flag-abuse":
+          (event) -> DiscussionUtil.activateOnSpace(event, @toggleFlagAbuse)
 
     $: (selector) ->
         @$el.find(selector)

@@ -5,14 +5,14 @@ if Backbone?
       "click .vote-btn":
         (event) -> @toggleVote(event)
       "keydown .vote-btn":
-        (event) -> DiscussionUtil.activateOnEnter(event, @toggleVote)
+        (event) -> DiscussionUtil.activateOnSpace(event, @toggleVote)
       "click .discussion-flag-abuse": "toggleFlagAbuse"
-      "keypress .discussion-flag-abuse":
-        (event) -> DiscussionUtil.activateOnEnter(event, toggleFlagAbuse)
+      "keydown .discussion-flag-abuse":
+        (event) -> DiscussionUtil.activateOnSpace(event, @toggleFlagAbuse)
       "click .admin-pin": "togglePin"
       "click .action-follow": "toggleFollowing"
-      "keypress .action-follow":
-        (event) -> DiscussionUtil.activateOnEnter(event, toggleFollowing)
+      "keydown .action-follow":
+        (event) -> DiscussionUtil.activateOnSpace(event, @toggleFollowing)
       "click .action-edit": "edit"
       "click .action-delete": "_delete"
       "click .action-openclose": "toggleClosed"
