@@ -1,5 +1,3 @@
-import logging
-
 from lxml import etree
 from pkg_resources import resource_string
 
@@ -41,6 +39,7 @@ class VideoAnnotationModule(AnnotatableFields, XModule):
                      resource_string(__name__, 'js/src/annotatable/display.coffee')],
           'js': []
     }
+#    js_module_name = "VideoAnnotation"
     css = {'scss': [resource_string(__name__, 'css/annotatable/display.scss')]}
     icon_class = 'videoannotation'
 
@@ -130,20 +129,22 @@ class VideoAnnotationModule(AnnotatableFields, XModule):
             xmltree.remove(instructions)
             return etree.tostring(instructions, encoding='unicode')
         return None
-	
-    def get_html(self):
-        """ Renders parameters to template. """
-        
-        extension = ""
-        if 'youtu' in self.sourceUrl:
-            extension = 'video/youtube'
+    
+    def _get_extension(self,srcURL):
+        if 'youtu' in srcURL:
+            return 'video/youtube'
         else:
-            spliturl = self.sourceUrl.split(".")
+            spliturl = srcURL.split(".")
             extensionPlus1 = spliturl[len(spliturl)-1]
             spliturl = extensionPlus1.split("?")
             extensionPlus2 = spliturl[0]
             spliturl = extensionPlus2.split("#")
-            extension = 'video/' + spliturl[0]
+            return 'video/' + spliturl[0]
+    
+    def get_html(self):
+        """ Renders parameters to template. """
+        extension = self._get_extension(self.sourceUrl)
+
         context = {
             'display_name': self.display_name_with_default,
             'element_id': self.element_id,
