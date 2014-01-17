@@ -62,12 +62,14 @@ class CapaModule(CapaMixin, XModule):
             'ungraded_response': self.handle_ungraded_response
         }
 
-        generic_error_message = (
+        _ = self.runtime.service(self, "i18n").ugettext
+
+        generic_error_message = _(
             "We're sorry, there was an error with processing your request. "
             "Please try reloading your page and trying again."
         )
 
-        not_found_error_message = (
+        not_found_error_message = _(
             "The state of this problem has changed since you loaded this page. "
             "Please refresh your page."
         )
