@@ -5,16 +5,16 @@ Feature: CMS.Static Pages
     Scenario: Users can add static pages
         Given I have opened a new course in Studio
         And I go to the static pages page
+        Then I should not see any static pages
         When I add a new page
         Then I should see a static page named "Empty"
 
-    # Disabled 1/13/14 due to flakiness observed in master
-    #Scenario: Users can delete static pages
-    #    Given I have created a static page
-    #    When I "delete" the static page
-    #    Then I am shown a prompt
-    #    When I confirm the prompt
-    #    Then I should not see any static pages
+    Scenario: Users can delete static pages
+        Given I have created a static page
+        When I "delete" the static page
+        Then I am shown a prompt
+        When I confirm the prompt
+        Then I should not see any static pages
 
     # Safari won't update the name properly
     @skip_safari
