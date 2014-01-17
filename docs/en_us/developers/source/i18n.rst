@@ -27,15 +27,17 @@ unfortunately limits what you can do with strings in the code.  In general:
    runtime, there is no way for the translator to construct a proper sentence
    in their language.
 
-2. Do not join together strings at runtime to create sentences.
+2. Don't join strings together at runtime to create sentences.
 
 3. Limit the amount of text in strings that is not presented to the user.  HTML
    markup is better applied after the translation.  If you give HTML to the
    translators, there's a good chance they will translate your tags or
    attributes.
 
-See the detailed :ref:`Style Guidelines <style_guidelines>` at the end for
-details.
+4. Use placeholders with descriptive names: ``"Welcome {student_name}"`` is
+   much better than ``"Welcome {0}"``.
+
+See the detailed Style Guidelines at the end for details.
 
 
 Editing source files
@@ -77,13 +79,18 @@ XModules, Inputtypes and Responsetypes forbid importing Django.  Each of these
 has its own way of accessing translations.  You'll use lines like these
 instead::
 
-    # for XBlock & XModule:
+    ### for XBlock & XModule:
     _ = self.runtime.service(self, "i18n").ugettext
+    # Translators: a greeting to newly-registered students.
     message = _("Welcome!")
 
     # for InputType and ResponseType:
     _ = self.capa_system.i18n.ugettext
+    # Translators: a greeting to newly-registered students.
     message = _("Welcome!")
+
+"Translators" comments will work in these places too, so don't be shy about
+providing clarifying comments to the translators.
 
 
 Django template files
@@ -105,7 +112,7 @@ Mako template files
 
 In Mako template files (`templates/*.html`), you can use all of the tools
 available to python programmers. Just make sure to import the relevant
-functions first. Here's a mako template example::
+functions first. Here's a Mako template example::
 
     <%! from django.utils.translation import ugettext as _ %>
  
@@ -172,11 +179,11 @@ Other kinds of code
 
 We have not yet established guidelines for internationalizing the following.
 
-* course content (such as subtitles for videos)
+* Course content (such as subtitles for videos)
 
-* documentation (written for Sphinx as .rst files)
+* Documentation (written for Sphinx as .rst files)
   
-* client-side templates written using Underscore.
+* Client-side templates written using Underscore.
 
 
 Building and testing your code
@@ -186,32 +193,16 @@ These instructions assume you are a developer writing new code to check in to
 Github. For other use cases in the translation life cycle (such as translating
 the strings, or checking the translations into Github, see use cases).
 
-1. Run the rake i18n:extract command to create human-readable .po files. This
-   command may take a minute or two to complete:
+1. Create human-readable .po files with the latest strings. This command may
+   take a minute or two to complete::
 
-::
+    $ cd edx-platform
+    $ rake assets
+    $ rake i18n:extract
 
-       $ cd edx-platform
-       $ rake i18n:extract
-
-2. Generate dummy strings: run rake i18n:dummy to create fake translations. See
-   coverage testing (below) for more details.
-
-   a. By default, these are created in the Esperanto language directory.
-
-      1. This will blow away any actual Esperanto translation files that may be
-         there. You can revert to the Github head after you complete testing.
-
-      2. You will need to switch your browser to Esperanto in order to view
-         the dummy text.
-
-      3. Django's implementation requires us to use a real language (like
-         Esperanto..) rather than an invented language (like Esperanto..
-         er Martian) for this testing.
-
-   b. Do not check the dummy text in to Github (in conf/locale/eo/LC_MESSAGES).
-
-::
+2. Generate dummy strings:  See coverage testing (below) for more details. This
+   will create an "Esperanto" translation that is actually over-accented
+   English.  Use this to create fake translations::
 
     $ rake i18n:dummy
     
@@ -219,26 +210,26 @@ the strings, or checking the translations into Github, see use cases).
  
     $ rake i18n:generate
 
-4. Django should be ready to go. The next time you run studio or lms with a
-   non-English browser, the non-English strings (from step 3, above) should be
-   displayed.  (But be sure that your settings for USE_I18N and USE_L10N are
-   both set to True.  USE_I18N is currently set to False by default in
-   common.py, but is set to True in lms/envs/dev.py and cms/envs/dev.py) 
+4. Django should be ready to go. The next time you run Studio or LMS with a
+   browser set to Esperanto, the accented-English strings (from step 3, above)
+   should be displayed.  Be sure that your settings for ``USE_I18N`` and
+   ``USE_L10N`` are both set to True.  ``USE_I18N`` is set to False by default
+   in common.py, but is set to True in development settings files.
 
 5. With your browser set to Esperanto, review the pages affected by your code
    and verify that you see fake translations. If you see plain English instead,
    your code is not being properly translated. Review the steps in editing
-   source files (above)
+   source files (above).
 
 
 Coverage testing
 ****************
 
 This tool is used during the bootstrap phase, when presumably (1) there is a
-lot of EdX source code to be converted, and (2) there are not a lot of
-available translations for externalized EdX strings. At the end of the
+lot of edX source code to be converted, and (2) there are not a lot of
+available translations for externalized edX strings. At the end of the
 bootstrap phase, we will eventually deprecate this tool in favor of other
-processes. Once most of the EdX source code has been successfully converted,
+processes. Once most of the edX source code has been successfully converted,
 and there are several full translations available, it will be easier to detect
 and correct specific gaps in compliance.
 
@@ -273,12 +264,11 @@ This dummy text is also distinguished by Lorem ipsum text at the end of each
 string, and is always terminated with "#". The original English string is
 padded by about 30% extra characters, to simulate some language (like German)
 which tend to have longer strings than English. If you see problems with your
-page layout, such as columns that do not fit, or text that is truncated (the #
-character should always be displayed on every string), then you will probably
-need to fix the page layouts accordingly to accommodate the longer strings.
+page layout, such as columns that don't fit, or text that is truncated (the
+``#`` character should always be displayed on every string), then you will
+probably need to fix the page layouts accordingly to accommodate the longer
+strings.
 
-
-.. _style_guidelines:
 
 Style guidelines
 ****************
@@ -288,7 +278,7 @@ Don't append strings, interpolate values
 
 It is harder for translators to provide reasonable translations of small
 sentence fragments. If your code appends sentence fragments, even if it seems
-to work ok for English, the same concatenation is very unlikely to work
+to work OK for English, the same concatenation is very unlikely to work
 properly for other languages.
 
 Bad::
@@ -301,34 +291,36 @@ directory has." In some languages the fragments will be in different order. For
 example, in Japanese, "files" will come before "has."
 
 It is much easier for a translator to figure out how to translate the entire
-sentence, using the pattern "The directory has %d files."
+sentence, using the pattern "The directory has {file_count} files."
 
 Good::
 
-    message = _("The directory has %d files.") % len(directory.files)
+    message = _("The directory has {file_count} files.").format(file_count=directory.files)
 
 
-Use named interpolation fields
-==============================
+Use named placeholders
+======================
 
-Named fields are better, especially if there are multiple fields, or if some
-fields will be locally formatted (for example, number, date, or currency).
+Python string formatting provides both positional and named placeholders.  Use
+named placeholders, never use positional placeholders.  Positional placeholders
+can't be translated into other languages which may need to re-order them to
+make syntactically correct sentences.  Even with a single placeholder, a named
+placeholder provides more context to the translator.
 
 Bad::
 
     message = _('Today is %s %d.') % (m, d)
 
-Good::
+OK::
 
     message = _('Today is %(month)s %(day)s.') % {'month': m, 'day': d}
 
-Better::
+Best::
 
     message = _('Today is {month} {day}.').format(month=m, day=d)
 
 Notice that in English, the month comes first, but in Spanish the day comes
-first. This is reflected in the
-edx-platform/conf/locale/es/LC_MESSAGES/django.po file like this::
+first. This is reflected in the .po file like this::
 
     # fragment from edx-platform/conf/locale/es/LC_MESSAGES/django.po
     msgid "Today is {month} {day}."
@@ -390,6 +382,41 @@ The difference between the right way and the wrong way can be very subtle:
         message = _("Goodbye.")
 
 
+Be aware of nested syntax
+=========================
+
+When translating strings in templated files, you have to be careful of nested
+syntax.  For example, consider this Javascript fragment in a Mako template::
+
+    <script>
+    var feeling = '${_("I love you.")';
+    </script>
+
+When rendered for a French speaker, it will produce this::
+
+    <script>
+    var feeling = 'Je t'aime.';
+    </script>
+
+which is now invalid Javascript.  This can be avoided by using double-quotes
+for the Javascript string.  The better solution is to use a filtering function
+that properly escapes the string for Javascript use::
+
+    <script>
+    var feeling = '${escapejs(_("I love you."))}';
+    </script>
+
+which produces::
+
+    <script>
+    var feeling = 'Je t\'aime.';
+    </script>
+
+Other places that might be problematic are HTML attributes::
+
+    <img alt='${_("I love you.")}'>
+
+
 Singular vs plural
 ==================
 
@@ -399,22 +426,22 @@ count::
     if count == 1:
         msg = _("There is 1 file.")
     else:
-        msg = _("There are %d files.") % count
+        msg = _("There are {file_count} files.").format(file_count=count)
 
 This is not the correct way to choose a string, because other languages have
-different rules for when to use singluar and when plural, and there may be more
+different rules for when to use singular and when plural, and there may be more
 than two choices!
 
 One option is not to use different text for different counts::
 
-    msg = _("Number of files: %d") % count
+    msg = _("Number of files: {file_count}").format(file_count=count)
 
 If you want to choose based on number, you need to use another gettext variant
 to do it::
 
     from django.utils.translation import ungettext
-    msg = ungettext("There is %d file", "There are %d files", count)
-    msg = msg % count
+    msg = ungettext("There is {file_count} file", "There are {file_count} files", count)
+    msg = msg.format(file_count=count)
 
 This will properly use count to find a correct string in the translation file,
 and then you can use that string to format in the count.
