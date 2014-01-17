@@ -24,6 +24,7 @@ PROJECT_ROOT = REPO_ROOT.dirname()      # /project_dir
 REPORT_DIR = PROJECT_ROOT / "reports"   # /project_dir/reports
 COMMON_ROOT = PROJECT_ROOT / "common"   # /project_dir/common
 COURSES_ROOT = PROJECT_ROOT / "data"    # /project_dir/data
+TEST_DIR = PROJECT_ROOT / ".testids"    # /project_dir/.testdir
 
 # Environment constants
 if 'SERVICE_VARIANT' in os.environ:
@@ -76,24 +77,18 @@ def coffee_clean():
 
 
 def coffee_cmd(watch=False):
-    flags = ["--compile"]
 
     if watch:
-        flags.append("--watch")
+        cmd = "node_modules/.bin/coffee --compile --watch lms/ cms/ common/"
+    else:
+        cmd = "node_modules/.bin/coffee --compile `find lms/ cms/ common/ -type f -name *.coffee` "
 
     if platform.system() == "Darwin":
         precmd = "ulimit -n 8000;"
     else:
         precmd = ""
 
-    tpl = "{precmd} {coffee} {flags} {dir}"
-
-    return tpl.format(
-        precmd=precmd,
-        coffee="node_modules/.bin/coffee",
-        flags=" ".join(flags),
-        dir="."
-    )
+    return "{precmd} {cmd}".format(precmd=precmd, cmd=cmd)
 
 
 def sass_cmd(watch=False, debug=False):
@@ -117,7 +112,6 @@ def sass_cmd(watch=False, debug=False):
     return cmd
 
 
- # This task takes arguments purely to pass them via dependencies to the preprocess task
 @task
 @cmdopts([
     ("system=", "s", "System to act on"),
@@ -246,7 +240,6 @@ def collectstatic(options):
         pass
 
 
-# This task takes arguments purely to pass them via dependencies to the preprocess task
 @task
 @cmdopts([
     ("system=", "s", "System to act on"),
