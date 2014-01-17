@@ -261,18 +261,18 @@ class CapaMixin(CapaFields):
             text = self.data
 
         capa_system = LoncapaSystem(
-            ajax_url=self.system.ajax_url,
-            anonymous_student_id=self.system.anonymous_student_id,
-            cache=self.system.cache,
-            can_execute_unsafe_code=self.system.can_execute_unsafe_code,
-            DEBUG=self.system.DEBUG,
-            filestore=self.system.filestore,
-            i18n=self.system.service(self, "i18n"),
-            node_path=self.system.node_path,
-            render_template=self.system.render_template,
-            seed=self.system.seed,      # Why do we do this if we have self.seed?
-            STATIC_URL=self.system.STATIC_URL,
-            xqueue=self.system.xqueue,
+            ajax_url=self.runtime.ajax_url,
+            anonymous_student_id=self.runtime.anonymous_student_id,
+            cache=self.runtime.cache,
+            can_execute_unsafe_code=self.runtime.can_execute_unsafe_code,
+            DEBUG=self.runtime.DEBUG,
+            filestore=self.runtime.filestore,
+            i18n=self.runtime.service(self, "i18n"),
+            node_path=self.runtime.node_path,
+            render_template=self.runtime.render_template,
+            seed=self.runtime.seed,      # Why do we do this if we have self.seed?
+            STATIC_URL=self.runtime.STATIC_URL,
+            xqueue=self.runtime.xqueue,
         )
 
         return LoncapaProblem(
