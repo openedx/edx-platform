@@ -67,7 +67,7 @@ class Command(BaseCommand):
                 cert_whitelist.whitelist = False
             cert_whitelist.save()
 
-        whitelist = CertificateWhitelist.objects.all()
+        whitelist = CertificateWhitelist.objects.filter(course_id=course_id)
         print "User whitelist for course {0}:\n{1}".format(course_id,
               '\n'.join(["{0} {1} {2}".format(
                   u.user.username, u.user.email, u.whitelist)
