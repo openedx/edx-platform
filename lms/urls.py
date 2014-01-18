@@ -352,6 +352,8 @@ if settings.COURSEWARE_ENABLED:
             url(r'^notification_prefs/disable/', 'notification_prefs.views.ajax_disable'),
             url(r'^notification_prefs/status/', 'notification_prefs.views.ajax_status'),
             url(r'^notification_prefs/unsubscribe/(?P<token>[a-zA-Z0-9-_=]+)/', 'notification_prefs.views.unsubscribe'),
+            url(r'^notification_prefs/resubscribe/(?P<token>[a-zA-Z0-9-_=]+)/',
+                'notification_prefs.views.unsubscribe', {'resubscribe': True}, name="resubscribe_forum_update"),
         )
     urlpatterns += (
         # This MUST be the last view in the courseware--it's a catch-all for custom tabs.

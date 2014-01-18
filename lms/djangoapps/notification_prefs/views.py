@@ -153,12 +153,13 @@ def ajax_status(request):
 
 
 @require_GET
-def unsubscribe(request, token):
+def unsubscribe(request, token, resubscribe=False):  # pylint: disable=unused-argument
     """
-    A view that disables notifications for a user who may not be authenticated
+    A view that disables or re-enables notifications for a user who may not be authenticated
 
     This view is meant to be the target of an unsubscribe link. The request
     must be a GET, and the `token` parameter must decrypt to a valid username.
+    The resubscribe feature allows "undo" of accidentally clicking on unsubscribe
 
     A 405 will be returned if the request method is not GET. A 404 will be
     returned if the token parameter does not decrypt to a valid username. On
@@ -174,6 +175,13 @@ def unsubscribe(request, token):
     except User.DoesNotExist:
         raise Http404("username")
 
-    UserPreference.objects.filter(user=user, key=NOTIFICATION_PREF_KEY).delete()
-
-    return render_to_response("unsubscribe.html", {})
+    if not resubscribe:
+        UserPreference.objects.filter(user=user, key=NOTIFICATION_PREF_KEY).delete()
+        return render_to_response("unsubscribe.html", {'token': token})
+    else:
+        UserPreference.objects.get_or_create(user=user,
+                                             key=NOTIFICATION_PREF_KEY,
+                                             defaults={
+                                                 "value": UsernameCipher.encrypt(user.username)
+                                             })
+        return render_to_response("resubscribe.html", {'token': token})

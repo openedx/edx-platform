@@ -12,10 +12,11 @@ from notification_prefs import NOTIFICATION_PREF_KEY
 from notification_prefs.views import ajax_enable, ajax_disable, ajax_status, unsubscribe
 from student.tests.factories import UserFactory
 from user_api.models import UserPreference
+from util.testing import UrlResetMixin
 
 
 @override_settings(SECRET_KEY="test secret key")
-class NotificationPrefViewTest(TestCase):
+class NotificationPrefViewTest(UrlResetMixin, TestCase):
     INITIALIZATION_VECTOR = "\x00" * 16
 
     @classmethod
@@ -23,7 +24,9 @@ class NotificationPrefViewTest(TestCase):
         # Make sure global state is set up appropriately
         Client().get("/")
 
+    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
+        super(NotificationPrefViewTest, self).setUp()
         self.user = UserFactory.create(username="testuser")
         # Tokens are intentionally hard-coded instead of computed to help us
         # avoid breaking existing links.
@@ -230,3 +233,17 @@ class NotificationPrefViewTest(TestCase):
         response = unsubscribe(request, self.tokens[self.user])
         self.assertEqual(response.status_code, 200)
         self.assertNotPrefExists(self.user)
+
+    def test_resubscribe_success(self):
+        def test_user(user):
+            # start without a pref key
+            self.assertFalse(UserPreference.objects.filter(user=user, key=NOTIFICATION_PREF_KEY))
+            request = self.request_factory.get("dummy")
+            request.user = AnonymousUser()
+            response = unsubscribe(request, self.tokens[user], resubscribe=True)
+            self.assertEqual(response.status_code, 200)
+            # this new DB entry will have a new value, so can't use assertPrefValid.  Just check existence
+            self.assertTrue(UserPreference.objects.filter(user=user, key=NOTIFICATION_PREF_KEY))
+
+        for user in self.tokens.keys():
+            test_user(user)
