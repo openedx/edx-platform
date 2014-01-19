@@ -135,7 +135,7 @@ class TestOrphan(unittest.TestCase):
         """
         Test that old mongo finds the orphans
         """
-        orphans = self.old_mongo.get_orphans(self.course_location, ['static_tab', 'about', 'course_info'], None)
+        orphans = self.old_mongo.get_orphans(self.course_location, None)
         self.assertEqual(len(orphans), 3, "Wrong # {}".format(orphans))
         location = self.course_location.replace(category='chapter', name='OrphanChapter')
         self.assertIn(location.url(), orphans)
@@ -148,7 +148,7 @@ class TestOrphan(unittest.TestCase):
         """
         Test that old mongo finds the orphans
         """
-        orphans = self.split_mongo.get_orphans(self.split_package_id, ['static_tab', 'about', 'course_info'], 'draft')
+        orphans = self.split_mongo.get_orphans(self.split_package_id, 'draft')
         self.assertEqual(len(orphans), 3, "Wrong # {}".format(orphans))
         location = BlockUsageLocator(package_id=self.split_package_id, branch='draft', block_id='OrphanChapter')
         self.assertIn(location, orphans)

@@ -40,9 +40,6 @@ __all__ = ['orphan_handler', 'xblock_handler']
 
 log = logging.getLogger(__name__)
 
-# cdodge: these are categories which should not be parented, they are detached from the hierarchy
-DETACHED_CATEGORIES = ['about', 'static_tab', 'course_info']
-
 CREATE_IF_NOT_FOUND = ['course_info']
 
 
@@ -297,10 +294,11 @@ def _create_item(request):
         dest_location,
         definition_data=data,
         metadata=metadata,
-        system=parent.system,
+        system=parent.runtime,
     )
 
-    if category not in DETACHED_CATEGORIES:
+    # TODO replace w/ nicer accessor
+    if not 'detached' in parent.runtime.load_block_type(category)._class_tags:
         get_modulestore(parent.location).update_children(parent_location, parent.children + [dest_location.url()])
 
     course_location = loc_mapper().translate_locator_to_location(parent_locator, get_course=True)
@@ -329,7 +327,7 @@ def _duplicate_item(parent_location, duplicate_source_location, display_name=Non
         dest_location,
         definition_data=source_item.data if hasattr(source_item, 'data') else None,
         metadata=duplicate_metadata,
-        system=source_item.system if hasattr(source_item, 'system') else None,
+        system=source_item.runtime,
     )
 
     # Children are not automatically copied over (and not all xblocks have a 'children' attribute).
@@ -340,7 +338,7 @@ def _duplicate_item(parent_location, duplicate_source_location, display_name=Non
             copied_children.append(_duplicate_item(dest_location, Location(child)).url())
         get_modulestore(dest_location).update_children(dest_location, copied_children)
 
-    if category not in DETACHED_CATEGORIES:
+    if not 'detached' in source_item.runtime.load_block_type(category)._class_tags:
         parent = get_modulestore(parent_location).get_item(parent_location)
         # If source was already a child of the parent, add duplicate immediately afterward.
         # Otherwise, add child to end.
@@ -404,12 +402,12 @@ def orphan_handler(request, tag=None, package_id=None, branch=None, version_guid
     old_location = loc_mapper().translate_locator_to_location(location)
     if request.method == 'GET':
         if has_course_access(request.user, old_location):
-            return JsonResponse(modulestore().get_orphans(old_location, DETACHED_CATEGORIES, 'draft'))
+            return JsonResponse(modulestore().get_orphans(old_location, 'draft'))
         else:
             raise PermissionDenied()
     if request.method == 'DELETE':
         if request.user.is_staff:
-            items = modulestore().get_orphans(old_location, DETACHED_CATEGORIES, 'draft')
+            items = modulestore().get_orphans(old_location, 'draft')
             for item in items:
                 modulestore('draft').delete_item(item, True)
             return JsonResponse({'deleted': items})
