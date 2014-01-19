@@ -97,6 +97,85 @@ function (Resizer) {
             expect(realWidth).toBe(expectedWidth);
         });
 
+        describe('Callbacks', function () {
+            var resizer,
+                spiesList = [];
+
+            beforeEach(function () {
+                var spiesCount = _.range(3);
+
+                spiesList = $.map(spiesCount, function() {
+                    return jasmine.createSpy();
+                });
+
+                resizer = new Resizer(config);
+            });
+
+
+            it('callbacks are called', function () {
+                $.each(spiesList, function(index, spy) {
+                    resizer.callbacks.add(spy);
+                });
+
+                resizer.align();
+
+                $.each(spiesList, function(index, spy) {
+                    expect(spy).toHaveBeenCalled();
+                });
+            });
+
+            it('callback called just once', function () {
+                resizer.callbacks.once(spiesList[0]);
+
+                resizer
+                    .align()
+                    .alignByHeightOnly();
+
+                expect(spiesList[0].calls.length).toEqual(1);
+            });
+
+            it('All callbacks are removed', function () {
+                $.each(spiesList, function(index, spy) {
+                    resizer.callbacks.add(spy);
+                });
+
+                resizer.callbacks.removeAll();
+                resizer.align();
+
+                $.each(spiesList, function(index, spy) {
+                    expect(spy).not.toHaveBeenCalled();
+                });
+            });
+
+            it('Specific callback is removed', function () {
+                $.each(spiesList, function(index, spy) {
+                    resizer.callbacks.add(spy);
+                });
+
+                resizer.callbacks.remove(spiesList[1]);
+                resizer.align();
+
+                expect(spiesList[1]).not.toHaveBeenCalled();
+            });
+
+            it('Error message is shown when wrong argument type is passed', function () {
+                var methods = ['add', 'once'],
+                    errorMessage = 'TypeError: Argument is not a function.',
+                    arg = {};
+
+                spyOn(console, 'error');
+
+                $.each(methods, function(index, methodName) {
+                     resizer.callbacks[methodName](arg);
+                     expect(console.error).toHaveBeenCalledWith(errorMessage);
+                     //reset spy
+                     console.log.reset();
+                });
+
+            });
+
+        });
+
     });
 });
 

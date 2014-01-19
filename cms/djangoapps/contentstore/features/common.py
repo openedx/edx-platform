@@ -43,9 +43,9 @@ def i_confirm_with_ok(_step):
 @step(u'I press the "([^"]*)" delete icon$')
 def i_press_the_category_delete_icon(_step, category):
     if category == 'section':
-        css = 'a.delete-button.delete-section-button span.delete-icon'
+        css = 'a.action.delete-section-button'
     elif category == 'subsection':
-        css = 'a.delete-button.delete-subsection-button  span.delete-icon'
+        css = 'a.action.delete-subsection-button'
     else:
         assert False, 'Invalid category: %s' % category
     world.css_click(css)
@@ -254,7 +254,7 @@ def create_course_with_unit():
 
     world.wait_for_js_to_load()
     css_selectors = [
-        'div.section-item a.expand-collapse-icon', 'a.new-unit-item'
+        'div.section-item a.expand-collapse', 'a.new-unit-item'
     ]
     for selector in css_selectors:
         world.css_click(selector)
@@ -385,3 +385,18 @@ def create_other_user(_step, name, has_extra_perms, role_name):
 @step('I log out')
 def log_out(_step):
     world.visit('logout')
+
+
+@step(u'I click on "edit a draft"$')
+def i_edit_a_draft(_step):
+    world.css_click("a.create-draft")
+
+
+@step(u'I click on "replace with draft"$')
+def i_edit_a_draft(_step):
+    world.css_click("a.publish-draft")
+
+
+@step(u'I publish the unit$')
+def publish_unit(_step):
+    world.select_option('visibility-select', 'public')

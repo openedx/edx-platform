@@ -40,7 +40,7 @@ def setup_masquerade(request, staff_access=False):
     if request.user is None:
         return None
 
-    if not settings.MITX_FEATURES.get('ENABLE_MASQUERADE', False):
+    if not settings.FEATURES.get('ENABLE_MASQUERADE', False):
         return None
 
     if not staff_access:  # can masquerade only if user has staff access to course

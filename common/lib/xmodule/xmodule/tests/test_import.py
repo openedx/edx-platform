@@ -13,7 +13,7 @@ from xmodule.xml_module import is_pointer_tag
 from xmodule.modulestore import Location
 from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
 from xmodule.modulestore.inheritance import compute_inherited_metadata
-from xmodule.x_module import XModuleMixin
+from xmodule.x_module import XModuleMixin, only_xmodules
 from xmodule.fields import Date
 from xmodule.tests import DATA_DIR
 from xmodule.modulestore.inheritance import InheritanceMixin
@@ -61,7 +61,12 @@ class BaseCourseTestCase(unittest.TestCase):
         """Get a test course by directory name.  If there's more than one, error."""
         print("Importing {0}".format(name))
 
-        modulestore = XMLModuleStore(DATA_DIR, course_dirs=[name], xblock_mixins=(InheritanceMixin,))
+        modulestore = XMLModuleStore(
+            DATA_DIR,
+            course_dirs=[name],
+            xblock_mixins=(InheritanceMixin,),
+            xblock_select=only_xmodules,
+        )
         courses = modulestore.get_courses()
         self.assertEquals(len(courses), 1)
         return courses[0]
@@ -91,6 +96,16 @@ class ImportTestCase(BaseCourseTestCase):
         descriptor2 = system.process_xml(bad_xml2)
 
         self.assertNotEqual(descriptor1.location, descriptor2.location)
+
+        # Check that each vertical gets its very own url_name
+        bad_xml = '''<vertical display_name="abc"><problem url_name="exam1:2013_Spring:abc"/></vertical>'''
+        bad_xml2 = '''<vertical display_name="abc"><problem url_name="exam2:2013_Spring:abc"/></vertical>'''
+
+        descriptor1 = system.process_xml(bad_xml)
+        descriptor2 = system.process_xml(bad_xml2)
+
+        self.assertNotEqual(descriptor1.location, descriptor2.location)
+
 
     def test_reimport(self):
         '''Make sure an already-exported error xml tag loads properly'''
@@ -218,9 +233,11 @@ class ImportTestCase(BaseCourseTestCase):
         # Check that the child does not inherit a value for due
         child = descriptor.get_children()[0]
         self.assertEqual(child.due, None)
+
+        # Check that the child hasn't started yet
         self.assertLessEqual(
-            child.start,
-            datetime.datetime.now(UTC())
+            datetime.datetime.now(UTC()),
+            child.start
         )
 
     def test_metadata_override_default(self):

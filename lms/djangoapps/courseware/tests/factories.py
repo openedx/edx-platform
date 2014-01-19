@@ -1,72 +1,124 @@
-from datetime import datetime
 import json
 from functools import partial
+import factory
+from factory.django import DjangoModelFactory
 
-from factory import DjangoModelFactory, SubFactory
-from student.tests.factories import UserFactory as StudentUserFactory
-from student.tests.factories import GroupFactory as StudentGroupFactory
+# Imported to re-export
+# pylint: disable=unused-import
+from student.tests.factories import UserFactory  # Imported to re-export
+from student.tests.factories import GroupFactory  # Imported to re-export
+from student.tests.factories import CourseEnrollmentAllowedFactory  # Imported to re-export
+from student.tests.factories import RegistrationFactory  # Imported to re-export
+# pylint: enable=unused-import
+
 from student.tests.factories import UserProfileFactory as StudentUserProfileFactory
-from student.tests.factories import CourseEnrollmentAllowedFactory as StudentCourseEnrollmentAllowedFactory
-from student.tests.factories import RegistrationFactory as StudentRegistrationFactory
 from courseware.models import StudentModule, XModuleUserStateSummaryField
 from courseware.models import XModuleStudentInfoField, XModuleStudentPrefsField
-from instructor.access import allow_access
+from courseware.roles import (
+    CourseInstructorRole,
+    CourseStaffRole,
+    CourseBetaTesterRole,
+    GlobalStaff,
+    OrgStaffRole,
+    OrgInstructorRole,
+)
 
 from xmodule.modulestore import Location
-from pytz import UTC
+
 
 location = partial(Location, 'i4x', 'edX', 'test_course', 'problem')
 
 
 class UserProfileFactory(StudentUserProfileFactory):
-    name = 'Robot Studio'
     courseware = 'course.xml'
 
 
-class RegistrationFactory(StudentRegistrationFactory):
-    pass
-
-
-class UserFactory(StudentUserFactory):
-    email = 'robot@edx.org'
-    last_name = 'Tester'
-    last_login = datetime.now(UTC)
-    date_joined = datetime.now(UTC)
-
-
-def InstructorFactory(course):  # pylint: disable=invalid-name
+class InstructorFactory(UserFactory):
     """
-    Given a course object, returns a User object with instructor
+    Given a course Location, returns a User object with instructor
     permissions for `course`.
     """
-    user = StudentUserFactory.create(last_name="Instructor")
-    allow_access(course, user, "instructor")
-    return user
+    last_name = "Instructor"
+
+    @factory.post_generation
+    def course(self, create, extracted, **kwargs):
+        if extracted is None:
+            raise ValueError("Must specify a course location for a course instructor user")
+        CourseInstructorRole(extracted).add_users(self)
 
 
-def StaffFactory(course):  # pylint: disable=invalid-name
+class StaffFactory(UserFactory):
     """
-    Given a course object, returns a User object with staff
+    Given a course Location, returns a User object with staff
     permissions for `course`.
     """
-    user = StudentUserFactory.create(last_name="Staff")
-    allow_access(course, user, "staff")
-    return user
+    last_name = "Staff"
+
+    @factory.post_generation
+    def course(self, create, extracted, **kwargs):
+        if extracted is None:
+            raise ValueError("Must specify a course location for a course staff user")
+        CourseStaffRole(extracted).add_users(self)
 
 
-class GroupFactory(StudentGroupFactory):
-    name = 'test_group'
+class BetaTesterFactory(UserFactory):
+    """
+    Given a course Location, returns a User object with beta-tester
+    permissions for `course`.
+    """
+    last_name = "Beta-Tester"
+
+    @factory.post_generation
+    def course(self, create, extracted, **kwargs):
+        if extracted is None:
+            raise ValueError("Must specify a course location for a beta-tester user")
+        CourseBetaTesterRole(extracted).add_users(self)
 
 
-class CourseEnrollmentAllowedFactory(StudentCourseEnrollmentAllowedFactory):
-    pass
+class OrgStaffFactory(UserFactory):
+    """
+    Given a course Location, returns a User object with org-staff
+    permissions for `course`.
+    """
+    last_name = "Org-Staff"
+
+    @factory.post_generation
+    def course(self, create, extracted, **kwargs):
+        if extracted is None:
+            raise ValueError("Must specify a course location for an org-staff user")
+        OrgStaffRole(extracted).add_users(self)
+
+
+class OrgInstructorFactory(UserFactory):
+    """
+    Given a course Location, returns a User object with org-instructor
+    permissions for `course`.
+    """
+    last_name = "Org-Instructor"
+
+    @factory.post_generation
+    def course(self, create, extracted, **kwargs):
+        if extracted is None:
+            raise ValueError("Must specify a course location for an org-instructor user")
+        OrgInstructorRole(extracted).add_users(self)
+
+
+class GlobalStaffFactory(UserFactory):
+    """
+    Returns a User object with global staff access
+    """
+    last_name = "GlobalStaff"
+
+    @factory.post_generation
+    def set_staff(self, create, extracted, **kwargs):
+        GlobalStaff().add_users(self)
 
 
 class StudentModuleFactory(DjangoModelFactory):
     FACTORY_FOR = StudentModule
 
     module_type = "problem"
-    student = SubFactory(UserFactory)
+    student = factory.SubFactory(UserFactory)
     course_id = "MITx/999/Robot_Super_Course"
     state = None
     grade = None
@@ -79,7 +131,7 @@ class UserStateSummaryFactory(DjangoModelFactory):
 
     field_name = 'existing_field'
     value = json.dumps('old_value')
-    usage_id = location('def_id').url()
+    usage_id = location('usage_id').url()
 
 
 class StudentPrefsFactory(DjangoModelFactory):
@@ -87,8 +139,8 @@ class StudentPrefsFactory(DjangoModelFactory):
 
     field_name = 'existing_field'
     value = json.dumps('old_value')
-    student = SubFactory(UserFactory)
-    module_type = 'MockProblemModule'
+    student = factory.SubFactory(UserFactory)
+    module_type = 'mock_problem'
 
 
 class StudentInfoFactory(DjangoModelFactory):
@@ -96,4 +148,4 @@ class StudentInfoFactory(DjangoModelFactory):
 
     field_name = 'existing_field'
     value = json.dumps('old_value')
-    student = SubFactory(UserFactory)
+    student = factory.SubFactory(UserFactory)

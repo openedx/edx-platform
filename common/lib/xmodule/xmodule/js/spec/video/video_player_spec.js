@@ -4,11 +4,21 @@
             videoProgressSlider, videoSpeedControl, videoVolumeControl,
             oldOTBD;
 
-        function initialize(fixture) {
-            if (typeof fixture === 'undefined') {
-                loadFixtures('video_all.html');
-            } else {
+        function initialize(fixture, params) {
+            if (_.isString(fixture)) {
                 loadFixtures(fixture);
+            } else {
+                if (_.isObject(fixture)) {
+                    params = fixture;
+                }
+
+                loadFixtures('video_all.html');
+            }
+
+            if (_.isObject(params)) {
+                $('#example')
+                    .find('#video_id')
+                    .data(params);
             }
 
             state = new Video('#example');
@@ -47,7 +57,7 @@
         beforeEach(function () {
             oldOTBD = window.onTouchBasedDevice;
             window.onTouchBasedDevice = jasmine.createSpy('onTouchBasedDevice')
-                .andReturn(false);
+                .andReturn(null);
         });
 
         afterEach(function () {
@@ -109,8 +119,8 @@
                 window.YT = {
                     Player: function () { },
                     PlayerState: oldYT.PlayerState,
-                    ready: function (f) {
-                        f();
+                    ready: function (callback) {
+                        callback();
                     }
                 };
 
@@ -146,19 +156,18 @@
             // available globally. It is defined within the scope of Require
             // JS.
 
-            describe('when not on a touch based device', function () {
-                beforeEach(function () {
-                    window.onTouchBasedDevice.andReturn(true);
-                    initialize();
-                });
-
-                it('create video volume control', function () {
-                    expect(videoVolumeControl).toBeDefined();
-                    expect(videoVolumeControl.el).toHaveClass('volume');
+            describe('when on a touch based device', function () {
+                $.each(['iPad', 'Android'], function(index, device) {
+                    it('create video volume control on' + device, function() {
+                        window.onTouchBasedDevice.andReturn([device]);
+                        initialize();
+                        expect(videoVolumeControl).toBeUndefined();
+                        expect(state.el.find('div.volume')).not.toExist();
+                    });
                 });
             });
 
-            describe('when on a touch based device', function () {
+            describe('when not on a touch based device', function () {
                 var oldOTBD;
 
                 beforeEach(function () {
@@ -326,29 +335,23 @@
             beforeEach(function () {
                 initialize();
 
-                spyOn(videoPlayer, 'updatePlayTime');
-                spyOn(videoPlayer, 'log');
-                spyOn(videoPlayer.player, 'seekTo');
-
-                state.videoPlayer.play();
+                runs(function () {
+                    state.videoPlayer.play();
+                });
 
                 waitsFor(function () {
-                    var duration = videoPlayer.duration(),
-                        currentTime = videoPlayer.currentTime;
+                    duration = videoPlayer.duration();
 
-                    return (
-                        isFinite(currentTime) &&
-                        currentTime > 0 &&
-                        isFinite(duration) &&
-                        duration > 0
-                    );
-                }, 'video begins playing', 10000);
+                    return duration > 0 && videoPlayer.isPlaying();
+                }, 'video begins playing', WAIT_TIMEOUT);
             });
 
             it('Slider event causes log update', function () {
+
                 runs(function () {
                     var currentTime = videoPlayer.currentTime;
 
+                    spyOn(videoPlayer, 'log');
                     videoProgressSlider.onSlide(
                         jQuery.Event('slide'), { value: 2 }
                     );
@@ -366,6 +369,7 @@
 
             it('seek the player', function () {
                 runs(function () {
+                    spyOn(videoPlayer.player, 'seekTo');
                     videoProgressSlider.onSlide(
                         jQuery.Event('slide'), { value: 60 }
                     );
@@ -377,6 +381,7 @@
 
             it('call updatePlayTime on player', function () {
                 runs(function () {
+                    spyOn(videoPlayer, 'updatePlayTime');
                     videoProgressSlider.onSlide(
                         jQuery.Event('slide'), { value: 60 }
                     );
@@ -411,8 +416,6 @@
             beforeEach(function () {
                 initialize();
 
-                videoPlayer.currentTime = 60;
-
                 spyOn(videoPlayer, 'updatePlayTime').andCallThrough();
                 spyOn(state, 'setSpeed').andCallThrough();
                 spyOn(videoPlayer, 'log').andCallThrough();
@@ -421,6 +424,8 @@
 
             describe('always', function () {
                 beforeEach(function () {
+
+                    videoPlayer.currentTime = 60;
                     videoPlayer.onSpeedChange('0.75', false);
                 });
 
@@ -446,8 +451,8 @@
 
             describe('when the video is playing', function () {
                 beforeEach(function () {
+                    videoPlayer.currentTime = 60;
                     videoPlayer.play();
-
                     videoPlayer.onSpeedChange('0.75', false);
                 });
 
@@ -459,8 +464,6 @@
 
             describe('when the video is not playing', function () {
                 beforeEach(function () {
-                    videoPlayer.pause();
-
                     videoPlayer.onSpeedChange('0.75', false);
                 });
 
@@ -468,19 +471,47 @@
                     expect(videoPlayer.player.setPlaybackRate)
                         .toHaveBeenCalledWith('0.75');
                 });
+
+                it('video has a correct speed', function () {
+                    spyOn(videoPlayer, 'onSpeedChange');
+                    state.speed = '2.0';
+                    videoPlayer.onPlay();
+                    expect(videoPlayer.onSpeedChange).toHaveBeenCalledWith('2.0');
+                    videoPlayer.onPlay();
+                    expect(videoPlayer.onSpeedChange.calls.length).toEqual(1);
+                });
+
+                it('video has a correct volume', function () {
+                    spyOn(videoPlayer.player, 'setVolume');
+                    state.currentVolume = '0.26';
+                    videoPlayer.onPlay();
+                    expect(videoPlayer.player.setVolume).toHaveBeenCalledWith('0.26');
+                });
             });
         });
 
         describe('onVolumeChange', function () {
             beforeEach(function () {
                 initialize();
-
-                spyOn(videoPlayer.player, 'setVolume');
-                videoPlayer.onVolumeChange(60);
             });
 
             it('set the volume on player', function () {
+                spyOn(videoPlayer.player, 'setVolume');
+                videoPlayer.onVolumeChange(60);
                 expect(videoPlayer.player.setVolume).toHaveBeenCalledWith(60);
+            });
+
+            describe('when the video is not playing', function () {
+                beforeEach(function () {
+                    videoPlayer.player.setVolume('1');
+                });
+
+                it('video has a correct volume', function () {
+                    spyOn(videoPlayer.player, 'setVolume');
+                    state.currentVolume = '0.26';
+                    videoPlayer.onPlay();
+                    expect(videoPlayer.player.setVolume).toHaveBeenCalledWith('0.26');
+                });
             });
         });
 
@@ -525,8 +556,44 @@
             });
         });
 
-        // Disabled 10/24/13 due to flakiness in master
-        xdescribe('updatePlayTime', function () {
+        describe('update with start & end time', function () {
+            var START_TIME = 1, END_TIME = 2;
+
+            beforeEach(function () {
+                initialize({start: START_TIME, end: END_TIME});
+
+                spyOn(videoPlayer, 'update').andCallThrough();
+                spyOn(videoPlayer, 'pause').andCallThrough();
+                spyOn(videoProgressSlider, 'notifyThroughHandleEnd')
+                    .andCallThrough();
+            });
+
+            it('video is paused on first endTime, start & end time are reset', function () {
+                var duration;
+
+                videoProgressSlider.notifyThroughHandleEnd.reset();
+                videoPlayer.pause.reset();
+                videoPlayer.play();
+
+                waitsFor(function () {
+                    duration = Math.round(videoPlayer.currentTime);
+
+                    return videoPlayer.pause.calls.length === 1;
+                }, 'pause() has been called', WAIT_TIMEOUT);
+
+                runs(function () {
+                    expect(videoPlayer.startTime).toBe(0);
+                    expect(videoPlayer.endTime).toBe(null);
+
+                    expect(duration).toBe(END_TIME);
+
+                    expect(videoProgressSlider.notifyThroughHandleEnd)
+                        .toHaveBeenCalledWith({end: true});
+                });
+            });
+        });
+
+        describe('updatePlayTime', function () {
             beforeEach(function () {
                 initialize();
 
@@ -541,11 +608,11 @@
                     duration = videoPlayer.duration();
 
                     if (duration > 0) {
-                    return true;
+                        return true;
                     }
 
                     return false;
-                }, 'Video is fully loaded.', 1000);
+                }, 'Video is fully loaded.', WAIT_TIMEOUT);
 
                 runs(function () {
                     var htmlStr;
@@ -574,7 +641,7 @@
             it('update the playback time on caption', function () {
                 waitsFor(function () {
                     return videoPlayer.duration() > 0;
-                }, 'Video is fully loaded.', 1000);
+                }, 'Video is fully loaded.', WAIT_TIMEOUT);
 
                 runs(function () {
                     videoPlayer.updatePlayTime(60);
@@ -591,7 +658,7 @@
                     duration = videoPlayer.duration();
 
                     return duration > 0;
-                }, 'Video is fully loaded.', 1000);
+                }, 'Video is fully loaded.', WAIT_TIMEOUT);
 
                 runs(function () {
                     videoPlayer.updatePlayTime(60);
@@ -601,6 +668,72 @@
                             time: 60,
                             duration: duration
                         });
+                });
+            });
+        });
+
+        describe('updatePlayTime when start & end times are defined', function () {
+            var START_TIME = 1,
+                END_TIME = 2;
+
+            beforeEach(function () {
+                initialize({start: START_TIME, end: END_TIME});
+
+                spyOn(videoPlayer, 'updatePlayTime').andCallThrough();
+                spyOn(videoPlayer.player, 'seekTo').andCallThrough();
+                spyOn(videoProgressSlider, 'updateStartEndTimeRegion')
+                    .andCallThrough();
+            });
+
+            it('when duration becomes available, updatePlayTime() is called', function () {
+                var duration;
+
+                expect(videoPlayer.initialSeekToStartTime).toBeTruthy();
+                expect(videoPlayer.seekToStartTimeOldSpeed).toBe('void');
+
+                videoPlayer.play();
+
+                waitsFor(function () {
+                    duration = videoPlayer.duration();
+
+                    return videoPlayer.isPlaying() &&
+                        videoPlayer.initialSeekToStartTime === false;
+                }, 'duration becomes available', WAIT_TIMEOUT);
+
+                runs(function () {
+                    expect(videoPlayer.startTime).toBe(START_TIME);
+                    expect(videoPlayer.endTime).toBe(END_TIME);
+
+                    expect(videoPlayer.player.seekTo).toHaveBeenCalledWith(START_TIME);
+
+                    expect(videoProgressSlider.updateStartEndTimeRegion)
+                        .toHaveBeenCalledWith({duration: duration});
+
+                    expect(videoPlayer.seekToStartTimeOldSpeed).toBe(state.speed);
+                });
+            });
+        });
+
+        describe('updatePlayTime with invalid endTime', function () {
+            beforeEach(function () {
+                initialize({end: 100000});
+
+                spyOn(videoPlayer, 'updatePlayTime').andCallThrough();
+            });
+
+            it('invalid endTime is reset to null', function () {
+                var duration;
+
+                videoPlayer.updatePlayTime.reset();
+                videoPlayer.play();
+
+                waitsFor(function () {
+                    return videoPlayer.isPlaying() &&
+                        videoPlayer.initialSeekToStartTime === false;
+                }, 'updatePlayTime was invoked and duration is set', WAIT_TIMEOUT);
+
+                runs(function () {
+                    expect(videoPlayer.endTime).toBe(null);
                 });
             });
         });
@@ -763,6 +896,64 @@
                 realValue = Math.round(player.getVolume()*100);
 
                 expect(realValue).toEqual(expectedValue);
+            });
+        });
+
+        describe('on Touch devices', function () {
+            it('`is-touch` class name is added to container', function () {
+                $.each(['iPad', 'Android', 'iPhone'], function(index, device) {
+                    window.onTouchBasedDevice.andReturn([device]);
+                    initialize();
+
+                    expect(state.el).toHaveClass('is-touch');
+                });
+            });
+
+            it('modules are not initialized on iPhone', function () {
+                window.onTouchBasedDevice.andReturn(['iPhone']);
+                initialize();
+
+                var modules = [
+                    videoControl, videoCaption, videoProgressSlider,
+                    videoSpeedControl, videoVolumeControl
+                ];
+
+                $.each(modules, function (index, module) {
+                    expect(module).toBeUndefined();
+                });
+            });
+
+            $.each(['iPad', 'Android'], function(index, device) {
+              var message = 'controls become visible after playing starts on ' +
+                            device;
+              it(message, function() {
+                var controls;
+                window.onTouchBasedDevice.andReturn([device]);
+
+                runs(function () {
+                    initialize();
+                    controls = state.el.find('.video-controls');
+                });
+
+                waitsFor(function () {
+                    return state.el.hasClass('is-initialized');
+                },'Video is not initialized.' , WAIT_TIMEOUT);
+
+                runs(function () {
+                    expect(controls).toHaveClass('is-hidden');
+                    videoPlayer.play();
+                });
+
+                waitsFor(function () {
+                    duration = videoPlayer.duration();
+
+                    return duration > 0 && videoPlayer.isPlaying();
+                },'Video does not play.' , WAIT_TIMEOUT);
+
+                runs(function () {
+                    expect(controls).not.toHaveClass('is-hidden');
+                });
+              });
             });
         });
     });

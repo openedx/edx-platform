@@ -11,7 +11,7 @@ from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
 from django.test.client import Client
 
-from mitxmako.shortcuts import render_to_string
+from edxmako.shortcuts import render_to_string
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from xblock.field_data import DictFieldData
@@ -46,7 +46,7 @@ class BaseTestXmodule(ModuleStoreTestCase):
     COURSE_DATA = {}
 
     # Data from YAML common/lib/xmodule/xmodule/templates/NAME/default.yaml
-    CATEGORY = ""
+    CATEGORY = "vertical"
     DATA = ''
     MODEL_DATA = {'data': '<some_module></some_module>'}
 

@@ -5,7 +5,6 @@
   <h2>${_("Student-specific grade inspection")}</h2>
   <div class="request-response-error"></div>
   <p>
-    <!-- Doesn't work for username but this MUST work -->
   ${_("Specify the {platform_name} email address or username of a student here:").format(platform_name=settings.PLATFORM_NAME)}
   <input type="text" name="student-select-progress" placeholder="${_("Student Email or Username")}">
   </p>
@@ -26,13 +25,12 @@
   <h2>${_("Student-specific grade adjustment")}</h2>
   <div class="request-response-error"></div>
   <p>
-    <!-- Doesn't work for username but this MUST work -->
   ${_("Specify the {platform_name} email address or username of a student here:").format(platform_name=settings.PLATFORM_NAME)}
   <input type="text" name="student-select-grade" placeholder="${_("Student Email or Username")}">
   </p>
   <br>
 
-  <p> ${_('Specify a particular problem in the course here by its url:')} 
+  <p> ${_('Specify a particular problem in the course here by its url:')}
   <input type="text" name="problem-select-single" placeholder="${_("Problem urlname")}">
   </p>
 
@@ -52,7 +50,7 @@
   <p>
   <input type="button" name="reset-attempts-single" value="${_("Reset Student Attempts")}" data-endpoint="${ section_data['reset_student_attempts_url'] }">
 
-  %if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS') and section_data['access']['instructor']:
+  %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS') and section_data['access']['instructor']:
     <input type="button" name="rescore-problem-single" value="${_("Rescore Student Submission")}" data-endpoint="${ section_data['rescore_problem_url'] }">
   %endif
   </p>
@@ -60,24 +58,24 @@
   <p>
   %if section_data['access']['instructor']:
     <p> ${_('You may also delete the entire state of a student for the specified problem:')} </p>
-    <input type="button" class="molly-guard" name="delete-state-single" value="${_("Delete Student State for Problem")}" data-endpoint="${ section_data['reset_student_attempts_url'] }">
+    <p><input type="button" class="molly-guard" name="delete-state-single" value="${_("Delete Student State for Problem")}" data-endpoint="${ section_data['reset_student_attempts_url'] }"></p>
   %endif
   </p>
 
 
-  %if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS') and section_data['access']['instructor']:
+  %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS') and section_data['access']['instructor']:
     <p>
-      ${_("Rescoring runs in the background, and status for active tasks will appear in a table on the Course Info tab. "
+      ${_("Rescoring runs in the background, and status for active tasks will appear in the 'Pending Instructor Tasks' table. "
       "To see status for all tasks submitted for this problem and student, click on this button:")}
     </p>
 
-    <input type="button" name="task-history-single" value="${_("Show Background Task History for Student")}" data-endpoint="${ section_data['list_instructor_tasks_url'] }">
+    <p><input type="button" name="task-history-single" value="${_("Show Background Task History for Student")}" data-endpoint="${ section_data['list_instructor_tasks_url'] }"></p>
     <div class="task-history-single-table"></div>
   %endif
   <hr>
 </div>
 
-%if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS') and section_data['access']['instructor']:
+%if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS') and section_data['access']['instructor']:
   <div class="course-specific-container action-type-container">
     <h2>${_('Course-specific grade adjustment')}</h2>
     <div class="request-response-error"></div>
@@ -101,16 +99,16 @@
     </p>
     <p>
     <p>
-      ${_("These actions run in the background, and status for active tasks will appear in a table on the Course Info tab. "
+      ${_("The above actions run in the background, and status for active tasks will appear in a table on the Course Info tab. "
       "To see status for all tasks submitted for this problem, click on this button")}:
     </p>
-      <input type="button" name="task-history-all" value="${_("Show Background Task History for Problem")}" data-endpoint="${ section_data['list_instructor_tasks_url'] }">
+      <p><input type="button" name="task-history-all" value="${_("Show Background Task History for Problem")}" data-endpoint="${ section_data['list_instructor_tasks_url'] }"></p>
       <div class="task-history-all-table"></div>
     </p>
   </div>
 %endif
 
-%if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
+%if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
   <div class="running-tasks-container action-type-container">
     <hr>
     <h2> ${_("Pending Instructor Tasks")} </h2>

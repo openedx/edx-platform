@@ -6,29 +6,28 @@ from datetime import datetime, timedelta
 from functools import partial
 
 from django.conf import settings
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, AnonymousUser
 
 from xmodule.course_module import CourseDescriptor
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore import Location
-from xmodule.x_module import XModule, XModuleDescriptor
+from xmodule.x_module import XModule
+
+from xblock.core import XBlock
 
 from student.models import CourseEnrollmentAllowed
 from external_auth.models import ExternalAuthMap
 from courseware.masquerade import is_masquerading_as_student
 from django.utils.timezone import UTC
 from student.models import CourseEnrollment
+from courseware.roles import (
+    GlobalStaff, CourseStaffRole, CourseInstructorRole,
+    OrgStaffRole, OrgInstructorRole, CourseBetaTesterRole
+)
 
 DEBUG_ACCESS = False
 
 log = logging.getLogger(__name__)
-
-
-class CourseContextRequired(Exception):
-    """
-    Raised when a course_context is required to determine permissions
-    """
-    pass
 
 
 def debug(*args, **kwargs):
@@ -47,7 +46,8 @@ def has_access(user, obj, action, course_context=None):
     - DISABLE_START_DATES
     - different access for instructor, staff, course staff, and students.
 
-    user: a Django user object. May be anonymous.
+    user: a Django user object. May be anonymous. If none is passed,
+                    anonymous is assumed
 
     obj: The object to check access for.  A module, descriptor, location, or
                     certain special strings (e.g. 'global')
@@ -64,6 +64,10 @@ def has_access(user, obj, action, course_context=None):
     Returns a bool.  It is up to the caller to actually deny access in a way
     that makes sense in context.
     """
+    # Just in case user is passed in as None, make them anonymous
+    if not user:
+        user = AnonymousUser()
+
     # delegate the work to type-specific functions.
     # (start with more specific types, then get more general)
     if isinstance(obj, CourseDescriptor):
@@ -72,12 +76,12 @@ def has_access(user, obj, action, course_context=None):
     if isinstance(obj, ErrorDescriptor):
         return _has_access_error_desc(user, obj, action, course_context)
 
-    # NOTE: any descriptor access checkers need to go above this
-    if isinstance(obj, XModuleDescriptor):
-        return _has_access_descriptor(user, obj, action, course_context)
-
     if isinstance(obj, XModule):
         return _has_access_xmodule(user, obj, action, course_context)
+
+    # NOTE: any descriptor access checkers need to go above this
+    if isinstance(obj, XBlock):
+        return _has_access_descriptor(user, obj, action, course_context)
 
     if isinstance(obj, Location):
         return _has_access_location(user, obj, action, course_context)
@@ -88,22 +92,6 @@ def has_access(user, obj, action, course_context=None):
     # Passing an unknown object here is a coding error, so rather than
     # returning a default, complain.
     raise TypeError("Unknown object type in has_access(): '{0}'"
-                    .format(type(obj)))
-
-
-def get_access_group_name(obj, action):
-    '''
-    Returns group name for user group which has "action" access to the given object.
-
-    Used in managing access lists.
-    '''
-
-    if isinstance(obj, CourseDescriptor):
-        return _get_access_group_name_course_desc(obj, action)
-
-    # Passing an unknown object here is a coding error, so rather than
-    # returning a default, complain.
-    raise TypeError("Unknown object type in get_access_group_name(): '{0}'"
                     .format(type(obj)))
 
 
@@ -153,7 +141,7 @@ def _has_access_course_desc(user, course, action):
         (staff can always enroll)
         """
         # if using registration method to restrict (say shibboleth)
-        if settings.MITX_FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
+        if settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
             if user is not None and user.is_authenticated() and \
                 ExternalAuthMap.objects.filter(user=user, external_domain=course.enrollment_domain):
                 debug("Allow: external_auth of " + course.enrollment_domain)
@@ -192,7 +180,7 @@ def _has_access_course_desc(user, course, action):
         # VS[compat] -- this setting should go away once all courses have
         # properly configured enrollment_start times (if course should be
         # staff-only, set enrollment_start far in the future.)
-        if settings.MITX_FEATURES.get('ACCESS_REQUIRE_STAFF_FOR_COURSE'):
+        if settings.FEATURES.get('ACCESS_REQUIRE_STAFF_FOR_COURSE'):
             # if this feature is on, only allow courses that have ispublic set to be
             # seen by non-staff
             if course.ispublic:
@@ -212,20 +200,6 @@ def _has_access_course_desc(user, course, action):
         }
 
     return _dispatch(checkers, action, user, course)
-
-
-def _get_access_group_name_course_desc(course, action):
-    '''
-    Return name of group which gives staff access to course.  Only understands action = 'staff' and 'instructor'
-    '''
-    if action == 'staff':
-        return _course_staff_group_name(course.location)
-    elif action == 'instructor':
-        return _course_instructor_group_name(course.location)
-
-    return []
-
-
 
 
 def _has_access_error_desc(user, descriptor, action, course_context):
@@ -267,14 +241,18 @@ def _has_access_descriptor(user, descriptor, action, course_context=None):
         don't have to hit the enrollments table on every module load.
         """
         # If start dates are off, can always load
-        if settings.MITX_FEATURES['DISABLE_START_DATES'] and not is_masquerading_as_student(user):
+        if settings.FEATURES['DISABLE_START_DATES'] and not is_masquerading_as_student(user):
             debug("Allow: DISABLE_START_DATES")
             return True
 
         # Check start date
         if descriptor.start is not None:
             now = datetime.now(UTC())
-            effective_start = _adjust_start_date_for_beta_testers(user, descriptor)
+            effective_start = _adjust_start_date_for_beta_testers(
+                user,
+                descriptor,
+                course_context=course_context
+            )
             if now > effective_start:
                 # after start date, everyone can see it
                 debug("Allow: now > effective start date")
@@ -340,11 +318,11 @@ def _has_access_string(user, perm, action, course_context):
         if perm != 'global':
             debug("Deny: invalid permission '%s'", perm)
             return False
-        return _has_global_staff_access(user)
+        return GlobalStaff().has_user(user)
 
     checkers = {
         'staff': check_staff
-        }
+    }
 
     return _dispatch(checkers, action, user, perm)
 
@@ -362,7 +340,7 @@ def _dispatch(table, action, user, obj):
         debug("%s user %s, object %s, action %s",
               'ALLOWED' if result else 'DENIED',
               user,
-              obj.location.url() if isinstance(obj, XModuleDescriptor) else str(obj)[:60],
+              obj.location.url() if isinstance(obj, XBlock) else str(obj)[:60],
               action)
         return result
 
@@ -370,140 +348,7 @@ def _dispatch(table, action, user, obj):
         type(obj), action))
 
 
-def _does_course_group_name_exist(name):
-    return len(Group.objects.filter(name=name)) > 0
-
-
-def _course_org_staff_group_name(location, course_context=None):
-    """
-    Get the name of the staff group for an organization which corresponds
-    to the organization in the course id.
-
-    location: something that can passed to Location
-    course_context: A course_id that specifies the course run in which
-                    the location occurs.
-                    Required if location doesn't have category 'course'
-
-    """
-    loc = Location(location)
-    if loc.category == 'course':
-        course_id = loc.course_id
-    else:
-        if course_context is None:
-            raise CourseContextRequired()
-        course_id = course_context
-    return 'staff_%s' % course_id.split('/')[0]
-
-
-def group_names_for(role, location, course_context=None):
-    """Returns the group names for a given role with this location. Plural
-    because it will return both the name we expect now as well as the legacy
-    group name we support for backwards compatibility. This should not check
-    the DB for existence of a group (like some of its callers do) because that's
-    a DB roundtrip, and we expect this might be invoked many times as we crawl
-    an XModule tree."""
-    loc = Location(location)
-    legacy_group_name = '{0}_{1}'.format(role, loc.course)
-
-    if loc.category == 'course':
-        course_id = loc.course_id
-    else:
-        if course_context is None:
-            raise CourseContextRequired()
-        course_id = course_context
-
-    group_name = '{0}_{1}'.format(role, course_id)
-
-    return [group_name, legacy_group_name]
-
-group_names_for_staff = partial(group_names_for, 'staff')
-group_names_for_instructor = partial(group_names_for, 'instructor')
-
-def _course_staff_group_name(location, course_context=None):
-    """
-    Get the name of the staff group for a location in the context of a course run.
-
-    location: something that can passed to Location
-    course_context: A course_id that specifies the course run in which the location occurs.
-        Required if location doesn't have category 'course'
-
-    cdodge: We're changing the name convention of the group to better epxress different runs of courses by
-    using course_id rather than just the course number. So first check to see if the group name exists
-    """
-    loc = Location(location)
-    group_name, legacy_group_name = group_names_for_staff(location, course_context)
-
-    if _does_course_group_name_exist(legacy_group_name):
-        return legacy_group_name
-
-    return group_name
-
-def _course_org_instructor_group_name(location, course_context=None):
-    """
-    Get the name of the instructor group for an organization which corresponds
-    to the organization in the course id.
-
-    location: something that can passed to Location
-    course_context: A course_id that specifies the course run in which
-                    the location occurs.
-                    Required if location doesn't have category 'course'
-
-    """
-    loc = Location(location)
-    if loc.category == 'course':
-        course_id = loc.course_id
-    else:
-        if course_context is None:
-            raise CourseContextRequired()
-        course_id = course_context
-    return 'instructor_%s' % course_id.split('/')[0]
-
-
-def _course_instructor_group_name(location, course_context=None):
-    """
-    Get the name of the instructor group for a location, in the context of a course run.
-    A course instructor has all staff privileges, but also can manage list of course staff (add, remove, list).
-
-    location: something that can passed to Location.
-    course_context: A course_id that specifies the course run in which the location occurs.
-        Required if location doesn't have category 'course'
-
-    cdodge: We're changing the name convention of the group to better epxress different runs of courses by
-    using course_id rather than just the course number. So first check to see if the group name exists
-    """
-    loc = Location(location)
-    group_name, legacy_group_name = group_names_for_instructor(location, course_context)
-
-    if _does_course_group_name_exist(legacy_group_name):
-        return legacy_group_name
-
-    return group_name
-
-def course_beta_test_group_name(location):
-    """
-    Get the name of the beta tester group for a location.  Right now, that's
-    beta_testers_COURSE.
-
-    location: something that can passed to Location.
-    """
-    return 'beta_testers_{0}'.format(Location(location).course)
-
-# nosetests thinks that anything with _test_ in the name is a test.
-# Correct this (https://nose.readthedocs.org/en/latest/finding_tests.html)
-course_beta_test_group_name.__test__ = False
-
-
-
-def _has_global_staff_access(user):
-    if user.is_staff:
-        debug("Allow: user.is_staff")
-        return True
-    else:
-        debug("Deny: not user.is_staff")
-        return False
-
-
-def _adjust_start_date_for_beta_testers(user, descriptor):
+def _adjust_start_date_for_beta_testers(user, descriptor, course_context=None):
     """
     If user is in a beta test group, adjust the start date by the appropriate number of
     days.
@@ -523,18 +368,15 @@ def _adjust_start_date_for_beta_testers(user, descriptor):
     the user is looking at.  Once we have proper usages and definitions per the XBlock
     design, this should use the course the usage is in.
 
-    NOTE: If testing manually, make sure MITX_FEATURES['DISABLE_START_DATES'] = False
+    NOTE: If testing manually, make sure FEATURES['DISABLE_START_DATES'] = False
     in envs/dev.py!
     """
     if descriptor.days_early_for_beta is None:
         # bail early if no beta testing is set up
         return descriptor.start
 
-    user_groups = [g.name for g in user.groups.all()]
-
-    beta_group = course_beta_test_group_name(descriptor.location)
-    if beta_group in user_groups:
-        debug("Adjust start time: user in group %s", beta_group)
+    if CourseBetaTesterRole(descriptor.location, course_context=course_context).has_user(user):
+        debug("Adjust start time: user in beta role for %s", descriptor)
         delta = timedelta(descriptor.days_early_for_beta)
         effective = descriptor.start - delta
         return effective
@@ -572,32 +414,34 @@ def _has_access_to_location(user, location, access_level, course_context):
     if is_masquerading_as_student(user):
         return False
 
-    if user.is_staff:
+    if GlobalStaff().has_user(user):
         debug("Allow: user.is_staff")
         return True
 
-    # If not global staff, is the user in the Auth group for this class?
-    user_groups = [g.name for g in user.groups.all()]
+    if access_level not in ('staff', 'instructor'):
+        log.debug("Error in access._has_access_to_location access_level=%s unknown", access_level)
+        debug("Deny: unknown access level")
+        return False
 
-    if access_level == 'staff':
-        staff_groups = group_names_for_staff(location, course_context) + \
-                       [_course_org_staff_group_name(location, course_context)]
-        for staff_group in staff_groups:
-            if staff_group in user_groups:
-                debug("Allow: user in group %s", staff_group)
-                return True
-        debug("Deny: user not in groups %s", staff_groups)
+    staff_access = (
+        CourseStaffRole(location, course_context).has_user(user) or
+        OrgStaffRole(location).has_user(user)
+    )
 
-    if access_level == 'instructor' or access_level == 'staff':  # instructors get staff privileges
-        instructor_groups = group_names_for_instructor(location, course_context) + \
-                            [_course_org_instructor_group_name(location, course_context)]
-        for instructor_group in instructor_groups:
-            if instructor_group in user_groups:
-                debug("Allow: user in group %s", instructor_group)
-                return True
-        debug("Deny: user not in groups %s", instructor_groups)
-    else:
-        log.debug("Error in access._has_access_to_location access_level=%s unknown" % access_level)
+    if staff_access and access_level == 'staff':
+        debug("Allow: user has course staff access")
+        return True
+
+    instructor_access = (
+        CourseInstructorRole(location, course_context).has_user(user) or
+        OrgInstructorRole(location).has_user(user)
+    )
+
+    if instructor_access and access_level in ('staff', 'instructor'):
+        debug("Allow: user has course instructor access")
+        return True
+
+    debug("Deny: user did not have correct access")
     return False
 
 

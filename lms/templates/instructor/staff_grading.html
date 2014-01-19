@@ -6,6 +6,7 @@
 <%block name="headextra">
 <%static:css group='style-course-vendor'/>
 <%static:css group='style-course'/>
+<script type="text/javascript" src="${static.url('js/vendor/underscore-min.js')}"></script>
 </%block>
 
 <%block name="title"><title>${_("{course_number} Staff Grading").format(course_number=course.display_number_with_default) | h}</title></%block>
@@ -24,7 +25,7 @@
 <div class="error-container"></div>
 <div class="message-container"></div>
 
-<! -- Problem List View -->
+<!-- Problem List View -->
 <section class="problem-list-container">
   <h2 class="sr">${_("Instructions")}</h2>
   <div class="instructions sr">

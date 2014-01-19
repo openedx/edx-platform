@@ -13,14 +13,20 @@ DISPLAY_NAME_VALUE = '"Robot Super Course"'
 
 @step('I select the Advanced Settings$')
 def i_select_advanced_settings(step):
+
     world.click_course_settings()
+
+    # The click handlers are set up so that if you click <body>
+    # the menu disappears.  This means that if we're even a *little*
+    # bit off on the last item ('Advanced Settings'), the menu
+    # will close and the test will fail.
+    # For this reason, we retrieve the link and visit it directly
+    # This is what the browser *should* be doing, since it's just a native
+    # link with no JavaScript involved.
     link_css = 'li.nav-course-settings-advanced a'
-    world.css_click(link_css)
-    world.wait_for_requirejs(
-        ["jquery", "js/models/course", "js/models/settings/advanced",
-         "js/views/settings/advanced", "codemirror"])
-    # this shouldn't be necessary, but we experience sporadic failures otherwise
-    world.wait(1)
+    world.wait_for_visible(link_css)
+    link = world.css_find(link_css).first['href']
+    world.visit(link)
 
 
 @step('I am on the Advanced Course Settings page in Studio$')

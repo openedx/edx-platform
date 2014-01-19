@@ -23,7 +23,14 @@
                     % endif
                     <label class="rubric-label" for="score-${i}-${j}-${m}">
                         <span class="wrapper-score-selection"><input type="radio" class="score-selection" data-category="${i}" name="score-selection-${i}" id="score-${i}-${j}-${m}" value="${option['points']}"/></span>
-                        <span class="wrappable"> ${option['points']} ${ungettext("point", "points", option['points'])} : ${option['text']}</span>
+                        <span class="wrappable">${ungettext(
+                            "{num} point: {text}",
+                            "{num} points: {text}",
+                            option['points']
+                        ).format(
+                            num=option['points'],
+                            text=option['text']
+                        )}</span>
                     </label>
                     </li>
                 % endfor

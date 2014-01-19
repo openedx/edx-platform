@@ -13,7 +13,7 @@ from abc import ABCMeta, abstractmethod
 from .exceptions import InvalidLocationError, InsufficientSpecificationError
 from xmodule.errortracker import make_error_tracker
 
-log = logging.getLogger('mitx.' + 'modulestore')
+log = logging.getLogger('edx.modulestore')
 
 SPLIT_MONGO_MODULESTORE_TYPE = 'split'
 MONGO_MODULESTORE_TYPE = 'mongo'
@@ -430,7 +430,7 @@ class ModuleStoreReadBase(ModuleStoreRead):
         self,
         doc_store_config=None,  # ignore if passed up
         metadata_inheritance_cache_subsystem=None, request_cache=None,
-        modulestore_update_signal=None, xblock_mixins=(),
+        modulestore_update_signal=None, xblock_mixins=(), xblock_select=None,
         # temporary parms to enable backward compatibility. remove once all envs migrated
         db=None, collection=None, host=None, port=None, tz_aware=True, user=None, password=None
     ):
@@ -442,6 +442,7 @@ class ModuleStoreReadBase(ModuleStoreRead):
         self.modulestore_update_signal = modulestore_update_signal
         self.request_cache = request_cache
         self.xblock_mixins = xblock_mixins
+        self.xblock_select = xblock_select
 
     def _get_errorlog(self, location):
         """

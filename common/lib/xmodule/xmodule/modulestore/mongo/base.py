@@ -25,7 +25,6 @@ from path import path
 from importlib import import_module
 from xmodule.errortracker import null_error_tracker, exc_info_to_str
 from xmodule.mako_module import MakoDescriptorSystem
-from xmodule.x_module import XModuleDescriptor
 from xmodule.error_module import ErrorDescriptor
 from xblock.runtime import DbModel
 from xblock.exceptions import InvalidScopeError
@@ -34,7 +33,6 @@ from xblock.fields import Scope, ScopeIds
 from xmodule.modulestore import ModuleStoreWriteBase, Location, MONGO_MODULESTORE_TYPE
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.inheritance import own_metadata, InheritanceMixin, inherit_metadata, InheritanceKeyValueStore
-import re
 
 log = logging.getLogger(__name__)
 
@@ -174,10 +172,8 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
             # load the module and apply the inherited metadata
             try:
                 category = json_data['location']['category']
-                class_ = XModuleDescriptor.load_class(
-                    category,
-                    self.default_class
-                )
+                class_ = self.load_block_type(category)
+
                 definition = json_data.get('definition', {})
                 metadata = json_data.get('metadata', {})
                 for old_name, new_name in getattr(class_, 'metadata_translations', {}).items():
@@ -275,25 +271,29 @@ class MongoModuleStore(ModuleStoreWriteBase):
             """
             Create & open the connection, authenticate, and provide pointers to the collection
             """
-            self.collection = pymongo.connection.Connection(
-                host=host,
-                port=port,
-                tz_aware=tz_aware,
-                **kwargs
-            )[db][collection]
+            self.database = pymongo.database.Database(
+                pymongo.MongoClient(
+                    host=host,
+                    port=port,
+                    tz_aware=tz_aware,
+                    **kwargs
+                ),
+                db
+            )
+            self.collection = self.database[collection]
 
             if user is not None and password is not None:
-                self.collection.database.authenticate(user, password)
+                self.database.authenticate(user, password)
 
         do_connection(**doc_store_config)
 
         # Force mongo to report errors, at the expense of performance
-        self.collection.safe = True
+        self.collection.write_concern = {'w': 1}
 
         # Force mongo to maintain an index over _id.* that is in the same order
         # that is used when querying by a location
         self.collection.ensure_index(
-            zip(('_id.' + field for field in Location._fields), repeat(1))
+            zip(('_id.' + field for field in Location._fields), repeat(1)),
         )
 
         if default_class is not None:
@@ -503,6 +503,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
             render_template=self.render_template,
             cached_metadata=cached_metadata,
             mixins=self.xblock_mixins,
+            select=self.xblock_select,
         )
         return system.load_item(item['location'])
 
@@ -624,8 +625,9 @@ class MongoModuleStore(ModuleStoreWriteBase):
                 render_template=self.render_template,
                 cached_metadata={},
                 mixins=self.xblock_mixins,
+                select=self.xblock_select,
             )
-        xblock_class = XModuleDescriptor.load_class(location.category, self.default_class)
+        xblock_class = system.load_block_type(location.category)
         if definition_data is None:
             if hasattr(xblock_class, 'data') and xblock_class.data.default is not None:
                 definition_data = xblock_class.data.default
@@ -721,7 +723,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         # @hack! We need to find the course location however, we don't
         # know the 'name' parameter in this context, so we have
         # to assume there's only one item in this query even though we are not specifying a name
-        course_search_location = ['i4x', location.org, location.course, 'course', None]
+        course_search_location = Location('i4x', location.org, location.course, 'course', None)
         courses = self.get_items(course_search_location, depth=depth)
 
         # make sure we found exactly one match on this above course search

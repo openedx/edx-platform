@@ -2,9 +2,10 @@
 
 <%!
   from django.core.urlresolvers import reverse
+  import waffle
   from django.template.defaultfilters import date as _date
-from pytz import timezone as _timezone
-from django.conf import settings
+  from pytz import timezone as _timezone
+  from django.conf import settings
 %>
 <%inherit file="main.html" />
 
@@ -24,6 +25,21 @@ from django.conf import settings
 
         $(this).closest('.message.is-expandable').toggleClass('is-expanded');
     }
+
+    $("#upgrade-to-verified").click(function(event) {
+      user = $(event.target).data("user");
+      course = $(event.target).data("course-id");
+      Logger.log('edx.course.enrollment.upgrade.clicked', [user, course], null);
+      % if waffle.flag_is_active(request, 'alternate_upsell_copy'):
+      analytics.track("Clicked on Alternate Upsell Copy", {
+        course: course
+      });
+      % else:
+      analytics.track("Clicked on Regular Upsell Copy", {
+        course: course
+      });
+      % endif
+    });
 
     $(".email-settings").click(function(event) {
       $("#email_settings_course_id").val( $(event.target).data("course-id") );
@@ -236,7 +252,7 @@ text-transform: capitalize;
       </ul>
     % else:
       <section class="empty-dashboard-message">
-        % if settings.MITX_FEATURES.get('COURSES_ARE_BROWSABLE'):
+        % if settings.FEATURES.get('COURSES_ARE_BROWSABLE'):
           <p>${_("Looks like you haven't registered for any courses yet.")}</p>
           <a href="${marketing_link('COURSES')}">
             ${_("Find courses now!")}
@@ -368,7 +384,6 @@ text-transform: capitalize;
     <button class="close-modal">&#10005; <span class="sr">${_('Close Modal')}</span></button>
     <header>
       <h2 id="unenrollment-modal-title">${_('<span id="track-info"></span> {course_number}?  <span id="refund-info"></span>').format(course_number='<span id="unenroll_course_number"></span>')}<span class="sr">, ${_("modal open")}</span></h2>
-      refund
       <hr/>
     </header>
     <div id="unenroll_error" class="modal-form-error"></div>

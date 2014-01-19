@@ -7,11 +7,11 @@ BLOCK_PREFIX = r"block/"
 # Prefix for the version portion of a locator URL, when it is preceded by a course ID
 VERSION_PREFIX = r"version/"
 
-ALLOWED_ID_CHARS = r'[a-zA-Z0-9_\-~.]'
+ALLOWED_ID_CHARS = r'[a-zA-Z0-9_\-~.:]'
 
 URL_RE_SOURCE = r"""
     (?P<tag>edx://)?
-    ((?P<course_id>{ALLOWED_ID_CHARS}+)/?)?
+    ((?P<package_id>{ALLOWED_ID_CHARS}+)/?)?
     ({BRANCH_PREFIX}(?P<branch>{ALLOWED_ID_CHARS}+)/?)?
     ({VERSION_PREFIX}(?P<version_guid>[A-F0-9]+)/?)?
     ({BLOCK_PREFIX}(?P<block>{ALLOWED_ID_CHARS}+))?
@@ -26,7 +26,7 @@ URL_RE = re.compile('^' + URL_RE_SOURCE + '$', re.IGNORECASE | re.VERBOSE)
 def parse_url(string, tag_optional=False):
     """
     A url usually begins with 'edx://' (case-insensitive match),
-    followed by either a version_guid or a course_id. If tag_optional, then
+    followed by either a version_guid or a package_id. If tag_optional, then
     the url does not have to start with the tag and edx will be assumed.
 
     Examples:
@@ -38,10 +38,10 @@ def parse_url(string, tag_optional=False):
 
     This returns None if string cannot be parsed.
 
-    If it can be parsed as a version_guid with no preceding course_id, returns a dict
+    If it can be parsed as a version_guid with no preceding package_id, returns a dict
     with key 'version_guid' and the value,
 
-    If it can be parsed as a course_id, returns a dict
+    If it can be parsed as a package_id, returns a dict
     with key 'id' and optional keys 'branch' and 'version_guid'.
 
     """
@@ -69,15 +69,15 @@ def parse_block_ref(string):
     return None
 
 
-def parse_course_id(string):
+def parse_package_id(string):
     r"""
 
-    A course_id has a main id component.
+    A package_id has a main id component.
     There may also be an optional branch (/branch/published or /branch/draft).
     There may also be an optional version (/version/519665f6223ebd6980884f2b).
     There may also be an optional block (/block/HW3 or /block/Quiz2).
 
-    Examples of valid course_ids:
+    Examples of valid package_ids:
 
       'mit.eecs.6002x'
       'mit.eecs.6002x/branch/published'
@@ -88,7 +88,7 @@ def parse_course_id(string):
 
     Syntax:
 
-      course_id = main_id [/branch/ branch] [/version/ version ] [/block/ block]
+      package_id = main_id [/branch/ branch] [/version/ version ] [/block/ block]
 
       main_id = name [. name]*
 
@@ -98,7 +98,7 @@ def parse_course_id(string):
 
       name = ALLOWED_ID_CHARS
 
-    If string is a course_id, returns a dict with keys 'id', 'branch', and 'block'.
+    If string is a package_id, returns a dict with keys 'id', 'branch', and 'block'.
     Revision is optional: if missing returned_dict['branch'] is None.
     Block is optional: if missing returned_dict['block'] is None.
     Else returns None.

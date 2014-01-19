@@ -9,7 +9,7 @@ import openendedchild
 
 from .combined_open_ended_rubric import CombinedOpenEndedRubric
 
-log = logging.getLogger("mitx.courseware")
+log = logging.getLogger("edx.courseware")
 
 
 class SelfAssessmentModule(openendedchild.OpenEndedChild):
@@ -304,7 +304,7 @@ class SelfAssessmentDescriptor():
             if len(xml_object.xpath(child)) != 1:
                 # This is a staff_facing_error
                 raise ValueError(
-                    "Self assessment definition must include exactly one '{0}' tag. Contact the learning sciences group for assistance.".format(
+                    u"Self assessment definition must include exactly one '{0}' tag. Contact the learning sciences group for assistance.".format(
                         child))
 
         def parse(k):
@@ -318,7 +318,7 @@ class SelfAssessmentDescriptor():
         elt = etree.Element('selfassessment')
 
         def add_child(k):
-            child_str = '<{tag}>{body}</{tag}>'.format(tag=k, body=getattr(self, k))
+            child_str = u'<{tag}>{body}</{tag}>'.format(tag=k, body=getattr(self, k))
             child_node = etree.fromstring(child_str)
             elt.append(child_node)
 

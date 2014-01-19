@@ -4,7 +4,7 @@ sessions. Assumes structure:
 
 /envroot/
         /db   # This is where it'll write the database file
-        /mitx # The location of this repo
+        /edx-platform  # The location of this repo
         /log  # Where we're going to write log files
 """
 
@@ -21,20 +21,24 @@ os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = 'localhost:8000-9000'
 
 # can't test start dates with this True, but on the other hand,
 # can test everything else :)
-MITX_FEATURES['DISABLE_START_DATES'] = True
+FEATURES['DISABLE_START_DATES'] = True
 
 # Most tests don't use the discussion service, so we turn it off to speed them up.
 # Tests that do can enable this flag, but must use the UrlResetMixin class to force urls.py
 # to reload
-MITX_FEATURES['ENABLE_DISCUSSION_SERVICE'] = False
+FEATURES['ENABLE_DISCUSSION_SERVICE'] = False
 
-MITX_FEATURES['ENABLE_SERVICE_STATUS'] = True
+FEATURES['ENABLE_SERVICE_STATUS'] = True
 
-MITX_FEATURES['ENABLE_HINTER_INSTRUCTOR_VIEW'] = True
+FEATURES['ENABLE_HINTER_INSTRUCTOR_VIEW'] = True
 
-MITX_FEATURES['ENABLE_INSTRUCTOR_BETA_DASHBOARD'] = True
+FEATURES['ENABLE_INSTRUCTOR_BETA_DASHBOARD'] = True
 
-MITX_FEATURES['ENABLE_SHOPPING_CART'] = True
+FEATURES['ENABLE_SHOPPING_CART'] = True
+
+# Enable this feature for course staff grade downloads, to enable acceptance tests
+FEATURES['ENABLE_S3_GRADE_DOWNLOADS'] = True
+FEATURES['ALLOW_COURSE_STAFF_GRADE_DOWNLOADS'] = True
 
 # Need wiki for courseware views to work. TODO (vshnayder): shouldn't need it.
 WIKI_ENABLED = True
@@ -130,7 +134,7 @@ DOC_STORE_CONFIG = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': TEST_ROOT / 'db' / 'mitx.db'
+        'NAME': TEST_ROOT / 'db' / 'edx.db'
     },
 
 }
@@ -140,7 +144,7 @@ CACHES = {
     # In staging/prod envs, the sessions also live here.
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'mitx_loc_mem_cache',
+        'LOCATION': 'edx_loc_mem_cache',
         'KEY_FUNCTION': 'util.memcache.safe_key',
     },
 
@@ -161,7 +165,12 @@ CACHES = {
         'LOCATION': '/var/tmp/mongo_metadata_inheritance',
         'TIMEOUT': 300,
         'KEY_FUNCTION': 'util.memcache.safe_key',
-    }
+    },
+    'loc_cache': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'edx_location_mem_cache',
+    },
+
 }
 
 # Dummy secret key for dev
@@ -171,13 +180,13 @@ SECRET_KEY = '85920908f28904ed733fe576320db18cabd7b6cd'
 filterwarnings('ignore', message='No request passed to the backend, unable to rate-limit')
 
 ################################## OPENID #####################################
-MITX_FEATURES['AUTH_USE_OPENID'] = True
-MITX_FEATURES['AUTH_USE_OPENID_PROVIDER'] = True
+FEATURES['AUTH_USE_OPENID'] = True
+FEATURES['AUTH_USE_OPENID_PROVIDER'] = True
 
 ################################## SHIB #######################################
-MITX_FEATURES['AUTH_USE_SHIB'] = True
-MITX_FEATURES['SHIB_DISABLE_TOS'] = True
-MITX_FEATURES['RESTRICT_ENROLL_BY_REG_METHOD'] = True
+FEATURES['AUTH_USE_SHIB'] = True
+FEATURES['SHIB_DISABLE_TOS'] = True
+FEATURES['RESTRICT_ENROLL_BY_REG_METHOD'] = True
 
 OPENID_CREATE_USERS = False
 OPENID_UPDATE_DETAILS_FROM_SREG = True
@@ -186,7 +195,7 @@ OPENID_PROVIDER_TRUSTED_ROOTS = ['*']
 
 ###################### Payment ##############################3
 # Enable fake payment processing page
-MITX_FEATURES['ENABLE_PAYMENT_FAKE'] = True
+FEATURES['ENABLE_PAYMENT_FAKE'] = True
 # Configure the payment processor to use the fake processing page
 # Since both the fake payment page and the shoppingcart app are using
 # the same settings, we can generate this randomly and guarantee
@@ -203,6 +212,10 @@ CC_PROCESSOR['CyberSource']['MERCHANT_ID'] = "edx"
 CC_PROCESSOR['CyberSource']['SERIAL_NUMBER'] = "0123456789012345678901"
 CC_PROCESSOR['CyberSource']['PURCHASE_ENDPOINT'] = "/shoppingcart/payment_fake"
 
+########################### SYSADMIN DASHBOARD ################################
+FEATURES['ENABLE_SYSADMIN_DASHBOARD'] = True
+GIT_REPO_DIR = TEST_ROOT / "course_repos"
+
 ################################# CELERY ######################################
 
 CELERY_ALWAYS_EAGER = True
@@ -217,7 +230,7 @@ STATICFILES_DIRS.append(("uploads", MEDIA_ROOT))
 
 new_staticfiles_dirs = []
 # Strip out any static files that aren't in the repository root
-# so that the tests can run with only the mitx directory checked out
+# so that the tests can run with only the edx-platform directory checked out
 for static_dir in STATICFILES_DIRS:
     # Handle both tuples and non-tuple directory definitions
     try:
@@ -234,6 +247,16 @@ FILE_UPLOAD_HANDLERS = (
     'django.core.files.uploadhandler.MemoryFileUploadHandler',
     'django.core.files.uploadhandler.TemporaryFileUploadHandler',
 )
+
+########################### Server Ports ###################################
+
+# These ports are carefully chosen so that if the browser needs to
+# access them, they will be available through the SauceLabs SSH tunnel
+LETTUCE_SERVER_PORT = 8003
+XQUEUE_PORT = 8040
+YOUTUBE_PORT = 8031
+LTI_PORT = 8765
+
 
 ################### Make tests faster
 
@@ -254,3 +277,33 @@ PASSWORD_HASHERS = (
 
 import openid.oidutil
 openid.oidutil.log = lambda message, level = 0: None
+
+# set up some testing for microsites
+MICROSITE_CONFIGURATION = {
+    "test_microsite": {
+        "domain_prefix": "testmicrosite",
+        "university": "test_microsite",
+        "platform_name": "Test Microsite",
+        "logo_image_url": "test_microsite/images/header-logo.png",
+        "email_from_address": "test_microsite@edx.org",
+        "payment_support_email": "test_microsite@edx.org",
+        "ENABLE_MKTG_SITE": False,
+        "SITE_NAME": "test_microsite.localhost",
+        "course_org_filter": "TestMicrositeX",
+        "course_about_show_social_links": False,
+        "css_overrides_file": "test_microsite/css/test_microsite.css",
+        "show_partners": False,
+        "show_homepage_promo_video": False,
+        "course_index_overlay_text": "This is a Test Microsite Overlay Text.",
+        "course_index_overlay_logo_file": "test_microsite/images/header-logo.png",
+        "homepage_overlay_html": "<h1>This is a Test Microsite Overlay HTML</h1>"
+    }
+}
+
+if len(MICROSITE_CONFIGURATION.keys()) > 0:
+    enable_microsites(
+        MICROSITE_CONFIGURATION,
+        SUBDOMAIN_BRANDING,
+        VIRTUAL_UNIVERSITIES,
+        microsites_root=ENV_ROOT / 'edx-platform' / 'test_microsites'
+    )

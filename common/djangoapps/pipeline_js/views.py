@@ -5,7 +5,7 @@ import json
 from django.conf import settings
 from django.http import HttpResponse
 from staticfiles.storage import staticfiles_storage
-from mitxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response
 
 
 def get_xmodule_urls():

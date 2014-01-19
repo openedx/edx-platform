@@ -4,7 +4,7 @@ sessions. Assumes structure:
 
 /envroot/
         /db   # This is where it'll write the database file
-        /mitx # The location of this repo
+        /edx-platform  # The location of this repo
         /log  # Where we're going to write log files
 """
 
@@ -60,7 +60,7 @@ DOC_STORE_CONFIG = {
 MODULESTORE_OPTIONS = {
     'default_class': 'xmodule.raw_module.RawDescriptor',
     'fs_root': TEST_ROOT / "data",
-    'render_template': 'mitxmako.shortcuts.render_to_string',
+    'render_template': 'edxmako.shortcuts.render_to_string',
 }
 
 MODULESTORE = {
@@ -109,7 +109,7 @@ DATABASES = {
 }
 
 LMS_BASE = "localhost:8000"
-MITX_FEATURES['PREVIEW_LMS_BASE'] = "preview"
+FEATURES['PREVIEW_LMS_BASE'] = "preview"
 
 CACHES = {
     # This is the cache used for most things. Askbot will not work without a
@@ -117,7 +117,7 @@ CACHES = {
     # In staging/prod envs, the sessions also live here.
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'mitx_loc_mem_cache',
+        'LOCATION': 'edx_loc_mem_cache',
         'KEY_FUNCTION': 'util.memcache.safe_key',
     },
 
@@ -138,7 +138,12 @@ CACHES = {
         'LOCATION': '/var/tmp/mongo_metadata_inheritance',
         'TIMEOUT': 300,
         'KEY_FUNCTION': 'util.memcache.safe_key',
-    }
+    },
+    'loc_cache': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'edx_location_mem_cache',
+    },
+
 }
 
 # hide ratelimit warnings while running tests
@@ -149,6 +154,17 @@ filterwarnings('ignore', message='No request passed to the backend, unable to ra
 CELERY_ALWAYS_EAGER = True
 CELERY_RESULT_BACKEND = 'cache'
 BROKER_TRANSPORT = 'memory'
+
+
+########################### Server Ports ###################################
+
+# These ports are carefully chosen so that if the browser needs to
+# access them, they will be available through the SauceLabs SSH tunnel
+LETTUCE_SERVER_PORT = 8003
+XQUEUE_PORT = 8040
+YOUTUBE_PORT = 8031
+LTI_PORT = 8765
+
 
 ################### Make tests faster
 # http://slacy.com/blog/2012/04/make-your-tests-faster-in-django-1-4/
@@ -161,9 +177,9 @@ PASSWORD_HASHERS = (
 SEGMENT_IO_KEY = '***REMOVED***'
 
 # disable NPS survey in test mode
-MITX_FEATURES['STUDIO_NPS_SURVEY'] = False
+FEATURES['STUDIO_NPS_SURVEY'] = False
 
-MITX_FEATURES['ENABLE_SERVICE_STATUS'] = True
+FEATURES['ENABLE_SERVICE_STATUS'] = True
 
 # This is to disable a test under the common directory that will not pass when run under CMS
-MITX_FEATURES['DISABLE_PASSWORD_RESET_EMAIL_TEST'] = True
+FEATURES['DISABLE_RESET_EMAIL_TEST'] = True

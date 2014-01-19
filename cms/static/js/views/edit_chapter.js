@@ -1,7 +1,7 @@
-define(["backbone", "underscore", "underscore.string", "jquery", "gettext", "js/models/uploads", "js/views/uploads"],
-        function(Backbone, _, str, $, gettext, FileUploadModel, UploadDialogView) {
+define(["js/views/baseview", "underscore", "underscore.string", "jquery", "gettext", "js/models/uploads", "js/views/uploads"],
+        function(BaseView, _, str, $, gettext, FileUploadModel, UploadDialogView) {
     _.str = str; // used in template
-    var EditChapter = Backbone.View.extend({
+    var EditChapter = BaseView.extend({
         initialize: function() {
             this.template = _.template($("#edit-chapter-tpl").text());
             this.listenTo(this.model, "change", this.render);
@@ -53,7 +53,7 @@ define(["backbone", "underscore", "underscore.string", "jquery", "gettext", "js/
             });
             var msg = new FileUploadModel({
                 title: _.template(gettext("Upload a new PDF to “<%= name %>”"),
-                    {name: section.escape('name')}),
+                    {name: course.escape('name')}),
                 message: "Files must be in PDF format.",
                 mimeTypes: ['application/pdf']
             });

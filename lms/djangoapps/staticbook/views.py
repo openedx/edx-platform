@@ -4,7 +4,7 @@ Views for serving static textbooks.
 
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
-from mitxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response
 
 from courseware.access import has_access
 from courseware.courses import get_course_with_access

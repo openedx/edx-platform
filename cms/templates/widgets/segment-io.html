@@ -1,9 +1,20 @@
-% if settings.MITX_FEATURES.get('SEGMENT_IO'):
+<%!
+from xmodule.modulestore.django import loc_mapper
+%>
+
+% if context_course:
+<%
+    ctx_loc = context_course.location
+    locator = loc_mapper().translate_location(ctx_loc.course_id, ctx_loc, False, True)
+%>
+% endif
+
+% if settings.FEATURES.get('SEGMENT_IO'):
 <!-- begin Segment.io -->
 <script type="text/javascript">
   // if inside course, inject the course location into the JS namespace
   %if context_course:
-  var course_location_analytics = "${context_course.location}";
+      var course_location_analytics = "${locator}";
   %endif
 
   var analytics=analytics||[];analytics.load=function(e){var t=document.createElement("script");t.type="text/javascript",t.async=!0,t.src=("https:"===document.location.protocol?"https://":"http://")+"d2dq2ahtl5zl1z.cloudfront.net/analytics.js/v1/"+e+"/analytics.min.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(t,n);var r=function(e){return function(){analytics.push([e].concat(Array.prototype.slice.call(arguments,0)))}},i=["identify","track","trackLink","trackForm","trackClick","trackSubmit","pageview","ab","alias","ready"];for(var s=0;s<i.length;s++)analytics[i[s]]=r(i[s])};
@@ -22,7 +33,7 @@
 <!-- dummy segment.io -->
 <script type="text/javascript">
   %if context_course:
-  var course_location_analytics = "${context_course.location}";
+  var course_location_analytics = "${locator}";
   %endif
   var analytics = {
     "track": function() {}

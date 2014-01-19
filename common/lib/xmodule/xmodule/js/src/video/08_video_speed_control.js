@@ -8,15 +8,19 @@ function () {
 
     // VideoSpeedControl() function - what this module "exports".
     return function (state) {
+        var dfd = $.Deferred();
+
+        if (state.isTouch) {
+            // iOS doesn't support speed change
+            state.el.find('div.speeds').remove();
+            dfd.resolve();
+            return dfd.promise();
+        }
+
         state.videoSpeedControl = {};
 
-        if (state.videoType === 'html5') {
-            _initialize(state);
-        } else if (state.videoType === 'youtube' && state.youtubeXhr) {
-            state.youtubeXhr.done(function () {
-                _initialize(state);
-            });
-        }
+        _initialize(state);
+        dfd.resolve();
 
         if (state.videoType === 'html5' && !(_checkPlaybackRates())) {
             console.log(
@@ -24,9 +28,9 @@ function () {
             );
 
             _hideSpeedControl(state);
-
-            return;
         }
+
+        return dfd.promise();
     };
 
     // ***************************************************************
@@ -134,7 +138,7 @@ function () {
         state.videoSpeedControl.videoSpeedsEl.find('a')
             .on('click', state.videoSpeedControl.changeVideoSpeed);
 
-        if (onTouchBasedDevice()) {
+        if (state.isTouch) {
             state.videoSpeedControl.el.on('click', function (event) {
                 // So that you can't highlight this control via a drag
                 // operation, we disable the default browser actions on a

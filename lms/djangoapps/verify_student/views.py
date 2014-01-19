@@ -6,7 +6,7 @@ import json
 import logging
 import decimal
 
-from mitxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response
 
 from django.conf import settings
 from django.core.urlresolvers import reverse

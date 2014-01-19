@@ -44,7 +44,7 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
 
 # Enable Berkeley forums
-MITX_FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
+FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
 
 # IMPORTANT: With this enabled, the server must always be behind a proxy that
 # strips the header HTTP_X_FORWARDED_PROTO from client requests. Otherwise,
@@ -86,6 +86,7 @@ CELERY_DEFAULT_EXCHANGE = 'edx.{0}core'.format(QUEUE_VARIANT)
 HIGH_PRIORITY_QUEUE = 'edx.{0}core.high'.format(QUEUE_VARIANT)
 DEFAULT_PRIORITY_QUEUE = 'edx.{0}core.default'.format(QUEUE_VARIANT)
 LOW_PRIORITY_QUEUE = 'edx.{0}core.low'.format(QUEUE_VARIANT)
+HIGH_MEM_QUEUE = 'edx.{0}core.high_mem'.format(QUEUE_VARIANT)
 
 CELERY_DEFAULT_QUEUE = DEFAULT_PRIORITY_QUEUE
 CELERY_DEFAULT_ROUTING_KEY = DEFAULT_PRIORITY_QUEUE
@@ -93,8 +94,18 @@ CELERY_DEFAULT_ROUTING_KEY = DEFAULT_PRIORITY_QUEUE
 CELERY_QUEUES = {
     HIGH_PRIORITY_QUEUE: {},
     LOW_PRIORITY_QUEUE: {},
-    DEFAULT_PRIORITY_QUEUE: {}
+    DEFAULT_PRIORITY_QUEUE: {},
+    HIGH_MEM_QUEUE: {},
 }
+
+# If we're a worker on the high_mem queue, set ourselves to die after processing
+# one request to avoid having memory leaks take down the worker server. This env
+# var is set in /etc/init/edx-workers.conf -- this should probably be replaced
+# with some celery API call to see what queue we started listening to, but I
+# don't know what that call is or if it's active at this point in the code.
+if os.environ.get('QUEUE') == 'high_mem':
+    CELERYD_MAX_TASKS_PER_CHILD = 1
+
 
 ########################## NON-SECURE ENV CONFIG ##############################
 # Things like server locations, ports, etc.
@@ -107,6 +118,15 @@ with open(CONFIG_ROOT / CONFIG_PREFIX + "env.json") as env_file:
 STATIC_ROOT_BASE = ENV_TOKENS.get('STATIC_ROOT_BASE', None)
 if STATIC_ROOT_BASE:
     STATIC_ROOT = path(STATIC_ROOT_BASE)
+
+
+# STATIC_URL_BASE specifies the base url to use for static files
+STATIC_URL_BASE = ENV_TOKENS.get('STATIC_URL_BASE', None)
+if STATIC_URL_BASE:
+    # collectstatic will fail if STATIC_URL is a unicode string
+    STATIC_URL = STATIC_URL_BASE.encode('ascii')
+    if not STATIC_URL.endswith("/"):
+        STATIC_URL += "/"
 
 PLATFORM_NAME = ENV_TOKENS.get('PLATFORM_NAME', PLATFORM_NAME)
 # For displaying on the receipt. At Stanford PLATFORM_NAME != MERCHANT_NAME, but PLATFORM_NAME is a fine default
@@ -148,6 +168,10 @@ PAYMENT_SUPPORT_EMAIL = ENV_TOKENS.get('PAYMENT_SUPPORT_EMAIL', PAYMENT_SUPPORT_
 PAID_COURSE_REGISTRATION_CURRENCY = ENV_TOKENS.get('PAID_COURSE_REGISTRATION_CURRENCY',
                                                    PAID_COURSE_REGISTRATION_CURRENCY)
 
+# Payment Report Settings
+PAYMENT_REPORT_GENERATOR_GROUP = ENV_TOKENS.get('PAYMENT_REPORT_GENERATOR_GROUP', PAYMENT_REPORT_GENERATOR_GROUP)
+PAYMENT_REPORT_MAX_ITEMS = ENV_TOKENS.get('PAYMENT_REPORT_MAX_ITEMS', PAYMENT_REPORT_MAX_ITEMS)
+
 # Bulk Email overrides
 BULK_EMAIL_DEFAULT_FROM_EMAIL = ENV_TOKENS.get('BULK_EMAIL_DEFAULT_FROM_EMAIL', BULK_EMAIL_DEFAULT_FROM_EMAIL)
 BULK_EMAIL_EMAILS_PER_TASK = ENV_TOKENS.get('BULK_EMAIL_EMAILS_PER_TASK', BULK_EMAIL_EMAILS_PER_TASK)
@@ -164,14 +188,6 @@ BULK_EMAIL_ROUTING_KEY = HIGH_PRIORITY_QUEUE
 
 # Theme overrides
 THEME_NAME = ENV_TOKENS.get('THEME_NAME', None)
-# Workaround for setting THEME_NAME to an empty
-# string which is the default due to this ansible
-# bug: https://github.com/ansible/ansible/issues/4812
-if THEME_NAME == "":
-    THEME_NAME = None
-if not THEME_NAME is None:
-    enable_theme(THEME_NAME)
-    FAVICON_PATH = 'themes/%s/images/favicon.ico' % THEME_NAME
 
 # Marketing link overrides
 MKTG_URL_LINK_MAP.update(ENV_TOKENS.get('MKTG_URL_LINK_MAP', {}))
@@ -188,8 +204,9 @@ USE_I18N = ENV_TOKENS.get('USE_I18N', USE_I18N)
 for app in ENV_TOKENS.get('ADDL_INSTALLED_APPS', []):
     INSTALLED_APPS += (app,)
 
-for feature, value in ENV_TOKENS.get('MITX_FEATURES', {}).items():
-    MITX_FEATURES[feature] = value
+ENV_FEATURES = ENV_TOKENS.get('FEATURES', ENV_TOKENS.get('MITX_FEATURES', {}))
+for feature, value in ENV_FEATURES.items():
+    FEATURES[feature] = value
 
 WIKI_ENABLED = ENV_TOKENS.get('WIKI_ENABLED', WIKI_ENABLED)
 local_loglevel = ENV_TOKENS.get('LOCAL_LOGLEVEL', 'INFO')
@@ -212,6 +229,10 @@ ZENDESK_URL = ENV_TOKENS.get("ZENDESK_URL")
 FEEDBACK_SUBMISSION_EMAIL = ENV_TOKENS.get("FEEDBACK_SUBMISSION_EMAIL")
 MKTG_URLS = ENV_TOKENS.get('MKTG_URLS', MKTG_URLS)
 
+# git repo loading  environment
+GIT_REPO_DIR = ENV_TOKENS.get('GIT_REPO_DIR', '/edx/var/edxapp/course_repos')
+GIT_IMPORT_STATIC = ENV_TOKENS.get('GIT_IMPORT_STATIC', True)
+
 for name, value in ENV_TOKENS.get("CODE_JAIL", {}).items():
     oldvalue = CODE_JAIL.get(name)
     if isinstance(oldvalue, dict):
@@ -226,6 +247,11 @@ COURSES_WITH_UNSAFE_CODE = ENV_TOKENS.get("COURSES_WITH_UNSAFE_CODE", [])
 if "TRACKING_IGNORE_URL_PATTERNS" in ENV_TOKENS:
     TRACKING_IGNORE_URL_PATTERNS = ENV_TOKENS.get("TRACKING_IGNORE_URL_PATTERNS")
 
+# SSL external authentication settings
+SSL_AUTH_EMAIL_DOMAIN = ENV_TOKENS.get("SSL_AUTH_EMAIL_DOMAIN", "MIT.EDU")
+SSL_AUTH_DN_FORMAT_STRING = ENV_TOKENS.get("SSL_AUTH_DN_FORMAT_STRING",
+                                           "/C=US/ST=Massachusetts/O=Massachusetts Institute of Technology/OU=Client CA v1/CN={0}/emailAddress={1}")
+
 ############################## SECURE AUTH ITEMS ###############
 # Secret things: passwords, access keys, etc.
 
@@ -236,14 +262,20 @@ with open(CONFIG_ROOT / CONFIG_PREFIX + "auth.json") as auth_file:
 # If Segment.io key specified, load it and enable Segment.io if the feature flag is set
 SEGMENT_IO_LMS_KEY = AUTH_TOKENS.get('SEGMENT_IO_LMS_KEY')
 if SEGMENT_IO_LMS_KEY:
-    MITX_FEATURES['SEGMENT_IO_LMS'] = ENV_TOKENS.get('SEGMENT_IO_LMS', False)
+    FEATURES['SEGMENT_IO_LMS'] = ENV_TOKENS.get('SEGMENT_IO_LMS', False)
 
 CC_PROCESSOR = AUTH_TOKENS.get('CC_PROCESSOR', CC_PROCESSOR)
 
 SECRET_KEY = AUTH_TOKENS['SECRET_KEY']
 
 AWS_ACCESS_KEY_ID = AUTH_TOKENS["AWS_ACCESS_KEY_ID"]
+if AWS_ACCESS_KEY_ID == "":
+    AWS_ACCESS_KEY_ID = None
+
 AWS_SECRET_ACCESS_KEY = AUTH_TOKENS["AWS_SECRET_ACCESS_KEY"]
+if AWS_SECRET_ACCESS_KEY == "":
+    AWS_SECRET_ACCESS_KEY = None
+
 AWS_STORAGE_BUCKET_NAME = AUTH_TOKENS.get('AWS_STORAGE_BUCKET_NAME', 'eduolimpiadaru')
 
 DATABASES = AUTH_TOKENS['DATABASES']
@@ -255,18 +287,13 @@ XQUEUE_INTERFACE = AUTH_TOKENS['XQUEUE_INTERFACE']
 MODULESTORE = AUTH_TOKENS.get('MODULESTORE', MODULESTORE)
 CONTENTSTORE = AUTH_TOKENS.get('CONTENTSTORE', CONTENTSTORE)
 DOC_STORE_CONFIG = AUTH_TOKENS.get('DOC_STORE_CONFIG',DOC_STORE_CONFIG)
+MONGODB_LOG = AUTH_TOKENS.get('MONGODB_LOG', {})
 
 OPEN_ENDED_GRADING_INTERFACE = AUTH_TOKENS.get('OPEN_ENDED_GRADING_INTERFACE',
                                                OPEN_ENDED_GRADING_INTERFACE)
 
 EMAIL_HOST_USER = AUTH_TOKENS.get('EMAIL_HOST_USER', '')  # django default is ''
 EMAIL_HOST_PASSWORD = AUTH_TOKENS.get('EMAIL_HOST_PASSWORD', '')  # django default is ''
-
-PEARSON_TEST_USER = "pearsontest"
-PEARSON_TEST_PASSWORD = AUTH_TOKENS.get("PEARSON_TEST_PASSWORD")
-
-# Pearson hash for import/export
-PEARSON = AUTH_TOKENS.get("PEARSON")
 
 # Datadog for events!
 DATADOG = AUTH_TOKENS.get("DATADOG", {})
@@ -305,3 +332,18 @@ TRACKING_BACKENDS.update(AUTH_TOKENS.get("TRACKING_BACKENDS", {}))
 
 # Student identity verification settings
 VERIFY_STUDENT = AUTH_TOKENS.get("VERIFY_STUDENT", VERIFY_STUDENT)
+
+# Grades download
+GRADES_DOWNLOAD_ROUTING_KEY = HIGH_MEM_QUEUE
+
+GRADES_DOWNLOAD = ENV_TOKENS.get("GRADES_DOWNLOAD", GRADES_DOWNLOAD)
+
+MICROSITE_CONFIGURATION = ENV_TOKENS.get('MICROSITE_CONFIGURATION', {})
+MICROSITE_ROOT_DIR = ENV_TOKENS.get('MICROSITE_ROOT_DIR')
+if MICROSITE_CONFIGURATION:
+    enable_microsites(
+        MICROSITE_CONFIGURATION,
+        SUBDOMAIN_BRANDING,
+        VIRTUAL_UNIVERSITIES,
+        microsites_root=path(MICROSITE_ROOT_DIR)
+    )

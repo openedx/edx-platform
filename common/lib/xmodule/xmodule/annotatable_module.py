@@ -51,7 +51,7 @@ class AnnotatableModule(AnnotatableFields, XModule):
     icon_class = 'annotatable'
 
     def __init__(self, *args, **kwargs):
-        XModule.__init__(self, *args, **kwargs)
+        super(AnnotatableModule, self).__init__(*args, **kwargs)
 
         xmltree = etree.fromstring(self.data)
 

@@ -2,19 +2,26 @@
 #pylint: disable=W0621
 
 from lettuce import world
+
 import time
 import json
 import re
 import platform
+
+# django_url is assigned late in the process of loading lettuce,
+# so we import this as a module, and then read django_url from
+# it to get the correct value
+import lettuce.django
+
+
 from textwrap import dedent
 from urllib import quote_plus
 from selenium.common.exceptions import (
     WebDriverException, TimeoutException,
-    StaleElementReferenceException)
+    StaleElementReferenceException, InvalidElementStateException)
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
-from lettuce.django import django_url
 from nose.tools import assert_true  # pylint: disable=E0611
 
 
@@ -31,7 +38,7 @@ REQUIREJS_WAIT = {
 
     # Individual Unit (editing)
     re.compile('^Individual Unit \|'): [
-        "js/base", "coffee/src/models/module", "coffee/src/views/unit",
+        "js/base", "coffee/src/views/unit",
         "coffee/src/views/module_edit"],
 
     # Content - Outline
@@ -247,13 +254,13 @@ def wait_for_ajax_complete():
 
 @world.absorb
 def visit(url):
-    world.browser.visit(django_url(url))
+    world.browser.visit(lettuce.django.django_url(url))
     wait_for_js_to_load()
 
 
 @world.absorb
 def url_equals(url):
-    return world.browser.url == django_url(url)
+    return world.browser.url == lettuce.django.django_url(url)
 
 
 @world.absorb
@@ -546,18 +553,21 @@ def save_the_html(path='/tmp'):
 
 @world.absorb
 def click_course_content():
+    world.wait_for_js_to_load()
     course_content_css = 'li.nav-course-courseware'
     css_click(course_content_css)
 
 
 @world.absorb
 def click_course_settings():
+    world.wait_for_js_to_load()
     course_settings_css = 'li.nav-course-settings'
     css_click(course_settings_css)
 
 
 @world.absorb
 def click_tools():
+    world.wait_for_js_to_load()
     tools_css = 'li.nav-course-tools'
     css_click(tools_css)
 
@@ -578,7 +588,7 @@ def trigger_event(css_selector, event='change', index=0):
 
 
 @world.absorb
-def retry_on_exception(func, max_attempts=5, ignored_exceptions=StaleElementReferenceException):
+def retry_on_exception(func, max_attempts=5, ignored_exceptions=(StaleElementReferenceException, InvalidElementStateException)):
     """
     Retry the interaction, ignoring the passed exceptions.
     By default ignore StaleElementReferenceException, which happens often in our application

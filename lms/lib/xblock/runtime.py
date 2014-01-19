@@ -58,24 +58,61 @@ def unquote_slashes(text):
     return re.sub(r'(;;|;_)', _unquote_slashes, text)
 
 
-def handler_url(course_id, block, handler, suffix='', query=''):
+def handler_url(course_id, block, handler, suffix='', query='', thirdparty=False):
     """
-    Return an xblock handler url for the specified course, block and handler
+    Return an XBlock handler url for the specified course, block and handler.
+
+    If handler is an empty string, this function is being used to create a
+    prefix of the general URL, which is assumed to be followed by handler name
+    and suffix.
+
+    If handler is specified, then it is checked for being a valid handler
+    function, and ValueError is raised if not.
+
     """
-    return reverse('xblock_handler', kwargs={
+    view_name = 'xblock_handler'
+    if handler:
+        # Be sure this is really a handler.
+        func = getattr(block, handler, None)
+        if not func:
+            raise ValueError("{!r} is not a function name".format(handler))
+        if not getattr(func, "_is_xblock_handler", False):
+            raise ValueError("{!r} is not a handler name".format(handler))
+
+    if thirdparty:
+        view_name = 'xblock_handler_noauth'
+
+    url = reverse(view_name, kwargs={
         'course_id': course_id,
         'usage_id': quote_slashes(str(block.scope_ids.usage_id)),
         'handler': handler,
         'suffix': suffix,
-    }) + '?' + query
+    })
+
+    # If suffix is an empty string, remove the trailing '/'
+    if not suffix:
+        url = url.rstrip('/')
+
+    # If there is a query string, append it
+    if query:
+        url += '?' + query
+
+    return url
 
 
 def handler_prefix(course_id, block):
     """
-    Returns a prefix for use by the javascript handler_url function.
-    The prefix is a valid handler url the handler name is appended to it.
+    Returns a prefix for use by the Javascript handler_url function.
+
+    The prefix is a valid handler url after the handler name is slash-appended
+    to it.
     """
-    return handler_url(course_id, block, '').rstrip('/')
+    # This depends on handler url having the handler_name as the final piece of the url
+    # so that leaving an empty handler_name really does leave the opportunity to append
+    # the handler_name on the frontend
+
+    # This is relied on by the xblock/runtime.v1.coffee frontend handlerUrl function
+    return handler_url(course_id, block, '').rstrip('/?')
 
 
 class LmsHandlerUrls(object):
@@ -86,10 +123,11 @@ class LmsHandlerUrls(object):
     This must be mixed in to a runtime that already accepts and stores
     a course_id
     """
-
-    def handler_url(self, block, handler_name, suffix='', query=''):  # pylint: disable=unused-argument
+    # pylint: disable=unused-argument
+    # pylint: disable=no-member
+    def handler_url(self, block, handler_name, suffix='', query='', thirdparty=False):
         """See :method:`xblock.runtime:Runtime.handler_url`"""
-        return handler_url(self.course_id, block, handler_name, suffix='', query='')  # pylint: disable=no-member
+        return handler_url(self.course_id, block, handler_name, suffix='', query='', thirdparty=thirdparty)
 
 
 class LmsModuleSystem(LmsHandlerUrls, ModuleSystem):  # pylint: disable=abstract-method

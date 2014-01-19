@@ -1,19 +1,9 @@
 <%! from django.utils.translation import ugettext as _ %>
-<%! from django.core.urlresolvers import reverse %>
 <%inherit file="../main.html" />
 
-<%namespace name='static' file='../static_content.html'/>
+<%block name="title"><title>${_("Help")}</title></%block>
 
-<%block name="title"><title>${_("{edX} Help").format(edX="edX")}</title></%block>
-
-<%block name="js_extra">
-<script src="${static.url('js/help.js')}"></script>
-</%block>
-
-<section class="static-container help">
-  <h1>${_("Help")}</h1>
-  <hr class="horizontal-divider">
-
-  <p>Страница находится в стадии разработки.</p>
-
+<section class="container about">
+<h1>${_("Help")}</h1>
+<p>${_("This page left intentionally blank. It is not used by edx.org but is left here for possible use by installations of Open edX.")}</p>
 </section>

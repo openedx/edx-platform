@@ -404,3 +404,11 @@ table {
     border-collapse: collapse;
     border-spacing: 0;
 }
+
+/**
+ * Hide staticpage preview on load (Studio).
+ */
+
+#preview-lms-staticpages {
+    display: none;
+}

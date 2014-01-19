@@ -4,7 +4,7 @@
 <script type="text/template" id="thread-template">
     <article class="discussion-article" data-id="${'<%- id %>'}">
         <div class="thread-content-wrapper"></div>
-        
+
         <ol class="responses">
             <li class="loading"><div class="loading-animation"><span class="sr">Loading content</span></div></li>
         </ol>
@@ -29,10 +29,10 @@
       <header>
       ${"<% if (obj.group_id) { %>"}
       <div class="group-visibility-label">${"<%- obj.group_string%>"}</div>
-              ${"<% }  %>"}      
-      
-          <a href="#" class="vote-btn discussion-vote discussion-vote-up" data-role="discussion-vote" data-tooltip="${_('vote')}">
-          <span class="plus-icon">+</span> <span class='votes-count-number'>${'<%- votes["up_count"] %>'}<span class="sr">${_("votes (click to vote)")}</span></span></a>
+              ${"<% }  %>"}
+
+          <a href="#" class="vote-btn" data-tooltip="vote" role="button" aria-pressed="false">
+          <span class="plus-icon"/><span class='votes-count-number'>${'<%- votes["up_count"] %>'}</span> <span class="sr">votes (click to vote)</span></a>
           <h1>${'<%- title %>'}</h1>
           <p class="posted-details">
               ${"<% if (obj.username) { %>"}
@@ -52,8 +52,8 @@
       <div class="post-body">${'<%- body %>'}</div>
       <div class="discussion-flag-abuse notflagged" data-role="thread-flag" role="button" aria-pressed="false" tabindex="0">
       <i class="icon icon-flag"></i><span class="flag-label">${_("Report Misuse")}</span></div>
-        
-        
+
+
       % if course and has_permission(user, 'openclose_thread', course.id):
       <div class="admin-pin discussion-pin notpinned" data-role="thread-pin" data-tooltip="${_('pin this thread')}">
       <i class="icon icon-pushpin"></i><span class="pin-label">${_("Pin Thread")}</span></div>
@@ -62,10 +62,10 @@
       ${"<% if (pinned) { %>"}
       <div class="discussion-pin notpinned" data-role="thread-pin" data-tooltip="${_('pin this thread')}">
       <i class="icon icon-pushpin"></i><span class="pin-label">${_("Pin Thread")}</span></div>
-      ${"<% }  %>"}  
+      ${"<% }  %>"}
       % endif
-      
-      
+
+
       ${'<% if (obj.courseware_url) { %>'}
       <div class="post-context">
           (${_("this post is about ")}<a href="${'<%- courseware_url%>'}">${'<%- courseware_title %>'}</a>)
@@ -123,8 +123,8 @@
 
 <script type="text/template" id="thread-response-show-template">
     <header class="response-local">
-        <a href="javascript:void(0)" class="vote-btn" data-tooltip="${_('vote')}"><span class="plus-icon"></span><span class="votes-count-number">${"<%- votes['up_count'] %>"}<span class="sr">${_("votes (click to vote)")}</span></span></a>
-        <a href="javascript:void(0)" class="endorse-btn${'<% if (endorsed) { %> is-endorsed<% } %>'} action-endorse" style="cursor: default; display: none;" data-tooltip="${_('endorse')}"><span class="check-icon" style="pointer-events: none; "></span></a>
+        <a href="#" class="vote-btn" data-tooltip="vote" role="button" aria-pressed="false"><span class="plus-icon"/><span class="votes-count-number">${"<%- votes['up_count'] %>"}</span> <span class="sr">votes (click to vote)</span></a>
+        <a href="javascript:void(0)" class="endorse-btn${'<% if (endorsed) { %> is-endorsed<% } %>'} action-endorse" style="cursor: default; display: none;" data-tooltip="endorse"><span class="check-icon" style="pointer-events: none; "></span></a>
         ${"<% if (obj.username) { %>"}
         <a href="${'<%- user_url %>'}" class="posted-by">${'<%- username %>'}</a>
         ${"<% } else {print('<span class=\"anonymous\"><em>' + _('anonymous') + '</em></span>');} %>"}
@@ -184,8 +184,8 @@
   % if course and course.display_name_with_default:
   <h1 class="home-title">${course.display_name_with_default}</h1>
   </section>
-  
-  % if settings.MITX_FEATURES.get('ENABLE_DISCUSSION_HOME_PANEL'):
+
+  % if settings.FEATURES.get('ENABLE_DISCUSSION_HOME_PANEL'):
   <span class="label label-settings">HOW TO USE EDX DISCUSSIONS</span>
   <table class="home-helpgrid">
   <tr class="helpgrid-row helpgrid-row-navigation">
@@ -231,5 +231,5 @@
   % endif
   % endif
 
-  </div>    
+  </div>
 </script>

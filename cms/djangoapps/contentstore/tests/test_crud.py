@@ -5,11 +5,12 @@ from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.django import modulestore, loc_mapper, clear_existing_modulestores
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.capa_module import CapaDescriptor
-from xmodule.modulestore.locator import CourseLocator, BlockUsageLocator
+from xmodule.modulestore.locator import CourseLocator, BlockUsageLocator, LocalId
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.html_module import HtmlDescriptor
 from xmodule.modulestore import inheritance
-from xmodule.x_module import XModuleDescriptor
+from xmodule.x_module import prefer_xmodules
+from xblock.core import XBlock
 
 
 class TemplateTests(unittest.TestCase):
@@ -64,7 +65,7 @@ class TemplateTests(unittest.TestCase):
         self.assertIsInstance(test_chapter, SequenceDescriptor)
         # refetch parent which should now point to child
         test_course = modulestore('split').get_course(test_chapter.location)
-        self.assertIn(test_chapter.location.usage_id, test_course.children)
+        self.assertIn(test_chapter.location.block_id, test_course.children)
 
     def test_temporary_xblocks(self):
         """
@@ -95,16 +96,25 @@ class TemplateTests(unittest.TestCase):
         """
         try saving temporary xblocks
         """
-        test_course = persistent_factories.PersistentCourseFactory.create(org='testx', prettyid='tempcourse',
+        test_course = persistent_factories.PersistentCourseFactory.create(
+            org='testx', prettyid='tempcourse',
             display_name='fun test course', user_id='testbot')
         test_chapter = self.load_from_json({'category': 'chapter',
             'fields': {'display_name': 'chapter n'}},
             test_course.system, parent_xblock=test_course)
         test_def_content = '<problem>boo</problem>'
         # create child
-        _ = self.load_from_json({'category': 'problem',
-            'fields': {'data': test_def_content}},
-            test_course.system, parent_xblock=test_chapter)
+        new_block = self.load_from_json({
+            'category': 'problem',
+            'fields': {
+                'data': test_def_content,
+                'display_name': 'problem'
+            }},
+            test_course.system,
+            parent_xblock=test_chapter
+        )
+        self.assertIsNotNone(new_block.definition_locator)
+        self.assertTrue(isinstance(new_block.definition_locator.definition_id, LocalId))
         # better to pass in persisted parent over the subdag so
         # subdag gets the parent pointer (otherwise 2 ops, persist dag, update parent children,
         # persist parent
@@ -117,6 +127,10 @@ class TemplateTests(unittest.TestCase):
         persisted_problem = persisted_chapter.get_children()[0]
         self.assertEqual(persisted_problem.category, 'problem')
         self.assertEqual(persisted_problem.data, test_def_content)
+        # update it
+        persisted_problem.display_name = 'altered problem'
+        persisted_problem = modulestore('split').persist_xblock_dag(persisted_problem, 'testbot')
+        self.assertEqual(persisted_problem.display_name, 'altered problem')
 
     def test_delete_course(self):
         test_course = persistent_factories.PersistentCourseFactory.create(
@@ -127,13 +141,13 @@ class TemplateTests(unittest.TestCase):
         persistent_factories.ItemFactory.create(display_name='chapter 1',
             parent_location=test_course.location)
 
-        id_locator = CourseLocator(course_id=test_course.location.course_id, branch='draft')
+        id_locator = CourseLocator(package_id=test_course.location.package_id, branch='draft')
         guid_locator = CourseLocator(version_guid=test_course.location.version_guid)
         # verify it can be retireved by id
         self.assertIsInstance(modulestore('split').get_course(id_locator), CourseDescriptor)
         # and by guid
         self.assertIsInstance(modulestore('split').get_course(guid_locator), CourseDescriptor)
-        modulestore('split').delete_course(id_locator.course_id)
+        modulestore('split').delete_course(id_locator.package_id)
         # test can no longer retrieve by id
         self.assertRaises(ItemNotFoundError, modulestore('split').get_course, id_locator)
         # but can by guid
@@ -166,7 +180,7 @@ class TemplateTests(unittest.TestCase):
 
         second_problem = persistent_factories.ItemFactory.create(
             display_name='problem 2',
-            parent_location=BlockUsageLocator(updated_loc, usage_id=sub.location.usage_id),
+            parent_location=BlockUsageLocator(updated_loc, block_id=sub.location.block_id),
             user_id='testbot', category='problem',
             data="<problem></problem>"
         )
@@ -235,9 +249,10 @@ class TemplateTests(unittest.TestCase):
         - 'definition':
         - '_id' (optional): the usage_id of this. Will generate one if not given one.
         """
-        class_ = XModuleDescriptor.load_class(
+        class_ = XBlock.load_class(
             json_data.get('category', json_data.get('location', {}).get('category')),
-            default_class
+            default_class,
+            select=prefer_xmodules
         )
         usage_id = json_data.get('_id', None)
         if not '_inherited_settings' in json_data and parent_xblock is not None:

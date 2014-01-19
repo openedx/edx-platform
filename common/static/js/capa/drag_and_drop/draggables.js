@@ -1,5 +1,5 @@
 (function (requirejs, require, define) {
-define(['js/capa/drag_and_drop/logme', 'js/capa/drag_and_drop/draggable_events', 'js/capa/drag_and_drop/draggable_logic'], function (logme, draggableEvents, draggableLogic) {
+define(['js/capa/drag_and_drop/draggable_events', 'js/capa/drag_and_drop/draggable_logic'], function (draggableEvents, draggableLogic) {
     return {
         'init': init
     };
@@ -307,5 +307,5 @@ define(['js/capa/drag_and_drop/logme', 'js/capa/drag_and_drop/draggable_events',
         state.numDraggablesInSlider += 1;
         draggableObj.stateDraggablesIndex = state.draggables.push(draggableObj) - 1;
     }
-}); // End-of: define(['logme', 'draggable_events', 'draggable_logic'], function (logme, draggableEvents, draggableLogic) {
+}); // End-of: define(['draggable_events', 'draggable_logic'], function (draggableEvents, draggableLogic) {
 }(RequireJS.requirejs, RequireJS.require, RequireJS.define)); // End-of: (function (requirejs, require, define) {

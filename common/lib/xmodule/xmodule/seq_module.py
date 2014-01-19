@@ -38,7 +38,7 @@ class SequenceModule(SequenceFields, XModule):
 
 
     def __init__(self, *args, **kwargs):
-        XModule.__init__(self, *args, **kwargs)
+        super(SequenceModule, self).__init__(*args, **kwargs)
 
         # if position is specified in system, then use that instead
         if getattr(self.system, 'position', None) is not None:
@@ -131,7 +131,7 @@ class SequenceDescriptor(SequenceFields, MakoModuleDescriptor, XmlDescriptor):
             except Exception as e:
                 log.exception("Unable to load child when parsing Sequence. Continuing...")
                 if system.error_tracker is not None:
-                    system.error_tracker("ERROR: " + unicode(e))
+                    system.error_tracker(u"ERROR: {0}".format(e))
                 continue
         return {}, children
 

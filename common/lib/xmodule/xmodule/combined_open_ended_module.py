@@ -4,14 +4,14 @@ from lxml import etree
 from pkg_resources import resource_string
 
 from xmodule.raw_module import RawDescriptor
-from .x_module import XModule
+from .x_module import XModule, module_attr
 from xblock.fields import Integer, Scope, String, List, Float, Boolean
 from xmodule.open_ended_grading_classes.combined_open_ended_modulev1 import CombinedOpenEndedV1Module, CombinedOpenEndedV1Descriptor
 from collections import namedtuple
 from .fields import Date, Timedelta
 import textwrap
 
-log = logging.getLogger("mitx.courseware")
+log = logging.getLogger("edx.courseware")
 
 from django.utils.translation import ugettext as _
 
@@ -324,7 +324,7 @@ class CombinedOpenEndedFields(object):
                         </p>
 
                         <p>
-                        Write a persuasive essay to a newspaper reflecting your vies on censorship in libraries. Do you believe that certain materials, such as books, music, movies, magazines, etc., should be removed from the shelves if they are found offensive? Support your position with convincing arguments from your own experience, observations, and/or reading.
+                        Write a persuasive essay to a newspaper reflecting your views on censorship in libraries. Do you believe that certain materials, such as books, music, movies, magazines, etc., should be removed from the shelves if they are found offensive? Support your position with convincing arguments from your own experience, observations, and/or reading.
                         </p>
                     [prompt]
                     [rubric]
@@ -414,7 +414,7 @@ class CombinedOpenEndedModule(CombinedOpenEndedFields, XModule):
         See DEFAULT_DATA for a sample.
 
         """
-        XModule.__init__(self, *args, **kwargs)
+        super(CombinedOpenEndedModule, self).__init__(*args, **kwargs)
 
         self.system.set('location', self.location)
 
@@ -510,5 +510,9 @@ class CombinedOpenEndedDescriptor(CombinedOpenEndedFields, RawDescriptor):
     def non_editable_metadata_fields(self):
         non_editable_fields = super(CombinedOpenEndedDescriptor, self).non_editable_metadata_fields
         non_editable_fields.extend([CombinedOpenEndedDescriptor.due, CombinedOpenEndedDescriptor.graceperiod,
-                                    CombinedOpenEndedDescriptor.markdown, CombinedOpenEndedDescriptor.version])
+                                    CombinedOpenEndedDescriptor.markdown, CombinedOpenEndedDescriptor.version, CombinedOpenEndedDescriptor.track_changes])
         return non_editable_fields
+
+    # Proxy to CombinedOpenEndedModule so that external callers don't have to know if they're working
+    # with a module or a descriptor
+    child_module = module_attr('child_module')

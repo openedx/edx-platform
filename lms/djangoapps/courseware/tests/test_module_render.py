@@ -1,6 +1,7 @@
 """
 Test for lms courseware app, module render unit
 """
+from ddt import ddt, data
 from mock import MagicMock, patch, Mock
 import json
 
@@ -11,10 +12,15 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 
-from xmodule.modulestore.django import modulestore
+from xblock.field_data import FieldData
+from xblock.runtime import Runtime
+from xblock.fields import ScopeIds
+from xmodule.lti_module import LTIDescriptor
 from xmodule.modulestore import Location
-from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
+from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
+from xmodule.x_module import XModuleDescriptor
 import courseware.module_render as render
 from courseware.tests.tests import LoginEnrollmentTestCase
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
@@ -73,7 +79,7 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
         module = render.get_module(
             self.mock_user,
             mock_request,
-            ['i4x', 'edX', 'toy', 'html', 'toyjumpto'],
+            Location('i4x', 'edX', 'toy', 'html', 'toyjumpto'),
             field_data_cache,
             self.course_id
         )
@@ -185,9 +191,11 @@ class TestHandleXBlockCallback(ModuleStoreTestCase, LoginEnrollmentTestCase):
         return mock_file
 
     def test_invalid_location(self):
+        request = self.request_factory.post('dummy_url', data={'position': 1})
+        request.user = self.mock_user
         with self.assertRaises(Http404):
             render.handle_xblock_callback(
-                None,
+                request,
                 'dummy/course/id',
                 'invalid Location',
                 'dummy_handler'
@@ -512,4 +520,75 @@ class TestHtmlModifiers(ModuleStoreTestCase):
         self.assertIn(
             'Staff Debug',
             result_fragment.content
+        )
+
+PER_COURSE_ANONYMIZED_DESCRIPTORS = (LTIDescriptor, )
+
+PER_STUDENT_ANONYMIZED_DESCRIPTORS = [
+    class_ for (name, class_) in XModuleDescriptor.load_classes()
+    if not issubclass(class_, PER_COURSE_ANONYMIZED_DESCRIPTORS)
+]
+
+
+@ddt
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class TestAnonymousStudentId(ModuleStoreTestCase, LoginEnrollmentTestCase):
+    """
+    Test that anonymous_student_id is set correctly across a variety of XBlock types
+    """
+
+    def setUp(self):
+        self.user = UserFactory()
+
+    @patch('courseware.module_render.has_access', Mock(return_value=True))
+    def _get_anonymous_id(self, course_id, xblock_class):
+        location = Location('dummy_org', 'dummy_course', 'dummy_category', 'dummy_name')
+        descriptor = Mock(
+            spec=xblock_class,
+            _field_data=Mock(spec=FieldData),
+            location=location,
+            static_asset_path=None,
+            runtime=Mock(
+                spec=Runtime,
+                resources_fs=None,
+                mixologist=Mock(_mixins=())
+            ),
+            scope_ids=Mock(spec=ScopeIds),
+        )
+        if hasattr(xblock_class, 'module_class'):
+            descriptor.module_class = xblock_class.module_class
+
+        return render.get_module_for_descriptor_internal(
+            self.user,
+            descriptor,
+            Mock(spec=FieldDataCache),
+            course_id,
+            Mock(),  # Track Function
+            Mock(),  # XQueue Callback Url Prefix
+        ).xmodule_runtime.anonymous_student_id
+
+    @data(*PER_STUDENT_ANONYMIZED_DESCRIPTORS)
+    def test_per_student_anonymized_id(self, descriptor_class):
+        for course_id in ('MITx/6.00x/2012_Fall', 'MITx/6.00x/2013_Spring'):
+            self.assertEquals(
+                # This value is set by observation, so that later changes to the student
+                # id computation don't break old data
+                '5afe5d9bb03796557ee2614f5c9611fb',
+                self._get_anonymous_id(course_id, descriptor_class)
+            )
+
+    @data(*PER_COURSE_ANONYMIZED_DESCRIPTORS)
+    def test_per_course_anonymized_id(self, descriptor_class):
+        self.assertEquals(
+            # This value is set by observation, so that later changes to the student
+            # id computation don't break old data
+            'e3b0b940318df9c14be59acb08e78af5',
+            self._get_anonymous_id('MITx/6.00x/2012_Fall', descriptor_class)
+        )
+
+        self.assertEquals(
+            # This value is set by observation, so that later changes to the student
+            # id computation don't break old data
+            'f82b5416c9f54b5ce33989511bb5ef2e',
+            self._get_anonymous_id('MITx/6.00x/2013_Spring', descriptor_class)
         )

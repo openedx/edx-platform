@@ -1,16 +1,5 @@
 // studio - assets - fonts
-// NOTE: Sass currently can't process the standard Google Web Font import method, so a @font-face with src declaration of the .woff file that the Google @import method uses is needed :/
 // ====================
 
-// Open Sans - http://www.google.com/fonts/specimen/Open+Sans
-@import "web-fonts";
-
-@include web-font((Open Sans), (italic bolditalic bold, i), (latin, cyrillic), (), (), true);
-
-// Bree Serif - http://www.google.com/fonts/specimen/Bree+Serif
-@font-face {
-  font-family: 'Bree Serif';
-  font-style: normal;
-  font-weight: 400;
-  src: local('Bree Serif'), local('BreeSerif'), url(http://themes.googleusercontent.com/static/fonts/breeserif/v2/LQ7WLTaITDg4OSRuOZCps73hpw3pgy2gAi-Ip7WPMi0.woff) format('woff');
-}
+// import from google fonts - Open Sans (http://www.google.com/fonts/specimen/Open+Sans)
+@import url(//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,300,600,700&subset=latin,cyrillic-ext,latin-ext,cyrillic);

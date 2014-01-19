@@ -1,5 +1,15 @@
 (function($){
   $.fn.extend({
+    /*
+     * leanModal prepares an element to be a modal dialog.  Call it once on the
+     * element that launches the dialog, when the page is ready.  This function
+     * will add a .click() handler that properly opens the dialog.
+     *
+     * The launching element must:
+     *   - be an <a> element, not a button,
+     *   - have an href= attribute identifying the id of the dialog element,
+     *   - have rel='leanModal'.
+     */
     leanModal: function(options) {
       var defaults = {
         top: 100,
@@ -13,7 +23,7 @@
         $("body").append(overlay);
       }
 
-      options =  $.extend(defaults, options);
+      options = $.extend(defaults, options);
 
       return this.each(function() {
         var o = options;
@@ -23,7 +33,7 @@
           $(".modal").hide();
 
           var modal_id = $(this).attr("href");
-          
+
           if ($(modal_id).hasClass("video-modal")) {
             //Video modals need to be cloned before being presented as a modal
             //This is because actions on the video get recorded in the history.
@@ -34,13 +44,12 @@
             modal_id = '#modal_clone';
           }
 
-
-          $("#lean_overlay").click(function() {
-             close_modal(modal_id);
+          $("#lean_overlay").click(function(e) {
+            close_modal(modal_id, e);
           });
 
-          $(o.closeButton).click(function() {
-             close_modal(modal_id);
+          $(o.closeButton).click(function(e) {
+            close_modal(modal_id, e);
           });
 
           var modal_height = $(modal_id).outerHeight();
@@ -72,34 +81,30 @@
           }
           window.scrollTo(0, 0);
           e.preventDefault();
-
         });
       });
 
-      function close_modal(modal_id){
+      function close_modal(modal_id, e) {
         $("#lean_overlay").fadeOut(200);
         $('iframe', modal_id).attr('src', '');
         $(modal_id).css({ 'display' : 'none' });
         if (modal_id == '#modal_clone') {
           $(modal_id).remove();
         }
+        e.preventDefault();
       }
     }
   });
 
-  $(document).ready(function($) {
-      $("a[rel*=leanModal]").each(function(){
-        $(this).leanModal({ top : 120, overlay: 1, closeButton: ".close-modal", position: 'absolute' });
-        embed = $($(this).attr('href')).find('iframe')
-        if(embed.length > 0) {
-          if(embed.attr('src').indexOf("?") > 0) {
-              embed.data('src', embed.attr('src') + '&autoplay=1&rel=0');
-              embed.attr('src', '');
-          } else {
-              embed.data('src', embed.attr('src') + '?autoplay=1&rel=0');
-              embed.attr('src', '');
-          }
-        }
-      });
+  $(document).ready(function ($) {
+    $("a[rel*=leanModal]").each(function () {
+      $(this).leanModal({ top : 120, overlay: 1, closeButton: ".close-modal", position: 'absolute' });
+      embed = $($(this).attr('href')).find('iframe')
+      if (embed.length > 0 && embed.attr('src')) {
+        var sep = (embed.attr('src').indexOf("?") > 0) ? '&' : '?';
+        embed.data('src', embed.attr('src') + sep + 'autoplay=1&rel=0');
+        embed.attr('src', '');
+      }
+    });
   });
 })(jQuery);

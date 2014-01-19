@@ -13,7 +13,7 @@
       oldOTBD = window.onTouchBasedDevice;
       window.onTouchBasedDevice = jasmine
                                       .createSpy('onTouchBasedDevice')
-                                      .andReturn(false);
+                                      .andReturn(null);
     });
 
     afterEach(function() {
@@ -49,7 +49,7 @@
           'role': 'button',
           'title': 'HD off',
           'aria-disabled': 'false'
-        }); 
+        });
       });
 
       it('bind the quality control', function() {

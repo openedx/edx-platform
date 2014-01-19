@@ -10,6 +10,7 @@ from courseware.courses import get_course_by_id
 from xmodule.modulestore.django import modulestore
 
 from django.core.management.base import BaseCommand
+from instructor.utils import DummyRequest
 
 
 class Command(BaseCommand):
@@ -37,7 +38,7 @@ class Command(BaseCommand):
         if len(args) > 2:
             get_raw_scores = args[2].lower() == 'raw'
 
-        request = self.DummyRequest()
+        request = DummyRequest()
         try:
             course = get_course_by_id(course_id)
         except Exception:
@@ -63,12 +64,3 @@ class Command(BaseCommand):
 
         fp.close()
         print "Done: %d records dumped" % len(datatable['data'])
-
-    class DummyRequest(object):
-        META = {}
-        def __init__(self):
-            return
-        def get_host(self):
-            return 'edx.mit.edu'
-        def is_secure(self):
-            return False

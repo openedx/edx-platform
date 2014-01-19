@@ -33,7 +33,9 @@ class PollFields(object):
     poll_answer = String(help=_("Student answer"), scope=Scope.user_state, default='')
     poll_answers = Dict(help=_("All possible answers for the poll fro other students"), scope=Scope.user_state_summary)
 
+    # List of answers, in the form {'id': 'some id', 'text': 'the answer text'}
     answers = List(help=_("Poll answers from xml"), scope=Scope.content, default=[])
+
     question = String(help=_("Poll question"), scope=Scope.content, default='')
 
 
@@ -41,8 +43,7 @@ class PollModule(PollFields, XModule):
     """Poll Module"""
     js = {
       'coffee': [resource_string(__name__, 'js/src/javascript_loader.coffee')],
-      'js': [resource_string(__name__, 'js/src/poll/logme.js'),
-             resource_string(__name__, 'js/src/poll/poll.js'),
+      'js': [resource_string(__name__, 'js/src/poll/poll.js'),
              resource_string(__name__, 'js/src/poll/poll_main.js')]
          }
     css = {'scss': [resource_string(__name__, 'css/poll/display.scss')]}
@@ -184,13 +185,13 @@ class PollDescriptor(PollFields, MakoModuleDescriptor, XmlDescriptor):
 
     def definition_to_xml(self, resource_fs):
         """Return an xml element representing to this definition."""
-        poll_str = '<{tag_name}>{text}</{tag_name}>'.format(
+        poll_str = u'<{tag_name}>{text}</{tag_name}>'.format(
             tag_name=self._tag_name, text=self.question)
         xml_object = etree.fromstring(poll_str)
         xml_object.set('display_name', self.display_name)
 
         def add_child(xml_obj, answer):
-            child_str = '<{tag_name} id="{id}">{text}</{tag_name}>'.format(
+            child_str = u'<{tag_name} id="{id}">{text}</{tag_name}>'.format(
                 tag_name=self._child_tag_name, id=answer['id'],
                 text=answer['text'])
             child_node = etree.fromstring(child_str)

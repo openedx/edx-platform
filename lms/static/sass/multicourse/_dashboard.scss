@@ -509,7 +509,7 @@
       .message-copy,
       .message-copy .copy {
         @extend %t-copy-sub1;
-        margin: 0;
+        margin: 2px 0 0 0;
       }
 
       // CASE: expandable
@@ -518,15 +518,18 @@
         .wrapper-tip {
 
           .message-title, .message-copy {
-            @include transition(color 0.25s ease-in-out 0);
             margin-bottom: 0;
+          }
+
+          .message-title .value, .message-copy {
+            @include transition(color 0.25s ease-in-out 0s);
           }
 
           // STATE: hover
           &:hover {
             cursor: pointer;
 
-            .message-title, .message-copy {
+            .message-title .value, .message-copy, .ui-toggle-expansion {
               color: $link-color;
             }
           }
@@ -540,6 +543,11 @@
 
         // STATE: is expanded
         &.is-expanded {
+
+          .ui-toggle-expansion {
+            @include transform(rotate(0));
+            @include transform-origin(50% 50%);
+          }
 
           .wrapper-extended {
             display: block;
@@ -557,6 +565,16 @@
 
         .message-title {
           float: left;
+        }
+
+        .ui-toggle-expansion {
+          @include transition(all 0.25s ease-in-out 0s);
+          @include transform(rotate(-90deg));
+          @include transform-origin(50% 50%);
+          @include font-size(21);
+          display: inline-block;
+          vertical-align: middle;
+          margin-right: ($baseline/4);
         }
 
         .message-copy {

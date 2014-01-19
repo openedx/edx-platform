@@ -43,7 +43,7 @@ create_task_list_table = ($table_tasks, tasks_data) ->
     id: 'task_type'
     field: 'task_type'
     name: 'Task Type'
-    minWidth: 100
+    minWidth: 102
   ,
     id: 'task_input'
     field: 'task_input'

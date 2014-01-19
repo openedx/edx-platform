@@ -3,7 +3,6 @@ import copy
 import logging
 import os
 import sys
-from collections import namedtuple
 from lxml import etree
 
 from xblock.fields import Dict, Scope, ScopeIds
@@ -133,15 +132,12 @@ class XmlDescriptor(XModuleDescriptor):
                            'ispublic',  # if True, then course is listed for all users; see
                            'xqa_key',  # for xqaa server access
                            'giturl',  # url of git server for origin of file
-                           # information about testcenter exams is a dict (of dicts), not a string,
-                           # so it cannot be easily exportable as a course element's attribute.
-                           'testcenter_info',
                            # VS[compat] Remove once unused.
                            'name', 'slug')
 
     metadata_to_strip = ('data_dir',
                          'tabs', 'grading_policy', 'published_by', 'published_date',
-                         'discussion_blackouts', 'testcenter_info',
+                         'discussion_blackouts',
                          # VS[compat] -- remove the below attrs once everything is in the CMS
                          'course', 'org', 'url_name', 'filename',
                          # Used for storing xml attributes between import and export, for roundtrips
@@ -391,7 +387,10 @@ class XmlDescriptor(XModuleDescriptor):
                 try:
                     xml_object.set(attr, val)
                 except Exception, e:
-                    logging.exception('Failed to serialize metadata attribute {0} with value {1}. This could mean data loss!!!  Exception: {2}'.format(attr, val, e))
+                    logging.exception(
+                        u'Failed to serialize metadata attribute %s with value %s in module %s. This could mean data loss!!! Exception: %s',
+                        attr, val, self.url_name, e
+                    )
                     pass
 
         for key, value in self.xml_attributes.items():

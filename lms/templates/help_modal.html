@@ -5,14 +5,15 @@
 <%! import pytz %>
 <%! from django.conf import settings %>
 <%! from courseware.tabs import get_discussion_link %>
+<%! from microsite_configuration.middleware import MicrositeConfiguration %>
 
-% if settings.MITX_FEATURES.get('ENABLE_FEEDBACK_SUBMISSION', False):
+% if settings.FEATURES.get('ENABLE_FEEDBACK_SUBMISSION', False):
 
 <div class="help-tab">
   <a href="#help-modal" rel="leanModal" role="button">${_("Help")}</a>
 </div>
 
-<section id="help-modal" class="modal" aria-hidden="true" role="dialog" aria-label='${_("{platform_name} Help").format(platform_name=settings.PLATFORM_NAME)}'>
+<section id="help-modal" class="modal" aria-hidden="true" role="dialog" aria-label="${_("{platform_name} Help").format(platform_name=MicrositeConfiguration.get_microsite_configuration_value("platform_name", settings.PLATFORM_NAME))}">
   <div class="inner-wrapper" id="help_wrapper">
     ## TODO: find a way to refactor this
     <button class="close-modal" tabindex="0">&#10005; <span class="sr">${_('Close Modal')}</span></button>
@@ -59,14 +60,14 @@ discussion_link = get_discussion_link(course) if course else None
     <form id="feedback_form" class="feedback_form" method="post" data-remote="true" action="/submit_feedback">
       <div id="feedback_error" class="modal-form-error" tabindex="-1"></div>
 % if not user.is_authenticated():
-      <label data-field="name" for="feedback_form_name">${_('Name*')}</label>
+      <label data-field="name" for="feedback_form_name">${_('Name')}*</label>
       <input name="name" type="text" id="feedback_form_name" aria-required="true">
-      <label data-field="email" for="feedback_form_email">${_('E-mail*')}</label>
+      <label data-field="email" for="feedback_form_email">${_('E-mail')}*</label>
       <input name="email" type="text" id="feedback_form_email" aria-required="true">
 % endif
-      <label data-field="subject" for="feedback_form_subject">${_('Briefly describe your issue*')}</label>
+      <label data-field="subject" for="feedback_form_subject">${_('Briefly describe your issue')}*</label>
       <input name="subject" type="text" id="feedback_form_subject" aria-required="true">
-      <label data-field="details" for="feedback_form_details">${_('Tell us the details*')}
+      <label data-field="details" for="feedback_form_details">${_('Tell us the details')}*
 <span class="tip">${_('Include error messages, steps which lead to the issue, etc')}</span></label>
       <textarea name="details" id="feedback_form_details" aria-required="true"></textarea>
       <input name="issue_type" type="hidden">

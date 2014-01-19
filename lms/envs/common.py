@@ -3,7 +3,7 @@
 This is the common settings file, intended to set sane defaults. If you have a
 piece of configuration that's dependent on a set of feature flags being set,
 then create a function that returns the calculated value based on the value of
-MITX_FEATURES[...]. Modules that extend this one can change the feature
+FEATURES[...]. Modules that extend this one can change the feature
 configuration in an environment specific config file and re-calculate those
 values.
 
@@ -15,7 +15,7 @@ Longer TODO:
 1. Right now our treatment of static content in general and in particular
    course-specific static content is haphazard.
 2. We should have a more disciplined approach to feature flagging, even if it
-   just means that we stick them in a dict called MITX_FEATURES.
+   just means that we stick them in a dict called FEATURES.
 3. We need to handle configuration for multiple courses. This could be as
    multiple sites, but we do need a way to map their data assets.
 """
@@ -26,6 +26,7 @@ Longer TODO:
 
 import sys
 import os
+import json
 
 from path import path
 
@@ -33,7 +34,7 @@ from .discussionsettings import *
 
 from lms.lib.xblock.mixin import LmsBlockMixin
 from xmodule.modulestore.inheritance import InheritanceMixin
-from xmodule.x_module import XModuleMixin
+from xmodule.x_module import XModuleMixin, only_xmodules
 
 ################################### FEATURES ###################################
 # The display name of the platform to be used in templates/emails/etc.
@@ -51,7 +52,7 @@ DISCUSSION_SETTINGS = {
 
 
 # Features
-MITX_FEATURES = {
+FEATURES = {
     'SAMPLE': False,
     'USE_DJANGO_PIPELINE': True,
     'DISPLAY_HISTOGRAMS_TO_STAFF': True,
@@ -89,6 +90,8 @@ MITX_FEATURES = {
     'ENABLE_MANUAL_GIT_RELOAD': False,
 
     'ENABLE_MASQUERADE': True,  # allow course staff to change to student view of courseware
+
+    'ENABLE_SYSADMIN_DASHBOARD': False,  # sysadmin dashboard, to see what courses are loaded, to delete & load courses
 
     'DISABLE_LOGIN_BUTTON': False,  # used in systems where login is automatic, eg MIT SSL
 
@@ -143,7 +146,7 @@ MITX_FEATURES = {
     # Enables the student notes API and UI.
     'ENABLE_STUDENT_NOTES': True,
 
-    # Provide a UI to allow users to submit feedback from the LMS
+    # Provide a UI to allow users to submit feedback from the LMS (left-hand help modal)
     'ENABLE_FEEDBACK_SUBMISSION': True,
 
     # Turn on a page that lets staff enter Python code to be run in the
@@ -189,6 +192,14 @@ MITX_FEATURES = {
 
     # Automatically approve student identity verification attempts
     'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': False,
+
+    # Grade calculation started from the new instructor dashboard will write
+    # grades CSV files to S3 and give links for downloads.
+    'ENABLE_S3_GRADE_DOWNLOADS': False,
+
+    # Give course staff unrestricted access to grade downloads (if set to False,
+    # only edX superusers can perform the downloads)
+    'ALLOW_COURSE_STAFF_GRADE_DOWNLOADS': False,
 }
 
 # Used for A/B testing
@@ -205,7 +216,7 @@ XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5  # seconds
 PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /edx-platform/lms
 REPO_ROOT = PROJECT_ROOT.dirname()
 COMMON_ROOT = REPO_ROOT / "common"
-ENV_ROOT = REPO_ROOT.dirname()  # virtualenv dir /mitx is in
+ENV_ROOT = REPO_ROOT.dirname()  # virtualenv dir /edx-platform is in
 COURSES_ROOT = ENV_ROOT / "data"
 
 DATA_DIR = COURSES_ROOT
@@ -234,7 +245,7 @@ STATUS_MESSAGE_PATH = ENV_ROOT / "status_message.json"
 ############################ OpenID Provider  ##################################
 OPENID_PROVIDER_TRUSTED_ROOTS = ['cs50.net', '*.cs50.net']
 
-################################## MITXWEB #####################################
+################################## EDX WEB #####################################
 # This is where we stick our compiled template files. Most of the app uses Mako
 # templates
 from tempdir import mkdtemp_clean
@@ -270,7 +281,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'course_wiki.course_nav.context_processor',
 
     # Hack to get required link URLs to password reset templates
-    'mitxmako.shortcuts.marketing_link_context_processor',
+    'edxmako.shortcuts.marketing_link_context_processor',
 
 # ...
     "announcements.context_processors.site_wide_announcements",
@@ -302,10 +313,10 @@ RSS_TIMEOUT = 600
 STATIC_GRAB = False
 DEV_CONTENT = True
 
-MITX_ROOT_URL = ''
+EDX_ROOT_URL = ''
 
-LOGIN_REDIRECT_URL = MITX_ROOT_URL + '/accounts/login'
-LOGIN_URL = MITX_ROOT_URL + '/accounts/login'
+LOGIN_REDIRECT_URL = EDX_ROOT_URL + '/accounts/login'
+LOGIN_URL = EDX_ROOT_URL + '/accounts/login'
 
 COURSE_NAME = "6.002_Spring_2012"
 COURSE_NUMBER = "6.002x"
@@ -313,7 +324,7 @@ COURSE_TITLE = "Circuits and Electronics"
 
 ### Dark code. Should be enabled in local settings for devel.
 
-ENABLE_MULTICOURSE = False  # set to False to disable multicourse display (see lib.util.views.mitxhome)
+ENABLE_MULTICOURSE = False  # set to False to disable multicourse display (see lib.util.views.edXhome)
 
 WIKI_ENABLED = False
 
@@ -352,7 +363,7 @@ TRACKING_BACKENDS = {
 
 # Backwards compatibility with ENABLE_SQL_TRACKING_LOGS feature flag.
 # In the future, adding the backend to TRACKING_BACKENDS enough.
-if MITX_FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):
+if FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):
     TRACKING_BACKENDS.update({
         'sql': {
             'ENGINE': 'track.backends.django.DjangoBackend'
@@ -367,7 +378,7 @@ TRACKING_ENABLED = True
 ######################## subdomain specific settings ###########################
 COURSE_LISTINGS = {}
 SUBDOMAIN_BRANDING = {}
-
+VIRTUAL_UNIVERSITIES = []
 
 ############################### XModule Store ##################################
 MODULESTORE = {
@@ -380,7 +391,11 @@ MODULESTORE = {
     }
 }
 CONTENTSTORE = None
-DOC_STORE_CONFIG = None
+DOC_STORE_CONFIG = {
+    'host': 'localhost',
+    'db': 'xmodule',
+    'collection': 'modulestore',
+}
 
 # Should we initialize the modulestores at startup, or wait until they are
 # needed?
@@ -391,6 +406,14 @@ INIT_MODULESTORE_ON_STARTUP = True
 # This should be moved into an XBlock Runtime/Application object
 # once the responsibility of XBlock creation is moved out of modulestore - cpennington
 XBLOCK_MIXINS = (LmsBlockMixin, InheritanceMixin, XModuleMixin)
+
+# Only allow XModules in the LMS
+XBLOCK_SELECT_FUNCTION = only_xmodules
+
+# Use the following lines to allow any xblock in the LMS,
+# either by uncommenting them here, or adding them to your private.py
+# from xmodule.x_module import prefer_xmodules
+# XBLOCK_SELECT_FUNCTION = prefer_xmodules
 
 #################### Python sandbox ############################################
 
@@ -436,6 +459,7 @@ SITE_NAME = "edu.olimpiada.ru"
 HTTPS = 'on'
 ROOT_URLCONF = 'lms.urls'
 IGNORABLE_404_ENDS = ('favicon.ico')
+# NOTE: Please set ALLOWED_HOSTS to some sane value, as we do not allow the default '*'
 
 # Platform Email
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
@@ -482,7 +506,7 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 # gitreload is used in LMS-workflow to pull content from github
 # gitreload requests are only allowed from these IP addresses, which are
 # the advertised public IPs of the github WebHook servers.
-# These are listed, eg at https://github.com/MITx/mitx/admin/hooks
+# These are listed, eg at https://github.com/edx/edx-platform/admin/hooks
 
 ALLOWED_GITRELOAD_IPS = ['207.97.227.253', '50.57.128.197', '108.171.174.178']
 
@@ -499,21 +523,21 @@ SIMPLE_WIKI_REQUIRE_LOGIN_EDIT = True
 SIMPLE_WIKI_REQUIRE_LOGIN_VIEW = False
 
 ################################# WIKI ###################################
+from course_wiki import settings as course_wiki_settings
+
 WIKI_ACCOUNT_HANDLING = False
 WIKI_EDITOR = 'course_wiki.editors.CodeMirror'
 WIKI_SHOW_MAX_CHILDREN = 0  # We don't use the little menu that shows children of an article in the breadcrumb
 WIKI_ANONYMOUS = False  # Don't allow anonymous access until the styling is figured out
-WIKI_CAN_CHANGE_PERMISSIONS = lambda article, user: user.is_staff or user.is_superuser
-WIKI_CAN_ASSIGN = lambda article, user: user.is_staff or user.is_superuser
+
+WIKI_CAN_DELETE = course_wiki_settings.CAN_DELETE
+WIKI_CAN_MODERATE = course_wiki_settings.CAN_MODERATE
+WIKI_CAN_CHANGE_PERMISSIONS = course_wiki_settings.CAN_CHANGE_PERMISSIONS
+WIKI_CAN_ASSIGN = course_wiki_settings.CAN_ASSIGN
 
 WIKI_USE_BOOTSTRAP_SELECT_WIDGET = False
 WIKI_LINK_LIVE_LOOKUPS = False
 WIKI_LINK_DEFAULT_LEVEL = 2
-
-################################# Pearson TestCenter config  ################
-
-PEARSONVUE_SIGNINPAGE_URL = "https://www1.pearsonvue.com/testtaker/signin/SignInPage/EDX"
-# TESTCENTER_ACCOMMODATION_REQUEST_EMAIL = "exam-help@example.com"
 
 ##### Feedback submission mechanism #####
 FEEDBACK_SUBMISSION_EMAIL = None
@@ -537,6 +561,12 @@ CC_PROCESSOR = {
 }
 # Setting for PAID_COURSE_REGISTRATION, DOES NOT AFFECT VERIFIED STUDENTS
 PAID_COURSE_REGISTRATION_CURRENCY = ['usd', '$']
+
+# Members of this group are allowed to generate payment reports
+PAYMENT_REPORT_GENERATOR_GROUP = 'shoppingcart_report_access'
+# Maximum number of rows the report can contain
+PAYMENT_REPORT_MAX_ITEMS = 10000
+
 ################################# open ended grading config  #####################
 
 #By setting up the default settings with an incorrect user name and password,
@@ -573,12 +603,13 @@ WAFFLE_MAX_AGE = 1209600
 STATICFILES_FINDERS = (
     'staticfiles.finders.FileSystemFinder',
     'staticfiles.finders.AppDirectoriesFinder',
+    'pipeline.finders.PipelineFinder',
 )
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
-    'mitxmako.makoloader.MakoFilesystemLoader',
-    'mitxmako.makoloader.MakoAppDirectoriesLoader',
+    'edxmako.makoloader.MakoFilesystemLoader',
+    'edxmako.makoloader.MakoAppDirectoriesLoader',
 
     # 'django.template.loaders.filesystem.Loader',
     # 'django.template.loaders.app_directories.Loader',
@@ -587,6 +618,7 @@ TEMPLATE_LOADERS = (
 
 MIDDLEWARE_CLASSES = (
     'request_cache.middleware.RequestCache',
+    'microsite_configuration.middleware.MicrositeConfiguration',
     'django_comment_client.middleware.AjaxExceptionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -600,7 +632,7 @@ MIDDLEWARE_CLASSES = (
 
     'django.contrib.messages.middleware.MessageMiddleware',
     'track.middleware.TrackMiddleware',
-    'mitxmako.middleware.MakoMiddleware',
+    'edxmako.middleware.MakoMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
 
     'course_wiki.course_nav.Middleware',
@@ -802,11 +834,15 @@ PIPELINE_JS_COMPRESSOR = None
 STATICFILES_IGNORE_PATTERNS = (
     "sass/*",
     "coffee/*",
+
+    # Symlinks used by js-test-tool
+    "xmodule_js",
+    "common_static",
 )
 
 PIPELINE_YUI_BINARY = 'yui-compressor'
 
-# Setting that will only affect the MITx version of django-pipeline until our changes are merged upstream
+# Setting that will only affect the edX version of django-pipeline until our changes are merged upstream
 PIPELINE_COMPILE_INPLACE = True
 
 ################################# CELERY ######################################
@@ -840,6 +876,7 @@ CELERY_DEFAULT_EXCHANGE_TYPE = 'direct'
 HIGH_PRIORITY_QUEUE = 'edx.core.high'
 DEFAULT_PRIORITY_QUEUE = 'edx.core.default'
 LOW_PRIORITY_QUEUE = 'edx.core.low'
+HIGH_MEM_QUEUE = 'edx.core.high_mem'
 
 CELERY_QUEUE_HA_POLICY = 'all'
 
@@ -851,7 +888,8 @@ CELERY_DEFAULT_ROUTING_KEY = DEFAULT_PRIORITY_QUEUE
 CELERY_QUEUES = {
     HIGH_PRIORITY_QUEUE: {},
     LOW_PRIORITY_QUEUE: {},
-    DEFAULT_PRIORITY_QUEUE: {}
+    DEFAULT_PRIORITY_QUEUE: {},
+    HIGH_MEM_QUEUE: {},
 }
 
 # let logging work as configured:
@@ -896,6 +934,13 @@ BULK_EMAIL_LOG_SENT_EMAILS = False
 # parallel, and what the SES rate is.
 BULK_EMAIL_RETRY_DELAY_BETWEEN_SENDS = 0.02
 
+
+############################## Video ##########################################
+
+# URL to test YouTube availability
+YOUTUBE_TEST_URL = 'https://gdata.youtube.com/feeds/api/videos/'
+
+
 ################################### APPS ######################################
 INSTALLED_APPS = (
     # Standard ones that are always installed...
@@ -915,7 +960,7 @@ INSTALLED_APPS = (
     'service_status',
 
     # For asset pipelining
-    'mitxmako',
+    'edxmako',
     'pipeline',
     'staticfiles',
     'static_replace',
@@ -931,6 +976,7 @@ INSTALLED_APPS = (
     'eventtracking.django',
     'util',
     'certificates',
+    'dashboard',
     'instructor',
     'instructor_task',
     'open_ended_grading',
@@ -1002,38 +1048,71 @@ MKTG_URL_LINK_MAP = {
     'TOS': 'tos',
     'HONOR': 'honor',
     'PRIVACY': 'privacy_edx',
+    'JOBS': 'jobs',
+    'PRESS': 'press',
 
     # Verified Certificates
     'WHAT_IS_VERIFIED_CERT': 'verified-certificate',
 }
 
 
-############################### THEME ################################
-def enable_theme(theme_name):
+############################### MICROSITES ################################
+def enable_microsites(microsite_config_dict, subdomain_branding, virtual_universities, microsites_root=ENV_ROOT / "microsites"):
     """
-    Enable the settings for a custom theme, whose files should be stored
-    in ENV_ROOT/themes/THEME_NAME (e.g., edx_all/themes/stanford).
-
-    The THEME_NAME setting should be configured separately since it can't
-    be set here (this function closes too early). An idiom for doing this
-    is:
-
-    THEME_NAME = "stanford"
-    enable_theme(THEME_NAME)
+    Enable the use of microsites, which are websites that allow
+    for subdomains for the edX platform, e.g. foo.edx.org
     """
-    MITX_FEATURES['USE_CUSTOM_THEME'] = True
 
-    # Calculate the location of the theme's files
-    theme_root = ENV_ROOT / "themes" / theme_name
+    if not microsite_config_dict:
+        return
 
-    # Include the theme's templates in the template search paths
-    TEMPLATE_DIRS.append(theme_root / 'templates')
-    MAKO_TEMPLATES['main'].append(theme_root / 'templates')
+    FEATURES['USE_MICROSITES'] = True
 
-    # Namespace the theme's static files to 'themes/<theme_name>' to
-    # avoid collisions with default edX static files
-    STATICFILES_DIRS.append((u'themes/%s' % theme_name,
-                             theme_root / 'static'))
+    for microsite_name in microsite_config_dict.keys():
+        # Calculate the location of the microsite's files
+        microsite_root = microsites_root / microsite_name
+        microsite_config = microsite_config_dict[microsite_name]
+
+        # pull in configuration information from each
+        # microsite root
+
+        if os.path.isdir(microsite_root):
+            # store the path on disk for later use
+            microsite_config['microsite_root'] = microsite_root
+
+            # get the domain that this should reside
+            domain = microsite_config['domain_prefix']
+
+            # get the virtual university that this should use
+            university = microsite_config['university']
+
+            # add to the existing maps in our settings
+            subdomain_branding[domain] = university
+            virtual_universities.append(university)
+
+            template_dir = microsite_root / 'templates'
+            microsite_config['template_dir'] = template_dir
+
+            microsite_config['microsite_name'] = microsite_name
+
+        else:
+            # not sure if we have application logging at this stage of
+            # startup
+            print '**** Error loading microsite {0}. Directory does not exist'.format(microsite_root)
+            # remove from our configuration as it is not valid
+            del microsite_config_dict[microsite_name]
+
+    # if we have microsites, then let's turn on SUBDOMAIN_BRANDING
+    # Note check size of the dict because some microsites might not be found on disk and
+    # we could be left with none
+    if microsite_config_dict:
+        FEATURES['SUBDOMAIN_BRANDING'] = True
+
+        TEMPLATE_DIRS.append(microsites_root)
+        MAKO_TEMPLATES['main'].append(microsites_root)
+
+        STATICFILES_DIRS.append(microsites_root)
+
 
 ################# Student Verification #################
 VERIFY_STUDENT = {
@@ -1042,7 +1121,7 @@ VERIFY_STUDENT = {
 
 ######################## CAS authentication ###########################
 
-if MITX_FEATURES.get('AUTH_USE_CAS'):
+if FEATURES.get('AUTH_USE_CAS'):
     CAS_SERVER_URL = 'https://provide_your_cas_url_here'
     AUTHENTICATION_BACKENDS = (
         'django.contrib.auth.backends.ModelBackend',
@@ -1061,3 +1140,12 @@ REGISTRATION_OPTIONAL_FIELDS = set([
     'mailing_address',
     'goals',
 ])
+
+###################### Grade Downloads ######################
+GRADES_DOWNLOAD_ROUTING_KEY = HIGH_MEM_QUEUE
+
+GRADES_DOWNLOAD = {
+    'STORAGE_TYPE': 'localfs',
+    'BUCKET': 'edx-grades',
+    'ROOT_PATH': '/tmp/edx-s3/grades',
+}

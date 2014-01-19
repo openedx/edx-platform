@@ -160,7 +160,10 @@ class @Annotatable
         @hideTips visible
 
     toggleAnnotationButtonText: (hide) ->
-        buttonText = (if hide then 'Show' else 'Hide')+' Annotations'
+        if hide
+            buttonText = gettext('Show Annotations')
+        else
+            buttonText = gettext('Hide Annotations')
         @$(@toggleAnnotationsSelector).text(buttonText)
 
     toggleInstructions: () ->
@@ -169,7 +172,10 @@ class @Annotatable
       @toggleInstructionsText hide
 
     toggleInstructionsButton: (hide) ->
-        txt = (if hide then 'Expand' else 'Collapse')+' Instructions'
+        if hide
+            txt = gettext('Expand Instructions')
+        else
+            txt = gettext('Collapse Instructions')
         cls = (if hide then ['expanded', 'collapsed'] else ['collapsed','expanded'])
         @$(@toggleInstructionsSelector).text(txt).removeClass(cls[0]).addClass(cls[1])
 
@@ -221,13 +227,14 @@ class @Annotatable
     makeTipTitle: (el) ->
         (api) =>
             title = $(el).data('comment-title')
-            (if title then title else 'Commentary')
+            (if title then title else gettext('Commentary'))
 
     createComment: (text) ->
         $("<div class=\"annotatable-comment\">#{text}</div>")
 
     createReplyLink: (problem_id) ->
-        $("<a class=\"annotatable-reply\" href=\"javascript:void(0);\" data-problem-id=\"#{problem_id}\">Reply to Annotation</a>")
+        linktxt = gettext('Reply to Annotation')
+        $("<a class=\"annotatable-reply\" href=\"javascript:void(0);\" data-problem-id=\"#{problem_id}\">#{linktxt}</a>")
 
     findVisibleTips: () ->
         visible = []

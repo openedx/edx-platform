@@ -34,7 +34,7 @@ DOC_STORE_CONFIG = {
 MODULESTORE_OPTIONS = {
     'default_class': 'xmodule.raw_module.RawDescriptor',
     'fs_root': TEST_ROOT / "data",
-    'render_template': 'mitxmako.shortcuts.render_to_string',
+    'render_template': 'edxmako.shortcuts.render_to_string',
 }
 
 MODULESTORE = {
@@ -87,7 +87,7 @@ PIPELINE = True
 STATICFILES_FINDERS += ('pipeline.finders.PipelineFinder', )
 
 # Use the auto_auth workflow for creating users and logging them in
-MITX_FEATURES['AUTOMATIC_AUTH_FOR_TESTING'] = True
+FEATURES['AUTOMATIC_AUTH_FOR_TESTING'] = True
 
 # HACK
 # Setting this flag to false causes imports to not load correctly in the lettuce python files
@@ -114,22 +114,6 @@ try:
 except ImportError:
     pass
 
-# Because an override for where to run will affect which ports to use,
-# set this up after the local overrides.
-if LETTUCE_SELENIUM_CLIENT == 'saucelabs':
-    LETTUCE_SERVER_PORT = choice(PORTS)
-else:
-    LETTUCE_SERVER_PORT = randint(1024, 65535)
-
-
-# Set up Video information so that the cms will send
-# requests to a mock Youtube server running locally
-if LETTUCE_SELENIUM_CLIENT == 'saucelabs':
-    VIDEO_PORT = choice(PORTS)
-    PORTS.remove(VIDEO_PORT)
-else:
-    VIDEO_PORT = randint(1024, 65535)
-
-# for testing Youtube
-YOUTUBE_API['url'] = "http://127.0.0.1:" + str(VIDEO_PORT) + '/test_transcripts_youtube/'
-
+# Point the URL used to test YouTube availability to our stub YouTube server
+YOUTUBE_TEST_URL = "http://127.0.0.1:{0}/test_youtube/".format(YOUTUBE_PORT)
+YOUTUBE_API['url'] = "http://127.0.0.1:{0}/test_transcripts_youtube/".format(YOUTUBE_PORT)
