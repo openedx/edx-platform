@@ -31,7 +31,7 @@ BABEL_CONFIG = BASE_DIR.relpathto(LOCALE_DIR.joinpath('babel.cfg'))
 # Use relpath to reduce noise in logs
 BABEL_OUT = BASE_DIR.relpathto(CONFIGURATION.source_messages_dir.joinpath('mako.po'))
 
-SOURCE_WARN = 'This English source file is machine-generated. Do not check it into github'
+SOURCE_WARN = 'This English source file is machine-generated. Do not check it into git.'
 
 LOG = logging.getLogger(__name__)
 
