@@ -705,7 +705,7 @@ def assign_syllabus_id(syllabus, used_ids=()):
 @require_http_methods(("GET", "POST", "PUT"))
 @login_required
 @ensure_csrf_cookie
-def syllabus_list_handler(request, tag=None, course_id=None, branch=None, version_guid=None, block=None):
+def syllabus_list_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None):
     """
     A RESTful handler for syllabus collections.
 
@@ -717,8 +717,9 @@ def syllabus_list_handler(request, tag=None, course_id=None, branch=None, versio
     PUT
         json: overwrite all syllabus in the course with the given list
     """
+    
     locator, course = _get_locator_and_course(
-        course_id, branch, version_guid, block, request.user
+        package_id, branch, version_guid, block, request.user
     )
     store = get_modulestore(course.location)
 
@@ -856,7 +857,7 @@ def textbooks_list_handler(request, tag=None, package_id=None, branch=None, vers
 @login_required
 @ensure_csrf_cookie
 @require_http_methods(("GET", "POST", "PUT", "DELETE"))
-def syllabus_detail_handler(request, tid, tag=None, course_id=None, branch=None, version_guid=None, block=None):
+def syllabus_detail_handler(request, tid, tag=None, package_id=None, branch=None, version_guid=None, block=None):
     """
     JSON API endpoint for manipulating a syllabus via its internal ID.
     Used by the Backbone application.
@@ -869,7 +870,7 @@ def syllabus_detail_handler(request, tid, tag=None, course_id=None, branch=None,
         json: remove syllabus
     """
     __, course = _get_locator_and_course(
-        course_id, branch, version_guid, block, request.user
+        package_id, branch, version_guid, block, request.user
     )
     store = get_modulestore(course.location)
     matching_id = [tb for tb in course.topic_syllabuses
