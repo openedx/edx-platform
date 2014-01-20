@@ -265,10 +265,10 @@ class TestRescoringTask(TestIntegrationTask):
         self.assertEqual(instructor_task.task_state, FAILURE)
         status = json.loads(instructor_task.task_output)
         self.assertEqual(status['exception'], 'NotImplementedError')
-        self.assertEqual(status['message'], "Problem's definition does not support rescoring")
+        self.assertEqual(status['message'], "Problem's definition does not support rescoring.")
 
         status = InstructorTaskModuleTestCase.get_task_status(instructor_task.task_id)
-        self.assertEqual(status['message'], "Problem's definition does not support rescoring")
+        self.assertEqual(status['message'], "Problem's definition does not support rescoring.")
 
     def define_randomized_custom_response_problem(self, problem_url_name, redefine=False):
         """

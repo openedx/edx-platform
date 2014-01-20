@@ -13,6 +13,8 @@ from mock import Mock
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
+from xmodule.modulestore import Location
+
 from xmodule.x_module import ModuleSystem, XModule, XModuleDescriptor
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.annotatable_module import AnnotatableDescriptor
@@ -75,7 +77,7 @@ class TestXBlockWrapper(object):
         return get_test_system()
 
     def leaf_descriptor(self, descriptor_cls):
-        location = 'i4x://org/course/category/name'
+        location = Location('i4x://org/course/category/name')
         runtime = get_test_descriptor_system()
         return runtime.construct_xblock_from_class(
             descriptor_cls,
@@ -100,7 +102,7 @@ class TestXBlockWrapper(object):
 
     def container_descriptor(self, descriptor_cls, depth):
         """Return an instance of `descriptor_cls` with `depth` levels of children"""
-        location = 'i4x://org/course/category/name'
+        location = Location('i4x://org/course/category/name')
         runtime = get_test_descriptor_system()
 
         if depth == 0:

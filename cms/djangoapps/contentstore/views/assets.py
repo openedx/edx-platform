@@ -1,5 +1,7 @@
 import logging
 from functools import partial
+import math
+import json
 
 from django.http import HttpResponseBadRequest
 from django.contrib.auth.decorators import login_required
@@ -19,15 +21,13 @@ from xmodule.modulestore import InvalidLocationError
 from xmodule.exceptions import NotFoundError
 from django.core.exceptions import PermissionDenied
 from xmodule.modulestore.django import loc_mapper
-from .access import has_access
 from xmodule.modulestore.locator import BlockUsageLocator
 
 from util.json_request import JsonResponse
 from django.http import HttpResponseNotFound
-import json
 from django.utils.translation import ugettext as _
-from pymongo import DESCENDING
-import math
+from pymongo import ASCENDING, DESCENDING
+from .access import has_course_access
 
 __all__ = ['assets_handler']
 
@@ -41,10 +41,13 @@ def assets_handler(request, tag=None, package_id=None, branch=None, version_guid
     deleting assets, and changing the "locked" state of an asset.
 
     GET
-        html: return html page which will show all course assets. Note that only the asset container
+        html: return an html page which will show all course assets. Note that only the asset container
             is returned and that the actual assets are filled in with a client-side request.
-        json: returns a page of assets. A page parameter specifies the desired page, and the
-            optional page_size parameter indicates the number of items per page (defaults to 50).
+        json: returns a page of assets. The following parameters are supported:
+            page: the desired page of results (defaults to 0)
+            page_size: the number of items per page (defaults to 50)
+            sort: the asset field to sort by (defaults to "date_added")
+            direction: the sort direction (defaults to "descending")
     POST
         json: create (or update?) an asset. The only updating that can be done is changing the lock state.
     PUT
@@ -53,7 +56,7 @@ def assets_handler(request, tag=None, package_id=None, branch=None, version_guid
         json: delete an asset
     """
     location = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
-    if not has_access(request.user, location):
+    if not has_course_access(request.user, location):
         raise PermissionDenied()
 
     response_format = request.REQUEST.get('format', 'html')
@@ -91,7 +94,17 @@ def _assets_json(request, location):
     """
     requested_page = int(request.REQUEST.get('page', 0))
     requested_page_size = int(request.REQUEST.get('page_size', 50))
-    sort = [('uploadDate', DESCENDING)]
+    requested_sort = request.REQUEST.get('sort', 'date_added')
+    sort_direction = DESCENDING
+    if request.REQUEST.get('direction', '').lower() == 'asc':
+        sort_direction = ASCENDING
+
+    # Convert the field name to the Mongo name
+    if requested_sort == 'date_added':
+        requested_sort = 'uploadDate'
+    elif requested_sort == 'display_name':
+        requested_sort = 'displayname'
+    sort = [(requested_sort, sort_direction)]
 
     current_page = max(requested_page, 0)
     start = current_page * requested_page_size
@@ -122,7 +135,8 @@ def _assets_json(request, location):
         'page': current_page,
         'pageSize': requested_page_size,
         'totalCount': total_count,
-        'assets': asset_json
+        'assets': asset_json,
+        'sort': requested_sort,
     })
 
 

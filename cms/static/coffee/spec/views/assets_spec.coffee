@@ -198,21 +198,51 @@ define ["jasmine", "js/spec/create_sinon", "squire"],
             @injector.clean()
             @injector.remove()
 
+        addMockAsset = (requests) ->
+            model = new @AssetModel
+                display_name: "new asset"
+                url: 'new_actual_asset_url'
+                portable_url: 'portable_url'
+                date_added: 'date'
+                thumbnail: null
+                id: 'idx'
+            @view.addAsset(model)
+            create_sinon.respondWithJson(requests,
+                {
+                    assets: [
+                        @mockAsset1, @mockAsset2,
+                        {
+                            display_name: "new asset"
+                            url: 'new_actual_asset_url'
+                            portable_url: 'portable_url'
+                            date_added: 'date'
+                            thumbnail: null
+                            id: 'idx'
+                        }
+                    ],
+                    start: 0,
+                    end: 2,
+                    page: 0,
+                    pageSize: 5,
+                    totalCount: 3
+                })
+
+
         describe "Basic", ->
             # Separate setup method to work-around mis-parenting of beforeEach methods
-            setup = (response) ->
+            setup = ->
                 requests = create_sinon.requests(this)
                 @view.setPage(0)
-                create_sinon.respondWithJson(requests, response)
+                create_sinon.respondWithJson(requests, @mockAssetsResponse)
                 return requests
 
             it "should render both assets", ->
-                requests = setup.call(this, @mockAssetsResponse)
+                requests = setup.call(this)
                 expect(@view.$el).toContainText("test asset 1")
                 expect(@view.$el).toContainText("test asset 2")
 
             it "should remove the deleted asset from the view", ->
-                requests = setup.call(this, @mockAssetsResponse)
+                requests = setup.call(this)
                 # Delete the 2nd asset with success from server.
                 @view.$(".remove-asset-button")[1].click()
                 @promptSpies.constructor.mostRecentCall.args[0].actions.primary.click(@promptSpies)
@@ -221,7 +251,7 @@ define ["jasmine", "js/spec/create_sinon", "squire"],
                 expect(@view.$el).not.toContainText("test asset 2")
 
             it "does not remove asset if deletion failed", ->
-                requests = setup.call(this, @mockAssetsResponse)
+                requests = setup.call(this)
                 # Delete the 2nd asset, but mimic a failure from the server.
                 @view.$(".remove-asset-button")[1].click()
                 @promptSpies.constructor.mostRecentCall.args[0].actions.primary.click(@promptSpies)
@@ -230,39 +260,60 @@ define ["jasmine", "js/spec/create_sinon", "squire"],
                 expect(@view.$el).toContainText("test asset 2")
 
             it "adds an asset if asset does not already exist", ->
-                requests = setup.call(this, @mockAssetsResponse)
-                model = new @AssetModel
-                    display_name: "new asset"
-                    url: 'new_actual_asset_url'
-                    portable_url: 'portable_url'
-                    date_added: 'date'
-                    thumbnail: null
-                    id: 'idx'
-                @view.addAsset(model)
-                create_sinon.respondWithJson(requests,
-                    {
-                        assets: [ @mockAsset1, @mockAsset2,
-                            {
-                                display_name: "new asset"
-                                url: 'new_actual_asset_url'
-                                portable_url: 'portable_url'
-                                date_added: 'date'
-                                thumbnail: null
-                                id: 'idx'
-                            }
-                        ],
-                        start: 0,
-                        end: 2,
-                        page: 0,
-                        pageSize: 5,
-                        totalCount: 3
-                    })
+                requests = setup.call(this)
+                addMockAsset.call(this, requests)
                 expect(@view.$el).toContainText("new asset")
                 expect(@collection.models.length).toBe(3)
 
             it "does not add an asset if asset already exists", ->
-                setup.call(this, @mockAssetsResponse)
+                setup.call(this)
                 spyOn(@collection, "add").andCallThrough()
                 model = @collection.models[1]
                 @view.addAsset(model)
                 expect(@collection.add).not.toHaveBeenCalled()
+
+        describe "Sorting", ->
+            # Separate setup method to work-around mis-parenting of beforeEach methods
+            setup = ->
+                requests = create_sinon.requests(this)
+                @view.setPage(0)
+                create_sinon.respondWithJson(requests, @mockAssetsResponse)
+                return requests
+
+            it "should have the correct default sort order", ->
+                requests = setup.call(this)
+                expect(@view.sortDisplayName()).toBe("Date Added")
+                expect(@view.collection.sortDirection).toBe("desc")
+
+            it "should toggle the sort order when clicking on the currently sorted column", ->
+                requests = setup.call(this)
+                expect(@view.sortDisplayName()).toBe("Date Added")
+                expect(@view.collection.sortDirection).toBe("desc")
+                @view.$("#js-asset-date-col").click()
+                create_sinon.respondWithJson(requests, @mockAssetsResponse)
+                expect(@view.sortDisplayName()).toBe("Date Added")
+                expect(@view.collection.sortDirection).toBe("asc")
+                @view.$("#js-asset-date-col").click()
+                create_sinon.respondWithJson(requests, @mockAssetsResponse)
+                expect(@view.sortDisplayName()).toBe("Date Added")
+                expect(@view.collection.sortDirection).toBe("desc")
+
+            it "should switch the sort order when clicking on a different column", ->
+                requests = setup.call(this)
+                @view.$("#js-asset-name-col").click()
+                create_sinon.respondWithJson(requests, @mockAssetsResponse)
+                expect(@view.sortDisplayName()).toBe("Name")
+                expect(@view.collection.sortDirection).toBe("asc")
+                @view.$("#js-asset-name-col").click()
+                create_sinon.respondWithJson(requests, @mockAssetsResponse)
+                expect(@view.sortDisplayName()).toBe("Name")
+                expect(@view.collection.sortDirection).toBe("desc")
+
+            it "should switch sort to most recent date added when a new asset is added", ->
+                requests = setup.call(this)
+                @view.$("#js-asset-name-col").click()
+                create_sinon.respondWithJson(requests, @mockAssetsResponse)
+                addMockAsset.call(this, requests)
+                create_sinon.respondWithJson(requests, @mockAssetsResponse)
+                expect(@view.sortDisplayName()).toBe("Date Added")
+                expect(@view.collection.sortDirection).toBe("desc")

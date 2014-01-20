@@ -6,6 +6,7 @@ from uuid import uuid4
 from django.test import TestCase
 from xmodule.modulestore.django import editable_modulestore, \
     clear_existing_modulestores
+from xmodule.contentstore.django import contentstore
 
 
 def mixed_store_config(data_dir, mappings):
@@ -211,17 +212,19 @@ class ModuleStoreTestCase(TestCase):
         return updated_course
 
     @staticmethod
-    def drop_mongo_collection():
+    def drop_mongo_collections():
         """
-        If using a Mongo-backed modulestore, drop the collection.
+        If using a Mongo-backed modulestore & contentstore, drop the collections.
         """
 
         # This will return the mongo-backed modulestore
         # even if we're using a mixed modulestore
         store = editable_modulestore()
-
         if hasattr(store, 'collection'):
             store.collection.drop()
+        if contentstore().fs_files:
+            db = contentstore().fs_files.database
+            db.connection.drop_database(db)
 
     @classmethod
     def setUpClass(cls):
@@ -241,7 +244,7 @@ class ModuleStoreTestCase(TestCase):
         Clean up any data stored in Mongo.
         """
         # Clean up by flushing the Mongo modulestore
-        cls.drop_mongo_collection()
+        cls.drop_mongo_collections()
 
         # Clear out the existing modulestores,
         # which will cause them to be re-created
@@ -257,7 +260,7 @@ class ModuleStoreTestCase(TestCase):
         """
 
         # Flush the Mongo modulestore
-        ModuleStoreTestCase.drop_mongo_collection()
+        ModuleStoreTestCase.drop_mongo_collections()
 
         # Call superclass implementation
         super(ModuleStoreTestCase, self)._pre_setup()
@@ -266,7 +269,7 @@ class ModuleStoreTestCase(TestCase):
         """
         Flush the ModuleStore after each test.
         """
-        ModuleStoreTestCase.drop_mongo_collection()
+        ModuleStoreTestCase.drop_mongo_collections()
 
         # Call superclass implementation
         super(ModuleStoreTestCase, self)._post_teardown()

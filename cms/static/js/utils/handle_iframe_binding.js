@@ -1,12 +1,12 @@
 define(["jquery"], function($) {
     var iframeBinding = function (e) {
         var target_element = null;
-        if (typeof(e) == "undefined"){
+        if (typeof(e) === "undefined") {
             target_element = $("iframe, embed");
         } else {
-            if (typeof(e.nodeName) != 'undefined'){
+            if (typeof(e.nodeName) !== 'undefined') {
                 target_element = $(e).find("iframe, embed");
-            } else{
+            } else {
                 target_element = e.$("iframe, embed");
             }
         }
@@ -14,21 +14,27 @@ define(["jquery"], function($) {
     };
 
     var modifyTagContent = function (target_element) {
-        target_element.each(function(){
-            if ($(this).prop('tagName') == 'IFRAME'){
+        target_element.each(function() {
+            if ($(this).prop('tagName') === 'IFRAME') {
                 var ifr_source = $(this).attr('src');
-                var wmode = "wmode=transparent";
-                if(ifr_source.indexOf('?') != -1) {
-                    var getQString = ifr_source.split('?');
-                    if (getQString[1].search('wmode=transparent') == -1){
-                        var oldString = getQString[1];
-                        var newString = getQString[0];
-                        $(this).attr('src',newString+'?'+wmode+'&'+oldString);
+
+                // Modify iframe src only if it is not empty
+                if (ifr_source) {
+                    var wmode = "wmode=transparent";
+                    if (ifr_source.indexOf('?') !== -1) {
+                        var getQString = ifr_source.split('?');
+                        if (getQString[1].search('wmode=transparent') === -1) {
+                            var oldString = getQString[1];
+                            var newString = getQString[0];
+                            $(this).attr('src', newString + '?' + wmode + '&' + oldString);
+                        }
+                    }
+                    else {
+                        $(this).attr('src', ifr_source + '?' + wmode);
                     }
                 }
-                else $(this).attr('src',ifr_source+'?'+wmode);
             }
-            else{
+            else {
                 $(this).attr('wmode', 'transparent');
             }
         });

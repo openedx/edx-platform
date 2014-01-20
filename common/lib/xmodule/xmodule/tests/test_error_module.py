@@ -5,9 +5,10 @@ import unittest
 from xmodule.tests import get_test_system
 from xmodule.error_module import ErrorDescriptor, ErrorModule, NonStaffErrorDescriptor
 from xmodule.modulestore import Location
+from xmodule.modulestore.xml import CourseLocationGenerator
 from xmodule.x_module import XModuleDescriptor, XModule
 from mock import MagicMock, Mock, patch
-from xblock.runtime import Runtime, UsageStore
+from xblock.runtime import Runtime, IdReader
 from xblock.field_data import FieldData
 from xblock.fields import ScopeIds
 from xblock.test.tools import unabc
@@ -32,7 +33,11 @@ class TestErrorModule(unittest.TestCase, SetupTestErrorModules):
 
     def test_error_module_xml_rendering(self):
         descriptor = ErrorDescriptor.from_xml(
-            self.valid_xml, self.system, self.org, self.course, self.error_msg)
+            self.valid_xml,
+            self.system,
+            CourseLocationGenerator(self.org, self.course),
+            self.error_msg
+        )
         self.assertIsInstance(descriptor, ErrorDescriptor)
         descriptor.xmodule_runtime = self.system
         context_repr = self.system.render(descriptor, 'student_view').content
@@ -63,12 +68,18 @@ class TestNonStaffErrorModule(unittest.TestCase, SetupTestErrorModules):
 
     def test_non_staff_error_module_create(self):
         descriptor = NonStaffErrorDescriptor.from_xml(
-            self.valid_xml, self.system, self.org, self.course)
+            self.valid_xml,
+            self.system,
+            CourseLocationGenerator(self.org, self.course)
+        )
         self.assertIsInstance(descriptor, NonStaffErrorDescriptor)
 
     def test_from_xml_render(self):
         descriptor = NonStaffErrorDescriptor.from_xml(
-            self.valid_xml, self.system, self.org, self.course)
+            self.valid_xml,
+            self.system,
+            CourseLocationGenerator(self.org, self.course)
+        )
         descriptor.xmodule_runtime = self.system
         context_repr = self.system.render(descriptor, 'student_view').content
         self.assertNotIn(self.error_msg, context_repr)
@@ -117,11 +128,11 @@ class TestErrorModuleConstruction(unittest.TestCase):
     def setUp(self):
         field_data = Mock(spec=FieldData)
         self.descriptor = BrokenDescriptor(
-            TestRuntime(Mock(spec=UsageStore), field_data),
+            TestRuntime(Mock(spec=IdReader), field_data),
             field_data,
             ScopeIds(None, None, None, 'i4x://org/course/broken/name')
         )
-        self.descriptor.xmodule_runtime = TestRuntime(Mock(spec=UsageStore), field_data)
+        self.descriptor.xmodule_runtime = TestRuntime(Mock(spec=IdReader), field_data)
         self.descriptor.xmodule_runtime.error_descriptor_class = ErrorDescriptor
         self.descriptor.xmodule_runtime.xmodule_instance = None
 

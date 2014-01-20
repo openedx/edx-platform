@@ -2,8 +2,8 @@
 Methods for interacting programmatically with the user creator table.
 """
 from course_creators.models import CourseCreator
-
-from auth.authz import add_user_to_creator_group, remove_user_from_creator_group
+from student.roles import CourseCreatorRole
+from student import auth
 
 
 def add_user_with_status_unrequested(user):
@@ -43,9 +43,9 @@ def update_course_creator_group(caller, user, add):
     Caller must have staff permissions.
     """
     if add:
-        add_user_to_creator_group(caller, user)
+        auth.add_users(caller, CourseCreatorRole(), user)
     else:
-        remove_user_from_creator_group(caller, user)
+        auth.remove_users(caller, CourseCreatorRole(), user)
 
 
 def get_course_creator_status(user):

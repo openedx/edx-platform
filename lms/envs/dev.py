@@ -22,7 +22,7 @@ TIME_ZONE = 'America/Guayaquil'
 LANGUAGE_CODE = 'es_419'
 # For displaying the dummy text, we need to provide a language mapping.
 TEMPLATE_DEBUG = True
-SITE_NAME = "iaen.edu.ec"
+SITE_NAME = "beta.iaen.edu.ec"
 
 FEATURES['DISABLE_START_DATES'] = False
 FEATURES['ENABLE_SQL_TRACKING_LOGS'] = True
@@ -52,6 +52,8 @@ LOGGING = get_logger_config(ENV_ROOT / "log",
                             dev_env=True,
                             debug=True)
 
+# If there is a database called 'read_replica', you can use the use_read_replica_if_available
+# function in util/query.py, which is useful for very large database reads
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -134,6 +136,8 @@ SUBDOMAIN_BRANDING = {
     'mit': 'MITx',
     'berkeley': 'BerkeleyX',
     'harvard': 'HarvardX',
+    'openedx': 'openedx',
+    'edge': 'edge',
 }
 
 # List of `university` landing pages to display, even though they may not

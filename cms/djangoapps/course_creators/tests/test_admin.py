@@ -10,8 +10,9 @@ import mock
 
 from course_creators.admin import CourseCreatorAdmin
 from course_creators.models import CourseCreator
-from auth.authz import is_user_in_creator_group
 from django.core import mail
+from student.roles import CourseCreatorRole
+from student import auth
 
 
 def mock_render_to_string(template_name, context):
@@ -54,7 +55,7 @@ class CourseCreatorAdminTest(TestCase):
         def change_state_and_verify_email(state, is_creator):
             """ Changes user state, verifies creator status, and verifies e-mail is sent based on transition """
             self._change_state(state)
-            self.assertEqual(is_creator, is_user_in_creator_group(self.user))
+            self.assertEqual(is_creator, auth.has_access(self.user, CourseCreatorRole()))
 
             context = {'studio_request_email': self.studio_request_email}
             if state == CourseCreator.GRANTED:
@@ -72,7 +73,7 @@ class CourseCreatorAdminTest(TestCase):
         with mock.patch.dict('django.conf.settings.FEATURES', self.enable_creator_group_patch):
 
             # User is initially unrequested.
-            self.assertFalse(is_user_in_creator_group(self.user))
+            self.assertFalse(auth.has_access(self.user, CourseCreatorRole()))
 
             change_state_and_verify_email(CourseCreator.GRANTED, True)
 

@@ -1,7 +1,6 @@
 #pylint: disable=C0111
 
 from lettuce import world, step
-from lettuce.django import django_url
 from common import i_am_registered_for_the_course, section_location, visit_scenario_item
 from django.utils.translation import ugettext as _
 
@@ -94,8 +93,10 @@ def video_is_rendered(_step, mode):
 
 @step('all sources are correct$')
 def all_sources_are_correct(_step):
-    sources = world.css_find('.video video source')
-    assert set(source['src'] for source in sources) == set(HTML5_SOURCES)
+    elements = world.css_find('.video video source')
+    sources = [source['src'].split('?')[0] for source in elements]
+
+    assert set(sources) == set(HTML5_SOURCES)
 
 
 @step('error message is shown$')

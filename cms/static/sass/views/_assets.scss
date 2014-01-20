@@ -87,7 +87,7 @@
       .nav-link {
         @include transition(all $tmg-f2 ease-in-out 0s);
         display: block;
-        padding: ($baseline/4) ($baseline*.75);
+        padding: ($baseline/4) ($baseline*0.75);
 
         &.previous {
           margin-right: ($baseline/2);
@@ -126,7 +126,7 @@
       .total-pages {
         @extend %t-copy-base;
         width: ($baseline*2.5);
-        margin: 0 ($baseline*.75);
+        margin: 0 ($baseline*0.75);
         padding: ($baseline/4);
         text-align: center;
         color: $gray;
@@ -195,14 +195,26 @@
       th {
         @extend %t-copy-sub2;
         background-color: $gray-l5;
-        padding: 0 $baseline ($baseline*.75) $baseline;
+        padding: 0 ($baseline/2) ($baseline*0.75) ($baseline/2);
         vertical-align: middle;
         text-align: left;
         color: $gray;
 
+        .column-sort-link {
+          cursor: pointer;
+          color: $blue;
+        }
+
+
         .current-sort {
-          font-weight: 700;
           border-bottom: 1px solid $gray-l3;
+          font-weight: 700;
+        }
+
+        // CASE: embed column
+        &.embed-col {
+          padding-left: ($baseline*0.75);
+          padding-right: ($baseline*0.75);
         }
       }
 
@@ -285,7 +297,7 @@
 
         .embed-col {
           @include transition(all $tmg-f2 ease-in-out 0s);
-          padding-left: ($baseline*.75);
+          padding-left: ($baseline*0.75);
           color: $gray-l2;
 
           .embeddable-xml-input {
@@ -455,7 +467,7 @@
       @include transition(color $tmg-f2 ease-in-out 0s);
       position: absolute;
       top: 0;
-      right: ($baseline*.75);
+      right: ($baseline*0.75);
       border: none;
       background: none;
       padding: 0;

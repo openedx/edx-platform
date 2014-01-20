@@ -267,9 +267,7 @@ class CourseFields(object):
     enrollment_start = Date(help="Date that enrollment for this class is opened", scope=Scope.settings)
     enrollment_end = Date(help="Date that enrollment for this class is closed", scope=Scope.settings)
     start = Date(help="Start time when this module is visible",
-                 # using now(UTC()) resulted in fractional seconds which screwed up comparisons and anyway w/b the
-                 # time of first invocation of this stmt on the server
-                 default=datetime.fromtimestamp(0, UTC()),
+                 default=datetime(2030, 1, 1, tzinfo=UTC()),
                  scope=Scope.settings)
     end = Date(help="Date that this class ends", scope=Scope.settings)
     advertised_start = String(help="Date that this course is advertised to start", scope=Scope.settings)
@@ -610,8 +608,8 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         return policy_str
 
     @classmethod
-    def from_xml(cls, xml_data, system, org=None, course=None):
-        instance = super(CourseDescriptor, cls).from_xml(xml_data, system, org, course)
+    def from_xml(cls, xml_data, system, id_generator):
+        instance = super(CourseDescriptor, cls).from_xml(xml_data, system, id_generator)
 
         # bleh, have to parse the XML here to just pull out the url_name attribute
         # I don't think it's stored anywhere in the instance.

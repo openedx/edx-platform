@@ -16,7 +16,7 @@ class Thread(models.Model):
 
     updatable_fields = [
         'title', 'body', 'anonymous', 'anonymous_to_peers', 'course_id',
-        'closed', 'tags', 'user_id', 'commentable_id', 'group_id', 'group_name', 'pinned'
+        'closed', 'user_id', 'commentable_id', 'group_id', 'group_name', 'pinned'
     ]
 
     initializable_fields = updatable_fields
@@ -34,7 +34,7 @@ class Thread(models.Model):
                           'recursive': False}
         params = merge_dict(default_params, strip_blank(strip_none(query_params)))
 
-        if query_params.get('text') or query_params.get('tags'):
+        if query_params.get('text'):
             url = cls.url(action='search')
         else:
             url = cls.url(action='get_all', params=extract(params, 'commentable_id'))

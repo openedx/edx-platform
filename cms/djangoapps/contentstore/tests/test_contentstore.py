@@ -20,8 +20,6 @@ from django.dispatch import Signal
 from contentstore.utils import get_modulestore
 from contentstore.tests.utils import parse_json, AjaxEnabledTestClient
 
-from auth.authz import add_user_to_creator_group
-
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from contentstore.tests.modulestore_config import TEST_MODULESTORE
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -57,6 +55,8 @@ import re
 
 from contentstore.utils import delete_course_and_groups
 from xmodule.modulestore.django import loc_mapper
+from student.roles import CourseCreatorRole
+from student import auth
 
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
@@ -176,7 +176,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         Lock an arbitrary asset in the course
         :param course_location:
         """
-        course_assets,__ = content_store.get_all_content_for_course(course_location)
+        course_assets, __ = content_store.get_all_content_for_course(course_location)
         self.assertGreater(len(course_assets), 0, "No assets to lock")
         content_store.set_attr(course_assets[0]['_id'], 'locked', True)
         return course_assets[0]['_id']
@@ -585,7 +585,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.assertIsNotNone(course)
 
         # make sure we have some assets in our contentstore
-        all_assets,__ = content_store.get_all_content_for_course(course_location)
+        all_assets, __ = content_store.get_all_content_for_course(course_location)
         self.assertGreater(len(all_assets), 0)
 
         # make sure we have some thumbnails in our contentstore
@@ -698,7 +698,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         # make sure there's something in the trashcan
         course_location = CourseDescriptor.id_to_location('edX/toy/6.002_Spring_2012')
-        all_assets,__ = trash_store.get_all_content_for_course(course_location)
+        all_assets, __ = trash_store.get_all_content_for_course(course_location)
         self.assertGreater(len(all_assets), 0)
 
         # make sure we have some thumbnails in our trashcan
@@ -713,7 +713,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         empty_asset_trashcan([course_location])
 
         # make sure trashcan is empty
-        all_assets,count = trash_store.get_all_content_for_course(course_location)
+        all_assets, count = trash_store.get_all_content_for_course(course_location)
         self.assertEqual(len(all_assets), 0)
         self.assertEqual(count, 0)
 
@@ -924,7 +924,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.assertEqual(len(items), 0)
 
         # assert that all content in the asset library is also deleted
-        assets,count = content_store.get_all_content_for_course(location)
+        assets, count = content_store.get_all_content_for_course(location)
         self.assertEqual(len(assets), 0)
         self.assertEqual(count, 0)
 
@@ -1501,7 +1501,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         """Test new course creation - error path for bad organization name"""
         self.course_data['org'] = 'University of California, Berkeley'
         self.assert_course_creation_failed(
-            "Unable to create course 'Robot Super Course'.\n\nInvalid characters in 'University of California, Berkeley'.")
+            "Unable to create course 'Robot Super Course'.\n\nInvalid characters in u'University of California, Berkeley'.")
 
     def test_create_course_with_course_creation_disabled_staff(self):
         """Test new course creation -- course creation disabled, but staff access."""
@@ -1530,7 +1530,7 @@ class ContentStoreTest(ModuleStoreTestCase):
     def test_create_course_with_course_creator(self):
         """Test new course creation -- use course creator group"""
         with mock.patch.dict('django.conf.settings.FEATURES', {"ENABLE_CREATOR_GROUP": True}):
-            add_user_to_creator_group(self.user, self.user)
+            auth.add_users(self.user, CourseCreatorRole(), self.user)
             self.assert_created_course()
 
     def assert_course_permission_denied(self):

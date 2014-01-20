@@ -193,6 +193,9 @@ function () {
                     sourceStr[videoType] =
                         '<source ' +
                             'src="' + _this.config.videoSources[videoType] +
+                            // Following hack allows to open the same video twice
+                            // https://code.google.com/p/chromium/issues/detail?id=31014
+                            '?' + (new Date()).getTime() +
                             '" ' + 'type="video/' + videoType + '" ' +
                         '/> ';
                 }

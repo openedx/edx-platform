@@ -14,7 +14,7 @@ from student.tests.factories import RegistrationFactory  # Imported to re-export
 from student.tests.factories import UserProfileFactory as StudentUserProfileFactory
 from courseware.models import StudentModule, XModuleUserStateSummaryField
 from courseware.models import XModuleStudentInfoField, XModuleStudentPrefsField
-from courseware.roles import (
+from student.roles import (
     CourseInstructorRole,
     CourseStaffRole,
     CourseBetaTesterRole,
@@ -131,7 +131,7 @@ class UserStateSummaryFactory(DjangoModelFactory):
 
     field_name = 'existing_field'
     value = json.dumps('old_value')
-    usage_id = location('def_id').url()
+    usage_id = location('usage_id').url()
 
 
 class StudentPrefsFactory(DjangoModelFactory):
@@ -140,7 +140,7 @@ class StudentPrefsFactory(DjangoModelFactory):
     field_name = 'existing_field'
     value = json.dumps('old_value')
     student = factory.SubFactory(UserFactory)
-    module_type = 'MockProblemModule'
+    module_type = 'mock_problem'
 
 
 class StudentInfoFactory(DjangoModelFactory):

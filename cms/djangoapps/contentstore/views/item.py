@@ -9,10 +9,18 @@ from xmodule_modifiers import wrap_xblock
 
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseBadRequest
+from django.views.decorators.http import require_http_methods
+
+from xblock.fields import Scope
+from xblock.core import XBlock
 
 from xmodule.modulestore.django import modulestore, loc_mapper
-from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
+from xmodule.modulestore.inheritance import own_metadata
+from xmodule.modulestore.locator import BlockUsageLocator
+from xmodule.modulestore import Location
+from xmodule.x_module import prefer_xmodules
 
 from util.json_request import expect_json, JsonResponse
 from util.string_utils import str_to_bool
@@ -21,24 +29,16 @@ from ..transcripts_utils import manage_video_subtitles_save
 
 from ..utils import get_modulestore
 
-from .access import has_access
+from .access import has_course_access
 from .helpers import _xmodule_recurse
-from xmodule.x_module import XModuleDescriptor
-from django.views.decorators.http import require_http_methods
-from xmodule.modulestore.locator import BlockUsageLocator
-from student.models import CourseEnrollment
-from django.http import HttpResponseBadRequest
-from xblock.fields import Scope
 from preview import handler_prefix, get_preview_html
 from edxmako.shortcuts import render_to_response, render_to_string
 from models.settings.course_grading import CourseGradingModel
+from django.utils.translation import ugettext as _
 
 __all__ = ['orphan_handler', 'xblock_handler']
 
 log = logging.getLogger(__name__)
-
-# cdodge: these are categories which should not be parented, they are detached from the hierarchy
-DETACHED_CATEGORIES = ['about', 'static_tab', 'course_info']
 
 CREATE_IF_NOT_FOUND = ['course_info']
 
@@ -70,17 +70,20 @@ def xblock_handler(request, tag=None, package_id=None, branch=None, version_guid
                 :publish: can be one of three values, 'make_public, 'make_private', or 'create_draft'
               The JSON representation on the updated xblock (minus children) is returned.
 
-              if xblock locator is not specified, create a new xblock instance. The json playload can contain
+              if xblock locator is not specified, create a new xblock instance, either by duplicating
+              an existing xblock, or creating an entirely new one. The json playload can contain
               these fields:
-                :parent_locator: parent for new xblock, required
-                :category: type of xblock, required
+                :parent_locator: parent for new xblock, required for both duplicate and create new instance
+                :duplicate_source_locator: if present, use this as the source for creating a duplicate copy
+                :category: type of xblock, required if duplicate_source_locator is not present.
                 :display_name: name for new xblock, optional
-                :boilerplate: template name for populating fields, optional
+                :boilerplate: template name for populating fields, optional and only used
+                     if duplicate_source_locator is not present
               The locator (and old-style id) for the created xblock (minus children) is returned.
     """
     if package_id is not None:
         locator = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
-        if not has_access(request.user, locator):
+        if not has_course_access(request.user, locator):
             raise PermissionDenied()
         old_location = loc_mapper().translate_locator_to_location(locator)
 
@@ -130,7 +133,24 @@ def xblock_handler(request, tag=None, package_id=None, branch=None, version_guid
                 publish=request.json.get('publish'),
             )
     elif request.method in ('PUT', 'POST'):
-        return _create_item(request)
+        if 'duplicate_source_locator' in request.json:
+            parent_locator = BlockUsageLocator(request.json['parent_locator'])
+            duplicate_source_locator = BlockUsageLocator(request.json['duplicate_source_locator'])
+
+            # _duplicate_item is dealing with locations to facilitate the recursive call for
+            # duplicating children.
+            parent_location = loc_mapper().translate_locator_to_location(parent_locator)
+            duplicate_source_location = loc_mapper().translate_locator_to_location(duplicate_source_locator)
+            dest_location = _duplicate_item(
+                parent_location,
+                duplicate_source_location,
+                request.json.get('display_name')
+            )
+            course_location = loc_mapper().translate_locator_to_location(BlockUsageLocator(parent_locator), get_course=True)
+            dest_locator = loc_mapper().translate_location(course_location.course_id, dest_location, False, True)
+            return JsonResponse({"locator": unicode(dest_locator)})
+        else:
+            return _create_item(request)
     else:
         return HttpResponseBadRequest(
             "Only instance creation is supported without a package_id.",
@@ -249,7 +269,7 @@ def _create_item(request):
 
     display_name = request.json.get('display_name')
 
-    if not has_access(request.user, parent_location):
+    if not has_course_access(request.user, parent_location):
         raise PermissionDenied()
 
     parent = get_modulestore(category).get_item(parent_location)
@@ -260,7 +280,7 @@ def _create_item(request):
     data = None
     template_id = request.json.get('boilerplate')
     if template_id is not None:
-        clz = XModuleDescriptor.load_class(category)
+        clz = XBlock.load_class(category, select=prefer_xmodules)
         if clz is not None:
             template = clz.get_template(template_id)
             if template is not None:
@@ -274,15 +294,62 @@ def _create_item(request):
         dest_location,
         definition_data=data,
         metadata=metadata,
-        system=parent.system,
+        system=parent.runtime,
     )
 
-    if category not in DETACHED_CATEGORIES:
+    # TODO replace w/ nicer accessor
+    if not 'detached' in parent.runtime.load_block_type(category)._class_tags:
         get_modulestore(parent.location).update_children(parent_location, parent.children + [dest_location.url()])
 
     course_location = loc_mapper().translate_locator_to_location(parent_locator, get_course=True)
     locator = loc_mapper().translate_location(course_location.course_id, dest_location, False, True)
     return JsonResponse({"locator": unicode(locator)})
+
+
+def _duplicate_item(parent_location, duplicate_source_location, display_name=None):
+    """
+    Duplicate an existing xblock as a child of the supplied parent_location.
+    """
+    store = get_modulestore(duplicate_source_location)
+    source_item = store.get_item(duplicate_source_location)
+    # Change the blockID to be unique.
+    dest_location = duplicate_source_location.replace(name=uuid4().hex)
+    category = dest_location.category
+
+    # Update the display name to indicate this is a duplicate (unless display name provided).
+    duplicate_metadata = own_metadata(source_item)
+    if display_name is not None:
+        duplicate_metadata['display_name'] = display_name
+    else:
+        duplicate_metadata['display_name'] = _("Duplicate of '{0}'").format(source_item.display_name)
+
+    get_modulestore(category).create_and_save_xmodule(
+        dest_location,
+        definition_data=source_item.data if hasattr(source_item, 'data') else None,
+        metadata=duplicate_metadata,
+        system=source_item.runtime,
+    )
+
+    # Children are not automatically copied over (and not all xblocks have a 'children' attribute).
+    # Because DAGs are not fully supported, we need to actually duplicate each child as well.
+    if source_item.has_children:
+        copied_children = []
+        for child in source_item.children:
+            copied_children.append(_duplicate_item(dest_location, Location(child)).url())
+        get_modulestore(dest_location).update_children(dest_location, copied_children)
+
+    if not 'detached' in source_item.runtime.load_block_type(category)._class_tags:
+        parent = get_modulestore(parent_location).get_item(parent_location)
+        # If source was already a child of the parent, add duplicate immediately afterward.
+        # Otherwise, add child to end.
+        if duplicate_source_location.url() in parent.children:
+            source_index = parent.children.index(duplicate_source_location.url())
+            parent.children.insert(source_index + 1, dest_location.url())
+        else:
+            parent.children.append(dest_location.url())
+        get_modulestore(parent_location).update_children(parent_location, parent.children)
+
+    return dest_location
 
 
 def _delete_item_at_location(item_location, delete_children=False, delete_all_versions=False):
@@ -334,13 +401,13 @@ def orphan_handler(request, tag=None, package_id=None, branch=None, version_guid
     # DHM: when split becomes back-end, move or conditionalize this conversion
     old_location = loc_mapper().translate_locator_to_location(location)
     if request.method == 'GET':
-        if has_access(request.user, old_location):
-            return JsonResponse(modulestore().get_orphans(old_location, DETACHED_CATEGORIES, 'draft'))
+        if has_course_access(request.user, old_location):
+            return JsonResponse(modulestore().get_orphans(old_location, 'draft'))
         else:
             raise PermissionDenied()
     if request.method == 'DELETE':
         if request.user.is_staff:
-            items = modulestore().get_orphans(old_location, DETACHED_CATEGORIES, 'draft')
+            items = modulestore().get_orphans(old_location, 'draft')
             for item in items:
                 modulestore('draft').delete_item(item, True)
             return JsonResponse({'deleted': items})

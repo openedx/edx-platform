@@ -15,7 +15,7 @@ from courseware.tests.factories import StudentModuleFactory as cmfStudentModuleF
 from courseware.tests.factories import UserStateSummaryFactory
 from courseware.tests.factories import StudentPrefsFactory, StudentInfoFactory
 
-from xblock.fields import Scope, BlockScope
+from xblock.fields import Scope, BlockScope, ScopeIds
 from xmodule.modulestore import Location
 from django.test import TestCase
 from django.db import DatabaseError
@@ -31,7 +31,7 @@ def mock_field(scope, name):
 
 def mock_descriptor(fields=[]):
     descriptor = Mock()
-    descriptor.location = location('def_id')
+    descriptor.scope_ids = ScopeIds('user1', 'mock_problem', location('def_id'), location('usage_id'))
     descriptor.module_class.fields.values.return_value = fields
     descriptor.fields.values.return_value = fields
     descriptor.module_class.__name__ = 'MockProblemModule'
@@ -43,15 +43,15 @@ course_id = 'edX/test_course/test'
 # The user ids here are 1 because we make a student in the setUp functions, and
 # they get an id of 1.  There's an assertion in setUp to ensure that assumption
 # is still true.
-user_state_summary_key = partial(DjangoKeyValueStore.Key, Scope.user_state_summary, None, location('def_id'))
-settings_key = partial(DjangoKeyValueStore.Key, Scope.settings, None, location('def_id'))
-user_state_key = partial(DjangoKeyValueStore.Key, Scope.user_state, 1, location('def_id'))
-prefs_key = partial(DjangoKeyValueStore.Key, Scope.preferences, 1, 'MockProblemModule')
+user_state_summary_key = partial(DjangoKeyValueStore.Key, Scope.user_state_summary, None, location('usage_id'))
+settings_key = partial(DjangoKeyValueStore.Key, Scope.settings, None, location('usage_id'))
+user_state_key = partial(DjangoKeyValueStore.Key, Scope.user_state, 1, location('usage_id'))
+prefs_key = partial(DjangoKeyValueStore.Key, Scope.preferences, 1, 'mock_problem')
 user_info_key = partial(DjangoKeyValueStore.Key, Scope.user_info, 1, None)
 
 
 class StudentModuleFactory(cmfStudentModuleFactory):
-    module_state_key = location('def_id').url()
+    module_state_key = location('usage_id').url()
     course_id = course_id
 
 
@@ -177,7 +177,7 @@ class TestMissingStudentModule(TestCase):
         student_module = StudentModule.objects.all()[0]
         self.assertEquals({'a_field': 'a_value'}, json.loads(student_module.state))
         self.assertEquals(self.user, student_module.student)
-        self.assertEquals(location('def_id').url(), student_module.module_state_key)
+        self.assertEquals(location('usage_id').url(), student_module.module_state_key)
         self.assertEquals(course_id, student_module.course_id)
 
     def test_delete_field_from_missing_student_module(self):

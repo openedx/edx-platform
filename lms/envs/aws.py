@@ -170,7 +170,6 @@ PAID_COURSE_REGISTRATION_CURRENCY = ENV_TOKENS.get('PAID_COURSE_REGISTRATION_CUR
 
 # Payment Report Settings
 PAYMENT_REPORT_GENERATOR_GROUP = ENV_TOKENS.get('PAYMENT_REPORT_GENERATOR_GROUP', PAYMENT_REPORT_GENERATOR_GROUP)
-PAYMENT_REPORT_MAX_ITEMS = ENV_TOKENS.get('PAYMENT_REPORT_MAX_ITEMS', PAYMENT_REPORT_MAX_ITEMS)
 
 # Bulk Email overrides
 BULK_EMAIL_DEFAULT_FROM_EMAIL = ENV_TOKENS.get('BULK_EMAIL_DEFAULT_FROM_EMAIL', BULK_EMAIL_DEFAULT_FROM_EMAIL)
@@ -188,14 +187,6 @@ BULK_EMAIL_ROUTING_KEY = HIGH_PRIORITY_QUEUE
 
 # Theme overrides
 THEME_NAME = ENV_TOKENS.get('THEME_NAME', None)
-# Workaround for setting THEME_NAME to an empty
-# string which is the default due to this ansible
-# bug: https://github.com/ansible/ansible/issues/4812
-if THEME_NAME == "":
-    THEME_NAME = None
-if not THEME_NAME is None:
-    enable_theme(THEME_NAME)
-    FAVICON_PATH = 'themes/%s/images/favicon.ico' % THEME_NAME
 
 # Marketing link overrides
 MKTG_URL_LINK_MAP.update(ENV_TOKENS.get('MKTG_URL_LINK_MAP', {}))
@@ -286,6 +277,8 @@ if AWS_SECRET_ACCESS_KEY == "":
 
 AWS_STORAGE_BUCKET_NAME = AUTH_TOKENS.get('AWS_STORAGE_BUCKET_NAME', 'edxuploads')
 
+# If there is a database called 'read_replica', you can use the use_read_replica_if_available
+# function in util/query.py, which is useful for very large database reads
 DATABASES = AUTH_TOKENS['DATABASES']
 
 XQUEUE_INTERFACE = AUTH_TOKENS['XQUEUE_INTERFACE']
@@ -345,3 +338,13 @@ VERIFY_STUDENT = AUTH_TOKENS.get("VERIFY_STUDENT", VERIFY_STUDENT)
 GRADES_DOWNLOAD_ROUTING_KEY = HIGH_MEM_QUEUE
 
 GRADES_DOWNLOAD = ENV_TOKENS.get("GRADES_DOWNLOAD", GRADES_DOWNLOAD)
+
+MICROSITE_CONFIGURATION = ENV_TOKENS.get('MICROSITE_CONFIGURATION', {})
+MICROSITE_ROOT_DIR = ENV_TOKENS.get('MICROSITE_ROOT_DIR')
+if MICROSITE_CONFIGURATION:
+    enable_microsites(
+        MICROSITE_CONFIGURATION,
+        SUBDOMAIN_BRANDING,
+        VIRTUAL_UNIVERSITIES,
+        microsites_root=path(MICROSITE_ROOT_DIR)
+    )

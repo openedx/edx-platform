@@ -25,6 +25,7 @@ Longer TODO:
 
 import sys
 import os
+import json
 
 from path import path
 
@@ -32,7 +33,7 @@ from .discussionsettings import *
 
 from lms.lib.xblock.mixin import LmsBlockMixin
 from xmodule.modulestore.inheritance import InheritanceMixin
-from xmodule.x_module import XModuleMixin
+from xmodule.x_module import XModuleMixin, only_xmodules
 
 ################################### FEATURES ###################################
 # The display name of the platform to be used in templates/emails/etc.
@@ -144,7 +145,7 @@ FEATURES = {
     # Enables the student notes API and UI.
     'ENABLE_STUDENT_NOTES': True,
 
-    # Provide a UI to allow users to submit feedback from the LMS
+    # Provide a UI to allow users to submit feedback from the LMS (left-hand help modal)
     'ENABLE_FEEDBACK_SUBMISSION': False,
 
     # Turn on a page that lets staff enter Python code to be run in the
@@ -162,6 +163,9 @@ FEATURES = {
 
     # Enable instructor dash to submit background tasks
     'ENABLE_INSTRUCTOR_BACKGROUND_TASKS': True,
+
+    # Enable instructor to assign individual due dates
+    'INDIVIDUAL_DUE_DATES': False,
 
     # Enable instructor dash beta version link
     'ENABLE_INSTRUCTOR_BETA_DASHBOARD': True,
@@ -202,6 +206,8 @@ FEATURES = {
     # Give course staff unrestricted access to grade downloads (if set to False,
     # only edX superusers can perform the downloads)
     'ALLOW_COURSE_STAFF_GRADE_DOWNLOADS': False,
+
+    'ENABLED_PAYMENT_REPORTS': ["refund_report", "itemized_purchase_report", "university_revenue_share", "certificate_status"],
 }
 
 # Used for A/B testing
@@ -377,7 +383,7 @@ TRACKING_ENABLED = True
 ######################## subdomain specific settings ###########################
 COURSE_LISTINGS = {}
 SUBDOMAIN_BRANDING = {}
-
+VIRTUAL_UNIVERSITIES = []
 
 ############################### XModule Store ##################################
 MODULESTORE = {
@@ -405,6 +411,14 @@ INIT_MODULESTORE_ON_STARTUP = True
 # This should be moved into an XBlock Runtime/Application object
 # once the responsibility of XBlock creation is moved out of modulestore - cpennington
 XBLOCK_MIXINS = (LmsBlockMixin, InheritanceMixin, XModuleMixin)
+
+# Only allow XModules in the LMS
+XBLOCK_SELECT_FUNCTION = only_xmodules
+
+# Use the following lines to allow any xblock in the LMS,
+# either by uncommenting them here, or adding them to your private.py
+# from xmodule.x_module import prefer_xmodules
+# XBLOCK_SELECT_FUNCTION = prefer_xmodules
 
 #################### Python sandbox ############################################
 
@@ -555,8 +569,6 @@ PAID_COURSE_REGISTRATION_CURRENCY = ['usd', '$']
 
 # Members of this group are allowed to generate payment reports
 PAYMENT_REPORT_GENERATOR_GROUP = 'shoppingcart_report_access'
-# Maximum number of rows the report can contain
-PAYMENT_REPORT_MAX_ITEMS = 10000
 
 ################################# open ended grading config  #####################
 
@@ -609,6 +621,7 @@ TEMPLATE_LOADERS = (
 
 MIDDLEWARE_CLASSES = (
     'request_cache.middleware.RequestCache',
+    'microsite_configuration.middleware.MicrositeConfiguration',
     'django_comment_client.middleware.AjaxExceptionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -1038,38 +1051,71 @@ MKTG_URL_LINK_MAP = {
     'TOS': 'tos',
     'HONOR': 'honor',
     'PRIVACY': 'privacy_edx',
+    'JOBS': 'jobs',
+    'PRESS': 'press',
 
     # Verified Certificates
     'WHAT_IS_VERIFIED_CERT': 'verified-certificate',
 }
 
 
-############################### THEME ################################
-def enable_theme(theme_name):
+############################### MICROSITES ################################
+def enable_microsites(microsite_config_dict, subdomain_branding, virtual_universities, microsites_root=ENV_ROOT / "microsites"):
     """
-    Enable the settings for a custom theme, whose files should be stored
-    in ENV_ROOT/themes/THEME_NAME (e.g., edx_all/themes/stanford).
-
-    The THEME_NAME setting should be configured separately since it can't
-    be set here (this function closes too early). An idiom for doing this
-    is:
-
-    THEME_NAME = "stanford"
-    enable_theme(THEME_NAME)
+    Enable the use of microsites, which are websites that allow
+    for subdomains for the edX platform, e.g. foo.edx.org
     """
-    FEATURES['USE_CUSTOM_THEME'] = True
 
-    # Calculate the location of the theme's files
-    theme_root = ENV_ROOT / "themes" / theme_name
+    if not microsite_config_dict:
+        return
 
-    # Include the theme's templates in the template search paths
-    TEMPLATE_DIRS.append(theme_root / 'templates')
-    MAKO_TEMPLATES['main'].append(theme_root / 'templates')
+    FEATURES['USE_MICROSITES'] = True
 
-    # Namespace the theme's static files to 'themes/<theme_name>' to
-    # avoid collisions with default edX static files
-    STATICFILES_DIRS.append((u'themes/%s' % theme_name,
-                             theme_root / 'static'))
+    for microsite_name in microsite_config_dict.keys():
+        # Calculate the location of the microsite's files
+        microsite_root = microsites_root / microsite_name
+        microsite_config = microsite_config_dict[microsite_name]
+
+        # pull in configuration information from each
+        # microsite root
+
+        if os.path.isdir(microsite_root):
+            # store the path on disk for later use
+            microsite_config['microsite_root'] = microsite_root
+
+            # get the domain that this should reside
+            domain = microsite_config['domain_prefix']
+
+            # get the virtual university that this should use
+            university = microsite_config['university']
+
+            # add to the existing maps in our settings
+            subdomain_branding[domain] = university
+            virtual_universities.append(university)
+
+            template_dir = microsite_root / 'templates'
+            microsite_config['template_dir'] = template_dir
+
+            microsite_config['microsite_name'] = microsite_name
+
+        else:
+            # not sure if we have application logging at this stage of
+            # startup
+            print '**** Error loading microsite {0}. Directory does not exist'.format(microsite_root)
+            # remove from our configuration as it is not valid
+            del microsite_config_dict[microsite_name]
+
+    # if we have microsites, then let's turn on SUBDOMAIN_BRANDING
+    # Note check size of the dict because some microsites might not be found on disk and
+    # we could be left with none
+    if microsite_config_dict:
+        FEATURES['SUBDOMAIN_BRANDING'] = True
+
+        TEMPLATE_DIRS.append(microsites_root)
+        MAKO_TEMPLATES['main'].append(microsites_root)
+
+        STATICFILES_DIRS.append(microsites_root)
+
 
 ################# Student Verification #################
 VERIFY_STUDENT = {

@@ -114,9 +114,10 @@ class VideoDescriptorTest(unittest.TestCase):
 
     def setUp(self):
         system = get_test_descriptor_system()
+        location = Location('i4x://org/course/video/name')
         self.descriptor = system.construct_xblock_from_class(
             VideoDescriptor,
-            scope_ids=ScopeIds(None, None, None, None),
+            scope_ids=ScopeIds(None, None, location, location),
             field_data=DictFieldData({}),
         )
 
@@ -226,7 +227,7 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
               <track src="http://www.example.com/track"/>
             </video>
         '''
-        output = VideoDescriptor.from_xml(xml_data, module_system)
+        output = VideoDescriptor.from_xml(xml_data, module_system, Mock())
         self.assert_attributes_equal(output, {
             'youtube_id_0_75': 'izygArpw-Qo',
             'youtube_id_1_0': 'p2Q6BrNhdh8',
@@ -255,7 +256,7 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
               <track src="http://www.example.com/track"/>
             </video>
         '''
-        output = VideoDescriptor.from_xml(xml_data, module_system)
+        output = VideoDescriptor.from_xml(xml_data, module_system, Mock())
         self.assert_attributes_equal(output, {
             'youtube_id_0_75': '',
             'youtube_id_1_0': 'p2Q6BrNhdh8',
@@ -276,7 +277,7 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
         """
         module_system = DummySystem(load_error_modules=True)
         xml_data = '<video></video>'
-        output = VideoDescriptor.from_xml(xml_data, module_system)
+        output = VideoDescriptor.from_xml(xml_data, module_system, Mock())
         self.assert_attributes_equal(output, {
             'youtube_id_0_75': '',
             'youtube_id_1_0': 'OEoXaMPEzfM',
@@ -310,7 +311,7 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
                 youtube_id_1_0="&quot;OEoXaMPEzf10&quot;"
                 />
         '''
-        output = VideoDescriptor.from_xml(xml_data, module_system)
+        output = VideoDescriptor.from_xml(xml_data, module_system, Mock())
         self.assert_attributes_equal(output, {
             'youtube_id_0_75': 'OEoXaMPEzf65',
             'youtube_id_1_0': 'OEoXaMPEzf10',
@@ -332,7 +333,7 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
                    youtube="1.0:&quot;p2Q6BrNhdh8&quot;,1.25:&quot;1EeWXzPdhSA&quot;">
             </video>
         '''
-        output = VideoDescriptor.from_xml(xml_data, module_system)
+        output = VideoDescriptor.from_xml(xml_data, module_system, Mock())
         self.assert_attributes_equal(output, {
             'youtube_id_0_75': '',
             'youtube_id_1_0': 'p2Q6BrNhdh8',
@@ -362,7 +363,7 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
               <track src="http://www.example.com/track"/>
             </video>
         """
-        output = VideoDescriptor.from_xml(xml_data, module_system)
+        output = VideoDescriptor.from_xml(xml_data, module_system, Mock())
         self.assert_attributes_equal(output, {
             'youtube_id_0_75': 'izygArpw-Qo',
             'youtube_id_1_0': 'p2Q6BrNhdh8',
@@ -391,7 +392,7 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
               <track src="http://www.example.com/track"/>
             </video>
         """
-        video = VideoDescriptor.from_xml(xml_data, module_system)
+        video = VideoDescriptor.from_xml(xml_data, module_system, Mock())
         self.assert_attributes_equal(video, {
             'youtube_id_0_75': 'izygArpw-Qo',
             'youtube_id_1_0': 'p2Q6BrNhdh8',
@@ -420,7 +421,7 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
               <track src="http://www.example.com/track"/>
             </video>
         """
-        video = VideoDescriptor.from_xml(xml_data, module_system)
+        video = VideoDescriptor.from_xml(xml_data, module_system, Mock())
         self.assert_attributes_equal(video, {
             'youtube_id_0_75': 'izygArpw-Qo',
             'youtube_id_1_0': 'p2Q6BrNhdh8',

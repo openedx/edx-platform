@@ -22,7 +22,6 @@ from django.views.decorators.http import require_http_methods, require_GET
 from django.utils.translation import ugettext as _
 
 from edxmako.shortcuts import render_to_response
-from auth.authz import create_all_course_groups
 
 from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.contentstore.django import contentstore
@@ -31,10 +30,12 @@ from xmodule.modulestore.django import modulestore, loc_mapper
 from xmodule.exceptions import SerializationError
 
 from xmodule.modulestore.locator import BlockUsageLocator
-from .access import has_access
+from .access import has_course_access
 
 from util.json_request import JsonResponse
 from extract_tar import safetar_extractall
+from student.roles import CourseInstructorRole, CourseStaffRole
+from student import auth
 
 
 __all__ = ['import_handler', 'import_status_handler', 'export_handler']
@@ -61,7 +62,7 @@ def import_handler(request, tag=None, package_id=None, branch=None, version_guid
         json: import a course via the .tar.gz file specified in request.FILES
     """
     location = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
-    if not has_access(request.user, location):
+    if not has_course_access(request.user, location):
         raise PermissionDenied()
 
     old_location = loc_mapper().translate_locator_to_location(location)
@@ -225,13 +226,15 @@ def import_handler(request, tag=None, package_id=None, branch=None, version_guid
                         draft_store=modulestore()
                     )
 
-                    logging.debug('new course at {0}'.format(course_items[0].location))
+                    new_location = course_items[0].location
+                    logging.debug('new course at {0}'.format(new_location))
 
                     session_status[key] = 3
                     request.session.modified = True
 
-                    create_all_course_groups(request.user, course_items[0].location)
-                    logging.debug('created all course groups at {0}'.format(course_items[0].location))
+                    auth.add_users(request.user, CourseInstructorRole(new_location), request.user)
+                    auth.add_users(request.user, CourseStaffRole(new_location), request.user)
+                    logging.debug('created all course groups at {0}'.format(new_location))
 
                 # Send errors to client with stage at which error occured.
                 except Exception as exception:   # pylint: disable=W0703
@@ -272,7 +275,7 @@ def import_status_handler(request, tag=None, package_id=None, branch=None, versi
 
     """
     location = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
-    if not has_access(request.user, location):
+    if not has_course_access(request.user, location):
         raise PermissionDenied()
 
     try:
@@ -303,7 +306,7 @@ def export_handler(request, tag=None, package_id=None, branch=None, version_guid
     which describes the error.
     """
     location = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
-    if not has_access(request.user, location):
+    if not has_course_access(request.user, location):
         raise PermissionDenied()
 
     old_location = loc_mapper().translate_locator_to_location(location)

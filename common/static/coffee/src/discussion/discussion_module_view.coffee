@@ -30,7 +30,7 @@ if Backbone?
       else
         @newPostForm.show()
       @toggleDiscussionBtn.addClass('shown')
-      @toggleDiscussionBtn.find('.button-text').html("Hide Discussion")
+      @toggleDiscussionBtn.find('.button-text').html(gettext("Hide Discussion"))
       @$("section.discussion").slideDown()
       @showed = true
 
@@ -41,7 +41,7 @@ if Backbone?
     hideDiscussion: ->
       @$("section.discussion").slideUp()
       @toggleDiscussionBtn.removeClass('shown')
-      @toggleDiscussionBtn.find('.button-text').html("Show Discussion")
+      @toggleDiscussionBtn.find('.button-text').html(gettext("Show Discussion"))
       @showed = false
 
     toggleDiscussion: (event) ->
@@ -49,7 +49,7 @@ if Backbone?
         @hideDiscussion()
       else
         @toggleDiscussionBtn.addClass('shown')
-        @toggleDiscussionBtn.find('.button-text').html("Hide Discussion")
+        @toggleDiscussionBtn.find('.button-text').html(gettext("Hide Discussion"))
 
         if @retrieved
           @$("section.discussion").slideDown()
@@ -61,8 +61,8 @@ if Backbone?
             =>
               @hideDiscussion()
               DiscussionUtil.discussionAlert(
-                "Sorry",
-                "We had some trouble loading the discussion. Please try again."
+                gettext("Sorry"),
+                gettext("We had some trouble loading the discussion. Please try again.")
               )
           )
 
@@ -154,7 +154,7 @@ if Backbone?
         =>
           @page = currPage
           DiscussionUtil.discussionAlert(
-            "Sorry",
-            "We had some trouble loading the threads you requested. Please try again."
+            gettext("Sorry"),
+            gettext("We had some trouble loading the threads you requested. Please try again.")
           )
       )
