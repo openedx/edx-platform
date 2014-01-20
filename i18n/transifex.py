@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 
-import os, sys
+import sys
 from polib import pofile
-from config import CONFIGURATION
-from extract import SOURCE_WARN
-from execute import execute
+
+from i18n.config import CONFIGURATION
+from i18n.extract import SOURCE_WARN
+from i18n.execute import execute
 
 TRANSIFEX_HEADER = 'Translations in this file have been downloaded from %s'
 TRANSIFEX_URL = 'https://www.transifex.com/projects/p/edx-studio/'

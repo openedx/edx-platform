@@ -28,7 +28,7 @@ Example use::
 
 """
 
-from converter import Converter
+from i18n.converter import Converter
 
 # Substitute plain characters with accented lookalikes.
 # http://tlt.its.psu.edu/suggestions/international/web/codehtml.html#accent

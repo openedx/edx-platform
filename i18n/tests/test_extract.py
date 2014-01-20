@@ -1,12 +1,13 @@
-import os
-import polib
-from unittest import TestCase
-from nose.plugins.skip import SkipTest
 from datetime import datetime, timedelta
+import os
+from unittest import TestCase
+
+from nose.plugins.skip import SkipTest
+import polib
 from pytz import UTC
 
-import extract
-from config import CONFIGURATION
+from i18n import extract
+from i18n.config import CONFIGURATION
 
 # Make sure setup runs only once
 SETUP_HAS_RUN = False
