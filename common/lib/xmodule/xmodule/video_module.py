@@ -25,7 +25,6 @@ from xmodule.x_module import XModule
 from xmodule.editing_module import TabsEditingDescriptor
 from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.xml_module import is_pointer_tag, name_to_pathname, deserialize_field
-from xmodule.modulestore import Location
 from xblock.fields import Scope, String, Boolean, List, Integer, ScopeIds
 from xmodule.fields import RelativeTime
 
@@ -134,8 +133,11 @@ class VideoModule(VideoFields, XModule):
     video_time = 0
     icon_class = 'video'
 
+    # To make sure that js files are called in proper order we use numerical
+    # index. We do that to avoid issues that occurs in tests.
     js = {
         'js': [
+            resource_string(__name__, 'js/src/video/00_cookie_storage.js'),
             resource_string(__name__, 'js/src/video/00_resizer.js'),
             resource_string(__name__, 'js/src/video/01_initialize.js'),
             resource_string(__name__, 'js/src/video/025_focus_grabber.js'),
