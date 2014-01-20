@@ -16,6 +16,7 @@ dealer==0.2.3
 distribute>=0.6.28, <0.7
 django-celery==3.0.17
 django-countries==1.5
+django-extensions==1.2.5
 django-filter==0.6.0
 django-followit==0.0.3
 django-keyedcache==1.4-6
@@ -92,7 +93,7 @@ transifex-client==0.9.1
 
 # Used for testing
 coverage==3.7
-ddt==0.4.0
+ddt==0.6.0
 factory_boy==2.2.1
 mock==1.0.1
 nosexcover==1.0.7
@@ -102,7 +103,7 @@ rednose==0.3
 selenium==2.34.0
 splinter==0.5.4
 django_nose==1.1
-django_debug_toolbar
+django_debug_toolbar==0.9.4
 django-debug-toolbar-mongo
 nose-ignore-docstring
 nose-exclude

@@ -295,7 +295,7 @@ def get_courses(user, domain=None):
     '''
     Returns a list of courses available, sorted by course.number
     '''
-    courses = branding.get_visible_courses(domain)
+    courses = branding.get_visible_courses()
     courses = [c for c in courses if has_access(user, c, 'see_exists')]
 
     courses = sorted(courses, key=lambda course: course.number)

@@ -17,7 +17,7 @@ def process_includes(fn):
     are supposed to include
     """
     @wraps(fn)
-    def from_xml(cls, xml_data, system, org=None, course=None):
+    def from_xml(cls, xml_data, system, id_generator):
         xml_object = etree.fromstring(xml_data)
         next_include = xml_object.find('include')
         while next_include is not None:
@@ -55,14 +55,14 @@ def process_includes(fn):
             parent.remove(next_include)
 
             next_include = xml_object.find('include')
-        return fn(cls, etree.tostring(xml_object), system, org, course)
+        return fn(cls, etree.tostring(xml_object), system, id_generator)
     return from_xml
 
 
 class SemanticSectionDescriptor(XModuleDescriptor):
     @classmethod
     @process_includes
-    def from_xml(cls, xml_data, system, org=None, course=None):
+    def from_xml(cls, xml_data, system, id_generator):
         """
         Removes sections with single child elements in favor of just embedding
         the child element
@@ -83,7 +83,7 @@ class SemanticSectionDescriptor(XModuleDescriptor):
 
 class TranslateCustomTagDescriptor(XModuleDescriptor):
     @classmethod
-    def from_xml(cls, xml_data, system, org=None, course=None):
+    def from_xml(cls, xml_data, system, id_generator):
         """
         Transforms the xml_data from <$custom_tag attr="" attr=""/> to
         <customtag attr="" attr="" impl="$custom_tag"/>

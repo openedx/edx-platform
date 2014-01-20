@@ -34,7 +34,7 @@ DOC_STORE_CONFIG = {
 }
 
 modulestore_options = {
-    'default_class': 'xmodule.raw_module.RawDescriptor',
+    'default_class': 'xmodule.hidden_module.HiddenDescriptor',
     'fs_root': TEST_ROOT / "data",
     'render_template': 'edxmako.shortcuts.render_to_string',
 }

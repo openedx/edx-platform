@@ -4,17 +4,29 @@ from cmath import isinf
 #-----------------------------------------------------------------------------
 #
 # Utility functions used in CAPA responsetypes
+default_tolerance = '0.001%'
 
 
-def compare_with_tolerance(v1, v2, tol):
-    ''' Compare v1 to v2 with maximum tolerance tol
-    tol is relative if it ends in %; otherwise, it is absolute
+def compare_with_tolerance(v1, v2, tol=default_tolerance):
+    """
+    Compare v1 to v2 with maximum tolerance tol.
 
-     - v1    :  student result (number)
-     - v2    :  instructor result (number)
+    tol is relative if it ends in %; otherwise, it is absolute.
+
+     - v1    :  student result (float complex number)
+     - v2    :  instructor result (float complex number)
      - tol   :  tolerance (string representing a number)
 
-    '''
+     Default tolerance of 1e-3% is added to compare two floats for near-equality
+     (to handle machine representation errors).
+     It is relative, as the acceptable difference between two floats depends on the magnitude of the floats.
+     (http://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/)
+     Examples:
+        In [183]: 0.000016 - 1.6*10**-5
+        Out[183]: -3.3881317890172014e-21
+        In [212]: 1.9e24 - 1.9*10**24
+        Out[212]: 268435456.0
+    """
     relative = tol.endswith('%')
     if relative:
         tolerance_rel = evaluator(dict(), dict(), tol[:-1]) * 0.01
@@ -28,12 +40,16 @@ def compare_with_tolerance(v1, v2, tol):
         # `inf <= inf` which is a fail. Instead, compare directly.
         return v1 == v2
     else:
+        # v1 and v2 are, in general, complex numbers:
+        # there are some notes about backward compatibility issue: see responsetypes.get_staff_ans()).
         return abs(v1 - v2) <= tolerance
 
 
 def contextualize_text(text, context):  # private
-    ''' Takes a string with variables. E.g. $a+$b.
-    Does a substitution of those variables from the context '''
+    """
+    Takes a string with variables. E.g. $a+$b.
+    Does a substitution of those variables from the context
+    """
     if not text:
         return text
     for key in sorted(context, lambda x, y: cmp(len(y), len(x))):
@@ -52,10 +68,10 @@ def contextualize_text(text, context):  # private
 
 
 def convert_files_to_filenames(answers):
-    '''
+    """
     Check for File objects in the dict of submitted answers,
         convert File objects to their filename (string)
-    '''
+    """
     new_answers = dict()
     for answer_id in answers.keys():
         answer = answers[answer_id]
@@ -72,9 +88,9 @@ def is_list_of_files(files):
 
 
 def is_file(file_to_test):
-    '''
+    """
     Duck typing to check if 'file_to_test' is a File object
-    '''
+    """
     return all(hasattr(file_to_test, method) for method in ['read', 'name'])
 
 

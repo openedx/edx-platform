@@ -3,7 +3,6 @@ import pytz
 
 from mock import patch
 
-from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 
@@ -128,6 +127,7 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
             display_name='Welcome'
         )
 
+        self.global_staff_user = GlobalStaffFactory()
         self.unenrolled_user = UserFactory(last_name="Unenrolled")
 
         self.enrolled_user = UserFactory(last_name="Enrolled")
@@ -135,10 +135,11 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         CourseEnrollmentFactory(user=self.enrolled_user, course_id=self.test_course.id)
 
         self.staff_user = StaffFactory(course=self.course.location)
-        self.instructor_user = InstructorFactory(course=self.course.location)
+        self.instructor_user = InstructorFactory(
+            course=self.course.location)
         self.org_staff_user = OrgStaffFactory(course=self.course.location)
-        self.org_instructor_user = OrgInstructorFactory(course=self.course.location)
-        self.global_staff_user = GlobalStaffFactory()
+        self.org_instructor_user = OrgInstructorFactory(
+            course=self.course.location)
 
     def test_redirection_unenrolled(self):
         """

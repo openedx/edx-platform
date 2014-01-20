@@ -70,6 +70,7 @@ function (HTML5Video, Resizer) {
             if (state.currentPlayerMode !== 'flash') {
                 state.videoPlayer.onSpeedChange(state.speed);
             }
+            state.videoPlayer.player.setVolume(state.currentVolume);
         });
 
         if (state.videoType === 'youtube') {

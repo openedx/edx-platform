@@ -2,9 +2,10 @@
 Provide tests for sysadmin dashboard feature in sysadmin.py
 """
 
-import unittest
+import glob
 import os
 import shutil
+import unittest
 
 from django.conf import settings
 from django.contrib.auth.hashers import check_password
@@ -16,10 +17,11 @@ from django.utils.html import escape
 from django.utils.translation import ugettext as _
 import mongoengine
 
-from courseware.roles import CourseStaffRole, GlobalStaff
+from student.roles import CourseStaffRole, GlobalStaff
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from dashboard.models import CourseImportLog
 from dashboard.sysadmin import Users
+from dashboard.git_import import GitImportError
 from external_auth.models import ExternalAuthMap
 from student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore
@@ -43,15 +45,6 @@ class SysadminBaseTestCase(ModuleStoreTestCase):
     Base class with common methods used in XML and Mongo tests
     """
 
-    @classmethod
-    def tearDownClass(cls):
-        """Delete all repos imported during tests."""
-        super(SysadminBaseTestCase, cls).tearDownClass()
-        try:
-            shutil.rmtree(getattr(settings, 'GIT_REPO_DIR'))
-        except OSError:
-            pass
-
     def setUp(self):
         """Setup test case by adding primary user."""
         super(SysadminBaseTestCase, self).setUp()
@@ -74,18 +67,37 @@ class SysadminBaseTestCase(ModuleStoreTestCase):
     def _rm_edx4edx(self):
         """Deletes the sample course from the XML store"""
         def_ms = modulestore()
+        course_path = '{0}/edx4edx_lite'.format(
+            os.path.abspath(settings.DATA_DIR))
         try:
             # using XML store
-            course = def_ms.courses.get('{0}/edx4edx_lite'.format(
-                os.path.abspath(settings.DATA_DIR)), None)
+            course = def_ms.courses.get(course_path, None)
         except AttributeError:
             # Using mongo store
             course = def_ms.get_course('MITx/edx4edx/edx4edx')
 
         # Delete git loaded course
-        return self.client.post(reverse('sysadmin_courses'),
+        response = self.client.post(reverse('sysadmin_courses'),
                                 {'course_id': course.id,
                                  'action': 'del_course', })
+        self.addCleanup(self._rm_glob, '{0}_deleted_*'.format(course_path))
+
+        return response
+
+    def _rm_glob(self, path):
+        """
+        Create a shell expansion of passed in parameter and iteratively
+        remove them.  Must only expand to directories.
+        """
+        for path in glob.glob(path):
+            shutil.rmtree(path)
+
+    def _mkdir(self, path):
+        """
+        Create directory and add the cleanup for it.
+        """
+        os.mkdir(path)
+        self.addCleanup(shutil.rmtree, path)
 
 
 @unittest.skipUnless(settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD'),
@@ -401,9 +413,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
 
         # Create git loaded course
         response = self._add_edx4edx()
-        self.assertIn(escape(_("Path {0} doesn't exist, please create it, or "
-                               "configure a different path with "
-                               "GIT_REPO_DIR").format(settings.GIT_REPO_DIR)),
+        self.assertIn(GitImportError.NO_DIR,
                       response.content.decode('UTF-8'))
 
     def test_mongo_course_add_delete(self):
@@ -413,8 +423,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         """
 
         self._setstaff_login()
-        if not os.path.isdir(getattr(settings, 'GIT_REPO_DIR')):
-            os.mkdir(getattr(settings, 'GIT_REPO_DIR'))
+        self._mkdir(getattr(settings, 'GIT_REPO_DIR'))
 
         def_ms = modulestore()
         self.assertFalse(isinstance(def_ms, XMLModuleStore))
@@ -433,10 +442,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         """
 
         self._setstaff_login()
-        try:
-            os.mkdir(getattr(settings, 'GIT_REPO_DIR'))
-        except OSError:
-            pass
+        self._mkdir(getattr(settings, 'GIT_REPO_DIR'))
 
         self._add_edx4edx()
         response = self.client.get(reverse('gitlogs'))
@@ -468,10 +474,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         Ensure course team users are allowed to access only their own course.
         """
 
-        try:
-            os.mkdir(getattr(settings, 'GIT_REPO_DIR'))
-        except OSError:
-            pass
+        self._mkdir(getattr(settings, 'GIT_REPO_DIR'))
 
         self._setstaff_login()
         self._add_edx4edx()

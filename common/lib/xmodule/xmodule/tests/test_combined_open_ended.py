@@ -390,6 +390,14 @@ class OpenEndedModuleTest(unittest.TestCase):
         # Confirm that the answer is stored properly.
         self.assertEqual(test_module.latest_answer(), submitted_response)
 
+    def test_parse_score_msg(self):
+        """
+        Test _parse_score_msg with empty dict.
+        """
+
+        assessment = self.openendedmodule._parse_score_msg("{}", self.test_system)
+        self.assertEqual(assessment.get("valid"), False)
+
 
 class CombinedOpenEndedModuleTest(unittest.TestCase):
     """

@@ -163,10 +163,10 @@ var allStats = $('#status-infos');
 var feedbackUrl = "${import_status_url}";
 
 var defaults = [
-    '${_("There was an error during the upload process.")}\n',
-    '${_("There was an error while unpacking the file.")}\n',
-    '${_("There was an error while verifying the file you submitted.")}\n',
-    '${_("There was an error while importing the new course to our database.")}\n'
+    "${_("There was an error during the upload process.")}\n",
+    "${_("There was an error while unpacking the file.")}\n",
+    "${_("There was an error while verifying the file you submitted.")}\n",
+    "${_("There was an error while importing the new course to our database.")}\n"
 ];
 
 $('#fileupload').fileupload({
@@ -201,12 +201,12 @@ $('#fileupload').fileupload({
                             CourseImport.stageError(stage, defaults[stage] + errMsg);
                         }
                         else {
-                            alert('${_("Your import has failed.")}\n\n' + errMsg);
+                            alert("${_("Your import has failed.")}\n\n" + errMsg);
                         }
-                        chooseBtn.html('${_("Choose new file")}').show();
+                        chooseBtn.html("${_("Choose new file")}").show();
                         bar.hide();
                     }
-                    chooseBtn.html('${_("Choose new file")}').show();
+                    chooseBtn.html("${_("Choose new file")}").show();
                     bar.hide();
                 });
             });
@@ -243,7 +243,7 @@ $('#fileupload').fileupload({
     },
     start: function(e) {
         window.onbeforeunload = function() {
-            return '${_("Your import is in progress; navigating away will abort it.")}';
+            return "${_("Your import is in progress; navigating away will abort it.")}";
         }
     },
     sequentialUploads: true,

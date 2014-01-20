@@ -12,9 +12,9 @@ from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
-from django.http import Http404
-from django.http import HttpResponse
-from django.views.decorators.csrf import csrf_exempt, csrf_protect
+from django.http import Http404, HttpResponse
+import django.utils
+from django.views.decorators.csrf import csrf_exempt
 
 from capa.xqueue_interface import XQueueInterface
 from courseware.access import has_access
@@ -27,8 +27,9 @@ from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
 from student.models import anonymous_id_for_user, user_by_anonymous_id
 from util.json_request import JsonResponse
 from util.sandboxing import can_execute_unsafe_code
+from xblock.core import XBlock
 from xblock.fields import Scope
-from xblock.runtime import DbModel, KeyValueStore
+from xblock.runtime import KvsFieldData, KeyValueStore
 from xblock.exceptions import NoSuchHandlerError
 from xblock.django.request import django_to_webob_request, webob_to_django_response
 from xmodule.error_module import ErrorDescriptor, NonStaffErrorDescriptor
@@ -36,8 +37,10 @@ from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.util.duedate import get_extended_due_date
 from xmodule_modifiers import replace_course_urls, replace_jump_to_id_urls, replace_static_urls, add_histogram, wrap_xblock
 from xmodule.lti_module import LTIModule
+from xmodule.x_module import XModuleDescriptor
 
 
 log = logging.getLogger(__name__)
@@ -110,7 +113,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
                 sections.append({'display_name': section.display_name_with_default,
                                  'url_name': section.url_name,
                                  'format': section.format if section.format is not None else '',
-                                 'due': section.due,
+                                 'due': get_extended_due_date(section),
                                  'active': active,
                                  'graded': section.graded,
                                  })
@@ -219,7 +222,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
     if not has_access(user, descriptor, 'load', course_id):
         return None
 
-    student_data = DbModel(DjangoKeyValueStore(field_data_cache))
+    student_data = KvsFieldData(DjangoKeyValueStore(field_data_cache))
     descriptor._field_data = LmsFieldData(descriptor._field_data, student_data)
 
 
@@ -373,7 +376,9 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
     # while giving selected modules a per-course anonymized id.
     # As we have the time to manually test more modules, we can add to the list
     # of modules that get the per-course anonymized id.
-    if issubclass(getattr(descriptor, 'module_class', None), LTIModule):
+    is_pure_xblock = isinstance(descriptor, XBlock) and not isinstance(descriptor, XModuleDescriptor)
+    is_lti_module = not is_pure_xblock and issubclass(descriptor.module_class, LTIModule)
+    if is_pure_xblock or is_lti_module:
         anonymous_student_id = anonymous_id_for_user(user, course_id)
     else:
         anonymous_student_id = anonymous_id_for_user(user, '')
@@ -419,6 +424,12 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
         mixins=descriptor.runtime.mixologist._mixins,  # pylint: disable=protected-access
         wrappers=block_wrappers,
         get_real_user=user_by_anonymous_id,
+        services={
+            # django.utils.translation implements the gettext.Translations
+            # interface (it has ugettext, ungettext, etc), so we can use it
+            # directly as the runtime i18n service.
+            'i18n': django.utils.translation,
+        },
     )
 
     # pass position specified in URL to module through ModuleSystem

@@ -26,7 +26,8 @@ class LocalId(object):
 
     Should be hashable and distinguishable, but nothing else
     """
-    pass
+    def __str__(self):
+        return "localid_{}".format(id(self))
 
 
 class Locator(object):
@@ -502,11 +503,16 @@ class DefinitionLocator(Locator):
 
     URL_RE = re.compile(r'^defx://' + VERSION_PREFIX + '([^/]+)$', re.IGNORECASE)
     def __init__(self, definition_id):
-        if isinstance(definition_id, basestring):
+        if isinstance(definition_id, LocalId):
+            self.definition_id = definition_id
+        elif isinstance(definition_id, basestring):
             regex_match = self.URL_RE.match(definition_id)
             if regex_match is not None:
-                definition_id = self.as_object_id(regex_match.group(1))
-        self.definition_id = self.as_object_id(definition_id)
+                self.definition_id = self.as_object_id(regex_match.group(1))
+            else:
+                self.definition_id = self.as_object_id(definition_id)
+        else:
+            self.definition_id = self.as_object_id(definition_id)
 
     def __unicode__(self):
         '''

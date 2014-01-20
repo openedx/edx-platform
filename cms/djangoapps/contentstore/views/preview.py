@@ -12,7 +12,7 @@ from xmodule.error_module import ErrorDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.modulestore.django import modulestore
 from xmodule.x_module import ModuleSystem
-from xblock.runtime import DbModel
+from xblock.runtime import KvsFieldData
 from xblock.django.request import webob_to_django_response, django_to_webob_request
 from xblock.exceptions import NoSuchHandlerError
 
@@ -142,7 +142,7 @@ def _load_preview_module(request, descriptor):
     request: The active django request
     descriptor: An XModuleDescriptor
     """
-    student_data = DbModel(SessionKeyValueStore(request))
+    student_data = KvsFieldData(SessionKeyValueStore(request))
     descriptor.bind_for_student(
         _preview_module_system(request, descriptor),
         LmsFieldData(descriptor._field_data, student_data),  # pylint: disable=protected-access

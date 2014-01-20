@@ -182,7 +182,10 @@ class NumericalResponseXMLFactory(ResponseXMLFactory):
         response_element = etree.Element('numericalresponse')
 
         if answer:
-            response_element.set('answer', str(answer))
+            if isinstance(answer, float):
+                response_element.set('answer', repr(answer))
+            else:
+                response_element.set('answer', str(answer))
 
         if tolerance:
             responseparam_element = etree.SubElement(response_element, 'responseparam')
@@ -690,22 +693,30 @@ class StringResponseXMLFactory(ResponseXMLFactory):
 
             *hintfn*: The name of a function in the script to use for hints.
 
+            *regexp*: Whether the response is regexp
+
+            *additional_answers*: list of additional asnwers.
+
         """
         # Retrieve the **kwargs
         answer = kwargs.get("answer", None)
         case_sensitive = kwargs.get("case_sensitive", True)
         hint_list = kwargs.get('hints', None)
         hint_fn = kwargs.get('hintfn', None)
+        regexp = kwargs.get('regexp', None)
+        additional_answers = kwargs.get('additional_answers', [])
         assert answer
 
         # Create the <stringresponse> element
         response_element = etree.Element("stringresponse")
 
         # Set the answer attribute
-        response_element.set("answer", str(answer))
+        response_element.set("answer", unicode(answer))
 
-        # Set the case sensitivity
-        response_element.set("type", "cs" if case_sensitive else "ci")
+        # Set the case sensitivity and regexp:
+        type_value = "cs" if case_sensitive else "ci"
+        type_value += ' regexp' if regexp else ''
+        response_element.set("type", type_value)
 
         # Add the hints if specified
         if hint_list or hint_fn:
@@ -726,6 +737,9 @@ class StringResponseXMLFactory(ResponseXMLFactory):
             if hint_fn:
                 assert not hint_list
                 hintgroup_element.set("hintfn", hint_fn)
+
+        for additional_answer in additional_answers:
+            etree.SubElement(response_element, "additional_answer").text = additional_answer
 
         return response_element
 

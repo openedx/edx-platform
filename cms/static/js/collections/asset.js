@@ -15,6 +15,8 @@ define(["backbone.paginator", "js/models/asset"], function(BackbonePaginator, As
         server_api: {
             'page': function() { return this.currentPage; },
             'page_size': function() { return this.perPage; },
+            'sort': function() { return this.sortField; },
+            'direction': function() { return this.sortDirection; },
             'format': 'json'
         },
 

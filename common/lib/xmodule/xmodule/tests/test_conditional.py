@@ -9,7 +9,7 @@ from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 from xmodule.error_module import NonStaffErrorDescriptor
 from xmodule.modulestore import Location
-from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
+from xmodule.modulestore.xml import ImportSystem, XMLModuleStore, CourseLocationGenerator
 from xmodule.conditional_module import ConditionalDescriptor
 from xmodule.tests import DATA_DIR, get_test_system, get_test_descriptor_system
 
@@ -32,7 +32,6 @@ class DummySystem(ImportSystem):
             error_tracker=Mock(),
             parent_tracker=Mock(),
             load_error_modules=load_error_modules,
-            policy={},
         )
 
     def render_template(self, template, context):
@@ -61,8 +60,7 @@ class ConditionalFactory(object):
             source_descriptor = NonStaffErrorDescriptor.from_xml(
                 'some random xml data',
                 system,
-                org=source_location.org,
-                course=source_location.course,
+                id_generator=CourseLocationGenerator(source_location.org, source_location.course),
                 error_msg='random error message'
             )
         else:
