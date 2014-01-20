@@ -1,26 +1,38 @@
 <%! from django.utils.translation import ugettext as _ %>
-<style type="text/css">
-  .syllabus {
-        @extend %ui-window;
-        position: relative;
-
-          header {
-            margin-bottom: 0;
-            border-bottom: 0;
-          }
-          .syllabus-title {
-            @extend %t-title4;
-            margin-right: ($baseline*14);
-            font-weight: bold;
-          }
-  }
-</style>
 <%inherit file="/main.html" />
 <%namespace name='static' file='/static_content.html'/>
 
 <%block name="headextra">
 <%static:css group='style-course-vendor'/>
 <%static:css group='style-course'/>
+<style type="text/css">
+*{
+  padding: 0;
+  margin: 0;
+}
+syllabus{
+  font: normal 12px Tahoma, Verdana, Arial, sans-serif;
+  
+}p{
+  text-align: justify;
+}
+.cls-padding{
+  padding: 15px;
+}
+.div-container{
+  margin: 0 auto;
+  margin-bottom: 10px;
+}
+  details{
+    border: solid 0px #000;
+  }  
+    summary{
+      border: #fff;
+      padding: 10px;
+      text-align: left;
+      font-style:italic;
+    }
+</style>
 </%block>
 
 <%block name="title"><title>${_("{course.display_number_with_default} Course Info").format(course=course) | h}</title></%block>
@@ -33,23 +45,25 @@
 
 <section class="container">
   <div class="syllabus">
-    <div class="syllabus_wrapper">
-
+    <div>
         % if len(course.topic_syllabuses)>0:
-            <div class="view-syllabus">
-              <div class="wrap-syllabus">
                 % for syllabo in course.topic_syllabuses:
                   <header>
                     <h1 class="syllabus-title">${syllabo["tab_title"]}</h1>
                   </header>
-                  % for items in syllabo["topics"]:
-                      <h2>${items['title']}</h2>
-                      <p>${items['description']}</p>
-                  % endfor
-                  <br/>
-                % endfor
-              </div>
-            </div>  
+                  <div class="div-container">
+                    % for items in syllabo["topics"]:
+                        <details>
+                          <summary>
+                            <strong>${items['title']}</strong>
+                          </summary>
+                          <div class=".cls-padding">
+                            <p>${items['description']}</p>
+                          </div>
+                        </details>
+                    % endfor
+                  </div>
+                  % endfor  
         % else:
                 <p>! Syllabus missing !</p>
         % endif
