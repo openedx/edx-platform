@@ -15,6 +15,9 @@ def run():
     """
     Executed during django startup
     """
+    if settings.FEATURES.get('USE_CUSTOM_THEME', False):
+        enable_theme()
+
     autostartup()
 
     # Trigger a forced initialization of our modulestores since this can take a
@@ -22,9 +25,6 @@ def run():
     if settings.INIT_MODULESTORE_ON_STARTUP:
         for store_name in settings.MODULESTORE:
             modulestore(store_name)
-
-    if settings.FEATURES.get('USE_CUSTOM_THEME', False):
-        enable_theme()
 
 
 def enable_theme():
