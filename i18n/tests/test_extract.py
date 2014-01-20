@@ -87,5 +87,5 @@ class TestExtract(TestCase):
             po = polib.pofile(path)
             metadata = po.metadata
             value = metadata['Report-Msgid-Bugs-To']
-            expected = 'translation_team@edx.org'
+            expected = 'openedx-translation@googlegroups.com'
             self.assertEquals(expected, value)
