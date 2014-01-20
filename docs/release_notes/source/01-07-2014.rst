@@ -1,0 +1,71 @@
+###################################
+January 7, 2014
+###################################
+
+You can now access the public edX roadmap_ for details about the currently planned product direction.
+
+.. _roadmap: https://edx-wiki.atlassian.net/wiki/display/OPENPROD/OpenEdX+Public+Product+Roadmap
+
+
+*************
+edX Studio
+*************
+
+New documentation, *Building a Course with edX Studio*, is available online_. You can also download the new guide as a PDF from the edX Studio user interface.
+
+.. _online: http://edx.readthedocs.org/projects/ca/en/latest/
+
+=============
+New Features
+=============
+
+* The **Files & Uploads** page has been updated so that a maximum of 50 files now appear on a single page. If your course has more than 50 files, additional files are listed in separate pages. You can navigate to other pages through pagination controls at the top and bottom of the file list.  This change improves the page performance for courses with a large number of files.
+
+  For more information, see the `updated documentation for adding files <http://edx.readthedocs.org/projects/ca/en/latest/create_new_course.html#add-files-to-a-course>`_.
+
+  .. note::  The :ref:`October 29 2013` release notes describe a workaround to limit the number of files that appear on a single page. With the January 7, 2014 release, this method is not necessary and no longer works.
+
+
+* The **Course Outline** page is updated to include several design improvements. The new Course Outline appears as in the following example:
+
+  .. image::  images/course_outline.png
+    :alt: The Course Outline
+
+  To see the changes, view your course in Studio or see the `updated documentation for organizing your course content <http://edx.readthedocs.org/projects/ca/en/latest/organizing_course.html>`_.
+
+* A template for custom JavaScript display and grading problems (also called JSInput problems) is now available. For more informatoin, see the `updated documentation for Custom JavaScript display and grading problems <http://edx.readthedocs.org/projects/ca/en/latest/advanced_problems.html#custom-javascript-display-and-grading>`_. (BLD-523) (BLD-556)
+
+* A template for the Zooming Image tool is now available. For more informatoin, see the `updated documentation for the zooming image tool <http://edx.readthedocs.org/projects/ca/en/latest/tools.html#zooming-image>`_. (BLD-206)
+
+==========================
+Changes and Updates
+==========================
+
+* The Course Export tool now supports non-ASCII characters. (STUD-868)
+
+* In the course outline, you can now drag a section to the end of the list of sections when the last section is collapsed. (STUD-879)
+
+* In Video components, when you click inside the **Start Time** or **End Time** field, you can enter a time in HH:MM:SS format as normal text. After you click out of the field, Studio adds zeros and performs unit conversions so that the field contains six digits that correspond to hours, minutes, and seconds.
+
+  For example, if you enter 1:35, the text in the field changes to 00:01:35. If you enter 2:71:35, the text changes to 3:11:35. (BLD-506 and BLD-581)
+
+* The **Save** button for JSInput Problem components now works as expected. (BLD-568)
+
+
+
+***************************************
+edX Learning Management System
+***************************************
+
+
+* When you download grades by clicking **Download CSV of answer distributions** on the Instructor Dashboard, the LMS no longer returns an empty CSV for small Studio-created courses. Instead, the LMS returns a CSV that is sorted by url_name and that includes responses from students who have unenrolled from the course.
+
+  Note that errors occur if you try to download grades for a large Studio-based course or an XML-based course.
+
+* In the course wiki, the **Preview this Revision** and the **Merge selected with Current** dialog boxes are now keyboard accessible in Internet Explorer. (LMS-1539)
+
+* On the Instructor Dashboard, when you click the Datadump tab and then click Download CSV of all student profile data, you no longer receive a 500 error message. (LMS-1675)
+
+* For Image Response problems, the correct answer now appears when a student clicks **Show Answer**. (BLD-21)
+
+* On iPads, the video player uses edX controls that appear after you click the video or the Play button. On iPhones, the video player uses native controls. (BLD-541)

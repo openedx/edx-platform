@@ -131,7 +131,7 @@ By opening up a pull request, we expect the following things:
 
 ### Expections You Have of Us
 
-1. Within 48 hours of opening up a pull request, one of our open source community managers will triage it, either tagging other reviewers for the PR or asking follow up questions. (Please give us a little extra time if you open the PR on a late Friday EST evening! We may not get to it until the following Monday or Tuesday).
+1. Within a week of opening up a pull request, one of our open source community managers will triage it, either tagging other reviewers for the PR or asking follow up questions (Please give us a little extra time if you open the PR on a weekend or around a US holiday! We may take a little longer getting to it.).
 2. We promise to engage in an active dialogue with you from the time we begin reviewing until either the PR is merged (by an edX staff member), or we decide that, for whatever reason, it should be closed.
 3. Once we have determined through visual review that your code is not malicious, we will run a Jenkins build on your branch.
 

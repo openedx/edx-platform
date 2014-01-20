@@ -1,25 +1,25 @@
 [main]
 host = https://www.transifex.com
 
-[edx-platform.django-partial]
+[upex-platform.django-partial]
 file_filter = conf/locale/<lang>/LC_MESSAGES/django-partial.po
 source_file = conf/locale/en/LC_MESSAGES/django-partial.po
 source_lang = en
 type = PO
 
-[edx-platform.djangojs]
+[upex-platform.djangojs]
 file_filter = conf/locale/<lang>/LC_MESSAGES/djangojs.po
 source_file = conf/locale/en/LC_MESSAGES/djangojs.po
 source_lang = en
 type = PO
 
-[edx-platform.mako]
+[upex-platform.mako]
 file_filter = conf/locale/<lang>/LC_MESSAGES/mako.po
 source_file = conf/locale/en/LC_MESSAGES/mako.po
 source_lang = en
 type = PO
 
-[edx-platform.messages]
+[upex-platform.messages]
 file_filter = conf/locale/<lang>/LC_MESSAGES/messages.po
 source_file = conf/locale/en/LC_MESSAGES/messages.po
 source_lang = en

@@ -1,12 +1,12 @@
 define(
     [
-        "backbone", "underscore", "js/models/metadata", "js/views/abstract_editor",
-        "js/views/transcripts/metadata_videolist", "jquery.maskedinput"
+        "js/views/baseview", "underscore", "js/models/metadata", "js/views/abstract_editor",
+        "js/views/transcripts/metadata_videolist"
     ],
-function(Backbone, _, MetadataModel, AbstractEditor, VideoList) {
+function(BaseView, _, MetadataModel, AbstractEditor, VideoList) {
     var Metadata = {};
 
-    Metadata.Editor = Backbone.View.extend({
+    Metadata.Editor = BaseView.extend({
 
         // Model is CMS.Models.MetadataCollection,
         initialize : function() {
@@ -301,6 +301,11 @@ function(Backbone, _, MetadataModel, AbstractEditor, VideoList) {
 
     Metadata.RelativeTime = AbstractEditor.extend({
 
+        defaultValue : '00:00:00',
+        // By default max value of RelativeTime field on Backend is 23:59:59,
+        // that is 86399 seconds.
+        maxTimeInSeconds : 86399,
+
         events : {
             "change input" : "updateModel",
             "keypress .setting-input" : "showClearButton"  ,
@@ -309,46 +314,60 @@ function(Backbone, _, MetadataModel, AbstractEditor, VideoList) {
 
         templateName: "metadata-string-entry",
 
-        initialize: function () {
-            AbstractEditor.prototype.initialize.apply(this);
+        getValueFromEditor : function () {
+            var $input = this.$el.find('#' + this.uniqueId);
 
-            // This list of definitions is used for creating appropriate
-            // time format mask;
-            //
-            // For example, mask 'hH:mM:sS':
-            // min value: 00:00:00
-            // max value: 23:59:59
-            //
-            // With this mask user cannot set following values:
-            // 93:23:23, 23:60:60, 77:77:77, etc.
-            var definitions = {
-                h: '[0-2]',
-                H: '[0-3]',
-                m: '[0-5]',
-                s: '[0-5]',
-                M: '[0-9]',
-                S: '[0-9]'
-            };
-
-            $.each(definitions, function(key, value) {
-                $.mask.definitions[key] = value;
-            });
-
-            this.$el
-                .find('#' + this.uniqueId)
-                .mask('hH:mM:sS', { placeholder: '0' });
+            return $input.val();
         },
 
-        getValueFromEditor : function () {
-            var $input = this.$el.find('#' + this.uniqueId),
-                value = $input.val();
+        updateModel: function () {
+            var value = this.getValueFromEditor(),
+                time = this.parseRelativeTime(value);
 
-            return value;
+            this.model.setValue(time);
+
+            // Sometimes, `parseRelativeTime` method returns the same value for
+            // the different inputs. In this case, model will not be
+            // updated (it already has the same value) and we should
+            // call `render` method manually.
+            // Examples:
+            //   value => 23:59:59; parseRelativeTime => 23:59:59
+            //   value => 44:59:59; parseRelativeTime => 23:59:59
+            if (value !== time && !this.model.hasChanged('value')) {
+                this.render();
+            }
+        },
+
+        parseRelativeTime: function (value) {
+            // This function ensure you have two-digits
+            var pad = function (number) {
+                    return (number < 10) ? "0" + number : number;
+                },
+                // Removes all white-spaces and splits by `:`.
+                list = value.replace(/\s+/g, '').split(':'),
+                seconds, date;
+
+            list = _.map(list, function(num) {
+                return Math.max(0, parseInt(num, 10) || 0);
+            }).reverse();
+
+            seconds = _.reduce(list, function(memo, num, index) {
+                return memo + num * Math.pow(60, index);
+            }, 0);
+
+            // multiply by 1000 because Date() requires milliseconds
+            date = new Date(Math.min(seconds, this.maxTimeInSeconds) * 1000);
+
+            return [
+                pad(date.getUTCHours()),
+                pad(date.getUTCMinutes()),
+                pad(date.getUTCSeconds())
+            ].join(':');
         },
 
         setValueInEditor : function (value) {
             if (!value) {
-                value = '00:00:00';
+                value = this.defaultValue;
             }
 
             this.$el.find('input').val(value);

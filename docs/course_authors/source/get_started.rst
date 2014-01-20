@@ -20,6 +20,7 @@ This chapter describes the tools you use to build an edX course, and how to crea
 * :ref:`Use Studio on Edge`
 * :ref:`Create Your First Course`
 * :ref:`View Your Course on Edge`
+* :ref:`What is edX.org?`
 * :ref:`Register Your Course on edX.org`
 
 If you are using an instance of Open edX, some specifics in this chapter may not apply.
@@ -32,7 +33,7 @@ What is Studio?
 
 Studio is the edX tool you use to build your courses. 
 
-You use Studio to create course content, problems, videos, and other resoruces for students.
+You use Studio to create course content, problems, videos, and other resources for students.
 
 With Studio, you can also manage your schedule and course team, set grading policies, publish your course, and more.
 
@@ -46,6 +47,8 @@ What is Edge?
 ******************
 
 EdX Edge_ is the site where you can create courses with Studio, then run courses through the edX Learning Management System.
+
+EdX Edge_ is also used to host SPOCs, or Small Private Online Courses.
 
 Visually and functionally, edX Edge is the same as edX.org_. 
 However, on Edge you can freely publish courses.  
@@ -94,7 +97,7 @@ Go to: https://studio.edge.edx.org. Sign in with the account you created on Edge
 
 You must then request access to create courses:  
 
-#. Click the **+** sign to expland the field labeled **Becoming a Course Creator in Studio**.
+#. Click the **+** sign to expand the field labeled **Becoming a Course Creator in Studio**.
 
 #. Click **Request the Ability to Create Courses**.
 
@@ -156,6 +159,20 @@ You can also go directly to Edge_. Log in if prompted. You see the course you ju
 You can view the course and see that there is no content yet.
 
 To build your course, keep reading this document.
+
+
+.. _What is edX.org?:
+
+*******************
+What is edX.org?
+*******************
+edX.org_ is the site where edX hosts MOOCs, or Massive Open Online Courses, that are created with our institutional partners. These courses are open to students from around the world.
+
+Courses on edX.org_ are listed publicly.
+
+To publish courses on edX.org, you must have an agreement with edX and specific approval from your university.
+
+
 
 .. _Register Your Course on edx.org:
 

@@ -253,8 +253,9 @@ Add an Image to an HTML Component
 ***********************************
 
 You can add an any image that you have uploaded for the course to an HTML component. 
+You must upload the image before editing the HTML component. 
 
-Find any copy the URL of the image in the Files & Uploads page.
+Find and copy the URL of the image in the Files & Uploads page.
 
 See :ref:`Add Files to a Course` for more information.
 

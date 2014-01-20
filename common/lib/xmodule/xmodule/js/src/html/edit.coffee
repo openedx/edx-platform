@@ -18,11 +18,11 @@ class @HTMLEditingDescriptor
 
 #   This is a workaround for the fact that tinyMCE's baseURL property is not getting correctly set on AWS
 #   instances (like sandbox). It is not necessary to explicitly set baseURL when running locally.
-    tinyMCE.baseURL = "#{baseUrl}/js/vendor/tiny_mce"
+    tinyMCE.baseURL = "#{baseUrl}/js/vendor/tinymce"
     @tiny_mce_textarea = $(".tiny-mce", @element).tinymce({
-      script_url : "#{baseUrl}/js/vendor/tiny_mce/tiny_mce.js",
-      theme : "advanced",
-      skin: 'studio',
+      script_url : "#{baseUrl}/js/vendor/tinymce/tinymce.min.js",
+      theme : "modern",
+      skin: 'lightgray',
       schema: "html5",
       # Necessary to preserve relative URLs to our images.
       convert_urls : false,
@@ -30,7 +30,7 @@ class @HTMLEditingDescriptor
       content_css : "#{baseUrl}/css/tiny-mce.css",
       # The default popup_css path uses an absolute path referencing page in which tinyMCE is being hosted.
       # Supply the correct relative path instead.
-      popup_css: "#{baseUrl}/js/vendor/tiny_mce/themes/advanced/skins/default/dialog.css",
+#      popup_css: "#{baseUrl}/js/vendor/tinymce/themes/advanced/skins/default/dialog.css",
       formats : {
         # Disable h4, h5, and h6 styles as we don't have CSS for them.
         h4: {},
@@ -42,12 +42,12 @@ class @HTMLEditingDescriptor
       # Disable visual aid on borderless table.
       visual:false,
       # We may want to add "styleselect" when we collect all styles used throughout the LMS
-      theme_advanced_buttons1 : "formatselect,bold,italic,underline,|,bullist,numlist,outdent,indent,|,blockquote,wrapAsCode,|,link,unlink",
-      theme_advanced_toolbar_location : "top",
-      theme_advanced_toolbar_align : "left",
-      theme_advanced_statusbar_location : "none",
-      theme_advanced_resizing : true,
-      theme_advanced_blockformats : "p,pre,h1,h2,h3",
+      theme_modern_buttons1 : "formatselect,bold,italic,underline,|,bullist,numlist,outdent,indent,|,blockquote,wrapAsCode,|,link,unlink",
+      theme_modern_toolbar_location : "top",
+      theme_modern_toolbar_align : "left",
+      theme_modern_statusbar_location : "none",
+      theme_modern_resizing : true,
+      theme_modern_blockformats : "p,pre,h1,h2,h3",
       width: '100%',
       height: '400px',
       setup : @setupTinyMCE,
@@ -65,19 +65,17 @@ class @HTMLEditingDescriptor
     @element.on('click', '.editor-tabs .tab', @onSwitchEditor)
 
   setupTinyMCE: (ed) =>
+    debugger
     ed.addButton('wrapAsCode', {
       title : 'Code',
       image : "#{baseUrl}/images/ico-tinymce-code.png",
+      stateSelector : 'code'
       onclick : () ->
         ed.formatter.toggle('code')
         # Without this, the dirty flag does not get set unless the user also types in text.
         # Visual Editor must be marked as dirty or else we won't populate the Advanced Editor from it.
         ed.isNotDirty = false
     })
-
-    ed.onNodeChange.add((editor, command, e) ->
-      command.setActive('wrapAsCode', e.nodeName == 'CODE')
-    )
 
     @visualEditor = ed
 

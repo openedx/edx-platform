@@ -25,11 +25,11 @@ Longer TODO:
 
 import sys
 import lms.envs.common
-from lms.envs.common import USE_TZ, TECH_SUPPORT_EMAIL, PLATFORM_NAME, BUGS_EMAIL
+from lms.envs.common import USE_TZ, TECH_SUPPORT_EMAIL, PLATFORM_NAME, BUGS_EMAIL, DOC_STORE_CONFIG
 from path import path
 
 from lms.lib.xblock.mixin import LmsBlockMixin
-from cms.xmodule_namespace import CmsBlockMixin
+from cms.lib.xblock.mixin import CmsBlockMixin
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.x_module import XModuleMixin
 from dealer.git import git
@@ -368,6 +368,13 @@ CELERY_QUEUES = {
     LOW_PRIORITY_QUEUE: {},
     DEFAULT_PRIORITY_QUEUE: {}
 }
+
+
+############################## Video ##########################################
+
+# URL to test YouTube availability
+YOUTUBE_TEST_URL = 'https://gdata.youtube.com/feeds/api/videos/'
+
 
 ############################ APPS #####################################
 

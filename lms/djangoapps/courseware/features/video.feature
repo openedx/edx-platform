@@ -18,7 +18,7 @@ Feature: LMS.Video component
   # 3
   # Youtube testing
   Scenario: Video component is fully rendered in the LMS in Youtube mode with HTML5 sources
-    Given youtube server is up and response time is  0.4 seconds
+    Given youtube server is up and response time is 0.4 seconds
     And the course has a Video component in Youtube_HTML5 mode
     Then when I view the video it has rendered in Youtube mode
 

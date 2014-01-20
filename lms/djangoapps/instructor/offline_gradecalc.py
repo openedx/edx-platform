@@ -13,6 +13,7 @@ from courseware import grades, models
 from courseware.courses import get_course_by_id
 from django.contrib.auth.models import User
 
+from instructor.utils import DummyRequest
 
 class MyEncoder(JSONEncoder):
 
@@ -37,15 +38,6 @@ def offline_grade_calculation(course_id):
     ).prefetch_related("groups").order_by('username')
 
     enc = MyEncoder()
-
-    class DummyRequest(object):
-        META = {}
-        def __init__(self):
-            return
-        def get_host(self):
-            return 'edx.mit.edu'
-        def is_secure(self):
-            return False
 
     print "%d enrolled students" % len(enrolled_students)
     course = get_course_by_id(course_id)

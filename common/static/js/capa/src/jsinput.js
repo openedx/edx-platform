@@ -1,37 +1,28 @@
-(function (jsinput, undefined) {
+/* 
+ * JSChannel (https://github.com/mozilla/jschannel) will be loaded prior to this
+ * script. We will use it use to let JSInput call 'gradeFn', and eventually 
+ * 'stateGetter' & 'stateSetter' in the iframe's content even if it hasn't the 
+ * same origin, therefore bypassing SOP:
+ * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Same_origin_policy_for_JavaScript
+ */    
+
+var JSInput = (function ($, undefined) {
     // Initialize js inputs on current page.
     // N.B.: No library assumptions about the iframe can be made (including,
     // most relevantly, jquery). Keep in mind what happens in which context
     // when modifying this file.
-
-    /*      Check whether there is anything to be done      */
 
     // When all the problems are first loaded, we want to make sure the
     // constructor only runs once for each iframe; but we also want to make
     // sure that if part of the page is reloaded (e.g., a problem is
     // submitted), the constructor is called again.
 
-    if (!jsinput) {
-        jsinput = {
-            runs : 1,
-            arr : [],
-            exists : function(id) {
-                jsinput.arr.filter(function(e, i, a) {
-                    return e.id = id;
-                });
-            }
-        };
-    }
-
-    jsinput.runs++;
-
-
     /*                      Utils                               */
 
 
     // Take a string and find the nested object that corresponds to it. E.g.:
-    //    deepKey(obj, "an.example") -> obj["an"]["example"]
-    var _deepKey = function(obj, path){
+    //    _deepKey(obj, "an.example") -> obj["an"]["example"]
+    function _deepKey(obj, path){
         for (var i = 0, p=path.split('.'), len = p.length; i < len; i++){
             obj = obj[p[i]];
         }
@@ -42,115 +33,141 @@
     /*      END     Utils                                   */
 
 
-
-
-    function jsinputConstructor(spec) {
+    function jsinputConstructor(elem) {
         // Define an class that will be instantiated for each jsinput element
         // of the DOM
 
-        // 'that' is the object returned by the constructor. It has a single
-        // public method, "update", which updates the hidden input field.
-        var that = {};
-
         /*                      Private methods                          */
 
-        var sect = $(spec.elem).parent().find('section[class="jsinput"]');
-        var sectAttr = function (e) { return $(sect).attr(e); };
-        var thisIFrame = $(spec.elem).
-                        find('iframe[name^="iframe_"]').
-                        get(0);
-        var cWindow = thisIFrame.contentWindow;
+        var section = $(elem).parent().find('section[class="jsinput"]'),
+            sectionAttr = function (e) { return $(section).attr(e); },
+            iframe = $(elem).find('iframe[name^="iframe_"]').get(0),
+            cWindow = iframe.contentWindow,
+            path = iframe.src.substring(0, iframe.src.lastIndexOf("/")+1),
+            // Get the hidden input field to pass to customresponse
+            inputField = $(elem).parent().find('input[id^="input_"]'),
+            // Get the grade function name
+            gradeFn = sectionAttr("data"),
+            // Get state getter
+            stateGetter = sectionAttr("data-getstate"),
+            // Get state setter
+            stateSetter = sectionAttr("data-setstate"),
+            // Get stored state
+            storedState = sectionAttr("data-stored"),
+            // Bypass single-origin policy only if this attribute is "false"
+            // In that case, use JSChannel to do so.
+            sop = sectionAttr("data-sop"),
+            channel;
+        
+        sop = (sop !== "false");
 
-        // Get the hidden input field to pass to customresponse
-        function _inputField() {
-            var parent = $(spec.elem).parent();
-            return parent.find('input[id^="input_"]');
-        }
-        var inputField = _inputField();
-
-        // Get the grade function name
-        var getGradeFn = sectAttr("data");
-        // Get state getter
-        var getStateGetter = sectAttr("data-getstate");
-        // Get state setter
-        var getStateSetter = sectAttr("data-setstate");
-        // Get stored state
-        var getStoredState = sectAttr("data-stored");
-
-
-
-        // Put the return value of gradeFn in the hidden inputField.
-        var update = function () {
-            var ans;
-
-            ans = _deepKey(cWindow, gradeFn)();
-            // setstate presumes getstate, so don't getstate unless setstate is
-            // defined.
-            if (getStateGetter && getStateSetter) {
-                var state, store;
-                state = unescape(_deepKey(cWindow, getStateGetter)());
-                store = {
-                    answer: ans,
-                    state:  state
-                };
-                inputField.val(JSON.stringify(store));
-            } else {
-                inputField.val(ans);
-            }
-            return;
-        };
+        if (!sop) {
+            channel = Channel.build({
+                window: cWindow,
+                origin: path,
+                scope: "JSInput"
+            });
+         }   
 
         /*                       Public methods                     */
+        
+        // Only one public method that updates the hidden input field.
+        var update = function (callback) {
+            var answer, state, store;
 
-        that.update = update;
+            if (sop) {
+                answer = _deepKey(cWindow, gradeFn)();
+                // Setting state presumes getting state, so don't get state
+                // unless set state is defined.
+                if (stateGetter && stateSetter) {
+                    state = unescape(_deepKey(cWindow, stateGetter)());
+                    store = {
+                        answer: answer,
+                        state:  state
+                    };
+                    inputField.val(JSON.stringify(store));
+                } else {
+                    inputField.val(answer);
+                }
+                callback();
+            } else {
+                channel.call({
+                    method: "getGrade",
+                    params: "",
+                    success: function(val) {
+                        answer = decodeURI(val.toString());
 
-
+                        // Setting state presumes getting state, so don't get
+                        // state unless set state is defined.
+                        if (stateGetter && stateSetter) {
+                            channel.call({
+                                method: "getState",
+                                params: "",
+                                success: function(val) {
+                                    state = decodeURI(val.toString());
+                                    store = {
+                                        answer: answer,
+                                        state:  state
+                                    };
+                                    inputField.val(JSON.stringify(store));
+                                    callback();
+                                }
+                            });
+                        } else {
+                            inputField.val(answer);
+                            callback();
+                        }
+                    }
+                });
+            }
+        };
 
         /*                      Initialization                          */
 
-        jsinput.arr.push(that);
-
         // Put the update function as the value of the inputField's "waitfor"
         // attribute so that it is called when the check button is clicked.
-        function bindCheck() {
-            inputField.data('waitfor', that.update);
-            return;
-        }
-
-        var gradeFn = getGradeFn;
-
-
-        bindCheck();
+        inputField.data('waitfor', update);
 
         // Check whether application takes in state and there is a saved
-        // state to give it. If getStateSetter is specified but calling it
+        // state to give it. If stateSetter is specified but calling it
         // fails, wait and try again, since the iframe might still be
         // loading.
-        if (getStateSetter && getStoredState) {
-            var sval, jsonVal;
+        if (stateSetter && storedState) {
+            var stateValue, jsonValue;
 
             try {
-              jsonVal = JSON.parse(getStoredState);
+              jsonValue = JSON.parse(storedState);
             } catch (err) {
-              jsonVal = getStoredState;
+              jsonValue = storedState;
             }
 
-            if (typeof(jsonVal) === "object") {
-                sval = jsonVal["state"];
+            if (typeof(jsonValue) === "object") {
+                stateValue = jsonValue["state"];
             } else {
-                sval = jsonVal;
+                stateValue = jsonValue;
             }
-
 
             // Try calling setstate every 200ms while it throws an exception,
             // up to five times; give up after that.
             // (Functions in the iframe may not be ready when we first try
             // calling it, but might just need more time. Give the functions
             // more time.)
+            // 200 ms and 5 times are arbitrary but this has functioned with the
+            // only application that has ever used JSInput, jsVGL. Something 
+            // more sturdy should be put in place.
             function whileloop(n) {
                 if (n < 5){
                     try {
-                        _deepKey(cWindow, getStateSetter)(sval);
+                        if (sop) {
+                            _deepKey(cWindow, stateSetter)(stateValue);
+                        } else {
+                            channel.call({
+                                method: "setState",
+                                params: stateValue,
+                                success: function() {
+                                }    
+                            });
+                        }
                     } catch (err) {
                         setTimeout(whileloop(n+1), 200);
                     }
@@ -160,40 +177,44 @@
                 }
             }
             whileloop(0);
-
         }
-
-
-        return that;
     }
 
-
     function walkDOM() {
-        var newid;
+        var dataProcessed, all;
 
-        // Find all jsinput elements, and create a jsinput object for each one
-        var all = $(document).find('section[class="jsinput"]');
+        // Find all jsinput elements
+        allSections = $('section.jsinput');
 
-        all.each(function(index, value) {
-            // Get just the mako variable 'id' from the id attribute
-            newid = $(value).attr("id").replace(/^inputtype_/, "");
-
-
-            if (!jsinput.exists(newid)){
-                var newJsElem = jsinputConstructor({
-                    id: newid,
-                    elem: value,
-                });
+        // When a JSInput problem loads, its data-processed attribute is false,
+        // so the jsconstructor will be called for it.
+        // The constructor will not be called again on subsequent reruns of
+        // this file by other JSInput. Only if it is reloaded, either with the
+        // rest of the page or when it is submitted, will this constructor be
+        // called again. 
+        allSections.each(function(index, value) {
+            dataProcessed = ($(value).attr("data-processed") === "true");
+            if (!dataProcessed) {
+                jsinputConstructor(value);
+                $(value).attr("data-processed", 'true');
             }
         });
     }
 
     // This is ugly, but without a timeout pages with multiple/heavy jsinputs
     // don't load properly.
+    // 300 ms is arbitrary but this has functioned with the only application 
+    // that has ever used JSInput, jsVGL. Something more sturdy should be put in
+    // place.
     if ($.isReady) {
         setTimeout(walkDOM, 300);
     } else {
         $(document).ready(setTimeout(walkDOM, 300));
     }
 
-})(window.jsinput = window.jsinput || false);
+    return {
+        jsinputConstructor: jsinputConstructor,
+        walkDOM: walkDOM
+    };
+    
+})(window.jQuery);

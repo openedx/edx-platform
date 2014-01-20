@@ -2,7 +2,7 @@
 // define() functions from Require JS available inside the anonymous function.
 (function (requirejs, require, define) {
 
-define('ElOutput', ['logme'], function (logme) {
+define('ElOutput', [], function () {
 
     return ElOutput;
 
@@ -37,13 +37,13 @@ define('ElOutput', ['logme'], function (logme) {
             }
 
             if (typeof obj['@el_id'] !== 'string') {
-                logme('ERROR: You specified "output" as "element", but did not spify "el_id".');
+                console.log('ERROR: You specified "output" as "element", but did not spify "el_id".');
 
                 return;
             }
 
             if (typeof obj['#text'] !== 'string') {
-                logme('ERROR: Function body is not defined.');
+                console.log('ERROR: Function body is not defined.');
 
                 return;
             }
@@ -73,7 +73,7 @@ define('ElOutput', ['logme'], function (logme) {
                 }
             } else {
                 if (funcString.search(/return/i) === -1) {
-                    logme(
+                    console.log(
                         'ERROR: You have specified a JavaScript ' +
                         'function without a "return" statemnt. Your ' +
                         'function will return "undefined" by default.'
@@ -91,12 +91,12 @@ define('ElOutput', ['logme'], function (logme) {
             try {
                 func = Function.apply(null, paramNames);
             } catch (err) {
-                logme(
+                console.log(
                     'ERROR: The function body "' +
                         funcString +
                         '" was not converted by the Function constructor.'
                 );
-                logme('Error message: "' + err.message + '".');
+                console.log('Error message: "' + err.message + '".');
 
                 if (state.showDebugInfo) {
                     $('#' + gstId).html('<div style="color: red;">' + 'ERROR IN XML: Could not create a function from string "' + funcString + '".' + '</div>');
@@ -114,7 +114,7 @@ define('ElOutput', ['logme'], function (logme) {
                 el = $('#' + obj['@el_id']);
 
                 if (el.length !== 1) {
-                    logme(
+                    console.log(
                         'ERROR: DOM element with ID "' + obj['@el_id'] + '" ' +
                         'not found. Dynamic element not created.'
                     );

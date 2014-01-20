@@ -1,16 +1,16 @@
 #!/usr/bin/env python
 
 """
- See https://edx-wiki.atlassian.net/wiki/display/ENG/PO+File+workflow
+See https://edx-wiki.atlassian.net/wiki/display/ENG/PO+File+workflow
 
+This task merges and compiles the human-readable .po files on the
+local filesystem into machine-readable .mo files. This is typically
+necessary as part of the build process since these .mo files are
+needed by Django when serving the web app.
 
- This task merges and compiles the human-readable .pofiles on the
- local filesystem into machine-readable .mofiles. This is typically
- necessary as part of the build process since these .mofiles are
- needed by Django when serving the web app.
+The configuration file (in edx-platform/conf/locale/config) specifies which
+languages to generate.
 
- The configuration file (in edx-platform/conf/locale/config) specifies which
- languages to generate.
 """
 
 import os, sys, logging
@@ -26,10 +26,13 @@ def merge(locale, target='django.po', fail_if_missing=True):
     """
     For the given locale, merge django-partial.po, messages.po, mako.po -> django.po
     target is the resulting filename
-    If fail_if_missing is True, and the files to be merged are missing,
-    throw an Exception.
-    If fail_if_missing is False, and the files to be merged are missing,
+
+    If fail_if_missing is true, and the files to be merged are missing,
+    throw an Exception, otherwise return silently.
+
+    If fail_if_missing is false, and the files to be merged are missing,
     just return silently.
+
     """
     LOG.info('Merging locale={0}'.format(locale))
     locale_directory = CONFIGURATION.get_messages_dir(locale)
@@ -57,9 +60,12 @@ def merge(locale, target='django.po', fail_if_missing=True):
 def clean_metadata(file):
     """
     Clean up redundancies in the metadata caused by merging.
-    This reads in a PO file and simply saves it back out again.
     """
-    pofile(file).save()
+    # Reading in the .po file and saving it again fixes redundancies.
+    pomsgs = pofile(file)
+    # The msgcat tool marks the metadata as fuzzy, but it's ok as it is.
+    pomsgs.metadata_is_fuzzy = False
+    pomsgs.save()
 
 
 def validate_files(dir, files_to_merge):

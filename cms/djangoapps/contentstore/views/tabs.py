@@ -49,7 +49,7 @@ def initialize_course_tabs(course):
 @login_required
 @ensure_csrf_cookie
 @require_http_methods(("GET", "POST", "PUT"))
-def tabs_handler(request, tag=None, course_id=None, branch=None, version_guid=None, block=None):
+def tabs_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None):
     """
     The restful handler for static tabs.
 
@@ -63,7 +63,7 @@ def tabs_handler(request, tag=None, course_id=None, branch=None, version_guid=No
     Creating a tab, deleting a tab, or changing its contents is not supported through this method.
     Instead use the general xblock URL (see item.xblock_handler).
     """
-    locator = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
+    locator = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
     if not has_access(request.user, locator):
         raise PermissionDenied()
 

@@ -29,8 +29,10 @@ if (typeof Array.prototype.filter == 'undefined') {
     };
 }
 
-var monthNames = gettext("January February March April May June July August September October November December").split(" ");
-var weekdayNames = gettext("Sunday Monday Tuesday Wednesday Thursday Friday Saturday").split(" ");
+// Translators: the names of months, keep the pipe (|) separators.
+var monthNames = gettext("January|February|March|April|May|June|July|August|September|October|November|December").split("|");
+// Translators: the names of days, keep the pipe (|) separators.
+var weekdayNames = gettext("Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday").split("|");
 
 /* Takes a string, returns the index of the month matching that string, throws
    an error if 0 or more than 1 matches

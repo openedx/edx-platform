@@ -44,15 +44,29 @@ function (VideoPlayer) {
 
         state.initialize(element)
             .done(function () {
+                // On iPhones and iPods native controls are used.
+                if (/iP(hone|od)/i.test(state.isTouch[0])) {
+                    _hideWaitPlaceholder(state);
+                    state.el.trigger('initialize', arguments);
+
+                    return false;
+                }
+
                 _initializeModules(state)
                     .done(function () {
-                        state.el
-                            .addClass('is-initialized')
-                            .find('.spinner')
-                            .attr({
-                                'aria-hidden': 'true',
-                                'tabindex': -1
-                            });
+                        // On iPad ready state occurs just after start playing.
+                        // We hide controls before video starts playing.
+                        if (/iPad|Android/i.test(state.isTouch[0])) {
+                            state.el.on('play', _.once(function() {
+                                state.trigger('videoControl.show', null);
+                            }));
+                        } else {
+                        // On PC show controls immediately.
+                            state.trigger('videoControl.show', null);
+                        }
+
+                        _hideWaitPlaceholder(state);
+                        state.el.trigger('initialize', arguments);
                     });
             });
     };
@@ -235,6 +249,16 @@ function (VideoPlayer) {
         return true;
     }
 
+    function _hideWaitPlaceholder(state) {
+        state.el
+            .addClass('is-initialized')
+            .find('.spinner')
+            .attr({
+                'aria-hidden': 'true',
+                'tabindex': -1
+            });
+    }
+
     function _setConfigurations(state) {
         _configureCaptions(state);
         _setPlayerMode(state);
@@ -242,7 +266,7 @@ function (VideoPlayer) {
         // Possible value are: 'visible', 'hiding', and 'invisible'.
         state.controlState = 'visible';
         state.controlHideTimeout = null;
-        state.captionState = 'visible';
+        state.captionState = 'invisible';
         state.captionHideTimeout = null;
     }
 
@@ -299,11 +323,16 @@ function (VideoPlayer) {
         // element has a CSS class 'fullscreen'.
         this.__dfd__ = $.Deferred();
         this.isFullScreen = false;
+        this.isTouch = onTouchBasedDevice() || '';
 
         // The parent element of the video, and the ID.
         this.el = $(element).find('.video');
         this.elVideoWrapper = this.el.find('.video-wrapper');
         this.id = this.el.attr('id').replace(/video_/, '');
+
+        if (this.isTouch) {
+            this.el.addClass('is-touch');
+        }
 
         // jQuery .data() return object with keys in lower camelCase format.
         data = this.el.data();

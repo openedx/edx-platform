@@ -12,6 +12,7 @@ Contents
    :maxdepth: 5
 
    read_me
+   change_log
    get_started
    create_new_course
    establish_grading_policy
@@ -22,10 +23,9 @@ Contents
    create_problem_component
    common_problems
    advanced_problems
-   javascript_input
-   create_lti
    specialized_problems
    open_response_assessment
+   tools
    set_content_releasedates
    view_course_content
    export_import_course
@@ -33,7 +33,7 @@ Contents
    checking_student_progress
    ora_students
    glossary
-   change_log
+
 
 
 
@@ -45,10 +45,3 @@ Appendices
    :glob:
 
    appendices/*
-
-
-
-
-
-
-
