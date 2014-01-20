@@ -131,11 +131,11 @@ def fix_metadata(po):
 
     fixes = {
         'PO-Revision-Date': datetime.utcnow(),
-        'Report-Msgid-Bugs-To': 'translation_team@edx.org',
+        'Report-Msgid-Bugs-To': 'openedx-translation@googlegroups.com'
         'Project-Id-Version': '0.1a',
         'Language' : 'en',
         'Last-Translator' : '',
-        'Language-Team': 'translation team <translation_team@edx.org>',
+        'Language-Team': 'openedx-translation <openedx-translation@googlegroups.com>',
     }
     po.metadata.update(fixes)
 
