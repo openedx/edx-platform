@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 """Tests of i18n/dummy.py"""
 
-import os, string, random
 from unittest import TestCase
 
 import ddt
 from polib import POEntry
 
-import dummy
+from i18n import dummy
 
 
 @ddt.ddt
