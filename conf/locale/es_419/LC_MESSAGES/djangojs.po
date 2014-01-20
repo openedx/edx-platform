@@ -1,72 +1,79 @@
 # edX translation file
 # This English source file is machine-generated. Do not check it into github.
-# Copyright (C) 2013 EdX
+# Copyright (C) 2014 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
 # apardo <apardo@alabs.org>, 2013
 # juancamilom <juan.montoya@hmltda.com>, 2013
-# juancamilom <juan.montoya@hmltda.com>, 2013
-# luisli88 <luislicardo1307@gmail.com>, 2013
+# Luis Ruiz <luislicardo1307@gmail.com>, 2013
 # Natalia_m <natromansol@gmail.com>, 2013
+# ovnicraft <ovnicraft@gmail.com>, 2014
 msgid ""
 msgstr ""
-"Project-Id-Version: edx-platform\n"
+"Project-Id-Version: upex-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
-"POT-Creation-Date: 2013-10-07 17:06-0400\n"
-"PO-Revision-Date: 2013-10-21 22:40+0000\n"
-"Last-Translator: juancamilom <juan.montoya@hmltda.com>\n"
-"Language-Team: Spanish (Latin America) (http://www.transifex.com/projects/p/edx-platform/language/es_419/)\n"
+"POT-Creation-Date: 2014-01-06 18:56+0000\n"
+"PO-Revision-Date: 2014-01-17 19:21+0000\n"
+"Last-Translator: ovnicraft <ovnicraft@gmail.com>\n"
+"Language-Team: Spanish (Latin America) (http://www.transifex.com/projects/p/edx-in-iaen/language/es_419/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: es_419\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: cms/static/js/base.js:80 lms/static/js/verify_student/photocapture.js:300
-msgid "This link will open in a new browser window/tab"
-msgstr "Este vínculo se abrirá en una nueva ventana o pestaña del navegador"
-
-#: cms/static/js/base.js:83
-msgid "This link will open in a modal window"
-msgstr "Este vínculo se abrirá en una ventana modal"
-
-#: cms/static/js/base.js:193
-msgid "Collapse All Sections"
-msgstr "Colapsar todas las secciones"
-
-#: cms/static/js/base.js:195
-msgid "Expand All Sections"
-msgstr "Expandir todas las secciones"
-
-#: cms/static/js/base.js:234
+#: cms/static/coffee/src/main.js:35
 msgid ""
-"File format not supported. Please upload a file with a <code>tar.gz</code> "
-"extension."
-msgstr "Formato de archivo no soportado. Por favor cargue un archivo con extensión <code>tar.gz</code>."
+"This may be happening because of an error with our server or your internet "
+"connection. Try refreshing the page or making sure you are online."
+msgstr "Esto puede estar sucediendo debido a un error en nuestro servidor o su conexión a Internet. Intenta actualizar la página o asegurarse de que están en línea."
 
-#: cms/static/js/base.js:324
-msgid "There has been an error while saving your changes."
-msgstr "Ha habido un error guardando sus cambios."
+#: cms/static/coffee/src/main.js:38
+msgid "Studio's having trouble saving your work"
+msgstr "Studio tiene problemas para guardar su trabajo"
 
-#: cms/static/js/base.js:371
-msgid "Delete this "
-msgstr "Borrar esto"
+#: cms/static/coffee/src/views/module_edit.js:71
+#, c-format
+msgid "<em>Editing:</em> %s"
+msgstr "<em>Editando:</em> %s"
 
-#: cms/static/js/base.js:372
-msgid "Deleting this "
-msgstr "Borrando esto"
+#: cms/static/coffee/src/views/module_edit.js:125
+#: cms/static/coffee/src/views/tabs.js:58
+#: cms/static/coffee/src/views/unit.js:69 cms/static/js/models/section.js:28
+#: cms/static/js/views/asset.js:79
+#: cms/static/js/views/course_info_handout.js:59
+#: cms/static/js/views/course_info_update.js:80
+#: cms/static/js/views/overview.js:75 cms/static/js/views/overview.js.c:487
+msgid "Saving&hellip;"
+msgstr "Guardando&hellip;"
 
-#: cms/static/js/base.js:375
-msgid "Yes, delete this "
-msgstr "Sí, borrar esto"
+#: cms/static/coffee/src/views/tabs.js:97
+msgid "Delete Component Confirmation"
+msgstr "Confirmación para borrar componente"
 
-#: cms/static/js/base.js:387 cms/static/js/views/course_info_update.js:147
+#: cms/static/coffee/src/views/tabs.js:98
+msgid ""
+"Are you sure you want to delete this component? This action cannot be "
+"undone."
+msgstr "Esta seguro de borrar este componente ? Esta acción no se puede deshacer."
+
+#: cms/static/coffee/src/views/tabs.js:101
+#: cms/static/js/views/course_info_update.js:140
+msgid "OK"
+msgstr "Aceptar"
+
+#: cms/static/coffee/src/views/tabs.js:112
+#: cms/static/coffee/src/views/unit.js:171 cms/static/js/base.js:277
+#: cms/static/js/views/course_info_update.js:148
 msgid "Deleting&hellip;"
 msgstr "Borrando&hellip;"
 
-#: cms/static/js/base.js:403 cms/static/js/views/asset.js:67
-#: cms/static/js/views/course_info_update.js:165
+#: cms/static/coffee/src/views/tabs.js:126
+#: cms/static/coffee/src/views/unit.js:195 cms/static/js/base.js:292
+#: cms/static/js/views/asset.js:67
+#: cms/static/js/views/course_info_update.js:166
+#: cms/static/js/views/show_syllabus.js:50
 #: cms/static/js/views/show_textbook.js:50
 #: cms/static/js/views/validation.js:115
 #: lms/static/admin/js/admin/DateTimeShortcuts.js:92
@@ -74,49 +81,61 @@ msgstr "Borrando&hellip;"
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: cms/static/js/base.js:445
-msgid "Hide Studio Help"
-msgstr "Ocultar la ayuda de Studio"
+#: cms/static/coffee/src/views/unit.js:162
+msgid "Delete this component?"
+msgstr "Borrar este componente?"
 
-#: cms/static/js/base.js:447
-msgid "Looking for Help with Studio?"
-msgstr "¿Buscando ayuda con Studio?"
+#: cms/static/coffee/src/views/unit.js:163
+msgid "Deleting this component is permanent and cannot be undone."
+msgstr "Borrar este componente es permanente y no se puede deshacer."
 
-#: cms/static/js/base.js:609
+#: cms/static/coffee/src/views/unit.js:166
+msgid "Yes, delete this component"
+msgstr "Si, borrar el componente."
+
+#: cms/static/js/base.js:70 lms/static/js/verify_student/photocapture.js:322
+msgid "This link will open in a new browser window/tab"
+msgstr "Este vínculo se abrirá en una nueva ventana o pestaña del navegador"
+
+#: cms/static/js/base.js:73
+msgid "This link will open in a modal window"
+msgstr "Este vínculo se abrirá en una ventana modal"
+
+#: cms/static/js/base.js:261
+msgid "Delete this "
+msgstr "Borrar esto"
+
+#: cms/static/js/base.js:262
+msgid "Deleting this "
+msgstr "Borrando esto"
+
+#: cms/static/js/base.js:265
+msgid "Yes, delete this "
+msgstr "Sí, borrar esto"
+
+#: cms/static/js/index.js:91
 msgid "Please do not use any spaces or special characters in this field."
 msgstr "Por favor, no usar espacios o caracteres especiales en este campo."
 
-#: cms/static/js/base.js:624
+#: cms/static/js/index.js:106
 msgid ""
 "The combined length of the organization, course number, and course run "
 "fields cannot be more than 65 characters."
 msgstr "La longitud combinada de los campos para la organización, número de curso y grupo no puede superar los 65 caracteres."
 
-#: cms/static/js/base.js:659
+#: cms/static/js/index.js:141
 msgid "Required field."
 msgstr "Campo requerido."
 
-#: cms/static/js/base.js:826 cms/static/js/models/section.js:27
-#: cms/static/js/views/asset.js:79
-#: cms/static/js/views/course_info_handout.js:59
-#: cms/static/js/views/course_info_update.js:81
-#: cms/static/js/views/overview.js:232
-msgid "Saving&hellip;"
-msgstr "Guardando&hellip;"
+#: cms/static/js/sock.js:22
+msgid "Hide Studio Help"
+msgstr "Ocultar la ayuda de Studio"
 
-#: cms/static/js/base.js:851
-msgid "Will Release:"
-msgstr "Será liberada el:"
+#: cms/static/js/sock.js:24
+msgid "Looking for Help with Studio?"
+msgstr "¿Buscando ayuda con Studio?"
 
-#: cms/static/js/base.js:852
-msgid "{month}/{day}/{year} at {hour}:{minute} UTC"
-msgstr "{day}/{month}/{year} a las {hour}:{minute} UTC"
-
-#: cms/static/js/base.js:855
-msgid "Edit"
-msgstr "Editar"
-
-#: cms/static/js/models/course.js:8 cms/static/js/models/section.js:8
+#: cms/static/js/models/course.js:8 cms/static/js/models/section.js:10
 msgid "You must specify a name"
 msgstr "Debe especificar un nombre"
 
@@ -130,27 +149,27 @@ msgstr "Solo pueden cargarse archivos de tipo <%= fileTypes %>. Por favor selecc
 msgid "or"
 msgstr "o"
 
-#: cms/static/js/models/settings/course_details.js:43
+#: cms/static/js/models/settings/course_details.js:42
 msgid "The course must have an assigned start date."
 msgstr "El curso debe tener asignada una fecha de inicio."
 
-#: cms/static/js/models/settings/course_details.js:46
+#: cms/static/js/models/settings/course_details.js:45
 msgid "The course end date cannot be before the course start date."
 msgstr "La fecha de finalización del curso no puede ser anterior a la fecha de inicio."
 
-#: cms/static/js/models/settings/course_details.js:49
+#: cms/static/js/models/settings/course_details.js:48
 msgid "The course start date cannot be before the enrollment start date."
 msgstr "La fecha de inicio del curso no puede ser anterior a la fecha de inicio de inscripciones."
 
-#: cms/static/js/models/settings/course_details.js:52
+#: cms/static/js/models/settings/course_details.js:51
 msgid "The enrollment start date cannot be after the enrollment end date."
 msgstr "La fecha de inicio de inscripciones no puede ser posterior a la fecha de finalización de inscripciones."
 
-#: cms/static/js/models/settings/course_details.js:55
+#: cms/static/js/models/settings/course_details.js:54
 msgid "The enrollment end date cannot be after the course end date."
 msgstr "La fecha de finalización de inscripciones no puede ser posterior a la fecha de finalización del curso."
 
-#: cms/static/js/models/settings/course_details.js:59
+#: cms/static/js/models/settings/course_details.js:58
 msgid "Key should only contain letters, numbers, _, or -"
 msgstr "Las claves solo deben contener letras, números, _, o -"
 
@@ -171,7 +190,7 @@ msgstr "Por favor ingrese un número entero."
 msgid "Cannot drop more <% attrs.types %> than will assigned."
 msgstr "No se pueden borrar más <% attrs.types %> del que será asignado."
 
-#: cms/static/js/models/settings/course_grading_policy.js:71
+#: cms/static/js/models/settings/course_grading_policy.js:62
 msgid "Grace period must be specified in HH:MM format."
 msgstr "El periodo de gracia debe especificarse en el formato HH:MM"
 
@@ -186,7 +205,8 @@ msgid ""
 "Also any content that links/refers to this item will no longer work (e.g. broken images and/or links)"
 msgstr "¿Está seguro de que desea borrar este item? Esta acción no puede revertirse!\n\nCualquier contenido que haga referencia a este item dejará de funcionar (imágenes o vínculos)"
 
-#: cms/static/js/views/asset.js:51 cms/static/js/views/show_textbook.js:36
+#: cms/static/js/views/asset.js:51 cms/static/js/views/show_syllabus.js:36
+#: cms/static/js/views/show_textbook.js:36
 msgid "Delete"
 msgstr "Borrar"
 
@@ -194,22 +214,19 @@ msgstr "Borrar"
 msgid "Your file has been deleted."
 msgstr "Su archivo ha sido borrado."
 
-#: cms/static/js/views/course_info_update.js:135
+#: cms/static/js/views/course_info_update.js:136
 msgid "Are you sure you want to delete this update?"
 msgstr "¿Estas seguro de que quieres borrar esta actualización?"
 
-#: cms/static/js/views/course_info_update.js:136
+#: cms/static/js/views/course_info_update.js:137
 msgid "This action cannot be undone."
 msgstr "Esta acción no se puede deshacer."
-
-#: cms/static/js/views/course_info_update.js:139
-msgid "OK"
-msgstr "Aceptar"
 
 #: cms/static/js/views/edit_chapter.js:55
 msgid "Upload a new PDF to “<%= name %>”"
 msgstr "Subiendo un nuevo PDF a “<%= name %>”"
 
+#: cms/static/js/views/edit_syllabus.js:63
 #: cms/static/js/views/edit_textbook.js:63
 #: cms/static/js/views/overview_assignment_grader.js:62
 msgid "Saving"
@@ -219,6 +236,32 @@ msgstr "Guardando"
 msgid "There was an error with the upload"
 msgstr "Hubo un error con la subida del archivo"
 
+#: cms/static/js/views/import.js:159
+msgid ""
+"File format not supported. Please upload a file with a <code>tar.gz</code> "
+"extension."
+msgstr "Formato de archivo no soportado. Por favor cargue un archivo con extensión <code>tar.gz</code>."
+
+#: cms/static/js/views/overview.js:14
+msgid "Collapse All Sections"
+msgstr "Colapsar todas las secciones"
+
+#: cms/static/js/views/overview.js:16
+msgid "Expand All Sections"
+msgstr "Expandir todas las secciones"
+
+#: cms/static/js/views/overview.js:99
+msgid "Release date:"
+msgstr "Fecha de lanzamiento:"
+
+#: cms/static/js/views/overview.js:100
+msgid "{month}/{day}/{year} at {hour}:{minute} UTC"
+msgstr "{day}/{month}/{year} a las {hour}:{minute} UTC"
+
+#: cms/static/js/views/overview.js:103
+msgid "Edit section release date"
+msgstr "Editar fecha de lanzamiento"
+
 #: cms/static/js/views/section_edit.js:50
 msgid "Your change could not be saved"
 msgstr "Sus cambios no pudieron ser guardados"
@@ -227,19 +270,27 @@ msgstr "Sus cambios no pudieron ser guardados"
 msgid "Return and resolve this issue"
 msgstr "Regresar y resolver este tema"
 
+#: cms/static/js/views/show_syllabus.js:31
 #: cms/static/js/views/show_textbook.js:31
 msgid "Delete “<%= name %>”?"
 msgstr "¿Borrar “<%= name %>”?"
+
+#: cms/static/js/views/show_syllabus.js:33
+msgid ""
+"Deleting a syllabus cannot be undone and once deleted any reference to it in"
+" your courseware's navigation will also be removed."
+msgstr "Borrar el sílabo no se puede deshacer y una vez eliminado ninguna referencia a el en su curso será eliminada."
+
+#: cms/static/js/views/show_syllabus.js:40
+#: cms/static/js/views/show_textbook.js:40
+msgid "Deleting"
+msgstr "Borrando"
 
 #: cms/static/js/views/show_textbook.js:33
 msgid ""
 "Deleting a textbook cannot be undone and once deleted any reference to it in"
 " your courseware's navigation will also be removed."
 msgstr "El borrado de un Libro de texto no se puede deshacer y una vez borrado, cualquier referencia al mismo en la navegación del curso será eliminada."
-
-#: cms/static/js/views/show_textbook.js:40
-msgid "Deleting"
-msgstr "Borrando"
 
 #: cms/static/js/views/uploads.js:104
 msgid "We're sorry, there was an error"
@@ -287,56 +338,71 @@ msgid ""
 "policy pairs."
 msgstr "Por favor tenga en cuanta que la validación de su par de clave y valor de política no está todavía en funcionamiento. Si presenta dificultades, por favor revise su par de política."
 
-#: cms/static/js/views/settings/main.js:256
+#: cms/static/js/views/settings/main.js:279
 msgid "Upload your course image."
 msgstr "Cargar la imagen para el curso"
 
-#: cms/static/js/views/settings/main.js:257
+#: cms/static/js/views/settings/main.js:280
 msgid "Files must be in JPEG or PNG format."
 msgstr "Los archivos deben estar en formato JPEG o PNG."
 
-#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js:72
+#: common/lib/xmodule/xmodule/js/src/capa/display.js:523
+#: common/static/xmodule/modules/js/001-e750f200c82c4515c03bb27ca93ebd1e.js:523
+msgid "unanswered"
+msgstr "no respondido"
+
+#: common/lib/xmodule/xmodule/js/src/capa/display.js:553
+#: common/static/xmodule/modules/js/001-e750f200c82c4515c03bb27ca93ebd1e.js:553
+msgid "Status: unsubmitted"
+msgstr "Estado: no enviado"
+
+#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js:81
+#: common/static/xmodule/modules/js/005-226d53eb5744d2a2104aea9d9ca6c3d2.js:81
 msgid "video slider"
 msgstr "Barra de control de video"
 
-#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js:152
+#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js:161
+#: common/static/xmodule/modules/js/005-226d53eb5744d2a2104aea9d9ca6c3d2.js:161
 msgid "Pause"
 msgstr "Pausar"
 
-#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js:157
+#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js:166
+#: common/static/xmodule/modules/js/005-226d53eb5744d2a2104aea9d9ca6c3d2.js:166
 msgid "Play"
 msgstr "Reproducir"
 
-#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js:179
-#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js:180
+#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js:189
+#: common/static/xmodule/modules/js/005-226d53eb5744d2a2104aea9d9ca6c3d2.js:189
 msgid "Fill browser"
 msgstr "Llenar navegador"
 
-#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js:185
-#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js:186
+#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js:203
+#: common/static/xmodule/modules/js/005-226d53eb5744d2a2104aea9d9ca6c3d2.js:203
 msgid "Exit full browser"
 msgstr "Salir de pantalla completa del navegador"
 
-#: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js:72
-#: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js:188
-msgid "Volume muted"
-msgstr "Volumen silenciado"
+#: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js:75
+#: common/static/xmodule/modules/js/006-910aaa8964829cc8946a5d99026b0ee7.js:75
+msgid "HD on"
+msgstr "HD on"
 
-#: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js:189
-msgid "Volume"
-msgstr "Volumen"
+#: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js:81
+#: common/static/xmodule/modules/js/006-910aaa8964829cc8946a5d99026b0ee7.js:81
+msgid "HD off"
+msgstr "HD off"
 
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js:189
+#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js:227
+#: common/static/xmodule/modules/js/010-80b35efb6ab5697388bee77ff4717755.js:227
 msgid "Caption will be displayed when "
 msgstr "El texto se mostrará cuando"
 
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js:595
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js:596
+#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js:712
+#: common/static/xmodule/modules/js/010-80b35efb6ab5697388bee77ff4717755.js:712
 msgid "Turn on captions"
 msgstr "Activar subtítulos"
 
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js:601
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js:602
+#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js:720
+#: common/static/xmodule/modules/js/010-80b35efb6ab5697388bee77ff4717755.js:720
 msgid "Turn off captions"
 msgstr "Desactivar subtítulos"
 
@@ -489,3 +555,310 @@ msgstr "Ayer"
 #: lms/static/admin/js/admin/DateTimeShortcuts.js:199
 msgid "Tomorrow"
 msgstr "Mañana"
+
+#: lms/static/coffee/src/calculator.js:36
+msgid "Open Calculator"
+msgstr "Abrir Calculadora"
+
+#: lms/static/coffee/src/calculator.js:42
+msgid "Close Calculator"
+msgstr "Cerrar Calculadora"
+
+#: lms/static/coffee/src/instructor_dashboard/data_download.js:54
+msgid "Loading..."
+msgstr "Cargando..."
+
+#: lms/static/coffee/src/instructor_dashboard/data_download.js:60
+msgid "Error getting student list."
+msgstr "Error listando estudiantes."
+
+#: lms/static/coffee/src/instructor_dashboard/data_download.js:103
+msgid "Error retrieving grading configuration."
+msgstr "Error obteniendo configuración de calificaciones."
+
+#: lms/static/coffee/src/instructor_dashboard/data_download.js:119
+msgid "Error generating grades. Please try again."
+msgstr "Error generando calificaciones. Por favor trate de nuevo."
+
+#: lms/static/coffee/src/instructor_dashboard/data_download.js:213
+msgid "File Name (Newest First)"
+msgstr "Nombre de archivo (más nuevo primero)"
+
+#: lms/static/coffee/src/instructor_dashboard/data_download.js:214
+msgid ""
+"Links are generated on demand and expire within 5 minutes due to the "
+"sensitive nature of student grade information."
+msgstr "Links son generados bajo demanda y expiran dentro de 5 minutos debido a ser información sensible del estudiante."
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js:375
+msgid "Successfully enrolled and sent email to the following students:"
+msgstr "Correctamente matriculado, se envió un mail a los siguientes estudiantes:"
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js:386
+msgid "Successfully enrolled the following students:"
+msgstr "Matriculados correctamente los siguientes estudiantes:"
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js:397
+msgid ""
+"Successfully sent enrollment emails to the following students. They will be "
+"allowed to enroll once they register:"
+msgstr "Se envió correctamente la matrícula a los siguientes estudiantes. Están permitidos a matricularse una vez que se registren:"
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js:408
+msgid "These students will be allowed to enroll once they register:"
+msgstr "Estos estudiantes será permitidos para matricularse una vez se registren:"
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js:419
+msgid ""
+"Successfully sent enrollment emails to the following students. They will be "
+"enrolled once they register:"
+msgstr "Exitosamente enviado correos electrónicos de inscripción a los siguientes estudiantes. Estos serán admitidos una vez que se registran:"
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js:430
+msgid "These students will be enrolled once they register:"
+msgstr "Estos estudiantes se matricularán una vez registrados:"
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js:441
+msgid ""
+"Emails successfully sent. The following students are no longer enrolled in "
+"the course:"
+msgstr "Email enviado correctamente. Los siguientes estudiantes no están matriculados en este curso:"
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js:452
+msgid "The following students are no longer enrolled in the course:"
+msgstr "Los siguientes estudiantes ya no están matriculados en el curso:"
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js:463
+msgid ""
+"These students were not affliliated with the course so could not be "
+"unenrolled:"
+msgstr "Estos estudiantes no se affliliated con el curso por lo que no podía ser anulado el registro:"
+
+#: lms/static/coffee/src/instructor_dashboard/send_email.js:46
+msgid "Your message must have a subject."
+msgstr "Su mensaje debe tener tema."
+
+#: lms/static/coffee/src/instructor_dashboard/send_email.js:48
+msgid "Your message cannot be blank."
+msgstr "Su mensaje no puede estar en blanco."
+
+#: lms/static/coffee/src/instructor_dashboard/send_email.js:50
+msgid "Your email was successfully queued for sending."
+msgstr "Su correo fue puesto en cola correctamente para su envío."
+
+#: lms/static/coffee/src/instructor_dashboard/send_email.js:53
+msgid "yourself"
+msgstr "Tú"
+
+#: lms/static/coffee/src/instructor_dashboard/send_email.js:55
+msgid "everyone who is staff or instructor on this course"
+msgstr "todos quienes son instructores o personal en este curso."
+
+#: lms/static/coffee/src/instructor_dashboard/send_email.js:57
+msgid ""
+"ALL (everyone who is enrolled in this course as student, staff, or "
+"instructor)"
+msgstr "ALL (todos los que están inscritos en este curso como estudiante, personal, o instructor)"
+
+#: lms/static/coffee/src/instructor_dashboard/send_email.js:58
+msgid ""
+"Your email was successfully queued for sending. Please note that for large "
+"classes, it may take up to an hour (or more, if other courses are "
+"simultaneously sending email) to send all emails."
+msgstr "Su correo electrónico se puso en cola correctamente para el envío. Tenga en cuenta que para las clases grandes, puede tardar hasta una hora (o más, si otros cursos están enviando simultáneamente correo electrónico) para enviar todos los correos electrónicos."
+
+#: lms/static/coffee/src/instructor_dashboard/send_email.js:61
+msgid "You are about to send an email titled \""
+msgstr "Usted está a punto de enviar un correo electrónico titulado \""
+
+#: lms/static/coffee/src/instructor_dashboard/send_email.js:78
+msgid "Error sending email."
+msgstr "Error enviando correo."
+
+#: lms/static/coffee/src/instructor_dashboard/send_email.js:97
+msgid "There is no email history for this course."
+msgstr "No hay historial de correo para este curso."
+
+#: lms/static/coffee/src/instructor_dashboard/send_email.js:104
+msgid "There was an error obtaining email task history for this course."
+msgstr "Hubo un error al obtener el historial de tareas de correo electrónico para este curso."
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js:65
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js:90
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js:127
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js:168
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js:204
+msgid "Please enter a student email address or username."
+msgstr "Por favor, introduce una dirección de correo electrónico del estudiante o nombre de usuario."
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js:67
+msgid ""
+"Error getting student progress url for '<%= student_id %>'. Check that the "
+"student identifier is spelled correctly."
+msgstr "Error al obtener el estudiante url progreso para '<% = student_id%>'. Compruebe que el identificador de estudiante este escrita correctamente."
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js:93
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js:130
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js:171
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js:207
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js:234
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js:272
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js:312
+msgid "Please enter a problem urlname."
+msgstr "Ingrese el nombre del url al problema"
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js:100
+msgid ""
+"Success! Problem attempts reset for problem '<%= problem_id %>' and student "
+"'<%= student_id %>'."
+msgstr "¡Éxito! Intentos de problema reestablecidos '<% = problem_id%> \"y estudiante' <% = student_id%> '."
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js:101
+msgid ""
+"Error resetting problem attempts for problem '<%= problem_id %>' and student"
+" '<%= student_id %>'. Check that the problem and student identifiers are "
+"spelled correctly."
+msgstr "Error restableciendo intentos para el problema '<% = problem_id%> \"y el estudiante' <% = student_id%> '. Compruebe que los identificadores de problemas y de los estudiantes estén escritas correctamente."
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js:132
+msgid ""
+"Delete student '<%= student_id %>'s state on problem '<%= problem_id %>'?"
+msgstr "Eliminar declaraciones <% =%> student_id 's sobre los problemas <% =%> PROBLEM_ID?"
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js:143
+msgid ""
+"Error deleting student '<%= student_id %>'s state on problem '<%= problem_id"
+" %>'. Check that the problem and student identifiers are spelled correctly."
+msgstr "Error al eliminar <% = student_id%> estado en problema \"<% = problem_id%>'. Compruebe que los identificadores de problemas y de los estudiantes estén escritas correctamente."
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js:153
+msgid "Module state successfully deleted."
+msgstr "Información del módulo eliminado correctamente."
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js:177
+msgid ""
+"Started rescore problem task for problem '<%= problem_id %>' and student "
+"'<%= student_id %>'. Click the 'Show Background Task History for Student' "
+"button to see the status of the task."
+msgstr "Iniciada tarea de revalidación para problema '<% = problem_id%> \" el estudiante' <% = student_id%> '. Haga clic en 'Mostrar historial de tareas para estudiante' para ver el estado de la tarea."
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js:182
+msgid ""
+"Error starting a task to rescore problem '<%= problem_id %>' for student "
+"'<%= student_id %>'. Check that the problem and student identifiers are "
+"spelled correctly."
+msgstr "Error empezando tarea para reevaluar '<%= problem_id %>'  por estudiante '<%= student_id %>'. Revise que el problema y el estudiante esten escritos correctamente."
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js:213
+msgid ""
+"Error getting task history for problem '<%= problem_id %>' and student '<%= "
+"student_id %>'. Check that the problem and student identifiers are spelled "
+"correctly."
+msgstr "Error obtenidiendo historial de tareas para este problema '<%= problem_id %>' y estudiante '<%= student_id %>'. Revisar que el problema y el estudiante esten correctamente escritos."
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js:236
+msgid "Reset attempts for all students on problem '<%= problem_id %>'?"
+msgstr "Reiniciar intentos para todos los estudiantes en problema '<%= problem_id %>'?"
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js:245
+msgid ""
+"Successfully started task to reset attempts for problem '<%= problem_id %>'."
+" Click the 'Show Background Task History for Problem' button to see the "
+"status of the task."
+msgstr "Correctamente iniciada la tarea de reinicio de intentos para problema   '<%= problem_id %>'. Click en el botón 'Mostrar historial de tareas de problemas' para ver el estado de la tarea."
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js:249
+msgid ""
+"Error starting a task to reset attempts for all students on problem '<%= "
+"problem_id %>'. Check that the problem identifier is spelled correctly."
+msgstr "Error iniciando tarea de reiniciar intentos para todos los estudiantes en problema '<%= problem_id %>'. Revisar que el problema este bien escrito."
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js:274
+msgid "Rescore problem '<%= problem_id %>' for all students?"
+msgstr "Revalidar problema '<%= problem_id %>'  para todos los estudiantes ?"
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js:283
+msgid ""
+"Successfully started task to rescore problem '<%= problem_id %>' for all "
+"students. Click the 'Show Background Task History for Problem' button to see"
+" the status of the task."
+msgstr "Correctamente iniciada tarea de reevaluar problema  '<%= problem_id %>' para todos los estudiantes. Click en el botón 'Ver historial de tareas de problema' para ver el estado de la tarea."
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js:287
+msgid ""
+"Error starting a task to rescore problem '<%= problem_id %>'. Check that the"
+" problem identifier is spelled correctly."
+msgstr "Error iniciando reevaluación de problema '<%= problem_id %>'. Revisar que el problema este escrito correctamente."
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js:322
+msgid "Error listing task history for this student and problem."
+msgstr "Error listando historial de tareas para estudiante y problema."
+
+#: lms/static/coffee/src/staff_grading/staff_grading.js:296
+msgid "Grades saved.  Fetching the next submission to grade."
+msgstr "Calificaciones guardadas. Leyendo siguiente presentación para calificar."
+
+#: lms/static/coffee/src/staff_grading/staff_grading.js:348
+msgid "Problem Name"
+msgstr "Nombre del problema"
+
+#: lms/static/coffee/src/staff_grading/staff_grading.js:348
+msgid "Graded"
+msgstr "Calificado"
+
+#: lms/static/coffee/src/staff_grading/staff_grading.js:348
+msgid "Available to Grade"
+msgstr "Disponible para calificar"
+
+#: lms/static/coffee/src/staff_grading/staff_grading.js:348
+msgid "Required"
+msgstr "Requerido"
+
+#: lms/static/coffee/src/staff_grading/staff_grading.js:348
+msgid "Progress"
+msgstr "Progreso"
+
+#: lms/static/coffee/src/staff_grading/staff_grading.js:420
+msgid "Back to problem list"
+msgstr "Regresar a la lista de problemas"
+
+#: lms/static/coffee/src/staff_grading/staff_grading.js:425
+msgid "Try loading again"
+msgstr "Tratar de cargar nuevamente"
+
+#: lms/static/coffee/src/staff_grading/staff_grading.js:429
+msgid "<%= num %> available"
+msgstr "<%= num %> disponible"
+
+#: lms/static/coffee/src/staff_grading/staff_grading.js:432
+msgid "<%= num %> graded"
+msgstr "<%= num %> calificado"
+
+#: lms/static/coffee/src/staff_grading/staff_grading.js:435
+msgid "<%= num %> more needed to start ML"
+msgstr "<%= num %> necesario para iniciar ML"
+
+#: lms/static/coffee/src/staff_grading/staff_grading.js:447
+msgid "Submit"
+msgstr "Enviar"
+
+#: lms/static/coffee/src/staff_grading/staff_grading.js:451
+msgid "Re-check for submissions"
+msgstr "Revisar presentaciones"
+
+#: lms/static/coffee/src/staff_grading/staff_grading.js:453
+msgid "System got into invalid state: <%= state %>"
+msgstr "Sistema envió a esta inválido: <%= state %>"
+
+#: lms/static/coffee/src/staff_grading/staff_grading.js:470
+msgid "System got into invalid state for submission: "
+msgstr "Sistema envió a estado inválido para presentación"
+
+#: lms/static/coffee/src/staff_grading/staff_grading.js:478
+#: lms/static/coffee/src/staff_grading/staff_grading.js:487
+msgid "(Hide)"
+msgstr "(Ocultar)"
+
+#: lms/static/coffee/src/staff_grading/staff_grading.js:482
+msgid "(Show)"
+msgstr "(Mostrar)"
