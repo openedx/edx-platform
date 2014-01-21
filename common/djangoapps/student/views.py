@@ -562,9 +562,16 @@ def _get_course_enrollment_domain(course_id):
 @ensure_csrf_cookie
 def student_handler(request):
     """
-    TODO:
+    Verificar informacion academica de estudiante
     """
-    data = {'number_senescyt': '000111A'}
+    data = {'result': 'Ninguno'}
+    from student import utils
+    if request.is_ajax() and request.method == 'GET':
+        if request.GET.get('cedula', False):
+            cedula = request.GET.get('cedula')
+    result = utils.verify_academic_student(cedula)
+    if result:
+        data.update(result)
     return HttpResponse(json.dumps(data))
     
 

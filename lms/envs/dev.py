@@ -292,10 +292,11 @@ EDX_API_KEY = None
 ########################## WS CONFIG ###########################
 
 WS_CONFIG = {
-    'wsdl_prod': "https://www.bsg.gob.ec/sw/SENESCYT/BSGSW01_Consultar_Titulos?wsdl",
-    'wsdl_auth': "https://www.bsg.gob.ec/sw/STI/BSGSW08_Acceder_BSG?wsdl",
+    'ws_prod': "https://www.bsg.gob.ec/sw/SENESCYT/BSGSW01_Consultar_Titulos?wsdl",
+    'ws_auth': "https://www.bsg.gob.ec/sw/STI/BSGSW08_Acceder_BSG?wsdl",
     'method_permission': "validarPermisoPeticion",
-    'method_query_title': "consultaTitulo"
+    'method_query_title': "consultaTitulo",
+    'identity': '1803550274'
     }
 
 ####################### Shoppingcart ###########################

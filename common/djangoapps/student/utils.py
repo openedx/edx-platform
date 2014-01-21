@@ -2,7 +2,7 @@
 
 from logging import getLogger
 
-from django.config import settings
+from django.conf import settings
 
 try:
     from suds.client import Client
@@ -15,18 +15,19 @@ LOGGER = getLogger(__name__)
 
 def authentification_service():
     """
-    TODO:
+    Creacion de cliente de servicio de
+    autentificacion en WS
     """
     try:
         client_auth = Client(settings.WS_CONFIG['ws_auth'])
     except ServiceNotFound:
         LOGGER.error("Could not connect to service {0}".format(WS_CONFIG['ws_prod']))
         return
-    req_auth = cl_auth.factory.create(settings.WS_CONFIG['method_permission'])
-    req_auth.Cedula = student_identity
-    req_auth.Urlsw = WS_CONFIG['ws_prod']
+    req_auth = client_auth.factory.create(settings.WS_CONFIG['method_permission'])
+    req_auth.Cedula = settings.WS_CONFIG['identity']
+    req_auth.Urlsw = settings.WS_CONFIG['ws_prod']
     try:
-        response = cl_auth.service.ValidarPermiso(req_auth)
+        response = client_auth.service.ValidarPermiso(req_auth)
     except WebFault, e:
         print e
         return False
@@ -36,8 +37,12 @@ def authentification_service():
     return response
 
 def add_tokens(response, student_identity):
+    """
+    Agregar token de seguridad y de tiempo
+    en header de WS
+    """
     security = Security()
-    token = UsernameToken(student_identity)
+    token = UsernameToken(settings.WS_CONFIG['identity'])
     token.setcreated(response.Fecha)
     token.nonce_has_encoding = True
     token.setnonce(response.Nonce)
@@ -51,43 +56,35 @@ def add_tokens(response, student_identity):
 
 def verify_academic_student(student_identity):
     """
-    TODO:
+    verificar en WS de Senescyt si el identificador
+    @student_identity tiene registros
     """
     try:
         client_titulo = Client(settings.WS_CONFIG['ws_prod'])
     except ServiceNotFound:
         LOGGER.error("Could not connect to service {0}".format(WS_CONFIG['ws_prod']))
         return
-#    try:
-#        client_auth = Client(settings.WS_CONFIG['ws_auth'])
-#    except ServiceNotFound:
-#        LOGGER.error("Could not connect to service {0}".format(WS_CONFIG['ws_prod']))
-#        return
     response = authentification_service()#cl_auth.factory.create(settings.WS_CONFIG['method_permission'])
-#    req_auth.Cedula = student_identity
-#    req_auth.Urlsw = WS_CONFIG['ws_prod']
-#    response = cl_auth.service.ValidarPermiso(req_auth)
-#    if response.TienePermiso == 'N':
-#        LOGGER.debug("Error: no tiene permisos, respuesta de WS: %s" % response.TienePermiso)
-#        return False
     if not response:
         return
     security = add_tokens(response, student_identity)
-#    security = Security()
-#    token = UsernameToken(student_identity)
-#    token.setcreated(response.Fecha)
-#    token.nonce_has_encoding = True
-#    token.setnonce(response.Nonce)
-#    token.setpassworddigest(response.Digest)
-#    security.tokens.append(token)
-#    token_ts = Timestamp()
-#    token_ts.created = response.Fecha
-#    token_ts.expires = response.FechaF
-#    security.tokens.append(token_ts)
-    client.set_options(wsse=security)
-    consulta_response = client.service.consultaTitulo(arg0=student_identity)
-    LOGGER.debug("Consulta de titulo universitario de identificador: {0}".format(consulta_response.cedula))
-    for t in consulta_response:
-        print t[0], t[1]
+    client_titulo.set_options(wsse=security)
+    LOGGER.debug("Consulta de titulo universitario de identificador: {0}".format(student_identity))
+    consulta_response = client_titulo.service.consultaTitulo(arg0=student_identity)
+    if not consulta_response:
+        return
+    nombre = consulta_response.nombre
+    flag = False
+    titulo = False
+    numero = False
+    for tit in consulta_response.niveltitulos:
+        for ti in tit.titulo:
+            titulo = ti.nombreTitulo
+            numero_senescyt = ti.numeroRegistro
+            flag = True
+        if flag:
+            break
+    return {'nombre': nombre, 'number_senescyt': numero_senescyt, 'result': True}
+
 
     

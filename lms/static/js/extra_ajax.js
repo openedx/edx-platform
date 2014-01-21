@@ -30,7 +30,11 @@
 $(function(){
     $("#cedula").bind("change keyup",function(){
         var cedula = $("input#cedula").val();
+        var senescyt = $("#number_senescyt");
+        var name = $("#name");
         if (cedula.length!=10){
+            senescyt.val("");
+            name.val("");
             return
         }
         $.ajax({
@@ -38,12 +42,15 @@ $(function(){
             dataType: "json",
             minLength: 10,
             data: {
-                query: cedula
+                cedula: cedula
             },
             success: function(data){
-                if (data){
-                    $("#number_senescyt").val(data['number_senescyt']); 
+                if (data['result']==true){
+                    senescyt.val(data['number_senescyt']); 
+                    name.val(data['nombre']);
                     return;
+                }else{
+                    senescyt.val("Ninguno");
                 }
             }
         });
