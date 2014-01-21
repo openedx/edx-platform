@@ -36,7 +36,7 @@ class VideoAnnotationModuleTestCase(unittest.TestCase):
         element = etree.fromstring(xml)
 
         expected_attr = { 'class': { 'value': 'annotatable-span highlight' } }
-        actual_attr = self.mod._get_annotation_class_attr(0, element)
+        actual_attr = self.mod._get_annotation_class_attr(element)
 
         self.assertIsInstance(actual_attr, dict)
         self.assertDictEqual(expected_attr, actual_attr)
@@ -52,7 +52,7 @@ class VideoAnnotationModuleTestCase(unittest.TestCase):
                 'value': value,
                 '_delete': 'highlight' }
             }
-            actual_attr = self.mod._get_annotation_class_attr(0, element)
+            actual_attr = self.mod._get_annotation_class_attr(element)
 
             self.assertIsInstance(actual_attr, dict)
             self.assertDictEqual(expected_attr, actual_attr)
@@ -66,7 +66,7 @@ class VideoAnnotationModuleTestCase(unittest.TestCase):
                 'value': 'annotatable-span highlight',
                 '_delete': 'highlight' }
             }
-            actual_attr = self.mod._get_annotation_class_attr(0, element)
+            actual_attr = self.mod._get_annotation_class_attr(element)
 
             self.assertIsInstance(actual_attr, dict)
             self.assertDictEqual(expected_attr, actual_attr)
@@ -80,7 +80,7 @@ class VideoAnnotationModuleTestCase(unittest.TestCase):
             'data-problem-id': {'value': '0', '_delete': 'problem' }
         }
 
-        actual_attr = self.mod._get_annotation_data_attr(0, element)
+        actual_attr = self.mod._get_annotation_data_attr(element)
 
         self.assertIsInstance(actual_attr, dict)
         self.assertDictEqual(expected_attr, actual_attr)
@@ -90,7 +90,8 @@ class VideoAnnotationModuleTestCase(unittest.TestCase):
         expected_el = etree.fromstring(expected_html)
 
         actual_el = etree.fromstring('<annotation title="x" body="y" problem="0" highlight="yellow">z</annotation>')
-        self.mod._render_annotation(0, actual_el)
+        index = 0
+        self.mod._render_annotation(index, actual_el)
 
         self.assertEqual(expected_el.tag, actual_el.tag)
         self.assertEqual(expected_el.text, actual_el.text)
@@ -101,10 +102,6 @@ class VideoAnnotationModuleTestCase(unittest.TestCase):
         element = etree.fromstring(content)
 
         self.assertEqual('div', element.tag, 'root tag is a div')
-
-        expected_num_annotations = 5
-        actual_num_annotations = element.xpath('count(//span[contains(@class,"annotatable-span")])')
-        self.assertEqual(expected_num_annotations, actual_num_annotations, 'check number of annotations')
 
     def test_extract_instructions(self):
         xmltree = etree.fromstring(self.sample_xml)

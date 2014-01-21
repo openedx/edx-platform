@@ -101,8 +101,8 @@ class VideoAnnotationModule(AnnotatableFields, XModule):
     def _render_annotation(self, index, element):
         """ Renders an annotation element for HTML output.  """
         attr = {}
-        attr.update(self._get_annotation_class_attr(index, element))
-        attr.update(self._get_annotation_data_attr(index, element))
+        attr.update(self._get_annotation_class_attr(element))
+        attr.update(self._get_annotation_data_attr(element))
 
         element.tag = 'span'
 
