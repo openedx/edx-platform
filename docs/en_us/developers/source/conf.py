@@ -32,7 +32,10 @@ sys.path.insert(0, root)
 
 sys.path.append(root / "common/djangoapps")
 sys.path.append(root / "common/lib")
+sys.path.append(root / "common/lib/capa")
+sys.path.append(root / "common/lib/chem")
 sys.path.append(root / "common/lib/sandbox-packages")
+sys.path.append(root / "common/lib/xmodule")
 sys.path.append(root / "lms/djangoapps")
 sys.path.append(root / "lms/lib")
 sys.path.append(root / "cms/djangoapps")
@@ -68,7 +71,6 @@ htmlhelp_basename = 'edXDocs'
 # --- Mock modules ------------------------------------------------------------
 
 # Mock all the modules that the readthedocs build can't import
-import mock
 
 class Mock(object):
     def __init__(self, *args, **kwargs):
@@ -92,12 +94,35 @@ class Mock(object):
 # Make sure you've tried including the relevant package in
 # docs/share/requirements.txt before adding to this list.
 MOCK_MODULES = [
-    'numpy',
+    'bson',
+    'bson.errors',
+    'bson.objectid',
+    'dateutil',
+    'dateutil.parser',
+    'fs',
+    'fs.errors',
+    'fs.osfs',
+    'lazy',
+    'mako',
+    'mako.template',
     'matplotlib',
     'matplotlib.pyplot',
+    'mock',
+    'numpy',
+    'oauthlib',
+    'oauthlib.oauth1',
+    'oauthlib.oauth1.rfc5849',
+    'PIL',
+    'pymongo',
+    'pyparsing',
+    'pysrt',
+    'requests',
     'scipy.interpolate',
     'scipy.constants',
     'scipy.optimize',
+    'yaml',
+    'webob',
+    'webob.multidict',
     ]
 
 if on_rtd:
