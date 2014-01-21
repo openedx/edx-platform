@@ -94,7 +94,7 @@ function () {
 
         volumeSliderHandleEl.attr({
             'role': 'slider',
-            'title': 'volume',
+            'title': gettext('Volume'),
             'aria-disabled': false,
             'aria-valuemin': slider.slider('option', 'min'),
             'aria-valuemax': slider.slider('option', 'max'),
@@ -238,20 +238,27 @@ function () {
     // Returns a string describing the level of volume.
     function getVolumeDescription(vol) {
         if (vol === 0) {
-            return 'muted';
+            // Translators: Volume level equals 0%.
+            return gettext('Muted');
         } else if (vol <= 20) {
-            return 'very low';
+            // Translators: Volume level in range (0,20]%
+            return gettext('Very low');
         } else if (vol <= 40) {
-            return 'low';
+            // Translators: Volume level in range (20,40]%
+            return gettext('Low');
         } else if (vol <= 60) {
-            return 'average';
+            // Translators: Volume level in range (40,60]%
+            return gettext('Average');
         } else if (vol <= 80) {
-            return 'loud';
+            // Translators: Volume level in range (60,80]%
+            return gettext('Loud');
         } else if (vol <= 99) {
-            return 'very loud';
+            // Translators: Volume level in range (80,100)%
+            return gettext('Very loud');
         }
 
-        return 'maximum';
+        // Translators: Volume level equals 100%.
+        return gettext('Maximum');
     }
 
 });

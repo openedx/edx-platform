@@ -15,6 +15,7 @@ from django.http import HttpResponse, Http404
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
+from django.utils.translation import ugettext as _
 
 from xmodule.contentstore.content import StaticContent
 from xmodule.exceptions import NotFoundError
@@ -439,15 +440,15 @@ def _validate_transcripts_data(request):
     """
     data = json.loads(request.GET.get('data', '{}'))
     if not data:
-        raise TranscriptsRequestValidationException('Incoming video data is empty.')
+        raise TranscriptsRequestValidationException(_('Incoming video data is empty.'))
 
     try:
         item = _get_item(request, data)
     except (ItemNotFoundError, InvalidLocationError, InsufficientSpecificationError):
-        raise TranscriptsRequestValidationException("Can't find item by locator.")
+        raise TranscriptsRequestValidationException(_("Can't find item by locator."))
 
     if item.category != 'video':
-        raise TranscriptsRequestValidationException('Transcripts are supported only for "video" modules.')
+        raise TranscriptsRequestValidationException(_('Transcripts are supported only for "video" modules.'))
 
     # parse data form request.GET.['data']['video'] to useful format
     videos = {'youtube': '', 'html5': {}}

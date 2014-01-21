@@ -16,19 +16,6 @@ define(
 'video/01_initialize.js',
 ['video/03_video_player.js', 'video/00_cookie_storage.js'],
 function (VideoPlayer, CookieStorage) {
-    // window.console.log() is expected to be available. We do not support
-    // browsers which lack this functionality.
-
-    // The function gettext() is defined by a vendor library. If, however, it
-    // is undefined, it is a simple wrapper. It is used to return a different
-    // version of the string passed (translated string, etc.). In the basic
-    // case, the original string is returned.
-    if (typeof(window.gettext) == 'undefined') {
-        window.gettext = function (s) {
-            return s;
-        };
-    }
-
     /**
      * @function
      *
