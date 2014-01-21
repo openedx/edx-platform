@@ -181,17 +181,21 @@ class WeightedSubsectionsGrader(CourseGrader):
 
         for subgrader, category, weight in self.sections:
             subgrade_result = subgrader.grade(grade_sheet, generate_random_scores)
-
+            
+            number_dropped = subgrade_result['number_dropped']
+            
             weighted_percent = subgrade_result['percent'] * weight
             section_detail = u"{0} = {1:.1%} of a possible {2:.0%}".format(category, weighted_percent, weight)
 
             total_percent += weighted_percent
             section_breakdown += subgrade_result['section_breakdown']
-            grade_breakdown.append({'percent': weighted_percent, 'detail': section_detail, 'category': category})
+            
+            grade_breakdown.append({'percent': weighted_percent, 'detail': section_detail, 'category': category, 'weight': weight, 'number_dropped': number_dropped})
 
         return {'percent': total_percent,
                 'section_breakdown': section_breakdown,
-                'grade_breakdown': grade_breakdown}
+                'grade_breakdown': grade_breakdown
+                }
 
 
 class SingleSectionGrader(CourseGrader):
@@ -350,11 +354,14 @@ class AssignmentFormatGrader(CourseGrader):
                               'detail': summary, 'category': self.category})
 
         total_percent, dropped_indices = total_with_drops(breakdown, self.drop_count)
-
+        
+        number_dropped = 0
+        
         for dropped_index in dropped_indices:
             breakdown[dropped_index]['mark'] = {'detail': u"The lowest {drop_count} {section_type} scores are dropped."
                                                 .format(drop_count=self.drop_count, section_type=self.section_type)}
-
+            number_dropped = self.drop_count
+        
         if len(breakdown) == 1:
             # if there is only one entry in a section, suppress the existing individual entry and the average,
             # and just display a single entry for the section.  That way it acts automatically like a
@@ -369,7 +376,7 @@ class AssignmentFormatGrader(CourseGrader):
                 percent=total_percent,
                 section_type=self.section_type
             )
-            total_label = u"{short_label} Avg".format(short_label=self.short_label)
+            total_label = u"{short_label} Total".format(short_label=self.short_label)
 
             if self.show_only_average:
                 breakdown = []
@@ -380,5 +387,6 @@ class AssignmentFormatGrader(CourseGrader):
 
         return {'percent': total_percent,
                 'section_breakdown': breakdown,
+                'number_dropped': number_dropped
                 #No grade_breakdown here
                 }

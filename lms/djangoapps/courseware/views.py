@@ -644,6 +644,16 @@ def _progress(request, course_id, student_id):
 
     grade_summary = grades.grade(student, request, course)
 
+    normalized_grades = {}
+    grades_total = 0;
+    for category in grade_summary['grade_breakdown']:
+      normalized_grade = {}
+      normalized_grade['number_dropped'] = category['number_dropped']
+      normalized_grade['weight'] = category['weight']
+      normalized_grades[category['category']] = normalized_grade
+      grades_total += category['weight']
+    if grades_total == 0:
+      grades_total = 1
     if courseware_summary is None:
         #This means the student didn't have access to the course (which the instructor requested)
         raise Http404
@@ -652,6 +662,8 @@ def _progress(request, course_id, student_id):
         'course': course,
         'courseware_summary': courseware_summary,
         'grade_summary': grade_summary,
+        'normalized_grades': normalized_grades,
+        'grades_total': grades_total,
         'staff_access': staff_access,
         'student': student,
     }

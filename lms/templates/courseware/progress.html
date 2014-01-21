@@ -38,6 +38,21 @@ ${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph",
 
       %if not course.disable_progress_graph:
         <div id="grade-detail-graph" aria-hidden="true"></div>
+        <div id="graph-sidebar" aria-hidden="true">
+            <h2>Grade Weighting</h2>
+            %for item in normalized_grades:
+              <%
+                normalized_grade = normalized_grades[item]['weight']
+                number_dropped = normalized_grades[item]['number_dropped']
+              %>
+              <p>
+                <strong>${item}: </strong> ${"{0:.1%}".format(normalized_grade)}
+                %if number_dropped > 0:
+                  <br /><span class="dropped">Lowest ${number_dropped} Dropped</span>
+                %endif
+              </p>
+            %endfor
+        </div>
       %endif
 
       <ol class="chapters">
