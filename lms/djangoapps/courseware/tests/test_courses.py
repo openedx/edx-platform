@@ -3,7 +3,6 @@
 Tests for course access
 """
 import mock
-from unittest import expectedFailure
 
 from django.http import Http404
 from django.test.utils import override_settings
@@ -96,7 +95,6 @@ class MongoCourseImageTestCase(ModuleStoreTestCase):
         course = CourseFactory.create(org='edX', course='999')
         self.assertEquals(course_image_url(course), '/c4x/edX/999/asset/{0}'.format(course.course_image))
 
-    @expectedFailure
     def test_non_ascii_image_name(self):
         # Verify that non-ascii image names are cleaned
         course = CourseFactory.create(course_image=u'before_\N{SNOWMAN}_after.jpg')

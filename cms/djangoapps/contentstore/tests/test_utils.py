@@ -2,7 +2,6 @@
 import collections
 import copy
 import mock
-from unittest import expectedFailure
 
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -168,7 +167,6 @@ class CourseImageTestCase(TestCase):
         url = utils.course_image_url(course)
         self.assertEquals(url, '/c4x/edX/999/asset/{0}'.format(course.course_image))
 
-    @expectedFailure
     def test_non_ascii_image_name(self):
         # Verify that non-ascii image names are cleaned
         course = CourseFactory.create(course_image=u'before_\N{SNOWMAN}_after.jpg')
