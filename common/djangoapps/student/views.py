@@ -559,6 +559,14 @@ def _get_course_enrollment_domain(course_id):
     except ItemNotFoundError:
         return None
 
+@ensure_csrf_cookie
+def student_handler(request):
+    """
+    TODO:
+    """
+    data = {'number_senescyt': '000111A'}
+    return HttpResponse(json.dumps(data))
+    
 
 @ensure_csrf_cookie
 def accounts_login(request):
