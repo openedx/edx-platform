@@ -834,7 +834,7 @@ def _do_create_account(post_vars):
             return HttpResponse(json.dumps(js))
 
         if len(User.objects.filter(email=post_vars['email'])) > 0:
-            js['value'] = _("An account with the Email '{email}' already exists.").format(email=post_vars['email'])
+            js['value'] = _("An account with the Email '{email}' already exists.".format(email=post_vars['email']))
             js['field'] = 'email'
             return HttpResponse(json.dumps(js))
 
