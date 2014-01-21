@@ -3,7 +3,23 @@
 
 import sys, os
 
+# on_rtd is whether we are on readthedocs.org, this line of code grabbed from docs.readthedocs.org
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
+
+if not on_rtd:  # only import and set the theme if we're building docs locally
+    import sphinx_rtd_theme
+    html_theme = 'sphinx_rtd_theme'
+    html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+
+# otherwise, readthedocs.org uses their theme by default, so no need to specify it
+html_theme = 'sphinx_rtd_theme'
+html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+
+
+
+
+
+
 
 sys.path.append(os.path.abspath('../../../'))
 sys.path.append(os.path.abspath('../../'))
@@ -23,7 +39,7 @@ templates_path.append('source/_templates')
 html_static_path.append('source/_static')
 
 project = u'edX Data Documentation'
-copyright = u'2013, edX Documentation Team'
+copyright = u'2013, edX'
 
 # The short X.Y version.
 version = ''
