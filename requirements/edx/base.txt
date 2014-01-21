@@ -41,7 +41,7 @@ glob2==0.3
 gunicorn==0.17.4
 lazy==1.1
 lxml==3.0.1
-mako==0.7.3
+mako==0.9.1
 Markdown==2.2.1
 mongoengine==0.7.10
 networkx==1.7
