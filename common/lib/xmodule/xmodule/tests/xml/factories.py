@@ -119,6 +119,10 @@ class XmlImportFactory(Factory):
 class CourseFactory(XmlImportFactory):
     """Factory for <course> nodes"""
     tag = 'course'
+    org = 'edX'
+    course = 'xml_test_course'
+    name = '101'
+    static_asset_path = 'xml_test_course'
 
 
 class SequenceFactory(XmlImportFactory):
