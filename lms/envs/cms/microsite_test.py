@@ -27,7 +27,7 @@ MICROSITE_CONFIGURATION = {
         "course_index_overlay_text": "Explore free courses from leading universities.",
         "course_index_overlay_logo_file": "openedx/images/header-logo.png",
         "homepage_overlay_html": "<h1>Take an Open edX Course</h1>"
-    },
+    }
 }
 
 if len(MICROSITE_CONFIGURATION.keys()) > 0:
@@ -36,3 +36,7 @@ if len(MICROSITE_CONFIGURATION.keys()) > 0:
         SUBDOMAIN_BRANDING,
         VIRTUAL_UNIVERSITIES
     )
+
+# pretend we are behind some marketing site, we want to be able to assert that the Microsite config values override
+# this global setting
+FEATURES['ENABLE_MKTG_SITE'] = True
