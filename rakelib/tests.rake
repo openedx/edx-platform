@@ -136,7 +136,7 @@ namespace :test do
 end
 
 desc "Run all tests"
-task :test, [:test_id] => [:test_docs, 'test:python']
+task :test, [:test_id] => [:test_docs, 'test:python', 'i18n:test']
 
 desc "Build the html, xml, and diff coverage reports"
 task :coverage => :report_dirs do
