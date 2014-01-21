@@ -99,16 +99,16 @@ class VideoAnnotationModuleTestCase(unittest.TestCase):
         content = self.mod._render_content()
         el = etree.fromstring(content)
 
-        self.assertEqual('div', el.tag, 'root tag is a div')
+        self.assertEqual('div', element.tag, 'root tag is a div')
 
         expected_num_annotations = 5
-        actual_num_annotations = el.xpath('count(//span[contains(@class,"annotatable-span")])')
+        actual_num_annotations = element.xpath('count(//span[contains(@class,"annotatable-span")])')
         self.assertEqual(expected_num_annotations, actual_num_annotations, 'check number of annotations')
     
     def test_extract_instructions(self):
         xmltree = etree.fromstring(self.sample_xml)
 
-        expected_xml = u"<div>Read the text.</div>"
+        expected_xml = u"<div><p>Video Test Instructions.</p></div>"
         actual_xml = self.mod._extract_instructions(xmltree)
         self.assertIsNotNone(actual_xml)
         self.assertEqual(expected_xml.strip(), actual_xml.strip())
