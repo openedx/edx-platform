@@ -1,5 +1,6 @@
 """Tests that validate .po files."""
 
+import argparse
 import codecs
 import logging
 import os
@@ -13,23 +14,25 @@ from i18n.execute import call
 from i18n.converter import Converter
 
 
-def test_po_files(root=LOCALE_DIR):
+log = logging.getLogger(__name__)
+
+def validate_po_files(root, report_empty=False):
     """
-    This is a generator. It yields all of the .po files under root, and tests each one.
+    Validate all of the po files found in the root directory.
     """
-    log = logging.getLogger(__name__)
-    logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
     for dirpath, __, filenames in os.walk(root):
         for name in filenames:
             __, ext = os.path.splitext(name)
             if ext.lower() == '.po':
                 filename = os.path.join(dirpath, name)
-                yield msgfmt_check_po_file, filename, log
-                yield check_messages, filename
+                # First validate the format of this file
+                msgfmt_check_po_file(filename)
+                # Now, check that the translated strings are valid, and optionally check for empty translations
+                check_messages(filename, report_empty)
 
 
-def msgfmt_check_po_file(filename, log):
+def msgfmt_check_po_file(filename):
     """
     Call GNU msgfmt -c on each .po file to validate its format.
     Any errors caught by msgfmt are logged to log.
@@ -70,12 +73,14 @@ def astral(msg):
     return any(ord(c) > 0xFFFF for c in msg)
 
 
-def check_messages(filename):
+def check_messages(filename, report_empty=False):
     """
     Checks messages in various ways:
 
-    Translations must have the same slots as the English.  The translation
-    must not be empty. Messages can't have astral characters in them.
+    Translations must have the same slots as the English. Messages can't have astral
+    characters in them.
+
+    If report_empty is True, will also report empty translation strings.
 
     """
     # Don't check English files.
@@ -95,7 +100,7 @@ def check_messages(filename):
         if msg.msgid_plural:
             # Plurals: two strings in, N strings out.
             source = msg.msgid + " | " + msg.msgid_plural
-            translation = " | ".join(v for k,v in sorted(msg.msgstr_plural.items()))
+            translation = " | ".join(v for k, v in sorted(msg.msgstr_plural.items()))
             empty = any(not t.strip() for t in msg.msgstr_plural.values())
         else:
             # Singular: just one string in and one string out.
@@ -104,10 +109,13 @@ def check_messages(filename):
             empty = not msg.msgstr.strip()
 
         if empty:
-            problems.append(("Empty translation", source))
+            if report_empty:
+                problems.append(("Empty translation", source))
         else:
             id_tags = tags_in_string(source)
             tx_tags = tags_in_string(translation)
+
+            # Check if tags don't match
             if id_tags != tx_tags:
                 id_has = u", ".join(u'"{}"'.format(t) for t in id_tags - tx_tags)
                 tx_has = u", ".join(u'"{}"'.format(t) for t in tx_tags - id_tags)
@@ -136,4 +144,74 @@ def check_messages(filename):
                     prob_file.write(u"{}\n".format(tx_filler.fill(translation)))
                 prob_file.write(u"\n")
 
-    assert not problems, "Found %d problems in %s, details in .prob file" % (len(problems), filename)
+        log.error(" {0} problems in {1}, details in .prob file".format(len(problems), filename))
+    else:
+        log.info(" No problems found in {0}".format(filename))
+
+
+def parse_args(argv):
+    """
+    Parse command line arguments, returning a dict of
+    valid options:
+
+        {
+            'empty': BOOLEAN,
+            'verbose': BOOLEAN,
+            'language': str
+        }
+
+    where 'language' is a language code, eg "fr"
+    """
+    parser = argparse.ArgumentParser(description="Automatically finds translation errors in all edx-platform *.po files, for all languages, unless one or more language(s) is specified to check.")
+
+    parser.add_argument(
+        '-l', '--language',
+        type=str,
+        nargs='*',
+        help="Specify one or more specific language code(s) to check (eg 'ko_KR')."
+    )
+
+    parser.add_argument(
+        '-e', '--empty',
+        action='store_true',
+        help="Includes empty translation strings in .prob files."
+    )
+
+    parser.add_argument(
+        '-v', '--verbose',
+        action='store_true',
+        help="Turns on info-level logging."
+    )
+
+    return vars(parser.parse_args(argv))
+
+
+def main():
+    """Main entry point for the tool."""
+
+    args_dict = parse_args(sys.argv[1:])
+    if args_dict['verbose']:
+        logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+    else:
+        logging.basicConfig(stream=sys.stdout, level=logging.WARNING)
+
+    langs = args_dict['language']
+
+    if langs is not None:
+        # lang will be a list of language codes; test each language.
+        for lang in langs:
+            root = LOCALE_DIR / lang
+            # Assert that a directory for this language code exists on the system
+            if not os.path.isdir(root):
+                log.error(" {0} is not a valid directory.\nSkipping language '{1}'".format(root, lang))
+                continue
+            # If we found the language code's directory, validate the files.
+            validate_po_files(root, args_dict['empty'])
+
+    else:
+        # If lang is None, we walk all of the .po files under root, and test each one.
+        root = LOCALE_DIR
+        validate_po_files(root, args_dict['empty'])
+
+if __name__ == '__main__':
+    main()
