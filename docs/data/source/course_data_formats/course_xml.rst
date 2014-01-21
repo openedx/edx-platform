@@ -294,7 +294,7 @@ This video has been encoded at 4 different speeds: `0.75x`, `1x`, `1.25x`, and `
 
 More on `url_name`
 ==================
-Every content element (within a course) should have a unique id.  This id is formed as `{category}/{url_name}`, or automatically generated from the content if `url_name` is not specified.  Categories are the different tag types ('chapter', 'problem', 'html', 'sequential', etc).  Url_name is a string containing a-z, A-Z, dot (.), underscore (_), and ':'.  This is what appears in urls that point to this object.
+Every content element (within a course) should have a unique id.  This id is formed as `{category}/{url_name}`, or automatically generated from the content if `url_name` is not specified.  Categories are the different tag types ('chapter', 'problem', 'html', 'sequential', etc).  Url_name is a string containing a-z, A-Z, 0-9, dot (.), underscore (_), and ':'.  This is what appears in urls that point to this object.
 
 Colon (':') is special--when looking for the content definition in an xml, ':' will be replaced with '/'.  This allows organizing content into folders.  For example, given the pointer tag
 
