@@ -289,6 +289,14 @@ CC_PROCESSOR['CyberSource']['PURCHASE_ENDPOINT'] = os.environ.get('CYBERSOURCE_P
 ########################## USER API ########################
 EDX_API_KEY = None
 
+########################## WS CONFIG ###########################
+
+WS_CONFIG = {
+    'wsdl_prod': "https://www.bsg.gob.ec/sw/SENESCYT/BSGSW01_Consultar_Titulos?wsdl",
+    'wsdl_auth': "https://www.bsg.gob.ec/sw/STI/BSGSW08_Acceder_BSG?wsdl",
+    'method_permission': "validarPermisoPeticion",
+    'method_query_title': "consultaTitulo"
+    }
 
 ####################### Shoppingcart ###########################
 FEATURES['ENABLE_SHOPPING_CART'] = True
