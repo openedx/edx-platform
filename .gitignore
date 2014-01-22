@@ -35,6 +35,9 @@ conf/locale/en/LC_MESSAGES/*.po
 ### Remove when we have real Esperanto translations. For now, ignore
 ### dummy Esperanto files.
 conf/locale/eo/*
+## Remove when we officially support these languages.
+conf/locale/fr
+conf/locale/ko_KR
 
 ### Testing artifacts
 .testids/
