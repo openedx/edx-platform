@@ -6,16 +6,13 @@ Change Log
 
 
 
+
 .. list-table::
    :widths: 10 80
    :header-rows: 1
 
-
    * - Date
      - Change
-   * - 01/24/2014
-     - Added the :ref:`Discussions` and :ref:`Guidance for Discussion Moderators` chapters.  
-   * - Added information about accessibility in the topic :ref:`Add Textbooks`. 
    * - 01/21/2014
      - Added more detailed instructions to :ref:`Zooming image`
    * - 01/14/2014

@@ -299,6 +299,15 @@ If you want to change, or "randomize," specific values in your problem, you have
 - Enable randomization in the Problem component. 
 
 To enable randomization, select an option for the **Randomization** setting. This setting has four options.
+=======
+Some problems have values that are randomized for each student. 
+
+
+.. image:: Images/Rerandomize.gif
+
+
+This setting has four options.
+>>>>>>> 7d8450f... Minor updates and typo fixes
 
 +-------------------+--------------------------------------+
 | **Always**        | Students see a different version of  |
