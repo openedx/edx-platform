@@ -102,3 +102,21 @@ class TestGitAddCourse(ModuleStoreTestCase):
 
         with self.assertRaisesRegexp(GitImportError, GitImportError.BAD_REPO):
             git_import.add_repo('file://{0}'.format(bare_repo), None)
+
+    def test_detached_repo(self):
+        """
+        Test repo that is in detached head state.
+        """
+        repo_dir = getattr(settings, 'GIT_REPO_DIR')
+        # Test successful import from command
+        try:
+            os.mkdir(repo_dir)
+        except OSError:
+            pass
+        self.addCleanup(shutil.rmtree, repo_dir)
+        git_import.add_repo(self.TEST_REPO, repo_dir / 'edx4edx_lite')
+        subprocess.check_output(['git', 'checkout', 'HEAD~2', ],
+                                stderr=subprocess.STDOUT,
+                                cwd=repo_dir / 'edx4edx_lite')
+        with self.assertRaisesRegexp(GitImportError, GitImportError.CANNOT_PULL):
+            git_import.add_repo(self.TEST_REPO, repo_dir / 'edx4edx_lite')
