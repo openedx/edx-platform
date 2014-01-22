@@ -27,31 +27,30 @@ define(["coffee/src/views/unit", "js/models/module_info", "js/spec/create_sinon"
         };
 
         describe('duplicateComponent ', function () {
+            var duplicateFixture =
+                '<div class="main-wrapper edit-state-draft" data-locator="unit_locator"> \
+                  <ol class="components"> \
+                    <li class="component" data-locator="loc_1"> \
+                      <div class="wrapper wrapper-component-editor"/> \
+                      <div class="component-actions"> \
+                        <a href="#" class="duplicate-button standard"><span class="duplicate-icon icon-copy"></span>Duplicate</a> \
+                      </div> \
+                    </li> \
+                    <li class="component" data-locator="loc_2"> \
+                      <div class="wrapper wrapper-component-editor"/> \
+                      <div class="component-actions"> \
+                        <a href="#" class="duplicate-button standard"><span class="duplicate-icon icon-copy"></span>Duplicate</a> \
+                      </div> \
+                    </li> \
+                  </ol> \
+                </div>';
+
             var unit;
             var clickDuplicate = function (index) {
                 unit.$(".duplicate-button")[index].click();
             };
             beforeEach(function () {
-                setFixtures(
-                    '<div class="main-wrapper edit-state-draft" data-locator="unit_locator"> \
-                    <ol class="components"> \
-                      <li class="component" data-locator="loc_1"> \
-                          <div class="wrapper wrapper-component-editor"> \
-                          </div> \
-                          <div class="component-actions"> \
-                              <a href="#" class="duplicate-button standard"><span class="duplicate-icon icon-copy"></span>Duplicate</a> \
-                          </div> \
-                      </li> \
-                      <li class="component" data-locator="loc_2"> \
-                          <div class="wrapper wrapper-component-editor"> \
-                          </div> \
-                          <div class="component-actions"> \
-                              <a href="#" class="duplicate-button standard"><span class="duplicate-icon icon-copy"></span>Duplicate</a> \
-                          </div> \
-                      </li> \
-                    </ol> \
-                    '
-                );
+                setFixtures(duplicateFixture);
                 unit = new UnitEditView({
                     el: $('.main-wrapper'),
                     model: new ModuleModel({
@@ -67,14 +66,14 @@ define(["coffee/src/views/unit", "js/models/module_info", "js/spec/create_sinon"
                 verifyJSON(requests, '{"duplicate_source_locator":"loc_1","parent_locator":"unit_locator"}');
             });
 
-            it('inserts duplicated component immediately after source upon success and shows notification', function () {
+            it('inserts duplicated component immediately after source upon success', function () {
                 var requests = create_sinon.requests(this);
                 clickDuplicate(0);
                 create_sinon.respondWithJson(requests, {"locator": "duplicated_item"});
                 verifyComponents(unit, ['loc_1', 'duplicated_item', 'loc_2']);
             });
 
-            it('inserts duplicated component at end if last duplicated', function () {
+            it('inserts duplicated component at end if source at end', function () {
                 var requests = create_sinon.requests(this);
                 clickDuplicate(1);
                 create_sinon.respondWithJson(requests, {"locator": "duplicated_item"});
@@ -98,34 +97,33 @@ define(["coffee/src/views/unit", "js/models/module_info", "js/spec/create_sinon"
             });
         });
         describe('saveNewComponent ', function () {
+            var newComponentFixture =
+                '<div class="main-wrapper edit-state-draft" data-locator="unit_locator"> \
+                  <ol class="components"> \
+                    <li class="component" data-locator="loc_1"> \
+                      <div class="wrapper wrapper-component-editor"/> \
+                    </li> \
+                    <li class="component" data-locator="loc_2"> \
+                      <div class="wrapper wrapper-component-editor"/> \
+                    </li> \
+                    <li class="new-component-item adding"> \
+                      <div class="new-component"> \
+                        <ul class="new-component-type"> \
+                          <li> \
+                            <a href="#" class="single-template" data-type="discussion" data-category="discussion"/> \
+                          </li> \
+                        </ul> \
+                      </div> \
+                    </li> \
+                  </ol> \
+                </div>';
+
             var unit;
             var clickNewComponent = function () {
                 unit.$(".new-component .new-component-type a.single-template").click();
             };
             beforeEach(function () {
-                setFixtures(
-                    '<div class="main-wrapper edit-state-draft" data-locator="unit_locator"> \
-                    <ol class="components"> \
-                      <li class="component" data-locator="loc_1"> \
-                          <div class="wrapper wrapper-component-editor"> \
-                          </div> \
-                      </li> \
-                      <li class="component" data-locator="loc_2"> \
-                          <div class="wrapper wrapper-component-editor"> \
-                          </div> \
-                      </li> \
-                      <li class="new-component-item adding"> \
-                        <div class="new-component"> \
-                          <ul class="new-component-type"> \
-                            <li> \
-                              <a href="#" class="single-template" data-type="discussion" data-category="discussion"/> \
-                            </li> \
-                          </ul> \
-                        </div> \
-                      </li> \
-                    </ol> \
-                   '
-                );
+                setFixtures(newComponentFixture);
                 unit = new UnitEditView({
                     el: $('.main-wrapper'),
                     model: new ModuleModel({
