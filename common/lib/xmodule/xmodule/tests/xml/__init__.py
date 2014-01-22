@@ -3,6 +3,7 @@ Xml parsing tests for XModules
 """
 import pprint
 from mock import Mock
+from unittest import TestCase
 
 from xmodule.x_module import XMLParsingSystem, policy_key
 from xmodule.mako_module import MakoDescriptorSystem
@@ -54,7 +55,7 @@ class InMemorySystem(XMLParsingSystem, MakoDescriptorSystem):  # pylint: disable
         return self._descriptors[Location(location).url()]
 
 
-class XModuleXmlImportTest(object):
+class XModuleXmlImportTest(TestCase):
     """Base class for tests that use basic XML parsing"""
     def process_xml(self, xml_import_data):
         """Use the `xml_import_data` to import an :class:`XBlock` from XML."""

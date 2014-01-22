@@ -1,14 +1,14 @@
 """ Tests for utils. """
-from contentstore import utils
-import mock
 import collections
 import copy
+import mock
 
 from django.test import TestCase
-from xmodule.modulestore.tests.factories import CourseFactory
 from django.test.utils import override_settings
 
+from contentstore import utils
 from xmodule.modulestore import Location
+from xmodule.modulestore.tests.factories import CourseFactory
 
 
 class LMSLinksTestCase(TestCase):
@@ -166,3 +166,22 @@ class CourseImageTestCase(TestCase):
         course = CourseFactory.create(org='edX', course='999')
         url = utils.course_image_url(course)
         self.assertEquals(url, '/c4x/edX/999/asset/{0}'.format(course.course_image))
+
+    def test_non_ascii_image_name(self):
+        # Verify that non-ascii image names are cleaned
+        course = CourseFactory.create(course_image=u'before_\N{SNOWMAN}_after.jpg')
+        self.assertEquals(
+            utils.course_image_url(course),
+            '/c4x/{org}/{course}/asset/before___after.jpg'.format(org=course.location.org, course=course.location.course)
+        )
+
+    def test_spaces_in_image_name(self):
+        # Verify that image names with spaces in them are cleaned
+        course = CourseFactory.create(course_image=u'before after.jpg')
+        self.assertEquals(
+            utils.course_image_url(course),
+            '/c4x/{org}/{course}/asset/before_after.jpg'.format(
+                org=course.location.org,
+                course=course.location.course
+            )
+        )
