@@ -1,3 +1,9 @@
+"""
+This test file will run through some LMS test scenarios regarding access and navigation of the LMS
+"""
+import time
+from django.conf import settings
+
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 
@@ -36,6 +42,28 @@ class TestNavigation(ModuleStoreTestCase, LoginEnrollmentTestCase):
             username = 'u{0}'.format(i)
             self.create_account(username, email, password)
             self.activate_user(email)
+
+    @override_settings(SESSION_INACTIVITY_TIMEOUT_IN_SECONDS=1)
+    def test_inactive_session_timeout(self):
+        """
+        Verify that an inactive session times out and redirects to the
+        login page
+        """
+        email, password = self.STUDENT_INFO[0]
+        self.login(email, password)
+
+        # make sure we can access courseware immediately
+        resp = self.client.get(reverse('dashboard'))
+        self.assertEquals(resp.status_code, 200)
+
+        # then wait a bit and see if we get timed out
+        time.sleep(2)
+
+        resp = self.client.get(reverse('dashboard'))
+
+        # re-request, and we should get a redirect to login page
+        self.assertRedirects(resp, settings.LOGIN_REDIRECT_URL + '?next=' + reverse('dashboard'))
+
 
     def test_redirects_first_time(self):
         """

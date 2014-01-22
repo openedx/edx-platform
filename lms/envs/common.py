@@ -654,6 +654,9 @@ MIDDLEWARE_CLASSES = (
 
     # For A/B testing
     'waffle.middleware.WaffleMiddleware',
+
+    # for expiring inactive sessions
+    'session_inactivity_timeout.middleware.SessionInactivityTimeout',
 )
 
 ############################### Pipeline #######################################
