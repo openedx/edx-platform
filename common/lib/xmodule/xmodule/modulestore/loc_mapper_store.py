@@ -7,7 +7,7 @@ import pymongo
 import bson.son
 
 from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError
-from xmodule.modulestore.locator import BlockUsageLocator
+from xmodule.modulestore.locator import BlockUsageLocator, CourseLocator
 from xmodule.modulestore import Location
 import urllib
 
@@ -248,6 +248,37 @@ class LocMapperStore(object):
             if result is not None:
                 return result
         return None
+
+    def translate_location_to_course_locator(self, old_style_course_id, location, published=True):
+        """
+        Used when you only need the CourseLocator and not a full BlockUsageLocator. Probably only
+        useful for get_items which wildcards name or category.
+
+        :param course_id: old style course id
+        """
+        # doesn't use caching as cache requires full location w/o wildcards
+        location_id = self._interpret_location_course_id(old_style_course_id, location)
+        if old_style_course_id is None:
+            old_style_course_id = self._generate_location_course_id(location_id)
+
+        maps = self.location_map.find(location_id)
+        maps = list(maps)
+        if len(maps) == 0:
+            raise ItemNotFoundError()
+        elif len(maps) == 1:
+            entry = maps[0]
+        else:
+            # find entry w/o name, if any; otherwise, pick arbitrary
+            entry = maps[0]
+            for item in maps:
+                if 'name' not in item['_id']:
+                    entry = item
+                    break
+        if published:
+            branch = entry['prod_branch']
+        else:
+            branch = entry['draft_branch']
+        return CourseLocator(package_id=entry['course_id'], branch=branch)
 
     def _add_to_block_map(self, location, location_id, block_map):
         '''add the given location to the block_map and persist it'''
