@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
-"POT-Creation-Date: 2013-11-29 18:40+0400\n"
+"POT-Creation-Date: 2013-12-13 16:02+0400\n"
 "PO-Revision-Date: 2013-11-29 19:04+0300\n"
 "Last-Translator: JK <korvin.lucky@gmail.com>\n"
 "Language-Team: Select LTD\n"
@@ -5094,6 +5094,18 @@ msgstr ""
 "Ваш ответ был отправлен. Пожалуйста, зайдите позже для просмотра вашей "
 "оценки."
 
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py:189
+msgid "The problem close date has passed, and this problem is now closed."
+msgstr "Дата сдачи данного задания прошла, задание закрыто для сдачи."
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py:195
+msgid ""
+"You have attempted this problem {attempts} times.  You are allowed {max} "
+"attempts."
+msgstr ""
+"Вы пытались ответить на этот вопрос {attempts} раз. Вы можете это сделать "
+"только {max} раз."
+
 #: common/templates/hinter_display.html:69
 msgid "Choose the incorrect answer for which you want to write a hint:"
 msgstr "Выберите неправильный ответ, для которого Вы хотите написать подсказку"
@@ -6753,7 +6765,7 @@ msgid "Level"
 msgstr "Уровень"
 
 #: lms/templates/folditbasic.html:23
-#: lms/templates/courseware/instructor_dashboard.html:798
+#: lms/templates/courseware/instructor_dashboard.html:797
 msgid "Submitted"
 msgstr "Отправлено"
 
@@ -7070,7 +7082,7 @@ msgstr "Информация для преподавателей"
 
 #: lms/templates/master_class.html:31
 msgid "Students pending registration"
-msgstr "Студенты, ожидащие регистрацию"
+msgstr "Студенты, ожидающие регистрацию"
 
 #: lms/templates/master_class.html:35
 msgid "Students passed registration"
@@ -8595,7 +8607,7 @@ msgstr "Экспортировать CSV с оценками для задани
 #: lms/templates/courseware/instructor_dashboard.html:244
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html:82
 msgid "Course-specific grade adjustment"
-msgstr "Поправка на оценку для студента"
+msgstr "Исправления оценок для всех студентов"
 
 #: lms/templates/courseware/instructor_dashboard.html:247
 #: lms/templates/courseware/instructor_dashboard.html:282
@@ -8640,17 +8652,17 @@ msgid ""
 "in a table below. To see status for all tasks submitted for this problem, "
 "click on this button:"
 msgstr ""
-"Эти действия будут выполняться в фоновом режиме, статус активных задач будет "
-"отображаться в таблице ниже. Чтобы увидеть статус всех задач нажмите на "
+"Эти действия будут выполняться в фоновом режиме, статус активных заданий будет "
+"отображаться в таблице ниже. Чтобы увидеть статус всех заданий нажмите на "
 "кнопку:"
 
 #: lms/templates/courseware/instructor_dashboard.html:266
 msgid "Show Background Task History"
-msgstr "Показать фоновую историю задач"
+msgstr "Показать историю фоновых заданий"
 
 #: lms/templates/courseware/instructor_dashboard.html:272
 msgid "Student-specific grade inspection and adjustment"
-msgstr "Специальная инспекция и поправка к оценке студента"
+msgstr "Специальная инспекция и исправление оценок студента"
 
 #: lms/templates/courseware/instructor_dashboard.html:274
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html:9
@@ -8691,14 +8703,14 @@ msgid ""
 "a table below. To see status for all tasks submitted for this problem and "
 "student, click on this button:"
 msgstr ""
-"Перепроверка работает в фоновом режиме, а состояние активных задач будет "
-"отображаться в таблице ниже. Чтобы увидеть статус всех отосланных на "
-"проверку задач, нажмите на эту кнопку:"
+"Перепроверка работает в фоновом режиме, а состояние активных заданий перепроверки будет "
+"отображаться в таблице ниже. Чтобы увидеть статус всех "
+"заданий, нажмите на эту кнопку:"
 
 #: lms/templates/courseware/instructor_dashboard.html:311
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html:74
 msgid "Show Background Task History for Student"
-msgstr "Показать фоновую историю задач студента"
+msgstr "Показать историю фоновых заданий перепроверки для студента"
 
 #: lms/templates/courseware/instructor_dashboard.html:320
 msgid "Select a problem and an action:"
@@ -8921,8 +8933,12 @@ msgstr "Тема:"
 msgid "(Max 128 characters)"
 msgstr "(Максимум 128 символов)"
 
+#: lms/templates/courseware/instructor_dashboard.html:533
+#: lms/templates/instructor/instructor_dashboard_2/send_email.html:35
+msgid "Message:"
+msgstr "Сообщение:"
+
 #: lms/templates/courseware/instructor_dashboard.html:542
-#, fuzzy
 msgid ""
 "Please try not to email students more than once per week. Important things "
 "to consider before sending:"
@@ -8943,7 +8959,7 @@ msgid ""
 "Have you sent the email to yourself first to make sure you're happy with how "
 "it's displayed, and that embedded links and images work properly?"
 msgstr ""
-"Вы отправили письмо себе чтобы убедиться, что удовлетворены тем, как оно "
+"Вы отправили письмо себе, чтобы убедиться, что удовлетворены тем, как оно "
 "отображается, и все ссылки и картинки работают правильно?"
 
 #: lms/templates/courseware/instructor_dashboard.html:548
@@ -8957,71 +8973,85 @@ msgid ""
 "Once the 'Send Email' button is clicked, your email will be queued for "
 "sending."
 msgstr ""
-"Как только нажата кнопка 'Отослать письмо', ваше письмо будет поставленно в "
-"очередь."
+"Как только нажата кнопка 'Отослать письмо', ваше письмо будет поставлено в "
+"очередь на отправку."
 
 #: lms/templates/courseware/instructor_dashboard.html:550
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html:52
 msgid "A queued email CANNOT be cancelled."
-msgstr "Письма находящиеся в очереди НЕЛЬЗЯ отменить."
+msgstr "Письма, находящиеся в очереди, НЕЛЬЗЯ отменить."
 
 #: lms/templates/courseware/instructor_dashboard.html:553
 msgid "Send email"
 msgstr "Отослать письмо"
 
-#: lms/templates/courseware/instructor_dashboard.html:594
+#: lms/templates/courseware/instructor_dashboard.html:574
+msgid ""
+"These email actions run in the background, and status for active email tasks "
+"will appear in a table below. To see status for all bulk email tasks "
+"submitted for this course, click on this button:"
+msgstr ""
+"Письма отправляются в фоновом режиме, статус активных заданий по отправке писем будет "
+"отображаться в таблице ниже. Чтобы увидеть статус всех заданий нажмите на "
+"кнопку:"
+
+#: lms/templates/courseware/instructor_dashboard.html:577
+msgid "Show Background Email Task History"
+msgstr "Показать историю фоновых заданий"
+
+#: lms/templates/courseware/instructor_dashboard.html:593
 msgid "No Analytics are available at this time."
 msgstr "Аналитика не доступна на данный момент."
 
-#: lms/templates/courseware/instructor_dashboard.html:599
+#: lms/templates/courseware/instructor_dashboard.html:598
 msgid "Students enrolled:"
 msgstr "Участвующие студенты"
 
-#: lms/templates/courseware/instructor_dashboard.html:607
+#: lms/templates/courseware/instructor_dashboard.html:606
 msgid "Students active in the last week:"
 msgstr "Студенты, активные на прошлой неделе"
 
-#: lms/templates/courseware/instructor_dashboard.html:615
+#: lms/templates/courseware/instructor_dashboard.html:614
 msgid "Student activity day by day"
 msgstr "Активность студентов день за днем"
 
-#: lms/templates/courseware/instructor_dashboard.html:621
+#: lms/templates/courseware/instructor_dashboard.html:620
 msgid "Day"
 msgstr "День"
 
-#: lms/templates/courseware/instructor_dashboard.html:622
+#: lms/templates/courseware/instructor_dashboard.html:621
 #: lms/templates/static_templates/faq.html:73
 #: lms/templates/static_templates/faq.html:131
 msgid "Students"
 msgstr "Студенты"
 
-#: lms/templates/courseware/instructor_dashboard.html:637
+#: lms/templates/courseware/instructor_dashboard.html:636
 msgid "Answer distribution for problems"
 msgstr "Распределение ответов по задачам"
 
-#: lms/templates/courseware/instructor_dashboard.html:643
-#: lms/templates/courseware/instructor_dashboard.html:680
+#: lms/templates/courseware/instructor_dashboard.html:642
+#: lms/templates/courseware/instructor_dashboard.html:679
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html:22
 msgid "Problem"
 msgstr "Задача"
 
-#: lms/templates/courseware/instructor_dashboard.html:644
+#: lms/templates/courseware/instructor_dashboard.html:643
 msgid "Max"
 msgstr "Максимальный"
 
-#: lms/templates/courseware/instructor_dashboard.html:645
+#: lms/templates/courseware/instructor_dashboard.html:644
 msgid "Points Earned (Num Students)"
 msgstr "Получено баллов (число студентов)"
 
-#: lms/templates/courseware/instructor_dashboard.html:674
+#: lms/templates/courseware/instructor_dashboard.html:673
 msgid "Students answering correctly"
 msgstr "Студенты, ответившие корректно"
 
-#: lms/templates/courseware/instructor_dashboard.html:681
+#: lms/templates/courseware/instructor_dashboard.html:680
 msgid "Number of students"
 msgstr "Число студентов"
 
-#: lms/templates/courseware/instructor_dashboard.html:694
+#: lms/templates/courseware/instructor_dashboard.html:693
 msgid ""
 "Student distribution per country, all courses, Sep-12 to Oct-17, 1 server "
 "(shown here as an example):"
@@ -9029,7 +9059,7 @@ msgstr ""
 "Распределение студентов по странам, все курсы, сен-2012, окт-2017, 1 сервер "
 "(показано для примера):"
 
-#: lms/templates/courseware/instructor_dashboard.html:790
+#: lms/templates/courseware/instructor_dashboard.html:789
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html:64
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html:26
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html:61
@@ -9037,49 +9067,49 @@ msgstr ""
 msgid "Pending Instructor Tasks"
 msgstr "Ожидающие в очереди задания"
 
-#: lms/templates/courseware/instructor_dashboard.html:794
+#: lms/templates/courseware/instructor_dashboard.html:793
 msgid "Task Type"
 msgstr "Тип задачи"
 
-#: lms/templates/courseware/instructor_dashboard.html:795
+#: lms/templates/courseware/instructor_dashboard.html:794
 msgid "Task inputs"
 msgstr "Входные данные задач"
 
-#: lms/templates/courseware/instructor_dashboard.html:796
+#: lms/templates/courseware/instructor_dashboard.html:795
 msgid "Task Id"
 msgstr "ID задачи"
 
-#: lms/templates/courseware/instructor_dashboard.html:797
+#: lms/templates/courseware/instructor_dashboard.html:796
 msgid "Requester"
 msgstr "Запрашивающий"
 
-#: lms/templates/courseware/instructor_dashboard.html:799
+#: lms/templates/courseware/instructor_dashboard.html:798
 msgid "Task State"
 msgstr "Состояние задачи"
 
-#: lms/templates/courseware/instructor_dashboard.html:800
+#: lms/templates/courseware/instructor_dashboard.html:799
 msgid "Duration (sec)"
 msgstr "Длительность (в секундах)"
 
-#: lms/templates/courseware/instructor_dashboard.html:801
+#: lms/templates/courseware/instructor_dashboard.html:800
 msgid "Task Progress"
 msgstr "Ход выполнения задачи"
 
+#: lms/templates/courseware/instructor_dashboard.html:812
 #: lms/templates/courseware/instructor_dashboard.html:813
-#: lms/templates/courseware/instructor_dashboard.html:814
 msgid "unknown"
 msgstr "неизвестный"
 
-#: lms/templates/courseware/instructor_dashboard.html:834
+#: lms/templates/courseware/instructor_dashboard.html:833
 msgid "Hide course statistics"
 msgstr "Скрыть статистику курса"
 
-#: lms/templates/courseware/instructor_dashboard.html:837
-#: lms/templates/courseware/instructor_dashboard.html:843
+#: lms/templates/courseware/instructor_dashboard.html:836
+#: lms/templates/courseware/instructor_dashboard.html:842
 msgid "Show course statistics"
 msgstr "Показать статистику курса"
 
-#: lms/templates/courseware/instructor_dashboard.html:896
+#: lms/templates/courseware/instructor_dashboard.html:895
 msgid "Course errors"
 msgstr "Ошибки курса"
 

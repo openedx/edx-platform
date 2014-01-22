@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
-"POT-Creation-Date: 2013-11-29 12:03+0000\n"
+"POT-Creation-Date: 2013-12-09 19:09+0400\n"
 "PO-Revision-Date: 2013-11-29 17:59+0300\n"
 "Last-Translator: JK <korvin.lucky@gmail.com>\n"
 "Language-Team: Select LTD\n"
@@ -2193,6 +2193,18 @@ msgid ""
 msgstr ""
 "Ваш ответ был отправлен. Пожалуйста, зайдите позже для просмотра вашей "
 "оценки."
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py:189
+msgid "The problem close date has passed, and this problem is now closed."
+msgstr "Дата сдачи данного задания прошла, задание закрыто для сдачи."
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py:195
+msgid ""
+"You have attempted this problem {attempts} times.  You are allowed {max} "
+"attempts."
+msgstr ""
+"Вы пытались ответить на этот вопрос {attempts} раз. Вы можете это сделать только "
+"{max} раз."
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html:23
 #, fuzzy
