@@ -1,50 +1,52 @@
 <%inherit file="base.html" />
 <%namespace name='static' file='static_content.html'/>
 
-<%! 
+<%!
   from django.core.urlresolvers import reverse
   from django.utils.translation import ugettext as _
 %>
-<%block name="title">${_("Push Course to LMS")}</%block>
-<%block name="bodyclass">is-signedin course tools view-push</%block>
+<%block name="title">${_("Export Course to Git")}</%block>
+<%block name="bodyclass">is-signedin course tools view-export-git</%block>
 
 <%block name="content">
 <div class="wrapper-mast wrapper">
   <header class="mast has-subtitle">
     <h1 class="page-header">
       <small class="subtitle">${_("Tools")}</small>
-      <span class="sr">&gt; </span>${_("Push to LMS")}
+      <span class="sr">&gt; </span>${_("Export to Git")}
     </h1>
   </header>
 </div>
 
-<div class="wrapper-master wrapper">
+<div class="wrapper-content wrapper">
   <section class="content">
     <article class="content-primary" role="main">
 
       <div class="introduction">
-        <h2 class="title">${_("About Push to LMS")}</h2>
-        <p>${_("Use this to export your course to its git repository.")}</p>
-        <p>${_("This will then trigger an automatic update of the main LMS site and update the contents of your course visible there to students.")}</p>
+        <h2 class="title">${_("About Export to Git")}</h2>
+        <div class="copy">
+          <p>${_("Use this to export your course to its git repository.")}</p>
+          <p>${_("This will then trigger an automatic update of the main LMS site and update the contents of your course visible there to students if automatic git imports are configured.")}</p>
+        </div>
       </div>
 
-      <div class="push-controls">
-        <h2 class="title">${_("Push Course:")}</h2>
-        
+      <div class="export-git-controls">
+        <h2 class="title">${_("Export Course to Git:")}</h2>
+
         % if not context_course.giturl:
-        <p class="error-text">${_("giturl must be defined in your course settings before you can push to LMS.")}</p>
+        <p class="error-text">${_("giturl must be defined in your course settings before you can export to git.")}</p>
         % else:
         <ul class="list-actions">
           <li class="item-action">
-            <a class="action action-push action-primary" href="${reverse('push_to_lms', kwargs=dict(org=context_course.location.org, course=context_course.location.course, name=context_course.location.name))}?action=push">
+            <a class="action action-export-git"" action-primary" href="${reverse('export_git', kwargs=dict(org=context_course.location.org, course=context_course.location.course, name=context_course.location.name))}?action=push">
               <i class="icon-download"></i>
-              <span class="copy">${_("Push to LMS")}</span>
+              <span class="copy">${_("Export to Git")}</span>
             </a>
           </li>
         </ul>
         % endif
       </div>
-	  <div class="messages">
+      <div class="messages">
         % if msg:
           % if failed:
           <h3 class="error-text">${_('Export Failed')}:</h3>
@@ -53,16 +55,16 @@
           % endif
         <pre>${msg|h}</pre>
         % endif
-	  </div>
+      </div>
     </article>
     <aside class="content-supplementary" role="complimentary">
-      <dl class='push-info-block'>
+      <dl class="export-git-info-block">
         <dt>${_("Your course:")}</dt>
         <dd class="course_text">${context_course.id}</dd>
         <dt>${_("Course git url:")}</dt>
         <dd class="giturl_text">${context_course.giturl}</dd>
       </dl>
-	</aside>
+    </aside>
   </section>
 </div>
 </%block>

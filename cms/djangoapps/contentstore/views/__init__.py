@@ -14,7 +14,7 @@ from .item import *
 from .import_export import *
 from .preview import *
 from .public import *
-from .push_to_lms import *
+from .export_git import *
 from .user import *
 from .tabs import *
 from .transcripts_ajax import *

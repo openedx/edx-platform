@@ -97,9 +97,9 @@ urlpatterns += patterns('',
 )
 
 
-if settings.FEATURES.get('ENABLE_PUSH_TO_LMS'):
-    urlpatterns += (url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/push/(?P<name>[^/]+)$',
-                        'contentstore.views.push_to_lms', name='push_to_lms'),)
+if settings.FEATURES.get('ENABLE_EXPORT_GIT'):
+    urlpatterns += (url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/export_git/(?P<name>[^/]+)$',
+                        'contentstore.views.export_git', name='export_git'),)
 
 if settings.FEATURES.get('ENABLE_SERVICE_STATUS'):
     urlpatterns += patterns('',
