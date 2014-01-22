@@ -8,6 +8,7 @@ Change Log
 ==============  ================================================================
      DATE       CHANGE
 ==============  ================================================================
+01/21/2014      Added information about accessibility in the topic :ref:`Add Textbooks`. 
 01/08/2014      Updated the topic :ref:`Set Important Dates for Your Course` to 
                 reflect change to default course start date to 2029.
 01/08/2014      Updated the topic :ref:`Add Files to a Course` to reflect addition of
