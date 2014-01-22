@@ -87,7 +87,7 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
       @$newComponentItem.removeClass('adding')
       @$newComponentItem.find('.rendered-component').remove()
 
-    createComponent: (event, data, message, success_callback) =>
+    createComponent: (event, data, notification_message, analytics_message, success_callback) =>
       event.preventDefault()
 
       editor = new ModuleEditView(
@@ -96,14 +96,14 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
       )
 
       notification = new NotificationView.Mini
-        title: gettext(message) + '&hellip;'
+        title: notification_message
 
       notification.show()
 
       callback = ->
         notification.hide()
         success_callback()
-        analytics.track message,
+        analytics.track analytics_message,
           course: course_location_analytics
           unit_id: unit_location_analytics
           type: editor.$el.data('locator')
@@ -121,7 +121,8 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
         @$newComponentItem.before(editor.$el)
       editor = @createComponent(
         event, $(event.currentTarget).data(),
-        "Adding",
+        gettext('Adding&hellip;'),
+        "Creating new component",
         success_callback
       )
       @closeNewComponent(event)
@@ -137,7 +138,8 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
       editor = @createComponent(
         event,
         {duplicate_source_locator: source_locator},
-        "Duplicating",
+        gettext('Duplicating&hellip;')
+        "Duplicating " + source_locator,
         success_callback
       )
 
