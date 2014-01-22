@@ -130,7 +130,19 @@ function (
         $(window).unload(function () {
             if (state && typeof state.videoPlayer) {
                 send(state.config.saveStateUrl, {
-                    position: state.videoPlayer.currentTime
+                    // TODO: Figure out why in Firefox
+                    //
+                    //     state.videoPlayer.currentTime
+                    //
+                    // is 0 after the video has been playing for a bit and the
+                    // user clicked "Pause", followed by a refresh of the page.
+
+                    // The below doesn't work in Firefox. It is always 0.
+                    // position: state.videoPlayer.currentTime
+
+                    // In Chrome and Firefox the below results in a correct
+                    // current time value.
+                    position: state.videoPlayer.player.getCurrentTime()
                 });
             }
         });
