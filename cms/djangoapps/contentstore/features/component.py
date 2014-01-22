@@ -134,8 +134,14 @@ def edit_and_save_component(step):
     world.css_click('.save-button')
 
 
-@step(u'I duplicate the "([^"]*)" component$')
-def duplicated_component(step, index):
+@step(u'I duplicate the (first|second|third) component$')
+def duplicated_component(step, ordinal):
+    ord_map = {
+        "first": 0,
+        "second": 1,
+        "third": 2,
+    }
+    index = ord_map[ordinal]
     duplicate_btn_css = 'a.duplicate-button'
     world.css_click(duplicate_btn_css, int(index))
 
