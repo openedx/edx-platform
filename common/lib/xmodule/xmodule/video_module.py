@@ -13,18 +13,24 @@ in XML.
 import json
 import logging
 
+from HTMLParser import HTMLParser
 from lxml import etree
 from pkg_resources import resource_string
 import datetime
 import copy
+from webob import Response
 
 from django.http import Http404
 from django.conf import settings
 
-from xmodule.x_module import XModule
+from xmodule.x_module import XModule, module_attr
 from xmodule.editing_module import TabsEditingDescriptor
 from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.xml_module import is_pointer_tag, name_to_pathname, deserialize_field
+from xmodule.contentstore.django import contentstore
+from xmodule.contentstore.content import StaticContent
+from xmodule.exceptions import NotFoundError
+from xblock.core import XBlock
 from xblock.fields import Scope, String, Boolean, List, Integer, ScopeIds
 from xmodule.fields import RelativeTime
 
@@ -103,11 +109,19 @@ class VideoFields(object):
         display_name="Video Sources",
         scope=Scope.settings,
     )
+    # `track` is deprecated field and should not be used in future.
+    # `download_track` is used instead.
     track = String(
-        help="The external URL to download the timed transcript track. This appears as a link beneath the video.",
+        help="The external URL to download the timed transcript track.",
         display_name="Download Transcript",
         scope=Scope.settings,
-        default=""
+        default=''
+    )
+    download_track = Boolean(
+        help="Show a link beneath the video to allow students to download the transcript. Note: You must add a link to the HTML5 Transcript field above.",
+        display_name="Transcript Download Allowed",
+        scope=Scope.settings,
+        default=False
     )
     sub = String(
         help="The name of the timed transcript track (for non-Youtube videos).",
@@ -162,18 +176,25 @@ class VideoModule(VideoFields, XModule):
         raise Http404()
 
     def get_html(self):
+        track_url = None
         caption_asset_path = "/static/subs/"
 
         get_ext = lambda filename: filename.rpartition('.')[-1]
         sources = {get_ext(src): src for src in self.html5_sources}
         sources['main'] = self.source
 
+        if self.download_track:
+            if self.track:
+                track_url = self.track
+            elif self.sub:
+                track_url = self.runtime.handler_url(self, 'download_transcript')
+
         return self.system.render_template('video.html', {
             'youtube_streams': _create_youtube_string(self),
             'id': self.location.html_id(),
             'sub': self.sub,
             'sources': sources,
-            'track': self.track,
+            'track': track_url,
             'display_name': self.display_name_with_default,
             # This won't work when we move to data that
             # isn't on the filesystem
@@ -189,10 +210,58 @@ class VideoModule(VideoFields, XModule):
             'yt_test_url': settings.YOUTUBE_TEST_URL
         })
 
+    def get_transcript(self, subs_id):
+        '''
+        Returns transcript without timecodes.
+
+        Args:
+            `subs_id`: str, subtitles id
+
+        Raises:
+            - NotFoundError if cannot find transcript file in storage.
+            - ValueError if transcript file is incorrect JSON.
+            - KeyError if transcript file has incorrect format.
+        '''
+
+        filename = 'subs_{0}.srt.sjson'.format(subs_id)
+        content_location = StaticContent.compute_location(
+            self.location.org, self.location.course, filename
+        )
+
+        data = contentstore().find(content_location).data
+        text = json.loads(data)['text']
+
+        return HTMLParser().unescape("\n".join(text))
+
+
+    @XBlock.handler
+    def download_transcript(self, __, ___):
+        """
+        This is called to get transcript file without timecodes to student.
+        """
+        try:
+            subs = self.get_transcript(self.sub)
+        except (NotFoundError):
+            log.debug("Can't find content in storage for %s transcript", self.sub)
+            return Response(status=404)
+        except (ValueError, KeyError):
+            log.debug("Invalid transcript JSON.")
+            return Response(status=400)
+
+        response = Response(
+            subs,
+            headerlist=[
+                ('Content-Disposition', 'attachment; filename="{0}.txt"'.format(self.sub)),
+            ])
+        response.content_type="text/plain; charset=utf-8"
+
+        return response
+
 
 class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor):
     """Descriptor for `VideoModule`."""
     module_class = VideoModule
+    download_transcript = module_attr('download_transcript')
 
     tabs = [
         {
@@ -207,6 +276,12 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
     ]
 
     def __init__(self, *args, **kwargs):
+        '''
+        `track` is deprecated field.
+        If `track` field exists show `track` field on front-end as not-editable
+        but clearable. Dropdown `download_track` is a new field and it has value
+        True.
+        '''
         super(VideoDescriptor, self).__init__(*args, **kwargs)
         # For backwards compatibility -- if we've got XML data, parse
         # it out and set the metadata fields
@@ -214,6 +289,24 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
             field_data = self._parse_video_xml(self.data)
             self._field_data.set_many(self, field_data)
             del self.data
+
+        self.track_visible = False
+        if self.track:
+            self.track_visible = True
+            download_track = self.editable_metadata_fields['download_track']
+            if not download_track['explicitly_set']:
+                self.download_track = True
+
+    @property
+    def editable_metadata_fields(self):
+        editable_fields = super(VideoDescriptor, self).editable_metadata_fields
+
+        if self.track_visible:
+            editable_fields['track']['non_editable'] = True
+        else:
+            editable_fields.pop('track')
+
+        return editable_fields
 
     @classmethod
     def from_xml(cls, xml_data, system, id_generator):
@@ -265,6 +358,7 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
             'start_time': self.start_time,
             'end_time': self.end_time,
             'sub': self.sub,
+            'download_track': json.dumps(self.download_track),
         }
         for key, value in attrs.items():
             # Mild workaround to ensure that tests pass -- if a field
@@ -282,6 +376,7 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
             ele = etree.Element('track')
             ele.set('src', self.track)
             xml.append(ele)
+
         return xml
 
     def get_context(self):

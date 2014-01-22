@@ -40,12 +40,12 @@ def correct_video_settings(_step):
 
         # advanced
         ['Display Name', 'Video', False],
-        ['Download Transcript', '', False],
         ['Download Video', '', False],
         ['End Time', '00:00:00', False],
         ['HTML5 Transcript', '', False],
         ['Show Transcript', 'True', False],
         ['Start Time', '00:00:00', False],
+        ['Transcript Download Allowed', 'False', False],
         ['Video Sources', '', False],
         ['Youtube ID', 'OEoXaMPEzfM', False],
         ['Youtube ID for .75x speed', '', False],
