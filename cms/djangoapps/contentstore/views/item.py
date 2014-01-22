@@ -321,7 +321,10 @@ def _duplicate_item(parent_location, duplicate_source_location, display_name=Non
     if display_name is not None:
         duplicate_metadata['display_name'] = display_name
     else:
-        duplicate_metadata['display_name'] = _("Duplicate of '{0}'").format(source_item.display_name)
+        if source_item.display_name is None:
+            duplicate_metadata['display_name'] = _("Duplicate of {0}").format(source_item.category)
+        else:
+            duplicate_metadata['display_name'] = _("Duplicate of '{0}'").format(source_item.display_name)
 
     get_modulestore(category).create_and_save_xmodule(
         dest_location,

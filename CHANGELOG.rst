@@ -12,6 +12,8 @@ Blades: Video player start-end time range is now shown even before Play is
 clicked. Video player VCR time shows correct non-zero total time for YouTube
 videos even before Play is clicked. BLD-529.
 
+Studio: Add ability to duplicate components on the unit page.
+
 Blades: Adds CookieStorage utility for video player that provides convenient
   way to work with cookies.
 
