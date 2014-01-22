@@ -288,9 +288,6 @@ def _has_access_descriptor(user, descriptor, action, course_context=None):
         students to see modules.  If not, views should check the course, so we
         don't have to hit the enrollments table on every module load.
         """
-        # nonregistered users shouldn't be able to access certain descriptor types
-        if not UserProfile.has_registered(user):
-            return _can_load_descriptor_nonregistered(descriptor)
 
         # If start dates are off, can always load
         if settings.FEATURES['DISABLE_START_DATES'] and not is_masquerading_as_student(user):
@@ -306,9 +303,10 @@ def _has_access_descriptor(user, descriptor, action, course_context=None):
                 course_context=course_context
             )
             if now > effective_start:
-                # after start date, everyone can see it
+                # after start date, all registered users can see it
+                # nonregistered users shouldn't be able to access certain descriptor types
                 debug("Allow: now > effective start date")
-                return True
+                return UserProfile.has_registered(user) or _can_load_descriptor_nonregistered(descriptor)
             # otherwise, need staff access
             return _has_staff_access_to_descriptor(user, descriptor, course_context)
 
