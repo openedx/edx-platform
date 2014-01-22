@@ -14,8 +14,7 @@ LOCALE_DIR = BASE_DIR.joinpath('conf', 'locale')
 
 class Configuration(object):
     """
-    # Reads localization configuration in json format
-
+    Reads localization configuration in json format.
     """
     DEFAULTS = {
         'generate_merge': {},

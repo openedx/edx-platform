@@ -21,6 +21,7 @@ from polib import pofile
 
 from i18n.config import BASE_DIR, LOCALE_DIR, CONFIGURATION
 from i18n.execute import execute, create_dir_if_necessary, remove_file
+from i18n.segment import segment_pofiles
 
 
 # BABEL_CONFIG contains declarations for Babel to extract strings from mako template files
@@ -44,7 +45,7 @@ def main():
 
     # Prepare makemessages command.
     makemessages = "django-admin.py makemessages -l en"
-    ignores = " ".join("--ignore={}/*".format(d) for d in CONFIGURATION.ignore_dirs)
+    ignores = " ".join('--ignore="{}/*"'.format(d) for d in CONFIGURATION.ignore_dirs)
     if ignores:
         makemessages += " " + ignores
 
@@ -67,6 +68,11 @@ def main():
         source_msgs_dir.joinpath('django-partial.po')
     )
 
+    # Segment the generated files.
+    segmented_files = segment_pofiles("en")
+    generated_files.extend(segmented_files)
+
+    # Finish each file.
     for filename in generated_files:
         LOG.info('Cleaning %s' % filename)
         po = pofile(source_msgs_dir.joinpath(filename))

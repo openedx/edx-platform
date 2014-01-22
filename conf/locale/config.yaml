@@ -59,3 +59,15 @@ segment:
     mako.po:
         mako-studio.po:
             - cms/*
+
+# How should the generate step merge files?
+generate_merge:
+    django.po:
+        - django-partial.po
+        - django-studio.po
+        - mako.po
+        - mako-studio.po
+        - messages.po
+    djangojs.po:
+        - djangojs.po
+        - djangojs-studio.po
