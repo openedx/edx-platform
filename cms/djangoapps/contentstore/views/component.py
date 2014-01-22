@@ -52,6 +52,8 @@ else:
 
     ADVANCED_COMPONENT_TYPES = [
         'annotatable',
+        'textannotation',
+        'videoannotation',
         'word_cloud',
         'graphical_slider_tool',
         'lti',

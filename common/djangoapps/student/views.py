@@ -1459,7 +1459,7 @@ def token(request):
     newhour, newmin = divmod((delta.days * 24 * 60 * 60 + delta.seconds + 30) // 60, 60)
     newtime = "%s%+02d:%02d" % (dtnow.isoformat(), newhour, newmin)
     secret = '4c7f4d1c-8ac4-4e9f-84c8-b271c57fcac4'
-    custom_data = {"issuedAt": newtime, "consumerKey": "4c7f4d1c-8ac4-4e9f-84c8-b271c57fcac4", "userId": "username", "ttl": 86400}
+    custom_data = {"issuedAt": newtime, "consumerKey": "4c7f4d1c-8ac4-4e9f-84c8-b271c57fcac4", "userId": request.user.email, "ttl": 86400}
     newtoken = create_token(secret, custom_data)
     response = HttpResponse(newtoken, mimetype="text/plain")
 
