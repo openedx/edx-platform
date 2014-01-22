@@ -35,7 +35,7 @@ if Backbone?
 
     hideEditorChrome: ->
       @$('.wmd-button-row').hide()
-      @$('.wmd-preview').hide()
+      @$('.wmd-preview-container').hide()
       @$('.wmd-input').css({
         height: '35px',
         padding: '5px'
@@ -44,7 +44,7 @@ if Backbone?
 
     showEditorChrome: ->
       @$('.wmd-button-row').show()
-      @$('.wmd-preview').show()
+      @$('.wmd-preview-container').show()
       @$('.comment-post-control').show()
       @$('.wmd-input').css({
         height: '125px',
@@ -97,7 +97,7 @@ if Backbone?
       event.preventDefault()
       if not @model.can('can_delete')
         return
-      if not confirm "Are you sure to delete this response? "
+      if not confirm gettext("Are you sure you want to delete this response?")
         return
       url = @model.urlFor('_delete')
       @model.remove()

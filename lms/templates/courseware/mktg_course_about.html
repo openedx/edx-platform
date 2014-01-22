@@ -37,7 +37,7 @@
         window.top.location.href = "${reverse('register_user')}?course_id=${course.id}&enrollment_action=enroll";
       } else {
         $('#register_error').html(
-            (xhr.responseText ? xhr.responseText : '${_("An error occurred. Please try again later.")}')
+            (xhr.responseText ? xhr.responseText : "${_("An error occurred. Please try again later.")}")
         ).css("display", "block");
       }
     });

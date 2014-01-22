@@ -41,7 +41,7 @@ glob2==0.3
 gunicorn==0.17.4
 lazy==1.1
 lxml==3.0.1
-mako==0.7.3
+mako==0.9.1
 Markdown==2.2.1
 mongoengine==0.7.10
 networkx==1.7
@@ -93,7 +93,7 @@ transifex-client==0.9.1
 
 # Used for testing
 coverage==3.7
-ddt==0.4.0
+ddt==0.6.0
 factory_boy==2.2.1
 mock==1.0.1
 nosexcover==1.0.7
@@ -103,7 +103,7 @@ rednose==0.3
 selenium==2.34.0
 splinter==0.5.4
 django_nose==1.1
-django_debug_toolbar
+django_debug_toolbar==0.9.4
 django-debug-toolbar-mongo
 nose-ignore-docstring
 nose-exclude

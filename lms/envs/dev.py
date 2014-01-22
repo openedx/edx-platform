@@ -23,7 +23,6 @@ LANGUAGES = (
 )
 TEMPLATE_DEBUG = True
 
-
 FEATURES['DISABLE_START_DATES'] = False
 FEATURES['ENABLE_SQL_TRACKING_LOGS'] = True
 FEATURES['SUBDOMAIN_COURSE_LISTINGS'] = False  # Enable to test subdomains--otherwise, want all courses to show up
@@ -52,6 +51,8 @@ LOGGING = get_logger_config(ENV_ROOT / "log",
                             dev_env=True,
                             debug=True)
 
+# If there is a database called 'read_replica', you can use the use_read_replica_if_available
+# function in util/query.py, which is useful for very large database reads
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',

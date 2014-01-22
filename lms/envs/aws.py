@@ -170,7 +170,6 @@ PAID_COURSE_REGISTRATION_CURRENCY = ENV_TOKENS.get('PAID_COURSE_REGISTRATION_CUR
 
 # Payment Report Settings
 PAYMENT_REPORT_GENERATOR_GROUP = ENV_TOKENS.get('PAYMENT_REPORT_GENERATOR_GROUP', PAYMENT_REPORT_GENERATOR_GROUP)
-PAYMENT_REPORT_MAX_ITEMS = ENV_TOKENS.get('PAYMENT_REPORT_MAX_ITEMS', PAYMENT_REPORT_MAX_ITEMS)
 
 # Bulk Email overrides
 BULK_EMAIL_DEFAULT_FROM_EMAIL = ENV_TOKENS.get('BULK_EMAIL_DEFAULT_FROM_EMAIL', BULK_EMAIL_DEFAULT_FROM_EMAIL)
@@ -252,6 +251,8 @@ SSL_AUTH_EMAIL_DOMAIN = ENV_TOKENS.get("SSL_AUTH_EMAIL_DOMAIN", "MIT.EDU")
 SSL_AUTH_DN_FORMAT_STRING = ENV_TOKENS.get("SSL_AUTH_DN_FORMAT_STRING",
                                            "/C=US/ST=Massachusetts/O=Massachusetts Institute of Technology/OU=Client CA v1/CN={0}/emailAddress={1}")
 
+HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS = ENV_TOKENS.get('HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS',{})
+
 ############################## SECURE AUTH ITEMS ###############
 # Secret things: passwords, access keys, etc.
 
@@ -278,6 +279,8 @@ if AWS_SECRET_ACCESS_KEY == "":
 
 AWS_STORAGE_BUCKET_NAME = AUTH_TOKENS.get('AWS_STORAGE_BUCKET_NAME', 'edxuploads')
 
+# If there is a database called 'read_replica', you can use the use_read_replica_if_available
+# function in util/query.py, which is useful for very large database reads
 DATABASES = AUTH_TOKENS['DATABASES']
 
 XQUEUE_INTERFACE = AUTH_TOKENS['XQUEUE_INTERFACE']

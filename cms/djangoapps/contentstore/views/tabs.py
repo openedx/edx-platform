@@ -1,7 +1,7 @@
 """
 Views related to course tabs
 """
-from access import has_access
+from access import has_course_access
 from util.json_request import expect_json, JsonResponse
 
 from django.http import HttpResponseNotFound
@@ -63,7 +63,7 @@ def tabs_handler(request, tag=None, package_id=None, branch=None, version_guid=N
     Instead use the general xblock URL (see item.xblock_handler).
     """
     locator = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
-    if not has_access(request.user, locator):
+    if not has_course_access(request.user, locator):
         raise PermissionDenied()
 
     old_location = loc_mapper().translate_locator_to_location(locator)

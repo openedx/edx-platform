@@ -1,13 +1,15 @@
+<%! from django.utils.translation import ugettext as _ %>
+
 <nav class="discussion-{{discussiontype}}-paginator discussion-paginator local">
     <ol>
         {{#previous}}
-        <li><a class="discussion-pagination" href="{{url}}" data-page-number="{{number}}">&lt; Previous</a></li>
+        <li><a class="discussion-pagination" href="{{url}}" data-page-number="{{number}}">&lt; ${_("Previous")}</a></li>
         {{/previous}}
         {{#first}}
         <li><a class="discussion-pagination" href="{{url}}" data-page-number="1">1</a></li>
         {{/first}}
         {{#leftdots}}
-        <li>&hellip;</li>
+        <li>${_(u"…")}</li>
         {{/leftdots}}
 
         {{#lowPages}}
@@ -19,13 +21,13 @@
         {{/highPages}}
 
         {{#rightdots}}
-        <li>&hellip;</li>
+        <li>${_(u"…")}</li>
         {{/rightdots}}
         {{#last}}
         <li><a class="discussion-pagination" href="{{url}}" data-page-number="{{number}}">{{number}}</a></li>
         {{/last}}
         {{#next}}
-        <li><a class="discussion-pagination" href="{{url}}" data-page-number="{{number}}">Next &gt;</a></li>
+        <li><a class="discussion-pagination" href="{{url}}" data-page-number="{{number}}">${_("Next")} &gt;</a></li>
         {{/next}}
     </ol>
 </nav>

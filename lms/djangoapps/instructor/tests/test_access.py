@@ -9,7 +9,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from django.test.utils import override_settings
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
-from courseware.roles import CourseBetaTesterRole, CourseStaffRole
+from student.roles import CourseBetaTesterRole, CourseStaffRole
 
 from django_comment_common.models import (Role,
                                           FORUM_ROLE_MODERATOR)

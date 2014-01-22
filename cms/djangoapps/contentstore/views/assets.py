@@ -21,13 +21,13 @@ from xmodule.modulestore import InvalidLocationError
 from xmodule.exceptions import NotFoundError
 from django.core.exceptions import PermissionDenied
 from xmodule.modulestore.django import loc_mapper
-from .access import has_access
 from xmodule.modulestore.locator import BlockUsageLocator
 
 from util.json_request import JsonResponse
 from django.http import HttpResponseNotFound
 from django.utils.translation import ugettext as _
 from pymongo import ASCENDING, DESCENDING
+from .access import has_course_access
 
 __all__ = ['assets_handler']
 
@@ -56,7 +56,7 @@ def assets_handler(request, tag=None, package_id=None, branch=None, version_guid
         json: delete an asset
     """
     location = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
-    if not has_access(request.user, location):
+    if not has_course_access(request.user, location):
         raise PermissionDenied()
 
     response_format = request.REQUEST.get('format', 'html')

@@ -8,9 +8,9 @@ import textwrap
 
 import polib
 
-from config import LOCALE_DIR
-from execute import call
-from converter import Converter
+from i18n.config import LOCALE_DIR
+from i18n.execute import call
+from i18n.converter import Converter
 
 
 def test_po_files(root=LOCALE_DIR):

@@ -1,6 +1,6 @@
 import os, subprocess, logging
 
-from config import CONFIGURATION, BASE_DIR
+from i18n.config import BASE_DIR
 
 LOG = logging.getLogger(__name__)
 

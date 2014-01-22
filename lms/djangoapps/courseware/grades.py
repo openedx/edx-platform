@@ -6,9 +6,7 @@ import random
 import logging
 
 from contextlib import contextmanager
-from collections import defaultdict
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.db import transaction
 from django.test.client import RequestFactory
 
@@ -16,13 +14,13 @@ from dogapi import dog_stats_api
 
 from courseware import courses
 from courseware.model_data import FieldDataCache
-from xblock.fields import Scope
 from xmodule import graders
 from xmodule.graders import Score
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.util.duedate import get_extended_due_date
 from .models import StudentModule
-from .module_render import get_module, get_module_for_descriptor
+from .module_render import get_module_for_descriptor
 
 log = logging.getLogger("edx.courseware")
 
@@ -372,7 +370,7 @@ def _progress_summary(student, request, course):
                     'scores': scores,
                     'section_total': section_total,
                     'format': module_format,
-                    'due': section_module.due,
+                    'due': get_extended_due_date(section_module),
                     'graded': graded,
                 })
 

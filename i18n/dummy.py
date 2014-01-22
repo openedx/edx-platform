@@ -28,7 +28,7 @@ Example use::
 
 """
 
-from converter import Converter
+from i18n.converter import Converter
 
 # Substitute plain characters with accented lookalikes.
 # http://tlt.its.psu.edu/suggestions/international/web/codehtml.html#accent
@@ -53,10 +53,12 @@ TABLE = {
 
 # The print industry's standard dummy text, in use since the 1500s
 # see http://www.lipsum.com/, then fed through a "fancy-text" converter.
-# The string should start with a space.
+# The string should start with a space, so that it joins nicely with the text
+# that precedes it.  The Lorem contains an apostrophe since French often does,
+# and translated strings get put into single-quoted strings, which then break.
 LOREM = " " + " ".join(     # join and split just make the string easier here.
     u"""
-    Ⱡσяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂
+    Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂
     тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм
     νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα
     ¢σммσ∂σ ¢σηѕєqυαт.  ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє
@@ -68,7 +70,7 @@ LOREM = " " + " ".join(     # join and split just make the string easier here.
 
 # To simulate more verbose languages (like German), pad the length of a string
 # by a multiple of PAD_FACTOR
-PAD_FACTOR = 1.3
+PAD_FACTOR = 1.33
 
 
 class Dummy(Converter):

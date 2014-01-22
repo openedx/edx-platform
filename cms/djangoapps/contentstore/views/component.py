@@ -29,7 +29,7 @@ from contentstore.utils import get_lms_link_for_item, compute_unit_state, UnitSt
 
 from models.settings.course_grading import CourseGradingModel
 
-from .access import has_access
+from .access import has_course_access
 
 __all__ = ['OPEN_ENDED_COMPONENT_TYPES',
            'ADVANCED_COMPONENT_POLICY_KEY',
@@ -311,7 +311,7 @@ def _get_item_in_course(request, locator):
 
     Verifies that the caller has permission to access this item.
     """
-    if not has_access(request.user, locator):
+    if not has_course_access(request.user, locator):
         raise PermissionDenied()
 
     old_location = loc_mapper().translate_locator_to_location(locator)

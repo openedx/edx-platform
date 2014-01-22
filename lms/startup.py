@@ -9,7 +9,7 @@ settings.INSTALLED_APPS  # pylint: disable=W0104
 
 from django_startup import autostartup
 from xmodule.modulestore.django import modulestore
-
+import edxmako
 
 def run():
     """
@@ -50,6 +50,7 @@ def enable_theme():
     # Include the theme's templates in the template search paths
     settings.TEMPLATE_DIRS.append(theme_root / 'templates')
     settings.MAKO_TEMPLATES['main'].append(theme_root / 'templates')
+    edxmako.startup.run()
 
     # Namespace the theme's static files to 'themes/<theme_name>' to
     # avoid collisions with default edX static files

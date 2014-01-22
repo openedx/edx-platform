@@ -4,7 +4,7 @@ import json
 from datetime import datetime
 import ddt
 
-from mock import Mock, patch
+from mock import patch
 from pytz import UTC
 from webob import Response
 
@@ -21,6 +21,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.django import loc_mapper
 from xmodule.modulestore.locator import BlockUsageLocator
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore import Location
 
 
 class ItemTest(CourseTestCase):
@@ -28,9 +29,10 @@ class ItemTest(CourseTestCase):
     def setUp(self):
         super(ItemTest, self).setUp()
 
-        self.unicode_locator = unicode(loc_mapper().translate_location(
+        self.course_locator = loc_mapper().translate_location(
             self.course.location.course_id, self.course.location, False, True
-        ))
+        )
+        self.unicode_locator = unicode(self.course_locator)
 
     def get_old_id(self, locator):
         """
@@ -155,6 +157,155 @@ class TestCreateItem(ItemTest):
         locator = self.response_locator(resp)
         obj = self.get_item_from_modulestore(locator)
         self.assertEqual(obj.start, datetime(2030, 1, 1, tzinfo=UTC))
+
+
+class TestDuplicateItem(ItemTest):
+    """
+    Test the duplicate method.
+    """
+    def setUp(self):
+        """ Creates the test course structure and a few components to 'duplicate'. """
+        super(TestDuplicateItem, self).setUp()
+        # Create a parent chapter (for testing children of children).
+        resp = self.create_xblock(parent_locator=self.unicode_locator, category='chapter')
+        self.chapter_locator = self.response_locator(resp)
+
+        # create a sequential containing a problem and an html component
+        resp = self.create_xblock(parent_locator=self.chapter_locator, category='sequential')
+        self.seq_locator = self.response_locator(resp)
+
+        # create problem and an html component
+        resp = self.create_xblock(parent_locator=self.seq_locator, category='problem', boilerplate='multiplechoice.yaml')
+        self.problem_locator = self.response_locator(resp)
+
+        resp = self.create_xblock(parent_locator=self.seq_locator, category='html')
+        self.html_locator = self.response_locator(resp)
+
+        # Create a second sequential just (testing children of children)
+        self.create_xblock(parent_locator=self.chapter_locator, category='sequential2')
+
+    def test_duplicate_equality(self):
+        """
+        Tests that a duplicated xblock is identical to the original,
+        except for location and display name.
+        """
+        def duplicate_and_verify(source_locator, parent_locator):
+            locator = self._duplicate_item(parent_locator, source_locator)
+            self.assertTrue(check_equality(source_locator, locator), "Duplicated item differs from original")
+
+        def check_equality(source_locator, duplicate_locator):
+            original_item = self.get_item_from_modulestore(source_locator, draft=True)
+            duplicated_item = self.get_item_from_modulestore(duplicate_locator, draft=True)
+
+            self.assertNotEqual(
+                original_item.location,
+                duplicated_item.location,
+                "Location of duplicate should be different from original"
+            )
+            # Set the location and display name to be the same so we can make sure the rest of the duplicate is equal.
+            duplicated_item.location = original_item.location
+            duplicated_item.display_name = original_item.display_name
+
+            # Children will also be duplicated, so for the purposes of testing equality, we will set
+            # the children to the original after recursively checking the children.
+            if original_item.has_children:
+                self.assertEqual(
+                    len(original_item.children),
+                    len(duplicated_item.children),
+                    "Duplicated item differs in number of children"
+                )
+                for i in xrange(len(original_item.children)):
+                    source_locator = loc_mapper().translate_location(
+                        self.course.location.course_id, Location(original_item.children[i]), False, True
+                    )
+                    duplicate_locator = loc_mapper().translate_location(
+                        self.course.location.course_id, Location(duplicated_item.children[i]), False, True
+                    )
+                    if not check_equality(source_locator, duplicate_locator):
+                        return False
+                duplicated_item.children = original_item.children
+
+            return original_item == duplicated_item
+
+        duplicate_and_verify(self.problem_locator, self.seq_locator)
+        duplicate_and_verify(self.html_locator, self.seq_locator)
+        duplicate_and_verify(self.seq_locator, self.chapter_locator)
+        duplicate_and_verify(self.chapter_locator, self.unicode_locator)
+
+    def test_ordering(self):
+        """
+        Tests the a duplicated xblock appears immediately after its source
+        (if duplicate and source share the same parent), else at the
+        end of the children of the parent.
+        """
+        def verify_order(source_locator, parent_locator, source_position=None):
+            locator = self._duplicate_item(parent_locator, source_locator)
+            parent = self.get_item_from_modulestore(parent_locator)
+            children = parent.children
+            if source_position is None:
+                self.assertFalse(source_locator in children, 'source item not expected in children array')
+                self.assertEqual(
+                    children[len(children) - 1],
+                    self.get_old_id(locator).url(),
+                    "duplicated item not at end"
+                )
+            else:
+                self.assertEqual(
+                    children[source_position],
+                    self.get_old_id(source_locator).url(),
+                    "source item at wrong position"
+                )
+                self.assertEqual(
+                    children[source_position + 1],
+                    self.get_old_id(locator).url(),
+                    "duplicated item not ordered after source item"
+                )
+
+        verify_order(self.problem_locator, self.seq_locator, 0)
+        # 2 because duplicate of problem should be located before.
+        verify_order(self.html_locator, self.seq_locator, 2)
+        verify_order(self.seq_locator, self.chapter_locator, 0)
+
+        # Test duplicating something into a location that is not the parent of the original item.
+        # Duplicated item should appear at the end.
+        verify_order(self.html_locator, self.unicode_locator)
+
+    def test_display_name(self):
+        """
+        Tests the expected display name for the duplicated xblock.
+        """
+        def verify_name(source_locator, parent_locator, expected_name, display_name=None):
+            locator = self._duplicate_item(parent_locator, source_locator, display_name)
+            duplicated_item = self.get_item_from_modulestore(locator, draft=True)
+            self.assertEqual(duplicated_item.display_name, expected_name)
+            return locator
+
+        # Display name comes from template.
+        dupe_locator = verify_name(self.problem_locator, self.seq_locator, "Duplicate of 'Multiple Choice'")
+        # Test dupe of dupe.
+        verify_name(dupe_locator, self.seq_locator, "Duplicate of 'Duplicate of 'Multiple Choice''")
+
+        # Uses default display_name of 'Text' from HTML component.
+        verify_name(self.html_locator, self.seq_locator, "Duplicate of 'Text'")
+
+        # The sequence does not have a display_name set, so None gets included as the string 'None'.
+        verify_name(self.seq_locator, self.chapter_locator, "Duplicate of 'None'")
+
+        # Now send a custom display name for the duplicate.
+        verify_name(self.seq_locator, self.chapter_locator, "customized name", display_name="customized name")
+
+    def _duplicate_item(self, parent_locator, source_locator, display_name=None):
+        data = {
+            'parent_locator': parent_locator,
+            'duplicate_source_locator': source_locator
+        }
+        if display_name is not None:
+            data['display_name'] = display_name
+
+        resp = self.client.ajax_post('/xblock', json.dumps(data))
+        resp_content = json.loads(resp.content)
+        self.assertEqual(resp.status_code, 200)
+        return resp_content['locator']
 
 
 class TestEditItem(ItemTest):

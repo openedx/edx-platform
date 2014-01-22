@@ -29,9 +29,9 @@ from edxmako.shortcuts import render_to_response
 import mongoengine
 
 from courseware.courses import get_course_by_id
-from courseware.roles import CourseStaffRole, CourseInstructorRole
 import dashboard.git_import as git_import
 from dashboard.git_import import GitImportError
+from student.roles import CourseStaffRole, CourseInstructorRole
 from dashboard.models import CourseImportLog
 from external_auth.models import ExternalAuthMap
 from external_auth.views import generate_password

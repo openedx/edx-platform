@@ -1,7 +1,7 @@
 define(
     [
         "jquery", "underscore",
-        "js/utils/handle_iframe_binding",
+        "js/utils/handle_iframe_binding"
     ],
 function ($, _, IframeBinding) {
 
@@ -32,6 +32,15 @@ function ($, _, IframeBinding) {
             expect(iframe_html).toEqual('<iframe src="http://www.youtube.com/embed/NHd27UvY-lw?wmode=transparent" frameborder="0" height="350" width="618"></iframe>' +
                 '<iframe src="http://www.youtube.com/embed/NHd27UvY-lw?wmode=transparent&amp;allowFullScreen=false" frameborder="0" height="350" width="618"></iframe>' +
                 '<embed wmode="transparent" type="application/x-shockwave-flash" src="http://www.youtube.com/embed/NHd27UvY-lw" height="315" width="560">');
+        });
+
+        it("does not modify src url of DOM iframe if it is empty", function () {
+            iframe_html = '<iframe width="618" height="350" src="" frameborder="0" allowfullscreen></iframe>';
+            doc.body.innerHTML = iframe_html;
+
+            IframeBinding.iframeBinding(doc);
+
+            expect($(doc).find("iframe")[0].src).toEqual("");
         });
     });
 });

@@ -16,7 +16,6 @@ import logging
 from lxml import etree
 from pkg_resources import resource_string
 import datetime
-import time
 import copy
 
 from django.http import Http404
@@ -26,12 +25,12 @@ from xmodule.x_module import XModule
 from xmodule.editing_module import TabsEditingDescriptor
 from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.xml_module import is_pointer_tag, name_to_pathname, deserialize_field
-from xmodule.modulestore import Location
 from xblock.fields import Scope, String, Boolean, List, Integer, ScopeIds
 from xmodule.fields import RelativeTime
 
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore
-from xblock.runtime import DbModel
+from xblock.runtime import KvsFieldData
+
 log = logging.getLogger(__name__)
 
 
@@ -134,8 +133,11 @@ class VideoModule(VideoFields, XModule):
     video_time = 0
     icon_class = 'video'
 
+    # To make sure that js files are called in proper order we use numerical
+    # index. We do that to avoid issues that occurs in tests.
     js = {
         'js': [
+            resource_string(__name__, 'js/src/video/00_cookie_storage.js'),
             resource_string(__name__, 'js/src/video/00_resizer.js'),
             resource_string(__name__, 'js/src/video/01_initialize.js'),
             resource_string(__name__, 'js/src/video/025_focus_grabber.js'),
@@ -214,7 +216,7 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
             del self.data
 
     @classmethod
-    def from_xml(cls, xml_data, system, org=None, course=None):
+    def from_xml(cls, xml_data, system, id_generator):
         """
         Creates an instance of this descriptor from the supplied xml_data.
         This may be overridden by subclasses
@@ -227,22 +229,21 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
         """
         xml_object = etree.fromstring(xml_data)
         url_name = xml_object.get('url_name', xml_object.get('slug'))
-        location = Location(
-            'i4x', org, course, 'video', url_name
-        )
+        block_type = 'video'
+        definition_id = id_generator.create_definition(block_type, url_name)
+        usage_id = id_generator.create_usage(definition_id)
         if is_pointer_tag(xml_object):
             filepath = cls._format_filepath(xml_object.tag, name_to_pathname(url_name))
-            xml_data = etree.tostring(cls.load_file(filepath, system.resources_fs, location))
+            xml_data = etree.tostring(cls.load_file(filepath, system.resources_fs, usage_id))
         field_data = cls._parse_video_xml(xml_data)
-        field_data['location'] = location
         kvs = InheritanceKeyValueStore(initial_values=field_data)
-        field_data = DbModel(kvs)
+        field_data = KvsFieldData(kvs)
         video = system.construct_xblock_from_class(
             cls,
             # We're loading a descriptor, so student_id is meaningless
             # We also don't have separate notions of definition and usage ids yet,
             # so we use the location for both
-            ScopeIds(None, location.category, location, location),
+            ScopeIds(None, block_type, definition_id, usage_id),
             field_data,
         )
         return video

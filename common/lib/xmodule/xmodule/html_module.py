@@ -3,14 +3,11 @@ from fs.errors import ResourceNotFoundError
 import logging
 import os
 import sys
-from datetime import datetime
 from lxml import etree
 from path import path
-from pytz import UTC
 
 from pkg_resources import resource_string
 from xblock.fields import Scope, String, Boolean
-from xmodule.fields import Date
 from xmodule.editing_module import EditingDescriptor
 from xmodule.html_checker import check_html
 from xmodule.stringify import stringify_children
@@ -18,6 +15,7 @@ from xmodule.x_module import XModule
 from xmodule.xml_module import XmlDescriptor, name_to_pathname
 import textwrap
 from xmodule.contentstore.content import StaticContent
+from xblock.core import XBlock
 
 log = logging.getLogger("edx.courseware")
 
@@ -230,14 +228,9 @@ class AboutFields(object):
         default="",
         scope=Scope.content
     )
-    # this exists purely to override the default start date
-    start = Date(
-        help="placeholder to make sure that About is always active",
-        default=datetime.fromtimestamp(0, UTC),
-        scope=Scope.settings,
-    )
 
 
+@XBlock.tag("detached")
 class AboutModule(AboutFields, HtmlModule):
     """
     Overriding defaults but otherwise treated as HtmlModule.
@@ -245,6 +238,7 @@ class AboutModule(AboutFields, HtmlModule):
     pass
 
 
+@XBlock.tag("detached")
 class AboutDescriptor(AboutFields, HtmlDescriptor):
     """
     These pieces of course content are treated as HtmlModules but we need to overload where the templates are located
@@ -271,14 +265,9 @@ class StaticTabFields(object):
         scope=Scope.content,
         help="HTML for the additional pages"
     )
-    # this exists purely to override the default start date
-    start = Date(
-        help="placeholder to make sure that Static Tabs are always active",
-        default=datetime.fromtimestamp(0, UTC),
-        scope=Scope.settings,
-    )
 
 
+@XBlock.tag("detached")
 class StaticTabModule(StaticTabFields, HtmlModule):
     """
     Supports the field overrides
@@ -286,6 +275,7 @@ class StaticTabModule(StaticTabFields, HtmlModule):
     pass
 
 
+@XBlock.tag("detached")
 class StaticTabDescriptor(StaticTabFields, HtmlDescriptor):
     """
     These pieces of course content are treated as HtmlModules but we need to overload where the templates are located
@@ -304,14 +294,9 @@ class CourseInfoFields(object):
         default="<ol></ol>",
         scope=Scope.content
     )
-    # this exists purely to override the default start date
-    start = Date(
-        help="placeholder to make sure that Course Info is always active",
-        default=datetime.fromtimestamp(0, UTC),
-        scope=Scope.settings,
-    )
 
 
+@XBlock.tag("detached")
 class CourseInfoModule(CourseInfoFields, HtmlModule):
     """
     Just to support xblock field overrides
@@ -319,6 +304,7 @@ class CourseInfoModule(CourseInfoFields, HtmlModule):
     pass
 
 
+@XBlock.tag("detached")
 class CourseInfoDescriptor(CourseInfoFields, HtmlDescriptor):
     """
     These pieces of course content are treated as HtmlModules but we need to overload where the templates are located

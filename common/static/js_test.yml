@@ -37,6 +37,7 @@ lib_paths:
     - js/vendor/URI.min.js
     - coffee/src/ajax_prefix.js
     - js/test/add_ajax_prefix.js
+    - js/test/i18n.js
     - coffee/src/jquery.immediateDescendents.js
 
 # Paths to source JavaScript files

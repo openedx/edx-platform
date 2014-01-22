@@ -26,7 +26,7 @@
                     </section>
                 </div>
             </div>
-            <section class="grading-wrapper" data-track-changes="${'true' if track_changes else 'false'}">
+            <section class="grading-wrapper">
                 <div class="grading-message">
                 </div>
                 <h2>${_("Student Response")}</h2>
@@ -42,28 +42,10 @@
                         <p class="rubric-selection-container"></p>
                         <p class="score-selection-container"></p>
                         <hr />
-                        <div class="answer-unknown-container">
-                            <input type="checkbox" class="answer-unknown-checkbox" value="answer_is_unknown">
-                            ${_("I am unsure about the scores I have given above: ")}
-                        </div>
                         <br />
                         <h3>${_("Written Feedback")}</h3>
-                        % if track_changes:
-                            <p class="peer-grading-instructions">${_("Please edit your peer's submission and give them written comments below.")}</p>
-                            <p class="ice-legend">
-                                <span class="ins">${_("This is an insertion.")}</span>&nbsp;
-                                <span class="del">${_("This is a deletion.")}</span>&nbsp;
-                                <span class="ins">${_("[This is a comment.]")}</span>&nbsp;
-                                <span class="ice-controls">
-                                    <a href="#" class="undo-change"><i class="icon-undo"></i> Undo Change</a>&nbsp;&nbsp;
-                                    <a href="#" class="reset-changes"><i class="icon-refresh"></i> Reset Changes</a>
-                                </span>
-                            </p>
-                            <div name="feedback" class="feedback-area track-changes" contenteditable="true"></div>
-                        % else:
-                            <p class="ora-instructions">${_("Please include some written feedback as well.")}</p>
-                            <textarea name="feedback" placeholder="Feedback for student" class="feedback-area" cols="70" ></textarea>
-                        % endif
+                        <p class="ora-instructions">${_("Please include some written feedback as well.")}</p>
+                        <textarea name="feedback" placeholder="Feedback for student" class="feedback-area" cols="70" ></textarea>
                         <div class="flag-student-container">
                             <br />
                             <input type="checkbox" class="flag-checkbox" value="student_is_flagged"> 

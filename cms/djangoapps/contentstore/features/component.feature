@@ -73,18 +73,19 @@ Feature: CMS.Component Adding
            | Problem with Adaptive Hint    |
 
 
-    Scenario: I can add Advanced Latex Problem components
-       Given I am in Studio editing a new unit
-       Given I have enabled latex compiler
-       When I add a "<Component>" "Advanced Problem" component
-       Then I see a "<Component>" Problem component
-       # Flush out the database before the next example executes
-       And I reset the database
+# Disabled 1/21/14 due to flakiness seen in master
+#    Scenario: I can add Advanced Latex Problem components
+#       Given I am in Studio editing a new unit
+#       Given I have enabled latex compiler
+#       When I add a "<Component>" "Advanced Problem" component
+#       Then I see a "<Component>" Problem component
+#       # Flush out the database before the next example executes
+#       And I reset the database
 
-    Examples:
-           | Component                     |
-           | Problem Written in LaTeX      |
-           | Problem with Adaptive Hint in Latex  |
+#    Examples:
+#           | Component                     |
+#           | Problem Written in LaTeX      |
+#           | Problem with Adaptive Hint in Latex  |
 
     Scenario: I see a prompt on delete
         Given I am in Studio editing a new unit

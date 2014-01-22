@@ -5,14 +5,14 @@ if Backbone?
       "click .vote-btn":
         (event) -> @toggleVote(event)
       "keydown .vote-btn":
-        (event) -> DiscussionUtil.activateOnEnter(event, @toggleVote)
+        (event) -> DiscussionUtil.activateOnSpace(event, @toggleVote)
       "click .discussion-flag-abuse": "toggleFlagAbuse"
-      "keypress .discussion-flag-abuse":
-        (event) -> DiscussionUtil.activateOnEnter(event, toggleFlagAbuse)
+      "keydown .discussion-flag-abuse":
+        (event) -> DiscussionUtil.activateOnSpace(event, @toggleFlagAbuse)
       "click .admin-pin": "togglePin"
       "click .action-follow": "toggleFollowing"
-      "keypress .action-follow":
-        (event) -> DiscussionUtil.activateOnEnter(event, toggleFollowing)
+      "keydown .action-follow":
+        (event) -> DiscussionUtil.activateOnSpace(event, @toggleFollowing)
       "click .action-edit": "edit"
       "click .action-delete": "_delete"
       "click .action-openclose": "toggleClosed"
@@ -46,22 +46,22 @@ if Backbone?
         @$("[data-role=thread-flag]").addClass("flagged")  
         @$("[data-role=thread-flag]").removeClass("notflagged")
         @$(".discussion-flag-abuse").attr("aria-pressed", "true")
-        @$(".discussion-flag-abuse .flag-label").html("Misuse Reported")
+        @$(".discussion-flag-abuse .flag-label").html(gettext("Misuse Reported"))
       else
         @$("[data-role=thread-flag]").removeClass("flagged")  
         @$("[data-role=thread-flag]").addClass("notflagged")      
         @$(".discussion-flag-abuse").attr("aria-pressed", "false")
-        @$(".discussion-flag-abuse .flag-label").html("Report Misuse")
+        @$(".discussion-flag-abuse .flag-label").html(gettext("Report Misuse"))
 
     renderPinned: =>
       if @model.get("pinned")
         @$("[data-role=thread-pin]").addClass("pinned")  
         @$("[data-role=thread-pin]").removeClass("notpinned")  
-        @$(".discussion-pin .pin-label").html("Pinned")
+        @$(".discussion-pin .pin-label").html(gettext("Pinned"))
       else
         @$("[data-role=thread-pin]").removeClass("pinned")  
         @$("[data-role=thread-pin]").addClass("notpinned")  
-        @$(".discussion-pin .pin-label").html("Pin Thread")
+        @$(".discussion-pin .pin-label").html(gettext("Pin Thread"))
 
 
     updateModelDetails: =>
@@ -97,7 +97,7 @@ if Backbone?
           if textStatus == 'success'
             @model.set('pinned', true)
         error: =>
-          $('.admin-pin').text("Pinning not currently available")
+          $('.admin-pin').text(gettext("Pinning is not currently available"))
        
     unPin: ->
       url = @model.urlFor("unPinThread")

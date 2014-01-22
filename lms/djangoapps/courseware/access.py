@@ -20,11 +20,10 @@ from external_auth.models import ExternalAuthMap
 from courseware.masquerade import is_masquerading_as_student
 from django.utils.timezone import UTC
 from student.models import CourseEnrollment
-from courseware.roles import (
+from student.roles import (
     GlobalStaff, CourseStaffRole, CourseInstructorRole,
     OrgStaffRole, OrgInstructorRole, CourseBetaTesterRole
 )
-
 DEBUG_ACCESS = False
 
 log = logging.getLogger(__name__)
@@ -246,7 +245,7 @@ def _has_access_descriptor(user, descriptor, action, course_context=None):
             return True
 
         # Check start date
-        if descriptor.start is not None:
+        if 'detached' not in descriptor._class_tags and descriptor.start is not None:
             now = datetime.now(UTC())
             effective_start = _adjust_start_date_for_beta_testers(
                 user,

@@ -270,7 +270,7 @@ describe 'MarkdownEditingDescriptor', ->
         <p>The answer is correct if it matches every character of the expected answer. This can be a problem with international spelling, dates, or anything where the format of the answer is not clear.</p>
 
         <p>Which US state has Lansing as its capital?</p>
-        <stringresponse answer="Michigan" type="ci">
+        <stringresponse answer="Michigan" type="ci" >
           <textline size="20"/>
         </stringresponse>
 
@@ -279,6 +279,29 @@ describe 'MarkdownEditingDescriptor', ->
         <p>Explanation</p>
 
         <p>Lansing is the capital of Michigan, although it is not Michgan's largest city, or even the seat of the county in which it resides.</p>
+
+        </div>
+        </solution>
+        </problem>""")
+    it 'converts StringResponse with regular expression to xml', ->
+      data = MarkdownEditingDescriptor.markdownToXml("""Who lead the civil right movement in the United States of America?
+        = | \w*\.?\s*Luther King\s*.*
+
+        [Explanation]
+        Test Explanation.
+        [Explanation]
+        """)
+      expect(data).toEqual("""<problem>
+        <p>Who lead the civil right movement in the United States of America?</p>
+        <stringresponse answer="\w*\.?\s*Luther King\s*.*" type="ci regexp" >
+          <textline size="20"/>
+        </stringresponse>
+
+        <solution>
+        <div class="detailed-solution">
+        <p>Explanation</p>
+
+        <p>Test Explanation.</p>
 
         </div>
         </solution>
@@ -296,7 +319,39 @@ describe 'MarkdownEditingDescriptor', ->
         """)
       expect(data).toEqual("""<problem>
         <p>Who lead the civil right movement in the United States of America?</p>
-        <stringresponse answer="Dr. Martin Luther King Jr._or_Doctor Martin Luther King Junior_or_Martin Luther King_or_Martin Luther King Junior" type="ci">
+        <stringresponse answer="Dr. Martin Luther King Jr." type="ci" >
+          <additional_answer>Doctor Martin Luther King Junior</additional_answer>
+          <additional_answer>Martin Luther King</additional_answer>
+          <additional_answer>Martin Luther King Junior</additional_answer>
+          <textline size="20"/>
+        </stringresponse>
+
+        <solution>
+        <div class="detailed-solution">
+        <p>Explanation</p>
+
+        <p>Test Explanation.</p>
+
+        </div>
+        </solution>
+        </problem>""")
+    it 'converts StringResponse with multiple answers and regular expressions to xml', ->
+      data = MarkdownEditingDescriptor.markdownToXml("""Write a number from 1 to 4.
+        =| ^One$
+        or= two
+        or= ^thre+
+        or= ^4|Four$
+
+        [Explanation]
+        Test Explanation.
+        [Explanation]
+        """)
+      expect(data).toEqual("""<problem>
+        <p>Write a number from 1 to 4.</p>
+        <stringresponse answer="^One$" type="ci regexp" >
+          <additional_answer>two</additional_answer>
+          <additional_answer>^thre+</additional_answer>
+          <additional_answer>^4|Four$</additional_answer>
           <textline size="20"/>
         </stringresponse>
 

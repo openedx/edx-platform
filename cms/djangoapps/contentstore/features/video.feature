@@ -86,7 +86,7 @@ Feature: CMS.Video Component
 
   # 11
   Scenario: When start end end times are specified, a range on slider is shown
-    Given I have created a Video component
+    Given I have created a Video component with subtitles
     And Make sure captions are closed
     And I edit the component
     And I open tab "Advanced"

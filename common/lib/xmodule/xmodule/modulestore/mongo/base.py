@@ -26,13 +26,15 @@ from importlib import import_module
 from xmodule.errortracker import null_error_tracker, exc_info_to_str
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.error_module import ErrorDescriptor
-from xblock.runtime import DbModel
+from xblock.runtime import KvsFieldData
 from xblock.exceptions import InvalidScopeError
 from xblock.fields import Scope, ScopeIds
 
 from xmodule.modulestore import ModuleStoreWriteBase, Location, MONGO_MODULESTORE_TYPE
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.inheritance import own_metadata, InheritanceMixin, inherit_metadata, InheritanceKeyValueStore
+from xmodule.modulestore.xml import LocationReader
+from xblock.core import XBlock
 
 log = logging.getLogger(__name__)
 
@@ -146,7 +148,12 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         render_template: a function for rendering templates, as per
             MakoDescriptorSystem
         """
-        super(CachingDescriptorSystem, self).__init__(load_item=self.load_item, **kwargs)
+        super(CachingDescriptorSystem, self).__init__(
+            id_reader=LocationReader(),
+            field_data=None,
+            load_item=self.load_item,
+            **kwargs
+        )
 
         self.modulestore = modulestore
         self.module_data = module_data
@@ -187,7 +194,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                     metadata,
                 )
 
-                field_data = DbModel(kvs)
+                field_data = KvsFieldData(kvs)
                 scope_ids = ScopeIds(None, category, location, location)
                 module = self.construct_xblock_from_class(class_, scope_ids, field_data)
                 if self.cached_metadata is not None:
@@ -480,7 +487,8 @@ class MongoModuleStore(ModuleStoreWriteBase):
         """
         Load an XModuleDescriptor from item, using the children stored in data_cache
         """
-        data_dir = getattr(item, 'data_dir', item['location']['course'])
+        location = Location(item['location'])
+        data_dir = getattr(item, 'data_dir', location.course)
         root = self.fs_root / data_dir
 
         if not root.isdir():
@@ -490,7 +498,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
 
         cached_metadata = {}
         if apply_cached_metadata:
-            cached_metadata = self.get_cached_metadata_inheritance_tree(Location(item['location']))
+            cached_metadata = self.get_cached_metadata_inheritance_tree(location)
 
         # TODO (cdodge): When the 'split module store' work has been completed, we should remove
         # the 'metadata_inheritance_tree' parameter
@@ -505,7 +513,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
             mixins=self.xblock_mixins,
             select=self.xblock_select,
         )
-        return system.load_item(item['location'])
+        return system.load_item(location)
 
     def _load_items(self, items, depth=0):
         """
@@ -779,6 +787,8 @@ class MongoModuleStore(ModuleStoreWriteBase):
         location: Something that can be passed to Location
         children: A list of child item identifiers
         """
+        # Normalize the children to urls
+        children = [Location(child).url() for child in children]
 
         self._update_single_item(location, {'definition.children': children})
         # recompute (and update) the metadata inheritance tree which is cached
@@ -860,10 +870,11 @@ class MongoModuleStore(ModuleStoreWriteBase):
         """
         return MONGO_MODULESTORE_TYPE
 
-    def get_orphans(self, course_location, detached_categories, _branch):
+    def get_orphans(self, course_location, _branch):
         """
         Return an array all of the locations for orphans in the course.
         """
+        detached_categories = [name for name, __ in XBlock.load_tagged_classes("detached")]
         all_items = self.collection.find({
             '_id.org': course_location.org,
             '_id.course': course_location.course,
@@ -888,5 +899,5 @@ class MongoModuleStore(ModuleStoreWriteBase):
             metadata,
         )
 
-        field_data = DbModel(kvs)
+        field_data = KvsFieldData(kvs)
         return field_data

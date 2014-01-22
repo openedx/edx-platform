@@ -497,8 +497,8 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         return policy_str
 
     @classmethod
-    def from_xml(cls, xml_data, system, org=None, course=None):
-        instance = super(CourseDescriptor, cls).from_xml(xml_data, system, org, course)
+    def from_xml(cls, xml_data, system, id_generator):
+        instance = super(CourseDescriptor, cls).from_xml(xml_data, system, id_generator)
 
         # bleh, have to parse the XML here to just pull out the url_name attribute
         # I don't think it's stored anywhere in the instance.

@@ -19,6 +19,9 @@ cms/envs/private.py
 .redcar/
 codekit-config.json
 
+### NFS artifacts
+.nfs*
+
 ### OS X artifacts
 *.DS_Store
 .AppleDouble
