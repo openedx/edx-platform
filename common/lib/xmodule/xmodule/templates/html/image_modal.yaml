@@ -1,0 +1,8 @@
+---
+metadata:
+    display_name: Image Modal
+data: |
+        <h2>Title of Unit</h2>
+        <p>
+          <a href="http://static.class.stanford.edu/stanford-hills-big.jpg" class="zoomable"><img alt="" src="http://static.class.stanford.edu/stanford-hills-small.jpg" /></a>
+        </p>

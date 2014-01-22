@@ -145,3 +145,110 @@ th {
   background: #eee;
   font-weight: bold;
 }
+
+
+//---------------------------------------- Image Modal Styling ----------------------------------------//
+
+.imageModal-link {
+  display: block;                                                                             
+  position: relative;
+  cursor: pointer;
+}
+
+.imageModal-link i,
+.imageModal .imageModal-content i {
+  position: absolute;
+  display: block;
+  padding: 5px;
+  cursor: pointer;
+  line-height: .9;
+  font-style: normal;
+  color: #2e2d29;
+  background: #fbfbf9;
+  border-radius: 10px;
+}
+.imageModal-link .icon-fullscreen {
+  opacity: 0;
+  height: 41px;
+  width: 41px;
+  top: 5px;
+  left: 5px;
+}
+.imageModal-link:hover .icon-fullscreen {
+  opacity: .9;
+}
+
+.imageModal {
+  display: none;
+  position: fixed;
+  cursor: pointer;
+  z-index: 1000;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+}
+.imageModal .imageModal-content {
+  height: 95%;
+  width: 95%;
+  display: block;
+  position: relative;
+  margin: auto;
+  overflow: hidden;
+  top: 2.5%;
+}
+.imageModal .imageModal-content .imageModal-imgWrapper {
+  position: relative;
+}
+.imageModal .imageModal-content .imageModal-imgWrapper img {
+  max-width: 100%;
+  max-height: 100%;
+  position: relative;
+  margin: auto;
+  display: block;
+  opacity: 1;
+  cursor: default;
+}
+.imageModal .imageModal-content .imageModal-imgWrapper img.zoomed {
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  cursor: move;
+}
+
+.imageModal .imageModal-content .icon-remove {
+  position: absolute;
+  height: 37px;
+  width: 37px;
+  top: 10px;
+  right: 10px;
+  line-height: .75;
+}
+
+.imageModal .imageModal-content .imageModal-zoom {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  height: 50px;
+  width: 110px;
+  padding: 5px 10px;
+  background: $white;
+  border-radius: 10px;
+  opacity: .9;
+}
+.imageModal .imageModal-content .imageModal-zoom i {
+  position: relative;
+  height: 50px;
+  padding: 0;
+  background: transparent;
+  line-height: 1;
+}
+.imageModal .imageModal-content .imageModal-zoom i.icon-zoom-in {
+  float: right;
+}
+.imageModal .imageModal-content .imageModal-zoom i.icon-zoom-out {
+  float: left;
+}
+
+//--------------------------------------- /Image Modal Styling ----------------------------------------//
