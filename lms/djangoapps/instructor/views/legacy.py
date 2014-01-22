@@ -35,6 +35,7 @@ from courseware.access import (has_access, get_access_group_name,
                                course_beta_test_group_name)
 from courseware.courses import get_course_with_access, get_cms_course_link
 from courseware.models import StudentModule
+from courseware.model_data import FieldDataCache
 from django_comment_common.models import (Role,
                                           FORUM_ROLE_ADMINISTRATOR,
                                           FORUM_ROLE_MODERATOR,
@@ -1133,12 +1134,30 @@ def get_student_grade_summary_data(request, course, course_id, get_grades=True, 
 
     header = [_u('ID'), _u('Username'), _u('Full Name'), _u('edX email'), _u('External email')]
     assignments = []
+
+    category_weights = {}
+    
+
     if get_grades and enrolled_students.count() > 0:
         # just to construct the header
         gradeset = student_grades(enrolled_students[0], request, course, keep_raw_scores=get_raw_scores, use_offline=use_offline)
+        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+            course_id, enrolled_students[0], course, depth=None)
+        courseware_summary = grades.progress_summary(enrolled_students[0], request, course,
+                                                 field_data_cache);
+
         # log.debug('student {0} gradeset {1}'.format(enrolled_students[0], gradeset))
         if get_raw_scores:
             assignments += [score.section for score in gradeset['raw_scores']]
+        elif course.new_progress:
+            for section in gradeset['grade_breakdown']:
+                category_weights[section['category']] = section['weight']
+            for chapter in courseware_summary:
+                for section in chapter['sections']:
+                    if not section['graded'] or len(section['format']) < 1:
+                        continue
+                    assignments += [section['format']]
+                assignments += [chapter['display_name']]
         else:
             assignments += [x['label'] for x in gradeset['section_breakdown']]
     header += assignments
@@ -1155,10 +1174,24 @@ def get_student_grade_summary_data(request, course, course_id, get_grades=True, 
 
         if get_grades:
             gradeset = student_grades(student, request, course, keep_raw_scores=get_raw_scores, use_offline=use_offline)
+            field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+                course_id, student, course, depth=None)
+            courseware_summary = grades.progress_summary(enrolled_students[0], request, course,
+                                                 field_data_cache);
             log.debug('student={0}, gradeset={1}'.format(student, gradeset))
             if get_raw_scores:
                 # TODO (ichuang) encode Score as dict instead of as list, so score[0] -> score['earned']
                 sgrades = [(getattr(score, 'earned', '') or score[0]) for score in gradeset['raw_scores']]
+            elif course.new_progress:
+                sgrades = []
+                for chapter in courseware_summary:
+                    total = 0
+                    for section in chapter['sections']:
+                        if not section['graded'] or len(section['format']) < 1:
+                            continue
+                        sgrades += [((section['section_total'].earned / section['section_total'].possible) if section['section_total'].possible else 0)]
+                        total += ((section['section_total'].earned / section['section_total'].possible) if section['section_total'].possible else 0) * category_weights.get(section['format'], 0.0)
+                    sgrades += [total]
             else:
                 sgrades = [x['percent'] for x in gradeset['section_breakdown']]
             datarow += sgrades

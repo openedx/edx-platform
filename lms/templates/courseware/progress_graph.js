@@ -61,8 +61,13 @@ $(function () {
                                                 'color' : colors[colorIndex]}
         
         categoryData = chapters[ chapter['display_name'] ]
-      
-        categoryData['data'].append( [tickIndex, section['section_total'].earned/(section['section_total'].possible + 0.01)] )
+        
+        if section['section_total'].possible > 0:
+            pers = section['section_total'].earned/(section['section_total'].possible)
+        else:
+            pers = "0"
+        
+        categoryData['data'].append( [tickIndex, pers] )
         ticks.append( [tickIndex, section['format'] ] )
       
         if chapter['display_name'] in detail_tooltips:
@@ -76,8 +81,9 @@ $(function () {
           
         tickIndex += 1
 
-        earned += section['section_total'].earned * category_weights.get(section['format'], 0.0)
-        total += (section['section_total'].earned / (section['section_total'].possible + 0.0001)) * category_weights.get(section['format'], 0.0)
+        if (section['section_total'].possible > 0):
+            earned += section['section_total'].earned * category_weights.get(section['format'], 0.0)
+            total += (section['section_total'].earned / section['section_total'].possible) * category_weights.get(section['format'], 0.0)
       
       
       if chapter['display_name'] not in chapters:
@@ -87,15 +93,15 @@ $(function () {
       
       categoryData = chapters[ chapter['display_name'] ]
       
-      categoryData['data'].append( [tickIndex, total - 0.01] )
+      categoryData['data'].append( [tickIndex, total] )
         
 
       ticks.append( [tickIndex, chapter['display_name'] ] )
       
       if chapter['display_name'] in detail_tooltips:
-            detail_tooltips[ chapter['display_name'] ].append( chapter['display_name'] + " (" + str(total*100) + "%)" )
+            detail_tooltips[ chapter['display_name'] ].append(u"{0} ({1:.0%})".format(chapter['display_name'], total))
       else:
-            detail_tooltips[ chapter['display_name']] = [ chapter['display_name'] + " (" + str(total*100) + "%)", ]
+            detail_tooltips[ chapter['display_name']] = [ u"{0} ({1:.0%})".format(chapter['display_name'], total), ]
 
       tickIndex += 1
         
