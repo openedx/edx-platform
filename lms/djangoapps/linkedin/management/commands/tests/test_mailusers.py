@@ -165,7 +165,7 @@ class MailusersTests(TestCase):
         self.assertEqual(
             fut(self.cert1),
             'http://www.linkedin.com/profile/guided?'
-            'pfCertificationName=TEST1&pfAuthorityName=edX&'
+            'pfCertificationName=TEST1&'
             'pfAuthorityId=0000000&'
             'pfCertificationUrl=http%3A%2F%2Ftest.foo%2Ftest&pfLicenseNo=TESTX%2F1%2FTEST1&'
             'pfCertStartDate=201005&_mSplash=1&'
