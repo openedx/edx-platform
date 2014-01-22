@@ -32,6 +32,15 @@ locales:
 # The locale used for fake-accented English, for testing.
 dummy-locale: eo
 
+# Directories we don't search for strings.
+ignore_dirs:
+    - docs
+    - src
+    - i18n
+    - test_root
+    - common/static/xmodule/modules
+    - common/static/xmodule/descriptors
+
 # How should .po files be segmented?  See i18n/segment.py for details. Strings
 # that are only found in a particular segment are segregated into that .po file
 # so that translators can focus on separate parts of the product.

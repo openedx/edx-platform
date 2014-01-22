@@ -40,15 +40,13 @@ def main():
     create_dir_if_necessary(LOCALE_DIR)
     source_msgs_dir = CONFIGURATION.source_messages_dir
 
-    remove_file(source_msgs_dir.joinpath('django.po'))
-    generated_files = ('django-partial.po', 'djangojs.po', 'mako.po')
-    for filename in generated_files:
-        remove_file(source_msgs_dir.joinpath(filename))
+    generated_files = ['django-partial.po', 'djangojs.po', 'mako.po']
 
     # Prepare makemessages command.
-    ignore_dirs = ["docs", "src", "i18n", "test_root"]
-    ignores = " ".join("--ignore={}/*".format(d) for d in ignore_dirs)
-    makemessages = 'django-admin.py makemessages -l en ' + ignores
+    makemessages = "django-admin.py makemessages -l en"
+    ignores = " ".join("--ignore={}/*".format(d) for d in CONFIGURATION.ignore_dirs)
+    if ignores:
+        makemessages += " " + ignores
 
     # Extract strings from mako templates.
     babel_mako_cmd = 'pybabel extract -F %s -c "Translators:" . -o %s' % (BABEL_CONFIG, BABEL_OUT)
@@ -79,6 +77,7 @@ def main():
         # remove key strings which belong in messages.po
         strip_key_strings(po)
         po.save()
+
 
 def fix_header(po):
     """
