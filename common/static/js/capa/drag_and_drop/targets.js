@@ -1,5 +1,5 @@
 (function (requirejs, require, define) {
-define(['js/capa/drag_and_drop/logme'], function (logme) {
+define([], function () {
     return {
         'initializeBaseTargets': initializeBaseTargets,
         'initializeTargetField': initializeTargetField,
@@ -268,5 +268,5 @@ define(['js/capa/drag_and_drop/logme'], function (logme) {
             this.numTextEl.html(this.draggableList.length);
         }
     }
-}); // End-of: define(['logme'], function (logme) {
+}); // End-of: define([], function () {
 }(RequireJS.requirejs, RequireJS.require, RequireJS.define)); // End-of: (function (requirejs, require, define) {

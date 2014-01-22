@@ -45,8 +45,8 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
           % if course_creator_status=='granted':
           <a href="#" class="button new-button new-course-button"><i class="icon-plus icon-inline"></i>
               ${_("New Course")}</a>
-          % elif course_creator_status=='disallowed_for_this_site' and settings.MITX_FEATURES.get('STUDIO_REQUEST_EMAIL',''):
-          <a href="mailto:${settings.MITX_FEATURES.get('STUDIO_REQUEST_EMAIL','')}">${_("Email staff to create course")}</a>
+          % elif course_creator_status=='disallowed_for_this_site' and settings.FEATURES.get('STUDIO_REQUEST_EMAIL',''):
+          <a href="mailto:${settings.FEATURES.get('STUDIO_REQUEST_EMAIL','')}">${_("Email staff to create course")}</a>
           % endif
         </li>
       </ul>
@@ -290,10 +290,10 @@ require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
         </ol>
       </div>
 
-      % if course_creator_status=='disallowed_for_this_site' and settings.MITX_FEATURES.get('STUDIO_REQUEST_EMAIL',''):
+      % if course_creator_status=='disallowed_for_this_site' and settings.FEATURES.get('STUDIO_REQUEST_EMAIL',''):
       <div class="bit">
         <h3 class="title title-3">${_('Can I create courses in Studio?')}</h3>
-        <p>${_('In order to create courses in Studio, you must')} <a href="mailto:${settings.MITX_FEATURES.get('STUDIO_REQUEST_EMAIL','')}">${_("contact edX staff to help you create a course")}</a></p>
+        <p>${_('In order to create courses in Studio, you must')} <a href="mailto:${settings.FEATURES.get('STUDIO_REQUEST_EMAIL','')}">${_("contact edX staff to help you create a course")}</a></p>
       </div>
       % endif
 

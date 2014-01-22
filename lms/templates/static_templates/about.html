@@ -1,23 +1,9 @@
 <%! from django.utils.translation import ugettext as _ %>
-<%! from django.core.urlresolvers import reverse %>
-<%namespace name='static' file='../static_content.html'/>
-
 <%inherit file="../main.html" />
 
-<%block name="title"><title>${_("About {edX}").format(edX="edX")}</title></%block>
+<%block name="title"><title>${_("Vision")}</title></%block>
 
 <section class="container about">
-  <nav>
-    <a href="${reverse('about_edx')}" class="active">${_("Vision")}</a>
-    <a href="${reverse('faq_edx')}">${_("Faq")}</a>
-    <a href="${reverse('press')}">${_("Press")}</a>
-    <a href="${reverse('contact')}">${_("Contact")}</a>
-  </nav>
-
-    <p>Страница находится в стадии разработки.</p>
-
-    <section class="partners">
-    </section>
-  </section>
+<h1>${_("Vision")}</h1>
+<p>${_("This page left intentionally blank. It is not used by edx.org but is left here for possible use by installations of Open edX.")}</p>
 </section>
-

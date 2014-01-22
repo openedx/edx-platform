@@ -2,6 +2,7 @@ from datetime import datetime
 import pytz
 import logging
 import smtplib
+import unicodecsv
 
 from model_utils.managers import InheritanceManager
 from collections import namedtuple
@@ -22,7 +23,7 @@ from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from course_modes.models import CourseMode
-from mitxmako.shortcuts import render_to_string
+from edxmako.shortcuts import render_to_string
 from student.views import course_from_id
 from student.models import CourseEnrollment, unenroll_done
 
@@ -30,6 +31,8 @@ from verify_student.models import SoftwareSecurePhotoVerification
 
 from .exceptions import (InvalidCartItem, PurchasedCallbackException, ItemAlreadyInCartException,
                          AlreadyEnrolledInCourseException, CourseDoesNotExistException)
+
+from microsite_configuration.middleware import MicrositeConfiguration
 
 log = logging.getLogger("shoppingcart")
 
@@ -53,6 +56,7 @@ class Order(models.Model):
     currency = models.CharField(default="usd", max_length=8)  # lower case ISO currency codes
     status = models.CharField(max_length=32, default='cart', choices=ORDER_STATUSES)
     purchase_time = models.DateTimeField(null=True, blank=True)
+    refunded_time = models.DateTimeField(null=True, blank=True)
     # Now we store data needed to generate a reasonable receipt
     # These fields only make sense after the purchase
     bill_to_first = models.CharField(max_length=64, blank=True)
@@ -141,7 +145,7 @@ class Order(models.Model):
         self.bill_to_state = state
         self.bill_to_country = country
         self.bill_to_postalcode = postalcode
-        if settings.MITX_FEATURES['STORE_BILLING_INFO']:
+        if settings.FEATURES['STORE_BILLING_INFO']:
             self.bill_to_street1 = street1
             self.bill_to_street2 = street2
             self.bill_to_ccnum = ccnum
@@ -159,14 +163,22 @@ class Order(models.Model):
 
         # send confirmation e-mail
         subject = _("Order Payment Confirmation")
-        message = render_to_string('emails/order_confirmation_email.txt', {
-            'order': self,
-            'order_items': orderitems,
-            'has_billing_info': settings.MITX_FEATURES['STORE_BILLING_INFO']
-        })
+        message = render_to_string(
+            'emails/order_confirmation_email.txt',
+            {
+                'order': self,
+                'order_items': orderitems,
+                'has_billing_info': settings.FEATURES['STORE_BILLING_INFO']
+            }
+        )
         try:
+            from_address = MicrositeConfiguration.get_microsite_configuration_value(
+                'email_from_address',
+                settings.DEFAULT_FROM_EMAIL
+            )
+
             send_mail(subject, message,
-                      settings.DEFAULT_FROM_EMAIL, [self.user.email])  # pylint: disable=E1101
+                      from_address, [self.user.email])  # pylint: disable=E1101
         except (smtplib.SMTPException, BotoServerError):  # sadly need to handle diff. mail backends individually
             log.error('Failed sending confirmation e-mail for order %d', self.id)  # pylint: disable=E1101
 
@@ -207,6 +219,9 @@ class OrderItem(models.Model):
     line_desc = models.CharField(default="Misc. Item", max_length=1024)
     currency = models.CharField(default="usd", max_length=8)  # lower case ISO currency codes
     fulfilled_time = models.DateTimeField(null=True)
+    refund_requested_time = models.DateTimeField(null=True)
+    # general purpose field, not user-visible.  Used for reporting
+    report_comments = models.TextField(default="")
 
     @property
     def line_cost(self):
@@ -253,6 +268,66 @@ class OrderItem(models.Model):
         Default implementation is to return an empty set
         """
         return self.pk_with_subclass, set([])
+
+    @classmethod
+    def purchased_items_btw_dates(cls, start_date, end_date):
+        """
+        Returns a QuerySet of the purchased items between start_date and end_date inclusive.
+        """
+        return cls.objects.filter(
+            status="purchased",
+            fulfilled_time__gte=start_date,
+            fulfilled_time__lt=end_date,
+        )
+
+    @classmethod
+    def csv_purchase_report_btw_dates(cls, filelike, start_date, end_date):
+        """
+        Outputs a CSV report into "filelike" (a file-like python object, such as an actual file, an HttpRequest,
+        or sys.stdout) of purchased items between start_date and end_date inclusive.
+        Opening and closing filelike (if applicable) should be taken care of by the caller
+        """
+        items = cls.purchased_items_btw_dates(start_date, end_date).order_by("fulfilled_time")
+
+        writer = unicodecsv.writer(filelike, encoding="utf-8")
+        writer.writerow(OrderItem.csv_report_header_row())
+
+        for item in items:
+            writer.writerow(item.csv_report_row)
+
+    @classmethod
+    def csv_report_header_row(cls):
+        """
+        Returns the "header" row for a csv report of purchases
+        """
+        return [
+            "Purchase Time",
+            "Order ID",
+            "Status",
+            "Quantity",
+            "Unit Cost",
+            "Total Cost",
+            "Currency",
+            "Description",
+            "Comments"
+        ]
+
+    @property
+    def csv_report_row(self):
+        """
+        Returns an array which can be fed into csv.writer to write out one csv row
+        """
+        return [
+            self.fulfilled_time,
+            self.order_id,  # pylint: disable=no-member
+            self.status,
+            self.qty,
+            self.unit_cost,
+            self.line_cost,
+            self.currency,
+            self.line_desc,
+            self.report_comments,
+        ]
 
     @property
     def pk_with_subclass(self):
@@ -345,13 +420,13 @@ class PaidCourseRegistration(OrderItem):
 
         item, created = cls.objects.get_or_create(order=order, user=order.user, course_id=course_id)
         item.status = order.status
-
         item.mode = course_mode.slug
         item.qty = 1
         item.unit_cost = cost
         item.line_desc = 'Registration for Course: {0}'.format(course.display_name_with_default)
         item.currency = currency
         order.currency = currency
+        item.report_comments = item.csv_report_comments
         order.save()
         item.save()
         log.info("User {} added course registration {} to cart: order {}"
@@ -391,6 +466,31 @@ class PaidCourseRegistration(OrderItem):
 
         return self.pk_with_subclass, set([notification])
 
+    @property
+    def csv_report_comments(self):
+        """
+        Tries to fetch an annotation associated with the course_id from the database.  If not found, returns u"".
+        Otherwise returns the annotation
+        """
+        try:
+            return PaidCourseRegistrationAnnotation.objects.get(course_id=self.course_id).annotation
+        except PaidCourseRegistrationAnnotation.DoesNotExist:
+            return u""
+
+
+class PaidCourseRegistrationAnnotation(models.Model):
+    """
+    A model that maps course_id to an additional annotation.  This is specifically needed because when Stanford
+    generates report for the paid courses, each report item must contain the payment account associated with a course.
+    And unfortunately we didn't have the concept of a "SKU" or stock item where we could keep this association,
+    so this is to retrofit it.
+    """
+    course_id = models.CharField(unique=True, max_length=128, db_index=True)
+    annotation = models.TextField(null=True)
+
+    def __unicode__(self):
+        return u"{} : {}".format(self.course_id, self.annotation)
+
 
 class CertificateItem(OrderItem):
     """
@@ -400,7 +500,7 @@ class CertificateItem(OrderItem):
     course_enrollment = models.ForeignKey(CourseEnrollment)
     mode = models.SlugField()
 
-    @receiver(unenroll_done, sender=CourseEnrollment)
+    @receiver(unenroll_done)
     def refund_cert_callback(sender, course_enrollment=None, **kwargs):
         """
         When a CourseEnrollment object calls its unenroll method, this function checks to see if that unenrollment
@@ -421,7 +521,10 @@ class CertificateItem(OrderItem):
             log.error("Matching CertificateItem not found while trying to refund.  User %s, Course %s", course_enrollment.user, course_enrollment.course_id)
             return
         target_cert.status = 'refunded'
+        target_cert.refund_requested_time = datetime.now(pytz.utc)
         target_cert.save()
+        target_cert.order.status = 'refunded'
+        target_cert.order.save()
 
         order_number = target_cert.order_id
         # send billing an email so they can handle refunding
@@ -430,7 +533,10 @@ class CertificateItem(OrderItem):
                                                                                                        user_email=course_enrollment.user.email,
                                                                                                        order_number=order_number)
         to_email = [settings.PAYMENT_SUPPORT_EMAIL]
-        from_email = [settings.PAYMENT_SUPPORT_EMAIL]
+        from_email = [MicrositeConfiguration.get_microsite_configuration_value(
+            'payment_support_email',
+            settings.PAYMENT_SUPPORT_EMAIL
+        )]
         try:
             send_mail(subject, message, from_email, to_email, fail_silently=False)
         except (smtplib.SMTPException, BotoServerError):
@@ -464,10 +570,8 @@ class CertificateItem(OrderItem):
 
         """
         super(CertificateItem, cls).add_to_order(order, course_id, cost, currency=currency)
-        try:
-            course_enrollment = CourseEnrollment.objects.get(user=order.user, course_id=course_id)
-        except ObjectDoesNotExist:
-            course_enrollment = CourseEnrollment.create_enrollment(order.user, course_id, mode=mode)
+
+        course_enrollment = CourseEnrollment.get_or_create_enrollment(order.user, course_id)
 
         # do some validation on the enrollment mode
         valid_modes = CourseMode.modes_for_course_dict(course_id)
@@ -480,7 +584,7 @@ class CertificateItem(OrderItem):
             user=order.user,
             course_id=course_id,
             course_enrollment=course_enrollment,
-            mode=mode
+            mode=mode,
         )
         item.status = order.status
         item.qty = 1
@@ -505,9 +609,7 @@ class CertificateItem(OrderItem):
             log.exception(
                 "Could not submit verification attempt for enrollment {}".format(self.course_enrollment)
             )
-
-        self.course_enrollment.mode = self.mode
-        self.course_enrollment.save()
+        self.course_enrollment.change_mode(self.mode)
         self.course_enrollment.activate()
 
     @property

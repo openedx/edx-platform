@@ -57,6 +57,8 @@ def see_a_multi_step_component(step, category):
                     '\n    \n',
                 'Announcement':
                     '<p> Words of encouragement! This is a short note that most students will read. </p>',
+                'Zooming Image':
+                    '<h2>ZOOMING DIAGRAMS</h2>',
                 'E-text Written in LaTeX':
                     '<h2>Example: E-text page</h2>',
             }
@@ -87,13 +89,18 @@ def add_component_category(step, component, category):
 
 @step(u'I delete all components$')
 def delete_all_components(step):
+    count = len(world.css_find('ol.components li.component'))
+    step.given('I delete "' + str(count) + '" component')
+
+
+@step(u'I delete "([^"]*)" component$')
+def delete_components(step, number):
     world.wait_for_xmodule()
     delete_btn_css = 'a.delete-button'
     prompt_css = 'div#prompt-warning'
     btn_css = '{} a.button.action-primary'.format(prompt_css)
     saving_mini_css = 'div#page-notification .wrapper-notification-mini'
-    count = len(world.css_find('ol.components li.component'))
-    for _ in range(int(count)):
+    for _ in range(int(number)):
         world.css_click(delete_btn_css)
         assert_true(
             world.is_css_present('{}.is-shown'.format(prompt_css)),

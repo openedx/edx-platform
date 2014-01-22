@@ -21,16 +21,16 @@
     <article class="content-primary" role="main">
 
       <div class="introduction">
-        <p>${_("You may import existing course structure and content into Studio.")}</p>
-
-          <p>${_("Importing is not something to take lightly as the course content you successfully upload will be integrated into your course content and cannot be reversed.")}</p>
-          <p>${_("During the initial stages of the import process, please do not navigate away from this page.")}</p>
+          <p>${_("Be sure you want to import a course before continuing. Content of the imported course replaces all the content of this course. {em_start}You cannot undo a course import{em_end}. We recommend that you first export the current course, so you have a backup copy of it.").format(em_start='<strong>', em_end="</strong>")}</p>
+          ## Translators: ".tar.gz" is a file extension, and files with that extension are called "gzipped tar files": these terms should not be translated
+          <p>${_("The course that you import must be in a .tar.gz file (that is, a .tar file compressed with GNU Zip). This .tar.gz file must contain a course.xml file. It may also contain other files.")}</p>
+          <p>${_("The import process has five stages. During the first two stages, you must stay on this page. You can leave this page after the Unpacking stage has completed. We recommend, however, that you don't make important changes to your course until the import operation has completed.")}</p>
       </div>
 
       <form id="fileupload" method="post" enctype="multipart/form-data" class="import-form">
 
         ## Translators: ".tar.gz" is a file extension, and files with that extension are called "gzipped tar files": these terms should not be translated
-        <h2 class="title">${_("Select a File (.tar.gz format) to Replace Your Course Content")}</h2>
+        <h2 class="title">${_("Select a .tar.gz File to Replace Your Course Content")}</h2>
 
         <p class="error-block"></p>
 
@@ -125,22 +125,18 @@
 
     <aside class="content-supplementary" role="complimentary">
       <div class="bit">
-        <h3 class="title-3">${_("Gzipped Tar Files (.tar.gz) Only")}</h3>
-        ## Translators: ".tar.gz" is a file extension, and files with that extension are called "gzipped tar files": these terms should not be translated
-        <p>${_("File uploads must be gzipped tar files (.tar.gz) containing, at a minimum, a {filename} file.").format(filename='<code>course.xml</code>')}</p>
+        <h3 class="title-3">${_("Why import a course?")}</h3>
+        <p>${_("You may want to run a new version of an existing course, or replace an existing course altogether. Or, you may have developed a course outside Studio.")}</p>
       </div>
 
       <div class="bit">
-        <h3 class="title-3">${_("Warning: Auto-generated Nodes")}</h3>
-        ## Translators: ".tar.gz" is a file extension, and files with that extension are called "gzipped tar files": these terms should not be translated
-        <p>${_("Please note that if your course has any problems with auto-generated {nodename} nodes, re-importing your course could cause the loss of student data associated with those problems.").format(nodename='<code>url_name</code>')}</p>
+        <h3 class="title-3">${_("What content is imported?")}</h3>
+        <p>${_("Only the course content and structure (including sections, subsections, and units) are imported. Other data, including student data, grading information, discussion forum data, course settings, and course team information, remains the same as it was in the existing course.")}</p>
       </div>
 
       <div class="bit">
-        ## Translators: ".tar.gz" is a file extension, and should not be translated
-        <h3 class="title-3">${_("Course Team Info and Exporting/Importing")}</h3>
-
-        <p>${_("Please note that when importing course content, your course team info will not be changed by the imported course's information.")}</p>
+        <h3 class="title-3">${_("Warning: Importing while a course is running")}</h3>
+        <p>${_("If you perform an import while your course is running, and you change the URL names (or url_name nodes) of any Problem components, the student data associated with those Problem components may be lost. This data includes students' problem scores.")}</p>
       </div>
     </aside>
   </section>

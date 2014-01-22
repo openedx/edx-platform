@@ -97,20 +97,20 @@ def generate_table(commit_range, include_merge=False):
     """
     Return a string corresponding to a commit table to embed in Confluence
     """
-    header = "||Author||Summary||Commit||JIRA||Verified?||"
+    header = u"||Author||Summary||Commit||JIRA||Verified?||"
     commit_link = "[commit|https://github.com/edx/edx-platform/commit/{sha}]"
     rows = [header]
     cbe = commits_by_email(commit_range, include_merge)
     for email, commits in cbe.items():
         for i, commit in enumerate(commits):
-            rows.append("| {author} | {summary} | {commit} | {jira} | {verified} |".format(
+            rows.append(u"| {author} | {summary} | {commit} | {jira} | {verified} |".format(
                 author=email if i == 0 else "",
                 summary=commit.summary.replace("|", "\|"),
                 commit=commit_link.format(sha=commit.hexsha),
                 jira=", ".join(parse_ticket_references(commit.message)),
                 verified="",
             ))
-    return "\n".join(rows)
+    return u"\n".join(rows)
 
 
 def generate_email(commit_range, release_date=None):
@@ -153,7 +153,7 @@ def main():
         return
 
     print("EMAIL:")
-    print(generate_email(commit_range, release_date=args.date))
+    print(generate_email(commit_range, release_date=args.date).encode('UTF-8'))
     print("\n")
     print("Wiki Table:")
     print(
@@ -161,7 +161,7 @@ def main():
         "in your release wiki page"
     )
     print("\n")
-    print(generate_table(commit_range, include_merge=args.merge))
+    print(generate_table(commit_range, include_merge=args.merge).encode('UTF-8'))
 
 if __name__ == "__main__":
     main()

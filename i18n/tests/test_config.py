@@ -17,7 +17,7 @@ class TestConfiguration(TestCase):
         config_filename = os.path.normpath(os.path.join(LOCALE_DIR, 'no_such_file'))
         with self.assertRaises(Exception):
             Configuration(config_filename)
-            
+
     def test_valid_configuration(self):
         """
         Make sure we have a valid configuration file,
@@ -29,5 +29,5 @@ class TestConfiguration(TestCase):
         self.assertIsNotNone(locales)
         self.assertIsInstance(locales, list)
         self.assertIn('en', locales)
-        self.assertEqual('fr', CONFIGURATION.dummy_locale)
+        self.assertEqual('eo', CONFIGURATION.dummy_locale)
         self.assertEqual('en', CONFIGURATION.source_locale)

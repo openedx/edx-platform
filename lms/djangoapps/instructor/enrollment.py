@@ -6,8 +6,18 @@ Does not include any access control, be sure to check access before calling.
 
 import json
 from django.contrib.auth.models import User
+from django.conf import settings
+from django.core.urlresolvers import reverse
+from django.core.mail import send_mail
+
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from courseware.models import StudentModule
+from edxmako.shortcuts import render_to_string
+
+from microsite_configuration.middleware import MicrositeConfiguration
+
+# For determining if a shibboleth course
+SHIBBOLETH_DOMAIN_PREFIX = 'shib:'
 
 
 class EmailEnrollmentState(object):
@@ -17,8 +27,10 @@ class EmailEnrollmentState(object):
         if exists_user:
             user = User.objects.get(email=email)
             exists_ce = CourseEnrollment.is_enrolled(user, course_id)
+            full_name = user.profile.name
         else:
             exists_ce = False
+            full_name = None
         ceas = CourseEnrollmentAllowed.objects.filter(course_id=course_id, email=email).all()
         exists_allowed = len(ceas) > 0
         state_auto_enroll = exists_allowed and ceas[0].auto_enroll
@@ -27,6 +39,7 @@ class EmailEnrollmentState(object):
         self.enrollment = exists_ce
         self.allowed = exists_allowed
         self.auto_enroll = bool(state_auto_enroll)
+        self.full_name = full_name
 
     def __repr__(self):
         return "{}(user={}, enrollment={}, allowed={}, auto_enroll={})".format(
@@ -54,7 +67,7 @@ class EmailEnrollmentState(object):
         }
 
 
-def enroll_email(course_id, student_email, auto_enroll=False):
+def enroll_email(course_id, student_email, auto_enroll=False, email_students=False, email_params=None):
     """
     Enroll a student by email.
 
@@ -62,6 +75,8 @@ def enroll_email(course_id, student_email, auto_enroll=False):
     `auto_enroll` determines what is put in CourseEnrollmentAllowed.auto_enroll
         if auto_enroll is set, then when the email registers, they will be
         enrolled in the course automatically.
+    `email_students` determines if student should be notified of action by email.
+    `email_params` parameters used while parsing email templates (a `dict`).
 
     returns two EmailEnrollmentState's
         representing state before and after the action.
@@ -71,21 +86,32 @@ def enroll_email(course_id, student_email, auto_enroll=False):
 
     if previous_state.user:
         CourseEnrollment.enroll_by_email(student_email, course_id)
+        if email_students:
+            email_params['message'] = 'enrolled_enroll'
+            email_params['email_address'] = student_email
+            email_params['full_name'] = previous_state.full_name
+            send_mail_to_student(student_email, email_params)
     else:
         cea, _ = CourseEnrollmentAllowed.objects.get_or_create(course_id=course_id, email=student_email)
         cea.auto_enroll = auto_enroll
         cea.save()
+        if email_students:
+            email_params['message'] = 'allowed_enroll'
+            email_params['email_address'] = student_email
+            send_mail_to_student(student_email, email_params)
 
     after_state = EmailEnrollmentState(course_id, student_email)
 
     return previous_state, after_state
 
 
-def unenroll_email(course_id, student_email):
+def unenroll_email(course_id, student_email, email_students=False, email_params=None):
     """
     Unenroll a student by email.
 
     `student_email` is student's emails e.g. "foo@bar.com"
+    `email_students` determines if student should be notified of action by email.
+    `email_params` parameters used while parsing email templates (a `dict`).
 
     returns two EmailEnrollmentState's
         representing state before and after the action.
@@ -95,9 +121,19 @@ def unenroll_email(course_id, student_email):
 
     if previous_state.enrollment:
         CourseEnrollment.unenroll_by_email(student_email, course_id)
+        if email_students:
+            email_params['message'] = 'enrolled_unenroll'
+            email_params['email_address'] = student_email
+            email_params['full_name'] = previous_state.full_name
+            send_mail_to_student(student_email, email_params)
 
     if previous_state.allowed:
         CourseEnrollmentAllowed.objects.get(course_id=course_id, email=student_email).delete()
+        if email_students:
+            email_params['message'] = 'allowed_unenroll'
+            email_params['email_address'] = student_email
+            # Since no User object exists for this student there is no "full_name" available.
+            send_mail_to_student(student_email, email_params)
 
     after_state = EmailEnrollmentState(course_id, student_email)
 
@@ -141,3 +177,112 @@ def _reset_module_attempts(studentmodule):
     # save
     studentmodule.state = json.dumps(problem_state)
     studentmodule.save()
+
+
+def get_email_params(course, auto_enroll):
+    """
+    Generate parameters used when parsing email templates.
+
+    `auto_enroll` is a flag for auto enrolling non-registered students: (a `boolean`)
+    Returns a dict of parameters
+    """
+
+    stripped_site_name = settings.SITE_NAME
+    registration_url = 'https://' + stripped_site_name + reverse('student.views.register_user')
+    is_shib_course = uses_shib(course)
+
+    # Composition of email
+    email_params = {
+        'site_name': stripped_site_name,
+        'registration_url': registration_url,
+        'course': course,
+        'auto_enroll': auto_enroll,
+        'course_url': 'https://' + stripped_site_name + '/courses/' + course.id,
+        'course_about_url': 'https://' + stripped_site_name + '/courses/' + course.id + '/about',
+        'is_shib_course': is_shib_course,
+    }
+    return email_params
+
+
+def send_mail_to_student(student, param_dict):
+    """
+    Construct the email using templates and then send it.
+    `student` is the student's email address (a `str`),
+
+    `param_dict` is a `dict` with keys
+    [
+        `site_name`: name given to edX instance (a `str`)
+        `registration_url`: url for registration (a `str`)
+        `course_id`: id of course (a `str`)
+        `auto_enroll`: user input option (a `str`)
+        `course_url`: url of course (a `str`)
+        `email_address`: email of student (a `str`)
+        `full_name`: student full name (a `str`)
+        `message`: type of email to send and template to use (a `str`)
+        `is_shib_course`: (a `boolean`)
+    ]
+
+    Returns a boolean indicating whether the email was sent successfully.
+    """
+
+    # add some helpers and microconfig subsitutions
+    if 'course' in param_dict:
+        param_dict['course_name'] = param_dict['course'].display_name_with_default
+
+    param_dict['site_name'] = MicrositeConfiguration.get_microsite_configuration_value(
+        'SITE_NAME',
+        param_dict['site_name']
+    )
+
+    subject = None
+    message = None
+
+    # see if we are running in a microsite and that there is an
+    # activation email template definition available as configuration, if so, then render that
+    message_type = param_dict['message']
+
+    email_template_dict = {
+        'allowed_enroll': (
+            'emails/enroll_email_allowedsubject.txt',
+            'emails/enroll_email_allowedmessage.txt'
+        ),
+        'enrolled_enroll': (
+            'emails/enroll_email_enrolledsubject.txt',
+            'emails/enroll_email_enrolledmessage.txt'
+        ),
+        'allowed_unenroll': (
+            'emails/unenroll_email_subject.txt',
+            'emails/unenroll_email_allowedmessage.txt'
+        ),
+        'enrolled_unenroll': (
+            'emails/unenroll_email_subject.txt',
+            'emails/unenroll_email_enrolledmessage.txt'
+        )
+    }
+
+    subject_template, message_template = email_template_dict.get(message_type, (None, None))
+    if subject_template is not None and message_template is not None:
+        subject = render_to_string(subject_template, param_dict)
+        message = render_to_string(message_template, param_dict)
+
+    if subject and message:
+        # Remove leading and trailing whitespace from body
+        message = message.strip()
+
+        # Email subject *must not* contain newlines
+        subject = ''.join(subject.splitlines())
+        from_address = MicrositeConfiguration.get_microsite_configuration_value(
+            'email_from_address',
+            settings.DEFAULT_FROM_EMAIL
+        )
+
+        send_mail(subject, message, from_address, [student], fail_silently=False)
+
+
+def uses_shib(course):
+    """
+    Used to return whether course has Shibboleth as the enrollment domain
+
+    Returns a boolean indicating if Shibboleth authentication is set for this course.
+    """
+    return course.enrollment_domain and course.enrollment_domain.startswith(SHIBBOLETH_DOMAIN_PREFIX)

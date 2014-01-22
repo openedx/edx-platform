@@ -17,6 +17,7 @@ dealer==0.2.3
 distribute>=0.6.28, <0.7
 django-celery==3.0.17
 django-countries==1.5
+django-extensions==1.2.5
 django-filter==0.6.0
 django-followit==0.0.3
 django-keyedcache==1.4-6
@@ -43,6 +44,7 @@ lazy==1.1
 lxml==3.0.1
 mako==0.7.3
 Markdown==2.2.1
+mongoengine==0.7.10
 networkx==1.7
 nltk==2.0.4
 oauthlib==0.5.1
@@ -71,6 +73,7 @@ South==0.7.6
 sympy==0.7.1
 xmltodict==0.4.1
 django-ratelimit-backend==0.6
+unicodecsv==0.9.4
 
 # Used for debugging
 ipython==0.13.1
@@ -90,8 +93,9 @@ Babel==1.3
 transifex-client==0.9.1
 
 # Used for testing
-coverage==3.6
-factory_boy==2.0.2
+coverage==3.7
+ddt==0.4.0
+factory_boy==2.2.1
 mock==1.0.1
 nosexcover==1.0.7
 pep8==1.4.5

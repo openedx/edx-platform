@@ -8,11 +8,16 @@ function () {
 
     // VideoControl() function - what this module "exports".
     return function (state) {
+        var dfd = $.Deferred();
+
         state.videoControl = {};
 
         _makeFunctionsPublic(state);
         _renderElements(state);
         _bindHandlers(state);
+
+        dfd.resolve();
+        return dfd.promise();
     };
 
     // ***************************************************************
@@ -27,9 +32,12 @@ function () {
         var methodsDict = {
             exitFullScreen: exitFullScreen,
             hideControls: hideControls,
+            hidePlayPlaceholder: hidePlayPlaceholder,
             pause: pause,
             play: play,
+            show: show,
             showControls: showControls,
+            showPlayPlaceholder: showPlayPlaceholder,
             toggleFullScreen: toggleFullScreen,
             togglePlayback: togglePlayback,
             updateVcrVidTime: updateVcrVidTime
@@ -49,16 +57,16 @@ function () {
 
         state.videoControl.sliderEl            = state.videoControl.el.find('.slider');
         state.videoControl.playPauseEl         = state.videoControl.el.find('.video_control');
+        state.videoControl.playPlaceholder     = state.el.find('.btn-play');
         state.videoControl.secondaryControlsEl = state.videoControl.el.find('.secondary-controls');
         state.videoControl.fullScreenEl        = state.videoControl.el.find('.add-fullscreen');
         state.videoControl.vidTimeEl           = state.videoControl.el.find('.vidtime');
 
         state.videoControl.fullScreenState = false;
+        state.videoControl.pause();
 
-        if (!onTouchBasedDevice()) {
-            state.videoControl.pause();
-        } else {
-            state.videoControl.play();
+        if (state.isTouch && state.videoType === 'html5') {
+            state.videoControl.showPlayPlaceholder();
         }
 
         if ((state.videoType === 'html5') && (state.config.autohideHtml5)) {
@@ -94,6 +102,13 @@ function () {
         state.videoControl.playPauseEl.on('blur', function () {
             state.previousFocus = 'playPause';
         });
+
+        if (/iPad|Android/i.test(state.isTouch[0])) {
+            state.videoControl.playPlaceholder
+                .on('click', function () {
+                    state.trigger('videoPlayer.play', null);
+                });
+        }
     }
 
     // ***************************************************************
@@ -101,6 +116,11 @@ function () {
     // These are available via the 'state' object. Their context ('this' keyword) is the 'state' object.
     // The magic private function that makes them available and sets up their context is makeFunctionsPublic().
     // ***************************************************************
+    function show() {
+        this.videoControl.el.removeClass('is-hidden');
+        this.el.trigger('controls:show', arguments);
+    }
+
     function showControls(event) {
         if (!this.controlShowLock) {
             if (!this.captionsHidden) {
@@ -152,14 +172,46 @@ function () {
         });
     }
 
+    function showPlayPlaceholder(event) {
+        this.videoControl.playPlaceholder
+            .removeClass('is-hidden')
+            .attr({
+                'aria-hidden': 'false',
+                'tabindex': 0
+            });
+    }
+
+    function hidePlayPlaceholder(event) {
+        this.videoControl.playPlaceholder
+            .addClass('is-hidden')
+            .attr({
+                'aria-hidden': 'true',
+                'tabindex': -1
+            });
+    }
+
     function play() {
-        this.videoControl.playPauseEl.removeClass('play').addClass('pause').attr('title', gettext('Pause'));
         this.videoControl.isPlaying = true;
+        this.videoControl.playPauseEl
+            .removeClass('play')
+            .addClass('pause')
+            .attr('title', gettext('Pause'));
+
+        if (/iPad|Android/i.test(this.isTouch[0]) && this.videoType === 'html5') {
+            this.videoControl.hidePlayPlaceholder();
+        }
     }
 
     function pause() {
-        this.videoControl.playPauseEl.removeClass('pause').addClass('play').attr('title', gettext('Play'));
         this.videoControl.isPlaying = false;
+        this.videoControl.playPauseEl
+            .removeClass('pause')
+            .addClass('play')
+            .attr('title', gettext('Play'));
+
+        if (/iPad|Android/i.test(this.isTouch[0]) && this.videoType === 'html5') {
+            this.videoControl.showPlayPlaceholder();
+        }
     }
 
     function togglePlayback(event) {

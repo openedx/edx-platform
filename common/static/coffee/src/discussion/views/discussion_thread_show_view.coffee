@@ -2,12 +2,17 @@ if Backbone?
   class @DiscussionThreadShowView extends DiscussionContentView
 
     events:
-      "click .discussion-vote": "toggleVote"
+      "click .vote-btn":
+        (event) -> @toggleVote(event)
+      "keydown .vote-btn":
+        (event) -> DiscussionUtil.activateOnEnter(event, @toggleVote)
       "click .discussion-flag-abuse": "toggleFlagAbuse"
-      "keypress .discussion-flag-abuse": "toggleFlagAbuseKeypress"
+      "keypress .discussion-flag-abuse":
+        (event) -> DiscussionUtil.activateOnEnter(event, toggleFlagAbuse)
       "click .admin-pin": "togglePin"
       "click .action-follow": "toggleFollowing"
-      "keypress .action-follow": "toggleFollowingKeypress"
+      "keypress .action-follow":
+        (event) -> DiscussionUtil.activateOnEnter(event, toggleFollowing)
       "click .action-edit": "edit"
       "click .action-delete": "_delete"
       "click .action-openclose": "toggleClosed"
@@ -26,7 +31,7 @@ if Backbone?
     render: ->
       @$el.html(@renderTemplate())
       @delegateEvents()
-      @renderVoted()
+      @renderVote()
       @renderFlagged()
       @renderPinned()
       @renderAttrs()
@@ -36,14 +41,6 @@ if Backbone?
       @highlight @$("h1,h3")
       @
 
-    renderVoted: =>
-      if window.user.voted(@model)
-        @$("[data-role=discussion-vote]").addClass("is-cast")
-        @$("[data-role=discussion-vote] span.sr").html("votes (click to remove your vote)")
-      else
-        @$("[data-role=discussion-vote]").removeClass("is-cast")
-        @$("[data-role=discussion-vote] span.sr").html("votes (click to vote)")
-        
     renderFlagged: =>
       if window.user.id in @model.get("abuse_flaggers") or (DiscussionUtil.isFlagModerator and @model.get("abuse_flaggers").length > 0)
         @$("[data-role=thread-flag]").addClass("flagged")  
@@ -68,51 +65,14 @@ if Backbone?
 
 
     updateModelDetails: =>
-      @renderVoted()
+      @renderVote()
       @renderFlagged()
       @renderPinned()
-      @$("[data-role=discussion-vote] .votes-count-number").html(@model.get("votes")["up_count"] + '<span class ="sr"></span>')
-      if window.user.voted(@model)
-        @$("[data-role=discussion-vote] .votes-count-number span.sr").html("votes (click to remove your vote)")
-      else
-        @$("[data-role=discussion-vote] .votes-count-number span.sr").html("votes (click to vote)")
-
 
     convertMath: ->
       element = @$(".post-body")
       element.html DiscussionUtil.postMathJaxProcessor DiscussionUtil.markdownWithHighlight element.text()
       MathJax.Hub.Queue ["Typeset", MathJax.Hub, element[0]]
-
-    toggleVote: (event) ->
-      event.preventDefault()
-      if window.user.voted(@model)
-        @unvote()
-      else
-        @vote()
-
-    vote: ->
-      window.user.vote(@model)
-      url = @model.urlFor("upvote")
-      DiscussionUtil.safeAjax
-        $elem: @$(".discussion-vote")
-        url: url
-        type: "POST"
-        success: (response, textStatus) =>
-          if textStatus == 'success'
-            @model.set(response, {silent: true})
-
-
-    unvote: ->
-      window.user.unvote(@model)
-      url = @model.urlFor("unvote")
-      DiscussionUtil.safeAjax
-        $elem: @$(".discussion-vote")
-        url: url
-        type: "POST"
-        success: (response, textStatus) =>
-          if textStatus == 'success'
-            @model.set(response, {silent: true})
-
 
     edit: (event) ->
       @trigger "thread:edit", event

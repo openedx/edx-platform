@@ -65,6 +65,7 @@ div.gradebook-wrapper {
 			background: #f3f3f3;
 			font-size: 13px;
 			line-height: 50px;
+			white-space: nowrap;
 		}
 
 		tr:nth-child(odd) td {
@@ -110,14 +111,12 @@ div.gradebook-wrapper {
 		position: absolute;
 		top: 0;
 		left: 0;
-		width: 1000px;
 		cursor: move;
 		@include transition(none);
 		@include user-select(none);
 
 		td,
 		th {
-			width: 50px;
 			text-align: center;
 		}
 
@@ -131,6 +130,8 @@ div.gradebook-wrapper {
 			text-align: center;
 			box-shadow: 0 1px 0 $table-border-color inset, 0 2px 0 rgba(255, 255, 255, .7) inset;
 			border-left: 1px solid #ccc;
+			padding-left: 10px;
+			padding-right: 10px;
 
 			&:first-child {
 				border-radius: 5px 0 0 0;
@@ -181,6 +182,7 @@ div.gradebook-wrapper {
 			font-size: 13px;
 			line-height: 50px;
 			border-left: 1px solid $cell-border-color;
+			word-break: keep-all;
 		}
 
 		tr:nth-child(odd) td {

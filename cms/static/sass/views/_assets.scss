@@ -27,8 +27,166 @@
 
   }
 
+  .no-asset-content {
+    @extend %ui-well;
+    padding: ($baseline*2);
+    background-color: $gray-l4;
+    text-align: center;
+    color: $gray;
+
+    .new-button {
+      @include font-size(14);
+      margin-left: $baseline;
+
+      [class^="icon-"] {
+        margin-right: ($baseline/2);
+      }
+    }
+  }
+
   .asset-library {
     @include clearfix;
+
+    .meta-wrap {
+      margin-bottom: $baseline;
+    }
+    .meta {
+      @extend %t-copy-sub2;
+      display: inline-block;
+      vertical-align: top;
+      width: flex-grid(9, 12);
+      color: $gray-l1;
+
+      .count-current-shown,
+      .count-total,
+      .sort-order {
+        font-weight: 700;
+      }
+    }
+
+    .pagination {
+      @include clearfix;
+      display: inline-block;
+      width: flex-grid(3, 12);
+
+      &.pagination-compact {
+        text-align: right;
+      }
+
+      &.pagination-full {
+        display: block;
+        width: flex-grid(4, 12);
+        margin: $baseline auto;
+      }
+
+      .nav-item {
+        position: relative;
+        display: inline-block;
+      }
+
+      .nav-link {
+        @include transition(all $tmg-f2 ease-in-out 0s);
+        display: block;
+        padding: ($baseline/4) ($baseline*0.75);
+
+        &.previous {
+          margin-right: ($baseline/2);
+        }
+
+        &.next {
+          margin-left: ($baseline/2);
+        }
+
+        &:hover {
+          background-color: $blue;
+          border-radius: 3px;
+          color: $white;
+        }
+
+        &.is-disabled {
+          background-color: transparent;
+          color: $gray-l2;
+          pointer-events: none;
+        }
+      }
+
+      .nav-label {
+        @extend .sr;
+      }
+
+      .pagination-form,
+      .current-page,
+      .page-divider,
+      .total-pages {
+        display: inline-block;
+      }
+
+      .current-page,
+      .page-number-input,
+      .total-pages {
+        @extend %t-copy-base;
+        width: ($baseline*2.5);
+        margin: 0 ($baseline*0.75);
+        padding: ($baseline/4);
+        text-align: center;
+        color: $gray;
+        font-weight: 600;
+      }
+
+      .current-page {
+        @extend %ui-depth1;
+        position: absolute;
+        left: -($baseline/4);
+      }
+
+      .page-divider {
+        @extend %t-title4;
+        vertical-align: middle;
+        color: $gray-l2;
+        font-weight: 400;
+      }
+
+
+      .pagination-form {
+        @extend %ui-depth2;
+        position: relative;
+
+        .page-number-label,
+        .submit-pagination-form {
+          @extend .sr;
+        }
+
+        .page-number-input {
+          @include transition(all $tmg-f2 ease-in-out 0s);
+          border: 1px solid transparent;
+          border-bottom: 1px dotted $gray-l2;
+          border-radius: 0;
+          box-shadow: none;
+          background: none;
+
+          &:hover {
+            background-color: $white;
+            opacity: 0.6;
+          }
+
+          &:focus {
+            // borrowing the base input focus styles to match overall app
+            @include linear-gradient($paleYellow, tint($paleYellow, 90%));
+            opacity: 1.0;
+            box-shadow: 0 0 3px $shadow-d1 inset;
+            background-color: $white;
+            border: 1px solid transparent;
+            border-radius: 3px;
+          }
+        }
+
+
+      }
+    }
+
+
+
+
 
     table {
       width: 100%;
@@ -37,10 +195,27 @@
       th {
         @extend %t-copy-sub2;
         background-color: $gray-l5;
-        padding: 0 $baseline ($baseline*.75) $baseline;
+        padding: 0 ($baseline/2) ($baseline*0.75) ($baseline/2);
         vertical-align: middle;
         text-align: left;
         color: $gray;
+
+        .column-sort-link {
+          cursor: pointer;
+          color: $blue;
+        }
+
+
+        .current-sort {
+          border-bottom: 1px solid $gray-l3;
+          font-weight: 700;
+        }
+
+        // CASE: embed column
+        &.embed-col {
+          padding-left: ($baseline*0.75);
+          padding-right: ($baseline*0.75);
+        }
       }
 
       td {
@@ -122,7 +297,7 @@
 
         .embed-col {
           @include transition(all $tmg-f2 ease-in-out 0s);
-          padding-left: ($baseline*.75);
+          padding-left: ($baseline*0.75);
           color: $gray-l2;
 
           .embeddable-xml-input {
@@ -292,7 +467,7 @@
       @include transition(color $tmg-f2 ease-in-out 0s);
       position: absolute;
       top: 0;
-      right: ($baseline*.75);
+      right: ($baseline*0.75);
       border: none;
       background: none;
       padding: 0;

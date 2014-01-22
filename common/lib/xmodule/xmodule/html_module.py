@@ -3,11 +3,14 @@ from fs.errors import ResourceNotFoundError
 import logging
 import os
 import sys
+from datetime import datetime
 from lxml import etree
 from path import path
+from pytz import UTC
 
 from pkg_resources import resource_string
 from xblock.fields import Scope, String, Boolean
+from xmodule.fields import Date
 from xmodule.editing_module import EditingDescriptor
 from xmodule.html_checker import check_html
 from xmodule.stringify import stringify_children
@@ -16,7 +19,7 @@ from xmodule.xml_module import XmlDescriptor, name_to_pathname
 import textwrap
 from xmodule.contentstore.content import StaticContent
 
-log = logging.getLogger("mitx.courseware")
+log = logging.getLogger("edx.courseware")
 
 from django.utils.translation import ugettext as _
 
@@ -228,6 +231,12 @@ class AboutFields(object):
         default="",
         scope=Scope.content
     )
+    # this exists purely to override the default start date
+    start = Date(
+        help="placeholder to make sure that About is always active",
+        default=datetime.fromtimestamp(0, UTC),
+        scope=Scope.settings,
+    )
 
 
 class AboutModule(AboutFields, HtmlModule):
@@ -263,6 +272,12 @@ class StaticTabFields(object):
         scope=Scope.content,
         help=_("HTML for the additional pages")
     )
+    # this exists purely to override the default start date
+    start = Date(
+        help="placeholder to make sure that Static Tabs are always active",
+        default=datetime.fromtimestamp(0, UTC),
+        scope=Scope.settings,
+    )
 
 
 class StaticTabModule(StaticTabFields, HtmlModule):
@@ -289,6 +304,12 @@ class CourseInfoFields(object):
         help=_("Html contents to display for this module"),
         default="<ol></ol>",
         scope=Scope.content
+    )
+    # this exists purely to override the default start date
+    start = Date(
+        help="placeholder to make sure that Course Info is always active",
+        default=datetime.fromtimestamp(0, UTC),
+        scope=Scope.settings,
     )
 
 

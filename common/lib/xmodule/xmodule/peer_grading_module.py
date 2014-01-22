@@ -141,9 +141,15 @@ class PeerGradingModule(PeerGradingFields, XModule):
         except Exception:
             pass
 
-        self.ajax_url = self.system.ajax_url
-        if not self.ajax_url.endswith("/"):
-            self.ajax_url = self.ajax_url + "/"
+    @property
+    def ajax_url(self):
+        """
+        Returns the `ajax_url` from the system, with any trailing '/' stripped off.
+        """
+        ajax_url = self.system.ajax_url
+        if not ajax_url.endswith("/"):
+            ajax_url += "/"
+        return ajax_url
 
     def closed(self):
         return self._closed(self.timeinfo)
@@ -334,7 +340,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
 
         data_dict = {k:data.get(k) for k in required}
         if 'rubric_scores[]' in required:
-            data_dict['rubric_scores'] = data.getlist('rubric_scores[]')
+            data_dict['rubric_scores'] = data.getall('rubric_scores[]')
         data_dict['grader_id'] = self.system.anonymous_student_id
 
         try:
@@ -470,7 +476,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
             return self._err_response(message)
 
         data_dict = {k:data.get(k) for k in required}
-        data_dict['rubric_scores'] = data.getlist('rubric_scores[]')
+        data_dict['rubric_scores'] = data.getall('rubric_scores[]')
         data_dict['student_id'] = self.system.anonymous_student_id
         data_dict['calibration_essay_id'] = data_dict['submission_id']
 

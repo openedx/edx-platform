@@ -4,7 +4,8 @@ if Backbone?
   
     events:
       "click .discussion-flag-abuse": "toggleFlagAbuse"
-      "keypress .discussion-flag-abuse": "toggleFlagAbuseKeypress"
+      "keypress .discussion-flag-abuse":
+        (event) -> DiscussionUtil.activateOnEnter(event, toggleFlagAbuse)
   
     attrRenderer:
       endorsed: (endorsed) ->
@@ -106,11 +107,6 @@ if Backbone?
       @model.bind('change', @renderPartialAttrs, @)
       
      
-    toggleFollowingKeypress: (event) ->
-      # Activate on spacebar or enter
-      if event.which == 32 or event.which == 13
-        @toggleFollowing(event)
-
     toggleFollowing: (event) ->
       event.preventDefault()
       $elem = $(event.target)
@@ -126,11 +122,6 @@ if Backbone?
         url: url
         type: "POST"
 
-    toggleFlagAbuseKeypress: (event) ->
-      # Activate on spacebar or enter
-      if event.which == 32 or event.which == 13
-        @toggleFlagAbuse(event)
-     
     toggleFlagAbuse: (event) ->
       event.preventDefault()
       if window.user.id in @model.get("abuse_flaggers") or (DiscussionUtil.isFlagModerator and @model.get("abuse_flaggers").length > 0)
@@ -168,3 +159,42 @@ if Backbone?
                 temp_array = []
 
             @model.set('abuse_flaggers', temp_array)         
+
+    renderVote: =>
+      button = @$el.find(".vote-btn")
+      voted = window.user.voted(@model)
+      voteNum = @model.get("votes")["up_count"]
+      button.toggleClass("is-cast", voted)
+      button.attr("aria-pressed", voted)
+      button.attr("data-tooltip", if voted then "remove vote" else "vote")
+      button.find(".votes-count-number").html(voteNum)
+      button.find(".sr").html(if voted then "votes (click to remove your vote)" else "votes (click to vote)")
+
+    toggleVote: (event) =>
+      event.preventDefault()
+      if window.user.voted(@model)
+        @unvote()
+      else
+        @vote()
+
+    vote: =>
+      window.user.vote(@model)
+      url = @model.urlFor("upvote")
+      DiscussionUtil.safeAjax
+        $elem: @$el.find(".vote-btn")
+        url: url
+        type: "POST"
+        success: (response, textStatus) =>
+          if textStatus == 'success'
+            @model.set(response)
+
+    unvote: =>
+      window.user.unvote(@model)
+      url = @model.urlFor("unvote")
+      DiscussionUtil.safeAjax
+        $elem: @$el.find(".vote-btn")
+        url: url
+        type: "POST"
+        success: (response, textStatus) =>
+          if textStatus == 'success'
+            @model.set(response)

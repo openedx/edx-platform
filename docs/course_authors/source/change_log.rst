@@ -8,14 +8,14 @@ Change Log
 ==============  ================================================================
      DATE       CHANGE
 ==============  ================================================================
-7/1/2013		Online help and pdf files finalized in Sphinx 1.2b1
-
-5/6/2013		Universal change to UTC for all GMT references. Changed “Add Course Catalog Information” to show URL and note that on this page, the course author sees local time from browser. Changed “Invite Students to Register” to reflect new link.
-
-4/18/13         “Create a Discussion” graphic change
-
-4/9/13          Changed order of sections (moved “Create a Lesson in Studio” after “Create a New Course”) Added content to “Export or Import a Course,”Create Lesson,” “Create Schedule,” and Upload a File to the "Files & Updates Page” sections. Revised “Add an Announcement" or Update"				   		section.
-
-3/22/13			Revised “Add Manual Policy Data” section. Added “Appendix C: Time Zones”
+01/01/2014      Updated the chapters :ref:`Organizing Your Course Content` and 
+                :ref:`Testing Your Course` to reflect changes in the Course Outline design.
+01/01/2014      Updated the topic :ref:`Add Files to a Course` to reflect addition of
+                pagination to the Files & Uploads page.
+12/10/2013      Added the appendix :ref:`MathJax in Studio`.  
+12/11/2013      Added the chapter :ref:`Guidelines for Creating Accessible Content` 
+12/12/2013      Added the edX :ref:`Glossary`    
+12/05/2013      Complete revision of edX Studio documentation and integration 
+                of edX101 content.
 ==============  ================================================================
 

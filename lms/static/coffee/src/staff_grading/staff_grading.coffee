@@ -47,36 +47,36 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
             '''
             rubric: '''
 <table class="rubric"><tbody><tr><th>Purpose</th>
-                
+
             <td>
                     <input type="radio" class="score-selection" name="score-selection-0" id="score-0-0" value="0"><label for="score-0-0">No product</label>
             </td>
-                
+
             <td>
                     <input type="radio" class="score-selection" name="score-selection-0" id="score-0-1" value="1"><label for="score-0-1">Unclear purpose or main idea</label>
             </td>
-                
+
             <td>
                     <input type="radio" class="score-selection" name="score-selection-0" id="score-0-2" value="2"><label for="score-0-2">Communicates an identifiable purpose and/or main idea for an audience</label>
             </td>
-                
+
             <td>
                     <input type="radio" class="score-selection" name="score-selection-0" id="score-0-3" value="3"><label for="score-0-3">Achieves a clear and distinct purpose for a targeted audience and communicates main ideas with effectively used techniques to introduce and represent ideas and insights</label>
             </td>
         </tr><tr><th>Organization</th>
-                
+
             <td>
                     <input type="radio" class="score-selection" name="score-selection-1" id="score-1-0" value="0"><label for="score-1-0">No product</label>
             </td>
-                
+
             <td>
                     <input type="radio" class="score-selection" name="score-selection-1" id="score-1-1" value="1"><label for="score-1-1">Organization is unclear; introduction, body, and/or conclusion are underdeveloped, missing or confusing.</label>
             </td>
-                
+
             <td>
                     <input type="radio" class="score-selection" name="score-selection-1" id="score-1-2" value="2"><label for="score-1-2">Organization is occasionally unclear; introduction, body or conclusion may be underdeveloped.</label>
             </td>
-                
+
             <td>
                     <input type="radio" class="score-selection" name="score-selection-1" id="score-1-3" value="3"><label for="score-1-3">Organization is clear and easy to follow; introduction, body and conclusion are defined and aligned with purpose.</label>
             </td>
@@ -98,9 +98,9 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
             max_score: 2 + @mock_cnt % 3
             ml_error_info : 'ML accuracy info: ' + @mock_cnt
         else
-          response = 
+          response =
             success: false
-          
+
 
     else if cmd == 'save_grade'
       response =
@@ -109,7 +109,7 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
     # should get back a list of problem_ids, problem_names, num_graded, min_for_ml
     else if cmd == 'get_problem_list'
       @mock_cnt = 1
-      response = 
+      response =
         success: true
         problem_list: [
           {location: 'i4x://MITx/3.091x/problem/open_ended_demo1', \
@@ -123,7 +123,7 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
         error: 'Unknown command ' + cmd
 
     if @mock_cnt % 5 == 0
-        response = 
+        response =
           success: true
           message: 'No more submissions'
 
@@ -132,7 +132,7 @@ The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for t
       response =
         success: false
         error: 'An error for testing'
-        
+
     return response
 
 
@@ -188,7 +188,7 @@ class @StaffGrading
     $(window).keydown @keydown_handler
     $(window).keyup @keyup_handler
     @question_header = $('.question-header')
-    
+
     # model state
     @state = state_no_data
     @submission_id = null
@@ -264,7 +264,7 @@ class @StaffGrading
 
     @render_view()
     @scroll_to_top()
-       
+
   get_next_submission: (location) ->
     @location = location
     @list_view = false
@@ -294,7 +294,7 @@ class @StaffGrading
       submission_id: @submission_id
       location: @location
       submission_flagged: @flag_submission_checkbox.is(':checked')
-    @gentle_alert "Оценки сохранены. Получаем следующий ответ на проверку."
+    @gentle_alert gettext("Grades saved.  Fetching the next submission to grade.")
     @backend.post('save_grade', data, @ajax_callback)
 
   gentle_alert: (msg) =>
@@ -348,7 +348,7 @@ class @StaffGrading
             <th class="sr">''' + gettext("Required") + '''</th>
             <th class="sr">''' + gettext("Progress") + '''</th>
         </tr>
-    ''')    
+    ''')
     @breadcrumbs.html('')
     @problem_list_container.toggle(@list_view)
     if @backend.mock_backend
@@ -362,14 +362,14 @@ class @StaffGrading
 
     # only show the grading elements when we are not in list view or the state
     # is invalid
-    show_grading_elements = !(@list_view || @state == state_error || 
+    show_grading_elements = !(@list_view || @state == state_error ||
       @state == state_no_data)
     @prompt_wrapper.toggle(show_grading_elements)
     @submission_wrapper.toggle(show_grading_elements)
     @grading_wrapper.toggle(show_grading_elements)
     @meta_info_wrapper.toggle(show_grading_elements)
     @action_button.hide()
-    
+
     if @list_view
       @render_list()
     else
@@ -417,7 +417,7 @@ class @StaffGrading
 
     # set up the breadcrumbing
     @breadcrumbs.append(problem_list_link)
-      
+
 
     if @state == state_error
       @set_button_text(gettext('Try loading again'))
@@ -425,10 +425,14 @@ class @StaffGrading
 
     else if @state == state_grading
       @ml_error_info_container.html(@ml_error_info)
+      available = _.template(gettext("<%= num %> available"), {num: @num_pending})
+      graded = _.template(gettext("<%= num %> graded"), {num: @num_graded})
+      needed = _.template(gettext("<%= num %> more needed to start ML"),
+        {num: Math.max(@min_for_ml - @num_graded, 0)})
       meta_list = $("<div>")
-      meta_list.append("<div class='meta-info'>#{@num_pending} " + gettext('available') + " | </div>")
-      meta_list.append("<div class='meta-info'>#{@num_graded} " + gettext('graded') + " | </div>")
-      meta_list.append("<div class='meta-info'>#{Math.max(@min_for_ml - @num_graded, 0)} " + gettext('more needed to start ML') + " </div><br/>")
+        .append("<div class='meta-info'>#{available}</div>")
+        .append("<div class='meta-info'>#{graded}</div>")
+        .append("<div class='meta-info'>#{needed}</div>")
       @problem_meta_info.html(meta_list)
 
       @prompt_container.html(@prompt)
@@ -439,7 +443,7 @@ class @StaffGrading
       show_action_button = false
 
       @setup_score_selection()
-      
+
     else if @state == state_graded
       @set_button_text(gettext('Submit'))
       show_action_button = false
@@ -449,14 +453,14 @@ class @StaffGrading
       @set_button_text(gettext('Re-check for submissions'))
 
     else
-      @error(gettext('System got into invalid state ') + @state)
+      @error(_.template(gettext('System got into invalid state: <%= state %>'), {state: @state}))
 
     @submit_button.toggle(show_submit_button)
     @action_button.toggle(show_action_button)
 
   submit: (event) =>
     event.preventDefault()
-    
+
     if @state == state_error
       @get_next_submission(@location)
     else if @state == state_graded

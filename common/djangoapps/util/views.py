@@ -9,8 +9,7 @@ from django.views.defaults import server_error
 from django.http import (Http404, HttpResponse, HttpResponseNotAllowed,
                          HttpResponseServerError)
 from dogapi import dog_stats_api
-from mitxmako.shortcuts import render_to_response, render_to_string
-
+from edxmako.shortcuts import render_to_response, render_to_string
 import zendesk
 
 import calc
@@ -164,7 +163,7 @@ def submit_feedback(request):
     will be returned with no body; if ticket creation succeeds, an empty
     successful response (200) will be returned.
     """
-    if not settings.MITX_FEATURES.get('ENABLE_FEEDBACK_SUBMISSION', False):
+    if not settings.FEATURES.get('ENABLE_FEEDBACK_SUBMISSION', False):
         raise Http404()
     if request.method != "POST":
         return HttpResponseNotAllowed(["POST"])

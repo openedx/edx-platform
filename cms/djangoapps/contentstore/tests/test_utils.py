@@ -1,21 +1,14 @@
 """ Tests for utils. """
 from contentstore import utils
 import mock
-import unittest
 import collections
 import copy
-import json
-from uuid import uuid4
 
 from django.test import TestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from django.test.utils import override_settings
-from xmodule.modulestore.tests.factories import CourseFactory
 
-from xmodule.contentstore.content import StaticContent
-from xmodule.contentstore.django import contentstore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.exceptions import NotFoundError
+from xmodule.modulestore import Location
 
 
 class LMSLinksTestCase(TestCase):
@@ -28,33 +21,33 @@ class LMSLinksTestCase(TestCase):
     @override_settings(MKTG_URLS={'ROOT': 'dummy-root'})
     def about_page_marketing_site_test(self):
         """ Get URL for about page, marketing root present. """
-        with mock.patch.dict('django.conf.settings.MITX_FEATURES', {'ENABLE_MKTG_SITE': True}):
+        with mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
             self.assertEquals(self.get_about_page_link(), "//dummy-root/courses/mitX/101/test/about")
-        with mock.patch.dict('django.conf.settings.MITX_FEATURES', {'ENABLE_MKTG_SITE': False}):
+        with mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': False}):
             self.assertEquals(self.get_about_page_link(), "//localhost:8000/courses/mitX/101/test/about")
 
     @override_settings(MKTG_URLS={'ROOT': 'http://www.dummy'})
     def about_page_marketing_site_remove_http_test(self):
         """ Get URL for about page, marketing root present, remove http://. """
-        with mock.patch.dict('django.conf.settings.MITX_FEATURES', {'ENABLE_MKTG_SITE': True}):
+        with mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
             self.assertEquals(self.get_about_page_link(), "//www.dummy/courses/mitX/101/test/about")
 
     @override_settings(MKTG_URLS={'ROOT': 'https://www.dummy'})
     def about_page_marketing_site_remove_https_test(self):
         """ Get URL for about page, marketing root present, remove https://. """
-        with mock.patch.dict('django.conf.settings.MITX_FEATURES', {'ENABLE_MKTG_SITE': True}):
+        with mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
             self.assertEquals(self.get_about_page_link(), "//www.dummy/courses/mitX/101/test/about")
 
     @override_settings(MKTG_URLS={'ROOT': 'www.dummyhttps://x'})
     def about_page_marketing_site_https__edge_test(self):
         """ Get URL for about page, only remove https:// at the beginning of the string. """
-        with mock.patch.dict('django.conf.settings.MITX_FEATURES', {'ENABLE_MKTG_SITE': True}):
+        with mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
             self.assertEquals(self.get_about_page_link(), "//www.dummyhttps://x/courses/mitX/101/test/about")
 
     @override_settings(MKTG_URLS={})
     def about_page_marketing_urls_not_set_test(self):
         """ Error case. ENABLE_MKTG_SITE is True, but there is either no MKTG_URLS, or no MKTG_URLS Root property. """
-        with mock.patch.dict('django.conf.settings.MITX_FEATURES', {'ENABLE_MKTG_SITE': True}):
+        with mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_MKTG_SITE': True}):
             self.assertEquals(self.get_about_page_link(), None)
 
     @override_settings(LMS_BASE=None)
@@ -64,12 +57,12 @@ class LMSLinksTestCase(TestCase):
 
     def get_about_page_link(self):
         """ create mock course and return the about page link """
-        location = 'i4x', 'mitX', '101', 'course', 'test'
+        location = Location('i4x', 'mitX', '101', 'course', 'test')
         return utils.get_lms_link_for_about_page(location)
 
     def lms_link_test(self):
         """ Tests get_lms_link_for_item. """
-        location = 'i4x', 'mitX', '101', 'vertical', 'contacting_us'
+        location = Location('i4x', 'mitX', '101', 'vertical', 'contacting_us')
         link = utils.get_lms_link_for_item(location, False, "mitX/101/test")
         self.assertEquals(link, "//localhost:8000/courses/mitX/101/test/jump_to/i4x://mitX/101/vertical/contacting_us")
         link = utils.get_lms_link_for_item(location, True, "mitX/101/test")
@@ -80,7 +73,7 @@ class LMSLinksTestCase(TestCase):
 
         # If no course_id is passed in, it is obtained from the location. This is the case for
         # Studio dashboard.
-        location = 'i4x', 'mitX', '101', 'course', 'test'
+        location = Location('i4x', 'mitX', '101', 'course', 'test')
         link = utils.get_lms_link_for_item(location)
         self.assertEquals(
             link,

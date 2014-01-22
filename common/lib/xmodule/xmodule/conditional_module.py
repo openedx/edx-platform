@@ -15,7 +15,7 @@ from xblock.fields import Scope, List
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 
-log = logging.getLogger('mitx.' + __name__)
+log = logging.getLogger('edx.' + __name__)
 
 
 class ConditionalFields(object):
@@ -96,7 +96,11 @@ class ConditionalModule(ConditionalFields, XModule):
             xml_value = self.descriptor.xml_attributes.get(xml_attr)
             if xml_value:
                 return xml_value, attr_name
-        raise Exception('Error in conditional module: unknown condition "%s"' % xml_attr)
+        raise Exception(
+            'Error in conditional module: no known conditional found in {!r}'.format(
+                self.descriptor.xml_attributes.keys()
+            )
+        )
 
     @lazy
     def required_modules(self):
@@ -237,7 +241,7 @@ class ConditionalDescriptor(ConditionalFields, SequenceDescriptor):
         for child in self.get_children():
             location = str(child.location)
             if location in self.show_tag_list:
-                show_str = '<{tag_name} sources="{sources}" />'.format(
+                show_str = u'<{tag_name} sources="{sources}" />'.format(
                     tag_name='show', sources=location)
                 xml_object.append(etree.fromstring(show_str))
             else:

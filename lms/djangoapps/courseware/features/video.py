@@ -1,8 +1,7 @@
 #pylint: disable=C0111
 
 from lettuce import world, step
-from lettuce.django import django_url
-from common import i_am_registered_for_the_course, section_location
+from common import i_am_registered_for_the_course, section_location, visit_scenario_item
 from django.utils.translation import ugettext as _
 
 ############### ACTIONS ####################
@@ -28,12 +27,7 @@ def view_video(_step, player_mode):
 
     # Make sure we have a video
     add_video_to_course(coursenum, player_mode.lower())
-    chapter_name = world.scenario_dict['SECTION'].display_name.replace(" ", "_")
-    section_name = chapter_name
-    url = django_url('/courses/%s/%s/%s/courseware/%s/%s' %
-                    (world.scenario_dict['COURSE'].org, world.scenario_dict['COURSE'].number, world.scenario_dict['COURSE'].display_name.replace(' ', '_'),
-                        chapter_name, section_name,))
-    world.browser.visit(url)
+    visit_scenario_item('SECTION')
 
 
 def add_video_to_course(course, player_mode):
@@ -83,7 +77,7 @@ def add_video_to_course(course, player_mode):
 
 @step('youtube server is up and response time is (.*) seconds$')
 def set_youtube_response_timeout(_step, time):
-    world.youtube_server.time_to_response = time
+    world.youtube.set_config('time_to_response', float(time))
 
 
 @step('when I view the video it has rendered in (.*) mode$')
@@ -94,12 +88,15 @@ def video_is_rendered(_step, mode):
     }
     html_tag = modes[mode.lower()]
     assert world.css_find('.video {0}'.format(html_tag)).first
+    assert world.is_css_present('.speed_link')
 
 
 @step('all sources are correct$')
 def all_sources_are_correct(_step):
-    sources = world.css_find('.video video source')
-    assert set(source['src'] for source in sources) == set(HTML5_SOURCES)
+    elements = world.css_find('.video video source')
+    sources = [source['src'].split('?')[0] for source in elements]
+
+    assert set(sources) == set(HTML5_SOURCES)
 
 
 @step('error message is shown$')

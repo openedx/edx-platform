@@ -78,6 +78,24 @@ class TestTrackViews(TestCase):
         }
         self.mock_tracker.send.assert_called_once_with(expected_event)
 
+    def test_server_track_with_no_request(self):
+        request = None
+        views.server_track(request, str(sentinel.event_type), '{}')
+
+        expected_event = {
+            'username': 'anonymous',
+            'ip': '',
+            'event_source': 'server',
+            'event_type': str(sentinel.event_type),
+            'event': '{}',
+            'agent': '',
+            'page': None,
+            'time': self._expected_timestamp,
+            'host': '',
+            'context': {},
+        }
+        self.mock_tracker.send.assert_called_once_with(expected_event)
+
     def test_task_track(self):
         request_info = {
             'username': 'anonymous',

@@ -66,6 +66,7 @@ def create_modulestore_instance(engine, doc_store_config, options):
         request_cache=request_cache,
         modulestore_update_signal=Signal(providing_args=['modulestore', 'course_id', 'location']),
         xblock_mixins=getattr(settings, 'XBLOCK_MIXINS', ()),
+        xblock_select=getattr(settings, 'XBLOCK_SELECT_FUNCTION', None),
         doc_store_config=doc_store_config,
         **_options
     )
@@ -83,7 +84,7 @@ def get_default_store_name_for_current_request():
 
     # get mapping information which is defined in configurations
     mappings = getattr(settings, 'HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS', None)
-   
+
     # compare hostname against the regex expressions set of mappings
     # which will tell us which store name to use
     if hostname and mappings:
@@ -129,8 +130,12 @@ def loc_mapper():
     global _loc_singleton
     # pylint: disable=W0212
     if _loc_singleton is None:
+        try:
+            loc_cache = get_cache('loc_cache')
+        except InvalidCacheBackendError:
+            loc_cache = get_cache('default')
         # instantiate
-        _loc_singleton = LocMapperStore(**settings.DOC_STORE_CONFIG)
+        _loc_singleton = LocMapperStore(loc_cache, **settings.DOC_STORE_CONFIG)
     # inject into split mongo modulestore
     if 'split' in _MODULESTORES:
         _MODULESTORES['split'].loc_mapper = _loc_singleton

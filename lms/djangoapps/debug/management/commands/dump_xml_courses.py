@@ -34,6 +34,7 @@ class Command(BaseCommand):
             default_class='xmodule.hidden_module.HiddenDescriptor',
             load_error_modules=True,
             xblock_mixins=settings.XBLOCK_MIXINS,
+            xblock_select=settings.XBLOCK_SELECT_FUNCTION,
         )
 
         export_dir = path(args[0])

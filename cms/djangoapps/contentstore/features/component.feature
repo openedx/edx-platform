@@ -19,10 +19,12 @@ Feature: CMS.Component Adding
            | Component               |
            | Text                    |
            | Announcement            |
+           | Zooming Image           |
        Then I see HTML components in this order:
            | Component               |
            | Text                    |
            | Announcement            |
+           | Zooming Image           |
 
     Scenario: I can add Latex HTML components
        Given I am in Studio editing a new unit
@@ -39,6 +41,7 @@ Feature: CMS.Component Adding
        When I add this type of Problem component:
            | Component            |
            | Blank Common Problem |
+           | Checkboxes           |
            | Dropdown             |
            | Multiple Choice      |
            | Numerical Input      |
@@ -46,6 +49,7 @@ Feature: CMS.Component Adding
        Then I see Problem components in this order:
            | Component            |
            | Blank Common Problem |
+           | Checkboxes           |
            | Dropdown             |
            | Multiple Choice      |
            | Numerical Input      |

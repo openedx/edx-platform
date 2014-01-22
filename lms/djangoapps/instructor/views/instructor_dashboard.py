@@ -1,11 +1,12 @@
 """
 Instructor Dashboard Views
 """
+from functools import partial
 
 from django.utils.translation import ugettext as _
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
-from mitxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
 from django.utils.html import escape
 from django.http import Http404
@@ -23,6 +24,8 @@ from django_comment_client.utils import has_forum_access
 from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from student.models import CourseEnrollment
 from bulk_email.models import CourseAuthorization
+from lms.lib.xblock.runtime import handler_prefix
+
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
@@ -53,7 +56,7 @@ def instructor_dashboard_2(request, course_id):
     ]
 
     # Gate access to course email by feature flag & by course-specific authorization
-    if settings.MITX_FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and \
+    if settings.FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and \
        is_studio_course and CourseAuthorization.instructor_email_enabled(course_id):
         sections.append(_section_send_email(course_id, access, course))
 
@@ -63,7 +66,7 @@ def instructor_dashboard_2(request, course_id):
 
     enrollment_count = sections[0]['enrollment_count']
     disable_buttons = False
-    max_enrollment_for_buttons = course.max_enrollment_instr_buttons
+    max_enrollment_for_buttons = settings.FEATURES.get("MAX_ENROLLMENT_INSTR_BUTTONS")
     if max_enrollment_for_buttons is not None:
         disable_buttons = enrollment_count > max_enrollment_for_buttons
 
@@ -168,15 +171,21 @@ def _section_data_download(course_id, access):
         'get_students_features_url': reverse('get_students_features', kwargs={'course_id': course_id}),
         'get_anon_ids_url': reverse('get_anon_ids', kwargs={'course_id': course_id}),
         'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': course_id}),
+        'list_grade_downloads_url': reverse('list_grade_downloads', kwargs={'course_id': course_id}),
+        'calculate_grades_csv_url': reverse('calculate_grades_csv', kwargs={'course_id': course_id}),
     }
     return section_data
 
 
 def _section_send_email(course_id, access, course):
     """ Provide data for the corresponding bulk email section """
-    html_module = HtmlDescriptor(course.system, DictFieldData({'data': ''}), ScopeIds(None, None, None, None))
+    html_module = HtmlDescriptor(
+        course.system,
+        DictFieldData({'data': ''}),
+        ScopeIds(None, None, None, 'i4x://dummy_org/dummy_course/html/dummy_name')
+    )
     fragment = course.system.render(html_module, 'studio_view')
-    fragment = wrap_xblock(html_module, 'studio_view', fragment, None)
+    fragment = wrap_xblock(partial(handler_prefix, course_id), html_module, 'studio_view', fragment, None)
     email_editor = fragment.content
     section_data = {
         'section_key': 'send_email',

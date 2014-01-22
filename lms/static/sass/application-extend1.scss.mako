@@ -23,7 +23,7 @@
 ## called themes/<theme-name>/, with its base Sass file in
 ## themes/<theme-name>/static/sass/_<theme-name>.scss. That one entry
 ## point can be used to @import in as many other things as needed.
-% if env.get('THEME_NAME') is not None:
+% if env["FEATURES"].get("USE_CUSTOM_THEME", False):
   // import theme's Sass overrides
   @import '${env.get('THEME_NAME')}';
 % endif
@@ -46,7 +46,6 @@
 @import 'multicourse/home';
 @import 'multicourse/dashboard';
 @import 'multicourse/account';
-@import 'multicourse/testcenter-register';
 @import 'multicourse/courses';
 @import 'multicourse/course_about';
 @import 'multicourse/jobs';
@@ -58,5 +57,6 @@
 @import 'multicourse/help';
 @import 'multicourse/edge';
 
+@import 'developer'; // used for any developer-created scss that needs further polish/refactoring
+@import 'shame';     // used for any bad-form/orphaned scss
 ## NOTE: needed here for cascade and dependency purposes, but not a great permanent solution
-@import 'shame'; // shame file - used for any bad-form/orphaned scss that knowingly violate edX FED architecture/standards (see - http://csswizardry.com/2013/04/shame-css/)

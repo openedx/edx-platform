@@ -2,13 +2,14 @@ import unittest
 import json
 import logging
 from mock import Mock
+from webob.multidict import MultiDict
 
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
 from xmodule.modulestore import Location
 from xmodule.tests import get_test_system, get_test_descriptor_system
-from xmodule.tests.test_util_open_ended import MockQueryDict, DummyModulestore
+from xmodule.tests.test_util_open_ended import DummyModulestore
 from xmodule.open_ended_grading_classes.peer_grading_service import MockPeerGradingService
 from xmodule.peer_grading_module import PeerGradingModule, PeerGradingDescriptor
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
@@ -29,25 +30,27 @@ class PeerGradingModuleTest(unittest.TestCase, DummyModulestore):
     coe_location = Location(["i4x", "edX", "open_ended", "combinedopenended", "SampleQuestion"])
     calibrated_dict = {'location': "blah"}
     coe_dict = {'location': coe_location.url()}
-    save_dict = MockQueryDict()
-    save_dict.update({
+    save_dict = MultiDict({
         'location': "blah",
         'submission_id': 1,
         'submission_key': "",
         'score': 1,
         'feedback': "",
-        'rubric_scores[]': [0, 1],
         'submission_flagged': False,
         'answer_unknown': False,
     })
+    save_dict.extend(('rubric_scores[]', val) for val in (0, 1))
+
+    def get_module_system(self, descriptor):
+        test_system = get_test_system()
+        test_system.open_ended_grading_interface = None
+        return test_system
 
     def setUp(self):
         """
         Create a peer grading module from a test system
         @return:
         """
-        self.test_system = get_test_system()
-        self.test_system.open_ended_grading_interface = None
         self.setup_modulestore(COURSE)
         self.peer_grading = self.get_module_from_location(self.problem_location, COURSE)
         self.coe = self.get_module_from_location(self.coe_location, COURSE)
@@ -173,13 +176,16 @@ class PeerGradingModuleScoredTest(unittest.TestCase, DummyModulestore):
         ["i4x", "edX", "open_ended", "peergrading", "PeerGradingScored"]
     )
 
+    def get_module_system(self, descriptor):
+        test_system = get_test_system()
+        test_system.open_ended_grading_interface = None
+        return test_system
+
     def setUp(self):
         """
         Create a peer grading module from a test system
         @return:
         """
-        self.test_system = get_test_system()
-        self.test_system.open_ended_grading_interface = None
         self.setup_modulestore(COURSE)
 
     def test_metadata_load(self):
@@ -213,12 +219,15 @@ class PeerGradingModuleLinkedTest(unittest.TestCase, DummyModulestore):
     coe_location = Location(["i4x", "edX", "open_ended", "combinedopenended",
                              "SampleQuestion"])
 
+    def get_module_system(self, descriptor):
+        test_system = get_test_system()
+        test_system.open_ended_grading_interface = None
+        return test_system
+
     def setUp(self):
         """
         Create a peer grading module from a test system.
         """
-        self.test_system = get_test_system()
-        self.test_system.open_ended_grading_interface = None
         self.setup_modulestore(COURSE)
 
     @property
@@ -270,10 +279,12 @@ class PeerGradingModuleLinkedTest(unittest.TestCase, DummyModulestore):
         else:
             pg_descriptor.get_required_module_descriptors = lambda: []
 
+        test_system = self.get_module_system(pg_descriptor)
+
         # Initialize the peer grading module.
         peer_grading = PeerGradingModule(
             pg_descriptor,
-            self.test_system,
+            test_system,
             self.field_data,
             self.scope_ids,
         )
@@ -383,13 +394,16 @@ class PeerGradingModuleTrackChangesTest(unittest.TestCase, DummyModulestore):
     mock_track_changes_problem = Mock(side_effect=[MockedTrackChangesProblem()])
     pgm_location = Location(["i4x", "edX", "open_ended", "peergrading", "PeerGradingSample"])
 
+    def get_module_system(self, descriptor):
+        test_system = get_test_system()
+        test_system.open_ended_grading_interface = None
+        return test_system
+
     def setUp(self):
         """
         Create a peer grading module from a test system
         @return:
         """
-        self.test_system = get_test_system()
-        self.test_system.open_ended_grading_interface = None
         self.setup_modulestore(COURSE)
         self.peer_grading = self.get_module_from_location(self.pgm_location, COURSE)
 

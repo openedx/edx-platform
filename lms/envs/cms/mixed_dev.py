@@ -31,9 +31,9 @@ MODULESTORE = {
                         'collection': 'modulestore',
                     },
                     'OPTIONS': {
-                        'default_class': 'xmodule.raw_module.RawDescriptor',
+                        'default_class': 'xmodule.hidden_module.HiddenDescriptor',
                         'fs_root': DATA_DIR,
-                        'render_template': 'mitxmako.shortcuts.render_to_string',
+                        'render_template': 'edxmako.shortcuts.render_to_string',
                     }
                 }
             },

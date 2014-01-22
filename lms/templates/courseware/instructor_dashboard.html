@@ -113,7 +113,7 @@ function goto( mode)
 <section class="container">
 <div class="instructor-dashboard-wrapper">
 
-  %if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BETA_DASHBOARD'):
+  %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BETA_DASHBOARD'):
     <div class="beta-button-wrapper"><a href="${ beta_dashboard_url }">${_("Try New Beta Dashboard")}</a></div>
   %endif
   %if studio_url:
@@ -126,7 +126,7 @@ function goto( mode)
     <h1>${_("Instructor Dashboard")}</h1>
 
     <h2 class="navbar">[ <a href="#" onclick="goto('Grades');" class="${modeflag.get('Grades')}">${_("Grades")}</a> |
-          %if settings.MITX_FEATURES.get('ENABLE_PSYCHOMETRICS'):
+          %if settings.FEATURES.get('ENABLE_PSYCHOMETRICS'):
             <a href="#" onclick="goto('Psychometrics');" class="${modeflag.get('Psychometrics')}">${_("Psychometrics")}</a> |
           %endif
           <a href="#" onclick="goto('Admin');" class="${modeflag.get('Admin')}">${_("Admin")}</a> |
@@ -137,7 +137,7 @@ function goto( mode)
           %if show_email_tab:
              | <a href="#" onclick="goto('Email')" class="${modeflag.get('Email')}">${_("Email")}</a>
           %endif
-          %if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_ANALYTICS'):
+          %if settings.FEATURES.get('ENABLE_INSTRUCTOR_ANALYTICS'):
              | <a href="#" onclick="goto('Analytics');" class="${modeflag.get('Analytics')}">${_("Analytics")}</a>
           %endif
 	  ]
@@ -172,7 +172,7 @@ function goto( mode)
               "with more than {max_enrollment} students. We are urgently working on "
               "fixing this issue. Thank you for your patience as we continue "
               "working to improve the platform!").format(
-              max_enrollment=course.max_enrollment_instr_buttons
+              max_enrollment=settings.FEATURES['MAX_ENROLLMENT_INSTR_BUTTONS']
             )}
         </p>
       </div>
@@ -207,7 +207,7 @@ function goto( mode)
     </p>
     <hr width="40%" style="align:left">
 
-  %if settings.MITX_FEATURES.get('REMOTE_GRADEBOOK_URL','') and instructor_access:
+  %if settings.FEATURES.get('REMOTE_GRADEBOOK_URL','') and instructor_access:
 
     <%
         rg = course.remote_gradebook
@@ -240,7 +240,7 @@ function goto( mode)
     <hr width="40%" style="align:left">
 
   %endif
-  %if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
+  %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
     <H2>${_("Course-specific grade adjustment")}</h2>
 
     <p>
@@ -292,7 +292,7 @@ function goto( mode)
     <p>
       ${_("Then select an action:")}
       <input type="submit" name="action" onclick="this.value='Reset student\'s attempts'" value="${_("Reset student\'s attempts")}">
-      %if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
+      %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
       <input type="submit" name="action" onclick="this.value='Rescore student\'s problem submission'" value="${_("Rescore student\'s problem submission")}">
       %endif
     </p>
@@ -303,7 +303,7 @@ function goto( mode)
       <input type="submit" name="action" onclick="this.value='Delete student state for module'" value="${_("Delete student state for module")}">
     </p>
     %endif
-    %if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
+    %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
     <p>${_("Rescoring runs in the background, and status for active tasks will appear in a table below. "
            "To see status for all tasks submitted for this problem and student, click on this button:")}
     </p>
@@ -359,7 +359,7 @@ function goto( mode)
     <hr width="40%" style="align:left">
   %endif
 
-  %if settings.MITX_FEATURES['ENABLE_MANUAL_GIT_RELOAD'] and admin_access:
+  %if settings.FEATURES['ENABLE_MANUAL_GIT_RELOAD'] and admin_access:
     <p>
     <input type="submit" name="action" onclick="this.value='Reload course from XML files'" value="${_("Reload course from XML files")}">
     <input type="submit" name="action" onclick="this.value='GIT pull and Reload course'" value="${_("GIT pull and Reload course")}">
@@ -409,7 +409,7 @@ function goto( mode)
               "with more than {max_enrollment} students. We are urgently working on "
               "fixing this issue. Thank you for your patience as we continue "
               "working to improve the platform!").format(
-              max_enrollment=course.max_enrollment_instr_buttons
+              max_enrollment=settings.FEATURES['MAX_ENROLLMENT_INSTR_BUTTONS']
             )}
         </p>
       </div>
@@ -420,7 +420,7 @@ function goto( mode)
     <input type="submit" name="action" onclick="this.value='List students who may enroll but may not have yet signed up'" value="${_("List students who may enroll but may not have yet signed up")}" class="${'is-disabled' if disable_buttons else ''}">
     <hr width="40%" style="align:left">
 
-  %if settings.MITX_FEATURES.get('REMOTE_GRADEBOOK_URL','') and instructor_access:
+  %if settings.FEATURES.get('REMOTE_GRADEBOOK_URL','') and instructor_access:
 
     <%
         rg = course.remote_gradebook

@@ -1,6 +1,6 @@
-define(["backbone", "underscore", "gettext", "js/models/assignment_grade", "js/views/feedback_notification"],
-        function(Backbone, _, gettext, AssignmentGrade, NotificationView) {
-    var OverviewAssignmentGrader = Backbone.View.extend({
+define(["js/views/baseview", "underscore", "gettext", "js/models/assignment_grade", "js/views/feedback_notification"],
+        function(BaseView, _, gettext, AssignmentGrade, NotificationView) {
+    var OverviewAssignmentGrader = BaseView.extend({
         // instantiate w/ { graders : CourseGraderCollection, el : <the gradable-status div> }
         events : {
             "click .menu-toggle" : "showGradeMenu",
@@ -21,7 +21,7 @@ define(["backbone", "underscore", "gettext", "js/models/assignment_grade", "js/v
                         '<li><a class="gradable-status-notgraded" href="#">Not Graded</a></li>' +
                     '</ul>');
             this.assignmentGrade = new AssignmentGrade({
-                assignmentUrl : this.$el.closest('.id-holder').data('id'),
+                locator : this.$el.closest('.id-holder').data('locator'),
                 graderType : this.$el.data('initial-status')});
             // TODO throw exception if graders is null
             this.graders = this.options['graders'];

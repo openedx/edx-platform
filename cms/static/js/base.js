@@ -1,6 +1,6 @@
 require(["domReady", "jquery", "underscore", "gettext", "js/views/feedback_notification", "js/views/feedback_prompt",
-    "js/utils/get_date", "jquery.ui", "jquery.leanModal", "jquery.form", "jquery.smoothScroll"],
-    function(domReady, $, _, gettext, NotificationView, PromptView, DateUtils) {
+    "js/utils/get_date", "js/utils/module", "js/utils/handle_iframe_binding", "jquery.ui", "jquery.leanModal", "jquery.form", "jquery.smoothScroll"],
+    function(domReady, $, _, gettext, NotificationView, PromptView, DateUtils, ModuleUtils, IframeUtils) {
 
 var $body;
 var $newComponentItem;
@@ -27,7 +27,7 @@ domReady(function() {
 
     $('body').addClass('js');
 
-    $('.unit .item-actions .delete-button').bind('click', deleteUnit);
+    $('.unit .item-actions .delete-unit-button').bind('click', deleteUnit);
     $('.new-unit-item').bind('click', createNewUnit);
 
     // lean/simple modal
@@ -116,6 +116,7 @@ domReady(function() {
         $('.edit-subsection-publish-settings').find('.save-button').show();
     });
 
+    IframeUtils.iframeBinding();
     $.datepicker.setDefaults( $.datepicker.regional[language] );
 });
 
@@ -182,7 +183,7 @@ function saveSubsection() {
         $spinner.show();
     }
 
-    var id = $('.subsection-body').data('id');
+    var locator = $('.subsection-body').data('locator');
 
     // pull all 'normalized' metadata editable fields on page
     var metadata_fields = $('input[data-metadata-name]');
@@ -206,12 +207,11 @@ function saveSubsection() {
     });
 
     $.ajax({
-        url: "/save_item",
-        type: "POST",
+        url: ModuleUtils.getUpdateUrl(locator),
+        type: "PUT",
         dataType: "json",
         contentType: "application/json",
         data: JSON.stringify({
-            'id': id,
             'metadata': metadata
         }),
         success: function() {
@@ -230,35 +230,35 @@ function createNewUnit(e) {
 
     analytics.track('Created a Unit', {
         'course': course_location_analytics,
-        'parent_location': parent
+        'parent_locator': parent
     });
 
 
-    $.postJSON('/create_item', {
-        'parent_location': parent,
+    $.postJSON(ModuleUtils.getUpdateUrl(), {
+        'parent_locator': parent,
         'category': category,
         'display_name': gettext('New Unit')
     },
 
     function(data) {
         // redirect to the edit page
-        window.location = "/edit/" + data['id'];
+        window.location = "/unit/" + data['locator'];
     });
 }
 
 function deleteUnit(e) {
     e.preventDefault();
-    _deleteItem($(this).parents('li.leaf'), gettext('Unit'));
+    _deleteItem($(this).parents('li.courseware-unit'), gettext('Unit'));
 }
 
 function deleteSubsection(e) {
     e.preventDefault();
-    _deleteItem($(this).parents('li.branch'), gettext('Subsection'));
+    _deleteItem($(this).parents('li.courseware-subsection'), gettext('Subsection'));
 }
 
 function deleteSection(e) {
     e.preventDefault();
-    _deleteItem($(this).parents('section.branch'), gettext('Section'));
+    _deleteItem($(this).parents('section.courseware-section'), gettext('Section'));
 }
 
 function _deleteItem($el, type) {
@@ -271,11 +271,11 @@ function _deleteItem($el, type) {
                 click: function(view) {
                     view.hide();
 
-                    var id = $el.data('id');
+                    var locator = $el.data('locator');
 
                     analytics.track('Deleted an Item', {
                         'course': course_location_analytics,
-                        'id': id
+                        'id': locator
                     });
 
                     var deleting = new NotificationView.Mini({
@@ -285,7 +285,7 @@ function _deleteItem($el, type) {
 
                     $.ajax({
                         type: 'DELETE',
-                        url: $el.data('update_url')+'?'+ $.param({recurse: true, all_versions: true}),
+                        url: ModuleUtils.getUpdateUrl(locator) +'?'+ $.param({recurse: true, all_versions: true}),
                         success: function () {
                             $el.remove();
                             deleting.hide();

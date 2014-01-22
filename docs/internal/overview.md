@@ -99,9 +99,7 @@ The LMS is a django site, with root in `lms/`.  It runs in many different enviro
 
   - calls the module's `.get_html()` method.  If the module has nested submodules, render_x_module() will be called again for each.
 
-  - ajax calls go to `module_render.py:modx_dispatch()`, which passes it to the module's `handle_ajax()` function, and then updates the grade and state if they changed.
-
-  - [This diagram](https://github.com/MITx/mitx/wiki/MITx-Architecture) visually shows how the clients communicate with problems + modules.
+  - ajax calls go to `module_render.py:handle_xblock_callback()`, which passes it to one of the `XBlock`s handler functions
 
 - See `lms/urls.py` for the wirings of urls to views.
 
@@ -120,7 +118,7 @@ environments, defined in `cms/envs`.
 
 - javascript -- we use coffeescript, which compiles to js, and is much nicer to work with.  Look for `*.coffee` files.  We use _jasmine_ for testing js.
 
-- _mako_  -- we use this for templates, and have wrapper called mitxmako that makes mako look like the django templating calls.
+- _mako_  -- we use this for templates, and have wrapper called edxmako that makes mako look like the django templating calls.
 
 We use a fork of django-pipeline to make sure that the js and css always reflect the latest `*.coffee` and `*.sass` files (We're hoping to get our changes merged in the official version soon).  This works differently in development and production.  Test uses the production settings.
 

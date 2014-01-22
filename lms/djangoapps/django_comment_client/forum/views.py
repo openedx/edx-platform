@@ -8,7 +8,7 @@ from django.core.context_processors import csrf
 from django.contrib.auth.models import User
 import newrelic.agent
 
-from mitxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response
 from courseware.courses import get_course_with_access
 from course_groups.cohorts import (is_course_cohorted, get_cohort_id, is_commentable_cohorted,
                                    get_cohorted_commentables, get_course_cohorts, get_cohort_by_id)
@@ -248,13 +248,10 @@ def single_thread(request, course_id, discussion_id, thread_id):
         with newrelic.agent.FunctionTrace(nr_transaction, "get_annotated_content_infos"):
             annotated_content_info = utils.get_annotated_content_infos(course_id, thread, request.user, user_info=user_info)
         context = {'thread': thread.to_dict(), 'course_id': course_id}
-        # TODO: Remove completely or switch back to server side rendering
-        # html = render_to_string('discussion/_ajax_single_thread.html', context)
         content = utils.safe_content(thread.to_dict())
         with newrelic.agent.FunctionTrace(nr_transaction, "add_courseware_context"):
             add_courseware_context([content], course)
         return utils.JsonResponse({
-            #'html': html,
             'content': content,
             'annotated_content_info': annotated_content_info,
         })

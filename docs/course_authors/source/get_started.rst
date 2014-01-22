@@ -1,178 +1,193 @@
 
 .. image:: Images/image001.png
+ :width: 800  
 
+.. _Getting Started with Studio:
 
 ###########################
 Getting Started with Studio
 ###########################
 
-  
-************
-Introduction
-************
+***************
+Overview
+***************
 
-Since the launch of edX to our original partners, we have been working to provide opportunities for additional educators to create courses on our platform. The fruits of our efforts are Edge and Studio. These tools are available not only to our edX partners, but to all faculty at consortium universities.
+This chapter describes the tools you use to build an edX course, and how to create your first course:
 
-EdX (http://edx.org) is our original, premiere learning portal. Publication to
-edX is available on a limited basis, depending on your university’s agreement
-with edX. You need specific approval from your university to release your
-course on the edX portal. Once a course is released on the edX portal, it
-becomes a publicly available massively open online course (MOOC).
+* :ref:`What is Studio?`
+* :ref:`What is Edge?`
+* :ref:`Get Started on Edge`
+* :ref:`Use Studio on Edge`
+* :ref:`Create Your First Course`
+* :ref:`View Your Course on Edge`
+* :ref:`What is edX.org?`
+* :ref:`Register Your Course on edX.org`
 
+If you are using an instance of Open edX, some specifics in this chapter may not apply.
 
-Edge (http://edge.edx.org) is our newest online learning portal. It is almost identical to edX.org both visibly and functionally. 
+.. _What is Studio?:        
+            
+***************
+What is Studio?
+***************
 
-Edge is where you view the content you create with Studio, our course authoring
-tool. Courses on Edge cannot be seen publicly; rather, only you, your
-colleagues, and the students with whom you explicitly share a course link can
-see your course. Instructors are encouraged to use Edge to experiment with
-creating courses. You do not need approval to release a course on Edge--you can
-create a course and release it immediately.
+Studio is the edX tool you use to build your courses. 
 
+You use Studio to create course content, problems, videos, and other resources for students.
 
-Studio (http://studio.edge.edx.org) is our web-based course authoring tool. It is the easiest way for educators to develop courses for the edX platform. You can create courses in Studio and view and enroll in them instantly on Edge—even before you have finished creating the course.
+With Studio, you can also manage your schedule and course team, set grading policies, publish your course, and more.
 
-
-
-**There is a workflow to getting started.** Here is a quick summary:
-
-
-
-1. First, go to: https://studio.edge.edx.org. Sign up and create an account.
+You use Studio directly through your browser. You do not need any additional software.
 
 
-.. image:: Images/image009.png
- :width: 800  
+.. _What is Edge?: 
 
+******************
+What is Edge?
+******************
 
-**then**
+EdX Edge_ is the site where you can create courses with Studio, then run courses through the edX Learning Management System.
 
+EdX Edge_ is also used to host SPOCs, or Small Private Online Courses.
 
-2. Create a course in Studio.
+Visually and functionally, edX Edge is the same as edX.org_. 
+However, on Edge you can freely publish courses.  
+There is no course catalog on Edge and other users will not find your course. You must explicitly invite students to participate in your course.
 
+Courses on Edge are not published on edX.org. All course data and accounts on Edge and edX.org are separate.
 
-.. image:: Images/image021.png
- :width: 800
+To publish courses on edX.org, you must have an agreement with edX and specific approval from your university.
 
-
-**then**
-
-
-3. View your course on Edge.
-
-
-.. image:: Images/image027.png
- :width: 800
-
-.. raw:: latex
-  
-	\newpage %
-
-
-*****************
-Create an Account
-*****************
-
-To begin using Studio, create an account with a unique user ID and password. A Studio account isn't the same as an edX account. Even if you already have an edX account, you still need to create a separate Studio account. You can use the same e-mail address for both accounts.
-
-When you create your account on Studio, an account on Edge is automatically created using the same user name and password. You don't have to create separate accounts on Studio and Edge. 
-
-Edge has two views - an Instructor view and a Student view. When you view your course on Edge, you view your course as an instructor, and you see the **Instructor** tab at the top of the page.
-
-.. image:: Images/image007.png
- :width: 800
-    
-
-Your students will view your courses in Student view, which is similar to Instructor view, but does not include the Instructor tab or release dates. 
-
-To create an account:
-
-1. Go to http://studio.edge.edX.org. The Welcome to edX Studio page opens.
-
-.. image:: Images/image009.png
- :width: 800
+.. _Edge: http://edge.edx.org
+.. _edX.org: http://edx.org
 
    
-2. Scroll to the bottom of the page and click **Sign Up & Start Making an edX Course.**
+.. _Get Started on Edge:
+         
+*******************
+Get Started on Edge
+*******************
 
-.. image:: Images/image011.png
- :width: 800
+Go to https://edge.edx.org, click **Register**, and fill out required information to create your account.
 
- 
-3.  In the page that opens, fill in the fields. Required fields are marked with an asterisk (*).
+.. note::  Students will see your **Public Username**, not your **Full Name**.
 
+.. note::  If you are at an edX consortium university, you should use your institutional e-mail
+   address.
 
-.. image:: Images/image013.png
- :width: 800
+After you click \ **Create My Account**, you will receive an activation
+e-mail message. To finish creating your account, click the link in the e-mail.
 
- 
-a. In the **Email Address** box, type your e-mail address.
-b. In the **Password** box, type a unique password. 
-c. In the **Public Username** field, type the name you want students to see when you post on the user forum. Most websites call this the "user name". 
-d. In the **Full Name** box, type your full name. This name only appears in Studio. 
-   Your students will not see this name.
-e.  Click to select I agree to the Terms of Service.
+When you log in to Edge, you can view edX101_.	
 
-.. image:: Images/image017.png
- :width: 800
+edX101 is both an example of a course you can build with Studio, 
+and a self-paced walk through of planning, building, and running your own online course.	
 
-4. Click **Create My Account & Start Authoring Courses,** After you click this button, the following page opens. 
+.. _edX101: https://edge.edx.org/courses/edX/edX101/How_to_Create_an_edX_Course/about
 
-.. image:: Images/image015.png
- :width: 800
+.. _Use Studio on Edge:
 
-5. To finish creating your account, click the link that you receive in the activation e-mail. When you click this link, the following page opens.
+******************
+Use Studio on Edge
+******************
 
-.. image:: Images/image017.png
- :width: 800
+You can use Studio_ on Edge to build your own courses.
 
-.. raw:: latex
+Go to: https://studio.edge.edx.org. Sign in with the account you created on Edge.
+
+You must then request access to create courses:  
+
+#. Click the **+** sign to expand the field labeled **Becoming a Course Creator in Studio**.
+
+#. Click **Request the Ability to Create Courses**.
+
+EdX then evaluates your request. When course creation permissions are granted, you receive an email message.
+
+.. _Studio: https://studio.edge.edx.org
   
-	\newpage %
+.. _Create Your First Course:  
+  
+***************************
+Create Your First Course
+***************************
 
-*******************
-Create a New Course
-*******************
+When you receive notice that you can create courses, log into Studio_.
 
-The first time that you log in to Studio, the following page opens.
+You see the following page:
 
-.. image:: Images/image017.png
- :width: 800
- 
-Click the **dashboard** link, and the **My Courses** page opens. 
+.. image:: Images/first_course.png
+ :width: 800  
 
-.. image:: Images/image021.png
- :width: 800
+#. Click **Create Your First Course**.
+#. Enter course information as needed and click **Create**.
 
-Once you have created a course in Studio, it will be listed on this page. From here, you can start creating courses immediately by clicking the **New Course** button.
+  .. image:: Images/new_course_info.png
+     :width: 800
 
+  .. note::  Enter new course information carefully. This information becomes part of the URL for your course. To change the URL after the course is created, you must contact edX through the Help site (http://help.edge.edx.org). Additionally, because this information becomes part of your course URL, the total number of characters in the following three fields must be 65 or fewer.
 
-To create a new course:
+  * For **Course Name**, enter the title of your course. For example, the name may be “Sets, Maps and Symmetry Groups". Use title capitalization for the course title.
 
-1. Click **New Course.** A screen opens.
+  * For **Organization**, enter the name of your university. Do not include whitespace or special characters.
 
+  * For **Course Number**, enter both a subject abbreviation and a number. For example, for public health course number 207, enter **PH207**. For math course 101x, enter **Math101x**. Do not include whitespace or special characters in the course number.
 
-.. note::
+    *Note: If your course will be open to the world, be sure to include the "x". If it is exclusively an on-campus offering, do not include the "x".* 
 
-	Enter your new course information carefully. This information becomes part of the URL for your course. To change the URL after the course is created, you must contact edX through the Help site (http://help.edge.edx.org).Additionally, because this information becomes part of your course URL, the total number of characters in the following three fields must be 65 or fewer.
+3. Click **Save.**
 
+You then see the empty Course Outline.
 
-2. For **Course Name**, enter the title of your course. For example, the name may be “Sets, Maps and Symmetry Groups". Use title capitalization for the course title.
+In your browser’s address bar, notice that the URL of your course includes the course organization, number, and course run.
 
-3. For **Organization**, enter the name of your university. Do not include whitespace or special characters.
-
-4. For **Course Number**, enter both a subject abbreviation and a number. For example, for public health course number 207, enter "PH207". For math course 101x, enter “Math101x”. Do not include whitespace or special characters in the course number.
-
-   *Note: If your course will be open to the world, be sure to include the "x". If it is exclusively anon-campus offering, do not include the "x".* 
-
-5. Click **Save.**
-
-.. image:: Images/image025.png
- :width: 800
+The rest of this documentation describes how you now build and run your course. But first, lets view your empty course on Edge.
+  
+.. _View Your Course on Edge:
     
-If you click **View Live** your course appears as follows on Edge.
+************************
+View Your Course on Edge
+************************
+You can now view the course you just created, even though it doesn't have any content.
 
-.. image:: Images/image027.png
+In the Course Outline in Studio, click **View Live**. The course opens on Edge.
+
+You can also go directly to Edge_. Log in if prompted. You see the course you just created listed:
+
+.. image:: Images/new_course.png
  :width: 800
 
-*Note: Although the start date is set to the current date by default, your course will not be advertised, so it will not be visible to the general public. You can change the start date of your course in Studio.*
+You can view the course and see that there is no content yet.
+
+To build your course, keep reading this document.
+
+
+.. _What is edX.org?:
+
+*******************
+What is edX.org?
+*******************
+edX.org_ is the site where edX hosts MOOCs, or Massive Open Online Courses, that are created with our institutional partners. These courses are open to students from around the world.
+
+Courses on edX.org_ are listed publicly.
+
+To publish courses on edX.org, you must have an agreement with edX and specific approval from your university.
+
+
+
+.. _Register Your Course on edx.org:
+
+************************************
+Register Your Course on edX.org
+************************************
+
+If you're creating your course on **edX**, you must register
+for your course.
+
+#. On the **Course Outline** page, click the blue **View
+   Live** button in the upper-right corner of your screen.
+
+   Your course registration page opens in a new tab on the LMS.
+
+#. Click the blue **Register** button to register for your course.
+#. In your browser, switch back to the tab that shows Studio. You will
+   still be on the **Course Outline** page.

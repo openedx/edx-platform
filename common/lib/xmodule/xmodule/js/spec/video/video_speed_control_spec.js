@@ -12,7 +12,7 @@
 
     beforeEach(function() {
       oldOTBD = window.onTouchBasedDevice;
-      window.onTouchBasedDevice = jasmine.createSpy('onTouchBasedDevice').andReturn(false);
+      window.onTouchBasedDevice = jasmine.createSpy('onTouchBasedDevice').andReturn(null);
     });
 
 
@@ -48,7 +48,7 @@
             'role': 'button',
             'title': 'Speeds',
             'aria-disabled': 'false'
-          }); 
+          });
         });
 
         it('bind to change video speed link', function() {
@@ -57,16 +57,12 @@
       });
 
       describe('when running on touch based device', function() {
-        beforeEach(function() {
-          window.onTouchBasedDevice.andReturn(true);
-          initialize();
-        });
-
-        it('open the speed toggle on click', function() {
-          $('.speeds').click();
-          expect($('.speeds')).toHaveClass('open');
-          $('.speeds').click();
-          expect($('.speeds')).not.toHaveClass('open');
+        $.each(['iPad', 'Android'], function(index, device) {
+          it('is not rendered on' + device, function() {
+            window.onTouchBasedDevice.andReturn([device]);
+            initialize();
+            expect(state.el.find('div.speeds')).not.toExist();
+          });
         });
       });
 
@@ -96,7 +92,7 @@
         // 2. Speed anchor
         // 3. A number of speed entry anchors
         // 4. Volume anchor
-        // If an other focusable element is inserted or if the order is changed, things will 
+        // If another focusable element is inserted or if the order is changed, things will
         // malfunction as a flag, state.previousFocus, is set in the 1,3,4 elements and is
         // used to determine the behavior of foucus() and blur() for the speed anchor.
         it('checks for a certain order in focusable elements in video controls', function() {

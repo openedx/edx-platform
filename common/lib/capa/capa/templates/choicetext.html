@@ -55,7 +55,7 @@
                 % else:
                     <% my_id = content_node.get('contents','') %>
                     <% my_val = value.get(my_id,'') %>
-                    <input class="ctinput" type="text" name="${content_node['contents']}" id="${content_node['contents']}" value="${my_val|h} "/>
+                    <input class="ctinput" type="text" name="${content_node['contents']}" id="${content_node['contents']}" value="${my_val|h}"/>
                 %endif
                 <span class="mock_label">
                     ${content_node['tail_text']}

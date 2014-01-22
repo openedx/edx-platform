@@ -8,11 +8,23 @@ function () {
 
     // VideoVolumeControl() function - what this module "exports".
     return function (state) {
+        var dfd = $.Deferred();
+
+        if (state.isTouch) {
+            // iOS doesn't support volume change
+            state.el.find('div.volume').remove();
+            dfd.resolve();
+            return dfd.promise();
+        }
+
         state.videoVolumeControl = {};
 
         _makeFunctionsPublic(state);
         _renderElements(state);
         _bindHandlers(state);
+
+        dfd.resolve();
+        return dfd.promise();
     };
 
     // ***************************************************************
@@ -38,59 +50,68 @@ function () {
     //     make the created DOM elements available via the 'state' object. Much easier to work this
     //     way - you don't have to do repeated jQuery element selects.
     function _renderElements(state) {
-        state.videoVolumeControl.el = state.el.find('div.volume');
+        var volumeControl = state.videoVolumeControl,
+            element = state.el.find('div.volume'),
+            button = element.find('a'),
+            volumeSlider = element.find('.volume-slider'),
+            // Figure out what the current volume is. If no information about
+            // volume level could be retrieved, then we will use the default 100
+            // level (full volume).
+            currentVolume = parseInt($.cookie('video_player_volume_level'), 10),
+            // Set it up so that muting/unmuting works correctly.
+            previousVolume = 100,
+            slider, buttonStr, volumeSliderHandleEl;
 
-        state.videoVolumeControl.buttonEl = state.videoVolumeControl.el.find('a');
-        state.videoVolumeControl.volumeSliderEl = state.videoVolumeControl.el.find('.volume-slider');
+        state.videoControl.secondaryControlsEl.prepend(element);
 
-        state.videoControl.secondaryControlsEl.prepend(state.videoVolumeControl.el);
-
-        // Figure out what the current volume is. If no information about volume level could be retrieved,
-        // then we will use the default 100 level (full volume).
-        state.videoVolumeControl.currentVolume = parseInt($.cookie('video_player_volume_level'), 10);
-        if (!isFinite(state.videoVolumeControl.currentVolume)) {
-            state.videoVolumeControl.currentVolume = 100;
+        if (!isFinite(currentVolume)) {
+            currentVolume = 100;
         }
 
-        // Set it up so that muting/unmuting works correctly.
-        state.videoVolumeControl.previousVolume = 100;
-
-        state.videoVolumeControl.slider = state.videoVolumeControl.volumeSliderEl.slider({
+        slider = volumeSlider.slider({
             orientation: 'vertical',
             range: 'min',
             min: 0,
             max: 100,
-            value: state.videoVolumeControl.currentVolume,
-            change: state.videoVolumeControl.onChange,
-            slide: state.videoVolumeControl.onChange
+            value: currentVolume,
+            change: volumeControl.onChange,
+            slide: volumeControl.onChange
         });
 
-        state.videoVolumeControl.el.toggleClass('muted', state.videoVolumeControl.currentVolume === 0);
+        element.toggleClass('muted', currentVolume === 0);
 
         // ARIA
         // Let screen readers know that:
-
         // This anchor behaves as a button named 'Volume'.
-        var currentVolume = state.videoVolumeControl.currentVolume,
-            buttonStr = (currentVolume === 0) ? 'Volume muted' : 'Volume';
+        buttonStr = (currentVolume === 0) ? 'Volume muted' : 'Volume';
         // We add the aria-label attribute because the title attribute cannot be
         // read.
-        state.videoVolumeControl.buttonEl.attr('aria-label', gettext(buttonStr));
+        button.attr('aria-label', gettext(buttonStr));
 
         // Let screen readers know that this anchor, representing the slider
         // handle, behaves as a slider named 'volume'.
-        var volumeSlider = state.videoVolumeControl.slider;
-        state.videoVolumeControl.volumeSliderHandleEl = state.videoVolumeControl
-                                                             .volumeSliderEl
-                                                             .find('.ui-slider-handle');
-        state.videoVolumeControl.volumeSliderHandleEl.attr({
+        volumeSliderHandleEl = slider.find('.ui-slider-handle');
+
+        volumeSliderHandleEl.attr({
             'role': 'slider',
             'title': 'volume',
             'aria-disabled': false,
-            'aria-valuemin': volumeSlider.slider('option', 'min'),
-            'aria-valuemax': volumeSlider.slider('option', 'max'),
-            'aria-valuenow': volumeSlider.slider('option', 'value'),
-            'aria-valuetext': getVolumeDescription(volumeSlider.slider('option', 'value'))
+            'aria-valuemin': slider.slider('option', 'min'),
+            'aria-valuemax': slider.slider('option', 'max'),
+            'aria-valuenow': slider.slider('option', 'value'),
+            'aria-valuetext': getVolumeDescription(slider.slider('option', 'value'))
+        });
+
+
+        state.currentVolume = currentVolume;
+        $.extend(state.videoVolumeControl, {
+            el: element,
+            buttonEl: button,
+            volumeSliderEl: volumeSlider,
+            currentVolume: currentVolume,
+            previousVolume: previousVolume,
+            slider: slider,
+            volumeSliderHandleEl: volumeSliderHandleEl
         });
     }
 

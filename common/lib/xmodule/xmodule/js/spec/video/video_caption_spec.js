@@ -15,7 +15,7 @@
         beforeEach(function () {
             oldOTBD = window.onTouchBasedDevice;
             window.onTouchBasedDevice = jasmine.createSpy('onTouchBasedDevice')
-                .andReturn(false);
+                .andReturn(null);
             initialize();
         });
 
@@ -175,7 +175,7 @@
 
             describe('when on a touch-based device', function () {
                 beforeEach(function () {
-                    window.onTouchBasedDevice.andReturn(true);
+                    window.onTouchBasedDevice.andReturn(['iPad']);
                     initialize();
                 });
 
@@ -209,34 +209,15 @@
         });
 
         describe('mouse movement', function () {
-            // We will store default window.setTimeout() function here.
-            var oldSetTimeout = null;
-
             beforeEach(function () {
-                // Store original window.setTimeout() function. If we do not do
-                // this, then all other tests that rely on code which uses
-                // window.setTimeout() function might (and probably will) fail.
-                oldSetTimeout = window.setTimeout;
-                // Redefine window.setTimeout() function as a spy.
-                window.setTimeout = jasmine.createSpy().andCallFake(
-                    function (callback, timeout) {
-                        return 5;
-                    }
-                );
-                window.setTimeout.andReturn(100);
+                jasmine.Clock.useMock();
                 spyOn(window, 'clearTimeout');
-            });
-
-            afterEach(function () {
-                // Reset the default window.setTimeout() function. If we do not
-                // do this, then all other tests that rely on code which uses
-                // window.setTimeout() function might (and probably will) fail.
-                window.setTimeout = oldSetTimeout;
             });
 
             describe('when cursor is outside of the caption box', function () {
                 beforeEach(function () {
                     $(window).trigger(jQuery.Event('mousemove'));
+                    jasmine.Clock.tick(state.config.captionsFreezeTime);
                 });
 
                 it('does not set freezing timeout', function () {
@@ -246,11 +227,14 @@
 
             describe('when cursor is in the caption box', function () {
                 beforeEach(function () {
+                    spyOn(videoCaption, 'onMouseLeave');
                     $('.subtitles').trigger(jQuery.Event('mouseenter'));
+                    jasmine.Clock.tick(state.config.captionsFreezeTime);
                 });
 
                 it('set the freezing timeout', function () {
-                    expect(videoCaption.frozen).toEqual(100);
+                    expect(videoCaption.frozen).not.toBeFalsy();
+                    expect(videoCaption.onMouseLeave).toHaveBeenCalled();
                 });
 
                 describe('when the cursor is moving', function () {
@@ -259,7 +243,7 @@
                     });
 
                     it('reset the freezing timeout', function () {
-                        expect(window.clearTimeout).toHaveBeenCalledWith(100);
+                        expect(window.clearTimeout).toHaveBeenCalled();
                     });
                 });
 
@@ -269,7 +253,7 @@
                     });
 
                     it('reset the freezing timeout', function () {
-                        expect(window.clearTimeout).toHaveBeenCalledWith(100);
+                        expect(window.clearTimeout).toHaveBeenCalled();
                     });
                 });
             });
@@ -337,7 +321,7 @@
         describe('play', function () {
             describe('when the caption was not rendered', function () {
                 beforeEach(function () {
-                    window.onTouchBasedDevice.andReturn(true);
+                    window.onTouchBasedDevice.andReturn(['iPad']);
                     initialize();
                     videoCaption.play();
                 });
@@ -456,7 +440,7 @@
                     expect(videoCaption.currentIndex).toEqual(5);
                 });
 
-                // Disabled 10/25/13 due to flakiness in master
+                // Disabled 11/25/13 due to flakiness in master
                 xit('scroll caption to new position', function () {
                     expect($.fn.scrollTo).toHaveBeenCalled();
                 });
@@ -537,7 +521,7 @@
             });
         });
 
-        // Disabled 10/23/13 due to flakiness in master
+        // Disabled 11/25/13 due to flakiness in master
         xdescribe('scrollCaption', function () {
             beforeEach(function () {
                 initialize();
@@ -682,7 +666,7 @@
                         .toHaveAttr('title', 'Turn off captions');
                 });
 
-                // Test turned off due to flakiness (30.10.2013).
+                // Test turned off due to flakiness (11/25/13)
                 xit('scroll the caption', function () {
                     // After transcripts are shown, and the video plays for a
                     // bit.

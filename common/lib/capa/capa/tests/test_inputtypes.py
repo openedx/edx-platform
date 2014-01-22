@@ -92,6 +92,7 @@ class ChoiceGroupTest(unittest.TestCase):
     <choice correct="false" name="foil1"><text>This is foil One.</text></choice>
     <choice correct="false" name="foil2"><text>This is foil Two.</text></choice>
     <choice correct="true" name="foil3">This is foil Three.</choice>
+    <choice correct="false" name="foil4">This is <b>foil</b> Four.</choice>
   </{tag}>
         """.format(tag=tag)
 
@@ -114,7 +115,8 @@ class ChoiceGroupTest(unittest.TestCase):
             'input_type': expected_input_type,
             'choices': [('foil1', '<text>This is foil One.</text>'),
                         ('foil2', '<text>This is foil Two.</text>'),
-                        ('foil3', 'This is foil Three.'), ],
+                        ('foil3', 'This is foil Three.'),
+                        ('foil4', 'This is <b>foil</b> Four.'), ],
             'show_correctness': 'always',
             'submitted_message': 'Answer received.',
             'name_array_suffix': expected_suffix,   # what is this for??

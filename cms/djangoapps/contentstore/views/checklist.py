@@ -5,9 +5,8 @@ from util.json_request import JsonResponse
 from django.http import HttpResponseBadRequest
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
-from django.core.urlresolvers import reverse
 from django_future.csrf import ensure_csrf_cookie
-from mitxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response
 from django.http import HttpResponseNotFound
 from django.core.exceptions import PermissionDenied
 from xmodule.modulestore.django import loc_mapper
@@ -22,10 +21,12 @@ from xmodule.modulestore.locator import BlockUsageLocator
 
 __all__ = ['checklists_handler']
 
+
+# pylint: disable=unused-argument
 @require_http_methods(("GET", "POST", "PUT"))
 @login_required
 @ensure_csrf_cookie
-def checklists_handler(request, tag=None, course_id=None, branch=None, version_guid=None, block=None, checklist_index=None):
+def checklists_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None, checklist_index=None):
     """
     The restful handler for checklists.
 
@@ -35,7 +36,7 @@ def checklists_handler(request, tag=None, course_id=None, branch=None, version_g
     POST or PUT
         json: updates the checked state for items within a particular checklist. checklist_index is required.
     """
-    location = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
+    location = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
     if not has_access(request.user, location):
         raise PermissionDenied()
 
@@ -85,8 +86,8 @@ def checklists_handler(request, tag=None, course_id=None, branch=None, version_g
             return JsonResponse(expanded_checklist)
         else:
             return HttpResponseBadRequest(
-                ( "Could not save checklist state because the checklist index "
-                  "was out of range or unspecified."),
+                ("Could not save checklist state because the checklist index "
+                 "was out of range or unspecified."),
                 content_type="text/plain"
             )
     else:
@@ -113,14 +114,12 @@ def expand_checklist_action_url(course_module, checklist):
     The method does a copy of the input checklist and does not modify the input argument.
     """
     expanded_checklist = copy.deepcopy(checklist)
-    oldurlconf_map = {
-        "SettingsDetails": "settings_details",
-        "SettingsGrading": "settings_grading"
-    }
 
     urlconf_map = {
         "ManageUsers": "course_team",
-        "CourseOutline": "course"
+        "CourseOutline": "course",
+        "SettingsDetails": "settings/details",
+        "SettingsGrading": "settings/grading",
     }
 
     for item in expanded_checklist.get('items'):
@@ -130,12 +129,5 @@ def expand_checklist_action_url(course_module, checklist):
             ctx_loc = course_module.location
             location = loc_mapper().translate_location(ctx_loc.course_id, ctx_loc, False, True)
             item['action_url'] = location.url_reverse(url_prefix, '')
-        elif action_url in oldurlconf_map:
-            urlconf_name = oldurlconf_map[action_url]
-            item['action_url'] = reverse(urlconf_name, kwargs={
-                'org': course_module.location.org,
-                'course': course_module.location.course,
-                'name': course_module.location.name,
-            })
 
     return expanded_checklist

@@ -14,7 +14,6 @@ from django.conf import settings
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django_future.csrf import ensure_csrf_cookie
-from django.core.urlresolvers import reverse
 from django.core.servers.basehttp import FileWrapper
 from django.core.files.temp import NamedTemporaryFile
 from django.core.exceptions import SuspiciousOperation, PermissionDenied
@@ -22,7 +21,7 @@ from django.http import HttpResponseNotFound
 from django.views.decorators.http import require_http_methods, require_GET
 from django.utils.translation import ugettext as _
 
-from mitxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response
 from auth.authz import create_all_course_groups
 
 from xmodule.modulestore.xml_importer import import_from_xml
@@ -51,7 +50,7 @@ CONTENT_RE = re.compile(r"(?P<start>\d{1,11})-(?P<stop>\d{1,11})/(?P<end>\d{1,11
 @login_required
 @ensure_csrf_cookie
 @require_http_methods(("GET", "POST", "PUT"))
-def import_handler(request, tag=None, course_id=None, branch=None, version_guid=None, block=None):
+def import_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None):
     """
     The restful handler for importing a course.
 
@@ -61,7 +60,7 @@ def import_handler(request, tag=None, course_id=None, branch=None, version_guid=
     POST or PUT
         json: import a course via the .tar.gz file specified in request.FILES
     """
-    location = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
+    location = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
     if not has_access(request.user, location):
         raise PermissionDenied()
 
@@ -140,7 +139,7 @@ def import_handler(request, tag=None, course_id=None, branch=None, version_guid=
                                   "size": size,
                                   "deleteUrl": "",
                                   "deleteType": "",
-                                  "url": location.url_reverse('import/', ''),
+                                  "url": location.url_reverse('import'),
                                   "thumbnailUrl": ""
                               }]
                 })
@@ -149,7 +148,7 @@ def import_handler(request, tag=None, course_id=None, branch=None, version_guid=
 
                 # Use sessions to keep info about import progress
                 session_status = request.session.setdefault("import_status", {})
-                key = location.course_id + filename
+                key = location.package_id + filename
                 session_status[key] = 1
                 request.session.modified = True
 
@@ -252,8 +251,8 @@ def import_handler(request, tag=None, course_id=None, branch=None, version_guid=
         course_module = modulestore().get_item(old_location)
         return render_to_response('import.html', {
             'context_course': course_module,
-            'successful_import_redirect_url': location.url_reverse("course/", ""),
-            'import_status_url': location.url_reverse("import_status/", "fillerName"),
+            'successful_import_redirect_url': location.url_reverse("course"),
+            'import_status_url': location.url_reverse("import_status", "fillerName"),
         })
     else:
         return HttpResponseNotFound()
@@ -262,7 +261,7 @@ def import_handler(request, tag=None, course_id=None, branch=None, version_guid=
 @require_GET
 @ensure_csrf_cookie
 @login_required
-def import_status_handler(request, tag=None, course_id=None, branch=None, version_guid=None, block=None, filename=None):
+def import_status_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None, filename=None):
     """
     Returns an integer corresponding to the status of a file import. These are:
 
@@ -272,13 +271,13 @@ def import_status_handler(request, tag=None, course_id=None, branch=None, versio
         3 : Importing to mongo
 
     """
-    location = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
+    location = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
     if not has_access(request.user, location):
         raise PermissionDenied()
 
     try:
         session_status = request.session["import_status"]
-        status = session_status[location.course_id + filename]
+        status = session_status[location.package_id + filename]
     except KeyError:
         status = 0
 
@@ -288,7 +287,7 @@ def import_status_handler(request, tag=None, course_id=None, branch=None, versio
 @ensure_csrf_cookie
 @login_required
 @require_http_methods(("GET",))
-def export_handler(request, tag=None, course_id=None, branch=None, version_guid=None, block=None):
+def export_handler(request, tag=None, package_id=None, branch=None, version_guid=None, block=None):
     """
     The restful handler for exporting a course.
 
@@ -303,7 +302,7 @@ def export_handler(request, tag=None, course_id=None, branch=None, version_guid=
     If the tar.gz file has been requested but the export operation fails, an HTML page will be returned
     which describes the error.
     """
-    location = BlockUsageLocator(course_id=course_id, branch=branch, version_guid=version_guid, usage_id=block)
+    location = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
     if not has_access(request.user, location):
         raise PermissionDenied()
 
@@ -313,7 +312,7 @@ def export_handler(request, tag=None, course_id=None, branch=None, version_guid=
     # an _accept URL parameter will be preferred over HTTP_ACCEPT in the header.
     requested_format = request.REQUEST.get('_accept', request.META.get('HTTP_ACCEPT', 'text/html'))
 
-    export_url = location.url_reverse('export/', '') + '?_accept=application/x-tgz'
+    export_url = location.url_reverse('export') + '?_accept=application/x-tgz'
     if 'application/x-tgz' in requested_format:
         name = old_location.name
         export_file = NamedTemporaryFile(prefix=name + '.', suffix=".tar.gz")
@@ -339,16 +338,16 @@ def export_handler(request, tag=None, course_id=None, branch=None, version_guid=
                 # if we have a nested exception, then we'll show the more generic error message
                 pass
 
+            unit_locator = loc_mapper().translate_location(old_location.course_id, parent.location, False, True)
+
             return render_to_response('export.html', {
                 'context_course': course_module,
                 'in_err': True,
                 'raw_err_msg': str(e),
                 'failed_module': failed_item,
                 'unit': unit,
-                'edit_unit_url': reverse('edit_unit', kwargs={
-                    'location': parent.location
-                }) if parent else '',
-                'course_home_url': location.url_reverse("course/", ""),
+                'edit_unit_url': unit_locator.url_reverse("unit") if parent else "",
+                'course_home_url': location.url_reverse("course"),
                 'export_url': export_url
 
             })
@@ -359,7 +358,7 @@ def export_handler(request, tag=None, course_id=None, branch=None, version_guid=
                 'in_err': True,
                 'unit': None,
                 'raw_err_msg': str(e),
-                'course_home_url': location.url_reverse("course/", ""),
+                'course_home_url': location.url_reverse("course"),
                 'export_url': export_url
             })
 
