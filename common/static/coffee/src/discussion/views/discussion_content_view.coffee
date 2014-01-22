@@ -4,8 +4,8 @@ if Backbone?
   
     events:
       "click .discussion-flag-abuse": "toggleFlagAbuse"
-      "keypress .discussion-flag-abuse":
-        (event) -> DiscussionUtil.activateOnEnter(event, toggleFlagAbuse)
+      "keydown .discussion-flag-abuse":
+        (event) -> DiscussionUtil.activateOnSpace(event, @toggleFlagAbuse)
   
     attrRenderer:
       endorsed: (endorsed) ->
@@ -107,7 +107,7 @@ if Backbone?
       @model.bind('change', @renderPartialAttrs, @)
       
      
-    toggleFollowing: (event) ->
+    toggleFollowing: (event) =>
       event.preventDefault()
       $elem = $(event.target)
       url = null
@@ -122,14 +122,14 @@ if Backbone?
         url: url
         type: "POST"
 
-    toggleFlagAbuse: (event) ->
+    toggleFlagAbuse: (event) =>
       event.preventDefault()
       if window.user.id in @model.get("abuse_flaggers") or (DiscussionUtil.isFlagModerator and @model.get("abuse_flaggers").length > 0)
         @unFlagAbuse()
       else
         @flagAbuse()
       
-    flagAbuse: ->
+    flagAbuse: =>
       url = @model.urlFor("flagAbuse")
       DiscussionUtil.safeAjax
         $elem: @$(".discussion-flag-abuse")
@@ -144,7 +144,7 @@ if Backbone?
             temp_array.push(window.user.id)
             @model.set('abuse_flaggers', temp_array)      
        
-    unFlagAbuse: ->
+    unFlagAbuse: =>
       url = @model.urlFor("unFlagAbuse")
       DiscussionUtil.safeAjax
         $elem: @$(".discussion-flag-abuse")

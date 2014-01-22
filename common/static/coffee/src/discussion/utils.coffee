@@ -88,8 +88,8 @@ class @DiscussionUtil
       "notifications_status" : "/notification_prefs/status/"
     }[name]
 
-  @activateOnEnter: (event, func) ->
-    if event.which == 13
+  @activateOnSpace: (event, func) ->
+    if event.which == 32
       event.preventDefault()
       func(event)
 

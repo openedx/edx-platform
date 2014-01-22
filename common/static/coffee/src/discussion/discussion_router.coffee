@@ -16,6 +16,7 @@ if Backbone?
         @nav.on "thread:created", @navigateToThread
         @newPost = $('.new-post-article')
         $('.new-post-btn').bind "click", @showNewPost
+        $('.new-post-btn').bind "keydown", (event) => DiscussionUtil.activateOnSpace(event, @showNewPost)
         $('.new-post-cancel').bind "click", @hideNewPost
 
     allThreads: ->
