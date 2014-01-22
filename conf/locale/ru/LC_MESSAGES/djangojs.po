@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
-"POT-Creation-Date: 2013-11-29 18:37+0400\n"
+"POT-Creation-Date: 2013-12-13 16:02+0400\n"
 "PO-Revision-Date: 2013-11-29 19:05+0300\n"
 "Last-Translator: Lenar Safin <safin@smartdec.ru>\n"
 "Language-Team: Select LTD\n"
@@ -383,7 +383,7 @@ msgstr "Файлы должны быть в формате PNG или JPEG."
 
 #: common/lib/xmodule/xmodule/js/spec/combinedopenended/display_spec.js:132
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:462
-#: common/static/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:462
+#: common/static/xmodule/modules/js/001-c354e493a5405415b7bc67022aa6a090.js:462
 #: lms/static/coffee/src/staff_grading/staff_grading.js:468
 msgid "Submit"
 msgstr "Отправить"
@@ -413,32 +413,32 @@ msgid "Status: unsubmitted"
 msgstr "Статус: не сдан"
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:351
-#: common/static/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:351
+#: common/static/xmodule/modules/js/001-c354e493a5405415b7bc67022aa6a090.js:351
 msgid "The problem state got out of sync.  Try reloading the page."
 msgstr ""
 "Состояние задачи не синхронизированно. Попробуйте перезагрузить страницу."
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:413
-#: common/static/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:413
+#: common/static/xmodule/modules/js/001-c354e493a5405415b7bc67022aa6a090.js:413
 msgid "You need to pick a rating before you can submit."
 msgstr "Вы должны выбрать оценки до того как вы сможете посылать результат"
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:458
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:747
-#: common/static/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:458
-#: common/static/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:747
+#: common/static/xmodule/modules/js/001-c354e493a5405415b7bc67022aa6a090.js:458
+#: common/static/xmodule/modules/js/001-c354e493a5405415b7bc67022aa6a090.js:747
 msgid "Your score did not meet the criteria to move to the next step."
 msgstr ""
 "Ваши оценки не соответствуют критериям для того что приступить к следующему "
 "этапу."
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:471
-#: common/static/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:471
+#: common/static/xmodule/modules/js/001-c354e493a5405415b7bc67022aa6a090.js:471
 msgid "Submit assessment"
 msgstr "Отправить задание"
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:478
-#: common/static/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:478
+#: common/static/xmodule/modules/js/001-c354e493a5405415b7bc67022aa6a090.js:478
 msgid ""
 "Your response has been submitted.  Please check back later for your grade."
 msgstr ""
@@ -446,17 +446,17 @@ msgstr ""
 "оценки."
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:489
-#: common/static/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:489
+#: common/static/xmodule/modules/js/001-c354e493a5405415b7bc67022aa6a090.js:489
 msgid "Submit post-assessment"
 msgstr "Отправить ответ"
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:532
-#: common/static/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:532
+#: common/static/xmodule/modules/js/001-c354e493a5405415b7bc67022aa6a090.js:532
 msgid "Answer saved, but not yet submitted."
 msgstr "Ваш ответ сохранен, но еще не отправлен."
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:563
-#: common/static/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:563
+#: common/static/xmodule/modules/js/001-c354e493a5405415b7bc67022aa6a090.js:563
 msgid ""
 "Please confirm that you wish to submit your work. You will not be able to "
 "make any changes after submitting."
@@ -465,18 +465,18 @@ msgstr ""
 "вносить какие-либо изменения после отправки."
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:699
-#: common/static/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:699
+#: common/static/xmodule/modules/js/001-c354e493a5405415b7bc67022aa6a090.js:699
 msgid ""
 "Are you sure you want to remove your previous response to this question?"
 msgstr "Вы уверены, что хотите удалить предыдущий ответ на этот вопрос?"
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:745
-#: common/static/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:745
+#: common/static/xmodule/modules/js/001-c354e493a5405415b7bc67022aa6a090.js:745
 msgid "Moved to next step."
 msgstr "Перейти к следующему шагу."
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:803
-#: common/static/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:803
+#: common/static/xmodule/modules/js/001-c354e493a5405415b7bc67022aa6a090.js:803
 msgid ""
 "File uploads are required for this question, but are not supported in this "
 "browser. Try the newest version of google chrome.  Alternatively, if you "
@@ -491,27 +491,29 @@ msgstr ""
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:841
 #: common/lib/xmodule/xmodule/js/src/peergrading/peer_grading_problem.js:631
 #: common/lib/xmodule/xmodule/js/src/peergrading/peer_grading_problem.js:640
-#: common/static/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:832
-#: common/static/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:841
+#: common/static/xmodule/modules/js/001-c354e493a5405415b7bc67022aa6a090.js:832
+#: common/static/xmodule/modules/js/001-c354e493a5405415b7bc67022aa6a090.js:841
 #: common/static/xmodule/modules/js/002-0b45725241efee6f326eaed444398070.js:631
 #: common/static/xmodule/modules/js/002-0b45725241efee6f326eaed444398070.js:640
 msgid "Hide Question"
 msgstr "Скрыть задание"
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:833
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:905
 #: common/lib/xmodule/xmodule/js/src/peergrading/peer_grading_problem.js:632
-#: common/static/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:833
+#: common/static/xmodule/modules/js/001-c354e493a5405415b7bc67022aa6a090.js:833
+#: common/static/xmodule/modules/js/001-c354e493a5405415b7bc67022aa6a090.js:905
 #: common/static/xmodule/modules/js/002-0b45725241efee6f326eaed444398070.js:632
 msgid "Show Question"
 msgstr "Показать задание"
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:912
-#: common/static/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:912
+#: common/static/xmodule/modules/js/001-c354e493a5405415b7bc67022aa6a090.js:912
 msgid "See full feedback"
 msgstr "Посмотреть полную обратную связь"
 
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:914
-#: common/static/xmodule/modules/js/001-a03f4157d01d9689432f68c91a91b6e5.js:914
+#: common/static/xmodule/modules/js/001-c354e493a5405415b7bc67022aa6a090.js:914
 msgid "Respond to Feedback"
 msgstr "Ответить на обратную связь"
 
