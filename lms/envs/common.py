@@ -1153,14 +1153,21 @@ if FEATURES.get('AUTH_USE_CAS'):
 
 ###################### Registration ##################################
 
-# Remove some of the fields from the list to not display them
-REGISTRATION_OPTIONAL_FIELDS = set([
-    'level_of_education',
-    'gender',
-    'year_of_birth',
-    'mailing_address',
-    'goals',
-])
+# For each of the fields, give one of the following values:
+# - 'required': to display the field, and make it mandatory
+# - 'optional': to display the field, and make it non-mandatory
+# - 'hidden': to not display the field
+
+REGISTRATION_EXTRA_FIELDS = {
+    'level_of_education': 'optional',
+    'gender': 'optional',
+    'year_of_birth': 'optional',
+    'mailing_address': 'optional',
+    'goals': 'optional',
+    'honor_code': 'required',
+    'city': 'hidden',
+    'country': 'hidden',
+}
 
 ###################### Grade Downloads ######################
 GRADES_DOWNLOAD_ROUTING_KEY = HIGH_MEM_QUEUE

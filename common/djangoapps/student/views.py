@@ -825,6 +825,8 @@ def _do_create_account(post_vars):
     profile.level_of_education = post_vars.get('level_of_education')
     profile.gender = post_vars.get('gender')
     profile.mailing_address = post_vars.get('mailing_address')
+    profile.city = post_vars.get('city')
+    profile.country = post_vars.get('country')
     profile.goals = post_vars.get('goals')
 
     try:
@@ -849,6 +851,7 @@ def create_account(request, post_override=None):
     js = {'success': False}
 
     post_vars = post_override if post_override else request.POST
+    extra_fields = getattr(settings, 'REGISTRATION_EXTRA_FIELDS', {})
 
     # if doing signup for an external authorization, then get email, password, name from the eamap
     # don't use the ones from the form, since the user could have hacked those
@@ -877,18 +880,23 @@ def create_account(request, post_override=None):
             js['field'] = a
             return HttpResponse(json.dumps(js))
 
-    if post_vars.get('honor_code', 'false') != u'true':
+    if extra_fields.get('honor_code', 'required') == 'required' and \
+            post_vars.get('honor_code', 'false') != u'true':
         js['value'] = _("To enroll, you must follow the honor code.").format(field=a)
         js['field'] = 'honor_code'
         return HttpResponse(json.dumps(js))
 
     # Can't have terms of service for certain SHIB users, like at Stanford
-    tos_not_required = (settings.FEATURES.get("AUTH_USE_SHIB") and
-                        settings.FEATURES.get('SHIB_DISABLE_TOS') and
-                        DoExternalAuth and
-                        eamap.external_domain.startswith(external_auth.views.SHIBBOLETH_DOMAIN_PREFIX))
+    tos_required = (
+        not settings.FEATURES.get("AUTH_USE_SHIB") or
+        not settings.FEATURES.get("SHIB_DISABLE_TOS") or
+        not DoExternalAuth or
+        not eamap.external_domain.startswith(
+            external_auth.views.SHIBBOLETH_DOMAIN_PREFIX
+        )
+    )
 
-    if not tos_not_required:
+    if tos_required:
         if post_vars.get('terms_of_service', 'false') != u'true':
             js['value'] = _("You must accept the terms of service.").format(field=a)
             js['field'] = 'terms_of_service'
@@ -900,20 +908,36 @@ def create_account(request, post_override=None):
     # this is a good idea
     # TODO: Check password is sane
 
-    required_post_vars = ['username', 'email', 'name', 'password', 'terms_of_service', 'honor_code']
-    if tos_not_required:
-        required_post_vars = ['username', 'email', 'name', 'password', 'honor_code']
+    required_post_vars = ['username', 'email', 'name', 'password']
+    required_post_vars += [fieldname for fieldname, val in extra_fields.items()
+                           if val == 'required']
+    if tos_required:
+        required_post_vars.append('terms_of_service')
 
-    for a in required_post_vars:
-        if len(post_vars[a]) < 2:
-            error_str = {'username': 'Username must be minimum of two characters long.',
-                         'email': 'A properly formatted e-mail is required.',
-                         'name': 'Your legal name must be a minimum of two characters long.',
-                         'password': 'A valid password is required.',
-                         'terms_of_service': 'Accepting Terms of Service is required.',
-                         'honor_code': 'Agreeing to the Honor Code is required.'}
-            js['value'] = error_str[a]
-            js['field'] = a
+    for field_name in required_post_vars:
+        if field_name in ('gender', 'level_of_education'):
+            min_length = 1
+        else:
+            min_length = 2
+
+        if len(post_vars[field_name]) < min_length:
+            error_str = {
+                'username': _('Username must be minimum of two characters long.'),
+                'email': _('A properly formatted e-mail is required.'),
+                'name': _('Your legal name must be a minimum of two characters long.'),
+                'password': _('A valid password is required.'),
+                'terms_of_service': _('Accepting Terms of Service is required.'),
+                'honor_code': _('Agreeing to the Honor Code is required.'),
+                'level_of_education': _('A level of education is required.'),
+                'gender': _('Your gender is required'),
+                'year_of_birth': _('Your year of birth is required'),
+                'mailing_address': _('Your mailing address is required'),
+                'goals': _('A description of your goals is required'),
+                'city': _('A city is required'),
+                'country': _('A country is required')
+            }
+            js['value'] = error_str[field_name]
+            js['field'] = field_name
             return HttpResponse(json.dumps(js))
 
     try:

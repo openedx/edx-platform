@@ -59,7 +59,7 @@
 
         <div class="input-group">
 
-          % if 'level_of_education' in settings.REGISTRATION_OPTIONAL_FIELDS:
+          % if settings.REGISTRATION_EXTRA_FIELDS['level_of_education'] != 'hidden':
           <section class="citizenship">
             <label data-field="level_of_education" for="signup_ed_level">${_("Ed. Completed")}</label>
             <div class="input-wrapper">
@@ -73,7 +73,7 @@
           </section>
           % endif
 
-          % if 'gender' in settings.REGISTRATION_OPTIONAL_FIELDS:
+          % if settings.REGISTRATION_EXTRA_FIELDS['gender'] != 'hidden':
           <section class="gender">
             <label data-field="gender" for="signup_gender">${_("Gender")}</label>
             <div class="input-wrapper">
@@ -87,7 +87,7 @@
           </section>
           % endif
 
-          % if 'year_of_birth' in settings.REGISTRATION_OPTIONAL_FIELDS:
+          % if settings.REGISTRATION_EXTRA_FIELDS['year_of_birth'] != 'hidden':
           <section class="date-of-birth">
             <label data-field="date-of-birth" for="signup_birth_year">${_("Year of birth")}</label>
             <div class="input-wrapper">
@@ -102,12 +102,12 @@
           </section>
           % endif
 
-          % if 'mailing_address' in settings.REGISTRATION_OPTIONAL_FIELDS:
+          % if settings.REGISTRATION_EXTRA_FIELDS['mailing_address'] != 'hidden':
           <label data-field="mailing_address" for="signup_mailing_address">${_("Mailing address")}</label>
 	    <textarea id="signup_mailing_address" name="mailing_address"></textarea>
           % endif
 
-          % if 'goals' in settings.REGISTRATION_OPTIONAL_FIELDS:
+          % if settings.REGISTRATION_EXTRA_FIELDS['goals'] != 'hidden':
           <label data-field="goals" for="signup_goals">${_("Goals in signing up for {platform_name}").format(platform_name=settings.PLATFORM_NAME)}</label>
 	    <textarea name="goals" id="signup_goals"></textarea>
           % endif
@@ -122,12 +122,14 @@
               link_end='</a>')}
           </label>
 
+          % if settings.REGISTRATION_EXTRA_FIELDS['honor_code'] != 'hidden':
           <label data-field="honor_code" class="honor-code" for="signup_honor">
             <input id="signup_honor" name="honor_code" type="checkbox" value="true">
             ${_('I agree to the {link_start}Honor Code{link_end}*').format(
               link_start='<a href="{url}" target="_blank">'.format(url=reverse('honor')),
               link_end='</a>')}
           </label>
+          % endif
         </div>
 
         <div class="submit">
