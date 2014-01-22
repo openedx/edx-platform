@@ -75,13 +75,17 @@ function (
     window.Video = function (element) {
         var state,
             send = function (url, data) {
+                console.log('[window.Video::send]: before $.ajax()');
+
                 $.ajax({
                     url: url,
                     type: 'POST',
+                    async: false,
                     dataType: 'json',
                     data: data,
                 });
-                debugger
+
+                console.log('[window.Video::send]: after $.ajax()');
             };
 
         // Stop bufferization of previous video on sequence change.
@@ -124,15 +128,11 @@ function (
         }
 
         $(window).unload(function () {
-
-
-            // if (state && typeof state.videoPlayer) {
-            //     send(state.config.saveStateUrl, {
-            //         position: state.videoPlayer.currentTime
-            //     });
-            // }
-
-
+            if (state && typeof state.videoPlayer) {
+                send(state.config.saveStateUrl, {
+                    position: state.videoPlayer.currentTime
+                });
+            }
         });
 
         // Because the 'state' object is only available inside this closure, we will also make

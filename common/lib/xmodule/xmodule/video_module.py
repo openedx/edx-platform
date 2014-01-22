@@ -173,6 +173,8 @@ class VideoModule(VideoFields, XModule):
         ''' get = request.POST instance '''
         ACCEPTED_KEYS = ['position']
 
+        # import ipdb; ipdb.set_trace()
+
         if dispatch == 'save_user_state':
             for key in data:
                 if hasattr(self, key) and key in ACCEPTED_KEYS:
