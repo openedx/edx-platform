@@ -1,0 +1,51 @@
+###################################
+January 23, 2014
+###################################
+
+You can now access the public edX roadmap_ for details about the currently planned product direction.
+
+.. _roadmap: https://edx-wiki.atlassian.net/wiki/display/OPENPROD/OpenEdX+Public+Product+Roadmap
+
+
+*************
+edX Studio
+*************
+
+New documentation, *Building a Course with edX Studio*, is available online_. You can also download the new guide as a PDF from the edX Studio user interface.
+
+.. _online: http://edx.readthedocs.org/projects/ca/en/latest/
+
+
+==========================
+Changes and Updates
+==========================
+
+* You can now use single quotation marks in option response answers without escaping, when the single quotation mark is between two alphabet characters.  (LMS-2031)
+
+
+***************************************
+edX Learning Management System
+***************************************
+
+
+
+* A problem that caused the dashboard to not load if there were unicode or space characters in the course image has been fixed. (LMS-2073, STUD-1197)
+
+* For numerical response problems, students can now enter negative exponents in the same ways they can enter positive exponents.  For example, students can enter ``4.9e-9`` or ``4.9*10^-9``. (BLD-434)
+
+* For string response questions, students can now enter regex expressions as answers. (BLD-475)
+
+* (BLD-529)
+
+
+***************************************
+Discussions
+***************************************
+
+* The Discussion search field now expands when it gets focus through the keyboard. (FOR-203)
+
+***************************************
+Open Response Assessments
+***************************************
+
+* (ORA-254)
