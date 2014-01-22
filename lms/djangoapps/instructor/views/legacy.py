@@ -1188,10 +1188,7 @@ def get_student_grade_summary_data(request, course, course_id, get_grades=True, 
     if get_grades and enrolled_students.count() > 0:
         # just to construct the header
         gradeset = student_grades(enrolled_students[0], request, course, keep_raw_scores=get_raw_scores, use_offline=use_offline)
-        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-            course_id, enrolled_students[0], course, depth=None)
-        courseware_summary = grades.progress_summary(enrolled_students[0], request, course,
-                                                 field_data_cache);
+        courseware_summary = grades.progress_summary(enrolled_students[0], request, course);
 
         # log.debug('student {0} gradeset {1}'.format(enrolled_students[0], gradeset))
         if get_raw_scores:
@@ -1220,10 +1217,6 @@ def get_student_grade_summary_data(request, course, course_id, get_grades=True, 
             datarow.append('')
 
         if get_grades:
-            field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-                course_id, student, course, depth=None)
-            courseware_summary = grades.progress_summary(student, request, course,
-                                                 field_data_cache);
             log.debug('student={0}, gradeset={1}'.format(student, gradeset))
             if get_raw_scores:
                 gradeset = student_grades(student, request, course, keep_raw_scores=get_raw_scores, use_offline=use_offline)
@@ -1231,6 +1224,7 @@ def get_student_grade_summary_data(request, course, course_id, get_grades=True, 
                 sgrades = [(getattr(score, 'earned', '') or score[0]) for score in gradeset['raw_scores']]
             elif course.new_progress:
                 sgrades = []
+                courseware_summary = grades.progress_summary(student, request, course);
                 for chapter in courseware_summary:
                     total = 0
                     for section in chapter['sections']:
