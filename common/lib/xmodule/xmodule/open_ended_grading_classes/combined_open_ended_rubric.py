@@ -73,7 +73,7 @@ class CombinedOpenEndedRubric(object):
             success = True
         except:
             #This is a staff_facing_error
-            error_message = "[render_rubric] Could not parse the rubric with xml: {0}. Contact the learning sciences group for assistance.".format(
+            error_message = u"[render_rubric] Could not parse the rubric with xml: {0}. Contact the learning sciences group for assistance.".format(
                 rubric_xml)
             log.exception(error_message)
             raise RubricParsingError(error_message)

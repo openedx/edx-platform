@@ -492,7 +492,13 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             'submission_ids': [0],
         }
         try:
-            score_result = json.loads(score_msg)
+            if score_msg is not None or score_msg == "":
+                score_result = json.loads(score_msg)
+            else:
+                error_message = ("External open ended grader message should be a JSON-serialized dict."
+                             " Received score_msg = {0}".format(score_msg))
+                fail['feedback'] = error_message
+                return fail
         except (TypeError, ValueError):
             # This is a dev_facing_error
             error_message = ("External open ended grader message should be a JSON-serialized dict."

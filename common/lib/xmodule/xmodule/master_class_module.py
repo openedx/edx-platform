@@ -74,7 +74,8 @@ class MasterClassModule(MasterClassFields, XModule):
     """MasterClass Xmodule"""
     js = {
         'coffee': [resource_string(__name__, 'js/src/javascript_loader.coffee')],
-        'js': [resource_string(__name__, 'js/src/word_cloud/logme.js'),
+        'js': [resource_string(__name__, 'js/src/word_cloud/d3.min.js'),
+        resource_string(__name__, 'js/src/word_cloud/d3.layout.cloud.js'),
         resource_string(__name__, 'js/src/master_class/master_class.js'),
         resource_string(__name__, 'js/src/master_class/master_class_main.js')]
     }
