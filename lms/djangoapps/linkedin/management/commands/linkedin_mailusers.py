@@ -167,7 +167,6 @@ class Command(BaseCommand):
             'gf'])
         query = [
             ('pfCertificationName', course.display_name_with_default),
-            ('pfAuthorityName', settings.PLATFORM_NAME),
             ('pfAuthorityId', settings.LINKEDIN_API['COMPANY_ID']),
             ('pfCertificationUrl', certificate.download_url),
             ('pfLicenseNo', certificate.course_id),
