@@ -154,7 +154,7 @@ Vertical
 
 Video
 =====
-
+.. include:: video_player.rst
 .. automodule:: xmodule.video_module
     :members:
     :show-inheritance:
