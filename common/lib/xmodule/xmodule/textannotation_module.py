@@ -15,9 +15,7 @@ log = logging.getLogger(__name__)
 
 class AnnotatableFields(object):
     """Fields for `TextModule` and `TextDescriptor`."""
-    data = String(help="XML data for the annotation", scope=Scope.content,
-        default=textwrap.dedent(
-        """\
+    data = String(help="XML data for the annotation", scope=Scope.content, default=textwrap.dedent("""\
         <annotatable>
             <instructions>
                 <p>
@@ -53,8 +51,7 @@ class AnnotatableFields(object):
 class TextAnnotationModule(AnnotatableFields, XModule):
     ''' Text Annotation Module '''
     js = {'coffee': [],
-          'js': []
-    }
+          'js': []}
     css = {'scss': [resource_string(__name__, 'css/annotatable/display.scss')]}
     icon_class = 'textannotation'
 

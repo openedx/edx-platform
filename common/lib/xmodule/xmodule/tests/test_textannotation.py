@@ -31,7 +31,7 @@ class TextAnnotationModuleTestCase(unittest.TestCase):
         self.mod = TextAnnotationModule(
             Mock(),
             get_test_system(),
-            DictFieldData({'data':self.sample_xml}),
+            DictFieldData({'data': self.sample_xml}),
             ScopeIds(None, None, None, None)
         )
 
@@ -58,4 +58,3 @@ class TextAnnotationModuleTestCase(unittest.TestCase):
         context = self.mod.get_html()
         for key in ['display_name', 'tag', 'source', 'element_id', 'instructions_html', 'content_html', 'annotation_storage']:
             self.assertIn(key, context)
-

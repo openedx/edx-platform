@@ -20,6 +20,7 @@ from django.contrib.auth.hashers import UNUSABLE_PASSWORD
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import int_to_base36
 from django.core.urlresolvers import reverse
+from django.http import HttpResponse
 
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -30,7 +31,7 @@ from textwrap import dedent
 
 from student.models import anonymous_id_for_user, user_by_anonymous_id, CourseEnrollment, unique_id_for_user
 from student.views import (process_survey_link, _cert_info, password_reset, password_reset_confirm_wrapper,
-                           change_enrollment, complete_course_mode_info)
+                           change_enrollment, complete_course_mode_info, token)
 from student.tests.factories import UserFactory, CourseModeFactory
 from student.tests.test_email import mock_render_to_string
 from student.firebase_token_generator import _encode, _encode_json, _encode_token, create_token
@@ -558,24 +559,14 @@ class AnonymousLookupTable(TestCase):
         real_user = user_by_anonymous_id(anonymous_id)
         self.assertEqual(self.user, real_user)
 
-
-class TokenGenerator(TestCase):
+class Token(TestCase):
     """
-    Tests for the Token Generator
+    Test for the token generator
     """
-    def test_encode(self):
-        expected = "dGVzdDE"
-        result = _encode("test1")
-        self.assertEqual(expected, result)
-
-    def test_encode_json(self):
-        expected = "eyJ0d28iOiAidGVzdDIiLCAib25lIjogInRlc3QxIn0"
-        result = _encode_json({'one': 'test1', 'two': 'test2'})
-        self.assertEqual(expected, result)
-
-    def test_create_token(self):
-        expected = "eyJhbGciOiAiSFMyNTYiLCAidHlwIjogIkpXVCJ9.eyJ1c2VySWQiOiAidXNlcm5hbWUiLCAidHRsIjogODY0MDB9.-p1sr7uwCapidTQ0qB7DdU2dbF-hViKpPNN_5vD10t8"
-        result1 = _encode_token('4c7f4d1c-8ac4-4e9f-84c8-b271c57fcac4', {"userId": "username", "ttl": 86400})
-        result2 = create_token('4c7f4d1c-8ac4-4e9f-84c8-b271c57fcac4', {"userId": "username", "ttl": 86400})
-        self.assertEqual(expected, result1)
-        self.assertEqual(expected, result2)
+    def setUp(self):
+        self.user = UserFactory()
+    
+    def test_token(self):
+        expected = HttpResponse("eyJhbGciOiAiSFMyNTYiLCAidHlwIjogIkpXVCJ9.eyJ1c2VySWQiOiAidXNlcm5hbWUiLCAidHRsIjogODY0MDB9.-p1sr7uwCapidTQ0qB7DdU2dbF-hViKpPNN_5vD10t8", mimetype="text/plain")
+        response = token(self)
+        self.assertEqual(expected,response)

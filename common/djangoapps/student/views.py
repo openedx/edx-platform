@@ -1452,7 +1452,6 @@ def token(request):
     '''
     Return a token for the backend of annotations
     '''
-    secret = request
     dtnow = datetime.datetime.now()
     dtutcnow = datetime.datetime.utcnow()
     delta = dtnow - dtutcnow

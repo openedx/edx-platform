@@ -35,7 +35,7 @@ class VideoAnnotationModuleTestCase(unittest.TestCase):
         xml = '<annotation title="x" body="y" problem="0">test</annotation>'
         element = etree.fromstring(xml)
 
-        expected_attr = { 'class': { 'value': 'annotatable-span highlight' } }
+        expected_attr = {'class': {'value': 'annotatable-span highlight'}}
         actual_attr = self.mod._get_annotation_class_attr(element)
 
         self.assertIsInstance(actual_attr, dict)
@@ -48,9 +48,9 @@ class VideoAnnotationModuleTestCase(unittest.TestCase):
             element = etree.fromstring(xml.format(highlight=color))
             value = 'annotatable-span highlight highlight-{highlight}'.format(highlight=color)
 
-            expected_attr = { 'class': {
+            expected_attr = {'class': {
                 'value': value,
-                '_delete': 'highlight' }
+                '_delete': 'highlight'}
             }
             actual_attr = self.mod._get_annotation_class_attr(element)
 
@@ -62,9 +62,9 @@ class VideoAnnotationModuleTestCase(unittest.TestCase):
 
         for invalid_color in ['rainbow', 'blink', 'invisible', '', None]:
             element = etree.fromstring(xml.format(highlight=invalid_color))
-            expected_attr = { 'class': {
+            expected_attr = {'class': {
                 'value': 'annotatable-span highlight',
-                '_delete': 'highlight' }
+                '_delete': 'highlight'}
             }
             actual_attr = self.mod._get_annotation_class_attr(element)
 
@@ -75,9 +75,9 @@ class VideoAnnotationModuleTestCase(unittest.TestCase):
         element = etree.fromstring('<annotation title="bar" body="foo" problem="0">test</annotation>')
 
         expected_attr = {
-            'data-comment-body': {'value': 'foo', '_delete': 'body' },
-            'data-comment-title': {'value': 'bar', '_delete': 'title' },
-            'data-problem-id': {'value': '0', '_delete': 'problem' }
+            'data-comment-body': {'value': 'foo', '_delete': 'body'},
+            'data-comment-title': {'value': 'bar', '_delete': 'title'},
+            'data-problem-id': {'value': '0', '_delete': 'problem'}
         }
 
         actual_attr = self.mod._get_annotation_data_attr(element)
@@ -100,8 +100,9 @@ class VideoAnnotationModuleTestCase(unittest.TestCase):
     def test_render_content(self):
         content = self.mod._render_content()
         element = etree.fromstring(content)
-
+        self.assertIsNotNone(element)
         self.assertEqual('div', element.tag, 'root tag is a div')
+        self.assertFalse('display_name' in element.attrib, "Display Name should have been deleted from Content")
 
     def test_extract_instructions(self):
         xmltree = etree.fromstring(self.sample_xml)

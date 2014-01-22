@@ -1,4 +1,8 @@
-''' library to generate a token '''
+'''
+    Firebase - library to generate a token
+    License: https://github.com/firebase/firebase-token-generator-python/blob/master/LICENSE
+    Tweaked and Edited by @danielcebrianr
+'''
 from base64 import urlsafe_b64encode
 import hashlib
 import hmac

@@ -14,9 +14,7 @@ log = logging.getLogger(__name__)
 
 class AnnotatableFields(object):
     """ Fields for `VideoModule` and `VideoDescriptor`. """
-    data = String(help="XML data for the annotation", scope=Scope.content,
-        default=textwrap.dedent(
-        """\
+    data = String(help="XML data for the annotation", scope=Scope.content, default=textwrap.dedent("""\
         <annotatable>
             <instructions>
                 <p>
@@ -41,10 +39,10 @@ class VideoAnnotationModule(AnnotatableFields, XModule):
     js = {'coffee': [resource_string(__name__, 'js/src/javascript_loader.coffee'),
                      resource_string(__name__, 'js/src/collapsible.coffee'),
                      resource_string(__name__, 'js/src/html/display.coffee'),
-                     resource_string(__name__, 'js/src/annotatable/display.coffee')],
+                     resource_string(__name__, 'js/src/annotatable/display.coffee')
+                     ],
           'js': []
     }
-#    js_module_name = "VideoAnnotation"
     css = {'scss': [resource_string(__name__, 'css/annotatable/display.scss')]}
     icon_class = 'videoannotation'
 
