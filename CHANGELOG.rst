@@ -5,6 +5,10 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Blades: Video player start-end time range is now shown even before Play is
+clicked. Video player VCR time shows correct non-zero total time for YouTube
+videos even before Play is clicked. BLD-529.
+
 Blades: Adds CookieStorage utility for video player that provides convenient
   way to work with cookies.
 

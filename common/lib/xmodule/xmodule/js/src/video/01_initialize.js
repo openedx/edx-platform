@@ -476,8 +476,7 @@ function (VideoPlayer) {
         this.config.endTime = parseInt(this.config.endTime, 10);
         if (
             !isFinite(this.config.endTime) ||
-            this.config.endTime < this.config.startTime ||
-            this.config.endTime === 0
+            this.config.endTime <= this.config.startTime
         ) {
             this.config.endTime = null;
         }
@@ -560,16 +559,32 @@ function (VideoPlayer) {
     //     example the length of the video can be determined from the meta
     //     data.
     function fetchMetadata() {
-        var _this = this;
+        var _this = this,
+            metadataXHRs = [];
 
         this.metadata = {};
 
         $.each(this.videos, function (speed, url) {
-            _this.getVideoMetadata(url, function (data) {
+            var xhr = _this.getVideoMetadata(url, function (data) {
                 if (data.data) {
                     _this.metadata[data.data.id] = data.data;
                 }
             });
+
+            metadataXHRs.push(xhr);
+        });
+
+        $.when.apply(this, metadataXHRs).done(function () {
+            _this.el.trigger('metadata_received');
+
+            // Not only do we trigger the "metadata_received" event, we also
+            // set a flag to notify that metadata has been received. This
+            // allows for code that will miss the "metadata_received" event
+            // to know that metadata has been received. This is important in
+            // cases when some code will subscribe to the "metadata_received"
+            // event after it has been triggered.
+            _this.youtubeMetadataReceived = true;
+
         });
     }
 
