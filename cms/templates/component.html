@@ -26,11 +26,29 @@
 		</div> <!-- Module Actions-->
   </div>
 </div>
-
-<div class="component-actions">
-  <a href="#" class="edit-button standard"><span class="edit-icon"></span>${_("Edit")}</a>
-  <a href="#" class="duplicate-button standard"><span class="duplicate-icon icon-copy"></span>${_("Duplicate")}</a>
-  <a href="#" class="delete-button standard"><span class="delete-icon"></span>${_("Delete")}</a>
+<div class="wrapper wrapper-component-action-header">
+	<div class="component-header">
+	</div>
+	<ul class="component-actions">
+	  <li class="action-item action-edit">
+	  	<a href="#" class="edit-button action-button">
+	  		<i class="icon-edit"></i>
+	  		<span class="action-button-text">${_("Edit")}</span>
+	  	</a>
+	  </li>
+	  <li class="action-item action-duplicate">
+	  	<a href="#" data-tooltip="Duplicate" class="duplicate-button action-button">
+	  		<i class="icon-copy"></i>
+	  		<span class="sr">${_("Duplicate this component")}</span>
+	  	</a>
+	  </li>
+	  <li class="action-item action-delete">
+	  	<a href="#" data-tooltip="Delete" class="delete-button action-button">
+	  		<i class="icon-trash"></i>
+	  		<span class="sr">${_("Duplicate this component")}</span>
+	  	</a>
+	  </li>
+	</ul>
 </div>
 <span data-tooltip="${_("Drag to reorder")}" class="drag-handle"></span>
 ${preview}
