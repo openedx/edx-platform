@@ -9,7 +9,7 @@
 <%block name="js_extra">
 <script src="${static.url('js/vendor/responsive-carousel/responsive-carousel.js')}"></script>
 <script src="${static.url('js/vendor/responsive-carousel/responsive-carousel.keybd.js')}"></script>
-<script src="${static.url('js/verify_student/photocapturebasic2.js')}"></script>
+<script src="${static.url('js/verify_student/photocapture.js')}"></script>
 </%block>
 
 
@@ -176,7 +176,7 @@
                     <form id="reverify_form" method="post">
                       <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
                       <input type="hidden" name="course_id" value="${course_id}">
-                      <input class="action-primary disabled" type="button" id="reverify_button" value="Submit photos &amp; re-verify" name="payment">
+                      <input class="action-primary disabled" type="button" id="midcourse_reverify_button" value="Submit photos &amp; re-verify" name="payment">
                     </form>
                   </li>
                 </ol>

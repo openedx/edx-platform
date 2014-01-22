@@ -22,14 +22,12 @@ class Migration(SchemaMigration):
                       self.gf('django.db.models.fields.related.ForeignKey')(to=orm['verify_student.MidcourseReverificationWindow'], null=True),
                       keep_default=False)
 
-
     def backwards(self, orm):
         # Deleting model 'MidcourseReverificationWindow'
         db.delete_table('verify_student_midcoursereverificationwindow')
 
         # Deleting field 'SoftwareSecurePhotoVerification.window'
         db.delete_column('verify_student_softwaresecurephotoverification', 'window_id')
-
 
     models = {
         'auth.group': {

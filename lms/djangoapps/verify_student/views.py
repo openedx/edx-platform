@@ -34,6 +34,7 @@ from verify_student.models import (
 )
 import ssencrypt
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from .exceptions import WindowExpiredException
 
 log = logging.getLogger(__name__)
 
@@ -362,9 +363,11 @@ class MidCourseReverifyView(View):
         submits the reverification to SoftwareSecure
         """
         try:
-            # TODO look at this more carefully! #1 testing candidate
             now = datetime.datetime.now(UTC)
-            attempt = SoftwareSecurePhotoVerification(user=request.user, window=MidcourseReverificationWindow.get_window(course_id, now))
+            window = MidcourseReverificationWindow.get_window(course_id, now)
+            if window is None:
+                raise WindowExpiredException
+            attempt = SoftwareSecurePhotoVerification(user=request.user, window=window)
             b64_face_image = request.POST['face_image'].split(",")[1]
 
             attempt.upload_face_image(b64_face_image.decode('base64'))
@@ -374,6 +377,13 @@ class MidCourseReverifyView(View):
             attempt.save()
             attempt.submit()
             return HttpResponseRedirect(reverse('verify_student_midcourse_reverification_confirmation'))
+
+        except WindowExpiredException:
+            log.exception(
+                "User {} attempted to re-verify, but the window expired before the attempt".format(request.user.id)
+            )
+            return HttpResponseRedirect(reverse('verify_student_reverification_window_expired'))
+
         except Exception:
             log.exception(
                 "Could not submit verification attempt for user {}".format(request.user.id)
@@ -390,7 +400,6 @@ def midcourse_reverify_dash(_request):
     Shows the "course reverification dashboard", which displays the reverification status (must reverify,
     pending, approved, failed, etc) of all courses in which a student has a verified enrollment.
     """
-    # TODO same comment as in student/views.py: need to factor out this functionality
     user = _request.user
     course_enrollment_pairs = []
     for enrollment in CourseEnrollment.enrollments_for_user(user):
@@ -406,7 +415,8 @@ def midcourse_reverify_dash(_request):
                 (
                     course.id,
                     course.display_name,
-                    MidcourseReverificationWindow.get_window(course.id, datetime.datetime.now(UTC)).end_date,
+                    course.number,
+                    MidcourseReverificationWindow.get_window(course.id, datetime.datetime.now(UTC)).end_date.strftime('%B %d, %Y %X %p'),
                     "must_reverify"
                 )
             )
@@ -431,3 +441,13 @@ def midcourse_reverification_confirmation(_request):
     Shows the user a confirmation page if the submission to SoftwareSecure was successful
     """
     return render_to_response("verify_student/midcourse_reverification_confirmation.html")
+
+
+@login_required
+def reverification_window_expired(_request):
+    """
+    Displays an error page if a student tries to submit a reverification, but the window
+    for that reverification has already expired.
+    """
+    # TODO need someone to review the copy for this template
+    return render_to_response("verify_student/reverification_window_expired.html")

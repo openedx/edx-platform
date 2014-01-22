@@ -23,7 +23,7 @@ import pytz
 import requests
 
 from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.contrib.auth.models import User
@@ -71,17 +71,9 @@ class MidcourseReverificationWindow(models.Model):
         Returns a boolean, True if the course is currently asking for reverification, else False.
         """
         now = datetime.now(pytz.UTC)
-
-        try:
-            cls.objects.get(
-                course_id=course_id,
-                start_date__lte=now,
-                end_date__gte=now,
-            )
-        except(ObjectDoesNotExist):
-            return False
-
-        return True
+        if cls.get_window(course_id, now):
+            return True
+        return False
 
     @classmethod
     def get_window(cls, course_id, date):
@@ -244,9 +236,13 @@ class PhotoVerification(StatusModel):
     @classmethod
     def user_is_verified(cls, user, earliest_allowed_date=None, window=None):
         """
-        Return whether or not a user has satisfactorily proved their
-        identity wrt to the INITIAL verification. Depending on the policy,
-        this can expire after some period of time, so a user might have to renew periodically.
+        Return whether or not a user has satisfactorily proved their identity.
+        Depending on the policy, this can expire after some period of time, so
+        a user might have to renew periodically.
+
+        If window=None, then this will check for the user's *initial* verification.
+        If window is set to anything else, it will check for the reverification
+        associated with that window.
         """
         return cls.objects.filter(
             user=user,
@@ -264,6 +260,10 @@ class PhotoVerification(StatusModel):
         have been submitted but had an non-user error when it was being
         submitted. It's basically any situation in which the user has signed off
         on the contents of the attempt, and we have not yet received a denial.
+
+        If window=None, this will check for the user's *initial* verification.  If
+        window is anything else, this will check for the reverification associated
+        with that window.
         """
         if window:
             valid_statuses = ['submitted', 'approved']
@@ -280,8 +280,11 @@ class PhotoVerification(StatusModel):
     @classmethod
     def active_for_user(cls, user, window=None):
         """
-        Return the most recent INITIAL PhotoVerification that is marked ready (i.e. the
+        Return the most recent PhotoVerification that is marked ready (i.e. the
         user has said they're set, but we haven't submitted anything yet).
+
+        If window=None, this checks for the original verification.  If window is set to
+        anything else, this will check for the reverification associated with that window.
         """
         # This should only be one at the most, but just in case we create more
         # by mistake, we'll grab the most recently created one.
@@ -301,6 +304,9 @@ class PhotoVerification(StatusModel):
         If the verification has been approved, returns 'approved'
         If the verification process is still ongoing, returns 'pending'
         If the verification has been denied and the user must resubmit photos, returns 'must_reverify'
+
+        If window=None, this checks initial verifications
+        If window is set, this checks for the reverification associated with that window
         """
         status = 'none'
         error_msg = ''

@@ -438,6 +438,7 @@ class TestMidcourseReverificationWindow(TestCase):
 @patch('verify_student.models.Key', new=MockKey)
 @patch('verify_student.models.requests.post', new=mock_software_secure_post)
 class TestMidcourseReverification(TestCase):
+    """ Tests for methods that are specific to midcourse SoftwareSecurePhotoVerification objects """
     def setUp(self):
         self.course_id = "MITx/999/Robot_Super_Course"
         self.course = CourseFactory.create(org='MITx', number='999', display_name='Robot Super Course')
@@ -527,6 +528,3 @@ class TestMidcourseReverification(TestCase):
         attempt.status = "approved"
         attempt.save()
         assert_true(SoftwareSecurePhotoVerification.user_has_valid_or_pending(user=self.user, window=window))
-
-    def test_active_for_user(self):
-        pass

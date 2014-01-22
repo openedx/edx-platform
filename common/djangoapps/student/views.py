@@ -182,6 +182,52 @@ def cert_info(user, course):
     return _cert_info(user, course, certificate_status_for_student(user, course.id))
 
 
+def reverification_info(user, course, enrollment):
+    """
+    If "user" currently needs to be reverified in "course", this returns a four-tuple with re-verification
+    info for views to display.  Else, returns None.
+
+    Four-tuple data: (course_id, course_display_name, reverification_end_date, reverification_status)
+    """
+    # IF the reverification window is open
+    if (MidcourseReverificationWindow.window_open_for_course(course.id)):
+        # AND the user is actually verified-enrolled AND they don't have a pending reverification already
+        window = MidcourseReverificationWindow.get_window(course.id, datetime.datetime.now(UTC))
+        if (enrollment.mode == "verified" and not SoftwareSecurePhotoVerification.user_has_valid_or_pending(user, window=window)):
+            window = MidcourseReverificationWindow.get_window(course.id, datetime.datetime.now(UTC))
+            return (
+                course.id,
+                course.display_name,
+                course.number,
+                window.end_date.strftime('%B %d, %Y %X %p'),
+                "must_reverify"  # TODO: reflect more states than just "must_reverify" has_valid_or_pending (must show failure)
+            )
+    return None
+
+
+def get_course_enrollment_pairs(user, course_org_filter, org_filter_out_set):
+    course_enrollment_pairs = []
+    for enrollment in CourseEnrollment.enrollments_for_user(user):
+        try:
+            course = course_from_id(enrollment.course_id)
+
+            # if we are in a Microsite, then filter out anything that is not
+            # attributed (by ORG) to that Microsite
+            if course_org_filter and course_org_filter != course.location.org:
+                continue
+            # Conversely, if we are not in a Microsite, then let's filter out any enrollments
+            # with courses attributed (by ORG) to Microsites
+            elif course.location.org in org_filter_out_set:
+                continue
+
+            course_enrollment_pairs.append((course, enrollment))
+        except ItemNotFoundError:
+            log.error("User {0} enrolled in non-existent course {1}"
+                      .format(user.username, enrollment.course_id))
+    return course_enrollment_pairs
+
+
+
 def _cert_info(user, course, cert_status):
     """
     Implements the logic for cert_info -- split out for testing.
@@ -323,11 +369,6 @@ def complete_course_mode_info(course_id, enrollment):
 def dashboard(request):
     user = request.user
 
-    # Build our (course, enrollment) list for the user, but ignore any courses that no
-    # longer exist (because the course IDs have changed). Still, we don't delete those
-    # enrollments, because it could have been a data push snafu.
-    course_enrollment_pairs = []
-
     # for microsites, we want to filter and only show enrollments for courses within
     # the microsites 'ORG'
     course_org_filter = MicrositeConfiguration.get_microsite_configuration_value('course_org_filter')
@@ -340,23 +381,10 @@ def dashboard(request):
     if course_org_filter:
         org_filter_out_set.remove(course_org_filter)
 
-    for enrollment in CourseEnrollment.enrollments_for_user(user):
-        try:
-            course = course_from_id(enrollment.course_id)
-
-            # if we are in a Microsite, then filter out anything that is not
-            # attributed (by ORG) to that Microsite
-            if course_org_filter and course_org_filter != course.location.org:
-                continue
-            # Conversely, if we are not in a Microsite, then let's filter out any enrollments
-            # with courses attributed (by ORG) to Microsites
-            elif course.location.org in org_filter_out_set:
-                continue
-
-            course_enrollment_pairs.append((course, enrollment))
-        except ItemNotFoundError:
-            log.error(u"User {0} enrolled in non-existent course {1}"
-                      .format(user.username, enrollment.course_id))
+    # Build our (course, enrollment) list for the user, but ignore any courses that no
+    # longer exist (because the course IDs have changed). Still, we don't delete those
+    # enrollments, because it could have been a data push snafu.
+    course_enrollment_pairs = get_course_enrollment_pairs(user, course_org_filter, org_filter_out_set)
 
     course_optouts = Optout.objects.filter(user=user).values_list('course_id', flat=True)
 
@@ -392,25 +420,12 @@ def dashboard(request):
     # TODO: make this banner appear at the top of courseware as well
     verification_status, verification_msg = SoftwareSecurePhotoVerification.user_status(user)
 
-    # TODO: Factor this out into a function; I'm pretty sure there's code duplication floating around...
+    # Gets data for midcourse reverifications, if any are necessary or have failed
     reverify_course_data = []
     for (course, enrollment) in course_enrollment_pairs:
-
-        # IF the reverification window is open
-        if (MidcourseReverificationWindow.window_open_for_course(course.id)):
-            # AND the user is actually verified-enrolled AND they don't have a pending reverification already
-            window = MidcourseReverificationWindow.get_window(course.id, datetime.datetime.now(UTC))
-            if (enrollment.mode == "verified" and not SoftwareSecurePhotoVerification.user_has_valid_or_pending(user, window=window)):
-                window = MidcourseReverificationWindow.get_window(course.id, datetime.datetime.now(UTC))
-                status_for_window = SoftwareSecurePhotoVerification.user_status(user, window=window)
-                reverify_course_data.append(
-                    (
-                        course.id,
-                        course.display_name,
-                        window.end_date,
-                        "must_reverify"  # TODO: reflect more states than just "must_reverify" has_valid_or_pending (must show failure)
-                    )
-                )
+        info = reverification_info(user, course, enrollment)
+        if info:
+            reverify_course_data.append(info)
 
     show_refund_option_for = frozenset(course.id for course, _enrollment in course_enrollment_pairs
                                        if _enrollment.refundable())
