@@ -289,9 +289,32 @@ answers, the student’s score is 0.5 out of 2 points.
 Randomization
 ===============
 
-This setting only applies to problems that have randomly generated
-numeric values. It specifies whether random variable inputs are
-randomized when a student loads the problem.
+Some problems have values that are randomized for each student. 
+
+
+.. image:: Images/Rerandomize.gif
+
+
+This setting has four options.
+
++-------------------+--------------------------------------+
+| **Always**        | Students see a different version of  |
+|                   | the problem each time they click     |
+|                   | **Check**.                           |
++-------------------+--------------------------------------+
+| **On Reset**      | Students see a different version of  |
+|                   | the problem each time they click     |
+|                   | **Reset**.                           |
++-------------------+--------------------------------------+
+| **Never**         | All students see the same version    |
+|                   | of the problem.                      |
++-------------------+--------------------------------------+
+| **Per Student**   | Individual students see the same     |
+|                   | version of the problem each time     |
+|                   | they look at it, but that version    |
+|                   | is different from what other         |
+|                   | students see.                        |
++-------------------+--------------------------------------+
 
 ===============
 Show Answer
