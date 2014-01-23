@@ -32,6 +32,7 @@ SOURCE_XML = """
     >
         <source src="example.mp4"/>
         <source src="example.webm"/>
+        <transcript language="ua" src="ukrainian_translation.srt" />
     </video>
 """
 
