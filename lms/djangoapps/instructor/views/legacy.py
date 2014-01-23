@@ -39,7 +39,6 @@ from courseware.roles import (
     CourseStaffRole, CourseInstructorRole, CourseBetaTesterRole, GlobalStaff
 )
 from courseware.models import StudentModule
-from courseware.model_data import FieldDataCache
 from django_comment_common.models import (
     Role, FORUM_ROLE_ADMINISTRATOR, FORUM_ROLE_MODERATOR, FORUM_ROLE_COMMUNITY_TA
 )
@@ -414,7 +413,7 @@ def instructor_dashboard(request, course_id):
                 try:
                     instructor_task = submit_rescore_problem_for_student(request, course_id, module_state_key, student)
                     if instructor_task is None:
-                        msg += '<font color="red">{text}</font>'.format(
+                        msg += u'<font color="red">{text}</font>'.format(
                             text=_u('Failed to create a background task for rescoring "{key}" for student {id}.').format(
                                 key=module_state_key, id=unique_student_identifier
                             )
@@ -422,7 +421,7 @@ def instructor_dashboard(request, course_id):
                     else:
                         track.views.server_track(request, "rescore-student-submission", {"problem": module_state_key, "student": unique_student_identifier, "course": course_id}, page="idashboard")
                 except Exception as err:
-                    msg += '<font color="red">{text}</font>'.format(
+                    msg += u'<font color="red">{text}</font>'.format(
                         text=_u('Failed to create a background task for rescoring "{key}": {id}.').format(
                             key=module_state_key, id=err.message
                         ))
@@ -439,7 +438,7 @@ def instructor_dashboard(request, course_id):
         if student is not None:
             progress_url = reverse('student_progress', kwargs={'course_id': course_id, 'student_id': student.id})
             track.views.server_track(request, "get-student-progress-page", {"student": unicode(student), "instructor": unicode(request.user), "course": course_id}, page="idashboard")
-            msg += "<a href='{url}' target='_blank'>{text}</a>.".format(
+            msg += u"<a href='{url}' target='_blank'>{text}</a>.".format(
                 url=progress_url,
                 text=_u("Progress page for username: {username} with email address: {email}").format(
                     username=student.username, email=student.email
