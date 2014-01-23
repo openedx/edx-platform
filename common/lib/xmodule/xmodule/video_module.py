@@ -30,7 +30,7 @@ from xmodule.contentstore.django import contentstore
 from xmodule.contentstore.content import StaticContent
 from xmodule.exceptions import NotFoundError
 from xblock.core import XBlock
-from xblock.fields import Scope, String, Boolean, List, Integer, ScopeIds
+from xblock.fields import Scope, String, Boolean, List, Integer, Float, ScopeIds
 from xmodule.fields import RelativeTime
 
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore
