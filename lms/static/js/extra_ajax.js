@@ -1,5 +1,5 @@
-  $(function(){
-      $("#city").autocomplete({
+$(function(){
+    $("#city").autocomplete({
         source: function(request, response){
             $.ajax({
                 url: "/city_lookup/",
@@ -9,11 +9,11 @@
                 },
                 success: function(data){
                     response( $.map(data, function(item){
-                      $("#city_id").val(item[0]); 
-                      return {
-                          label: item[1],
-                          value: item[1]
-                      }
+                        $("#city_id").val(item[0]); 
+                        return {
+                            label: item[1],
+                            value: item[1]
+                        }
                     }));
                 }
             });
@@ -24,8 +24,8 @@
         close: function(){
             $(this).removeClass("ui-corner-top").addClass("ui-corner-all");
         }
-      })
-  });
+    })
+});
 
 $(function(){
     $("#cedula").bind("change keyup",function(){
