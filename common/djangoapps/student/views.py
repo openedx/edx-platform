@@ -580,6 +580,7 @@ def accounts_login(request):
         if course_id and _get_course_enrollment_domain(course_id):
             return external_auth.views.course_specific_login(request, course_id)
     context = {
+        'suppress_toplevel_navigation': True,
         'platform_name': settings.PLATFORM_NAME,
     }
     return render_to_response('login.html', context)
