@@ -348,6 +348,7 @@ function (VideoPlayer) {
         this.config = {
             element: element,
 
+            saveStateUrl:       data['saveStateUrl'],
             startTime:          data['start'],
             endTime:            data['end'],
             caption_data_dir:   data['captionDataDir'],

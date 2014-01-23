@@ -73,7 +73,20 @@ function (
     previousState = null;
 
     window.Video = function (element) {
-        var state;
+        var state,
+            send = function (url, data) {
+                console.log('[window.Video::send]: before $.ajax()');
+
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    async: false,
+                    dataType: 'json',
+                    data: data,
+                });
+
+                console.log('[window.Video::send]: after $.ajax()');
+            };
 
         // Stop bufferization of previous video on sequence change.
         // Problem: multiple video tags with the same src cannot
@@ -83,6 +96,10 @@ function (
             if (previousState !== null && typeof previousState.videoPlayer !== 'undefined') {
                 previousState.stopBuffering();
                 $(e.currentTarget).unbind('sequence:change');
+
+                send(previousState.config.saveStateUrl, {
+                    position: previousState.videoPlayer.currentTime
+                });
             }
         });
 
@@ -109,6 +126,26 @@ function (
         if (!youtubeXhr) {
             youtubeXhr = state.youtubeXhr;
         }
+
+        $(window).unload(function () {
+            if (state && typeof state.videoPlayer) {
+                send(state.config.saveStateUrl, {
+                    // TODO: Figure out why in Firefox
+                    //
+                    //     state.videoPlayer.currentTime
+                    //
+                    // is 0 after the video has been playing for a bit and the
+                    // user clicked "Pause", followed by a refresh of the page.
+
+                    // The below doesn't work in Firefox. It is always 0.
+                    // position: state.videoPlayer.currentTime
+
+                    // In Chrome and Firefox the below results in a correct
+                    // current time value.
+                    position: state.videoPlayer.player.getCurrentTime()
+                });
+            }
+        });
 
         // Because the 'state' object is only available inside this closure, we will also make
         // it available to the caller by returning it. This is necessary so that we can test
