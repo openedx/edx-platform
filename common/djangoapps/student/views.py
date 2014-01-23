@@ -1452,8 +1452,8 @@ def token(request):
     '''
     Return a token for the backend of annotations
     '''
-    course_id = request.POST.get("course_id")
-    course = get_course_by_id(course_id)
+    course_id = request.GET.get("course_id")
+    course = course_from_id(course_id)
     dtnow = datetime.datetime.now()
     dtutcnow = datetime.datetime.utcnow()
     delta = dtnow - dtutcnow

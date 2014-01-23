@@ -48,11 +48,14 @@
 	
 	//Grab uri of the course
     var parts = window.location.href.split("/"), 
-    	uri = '';
+    	uri = '',
+	courseid;
 	for (var index = 0; index <= 9; index += 1) uri += parts[index]+"/"; //Get the unit url
+	courseid = parts[4] + "/" + parts[5] + "/" + parts[6];
 	//Change uri in cms
 	var lms_location = $('.sidebar .preview-button').attr('href');
 	if (typeof lms_location!='undefined'){
+		courseid = parts[4].split(".").join("/");
 		uri = window.location.protocol;
 		for (var index = 0; index <= 9; index += 1) uri += lms_location.split("/")[index]+"/"; //Get the unit url
 	}
@@ -115,7 +118,7 @@
                   },
             },
             auth: {
-                tokenUrl: location.protocol+'//'+location.host+"/token"
+                tokenUrl: location.protocol+'//'+location.host+"/token?course_id="+courseid
             },
             store: {
                 // The endpoint of the store on your server.

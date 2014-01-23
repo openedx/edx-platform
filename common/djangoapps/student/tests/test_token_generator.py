@@ -6,6 +6,11 @@ from datetime import datetime, timedelta
 
 from django.conf import settings
 from django.test import TestCase
+from django.test.utils import override_settings
+from django.test.client import RequestFactory
+from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from courseware.tests.tests import TEST_DATA_MIXED_MODULESTORE
 from django.http import HttpResponse
 
 from mock import Mock, patch, sentinel
