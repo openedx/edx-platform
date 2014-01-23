@@ -47,7 +47,7 @@ class Command(BaseCommand):
             hostname = args[3]
         elif len(args) == 2:
             combined = True
-            hostname = args[3]
+            hostname = args[1]
         else:
             print self.help
             return
