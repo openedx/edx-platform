@@ -54,6 +54,7 @@ class Command(BaseCommand):
 
         if combined:
             for line in open(args[0]):
+                print "Proccess line: {line}".format(line = line)
                 data =  line.split(';')
                 course_id = data[0]
                 location = data[1]
