@@ -9,7 +9,7 @@ class TestConfiguration(TestCase):
     """
 
     def test_config(self):
-        config_filename = os.path.normpath(os.path.join(LOCALE_DIR, 'config'))
+        config_filename = os.path.normpath(os.path.join(LOCALE_DIR, 'config.yaml'))
         config = Configuration(config_filename)
         self.assertEqual(config.source_locale, 'en')
 
