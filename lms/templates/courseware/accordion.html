@@ -2,6 +2,7 @@
     from django.core.urlresolvers import reverse
     from xmodule.util.date_utils import get_time_display
     from django.utils.translation import ugettext as _
+    from django.conf import settings
 %>
 
 <%def name="make_chapter(chapter)">
@@ -29,7 +30,7 @@
                 if section.get('due') is None:
                     due_date = ''
                 else:
-                    formatted_string = get_time_display(section['due'], due_date_display_format)
+                    formatted_string = get_time_display(section['due'], due_date_display_format, coerce_tz=settings.TIME_ZONE)
                     due_date = '' if len(formatted_string)==0 else _('due {date}'.format(date=formatted_string))
               %>
               <p class="subtitle">${section['format']} ${due_date}</p>
