@@ -20,14 +20,13 @@ New documentation, *Building a Course with edX Studio*, is available online_. Yo
 Changes and Updates
 ==========================
 
-* You can now use single quotation marks in option response answers without escaping, when the single quotation mark is between two alphabet characters.  (LMS-2031)
+* You can now use single quotation marks without escaping them when you specify option response answers. The single quotation mark must be between two alphabet characters.  (LMS-2031)
+
 
 
 ***************************************
 edX Learning Management System
 ***************************************
-
-
 
 * A problem that caused the dashboard to not load if there were unicode or space characters in the course image has been fixed. (LMS-2073, STUD-1197)
 
@@ -35,7 +34,7 @@ edX Learning Management System
 
 * For string response questions, students can now enter regex expressions as answers. (BLD-475)
 
-* (BLD-529)
+* The video length is now shown when a student first views the video component. The student no longer must start the video to see the total time. (BLD-529)
 
 
 ***************************************
@@ -44,8 +43,3 @@ Discussions
 
 * The Discussion search field now expands when it gets focus through the keyboard. (FOR-203)
 
-***************************************
-Open Response Assessments
-***************************************
-
-* (ORA-254)
