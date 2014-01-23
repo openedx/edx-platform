@@ -2,181 +2,15 @@
 
 <%inherit file="../main.html" />
 
-<%namespace name='static' file='../static_content.html'/>
 <%! from django.core.urlresolvers import reverse %>
 
-<%block name="title"><title>Департамент образования города Москвы - центр педагогического мастерства - курсы повышения квалификации учителей</title></%block>
+<%block name="title"><title>${_("edX edge")}</title></%block>
 <%block name="bodyclass">no-header edge-landing</%block>
 
 <%block name="content">
-
-
-<style>
-.olimpiada-logo-large {
-  display: block;
-  height: 110px;
-  margin: 10px auto 0 auto;
-  width: 1100px;
-}
-.log-in-form {
-  width: 270px !important;
-  height: 300px;
-}
-.banners {
-    background: #F0EFEF;  border-top: 1px solid #8A8C8F;  border-bottom: 1px solid #8A8C8F;  width: 100%;  height: 83px;
-    margin-bottom: 40px;
-}
-.banners-inner {
-   width: 930px;  height: 83px;  text-align: center;  margin-left: auto;  margin-right: auto;  background: #f0efef;  background: -moz-linear-gradient(left, #f0efef 0%, #ffffff 50%, #f0efef 100%);  background: -webkit-gradient(linear, left top, right top, color-stop(0%,#f0efef), color-stop(50%,#ffffff), color-stop(100%,#f0efef));  background: -webkit-linear-gradient(left, #f0efef 0%,#ffffff 50%,#f0efef 100%);  background: -o-linear-gradient(left, #f0efef 0%,#ffffff 50%,#f0efef 100%);  background: -ms-linear-gradient(left, #f0efef 0%,#ffffff 50%,#f0efef 100%);  background: linear-gradient(to right, #f0efef 0%,#ffffff 50%,#f0efef 100%);  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f0efef', endColorstr='#f0efef',GradientType=1 );  border-bottom: 1px solid #8A8C8F;
-}
-.banners-inner a img {
-  margin: 12px;
-}
-
-.footer-short {
-  border-top: 1px solid #c4c5c7;
-  padding: 0 0 10px 0;
-}
-
-footer .colophon .nav-colophon li a {
-color: #333;
-}
-
-footer a:link, footer a:visited, footer a:hover, footer a:active {
-  border-bottom: none;
-  color: #1d9dd9;
-  text-decoration: none !important;
-  font-family: "Open Sans",Verdana,Geneva,sans-serif;
-}
-
-footer a:hover {
-  border-bottom: 1px dotted #1d9dd9;
-  color: #1d9dd9;
-}
-
-footer .references .copyright {
-margin: 0;
-}
-
-footer .colophon {
-margin-right: 1.69492%;
-width: 66.10169%;
-float: left;
-}
-footer .references {
-margin: -10px 0 0 0;
-width: 32.20339%;
-float: right;
-}
-.modal-form-error {
-background: tint($red,90%);
-color: rgb(143, 14, 14);
-display: block;
-font-weight: bold;
-}
-</style>
-
-<style>
-div.announcements-wrapper section.announcements > ol {
-list-style: none;
-margin-bottom: 1.41575em;
-padding-left: 0;
-}
-div.announcements-wrapper section.announcements > ol > li h2 {
-font-size: 0.875em;
-font-weight: bold;
-background: url("/static/images/calendar-icon.png") 0 center no-repeat;
-padding-left: 20px;
-margin-bottom: 5px;
-margin-top: 10px;
-}
-</style>
-
-<script>
-  $(window).bind("load", function() { 
-       
-       var footerHeight = 0,
-           footerTop = 0,
-           $footer = $("#footer-short");
-           
-       positionFooter();
-       
-       function positionFooter() {
-       
-                footerHeight = $footer.height();
-                footerTop = ($(window).scrollTop()+$(window).height()-footerHeight)+"px";
-       
-               if ( ($(document.body).height()+footerHeight) < $(window).height()) {
-                   $footer.css({
-                        position: "absolute"
-                   }).animate({
-                        top: footerTop
-                   })
-               } else {
-                   $footer.css({
-                        position: "static"
-                   })
-               }
-               
-       }
-
-       $(window)
-               .scroll(positionFooter)
-               .resize(positionFooter)
-               
-});
-</script>
-
-<div class="wrapper">
-<div>
-<div class="olimpiada-logo-large"><img src="http://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/Coat_of_Arms_of_Moscow.svg/200px-Coat_of_Arms_of_Moscow.svg.png?uselang=ru" style="
-    float: left;
-    height: 140px;
-"><span style="
-    margin-top: 5px;
-    margin-left: 60px;
-    float: left;
-    font-size: larger;
-    font-weight: 800;
-    white-space: nowrap;
-">Департамент образования города Москвы<br>
-Центр педагогического мастерства<br>
-<span style="padding-top: 5px;
-font-weight: bolder;
-font-size: x-large;
-">Курсы повышения квалификации учителей</span><span>
- </span></span></div>
-</div>
-<div class="banners">
-  <div class="banners-inner">
-  <a href="http://info.olimpiada.ru/" target="_blank"><img src="${static.url('/static/images/banners/olimp.png')}" border="0" alt="Олимпиада.ру" ></a>
-  <a href="http://vos.olimpiada.ru/" target="_blank"><img src="${static.url('/static/images/banners/vseros.png')}" border="0" alt="Всероссийская олимпиада"></a>
-  <a href="http://statgrad.org/" target="_blank"><img src="${static.url('/static/images/banners/statgrad.png')}" border="0" alt="Статград"></a>
- </div>
-</div>
-
-<div class="main-wrapper" style="width:1142px; margin-bottom:50px;">
+<div class="main-wrapper">
+  <div class="edx-edge-logo-large">${_("edX edge")}</div>
   <div class="content">
-    <div class="log-in-form">
-      <h2>Новости</h2>
-      % if site_wide_announcements:
-        <div class="announcements-wrapper">
-           <section class="announcements">
-            <ol>
-                % for announcement in site_wide_announcements:
-                <li class="announcement">
-                    <h2 class="title"><span class="date">
-<%! from django.template.defaultfilters import date as _date%>
-${ _date(announcement.creation_date, "j/m/Y")}</span></h2>
-                    <p style="font-size: smaller;">${announcement.content}</p>
-                    <!-- <a id="hide" href="${reverse('announcement_hide', args=[announcement.pk])}?next=${request.path}">Убрать</a> -->
-                </li>
-                % endfor
-            </ol>
-           </section>
-        </div>
-    % endif
-    </div>
     <div class="log-in-form">
       <h2>${_("Log in to your courses")}</h2>
       <form id="login_form" data-remote="true" method="post" action="/login_ajax">
@@ -194,51 +28,18 @@ ${ _date(announcement.creation_date, "j/m/Y")}</span></h2>
         </div>
       </form>
     </div>
-    <div class="sign-up" style="width: 280px;">
+    <div class="sign-up">
       <h3>${_("Register for classes")}</h3>
-      <p style="font-size: smaller;">Для регистрации на курсы директору необходимо заполнить форму отчета и внести в нее данные о своих сотрудниках. Форму отчета нужно отправить до 22-00 20 сентября 2013 года. Форма размещена <a href="http://www.statgrad.org/#509" target="_blank"> на сайте системы Статград.</a> Свои вопросы вы можете задать, написав на адрес почты <a href="mailto:statgrad@yandex.ru">statgrad@yandex.ru</a> или <a href="mailto:edu.olimpiada@yandex.ru">edu.olimpiada@yandex.ru</a>.</p>
+      <p>${_("Take free online courses from today's leading universities.")}</p>
+      <p><a href="#signup-modal" id="signup" rel="leanModal" class="register-button">${_("Register")}</a></p>
     </div>
   </div>
-</div>
-</div>
-<div class="wrapper-footer footer-short">
-  <footer>
-  <div class="colophon" style="padding-top: 10px;">
-    <nav class="nav-colophon">
-        <ol>
-        </ol>
-    </nav>
-  </div>
-    <div class="references" style="margin: 10px 0 0 0;">
-        <nav class="nav-legal">
-          <ul>
-  <li>
-        <a href="http://olimpiada.ru/">Olimpiada.ru</a>
-        </li>
-        <li>
-        <a href="http://vos.olimpiada.ru/">Всероссийская олимпиада в Москве</a>
-        </li>
-        <li>
-        <a href="http://mosolymp.olimpiada.ru/">Московская олимпиада школьников</a>
-        </li>
-        <li>
-        <a href="http://info.olimpiada.ru/calendar">Календарь олимпиад</a>
-  </li>
-  </ul>
-  </nav>
-
-        <p class="copyright">© 2013 ГБОУ ЦПМ г. Москва.</p>
-        <p class="copyright"><span style="margin-right:40px"><a href="#signup-modal" id="signup" rel="leanModal" class="register-button">&nbsp;</a></span> Powered by <a href="http://code.edx.org/">edX</a>.</p>
-      </div>
-</footer>
 </div>
 
 </%block>
 
 <%block name="js_extra">
-<script type="text/javascript" src="${static.url('js/jquery.maskedinput.min.js')}"></script>
 <script type="text/javascript">
-
   (function() {
     $(document).ready(function() {
       if ($.deparam.fragment()['forgot-password-modal'] !== undefined) {
@@ -258,7 +59,6 @@ ${ _date(announcement.creation_date, "j/m/Y")}</span></h2>
          $('#login_form').prepend('<div id="login_error" class="modal-form-error"></div>');
        }
        $('#login_error').html(json.value).stop().css("display", "block");
-       $('#login_error').effect("shake");
      }
     });
   })(this)

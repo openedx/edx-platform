@@ -264,7 +264,7 @@ def signin_user(request):
             settings.PLATFORM_NAME
         ),
     }
-    return render_to_response('university_profile/edge.html', context)
+    return render_to_response('login.html', context)
 
 
 @ensure_csrf_cookie
