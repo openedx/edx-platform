@@ -392,6 +392,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         Expects the same arguments as XModuleDescriptor.__init__
         """
         super(CourseDescriptor, self).__init__(*args, **kwargs)
+        _ = self.runtime.service(self, "i18n").ugettext
 
         if self.wiki_slug is None:
             if isinstance(self.location, Location):
@@ -419,8 +420,9 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         self._grading_policy = {}
 
         self.set_grading_policy(self.grading_policy)
+
         if self.discussion_topics == {}:
-            self.discussion_topics = {'General': {'id': self.location.html_id()}}
+            self.discussion_topics = {_('General'): {'id': self.location.html_id()}}
 
         # TODO check that this is still needed here and can't be by defaults.
         if not self.tabs:
@@ -428,7 +430,8 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             # first arg, since that's only used for dispatch
             tabs = []
             tabs.append({'type': 'courseware'})
-            tabs.append({'type': 'course_info', 'name': 'Course Info'})
+            # Translators: "Course Info" is the name of the course's information and updates page
+            tabs.append({'type': 'course_info', 'name': _('Course Info')})
 
             if self.syllabus_present:
                 tabs.append({'type': 'syllabus'})
@@ -441,12 +444,15 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             if self.discussion_link:
                 tabs.append({'type': 'external_discussion', 'link': self.discussion_link})
             else:
-                tabs.append({'type': 'discussion', 'name': 'Discussion'})
+                # Translators: "Discussion" is the title of the course forum page
+                tabs.append({'type': 'discussion', 'name': _('Discussion')})
 
-            tabs.append({'type': 'wiki', 'name': 'Wiki'})
+            # Translators: "Wiki" is the title of the course's wiki page
+            tabs.append({'type': 'wiki', 'name': _('Wiki')})
 
             if not self.hide_progress_tab:
-                tabs.append({'type': 'progress', 'name': 'Progress'})
+                # Translators: "Progress" is the title of the student's grade information page
+                tabs.append({'type': 'progress', 'name': _('Progress')})
 
             self.tabs = tabs
 
@@ -770,7 +776,10 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
                     xmoduledescriptors.append(s)
 
                     # The xmoduledescriptors included here are only the ones that have scores.
-                    section_description = {'section_descriptor': s, 'xmoduledescriptors': filter(lambda child: child.has_score, xmoduledescriptors)}
+                    section_description = {
+                        'section_descriptor': s,
+                        'xmoduledescriptors': filter(lambda child: child.has_score, xmoduledescriptors)
+                    }
 
                     section_format = s.format if s.format is not None else ''
                     graded_sections[section_format] = graded_sections.get(section_format, []) + [section_description]
