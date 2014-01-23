@@ -282,7 +282,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         message = "Successfully saved your submission."
         if error:
             success = False
-            message = 'Unable to send your submission to grader. Please try again later.'
+            message = 'Unable to submit your submission to grader. Please try again later.'
             log.error("Unable to submit to grader. location: {0}, error_message: {1}".format(
                 self.location_string, error_message
             ))
@@ -702,6 +702,8 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             success, error_message = self.send_to_grader(data['student_answer'], system)
             if not success:
                 message = error_message
+                # Store the answer instead
+                self.store_answer(data, system)
             else:
                 self.new_history_entry(data['student_answer'])
                 self.change_state(self.ASSESSING)

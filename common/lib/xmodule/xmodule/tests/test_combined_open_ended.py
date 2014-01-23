@@ -363,8 +363,10 @@ class OpenEndedModuleTest(unittest.TestCase):
         )
         self.assertFalse(response['success'])
         self.assertNotEqual(self.openendedmodule.latest_answer(), submission)
+        self.assertEqual(self.openendedmodule.stored_answer, submission)
         state = json.loads(self.openendedmodule.get_instance_state())
         self.assertEqual(state['child_state'], OpenEndedModule.INITIAL)
+        self.assertEqual(state['stored_answer'], submission)
 
     def update_score_single(self):
         self.openendedmodule.new_history_entry("New Entry")
