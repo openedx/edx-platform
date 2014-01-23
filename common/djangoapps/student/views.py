@@ -256,6 +256,7 @@ def signin_user(request):
         return redirect(reverse('dashboard'))
 
     context = {
+        'suppress_toplevel_navigation': True,
         'course_id': request.GET.get('course_id'),
         'enrollment_action': request.GET.get('enrollment_action'),
         'platform_name': MicrositeConfiguration.get_microsite_configuration_value(
