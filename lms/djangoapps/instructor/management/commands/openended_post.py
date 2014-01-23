@@ -64,11 +64,14 @@ class Command(BaseCommand):
                     print err
                     return
 
-                descriptor = modulestore().get_instance(course.id, location, depth=0)
-                if descriptor is None:
-                    print "Location not found in course"
-                    return
-
+                try:
+                    descriptor = modulestore().get_instance(course.id, location, depth=0)
+                    if descriptor is None:
+                        print "Location not found in course"
+                        continue
+                except:
+                    continue
+                
                 if dry_run:
                     print "Doing a dry run."
 
