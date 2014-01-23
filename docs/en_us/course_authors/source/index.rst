@@ -24,6 +24,7 @@ Contents
    common_problems
    advanced_problems
    specialized_problems
+   external_graders
    open_response_assessment
    tools
    set_content_releasedates
