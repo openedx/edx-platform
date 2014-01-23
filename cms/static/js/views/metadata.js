@@ -106,7 +106,6 @@ function(BaseView, _, MetadataModel, AbstractEditor, VideoList) {
             }
         },
 
-
         getValueFromEditor : function () {
             return this.$el.find('#' + this.uniqueId).val();
         },

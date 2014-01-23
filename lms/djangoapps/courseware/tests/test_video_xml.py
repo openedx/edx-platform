@@ -31,6 +31,7 @@ SOURCE_XML = """
     display_name="A Name"
     youtube="0.75:jNCf2gIqpeE,1.0:ZwkTiUPN0mg,1.25:rsq9auxASqI,1.50:kMyNdzVHHgg"
     sub="a_sub_file.srt.sjson"
+    download_video="true"
     start_time="01:00:03" end_time="01:00:10"
     >
         <source src="example.mp4"/>
