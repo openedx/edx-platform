@@ -76,7 +76,7 @@ these are recommended but not required.)
 Video Formats
 -------------
 
-The edX video player supports videos in .mp4, .ogg, and .webm format.
+The edX video player supports videos in .mp4, .mpeg, .ogg, and .webm format.
 
 *********************************************
 Step 2. Create or Obtain a Video Transcript
