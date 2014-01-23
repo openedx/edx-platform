@@ -156,19 +156,13 @@ function () {
                        'ui-widget-header ' +
                        'ui-corner-all ' +
                        'slider-range'
-            }).css({
-                left: rangeParams.left,
-                width: rangeParams.width
-            });
+            }).css(rangeParams);
 
             this.videoProgressSlider.sliderProgress
                 .after(this.videoProgressSlider.sliderRange);
         } else {
             this.videoProgressSlider.sliderRange
-                .css({
-                    left: rangeParams.left,
-                    width: rangeParams.width
-                });
+                .css(rangeParams);
         }
     }
 
