@@ -10,7 +10,6 @@ from urlparse import urlparse, urlunparse
 
 from xmodule.modulestore import Location
 from .django import contentstore
-# to install PIL on MacOSX: 'easy_install http://dist.repoze.org/PIL-1.1.6.tar.gz'
 from PIL import Image
 
 
