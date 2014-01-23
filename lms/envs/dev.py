@@ -16,11 +16,6 @@ from .common import *
 from logsettings import get_logger_config
 
 DEBUG = True
-USE_I18N = True
-# For displaying the dummy text, we need to provide a language mapping.
-LANGUAGES = (
-    ('eo', 'Esperanto'),
-)
 TEMPLATE_DEBUG = True
 
 FEATURES['DISABLE_START_DATES'] = False

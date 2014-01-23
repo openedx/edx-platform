@@ -492,14 +492,17 @@ FAVICON_PATH = 'images/favicon.ico'
 # Locale/Internationalization
 TIME_ZONE = 'America/New_York'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
-LANGUAGES = ()
 
-# We want i18n to be turned off in production, at least until we have full localizations.
-# Thus we want the Django translation engine to be disabled. Otherwise even without
-# localization files, if the user's browser is set to a language other than us-en,
-# strings like "login" and "password" will be translated and the rest of the page will be
-# in English, which is confusing.
-USE_I18N = False
+LANGUAGES = (
+    ('en@pirate', 'Pirate English'),
+    ('eo', 'Esperanto'),
+)
+
+# This is the list of language codes for languanges which are released to all users.
+# See dark_lang/README.rst for more details.
+RELEASED_LANGUAGES = ()
+
+USE_I18N = True
 USE_L10N = True
 
 # Localization strings (e.g. django.po) are under this directory
@@ -638,6 +641,9 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
 
     'course_wiki.course_nav.Middleware',
+
+    # Allows us to dark-launch particular languages
+    'dark_lang.middleware.DarkLangMiddleware',
 
     # Detects user-requested locale from 'accept-language' header in http request
     'django.middleware.locale.LocaleMiddleware',
