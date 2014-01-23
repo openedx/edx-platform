@@ -20,7 +20,10 @@ class Command(BaseCommand):
     """
 
     help = ("Usage: openended_post <course_id> <problem_location> <student_ids.txt> <hostname> --dry-run --task-number=<task_number>\n"
-            "The text file should contain a User.id in each line.")
+            "The text file should contain a User.id in each line.\n"
+            "Or\n"
+            "Usage: openended_post <combined.csv> <hostname> --dry-run --task-number=<task_number>\n"
+            "The text file should contain a course_id;module_id;user.id in each line.\n")
 
     option_list = BaseCommand.option_list + (
         make_option('-n', '--dry-run',
@@ -36,34 +39,64 @@ class Command(BaseCommand):
         dry_run = options['dry_run']
         task_number = options['task_number']
 
+        combined =  False
         if len(args) == 4:
             course_id = args[0]
             location = args[1]
             students_ids = [line.strip() for line in open(args[2])]
             hostname = args[3]
+        elif len(args) == 2:
+            combined = True
+            hostname = args[3]
         else:
             print self.help
             return
 
-        try:
-            course = get_course(course_id)
-        except ValueError as err:
-            print err
-            return
+        if combined:
+            for line in open(args[0]):
+                data =  line.split(';')
+            course_id = data[0]
+            location = data[1]
+            student_id = data[2]
+            try:
+                course = get_course(course_id)
+            except ValueError as err:
+                print err
+                return
 
-        descriptor = modulestore().get_instance(course.id, location, depth=0)
-        if descriptor is None:
-            print "Location not found in course"
-            return
+            descriptor = modulestore().get_instance(course.id, location, depth=0)
+            if descriptor is None:
+                print "Location not found in course"
+                return
 
-        if dry_run:
-            print "Doing a dry run."
+            if dry_run:
+                print "Doing a dry run."
 
-        students = User.objects.filter(id__in=students_ids).order_by('username')
-        print "Number of students: {0}".format(students.count())
+            students = User.objects.filter(id=student_id).order_by('username')
+            print "Number of students: {0}".format(students.count())
 
-        for student in students:
-            post_submission_for_student(student, course, location, task_number, dry_run=dry_run, hostname=hostname)
+            for student in students:
+                post_submission_for_student(student, course, location, task_number, dry_run=dry_run, hostname=hostname)
+        else:
+            try:
+                course = get_course(course_id)
+            except ValueError as err:
+                print err
+                return
+
+            descriptor = modulestore().get_instance(course.id, location, depth=0)
+            if descriptor is None:
+                print "Location not found in course"
+                return
+
+            if dry_run:
+                print "Doing a dry run."
+
+            students = User.objects.filter(id__in=students_ids).order_by('username')
+            print "Number of students: {0}".format(students.count())
+
+            for student in students:
+                post_submission_for_student(student, course, location, task_number, dry_run=dry_run, hostname=hostname)
 
 
 def post_submission_for_student(student, course, location, task_number, dry_run=True, hostname=None):
