@@ -57,7 +57,7 @@ function () {
     function _renderElements(state) {
         state.videoProgressSlider.el = state.videoControl.sliderEl;
 
-        buildSlider(state);
+        state.videoProgressSlider.buildSlider();
         _buildHandle(state);
     }
 
@@ -86,15 +86,15 @@ function () {
     // them available and sets up their context is makeFunctionsPublic().
     // ***************************************************************
 
-    function buildSlider(state) {
-        state.videoProgressSlider.slider = state.videoProgressSlider.el
+    function buildSlider() {
+        this.videoProgressSlider.slider = this.videoProgressSlider.el
             .slider({
                 range: 'min',
-                slide: state.videoProgressSlider.onSlide,
-                stop: state.videoProgressSlider.onStop
+                slide: this.videoProgressSlider.onSlide,
+                stop: this.videoProgressSlider.onStop
             });
 
-        state.videoProgressSlider.sliderProgress = state.videoProgressSlider
+        this.videoProgressSlider.sliderProgress = this.videoProgressSlider
             .slider
             .find('.ui-slider-range.ui-widget-header.ui-slider-range-min');
     }
