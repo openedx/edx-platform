@@ -492,15 +492,6 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.assertContains(resp, 'i4x://edX/toy/video/video_with_end_time')
         self.assertContains(resp, 'i4x://edX/toy/poll_question/T1_changemind_poll_foo_2')
 
-    def test_video_module_caption_asset_path(self):
-        """
-        This verifies that a video caption url is as we expect it to be
-        """
-        resp = self._test_preview(Location('i4x', 'edX', 'toy', 'video', 'sample_video', None))
-        self.assertEquals(resp.status_code, 200)
-        content = json.loads(resp.content)
-        self.assertIn('data-caption-asset-path="/c4x/edX/toy/asset/subs_"', content['html'])
-
     def _test_preview(self, location):
         """ Preview test case. """
         direct_store = modulestore('direct')
