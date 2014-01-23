@@ -39,7 +39,7 @@ def msgfmt_check_po_file(filename):
     """
     # Use relative paths to make output less noisy.
     rfile = os.path.relpath(filename, LOCALE_DIR)
-    out, err = call(['msgfmt', '-c', rfile], working_directory=LOCALE_DIR)
+    out, err = call('msgfmt -c {}'.format(rfile), working_directory=LOCALE_DIR)
     if err != '':
         log.info('\n' + out)
         log.warn('\n' + err)

@@ -11,7 +11,7 @@ def execute(command, working_directory=BASE_DIR):
     Output is ignored.
     """
     LOG.info(command)
-    subprocess.check_call(command, cwd=working_directory, stderr=sys.STDOUT, shell=True)
+    subprocess.check_call(command, cwd=working_directory, stderr=subprocess.STDOUT, shell=True)
 
 
 def call(command, working_directory=BASE_DIR):
@@ -22,7 +22,7 @@ def call(command, working_directory=BASE_DIR):
 
     """
     LOG.info(command)
-    p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=working_directory)
+    p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=working_directory, shell=True)
     out, err = p.communicate()
     return (out, err)
 
