@@ -55,28 +55,28 @@ class Command(BaseCommand):
         if combined:
             for line in open(args[0]):
                 data =  line.split(';')
-            course_id = data[0]
-            location = data[1]
-            student_id = data[2]
-            try:
-                course = get_course(course_id)
-            except ValueError as err:
-                print err
-                return
+                course_id = data[0]
+                location = data[1]
+                student_id = data[2]
+                try:
+                    course = get_course(course_id)
+                except ValueError as err:
+                    print err
+                    return
 
-            descriptor = modulestore().get_instance(course.id, location, depth=0)
-            if descriptor is None:
-                print "Location not found in course"
-                return
+                descriptor = modulestore().get_instance(course.id, location, depth=0)
+                if descriptor is None:
+                    print "Location not found in course"
+                    return
 
-            if dry_run:
-                print "Doing a dry run."
+                if dry_run:
+                    print "Doing a dry run."
 
-            students = User.objects.filter(id=student_id).order_by('username')
-            print "Number of students: {0}".format(students.count())
+                students = User.objects.filter(id=student_id).order_by('username')
+                print "Number of students: {0}".format(students.count())
 
-            for student in students:
-                post_submission_for_student(student, course, location, task_number, dry_run=dry_run, hostname=hostname)
+                for student in students:
+                    post_submission_for_student(student, course, location, task_number, dry_run=dry_run, hostname=hostname)
         else:
             try:
                 course = get_course(course_id)
