@@ -24,9 +24,10 @@
 
 import os, sys
 import polib
-from dummy import Dummy
-from config import CONFIGURATION
-from execute import create_dir_if_necessary
+
+from i18n.dummy import Dummy
+from i18n.config import CONFIGURATION
+from i18n.execute import create_dir_if_necessary
 
 
 def main(file, locale):

@@ -31,11 +31,11 @@ SOURCE_XML = """
     display_name="A Name"
     youtube="0.75:jNCf2gIqpeE,1.0:ZwkTiUPN0mg,1.25:rsq9auxASqI,1.50:kMyNdzVHHgg"
     sub="a_sub_file.srt.sjson"
+    download_video="true"
     start_time="01:00:03" end_time="01:00:10"
     >
         <source src="example.mp4"/>
         <source src="example.webm"/>
-        <source src="example.ogv"/>
     </video>
 """
 
@@ -68,12 +68,10 @@ class VideoModuleUnitTest(unittest.TestCase):
     def test_video_get_html(self):
         """Make sure that all parameters extracted correclty from xml"""
         module = VideoFactory.create()
-
         sources = {
             'main': 'example.mp4',
             'mp4': 'example.mp4',
             'webm': 'example.webm',
-            'ogv': 'example.ogv'
         }
 
         expected_context = {
@@ -87,7 +85,7 @@ class VideoModuleUnitTest(unittest.TestCase):
             'show_captions': 'true',
             'sources': sources,
             'youtube_streams': _create_youtube_string(module),
-            'track': '',
+            'track': None,
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', False),
             'yt_test_timeout': 1500,
             'yt_test_url': 'https://gdata.youtube.com/feeds/api/videos/'

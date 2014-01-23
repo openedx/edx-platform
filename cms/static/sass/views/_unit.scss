@@ -708,6 +708,12 @@ body.course.unit,.view-unit {
         text-overflow: ellipsis;
       }
 
+      //Allows users to copy full value of disabled inputs.
+      input.is-disabled{
+        text-overflow: clip;
+        opacity: .5;
+      }
+
       input[type="number"] {
 
         width: 38.5%;

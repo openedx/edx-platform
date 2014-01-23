@@ -257,7 +257,6 @@ XQUEUE_PORT = 8040
 YOUTUBE_PORT = 8031
 LTI_PORT = 8765
 
-
 ################### Make tests faster
 
 #http://slacy.com/blog/2012/04/make-your-tests-faster-in-django-1-4/
@@ -305,5 +304,8 @@ if len(MICROSITE_CONFIGURATION.keys()) > 0:
         MICROSITE_CONFIGURATION,
         SUBDOMAIN_BRANDING,
         VIRTUAL_UNIVERSITIES,
-        microsites_root=ENV_ROOT / 'edx-platform' / 'test_microsites'
+        microsites_root=COMMON_ROOT / "test" / 'test_microsites'
     )
+
+######### LinkedIn ########
+LINKEDIN_API['COMPANY_ID'] = '0000000'

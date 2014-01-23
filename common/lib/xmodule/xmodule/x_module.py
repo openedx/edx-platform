@@ -6,7 +6,12 @@ import yaml
 from functools import partial
 from lxml import etree
 from collections import namedtuple
-from pkg_resources import resource_listdir, resource_string, resource_isdir
+from pkg_resources import (
+    resource_exists,
+    resource_listdir,
+    resource_string,
+    resource_isdir,
+)
 from webob import Response
 from webob.multidict import MultiDict
 
@@ -14,7 +19,7 @@ from xblock.core import XBlock
 from xblock.fields import Scope, Integer, Float, List, XBlockMixin, String
 from xblock.fragment import Fragment
 from xblock.plugin import default_select
-from xblock.runtime import Runtime, MemoryIdManager
+from xblock.runtime import Runtime
 from xmodule.fields import RelativeTime
 
 from xmodule.errortracker import exc_info_to_str
@@ -508,6 +513,8 @@ class ResourceTemplates(object):
     Gets the templates associated w/ a containing cls. The cls must have a 'template_dir_name' attribute.
     It finds the templates as directly in this directory under 'templates'.
     """
+    template_packages = [__name__]
+
     @classmethod
     def templates(cls):
         """
@@ -520,14 +527,17 @@ class ResourceTemplates(object):
         templates = []
         dirname = cls.get_template_dir()
         if dirname is not None:
-            for template_file in resource_listdir(__name__, dirname):
-                if not template_file.endswith('.yaml'):
-                    log.warning("Skipping unknown template file %s", template_file)
+            for pkg in cls.template_packages:
+                if not resource_isdir(pkg, dirname):
                     continue
-                template_content = resource_string(__name__, os.path.join(dirname, template_file))
-                template = yaml.safe_load(template_content)
-                template['template_id'] = template_file
-                templates.append(template)
+                for template_file in resource_listdir(pkg, dirname):
+                    if not template_file.endswith('.yaml'):
+                        log.warning("Skipping unknown template file %s", template_file)
+                        continue
+                    template_content = resource_string(pkg, os.path.join(dirname, template_file))
+                    template = yaml.safe_load(template_content)
+                    template['template_id'] = template_file
+                    templates.append(template)
 
         return templates
 
@@ -555,15 +565,13 @@ class ResourceTemplates(object):
         """
         dirname = cls.get_template_dir()
         if dirname is not None:
-            try:
-                template_content = resource_string(__name__, os.path.join(dirname, template_id))
-            except IOError:
-                return None
-            template = yaml.safe_load(template_content)
-            template['template_id'] = template_id
-            return template
-        else:
-            return None
+            path = os.path.join(dirname, template_id)
+            for pkg in cls.template_packages:
+                if resource_exists(pkg, path):
+                    template_content = resource_string(pkg, path)
+                    template = yaml.safe_load(template_content)
+                    template['template_id'] = template_id
+                    return template
 
 
 def prefer_xmodules(identifier, entry_points):

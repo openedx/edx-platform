@@ -370,7 +370,7 @@ class Courses(SysadminDashboardView):
 
         msg = u''
 
-        logging.debug('Adding course using git repo {0}'.format(gitloc))
+        log.debug('Adding course using git repo {0}'.format(gitloc))
 
         # Grab logging output for debugging imports
         output = StringIO.StringIO()
@@ -674,7 +674,7 @@ class GitLogs(TemplateView):
             else:
                 mdb = mongoengine.connect(mongo_db['db'], host=mongo_db['host'])
         except mongoengine.connection.ConnectionError:
-            logging.exception('Unable to connect to mongodb to save log, '
+            log.exception('Unable to connect to mongodb to save log, '
                               'please check MONGODB_LOG settings.')
 
         if course_id is None:
@@ -686,8 +686,8 @@ class GitLogs(TemplateView):
             try:
                 course = get_course_by_id(course_id)
             except Exception:  # pylint: disable=broad-except
-                cilset = None
-                error_msg = _('Cannot find course {0}').format(course_id)
+                log.info('Cannot find course {0}'.format(course_id))
+                raise Http404
 
             # Allow only course team, instructors, and staff
             if not (request.user.is_staff or

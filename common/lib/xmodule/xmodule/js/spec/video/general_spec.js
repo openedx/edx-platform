@@ -1,4 +1,4 @@
-(function () {
+(function (undefined) {
     describe('Video', function () {
         var oldOTBD;
 
@@ -10,7 +10,6 @@
         });
 
         afterEach(function () {
-            window.OldVideoPlayer = undefined;
             $('source').remove();
         });
 
@@ -28,10 +27,6 @@
 
                     it('check videoType', function () {
                         expect(this.state.videoType).toEqual('youtube');
-                    });
-
-                    it('reset the current video player', function () {
-                        expect(window.OldVideoPlayer).toBeUndefined();
                     });
 
                     it('set the elements', function () {
@@ -74,10 +69,6 @@
 
                     it('check videoType', function () {
                         expect(state.videoType).toEqual('html5');
-                    });
-
-                    it('reset the current video player', function () {
-                        expect(window.OldVideoPlayer).toBeUndefined();
                     });
 
                     it('set the elements', function () {

@@ -1,6 +1,6 @@
 import os, subprocess, logging
 
-from config import CONFIGURATION, BASE_DIR
+from i18n.config import BASE_DIR
 
 LOG = logging.getLogger(__name__)
 
@@ -11,7 +11,7 @@ def execute(command, working_directory=BASE_DIR):
     Output is ignored.
     """
     LOG.info(command)
-    subprocess.check_output(command.split(' '), cwd=working_directory, stderr=subprocess.STDOUT)
+    subprocess.check_call(command, cwd=working_directory, stderr=sys.STDOUT, shell=True)
 
 
 def call(command, working_directory=BASE_DIR):
