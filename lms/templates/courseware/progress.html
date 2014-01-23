@@ -16,7 +16,10 @@
     from django.core.urlresolvers import reverse
 %>
 
-<%! from xmodule.util.date_utils import get_time_display %>
+<%!
+from xmodule.util.date_utils import get_time_display
+from django.conf import settings
+%>
 
 <%block name="js_extra">
 <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
@@ -74,7 +77,7 @@ ${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph",
 
                 %if section.get('due') is not None:
                   <%
-                      formatted_string = get_time_display(section['due'], course.due_date_display_format)
+                      formatted_string = get_time_display(section['due'], course.due_date_display_format, coerce_tz=settings.TIME_ZONE)
                       due_date = '' if len(formatted_string)==0 else _(u'due {date}').format(date=formatted_string)
                   %>
                   <em>
