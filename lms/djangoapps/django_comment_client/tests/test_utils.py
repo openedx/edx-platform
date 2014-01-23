@@ -1,4 +1,5 @@
 import json
+import mock
 from datetime import datetime
 from pytz import UTC
 from django.core.urlresolvers import reverse
@@ -11,6 +12,7 @@ import django_comment_client.utils as utils
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
+from edxmako import add_lookup
 
 
 class DictionaryTestCase(TestCase):
@@ -505,3 +507,17 @@ class JsonResponseTestCase(TestCase, UnicodeTestMixin):
         response = utils.JsonResponse(text)
         reparsed = json.loads(response.content)
         self.assertEqual(reparsed, text)
+
+
+class RenderMustacheTests(TestCase):
+    """
+    Test the `render_mustache` utility function.
+    """
+
+    @mock.patch('edxmako.LOOKUP', {})
+    def test_it(self):
+        """
+        Basic test.
+        """
+        add_lookup('main', '', package=__name__)
+        self.assertEqual(utils.render_mustache('test.mustache', {}), 'Testing 1 2 3.\n')

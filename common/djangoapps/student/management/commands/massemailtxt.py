@@ -4,7 +4,7 @@ import time
 from django.core.management.base import BaseCommand
 from django.conf import settings
 
-import edxmako
+from edxmako import lookup_template
 
 from django.core.mail import send_mass_mail
 import sys
@@ -39,8 +39,8 @@ rate -- messages per second
 
         users = [u.strip() for u in open(user_file).readlines()]
 
-        message = edxmako.lookup['main'].get_template('emails/' + message_base + "_body.txt").render()
-        subject = edxmako.lookup['main'].get_template('emails/' + message_base + "_subject.txt").render().strip()
+        message = lookup_template('main', 'emails/' + message_base + "_body.txt").render()
+        subject = lookup_template('main', 'emails/' + message_base + "_subject.txt").render().strip()
         rate = int(ratestr)
 
         self.log_file = open(logfilename, "a+", buffering=0)
