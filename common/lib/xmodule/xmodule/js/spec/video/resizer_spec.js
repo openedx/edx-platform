@@ -163,7 +163,7 @@ function (Resizer) {
                 function ()
             {
                 var methods = ['add', 'once'],
-                    errorMessage = 'TypeError: Argument is not a function.',
+                    errorMessage = '[Video info]: TypeError: Argument is not a function.',
                     arg = {};
 
                 spyOn(console, 'error');
