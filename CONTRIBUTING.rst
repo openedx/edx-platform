@@ -57,7 +57,7 @@ new pep8 or pylint errors (and ideally, should fix up other errors you
 encounter in the files you edit). From the edx-platform main directory, you can
 run the command::
 
-    $ rake quality
+    $ paver run_quality
 
 to print the "Diff Quality" report, a report of the quality violations your
 branch has made.
@@ -90,13 +90,13 @@ list *before* you start coding.
 
 Running the command ::
 
-    $ rake test
+    $ paver test
 
 in the edx-platform directory will run all the unit tests on edx-platform (to
 run specific tests, refer to the testing documentation). Once you've run this
 command, you can run ::
 
-    $ rake coverage
+    $ paver coverage
 
 to generate the "Diff Coverage" report. This report tells you how much of the
 Python and JavaScript code you've changed is covered by unit tests. We aim for
@@ -117,12 +117,12 @@ When you open a pull request (PR), please follow these guidelines:
 
 * As far as code goes, a first pass is to make sure that your code is of high
   quality. This means ensuring plenty of comments, as well as a 100% pass rate
-  when you run ``rake quality`` locally. See the section **Code Quality
+  when you run ``paver run_quality`` locally. See the section **Code Quality
   Guidelines**.
 
 * Testing coverage should be as complete as possible. 95% or greater on
-  JavaScript and Python coverage (you can check this by running ``rake test;
-  rake coverage`` locally). Percentage coverage is only calculated from unit
+  JavaScript and Python coverage (you can check this by running ``paver test;
+  paver coverage`` locally). Percentage coverage is only calculated from unit
   tests, however. If you're adding new visual features, we love seeing
   acceptance tests as applicable. See the section **Testing Coverage
   Guidelines**.

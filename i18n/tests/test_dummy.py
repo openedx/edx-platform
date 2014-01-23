@@ -22,7 +22,7 @@ class TestDummy(TestCase):
     def assertUnicodeEquals(self, str1, str2):
         """Just like assertEquals, but doesn't put Unicode into the fail message.
 
-        Either nose, or rake, or something, deals very badly with unusual
+        Either nose, or something, deals very badly with unusual
         Unicode characters in the assertions, so we use repr here to keep
         things safe.
 

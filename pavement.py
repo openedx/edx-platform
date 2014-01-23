@@ -1,13 +1,6 @@
 import sys
 sys.path.append('.')
-from paver.setuputils import setup
-from pavelib import prereqs, assets, django, docs
+from pavelib import acceptance_test, assets, bok_choy, devstack, django, docs, i18n, js_test, prereqs
+from pavelib import quality, tests, workspace
 
-setup(
-    name="OpenEdX",
-    packages=['OpenEdX'],
-    version="1.0",
-    url="",
-    author="OpenEdX",
-    author_email=""
-)
+

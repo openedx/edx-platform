@@ -37,7 +37,7 @@ Compiling
 The dev server will automatically compile coffeescript files that have changed.
 Simply start the server using:
     
-    $ rake runserver
+    $ paver run_server
 
 Testing
 -------

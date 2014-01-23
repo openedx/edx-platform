@@ -21,9 +21,9 @@ Each file in this directory should meet the following criteria
 Execution
 ---------
 
-The scripts are run by the rake task `ws:migrate`. That task
+The scripts are run by the paver task `paver ws_migrate`. That task
 only runs a given script if a corresponding marker file
-in .completed-ws-migrations doesn't already exist.
+in .ws_migrations_complete doesn't already exist.
 
 If the SKIP_WS_MIGRATIONS environment variable is set, then
 no workspace migrations will be run.

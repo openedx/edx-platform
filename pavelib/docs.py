@@ -1,16 +1,6 @@
 from paver.easy import *
-from paver.setuputils import setup
 from pavelib import assets
 import webbrowser
-
-setup(
-    name="OpenEdX",
-    packages=['OpenEdX'],
-    version="1.0",
-    url="",
-    author="OpenEdX",
-    author_email=""
-)
 
 
 @task

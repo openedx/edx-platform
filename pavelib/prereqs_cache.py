@@ -6,6 +6,7 @@ REPO_ROOT = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 
 PREREQS_MD5_DIR = os.getenv('PREREQ_CACHE_DIR', os.path.join(REPO_ROOT, '.prereqs_cache'))
 
+
 def get_files(dir):
 
     files = []

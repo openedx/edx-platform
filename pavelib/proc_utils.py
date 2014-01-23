@@ -3,6 +3,9 @@ import os
 import subprocess
 import signal
 import psutil
+import time
+
+from urllib2 import urlopen, URLError
 
 
 def write_stderr(message):
@@ -23,10 +26,18 @@ def kill_process(proc):
         os.kill(child_pid.pid, signal.SIGKILL)
 
 
-def run_process(processes, wait):
+def run_process(processes, wait, out_log=None, err_log=None):
 
     kwargs = {'shell': True, 'cwd': None}
     pids = []
+
+    if out_log:
+        out_log_file = open(out_log, 'w')
+        kwargs['stdout'] = out_log_file
+
+    if err_log:
+        err_log_file = open(err_log, 'w')
+        kwargs['stderr'] = err_log_file
 
     try:
         for proc in processes:
@@ -37,7 +48,7 @@ def run_process(processes, wait):
             print("Enter CTL-C to end")
             signal.pause()
             print("Processes ending")
-    except Exception, e:
+    except Exception as e:
         write_stderr("Error running process %s\n" % e)
     finally:
         if wait:
@@ -48,3 +59,26 @@ def run_process(processes, wait):
                 pass
             except:
                 pass
+
+    if not wait:
+        return pids
+    else:
+        return None
+
+
+# Wait for a server to respond with status 200 at "/"
+def wait_for_server(server):
+    attempts = 0
+    status = False
+
+    while attempts < 20:
+        try:
+            response = urlopen(server, timeout=10)
+            if response.code == 200:
+                status = True
+                break
+        except URLError:
+            attempts += 1
+            time.sleep(1)
+
+    return status

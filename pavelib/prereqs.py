@@ -1,18 +1,8 @@
 from paver.easy import *
-from paver.setuputils import setup
 import os
 from distutils import sysconfig
 
 import prereqs_cache
-
-setup(
-    name="OpenEdX",
-    packages=['OpenEdX'],
-    version="1.0",
-    url="",
-    author="OpenEdX",
-    author_email=""
-)
 
 NPM_REGISTRY = "http://registry.npmjs.org/"
 

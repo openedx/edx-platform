@@ -1,19 +1,8 @@
 from paver.easy import *
-from paver.setuputils import setup
-
 from pavelib import prereqs, proc_utils
 from proc_utils import write_stderr
 
 default_port = {"lms": 8000, "cms": 8001}
-
-setup(
-    name="OpenEdX",
-    packages=['OpenEdX'],
-    version="1.0",
-    url="",
-    author="OpenEdX",
-    author_email=""
-)
 
 
 @task
@@ -72,7 +61,7 @@ def run_server(options):
     proc_utils.run_process(
         ['python manage.py {system} runserver --traceback --settings={env} --pythonpath=. {port}'.format(
             system=system, env=env, port=port)
-         ], True)
+         ], wait=True)
 
 
 @task
@@ -120,7 +109,8 @@ def run_celery():
     system = getattr(options, 'system', 'lms')
     env = getattr(options, 'env', 'dev_with_worker')
 
-    proc_utils.run_process(['python manage.py {system} celery worker --loglevel=INFO --settings={env} --pythonpath=. '.format(system=system, env=env)], True)
+    proc_utils.run_process(['python manage.py {system} celery worker --loglevel=INFO --settings={env} --pythonpath=. '.format(
+                            system=system, env=env)], wait=True)
 
 
 @task
@@ -140,7 +130,7 @@ def run_all_servers():
          'python manage.py cms runserver --traceback --settings={env}  --pythonpath=. {port}'.format(env=env, port=default_options['cms']),
          'python manage.py lms celery worker --loglevel=INFO --settings={env} --pythonpath=. '.format(env=worker_env),
          'python manage.py cms celery worker --loglevel=INFO --settings={env} --pythonpath=. '.format(env=worker_env)
-         ], True)
+         ], wait=True)
 
 
 @task
@@ -161,7 +151,8 @@ def clone_course():
         print("You must provide a source and destination")
         exit()
 
-    sh('python manage.py cms clone --traceback --settings={env} --pythonpath=. {src} {dest}'.format(env=env, src=src, dest=dest))
+    sh('python manage.py cms clone --traceback --settings={env} --pythonpath=. {src} {dest}'.format(
+        env=env, src=src, dest=dest))
 
 
 @task
@@ -260,7 +251,6 @@ def export_course():
 
 @task
 @cmdopts([
-    ("system=", "s", "System to act on"),
     ("env=", "e", "Environment settings"),
     ("user=", "u", "User to set staff bit"),
 ])
@@ -268,7 +258,6 @@ def set_staff():
     """
       Export course data to a tar.gz file
     """
-    system = getattr(options, 'system', 'lms')
     env = getattr(options, 'env', 'dev')
     user = getattr(options, 'user', '')
 

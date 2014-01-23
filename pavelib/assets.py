@@ -1,5 +1,4 @@
 from paver.easy import *
-from paver.setuputils import setup
 from pavelib import prereqs, proc_utils
 from proc_utils import write_stderr
 
@@ -8,23 +7,14 @@ import glob
 import os
 import platform
 
-setup(
-    name="OpenEdX",
-    packages=['OpenEdX'],
-    version="1.0",
-    url="",
-    author="OpenEdX",
-    author_email=""
-)
-
-
 # Build Constants
 REPO_ROOT = path(__file__).abspath().dirname().dirname()  # /project_dir/edx-platform/
 PROJECT_ROOT = REPO_ROOT.dirname()      # /project_dir
-REPORT_DIR = PROJECT_ROOT / "reports"   # /project_dir/reports
+REPORT_DIR = REPO_ROOT / "reports"   # /project_dir/edx-platform/reports
+TEST_DIR = REPO_ROOT / ".testids"    # /project_dir/edx-platform/.testdir
 COMMON_ROOT = PROJECT_ROOT / "common"   # /project_dir/common
 COURSES_ROOT = PROJECT_ROOT / "data"    # /project_dir/data
-TEST_DIR = PROJECT_ROOT / ".testids"    # /project_dir/.testdir
+
 
 # Environment constants
 if 'SERVICE_VARIANT' in os.environ:
@@ -128,7 +118,6 @@ def compile_coffeescript(options):
     system = getattr(options, 'system', 'lms')
     env = getattr(options, 'env', 'dev')
     run_watch = getattr(options, 'watch', False)
-    run_debug = getattr(options, 'debug', False)
     clobber = getattr(options, 'clobber', False)
 
     print ("Compile Coffeescript")

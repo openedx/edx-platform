@@ -7,7 +7,7 @@ from contentstore.utils import delete_course_and_groups
 
 
 #
-# To run from command line: rake cms:delete_course LOC=edX/111/Foo1
+# To run from command line: paver delete_course --env=<settings> --location=edX/111/Foo1
 #
 class Command(BaseCommand):
     help = '''Delete a MongoDB backed course'''
