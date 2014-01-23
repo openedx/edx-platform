@@ -39,7 +39,9 @@ class GitImportError(Exception):
     CANNOT_PULL = _('git clone or pull failed!')
     XML_IMPORT_FAILED = _('Unable to run import command.')
     UNSUPPORTED_STORE = _('The underlying module store does not support import.')
-
+    REMOTE_BRANCH_MISSING = _('The specified remote branch is not available.')
+    CANNOT_BRANCH = _('Unable to switch to specified branch. Please check '
+                      'your branch name.')
 
 def cmd_log(cmd, cwd):
     """
@@ -54,7 +56,60 @@ def cmd_log(cmd, cwd):
     return output
 
 
-def add_repo(repo, rdir_in):
+def switch_branch(branch, rdir):
+    """
+    This will determine how to change the branch of the repo, and then
+    use the appropriate git commands to do so.
+
+    Raises an appropriate GitImportError exception if there is any issues with changing
+    branches.
+    """
+    # Get the latest remote
+    try:
+        cmd_log(['git', 'fetch', ], rdir)
+    except subprocess.CalledProcessError as ex:
+        log.exception('Unable to fetch remote: %r', ex.output)
+        raise GitImportError(GitImportError.CANNOT_BRANCH)
+
+    # Check if the branch is available from the remote.
+    cmd = ['git', 'ls-remote', 'origin', '-h', 'refs/heads/{0}'.format(branch), ]
+    try:
+        output = cmd_log(cmd, rdir)
+    except subprocess.CalledProcessError as ex:
+        log.exception('Getting a list of remote branches failed: %r', ex.output)
+        raise GitImportError(GitImportError.CANNOT_BRANCH)
+    if not branch in output:
+        raise GitImportError(GitImportError.REMOTE_BRANCH_MISSING)
+    # Check it the remote branch has already been made locally
+    cmd = ['git', 'branch', '-a', ]
+    try:
+        output = cmd_log(cmd, rdir)
+    except subprocess.CalledProcessError as ex:
+        log.exception('Getting a list of local branches failed: %r', ex.output)
+        raise GitImportError(GitImportError.CANNOT_BRANCH)
+    branches = []
+    for line in output.split('\n'):
+        branches.append(line.strip())
+
+    if branch not in branches:
+        # Checkout with -b since it is remote only
+        cmd = ['git', 'checkout', '--force', '--track',
+               '-b', branch, 'origin/{0}'.format(branch), ]
+        try:
+            cmd_log(cmd, rdir)
+        except subprocess.CalledProcessError as ex:
+            log.exception('Unable to checkout remote branch: %r', ex.output)
+            raise GitImportError(GitImportError.CANNOT_BRANCH)
+    # Go ahead and reset hard to the newest version of the branch now that we know
+    # it is local.
+    try:
+        cmd_log(['git', 'reset', '--hard', 'origin/{0}'.format(branch), ], rdir)
+    except subprocess.CalledProcessError as ex:
+        log.exception('Unable to reset to branch: %r', ex.output)
+        raise GitImportError(GitImportError.CANNOT_BRANCH)
+
+
+def add_repo(repo, rdir_in, branch):
     """This will add a git repo into the mongo modulestore"""
     # pylint: disable=R0915
 
@@ -101,6 +156,9 @@ def add_repo(repo, rdir_in):
     except subprocess.CalledProcessError as ex:
         log.exception('Error running git pull: %r', ex.output)
         raise GitImportError(GitImportError.CANNOT_PULL)
+
+    if branch:
+        switch_branch(branch, rdirp)
 
     # get commit id
     cmd = ['git', 'log', '-1', '--format=%H', ]

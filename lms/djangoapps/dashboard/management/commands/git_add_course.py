@@ -25,8 +25,10 @@ class Command(BaseCommand):
     Pull a git repo and import into the mongo based content database.
     """
 
-    help = _('Import the specified git repository into the '
-             'modulestore and directory')
+    help = ('Usage: '
+            'git_add_course repository_url [directory to check out into] [repository_branch] '
+            '\n{0}'.format(_('Import the specified git repository and optional branch into the '
+                             'modulestore and optionally specified directory.')))
 
     def handle(self, *args, **options):
         """Check inputs and run the command"""
@@ -38,16 +40,19 @@ class Command(BaseCommand):
             raise CommandError('This script requires at least one argument, '
                                'the git URL')
 
-        if len(args) > 2:
-            raise CommandError('This script requires no more than two '
+        if len(args) > 3:
+            raise CommandError('This script requires no more than three '
                                'arguments')
 
         rdir_arg = None
+        branch = None
 
         if len(args) > 1:
             rdir_arg = args[1]
+        if len(args) > 2:
+            branch = args[2]
 
         try:
-            dashboard.git_import.add_repo(args[0], rdir_arg)
+            dashboard.git_import.add_repo(args[0], rdir_arg, branch)
         except GitImportError as ex:
             raise CommandError(str(ex))

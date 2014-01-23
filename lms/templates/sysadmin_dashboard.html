@@ -126,9 +126,15 @@ textarea {
   <ul class="list-input">
 	<li class="field text">
 	  <label for="repo_location">
-		${_('Repo location')}:
+		${_('Repo Location')}:
 	  </label>
 	  <input type="text" name="repo_location" style="width:60%" />
+	</li>
+	<li class="field text">
+	  <label for="repo_location">
+		${_('Repo Branch (optional)')}:
+	  </label>
+	  <input type="text" name="repo_branch" style="width:60%" />
 	</li>
   </ul>
   <div class="form-actions">
@@ -201,6 +207,6 @@ textarea {
 
   </section>
   <div style="text-align:right; float: right"><span id="djangopid">${_('Django PID')}: ${djangopid}</span>
-  | <span id="mitxver">${_('Platform Version')}: ${mitx_version}</span></div>
+  | <span id="edxver">${_('Platform Version')}: ${edx_platform_version}</span></div>
 </div>
 </section>
