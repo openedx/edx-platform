@@ -3,7 +3,7 @@
 from nose.tools import assert_equals, assert_false  # pylint: disable=E0611
 from xmodule.util.date_utils import get_default_time_display, get_time_display, almost_same_datetime
 from datetime import datetime, timedelta, tzinfo
-from pytz import UTC
+from pytz import UTC, timezone
 
 
 def test_get_default_time_display():
@@ -40,6 +40,23 @@ def test_get_time_pass_through():
     assert_equals("Mar 12, 1992 at 15:03 UTC", get_time_display(test_time))
     assert_equals("Mar 12, 1992 at 15:03 UTC", get_time_display(test_time, None))
     assert_equals("Mar 12, 1992 at 15:03 UTC", get_time_display(test_time, "%"))
+
+
+def test_get_time_display_coerce():
+    test_time_standard = datetime(1992, 1, 12, 15, 3, 30, tzinfo=UTC)
+    test_time_daylight = datetime(1992, 7, 12, 15, 3, 30, tzinfo=UTC)
+    assert_equals("Jan 12, 1992 at 07:03 PST",
+                  get_time_display(test_time_standard, None, coerce_tz="US/Pacific"))
+    assert_equals("Jan 12, 1992 at 15:03 UTC",
+                  get_time_display(test_time_standard, None, coerce_tz="NONEXISTENTTZ"))
+    assert_equals("Jan 12 07:03",
+                  get_time_display(test_time_standard, '%b %d %H:%M', coerce_tz="US/Pacific"))
+    assert_equals("Jul 12, 1992 at 08:03 PDT",
+                  get_time_display(test_time_daylight, None, coerce_tz="US/Pacific"))
+    assert_equals("Jul 12, 1992 at 15:03 UTC",
+                  get_time_display(test_time_daylight, None, coerce_tz="NONEXISTENTTZ"))
+    assert_equals("Jul 12 08:03",
+                  get_time_display(test_time_daylight, '%b %d %H:%M', coerce_tz="US/Pacific"))
 
 
 # pylint: disable=W0232
