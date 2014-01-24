@@ -11,7 +11,7 @@ from xmodule.modulestore import Location
 from xmodule.tests import get_test_system, get_test_descriptor_system
 from xmodule.tests.test_util_open_ended import DummyModulestore
 from xmodule.open_ended_grading_classes.peer_grading_service import MockPeerGradingService
-from xmodule.peer_grading_module import PeerGradingModule, PeerGradingDescriptor
+from xmodule.peer_grading_module import PeerGradingModule, PeerGradingDescriptor, MAX_ALLOWED_FEEDBACK_LENGTH
 from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 
 log = logging.getLogger(__name__)
@@ -157,6 +157,27 @@ class PeerGradingModuleTest(unittest.TestCase, DummyModulestore):
         @return:
         """
         self.peer_grading.get_instance_state()
+
+    def test_save_grade_with_long_feedback(self):
+        """
+        Test if feedback is too long save_grade() should return error message.
+        """
+
+        feedback_fragment = "This is very long feedback."
+        self.save_dict["feedback"] = feedback_fragment * (
+            (MAX_ALLOWED_FEEDBACK_LENGTH / len(feedback_fragment) + 1)
+        )
+
+        response = self.peer_grading.save_grade(self.save_dict)
+
+        # Should not succeed.
+        self.assertEqual(response['success'], False)
+        self.assertEqual(
+            response['error'],
+            "Feedback is too long, Max length is {0} characters.".format(
+                MAX_ALLOWED_FEEDBACK_LENGTH
+            )
+        )
 
 
 class MockPeerGradingServiceProblemList(MockPeerGradingService):
