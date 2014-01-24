@@ -22,7 +22,7 @@ def call(command, working_directory=BASE_DIR):
 
     """
     LOG.info(command)
-    p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=working_directory)
+    p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=working_directory, shell=True)
     out, err = p.communicate()
     return (out, err)
 
