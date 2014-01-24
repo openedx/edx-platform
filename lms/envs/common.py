@@ -33,6 +33,8 @@ from .discussionsettings import *
 from lms.lib.xblock.mixin import LmsBlockMixin
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.x_module import XModuleMixin
+from datetime import datetime
+from pytz import UTC
 
 ################################### FEATURES ###################################
 # The display name of the platform to be used in templates/emails/etc.
@@ -207,6 +209,11 @@ FEATURES = {
     # Disable instructor dash buttons for downloading course data
     # when enrollment exceeds this number
     'MAX_ENROLLMENT_INSTR_BUTTONS': 200,
+
+    # If a course's start datetime is set to a datetime after this constant, then the course start date
+    # will not be shown on the tile page (NON Drupal), the about page (NON Drupal), or the dashboard.
+    # This is to handle publicity + accepting registration before a start date has been determined.
+    'DATETIME_DENOTING_NO_COURSE_STARTDATE': datetime(2050, 1, 1, tzinfo=UTC),
 
     # Grade calculation started from the new instructor dashboard will write
     # grades CSV files to S3 and give links for downloads.
