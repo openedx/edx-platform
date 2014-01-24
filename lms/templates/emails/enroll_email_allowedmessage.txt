@@ -33,6 +33,8 @@ ${_("Once you have registered and activated your account, visit {course_about_ur
 	"to join the course.").format(course_about_url=course_about_url)}
 % endif
 
+% endif
+----
 Внимание!
 Это письмо было сформировано и отправлено автоматической системой информирования.
 Пожалуйста, не отвечайте на него, так как ваш ответ не будет доставлен.

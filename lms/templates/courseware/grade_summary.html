@@ -21,12 +21,12 @@
 
   <script type="text/javascript">
     $(document).ready(function() {
-      $('#CSVTable').CSVToTable('http://edu.olimpiada.ru:11081/${course.id.replace('/','_')}.csv',
+      $('#CSVTable').CSVToTable('https://edu.olimpiada.ru/edx/${course.id.replace('/','_')}.csv',
         {
           tableClass: 'grade-table'
           }).bind("loadComplete",function() { 
             $('#CSVTable tbody').children('tr').each(function() {$('.student-table > tbody:last').append($('<tr>').append($(this).children('td')[0]))});
-            $('#CSVTable thead').children('tr').each(function() {$(this).children('td')[0].remove()});
+            $('#CSVTable thead').children('th').each(function() {$(this).children('td')[0].remove()});
             var gradebook = new Gradebook($('.gradebook-content'));
       });;
     });
@@ -40,7 +40,8 @@
 <div class="gradebook-wrapper">
   <section class="gradebook-content">
     <h1>${_("Gradebook")}</h1>
-
+    Таблица обновленна 24.01.2014 в 04:10:13 (GMT+4)<br>
+    <a href='https://edu.olimpiada.ru/edx/${course.id.replace('/','_')}.csv'> Таблица в CSV формате (кодировка UTF-8) </a><br>
     <table class="student-table">
       <thead>
         <tr>

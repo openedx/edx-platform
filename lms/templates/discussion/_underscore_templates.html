@@ -170,7 +170,7 @@
     <a href="${'<%- id %>'}" data-id="${'<%- id %>'}">
         <span class="title">${"<%- title %>"}</span>
         ${"<% if (unread_comments_count > 0) { %>"}
-            <span class="comments-count unread" data-tooltip="${"<%- interpolate(ngettext("%s new comment","%s new comments", unread_comments_count), [unread_comments_count]) %>"}">${"<%- comments_count %>"} <span class="sr">comments (${"<%- unread_comments_count %>"} unread comments)</span></span>
+            <span class="comments-count unread" data-tooltip="${'<%- interpolate(ngettext("%s new comment","%s new comments", unread_comments_count), [unread_comments_count]) %>'}">${"<%- comments_count %>"} <span class="sr">comments (${"<%- unread_comments_count %>"} unread comments)</span></span>
         ${"<% } else { %>"}
             <span class="comments-count">${"<%- comments_count %>"}<span class="sr">comments</span></span>
         ${"<% } %>"}
