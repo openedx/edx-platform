@@ -41,9 +41,6 @@ def main():
     create_dir_if_necessary(LOCALE_DIR)
     source_msgs_dir = CONFIGURATION.source_messages_dir
 
-    generated_files = ['django-partial.po', 'djangojs.po', 'mako.po']
-
-    # Prepare makemessages command.
     makemessages = "django-admin.py makemessages -l en"
     ignores = " ".join('--ignore="{}/*"'.format(d) for d in CONFIGURATION.ignore_dirs)
     if ignores:
@@ -70,10 +67,9 @@ def main():
 
     # Segment the generated files.
     segmented_files = segment_pofiles("en")
-    generated_files.extend(segmented_files)
 
     # Finish each file.
-    for filename in generated_files:
+    for filename in segmented_files:
         LOG.info('Cleaning %s' % filename)
         po = pofile(source_msgs_dir.joinpath(filename))
         # replace default headers with edX headers
