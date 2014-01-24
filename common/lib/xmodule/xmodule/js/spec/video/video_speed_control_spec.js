@@ -28,7 +28,7 @@
                     expect(secondaryControls).toContain('.speeds');
                     expect(secondaryControls).toContain('.video_speeds');
                     expect(secondaryControls.find('p.active').text())
-                        .toBe('1.0x');
+                        .toBe('1.50x');
                     expect(li.filter('.active')).toHaveData(
                         'speed', state.videoSpeedControl.currentSpeed
                     );

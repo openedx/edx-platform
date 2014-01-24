@@ -15,8 +15,6 @@ function() {
  * @param {string} namespace Namespace that is used to store data.
  * @return {object} CookieStorage API.
  */
-
-
     var CookieStorage = function (namespace) {
         var Storage;
 
@@ -73,7 +71,7 @@ function() {
             });
 
             $.cookie(namespace, JSON.stringify(Storage), {
-                expires: -1,
+                expires: 3650,
                 path: '/'
             });
         };

@@ -5,6 +5,8 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Blades: Video player persist speed preferences between videos. BLD-237.
+
 Blades: Change the download video field to a dropdown that will allow students
 to download the first source listed in the alternate sources. BLD-364.
 

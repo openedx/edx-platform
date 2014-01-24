@@ -19,6 +19,7 @@ from xmodule.exceptions import NotFoundError
 
 class TestVideo(BaseTestXmodule):
     """Integration tests: web client + mongo."""
+
     CATEGORY = "video"
     DATA = SOURCE_XML
     METADATA = {}
@@ -57,6 +58,7 @@ class TestVideoYouTube(TestVideo):
         }
 
         expected_context = {
+            'ajax_url': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
             'data_dir': getattr(self, 'data_dir', None),
             'caption_asset_path': '/static/subs/',
             'show_captions': 'true',
@@ -64,6 +66,7 @@ class TestVideoYouTube(TestVideo):
             'end': 3610.0,
             'id': self.item_module.location.html_id(),
             'sources': sources,
+            'speed': 1.0,
             'start': 3603.0,
             'sub': u'a_sub_file.srt.sjson',
             'track': None,
@@ -75,7 +78,7 @@ class TestVideoYouTube(TestVideo):
 
         self.assertEqual(
             context,
-            self.item_module.xmodule_runtime.render_template('video.html', expected_context)
+            self.item_module.xmodule_runtime.render_template('video.html', expected_context),
         )
 
 
@@ -93,9 +96,10 @@ class TestVideoNonYouTube(TestVideo):
         </video>
     """
     MODEL_DATA = {
-        'data': DATA
+        'data': DATA,
     }
     METADATA = {}
+
     def test_video_constructor(self):
         """Make sure that if the 'youtube' attribute is omitted in XML, then
             the template generates an empty string for the YouTube streams.
@@ -107,8 +111,8 @@ class TestVideoNonYouTube(TestVideo):
         }
 
         context = self.item_module.render('student_view').content
-
         expected_context = {
+            'ajax_url': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
             'data_dir': getattr(self, 'data_dir', None),
             'caption_asset_path': '/static/subs/',
             'show_captions': 'true',
@@ -116,6 +120,7 @@ class TestVideoNonYouTube(TestVideo):
             'end': 3610.0,
             'id': self.item_module.location.html_id(),
             'sources': sources,
+            'speed': 1.0,
             'start': 3603.0,
             'sub': u'a_sub_file.srt.sjson',
             'track': None,
@@ -127,7 +132,7 @@ class TestVideoNonYouTube(TestVideo):
 
         self.assertEqual(
             context,
-            self.item_module.xmodule_runtime.render_template('video.html', expected_context)
+            self.item_module.xmodule_runtime.render_template('video.html', expected_context),
         )
 
 
@@ -137,6 +142,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
     '''
     CATEGORY = "video"
     DATA = SOURCE_XML
+    maxDiff = None
     METADATA = {}
 
     def setUp(self):
@@ -195,7 +201,8 @@ class TestGetHtmlMethod(BaseTestXmodule):
             },
             'start': 3603.0,
             'sub': u'a_sub_file.srt.sjson',
-            'track': '',
+            'speed': 1.0,
+            'track': None,
             'youtube_streams': '1.00:OEoXaMPEzfM',
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', True),
             'yt_test_timeout': 1500,
@@ -212,16 +219,18 @@ class TestGetHtmlMethod(BaseTestXmodule):
             self.initialize_module(data=DATA)
             track_url = self.item_descriptor.xmodule_runtime.handler_url(self.item_module, 'download_transcript')
 
+            context = self.item_module.render('student_view').content
+
             expected_context.update({
+                'ajax_url': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
                 'track': track_url if data['expected_track_url'] == u'a_sub_file.srt.sjson' else data['expected_track_url'],
                 'sub': data['sub'],
                 'id': self.item_module.location.html_id(),
             })
 
-            context = self.item_module.render('student_view').content
             self.assertEqual(
                 context,
-                self.item_module.xmodule_runtime.render_template('video.html', expected_context)
+                self.item_module.xmodule_runtime.render_template('video.html', expected_context),
             )
 
     def test_get_html_source(self):
@@ -293,6 +302,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'end': 3610.0,
             'id': None,
             'sources': None,
+            'speed': 1.0,
             'start': 3603.0,
             'sub': u'a_sub_file.srt.sjson',
             'track': None,
@@ -309,13 +319,13 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 sources=data['sources']
             )
             self.initialize_module(data=DATA)
+            context = self.item_module.render('student_view').content
 
             expected_context.update({
+                'ajax_url': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
                 'sources': data['result'],
                 'id': self.item_module.location.html_id(),
             })
-
-            context = self.item_module.render('student_view').content
 
             self.assertEqual(
                 context,

@@ -32,7 +32,7 @@ function (CookieStorage) {
         it('unload', function () {
             var expected = JSON.stringify({
                     storage: {
-                        'item_2': {
+                        item_2: {
                             value: 'value_2',
                             session: false
                         }
@@ -51,7 +51,7 @@ function (CookieStorage) {
         describe('methods: ', function () {
             var data = {
                     storage: {
-                        'item_1': {
+                        item_1: {
                             value: 'value_1',
                             session: false
                         }
@@ -69,15 +69,15 @@ function (CookieStorage) {
                 it('pass correct data', function () {
                     var expected = JSON.stringify({
                             storage: {
-                                'item_1': {
+                                item_1: {
                                     value: 'value_1',
                                     session: false
                                 },
-                                'item_2': {
+                                item_2: {
                                     value: 'value_2',
                                     session: false
                                 },
-                                'item_3': {
+                                item_3: {
                                     value: 'value_3',
                                     session: true
                                 },

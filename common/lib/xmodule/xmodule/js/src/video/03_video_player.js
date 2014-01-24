@@ -324,7 +324,7 @@ function (HTML5Video, Resizer) {
         }
     }
 
-    function onSpeedChange(newSpeed, updateCookie) {
+    function onSpeedChange(newSpeed) {
         var time = this.videoPlayer.currentTime,
             methodName, youtubeId;
 
@@ -347,7 +347,7 @@ function (HTML5Video, Resizer) {
             }
         );
 
-        this.setSpeed(newSpeed, updateCookie);
+        this.setSpeed(newSpeed, true);
 
         if (
             this.currentPlayerMode === 'html5' &&
@@ -376,6 +376,15 @@ function (HTML5Video, Resizer) {
         }
 
         this.el.trigger('speedchange', arguments);
+
+        $.ajax({
+            url: this.config.saveStateUrl,
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                speed: newSpeed
+            },
+        });
     }
 
     // Every 200 ms, if the video is playing, we call the function update, via
@@ -434,7 +443,7 @@ function (HTML5Video, Resizer) {
             end: true
         });
 
-        if (this.config.show_captions) {
+        if (this.config.showCaptions) {
             this.trigger('videoCaption.pause', null);
         }
 
@@ -466,7 +475,7 @@ function (HTML5Video, Resizer) {
 
         this.trigger('videoControl.pause', null);
 
-        if (this.config.show_captions) {
+        if (this.config.showCaptions) {
             this.trigger('videoCaption.pause', null);
         }
 
@@ -495,7 +504,7 @@ function (HTML5Video, Resizer) {
             end: false
         });
 
-        if (this.config.show_captions) {
+        if (this.config.showCaptions) {
             this.trigger('videoCaption.play', null);
         }
 
@@ -579,7 +588,6 @@ function (HTML5Video, Resizer) {
                     var key = value.toFixed(2).replace(/\.00$/, '.0');
 
                     _this.videos[key] = baseSpeedSubs;
-
                     _this.speeds.push(key);
                 });
 
@@ -590,8 +598,8 @@ function (HTML5Video, Resizer) {
                         currentSpeed: this.speed
                     }
                 );
-
-                this.setSpeed($.cookie('video_speed'));
+                this.setSpeed(this.speed);
+                this.trigger('videoSpeedControl.setSpeed', this.speed);
             }
         }
 

@@ -4,9 +4,6 @@
 
         beforeEach(function () {
             jasmine.stubRequests();
-            this.videosDefinition = '0.75:7tqY6eQzVhE,1.0:cogebirgzzM';
-            this['7tqY6eQzVhE'] = '7tqY6eQzVhE';
-            this['cogebirgzzM'] = 'cogebirgzzM';
         });
 
         afterEach(function () {
@@ -17,7 +14,7 @@
             describe('YT', function () {
                 beforeEach(function () {
                     loadFixtures('video.html');
-                    $.cookie.andReturn('0.75');
+                    $.cookie.andReturn('0.50');
                 });
 
                 describe('by default', function () {
@@ -35,17 +32,18 @@
 
                     it('parse the videos', function () {
                         expect(this.state.videos).toEqual({
-                            '0.75': this['7tqY6eQzVhE'],
-                            '1.0': this['cogebirgzzM']
+                            '0.50': '7tqY6eQzVhE',
+                            '1.0': 'cogebirgzzM',
+                            '1.50': 'abcdefghijkl'
                         });
                     });
 
                     it('parse available video speeds', function () {
-                        expect(this.state.speeds).toEqual(['0.75', '1.0']);
+                        expect(this.state.speeds).toEqual(['0.50', '1.0', '1.50']);
                     });
 
                     it('set current video speed via cookie', function () {
-                        expect(this.state.speed).toEqual('0.75');
+                        expect(this.state.speed).toEqual('1.50');
                     });
                 });
             });
@@ -157,7 +155,7 @@
                     });
 
                     it('set current video speed via cookie', function () {
-                        expect(state.speed).toEqual('0.75');
+                        expect(state.speed).toEqual('1.50');
                     });
                 });
 
@@ -190,16 +188,18 @@
 
             describe('with speed', function () {
                 it('return the video id for given speed', function () {
-                    expect(state.youtubeId('0.75'))
-                        .toEqual(this['7tqY6eQzVhE']);
+                    expect(state.youtubeId('0.50'))
+                        .toEqual('7tqY6eQzVhE');
                     expect(state.youtubeId('1.0'))
-                        .toEqual(this['cogebirgzzM']);
+                        .toEqual('cogebirgzzM');
+                    expect(state.youtubeId('1.50'))
+                        .toEqual('abcdefghijkl');
                 });
             });
 
             describe('without speed', function () {
                 it('return the video id for current speed', function () {
-                    expect(state.youtubeId()).toEqual(this.cogebirgzzM);
+                    expect(state.youtubeId()).toEqual('abcdefghijkl');
                 });
             });
         });
@@ -314,44 +314,25 @@
         });
 
         describe('setSpeed', function () {
+
             describe('YT', function () {
                 beforeEach(function () {
                     loadFixtures('video.html');
                     state = new Video('#example');
                 });
 
-                describe('when new speed is available', function () {
-                    beforeEach(function () {
-                        state.setSpeed('0.75', true);
-                    });
+                it('check mapping', function () {
+                    var map = {
+                        '0.75': '0.50',
+                        '1.25': '1.50'
+                    };
 
-                    it('set new speed', function () {
-                        expect(state.speed).toEqual('0.75');
-                    });
-
-                    it('save setting for new speed', function () {
-                        expect($.cookie).toHaveBeenCalledWith(
-                            'video_speed',
-                            '0.75',
-                            {
-                                expires: 3650,
-                                path: '/'
-                            }
-                        );
-                    });
-                });
-
-                describe('when new speed is not available', function () {
-                    beforeEach(function () {
-                        state.setSpeed('1.75');
-                    });
-
-                    it('set speed to 1.0x', function () {
-                        expect(state.speed).toEqual('1.0');
+                    $.each(map, function(key, expected) {
+                        state.setSpeed(key, true);
+                        expect(state.speed).toBe(expected);
                     });
                 });
             });
-
             describe('HTML5', function () {
                 beforeEach(function () {
                     loadFixtures('video_html5.html');
@@ -368,14 +349,9 @@
                     });
 
                     it('save setting for new speed', function () {
-                        expect($.cookie).toHaveBeenCalledWith(
-                            'video_speed',
-                            '0.75',
-                            {
-                                expires: 3650,
-                                path: '/'
-                            }
-                        );
+
+                        expect(state.storage.getItem('general_speed')).toBe('0.75');
+                        expect(state.storage.getItem('video_speed_' + state.id)).toBe('0.75');
                     });
                 });
 
@@ -388,6 +364,19 @@
                         expect(state.speed).toEqual('1.0');
                     });
                 });
+
+                it('check mapping', function () {
+                    var map = {
+                        '0.25': '0.75',
+                        '0.50': '0.75',
+                        '2.0': '1.50'
+                    };
+
+                    $.each(map, function(key, expected) {
+                        state.setSpeed(key, true);
+                        expect(state.speed).toBe(expected);
+                    });
+                });
             });
         });
 
@@ -398,7 +387,7 @@
             });
 
             it('return duration for current video', function () {
-                expect(state.getDuration()).toEqual(200);
+                expect(state.getDuration()).toEqual(400);
             });
         });
 
