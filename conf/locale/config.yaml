@@ -2,10 +2,10 @@
 
 locales: 
     - en
-    - fr
-    - ko_KR
 
     # More languages we might want someday, these have started on Transifex.
+    # fr
+    # ko_KR
     # ru
     # es_419
     # ja_JP
