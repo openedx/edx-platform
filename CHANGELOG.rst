@@ -5,7 +5,269 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Blades: Allow user with BetaTester role correctly use LTI. BLD-641.
+
+Blades: Video player persist speed preferences between videos. BLD-237.
+
+Blades: Change the download video field to a dropdown that will allow students
+to download the first source listed in the alternate sources. BLD-364.
+
+Blades: Change the track field to a dropdown that will allow students
+to download the transcript of the video without timecodes. BLD-368.
+
+Blades: Video player start-end time range is now shown even before Play is
+clicked. Video player VCR time shows correct non-zero total time for YouTube
+videos even before Play is clicked. BLD-529.
+
+Studio: Add ability to duplicate components on the unit page.
+
+Blades: Adds CookieStorage utility for video player that provides convenient
+  way to work with cookies.
+
+Blades: Fix comparison of float numbers. BLD-434.
+
+Blades: Allow regexp strings as the correct answer to a string response question. BLD-475.
+
+Common: Add feature flags to allow developer use of pure XBlocks
+  - ALLOW_ALL_ADVANCED_COMPONENTS disables the hard-coded list of advanced
+    components in Studio, and allows any xblock to be added as an
+    advanced component in Studio settings
+  - XBLOCK_SELECT_FUNCTION allows the insertion of a custom function
+    to limit loading of XBlocks with (including allowing pure xblocks)
+
+Studio: Add sorting by column to the Files & Uploads page.
+See mongo_indexes.md for new indices that should be added.
+
+Common: Previously, theming was activated by providing a value for the THEME_NAME
+  setting. Now, theming is activated by setting the "USE_CUSTOM_THEME" feature
+  flag to True -- a THEME_NAME setting is still required to determine *which*
+  theme to use.
+
+Studio: Newly-created courses default to being published on Jan 1, 2030
+
+Studio: Added pagination to the Files & Uploads page.
+
+Common: Centralized authorization mechanisms and removed the app-specific ones.
+
+Blades: Video player improvements:
+  - Disable edX controls on iPhone/iPod (native controls are used).
+  - Disable unsupported controls (volume, playback rate) on iPad/Android.
+  - Controls becomes visible after click on video or play placeholder to avoid
+    issues with YouTube API on iPad/Android.
+  - Captions becomes visible just after full initialization of video player.
+  - Fix blinking of captions after initialization of video player. BLD-206.
+
+LMS: Fix answer distribution download for small courses. LMS-922, LMS-811
+
+Blades: Add template for the zooming image in studio. BLD-206.
+
+Blades: Update behavior of start/end time fields. BLD-506.
+
+Blades: Make LTI module not send grade_back_url if has_score=False. BLD-561.
+
+Blades: Show answer for imageresponse. BLD-21.
+
+Blades: LTI additional Python tests. LTI must use HTTPS for
+lis_outcome_service_url. BLD-564.
+
+Studio: Enable Terms of Service and Privacy Policy links to be served by
+  an alternate site. STUD-151.
+
+Blades: Fix bug when Image mapping problems are not working for students in IE. BLD-413.
+
+Blades: Add template that displays the most up-to-date features of
+drag-and-drop. BLD-479.
+
+Blades: LTI fix bug e-reader error when popping out window. BLD-465.
+
+Common: Switch from mitx.db to edx.db for sqlite databases. This will effectively
+  reset state for local instances of the code, unless you manually rename your
+  mitx.db file to edx.db.
+
+Common: significant performance improvement for authorization checks and location translations.
+  Ensure all auth checks, check all possible permutations of the auth key (Instructor dashboard
+  now shows when it should for all courses in lms).
+  Made queries for Studio dashboard 2 orders of magnitude faster (and fewer).
+
+Blades: Video Transcripts: Fix clear and download buttons. BLD-438.
+
+Common: Switch over from MITX_FEATURES to just FEATURES. To override items in
+  the FEATURES dict, the environment variable you must set to do so is also
+  now called FEATURES instead of MITX_FEATURES.
+
+LMS: Change the forum role granted to global staff on enrollment in a
+course. Previously, staff were given the Moderator role; now, they are
+given the Student role.
+
+Blades: Fix Numerical input to support mathematical operations. BLD-525.
+
+Blades: Improve calculator's tooltip accessibility. Add possibility to navigate
+  through the hints via arrow keys. BLD-533.
+
+LMS: Add feature for providing background grade report generation via Celery
+  instructor task, with reports uploaded to S3. Feature is visible on the beta
+  instructor dashboard. LMS-58
+
+Blades: Added grading support for LTI module. LTI providers can now grade
+student's work and send edX scores. OAuth1 based authentication
+implemented. BLD-384.
+
+LMS: Beta-tester status is now set on a per-course-run basis, rather than being
+  valid across all runs with the same course name. Old group membership will
+  still work across runs, but new beta-testers will only be added to a single
+  course run.
+
+Blades: Enabled several Video Jasmine tests. BLD-463.
+
+Studio: Continued modification of Studio pages to follow a RESTful framework.
+includes Settings pages, edit page for Subsection and Unit, and interfaces
+for updating xblocks (xmodules) and getting their editing HTML.
+
+LMS: Improve accessibility of inline discussions in courseware.
+
+Blades: Put 2nd "Hide output" button at top of test box & increase text size for
+code response questions. BLD-126.
+
+Blades: Update the calculator hints tooltip with full information. BLD-400.
+
+Blades: Fix transcripts 500 error in studio (BLD-530)
+
+LMS: Add error recovery when a user loads or switches pages in an
+inline discussion.
+
+Blades: Allow multiple strings as the correct answer to a string response
+question. BLD-474.
+
+Blades: a11y - Videos will alert screenreaders when the video is over.
+
+LMS: Trap focus on the loading element when a user loads more threads
+in the forum sidebar to improve accessibility.
+
+LMS: Add error recovery when a user loads more threads in the forum sidebar.
+
+LMS: Add a user-visible alert modal when a forums AJAX request fails.
+
+Blades: Add template for checkboxes response to studio. BLD-193.
+
+Blades: Video player:
+  - Add spinner;
+  - Improve initialization of modules;
+  - Speed up video resizing during page loading;
+  - Speed up acceptance tests. (BLD-502)
+  - Fix transcripts bug - when show_captions is set to false. BLD-467.
+
+Studio: change create_item, delete_item, and save_item to RESTful API (STUD-847).
+
+Blades: Fix answer choices rearranging if user tries to stylize something in the
+text like with bold or italics. (BLD-449)
+
+LMS: Beta instructor dashboard will only count actively enrolled students for
+course enrollment numbers.
+
+Blades: Fix speed menu that is not rendered correctly when YouTube is
+unavailable. (BLD-457).
+
+LMS: Users with is_staff=True no longer have the STAFF label appear on
+their forum posts.
+
+Blades: Video start and end times now function the same for both YouTube and
+HTML5 videos. If end time is set, the video can still play until the end, after
+it pauses on the end time.
+
+Blades: Disallow users to enter video url's in http.
+
+LMS: Improve the acessibility of the forum follow post buttons.
+
+Blades: Latex problems are now enabled via use_latex_compiler
+key in course settings. (BLD-426)
+
+Blades: Fix bug when the speed can only be changed when the video is playing.
+
+LMS: The dialogs on the wiki "changes" page are now accessible to screen
+readers.  Now all wiki pages have been made accessible. (LMS-1337)
+
+LMS: Change bulk email implementation to use less memory, and to better handle
+duplicate tasks in celery.
+
+LMS: When a topic is selected in the forums navigation sidebar, fetch
+the thread list using the /threads endpoint of the comments service
+instead of /search/threads, which does not sort and paginate
+correctly. This requires at least version 31ef160 of
+cs_comments_service.
+
+LMS: Improve forum error handling so that errors in the logs are
+clearer and HTTP status codes from the comments service indicating
+client error are correctly passed through to the client.
+
+LMS: Improve performance of page load and thread list load for
+discussion tab
+
+LMS: The wiki markup cheatsheet dialog is now accessible to screen readers.
+(LMS-1303)
+
+Common: Add skip links for accessibility to CMS and LMS. (LMS-1311)
+
+Studio: Change course overview page, checklists, assets, import, export, and course staff
+management page URLs to a RESTful interface. Also removed "\listing", which
+duplicated "\index".
+
+LMS: Fixed accessibility bug where users could not tab through wiki (LMS-1307)
+
+Blades: When start time and end time are specified for a video, a visual range
+will be shown on the time slider to highlight the place in the video that will
+be played.
+
+Studio: added restful interface for finding orphans in courses.
+An orphan is an xblock to which no children relation points and whose type is not
+in the set contentstore.views.item.DETACHED_CATEGORIES nor 'course'.
+    GET http://host/orphan/org.course returns json array of ids.
+        Requires course author access.
+    DELETE http://orphan/org.course deletes all the orphans in that course.
+        Requires is_staff access
+
+Studio: Bug fix for text loss in Course Updates when the text exists
+before the first tag.
+
+Common: expect_json decorator now puts the parsed json payload into a json attr
+on the request instead of overwriting the POST attr
+
+---------- split mongo backend refactoring changelog section ------------
+
+Studio: course catalog, assets, checklists, course outline pages now use course
+id syntax w/ restful api style
+
+Common:
+  separate the non-sql db connection configuration from the modulestore (xblock modeling) configuration.
+  in split, separate the the db connection and atomic crud ops into a distinct module & class from modulestore
+
+Common: location mapper: % encode periods and dollar signs when used as key in the mapping dict
+
+Common: location mapper: added a bunch of new helper functions for generating
+old location style info from a CourseLocator
+
+Common: locators: allow - ~ and . in course, branch, and block ids.
+
+---------- end split mongo backend section ---------
+
+Blades: Hovering over CC button in video player, when transcripts are hidden,
+will cause them to show up. Moving the mouse from the CC button will auto hide
+them. You can hover over the CC button and then move the mouse to the
+transcripts which will allow you to select some video position in 1 click.
+
+Blades: Add possibility to use multiple LTI tools per page.
+
+Blades: LTI module can now load external content in a new window.
+
 LMS: Disable data download buttons on the instructor dashboard for large courses
+
+Common: Adds ability to disable a student's account. Students with disabled
+accounts will be prohibited from site access.
+
+LMS: Fix issue with CourseMode expiration dates
+
+LMS: Ported bulk emailing to the beta instructor dashboard.
+
+LMS: Add monitoring of bulk email subtasks to display progress on instructor dash.
 
 LMS: Refactor and clean student dashboard templates.
 
@@ -22,6 +284,8 @@ Studio: Switched to loading Javascript using require.js
 
 Studio: Better feedback during the course import process
 
+Studio: Improve drag and drop on the course overview and subsection views.
+
 LMS: Add split testing functionality for internal use.
 
 CMS: Add edit_course_tabs management command, providing a primitive
@@ -30,6 +294,9 @@ editing capability for a course's list of tabs.
 Studio and LMS: add ability to lock assets (cannot be viewed unless registered
 for class).
 
+Studio: add restful interface for paging assets (no UX yet, but just add
+/start/45/max/50 to end of url to get items 45-95, e.g.)
+
 LMS: First round of improvements to New (beta) Instructor Dash:
 improvements, fixes, and internationalization to the Student Info section.
 
@@ -37,6 +304,8 @@ LMS: Improved accessibility of parts of forum navigation sidebar.
 
 LMS: enhanced accessibility labeling and aria support for the discussion forum
 new post dropdown as well as response and comment area labeling.
+
+Blades: Add Studio timed transcripts editor to video player.
 
 LMS: enhanced shib support, including detection of linked shib account
 at login page and support for the ?next= GET parameter.
@@ -72,6 +341,11 @@ Blades: Took videoalpha out of alpha, replacing the old video player
 Common: Allow instructors to input complicated expressions as answers to
 `NumericalResponse`s. Prior to the change only numbers were allowed, now any
 answer from '1/3' to 'sqrt(12)*(1-1/3^2+1/5/3^2)' are valid.
+
+Studio/LMS: Allow for 'preview' and 'published' in a single LMS instance. Use
+middlware components to retain the incoming Django request and put in thread
+local storage. It is recommended that all developers define a 'preview.localhost'
+which maps to the same IP address as localhost in his/her HOSTS file.
 
 LMS: Enable beta instructor dashboard. The beta dashboard is a rearchitecture
 of the existing instructor dashboard and is available by clicking a link at

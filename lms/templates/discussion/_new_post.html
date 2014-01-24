@@ -31,7 +31,7 @@
                     <div class="topic_menu_wrapper">
                         <div class="topic_menu_search" role="menu">
                             <label class="sr" for="browse-topic-newpost">${_("Filter List")}</label>
-                            <input type="text" id="browse-topic-newpost" class="form-topic-drop-search-input" placeholder="Filter discussion areas">
+                            <input type="text" id="browse-topic-newpost" class="form-topic-drop-search-input" placeholder="${_("Filter discussion areas")}">
                         </div>
                         <ul class="topic_menu" role="menu">
                             ${render_form_filter_dropdown(category_map)}
@@ -48,6 +48,7 @@
                     %endif
                     %if is_course_cohorted and is_moderator:
                     <div class="form-group-label choose-cohort">
+                        ## Translators: This labels the selector for which group of students can view a post
                         ${_("Make visible to:")}
                         <select class="group-filter-select new-post-group" name = "group_id">
                             <option value="">${_("All Groups")}</option>
@@ -67,17 +68,12 @@
                 <ul class="new-post-form-errors"></ul>
                 <div class="form-row">
                     <label class="sr" for="new-post-title">${_("new post title")}</label>
-                    <input type="text" id="new-post-title" class="new-post-title" name="title" placeholder="Title">
+                    <input type="text" id="new-post-title" class="new-post-title" name="title" placeholder="${_("Title")}">
                 </div>
                 <div class="form-row">
-                    <div class="new-post-body" name="body" placeholder="Enter your question or comment…"></div>
+                    <div class="new-post-body" name="body" placeholder="${_(u"Enter your question or comment…")}"></div>
                     <!---<div class="new-post-preview"><span class="new-post-preview-label">Preview</span></div>-->
                 </div>
-                ## TODO tags commenting out til we figure out what to do w/ tags
-                ##<div class="form-row">
-                ##    <label class="sr" for="new-post-tags">${_("Add post tags")}</label>
-                ##    <input type="text" id="new-post-tags" class="new-post-tags" name="tags" placeholder="Tags">
-                ##</div>
                 <input type="submit" id="new-post-submit" class="submit" value="${_("Add post")}">
                 <a href="#" class="new-post-cancel">${_("Cancel")}</a>
             </div>

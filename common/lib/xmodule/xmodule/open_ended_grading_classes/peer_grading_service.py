@@ -1,13 +1,9 @@
 import json
 import logging
 
-from .grading_service_module import GradingService
+from .grading_service_module import GradingService, GradingServiceError
 
 log = logging.getLogger(__name__)
-
-
-class GradingServiceError(Exception):
-    pass
 
 
 class PeerGradingService(GradingService):

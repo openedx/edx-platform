@@ -1,7 +1,6 @@
 import re
 from xmodule.contentstore.content import StaticContent
 from xmodule.modulestore import Location
-from xmodule.modulestore.mongo import MongoModuleStore
 from xmodule.modulestore.inheritance import own_metadata
 
 import logging
@@ -200,7 +199,7 @@ def clone_course(modulestore, contentstore, source_location, dest_location, dele
 
     # now iterate through all of the assets, also updating the thumbnail pointer
 
-    assets = contentstore.get_all_content_for_course(source_location)
+    assets, __ = contentstore.get_all_content_for_course(source_location)
     for asset in assets:
         asset_loc = Location(asset["_id"])
         content = contentstore.find(asset_loc)
@@ -261,7 +260,7 @@ def delete_course(modulestore, contentstore, source_location, commit=False):
     _delete_assets(contentstore, thumbs, commit)
 
     # then delete all of the assets
-    assets = contentstore.get_all_content_for_course(source_location)
+    assets, __ = contentstore.get_all_content_for_course(source_location)
     _delete_assets(contentstore, assets, commit)
 
     # then delete all course modules

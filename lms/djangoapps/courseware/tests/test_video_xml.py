@@ -15,14 +15,9 @@ common/lib/xmodule/xmodule/modulestore/tests/factories.py to create the
 course, section, subsection, unit, etc.
 """
 
-import json
-import unittest
-
-from django.conf import settings
-
-from xmodule.video_module import VideoDescriptor, _create_youtube_string
+from xmodule.video_module import VideoDescriptor
 from xmodule.modulestore import Location
-from xmodule.tests import get_test_system, LogicTest
+from xmodule.tests import get_test_system, LogicTest, get_test_descriptor_system
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
@@ -32,11 +27,11 @@ SOURCE_XML = """
     display_name="A Name"
     youtube="0.75:jNCf2gIqpeE,1.0:ZwkTiUPN0mg,1.25:rsq9auxASqI,1.50:kMyNdzVHHgg"
     sub="a_sub_file.srt.sjson"
+    download_video="true"
     start_time="01:00:03" end_time="01:00:10"
     >
         <source src="example.mp4"/>
         <source src="example.webm"/>
-        <source src="example.ogv"/>
     </video>
 """
 
@@ -57,56 +52,11 @@ class VideoFactory(object):
         field_data = {'data': VideoFactory.sample_problem_xml_youtube,
                       'location': location}
 
-        system = get_test_system()
-        system.render_template = lambda template, context: context
+        system = get_test_descriptor_system()
 
         descriptor = VideoDescriptor(system, DictFieldData(field_data), ScopeIds(None, None, None, None))
-
-        module = descriptor.xmodule(system)
-
-        return module
-
-
-class VideoModuleUnitTest(unittest.TestCase):
-    """Unit tests for Video Xmodule."""
-
-    def test_video_get_html(self):
-        """Make sure that all parameters extracted correclty from xml"""
-        module = VideoFactory.create()
-        module.runtime.render_template = lambda template, context: context
-
-        sources = {
-            'main': 'example.mp4',
-            'mp4': 'example.mp4',
-            'webm': 'example.webm',
-            'ogv': 'example.ogv'
-        }
-
-        expected_context = {
-            'caption_asset_path': '/static/subs/',
-            'sub': 'a_sub_file.srt.sjson',
-            'data_dir': getattr(self, 'data_dir', None),
-            'display_name': 'A Name',
-            'end': 3610.0,
-            'start': 3603.0,
-            'id': module.location.html_id(),
-            'show_captions': 'true',
-            'sources': sources,
-            'youtube_streams': _create_youtube_string(module),
-            'track': '',
-            'autoplay': settings.MITX_FEATURES.get('AUTOPLAY_VIDEOS', False),
-            'yt_test_timeout': 1500,
-            'yt_test_url': 'https://gdata.youtube.com/feeds/api/videos/'
-        }
-
-        self.assertEqual(module.get_html(), expected_context)
-
-    def test_video_instance_state(self):
-        module = VideoFactory.create()
-
-        self.assertDictEqual(
-            json.loads(module.get_instance_state()),
-            {'position': 0})
+        descriptor.xmodule_runtime = get_test_system()
+        return descriptor
 
 
 class VideoModuleLogicTest(LogicTest):
@@ -117,21 +67,6 @@ class VideoModuleLogicTest(LogicTest):
     raw_field_data = {
         'data': '<video />'
     }
-
-    def test_parse_time(self):
-        """Ensure that times are parsed correctly into seconds."""
-        output = VideoDescriptor._parse_time('00:04:07')
-        self.assertEqual(output, 247)
-
-    def test_parse_time_none(self):
-        """Check parsing of None."""
-        output = VideoDescriptor._parse_time(None)
-        self.assertEqual(output, '')
-
-    def test_parse_time_empty(self):
-        """Check parsing of the empty string."""
-        output = VideoDescriptor._parse_time('')
-        self.assertEqual(output, '')
 
     def test_parse_youtube(self):
         """Test parsing old-style Youtube ID strings into a dict."""

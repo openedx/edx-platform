@@ -1,16 +1,18 @@
 import unittest
-from xmodule.modulestore import Location
-from .import get_test_system
-from test_util_open_ended import MockQueryDict, DummyModulestore
-from xmodule.open_ended_grading_classes.peer_grading_service import MockPeerGradingService
+import json
+import logging
 from mock import Mock
-from xmodule.peer_grading_module import PeerGradingModule, InvalidLinkLocation
+from webob.multidict import MultiDict
+
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
-from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
-import json
 
-import logging
+from xmodule.modulestore import Location
+from xmodule.tests import get_test_system, get_test_descriptor_system
+from xmodule.tests.test_util_open_ended import DummyModulestore
+from xmodule.open_ended_grading_classes.peer_grading_service import MockPeerGradingService
+from xmodule.peer_grading_module import PeerGradingModule, PeerGradingDescriptor
+from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 
 log = logging.getLogger(__name__)
 
@@ -28,25 +30,27 @@ class PeerGradingModuleTest(unittest.TestCase, DummyModulestore):
     coe_location = Location(["i4x", "edX", "open_ended", "combinedopenended", "SampleQuestion"])
     calibrated_dict = {'location': "blah"}
     coe_dict = {'location': coe_location.url()}
-    save_dict = MockQueryDict()
-    save_dict.update({
+    save_dict = MultiDict({
         'location': "blah",
         'submission_id': 1,
         'submission_key': "",
         'score': 1,
         'feedback': "",
-        'rubric_scores[]': [0, 1],
         'submission_flagged': False,
-        'answer_unknown' : False,
+        'answer_unknown': False,
     })
+    save_dict.extend(('rubric_scores[]', val) for val in (0, 1))
+
+    def get_module_system(self, descriptor):
+        test_system = get_test_system()
+        test_system.open_ended_grading_interface = None
+        return test_system
 
     def setUp(self):
         """
         Create a peer grading module from a test system
         @return:
         """
-        self.test_system = get_test_system()
-        self.test_system.open_ended_grading_interface = None
         self.setup_modulestore(COURSE)
         self.peer_grading = self.get_module_from_location(self.problem_location, COURSE)
         self.coe = self.get_module_from_location(self.coe_location, COURSE)
@@ -57,22 +61,22 @@ class PeerGradingModuleTest(unittest.TestCase, DummyModulestore):
         @return:
         """
         closed = self.peer_grading.closed()
-        self.assertEqual(closed, False)
+        self.assertFalse(closed)
 
     def test_get_html(self):
         """
         Test to see if the module can be rendered
         @return:
         """
-        html = self.peer_grading.get_html()
+        _html = self.peer_grading.get_html()
 
     def test_get_data(self):
         """
         Try getting data from the external grading service
         @return:
         """
-        success, data = self.peer_grading.query_data_for_location(self.problem_location.url())
-        self.assertEqual(success, True)
+        success, _data = self.peer_grading.query_data_for_location(self.problem_location.url())
+        self.assertTrue(success)
 
     def test_get_score(self):
         """
@@ -80,7 +84,7 @@ class PeerGradingModuleTest(unittest.TestCase, DummyModulestore):
         @return:
         """
         score = self.peer_grading.get_score()
-        self.assertEquals(score['score'], None)
+        self.assertIsNone(score['score'])
 
     def test_get_max_score(self):
         """
@@ -95,7 +99,7 @@ class PeerGradingModuleTest(unittest.TestCase, DummyModulestore):
         Test to see if we can get the next mock submission
         @return:
         """
-        success, next_submission = self.peer_grading.get_next_submission({'location': 'blah'})
+        success, _next_submission = self.peer_grading.get_next_submission({'location': 'blah'})
         self.assertEqual(success, True)
 
     def test_save_grade(self):
@@ -111,9 +115,8 @@ class PeerGradingModuleTest(unittest.TestCase, DummyModulestore):
         Check to see if the student has calibrated yet
         @return:
         """
-        calibrated_dict = {'location': "blah"}
         response = self.peer_grading.is_student_calibrated(self.calibrated_dict)
-        self.assertEqual(response['success'], True)
+        self.assertTrue(response['success'])
 
     def test_show_calibration_essay(self):
         """
@@ -121,7 +124,7 @@ class PeerGradingModuleTest(unittest.TestCase, DummyModulestore):
         @return:
         """
         response = self.peer_grading.show_calibration_essay(self.calibrated_dict)
-        self.assertEqual(response['success'], True)
+        self.assertTrue(response['success'])
 
     def test_save_calibration_essay(self):
         """
@@ -129,7 +132,7 @@ class PeerGradingModuleTest(unittest.TestCase, DummyModulestore):
         @return:
         """
         response = self.peer_grading.save_calibration_essay(self.save_dict)
-        self.assertEqual(response['success'], True)
+        self.assertTrue(response['success'])
 
     def test_peer_grading_problem(self):
         """
@@ -137,7 +140,7 @@ class PeerGradingModuleTest(unittest.TestCase, DummyModulestore):
         @return:
         """
         response = self.peer_grading.peer_grading_problem(self.coe_dict)
-        self.assertEqual(response['success'], True)
+        self.assertTrue(response['success'])
 
     def test___find_corresponding_module_for_location_exceptions(self):
         """
@@ -146,7 +149,7 @@ class PeerGradingModuleTest(unittest.TestCase, DummyModulestore):
         @return:
         """
         with self.assertRaises(ItemNotFoundError):
-            self.peer_grading._find_corresponding_module_for_location(Location('i4x','a','b','c','d'))
+            self.peer_grading._find_corresponding_module_for_location(Location('i4x', 'a', 'b', 'c', 'd'))
 
     def test_get_instance_state(self):
         """
@@ -155,6 +158,7 @@ class PeerGradingModuleTest(unittest.TestCase, DummyModulestore):
         """
         self.peer_grading.get_instance_state()
 
+
 class MockPeerGradingServiceProblemList(MockPeerGradingService):
     def get_problem_list(self, course_id, grader_id):
         return {'success': True,
@@ -162,25 +166,31 @@ class MockPeerGradingServiceProblemList(MockPeerGradingService):
                     {"num_graded": 3, "num_pending": 681, "num_required": 3, "location": "i4x://edX/open_ended/combinedopenended/SampleQuestion", "problem_name": "Peer-Graded Essay"},
                 ]}
 
+
 class PeerGradingModuleScoredTest(unittest.TestCase, DummyModulestore):
     """
     Test peer grading xmodule at the unit level.  More detailed tests are difficult, as the module relies on an
     external grading service.
     """
-    problem_location = Location(["i4x", "edX", "open_ended", "peergrading",
-                                 "PeerGradingScored"])
+    problem_location = Location(
+        ["i4x", "edX", "open_ended", "peergrading", "PeerGradingScored"]
+    )
+
+    def get_module_system(self, descriptor):
+        test_system = get_test_system()
+        test_system.open_ended_grading_interface = None
+        return test_system
+
     def setUp(self):
         """
         Create a peer grading module from a test system
         @return:
         """
-        self.test_system = get_test_system()
-        self.test_system.open_ended_grading_interface = None
         self.setup_modulestore(COURSE)
 
     def test_metadata_load(self):
         peer_grading = self.get_module_from_location(self.problem_location, COURSE)
-        self.assertEqual(peer_grading.closed(), False)
+        self.assertFalse(peer_grading.closed())
 
     def test_problem_list(self):
         """
@@ -199,6 +209,7 @@ class PeerGradingModuleScoredTest(unittest.TestCase, DummyModulestore):
         html = peer_grading.peer_grading()
         self.assertIn("Peer-Graded", html)
 
+
 class PeerGradingModuleLinkedTest(unittest.TestCase, DummyModulestore):
     """
     Test peer grading that is linked to an open ended module.
@@ -208,13 +219,47 @@ class PeerGradingModuleLinkedTest(unittest.TestCase, DummyModulestore):
     coe_location = Location(["i4x", "edX", "open_ended", "combinedopenended",
                              "SampleQuestion"])
 
+    def get_module_system(self, descriptor):
+        test_system = get_test_system()
+        test_system.open_ended_grading_interface = None
+        return test_system
+
     def setUp(self):
         """
         Create a peer grading module from a test system.
         """
-        self.test_system = get_test_system()
-        self.test_system.open_ended_grading_interface = None
         self.setup_modulestore(COURSE)
+
+    @property
+    def field_data(self):
+        """
+        Setup the proper field data for a peer grading module.
+        """
+
+        return DictFieldData({
+            'data': '<peergrading/>',
+            'location': self.problem_location,
+            'use_for_single_location': True,
+            'link_to_location': self.coe_location.url(),
+            'graded': True,
+            })
+
+    @property
+    def scope_ids(self):
+        """
+        Return the proper scope ids for the peer grading module.
+        """
+        return ScopeIds(None, None, self.problem_location, self.problem_location)
+
+    def _create_peer_grading_descriptor_with_linked_problem(self):
+        # Initialize the peer grading module.
+        system = get_test_descriptor_system()
+
+        return system.construct_xblock_from_class(
+            PeerGradingDescriptor,
+            field_data=self.field_data,
+            scope_ids=self.scope_ids
+        )
 
     def _create_peer_grading_with_linked_problem(self, location, valid_linked_descriptor=True):
         """
@@ -234,34 +279,58 @@ class PeerGradingModuleLinkedTest(unittest.TestCase, DummyModulestore):
         else:
             pg_descriptor.get_required_module_descriptors = lambda: []
 
-        # Setup the proper field data for the peer grading module.
-        field_data = DictFieldData({
-            'data': '<peergrading/>',
-            'location': self.problem_location,
-            'use_for_single_location': True,
-            'link_to_location': self.coe_location.url(),
-            'graded': True,
-        })
+        test_system = self.get_module_system(pg_descriptor)
 
         # Initialize the peer grading module.
         peer_grading = PeerGradingModule(
             pg_descriptor,
-            self.test_system,
-            field_data,
-            ScopeIds(None, None, self.problem_location, self.problem_location)
+            test_system,
+            self.field_data,
+            self.scope_ids,
         )
 
         return peer_grading
 
+    def _get_descriptor_with_invalid_link(self, exception_to_raise):
+        """
+        Ensure that a peer grading descriptor with an invalid link will return an empty list.
+        """
+
+        # Create a descriptor, and make loading an item throw an error.
+        descriptor = self._create_peer_grading_descriptor_with_linked_problem()
+        descriptor.system.load_item = Mock(side_effect=exception_to_raise)
+
+        # Ensure that modules is a list of length 0.
+        modules = descriptor.get_required_module_descriptors()
+        self.assertIsInstance(modules, list)
+        self.assertEqual(len(modules), 0)
+
+    def test_descriptor_with_nopath(self):
+        """
+        Test to see if a descriptor with a NoPathToItem error when trying to get
+        its linked module behaves properly.
+        """
+
+        self._get_descriptor_with_invalid_link(NoPathToItem)
+
+    def test_descriptor_with_item_not_found(self):
+        """
+        Test to see if a descriptor with an ItemNotFound error when trying to get
+        its linked module behaves properly.
+        """
+
+        self._get_descriptor_with_invalid_link(ItemNotFoundError)
+
     def test_invalid_link(self):
         """
-        Ensure that a peer grading problem with no linked locations raises an error.
+        Ensure that a peer grading problem with no linked locations stays in panel mode.
         """
 
         # Setup the peer grading module with no linked locations.
-        with self.assertRaises(InvalidLinkLocation):
-            self._create_peer_grading_with_linked_problem(self.coe_location, valid_linked_descriptor=False)
+        peer_grading = self._create_peer_grading_with_linked_problem(self.coe_location, valid_linked_descriptor=False)
 
+        self.assertFalse(peer_grading.use_for_single_location_local)
+        self.assertTrue(peer_grading.use_for_single_location)
 
     def test_linked_problem(self):
         """
@@ -283,7 +352,7 @@ class PeerGradingModuleLinkedTest(unittest.TestCase, DummyModulestore):
         peer_grading = self._create_peer_grading_with_linked_problem(self.coe_location)
 
         # If we specify a location, it will render the problem for that location.
-        data = peer_grading.handle_ajax('problem', {'location' : self.coe_location})
+        data = peer_grading.handle_ajax('problem', {'location': self.coe_location})
         self.assertTrue(json.loads(data)['success'])
 
         # If we don't specify a location, it should use the linked location.
@@ -313,35 +382,3 @@ class PeerGradingModuleLinkedTest(unittest.TestCase, DummyModulestore):
 
         data = peer_grading.handle_ajax('get_next_submission', {'location': self.coe_location})
         self.assertEqual(json.loads(data)['submission_id'], 1)
-
-
-class PeerGradingModuleTrackChangesTest(unittest.TestCase, DummyModulestore):
-    """
-    Test peer grading with the track changes modification
-    """
-    class MockedTrackChangesProblem(object):
-        track_changes = True
-
-    mock_track_changes_problem = Mock(side_effect=[MockedTrackChangesProblem()])
-    pgm_location = Location(["i4x", "edX", "open_ended", "peergrading", "PeerGradingSample"])
-
-    def setUp(self):
-        """
-        Create a peer grading module from a test system
-        @return:
-        """
-        self.test_system = get_test_system()
-        self.test_system.open_ended_grading_interface = None
-        self.setup_modulestore(COURSE)
-        self.peer_grading = self.get_module_from_location(self.pgm_location, COURSE)
-
-    def test_tracking_peer_eval_problem(self):
-        """
-        Tests rendering of peer eval problem with track changes set.  With the test_system render_template
-        this test becomes a bit tautological, but oh well.
-        @return:
-        """
-        self.peer_grading._find_corresponding_module_for_location = self.mock_track_changes_problem
-        response = self.peer_grading.peer_grading_problem({'location': 'mocked'})
-        self.assertEqual(response['success'], True)
-        self.assertIn("'track_changes': True", response['html'])

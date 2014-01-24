@@ -11,16 +11,15 @@ Notes for running by hand:
 from django.test.utils import override_settings
 
 # Need access to internal func to put users in the right group
-from django.contrib.auth.models import Group, User
+from django.contrib.auth.models import User
 
 from django.core.urlresolvers import reverse
 
-from courseware.access import _course_staff_group_name
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from student.roles import CourseStaffRole
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.django import modulestore, clear_existing_modulestores
-import xmodule.modulestore.django
 
 from mock import patch
 
@@ -45,13 +44,7 @@ class TestInstructorDashboardAnonCSV(ModuleStoreTestCase, LoginEnrollmentTestCas
         self.activate_user(self.student)
         self.activate_user(self.instructor)
 
-        def make_instructor(course):
-            """ Create an instructor for the course. """
-            group_name = _course_staff_group_name(course.location)
-            group = Group.objects.create(name=group_name)
-            group.user_set.add(User.objects.get(email=self.instructor))
-
-        make_instructor(self.toy)
+        CourseStaffRole(self.toy.location).add_users(User.objects.get(email=self.instructor))
 
         self.logout()
         self.login(self.instructor, self.password)
@@ -68,4 +61,3 @@ class TestInstructorDashboardAnonCSV(ModuleStoreTestCase, LoginEnrollmentTestCas
         self.assertEqual(response['Content-Type'], 'text/csv')
         body = response.content.replace('\r', '')
         self.assertEqual(body, '"User ID","Anonymized user ID"\n"2","42"\n')
-

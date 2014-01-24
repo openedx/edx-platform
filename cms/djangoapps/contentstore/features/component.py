@@ -1,44 +1,24 @@
 #pylint: disable=C0111
 #pylint: disable=W0621
 
+# Lettuce formats proposed definitions for unimplemented steps with the
+# argument name "step" instead of "_step" and pylint does not like that.
+#pylint: disable=W0613
+
 from lettuce import world, step
-from nose.tools import assert_true, assert_in, assert_equal  # pylint: disable=E0611
-from common import create_studio_user, add_course_author, log_into_studio
-
-
-@step(u'I am in Studio editing a new unit$')
-def add_unit(step):
-    world.clear_courses()
-    course = world.CourseFactory.create()
-    section = world.ItemFactory.create(parent_location=course.location)
-    world.ItemFactory.create(
-        parent_location=section.location,
-        category='sequential',
-        display_name='Subsection One',)
-    user = create_studio_user(is_staff=False)
-    add_course_author(user, course)
-    log_into_studio()
-    world.wait_for_requirejs([
-        "jquery", "js/models/course", "coffee/src/models/module",
-        "coffee/src/views/unit", "jquery.ui",
-    ])
-    world.wait_for_mathjax()
-    css_selectors = [
-        'a.course-link', 'div.section-item a.expand-collapse-icon',
-        'a.new-unit-item',
-    ]
-    for selector in css_selectors:
-        world.css_click(selector)
+from nose.tools import assert_true, assert_in  # pylint: disable=E0611
 
 
 @step(u'I add this type of single step component:$')
 def add_a_single_step_component(step):
-    world.wait_for_xmodule()
     for step_hash in step.hashes:
         component = step_hash['Component']
         assert_in(component, ['Discussion', 'Video'])
-        css_selector = 'a[data-type="{}"]'.format(component.lower())
-        world.css_click(css_selector)
+
+        world.create_component_instance(
+            step=step,
+            category='{}'.format(component.lower()),
+        )
 
 
 @step(u'I see this type of single step component:$')
@@ -53,63 +33,51 @@ def see_a_single_step_component(step):
 
 @step(u'I add this type of( Advanced)? (HTML|Problem) component:$')
 def add_a_multi_step_component(step, is_advanced, category):
-    def click_advanced():
-        css = 'ul.problem-type-tabs a[href="#tab2"]'
-        world.css_click(css)
-        my_css = 'ul.problem-type-tabs li.ui-state-active a[href="#tab2"]'
-        assert(world.css_find(my_css))
-
-    def find_matching_link():
-        """
-        Find the link with the specified text. There should be one and only one.
-        """
-        # The tab shows links for the given category
-        links = world.css_find('div.new-component-{} a'.format(category))
-
-        # Find the link whose text matches what you're looking for
-        matched_links = [link for link in links if link.text == step_hash['Component']]
-
-        # There should be one and only one
-        assert_equal(len(matched_links), 1)
-        return matched_links[0]
-
-    def click_link():
-        link.click()
-
-    world.wait_for_xmodule()
-    category = category.lower()
     for step_hash in step.hashes:
-        css_selector = 'a[data-type="{}"]'.format(category)
-        world.css_click(css_selector)
-        world.wait_for_invisible(css_selector)
-
-        if is_advanced:
-            # Sometimes this click does not work if you go too fast.
-            world.retry_on_exception(click_advanced, max_attempts=5, ignored_exceptions=AssertionError)
-
-        # Retry this in case the list is empty because you tried too fast.
-        link = world.retry_on_exception(func=find_matching_link, ignored_exceptions=AssertionError)
-
-        # Wait for the link to be clickable. If you go too fast it is not.
-        world.retry_on_exception(click_link)
+        world.create_component_instance(
+            step=step,
+            category='{}'.format(category.lower()),
+            component_type=step_hash['Component'],
+            is_advanced=bool(is_advanced),
+        )
 
 
 @step(u'I see (HTML|Problem) components in this order:')
 def see_a_multi_step_component(step, category):
-    components = world.css_find('li.component section.xmodule_display')
+
+    # Wait for all components to finish rendering
+    selector = 'li.component section.xblock-student_view'
+    world.wait_for(lambda _: len(world.css_find(selector)) == len(step.hashes))
+
     for idx, step_hash in enumerate(step.hashes):
+
         if category == 'HTML':
             html_matcher = {
                 'Text':
                     '\n    \n',
                 'Announcement':
                     '<p> Words of encouragement! This is a short note that most students will read. </p>',
+                'Zooming Image':
+                    '<h2>ZOOMING DIAGRAMS</h2>',
                 'E-text Written in LaTeX':
                     '<h2>Example: E-text page</h2>',
             }
-            assert_in(html_matcher[step_hash['Component']], components[idx].html)
+            actual_html = world.css_html(selector, index=idx)
+            assert_in(html_matcher[step_hash['Component']], actual_html)
         else:
-            assert_in(step_hash['Component'].upper(), components[idx].text)
+            actual_text = world.css_text(selector, index=idx)
+            assert_in(step_hash['Component'].upper(), actual_text)
+
+
+@step(u'I see a "([^"]*)" Problem component$')
+def see_a_problem_component(step, category):
+    component_css = 'section.xmodule_CapaModule'
+    assert_true(world.is_css_present(component_css),
+                'No problem was added to the unit.')
+
+    problem_css = 'li.component section.xblock-student_view'
+    actual_text = world.css_text(problem_css)
+    assert_in(category.upper(), actual_text)
 
 
 @step(u'I add a "([^"]*)" "([^"]*)" component$')
@@ -121,13 +89,18 @@ def add_component_category(step, component, category):
 
 @step(u'I delete all components$')
 def delete_all_components(step):
+    count = len(world.css_find('ol.components li.component'))
+    step.given('I delete "' + str(count) + '" component')
+
+
+@step(u'I delete "([^"]*)" component$')
+def delete_components(step, number):
     world.wait_for_xmodule()
     delete_btn_css = 'a.delete-button'
     prompt_css = 'div#prompt-warning'
     btn_css = '{} a.button.action-primary'.format(prompt_css)
     saving_mini_css = 'div#page-notification .wrapper-notification-mini'
-    count = len(world.css_find('ol.components li.component'))
-    for _ in range(int(count)):
+    for _ in range(int(number)):
         world.css_click(delete_btn_css)
         assert_true(
             world.is_css_present('{}.is-shown'.format(prompt_css)),
@@ -159,3 +132,25 @@ def delete_one_component(step):
 def edit_and_save_component(step):
     world.css_click('.edit-button')
     world.css_click('.save-button')
+
+
+@step(u'I duplicate the (first|second|third) component$')
+def duplicated_component(step, ordinal):
+    ord_map = {
+        "first": 0,
+        "second": 1,
+        "third": 2,
+    }
+    index = ord_map[ordinal]
+    duplicate_btn_css = 'a.duplicate-button'
+    world.css_click(duplicate_btn_css, int(index))
+
+
+@step(u'I see a Problem component with display name "([^"]*)" in position "([^"]*)"$')
+def see_component_in_position(step, display_name, index):
+    component_css = 'section.xmodule_CapaModule'
+
+    def find_problem(_driver):
+        return world.css_text(component_css, int(index)).startswith(display_name.upper())
+
+    world.wait_for(find_problem, timeout_msg='Did not find the duplicated problem')

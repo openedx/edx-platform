@@ -23,7 +23,7 @@ from pytz import UTC
 
 from .combined_open_ended_rubric import CombinedOpenEndedRubric
 
-log = logging.getLogger("mitx.courseware")
+log = logging.getLogger("edx.courseware")
 
 
 class OpenEndedModule(openendedchild.OpenEndedChild):
@@ -281,9 +281,27 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         if not new_score_msg['valid']:
             new_score_msg['feedback'] = 'Invalid grader reply. Please contact the course staff.'
 
-        self.record_latest_score(new_score_msg['score'])
-        self.record_latest_post_assessment(score_msg)
-        self.child_state = self.POST_ASSESSMENT
+        # self.child_history is initialized as [].  record_latest_score() and record_latest_post_assessment()
+        # operate on self.child_history[-1].  Thus we have to make sure child_history is not [].
+        # Handle at this level instead of in record_*() because this is a good place to reduce the number of conditions
+        # and also keep the persistent state from changing.
+        if self.child_history:
+            self.record_latest_score(new_score_msg['score'])
+            self.record_latest_post_assessment(score_msg)
+            self.child_state = self.POST_ASSESSMENT
+        else:
+            log.error((
+                "Trying to update score without existing studentmodule child_history:\n"
+                "   location: {location}\n"
+                "   score: {score}\n"
+                "   grader_ids: {grader_ids}\n"
+                "   submission_ids: {submission_ids}").format(
+                    location=self.location_string,
+                    score=new_score_msg['score'],
+                    grader_ids=new_score_msg['grader_ids'],
+                    submission_ids=new_score_msg['submission_ids']
+                )
+            )
 
         return True
 
@@ -485,6 +503,9 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             fail['feedback'] = error_message
             return fail
 
+        if not score_result:
+            return fail
+
         for tag in ['score', 'feedback', 'grader_type', 'success', 'grader_id', 'submission_id']:
             if tag not in score_result:
                 # This is a dev_facing_error
@@ -568,7 +589,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             return ""
 
         feedback_dict = self._parse_score_msg(
-            self.child_history[-1].get('post_assessment', ""),
+            self.child_history[-1].get('post_assessment', "{}"),
             system,
             join_feedback=join_feedback
         )
@@ -661,7 +682,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         return {
             'success': success,
             'error': error_message,
-            'student_response': data['student_answer'].replace("\n","<br/>")
+            'student_response': data['student_answer'].replace("\n", "<br/>")
         }
 
     def update_score(self, data, system):
@@ -696,6 +717,13 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             correct = ""
         previous_answer = self.get_display_answer()
 
+        # Use the module name as a unique id to pass to the template.
+        try:
+            module_id = self.system.location.name
+        except AttributeError:
+            # In cases where we don't have a system or a location, use a fallback.
+            module_id = "open_ended"
+
         context = {
             'prompt': self.child_prompt,
             'previous_answer': previous_answer,
@@ -703,7 +731,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             'allow_reset': self._allow_reset(),
             'rows': 30,
             'cols': 80,
-            'id': 'open_ended',
+            'module_id': module_id,
             'msg': post_assessment,
             'child_type': 'openended',
             'correct': correct,
@@ -712,6 +740,44 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         }
         html = system.render_template('{0}/open_ended.html'.format(self.TEMPLATE_DIR), context)
         return html
+
+    def latest_score(self):
+        """None if not available"""
+        if not self.child_history:
+            return None
+        return self.score_for_attempt(-1)
+
+    def all_scores(self):
+        """None if not available"""
+        if not self.child_history:
+            return None
+        return [self.score_for_attempt(index) for index in xrange(0, len(self.child_history))]
+
+    def score_for_attempt(self, index):
+        """
+        Return sum of rubric scores for ML grading otherwise return attempt["score"].
+        """
+        attempt = self.child_history[index]
+        score = attempt.get('score')
+        post_assessment_data = self._parse_score_msg(attempt.get('post_assessment', "{}"), self.system)
+        grader_types = post_assessment_data.get('grader_types')
+
+        # According to _parse_score_msg in ML grading there should be only one grader type.
+        if len(grader_types) == 1 and grader_types[0] == 'ML':
+            rubric_scores = post_assessment_data.get("rubric_scores")
+
+            # Similarly there should be only one list of rubric scores.
+            if len(rubric_scores) == 1:
+                rubric_scores_sum = sum(rubric_scores[0])
+                log.debug("""Score normalized for location={loc}, old_score={old_score},
+                new_score={new_score}, rubric_score={rubric_score}""".format(
+                    loc=self.location_string,
+                    old_score=score,
+                    new_score=rubric_scores_sum,
+                    rubric_score=rubric_scores
+                ))
+                return rubric_scores_sum
+        return score
 
 
 class OpenEndedDescriptor():
@@ -741,7 +807,7 @@ class OpenEndedDescriptor():
             if len(xml_object.xpath(child)) != 1:
                 # This is a staff_facing_error
                 raise ValueError(
-                    "Open Ended definition must include exactly one '{0}' tag. Contact the learning sciences group for assistance.".format(
+                    u"Open Ended definition must include exactly one '{0}' tag. Contact the learning sciences group for assistance.".format(
                         child))
 
         def parse(k):
@@ -757,7 +823,7 @@ class OpenEndedDescriptor():
         elt = etree.Element('openended')
 
         def add_child(k):
-            child_str = '<{tag}>{body}</{tag}>'.format(tag=k, body=self.definition[k])
+            child_str = u'<{tag}>{body}</{tag}>'.format(tag=k, body=self.definition[k])
             child_node = etree.fromstring(child_str)
             elt.append(child_node)
 

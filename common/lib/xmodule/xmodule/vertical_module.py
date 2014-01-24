@@ -1,3 +1,4 @@
+from xblock.fragment import Fragment
 from xmodule.x_module import XModule
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.progress import Progress
@@ -15,20 +16,23 @@ class VerticalFields(object):
 class VerticalModule(VerticalFields, XModule):
     ''' Layout module for laying out submodules vertically.'''
 
-    def __init__(self, *args, **kwargs):
-        XModule.__init__(self, *args, **kwargs)
-        self.contents = None
+    def student_view(self, context):
+        fragment = Fragment()
+        contents = []
 
-    def get_html(self):
-        if self.contents is None:
-            self.contents = [{
+        for child in self.get_display_items():
+            rendered_child = child.render('student_view', context)
+            fragment.add_frag_resources(rendered_child)
+
+            contents.append({
                 'id': child.id,
-                'content': self.runtime.render_child(child, None, 'student_view').content
-            } for child in self.get_display_items()]
+                'content': rendered_child.content
+            })
 
-        return self.system.render_template('vert_module.html', {
-            'items': self.contents
-        })
+        fragment.add_content(self.system.render_template('vert_module.html', {
+            'items': contents
+        }))
+        return fragment
 
     def get_progress(self):
         # TODO: Cache progress or children array?

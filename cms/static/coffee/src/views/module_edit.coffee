@@ -1,7 +1,7 @@
-define ["backbone", "jquery", "underscore", "gettext", "xmodule",
+define ["backbone", "jquery", "underscore", "gettext", "xblock/runtime.v1",
         "js/views/feedback_notification", "js/views/metadata", "js/collections/metadata"
-        "jquery.inputnumber"],
-(Backbone, $, _, gettext, XModule, NotificationView, MetadataView, MetadataCollection) ->
+        "js/utils/modal", "jquery.inputnumber", "xmodule", "coffee/src/main"],
+(Backbone, $, _, gettext, XBlock, NotificationView, MetadataView, MetadataCollection, ModalUtils) ->
   class ModuleEdit extends Backbone.View
     tagName: 'li'
     className: 'component'
@@ -21,11 +21,11 @@ define ["backbone", "jquery", "underscore", "gettext", "xmodule",
     $component_editor: => @$el.find('.component-editor')
 
     loadDisplay: ->
-      XModule.loadModule(@$el.find('.xmodule_display'))
+      XBlock.initializeBlock(@$el.find('.xblock-student_view'))
 
     loadEdit: ->
       if not @module
-        @module = XModule.loadModule(@$el.find('.xmodule_edit'))
+        @module = XBlock.initializeBlock(@$el.find('.xblock-studio_view'))
         # At this point, metadata-edit.html will be loaded, and the metadata (as JSON) is available.
         metadataEditor = @$el.find('.metadata_edit')
         metadataData = metadataEditor.data('metadata')
@@ -36,6 +36,8 @@ define ["backbone", "jquery", "underscore", "gettext", "xmodule",
             el: metadataEditor,
             collection: new MetadataCollection(models)
         })
+
+        @module.setMetadataEditor(@metadataEditor) if @module.setMetadataEditor
 
         # Need to update set "active" class on data editor if there is one.
         # If we are only showing settings, hide the data editor controls and update settings accordingly.
@@ -60,20 +62,20 @@ define ["backbone", "jquery", "underscore", "gettext", "xmodule",
     changedMetadata: ->
       return _.extend(@metadataEditor.getModifiedMetadataValues(), @customMetadata())
 
-    createItem: (parent, payload) ->
-      payload.parent_location = parent
-      $.post(
-          "/create_item"
+    createItem: (parent, payload, callback=->) ->
+      payload.parent_locator = parent
+      $.postJSON(
+          @model.urlRoot
           payload
           (data) =>
-              @model.set(id: data.id)
-              @$el.data('id', data.id)
+              @model.set(id: data.locator)
+              @$el.data('locator', data.locator)
               @render()
-      )
+      ).success(callback)
 
     render: ->
       if @model.id
-        @$el.load("/preview_component/#{@model.id}", =>
+        @$el.load(@model.url(), =>
           @loadDisplay()
           @delegateEvents()
         )
@@ -87,12 +89,11 @@ define ["backbone", "jquery", "underscore", "gettext", "xmodule",
         id: _this.model.id
 
       data.metadata = _.extend(data.metadata || {}, @changedMetadata())
-      @hideModal()
+      ModalUtils.hideModalCover()
       saving = new NotificationView.Mini
         title: gettext('Saving&hellip;')
       saving.show()
       @model.save(data).done( =>
-      #   # showToastMessage("Your changes have been saved.", null, 3)
         @module = null
         @render()
         @$el.removeClass('editing')
@@ -103,17 +104,12 @@ define ["backbone", "jquery", "underscore", "gettext", "xmodule",
       event.preventDefault()
       @$el.removeClass('editing')
       @$component_editor().slideUp(150)
-      @hideModal()
-
-    hideModal: ->
-      $modalCover = $(".modal-cover")
-      $modalCover.hide()
-      $modalCover.removeClass('is-fixed')
+      ModalUtils.hideModalCover()
 
     clickEditButton: (event) ->
       event.preventDefault()
       @$el.addClass('editing')
-      $(".modal-cover").show().addClass('is-fixed')
+      ModalUtils.showModalCover(true)
       @$component_editor().slideDown(150)
       @loadEdit()
 

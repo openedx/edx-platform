@@ -6,7 +6,7 @@ from django.conf.urls.static import static
 import django.contrib.auth.views
 
 # Uncomment the next two lines to enable the admin:
-if settings.DEBUG or settings.MITX_FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
+if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
     admin.autodiscover()
 
 urlpatterns = ('',  # nopep8
@@ -30,15 +30,16 @@ urlpatterns = ('',  # nopep8
     url(r'^t/(?P<template>[^/]*)$', 'static_template_view.views.index'),   # TODO: Is this used anymore? What is STATIC_GRAB?
 
     url(r'^accounts/login$', 'student.views.accounts_login', name="accounts_login"),
+    url(r'^accounts/manage_user_standing', 'student.views.manage_user_standing',
+        name='manage_user_standing'),
+    url(r'^accounts/disable_account_ajax$', 'student.views.disable_account_ajax',
+        name="disable_account_ajax"),
 
     url(r'^login_ajax$', 'student.views.login_user', name="login"),
     url(r'^login_ajax/(?P<error>[^/]*)$', 'student.views.login_user'),
     url(r'^logout$', 'student.views.logout_user', name='logout'),
     url(r'^create_account$', 'student.views.create_account', name='create_account'),
     url(r'^activate/(?P<key>[^/]*)$', 'student.views.activate_account', name="activate"),
-
-    url(r'^begin_exam_registration/(?P<course_id>[^/]+/[^/]+/[^/]+)$', 'student.views.begin_exam_registration', name="begin_exam_registration"),
-    url(r'^create_exam_registration$', 'student.views.create_exam_registration'),
 
     url(r'^password_reset/$', 'student.views.password_reset', name='password_reset'),
     ## Obsolete Django views for password resets
@@ -62,7 +63,7 @@ urlpatterns = ('',  # nopep8
     url(r'^', include('waffle.urls')),
 )
 
-# if settings.MITX_FEATURES.get("MULTIPLE_ENROLLMENT_ROLES"):
+# if settings.FEATURES.get("MULTIPLE_ENROLLMENT_ROLES"):
 urlpatterns += (
     url(r'^verify_student/', include('verify_student.urls')),
     url(r'^course_modes/', include('course_modes.urls')),
@@ -71,13 +72,20 @@ urlpatterns += (
 
 js_info_dict = {
     'domain': 'djangojs',
-    'packages': ('lms',),
+    # No packages needed, we get LOCALE_PATHS anyway.
+    'packages': (),
 }
 
 urlpatterns += (
     # Serve catalog of localized strings to be rendered by Javascript
     url(r'^jsi18n/$', 'django.views.i18n.javascript_catalog', js_info_dict),
 )
+
+# sysadmin dashboard, to see what courses are loaded, to delete & load courses
+if settings.FEATURES["ENABLE_SYSADMIN_DASHBOARD"]:
+    urlpatterns += (
+        url(r'^sysadmin/', include('dashboard.sysadmin_urls')),
+    )
 
 #Semi-static views (these need to be rendered and have the login bar, but don't change)
 urlpatterns += (
@@ -86,7 +94,7 @@ urlpatterns += (
 )
 
 # Semi-static views only used by edX, not by themes
-if not settings.MITX_FEATURES["USE_CUSTOM_THEME"]:
+if not settings.FEATURES["USE_CUSTOM_THEME"]:
     urlpatterns += (
         url(r'^jobs$', 'static_template_view.views.render',
             {'template': 'jobs.html'}, name="jobs"),
@@ -102,7 +110,7 @@ if not settings.MITX_FEATURES["USE_CUSTOM_THEME"]:
         # url(r'^copyright$', 'static_template_view.views.render',
         #     {'template': 'copyright.html'}, name="copyright"),
 
-        #Press releases
+        # Press releases
         url(r'^press/([_a-zA-Z0-9-]+)$', 'static_template_view.views.render_press_release', name='press_release'),
 
         # Favicon
@@ -120,7 +128,7 @@ for key, value in settings.MKTG_URL_LINK_MAP.items():
         continue
 
     # These urls are enabled separately
-    if key == "ROOT" or key == "COURSES" or key == "FAQ":
+    if key == "ROOT" or key == "COURSES":
         continue
 
     # Make the assumptions that the templates are all in the same dir
@@ -129,7 +137,7 @@ for key, value in settings.MKTG_URL_LINK_MAP.items():
 
     # To allow theme templates to inherit from default templates,
     # prepend a standard prefix
-    if settings.MITX_FEATURES["USE_CUSTOM_THEME"]:
+    if settings.FEATURES["USE_CUSTOM_THEME"]:
         template = "theme-" + template
 
     # Make the assumption that the URL we want is the lowercased
@@ -140,7 +148,7 @@ for key, value in settings.MKTG_URL_LINK_MAP.items():
 
 
 if settings.PERFSTATS:
-    urlpatterns += (url(r'^reprofile$', 'perfstats.views.end_profile'),)
+    urlpatterns += (url(r'^reprofile$', 'lms.lib.perfstats.views.end_profile'),)
 
 # Multicourse wiki (Note: wiki urls must be above the courseware ones because of
 # the custom tab catch-all)
@@ -171,10 +179,12 @@ if settings.COURSEWARE_ENABLED:
             'courseware.views.jump_to', name="jump_to"),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/jump_to_id/(?P<module_id>.*)$',
             'courseware.views.jump_to_id', name="jump_to_id"),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/modx/(?P<location>.*?)/(?P<dispatch>[^/]*)$',
-            'courseware.module_render.modx_dispatch',
-            name='modx_dispatch'),
-
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/xblock/(?P<usage_id>[^/]*)/handler/(?P<handler>[^/]*)(?:/(?P<suffix>.*))?$',
+            'courseware.module_render.handle_xblock_callback',
+            name='xblock_handler'),
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/xblock/(?P<usage_id>[^/]*)/handler_noauth/(?P<handler>[^/]*)(?:/(?P<suffix>.*))?$',
+            'courseware.module_render.handle_xblock_callback_noauth',
+            name='xblock_handler_noauth'),
 
         # Software Licenses
 
@@ -270,8 +280,6 @@ if settings.COURSEWARE_ENABLED:
             'open_ended_grading.staff_grading_service.get_next', name='staff_grading_get_next'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/staff_grading/save_grade$',
             'open_ended_grading.staff_grading_service.save_grade', name='staff_grading_save_grade'),
-        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/staff_grading/save_grade$',
-            'open_ended_grading.staff_grading_service.save_grade', name='staff_grading_save_grade'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/staff_grading/get_problem_list$',
             'open_ended_grading.staff_grading_service.get_problem_list', name='staff_grading_get_problem_list'),
 
@@ -317,22 +325,23 @@ if settings.COURSEWARE_ENABLED:
     )
 
     # allow course staff to change to student view of courseware
-    if settings.MITX_FEATURES.get('ENABLE_MASQUERADE'):
+    if settings.FEATURES.get('ENABLE_MASQUERADE'):
         urlpatterns += (
             url(r'^masquerade/(?P<marg>.*)$', 'courseware.masquerade.handle_ajax', name="masquerade-switch"),
         )
 
     # discussion forums live within courseware, so courseware must be enabled first
-    if settings.MITX_FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
+    if settings.FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
         urlpatterns += (
-            url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/news$',
-                'courseware.views.news', name="news"),
             url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/discussion/',
                 include('django_comment_client.urls')),
             url(r'^notification_prefs/enable/', 'notification_prefs.views.ajax_enable'),
             url(r'^notification_prefs/disable/', 'notification_prefs.views.ajax_disable'),
             url(r'^notification_prefs/status/', 'notification_prefs.views.ajax_status'),
-            url(r'^notification_prefs/unsubscribe/(?P<token>[a-zA-Z0-9-_=]+)/', 'notification_prefs.views.unsubscribe'),
+            url(r'^notification_prefs/unsubscribe/(?P<token>[a-zA-Z0-9-_=]+)/',
+                'notification_prefs.views.set_subscription', {'subscribe': False}, name="unsubscribe_forum_update"),
+            url(r'^notification_prefs/resubscribe/(?P<token>[a-zA-Z0-9-_=]+)/',
+                'notification_prefs.views.set_subscription', {'subscribe': True}, name="resubscribe_forum_update"),
         )
     urlpatterns += (
         # This MUST be the last view in the courseware--it's a catch-all for custom tabs.
@@ -340,7 +349,7 @@ if settings.COURSEWARE_ENABLED:
         'courseware.views.static_tab', name="static_tab"),
     )
 
-    if settings.MITX_FEATURES.get('ENABLE_STUDENT_HISTORY_VIEW'):
+    if settings.FEATURES.get('ENABLE_STUDENT_HISTORY_VIEW'):
         urlpatterns += (
             url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/submission_history/(?P<student_username>[^/]*)/(?P<location>.*?)$',
                 'courseware.views.submission_history',
@@ -348,7 +357,7 @@ if settings.COURSEWARE_ENABLED:
         )
 
 
-if settings.COURSEWARE_ENABLED and settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BETA_DASHBOARD'):
+if settings.COURSEWARE_ENABLED and settings.FEATURES.get('ENABLE_INSTRUCTOR_BETA_DASHBOARD'):
     urlpatterns += (
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/instructor_dashboard$',
             'instructor.views.instructor_dashboard.instructor_dashboard_2', name="instructor_dashboard_2"),
@@ -357,29 +366,29 @@ if settings.COURSEWARE_ENABLED and settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR
             include('instructor.views.api_urls'))
     )
 
-if settings.DEBUG or settings.MITX_FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
+if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
     ## Jasmine and admin
     urlpatterns += (url(r'^admin/', include(admin.site.urls)),)
 
-if settings.MITX_FEATURES.get('AUTH_USE_OPENID'):
+if settings.FEATURES.get('AUTH_USE_OPENID'):
     urlpatterns += (
         url(r'^openid/login/$', 'django_openid_auth.views.login_begin', name='openid-login'),
         url(r'^openid/complete/$', 'external_auth.views.openid_login_complete', name='openid-complete'),
         url(r'^openid/logo.gif$', 'django_openid_auth.views.logo', name='openid-logo'),
     )
 
-if settings.MITX_FEATURES.get('AUTH_USE_SHIB'):
+if settings.FEATURES.get('AUTH_USE_SHIB'):
     urlpatterns += (
         url(r'^shib-login/$', 'external_auth.views.shib_login', name='shib-login'),
     )
 
-if settings.MITX_FEATURES.get('AUTH_USE_CAS'):
+if settings.FEATURES.get('AUTH_USE_CAS'):
     urlpatterns += (
         url(r'^cas-auth/login/$', 'external_auth.views.cas_login', name="cas-login"),
         url(r'^cas-auth/logout/$', 'django_cas.views.logout', {'next_page': '/'}, name="cas-logout"),
     )
 
-if settings.MITX_FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD'):
+if settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD'):
     urlpatterns += (
         url(r'^course_specific_login/(?P<course_id>[^/]+/[^/]+/[^/]+)/$',
             'external_auth.views.course_specific_login', name='course-specific-login'),
@@ -394,7 +403,7 @@ urlpatterns += (
 )
 
 
-if settings.MITX_FEATURES.get('AUTH_USE_OPENID_PROVIDER'):
+if settings.FEATURES.get('AUTH_USE_OPENID_PROVIDER'):
     urlpatterns += (
         url(r'^openid/provider/login/$', 'external_auth.views.provider_login', name='openid-provider-login'),
         url(r'^openid/provider/login/(?:.+)$', 'external_auth.views.provider_identity', name='openid-provider-login-identity'),
@@ -402,10 +411,7 @@ if settings.MITX_FEATURES.get('AUTH_USE_OPENID_PROVIDER'):
         url(r'^openid/provider/xrds/$', 'external_auth.views.provider_xrds', name='openid-provider-xrds')
     )
 
-if settings.MITX_FEATURES.get('ENABLE_PEARSON_LOGIN', False):
-    urlpatterns += url(r'^testcenter/login$', 'external_auth.views.test_center_login'),
-
-if settings.MITX_FEATURES.get('ENABLE_LMS_MIGRATION'):
+if settings.FEATURES.get('ENABLE_LMS_MIGRATION'):
     urlpatterns += (
         url(r'^migrate/modules$', 'lms_migration.migrate.manage_modulestores'),
         url(r'^migrate/reload/(?P<reload_dir>[^/]+)$', 'lms_migration.migrate.manage_modulestores'),
@@ -414,23 +420,23 @@ if settings.MITX_FEATURES.get('ENABLE_LMS_MIGRATION'):
         url(r'^gitreload/(?P<reload_dir>[^/]+)$', 'lms_migration.migrate.gitreload'),
     )
 
-if settings.MITX_FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):
+if settings.FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):
     urlpatterns += (
         url(r'^event_logs$', 'track.views.view_tracking_log'),
         url(r'^event_logs/(?P<args>.+)$', 'track.views.view_tracking_log'),
     )
 
-if settings.MITX_FEATURES.get('ENABLE_SERVICE_STATUS'):
+if settings.FEATURES.get('ENABLE_SERVICE_STATUS'):
     urlpatterns += (
         url(r'^status/', include('service_status.urls')),
     )
 
-if settings.MITX_FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
+if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
     urlpatterns += (
         url(r'^instructor_task_status/$', 'instructor_task.views.instructor_task_status', name='instructor_task_status'),
     )
 
-if settings.MITX_FEATURES.get('RUN_AS_ANALYTICS_SERVER_ENABLED'):
+if settings.FEATURES.get('RUN_AS_ANALYTICS_SERVER_ENABLED'):
     urlpatterns += (
         url(r'^edinsights_service/', include('edinsights.core.urls')),
     )
@@ -442,20 +448,20 @@ urlpatterns += (
     url(r'^comm/foldit_ops', 'foldit.views.foldit_ops', name="foldit_ops"),
 )
 
-if settings.MITX_FEATURES.get('ENABLE_DEBUG_RUN_PYTHON'):
+if settings.FEATURES.get('ENABLE_DEBUG_RUN_PYTHON'):
     urlpatterns += (
         url(r'^debug/run_python', 'debug.views.run_python'),
     )
 
 # Crowdsourced hinting instructor manager.
-if settings.MITX_FEATURES.get('ENABLE_HINTER_INSTRUCTOR_VIEW'):
+if settings.FEATURES.get('ENABLE_HINTER_INSTRUCTOR_VIEW'):
     urlpatterns += (
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/hint_manager$',
             'instructor.hint_manager.hint_manager', name="hint_manager"),
     )
 
 # enable automatic login
-if settings.MITX_FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING'):
+if settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING'):
     urlpatterns += (
         url(r'^auto_auth$', 'student.views.auto_auth'),
     )

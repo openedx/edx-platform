@@ -4,7 +4,8 @@
 <%namespace name='static' file='/static_content.html'/>
 
 <%block name="headextra">
-<%static:css group='course'/>
+<%static:css group='style-course-vendor'/>
+<%static:css group='style-course'/>
 </%block>
 
 <%block name="title"><title>${_("{course_number} Combined Notifications").format(course_number=course.display_number_with_default) | h}</title></%block>
@@ -15,6 +16,7 @@
 <section class="container">
     <div class="combined-notifications" data-ajax_url="${ajax_url}">
         <div class="error-container">${error_text}</div>
+
         <h1>${_("Open Ended Console")}</h1>
         <h2>${_("Instructions")}</h2>
         <p>${_("Here are items that could potentially need your attention.")}</p>

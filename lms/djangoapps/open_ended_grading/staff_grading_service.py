@@ -4,24 +4,32 @@ This module provides views that proxy to the staff grading backend service.
 
 import json
 import logging
-from xmodule.open_ended_grading_classes.grading_service_module import GradingService, GradingServiceError
 
 from django.conf import settings
 from django.http import HttpResponse, Http404
+from django.utils.translation import ugettext as _
 
-from xblock.field_data import DictFieldData
+from xmodule.course_module import CourseDescriptor
+from xmodule.open_ended_grading_classes.grading_service_module import GradingService, GradingServiceError
 
 from courseware.access import has_access
-from util.json_request import expect_json
-from xmodule.course_module import CourseDescriptor
+from lms.lib.xblock.runtime import LmsModuleSystem
+from edxmako.shortcuts import render_to_string
 from student.models import unique_id_for_user
-from xmodule.x_module import ModuleSystem
-from mitxmako.shortcuts import render_to_string
-from utils import does_location_exist
+from util.json_request import expect_json
+
+from open_ended_grading.utils import does_location_exist
 
 log = logging.getLogger(__name__)
 
-STAFF_ERROR_MESSAGE = 'Could not contact the external grading server.  Please contact the development team.  If you do not have a point of contact, you can contact Vik at vik@edx.org.'
+STAFF_ERROR_MESSAGE = _(
+    u'Could not contact the external grading server. Please contact the '
+    u'development team at {email}.'
+).format(
+    email=u'<a href="mailto:{tech_support_email}>{tech_support_email}</a>'.format(
+        tech_support_email=settings.TECH_SUPPORT_EMAIL
+    )
+)
 
 
 class MockStaffGradingService(object):
@@ -69,14 +77,12 @@ class StaffGradingService(GradingService):
     """
 
     def __init__(self, config):
-        config['system'] = ModuleSystem(
+        config['system'] = LmsModuleSystem(
             static_url='/static',
-            ajax_url=None,
             track_function=None,
             get_module = None,
             render_template=render_to_string,
             replace_urls=None,
-            xmodule_field_data=DictFieldData({})
         )
         super(StaffGradingService, self).__init__(config)
         self.url = config['url'] + config['staff_grading']
@@ -324,7 +330,6 @@ def _get_next(course_id, grader_id, location):
                            'error': STAFF_ERROR_MESSAGE})
 
 
-@expect_json
 def save_grade(request, course_id):
     """
     Save the grade and feedback for a submission, and, if all goes well, return

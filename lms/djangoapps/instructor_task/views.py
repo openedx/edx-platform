@@ -3,6 +3,7 @@ import json
 import logging
 
 from django.http import HttpResponse
+from django.utils.translation import ugettext as _
 
 from celery.states import FAILURE, REVOKED, READY_STATES
 
@@ -40,7 +41,7 @@ def instructor_task_status(request):
 
     Status is returned as a JSON-serialized dict, wrapped as the content of a HTTPResponse.
 
-    The task_id can be specified to this view in one of three ways:
+    The task_id can be specified to this view in one of two ways:
 
     * by making a request containing 'task_id' as a parameter with a single value
       Returns a dict containing status information for the specified task_id
@@ -65,7 +66,7 @@ def instructor_task_status(request):
       'in_progress': boolean indicating if task is still running.
       'task_progress': dict containing progress information.  This includes:
           'attempted': number of attempts made
-          'updated': number of attempts that "succeeded"
+          'succeeded': number of attempts that "succeeded"
           'total': number of possible subtasks to attempt
           'action_name': user-visible verb to use in status messages.  Should be past-tense.
           'duration_ms': how long the task has (or had) been running.
@@ -74,7 +75,6 @@ def instructor_task_status(request):
           'traceback': optional, returned if task failed and produced a traceback.
 
     """
-
     output = {}
     if 'task_id' in request.REQUEST:
         task_id = request.REQUEST['task_id']
@@ -105,68 +105,118 @@ def get_task_completion_info(instructor_task):
     succeeded = False
 
     if instructor_task.task_state not in STATES_WITH_STATUS:
-        return (succeeded, "No status information available")
+        return (succeeded, _("No status information available"))
 
     # we're more surprised if there is no output for a completed task, but just warn:
     if instructor_task.task_output is None:
-        log.warning("No task_output information found for instructor_task {0}".format(instructor_task.task_id))
-        return (succeeded, "No status information available")
+        log.warning(_("No task_output information found for instructor_task {0}").format(instructor_task.task_id))
+        return (succeeded, _("No status information available"))
 
     try:
         task_output = json.loads(instructor_task.task_output)
     except ValueError:
-        fmt = "No parsable task_output information found for instructor_task {0}: {1}"
+        fmt = _("No parsable task_output information found for instructor_task {0}: {1}")
         log.warning(fmt.format(instructor_task.task_id, instructor_task.task_output))
-        return (succeeded, "No parsable status information available")
+        return (succeeded, _("No parsable status information available"))
 
     if instructor_task.task_state in [FAILURE, REVOKED]:
-        return (succeeded, task_output.get('message', 'No message provided'))
+        return (succeeded, task_output.get('message', _('No message provided')))
 
-    if any([key not in task_output for key in ['action_name', 'attempted', 'updated', 'total']]):
-        fmt = "Invalid task_output information found for instructor_task {0}: {1}"
+    if any([key not in task_output for key in ['action_name', 'attempted', 'total']]):
+        fmt = _("Invalid task_output information found for instructor_task {0}: {1}")
         log.warning(fmt.format(instructor_task.task_id, instructor_task.task_output))
-        return (succeeded, "No progress status information available")
+        return (succeeded, _("No progress status information available"))
 
-    action_name = task_output['action_name']
+    action_name = _(task_output['action_name'])
     num_attempted = task_output['attempted']
-    num_updated = task_output['updated']
     num_total = task_output['total']
 
+    # In earlier versions of this code, the key 'updated' was used instead of
+    # (the more general) 'succeeded'.  In order to support history that may contain
+    # output with the old key, we check for values with both the old and the current
+    # key, and simply sum them.
+    num_succeeded = task_output.get('updated', 0) + task_output.get('succeeded', 0)
+    num_skipped = task_output.get('skipped', 0)
+
     student = None
+    problem_url = None
+    email_id = None
     try:
         task_input = json.loads(instructor_task.task_input)
     except ValueError:
-        fmt = "No parsable task_input information found for instructor_task {0}: {1}"
+        fmt = _("No parsable task_input information found for instructor_task {0}: {1}")
         log.warning(fmt.format(instructor_task.task_id, instructor_task.task_input))
     else:
         student = task_input.get('student')
+        problem_url = task_input.get('problem_url')
+        email_id = task_input.get('email_id')
 
     if instructor_task.task_state == PROGRESS:
         # special message for providing progress updates:
-        msg_format = "Progress: {action} {updated} of {attempted} so far"
-    elif student is not None:
+        # Translators: {action} is a past-tense verb that is localized separately. {attempted} and {succeeded} are counts.
+        msg_format = _("Progress: {action} {succeeded} of {attempted} so far")
+    elif student is not None and problem_url is not None:
+        # this reports on actions on problems for a particular student:
         if num_attempted == 0:
-            msg_format = "Unable to find submission to be {action} for student '{student}'"
-        elif num_updated == 0:
-            msg_format = "Problem failed to be {action} for student '{student}'"
+            # Translators: {action} is a past-tense verb that is localized separately. {student} is a student identifier.
+            msg_format = _("Unable to find submission to be {action} for student '{student}'")
+        elif num_succeeded == 0:
+            # Translators: {action} is a past-tense verb that is localized separately. {student} is a student identifier.
+            msg_format = _("Problem failed to be {action} for student '{student}'")
         else:
             succeeded = True
-            msg_format = "Problem successfully {action} for student '{student}'"
-    elif num_attempted == 0:
-        msg_format = "Unable to find any students with submissions to be {action}"
-    elif num_updated == 0:
-        msg_format = "Problem failed to be {action} for any of {attempted} students"
-    elif num_updated == num_attempted:
-        succeeded = True
-        msg_format = "Problem successfully {action} for {attempted} students"
-    else:  # num_updated < num_attempted
-        msg_format = "Problem {action} for {updated} of {attempted} students"
+            # Translators: {action} is a past-tense verb that is localized separately. {student} is a student identifier.
+            msg_format = _("Problem successfully {action} for student '{student}'")
+    elif student is None and problem_url is not None:
+        # this reports on actions on problems for all students:
+        if num_attempted == 0:
+            # Translators: {action} is a past-tense verb that is localized separately.
+            msg_format = _("Unable to find any students with submissions to be {action}")
+        elif num_succeeded == 0:
+            # Translators: {action} is a past-tense verb that is localized separately. {attempted} is a count.
+            msg_format = _("Problem failed to be {action} for any of {attempted} students")
+        elif num_succeeded == num_attempted:
+            succeeded = True
+            # Translators: {action} is a past-tense verb that is localized separately. {attempted} is a count.
+            msg_format = _("Problem successfully {action} for {attempted} students")
+        else:  # num_succeeded < num_attempted
+            # Translators: {action} is a past-tense verb that is localized separately. {succeeded} and {attempted} are counts.
+            msg_format = _("Problem {action} for {succeeded} of {attempted} students")
+    elif email_id is not None:
+        # this reports on actions on bulk emails
+        if num_attempted == 0:
+            # Translators: {action} is a past-tense verb that is localized separately.
+            msg_format = _("Unable to find any recipients to be {action}")
+        elif num_succeeded == 0:
+            # Translators: {action} is a past-tense verb that is localized separately. {attempted} is a count.
+            msg_format = _("Message failed to be {action} for any of {attempted} recipients ")
+        elif num_succeeded == num_attempted:
+            succeeded = True
+            # Translators: {action} is a past-tense verb that is localized separately. {attempted} is a count.
+            msg_format = _("Message successfully {action} for {attempted} recipients")
+        else:  # num_succeeded < num_attempted
+            # Translators: {action} is a past-tense verb that is localized separately. {succeeded} and {attempted} are counts.
+            msg_format = _("Message {action} for {succeeded} of {attempted} recipients")
+    else:
+        # provide a default:
+        # Translators: {action} is a past-tense verb that is localized separately. {succeeded} and {attempted} are counts.
+        msg_format = _("Status: {action} {succeeded} of {attempted}")
+
+    if num_skipped > 0:
+        # Translators: {skipped} is a count.  This message is appended to task progress status messages.
+        msg_format += _(" (skipping {skipped})")
 
     if student is None and num_attempted != num_total:
-        msg_format += " (out of {total})"
+        # Translators: {total} is a count.  This message is appended to task progress status messages.
+        msg_format += _(" (out of {total})")
 
     # Update status in task result object itself:
-    message = msg_format.format(action=action_name, updated=num_updated,
-                                attempted=num_attempted, total=num_total,
-                                student=student)
+    message = msg_format.format(
+        action=action_name,
+        succeeded=num_succeeded,
+        attempted=num_attempted,
+        total=num_total,
+        skipped=num_skipped,
+        student=student
+    )
     return (succeeded, message)

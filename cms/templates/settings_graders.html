@@ -6,6 +6,7 @@
 <%!
   from contentstore import utils
   from django.utils.translation import ugettext as _
+  from xmodule.modulestore.django import loc_mapper
 %>
 
 <%block name="header_extras">
@@ -26,9 +27,11 @@ require(["domReady!", "jquery", "js/views/settings/grading", "js/models/settings
       $("label").removeClass("is-focused");
     });
 
+    var model = new CourseGradingPolicyModel(${course_details|n},{parse:true});
+    model.urlRoot = '${grading_url}';
     var editor = new GradingView({
         el: $('.settings-grading'),
-        model : new CourseGradingPolicyModel(${course_details|n},{parse:true})
+        model : model
     });
 
     editor.render();
@@ -115,7 +118,7 @@ require(["domReady!", "jquery", "js/views/settings/grading", "js/models/settings
 
           <div class="actions">
             <a href="#" class="new-button new-course-grading-item add-grading-data">
-              <i class="icon-plus"></i>${_("New Assignment Type")}
+              <i class="icon-plus"></i> ${_("New Assignment Type")}
             </a>
           </div>
         </section>
@@ -124,22 +127,27 @@ require(["domReady!", "jquery", "js/views/settings/grading", "js/models/settings
 
     <aside class="content-supplementary" role="complimentary">
       <div class="bit">
-        <h3 class="title-3">${_("How will these settings be used?")}</h3>
-        <p>${_("Your grading settings will be used to calculate students grades and performance.")}</p>
+        <h3 class="title-3">${_("What can I do on this page?")}</h3>
+        <p>${_("You can use the slider under Overall Grade Range to specify whether your course is pass/fail or graded by letter, and to establish the thresholds for each grade.")}</p>
 
-        <p>${_("Overall grade range will be used in students' final grades, which are calculated by the weighting you determine for each custom assignment type.")}</p>
+        <p>${_("You can specify whether your course offers students a grace period for late assignments.")}</p>
+      	<p>${_("You can also create assignment types, such as homework, labs, quizzes, and exams, and specify how much of a student's grade each assignment type is worth.")}</p>
+
       </div>
 
       <div class="bit">
       % if context_course:
-      <% ctx_loc = context_course.location %>
-      <%! from django.core.urlresolvers import reverse %>
+        <%
+          course_team_url = course_locator.url_reverse('course_team/')
+          advanced_settings_url = course_locator.url_reverse('settings/advanced/')
+          detailed_settings_url = course_locator.url_reverse('settings/details/')
+        %>
         <h3 class="title-3">${_("Other Course Settings")}</h3>
         <nav class="nav-related">
           <ul>
-            <li class="nav-item"><a href="${reverse('contentstore.views.get_course_settings', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">${_("Details &amp; Schedule")}</a></li>
-            <li class="nav-item"><a href="${reverse('manage_users', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">${_("Course Team")}</a></li>
-            <li class="nav-item"><a href="${reverse('course_advanced_settings', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">${_("Advanced Settings")}</a></li>
+            <li class="nav-item"><a href="${detailed_settings_url}">${_("Details &amp; Schedule")}</a></li>
+            <li class="nav-item"><a href="${course_team_url}">${_("Course Team")}</a></li>
+            <li class="nav-item"><a href="${advanced_settings_url}">${_("Advanced Settings")}</a></li>
           </ul>
         </nav>
       % endif

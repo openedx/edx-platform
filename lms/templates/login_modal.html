@@ -5,6 +5,8 @@
 
 <section id="login-modal" class="modal login-modal">
   <div class="inner-wrapper">
+    <button class="close-modal">&#10005; <span class="sr">${_('Close Modal')}</span></button>
+
     <header>
       <h2>${_("Log In")}</h2>
       <hr>
@@ -13,15 +15,15 @@
     <form id="login_form" class="login_form" method="post" data-remote="true" action="/login">
       <label for="login_email">${_("E-mail")}</label>
         <input id="login_email" type="email" name="email" placeholder="e.g. yourname@domain.com" />
-      
+
       <label for="login_password">${_("Password")}</label>
-        <input id="login_password" type="password" name="password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" />  
-      
+        <input id="login_password" type="password" name="password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" />
+
       <label for="login_remember_me" class="remember-me">
         <input id="login_remember_me" type="checkbox" name="remember" value="true" />
         ${_("Remember me")}
       </label>
-      
+
       <div class="submit">
         <input name="submit" type="submit" value="${_('Access My Courses')}">
       </div>
@@ -32,18 +34,12 @@
         <span>${_('Not enrolled?')} <a href="#signup-modal" class="close-login" rel="leanModal">${_('Sign up.')}</a></span>
         <a href="#forgot-password-modal" rel="leanModal" class="pwd-reset">${_('Forgot password?')}</a>
       </p>
-% if settings.MITX_FEATURES.get('AUTH_USE_OPENID'):
+% if settings.FEATURES.get('AUTH_USE_OPENID'):
       <p>
-      <a href="${MITX_ROOT_URL}/openid/login/">${_('login via openid')}</a>
+      <a href="${EDX_ROOT_URL}/openid/login/">${_('login via openid')}</a>
       </p>
 % endif
     </section>
-
-    <a href="#" role="button" class="close-modal" title="${_('Close Modal')}">
-      <div class="inner">
-        <p>&#10005;</p>
-      </div>
-    </a>
   </div>
 </section>
 
@@ -64,7 +60,7 @@
        $('#login_error').html(json.value).stop().css("display", "block");
      }
    });
-   
+
    // removing close link's default behavior
    $('#login-modal .close-modal').click(function(e) {
     e.preventDefault();

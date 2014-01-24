@@ -1,16 +1,17 @@
-define ["jquery", "underscore.string", "backbone", "js/views/feedback_notification", "jquery.cookie"],
-($, str, Backbone, NotificationView) ->
-  AjaxPrefix.addAjaxPrefix jQuery, ->
-    $("meta[name='path_prefix']").attr('content')
-
-  window.CMS = window.CMS or {}
-  CMS.URL = CMS.URL or {}
-  window.onTouchBasedDevice = ->
-    navigator.userAgent.match /iPhone|iPod|iPad/i
-
-  _.extend CMS, Backbone.Events
-
+define ["domReady", "jquery", "underscore.string", "backbone", "gettext",
+        "js/views/feedback_notification",
+        "coffee/src/ajax_prefix", "jquery.cookie"],
+(domReady, $, str, Backbone, gettext, NotificationView) ->
   main = ->
+    AjaxPrefix.addAjaxPrefix jQuery, ->
+      $("meta[name='path_prefix']").attr('content')
+
+    window.CMS = window.CMS or {}
+    CMS.URL = CMS.URL or {}
+    window.onTouchBasedDevice = ->
+      navigator.userAgent.match /iPhone|iPod|iPad|Android/i
+
+    _.extend CMS, Backbone.Events
     Backbone.emulateHTTP = true
 
     $.ajaxSetup
@@ -33,8 +34,22 @@ define ["jquery", "underscore.string", "backbone", "js/views/feedback_notificati
       )
       msg.show()
 
-    if onTouchBasedDevice()
-      $('body').addClass 'touch-based-device'
+    $.postJSON = (url, data, callback) ->
+      # shift arguments if data argument was omitted
+      if $.isFunction(data)
+        callback = data
+        data = `undefined`
+      $.ajax
+        url: url
+        type: "POST"
+        contentType: "application/json; charset=utf-8"
+        dataType: "json"
+        data: JSON.stringify(data)
+        success: callback
 
-  $(main)
+    domReady ->
+      if onTouchBasedDevice()
+        $('body').addClass 'touch-based-device'
+
+  main()
   return main

@@ -3,8 +3,8 @@ Django admin page for bulk email models
 """
 from django.contrib import admin
 
-from bulk_email.models import CourseEmail, Optout, CourseEmailTemplate
-from bulk_email.forms import CourseEmailTemplateForm
+from bulk_email.models import CourseEmail, Optout, CourseEmailTemplate, CourseAuthorization
+from bulk_email.forms import CourseEmailTemplateForm, CourseAuthorizationAdminForm
 
 
 class CourseEmailAdmin(admin.ModelAdmin):
@@ -57,6 +57,23 @@ unsupported tags will cause email sending to fail.
         return False
 
 
+class CourseAuthorizationAdmin(admin.ModelAdmin):
+    """Admin for enabling email on a course-by-course basis."""
+    form = CourseAuthorizationAdminForm
+    fieldsets = (
+        (None, {
+            'fields': ('course_id', 'email_enabled'),
+            'description': '''
+Enter a course id in the following form: Org/Course/CourseRun, eg MITx/6.002x/2012_Fall
+Do not enter leading or trailing slashes. There is no need to surround the course ID with quotes.
+Validation will be performed on the course name, and if it is invalid, an error message will display.
+
+To enable email for the course, check the "Email enabled" box, then click "Save".
+'''
+        }),
+    )
+
 admin.site.register(CourseEmail, CourseEmailAdmin)
 admin.site.register(Optout, OptoutAdmin)
 admin.site.register(CourseEmailTemplate, CourseEmailTemplateAdmin)
+admin.site.register(CourseAuthorization, CourseAuthorizationAdmin)

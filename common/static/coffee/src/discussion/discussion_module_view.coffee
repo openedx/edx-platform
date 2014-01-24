@@ -2,7 +2,11 @@ if Backbone?
   class @DiscussionModuleView extends Backbone.View
     events:
       "click .discussion-show": "toggleDiscussion"
+      "keydown .discussion-show":
+        (event) -> DiscussionUtil.activateOnSpace(event, @toggleDiscussion)
       "click .new-post-btn": "toggleNewPost"
+      "keydown .new-post-btn":
+        (event) -> DiscussionUtil.activateOnSpace(event, @toggleNewPost)
       "click .new-post-cancel": "hideNewPost"
       "click .discussion-paginator a": "navigateToPage"
 
@@ -17,7 +21,7 @@ if Backbone?
       else
         @page = 1
 
-    toggleNewPost: (event) ->
+    toggleNewPost: (event) =>
       event.preventDefault()
       if !@newPostForm
         @toggleDiscussion()
@@ -28,7 +32,7 @@ if Backbone?
       else
         @newPostForm.show()
       @toggleDiscussionBtn.addClass('shown')
-      @toggleDiscussionBtn.find('.button-text').html("Hide Discussion")
+      @toggleDiscussionBtn.find('.button-text').html(gettext("Hide Discussion"))
       @$("section.discussion").slideDown()
       @showed = true
 
@@ -36,35 +40,49 @@ if Backbone?
       event.preventDefault()
       @newPostForm.slideUp(300)
 
-    toggleDiscussion: (event) ->
+    hideDiscussion: =>
+      @$("section.discussion").slideUp()
+      @toggleDiscussionBtn.removeClass('shown')
+      @toggleDiscussionBtn.find('.button-text').html(gettext("Show Discussion"))
+      @showed = false
+
+    toggleDiscussion: (event) =>
       if @showed
-        @$("section.discussion").slideUp()
-        @toggleDiscussionBtn.removeClass('shown')
-        @toggleDiscussionBtn.find('.button-text').html("Show Discussion")
-        @showed = false
+        @hideDiscussion()
       else
         @toggleDiscussionBtn.addClass('shown')
-        @toggleDiscussionBtn.find('.button-text').html("Hide Discussion")
+        @toggleDiscussionBtn.find('.button-text').html(gettext("Hide Discussion"))
 
         if @retrieved
           @$("section.discussion").slideDown()
           @showed = true
         else
           $elem = @toggleDiscussionBtn
-          @loadPage $elem
+          @loadPage(
+            $elem,
+            =>
+              @hideDiscussion()
+              DiscussionUtil.discussionAlert(
+                gettext("Sorry"),
+                gettext("We had some trouble loading the discussion. Please try again.")
+              )
+          )
 
-    loadPage: ($elem)=>
+    loadPage: ($elem, error) =>
       discussionId = @$el.data("discussion-id")
       url = DiscussionUtil.urlFor('retrieve_discussion', discussionId) + "?page=#{@page}"
       DiscussionUtil.safeAjax
         $elem: $elem
         $loading: $elem
+        takeFocus: true
         url: url
         type: "GET"
         dataType: 'json'
         success: (response, textStatus, jqXHR) => @renderDiscussion($elem, response, textStatus, discussionId)
+        error: error
 
     renderDiscussion: ($elem, response, textStatus, discussionId) =>
+      $elem.focus()
       window.user = new DiscussionUser(response.user_info)
       Content.loadContentInfos(response.annotated_content_info)
       DiscussionUtil.loadRoles(response.roles)
@@ -131,5 +149,14 @@ if Backbone?
     navigateToPage: (event) =>
       event.preventDefault()
       window.history.pushState({}, window.document.title, event.target.href)
+      currPage = @page
       @page = $(event.target).data('page-number')
-      @loadPage($(event.target))
+      @loadPage(
+        $(event.target),
+        =>
+          @page = currPage
+          DiscussionUtil.discussionAlert(
+            gettext("Sorry"),
+            gettext("We had some trouble loading the threads you requested. Please try again.")
+          )
+      )

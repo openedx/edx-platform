@@ -2,8 +2,6 @@ from django.conf.urls.defaults import url, patterns
 
 urlpatterns = patterns('django_comment_client.base.views',  # nopep8
     url(r'upload$', 'upload', name='upload'),
-    url(r'users/(?P<user_id>\w+)/update_moderator_status$', 'update_moderator_status', name='update_moderator_status'),
-    url(r'threads/tags/autocomplete$', 'tags_autocomplete', name='tags_autocomplete'),
     url(r'threads/(?P<thread_id>[\w\-]+)/update$', 'update_thread', name='update_thread'),
     url(r'threads/(?P<thread_id>[\w\-]+)/reply$', 'create_comment', name='create_comment'),
     url(r'threads/(?P<thread_id>[\w\-]+)/delete', 'delete_thread', name='delete_thread'),

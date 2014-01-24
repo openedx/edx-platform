@@ -1,5 +1,5 @@
 (function (requirejs, require, define) {
-define(['logme'], function (logme) {
+define([], function () {
     return Scroller;
 
     function Scroller(state) {
@@ -40,7 +40,7 @@ define(['logme'], function (logme) {
                         '-webkit-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset; ' +
                         'box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset; ' +
 
-                        'background-image: url(\'/static/images/arrow-left.png\'); ' +
+                        "background-image: url('"+baseUrl+"images/arrow-left.png'); " +
                         'background-position: center center; ' +
                         'background-repeat: no-repeat; ' +
                     '" ' +
@@ -136,7 +136,7 @@ define(['logme'], function (logme) {
                         '-webkit-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset; ' +
                         'box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset; ' +
 
-                        'background-image: url(\'/static/images/arrow-right.png\'); ' +
+                        "background-image: url('"+baseUrl+"images/arrow-right.png'); " +
                         'background-position: center center; ' +
                         'background-repeat: no-repeat; ' +
                     '" ' +
@@ -201,5 +201,5 @@ define(['logme'], function (logme) {
             }
         }
     } // End-of: function Scroller(state)
-}); // End-of: define(['logme'], function (logme) {
+}); // End-of: define([], function () {
 }(RequireJS.requirejs, RequireJS.require, RequireJS.define)); // End-of: (function (requirejs, require, define) {

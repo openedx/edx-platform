@@ -1,7 +1,13 @@
+"""
+Module for checking permissions with the comment_client backend
+"""
+
 import logging
-from util.cache import cache
 from django.core import cache
-cache = cache.get_cache('default')
+
+
+CACHE = cache.get_cache('default')
+CACHE_LIFESPAN = 60
 
 
 def cached_has_permission(user, permission, course_id=None):
@@ -9,12 +15,11 @@ def cached_has_permission(user, permission, course_id=None):
     Call has_permission if it's not cached. A change in a user's role or
     a role's permissions will only become effective after CACHE_LIFESPAN seconds.
     """
-    CACHE_LIFESPAN = 60
     key = "permission_%d_%s_%s" % (user.id, str(course_id), permission)
-    val = cache.get(key, None)
+    val = CACHE.get(key, None)
     if val not in [True, False]:
         val = has_permission(user, permission, course_id=course_id)
-        cache.set(key, val, CACHE_LIFESPAN)
+        CACHE.set(key, val, CACHE_LIFESPAN)
     return val
 
 
@@ -72,32 +77,31 @@ def check_conditions_permissions(user, permissions, course_id, **kwargs):
 
 
 VIEW_PERMISSIONS = {
-    'update_thread'     :       ['edit_content', ['update_thread', 'is_open', 'is_author']],
-    'create_comment'    :       [["create_comment", "is_open"]],
-    'delete_thread'     :       ['delete_thread', ['update_thread', 'is_author']],
-    'update_comment'    :       ['edit_content', ['update_comment', 'is_open', 'is_author']],
-    'endorse_comment'   :       ['endorse_comment'],
-    'openclose_thread'  :       ['openclose_thread'],
-    'create_sub_comment':       [['create_sub_comment', 'is_open']],
-    'delete_comment'    :       ['delete_comment', ['update_comment', 'is_open', 'is_author']],
-    'vote_for_comment'  :       [['vote', 'is_open']],
-    'undo_vote_for_comment':    [['unvote', 'is_open']],
-    'vote_for_thread'   :       [['vote', 'is_open']],
-    'flag_abuse_for_thread':    [['vote', 'is_open']],
-    'un_flag_abuse_for_thread':    [['vote', 'is_open']],
-    'flag_abuse_for_comment':    [['vote', 'is_open']],
-    'un_flag_abuse_for_comment':    [['vote', 'is_open']],
-    'undo_vote_for_thread':     [['unvote', 'is_open']],
-    'pin_thread':    ['create_comment'],
-    'un_pin_thread':    ['create_comment'],
-    'follow_thread'     :       ['follow_thread'],
-    'follow_commentable':       ['follow_commentable'],
-    'follow_user'       :       ['follow_user'],
-    'unfollow_thread'   :       ['unfollow_thread'],
-    'unfollow_commentable':     ['unfollow_commentable'],
-    'unfollow_user'     :       ['unfollow_user'],
-    'create_thread'     :       ['create_thread'],
-    'update_moderator_status': ['manage_moderator'],
+    'update_thread': ['edit_content', ['update_thread', 'is_open', 'is_author']],
+    'create_comment': [["create_comment", "is_open"]],
+    'delete_thread': ['delete_thread', ['update_thread', 'is_author']],
+    'update_comment': ['edit_content', ['update_comment', 'is_open', 'is_author']],
+    'endorse_comment': ['endorse_comment'],
+    'openclose_thread': ['openclose_thread'],
+    'create_sub_comment': [['create_sub_comment', 'is_open']],
+    'delete_comment': ['delete_comment', ['update_comment', 'is_open', 'is_author']],
+    'vote_for_comment': [['vote', 'is_open']],
+    'undo_vote_for_comment': [['unvote', 'is_open']],
+    'vote_for_thread': [['vote', 'is_open']],
+    'flag_abuse_for_thread': [['vote', 'is_open']],
+    'un_flag_abuse_for_thread': [['vote', 'is_open']],
+    'flag_abuse_for_comment': [['vote', 'is_open']],
+    'un_flag_abuse_for_comment': [['vote', 'is_open']],
+    'undo_vote_for_thread': [['unvote', 'is_open']],
+    'pin_thread': ['create_comment'],
+    'un_pin_thread': ['create_comment'],
+    'follow_thread': ['follow_thread'],
+    'follow_commentable': ['follow_commentable'],
+    'follow_user': ['follow_user'],
+    'unfollow_thread': ['unfollow_thread'],
+    'unfollow_commentable': ['unfollow_commentable'],
+    'unfollow_user': ['unfollow_user'],
+    'create_thread': ['create_thread'],
 }
 
 

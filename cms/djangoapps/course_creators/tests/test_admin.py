@@ -10,8 +10,9 @@ import mock
 
 from course_creators.admin import CourseCreatorAdmin
 from course_creators.models import CourseCreator
-from auth.authz import is_user_in_creator_group
 from django.core import mail
+from student.roles import CourseCreatorRole
+from student import auth
 
 
 def mock_render_to_string(template_name, context):
@@ -54,7 +55,7 @@ class CourseCreatorAdminTest(TestCase):
         def change_state_and_verify_email(state, is_creator):
             """ Changes user state, verifies creator status, and verifies e-mail is sent based on transition """
             self._change_state(state)
-            self.assertEqual(is_creator, is_user_in_creator_group(self.user))
+            self.assertEqual(is_creator, auth.has_access(self.user, CourseCreatorRole()))
 
             context = {'studio_request_email': self.studio_request_email}
             if state == CourseCreator.GRANTED:
@@ -69,10 +70,10 @@ class CourseCreatorAdminTest(TestCase):
                 self.studio_request_email
             )
 
-        with mock.patch.dict('django.conf.settings.MITX_FEATURES', self.enable_creator_group_patch):
+        with mock.patch.dict('django.conf.settings.FEATURES', self.enable_creator_group_patch):
 
             # User is initially unrequested.
-            self.assertFalse(is_user_in_creator_group(self.user))
+            self.assertFalse(auth.has_access(self.user, CourseCreatorRole()))
 
             change_state_and_verify_email(CourseCreator.GRANTED, True)
 
@@ -119,7 +120,7 @@ class CourseCreatorAdminTest(TestCase):
             else:
                 self.assertEquals(base_num_emails, len(mail.outbox))
 
-        with mock.patch.dict('django.conf.settings.MITX_FEATURES', self.enable_creator_group_patch):
+        with mock.patch.dict('django.conf.settings.FEATURES', self.enable_creator_group_patch):
             # E-mail message should be sent to admin only when new state is PENDING, regardless of what
             # previous state was (unless previous state was already PENDING).
             # E-mail message sent to user only on transition into and out of GRANTED state.
@@ -159,7 +160,7 @@ class CourseCreatorAdminTest(TestCase):
         self.assertFalse(self.creator_admin.has_change_permission(self.request))
 
     def test_rate_limit_login(self):
-        with mock.patch.dict('django.conf.settings.MITX_FEATURES', {'ENABLE_CREATOR_GROUP': True}):
+        with mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_CREATOR_GROUP': True}):
             post_params = {'username': self.user.username, 'password': 'wrong_password'}
             # try logging in 30 times, the default limit in the number of failed
             # login attempts in one 5 minute period before the rate gets limited

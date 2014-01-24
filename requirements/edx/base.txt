@@ -8,12 +8,15 @@
 
 beautifulsoup4==4.1.3
 beautifulsoup==3.2.1
-boto==2.6.0
+bleach==1.2.2
+html5lib==0.95
+boto==2.13.3
 celery==3.0.19
 dealer==0.2.3
 distribute>=0.6.28, <0.7
 django-celery==3.0.17
 django-countries==1.5
+django-extensions==1.2.5
 django-filter==0.6.0
 django-followit==0.0.3
 django-keyedcache==1.4-6
@@ -35,10 +38,12 @@ feedparser==5.1.3
 fs==0.4.0
 GitPython==0.3.2.RC1
 glob2==0.3
+gunicorn==0.17.4
 lazy==1.1
 lxml==3.0.1
-mako==0.7.3
+mako==0.9.1
 Markdown==2.2.1
+mongoengine==0.7.10
 networkx==1.7
 nltk==2.0.4
 oauthlib==0.5.1
@@ -54,7 +59,9 @@ pymongo==2.4.1
 pyparsing==1.5.6
 python-memcached==1.48
 python-openid==2.2.5
+python-dateutil==2.1
 pytz==2012h
+pysrt==0.4.7
 PyYAML==3.10
 requests==1.2.3
 scipy==0.11.0
@@ -65,6 +72,7 @@ South==0.7.6
 sympy==0.7.1
 xmltodict==0.4.1
 django-ratelimit-backend==0.6
+unicodecsv==0.9.4
 
 # Used for debugging
 ipython==0.13.1
@@ -74,18 +82,19 @@ watchdog==0.6.0
 
 # Metrics gathering and monitoring
 dogapi==1.2.1
-newrelic==1.13.1.31
+newrelic==2.4.0.4
 
 # Used for documentation gathering
 sphinx==1.1.3
 
 # Used for Internationalization and localization
 Babel==1.3
-transifex-client==0.9.1
+transifex-client==0.10
 
 # Used for testing
-coverage==3.6
-factory_boy==2.0.2
+coverage==3.7
+ddt==0.6.0
+factory_boy==2.2.1
 mock==1.0.1
 nosexcover==1.0.7
 pep8==1.4.5
@@ -94,10 +103,11 @@ rednose==0.3
 selenium==2.34.0
 splinter==0.5.4
 django_nose==1.1
-django_debug_toolbar
+django_debug_toolbar==0.9.4
 django-debug-toolbar-mongo
 nose-ignore-docstring
 nose-exclude
+django-crum==0.5
 
 git+https://github.com/mfogel/django-settings-context-processor.git
 

@@ -11,17 +11,17 @@ from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
 from django.test.client import Client
 
-from mitxmako.shortcuts import render_to_string
+from edxmako.shortcuts import render_to_string
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from xblock.field_data import DictFieldData
-from xblock.fields import Scope
-from xmodule.tests import get_test_system
+from xmodule.tests import get_test_system, get_test_descriptor_system
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from lms.xblock.field_data import lms_field_data
+from lms.lib.xblock.field_data import LmsFieldData
+from lms.lib.xblock.runtime import quote_slashes
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -34,7 +34,7 @@ class BaseTestXmodule(ModuleStoreTestCase):
 
     Any xmodule should overwrite only next parameters for test:
         1. CATEGORY
-        2. DATA
+        2. DATA or METADATA
         3. MODEL_DATA
         4. COURSE_DATA and USER_COUNT if needed
 
@@ -45,18 +45,56 @@ class BaseTestXmodule(ModuleStoreTestCase):
     COURSE_DATA = {}
 
     # Data from YAML common/lib/xmodule/xmodule/templates/NAME/default.yaml
-    CATEGORY = ""
+    CATEGORY = "vertical"
     DATA = ''
+    # METADATA must be overwritten for every instance that uses it. Otherwise,
+    # if we'll change it in the tests, it will be changed for all other instances
+    # of parent class.
+    METADATA = {}
     MODEL_DATA = {'data': '<some_module></some_module>'}
 
-    def xmodule_field_data(self, descriptor):
+    def new_module_runtime(self):
+        """
+        Generate a new ModuleSystem that is minimally set up for testing
+        """
+        runtime = get_test_system(course_id=self.course.id)
+
+        # When asked for a module out of a descriptor, just create a new xmodule runtime,
+        # and inject it into the descriptor
+        def get_module(descr):
+            descr.xmodule_runtime = self.new_module_runtime()
+            return descr
+
+        runtime.get_module = get_module
+
+        return runtime
+
+    def new_descriptor_runtime(self):
+        runtime = get_test_descriptor_system()
+        runtime.get_block = modulestore().get_item
+        return runtime
+
+    def initialize_module(self, **kwargs):
+        kwargs.update({
+            'parent_location': self.section.location,
+            'category': self.CATEGORY
+        })
+
+        self.item_descriptor = ItemFactory.create(**kwargs)
+
+        self.runtime = self.new_descriptor_runtime()
+
         field_data = {}
         field_data.update(self.MODEL_DATA)
         student_data = DictFieldData(field_data)
-        return lms_field_data(descriptor._field_data, student_data)
+        self.item_descriptor._field_data = LmsFieldData(self.item_descriptor._field_data, student_data)
 
-    def setUp(self):
+        self.item_descriptor.xmodule_runtime = self.new_module_runtime()
+        self.item_module = self.item_descriptor
 
+        self.item_url = Location(self.item_module.location).url()
+
+    def setup_course(self):
         self.course = CourseFactory.create(data=self.COURSE_DATA)
 
         # Turn off cache.
@@ -67,7 +105,7 @@ class BaseTestXmodule(ModuleStoreTestCase):
             parent_location=self.course.location,
             category="sequential",
         )
-        section = ItemFactory.create(
+        self.section = ItemFactory.create(
             parent_location=chapter.location,
             category="sequential"
         )
@@ -81,25 +119,6 @@ class BaseTestXmodule(ModuleStoreTestCase):
         for user in self.users:
             CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
 
-        self.item_descriptor = ItemFactory.create(
-            parent_location=section.location,
-            category=self.CATEGORY,
-            data=self.DATA
-        )
-
-        self.runtime = get_test_system(course_id=self.course.id)
-        # Allow us to assert that the template was called in the same way from
-        # different code paths while maintaining the type returned by render_template
-        self.runtime.render_template = lambda template, context: u'{!r}, {!r}'.format(template, sorted(context.items()))
-
-        self.runtime.xmodule_field_data = self.xmodule_field_data
-
-        self.runtime.get_module = lambda descr: descr.xmodule(self.runtime)
-
-        self.item_module = self.item_descriptor.xmodule(self.runtime)
-
-        self.item_url = Location(self.item_module.location).url()
-
         # login all users for acces to Xmodule
         self.clients = {user.username: Client() for user in self.users}
         self.login_statuses = [
@@ -110,16 +129,24 @@ class BaseTestXmodule(ModuleStoreTestCase):
 
         self.assertTrue(all(self.login_statuses))
 
+    def setUp(self):
+        self.setup_course();
+        self.initialize_module(metadata=self.METADATA, data=self.DATA)
+
     def get_url(self, dispatch):
         """Return item url with dispatch."""
         return reverse(
-            'modx_dispatch',
-            args=(self.course.id, self.item_url, dispatch)
+            'xblock_handler',
+            args=(self.course.id, quote_slashes(self.item_url), 'xmodule_handler', dispatch)
         )
 
 
 class XModuleRenderingTestBase(BaseTestXmodule):
-    def setUp(self):
-        super(XModuleRenderingTestBase, self).setUp()
 
-        self.runtime.render_template = render_to_string
+    def new_module_runtime(self):
+        """
+        Create a runtime that actually does html rendering
+        """
+        runtime = super(XModuleRenderingTestBase, self).new_module_runtime()
+        runtime.render_template = render_to_string
+        return runtime

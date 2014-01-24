@@ -5,8 +5,11 @@
 <%block name="title"><title>${_("{course_number} Courseware").format(course_number=course.display_number_with_default) | h}</title></%block>
 
 <%block name="headextra">
-  <%static:css group='course'/>
-  <%include file="../discussion/_js_head_dependencies.html" />
+<%static:css group='style-course-vendor'/>
+<%static:css group='style-course'/>
+
+<%include file="../discussion/_js_head_dependencies.html" />
+
   % if show_chat:
     <link rel="stylesheet" href="${static.url('css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css')}" />
     ## It'd be better to have this in a place like lms/css/vendor/candy,
@@ -14,6 +17,7 @@
     ## all needs to stay together for the Candy.js plugin to work.
     <link rel="stylesheet" href="${static.url('candy_res/candy_full.css')}" />
   % endif
+  ${fragment.head_html()}
 </%block>
 
 <%block name="js_extra">
@@ -150,6 +154,8 @@
   </script>
 % endif
 
+${fragment.foot_html()}
+
 </%block>
 
 % if timer_expiration_duration:
@@ -185,7 +191,7 @@
 % endif
 
     <section class="course-content">
-      ${content}
+      ${fragment.body_html()}
     </section>
   </div>
 </section>
@@ -205,33 +211,124 @@
 
 % if course.show_calculator:
     <div class="calc-main">
-        <a aria-label="${_('Open Calculator')}" href="#" class="calc">${_("Calculator")}</a>
-
+        <a title="${_('Open Calculator')}" href="#" role="button" aria-controls="calculator_wrapper" aria-expanded="false" class="calc">${_("Open Calculator")}</a>
         <div id="calculator_wrapper">
             <form id="calculator">
                 <div class="input-wrapper">
-                    <input type="text" id="calculator_input" title="Calculator Input Field" />
+                    <input type="text" id="calculator_input" title="${_('Calculator Input Field')}" tabindex="-1" />
 
                     <div class="help-wrapper">
-                        <a href="#">${_("Hints")}</a>
-                        <dl class="help">
-                            <dt>${_("Suffixes:")}</dt>
-                            <dd> %kMGTcmunp</dd>
-                            <dt>${_("Operations:")}</dt>
-                            <dd>^ * / + - ()</dd>
-                            <dt>${_("Functions:")}</dt>
-                            <dd>sin, cos, tan, sqrt, log10, log2, ln, arccos, arcsin, arctan, abs </dd>
-                            <dt>${_("Constants")}</dt>
-                            <dd>e, pi</dd>
-
-                            <!-- Students won't know what parallel means at this time.  Complex numbers aren't well tested in the courseware, so we would prefer to not expose them.  If you read the comments in the source, feel free to use them. If you run into a bug, please let us know. But we can't officially support them right now.
-
-                            <dt>Unsupported:</dt> <dd>||, j </dd>  -->
-                        </dl>
+                        <p class="sr" id="hint-instructions">${_('Use the arrow keys to navigate the tips or use the tab key to return to the calculator')}</p>
+                        <a id="calculator_hint" href="#" role="button" aria-haspopup="true" tabindex="-1" aria-describedby="hint-instructions">${_("Hints")}</a>
+                        <ul id="calculator_input_help" class="help" aria-activedescendant="hint-integers" role="tooltip" aria-hidden="true">
+                          <li class="hint-item" id="hint-integers" tabindex="-1"><p><span class="bold">${_("Integers")}:</span> 2520</p></li>
+                          <li class="hint-item" id="hint-decimals" tabindex="-1"><p><span class="bold">${_("Decimals")}:</span> 3.14 or .98</p></li>
+                          <li class="hint-item" id="hint-scientific-notation" tabindex="-1"><p><span class="bold">${_("Scientific notation")}:</span> 1.2e-2 (=0.012), -4.4e+5 = -4.4e5 (=-440,000)</p></li>
+                          <li class="hint-item" id="hint-appending-postfixes" tabindex="-1"><p><span class="bold">${_("Appending SI postfixes")}:</span> 2.25k (=2,250)</p></li>
+                          <li class="hint-item" id="hint-supported-postfixes" tabindex="-1"><p><span class="bold">${_("Supported SI postfixes")}:</span></p>
+                            <table class="calc-postfixes">
+                              <tbody>
+                                <tr>
+                                  <td>%</td>
+                                  <td>percent</td>
+                                  <td>0.01 = 1e-2</td>
+                                </tr>
+                                <tr>
+                                  <td>T</td>
+                                  <td>tera</td>
+                                  <td>1e12</td>
+                                </tr>
+                                <tr>
+                                  <td>G</td>
+                                  <td>giga</td>
+                                  <td>1e9</td>
+                                </tr>
+                                <tr>
+                                  <td>M</td>
+                                  <td>mega</td>
+                                  <td>1e6</td>
+                                </tr>
+                                <tr>
+                                  <td>k</td>
+                                  <td>kilo</td>
+                                  <td>1000 = 1e3</td>
+                                </tr>
+                                <tr>
+                                  <td>c</td>
+                                  <td>centi</td>
+                                  <td>0.01 = 1e-2</td>
+                                </tr>
+                                <tr>
+                                  <td>m</td>
+                                  <td>milli</td>
+                                  <td>0.001 = 1e-3</td>
+                                </tr>
+                                <tr>
+                                  <td>u</td>
+                                  <td>micro</td>
+                                  <td>1e-6</td>
+                                </tr>
+                                <tr>
+                                  <td>n</td>
+                                  <td>nano</td>
+                                  <td>1e-9</td>
+                                </tr>
+                                <tr>
+                                  <td>p</td>
+                                  <td>pico</td>
+                                  <td>1e-12</td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </li>
+                          <li class="hint-item" id="hint-operators" tabindex="-1"><p><span class="bold">${_("Operators")}:</span> + - * / ^ and || (${_("parallel resistors function")})</p></li>
+                          <li class="hint-item" id="hint-functions" tabindex="-1"><p><span class="bold">${_("Functions")}:</span> sin, cos, tan, sqrt, log10, log2, ln, arccos, arcsin, arctan, abs, fact/factorial</p></li>
+                          <li class="hint-item" id="hint-constants" tabindex="-1"><p><span class="bold">${_("Constants")}:</span></p>
+                            <table>
+                              <tbody>
+                              <tr>
+                                <td>j</td>
+                                <td>=</td>
+                                <td>sqrt(-1)</td>
+                              </tr>
+                              <tr>
+                                <td>e</td>
+                                <td>=</td>
+                                <td>${_("Euler's number")}</td>
+                              </tr>
+                              <tr>
+                                <td>pi</td>
+                                <td>=</td>
+                                <td>${_("ratio of a circle's circumference to it's diameter")}</td>
+                              </tr>
+                              <tr>
+                                <td>k</td>
+                                <td>=</td>
+                                <td>${_("Boltzmann constant")}</td>
+                              </tr>
+                              <tr>
+                                <td>c</td>
+                                <td>=</td>
+                                <td>${_("speed of light")}</td>
+                              </tr>
+                              <tr>
+                                <td>T</td>
+                                <td>=</td>
+                                <td>${_("freezing point of water in degrees Kelvin")}</td>
+                              </tr>
+                              <tr>
+                                <td>q</td>
+                                <td>=</td>
+                                <td>${_("fundamental charge")}</td>
+                              </tr>
+                              </tbody>
+                            </table>
+                          </li>
+                        </ul>
                     </div>
                 </div>
-                <input id="calculator_button" type="submit" title="Calculate" value="="/>
-                <input type="text" id="calculator_output" title="Calculator Output Field" readonly />
+                <input id="calculator_button" type="submit" title="${_('Calculate')}" value="=" aria-label="${_('Calculate')}" value="=" tabindex="-1" />
+                <input type="text" id="calculator_output" title="${_('Calculator Output Field')}" readonly tabindex="-1" />
             </form>
 
         </div>

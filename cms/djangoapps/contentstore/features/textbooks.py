@@ -11,6 +11,7 @@ TEST_ROOT = settings.COMMON_TEST_DATA_ROOT
 
 @step(u'I go to the textbooks page')
 def go_to_uploads(_step):
+    world.wait_for_js_to_load()
     world.click_course_content()
     menu_css = 'li.nav-course-courseware-textbooks a'
     world.css_click(menu_css)
@@ -47,7 +48,7 @@ def name_textbook(_step, name):
 @step(u'I name the (first|second|third) chapter "([^"]*)"')
 def name_chapter(_step, ordinal, name):
     index = ["first", "second", "third"].index(ordinal)
-    input_css = ".textbook .chapter{i} input.chapter-name".format(i=index+1)
+    input_css = ".textbook .chapter{i} input.chapter-name".format(i=index + 1)
     world.css_fill(input_css, name)
     if world.is_firefox():
         world.trigger_event(input_css)
@@ -56,7 +57,7 @@ def name_chapter(_step, ordinal, name):
 @step(u'I type in "([^"]*)" for the (first|second|third) chapter asset')
 def asset_chapter(_step, name, ordinal):
     index = ["first", "second", "third"].index(ordinal)
-    input_css = ".textbook .chapter{i} input.chapter-asset-path".format(i=index+1)
+    input_css = ".textbook .chapter{i} input.chapter-asset-path".format(i=index + 1)
     world.css_fill(input_css, name)
     if world.is_firefox():
         world.trigger_event(input_css)
@@ -65,7 +66,7 @@ def asset_chapter(_step, name, ordinal):
 @step(u'I click the Upload Asset link for the (first|second|third) chapter')
 def click_upload_asset(_step, ordinal):
     index = ["first", "second", "third"].index(ordinal)
-    button_css = ".textbook .chapter{i} .action-upload".format(i=index+1)
+    button_css = ".textbook .chapter{i} .action-upload".format(i=index + 1)
     world.css_click(button_css)
 
 

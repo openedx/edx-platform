@@ -417,70 +417,6 @@ p, ul, ol, dl {
   > section {
     margin: 0 0 $baseline 0;
   }
-
-  .bit {
-    @extend %t-copy-sub1;
-    margin: 0 0 $baseline 0;
-    border-bottom: 1px solid $gray-l4;
-    padding: 0 0 $baseline 0;
-    color: $gray-l1;
-
-    &:last-child {
-      margin-bottom: 0;
-      border: none;
-      padding-bottom: 0;
-    }
-
-    h3 {
-      @extend %t-title7;
-      margin: 0 0 ($baseline/4) 0;
-      color: $gray-d2;
-      font-weight: 600;
-    }
-
-    p {
-      margin: 0 0 $baseline 0;
-
-      &:last-child {
-        margin-bottom: 0;
-      }
-    }
-
-    // actions
-    .list-actions {
-      @extend %cont-no-list;
-
-      .action-item {
-        margin-bottom: ($baseline/4);
-        border-bottom: 1px dotted $gray-l4;
-        padding-bottom: ($baseline/4);
-
-
-        &:last-child {
-          margin-bottom: 0;
-          border: none;
-          padding-bottom: 0;
-        }
-      }
-    }
-
-    // navigation
-    .nav-related, .nav-page {
-
-      .nav-item {
-        margin-bottom: ($baseline/4);
-        border-bottom: 1px dotted $gray-l4;
-        padding-bottom: ($baseline/4);
-
-
-        &:last-child {
-          margin-bottom: 0;
-          border: none;
-          padding-bottom: 0;
-        }
-      }
-    }
-  }
 }
 
 // ====================
@@ -528,9 +464,9 @@ p, ul, ol, dl {
 .new-subsection-item,
 .new-policy-item {
   @include grey-button;
-  margin: 5px 8px;
-  padding: 3px 10px 4px 10px;
-  font-size: 10px;
+  @include font-size(10);
+  margin: ($baseline/2);
+  padding: 3px ($baseline/2) 4px ($baseline/2);
 
   .new-folder-icon,
   .new-policy-icon,
@@ -753,7 +689,8 @@ hr.divide {
 }
 
 .edit-button.standard,
-.delete-button.standard {
+.delete-button.standard,
+.duplicate-button.standard {
   @extend %t-action4;
   @include white-button;
   float: left;
@@ -762,7 +699,8 @@ hr.divide {
   font-weight: 400;
 
   .edit-icon,
-  .delete-icon {
+  .delete-icon,
+  .duplicate-icon{
     margin-right: 4px;
   }
 }
@@ -826,8 +764,30 @@ hr.divide {
   word-wrap: break-word;
 }
 
+// ui - semantic + visual divider
 hr.divider {
   @extend %cont-text-sr;
+}
+
+// ui - skipnav
+.nav-skip {
+  @include font-size(13);
+  display: block;
+  position: absolute;
+  left: 0px;
+  top: -($baseline*30);
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  background: $white;
+  border-bottom: 1px solid $gray-l4;
+  padding: ($baseline*0.75) ($baseline/2);
+
+  &:focus, &:active {
+    position: static;
+    width: auto;
+    height: auto;
+  }
 }
 
 // ====================

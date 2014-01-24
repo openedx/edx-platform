@@ -1,9 +1,12 @@
-import fs.osfs
+"""Tools for helping with testing capa."""
+
+import gettext
 import os
 import os.path
 
-from capa.capa_problem import LoncapaProblem
-from xmodule.x_module import ModuleSystem
+import fs.osfs
+
+from capa.capa_problem import LoncapaProblem, LoncapaSystem
 from mock import Mock, MagicMock
 
 import xml.sax.saxutils as saxutils
@@ -26,34 +29,29 @@ xqueue_interface = MagicMock()
 xqueue_interface.send_to_queue.return_value = (0, 'Success!')
 
 
-def test_system():
+def test_capa_system():
     """
-    Construct a mock ModuleSystem instance.
+    Construct a mock LoncapaSystem instance.
 
     """
     the_system = Mock(
-        spec=ModuleSystem,
-        STATIC_URL='/dummy-static/',
-        DEBUG=True,
-        ajax_url='courses/course_id/modx/a_location',
-        track_function=Mock(),
-        get_module=Mock(),
-        render_template=tst_render_template,
-        replace_urls=Mock(),
-        user=Mock(),
-        seed=0,
-        filestore=fs.osfs.OSFS(os.path.join(TEST_DIR, "test_files")),
-        debug=True,
-        hostname="edx.org",
-        xqueue={'interface': xqueue_interface, 'construct_callback': calledback_url, 'default_queuename': 'testqueue', 'waittime': 10},
-        node_path=os.environ.get("NODE_PATH", "/usr/local/lib/node_modules"),
+        spec=LoncapaSystem,
+        ajax_url='/dummy-ajax-url',
         anonymous_student_id='student',
         cache=None,
         can_execute_unsafe_code=lambda: False,
+        DEBUG=True,
+        filestore=fs.osfs.OSFS(os.path.join(TEST_DIR, "test_files")),
+        i18n=gettext.NullTranslations(),
+        node_path=os.environ.get("NODE_PATH", "/usr/local/lib/node_modules"),
+        render_template=tst_render_template,
+        seed=0,
+        STATIC_URL='/dummy-static/',
+        xqueue={'interface': xqueue_interface, 'construct_callback': calledback_url, 'default_queuename': 'testqueue', 'waittime': 10},
     )
     return the_system
 
 
-def new_loncapa_problem(xml, system=None):
+def new_loncapa_problem(xml, capa_system=None):
     """Construct a `LoncapaProblem` suitable for unit tests."""
-    return LoncapaProblem(xml, id='1', seed=723, system=system or test_system())
+    return LoncapaProblem(xml, id='1', seed=723, capa_system=capa_system or test_capa_system())

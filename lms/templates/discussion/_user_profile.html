@@ -1,24 +1,10 @@
-<%! from django.utils.translation import ugettext as _ %>
-<%! from django_comment_client.helpers import pluralize %>
-<%! from django_comment_client.permissions import has_permission, check_permissions_by_view %>
-<%! from operator import attrgetter %>
-
-
+<%! from django.utils.translation import ugettext as _, ungettext %>
+<%def name="span(num)"><span>${num}</span></%def>
 <div class="user-profile">
-  <%
-    role_names = sorted(set(map(attrgetter('name'), django_user.roles.all())))
-  %>
   <div class="sidebar-username">${django_user.username | h}</div>
   <div class="sidebar-user-roles">
-    ${", ".join(role_names)}
+      ${_(', ').join(sorted(set(map(_, [role.name for role in django_user.roles.all()]))))}
   </div>
-  <div class="sidebar-threads-count"><span>${profiled_user['threads_count'] | h}</span> ${pluralize('discussion', profiled_user['threads_count']) | h} started</div>
-  <div class="sidebar-comments-count"><span>${profiled_user['comments_count'] | h}</span> ${pluralize('comment', profiled_user['comments_count']) | h}</div>
-  % if check_permissions_by_view(user, course.id, content=None, name='update_moderator_status'):
-    % if "Moderator" in role_names:
-      <a href="javascript:void(0)" class="sidebar-toggle-moderator-button sidebar-revoke-moderator-button">${_("Revoke Moderator rights")}</a>
-    % else:
-      <a href="javascript:void(0)" class="sidebar-toggle-moderator-button sidebar-promote-moderator-button">${_("Promote to Moderator")}</a>
-    % endif
-  % endif
+  <div class="sidebar-threads-count">${ungettext('%s discussion started', '%s discussions started', profiled_user['threads_count']) % span(profiled_user['threads_count']) | h}</div>
+  <div class="sidebar-comments-count">${ungettext('%s comment', '%s comments', profiled_user['comments_count']) % span(profiled_user['comments_count']) | h}</div>
 </div>

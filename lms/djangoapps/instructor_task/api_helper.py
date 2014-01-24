@@ -52,19 +52,33 @@ def _reserve_task(course_id, task_type, task_key, task_input, requester):
     """
 
     if _task_is_running(course_id, task_type, task_key):
+        log.warning("Duplicate task found for task_type %s and task_key %s", task_type, task_key)
         raise AlreadyRunningError("requested task is already running")
+
+    try:
+        most_recent_id = InstructorTask.objects.latest('id').id
+    except InstructorTask.DoesNotExist:
+        most_recent_id = "None found"
+    finally:
+        log.warning(
+            "No duplicate tasks found: task_type %s, task_key %s, and most recent task_id = %s",
+            task_type,
+            task_key,
+            most_recent_id
+        )
 
     # Create log entry now, so that future requests will know it's running.
     return InstructorTask.create(course_id, task_type, task_key, task_input, requester)
 
 
-def _get_xmodule_instance_args(request):
+def _get_xmodule_instance_args(request, task_id):
     """
     Calculate parameters needed for instantiating xmodule instances.
 
     The `request_info` will be passed to a tracking log function, to provide information
     about the source of the task request.   The `xqueue_callback_url_prefix` is used to
     permit old-style xqueue callbacks directly to the appropriate module in the LMS.
+    The `task_id` is also passed to the tracking log function.
     """
     request_info = {'username': request.user.username,
                     'ip': request.META['REMOTE_ADDR'],
@@ -74,6 +88,7 @@ def _get_xmodule_instance_args(request):
 
     xmodule_instance_args = {'xqueue_callback_url_prefix': get_xqueue_callback_url_prefix(request),
                              'request_info': request_info,
+                             'task_id': task_id,
                              }
     return xmodule_instance_args
 
@@ -88,9 +103,15 @@ def _update_instructor_task(instructor_task, task_result):
     is usually not saved.  In general, tasks that have finished (either with
     success or failure) should have their entries updated by the task itself,
     so are not updated here.  Tasks that are still running are not updated
-    while they run.  So the one exception to the no-save rule are tasks that
+    and saved while they run.  The one exception to the no-save rule are tasks that
     are in a "revoked" state.  This may mean that the task never had the
     opportunity to update the InstructorTask entry.
+
+    Tasks that are in progress and have subtasks doing the processing do not look
+    to the task's AsyncResult object.  When subtasks are running, the
+    InstructorTask object itself is updated with the subtasks' progress,
+    not any AsyncResult object.  In this case, the InstructorTask is
+    not updated at all.
 
     Calculates json to store in "task_output" field of the `instructor_task`,
     as well as updating the task_state.
@@ -108,11 +129,21 @@ def _update_instructor_task(instructor_task, task_result):
     returned_result = task_result.result
     result_traceback = task_result.traceback
 
-    # Assume we don't always update the InstructorTask entry if we don't have to:
+    # Assume we don't always save the InstructorTask entry if we don't have to,
+    # but that in most cases we will update the InstructorTask in-place with its
+    # current progress.
+    entry_needs_updating = True
     entry_needs_saving = False
     task_output = None
 
-    if result_state in [PROGRESS, SUCCESS]:
+    if instructor_task.task_state == PROGRESS and len(instructor_task.subtasks) > 0:
+        # This happens when running subtasks:  the result object is marked with SUCCESS,
+        # meaning that the subtasks have successfully been defined.  However, the InstructorTask
+        # will be marked as in PROGRESS, until the last subtask completes and marks it as SUCCESS.
+        # We want to ignore the parent SUCCESS if subtasks are still running, and just trust the
+        # contents of the InstructorTask.
+        entry_needs_updating = False
+    elif result_state in [PROGRESS, SUCCESS]:
         # construct a status message directly from the task result's result:
         # it needs to go back with the entry passed in.
         log.info("background task (%s), state %s:  result: %s", task_id, result_state, returned_result)
@@ -134,12 +165,13 @@ def _update_instructor_task(instructor_task, task_result):
     # save progress and state into the entry, even if it's not being saved:
     # when celery is run in "ALWAYS_EAGER" mode, progress needs to go back
     # with the entry passed in.
-    instructor_task.task_state = result_state
-    if task_output is not None:
-        instructor_task.task_output = task_output
+    if entry_needs_updating:
+        instructor_task.task_state = result_state
+        if task_output is not None:
+            instructor_task.task_output = task_output
 
-    if entry_needs_saving:
-        instructor_task.save()
+        if entry_needs_saving:
+            instructor_task.save()
 
 
 def get_updated_instructor_task(task_id):
@@ -175,7 +207,7 @@ def get_status_from_instructor_task(instructor_task):
       'in_progress': boolean indicating if task is still running.
       'task_progress': dict containing progress information.  This includes:
           'attempted': number of attempts made
-          'updated': number of attempts that "succeeded"
+          'succeeded': number of attempts that "succeeded"
           'total': number of possible subtasks to attempt
           'action_name': user-visible verb to use in status messages.  Should be past-tense.
           'duration_ms': how long the task has (or had) been running.
@@ -214,7 +246,7 @@ def check_arguments_for_rescoring(course_id, problem_url):
 
 def encode_problem_and_student_input(problem_url, student=None):
     """
-    Encode problem_url and optional student into task_key and task_input values.
+    Encode optional problem_url and optional student into task_key and task_input values.
 
     `problem_url` is full URL of the problem.
     `student` is the user object of the student
@@ -257,7 +289,7 @@ def submit_task(request, task_type, task_class, course_id, task_input, task_key)
 
     # submit task:
     task_id = instructor_task.task_id
-    task_args = [instructor_task.id, _get_xmodule_instance_args(request)]
+    task_args = [instructor_task.id, _get_xmodule_instance_args(request, task_id)]  # pylint: disable=E1101
     task_class.apply_async(task_args, task_id=task_id)
 
     return instructor_task

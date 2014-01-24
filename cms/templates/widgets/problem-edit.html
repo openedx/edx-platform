@@ -7,24 +7,24 @@
         %if enable_markdown:
         <div class="editor-bar">
             <ul class="format-buttons">
-                <li><a href="#" class="header-button" data-tooltip='${_("Heading 1")}'><span
+                <li><a href="#" class="header-button" data-tooltip="${_("Heading 1")}"><span
                         class="problem-editor-icon heading1"></span></a></li>
-                <li><a href="#" class="multiple-choice-button" data-tooltip='${_("Multiple Choice")}'><span
+                <li><a href="#" class="multiple-choice-button" data-tooltip="${_("Multiple Choice")}"><span
                         class="problem-editor-icon multiple-choice"></span></a></li>
-                <li><a href="#" class="checks-button" data-tooltip='${_("Checkboxes")}'><span
+                <li><a href="#" class="checks-button" data-tooltip="${_("Checkboxes")}"><span
                         class="problem-editor-icon checks"></span></a></li>
-                <li><a href="#" class="string-button" data-tooltip='${_("Text Input")}'><span
+                <li><a href="#" class="string-button" data-tooltip="${_("Text Input")}"><span
                         class="problem-editor-icon string"></span></a></li>
-                <li><a href="#" class="number-button" data-tooltip='${_("Numerical Input")}'><span
+                <li><a href="#" class="number-button" data-tooltip="${_("Numerical Input")}"><span
                         class="problem-editor-icon number"></span></a></li>
-                <li><a href="#" class="dropdown-button" data-tooltip='${_("Dropdown")}'><span
+                <li><a href="#" class="dropdown-button" data-tooltip="${_("Dropdown")}"><span
                         class="problem-editor-icon dropdown"></span></a></li>
-                <li><a href="#" class="explanation-button" data-tooltip='${_("Explanation")}'><span
+                <li><a href="#" class="explanation-button" data-tooltip="${_("Explanation")}"><span
                         class="problem-editor-icon explanation"></span></a></li>
             </ul>
             <ul class="editor-tabs">
                 <li><a href="#" class="xml-tab advanced-toggle" data-tab="xml">${_("Advanced Editor")}</a></li>
-                <li><a href="#" class="cheatsheet-toggle" data-tooltip='${_("Toggle Cheatsheet")}'>?</a></li>
+                <li><a href="#" class="cheatsheet-toggle" data-tooltip="${_("Toggle Cheatsheet")}">?</a></li>
             </ul>
         </div>
         <textarea class="markdown-box">${markdown | h}</textarea>
@@ -39,7 +39,7 @@
             <div class="row">
                 <h6>${_("Heading 1")}</h6>
                 <div class="col sample heading-1">
-                    <img src="${static.url("/img/header-example.png")}" />
+                    <img src="${static.url("img/header-example.png")}" />
                 </div>
                 <div class="col">
 <pre><code>H1
@@ -75,7 +75,9 @@
                     <img src="${static.url("img/string-example.png")}" />
                 </div>
                 <div class="col">
-                    <pre><code>= dog</code></pre>
+                    <pre><code>= dog
+or= cat
+or= mouse</code></pre>
                 </div>
             </div>
             <div class="row">

@@ -2,184 +2,195 @@
 @import "base/variables";
 
 // These are all quick solutions for IE please rewrite
-//Make overlay white because ie doesn't like rgba
-.highlighted-courses .courses .course header.course-preview, .find-courses .courses .course header.course-preview,
-.home .highlighted-courses > h2, .home .highlighted-courses > section.outside-app h1, section.outside-app .home .highlighted-courses > h1,
-header.global {
-  background: #FFF;
-}
+.ie {
 
-// hide all actions
-.home > header .title .actions,
-.home > header .title:hover .actions {
-  display: none;
-  height: auto;
-}
+  //Make overlay white because ie doesn't like rgba
+  .highlighted-courses .courses .course header.course-preview, .find-courses .courses .course header.course-preview,
+  .home .highlighted-courses > h2, .home .highlighted-courses > section.outside-app h1, section.outside-app .home .highlighted-courses > h1,
+  header.global {
+    background: #FFF;
+  }
 
-.home > header .title {
-  &:hover {
+  // hide all actions
+  .home > header .title .actions,
+  .home > header .title:hover .actions,
+  .home > header .title:focus .actions {
+    display: none;
+    height: auto;
+  }
 
-    > hgroup {
-      h1 {
-        border-bottom: 0;
-        padding-bottom: 0;
+  .home > header .title {
+    &:hover, &:focus {
+
+      > hgroup {
+        h1 {
+          border-bottom: 0;
+          padding-bottom: 0;
+        }
+
+        h2 {
+          opacity: 1.0;
+        }
       }
 
-      h2 {
+      .actions {
+        opacity: 0;
+      }
+    }
+  }
+
+  // because ie doesn't like :last
+  .last {
+    margin-right: 0  !important;
+  }
+
+  // make partners not animate
+  .home .university-partners .partners a {
+    .name {
+      position: static;
+    }
+
+    &:hover, &:focus {
+      text-decoration: none;
+
+      &::before {
         opacity: 1.0;
       }
+
+      .name {
+        bottom: 0px;
+      }
+
+      img {
+        top: 0px;
+      }
     }
 
-    .actions {
-      opacity: 0;
-    }
-  }
-}
-
-// because ie doesn't like :last
-.last {
-  margin-right: 0  !important;
-}
-
-// make partners not animate
-.home .university-partners .partners a {
-  .name {
-    position: static;
   }
 
-  &:hover {
-    text-decoration: none;
+  .home .university-partners .partners {
+    width: 660px;
 
-    &::before {
-      opacity: 1.0;
+    li.partner {
+      float: left;
+      display: block;
+      padding: 0;
+      width: 220px;
+      overflow: hidden;
+    }
+  }
+
+  // make animations on homepage not animate and show everything
+  .highlighted-courses .courses .course, .find-courses .courses .course {
+    .meta-info {
+      display: none;
     }
 
-    .name {
-      bottom: 0px;
+    .inner-wrapper {
+      height: 100%;
+      overflow: visible;
+      position: relative;
     }
 
-    img {
+    header.course-preview {
+      left: 0px;
+      position: relative;
       top: 0px;
+      width: 100%;
+      z-index: 3;
+      height: auto;
+
+      hgroup {
+        position: relative;
+        right: 0;
+        top: 0;
+      }
+
+    }
+
+    .info {
+      height: auto;
+      position: static;
+      overflow: visible;
+
+      .desc {
+        height: auto;
+      }
+    }
+
+    &:hover, &:focus {
+      background: rgb(245,245,245);
+      border-color: rgb(170,170,170);
+      box-shadow: 0 1px 16px 0 rgba($blue, 0.4);
+
+      .info {
+        top: 0;
+      }
+
+      .meta-info {
+        opacity: 0;
+      }
     }
   }
 
-}
-
-.home .university-partners .partners {
-  width: 660px;
-
-  li.partner {
-    float: left;
-    display: block;
-    padding: 0;
-    width: 220px;
-    overflow: hidden;
+  // make overlay flat black since IE cant handle rgba
+  #lean_overlay {
+    background: #000;
   }
-}
 
-// make animations on homepage not animate and show everything
-.highlighted-courses .courses .course, .find-courses .courses .course {
-  .meta-info {
+  // active navigation
+  nav.course-material ol.course-tabs li a.active, nav.course-material .xmodule_SequenceModule nav.sequence-nav ol.course-tabs li a.seq_video.active, .xmodule_SequenceModule nav.sequence-nav nav.course-material ol.course-tabs li a.seq_video.active {
+    background-color: #333;
+    background-color: rgba(0, 0, 0, .4);
+  }
+
+  // make dropdown user consistent size
+  header.global ol.user > li.primary a.dropdown {
+    padding-top: 6px;
+    padding-bottom: 6px;
+  }
+
+  // always hide arrow in IE
+  .dashboard .my-courses .my-course .cover .arrow {
     display: none;
   }
 
-  .inner-wrapper {
-    height: 100%;
-    overflow: visible;
-    position: relative;
-  }
-
-  header.course-preview {
-    left: 0px;
-    position: relative;
-    top: 0px;
-    width: 100%;
-    z-index: 3;
-    height: auto;
-
-    hgroup {
-      position: relative;
-      right: 0;
-      top: 0;
-    }
-
-  }
-
-  .info {
-    height: auto;
-    position: static;
-    overflow: visible;
-
-    .desc {
-      height: auto;
-    }
-  }
-
-  &:hover {
-    background: rgb(245,245,245);
-    border-color: rgb(170,170,170);
-    box-shadow: 0 1px 16px 0 rgba($blue, 0.4);
-
-    .info {
-      top: 0;
-    }
-
-    .meta-info {
-      opacity: 0;
-    }
-  }
-}
-
-// make overlay flat black since IE cant handle rgba
-#lean_overlay {
-  background: #000;
-}
-
-// active navigation
-nav.course-material ol.course-tabs li a.active, nav.course-material .xmodule_SequenceModule nav.sequence-nav ol.course-tabs li a.seq_video.active, .xmodule_SequenceModule nav.sequence-nav nav.course-material ol.course-tabs li a.seq_video.active {
-  background-color: #333;
-  background-color: rgba(0, 0, 0, .4);
-}
-
-// make dropdown user consistent size
-header.global ol.user > li.primary a.dropdown {
-  padding-top: 6px;
-  padding-bottom: 6px;
-}
-
-// always hide arrow in IE
-.dashboard .my-courses .my-course .cover .arrow {
-  display: none;
-}
-
-.ie-banner {
-  display: block !important;
-}
-
-div.course-wrapper {
-  display: block !important;
-
-  section.course-content,
-  section.course-index {
+  div.course-wrapper {
     display: block !important;
-    float: left;
+
+    section.course-content,
+    section.course-index {
+      display: block !important;
+      float: left;
+    }
+
+    section.course-content {
+      width: 71.27%;
+    }
   }
 
-  section.course-content {
-    width: 71.27%;
-  }
-}
-
-.sidebar {
-  float: left !important;
-  display: block !important;
-}
-
-.sequence-nav ol {
-  display: block !important;
-
-  li {
+  .sidebar {
     float: left !important;
-    width: 50px;
+    display: block !important;
+  }
+
+  .sequence-nav ol {
+    display: block !important;
+
+    li {
+      float: left !important;
+      width: 50px;
+    }
+  }
+
+  .course-wrapper {
+    clear: both !important;
+  }
+}
+
+.lte9 {
+
+  .ie-banner {
+    display: block !important;
   }
 }

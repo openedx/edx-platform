@@ -1,9 +1,6 @@
 if Backbone?
   class @ResponseCommentShowView extends DiscussionContentView
 
-    events:
-      "click .discussion-flag-abuse": "toggleFlagAbuse"
-
     tagName: "li"
 
     initialize: ->
@@ -27,7 +24,7 @@ if Backbone?
 
     addReplyLink: () ->
       if @model.hasOwnProperty('parent')
-        name = @model.parent.get('username') ? "anonymous"
+        name = @model.parent.get('username') ? gettext("anonymous")
         html = "<a href='#comment_#{@model.parent.id}'>@#{name}</a>:  "
         p = @$('.response-body p:first')
         p.prepend(html)
@@ -39,18 +36,24 @@ if Backbone?
 
     markAsStaff: ->
       if DiscussionUtil.isStaff(@model.get("user_id"))
-        @$el.find("a.profile-link").after('<span class="staff-label">staff</span>')
+        @$el.find("a.profile-link").after('<span class="staff-label">' + gettext('staff') + '</span>')
       else if DiscussionUtil.isTA(@model.get("user_id"))
-        @$el.find("a.profile-link").after('<span class="community-ta-label">Community&nbsp;&nbsp;TA</span>')
+        @$el.find("a.profile-link").after('<span class="community-ta-label">' + gettext('Community TA') + '</span>')
 
 
     renderFlagged: =>
       if window.user.id in @model.get("abuse_flaggers") or (DiscussionUtil.isFlagModerator and @model.get("abuse_flaggers").length > 0)
         @$("[data-role=thread-flag]").addClass("flagged")
         @$("[data-role=thread-flag]").removeClass("notflagged")
+        @$(".discussion-flag-abuse").attr("aria-pressed", "true")
+        @$(".discussion-flag-abuse").attr("data-tooltip", gettext("Misuse Reported"))
+        @$(".discussion-flag-abuse .flag-label").html("Misuse Reported")
       else
         @$("[data-role=thread-flag]").removeClass("flagged")
         @$("[data-role=thread-flag]").addClass("notflagged")
+        @$(".discussion-flag-abuse").attr("aria-pressed", "false")
+        @$(".discussion-flag-abuse").attr("data-tooltip", gettext("Report Misuse"))
+        @$(".discussion-flag-abuse .flag-label").html(gettext("Report Misuse"))
 
     updateModelDetails: =>
       @renderFlagged()

@@ -1,5 +1,5 @@
 (function (requirejs, require, define) {
-define(['logme'], function (logme) {
+define([], function () {
 return {
     'attachMouseEventsTo': function (element) {
         var self;
@@ -127,5 +127,5 @@ return {
         }
     }
 }; // End-of: return {
-}); // End-of: define(['logme'], function (logme) {
+}); // End-of: define([], function () {
 }(RequireJS.requirejs, RequireJS.require, RequireJS.define)); // End-of: (function (requirejs, require, define) {

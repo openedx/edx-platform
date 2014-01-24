@@ -2,6 +2,8 @@
 """
 Unit tests for sending course email
 """
+from mock import patch
+
 from django.conf import settings
 from django.core import mail
 from django.core.urlresolvers import reverse
@@ -9,14 +11,13 @@ from django.core.management import call_command
 from django.test.utils import override_settings
 
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
-from student.tests.factories import UserFactory, GroupFactory, CourseEnrollmentFactory
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from courseware.tests.factories import StaffFactory, InstructorFactory
+
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-
-from bulk_email.tasks import delegate_email_batches, course_email
-from bulk_email.models import CourseEmail, Optout
-
-from mock import patch
+from bulk_email.models import Optout
+from instructor_task.subtasks import update_subtask_status
 
 STAFF_COUNT = 3
 STUDENT_COUNT = 10
@@ -30,13 +31,13 @@ class MockCourseEmailResult(object):
     """
     emails_sent = 0
 
-    def get_mock_course_email_result(self):
+    def get_mock_update_subtask_status(self):
         """Wrapper for mock email function."""
-        def mock_course_email_result(sent, failed, output, **kwargs):  # pylint: disable=W0613
+        def mock_update_subtask_status(entry_id, current_task_id, new_subtask_status):  # pylint: disable=W0613
             """Increments count of number of emails sent."""
-            self.emails_sent += sent
-            return True
-        return mock_course_email_result
+            self.emails_sent += new_subtask_status.succeeded
+            return update_subtask_status(entry_id, current_task_id, new_subtask_status)
+        return mock_update_subtask_status
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
@@ -45,19 +46,15 @@ class TestEmailSendFromDashboard(ModuleStoreTestCase):
     Test that emails send correctly.
     """
 
-    @patch.dict(settings.MITX_FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True})
+    @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
     def setUp(self):
         self.course = CourseFactory.create()
-        self.instructor = UserFactory.create(username="instructor", email="robot+instructor@edx.org")
-        # Create instructor group for course
-        instructor_group = GroupFactory.create(name="instructor_MITx/999/Robot_Super_Course")
-        instructor_group.user_set.add(self.instructor)
+
+        self.instructor = InstructorFactory(course=self.course.location)
 
         # Create staff
-        self.staff = [UserFactory() for _ in xrange(STAFF_COUNT)]
-        staff_group = GroupFactory()
-        for staff in self.staff:
-            staff_group.user_set.add(staff)  # pylint: disable=E1101
+        self.staff = [StaffFactory(course=self.course.location)
+                      for _ in xrange(STAFF_COUNT)]
 
         # Create students
         self.students = [UserFactory() for _ in xrange(STUDENT_COUNT)]
@@ -244,14 +241,14 @@ class TestEmailSendFromDashboard(ModuleStoreTestCase):
             [self.instructor.email] + [s.email for s in self.staff] + [s.email for s in self.students]
         )
 
-    @override_settings(EMAILS_PER_TASK=3, EMAILS_PER_QUERY=7)
-    @patch('bulk_email.tasks.course_email_result')
+    @override_settings(BULK_EMAIL_EMAILS_PER_TASK=3, BULK_EMAIL_EMAILS_PER_QUERY=7)
+    @patch('bulk_email.tasks.update_subtask_status')
     def test_chunked_queries_send_numerous_emails(self, email_mock):
         """
         Test sending a large number of emails, to test the chunked querying
         """
         mock_factory = MockCourseEmailResult()
-        email_mock.side_effect = mock_factory.get_mock_course_email_result()
+        email_mock.side_effect = mock_factory.get_mock_update_subtask_status()
         added_users = []
         for _ in xrange(LARGE_NUM_EMAILS):
             user = UserFactory()
@@ -281,14 +278,3 @@ class TestEmailSendFromDashboard(ModuleStoreTestCase):
                                 [s.email for s in self.students] +
                                 [s.email for s in added_users if s not in optouts])
         self.assertItemsEqual(outbox_contents, should_send_contents)
-
-
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
-class TestEmailSendExceptions(ModuleStoreTestCase):
-    """
-    Test that exceptions are handled correctly.
-    """
-    def test_no_course_email_obj(self):
-        # Make sure course_email handles CourseEmail.DoesNotExist exception.
-        with self.assertRaises(CourseEmail.DoesNotExist):
-            course_email(101, [], "_", "_", "_", False)

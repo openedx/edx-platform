@@ -45,7 +45,7 @@ class ABTestModule(ABTestFields, XModule):
     """
 
     def __init__(self, *args, **kwargs):
-        XModule.__init__(self, *args, **kwargs)
+        super(ABTestModule, self).__init__(*args, **kwargs)
 
         if self.group is None:
             self.group = group_from_value(
@@ -111,7 +111,8 @@ class ABTestDescriptor(ABTestFields, RawDescriptor, XmlDescriptor):
             child_content_urls = []
             for child in group:
                 try:
-                    child_content_urls.append(system.process_xml(etree.tostring(child)).location.url())
+                    child_block = system.process_xml(etree.tostring(child))
+                    child_content_urls.append(child_block.scope_ids.usage_id)
                 except:
                     log.exception("Unable to load child when parsing ABTest. Continuing...")
                     continue

@@ -28,6 +28,7 @@ from instructor_task.models import InstructorTask
 from instructor_task.tests.test_base import (InstructorTaskModuleTestCase, TEST_COURSE_ORG, TEST_COURSE_NUMBER,
                                              OPTION_1, OPTION_2)
 from capa.responsetypes import StudentInputError
+from lms.lib.xblock.runtime import quote_slashes
 
 
 log = logging.getLogger(__name__)
@@ -57,10 +58,11 @@ class TestIntegrationTask(InstructorTaskModuleTestCase):
         # on the right problem:
         self.login_username(username)
         # make ajax call:
-        modx_url = reverse('modx_dispatch',
+        modx_url = reverse('xblock_handler',
                            kwargs={'course_id': self.course.id,
-                                   'location': InstructorTaskModuleTestCase.problem_location(problem_url_name),
-                                   'dispatch': 'problem_check', })
+                                   'usage_id': quote_slashes(InstructorTaskModuleTestCase.problem_location(problem_url_name)),
+                                   'handler': 'xmodule_handler',
+                                   'suffix': 'problem_check', })
 
         # we assume we have two responses, so assign them the correct identifiers.
         resp = self.client.post(modx_url, {
@@ -110,10 +112,11 @@ class TestRescoringTask(TestIntegrationTask):
         # on the right problem:
         self.login_username(username)
         # make ajax call:
-        modx_url = reverse('modx_dispatch',
+        modx_url = reverse('xblock_handler',
                            kwargs={'course_id': self.course.id,
-                                   'location': InstructorTaskModuleTestCase.problem_location(problem_url_name),
-                                   'dispatch': 'problem_get', })
+                                   'usage_id': quote_slashes(InstructorTaskModuleTestCase.problem_location(problem_url_name)),
+                                   'handler': 'xmodule_handler',
+                                   'suffix': 'problem_get', })
         resp = self.client.post(modx_url, {})
         return resp
 
@@ -227,7 +230,7 @@ class TestRescoringTask(TestIntegrationTask):
         self.assertEqual(task_input['problem_url'], InstructorTaskModuleTestCase.problem_location(problem_url_name))
         status = json.loads(instructor_task.task_output)
         self.assertEqual(status['attempted'], 1)
-        self.assertEqual(status['updated'], 0)
+        self.assertEqual(status['succeeded'], 0)
         self.assertEqual(status['total'], 1)
 
     def define_code_response_problem(self, problem_url_name):
@@ -262,10 +265,10 @@ class TestRescoringTask(TestIntegrationTask):
         self.assertEqual(instructor_task.task_state, FAILURE)
         status = json.loads(instructor_task.task_output)
         self.assertEqual(status['exception'], 'NotImplementedError')
-        self.assertEqual(status['message'], "Problem's definition does not support rescoring")
+        self.assertEqual(status['message'], "Problem's definition does not support rescoring.")
 
         status = InstructorTaskModuleTestCase.get_task_status(instructor_task.task_id)
-        self.assertEqual(status['message'], "Problem's definition does not support rescoring")
+        self.assertEqual(status['message'], "Problem's definition does not support rescoring.")
 
     def define_randomized_custom_response_problem(self, problem_url_name, redefine=False):
         """

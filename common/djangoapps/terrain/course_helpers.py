@@ -1,8 +1,9 @@
 # pylint: disable=C0111
 # pylint: disable=W0621
 
+import urllib
 from lettuce import world
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from student.models import CourseEnrollment
 from xmodule.modulestore.django import editable_modulestore
 from xmodule.contentstore.django import contentstore
@@ -27,12 +28,13 @@ def create_user(uname, password):
 
 
 @world.absorb
-def log_in(username='robot', password='test', email='robot@edx.org', name='Robot'):
+def log_in(username='robot', password='test', email='robot@edx.org', name="Robot"):
     """
     Use the auto_auth feature to programmatically log the user in
     """
-    url = '/auto_auth?username=%s&password=%s&name=%s&email=%s' % (username,
-          password, name, email)
+    url = '/auto_auth'
+    params = { 'username': username, 'password': password, 'email': email, 'full_name': name }
+    url += "?" + urllib.urlencode(params)
     world.visit(url)
 
     # Save the user info in the world scenario_dict for use in the tests
@@ -44,9 +46,21 @@ def log_in(username='robot', password='test', email='robot@edx.org', name='Robot
 def register_by_course_id(course_id, username='robot', password='test', is_staff=False):
     create_user(username, password)
     user = User.objects.get(username=username)
+    # Note: this flag makes the user global staff - that is, an edX employee - not a course staff.
+    # See courseware.tests.factories for StaffFactory and InstructorFactory.
     if is_staff:
         user.is_staff = True
         user.save()
+    CourseEnrollment.enroll(user, course_id)
+
+
+@world.absorb
+def enroll_user(user, course_id):
+    # Activate user
+    registration = world.RegistrationFactory(user=user)
+    registration.register(user)
+    registration.activate()
+    # Enroll them in the course
     CourseEnrollment.enroll(user, course_id)
 
 

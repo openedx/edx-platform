@@ -182,7 +182,10 @@ class NumericalResponseXMLFactory(ResponseXMLFactory):
         response_element = etree.Element('numericalresponse')
 
         if answer:
-            response_element.set('answer', str(answer))
+            if isinstance(answer, float):
+                response_element.set('answer', repr(answer))
+            else:
+                response_element.set('answer', str(answer))
 
         if tolerance:
             responseparam_element = etree.SubElement(response_element, 'responseparam')
@@ -314,24 +317,43 @@ class CodeResponseXMLFactory(ResponseXMLFactory):
         return super(CodeResponseXMLFactory, self).build_xml(**kwargs)
 
     def create_response_element(self, **kwargs):
-        """ Create a <coderesponse> XML element:
+        """
+        Create a <coderesponse> XML element.
 
-            Uses **kwargs:
+        Uses **kwargs:
 
-            *initial_display*: The code that initially appears in the textbox
-                                [DEFAULT: "Enter code here"]
-            *answer_display*: The answer to display to the student
-                                [DEFAULT: "This is the correct answer!"]
-            *grader_payload*: A JSON-encoded string sent to the grader
-                                [DEFAULT: empty dict string]
+        *initial_display*: The code that initially appears in the textbox
+                            [DEFAULT: "Enter code here"]
+        *answer_display*: The answer to display to the student
+                            [DEFAULT: "This is the correct answer!"]
+        *grader_payload*: A JSON-encoded string sent to the grader
+                            [DEFAULT: empty dict string]
+        *allowed_files*: A space-separated string of file names.
+                            [DEFAULT: None]
+        *required_files*: A space-separated string of file names.
+                            [DEFAULT: None]
+
         """
         # Get **kwargs
         initial_display = kwargs.get("initial_display", "Enter code here")
         answer_display = kwargs.get("answer_display", "This is the correct answer!")
         grader_payload = kwargs.get("grader_payload", '{}')
+        allowed_files = kwargs.get("allowed_files", None)
+        required_files = kwargs.get("required_files", None)
 
         # Create the <coderesponse> element
         response_element = etree.Element("coderesponse")
+
+        # If files are involved, create the <filesubmission> element.
+        has_files = allowed_files or required_files
+        if has_files:
+            filesubmission_element = etree.SubElement(response_element, "filesubmission")
+            if allowed_files:
+                filesubmission_element.set("allowed_files", allowed_files)
+            if required_files:
+                filesubmission_element.set("required_files", required_files)
+
+        # Create the <codeparam> element.
         codeparam_element = etree.SubElement(response_element, "codeparam")
 
         # Set the initial display text
@@ -347,8 +369,9 @@ class CodeResponseXMLFactory(ResponseXMLFactory):
         grader_element.text = str(grader_payload)
 
         # Create the input within the response
-        input_element = etree.SubElement(response_element, "textbox")
-        input_element.set("mode", "python")
+        if not has_files:
+            input_element = etree.SubElement(response_element, "textbox")
+            input_element.set("mode", "python")
 
         return response_element
 
@@ -640,8 +663,8 @@ class OptionResponseXMLFactory(ResponseXMLFactory):
 
         # Set the "options" attribute
         # Format: "('first', 'second', 'third')"
-        options_attr_string = ",".join(["'%s'" % str(o) for o in options_list])
-        options_attr_string = "(%s)" % options_attr_string
+        options_attr_string = u",".join([u"'{}'".format(o) for o in options_list])
+        options_attr_string = u"({})".format(options_attr_string)
         optioninput_element.set('options', options_attr_string)
 
         # Set the "correct" attribute
@@ -670,22 +693,30 @@ class StringResponseXMLFactory(ResponseXMLFactory):
 
             *hintfn*: The name of a function in the script to use for hints.
 
+            *regexp*: Whether the response is regexp
+
+            *additional_answers*: list of additional asnwers.
+
         """
         # Retrieve the **kwargs
         answer = kwargs.get("answer", None)
         case_sensitive = kwargs.get("case_sensitive", True)
         hint_list = kwargs.get('hints', None)
         hint_fn = kwargs.get('hintfn', None)
+        regexp = kwargs.get('regexp', None)
+        additional_answers = kwargs.get('additional_answers', [])
         assert answer
 
         # Create the <stringresponse> element
         response_element = etree.Element("stringresponse")
 
         # Set the answer attribute
-        response_element.set("answer", str(answer))
+        response_element.set("answer", unicode(answer))
 
-        # Set the case sensitivity
-        response_element.set("type", "cs" if case_sensitive else "ci")
+        # Set the case sensitivity and regexp:
+        type_value = "cs" if case_sensitive else "ci"
+        type_value += ' regexp' if regexp else ''
+        response_element.set("type", type_value)
 
         # Add the hints if specified
         if hint_list or hint_fn:
@@ -706,6 +737,9 @@ class StringResponseXMLFactory(ResponseXMLFactory):
             if hint_fn:
                 assert not hint_list
                 hintgroup_element.set("hintfn", hint_fn)
+
+        for additional_answer in additional_answers:
+            etree.SubElement(response_element, "additional_answer").text = additional_answer
 
         return response_element
 

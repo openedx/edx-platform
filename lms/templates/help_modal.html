@@ -5,20 +5,21 @@
 <%! import pytz %>
 <%! from django.conf import settings %>
 <%! from courseware.tabs import get_discussion_link %>
+<%! from microsite_configuration.middleware import MicrositeConfiguration %>
 
-% if settings.MITX_FEATURES.get('ENABLE_FEEDBACK_SUBMISSION', False):
+% if settings.FEATURES.get('ENABLE_FEEDBACK_SUBMISSION', False):
 
 <div class="help-tab">
   <a href="#help-modal" rel="leanModal" role="button">${_("Help")}</a>
 </div>
 
-<section id="help-modal" class="modal" aria-hidden="true" role="dialog" aria-label='${_("{platform_name} Help").format(platform_name=settings.PLATFORM_NAME)}'>
+<section id="help-modal" class="modal" aria-hidden="true" role="dialog" aria-label="${_("{platform_name} Help").format(platform_name=MicrositeConfiguration.get_microsite_configuration_value("platform_name", settings.PLATFORM_NAME))}">
   <div class="inner-wrapper" id="help_wrapper">
     ## TODO: find a way to refactor this
-    <a href="#" role="button" class="close-modal" tabindex="0" title="${_('Close Modal')}">&#10005;</a>
+    <button class="close-modal "tabindex="0">&#10005; <span class="sr">${_('Close Modal')}</span></button>
 
     <header>
-      <h2>${_('{span_start}{platform_name}{span_end} Help').format(span_start='<span class="edx">', span_end='</span>', platform_name=settings.PLATFORM_NAME)}</h2>
+      <h2>${_('{span_start}{platform_name}{span_end} Help').format(span_start='<span class="edx">', span_end='</span>', platform_name=MicrositeConfiguration.get_microsite_configuration_value('platform_name', settings.PLATFORM_NAME))}</h2>
       <hr>
     </header>
 
@@ -39,10 +40,10 @@ discussion_link = get_discussion_link(course) if course else None
           url=marketing_link('FAQ')
         ),
         link_end='</a>',
-        platform_name=settings.PLATFORM_NAME)}
+        platform_name=MicrositeConfiguration.get_microsite_configuration_value('platform_name', settings.PLATFORM_NAME))}
       </p>
 
-    <p>${_('Have a <strong>question about something specific</strong>? You can contact the {platform_name} general support team directly:').format(platform_name=settings.PLATFORM_NAME)}</p>
+    <p>${_('Have a <strong>question about something specific</strong>? You can contact the {platform_name} general support team directly:').format(platform_name=MicrositeConfiguration.get_microsite_configuration_value('platform_name', settings.PLATFORM_NAME))}</p>
     <hr>
 
     <div class="help-buttons">
@@ -53,21 +54,21 @@ discussion_link = get_discussion_link(course) if course else None
   </div>
 
   <div class="inner-wrapper" id="feedback_form_wrapper">
-    <a href="#" role="button" class="close-modal" title="${_('Close Modal')}">&#10005;</a>
+    <button class="close-modal">&#10005; <span class="sr">${_('Close Modal')}</span></button>
 
     <header></header>
 
     <form id="feedback_form" class="feedback_form" method="post" data-remote="true" action="/submit_feedback">
       <div id="feedback_error" class="modal-form-error" tabindex="-1"></div>
 % if not user.is_authenticated():
-      <label data-field="name" for="feedback_form_name">${_('Name*')}</label>
+      <label data-field="name" for="feedback_form_name">${_('Name')}*</label>
       <input name="name" type="text" id="feedback_form_name" aria-required="true">
-      <label data-field="email" for="feedback_form_email">${_('E-mail*')}</label>
+      <label data-field="email" for="feedback_form_email">${_('E-mail')}*</label>
       <input name="email" type="text" id="feedback_form_email" aria-required="true">
 % endif
-      <label data-field="subject" for="feedback_form_subject">${_('Briefly describe your issue*')}</label>
+      <label data-field="subject" for="feedback_form_subject">${_('Briefly describe your issue')}*</label>
       <input name="subject" type="text" id="feedback_form_subject" aria-required="true">
-      <label data-field="details" for="feedback_form_details">${_('Tell us the details*')}
+      <label data-field="details" for="feedback_form_details">${_('Tell us the details')}*
 <span class="tip">${_('Include error messages, steps which lead to the issue, etc')}</span></label>
       <textarea name="details" id="feedback_form_details" aria-required="true"></textarea>
       <input name="issue_type" type="hidden">
@@ -75,13 +76,13 @@ discussion_link = get_discussion_link(course) if course else None
       <input name="course_id" type="hidden" value="${course.id | h}">
 % endif
       <div class="submit">
-        <input name="submit" type="submit" value="Submit" id="feedback_submit">
+        <input name="submit" type="submit" value="${_('Submit')}" id="feedback_submit">
       </div>
     </form>
   </div>
 
   <div class="inner-wrapper" id="feedback_success_wrapper" tabindex="0">
-    <a href="#" role="button" class="close-modal" title="${_('Close Modal')}" tabindex="0">&#10005;</a>
+    <button class="close-modal "tabindex="0">&#10005; <span class="sr">${_('Close Modal')}</span></button>
 
     <header>
       <h2>${_('Thank You!')}</h2>
@@ -168,29 +169,29 @@ discussion_link = get_discussion_link(course) if course else None
     $("#feedback_link_problem").click(function(event) {
         showFeedback(
             event,
-            gettext("problem"),
-            gettext("Report a Problem"),
-            gettext("Brief description of the problem*"),
-            gettext("Details of the problem you are encountering*") + "<span class='tip'>" +
-              gettext("Include error messages, steps which lead to the issue, etc.") + "</span>"
+            "${_('problem')}",
+            "${_('Report a Problem')}",
+            "${_('Brief description of the problem')}" + "*",
+            "${_('Details of the problem you are encountering')}" + "*" + "<span class='tip'>" +
+              "${_('Include error messages, steps which lead to the issue, etc.')}" + "</span>"
         );
     });
     $("#feedback_link_suggestion").click(function(event) {
         showFeedback(
             event,
-            gettext("suggestion"),
-            gettext("Make a Suggestion"),
-            gettext("Brief description of your suggestion*"),
-            gettext("Details*")
+            "${_('suggestion')}",
+            "${_('Make a Suggestion')}",
+            "${_('Brief description of your suggestion')}" + "*",
+            "${_('Details')}" + "*"
         );
     });
     $("#feedback_link_question").click(function(event) {
         showFeedback(
             event,
-            gettext("question"),
-            gettext("Ask a Question"),
-            gettext("Brief summary of your question*"),
-            gettext("Details*")
+            "${_('question')}",
+            "${_('Ask a Question')}",
+            "${_('Brief summary of your question')}" + "*",
+            "${_('Details')}" + "*"
         );
     });
     $("#feedback_form").submit(function() {
@@ -218,16 +219,16 @@ discussion_link = get_discussion_link(course) if course else None
             $("#feedback_error").html(responseData.error).stop().css("display", "block");
         } else {
             // If no data (or malformed data) is returned, a server error occurred
-            htmlStr = gettext("An error has occurred.");
+            htmlStr = "${_('An error has occurred.')}";
 % if settings.FEEDBACK_SUBMISSION_EMAIL:
             htmlStr += " " + _.template(
-              gettext("Please {link_start}send us e-mail{link_end}."),
+              "${_('Please {link_start}send us e-mail{link_end}.')}",
               {link_start: '<a href="#" id="feedback_email">', link_end: '</a>'},
               {interpolate: /\{(.+?)\}/g})
 % else:
             // If no email is configured, we can't do much other than
             // ask the user to try again later
-            htmlStr += gettext(" Please try again later.");
+            htmlStr += "${_('Please try again later.')}";
 % endif
             $("#feedback_error").html(htmlStr).stop().css("display", "block");
 % if settings.FEEDBACK_SUBMISSION_EMAIL:

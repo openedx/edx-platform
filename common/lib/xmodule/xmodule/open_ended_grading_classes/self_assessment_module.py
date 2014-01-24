@@ -9,7 +9,7 @@ import openendedchild
 
 from .combined_open_ended_rubric import CombinedOpenEndedRubric
 
-log = logging.getLogger("mitx.courseware")
+log = logging.getLogger("edx.courseware")
 
 
 class SelfAssessmentModule(openendedchild.OpenEndedChild):
@@ -57,6 +57,13 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         # set context variables and render template
         previous_answer = self.get_display_answer()
 
+        # Use the module name as a unique id to pass to the template.
+        try:
+            module_id = self.system.location.name
+        except AttributeError:
+            # In cases where we don't have a system or a location, use a fallback.
+            module_id = "self_assessment"
+
         context = {
             'prompt': self.child_prompt,
             'previous_answer': previous_answer,
@@ -66,6 +73,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
             'allow_reset': self._allow_reset(),
             'child_type': 'selfassessment',
             'accept_file_upload': self.accept_file_upload,
+            'module_id': module_id,
         }
 
         html = system.render_template('{0}/self_assessment_prompt.html'.format(self.TEMPLATE_DIR), context)
@@ -205,6 +213,10 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
 
         with 'error' only present if 'success' is False, and 'hint_html' or
         'message_html' only if success is true
+
+        :param data: A `webob.multidict.MultiDict` containing the keys
+            asasssment: The sum of assessment scores
+            score_list[]: A multivalue key containing all the individual scores
         """
 
         if self.child_state != self.ASSESSING:
@@ -212,9 +224,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
 
         try:
             score = int(data.get('assessment'))
-            score_list = data.getlist('score_list[]')
-            for i in xrange(0, len(score_list)):
-                score_list[i] = int(score_list[i])
+            score_list = [int(x) for x in data.getall('score_list[]')]
         except (ValueError, TypeError):
             # This is a dev_facing_error
             log.error("Non-integer score value passed to save_assessment, or no score list present.")
@@ -294,7 +304,7 @@ class SelfAssessmentDescriptor():
             if len(xml_object.xpath(child)) != 1:
                 # This is a staff_facing_error
                 raise ValueError(
-                    "Self assessment definition must include exactly one '{0}' tag. Contact the learning sciences group for assistance.".format(
+                    u"Self assessment definition must include exactly one '{0}' tag. Contact the learning sciences group for assistance.".format(
                         child))
 
         def parse(k):
@@ -308,7 +318,7 @@ class SelfAssessmentDescriptor():
         elt = etree.Element('selfassessment')
 
         def add_child(k):
-            child_str = '<{tag}>{body}</{tag}>'.format(tag=k, body=getattr(self, k))
+            child_str = u'<{tag}>{body}</{tag}>'.format(tag=k, body=getattr(self, k))
             child_node = etree.fromstring(child_str)
             elt.append(child_node)
 

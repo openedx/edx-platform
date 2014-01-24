@@ -38,7 +38,7 @@ def export_to_xml(modulestore, contentstore, course_location, root_dir, course_d
     Export all modules from `modulestore` and content from `contentstore` as xml to `root_dir`.
 
     `modulestore`: A `ModuleStore` object that is the source of the modules to export
-    `contentstore`: A `ContentStore` object that is the source of the content to export
+    `contentstore`: A `ContentStore` object that is the source of the content to export, can be None
     `course_location`: The `Location` of the `CourseModuleDescriptor` to export
     `root_dir`: The directory to write the exported xml to
     `course_dir`: The name of the directory inside `root_dir` to write the course content to
@@ -46,7 +46,8 @@ def export_to_xml(modulestore, contentstore, course_location, root_dir, course_d
         alongside the public content in the course.
     """
 
-    course = modulestore.get_item(course_location)
+    course_id = course_location.course_id
+    course = modulestore.get_course(course_id)
 
     fs = OSFS(root_dir)
     export_fs = fs.makeopendir(course_dir)
@@ -55,25 +56,26 @@ def export_to_xml(modulestore, contentstore, course_location, root_dir, course_d
     with export_fs.open('course.xml', 'w') as course_xml:
         course_xml.write(xml)
 
-    policies_dir = export_fs.makeopendir('policies')
     # export the static assets
-    contentstore.export_all_for_course(
-        course_location,
-        root_dir + '/' + course_dir + '/static/',
-        root_dir + '/' + course_dir + '/policies/assets.json',
-    )
+    policies_dir = export_fs.makeopendir('policies')
+    if contentstore:
+        contentstore.export_all_for_course(
+            course_location,
+            root_dir + '/' + course_dir + '/static/',
+            root_dir + '/' + course_dir + '/policies/assets.json',
+        )
 
     # export the static tabs
-    export_extra_content(export_fs, modulestore, course_location, 'static_tab', 'tabs', '.html')
+    export_extra_content(export_fs, modulestore, course_id, course_location, 'static_tab', 'tabs', '.html')
 
     # export the custom tags
-    export_extra_content(export_fs, modulestore, course_location, 'custom_tag_template', 'custom_tags')
+    export_extra_content(export_fs, modulestore, course_id, course_location, 'custom_tag_template', 'custom_tags')
 
     # export the course updates
-    export_extra_content(export_fs, modulestore, course_location, 'course_info', 'info', '.html')
+    export_extra_content(export_fs, modulestore, course_id, course_location, 'course_info', 'info', '.html')
 
     # export the 'about' data (e.g. overview, etc.)
-    export_extra_content(export_fs, modulestore, course_location, 'about', 'about', '.html')
+    export_extra_content(export_fs, modulestore, course_id, course_location, 'about', 'about', '.html')
 
     # export the grading policy
     course_run_policy_dir = policies_dir.makeopendir(course.location.name)
@@ -106,9 +108,9 @@ def export_to_xml(modulestore, contentstore, course_location, root_dir, course_d
                     draft_vertical.export_to_xml(draft_course_dir)
 
 
-def export_extra_content(export_fs, modulestore, course_location, category_type, dirname, file_suffix=''):
+def export_extra_content(export_fs, modulestore, course_id, course_location, category_type, dirname, file_suffix=''):
     query_loc = Location('i4x', course_location.org, course_location.course, category_type, None)
-    items = modulestore.get_items(query_loc)
+    items = modulestore.get_items(query_loc, course_id)
 
     if len(items) > 0:
         item_dir = export_fs.makeopendir(dirname)

@@ -88,11 +88,7 @@ def delete_file(_step, file_name):
     assert index != -1
     delete_css = "a.remove-asset-button"
     world.css_click(delete_css, index=index)
-
-    world.wait_for_present(".wrapper-prompt.is-shown")
-    world.wait(0.2)  # wait for css animation
-    prompt_confirm_css = 'li.nav-item > a.action-primary'
-    world.css_click(prompt_confirm_css)
+    world.confirm_studio_prompt()
 
 
 @step(u'I should see only one "([^"]*)"$')
@@ -191,7 +187,7 @@ def view_asset(_step, status):
     # Note that world.visit would trigger a 403 error instead of displaying "Unauthorized"
     # Instead, we can drop back into the selenium driver get command.
     world.browser.driver.get(url)
-    assert_equal(world.css_text('body'),expected_text)
+    assert_equal(world.css_text('body'), expected_text)
 
 
 @step('I see a confirmation that the file was deleted$')

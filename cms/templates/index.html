@@ -7,29 +7,26 @@
 
 <%block name="jsextra">
 <script type="text/javascript">
-require(['jquery', 'jquery.form'], function($) {
-    $(document).ready(function () {
+require(["domReady!", "jquery", "jquery.form", "js/index"], function(doc, $) {
+    // showing/hiding creation rights UI
+    $('.show-creationrights').click(function(e){
+        (e).preventDefault();
+        $(this).closest('.wrapper-creationrights').toggleClass('is-shown').find('.ui-toggle-control').toggleClass('current');
+    });
 
-        // showing/hiding creation rights UI
-        $('.show-creationrights').click(function(e){
-            (e).preventDefault();
-            $(this).closest('.wrapper-creationrights').toggleClass('is-shown').find('.ui-toggle-control').toggleClass('current');
-        });
+    var reloadPage = function () {
+        location.reload();
+    };
 
-        var reloadPage = function () {
-            location.reload();
-        };
+    var showError = function ()  {
+        $('#request-coursecreator-submit').toggleClass('has-error').find('.label').text('Sorry, there was error with your request');
+        $('#request-coursecreator-submit').find('.icon-cog').toggleClass('icon-spin');
+    };
 
-        var showError = function ()  {
-            $('#request-coursecreator-submit').toggleClass('has-error').find('.label').text('Sorry, there was error with your request');
-            $('#request-coursecreator-submit').find('.icon-cog').toggleClass('icon-spin');
-        };
+    $('#request-coursecreator').ajaxForm({error: showError, success: reloadPage});
 
-        $('#request-coursecreator').ajaxForm({error: showError, success: reloadPage});
-
-        $('#request-coursecreator-submit').click(function(e){
-          $(this).toggleClass('is-disabled is-submitting').find('.label').text('Submitting Your Request');
-        });
+    $('#request-coursecreator-submit').click(function(e){
+      $(this).toggleClass('is-disabled is-submitting').find('.label').text('Submitting Your Request');
     });
 });
 </script>
@@ -48,8 +45,8 @@ require(['jquery', 'jquery.form'], function($) {
           % if course_creator_status=='granted':
           <a href="#" class="button new-button new-course-button"><i class="icon-plus icon-inline"></i>
               ${_("New Course")}</a>
-          % elif course_creator_status=='disallowed_for_this_site' and settings.MITX_FEATURES.get('STUDIO_REQUEST_EMAIL',''):
-          <a href="mailto:${settings.MITX_FEATURES.get('STUDIO_REQUEST_EMAIL','')}">${_("Email staff to create course")}</a>
+          % elif course_creator_status=='disallowed_for_this_site' and settings.FEATURES.get('STUDIO_REQUEST_EMAIL',''):
+          <a href="mailto:${settings.FEATURES.get('STUDIO_REQUEST_EMAIL','')}">${_("Email staff to create course")}</a>
           % endif
         </li>
       </ul>
@@ -64,7 +61,7 @@ require(['jquery', 'jquery.form'], function($) {
     <article class="content-primary" role="main">
 
       <div class="introduction">
-        <h2 class="title">${_("Welcome, {0}!".format(user.username))}</h2>
+        <h2 class="title">${_("Welcome, {0}!").format(user.username)}</h2>
 
         %if len(courses) > 0:
         <div class="copy">
@@ -94,30 +91,30 @@ require(['jquery', 'jquery.form'], function($) {
               <legend class="sr">${_("Required Information to Create a New Course")}</legend>
 
               <ol class="list-input">
-                <li class="field field-inline text required" id="field-course-name">
+                <li class="field text required" id="field-course-name">
                   <label for="new-course-name">${_("Course Name")}</label>
                   <input class="new-course-name" id="new-course-name" type="text" name="new-course-name" aria-required="true" placeholder="${_('e.g. Introduction to Computer Science')}" />
-                  <span class="tip tip-stacked">${_("The public display name for your course.")}</span>
+                  <span class="tip">${_("The public display name for your course.")}</span>
                   <span class="tip tip-error is-hiding"></span>
                 </li>
-                <li class="field field-inline text required" id="field-organization">
+                <li class="field text required" id="field-organization">
                   <label for="new-course-org">${_("Organization")}</label>
-                  <input class="new-course-org" id="new-course-org" type="text" name="new-course-org" aria-required="true" placeholder="${_('e.g. MITX or IMF')}" />
-                  <span class="tip tip-stacked">${_("The name of the organization sponsoring the course")}  - <strong>${_("Note: No spaces or special characters are allowed. This cannot be changed.")}</strong></span>
+                  <input class="new-course-org" id="new-course-org" type="text" name="new-course-org" aria-required="true" placeholder="${_('e.g. UniversityX or OrganizationX')}" />
+                  <span class="tip">${_("The name of the organization sponsoring the course.")}  <strong>${_("Note: This is part of your course URL, so no spaces or special characters are allowed.")}</strong> ${_("This cannot be changed, but you can set a different display name in Advanced Settings later.")}</span>
                   <span class="tip tip-error is-hiding"></span>
                 </li>
 
-                <li class="field field-inline text required" id="field-course-number">
+                <li class="field text required" id="field-course-number">
                   <label for="new-course-number">${_("Course Number")}</label>
                   <input class="new-course-number" id="new-course-number" type="text" name="new-course-number" aria-required="true" placeholder="${_('e.g. CS101')}" />
-                  <span class="tip tip-stacked">${_("The unique number that identifies your course within your organization")} - <strong>${_("Note: No spaces or special characters are allowed. This cannot be changed.")}</strong></span>
+                  <span class="tip">${_("The unique number that identifies your course within your organization.")} <strong>${_("Note: This is part of your course URL, so no spaces or special characters are allowed and it cannot be changed.")}</strong></span>
                   <span class="tip tip-error is-hiding"></span>
                 </li>
 
-                <li class="field field-inline text required" id="field-course-run">
+                <li class="field text required" id="field-course-run">
                   <label for="new-course-run">${_("Course Run")}</label>
-                  <input class="new-course-run" id="new-course-run" type="text" name="new-course-run" aria-required="true"placeholder="${_('e.g. 2013_Spring')}" />
-                  <span class="tip tip-stacked">${_("The term in which your course will run")} - <strong>${_("Note: No spaces or special characters are allowed. This cannot be changed.")}</strong></span>
+                  <input class="new-course-run" id="new-course-run" type="text" name="new-course-run" aria-required="true"placeholder="${_('e.g. 2014_T1')}" />
+                  <span class="tip">${_("The term in which your course will run.")} <strong>${_("Note: This is part of your course URL, so no spaces or special characters are allowed and it cannot be changed.")}</strong></span>
                   <span class="tip tip-error is-hiding"></span>
                 </li>
               </ol>
@@ -215,7 +212,6 @@ require(['jquery', 'jquery.form'], function($) {
             <h4 class="title">${_('Your Course Creator Request Status:')}</h4>
 
             <form id="request-coursecreator" action="${request_course_creator_url}" method="post" enctype="multipart/form-data">
-              <input type="hidden" name="csrfmiddlewaretoken" value="${csrf}">
               <div class="form-actions">
                 <button type="submit" id="request-coursecreator-submit" name="request-coursecreator-submit" class="action-primary action-request"><i class="icon-cog icon-inline icon-spin"></i> <span class="label">${_('Request the Ability to Create Courses')}</span></button>
               </div>
@@ -294,10 +290,10 @@ require(['jquery', 'jquery.form'], function($) {
         </ol>
       </div>
 
-      % if course_creator_status=='disallowed_for_this_site' and settings.MITX_FEATURES.get('STUDIO_REQUEST_EMAIL',''):
+      % if course_creator_status=='disallowed_for_this_site' and settings.FEATURES.get('STUDIO_REQUEST_EMAIL',''):
       <div class="bit">
         <h3 class="title title-3">${_('Can I create courses in Studio?')}</h3>
-        <p>${_('In order to create courses in Studio, you must')} <a href="mailto:${settings.MITX_FEATURES.get('STUDIO_REQUEST_EMAIL','')}">${_("contact edX staff to help you create a course")}</a></p>
+        <p>${_('In order to create courses in Studio, you must')} <a href="mailto:${settings.FEATURES.get('STUDIO_REQUEST_EMAIL','')}">${_("contact edX staff to help you create a course")}</a></p>
       </div>
       % endif
 

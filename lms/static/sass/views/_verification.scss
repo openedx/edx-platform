@@ -14,7 +14,7 @@
   @extend %t-title4;
   @extend %t-weight1;
   margin: 0 0 ($baseline*0.75) 0;
-  border-bottom: 1px solid $m-gray-l3;
+  border-bottom: 1px solid $m-gray-l4;
   padding-bottom: ($baseline/2);
   color: $m-gray-d4;
 }
@@ -80,16 +80,9 @@
   }
 }
 
-%copy-badge {
-  @extend %t-title8;
-  @extend %t-weight5;
-  border-radius: ($baseline/5);
-  padding: ($baseline/2) $baseline;
-  text-transform: uppercase;
-}
-
 // ====================
 
+// MISC: extends - button
 %btn-verify-primary {
   @extend %btn-primary-green;
 }
@@ -160,7 +153,7 @@
 // ====================
 
 // VIEW: all verification steps
-.register.verification-process {
+.verification-process {
 
   // reset: box-sizing (making things so right its scary)
   * {
@@ -233,7 +226,7 @@
   }
 
   //  reset: lists
-  .list-actions, .list-steps, .progress-steps, .list-controls, .list-fields, .list-help, .list-faq, .nav-wizard, .list-reqs, .list-faq, .review-tasks, .list-tips, .wrapper-photos, .field-group, .list-info {
+  .list-actions, .list-steps, .progress-steps, .list-controls, .list-fields, .list-nav, .list-help, .list-faq, .nav-wizard, .list-reqs, .list-faq, .review-tasks, .list-tips, .wrapper-photos, .field-group, .list-info {
     @extend %ui-no-list;
   }
 
@@ -267,12 +260,16 @@
   // elements - controls
   .action-primary {
     @extend %btn-primary-blue;
-    border: none;
+    // needed for override due to .register a:link styling
+    border: 0 !important;
+    color: $white !important;
   }
 
   .action-confirm {
     @extend %btn-verify-primary;
-    border: none;
+    // needed for override due to .register a:link styling
+    border: 0 !important;
+    color: $white !important;
   }
 
   // ====================
@@ -361,15 +358,22 @@
 
   // UI : message
   .wrapper-msg {
-    width: flex-grid(12,12);
-    margin: 0 auto ($baseline*1.5) auto;
+    margin-bottom: ($baseline*1.5);
     border-bottom: ($baseline/4) solid $m-blue;
     padding: $baseline ($baseline*1.5);
     background: tint($m-blue, 95%);
 
+    .msg {
+      @include clearfix();
+      max-width: grid-width(12);
+      min-width: 760px;
+      width: flex-grid(12);
+      margin: 0 auto;
+    }
+
     .msg-content, .msg-icon {
-      display: inline-block;
-      vertical-align: middle;
+      display: block;
+      float: left;
     }
 
     .msg-content {
@@ -388,6 +392,7 @@
     .msg-icon {
       width: flex-grid(1,12);
       @extend %t-icon2;
+      margin-right: flex-gutter();
       text-align: center;
       color: $m-blue;
     }
@@ -470,17 +475,19 @@
             margin-right: ($baseline/4);
             opacity: 0.80;
             color: $white;
+            letter-spacing: 0.1rem;
           }
         }
       }
 
       .sts-label {
         @extend %t-title7;
+        @extend %t-weight4;
         display: block;
         margin-bottom: ($baseline/2);
         border-bottom: ($baseline/10) solid $m-gray-l4;
         padding-bottom: ($baseline/2);
-        color: $m-gray;
+        color: $m-gray-d1;
       }
 
       .sts-course {
@@ -621,6 +628,38 @@
 
   // ====================
 
+  // UI: reverification message
+  .wrapper-reverification {
+    border-bottom: ($baseline/10) solid $m-pink;
+    margin-bottom: $baseline;
+    padding-bottom: $baseline;
+    position: relative;
+
+    .deco-arrow {
+      @include triangle($baseline, $m-pink, down);
+      position: absolute;
+      bottom: -($baseline);
+      left: 50%;
+    }
+  }
+
+  .reverification {
+
+    .message {
+
+      .title {
+        @extend %hd-lv3;
+        color: $m-pink;
+      }
+
+      .copy {
+        @extend %t-copy-sub1;
+      }
+    }
+  }
+
+  // ====================
+
   // UI: slides
   .carousel {
 
@@ -698,6 +737,10 @@
                 padding-bottom: 0;
               }
             }
+
+            .help-item-emphasis {
+              @extend %t-weight4;
+            }
           }
 
           // help - faq
@@ -751,6 +794,7 @@
 
             .action {
               @extend %btn-verify-primary;
+              padding: ($baseline/2) ($baseline*0.75);
             }
           }
         }
@@ -1190,7 +1234,7 @@
     .form-register-choose {
       @include clearfix();
       width: flex-grid(12,12);
-      margin: $baseline 0;
+      margin: ($baseline*2) 0;
 
       .deco-divider {
         width: flex-grid(8,12);
@@ -1210,7 +1254,7 @@
       background: $m-gray-l4;
 
       &:last-child {
-        margin-bottom: none;
+        margin-bottom: 0;
       }
 
       .wrapper-copy, .list-actions {
@@ -1352,12 +1396,13 @@
 
       .field {
         float: left;
-        margin-right: ($baseline/2);
+        margin: 0 ($baseline/2) ($baseline/2) 0;
         padding: ($baseline/2) ($baseline*0.75);
         background: $m-gray-t0;
 
         input {
           width: auto;
+          padding: 0;
         }
 
         &:last-child {
@@ -1646,7 +1691,7 @@
         @include font-size(24);
         color: $m-blue-d3;
 
-        &:hover {
+        &:hover, &:focus {
           color: $m-blue-d1;
           border: none;
         }
@@ -1796,7 +1841,7 @@
         &:last-child {
           margin-bottom: 0;
           border-bottom: none;
-          padding-bottom: none;
+          padding-bottom: 0;
         }
 
         > .title {
@@ -1850,6 +1895,7 @@
     }
   }
 }
+// ====================
 
 // STATE: already verified
 .register.is-verified {
@@ -1900,5 +1946,153 @@
 
   .progress-sts-value {
     width: 32% !important;
+  }
+}
+
+// ====================
+
+// STATE: upgrading registration type
+.register.is-upgrading {
+
+  .form-register-choose {
+    margin-top: ($baseline*2) !important;
+  }
+}
+
+// STATE: re-verifying
+.register.is-not-verified {
+
+  .help-item-emphasis {
+    color: $m-pink;
+  }
+
+  // progress indicator
+  .progress-sts {
+    width: 72%;
+    left: 15%;
+  }
+
+  // VIEW: photo
+  &.step-photos {
+
+    // progress nav
+    .progress .progress-step {
+
+      // STATE: is current
+      &#progress-step1 {
+        border-bottom: ($baseline/5) solid $m-blue-d1;
+        opacity: 1.0;
+
+        .wrapper-step-number {
+          border-color: $m-blue-d1;
+        }
+
+        .step-number, .step-name {
+          color: $m-gray-d3;
+        }
+      }
+    }
+
+    .progress-sts-value {
+      width: 0% !important;
+    }
+  }
+
+  // VIEW: ID
+  &.step-photos-id {
+
+    // progress nav
+    .progress .progress-step {
+
+      // STATE: is completed
+       &#progress-step1 {
+        border-bottom: ($baseline/5) solid $verified-color-lvl3;
+
+        .wrapper-step-number {
+          border-color: $verified-color-lvl3;
+        }
+
+        .step-number, .step-name {
+          color: $m-gray-l3;
+        }
+      }
+
+      // STATE: is current
+      &#progress-step2 {
+        border-bottom: ($baseline/5) solid $m-blue-d1;
+        opacity: 1.0;
+
+        .wrapper-step-number {
+          border-color: $m-blue-d1;
+        }
+
+        .step-number, .step-name {
+          color: $m-gray-d3;
+        }
+      }
+    }
+
+    .progress-sts-value {
+      width: 40% !important;
+    }
+  }
+
+  // VIEW: REVIEW
+  &.step-review {
+
+    // progress nav
+    .progress .progress-step {
+
+      // STATE: is completed
+       &#progress-step1, &#progress-step2 {
+        border-bottom: ($baseline/5) solid $verified-color-lvl3;
+
+        .wrapper-step-number {
+          border-color: $verified-color-lvl3;
+        }
+
+        .step-number, .step-name {
+          color: $m-gray-l3;
+        }
+      }
+
+      // STATE: is current
+      &#progress-step3 {
+        border-bottom: ($baseline/5) solid $m-blue-d1;
+        opacity: 1.0;
+
+        .wrapper-step-number {
+          border-color: $m-blue-d1;
+        }
+
+        .step-number, .step-name {
+          color: $m-gray-d3;
+        }
+      }
+    }
+
+    .progress-sts-value {
+      width: 70% !important;
+    }
+  }
+
+  &.step-confirmation {
+
+    .content-confirmation {
+      margin-bottom: ($baseline*2);
+    }
+
+    .view {
+
+      .title {
+        @extend %hd-lv2;
+        color: $m-blue-d1;
+      }
+
+      .instruction {
+        @extend %t-copy-lead1;
+        margin-bottom: $baseline;
+      }
+    }
   }
 }

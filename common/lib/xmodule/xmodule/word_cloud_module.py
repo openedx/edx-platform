@@ -83,8 +83,7 @@ class WordCloudModule(WordCloudFields, XModule):
     """WordCloud Xmodule"""
     js = {
         'coffee': [resource_string(__name__, 'js/src/javascript_loader.coffee')],
-        'js': [resource_string(__name__, 'js/src/word_cloud/logme.js'),
-        resource_string(__name__, 'js/src/word_cloud/d3.min.js'),
+        'js': [resource_string(__name__, 'js/src/word_cloud/d3.min.js'),
         resource_string(__name__, 'js/src/word_cloud/d3.layout.cloud.js'),
         resource_string(__name__, 'js/src/word_cloud/word_cloud.js'),
         resource_string(__name__, 'js/src/word_cloud/word_cloud_main.js')]
@@ -193,7 +192,7 @@ class WordCloudModule(WordCloudFields, XModule):
 
             # Student words from client.
             # FIXME: we must use raw JSON, not a post data (multipart/form-data)
-            raw_student_words = data.getlist('student_words[]')
+            raw_student_words = data.getall('student_words[]')
             student_words = filter(None, map(self.good_word, raw_student_words))
 
             self.student_words = student_words

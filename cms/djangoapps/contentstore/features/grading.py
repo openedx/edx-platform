@@ -67,9 +67,13 @@ def change_assignment_name(step, old_name, new_name):
 
 @step(u'I go back to the main course page')
 def main_course_page(step):
-    main_page_link = '/{}/{}/course/{}'.format(world.scenario_dict['COURSE'].org,
-                                               world.scenario_dict['COURSE'].number,
-                                               world.scenario_dict['COURSE'].display_name.replace(' ', '_'),)
+    course_name = world.scenario_dict['COURSE'].display_name.replace(' ', '_')
+    main_page_link = '/course/{org}.{number}.{name}/branch/draft/block/{name}'.format(
+        org=world.scenario_dict['COURSE'].org,
+        number=world.scenario_dict['COURSE'].number,
+        name=course_name
+    )
+
     world.visit(main_page_link)
     assert_in('Course Outline', world.css_text('h1.page-header'))
 
@@ -104,6 +108,22 @@ def add_assignment_type(step, new_name):
     name_id = '#course-grading-assignment-name'
     new_assignment = world.css_find(name_id)[-1]
     new_assignment._element.send_keys(new_name)
+
+
+@step(u'I set the assignment weight to "([^"]*)"$')
+def set_weight(step, weight):
+    weight_id = '#course-grading-assignment-gradeweight'
+    weight_field = world.css_find(weight_id)[-1]
+    old_weight = world.css_value(weight_id, -1)
+    for count in range(len(old_weight)):
+        weight_field._element.send_keys(Keys.END, Keys.BACK_SPACE)
+    weight_field._element.send_keys(weight)
+
+
+@step(u'the assignment weight is displayed as "([^"]*)"$')
+def verify_weight(step, weight):
+    weight_id = '#course-grading-assignment-gradeweight'
+    assert_equal(world.css_value(weight_id, -1), weight)
 
 
 @step(u'I have populated the course')
@@ -164,7 +184,7 @@ def cannot_edit_fail(_step):
 def i_change_grace_period(_step, grace_period):
     grace_period_css = '#course-grading-graceperiod'
     ele = world.css_find(grace_period_css).first
-    
+
     # Sometimes it takes a moment for the JavaScript
     # to populate the field.  If we don't wait for
     # this to happen, then we can end up with
@@ -179,8 +199,12 @@ def i_change_grace_period(_step, grace_period):
 @step(u'I see the grace period is "(.*)"$')
 def the_grace_period_is(_step, grace_period):
     grace_period_css = '#course-grading-graceperiod'
-    ele = world.css_find(grace_period_css).first
-    assert_equal(ele.value, grace_period)
+
+    # The default value is 00:00
+    # so we need to wait for it to change
+    world.wait_for(
+        lambda _: world.css_has_value(grace_period_css, grace_period)
+    )
 
 
 def get_type_index(name):

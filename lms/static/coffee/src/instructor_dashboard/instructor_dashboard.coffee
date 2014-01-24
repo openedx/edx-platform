@@ -1,26 +1,31 @@
-# Instructor Dashboard Tab Manager
-# The instructor dashboard is broken into sections.
-# Only one section is visible at a time,
-#   and is responsible for its own functionality.
-#
-# NOTE: plantTimeout (which is just setTimeout from util.coffee)
-#       is used frequently in the instructor dashboard to isolate
-#       failures. If one piece of code under a plantTimeout fails
-#       then it will not crash the rest of the dashboard.
-#
-# NOTE: The instructor dashboard currently does not
-#       use backbone. Just lots of jquery. This should be fixed.
-#
-# NOTE: Server endpoints in the dashboard are stored in
-#       the 'data-endpoint' attribute of relevant html elements.
-#       The urls are rendered there by a template.
-#
-# NOTE: For an example of what a section object should look like
-#       see course_info.coffee
+###
+Instructor Dashboard Tab Manager
 
-# imports from other modules
-# wrap in (-> ... apply) to defer evaluation
-# such that the value can be defined later than this assignment (file load order).
+The instructor dashboard is broken into sections.
+
+Only one section is visible at a time,
+  and is responsible for its own functionality.
+
+NOTE: plantTimeout (which is just setTimeout from util.coffee)
+      is used frequently in the instructor dashboard to isolate
+      failures. If one piece of code under a plantTimeout fails
+      then it will not crash the rest of the dashboard.
+
+NOTE: The instructor dashboard currently does not
+      use backbone. Just lots of jquery. This should be fixed.
+
+NOTE: Server endpoints in the dashboard are stored in
+      the 'data-endpoint' attribute of relevant html elements.
+      The urls are rendered there by a template.
+
+NOTE: For an example of what a section object should look like
+      see course_info.coffee
+
+imports from other modules
+wrap in (-> ... apply) to defer evaluation
+such that the value can be defined later than this assignment (file load order).
+###
+
 plantTimeout = -> window.InstructorDashboard.util.plantTimeout.apply this, arguments
 std_ajax_err = -> window.InstructorDashboard.util.std_ajax_err.apply this, arguments
 
@@ -113,7 +118,7 @@ setup_instructor_dashboard = (idash_content) =>
       location.hash = "#{HASH_LINK_PREFIX}#{section_name}"
 
       sections_have_loaded.after ->
-        $section.data('wrapper')?.onClickTitle?()
+        $section.data('wrapper').onClickTitle()
 
       # call onExit handler if exiting a section to a different section.
       unless $section.is $active_section
@@ -156,6 +161,12 @@ setup_instructor_dashboard_sections = (idash_content) ->
   ,
     constructor: window.InstructorDashboard.sections.StudentAdmin
     $element: idash_content.find ".#{CSS_IDASH_SECTION}#student_admin"
+  ,
+    constructor: window.InstructorDashboard.sections.Extensions
+    $element: idash_content.find ".#{CSS_IDASH_SECTION}#extensions"
+  ,
+    constructor: window.InstructorDashboard.sections.Email
+    $element: idash_content.find ".#{CSS_IDASH_SECTION}#send_email"
   ,
     constructor: window.InstructorDashboard.sections.Analytics
     $element: idash_content.find ".#{CSS_IDASH_SECTION}#analytics"

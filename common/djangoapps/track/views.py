@@ -1,6 +1,5 @@
 import datetime
 
-import pytz
 from pytz import UTC
 
 from django.contrib.auth.decorators import login_required
@@ -9,15 +8,25 @@ from django.shortcuts import redirect
 
 from django_future.csrf import ensure_csrf_cookie
 
-from mitxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response
 
 from track import tracker
+from track import contexts
 from track.models import TrackingLog
+from eventtracking import tracker as eventtracker
 
 
 def log_event(event):
     """Capture a event by sending it to the register trackers"""
     tracker.send(event)
+
+
+def _get_request_header(request, header_name, default=''):
+    """Helper method to get header values from a request's META dict, if present."""
+    if request is not None and hasattr(request, 'META') and header_name in request.META:
+        return request.META[header_name]
+    else:
+        return default
 
 
 def user_track(request):
@@ -38,23 +47,22 @@ def user_track(request):
     except:
         scookie = ""
 
-    try:
-        agent = request.META['HTTP_USER_AGENT']
-    except:
-        agent = ''
+    page = request.REQUEST['page']
 
-    event = {
-        "username": username,
-        "session": scookie,
-        "ip": request.META['REMOTE_ADDR'],
-        "event_source": "browser",
-        "event_type": request.REQUEST['event_type'],
-        "event": request.REQUEST['event'],
-        "agent": agent,
-        "page": request.REQUEST['page'],
-        "time": datetime.datetime.now(UTC),
-        "host": request.META['SERVER_NAME'],
-    }
+    with eventtracker.get_tracker().context('edx.course.browser', contexts.course_context_from_url(page)):
+        event = {
+            "username": username,
+            "session": scookie,
+            "ip": _get_request_header(request, 'REMOTE_ADDR'),
+            "event_source": "browser",
+            "event_type": request.REQUEST['event_type'],
+            "event": request.REQUEST['event'],
+            "agent": _get_request_header(request, 'HTTP_USER_AGENT'),
+            "page": page,
+            "time": datetime.datetime.now(UTC),
+            "host": _get_request_header(request, 'SERVER_NAME'),
+            "context": eventtracker.get_tracker().resolve_context(),
+        }
 
     log_event(event)
 
@@ -62,31 +70,32 @@ def user_track(request):
 
 
 def server_track(request, event_type, event, page=None):
-    """Log events related to server requests."""
+    """
+    Log events related to server requests.
+
+    Handle the situation where the request may be NULL, as may happen with management commands.
+    """
+    if event_type.startswith("/event_logs") and request.user.is_staff:
+        return  # don't log
+
     try:
         username = request.user.username
     except:
         username = "anonymous"
 
-    try:
-        agent = request.META['HTTP_USER_AGENT']
-    except:
-        agent = ''
-
+    # define output:
     event = {
         "username": username,
-        "ip": request.META['REMOTE_ADDR'],
+        "ip": _get_request_header(request, 'REMOTE_ADDR'),
         "event_source": "server",
         "event_type": event_type,
         "event": event,
-        "agent": agent,
+        "agent": _get_request_header(request, 'HTTP_USER_AGENT'),
         "page": page,
         "time": datetime.datetime.now(UTC),
-        "host": request.META['SERVER_NAME'],
+        "host": _get_request_header(request, 'SERVER_NAME'),
+        "context": eventtracker.get_tracker().resolve_context(),
     }
-
-    if event_type.startswith("/event_logs") and request.user.is_staff:
-        return  # don't log
 
     log_event(event)
 
@@ -118,17 +127,19 @@ def task_track(request_info, task_info, event_type, event, page=None):
     # All fields must be specified, in case the tracking information is
     # also saved to the TrackingLog model.  Get values from the task-level
     # information, or just add placeholder values.
-    event = {
-        "username": request_info.get('username', 'unknown'),
-        "ip": request_info.get('ip', 'unknown'),
-        "event_source": "task",
-        "event_type": event_type,
-        "event": full_event,
-        "agent": request_info.get('agent', 'unknown'),
-        "page": page,
-        "time": datetime.datetime.now(UTC),
-        "host": request_info.get('host', 'unknown')
-    }
+    with eventtracker.get_tracker().context('edx.course.task', contexts.course_context_from_url(page)):
+        event = {
+            "username": request_info.get('username', 'unknown'),
+            "ip": request_info.get('ip', 'unknown'),
+            "event_source": "task",
+            "event_type": event_type,
+            "event": full_event,
+            "agent": request_info.get('agent', 'unknown'),
+            "page": page,
+            "time": datetime.datetime.now(UTC),
+            "host": request_info.get('host', 'unknown'),
+            "context": eventtracker.get_tracker().resolve_context(),
+        }
 
     log_event(event)
 

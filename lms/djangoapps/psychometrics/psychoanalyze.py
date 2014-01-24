@@ -18,7 +18,7 @@ from psychometrics.models import PsychometricData
 from courseware.models import StudentModule
 from pytz import UTC
 
-log = logging.getLogger("mitx.psychometrics")
+log = logging.getLogger("edx.psychometrics")
 
 #db = "ocwtutor"        # for debugging
 #db = "default"

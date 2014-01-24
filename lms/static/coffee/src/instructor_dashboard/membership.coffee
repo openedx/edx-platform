@@ -1,10 +1,14 @@
-# Membership Section
+###
+Membership Section
 
-# imports from other modules.
-# wrap in (-> ... apply) to defer evaluation
-# such that the value can be defined later than this assignment (file load order).
+imports from other modules.
+wrap in (-> ... apply) to defer evaluation
+such that the value can be defined later than this assignment (file load order).
+###
+
 plantTimeout = -> window.InstructorDashboard.util.plantTimeout.apply this, arguments
 std_ajax_err = -> window.InstructorDashboard.util.std_ajax_err.apply this, arguments
+emailStudents = false
 
 
 class MemberListWidget
@@ -186,16 +190,20 @@ class BatchEnrollment
     @$btn_enroll             = @$container.find("input[name='enroll']'")
     @$btn_unenroll           = @$container.find("input[name='unenroll']'")
     @$checkbox_autoenroll    = @$container.find("input[name='auto-enroll']'")
+    @$checkbox_emailstudents = @$container.find("input[name='email-students']'")
     @$task_response          = @$container.find(".request-response")
     @$request_response_error = @$container.find(".request-response-error")
 
     # attach click handlers
 
     @$btn_enroll.click =>
+      emailStudents = @$checkbox_emailstudents.is(':checked')
+
       send_data =
         action: 'enroll'
         emails: @$emails_input.val()
         auto_enroll: @$checkbox_autoenroll.is(':checked')
+        email_students: emailStudents
 
       $.ajax
         dataType: 'json'
@@ -205,10 +213,13 @@ class BatchEnrollment
         error: std_ajax_err => @fail_with_error "Error enrolling/unenrolling students."
 
     @$btn_unenroll.click =>
+      emailStudents = @$checkbox_emailstudents.is(':checked')
+
       send_data =
         action: 'unenroll'
         emails: @$emails_input.val()
         auto_enroll: @$checkbox_autoenroll.is(':checked')
+        email_students: emailStudents
 
       $.ajax
         dataType: 'json'
@@ -241,6 +252,8 @@ class BatchEnrollment
     autoenrolled = []
     # students who are now not enrolled in the course
     notenrolled = []
+    # students who were not enrolled or allowed prior to unenroll action
+    notunenrolled = []
 
     # categorize student results into the above arrays.
     for student_results in data_from_server.results
@@ -269,15 +282,23 @@ class BatchEnrollment
 
       if student_results.error
         errors.push student_results
+
       else if student_results.after.enrollment
         enrolled.push student_results
+
       else if student_results.after.allowed
         if student_results.after.auto_enroll
           autoenrolled.push student_results
         else
           allowed.push student_results
+
+      # The instructor is trying to unenroll someone who is not enrolled or allowed to enroll; non-sensical action.
+      else if data_from_server.action is 'unenroll' and not (student_results.before.enrollment) and not (student_results.before.allowed) 
+        notunenrolled.push student_results
+
       else if not student_results.after.enrollment
         notenrolled.push student_results
+
       else
         console.warn 'student results not reported to user'
         console.warn student_results
@@ -307,21 +328,43 @@ class BatchEnrollment
       for student_results in errors
         render_list errors_label, (sr.email for sr in errors)
 
-    if enrolled.length
-      render_list "Students Enrolled:", (sr.email for sr in enrolled)
+    if enrolled.length and emailStudents
+      render_list gettext("Successfully enrolled and sent email to the following students:"), (sr.email for sr in enrolled)
 
-    if allowed.length
-      render_list "These students will be allowed to enroll once they register:",
+    if enrolled.length and not emailStudents
+      render_list gettext("Successfully enrolled the following students:"), (sr.email for sr in enrolled)
+
+    # Student hasn't registered so we allow them to enroll
+    if allowed.length and emailStudents
+      render_list gettext("Successfully sent enrollment emails to the following students. They will be allowed to enroll once they register:"),
         (sr.email for sr in allowed)
 
-    if autoenrolled.length
-      render_list "These students will be enrolled once they register:",
+    # Student hasn't registered so we allow them to enroll
+    if allowed.length and not emailStudents
+      render_list gettext("These students will be allowed to enroll once they register:"),
+        (sr.email for sr in allowed)
+
+    # Student hasn't registered so we allow them to enroll with autoenroll
+    if autoenrolled.length and emailStudents
+      render_list gettext("Successfully sent enrollment emails to the following students. They will be enrolled once they register:"),
         (sr.email for sr in autoenrolled)
 
-    if notenrolled.length
-      render_list "These students are now not enrolled:",
+    # Student hasn't registered so we allow them to enroll with autoenroll
+    if autoenrolled.length and not emailStudents
+      render_list gettext("These students will be enrolled once they register:"),
+        (sr.email for sr in autoenrolled)
+
+    if notenrolled.length and emailStudents
+      render_list gettext("Emails successfully sent. The following students are no longer enrolled in the course:"),
         (sr.email for sr in notenrolled)
 
+    if notenrolled.length and not emailStudents
+      render_list gettext("The following students are no longer enrolled in the course:"),
+        (sr.email for sr in notenrolled)
+
+    if notunenrolled.length
+      render_list gettext("These students were not affliliated with the course so could not be unenrolled:"),
+        (sr.email for sr in notunenrolled)
 
 # Wrapper for auth list subsection.
 # manages a list of users who have special access.
@@ -484,9 +527,7 @@ class Membership
 
 # export for use
 # create parent namespaces if they do not already exist.
-# abort if underscore can not be found.
-if _?
-  _.defaults window, InstructorDashboard: {}
-  _.defaults window.InstructorDashboard, sections: {}
-  _.defaults window.InstructorDashboard.sections,
-    Membership: Membership
+_.defaults window, InstructorDashboard: {}
+_.defaults window.InstructorDashboard, sections: {}
+_.defaults window.InstructorDashboard.sections,
+  Membership: Membership

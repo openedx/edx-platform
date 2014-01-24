@@ -1,4 +1,6 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%! 
+    from django.utils.translation import ugettext as _
+%>
 <%inherit file="base.html" />
 <%namespace name='static' file='static_content.html'/>
 
@@ -17,21 +19,20 @@
 
 <%block name="jsextra">
   <script type="text/javascript" charset="utf-8">
+  
 require(["domReady!", "jquery", "js/collections/course_update", "js/models/module_info", "js/models/course_info", "js/views/course_info_edit"],
   function(doc, $, CourseUpdateCollection, ModuleInfoModel, CourseInfoModel, CourseInfoEditView) {
     var course_updates = new CourseUpdateCollection();
-    course_updates.urlbase = '${url_base}';
+    course_updates.url = '${updates_url}';
     course_updates.fetch({reset: true});
 
     var course_handouts = new ModuleInfoModel({
-        id: '${handouts_location}'
+        id: '${handouts_locator}'
       });
-    course_handouts.urlbase = '${url_base}';
 
     var editor = new CourseInfoEditView({
       el: $('.main-wrapper'),
       model : new CourseInfoModel({
-        courseId : '${context_course.location}',
         updates : course_updates,
         base_asset_url : '${base_asset_url}',
         handouts : course_handouts
@@ -64,7 +65,7 @@ require(["domReady!", "jquery", "js/collections/course_update", "js/models/modul
   <div class="wrapper-content wrapper">
     <section class="content">
       <div class="introduction">
-        <p clas="copy">${_('Course updates are announcements or notifications you want to share with your class. Other course authors have used them for important exam/date reminders, change in schedules, and to call out any important steps students need to be aware of.')}</p>
+        <p clas="copy">${_('Use course updates to notify students of important dates or exams, highlight particular discussions in the forums, announce schedule changes, and respond to student questions. You add or edit updates in HTML.')}</p>
       </div>
     </section>
   </div>
@@ -77,7 +78,7 @@ require(["domReady!", "jquery", "js/collections/course_update", "js/models/modul
             <ol class="update-list" id="course-update-list"></ol>
           </article>
         </div>
-        <div class="sidebar window course-handouts" id="course-handouts-view"></div>
+        <div class="sidebar course-handouts" id="course-handouts-view"></div>
       </div>
     </div>
   </div>

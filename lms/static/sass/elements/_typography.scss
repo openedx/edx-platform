@@ -194,3 +194,93 @@
 %t-weight5 {
   font-weight: 700;
 }
+
+// ====================
+
+// MISC: extends - type
+// application: canned headings
+%hd-lv1 {
+  @extend %t-title1;
+  @extend %t-weight1;
+  color: $m-gray-d4;
+  margin: 0 0 ($baseline*2) 0;
+}
+
+%hd-lv2 {
+  @extend %t-title4;
+  @extend %t-weight1;
+  margin: 0 0 ($baseline*0.75) 0;
+  border-bottom: 1px solid $m-gray-l3;
+  padding-bottom: ($baseline/2);
+  color: $m-gray-d4;
+}
+
+%hd-lv3 {
+  @extend %t-title6;
+  @extend %t-weight4;
+  margin: 0 0 ($baseline/4) 0;
+  color: $m-gray-d4;
+}
+
+%hd-lv4 {
+  @extend %t-title6;
+  @extend %t-weight2;
+  margin: 0 0 $baseline 0;
+  color: $m-gray-d4;
+}
+
+%hd-lv5 {
+  @extend %t-title7;
+  @extend %t-weight4;
+  margin: 0 0 ($baseline/4) 0;
+  color: $m-gray-d4;
+}
+
+// application: canned copy
+%copy-base {
+  @extend %t-copy-base;
+  color: $m-gray-d2;
+}
+
+%copy-lead1 {
+  @extend %t-copy-lead2;
+  color: $m-gray;
+}
+
+%copy-detail {
+  @extend %t-copy-sub1;
+  @extend %t-weight3;
+  color: $m-gray-d1;
+}
+
+%copy-metadata {
+  @extend %t-copy-sub2;
+  color: $m-gray-d1;
+
+
+  %copy-metadata-value {
+    @extend %t-weight2;
+  }
+
+  %copy-metadata-value {
+    @extend %t-weight4;
+  }
+}
+
+// application: canned links
+%copy-link {
+  border-bottom: 1px dotted transparent;
+
+  &:hover, &:active, &:focus {
+    border-color: $link-color-d1;
+  }
+}
+
+%copy-badge {
+  @extend %t-title8;
+  @extend %t-weight3;
+  border-radius: ($baseline/5);
+  padding: ($baseline/2) $baseline;
+  text-transform: uppercase;
+  letter-spacing: 0.1rem;
+}

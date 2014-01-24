@@ -1,0 +1,395 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%! from django.core.urlresolvers import reverse %>
+<%inherit file="../main.html" />
+<%namespace name='static' file='/static_content.html'/>
+
+<%block name="bodyclass">register verification-process is-not-verified step-photos</%block>
+<%block name="title"><title>${_("Re-Verification")}</title></%block>
+
+<%block name="js_extra">
+<script src="${static.url('js/vendor/responsive-carousel/responsive-carousel.js')}"></script>
+<script src="${static.url('js/vendor/responsive-carousel/responsive-carousel.keybd.js')}"></script>
+<script src="${static.url('js/verify_student/photocapture.js')}"></script>
+</%block>
+
+
+<%block name="content">
+
+<div id="no-webcam" style="display: none;" class="wrapper-msg wrapper-msg-activate">
+  <div class=" msg msg-activate">
+    <i class="msg-icon icon-warning-sign"></i>
+    <div class="msg-content">
+      <h3 class="title">${_("No Webcam Detected")}</h3>
+      <div class="copy">
+        <p>${_("You don't seem to have a webcam connected. Double-check that your webcam is connected and working to continue.")}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="no-flash" style="display: none;" class="wrapper-msg wrapper-msg-activate">
+  <div class=" msg msg-activate">
+    <i class="msg-icon icon-warning-sign"></i>
+    <div class="msg-content">
+      <h3 class="title">${_("No Flash Detected")}</h3>
+      <div class="copy">
+        <p>${_("You don't seem to have Flash installed. {a_start} Get Flash {a_end} to continue your registration.").format(a_start='<a rel="external" href="http://get.adobe.com/flashplayer/">', a_end="</a>")}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+%if error:
+<div id="submission-error" class="wrapper-msg wrapper-msg-activate">
+  <div class=" msg msg-activate">
+    <i class="msg-icon icon-warning-sign"></i>
+    <div class="msg-content">
+      <h3 class="title">${_("Error submitting your images")}</h3>
+      <div class="copy">
+        <p>${_("Oops! Something went wrong. Please confirm your details and try again.")}</p>
+      </div>
+    </div>
+  </div>
+</div>
+%endif
+
+<div class="container">
+  <section class="wrapper">
+
+    <div class="wrapper-reverification">
+      <section class="reverification">
+        <div class="message">
+          <h3 class="title">${_("Please Resubmit Your Verification Information")}</h3>
+          <div class="copy">
+            <p>${_("There was an error with your previous verification. In order proceed in the verified certificate of achievement track of your current courses, please complete the following steps.")}</p>
+          </div>
+        </div>
+
+        <span class="deco-arrow"></span>
+      </section>
+    </div>
+
+    <div class="wrapper-progress">
+      <section class="progress">
+        <h3 class="sr title">${_("Your Progress")}</h3>
+
+        <ol class="progress-steps">
+          <li class="progress-step is-current" id="progress-step1">
+            <span class="wrapper-step-number"><span class="step-number">1</span></span>
+            <span class="step-name"><span class="sr">${_("Current Step: ")}</span>${_("Re-Take Photo")}</span>
+          </li>
+
+          <li class="progress-step" id="progress-step2">
+            <span class="wrapper-step-number"><span class="step-number">2</span></span>
+            <span class="step-name">${_("Re-Take ID Photo")}</span>
+          </li>
+
+          <li class="progress-step" id="progress-step3">
+            <span class="wrapper-step-number"><span class="step-number">3</span></span>
+            <span class="step-name">${_("Review")}</span>
+          </li>
+
+          <li class="progress-step progress-step-icon" id="progress-step4">
+            <span class="wrapper-step-number"><span class="step-number">
+              <i class="icon-ok"></i>
+            </span></span>
+            <span class="step-name">${_("Confirmation")}</span>
+          </li>
+        </ol>
+
+        <span class="progress-sts">
+          <span class="progress-sts-value"></span>
+        </span>
+      </section>
+    </div>
+
+    <div class="wrapper-content-main">
+      <article class="content-main">
+
+        <section class="wrapper carousel"  data-transition="slide">
+          <div id="wrapper-facephoto" class="wrapper-view block-photo">
+            <div class="facephoto view">
+              <h3 class="title">${_("Re-Take Your Photo")}</h3>
+              <div class="instruction">
+                <p>${_("Use your webcam to take a picture of your face so we can match it with the picture on your ID.")}</p>
+              </div>
+
+              <div class="wrapper-task">
+                <div id="facecam" class="task cam">
+                  <div class="placeholder-cam" id="face_capture_div">
+
+                    <div class="placeholder-art">
+                      <p class="copy">${_("Don't see your picture? Make sure to allow your browser to use your camera when it asks for permission.")}</p>
+                    </div>
+
+                    <video id="face_video" autoplay></video><br/>
+                    <canvas id="face_canvas" style="display:none;" width="640" height="480"></canvas>
+                  </div>
+
+                  <div class="controls photo-controls">
+                    <ul class="list-controls">
+                      <li class="control control-redo" id="face_reset_button">
+                        <a class="action action-redo" href="">
+                          <i class="icon-undo"></i> <span class="sr">${_("Retake")}</span>
+                        </a>
+                      </li>
+
+                      <li class="control control-do" id="face_capture_button">
+                        <a class="action action-do" href="">
+                          <i class="icon-camera"></i><span class="sr">${_("Take photo")}</span>
+                        </a>
+                      </li>
+
+                      <li class="control control-approve" id="face_approve_button">
+                        <a class="action action-approve" href="">
+                          <i class="icon-ok"></i> <span class="sr">${_("Looks good")}</span>
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div class="wrapper-help">
+                  <div class="help help-task photo-tips facetips">
+                    <h4 class="title">${_("Tips on taking a successful photo")}</h4>
+
+                    <div class="copy">
+                      <ul class="list-help">
+                        <li class="help-item">${_("Make sure your face is well-lit")}</li>
+                        <li class="help-item">${_("Be sure your entire face is inside the frame")}</li>
+                        <li class="help-item">${_("Can we match the photo you took with the one on your ID?")}</li>
+                        <li class="help-item">${_("Once in position, use the camera button")} <span class="example">(<i class="icon-camera"></i>)</span> ${_("to capture your picture")}</li>
+                        <li class="help-item">${_("Use the checkmark button")} <span class="example">(<i class="icon-ok"></i>)</span> ${_("once you are happy with the photo")}</li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  <div class="help help-faq facefaq">
+                    <h4 class="sr title">${_("Common Questions")}</h4>
+
+                    <div class="copy">
+                      <dl class="list-faq">
+                        <dt class="faq-question">${_("Why do you need my photo?")}</dt>
+                        <dd class="faq-answer">${_("As part of the verification process, we need your photo to confirm that you are you.")}</dd>
+
+                        <dt class="faq-question">${_("What do you do with this picture?")}</dt>
+                        <dd class="faq-answer">${_("We only use it to verify your identity.  It is not displayed anywhere.")}</dd>
+                      </dl>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <nav class="nav-wizard" id="face_next_button_nav">
+                <span class="help help-inline">${_("Once you verify your photo looks good, you can move on to step 2.")}</span>
+
+                <ol class="wizard-steps">
+                  <li class="wizard-step">
+                    <a id="face_next_link" class="next action-primary" href="#next" aria-hidden="true" title="Next">${_("Go to Step 2: Re-Take ID Photo")}</a>
+                  </li>
+                </ol>
+              </nav>
+
+            </div> <!-- /view -->
+          </div> <!-- /wrapper-view -->
+
+          <div id="wrapper-idphoto" class="wrapper-view block-photo">
+            <div class="idphoto view">
+              <h3 class="title">${_("Show Us Your ID")}</h3>
+              <div class="instruction">
+                <p>${_("Use your webcam to take a picture of your ID so we can match it with your photo and the name on your account.")}</p>
+              </div>
+
+              <div class="wrapper-task">
+                <div id="idcam" class="task cam">
+                  <div class="placeholder-cam" id="photo_id_capture_div">
+
+                    <div class="placeholder-art">
+                      <p class="copy">${_("Don't see your picture? Make sure to allow your browser to use your camera when it asks for permission.")}</p>
+                    </div>
+
+                    <video id="photo_id_video" autoplay></video><br/>
+                    <canvas id="photo_id_canvas" style="display:none;" width="640" height="480"></canvas>
+                  </div>
+
+                  <div class="controls photo-controls">
+                    <ul class="list-controls">
+                      <li class="control control-redo" id="photo_id_reset_button">
+                        <a class="action action-redo" href="">
+                          <i class="icon-undo"></i> <span class="sr">${_("Retake")}</span>
+                        </a>
+                      </li>
+
+                      <li class="control control-do" id="photo_id_capture_button">
+                        <a class="action action-do" href="">
+                          <i class="icon-camera"></i> <span class="sr">${_("Take photo")}</span>
+                        </a>
+                      </li>
+
+                      <li class="control control-approve" id="photo_id_approve_button">
+                        <a class="action action-approve" href="">
+                          <i class="icon-ok"></i> <span class="sr">${_("Looks good")}</span>
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div class="wrapper-help">
+                  <div class="help help-task photo-tips idtips">
+                    <h4 class="title">${_("Tips on taking a successful photo")}</h4>
+
+                    <div class="copy">
+                      <ul class="list-help">
+                        <li class="help-item">${_("Make sure your ID is well-lit")}</li>
+                        <li class="help-item help-item-emphasis">${_("Acceptable IDs include drivers licenses, passports, or other goverment-issued IDs that include your name and photo")}</li>
+                        <li class="help-item">${_("Check that there isn't any glare")}</li>
+                        <li class="help-item">${_("Ensure that you can see your photo and read your name")}</li>
+                        <li class="help-item">${_("Try to keep your fingers at the edge to avoid covering important information")}</li>
+                        <li class="help-item">${_("Once in position, use the camera button")} <span class="example">(<i class="icon-camera"></i>)</span> ${_("to capture your ID")}</li>
+                        <li class="help-item">${_("Use the checkmark button")} <span class="example">(<i class="icon-ok"></i>)</span> ${_("once you are happy with the photo")}</li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  <div class="help help-faq facefaq">
+                    <h4 class="sr title">${_("Common Questions")}</h4>
+
+                    <div class="copy">
+                      <dl class="list-faq">
+                        <dt class="faq-question">${_("Why do you need a photo of my ID?")}</dt>
+                        <dd class="faq-answer">${_("We need to match your ID with your photo and name to confirm that you are you.")}</dd>
+
+                        <dt class="faq-question">${_("What do you do with this picture?")}</dt>
+                        <dd class="faq-answer">${_("We encrypt it and send it to our secure authorization service for review. We use the highest levels of security and do not save the photo or information anywhere once the match has been completed.")}</dd>
+                      </dl>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <nav class="nav-wizard" id="photo_id_next_button_nav">
+                <span class="help help-inline">${_("Once you verify your ID photo looks good, you can move on to step 3.")}</span>
+
+                <ol class="wizard-steps">
+                  <li class="wizard-step">
+                    <a id="photo_id_next_link" class="next action-primary" href="#next" aria-hidden="true" title="Next">${_("Go to Step 3: Review Your Info")}</a>
+                  </li>
+                </ol>
+              </nav>
+            </div> <!-- /view -->
+          </div> <!-- /wrapper-view -->
+
+          <div id="wrapper-review" class="wrapper-view">
+            <div class="review view">
+              <h3 class="title">${_("Verify Your Submission")}</h3>
+              <div class="instruction">
+                <p>${_("Make sure we can verify your identity with the photos and information below.")}</p>
+              </div>
+
+              <div class="wrapper-task">
+                <ol class="review-tasks">
+
+                  <li class="review-task review-task-photos">
+                    <h4 class="title">${_("Review the Photos You've Re-Taken")}</h4>
+
+                    <div class="copy">
+                      <p>${_("Please review the photos and verify that they meet the requirements listed below.")}</p>
+                    </div>
+
+                    <ol class="wrapper-photos">
+                      <li class="wrapper-photo">
+                        <div class="placeholder-photo">
+                          <img id="face_image" src=""/>
+                        </div>
+
+                        <div class="help-tips">
+                          <h5 class="title">${_("The photo above needs to meet the following requirements:")}</h5>
+                          <ul class="list-help list-tips copy">
+                            <li class="tip">${_("Be well lit")}</li>
+                            <li class="tip">${_("Show your whole face")}</li>
+                            <li class="tip">${_("The photo on your ID must match the photo of your face")}</li>
+                          </ul>
+                        </div>
+                      </li>
+
+                      <li class="wrapper-photo">
+                       <div class="placeholder-photo">
+                         <img id="photo_id_image" src=""/>
+                       </div>
+
+                       <div class="help-tips">
+                         <h5 class="title">${_("The photo above needs to meet the following requirements:")}</h5>
+                         <ul class="list-help list-tips copy">
+                           <li class="tip">${_("Be readable (not too far away, no glare)")}</li>
+                           <li class="tip">${_("The photo on your ID must match the photo of your face")}</li>
+                           <li class="tip">${_("The name on your ID must match the name on your account below")}</li>
+                         </ul>
+                       </div>
+                      </li>
+                    </ol>
+
+                    <div class="msg msg-retake msg-followup">
+                      <div class="copy">
+                        <p>${_("Photos don't meet the requirements?")}</p>
+                      </div>
+
+                      <ul class="list-actions">
+                        <li class="action action-retakephotos">
+                        <a class="retake-photos" href="javascript:void(0);" onclick="document.location.reload(true);">${_("Retake Your Photos")}</a>
+                        </li>
+                      </ul>
+                    </div>
+                  </li>
+
+                  <li class="review-task review-task-name">
+                    <h4 class="title">${_("Check Your Name")}</h4>
+
+                    <div class="copy">
+                        <p>${_("Make sure your full name on your edX account ({full_name}) matches your ID. We will also use this as the name on your certificate.").format(full_name="<span id='full-name'>" + user_full_name + "</span>")}</p>
+                    </div>
+
+                    <ul class="list-actions">
+                      <li class="action action-editname">
+                        <a class="edit-name" rel="leanModal" href="#edit-name">${_("Edit your name")}</a>
+                      </li>
+                    </ul>
+                  </li>
+                </ol>
+              </div>
+
+              <nav class="nav-wizard">
+                <div class="prompt-verify">
+                  <h3 class="title">Before proceeding, please confirm that your details match</h3>
+
+                   <p class="copy"> ${_("Once you verify your details match the requirements, you can move onto to confirm your re-verification submisssion.")}</p>
+
+                  <ul class="list-actions">
+                    <li class="action action-verify">
+                      <input type="checkbox" name="match" id="confirm_pics_good" />
+                      <label for="confirm_pics_good">${_("Yes! My details all match.")}</label>
+                    </li>
+                  </ul>
+                </div>
+
+                <ol class="wizard-steps">
+                  <li class="wizard-step step-proceed">
+                    <form id="reverify_form" method="post">
+                      <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
+                      <input class="action-primary disabled" type="button" id="reverify_button" value="Submit photos & re-verify" name="payment">
+                    </form>
+                  </li>
+                </ol>
+              </nav>
+            </div> <!-- /view -->
+          </div> <!-- /wrapper-view -->
+        </section>
+      </article>
+    </div> <!-- /wrapper-content-main -->
+
+    <%include file="_reverification_support.html" />
+  </section>
+</div>
+
+<%include file="_modal_editname.html" />
+</%block>

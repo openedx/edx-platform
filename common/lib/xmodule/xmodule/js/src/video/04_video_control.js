@@ -8,11 +8,16 @@ function () {
 
     // VideoControl() function - what this module "exports".
     return function (state) {
+        var dfd = $.Deferred();
+
         state.videoControl = {};
 
         _makeFunctionsPublic(state);
         _renderElements(state);
         _bindHandlers(state);
+
+        dfd.resolve();
+        return dfd.promise();
     };
 
     // ***************************************************************
@@ -24,14 +29,21 @@ function () {
     //     Functions which will be accessible via 'state' object. When called, these functions will
     //     get the 'state' object as a context.
     function _makeFunctionsPublic(state) {
-        state.videoControl.showControls     = _.bind(showControls,state);
-        state.videoControl.hideControls     = _.bind(hideControls,state);
-        state.videoControl.play             = _.bind(play,state);
-        state.videoControl.pause            = _.bind(pause,state);
-        state.videoControl.togglePlayback   = _.bind(togglePlayback,state);
-        state.videoControl.toggleFullScreen = _.bind(toggleFullScreen,state);
-        state.videoControl.exitFullScreen   = _.bind(exitFullScreen,state);
-        state.videoControl.updateVcrVidTime = _.bind(updateVcrVidTime,state);
+        var methodsDict = {
+            exitFullScreen: exitFullScreen,
+            hideControls: hideControls,
+            hidePlayPlaceholder: hidePlayPlaceholder,
+            pause: pause,
+            play: play,
+            show: show,
+            showControls: showControls,
+            showPlayPlaceholder: showPlayPlaceholder,
+            toggleFullScreen: toggleFullScreen,
+            togglePlayback: togglePlayback,
+            updateVcrVidTime: updateVcrVidTime
+        };
+
+        state.bindTo(methodsDict, state.videoControl, state);
     }
 
     // function _renderElements(state)
@@ -45,19 +57,19 @@ function () {
 
         state.videoControl.sliderEl            = state.videoControl.el.find('.slider');
         state.videoControl.playPauseEl         = state.videoControl.el.find('.video_control');
+        state.videoControl.playPlaceholder     = state.el.find('.btn-play');
         state.videoControl.secondaryControlsEl = state.videoControl.el.find('.secondary-controls');
         state.videoControl.fullScreenEl        = state.videoControl.el.find('.add-fullscreen');
         state.videoControl.vidTimeEl           = state.videoControl.el.find('.vidtime');
 
         state.videoControl.fullScreenState = false;
+        state.videoControl.pause();
 
-        if (!onTouchBasedDevice()) {
-            state.videoControl.pause();
-        } else {
-            state.videoControl.play();
+        if (state.isTouch && state.videoType === 'html5') {
+            state.videoControl.showPlayPlaceholder();
         }
 
-        if (state.videoType === 'html5') {
+        if ((state.videoType === 'html5') && (state.config.autohideHtml5)) {
             state.videoControl.fadeOutTimeout = state.config.fadeOutTimeout;
 
             state.videoControl.el.addClass('html5');
@@ -81,7 +93,7 @@ function () {
         state.videoControl.fullScreenEl.on('click', state.videoControl.toggleFullScreen);
         $(document).on('keyup', state.videoControl.exitFullScreen);
 
-        if (state.videoType === 'html5') {
+        if ((state.videoType === 'html5') && (state.config.autohideHtml5)) {
             state.el.on('mousemove', state.videoControl.showControls);
             state.el.on('keydown', state.videoControl.showControls);
         }
@@ -90,6 +102,13 @@ function () {
         state.videoControl.playPauseEl.on('blur', function () {
             state.previousFocus = 'playPause';
         });
+
+        if (/iPad|Android/i.test(state.isTouch[0])) {
+            state.videoControl.playPlaceholder
+                .on('click', function () {
+                    state.trigger('videoPlayer.play', null);
+                });
+        }
     }
 
     // ***************************************************************
@@ -97,6 +116,11 @@ function () {
     // These are available via the 'state' object. Their context ('this' keyword) is the 'state' object.
     // The magic private function that makes them available and sets up their context is makeFunctionsPublic().
     // ***************************************************************
+    function show() {
+        this.videoControl.el.removeClass('is-hidden');
+        this.el.trigger('controls:show', arguments);
+    }
+
     function showControls(event) {
         if (!this.controlShowLock) {
             if (!this.captionsHidden) {
@@ -148,14 +172,46 @@ function () {
         });
     }
 
+    function showPlayPlaceholder(event) {
+        this.videoControl.playPlaceholder
+            .removeClass('is-hidden')
+            .attr({
+                'aria-hidden': 'false',
+                'tabindex': 0
+            });
+    }
+
+    function hidePlayPlaceholder(event) {
+        this.videoControl.playPlaceholder
+            .addClass('is-hidden')
+            .attr({
+                'aria-hidden': 'true',
+                'tabindex': -1
+            });
+    }
+
     function play() {
-        this.videoControl.playPauseEl.removeClass('play').addClass('pause').attr('title', gettext('Pause'));
         this.videoControl.isPlaying = true;
+        this.videoControl.playPauseEl
+            .removeClass('play')
+            .addClass('pause')
+            .attr('title', gettext('Pause'));
+
+        if (/iPad|Android/i.test(this.isTouch[0]) && this.videoType === 'html5') {
+            this.videoControl.hidePlayPlaceholder();
+        }
     }
 
     function pause() {
-        this.videoControl.playPauseEl.removeClass('pause').addClass('play').attr('title', gettext('Play'));
         this.videoControl.isPlaying = false;
+        this.videoControl.playPauseEl
+            .removeClass('pause')
+            .addClass('play')
+            .attr('title', gettext('Play'));
+
+        if (/iPad|Android/i.test(this.isTouch[0]) && this.videoType === 'html5') {
+            this.videoControl.showPlayPlaceholder();
+        }
     }
 
     function togglePlayback(event) {
@@ -170,21 +226,40 @@ function () {
 
     function toggleFullScreen(event) {
         event.preventDefault();
-        var fullScreenClassNameEl = this.el.add(document.documentElement);
+        var fullScreenClassNameEl = this.el.add(document.documentElement),
+            win = $(window),
+            text;
 
         if (this.videoControl.fullScreenState) {
-            this.videoControl.fullScreenState = false;
+            this.videoControl.fullScreenState = this.isFullScreen = false;
             fullScreenClassNameEl.removeClass('video-fullscreen');
-            this.isFullScreen = false;
-            this.videoControl.fullScreenEl.attr('title', gettext('Fill browser'))
-                                          .text(gettext('Fill browser'));
+            text = gettext('Fill browser');
+
+            this.resizer
+                .setParams({
+                    container: this.videoEl.parent()
+                })
+                .setMode('width');
+
+            win.scrollTop(this.scrollPos);
         } else {
-            this.videoControl.fullScreenState = true;
+            this.scrollPos = win.scrollTop();
+            win.scrollTop(0);
+            this.videoControl.fullScreenState = this.isFullScreen = true;
             fullScreenClassNameEl.addClass('video-fullscreen');
-            this.isFullScreen = true;
-            this.videoControl.fullScreenEl.attr('title', gettext('Exit full browser'))
-                                          .text(gettext('Exit full browser'));
+            text = gettext('Exit full browser');
+
+            this.resizer
+                .setParams({
+                    container: window
+                })
+                .setMode('both');
+
         }
+
+        this.videoControl.fullScreenEl
+            .attr('title', text)
+            .text(text);
 
         this.trigger('videoCaption.resize', null);
     }

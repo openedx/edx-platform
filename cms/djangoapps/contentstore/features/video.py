@@ -3,21 +3,44 @@
 from lettuce import world, step
 from xmodule.modulestore import Location
 from contentstore.utils import get_modulestore
+from selenium.webdriver.common.keys import Keys
+
+VIDEO_BUTTONS = {
+    'CC': '.hide-subtitles',
+    'volume': '.volume',
+    'play': '.video_control.play',
+    'pause': '.video_control.pause',
+}
+
+SELECTORS = {
+    'spinner': '.video-wrapper .spinner',
+    'controls': 'section.video-controls',
+}
+
+# We should wait 300 ms for event handler invocation + 200ms for safety.
+DELAY = 0.5
 
 
 @step('I have created a Video component$')
 def i_created_a_video_component(step):
+    world.create_course_with_unit()
     world.create_component_instance(
-        step, '.large-video-icon',
-        'video',
-        '.xmodule_VideoModule',
-        has_multiple_templates=False
+        step=step,
+        category='video',
     )
+
+    world.wait_for_xmodule()
+    world.disable_jquery_animations()
+
+    world.wait_for_present('.is-initialized')
+    world.wait(DELAY)
+    world.wait_for_invisible(SELECTORS['spinner'])
 
 
 @step('I have created a Video component with subtitles$')
 def i_created_a_video_with_subs(_step):
     _step.given('I have created a Video component with subtitles "OEoXaMPEzfM"')
+
 
 @step('I have created a Video component with subtitles "([^"]*)"$')
 def i_created_a_video_with_subs_with_name(_step, sub_id):
@@ -31,22 +54,22 @@ def i_created_a_video_with_subs_with_name(_step, sub_id):
 
     # Return to the video
     world.visit(video_url)
+
     world.wait_for_xmodule()
+    world.disable_jquery_animations()
+
+    world.wait_for_present('.is-initialized')
+    world.wait_for_invisible(SELECTORS['spinner'])
 
 
 @step('I have uploaded subtitles "([^"]*)"$')
 def i_have_uploaded_subtitles(_step, sub_id):
     _step.given('I go to the files and uploads page')
-
-    sub_id = sub_id.strip()
-    if not sub_id:
-        sub_id = 'OEoXaMPEzfM'
-    _step.given('I upload the test file "subs_{}.srt.sjson"'.format(sub_id))
+    _step.given('I upload the test file "subs_{}.srt.sjson"'.format(sub_id.strip()))
 
 
 @step('when I view the (.*) it does not have autoplay enabled$')
 def does_not_autoplay(_step, video_type):
-    world.wait_for_xmodule()
     assert world.css_find('.%s' % video_type)[0]['data-autoplay'] == 'False'
     assert world.css_has_class('.video_control', 'play')
 
@@ -67,7 +90,6 @@ def i_edit_the_component(_step):
 
 @step('I have (hidden|toggled) captions$')
 def hide_or_show_captions(step, shown):
-    world.wait_for_xmodule()
     button_css = 'a.hide-subtitles'
     if shown == 'hidden':
         world.css_click(button_css)
@@ -112,6 +134,67 @@ def xml_only_video(step):
 
 @step('The correct Youtube video is shown$')
 def the_youtube_video_is_shown(_step):
-    world.wait_for_xmodule()
     ele = world.css_find('.video').first
     assert ele['data-streams'].split(':')[1] == world.scenario_dict['YOUTUBE_ID']
+
+
+@step('Make sure captions are (.+)$')
+def set_captions_visibility_state(_step, captions_state):
+    SELECTOR = '.closed .subtitles'
+    world.wait_for_visible('.hide-subtitles')
+    if captions_state == 'closed':
+        if not world.is_css_present(SELECTOR):
+            world.css_find('.hide-subtitles').click()
+    else:
+        if world.is_css_present(SELECTOR):
+            world.css_find('.hide-subtitles').click()
+
+
+@step('I hover over button "([^"]*)"$')
+def hover_over_button(_step, button):
+    world.css_find(VIDEO_BUTTONS[button.strip()]).mouse_over()
+
+
+@step('Captions (?:are|become) "([^"]*)"$')
+def check_captions_visibility_state(_step, visibility_state):
+    if visibility_state == 'visible':
+        assert world.css_visible('.subtitles')
+    else:
+        assert not world.css_visible('.subtitles')
+
+
+def find_caption_line_by_data_index(index):
+    SELECTOR = ".subtitles > li[data-index='{index}']".format(index=index)
+    return world.css_find(SELECTOR).first
+
+
+@step('I focus on caption line with data-index "([^"]*)"$')
+def focus_on_caption_line(_step, index):
+    find_caption_line_by_data_index(int(index.strip()))._element.send_keys(Keys.TAB)
+
+
+@step('I press "enter" button on caption line with data-index "([^"]*)"$')
+def click_on_the_caption(_step, index):
+    find_caption_line_by_data_index(int(index.strip()))._element.send_keys(Keys.ENTER)
+
+
+@step('I see caption line with data-index "([^"]*)" has class "([^"]*)"$')
+def caption_line_has_class(_step, index, className):
+    SELECTOR = ".subtitles > li[data-index='{index}']".format(index=int(index.strip()))
+    assert world.css_has_class(SELECTOR, className.strip())
+
+
+@step('I see a range on slider$')
+def see_a_range_slider_with_proper_range(_step):
+    world.wait_for_visible(VIDEO_BUTTONS['pause'])
+
+    assert world.css_visible(".slider-range")
+
+
+@step('I click video button "([^"]*)"$')
+def click_button_video(_step, button_type):
+    world.wait(DELAY)
+    world.wait_for_ajax_complete()
+    button = button_type.strip()
+    world.css_click(VIDEO_BUTTONS[button])
+

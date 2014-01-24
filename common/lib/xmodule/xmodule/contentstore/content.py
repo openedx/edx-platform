@@ -6,10 +6,10 @@ XASSET_THUMBNAIL_TAIL_NAME = '.jpg'
 import os
 import logging
 import StringIO
+from urlparse import urlparse, urlunparse
 
 from xmodule.modulestore import Location
 from .django import contentstore
-# to install PIL on MacOSX: 'easy_install http://dist.repoze.org/PIL-1.1.6.tar.gz'
 from PIL import Image
 
 
@@ -55,7 +55,7 @@ class StaticContent(object):
     @staticmethod
     def get_url_path_from_location(location):
         if location is not None:
-            return "/{tag}/{org}/{course}/{category}/{name}".format(**location.dict())
+            return u"/{tag}/{org}/{course}/{category}/{name}".format(**location.dict())
         else:
             return None
 
@@ -125,8 +125,14 @@ class StaticContent(object):
         a course_id
         """
         org, course_num, __ = course_id.split("/")
-        loc = StaticContent.compute_location(org, course_num, path)
-        return StaticContent.get_url_path_from_location(loc)
+
+        # Generate url of urlparse.path component
+        scheme, netloc, orig_path, params, query, fragment = urlparse(path)
+        loc = StaticContent.compute_location(org, course_num, orig_path)
+        loc_url = StaticContent.get_url_path_from_location(loc)
+
+        # Reconstruct with new path
+        return urlunparse((scheme, netloc, loc_url, params, query, fragment))
 
     def stream_data(self):
         yield self._data
@@ -168,9 +174,12 @@ class ContentStore(object):
     def find(self, filename):
         raise NotImplementedError
 
-    def get_all_content_for_course(self, location):
+    def get_all_content_for_course(self, location, start=0, maxresults=-1, sort=None):
         '''
-        Returns a list of all static assets for a course. The return format is a list of dictionary elements. Example:
+        Returns a list of static assets for a course, followed by the total number of assets.
+        By default all assets are returned, but start and maxresults can be provided to limit the query.
+
+        The return format is a list of dictionary elements. Example:
 
             [
 

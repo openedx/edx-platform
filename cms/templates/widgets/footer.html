@@ -1,25 +1,25 @@
 <%! from django.core.urlresolvers import reverse %>
 <%! from django.utils.translation import ugettext as _ %>
 
-<div class="wrapper-footer wrapper">  
+<div class="wrapper-footer wrapper">
   <footer class="primary" role="contentinfo">
     <div class="colophon">
-      <p>&copy; 2013 <a href="http://www.edx.org" rel="external">edX</a>. ${ _("All rights reserved.")}</p>
+      <p>&copy; 2014 <a href="http://www.edx.org" rel="external">edX</a>. ${ _("All rights reserved.")}</p>
     </div>
-    
+
     <nav class="nav-peripheral">
       <ol>
-        <!-- <li class="nav-item nav-peripheral-tos">
-          <a href="#">Terms of Service</a>
+        <li class="nav-item nav-peripheral-tos">
+          <a data-rel="edx.org" href="${marketing_link('TOS')}">${_("Terms of Service")}</a>
         </li>
         <li class="nav-item nav-peripheral-pp">
-          <a href="#">Privacy Policy</a>
-        </li> -->
+          <a data-rel="edx.org" href="${marketing_link('PRIVACY')}">${_("Privacy Policy")}</a>
+        </li>
         % if user.is_authenticated():
         <li class="nav-item nav-peripheral-feedback">
           <a href="http://help.edge.edx.org/discussion/new" class="show-tender" title="${_('Use our feedback tool, Tender, to share your feedback')}">${_("Contact Us")}</a>
         </li>
-        % endif    
+        % endif
       </ol>
     </nav>
   </footer>

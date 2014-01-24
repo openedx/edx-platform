@@ -1,12 +1,14 @@
 """
 Test for Mock_LTI_Server
 """
+import mock
+from mock import Mock
 import unittest
 import threading
+import textwrap
 import urllib
+import requests
 from mock_lti_server import MockLTIServer
-
-from nose.plugins.skip import SkipTest
 
 
 class MockLTIServerTest(unittest.TestCase):
@@ -19,14 +21,9 @@ class MockLTIServerTest(unittest.TestCase):
 
     def setUp(self):
 
-        # This is a test of the test setup,
-        # so it does not need to run as part of the unit test suite
-        # You can re-enable it by commenting out the line below
-        # raise SkipTest
-
         # Create the server
         server_port = 8034
-        server_host = '127.0.0.1'
+        server_host = 'localhost'
         address = (server_host, server_port)
         self.server = MockLTIServer(address)
         self.server.oauth_settings = {
@@ -35,6 +32,13 @@ class MockLTIServerTest(unittest.TestCase):
             'lti_base':  'http://{}:{}/'.format(server_host, server_port),
             'lti_endpoint': 'correct_lti_endpoint'
         }
+        self.server.run_inside_unittest_flag = True
+        #flag for creating right callback_url
+        self.server.test_mode = True
+
+        self.server.server_host = server_host
+        self.server.server_port = server_port
+
         # Start the server in a separate daemon thread
         server_thread = threading.Thread(target=self.server.serve_forever)
         server_thread.daemon = True
@@ -45,17 +49,34 @@ class MockLTIServerTest(unittest.TestCase):
         # Stop the server, freeing up the port
         self.server.shutdown()
 
-    def test_request(self):
+
+    def test_wrong_header(self):
         """
-        Tests that LTI server processes request with right program
-        path,  and responses with incorrect signature.
+        Tests that LTI server processes request with right program path but with wrong header.
         """
-        request = {
+        #wrong number of params and no signature
+        payload = {
             'user_id': 'default_user_id',
             'role': 'student',
             'oauth_nonce': '',
             'oauth_timestamp': '',
-            'oauth_consumer_key': 'client_key',
+        }
+        uri = self.server.oauth_settings['lti_base'] + self.server.oauth_settings['lti_endpoint']
+        headers = {'referer': 'http://localhost:8000/'}
+        response = requests.post(uri, data=payload, headers=headers)
+        self.assertIn('Wrong LTI signature', response.content)
+
+    def test_wrong_signature(self):
+        """
+        Tests that LTI server processes request with right program
+        path and responses with incorrect signature.
+        """
+        payload = {
+            'user_id': 'default_user_id',
+            'role': 'student',
+            'oauth_nonce': '',
+            'oauth_timestamp': '',
+            'oauth_consumer_key': 'test_client_key',
             'lti_version': 'LTI-1p0',
             'oauth_signature_method': 'HMAC-SHA1',
             'oauth_version': '1.0',
@@ -64,12 +85,73 @@ class MockLTIServerTest(unittest.TestCase):
             'oauth_callback': 'about:blank',
             'launch_presentation_return_url': '',
             'lis_outcome_service_url': '',
-            'lis_result_sourcedid': ''
+            'lis_result_sourcedid': '',
+            'resource_link_id':'',
         }
+        uri = self.server.oauth_settings['lti_base'] + self.server.oauth_settings['lti_endpoint']
+        headers = {'referer': 'http://localhost:8000/'}
+        response = requests.post(uri, data=payload, headers=headers)
+        self.assertIn('Wrong LTI signature', response.content)
 
-        response_handle = urllib.urlopen(
-            self.server.oauth_settings['lti_base'] + self.server.oauth_settings['lti_endpoint'],
-            urllib.urlencode(request)
-        )
-        response = response_handle.read()
-        self.assertTrue('Wrong LTI signature' in response)
+
+    def test_success_response_launch_lti(self):
+        """
+        Success lti launch.
+        """
+        payload = {
+            'user_id': 'default_user_id',
+            'role': 'student',
+            'oauth_nonce': '',
+            'oauth_timestamp': '',
+            'oauth_consumer_key': 'test_client_key',
+            'lti_version': 'LTI-1p0',
+            'oauth_signature_method': 'HMAC-SHA1',
+            'oauth_version': '1.0',
+            'oauth_signature': '',
+            'lti_message_type': 'basic-lti-launch-request',
+            'oauth_callback': 'about:blank',
+            'launch_presentation_return_url': '',
+            'lis_outcome_service_url': '',
+            'lis_result_sourcedid': '',
+            'resource_link_id':'',
+        }
+        self.server.check_oauth_signature = Mock(return_value=True)
+
+        uri = self.server.oauth_settings['lti_base'] + self.server.oauth_settings['lti_endpoint']
+        headers = {'referer': 'http://localhost:8000/'}
+        response = requests.post(uri, data=payload, headers=headers)
+        self.assertIn('This is LTI tool. Success.', response.content)
+
+    def test_send_graded_result(self):
+
+        payload = {
+            'user_id': 'default_user_id',
+            'role': 'student',
+            'oauth_nonce': '',
+            'oauth_timestamp': '',
+            'oauth_consumer_key': 'test_client_key',
+            'lti_version': 'LTI-1p0',
+            'oauth_signature_method': 'HMAC-SHA1',
+            'oauth_version': '1.0',
+            'oauth_signature': '',
+            'lti_message_type': 'basic-lti-launch-request',
+            'oauth_callback': 'about:blank',
+            'launch_presentation_return_url': '',
+            'lis_outcome_service_url': '',
+            'lis_result_sourcedid': '',
+            'resource_link_id':'',
+        }
+        self.server.check_oauth_signature = Mock(return_value=True)
+
+        uri = self.server.oauth_settings['lti_base'] + self.server.oauth_settings['lti_endpoint']
+        #this is the uri for sending grade from lti
+        headers = {'referer': 'http://localhost:8000/'}
+        response = requests.post(uri, data=payload, headers=headers)
+        self.assertIn('This is LTI tool. Success.', response.content)
+
+        self.server.grade_data['TC answer'] = "Test response"
+        graded_response = requests.post('http://127.0.0.1:8034/grade')
+        self.assertIn('Test response', graded_response.content)
+
+
+

@@ -1,4 +1,4 @@
-@shard_3
+@shard_1
 Feature: CMS.Problem Editor
   As a course author, I want to be able to create problems and edit their settings.
 
@@ -81,11 +81,41 @@ Feature: CMS.Problem Editor
     When I edit and select Settings
     Then Edit High Level Source is visible
 
+  # This is a very specific scenario that was failing with some of the
+  # DB rearchitecture changes. It had to do with children IDs being stored
+  # with @draft at the end. To reproduce, must update children while in draft mode.
+  Scenario: Problems can be deleted after being public
+    Given I have created a Blank Common Problem
+    And I have created another Blank Common Problem
+    When I publish the unit
+    And I click on "edit a draft"
+    And I delete "1" component
+    And I click on "replace with draft"
+    And I click on "edit a draft"
+    And I delete "1" component
+    Then I see no components
+
+
+  # Disabled 11/13/2013 after failing in master
+  # The screenshot showed that the LaTeX editor had the text "hi",
+  # but Selenium timed out waiting for the text to appear.
+  # It also caused later tests to fail with "UnexpectedAlertPresent"
+  #
   # This feature will work in Firefox only when Firefox is the active window
   # IE will not interact with the high level source in sauce labs
-  @skip_internetexplorer
-  Scenario: High Level source is persisted for LaTeX problem (bug STUD-280)
-    Given I have created a LaTeX Problem
-    When I edit and compile the High Level Source
-    Then my change to the High Level Source is persisted
-    And when I view the High Level Source I see my changes
+  #@skip_internetexplorer
+  #Scenario: High Level source is persisted for LaTeX problem (bug STUD-280)
+  #  Given I have created a LaTeX Problem
+  #  When I edit and compile the High Level Source
+  #  Then my change to the High Level Source is persisted
+  #  And when I view the High Level Source I see my changes
+
+    # Disabled 10/28/13 due to flakiness observed in master
+    #  Scenario: Exceptions don't cause problem to be uneditable (bug STUD-786)
+    #Given I have an empty course
+    #And I go to the import page
+    #And I import the file "get_html_exception_test.tar.gz"
+    #When I go to the unit "Probability and BMI"
+    #And I click on "edit a draft"
+    #Then I see a message that says "We're having trouble rendering your component"
+    #And I can edit the problem

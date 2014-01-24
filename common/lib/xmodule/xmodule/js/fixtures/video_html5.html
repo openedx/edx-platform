@@ -3,8 +3,10 @@
     <div id="example">
       <div
         id="video_id"
-        class="video"
+        class="video closed"
         data-show-captions="true"
+        data-save-state-url="/save_user_state"
+        data-speed="1.5"
         data-start=""
         data-end=""
         data-caption-asset-path="/static/subs/"
@@ -15,15 +17,18 @@
         data-autoplay="False"
         data-yt-test-timeout="1500"
         data-yt-test-url="https://gdata.youtube.com/feeds/api/videos/"
+        data-autohide-html5="True"
       >
         <div class="focus_grabber first"></div>
 
         <div class="tc-wrapper">
           <article class="video-wrapper">
+            <span tabindex="0" class="spinner" aria-hidden="false" aria-label="${_('Loading video player')}"></span>
+            <span tabindex="-1" class="btn-play is-hidden" aria-hidden="true" aria-label="${_('Play video')}"></span>
             <section class="video-player">
               <div id="id"></div>
             </section>
-            <section class="video-controls"></section>
+            <section class="video-controls is-hidden"></section>
           </article>
 
           <ol class="subtitles"><li></li></ol>

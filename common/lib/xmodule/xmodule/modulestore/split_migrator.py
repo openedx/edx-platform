@@ -23,41 +23,41 @@ class SplitMigrator(object):
         self.draft_modulestore = draft_modulestore
         self.loc_mapper = loc_mapper
 
-    def migrate_mongo_course(self, course_location, user_id, new_course_id=None):
+    def migrate_mongo_course(self, course_location, user_id, new_package_id=None):
         """
         Create a new course in split_mongo representing the published and draft versions of the course from the
-        original mongo store. And return the new_course_id (which the caller can also get by calling
+        original mongo store. And return the new_package_id (which the caller can also get by calling
         self.loc_mapper.translate_location(old_course_location)
 
         If the new course already exists, this raises DuplicateItemError
 
         :param course_location: a Location whose category is 'course' and points to the course
         :param user_id: the user whose action is causing this migration
-        :param new_course_id: (optional) the Locator.course_id for the new course. Defaults to
+        :param new_package_id: (optional) the Locator.package_id for the new course. Defaults to
         whatever translate_location_to_locator returns
         """
-        new_course_id = self.loc_mapper.create_map_entry(course_location, course_id=new_course_id)
+        new_package_id = self.loc_mapper.create_map_entry(course_location, package_id=new_package_id)
         old_course_id = course_location.course_id
         # the only difference in data between the old and split_mongo xblocks are the locations;
         # so, any field which holds a location must change to a Locator; otherwise, the persistence
         # layer and kvs's know how to store it.
         # locations are in location, children, conditionals, course.tab
 
-        # create the course: set fields to explicitly_set for each scope, id_root = new_course_id, master_branch = 'production'
+        # create the course: set fields to explicitly_set for each scope, id_root = new_package_id, master_branch = 'production'
         original_course = self.direct_modulestore.get_item(course_location)
         new_course_root_locator = self.loc_mapper.translate_location(old_course_id, course_location)
         new_course = self.split_modulestore.create_course(
             course_location.org, original_course.display_name,
-            user_id, id_root=new_course_id,
+            user_id, id_root=new_package_id,
             fields=self._get_json_fields_translate_children(original_course, old_course_id, True),
-            root_usage_id=new_course_root_locator.usage_id,
+            root_block_id=new_course_root_locator.block_id,
             master_branch=new_course_root_locator.branch
         )
 
         self._copy_published_modules_to_course(new_course, course_location, old_course_id, user_id)
-        self._add_draft_modules_to_course(new_course_id, old_course_id, course_location, user_id)
+        self._add_draft_modules_to_course(new_package_id, old_course_id, course_location, user_id)
 
-        return new_course_id
+        return new_package_id
 
     def _copy_published_modules_to_course(self, new_course, old_course_loc, old_course_id, user_id):
         """
@@ -74,13 +74,13 @@ class SplitMigrator(object):
             # don't copy the course again. No drafts should get here but check
             if module.location != old_course_loc and not getattr(module, 'is_draft', False):
                 # create split_xblock using split.create_item
-                # where usage_id is computed by translate_location_to_locator
+                # where block_id is computed by translate_location_to_locator
                 new_locator = self.loc_mapper.translate_location(
                     old_course_id, module.location, True, add_entry_if_missing=True
                 )
                 _new_module = self.split_modulestore.create_item(
                     course_version_locator, module.category, user_id,
-                    usage_id=new_locator.usage_id,
+                    block_id=new_locator.block_id,
                     fields=self._get_json_fields_translate_children(module, old_course_id, True),
                     continue_version=True
                 )
@@ -88,19 +88,19 @@ class SplitMigrator(object):
         index_info = self.split_modulestore.get_course_index_info(course_version_locator)
         versions = index_info['versions']
         versions['draft'] = versions['published']
-        self.split_modulestore.update_course_index(course_version_locator, {'versions': versions}, update_versions=True)
+        self.split_modulestore.update_course_index(index_info)
 
         # clean up orphans in published version: in old mongo, parents pointed to the union of their published and draft
         # children which meant some pointers were to non-existent locations in 'direct'
         self.split_modulestore.internal_clean_children(course_version_locator)
 
-    def _add_draft_modules_to_course(self, new_course_id, old_course_id, old_course_loc, user_id):
+    def _add_draft_modules_to_course(self, new_package_id, old_course_id, old_course_loc, user_id):
         """
         update each draft. Create any which don't exist in published and attach to their parents.
         """
         # each true update below will trigger a new version of the structure. We may want to just have one new version
         # but that's for a later date.
-        new_draft_course_loc = CourseLocator(course_id=new_course_id, branch='draft')
+        new_draft_course_loc = CourseLocator(package_id=new_package_id, branch='draft')
         # to prevent race conditions of grandchilden being added before their parents and thus having no parent to
         # add to
         awaiting_adoption = {}
@@ -112,7 +112,7 @@ class SplitMigrator(object):
                 new_locator = self.loc_mapper.translate_location(
                     old_course_id, module.location, False, add_entry_if_missing=True
                 )
-                if self.split_modulestore.has_item(new_course_id, new_locator):
+                if self.split_modulestore.has_item(new_package_id, new_locator):
                     # was in 'direct' so draft is a new version
                     split_module = self.split_modulestore.get_item(new_locator)
                     # need to remove any no-longer-explicitly-set values and add/update any now set values.
@@ -130,18 +130,18 @@ class SplitMigrator(object):
                     # create a new course version just in case the current head is also the prod head
                     _new_module = self.split_modulestore.create_item(
                         new_draft_course_loc, module.category, user_id,
-                        usage_id=new_locator.usage_id,
+                        block_id=new_locator.block_id,
                         fields=self._get_json_fields_translate_children(module, old_course_id, True)
                     )
-                    awaiting_adoption[module.location] = new_locator.usage_id
-        for draft_location, new_usage_id in awaiting_adoption.iteritems():
+                    awaiting_adoption[module.location] = new_locator.block_id
+        for draft_location, new_block_id in awaiting_adoption.iteritems():
             for parent_loc in self.draft_modulestore.get_parent_locations(draft_location, old_course_id):
                 old_parent = self.draft_modulestore.get_item(parent_loc)
                 new_parent = self.split_modulestore.get_item(
                     self.loc_mapper.translate_location(old_course_id, old_parent.location, False)
                 )
                 # this only occurs if the parent was also awaiting adoption
-                if new_usage_id in new_parent.children:
+                if new_block_id in new_parent.children:
                     break
                 # find index for module: new_parent may be missing quite a few of old_parent's children
                 new_parent_cursor = 0
@@ -152,15 +152,15 @@ class SplitMigrator(object):
                     sibling_loc = self.loc_mapper.translate_location(old_course_id, Location(old_child_loc), False)
                     # sibling may move cursor
                     for idx in range(new_parent_cursor, len(new_parent.children)):
-                        if new_parent.children[idx] == sibling_loc.usage_id:
+                        if new_parent.children[idx] == sibling_loc.block_id:
                             new_parent_cursor = idx + 1
                             break
-                new_parent.children.insert(new_parent_cursor, new_usage_id)
+                new_parent.children.insert(new_parent_cursor, new_block_id)
                 new_parent = self.split_modulestore.update_item(new_parent, user_id)
 
     def _get_json_fields_translate_children(self, xblock, old_course_id, published):
         """
-        Return the json repr for explicitly set fields but convert all children to their usage_id's
+        Return the json repr for explicitly set fields but convert all children to their block_id's
         """
         fields = self.get_json_fields_explicitly_set(xblock)
         # this will too generously copy the children even for ones that don't exist in the published b/c the old mongo
@@ -169,7 +169,7 @@ class SplitMigrator(object):
             fields['children'] = [
                 self.loc_mapper.translate_location(
                     old_course_id, Location(child), published, add_entry_if_missing=True
-                ).usage_id
+                ).block_id
                 for child in fields['children']]
         return fields
 

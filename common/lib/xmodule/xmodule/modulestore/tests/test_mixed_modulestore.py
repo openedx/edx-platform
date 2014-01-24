@@ -21,7 +21,7 @@ from xmodule.modulestore.mixed import MixedModuleStore
 
 HOST = 'localhost'
 PORT = 27017
-DB = 'test_mongo_%s' % uuid4().hex
+DB = 'test_mongo_%s' % uuid4().hex[:5]
 COLLECTION = 'modulestore'
 FS_ROOT = DATA_DIR
 DEFAULT_CLASS = 'xmodule.raw_module.RawDescriptor'
@@ -47,11 +47,13 @@ OPTIONS = {
         },
         'default': {
             'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
-            'OPTIONS': {
-                'default_class': DEFAULT_CLASS,
+            'DOC_STORE_CONFIG': {
                 'host': HOST,
                 'db': DB,
                 'collection': COLLECTION,
+            },
+            'OPTIONS': {
+                'default_class': DEFAULT_CLASS,
                 'fs_root': DATA_DIR,
                 'render_template': RENDER_TEMPLATE,
             }
@@ -67,7 +69,11 @@ class TestMixedModuleStore(object):
         """
         Set up the database for testing
         """
-        cls.connection = pymongo.connection.Connection(HOST, PORT)
+        cls.connection = pymongo.MongoClient(
+            host=HOST,
+            port=PORT,
+            tz_aware=True,
+        )
         cls.connection.drop_database(DB)
         cls.fake_location = Location(['i4x', 'foo', 'bar', 'vertical', 'baz'])
         cls.import_org, cls.import_course, cls.import_run = IMPORT_COURSEID.split('/')
@@ -176,15 +182,15 @@ class TestMixedModuleStore(object):
             )
 
     def test_get_items(self):
-        modules = self.store.get_items(['i4x', None, None, 'course', None], IMPORT_COURSEID)
+        modules = self.store.get_items(Location('i4x', None, None, 'course', None), IMPORT_COURSEID)
         assert_equals(len(modules), 1)
         assert_equals(modules[0].location.course, self.import_course)
 
-        modules = self.store.get_items(['i4x', None, None, 'course', None], XML_COURSEID1)
+        modules = self.store.get_items(Location('i4x', None, None, 'course', None), XML_COURSEID1)
         assert_equals(len(modules), 1)
         assert_equals(modules[0].location.course, 'toy')
 
-        modules = self.store.get_items(['i4x', None, None, 'course', None], XML_COURSEID2)
+        modules = self.store.get_items(Location('i4x', None, None, 'course', None), XML_COURSEID2)
         assert_equals(len(modules), 1)
         assert_equals(modules[0].location.course, 'simple')
 

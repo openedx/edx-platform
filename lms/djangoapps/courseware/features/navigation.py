@@ -88,20 +88,22 @@ def view_course_multiple_sequences(step):
 
 @step(u'I navigate to a section')
 def when_i_navigate_to_a_section(step):
-    section_css = 'h3[tabindex="-1"]'
-    world.css_click(section_css)
+    # Prevent jQuery menu animations from interferring with the clicks
+    world.disable_jquery_animations()
 
-    subid = "ui-accordion-accordion-panel-1"
-    world.wait_for_visible("#" + subid)
+    # Open the 2nd section
+    world.css_click(css_selector='div.chapter', index=1)
+    subsection_css = 'a[href*="Test_Subsection_2/"]'
 
-    subsection_css = "ul.ui-accordion-content-active[id='{}'] > li > a".format(subid)
+    # Click on the subsection to see the content
     world.css_click(subsection_css)
 
 
 @step(u'I navigate to a subsection')
 def when_i_navigate_to_a_subsection(step):
-    subsection_css = 'ul[id="ui-accordion-accordion-panel-0"]> li > a'
-    world.css_click(subsection_css, index=1)
+    # Click on the 2nd subsection to see the content
+    subsection_css = 'a[href*="Test_Subsection_2/"]'
+    world.css_click(subsection_css)
 
 
 @step(u'I navigate to an item in a sequence')
@@ -177,6 +179,9 @@ def wait_for_problem(display_name):
     """
     Wait for the problem with `display_name` to appear on the page.
     """
+    # Wait for the problem to reload
+    world.wait_for_ajax_complete()
+
     wait_func = lambda _: world.css_has_text(
         'h2.problem-header', display_name, strip=True
     )

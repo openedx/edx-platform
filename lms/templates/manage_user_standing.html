@@ -1,0 +1,56 @@
+<%inherit file="main.html" />
+
+<%! from django.core.urlresolvers import reverse %>
+<%! from django.utils.translation import ugettext as _ %>
+
+<h2>${_("Disable or Reenable student accounts")}</h2>
+<form action="${reverse('disable_account_ajax')}" method="post" data-remote="true" id="disable-form">
+	<label for="username">${_("Username:")}</label>
+	<input type="text" id="username" name="username" required="true">
+	<br>
+	<label for="account_action">${_("Disable Account")}</label>
+	<input type="radio" name="account_action" value="disable" id="account_action">
+	<br>
+	<label for="account_action">${_("Reenable Account")}</label>
+	<input type="radio" name="account_action" value="reenable" id="account_action">
+	<br>
+	<br>
+</form>
+
+<button id="submit-form">${_("Submit")}</button>
+<br>
+<br>
+<p id="account-change-status"></p>
+<h2>${_("Students whose accounts have been disabled")}</h2>
+<p>${_("(reload your page to refresh)")}</p>
+<table id="account-table" border='1'>
+	<tr>
+		% for header in headers:
+		<th>${header}</th>
+		% endfor
+	</tr>
+	% for row in rows:
+	<tr>
+		% for cell in row:
+		<td>${cell}</td>
+		% endfor
+	</tr>
+	% endfor
+</table>
+
+<script type="text/javascript">
+	$(function() {
+		var form = $("#disable-form");
+		$("#submit-form").click(function(){
+			$("#account-change-status").text("${_('working...')}");
+			$.ajax({
+				type: "POST",
+				url: form.attr('action'),
+				data: form.serialize(),
+				success: function(response){
+					$("#account-change-status").html(response.message);
+				},
+			});
+		});
+	});
+</script>

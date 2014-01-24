@@ -1,16 +1,33 @@
 import sys
 import logging
 from xmodule.mako_module import MakoDescriptorSystem
-from xmodule.x_module import XModuleDescriptor
 from xmodule.modulestore.locator import BlockUsageLocator, LocalId
 from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import exc_info_to_str
-from xblock.runtime import DbModel
+from xblock.runtime import KvsFieldData, IdReader
 from ..exceptions import ItemNotFoundError
 from .split_mongo_kvs import SplitMongoKVS
 from xblock.fields import ScopeIds
+from xmodule.modulestore.loc_mapper_store import LocMapperStore
 
 log = logging.getLogger(__name__)
+
+
+class SplitMongoIdReader(IdReader):
+    """
+    An :class:`~xblock.runtime.IdReader` associated with a particular
+    :class:`.CachingDescriptorSystem`.
+    """
+    def __init__(self, system):
+        self.system = system
+
+    def get_definition_id(self, usage_id):
+        usage = self.system.load_item(usage_id)
+        return usage.definition_locator
+
+    def get_block_type(self, def_id):
+        definition = self.system.modulestore.db_connection.get_definition(def_id)
+        return definition['category']
 
 
 class CachingDescriptorSystem(MakoDescriptorSystem):
@@ -27,14 +44,19 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         modulestore: the module store that can be used to retrieve additional
         modules
 
-        course_entry: the originally fetched enveloped course_structure w/ branch and course_id info.
+        course_entry: the originally fetched enveloped course_structure w/ branch and package_id info.
         Callers to _load_item provide an override but that function ignores the provided structure and
-        only looks at the branch and course_id
+        only looks at the branch and package_id
 
         module_data: a dict mapping Location -> json that was cached from the
             underlying modulestore
         """
-        super(CachingDescriptorSystem, self).__init__(load_item=self._load_item, **kwargs)
+        super(CachingDescriptorSystem, self).__init__(
+            id_reader=SplitMongoIdReader(self),
+            field_data=None,
+            load_item=self._load_item,
+            **kwargs
+        )
         self.modulestore = modulestore
         self.course_entry = course_entry
         self.lazy = lazy
@@ -42,31 +64,30 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         # Compute inheritance
         modulestore.inherit_settings(
             course_entry['structure'].get('blocks', {}),
-            course_entry['structure'].get('blocks', {}).get(course_entry['structure'].get('root'))
+            course_entry['structure'].get('blocks', {}).get(
+                LocMapperStore.encode_key_for_mongo(course_entry['structure'].get('root'))
+            )
         )
         self.default_class = default_class
         self.local_modules = {}
 
-    def _load_item(self, usage_id, course_entry_override=None):
-        if isinstance(usage_id, BlockUsageLocator) and isinstance(usage_id.usage_id, LocalId):
+    def _load_item(self, block_id, course_entry_override=None):
+        if isinstance(block_id, BlockUsageLocator) and isinstance(block_id.block_id, LocalId):
             try:
-                return self.local_modules[usage_id]
+                return self.local_modules[block_id]
             except KeyError:
                 raise ItemNotFoundError
 
-        json_data = self.module_data.get(usage_id)
+        json_data = self.module_data.get(block_id)
         if json_data is None:
             # deeper than initial descendant fetch or doesn't exist
-            self.modulestore.cache_items(self, [usage_id], lazy=self.lazy)
-            json_data = self.module_data.get(usage_id)
+            self.modulestore.cache_items(self, [block_id], lazy=self.lazy)
+            json_data = self.module_data.get(block_id)
             if json_data is None:
-                raise ItemNotFoundError(usage_id)
+                raise ItemNotFoundError(block_id)
 
-        class_ = XModuleDescriptor.load_class(
-            json_data.get('category'),
-            self.default_class
-        )
-        return self.xblock_from_json(class_, usage_id, json_data, course_entry_override)
+        class_ = self.load_block_type(json_data.get('category'))
+        return self.xblock_from_json(class_, block_id, json_data, course_entry_override)
 
     # xblock's runtime does not always pass enough contextual information to figure out
     # which named container (course x branch) or which parent is requesting an item. Because split allows
@@ -78,26 +99,26 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
     # the thread is working with more than one named container pointing to the same specific structure is
     # low; thus, the course_entry is most likely correct. If the thread is looking at > 1 named container
     # pointing to the same structure, the access is likely to be chunky enough that the last known container
-    # is the intended one when not given a course_entry_override; thus, the caching of the last branch/course_id.
-    def xblock_from_json(self, class_, usage_id, json_data, course_entry_override=None):
+    # is the intended one when not given a course_entry_override; thus, the caching of the last branch/package_id.
+    def xblock_from_json(self, class_, block_id, json_data, course_entry_override=None):
         if course_entry_override is None:
             course_entry_override = self.course_entry
         else:
             # most recent retrieval is most likely the right one for next caller (see comment above fn)
             self.course_entry['branch'] = course_entry_override['branch']
-            self.course_entry['course_id'] = course_entry_override['course_id']
+            self.course_entry['package_id'] = course_entry_override['package_id']
         # most likely a lazy loader or the id directly
         definition = json_data.get('definition', {})
         definition_id = self.modulestore.definition_locator(definition)
 
         # If no usage id is provided, generate an in-memory id
-        if usage_id is None:
-            usage_id = LocalId()
+        if block_id is None:
+            block_id = LocalId()
 
         block_locator = BlockUsageLocator(
             version_guid=course_entry_override['structure']['_id'],
-            usage_id=usage_id,
-            course_id=course_entry_override.get('course_id'),
+            block_id=block_id,
+            package_id=course_entry_override.get('package_id'),
             branch=course_entry_override.get('branch')
         )
 
@@ -106,7 +127,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
             json_data.get('fields', {}),
             json_data.get('_inherited_settings'),
         )
-        field_data = DbModel(kvs)
+        field_data = KvsFieldData(kvs)
 
         try:
             module = self.construct_xblock_from_class(
@@ -121,7 +142,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
                 self,
                 BlockUsageLocator(
                     version_guid=course_entry_override['structure']['_id'],
-                    usage_id=usage_id
+                    block_id=block_id
                 ),
                 error_msg=exc_info_to_str(sys.exc_info())
             )
@@ -131,12 +152,12 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         module.edited_on = edit_info.get('edited_on')
         module.previous_version = edit_info.get('previous_version')
         module.update_version = edit_info.get('update_version')
-        module.definition_locator = self.modulestore.definition_locator(definition)
+        module.definition_locator = definition_id
         # decache any pending field settings
         module.save()
 
         # If this is an in-memory block, store it in this system
-        if isinstance(block_locator.usage_id, LocalId):
+        if isinstance(block_locator.block_id, LocalId):
             self.local_modules[block_locator] = module
 
         return module

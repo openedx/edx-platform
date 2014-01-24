@@ -5,6 +5,7 @@ if Backbone?
       "click .home": "goHome"
       "click .browse": "toggleTopicDrop"
       "keydown .post-search-field": "performSearch"
+      "focus .post-search-field": "showSearch"
       "click .sort-bar a": "sortThreads"
       "click .browse-topic-drop-menu": "filterTopic"
       "click .browse-topic-drop-search-input": "ignoreClick"
@@ -119,13 +120,16 @@ if Backbone?
 
     renderMorePages: ->
       if @displayedCollection.hasMorePages()
-        @$(".post-list").append("<li class='more-pages'><a href='#'>Load more</a></li>")
+        @$(".post-list").append("<li class='more-pages'><a href='#'>" + gettext("Load more") + "</a></li>")
 
     loadMorePages: (event) ->
       if event
         event.preventDefault()
-      @$(".more-pages").html('<div class="loading-animation"></div>')
+      @$(".more-pages").html('<div class="loading-animation" tabindex=0><span class="sr" role="alert">' + gettext('Loading more threads') + '</span></div>')
       @$(".more-pages").addClass("loading")
+      loadingDiv = @$(".more-pages .loading-animation")
+      DiscussionUtil.makeFocusTrap(loadingDiv)
+      loadingDiv.focus()
       options = {}
       switch @mode
         when 'search'
@@ -156,7 +160,11 @@ if Backbone?
           $(".post-list a").first()?.focus()
         )
 
-      @collection.retrieveAnotherPage(@mode, options, {sort_key: @sortBy})
+      error = =>
+        @renderThreads()
+        DiscussionUtil.discussionAlert(gettext("Sorry"), gettext("We had some trouble loading more threads. Please try again."))
+
+      @collection.retrieveAnotherPage(@mode, options, {sort_key: @sortBy}, error)
 
     renderThread: (thread) =>
       content = $(_.template($("#thread-list-item-template").html())(thread.toJSON()))
@@ -166,6 +174,14 @@ if Backbone?
         content.addClass("resolved")
       if thread.get('read')
         content.addClass("read")
+      if thread.get('unread_comments_count') > 0
+        content.find('.comments-count').addClass("unread").attr(
+          "data-tooltip",
+          interpolate(
+            ngettext('%(unread_count)s new comment', '%(unread_count)s new comments', {'unread_count': thread.get('unread_comments_count')}),
+            [thread.get('unread_comments_count')]
+          )
+        )
       @highlight(content)
 
 
@@ -202,7 +218,7 @@ if Backbone?
 
       @$(".search").addClass('is-open')
       @$(".browse").removeClass('is-open')
-      setTimeout (-> @$(".post-search-field").focus()), 200
+      setTimeout (-> @$(".post-search-field").focus()), 200 unless @$(".post-search-field").is(":focus")
 
     goHome: ->
       @template = _.template($("#discussion-home").html())
@@ -285,14 +301,14 @@ if Backbone?
       path = (x.replace /^\s+|\s+$/g, "" for x in name.split("/"))
       while path.length > 1
         path.shift()
-        partialName = "…/" + path.join("/")
+        partialName = gettext("…") + "/" + path.join("/")
         if  @getNameWidth(partialName) < @maxNameWidth
           return partialName
       rawName = path[0]
-      name = "…/" + rawName
+      name = gettext("…") + "/" + rawName
       while @getNameWidth(name) > @maxNameWidth
         rawName = rawName[0...rawName.length-1]
-        name =  "…/" + rawName + "…"
+        name =  gettext("…") + "/" + rawName + gettext("…")
       return name
 
     filterTopic: (event) ->
@@ -386,11 +402,6 @@ if Backbone?
         text = @$(".post-search-field").val()
         @searchFor(text)
 
-    setAndSearchFor: (text) ->
-      @showSearch()
-      @$(".post-search-field").val(text)
-      @searchFor(text)
-
     searchFor: (text, callback, value) ->
       @mode = 'search'
       @current_search = text
@@ -405,7 +416,7 @@ if Backbone?
         type: "GET"
         $loading: $
         loadingCallback: =>
-          @$(".post-list").html('<li class="loading"><div class="loading-animation"></div></li>')
+          @$(".post-list").html('<li class="loading"><div class="loading-animation"><span class="sr">' + gettext('Loading thread list') + '</span></div></li>')
         loadedCallback: =>
           if callback
             callback.apply @, [value]
@@ -470,4 +481,4 @@ if Backbone?
           error: () =>
             $('input.email-setting').attr('checked','checked')
 
-          
+

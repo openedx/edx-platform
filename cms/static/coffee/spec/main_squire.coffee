@@ -1,5 +1,5 @@
 requirejs.config({
-   paths: {
+    paths: {
         "gettext": "xmodule_js/common_static/js/test/i18n",
         "mustache": "xmodule_js/common_static/js/vendor/mustache",
         "codemirror": "xmodule_js/common_static/js/vendor/CodeMirror/codemirror",
@@ -16,25 +16,33 @@ requirejs.config({
         "jquery.fileupload": "xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.fileupload",
         "jquery.iframe-transport": "xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.iframe-transport",
         "jquery.inputnumber": "xmodule_js/common_static/js/vendor/html5-input-polyfills/number-polyfill",
+        "jquery.immediateDescendents": "xmodule_js/common_static/coffee/src/jquery.immediateDescendents",
         "datepair": "xmodule_js/common_static/js/vendor/timepicker/datepair",
         "date": "xmodule_js/common_static/js/vendor/date",
         "underscore": "xmodule_js/common_static/js/vendor/underscore-min",
         "underscore.string": "xmodule_js/common_static/js/vendor/underscore.string.min",
         "backbone": "xmodule_js/common_static/js/vendor/backbone-min",
         "backbone.associations": "xmodule_js/common_static/js/vendor/backbone-associations-min",
-        "youtube": "xmodule_js/common_static/js/load_youtube",
+        "backbone.paginator": "xmodule_js/common_static/js/vendor/backbone.paginator.min",
         "tinymce": "xmodule_js/common_static/js/vendor/tiny_mce/tiny_mce",
         "jquery.tinymce": "xmodule_js/common_static/js/vendor/tiny_mce/jquery.tinymce",
-        "mathjax": "https://edx-static.s3.amazonaws.com/mathjax-MathJax-727332c/MathJax.js?config=TeX-MML-AM_HTMLorMML-full",
         "xmodule": "xmodule_js/src/xmodule",
+        "xblock": "xmodule_js/common_static/coffee/src/xblock",
         "utility": "xmodule_js/common_static/js/src/utility",
         "sinon": "xmodule_js/common_static/js/vendor/sinon-1.7.1",
         "squire": "xmodule_js/common_static/js/vendor/Squire",
         "jasmine-stealth": "xmodule_js/common_static/js/vendor/jasmine-stealth",
         "jasmine.async": "xmodule_js/common_static/js/vendor/jasmine.async",
+        "draggabilly": "xmodule_js/common_static/js/vendor/draggabilly.pkgd",
+        "domReady": "xmodule_js/common_static/js/vendor/domReady",
+        "URI": "xmodule_js/common_static/js/vendor/URI.min",
+
+        "mathjax": "//edx-static.s3.amazonaws.com/mathjax-MathJax-727332c/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&delayStartupUntil=configured",
+        "youtube": "//www.youtube.com/player_api?noext",
+        "tender": "//edxedge.tenderapp.com/tender_widget.js"
 
         "coffee/src/ajax_prefix": "xmodule_js/common_static/coffee/src/ajax_prefix"
-    },
+    }
     shim: {
         "gettext": {
             exports: "gettext"
@@ -100,6 +108,13 @@ requirejs.config({
             deps: ["backbone"],
             exports: "Backbone.Associations"
         },
+        "backbone.paginator": {
+            deps: ["backbone"],
+            exports: "Backbone.Paginator"
+        },
+        "youtube": {
+            exports: "YT"
+        },
         "codemirror": {
             exports: "CodeMirror"
         },
@@ -107,7 +122,22 @@ requirejs.config({
             exports: "tinymce"
         },
         "mathjax": {
-            exports: "MathJax"
+            exports: "MathJax",
+            init: ->
+              MathJax.Hub.Config
+                tex2jax:
+                  inlineMath: [
+                    ["\\(","\\)"],
+                    ['[mathjaxinline]','[/mathjaxinline]']
+                  ]
+                  displayMath: [
+                    ["\\[","\\]"],
+                    ['[mathjax]','[/mathjax]']
+                  ]
+              MathJax.Hub.Configured();
+        },
+        "URI": {
+            exports: "URI"
         },
         "xmodule": {
             exports: "XModule"
@@ -121,6 +151,14 @@ requirejs.config({
         "jasmine.async": {
             deps: ["jasmine"],
             exports: "AsyncSpec"
+        },
+        "xblock/core": {
+            exports: "XBlock",
+            deps: ["jquery", "jquery.immediateDescendents"]
+        },
+        "xblock/runtime.v1": {
+            exports: "XBlock",
+            deps: ["xblock/core"]
         },
 
         "coffee/src/main": {
@@ -137,4 +175,3 @@ jasmine.getFixtures().fixturesPath += 'coffee/fixtures'
 define([
     "coffee/spec/views/assets_spec"
     ])
-

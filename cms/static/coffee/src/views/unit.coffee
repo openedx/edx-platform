@@ -1,7 +1,7 @@
 define ["jquery", "jquery.ui", "gettext", "backbone",
         "js/views/feedback_notification", "js/views/feedback_prompt",
-        "coffee/src/models/module", "coffee/src/views/module_edit"],
-($, ui, gettext, Backbone, NotificationView, PromptView, ModuleModel, ModuleEditView) ->
+        "coffee/src/views/module_edit", "js/models/module_info"],
+($, ui, gettext, Backbone, NotificationView, PromptView, ModuleEditView, ModuleModel) ->
   class UnitEditView extends Backbone.View
     events:
       'click .new-component .new-component-type a.multiple-templates': 'showComponentTemplates'
@@ -13,6 +13,7 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
       'click .create-draft': 'createDraft'
       'click .publish-draft': 'publishDraft'
       'change .visibility-select': 'setVisibility'
+      "click .component-actions .duplicate-button": 'duplicateComponent'
 
     initialize: =>
       @visibilityView = new UnitEditView.Visibility(
@@ -61,11 +62,12 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
       )
 
       @$('.component').each (idx, element) =>
+        model = new ModuleModel
+            id: $(element).data('locator')
         new ModuleEditView
           el: element,
           onDelete: @deleteComponent,
-          model: new ModuleModel
-            id: $(element).data('id')
+          model: model
 
     showComponentTemplates: (event) =>
       event.preventDefault()
@@ -85,7 +87,7 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
       @$newComponentItem.removeClass('adding')
       @$newComponentItem.find('.rendered-component').remove()
 
-    saveNewComponent: (event) =>
+    createComponent: (event, data, notification_message, analytics_message, success_callback) =>
       event.preventDefault()
 
       editor = new ModuleEditView(
@@ -93,21 +95,55 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
         model: new ModuleModel()
       )
 
-      @$newComponentItem.before(editor.$el)
+      notification = new NotificationView.Mini
+        title: notification_message
+
+      notification.show()
+
+      callback = ->
+        notification.hide()
+        success_callback()
+        analytics.track analytics_message,
+          course: course_location_analytics
+          unit_id: unit_location_analytics
+          type: editor.$el.data('locator')
 
       editor.createItem(
-        @$el.data('id'),
-        $(event.currentTarget).data()
+        @$el.data('locator'),
+        data,
+        callback
       )
 
-      analytics.track "Added a Component",
-        course: course_location_analytics
-        unit_id: unit_location_analytics
-        type: $(event.currentTarget).data('location')
+      return editor
 
+    saveNewComponent: (event) =>
+      success_callback = =>
+        @$newComponentItem.before(editor.$el)
+      editor = @createComponent(
+        event, $(event.currentTarget).data(),
+        gettext('Adding&hellip;'),
+        "Creating new component",
+        success_callback
+      )
       @closeNewComponent(event)
 
-    components: => @$('.component').map((idx, el) -> $(el).data('id')).get()
+    duplicateComponent: (event) =>
+      $component = $(event.currentTarget).parents('.component')
+      source_locator = $component.data('locator')
+      success_callback = ->
+        $component.after(editor.$el)
+        $('html, body').animate({
+          scrollTop: editor.$el.offset().top
+        }, 500)
+      editor = @createComponent(
+        event,
+        {duplicate_source_locator: source_locator},
+        gettext('Duplicating&hellip;')
+        "Duplicating " + source_locator,
+        success_callback
+      )
+
+    components: => @$('.component').map((idx, el) -> $(el).data('locator')).get()
 
     wait: (value) =>
       @$('.unit-body').toggleClass("waiting", value)
@@ -134,14 +170,15 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
                 title: gettext('Deleting&hellip;'),
               deleting.show()
               $component = $(event.currentTarget).parents('.component')
-              $.post('/delete_item', {
-                id: $component.data('id')
-              }, =>
+              $.ajax({
+                type: 'DELETE',
+                url: @model.urlRoot + "/" + $component.data('locator')
+              }).success(=>
                 deleting.hide()
                 analytics.track "Deleted a Component",
                   course: course_location_analytics
                   unit_id: unit_location_analytics
-                  id: $component.data('id')
+                  id: $component.data('locator')
 
                 $component.remove()
                 # b/c we don't vigilantly keep children up to date
@@ -162,23 +199,23 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
 
     deleteDraft: (event) ->
       @wait(true)
+      $.ajax({
+          type: 'DELETE',
+          url: @model.url() + "?" + $.param({recurse: true})
+      }).success(=>
 
-      $.post('/delete_item', {
-        id: @$el.data('id')
-        delete_children: true
-      }, =>
-        analytics.track "Deleted Draft",
-          course: course_location_analytics
-          unit_id: unit_location_analytics
+          analytics.track "Deleted Draft",
+              course: course_location_analytics
+              unit_id: unit_location_analytics
 
-        window.location.reload()
+          window.location.reload()
       )
 
     createDraft: (event) ->
       @wait(true)
 
-      $.post('/create_draft', {
-        id: @$el.data('id')
+      $.postJSON(@model.url(), {
+        publish: 'create_draft'
       }, =>
         analytics.track "Created Draft",
           course: course_location_analytics
@@ -191,8 +228,8 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
       @wait(true)
       @saveDraft()
 
-      $.post('/publish_draft', {
-        id: @$el.data('id')
+      $.postJSON(@model.url(), {
+        publish: 'make_public'
       }, =>
         analytics.track "Published Draft",
           course: course_location_analytics
@@ -203,16 +240,16 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
 
     setVisibility: (event) ->
       if @$('.visibility-select').val() == 'private'
-        target_url = '/unpublish_unit'
+        action = 'make_private'
         visibility = "private"
       else
-        target_url = '/publish_draft'
+        action = 'make_public'
         visibility = "public"
 
       @wait(true)
 
-      $.post(target_url, {
-        id: @$el.data('id')
+      $.postJSON(@model.url(), {
+        publish: action
       }, =>
         analytics.track "Set Unit Visibility",
           course: course_location_analytics

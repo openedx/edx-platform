@@ -8,6 +8,7 @@ from xmodule.x_module import XModule
 from xmodule.xml_module import XmlDescriptor
 from xblock.fields import Scope, Integer, String
 from .fields import Date
+from .util.duedate import get_extended_due_date
 
 
 log = logging.getLogger(__name__)
@@ -20,6 +21,14 @@ class FolditFields(object):
     required_level = Integer(default=4, scope=Scope.settings)
     required_sublevel = Integer(default=5, scope=Scope.settings)
     due = Date(help="Date that this problem is due by", scope=Scope.settings)
+    extended_due = Date(
+        help="Date that this problem is due by for a particular student. This "
+             "can be set by an instructor, and will override the global due "
+             "date if it is set to a date that is later than the global due "
+             "date.",
+        default=None,
+        scope=Scope.user_state,
+    )
 
     show_basic_score = String(scope=Scope.settings, default='false')
     show_leaderboard = String(scope=Scope.settings, default='false')
@@ -39,8 +48,8 @@ class FolditModule(FolditFields, XModule):
             required_sublevel_half_credit="3"
             show_leaderboard="false"/>
         """
-        XModule.__init__(self, *args, **kwargs)
-        self.due_time = self.due
+        super(FolditModule, self).__init__(*args, **kwargs)
+        self.due_time = get_extended_due_date(self)
 
     def is_complete(self):
         """

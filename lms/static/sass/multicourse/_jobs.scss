@@ -97,7 +97,7 @@
           padding: 12px 0px 12px 20px;
           text-align: left;
 
-          &:hover {
+          &:hover, &:focus {
             background: rgb(245,245,245);
             text-decoration: none;
           }

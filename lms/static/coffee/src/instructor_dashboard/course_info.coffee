@@ -1,18 +1,25 @@
-# Course Info Section
-# This is the implementation of the simplest section
-# of the instructor dashboard.
+###
+Course Info Section
 
-# imports from other modules.
-# wrap in (-> ... apply) to defer evaluation
-# such that the value can be defined later than this assignment (file load order).
-plantTimeout = -> window.InstructorDashboard.util.plantTimeout.apply this, arguments
-std_ajax_err = -> window.InstructorDashboard.util.std_ajax_err.apply this, arguments
+imports from other modules.
+wrap in (-> ... apply) to defer evaluation
+such that the value can be defined later than this assignment (file load order).
+###
+
+# Load utilities
+PendingInstructorTasks = -> window.InstructorDashboard.util.PendingInstructorTasks
 
 # A typical section object.
 # constructed with $section, a jquery object
 # which holds the section body container.
 class CourseInfo
   constructor: (@$section) ->
+    # attach self to html so that instructor_dashboard.coffee can find
+    #  this object to call event handlers like 'onClickTitle'
+    @$section.data 'wrapper', @
+
+    # gather elements
+    @instructor_tasks = new (PendingInstructorTasks()) @$section
     @$course_errors_wrapper = @$section.find '.course-errors-wrapper'
 
     # if there are errors
@@ -34,12 +41,15 @@ class CourseInfo
         else
           @$course_errors_wrapper.addClass 'open'
 
+  # handler for when the section title is clicked.
+  onClickTitle: -> @instructor_tasks.task_poller.start()
+
+  # handler for when the section is closed
+  onExit: -> @instructor_tasks.task_poller.stop()
 
 # export for use
 # create parent namespaces if they do not already exist.
-# abort if underscore can not be found.
-if _?
-  _.defaults window, InstructorDashboard: {}
-  _.defaults window.InstructorDashboard, sections: {}
-  _.defaults window.InstructorDashboard.sections,
-    CourseInfo: CourseInfo
+_.defaults window, InstructorDashboard: {}
+_.defaults window.InstructorDashboard, sections: {}
+_.defaults window.InstructorDashboard.sections,
+  CourseInfo: CourseInfo

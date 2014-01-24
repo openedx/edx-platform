@@ -1,14 +1,15 @@
+from datetime import datetime, timedelta
 import os
 import string
 import random
 import re
-from polib import pofile
 from unittest import TestCase
-from datetime import datetime, timedelta
+
+from polib import pofile
 from pytz import UTC
 
-import generate
-from config import CONFIGURATION
+from i18n import generate
+from i18n.config import CONFIGURATION
 
 
 class TestGenerate(TestCase):
@@ -48,7 +49,10 @@ class TestGenerate(TestCase):
                 self.assertTrue(exists, msg='Missing file in locale %s: %s' % (locale, mofile))
                 self.assertTrue(datetime.fromtimestamp(os.path.getmtime(path), UTC) >= self.start_time,
                                 msg='File not recently modified: %s' % path)
-            self.assert_merge_headers(locale)
+            # Segmenting means that the merge headers don't work they way they
+            # used to, so don't make this check for now. I'm not sure if we'll
+            # get the merge header back eventually, or delete this code eventually.
+            # self.assert_merge_headers(locale)
 
     def assert_merge_headers(self, locale):
         """

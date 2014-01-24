@@ -3,8 +3,10 @@
     <div id="example">
       <div
         id="video_id"
-        class="video"
+        class="video closed"
         data-show-captions="true"
+        data-save-state-url="/save_user_state"
+        data-speed="1.5"
         data-start=""
         data-end=""
         data-caption-asset-path="/static/subs/"
@@ -15,17 +17,20 @@
         data-autoplay="False"
         data-yt-test-timeout="1500"
         data-yt-test-url="https://gdata.youtube.com/feeds/api/videos/"
+        data-autohide-html5="True"
       >
         <div class="focus_grabber first"></div>
 
         <div class="tc-wrapper">
           <article class="video-wrapper">
+            <span tabindex="0" class="spinner" aria-hidden="false" aria-label="${_('Loading video player')}"></span>
+            <span tabindex="-1" class="btn-play is-hidden" aria-hidden="true" aria-label="${_('Play video')}"></span>
             <div class="video-player-pre"></div>
             <section class="video-player">
               <div id="id"></div>
             </section>
             <div class="video-player-post"></div>
-            <section class="video-controls">
+            <section class="video-controls is-hidden">
               <div class="slider"></div>
               <div>
                 <ul class="vcr">
@@ -47,7 +52,7 @@
                     </div>
                   </div>
                   <a href="#" class="add-fullscreen" title="Fill browser" role="button" aria-disabled="false">Fill Browser</a>
-                  <a href="#" class="quality_control" title="HD" role="button" aria-disabled="false">HD</a>
+                  <a href="#" class="quality_control" title="HD off" role="button" aria-disabled="false">HD off</a>
                   <a href="#" class="hide-subtitles" title="Turn off captions" role="button" aria-disabled="false">Captions</a>
                 </div>
               </div>

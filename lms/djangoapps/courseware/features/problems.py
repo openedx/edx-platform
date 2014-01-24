@@ -7,59 +7,35 @@ Steps for problem.feature lettuce tests
 
 from lettuce import world, step
 from lettuce.django import django_url
-from common import i_am_registered_for_the_course
+from common import i_am_registered_for_the_course, visit_scenario_item
 from problems_setup import PROBLEM_DICT, answer_problem, problem_has_answer, add_problem_to_course
+from nose.tools import assert_equal
+
+
+def _view_problem(step, problem_type, problem_settings=None):
+    i_am_registered_for_the_course(step, 'model_course')
+
+    # Ensure that the course has this problem type
+    add_problem_to_course(world.scenario_dict['COURSE'].number, problem_type, problem_settings)
+
+    # Go to the one section in the factory-created course
+    # which should be loaded with the correct problem
+    visit_scenario_item('SECTION')
 
 
 @step(u'I am viewing a "([^"]*)" problem with "([^"]*)" attempt')
 def view_problem_with_attempts(step, problem_type, attempts):
-    i_am_registered_for_the_course(step, 'model_course')
-
-    # Ensure that the course has this problem type
-    add_problem_to_course(world.scenario_dict['COURSE'].number, problem_type, {'max_attempts': attempts})
-
-    # Go to the one section in the factory-created course
-    # which should be loaded with the correct problem
-    chapter_name = world.scenario_dict['SECTION'].display_name.replace(" ", "_")
-    section_name = chapter_name
-    url = django_url('/courses/%s/%s/%s/courseware/%s/%s' %
-                    (world.scenario_dict['COURSE'].org, world.scenario_dict['COURSE'].number, world.scenario_dict['COURSE'].display_name.replace(' ', '_'),
-                        chapter_name, section_name,))
-    world.browser.visit(url)
+    _view_problem(step, problem_type, {'max_attempts': attempts})
 
 
 @step(u'I am viewing a "([^"]*)" that shows the answer "([^"]*)"')
 def view_problem_with_show_answer(step, problem_type, answer):
-    i_am_registered_for_the_course(step, 'model_course')
-
-    # Ensure that the course has this problem type
-    add_problem_to_course('model_course', problem_type, {'showanswer': answer})
-
-    # Go to the one section in the factory-created course
-    # which should be loaded with the correct problem
-    chapter_name = world.scenario_dict['SECTION'].display_name.replace(" ", "_")
-    section_name = chapter_name
-    url = django_url('/courses/%s/%s/%s/courseware/%s/%s' %
-                    (world.scenario_dict['COURSE'].org, world.scenario_dict['COURSE'].number, world.scenario_dict['COURSE'].display_name.replace(' ', '_'),
-                        chapter_name, section_name,))
-    world.browser.visit(url)
+    _view_problem(step, problem_type, {'showanswer': answer})
 
 
 @step(u'I am viewing a "([^"]*)" problem')
 def view_problem(step, problem_type):
-    i_am_registered_for_the_course(step, 'model_course')
-
-    # Ensure that the course has this problem type
-    add_problem_to_course('model_course', problem_type)
-
-    # Go to the one section in the factory-created course
-    # which should be loaded with the correct problem
-    chapter_name = world.scenario_dict['SECTION'].display_name.replace(" ", "_")
-    section_name = chapter_name
-    url = django_url('/courses/%s/%s/%s/courseware/%s/%s' %
-                    (world.scenario_dict['COURSE'].org, world.scenario_dict['COURSE'].number, world.scenario_dict['COURSE'].display_name.replace(' ', '_'),
-                        chapter_name, section_name,))
-    world.browser.visit(url)
+    _view_problem(step, problem_type)
 
 
 @step(u'External graders respond "([^"]*)"')
@@ -72,7 +48,7 @@ def set_external_grader_response(step, correctness):
 
     # Set the fake xqueue server to always respond
     # correct/incorrect when asked to grade a problem
-    world.xqueue_server.set_grade_response(response_dict)
+    world.xqueue.set_config('grade_response', response_dict)
 
 
 @step(u'I answer a "([^"]*)" problem "([^"]*)ly"')
@@ -96,7 +72,7 @@ def input_problem_answer(_, problem_type, correctness):
     """
     assert(correctness in ['correct', 'incorrect'])
     assert(problem_type in PROBLEM_DICT)
-    answer_problem(problem_type, correctness)
+    answer_problem(world.scenario_dict['COURSE'].number, problem_type, correctness)
 
 
 @step(u'I check a problem')
@@ -105,6 +81,9 @@ def check_problem(step):
     # cover up the Check button
     world.browser.execute_script("window.scrollTo(0,1024)")
     world.css_click("input.check")
+
+    # Wait for the problem to finish re-rendering
+    world.wait_for_ajax_complete()
 
 
 @step(u'The "([^"]*)" problem displays a "([^"]*)" answer')
@@ -119,12 +98,15 @@ def assert_problem_has_answer(step, problem_type, answer_class):
     '''
     assert answer_class in ['correct', 'incorrect', 'blank']
     assert problem_type in PROBLEM_DICT
-    problem_has_answer(problem_type, answer_class)
+    problem_has_answer(world.scenario_dict['COURSE'].number, problem_type, answer_class)
 
 
 @step(u'I reset the problem')
 def reset_problem(_step):
     world.css_click('input.reset')
+
+    # Wait for the problem to finish re-rendering
+    world.wait_for_ajax_complete()
 
 
 @step(u'I press the button with the label "([^"]*)"$')
@@ -138,23 +120,28 @@ def press_the_button_with_label(_step, buttonname):
 @step(u'The "([^"]*)" button does( not)? appear')
 def action_button_present(_step, buttonname, doesnt_appear):
     button_css = 'section.action input[value*="%s"]' % buttonname
-    if doesnt_appear:
+    if bool(doesnt_appear):
         assert world.is_css_not_present(button_css)
     else:
         assert world.is_css_present(button_css)
 
 
-@step(u'the button with the label "([^"]*)" does( not)? appear')
-def button_with_label_present(_step, buttonname, doesnt_appear):
-    if doesnt_appear:
-        assert world.browser.is_text_not_present(buttonname, wait_time=5)
-    else:
-        assert world.browser.is_text_present(buttonname, wait_time=5)
+@step(u'the Show/Hide button label is "([^"]*)"$')
+def show_hide_label_is(_step, label_name):
+    # The label text is changed by static/xmodule_js/src/capa/display.js
+    # so give it some time to change on the page.
+    label_css = 'button.show span.show-label'
+    world.wait_for(lambda _: world.css_has_text(label_css, label_name))
 
 
 @step(u'I should see a score of "([^"]*)"$')
 def see_score(_step, score):
-    assert world.browser.is_text_present(score)
+    # The problem progress is changed by
+    # cms/static/xmodule_js/src/capa/display.js
+    # so give it some time to render on the page.
+    score_css = 'section.problem-progress'
+    expected_text = '({})'.format(score)
+    world.wait_for(lambda _: world.css_has_text(score_css, expected_text))
 
 
 @step(u'[Mm]y "([^"]*)" answer is( NOT)? marked "([^"]*)"')
@@ -166,14 +153,13 @@ def assert_answer_mark(_step, problem_type, isnt_marked, correctness):
     *problem_type* is a string identifying the type of problem (e.g. 'drop down')
     *correctness* is in ['correct', 'incorrect', 'unanswered']
     """
-
     # Determine which selector(s) to look for based on correctness
     assert(correctness in ['correct', 'incorrect', 'unanswered'])
     assert(problem_type in PROBLEM_DICT)
 
     # At least one of the correct selectors should be present
     for sel in PROBLEM_DICT[problem_type][correctness]:
-        if isnt_marked:
+        if bool(isnt_marked):
             has_expected = world.is_css_not_present(sel)
         else:
             has_expected = world.is_css_present(sel)

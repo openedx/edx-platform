@@ -7,7 +7,7 @@ class @Hinter
   constructor: (element) ->
     @el = $(element).find('.crowdsource-wrapper')
     @url = @el.data('url')
-    Logger.listen('problem_graded', @el.data('child-url'), @capture_problem)
+    Logger.listen('problem_graded', @el.data('child-id'), @capture_problem)
     @render()
 
   capture_problem: (event_type, data, element) =>

@@ -6,6 +6,7 @@ already been submitted, filtered either by running state or input
 arguments.
 
 """
+import hashlib
 
 from celery.states import READY_STATES
 
@@ -14,11 +15,14 @@ from xmodule.modulestore.django import modulestore
 from instructor_task.models import InstructorTask
 from instructor_task.tasks import (rescore_problem,
                                    reset_problem_attempts,
-                                   delete_problem_state)
+                                   delete_problem_state,
+                                   send_bulk_course_email,
+                                   calculate_grades_csv)
 
 from instructor_task.api_helper import (check_arguments_for_rescoring,
                                         encode_problem_and_student_input,
                                         submit_task)
+from bulk_email.models import CourseEmail
 
 
 def get_running_instructor_tasks(course_id):
@@ -34,14 +38,18 @@ def get_running_instructor_tasks(course_id):
     return instructor_tasks.order_by('-id')
 
 
-def get_instructor_task_history(course_id, problem_url, student=None):
+def get_instructor_task_history(course_id, problem_url=None, student=None, task_type=None):
     """
     Returns a query of InstructorTask objects of historical tasks for a given course,
-    that match a particular problem and optionally a student.
+    that optionally match a particular problem, a student, and/or a task type.
     """
-    _, task_key = encode_problem_and_student_input(problem_url, student)
+    instructor_tasks = InstructorTask.objects.filter(course_id=course_id)
+    if problem_url is not None or student is not None:
+        _, task_key = encode_problem_and_student_input(problem_url, student)
+        instructor_tasks = instructor_tasks.filter(task_key=task_key)
+    if task_type is not None:
+        instructor_tasks = instructor_tasks.filter(task_type=task_type)
 
-    instructor_tasks = InstructorTask.objects.filter(course_id=course_id, task_key=task_key)
     return instructor_tasks.order_by('-id')
 
 
@@ -161,4 +169,53 @@ def submit_delete_problem_state_for_all_students(request, course_id, problem_url
     task_type = 'delete_problem_state'
     task_class = delete_problem_state
     task_input, task_key = encode_problem_and_student_input(problem_url)
+    return submit_task(request, task_type, task_class, course_id, task_input, task_key)
+
+
+def submit_bulk_course_email(request, course_id, email_id):
+    """
+    Request to have bulk email sent as a background task.
+
+    The specified CourseEmail object will be sent be updated for all students who have enrolled
+    in a course.  Parameters are the `course_id` and the `email_id`, the id of the CourseEmail object.
+
+    AlreadyRunningError is raised if the same recipients are already being emailed with the same
+    CourseEmail object.
+
+    This method makes sure the InstructorTask entry is committed.
+    When called from any view that is wrapped by TransactionMiddleware,
+    and thus in a "commit-on-success" transaction, an autocommit buried within here
+    will cause any pending transaction to be committed by a successful
+    save here.  Any future database operations will take place in a
+    separate transaction.
+    """
+    # Assume that the course is defined, and that the user has already been verified to have
+    # appropriate access to the course. But make sure that the email exists.
+    # We also pull out the To argument here, so that is displayed in
+    # the InstructorTask status.
+    email_obj = CourseEmail.objects.get(id=email_id)
+    to_option = email_obj.to_option
+
+    task_type = 'bulk_course_email'
+    task_class = send_bulk_course_email
+    # Pass in the to_option as a separate argument, even though it's (currently)
+    # in the CourseEmail.  That way it's visible in the progress status.
+    # (At some point in the future, we might take the recipient out of the CourseEmail,
+    # so that the same saved email can be sent to different recipients, as it is tested.)
+    task_input = {'email_id': email_id, 'to_option': to_option}
+    task_key_stub = "{email_id}_{to_option}".format(email_id=email_id, to_option=to_option)
+    # create the key value by using MD5 hash:
+    task_key = hashlib.md5(task_key_stub).hexdigest()
+    return submit_task(request, task_type, task_class, course_id, task_input, task_key)
+
+
+def submit_calculate_grades_csv(request, course_id):
+    """
+    AlreadyRunningError is raised if the course's grades are already being updated.
+    """
+    task_type = 'grade_course'
+    task_class = calculate_grades_csv
+    task_input = {}
+    task_key = ""
+
     return submit_task(request, task_type, task_class, course_id, task_input, task_key)

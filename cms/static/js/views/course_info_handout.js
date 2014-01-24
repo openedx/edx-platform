@@ -1,9 +1,8 @@
-define(["backbone", "underscore", "codemirror", "js/views/feedback_notification", "js/views/course_info_helper"],
-    function(Backbone, _, CodeMirror, NotificationView, CourseInfoHelper) {
+define(["js/views/baseview", "underscore", "codemirror", "js/views/feedback_notification", "js/views/course_info_helper", "js/utils/modal"],
+    function(BaseView, _, CodeMirror, NotificationView, CourseInfoHelper, ModalUtils) {
 
-    var $modalCover = $(".modal-cover");
     // the handouts view is dumb right now; it needs tied to a model and all that jazz
-    var CourseInfoHandoutsView = Backbone.View.extend({
+    var CourseInfoHandoutsView = BaseView.extend({
         // collection is CourseUpdateCollection
         events: {
             "click .save-button" : "onSave",
@@ -31,6 +30,7 @@ define(["backbone", "underscore", "codemirror", "js/views/feedback_notification"
                     model: this.model
                 }))
             );
+            $('.handouts-content').html(this.model.get('data'));
             this.$preview = this.$el.find('.handouts-content');
             this.$form = this.$el.find(".edit-handouts-form");
             this.$editor = this.$form.find('.handouts-content-editor');
@@ -47,42 +47,49 @@ define(["backbone", "underscore", "codemirror", "js/views/feedback_notification"
             this.$codeMirror = CourseInfoHelper.editWithCodeMirror(
                 self.model, 'data', self.options['base_asset_url'], this.$editor.get(0));
 
-            $modalCover.show();
-            $modalCover.bind('click', function() {
-                self.closeEditor();
-            });
+            ModalUtils.showModalCover(false, function() { self.closeEditor() });
         },
 
         onSave: function(event) {
-            this.model.set('data', this.$codeMirror.getValue());
-            var saving = new NotificationView.Mini({
-                title: gettext('Saving&hellip;')
-            });
-            saving.show();
-            this.model.save({}, {
-                success: function() {
-                    saving.hide();
-                }
-            });
-            this.render();
-            this.$form.hide();
-            this.closeEditor();
+            $('#handout_error').removeClass('is-shown');
+            $('.save-button').removeClass('is-disabled');
+            if ($('.CodeMirror-lines').find('.cm-error').length == 0){
+                this.model.set('data', this.$codeMirror.getValue());
+                var saving = new NotificationView.Mini({
+                    title: gettext('Saving&hellip;')
+                });
+                saving.show();
+                this.model.save({}, {
+                    success: function() {
+                        saving.hide();
+                    }
+                });
+                this.render();
+                this.$form.hide();
+                this.closeEditor();
 
-            analytics.track('Saved Course Handouts', {
-                'course': course_location_analytics
-            });
-
+                analytics.track('Saved Course Handouts', {
+                    'course': course_location_analytics
+                });
+            }else{
+                $('#handout_error').addClass('is-shown');
+                $('.save-button').addClass('is-disabled');
+                event.preventDefault();
+            }
         },
 
         onCancel: function(event) {
+            $('#handout_error').removeClass('is-shown');
+            $('.save-button').removeClass('is-disabled');
             this.$form.hide();
             this.closeEditor();
         },
 
         closeEditor: function() {
+            $('#handout_error').removeClass('is-shown');
+            $('.save-button').removeClass('is-disabled');
             this.$form.hide();
-            $modalCover.unbind('click');
-            $modalCover.hide();
+            ModalUtils.hideModalCover();
             this.$form.find('.CodeMirror').remove();
             this.$codeMirror = null;
         }

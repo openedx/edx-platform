@@ -6,10 +6,10 @@ JSON views which the instructor dashboard requests.
 Many of these GETs may become PUTs in the future.
 """
 
-import re
+import json
 import logging
+import re
 import requests
-from collections import OrderedDict
 from django.conf import settings
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
@@ -31,14 +31,28 @@ from courseware.models import StudentModule
 from student.models import unique_id_for_user
 import instructor_task.api
 from instructor_task.api_helper import AlreadyRunningError
+from instructor_task.views import get_task_completion_info
+from instructor_task.models import GradesStore
 import instructor.enrollment as enrollment
-from instructor.enrollment import enroll_email, unenroll_email
-from instructor.views.tools import strip_if_string, get_student_from_identifier
-import instructor.access as access
+from instructor.enrollment import enroll_email, unenroll_email, get_email_params
+from instructor.access import list_with_level, allow_access, revoke_access, update_forum_role
 import analytics.basic
 import analytics.distributions
 import analytics.csvs
 import csv
+
+from bulk_email.models import CourseEmail
+
+from .tools import (
+    dump_student_extensions,
+    dump_module_extensions,
+    find_unit,
+    get_student_from_identifier,
+    handle_dashboard_error,
+    parse_datetime,
+    set_due_date_extension,
+    strip_if_string,
+)
 
 log = logging.getLogger(__name__)
 
@@ -95,7 +109,44 @@ def require_query_params(*args, **kwargs):
             for (param, extra) in required_params:
                 default = object()
                 if request.GET.get(param, default) == default:
-                    error_response_data['parameters'] += [param]
+                    error_response_data['parameters'].append(param)
+                    error_response_data['info'][param] = extra
+
+            if len(error_response_data['parameters']) > 0:
+                return JsonResponse(error_response_data, status=400)
+            else:
+                return func(*args, **kwargs)
+        return wrapped
+    return decorator
+
+
+def require_post_params(*args, **kwargs):
+    """
+    Checks for required parameters or renders a 400 error.
+    (decorator with arguments)
+
+    Functions like 'require_query_params', but checks for
+    POST parameters rather than GET parameters.
+    """
+    required_params = []
+    required_params += [(arg, None) for arg in args]
+    required_params += [(key, kwargs[key]) for key in kwargs]
+    # required_params = e.g. [('action', 'enroll or unenroll'), ['emails', None]]
+
+    def decorator(func):  # pylint: disable=C0111
+        def wrapped(*args, **kwargs):  # pylint: disable=C0111
+            request = args[0]
+
+            error_response_data = {
+                'error': 'Missing required query parameter(s)',
+                'parameters': [],
+                'info': {},
+            }
+
+            for (param, extra) in required_params:
+                default = object()
+                if request.POST.get(param, default) == default:
+                    error_response_data['parameters'].append(param)
                     error_response_data['info'][param] = extra
 
             if len(error_response_data['parameters']) > 0:
@@ -117,7 +168,7 @@ def require_level(level):
 
     `level` is in ['instructor', 'staff']
     if `level` is 'staff', instructors will also be allowed, even
-        if they are not int he staff group.
+        if they are not in the staff group.
     """
     if level not in ['instructor', 'staff']:
         raise ValueError("unrecognized level '{}'".format(level))
@@ -149,7 +200,10 @@ def students_update_enrollment(request, course_id):
     - emails is string containing a list of emails separated by anything split_input_list can handle.
     - auto_enroll is a boolean (defaults to false)
         If auto_enroll is false, students will be allowed to enroll.
-        If auto_enroll is true, students will be enroled as soon as they register.
+        If auto_enroll is true, students will be enrolled as soon as they register.
+    - email_students is a boolean (defaults to false)
+        If email_students is true, students will be sent email notification
+        If email_students is false, students will not be sent email notification
 
     Returns an analog to this JSON structure: {
         "action": "enroll",
@@ -173,18 +227,25 @@ def students_update_enrollment(request, course_id):
         ]
     }
     """
+
     action = request.GET.get('action')
     emails_raw = request.GET.get('emails')
     emails = _split_input_list(emails_raw)
     auto_enroll = request.GET.get('auto_enroll') in ['true', 'True', True]
+    email_students = request.GET.get('email_students') in ['true', 'True', True]
+
+    email_params = {}
+    if email_students:
+        course = get_course_by_id(course_id)
+        email_params = get_email_params(course, auto_enroll)
 
     results = []
     for email in emails:
         try:
             if action == 'enroll':
-                before, after = enroll_email(course_id, email, auto_enroll)
+                before, after = enroll_email(course_id, email, auto_enroll, email_students, email_params)
             elif action == 'unenroll':
-                before, after = unenroll_email(course_id, email)
+                before, after = unenroll_email(course_id, email, email_students, email_params)
             else:
                 return HttpResponseBadRequest("Unrecognized action '{}'".format(action))
 
@@ -254,9 +315,9 @@ def modify_access(request, course_id):
         )
 
     if action == 'allow':
-        access.allow_access(course, user, rolename)
+        allow_access(course, user, rolename)
     elif action == 'revoke':
-        access.revoke_access(course, user, rolename)
+        revoke_access(course, user, rolename)
     else:
         return HttpResponseBadRequest("unrecognized action '{}'".format(action))
 
@@ -312,7 +373,7 @@ def list_course_role_members(request, course_id):
 
     response_payload = {
         'course_id': course_id,
-        rolename: map(extract_user_info, access.list_with_level(
+        rolename: map(extract_user_info, list_with_level(
             course, rolename
         )),
     }
@@ -341,7 +402,7 @@ def get_grading_config(request, course_id):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-def get_students_features(request, course_id, csv=False):  # pylint: disable=W0613
+def get_students_features(request, course_id, csv=False):  # pylint: disable=W0613, W0621
     """
     Respond with json which contains a summary of all enrolled students profile information.
 
@@ -397,7 +458,7 @@ def get_anon_ids(request, course_id):  # pylint: disable=W0613
     students = User.objects.filter(
         courseenrollment__course_id=course_id,
     ).order_by('id')
-    header =['User ID', 'Anonymized user ID']
+    header = ['User ID', 'Anonymized user ID']
     rows = [[s.id, unique_id_for_user(s)] for s in students]
     return csv_response(course_id.replace('/', '-') + '-anon-ids.csv', header, rows)
 
@@ -603,13 +664,68 @@ def rescore_problem(request, course_id):
     return JsonResponse(response_payload)
 
 
+def extract_task_features(task):
+    """
+    Convert task to dict for json rendering.
+    Expects tasks have the following features:
+    * task_type (str, type of task)
+    * task_input (dict, input(s) to the task)
+    * task_id (str, celery id of the task)
+    * requester (str, username who submitted the task)
+    * task_state (str, state of task eg PROGRESS, COMPLETED)
+    * created (datetime, when the task was completed)
+    * task_output (optional)
+    """
+    # Pull out information from the task
+    features = ['task_type', 'task_input', 'task_id', 'requester', 'task_state']
+    task_feature_dict = {feature: str(getattr(task, feature)) for feature in features}
+    # Some information (created, duration, status, task message) require additional formatting
+    task_feature_dict['created'] = task.created.isoformat()
+
+    # Get duration info, if known
+    duration_sec = 'unknown'
+    if hasattr(task, 'task_output') and task.task_output is not None:
+        try:
+            task_output = json.loads(task.task_output)
+        except ValueError:
+            log.error("Could not parse task output as valid json; task output: %s", task.task_output)
+        else:
+            if 'duration_ms' in task_output:
+                duration_sec = int(task_output['duration_ms'] / 1000.0)
+    task_feature_dict['duration_sec'] = duration_sec
+
+    # Get progress status message & success information
+    success, task_message = get_task_completion_info(task)
+    status = _("Complete") if success else _("Incomplete")
+    task_feature_dict['status'] = status
+    task_feature_dict['task_message'] = task_message
+
+    return task_feature_dict
+
+
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_level('instructor')
+@require_level('staff')
+def list_background_email_tasks(request, course_id):  # pylint: disable=unused-argument
+    """
+    List background email tasks.
+    """
+    task_type = 'bulk_course_email'
+    # Specifying for the history of a single task type
+    tasks = instructor_task.api.get_instructor_task_history(course_id, task_type=task_type)
+
+    response_payload = {
+        'tasks': map(extract_task_features, tasks),
+    }
+    return JsonResponse(response_payload)
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
 def list_instructor_tasks(request, course_id):
     """
     List instructor tasks.
-    Limited to instructor access.
 
     Takes optional query paremeters.
         - With no arguments, lists running tasks.
@@ -630,21 +746,55 @@ def list_instructor_tasks(request, course_id):
     if problem_urlname:
         module_state_key = _msk_from_problem_urlname(course_id, problem_urlname)
         if student:
+            # Specifying for a single student's history on this problem
             tasks = instructor_task.api.get_instructor_task_history(course_id, module_state_key, student)
         else:
+            # Specifying for single problem's history
             tasks = instructor_task.api.get_instructor_task_history(course_id, module_state_key)
     else:
+        # If no problem or student, just get currently running tasks
         tasks = instructor_task.api.get_running_instructor_tasks(course_id)
-
-    def extract_task_features(task):
-        """ Convert task to dict for json rendering """
-        features = ['task_type', 'task_input', 'task_id', 'requester', 'created', 'task_state']
-        return dict((feature, str(getattr(task, feature))) for feature in features)
 
     response_payload = {
         'tasks': map(extract_task_features, tasks),
     }
     return JsonResponse(response_payload)
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+def list_grade_downloads(_request, course_id):
+    """
+    List grade CSV files that are available for download for this course.
+    """
+    grades_store = GradesStore.from_config()
+
+    response_payload = {
+        'downloads': [
+            dict(name=name, url=url, link='<a href="{}">{}</a>'.format(url, name))
+            for name, url in grades_store.links_for(course_id)
+        ]
+    }
+    return JsonResponse(response_payload)
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+def calculate_grades_csv(request, course_id):
+    """
+    AlreadyRunningError is raised if the course's grades are already being updated.
+    """
+    try:
+        instructor_task.api.submit_calculate_grades_csv(request, course_id)
+        success_status = _("Your grade report is being generated! You can view the status of the generation task in the 'Pending Instructor Tasks' section.")
+        return JsonResponse({"status": success_status})
+    except AlreadyRunningError:
+        already_running_status = _("A grade report generation task is already in progress. Check the 'Pending Instructor Tasks' table for the status of the task. When completed, the report will be available for download in the table below.")
+        return JsonResponse({
+            "status": already_running_status
+        })
 
 
 @ensure_csrf_cookie
@@ -709,6 +859,36 @@ def list_forum_members(request, course_id):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
+@require_post_params(send_to="sending to whom", subject="subject line", message="message text")
+def send_email(request, course_id):
+    """
+    Send an email to self, staff, or everyone involved in a course.
+    Query Parameters:
+    - 'send_to' specifies what group the email should be sent to
+       Options are defined by the CourseEmail model in
+       lms/djangoapps/bulk_email/models.py
+    - 'subject' specifies email's subject
+    - 'message' specifies email's content
+    """
+    send_to = request.POST.get("send_to")
+    subject = request.POST.get("subject")
+    message = request.POST.get("message")
+
+    # Create the CourseEmail object.  This is saved immediately, so that
+    # any transaction that has been pending up to this point will also be
+    # committed.
+    email = CourseEmail.create(course_id, request.user, send_to, subject, message)
+
+    # Submit the task, so that the correct InstructorTask object gets created (for monitoring purposes)
+    instructor_task.api.submit_bulk_course_email(request, course_id, email.id)  # pylint: disable=E1101
+
+    response_payload = {'course_id': course_id}
+    return JsonResponse(response_payload)
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
 @require_query_params(
     email="the target users email",
     rolename="the forum role",
@@ -759,7 +939,7 @@ def update_forum_role_membership(request, course_id):
         return HttpResponseBadRequest("Cannot revoke instructor forum admin privelages.")
 
     try:
-        access.update_forum_role_membership(course_id, user, rolename, action)
+        update_forum_role(course_id, user, rolename, action)
     except Role.DoesNotExist:
         return HttpResponseBadRequest("Role does not exist.")
 
@@ -798,7 +978,7 @@ def proxy_legacy_analytics(request, course_id):
 
     try:
         res = requests.get(url)
-    except Exception:
+    except Exception:  # pylint: disable=broad-except
         log.exception("Error requesting from analytics server at %s", url)
         return HttpResponse("Error requesting from analytics server.", status=500)
 
@@ -819,6 +999,87 @@ def proxy_legacy_analytics(request, course_id):
             "Error from analytics server ({}).".format(res.status_code),
             status=500
         )
+
+
+def _display_unit(unit):
+    """
+    Gets string for displaying unit to user.
+    """
+    name = getattr(unit, 'display_name', None)
+    if name:
+        return u'{0} ({1})'.format(name, unit.location.url())
+    else:
+        return unit.location.url()
+
+
+@handle_dashboard_error
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+@require_query_params('student', 'url', 'due_datetime')
+def change_due_date(request, course_id):
+    """
+    Grants a due date extension to a student for a particular unit.
+    """
+    course = get_course_by_id(course_id)
+    student = get_student_from_identifier(request.GET.get('student'))
+    unit = find_unit(course, request.GET.get('url'))
+    due_date = parse_datetime(request.GET.get('due_datetime'))
+    set_due_date_extension(course, unit, student, due_date)
+
+    return JsonResponse(_(
+        'Successfully changed due date for student {0} for {1} '
+        'to {2}').format(student.profile.name, _display_unit(unit),
+                         due_date.strftime('%Y-%m-%d %H:%M')))
+
+
+@handle_dashboard_error
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+@require_query_params('student', 'url')
+def reset_due_date(request, course_id):
+    """
+    Rescinds a due date extension for a student on a particular unit.
+    """
+    course = get_course_by_id(course_id)
+    student = get_student_from_identifier(request.GET.get('student'))
+    unit = find_unit(course, request.GET.get('url'))
+    set_due_date_extension(course, unit, student, None)
+
+    return JsonResponse(_(
+        'Successfully reset due date for student {0} for {1} '
+        'to {2}').format(student.profile.name, _display_unit(unit),
+                         unit.due.strftime('%Y-%m-%d %H:%M')))
+
+
+@handle_dashboard_error
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+@require_query_params('url')
+def show_unit_extensions(request, course_id):
+    """
+    Shows all of the students which have due date extensions for the given unit.
+    """
+    course = get_course_by_id(course_id)
+    unit = find_unit(course, request.GET.get('url'))
+    return JsonResponse(dump_module_extensions(course, unit))
+
+
+@handle_dashboard_error
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+@require_query_params('student')
+def show_student_extensions(request, course_id):
+    """
+    Shows all of the due date extensions granted to a particular student in a
+    particular course.
+    """
+    student = get_student_from_identifier(request.GET.get('student'))
+    course = get_course_by_id(course_id)
+    return JsonResponse(dump_student_extensions(course, student))
 
 
 def _split_input_list(str_list):

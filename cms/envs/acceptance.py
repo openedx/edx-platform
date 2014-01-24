@@ -14,9 +14,10 @@ from lms.envs.sauce import *
 # otherwise the browser will not render the pages correctly
 DEBUG = True
 
-# Disable warnings for acceptance tests, to make the logs readable
+# Output Django logs to a file
 import logging
-logging.disable(logging.ERROR)
+logging.basicConfig(filename=TEST_ROOT / "log" / "cms_acceptance.log", level=logging.ERROR)
+
 import os
 from random import choice, randint
 
@@ -30,30 +31,33 @@ DOC_STORE_CONFIG = {
     'collection': 'acceptance_modulestore_%s' % seed(),
 }
 
-MODULESTORE_OPTIONS = dict({
+MODULESTORE_OPTIONS = {
     'default_class': 'xmodule.raw_module.RawDescriptor',
     'fs_root': TEST_ROOT / "data",
-    'render_template': 'mitxmako.shortcuts.render_to_string',
-}, **DOC_STORE_CONFIG)
+    'render_template': 'edxmako.shortcuts.render_to_string',
+}
 
 MODULESTORE = {
     'default': {
         'ENGINE': 'xmodule.modulestore.draft.DraftModuleStore',
+        'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
         'OPTIONS': MODULESTORE_OPTIONS
     },
     'direct': {
         'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
+        'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
         'OPTIONS': MODULESTORE_OPTIONS
     },
     'draft': {
         'ENGINE': 'xmodule.modulestore.draft.DraftModuleStore',
+        'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
         'OPTIONS': MODULESTORE_OPTIONS
     }
 }
 
 CONTENTSTORE = {
     'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
-    'OPTIONS': {
+    'DOC_STORE_CONFIG': {
         'host': 'localhost',
         'db': 'acceptance_xcontent_%s' % seed(),
     },
@@ -76,8 +80,14 @@ DATABASES = {
     }
 }
 
+# Enable asset pipeline
+# Our fork of django-pipeline uses `PIPELINE` instead of `PIPELINE_ENABLED`
+# PipelineFinder is explained here: http://django-pipeline.readthedocs.org/en/1.1.24/storages.html
+PIPELINE = True
+STATICFILES_FINDERS += ('pipeline.finders.PipelineFinder', )
+
 # Use the auto_auth workflow for creating users and logging them in
-MITX_FEATURES['AUTOMATIC_AUTH_FOR_TESTING'] = True
+FEATURES['AUTOMATIC_AUTH_FOR_TESTING'] = True
 
 # HACK
 # Setting this flag to false causes imports to not load correctly in the lettuce python files
@@ -104,9 +114,6 @@ try:
 except ImportError:
     pass
 
-# Because an override for where to run will affect which ports to use,
-# set this up after the local overrides.
-if LETTUCE_SELENIUM_CLIENT == 'saucelabs':
-    LETTUCE_SERVER_PORT = choice(PORTS)
-else:
-    LETTUCE_SERVER_PORT = randint(1024, 65535)
+# Point the URL used to test YouTube availability to our stub YouTube server
+YOUTUBE_TEST_URL = "http://127.0.0.1:{0}/test_youtube/".format(YOUTUBE_PORT)
+YOUTUBE_API['url'] = "http://127.0.0.1:{0}/test_transcripts_youtube/".format(YOUTUBE_PORT)

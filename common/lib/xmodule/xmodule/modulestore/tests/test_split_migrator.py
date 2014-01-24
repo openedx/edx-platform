@@ -31,23 +31,28 @@ class TestMigration(unittest.TestCase):
     db_config = {
         'host': 'localhost',
         'db': 'test_xmodule',
-        'collection': 'modulestore{0}'.format(uuid.uuid4().hex),
+        'collection': 'modulestore{0}'.format(uuid.uuid4().hex[:5]),
     }
 
-    modulestore_options = dict({
+    modulestore_options = {
         'default_class': 'xmodule.raw_module.RawDescriptor',
         'fs_root': '',
         'render_template': mock.Mock(return_value=""),
         'xblock_mixins': (InheritanceMixin,)
-    }, **db_config)
+    }
 
     def setUp(self):
         super(TestMigration, self).setUp()
-        self.loc_mapper = LocMapperStore(**self.db_config)
-        self.old_mongo = MongoModuleStore(**self.modulestore_options)
-        self.draft_mongo = DraftModuleStore(**self.modulestore_options)
+        noop_cache = mock.Mock(spec=['get', 'set_many'])
+        noop_cache.configure_mock(**{'get.return_value': None})
+        # pylint: disable=W0142
+        self.loc_mapper = LocMapperStore(noop_cache, **self.db_config)
+        self.old_mongo = MongoModuleStore(self.db_config, **self.modulestore_options)
+        self.draft_mongo = DraftModuleStore(self.db_config, **self.modulestore_options)
         self.split_mongo = SplitMongoModuleStore(
-            loc_mapper=self.loc_mapper, **self.modulestore_options
+            doc_store_config=self.db_config,
+            loc_mapper=self.loc_mapper,
+            **self.modulestore_options
         )
         self.migrator = SplitMigrator(self.split_mongo, self.old_mongo, self.draft_mongo, self.loc_mapper)
         self.course_location = None
@@ -57,9 +62,9 @@ class TestMigration(unittest.TestCase):
         dbref = self.loc_mapper.db
         dbref.drop_collection(self.loc_mapper.location_map)
         split_db = self.split_mongo.db
-        split_db.drop_collection(split_db.course_index)
-        split_db.drop_collection(split_db.structures)
-        split_db.drop_collection(split_db.definitions)
+        split_db.drop_collection(self.split_mongo.db_connection.course_index)
+        split_db.drop_collection(self.split_mongo.db_connection.structures)
+        split_db.drop_collection(self.split_mongo.db_connection.definitions)
         # old_mongo doesn't give a db attr, but all of the dbs are the same
         dbref.drop_collection(self.old_mongo.collection)
 

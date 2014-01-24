@@ -4,6 +4,7 @@ some xmodules by conditions.
 
 import json
 import logging
+from lazy import lazy
 from lxml import etree
 from pkg_resources import resource_string
 
@@ -14,11 +15,12 @@ from xblock.fields import Scope, List
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 
-log = logging.getLogger('mitx.' + __name__)
+log = logging.getLogger('edx.' + __name__)
 
 
 class ConditionalFields(object):
-    show_tag_list = List(help="Poll answers", scope=Scope.content)
+    has_children = True
+    show_tag_list = List(help="List of urls of children that are references to external modules", scope=Scope.content)
 
 
 class ConditionalModule(ConditionalFields, XModule):
@@ -94,12 +96,18 @@ class ConditionalModule(ConditionalFields, XModule):
             xml_value = self.descriptor.xml_attributes.get(xml_attr)
             if xml_value:
                 return xml_value, attr_name
-        raise Exception('Error in conditional module: unknown condition "%s"' % xml_attr)
+        raise Exception(
+            'Error in conditional module: no known conditional found in {!r}'.format(
+                self.descriptor.xml_attributes.keys()
+            )
+        )
+
+    @lazy
+    def required_modules(self):
+        return [self.system.get_module(descriptor) for
+                descriptor in self.descriptor.get_required_module_descriptors()]
 
     def is_condition_satisfied(self):
-        self.required_modules = [self.system.get_module(descriptor) for
-                                 descriptor in self.descriptor.get_required_module_descriptors()]
-
         xml_value, attr_name = self._get_condition()
 
         if xml_value and self.required_modules:
@@ -148,7 +156,7 @@ class ConditionalModule(ConditionalFields, XModule):
                                                context)
             return json.dumps({'html': [html], 'message': bool(message)})
 
-        html = [self.runtime.render_child(child, None, 'student_view').content for child in self.get_display_items()]
+        html = [child.render('student_view').content for child in self.get_display_items()]
 
         return json.dumps({'html': html})
 
@@ -188,6 +196,7 @@ class ConditionalDescriptor(ConditionalFields, SequenceDescriptor):
             locations = [location.strip() for location in sources.split(';')]
             for location in locations:
                 if Location.is_valid(location):  # Check valid location url.
+                    location = Location(location)
                     try:
                         if return_descriptor:
                             descriptor = system.load_item(location)
@@ -213,15 +222,13 @@ class ConditionalDescriptor(ConditionalFields, SequenceDescriptor):
         show_tag_list = []
         for child in xml_object:
             if child.tag == 'show':
-                location = ConditionalDescriptor.parse_sources(
-                    child, system)
+                location = ConditionalDescriptor.parse_sources(child, system)
                 children.extend(location)
-                show_tag_list.extend(location)
+                show_tag_list.extend(location.url())
             else:
                 try:
                     descriptor = system.process_xml(etree.tostring(child))
-                    module_url = descriptor.location.url()
-                    children.append(module_url)
+                    children.append(descriptor.scope_ids.usage_id)
                 except:
                     msg = "Unable to load child when parsing Conditional."
                     log.exception(msg)
@@ -233,7 +240,7 @@ class ConditionalDescriptor(ConditionalFields, SequenceDescriptor):
         for child in self.get_children():
             location = str(child.location)
             if location in self.show_tag_list:
-                show_str = '<{tag_name} sources="{sources}" />'.format(
+                show_str = u'<{tag_name} sources="{sources}" />'.format(
                     tag_name='show', sources=location)
                 xml_object.append(etree.fromstring(show_str))
             else:

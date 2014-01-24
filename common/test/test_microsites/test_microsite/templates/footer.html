@@ -1,0 +1,17 @@
+## mako
+<%! from django.core.urlresolvers import reverse %>
+<%! from django.utils.translation import ugettext as _ %>
+<%! from microsite_configuration.middleware import MicrositeConfiguration %>
+
+<%namespace name='static' file='static_content.html'/>
+
+<div class="wrapper wrapper-footer">
+  <footer>
+    <div class="colophon">
+      <div class="colophon-about">
+        <p>This is a Test Microsite footer</p>
+      </div>
+    </div>
+
+  </footer>
+</div>

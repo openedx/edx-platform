@@ -1,44 +1,47 @@
 import json
 import logging
-import sys
+
+import static_replace
+
 from functools import partial
+from requests.auth import HTTPBasicAuth
+from dogapi import dog_stats_api
 
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
-from django.http import Http404
-from django.http import HttpResponse
+from django.http import Http404, HttpResponse
+import django.utils
 from django.views.decorators.csrf import csrf_exempt
 
-from requests.auth import HTTPBasicAuth
-from dogapi import dog_stats_api
-
 from capa.xqueue_interface import XQueueInterface
-from mitxmako.shortcuts import render_to_string
-from xblock.runtime import DbModel
+from courseware.access import has_access
+from courseware.masquerade import setup_masquerade
+from courseware.model_data import FieldDataCache, DjangoKeyValueStore
+from lms.lib.xblock.field_data import LmsFieldData
+from lms.lib.xblock.runtime import LmsModuleSystem, handler_prefix, unquote_slashes
+from edxmako.shortcuts import render_to_string
+from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
+from student.models import anonymous_id_for_user, user_by_anonymous_id
+from util.json_request import JsonResponse
+from util.sandboxing import can_execute_unsafe_code
+from xblock.core import XBlock
+from xblock.fields import Scope
+from xblock.runtime import KvsFieldData, KeyValueStore
+from xblock.exceptions import NoSuchHandlerError
+from xblock.django.request import django_to_webob_request, webob_to_django_response
 from xmodule.error_module import ErrorDescriptor, NonStaffErrorDescriptor
-from xmodule.errortracker import exc_info_to_str
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.x_module import ModuleSystem
-from xmodule_modifiers import replace_course_urls, replace_jump_to_id_urls, replace_static_urls, add_histogram, wrap_xmodule
+from xmodule.util.duedate import get_extended_due_date
+from xmodule_modifiers import replace_course_urls, replace_jump_to_id_urls, replace_static_urls, add_histogram, wrap_xblock
+from xmodule.lti_module import LTIModule
+from xmodule.x_module import XModuleDescriptor
 
-import static_replace
-from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
-from student.models import unique_id_for_user
-
-from courseware.access import has_access
-from courseware.masquerade import setup_masquerade
-from courseware.model_data import FieldDataCache, DjangoKeyValueStore
-from xblock.runtime import KeyValueStore
-from xblock.fields import Scope
-from util.sandboxing import can_execute_unsafe_code
-from util.json_request import JsonResponse
-from lms.xblock.field_data import lms_field_data
 
 log = logging.getLogger(__name__)
 
@@ -110,7 +113,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
                 sections.append({'display_name': section.display_name_with_default,
                                  'url_name': section.url_name,
                                  'format': section.format if section.format is not None else '',
-                                 'due': section.due,
+                                 'due': get_extended_due_date(section),
                                  'active': active,
                                  'graded': section.graded,
                                  })
@@ -215,21 +218,15 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
     See get_module() docstring for further details.
     """
 
-    # Short circuit--if the user shouldn't have access, bail without doing any work
-    if not has_access(user, descriptor, 'load', course_id):
-        return None
+    # Do not check access when it's a noauth request.
+    if getattr(user, 'known', True):
+        # Short circuit--if the user shouldn't have access, bail without doing any work
+        if not has_access(user, descriptor, 'load', course_id):
+            return None
 
-    # Setup system context for module instance
-    ajax_url = reverse(
-        'modx_dispatch',
-        kwargs=dict(
-            course_id=course_id,
-            location=descriptor.location.url(),
-            dispatch=''
-        ),
-    )
-    # Intended use is as {ajax_url}/{dispatch_command}, so get rid of the trailing slash.
-    ajax_url = ajax_url.rstrip('/')
+    student_data = KvsFieldData(DjangoKeyValueStore(field_data_cache))
+    descriptor._field_data = LmsFieldData(descriptor._field_data, student_data)
+
 
     def make_xqueue_callback(dispatch='score_update'):
         # Fully qualified callback URL for external queueing system
@@ -294,19 +291,20 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
                                                   position, wrap_xmodule_display, grade_bucket_type,
                                                   static_asset_path)
 
-    def xmodule_field_data(descriptor):
-        student_data = DbModel(DjangoKeyValueStore(field_data_cache))
-        return lms_field_data(descriptor._field_data, student_data)
-
-    def publish(event):
+    def publish(event, custom_user=None):
         """A function that allows XModules to publish events. This only supports grade changes right now."""
         if event.get('event_name') != 'grade':
             return
 
+        if custom_user:
+            user_id = custom_user.id
+        else:
+            user_id = user.id
+
         # Construct the key for the module
         key = KeyValueStore.Key(
             scope=Scope.user_state,
-            user_id=user.id,
+            user_id=user_id,
             block_scope_id=descriptor.location,
             field_name='grade'
         )
@@ -341,7 +339,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
     # Wrap the output display in a single div to allow for the XModule
     # javascript to be bound correctly
     if wrap_xmodule_display is True:
-        block_wrappers.append(partial(wrap_xmodule, 'xmodule_display.html'))
+        block_wrappers.append(partial(wrap_xblock, partial(handler_prefix, course_id)))
 
     # TODO (cpennington): When modules are shared between courses, the static
     # prefix is going to have to be specific to the module, not the directory
@@ -370,15 +368,27 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
         reverse('jump_to_id', kwargs={'course_id': course_id, 'module_id': ''}),
     ))
 
-    if settings.MITX_FEATURES.get('DISPLAY_HISTOGRAMS_TO_STAFF'):
+    if settings.FEATURES.get('DISPLAY_HISTOGRAMS_TO_STAFF'):
         if has_access(user, descriptor, 'staff', course_id):
             block_wrappers.append(partial(add_histogram, user))
 
-    system = ModuleSystem(
+    # These modules store data using the anonymous_student_id as a key.
+    # To prevent loss of data, we will continue to provide old modules with
+    # the per-student anonymized id (as we have in the past),
+    # while giving selected modules a per-course anonymized id.
+    # As we have the time to manually test more modules, we can add to the list
+    # of modules that get the per-course anonymized id.
+    is_pure_xblock = isinstance(descriptor, XBlock) and not isinstance(descriptor, XModuleDescriptor)
+    is_lti_module = not is_pure_xblock and issubclass(descriptor.module_class, LTIModule)
+    if is_pure_xblock or is_lti_module:
+        anonymous_student_id = anonymous_id_for_user(user, course_id)
+    else:
+        anonymous_student_id = anonymous_id_for_user(user, '')
+
+    system = LmsModuleSystem(
         track_function=track_function,
         render_template=render_to_string,
         static_url=settings.STATIC_URL,
-        ajax_url=ajax_url,
         xqueue=xqueue,
         # TODO (cpennington): Figure out how to share info between systems
         filestore=descriptor.runtime.resources_fs,
@@ -405,9 +415,8 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
             jump_to_id_base_url=reverse('jump_to_id', kwargs={'course_id': course_id, 'module_id': ''})
         ),
         node_path=settings.NODE_PATH,
-        xmodule_field_data=xmodule_field_data,
         publish=publish,
-        anonymous_student_id=unique_id_for_user(user),
+        anonymous_student_id=anonymous_student_id,
         course_id=course_id,
         open_ended_grading_interface=open_ended_grading_interface,
         s3_interface=s3_interface,
@@ -416,37 +425,34 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
         # TODO: When we merge the descriptor and module systems, we can stop reaching into the mixologist (cpennington)
         mixins=descriptor.runtime.mixologist._mixins,  # pylint: disable=protected-access
         wrappers=block_wrappers,
+        get_real_user=user_by_anonymous_id,
+        services={
+            # django.utils.translation implements the gettext.Translations
+            # interface (it has ugettext, ungettext, etc), so we can use it
+            # directly as the runtime i18n service.
+            'i18n': django.utils.translation,
+        },
     )
 
     # pass position specified in URL to module through ModuleSystem
     system.set('position', position)
-    if settings.MITX_FEATURES.get('ENABLE_PSYCHOMETRICS'):
+    if settings.FEATURES.get('ENABLE_PSYCHOMETRICS'):
         system.set(
             'psychometrics_handler',  # set callback for updating PsychometricsData
             make_psychometrics_data_update_handler(course_id, user, descriptor.location.url())
         )
 
-    try:
-        module = descriptor.xmodule(system)
-    except:
-        log.exception("Error creating module from descriptor {0}".format(descriptor))
-
-        # make an ErrorDescriptor -- assuming that the descriptor's system is ok
-        if has_access(user, descriptor.location, 'staff', course_id):
-            err_descriptor_class = ErrorDescriptor
-        else:
-            err_descriptor_class = NonStaffErrorDescriptor
-
-        err_descriptor = err_descriptor_class.from_descriptor(
-            descriptor,
-            error_msg=exc_info_to_str(sys.exc_info())
-        )
-
-        # Make an error module
-        return err_descriptor.xmodule(system)
-
     system.set('user_is_staff', has_access(user, descriptor.location, 'staff', course_id))
-    return module
+
+    # make an ErrorDescriptor -- assuming that the descriptor's system is ok
+    if has_access(user, descriptor.location, 'staff', course_id):
+        system.error_descriptor_class = ErrorDescriptor
+    else:
+        system.error_descriptor_class = NonStaffErrorDescriptor
+
+    descriptor.xmodule_runtime = system
+    descriptor.scope_ids = descriptor.scope_ids._replace(user_id=user.id)
+    return descriptor
 
 
 def find_target_student_module(request, user_id, course_id, mod_id):
@@ -507,15 +513,23 @@ def xqueue_callback(request, course_id, userid, mod_id, dispatch):
     return HttpResponse("")
 
 
-def modx_dispatch(request, dispatch, location, course_id):
-    ''' Generic view for extensions. This is where AJAX calls go.
+@csrf_exempt
+def handle_xblock_callback_noauth(request, course_id, usage_id, handler, suffix=None):
+    """
+    Entry point for unauthenticated XBlock handlers.
+    """
+    request.user.known = False
+
+    return _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, request.user)
+
+
+def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
+    """
+    Generic view for extensions. This is where AJAX calls go.
 
     Arguments:
 
       - request -- the django request.
-      - dispatch -- the command string to pass through to the module's handle_ajax call
-           (e.g. 'problem_reset').  If this string contains '?', only pass
-           through the part before the first '?'.
       - location -- the module location. Used to look up the XModule instance
       - course_id -- defines the course context for this request.
 
@@ -523,26 +537,29 @@ def modx_dispatch(request, dispatch, location, course_id):
     the location and course_id do not identify a valid module, the module is
     not accessible by the user, or the module raises NotFoundError. If the
     module raises any other error, it will escape this function.
-    '''
-    # ''' (fix emacs broken parsing)
+    """
+    if not request.user.is_authenticated():
+        raise PermissionDenied
+
+    return _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, request.user)
+
+
+def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, user):
+    """
+    Invoke an XBlock handler, either authenticated or not.
+
+    """
+    location = unquote_slashes(usage_id)
 
     # Check parameters and fail fast if there's a problem
     if not Location.is_valid(location):
         raise Http404("Invalid location")
 
-    if not request.user.is_authenticated():
-        raise PermissionDenied
-
-    # Get the submitted data
-    data = request.POST.copy()
-
-    # Get and check submitted files
+    # Check submitted files
     files = request.FILES or {}
     error_msg = _check_files_limits(files)
     if error_msg:
         return HttpResponse(json.dumps({'success': error_msg}))
-    for key in files:  # Merge files into to data dictionary
-        data[key] = files.getlist(key)
 
     try:
         descriptor = modulestore().get_instance(course_id, location)
@@ -557,22 +574,23 @@ def modx_dispatch(request, dispatch, location, course_id):
 
     field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
         course_id,
-        request.user,
+        user,
         descriptor
     )
-
-    instance = get_module(request.user, request, location, field_data_cache, course_id, grade_bucket_type='ajax')
+    instance = get_module(user, request, location, field_data_cache, course_id, grade_bucket_type='ajax')
     if instance is None:
         # Either permissions just changed, or someone is trying to be clever
         # and load something they shouldn't have access to.
-        log.debug("No module {0} for user {1}--access denied?".format(location, request.user))
+        log.debug("No module %s for user %s -- access denied?", location, user)
         raise Http404
 
-    # Let the module handle the AJAX
+    req = django_to_webob_request(request)
     try:
-        ajax_return = instance.handle_ajax(dispatch, data)
-        # Save any fields that have changed to the underlying KeyValueStore
-        instance.save()
+        resp = instance.handle(handler, req, suffix)
+
+    except NoSuchHandlerError:
+        log.exception("XBlock %s attempted to access missing handler %r", instance, handler)
+        raise Http404
 
     # If we can't find the module, respond with a 404
     except NotFoundError:
@@ -586,12 +604,11 @@ def modx_dispatch(request, dispatch, location, course_id):
         return JsonResponse(object={'success': err.args[0]}, status=200)
 
     # If any other error occurred, re-raise it to trigger a 500 response
-    except:
-        log.exception("error processing ajax call")
+    except Exception:
+        log.exception("error executing xblock handler")
         raise
 
-    # Return whatever the module wanted to return to the client/caller
-    return HttpResponse(ajax_return)
+    return webob_to_django_response(resp)
 
 
 def get_score_bucket(grade, max_grade):

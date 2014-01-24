@@ -3,8 +3,16 @@
 <%inherit file="../main.html" />
 <%namespace name='static' file='/static_content.html'/>
 
-<%block name="bodyclass">register verification-process step-photos</%block>
-<%block name="title"><title>${_("Register for {} | Verification").format(course_name)}</title></%block>
+<%block name="bodyclass">register verification-process step-photos ${'is-upgrading' if upgrade else ''}</%block>
+<%block name="title">
+  <title>
+    %if upgrade:
+      ${_("Upgrade Your Registration for {} | Verification").format(course_name)}
+    %else:
+      ${_("Register for {} | Verification").format(course_name)}
+    %endif
+  </title>
+</%block>
 
 <%block name="js_extra">
 <script src="${static.url('js/vendor/responsive-carousel/responsive-carousel.js')}"></script>
@@ -59,7 +67,6 @@
       <section class="progress">
         <h3 class="sr title">${_("Your Progress")}</h3>
 
-        <!-- FIXME: Move the "Current Step: " text to the right DOM element -->
         <ol class="progress-steps">
           <li class="progress-step is-completed" id="progress-step0">
             <span class="wrapper-step-number"><span class="step-number">0</span></span>
@@ -172,7 +179,12 @@
                         <dt class="faq-question">${_("What do you do with this picture?")}</dt>
                         <dd class="faq-answer">${_("We only use it to verify your identity.  It is not displayed anywhere.")}</dd>
                         <dt class="faq-question">${_("What if my camera isn't working?")}</dt>
-                        <dd class="faq-answer">${_("You can always {a_start} audit the course for free {a_end} without verifying.").format(a_start='<a rel="external" href="/course_modes/choose/' + course_id + '">', a_end="</a>")}</dd>
+
+                        %if upgrade:
+                          <dd class="faq-answer">${_("You can always continue to audit the course without verifying.")}</dd>
+                        %else:
+                          <dd class="faq-answer">${_("You can always {a_start} audit the course for free {a_end} without verifying.").format(a_start='<a rel="external" href="/course_modes/choose/' + course_id + '">', a_end="</a>")}</dd>
+                        %endif
                       </dl>
                     </div>
                   </div>

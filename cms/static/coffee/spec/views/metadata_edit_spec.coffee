@@ -49,7 +49,7 @@ define ["js/models/metadata", "js/collections/metadata", "js/views/metadata", "c
       }
 
       integerEntry = {
-          default_value: 5,
+          default_value: 6,
           display_name: "Inputs",
           explicitly_set: false,
           field_name: "num_inputs",
@@ -81,6 +81,18 @@ define ["js/models/metadata", "js/collections/metadata", "js/views/metadata", "c
           value: ["the first display value", "the second"]
       }
 
+      timeEntry = {
+          default_value: "00:00:00",
+          display_name: "Time",
+          explicitly_set: true,
+          field_name: "relative_time",
+          help: "Specifies the name for this component.",
+          options: [],
+          type: MetadataModel.RELATIVE_TIME_TYPE,
+          value: "12:12:12"
+      }
+
+
       # Test for the editor that creates the individual views.
       describe "MetadataView.Editor creates editors for each field", ->
           beforeEach ->
@@ -103,17 +115,18 @@ define ["js/models/metadata", "js/collections/metadata", "js/views/metadata", "c
                           type: "unknown type",
                           value: null
                       },
-                      listEntry
+                      listEntry,
+                      timeEntry
                   ]
               )
 
           it "creates child views on initialize, and sorts them alphabetically", ->
               view = new MetadataView.Editor({collection: @model})
               childModels = view.collection.models
-              expect(childModels.length).toBe(6)
+              expect(childModels.length).toBe(7)
               # Be sure to check list view as well as other input types
               childViews = view.$el.find('.setting-input, .list-settings')
-              expect(childViews.length).toBe(6)
+              expect(childViews.length).toBe(7)
 
               verifyEntry = (index, display_name, type) ->
                   expect(childModels[index].get('display_name')).toBe(display_name)
@@ -123,8 +136,9 @@ define ["js/models/metadata", "js/collections/metadata", "js/views/metadata", "c
               verifyEntry(1, 'Inputs', 'number')
               verifyEntry(2, 'List', '')
               verifyEntry(3, 'Show Answer', 'select-one')
-              verifyEntry(4, 'Unknown', 'text')
-              verifyEntry(5, 'Weight', 'number')
+              verifyEntry(4, 'Time', 'text')
+              verifyEntry(5, 'Unknown', 'text')
+              verifyEntry(6, 'Weight', 'number')
 
           it "returns its display name", ->
               view = new MetadataView.Editor({collection: @model})
@@ -233,6 +247,11 @@ define ["js/models/metadata", "js/collections/metadata", "js/views/metadata", "c
               expect(@view.getValueFromEditor()).toBe('always')
 
       describe "MetadataView.Number supports integer or float type and has clear functionality", ->
+          verifyValueAfterChanged = (view, value, expectedResult) ->
+              view.setValueInEditor(value)
+              view.changed()
+              expect(view.getValueFromEditor()).toBe(expectedResult)
+
           beforeEach ->
               integerModel = new MetadataModel(integerEntry)
               @integerView = new MetadataView.Number({model: integerModel})
@@ -253,7 +272,7 @@ define ["js/models/metadata", "js/collections/metadata", "js/views/metadata", "c
               assertCanUpdateView(@floatView, "-2.4")
 
           it "has a clear method to revert to the model default", ->
-              assertClear(@integerView, 5, '5')
+              assertClear(@integerView, 6, '6')
               assertClear(@floatView, 2.7, '2.7')
 
           it "has an update model method", ->
@@ -276,11 +295,6 @@ define ["js/models/metadata", "js/collections/metadata", "js/views/metadata", "c
               verifyAttributes(@floatView, 1.3, .1, 100.2)
 
           it "corrects values that are out of range", ->
-              verifyValueAfterChanged = (view, value, expectedResult) ->
-                  view.setValueInEditor(value)
-                  view.changed()
-                  expect(view.getValueFromEditor()).toBe(expectedResult)
-
               verifyValueAfterChanged(@integerView, '-4', '1')
               verifyValueAfterChanged(@integerView, '1', '1')
               verifyValueAfterChanged(@integerView, '0', '1')
@@ -291,6 +305,10 @@ define ["js/models/metadata", "js/collections/metadata", "js/views/metadata", "c
               verifyValueAfterChanged(@floatView, '1.2', '1.3')
               verifyValueAfterChanged(@floatView, '100.2', '100.2')
               verifyValueAfterChanged(@floatView, '100.3', '100.2')
+
+          it "sets default values for integer and float fields that are empty", ->
+              verifyValueAfterChanged(@integerView, '', '6')
+              verifyValueAfterChanged(@floatView, '', '2.7')
 
           it "disallows invalid characters", ->
               verifyValueAfterKeyPressed = (view, character, reject) ->
@@ -361,3 +379,110 @@ define ["js/models/metadata", "js/collections/metadata", "js/views/metadata", "c
           @el.find('input').last().val('third setting')
           @el.find('input').last().trigger('input')
           expect(@el.find('.create-setting')).not.toHaveClass('is-disabled')
+
+      describe "MetadataView.RelativeTime allows the user to enter time string in HH:mm:ss format", ->
+          beforeEach ->
+              model = new MetadataModel(timeEntry)
+              @view = new MetadataView.RelativeTime({model: model})
+
+          it "uses a text input type", ->
+              assertInputType(@view, 'text')
+
+          it "returns the intial value upon initialization", ->
+              assertValueInView(@view, '12:12:12')
+
+          it "value is converted correctly", ->
+            view = @view
+
+            cases = [
+              {
+                input: '23:100:0'
+                output: '23:59:59'
+              },
+              {
+                input: '100000000000000000'
+                output: '23:59:59'
+              },
+              {
+                input: '80000'
+                output: '22:13:20'
+              },
+              {
+                input: '-100'
+                output: '00:00:00'
+              },
+              {
+                input: '-100:-10'
+                output: '00:00:00'
+              },
+              {
+                input: '99:99'
+                output: '01:40:39'
+              },
+              {
+                input: '2'
+                output: '00:00:02'
+              },
+              {
+                input: '1:2'
+                output: '00:01:02'
+              },
+              {
+                input: '1:25'
+                output: '00:01:25'
+              },
+              {
+                input: '3:1:25'
+                output: '03:01:25'
+              },
+              {
+                input: ' 2 3 : 5 9 : 5 9 '
+                output: '23:59:59'
+              },
+              {
+                input: '9:1:25'
+                output: '09:01:25'
+              },
+              {
+                input: '77:72:77'
+                output: '23:59:59'
+              },
+              {
+                input: '22:100:100'
+                output: '23:41:40'
+              },
+              # negative value
+              {
+                input: '-22:22:22'
+                output: '00:22:22'
+              },
+              # simple string
+              {
+                input: 'simple text'
+                output: '00:00:00'
+              },
+              {
+                input: 'a10a:a10a:a10a'
+                output: '00:00:00'
+              },
+              # empty string
+              {
+                input: ''
+                output: '00:00:00'
+              }
+            ]
+
+            $.each cases, (index, data) ->
+                expect(view.parseRelativeTime(data.input)).toBe(data.output)
+
+          it "can update its value in the view", ->
+              assertCanUpdateView(@view, "23:59:59")
+              @view.setValueInEditor("33:59:59")
+              @view.updateModel()
+              assertValueInView(@view, "23:59:59")
+
+          it "has a clear method to revert to the model default", ->
+              assertClear(@view, '00:00:00')
+
+          it "has an update model method", ->
+              assertUpdateModel(@view, '12:12:12', '23:59:59')

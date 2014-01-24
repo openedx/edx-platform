@@ -1,7 +1,8 @@
 import json
 import logging
-from lxml.html.clean import Cleaner, autolink_html
 import re
+import bleach
+from html5lib.tokenizer import HTMLTokenizer
 from xmodule.progress import Progress
 import capa.xqueue_interface as xqueue_interface
 from capa.util import *
@@ -10,11 +11,10 @@ import controller_query_service
 
 from datetime import datetime
 from pytz import UTC
-import requests
 from boto.s3.connection import S3Connection
 from boto.s3.key import Key
 
-log = logging.getLogger("mitx.courseware")
+log = logging.getLogger("edx.courseware")
 
 # Set the default number of max attempts.  Should be 1 for production
 # Set higher for debugging/testing
@@ -28,6 +28,7 @@ MAX_SCORE = 1
 FILE_NOT_FOUND_IN_RESPONSE_MESSAGE = "We could not find a file in your submission.  Please try choosing a file or pasting a link to your file into the answer box."
 ERROR_SAVING_FILE_MESSAGE = "We are having trouble saving your file.  Please try another file or paste a link to your file into the answer box."
 
+
 def upload_to_s3(file_to_upload, keyname, s3_interface):
     '''
     Upload file to S3 using provided keyname.
@@ -38,7 +39,9 @@ def upload_to_s3(file_to_upload, keyname, s3_interface):
 
     conn = S3Connection(s3_interface['access_key'], s3_interface['secret_access_key'])
     bucketname = str(s3_interface['storage_bucket_name'])
-    bucket = conn.create_bucket(bucketname.lower())
+    bucket = conn.lookup(bucketname.lower())
+    if not bucket:
+        bucket = conn.create_bucket(bucketname.lower())
 
     k = Key(bucket)
     k.key = keyname
@@ -50,24 +53,14 @@ def upload_to_s3(file_to_upload, keyname, s3_interface):
 
     return public_url
 
-class WhiteListCleaner(Cleaner):
-    """
-    By default, lxml cleaner strips out all links that are not in a defined whitelist.
-    We want to allow all links, and rely on the peer grading flagging mechanic to catch
-    the "bad" ones.  So, don't define a whitelist at all.
-    """
-    def allow_embedded_url(self, el, url):
-        """
-        Override the Cleaner allow_embedded_url method to remove the whitelist url requirement.
-        Ensure that any tags not in the whitelist are stripped beforehand.
-        """
-
-        # Tell cleaner to strip any element with a tag that isn't whitelisted.
-        if self.whitelist_tags is not None and el.tag not in self.whitelist_tags:
-            return False
-
-        # Tell cleaner to allow all urls.
-        return True
+# Used by sanitize_html
+ALLOWED_HTML_ATTRS = {
+    '*': ['id', 'class', 'height', 'width', 'alt'],
+    'a': ['href', 'title', 'rel', 'target'],
+    'embed': ['src'],
+    'iframe': ['src'],
+    'img': ['src'],
+}
 
 
 class OpenEndedChild(object):
@@ -228,22 +221,23 @@ class OpenEndedChild(object):
         answer - any string
         return - a cleaned version of the string
         """
-        try:
-            answer = autolink_html(answer)
-            cleaner = WhiteListCleaner(
-                style=True,
-                links=True,
-                add_nofollow=False,
-                page_structure=True,
-                safe_attrs_only=True,
-                whitelist_tags=('embed', 'iframe', 'a', 'img', 'br',)
-            )
-            clean_html = cleaner.clean_html(answer)
-            clean_html = re.sub(r'</p>$', '', re.sub(r'^<p>', '', clean_html))
-            clean_html = re.sub("\n","<br/>", clean_html)
-        except Exception:
-            clean_html = answer
-        return clean_html
+        clean_html = bleach.clean(answer,
+                                  tags=['embed', 'iframe', 'a', 'img', 'br'],
+                                  attributes=ALLOWED_HTML_ATTRS,
+                                  strip=True)
+        autolinked = bleach.linkify(clean_html,
+                                    callbacks=[bleach.callbacks.target_blank],
+                                    skip_pre=True,
+                                    tokenizer=HTMLTokenizer)
+        return OpenEndedChild.replace_newlines(autolinked)
+
+    @staticmethod
+    def replace_newlines(html):
+        """
+        Replaces "\n" newlines with <br/>
+        """
+        retv = re.sub(r'</p>$', '', re.sub(r'^<p>', '', html))
+        return re.sub("\n","<br/>", retv)
 
     def new_history_entry(self, answer):
         """

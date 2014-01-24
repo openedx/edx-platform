@@ -281,7 +281,7 @@
   }
 }
 
-@mixin gray-button {
+.gray-button {
   @include button;
   @include linear-gradient(top, $white-t1, rgba(255, 255, 255, 0));
   box-shadow: 0 1px 0 $white-t1 inset;
@@ -354,15 +354,11 @@
 }
 
 @mixin tree-view {
-  border: 1px solid $mediumGrey;
-  background: $lightGrey;
+  border: 0;
+  background: $white;
 
   .branch {
-    margin-bottom: 10px;
-
-    &.collapsed {
-      margin-bottom: 0;
-    }
+    margin-bottom: 0;
   }
 
   .branch > .section-item {
@@ -370,6 +366,7 @@
   }
 
   .section-item {
+    @include transition(background $tmg-avg ease-in-out 0);
     position: relative;
     display: block;
     padding: 6px 8px 8px 16px;
@@ -377,7 +374,7 @@
     font-size: 13px;
 
     &:hover {
-      background: #fffcf1;
+      background: $blue-l5;
 
       .item-actions {
         display: block;
@@ -385,7 +382,7 @@
     }
 
     &.editing {
-      background: #fffcf1;
+      background: $orange-l4;
     }
 
     .draft-item:after,
@@ -406,11 +403,11 @@
     }
 
     .private-item {
-      color: #a4aab7;
+      color: $gray-l1;
     }
 
     .draft-item {
-      color: #9f7d10;
+      color: $yellow-d1;
     }
   }
 

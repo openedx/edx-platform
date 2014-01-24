@@ -23,12 +23,12 @@ $paleYellow: #fffcf1;
     color: $darkGrey !important;
     pointer-events: none;
     cursor: none;
-    &:hover {
+    &:hover, &:focus {
       box-shadow: 0 0 0 0 !important;
     }
   }
 
-  &:hover {
+  &:hover, &:focus {
     box-shadow: 0 1px 0 rgba(255, 255, 255, .3) inset, 0 1px 1px rgba(0, 0, 0, .15);
     text-decoration: none;
   }
@@ -42,7 +42,7 @@ $paleYellow: #fffcf1;
   background-color: $blue;
   color: #fff;
 
-  &:hover {
+  &:hover, &:focus {
     background-color: #62aaf5;
     color: #fff;
   }
@@ -57,7 +57,7 @@ $paleYellow: #fffcf1;
   box-shadow: 0 1px 0 rgba(255, 255, 255, .3) inset;
   color: #6d788b;
 
-  &:hover {
+  &:hover, &:focus {
     background-color: #d9e3ee;
     color: #6d788b;
   }
@@ -72,8 +72,12 @@ $paleYellow: #fffcf1;
     border-bottom: 3px solid $blue;
   }
 
-  a:hover {
+  a:hover, a:focus {
     text-decoration: none;
+  }
+
+  .content-wrapper {
+    background: $body-bg;
   }
 
   .main-wrapper {
@@ -183,6 +187,13 @@ $paleYellow: #fffcf1;
 
     .inner-wrapper {
       border-radius: 3px;
+    }
+  }
+
+  #password-reset {
+    header {
+      background: none;
+      border-bottom: none;
     }
   }
 

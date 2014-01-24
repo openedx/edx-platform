@@ -1,13 +1,14 @@
+<%! import json %>
 <%! from django.utils.translation import ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
-<%! from auth.authz import is_user_in_course_group_role %>
-<%! import json %>
+<%! from student.roles import CourseInstructorRole %>
+<%! from xmodule.modulestore.django import loc_mapper %>
 <%inherit file="base.html" />
 <%block name="title">${_("Course Team Settings")}</%block>
 <%block name="bodyclass">is-signedin course users view-team</%block>
 
-
 <%block name="content">
+
 <div class="wrapper-mast wrapper">
   <header class="mast has-actions has-subtitle">
     <h1 class="page-header">
@@ -59,17 +60,12 @@
       %endif
 
       <ol class="user-list">
+        <% new_location = loc_mapper().translate_location(context_course.location.course_id, context_course.location, False, True) %>
         % for user in staff:
-          <% api_url = reverse('course_team_user', kwargs=dict(
-               org=context_course.location.org,
-               course=context_course.location.course,
-               name=context_course.location.name,
-               email=user.email,
-             ))
-          %>
-        <li class="user-item" data-email="${user.email}" data-url="${api_url}">
 
-        <% is_instuctor = is_user_in_course_group_role(user, context_course.location, 'instructor', check_staff=False) %>
+        <li class="user-item" data-email="${user.email}" data-url="${new_location.url_reverse('course_team/', user.email) }">
+
+        <% is_instuctor = CourseInstructorRole(context_course.location).has_user(user) %>
           % if is_instuctor:
           <span class="wrapper-ui-badge">
             <span class="flag flag-role flag-role-admin is-hanging">
@@ -124,7 +120,7 @@
         % endfor
       </ol>
 
-      <% user_is_instuctor = is_user_in_course_group_role(request.user, context_course.location, 'instructor', check_staff=False) %>
+      <% user_is_instuctor = CourseInstructorRole(context_course.location).has_user(request.user) %>
       % if user_is_instuctor and len(staff) == 1:
       <div class="notice notice-incontext notice-create has-actions">
         <div class="msg">
@@ -145,14 +141,15 @@
 
     <aside class="content-supplementary" role="complimentary">
       <div class="bit">
-        <h3 class="title-3">${_("About Roles within Your Course Team")}</h3>
-        <p>${_("Course team members are co-authors (staff). They have full access to all the content in the course and all the same editing privileges. Admins have the unique ability to add and remove course team members.")}</p>
+        <h3 class="title-3">${_("Course Team Roles")}</h3>
+        <p>${_("Course team members, or staff, are course co-authors. They have full writing and editing privileges on all course content.")}</p>
+        <p>${_("Admins are course team members who can add and remove other course team members.")}</p>      
       </div>
 
       % if user_is_instuctor and len(instructors) == 1:
       <div class="bit">
-        <h3 class="title-3">${_("Tranferring Ownership")}</h3>
-        <p>${_("There must always be an Admin assigned to every course. To transfer your ownership of the course, add Admin access to another user and request they remove you from the Course Team list.")}</p>
+        <h3 class="title-3">${_("Transferring Ownership")}</h3>
+        <p>${_("Every course must have an Admin. If you're the Admin and you want transfer ownership of the course, click Add admin access to make another user the Admin, then ask that user to remove you from the Course Team list.")}</p>
       </div>
       % endif
     </aside>
@@ -166,13 +163,11 @@ require(["jquery", "underscore", "gettext", "js/views/feedback_prompt"],
     function($, _, gettext, PromptView) {
 
   var staffEmails = ${json.dumps([user.email for user in staff])};
-  var tplUserURL = "${reverse('course_team_user', kwargs=dict(
-      org=context_course.location.org,
-      course=context_course.location.course,
-      name=context_course.location.name,
-      email="@@EMAIL@@",
-    ))}";
-  var unknownErrorMessage = gettext("Unknown")
+  var tplUserURL = "${loc_mapper().\
+      translate_location(context_course.location.course_id, context_course.location, False, True).\
+      url_reverse('course_team/', "@@EMAIL@@")}";
+
+  var unknownErrorMessage = gettext("Unknown");
 
   $(document).ready(function() {
     var $createUserForm = $('#create-user-form');

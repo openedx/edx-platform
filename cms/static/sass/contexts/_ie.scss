@@ -1,0 +1,32 @@
+// studio - contexts - ie
+// ====================
+
+// CASE: less than or equal to IE9
+.lte9 {
+
+  // CASE: IE9 doesn't support css animations and negative positioning
+  .wrapper-notification {
+
+    &.is-shown {
+      bottom: 0;
+    }
+
+    &.is-hiding {
+      bottom: -($ui-notification-height);
+    }
+  }
+}
+
+// ====================
+
+// CASE: less than or equal to IE8
+.lte8 {
+
+}
+
+// ====================
+
+// CASE: less than or equal to IE7
+.lte7 {
+
+}

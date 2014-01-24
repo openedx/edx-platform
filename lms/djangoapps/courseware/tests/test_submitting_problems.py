@@ -1,9 +1,15 @@
-"""Integration tests for submitting problem responses and getting grades."""
-
-# text processing dependancies
+# -*- coding: utf-8 -*-
+"""
+Integration tests for submitting problem responses and getting grades.
+"""
+# text processing dependencies
 import json
+import os
 from textwrap import dedent
 
+from mock import patch
+
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.test.client import RequestFactory
 from django.core.urlresolvers import reverse
@@ -12,15 +18,21 @@ from django.test.utils import override_settings
 # Need access to internal func to put users in the right group
 from courseware import grades
 from courseware.model_data import FieldDataCache
+from courseware.models import StudentModule
 
 from xmodule.modulestore.django import modulestore, editable_modulestore
 
 #import factories and parent testcase modules
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from capa.tests.response_xml_factory import OptionResponseXMLFactory, CustomResponseXMLFactory, SchematicResponseXMLFactory
+from capa.tests.response_xml_factory import (
+    OptionResponseXMLFactory, CustomResponseXMLFactory, SchematicResponseXMLFactory,
+    CodeResponseXMLFactory,
+)
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from lms.lib.xblock.runtime import quote_slashes
+from student.tests.factories import UserFactory
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -71,11 +83,12 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
             example: 'check_problem' for having responses processed
         """
         return reverse(
-            'modx_dispatch',
+            'xblock_handler',
             kwargs={
                 'course_id': self.course.id,
-                'location': problem_location,
-                'dispatch': dispatch,
+                'usage_id': quote_slashes(problem_location),
+                'handler': 'xmodule_handler',
+                'suffix': dispatch,
             }
         )
 
@@ -132,7 +145,7 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
             question_text='The correct answer is Correct',
             num_inputs=num_inputs,
             weight=num_inputs,
-            options=['Correct', 'Incorrect'],
+            options=['Correct', 'Incorrect', u'ⓤⓝⓘⓒⓞⓓⓔ'],
             correct_option='Correct'
         )
 
@@ -234,14 +247,11 @@ class TestCourseGrader(TestSubmittingProblems):
             make up the final grade. (For display)
         """
 
-        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-            self.course.id, self.student_user, self.course)
+        fake_request = self.factory.get(
+            reverse('progress', kwargs={'course_id': self.course.id})
+        )
 
-        fake_request = self.factory.get(reverse('progress',
-                                        kwargs={'course_id': self.course.id}))
-
-        return grades.grade(self.student_user, fake_request,
-                            self.course, field_data_cache)
+        return grades.grade(self.student_user, fake_request, self.course)
 
     def get_progress_summary(self):
         """
@@ -255,16 +265,13 @@ class TestCourseGrader(TestSubmittingProblems):
         etc.
         """
 
-        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-            self.course.id, self.student_user, self.course)
+        fake_request = self.factory.get(
+            reverse('progress', kwargs={'course_id': self.course.id})
+        )
 
-        fake_request = self.factory.get(reverse('progress',
-                                        kwargs={'course_id': self.course.id}))
-
-        progress_summary = grades.progress_summary(self.student_user,
-                                                   fake_request,
-                                                   self.course,
-                                                   field_data_cache)
+        progress_summary = grades.progress_summary(
+            self.student_user, fake_request, self.course
+        )
         return progress_summary
 
     def check_grade_percent(self, percent):
@@ -551,6 +558,58 @@ class TestCourseGrader(TestSubmittingProblems):
         self.assertEqual(self.score_for_hw('homework3'), [1.0, 1.0])
 
 
+class ProblemWithUploadedFilesTest(TestSubmittingProblems):
+    """Tests of problems with uploaded files."""
+
+    def setUp(self):
+        super(ProblemWithUploadedFilesTest, self).setUp()
+        self.section = self.add_graded_section_to_course('section')
+
+    def problem_setup(self, name, files):
+        """
+        Create a CodeResponse problem with files to upload.
+        """
+
+        xmldata = CodeResponseXMLFactory().build_xml(
+            allowed_files=files, required_files=files,
+        )
+        ItemFactory.create(
+            parent_location=self.section.location,
+            category='problem',
+            display_name=name,
+            data=xmldata
+        )
+
+        # re-fetch the course from the database so the object is up to date
+        self.refresh_course()
+
+    def test_three_files(self):
+        # Open the test files, and arrange to close them later.
+        filenames = "prog1.py prog2.py prog3.py"
+        fileobjs = [
+            open(os.path.join(settings.COMMON_TEST_DATA_ROOT, "capa", filename))
+            for filename in filenames.split()
+        ]
+        for fileobj in fileobjs:
+            self.addCleanup(fileobj.close)
+
+        self.problem_setup("the_problem", filenames)
+        with patch('courseware.module_render.xqueue_interface.session') as mock_session:
+            resp = self.submit_question_answer("the_problem", {'2_1': fileobjs})
+
+        self.assertEqual(resp.status_code, 200)
+        json_resp = json.loads(resp.content)
+        self.assertEqual(json_resp['success'], "incorrect")
+
+        # See how post got called.
+        name, args, kwargs = mock_session.mock_calls[0]
+        self.assertEqual(name, "post")
+        self.assertEqual(len(args), 1)
+        self.assertTrue(args[0].endswith("/submit/"))
+        self.assertItemsEqual(kwargs.keys(), ["files", "data"])
+        self.assertItemsEqual(kwargs['files'].keys(), filenames.split())
+
+
 class TestPythonGradedResponse(TestSubmittingProblems):
     """
     Check that we can submit a schematic and custom response, and it answers properly.
@@ -797,3 +856,156 @@ class TestPythonGradedResponse(TestSubmittingProblems):
         name = 'computed_answer'
         self.computed_answer_setup(name)
         self._check_ireset(name)
+
+
+class TestAnswerDistributions(TestSubmittingProblems):
+    """Check that we can pull answer distributions for problems."""
+
+    def setUp(self):
+        """Set up a simple course with four problems."""
+        super(TestAnswerDistributions, self).setUp()
+
+        self.homework = self.add_graded_section_to_course('homework')
+        self.add_dropdown_to_section(self.homework.location, 'p1', 1)
+        self.add_dropdown_to_section(self.homework.location, 'p2', 1)
+        self.add_dropdown_to_section(self.homework.location, 'p3', 1)
+        self.refresh_course()
+
+    def test_empty(self):
+        # Just make sure we can process this without errors.
+        empty_distribution = grades.answer_distributions(self.course.id)
+        self.assertFalse(empty_distribution)  # should be empty
+
+    def test_one_student(self):
+        # Basic test to make sure we have simple behavior right for a student
+
+        # Throw in a non-ASCII answer
+        self.submit_question_answer('p1', {'2_1': u'ⓤⓝⓘⓒⓞⓓⓔ'})
+        self.submit_question_answer('p2', {'2_1': 'Correct'})
+
+        distributions = grades.answer_distributions(self.course.id)
+        self.assertEqual(
+            distributions,
+            {
+                ('p1', 'p1', 'i4x-MITx-100-problem-p1_2_1'): {
+                    u'ⓤⓝⓘⓒⓞⓓⓔ': 1
+                },
+                ('p2', 'p2', 'i4x-MITx-100-problem-p2_2_1'): {
+                    'Correct': 1
+                }
+            }
+        )
+
+    def test_multiple_students(self):
+        # Our test class is based around making requests for a particular user,
+        # so we're going to cheat by creating another user and copying and
+        # modifying StudentModule entries to make them from other users. It's
+        # a little hacky, but it seemed the simpler way to do this.
+        self.submit_question_answer('p1', {'2_1': u'Correct'})
+        self.submit_question_answer('p2', {'2_1': u'Incorrect'})
+        self.submit_question_answer('p3', {'2_1': u'Correct'})
+
+        # Make the above submissions owned by user2
+        user2 = UserFactory.create()
+        problems = StudentModule.objects.filter(
+            course_id=self.course.id,
+            student_id=self.student_user.id
+        )
+        for problem in problems:
+            problem.student_id = user2.id
+            problem.save()
+
+        # Now make more submissions by our original user
+        self.submit_question_answer('p1', {'2_1': u'Correct'})
+        self.submit_question_answer('p2', {'2_1': u'Correct'})
+
+        self.assertEqual(
+            grades.answer_distributions(self.course.id),
+            {
+                ('p1', 'p1', 'i4x-MITx-100-problem-p1_2_1'): {
+                    'Correct': 2
+                },
+                ('p2', 'p2', 'i4x-MITx-100-problem-p2_2_1'): {
+                    'Correct': 1,
+                    'Incorrect': 1
+                },
+                ('p3', 'p3', 'i4x-MITx-100-problem-p3_2_1'): {
+                    'Correct': 1
+                }
+            }
+        )
+
+    def test_other_data_types(self):
+        # We'll submit one problem, and then muck with the student_answers
+        # dict inside its state to try different data types (str, int, float,
+        # none)
+        self.submit_question_answer('p1', {'2_1': u'Correct'})
+
+        # Now fetch the state entry for that problem.
+        student_module = StudentModule.objects.get(
+            course_id=self.course.id,
+            student_id=self.student_user.id
+        )
+        for val in ('Correct', True, False, 0, 0.0, 1, 1.0, None):
+            state = json.loads(student_module.state)
+            state["student_answers"]['i4x-MITx-100-problem-p1_2_1'] = val
+            student_module.state = json.dumps(state)
+            student_module.save()
+
+            self.assertEqual(
+                grades.answer_distributions(self.course.id),
+                {
+                    ('p1', 'p1', 'i4x-MITx-100-problem-p1_2_1'): {
+                        str(val): 1
+                    },
+                }
+            )
+
+    def test_missing_content(self):
+        # If there's a StudentModule entry for content that no longer exists,
+        # we just quietly ignore it (because we can't display a meaningful url
+        # or name for it).
+        self.submit_question_answer('p1', {'2_1': 'Incorrect'})
+
+        # Now fetch the state entry for that problem and alter it so it points
+        # to a non-existent problem.
+        student_module = StudentModule.objects.get(
+            course_id=self.course.id,
+            student_id=self.student_user.id
+        )
+        student_module.module_state_key += "_fake"
+        student_module.save()
+
+        # It should be empty (ignored)
+        empty_distribution = grades.answer_distributions(self.course.id)
+        self.assertFalse(empty_distribution)  # should be empty
+
+    def test_broken_state(self):
+        # Missing or broken state for a problem should be skipped without
+        # causing the whole answer_distribution call to explode.
+
+        # Submit p1
+        self.submit_question_answer('p1', {'2_1': u'Correct'})
+
+        # Now fetch the StudentModule entry for p1 so we can corrupt its state
+        prb1 = StudentModule.objects.get(
+            course_id=self.course.id,
+            student_id=self.student_user.id
+        )
+
+        # Submit p2
+        self.submit_question_answer('p2', {'2_1': u'Incorrect'})
+
+        for new_p1_state in ('{"student_answers": {}}', "invalid json!", None):
+            prb1.state = new_p1_state
+            prb1.save()
+
+            # p1 won't show up, but p2 should still work
+            self.assertEqual(
+                grades.answer_distributions(self.course.id),
+                {
+                    ('p2', 'p2', 'i4x-MITx-100-problem-p2_2_1'): {
+                        'Incorrect': 1
+                    },
+                }
+            )

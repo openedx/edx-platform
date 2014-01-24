@@ -8,7 +8,7 @@
   cursor: pointer;
   text-decoration: none;
 
-  &:hover, &:active {
+  &:hover, &:active, &:focus {
     text-decoration: none;
   }
 
@@ -30,6 +30,44 @@
   border-radius: ($baseline/10);
 }
 
+// ====================
+
+%btn-inherited {
+  @include transition(background-color 0.15s, box-shadow 0.15s);
+  border-radius: 3px;
+  box-shadow: 0 1px 0 rgba($white, .3) inset, 0 0 0 rgba($black, 0);
+  padding: ($baseline/2) $baseline;
+
+  &:hover, &.active {
+    text-decoration: none;
+  }
+
+  &.disabled, &.is-disabled, &[disabled="disabled"] {
+    box-shadow: none;
+  }
+}
+
+%btn-inherited-primary {
+  @extend %btn-inherited;
+  @include linear-gradient(top, rgba($white, .3), rgba($white, 0));
+  border: 1px solid shade($action-primary-bg, 10%);
+  background-color: $action-primary-bg;
+  color: $action-primary-fg;
+
+  &:hover, &.active {
+    background-color: $action-primary-focused-bg;
+    color: $action-primary-focused-fg;
+  }
+
+  &.disabled, &.is-disabled, &[disabled="disabled"] {
+    border: 1px solid tint($action-primary-disabled-bg, 10%);
+    background: $action-primary-disabled-bg;
+    color: $action-prmary-disabled-fg;
+  }
+}
+
+// ====================
+
 // primary button
 %btn-primary {
   @extend %t-weight3;
@@ -39,13 +77,13 @@
   padding: ($baseline*0.75) $baseline;
   text-align: center;
 
-  &:hover, &:active {
+  &:hover, &:active, &:focus {
 
   }
 
   &.current, &.active {
 
-    &:hover, &:active {
+    &:hover, &:active, &:focus {
 
     }
   }
@@ -63,7 +101,7 @@
   background: $m-gray;
   color: $white;
 
-  &:hover, &:active {
+  &:hover, &:active, &:focus {
     background: $m-gray-l1;
     color: $white;
   }
@@ -73,10 +111,27 @@
     background: $m-gray;
     color: $m-gray-l1;
 
-    &:hover, &:active {
+    &:hover, &:active, &:focus {
       box-shadow: inset 0 2px 1px 1px $m-gray-d3;
       color: $m-gray-d3;
     }
+  }
+
+  &.disabled, &[disabled] {
+    box-shadow: none;
+  }
+}
+
+// blue primary error color
+%btn-primary-error {
+  @extend %btn-primary;
+  box-shadow: 0 2px 1px 0 shade($error-color, 25%);
+  background: shade($error-color, 25%);
+  color: $white;
+
+  &:hover, &:active {
+    background: $error-color;
+    color: $white;
   }
 
   &.disabled, &[disabled] {
@@ -91,7 +146,7 @@
   background: $m-blue-d3;
   color: $white;
 
-  &:hover, &:active {
+  &:hover, &:active, &:focus {
     background: $m-blue-d1;
     color: $white;
   }
@@ -101,7 +156,7 @@
     background: $m-blue;
     color: $m-blue-d2;
 
-    &:hover, &:active {
+    &:hover, &:active, &:focus {
       box-shadow: inset 0 2px 1px 1px $m-blue-d3;
       color: $m-blue-d3;
     }
@@ -119,7 +174,7 @@
   background: $m-pink;
   color: $white;
 
-  &:hover, &:active {
+  &:hover, &:active, &:focus {
     background: $m-pink-l3;
     color: $white;
   }
@@ -129,7 +184,7 @@
     background: $m-pink-l2;
     color: $m-pink-d1;
 
-    &:hover, &:active {
+    &:hover, &:active, &:focus {
       box-shadow: inset 0 2px 1px 1px $m-pink-d2;
       color: $m-pink-d3;
     }
@@ -147,7 +202,7 @@
   background: $m-green-d1;
   color: $white;
 
-  &:hover, &:active {
+  &:hover, &:active, &:focus {
     background: $m-green-s1;
     color: $white;
   }
@@ -157,7 +212,7 @@
     background: $m-green-l2;
     color: $m-green;
 
-    &:hover, &:active {
+    &:hover, &:active, &:focus {
       box-shadow: inset 0 2px 1px 1px $m-green-d1;
       color: $m-green-d1;
     }
@@ -176,7 +231,7 @@
   cursor: default;
   pointer-events: none;
   box-shadow: none;
-  :hover {
+  :hover, :focus {
     pointer-events: none;
   }
 }

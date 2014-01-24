@@ -4,7 +4,7 @@ from time import sleep
 
 from lettuce import world, step
 from lettuce.django import django_url
-from common import i_am_registered_for_the_course, section_location
+from common import i_am_registered_for_the_course, section_location, visit_scenario_item
 
 
 @step('I view the word cloud and it has rendered')
@@ -18,23 +18,12 @@ def view_word_cloud(_step):
     i_am_registered_for_the_course(_step, coursenum)
 
     add_word_cloud_to_course(coursenum)
-    chapter_name = world.scenario_dict['SECTION'].display_name.replace(
-        " ", "_")
-    section_name = chapter_name
-    url = django_url('/courses/%s/%s/%s/courseware/%s/%s' % (
-        world.scenario_dict['COURSE'].org,
-        world.scenario_dict['COURSE'].number,
-        world.scenario_dict['COURSE'].display_name.replace(' ', '_'),
-        chapter_name, section_name,)
-    )
-    world.browser.visit(url)
+    visit_scenario_item('SECTION')
 
 
 @step('I press the Save button')
 def press_the_save_button(_step):
     button_css = '.input_cloud_section input.save'
-    elem = world.css_find(button_css).first
-    world.css_has_text(button_css, elem)
     world.css_click(button_css)
 
 

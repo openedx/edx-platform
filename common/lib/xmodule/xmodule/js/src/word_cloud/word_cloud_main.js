@@ -8,13 +8,11 @@
  *
  *  @exports WordCloudMain
  *
- *  @requires logme
- *
  *  @external d3, $, RequireJS
  */
 
 (function (requirejs, require, define) {
-define('WordCloudMain', ['logme'], function (logme) {
+define('WordCloudMain', [], function () {
 
     /**
      * @function WordCloudMain
@@ -50,7 +48,7 @@ define('WordCloudMain', ['logme'], function (logme) {
             _this.ajax_url + '/' + 'get_state', null,
             function (response) {
                 if (response.status !== 'success') {
-                    logme('ERROR: ' + response.error);
+                    console.log('ERROR: ' + response.error);
 
                     return;
                 }
@@ -96,7 +94,7 @@ define('WordCloudMain', ['logme'], function (logme) {
             _this.ajax_url + '/' + 'submit', $.param(data),
             function (response) {
                 if (response.status !== 'success') {
-                    logme('ERROR: ' + response.error);
+                    console.log('ERROR: ' + response.error);
 
                     return;
                 }
@@ -239,6 +237,7 @@ define('WordCloudMain', ['logme'], function (logme) {
         cloudSectionEl
             .addClass('active')
             .find('.your_words').html(studentWordsStr)
+            .end()
             .find('.total_num_words').html(response.total_count);
 
         $(cloudSectionEl.attr('id') + ' .word_cloud').empty();
@@ -282,12 +281,12 @@ define('WordCloudMain', ['logme'], function (logme) {
             .attr('transform', function (d) {
                 return 'translate(' + [d.x, d.y] + ')rotate(' + d.rotate + ')scale(' + scale + ')';
             })
-            .text(function (d) {               
+            .text(function (d) {
                 return d.text;
             });
     }; // End-of: WordCloudMain.prototype.drawWordCloud = function (words, bounds) {
 
     return WordCloudMain;
 
-}); // End-of: define('WordCloudMain', ['logme'], function (logme) {
+}); // End-of: define('WordCloudMain', [], function () {
 }(RequireJS.requirejs, RequireJS.require, RequireJS.define)); // End-of: (function (requirejs, require, define) {

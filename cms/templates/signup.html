@@ -60,7 +60,9 @@
 
             <li class="field checkbox required" id="field-tos">
               <input id="tos" name="terms_of_service" type="checkbox" value="true" />
-              <label for="tos">${_("I agree to the Terms of Service")}</label>
+              <label for="tos">
+                ${_("I agree to the {a_start} Terms of Service {a_end}").format(a_start='<a data-rel="edx.org" href="{}">'.format(marketing_link('TOS')), a_end="</a>")}
+              </label>
             </li>
           </ol>
         </fieldset>
@@ -124,7 +126,7 @@ require(["jquery", "jquery.cookie"], function($) {
       submit_data,
       function(json) {
         if(json.success) {
-          location.href = "${reverse('index')}";
+          location.href = "${'/course'}";
         } else {
           $('#register_error').html(json.value).stop().addClass('is-shown');
         }

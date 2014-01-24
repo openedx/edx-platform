@@ -17,7 +17,6 @@ from xblock.fields import Scope, List, String, Dict, Boolean
 from .fields import Date
 from xmodule.modulestore.locator import CourseLocator
 from django.utils.timezone import UTC
-from xmodule.util import date_utils
 
 
 log = logging.getLogger(__name__)
@@ -165,9 +164,7 @@ class CourseFields(object):
     enrollment_start = Date(help="Date that enrollment for this class is opened", scope=Scope.settings)
     enrollment_end = Date(help="Date that enrollment for this class is closed", scope=Scope.settings)
     start = Date(help="Start time when this module is visible",
-                 # using now(UTC()) resulted in fractional seconds which screwed up comparisons and anyway w/b the
-                 # time of first invocation of this stmt on the server
-                 default=datetime.fromtimestamp(0, UTC()),
+                 default=datetime(2030, 1, 1, tzinfo=UTC()),
                  scope=Scope.settings)
     end = Date(help="Date that this class ends", scope=Scope.settings)
     advertised_start = String(help="Date that this course is advertised to start", scope=Scope.settings)
@@ -213,7 +210,6 @@ class CourseFields(object):
     discussion_blackouts = List(help="List of pairs of start/end dates for discussion blackouts", scope=Scope.settings)
     discussion_topics = Dict(help="Map of topics names to ids", scope=Scope.settings)
     discussion_sort_alpha = Boolean(scope=Scope.settings, default=False, help="Sort forum categories and subcategories alphabetically.")
-    testcenter_info = Dict(help="Dictionary of Test Center info", scope=Scope.settings)
     announcement = Date(help="Date this course is announced", scope=Scope.settings)
     cohort_config = Dict(help="Dictionary defining cohort configuration", scope=Scope.settings)
     is_new = Boolean(help="Whether this course should be flagged as new", scope=Scope.settings)
@@ -396,12 +392,13 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         Expects the same arguments as XModuleDescriptor.__init__
         """
         super(CourseDescriptor, self).__init__(*args, **kwargs)
+        _ = self.runtime.service(self, "i18n").ugettext
 
         if self.wiki_slug is None:
             if isinstance(self.location, Location):
                 self.wiki_slug = self.location.course
             elif isinstance(self.location, CourseLocator):
-                self.wiki_slug = self.location.course_id or self.display_name
+                self.wiki_slug = self.location.package_id or self.display_name
 
         if self.due_date_display_format is None and self.show_timezone is False:
             # For existing courses with show_timezone set to False (and no due_date_display_format specified),
@@ -423,22 +420,9 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         self._grading_policy = {}
 
         self.set_grading_policy(self.grading_policy)
-        if self.discussion_topics == {}:
-            self.discussion_topics = {'General': {'id': self.location.html_id()}}
 
-        self.test_center_exams = []
-        test_center_info = self.testcenter_info
-        if test_center_info is not None:
-            for exam_name in test_center_info:
-                try:
-                    exam_info = test_center_info[exam_name]
-                    self.test_center_exams.append(self.TestCenterExam(self.id, exam_name, exam_info))
-                except Exception as err:
-                    # If we can't parse the test center exam info, don't break
-                    # the rest of the courseware.
-                    msg = 'Error %s: Unable to load test-center exam info for exam "%s" of course "%s"' % (err, exam_name, self.id)
-                    log.error(msg)
-                    continue
+        if self.discussion_topics == {}:
+            self.discussion_topics = {_('General'): {'id': self.location.html_id()}}
 
         # TODO check that this is still needed here and can't be by defaults.
         if not self.tabs:
@@ -446,7 +430,8 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             # first arg, since that's only used for dispatch
             tabs = []
             tabs.append({'type': 'courseware'})
-            tabs.append({'type': 'course_info', 'name': 'Course Info'})
+            # Translators: "Course Info" is the name of the course's information and updates page
+            tabs.append({'type': 'course_info', 'name': _('Course Info')})
 
             if self.syllabus_present:
                 tabs.append({'type': 'syllabus'})
@@ -459,12 +444,15 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             if self.discussion_link:
                 tabs.append({'type': 'external_discussion', 'link': self.discussion_link})
             else:
-                tabs.append({'type': 'discussion', 'name': 'Discussion'})
+                # Translators: "Discussion" is the title of the course forum page
+                tabs.append({'type': 'discussion', 'name': _('Discussion')})
 
-            tabs.append({'type': 'wiki', 'name': 'Wiki'})
+            # Translators: "Wiki" is the title of the course's wiki page
+            tabs.append({'type': 'wiki', 'name': _('Wiki')})
 
             if not self.hide_progress_tab:
-                tabs.append({'type': 'progress', 'name': 'Progress'})
+                # Translators: "Progress" is the title of the student's grade information page
+                tabs.append({'type': 'progress', 'name': _('Progress')})
 
             self.tabs = tabs
 
@@ -515,8 +503,8 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         return policy_str
 
     @classmethod
-    def from_xml(cls, xml_data, system, org=None, course=None):
-        instance = super(CourseDescriptor, cls).from_xml(xml_data, system, org, course)
+    def from_xml(cls, xml_data, system, id_generator):
+        instance = super(CourseDescriptor, cls).from_xml(xml_data, system, id_generator)
 
         # bleh, have to parse the XML here to just pull out the url_name attribute
         # I don't think it's stored anywhere in the instance.
@@ -597,6 +585,9 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
 
     @property
     def raw_grader(self):
+        # force the caching of the xblock value so that it can detect the change
+        # pylint: disable=pointless-statement
+        self.grading_policy['GRADER']
         return self._grading_policy['RAW_GRADER']
 
     @raw_grader.setter
@@ -785,7 +776,10 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
                     xmoduledescriptors.append(s)
 
                     # The xmoduledescriptors included here are only the ones that have scores.
-                    section_description = {'section_descriptor': s, 'xmoduledescriptors': filter(lambda child: child.has_score, xmoduledescriptors)}
+                    section_description = {
+                        'section_descriptor': s,
+                        'xmoduledescriptors': filter(lambda child: child.has_score, xmoduledescriptors)
+                    }
 
                     section_format = s.format if s.format is not None else ''
                     graded_sections[section_format] = graded_sections.get(section_format, []) + [section_description]
@@ -872,93 +866,6 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             log.exception("Error parsing discussion_blackouts for course {0}".format(self.id))
 
         return True
-
-    class TestCenterExam(object):
-        def __init__(self, course_id, exam_name, exam_info):
-            self.course_id = course_id
-            self.exam_name = exam_name
-            self.exam_info = exam_info
-            self.exam_series_code = exam_info.get('Exam_Series_Code') or exam_name
-            self.display_name = exam_info.get('Exam_Display_Name') or self.exam_series_code
-            self.first_eligible_appointment_date = self._try_parse_time('First_Eligible_Appointment_Date')
-            if self.first_eligible_appointment_date is None:
-                raise ValueError("First appointment date must be specified")
-            # TODO: If defaulting the last appointment date, it should be the
-            # *end* of the same day, not the same time.  It's going to be used as the
-            # end of the exam overall, so we don't want the exam to disappear too soon.
-            # It's also used optionally as the registration end date, so time matters there too.
-            self.last_eligible_appointment_date = self._try_parse_time('Last_Eligible_Appointment_Date')  # or self.first_eligible_appointment_date
-            if self.last_eligible_appointment_date is None:
-                raise ValueError("Last appointment date must be specified")
-            self.registration_start_date = (self._try_parse_time('Registration_Start_Date') or
-                datetime.fromtimestamp(0, UTC()))
-            self.registration_end_date = self._try_parse_time('Registration_End_Date') or self.last_eligible_appointment_date
-            # do validation within the exam info:
-            if self.registration_start_date > self.registration_end_date:
-                raise ValueError("Registration start date must be before registration end date")
-            if self.first_eligible_appointment_date > self.last_eligible_appointment_date:
-                raise ValueError("First appointment date must be before last appointment date")
-            if self.registration_end_date > self.last_eligible_appointment_date:
-                raise ValueError("Registration end date must be before last appointment date")
-            self.exam_url = exam_info.get('Exam_URL')
-
-        def _try_parse_time(self, key):
-            """
-            Parse an optional metadata key containing a time: if present, complain
-            if it doesn't parse.
-            Return None if not present or invalid.
-            """
-            if key in self.exam_info:
-                try:
-                    return Date().from_json(self.exam_info[key])
-                except ValueError as e:
-                    msg = "Exam {0} in course {1} loaded with a bad exam_info key '{2}': '{3}'".format(self.exam_name, self.course_id, self.exam_info[key], e)
-                    log.warning(msg)
-                return None
-
-        def has_started(self):
-            return datetime.now(UTC()) > self.first_eligible_appointment_date
-
-        def has_ended(self):
-            return datetime.now(UTC()) > self.last_eligible_appointment_date
-
-        def has_started_registration(self):
-            return datetime.now(UTC()) > self.registration_start_date
-
-        def has_ended_registration(self):
-            return datetime.now(UTC()) > self.registration_end_date
-
-        def is_registering(self):
-            now = datetime.now(UTC())
-            return now >= self.registration_start_date and now <= self.registration_end_date
-
-        @property
-        def first_eligible_appointment_date_text(self):
-            return self.first_eligible_appointment_date.strftime("%b %d, %Y")
-
-        @property
-        def last_eligible_appointment_date_text(self):
-            return self.last_eligible_appointment_date.strftime("%b %d, %Y")
-
-        @property
-        def registration_end_date_text(self):
-            return date_utils.get_default_time_display(self.registration_end_date)
-
-    @property
-    def current_test_center_exam(self):
-        exams = [exam for exam in self.test_center_exams if exam.has_started_registration() and not exam.has_ended()]
-        if len(exams) > 1:
-            # TODO: output some kind of warning.  This should already be
-            # caught if we decide to do validation at load time.
-            return exams[0]
-        elif len(exams) == 1:
-            return exams[0]
-        else:
-            return None
-
-    def get_test_center_exam(self, exam_series_code):
-        exams = [exam for exam in self.test_center_exams if exam.exam_series_code == exam_series_code]
-        return exams[0] if len(exams) == 1 else None
 
     @property
     def number(self):

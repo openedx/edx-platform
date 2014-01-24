@@ -1,4 +1,4 @@
-from pymongo import Connection
+import pymongo
 import gridfs
 from gridfs.errors import NoFile
 
@@ -16,9 +16,22 @@ import json
 
 
 class MongoContentStore(ContentStore):
-    def __init__(self, host, db, port=27017, user=None, password=None, bucket='fs', **kwargs):
+    # pylint: disable=W0613
+    def __init__(self, host, db, port=27017, user=None, password=None, bucket='fs', collection=None, **kwargs):
+        """
+        Establish the connection with the mongo backend and connect to the collections
+
+        :param collection: ignores but provided for consistency w/ other doc_store_config patterns
+        """
         logging.debug('Using MongoDB for static content serving at host={0} db={1}'.format(host, db))
-        _db = Connection(host=host, port=port, **kwargs)[db]
+        _db = pymongo.database.Database(
+            pymongo.MongoClient(
+                host=host,
+                port=port,
+                **kwargs
+            ),
+            db
+        )
 
         if user is not None and password is not None:
             _db.authenticate(user, password)
@@ -87,7 +100,7 @@ class MongoContentStore(ContentStore):
     def close_stream(self, handle):
         try:
             handle.close()
-        except:
+        except Exception:
             pass
 
     def export(self, location, output_directory):
@@ -115,7 +128,7 @@ class MongoContentStore(ContentStore):
         directory as the other policy files.
         """
         policy = {}
-        assets = self.get_all_content_for_course(course_location)
+        assets, __ = self.get_all_content_for_course(course_location)
 
         for asset in assets:
             asset_location = Location(asset['_id'])
@@ -128,12 +141,14 @@ class MongoContentStore(ContentStore):
             json.dump(policy, f)
 
     def get_all_content_thumbnails_for_course(self, location):
-        return self._get_all_content_for_course(location, get_thumbnails=True)
+        return self._get_all_content_for_course(location, get_thumbnails=True)[0]
 
-    def get_all_content_for_course(self, location):
-        return self._get_all_content_for_course(location, get_thumbnails=False)
+    def get_all_content_for_course(self, location, start=0, maxresults=-1, sort=None):
+        return self._get_all_content_for_course(
+            location, start=start, maxresults=maxresults, get_thumbnails=False, sort=sort
+        )
 
-    def _get_all_content_for_course(self, location, get_thumbnails=False):
+    def _get_all_content_for_course(self, location, get_thumbnails=False, start=0, maxresults=-1, sort=None):
         '''
         Returns a list of all static assets for a course. The return format is a list of dictionary elements. Example:
 
@@ -156,8 +171,15 @@ class MongoContentStore(ContentStore):
         course_filter = Location(XASSET_LOCATION_TAG, category="asset" if not get_thumbnails else "thumbnail",
                                  course=location.course, org=location.org)
         # 'borrow' the function 'location_to_query' from the Mongo modulestore implementation
-        items = self.fs_files.find(location_to_query(course_filter))
-        return list(items)
+        if maxresults > 0:
+            items = self.fs_files.find(
+                location_to_query(course_filter),
+                skip=start, limit=maxresults, sort=sort
+            )
+        else:
+            items = self.fs_files.find(location_to_query(course_filter), sort=sort)
+        count = items.count()
+        return list(items), count
 
     def set_attr(self, location, attr, value=True):
         """

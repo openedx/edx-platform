@@ -1,20 +1,23 @@
 #pylint: disable=E1103, E1101
 
-from django.conf import settings
-from xmodule.modulestore import Location
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError
-from xmodule.contentstore.content import StaticContent
-from xmodule.contentstore.django import contentstore
 import copy
 import logging
 import re
-from xmodule.modulestore.draft import DIRECT_ONLY_CATEGORIES
+
+from django.conf import settings
 from django.utils.translation import ugettext as _
+
+from xmodule.contentstore.content import StaticContent
+from xmodule.contentstore.django import contentstore
+from xmodule.modulestore import Location
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError
 from django_comment_common.utils import unseed_permissions_roles
-from auth.authz import _delete_course_group
 from xmodule.modulestore.store_utilities import delete_course
 from xmodule.course_module import CourseDescriptor
+from xmodule.modulestore.draft import DIRECT_ONLY_CATEGORIES
+from student.roles import CourseInstructorRole, CourseStaffRole
+
 
 log = logging.getLogger(__name__)
 
@@ -32,7 +35,7 @@ def delete_course_and_groups(course_id, commit=False):
     module_store = modulestore('direct')
     content_store = contentstore()
 
-    org, course_num, run = course_id.split("/")
+    org, course_num, _ = course_id.split("/")
     module_store.ignore_write_events_on_courses.append('{0}/{1}'.format(org, course_num))
 
     loc = CourseDescriptor.id_to_location(course_id)
@@ -44,7 +47,10 @@ def delete_course_and_groups(course_id, commit=False):
         # in the django layer, we need to remove all the user permissions groups associated with this course
         if commit:
             try:
-                _delete_course_group(loc)
+                staff_role = CourseStaffRole(loc)
+                staff_role.remove_users(*staff_role.users_with_role())
+                instructor_role = CourseInstructorRole(loc)
+                instructor_role.remove_users(*instructor_role.users_with_role())
             except Exception as err:
                 log.error("Error in deleting course groups for {0}: {1}".format(loc, err))
 
@@ -76,7 +82,7 @@ def get_course_location_for_item(location):
         # @hack! We need to find the course location however, we don't
         # know the 'name' parameter in this context, so we have
         # to assume there's only one item in this query even though we are not specifying a name
-        course_search_location = ['i4x', item_loc.org, item_loc.course, 'course', None]
+        course_search_location = Location('i4x', item_loc.org, item_loc.course, 'course', None)
         courses = modulestore().get_items(course_search_location)
 
         # make sure we found exactly one match on this above course search
@@ -104,7 +110,7 @@ def get_course_for_item(location):
     # @hack! We need to find the course location however, we don't
     # know the 'name' parameter in this context, so we have
     # to assume there's only one item in this query even though we are not specifying a name
-    course_search_location = ['i4x', item_loc.org, item_loc.course, 'course', None]
+    course_search_location = Location('i4x', item_loc.org, item_loc.course, 'course', None)
     courses = modulestore().get_items(course_search_location)
 
     # make sure we found exactly one match on this above course search
@@ -133,7 +139,7 @@ def get_lms_link_for_item(location, preview=False, course_id=None):
 
     if settings.LMS_BASE is not None:
         if preview:
-            lms_base = settings.MITX_FEATURES.get('PREVIEW_LMS_BASE')
+            lms_base = settings.FEATURES.get('PREVIEW_LMS_BASE')
         else:
             lms_base = settings.LMS_BASE
 
@@ -152,7 +158,7 @@ def get_lms_link_for_about_page(location):
     """
     Returns the url to the course about page from the location tuple.
     """
-    if settings.MITX_FEATURES.get('ENABLE_MKTG_SITE', False):
+    if settings.FEATURES.get('ENABLE_MKTG_SITE', False):
         if not hasattr(settings, 'MKTG_URLS'):
             log.exception("ENABLE_MKTG_SITE is True, but MKTG_URLS is not defined.")
             about_base = None
@@ -185,7 +191,7 @@ def get_lms_link_for_about_page(location):
 
 def course_image_url(course):
     """Returns the image url for the course."""
-    loc = course.location._replace(tag='c4x', category='asset', name=course.course_image)
+    loc = StaticContent.compute_location(course.location.org, course.location.course, course.course_image)
     path = StaticContent.get_url_path_from_location(loc)
     return path
 

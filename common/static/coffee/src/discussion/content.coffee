@@ -99,6 +99,13 @@ if Backbone?
       @get("abuse_flaggers").pop(window.user.get('id'))
       @trigger "change", @
 
+    vote: ->
+      @get("votes")["up_count"] = parseInt(@get("votes")["up_count"]) + 1
+      @trigger "change", @
+
+    unvote: ->
+      @get("votes")["up_count"] = parseInt(@get("votes")["up_count"]) - 1
+      @trigger "change", @
     
   class @Thread extends @Content
     urlMappers:
@@ -129,14 +136,6 @@ if Backbone?
 
     unfollow: ->
       @set('subscribed', false)
-
-    vote: ->
-      @get("votes")["up_count"] = parseInt(@get("votes")["up_count"]) + 1
-      @trigger "change", @
-
-    unvote: ->
-      @get("votes")["up_count"] = parseInt(@get("votes")["up_count"]) - 1
-      @trigger "change", @
 
     display_body: ->
       if @has("highlighted_body")

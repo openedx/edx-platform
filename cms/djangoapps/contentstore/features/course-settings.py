@@ -151,9 +151,10 @@ def i_see_new_course_image(_step):
     assert len(images) == 1
     img = images[0]
     expected_src = '/c4x/MITx/999/asset/image.jpg'
+
     # Don't worry about the domain in the URL
-    assert img['src'].endswith(expected_src), "Was looking for {expected}, found {actual}".format(
-        expected=expected_src, actual=img['src'])
+    success_func = lambda _: img['src'].endswith(expected_src)
+    world.wait_for(success_func)
 
 
 @step('the image URL should be present in the field')
@@ -178,7 +179,9 @@ def verify_date_or_time(css, date_or_time):
     """
     Verifies date or time field.
     """
-    assert_equal(date_or_time, world.css_value(css))
+    # We need to wait for JavaScript to fill in the field, so we use
+    # css_has_value(), which first checks that the field is not blank
+    assert_true(world.css_has_value(css, date_or_time))
 
 
 @step('I do not see the changes')

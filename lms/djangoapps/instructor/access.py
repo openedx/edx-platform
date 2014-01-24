@@ -10,12 +10,17 @@ TO DO sync instructor and staff flags
 """
 
 import logging
-from django.contrib.auth.models import Group
-from courseware.access import (get_access_group_name,
-                               course_beta_test_group_name)
 from django_comment_common.models import Role
 
+from student.roles import CourseBetaTesterRole, CourseInstructorRole, CourseStaffRole
+
 log = logging.getLogger(__name__)
+
+ROLES = {
+    'beta': CourseBetaTesterRole,
+    'instructor': CourseInstructorRole,
+    'staff': CourseStaffRole,
+}
 
 
 def list_with_level(course, level):
@@ -26,16 +31,7 @@ def list_with_level(course, level):
     There could be other levels specific to the course.
     If there is no Group for that course-level, returns an empty list
     """
-    if level == 'beta':
-        grpname = course_beta_test_group_name(course.location)
-    else:
-        grpname = get_access_group_name(course, level)
-
-    try:
-        return Group.objects.get(name=grpname).user_set.all()
-    except Group.DoesNotExist:
-        log.info("list_with_level called with non-existant group named {}".format(grpname))
-        return []
+    return ROLES[level](course.location).users_with_role()
 
 
 def allow_access(course, user, level):
@@ -66,23 +62,20 @@ def _change_access(course, user, level, action):
     NOTE: will create a group if it does not yet exist.
     """
 
-    if level == 'beta':
-        grpname = course_beta_test_group_name(course.location)
-    elif level in ['instructor', 'staff']:
-        grpname = get_access_group_name(course, level)
-    else:
+    try:
+        role = ROLES[level](course.location)
+    except KeyError:
         raise ValueError("unrecognized level '{}'".format(level))
-    group, _ = Group.objects.get_or_create(name=grpname)
 
     if action == 'allow':
-        user.groups.add(group)
+        role.add_users(user)
     elif action == 'revoke':
-        user.groups.remove(group)
+        role.remove_users(user)
     else:
         raise ValueError("unrecognized action '{}'".format(action))
 
 
-def update_forum_role_membership(course_id, user, rolename, action):
+def update_forum_role(course_id, user, rolename, action):
     """
     Change forum access of user.
 

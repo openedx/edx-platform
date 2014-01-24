@@ -1,19 +1,19 @@
-from django.conf import settings
-from xmodule.open_ended_grading_classes import peer_grading_service
-from .staff_grading_service import StaffGradingService
-from xmodule.open_ended_grading_classes.controller_query_service import ControllerQueryService
+import datetime
 import json
-from student.models import unique_id_for_user
-from courseware.models import StudentModule
 import logging
-from courseware.access import has_access
-from util.cache import cache
-import datetime
-from xmodule.x_module import ModuleSystem
-from mitxmako.shortcuts import render_to_string
-import datetime
 
-from xblock.field_data import DictFieldData
+from django.conf import settings
+
+from xmodule.open_ended_grading_classes import peer_grading_service
+from xmodule.open_ended_grading_classes.controller_query_service import ControllerQueryService
+
+from courseware.access import has_access
+from lms.lib.xblock.runtime import LmsModuleSystem
+from edxmako.shortcuts import render_to_string
+from student.models import unique_id_for_user
+from util.cache import cache
+
+from .staff_grading_service import StaffGradingService
 
 log = logging.getLogger(__name__)
 
@@ -64,13 +64,11 @@ def staff_grading_notifications(course, user):
 
 
 def peer_grading_notifications(course, user):
-    system = ModuleSystem(
-        ajax_url=None,
+    system = LmsModuleSystem(
         track_function=None,
         get_module = None,
         render_template=render_to_string,
         replace_urls=None,
-        xmodule_field_data=DictFieldData({}),
     )
     peer_gs = peer_grading_service.PeerGradingService(settings.OPEN_ENDED_GRADING_INTERFACE, system)
     pending_grading = False
@@ -125,14 +123,12 @@ def combined_notifications(course, user):
         return notification_dict
 
     #Define a mock modulesystem
-    system = ModuleSystem(
+    system = LmsModuleSystem(
         static_url="/static",
-        ajax_url=None,
         track_function=None,
         get_module = None,
         render_template=render_to_string,
         replace_urls=None,
-        xmodule_field_data=DictFieldData({})
     )
     #Initialize controller query service using our mock system
     controller_qs = ControllerQueryService(settings.OPEN_ENDED_GRADING_INTERFACE, system)

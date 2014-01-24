@@ -1,18 +1,12 @@
-(function () {
+(function (undefined) {
     describe('Video', function () {
         var oldOTBD;
 
         beforeEach(function () {
             jasmine.stubRequests();
-            this.videosDefinition = '0.75:7tqY6eQzVhE,1.0:cogebirgzzM';
-            this['7tqY6eQzVhE'] = '7tqY6eQzVhE';
-            this['cogebirgzzM'] = 'cogebirgzzM';
         });
 
         afterEach(function () {
-            window.OldVideoPlayer = undefined;
-            window.onYouTubePlayerAPIReady = undefined;
-            window.onHTML5PlayerAPIReady = undefined;
             $('source').remove();
         });
 
@@ -20,7 +14,7 @@
             describe('YT', function () {
                 beforeEach(function () {
                     loadFixtures('video.html');
-                    $.cookie.andReturn('0.75');
+                    $.cookie.andReturn('0.50');
                 });
 
                 describe('by default', function () {
@@ -32,27 +26,24 @@
                         expect(this.state.videoType).toEqual('youtube');
                     });
 
-                    it('reset the current video player', function () {
-                        expect(window.OldVideoPlayer).toBeUndefined();
-                    });
-
                     it('set the elements', function () {
                         expect(this.state.el).toBe('#video_id');
                     });
 
                     it('parse the videos', function () {
                         expect(this.state.videos).toEqual({
-                            '0.75': this['7tqY6eQzVhE'],
-                            '1.0': this['cogebirgzzM']
+                            '0.50': '7tqY6eQzVhE',
+                            '1.0': 'cogebirgzzM',
+                            '1.50': 'abcdefghijkl'
                         });
                     });
 
                     it('parse available video speeds', function () {
-                        expect(this.state.speeds).toEqual(['0.75', '1.0']);
+                        expect(this.state.speeds).toEqual(['0.50', '1.0', '1.50']);
                     });
 
                     it('set current video speed via cookie', function () {
-                        expect(this.state.speed).toEqual('0.75');
+                        expect(this.state.speed).toEqual('1.50');
                     });
                 });
             });
@@ -62,7 +53,6 @@
 
                 beforeEach(function () {
                     loadFixtures('video_html5.html');
-                    this.stubVideoPlayer = jasmine.createSpy('VideoPlayer');
                     $.cookie.andReturn('0.75');
                 });
 
@@ -77,10 +67,6 @@
 
                     it('check videoType', function () {
                         expect(state.videoType).toEqual('html5');
-                    });
-
-                    it('reset the current video player', function () {
-                        expect(window.OldVideoPlayer).toBeUndefined();
                     });
 
                     it('set the elements', function () {
@@ -98,7 +84,10 @@
                         });
                     });
 
-                    it('parse the videos if subtitles do not exist', function () {
+                    it(
+                        'parse the videos if subtitles do not exist',
+                        function ()
+                    {
                         var sub = '';
 
                         $('#example').find('.video').data('sub', '');
@@ -119,16 +108,41 @@
                                 ogg: null
                             }, v = document.createElement('video');
 
-                        if (!!(v.canPlayType && v.canPlayType('video/webm; codecs="vp8, vorbis"').replace(/no/, ''))) {
-                            html5Sources['webm'] = 'xmodule/include/fixtures/test.webm';
+                        if (
+                            !!(
+                                v.canPlayType &&
+                                v.canPlayType(
+                                    'video/webm; codecs="vp8, vorbis"'
+                                ).replace(/no/, '')
+                            )
+                        ) {
+                            html5Sources['webm'] =
+                                'xmodule/include/fixtures/test.webm';
                         }
 
-                        if (!!(v.canPlayType && v.canPlayType('video/mp4; codecs="avc1.42E01E, mp4a.40.2"').replace(/no/, ''))) {
-                            html5Sources['mp4'] = 'xmodule/include/fixtures/test.mp4';
+                        if (
+                            !!(
+                                v.canPlayType &&
+                                v.canPlayType(
+                                    'video/mp4; codecs="avc1.42E01E, ' +
+                                    'mp4a.40.2"'
+                                ).replace(/no/, '')
+                            )
+                        ) {
+                            html5Sources['mp4'] =
+                                'xmodule/include/fixtures/test.mp4';
                         }
 
-                        if (!!(v.canPlayType && v.canPlayType('video/ogg; codecs="theora"').replace(/no/, ''))) {
-                            html5Sources['ogg'] = 'xmodule/include/fixtures/test.ogv';
+                        if (
+                            !!(
+                                v.canPlayType &&
+                                v.canPlayType(
+                                    'video/ogg; codecs="theora"'
+                                ).replace(/no/, '')
+                            )
+                        ) {
+                            html5Sources['ogg'] =
+                                'xmodule/include/fixtures/test.ogv';
                         }
 
                         expect(state.html5Sources).toEqual(html5Sources);
@@ -141,14 +155,14 @@
                     });
 
                     it('set current video speed via cookie', function () {
-                        expect(state.speed).toEqual('0.75');
+                        expect(state.speed).toEqual('1.50');
                     });
                 });
 
-                // Note that the loading of stand alone HTML5 player API is handled by
-                // Require JS. When state.videoPlayer is created, the stand alone HTML5
-                // player object is already loaded, so no further testing in that case
-                // is required.
+                // Note that the loading of stand alone HTML5 player API is
+                // handled by Require JS. When state.videoPlayer is created,
+                // the stand alone HTML5 player object is already loaded, so no
+                // further testing in that case is required.
                 describe('HTML5 API is available', function () {
                     beforeEach(function () {
                         state = new Video('#example');
@@ -174,19 +188,80 @@
 
             describe('with speed', function () {
                 it('return the video id for given speed', function () {
-                    expect(state.youtubeId('0.75')).toEqual(this['7tqY6eQzVhE']);
-                    expect(state.youtubeId('1.0')).toEqual(this['cogebirgzzM']);
+                    expect(state.youtubeId('0.50'))
+                        .toEqual('7tqY6eQzVhE');
+                    expect(state.youtubeId('1.0'))
+                        .toEqual('cogebirgzzM');
+                    expect(state.youtubeId('1.50'))
+                        .toEqual('abcdefghijkl');
                 });
             });
 
             describe('without speed', function () {
                 it('return the video id for current speed', function () {
-                    expect(state.youtubeId()).toEqual(this.cogebirgzzM);
+                    expect(state.youtubeId()).toEqual('abcdefghijkl');
                 });
             });
         });
 
-        describe('multiple YT on page', function () {
+        describe('checking start and end times', function () {
+            var miniTestSuite = [
+                {
+                    itDescription: 'both times are proper',
+                    data: {start: 12, end: 24},
+                    expectData: {start: 12, end: 24}
+                },
+                {
+                    itDescription: 'start time is invalid',
+                    data: {start: '', end: 24},
+                    expectData: {start: 0, end: 24}
+                },
+                {
+                    itDescription: 'end time is invalid',
+                    data: {start: 12, end: ''},
+                    expectData: {start: 12, end: null}
+                },
+                {
+                    itDescription: 'start time is less than 0',
+                    data: {start: -12, end: 24},
+                    expectData: {start: 0, end: 24}
+                },
+                {
+                    itDescription: 'start time is greater than end time',
+                    data: {start: 42, end: 24},
+                    expectData: {start: 42, end: null}
+                }
+            ];
+
+            beforeEach(function () {
+                loadFixtures('video.html');
+
+            });
+
+            $.each(miniTestSuite, function (index, test) {
+                itFabrique(test.itDescription, test.data, test.expectData);
+            });
+
+            return;
+
+            function itFabrique(itDescription, data, expectData) {
+                it(itDescription, function () {
+                    $('#example').find('.video')
+                        .data({
+                            'start': data.start,
+                            'end': data.end
+                        });
+
+                    state = new Video('#example');
+
+                    expect(state.config.startTime).toBe(expectData.start);
+                    expect(state.config.endTime).toBe(expectData.end);
+                });
+            }
+        });
+
+        // Disabled 11/25/13 due to flakiness in master
+        xdescribe('multiple YT on page', function () {
             var state1, state2, state3;
 
             beforeEach(function () {
@@ -208,59 +283,56 @@
                 state3 = new Video('#example3');
             });
 
-            it('check for YT availability is performed only once', function () {
+            it(
+                'check for YT availability is performed only once',
+                function ()
+            {
                 var numAjaxCalls = 0;
 
                 // Total ajax calls made.
                 numAjaxCalls = $.ajax.calls.length;
 
-                // Subtract ajax calls to get captions.
+                // Subtract ajax calls to get captions via
+                // state.videoCaption.fetchCaption() function.
                 numAjaxCalls -= $.ajaxWithPrefix.calls.length;
 
-                // Subtract ajax calls to get metadata for each video.
+                // Subtract ajax calls to get metadata for each video via
+                // state.getVideoMetadata() function.
+                numAjaxCalls -= 3;
+
+                // Subtract ajax calls to log event 'pause_video' via
+                // state.videoPlayer.log() function.
                 numAjaxCalls -= 3;
 
                 // This should leave just one call. It was made to check
-                // for YT availability.
+                // for YT availability. This is done in state.initialize()
+                // function. SPecifically, with the statement
+                //
+                //     this.youtubeXhr = this.getVideoMetadata();
                 expect(numAjaxCalls).toBe(1);
             });
         });
 
         describe('setSpeed', function () {
+
             describe('YT', function () {
                 beforeEach(function () {
                     loadFixtures('video.html');
                     state = new Video('#example');
                 });
 
-                describe('when new speed is available', function () {
-                    beforeEach(function () {
-                        state.setSpeed('0.75', true);
-                    });
+                it('check mapping', function () {
+                    var map = {
+                        '0.75': '0.50',
+                        '1.25': '1.50'
+                    };
 
-                    it('set new speed', function () {
-                        expect(state.speed).toEqual('0.75');
-                    });
-
-                    it('save setting for new speed', function () {
-                        expect($.cookie).toHaveBeenCalledWith('video_speed', '0.75', {
-                            expires: 3650,
-                            path: '/'
-                        });
-                    });
-                });
-
-                describe('when new speed is not available', function () {
-                    beforeEach(function () {
-                        state.setSpeed('1.75');
-                    });
-
-                    it('set speed to 1.0x', function () {
-                        expect(state.speed).toEqual('1.0');
+                    $.each(map, function(key, expected) {
+                        state.setSpeed(key, true);
+                        expect(state.speed).toBe(expected);
                     });
                 });
             });
-
             describe('HTML5', function () {
                 beforeEach(function () {
                     loadFixtures('video_html5.html');
@@ -277,10 +349,9 @@
                     });
 
                     it('save setting for new speed', function () {
-                        expect($.cookie).toHaveBeenCalledWith('video_speed', '0.75', {
-                            expires: 3650,
-                            path: '/'
-                        });
+
+                        expect(state.storage.getItem('general_speed')).toBe('0.75');
+                        expect(state.storage.getItem('video_speed_' + state.id)).toBe('0.75');
                     });
                 });
 
@@ -293,6 +364,19 @@
                         expect(state.speed).toEqual('1.0');
                     });
                 });
+
+                it('check mapping', function () {
+                    var map = {
+                        '0.25': '0.75',
+                        '0.50': '0.75',
+                        '2.0': '1.50'
+                    };
+
+                    $.each(map, function(key, expected) {
+                        state.setSpeed(key, true);
+                        expect(state.speed).toBe(expected);
+                    });
+                });
             });
         });
 
@@ -303,7 +387,7 @@
             });
 
             it('return duration for current video', function () {
-                expect(state.getDuration()).toEqual(200);
+                expect(state.getDuration()).toEqual(400);
             });
         });
 

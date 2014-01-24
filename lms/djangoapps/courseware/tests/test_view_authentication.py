@@ -3,20 +3,28 @@ import pytz
 
 from mock import patch
 
-from django.contrib.auth.models import User, Group
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 
 # Need access to internal func to put users in the right group
-from courseware.access import (has_access, _course_staff_group_name,
-                               course_beta_test_group_name, settings as access_settings)
+from courseware.access import has_access
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
-from helpers import LoginEnrollmentTestCase, check_for_get_code
+from student.tests.factories import UserFactory, CourseEnrollmentFactory
+
+from courseware.tests.helpers import LoginEnrollmentTestCase, check_for_get_code
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from courseware.tests.factories import (
+    BetaTesterFactory,
+    StaffFactory,
+    GlobalStaffFactory,
+    InstructorFactory,
+    OrgStaffFactory,
+    OrgInstructorFactory,
+)
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -89,12 +97,15 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         # user (the student), and the requesting user (the prof)
         url = reverse('student_progress',
                       kwargs={'course_id': course.id,
-                              'student_id': User.objects.get(email=self.ACCOUNT_INFO[0][0]).id})
+                              'student_id': self.enrolled_user.id})
         check_for_get_code(self, 404, url)
 
         # The courseware url should redirect, not 200
         url = self._reverse_urls(['courseware'], course)[0]
         check_for_get_code(self, 302, url)
+
+    def login(self, user):
+        return super(TestViewAuth, self).login(user.email, 'test')
 
     def setUp(self):
 
@@ -103,26 +114,39 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.courseware_chapter = ItemFactory.create(display_name='courseware')
 
         self.test_course = CourseFactory.create(number='666', display_name='Robot_Sub_Course')
-        self.sub_courseware_chapter = ItemFactory.create(parent_location=self.test_course.location,
-                                                         display_name='courseware')
-        self.sub_overview_chapter = ItemFactory.create(parent_location=self.sub_courseware_chapter.location,
-                                                       display_name='Overview')
-        self.welcome_section = ItemFactory.create(parent_location=self.overview_chapter.location,
-                                                  display_name='Welcome')
+        self.other_org_course = CourseFactory.create(org='Other_Org_Course')
+        self.sub_courseware_chapter = ItemFactory.create(
+            parent_location=self.test_course.location, display_name='courseware'
+        )
+        self.sub_overview_chapter = ItemFactory.create(
+            parent_location=self.sub_courseware_chapter.location,
+            display_name='Overview'
+        )
+        self.welcome_section = ItemFactory.create(
+            parent_location=self.overview_chapter.location,
+            display_name='Welcome'
+        )
 
-        # Create two accounts and activate them.
-        for i in range(len(self.ACCOUNT_INFO)):
-            username, email, password = 'u{0}'.format(i), self.ACCOUNT_INFO[i][0], self.ACCOUNT_INFO[i][1]
-            self.create_account(username, email, password)
-            self.activate_user(email)
+        self.global_staff_user = GlobalStaffFactory()
+        self.unenrolled_user = UserFactory(last_name="Unenrolled")
+
+        self.enrolled_user = UserFactory(last_name="Enrolled")
+        CourseEnrollmentFactory(user=self.enrolled_user, course_id=self.course.id)
+        CourseEnrollmentFactory(user=self.enrolled_user, course_id=self.test_course.id)
+
+        self.staff_user = StaffFactory(course=self.course.location)
+        self.instructor_user = InstructorFactory(
+            course=self.course.location)
+        self.org_staff_user = OrgStaffFactory(course=self.course.location)
+        self.org_instructor_user = OrgInstructorFactory(
+            course=self.course.location)
 
     def test_redirection_unenrolled(self):
         """
         Verify unenrolled student is redirected to the 'about' section of the chapter
         instead of the 'Welcome' section after clicking on the courseware tab.
         """
-        email, password = self.ACCOUNT_INFO[0]
-        self.login(email, password)
+        self.login(self.unenrolled_user)
         response = self.client.get(reverse('courseware',
                                            kwargs={'course_id': self.course.id}))
         self.assertRedirects(response,
@@ -134,9 +158,7 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         Verify enrolled student is redirected to the 'Welcome' section of
         the chapter after clicking on the courseware tab.
         """
-        email, password = self.ACCOUNT_INFO[0]
-        self.login(email, password)
-        self.enroll(self.course)
+        self.login(self.enrolled_user)
 
         response = self.client.get(reverse('courseware',
                                            kwargs={'course_id': self.course.id}))
@@ -152,11 +174,7 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         Verify non-staff cannot load the instructor
         dashboard, the grade views, and student profile pages.
         """
-        email, password = self.ACCOUNT_INFO[0]
-        self.login(email, password)
-
-        self.enroll(self.course)
-        self.enroll(self.test_course)
+        self.login(self.enrolled_user)
 
         urls = [reverse('instructor_dashboard', kwargs={'course_id': self.course.id}),
                 reverse('instructor_dashboard', kwargs={'course_id': self.test_course.id})]
@@ -165,19 +183,12 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         for url in urls:
             check_for_get_code(self, 404, url)
 
-    def test_instructor_course_access(self):
+    def test_staff_course_access(self):
         """
-        Verify instructor can load the instructor dashboard, the grade views,
+        Verify staff can load the staff dashboard, the grade views,
         and student profile pages for their course.
         """
-        email, password = self.ACCOUNT_INFO[1]
-
-        # Make the instructor staff in self.course
-        group_name = _course_staff_group_name(self.course.location)
-        group = Group.objects.create(name=group_name)
-        group.user_set.add(User.objects.get(email=email))
-
-        self.login(email, password)
+        self.login(self.staff_user)
 
         # Now should be able to get to self.course, but not  self.test_course
         url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id})
@@ -186,18 +197,55 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         url = reverse('instructor_dashboard', kwargs={'course_id': self.test_course.id})
         check_for_get_code(self, 404, url)
 
-    def test_instructor_as_staff_access(self):
+    def test_instructor_course_access(self):
         """
-        Verify the instructor can load staff pages if he is given
-        staff permissions.
+        Verify instructor can load the instructor dashboard, the grade views,
+        and student profile pages for their course.
         """
-        email, password = self.ACCOUNT_INFO[1]
-        self.login(email, password)
+        self.login(self.instructor_user)
 
-        # now make the instructor also staff
-        instructor = User.objects.get(email=email)
-        instructor.is_staff = True
-        instructor.save()
+        # Now should be able to get to self.course, but not  self.test_course
+        url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id})
+        check_for_get_code(self, 200, url)
+
+        url = reverse('instructor_dashboard', kwargs={'course_id': self.test_course.id})
+        check_for_get_code(self, 404, url)
+
+    def test_org_staff_access(self):
+        """
+        Verify org staff can load the instructor dashboard, the grade views,
+        and student profile pages for course in their org.
+        """
+        self.login(self.org_staff_user)
+        url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id})
+        check_for_get_code(self, 200, url)
+
+        url = reverse('instructor_dashboard', kwargs={'course_id': self.test_course.id})
+        check_for_get_code(self, 200, url)
+
+        url = reverse('instructor_dashboard', kwargs={'course_id': self.other_org_course.id})
+        check_for_get_code(self, 404, url)
+
+    def test_org_instructor_access(self):
+        """
+        Verify org instructor can load the instructor dashboard, the grade views,
+        and student profile pages for course in their org.
+        """
+        self.login(self.org_instructor_user)
+        url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id})
+        check_for_get_code(self, 200, url)
+
+        url = reverse('instructor_dashboard', kwargs={'course_id': self.test_course.id})
+        check_for_get_code(self, 200, url)
+
+        url = reverse('instructor_dashboard', kwargs={'course_id': self.other_org_course.id})
+        check_for_get_code(self, 404, url)
+
+    def test_global_staff_access(self):
+        """
+        Verify the global staff user can access any course.
+        """
+        self.login(self.global_staff_user)
 
         # and now should be able to load both
         urls = [reverse('instructor_dashboard', kwargs={'course_id': self.course.id}),
@@ -206,14 +254,12 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         for url in urls:
             check_for_get_code(self, 200, url)
 
-    @patch.dict(access_settings.MITX_FEATURES, {'DISABLE_START_DATES': False})
+    @patch.dict('courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_dark_launch_enrolled_student(self):
         """
         Make sure that before course start, students can't access course
         pages.
         """
-
-        student_email, student_password = self.ACCOUNT_INFO[0]
 
         # Make courses start in the future
         now = datetime.datetime.now(pytz.UTC)
@@ -227,9 +273,7 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertFalse(self.test_course.has_started())
 
         # First, try with an enrolled student
-        self.login(student_email, student_password)
-        self.enroll(self.course, True)
-        self.enroll(self.test_course, True)
+        self.login(self.enrolled_user)
 
         # shouldn't be able to get to anything except the light pages
         self._check_non_staff_light(self.course)
@@ -237,14 +281,12 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self._check_non_staff_light(self.test_course)
         self._check_non_staff_dark(self.test_course)
 
-    @patch.dict(access_settings.MITX_FEATURES, {'DISABLE_START_DATES': False})
+    @patch.dict('courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_dark_launch_instructor(self):
         """
         Make sure that before course start instructors can access the
         page for their course.
         """
-        instructor_email, instructor_password = self.ACCOUNT_INFO[1]
-
         now = datetime.datetime.now(pytz.UTC)
         tomorrow = now + datetime.timedelta(days=1)
         course_data = {'start': tomorrow}
@@ -252,12 +294,7 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.course = self.update_course(self.course, course_data)
         self.test_course = self.update_course(self.test_course, test_course_data)
 
-        # Make the instructor staff in  self.course
-        group_name = _course_staff_group_name(self.course.location)
-        group = Group.objects.create(name=group_name)
-        group.user_set.add(User.objects.get(email=instructor_email))
-        self.logout()
-        self.login(instructor_email, instructor_password)
+        self.login(self.instructor_user)
         # Enroll in the classes---can't see courseware otherwise.
         self.enroll(self.course, True)
         self.enroll(self.test_course, True)
@@ -267,14 +304,12 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self._check_non_staff_dark(self.test_course)
         self._check_staff(self.course)
 
-    @patch.dict(access_settings.MITX_FEATURES, {'DISABLE_START_DATES': False})
-    def test_dark_launch_staff(self):
+    @patch.dict('courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
+    def test_dark_launch_global_staff(self):
         """
         Make sure that before course start staff can access
         course pages.
         """
-        instructor_email, instructor_password = self.ACCOUNT_INFO[1]
-
         now = datetime.datetime.now(pytz.UTC)
         tomorrow = now + datetime.timedelta(days=1)
         course_data = {'start': tomorrow}
@@ -282,27 +317,19 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.course = self.update_course(self.course, course_data)
         self.test_course = self.update_course(self.test_course, test_course_data)
 
-        self.login(instructor_email, instructor_password)
+        self.login(self.global_staff_user)
         self.enroll(self.course, True)
         self.enroll(self.test_course, True)
-
-        # now also make the instructor staff
-        instructor = User.objects.get(email=instructor_email)
-        instructor.is_staff = True
-        instructor.save()
 
         # and now should be able to load both
         self._check_staff(self.course)
         self._check_staff(self.test_course)
 
-    @patch.dict(access_settings.MITX_FEATURES, {'DISABLE_START_DATES': False})
+    @patch.dict('courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_enrollment_period(self):
         """
         Check that enrollment periods work.
         """
-        student_email, student_password = self.ACCOUNT_INFO[0]
-        instructor_email, instructor_password = self.ACCOUNT_INFO[1]
-
         # Make courses start in the future
         now = datetime.datetime.now(pytz.UTC)
         tomorrow = now + datetime.timedelta(days=1)
@@ -318,57 +345,53 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.test_course = self.update_course(self.test_course, test_course_data)
 
         # First, try with an enrolled student
-        self.login(student_email, student_password)
+        self.login(self.unenrolled_user)
         self.assertFalse(self.enroll(self.course))
         self.assertTrue(self.enroll(self.test_course))
 
-        # Make the instructor staff in the self.course
-        group_name = _course_staff_group_name(self.course.location)
-        group = Group.objects.create(name=group_name)
-        group.user_set.add(User.objects.get(email=instructor_email))
-
         self.logout()
-        self.login(instructor_email, instructor_password)
+        self.login(self.instructor_user)
         self.assertTrue(self.enroll(self.course))
-
-        # now make the instructor global staff, but not in the instructor group
-        group.user_set.remove(User.objects.get(email=instructor_email))
-        instructor = User.objects.get(email=instructor_email)
-        instructor.is_staff = True
-        instructor.save()
 
         # unenroll and try again
-        self.unenroll(self.course)
+        self.login(self.global_staff_user)
         self.assertTrue(self.enroll(self.course))
 
-    @patch.dict(access_settings.MITX_FEATURES, {'DISABLE_START_DATES': False})
-    def test_beta_period(self):
-        """
-        Check that beta-test access works.
-        """
-        student_email, student_password = self.ACCOUNT_INFO[0]
-        instructor_email, instructor_password = self.ACCOUNT_INFO[1]
 
-        # Make courses start in the future
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class TestBetatesterAccess(ModuleStoreTestCase):
+
+    def setUp(self):
+
         now = datetime.datetime.now(pytz.UTC)
         tomorrow = now + datetime.timedelta(days=1)
-        course_data = {'start': tomorrow}
 
-        # self.course's hasn't started
-        self.course = self.update_course(self.course, course_data)
+        self.course = CourseFactory(days_early_for_beta=2, start=tomorrow)
+        self.content = ItemFactory(parent=self.course)
+
+        self.normal_student = UserFactory()
+        self.beta_tester = BetaTesterFactory(course=self.course.location)
+
+    @patch.dict('courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
+    def test_course_beta_period(self):
+        """
+        Check that beta-test access works for courses.
+        """
         self.assertFalse(self.course.has_started())
 
-        # but should be accessible for beta testers
-        self.course.days_early_for_beta = 2
-
         # student user shouldn't see it
-        student_user = User.objects.get(email=student_email)
-        self.assertFalse(has_access(student_user, self.course, 'load'))
-
-        # now add the student to the beta test group
-        group_name = course_beta_test_group_name(self.course.location)
-        group = Group.objects.create(name=group_name)
-        group.user_set.add(student_user)
+        self.assertFalse(has_access(self.normal_student, self.course, 'load'))
 
         # now the student should see it
-        self.assertTrue(has_access(student_user, self.course, 'load'))
+        self.assertTrue(has_access(self.beta_tester, self.course, 'load'))
+
+    @patch.dict('courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
+    def test_content_beta_period(self):
+        """
+        Check that beta-test access works for content.
+        """
+        # student user shouldn't see it
+        self.assertFalse(has_access(self.normal_student, self.content, 'load', self.course.id))
+
+        # now the student should see it
+        self.assertTrue(has_access(self.beta_tester, self.content, 'load', self.course.id))

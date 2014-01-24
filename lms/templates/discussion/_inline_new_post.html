@@ -15,6 +15,7 @@
                     %endif
                     %if is_course_cohorted:
                     <div class="form-group-label choose-cohort">
+                        ## Translators: This labels the selector for which group of students can view a post
                         ${_("Make visible to:")}
                         <select class="group-filter-select new-post-group" name = "group_id">
                             <option value="">${_("All Groups")}</option>
@@ -36,17 +37,12 @@
             <div class="right-column">
                 <div class="form-row">
                     <label class="sr" for="new-inline-post-title">${_("new post title")}</label>
-                    <input type="text" id="new-inline-post-title" class="new-post-title" name="title" placeholder="Title">
+                    <input type="text" id="new-inline-post-title" class="new-post-title" name="title" placeholder="${_('Title')}">
                 </div>
                 <div class="form-row">
-                    <div class="new-post-body" name="body" placeholder="Enter your question or comment&hellip;"></div>
+                    <div class="new-post-body" name="body" placeholder="${_(u'Enter your question or comment…')}"></div>
                     <!---<div class="new-post-preview"><span class="new-post-preview-label">Preview</span></div>-->
                 </div>
-                ## TODO commenting out tags til we figure out what to do with them
-                ##<div class="form-row">
-                ##    <label class="sr" for="new-inline-post-tags">${_("Add post tags")}</label>
-                ##    <input type="text" id="new-inline-post-tags" class="new-post-tags" name="tags" placeholder="Tags">
-                ##</div>
                 <input type="submit" id="new-inline-post-submit" class="submit" value="${_("Add post")}">
                 <a href="#" class="new-post-cancel">${_("Cancel")}</a>
             </div>

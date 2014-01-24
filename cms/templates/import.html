@@ -1,7 +1,6 @@
 <%inherit file="base.html" />
 <%namespace name='static' file='static_content.html'/>
 <%!
-  from django.core.urlresolvers import reverse
   from django.utils.translation import ugettext as _
 %>
 <%block name="title">${_("Course Import")}</%block>
@@ -22,23 +21,23 @@
     <article class="content-primary" role="main">
 
       <div class="introduction">
-        <p>${_("You may import existing course structure and content into Studio.")}</p>
-
-          <p>${_("Importing is not something to take lightly as the course content you successfully upload will be integrated into your course content and cannot be reversed.")}</p>
-          <p>${_("During the initial stages of the import process, please do not navigate away from this page.")}</p>
+          <p>${_("Be sure you want to import a course before continuing. Content of the imported course replaces all the content of this course. {em_start}You cannot undo a course import{em_end}. We recommend that you first export the current course, so you have a backup copy of it.").format(em_start='<strong>', em_end="</strong>")}</p>
+          ## Translators: ".tar.gz" is a file extension, and files with that extension are called "gzipped tar files": these terms should not be translated
+          <p>${_("The course that you import must be in a .tar.gz file (that is, a .tar file compressed with GNU Zip). This .tar.gz file must contain a course.xml file. It may also contain other files.")}</p>
+          <p>${_("The import process has five stages. During the first two stages, you must stay on this page. You can leave this page after the Unpacking stage has completed. We recommend, however, that you don't make important changes to your course until the import operation has completed.")}</p>
       </div>
 
-      <form id="fileupload" method="post" enctype="multipart/form-data"
-          class="import-form" url="${reverse('import_course', kwargs=dict(org=context_course.location.org, course=context_course.location.course, name=context_course.location.name))}">
-
-        <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}" />
+      <form id="fileupload" method="post" enctype="multipart/form-data" class="import-form">
 
         ## Translators: ".tar.gz" is a file extension, and files with that extension are called "gzipped tar files": these terms should not be translated
-        <h2 class="title">${_("Select a File (.tar.gz format) to Replace Your Course Content")}</h2>
+        <h2 class="title">${_("Select a .tar.gz File to Replace Your Course Content")}</h2>
 
         <p class="error-block"></p>
 
-        <a href="#" class="action action-choose-file choose-file-button">${_("Choose File")}</a>
+        <a href="#" class="action action-choose-file choose-file-button">
+          <i class="icon-upload"></i>
+          <span class="copy">${_("Choose a File to Import")}</span>
+        </a>
 
         <div class="wrapper wrapper-file-name file-name-block">
             <h3 class="title">
@@ -111,13 +110,13 @@
               <div class="status-detail">
                 <h3 class="title">${_("Success")}</h3>
                 <p class="copy">${_("Your imported content has now been integrated into this course")}</p>
-              </div>
 
-              <ul class="list-actions">
-                <li class="item-action">
-                  <a href="${successful_import_redirect_url}" class="action action-primary">${_("View Updated Outline")}</a>
-                </li>
-              </ul>
+                <ul class="list-actions">
+                  <li class="item-action">
+                    <a href="${successful_import_redirect_url}" class="action action-primary">${_("View Updated Outline")}</a>
+                  </li>
+                </ul>
+              </div>
             </li>
           </ol>
         </div>
@@ -126,15 +125,18 @@
 
     <aside class="content-supplementary" role="complimentary">
       <div class="bit">
-        <h3 class="title-3">${_("Gzipped Tar Files (.tar.gz) Only")}</h3>
-        ## Translators: ".tar.gz" is a file extension, and files with that extension are called "gzipped tar files": these terms should not be translated
-        <p>${_("File uploads must be gzipped tar files (.tar.gz) containing, at a minimum, a {filename} file.").format(filename='<code>course.xml</code>')}</p>
+        <h3 class="title-3">${_("Why import a course?")}</h3>
+        <p>${_("You may want to run a new version of an existing course, or replace an existing course altogether. Or, you may have developed a course outside Studio.")}</p>
       </div>
 
       <div class="bit">
-        <h3 class="title-3">${_("Warning: Auto-generated Nodes")}</h3>
-        ## Translators: ".tar.gz" is a file extension, and files with that extension are called "gzipped tar files": these terms should not be translated
-        <p>${_("Please note that if your course has any problems with auto-generated {nodename} nodes, re-importing your course could cause the loss of student data associated with those problems.").format(nodename='<code>url_name</code>')}</p>
+        <h3 class="title-3">${_("What content is imported?")}</h3>
+        <p>${_("Only the course content and structure (including sections, subsections, and units) are imported. Other data, including student data, grading information, discussion forum data, course settings, and course team information, remains the same as it was in the existing course.")}</p>
+      </div>
+
+      <div class="bit">
+        <h3 class="title-3">${_("Warning: Importing while a course is running")}</h3>
+        <p>${_("If you perform an import while your course is running, and you change the URL names (or url_name nodes) of any Problem components, the student data associated with those Problem components may be lost. This data includes students' problem scores.")}</p>
       </div>
     </aside>
   </section>
@@ -144,8 +146,8 @@
 <%block name="jsextra">
 <script>
 require(
-        ["js/views/import", "jquery", "jquery.fileupload"],
-        function(CourseImport, $) {
+        ["js/views/import", "jquery", "gettext", "jquery.fileupload"],
+        function(CourseImport, $, gettext) {
 
 var file;
 var bar = $('.progress-bar');
@@ -158,13 +160,13 @@ var chooseBtn = $('.choose-file-button');
 
 var allStats = $('#status-infos');
 
-var feedbackUrl = "${reverse('import_status', kwargs=dict(org=context_course.location.org, course=context_course.location.course, name='fillerName'))}"
+var feedbackUrl = "${import_status_url}";
 
 var defaults = [
-    '${_("There was an error during the upload process.")}\n',
-    '${_("There was an error while unpacking the file.")}\n',
-    '${_("There was an error while verifying the file you submitted.")}\n',
-    '${_("There was an error while importing the new course to our database.")}\n'
+    "${_("There was an error during the upload process.")}\n",
+    "${_("There was an error while unpacking the file.")}\n",
+    "${_("There was an error while verifying the file you submitted.")}\n",
+    "${_("There was an error while importing the new course to our database.")}\n"
 ];
 
 $('#fileupload').fileupload({
@@ -188,6 +190,10 @@ $('#fileupload').fileupload({
                     CourseImport.stopGetStatus = true;
                     window.onbeforeunload = null;
                     if (xhr.status != 200) {
+                        if (!result.responseText) {
+                            alert(gettext("Your import may have failed. Please check your course and try again if necessary."));
+                            return;
+                        }
                         var serverMsg = $.parseJSON(result.responseText);
                         var errMsg = serverMsg.hasOwnProperty("ErrMsg") ?  serverMsg.ErrMsg : "" ;
                         if (serverMsg.hasOwnProperty("Stage")) {
@@ -195,12 +201,12 @@ $('#fileupload').fileupload({
                             CourseImport.stageError(stage, defaults[stage] + errMsg);
                         }
                         else {
-                            alert('${_("Your import has failed.")}\n\n' + errMsg);
+                            alert("${_("Your import has failed.")}\n\n" + errMsg);
                         }
-                        chooseBtn.html('${_("Choose new file")}').show();
+                        chooseBtn.html("${_("Choose new file")}").show();
                         bar.hide();
                     }
-                    chooseBtn.html('${_("Choose new file")}').show();
+                    chooseBtn.html("${_("Choose new file")}").show();
                     bar.hide();
                 });
             });
@@ -237,7 +243,7 @@ $('#fileupload').fileupload({
     },
     start: function(e) {
         window.onbeforeunload = function() {
-            return '${_("Your import is in progress; navigating away will abort it.")}';
+            return "${_("Your import is in progress; navigating away will abort it.")}";
         }
     },
     sequentialUploads: true,

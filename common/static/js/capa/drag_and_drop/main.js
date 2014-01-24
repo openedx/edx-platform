@@ -1,7 +1,11 @@
 (function (requirejs, require, define) {
 define(
-    ['logme', 'state', 'config_parser', 'container', 'base_image', 'scroller', 'draggables', 'targets', 'update_input'],
-    function (logme, State, configParser, Container, BaseImage, Scroller, Draggables, Targets, updateInput) {
+    ['js/capa/drag_and_drop/state',
+     'js/capa/drag_and_drop/config_parser', 'js/capa/drag_and_drop/container',
+     'js/capa/drag_and_drop/base_image', 'js/capa/drag_and_drop/scroller',
+     'js/capa/drag_and_drop/draggables', 'js/capa/drag_and_drop/targets',
+     'js/capa/drag_and_drop/update_input'],
+    function (State, configParser, Container, BaseImage, Scroller, Draggables, Targets, updateInput) {
     return Main;
 
     function Main() {
@@ -53,7 +57,7 @@ define(
 
         problemId = $(value).attr('data-plain-id');
         if (typeof problemId !== 'string') {
-            logme('ERROR: Could not find the ID of the problem DOM element.');
+            console.log('ERROR: Could not find the ID of the problem DOM element.');
 
             return;
         }
@@ -61,8 +65,8 @@ define(
         try {
             config = JSON.parse($('#drag_and_drop_json_' + problemId).html());
         } catch (err) {
-            logme('ERROR: Could not parse the JSON configuration options.');
-            logme('Error message: "' + err.message + '".');
+            console.log('ERROR: Could not parse the JSON configuration options.');
+            console.log('Error message: "' + err.message + '".');
 
             return;
         }
@@ -70,7 +74,7 @@ define(
         state = State(problemId);
 
         if (configParser(state, config) !== true) {
-            logme('ERROR: Could not make sense of the JSON configuration options.');
+            console.log('ERROR: Could not make sense of the JSON configuration options.');
 
             return;
         }

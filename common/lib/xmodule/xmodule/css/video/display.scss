@@ -2,6 +2,10 @@
     margin-bottom: 30px;
 }
 
+.is-hidden {
+  display: none;
+}
+
 div.video {
   @include clearfix();
   background: #f3f3f3;
@@ -15,9 +19,17 @@ div.video {
     border: 0;
   }
 
+  &.is-initialized {
+    article.video-wrapper {
+      .spinner {
+        display: none;
+      }
+    }
+  }
+
   div.tc-wrapper {
-    position: relative;
     @include clearfix;
+    position: relative;
   }
 
   div.focus_grabber {
@@ -27,43 +39,104 @@ div.video {
     height: 0px;
   }
 
+  .wrapper-downloads {
+    margin: 0;
+    padding: 0;
+
+    .video-sources,
+    .video-tracks {
+      display: inline-block;
+      margin: ($baseline*.75) ($baseline/2) 0 0;
+
+      a {
+        @include transition(all 0.25s ease-in-out 0s);
+        @include font-size(14);
+        display: inline-block;
+        border-radius: 3px 3px 3px 3px;
+        background-color: $very-light-text;
+        padding: ($baseline*.75);
+        color: $lighter-base-font-color;
+
+        &:hover {
+          background-color: $action-primary-active-bg;
+          color: $very-light-text;
+        }
+      }
+
+    }
+  }
+
   article.video-wrapper {
     float: left;
     margin-right: flex-gutter(9);
     width: flex-grid(6, 9);
-
     background-color: black;
-
     position: relative;
 
-    div.video-player-pre {
-        height: 50px;
-        background-color: black;
+    div.video-player-pre, div.video-player-post {
+       height: 50px;
+       background-color: black;
     }
 
-    div.video-player-post {
-        height: 50px;
-        background-color: black;
+    .spinner {
+      @include transform(translate(-50%, -50%));
+      position: absolute;
+      z-index: 1;
+      background: rgba(0, 0, 0, 0.7);
+      top: 50%;
+      left: 50%;
+      padding: 30px;
+      border-radius: 25%;
+
+      &:after{
+        @include animation(rotateCW 3s infinite linear);
+        content: '';
+        display: block;
+        width: 30px;
+        height: 30px;
+        border: 7px solid white;
+        border-top-color: transparent;
+        border-radius: 100%;
+        position: relative;
+      }
+    }
+
+    .btn-play {
+      @include transform(translate(-50%, -50%));
+      position: absolute;
+      z-index: 1;
+      background: rgba(0, 0, 0, 0.7);
+      top: 50%;
+      left: 50%;
+      padding: 30px;
+      border-radius: 25%;
+
+      &:after{
+        content: '';
+        display: block;
+        width: 0px;
+        height: 0px;
+        border-style: solid;
+        border-width: 30px 0 30px 50px;
+        border-color: transparent transparent transparent #ffffff;
+        position: relative;
+      }
     }
 
     section.video-player {
-      height: 0;
       overflow: hidden;
-      padding-bottom: 56.25%;
-      position: relative;
+      min-height: 300px;
 
-      div {
+      > div {
+        height: 100%;
+
         &.hidden {
           display: none;
         }
       }
 
-      object, iframe {
+      object, iframe, video {
         border: none;
-        height: 100%;
-        left: 0;
-        position: absolute;
-        top: 0;
         width: 100%;
       }
 
@@ -87,12 +160,13 @@ div.video {
 
       &:hover {
         ul, div {
-          opacity: 1.0;
+          opacity: 1;
         }
       }
 
       div.slider {
         @include clearfix();
+        @include transform(scaleY(0.5) translate3d(0, 50%, 0));
         background: #c2c2c2;
         border: 1px solid #000;
         border-radius: 0;
@@ -110,14 +184,19 @@ div.video {
         -moz-transition: -moz-transform 0.7s ease-in-out;
         -ms-transition: -ms-transform 0.7s ease-in-out;
         transition: transform 0.7s ease-in-out;
-        @include transform(scaleY(0.5) translate3d(0, 50%, 0));
 
         div.ui-widget-header {
           background: #777;
           box-shadow: inset 0 1px 0 #999;
         }
 
+        div.ui-corner-all.slider-range {
+          background-color: #1e91d3;
+          opacity: 0.3;
+        }
+
         a.ui-slider-handle {
+          @include transform(scale(.7, 1.3) translate3d(-80%, -15%, 0));
           background: $pink url(../images/slider-handle.png) center center no-repeat;
           background-size: 50%;
           border: 1px solid darken($pink, 20%);
@@ -131,7 +210,6 @@ div.video {
           -moz-transition: -moz-transform 0.7s ease-in-out;
           -ms-transition: -ms-transform 0.7s ease-in-out;
           transition: transform 0.7s ease-in-out;
-          @include transform(scale(.7, 1.3) translate3d(-80%, -15%, 0));
           width: 20px;
 
           &:focus, &:hover {
@@ -228,25 +306,26 @@ div.video {
           position: relative;
 
           &.open {
-            &>a {
+            & > a {
               background: url('../images/open-arrow.png') 10px center no-repeat;
             }
 
             ol.video_speeds {
               display: block;
-              opacity: 1.0;
+              opacity: 1;
               padding: 0;
               margin: 0;
               list-style: none;
             }
           }
 
-          &>a {
+          & > a {
+            @include clearfix();
+            @include transition(none);
             background: url('../images/closed-arrow.png') 10px center no-repeat;
             border-left: 1px solid #000;
             border-right: 1px solid #000;
             box-shadow: 1px 0 0 #555, inset 1px 0 0 #555;
-            @include clearfix();
             color: #fff;
             cursor: pointer;
             display: block;
@@ -254,11 +333,11 @@ div.video {
             margin-right: 0;
             padding-left: 15px;
             position: relative;
-            @include transition(none);
             -webkit-font-smoothing: antialiased;
-            width: 116px;
+            min-width: 116px;
 
             @media (max-width: 1024px) {
+              min-width: 0;
               width: 86px;
             }
 
@@ -272,12 +351,12 @@ div.video {
 
             &:hover {
               outline: 0;
-              opacity: 1.0;
+              opacity: 1;
               background-color: #444;
             }
 
             &:active {
-              opacity: 1.0;
+              opacity: 1;
               background-color: #444;
             }
 
@@ -309,13 +388,13 @@ div.video {
 
           // fix for now
           ol.video_speeds {
-            box-shadow: inset 1px 0 0 #555, 0 4px 0 #444;
             @include transition(none);
+            box-shadow: inset 1px 0 0 #555, 0 4px 0 #444;
             background-color: #444;
             border: 1px solid #000;
             bottom: 46px;
             display: none;
-            opacity: 0.0;
+            opacity: 0;
             position: absolute;
             width: 131px;
 
@@ -364,24 +443,24 @@ div.video {
           &.open {
             .volume-slider-container {
               display: block;
-              opacity: 1.0;
+              opacity: 1;
             }
           }
 
           &.muted {
-            &>a {
+            & > a {
               background-image: url('../images/mute.png');
             }
           }
 
-          > a {
+          & > a {
+            @include clearfix();
+            @include transition(none);
             background-image: url('../images/volume.png');
             background-position: 10px center;
             background-repeat: no-repeat;
-
             border-right: 1px solid #000;
             box-shadow: 1px 0 0 #555, inset 1px 0 0 #555;
-            @include clearfix();
             color: #fff;
             cursor: pointer;
             display: block;
@@ -389,10 +468,9 @@ div.video {
             margin-right: 0;
             padding-left: 15px;
             position: relative;
-            @include transition(none);
             -webkit-font-smoothing: antialiased;
             width: 30px;
-          
+
             &:hover, &:active {
               background-color: #444;
               color: #fff;
@@ -402,13 +480,13 @@ div.video {
           }
 
           .volume-slider-container {
-            box-shadow: inset 1px 0 0 #555, 0 3px 0 #444;
             @include transition(none);
+            box-shadow: inset 1px 0 0 #555, 0 3px 0 #444;
             background-color: #444;
             border: 1px solid #000;
             bottom: 46px;
             display: none;
-            opacity: 0.0;
+            opacity: 0;
             position: absolute;
             width: 45px;
             height: 125px;
@@ -425,6 +503,7 @@ div.video {
               box-shadow: 0 1px 0 #333;
 
               a.ui-slider-handle {
+                @include transition(height 2.0s ease-in-out 0s, width 2.0s ease-in-out 0s);
                 background: $pink url(../images/slider-handle.png) center center no-repeat;
                 background-size: 50%;
                 border: 1px solid darken($pink, 20%);
@@ -433,7 +512,6 @@ div.video {
                 cursor: pointer;
                 height: 15px;
                 left: -6px;
-                @include transition(height 2.0s ease-in-out 0s, width 2.0s ease-in-out 0s);
                 width: 15px;
               }
 
@@ -445,6 +523,7 @@ div.video {
         }
 
         a.add-fullscreen {
+          @include transition(none);
           background: url(../images/fullscreen.png) center no-repeat;
           border-right: 1px solid #000;
           box-shadow: 1px 0 0 #555, inset 1px 0 0 #555;
@@ -455,9 +534,8 @@ div.video {
           margin-left: 0;
           padding: 0 lh(.5);
           text-indent: -9999px;
-          @include transition(none);
           width: 30px;
-          
+
           &:hover, &:active {
             background-color: #444;
             color: #fff;
@@ -468,6 +546,7 @@ div.video {
 
 
         a.quality_control {
+          @include transition(none);
           background: url(../images/hd.png) center no-repeat;
           border-right: 1px solid #000;
           box-shadow: 1px 0 0 #555, inset 1px 0 0 #555;
@@ -478,7 +557,6 @@ div.video {
           margin-left: 0;
           padding: 0 lh(.5);
           text-indent: -9999px;
-          @include transition(none);
           width: 30px;
 
           &:hover {
@@ -498,16 +576,16 @@ div.video {
 
 
         a.hide-subtitles {
+          @include transition(none);
           background: url('../images/cc.png') center no-repeat;
           float: left;
           font-weight: 800;
           line-height: 46px; //height of play pause buttons
           margin-left: 0;
-          opacity: 1.0;
+          opacity: 1;
           padding: 0 lh(.5);
           position: relative;
           text-indent: -9999px;
-          @include transition(none);
           -webkit-font-smoothing: antialiased;
           width: 30px;
 
@@ -529,7 +607,7 @@ div.video {
 
     &:hover section.video-controls {
       ul, div {
-        opacity: 1.0;
+        opacity: 1;
       }
 
       div.slider {
@@ -555,7 +633,7 @@ div.video {
 
     li {
       border: 0;
-      color: #666;
+      color: rgb(29,157,217);
       cursor: pointer;
       margin-bottom: 8px;
       padding: 0;
@@ -573,7 +651,7 @@ div.video {
       }
 
       &:hover {
-        color: $blue;
+        text-decoration: underline;
       }
 
       &:empty {
@@ -611,7 +689,6 @@ div.video {
     ol.subtitles {
         width: 0;
         height: 0;
-        visibility: hidden;
     }
 
     ol.subtitles.html5 {
@@ -624,6 +701,7 @@ div.video {
         width: 275px;
         padding: 0 20px;
         z-index: 0;
+        display: none;
     }
   }
 
@@ -645,7 +723,6 @@ div.video {
       ol.subtitles {
         right: -(flex-grid(4));
         width: auto;
-        visibility: hidden;
       }
     }
 
@@ -676,15 +753,12 @@ div.video {
         display: table-cell;
         vertical-align: middle;
         float: none;
-      }
 
-      object, iframe {
-        bottom: 0;
-        height: 100%;
-        left: 0;
-        overflow: hidden;
-        position: fixed;
-        top: 0;
+        object, iframe, video{
+          position: absolute;
+          width: auto;
+          height: auto;
+        }
       }
 
       section.video-controls {
@@ -697,6 +771,7 @@ div.video {
     }
 
     ol.subtitles {
+      @include transition(none);
       background: rgba(#000, .8);
       bottom: 0;
       height: 100%;
@@ -707,7 +782,6 @@ div.video {
       right: 0;
       top: 0;
       visibility: visible;
-      @include transition(none);
 
       li {
         color: #aaa;
@@ -718,4 +792,17 @@ div.video {
       }
     }
   }
+
+  &.is-touch {
+    div.tc-wrapper {
+      article.video-wrapper {
+        object, iframe, video{
+          width: 100%;
+          height: 100%;
+        }
+      }
+    }
+  }
 }
+
+

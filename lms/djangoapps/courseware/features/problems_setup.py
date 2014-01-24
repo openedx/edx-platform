@@ -14,11 +14,18 @@ from lettuce import world
 import random
 import textwrap
 from common import section_location
-from capa.tests.response_xml_factory import OptionResponseXMLFactory, \
-    ChoiceResponseXMLFactory, MultipleChoiceResponseXMLFactory, \
-    StringResponseXMLFactory, NumericalResponseXMLFactory, \
-    FormulaResponseXMLFactory, CustomResponseXMLFactory, \
-    CodeResponseXMLFactory, ChoiceTextResponseXMLFactory
+from capa.tests.response_xml_factory import (
+    ChoiceResponseXMLFactory,
+    ChoiceTextResponseXMLFactory,
+    CodeResponseXMLFactory,
+    CustomResponseXMLFactory,
+    FormulaResponseXMLFactory,
+    ImageResponseXMLFactory,
+    MultipleChoiceResponseXMLFactory,
+    NumericalResponseXMLFactory,
+    OptionResponseXMLFactory,
+    StringResponseXMLFactory,
+)
 
 
 # Factories from capa.tests.response_xml_factory that we will use
@@ -158,46 +165,62 @@ PROBLEM_DICT = {
         },
         'correct': ['span.correct'],
         'incorrect': ['span.incorrect'],
+        'unanswered': ['span.unanswered']},
+
+    'image': {
+        'factory': ImageResponseXMLFactory(),
+        'kwargs': {
+            'src': '/static/images/mit_dome.jpg',
+            'rectangle': '(50,50)-(100,100)'
+        },
+        'correct': ['span.correct'],
+        'incorrect': ['span.incorrect'],
         'unanswered': ['span.unanswered']}
 }
 
 
-def answer_problem(problem_type, correctness):
+def answer_problem(course, problem_type, correctness):
+    # Make sure that the problem has been completely rendered before
+    # starting to input an answer.
+    world.wait_for_ajax_complete()
+
+    section_loc = section_location(course)
+
     if problem_type == "drop down":
-        select_name = "input_i4x-edx-model_course-problem-drop_down_2_1"
+        select_name = "input_i4x-{0.org}-{0.course}-problem-drop_down_2_1".format(section_loc)
         option_text = 'Option 2' if correctness == 'correct' else 'Option 3'
         world.select_option(select_name, option_text)
 
     elif problem_type == "multiple choice":
         if correctness == 'correct':
-            world.css_check(inputfield('multiple choice', choice='choice_2'))
+            world.css_check(inputfield(course, 'multiple choice', choice='choice_2'))
         else:
-            world.css_check(inputfield('multiple choice', choice='choice_1'))
+            world.css_check(inputfield(course, 'multiple choice', choice='choice_1'))
 
     elif problem_type == "checkbox":
         if correctness == 'correct':
-            world.css_check(inputfield('checkbox', choice='choice_0'))
-            world.css_check(inputfield('checkbox', choice='choice_2'))
+            world.css_check(inputfield(course, 'checkbox', choice='choice_0'))
+            world.css_check(inputfield(course, 'checkbox', choice='choice_2'))
         else:
-            world.css_check(inputfield('checkbox', choice='choice_3'))
+            world.css_check(inputfield(course, 'checkbox', choice='choice_3'))
 
     elif problem_type == 'radio':
         if correctness == 'correct':
-            world.css_check(inputfield('radio', choice='choice_2'))
+            world.css_check(inputfield(course, 'radio', choice='choice_2'))
         else:
-            world.css_check(inputfield('radio', choice='choice_1'))
+            world.css_check(inputfield(course, 'radio', choice='choice_1'))
 
     elif problem_type == 'string':
         textvalue = 'correct string' if correctness == 'correct' else 'incorrect'
-        world.css_fill(inputfield('string'), textvalue)
+        world.css_fill(inputfield(course, 'string'), textvalue)
 
     elif problem_type == 'numerical':
         textvalue = "pi + 1" if correctness == 'correct' else str(random.randint(-2, 2))
-        world.css_fill(inputfield('numerical'), textvalue)
+        world.css_fill(inputfield(course, 'numerical'), textvalue)
 
     elif problem_type == 'formula':
         textvalue = "x^2+2*x+y" if correctness == 'correct' else 'x^2'
-        world.css_fill(inputfield('formula'), textvalue)
+        world.css_fill(inputfield(course, 'formula'), textvalue)
 
     elif problem_type == 'script':
         # Correct answer is any two integers that sum to 10
@@ -209,8 +232,8 @@ def answer_problem(problem_type, correctness):
         if correctness == 'incorrect':
             second_addend += random.randint(1, 10)
 
-        world.css_fill(inputfield('script', input_num=1), str(first_addend))
-        world.css_fill(inputfield('script', input_num=2), str(second_addend))
+        world.css_fill(inputfield(course, 'script', input_num=1), str(first_addend))
+        world.css_fill(inputfield(course, 'script', input_num=2), str(second_addend))
 
     elif problem_type == 'code':
         # The fake xqueue server is configured to respond
@@ -229,15 +252,37 @@ def answer_problem(problem_type, correctness):
         choice = "choiceinput_0bc" if correctness == 'correct' else "choiceinput_1bc"
         world.css_fill(
             inputfield(
+                course,
                 problem_type,
                 choice="choiceinput_0_numtolerance_input_0"
             ),
             input_value
         )
-        world.css_check(inputfield(problem_type, choice=choice))
+        world.css_check(inputfield(course, problem_type, choice=choice))
+    elif problem_type == 'image':
+        offset = 25 if correctness == "correct" else -25
+
+        def try_click():
+            image_selector = "#imageinput_i4x-{0.org}-{0.course}-problem-image_2_1".format(section_loc)
+            input_selector = "#input_i4x-{0.org}-{0.course}-problem-image_2_1".format(section_loc)
+
+            world.browser.execute_script('$("body").on("click", function(event) {console.log(event);})')
+
+            initial_input = world.css_value(input_selector)
+            world.wait_for_visible(image_selector)
+            image = world.css_find(image_selector).first
+            (image.action_chains
+                .move_to_element(image._element)
+                .move_by_offset(offset, offset)
+                .click()
+                .perform())
+
+            world.wait_for(lambda _: world.css_value(input_selector) != initial_input)
+
+        world.retry_on_exception(try_click)
 
 
-def problem_has_answer(problem_type, answer_class):
+def problem_has_answer(course, problem_type, answer_class):
     if problem_type == "drop down":
         if answer_class == 'blank':
             assert world.is_css_not_present('option[selected="true"]')
@@ -248,52 +293,52 @@ def problem_has_answer(problem_type, answer_class):
 
     elif problem_type == "multiple choice":
         if answer_class == 'correct':
-            assert_checked('multiple choice', ['choice_2'])
+            assert_checked(course, 'multiple choice', ['choice_2'])
         elif answer_class == 'incorrect':
-            assert_checked('multiple choice', ['choice_1'])
+            assert_checked(course, 'multiple choice', ['choice_1'])
         else:
-            assert_checked('multiple choice', [])
+            assert_checked(course, 'multiple choice', [])
 
     elif problem_type == "checkbox":
         if answer_class == 'correct':
-            assert_checked('checkbox', ['choice_0', 'choice_2'])
+            assert_checked(course, 'checkbox', ['choice_0', 'choice_2'])
         elif answer_class == 'incorrect':
-            assert_checked('checkbox', ['choice_3'])
+            assert_checked(course, 'checkbox', ['choice_3'])
         else:
-            assert_checked('checkbox', [])
+            assert_checked(course, 'checkbox', [])
 
     elif problem_type == "radio":
         if answer_class == 'correct':
-            assert_checked('radio', ['choice_2'])
+            assert_checked(course, 'radio', ['choice_2'])
         elif answer_class == 'incorrect':
-            assert_checked('radio', ['choice_1'])
+            assert_checked(course, 'radio', ['choice_1'])
         else:
-            assert_checked('radio', [])
+            assert_checked(course, 'radio', [])
 
     elif problem_type == 'string':
         if answer_class == 'blank':
             expected = ''
         else:
             expected = 'correct string' if answer_class == 'correct' else 'incorrect'
-        assert_textfield('string', expected)
+        assert_textfield(course, 'string', expected)
 
     elif problem_type == 'formula':
         if answer_class == 'blank':
             expected = ''
         else:
             expected = "x^2+2*x+y" if answer_class == 'correct' else 'x^2'
-        assert_textfield('formula', expected)
+        assert_textfield(course, 'formula', expected)
 
     elif problem_type in ("radio_text", "checkbox_text"):
         if answer_class == 'blank':
             expected = ('', '')
-            assert_choicetext_values(problem_type, (), expected)
+            assert_choicetext_values(course, problem_type, (), expected)
         elif answer_class == 'incorrect':
             expected = ('5', '')
-            assert_choicetext_values(problem_type, ["choiceinput_1bc"], expected)
+            assert_choicetext_values(course, problem_type, ["choiceinput_1bc"], expected)
         else:
             expected = ('8', '')
-            assert_choicetext_values(problem_type, ["choiceinput_0bc"], expected)
+            assert_choicetext_values(course, problem_type, ["choiceinput_0bc"], expected)
 
     else:
         # The other response types use random data,
@@ -303,7 +348,7 @@ def problem_has_answer(problem_type, answer_class):
         pass
 
 
-def add_problem_to_course(course, problem_type, extraMeta=None):
+def add_problem_to_course(course, problem_type, extra_meta=None):
     '''
     Add a problem to the course we have created using factories.
     '''
@@ -314,21 +359,23 @@ def add_problem_to_course(course, problem_type, extraMeta=None):
     factory_dict = PROBLEM_DICT[problem_type]
     problem_xml = factory_dict['factory'].build_xml(**factory_dict['kwargs'])
     metadata = {'rerandomize': 'always'} if not 'metadata' in factory_dict else factory_dict['metadata']
-    if extraMeta:
-        metadata = dict(metadata, **extraMeta)
+    if extra_meta:
+        metadata = dict(metadata, **extra_meta)
 
     # Create a problem item using our generated XML
     # We set rerandomize=always in the metadata so that the "Reset" button
     # will appear.
     category_name = "problem"
-    return world.ItemFactory.create(parent_location=section_location(course),
-                            category=category_name,
-                            display_name=str(problem_type),
-                            data=problem_xml,
-                            metadata=metadata)
+    return world.ItemFactory.create(
+        parent_location=section_location(course),
+        category=category_name,
+        display_name=str(problem_type),
+        data=problem_xml,
+        metadata=metadata
+    )
 
 
-def inputfield(problem_type, choice=None, input_num=1):
+def inputfield(course, problem_type, choice=None, input_num=1):
     """ Return the css selector for `problem_type`.
     For example, if problem_type is 'string', return
     the text field for the string problem in the test course.
@@ -336,14 +383,20 @@ def inputfield(problem_type, choice=None, input_num=1):
     `choice` is the name of the checkbox input in a group
     of checkboxes. """
 
-    sel = ("input#input_i4x-edx-model_course-problem-%s_2_%s" %
-           (problem_type.replace(" ", "_"), str(input_num)))
+    section_loc = section_location(course)
 
-   # this is necessary due to naming requirement for this problem type
+    # this is necessary due to naming requirement for this problem type
     if problem_type in ("radio_text", "checkbox_text"):
-        sel = "input#i4x-edx-model_course-problem-{0}_2_{1}".format(
-            problem_type.replace(" ", "_"), str(input_num)
-        )
+        selector_template = "input#i4x-{org}-{course}-problem-{ptype}_2_{input}"
+    else:
+        selector_template = "input#input_i4x-{org}-{course}-problem-{ptype}_2_{input}"
+
+    sel = selector_template.format(
+        org=section_loc.org,
+        course=section_loc.course,
+        ptype=problem_type.replace(" ", "_"),
+        input=input_num,
+    )
 
     if choice is not None:
         base = "_choice_" if problem_type == "multiple choice" else "_"
@@ -356,7 +409,7 @@ def inputfield(problem_type, choice=None, input_num=1):
     return sel
 
 
-def assert_checked(problem_type, choices):
+def assert_checked(course, problem_type, choices):
     '''
     Assert that choice names given in *choices* are the only
     ones checked.
@@ -367,7 +420,7 @@ def assert_checked(problem_type, choices):
     all_choices = ['choice_0', 'choice_1', 'choice_2', 'choice_3']
     for this_choice in all_choices:
         def check_problem():
-            element = world.css_find(inputfield(problem_type, choice=this_choice))
+            element = world.css_find(inputfield(course, problem_type, choice=this_choice))
             if this_choice in choices:
                 assert element.checked
             else:
@@ -375,12 +428,12 @@ def assert_checked(problem_type, choices):
         world.retry_on_exception(check_problem)
 
 
-def assert_textfield(problem_type, expected_text, input_num=1):
-    element_value = world.css_value(inputfield(problem_type, input_num=input_num))
+def assert_textfield(course, problem_type, expected_text, input_num=1):
+    element_value = world.css_value(inputfield(course, problem_type, input_num=input_num))
     assert element_value == expected_text
 
 
-def assert_choicetext_values(problem_type, choices, expected_values):
+def assert_choicetext_values(course, problem_type, choices, expected_values):
     """
     Asserts that only the given choices are checked, and given
     text fields have a desired value
@@ -393,7 +446,7 @@ def assert_choicetext_values(problem_type, choices, expected_values):
         "choiceinput_1_numtolerance_input_0"
     ]
     for this_choice in all_choices:
-        element = world.css_find(inputfield(problem_type, choice=this_choice))
+        element = world.css_find(inputfield(course, problem_type, choice=this_choice))
 
         if this_choice in choices:
             assert element.checked
@@ -401,6 +454,6 @@ def assert_choicetext_values(problem_type, choices, expected_values):
             assert not element.checked
 
     for (name, expected) in zip(all_inputs, expected_values):
-        element = world.css_find(inputfield(problem_type, name))
+        element = world.css_find(inputfield(course, problem_type, name))
         # Remove any trailing spaces that may have been added
         assert element.value.strip() == expected

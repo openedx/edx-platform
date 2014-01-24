@@ -5,16 +5,16 @@ from django.contrib.auth.models import User
 
 from django.dispatch import receiver
 from django.db.models.signals import post_save
-
+from django.utils.translation import ugettext_noop
 from student.models import CourseEnrollment
 
 from xmodule.modulestore.django import modulestore
 from xmodule.course_module import CourseDescriptor
 
-FORUM_ROLE_ADMINISTRATOR = 'Administrator'
-FORUM_ROLE_MODERATOR = 'Moderator'
-FORUM_ROLE_COMMUNITY_TA = 'Community TA'
-FORUM_ROLE_STUDENT = 'Student'
+FORUM_ROLE_ADMINISTRATOR = ugettext_noop('Administrator')
+FORUM_ROLE_MODERATOR = ugettext_noop('Moderator')
+FORUM_ROLE_COMMUNITY_TA = ugettext_noop('Community TA')
+FORUM_ROLE_STUDENT = ugettext_noop('Student')
 
 
 @receiver(post_save, sender=CourseEnrollment)
@@ -32,13 +32,8 @@ def assign_default_role(sender, instance, **kwargs):
     #     instance.user.roles.remove(*course_roles)
     #     return
 
-    # We've enrolled the student, so make sure they have a default role
-    if instance.user.is_staff:
-        role = Role.objects.get_or_create(course_id=instance.course_id, name="Moderator")[0]
-    else:
-        role = Role.objects.get_or_create(course_id=instance.course_id, name="Student")[0]
-
-    logging.info("assign_default_role: adding %s as %s" % (instance.user, role))
+    # We've enrolled the student, so make sure they have the Student role
+    role = Role.objects.get_or_create(course_id=instance.course_id, name="Student")[0]
     instance.user.roles.add(role)
 
 

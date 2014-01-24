@@ -12,7 +12,7 @@
   text-shadow: 0 1px 0 rgba(0, 0, 0, .3);
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 1px 1px rgba(0, 0, 0, .15);
 
-  &:hover {
+  &:hover, &:focus {
     border-color: #297095;
     @include linear-gradient(top, #4fbbe4, #2090d0);
   }
@@ -32,7 +32,7 @@
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 1px 1px rgba(0, 0, 0, .15);
 
-  &:hover {
+  &:hover, &:focus {
     @include linear-gradient(top, #fff, #ddd);
   }
 }
@@ -51,7 +51,7 @@
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.6);
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 1px 1px rgba(0, 0, 0, .15);
 
-  &:hover {
+  &:hover, &:focus {
     background: -webkit-linear-gradient(top, #888, #666);
   }
 }

@@ -2,9 +2,11 @@
 Tests for the Shopping Cart Models
 """
 import smtplib
+import StringIO
+from textwrap import dedent
 from boto.exception import BotoServerError  # this is a super-class of SESError and catches connection errors
 
-from mock import patch, MagicMock
+from mock import patch, MagicMock, sentinel
 from django.core import mail
 from django.conf import settings
 from django.db import DatabaseError
@@ -15,11 +17,13 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from shoppingcart.models import (Order, OrderItem, CertificateItem, InvalidCartItem, PaidCourseRegistration,
-                                 OrderItemSubclassPK)
+                                 OrderItemSubclassPK, PaidCourseRegistrationAnnotation)
 from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
 from course_modes.models import CourseMode
 from shoppingcart.exceptions import PurchasedCallbackException
+import pytz
+import datetime
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
@@ -157,7 +161,7 @@ class OrderTest(ModuleStoreTestCase):
         )
 
     @patch('shoppingcart.models.render_to_string')
-    @patch.dict(settings.MITX_FEATURES, {'STORE_BILLING_INFO': True})
+    @patch.dict(settings.FEATURES, {'STORE_BILLING_INFO': True})
     def test_billing_info_storage_on(self, render):
         cart = Order.get_cart_for_user(self.user)
         self.purchase_with_data(cart)
@@ -175,7 +179,7 @@ class OrderTest(ModuleStoreTestCase):
         self.assertTrue(context['has_billing_info'])
 
     @patch('shoppingcart.models.render_to_string')
-    @patch.dict(settings.MITX_FEATURES, {'STORE_BILLING_INFO': False})
+    @patch.dict(settings.FEATURES, {'STORE_BILLING_INFO': False})
     def test_billing_info_storage_off(self, render):
         cart = Order.get_cart_for_user(self.user)
         self.purchase_with_data(cart)
@@ -340,12 +344,21 @@ class CertificateItemTest(ModuleStoreTestCase):
                                  min_price=self.cost)
         course_mode.save()
 
+        patcher = patch('student.models.server_track')
+        self.mock_server_track = patcher.start()
+        self.addCleanup(patcher.stop)
+        crum_patcher = patch('student.models.crum.get_current_request')
+        self.mock_get_current_request = crum_patcher.start()
+        self.addCleanup(crum_patcher.stop)
+        self.mock_get_current_request.return_value = sentinel.request
+
     def test_existing_enrollment(self):
         CourseEnrollment.enroll(self.user, self.course_id)
         cart = Order.get_cart_for_user(user=self.user)
         CertificateItem.add_to_order(cart, self.course_id, self.cost, 'verified')
         # verify that we are still enrolled
         self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course_id))
+        self.mock_server_track.reset_mock()
         cart.purchase()
         enrollment = CourseEnrollment.objects.get(user=self.user, course_id=self.course_id)
         self.assertEquals(enrollment.mode, u'verified')
@@ -360,3 +373,93 @@ class CertificateItemTest(ModuleStoreTestCase):
         cert_item = CertificateItem.add_to_order(cart, self.course_id, self.cost, 'honor')
         self.assertEquals(cert_item.single_item_receipt_template,
                           'shoppingcart/receipt.html')
+
+    def test_refund_cert_callback_no_expiration(self):
+        # When there is no expiration date on a verified mode, the user can always get a refund
+        CourseEnrollment.enroll(self.user, self.course_id, 'verified')
+        cart = Order.get_cart_for_user(user=self.user)
+        CertificateItem.add_to_order(cart, self.course_id, self.cost, 'verified')
+        cart.purchase()
+
+        CourseEnrollment.unenroll(self.user, self.course_id)
+        target_certs = CertificateItem.objects.filter(course_id=self.course_id, user_id=self.user, status='refunded', mode='verified')
+        self.assertTrue(target_certs[0])
+        self.assertTrue(target_certs[0].refund_requested_time)
+        self.assertEquals(target_certs[0].order.status, 'refunded')
+
+    def test_refund_cert_callback_before_expiration(self):
+        # If the expiration date has not yet passed on a verified mode, the user can be refunded
+        course_id = "refund_before_expiration/test/one"
+        many_days = datetime.timedelta(days=60)
+
+        CourseFactory.create(org='refund_before_expiration', number='test', run='course', display_name='one')
+        course_mode = CourseMode(course_id=course_id,
+                                 mode_slug="verified",
+                                 mode_display_name="verified cert",
+                                 min_price=self.cost,
+                                 expiration_datetime=(datetime.datetime.now(pytz.utc) + many_days))
+        course_mode.save()
+
+        CourseEnrollment.enroll(self.user, course_id, 'verified')
+        cart = Order.get_cart_for_user(user=self.user)
+        CertificateItem.add_to_order(cart, course_id, self.cost, 'verified')
+        cart.purchase()
+
+        CourseEnrollment.unenroll(self.user, course_id)
+        target_certs = CertificateItem.objects.filter(course_id=course_id, user_id=self.user, status='refunded', mode='verified')
+        self.assertTrue(target_certs[0])
+        self.assertTrue(target_certs[0].refund_requested_time)
+        self.assertEquals(target_certs[0].order.status, 'refunded')
+
+    @patch('shoppingcart.models.log.error')
+    def test_refund_cert_callback_before_expiration_email_error(self, error_logger):
+        # If there's an error sending an email to billing, we need to log this error
+        course_id = "refund_before_expiration/test/one"
+        many_days = datetime.timedelta(days=60)
+
+        CourseFactory.create(org='refund_before_expiration', number='test', run='course', display_name='one')
+        course_mode = CourseMode(course_id=course_id,
+                                 mode_slug="verified",
+                                 mode_display_name="verified cert",
+                                 min_price=self.cost,
+                                 expiration_datetime=datetime.datetime.now(pytz.utc) + many_days)
+        course_mode.save()
+
+        CourseEnrollment.enroll(self.user, course_id, 'verified')
+        cart = Order.get_cart_for_user(user=self.user)
+        CertificateItem.add_to_order(cart, course_id, self.cost, 'verified')
+        cart.purchase()
+
+        with patch('shoppingcart.models.send_mail', side_effect=smtplib.SMTPException):
+            CourseEnrollment.unenroll(self.user, course_id)
+            self.assertTrue(error_logger.called)
+
+    def test_refund_cert_callback_after_expiration(self):
+        # If the expiration date has passed, the user cannot get a refund
+        course_id = "refund_after_expiration/test/two"
+        many_days = datetime.timedelta(days=60)
+
+        CourseFactory.create(org='refund_after_expiration', number='test', run='course', display_name='two')
+        course_mode = CourseMode(course_id=course_id,
+                                 mode_slug="verified",
+                                 mode_display_name="verified cert",
+                                 min_price=self.cost,)
+        course_mode.save()
+
+        CourseEnrollment.enroll(self.user, course_id, 'verified')
+        cart = Order.get_cart_for_user(user=self.user)
+        CertificateItem.add_to_order(cart, course_id, self.cost, 'verified')
+        cart.purchase()
+
+        course_mode.expiration_datetime = (datetime.datetime.now(pytz.utc) - many_days)
+        course_mode.save()
+
+        CourseEnrollment.unenroll(self.user, course_id)
+        target_certs = CertificateItem.objects.filter(course_id=course_id, user_id=self.user, status='refunded', mode='verified')
+        self.assertEqual(len(target_certs), 0)
+
+    def test_refund_cert_no_cert_exists(self):
+        # If there is no paid certificate, the refund callback should return nothing
+        CourseEnrollment.enroll(self.user, self.course_id, 'verified')
+        ret_val = CourseEnrollment.unenroll(self.user, self.course_id)
+        self.assertFalse(ret_val)

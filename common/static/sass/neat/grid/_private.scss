@@ -19,3 +19,32 @@ $layout-direction: nil !default;
 @function grid-width($n) {
   @return $n * $gw-column + ($n - 1) * $gw-gutter;
 }
+
+@function get-parent-columns($columns) {
+  @if $columns != $grid-columns {
+    $parent-columns: $columns;
+  } @else {
+    $parent-columns: $grid-columns;
+  }
+
+  @return $parent-columns;
+}
+
+@function is-display-table($container-is-display-table, $display) {
+  $display-table: false;
+
+  @if $container-is-display-table == true {
+    $display-table: true;
+  } @else if $display == table {
+    $display-table: true;
+  }
+
+  @return $display-table;
+}
+
+@function get-padding-for-table-layout($columns, $total-columns) {
+  $total-padding: flex-gutter($total-columns) * ($columns - 1);
+  $padding: $total-padding / $columns;
+
+  @return $padding;
+}

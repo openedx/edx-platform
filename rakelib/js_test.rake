@@ -1,7 +1,7 @@
 JS_TEST_SUITES = {
     'lms' => 'lms/static/js_test.yml',
     'cms' => 'cms/static/js_test.yml',
-    # 'cms-squire' => 'cms/static/js_test_squire.yml',
+    'cms-squire' => 'cms/static/js_test_squire.yml',
     'xmodule' => 'common/lib/xmodule/xmodule/js/js_test.yml',
     'common' => 'common/static/js_test.yml',
 }
@@ -32,14 +32,15 @@ end
 # command line arguments
 def js_test_tool(env, command, do_coverage)
     suite = suite_for_env(env)
-    cmd = "js-test-tool #{command} #{suite} --use-firefox --timeout-sec 600"
+    xunit_report = File.join(JS_REPORT_DIR, 'javascript_xunit.xml')
+    cmd = "js-test-tool #{command} #{suite} --use-firefox --timeout-sec 600 --xunit-report #{xunit_report}"
 
     if do_coverage
         report_dir = File.join(JS_REPORT_DIR, 'coverage.xml')
         cmd += " --coverage-xml #{report_dir}"
     end
 
-    sh(cmd)
+    test_sh(cmd)
 end
 
 # Print a list of js_test commands for
@@ -54,7 +55,7 @@ end
 namespace :'test:js' do
 
     desc "Run the JavaScript tests and print results to the console"
-    task :run, [:env] => [:clean_test_files, :'assets:coffee'] do |t, args|
+    task :run, [:env] => [:clean_test_files, :'assets:coffee', JS_REPORT_DIR] do |t, args|
         if args[:env].nil?
             puts "Running all test suites.  To run a specific test suite, try:"
             print_js_test_cmds('run')
@@ -63,7 +64,7 @@ namespace :'test:js' do
     end
 
     desc "Run the JavaScript tests in your default browser"
-    task :dev, [:env] => [:clean_test_files, :'assets:coffee'] do |t, args|
+    task :dev, [:env] => [:clean_test_files, :'assets:coffee:_watch'] do |t, args|
         if args[:env].nil?
             puts "Error: No test suite specified.  Try one of these instead:"
             print_js_test_cmds('dev')

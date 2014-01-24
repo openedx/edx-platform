@@ -28,7 +28,6 @@ prepend_path: cms/static
 
 # Paths to library JavaScript files (optional)
 lib_paths:
-    - coffee/spec/setup_require.js
     - xmodule_js/common_static/js/vendor/require.js
     - xmodule_js/common_static/coffee/src/ajax_prefix.js
     - xmodule_js/common_static/js/src/utility.js
@@ -39,6 +38,7 @@ lib_paths:
     - xmodule_js/common_static/js/vendor/underscore.string.min.js
     - xmodule_js/common_static/js/vendor/backbone-min.js
     - xmodule_js/common_static/js/vendor/backbone-associations-min.js
+    - xmodule_js/common_static/js/vendor/backbone.paginator.min.js
     - xmodule_js/common_static/js/vendor/timepicker/jquery.timepicker.js
     - xmodule_js/common_static/js/vendor/jquery.leanModal.min.js
     - xmodule_js/common_static/js/vendor/jquery.form.js
@@ -47,9 +47,12 @@ lib_paths:
     - xmodule_js/common_static/js/vendor/Squire.js
     - xmodule_js/common_static/js/vendor/jasmine-jquery.js
     - xmodule_js/common_static/js/vendor/jasmine-stealth.js
+    - xmodule_js/common_static/js/vendor/jasmine-imagediff.js
     - xmodule_js/common_static/js/vendor/jasmine.async.js
     - xmodule_js/common_static/js/vendor/CodeMirror/codemirror.js
+    - xmodule_js/common_static/js/vendor/URI.min.js
     - xmodule_js/src/xmodule.js
+    - xmodule_js/common_static/coffee/src/jquery.immediateDescendents.js
     - xmodule_js/common_static/js/test/i18n.js
 
 # Paths to source JavaScript files

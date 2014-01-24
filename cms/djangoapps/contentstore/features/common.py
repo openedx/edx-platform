@@ -1,18 +1,20 @@
 # pylint: disable=C0111
 # pylint: disable=W0621
 
-from lettuce import world, step
-from nose.tools import assert_true, assert_equal, assert_in, assert_false  # pylint: disable=E0611
-
-from auth.authz import get_user_by_email, get_course_groupname_for_role
-from django.conf import settings
-
-from selenium.webdriver.common.keys import Keys
 import time
 import os
-from django.contrib.auth.models import Group
+from lettuce import world, step
+from nose.tools import assert_true, assert_in  # pylint: disable=no-name-in-module
+from django.conf import settings
+
+from student.roles import CourseRole, CourseStaffRole, CourseInstructorRole
+from student.models import get_user
+
+from selenium.webdriver.common.keys import Keys
 
 from logging import getLogger
+from student.tests.factories import AdminFactory
+from student import auth
 logger = getLogger(__name__)
 
 from terrain.browser import reset_data
@@ -43,9 +45,9 @@ def i_confirm_with_ok(_step):
 @step(u'I press the "([^"]*)" delete icon$')
 def i_press_the_category_delete_icon(_step, category):
     if category == 'section':
-        css = 'a.delete-button.delete-section-button span.delete-icon'
+        css = 'a.action.delete-section-button'
     elif category == 'subsection':
-        css = 'a.delete-button.delete-subsection-button  span.delete-icon'
+        css = 'a.action.delete-subsection-button'
     else:
         assert False, 'Invalid category: %s' % category
     world.css_click(css)
@@ -158,11 +160,9 @@ def add_course_author(user, course):
     Add the user to the instructor group of the course
     so they will have the permissions to see it in studio
     """
-    for role in ("staff", "instructor"):
-        groupname = get_course_groupname_for_role(course.location, role)
-        group, __ = Group.objects.get_or_create(name=groupname)
-        user.groups.add(group)
-    user.save()
+    global_admin = AdminFactory()
+    for role in (CourseStaffRole, CourseInstructorRole):
+        auth.add_users(global_admin, role(course.location), user)
 
 
 def create_a_course():
@@ -171,7 +171,7 @@ def create_a_course():
 
     user = world.scenario_dict.get("USER")
     if not user:
-        user = get_user_by_email('robot+studio@edx.org')
+        user = get_user('robot+studio@edx.org')
 
     add_course_author(user, course)
 
@@ -224,14 +224,51 @@ def i_enabled_the_advanced_module(step, module):
     press_the_notification_button(step, 'Save')
 
 
-@step('I have clicked the new unit button')
-def open_new_unit(step):
-    step.given('I have opened a new course section in Studio')
-    step.given('I have added a new subsection')
-    step.given('I expand the first section')
-    old_url = world.browser.url
-    world.css_click('a.new-unit-item')
-    world.wait_for(lambda x: world.browser.url != old_url)
+@world.absorb
+def create_course_with_unit():
+    """
+    Prepare for tests by creating a course with a section, subsection, and unit.
+    Performs the following:
+        Clear out all courseware
+        Create a course with a section, subsection, and unit
+        Create a user and make that user a course author
+        Log the user into studio
+        Open the course from the dashboard
+        Expand the section and click on the New Unit link
+    The end result is the page where the user is editing the new unit
+    """
+    world.clear_courses()
+    course = world.CourseFactory.create()
+    world.scenario_dict['COURSE'] = course
+    section = world.ItemFactory.create(parent_location=course.location)
+    world.ItemFactory.create(
+        parent_location=section.location,
+        category='sequential',
+        display_name='Subsection One',
+    )
+    user = create_studio_user(is_staff=False)
+    add_course_author(user, course)
+
+    log_into_studio()
+    world.css_click('a.course-link')
+
+    world.wait_for_js_to_load()
+    css_selectors = [
+        'div.section-item a.expand-collapse', 'a.new-unit-item'
+    ]
+    for selector in css_selectors:
+        world.css_click(selector)
+
+    world.wait_for_mathjax()
+    world.wait_for_xmodule()
+
+    assert world.is_css_present('ul.new-component-type')
+
+
+@step('I have clicked the new unit button$')
+@step(u'I am in Studio editing a new unit$')
+def edit_new_unit(step):
+    create_course_with_unit()
 
 
 @step('the save notification button is disabled')
@@ -247,29 +284,38 @@ def button_disabled(step, value):
     assert world.css_has_class(button_css, 'is-disabled')
 
 
+def _do_studio_prompt_action(intent, action):
+    """
+    Wait for a studio prompt to appear and press the specified action button
+    See cms/static/js/views/feedback_prompt.js for implementation
+    """
+    assert intent in ['warning', 'error', 'confirmation', 'announcement',
+        'step-required', 'help', 'mini']
+    assert action in ['primary', 'secondary']
+
+    world.wait_for_present('div.wrapper-prompt.is-shown#prompt-{}'.format(intent))
+
+    action_css = 'li.nav-item > a.action-{}'.format(action)
+    world.trigger_event(action_css, event='focus')
+    world.browser.execute_script("$('{}').click()".format(action_css))
+
+    world.wait_for_ajax_complete()
+    world.wait_for_present('div.wrapper-prompt.is-hiding#prompt-{}'.format(intent))
+
+
+@world.absorb
+def confirm_studio_prompt():
+    _do_studio_prompt_action('warning', 'primary')
+
+
 @step('I confirm the prompt')
 def confirm_the_prompt(step):
-
-    def click_button(btn_css):
-        world.css_click(btn_css)
-        return world.css_find(btn_css).visible == False
-
-    prompt_css = 'div.prompt.has-actions'
-    world.wait_for_visible(prompt_css)
-
-    btn_css = 'a.button.action-primary'
-    world.wait_for_visible(btn_css)
-
-    # Sometimes you can do a click before the prompt is up.
-    # Thus we need some retry logic here.
-    world.wait_for(lambda _driver: click_button(btn_css))
-
-    assert_false(world.css_find(btn_css).visible)
+    confirm_studio_prompt()
 
 
-@step(u'I am shown a (.*)$')
-def i_am_shown_a_notification(step, notification_type):
-    assert world.is_css_present('.wrapper-%s' % notification_type)
+@step(u'I am shown a prompt$')
+def i_am_shown_a_notification(step):
+    assert world.is_css_present('.wrapper-prompt')
 
 
 def type_in_codemirror(index, text):
@@ -312,7 +358,7 @@ def other_user_login(step, name):
         login_form.find_by_name('submit').click()
     world.retry_on_exception(fill_login_form)
     assert_true(world.is_css_present('.new-course-button'))
-    world.scenario_dict['USER'] = get_user_by_email(name + '@edx.org')
+    world.scenario_dict['USER'] = get_user(name + '@edx.org')
 
 
 @step(u'the user "([^"]*)" exists( as a course (admin|staff member|is_staff))?$')
@@ -322,20 +368,34 @@ def create_other_user(_step, name, has_extra_perms, role_name):
     if has_extra_perms:
         if role_name == "is_staff":
             user.is_staff = True
+            user.save()
         else:
             if role_name == "admin":
                 # admins get staff privileges, as well
-                roles = ("staff", "instructor")
+                roles = (CourseStaffRole, CourseInstructorRole)
             else:
-                roles = ("staff",)
+                roles = (CourseStaffRole,)
             location = world.scenario_dict["COURSE"].location
+            global_admin = AdminFactory()
             for role in roles:
-                groupname = get_course_groupname_for_role(location, role)
-                group, __ = Group.objects.get_or_create(name=groupname)
-                user.groups.add(group)
-        user.save()
+                auth.add_users(global_admin, role(location), user)
 
 
 @step('I log out')
 def log_out(_step):
     world.visit('logout')
+
+
+@step(u'I click on "edit a draft"$')
+def i_edit_a_draft(_step):
+    world.css_click("a.create-draft")
+
+
+@step(u'I click on "replace with draft"$')
+def i_replace_w_draft(_step):
+    world.css_click("a.publish-draft")
+
+
+@step(u'I publish the unit$')
+def publish_unit(_step):
+    world.select_option('visibility-select', 'public')

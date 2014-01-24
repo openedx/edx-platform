@@ -16,20 +16,22 @@
 <div class="main-wrapper">
   <div class="inner-wrapper">
     <div class="main-column">
-      <article class="subsection-body window" data-id="${subsection.location}">
+      <article class="subsection-body window" data-locator="${locator}">
         <div class="subsection-name-input">
         <label>${_("Display Name:")}</label>
           <input type="text" value="${subsection.display_name_with_default | h}" class="subsection-display-name-input" data-metadata-name="display_name"/>
         </div>
-        <div class="sortable-unit-list">
-        <label>${_("Units:")}</label>
-          ${units.enum_units(subsection, subsection_units=subsection_units)}
+        <div class="wrapper-dnd">
+          <div class="sortable-unit-list">
+            <label>${_("Units:")}</label>
+              ${units.enum_units(subsection, subsection_units=subsection_units)}
+          </div>
         </div>
       </article>
     </div>
 
     <div class="sidebar">
-      <div class="unit-settings window id-holder" data-id="${subsection.location}">
+      <div class="unit-settings window id-holder" data-locator="${locator}">
     <h4 class="header">${_("Subsection Settings")}</h4>
     <div class="window-contents">
       <div class="scheduled-date-input row">
@@ -112,9 +114,7 @@ require(["domReady!", "jquery", "js/models/location", "js/views/overview_assignm
     // I believe that current (New Section/New Subsection) cause full page reloads which means these aren't needed globally
     // but we really should change that behavior.
     if (!window.graderTypes) {
-        window.graderTypes = new CourseGraderCollection();
-        window.graderTypes.course_location = new Location('${parent_location}');
-        window.graderTypes.reset(${course_graders|n});
+        window.graderTypes = new CourseGraderCollection(${course_graders|n}, {parse:true});
     }
 
     $(".gradable-status").each(function(index, ele) {

@@ -14,9 +14,10 @@ from .sauce import *
 # otherwise the browser will not render the pages correctly
 DEBUG = True
 
-# Disable warnings for acceptance tests, to make the logs readable
+# Output Django logs to a file
 import logging
-logging.disable(logging.ERROR)
+logging.basicConfig(filename=TEST_ROOT / "log" / "lms_acceptance.log", level=logging.ERROR)
+
 import os
 from random import choice, randint
 import string
@@ -32,11 +33,11 @@ DOC_STORE_CONFIG = {
     'collection': 'acceptance_modulestore_%s' % seed(),
 }
 
-modulestore_options = dict({
-    'default_class': 'xmodule.raw_module.RawDescriptor',
+modulestore_options = {
+    'default_class': 'xmodule.hidden_module.HiddenDescriptor',
     'fs_root': TEST_ROOT / "data",
-    'render_template': 'mitxmako.shortcuts.render_to_string',
-}, **DOC_STORE_CONFIG)
+    'render_template': 'edxmako.shortcuts.render_to_string',
+}
 
 MODULESTORE = {
     'default': {
@@ -46,6 +47,7 @@ MODULESTORE = {
             'stores': {
                 'default': {
                     'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
+                    'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
                     'OPTIONS': modulestore_options
                 }
             }
@@ -57,7 +59,7 @@ MODULESTORE['direct'] = MODULESTORE['default']
 
 CONTENTSTORE = {
     'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
-    'OPTIONS': {
+    'DOC_STORE_CONFIG': {
         'host': 'localhost',
         'db': 'acceptance_xcontent_%s' % seed(),
     }
@@ -74,19 +76,38 @@ DATABASES = {
     }
 }
 
+TRACKING_BACKENDS.update({
+    'mongo': {
+        'ENGINE': 'track.backends.mongodb.MongoBackend'
+    }
+})
+
+
+# Enable asset pipeline
+# Our fork of django-pipeline uses `PIPELINE` instead of `PIPELINE_ENABLED`
+# PipelineFinder is explained here: http://django-pipeline.readthedocs.org/en/1.1.24/storages.html
+PIPELINE = True
+STATICFILES_FINDERS += ('pipeline.finders.PipelineFinder', )
+
+BULK_EMAIL_DEFAULT_FROM_EMAIL = "test@test.org"
+
 # Forums are disabled in test.py to speed up unit tests, but we do not have
 # per-test control for acceptance tests
-MITX_FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
+FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
 
 # Use the auto_auth workflow for creating users and logging them in
-MITX_FEATURES['AUTOMATIC_AUTH_FOR_TESTING'] = True
+FEATURES['AUTOMATIC_AUTH_FOR_TESTING'] = True
+
+# Enable fake payment processing page
+FEATURES['ENABLE_PAYMENT_FAKE'] = True
+
+# Enable email on the instructor dash
+FEATURES['ENABLE_INSTRUCTOR_EMAIL'] = True
+FEATURES['REQUIRE_COURSE_EMAIL_AUTH'] = False
 
 # Don't actually send any requests to Software Secure for student identity
 # verification.
-MITX_FEATURES['AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'] = True
-
-# Enable fake payment processing page
-MITX_FEATURES['ENABLE_PAYMENT_FAKE'] = True
+FEATURES['AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'] = True
 
 # Configure the payment processor to use the fake processing page
 # Since both the fake payment page and the shoppingcart app are using
@@ -107,12 +128,20 @@ CC_PROCESSOR['CyberSource']['PURCHASE_ENDPOINT'] = "/shoppingcart/payment_fake"
 # We do not yet understand why this occurs. Setting this to true is a stopgap measure
 USE_I18N = True
 
-MITX_FEATURES['ENABLE_FEEDBACK_SUBMISSION'] = True
+FEATURES['ENABLE_FEEDBACK_SUBMISSION'] = True
 FEEDBACK_SUBMISSION_EMAIL = 'dummy@example.com'
 
 # Include the lettuce app for acceptance testing, including the 'harvest' django-admin command
 INSTALLED_APPS += ('lettuce.django',)
-LETTUCE_APPS = ('courseware',)
+LETTUCE_APPS = ('courseware', 'instructor',)
+
+# Lettuce appears to have a bug that causes it to search
+# `instructor_task` when we specify the `instructor` app.
+# This causes some pretty cryptic errors as lettuce tries
+# to parse files in `instructor_task` as features.
+# As a quick workaround, explicitly exclude the `instructor_task` app.
+LETTUCE_AVOID_APPS = ('instructor_task',)
+
 LETTUCE_BROWSER = os.environ.get('LETTUCE_BROWSER', 'chrome')
 
 # Where to run: local, saucelabs, or grid
@@ -123,6 +152,7 @@ SELENIUM_GRID = {
     'BROWSER': LETTUCE_BROWSER,
 }
 
+
 #####################################################################
 # See if the developer has any local overrides.
 try:
@@ -132,22 +162,9 @@ except ImportError:
 
 # Because an override for where to run will affect which ports to use,
 # set these up after the local overrides.
-if LETTUCE_SELENIUM_CLIENT == 'saucelabs':
-    LETTUCE_SERVER_PORT = choice(PORTS)
-    PORTS.remove(LETTUCE_SERVER_PORT)
-else:
-    LETTUCE_SERVER_PORT = randint(1024, 65535)
-
-# Set up XQueue information so that the lms will send
-# requests to a mock XQueue server running locally
-if LETTUCE_SELENIUM_CLIENT == 'saucelabs':
-    XQUEUE_PORT = choice(PORTS)
-    PORTS.remove(XQUEUE_PORT)
-else:
-    XQUEUE_PORT = randint(1024, 65535)
-
+# Configure XQueue interface to use our stub XQueue server
 XQUEUE_INTERFACE = {
-    "url": "http://127.0.0.1:%d" % XQUEUE_PORT,
+    "url": "http://127.0.0.1:{0:d}".format(XQUEUE_PORT),
     "django_auth": {
         "username": "lms",
         "password": "***REMOVED***"
@@ -155,10 +172,5 @@ XQUEUE_INTERFACE = {
     "basic_auth": ('anant', 'agarwal'),
 }
 
-# Set up Video information so that the lms will send
-# requests to a mock Youtube server running locally
-if LETTUCE_SELENIUM_CLIENT == 'saucelabs':
-    VIDEO_PORT = choice(PORTS)
-    PORTS.remove(VIDEO_PORT)
-else:
-    VIDEO_PORT = randint(1024, 65535)
+# Point the URL used to test YouTube availability to our stub YouTube server
+YOUTUBE_TEST_URL = "http://127.0.0.1:{0}/test_youtube/".format(YOUTUBE_PORT)

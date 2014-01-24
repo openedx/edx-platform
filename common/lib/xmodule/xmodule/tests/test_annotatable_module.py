@@ -13,7 +13,6 @@ from xmodule.modulestore import Location
 from . import get_test_system
 
 class AnnotatableModuleTestCase(unittest.TestCase):
-    location = Location(["i4x", "edX", "toy", "annotatable", "guided_discussion"])
     sample_xml = '''
         <annotatable display_name="Iliad">
             <instructions>Read the text.</instructions>
@@ -30,14 +29,12 @@ class AnnotatableModuleTestCase(unittest.TestCase):
             <annotation title="footnote" body="the end">The Iliad of Homer by Samuel Butler</annotation>
         </annotatable>
     '''
-    descriptor = Mock()
-    field_data = DictFieldData({'data': sample_xml})
 
     def setUp(self):
         self.annotatable = AnnotatableModule(
-            self.descriptor,
+            Mock(),
             get_test_system(),
-            self.field_data,
+            DictFieldData({'data': self.sample_xml}),
             ScopeIds(None, None, None, None)
         )
 
@@ -52,7 +49,7 @@ class AnnotatableModuleTestCase(unittest.TestCase):
 
         actual_attr = self.annotatable._get_annotation_data_attr(0, el)
 
-        self.assertTrue(type(actual_attr) is dict)
+        self.assertIsInstance(actual_attr, dict)
         self.assertDictEqual(expected_attr, actual_attr)
 
     def test_annotation_class_attr_default(self):
@@ -62,7 +59,7 @@ class AnnotatableModuleTestCase(unittest.TestCase):
         expected_attr = { 'class': { 'value': 'annotatable-span highlight' } }
         actual_attr = self.annotatable._get_annotation_class_attr(0, el)
 
-        self.assertTrue(type(actual_attr) is dict)
+        self.assertIsInstance(actual_attr, dict)
         self.assertDictEqual(expected_attr, actual_attr)
 
     def test_annotation_class_attr_with_valid_highlight(self):
@@ -78,7 +75,7 @@ class AnnotatableModuleTestCase(unittest.TestCase):
             }
             actual_attr = self.annotatable._get_annotation_class_attr(0, el)
 
-            self.assertTrue(type(actual_attr) is dict)
+            self.assertIsInstance(actual_attr, dict)
             self.assertDictEqual(expected_attr, actual_attr)
 
     def test_annotation_class_attr_with_invalid_highlight(self):
@@ -92,7 +89,7 @@ class AnnotatableModuleTestCase(unittest.TestCase):
             }
             actual_attr = self.annotatable._get_annotation_class_attr(0, el)
 
-            self.assertTrue(type(actual_attr) is dict)
+            self.assertIsInstance(actual_attr, dict)
             self.assertDictEqual(expected_attr, actual_attr)
 
     def test_render_annotation(self):

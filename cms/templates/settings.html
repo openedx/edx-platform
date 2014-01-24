@@ -4,10 +4,9 @@
 
 <%namespace name='static' file='static_content.html'/>
 <%!
-  from contentstore import utils
   from django.utils.translation import ugettext as _
+  from xmodule.modulestore.django import loc_mapper
 %>
-
 
 <%block name="jsextra">
   <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
@@ -17,9 +16,13 @@
   </script>
 
   <script type="text/javascript">
+window.CMS = window.CMS || {};
+CMS.URL = CMS.URL || {};
+CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
+
 require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/settings/main"],
   function(doc, $, CourseDetailsModel, MainView) {
-    // hilighting labels when fields are focused in
+    // highlighting labels when fields are focused in
     $("form :input").focus(function() {
       $("label[for='" + this.id + "']").addClass("is-focused");
     }).blur(function() {
@@ -37,8 +40,6 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
       },
       reset: true
     });
-
-    CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
 });
   </script>
 </%block>
@@ -66,17 +67,20 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
           <ol class="list-input">
             <li class="field text is-not-editable" id="field-course-organization">
               <label for="course-organization">${_("Organization")}</label>
-              <input title="${_('This field is disabled: this information cannot be changed.')}" type="text" class="long" id="course-organization" value="[Course Organization]" readonly />
+              <input title="${_('This field is disabled: this information cannot be changed.')}" type="text" 
+                class="long" id="course-organization" readonly />
             </li>
 
             <li class="field text is-not-editable" id="field-course-number">
               <label for="course-number">${_("Course Number")}</label>
-              <input title="${_('This field is disabled: this information cannot be changed.')}" type="text" class="short" id="course-number" value="[Course No.]" readonly>
+              <input title="${_('This field is disabled: this information cannot be changed.')}" type="text" 
+                class="short" id="course-number" readonly>
             </li>
 
             <li class="field text is-not-editable" id="field-course-name">
               <label for="course-name">${_("Course Name")}</label>
-              <input title="${_('This field is disabled: this information cannot be changed.')}" type="text" class="long" id="course-name" value="[Course Name]" readonly />
+              <input title="${_('This field is disabled: this information cannot be changed.')}" type="text" 
+                class="long" id="course-name" readonly />
             </li>
           </ol>
 
@@ -84,12 +88,14 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
           <div class="note note-promotion note-promotion-courseURL has-actions">
             <h3 class="title">${_("Course Summary Page")} <span class="tip">${_("(for student enrollment and access)")}</span></h3>
             <div class="copy">
-              <p><a class="link-courseURL" rel="external" href="https:${utils.get_lms_link_for_about_page(course_location)}" />https:${utils.get_lms_link_for_about_page(course_location)}</a></p>
+              <p><a class="link-courseURL" rel="external" href="https:${lms_link_for_about_page}">https:${lms_link_for_about_page}</a></p>
             </div>
 
             <ul class="list-actions">
               <li class="action-item">
-                <a title="${_('Send a note to students via email')}" href="mailto:someone@domain.com?Subject=Enroll%20in%20${context_course.display_name_with_default}&body=The%20course%20&quot;${context_course.display_name_with_default}&quot;,%20provided%20by%20edX,%20is%20open%20for%20enrollment.%20Please%20navigate%20to%20this%20course%20at%20https:${utils.get_lms_link_for_about_page(course_location)}%20to%20enroll." class="action action-primary"><i class="icon-envelope-alt icon-inline"></i>${_("Invite your students")}</a>
+                <a title="${_('Send a note to students via email')}" 
+                    href="mailto:someone@domain.com?Subject=Enroll%20in%20${context_course.display_name_with_default}&body=The%20course%20&quot;${context_course.display_name_with_default}&quot;,%20provided%20by%20edX,%20is%20open%20for%20enrollment.%20Please%20navigate%20to%20this%20course%20at%20https:${lms_link_for_about_page}%20to%20enroll." class="action action-primary">
+                    <i class="icon-envelope-alt icon-inline"></i>${_("Invite your students")}</a>
               </li>
             </ul>
           </div>
@@ -99,7 +105,10 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
           <div class="notice notice-incontext notice-workflow">
             <h3 class="title">${_("Promoting Your Course with edX")}</h3>
             <div class="copy">
-              <p>${_('Your course summary page will not be viewable until your course has been announced. To provide content for the page and preview it, follow the instructions provided by your <abbr title="Program Manager">PM</abbr> or Conrad Warre <a rel="email" class="action action-email" href="mailto:conrad@edx.org">(conrad@edx.org)</a>.')}</p>
+              <p>${_('Your course summary page will not be viewable until your '
+                      'course has been announced. To provide content for the '
+                      'page and preview it, follow the instructions provided '
+                      'by your <abbr title="Program Manager">PM</abbr>.')}</p>
             </div>
           </div>
           % endif
@@ -110,7 +119,7 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
         <section class="group-settings schedule">
           <header>
             <h2 class="title-2">${_('Course Schedule')}</h2>
-            <span class="tip">${_('Dates that control when your course can be viewed.')}</span>
+            <span class="tip">${_('Dates that control when your course can be viewed')}</span>
           </header>
 
           <ol class="list-input">
@@ -196,7 +205,7 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
                   <%def name='overview_text()'><%
                     a_link_start = '<a class="link-courseURL" rel="external" href="'
                     a_link_end = '">' + _("your course summary page") + '</a>'
-                    a_link = a_link_start + utils.get_lms_link_for_about_page(course_location) + a_link_end
+                    a_link = a_link_start + lms_link_for_about_page + a_link_end
                     text = _("Introductions, prerequisites, FAQs that are used on %s (formatted in HTML)") % a_link
                     %>${text}</%def>
                   <span class="tip tip-stacked">${overview_text()}</span>
@@ -208,15 +217,16 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
                   <div class="current current-course-image">
                     % if context_course.course_image:
                     <span class="wrapper-course-image">
-                      <img class="course-image" id="course-image" src="${utils.course_image_url(context_course)}" alt="${_('Course Image')}"/>
+                      <img class="course-image" id="course-image" src="${course_image_url}" alt="${_('Course Image')}"/>
                     </span>
 
-                    <% ctx_loc = context_course.location %>
-                    <span class="msg msg-help">${_("You can manage this image along with all of your other")} <a href="${reverse('asset_index', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">${_("files &amp; uploads")}</a></span>
+                    <span class="msg msg-help">
+                    ${_("You can manage this image along with all of your other <a href='{}'>files &amp; uploads</a>").format(upload_asset_url)}
+                    </span>
 
                     % else:
                     <span class="wrapper-course-image">
-                      <img class="course-image placeholder" id="course-image" src="${utils.course_image_url(context_course)}" alt="${_('Course Image')}"/>
+                      <img class="course-image placeholder" id="course-image" src="${course_image_url}" alt="${_('Course Image')}"/>
                     </span>
                     <span class="msg msg-empty">${_("Your course currently does not have an image. Please upload one (JPEG or PNG format, and minimum suggested dimensions are 375px wide by 200px tall)")}</span>
                     % endif
@@ -274,26 +284,29 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
     </article>
     <aside class="content-supplementary" role="complimentary">
      <div class="bit">
-        <h3 class="title-3">${_("How will these settings be used?")}</h3>
-        <p>${_("Your course's schedule settings determine when students can enroll in and begin a course.")}</p>
+        <h3 class="title-3">${_("How are these settings used?")}</h3>
+        <p>${_("Your course's schedule determines when students can enroll in and begin a course.")}</p>
 
-        <p>${_("Additionally, details provided on this page are also used in edX's catalog of courses, which new and returning students use to choose new courses to study.")}</p>
-      </div>
+        <p>${_("Other information from this page appears on the About page for your course. This information includes the course overview, course image, introduction video, and estimated time requirements. Students use About pages to choose new courses to take.")}</p>
+     </div>
 
-      <div class="bit">
-      % if context_course:
-      <% ctx_loc = context_course.location %>
-      <%! from django.core.urlresolvers import reverse %>
+     <div class="bit">
+     % if context_course:
+          <%
+            course_team_url = course_locator.url_reverse('course_team/', '')
+            grading_config_url = course_locator.url_reverse('settings/grading/')
+            advanced_config_url = course_locator.url_reverse('settings/advanced/')
+          %>
         <h3 class="title-3">${_("Other Course Settings")}</h3>
         <nav class="nav-related">
           <ul>
-            <li class="nav-item"><a href="${reverse('contentstore.views.course_config_graders_page', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">${_("Grading")}</a></li>
-            <li class="nav-item"><a href="${reverse('manage_users', kwargs=dict(org=ctx_loc.org, course=ctx_loc.course, name=ctx_loc.name))}">${_("Course Team")}</a></li>
-            <li class="nav-item"><a href="${reverse('course_advanced_settings', kwargs={'org' : ctx_loc.org, 'course' : ctx_loc.course, 'name': ctx_loc.name})}">${_("Advanced Settings")}</a></li>
+            <li class="nav-item"><a href="${grading_config_url}">${_("Grading")}</a></li>
+            <li class="nav-item"><a href="${course_team_url}">${_("Course Team")}</a></li>
+            <li class="nav-item"><a href="${advanced_config_url}">${_("Advanced Settings")}</a></li>
           </ul>
         </nav>
-      % endif
-      </div>
+     % endif
+     </div>
     </aside>
   </section>
 </div>

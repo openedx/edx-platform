@@ -9,20 +9,17 @@ from django.core.urlresolvers import reverse
 from django.db import connection
 from django.http import HttpResponse
 from django.utils import simplejson
-from django_comment_common.models import Role
+from django_comment_common.models import Role, FORUM_ROLE_STUDENT
 from django_comment_client.permissions import check_permissions_by_view
 
-import mitxmako
+import edxmako
 import pystache_custom as pystache
 
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore import Location
 from django.utils.timezone import UTC
 
 log = logging.getLogger(__name__)
-
-# TODO these should be cached via django's caching rather than in-memory globals
-_FULLMODULES = None
-_DISCUSSIONINFO = defaultdict(dict)
 
 
 def extract(dic, keys):
@@ -46,12 +43,8 @@ def merge_dict(dic1, dic2):
 
 
 def get_role_ids(course_id):
-    roles = Role.objects.filter(course_id=course_id)
-    staff = list(User.objects.filter(is_staff=True).values_list('id', flat=True))
-    roles_with_ids = {'Staff': staff}
-    for role in roles:
-        roles_with_ids[role.name] = list(role.users.values_list('id', flat=True))
-    return roles_with_ids
+    roles = Role.objects.filter(course_id=course_id).exclude(name=FORUM_ROLE_STUDENT)
+    return dict([(role.name, list(role.users.values_list('id', flat=True))) for role in roles])
 
 
 def has_forum_access(uname, course_id, rolename):
@@ -62,33 +55,33 @@ def has_forum_access(uname, course_id, rolename):
     return role.users.filter(username=uname).exists()
 
 
-def get_full_modules():
-    global _FULLMODULES
-    if not _FULLMODULES:
-        _FULLMODULES = modulestore().modules
-    return _FULLMODULES
+def _get_discussion_modules(course):
+    all_modules = modulestore().get_items(
+        Location('i4x', course.location.org, course.location.course, 'discussion', None),
+        course_id=course.id
+    )
+
+    def has_required_keys(module):
+        for key in ('discussion_id', 'discussion_category', 'discussion_target'):
+            if getattr(module, key) is None:
+                log.warning("Required key '%s' not in discussion %s, leaving out of category map" % (key, module.location))
+                return False
+        return True
+
+    return filter(has_required_keys, all_modules)
 
 
-def get_discussion_id_map(course):
-    """
-        return a dict of the form {category: modules}
-    """
-    initialize_discussion_info(course)
-    return _DISCUSSIONINFO[course.id]['id_map']
+def _get_discussion_id_map(course):
+    def get_entry(module):
+        discussion_id = module.discussion_id
+        title = module.discussion_target
+        last_category = module.discussion_category.split("/")[-1].strip()
+        return (discussion_id, {"location": module.location, "title": last_category + " / " + title})
+
+    return dict(map(get_entry, _get_discussion_modules(course)))
 
 
-def get_discussion_title(course, discussion_id):
-    initialize_discussion_info(course)
-    title = _DISCUSSIONINFO[course.id]['id_map'].get(discussion_id, {}).get('title', '(no title)')
-    return title
-
-
-def get_discussion_category_map(course):
-    initialize_discussion_info(course)
-    return filter_unstarted_categories(_DISCUSSIONINFO[course.id]['category_map'])
-
-
-def filter_unstarted_categories(category_map):
+def _filter_unstarted_categories(category_map):
 
     now = datetime.now(UTC())
 
@@ -125,8 +118,8 @@ def filter_unstarted_categories(category_map):
 
     return result_map
 
-    
-def sort_map_entries(category_map, sort_alpha):
+
+def _sort_map_entries(category_map, sort_alpha):
     things = []
     for title, entry in category_map["entries"].items():
         if entry["sort_key"] == None and sort_alpha:
@@ -134,37 +127,22 @@ def sort_map_entries(category_map, sort_alpha):
         things.append((title, entry))
     for title, category in category_map["subcategories"].items():
         things.append((title, category))
-        sort_map_entries(category_map["subcategories"][title], sort_alpha)
+        _sort_map_entries(category_map["subcategories"][title], sort_alpha)
     category_map["children"] = [x[0] for x in sorted(things, key=lambda x: x[1]["sort_key"])]
 
 
-def initialize_discussion_info(course):
+def get_discussion_category_map(course):
     course_id = course.id
 
-    discussion_id_map = {}
     unexpanded_category_map = defaultdict(list)
 
-    # get all discussion models within this course_id
-    all_modules = modulestore().get_items(['i4x', course.location.org, course.location.course,
-                                          'discussion', None], course_id=course_id)
+    modules = _get_discussion_modules(course)
 
-    for module in all_modules:
-        skip_module = False
-        for key in ('discussion_id', 'discussion_category', 'discussion_target'):
-            if getattr(module, key) is None:
-                log.warning("Required key '%s' not in discussion %s, leaving out of category map" % (key, module.location))
-                skip_module = True
-
-        if skip_module:
-            continue
-
+    for module in modules:
         id = module.discussion_id
-        category = module.discussion_category
         title = module.discussion_target
         sort_key = module.sort_key
-        category = " / ".join([x.strip() for x in category.split("/")])
-        last_category = category.split("/")[-1]
-        discussion_id_map[id] = {"location": module.location, "title": last_category + " / " + title}
+        category = " / ".join([x.strip() for x in module.discussion_category.split("/")])
         #Handle case where module.start is None
         entry_start_date = module.start if module.start else datetime.max.replace(tzinfo=pytz.UTC)
         unexpanded_category_map[category].append({"title": title, "id": id, "sort_key": sort_key, "start_date": entry_start_date})
@@ -214,11 +192,9 @@ def initialize_discussion_info(course):
                                           "sort_key": entry.get("sort_key", topic),
                                           "start_date": datetime.now(UTC())}
 
-    sort_map_entries(category_map, course.discussion_sort_alpha)
+    _sort_map_entries(category_map, course.discussion_sort_alpha)
 
-    _DISCUSSIONINFO[course.id]['id_map'] = discussion_id_map
-    _DISCUSSIONINFO[course.id]['category_map'] = category_map
-    _DISCUSSIONINFO[course.id]['timestamp'] = datetime.now(UTC())
+    return _filter_unstarted_categories(category_map)
 
 
 class JsonResponse(HttpResponse):
@@ -330,12 +306,8 @@ def get_metadata_for_threads(course_id, threads, user, user_info):
 # put this method in utils.py to avoid circular import dependency between helpers and mustache_helpers
 
 
-def url_for_tags(course_id, tags):
-    return reverse('django_comment_client.forum.views.forum_form_discussion', args=[course_id]) + '?' + urllib.urlencode({'tags': tags})
-
-
 def render_mustache(template_name, dictionary, *args, **kwargs):
-    template = mitxmako.lookup['main'].get_template(template_name).source
+    template = edxmako.lookup['main'].get_template(template_name).source
     return pystache.render(template, dictionary)
 
 
@@ -354,13 +326,12 @@ def extend_content(content):
         try:
             user = User.objects.get(pk=content['user_id'])
             roles = dict(('name', role.name.lower()) for role in user.roles.filter(course_id=content['course_id']))
-        except user.DoesNotExist:
+        except User.DoesNotExist:
             log.error('User ID {0} in comment content {1} but not in our DB.'.format(content.get('user_id'), content.get('id')))
 
     content_info = {
         'displayed_title': content.get('highlighted_title') or content.get('title', ''),
         'displayed_body': content.get('highlighted_body') or content.get('body', ''),
-        'raw_tags': ','.join(content.get('tags', [])),
         'permalink': permalink(content),
         'roles': roles,
         'updated': content['created_at'] != content['updated_at'],
@@ -368,19 +339,19 @@ def extend_content(content):
     return merge_dict(content, content_info)
 
 
-def get_courseware_context(content, course):
-    id_map = get_discussion_id_map(course)
-    id = content['commentable_id']
-    content_info = None
-    if id in id_map:
-        location = id_map[id]["location"].url()
-        title = id_map[id]["title"]
+def add_courseware_context(content_list, course):
+    id_map = _get_discussion_id_map(course)
 
-        url = reverse('jump_to', kwargs={"course_id": course.location.course_id,
-                      "location": location})
+    for content in content_list:
+        commentable_id = content['commentable_id']
+        if commentable_id in id_map:
+            location = id_map[commentable_id]["location"].url()
+            title = id_map[commentable_id]["title"]
 
-        content_info = {"courseware_url": url, "courseware_title": title}
-    return content_info
+            url = reverse('jump_to', kwargs={"course_id": course.location.course_id,
+                          "location": location})
+
+            content.update({"courseware_url": url, "courseware_title": title})
 
 
 def safe_content(content):
@@ -389,7 +360,7 @@ def safe_content(content):
         'endorsed', 'parent_id', 'thread_id', 'votes', 'closed', 'created_at',
         'updated_at', 'depth', 'type', 'commentable_id', 'comments_count',
         'at_position_list', 'children', 'highlighted_title', 'highlighted_body',
-        'courseware_title', 'courseware_url', 'tags', 'unread_comments_count',
+        'courseware_title', 'courseware_url', 'unread_comments_count',
         'read', 'group_id', 'group_name', 'group_string', 'pinned', 'abuse_flaggers',
         'stats'
 

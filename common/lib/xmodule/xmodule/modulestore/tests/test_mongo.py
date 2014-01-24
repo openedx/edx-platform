@@ -13,14 +13,14 @@ from xblock.runtime import KeyValueStore
 from xblock.exceptions import InvalidScopeError
 
 from xmodule.tests import DATA_DIR
-from xmodule.modulestore import Location
+from xmodule.modulestore import Location, MONGO_MODULESTORE_TYPE
 from xmodule.modulestore.mongo import MongoModuleStore, MongoKeyValueStore
 from xmodule.modulestore.draft import DraftModuleStore
 from xmodule.modulestore.xml_importer import import_from_xml, perform_xlint
 from xmodule.contentstore.mongo import MongoContentStore
 
 from xmodule.modulestore.tests.test_modulestore import check_path_to_location
-from IPython.testing.nose_assert_methods import assert_in, assert_not_in
+from IPython.testing.nose_assert_methods import assert_in
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.exceptions import InsufficientSpecificationError
 
@@ -28,7 +28,7 @@ log = logging.getLogger(__name__)
 
 HOST = 'localhost'
 PORT = 27017
-DB = 'test_mongo_%s' % uuid4().hex
+DB = 'test_mongo_%s' % uuid4().hex[:5]
 COLLECTION = 'modulestore'
 FS_ROOT = DATA_DIR  # TODO (vshnayder): will need a real fs_root for testing load_item
 DEFAULT_CLASS = 'xmodule.raw_module.RawDescriptor'
@@ -39,7 +39,11 @@ class TestMongoModuleStore(object):
     '''Tests!'''
     @classmethod
     def setupClass(cls):
-        cls.connection = pymongo.connection.Connection(HOST, PORT)
+        cls.connection = pymongo.MongoClient(
+            host=HOST,
+            port=PORT,
+            tz_aware=True,
+        )
         cls.connection.drop_database(DB)
 
         # NOTE: Creating a single db for all the tests to save time.  This
@@ -50,20 +54,25 @@ class TestMongoModuleStore(object):
 
     @classmethod
     def teardownClass(cls):
-        cls.connection = pymongo.connection.Connection(HOST, PORT)
-        cls.connection.drop_database(DB)
+        if cls.connection:
+            cls.connection.drop_database(DB)
 
     @staticmethod
     def initdb():
         # connect to the db
-        store = MongoModuleStore(HOST, DB, COLLECTION, FS_ROOT, RENDER_TEMPLATE, default_class=DEFAULT_CLASS)
+        doc_store_config = {
+            'host': HOST,
+            'db': DB,
+            'collection': COLLECTION,
+        }
+        store = MongoModuleStore(doc_store_config, FS_ROOT, RENDER_TEMPLATE, default_class=DEFAULT_CLASS)
         # since MongoModuleStore and MongoContentStore are basically assumed to be together, create this class
         # as well
         content_store = MongoContentStore(HOST, DB)
         #
         # Also test draft store imports
         #
-        draft_store = DraftModuleStore(HOST, DB, COLLECTION, FS_ROOT, RENDER_TEMPLATE, default_class=DEFAULT_CLASS)
+        draft_store = DraftModuleStore(doc_store_config, FS_ROOT, RENDER_TEMPLATE, default_class=DEFAULT_CLASS)
         # Explicitly list the courses to load (don't want the big one)
         courses = ['toy', 'simple', 'simple_with_draft', 'test_unicode']
         import_from_xml(store, DATA_DIR, courses, draft_store=draft_store, static_content_store=content_store)
@@ -113,8 +122,11 @@ class TestMongoModuleStore(object):
         pprint([Location(i['_id']).url() for i in ids])
 
     def test_mongo_modulestore_type(self):
-        store = MongoModuleStore(HOST, DB, COLLECTION, FS_ROOT, RENDER_TEMPLATE, default_class=DEFAULT_CLASS)
-        assert_equals(store.get_modulestore_type('foo/bar/baz'), 'mongo')
+        store = MongoModuleStore(
+            {'host': HOST, 'db': DB, 'collection': COLLECTION},
+            FS_ROOT, RENDER_TEMPLATE, default_class=DEFAULT_CLASS
+        )
+        assert_equals(store.get_modulestore_type('foo/bar/baz'), MONGO_MODULESTORE_TYPE)
 
     def test_get_courses(self):
         '''Make sure the course objects loaded properly'''
@@ -211,7 +223,7 @@ class TestMongoModuleStore(object):
         Test getting, setting, and defaulting the locked attr and arbitrary attrs.
         """
         location = Location('i4x', 'edX', 'toy', 'course', '2012_Fall')
-        course_content = TestMongoModuleStore.content_store.get_all_content_for_course(location)
+        course_content, __ = TestMongoModuleStore.content_store.get_all_content_for_course(location)
         assert len(course_content) > 0
         # a bit overkill, could just do for content[0]
         for content in course_content:
@@ -272,13 +284,6 @@ class TestMongoKeyValueStore(object):
         self.children = ['i4x://org/course/child/a', 'i4x://org/course/child/b']
         self.metadata = {'meta': 'meta_val'}
         self.kvs = MongoKeyValueStore(self.data, self.children, self.metadata)
-
-    def _check_read(self, key, expected_value):
-        """
-        Asserts the get and has methods.
-        """
-        assert_equals(expected_value, self.kvs.get(key))
-        assert self.kvs.has(key)
 
     def test_read(self):
         assert_equals(self.data['foo'], self.kvs.get(KeyValueStore.Key(Scope.content, None, None, 'foo')))

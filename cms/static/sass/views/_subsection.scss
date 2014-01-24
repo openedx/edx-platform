@@ -33,6 +33,7 @@
         }
 
         label {
+          @extend %t-title8;
           margin-bottom: ($baseline/4);
         }
       }
@@ -201,12 +202,6 @@
     input {
       font-size: 14px;
     }
-
-    .sortable-unit-list {
-      ol {
-        @include tree-view;
-      }
-    }
   }
 
   .subsection-name-input {
@@ -237,8 +232,8 @@
     }
 
     .notice {
+      @extend %t-copy-sub2;
       margin-top: 6px;
-      font-size: 11px;
       color: #999;
     }
   }
@@ -295,9 +290,105 @@
     }
   }
 
+  .sortable-unit-list {
+
+    .courseware-unit {
+      @include font-size(13);
+      @include clearfix();
+      margin: -1px 0 0 0;
+
+      .section-item {
+        @include transition(background $tmg-avg ease-in-out 0);
+        @include font-size(13);
+        position: relative;
+        display: block;
+        padding: 6px 8px 8px 16px;
+
+        &:hover {
+          background: $blue-l5;
+        }
+      }
+
+      .public-item {
+        color: $black;
+      }
+
+      .private-item {
+        color: $gray-l1;
+      }
+
+      .draft-item {
+        color: $yellow-d1;
+      }
+
+      .draft-item:after,
+      .public-item:after,
+      .private-item:after {
+        @include font-size(9);
+        margin-left: 3px;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+
+      .draft-item:after {
+        content: "- draft";
+      }
+
+      .private-item:after {
+        content: "- private";
+      }
+    }
+
+    .actions-list {
+      display: inline-block;
+      margin-bottom: 0;
+    }
+
+    .actions-item {
+      @include font-size(13);
+      display: inline-block;
+      padding: 0 4px;
+      vertical-align: middle;
+
+      .action {
+        min-width: ($baseline*.75);
+        color: $gray-l2;
+
+        &:hover,
+        &.is-set {
+          color: $blue;
+          visibility: visible;
+        }
+
+        //reset old drag handle style
+        &.drag-handle {
+          float: none;
+          margin: 0;
+          background: transparent url(../img/drag-handles.png) right 5px no-repeat;
+          text-align: center;
+        }
+      }
+    }
+
+    .new-unit-item {
+      @extend %ui-btn-flat-outline;
+      width: 100%;
+      margin: 0 0 ($baseline/2) 0;
+      border: 1px solid $gray-l3;
+      padding: ($baseline/2) 0;
+      color: $gray-l2;
+
+      &:hover {
+        box-shadow: none;
+        background-image: none;
+      }
+    }
+  }
+
   .gradable {
 
     label {
+      @extend %t-title8;
       display: inline-block;
       vertical-align: top;
     }
@@ -399,5 +490,22 @@
         }
       }
     }
+  }
+
+  // UI: DnD - specific elems/cases - units
+  .courseware-unit {
+
+    .draggable-drop-indicator-before {
+      top: 0;
+    }
+
+    .draggable-drop-indicator-after {
+      bottom: 0;
+    }
+  }
+
+  // UI: DnD - specific elems/cases - empty parents initial drop indicator
+  .draggable-drop-indicator-initial {
+    display: none;
   }
 }

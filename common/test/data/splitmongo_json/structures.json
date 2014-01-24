@@ -11,7 +11,7 @@
         "blocks":{
             "head12345":{
                 "category":"course",
-                "definition":"head12345_12",
+                "definition":{ "$oid" : "ad00000000000000dddd0000"},
                 "fields":{
                     "children":[
                         "chapter1",
@@ -65,10 +65,10 @@
             },
             "chapter1":{
                 "category":"chapter",
-                "definition":"chapter12345_1",
+                "definition":{ "$oid" : "cd00000000000000dddd0020"},
                 "fields":{
                     "children":[
-                        
+
                     ],
                     "display_name":"Hercules"
                 },
@@ -83,10 +83,10 @@
             },
             "chapter2":{
                 "category":"chapter",
-                "definition":"chapter12345_2",
+                "definition":{ "$oid" : "cd00000000000000dddd0022"},
                 "fields":{
                     "children":[
-                        
+
                     ],
                     "display_name":"Hera heckles Hercules"
                 },
@@ -101,7 +101,7 @@
             },
             "chapter3":{
                 "category":"chapter",
-                "definition":"chapter12345_3",
+                "definition":{ "$oid" : "cd00000000000000dddd0032"},
                 "fields":{
                     "children":[
                         "problem1",
@@ -120,10 +120,10 @@
             },
             "problem1":{
                 "category":"problem",
-                "definition":"problem12345_3_1",
+                "definition":{ "$oid" : "0d00000040000000dddd0031"},
                 "fields":{
                     "children":[
-                        
+
                     ],
                     "display_name":"Problem 3.1",
                     "graceperiod":"4 hours 0 minutes 0 seconds"
@@ -139,10 +139,10 @@
             },
             "problem3_2":{
                 "category":"problem",
-                "definition":"problem12345_3_2",
+                "definition":{ "$oid" : "0d00000040000000dddd0032"},
                 "fields":{
                     "children":[
-                        
+
                     ],
                     "display_name":"Problem 3.2"
                 },
@@ -169,10 +169,10 @@
         "blocks":{
             "head12345":{
                 "category":"course",
-                "definition":"head12345_11",
+                "definition":{ "$oid" : "ad00000000000000dddd0001"},
                 "fields":{
                     "children":[
-                        
+
                     ],
                     "end":"2013-04-13T04:30",
                     "tabs":[
@@ -233,10 +233,10 @@
         "blocks":{
             "head12345":{
                 "category":"course",
-                "definition":"head12345_10",
+                "definition":{ "$oid" : "ad00000000000000dddd0010"},
                 "fields":{
                     "children":[
-                        
+
                     ],
                     "end":null,
                     "tabs":[
@@ -287,10 +287,10 @@
         "blocks":{
             "head23456":{
                 "category":"course",
-                "definition":"head23456_1",
+                "definition":{ "$oid" : "ad00000000000000dddd0020"},
                 "fields":{
                     "children":[
-                        
+
                     ],
                     "end":null,
                     "tabs":[
@@ -326,7 +326,7 @@
                         "$date":1364481313238
                     }
                 }
-                
+
             }
         }
     },
@@ -342,10 +342,10 @@
         "blocks":{
             "head23456":{
                 "category":"course",
-                "definition":"head23456_0",
+                "definition":{ "$oid" : "2d00000000000000dddd0020"},
                 "fields":{
                     "children":[
-                        
+
                     ],
                     "end":null,
                     "tabs":[
@@ -396,10 +396,10 @@
         "blocks":{
             "head23456":{
                 "category":"course",
-                "definition":"head23456_1",
+                "definition":{ "$oid" : "ad00000000000000dddd0020"},
                 "fields":{
                     "children":[
-                        
+
                     ],
                     "end":null,
                     "tabs":[
@@ -450,10 +450,10 @@
         "blocks":{
             "head345679":{
                 "category":"course",
-                "definition":"head345679_1",
+                "definition":{ "$oid" : "3d00000000000000dddd0020"},
                 "fields":{
                     "children":[
-                        
+
                     ],
                     "end":null,
                     "tabs":[

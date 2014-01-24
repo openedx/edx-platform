@@ -22,7 +22,7 @@ from lxml import etree
 import unittest
 import xml.sax.saxutils as saxutils
 
-from . import test_system
+from . import test_capa_system
 from capa import inputtypes
 from mock import ANY, patch
 from pyparsing import ParseException
@@ -41,20 +41,20 @@ class OptionInputTest(unittest.TestCase):
     '''
 
     def test_rendering(self):
-        xml_str = """<optioninput options="('Up','Down')" id="sky_input" correct="Up"/>"""
+        xml_str = """<optioninput options="('Up','Down','Don't know')" id="sky_input" correct="Up"/>"""
         element = etree.fromstring(xml_str)
 
         state = {'value': 'Down',
                  'id': 'sky_input',
                  'status': 'answered'}
-        option_input = lookup_tag('optioninput')(test_system(), element, state)
+        option_input = lookup_tag('optioninput')(test_capa_system(), element, state)
 
         context = option_input._get_render_context()  # pylint: disable=W0212
 
         expected = {
             'STATIC_URL': '/dummy-static/',
             'value': 'Down',
-            'options': [('Up', 'Up'), ('Down', 'Down')],
+            'options': [('Up', 'Up'), ('Down', 'Down'), ('Don\'t know', 'Don\'t know')],
             'status': 'answered',
             'msg': '',
             'inline': False,
@@ -75,6 +75,14 @@ class OptionInputTest(unittest.TestCase):
         check("('a', 'b')", ['a', 'b'])
         check("('a b','b')", ['a b', 'b'])
         check("('My \"quoted\"place','b')", ['My \"quoted\"place', 'b'])
+        check(u"('б','в')", [u'б', u'в'])
+        check(u"('б', 'в')", [u'б', u'в'])
+        check(u"('б в','в')", [u'б в', u'в'])
+        check(u"('Мой \"кавыки\"место','в')", [u'Мой \"кавыки\"место', u'в'])
+
+        # check that escaping single quotes with leading backslash (\') properly works
+        # note: actual input by user will be hasn\'t but json parses it as hasn\\'t
+        check(u"('hasnt','hasn't')", [u'hasnt', u'hasn\'t'])
 
 
 class ChoiceGroupTest(unittest.TestCase):
@@ -88,6 +96,7 @@ class ChoiceGroupTest(unittest.TestCase):
     <choice correct="false" name="foil1"><text>This is foil One.</text></choice>
     <choice correct="false" name="foil2"><text>This is foil Two.</text></choice>
     <choice correct="true" name="foil3">This is foil Three.</choice>
+    <choice correct="false" name="foil4">This is <b>foil</b> Four.</choice>
   </{tag}>
         """.format(tag=tag)
 
@@ -97,7 +106,7 @@ class ChoiceGroupTest(unittest.TestCase):
                  'id': 'sky_input',
                  'status': 'answered'}
 
-        the_input = lookup_tag(tag)(test_system(), element, state)
+        the_input = lookup_tag(tag)(test_capa_system(), element, state)
 
         context = the_input._get_render_context()  # pylint: disable=W0212
 
@@ -110,7 +119,8 @@ class ChoiceGroupTest(unittest.TestCase):
             'input_type': expected_input_type,
             'choices': [('foil1', '<text>This is foil One.</text>'),
                         ('foil2', '<text>This is foil Two.</text>'),
-                        ('foil3', 'This is foil Three.'), ],
+                        ('foil3', 'This is foil Three.'),
+                        ('foil4', 'This is <b>foil</b> Four.'), ],
             'show_correctness': 'always',
             'submitted_message': 'Answer received.',
             'name_array_suffix': expected_suffix,   # what is this for??
@@ -149,7 +159,7 @@ class JavascriptInputTest(unittest.TestCase):
         element = etree.fromstring(xml_str)
 
         state = {'value': '3', }
-        the_input = lookup_tag('javascriptinput')(test_system(), element, state)
+        the_input = lookup_tag('javascriptinput')(test_capa_system(), element, state)
 
         context = the_input._get_render_context()  # pylint: disable=W0212
 
@@ -180,7 +190,7 @@ class TextLineTest(unittest.TestCase):
         element = etree.fromstring(xml_str)
 
         state = {'value': 'BumbleBee', }
-        the_input = lookup_tag('textline')(test_system(), element, state)
+        the_input = lookup_tag('textline')(test_capa_system(), element, state)
 
         context = the_input._get_render_context()  # pylint: disable=W0212
 
@@ -211,7 +221,7 @@ class TextLineTest(unittest.TestCase):
         element = etree.fromstring(xml_str)
 
         state = {'value': 'BumbleBee', }
-        the_input = lookup_tag('textline')(test_system(), element, state)
+        the_input = lookup_tag('textline')(test_capa_system(), element, state)
 
         context = the_input._get_render_context()  # pylint: disable=W0212
 
@@ -254,7 +264,7 @@ class TextLineTest(unittest.TestCase):
             element = etree.fromstring(xml_str)
 
             state = {'value': 'BumbleBee', }
-            the_input = lookup_tag('textline')(test_system(), element, state)
+            the_input = lookup_tag('textline')(test_capa_system(), element, state)
 
             context = the_input._get_render_context()  # pylint: disable=W0212
 
@@ -295,7 +305,7 @@ class FileSubmissionTest(unittest.TestCase):
                  'status': 'incomplete',
                  'feedback': {'message': '3'}, }
         input_class = lookup_tag('filesubmission')
-        the_input = input_class(test_system(), element, state)
+        the_input = input_class(test_capa_system(), element, state)
 
         context = the_input._get_render_context()  # pylint: disable=W0212
 
@@ -303,7 +313,7 @@ class FileSubmissionTest(unittest.TestCase):
             'STATIC_URL': '/dummy-static/',
             'id': 'prob_1_2',
             'status': 'queued',
-            'msg': input_class.submitted_msg,
+            'msg': the_input.submitted_msg,
             'value': 'BumbleBee.py',
             'queue_len': '3',
             'allowed_files': '["runme.py", "nooooo.rb", "ohai.java"]',
@@ -343,7 +353,7 @@ class CodeInputTest(unittest.TestCase):
                  'feedback': {'message': '3'}, }
 
         input_class = lookup_tag('codeinput')
-        the_input = input_class(test_system(), element, state)
+        the_input = input_class(test_capa_system(), element, state)
 
         context = the_input._get_render_context()  # pylint: disable=W0212
 
@@ -352,7 +362,7 @@ class CodeInputTest(unittest.TestCase):
             'id': 'prob_1_2',
             'value': 'print "good evening"',
             'status': 'queued',
-            'msg': input_class.submitted_msg,
+            'msg': the_input.submitted_msg,
             'mode': mode,
             'linenumbers': linenumbers,
             'rows': rows,
@@ -395,7 +405,7 @@ class MatlabTest(unittest.TestCase):
                  'feedback': {'message': '3'}, }
 
         self.input_class = lookup_tag('matlabinput')
-        self.the_input = self.input_class(test_system(), elt, state)
+        self.the_input = self.input_class(test_capa_system(), elt, state)
 
     def test_rendering(self):
         context = self.the_input._get_render_context()  # pylint: disable=W0212
@@ -405,7 +415,7 @@ class MatlabTest(unittest.TestCase):
             'id': 'prob_1_2',
             'value': 'print "good evening"',
             'status': 'queued',
-            'msg': self.input_class.submitted_msg,
+            'msg': self.the_input.submitted_msg,
             'mode': self.mode,
             'rows': self.rows,
             'cols': self.cols,
@@ -426,7 +436,7 @@ class MatlabTest(unittest.TestCase):
                  'feedback': {'message': '3'}, }
         elt = etree.fromstring(self.xml)
 
-        the_input = self.input_class(test_system(), elt, state)
+        the_input = self.input_class(test_capa_system(), elt, state)
         context = the_input._get_render_context()  # pylint: disable=W0212
 
         expected = {
@@ -434,7 +444,7 @@ class MatlabTest(unittest.TestCase):
             'id': 'prob_1_2',
             'value': 'print "good evening"',
             'status': 'queued',
-            'msg': self.input_class.submitted_msg,
+            'msg': the_input.submitted_msg,
             'mode': self.mode,
             'rows': self.rows,
             'cols': self.cols,
@@ -456,7 +466,7 @@ class MatlabTest(unittest.TestCase):
                      }
             elt = etree.fromstring(self.xml)
 
-            the_input = self.input_class(test_system(), elt, state)
+            the_input = self.input_class(test_capa_system(), elt, state)
             context = the_input._get_render_context()  # pylint: disable=W0212
             expected = {
                 'STATIC_URL': '/dummy-static/',
@@ -484,14 +494,14 @@ class MatlabTest(unittest.TestCase):
                  }
         elt = etree.fromstring(self.xml)
 
-        the_input = self.input_class(test_system(), elt, state)
+        the_input = self.input_class(test_capa_system(), elt, state)
         context = the_input._get_render_context()  # pylint: disable=W0212
         expected = {
             'STATIC_URL': '/dummy-static/',
             'id': 'prob_1_2',
             'value': 'print "good evening"',
             'status': 'queued',
-            'msg': self.input_class.plot_submitted_msg,
+            'msg': the_input.submitted_msg,
             'mode': self.mode,
             'rows': self.rows,
             'cols': self.cols,
@@ -509,7 +519,7 @@ class MatlabTest(unittest.TestCase):
         data = {'submission': 'x = 1234;'}
         response = self.the_input.handle_ajax("plot", data)
 
-        test_system().xqueue['interface'].send_to_queue.assert_called_with(header=ANY, body=ANY)
+        test_capa_system().xqueue['interface'].send_to_queue.assert_called_with(header=ANY, body=ANY)
 
         self.assertTrue(response['success'])
         self.assertTrue(self.the_input.input_state['queuekey'] is not None)
@@ -518,7 +528,7 @@ class MatlabTest(unittest.TestCase):
     def test_plot_data_failure(self):
         data = {'submission': 'x = 1234;'}
         error_message = 'Error message!'
-        test_system().xqueue['interface'].send_to_queue.return_value = (1, error_message)
+        test_capa_system().xqueue['interface'].send_to_queue.return_value = (1, error_message)
         response = self.the_input.handle_ajax("plot", data)
         self.assertFalse(response['success'])
         self.assertEqual(response['message'], error_message)
@@ -534,7 +544,7 @@ class MatlabTest(unittest.TestCase):
                  'feedback': {'message': '3'}, }
         elt = etree.fromstring(self.xml)
 
-        the_input = self.input_class(test_system(), elt, state)
+        the_input = self.input_class(test_capa_system(), elt, state)
         inner_msg = 'hello!'
         queue_msg = json.dumps({'msg': inner_msg})
 
@@ -552,7 +562,7 @@ class MatlabTest(unittest.TestCase):
                  'feedback': {'message': '3'}, }
         elt = etree.fromstring(self.xml)
 
-        the_input = self.input_class(test_system(), elt, state)
+        the_input = self.input_class(test_capa_system(), elt, state)
         inner_msg = 'hello!'
         queue_msg = json.dumps({'msg': inner_msg})
 
@@ -591,7 +601,7 @@ class SchematicTest(unittest.TestCase):
         state = {'value': value,
                  'status': 'unsubmitted'}
 
-        the_input = lookup_tag('schematic')(test_system(), element, state)
+        the_input = lookup_tag('schematic')(test_capa_system(), element, state)
 
         context = the_input._get_render_context()  # pylint: disable=W0212
 
@@ -633,7 +643,7 @@ class ImageInputTest(unittest.TestCase):
         state = {'value': value,
                  'status': 'unsubmitted'}
 
-        the_input = lookup_tag('imageinput')(test_system(), element, state)
+        the_input = lookup_tag('imageinput')(test_capa_system(), element, state)
 
         context = the_input._get_render_context()  # pylint: disable=W0212
 
@@ -687,7 +697,7 @@ class CrystallographyTest(unittest.TestCase):
         state = {'value': value,
                  'status': 'unsubmitted'}
 
-        the_input = lookup_tag('crystallography')(test_system(), element, state)
+        the_input = lookup_tag('crystallography')(test_capa_system(), element, state)
 
         context = the_input._get_render_context()  # pylint: disable=W0212
 
@@ -728,7 +738,7 @@ class VseprTest(unittest.TestCase):
         state = {'value': value,
                  'status': 'unsubmitted'}
 
-        the_input = lookup_tag('vsepr_input')(test_system(), element, state)
+        the_input = lookup_tag('vsepr_input')(test_capa_system(), element, state)
 
         context = the_input._get_render_context()  # pylint: disable=W0212
 
@@ -758,7 +768,7 @@ class ChemicalEquationTest(unittest.TestCase):
         element = etree.fromstring(xml_str)
 
         state = {'value': 'H2OYeah', }
-        self.the_input = lookup_tag('chemicalequationinput')(test_system(), element, state)
+        self.the_input = lookup_tag('chemicalequationinput')(test_capa_system(), element, state)
 
     def test_rendering(self):
         ''' Verify that the render context matches the expected render context'''
@@ -843,7 +853,7 @@ class FormulaEquationTest(unittest.TestCase):
         element = etree.fromstring(xml_str)
 
         state = {'value': 'x^2+1/2'}
-        self.the_input = lookup_tag('formulaequationinput')(test_system(), element, state)
+        self.the_input = lookup_tag('formulaequationinput')(test_capa_system(), element, state)
 
     def test_rendering(self):
         """
@@ -951,7 +961,7 @@ class DragAndDropTest(unittest.TestCase):
     '''
 
     def test_rendering(self):
-        path_to_images = '/static/images/'
+        path_to_images = '/dummy-static/images/'
 
         xml_str = """
         <drag_and_drop_input id="prob_1_2" img="{path}about_1.png" target_outline="false">
@@ -978,15 +988,15 @@ class DragAndDropTest(unittest.TestCase):
 
         user_input = {  # order matters, for string comparison
                         "target_outline": "false",
-                        "base_image": "/static/images/about_1.png",
+                        "base_image": "/dummy-static/images/about_1.png",
                         "draggables": [
 {"can_reuse": "", "label": "Label 1", "id": "1", "icon": "", "target_fields": []},
-{"can_reuse": "", "label": "cc", "id": "name_with_icon", "icon": "/static/images/cc.jpg", "target_fields": []},
-{"can_reuse": "", "label": "arrow-left", "id": "with_icon", "icon": "/static/images/arrow-left.png", "can_reuse": "", "target_fields": []},
+{"can_reuse": "", "label": "cc", "id": "name_with_icon", "icon": "/dummy-static/images/cc.jpg", "target_fields": []},
+{"can_reuse": "", "label": "arrow-left", "id": "with_icon", "icon": "/dummy-static/images/arrow-left.png", "can_reuse": "", "target_fields": []},
 {"can_reuse": "", "label": "Label2", "id": "5", "icon": "", "can_reuse": "", "target_fields": []},
-{"can_reuse": "", "label": "Mute", "id": "2", "icon": "/static/images/mute.png", "can_reuse": "", "target_fields": []},
-{"can_reuse": "", "label": "spinner", "id": "name_label_icon3", "icon": "/static/images/spinner.gif", "can_reuse": "", "target_fields": []},
-{"can_reuse": "", "label": "Star", "id": "name4", "icon": "/static/images/volume.png", "can_reuse": "", "target_fields": []},
+{"can_reuse": "", "label": "Mute", "id": "2", "icon": "/dummy-static/images/mute.png", "can_reuse": "", "target_fields": []},
+{"can_reuse": "", "label": "spinner", "id": "name_label_icon3", "icon": "/dummy-static/images/spinner.gif", "can_reuse": "", "target_fields": []},
+{"can_reuse": "", "label": "Star", "id": "name4", "icon": "/dummy-static/images/volume.png", "can_reuse": "", "target_fields": []},
 {"can_reuse": "", "label": "Label3", "id": "7", "icon": "", "can_reuse": "", "target_fields": []}],
                         "one_per_target": "True",
                         "targets": [
@@ -995,7 +1005,7 @@ class DragAndDropTest(unittest.TestCase):
                                     ]
                     }
 
-        the_input = lookup_tag('drag_and_drop_input')(test_system(), element, state)
+        the_input = lookup_tag('drag_and_drop_input')(test_capa_system(), element, state)
 
         context = the_input._get_render_context()  # pylint: disable=W0212
         expected = {
@@ -1046,7 +1056,7 @@ class AnnotationInputTest(unittest.TestCase):
 
         tag = 'annotationinput'
 
-        the_input = lookup_tag(tag)(test_system(), element, state)
+        the_input = lookup_tag(tag)(test_capa_system(), element, state)
 
         context = the_input._get_render_context()  # pylint: disable=W0212
 
@@ -1136,7 +1146,7 @@ class TestChoiceText(unittest.TestCase):
             'submitted_message': 'Answer received.'
         }
         expected.update(state)
-        the_input = lookup_tag(tag)(test_system(), element, state)
+        the_input = lookup_tag(tag)(test_capa_system(), element, state)
         context = the_input._get_render_context()  # pylint: disable=W0212
         self.assertEqual(context, expected)
 

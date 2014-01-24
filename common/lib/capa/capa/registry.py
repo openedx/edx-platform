@@ -1,3 +1,5 @@
+"""A registry for finding classes based on tags in the class."""
+
 class TagRegistry(object):
     """
     A registry mapping tags to handlers.
@@ -34,6 +36,9 @@ class TagRegistry(object):
         # Ok, should be good to change state now.
         for t in cls.tags:
             self._mapping[t] = cls
+
+        # Returning the cls means we can use this as a decorator.
+        return cls
 
     def registered_tags(self):
         """

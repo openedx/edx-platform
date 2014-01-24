@@ -26,18 +26,18 @@ class TestPublish(unittest.TestCase):
         'db': 'test_xmodule',
     }
 
-    modulestore_options = dict({
+    modulestore_options = {
         'default_class': 'xmodule.raw_module.RawDescriptor',
         'fs_root': '',
         'render_template': mock.Mock(return_value=""),
         'xblock_mixins': (InheritanceMixin,)
-    }, **db_config)
+    }
 
     def setUp(self):
-        self.modulestore_options['collection'] = 'modulestore{0}'.format(uuid.uuid4().hex)
+        self.db_config['collection'] = 'modulestore{0}'.format(uuid.uuid4().hex[:5])
 
-        self.old_mongo = MongoModuleStore(**self.modulestore_options)
-        self.draft_mongo = DraftMongoModuleStore(**self.modulestore_options)
+        self.old_mongo = MongoModuleStore(self.db_config, **self.modulestore_options)
+        self.draft_mongo = DraftMongoModuleStore(self.db_config, **self.modulestore_options)
         self.addCleanup(self.tear_down_mongo)
         self.course_location = None
 
@@ -129,7 +129,7 @@ class TestPublish(unittest.TestCase):
         """
         Applies action depth-first down tree and to item last.
 
-        A copy of  cms.djangoapps.contentstore.views.requests._xmodule_recurse to reproduce its use and behavior
+        A copy of  cms.djangoapps.contentstore.views.helpers._xmodule_recurse to reproduce its use and behavior
         outside of django.
         """
         for child in item.get_children():

@@ -2,7 +2,7 @@ describe 'Annotatable', ->
     beforeEach ->
         loadFixtures 'annotatable.html'
     describe 'constructor', ->
-        el = $('.xmodule_display.xmodule_AnnotatableModule')
+        el = $('.xblock-student_view.xmodule_AnnotatableModule')
         beforeEach ->
             @annotatable = new Annotatable(el)
         it 'works', ->

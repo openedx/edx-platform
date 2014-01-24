@@ -9,23 +9,30 @@ This is the default template for our main set of AWS servers.
 import json
 
 from .common import *
+
 from logsettings import get_logger_config
 import os
 
-# specified as an environment variable.  Typically this is set
-# in the service's upstart script and corresponds exactly to the service name.
-# Service variants apply config differences via env and auth JSON files,
-# the names of which correspond to the variant.
+from path import path
+from dealer.git import git
+
+# SERVICE_VARIANT specifies name of the variant used, which decides what JSON
+# configuration files are read during startup.
 SERVICE_VARIANT = os.environ.get('SERVICE_VARIANT', None)
 
-# when not variant is specified we attempt to load an unvaried
-# config set.
-CONFIG_PREFIX = ""
+# CONFIG_ROOT specifies the directory where the JSON configuration
+# files are expected to be found. If not specified, use the project
+# directory.
+CONFIG_ROOT = path(os.environ.get('CONFIG_ROOT', ENV_ROOT))
 
-if SERVICE_VARIANT:
-    CONFIG_PREFIX = SERVICE_VARIANT + "."
+# CONFIG_PREFIX specifies the prefix of the JSON configuration files,
+# based on the service variant. If no variant is use, don't use a
+# prefix.
+CONFIG_PREFIX = SERVICE_VARIANT + "." if SERVICE_VARIANT else ""
+
 
 ############### ALWAYS THE SAME ################################
+
 DEBUG = False
 TEMPLATE_DEBUG = False
 
@@ -77,13 +84,38 @@ CELERY_QUEUES = {
 
 ############# NON-SECURE ENV CONFIG ##############################
 # Things like server locations, ports, etc.
-with open(ENV_ROOT / CONFIG_PREFIX + "env.json") as env_file:
+with open(CONFIG_ROOT / CONFIG_PREFIX + "env.json") as env_file:
     ENV_TOKENS = json.load(env_file)
+
+# STATIC_URL_BASE specifies the base url to use for static files
+STATIC_URL_BASE = ENV_TOKENS.get('STATIC_URL_BASE', None)
+if STATIC_URL_BASE:
+    # collectstatic will fail if STATIC_URL is a unicode string
+    STATIC_URL = STATIC_URL_BASE.encode('ascii')
+    if not STATIC_URL.endswith("/"):
+        STATIC_URL += "/"
+    STATIC_URL += git.revision + "/"
+
+# GITHUB_REPO_ROOT is the base directory
+# for course data
+GITHUB_REPO_ROOT = ENV_TOKENS.get('GITHUB_REPO_ROOT', GITHUB_REPO_ROOT)
+
+# STATIC_ROOT specifies the directory where static files are
+# collected
+
+STATIC_ROOT_BASE = ENV_TOKENS.get('STATIC_ROOT_BASE', None)
+if STATIC_ROOT_BASE:
+    STATIC_ROOT = path(STATIC_ROOT_BASE) / git.revision
 
 EMAIL_BACKEND = ENV_TOKENS.get('EMAIL_BACKEND', EMAIL_BACKEND)
 EMAIL_FILE_PATH = ENV_TOKENS.get('EMAIL_FILE_PATH', None)
+
+EMAIL_HOST = ENV_TOKENS.get('EMAIL_HOST', EMAIL_HOST)
+EMAIL_PORT = ENV_TOKENS.get('EMAIL_PORT', EMAIL_PORT)
+EMAIL_USE_TLS = ENV_TOKENS.get('EMAIL_USE_TLS', EMAIL_USE_TLS)
+
 LMS_BASE = ENV_TOKENS.get('LMS_BASE')
-# Note that MITX_FEATURES['PREVIEW_LMS_BASE'] gets read in from the environment file.
+# Note that FEATURES['PREVIEW_LMS_BASE'] gets read in from the environment file.
 
 SITE_NAME = ENV_TOKENS['SITE_NAME']
 
@@ -114,9 +146,9 @@ COURSES_WITH_UNSAFE_CODE = ENV_TOKENS.get("COURSES_WITH_UNSAFE_CODE", [])
 #Timezone overrides
 TIME_ZONE = ENV_TOKENS.get('TIME_ZONE', TIME_ZONE)
 
-
-for feature, value in ENV_TOKENS.get('MITX_FEATURES', {}).items():
-    MITX_FEATURES[feature] = value
+ENV_FEATURES = ENV_TOKENS.get('FEATURES', ENV_TOKENS.get('MITX_FEATURES', {}))
+for feature, value in ENV_FEATURES.items():
+    FEATURES[feature] = value
 
 LOGGING = get_logger_config(LOG_DIR,
                             logging_env=ENV_TOKENS['LOGGING_ENV'],
@@ -134,22 +166,30 @@ if "TRACKING_IGNORE_URL_PATTERNS" in ENV_TOKENS:
 
 ################ SECURE AUTH ITEMS ###############################
 # Secret things: passwords, access keys, etc.
-with open(ENV_ROOT / CONFIG_PREFIX + "auth.json") as auth_file:
+with open(CONFIG_ROOT / CONFIG_PREFIX + "auth.json") as auth_file:
     AUTH_TOKENS = json.load(auth_file)
+
+EMAIL_HOST_USER = AUTH_TOKENS.get('EMAIL_HOST_USER', EMAIL_HOST_USER)
+EMAIL_HOST_PASSWORD = AUTH_TOKENS.get('EMAIL_HOST_PASSWORD', EMAIL_HOST_PASSWORD)
 
 # If Segment.io key specified, load it and turn on Segment.io if the feature flag is set
 # Note that this is the Studio key. There is a separate key for the LMS.
 SEGMENT_IO_KEY = AUTH_TOKENS.get('SEGMENT_IO_KEY')
 if SEGMENT_IO_KEY:
-    MITX_FEATURES['SEGMENT_IO'] = ENV_TOKENS.get('SEGMENT_IO', False)
-
+    FEATURES['SEGMENT_IO'] = ENV_TOKENS.get('SEGMENT_IO', False)
 
 AWS_ACCESS_KEY_ID = AUTH_TOKENS["AWS_ACCESS_KEY_ID"]
+if AWS_ACCESS_KEY_ID == "":
+    AWS_ACCESS_KEY_ID = None
+
 AWS_SECRET_ACCESS_KEY = AUTH_TOKENS["AWS_SECRET_ACCESS_KEY"]
+if AWS_SECRET_ACCESS_KEY == "":
+    AWS_SECRET_ACCESS_KEY = None
+
 DATABASES = AUTH_TOKENS['DATABASES']
 MODULESTORE = AUTH_TOKENS['MODULESTORE']
 CONTENTSTORE = AUTH_TOKENS['CONTENTSTORE']
-
+DOC_STORE_CONFIG = AUTH_TOKENS['DOC_STORE_CONFIG']
 # Datadog for events!
 DATADOG = AUTH_TOKENS.get("DATADOG", {})
 DATADOG.update(ENV_TOKENS.get("DATADOG", {}))
@@ -173,3 +213,16 @@ BROKER_URL = "{0}://{1}:{2}@{3}/{4}".format(CELERY_BROKER_TRANSPORT,
 
 # Event tracking
 TRACKING_BACKENDS.update(AUTH_TOKENS.get("TRACKING_BACKENDS", {}))
+
+SUBDOMAIN_BRANDING = ENV_TOKENS.get('SUBDOMAIN_BRANDING', {})
+VIRTUAL_UNIVERSITIES = ENV_TOKENS.get('VIRTUAL_UNIVERSITIES', [])
+
+MICROSITE_CONFIGURATION = ENV_TOKENS.get('MICROSITE_CONFIGURATION', {})
+MICROSITE_ROOT_DIR = ENV_TOKENS.get('MICROSITE_ROOT_DIR')
+if len(MICROSITE_CONFIGURATION.keys()) > 0:
+    enable_microsites(
+        MICROSITE_CONFIGURATION,
+        SUBDOMAIN_BRANDING,
+        VIRTUAL_UNIVERSITIES,
+        microsites_root=path(MICROSITE_ROOT_DIR)
+    )

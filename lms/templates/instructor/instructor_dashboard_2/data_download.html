@@ -2,37 +2,58 @@
 <%page args="section_data"/>
 
 
-<h2>${_("Data Download")}</h2>
-% if disable_buttons:
-<div class="msg msg-warning">
-	<div class="copy">
-		<p>
-	    ${_("Note: some of these buttons are known to time out for larger "
-			"courses. We have temporarily disabled those features for courses "
-			"with more than {max_enrollment} students. We are urgently working on "
-			"fixing this issue. Thank you for your patience as we continue "
-			"working to improve the platform!").format(
-	        max_enrollment=settings.MITX_FEATURES['MAX_ENROLLMENT_INSTR_BUTTONS']
-	      )}
-		</p>
-	</div>
-</div>
-	<br>
-% endif
+<div class="data-download-container action-type-container">
+  <h2>${_("Data Download")}</h2>
+  <div class="request-response-error msg msg-error copy" id="data-request-response-error"></div>
 
-<input type="button" name="list-profiles" value="${_("List enrolled students with profile information")}" data-endpoint="${ section_data['get_students_features_url'] }" class="${'is-disabled' if disable_buttons else ''}">
-<input type="button" name="list-profiles" value="CSV" data-csv="true" class="csv ${'is-disabled' if disable_buttons else ''}" data-endpoint="${ section_data['get_students_features_url'] }" >
-<br>
-## <input type="button" name="list-grades" value="Student grades">
-## <input type="button" name="list-profiles" value="CSV" data-csv="true" class="csv">
-## <br>
-## <input type="button" name="list-answer-distributions" value="Answer distributions (x students got y points)">
-## <br>
-<input type="button" name="dump-gradeconf" value="${_("Grading Configuration")}" data-endpoint="${ section_data['get_grading_config_url'] }">
-<input type="button" name="list-anon-ids" value="${_("Get Student Anonymized IDs CSV")}" data-csv="true" class="csv" data-endpoint="${ section_data['get_anon_ids_url'] }" class="${'is-disabled' if disable_buttons else ''}">
+  <p>${_("The following button displays a list of all students enrolled in this course, along with profile information such as email address and username. The data can also be downloaded as a CSV file.")}</p>
 
-<div class="data-display">
-  <div class="data-display-text"></div>
-  <div class="data-display-table"></div>
-  <div class="request-response-error"></div>
+  <p><input type="button" name="list-profiles" value="${_("List enrolled students' profile information")}" data-endpoint="${ section_data['get_students_features_url'] }">
+  <input type="button" name="list-profiles" value="${_("Download profile information as a CSV")}" data-csv="true"></p>
+  <div class="data-display-table" id="data-student-profiles-table"></div>
+
+  <br>
+  <p>${_("Displays the grading configuration for the course. The grading configuration is the breakdown of graded subsections of the course (such as exams and problem sets), and can be changed on the 'Grading' page (under 'Settings') in Studio.")}</p>
+  <p><input type="button" name="dump-gradeconf" value="${_("Grading Configuration")}" data-endpoint="${ section_data['get_grading_config_url'] }"></p>
+
+  <div class="data-display-text" id="data-grade-config-text"></div>
+  <br>
+
+  <p>${_("Download a CSV of anonymized student IDs by clicking this button.")}</p>
+  <p><input type="button" name="list-anon-ids" value="${_("Get Student Anonymized IDs CSV")}" data-csv="true" class="csv" data-endpoint="${ section_data['get_anon_ids_url'] }" class="${'is-disabled' if disable_buttons else ''}"></p>
 </div>
+
+%if settings.FEATURES.get('ENABLE_S3_GRADE_DOWNLOADS'):
+  <div class="grades-download-container action-type-container">
+    <hr>
+    <h2> ${_("Grade Reports")}</h2>
+
+  %if settings.FEATURES.get('ALLOW_COURSE_STAFF_GRADE_DOWNLOADS') or section_data['access']['admin']:
+    <p>${_("The following button will generate a CSV grade report for all currently enrolled students.  Generated reports appear in a table below and can be downloaded.")}</p>
+
+    <p>${_("For large courses, generating this report may take several hours. Please be patient and do not click the button multiple times. Clicking the button multiple times will significantly slow the grade generation process.")}</p>
+
+    <p>${_("The report is generated in the background, meaning it is OK to navigate away from this page while your report is generating.")}</p>
+
+    <div class="request-response msg msg-confirm copy" id="grade-request-response"></div>
+    <div class="request-response-error msg msg-warning copy" id="grade-request-response-error"></div>
+    <br>
+
+    <p><input type="button" name="calculate-grades-csv" value="${_("Generate Grade Report")}" data-endpoint="${ section_data['calculate_grades_csv_url'] }"/></p>
+  %endif
+
+    <p><b>${_("Reports Available for Download")}</b></p>
+    <p>${_("Unique, new file links for the CSV reports are generated on each visit to this page. These unique links expire within 5 minutes, due to the sensitive nature of student grade information. Please note that the report filename contains a timestamp that represents when your file was generated; this timestamp is UTC, not your local timezone.")}</p><br>
+    <div class="grade-downloads-table" id="grade-downloads-table" data-endpoint="${ section_data['list_grade_downloads_url'] }" ></div>
+  </div>
+%endif
+
+%if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):
+  <div class="running-tasks-container action-type-container">
+    <hr>
+    <h2> ${_("Pending Instructor Tasks")} </h2>
+    <p>${_("The status for any active tasks appears in a table below.")} </p>
+    <br />
+    <div class="running-tasks-table" data-endpoint="${ section_data['list_instructor_tasks_url'] }"></div>
+  </div>
+%endif
