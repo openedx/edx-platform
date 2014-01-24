@@ -11,7 +11,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
-from helpers import LoginEnrollmentTestCase, check_for_get_code
+from courseware.tests.helpers import LoginEnrollmentTestCase, check_for_get_code
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 
 
@@ -63,7 +63,6 @@ class TestNavigation(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
         # re-request, and we should get a redirect to login page
         self.assertRedirects(resp, settings.LOGIN_REDIRECT_URL + '?next=' + reverse('dashboard'))
-
 
     def test_redirects_first_time(self):
         """
