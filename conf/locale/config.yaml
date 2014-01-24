@@ -32,6 +32,17 @@ locales:
 # The locale used for fake-accented English, for testing.
 dummy-locale: eo
 
+# Source files that should be used for generating dummy strings
+dummy_sources:
+    - django-partial.po
+    - django-studio.po
+    - django.po
+    - djangojs-studio.po
+    - djangojs.po
+    - mako-studio.po
+    - mako.po
+    - messages.po
+
 # Directories we don't search for strings.
 ignore_dirs:
     - docs
