@@ -14,35 +14,29 @@
     <div class="wrapper-content-main">
       <article class="content-main">
 
-        <h2 class="title">You are re-verifying your identity</h2>
+        <h2 class="title">You are in the Verified track</h2>
 
         <div class="copy">
           <p>You currently need to re-verify for the following course:</p>
 
-          <table class="reverification-table">
-          <tr>
-          <th>Course and Reverification window</th>
-          <th>Status</th>
-          </tr>
-
+          <ul class="reverification-list">
           % for course_id, course_name, course_number, date, status in reverify_course_data:
-            <tr>
-            	<td>
-                <span class="course-name">${course_name} (HKS211.1x)</span>
-                <span class="deadline">Re-verify by <strong>${date}</strong></span>
-              </td>
-              <td>
+            <li class="item">
+                <div class="course-info">
+                  <h3 class="course-name">${course_name} (${course_number})</h3>
+                  <p class="deadline">Re-verify by <strong>${date}</strong></p>
+                </div>
+
             		% if status == "must_reverify":
-                  <a class="btn action-primary action-reverify" href="${reverse('verify_student_midcourse_reverify', kwargs={'course_id': course_id})}">Re-verify for HKS211.1x</a>
+                  <p class="reverify-status"><a class="btn action-primary action-reverify" href="${reverse('verify_student_midcourse_reverify', kwargs={'course_id': course_id})}">Re-verify for ${course_number}</a></p>
             		% elif status == "completed":
             		  Completed
             		% elif status == "failed":
             		  Failed
             		% endif
-              </td>
-            </tr>
+            </li>
           % endfor
-          </table>
+          </ul>
         </div>
 
         <div class="wrapper-reverification-help list-faq">
