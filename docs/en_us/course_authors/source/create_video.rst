@@ -62,8 +62,8 @@ these are recommended but not required.)
      - 32 mbps
      - 5 mbps
      - 1 mbps
-   * - Max VBS
-     - 40 vbs
+   * - Max VBR
+     - 40 mbps
      - 7.5 mbps
      - 1.5 mbps
    * - Audio
@@ -76,7 +76,7 @@ these are recommended but not required.)
 Video Formats
 -------------
 
-The edX video player supports videos in .mp4, .ogg, and .mpeg format.
+The edX video player supports videos in .mp4, .mpeg, .ogg, and .webm format.
 
 *********************************************
 Step 2. Create or Obtain a Video Transcript
