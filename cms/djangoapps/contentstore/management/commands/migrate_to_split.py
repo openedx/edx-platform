@@ -8,6 +8,7 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.split_migrator import SplitMigrator
 from xmodule.modulestore import InvalidLocationError
+from xmodule.modulestore.django import loc_mapper
 
 
 class Command(BaseCommand):
@@ -60,15 +61,11 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         location, user, locator_string = self.parse_args(*args)
 
-        draft = modulestore('default')
-        direct = modulestore('direct')
-        split = modulestore('split')
-
         migrator = SplitMigrator(
-            draft_modulestore=draft,
-            direct_modulestore=direct,
-            split_modulestore=split,
-            loc_mapper=split.loc_mapper,
+            draft_modulestore=modulestore('default'),
+            direct_modulestore=modulestore('direct'),
+            split_modulestore=modulestore('split'),
+            loc_mapper=loc_mapper(),
         )
 
         migrator.migrate_mongo_course(location, user, locator_string)

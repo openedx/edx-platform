@@ -5,7 +5,7 @@ Modulestore configuration for test cases.
 from uuid import uuid4
 from django.test import TestCase
 from xmodule.modulestore.django import editable_modulestore, \
-    clear_existing_modulestores
+    clear_existing_modulestores, loc_mapper
 from xmodule.contentstore.django import contentstore
 
 
@@ -225,6 +225,9 @@ class ModuleStoreTestCase(TestCase):
         if contentstore().fs_files:
             db = contentstore().fs_files.database
             db.connection.drop_database(db)
+        lm = loc_mapper()
+        if lm.db:
+            lm.location_map.drop()
 
     @classmethod
     def setUpClass(cls):
