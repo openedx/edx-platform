@@ -530,7 +530,12 @@ The `courseware_studentmodule` table holds all courseware state for a given user
   `combinedopenended`
    JSON data that shows the status of Open Response Assessment problems. 
 
-   The problem can be in one of two states, **done** or **assessing**.
+   The problem can be in one of four states:
+   
+   * **initial**
+   * **assessing**
+   * **post_assessment**
+   * **done**
 
    Following is an example of a problem in **done** state:
 
