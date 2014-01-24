@@ -23,6 +23,9 @@
 span .annotator-hl{
 	font:inherit;
 }
+.vjs-has-started .vjs-loading-spinner {
+	display: none!important;
+}
 /*Catch*/
 #mainCatch *{
 	-moz-box-sizing: border-box;
