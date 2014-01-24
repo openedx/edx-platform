@@ -24,6 +24,9 @@ class VideoAnnotationModuleTestCase(unittest.TestCase):
     sample_youtubeurl = "http://www.youtube.com/watch?v=yxLIu-scR9Y"
 
     def setUp(self):
+        """
+        Makes sure that the Video Annotation Module is created. 
+        """
         self.mod = VideoAnnotationModule(
             Mock(),
             get_test_system(),
@@ -32,6 +35,11 @@ class VideoAnnotationModuleTestCase(unittest.TestCase):
         )
 
     def test_annotation_class_attr_default(self):
+        """
+        Makes sure that it can detect annotation values in text-form if user
+        decides to add text to the area below video, video functionality is completely
+        found in javascript. 
+        """
         xml = '<annotation title="x" body="y" problem="0">test</annotation>'
         element = etree.fromstring(xml)
 
@@ -42,6 +50,10 @@ class VideoAnnotationModuleTestCase(unittest.TestCase):
         self.assertDictEqual(expected_attr, actual_attr)
 
     def test_annotation_class_attr_with_valid_highlight(self):
+        """
+        Same as above but more specific to an area that is highlightable in the appropriate
+        color designated.
+        """
         xml = '<annotation title="x" body="y" problem="0" highlight="{highlight}">test</annotation>'
 
         for color in self.mod.highlight_colors:
@@ -58,6 +70,9 @@ class VideoAnnotationModuleTestCase(unittest.TestCase):
             self.assertDictEqual(expected_attr, actual_attr)
 
     def test_annotation_class_attr_with_invalid_highlight(self):
+        """
+        Same as above, but checked with invalid colors.
+        """
         xml = '<annotation title="x" body="y" problem="0" highlight="{highlight}">test</annotation>'
 
         for invalid_color in ['rainbow', 'blink', 'invisible', '', None]:
@@ -72,6 +87,9 @@ class VideoAnnotationModuleTestCase(unittest.TestCase):
             self.assertDictEqual(expected_attr, actual_attr)
 
     def test_annotation_data_attr(self):
+        """
+        Test that each highlight contains the data information from the annotation itself. 
+        """
         element = etree.fromstring('<annotation title="bar" body="foo" problem="0">test</annotation>')
 
         expected_attr = {
@@ -86,6 +104,9 @@ class VideoAnnotationModuleTestCase(unittest.TestCase):
         self.assertDictEqual(expected_attr, actual_attr)
 
     def test_render_annotation(self):
+        """
+        Tests to make sure that the spans designating annotations acutally visually render as annotations.
+        """
         expected_html = '<span class="annotatable-span highlight highlight-yellow" data-comment-title="x" data-comment-body="y" data-problem-id="0">z</span>'
         expected_el = etree.fromstring(expected_html)
 
@@ -98,6 +119,10 @@ class VideoAnnotationModuleTestCase(unittest.TestCase):
         self.assertDictEqual(dict(expected_el.attrib), dict(actual_el.attrib))
 
     def test_render_content(self):
+        """
+        Like above, but using the entire text, it makes sure that display_name is removed and that there is only one
+        div encompassing the annotatable area. 
+        """
         content = self.mod._render_content()
         element = etree.fromstring(content)
         self.assertIsNotNone(element)
@@ -105,6 +130,10 @@ class VideoAnnotationModuleTestCase(unittest.TestCase):
         self.assertFalse('display_name' in element.attrib, "Display Name should have been deleted from Content")
 
     def test_extract_instructions(self):
+        """
+        This test ensures that if an instruction exists it is pulled and
+        formatted from the <instructions> tags. Otherwise, it should return nothing.
+        """
         xmltree = etree.fromstring(self.sample_xml)
 
         expected_xml = u"<div><p>Video Test Instructions.</p></div>"
@@ -117,6 +146,10 @@ class VideoAnnotationModuleTestCase(unittest.TestCase):
         self.assertIsNone(actual)
 
     def test_get_extension(self):
+        """
+        Tests the function that returns the appropriate extension depending on whether it is
+        a video from youtube, or one uploaded to the EdX server. 
+        """
         expectedyoutube = 'video/youtube'
         expectednotyoutube = 'video/mp4'
         result1 = self.mod._get_extension(self.sample_sourceurl)
@@ -125,6 +158,9 @@ class VideoAnnotationModuleTestCase(unittest.TestCase):
         self.assertEqual(expectednotyoutube, result1)
 
     def test_get_html(self):
+        """
+        Tests to make sure variables passed in truly exist within the html once it is all rendered.
+        """
         context = self.mod.get_html()
         for key in ['display_name', 'element_id', 'content_html', 'instructions_html', 'sourceUrl', 'typeSource', 'poster', 'alert', 'annotation_storage']:
             self.assertIn(key, context)

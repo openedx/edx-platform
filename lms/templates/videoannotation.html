@@ -7,8 +7,8 @@
 	% if instructions_html is not UNDEFINED and instructions_html is not None:
 	<div class="annotatable-section shaded">
 		<div class="annotatable-section-title">
-		    Instructions
-		    <a class="annotatable-toggle annotatable-toggle-instructions expanded" href="javascript:void(0)">Collapse Instructions</a>
+		    ${_('Instructions')}
+		    <a class="annotatable-toggle annotatable-toggle-instructions expanded" href="javascript:void(0)">${_('Collapse Instructions')}</a>
 		</div>
 		<div class="annotatable-section-body annotatable-instructions">
 		    ${instructions_html}
@@ -18,13 +18,12 @@
 	<div class="annotatable-section">
 		<div class="annotatable-content">
 		    <div id="videoHolder">
-				<video id="vid1" class="video-js vjs-default-skin" controls preload="none" width="640" height="264"
-				poster="${poster}">
+				<video id="vid1" class="video-js vjs-default-skin" controls preload="none" width="640" height="264" poster="${poster}">
 					<source src="${sourceUrl}" type='${typeSource}' />
 				</video>
 			</div> 
 			<div id="catchDIV">
-				<div class="annotationListContainer">You do not have any notes.</div>
+				<div class="annotationListContainer">${_('You do not have any notes.')}</div>
 			</div>
 		</div>
 	</div>

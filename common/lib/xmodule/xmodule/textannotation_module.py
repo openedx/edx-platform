@@ -1,5 +1,4 @@
-''' text annotation module '''
-import logging
+''' Text annotation module '''
 
 from lxml import etree
 from pkg_resources import resource_string
@@ -9,8 +8,6 @@ from xmodule.raw_module import RawDescriptor
 from xblock.core import Scope, String
 
 import textwrap
-
-log = logging.getLogger(__name__)
 
 
 class AnnotatableFields(object):
@@ -56,7 +53,7 @@ class TextAnnotationModule(AnnotatableFields, XModule):
     icon_class = 'textannotation'
 
     def __init__(self, *args, **kwargs):
-        XModule.__init__(self, *args, **kwargs)
+        super(TextAnnotationModule, self).__init__(*args, **kwargs)
 
         xmltree = etree.fromstring(self.data)
 

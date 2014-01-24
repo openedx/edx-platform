@@ -1,5 +1,6 @@
-import logging
-
+"""
+Module for Video annotations using annotator.
+"""
 from lxml import etree
 from pkg_resources import resource_string
 
@@ -8,8 +9,6 @@ from xmodule.raw_module import RawDescriptor
 from xblock.core import Scope, String
 
 import textwrap
-
-log = logging.getLogger(__name__)
 
 
 class AnnotatableFields(object):
@@ -41,13 +40,12 @@ class VideoAnnotationModule(AnnotatableFields, XModule):
                      resource_string(__name__, 'js/src/html/display.coffee'),
                      resource_string(__name__, 'js/src/annotatable/display.coffee')
                      ],
-          'js': []
-    }
+          'js': []}
     css = {'scss': [resource_string(__name__, 'css/annotatable/display.scss')]}
     icon_class = 'videoannotation'
 
     def __init__(self, *args, **kwargs):
-        XModule.__init__(self, *args, **kwargs)
+        super(VideoAnnotationModule, self).__init__(*args, **kwargs)
 
         xmltree = etree.fromstring(self.data)
 

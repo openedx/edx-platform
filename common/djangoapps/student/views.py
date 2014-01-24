@@ -1450,7 +1450,11 @@ from student.firebase_token_generator import create_token
 @login_required
 def token(request):
     '''
-    Return a token for the backend of annotations
+    Return a token for the backend of annotations.
+    It uses the course id to retrieve a variable that contains the secret
+    token found in inheritance.py. It also contains information of when
+    the token was issued. This will be stored with the user along with
+    the id for identification purposes in the backend. 
     '''
     course_id = request.GET.get("course_id")
     course = course_from_id(course_id)
@@ -1463,5 +1467,4 @@ def token(request):
     custom_data = {"issuedAt": newtime, "consumerKey": secret, "userId": request.user.email, "ttl": 86400}
     newtoken = create_token(secret, custom_data)
     response = HttpResponse(newtoken, mimetype="text/plain")
-
     return response
