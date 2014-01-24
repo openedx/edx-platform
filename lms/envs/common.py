@@ -983,6 +983,9 @@ INSTALLED_APPS = (
     'djcelery',
     'south',
 
+    # Database-backed configuration
+    'config_models',
+
     # Monitor the status of services
     'service_status',
 

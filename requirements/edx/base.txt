@@ -94,21 +94,22 @@ transifex-client==0.10
 # Used for testing
 coverage==3.7
 ddt==0.6.0
+django-crum==0.5
+django-debug-toolbar-mongo
+django_debug_toolbar==0.9.4
+django_nose==1.1
 factory_boy==2.2.1
+freezegun==0.1.11
 mock==1.0.1
+nose-exclude
+nose-ignore-docstring
 nosexcover==1.0.7
 pep8==1.4.5
 pylint==0.28
+python-subunit==0.0.16
 rednose==0.3
 selenium==2.34.0
 splinter==0.5.4
-django_nose==1.1
-django_debug_toolbar==0.9.4
-django-debug-toolbar-mongo
-nose-ignore-docstring
-nose-exclude
-django-crum==0.5
-python-subunit==0.0.16
 testtools==0.9.34
 
 git+https://github.com/mfogel/django-settings-context-processor.git

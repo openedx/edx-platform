@@ -413,6 +413,9 @@ INSTALLED_APPS = (
     'south',
     'method_override',
 
+    # Database-backed configuration
+    'config_models',
+
     # Monitor the status of services
     'service_status',
 

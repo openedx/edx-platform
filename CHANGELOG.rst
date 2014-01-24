@@ -12,6 +12,10 @@ Blades: Fix bug when image response in Firefox does not retain input. BLD-711.
 
 Blades: Give numerical response tolerance as a range. BLD-25.
 
+Common: Add a utility app for building databased-backed configuration
+  for specific application features. Includes admin site customization
+  for easier administration and tracking.
+
 Common: Add the ability to dark-launch site translations. These languages
   will be unavailable to users except through the use of a specific query
   parameter.
