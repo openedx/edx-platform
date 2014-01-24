@@ -91,6 +91,8 @@ Transcript Format
 
 Your transcript must be an .srt file.
 
+.. note:: Some past courses have used .sjson files for video transcripts. If your course uses this format, see :ref:`Steps for sjson files`. We don't recommend that you use .sjson files.
+
 
 *****************************
 Step 3. Post the Video Online
@@ -120,20 +122,23 @@ Other Sites
 You can use any video backup site that you want. However, keep in mind that the site where you 
 post the videos may have to handle a lot of traffic.
 
-.. note:: The URL for the video that you post on a third-party site must end in .mp4, .ogg, or 
-          .mpeg. EdX can't support videos that you post on sites such as Vimeo. 
+.. note:: The URL for the video that you post on a third-party site must end in .mp4, .mpeg, .ogg, or .webm. EdX can't support videos that you post on sites such as Vimeo. 
 
 
 
 .. _Create a Video Component:
 
-*************************
-Create a Video Component
-*************************
+********************************
+Step 4. Create a Video Component
+********************************
 
 #. Under **Add New Component**, click **Video**.
 
 #. When the new video component appears, click **Edit**. The video editor opens to the **Basic** tab.
+
+   .. image:: Images/
+
+   You'll replace the default values with your own.
    
 #. In the **Display Name** field, enter the name you want students to see when they hover the mouse 
    over the unit in the course accordion. This text also appears as a header for the video.
@@ -166,19 +171,36 @@ Advanced Options
    :widths: 20 80
    :header-rows: 0
 
-   * - **Download Transcript**
-     - If you've uploaded a transcript for your video to a backup website such as Amazon S3, enter the external URL for this transcript. 
    * - **Download Video**
-     - If you've uploaded a copy of your video to a backup website such as Amazon S3, enter the external URL for this video. Note this URL must end in .mpeg, .mp4, or .ogg.
+     - If you've uploaded a copy of your video to a backup website such as Amazon S3, enter the external URL for this video. Note that this URL must end in .mpeg, .mp4, .ogg, or .webm.
    * - **End Time**
      - The time, formatted as hours, minutes, and seconds (HH:MM:SS), when you want the video to end.
    * - **HTML5 Transcript**
-     - The name of the timed transcript track (for non-YouTube videos).
+     - If you uploaded an .srt file on the **Basic** tab, the name of your .srt file appears in this field by default. You don't have to change this setting.
    * - **Show Transcript**
      - Specifies whether you want the transcript to show by default. Students can always turn transcripts on or off while they watch the video.
    * - **Start Time**
      - The time, formatted as hours, minutes, and seconds (HH:MM:SS), when you want the video to begin. 
+   * - **Transcript Download Allowed**
+     - Specifies whether you want to allow your students to download a copy of the transcript. 
    * - **Video Sources**
-     - Additional locations where you've posted the video. This field must contain a URL that ends in .mpeg, .mp4, or .ogg.
+     - Additional locations where you've posted the video. This field must contain a URL that ends in .mpeg, .mp4, .ogg, or .webm.
    * - **YouTube ID, YouTube ID for .75x speed, YouTube ID for 1.25x speed, YouTube ID for 1.5x speed**
      - If you have uploaded separate videos to YouTube for different speeds of your video, enter the YouTube IDs for these videos in these fields.
+
+.. _Steps for sjson files:
+
+**********************
+Steps for .sjson Files
+**********************
+
+If your course uses .sjson files, you'll (overview of process).
+
+.. note:: We don't recommend that you use .sjson files.
+
+#. Upload the .sjson file for your video to the **Files & Uploads** page.
+#. Create a new video component.
+#. On the **Basic** tab, (do anything?).
+#. Click the **Advanced** tab.
+#. In the **HTML5 Transcript** field, enter the name of your .sjson file. Do not include ".sjson".
+#. Set the other options that you want.
