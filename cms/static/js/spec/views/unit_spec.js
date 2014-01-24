@@ -32,19 +32,19 @@ define(["coffee/src/views/unit", "js/models/module_info", "js/spec/create_sinon"
                   <ol class="components"> \
                     <li class="component" data-locator="loc_1"> \
                       <div class="wrapper wrapper-component-editor"/> \
-                      <div class="component-actions"> \
-                        <a href="#" class="duplicate-button standard"><span class="duplicate-icon icon-copy"></span>Duplicate</a> \
-                      </div> \
+                      <ul class="component-actions"> \
+                        <a href="#" data-tooltip="Duplicate" class="duplicate-button action-button"><i class="icon-copy"></i><span class="sr"></span>Duplicate</span></a> \
+                      </ul> \
                     </li> \
                     <li class="component" data-locator="loc_2"> \
                       <div class="wrapper wrapper-component-editor"/> \
-                      <div class="component-actions"> \
-                        <a href="#" class="duplicate-button standard"><span class="duplicate-icon icon-copy"></span>Duplicate</a> \
-                      </div> \
+                      <ul class="component-actions"> \
+                        <a href="#" data-tooltip="Duplicate" class="duplicate-button action-button"><i class="icon-copy"></i><span class="sr"></span>Duplicate</span></a> \
+                      </ul> \
                     </li> \
                   </ol> \
                 </div>';
-
+                
             var unit;
             var clickDuplicate = function (index) {
                 unit.$(".duplicate-button")[index].click();
