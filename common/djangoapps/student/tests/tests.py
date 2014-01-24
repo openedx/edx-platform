@@ -24,7 +24,6 @@ from django.http import HttpResponse
 
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.django import modulestore
 from courseware.tests.tests import TEST_DATA_MIXED_MODULESTORE
 
 from mock import Mock, patch, sentinel
@@ -564,18 +563,20 @@ class AnonymousLookupTable(TestCase):
 class Token(ModuleStoreTestCase):
     """
     Test for the token generator. This creates a random course and passes it through the token file which generates the
-    token that will be passed in to the annotation_storage_url. 
+    token that will be passed in to the annotation_storage_url.
     """
     request_factory = RequestFactory()
     COURSE_SLUG = "100"
     COURSE_NAME = "test_course"
     COURSE_ORG = "edx"
+
     def setUp(self):
         self.course = CourseFactory.create(org=self.COURSE_ORG, display_name=self.COURSE_NAME, number=self.COURSE_SLUG)
         self.user = User.objects.create(username="username", email="username")
         self.req = self.request_factory.post('/token?course_id=edx/100/test_course', {'user': self.user})
         self.req.user = self.user
     @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+
     def test_token(self):
         expected = HttpResponse("eyJhbGciOiAiSFMyNTYiLCAidHlwIjogIkpXVCJ9.eyJpc3N1ZWRBdCI6ICIyMDE0LTAxLTIzVDE5OjM1OjE3LjUyMjEwNC01OjAwIiwgImNvbnN1bWVyS2V5IjogInh4eHh4eHh4LXh4eHgteHh4eC14eHh4LXh4eHh4eHh4eHh4eCIsICJ1c2VySWQiOiAidXNlcm5hbWUiLCAidHRsIjogODY0MDB9.OjWz9mzqJnYuzX-f3uCBllqJUa8PVWJjcDy_McfxLvc", mimetype="text/plain")
         response = token(self.req)

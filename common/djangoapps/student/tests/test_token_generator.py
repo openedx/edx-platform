@@ -34,7 +34,7 @@ class TokenGenerator(TestCase):
         """
         Unlike its counterpart in student/views.py, this function
         just checks for the encoding of a token. The other function
-        will test depending on time and user. 
+        will test depending on time and user.
         """
         expected = "eyJhbGciOiAiSFMyNTYiLCAidHlwIjogIkpXVCJ9.eyJ1c2VySWQiOiAidXNlcm5hbWUiLCAidHRsIjogODY0MDB9.-p1sr7uwCapidTQ0qB7DdU2dbF-hViKpPNN_5vD10t8"
         result1 = _encode_token('4c7f4d1c-8ac4-4e9f-84c8-b271c57fcac4', {"userId": "username", "ttl": 86400})

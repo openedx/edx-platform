@@ -1454,7 +1454,7 @@ def token(request):
     It uses the course id to retrieve a variable that contains the secret
     token found in inheritance.py. It also contains information of when
     the token was issued. This will be stored with the user along with
-    the id for identification purposes in the backend. 
+    the id for identification purposes in the backend.
     '''
     course_id = request.GET.get("course_id")
     course = course_from_id(course_id)

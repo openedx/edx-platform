@@ -41,7 +41,7 @@ class TextAnnotationModuleTestCase(unittest.TestCase):
     def test_render_content(self):
         """
         Tests to make sure the sample xml is rendered and that it forms a valid xmltree
-        that does not contain a display_name. 
+        that does not contain a display_name.
         """
         content = self.mod._render_content()
         self.assertIsNotNone(content)
@@ -72,3 +72,4 @@ class TextAnnotationModuleTestCase(unittest.TestCase):
         context = self.mod.get_html()
         for key in ['display_name', 'tag', 'source', 'element_id', 'instructions_html', 'content_html', 'annotation_storage']:
             self.assertIn(key, context)
+

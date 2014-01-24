@@ -2,7 +2,7 @@
     Firebase - library to generate a token
     License: https://github.com/firebase/firebase-token-generator-python/blob/master/LICENSE
     Tweaked and Edited by @danielcebrianr and @lduarte1991
-    
+
     This library will take either objects or strings and use python's built-in encoding
     system as specified by RFC 3548. Thanks to the firebase team for their open-source
     library. This was made specifically for speaking with the annotation_storage_url and
@@ -76,7 +76,7 @@ def _sign(secret, to_sign):
         Simply transforms a string into a bytes object,
         which is a series of immutable integers 0<=x<=256.
         Always try to encode as utf-8, unless it is not
-        compliant. 
+        compliant.
         '''
         try:
             return bytes(string, 'utf-8')
@@ -90,7 +90,7 @@ def _encode_token(secret, claims):
     This is the main function that takes the secret token and
     the data to be transmitted. There is a header created for decoding
     purposes. Token_SEP means that a period/full stop separates the
-    header, data object/message, and signatures. 
+    header, data object/message, and signatures.
     '''
     encoded_header = _encode_json({'typ': 'JWT', 'alg': 'HS256'})
     encoded_claims = _encode_json(claims)

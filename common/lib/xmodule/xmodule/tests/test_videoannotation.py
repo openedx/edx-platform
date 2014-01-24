@@ -25,7 +25,7 @@ class VideoAnnotationModuleTestCase(unittest.TestCase):
 
     def setUp(self):
         """
-        Makes sure that the Video Annotation Module is created. 
+        Makes sure that the Video Annotation Module is created.
         """
         self.mod = VideoAnnotationModule(
             Mock(),
@@ -38,7 +38,7 @@ class VideoAnnotationModuleTestCase(unittest.TestCase):
         """
         Makes sure that it can detect annotation values in text-form if user
         decides to add text to the area below video, video functionality is completely
-        found in javascript. 
+        found in javascript.
         """
         xml = '<annotation title="x" body="y" problem="0">test</annotation>'
         element = etree.fromstring(xml)
@@ -88,7 +88,7 @@ class VideoAnnotationModuleTestCase(unittest.TestCase):
 
     def test_annotation_data_attr(self):
         """
-        Test that each highlight contains the data information from the annotation itself. 
+        Test that each highlight contains the data information from the annotation itself.
         """
         element = etree.fromstring('<annotation title="bar" body="foo" problem="0">test</annotation>')
 
@@ -121,7 +121,7 @@ class VideoAnnotationModuleTestCase(unittest.TestCase):
     def test_render_content(self):
         """
         Like above, but using the entire text, it makes sure that display_name is removed and that there is only one
-        div encompassing the annotatable area. 
+        div encompassing the annotatable area.
         """
         content = self.mod._render_content()
         element = etree.fromstring(content)
@@ -148,7 +148,7 @@ class VideoAnnotationModuleTestCase(unittest.TestCase):
     def test_get_extension(self):
         """
         Tests the function that returns the appropriate extension depending on whether it is
-        a video from youtube, or one uploaded to the EdX server. 
+        a video from youtube, or one uploaded to the EdX server.
         """
         expectedyoutube = 'video/youtube'
         expectednotyoutube = 'video/mp4'
