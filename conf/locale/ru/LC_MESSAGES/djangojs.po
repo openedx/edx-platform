@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
-"POT-Creation-Date: 2013-12-13 16:02+0400\n"
+"POT-Creation-Date: 2014-01-24 14:34+0400\n"
 "PO-Revision-Date: 2013-11-29 19:05+0300\n"
 "Last-Translator: Lenar Safin <safin@smartdec.ru>\n"
 "Language-Team: Select LTD\n"
@@ -33,37 +33,38 @@ msgstr "Студия не может сохранить Вашу работу"
 msgid "<em>Editing:</em> %s"
 msgstr "<em>Редактирование:</em> %s"
 
-#: cms/static/coffee/src/views/module_edit.js:137
-#: cms/static/coffee/src/views/unit.js:88 cms/static/js/models/section.js:27
+#: cms/static/coffee/src/views/module_edit.js:136
+#: cms/static/coffee/src/views/tabs.js:67
+#: cms/static/coffee/src/views/unit.js:88 cms/static/js/models/section.js:28
 #: cms/static/js/views/asset.js:79
-#: cms/static/js/views/course_info_handout.js:55
+#: cms/static/js/views/course_info_handout.js:59
 #: cms/static/js/views/course_info_update.js:80
-#: cms/static/js/views/overview.js:67 cms/static/js/views/overview.js.c:432
+#: cms/static/js/views/overview.js:75 cms/static/js/views/overview.js.c:487
 msgid "Saving&hellip;"
 msgstr "Сохранение&hellip;"
 
-#: cms/static/coffee/src/views/tabs.js:98
+#: cms/static/coffee/src/views/tabs.js:106
 msgid "Delete Component Confirmation"
 msgstr "Подверждение удаления компонента"
 
-#: cms/static/coffee/src/views/tabs.js:99
+#: cms/static/coffee/src/views/tabs.js:107
 msgid ""
 "Are you sure you want to delete this component? This action cannot be undone."
 msgstr "Вы уверены, что хотите удалить этот компонент? Операция необратима."
 
-#: cms/static/coffee/src/views/tabs.js:102
+#: cms/static/coffee/src/views/tabs.js:110
 #: cms/static/js/views/course_info_update.js:140
 msgid "OK"
 msgstr "ОК"
 
-#: cms/static/coffee/src/views/tabs.js:113
-#: cms/static/coffee/src/views/unit.js:188 cms/static/js/base.js:282
+#: cms/static/coffee/src/views/tabs.js:121
+#: cms/static/coffee/src/views/unit.js:190 cms/static/js/base.js:282
 #: cms/static/js/views/course_info_update.js:148
 msgid "Deleting&hellip;"
 msgstr "Удаление&hellip;"
 
-#: cms/static/coffee/src/views/tabs.js:127
-#: cms/static/coffee/src/views/unit.js:212 cms/static/js/base.js:297
+#: cms/static/coffee/src/views/tabs.js:135
+#: cms/static/coffee/src/views/unit.js:214 cms/static/js/base.js:297
 #: cms/static/js/views/asset.js:67
 #: cms/static/js/views/course_info_update.js:166
 #: cms/static/js/views/show_textbook.js:50
@@ -73,15 +74,15 @@ msgstr "Удаление&hellip;"
 msgid "Cancel"
 msgstr "Отмена"
 
-#: cms/static/coffee/src/views/unit.js:179
+#: cms/static/coffee/src/views/unit.js:181
 msgid "Delete this component?"
 msgstr "Удалить этот компонент?"
 
-#: cms/static/coffee/src/views/unit.js:180
+#: cms/static/coffee/src/views/unit.js:182
 msgid "Deleting this component is permanent and cannot be undone."
 msgstr "Удаление этого компонента необратимо."
 
-#: cms/static/coffee/src/views/unit.js:183
+#: cms/static/coffee/src/views/unit.js:185
 msgid "Yes, delete this component"
 msgstr "Да, удалить"
 
@@ -146,7 +147,7 @@ msgstr "Скрытая помощь студии"
 msgid "Looking for Help with Studio?"
 msgstr "Нужна помощь со студией?"
 
-#: cms/static/js/models/course.js:8 cms/static/js/models/section.js:8
+#: cms/static/js/models/course.js:8 cms/static/js/models/section.js:10
 msgid "You must specify a name"
 msgstr "Вы должны указать имя"
 
@@ -162,31 +163,31 @@ msgstr ""
 msgid "or"
 msgstr "или"
 
-#: cms/static/js/models/settings/course_details.js:43
+#: cms/static/js/models/settings/course_details.js:42
 msgid "The course must have an assigned start date."
 msgstr "Для курса должна быть указана дата начала."
 
-#: cms/static/js/models/settings/course_details.js:46
+#: cms/static/js/models/settings/course_details.js:45
 msgid "The course end date cannot be before the course start date."
 msgstr "Конец курса не может предшествовать началу курса. "
 
-#: cms/static/js/models/settings/course_details.js:49
+#: cms/static/js/models/settings/course_details.js:48
 msgid "The course start date cannot be before the enrollment start date."
 msgstr ""
 "Дата начала курса не может предшествовать дате начала регистрации на курс."
 
-#: cms/static/js/models/settings/course_details.js:52
+#: cms/static/js/models/settings/course_details.js:51
 msgid "The enrollment start date cannot be after the enrollment end date."
 msgstr ""
 "Дата конца регистрации на курс не может предшествовать дате начала "
 "регистрации на курс."
 
-#: cms/static/js/models/settings/course_details.js:55
+#: cms/static/js/models/settings/course_details.js:54
 msgid "The enrollment end date cannot be after the course end date."
 msgstr ""
 "Дата конца курса не может предшествовать дате конца регистрации на курс."
 
-#: cms/static/js/models/settings/course_details.js:59
+#: cms/static/js/models/settings/course_details.js:58
 msgid "Key should only contain letters, numbers, _, or -"
 msgstr "Ключ должен содержать только буквы, цифры, _ или -"
 
@@ -198,16 +199,21 @@ msgstr "Задание с таким именем уже существует."
 msgid "Please enter an integer between 0 and 100."
 msgstr "Пожалуйста, введите целое число в диапазоне от 0 до 100."
 
-#: cms/static/js/models/settings/course_grader.js:54
-#: cms/static/js/models/settings/course_grader.js:60
-msgid "Please enter an integer."
+#: cms/static/js/models/settings/course_grader.js:55
+#, fuzzy
+msgid "Please enter an integer greater than 0."
+msgstr "Пожалуйста, введите целое число в диапазоне от 0 до 100."
+
+#: cms/static/js/models/settings/course_grader.js:62
+#, fuzzy
+msgid "Please enter non-negative integer."
 msgstr "Пожалуйста, введите целое число."
 
-#: cms/static/js/models/settings/course_grader.js:66
+#: cms/static/js/models/settings/course_grader.js:68
 msgid "Cannot drop more <% attrs.types %> than will assigned."
 msgstr "Нельзя удалить более <% attrs.types %>, чем было назначено."
 
-#: cms/static/js/models/settings/course_grading_policy.js:71
+#: cms/static/js/models/settings/course_grading_policy.js:62
 msgid "Grace period must be specified in HH:MM format."
 msgstr "Время оценивания должно быть задано в формате ЧЧ:ММ."
 
@@ -235,6 +241,14 @@ msgstr "Удалить"
 #: cms/static/js/views/asset.js:58
 msgid "Your file has been deleted."
 msgstr "Ваш файл был удален."
+
+#: cms/static/js/views/assets.js:16
+msgid "Name"
+msgstr ""
+
+#: cms/static/js/views/assets.js:17
+msgid "Date Added"
+msgstr ""
 
 #: cms/static/js/views/course_info_update.js:136
 msgid "Are you sure you want to delete this update?"
@@ -265,25 +279,41 @@ msgstr ""
 "Формат файла не поддерживается. Пожалуйста, загрузите файл с расширением "
 "<code>tar.gz</code>."
 
-#: cms/static/js/views/overview.js:13
+#: cms/static/js/views/overview.js:14
 msgid "Collapse All Sections"
 msgstr "Свернуть все разделы"
 
-#: cms/static/js/views/overview.js:15
+#: cms/static/js/views/overview.js:16
 msgid "Expand All Sections"
 msgstr "Развернуть все разделы"
 
-#: cms/static/js/views/overview.js:92
-msgid "Will Release:"
+#: cms/static/js/views/overview.js:99
+#, fuzzy
+msgid "Release date:"
 msgstr "Будет начат:"
 
-#: cms/static/js/views/overview.js:93
+#: cms/static/js/views/overview.js:100
 msgid "{month}/{day}/{year} at {hour}:{minute} UTC"
 msgstr "{month}/{day}/{year} в {hour}:{minute} UTC"
 
-#: cms/static/js/views/overview.js:96
-msgid "Edit"
-msgstr "Редактировать"
+#: cms/static/js/views/overview.js:103
+msgid "Edit section release date"
+msgstr ""
+
+#: cms/static/js/views/paging.js:87
+msgid "ascending"
+msgstr ""
+
+#: cms/static/js/views/paging.js:89
+msgid "descending"
+msgstr ""
+
+#: cms/static/js/views/paging_header.js:42
+msgid ""
+"Showing %(current_span)s%(start)s-%(end)s%(end_span)s out of %(total_span)s"
+"%(total)s total%(end_span)s, sorted by %(order_span)s%(sort_order)s"
+"%(end_span)s %(sort_direction)s"
+msgstr ""
 
 #: cms/static/js/views/section_edit.js:50
 msgid "Your change could not be saved"
@@ -384,17 +414,52 @@ msgstr "Файлы должны быть в формате PNG или JPEG."
 #: common/lib/xmodule/xmodule/js/spec/combinedopenended/display_spec.js:132
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js:462
 #: common/static/xmodule/modules/js/001-c354e493a5405415b7bc67022aa6a090.js:462
-#: lms/static/coffee/src/staff_grading/staff_grading.js:468
+#: lms/static/coffee/src/staff_grading/staff_grading.js:474
 msgid "Submit"
 msgstr "Отправить"
 
-#: common/lib/xmodule/xmodule/js/src/capa/display.js:106
-#: common/static/xmodule/modules/js/001-5d52f96e690b7d20791110be817c6bff.js:106
+#: common/lib/xmodule/xmodule/js/src/annotatable/display.js:220
+#: common/static/xmodule/modules/js/004-8ecfc05f0a8679740613a10aae8a9a09.js:220
+#, fuzzy
+msgid "Show Annotations"
+msgstr "Показать задание"
+
+#: common/lib/xmodule/xmodule/js/src/annotatable/display.js:222
+#: common/static/xmodule/modules/js/004-8ecfc05f0a8679740613a10aae8a9a09.js:222
+#, fuzzy
+msgid "Hide Annotations"
+msgstr "Скрыть задание"
+
+#: common/lib/xmodule/xmodule/js/src/annotatable/display.js:237
+#: common/static/xmodule/modules/js/004-8ecfc05f0a8679740613a10aae8a9a09.js:237
+#, fuzzy
+msgid "Expand Instructions"
+msgstr "Развернуть все разделы"
+
+#: common/lib/xmodule/xmodule/js/src/annotatable/display.js:239
+#: common/static/xmodule/modules/js/004-8ecfc05f0a8679740613a10aae8a9a09.js:239
+#, fuzzy
+msgid "Collapse Instructions"
+msgstr "Свернуть все разделы"
+
+#: common/lib/xmodule/xmodule/js/src/annotatable/display.js:327
+#: common/static/xmodule/modules/js/004-8ecfc05f0a8679740613a10aae8a9a09.js:327
+#, fuzzy
+msgid "Commentary"
+msgstr "Модератор"
+
+#: common/lib/xmodule/xmodule/js/src/annotatable/display.js:338
+#: common/static/xmodule/modules/js/004-8ecfc05f0a8679740613a10aae8a9a09.js:338
+msgid "Reply to Annotation"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/capa/display.js:112
+#: common/static/xmodule/modules/js/001-fd72678ee0183f5975bc30a2df9c4fda.js:112
 msgid "points"
 msgstr "баллов"
 
-#: common/lib/xmodule/xmodule/js/src/capa/display.js:110
-#: common/static/xmodule/modules/js/001-5d52f96e690b7d20791110be817c6bff.js:110
+#: common/lib/xmodule/xmodule/js/src/capa/display.js:116
+#: common/static/xmodule/modules/js/001-fd72678ee0183f5975bc30a2df9c4fda.js:116
 #, c-format
 msgid "%s point possible"
 msgid_plural "%s points possible"
@@ -402,13 +467,31 @@ msgstr[0] "%s балл"
 msgstr[1] "%s балла"
 msgstr[2] "%s баллов"
 
-#: common/lib/xmodule/xmodule/js/src/capa/display.js:554
-#: common/static/xmodule/modules/js/001-5d52f96e690b7d20791110be817c6bff.js:554
+#. Translators: the word Answer here refers to the answer to a problem the
+#. student must solve.;
+#: common/lib/xmodule/xmodule/js/src/capa/display.js:444
+#: common/static/xmodule/modules/js/001-fd72678ee0183f5975bc30a2df9c4fda.js:444
+msgid "Hide Answer(s)"
+msgstr ""
+
+#. Translators: the word Answer here refers to the answer to a problem the
+#. student must solve.;
+#: common/lib/xmodule/xmodule/js/src/capa/display.js:455
+#: common/static/xmodule/modules/js/001-fd72678ee0183f5975bc30a2df9c4fda.js:455
+msgid "Show Answer(s)"
+msgstr ""
+
+#. Translators: the word unanswered here is about answering a problem the
+#. student must solve.;
+#: common/lib/xmodule/xmodule/js/src/capa/display.js:576
+#: common/lib/xmodule/xmodule/js/src/capa/display.js:614
+#: common/static/xmodule/modules/js/001-fd72678ee0183f5975bc30a2df9c4fda.js:576
+#: common/static/xmodule/modules/js/001-fd72678ee0183f5975bc30a2df9c4fda.js:614
 msgid "unanswered"
 msgstr "не отвечен"
 
-#: common/lib/xmodule/xmodule/js/src/capa/display.js:584
-#: common/static/xmodule/modules/js/001-5d52f96e690b7d20791110be817c6bff.js:584
+#: common/lib/xmodule/xmodule/js/src/capa/display.js:606
+#: common/static/xmodule/modules/js/001-fd72678ee0183f5975bc30a2df9c4fda.js:606
 msgid "Status: unsubmitted"
 msgstr "Статус: не сдан"
 
@@ -518,7 +601,7 @@ msgid "Respond to Feedback"
 msgstr "Ответить на обратную связь"
 
 #: common/lib/xmodule/xmodule/js/src/master_class/master_class_main.js:177
-#: common/static/xmodule/modules/js/002-09cb29587c5d3e7480b959195ae3a4f8.js:177
+#: common/static/xmodule/modules/js/003-09cb29587c5d3e7480b959195ae3a4f8.js:177
 msgid ""
 "You have been registered for this master class. We will provide addition "
 "information soon."
@@ -527,7 +610,7 @@ msgstr ""
 "скором времени."
 
 #: common/lib/xmodule/xmodule/js/src/master_class/master_class_main.js:178
-#: common/static/xmodule/modules/js/002-09cb29587c5d3e7480b959195ae3a4f8.js:178
+#: common/static/xmodule/modules/js/003-09cb29587c5d3e7480b959195ae3a4f8.js:178
 msgid ""
 "You are pending for registration for this master class. Please visit this "
 "page later for result."
@@ -535,72 +618,68 @@ msgstr ""
 "Вы ожидаете подтверждения регистрации на мастер-класс. Пожалуйста, посетите "
 "данную страницу позже для результатов."
 
-#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js:76
-#: common/static/xmodule/modules/js/005-1075ba49b142eee8810d95640aaebefc.js:76
+#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js:84
+#: common/static/xmodule/modules/js/005-5a90e013baf87a27c703186af8f23d08.js:84
 msgid "video slider"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js:156
-#: common/static/xmodule/modules/js/005-1075ba49b142eee8810d95640aaebefc.js:156
+#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js:198
+#: common/static/xmodule/modules/js/005-5a90e013baf87a27c703186af8f23d08.js:198
 msgid "Pause"
 msgstr "Пауза"
 
-#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js:161
-#: common/static/xmodule/modules/js/005-1075ba49b142eee8810d95640aaebefc.js:161
+#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js:210
+#: common/static/xmodule/modules/js/005-5a90e013baf87a27c703186af8f23d08.js:210
 msgid "Play"
 msgstr "Воспроизвести"
 
-#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js:184
-#: common/static/xmodule/modules/js/005-1075ba49b142eee8810d95640aaebefc.js:184
+#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js:236
+#: common/static/xmodule/modules/js/005-5a90e013baf87a27c703186af8f23d08.js:236
 msgid "Fill browser"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js:198
-#: common/static/xmodule/modules/js/005-1075ba49b142eee8810d95640aaebefc.js:198
+#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js:250
+#: common/static/xmodule/modules/js/005-5a90e013baf87a27c703186af8f23d08.js:250
 msgid "Exit full browser"
 msgstr "Выйти из полноэкранного режима"
 
-#: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js:70
-#: common/static/xmodule/modules/js/006-6ebb17a864932d2f0db132c5be91687b.js:70
+#: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js:76
+#: common/static/xmodule/modules/js/006-3f14947a3838b1c66d9e7c3940cfd85b.js:76
 msgid "HD on"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js:76
-#: common/static/xmodule/modules/js/006-6ebb17a864932d2f0db132c5be91687b.js:76
+#: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js:82
+#: common/static/xmodule/modules/js/006-3f14947a3838b1c66d9e7c3940cfd85b.js:82
 msgid "HD off"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js:222
-#: common/static/xmodule/modules/js/010-f54db23669849c9c6e64498b10c2bd2b.js:222
+#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js:229
+#: common/static/xmodule/modules/js/010-12572aadcfc153437a268d290dc605d7.js:229
 msgid "Caption will be displayed when "
 msgstr "Заголовки будут отображаться, когда"
 
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js:707
-#: common/static/xmodule/modules/js/010-f54db23669849c9c6e64498b10c2bd2b.js:707
+#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js:700
+#: common/static/xmodule/modules/js/010-12572aadcfc153437a268d290dc605d7.js:700
 msgid "Turn on captions"
 msgstr "Включить заголовки"
 
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js:715
-#: common/static/xmodule/modules/js/010-f54db23669849c9c6e64498b10c2bd2b.js:715
+#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js:708
+#: common/static/xmodule/modules/js/010-12572aadcfc153437a268d290dc605d7.js:708
 msgid "Turn off captions"
 msgstr "Отключить заголовки"
 
-#: common/static/coffee/src/discussion/discussion_module_view.js:69
-#: common/static/coffee/src/discussion/discussion_module_view.js:88
+#: common/static/coffee/src/discussion/discussion_module_view.js:72
+#: common/static/coffee/src/discussion/discussion_module_view.js:96
 msgid "Hide Discussion"
 msgstr "Скрыть дискуссии"
 
-#: common/static/coffee/src/discussion/discussion_module_view.js:84
-msgid "Show Discussion"
-msgstr "Показать дискуссии"
-
-#: common/static/coffee/src/discussion/views/discussion_content_view.js:58
-#: common/static/coffee/src/discussion/views/discussion_content_view.js:62
+#: common/static/coffee/src/discussion/views/discussion_content_view.js:72
+#: common/static/coffee/src/discussion/views/discussion_content_view.js:76
 msgid "Close"
 msgstr "Закрыть"
 
-#: common/static/coffee/src/discussion/views/discussion_content_view.js:58
-#: common/static/coffee/src/discussion/views/discussion_content_view.js:62
+#: common/static/coffee/src/discussion/views/discussion_content_view.js:72
+#: common/static/coffee/src/discussion/views/discussion_content_view.js:76
 msgid "Open"
 msgstr "Открыть"
 
@@ -608,33 +687,29 @@ msgstr "Открыть"
 msgid "Load more"
 msgstr "Загрузить еще"
 
-#: common/static/coffee/src/discussion/views/discussion_thread_list_view.js:183
-msgid "Loading more threads"
-msgstr "Загрузить больше тем"
-
-#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js:86
+#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js:82
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js:78
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js:79
-#: common/static/coffee/src/discussion/views/thread_response_show_view.js:161
+#: common/static/coffee/src/discussion/views/thread_response_show_view.js:119
 msgid "Misuse Reported"
 msgstr "Жалоба отправлена"
 
-#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js:91
+#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js:87
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js:84
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js:85
-#: common/static/coffee/src/discussion/views/thread_response_show_view.js:166
+#: common/static/coffee/src/discussion/views/thread_response_show_view.js:124
 msgid "Report Misuse"
 msgstr "Пожаловаться"
 
-#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js:99
+#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js:95
 msgid "Pinned"
 msgstr "Прикрепленно"
 
-#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js:103
+#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js:99
 msgid "Pin Thread"
 msgstr "Прикрепить тему"
 
-#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js:204
+#: common/static/coffee/src/discussion/views/discussion_thread_show_view.js:147
 msgid "Pinning not currently available"
 msgstr "Прикрепление недоступно"
 
@@ -643,7 +718,7 @@ msgid "anonymous"
 msgstr "аноним"
 
 #: common/static/coffee/src/discussion/views/response_comment_show_view.js:66
-#: common/static/coffee/src/discussion/views/thread_response_show_view.js:72
+#: common/static/coffee/src/discussion/views/thread_response_show_view.js:76
 msgid "staff"
 msgstr "преподаватель"
 
@@ -748,17 +823,21 @@ msgstr ""
 "Вы выбрали действие, и не сделали никаких изменений в отдельных полях. ВЫ, "
 "вероятно ищете кнопку \"Начать\", а не кнопку \"Сохранить\"."
 
-#: lms/static/admin/js/calendar.js:26 lms/static/admin/js/dateparse.js:32
+#. Translators: the names of months, keep the pipe (|) separators.
+#: lms/static/admin/js/calendar.js:27 lms/static/admin/js/dateparse.js:33
+#, fuzzy
 msgid ""
-"January February March April May June July August September October November "
+"January|February|March|April|May|June|July|August|September|October|November|"
 "December"
 msgstr ""
 "Январь Февраль Март Апрель Май Июнь Июль Август Сентябрь Октябрь Ноябрь "
 "Декабрь"
 
-#: lms/static/admin/js/calendar.js:27
-msgid "S M T W T F S"
-msgstr "Пн Вт Ср Чт Пт Сб Вс"
+#. Translators: abbreviations for days of the week, keep the pipe (|)
+#. separators.
+#: lms/static/admin/js/calendar.js:29
+msgid "S|M|T|W|T|F|S"
+msgstr ""
 
 #: lms/static/admin/js/collapse.js:8 lms/static/admin/js/collapse.js.c:19
 #: lms/static/admin/js/collapse.min.js:1
@@ -769,8 +848,10 @@ msgstr "Показать"
 msgid "Hide"
 msgstr "Спрятать"
 
-#: lms/static/admin/js/dateparse.js:33
-msgid "Sunday Monday Tuesday Wednesday Thursday Friday Saturday"
+#. Translators: the names of days, keep the pipe (|) separators.
+#: lms/static/admin/js/dateparse.js:35
+#, fuzzy
+msgid "Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday"
 msgstr "Понедельник Вторник Среда Четверг Пятница Суббота Воскресенье"
 
 #: lms/static/admin/js/admin/DateTimeShortcuts.js:49
@@ -815,13 +896,84 @@ msgstr "Вчера"
 msgid "Tomorrow"
 msgstr "Завтра"
 
-#: lms/static/coffee/src/calculator.js:22
+#: lms/static/coffee/src/calculator.js:38
 msgid "Open Calculator"
 msgstr ""
 
-#: lms/static/coffee/src/calculator.js:28
+#: lms/static/coffee/src/calculator.js:44
 msgid "Close Calculator"
 msgstr "Закрыть калькулятор"
+
+#: lms/static/coffee/src/instructor_dashboard/data_download.js:56
+msgid "Loading..."
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/data_download.js:62
+msgid "Error getting student list."
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/data_download.js:105
+msgid "Error retrieving grading configuration."
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/data_download.js:121
+#, fuzzy
+msgid "Error generating grades. Please try again."
+msgstr "Произошла ошибка при сохранении изменений. Попробуйте еще раз."
+
+#: lms/static/coffee/src/instructor_dashboard/data_download.js:216
+msgid "File Name (Newest First)"
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/data_download.js:217
+msgid ""
+"Links are generated on demand and expire within 5 minutes due to the "
+"sensitive nature of student grade information."
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js:379
+msgid "Successfully enrolled and sent email to the following students:"
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js:390
+msgid "Successfully enrolled the following students:"
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js:401
+msgid ""
+"Successfully sent enrollment emails to the following students. They will be "
+"allowed to enroll once they register:"
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js:412
+msgid "These students will be allowed to enroll once they register:"
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js:423
+msgid ""
+"Successfully sent enrollment emails to the following students. They will be "
+"enrolled once they register:"
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js:434
+msgid "These students will be enrolled once they register:"
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js:445
+msgid ""
+"Emails successfully sent. The following students are no longer enrolled in "
+"the course:"
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js:456
+msgid "The following students are no longer enrolled in the course:"
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/membership.js:467
+msgid ""
+"These students were not affliliated with the course so could not be "
+"unenrolled:"
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js:48
 msgid "Your message must have a subject."
@@ -1011,6 +1163,10 @@ msgstr ""
 msgid "Error listing task history for this student and problem."
 msgstr "Ошибка при отображении списка задании для задачи и студента."
 
+#: lms/static/coffee/src/staff_grading/staff_grading.js:319
+msgid "Grades saved.  Fetching the next submission to grade."
+msgstr ""
+
 #: lms/static/coffee/src/staff_grading/staff_grading.js:371
 msgid "Problem Name"
 msgstr "Имя задачи"
@@ -1043,36 +1199,39 @@ msgstr "Вернуться к списку заданий"
 msgid "Try loading again"
 msgstr "Пытаюсь загрузить снова"
 
-#: lms/static/coffee/src/staff_grading/staff_grading.js:457
-msgid "available"
+#: lms/static/coffee/src/staff_grading/staff_grading.js:456
+#, fuzzy
+msgid "<%= num %> available"
 msgstr "доступно"
 
-#: lms/static/coffee/src/staff_grading/staff_grading.js:458
-msgid "graded"
-msgstr "оценено"
-
 #: lms/static/coffee/src/staff_grading/staff_grading.js:459
-msgid "more needed to start ML"
+msgid "<%= num %> graded"
+msgstr ""
+
+#: lms/static/coffee/src/staff_grading/staff_grading.js:462
+#, fuzzy
+msgid "<%= num %> more needed to start ML"
 msgstr "требуется еще для начала автоматической проверки"
 
-#: lms/static/coffee/src/staff_grading/staff_grading.js:472
+#: lms/static/coffee/src/staff_grading/staff_grading.js:478
 msgid "Re-check for submissions"
 msgstr "Проверить наличие заданий"
 
-#: lms/static/coffee/src/staff_grading/staff_grading.js:474
-msgid "System got into invalid state "
+#: lms/static/coffee/src/staff_grading/staff_grading.js:480
+#, fuzzy
+msgid "System got into invalid state: <%= state %>"
 msgstr "Кажется что-то пошло не так"
 
-#: lms/static/coffee/src/staff_grading/staff_grading.js:489
+#: lms/static/coffee/src/staff_grading/staff_grading.js:497
 msgid "System got into invalid state for submission: "
 msgstr "Кажется что-то пошло не так для посылки: "
 
-#: lms/static/coffee/src/staff_grading/staff_grading.js:497
-#: lms/static/coffee/src/staff_grading/staff_grading.js:506
+#: lms/static/coffee/src/staff_grading/staff_grading.js:505
+#: lms/static/coffee/src/staff_grading/staff_grading.js:514
 msgid "(Hide)"
 msgstr "Спрятать"
 
-#: lms/static/coffee/src/staff_grading/staff_grading.js:501
+#: lms/static/coffee/src/staff_grading/staff_grading.js:509
 msgid "(Show)"
 msgstr "Показать"
 
@@ -1083,6 +1242,21 @@ msgid_plural "%s new comments"
 msgstr[0] "%s новый комментарий"
 msgstr[1] "%s новых комментария"
 msgstr[2] "%s новых комментариев"
+
+#~ msgid "Edit"
+#~ msgstr "Редактировать"
+
+#~ msgid "Show Discussion"
+#~ msgstr "Показать дискуссии"
+
+#~ msgid "Loading more threads"
+#~ msgstr "Загрузить больше тем"
+
+#~ msgid "S M T W T F S"
+#~ msgstr "Пн Вт Ср Чт Пт Сб Вс"
+
+#~ msgid "graded"
+#~ msgstr "оценено"
 
 #~ msgid "Are you sure to delete thread"
 #~ msgstr "Вы уверены, что хотите удалить всю ветку"
@@ -1097,9 +1271,6 @@ msgstr[2] "%s новых комментариев"
 #~ "Вы пытаетесь загрузить слишком большой фаил для нашей системы. Пожалйста "
 #~ "выберите фаил меньше 2MB или вставьте ссылку на ваш фаил в поле для "
 #~ "ответа."
-
-#~ msgid "There was an error saving your changes. Please try again."
-#~ msgstr "Произошла ошибка при сохранении изменений. Попробуйте еще раз."
 
 #~ msgid "There has been an error while saving your changes."
 #~ msgstr "Произошла ошибка при сохранении изменений."
