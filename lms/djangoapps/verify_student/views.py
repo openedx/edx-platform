@@ -24,14 +24,15 @@ from django.contrib.auth.decorators import login_required
 
 from course_modes.models import CourseMode
 from student.models import CourseEnrollment
-from student.views import course_from_id
+from student.views import course_from_id, reverification_info
 from shoppingcart.models import Order, CertificateItem
 from shoppingcart.processors.CyberSource import (
     get_signed_purchase_params, get_purchase_endpoint
 )
 from verify_student.models import (
-    SoftwareSecurePhotoVerification, MidcourseReverificationWindow,
+    SoftwareSecurePhotoVerification,
 )
+from reverification.models import MidcourseReverificationWindow
 import ssencrypt
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from .exceptions import WindowExpiredException
@@ -48,7 +49,6 @@ class VerifyView(View):
             - Taking the id photo
             - Confirming that the photos and payment price are correct
               before proceeding to payment
-
         """
         upgrade = request.GET.get('upgrade', False)
 
@@ -408,21 +408,35 @@ def midcourse_reverify_dash(_request):
         except ItemNotFoundError:
             log.error("User {0} enrolled in non-existent course {1}"
                       .format(user.username, enrollment.course_id))
-    reverify_course_data = []
+
+    reverifications_must_reverify = []
+    reverifications_denied = []
+    reverifications_pending = []
+    reverifications_approved = []
     for (course, enrollment) in course_enrollment_pairs:
-        if MidcourseReverificationWindow.window_open_for_course(course.id):
-            reverify_course_data.append(
-                (
-                    course.id,
-                    course.display_name,
-                    course.number,
-                    MidcourseReverificationWindow.get_window(course.id, datetime.datetime.now(UTC)).end_date.strftime('%B %d, %Y %X %p'),
-                    "must_reverify"
-                )
-            )
+        info = reverification_info(user, course, enrollment)
+        if info:
+            if "approved" in info:
+                reverifications_approved.append(info)
+            elif "pending" in info:
+                reverifications_pending.append(info)
+            elif "must_reverify" in info:
+                reverifications_must_reverify.append(info)
+            elif "denied" in info:
+                reverifications_denied.append(info)
+
+    # Sort the data by the reverification_end_date
+    reverifications_must_reverify = sorted(reverifications_must_reverify, key=lambda x: x[3])
+    reverifications_denied = sorted(reverifications_denied, key=lambda x: x[3])
+    reverifications_pending = sorted(reverifications_pending, key=lambda x: x[3])
+    reverifications_approved = sorted(reverifications_approved, key=lambda x: x[3])
+
     context = {
-        "user_full_name": _request.user.profile.name,
-        "reverify_course_data": reverify_course_data,
+        "user_full_name": user.profile.name,
+        'reverifications_must_reverify': reverifications_must_reverify,
+        'reverifications_denied': reverifications_denied,
+        'reverifications_pending': reverifications_pending,
+        'reverifications_approved': reverifications_approved,
     }
     return render_to_response("verify_student/midcourse_reverify_dash.html", context)
 
@@ -436,7 +450,7 @@ def reverification_submission_confirmation(_request):
 
 
 @login_required
-def midcourse_reverification_confirmation(_request):
+def midcourse_reverification_confirmation(request):  # pylint: disable=W0613
     """
     Shows the user a confirmation page if the submission to SoftwareSecure was successful
     """

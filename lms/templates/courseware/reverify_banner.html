@@ -1,0 +1,14 @@
+<%!
+    from django.core.urlresolvers import reverse
+    from xmodule.util.date_utils import get_time_display
+    from django.utils.translation import ugettext as _
+%>
+YOLO
+%if status == "must_reverify":
+You need to verify your ID again before DATE.
+
+To continue in the verified track in this course, you need to re-verify by DATE.  Why you need to verify yourself again.
+
+%elif status == "denied":
+
+You re-verification for this course failed and you are no longer eligible for a Verified Certificate.  If you think this is in error, please contact us at support@edx.org

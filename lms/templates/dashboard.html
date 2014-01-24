@@ -152,9 +152,8 @@
   </script>
 </%block>
 
-
 <!-- TODO later will need to make this ping for all courses on the dash -->
-%if reverify_course_data:
+% if reverifications_must_reverify or reverifications_denied:
   <section class="dashboard-banner">
     <div class="wrapper-msg">
       <%include file='dashboard/_dashboard_prompt_midcourse_reverify.html' />
@@ -198,6 +197,8 @@
         % endif
 
         <%include file='dashboard/_dashboard_status_verification.html' />
+
+        <%include file='dashboard/_dashboard_reverification_sidebar.html' />
 
       </ul>
     </section>

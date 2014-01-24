@@ -17,26 +17,40 @@
         <h2 class="title">You are in the Verified track</h2>
 
         <div class="copy">
+          % if len(reverifications_must_reverify) > 1:
+          <p>You currently need to re-verify for the following courses:</p>
+          % elif reverifications_must_reverify:
           <p>You currently need to re-verify for the following course:</p>
+          % elif reverifications_pending or reverifications_approved or reverifications_denied:
+          <p>The status of your re-verifications is as follows:</p>
+          % else:
+          <p>You have no re-verifications at present.
+          % endif
 
           <ul class="reverification-list">
-          % for course_id, course_name, course_number, date, status in reverify_course_data:
+          % for course_id, course_name, course_number, date, status in reverifications_must_reverify:
             <li class="item">
                 <div class="course-info">
                   <h3 class="course-name">${course_name} (${course_number})</h3>
                   <p class="deadline">Re-verify by <strong>${date}</strong></p>
                 </div>
 
-            		% if status == "must_reverify":
-                  <p class="reverify-status"><a class="btn action-primary action-reverify" href="${reverse('verify_student_midcourse_reverify', kwargs={'course_id': course_id})}">Re-verify for ${course_number}</a></p>
-            		% elif status == "completed":
-            		  Completed
-            		% elif status == "failed":
-            		  Failed
-            		% endif
+                  <p class="reverify-status"><a class="btn action-primary action-reverify" href="${reverse('verify_student_midcourse_reverify', kwargs={'course_id': course_id})}"
             </li>
           % endfor
           </ul>
+
+          % for course_id, course_name, course_number, date, status in reverifications_pending:
+            <br/>Pending: ${course_name}
+          % endfor
+
+          % for course_id, course_name, course_number, date, status in reverifications_approved:
+            <br/>Approved: ${course_name}
+          % endfor
+
+          % for course_id, course_name, course_number, date, status in reverifications_denied:
+            <br/>Denied: ${course_name}
+          % endfor
         </div>
 
         <div class="wrapper-reverification-help list-faq">

@@ -2,11 +2,11 @@
 <%! from django.core.urlresolvers import reverse %>
 <!--TODO replace this with something a clever deisgn person approves of-->
 <!--TODO replace this with a shiny loopy thing to actually print out all courses-->
-% if reverify_course_data:
+% if reverifications_must_reverify:
 <div class="msg msg-reverify has-actions">
     <div class="msg-content">
       <h2 class="title">${_("You need to re-verify to continue")}</h2>
-      % for course_id, course_name, course_number, date, status in reverify_course_data:
+      % for course_id, course_name, course_number, date, status in reverifications_must_reverify:
       <div class="copy">
         <p class='activation-message'>
         	${_('To continue in the verified track in <strong>{course_name}</strong>, you need to re-verify your identity by {date}.').format(course_name=course_name, date=date)}
@@ -19,6 +19,22 @@
         <li class="nav-item"><a class="btn action-primary action-reverify" href="${reverse('verify_student_midcourse_reverify_dash')}">Re-verify</a></li>
       </ul>
     </nav>
+  </div>
+</div>
+% endfor
+%endif
+
+%if reverifications_denied:
+<div class="msg msg-reverify has-actions">
+    <div class="msg-content">
+      <h2 class="title">${_("Your re-verification failed")}</h2>
+      % for course_id, course_name, course_number, date, status in reverifications_denied:
+      <div class="copy">
+        <p class='activation-message'>
+          ${_('Your re-verification for <strong>{course_name}</strong> failed and you are no longer eligible for a Verified Certificate.  If you think this is in error, please contact us at billing@edx.org.')}
+        </p>
+      </div>
+    </div>
   </div>
 </div>
 % endfor

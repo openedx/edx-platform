@@ -27,7 +27,7 @@ from student.models import CourseEnrollment
 from course_modes.models import CourseMode
 from verify_student.views import render_to_response
 from verify_student.models import SoftwareSecurePhotoVerification
-from verify_student.tests.factories import MidcourseReverificationWindowFactory
+from reverification.tests.factories import MidcourseReverificationWindowFactory
 
 
 def mock_render_to_response(*args, **kwargs):

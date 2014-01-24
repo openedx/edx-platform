@@ -1,0 +1,32 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%! from django.core.urlresolvers import reverse %>
+<!--TODO replace this with something a clever deisgn person approves of-->
+<!--TODO replace this with a shiny loopy thing to actually print out all courses-->
+% if reverifications_must_reverify or reverifications_denied or reverifications_pending or reverifications_approved:
+
+    <h2 class="title">${_("Re-verification now open for")}</h2>
+    % if reverifications_must_reverify:
+        % for course_id, course_name, course_number, date, status in reverifications_must_reverify:
+            ${_('Must Reverify: <strong>{course_name}</strong>').format(course_name=course_name)}
+        % endfor
+    %endif
+
+    % if reverifications_pending:
+        % for course_id, course_name, course_number, date, status in reverifications_pending:
+            ${_('Denied: <strong>{course_name}</strong>').format(course_name=course_name)}
+        % endfor
+    %endif
+
+    % if reverifications_denied:
+        % for course_id, course_name, course_number, date, status in reverifications_denied:
+            ${_('Denied: <strong>{course_name}</strong>').format(course_name=course_name)}
+        % endfor
+    %endif
+
+    % if reverifications_approved:
+        % for course_id, course_name, course_number, date, status in reverifications_approved:
+            ${_('Denied: <strong>{course_name}</strong>').format(course_name=course_name)}
+        % endfor
+    %endif
+
+%endif

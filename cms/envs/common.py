@@ -451,9 +451,12 @@ INSTALLED_APPS = (
 
     # for managing course modes
     'course_modes',
+<<<<<<< HEAD
 
     # Dark-launching languages
     'dark_lang',
+    # Student identity reverification
+    'reverification',
 )
 
 

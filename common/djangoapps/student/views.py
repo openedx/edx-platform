@@ -184,28 +184,34 @@ def cert_info(user, course):
 
 def reverification_info(user, course, enrollment):
     """
-    If "user" currently needs to be reverified in "course", this returns a four-tuple with re-verification
-    info for views to display.  Else, returns None.
+    If
+    - a course has an open re-verification window, and
+    - that user has a verified enrollment in the course
+    then we return a tuple with relevant information.
 
-    Four-tuple data: (course_id, course_display_name, reverification_end_date, reverification_status)
+    Else, return None.
+
+    Five-tuple data: (course_id, course_display_name, course_number, reverification_end_date, reverification_status)
     """
-    # IF the reverification window is open
-    if (MidcourseReverificationWindow.window_open_for_course(course.id)):
-        # AND the user is actually verified-enrolled AND they don't have a pending reverification already
-        window = MidcourseReverificationWindow.get_window(course.id, datetime.datetime.now(UTC))
-        if (enrollment.mode == "verified" and not SoftwareSecurePhotoVerification.user_has_valid_or_pending(user, window=window)):
-            window = MidcourseReverificationWindow.get_window(course.id, datetime.datetime.now(UTC))
+    window = MidcourseReverificationWindow.get_window(course.id, datetime.datetime.now(UTC))
+
+    # If there's an open window AND the user is verified
+    if (window and (enrollment.mode == "verified")):
             return (
                 course.id,
                 course.display_name,
                 course.number,
                 window.end_date.strftime('%B %d, %Y %X %p'),
-                "must_reverify"  # TODO: reflect more states than just "must_reverify" has_valid_or_pending (must show failure)
+                SoftwareSecurePhotoVerification.user_status(user, window)[0],
             )
     return None
 
 
 def get_course_enrollment_pairs(user, course_org_filter, org_filter_out_set):
+    """
+    Get the relevant set of (Course, CourseEnrollment) pairs to be displayed on
+    a student's dashboard.
+    """
     course_enrollment_pairs = []
     for enrollment in CourseEnrollment.enrollments_for_user(user):
         try:
@@ -220,11 +226,10 @@ def get_course_enrollment_pairs(user, course_org_filter, org_filter_out_set):
             elif course.location.org in org_filter_out_set:
                 continue
 
-            course_enrollment_pairs.append((course, enrollment))
+            yield (course, enrollment)
         except ItemNotFoundError:
             log.error("User {0} enrolled in non-existent course {1}"
                       .format(user.username, enrollment.course_id))
-    return course_enrollment_pairs
 
 
 
@@ -252,7 +257,6 @@ def _cert_info(user, course, cert_status):
         CertificateStatuses.restricted: 'restricted',
     }
 
-    # TODO: We need the thing on the sidebar to mention if reverification, as per UI flows.
     status = template_state.get(cert_status['status'], default_status)
 
     d = {'status': status,
@@ -384,7 +388,7 @@ def dashboard(request):
     # Build our (course, enrollment) list for the user, but ignore any courses that no
     # longer exist (because the course IDs have changed). Still, we don't delete those
     # enrollments, because it could have been a data push snafu.
-    course_enrollment_pairs = get_course_enrollment_pairs(user, course_org_filter, org_filter_out_set)
+    course_enrollment_pairs = list(get_course_enrollment_pairs(user, course_org_filter, org_filter_out_set))
 
     course_optouts = Optout.objects.filter(user=user).values_list('course_id', flat=True)
 
@@ -417,15 +421,30 @@ def dashboard(request):
 
     # Verification Attempts
     # Used to generate the "you must reverify for course x" banner
-    # TODO: make this banner appear at the top of courseware as well
     verification_status, verification_msg = SoftwareSecurePhotoVerification.user_status(user)
 
     # Gets data for midcourse reverifications, if any are necessary or have failed
-    reverify_course_data = []
+    reverifications_must_reverify = []
+    reverifications_denied = []
+    reverifications_pending = []
+    reverifications_approved = []
     for (course, enrollment) in course_enrollment_pairs:
         info = reverification_info(user, course, enrollment)
         if info:
-            reverify_course_data.append(info)
+            if "approved" in info:
+                reverifications_approved.append(info)
+            elif "pending" in info:
+                reverifications_pending.append(info)
+            elif "must_reverify" in info:
+                reverifications_must_reverify.append(info)
+            elif "denied" in info:
+                reverifications_denied.append(info)
+
+    # Sort the data by the reverification_end_date
+    reverifications_must_reverify = sorted(reverifications_must_reverify, key=lambda x: x[3])
+    reverifications_denied = sorted(reverifications_denied, key=lambda x: x[3])
+    reverifications_pending = sorted(reverifications_pending, key=lambda x: x[3])
+    reverifications_approved = sorted(reverifications_approved, key=lambda x: x[3])
 
     show_refund_option_for = frozenset(course.id for course, _enrollment in course_enrollment_pairs
                                        if _enrollment.refundable())
@@ -447,7 +466,10 @@ def dashboard(request):
                'all_course_modes': course_modes,
                'cert_statuses': cert_statuses,
                'show_email_settings_for': show_email_settings_for,
-               'reverify_course_data': reverify_course_data,
+               'reverifications_must_reverify': reverifications_must_reverify,
+               'reverifications_denied': reverifications_denied,
+               'reverifications_pending': reverifications_pending,
+               'reverifications_approved': reverifications_approved,
                'verification_status': verification_status,
                'verification_msg': verification_msg,
                'show_refund_option_for': show_refund_option_for,

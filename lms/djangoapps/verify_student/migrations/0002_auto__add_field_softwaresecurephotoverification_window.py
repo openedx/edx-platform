@@ -8,26 +8,16 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding model 'MidcourseReverificationWindow'
-        db.create_table('verify_student_midcoursereverificationwindow', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('course_id', self.gf('django.db.models.fields.CharField')(max_length=255, db_index=True)),
-            ('start_date', self.gf('django.db.models.fields.DateTimeField')(default=None, null=True, blank=True)),
-            ('end_date', self.gf('django.db.models.fields.DateTimeField')(default=None, null=True, blank=True)),
-        ))
-        db.send_create_signal('verify_student', ['MidcourseReverificationWindow'])
-
         # Adding field 'SoftwareSecurePhotoVerification.window'
         db.add_column('verify_student_softwaresecurephotoverification', 'window',
-                      self.gf('django.db.models.fields.related.ForeignKey')(to=orm['verify_student.MidcourseReverificationWindow'], null=True),
+                      self.gf('django.db.models.fields.related.ForeignKey')(to=orm['reverification.MidcourseReverificationWindow'], null=True),
                       keep_default=False)
 
-    def backwards(self, orm):
-        # Deleting model 'MidcourseReverificationWindow'
-        db.delete_table('verify_student_midcoursereverificationwindow')
 
+    def backwards(self, orm):
         # Deleting field 'SoftwareSecurePhotoVerification.window'
         db.delete_column('verify_student_softwaresecurephotoverification', 'window_id')
+
 
     models = {
         'auth.group': {
@@ -66,7 +56,7 @@ class Migration(SchemaMigration):
             'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
-        'verify_student.midcoursereverificationwindow': {
+        'reverification.midcoursereverificationwindow': {
             'Meta': {'object_name': 'MidcourseReverificationWindow'},
             'course_id': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
             'end_date': ('django.db.models.fields.DateTimeField', [], {'default': 'None', 'null': 'True', 'blank': 'True'}),
@@ -83,7 +73,7 @@ class Migration(SchemaMigration):
             'name': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
             'photo_id_image_url': ('django.db.models.fields.URLField', [], {'max_length': '255', 'blank': 'True'}),
             'photo_id_key': ('django.db.models.fields.TextField', [], {'max_length': '1024'}),
-            'receipt_id': ('django.db.models.fields.CharField', [], {'default': "'<function uuid4 at 0x1d47320>'", 'max_length': '255', 'db_index': 'True'}),
+            'receipt_id': ('django.db.models.fields.CharField', [], {'default': "'<function uuid4 at 0x21d4398>'", 'max_length': '255', 'db_index': 'True'}),
             'reviewing_service': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
             'reviewing_user': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'related_name': "'photo_verifications_reviewed'", 'null': 'True', 'to': "orm['auth.User']"}),
             'status': ('model_utils.fields.StatusField', [], {'default': "'created'", 'max_length': '100', u'no_check_for_status': 'True'}),
@@ -91,7 +81,7 @@ class Migration(SchemaMigration):
             'submitted_at': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'db_index': 'True'}),
             'updated_at': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'db_index': 'True', 'blank': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
-            'window': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['verify_student.MidcourseReverificationWindow']", 'null': 'True'})
+            'window': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['reverification.MidcourseReverificationWindow']", 'null': 'True'})
         }
     }
 

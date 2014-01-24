@@ -13,7 +13,7 @@ urlpatterns = patterns(
 
     url(
         r'^verify/(?P<course_id>[^/]+/[^/]+/[^/]+)$',
-        views.VerifyView.as_view(),
+        views.VerifyView.as_view(),  # pylint: disable=E1120
         name="verify_student_verify"
     ),
 
@@ -43,7 +43,7 @@ urlpatterns = patterns(
 
     url(
         r'^midcourse_reverify/(?P<course_id>[^/]+/[^/]+/[^/]+)$',
-        views.MidCourseReverifyView.as_view(),
+        views.MidCourseReverifyView.as_view(),  # pylint: disable=E1120
         name="verify_student_midcourse_reverify"
     ),
 

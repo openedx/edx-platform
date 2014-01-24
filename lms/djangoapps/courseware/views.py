@@ -29,6 +29,7 @@ from courseware.models import StudentModule, StudentModuleHistory
 from course_modes.models import CourseMode
 
 from student.models import UserTestGroup, CourseEnrollment
+from student.views import course_from_id, reverification_info
 from util.cache import cache, cache_if_anonymous
 from xblock.fragment import Fragment
 from xmodule.modulestore import Location
@@ -267,6 +268,8 @@ def index(request, course_id, chapter=None, section=None,
             'masquerade': masq,
             'xqa_server': settings.FEATURES.get('USE_XQA_SERVER', 'http://xqa:server@content-qa.mitx.mit.edu/xqa')
             }
+        reverify_context = fetch_reverify_banner_keypairs(request, course_id)
+        context = dict(context.items() + reverify_context.items())
 
         # Only show the chat if it's enabled by the course and in the
         # settings.
@@ -452,8 +455,12 @@ def course_info(request, course_id):
     staff_access = has_access(request.user, course, 'staff')
     masq = setup_masquerade(request, staff_access)    # allow staff to toggle masquerade on info page
 
-    return render_to_response('courseware/info.html', {'request': request, 'course_id': course_id, 'cache': None,
-            'course': course, 'staff_access': staff_access, 'masquerade': masq})
+    context = {'request': request, 'course_id': course_id, 'cache': None,
+               'course': course, 'staff_access': staff_access, 'masquerade': masq}
+    reverify_context = fetch_reverify_banner_keypairs(request, course_id)
+    context = dict(context.items() + reverify_context.items())
+
+    return render_to_response('courseware/info.html', context)
 
 
 @ensure_csrf_cookie
@@ -655,11 +662,37 @@ def _progress(request, course_id, student_id):
         'staff_access': staff_access,
         'student': student,
     }
+    reverify_context = fetch_reverify_banner_keypairs(request, course_id)
+    context = dict(context.items() + reverify_context.items())
+
 
     with grades.manual_transaction():
         response = render_to_response('courseware/progress.html', context)
 
     return response
+
+
+def fetch_reverify_banner_keypairs(request, course_id):
+    """
+    Fetches needed context variables to display reverification banner in courseware
+    """
+    reverifications_must_reverify = []
+    reverifications_denied = []
+    user = request.user
+    if not user.id:
+        return {'reverifications_must_reverify': None, 'reverifications_denied': None, }
+    enrollment = CourseEnrollment.get_or_create_enrollment(request.user, course_id)
+    course = course_from_id(course_id)
+    info = reverification_info(user, course, enrollment)
+    if info:
+        if "must_reverify" in info:
+            reverifications_must_reverify.append(info)
+        elif "denied" in info:
+            reverifications_denied.append(info)
+    return {
+        'reverifications_must_reverify': reverifications_must_reverify,
+        'reverifications_denied': reverifications_denied,
+    }
 
 
 @login_required

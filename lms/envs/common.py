@@ -1068,7 +1068,12 @@ INSTALLED_APPS = (
 
     # Dark-launching languages
     'dark_lang',
+
+    # Microsite configuration
     'microsite_configuration',
+
+    # Student Identity Reverification
+    'reverification',
 )
 
 ######################### MARKETING SITE ###############################
