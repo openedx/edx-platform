@@ -11,28 +11,33 @@ This middleware must be placed before the LocaleMiddleware, but after
 the SessionMiddleware.
 """
 
-from django.conf import settings
-from django.core.exceptions import MiddlewareNotUsed
 from django.utils.translation.trans_real import parse_accept_lang_header
+
+from dark_lang.models import DarkLangConfig
 
 
 class DarkLangMiddleware(object):
     """
     Middleware for dark-launching languages.
 
-    This middleware will only be active if the RELEASED_LANGUAGES setting is set.
-    This setting should contain a list of language codes for languages which
-    are considered to be dark-launched, and those won't activate based on a
-    users browser settings.
+    This is configured by creating ``DarkLangConfig`` rows in the database,
+    using the django admin site.
     """
 
-    def __init__(self):
-        self.released_langs = getattr(settings, 'RELEASED_LANGUAGES', None)
-
-        if self.released_langs is None:
-            raise MiddlewareNotUsed()
+    @property
+    def released_langs(self):
+        """
+        Current list of released languages
+        """
+        return DarkLangConfig.current().released_languages_list
 
     def process_request(self, request):
+        """
+        Prevent user from requesting un-released languages except by using the preview-lang query string.
+        """
+        if not DarkLangConfig.current().enabled:
+            return
+
         self._clean_accept_headers(request)
         self._activate_preview_language(request)
 

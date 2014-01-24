@@ -1,0 +1,26 @@
+"""
+Models for the dark-launching languages
+"""
+from django.db import models
+
+from config_models.models import ConfigurationModel
+
+
+class DarkLangConfig(ConfigurationModel):
+    """
+    Configuration for the dark_lang django app
+    """
+    released_languages = models.TextField(
+        blank=True,
+        help_text="A comma-separated list of language codes to release to the public."
+    )
+
+    @property
+    def released_languages_list(self):
+        """
+        ``released_languages`` as a list of language codes.
+        """
+        if not self.released_languages.strip():  # pylint: disable=no-member
+            return []
+
+        return [lang.strip() for lang in self.released_languages.split(',')]  # pylint: disable=no-member

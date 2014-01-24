@@ -27,7 +27,7 @@ class ConfigurationModel(models.Model):
     cache_timeout = 600
 
     change_date = models.DateTimeField(auto_now_add=True)
-    changed_by = models.ForeignKey(User, editable=False)
+    changed_by = models.ForeignKey(User, editable=False, null=True, on_delete=models.PROTECT)
     enabled = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):

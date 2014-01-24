@@ -248,13 +248,8 @@ TIME_ZONE = 'America/New_York'  # http://en.wikipedia.org/wiki/List_of_tz_zones_
 LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
 
 LANGUAGES = (
-    ('en@pirate', 'Pirate English'),
     ('eo', 'Esperanto'),
 )
-
-# This is the list of language codes for languanges which are released to all users.
-# See dark_lang/README.rst for more details.
-RELEASED_LANGUAGES = ()
 
 USE_I18N = True
 USE_L10N = True
@@ -448,7 +443,10 @@ INSTALLED_APPS = (
     'django.contrib.admin',
 
     # for managing course modes
-    'course_modes'
+    'course_modes',
+
+    # Dark-launching languages
+    'dark_lang',
 )
 
 
