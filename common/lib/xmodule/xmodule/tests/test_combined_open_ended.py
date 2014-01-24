@@ -265,29 +265,29 @@ class OpenEndedModuleTest(unittest.TestCase):
         self.openendedmodule = OpenEndedModule(self.test_system, self.location,
                                                self.definition, self.descriptor, self.static_data, self.metadata)
 
-    # Disabled 1/27/14 due to flakiness in master
-    # Should not be comparing the submission time to the current time!
-    @unittest.skip
     def test_message_post(self):
-        get = {'feedback': 'feedback text',
-               'submission_id': '1',
-               'grader_id': '1',
-               'score': 3}
-        qtime = datetime.strftime(datetime.now(UTC), xqueue_interface.dateformat)
-        student_info = {'anonymous_student_id': self.test_system.anonymous_student_id,
-                        'submission_time': qtime}
-        contents = {
-            'feedback': get['feedback'],
-            'submission_id': int(get['submission_id']),
-            'grader_id': int(get['grader_id']),
-            'score': get['score'],
-            'student_info': json.dumps(student_info)
-        }
+        """Test message_post() sends feedback to xqueue."""
 
-        result = self.openendedmodule.message_post(get, self.test_system)
+        submission_time = datetime.strftime(datetime.now(UTC), xqueue_interface.dateformat)
+
+        feedback_post = {
+            'feedback': 'feedback text',
+            'submission_id': '1',
+            'grader_id': '1',
+            'score': 3
+        }
+        result = self.openendedmodule.message_post(feedback_post, self.test_system)
         self.assertTrue(result['success'])
+
         # make sure it's actually sending something we want to the queue
-        self.mock_xqueue.send_to_queue.assert_called_with(body=json.dumps(contents), header=ANY)
+        mock_send_to_queue_body_arg = json.loads(self.mock_xqueue.send_to_queue.call_args[1]['body'])
+        self.assertEqual(mock_send_to_queue_body_arg['feedback'], feedback_post['feedback'])
+        self.assertEqual(mock_send_to_queue_body_arg['submission_id'], int(feedback_post['submission_id']))
+        self.assertEqual(mock_send_to_queue_body_arg['grader_id'], int(feedback_post['grader_id']))
+        self.assertEqual(mock_send_to_queue_body_arg['score'], feedback_post['score'])
+        body_arg_student_info = json.loads(mock_send_to_queue_body_arg['student_info'])
+        self.assertEqual(body_arg_student_info['anonymous_student_id'], self.test_system.anonymous_student_id)
+        self.assertGreaterEqual(body_arg_student_info['submission_time'], submission_time)
 
         state = json.loads(self.openendedmodule.get_instance_state())
         self.assertEqual(state['child_state'], OpenEndedModule.DONE)
@@ -295,61 +295,40 @@ class OpenEndedModuleTest(unittest.TestCase):
     def test_message_post_fail(self):
         """Test message_post() if unable to send feedback to xqueue."""
 
-        get = {'feedback': 'feedback text',
-               'submission_id': '1',
-               'grader_id': '1',
-               'score': 3}
-        qtime = datetime.strftime(datetime.now(UTC), xqueue_interface.dateformat)
-        student_info = {'anonymous_student_id': self.test_system.anonymous_student_id,
-                        'submission_time': qtime}
-        contents = {
-            'feedback': get['feedback'],
-            'submission_id': int(get['submission_id']),
-            'grader_id': int(get['grader_id']),
-            'score': get['score'],
-            'student_info': json.dumps(student_info)
-        }
-
         self.mock_xqueue.send_to_queue.return_value = (1, "Not Queued")
-        result = self.openendedmodule.message_post(get, self.test_system)
+
+        feedback_post = {
+            'feedback': 'feedback text',
+            'submission_id': '1',
+            'grader_id': '1',
+            'score': 3
+        }
+        result = self.openendedmodule.message_post(feedback_post, self.test_system)
         self.assertFalse(result['success'])
 
         state = json.loads(self.openendedmodule.get_instance_state())
         self.assertNotEqual(state['child_state'], OpenEndedModule.DONE)
 
-    # Disabled 1/27/14 due to flakiness in master
-    # Should not be comparing the submission time to the current time!
-    @unittest.skip
     def test_send_to_grader(self):
-        submission = "This is a student submission"
-        qtime = datetime.strftime(datetime.now(UTC), xqueue_interface.dateformat)
-        student_info = {'anonymous_student_id': self.test_system.anonymous_student_id,
-                        'submission_time': qtime}
-        contents = self.openendedmodule.payload.copy()
-        contents.update({
-            'student_info': json.dumps(student_info),
-            'student_response': submission,
-            'max_score': self.max_score
-        })
-        result, __ = self.openendedmodule.send_to_grader(submission, self.test_system)
+        student_response = "This is a student submission"
+        submission_time = datetime.strftime(datetime.now(UTC), xqueue_interface.dateformat)
+
+        result, __ = self.openendedmodule.send_to_grader(student_response, self.test_system)
         self.assertTrue(result)
-        self.mock_xqueue.send_to_queue.assert_called_with(body=json.dumps(contents), header=ANY)
+
+        mock_send_to_queue_body_arg = json.loads(self.mock_xqueue.send_to_queue.call_args[1]['body'])
+        self.assertEqual(mock_send_to_queue_body_arg['student_response'], student_response)
+        self.assertEqual(mock_send_to_queue_body_arg['max_score'], self.max_score)
+        body_arg_student_info = json.loads(mock_send_to_queue_body_arg['student_info'])
+        self.assertEqual(body_arg_student_info['anonymous_student_id'], self.test_system.anonymous_student_id)
+        self.assertGreaterEqual(body_arg_student_info['submission_time'], submission_time)
 
     def test_send_to_grader_fail(self):
         """Test send_to_grader() if unable to send submission to xqueue."""
 
-        submission = "This is a student submission"
-        qtime = datetime.strftime(datetime.now(UTC), xqueue_interface.dateformat)
-        student_info = {'anonymous_student_id': self.test_system.anonymous_student_id,
-                        'submission_time': qtime}
-        contents = self.openendedmodule.payload.copy()
-        contents.update({
-            'student_info': json.dumps(student_info),
-            'student_response': submission,
-            'max_score': self.max_score
-        })
+        student_response = "This is a student submission"
         self.mock_xqueue.send_to_queue.return_value = (1, "Not Queued")
-        result, __ = self.openendedmodule.send_to_grader(submission, self.test_system)
+        result, __ = self.openendedmodule.send_to_grader(student_response, self.test_system)
         self.assertFalse(result)
 
     def test_save_answer_fail(self):
@@ -1075,7 +1054,6 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         """
         Test a two step problem where the student first goes through the self assessment step, and then the
         open ended step with the xqueue failing in the first step.
-        @return:
         """
         assessment = [1, 1]
 
