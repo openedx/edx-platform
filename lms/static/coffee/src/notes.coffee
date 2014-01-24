@@ -23,7 +23,9 @@ class StudentNotes
         unless uri.substring(0, 4) is "http"
             uri_root = (window.location.href.split(/#|\?/).shift() or "")
             uri = uri_root + uri.substring(1)
-        
+        parts = window.location.href.split("/")
+        courseid = parts[4] + "/" + parts[5] + "/" + parts[6]
+
         # Get id and name user    
         idUdiv = $(event.target).parent().find(".idU")[0]
         idDUdiv = $(event.target).parent().find(".idDU")[0]
@@ -45,7 +47,7 @@ class StudentNotes
                         return user.id  if user and user.id
                         user 
                 auth: 
-                    tokenUrl: location.protocol+'//'+location.host+"/token"
+                    tokenUrl: location.protocol+'//'+location.host+"/token?course_id="+courseid
 
                 store:
                     prefix: 'http://catch.aws.af.cm/annotator'
