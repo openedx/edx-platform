@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.core.context_processors import csrf
 from django.contrib.auth.models import User
+from django.views.decorators.http import require_GET
 import newrelic.agent
 
 from edxmako.shortcuts import render_to_response
@@ -229,6 +230,7 @@ def forum_form_discussion(request, course_id):
         return render_to_response('discussion/index.html', context)
 
 
+@require_GET
 @login_required
 def single_thread(request, course_id, discussion_id, thread_id):
     nr_transaction = newrelic.agent.current_transaction()
@@ -237,12 +239,16 @@ def single_thread(request, course_id, discussion_id, thread_id):
     cc_user = cc.User.from_django_user(request.user)
     user_info = cc_user.to_dict()
 
-    thread = cc.Thread.find(thread_id).retrieve(recursive=True, user_id=request.user.id)
+    thread = cc.Thread.find(thread_id).retrieve(
+        recursive=True,
+        user_id=request.user.id,
+        response_skip=request.GET.get("resp_skip"),
+        response_limit=request.GET.get("resp_limit")
+    )
 
     if request.is_ajax():
         with newrelic.agent.FunctionTrace(nr_transaction, "get_annotated_content_infos"):
             annotated_content_info = utils.get_annotated_content_infos(course_id, thread, request.user, user_info=user_info)
-        context = {'thread': thread.to_dict(), 'course_id': course_id}
         content = utils.safe_content(thread.to_dict())
         with newrelic.agent.FunctionTrace(nr_transaction, "add_courseware_context"):
             add_courseware_context([content], course)

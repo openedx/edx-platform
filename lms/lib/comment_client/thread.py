@@ -74,10 +74,9 @@ class Thread(models.Model):
             'recursive': kwargs.get('recursive'),
             'user_id': kwargs.get('user_id'),
             'mark_as_read': kwargs.get('mark_as_read', True),
+            'resp_skip': kwargs.get('response_skip'),
+            'resp_limit': kwargs.get('response_limit'),
         }
-
-        # user_id may be none, in which case it shouldn't be part of the
-        # request.
         request_params = strip_none(request_params)
 
         response = perform_request('get', url, request_params)
