@@ -15,7 +15,7 @@
 -e git+https://github.com/eventbrite/zendesk.git@d53fe0e81b623f084e91776bcf6369f8b7b63879#egg=zendesk
 
 # Our libraries:
--e git+https://github.com/edx/XBlock.git@a1a3e76b269d15b7bbd11976d8aef63e1db6c4c2#egg=XBlock
+-e git+https://github.com/edx/XBlock.git@de92d3bf798699a6bbd06b54012ef15934c41ac0#egg=XBlock
 -e git+https://github.com/edx/codejail.git@e3d98f9455#egg=codejail
 -e git+https://github.com/edx/diff-cover.git@v0.2.9#egg=diff_cover
 -e git+https://github.com/edx/js-test-tool.git@v0.1.5#egg=js_test_tool
