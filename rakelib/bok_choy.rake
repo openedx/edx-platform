@@ -12,11 +12,16 @@ BOK_CHOY_NUM_PARALLEL = ENV.fetch('NUM_PARALLEL', 1).to_i
 BOK_CHOY_TEST_TIMEOUT = ENV.fetch("TEST_TIMEOUT", 300).to_f
 
 # Ensure that we have a directory to put logs and reports
-BOK_CHOY_TEST_DIR = File.join(REPO_ROOT, "common", "test", "acceptance", "tests")
+BOK_CHOY_DIR = File.join(REPO_ROOT, "common", "test", "acceptance")
+BOK_CHOY_TEST_DIR = File.join(BOK_CHOY_DIR, "tests")
 BOK_CHOY_LOG_DIR = File.join(REPO_ROOT, "test_root", "log")
 directory BOK_CHOY_LOG_DIR
 
-BOK_CHOY_XUNIT_REPORT = report_dir_path("bok_choy_xunit.xml")
+# Reports
+BOK_CHOY_REPORT_DIR = report_dir_path("bok_choy")
+BOK_CHOY_XUNIT_REPORT = File.join(BOK_CHOY_REPORT_DIR, "xunit.xml")
+BOK_CHOY_COVERAGE_RC = File.join(BOK_CHOY_DIR, ".coveragerc")
+directory BOK_CHOY_REPORT_DIR
 
 
 BOK_CHOY_SERVERS = {
@@ -31,10 +36,8 @@ BOK_CHOY_CACHE = Dalli::Client.new('localhost:11211')
 def start_servers()
     BOK_CHOY_SERVERS.each do | service, info |
         address = "0.0.0.0:#{info[:port]}"
-        singleton_process(
-            django_admin(service, 'bok_choy', 'runserver', address),
-            logfile=info[:log]
-        )
+        cmd = "coverage run --rcfile=#{BOK_CHOY_COVERAGE_RC} -m manage #{service} --settings bok_choy runserver #{address} --traceback --noreload"
+        singleton_process(cmd, logfile=info[:log])
     end
 end
 
@@ -166,7 +169,9 @@ namespace :'test:bok_choy' do
     end
 
     desc "Run acceptance tests that use the bok-choy framework but skip setup"
-    task :fast, [:test_spec] => [:check_services, BOK_CHOY_LOG_DIR] do |t, args|
+    task :fast, [:test_spec] => [
+        :check_services, BOK_CHOY_LOG_DIR, BOK_CHOY_REPORT_DIR, :clean_reports_dir
+    ] do |t, args|
 
         # Ensure the test servers are available
         puts "Starting test servers...".red
@@ -184,6 +189,17 @@ namespace :'test:bok_choy' do
             puts "Cleaning up databases...".red
             cleanup()
         end
+    end
+
+    desc "Generate coverage reports for bok-choy tests"
+    task :coverage => BOK_CHOY_REPORT_DIR do | t, args |
+        puts "Combining coverage reports".red
+        sh("coverage combine --rcfile=#{BOK_CHOY_COVERAGE_RC}")
+
+        puts "Generating coverage reports".red
+        sh("coverage html --rcfile=#{BOK_CHOY_COVERAGE_RC}")
+        sh("coverage xml --rcfile=#{BOK_CHOY_COVERAGE_RC}")
+        sh("coverage report --rcfile=#{BOK_CHOY_COVERAGE_RC}")
     end
 
 end
