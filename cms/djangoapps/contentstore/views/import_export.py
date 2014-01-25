@@ -236,7 +236,7 @@ def import_handler(request, tag=None, package_id=None, branch=None, version_guid
                     auth.add_users(request.user, CourseStaffRole(new_location), request.user)
                     logging.debug('created all course groups at {0}'.format(new_location))
 
-                # Send errors to client with stage at which error occured.
+                # Send errors to client with stage at which error occurred.
                 except Exception as exception:   # pylint: disable=W0703
                     return JsonResponse(
                         {
