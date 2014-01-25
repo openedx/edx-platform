@@ -38,17 +38,6 @@ class TextAnnotationModuleTestCase(unittest.TestCase):
             ScopeIds(None, None, None, None)
         )
 
-    def test_render_content(self):
-        """
-        Tests to make sure the sample xml is rendered and that it forms a valid xmltree
-        that does not contain a display_name.
-        """
-        content = self.mod._render_content()
-        self.assertIsNotNone(content)
-        element = etree.fromstring(content)
-        self.assertIsNotNone(element)
-        self.assertFalse('display_name' in element.attrib, "Display Name should have been deleted from Content")
-
     def test_extract_instructions(self):
         """
         Tests to make sure that the instructions are correctly pulled from the sample xml above.
@@ -70,6 +59,6 @@ class TextAnnotationModuleTestCase(unittest.TestCase):
         Tests the function that passes in all the information in the context that will be used in templates/textannotation.html
         """
         context = self.mod.get_html()
-        for key in ['display_name', 'tag', 'source', 'element_id', 'instructions_html', 'content_html', 'annotation_storage']:
+        for key in ['display_name', 'tag', 'source', 'instructions_html', 'content_html', 'annotation_storage']:
             self.assertIn(key, context)
 

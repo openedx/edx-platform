@@ -59,16 +59,6 @@ class TextAnnotationModule(AnnotatableFields, XModule):
 
         self.instructions = self._extract_instructions(xmltree)
         self.content = etree.tostring(xmltree, encoding='unicode')
-        self.element_id = self.location.name
-        self.highlight_colors = ['yellow', 'orange', 'purple', 'blue', 'green']
-
-    def _render_content(self):
-        """ Renders annotatable content with annotation spans and returns HTML. """
-        xmltree = etree.fromstring(self.content)
-        if 'display_name' in xmltree.attrib:
-            del xmltree.attrib['display_name']
-
-        return etree.tostring(xmltree, encoding='unicode')
 
     def _extract_instructions(self, xmltree):
         """ Removes <instructions> from the xmltree and returns them as a string, otherwise None. """
@@ -85,9 +75,8 @@ class TextAnnotationModule(AnnotatableFields, XModule):
             'display_name': self.display_name_with_default,
             'tag': self.tags,
             'source': self.source,
-            'element_id': self.element_id,
             'instructions_html': self.instructions,
-            'content_html': self._render_content(),
+            'content_html': self.content,
             'annotation_storage': self.annotation_storage_url
         }
 
