@@ -41,11 +41,7 @@ def url_class(is_active):
     <%block name="extratabs" />
         % if masquerade is not UNDEFINED:
           % if staff_access and masquerade is not None:
-            % if get_language_bidi():
-                <li style="float:left"><a href="#" id="staffstatus">${_("Staff view")}</a></li>
-                % else:
-                <li style="float:right"><a href="#" id="staffstatus">${_("Staff view")}</a></li>
-                % endif
+                <li style='float:${"left" if get_language_bidi() else "right"}'><a href="#" id="staffstatus">${_("Staff view")}</a></li>
             % endif
         % endif
     </ol>
