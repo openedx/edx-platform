@@ -7,7 +7,7 @@ import pymongo
 import bson.son
 
 from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError
-from xmodule.modulestore.locator import BlockUsageLocator
+from xmodule.modulestore.locator import BlockUsageLocator, CourseLocator
 from xmodule.modulestore import Location
 import urllib
 
@@ -249,6 +249,42 @@ class LocMapperStore(object):
                 return result
         return None
 
+    def translate_location_to_course_locator(self, old_style_course_id, location, published=True):
+        """
+        Used when you only need the CourseLocator and not a full BlockUsageLocator. Probably only
+        useful for get_items which wildcards name or category.
+
+        :param course_id: old style course id
+        """
+        cached = self._get_course_locator_from_cache(old_style_course_id, published)
+        if cached:
+            return cached
+
+        location_id = self._interpret_location_course_id(old_style_course_id, location)
+        if old_style_course_id is None:
+            old_style_course_id = self._generate_location_course_id(location_id)
+
+        maps = self.location_map.find(location_id)
+        maps = list(maps)
+        if len(maps) == 0:
+            raise ItemNotFoundError()
+        elif len(maps) == 1:
+            entry = maps[0]
+        else:
+            # find entry w/o name, if any; otherwise, pick arbitrary
+            entry = maps[0]
+            for item in maps:
+                if 'name' not in item['_id']:
+                    entry = item
+                    break
+        published_course_locator = CourseLocator(package_id=entry['course_id'], branch=entry['prod_branch'])
+        draft_course_locator = CourseLocator(package_id=entry['course_id'], branch=entry['draft_branch'])
+        self._cache_course_locator(old_style_course_id, published_course_locator, draft_course_locator)
+        if published:
+            return published_course_locator
+        else:
+            return draft_course_locator
+
     def _add_to_block_map(self, location, location_id, block_map):
         '''add the given location to the block_map and persist it'''
         if self._block_id_is_guid(location.name):
@@ -353,13 +389,25 @@ class LocMapperStore(object):
         """
         See if the location x published pair is in the cache. If so, return the mapped locator.
         """
-        entry = self.cache.get('{}+{}'.format(old_course_id, location.url()))
+        entry = self.cache.get(old_course_id, {}).get(location.url(), None)
         if entry is not None:
             if published:
                 return entry[0]
             else:
                 return entry[1]
         return None
+
+    def _get_course_locator_from_cache(self, old_course_id, published):
+        """
+        Get the course Locator for this old course id
+        """
+        entry = self.cache.get(old_course_id)
+        if entry is not None:
+            entry = next(entry.itervalues())
+            if published:
+                return entry[0].as_course_locator()
+            else:
+                return entry[1].as_course_locator()
 
     def _get_location_from_cache(self, locator):
         """
@@ -374,6 +422,12 @@ class LocMapperStore(object):
         """
         return self.cache.get('courseId+{}'.format(locator_package_id))
 
+    def _cache_course_locator(self, old_course_id, published_course_locator, draft_course_locator):
+        """
+        For quick lookup of courses
+        """
+        self.cache.set(old_course_id, {old_course_id: (published_course_locator, draft_course_locator)})
+
     def _cache_location_map_entry(self, old_course_id, location, published_usage, draft_usage):
         """
         Cache the mapping from location to the draft and published Locators in entry.
@@ -385,5 +439,10 @@ class LocMapperStore(object):
             setmany['courseId+{}'.format(published_usage.package_id)] = location
         setmany[unicode(published_usage)] = location
         setmany[unicode(draft_usage)] = location
-        setmany['{}+{}'.format(old_course_id, location.url())] = (published_usage, draft_usage)
+        entry = self.cache.get(old_course_id, {})
+        if entry is None:
+            setmany[old_course_id] = {location.url(): (published_usage, draft_usage)}
+        else:
+            entry[location.url()] = (published_usage, draft_usage)
+            setmany[old_course_id] = entry
         self.cache.set_many(setmany)
