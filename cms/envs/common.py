@@ -63,6 +63,9 @@ FEATURES = {
     # edX has explicitly added them to the course creator group.
     'ENABLE_CREATOR_GROUP': False,
 
+    # whether to use password policy enforcement or not
+    'USE_PASSWORD_POLICY_ENFORCEMENT': False,
+
     # If set to True, Studio won't restrict the set of advanced components
     # to just those pre-approved by edX
     'ALLOW_ALL_ADVANCED_COMPONENTS': False,
@@ -473,6 +476,14 @@ TRACKING_BACKENDS = {
         }
     }
 }
+
+#### PASSWORD POLICY SETTINGS #####
+
+PASSWORD_MIN_LENGTH = None
+PASSWORD_MAX_LENGTH = None
+PASSWORD_COMPLEXITY = {}
+PASSWORD_MATCH_THRESHOLD = None
+PASSWORD_DICTIONARY = []
 
 # We're already logging events, and we don't want to capture user
 # names/passwords.  Heartbeat events are likely not interesting.
