@@ -24,24 +24,19 @@ window.ImageInput = (function ($, undefined) {
     return ImageInput;
 
     function ImageInputConstructor(elementId) {
-        var _this = this;
+        this.el = $('#imageinput_' + elementId);
+        this.crossEl = $('#cross_' + elementId);
+        this.inputEl = $('#input_' + elementId);
 
-        this.elementId = elementId;
-
-        this.el = $('#imageinput_' + this.elementId);
-        this.crossEl = $('#cross_' + this.elementId);
-        this.inputEl = $('#input_' + this.elementId);
-
-        this.el.on('click', function (event) {
-            _this.clickHandler(event);
-        });
+        this.el.on('click', this.clickHandler.bind(this));
     }
 
     function clickHandler(event) {
-        var posX = event.offsetX ?
-                event.offsetX : event.pageX - this.el[0].offsetLeft,
+        var offset = this.el.offset(),
+            posX = event.offsetX ?
+                event.offsetX : event.pageX - offset.left,
             posY = event.offsetY ?
-                event.offsetY : event.pageY - this.el[0].offsetTop,
+                event.offsetY : event.pageY - offset.top,
 
             // To reduce differences between values returned by different kinds
             // of browsers, we round `posX` and `posY`.

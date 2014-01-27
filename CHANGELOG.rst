@@ -5,6 +5,8 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Blades: Fix bug when image response in Firefox does not retain input. BLD-711.
+
 Blades: Give numerical response tolerance as a range. BLD-25.
 
 Blades: Allow user with BetaTester role correctly use LTI. BLD-641.
