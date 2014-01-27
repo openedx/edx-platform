@@ -89,7 +89,7 @@ class VideoAnnotationModule(AnnotatableFields, XModule):
         return self.system.render_template('videoannotation.html', context)
 
 
-class VideoAnnotationDescriptor(AnnotatableFields, RawDescriptor):
+class VideoAnnotationDescriptor(AnnotatableFields, RawDescriptor):  # pylint: disable=W0223
     ''' Video annotation descriptor '''
     module_class = VideoAnnotationModule
     mako_template = "widgets/raw-edit.html"
