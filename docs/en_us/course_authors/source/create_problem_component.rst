@@ -312,8 +312,8 @@ This setting has four options.
 | **Per Student**   | Individual students see the same     |
 |                   | version of the problem each time     |
 |                   | they look at it, but that version    |
-|                   | is different from what other         |
-|                   | students see.                        |
+|                   | is different from the version that   |
+|                   | other students see.                  |
 +-------------------+--------------------------------------+
 
 ===============
