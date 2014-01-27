@@ -241,7 +241,7 @@
                 state.videoProgressSlider.notifyThroughHandleEnd({end: true});
 
                 expect(state.videoProgressSlider.handle.attr('title'))
-                    .toBe('video ended');
+                    .toBe('Video ended');
 
                 expect('focus').toHaveBeenTriggeredOn(
                     state.videoProgressSlider.handle
@@ -252,7 +252,7 @@
                 state.videoProgressSlider.notifyThroughHandleEnd({end: false});
 
                 expect(state.videoProgressSlider.handle.attr('title'))
-                    .toBe('video position');
+                    .toBe('Video position');
 
                 expect('focus').not.toHaveBeenTriggeredOn(
                     state.videoProgressSlider.handle
@@ -272,6 +272,30 @@
                 });
             });
         });
+
+        it('getTimeDescription', function () {
+            var cases = {
+                    '0': '0 seconds',
+                    '1': '1 second',
+                    '10': '10 seconds',
+
+                    '60': '1 minute 0 seconds',
+                    '121': '2 minutes 1 second',
+
+                    '3670': '1 hour 1 minute 10 seconds',
+                    '21541': '5 hours 59 minutes 1 second',
+                },
+                getTimeDescription;
+
+            state = jasmine.initializePlayer();
+
+            getTimeDescription = state.videoProgressSlider.getTimeDescription;
+
+            $.each(cases, function(input, output) {
+                expect(getTimeDescription(input)).toBe(output);
+            });
+        });
+
     });
 
 }).call(this);
