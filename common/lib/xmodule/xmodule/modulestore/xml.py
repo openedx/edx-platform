@@ -568,6 +568,9 @@ class XMLModuleStore(ModuleStoreReadBase):
             if not os.path.isfile(filepath):
                 continue
 
+            if filepath.endswith('~'):	# skip *~ files
+                continue
+
             with open(filepath) as f:
                 try:
                     html = f.read().decode('utf-8')
