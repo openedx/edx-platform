@@ -289,11 +289,16 @@ answers, the student’s score is 0.5 out of 2 points.
 Randomization
 ===============
 
-You may have created a problem that can use a Python script to change specific values in the problem each time a different student sees the problem, or every time a single student tries to answer the problem. For example, the highlighted values in the problem below change each time a student submits an answer to the problem. 
+This setting specifies whether certain values in your problem change each time a different student accesses the problem, or each time a single student tries to answer the problem. For example, the highlighted values in the problem below change each time a student submits an answer to the problem. 
 
 .. image:: Images/Rerandomize.gif
 
-To "turn on" the ability to change these values, use the **Randomization** setting. This setting has four options.
+If you want to change, or "randomize," specific values in your problem, you have to do both the following:
+
+- Make sure that your problem contains a Python script that randomizes the values that you want. 
+- Enable randomization in the Problem component. 
+
+To enable randomization, select an option for the **Randomization** setting. This setting has four options.
 
 +-------------------+--------------------------------------+
 | **Always**        | Students see a different version of  |
