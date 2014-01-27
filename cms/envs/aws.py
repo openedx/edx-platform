@@ -122,6 +122,12 @@ SITE_NAME = ENV_TOKENS['SITE_NAME']
 LOG_DIR = ENV_TOKENS['LOG_DIR']
 
 CACHES = ENV_TOKENS['CACHES']
+# Cache used for location mapping -- called many times with the same key/value
+# in a given request.
+CACHES['loc_cache'] = {
+    'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    'LOCATION': 'edx_location_mem_cache',
+}
 
 SESSION_COOKIE_DOMAIN = ENV_TOKENS.get('SESSION_COOKIE_DOMAIN')
 SESSION_ENGINE = ENV_TOKENS.get('SESSION_ENGINE', SESSION_ENGINE)
