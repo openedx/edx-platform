@@ -92,7 +92,7 @@ class TextAnnotationModule(AnnotatableFields, XModule):
         return self.system.render_template('textannotation.html', context)
 
 
-class TextAnnotationDescriptor(AnnotatableFields, RawDescriptor):
+class TextAnnotationDescriptor(AnnotatableFields, RawDescriptor):  # pylint: disable=W0223
     ''' Text Annotation Descriptor '''
     module_class = TextAnnotationModule
     mako_template = "widgets/raw-edit.html"
