@@ -5,6 +5,8 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Blades: Give numerical response tolerance as a range. BLD-25.
+
 Blades: Allow user with BetaTester role correctly use LTI. BLD-641.
 
 Blades: Video player persist speed preferences between videos. BLD-237.

@@ -1061,6 +1061,48 @@ class NumericalResponseTest(ResponseTest):
     # We blend the line between integration (using evaluator) and exclusively
     # unit testing the NumericalResponse (mocking out the evaluator)
     # For simple things its not worth the effort.
+
+    def test_grade_range_tolerance(self):
+        problem_setup = [
+            # [given_asnwer, [list of correct responses], [list of incorrect responses]]
+            ['[5, 7)', ['5', '6', '6.999'], ['4.999', '7']],
+            ['[1.6e-5, 1.9e24)', ['0.000016', '1.6*10^-5', '1.59e24'], ['1.59e-5', '1.9e24', '1.9*10^24']],
+            ['[0, 1.6e-5]', ['1.6*10^-5'], ["2"]],
+            ['(1.6e-5, 10]', ["2"], ['1.6*10^-5']],
+        ]
+        for given_answer, correct_responses, incorrect_responses in problem_setup:
+            problem = self.build_problem(answer=given_answer)
+            self.assert_multiple_grade(problem, correct_responses, incorrect_responses)
+
+    def test_grade_range_tolerance_exceptions(self):
+        # no complex number in range tolerance staff answer
+        problem = self.build_problem(answer='[1j, 5]')
+        input_dict = {'1_2_1': '3'}
+        with self.assertRaises(StudentInputError):
+            problem.grade_answers(input_dict)
+
+        # no complex numbers in student ansers to range tolerance problems
+        problem = self.build_problem(answer='(1, 5)')
+        input_dict = {'1_2_1': '1*J'}
+        with self.assertRaises(StudentInputError):
+            problem.grade_answers(input_dict)
+
+        # test isnan variable
+        problem = self.build_problem(answer='(1, 5)')
+        input_dict = {'1_2_1': ''}
+        with self.assertRaises(StudentInputError):
+            problem.grade_answers(input_dict)
+
+        # test invalid range tolerance answer
+        with self.assertRaises(StudentInputError):
+            problem = self.build_problem(answer='(1 5)')
+
+        # test empty boundaries
+        problem = self.build_problem(answer='(1, ]')
+        input_dict = {'1_2_1': '3'}
+        with self.assertRaises(StudentInputError):
+            problem.grade_answers(input_dict)
+
     def test_grade_exact(self):
         problem = self.build_problem(answer=4)
         correct_responses = ["4", "4.0", "4.00"]
@@ -1084,17 +1126,17 @@ class NumericalResponseTest(ResponseTest):
         Default tolerance for all responsetypes is 1e-3%.
         """
         problem_setup = [
-          #[given_asnwer, [list of correct responses], [list of incorrect responses]]
-            [1, ["1"], ["1.1"],],
-            [2.0, ["2.0"], ["1.0"],],
-            [4, ["4.0", "4.00004"],  ["4.00005"]],
+            # [given_answer, [list of correct responses], [list of incorrect responses]]
+            [1, ["1"], ["1.1"]],
+            [2.0, ["2.0"], ["1.0"]],
+            [4, ["4.0", "4.00004"], ["4.00005"]],
             [0.00016, ["1.6*10^-4"], [""]],
             [0.000016, ["1.6*10^-5"], ["0.000165"]],
             [1.9e24, ["1.9*10^24"], ["1.9001*10^24"]],
             [2e-15, ["2*10^-15"], [""]],
             [3141592653589793238., ["3141592653589793115."], [""]],
-            [0.1234567,  ["0.123456", "0.1234561"], ["0.123451"]],
-            [1e-5,  ["1e-5", "1.0e-5"], ["-1e-5", "2*1e-5"]],
+            [0.1234567, ["0.123456", "0.1234561"], ["0.123451"]],
+            [1e-5, ["1e-5", "1.0e-5"], ["-1e-5", "2*1e-5"]],
         ]
         for given_answer, correct_responses, incorrect_responses in problem_setup:
             problem = self.build_problem(answer=given_answer)
