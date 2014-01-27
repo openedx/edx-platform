@@ -49,6 +49,7 @@ coverage.xml
 cover/
 cover_html/
 reports/
+jscover.log.*
 
 ### Installation artifacts
 *.egg-info
