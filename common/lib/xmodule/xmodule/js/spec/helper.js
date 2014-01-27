@@ -16,7 +16,7 @@
             );
 
             Player.getDuration.andReturn(60);
-            Player.getAvailablePlaybackRates.andReturn(['0.50', '1.0', '1.50', '2.0']);
+            Player.getAvailablePlaybackRates.andReturn([0.50, 1.0, 1.50, 2.0]);
 
             return Player;
         },

@@ -5,6 +5,9 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Blades: Bugfix "In Firefox YouTube video with start time plays from 00:00:00".
+BLD-708.
+
 Blades: Fix bug when image response in Firefox does not retain input. BLD-711.
 
 Blades: Give numerical response tolerance as a range. BLD-25.

@@ -204,6 +204,52 @@
             });
         });
 
+        describe('YouTube video in FireFox will cue first', function () {
+            var oldUserAgent;
+
+            beforeEach(function () {
+                oldUserAgent = window.navigator.userAgent;
+                window.navigator.userAgent = 'firefox';
+
+                state = jasmine.initializePlayer('video.html', {
+                  start: 10,
+                  end: 30
+                });
+            });
+
+            afterEach(function () {
+                window.navigator.userAgent = oldUserAgent;
+            });
+
+            it('cue is called, skipOnEndedStartEndReset is set', function () {
+                state.videoPlayer.updatePlayTime(10);
+                expect(state.videoPlayer.player.cueVideoById).toHaveBeenCalledWith('cogebirgzzM', 10);
+                expect(state.videoPlayer.skipOnEndedStartEndReset).toBe(true);
+            });
+
+            it('Handling cue state', function () {
+                spyOn(state.videoPlayer, 'play');
+
+                state.videoPlayer.startTime = 10;
+                state.videoPlayer.onStateChange({data: 5});
+
+                expect(state.videoPlayer.player.seekTo).toHaveBeenCalledWith(10, true);
+                expect(state.videoPlayer.play).toHaveBeenCalled();
+            });
+
+            it('when cued, onEnded resets start and end time only the second time', function () {
+                state.videoPlayer.skipOnEndedStartEndReset = true;
+                state.videoPlayer.onEnded();
+                expect(state.videoPlayer.startTime).toBe(10);
+                expect(state.videoPlayer.endTime).toBe(30);
+
+                state.videoPlayer.skipOnEndedStartEndReset = undefined;
+                state.videoPlayer.onEnded();
+                expect(state.videoPlayer.startTime).toBe(0);
+                expect(state.videoPlayer.endTime).toBe(null);
+            });
+        });
+
         describe('checking start and end times', function () {
             var miniTestSuite = [
                 {
