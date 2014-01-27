@@ -92,7 +92,10 @@ class GroupBasedRole(AccessRole):
         If a user is a member of any of the groups in the list, then
         they will be consider a member of the Role
         """
-        self._group_names = [name.lower() for name in group_names]
+        if isinstance(group_names, list):
+            self._group_names = [name.lower() for name in group_names]
+        else:
+            raise TypeError('group_names must be list.  Passed {0}'.format(group_names))
 
     def has_user(self, user):
         """
@@ -239,4 +242,4 @@ class CourseCreatorRole(GroupBasedRole):
     """
     ROLE = "course_creator_group"
     def __init__(self, *args, **kwargs):
-        super(CourseCreatorRole, self).__init__(self.ROLE, *args, **kwargs)
+        super(CourseCreatorRole, self).__init__([self.ROLE], *args, **kwargs)

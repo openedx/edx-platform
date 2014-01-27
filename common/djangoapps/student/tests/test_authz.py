@@ -7,8 +7,9 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from xmodule.modulestore import Location
 from django.core.exceptions import PermissionDenied
+from nose.tools import raises
 
-from student.roles import CourseInstructorRole, CourseStaffRole, CourseCreatorRole
+from student.roles import GroupBasedRole, CourseInstructorRole, CourseStaffRole, CourseCreatorRole
 from student.tests.factories import AdminFactory
 from student.auth import has_access, add_users, remove_users
 
@@ -40,6 +41,11 @@ class CreatorGroupTest(TestCase):
             self.user.is_staff = True
             self.assertTrue(has_access(self.user, CourseCreatorRole()))
 
+    @raises(TypeError)
+    def test_group_based_role(self):
+        """ GroupBasedRole raises exception ('TypeError') if passed parameter ('group_names') is not list. """
+        GroupBasedRole(group_names=CourseCreatorRole.ROLE)
+
     def test_creator_group_enabled_nonempty(self):
         """ Tests creator group feature on, user added. """
         with mock.patch.dict('django.conf.settings.FEATURES', {"ENABLE_CREATOR_GROUP": True}):
@@ -49,6 +55,10 @@ class CreatorGroupTest(TestCase):
             # check that a user who has not been added to the group still returns false
             user_not_added = User.objects.create_user('testuser2', 'test+courses2@edx.org', 'foo2')
             self.assertFalse(has_access(user_not_added, CourseCreatorRole()))
+
+            # check that '_group_names' of 'CourseCreatorRole' contains default 'ROLE' ('course_creator_group')
+            # pylint: disable=protected-access
+            self.assertTrue(CourseCreatorRole.ROLE in CourseCreatorRole()._group_names)
 
             # remove first user from the group and verify that CourseCreatorRole().has_user now returns false
             remove_users(self.admin, CourseCreatorRole(), self.user)
