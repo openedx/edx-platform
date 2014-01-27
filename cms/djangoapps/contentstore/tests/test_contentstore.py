@@ -133,7 +133,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         # just pick one vertical
         descriptor = store.get_items(Location('i4x', 'edX', 'simple', 'vertical', None, None))[0]
-        locator = loc_mapper().translate_location(course.location.course_id, descriptor.location, False, True)
+        locator = loc_mapper().translate_location(course.location.course_id, descriptor.location, True, True)
         resp = self.client.get_html(locator.url_reverse('unit'))
         self.assertEqual(resp.status_code, 200)
         _test_no_locations(self, resp)
@@ -144,12 +144,11 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
     def test_advanced_components_in_edit_unit(self):
         # This could be made better, but for now let's just assert that we see the advanced modules mentioned in the page
         # response HTML
-        self.check_components_on_page(ADVANCED_COMPONENT_TYPES, ['Word cloud',
-                                                                 'Annotation',
-                                                                 'Text Annotation',
-                                                                 'Video Annotation',
-                                                                 'Open Response Assessment',
-                                                                 'Peer Grading Interface'])
+        self.check_components_on_page(
+            ADVANCED_COMPONENT_TYPES,
+            ['Word cloud', 'Annotation', 'Text Annotation', 'Video Annotation',
+             'Open Response Assessment', 'Peer Grading Interface'],
+        )
 
     def test_advanced_components_require_two_clicks(self):
         self.check_components_on_page(['word_cloud'], ['Word cloud'])
@@ -161,7 +160,8 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # just pick one vertical
         descriptor = store.get_items(Location('i4x', 'edX', 'simple', 'vertical', None, None))[0]
         location = descriptor.location.replace(name='.' + descriptor.location.name)
-        locator = loc_mapper().translate_location(course_items[0].location.course_id, location, False, True)
+        locator = loc_mapper().translate_location(
+            course_items[0].location.course_id, location, add_entry_if_missing=True)
 
         resp = self.client.get_html(locator.url_reverse('unit'))
         self.assertEqual(resp.status_code, 400)
@@ -449,7 +449,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         """ Returns the locator for a given tab. """
         tab_location = 'i4x://edX/999/static_tab/{0}'.format(tab['url_slug'])
         return loc_mapper().translate_location(
-            course.location.course_id, Location(tab_location), False, True
+            course.location.course_id, Location(tab_location), True, True
         )
 
     def _create_static_tabs(self):
@@ -457,7 +457,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         module_store = modulestore('direct')
         CourseFactory.create(org='edX', course='999', display_name='Robot Super Course')
         course_location = Location('i4x', 'edX', '999', 'course', 'Robot_Super_Course', None)
-        new_location = loc_mapper().translate_location(course_location.course_id, course_location, False, True)
+        new_location = loc_mapper().translate_location(course_location.course_id, course_location, True, True)
 
         ItemFactory.create(
             parent_location=course_location,
@@ -512,7 +512,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         # also try a custom response which will trigger the 'is this course in whitelist' logic
         locator = loc_mapper().translate_location(
-            course_items[0].location.course_id, location, False, True
+            course_items[0].location.course_id, location, True, True
         )
         resp = self.client.get_html(locator.url_reverse('xblock'))
         self.assertEqual(resp.status_code, 200)
@@ -534,7 +534,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # make sure the parent points to the child object which is to be deleted
         self.assertTrue(sequential.location.url() in chapter.children)
 
-        location = loc_mapper().translate_location(course_location.course_id, sequential.location, False, True)
+        location = loc_mapper().translate_location(course_location.course_id, sequential.location, True, True)
         self.client.delete(location.url_reverse('xblock'), {'recurse': True, 'all_versions': True})
 
         found = False
@@ -685,7 +685,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         # go through the website to do the delete, since the soft-delete logic is in the view
         course = course_items[0]
-        location = loc_mapper().translate_location(course.location.course_id, course.location, False, True)
+        location = loc_mapper().translate_location(course.location.course_id, course.location, True, True)
         url = location.url_reverse('assets/', '/c4x/edX/toy/asset/sample_static.txt')
         resp = self.client.delete(url)
         self.assertEqual(resp.status_code, 204)
@@ -1062,7 +1062,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         )
 
         # Unit test fails in Jenkins without this.
-        loc_mapper().translate_location(course_location.course_id, course_location, False, True)
+        loc_mapper().translate_location(course_location.course_id, course_location, True, True)
 
         items = module_store.get_items(stub_location.replace(category='vertical', name=None))
         self._check_verticals(items, course_location.course_id)
@@ -1353,7 +1353,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         # Assert is here to make sure that the course being tested actually has verticals (units) to check.
         self.assertGreater(len(items), 0)
         for descriptor in items:
-            unit_locator = loc_mapper().translate_location(course_id, descriptor.location, False, True)
+            unit_locator = loc_mapper().translate_location(course_id, descriptor.location, True, True)
             resp = self.client.get_html(unit_locator.url_reverse('unit'))
             self.assertEqual(resp.status_code, 200)
             _test_no_locations(self, resp)
@@ -1645,7 +1645,7 @@ class ContentStoreTest(ModuleStoreTestCase):
 
         import_from_xml(modulestore('direct'), 'common/test/data/', ['simple'])
         loc = Location(['i4x', 'edX', 'simple', 'course', '2012_Fall', None])
-        new_location = loc_mapper().translate_location(loc.course_id, loc, False, True)
+        new_location = loc_mapper().translate_location(loc.course_id, loc, True, True)
 
         resp = self._show_course_overview(loc)
         self.assertEqual(resp.status_code, 200)
@@ -1666,14 +1666,14 @@ class ContentStoreTest(ModuleStoreTestCase):
 
         # go look at a subsection page
         subsection_location = loc.replace(category='sequential', name='test_sequence')
-        subsection_locator = loc_mapper().translate_location(loc.course_id, subsection_location, False, True)
+        subsection_locator = loc_mapper().translate_location(loc.course_id, subsection_location, True, True)
         resp = self.client.get_html(subsection_locator.url_reverse('subsection'))
         self.assertEqual(resp.status_code, 200)
         _test_no_locations(self, resp)
 
         # go look at the Edit page
         unit_location = loc.replace(category='vertical', name='test_vertical')
-        unit_locator = loc_mapper().translate_location(loc.course_id, unit_location, False, True)
+        unit_locator = loc_mapper().translate_location(loc.course_id, unit_location, True, True)
         resp = self.client.get_html(unit_locator.url_reverse('unit'))
         self.assertEqual(resp.status_code, 200)
         _test_no_locations(self, resp)
@@ -1681,7 +1681,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         def delete_item(category, name):
             """ Helper method for testing the deletion of an xblock item. """
             del_loc = loc.replace(category=category, name=name)
-            del_location = loc_mapper().translate_location(loc.course_id, del_loc, False, True)
+            del_location = loc_mapper().translate_location(loc.course_id, del_loc, True, True)
             resp = self.client.delete(del_location.url_reverse('xblock'))
             self.assertEqual(resp.status_code, 204)
             _test_no_locations(self, resp, status_code=204, html=False)
@@ -1883,7 +1883,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         """
         Show the course overview page.
         """
-        new_location = loc_mapper().translate_location(location.course_id, location, False, True)
+        new_location = loc_mapper().translate_location(location.course_id, location, True, True)
         resp = self.client.get_html(new_location.url_reverse('course/', ''))
         _test_no_locations(self, resp)
         return resp
@@ -1998,7 +1998,7 @@ def _course_factory_create_course():
     Creates a course via the CourseFactory and returns the locator for it.
     """
     course = CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
-    return loc_mapper().translate_location(course.location.course_id, course.location, False, True)
+    return loc_mapper().translate_location(course.location.course_id, course.location, True, True)
 
 
 def _get_course_id(test_course_data):

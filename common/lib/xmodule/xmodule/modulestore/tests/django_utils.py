@@ -4,8 +4,8 @@ Modulestore configuration for test cases.
 
 from uuid import uuid4
 from django.test import TestCase
-from xmodule.modulestore.django import editable_modulestore, \
-    clear_existing_modulestores, loc_mapper
+from xmodule.modulestore.django import (
+    editable_modulestore, clear_existing_modulestores, loc_mapper)
 from xmodule.contentstore.django import contentstore
 
 
