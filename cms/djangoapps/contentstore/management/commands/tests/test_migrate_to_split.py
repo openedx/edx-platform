@@ -3,13 +3,13 @@ Unittests for importing a course via management command
 """
 import unittest
 
+from django.contrib.auth.models import User
 from django.core.management import CommandError, call_command
 from django.test.utils import override_settings
 from contentstore.management.commands.migrate_to_split import Command
 from contentstore.tests.modulestore_config import TEST_MODULESTORE
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.django import loc_mapper
 
@@ -47,8 +47,11 @@ class TestMigrateToSplit(ModuleStoreTestCase):
 
     def setUp(self):
         super(TestMigrateToSplit, self).setUp()
+        uname = 'testuser'
+        email = 'test+courses@edx.org'
+        password = 'foo'
+        self.user = User.objects.create_user(uname, email, password)
         self.course = CourseFactory()
-        self.user = UserFactory()
 
     def test_happy_path(self):
         call_command(
