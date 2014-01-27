@@ -895,7 +895,7 @@ body.unit {
       display: inline-block;
       float: right;
       vertical-align: middle;
-      text-align: center; 
+      text-align: center;
     }
 
     &.editing {
@@ -1212,7 +1212,7 @@ body.unit {
 
 .edit-state-public {
   .delete-draft,
-  .component-actions,
+  .wrapper-component-action-header,
   .new-component-item,
   .editing-draft-alert,
   .publish-draft-message,
