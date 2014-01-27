@@ -42,12 +42,13 @@ class VideoAnnotationModuleTestCase(unittest.TestCase):
         xmltree = etree.fromstring(self.sample_xml)
 
         expected_xml = u"<div><p>Video Test Instructions.</p></div>"
-        actual_xml = self.mod._extract_instructions(xmltree)
+        actual_xml = self.mod._extract_instructions(xmltree)  # pylint: disable=W0212
+
         self.assertIsNotNone(actual_xml)
         self.assertEqual(expected_xml.strip(), actual_xml.strip())
 
         xmltree = etree.fromstring('<annotatable>foo</annotatable>')
-        actual = self.mod._extract_instructions(xmltree)
+        actual = self.mod._extract_instructions(xmltree)  # pylint: disable=W0212
         self.assertIsNone(actual)
 
     def test_get_extension(self):
@@ -57,8 +58,8 @@ class VideoAnnotationModuleTestCase(unittest.TestCase):
         """
         expectedyoutube = 'video/youtube'
         expectednotyoutube = 'video/mp4'
-        result1 = self.mod._get_extension(self.sample_sourceurl)
-        result2 = self.mod._get_extension(self.sample_youtubeurl)
+        result1 = self.mod._get_extension(self.sample_sourceurl)  # pylint: disable=W0212
+        result2 = self.mod._get_extension(self.sample_youtubeurl)  # pylint: disable=W0212
         self.assertEqual(expectedyoutube, result2)
         self.assertEqual(expectednotyoutube, result1)
 
@@ -66,6 +67,6 @@ class VideoAnnotationModuleTestCase(unittest.TestCase):
         """
         Tests to make sure variables passed in truly exist within the html once it is all rendered.
         """
-        context = self.mod.get_html()
+        context = self.mod.get_html()  # pylint: disable=W0212
         for key in ['display_name', 'instructions_html', 'sourceUrl', 'typeSource', 'poster', 'annotation_storage']:
             self.assertIn(key, context)

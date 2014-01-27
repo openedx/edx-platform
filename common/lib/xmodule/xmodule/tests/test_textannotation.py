@@ -46,19 +46,18 @@ class TextAnnotationModuleTestCase(unittest.TestCase):
         xmltree = etree.fromstring(self.sample_xml)
 
         expected_xml = u"<div><p>Test Instructions.</p></div>"
-        actual_xml = self.mod._extract_instructions(xmltree)
+        actual_xml = self.mod._extract_instructions(xmltree)  # pylint: disable=W0212
         self.assertIsNotNone(actual_xml)
         self.assertEqual(expected_xml.strip(), actual_xml.strip())
 
         xmltree = etree.fromstring('<annotatable>foo</annotatable>')
-        actual = self.mod._extract_instructions(xmltree)
+        actual = self.mod._extract_instructions(xmltree)  # pylint: disable=W0212
         self.assertIsNone(actual)
 
     def test_get_html(self):
         """
         Tests the function that passes in all the information in the context that will be used in templates/textannotation.html
         """
-        context = self.mod.get_html()
+        context = self.mod.get_html()  # pylint: disable=W0212
         for key in ['display_name', 'tag', 'source', 'instructions_html', 'content_html', 'annotation_storage']:
             self.assertIn(key, context)
-

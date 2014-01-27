@@ -82,7 +82,7 @@ def _sign(secret, to_sign):
             return bytes(string, 'utf-8')
         except TypeError:
             return bytes(string)
-    return _encode(hmac.new(portable_bytes(secret), portable_bytes(to_sign), hashlib.sha256).digest())
+    return _encode(hmac.new(portable_bytes(secret), portable_bytes(to_sign), hashlib.sha256).digest())  # pylint: disable=E1101
 
 
 def _encode_token(secret, claims):

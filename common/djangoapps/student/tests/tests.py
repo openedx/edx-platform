@@ -575,7 +575,6 @@ class Token(ModuleStoreTestCase):
         self.user = User.objects.create(username="username", email="username")
         self.req = self.request_factory.post('/token?course_id=edx/100/test_course', {'user': self.user})
         self.req.user = self.user
-    @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 
     def test_token(self):
         expected = HttpResponse("eyJhbGciOiAiSFMyNTYiLCAidHlwIjogIkpXVCJ9.eyJpc3N1ZWRBdCI6ICIyMDE0LTAxLTIzVDE5OjM1OjE3LjUyMjEwNC01OjAwIiwgImNvbnN1bWVyS2V5IjogInh4eHh4eHh4LXh4eHgteHh4eC14eHh4LXh4eHh4eHh4eHh4eCIsICJ1c2VySWQiOiAidXNlcm5hbWUiLCAidHRsIjogODY0MDB9.OjWz9mzqJnYuzX-f3uCBllqJUa8PVWJjcDy_McfxLvc", mimetype="text/plain")

@@ -93,3 +93,14 @@ class VideoAnnotationDescriptor(AnnotatableFields, RawDescriptor):
     ''' Video annotation descriptor '''
     module_class = VideoAnnotationModule
     mako_template = "widgets/raw-edit.html"
+
+    def get_html(self):
+        return self.module_class().get_html()
+
+    @property
+    def non_editable_metadata_fields(self):
+        non_editable_fields = super(VideoAnnotationDescriptor, self).non_editable_metadata_fields
+        non_editable_fields.extend([
+            VideoAnnotationDescriptor.annotation_storage_url
+        ])
+        return non_editable_fields
