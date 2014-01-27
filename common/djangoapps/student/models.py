@@ -11,7 +11,7 @@ file and check it in at the same time as your model changes. To do that,
 3. Add the migration file created in edx-platform/common/djangoapps/student/migrations/
 """
 import crum
-from datetime import datetime
+from datetime import datetime, timedelta
 import hashlib
 import json
 import logging
@@ -287,6 +287,68 @@ class PendingEmailChange(models.Model):
 
 EVENT_NAME_ENROLLMENT_ACTIVATED = 'edx.course.enrollment.activated'
 EVENT_NAME_ENROLLMENT_DEACTIVATED = 'edx.course.enrollment.deactivated'
+
+
+class LoginFailures(models.Model):
+    """
+    This model will keep track of failed login attempts
+    """
+    user = models.ForeignKey(User)
+    failure_count = models.IntegerField(default=0)
+    lockout_until = models.DateTimeField(null=True)
+
+    @classmethod
+    def is_feature_enabled(cls):
+        """
+        Returns whether the feature flag around this functionality has been set
+        """
+        return settings.FEATURES['ENABLE_MAX_FAILED_LOGIN_ATTEMPTS']
+
+    @classmethod
+    def is_user_locked_out(cls, user):
+        """
+        Static method to return in a given user has his/her account locked out
+        """
+        try:
+            record = LoginFailures.objects.get(user=user)
+            if not record.lockout_until:
+                return False
+
+            now = datetime.now(UTC)
+            until = record.lockout_until
+            is_locked_out = until and now < until
+
+            return is_locked_out
+        except ObjectDoesNotExist:
+            return False
+
+    @classmethod
+    def increment_lockout_counter(cls, user):
+        """
+        Ticks the failed attempt counter
+        """
+        record, _ = LoginFailures.objects.get_or_create(user=user)
+        record.failure_count = record.failure_count + 1
+        max_failures_allowed = settings.MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED
+
+        # did we go over the limit in attempts
+        if record.failure_count >= max_failures_allowed:
+            # yes, then store when this account is locked out until
+            lockout_period_secs = settings.MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS
+            record.lockout_until = datetime.now(UTC) + timedelta(seconds=lockout_period_secs)
+
+        record.save()
+
+    @classmethod
+    def clear_lockout_counter(cls, user):
+        """
+        Removes the lockout counters (normally called after a successful login)
+        """
+        try:
+            entry = LoginFailures.objects.get(user=user)
+            entry.delete()
+        except ObjectDoesNotExist:
+            return
 
 
 class CourseEnrollment(models.Model):

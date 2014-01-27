@@ -1,18 +1,27 @@
 # -*- coding: utf-8 -*-
 import datetime
 from south.db import db
-from south.v2 import DataMigration
+from south.v2 import SchemaMigration
 from django.db import models
 
-class Migration(DataMigration):
+
+class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        "Write your forwards methods here."
-        # Note: Remember to use orm['appname.ModelName'] rather than "from appname.models..."
-        db.execute("DROP TABLE student_anonymoususerid_temp_archive")
+        # Adding model 'LoginFailures'
+        db.create_table('student_loginfailures', (
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
+            ('failure_count', self.gf('django.db.models.fields.IntegerField')(default=0)),
+            ('lockout_until', self.gf('django.db.models.fields.DateTimeField')(null=True)),
+        ))
+        db.send_create_signal('student', ['LoginFailures'])
+
 
     def backwards(self, orm):
-        "Write your backwards methods here."
+        # Deleting model 'LoginFailures'
+        db.delete_table('student_loginfailures')
+
 
     models = {
         'auth.group': {
@@ -75,6 +84,13 @@ class Migration(DataMigration):
             'email': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
         },
+        'student.loginfailures': {
+            'Meta': {'object_name': 'LoginFailures'},
+            'failure_count': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'lockout_until': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"})
+        },
         'student.pendingemailchange': {
             'Meta': {'object_name': 'PendingEmailChange'},
             'activation_key': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '32', 'db_index': 'True'}),
@@ -129,4 +145,3 @@ class Migration(DataMigration):
     }
 
     complete_apps = ['student']
-    symmetrical = True
