@@ -93,13 +93,13 @@ def segment_pofile(filename, segments):
             else:
                 msg_segments.add(filename)
 
+        assert msg_segments
         if len(msg_segments) == 1:
             # This message belongs in this segment.
             segment_file = msg_segments.pop()
             segment_po_files[segment_file].append(msg)
         else:
-            # Either it's in more than one segment, or none, so put it back in
-            # the main file.
+            # It's in more than one segment, so put it back in the main file.
             remaining_po.append(msg)
 
     # Write out the results.
@@ -112,9 +112,6 @@ def segment_pofile(filename, segments):
             LOG.info(writing_msg.format(file=out_file, num=len(pofile)))
             pofile.save(out_file)
             files_written.add(out_file)
-
-    LOG.info(writing_msg.format(file=filename, num=len(remaining_po)))
-    remaining_po.save(filename)
 
     return files_written
 

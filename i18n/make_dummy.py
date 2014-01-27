@@ -42,11 +42,9 @@ def main(file, locale):
     for msg in pofile:
         converter.convert_msg(msg)
 
-    # If any message has a plural, then the file needs plural information.
     # Apply declaration for English pluralization rules so that ngettext will
     # do something reasonable.
-    if any(m.msgid_plural for m in pofile):
-        pofile.metadata['Plural-Forms'] = 'nplurals=2; plural=(n != 1);'
+    pofile.metadata['Plural-Forms'] = 'nplurals=2; plural=(n != 1);'
 
     new_file = new_filename(file, locale)
     create_dir_if_necessary(new_file)
