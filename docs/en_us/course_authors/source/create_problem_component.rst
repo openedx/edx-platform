@@ -289,13 +289,11 @@ answers, the student’s score is 0.5 out of 2 points.
 Randomization
 ===============
 
-You may want to set up a problem so that specific values are different each time a different student sees the problem, or even every time a single student tries to answer the problem. When you use the **Randomization** setting, Studio uses a Python script that you supply to change the values that you specify, as in the example below. 
-
+You may have created a problem that can use a Python script to change specific values in the problem each time a different student sees the problem, or every time a single student tries to answer the problem. For example, the highlighted values in the problem below change each time a student submits an answer to the problem. 
 
 .. image:: Images/Rerandomize.gif
 
-
-This setting has four options.
+To "turn on" the ability to change these values, use the **Randomization** setting. This setting has four options.
 
 +-------------------+--------------------------------------+
 | **Always**        | Students see a different version of  |
