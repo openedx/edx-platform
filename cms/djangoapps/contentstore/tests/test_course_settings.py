@@ -312,7 +312,7 @@ class CourseGradingTest(CourseTestCase):
         descriptor = get_modulestore(self.course.location).get_item(self.course.location)
         section_grader_type = CourseGradingModel.get_section_grader_type(self.course_locator)
 
-        self.assertEqual('Not Graded', section_grader_type['graderType'])
+        self.assertEqual('notgraded', section_grader_type['graderType'])
         self.assertEqual(None, descriptor.format)
         self.assertEqual(False, descriptor.graded)
 
@@ -325,12 +325,12 @@ class CourseGradingTest(CourseTestCase):
         self.assertEqual('Homework', descriptor.format)
         self.assertEqual(True, descriptor.graded)
 
-        # Change the grader type back to Not Graded, which should also unmark the section as graded
-        CourseGradingModel.update_section_grader_type(self.course, 'Not Graded')
+        # Change the grader type back to notgraded, which should also unmark the section as graded
+        CourseGradingModel.update_section_grader_type(self.course, 'notgraded')
         descriptor = get_modulestore(self.course.location).get_item(self.course.location)
         section_grader_type = CourseGradingModel.get_section_grader_type(self.course_locator)
 
-        self.assertEqual('Not Graded', section_grader_type['graderType'])
+        self.assertEqual('notgraded', section_grader_type['graderType'])
         self.assertEqual(None, descriptor.format)
         self.assertEqual(False, descriptor.graded)
 
@@ -406,10 +406,10 @@ class CourseGradingTest(CourseTestCase):
         response = self.client.get_json(grade_type_url + '?fields=graderType')
         self.assertEqual(json.loads(response.content).get('graderType'), u'Homework')
         # and unset
-        response = self.client.ajax_post(grade_type_url, {'graderType': u'Not Graded'})
+        response = self.client.ajax_post(grade_type_url, {'graderType': u'notgraded'})
         self.assertEqual(200, response.status_code)
         response = self.client.get_json(grade_type_url + '?fields=graderType')
-        self.assertEqual(json.loads(response.content).get('graderType'), u'Not Graded')
+        self.assertEqual(json.loads(response.content).get('graderType'), u'notgraded')
 
 
 class CourseMetadataEditingTest(CourseTestCase):
