@@ -564,6 +564,10 @@ class StringResponseTest(ResponseTest):
         problem = self.build_problem(answer=".*tre+", case_sensitive=False, regexp=True)
         self.assert_grade(problem, "There is a tree", "correct")
 
+        # test with case_sensitive not specified
+        problem = self.build_problem(answer=".*tre+", regexp=True)
+        self.assert_grade(problem, "There is a tree", "correct")
+
         answers = [
             "Martin Luther King Junior",
             "Doctor Martin Luther King Junior",
@@ -611,6 +615,7 @@ class StringResponseTest(ResponseTest):
         self.assert_grade(problem, u"î", "incorrect")
         self.assert_grade(problem, u"o", "incorrect")
 
+
     def test_backslash_and_unicode_regexps(self):
         """
         Test some special cases of [unicode] regexps.
@@ -643,26 +648,39 @@ class StringResponseTest(ResponseTest):
 
     def test_case_sensitive(self):
         # Test single answer
-        problem = self.build_problem(answer="Second", case_sensitive=True)
+        problem_specified = self.build_problem(answer="Second", case_sensitive=True)
+        
+        # should also be case_sensitive if case sensitivity is not specified
+        problem_not_specified = self.build_problem(answer="Second")
+        problems = [problem_specified, problem_not_specified]
 
-        # Exact string should be correct
-        self.assert_grade(problem, "Second", "correct")
+        for problem in problems:
+            # Exact string should be correct
+            self.assert_grade(problem, "Second", "correct")
 
-        # Other strings and the lowercase version of the string are incorrect
-        self.assert_grade(problem, "Other String", "incorrect")
-        self.assert_grade(problem, "second", "incorrect")
+            # Other strings and the lowercase version of the string are incorrect
+            self.assert_grade(problem, "Other String", "incorrect")
+            self.assert_grade(problem, "second", "incorrect")
 
         # Test multiple answers
         answers = ["Second", "Third", "Fourth"]
-        problem = self.build_problem(answer="sample_answer", case_sensitive=True, additional_answers=answers)
 
-        for answer in answers:
-            # Exact string should be correct
-            self.assert_grade(problem, answer, "correct")
+        # set up problems
+        problem_specified = self.build_problem(
+            answer="sample_answer", case_sensitive=True, additional_answers=answers
+        )
+        problem_not_specified = self.build_problem(
+            answer="sample_answer", additional_answers=answers
+        )
+        problems = [problem_specified, problem_not_specified]
+        for problem in problems:
+            for answer in answers:
+                # Exact string should be correct
+                self.assert_grade(problem, answer, "correct")
 
-        # Other strings and the lowercase version of the string are incorrect
-        self.assert_grade(problem, "Other String", "incorrect")
-        self.assert_grade(problem, "second", "incorrect")
+            # Other strings and the lowercase version of the string are incorrect
+            self.assert_grade(problem, "Other String", "incorrect")
+            self.assert_grade(problem, "second", "incorrect")
 
     def test_bogus_escape_not_raised(self):
         """

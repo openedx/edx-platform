@@ -700,7 +700,7 @@ class StringResponseXMLFactory(ResponseXMLFactory):
         """
         # Retrieve the **kwargs
         answer = kwargs.get("answer", None)
-        case_sensitive = kwargs.get("case_sensitive", True)
+        case_sensitive = kwargs.get("case_sensitive", None)
         hint_list = kwargs.get('hints', None)
         hint_fn = kwargs.get('hintfn', None)
         regexp = kwargs.get('regexp', None)
@@ -714,9 +714,12 @@ class StringResponseXMLFactory(ResponseXMLFactory):
         response_element.set("answer", unicode(answer))
 
         # Set the case sensitivity and regexp:
-        type_value = "cs" if case_sensitive else "ci"
+        type_value = ''
+        if case_sensitive is not None:
+            type_value += "cs" if case_sensitive else "ci"
         type_value += ' regexp' if regexp else ''
-        response_element.set("type", type_value)
+        if type_value:
+            response_element.set("type", type_value.strip())
 
         # Add the hints if specified
         if hint_list or hint_fn:

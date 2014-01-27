@@ -1054,8 +1054,11 @@ class StringResponse(LoncapaResponse):
     def setup_response(self):
 
         self.backward = '_or_' in self.xml.get('answer').lower()
-        self.regexp = 'regexp' in self.xml.get('type').lower().split(' ')
-        self.case_insensitive = 'ci' in self.xml.get('type').lower().split(' ')
+        self.regexp = False
+        self.case_insensitive = False
+        if self.xml.get('type') is not None:
+            self.regexp = 'regexp' in self.xml.get('type').lower().split(' ')
+            self.case_insensitive = 'ci' in self.xml.get('type').lower().split(' ')
 
         # backward compatibility, can be removed in future, it is up to @Lyla Fisher.
         if self.backward:
