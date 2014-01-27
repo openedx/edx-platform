@@ -91,7 +91,7 @@ Transcript Format
 
 Your transcript must be an .srt file.
 
-.. note:: Some past courses have used .sjson files for video transcripts. If your course uses this format, see :ref:`Steps for sjson files`. We don't recommend that you use .sjson files.
+.. note:: Some past courses have used .sjson files for video transcripts. If transcripts in your course uses this format, see :ref:`Steps for sjson files`. We don't recommend that you use .sjson files.
 
 
 *****************************
@@ -136,9 +136,9 @@ Step 4. Create a Video Component
 
 #. When the new video component appears, click **Edit**. The video editor opens to the **Basic** tab.
 
-   .. image:: Images/
+   .. image:: Images/VideoComponentEditor.gif
 
-   You'll replace the default values with your own.
+   You'll replace the default values with your own. 
    
 #. In the **Display Name** field, enter the name you want students to see when they hover the mouse 
    over the unit in the course accordion. This text also appears as a header for the video.
@@ -154,11 +154,15 @@ Step 4. Create a Video Component
 
 #. Next to **Timed Transcript**, select an option.
 
-   - If edX has a transcript for your video, Studio automatically finds the transcript and associates the transcript with the video. (If you want to modify the transcript, click **Download to Edit**. You can then make your changes and upload the new file by clicking **Upload New Timed Transcript**.)
+   - If edX already has a transcript for your video, Studio automatically finds the transcript and associates the transcript with the video. For example, edX may have a transcript for your video if you're using a video from an existing course.
+     
+     If you want to modify the transcript, click **Download to Edit**. You can then make your changes and upload the new file by clicking **Upload New Timed Transcript**.
 
    - If your video has a transcript on YouTube, Studio automatically finds the transcript and asks if you want to import it. To use this YouTube transcript, click **Import from YouTube**. (If you want to modify the YouTube transcript, click **Download to Edit**. You can then make your changes and upload the new file by clicking **Upload New Timed Transcript**.)
 
-   - If neither edX nor YouTube has a transcript for your video, click **Upload New Timed Transcript** to upload a transcript file from your computer.
+   - If neither edX nor YouTube has a transcript for your video, and your transcript uses the .srt format, click **Upload New Timed Transcript** to upload the transcript file from your computer. 
+
+     .. note:: If your transcript uses the .sjson format, do not use this setting. For more information, see :ref:`Steps for sjson files`.
 
 #. Optionally, click **Advanced** to set more options for the video. For a description of each option, see the table below.
 
@@ -171,18 +175,21 @@ Advanced Options
    :widths: 20 80
    :header-rows: 0
 
-   * - **Download Video**
-     - If you've uploaded a copy of your video to a backup website such as Amazon S3, enter the external URL for this video. Note that this URL must end in .mpeg, .mp4, .ogg, or .webm.
+   * - **Display Name**
+     - The name that you want your students to see. This is the same as the **Display Name** field on the **Basic** tab.
    * - **End Time**
      - The time, formatted as hours, minutes, and seconds (HH:MM:SS), when you want the video to end.
    * - **HTML5 Transcript**
      - If you uploaded an .srt file on the **Basic** tab, the name of your .srt file appears in this field by default. You don't have to change this setting.
+       If your transcript uses an .sjson file, see :ref:`Steps for sjson files`.
    * - **Show Transcript**
      - Specifies whether you want the transcript to show by default. Students can always turn transcripts on or off while they watch the video.
    * - **Start Time**
      - The time, formatted as hours, minutes, and seconds (HH:MM:SS), when you want the video to begin. 
    * - **Transcript Download Allowed**
      - Specifies whether you want to allow your students to download a copy of the transcript. 
+   * - **Video Download Allowed**
+     - Specifies whether you want to allow your students to download a copy of the video.
    * - **Video Sources**
      - Additional locations where you've posted the video. This field must contain a URL that ends in .mpeg, .mp4, .ogg, or .webm.
    * - **YouTube ID, YouTube ID for .75x speed, YouTube ID for 1.25x speed, YouTube ID for 1.5x speed**
@@ -194,13 +201,28 @@ Advanced Options
 Steps for .sjson Files
 **********************
 
-If your course uses .sjson files, you'll (overview of process).
+If your course uses .sjson files, you'll upload the .sjson file for the video to the **Files & Uploads** page, and then specify the name of the .sjson file in the Video component.
 
-.. note:: We don't recommend that you use .sjson files.
+.. note:: Only older courses that have used .sjson files in the past should use .sjson files. All new courses should use .srt files. 
 
+#. Obtain the .sjson file from a media company such as 3Play.
+#. Change the name of the .sjson file to use the following format:
+   
+   ``subs_FILENAME.srt.sjson``
+   
+   For example, if the name of your video is **Lecture1a**, the name of your .sjson file must be **subs_Lecture1a.srt.sjson**.
 #. Upload the .sjson file for your video to the **Files & Uploads** page.
 #. Create a new video component.
-#. On the **Basic** tab, (do anything?).
+#. On the **Basic** tab, enter the name that you want students to see in the **Display Name** field.
+#. In the **Video URL** field, enter the URL of the video. For example, the URL may resemble one of the following.
+
+   ::
+   
+      http://youtu.be/OEoXaMPEzfM
+      http://www.youtube.com/watch?v=OEoXaMPEzfM
+      https://s3.amazonaws.com/edx-course-videos/edx-edx101/EDXSPCPJSP13-G030300.mp4
+
 #. Click the **Advanced** tab.
-#. In the **HTML5 Transcript** field, enter the name of your .sjson file. Do not include ".sjson".
+#. In the **HTML5 Transcript** field, enter the file name of your video. Do not include "subs\_" or ".sjson". For the example in step 2, you would only enter **Lecture1a**.
 #. Set the other options that you want.
+#. Click **Save**.
