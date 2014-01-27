@@ -65,6 +65,7 @@ function () {
             play: play,
             renderCaption: renderCaption,
             renderElements: renderElements,
+            renderLanguages: renderLanguages,
             resize: resize,
             scrollCaption: scrollCaption,
             search: search,
@@ -105,14 +106,19 @@ function () {
      *         and the CC button will be hidden.
      */
     function renderElements() {
-        this.videoCaption.loaded = false;
+        var Caption = this.videoCaption;
+        Caption.loaded = false;
 
-        this.videoCaption.subtitlesEl = this.el.find('ol.subtitles');
-        this.videoCaption.hideSubtitlesEl = this.el.find('a.hide-subtitles');
+        Caption.subtitlesEl = this.el.find('ol.subtitles');
+        Caption.container = this.el.find('.lang');
+        Caption.hideSubtitlesEl = this.el.find('a.hide-subtitles');
 
-        if (!this.videoCaption.fetchCaption()) {
-            this.videoCaption.hideCaptions(true);
-            this.videoCaption.hideSubtitlesEl.hide();
+        Caption.renderLanguages();
+
+
+        if (!Caption.fetchCaption()) {
+            Caption.hideCaptions(true);
+            Caption.hideSubtitlesEl.hide();
         }
     }
 
@@ -218,6 +224,10 @@ function () {
         $.ajaxWithPrefix({
             url: _this.videoCaption.captionURL(),
             notifyOnError: false,
+            data: {
+                videoId: this.youtubeId(),
+                language: this.getCurrentLanguage()
+            },
             success: function (captions) {
                 _this.videoCaption.captions = captions.text;
                 _this.videoCaption.start = captions.start;
@@ -351,47 +361,86 @@ function () {
         this.videoCaption.onMouseEnter();
     }
 
-    function renderCaption() {
-        var container = $('<ol>'),
-            _this = this,
-            autohideHtml5 = this.config.autohideHtml5;
+    function renderLanguages() {
+        var self = this,
+            menu = $('<ol class="langs-list">'),
+            currentLang = 'ua' || this.getCurrentLanguage(),
+            langsList = this.config.transcripts;
 
-        this.container.after(this.videoCaption.subtitlesEl);
-        this.el.find('.video-controls .secondary-controls')
-            .append(this.videoCaption.hideSubtitlesEl);
+        $.each(langsList, function(code, label) {
+            var li = $('<li data-lang-code="' + code + '" />'),
+                link = $('<a href="javascript:void(0);">' + label + '</a>');
 
-        this.videoCaption.setSubtitlesHeight();
+            if (currentLang === code) {
+                li.addClass('active');
+            }
 
-        if ((this.videoType === 'html5' && autohideHtml5) || !autohideHtml5) {
-            this.videoCaption.fadeOutTimeout = this.config.fadeOutTimeout;
-            this.videoCaption.subtitlesEl.addClass('html5');
-        }
+            li.append(link);
+            menu.append(li);
+        });
 
-        $.each(this.videoCaption.captions, function(index, text) {
+        this.videoCaption.container.append(menu);
+
+        menu.find('a').on('click', function (e) {
+            var el = $(e.currentTarget).parent(),
+                Caption = self.videoCaption,
+                langCode = el.data('lang-code');
+
+            self.lang = langCode;
+
+            Caption.fetchCaption();
+            // Caption.subtitlesEl.find('li').not('.spacing').remove();
+            // Caption.rendered = false;
+            // buildCaptions(self.container, Caption.captions, Caption.start);
+            // Caption.rendered = true;
+        });
+    }
+
+    function buildCaptions (container, captions, start) {
+        $.each(captions, function(index, text) {
             var liEl = $('<li>');
 
             liEl.html(text);
 
             liEl.attr({
                 'data-index': index,
-                'data-start': _this.videoCaption.start[index],
+                'data-start': start[index],
                 'tabindex': 0
             });
 
             container.append(liEl);
         });
+    }
 
-        this.videoCaption.subtitlesEl
+    function renderCaption() {
+        var Caption = this.videoCaption,
+            container = $('<ol>'),
+            autohideHtml5 = this.config.autohideHtml5;
+
+        this.container.after(Caption.subtitlesEl);
+        this.el.find('.video-controls .secondary-controls')
+            .append(Caption.hideSubtitlesEl);
+
+        Caption.setSubtitlesHeight();
+
+        if ((this.videoType === 'html5' && autohideHtml5) || !autohideHtml5) {
+            Caption.fadeOutTimeout = this.config.fadeOutTimeout;
+            Caption.subtitlesEl.addClass('html5');
+        }
+
+        buildCaptions(container, Caption.captions, Caption.start);
+
+        Caption.subtitlesEl
             .html(container.html())
             .find('li[data-index]')
             .on({
-                mouseover:  this.videoCaption.captionMouseOverOut,
-                mouseout:   this.videoCaption.captionMouseOverOut,
-                mousedown:  this.videoCaption.captionMouseDown,
-                click:      this.videoCaption.captionClick,
-                focus:      this.videoCaption.captionFocus,
-                blur:       this.videoCaption.captionBlur,
-                keydown:    this.videoCaption.captionKeyDown
+                mouseover:  Caption.captionMouseOverOut,
+                mouseout:   Caption.captionMouseOverOut,
+                mousedown:  Caption.captionMouseDown,
+                click:      Caption.captionClick,
+                focus:      Caption.captionFocus,
+                blur:       Caption.captionBlur,
+                keydown:    Caption.captionKeyDown
             });
 
         // Enables or disables automatic scrolling of the captions when the
@@ -399,35 +448,35 @@ function () {
         // through them as it interferes with that action. Initially, have this
         // flag enabled as we assume mouse use. Then, if the first caption
         // (through forward tabbing) or the last caption (through backwards
-        // tabbing) gets the focus, disable that feature. Renable it if tabbing
+        // tabbing) gets the focus, disable that feature. Re-enable it if tabbing
         // then cycles out of the the captions.
-        this.videoCaption.autoScrolling = true;
+        Caption.autoScrolling = true;
         // Keeps track of where the focus is situated in the array of captions.
         // Used to implement the automatic scrolling behavior and decide if the
         // outline around a caption has to be hidden or shown on a mouseenter
         // or mouseleave. Initially, no caption has the focus, set the
         // index to -1.
-        this.videoCaption.currentCaptionIndex = -1;
+        Caption.currentCaptionIndex = -1;
         // Used to track if the focus is coming from a click or tabbing. This
         // has to be known to decide if, when a caption gets the focus, an
         // outline has to be drawn (tabbing) or not (mouse click).
-        this.videoCaption.isMouseFocus = false;
+        Caption.isMouseFocus = false;
 
-        // Set top and bottom spacing heigh and make sure they are taken out of
+        // Set top and bottom spacing height and make sure they are taken out of
         // the tabbing order.
-        this.videoCaption.subtitlesEl
+        Caption.subtitlesEl
             .prepend(
                 $('<li class="spacing">')
-                    .height(this.videoCaption.topSpacingHeight())
+                    .height(Caption.topSpacingHeight())
                     .attr('tabindex', -1)
             )
             .append(
                 $('<li class="spacing">')
-                    .height(this.videoCaption.bottomSpacingHeight())
+                    .height(Caption.bottomSpacingHeight())
                     .attr('tabindex', -1)
             );
 
-        this.videoCaption.rendered = true;
+        Caption.rendered = true;
     }
 
     // On mouseOver, hide the outline of a caption that has been tabbed to.
@@ -775,7 +824,17 @@ function () {
         this.videoCaption.subtitlesEl.css({
             maxHeight: this.videoCaption.captionHeight() - height
         });
-     }
+    }
+
+    function destroy() {
+        this.videoCaption.subtitlesEl.off();
+        this.videoCaption.hideSubtitlesEl
+            .remove()
+            .removeClass('html5');
+
+        this.videoCaption.subtitlesEl.empty();
+        this.videoCaption.rendered = false;
+    }
 });
 
 }(RequireJS.requirejs, RequireJS.require, RequireJS.define));

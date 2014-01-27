@@ -76,6 +76,7 @@ function (VideoPlayer, CookieStorage) {
         var methodsDict = {
             bindTo: bindTo,
             fetchMetadata: fetchMetadata,
+            getCurrentLanguage: getCurrentLanguage,
             getDuration: getDuration,
             getVideoMetadata: getVideoMetadata,
             initialize: initialize,
@@ -681,6 +682,10 @@ function (VideoPlayer, CookieStorage) {
         } catch (err) {
             return this.metadata[this.youtubeId('1.0')].duration;
         }
+    }
+
+    function getCurrentLanguage() {
+        return this.lang || 'en';
     }
 
     /*

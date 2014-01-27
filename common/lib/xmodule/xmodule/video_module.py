@@ -145,12 +145,15 @@ class VideoFields(object):
         default=1.0
     )
 
-    # Data format: {de': 'german_translation.srt', 'ua': 'ukrainian_translation.srt'}
+    # Data format: {de': 'german_translation', 'ua': 'ukrainian_translation'}
     transcripts = Dict(
         help="Additional translations for transcripts",
         display_name="Additional translations for transcripts",
         scope=Scope.settings,
-        default={}
+        default={
+                'de': 'german_translation',
+                'ua': 'ukrainian_translation',
+            }
         )
 
 
@@ -245,12 +248,12 @@ class VideoModule(VideoFields, XModule):
             'start': self.start_time.total_seconds(),
             'sub': self.sub,
             'track': track_url,
+            'transcripts': json.dumps(self.transcripts),
             'youtube_streams': _create_youtube_string(self),
             # TODO: Later on the value 1500 should be taken from some global
             # configuration setting field.
             'yt_test_timeout': 1500,
             'yt_test_url': settings.YOUTUBE_TEST_URL,
-            'transcripts': json.dumps(self.transcripts)
         })
 
     def get_transcript(self, subs_id):
