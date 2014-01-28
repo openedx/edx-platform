@@ -72,7 +72,10 @@ def save_subs_to_store(subs, subs_id, item, language='en'):
     """
     filedata = json.dumps(subs, indent=2)
     mime_type = 'application/json'
-    filename = '{0}_subs_{1}.srt.sjson'.format(language, subs_id)
+    if language == 'en':
+        filename = 'subs_{0}.srt.sjson'.format(subs_id)
+    else:
+        filename = '{0}_subs_{1}.srt.sjson'.format(language, subs_id)
 
     content_location = StaticContent.compute_location(
         item.location.org, item.location.course, filename
