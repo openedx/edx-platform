@@ -286,6 +286,7 @@ class @StaffGrading
 
   get_problem_list: () ->
     @list_view = true
+    @render_view(true)
     @backend.post('get_problem_list', {}, @ajax_callback)
 
   submit_and_get_next: () ->
@@ -340,7 +341,7 @@ class @StaffGrading
     @max_score = 0
     @state = state_no_data
 
-  render_view: () ->
+  render_view: (before_ajax) ->
     # clear the problem list and breadcrumbs
     @problem_list.html('''
         <tr>
@@ -372,10 +373,13 @@ class @StaffGrading
     @meta_info_wrapper.toggle(show_grading_elements)
     @action_button.hide()
 
-    if @list_view
-      @render_list()
+    if before_ajax
+      @scroll_to_top()
     else
-      @render_problem()
+      if @list_view
+        @render_list()
+      else
+        @render_problem()
 
   problem_link:(problem) ->
     link = $('<a>').attr('href', "javascript:void(0)").append(
