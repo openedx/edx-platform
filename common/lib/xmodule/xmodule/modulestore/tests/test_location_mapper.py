@@ -397,14 +397,20 @@ class TrivialCache(object):
     def __init__(self):
         self.cache = {}
 
-    def get(self, key):
+    def get(self, key, default=None):
         """
         Mock the .get
         """
-        return self.cache.get(key)
+        return self.cache.get(key, default)
 
     def set_many(self, entries):
         """
         mock set_many
         """
         self.cache.update(entries)
+
+    def set(self, key, entry):
+        """
+        mock set
+        """
+        self.cache[key] = entry

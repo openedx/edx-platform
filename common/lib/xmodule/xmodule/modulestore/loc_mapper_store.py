@@ -256,7 +256,10 @@ class LocMapperStore(object):
 
         :param course_id: old style course id
         """
-        # doesn't use caching as cache requires full location w/o wildcards
+        cached = self._get_course_locator_from_cache(old_style_course_id, published)
+        if cached:
+            return cached
+
         location_id = self._interpret_location_course_id(old_style_course_id, location)
         if old_style_course_id is None:
             old_style_course_id = self._generate_location_course_id(location_id)
@@ -274,11 +277,13 @@ class LocMapperStore(object):
                 if 'name' not in item['_id']:
                     entry = item
                     break
+        published_course_locator = CourseLocator(package_id=entry['course_id'], branch=entry['prod_branch'])
+        draft_course_locator = CourseLocator(package_id=entry['course_id'], branch=entry['draft_branch'])
+        self._cache_course_locator(old_style_course_id, published_course_locator, draft_course_locator)
         if published:
-            branch = entry['prod_branch']
+            return published_course_locator
         else:
-            branch = entry['draft_branch']
-        return CourseLocator(package_id=entry['course_id'], branch=branch)
+            return draft_course_locator
 
     def _add_to_block_map(self, location, location_id, block_map):
         '''add the given location to the block_map and persist it'''
@@ -392,6 +397,17 @@ class LocMapperStore(object):
                 return entry[1]
         return None
 
+    def _get_course_locator_from_cache(self, old_course_id, published):
+        """
+        Get the course Locator for this old course id
+        """
+        entry = self.cache.get(old_course_id)
+        if entry is not None:
+            if published:
+                return entry[0].as_course_locator()
+            else:
+                return entry[1].as_course_locator()
+
     def _get_location_from_cache(self, locator):
         """
         See if the locator is in the cache. If so, return the mapped location.
@@ -405,6 +421,12 @@ class LocMapperStore(object):
         """
         return self.cache.get('courseId+{}'.format(locator_package_id))
 
+    def _cache_course_locator(self, old_course_id, published_course_locator, draft_course_locator):
+        """
+        For quick lookup of courses
+        """
+        self.cache.set(old_course_id, (published_course_locator, draft_course_locator))
+
     def _cache_location_map_entry(self, old_course_id, location, published_usage, draft_usage):
         """
         Cache the mapping from location to the draft and published Locators in entry.
@@ -417,4 +439,5 @@ class LocMapperStore(object):
         setmany[unicode(published_usage)] = location
         setmany[unicode(draft_usage)] = location
         setmany['{}+{}'.format(old_course_id, location.url())] = (published_usage, draft_usage)
+        setmany[old_course_id] = (published_usage, draft_usage)
         self.cache.set_many(setmany)

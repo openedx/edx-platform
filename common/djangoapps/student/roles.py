@@ -239,4 +239,4 @@ class CourseCreatorRole(GroupBasedRole):
     """
     ROLE = "course_creator_group"
     def __init__(self, *args, **kwargs):
-        super(CourseCreatorRole, self).__init__(self.ROLE, *args, **kwargs)
+        super(CourseCreatorRole, self).__init__([self.ROLE], *args, **kwargs)
