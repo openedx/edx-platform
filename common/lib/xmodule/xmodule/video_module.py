@@ -12,6 +12,7 @@ in XML.
 
 import json
 import logging
+import os
 
 from HTMLParser import HTMLParser
 from lxml import etree
@@ -32,11 +33,17 @@ from xmodule.exceptions import NotFoundError
 from xblock.core import XBlock
 from xblock.fields import Scope, String, Float, Boolean, List, Integer, ScopeIds, Dict
 from xmodule.fields import RelativeTime
+from xmodule.util.transcripts_utils import (
+    generate_subs_from_source,
+    save_subs_to_store,
+    generate_subs,
+)
 
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore
 from xblock.runtime import KvsFieldData
 
 log = logging.getLogger(__name__)
+
 
 class VideoFields(object):
     """Fields for `VideoModule` and `VideoDescriptor`."""
@@ -161,6 +168,13 @@ class VideoFields(object):
             }
         )
 
+    preferred_language = String(
+        help="Preferred language for transcripts",
+        display_name="Preferred language for transcripts",
+        scope=Scope.preferences,
+        default="en"
+        )
+
 
 class VideoModule(VideoFields, XModule):
     """
@@ -259,6 +273,8 @@ class VideoModule(VideoFields, XModule):
             # configuration setting field.
             'yt_test_timeout': 1500,
             'yt_test_url': settings.YOUTUBE_TEST_URL,
+            'transcripts': json.dumps(self.transcripts),
+            'transcript_translation_url': self.runtime.handler_url(self, 'transcript_translation')
         })
 
     def get_transcript(self, subs_id):
@@ -284,7 +300,6 @@ class VideoModule(VideoFields, XModule):
 
         return HTMLParser().unescape("\n".join(text))
 
-
     @XBlock.handler
     def download_transcript(self, __, ___):
         """
@@ -308,11 +323,114 @@ class VideoModule(VideoFields, XModule):
 
         return response
 
+    @XBlock.handler
+    def transcript_translation(self, request, __):
+        """
+        This is called to get transcript file for specific language.
+
+        request.get contains:
+          language code ("en")
+          video_id ("example")
+          language ("ge")
+        """
+        try:
+            video_id = request.GET.get('videoId')
+            language = request.GET.get('language')
+        except Exception:
+            log.info("Invalid transcript_translation GET request parameters.")
+            return Response(status=400)
+
+        if language != 'en' and language != self.preferred_language:
+            self.preferred_language = language
+
+        if language not in self.transcripts:
+            log.info("transcript_translation is not available for given language.")
+            return Response(status=404)
+
+        youtube_ids = {self.youtube_id_1_0: 1.0}
+
+        # for flash youtube player
+        if self.youtube_id_0_75:
+            youtube_ids[self.youtube_id_0_75] = 0.75
+        if self.youtube_id_1_25:
+            youtube_ids[self.youtube_id_1_25] = 1.25
+        if self.youtube_id_1_5:
+            youtube_ids[self.youtube_id_1_5] = 1.5
+
+        if video_id not in youtube_ids:
+            log.info("Incorrect video_id %s for transcript translation", video_id)
+            return Response(status=404)
+
+        speed = youtube_ids[video_id]
+        filename = '{0}_subs_{0}.sjson'.format(language, video_id)
+        content_location = StaticContent.compute_location(
+            self.location.org, self.location.course, filename
+        )
+
+        try:
+            sjson_transcripts = contentstore().find(content_location)
+        except (NotFoundError):  # generating
+            generate_1_0_version = False
+            log.info("Can't find content in storage for %s transcript: generating.", video_id)
+            # check if sjson version of transcripts for 1.0 speed exists:
+            if speed != 1.0:
+                content_location_1_0 = StaticContent.compute_location(
+                    self.location.org,
+                    self.location.course,
+                    '{0}_subs_{0}.sjson'.format(language, self.youtube_id_1_0)
+                )
+                try:
+                    sjson_transcripts_1_0 = contentstore().find(content_location_1_0)
+                except (NotFoundError):
+                    generate_1_0_version = True
+            else:
+                generate_1_0_version = True
+
+            if generate_1_0_version: #generating for all speeds
+                try:
+                    content_location_uploaded_srt = StaticContent.compute_location(
+                        self.location.org, self.location.course, self.transcripts[language]
+                    )
+                    srt_transcripts = contentstore().find(content_location_uploaded_srt)
+                except (NotFoundError):
+                    log.info("No srt file for language %s for transcript", language)
+                    return Response(status=404)
+                source_subs_ext = os.path.splitext(self.transcripts[language])[1][1:]
+                source_subs_filedata = json.loads(srt_transcripts)
+                try:
+                    generate_subs_from_source(
+                        {speed: video_id for video_id, speed in youtube_ids.iteritems()},
+                        source_subs_ext,
+                        source_subs_filedata,
+                        self,
+                        language
+                    )
+                except Exception as exc:
+                    log.info(exc.msg)
+                    return Response(status=404)
+
+                sjson_transcripts = contentstore().find(content_location)
+            else: # generate only for needed speed != 1.0
+                # at this point we should have srt.sjson for speed 1.0 in database
+                source_subs = json.loads(contentstore().find(content_location_1_0))
+                subs = generate_subs(youtube_ids[video_id], 1.0, source_subs)
+                save_subs_to_store(subs, video_id,self, language)
+                sjson_transcripts = json.dumps(subs, indent=2)
+
+        response = Response(
+            sjson_transcripts,
+            headerlist=[
+                ('Content-Disposition', 'attachment; filename="{0}.srt"'.format(self.sub)),
+            ])
+        response.content_type='application/json'
+
+        return response
 
 class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor):
     """Descriptor for `VideoModule`."""
     module_class = VideoModule
     download_transcript = module_attr('download_transcript')
+    transcript_translation = module_attr('transcript_translation')
 
     tabs = [
         {
@@ -387,6 +505,7 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
             else:
                 editable_fields.pop('source')
 
+        editable_fields.pop('transcripts')
         return editable_fields
 
     @classmethod
