@@ -22,10 +22,10 @@
 </%def>
 
 <!DOCTYPE html>
-<!--[if IE 7]><html class="ie ie7 lte9 lte8 lte7" lang="en-us"><![endif]-->
-<!--[if IE 8]><html class="ie ie8 lte9 lte8" lang="en-us"><![endif]-->
-<!--[if IE 9]><html class="ie ie9 lte9" lang="en-us"><![endif]-->
-<!--[if gt IE 9]><!--><html lang="en-us"><!--<![endif]-->
+<!--[if IE 7]><html class="ie ie7 lte9 lte8 lte7" lang="${LANGUAGE_CODE}"><![endif]-->
+<!--[if IE 8]><html class="ie ie8 lte9 lte8" lang="${LANGUAGE_CODE}"><![endif]-->
+<!--[if IE 9]><html class="ie ie9 lte9" lang="${LANGUAGE_CODE}"><![endif]-->
+<!--[if gt IE 9]><!--><html lang="${LANGUAGE_CODE}"><!--<![endif]-->
 <head>
   <%block name="title">
     % if stanford_theme_enabled():
@@ -102,7 +102,7 @@
 
 </head>
 
-<body class="<%block name='bodyclass'/>">
+<body class="<%block name='bodyclass'/> lang_${LANGUAGE_CODE}">
   <a class="nav-skip" href="#content">${_("Skip to this view's content")}</a>
 
   <%include file="mathjax_accessible.html" />

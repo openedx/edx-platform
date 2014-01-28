@@ -277,7 +277,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.request',
     'django.core.context_processors.static',
     'django.contrib.messages.context_processors.messages',
-    #'django.core.context_processors.i18n',
+    'django.core.context_processors.i18n',
     'django.contrib.auth.context_processors.auth',  # this is required for admin
     'django.core.context_processors.csrf',
 
@@ -635,7 +635,6 @@ MIDDLEWARE_CLASSES = (
 
     'django.contrib.messages.middleware.MessageMiddleware',
     'track.middleware.TrackMiddleware',
-    'edxmako.middleware.MakoMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
 
     'course_wiki.course_nav.Middleware',
@@ -651,6 +650,8 @@ MIDDLEWARE_CLASSES = (
 
     # catches any uncaught RateLimitExceptions and returns a 403 instead of a 500
     'ratelimitbackend.middleware.RateLimitMiddleware',
+    # needs to run after locale middleware (or anything that modifies the request context)
+    'edxmako.middleware.MakoMiddleware',
 
     # For A/B testing
     'waffle.middleware.WaffleMiddleware',

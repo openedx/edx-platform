@@ -113,6 +113,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.request',
     'django.core.context_processors.static',
     'django.contrib.messages.context_processors.messages',
+    'django.core.context_processors.i18n',
     'django.contrib.auth.context_processors.auth',  # this is required for admin
     'django.core.context_processors.csrf',
     'dealer.contrib.django.staff.context_processor',  # access git revision
@@ -165,12 +166,13 @@ MIDDLEWARE_CLASSES = (
 
     'django.contrib.messages.middleware.MessageMiddleware',
     'track.middleware.TrackMiddleware',
-    'edxmako.middleware.MakoMiddleware',
 
     # Detects user-requested locale from 'accept-language' header in http request
     'django.middleware.locale.LocaleMiddleware',
 
     'django.middleware.transaction.TransactionMiddleware',
+    # needs to run after locale middleware (or anything that modifies the request context)
+    'edxmako.middleware.MakoMiddleware',
 
     # catches any uncaught RateLimitExceptions and returns a 403 instead of a 500
     'ratelimitbackend.middleware.RateLimitMiddleware',
