@@ -6,7 +6,7 @@
 <%inherit file="../main.html" />
 <%namespace name='static' file='../static_content.html'/>
 <%block name="bodyclass">discussion</%block>
-<%block name="title"><title>${_("Discussion - {course_number}").format(course_number=course.display_number_with_default) | h}</title></%block>
+<%block name="pagetitle">${_("Discussion - {course_number}").format(course_number=course.display_number_with_default) | h}</%block>
 
 <%block name="headextra">
 <%static:css group='style-course-vendor'/>

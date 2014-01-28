@@ -1062,6 +1062,7 @@ INSTALLED_APPS = (
 
     # Dark-launching languages
     'dark_lang',
+    'microsite_configuration',
 )
 
 ######################### MARKETING SITE ###############################

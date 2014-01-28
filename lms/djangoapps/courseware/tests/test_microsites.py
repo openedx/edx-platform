@@ -72,7 +72,7 @@ class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertContains(resp, 'This is a Test Microsite Overlay')   # Overlay test message
         self.assertContains(resp, 'test_microsite/images/header-logo.png')  # logo swap
         self.assertContains(resp, 'test_microsite/css/test_microsite.css')  # css override
-        self.assertContains(resp, '<title>Test Microsite</title>')   # page title
+        self.assertContains(resp, 'Test Microsite')   # page title
 
         # assert that test course display name is visible
         self.assertContains(resp, 'Robot_Super_Course')

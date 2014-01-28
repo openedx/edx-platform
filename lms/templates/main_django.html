@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-{% load compressed %}{% load sekizai_tags i18n %}{% load url from future %}{% load staticfiles %}
+{% load compressed %}{% load sekizai_tags i18n microsite %}{% load url from future %}{% load staticfiles %}
 <html lang="{{LANGUAGE_CODE}}">
 <head>
-  {# "edX" should *not* be translated #}
-  {% block title %}<title>edX</title>{% endblock %}
+  {% block title %}<title>{% platform_name %}</title>{% endblock %}
 
   <link rel="icon" type="image/x-icon" href="{% static "images/favicon.ico" %}" />
 

@@ -1,8 +1,10 @@
 <%! from django.utils.translation import ugettext as _ %>
-<%inherit file="/main.html" />
 <%! from django.core.urlresolvers import reverse %>
+
+<%inherit file="../main.html" />
 <%namespace name='static' file='/static_content.html'/>
 
+<%block name="pagetitle">${_("Instructor Dashboard")}</%block>
 <%block name="headextra">
 <%static:css group='style-course-vendor'/>
 <%static:css group='style-course'/>

@@ -57,7 +57,7 @@ def i_visit_the_dashboard(step):
 @step('I should be on the dashboard page$')
 def i_should_be_on_the_dashboard(step):
     assert world.is_css_present('section.container.dashboard')
-    assert world.browser.title == 'Dashboard'
+    assert 'Dashboard' in world.browser.title
 
 
 @step(u'I (?:visit|access|open) the courses page$')

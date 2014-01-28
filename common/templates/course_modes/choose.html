@@ -1,16 +1,15 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
+
 <%inherit file="../main.html" />
 
 <%block name="bodyclass">register verification-process step-select-track ${'is-upgrading' if upgrade else ''}</%block>
-<%block name="title">
-  <title>
+<%block name="pagetitle">
     %if upgrade:
       ${_("Upgrade Your Registration for {} | Choose Your Track").format(course_name)}
     %else:
       ${_("Register for {} | Choose Your Track").format(course_name)}
     %endif
-  </title>
 </%block>
 
 <%block name="js_extra">
