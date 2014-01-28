@@ -6,8 +6,6 @@
 # two letter language codes reference:
 # see http://www.loc.gov/standards/iso639-2/php/code_list.php
 #
-# po files to turn into dummy strings are specified in configuration file
-#
 # Django will not localize in languages that django itself has not been
 # localized for. So we are using a well-known language (default='eo').
 # Django languages are listed in django.conf.global_settings.LANGUAGES
@@ -19,10 +17,8 @@
 #
 # $ ./make_dummy.py
 #
-# generates output to
-#    CONFIGURATION.get_messages_dir(CONFIGURATION.dummy_locale)
-# (for example,
-#    edx-platform/conf/locale/eo/LC_MESSAGES/)
+# generates output conf/locale/$DUMMY_LOCALE/LC_MESSAGES,
+# where $DUMMY_LOCALE is the dummy_locale value set in the i18n config
 
 import os, sys
 import polib
@@ -63,8 +59,8 @@ def new_filename(original_filename, new_locale):
 if __name__ == '__main__':
     LOCALE = CONFIGURATION.dummy_locale
     SOURCE_MSGS_DIR = CONFIGURATION.source_messages_dir
-    print "Processing source language files into dummy strings:",
-    for source_file in CONFIGURATION.dummy_sources:
-        print source_file,
+    print "Processing source language files into dummy strings:"
+    for source_file in CONFIGURATION.source_messages_dir.walkfiles('*.po'):
+        print '   ', source_file.relpath()
         main(SOURCE_MSGS_DIR.joinpath(source_file), LOCALE)
     print

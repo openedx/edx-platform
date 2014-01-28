@@ -22,7 +22,6 @@ class Configuration(object):
         'locales': ['en'],
         'segment': {},
         'source_locale': 'en',
-        'dummy_sources': [],
     }
 
     def __init__(self, filename):
