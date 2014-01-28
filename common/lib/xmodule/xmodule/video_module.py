@@ -343,6 +343,24 @@ class VideoModule(VideoFields, XModule):
         if language != 'en' and language != self.preferred_language:
             self.preferred_language = language
 
+        if language == 'en':
+            if self.sub:
+                filename = 'subs_{0}.srt.sjson'.format(self.sub)
+                content_location = StaticContent.compute_location(
+                    self.location.org, self.location.course, filename
+                )
+                sjson_transcripts = contentstore().find(content_location)
+                response = Response(
+                    sjson_transcripts,
+                    headerlist=[
+                    ('Content-Disposition', 'attachment; filename="{0}.srt"'.format(filename)),
+                ])
+                response.content_type='application/json'
+                return Response
+            else:
+                log.info("transcript_translation is not available for given language.")
+                return Response(status=404)
+
         if language not in self.transcripts:
             log.info("transcript_translation is not available for given language.")
             return Response(status=404)
@@ -362,7 +380,7 @@ class VideoModule(VideoFields, XModule):
             return Response(status=404)
 
         speed = youtube_ids[video_id]
-        filename = '{0}_subs_{0}.sjson'.format(language, video_id)
+        filename = '{0}_subs_{1}.srt.sjson'.format(language, video_id)
         content_location = StaticContent.compute_location(
             self.location.org, self.location.course, filename
         )
@@ -377,7 +395,7 @@ class VideoModule(VideoFields, XModule):
                 content_location_1_0 = StaticContent.compute_location(
                     self.location.org,
                     self.location.course,
-                    '{0}_subs_{0}.sjson'.format(language, self.youtube_id_1_0)
+                    '{0}_subs_{1}.srt.sjson'.format(language, self.youtube_id_1_0)
                 )
                 try:
                     sjson_transcripts_1_0 = contentstore().find(content_location_1_0)
@@ -414,7 +432,7 @@ class VideoModule(VideoFields, XModule):
                 # at this point we should have srt.sjson for speed 1.0 in database
                 source_subs = json.loads(contentstore().find(content_location_1_0))
                 subs = generate_subs(youtube_ids[video_id], 1.0, source_subs)
-                save_subs_to_store(subs, video_id,self, language)
+                save_subs_to_store(subs, video_id, self, language)
                 sjson_transcripts = json.dumps(subs, indent=2)
 
         response = Response(
