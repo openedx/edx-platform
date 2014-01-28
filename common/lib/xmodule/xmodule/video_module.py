@@ -266,18 +266,24 @@ class VideoModule(VideoFields, XModule):
             'transcript_translation_url': self.runtime.handler_url(self, 'transcript_translation')
         })
 
-    def get_transcript(self, subs_id):
+    def get_transcript(self, lang):
         '''
         Returns transcript without timecodes.
 
         Args:
-            `subs_id`: str, subtitles id
+            `lang`: str, 2 chars language id.
 
         Raises:
             - NotFoundError if cannot find transcript file in storage.
             - ValueError if transcript file is incorrect JSON.
             - KeyError if transcript file has incorrect format.
         '''
+        if lang == 'en':
+            subs_id = self.sub
+            filename = 'subs_{0}.srt.sjson'.format(subs_id)
+        else:
+            subs_id = self.youtube_id_1_0
+            filename = '{0}_subs_{1}.srt.sjson'.format(lang, subs_id)
 
         filename = 'subs_{0}.srt.sjson'.format(subs_id)
         content_location = StaticContent.compute_location(
@@ -290,12 +296,24 @@ class VideoModule(VideoFields, XModule):
         return HTMLParser().unescape("\n".join(text))
 
     @XBlock.handler
-    def download_transcript(self, __, ___):
+    def download_transcript(self, request, ___):
         """
         This is called to get transcript file without timecodes to student.
+
+        request.GET should contain language code, for example: en".
         """
         try:
-            subs = self.get_transcript(self.sub)
+            language = request.GET.get('language')
+        except Exception:
+            log.info("Invalid download_transcript GET request parameters.")
+            return Response(status=400)
+
+        if language not in ['en'].extend(self.transcripts):
+            log.info("transcript_translation is not available for given language.")
+            return Response(status=404)
+
+        try:
+            subs = self.get_transcript(language)
         except (NotFoundError):
             log.debug("Can't find content in storage for %s transcript", self.sub)
             return Response(status=404)
@@ -308,7 +326,7 @@ class VideoModule(VideoFields, XModule):
             headerlist=[
                 ('Content-Disposition', 'attachment; filename="{0}.txt"'.format(self.sub)),
             ])
-        response.content_type="text/plain; charset=utf-8"
+        response.content_type = "text/plain; charset=utf-8"
 
         return response
 
@@ -317,10 +335,7 @@ class VideoModule(VideoFields, XModule):
         """
         This is called to get transcript file for specific language.
 
-        request.get contains:
-          language code ("en")
-          video_id ("example")
-          language ("de")
+        request.GET should contain language code, for example: en", and video_id.
         """
         try:
             video_id = request.GET.get('videoId')

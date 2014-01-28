@@ -198,6 +198,7 @@ def remove_subs_from_store(subs_id, item):
     try:
         content = contentstore().find(content_location)
         contentstore().delete(content.get_id())
+        from cache_toolbox.core import del_cached_content
         del_cached_content(content.location)
         log.info("Removed subs %s from store", subs_id)
     except NotFoundError:
