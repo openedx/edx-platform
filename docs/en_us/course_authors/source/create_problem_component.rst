@@ -289,9 +289,39 @@ answers, the student’s score is 0.5 out of 2 points.
 Randomization
 ===============
 
-This setting only applies to problems that have randomly generated
-numeric values. It specifies whether random variable inputs are
-randomized when a student loads the problem.
+
+This setting specifies whether certain values in your problem change each time a different student accesses the problem, or each time a single student tries to answer the problem. For example, the highlighted values in the problem below change each time a student submits an answer to the problem. 
+
+
+
+.. image:: Images/Rerandomize.gif
+
+If you want to change, or "randomize," specific values in your problem, you have to do both the following:
+
+- Make sure that your problem contains a Python script that randomizes the values that you want. 
+- Enable randomization in the Problem component. 
+
+To enable randomization, select an option for the **Randomization** setting. This setting has four options.
+
+
++-------------------+--------------------------------------+
+| **Always**        | Students see a different version of  |
+|                   | the problem each time they click     |
+|                   | **Check**.                           |
++-------------------+--------------------------------------+
+| **On Reset**      | Students see a different version of  |
+|                   | the problem each time they click     |
+|                   | **Reset**.                           |
++-------------------+--------------------------------------+
+| **Never**         | All students see the same version    |
+|                   | of the problem. This is the default. |
++-------------------+--------------------------------------+
+| **Per Student**   | Individual students see the same     |
+|                   | version of the problem each time     |
+|                   | they look at it, but that version    |
+|                   | is different from the version that   |
+|                   | other students see.                  |
++-------------------+--------------------------------------+
 
 ===============
 Show Answer

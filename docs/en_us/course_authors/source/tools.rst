@@ -72,6 +72,9 @@ unit, you need the following information.
 Create an LTI Component
 -----------------------
 
+.. note:: You cannot view an LTI component in Preview mode. To view an LTI component that you've created, you must first publish the unit, and then click **View Live** to see the unit in Live mode. For more information about publishing a unit, see :ref:`Publishing Your Course`.
+
+
 Creating an LTI component in your course has three steps.
 
 #. Add LTI to the **advanced_modules** policy key.
