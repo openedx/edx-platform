@@ -408,3 +408,9 @@ class TrivialCache(object):
         mock set_many
         """
         self.cache.update(entries)
+
+    def set(self, key, entry):
+        """
+        mock set
+        """
+        self.cache[key] = entry
