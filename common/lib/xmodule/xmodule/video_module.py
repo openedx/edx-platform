@@ -156,10 +156,7 @@ class VideoFields(object):
         help="Additional translations for transcripts",
         display_name="Additional translations for transcripts",
         scope=Scope.settings,
-        default={
-                'de': 'edX-FA12-cware-1_100',
-                'en': 'OEoXaMPEzfM',
-            }
+        default={}
         )
 
     language = String(
@@ -332,7 +329,7 @@ class VideoModule(VideoFields, XModule):
             log.info("Invalid transcript_translation GET request parameters.")
             return Response(status=400)
 
-        if language != 'en' and language != self.language:
+        if language != self.language:
             self.language = language
 
         if language == 'en':
@@ -342,7 +339,7 @@ class VideoModule(VideoFields, XModule):
                     self.location.org, self.location.course, filename
                 )
                 sjson_transcripts = contentstore().find(content_location)
-                response = Response(sjson_transcripts)
+                response = Response(sjson_transcripts.data)
                 response.content_type = 'application/json'
                 return response
             else:
@@ -423,7 +420,7 @@ class VideoModule(VideoFields, XModule):
                 save_subs_to_store(subs, video_id, self, language)
                 sjson_transcripts = json.dumps(subs, indent=2)
 
-        response = Response(sjson_transcripts)
+        response = Response(sjson_transcripts.data)
         response.content_type = 'application/json'
         return response
 

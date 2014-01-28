@@ -251,7 +251,7 @@ function () {
     function renderLanguages() {
         var self = this,
             menu = $('<ol class="langs-list menu">'),
-            currentLang = 'de' || this.getCurrentLanguage(),
+            currentLang = this.getCurrentLanguage(),
             langsList = this.config.transcripts;
 
         $.each(langsList, function(code, label) {
