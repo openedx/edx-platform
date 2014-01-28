@@ -151,8 +151,8 @@ class VideoFields(object):
         display_name="Additional translations for transcripts",
         scope=Scope.settings,
         default={
-                'de': 'german_translation',
-                'ua': 'ukrainian_translation',
+                'de': 'edX-FA12-cware-1_100',
+                'ua': 'OEoXaMPEzfM',
             }
         )
 

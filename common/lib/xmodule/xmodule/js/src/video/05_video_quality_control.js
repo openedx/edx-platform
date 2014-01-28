@@ -59,7 +59,10 @@ function () {
     //
     //     Bind any necessary function callbacks to DOM events (click, mousemove, etc.).
     function _bindHandlers(state) {
-        state.videoQualityControl.el.on('click', state.videoQualityControl.toggleQuality);
+        state.videoQualityControl.el.on({
+            'click': state.videoQualityControl.toggleQuality,
+            'focus': function () { state.previousFocus = 'quality'; }
+        });
     }
 
     // ***************************************************************

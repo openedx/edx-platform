@@ -78,6 +78,37 @@ div.video {
        background-color: black;
     }
 
+    .button {
+      @include transition(none);
+      display: block;
+      font-weight: 800;
+      line-height: 46px;
+      margin-left: 0;
+      margin-right: 0;
+      padding-left: 15px;
+      text-indent: -9999px;
+      -webkit-font-smoothing: antialiased;
+      box-shadow: 1px 0 0 #555, inset 1px 0 0 #555;
+      color: #fff;
+      cursor: pointer;
+      border-left: 1px solid #000;
+      border-right: 1px solid #000;
+
+      &:hover {
+        background-color: #444;
+        color: #fff;
+        text-decoration: none;
+        outline: 0;
+      }
+
+      &:active,
+      &:focus {
+        color: #fff;
+        background-color: #444;
+        text-decoration: none;
+      }
+    }
+
     .spinner {
       @include transform(translate(-50%, -50%));
       position: absolute;
@@ -230,48 +261,33 @@ div.video {
           margin-bottom: 0;
 
           a {
-            border-bottom: none;
-            border-right: 1px solid #000;
+            @extend .button;
+            background-image: url('../images/vcr.png');
+            background-position: 15px 15px ;
+            background-repeat: no-repeat;
+            border-left: none;
             box-shadow: 1px 0 0 #555;
-            cursor: pointer;
-            display: block;
-            line-height: 46px;
             padding: 0 lh(.75);
-            text-indent: -9999px;
             width: 14px;
-            background: url('../images/vcr.png') 15px 15px no-repeat;
 
             &:focus {
               position: relative;
               z-index: 10000;
               outline: #fff dotted thin;
               outline-offset: -2px;
-              background: #333;
-            }
-
-            &:hover {
-              outline: 0;
             }
 
             &:empty {
               height: 46px;
-              background: url('../images/vcr.png') 15px 15px no-repeat;
+              background-position: 15px 15px;
             }
 
             &.play {
               background-position: 17px -114px;
-
-              &:hover {
-                background-color: #444;
-              }
             }
 
             &.pause {
               background-position: 16px -50px;
-
-              &:hover {
-                background-color: #444;
-              }
             }
           }
 
@@ -301,16 +317,12 @@ div.video {
           }
         }
 
-        div.speeds {
+        .menu-container {
           float: left;
           position: relative;
 
           &.open {
-            & > a {
-              background: url('../images/open-arrow.png') 10px center no-repeat;
-            }
-
-            ol.video_speeds {
+            .menu {
               display: block;
               opacity: 1;
               padding: 0;
@@ -319,89 +331,15 @@ div.video {
             }
           }
 
-          & > a {
-            @include clearfix();
+          .menu {
             @include transition(none);
-            background: url('../images/closed-arrow.png') 10px center no-repeat;
-            border-left: 1px solid #000;
-            border-right: 1px solid #000;
-            box-shadow: 1px 0 0 #555, inset 1px 0 0 #555;
-            color: #fff;
-            cursor: pointer;
-            display: block;
-            line-height: 46px; //height of play pause buttons
-            margin-right: 0;
-            padding-left: 15px;
-            position: relative;
-            -webkit-font-smoothing: antialiased;
-            min-width: 116px;
-
-            @media (max-width: 1024px) {
-              min-width: 0;
-              width: 86px;
-            }
-
-            h3 {
-              display: block;
-
-              @media (max-width: 1024px) {
-                display: none;
-              }
-            }
-
-            &:hover {
-              outline: 0;
-              opacity: 1;
-              background-color: #444;
-            }
-
-            &:active {
-              opacity: 1;
-              background-color: #444;
-            }
-
-            h3 {
-              color: #999;
-              float: left;
-              font-size: em(14);
-              font-weight: normal;
-              letter-spacing: 1px;
-              padding: 0 lh(.25) 0 lh(.5);
-              line-height: 46px;
-              text-transform: uppercase;
-            }
-
-            p.active {
-              float: left;
-              font-weight: bold;
-              margin-bottom: 0;
-              padding: 0 lh(.5) 0 0;
-
-              @media (max-width: 1024px) {
-                padding: 0 lh(.5) 0 lh(.5);
-              }
-
-              line-height: 46px;
-              color: #fff;
-            }
-          }
-
-          // fix for now
-          ol.video_speeds {
-            @include transition(none);
-            box-shadow: inset 1px 0 0 #555, 0 4px 0 #444;
+            box-shadow: inset 1px 0 0 #555, 0 1px 0 #444;
             background-color: #444;
             border: 1px solid #000;
             bottom: 46px;
             display: none;
             opacity: 0;
             position: absolute;
-            width: 131px;
-
-            @media (max-width: 1024px) {
-              width: 101px;
-            }
-
             z-index: 10;
 
             li {
@@ -415,6 +353,9 @@ div.video {
                 color: #fff;
                 display: block;
                 padding: lh(.5);
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
 
                 &:hover {
                   background-color: #666;
@@ -432,6 +373,65 @@ div.video {
                 border-bottom: 0;
                 margin-top: 0;
               }
+            }
+          }
+        }
+
+        div.speeds {
+          &.open {
+            & > a {
+              background-image: url('../images/open-arrow.png');
+            }
+          }
+
+          .menu{
+            width: 131px;
+
+            @media (max-width: 1024px) {
+              width: 101px;
+            }
+          }
+
+          & > a {
+            @extend .button;
+            @include clearfix();
+            background-image: url('../images/closed-arrow.png');
+            background-position: 10px center;
+            background-repeat: no-repeat;
+            min-width: 116px;
+            text-indent: 0;
+
+            @media (max-width: 1024px) {
+              min-width: 0;
+              width: 86px;
+            }
+
+            h3 {
+              float: left;
+              font-size: em(14);
+              font-weight: normal;
+              letter-spacing: 1px;
+              padding: 0 lh(.25) 0 lh(.5);
+              line-height: 46px;
+              text-transform: uppercase;
+
+              @media (max-width: 1024px) {
+                display: none;
+              }
+            }
+
+            p.active {
+              float: left;
+              font-weight: bold;
+              margin-bottom: 0;
+              padding: 0 lh(.5) 0 0;
+
+              @media (max-width: 1024px) {
+                padding: 0 lh(.5) 0 lh(.5);
+              }
+
+              line-height: 46px;
+              color: #fff;
             }
           }
         }
@@ -454,29 +454,14 @@ div.video {
           }
 
           & > a {
+            @extend .button;
             @include clearfix();
-            @include transition(none);
             background-image: url('../images/volume.png');
             background-position: 10px center;
             background-repeat: no-repeat;
-            border-right: 1px solid #000;
-            box-shadow: 1px 0 0 #555, inset 1px 0 0 #555;
-            color: #fff;
-            cursor: pointer;
-            display: block;
-            height: 46px;
-            margin-right: 0;
-            padding-left: 15px;
-            position: relative;
-            -webkit-font-smoothing: antialiased;
+            border-left: none;
             width: 30px;
-
-            &:hover, &:active {
-              background-color: #444;
-              color: #fff;
-              text-decoration: none;
-              outline: 0;
-            }
+            height: 46px;
           }
 
           .volume-slider-container {
@@ -523,48 +508,23 @@ div.video {
         }
 
         a.add-fullscreen {
-          @include transition(none);
+          @extend .button;
           background: url(../images/fullscreen.png) center no-repeat;
-          border-right: 1px solid #000;
-          box-shadow: 1px 0 0 #555, inset 1px 0 0 #555;
-          color: #797979;
-          display: block;
+          border-left: none;
           float: left;
-          line-height: 46px; //height of play pause buttons
-          margin-left: 0;
-          padding: 0 lh(.5);
-          text-indent: -9999px;
+          padding: 0 11px;
           width: 30px;
-
-          &:hover, &:active {
-            background-color: #444;
-            color: #fff;
-            text-decoration: none;
-            outline: 0;
-          }
         }
 
 
         a.quality_control {
-          @include transition(none);
+          @extend .button;
           background: url(../images/hd.png) center no-repeat;
-          border-right: 1px solid #000;
-          box-shadow: 1px 0 0 #555, inset 1px 0 0 #555;
-          color: #797979;
+          border-left: none;
           display: none;
           float: left;
-          line-height: 46px; //height of play pause buttons
-          margin-left: 0;
-          padding: 0 lh(.5);
-          text-indent: -9999px;
+          padding: 0 11px;
           width: 30px;
-
-          &:hover {
-            background-color: #444;
-            color: #fff;
-            text-decoration: none;
-            outline: 0;
-          }
 
           &.active {
             background-color: #F44;
@@ -575,96 +535,24 @@ div.video {
         }
 
         div.lang {
-          float: left;
-          position: relative;
-
-          &.open {
-            ol.langs-list {
-              display: block;
-              opacity: 1;
-              padding: 0;
-              margin: 0;
-              list-style: none;
-            }
-          }
-
           & > a.hide-subtitles {
+            @extend .button;
             @include transition(none);
+            box-shadow: inset 1px 0 0 #555;
             background: url('../images/cc.png') center no-repeat;
-            display: block;
-            font-weight: 800;
-            line-height: 46px; //height of play pause buttons
-            margin-left: 0;
-            opacity: 1;
-            padding: 0 lh(.5);
-            text-indent: -9999px;
-            -webkit-font-smoothing: antialiased;
+            border-left: none;
+            border-right: none;
+            padding: 0 11px;
             width: 30px;
-
-            &:hover {
-              background-color: #444;
-              color: #fff;
-              text-decoration: none;
-              outline: 0;
-            }
 
             &.off {
               opacity: 0.7;
             }
-
-            &:active {
-              opacity: 1;
-              background-color: #444;
-            }
-
-            color: #797979;
           }
 
-          // fix for now
-          ol.langs-list {
-            @include transition(none);
-            box-shadow: inset 1px 0 0 #555, 0 1px 0 #444;
-            background-color: #444;
-            border: 1px solid #000;
-            bottom: 46px;
-            right: 0;
-            display: none;
-            opacity: 0;
-            position: absolute;
-            max-width: 430px;
-            z-index: 10;
-
-            li {
-              box-shadow:  0 1px 0 #555;
-              border-bottom: 1px solid #000;
-              color: #fff;
-              cursor: pointer;
-
-              a {
-                border: 0;
-                color: #fff;
-                display: block;
-                padding: lh(.5);
-                text-overflow: ellipsis;
-                overflow: hidden;
-
-                &:hover {
-                  background-color: #666;
-                  color: #aaa;
-                  outline-offset: -4px;
-                }
-              }
-
-              &.active {
-                font-weight: bold;
-              }
-
-              &:last-child {
-                box-shadow: none;
-                border-bottom: 0;
-                margin-top: 0;
-              }
-            }
+          .menu.langs-list {
+            right: -1px;
+            max-width: 150px;
           }
         }
       }

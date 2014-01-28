@@ -43,6 +43,7 @@ function () {
     //     these functions will get the 'state' object as a context.
     function _makeFunctionsPublic(state) {
         var methodsDict = {
+            addPaddings: addPaddings,
             bindHandlers: bindHandlers,
             bottomSpacingHeight: bottomSpacingHeight,
             calculateOffset: calculateOffset,
@@ -104,15 +105,17 @@ function () {
      *         and the CC button will be hidden.
      */
     function renderElements() {
-        var Caption = this.videoCaption;
+        var Caption = this.videoCaption,
+            transcripts = this.config.transcripts;
         Caption.loaded = false;
 
         Caption.subtitlesEl = this.el.find('ol.subtitles');
         Caption.container = this.el.find('.lang');
         Caption.hideSubtitlesEl = this.el.find('a.hide-subtitles');
 
-        Caption.renderLanguages();
-
+        if (transcripts && _.keys(transcripts).length > 1) {
+            Caption.renderLanguages();
+        }
 
         if (!Caption.fetchCaption()) {
             Caption.hideCaptions(true);
@@ -126,11 +129,13 @@ function () {
     //     mousemove, etc.).
     function bindHandlers() {
         $(window).bind('resize', this.videoCaption.resize);
-        this.videoCaption.hideSubtitlesEl.on('click', this.videoCaption.toggle);
+        this.videoCaption.hideSubtitlesEl.on({
+            'click': this.videoCaption.toggle
+        });
 
         this.videoCaption.container.on({
             mouseenter: this.videoCaption.onMouseEnter,
-            mouseleave: this.videoCaption.onMouseLeave
+            mouseleave: this.videoCaption.onMouseLeave,
         });
     }
 
@@ -176,7 +181,9 @@ function () {
             return false;
         }
 
-        if (!this.videoCaption.loaded) {
+        if (this.videoCaption.loaded) {
+            this.videoCaption.hideCaptions(false);
+        } else {
             this.videoCaption.hideCaptions(this.hide_captions);
         }
 
@@ -186,7 +193,7 @@ function () {
             url: self.videoCaption.captionURL(),
             notifyOnError: false,
             data: {
-                videoId: this.youtubeId(),
+                videoId: this.youtubeId() == 'OEoXaMPEzfM' ? 'edX-FA12-cware-1_100' : 'OEoXaMPEzfM',
                 language: this.getCurrentLanguage()
             },
             success: function (captions) {
@@ -229,8 +236,8 @@ function () {
     }
 
     function captionURL() {
-        return '' + this.config.captionAssetPath +
-            this.youtubeId('1.0') + '.srt.sjson';
+        return '' + this.config.captionAssetPath + (this.lang == 'de' ? 'edX-FA12-cware-1_100' : 'OEoXaMPEzfM') + '.srt.sjson';
+            // this.youtubeId('1.0') + '.srt.sjson';
     }
 
     function resize() {
@@ -247,8 +254,8 @@ function () {
 
     function renderLanguages() {
         var self = this,
-            menu = $('<ol class="langs-list">'),
-            currentLang = 'ua' || this.getCurrentLanguage(),
+            menu = $('<ol class="langs-list menu">'),
+            currentLang = 'de' || this.getCurrentLanguage(),
             langsList = this.config.transcripts;
 
         $.each(langsList, function(code, label) {
@@ -270,16 +277,20 @@ function () {
                 Caption = self.videoCaption,
                 langCode = el.data('lang-code');
 
-            self.lang = langCode;
-            el  .addClass('active')
-                .siblings('li')
-                .removeClass('active');
+            if (self.lang !== langCode) {
+                self.lang = langCode;
+                el  .addClass('active')
+                    .siblings('li')
+                    .removeClass('active');
 
-            Caption.fetchCaption();
+                Caption.fetchCaption();
+            }
         });
     }
 
     function buildCaptions (container, captions, start) {
+        var fragment = document.createDocumentFragment();
+
         $.each(captions, function(index, text) {
             var liEl = $('<li>');
 
@@ -291,17 +302,17 @@ function () {
                 'tabindex': 0
             });
 
-            container.append(liEl);
+            fragment.appendChild(liEl[0]);
         });
+
+        container.append([fragment]);
     }
 
     function renderCaption() {
         var Caption = this.videoCaption,
-            container = $('<ol>'),
             autohideHtml5 = this.config.autohideHtml5,
-            events = 'mouseover mouseout mousedown click focus blur keydown';
-
-        this.container.after(Caption.subtitlesEl);
+            events = ['mouseover', 'mouseout', 'mousedown', 'click', 'focus',
+                'blur', 'keydown'].join(' ');
 
         Caption.setSubtitlesHeight();
 
@@ -310,12 +321,9 @@ function () {
             Caption.subtitlesEl.addClass('html5');
         }
 
-        buildCaptions(container, Caption.captions, Caption.start);
+        buildCaptions(Caption.subtitlesEl, Caption.captions, Caption.start);
 
-        Caption.subtitlesEl
-            .html(container.html());
-
-        Caption.subtitlesEl.on(events, 'li', function (event) {
+        Caption.subtitlesEl.on(events, 'li[data-index]', function (event) {
             switch (event.type) {
                 case 'mouseover':
                 case 'mouseout':
@@ -327,10 +335,10 @@ function () {
                 case 'click':
                     Caption.captionClick(event);
                     break;
-                case 'focus':
+                case 'focusin':
                     Caption.captionFocus(event);
                     break;
-                case 'blur':
+                case 'focusout':
                     Caption.captionBlur(event);
                     break;
                 case 'keydown':
@@ -357,21 +365,7 @@ function () {
         // has to be known to decide if, when a caption gets the focus, an
         // outline has to be drawn (tabbing) or not (mouse click).
         Caption.isMouseFocus = false;
-
-        // Set top and bottom spacing height and make sure they are taken out of
-        // the tabbing order.
-        Caption.subtitlesEl
-            .prepend(
-                $('<li class="spacing">')
-                    .height(Caption.topSpacingHeight())
-                    .attr('tabindex', -1)
-            )
-            .append(
-                $('<li class="spacing">')
-                    .height(Caption.bottomSpacingHeight())
-                    .attr('tabindex', -1)
-            );
-
+        Caption.addPaddings();
         Caption.rendered = true;
     }
 
@@ -380,9 +374,29 @@ function () {
 
         Caption.currentIndex = null;
         Caption.rendered = false;
-        Caption.subtitlesEl.find('li').not('.spacing').remove();
+        // Caption.subtitlesEl.find('li').not('.spacing').remove();
+        Caption.subtitlesEl.empty();
         buildCaptions(Caption.subtitlesEl, Caption.captions, Caption.start);
+        // Set top and bottom spacing height and make sure they are taken out of
+        // the tabbing order.
+        Caption.addPaddings();
         Caption.rendered = true;
+    }
+
+    function addPaddings() {
+        // Set top and bottom spacing height and make sure they are taken out of
+        // the tabbing order.
+        this.videoCaption.subtitlesEl
+            .prepend(
+                $('<li class="spacing">')
+                    .height(this.videoCaption.topSpacingHeight())
+                    .attr('tabindex', -1)
+            )
+            .append(
+                $('<li class="spacing">')
+                    .height(this.videoCaption.bottomSpacingHeight())
+                    .attr('tabindex', -1)
+            );
     }
 
     // On mouseOver, hide the outline of a caption that has been tabbed to.
