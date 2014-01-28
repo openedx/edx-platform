@@ -559,6 +559,21 @@ def _get_course_enrollment_domain(course_id):
     except ItemNotFoundError:
         return None
 
+@ensure_csrf_cookie
+def student_handler(request):
+    """
+    Verificar informacion academica de estudiante
+    """
+    data = {'result': 'Ninguno'}
+    from student import utils
+    if request.is_ajax() and request.method == 'GET':
+        if request.GET.get('cedula', False):
+            cedula = request.GET.get('cedula')
+    result = utils.verify_academic_student(cedula)
+    if result:
+        data.update(result)
+    return HttpResponse(json.dumps(data))
+    
 
 @ensure_csrf_cookie
 def accounts_login(request):
@@ -819,7 +834,7 @@ def _do_create_account(post_vars):
             return HttpResponse(json.dumps(js))
 
         if len(User.objects.filter(email=post_vars['email'])) > 0:
-            js['value'] = _("An account with the Email '{email}' already exists.").format(email=post_vars['email'])
+            js['value'] = _("An account with the Email '{email}' already exists.".format(email=post_vars['email']))
             js['field'] = 'email'
             return HttpResponse(json.dumps(js))
 

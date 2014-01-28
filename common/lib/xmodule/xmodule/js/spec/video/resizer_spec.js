@@ -1,4 +1,4 @@
-(function (requirejs, require, define) {
+(function (requirejs, require, define, undefined) {
 
 require(
 ['video/00_resizer.js'],
@@ -104,7 +104,7 @@ function (Resizer) {
             beforeEach(function () {
                 var spiesCount = _.range(3);
 
-                spiesList = $.map(spiesCount, function() {
+                spiesList = $.map(spiesCount, function () {
                     return jasmine.createSpy();
                 });
 
@@ -113,13 +113,13 @@ function (Resizer) {
 
 
             it('callbacks are called', function () {
-                $.each(spiesList, function(index, spy) {
+                $.each(spiesList, function (index, spy) {
                     resizer.callbacks.add(spy);
                 });
 
                 resizer.align();
 
-                $.each(spiesList, function(index, spy) {
+                $.each(spiesList, function (index, spy) {
                     expect(spy).toHaveBeenCalled();
                 });
             });
@@ -135,20 +135,20 @@ function (Resizer) {
             });
 
             it('All callbacks are removed', function () {
-                $.each(spiesList, function(index, spy) {
+                $.each(spiesList, function (index, spy) {
                     resizer.callbacks.add(spy);
                 });
 
                 resizer.callbacks.removeAll();
                 resizer.align();
 
-                $.each(spiesList, function(index, spy) {
+                $.each(spiesList, function (index, spy) {
                     expect(spy).not.toHaveBeenCalled();
                 });
             });
 
             it('Specific callback is removed', function () {
-                $.each(spiesList, function(index, spy) {
+                $.each(spiesList, function (index, spy) {
                     resizer.callbacks.add(spy);
                 });
 
@@ -158,14 +158,17 @@ function (Resizer) {
                 expect(spiesList[1]).not.toHaveBeenCalled();
             });
 
-            it('Error message is shown when wrong argument type is passed', function () {
+            it(
+                'Error message is shown when wrong argument type is passed',
+                function ()
+            {
                 var methods = ['add', 'once'],
-                    errorMessage = 'TypeError: Argument is not a function.',
+                    errorMessage = '[Video info]: TypeError: Argument is not a function.',
                     arg = {};
 
                 spyOn(console, 'error');
 
-                $.each(methods, function(index, methodName) {
+                $.each(methods, function (index, methodName) {
                      resizer.callbacks[methodName](arg);
                      expect(console.error).toHaveBeenCalledWith(errorMessage);
                      //reset spy

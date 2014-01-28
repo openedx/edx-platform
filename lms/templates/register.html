@@ -138,7 +138,7 @@
             <input id="username" type="text" name="username" value="" placeholder="${_('example: JaneDoe')}" required aria-required="true" aria-describedby="username-tip"/>
             <span class="tip tip-input" id="username-tip">${_('Will be shown in any discussions or forums you participate in')} <strong>(${_('cannot be changed later')}) (${_('Just letter and numbers allowed')})</strong></span>
           </li>
-          <li class="field-group" id="field-cedula">
+          <li class="field-group">
             <div class="field required select" id="type-id">
               <label for="type_id">${_("TYPE ID")}</label>
               <select id="type-id" name="type_id">
@@ -146,10 +146,17 @@
                 <option value="pasaporte">PASAPORTE</option>
               </select>
             </div>
-            <div class="field required text" id="type-id">
-              <label for="name">${_('Cedula / Pasaporte')}</label>
+          </li>
+          <li class="field-group">
+            <div class="field required text" id="field-cedula">
+              <label for="cedula-label">${_('Cedula / Pasaporte')}</label>
               <input id="cedula" type="text" name="cedula" value="" placeholder="${_('example: 0102030405')}" required aria-required="true" aria-describedby="cedula-tip"/>
               <span class="tip tip-input" id="cedula-tip">${_("Don't input special characters in your ID")}</span>
+            </div>
+            <div class="field text" id="field-senescyt">
+              <label for="senescyt">Registro Senescyt</label>
+              <input id="number_senescyt" type="text" name="senescyt" value="" readonly aria-describedby="senescyt-tip"/>
+              <span class="tip tip-input" id="senescyt-tip">Si tiene título de tercer nivel o superior.</span>
             </div>
           </li>
           <li class="field required text" id="field-name">

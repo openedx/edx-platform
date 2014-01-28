@@ -6,6 +6,8 @@ from .http import StubHttpRequestHandler, StubHttpService
 import json
 import time
 import requests
+from urlparse import urlparse
+from collections import OrderedDict
 
 
 class StubYouTubeHandler(StubHttpRequestHandler):
@@ -54,14 +56,17 @@ class StubYouTubeHandler(StubHttpRequestHandler):
                 self.send_response(404)
 
         elif 'test_youtube' in self.path:
-            self._send_video_response("I'm youtube.")
+            params = urlparse(self.path)
+            youtube_id = params.path.split('/').pop()
+
+            self._send_video_response(youtube_id, "I'm youtube.")
 
         else:
             self.send_response(
                 404, content="Unused url", headers={'Content-type': 'text/plain'}
             )
 
-    def _send_video_response(self, message):
+    def _send_video_response(self, youtube_id, message):
         """
         Send message back to the client for video player requests.
         Requires sending back callback id.
@@ -71,7 +76,14 @@ class StubYouTubeHandler(StubHttpRequestHandler):
 
         # Construct the response content
         callback = self.get_params['callback'][0]
-        response = callback + '({})'.format(json.dumps({'message': message}))
+        data = OrderedDict({
+            'data': OrderedDict({
+                'id': youtube_id,
+                'message': message,
+                'duration': 60,
+            })
+        })
+        response = "{cb}({data})".format(cb=callback, data=json.dumps(data))
 
         self.send_response(200, content=response, headers={'Content-type': 'text/html'})
         self.log_message("Youtube: sent response {}".format(message))

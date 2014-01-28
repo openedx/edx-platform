@@ -1148,6 +1148,16 @@ REGISTRATION_OPTIONAL_FIELDS = set([
 DELTA_YEAR = 12
 MAX_YEAR_ALLOWED = 70
 
+########################## WS CONFIG ###########################
+
+WS_CONFIG = {
+    'ws_prod': "https://www.bsg.gob.ec/sw/SENESCYT/BSGSW01_Consultar_Titulos?wsdl",
+    'ws_auth': "https://www.bsg.gob.ec/sw/STI/BSGSW08_Acceder_BSG?wsdl",
+    'method_permission': "validarPermisoPeticion",
+    'method_query_title': "consultaTitulo",
+    'identity': '1803550274'
+    }
+
 ###################### Grade Downloads ######################
 GRADES_DOWNLOAD_ROUTING_KEY = HIGH_MEM_QUEUE
 
@@ -1155,4 +1165,15 @@ GRADES_DOWNLOAD = {
     'STORAGE_TYPE': 'localfs',
     'BUCKET': 'edx-grades',
     'ROOT_PATH': '/tmp/edx-s3/grades',
+}
+
+##################### LinkedIn #####################
+INSTALLED_APPS += ('django_openid_auth',)
+
+
+############################ LinkedIn Integration #############################
+INSTALLED_APPS += ('linkedin',)
+LINKEDIN_API = {
+    'EMAIL_WHITELIST': [],
+    'COMPANY_ID': '2746406',
 }

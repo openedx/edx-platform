@@ -38,6 +38,8 @@ from xmodule.modulestore.search import path_to_location
 from xmodule.course_module import CourseDescriptor
 import shoppingcart
 
+from microsite_configuration.middleware import MicrositeConfiguration
+
 log = logging.getLogger("edx.courseware")
 
 template_imports = {'urllib': urllib}
@@ -514,7 +516,11 @@ def registered_for_course(course, user):
 @ensure_csrf_cookie
 @cache_if_anonymous
 def course_about(request, course_id):
-    if settings.FEATURES.get('ENABLE_MKTG_SITE', False):
+
+    if MicrositeConfiguration.get_microsite_configuration_value(
+        'ENABLE_MKTG_SITE',
+        settings.FEATURES.get('ENABLE_MKTG_SITE', False)
+    ):
         raise Http404
 
     course = get_course_with_access(request.user, course_id, 'see_exists')

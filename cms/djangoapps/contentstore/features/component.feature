@@ -73,18 +73,19 @@ Feature: CMS.Component Adding
            | Problem with Adaptive Hint    |
 
 
-    Scenario: I can add Advanced Latex Problem components
-       Given I am in Studio editing a new unit
-       Given I have enabled latex compiler
-       When I add a "<Component>" "Advanced Problem" component
-       Then I see a "<Component>" Problem component
-       # Flush out the database before the next example executes
-       And I reset the database
+# Disabled 1/21/14 due to flakiness seen in master
+#    Scenario: I can add Advanced Latex Problem components
+#       Given I am in Studio editing a new unit
+#       Given I have enabled latex compiler
+#       When I add a "<Component>" "Advanced Problem" component
+#       Then I see a "<Component>" Problem component
+#       # Flush out the database before the next example executes
+#       And I reset the database
 
-    Examples:
-           | Component                     |
-           | Problem Written in LaTeX      |
-           | Problem with Adaptive Hint in Latex  |
+#    Examples:
+#           | Component                     |
+#           | Problem Written in LaTeX      |
+#           | Problem with Adaptive Hint in Latex  |
 
     Scenario: I see a prompt on delete
         Given I am in Studio editing a new unit
@@ -100,3 +101,14 @@ Feature: CMS.Component Adding
         And I add a "Blank Advanced Problem" "Advanced Problem" component
         And I delete all components
         Then I see no components
+
+    Scenario: I can duplicate a component
+        Given I am in Studio editing a new unit
+        And I add a "Blank Common Problem" "Problem" component
+        And I add a "Multiple Choice" "Problem" component
+        And I duplicate the first component
+        Then I see a Problem component with display name "Duplicate of 'Blank Common Problem'" in position "1"
+        And I reload the page
+        Then I see a Problem component with display name "Blank Common Problem" in position "0"
+        And I see a Problem component with display name "Duplicate of 'Blank Common Problem'" in position "1"
+        And I see a Problem component with display name "Multiple Choice" in position "2"

@@ -5,33 +5,4 @@
     background: white url('images/ui-anim_basic_16x16.gif') right center no-repeat;
 }
 </style>
-<script type="text/javascript">
-  $(function(){
-      $("#city").autocomplete({
-        source: function(request, response){
-            $.ajax({
-                url: "/city_lookup/",
-                dataType: 'json',
-                data: {
-                    query: request.term
-                },
-                success: function(data){
-                    response( $.map(data, function(item){
-                      $("#city_id").val(item[0]); 
-                      return {
-                          label: item[1],
-                          value: item[1]
-                      }
-                    }));
-                }
-            });
-        },
-        open: function(){
-            $(this).removeClass("ui-corner-all").addClass("ui-corner-top");
-        },
-        close: function(){
-            $(this).removeClass("ui-corner-top").addClass("ui-corner-all");
-        }
-      })
-  });
-</script>
+<script type="text/javascript" src="${static.url('js/extra_ajax.js')}"></script>

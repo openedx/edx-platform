@@ -1,7 +1,7 @@
 import os
 from unittest import TestCase
 
-from config import Configuration, LOCALE_DIR, CONFIGURATION
+from i18n.config import Configuration, LOCALE_DIR, CONFIGURATION
 
 class TestConfiguration(TestCase):
     """

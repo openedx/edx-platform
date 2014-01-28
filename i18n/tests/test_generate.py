@@ -1,14 +1,15 @@
+from datetime import datetime, timedelta
 import os
 import string
 import random
 import re
-from polib import pofile
 from unittest import TestCase
-from datetime import datetime, timedelta
+
+from polib import pofile
 from pytz import UTC
 
-import generate
-from config import CONFIGURATION
+from i18n import generate
+from i18n.config import CONFIGURATION
 
 
 class TestGenerate(TestCase):

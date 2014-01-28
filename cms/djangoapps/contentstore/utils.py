@@ -191,7 +191,7 @@ def get_lms_link_for_about_page(location):
 
 def course_image_url(course):
     """Returns the image url for the course."""
-    loc = course.location._replace(tag='c4x', category='asset', name=course.course_image)
+    loc = StaticContent.compute_location(course.location.org, course.location.course, course.course_image)
     path = StaticContent.get_url_path_from_location(loc)
     return path
 

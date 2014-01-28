@@ -16,8 +16,8 @@ languages to generate.
 import os, sys, logging
 from polib import pofile
 
-from config import BASE_DIR, CONFIGURATION
-from execute import execute
+from i18n.config import BASE_DIR, CONFIGURATION
+from i18n.execute import execute
 
 LOG = logging.getLogger(__name__)
 

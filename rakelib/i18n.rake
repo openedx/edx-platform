@@ -7,11 +7,8 @@ namespace :i18n do
     sh(File.join(REPO_ROOT, "i18n", "extract.py"))
   end
 
-  desc "Compile localizable strings from sources. With optional flag 'extract', will extract strings first."
-  task :generate => "i18n:validate:gettext" do
-    if ARGV.last.downcase == 'extract'
-      Rake::Task["i18n:extract"].execute
-    end
+  desc "Compile localizable strings from sources, extracting strings first."
+  task :generate => "i18n:extract" do
     sh(File.join(REPO_ROOT, "i18n", "generate.py"))
   end
 

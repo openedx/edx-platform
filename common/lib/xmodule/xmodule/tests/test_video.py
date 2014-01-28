@@ -25,7 +25,6 @@ from .test_import import DummySystem
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
-from textwrap import dedent
 from xmodule.tests import get_test_descriptor_system
 
 
@@ -187,6 +186,8 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
             <video display_name="Test Video"
                    youtube="1.0:p2Q6BrNhdh8,0.75:izygArpw-Qo,1.25:1EeWXzPdhSA,1.5:rABDYkeK0x8"
                    show_captions="false"
+                   download_track="true"
+                   download_video="true"
                    start_time="00:00:01"
                    end_time="00:01:00">
               <source src="http://www.example.com/source.mp4"/>
@@ -207,10 +208,12 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
             'youtube_id_1_0': 'p2Q6BrNhdh8',
             'youtube_id_1_25': '1EeWXzPdhSA',
             'youtube_id_1_5': 'rABDYkeK0x8',
+            'download_video': True,
             'show_captions': False,
             'start_time': datetime.timedelta(seconds=1),
             'end_time': datetime.timedelta(seconds=60),
             'track': 'http://www.example.com/track',
+            'download_track': True,
             'html5_sources': ['http://www.example.com/source.mp4', 'http://www.example.com/source.ogg'],
             'data': ''
         })
@@ -221,7 +224,9 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
             <video display_name="Test Video"
                    youtube="1.0:p2Q6BrNhdh8,0.75:izygArpw-Qo,1.25:1EeWXzPdhSA,1.5:rABDYkeK0x8"
                    show_captions="false"
+                   download_track="false"
                    start_time="00:00:01"
+                   download_video="false"
                    end_time="00:01:00">
               <source src="http://www.example.com/source.mp4"/>
               <track src="http://www.example.com/track"/>
@@ -237,7 +242,8 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
             'start_time': datetime.timedelta(seconds=1),
             'end_time': datetime.timedelta(seconds=60),
             'track': 'http://www.example.com/track',
-            'source': 'http://www.example.com/source.mp4',
+            'download_track': False,
+            'download_video': False,
             'html5_sources': ['http://www.example.com/source.mp4'],
             'data': ''
         })
@@ -253,7 +259,6 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
                    youtube="1.0:p2Q6BrNhdh8,1.25:1EeWXzPdhSA"
                    show_captions="true">
               <source src="http://www.example.com/source.mp4"/>
-              <track src="http://www.example.com/track"/>
             </video>
         '''
         output = VideoDescriptor.from_xml(xml_data, module_system, Mock())
@@ -265,8 +270,9 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
             'show_captions': True,
             'start_time': datetime.timedelta(seconds=0.0),
             'end_time': datetime.timedelta(seconds=0.0),
-            'track': 'http://www.example.com/track',
-            'source': 'http://www.example.com/source.mp4',
+            'track': '',
+            'download_track': False,
+            'download_video': False,
             'html5_sources': ['http://www.example.com/source.mp4'],
             'data': ''
         })
@@ -287,7 +293,8 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
             'start_time': datetime.timedelta(seconds=0.0),
             'end_time': datetime.timedelta(seconds=0.0),
             'track': '',
-            'source': '',
+            'download_track': False,
+            'download_video': False,
             'html5_sources': [],
             'data': ''
         })
@@ -302,9 +309,10 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
             <video display_name="&quot;display_name&quot;"
                 html5_sources="[&quot;source_1&quot;, &quot;source_2&quot;]"
                 show_captions="false"
-                source="&quot;http://download_video&quot;"
+                download_video="true"
                 sub="&quot;html5_subtitles&quot;"
                 track="&quot;http://download_track&quot;"
+                download_track="true"
                 youtube_id_0_75="&quot;OEoXaMPEzf65&quot;"
                 youtube_id_1_25="&quot;OEoXaMPEzf125&quot;"
                 youtube_id_1_5="&quot;OEoXaMPEzf15&quot;"
@@ -321,7 +329,8 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
             'start_time': datetime.timedelta(seconds=0.0),
             'end_time': datetime.timedelta(seconds=0.0),
             'track': 'http://download_track',
-            'source': 'http://download_video',
+            'download_track': True,
+            'download_video': True,
             'html5_sources': ["source_1", "source_2"],
             'data': ''
         })
@@ -343,7 +352,8 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
             'start_time': datetime.timedelta(seconds=0.0),
             'end_time': datetime.timedelta(seconds=0.0),
             'track': '',
-            'source': '',
+            'download_track': False,
+            'download_video': False,
             'html5_sources': [],
             'data': ''
         })
@@ -357,6 +367,7 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
             <video display_name="Test Video"
                    youtube="1.0:p2Q6BrNhdh8,0.75:izygArpw-Qo,1.25:1EeWXzPdhSA,1.5:rABDYkeK0x8"
                    show_captions="false"
+                   source="http://www.example.com/source.mp4"
                    from="00:00:01"
                    to="00:01:00">
               <source src="http://www.example.com/source.mp4"/>
@@ -373,8 +384,9 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
             'start_time': datetime.timedelta(seconds=1),
             'end_time': datetime.timedelta(seconds=60),
             'track': 'http://www.example.com/track',
+            'download_track': True,
             'html5_sources': ['http://www.example.com/source.mp4'],
-            'data': ''
+            'data': '',
         })
 
     def test_old_video_data(self):
@@ -402,6 +414,7 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
             'start_time': datetime.timedelta(seconds=1),
             'end_time': datetime.timedelta(seconds=60),
             'track': 'http://www.example.com/track',
+            'download_track': True,
             'html5_sources': ['http://www.example.com/source.mp4'],
             'data': ''
         })
@@ -431,6 +444,7 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
             'start_time': datetime.timedelta(seconds=1),
             'end_time': datetime.timedelta(seconds=60),
             'track': 'http://www.example.com/track',
+            'download_track': True,
             'html5_sources': ['http://www.example.com/source.mp4'],
             'data': ''
         })
@@ -461,11 +475,13 @@ class VideoExportTestCase(unittest.TestCase):
         desc.start_time = datetime.timedelta(seconds=1.0)
         desc.end_time = datetime.timedelta(seconds=60)
         desc.track = 'http://www.example.com/track'
+        desc.download_track = True
         desc.html5_sources = ['http://www.example.com/source.mp4', 'http://www.example.com/source.ogg']
+        desc.download_video = True
 
         xml = desc.definition_to_xml(None)  # We don't use the `resource_fs` parameter
         expected = etree.fromstring('''\
-         <video url_name="SampleProblem1" start_time="0:00:01" youtube="0.75:izygArpw-Qo,1.00:p2Q6BrNhdh8,1.25:1EeWXzPdhSA,1.50:rABDYkeK0x8" show_captions="false" end_time="0:01:00">
+         <video url_name="SampleProblem1" start_time="0:00:01" youtube="0.75:izygArpw-Qo,1.00:p2Q6BrNhdh8,1.25:1EeWXzPdhSA,1.50:rABDYkeK0x8" show_captions="false" end_time="0:01:00" download_video="true" download_track="true">
            <source src="http://www.example.com/source.mp4"/>
            <source src="http://www.example.com/source.ogg"/>
            <track src="http://www.example.com/track"/>
@@ -488,11 +504,13 @@ class VideoExportTestCase(unittest.TestCase):
         desc.start_time = datetime.timedelta(seconds=5.0)
         desc.end_time = datetime.timedelta(seconds=0.0)
         desc.track = 'http://www.example.com/track'
+        desc.download_track = True
         desc.html5_sources = ['http://www.example.com/source.mp4', 'http://www.example.com/source.ogg']
+        desc.download_video = True
 
         xml = desc.definition_to_xml(None)  # We don't use the `resource_fs` parameter
         expected = etree.fromstring('''\
-         <video url_name="SampleProblem1" start_time="0:00:05" youtube="0.75:izygArpw-Qo,1.00:p2Q6BrNhdh8,1.25:1EeWXzPdhSA,1.50:rABDYkeK0x8" show_captions="false">
+         <video url_name="SampleProblem1" start_time="0:00:05" youtube="0.75:izygArpw-Qo,1.00:p2Q6BrNhdh8,1.25:1EeWXzPdhSA,1.50:rABDYkeK0x8" show_captions="false" download_video="true" download_track="true">
            <source src="http://www.example.com/source.mp4"/>
            <source src="http://www.example.com/source.ogg"/>
            <track src="http://www.example.com/track"/>

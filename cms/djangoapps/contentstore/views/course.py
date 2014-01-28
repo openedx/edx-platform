@@ -101,10 +101,10 @@ def course_handler(request, tag=None, package_id=None, branch=None, version_guid
     DELETE
         json: delete this branch from this course (leaving off /branch/draft would imply delete the course)
     """
-
-    if 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
+    response_format = request.REQUEST.get('format', 'html')
+    if response_format == 'json' or 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
         if request.method == 'GET':
-            raise NotImplementedError('coming soon')
+            return JsonResponse(_course_json(request, package_id, branch, version_guid, block))
         elif request.method == 'POST':  # not sure if this is only post. If one will have ids, it goes after access
             return create_new_course(request)
         elif not has_course_access(
@@ -125,6 +125,37 @@ def course_handler(request, tag=None, package_id=None, branch=None, version_guid
             return course_index(request, package_id, branch, version_guid, block)
     else:
         return HttpResponseNotFound()
+
+
+@login_required
+def _course_json(request, package_id, branch, version_guid, block):
+    """
+    Returns a JSON overview of a course
+    """
+    __, course = _get_locator_and_course(
+        package_id, branch, version_guid, block, request.user, depth=None
+    )
+    return _xmodule_json(course, course.location.course_id)
+
+
+def _xmodule_json(xmodule, course_id):
+    """
+    Returns a JSON overview of an XModule
+    """
+    locator = loc_mapper().translate_location(
+        course_id, xmodule.location, published=False, add_entry_if_missing=True
+    )
+    is_container = xmodule.has_children
+    result = {
+        'display_name': xmodule.display_name,
+        'id': unicode(locator),
+        'category': xmodule.category,
+        'is_draft': getattr(xmodule, 'is_draft', False),
+        'is_container': is_container,
+    }
+    if is_container:
+        result['children'] = [_xmodule_json(child, course_id) for child in xmodule.get_children()]
+    return result
 
 
 @login_required
