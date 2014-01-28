@@ -1,5 +1,5 @@
 """
-Unittests for importing a course via management command
+Unittests for migrating a course to split mongo
 """
 import unittest
 
