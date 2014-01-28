@@ -144,6 +144,11 @@ class VideoFields(object):
         scope=Scope.preferences,
         default=1.0
     )
+    language = String(
+        help="The last language that was explicitly set by user for the video.",
+        scope=Scope.preferences,
+        default='en'
+    )
 
     # Data format: {de': 'german_translation', 'ua': 'ukrainian_translation'}
     transcripts = Dict(
@@ -196,7 +201,7 @@ class VideoModule(VideoFields, XModule):
     js_module_name = "Video"
 
     def handle_ajax(self, dispatch, data):
-        ACCEPTED_KEYS = ['speed']
+        ACCEPTED_KEYS = ['speed', 'language']
 
         if dispatch == 'save_user_state':
             for key in data:

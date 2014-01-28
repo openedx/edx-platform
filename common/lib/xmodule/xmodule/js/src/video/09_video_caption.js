@@ -193,7 +193,8 @@ function () {
             url: self.videoCaption.captionURL(),
             notifyOnError: false,
             data: {
-                videoId: this.youtubeId() == 'OEoXaMPEzfM' ? 'edX-FA12-cware-1_100' : 'OEoXaMPEzfM',
+                videoId: this.youtubeId(),
+                // videoId: this.youtubeId() == 'OEoXaMPEzfM' ? 'edX-FA12-cware-1_100' : 'OEoXaMPEzfM',
                 language: this.getCurrentLanguage()
             },
             success: function (captions) {
@@ -236,8 +237,8 @@ function () {
     }
 
     function captionURL() {
-        return '' + this.config.captionAssetPath + (this.lang == 'de' ? 'edX-FA12-cware-1_100' : 'OEoXaMPEzfM') + '.srt.sjson';
-            // this.youtubeId('1.0') + '.srt.sjson';
+        // return '' + this.config.captionAssetPath + (this.lang == 'de' ? 'edX-FA12-cware-1_100' : 'OEoXaMPEzfM') + '.srt.sjson';
+        return this.config.captionAssetPath + this.youtubeId('1.0') + '.srt.sjson';
     }
 
     function resize() {
@@ -282,6 +283,15 @@ function () {
                 el  .addClass('active')
                     .siblings('li')
                     .removeClass('active');
+
+                $.ajax({
+                    url: self.config.saveStateUrl,
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        language: self.getCurrentLanguage()
+                    },
+                });
 
                 Caption.fetchCaption();
             }

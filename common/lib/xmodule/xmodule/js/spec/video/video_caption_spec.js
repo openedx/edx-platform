@@ -67,6 +67,10 @@
                         expect($.ajaxWithPrefix).toHaveBeenCalledWith({
                             url: state.videoCaption.captionURL(),
                             notifyOnError: false,
+                            data: {
+                                videoId: 'Z5KLxerq05Y',
+                                language: 'en'
+                            },
                             success: jasmine.any(Function),
                             error: jasmine.any(Function)
                         });
@@ -83,31 +87,6 @@
                     expect($('.hide-subtitles')).toHandleWith(
                         'click', state.videoCaption.toggle
                     );
-                });
-
-                it('bind the mouse movement', function () {
-                    expect($('.subtitles')).toHandleWith(
-                        'mouseover', state.videoCaption.onMouseEnter
-                    );
-                    expect($('.subtitles')).toHandleWith(
-                        'mouseout', state.videoCaption.onMouseLeave
-                    );
-                    expect($('.subtitles')).toHandleWith(
-                        'mousemove', state.videoCaption.onMovement
-                    );
-                    expect($('.subtitles')).toHandleWith(
-                        'mousewheel', state.videoCaption.onMovement
-                    );
-                    expect($('.subtitles')).toHandleWith(
-                        'DOMMouseScroll', state.videoCaption.onMovement
-                    );
-                });
-
-                it('bind the scroll', function () {
-                    expect($('.subtitles'))
-                        .toHandleWith('scroll', state.videoCaption.autoShowCaptions);
-                    expect($('.subtitles'))
-                        .toHandleWith('scroll', videoControl.showControls);
                 });
             });
 
@@ -141,34 +120,6 @@
                         .toBe(true);
                     expect($('.subtitles li:last').hasClass('spacing'))
                         .toBe(true);
-                });
-
-                it('bind all the caption link', function () {
-                    $('.subtitles li[data-index]').each(
-                        function (index, link) {
-
-                        expect($(link)).toHandleWith(
-                            'mouseover', state.videoCaption.captionMouseOverOut
-                        );
-                        expect($(link)).toHandleWith(
-                            'mouseout', state.videoCaption.captionMouseOverOut
-                        );
-                        expect($(link)).toHandleWith(
-                            'mousedown', state.videoCaption.captionMouseDown
-                        );
-                        expect($(link)).toHandleWith(
-                            'click', state.videoCaption.captionClick
-                        );
-                        expect($(link)).toHandleWith(
-                            'focus', state.videoCaption.captionFocus
-                        );
-                        expect($(link)).toHandleWith(
-                            'blur', state.videoCaption.captionBlur
-                        );
-                        expect($(link)).toHandleWith(
-                            'keydown', state.videoCaption.captionKeyDown
-                        );
-                    });
                 });
 
                 it('set rendered to true', function () {
@@ -211,105 +162,6 @@
 
                 it('captions panel is not shown', function () {
                     expect(state.videoCaption.hideSubtitlesEl).toBeHidden();
-                });
-            });
-        });
-
-        describe('mouse movement', function () {
-            beforeEach(function () {
-                jasmine.Clock.useMock();
-                spyOn(window, 'clearTimeout');
-            });
-
-            describe('when cursor is outside of the caption box', function () {
-                beforeEach(function () {
-                    $(window).trigger(jQuery.Event('mousemove'));
-                    jasmine.Clock.tick(state.config.captionsFreezeTime);
-                });
-
-                it('does not set freezing timeout', function () {
-                    expect(state.videoCaption.frozen).toBeFalsy();
-                });
-            });
-
-            describe('when cursor is in the caption box', function () {
-                beforeEach(function () {
-                    spyOn(state.videoCaption, 'onMouseLeave');
-                    $('.subtitles').trigger(jQuery.Event('mouseenter'));
-                    jasmine.Clock.tick(state.config.captionsFreezeTime);
-                });
-
-                it('set the freezing timeout', function () {
-                    expect(state.videoCaption.frozen).not.toBeFalsy();
-                    expect(state.videoCaption.onMouseLeave).toHaveBeenCalled();
-                });
-
-                describe('when the cursor is moving', function () {
-                    beforeEach(function () {
-                        $('.subtitles').trigger(jQuery.Event('mousemove'));
-                    });
-
-                    it('reset the freezing timeout', function () {
-                        expect(window.clearTimeout).toHaveBeenCalled();
-                    });
-                });
-
-                describe('when the mouse is scrolling', function () {
-                    beforeEach(function () {
-                        $('.subtitles').trigger(jQuery.Event('mousewheel'));
-                    });
-
-                    it('reset the freezing timeout', function () {
-                        expect(window.clearTimeout).toHaveBeenCalled();
-                    });
-                });
-            });
-
-            describe(
-                'when cursor is moving out of the caption box',
-                function () {
-
-                beforeEach(function () {
-                    state.videoCaption.frozen = 100;
-                    $.fn.scrollTo.reset();
-                });
-
-                describe('always', function () {
-                    beforeEach(function () {
-                        $('.subtitles').trigger(jQuery.Event('mouseout'));
-                    });
-
-                    it('reset the freezing timeout', function () {
-                        expect(window.clearTimeout).toHaveBeenCalledWith(100);
-                    });
-
-                    it('unfreeze the caption', function () {
-                        expect(state.videoCaption.frozen).toBeNull();
-                    });
-                });
-
-                describe('when the player is playing', function () {
-                    beforeEach(function () {
-                        state.videoCaption.playing = true;
-                        $('.subtitles li[data-index]:first')
-                            .addClass('current');
-                        $('.subtitles').trigger(jQuery.Event('mouseout'));
-                    });
-
-                    it('scroll the caption', function () {
-                        expect($.fn.scrollTo).toHaveBeenCalled();
-                    });
-                });
-
-                describe('when the player is not playing', function () {
-                    beforeEach(function () {
-                        state.videoCaption.playing = false;
-                        $('.subtitles').trigger(jQuery.Event('mouseout'));
-                    });
-
-                    it('does not scroll the caption', function () {
-                        expect($.fn.scrollTo).not.toHaveBeenCalled();
-                    });
                 });
             });
         });
@@ -358,34 +210,6 @@
                 it('add a padding element to caption', function () {
                     expect($('.subtitles li:first')).toBe('.spacing');
                     expect($('.subtitles li:last')).toBe('.spacing');
-                });
-
-                it('bind all the caption link', function () {
-                    $('.subtitles li[data-index]').each(
-                        function (index, link) {
-
-                        expect($(link)).toHandleWith(
-                            'mouseover', state.videoCaption.captionMouseOverOut
-                        );
-                        expect($(link)).toHandleWith(
-                            'mouseout', state.videoCaption.captionMouseOverOut
-                        );
-                        expect($(link)).toHandleWith(
-                            'mousedown', state.videoCaption.captionMouseDown
-                        );
-                        expect($(link)).toHandleWith(
-                            'click', state.videoCaption.captionClick
-                        );
-                        expect($(link)).toHandleWith(
-                            'focus', state.videoCaption.captionFocus
-                        );
-                        expect($(link)).toHandleWith(
-                            'blur', state.videoCaption.captionBlur
-                        );
-                        expect($(link)).toHandleWith(
-                            'keydown', state.videoCaption.captionKeyDown
-                        );
-                    });
                 });
 
                 it('set rendered to true', function () {
