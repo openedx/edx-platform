@@ -342,13 +342,9 @@ class VideoModule(VideoFields, XModule):
                     self.location.org, self.location.course, filename
                 )
                 sjson_transcripts = contentstore().find(content_location)
-                response = Response(
-                    sjson_transcripts,
-                    headerlist=[
-                    ('Content-Disposition', 'attachment; filename="{0}.srt"'.format(filename)),
-                ])
-                response.content_type='application/json'
-                return Response
+                response = Response(sjson_transcripts)
+                response.content_type = 'application/json'
+                return response
             else:
                 log.info("transcript_translation is not available for given language.")
                 return Response(status=404)
@@ -427,13 +423,8 @@ class VideoModule(VideoFields, XModule):
                 save_subs_to_store(subs, video_id, self, language)
                 sjson_transcripts = json.dumps(subs, indent=2)
 
-        response = Response(
-            sjson_transcripts,
-            headerlist=[
-                ('Content-Disposition', 'attachment; filename="{0}.srt"'.format(self.sub)),
-            ])
-        response.content_type='application/json'
-
+        response = Response(sjson_transcripts)
+        response.content_type = 'application/json'
         return response
 
 class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor):
