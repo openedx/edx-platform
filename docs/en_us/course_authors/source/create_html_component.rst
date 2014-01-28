@@ -156,7 +156,7 @@ You can add a link to a course unit in an HTML component.
 
 #. Obtain the unit identifier of the unit you're linking to. To do this, open the unit page in Studio, and copy the unit ID from the **Unit Identifier** field under **Unit Location** in the right pane.
    
-   .. image:: /Images/UnitIdentifier.gif
+   .. image:: /Images/UnitIdentifier.png
     :alt: Image of the unit page with the unit identifier circled
 
 #. Open the HTML component where you want to add the link.
@@ -270,8 +270,9 @@ To create an HTML component that contains LaTeX code:
 
 #. In the component that appears, click **upload** in the upper-right corner.
 
-   .. image:: Images/HTML_LaTeX.gif
+   .. image:: Images/HTML_LaTeX.png
     :alt: Image of the LaTeX component with the upload button circled
+
 
 #. In the dialog box that opens, select a file, and then click **Open**.
 
@@ -286,7 +287,7 @@ To create an HTML component that contains LaTeX code:
 
    The component editor closes, and the unit page opens. You can see the way your LaTeX content looks.
 
-   .. image:: Images/HTML_LaTeX_CompEditor.gif
+   .. image:: Images/HTML_LaTeX_CompEditor.png
     :alt: Image of the LaTeX component
 
 #. On the unit page, click **Preview** to verify that your content looks the way you want it to in the LMS. 
