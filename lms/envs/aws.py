@@ -157,10 +157,11 @@ LOG_DIR = ENV_TOKENS['LOG_DIR']
 CACHES = ENV_TOKENS['CACHES']
 # Cache used for location mapping -- called many times with the same key/value
 # in a given request.
-CACHES['loc_cache'] = {
-    'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-    'LOCATION': 'edx_location_mem_cache',
-}
+if 'loc_cache' not in CACHES:
+    CACHES['loc_cache'] = {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'edx_location_mem_cache',
+    }
 
 # Email overrides
 DEFAULT_FROM_EMAIL = ENV_TOKENS.get('DEFAULT_FROM_EMAIL', DEFAULT_FROM_EMAIL)
