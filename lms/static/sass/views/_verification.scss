@@ -1800,78 +1800,115 @@
 
     // step-dash
 
-    .content-main > .title {
-      @extend %t-title7;
-      display: block;
-      font-weight: 600;
-      color: $m-gray;
-    }
+    &.step-dash {
 
-    .action-reverify {
-      //@extend %btn-verify-primary;
-      padding: ($baseline/2) ($baseline*0.75);
-    }
-
-    .reverification-list {
-      list-style-type: none;
-
-      .item {
-        display: inline-block;
-        width: 48%;
-        box-shadow: 0 2px 5px 2px $shadow-l1;
-        margin: ($baseline*.75) ($baseline*.75) ($baseline*.75) 0;
-        border: 1px solid $m-gray-t2;
-
-        &.complete {
-          border: 1px solid $verified-color-lvl1;
-        }
-
-        &.failed {
-          border: 1px solid $error-color;
-        }
-      }
-
-      .course-info {
-        margin-bottom: ($baseline/2);
-        padding: ($baseline/2) ($baseline*.75);
-      }
-
-      .reverify-status {
-        background-color: $light-gray;
-        padding: ($baseline/2) ($baseline*.75);
-      }
-
-      .course-name {
-        @extend %t-title5;
+      .content-main > .title {
+        @extend %t-title7;
         display: block;
-        font-weight: bold;
+        font-weight: 600;
+        color: $m-gray;
       }
 
-      .deadline {
-        @extend %copy-detail;
-        display: block;
-        margin-top: ($baseline/4);
-      }
-    }
-
-
-    .wrapper-reverification-help {
-      margin-top: $baseline;
-      border-top: 1px solid $light-gray;
-      padding-top: ($baseline*1.5);
-
-      .faq-item {
+      .wrapper-reverify-open,
+      .wrapper-reverify-status {
         display: inline-block;
         vertical-align: top;
-        width: flex-grid(4,12);
-        padding-right: $baseline;
+        width: 48%;
+      }
 
-        &:last-child {
-          padding-right: 0;
+      .copy .title {
+        @extend %t-title6;
+        font-weight: 600;
+      }
+
+      .wrapper-reverify-status .title {
+        @extend %t-title6;
+        font-weight: normal;
+        color: $m-gray;
+      }
+
+      .action-reverify {
+        padding: ($baseline/2) ($baseline*0.75);
+      }
+
+      .reverification-list {
+        list-style-type: none;
+        padding: 0 $baseline;
+
+        .item {
+          box-shadow: 0 2px 5px 0 $shadow-l1 inset;
+          margin: ($baseline*.75) ($baseline*.75) ($baseline*.75) 0;
+          border: 1px solid $m-gray-t2;
+
+          &.complete {
+            border: 1px solid $verified-color-lvl1;
+
+            .reverify-status {
+              border-top: 1px solid $light-gray;
+              background-color: $m-gray-l4;
+              color: $verified-color-lvl1;
+              font-weight: 600;
+            }
+          }
+
+          &.failed {
+            border: 1px solid $danger-red;
+
+            .reverify-status {
+              border-top: 1px solid $light-gray;
+              background-color: $m-gray-l4;
+              color: $danger-red;
+              font-weight: 600;
+            }
+          }
         }
 
-        .faq-answer {
-          @extend %t-copy-sub1;
+        .course-info {
+          margin-bottom: ($baseline/2);
+          padding: ($baseline/2) ($baseline*.75);
+        }
+
+        .course-name {
+          @extend %t-title5;
+          display: block;
+          font-weight: bold;
+        }
+
+        .deadline {
+          @extend %copy-detail;
+          display: block;
+          margin-top: ($baseline/4);
+        }
+
+        .reverify-status {
+          background-color: $light-gray;
+          padding: ($baseline/2) ($baseline*.75);
+        }
+      }
+
+      .support {
+        margin-top: $baseline;
+        @extend %t-copy-sub1;
+      }
+
+      .wrapper-reverification-help {
+        margin-top: $baseline;
+        border-top: 1px solid $light-gray;
+        padding-top: ($baseline*1.5);
+
+        .faq-item {
+          display: inline-block;
+          vertical-align: top;
+          width: flex-grid(4,12);
+          padding-right: $baseline;
+
+          &:last-child {
+            padding-right: 0;
+          }
+
+          .faq-answer {
+            @extend %t-copy-sub1;
+          }
         }
       }
     }
