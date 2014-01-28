@@ -254,7 +254,7 @@ class OpenEndedModuleTest(unittest.TestCase):
         self.test_system.open_ended_grading_interface = None
         self.test_system.location = self.location
         self.mock_xqueue = MagicMock()
-        self.mock_xqueue.send_to_queue.return_value = (None, "Message")
+        self.mock_xqueue.send_to_queue.return_value = (0, "Queued")
 
         def constructed_callback(dispatch="score_update"):
             return dispatch
@@ -265,50 +265,87 @@ class OpenEndedModuleTest(unittest.TestCase):
         self.openendedmodule = OpenEndedModule(self.test_system, self.location,
                                                self.definition, self.descriptor, self.static_data, self.metadata)
 
-    # Disabled 1/27/14 due to flakiness in master
-    # Should not be comparing the submission time to the current time!
-    @unittest.skip
     def test_message_post(self):
-        get = {'feedback': 'feedback text',
-               'submission_id': '1',
-               'grader_id': '1',
-               'score': 3}
-        qtime = datetime.strftime(datetime.now(UTC), xqueue_interface.dateformat)
-        student_info = {'anonymous_student_id': self.test_system.anonymous_student_id,
-                        'submission_time': qtime}
-        contents = {
-            'feedback': get['feedback'],
-            'submission_id': int(get['submission_id']),
-            'grader_id': int(get['grader_id']),
-            'score': get['score'],
-            'student_info': json.dumps(student_info)
-        }
+        """Test message_post() sends feedback to xqueue."""
 
-        result = self.openendedmodule.message_post(get, self.test_system)
+        submission_time = datetime.strftime(datetime.now(UTC), xqueue_interface.dateformat)
+
+        feedback_post = {
+            'feedback': 'feedback text',
+            'submission_id': '1',
+            'grader_id': '1',
+            'score': 3
+        }
+        result = self.openendedmodule.message_post(feedback_post, self.test_system)
         self.assertTrue(result['success'])
+
         # make sure it's actually sending something we want to the queue
-        self.mock_xqueue.send_to_queue.assert_called_with(body=json.dumps(contents), header=ANY)
+        mock_send_to_queue_body_arg = json.loads(self.mock_xqueue.send_to_queue.call_args[1]['body'])
+        self.assertEqual(mock_send_to_queue_body_arg['feedback'], feedback_post['feedback'])
+        self.assertEqual(mock_send_to_queue_body_arg['submission_id'], int(feedback_post['submission_id']))
+        self.assertEqual(mock_send_to_queue_body_arg['grader_id'], int(feedback_post['grader_id']))
+        self.assertEqual(mock_send_to_queue_body_arg['score'], feedback_post['score'])
+        body_arg_student_info = json.loads(mock_send_to_queue_body_arg['student_info'])
+        self.assertEqual(body_arg_student_info['anonymous_student_id'], self.test_system.anonymous_student_id)
+        self.assertGreaterEqual(body_arg_student_info['submission_time'], submission_time)
 
         state = json.loads(self.openendedmodule.get_instance_state())
-        self.assertIsNotNone(state['child_state'], OpenEndedModule.DONE)
+        self.assertEqual(state['child_state'], OpenEndedModule.DONE)
 
-    # Disabled 1/27/14 due to flakiness in master
-    # Should not be comparing the submission time to the current time!
-    @unittest.skip
+    def test_message_post_fail(self):
+        """Test message_post() if unable to send feedback to xqueue."""
+
+        self.mock_xqueue.send_to_queue.return_value = (1, "Not Queued")
+
+        feedback_post = {
+            'feedback': 'feedback text',
+            'submission_id': '1',
+            'grader_id': '1',
+            'score': 3
+        }
+        result = self.openendedmodule.message_post(feedback_post, self.test_system)
+        self.assertFalse(result['success'])
+
+        state = json.loads(self.openendedmodule.get_instance_state())
+        self.assertNotEqual(state['child_state'], OpenEndedModule.DONE)
+
     def test_send_to_grader(self):
-        submission = "This is a student submission"
-        qtime = datetime.strftime(datetime.now(UTC), xqueue_interface.dateformat)
-        student_info = {'anonymous_student_id': self.test_system.anonymous_student_id,
-                        'submission_time': qtime}
-        contents = self.openendedmodule.payload.copy()
-        contents.update({
-            'student_info': json.dumps(student_info),
-            'student_response': submission,
-            'max_score': self.max_score
-        })
-        result = self.openendedmodule.send_to_grader(submission, self.test_system)
+        student_response = "This is a student submission"
+        submission_time = datetime.strftime(datetime.now(UTC), xqueue_interface.dateformat)
+
+        result, __ = self.openendedmodule.send_to_grader(student_response, self.test_system)
         self.assertTrue(result)
-        self.mock_xqueue.send_to_queue.assert_called_with(body=json.dumps(contents), header=ANY)
+
+        mock_send_to_queue_body_arg = json.loads(self.mock_xqueue.send_to_queue.call_args[1]['body'])
+        self.assertEqual(mock_send_to_queue_body_arg['student_response'], student_response)
+        self.assertEqual(mock_send_to_queue_body_arg['max_score'], self.max_score)
+        body_arg_student_info = json.loads(mock_send_to_queue_body_arg['student_info'])
+        self.assertEqual(body_arg_student_info['anonymous_student_id'], self.test_system.anonymous_student_id)
+        self.assertGreaterEqual(body_arg_student_info['submission_time'], submission_time)
+
+    def test_send_to_grader_fail(self):
+        """Test send_to_grader() if unable to send submission to xqueue."""
+
+        student_response = "This is a student submission"
+        self.mock_xqueue.send_to_queue.return_value = (1, "Not Queued")
+        result, __ = self.openendedmodule.send_to_grader(student_response, self.test_system)
+        self.assertFalse(result)
+
+    def test_save_answer_fail(self):
+        """Test save_answer() if unable to send submission to grader."""
+
+        submission = "This is a student submission"
+        self.openendedmodule.send_to_grader = Mock(return_value=(False, "Failed"))
+        response = self.openendedmodule.save_answer(
+            {"student_answer": submission},
+            get_test_system()
+        )
+        self.assertFalse(response['success'])
+        self.assertNotEqual(self.openendedmodule.latest_answer(), submission)
+        self.assertEqual(self.openendedmodule.stored_answer, submission)
+        state = json.loads(self.openendedmodule.get_instance_state())
+        self.assertEqual(state['child_state'], OpenEndedModule.INITIAL)
+        self.assertEqual(state['stored_answer'], submission)
 
     def update_score_single(self):
         self.openendedmodule.new_history_entry("New Entry")
@@ -384,7 +421,7 @@ class OpenEndedModuleTest(unittest.TestCase):
         self.assertEqual(test_module.get_display_answer(), saved_response)
 
         # Mock out the send_to_grader function so it doesn't try to connect to the xqueue.
-        test_module.send_to_grader = Mock(return_value=True)
+        test_module.send_to_grader = Mock(return_value=(True, "Success"))
         # Submit a student response to the question.
         test_module.handle_ajax(
             "save_answer",
@@ -815,7 +852,6 @@ class CombinedOpenEndedModuleConsistencyTest(unittest.TestCase):
            </openendedparam>
     </openended>'''
 
-
     static_data = {
         'max_attempts': 20,
         'prompt': prompt,
@@ -934,11 +970,16 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
     hint = "blah"
 
     def get_module_system(self, descriptor):
+
+        def construct_callback(dispatch="score_update"):
+            return dispatch
+
         test_system = get_test_system()
         test_system.open_ended_grading_interface = None
         test_system.xqueue['interface'] = Mock(
-            send_to_queue=Mock(side_effect=[1, "queued"])
+            send_to_queue=Mock(return_value=(0, "Queued"))
         )
+        test_system.xqueue['construct_callback'] = construct_callback
 
         return test_system
 
@@ -1009,6 +1050,96 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         self._handle_ajax("reset", {})
         self.assertEqual(self._module().current_task_number, 0)
 
+    def test_open_ended_flow_with_xqueue_failure(self):
+        """
+        Test a two step problem where the student first goes through the self assessment step, and then the
+        open ended step with the xqueue failing in the first step.
+        """
+        assessment = [1, 1]
+
+        # Simulate a student saving an answer
+        self._handle_ajax("save_answer", {"student_answer": self.answer})
+        status = self._handle_ajax("get_status", {})
+        self.assertIsInstance(status, basestring)
+
+        # Mock a student submitting an assessment
+        assessment_dict = MultiDict({'assessment': sum(assessment)})
+        assessment_dict.extend(('score_list[]', val) for val in assessment)
+
+        mock_xqueue_interface = Mock(
+            send_to_queue=Mock(return_value=(1, "Not Queued"))
+        )
+
+        # Call handle_ajax on the module with xqueue down
+        module = self._module()
+        with patch.dict(module.xmodule_runtime.xqueue, {'interface': mock_xqueue_interface}):
+            module.handle_ajax("save_assessment", assessment_dict)
+            self.assertEqual(module.current_task_number, 1)
+            self.assertTrue((module.child_module.get_task_number(1).child_created))
+        module.save()
+
+        # Check that next time the OpenEndedModule is loaded it calls send_to_grader
+        with patch.object(OpenEndedModule, 'send_to_grader') as mock_send_to_grader:
+            mock_send_to_grader.return_value = (False, "Not Queued")
+            module = self._module().child_module.get_score()
+            self.assertTrue(mock_send_to_grader.called)
+            self.assertTrue((self._module().child_module.get_task_number(1).child_created))
+
+        # Loading it this time should send submission to xqueue correctly
+        self.assertFalse((self._module().child_module.get_task_number(1).child_created))
+        self.assertEqual(self._module().current_task_number, 1)
+        self.assertEqual(self._module().state, OpenEndedChild.ASSESSING)
+
+        task_one_json = json.loads(self._module().task_states[0])
+        self.assertEqual(json.loads(task_one_json['child_history'][0]['post_assessment']), assessment)
+
+        # Move to the next step in the problem
+        self._handle_ajax("next_problem", {})
+        self.assertEqual(self._module().current_task_number, 1)
+        self._module().render('student_view')
+
+        # Try to get the rubric from the module
+        self._handle_ajax("get_combined_rubric", {})
+
+        self.assertEqual(self._module().state, OpenEndedChild.ASSESSING)
+
+        # Make a fake reply from the queue
+        queue_reply = {
+            'queuekey': "",
+            'xqueue_body': json.dumps({
+                'score': 0,
+                'feedback': json.dumps({"spelling": "Spelling: Ok.", "grammar": "Grammar: Ok.",
+                                        "markup-text": " all of us can think of a book that we hope none of our children or any other children have taken off the shelf . but if i have the right to remove that book from the shelf that work i abhor then you also have exactly the same right and so does everyone else . and then we <bg>have no books left</bg> on the shelf for any of us . <bs>katherine</bs> <bs>paterson</bs> , author write a persuasive essay to a newspaper reflecting your vies on censorship <bg>in libraries . do</bg> you believe that certain materials , such as books , music , movies , magazines , <bg>etc . , should be</bg> removed from the shelves if they are found <bg>offensive ? support your</bg> position with convincing arguments from your own experience , observations <bg>, and or reading .</bg> "}),
+                'grader_type': "ML",
+                'success': True,
+                'grader_id': 1,
+                'submission_id': 1,
+                'rubric_xml': "<rubric><category><description>Writing Applications</description><score>0</score><option points='0'> The essay loses focus, has little information or supporting details, and the organization makes it difficult to follow.</option><option points='1'> The essay presents a mostly unified theme, includes sufficient information to convey the theme, and is generally organized well.</option></category><category><description> Language Conventions </description><score>0</score><option points='0'> The essay demonstrates a reasonable command of proper spelling and grammar. </option><option points='1'> The essay demonstrates superior command of proper spelling and grammar.</option></category></rubric>",
+                'rubric_scores_complete': True,
+            })
+        }
+
+        self._handle_ajax("check_for_score", {})
+
+        # Update the module with the fake queue reply
+        self._handle_ajax("score_update", queue_reply)
+
+        module = self._module()
+        self.assertFalse(module.ready_to_reset)
+        self.assertEqual(module.current_task_number, 1)
+
+        # Get html and other data client will request
+        module.render('student_view')
+
+        self._handle_ajax("skip_post_assessment", {})
+
+        # Get all results
+        self._handle_ajax("get_combined_rubric", {})
+
+        # reset the problem
+        self._handle_ajax("reset", {})
+        self.assertEqual(self._module().state, "initial")
+
     def test_open_ended_flow_correct(self):
         """
         Test a two step problem where the student first goes through the self assessment step, and then the
@@ -1032,17 +1163,9 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         self.assertEqual(json.loads(task_one_json['child_history'][0]['post_assessment']), assessment)
 
         # Move to the next step in the problem
-        try:
-            self._handle_ajax("next_problem", {})
-        except GradingServiceError:
-            # This error is okay.  We don't have a grading service to connect to!
-            pass
+        self._handle_ajax("next_problem", {})
         self.assertEqual(self._module().current_task_number, 1)
-        try:
-            self._module().render('student_view')
-        except GradingServiceError:
-            # This error is okay.  We don't have a grading service to connect to!
-            pass
+        self._module().render('student_view')
 
         # Try to get the rubric from the module
         self._handle_ajax("get_combined_rubric", {})
@@ -1098,7 +1221,7 @@ class OpenEndedModuleXmlAttemptTest(unittest.TestCase, DummyModulestore):
         test_system = get_test_system()
         test_system.open_ended_grading_interface = None
         test_system.xqueue['interface'] = Mock(
-            send_to_queue=Mock(side_effect=[1, "queued"])
+            send_to_queue=Mock(return_value=(0, "Queued"))
         )
         return test_system
 
@@ -1172,7 +1295,7 @@ class OpenEndedModuleXmlImageUploadTest(unittest.TestCase, DummyModulestore):
         test_system.open_ended_grading_interface = None
         test_system.s3_interface = test_util_open_ended.S3_INTERFACE
         test_system.xqueue['interface'] = Mock(
-            send_to_queue=Mock(side_effect=[1, "queued"])
+            send_to_queue=Mock(return_value=(0, "Queued"))
         )
         return test_system
 
