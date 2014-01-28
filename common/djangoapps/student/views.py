@@ -10,6 +10,7 @@ import string       # pylint: disable=W0402
 import urllib
 import uuid
 import time
+from collections import defaultdict
 from pytz import UTC
 
 from django.conf import settings
@@ -182,29 +183,61 @@ def cert_info(user, course):
     return _cert_info(user, course, certificate_status_for_student(user, course.id))
 
 
-def reverification_info(user, course, enrollment):
+def reverification_info(course_enrollment_pairs, user, statuses):
     """
-    If
-    - a course has an open re-verification window, and
-    - that user has a verified enrollment in the course
-    then we return a tuple with relevant information.
+    Returns reverification-related information for *all* of user's enrollments whose
+    reverification status is in status_list
 
-    Else, return None.
+    Args:
+        course_enrollment_pairs (list): list of (course, enrollment) tuples
+        user (User): the user whose information we want
+        statuses (list): a list of reverification statuses we want information for
+            example: ["must_reverify", "denied"]
 
-    Five-tuple data: (course_id, course_display_name, course_number, reverification_end_date, reverification_status)
+    Returns:
+        dictionary of lists: dictionary with one key per status, e.g.
+            dict["must_reverify"] = []
+            dict["must_reverify"] = [some information]
+    """
+    reverifications = defaultdict(list)
+    for (course, enrollment) in course_enrollment_pairs:
+        info = single_course_reverification_info(user, course, enrollment)
+        for status in statuses:
+            if info and (status in info):
+                reverifications[status].append(info)
+
+    # Sort the data by the reverification_end_date
+    for status in statuses:
+        if reverifications[status]:
+            reverifications[status] = sorted(reverifications[status], key=lambda x: x[3])
+    return reverifications
+
+
+def single_course_reverification_info(user, course, enrollment):
+    """Returns midcourse reverification-related information for user with enrollment in course.
+
+    If a course has an open re-verification window, and that user has a verified enrollment in
+    the course, we return a tuple with relevant information.  Returns None if there is no info..
+
+    Args:
+        user (User): the user we want to get information for
+        course (Course): the course in which the student is enrolled
+        enrollment (CourseEnrollment): the object representing the type of enrollment user has in course
+
+    Returns:
+        5-tuple: (course_id, course_display_name, course_number, reverification_end_date, reverification_status)
+        OR, None: None if there is no re-verification info for this enrollment
     """
     window = MidcourseReverificationWindow.get_window(course.id, datetime.datetime.now(UTC))
 
-    # If there's an open window AND the user is verified
-    if (window and (enrollment.mode == "verified")):
-            return (
-                course.id,
-                course.display_name,
-                course.number,
-                window.end_date.strftime('%B %d, %Y %X %p'),
-                SoftwareSecurePhotoVerification.user_status(user, window)[0],
-            )
-    return None
+    # If there's no window OR the user is not verified, we don't get reverification info
+    if (not window) or (enrollment.mode != "verified"):
+        return None
+    return (
+        course.id, course.display_name, course.number,
+        window.end_date.strftime('%B %d, %Y %X %p'),
+        SoftwareSecurePhotoVerification.user_status(user, window)[0],
+    )
 
 
 def get_course_enrollment_pairs(user, course_org_filter, org_filter_out_set):
@@ -212,7 +245,6 @@ def get_course_enrollment_pairs(user, course_org_filter, org_filter_out_set):
     Get the relevant set of (Course, CourseEnrollment) pairs to be displayed on
     a student's dashboard.
     """
-    course_enrollment_pairs = []
     for enrollment in CourseEnrollment.enrollments_for_user(user):
         try:
             course = course_from_id(enrollment.course_id)
@@ -424,27 +456,8 @@ def dashboard(request):
     verification_status, verification_msg = SoftwareSecurePhotoVerification.user_status(user)
 
     # Gets data for midcourse reverifications, if any are necessary or have failed
-    reverifications_must_reverify = []
-    reverifications_denied = []
-    reverifications_pending = []
-    reverifications_approved = []
-    for (course, enrollment) in course_enrollment_pairs:
-        info = reverification_info(user, course, enrollment)
-        if info:
-            if "approved" in info:
-                reverifications_approved.append(info)
-            elif "pending" in info:
-                reverifications_pending.append(info)
-            elif "must_reverify" in info:
-                reverifications_must_reverify.append(info)
-            elif "denied" in info:
-                reverifications_denied.append(info)
-
-    # Sort the data by the reverification_end_date
-    reverifications_must_reverify = sorted(reverifications_must_reverify, key=lambda x: x[3])
-    reverifications_denied = sorted(reverifications_denied, key=lambda x: x[3])
-    reverifications_pending = sorted(reverifications_pending, key=lambda x: x[3])
-    reverifications_approved = sorted(reverifications_approved, key=lambda x: x[3])
+    statuses = ["approved", "denied", "pending", "must_reverify"]
+    reverifications = reverification_info(course_enrollment_pairs, user, statuses)
 
     show_refund_option_for = frozenset(course.id for course, _enrollment in course_enrollment_pairs
                                        if _enrollment.refundable())
@@ -466,10 +479,7 @@ def dashboard(request):
                'all_course_modes': course_modes,
                'cert_statuses': cert_statuses,
                'show_email_settings_for': show_email_settings_for,
-               'reverifications_must_reverify': reverifications_must_reverify,
-               'reverifications_denied': reverifications_denied,
-               'reverifications_pending': reverifications_pending,
-               'reverifications_approved': reverifications_approved,
+               'reverifications': reverifications,
                'verification_status': verification_status,
                'verification_msg': verification_msg,
                'show_refund_option_for': show_refund_option_for,

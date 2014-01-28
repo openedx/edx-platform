@@ -18,12 +18,12 @@
 
         <div class="copy">
 
-          % if reverifications_must_reverify:
-            % if len(reverifications_must_reverify) > 1:
+          % if reverifications["must_reverify"]:
+            % if len(reverifications["must_reverify"]) > 1:
               <div class="wrapper-reverify-open">
                 <h3 class="title">You currently need to re-verify for the following courses:</h3>
                 <ul class="reverification-list">
-                % for course_id, course_name, course_number, date, status in reverifications_must_reverify:
+                % for course_id, course_name, course_number, date, status in reverifications["must_reverify"]:
                   <li class="item">
                     <div class="course-info">
                       <h3 class="course-name">${course_name} (${course_number})</h3>
@@ -35,12 +35,12 @@
                 </ul>
               </div>
 
-            % elif reverifications_must_reverify:
+            % elif reverifications["must_reverify"]:
               <div class="wrapper-reverify-open">
                 <h3 class="title">You currently need to re-verify for the following course:</h3>
 
                 <ul class="reverification-list">
-                % for course_id, course_name, course_number, date, status in reverifications_must_reverify:
+                % for course_id, course_name, course_number, date, status in reverifications["must_reverify"]:
                   <li class="item">
                     <div class="course-info">
                       <h3 class="course-name">${course_name} (${course_number})</h3>
@@ -53,12 +53,12 @@
               </div>
           %endif
 
-          % if reverifications_pending or reverifications_approved or reverifications_denied:
+          % if reverifications["pending"] or reverifications["approved"] or reverifications["denied"]:
             <div class="wrapper-reverify-status">
               <h3 class="title">The status of your submitted re-verifications:</h3>
               <ul class="reverification-list reverification-status">
 
-              % for course_id, course_name, course_number, date, status in reverifications_pending:
+              % for course_id, course_name, course_number, date, status in reverifications["pending"]:
                 <li class="item pending">
                   <div class="course-info">
                     <h3 class="course-name">${course_name} (${course_number})</h3>
@@ -68,7 +68,7 @@
                 </li>
               % endfor
 
-              % for course_id, course_name, course_number, date, status in reverifications_approved:
+              % for course_id, course_name, course_number, date, status in reverifications["approved"]:
                 <li class="item complete">
                   <div class="course-info">
                     <h3 class="course-name">${course_name} (${course_number})</h3>
@@ -78,7 +78,7 @@
                 </li>
               % endfor
 
-              % for course_id, course_name, course_number, date, status in reverifications_denied:
+              % for course_id, course_name, course_number, date, status in reverifications["denied"]:
                 <li class="item failed">
                   <div class="course-info">
                     <h3 class="course-name">${course_name} (${course_number})</h3>
@@ -96,7 +96,7 @@
           <p class="title">You have no re-verifications at present.</p>
           % endif
 
-          % if reverifications_must_reverify:
+          % if reverifications["must_reverify"]:
             <p class="support">Don't want to re-verify right now? <a href="">Return to where you left off <i class="icon-angle-right"></i></a></p>
           % endif
 

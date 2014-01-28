@@ -2,29 +2,29 @@
 <%! from django.core.urlresolvers import reverse %>
 <!--TODO replace this with something a clever deisgn person approves of-->
 <!--TODO replace this with a shiny loopy thing to actually print out all courses-->
-% if reverifications_must_reverify or reverifications_denied or reverifications_pending or reverifications_approved:
+% if reverifications["must_reverify"] or reverifications["pending"] or reverifications["denied"] or reverifications["approved"]:
 
     <h2 class="title">${_("Re-verification now open for")}</h2>
-    % if reverifications_must_reverify:
-        % for course_id, course_name, course_number, date, status in reverifications_must_reverify:
+    % if reverifications["must_reverify"]:
+        % for course_id, course_name, course_number, date, status in reverifications["must_reverify"]:
             ${_('Must Reverify: <strong>{course_name}</strong>').format(course_name=course_name)}
         % endfor
     %endif
 
-    % if reverifications_pending:
-        % for course_id, course_name, course_number, date, status in reverifications_pending:
+    % if reverifications["pending"]:
+        % for course_id, course_name, course_number, date, status in reverifications["pending"]:
             ${_('Denied: <strong>{course_name}</strong>').format(course_name=course_name)}
         % endfor
     %endif
 
-    % if reverifications_denied:
-        % for course_id, course_name, course_number, date, status in reverifications_denied:
+    % if reverifications["denied"]:
+        % for course_id, course_name, course_number, date, status in reverifications["denied"]:
             ${_('Denied: <strong>{course_name}</strong>').format(course_name=course_name)}
         % endfor
     %endif
 
-    % if reverifications_approved:
-        % for course_id, course_name, course_number, date, status in reverifications_approved:
+    % if reverifications["approved"]:
+        % for course_id, course_name, course_number, date, status in reverifications["approved"]:
             ${_('Denied: <strong>{course_name}</strong>').format(course_name=course_name)}
         % endfor
     %endif
