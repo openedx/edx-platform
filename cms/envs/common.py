@@ -117,6 +117,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.auth.context_processors.auth',  # this is required for admin
     'django.core.context_processors.csrf',
     'dealer.contrib.django.staff.context_processor',  # access git revision
+    'contentstore.context_processors.doc_url',
 )
 
 # use the ratelimit backend to prevent brute force attacks
