@@ -225,9 +225,9 @@ class ModuleStoreTestCase(TestCase):
         if contentstore().fs_files:
             db = contentstore().fs_files.database
             db.connection.drop_database(db)
-        lm = loc_mapper()
-        if lm.db:
-            lm.location_map.drop()
+        location_mapper = loc_mapper()
+        if location_mapper.db:
+            location_mapper.location_map.drop()
 
     @classmethod
     def setUpClass(cls):

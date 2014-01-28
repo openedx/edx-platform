@@ -12,9 +12,13 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.django import loc_mapper
+# pylint: disable=E1101
 
 
 class TestArgParsing(unittest.TestCase):
+    """
+    Tests for parsing arguments for the `migrate_to_split` management command
+    """
     def setUp(self):
         self.command = Command()
 

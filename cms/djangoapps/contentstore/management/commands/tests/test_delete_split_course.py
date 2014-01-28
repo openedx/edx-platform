@@ -11,9 +11,13 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.persistent_factories import PersistentCourseFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
+# pylint: disable=E1101
 
 
 class TestArgParsing(unittest.TestCase):
+    """
+    Tests for parsing arguments for the `delete_split_course` management command
+    """
     def setUp(self):
         self.command = Command()
 

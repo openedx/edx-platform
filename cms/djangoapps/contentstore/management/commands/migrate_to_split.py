@@ -11,7 +11,7 @@ from xmodule.modulestore import InvalidLocationError
 from xmodule.modulestore.django import loc_mapper
 
 
-def user_from_str(s):
+def user_from_str(identifier):
     """
     Return a user identified by the given string. The string could be an email
     address, or a stringified integer corresponding to the ID of the user in
@@ -19,14 +19,16 @@ def user_from_str(s):
     will be raised.
     """
     try:
-        user_id = int(s)
+        user_id = int(identifier)
     except ValueError:
-        return User.objects.get(email=s)
+        return User.objects.get(email=identifier)
     else:
         return User.objects.get(id=user_id)
 
 
 class Command(BaseCommand):
+    "Migrate a course from old-Mongo to split-Mongo"
+
     help = "Migrate a course from old-Mongo to split-Mongo"
     args = "location email <locator>"
 
