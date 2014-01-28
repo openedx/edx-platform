@@ -447,12 +447,16 @@ function (HTML5Video, Resizer) {
             this.trigger('videoCaption.pause', null);
         }
 
-        // When only `startTime` is set, the video will play to the end
-        // starting at `startTime`. After the first time the video reaches the
-        // end, `startTime` and `endTime` are disabled. The video will play
-        // from start to the end on subsequent runs.
-        this.videoPlayer.startTime = 0;
-        this.videoPlayer.endTime = null;
+        if (this.videoPlayer.skipOnEndedStartEndReset) {
+            this.videoPlayer.skipOnEndedStartEndReset = undefined;
+        } else {
+            // When only `startTime` is set, the video will play to the end
+            // starting at `startTime`. After the first time the video reaches the
+            // end, `startTime` and `endTime` are disabled. The video will play
+            // from start to the end on subsequent runs.
+            this.videoPlayer.startTime = 0;
+            this.videoPlayer.endTime = null;
+        }
 
         // Sometimes `onEnded` events fires when `currentTime` not equal
         // `duration`. In this case, slider doesn't reach the end point of
@@ -633,12 +637,21 @@ function (HTML5Video, Resizer) {
             case this.videoPlayer.PlayerState.ENDED:
                 this.videoPlayer.onEnded();
                 break;
+            case this.videoPlayer.PlayerState.CUED:
+                this.videoPlayer.player.seekTo(this.videoPlayer.startTime, true);
+                // We need to call play() explicitly because after the call
+                // to functions cueVideoById() followed by seekTo() the video
+                // is in a PAUSED state.
+                //
+                // Why? This is how the YouTube API is implemented.
+                this.videoPlayer.play();
+                break;
         }
     }
 
     function updatePlayTime(time) {
         var duration = this.videoPlayer.duration(),
-            durationChange, tempStartTime, tempEndTime;
+            durationChange, tempStartTime, tempEndTime, youTubeId;
 
         if (
             duration > 0 &&
@@ -722,7 +735,38 @@ function (HTML5Video, Resizer) {
                 this.videoPlayer.startTime > 0 &&
                 !(tempStartTime === 0 && tempEndTime === null)
             ) {
-                this.videoPlayer.player.seekTo(this.videoPlayer.startTime);
+                // After a bug came up (BLD-708: "In Firefox YouTube video with
+                // start time plays from 00:00:00") the video refused to play
+                // from start time, and only played from the beginning.
+                //
+                // It turned out that for some reason if Firefox you couldn't
+                // seek beyond some amount of time before the video loaded.
+                // Very strange, but in Chrome there is no such bug.
+                //
+                // HTML5 video sources play fine from start time in both Chrome
+                // and Firefox.
+                if (this.browserIsFirefox && this.videoType === 'youtube') {
+                    if (this.currentPlayerMode === 'flash') {
+                        youTubeId = this.youtubeId();
+                    } else {
+                        youTubeId = this.youtubeId('1.0');
+                    }
+
+                    // When we will call cueVideoById() for some strange reason
+                    // an ENDED event will be fired. It really does no damage
+                    // except for the fact that the end time is reset to null.
+                    // We do not want this.
+                    //
+                    // The flag `skipOnEndedStartEndReset` will notify the
+                    // onEnded() callback for the ENDED event that just this
+                    // once there is no need in resetting the start and end
+                    // times
+                    this.videoPlayer.skipOnEndedStartEndReset = true;
+
+                    this.videoPlayer.player.cueVideoById(youTubeId, this.videoPlayer.startTime);
+                } else {
+                    this.videoPlayer.player.seekTo(this.videoPlayer.startTime);
+                }
             }
 
             // Reset back the actual startTime and endTime if they have been
