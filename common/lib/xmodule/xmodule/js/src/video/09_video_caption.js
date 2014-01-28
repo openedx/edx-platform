@@ -54,7 +54,6 @@ function () {
             captionKeyDown: captionKeyDown,
             captionMouseDown: captionMouseDown,
             captionMouseOverOut: captionMouseOverOut,
-            captionURL: captionURL,
             fetchCaption: fetchCaption,
             hideCaptions: hideCaptions,
             onMouseEnter: onMouseEnter,
@@ -190,12 +189,13 @@ function () {
         // Fetch the captions file. If no file was specified, or if an error
         // occurred, then we hide the captions panel, and the "CC" button
         $.ajaxWithPrefix({
-            url: self.videoCaption.captionURL(),
+            url: self.config.transcriptTranslationUrl,
             notifyOnError: false,
             data: {
-                videoId: this.youtubeId(),
-                // videoId: this.youtubeId() == 'OEoXaMPEzfM' ? 'edX-FA12-cware-1_100' : 'OEoXaMPEzfM',
+                videoId: this.lang == 'en'? 'OEoXaMPEzfM': 'edX-FA12-cware-1_100',
                 language: this.getCurrentLanguage()
+                // videoId: this.youtubeId(),
+                // language: this.getCurrentLanguage()
             },
             success: function (captions) {
                 self.videoCaption.captions = captions.text;
@@ -234,11 +234,6 @@ function () {
         });
 
         return true;
-    }
-
-    function captionURL() {
-        // return '' + this.config.captionAssetPath + (this.lang == 'de' ? 'edX-FA12-cware-1_100' : 'OEoXaMPEzfM') + '.srt.sjson';
-        return this.config.captionAssetPath + this.youtubeId('1.0') + '.srt.sjson';
     }
 
     function resize() {
@@ -283,15 +278,6 @@ function () {
                 el  .addClass('active')
                     .siblings('li')
                     .removeClass('active');
-
-                $.ajax({
-                    url: self.config.saveStateUrl,
-                    type: 'POST',
-                    dataType: 'json',
-                    data: {
-                        language: self.getCurrentLanguage()
-                    },
-                });
 
                 Caption.fetchCaption();
             }

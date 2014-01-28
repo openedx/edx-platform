@@ -250,6 +250,16 @@
             });
         });
 
+        it('getCurrentLanguage', function () {
+            loadFixtures('video.html');
+            $('.video').data('language', 'de');
+            state = new Video('#example');
+
+            expect(state.getCurrentLanguage()).toBe('de');
+            state.lang = null;
+            expect(state.getCurrentLanguage()).toBe('en');
+        });
+
         describe('checking start and end times', function () {
             var miniTestSuite = [
                 {

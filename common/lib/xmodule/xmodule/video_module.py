@@ -151,12 +151,6 @@ class VideoFields(object):
         scope=Scope.preferences,
         default=1.0
     )
-    language = String(
-        help="The last language that was explicitly set by user for the video.",
-        scope=Scope.preferences,
-        default='en'
-    )
-
     # Data format: {de': 'german_translation', 'ua': 'ukrainian_translation'}
     transcripts = Dict(
         help="Additional translations for transcripts",
@@ -164,11 +158,11 @@ class VideoFields(object):
         scope=Scope.settings,
         default={
                 'de': 'edX-FA12-cware-1_100',
-                'ua': 'OEoXaMPEzfM',
+                'en': 'OEoXaMPEzfM',
             }
         )
 
-    preferred_language = String(
+    language = String(
         help="Preferred language for transcripts",
         display_name="Preferred language for transcripts",
         scope=Scope.preferences,
@@ -233,7 +227,6 @@ class VideoModule(VideoFields, XModule):
 
     def get_html(self):
         track_url = None
-        caption_asset_path = "/static/subs/"
 
         get_ext = lambda filename: filename.rpartition('.')[-1]
         sources = {get_ext(src): src for src in self.html5_sources}
@@ -257,7 +250,6 @@ class VideoModule(VideoFields, XModule):
             # isn't on the filesystem
             'data_dir': getattr(self, 'data_dir', None),
             'display_name': self.display_name_with_default,
-            'caption_asset_path': caption_asset_path,
             'end': self.end_time.total_seconds(),
             'id': self.location.html_id(),
             'show_captions': json.dumps(self.show_captions),
@@ -267,12 +259,12 @@ class VideoModule(VideoFields, XModule):
             'start': self.start_time.total_seconds(),
             'sub': self.sub,
             'track': track_url,
-            'transcripts': json.dumps(self.transcripts),
             'youtube_streams': _create_youtube_string(self),
             # TODO: Later on the value 1500 should be taken from some global
             # configuration setting field.
             'yt_test_timeout': 1500,
             'yt_test_url': settings.YOUTUBE_TEST_URL,
+            'language': self.language,
             'transcripts': json.dumps(self.transcripts),
             'transcript_translation_url': self.runtime.handler_url(self, 'transcript_translation')
         })
@@ -331,7 +323,7 @@ class VideoModule(VideoFields, XModule):
         request.get contains:
           language code ("en")
           video_id ("example")
-          language ("ge")
+          language ("de")
         """
         try:
             video_id = request.GET.get('videoId')
@@ -340,8 +332,8 @@ class VideoModule(VideoFields, XModule):
             log.info("Invalid transcript_translation GET request parameters.")
             return Response(status=400)
 
-        if language != 'en' and language != self.preferred_language:
-            self.preferred_language = language
+        if language != 'en' and language != self.language:
+            self.language = language
 
         if language == 'en':
             if self.sub:
