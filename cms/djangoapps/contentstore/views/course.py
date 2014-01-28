@@ -734,7 +734,6 @@ def syllabus_list_handler(request, tag=None, package_id=None, branch=None, versi
         package_id, branch, version_guid, block, request.user
     )
     store = get_modulestore(course.location)
-
     if not "application/json" in request.META.get('HTTP_ACCEPT', 'text/html'):
         # return HTML page
         syllabus_url = locator.url_reverse('/syllabuses')
@@ -743,7 +742,7 @@ def syllabus_list_handler(request, tag=None, package_id=None, branch=None, versi
             'syllabuses': course.topic_syllabuses,
             'syllabus_url': syllabus_url,
         })
-
+    
     # from here on down, we know the client has requested JSON
     if request.method == 'GET':
         return JsonResponse(course.topic_syllabuses)

@@ -1,4 +1,5 @@
-define(["backbone", "underscore", "js/models/topic", "js/collections/topic", "backbone.associations"],
+define(["backbone", "underscore", "js/models/topic", "js/collections/topic",
+        "backbone.associations","coffee/src/main"],
     function(Backbone, _, TopicModel, TopicCollection) {
 
     var Syllabus = Backbone.AssociatedModel.extend({
@@ -32,13 +33,7 @@ define(["backbone", "underscore", "js/models/topic", "js/collections/topic", "ba
         isEmpty: function() {
             return !this.get('name') && this.get('topics').isEmpty();
         },
-        url: function() {
-            if(this.isNew()) {
-                return CMS.URL.SYLLABUSES + "/new";
-            } else {
-                return CMS.URL.SYLLABUSES + "/" + this.id;
-            }
-        },
+        urlRoot: function() { return CMS.URL.SYLLABUSES; },
         parse: function(response) {
             var ret = $.extend(true, {}, response);
             if("tab_title" in ret && !("name" in ret)) {

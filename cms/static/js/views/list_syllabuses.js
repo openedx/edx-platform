@@ -1,6 +1,6 @@
-define(["backbone", "underscore", "jquery", "js/views/edit_syllabus", "js/views/show_syllabus"],
-        function(Backbone, _, $, EditSyllabusView, ShowSyllabusView) {
-    var ListSyllabuses = Backbone.View.extend({
+define(["js/views/baseview", "underscore", "jquery", "js/views/edit_syllabus", "js/views/show_syllabus"],
+        function(BaseView, _, $, EditSyllabusView, ShowSyllabusView) {
+    var ListSyllabuses = BaseView.extend({
         initialize: function() {
             this.emptyTemplate = _.template($("#no-syllabuses-tpl").text());
             this.listenTo(this.collection, 'all', this.render);

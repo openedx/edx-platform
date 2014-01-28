@@ -1,5 +1,5 @@
-define(["backbone", "underscore", "jquery", "js/views/edit_topic", "js/views/feedback_notification"],
-        function(Backbone, _, $, EditTopicView, NotificationView) {
+define(["js/views/baseview", "underscore", "jquery", "js/views/edit_topic", "js/views/feedback_notification"],
+        function(Baseview, _, $, EditTopicView, NotificationView) {
     var EditSyllabus = Backbone.View.extend({
         initialize: function() {
             this.template = _.template($("#edit-syllabus-tpl").text());

@@ -1,6 +1,7 @@
-define(["backbone", "underscore", "underscore.string", "jquery", "gettext"], function(Backbone, _, str, $, gettext){
+define(["js/views/baseview", "underscore", "underscore.string", "jquery", "gettext"], 
+        function(BaseView, _, str, $, gettext){
     _.str = str;
-    var EditTopic = Backbone.View.extend({
+    var EditTopic = BaseView.extend({
         initialize: function(){
             this.template = _.template($("#edit-topic-tpl").text());
             this.listenTo(this.model, "change", this.render);
