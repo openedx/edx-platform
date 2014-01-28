@@ -11,6 +11,21 @@ from xmodule.modulestore import InvalidLocationError
 from xmodule.modulestore.django import loc_mapper
 
 
+def user_from_str(s):
+    """
+    Return a user identified by the given string. The string could be an email
+    address, or a stringified integer corresponding to the ID of the user in
+    the database. If no user could be found, a User.DoesNotExist exception
+    will be raised.
+    """
+    try:
+        user_id = int(s)
+    except ValueError:
+        return User.objects.get(email=s)
+    else:
+        return User.objects.get(id=user_id)
+
+
 class Command(BaseCommand):
     help = "Migrate a course from old-Mongo to split-Mongo"
     args = "location email <locator>"
@@ -32,24 +47,10 @@ class Command(BaseCommand):
         except InvalidLocationError:
             raise CommandError("Invalid location string {}".format(args[0]))
 
-        user_id = None
-        email = None
         try:
-            user_id = int(args[1])
-        except ValueError:
-            email = args[1]
-        if user_id:
-            try:
-                user = User.objects.get(pk=user_id)
-            except User.DoesNotExist:
-                raise CommandError("No user exists with ID {}".format(user_id))
-        else:
-            try:
-                user = User.objects.get(email=email)
-            except User.DoesNotExist:
-                raise CommandError("No user exists with email {}".format(email))
-
-        assert user, "User doesn't exist! That shouldn't happen..."
+            user = user_from_str(args[1])
+        except User.DoesNotExist:
+            raise CommandError("No user found identified by {}".format(args[1]))
 
         try:
             locator_string = args[2]

@@ -29,12 +29,12 @@ class TestArgParsing(unittest.TestCase):
             self.command.handle("foo", "bar")
 
     def test_nonexistant_user_id(self):
-        errstring = "No user exists with ID 99"
+        errstring = "No user found identified by 99"
         with self.assertRaisesRegexp(CommandError, errstring):
             self.command.handle("i4x://org/course/category/name", "99")
 
     def test_nonexistant_user_email(self):
-        errstring = "No user exists with email fake@example.com"
+        errstring = "No user found identified by fake@example.com"
         with self.assertRaisesRegexp(CommandError, errstring):
             self.command.handle("i4x://org/course/category/name", "fake@example.com")
 
@@ -53,11 +53,21 @@ class TestMigrateToSplit(ModuleStoreTestCase):
         self.user = User.objects.create_user(uname, email, password)
         self.course = CourseFactory()
 
-    def test_happy_path(self):
+    def test_happy_path_email(self):
         call_command(
             "migrate_to_split",
             str(self.course.location),
-            self.user.email,
+            str(self.user.email),
+        )
+        locator = loc_mapper().translate_location(self.course.id, self.course.location)
+        course_from_split = modulestore('split').get_course(locator)
+        self.assertIsNotNone(course_from_split)
+
+    def test_happy_path_user_id(self):
+        call_command(
+            "migrate_to_split",
+            str(self.course.location),
+            str(self.user.id),
         )
         locator = loc_mapper().translate_location(self.course.id, self.course.location)
         course_from_split = modulestore('split').get_course(locator)
