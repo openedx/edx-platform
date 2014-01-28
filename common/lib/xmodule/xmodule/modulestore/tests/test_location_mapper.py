@@ -80,8 +80,8 @@ class TestLocationMapper(unittest.TestCase):
         Request translation, check package_id, block_id, and branch
         """
         prob_locator = loc_mapper().translate_location(
-            old_style_course_id, 
-            location, 
+            old_style_course_id,
+            location,
             published= (branch=='published'),
             add_entry_if_missing=add_entry
         )
@@ -114,7 +114,7 @@ class TestLocationMapper(unittest.TestCase):
 
         new_style_package_id = '{}.geek_dept.{}.baz_run'.format(org, course)
         block_map = {
-            'abc123': {'problem': 'problem2'}, 
+            'abc123': {'problem': 'problem2'},
             'def456': {'problem': 'problem4'},
             'ghi789': {'problem': 'problem7'},
         }
@@ -139,7 +139,7 @@ class TestLocationMapper(unittest.TestCase):
 
         # add a distractor course (note that abc123 has a different translation in this one)
         distractor_block_map = {
-            'abc123': {'problem': 'problem3'}, 
+            'abc123': {'problem': 'problem3'},
             'def456': {'problem': 'problem4'},
             'ghi789': {'problem': 'problem7'},
         }

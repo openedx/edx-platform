@@ -404,6 +404,8 @@ class LocMapperStore(object):
         """
         Get the course Locator for this old course id
         """
+        if not old_course_id:
+            return None
         entry = self.cache.get(old_course_id)
         if entry is not None:
             if published:
@@ -428,6 +430,8 @@ class LocMapperStore(object):
         """
         For quick lookup of courses
         """
+        if not old_course_id:
+            return
         self.cache.set(old_course_id, (published_course_locator, draft_course_locator))
 
     def _cache_location_map_entry(self, old_course_id, location, published_usage, draft_usage):
