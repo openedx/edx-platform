@@ -6,12 +6,12 @@
  * @version 0.11.4
  * @requires jQuery v1.2.3+
  * @author Ryan McGeary
- * @license MIT License - http://www.opensource.org/licenses/mit-license.php
  *
  * For usage and examples, visit:
  * http://timeago.yarp.com/
  *
- * Copyright (c) 2008-2012, Ryan McGeary (ryan -[at]- mcgeary [*dot*] org)
+ * Portions copyright (c) 2008-2012, Ryan McGeary (ryan -[at]- mcgeary [*dot*] org)
+ * and licensed under the MIT license (http://www.opensource.org/licenses/mit-license.php)
  */
 (function($) {
   $.timeago = function(timestamp) {
@@ -32,10 +32,8 @@
       refreshMillis: 60000,
       allowFuture: false,
       strings: {
-        prefixAgo: null,
-        prefixFromNow: null,
-        suffixAgo: "ago",
-        suffixFromNow: "from now",
+        formatAgo: "%s ago",
+        formatFromNow: "%s from now",
         seconds: "less than a minute",
         minute: "about a minute",
         minutes: "%d minutes",
@@ -47,18 +45,15 @@
         months: "%d months",
         year: "about a year",
         years: "%d years",
-        wordSeparator: " ",
         numbers: []
       }
     },
     inWords: function(distanceMillis) {
       var $l = this.settings.strings;
-      var prefix = $l.prefixAgo;
-      var suffix = $l.suffixAgo;
+      var format = $l.formatAgo;
       if (this.settings.allowFuture) {
         if (distanceMillis < 0) {
-          prefix = $l.prefixFromNow;
-          suffix = $l.suffixFromNow;
+          format = $l.formatFromNow;
         }
       }
 
@@ -86,8 +81,7 @@
         years < 1.5 && substitute($l.year, 1) ||
         substitute($l.years, Math.round(years));
 
-      var separator = $l.wordSeparator === undefined ?  " " : $l.wordSeparator;
-      return $.trim([prefix, words, suffix].join(separator));
+      return $.trim(format.replace(/%s/i, words));
     },
     parse: function(iso8601) {
       var s = $.trim(iso8601);

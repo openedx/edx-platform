@@ -52,6 +52,8 @@ else:
 
     ADVANCED_COMPONENT_TYPES = [
         'annotatable',
+        'textannotation',  # module for annotating text (with annotation table)
+        'videoannotation',  # module for annotating video (with annotation table)
         'word_cloud',
         'graphical_slider_tool',
         'lti',

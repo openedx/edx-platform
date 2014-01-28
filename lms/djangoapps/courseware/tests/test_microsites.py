@@ -45,7 +45,7 @@ class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
         self.course_outside_microsite = CourseFactory.create(display_name='Robot_Course_Outside_Microsite', org='FooX')
 
-    def create_test_accounts(self):
+    def create_student_accounts(self):
         """
         Build out the test accounts we'll use in these tests
         """
@@ -56,7 +56,7 @@ class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
             self.create_account(username, email, password)
             self.activate_user(email)
 
-    @skip   # skipping - runs fine on localdev, not jenkins environment
+
     def test_microsite_anonymous_homepage_content(self):
         """
         Verify that the homepage, when accessed via a Microsite domain, returns
@@ -89,7 +89,7 @@ class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
         # assert that the edX partners tag line is not in the HTML
         self.assertNotContains(resp, 'Explore free courses from')
 
-    @skip   # skipping - runs fine on localdev, not jenkins environment
+
     def test_not_microsite_anonymous_homepage_content(self):
         """
         Make sure we see the right content on the homepage if we are not in a microsite
@@ -120,14 +120,14 @@ class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
         # assert that the edX partners tag line is not in the HTML
         self.assertContains(resp, 'Explore free courses from')
 
-    @skip   # skipping - runs fine on localdev, not jenkins environment
+
     def test_microsite_course_enrollment(self):
         """
         Enroll user in a course scoped in a Microsite and one course outside of a Microsite
         and make sure that they are only visible in the right Dashboards
         """
 
-        self.create_test_accounts()
+        self.create_student_accounts()
 
         email, password = self.STUDENT_INFO[0]
         self.login(email, password)

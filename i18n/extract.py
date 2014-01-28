@@ -21,6 +21,7 @@ from polib import pofile
 
 from i18n.config import BASE_DIR, LOCALE_DIR, CONFIGURATION
 from i18n.execute import execute, create_dir_if_necessary, remove_file
+from i18n.segment import segment_pofiles
 
 
 # BABEL_CONFIG contains declarations for Babel to extract strings from mako template files
@@ -31,7 +32,7 @@ BABEL_CONFIG = BASE_DIR.relpathto(LOCALE_DIR.joinpath('babel.cfg'))
 # Use relpath to reduce noise in logs
 BABEL_OUT = BASE_DIR.relpathto(CONFIGURATION.source_messages_dir.joinpath('mako.po'))
 
-SOURCE_WARN = 'This English source file is machine-generated. Do not check it into github'
+SOURCE_WARN = 'This English source file is machine-generated. Do not check it into git.'
 
 LOG = logging.getLogger(__name__)
 
@@ -40,15 +41,10 @@ def main():
     create_dir_if_necessary(LOCALE_DIR)
     source_msgs_dir = CONFIGURATION.source_messages_dir
 
-    remove_file(source_msgs_dir.joinpath('django.po'))
-    generated_files = ('django-partial.po', 'djangojs.po', 'mako.po')
-    for filename in generated_files:
-        remove_file(source_msgs_dir.joinpath(filename))
-
-    # Prepare makemessages command.
-    ignore_dirs = ["docs", "src", "i18n", "test_root"]
-    ignores = " ".join("--ignore={}/*".format(d) for d in ignore_dirs)
-    makemessages = 'django-admin.py makemessages -l en ' + ignores
+    makemessages = "django-admin.py makemessages -l en"
+    ignores = " ".join('--ignore="{}/*"'.format(d) for d in CONFIGURATION.ignore_dirs)
+    if ignores:
+        makemessages += " " + ignores
 
     # Extract strings from mako templates.
     babel_mako_cmd = 'pybabel extract -F %s -c "Translators:" . -o %s' % (BABEL_CONFIG, BABEL_OUT)
@@ -69,7 +65,11 @@ def main():
         source_msgs_dir.joinpath('django-partial.po')
     )
 
-    for filename in generated_files:
+    # Segment the generated files.
+    segmented_files = segment_pofiles("en")
+
+    # Finish each file.
+    for filename in segmented_files:
         LOG.info('Cleaning %s' % filename)
         po = pofile(source_msgs_dir.joinpath(filename))
         # replace default headers with edX headers
@@ -79,6 +79,7 @@ def main():
         # remove key strings which belong in messages.po
         strip_key_strings(po)
         po.save()
+
 
 def fix_header(po):
     """

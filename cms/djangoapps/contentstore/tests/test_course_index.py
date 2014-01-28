@@ -6,7 +6,7 @@ import lxml
 
 from contentstore.tests.utils import CourseTestCase
 from xmodule.modulestore.django import loc_mapper
-from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore import parsers
 
 class TestCourseIndex(CourseTestCase):
@@ -83,3 +83,49 @@ class TestCourseIndex(CourseTestCase):
 
         # test access
         self.check_index_and_outline(course_staff_client)
+
+    def test_json_responses(self):
+        outline_url = self.course_locator.url_reverse('course/')
+        chapter = ItemFactory.create(parent_location=self.course.location, category='chapter', display_name="Week 1")
+        lesson = ItemFactory.create(parent_location=chapter.location, category='sequential', display_name="Lesson 1")
+        subsection = ItemFactory.create(parent_location=lesson.location, category='vertical', display_name='Subsection 1')
+        ItemFactory.create(parent_location=subsection.location, category="video", display_name="My Video")
+
+        resp = self.client.get(outline_url, HTTP_ACCEPT='application/json')
+        json_response = json.loads(resp.content)
+
+        # First spot check some values in the root response
+        self.assertEqual(json_response['category'], 'course')
+        self.assertEqual(json_response['id'], 'MITx.999.Robot_Super_Course/branch/draft/block/Robot_Super_Course')
+        self.assertEqual(json_response['display_name'], 'Robot Super Course')
+        self.assertTrue(json_response['is_container'])
+        self.assertFalse(json_response['is_draft'])
+
+        # Now verify that the first child
+        children = json_response['children']
+        self.assertTrue(len(children) > 0)
+        first_child_response = children[0]
+        self.assertEqual(first_child_response['category'], 'chapter')
+        self.assertEqual(first_child_response['id'], 'MITx.999.Robot_Super_Course/branch/draft/block/Week_1')
+        self.assertEqual(first_child_response['display_name'], 'Week 1')
+        self.assertTrue(first_child_response['is_container'])
+        self.assertFalse(first_child_response['is_draft'])
+        self.assertTrue(len(first_child_response['children']) > 0)
+
+        # Finally, validate the entire response for consistency
+        self.assert_correct_json_response(json_response)
+
+    def assert_correct_json_response(self, json_response):
+        """
+        Asserts that the JSON response is syntactically consistent
+        """
+        self.assertIsNotNone(json_response['display_name'])
+        self.assertIsNotNone(json_response['id'])
+        self.assertIsNotNone(json_response['category'])
+        self.assertIsNotNone(json_response['is_draft'])
+        self.assertIsNotNone(json_response['is_container'])
+        if json_response['is_container']:
+            for child_response in json_response['children']:
+                self.assert_correct_json_response(child_response)
+        else:
+            self.assertFalse('children' in json_response)

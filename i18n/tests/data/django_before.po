@@ -1,0 +1,52 @@
+# This is test data.
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: 0.1a\n"
+"Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
+"POT-Creation-Date: 2014-01-22 15:35-0500\n"
+"PO-Revision-Date: 2014-01-22 20:35:52.096456\n"
+"Last-Translator: \n"
+"Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en\n"
+
+#: cms/djangoapps/contentstore/views/tabs.py:39
+#: lms/djangoapps/instructor/views/instructor_dashboard.py:111
+msgid "Course Info"
+msgstr "stuff about the course"
+
+#: common/djangoapps/course_modes/models.py:43
+msgid "Honor Code Certificate"
+msgstr "your paper"
+
+#: common/djangoapps/course_modes/views.py:81
+#: common/djangoapps/student/views.py:478
+msgid "Enrollment is closed"
+msgstr "no way, dude"
+
+#: cms/djangoapps/contentstore/views/course.py:237
+msgid ""
+"There is already a course defined with the same organization, course number,"
+" and course run. Please change either organization or course number to be "
+"unique."
+msgstr "org/course/run, wtf??"
+
+#: cms/djangoapps/contentstore/views/course.py:243
+#: cms/djangoapps/contentstore/views/course.py:247
+#: other_cms/djangoapps/contentstore/views/course.py:269
+#: cms/djangoapps/contentstore/views/course.py:272
+msgid ""
+"Please change either the organization or course number so that it is unique."
+msgstr "pick again!"
+
+#: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html:129
+#: lms/templates/wiki/plugins/attachments/index.html:40
+msgid "Search"
+msgstr "find it!"
+
+#: lms/djangoapps/courseware/features/video.py:111
+msgid "ERROR: No playable video sources found!"
+msgstr "try youtube, dude!"

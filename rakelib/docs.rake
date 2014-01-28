@@ -23,7 +23,7 @@ task :builddocs, [:type, :quiet] do |t, args|
     end
 end
 
-desc "Show docs in browser (mac and ubuntu)."
+desc "Show docs in browser: dev, author, data."
 task :showdocs, [:options] do |t, args|
     if args.options == 'dev'
         path = "docs/en_us/developers"

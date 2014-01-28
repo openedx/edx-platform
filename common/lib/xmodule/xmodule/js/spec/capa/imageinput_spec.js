@@ -18,13 +18,9 @@
             el.append(createTestImage('cross_12345', 300, 400, 'red'));
 
             state = new ImageInput('12345');
-
-            spyOn(state, 'clickHandler').andCallThrough();
         });
 
         it('initialization', function () {
-            expect(state.elementId).toBe('12345');
-
             // Check that object's properties are present, and that the DOM
             // elements they reference exist.
             expect(state.el).toBeDefined();
@@ -36,12 +32,7 @@
             expect(state.inputEl).toBeDefined();
             expect(state.inputEl).toExist();
 
-            // Check that the click handler has been attached to the `state.el`
-            // element. Note that `state.clickHandler()` method is called from
-            // within the attached handler. That is why we can't use
-            // Jasmine-jQuery `toHandleWith()` method.
-            state.el.click();
-            expect(state.clickHandler).toHaveBeenCalled();
+            expect(state.el).toHandle('click');
         });
 
         it('cross becomes visible after first click', function () {
@@ -81,7 +72,8 @@
         });
 
         it('coordinates are updated [offsetX is NOT set]', function () {
-            var event, posX, posY, cssLeft, cssTop;
+            var offset = state.el.offset(),
+                event, posX, posY, cssLeft, cssTop;
 
             // Set up of 'click' event.
             event = jQuery.Event(
@@ -91,12 +83,10 @@
                     pageX: 35.3, pageY: 42.7
                 }
             );
-            state.el[0].offsetLeft = 12;
-            state.el[0].offsetTop = 3;
 
             // Calculating the expected coordinates.
-            posX = event.pageX - state.el[0].offsetLeft;
-            posY = event.pageY - state.el[0].offsetTop;
+            posX = event.pageX - offset.left;
+            posY = event.pageY - offset.top;
 
             // Triggering 'click' event.
             jQuery(state.el).trigger(event);

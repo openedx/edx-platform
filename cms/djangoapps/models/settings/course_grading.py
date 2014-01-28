@@ -173,13 +173,13 @@ class CourseGradingModel(object):
         old_location = loc_mapper().translate_locator_to_location(location)
         descriptor = get_modulestore(old_location).get_item(old_location)
         return {
-            "graderType": descriptor.format if descriptor.format is not None else 'Not Graded',
+            "graderType": descriptor.format if descriptor.format is not None else 'notgraded',
             "location": unicode(location),
         }
 
     @staticmethod
     def update_section_grader_type(descriptor, grader_type):
-        if grader_type is not None and grader_type != u"Not Graded":
+        if grader_type is not None and grader_type != u'notgraded':
             descriptor.format = grader_type
             descriptor.graded = True
         else:

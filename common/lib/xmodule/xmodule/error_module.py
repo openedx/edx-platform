@@ -1,5 +1,5 @@
 """
-Modules that get shown to the users when an error has occured while
+Modules that get shown to the users when an error has occurred while
 loading or rendering other modules
 """
 

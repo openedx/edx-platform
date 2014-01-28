@@ -252,7 +252,7 @@ function () {
     }
 
     function captionURL() {
-        return '' + this.config.caption_asset_path +
+        return '' + this.config.captionAssetPath +
             this.youtubeId('1.0') + '.srt.sjson';
     }
 
@@ -356,7 +356,7 @@ function () {
             _this = this,
             autohideHtml5 = this.config.autohideHtml5;
 
-        this.elVideoWrapper.after(this.videoCaption.subtitlesEl);
+        this.container.after(this.videoCaption.subtitlesEl);
         this.el.find('.video-controls .secondary-controls')
             .append(this.videoCaption.hideSubtitlesEl);
 
@@ -745,7 +745,7 @@ function () {
                 0.5 * this.videoControl.sliderEl.height() -
                 2 * paddingTop;
         } else {
-            return this.elVideoWrapper.height();
+            return this.container.height();
         }
     }
 

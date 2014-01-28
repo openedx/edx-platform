@@ -42,7 +42,8 @@ function () {
             onStop: onStop,
             updatePlayTime: updatePlayTime,
             updateStartEndTimeRegion: updateStartEndTimeRegion,
-            notifyThroughHandleEnd: notifyThroughHandleEnd
+            notifyThroughHandleEnd: notifyThroughHandleEnd,
+            getTimeDescription: getTimeDescription
         };
 
         state.bindTo(methodsDict, state.videoProgressSlider, state);
@@ -57,7 +58,7 @@ function () {
     function _renderElements(state) {
         state.videoProgressSlider.el = state.videoControl.sliderEl;
 
-        buildSlider(state);
+        state.videoProgressSlider.buildSlider();
         _buildHandle(state);
     }
 
@@ -72,7 +73,7 @@ function () {
         // handle, behaves as a slider named 'video position'.
         state.videoProgressSlider.handle.attr({
             'role': 'slider',
-            'title': 'video position',
+            'title': gettext('Video position'),
             'aria-disabled': false,
             'aria-valuetext': getTimeDescription(state.videoProgressSlider
                 .slider.slider('option', 'value'))
@@ -86,15 +87,15 @@ function () {
     // them available and sets up their context is makeFunctionsPublic().
     // ***************************************************************
 
-    function buildSlider(state) {
-        state.videoProgressSlider.slider = state.videoProgressSlider.el
+    function buildSlider() {
+        this.videoProgressSlider.slider = this.videoProgressSlider.el
             .slider({
                 range: 'min',
-                slide: state.videoProgressSlider.onSlide,
-                stop: state.videoProgressSlider.onStop
+                slide: this.videoProgressSlider.onSlide,
+                stop: this.videoProgressSlider.onStop
             });
 
-        state.videoProgressSlider.sliderProgress = state.videoProgressSlider
+        this.videoProgressSlider.sliderProgress = this.videoProgressSlider
             .slider
             .find('.ui-slider-range.ui-widget-header.ui-slider-range-min');
     }
@@ -152,23 +153,21 @@ function () {
 
         if (!this.videoProgressSlider.sliderRange) {
             this.videoProgressSlider.sliderRange = $('<div />', {
-                class: 'ui-slider-range ' +
-                       'ui-widget-header ' +
-                       'ui-corner-all ' +
-                       'slider-range'
-            }).css({
-                left: rangeParams.left,
-                width: rangeParams.width
-            });
+                    'class': 'ui-slider-range ' +
+                             'ui-widget-header ' +
+                             'ui-corner-all ' +
+                             'slider-range'
+                })
+                .css({
+                    left: rangeParams.left,
+                    width: rangeParams.width
+                });
 
             this.videoProgressSlider.sliderProgress
                 .after(this.videoProgressSlider.sliderRange);
         } else {
             this.videoProgressSlider.sliderRange
-                .css({
-                    left: rangeParams.left,
-                    width: rangeParams.width
-                });
+                .css(rangeParams);
         }
     }
 
@@ -251,61 +250,50 @@ function () {
     function notifyThroughHandleEnd(params) {
         if (params.end) {
             this.videoProgressSlider.handle
-                .attr('title', 'video ended')
+                .attr('title', gettext('Video ended'))
                 .focus();
         } else {
-            this.videoProgressSlider.handle.attr('title', 'video position');
+            this.videoProgressSlider.handle
+                .attr('title', gettext('Video position'));
         }
     }
 
-    // Returns a string describing the current time of video in hh:mm:ss
-    // format.
+    // Returns a string describing the current time of video in
+    // `%d hours %d minutes %d seconds` format.
     function getTimeDescription(time) {
         var seconds = Math.floor(time),
             minutes = Math.floor(seconds / 60),
             hours = Math.floor(minutes / 60),
-            hrStr, minStr, secStr;
+            i18n = function (value, word) {
+                var msg;
+
+                switch(word) {
+                    case 'hour':
+                        msg = ngettext('%(value)s hour', '%(value)s hours', value);
+                        break;
+                    case 'minute':
+                        msg = ngettext('%(value)s minute', '%(value)s minutes', value);
+                        break;
+                    case 'second':
+                        msg = ngettext('%(value)s second', '%(value)s seconds', value);
+                        break;
+                }
+                return interpolate(msg, {'value': value}, true);
+            };
 
         seconds = seconds % 60;
         minutes = minutes % 60;
 
-        hrStr = hours.toString(10);
-        minStr = minutes.toString(10);
-        secStr = seconds.toString(10);
-
         if (hours) {
-            hrStr += (hours < 2 ? ' hour ' : ' hours ');
-
-            if (minutes) {
-                minStr += (minutes < 2 ? ' minute ' : ' minutes ');
-            } else {
-                minStr += ' 0 minutes ';
-            }
-
-            if (seconds) {
-                secStr += (seconds < 2 ? ' second ' : ' seconds ');
-            } else {
-                secStr += ' 0 seconds ';
-            }
-
-            return hrStr + minStr + secStr;
+            return  i18n(hours, 'hour') + ' ' +
+                    i18n(minutes, 'minute') + ' ' +
+                    i18n(seconds, 'second');
         } else if (minutes) {
-            minStr += (minutes < 2 ? ' minute ' : ' minutes ');
-
-            if (seconds) {
-                secStr += (seconds < 2 ? ' second ' : ' seconds ');
-            } else {
-                secStr += ' 0 seconds ';
-            }
-
-            return minStr + secStr;
-        } else if (seconds) {
-            secStr += (seconds < 2 ? ' second ' : ' seconds ');
-
-            return secStr;
+            return  i18n(minutes, 'minute') + ' ' +
+                    i18n(seconds, 'second');
         }
 
-        return '0 seconds';
+        return i18n(seconds, 'second');
     }
 
 });

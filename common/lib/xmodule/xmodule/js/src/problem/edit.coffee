@@ -186,124 +186,175 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 #}
 #
   @markdownToXml: (markdown)->
-    toXml = `function(markdown) {
-      var xml = markdown;
+    toXml = `function (markdown) {
+      var xml = markdown,
+          i, splits, scriptFlag;
 
       // replace headers
       xml = xml.replace(/(^.*?$)(?=\n\=\=+$)/gm, '<h1>$1</h1>');
       xml = xml.replace(/\n^\=\=+$/gm, '');
 
       // group multiple choice answers
-      xml = xml.replace(/(^\s*\(.?\).*?$\n*)+/gm, function(match, p) {
-        var groupString = '<multiplechoiceresponse>\n';
-        groupString += '  <choicegroup type="MultipleChoice">\n';
-        var options = match.split('\n');
-        for(var i = 0; i < options.length; i++) {
-          if(options[i].length > 0) {
-            var value = options[i].split(/^\s*\(.?\)\s*/)[1];
-            var correct = /^\s*\(x\)/i.test(options[i]);
-            groupString += '    <choice correct="' + correct + '">' + value + '</choice>\n';
+      xml = xml.replace(/(^\s*\(.?\).*?$\n*)+/gm, function (match) {
+          var groupString = '<multiplechoiceresponse>\n',
+              value, correct, options;
+
+          groupString += '  <choicegroup type="MultipleChoice">\n';
+          options = match.split('\n');
+
+          for (i = 0; i < options.length; i += 1) {
+              if(options[i].length > 0) {
+                  value = options[i].split(/^\s*\(.?\)\s*/)[1];
+                  correct = /^\s*\(x\)/i.test(options[i]);
+                  groupString += '    <choice correct="' + correct + '">' + value + '</choice>\n';
+              }
           }
-        }
-        groupString += '  </choicegroup>\n';
-        groupString += '</multiplechoiceresponse>\n\n';
-        return groupString;
+
+          groupString += '  </choicegroup>\n';
+          groupString += '</multiplechoiceresponse>\n\n';
+
+          return groupString;
       });
 
       // group check answers
-      xml = xml.replace(/(^\s*\[.?\].*?$\n*)+/gm, function(match, p) {
-        var groupString = '<choiceresponse>\n';
-        groupString += '  <checkboxgroup direction="vertical">\n';
-        var options = match.split('\n');
-        for(var i = 0; i < options.length; i++) {
-          if(options[i].length > 0) {
-            var value = options[i].split(/^\s*\[.?\]\s*/)[1];
-            var correct = /^\s*\[x\]/i.test(options[i]);
-            groupString += '    <choice correct="' + correct + '">' + value + '</choice>\n';
+      xml = xml.replace(/(^\s*\[.?\].*?$\n*)+/gm, function(match) {
+          var groupString = '<choiceresponse>\n',
+              options, value, correct;
+
+          groupString += '  <checkboxgroup direction="vertical">\n';
+          options = match.split('\n');
+
+          for (i = 0; i < options.length; i += 1) {
+              if(options[i].length > 0) {
+                  value = options[i].split(/^\s*\[.?\]\s*/)[1];
+                  correct = /^\s*\[x\]/i.test(options[i]);
+                  groupString += '    <choice correct="' + correct + '">' + value + '</choice>\n';
+              }
           }
-        }
-        groupString += '  </checkboxgroup>\n';
-        groupString += '</choiceresponse>\n\n';
-        return groupString;
+
+          groupString += '  </checkboxgroup>\n';
+          groupString += '</choiceresponse>\n\n';
+
+          return groupString;
       });
 
       // replace string and numerical
       xml = xml.replace(/(^\=\s*(.*?$)(\n*or\=\s*(.*?$))*)+/gm, function(match, p) {
-        var string,
-            answersList = p.replace(/^(or)?=\s*/gm, '').split('\n'),
-            floatValue = parseFloat(answersList[0]);
+          // Split answers
+          var answersList = p.replace(/^(or)?=\s*/gm, '').split('\n'),
 
-        if(!isNaN(floatValue)) {
-          // Tries to extract parameters from string like 'expr +- tolerance'
-          var params = /(.*?)\+\-\s*(.*?$)/.exec(answersList[0]),
-              answer = answersList[0].replace(/\s+/g, '');
-          if(params) {
-            answer = params[1].replace(/\s+/g, '');
-            string = '<numericalresponse answer="' + answer + '">\n';
-            string += '  <responseparam type="tolerance" default="' + params[2] + '" />\n';
-          } else {
-            string = '<numericalresponse answer="' + answer + '">\n';
-          }
-          string += '  <formulaequationinput />\n';
-          string += '</numericalresponse>\n\n';
-        } else {
-            var firstAnswer = answersList.shift();
-            if (firstAnswer[0] === '|') { // this is regexp case
-              string = '<stringresponse answer="' + firstAnswer.slice(1).trim() +  '" type="ci regexp" >\n'
-            }
-            else {
-              string = '<stringresponse answer="' + firstAnswer +  '" type="ci" >\n'
-            }
-            for(var i = 0; i < answersList.length; i++) {
-                string += '  <additional_answer>' + answersList[i] + '</additional_answer>\n'
-            }
-            string +=  '  <textline size="20"/>\n</stringresponse>\n\n';
-        }
-        return string;
-    });
+              processNumericalResponse = function (value) {
+                  var params, answer, string;
+
+                  if (_.contains([ '[', '(' ], value[0]) && _.contains([ ']', ')' ], value[value.length-1]) ) {
+                    // [5, 7) or (5, 7), or (1.2345 * (2+3), 7*4 ]  - range tolerance case
+                    // = (5*2)*3 should not be used as range tolerance
+                    string = '<numericalresponse answer="' + value +  '">\n';
+                    string += '  <formulaequationinput />\n';
+                    string += '</numericalresponse>\n\n';
+                    return string;
+                  }
+
+                  if (isNaN(parseFloat(value))) {
+                      return false;
+                  }
+
+                  // Tries to extract parameters from string like 'expr +- tolerance'
+                  params = /(.*?)\+\-\s*(.*?$)/.exec(value);
+
+                  if(params) {
+                      answer = params[1].replace(/\s+/g, ''); // support inputs like 5*2 +- 10
+                      string = '<numericalresponse answer="' + answer + '">\n';
+                      string += '  <responseparam type="tolerance" default="' + params[2] + '" />\n';
+                  } else {
+                      answer = value.replace(/\s+/g, ''); // support inputs like 5*2
+                      string = '<numericalresponse answer="' + answer + '">\n';
+                  }
+
+                  string += '  <formulaequationinput />\n';
+                  string += '</numericalresponse>\n\n';
+
+                  return string;
+              },
+
+              processStringResponse = function (values) {
+                  var firstAnswer = values.shift(), string;
+
+                  if (firstAnswer[0] === '|') { // this is regexp case
+                      string = '<stringresponse answer="' + firstAnswer.slice(1).trim() +  '" type="ci regexp" >\n';
+                  } else {
+                      string = '<stringresponse answer="' + firstAnswer +  '" type="ci" >\n';
+                  }
+
+                  for (i = 0; i < values.length; i += 1) {
+                      string += '  <additional_answer>' + values[i] + '</additional_answer>\n';
+                  }
+
+                  string +=  '  <textline size="20"/>\n</stringresponse>\n\n';
+
+                  return string;
+              };
+
+          return processNumericalResponse(answersList[0]) || processStringResponse(answersList);
+      });
 
       // replace selects
       xml = xml.replace(/\[\[(.+?)\]\]/g, function(match, p) {
-        var selectString = '\n<optionresponse>\n';
-        selectString += '  <optioninput options="(';
-        var options = p.split(/\,\s*/g);
-        for(var i = 0; i < options.length; i++) {
-          selectString += "'" + options[i].replace(/(?:^|,)\s*\((.*?)\)\s*(?:$|,)/g, '$1') + "'" + (i < options.length -1 ? ',' : '');
-        }
-        selectString += ')" correct="';
-        var correct = /(?:^|,)\s*\((.*?)\)\s*(?:$|,)/g.exec(p);
-        if (correct) selectString += correct[1];
-        selectString += '"></optioninput>\n';
-        selectString += '</optionresponse>\n\n';
-        return selectString;
+          var selectString = '\n<optionresponse>\n',
+              correct, options;
+
+          selectString += '  <optioninput options="(';
+          options = p.split(/\,\s*/g);
+
+          for (i = 0; i < options.length; i += 1) {
+              selectString += "'" + options[i].replace(/(?:^|,)\s*\((.*?)\)\s*(?:$|,)/g, '$1') + "'" + (i < options.length -1 ? ',' : '');
+          }
+
+          selectString += ')" correct="';
+          correct = /(?:^|,)\s*\((.*?)\)\s*(?:$|,)/g.exec(p);
+
+          if (correct) {
+              selectString += correct[1];
+          }
+
+          selectString += '"></optioninput>\n';
+          selectString += '</optionresponse>\n\n';
+
+          return selectString;
       });
 
       // replace explanations
       xml = xml.replace(/\[explanation\]\n?([^\]]*)\[\/?explanation\]/gmi, function(match, p1) {
           var selectString = '<solution>\n<div class="detailed-solution">\nExplanation\n\n' + p1 + '\n</div>\n</solution>';
+
           return selectString;
       });
 
       // replace code blocks
       xml = xml.replace(/\[code\]\n?([^\]]*)\[\/?code\]/gmi, function(match, p1) {
           var selectString = '<pre><code>\n' + p1 + '</code></pre>';
+
           return selectString;
       });
 
       // split scripts and preformatted sections, and wrap paragraphs
-      var splits = xml.split(/(\<\/?(?:script|pre).*?\>)/g);
-      var scriptFlag = false;
-      for(var i = 0; i < splits.length; i++) {
-        if(/\<(script|pre)/.test(splits[i])) {
-          scriptFlag = true;
-        }
-        if(!scriptFlag) {
-          splits[i] = splits[i].replace(/(^(?!\s*\<|$).*$)/gm, '<p>$1</p>');
-        }
-        if(/\<\/(script|pre)/.test(splits[i])) {
-          scriptFlag = false;
-        }
+      splits = xml.split(/(\<\/?(?:script|pre).*?\>)/g);
+      scriptFlag = false;
+
+      for (i = 0; i < splits.length; i += 1) {
+          if(/\<(script|pre)/.test(splits[i])) {
+              scriptFlag = true;
+          }
+
+          if(!scriptFlag) {
+              splits[i] = splits[i].replace(/(^(?!\s*\<|$).*$)/gm, '<p>$1</p>');
+          }
+
+          if(/\<\/(script|pre)/.test(splits[i])) {
+              scriptFlag = false;
+          }
       }
+
       xml = splits.join('');
 
       // rid white space
@@ -313,7 +364,6 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       xml = '<problem>\n' + xml + '\n</problem>';
 
       return xml;
-    }
-    `
+    }`
     return toXml markdown
 

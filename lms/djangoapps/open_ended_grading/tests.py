@@ -217,6 +217,40 @@ class TestStaffGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
         # Check that the error text is correct.
         self.assertIn("Cannot find", response['error'])
 
+    def test_save_grade_with_long_feedback(self):
+        """
+        Test if feedback is too long save_grade() should return error message.
+        """
+        self.login(self.instructor, self.password)
+
+        url = reverse('staff_grading_save_grade', kwargs={'course_id': self.course_id})
+
+        data = {
+            'score': '12',
+            'feedback': '',
+            'submission_id': '123',
+            'location': self.location,
+            'submission_flagged': "false",
+            'rubric_scores[]': ['1', '2']
+        }
+
+        feedback_fragment = "This is very long feedback."
+        data["feedback"] = feedback_fragment * (
+            (staff_grading_service.MAX_ALLOWED_FEEDBACK_LENGTH / len(feedback_fragment) + 1)
+        )
+
+        response = check_for_post_code(self, 200, url, data)
+        content = json.loads(response.content)
+
+        # Should not succeed.
+        self.assertEquals(content['success'], False)
+        self.assertEquals(
+            content['error'],
+            "Feedback is too long, Max length is {0} characters.".format(
+                staff_grading_service.MAX_ALLOWED_FEEDBACK_LENGTH
+            )
+        )
+
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestPeerGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
@@ -370,6 +404,38 @@ class TestPeerGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertFalse(response['success'])
         self.assertTrue(response['error'].find('Missing required keys:') > -1)
         self.assertFalse('actual_score' in response)
+
+    def test_save_grade_with_long_feedback(self):
+        """
+        Test if feedback is too long save_grade() should return error message.
+        """
+        data = {
+            'rubric_scores[]': [0, 0],
+            'location': self.location,
+            'submission_id': 1,
+            'submission_key': 'fake key',
+            'score': 2,
+            'feedback': '',
+            'submission_flagged': 'false',
+            'answer_unknown': 'false',
+            'rubric_scores_complete': 'true'
+        }
+
+        feedback_fragment = "This is very long feedback."
+        data["feedback"] = feedback_fragment * (
+            (staff_grading_service.MAX_ALLOWED_FEEDBACK_LENGTH / len(feedback_fragment) + 1)
+        )
+
+        response_dict = self.peer_module.save_grade(data)
+
+        # Should not succeed.
+        self.assertEquals(response_dict['success'], False)
+        self.assertEquals(
+            response_dict['error'],
+            "Feedback is too long, Max length is {0} characters.".format(
+                staff_grading_service.MAX_ALLOWED_FEEDBACK_LENGTH
+            )
+        )
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)

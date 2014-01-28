@@ -1,0 +1,24 @@
+<%!
+from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
+from django.conf import settings
+%>
+<%inherit file="main.html" />
+
+<%namespace name='static' file='static_content.html'/>
+
+<section class="container unsubscribe">
+
+  <section class="message">
+    <h1>${_("Re-subscribe Successful!")}</h1>
+    <hr class="horizontal-divider">
+    
+    <p>
+      ${_("You have re-enabled forum notification emails from {platform_name}. "
+          "Click {dashboard_link_start}here{link_end} to return to your dashboard. ").format(
+             platform_name=settings.PLATFORM_NAME,
+             dashboard_link_start="<a href='{}'>".format(reverse('dashboard')),
+             link_end="</a>",)}
+    </p>
+  </section>
+</section>

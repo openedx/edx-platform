@@ -467,7 +467,7 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         response = self.client.get(
             reverse('gitlogs_detail', kwargs={
                 'course_id': 'Not/Real/Testing'}))
-        self.assertIn(_('Cannot find course'), response.content)
+        self.assertEqual(404, response.status_code)
 
     def test_gitlog_courseteam_access(self):
         """

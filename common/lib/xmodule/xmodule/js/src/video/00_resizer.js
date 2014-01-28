@@ -127,7 +127,7 @@ function () {
             if ($.isFunction(func)) {
                 callbacksList.push(func);
             } else {
-                console.error('TypeError: Argument is not a function.');
+                console.error('[Video info]: TypeError: Argument is not a function.');
             }
 
             return module;
@@ -142,7 +142,7 @@ function () {
 
                 addCallback(decorator);
             } else {
-                console.error('TypeError: Argument is not a function.');
+                console.error('[Video info]: TypeError: Argument is not a function.');
             }
 
             return module;

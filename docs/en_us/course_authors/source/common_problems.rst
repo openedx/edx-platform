@@ -269,11 +269,13 @@ Create a Numerical Input Problem
    
    When you do this, an equal sign appears next to the answer.
         
-#. (Optional) If you want to include a margin of error, or tolerance, add **+-NUMBER** after the answer. 
-   
-   You can add a percentage or number.  
-   For example, if you want to include a 2% tolerance, add **+-2%**. To add
-   a tolerance of 5, add **+-5**.
+#. (Optional) Specify a margin of error, or tolerance. You can specify a percentage, number, or range.
+
+   * To specify a percentage on either side of the correct answer, add **+-NUMBER%** after the answer. For example, if you want to include a 2% tolerance, add **+-2%**. 
+
+   * To specify a number on either side of the correct answer, add **+-NUMBER** after the answer. For example, if you want to include a tolerance of 5, add **+-5**.
+
+   * To specify a range, use brackets [] or parentheses (). A bracket indicates that range includes the number next to it. A parenthesis indicates that the range does not include the number next to it. For example, if you specify **[5, 8)**, correct answers can be 5, 6, and 7, but not 8. Likewise, if you specify **(5, 8]**, correct answers can be 6, 7, and 8, but not 5.
 
 #. In the component editor, select the text of the explanation, and then click the 
    explanation button to add explanation tags around the text.

@@ -452,7 +452,7 @@ class @CombinedOpenEnded
 
           @rebind()
         else
-          @errors_area.html(response.error)
+          @gentle_alert response.error
     else
       @errors_area.html(@out_of_sync_message)
 

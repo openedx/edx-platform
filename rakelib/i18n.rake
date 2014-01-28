@@ -7,11 +7,8 @@ namespace :i18n do
     sh(File.join(REPO_ROOT, "i18n", "extract.py"))
   end
 
-  desc "Compile localizable strings from sources. With optional flag 'extract', will extract strings first."
-  task :generate => "i18n:validate:gettext" do
-    if ARGV.last.downcase == 'extract'
-      Rake::Task["i18n:extract"].execute
-    end
+  desc "Compile localizable strings from sources, extracting strings first."
+  task :generate => "i18n:extract" do
     sh(File.join(REPO_ROOT, "i18n", "generate.py"))
   end
 
@@ -65,7 +62,7 @@ namespace :i18n do
   end
 
   desc "Run tests for the internationalization library"
-  task :test => "i18n:validate:gettext" do
+  task :test => ["i18n:validate:gettext", "i18n:extract", "i18n:generate"] do
     test = File.join(REPO_ROOT, "i18n", "tests")
     pythonpath_prefix = "PYTHONPATH=#{REPO_ROOT}/i18n:$PYTHONPATH"
     sh("#{pythonpath_prefix} nosetests #{test}")

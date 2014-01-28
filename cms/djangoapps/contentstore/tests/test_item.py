@@ -288,8 +288,8 @@ class TestDuplicateItem(ItemTest):
         # Uses default display_name of 'Text' from HTML component.
         verify_name(self.html_locator, self.seq_locator, "Duplicate of 'Text'")
 
-        # The sequence does not have a display_name set, so None gets included as the string 'None'.
-        verify_name(self.seq_locator, self.chapter_locator, "Duplicate of 'None'")
+        # The sequence does not have a display_name set, so category is shown.
+        verify_name(self.seq_locator, self.chapter_locator, "Duplicate of sequential")
 
         # Now send a custom display name for the duplicate.
         verify_name(self.seq_locator, self.chapter_locator, "customized name", display_name="customized name")

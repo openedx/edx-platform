@@ -28,6 +28,7 @@ prepend_path: lms/static
 
 # Paths to library JavaScript files (optional)
 lib_paths:
+    - xmodule_js/common_static/js/test/i18n.js
     - xmodule_js/common_static/coffee/src/ajax_prefix.js
     - xmodule_js/common_static/coffee/src/logger.js
     - xmodule_js/common_static/js/vendor/jasmine-jquery.js

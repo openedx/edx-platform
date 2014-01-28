@@ -474,7 +474,7 @@ def iterate_grades_for(course_id, students):
 
     (student, gradeset, err_msg) for every student enrolled in the course.
 
-    If an error occured, gradeset will be an empty dict and err_msg will be an
+    If an error occurred, gradeset will be an empty dict and err_msg will be an
     exception message. If there was no error, err_msg is an empty string.
 
     The gradeset is a dictionary with the following fields:

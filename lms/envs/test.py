@@ -304,7 +304,7 @@ if len(MICROSITE_CONFIGURATION.keys()) > 0:
         MICROSITE_CONFIGURATION,
         SUBDOMAIN_BRANDING,
         VIRTUAL_UNIVERSITIES,
-        microsites_root=ENV_ROOT / 'edx-platform' / 'test_microsites'
+        microsites_root=COMMON_ROOT / "test" / 'test_microsites'
     )
 
 ######### LinkedIn ########

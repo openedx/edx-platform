@@ -131,7 +131,9 @@ class @Sequence
 
       @render new_position
     else
-      alert 'Sequence error! Cannot navigate to tab ' + new_position + 'in the current SequenceModule. Please contact the course staff.'
+      alert_template = gettext("Sequence error! Cannot navigate to tab %(tab_name)s in the current SequenceModule. Please contact the course staff.")
+      alert_text = interpolate(alert_text, {tab_name: new_position}, true)
+      alert alert_text
 
   next: (event) => @_change_sequential 'seq_next', event
   previous: (event) => @_change_sequential 'seq_prev', event

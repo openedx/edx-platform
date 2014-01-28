@@ -218,9 +218,11 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
     See get_module() docstring for further details.
     """
 
-    # Short circuit--if the user shouldn't have access, bail without doing any work
-    if not has_access(user, descriptor, 'load', course_id):
-        return None
+    # Do not check access when it's a noauth request.
+    if getattr(user, 'known', True):
+        # Short circuit--if the user shouldn't have access, bail without doing any work
+        if not has_access(user, descriptor, 'load', course_id):
+            return None
 
     student_data = KvsFieldData(DjangoKeyValueStore(field_data_cache))
     descriptor._field_data = LmsFieldData(descriptor._field_data, student_data)
@@ -516,6 +518,8 @@ def handle_xblock_callback_noauth(request, course_id, usage_id, handler, suffix=
     """
     Entry point for unauthenticated XBlock handlers.
     """
+    request.user.known = False
+
     return _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, request.user)
 
 

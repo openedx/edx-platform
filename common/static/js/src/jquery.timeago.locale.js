@@ -1,8 +1,6 @@
 jQuery.timeago.settings.strings = {
-    prefixAgo: pgettext("Prefix indicating time ago", ""),
-    prefixFromNow: pgettext("Prefix indicating time from now", ""),
-    suffixAgo: pgettext("Suffix indicating time ago", "ago"),
-    suffixFromNow: pgettext("Suffix indicating time from now", "from now"),
+    formatAgo: gettext("%s ago"),
+    formatFromNow: gettext("%s from now"),
     seconds: gettext("less than a minute"),
     minute: gettext("about a minute"),
     minutes: function(value) { return ngettext("%d minute", "%d minutes", value)},
@@ -14,6 +12,5 @@ jQuery.timeago.settings.strings = {
     months: function(value) { return ngettext("%d month", "%d months", value) },
     year: gettext("about a year"),
     years: function(value) { return ngettext("%d year", "%d years", value) },
-    wordSeparator: pgettext("Word separator", " "),
     numbers: []
 };
