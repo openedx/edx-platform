@@ -13,6 +13,7 @@
 
 <%block name="js_extra">
   <script type="text/javascript">
+tinyMCE.baseURL = "${settings.STATIC_URL}" + "js/vendor/ova";
 (function($) {
     $.fn.myHTMLViewer = function(options) {
         var urlToLoad = null;
