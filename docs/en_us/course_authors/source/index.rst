@@ -25,6 +25,7 @@ Contents
    advanced_problems
    specialized_problems
    open_response_assessment
+   google_hangouts
    tools
    set_content_releasedates
    view_course_content

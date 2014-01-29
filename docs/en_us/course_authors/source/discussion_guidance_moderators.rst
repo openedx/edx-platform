@@ -1,3 +1,5 @@
+.. _Guidance for Discussion Moderators:
+
 ######################################
 Guidance for Discussion Moderators
 ######################################
