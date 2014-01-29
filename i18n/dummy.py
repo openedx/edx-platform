@@ -22,7 +22,7 @@ $ ./dummy.py
 generates output conf/locale/$DUMMY_LOCALE/LC_MESSAGES,
 where $DUMMY_LOCALE is the dummy_locale value set in the i18n config
 """
-
+from __future__ import print_function
 import re
 import sys
 
@@ -197,17 +197,20 @@ def new_filename(original_filename, new_locale):
     return new_file.abspath()
 
 
-def main():
+def main(verbosity=1):
     """
     Generate dummy strings for all source po files.
     """
     SOURCE_MSGS_DIR = CONFIGURATION.source_messages_dir
     for locale, converter in zip(CONFIGURATION.dummy_locales, [Dummy(), Dummy2()]):
-        print "Processing source language files into dummy strings, locale {}:".format(locale)
+        if verbosity:
+            print("Processing source language files into dummy strings, locale {}:".format(locale))
         for source_file in CONFIGURATION.source_messages_dir.walkfiles('*.po'):
-            print '   ', source_file.relpath()
+            if verbosity:
+                print('   ', source_file.relpath())
             make_dummy(SOURCE_MSGS_DIR.joinpath(source_file), locale, converter)
-    print
+    if verbosity:
+        print()
 
 
 if __name__ == '__main__':

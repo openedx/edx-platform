@@ -4,7 +4,7 @@ from i18n.config import BASE_DIR
 
 LOG = logging.getLogger(__name__)
 
-def execute(command, working_directory=BASE_DIR):
+def execute(command, working_directory=BASE_DIR, stderr=subprocess.STDOUT):
     """
     Executes shell command in a given working_directory.
     Command is a string to pass to the shell.
@@ -12,7 +12,7 @@ def execute(command, working_directory=BASE_DIR):
     """
     LOG.info("Executing in %s ...", working_directory)
     LOG.info(command)
-    subprocess.check_call(command, cwd=working_directory, stderr=subprocess.STDOUT, shell=True)
+    subprocess.check_call(command, cwd=working_directory, stderr=stderr, shell=True)
 
 
 def call(command, working_directory=BASE_DIR):

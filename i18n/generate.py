@@ -24,6 +24,7 @@ from i18n.config import BASE_DIR, CONFIGURATION
 from i18n.execute import execute
 
 LOG = logging.getLogger(__name__)
+DEVNULL = open(os.devnull, "wb")
 
 
 def merge(locale, target='django.po', sources=('django-partial.po',), fail_if_missing=True):
@@ -124,8 +125,8 @@ def main(argv=None):
     for locale in CONFIGURATION.dummy_locales:
         merge_files(locale, fail_if_missing=False)
 
-    compile_cmd = 'django-admin.py compilemessages'
-    execute(compile_cmd, working_directory=BASE_DIR)
+    compile_cmd = 'django-admin.py compilemessages -v0'
+    execute(compile_cmd, working_directory=BASE_DIR, stderr=DEVNULL)
 
 
 if __name__ == '__main__':

@@ -33,7 +33,7 @@ class TestExtract(TestCase):
         super(TestExtract, self).setUp()
         if not SETUP_HAS_RUN:
             # Run extraction script. Warning, this takes 1 minute or more
-            extract.main()
+            extract.main(verbosity=0)
             SETUP_HAS_RUN = True
 
     def get_files(self):

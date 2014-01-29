@@ -21,6 +21,7 @@ import os
 import os.path
 import logging
 import sys
+import argparse
 
 from path import path
 from polib import pofile
@@ -31,39 +32,48 @@ from i18n.segment import segment_pofiles
 
 
 EDX_MARKER = "edX translation file"
-
 LOG = logging.getLogger(__name__)
+DEVNULL = open(os.devnull, 'wb')
 
 def base(path1, *paths):
     """Return a relative path from BASE_DIR to path1 / paths[0] / ... """
     return BASE_DIR.relpathto(path1.joinpath(*paths))
 
-def main():
+
+def main(verbosity=1):
     logging.basicConfig(stream=sys.stdout, level=logging.INFO)
     create_dir_if_necessary(LOCALE_DIR)
     source_msgs_dir = CONFIGURATION.source_messages_dir
     remove_file(source_msgs_dir.joinpath('django.po'))
 
     # Extract strings from mako templates.
-    babel_mako_cmd = 'pybabel extract -F {config} -c "Translators:" . -o {output}'
+    verbosity_map = {
+        0: "-q",
+        1: "",
+        2: "-v",
+    }
+    babel_verbosity = verbosity_map.get(verbosity, "")
+
+    babel_mako_cmd = 'pybabel {verbosity} extract -F {config} -c "Translators:" . -o {output}'
     babel_mako_cmd = babel_mako_cmd.format(
+        verbosity=babel_verbosity,
         config=base(LOCALE_DIR, 'babel_mako.cfg'),
         output=base(CONFIGURATION.source_messages_dir, 'mako.po'),
     )
-    execute(babel_mako_cmd, working_directory=BASE_DIR)
+    execute(babel_mako_cmd, working_directory=BASE_DIR, stderr=DEVNULL)
 
-    makemessages = "django-admin.py makemessages -l en"
+    makemessages = "django-admin.py makemessages -l en -v{}".format(verbosity)
     ignores = " ".join('--ignore="{}/*"'.format(d) for d in CONFIGURATION.ignore_dirs)
     if ignores:
         makemessages += " " + ignores
 
     # Extract strings from django source files, including .py files.
     make_django_cmd = makemessages + ' --extension html'
-    execute(make_django_cmd, working_directory=BASE_DIR)
+    execute(make_django_cmd, working_directory=BASE_DIR, stderr=DEVNULL)
 
     # Extract strings from Javascript source files.
     make_djangojs_cmd = makemessages + ' -d djangojs --extension js'
-    execute(make_djangojs_cmd, working_directory=BASE_DIR)
+    execute(make_djangojs_cmd, working_directory=BASE_DIR, stderr=DEVNULL)
 
     # makemessages creates 'django.po'. This filename is hardcoded.
     # Rename it to django-partial.po to enable merging into django.po later.
@@ -90,13 +100,14 @@ def main():
         output_file = source_msgs_dir / (app_name + ".po")
         files_to_clean.add(output_file)
 
-        babel_cmd = 'pybabel extract -F {config} -c "Translators:" {app} -o {output}'
+        babel_cmd = 'pybabel {verbosity} extract -F {config} -c "Translators:" {app} -o {output}'
         babel_cmd = babel_cmd.format(
+            verbosity=babel_verbosity,
             config=LOCALE_DIR / 'babel_third_party.cfg',
             app=app_name,
             output=output_file,
         )
-        execute(babel_cmd, working_directory=app_dir)
+        execute(babel_cmd, working_directory=app_dir, stderr=DEVNULL)
 
     # Segment the generated files.
     segmented_files = segment_pofiles("en")
@@ -191,4 +202,7 @@ def is_key_string(string):
     return len(string) > 1 and string[0] == '_'
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--verbose', '-v', action='count', default=0)
+    args = parser.parse_args()
+    main(verbosity=args.verbose)

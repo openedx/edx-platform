@@ -23,8 +23,8 @@ class TestGenerate(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        extract.main()
-        dummy.main()
+        extract.main(verbosity=0)
+        dummy.main(verbosity=0)
 
     def setUp(self):
         # Subtract 1 second to help comparisons with file-modify time succeed,
