@@ -381,6 +381,18 @@ class TestPhotoVerification(TestCase):
         reverify_status = SoftwareSecurePhotoVerification.user_status(user=user, window=window)
         self.assertEquals(reverify_status, ('denied', ''))
 
+    def test_display(self):
+        user = UserFactory.create()
+        window = MidcourseReverificationWindowFactory()
+        attempt = SoftwareSecurePhotoVerification(user=user, window=window, status="denied")
+        attempt.save()
+
+        # We expect the verification to be displayed by default
+        self.assertEquals(SoftwareSecurePhotoVerification.display_status(user, window), True)
+
+        # Turn it off
+        SoftwareSecurePhotoVerification.display_off(user.id)
+        self.assertEquals(SoftwareSecurePhotoVerification.display_status(user, window), False)
 
     def test_parse_error_msg_success(self):
         user = UserFactory.create()

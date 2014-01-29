@@ -23,6 +23,15 @@
         $(this).closest('.message.is-expandable').toggleClass('is-expanded');
     }
 
+    $("#failed-verification-button-dismiss").click(function(event) {
+      $.ajax({
+        url: "${reverse('verify_student_toggle_failed_banner_off')}",
+        type: "post",
+        data: { 'user_id': ${user.id}, }
+        })
+      $("#failed-verification-banner").css("display","none");
+      })
+
     $("#upgrade-to-verified").click(function(event) {
       user = $(event.target).data("user");
       course = $(event.target).data("course-id");
@@ -152,7 +161,6 @@
   </script>
 </%block>
 
-<!-- TODO later will need to make this ping for all courses on the dash -->
 % if reverifications["must_reverify"] or reverifications["denied"]:
   <section class="dashboard-banner">
     <%include file='dashboard/_dashboard_prompt_midcourse_reverify.html' />

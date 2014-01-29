@@ -57,14 +57,15 @@ class TestMidcourseReverificationWindow(TestCase):
         )
 
     def test_no_overlapping_windows(self):
-        MidcourseReverificationWindowFactory(
+        window_valid = MidcourseReverificationWindow(
             course_id=self.course_id,
             start_date=datetime.now(pytz.utc) - timedelta(days=3),
             end_date=datetime.now(pytz.utc) + timedelta(days=3)
         )
+        window_valid.save()
 
         with self.assertRaises(ValidationError):
-            window_invalid = MidcourseReverificationWindowFactory(
+            window_invalid = MidcourseReverificationWindow(
                 course_id=self.course_id,
                 start_date=datetime.now(pytz.utc) - timedelta(days=2),
                 end_date=datetime.now(pytz.utc) + timedelta(days=4)

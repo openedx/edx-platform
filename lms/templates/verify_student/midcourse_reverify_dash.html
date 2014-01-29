@@ -18,12 +18,12 @@
 
         <div class="copy">
 
-          % if reverifications["must_reverify"]:
-            % if len(reverifications["must_reverify"]) > 1:
+          % if reverifications["must_reverify"]: # if 1st IF YOU HAVE REVERIFIES
+            % if len(reverifications["must_reverify"]) > 1: # if 2nd IF YOU HAVE >1 REVERIFIES
               <div class="wrapper-reverify-open">
                 <h3 class="title">${_("You currently need to re-verify for the following courses:")}</h3>
                 <ul class="reverification-list">
-                % for course_id, course_name, course_number, date, status in reverifications["must_reverify"]:
+                % for course_id, course_name, course_number, date, status, display in reverifications["must_reverify"]: # for 1st
                   <li class="item">
                     <div class="course-info">
                       <h3 class="course-name">${course_name} (${course_number})</h3>
@@ -31,16 +31,16 @@
                     </div>
                     <p class="reverify-status"><a class="btn action-primary action-reverify" href="${reverse('verify_student_midcourse_reverify', kwargs={'course_id': course_id})}">Re-verify for ${course_number}</a></p>
                   </li>
-                % endfor
+                % endfor # closed for 1st
                 </ul>
               </div>
 
-            % elif reverifications["must_reverify"]:
+            % elif reverifications["must_reverify"]: # con't 2nd if
               <div class="wrapper-reverify-open">
                 <h3 class="title">${_("You currently need to re-verify for the following course:")}</h3>
 
                 <ul class="reverification-list">
-                % for course_id, course_name, course_number, date, status in reverifications["must_reverify"]:
+                % for course_id, course_name, course_number, date, status, display in reverifications["must_reverify"]:
                   <li class="item">
                     <div class="course-info">
                       <h3 class="course-name">${course_name} (${course_number})</h3>
@@ -51,14 +51,19 @@
                 % endfor
                 </ul>
               </div>
-          %endif
+          %endif #close 2nd if
+        % else:
+        <div class="wrapper-reverify-open">
+          <p class="title">${_("You have no re-verifications at present.")}</p>
+          </div>
+        %endif #close first if
 
-          % if reverifications["pending"] or reverifications["approved"] or reverifications["denied"]:
+          % if reverifications["pending"] or reverifications["approved"] or reverifications["denied"]: #open a 1st if
             <div class="wrapper-reverify-status">
               <h3 class="title">${_("The status of your submitted re-verifications:")}</h3>
               <ul class="reverification-list reverification-status">
 
-              % for course_id, course_name, course_number, date, status in reverifications["pending"]:
+              % for course_id, course_name, course_number, date, status, display in reverifications["pending"]:
                 <li class="item pending">
                   <div class="course-info">
                     <h3 class="course-name">${course_name} (${course_number})</h3>
@@ -68,7 +73,7 @@
                 </li>
               % endfor
 
-              % for course_id, course_name, course_number, date, status in reverifications["approved"]:
+              % for course_id, course_name, course_number, date, status, display in reverifications["approved"]:
                 <li class="item complete">
                   <div class="course-info">
                     <h3 class="course-name">${course_name} (${course_number})</h3>
@@ -78,7 +83,7 @@
                 </li>
               % endfor
 
-              % for course_id, course_name, course_number, date, status in reverifications["denied"]:
+              % for course_id, course_name, course_number, date, status, display in reverifications["denied"]:
                 <li class="item failed">
                   <div class="course-info">
                     <h3 class="course-name">${course_name} (${course_number})</h3>
@@ -90,14 +95,12 @@
 
               </ul>
             </div>
-          % endif
-
-          % else:
-          <p class="title">${_("You have no re-verifications at present.")}</p>
-          % endif
+          % endif # close a 1st if
 
           % if reverifications["must_reverify"]:
-            <p class="support">Don't want to re-verify right now? <a href="">Return to where you left off <i class="icon-angle-right"></i></a></p>
+            <p class="support">Don't want to re-verify right now? <a href="${referer}">Return to where you left off <i class="icon-angle-right"></i></a></p>
+          % else:
+          <p class="support"><a href="${referer}">Return to where you left off <i class="icon-angle-right"></i></a></p>
           % endif
 
         </div>

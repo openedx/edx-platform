@@ -84,7 +84,7 @@ log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
 
 Article = namedtuple('Article', 'title url author image deck publication publish_date')
-ReverifyInfo = namedtuple('ReverifyInfo', 'course_id course_name course_number date status')
+ReverifyInfo = namedtuple('ReverifyInfo', 'course_id course_name course_number date status display')  # pylint: disable=C0103
 
 
 def csrf_token(context):
@@ -203,18 +203,17 @@ def reverification_info(course_enrollment_pairs, user, statuses):
     reverifications = defaultdict(list)
     for (course, enrollment) in course_enrollment_pairs:
         info = single_course_reverification_info(user, course, enrollment)
-        for status in statuses:
-            if info and (status in info):
-                reverifications[status].append(info)
+        if info:
+            reverifications[info.status].append(info)
 
     # Sort the data by the reverification_end_date
     for status in statuses:
         if reverifications[status]:
-            reverifications[status] = sorted(reverifications[status], key=lambda x: x.date)
+            reverifications[status].sort(key=lambda x: x.date)
     return reverifications
 
 
-def single_course_reverification_info(user, course, enrollment):
+def single_course_reverification_info(user, course, enrollment):  # pylint: disable=invalid-name
     """Returns midcourse reverification-related information for user with enrollment in course.
 
     If a course has an open re-verification window, and that user has a verified enrollment in
@@ -226,7 +225,7 @@ def single_course_reverification_info(user, course, enrollment):
         enrollment (CourseEnrollment): the object representing the type of enrollment user has in course
 
     Returns:
-        5-namedtuple: (course_id, course_name, course_number, date, status)
+        ReverifyInfo: (course_id, course_name, course_number, date, status)
         OR, None: None if there is no re-verification info for this enrollment
     """
     window = MidcourseReverificationWindow.get_window(course.id, datetime.datetime.now(UTC))
@@ -238,6 +237,7 @@ def single_course_reverification_info(user, course, enrollment):
         course.id, course.display_name, course.number,
         window.end_date.strftime('%B %d, %Y %X %p'),
         SoftwareSecurePhotoVerification.user_status(user, window)[0],
+        SoftwareSecurePhotoVerification.display_status(user, window),
     )
 
 
@@ -470,6 +470,10 @@ def dashboard(request):
     except ExternalAuthMap.DoesNotExist:
         pass
 
+    # If there are *any* denied reverifications that have not been toggled off,
+    # we'll display the banner
+    denied_banner = any(item.display for item in reverifications["denied"])
+
     context = {'course_enrollment_pairs': course_enrollment_pairs,
                'course_optouts': course_optouts,
                'message': message,
@@ -484,6 +488,7 @@ def dashboard(request):
                'verification_status': verification_status,
                'verification_msg': verification_msg,
                'show_refund_option_for': show_refund_option_for,
+               'denied_banner': denied_banner,
                }
 
     return render_to_response('dashboard.html', context)

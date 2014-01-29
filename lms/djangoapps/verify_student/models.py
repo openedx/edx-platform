@@ -149,6 +149,11 @@ class PhotoVerification(StatusModel):
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
 
+    # Indicates whether or not a user wants to see the verification status
+    # displayed on their dash.  Right now, only relevant for allowing students
+    # to "dismiss" a failed midcourse reverification message
+    display = models.BooleanField(db_index=True, default=True)
+
     ######################## Fields Set When Submitting ########################
     submitted_at = models.DateTimeField(null=True, db_index=True)
 
@@ -223,10 +228,9 @@ class PhotoVerification(StatusModel):
         window is anything else, this will check for the reverification associated
         with that window.
         """
-        if window:
-            valid_statuses = ['submitted', 'approved']
-        else:
-            valid_statuses = ['must_retry', 'submitted', 'approved']
+        valid_statuses = ['submitted', 'approved']
+        if not window:
+            valid_statuses.append('must_retry')
         return cls.objects.filter(
             user=user,
             status__in=valid_statuses,
@@ -465,6 +469,28 @@ class PhotoVerification(StatusModel):
         self.status = "must_retry"
         self.save()
 
+    @classmethod
+    def display_off(cls, user_id):
+        """
+        Find all failed PhotoVerifications for a user, and sets those verifications' `display`
+        property to false, so the notification banner can be switched off.
+        """
+        user = User.objects.get(id=user_id)
+        cls.objects.filter(user=user, status="denied").exclude(window=None).update(display=False)
+
+    @classmethod
+    def display_status(cls, user, window):
+        """
+        Finds the `display` property for the PhotoVerification associated with
+        (user, window). Default is True
+        """
+        attempts = cls.objects.filter(user=user, window=window).order_by('-updated_at')
+        try:
+            attempt = attempts[0]
+            return attempt.display
+        except IndexError:
+            return True
+
 
 class SoftwareSecurePhotoVerification(PhotoVerification):
     """
@@ -518,7 +544,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
         """
         all_windows = MidcourseReverificationWindow.objects.filter(course_id=course_id)
         # if there are no windows for a course, then return True right off
-        if (not all_windows):
+        if (not all_windows.exists()):
             return True
 
         for window in all_windows:

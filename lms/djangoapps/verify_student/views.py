@@ -416,8 +416,18 @@ def midcourse_reverify_dash(request):
     context = {
         "user_full_name": user.profile.name,
         'reverifications': reverifications,
+        'referer': request.META.get('HTTP_REFERER'),
     }
     return render_to_response("verify_student/midcourse_reverify_dash.html", context)
+
+
+def toggle_failed_banner_off(request):
+    """
+    Finds all denied midcourse reverifications for a user and permanently toggles
+    the "Reverification Failed" banner off for those verifications.
+    """
+    user_id = request.POST.get('user_id')
+    SoftwareSecurePhotoVerification.display_off(user_id)
 
 
 @login_required
@@ -429,7 +439,7 @@ def reverification_submission_confirmation(_request):
 
 
 @login_required
-def midcourse_reverification_confirmation(request):  # pylint: disable=W0613
+def midcourse_reverification_confirmation(_request):  # pylint: disable=C0103
     """
     Shows the user a confirmation page if the submission to SoftwareSecure was successful
     """

@@ -70,4 +70,10 @@ urlpatterns = patterns(
         views.reverification_window_expired,
         name="verify_student_reverification_window_expired"
     ),
+
+    url(
+        r'^toggle_failed_banner_off$',
+        views.toggle_failed_banner_off,
+        name="verify_student_toggle_failed_banner_off"
+    ),
 )
