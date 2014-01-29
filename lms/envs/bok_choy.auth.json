@@ -107,7 +107,7 @@
             "password": "password",
             "username": "lms"
         },
-        "url": "http://localhost:18040"
+        "url": "** OVERRIDDEN **"
     },
     "ZENDESK_API_KEY": "",
     "ZENDESK_USER": ""

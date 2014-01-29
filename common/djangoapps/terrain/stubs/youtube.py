@@ -72,7 +72,7 @@ class StubYouTubeHandler(StubHttpRequestHandler):
         Requires sending back callback id.
         """
         # Delay the response to simulate network latency
-        time.sleep(self.server.config('time_to_response', self.DEFAULT_DELAY_SEC))
+        time.sleep(self.server.config.get('time_to_response', self.DEFAULT_DELAY_SEC))
 
         # Construct the response content
         callback = self.get_params['callback'][0]

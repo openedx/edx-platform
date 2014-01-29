@@ -8,8 +8,6 @@ from terrain.stubs.youtube import StubYouTubeService
 from terrain.stubs.xqueue import StubXQueueService
 
 
-USAGE = "USAGE: python -m fakes.start SERVICE_NAME PORT_NUM"
-
 SERVICES = {
     "youtube": {"port": settings.YOUTUBE_PORT, "class": StubYouTubeService},
     "xqueue": {"port": settings.XQUEUE_PORT, "class": StubXQueueService},

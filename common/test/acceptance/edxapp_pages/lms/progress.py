@@ -27,7 +27,7 @@ class ProgressPage(PageObject):
         for the section.
 
         Example:
-            section_scores('Week 1', 'Lesson 1', 2) --> [(2, 4), (0, 1)]
+            scores('Week 1', 'Lesson 1') --> [(2, 4), (0, 1)]
 
         Returns `None` if no such chapter and section can be found.
         """
