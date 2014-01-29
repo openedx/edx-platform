@@ -168,6 +168,8 @@ Step 4. Create a Video Component
 
 #. Click **Save.**
   
+.. _Video Advanced Options:
+
 Advanced Options
 ----------------
 
