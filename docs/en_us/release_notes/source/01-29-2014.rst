@@ -26,8 +26,6 @@ Changes and Updates
 
 * You can now use single quotation marks without escaping them when you specify option response answers. The single quotation mark must be between two alphabet characters.  (LMS-2031)
 
-* Give numerical response tolerance as a range (for example [5,7))  SYLVIA? (BLD-25)
-
 
 
 ***************************************
@@ -38,19 +36,17 @@ edX Learning Management System
 
 * When a student sets the speed for a video, that speed setting is now saved and used when the student views subsequent videos. (BLD-237)
 
-* Merge "video sources" and "download video" into the same field (BLD-364) SYLVIA?
+* In the Video component, the settings on the **Advanced** tab now include **Transcript Download Allowed** and **Video Download Allowed**, and **Download Video** has been merged into **Video Sources** to eliminate redundancy. A description of each setting is available at :ref:`Video Advanced Options`. (BLD-364, BLD-368)
 
-* Turn download transcript into a checkbox (BLD-368) SYLVIA?
+* For numerical response problems, students can now enter negative exponents in the same ways they can enter positive exponents. For example, students can enter ``4.9e-9`` or ``4.9*10^-9``. (BLD-434)
 
-* For numerical response problems, students can now enter negative exponents in the same ways they can enter positive exponents.  For example, students can enter ``4.9e-9`` or ``4.9*10^-9``. (BLD-434)
+* For text input problems, course teams can now use regular expressions to allow some flexibility in students' answers. For example, if a question asks students to name the birthplace of Bill Clinton, students can answer "Hope, AR", "Hope, Arkansas", or "Arkansas."
 
-* For string response questions, students can now enter regex expressions as answers. (BLD-475)
+* The video length now appears when a student first views the video component. The student no longer has to start the video to see the total time. (BLD-529)
 
-* The video length is now shown when a student first views the video component. The student no longer must start the video to see the total time. (BLD-529)
+* Grading in unreleased LTI components did not work correctly for users with the Beta Tester role. This problem has been resolved. (BLD-641)
 
-* Users with the BetaTester role can now receive grades back from an LTI component. SYLVIA? (BLD-641)
-
-* In Firefox YouTube video with start time plays from 00:00:00 (BLD-708) SYLVIA?
+* In Firefox, videos started playing from 00:00 even if the instructor specified a different start time for the video. Videos now start from the specified start time. (BLD-708)
 
 
 ***************************************
@@ -64,9 +60,9 @@ Discussions
 Open Response Assessments
 ***************************************
 
-* If a student submitted an answer to be peer graded when the XQueue was down, the submission was lost. This problem is resolved.  (ORA-197)
+* If a student submitted a response to be peer graded when the XQueue was down, the submission was lost. The LMS now prevents response submissions when the XQueue is down. Students see an error message that tells them to try to submit the response later. (ORA-197)
 
-* Large comments in peer grading had caused database issues. Comments now have a 5000 character limit, which prevents this problem. (ORA-201) SYLVIA??
+* Large comments in peer grading caused database issues. Comments now have a 5000 character limit, which prevents this problem. (ORA-201)
  
-* Fixed self assessment deadlines don't apply to the submission of the rubric (ORA-202)
+* In self assessments, students had to submit responses before the deadline for the problem passed, but didn't have to perform the self assessment of their responses before the deadline. Students must now submit both the response to the problem and their self assessment of that response before the deadline for the problem. (ORA-202) 
 
