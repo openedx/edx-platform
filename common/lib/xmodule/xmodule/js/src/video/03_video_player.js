@@ -338,14 +338,16 @@ function (HTML5Video, Resizer) {
 
         newSpeed = parseFloat(newSpeed).toFixed(2).replace(/\.00$/, '.0');
 
-        this.videoPlayer.log(
-            'speed_change_video',
-            {
-                current_time: time,
-                old_speed: this.speed,
-                new_speed: newSpeed
-            }
-        );
+        if (this.speed != newSpeed) {
+            this.videoPlayer.log(
+                'speed_change_video',
+                {
+                    current_time: time,
+                    old_speed: this.speed,
+                    new_speed: newSpeed
+                }
+            );
+        }
 
         this.setSpeed(newSpeed, true);
 
