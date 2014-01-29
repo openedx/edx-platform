@@ -949,8 +949,6 @@ class NumericalResponse(LoncapaResponse):
         if self.range_tolerance:
             if isinstance(student_float, complex):
                 raise StudentInputError(_(u"You may not use complex numbers in range tolerance problems"))
-            if isnan(student_float):
-                raise general_exception
             boundaries = []
             for inclusion, answer in zip(self.inclusion, self.answer_range):
                 boundary = self.get_staff_ans(answer)
