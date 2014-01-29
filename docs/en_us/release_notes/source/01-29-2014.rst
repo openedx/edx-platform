@@ -15,7 +15,7 @@ New documentation, *Building a Course with edX Studio*, is available online_. Yo
 
 .. _online: http://edx.readthedocs.org/projects/ca/en/latest/
 
-There is new documentation on `managing discussion  <http://edx.readthedocs.org/projects/ca/en/latest/discussions.html>`_ and `best practices for discussion moderators <http://edx.readthedocs.org/projects/ca/en/latest/discussion_guidance_moderators.html>`_.
+There is new documentation on `managing discussions <http://edx.readthedocs.org/projects/ca/en/latest/discussions.html>`_ and `best practices for discussion moderators <http://edx.readthedocs.org/projects/ca/en/latest/discussion_guidance_moderators.html>`_.
 
 
 ==========================
