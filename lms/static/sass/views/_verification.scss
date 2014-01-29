@@ -1832,8 +1832,9 @@
       }
 
       .reverification-list {
+        margin-right: ($baseline*1.5);
+        padding: 0;
         list-style-type: none;
-        padding: 0 $baseline;
 
         .item {
           box-shadow: 0 2px 5px 0 $shadow-l1 inset;
@@ -1841,7 +1842,15 @@
           border: 1px solid $m-gray-t2;
 
           &.complete {
-            border: 1px solid $verified-color-lvl1;
+            border: 1px solid $verified-color-lvl3;
+
+            .course-info {
+              opacity: .5;
+
+              .course-name {
+                font-weight: normal;
+              }
+            }
 
             .reverify-status {
               border-top: 1px solid $light-gray;
@@ -1852,7 +1861,15 @@
           }
 
           &.failed {
-            border: 1px solid $danger-red;
+            border: 1px solid $error-red;
+
+            .course-info {
+              opacity: .5;
+
+              .course-name {
+                font-weight: normal;
+              }
+            }
 
             .reverify-status {
               border-top: 1px solid $light-gray;
@@ -1914,134 +1931,198 @@
     }
 
     // step-photos
-    .wrapper-task {
-      @include clearfix();
-      width: flex-grid(12,12);
-      margin: $baseline 0;
+    &.step-photos {
 
-      .wrapper-help {
-        float: right;
-        width: flex-grid(6,12);
-        padding: 0 $baseline;
+      .block-photo .title {
+        @extend %t-title4;
+        color: $m-blue-d1;
+      }
 
-        .help {
-          margin-bottom: ($baseline*1.5);
+      .wrapper-task {
+        @include clearfix();
+        width: flex-grid(12,12);
+        margin: $baseline 0;
 
-          &:last-child {
-            margin-bottom: 0;
-          }
+        .wrapper-help {
+          float: right;
+          width: flex-grid(6,12);
+          padding: 0 $baseline;
 
-          .title {
-            @extend %hd-lv3;
-          }
+          .help {
+            margin-bottom: ($baseline*1.5);
 
-          .copy {
-            @extend %copy-detail;
-          }
+            &:last-child {
+              margin-bottom: 0;
+            }
 
-          .example {
-            color: $m-gray-l2;
-          }
+            .title {
+              @extend %hd-lv3;
+            }
 
-          // help - general list
-          .list-help {
-            margin-top: ($baseline/2);
-            color: $black;
+            .copy {
+              @extend %copy-detail;
+            }
 
-            .help-item {
-              margin-bottom: ($baseline/4);
-              border-bottom: 1px solid $m-gray-l4;
-              padding-bottom: ($baseline/4);
+            .example {
+              color: $m-gray-l2;
+            }
 
-              &:last-child {
-                margin-bottom: 0;
-                border-bottom: none;
-                padding-bottom: 0;
+            // help - general list
+            .list-help {
+              margin-top: ($baseline/2);
+              color: $black;
+
+              .help-item {
+                margin-bottom: ($baseline/4);
+                border-bottom: 1px solid $m-gray-l4;
+                padding-bottom: ($baseline/4);
+
+                &:last-child {
+                  margin-bottom: 0;
+                  border-bottom: none;
+                  padding-bottom: 0;
+                }
+              }
+
+              .help-item-emphasis {
+                @extend %t-weight4;
               }
             }
 
-            .help-item-emphasis {
-              @extend %t-weight4;
+            // help - faq
+            .list-faq {
+              margin-bottom: $baseline;
             }
           }
-
-          // help - faq
-          .list-faq {
-            margin-bottom: $baseline;
-          }
-        }
-      }
-
-      .task {
-        @extend %ui-window;
-        float: left;
-        width: flex-grid(6,12);
-        margin-right: flex-gutter();
-      }
-
-      .controls {
-        padding: ($baseline*0.75) $baseline;
-        background: $m-gray-l4;
-
-        .list-controls {
-          position: relative;
         }
 
-        .control {
-          position: absolute;
+        .task {
+          @extend %ui-window;
+          float: left;
+          width: flex-grid(6,12);
+          margin-right: flex-gutter();
+        }
 
-          .action {
-            @extend %btn-primary-blue;
-            padding: ($baseline/2) ($baseline*0.75);
+        .controls {
+          padding: ($baseline*0.75) $baseline;
+          background: $m-gray-l4;
 
-            *[class^="icon-"] {
-              @extend %t-icon4;
-              padding: ($baseline*.25) ($baseline*.5);
-              display: block;
-            }
+          .list-controls {
+            position: relative;
           }
 
-          // STATE: hidden
-          &.is-hidden {
-            visibility: hidden;
-          }
-
-          // STATE: shown
-          &.is-shown {
-            visibility: visible;
-          }
-
-          // STATE: approved
-          &.approved {
+          .control {
+            position: absolute;
 
             .action {
-              @extend %btn-verify-primary;
+              @extend %btn-primary-blue;
               padding: ($baseline/2) ($baseline*0.75);
+
+              *[class^="icon-"] {
+                @extend %t-icon4;
+                padding: ($baseline*.25) ($baseline*.5);
+                display: block;
+              }
+            }
+
+            // STATE: hidden
+            &.is-hidden {
+              visibility: hidden;
+            }
+
+            // STATE: shown
+            &.is-shown {
+              visibility: visible;
+            }
+
+            // STATE: approved
+            &.approved {
+
+              .action {
+                @extend %btn-verify-primary;
+                padding: ($baseline/2) ($baseline*0.75);
+              }
+            }
+          }
+
+          // control - redo
+          .control-redo {
+            position: absolute;
+            left: ($baseline/2);
+          }
+
+          // control - take/do
+          .control-do {
+            left: 45%;
+          }
+
+          // control - approve
+          .control-approve {
+            position: absolute;
+            right: ($baseline/2);
+          }
+        }
+
+        .msg {
+          @include clearfix();
+          margin-top: ($baseline*2);
+
+          .copy {
+            float: left;
+            width: flex-grid(8,12);
+            margin-right: flex-gutter();
+          }
+
+          .list-actions {
+            position: relative;
+            top: -($baseline/2);
+            float: left;
+            width: flex-grid(4,12);
+            text-align: right;
+
+            .action-retakephotos a {
+              @extend %btn-primary-blue;
+              @include font-size(14);
+              padding: ($baseline/2) ($baseline*.75);
             }
           }
         }
 
-        // control - redo
-        .control-redo {
-          position: absolute;
-          left: ($baseline/2);
-        }
-
-        // control - take/do
-        .control-do {
-          left: 45%;
-        }
-
-        // control - approve
-        .control-approve {
-          position: absolute;
-          right: ($baseline/2);
+        .msg-followup {
+          border-top: ($baseline/10) solid $m-gray-t0;
+          padding-top: $baseline;
         }
       }
 
-      .msg {
+      .review-task {
+        margin-bottom: ($baseline*1.5);
+        padding: ($baseline*0.75) $baseline;
+        border-radius: ($baseline/10);
+        background: $m-gray-l4;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        > .title {
+          @extend %hd-lv3;
+        }
+
+        .copy {
+          @extend %copy-base;
+
+          strong {
+            @extend %t-weight5;
+            color: $m-gray-d4;
+          }
+        }
+      }
+
+
+      // individual task - name
+      .review-task-name {
         @include clearfix();
-        margin-top: ($baseline*2);
+        border: 1px solid $light-gray;
 
         .copy {
           float: left;
@@ -2051,12 +2132,12 @@
 
         .list-actions {
           position: relative;
-          top: -($baseline/2);
+          top: -($baseline);
           float: left;
           width: flex-grid(4,12);
           text-align: right;
 
-          .action-retakephotos a {
+          .action-editname a {
             @extend %btn-primary-blue;
             @include font-size(14);
             padding: ($baseline/2) ($baseline*.75);
@@ -2064,123 +2145,67 @@
         }
       }
 
-      .msg-followup {
-        border-top: ($baseline/10) solid $m-gray-t0;
-        padding-top: $baseline;
-      }
-    }
+      .nav-wizard {
+        padding: ($baseline*.75) $baseline;
 
+        .prompt-verify {
+          float: left;
+          width: flex-grid(6,12);
+          margin: 0 flex-gutter() 0 0;
 
-    .review-task {
-      margin-bottom: ($baseline*1.5);
-      padding: ($baseline*0.75) $baseline;
-      border-radius: ($baseline/10);
-      background: $m-gray-l4;
+          .title {
+            @extend %hd-lv4;
+            margin-bottom: ($baseline/4);
+          }
 
-      &:last-child {
-        margin-bottom: 0;
-      }
+          .copy {
+            @extend %t-copy-sub1;
+            @extend %t-weight3;
+          }
 
-      > .title {
-        @extend %hd-lv3;
-      }
+          .list-actions {
+            margin-top: ($baseline/2);
+          }
 
-      .copy {
-        @extend %copy-base;
-
-        strong {
-          @extend %t-weight5;
-          color: $m-gray-d4;
-        }
-      }
-    }
-
-
-    // individual task - name
-    .review-task-name {
-      @include clearfix();
-
-      .copy {
-        float: left;
-        width: flex-grid(8,12);
-        margin-right: flex-gutter();
-      }
-
-      .list-actions {
-        position: relative;
-        top: -($baseline);
-        float: left;
-        width: flex-grid(4,12);
-        text-align: right;
-
-        .action-editname a {
-          @extend %btn-primary-blue;
-          @include font-size(14);
-          padding: ($baseline/2) ($baseline*.75);
-        }
-      }
-    }
-
-    .nav-wizard {
-      padding: ($baseline*.75) $baseline;
-
-      .prompt-verify {
-        float: left;
-        width: flex-grid(6,12);
-        margin: 0 flex-gutter() 0 0;
-
-        .title {
-          @extend %hd-lv4;
-          margin-bottom: ($baseline/4);
+          .action-verify label  {
+            @extend %t-copy-sub1;
+          }
         }
 
-        .copy {
-          @extend %t-copy-sub1;
-          @extend %t-weight3;
-        }
-
-        .list-actions {
+        .wizard-steps {
           margin-top: ($baseline/2);
-        }
 
-        .action-verify label  {
-          @extend %t-copy-sub1;
-        }
-      }
+          .wizard-step {
+            margin-right: flex-gutter();
+            display: inline-block;
+            vertical-align: middle;
 
-      .wizard-steps {
-        margin-top: ($baseline/2);
-
-        .wizard-step {
-          margin-right: flex-gutter();
-          display: inline-block;
-          vertical-align: middle;
-
-          &:last-child {
-            margin-right: 0;
+            &:last-child {
+              margin-right: 0;
+            }
           }
         }
       }
-    }
 
 
-    .modal {
+      .modal {
 
-      fieldset {
-        margin-top: $baseline;
-      }
+        fieldset {
+          margin-top: $baseline;
+        }
 
-      .close-modal {
-        @include font-size(24);
-        color: $m-blue-d3;
+        .close-modal {
+          @include font-size(24);
+          color: $m-blue-d3;
 
-        &:hover, &:focus {
-          color: $m-blue-d1;
-          border: none;
+          &:hover, &:focus {
+            color: $m-blue-d1;
+            border: none;
+          }
         }
       }
-    }
 
+    }
   }
 
 

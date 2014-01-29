@@ -2,8 +2,9 @@
 <%! from django.core.urlresolvers import reverse %>
 <!--TODO replace this with something a clever deisgn person approves of-->
 <!--TODO replace this with a shiny loopy thing to actually print out all courses-->
+
 % if reverifications["must_reverify"]:
-<div class="wrapper-msg">
+<div class="wrapper-msg urgency-high">
   <div class="msg msg-reverify has-actions">
       <div class="msg-content">
         <h2 class="title">${_("You need to re-verify to continue")}</h2>
@@ -27,8 +28,8 @@
 %endif
 
 %if reverifications["denied"]:
-<div class="wrapper-msg">
-  <div class="msg msg-reverify has-actions">
+<div class="wrapper-msg urgency-low">
+  <div class="msg msg-reverify is-dismissable">
       <div class="msg-content">
         <h2 class="title">${_("Your re-verification failed")}</h2>
         % for course_id, course_name, course_number, date, status in reverifications["denied"]:
@@ -37,6 +38,9 @@
             ${_('Your re-verification for <strong>{course_name}</strong> failed and you are no longer eligible for a Verified Certificate.  If you think this is in error, please contact us at support@edx.org.')}
           </p>
         </div>
+      </div>
+      <div class="action-dismiss">
+        <button class="button-dismiss"><i class="icon-remove-sign"></i> <span class="sr">Dismiss</span></button>
       </div>
     </div>
   </div>

@@ -2,31 +2,36 @@
 <%! from django.core.urlresolvers import reverse %>
 <!--TODO replace this with something a clever deisgn person approves of-->
 <!--TODO replace this with a shiny loopy thing to actually print out all courses-->
-% if reverifications["must_reverify"] or reverifications["pending"] or reverifications["denied"] or reverifications["approved"]:
 
-    <h2 class="title">${_("Re-verification now open for")}</h2>
+% if reverifications["must_reverify"] or reverifications["pending"] or reverifications["denied"] or reverifications["approved"]:
+<li class="status status-verification is-accepted">
+  <span class="title status-title">${_("Re-verification now open for:")}</span>
+
+    <ul class="reverify-status-list">
+
     % if reverifications["must_reverify"]:
         % for course_id, course_name, course_number, date, status in reverifications["must_reverify"]:
-            ${_('Must Reverify: <strong>{course_name}</strong>').format(course_name=course_name)}
+            <li class="status-item is-open">${_('<i class="icon-circle"></i><span class="label">Re-verify now:</span> <span class="course-name"><a href="">{course_name}</span></a>').format(course_name=course_name)}</li>
         % endfor
     %endif
 
     % if reverifications["pending"]:
         % for course_id, course_name, course_number, date, status in reverifications["pending"]:
-            ${_('Denied: <strong>{course_name}</strong>').format(course_name=course_name)}
+            <li class="status-item is-pending">${_('<i class="icon-circle"></i><span class="label">Pending:</span> <span class="course-name"><a href="">{course_name}</span></a>').format(course_name=course_name)}</li>
         % endfor
     %endif
 
     % if reverifications["denied"]:
         % for course_id, course_name, course_number, date, status in reverifications["denied"]:
-            ${_('Denied: <strong>{course_name}</strong>').format(course_name=course_name)}
+            <li class="status-item is-denied">${_('<i class="icon-remove-sign"></i><span class="label">Denied:</span> <span class="course-name"><a href="">{course_name}</span></a>').format(course_name=course_name)}</li>
         % endfor
     %endif
 
     % if reverifications["approved"]:
         % for course_id, course_name, course_number, date, status in reverifications["approved"]:
-            ${_('Denied: <strong>{course_name}</strong>').format(course_name=course_name)}
+            <li class="status-item is-approved">${_('<i class="icon-ok"></i><span class="label">Approved:</span> <span class="course-name"><a href="">{course_name}</span></a>').format(course_name=course_name)}</li>
         % endfor
     %endif
-
+    </ul>
+</li>
 %endif
