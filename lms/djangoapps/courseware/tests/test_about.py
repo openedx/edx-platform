@@ -1,6 +1,7 @@
 """
 Test the about xblock
 """
+import mock
 from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
 
@@ -18,6 +19,10 @@ class AboutTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
             category="about", parent_location=self.course.location,
             data="OOGIE BLOOGIE", display_name="overview"
         )
+        # The following XML course is closed; we're testing that
+        # an about page still appears when the course is already closed
+        self.xml_course_id = 'edX/detached_pages/2014'
+        self.xml_data = "about page 463139"
 
     def test_logged_in(self):
         self.setup_user()
@@ -31,3 +36,18 @@ class AboutTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn("OOGIE BLOOGIE", resp.content)
+
+    @mock.patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
+    def test_logged_in_xml(self):
+        self.setup_user()
+        url = reverse('about_course', args=[self.xml_course_id])
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn(self.xml_data, resp.content)
+
+    @mock.patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
+    def test_anonymous_user_xml(self):
+        url = reverse('about_course', args=[self.xml_course_id])
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn(self.xml_data, resp.content)
