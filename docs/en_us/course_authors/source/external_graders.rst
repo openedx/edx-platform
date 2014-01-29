@@ -10,7 +10,7 @@ Using External Graders
 Overview
 *******************
 
-An external grader is a service that receives student resposnes to a problem, processes those responses, and returns feedback and a problem grade to the edX platform. You build and deploy an external grader separately from the edX platform.
+An external grader is a service that receives student responses to a problem, processes those responses, and returns feedback and a problem grade to the edX platform. You build and deploy an external grader separately from the edX platform.
 
 See the following sections for more information:
 
@@ -26,15 +26,15 @@ See the following sections for more information:
 External Grader Example
 ***************************
 
-An external grader is particularly useful for software programming courses where students are asked to submit complicated code.  The grader can run tests that you define on that code and return results to a student.
+An external grader is particularly useful for software programming courses where students are asked to submit complex code.  The grader can run tests that you define on that code and return results to a student.
 
-For example, a student enters Python code for the following problem.  When the student clicks Check, the code is sent to the grader for testing.  If the code passes all tests, the grader returns the score you assigned to the problem and a string indicating that the solution is correct.
+For example, you define a problem that requires students to submit Python code, and create a set of tests that an external grader can run to verify the submissions. When a student enters Python code for the problem and clicks **Check**, the code is sent to the grader for testing.  If the code passes all tests, the grader returns the score and a string indicating that the solution is correct.
 
 .. image:: Images/external-grader-correct.png
  :alt: Image of a students view of a programming problem that uses an external grader, with a correct result 
 
 
-The external grader can return a string with results, which the student can see by clicking See full output. This can be particularly useful when the solution is not correct and you want to return information about the failed tests. For example:
+The external grader can return a string with results, which the student can see by clicking **See full output**. This can be particularly useful when the solution is not correct and you want to return information about the failed tests. For example:
 
 .. image:: Images/external-grader-incorrect.png
  :alt: Image of a students view of a programming problem that uses an external grader, with a correct result 
@@ -45,14 +45,15 @@ The external grader can return a string with results, which the student can see 
 External Graders and XQueue
 **************************************
 
-To use an external grader to check problems, you use XQueue.  XQueue is the edX interface that manages communication between the edX Platform and your grader.  The XQueue provides students' input to the grader; it then receives results from the grader and returns them to students.  
+The edX Platform communicates with your external grader through XQueue.  XQueue provides students' input to the grader; it then receives results from the grader and returns them to students.  
 
-XQueue must be set up in one of two modes:
+The queue for your course must be set up in one of two modes:
 
 *  **Pull**
 
 *  **Push**
 
+In most situations, edX recommends that you use Pull mode. Pull mode will prevent your grader from being overloaded by submissions it is not ready to process.
 
 You determine which mode to use when you are building your course and your grader. You must communicate this decision to your edX Program Manager. The student experience is not affected by this decision.
 
@@ -64,13 +65,11 @@ In Pull mode, student submissions are collected in XQueue, where they remain unt
 
 The external grader polls the XQueue through a RESTful interface at a regular interval. When the external grader receives a submission, it runs the tests on it, then pushes the response back to XQueue through the RESTful interface. XQueue then delivers the response to the edX Learning Management System.
 
-[INTERFACE DETAILS NEEDED?]
-
 ==================
 Push Mode
 ==================
 
-In Push mode, XQueue actively pushes student submissions to the external grader, which passivily waits for the next submission to grade. When the external grader receives a submission, it runs the tests on it, then synchronously delivers the graded response back to the XQueue. XQueue then delivers the response to the edX Learning Management System.
+In Push mode, XQueue actively pushes student submissions to the external grader, which passively waits for the next submission to grade. When the external grader receives a submission, it runs the tests on it, then synchronously delivers the graded response back to the XQueue. XQueue then delivers the response to the edX Learning Management System.
 
 
 ============================
@@ -82,7 +81,7 @@ The following steps show the complete process:
 #. The student either enters code or attaches a file for a problem, then clicks Check.
 #. XQueue either pushes the code to the external grader, or waits until the external grader pulls the code.
 #. The external grader runs the tests that you created on the code.
-#. The external grader returns to the XQueue the grade for the submission, as well as any results in a string. 
+#. The external grader returns the grade for the submission, as well as any results in a string, to XQueue. 
 #. The XQueue delivers the results to the edX Learning Management System.
 #. The student sees the problem results and the grade.
 
@@ -100,7 +99,7 @@ Your course will use a specific XQueue name. You use this name when creating pro
 The XQueue Interface
 **************************************
 
-The student submission sent from XQueue to the grader, and the response send from the grader to XQueue, are JSON objects, as described below.
+The student submission sent from XQueue to the grader, and the response sent from the grader to XQueue, are JSON objects, as described below.
 
 ======================================================
 Inputs to the External Grader
@@ -108,7 +107,7 @@ Inputs to the External Grader
 
 The grader receives student submissions as a JSON object with two keys:
 
-* **student_response**: A string containing the student's code submission.  The string can come from input the student enters in the edX Learning Management System, or a file the student attaches.
+* **student_response**: A string containing the student's code submission.  The string comes from either input the student enters in the edX Learning Management System or a file the student attaches.
 
 * **grader_payload**: An optional string that you can specify when creating the problem. For more information, see the section :ref:`Create a Code Response Problem`.
 
@@ -160,7 +159,7 @@ Scale
 
 Your external grader must be able to scale to support the number of students in your course.
 
-Keep in mind that student submissions will likely come in spikes, not in an even flow.  For example, you should expect the load to be much greater than average in the hours before an exam is due.  Therefore, you should verify that the external grader can process submissions from a majority of students in a short period of time. [HOW MUCH MORE SPECIFIC CAN WE BE HERE?]
+Keep in mind that student submissions will likely come in spikes, not in an even flow.  For example, you should expect the load to be much greater than average in the hours before an exam is due.  Therefore, you should verify that the external grader can process submissions from a majority of students in a short period of time. 
 
 .. _Security:
 
@@ -168,7 +167,7 @@ Keep in mind that student submissions will likely come in spikes, not in an even
 Security
 ==================
 
-Students are submitting code than executes directly on a server your are responsible for. It is possible that a student will submit malicious code. Your system must protect against this and ensure that the external grader runs only code that is relevent to the course problems.  How you implement these protections depends on the programming language you are using and your deployment architecture.  You must verify that your system can identify malicious code and prevent its execution.
+Students are submitting code that executes directly on a server that you are responsible for. It is possible that a student will submit malicious code. Your system must protect against this and ensure that the external grader runs only code that is relevent to the course problems.  How you implement these protections depends on the programming language you are using and your deployment architecture.  You must ensure that malicious code won't damage your server.
 
 .. _Reliability and Recovery:
 
@@ -178,7 +177,7 @@ Reliability and Recovery
 
 Once your course starts, many students will submit code at any possible time, and expect to see results quickly.  If your external grader is prone to failure or unexpected delays, the student experience will be poor.
 
-Therefore, you must ensure that your grader has high availability and can recover from errors. Prior to your course starting, you must have a plan to immediately notifiy the team reponsible for operating your grader, as well as edX operations, when the grader fails. In collaboration with edX, you should develop a system to quickly identify to cause of failure, which may be your grader or edX's XQueue.
+Therefore, you must ensure that your grader has high availability and can recover from errors. Prior to your course starting, you must have a plan to immediately notifiy the team reponsible for operating your grader, as well as edX operations, when the grader fails. In collaboration with edX, you should develop a procedure to quickly identify the cause of failure, which can be your grader or edX's XQueue.
 
 Contact your edX Program Manager for more information.
 
@@ -190,7 +189,7 @@ If you know the grader will be unavailable at a certain time for maintenance, yo
 Testing
 ==================
 
-You should test your grader thoroughly before you course starts.  Be sure to test incorrect code to ensure that the grader responds with appropriate scores and messages.
+You should test your grader thoroughly before your course starts.  Be sure to test incorrect code as well as correct code to ensure that the grader responds with appropriate scores and messages.
 
 .. _Create a Code Response Problem:
 
@@ -198,7 +197,7 @@ You should test your grader thoroughly before you course starts.  Be sure to tes
 Create a Code Response Problem
 ********************************
 
-You create a code response problem in edX Studio adding a common blank problem, then editing the XML problem definition in the :ref:`Advanced Editor`.
+You create a code response problem in edX Studio by adding a common blank problem, then editing the XML problem definition in the :ref:`Advanced Editor`.
 
 See :ref:`Working with Problem Components` for more information.
 
@@ -229,9 +228,6 @@ Note the following about the XML definition:
 
 * **queuename**: The value of the queuename attribute of the <coderesponse> element maps to an XQueue that edX sets up for the course.  You get this name from your edX Program Manager. You must use this exact name in order for the problem to communicate with the correct XQueue.
 
-* **Input Type**: In this example, the input type is specificed by the **<textbox>** element.  When you use <textbox>, the student enters code in a browser field when viewing the course unit.  The other element you can use is <filesubmission>, which enables the student to attach and submit a code file in the unit.
+* **Input Type**: In this example, the input type is specificed by the **<textbox>** element.  When you use <textbox>, the student enters code in a browser field when viewing the course unit.  The other element you can use to specify the input type is <filesubmission>, which enables the student to attach and submit a code file in the unit.
 
 * **<grader_payload>**: You can use the <grader_payload> element to send information to the external grader in the form of a JSON object. For example, you can use <grader_payload> to tell the grader which tests to run for this problem.
-
-
-
