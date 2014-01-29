@@ -649,7 +649,7 @@ class StringResponseTest(ResponseTest):
     def test_case_sensitive(self):
         # Test single answer
         problem_specified = self.build_problem(answer="Second", case_sensitive=True)
-        
+
         # should also be case_sensitive if case sensitivity is not specified
         problem_not_specified = self.build_problem(answer="Second")
         problems = [problem_specified, problem_not_specified]
@@ -1105,11 +1105,13 @@ class NumericalResponseTest(ResponseTest):
         with self.assertRaises(StudentInputError):
             problem.grade_answers(input_dict)
 
-        # test isnan variable
+        # test isnan student input: no exception,
+        # but problem should be graded as incorrect
         problem = self.build_problem(answer='(1, 5)')
         input_dict = {'1_2_1': ''}
-        with self.assertRaises(StudentInputError):
-            problem.grade_answers(input_dict)
+        correct_map = problem.grade_answers(input_dict)
+        correctness = correct_map.get_correctness('1_2_1')
+        self.assertEqual(correctness, 'incorrect')
 
         # test invalid range tolerance answer
         with self.assertRaises(StudentInputError):
