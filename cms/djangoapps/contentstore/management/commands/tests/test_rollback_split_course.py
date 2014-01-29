@@ -40,7 +40,8 @@ class TestArgParsing(unittest.TestCase):
 @override_settings(MODULESTORE=TEST_MODULESTORE)
 class TestRollbackSplitCourseNoOldMongo(ModuleStoreTestCase):
     """
-    Unit tests for rolling back a split-mongo course from command line
+    Unit tests for rolling back a split-mongo course from command line,
+    where the course doesn't exist in the old mongo store
     """
 
     def setUp(self):
@@ -56,7 +57,8 @@ class TestRollbackSplitCourseNoOldMongo(ModuleStoreTestCase):
 @override_settings(MODULESTORE=TEST_MODULESTORE)
 class TestRollbackSplitCourseNoSplitMongo(ModuleStoreTestCase):
     """
-    Unit tests for rolling back a split-mongo course from command line
+    Unit tests for rolling back a split-mongo course from command line,
+    where the course doesn't exist in the split mongo store
     """
 
     def setUp(self):

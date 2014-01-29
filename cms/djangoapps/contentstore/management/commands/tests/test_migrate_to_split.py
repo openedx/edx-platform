@@ -46,7 +46,7 @@ class TestArgParsing(unittest.TestCase):
 @override_settings(MODULESTORE=TEST_MODULESTORE)
 class TestMigrateToSplit(ModuleStoreTestCase):
     """
-    Unit tests for importing a course from command line
+    Unit tests for migrating a course from old mongo to split mongo
     """
 
     def setUp(self):
