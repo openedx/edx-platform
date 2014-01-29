@@ -27,6 +27,6 @@ data: |
                 $('.verify-button-success-text').html(success_message);
               }
             });
-          }).call(document.getElementById('click_me'), event);
+          }).call(document.getElementById('User_Verify_Button'), event);
         });
       </script>
