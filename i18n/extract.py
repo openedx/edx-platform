@@ -15,7 +15,10 @@ and it cannot be overridden.
 
 """
 
-import os, sys, logging
+import argparse
+import logging
+import os
+import sys
 from datetime import datetime
 from polib import pofile
 
@@ -37,17 +40,32 @@ SOURCE_WARN = 'This English source file is machine-generated. Do not check it in
 LOG = logging.getLogger(__name__)
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--verbose', '-v', action='count', default=1)
+    args = parser.parse_args()
+
     logging.basicConfig(stream=sys.stdout, level=logging.INFO)
     create_dir_if_necessary(LOCALE_DIR)
     source_msgs_dir = CONFIGURATION.source_messages_dir
 
-    makemessages = "django-admin.py makemessages -l en"
+    makemessages = "django-admin.py makemessages -l en -v{}".format(args.verbose)
     ignores = " ".join('--ignore="{}/*"'.format(d) for d in CONFIGURATION.ignore_dirs)
     if ignores:
         makemessages += " " + ignores
 
     # Extract strings from mako templates.
-    babel_mako_cmd = 'pybabel extract -F %s -c "Translators:" . -o %s' % (BABEL_CONFIG, BABEL_OUT)
+    if args.verbose == 1:
+        babel_verbosity = '-q'
+    elif args.verbose == 2:
+        babel_verbosity = ''
+    else:
+        babel_verbosity = '-v'
+
+    babel_mako_cmd = 'pybabel {} extract -F {} -c "Translators:" . -o {}'.format(
+        babel_verbosity,
+        BABEL_CONFIG,
+        BABEL_OUT,
+    )
     execute(babel_mako_cmd, working_directory=BASE_DIR)
 
     # Extract strings from django source files, including .py files.
