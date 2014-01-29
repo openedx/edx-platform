@@ -1186,6 +1186,8 @@ body.discussion {
 
   .blank-slate {
 
+    padding: 40px 40px 10px;
+
     section {
       border-bottom: 1px solid #ccc;
     }
@@ -1336,7 +1338,6 @@ body.discussion {
 
   .discussion-article {
     position: relative;
-    padding: $baseline*2;
     min-height: 468px;         
 
     a {
@@ -1397,7 +1398,7 @@ body.discussion {
   }
 
   .discussion-post {
-    padding: $baseline/2 $baseline;
+    padding: $baseline*2 $baseline*2 $baseline/2 $baseline*2;
 
     > header .vote-btn {
       position: relative;
@@ -1443,7 +1444,7 @@ body.discussion {
   .responses {
     list-style: none;
     margin-top: $baseline;
-    padding: 0;
+    padding: 0px $baseline*2;
 
     > li {
       position: relative;
@@ -1508,6 +1509,27 @@ body.discussion {
 
     .posted-by {
       font-weight: 700;
+    }
+  }
+
+  div.add-response {
+    margin-top: $baseline;
+    padding: 0px 30px;
+
+    button.add-response-btn {
+      @include white-button;
+      position: relative;
+      padding: 0px 30px;
+      border: 1px solid #b2b2b2;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, .15);
+      font-size: 13px;
+      text-align: left;
+      @include animation(fadeIn .3s);
+      width: 100%;
+
+      span.add-response-btn-text {
+        padding-left: 4px;
+      }
     }
   }
 
@@ -1783,7 +1805,7 @@ body.discussion {
 
 
   .discussion-reply-new {
-    padding: $baseline;
+    padding: 0px 30px $baseline;
     @include clearfix;
     @include transition(opacity .2s linear 0s);
 
@@ -1856,8 +1878,28 @@ body.discussion {
     margin-top: $baseline*2;
 
     > li {
-      margin: 0 $baseline $baseline !important;
       padding: 26px 30px $baseline !important;
+    }
+  }
+
+  div.add-response.post-extended-content {
+    margin-top: $baseline;
+    margin-bottom: 20px; 
+
+    button.add-response-btn {
+      @include white-button;
+      position: relative;
+      border: 1px solid #b2b2b2;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, .15);
+      font-size: 13px;
+      text-align: left;
+      @include animation(fadeIn .3s);
+      width: 100%; 
+      padding-left: 30px;
+
+      span.add-response-btn-text {
+        padding-left: 4px;
+      }
     }
   }
 
@@ -1938,7 +1980,7 @@ body.discussion {
         @include transition(all .2s linear 0s);
 
         .discussion-post {
-          padding: 12px $baseline 0 $baseline;
+          padding: 12px 30px 0px;
           @include clearfix;
 
           .inline-comment-count {
