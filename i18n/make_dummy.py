@@ -12,15 +12,13 @@
 #
 # po files can be generated with this:
 # django-admin.py makemessages --all --extension html -l en
-
+#
 # Usage:
 #
-# $ ./make_dummy.py <sourcefile>
+# $ ./make_dummy.py
 #
-# $ ./make_dummy.py ../conf/locale/en/LC_MESSAGES/django.po
-#
-# generates output to
-#    edx-platform/conf/locale/eo/LC_MESSAGES/django.po
+# generates output conf/locale/$DUMMY_LOCALE/LC_MESSAGES,
+# where $DUMMY_LOCALE is the dummy_locale value set in the i18n config
 
 import os, sys
 import polib
@@ -59,12 +57,10 @@ def new_filename(original_filename, new_locale):
     return os.path.abspath(os.path.join(orig_dir, '../..', new_locale, msgs_dir, orig_file))
 
 if __name__ == '__main__':
-    # required arg: file
-    if len(sys.argv) < 2:
-        raise Exception("missing file argument")
-    # optional arg: locale
-    if len(sys.argv) < 3:
-        locale = CONFIGURATION.get_dummy_locale()
-    else:
-        locale = sys.argv[2]
-    main(sys.argv[1], locale)
+    LOCALE = CONFIGURATION.dummy_locale
+    SOURCE_MSGS_DIR = CONFIGURATION.source_messages_dir
+    print "Processing source language files into dummy strings:"
+    for source_file in CONFIGURATION.source_messages_dir.walkfiles('*.po'):
+        print '   ', source_file.relpath()
+        main(SOURCE_MSGS_DIR.joinpath(source_file), LOCALE)
+    print

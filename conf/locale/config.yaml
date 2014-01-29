@@ -1,6 +1,6 @@
 # Configuration for i18n workflow.
 
-locales: 
+locales:
     - en
 
     # More languages we might want someday, these have started on Transifex.
