@@ -1,7 +1,7 @@
 define(["backbone", "underscore"], function(Backbone, _) {
     var AssignmentGrade = Backbone.Model.extend({
         defaults : {
-            graderType : null, // the type label (string). May be "Not Graded" which implies None. 
+            graderType : null, // the type label (string). May be "notgraded" which implies None.
             locator : null // locator for the block
         },
         idAttribute: 'locator',

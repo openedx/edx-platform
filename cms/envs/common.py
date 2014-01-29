@@ -174,6 +174,9 @@ MIDDLEWARE_CLASSES = (
 
     # catches any uncaught RateLimitExceptions and returns a 403 instead of a 500
     'ratelimitbackend.middleware.RateLimitMiddleware',
+
+    # for expiring inactive sessions
+    'session_inactivity_timeout.middleware.SessionInactivityTimeout',
 )
 
 ############# XBlock Configuration ##########

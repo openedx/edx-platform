@@ -271,7 +271,7 @@ For more information, see `Xml Format of "Word Cloud" Module
 Zooming Image Tool
 ******************
 
-You may want to present information to your students as a graphic. If your graphic is very large or very detailed, students may not be able to see all the information in the graphic. You can use the zooming image tool  
+You may want to present information to your students as an image. If your image is very large or very detailed, students may not be able to see all the information in the image. You can use the zooming image tool to enlarge areas of your image as the student moves the mouse over the image, as in the example below.
 
 .. image:: Images/Zooming_Image.gif
   :alt: Example zooming image tool showing a chemistry exercise

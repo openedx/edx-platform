@@ -32,8 +32,9 @@ Contents
    accessibility
    checking_student_progress
    ora_students
+   discussions
+   discussion_guidance_moderators
    glossary
-
 
 
 

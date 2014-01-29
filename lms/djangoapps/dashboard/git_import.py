@@ -97,23 +97,28 @@ def add_repo(repo, rdir_in):
     cwd = os.path.abspath(cwd)
     try:
         ret_git = cmd_log(cmd, cwd=cwd)
-    except subprocess.CalledProcessError:
+    except subprocess.CalledProcessError as ex:
+        log.exception('Error running git pull: %r', ex.output)
         raise GitImportError(GitImportError.CANNOT_PULL)
 
     # get commit id
     cmd = ['git', 'log', '-1', '--format=%H', ]
     try:
         commit_id = cmd_log(cmd, cwd=rdirp)
-    except subprocess.CalledProcessError:
+    except subprocess.CalledProcessError as ex:
+        log.exception('Unable to get git log: %r', ex.output)
         raise GitImportError(GitImportError.BAD_REPO)
 
     ret_git += '\nCommit ID: {0}'.format(commit_id)
 
     # get branch
-    cmd = ['git', 'rev-parse', '--abbrev-ref', 'HEAD', ]
+    cmd = ['git', 'symbolic-ref', '--short', 'HEAD', ]
     try:
         branch = cmd_log(cmd, cwd=rdirp)
-    except subprocess.CalledProcessError:
+    except subprocess.CalledProcessError as ex:
+        # I can't discover a way to excercise this, but git is complex
+        # so still logging and raising here in case.
+        log.exception('Unable to determine branch: %r', ex.output)
         raise GitImportError(GitImportError.BAD_REPO)
 
     ret_git += '{0}Branch: {1}'.format('   \n', branch)

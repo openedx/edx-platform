@@ -140,7 +140,7 @@ def verify_setting_entry(setting, display_name, value, explicitly_set):
         for the problem, rather than derived from the defaults. This is verified
         by the existence of a "Clear" button next to the field value.
     """
-    assert_equal(display_name, setting.find_by_css('.setting-label')[0].html)
+    assert_equal(display_name, setting.find_by_css('.setting-label')[0].html.strip())
 
     # Check if the web object is a list type
     # If so, we use a slightly different mechanism for determining its value

@@ -654,6 +654,9 @@ MIDDLEWARE_CLASSES = (
 
     # For A/B testing
     'waffle.middleware.WaffleMiddleware',
+
+    # for expiring inactive sessions
+    'session_inactivity_timeout.middleware.SessionInactivityTimeout',
 )
 
 ############################### Pipeline #######################################
@@ -680,15 +683,26 @@ main_vendor_js = [
     'js/vendor/jquery.qtip.min.js',
     'js/vendor/swfobject/swfobject.js',
     'js/vendor/jquery.ba-bbq.min.js',
-    'js/vendor/annotator.min.js',
-    'js/vendor/annotator.store.min.js',
-    'js/vendor/annotator.tags.min.js'
+    'js/vendor/ova/annotator-full.js',
+    'js/vendor/ova/video.dev.js',
+    'js/vendor/ova/vjs.youtube.js',
+    'js/vendor/ova/rangeslider.js',
+    'js/vendor/ova/share-annotator.js',
+    'js/vendor/ova/tinymce.min.js',
+    'js/vendor/ova/richText-annotator.js',
+    'js/vendor/ova/reply-annotator.js',
+    'js/vendor/ova/tags-annotator.js',
+    'js/vendor/ova/flagging-annotator.js',
+    'js/vendor/ova/jquery-Watch.js',
+    'js/vendor/ova/ova.js',
+    'js/vendor/ova/catch/js/catch.js',
+    'js/vendor/ova/catch/js/handlebars-1.1.2.js'
 ]
 
 discussion_js = sorted(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/discussion/**/*.js'))
 staff_grading_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/staff_grading/**/*.js'))
 open_ended_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/open_ended/**/*.js'))
-notes_js = ['coffee/src/notes.js']
+notes_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/notes/**/*.js'))
 instructor_dash_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/instructor_dashboard/**/*.js'))
 
 PIPELINE_CSS = {
@@ -698,6 +712,16 @@ PIPELINE_CSS = {
             'css/vendor/jquery.qtip.min.css',
             'css/vendor/responsive-carousel/responsive-carousel.css',
             'css/vendor/responsive-carousel/responsive-carousel.slide.css',
+            'css/vendor/ova/edx-annotator.css',
+            'css/vendor/ova/annotator.css',
+            'css/vendor/ova/video-js.min.css',
+            'css/vendor/ova/rangeslider.css',
+            'css/vendor/ova/share-annotator.css',
+            'css/vendor/ova/richText-annotator.css',
+            'css/vendor/ova/tags-annotator.css',
+            'css/vendor/ova/flagging-annotator.css',
+            'css/vendor/ova/ova.css',
+            'js/vendor/ova/catch/css/main.css'
         ],
         'output_filename': 'css/lms-style-vendor.css',
     },
@@ -725,7 +749,6 @@ PIPELINE_CSS = {
             'js/vendor/CodeMirror/codemirror.css',
             'css/vendor/jquery.treeview.css',
             'css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css',
-            'css/vendor/annotator.min.css',
         ],
         'output_filename': 'css/lms-style-course-vendor.css',
     },

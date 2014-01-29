@@ -168,7 +168,7 @@ class CourseRole(GroupBasedRole):
                 else:
                     groupnames.append('{0}_{1}'.format(role, course_context))
             try:
-                locator = loc_mapper().translate_location(course_context, self.location, False, False)
+                locator = loc_mapper().translate_location_to_course_locator(course_context, self.location)
                 groupnames.append('{0}_{1}'.format(role, locator.package_id))
             except (InvalidLocationError, ItemNotFoundError):
                 # if it's never been mapped, the auth won't be via the Locator syntax
@@ -239,4 +239,4 @@ class CourseCreatorRole(GroupBasedRole):
     """
     ROLE = "course_creator_group"
     def __init__(self, *args, **kwargs):
-        super(CourseCreatorRole, self).__init__(self.ROLE, *args, **kwargs)
+        super(CourseCreatorRole, self).__init__([self.ROLE], *args, **kwargs)

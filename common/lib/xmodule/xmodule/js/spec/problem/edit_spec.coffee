@@ -105,6 +105,14 @@ describe 'MarkdownEditingDescriptor', ->
         Enter the number of fingers on a human hand:
         = 5
 
+        Range tolerance case
+        = [6, 7]
+        = (1, 2)
+
+        If first and last symbols are not brackets, or they are not closed, stringresponse will appear.
+        = (7), 7
+        = (1+2
+
         [Explanation]
         Pi, or the the ratio between a circle's circumference to its diameter, is an irrational number known to extreme precision. It is value is approximately equal to 3.14.
 
@@ -134,6 +142,22 @@ describe 'MarkdownEditingDescriptor', ->
         <numericalresponse answer="5">
           <formulaequationinput />
         </numericalresponse>
+
+        <p>Range tolerance case</p>
+        <numericalresponse answer="[6, 7]">
+          <formulaequationinput />
+        </numericalresponse>
+        <numericalresponse answer="(1, 2)">
+          <formulaequationinput />
+        </numericalresponse>
+
+        <p>If first and last symbols are not brackets, or they are not closed, stringresponse will appear.</p>
+        <stringresponse answer="(7), 7" type="ci" >
+          <textline size="20"/>
+        </stringresponse>
+        <stringresponse answer="(1+2" type="ci" >
+          <textline size="20"/>
+        </stringresponse>
 
         <solution>
         <div class="detailed-solution">

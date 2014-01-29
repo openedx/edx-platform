@@ -7,19 +7,21 @@ from cmath import isinf
 default_tolerance = '0.001%'
 
 
-def compare_with_tolerance(v1, v2, tol=default_tolerance):
+def compare_with_tolerance(complex1, complex2, tolerance=default_tolerance, relative_tolerance=False):
     """
-    Compare v1 to v2 with maximum tolerance tol.
+    Compare complex1 to complex2 with maximum tolerance tol.
 
-    tol is relative if it ends in %; otherwise, it is absolute.
+    If tolerance is type string, then it is counted as relative if it ends in %; otherwise, it is absolute.
 
-     - v1    :  student result (float complex number)
-     - v2    :  instructor result (float complex number)
-     - tol   :  tolerance (string representing a number)
+     - complex1    :  student result (float complex number)
+     - complex2    :  instructor result (float complex number)
+     - tolerance   :  string representing a number or float
+     - relative_tolerance: bool, used when`tolerance` is float to explicitly use passed tolerance as relative.
 
-     Default tolerance of 1e-3% is added to compare two floats for near-equality
-     (to handle machine representation errors).
-     It is relative, as the acceptable difference between two floats depends on the magnitude of the floats.
+     Default tolerance of 1e-3% is added to compare two floats for
+     near-equality (to handle machine representation errors).
+     Default tolerance is relative, as the acceptable difference between two
+     floats depends on the magnitude of the floats.
      (http://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/)
      Examples:
         In [183]: 0.000016 - 1.6*10**-5
@@ -27,22 +29,23 @@ def compare_with_tolerance(v1, v2, tol=default_tolerance):
         In [212]: 1.9e24 - 1.9*10**24
         Out[212]: 268435456.0
     """
-    relative = tol.endswith('%')
-    if relative:
-        tolerance_rel = evaluator(dict(), dict(), tol[:-1]) * 0.01
-        tolerance = tolerance_rel * max(abs(v1), abs(v2))
+    if relative_tolerance:
+        tolerance = tolerance * max(abs(complex1), abs(complex2))
+    elif tolerance.endswith('%'):
+        tolerance = evaluator(dict(), dict(), tolerance[:-1]) * 0.01
+        tolerance = tolerance * max(abs(complex1), abs(complex2))
     else:
-        tolerance = evaluator(dict(), dict(), tol)
+        tolerance = evaluator(dict(), dict(), tolerance)
 
-    if isinf(v1) or isinf(v2):
-        # If an input is infinite, we can end up with `abs(v1-v2)` and
+    if isinf(complex1) or isinf(complex2):
+        # If an input is infinite, we can end up with `abs(complex1-complex2)` and
         # `tolerance` both equal to infinity. Then, below we would have
         # `inf <= inf` which is a fail. Instead, compare directly.
-        return v1 == v2
+        return complex1 == complex2
     else:
         # v1 and v2 are, in general, complex numbers:
         # there are some notes about backward compatibility issue: see responsetypes.get_staff_ans()).
-        return abs(v1 - v2) <= tolerance
+        return abs(complex1 - complex2) <= tolerance
 
 
 def contextualize_text(text, context):  # private

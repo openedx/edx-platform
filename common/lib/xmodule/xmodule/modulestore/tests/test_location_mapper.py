@@ -89,6 +89,14 @@ class TestLocationMapper(unittest.TestCase):
         self.assertEqual(prob_locator.block_id, block_id)
         self.assertEqual(prob_locator.branch, branch)
 
+        course_locator = loc_mapper().translate_location_to_course_locator(
+           old_style_course_id,
+           location,
+           published=(branch == 'published'),
+        )
+        self.assertEqual(course_locator.package_id, new_style_package_id)
+        self.assertEqual(course_locator.branch, branch)
+
     def test_translate_location_read_only(self):
         """
         Test the variants of translate_location which don't create entries, just decode
@@ -389,14 +397,20 @@ class TrivialCache(object):
     def __init__(self):
         self.cache = {}
 
-    def get(self, key):
+    def get(self, key, default=None):
         """
         Mock the .get
         """
-        return self.cache.get(key)
+        return self.cache.get(key, default)
 
     def set_many(self, entries):
         """
         mock set_many
         """
         self.cache.update(entries)
+
+    def set(self, key, entry):
+        """
+        mock set
+        """
+        self.cache[key] = entry

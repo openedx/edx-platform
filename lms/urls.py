@@ -15,6 +15,7 @@ urlpatterns = ('',  # nopep8
     url(r'^update_certificate$', 'certificates.views.update_certificate'),
     url(r'^$', 'branding.views.index', name="root"),   # Main marketing page, or redirect to courseware
     url(r'^dashboard$', 'student.views.dashboard', name="dashboard"),
+    url(r'^token$', 'student.views.token', name="token"),
     url(r'^login$', 'student.views.signin_user', name="signin_user"),
     url(r'^register$', 'student.views.register_user', name="register_user"),
 
@@ -338,7 +339,10 @@ if settings.COURSEWARE_ENABLED:
             url(r'^notification_prefs/enable/', 'notification_prefs.views.ajax_enable'),
             url(r'^notification_prefs/disable/', 'notification_prefs.views.ajax_disable'),
             url(r'^notification_prefs/status/', 'notification_prefs.views.ajax_status'),
-            url(r'^notification_prefs/unsubscribe/(?P<token>[a-zA-Z0-9-_=]+)/', 'notification_prefs.views.unsubscribe'),
+            url(r'^notification_prefs/unsubscribe/(?P<token>[a-zA-Z0-9-_=]+)/',
+                'notification_prefs.views.set_subscription', {'subscribe': False}, name="unsubscribe_forum_update"),
+            url(r'^notification_prefs/resubscribe/(?P<token>[a-zA-Z0-9-_=]+)/',
+                'notification_prefs.views.set_subscription', {'subscribe': True}, name="resubscribe_forum_update"),
         )
     urlpatterns += (
         # This MUST be the last view in the courseware--it's a catch-all for custom tabs.

@@ -16,7 +16,7 @@
             );
 
             Player.getDuration.andReturn(60);
-            Player.getAvailablePlaybackRates.andReturn(['0.50', '1.0', '1.50', '2.0']);
+            Player.getAvailablePlaybackRates.andReturn([0.50, 1.0, 1.50, 2.0]);
 
             return Player;
         },
@@ -113,6 +113,10 @@
             id: 'cogebirgzzM',
             duration: 200
         },
+        'abcdefghijkl': {
+            id: 'abcdefghijkl',
+            duration: 400
+        },
         bogus: {
             duration: 100
         }
@@ -189,6 +193,8 @@
                 settings.url.match(/.+\/problem_(check|reset|show|save)$/)
             ) {
                 // Do nothing.
+            } else if (settings.url == '/save_user_state') {
+                return {success: true};
             } else {
                 throw 'External request attempted for ' +
                     settings.url +

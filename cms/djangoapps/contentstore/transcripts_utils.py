@@ -11,6 +11,7 @@ from lxml import etree
 
 from cache_toolbox.core import del_cached_content
 from django.conf import settings
+from django.utils.translation import ugettext as _
 
 from xmodule.exceptions import NotFoundError
 from xmodule.contentstore.content import StaticContent
@@ -103,8 +104,10 @@ def get_transcripts_from_youtube(youtube_id):
     data = requests.get(youtube_api['url'], params=youtube_api['params'])
 
     if data.status_code != 200 or not data.text:
-        msg = "Can't receive transcripts from Youtube for {}. Status code: {}.".format(
-            youtube_id, data.status_code)
+        msg = _("Can't receive transcripts from Youtube for {youtube_id}. Status code: {statuc_code}.").format(
+            youtube_id=youtube_id,
+            statuc_code=data.status_code
+        )
         raise GetTranscriptsFromYouTubeException(msg)
 
     sub_starts, sub_ends, sub_texts = [], [], []
@@ -162,7 +165,7 @@ def download_youtube_subs(youtube_subs, item):
         highest_speed_subs = subs
 
     if not highest_speed:
-        raise GetTranscriptsFromYouTubeException("Can't find any transcripts on the Youtube service.")
+        raise GetTranscriptsFromYouTubeException(_("Can't find any transcripts on the Youtube service."))
 
     # When we exit from the previous loop, `highest_speed` and `highest_speed_subs`
     # are the transcripts data for the highest speed available on the
@@ -214,16 +217,16 @@ def generate_subs_from_source(speed_subs, subs_type, subs_filedata, item):
     :returns: True, if all subs are generated and saved successfully.
     """
     if subs_type != 'srt':
-        raise TranscriptsGenerationException("We support only SubRip (*.srt) transcripts format.")
+        raise TranscriptsGenerationException(_("We support only SubRip (*.srt) transcripts format."))
     try:
         srt_subs_obj = SubRipFile.from_string(subs_filedata)
     except Exception as e:
-        raise TranscriptsGenerationException(
-            "Something wrong with SubRip transcripts file during parsing. "
-            "Inner message is {}".format(e.message)
+        msg = _("Something wrong with SubRip transcripts file during parsing. Inner message is {error_message}").format(
+            error_message=e.message
         )
+        raise TranscriptsGenerationException(msg)
     if not srt_subs_obj:
-        raise TranscriptsGenerationException("Something wrong with SubRip transcripts file during parsing.")
+        raise TranscriptsGenerationException(_("Something wrong with SubRip transcripts file during parsing."))
 
     sub_starts = []
     sub_ends = []

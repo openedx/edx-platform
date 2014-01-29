@@ -25,13 +25,10 @@ templates for these problems, but the problems open directly in the
 -  :ref:`Math Expression Input` Math expression input problems require
    students to enter a mathematical expression as text, such as
    e=m\*c^2.
--  :ref:`Problem Written in LaTeX` This problem type allows you to convert
-   problems that you've already written in LaTeX into the edX format.
-   Note that this problem type is still a prototype, however, and may
-   not be supported in the future.
 -  :ref:`Problem with Adaptive Hint` These problems can give students
    feedback or hints based on their responses. Problems with adaptive
    hints can be text input or multiple choice problems.
+- :ref:`Problem Written in LaTeX` This problem type allows you to convert problems that you’ve already written in LaTeX into the edX format. Note that this problem type is still a prototype, however, and may not be supported in the future.
 
 These problems are easy to access in Studio. To create them, click
 **Problem** under **Add New Component**, click the **Advanced** tab, and
@@ -328,40 +325,6 @@ To create a math expression input problem:
 For more information, see `Symbolic Response
 <https://edx.readthedocs.org/en/latest/course_data_formats/symbolic_response.html>`_.
 
-.. _Problem Written in LaTeX:
-
-Problem Written in LaTeX
-------------------------
-
-If you have an problem that is already written in LaTeX, you can use
-this problem type to easily convert your code into XML. After you paste
-your code into the LaTeX editor, you'll only need to make a few minor
-adjustments. Note that **this problem type is still a prototype and may
-not be supported in the future**, so you should use it with caution.
-
-.. note:: If you want to use LaTeX to typeset mathematical expressions
-          in problems that you haven't yet written, use any of the other problem
-          templates together with `MathJax <http://www.mathjax.org>`_. For more
-          information about how to create mathematical expressions in Studio using
-          MathJax, see *A Brief Introduction to MathJax in Studio*.
-
-.. image:: Images/ProblemWrittenInLaTeX.gif
- :alt: Image of a problem written in LaTeX
-
-Create a Problem Written in LaTeX
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-To create a problem written in LaTeX:
-
-#. In the unit where you want to create the problem, click **Problem**
-   under **Add New Component**, and then click the **Advanced** tab.
-#. Click **Problem Written in LaTeX**.
-#. In the component editor that appears, click **Edit**.
-#. In the lower left corner of the component editor, click **Launch
-   LaTeX Source Compiler**.
-#. Replace the example code with your own code.
-#. In the lower left corner of the LaTeX source compiler, click **Save &
-   Compile to edX XML**.
 
 .. _Problem with Adaptive Hint:
 
@@ -387,3 +350,46 @@ To create a problem with an adaptive hint:
 #. In the component that appears, click **Edit**.
 #. In the component editor, replace the example code with your own code.
 #. Click **Save**.
+
+.. _Problem Written in LaTeX:
+
+Problem Written in LaTeX
+------------------------
+
+.. warning:: This problem type is still a prototype and may not be supported in the future. By default, the ability to create these problems is not enabled in Studio. You must change the advanced settings in your course before you can create problems with LaTeX. Use this problem type with caution.
+
+If you have an problem that is already written in LaTeX, you can use
+this problem type to easily convert your code into XML. After you paste
+your code into the LaTeX editor, you'll only need to make a few minor
+adjustments. 
+
+.. note:: If you want to use LaTeX to typeset mathematical expressions
+          in problems that you haven't yet written, use any of the other problem
+          templates together with `MathJax <http://www.mathjax.org>`_. For more
+          information about how to create mathematical expressions in Studio using
+          MathJax, see *A Brief Introduction to MathJax in Studio*.
+
+.. image:: Images/ProblemWrittenInLaTeX.gif
+ :alt: Image of a problem written in LaTeX
+
+Create a Problem Written in LaTeX
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To create a problem written in LaTeX:
+
+#. Enable the policy key in your course.
+
+   #. In Studio, click **Settings**, and then click **Advanced Settings**.
+   #. On the **Advanced Settings** page, scroll down to the **use_latex_compiler** policy key.
+   #. In the **Policy Value** field next to the **use_latex_compiler** policy key, change **false** to **true**.
+   #. At the bottom of the page, click **Save Changes**.
+   
+#. In the unit where you want to create the problem, click **Problem**
+   under **Add New Component**, and then click the **Advanced** tab.
+#. Click **Problem Written in LaTeX**.
+#. In the component editor that appears, click **Edit**.
+#. In the lower left corner of the component editor, click **Launch
+   LaTeX Source Compiler**.
+#. Replace the example code with your own code.
+#. In the lower left corner of the LaTeX source compiler, click **Save &
+   Compile to edX XML**.

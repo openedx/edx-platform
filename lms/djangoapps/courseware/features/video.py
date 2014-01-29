@@ -15,6 +15,9 @@ HTML5_SOURCES_INCORRECT = [
     'https://s3.amazonaws.com/edx-course-videos/edx-intro/edX-FA12-cware-1_100.mp99'
 ]
 
+coursenum = 'test_course'
+sequence = {}
+
 @step('when I view the (.*) it does not have autoplay enabled$')
 def does_not_autoplay(_step, video_type):
     assert(world.css_find('.%s' % video_type)[0]['data-autoplay'] == 'False')
@@ -22,21 +25,48 @@ def does_not_autoplay(_step, video_type):
 
 @step('the course has a Video component in (.*) mode$')
 def view_video(_step, player_mode):
-    coursenum = 'test_course'
-    i_am_registered_for_the_course(step, coursenum)
+
+    i_am_registered_for_the_course(_step, coursenum)
 
     # Make sure we have a video
     add_video_to_course(coursenum, player_mode.lower())
     visit_scenario_item('SECTION')
 
 
-def add_video_to_course(course, player_mode):
+@step('a video "([^"]*)" in "([^"]*)" mode in position "([^"]*)" of sequential$')
+def add_video(_step, player_id, player_mode, position):
+    sequence[player_id] = position
+    add_video_to_course(coursenum, player_mode.lower(), display_name=player_id)
+
+
+@step('I open the section with videos$')
+def visit_video_section(_step):
+    visit_scenario_item('SECTION')
+
+
+@step('I select the "([^"]*)" speed on video "([^"]*)"$')
+def change_video_speed(_step, speed, player_id):
+      _navigate_to_an_item_in_a_sequence(sequence[player_id])
+      _change_video_speed(speed)
+
+
+@step('I open video "([^"]*)"$')
+def open_video(_step, player_id):
+    _navigate_to_an_item_in_a_sequence(sequence[player_id])
+
+
+@step('video "([^"]*)" should start playing at speed "([^"]*)"$')
+def check_video_speed(_step, player_id, speed):
+    speed_css = '.speeds p.active'
+    assert world.css_has_text(speed_css, '{0}x'.format(speed))
+
+def add_video_to_course(course, player_mode, display_name='Video'):
     category = 'video'
 
     kwargs = {
         'parent_location': section_location(course),
         'category': category,
-        'display_name': 'Video'
+        'display_name': display_name
     }
 
     if player_mode == 'html5':
@@ -112,3 +142,12 @@ def error_message_has_correct_text(_step):
     assert world.css_has_text(selector, text)
 
 
+def _navigate_to_an_item_in_a_sequence(number):
+    sequence_css = 'a[data-element="{0}"]'.format(number)
+    world.css_click(sequence_css)
+
+
+def _change_video_speed(speed):
+    world.browser.execute_script("$('.speeds').addClass('open')")
+    speed_css = 'li[data-speed="{0}"] a'.format(speed)
+    world.css_click(speed_css)

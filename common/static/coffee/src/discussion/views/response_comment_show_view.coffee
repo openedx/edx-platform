@@ -46,8 +46,8 @@ if Backbone?
         @$("[data-role=thread-flag]").addClass("flagged")
         @$("[data-role=thread-flag]").removeClass("notflagged")
         @$(".discussion-flag-abuse").attr("aria-pressed", "true")
-        @$(".discussion-flag-abuse").attr("data-tooltip", gettext("Misuse Reported"))
-        @$(".discussion-flag-abuse .flag-label").html("Misuse Reported")
+        @$(".discussion-flag-abuse").attr("data-tooltip", gettext("Misuse Reported, click to remove report"))
+        @$(".discussion-flag-abuse .flag-label").html(gettext("Misuse Reported, click to remove report"))
       else
         @$("[data-role=thread-flag]").removeClass("flagged")
         @$("[data-role=thread-flag]").addClass("notflagged")

@@ -1,6 +1,12 @@
+"""
+This test file will test registration, login, activation, and session activity timeouts
+"""
+import time
+
 from django.test.utils import override_settings
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
+from django.conf import settings
 
 from contentstore.tests.utils import parse_json, user, registration, AjaxEnabledTestClient
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -187,6 +193,29 @@ class AuthTestCase(ContentStoreTestCase):
         self.assertEqual(resp.status_code, 302)
 
         # Logged in should work.
+
+    @override_settings(SESSION_INACTIVITY_TIMEOUT_IN_SECONDS=1)
+    def test_inactive_session_timeout(self):
+        """
+        Verify that an inactive session times out and redirects to the
+        login page
+        """
+        self.create_account(self.username, self.email, self.pw)
+        self.activate_user(self.email)
+
+        self.login(self.email, self.pw)
+
+        # make sure we can access courseware immediately
+        resp = self.client.get_html('/course')
+        self.assertEquals(resp.status_code, 200)
+
+        # then wait a bit and see if we get timed out
+        time.sleep(2)
+
+        resp = self.client.get_html('/course')
+
+        # re-request, and we should get a redirect to login page
+        self.assertRedirects(resp, settings.LOGIN_REDIRECT_URL + '?next=/course')
 
 
 class ForumTestCase(CourseTestCase):
