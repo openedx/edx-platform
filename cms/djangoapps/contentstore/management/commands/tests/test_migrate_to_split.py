@@ -10,8 +10,8 @@ from contentstore.management.commands.migrate_to_split import Command
 from contentstore.tests.modulestore_config import TEST_MODULESTORE
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.django import loc_mapper
+from xmodule.modulestore.django import modulestore, loc_mapper
+from xmodule.modulestore.locator import CourseLocator
 # pylint: disable=E1101
 
 
@@ -57,7 +57,7 @@ class TestMigrateToSplit(ModuleStoreTestCase):
         self.user = User.objects.create_user(uname, email, password)
         self.course = CourseFactory()
 
-    def test_happy_path_email(self):
+    def test_user_email(self):
         call_command(
             "migrate_to_split",
             str(self.course.location),
@@ -67,12 +67,23 @@ class TestMigrateToSplit(ModuleStoreTestCase):
         course_from_split = modulestore('split').get_course(locator)
         self.assertIsNotNone(course_from_split)
 
-    def test_happy_path_user_id(self):
+    def test_user_id(self):
         call_command(
             "migrate_to_split",
             str(self.course.location),
             str(self.user.id),
         )
         locator = loc_mapper().translate_location(self.course.id, self.course.location)
+        course_from_split = modulestore('split').get_course(locator)
+        self.assertIsNotNone(course_from_split)
+
+    def test_locator_string(self):
+        call_command(
+            "migrate_to_split",
+            str(self.course.location),
+            str(self.user.id),
+            "org.dept.name.run",
+        )
+        locator = CourseLocator(package_id="org.dept.name.run", branch="published")
         course_from_split = modulestore('split').get_course(locator)
         self.assertIsNotNone(course_from_split)
