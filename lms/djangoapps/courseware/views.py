@@ -677,7 +677,7 @@ def fetch_reverify_banner_info(request, course_id):
     reverifications = defaultdict(list)
     user = request.user
     if not user.id:
-        return {'reverifications': None, }
+        return reverifications
     enrollment = CourseEnrollment.get_or_create_enrollment(request.user, course_id)
     course = course_from_id(course_id)
     info = single_course_reverification_info(user, course, enrollment)

@@ -395,12 +395,12 @@ class MidCourseReverifyView(View):
             return render_to_response("verify_student/midcourse_photo_reverification.html", context)
 
 
-def midcourse_reverify_dash(_request):
+def midcourse_reverify_dash(request):
     """
     Shows the "course reverification dashboard", which displays the reverification status (must reverify,
     pending, approved, failed, etc) of all courses in which a student has a verified enrollment.
     """
-    user = _request.user
+    user = request.user
     course_enrollment_pairs = []
     for enrollment in CourseEnrollment.enrollments_for_user(user):
         try:
