@@ -1842,7 +1842,7 @@
           border: 1px solid $m-gray-t2;
 
           &.complete {
-            border: 1px solid $verified-color-lvl3;
+            border: 1px solid $success-color;
 
             .course-info {
               opacity: .5;
@@ -1855,13 +1855,32 @@
             .reverify-status {
               border-top: 1px solid $light-gray;
               background-color: $m-gray-l4;
-              color: $verified-color-lvl1;
+              color: $success-color;
+              font-weight: 600;
+            }
+          }
+
+          &.pending {
+            border: 1px solid $warning-color;
+
+            .course-info {
+              opacity: .5;
+
+              .course-name {
+                font-weight: normal;
+              }
+            }
+
+            .reverify-status {
+              border-top: 1px solid $light-gray;
+              background-color: $m-gray-l4;
+              color: $warning-color;
               font-weight: 600;
             }
           }
 
           &.failed {
-            border: 1px solid $error-red;
+            border: 1px solid $alert-color;
 
             .course-info {
               opacity: .5;
@@ -1874,7 +1893,7 @@
             .reverify-status {
               border-top: 1px solid $light-gray;
               background-color: $m-gray-l4;
-              color: $danger-red;
+              color: $alert-color;
               font-weight: 600;
             }
           }
@@ -2208,10 +2227,44 @@
     }
   }
 
+  &.step-confirmation {
 
+    .instruction {
+      display: inline-block;
+      width: flex-grid(8,12);
+      vertical-align: top;
+    }
 
+    .actions-next {
+      display: inline-block;
+      width: flex-grid(4,12);
+      vertical-align: top;
+      margin-top: $baseline;
+    }
 
+    .nav-item {
+      display: block;
+      margin: 0 0 $baseline 0;
+      text-align: center;
+
+      &.conditional:after {
+        content: "or";
+        display: block;
+        margin: $baseline 0;
+      }
+    }
+
+  }
 }
+
+
+//reverify notification special styles
+.msg-reverify {
+  .reverify-list {
+    margin: 5px 0;
+  }
+}
+
 // ====================
 
 // STATE: already verified

@@ -135,7 +135,8 @@
       }
 
       .reverify-status-list {
-        padding: 0 0 0 9px;
+        padding: 0 0 0 ($baseline/2);
+        margin: ($baseline/4) 0;
 
         .status-item {
           @extend %t-copy-sub2;

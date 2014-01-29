@@ -4,7 +4,7 @@
 <%block name="bodyclass">midcourse-reverification-process step-dash register</%block>
 <%block name="title">
   <title>
-      ${_("Reverification Status | edX")}
+      ${_("Reverification Status")}
   </title>
 </%block>
 
@@ -14,14 +14,14 @@
     <div class="wrapper-content-main">
       <article class="content-main">
 
-        <h2 class="title">You are in the Verified track</h2>
+        <h2 class="title">${_("You are in the Verified track")}</h2>
 
         <div class="copy">
 
           % if reverifications["must_reverify"]:
             % if len(reverifications["must_reverify"]) > 1:
               <div class="wrapper-reverify-open">
-                <h3 class="title">You currently need to re-verify for the following courses:</h3>
+                <h3 class="title">${_("You currently need to re-verify for the following courses:")}</h3>
                 <ul class="reverification-list">
                 % for course_id, course_name, course_number, date, status in reverifications["must_reverify"]:
                   <li class="item">
@@ -37,7 +37,7 @@
 
             % elif reverifications["must_reverify"]:
               <div class="wrapper-reverify-open">
-                <h3 class="title">You currently need to re-verify for the following course:</h3>
+                <h3 class="title">${_("You currently need to re-verify for the following course:")}</h3>
 
                 <ul class="reverification-list">
                 % for course_id, course_name, course_number, date, status in reverifications["must_reverify"]:
@@ -55,7 +55,7 @@
 
           % if reverifications["pending"] or reverifications["approved"] or reverifications["denied"]:
             <div class="wrapper-reverify-status">
-              <h3 class="title">The status of your submitted re-verifications:</h3>
+              <h3 class="title">${_("The status of your submitted re-verifications:")}</h3>
               <ul class="reverification-list reverification-status">
 
               % for course_id, course_name, course_number, date, status in reverifications["pending"]:
@@ -64,7 +64,7 @@
                     <h3 class="course-name">${course_name} (${course_number})</h3>
                     <p class="deadline">Re-verify by <strong>${date}</strong></p>
                   </div>
-                  <p class="reverify-status pending">Pending</p>
+                  <p class="reverify-status pending">${_("Pending")}</p>
                 </li>
               % endfor
 
@@ -74,7 +74,7 @@
                     <h3 class="course-name">${course_name} (${course_number})</h3>
                     <p class="deadline">Re-verify by <strong>${date}</strong></p>
                   </div>
-                  <p class="reverify-status complete">Complete</p>
+                  <p class="reverify-status complete">${_("Complete")}</p>
                 </li>
               % endfor
 
@@ -84,7 +84,7 @@
                     <h3 class="course-name">${course_name} (${course_number})</h3>
                     <p class="deadline">Re-verify by <strong>${date}</strong></p>
                   </div>
-                  <p class="reverify-status">Failed</p>
+                  <p class="reverify-status">${_("Failed")}</p>
                 </li>
               % endfor
 
@@ -93,7 +93,7 @@
           % endif
 
           % else:
-          <p class="title">You have no re-verifications at present.</p>
+          <p class="title">${_("You have no re-verifications at present.")}</p>
           % endif
 
           % if reverifications["must_reverify"]:
@@ -105,25 +105,25 @@
         <div class="wrapper-reverification-help list-faq">
 
           <div class="faq-item">
-            <h3 class="title faq-question">Why do I need to re-verify?</h3>
+            <h3 class="title faq-question">${_("Why do I need to re-verify?")}</h3>
             <div class="copy faq-answer">
 
-              <p>At key points in a course, the professor will ask you to re-verify your identity by submitting a new photo of your face. We will send the new photo to be matched up with the photo of the original ID you submitted when you signed up for the course. If you are taking multiple courses, you may need to re-verify multiple times, once for every important point in each course you are taking as a verified student.</p>
+              <p>${_("At key points in a course, the professor will ask you to re-verify your identity by submitting a new photo of your face. We will send the new photo to be matched up with the photo of the original ID you submitted when you signed up for the course. If you are taking multiple courses, you may need to re-verify multiple times, once for every important point in each course you are taking as a verified student.")}</p>
             </div>
           </div>
 
           <div class="faq-item">
-            <h3 class="title faq-question">What will I need to re-verify?</h3>
+            <h3 class="title faq-question">${_("What will I need to re-verify?")}</h3>
             <div class="copy faq-answer">
 
-              <p>Because you are just confirming that you are still you, the only thing you will need to do to re-verify is to <b>submit a new photo of your face with your webcam</b>. The process is quick and you will be brought back to where you left off so you can keep on learning.</p>
+              <p>${_("Because you are just confirming that you are still you, the only thing you will need to do to re-verify is to <b>submit a new photo of your face with your webcam</b>. The process is quick and you will be brought back to where you left off so you can keep on learning.")}</p>
 
-              <p>If you changed your name during the semester and it no longer matches the original ID you submitted, you will need to re-edit your name to match as well.</p>
+              <p>${_("If you changed your name during the semester and it no longer matches the original ID you submitted, you will need to re-edit your name to match as well.")}</p>
             </div>
           </div>
 
           <div class="faq-item">
-            <h3 class="title faq-question">What if I have trouble with my re-verification?</h3>
+            <h3 class="title faq-question">${_("What if I have trouble with my re-verification?")}</h3>
             <div class="copy faq-answer">
               <p>Because of the short time that re-verification is open, you <b>will not be able to correct a failed verification</b>. If you think there was an error in the review, please contact us at <a href="stuff">support@edx.org</a>.</p>
             </div>

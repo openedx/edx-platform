@@ -4,7 +4,7 @@
 <%namespace name='static' file='/static_content.html'/>
 
 <%block name="bodyclass">midcourse-reverification-process is-not-verified step-photos register</%block>
-<%block name="title"><title>${_("Re-Verify | edX")}</title></%block>
+<%block name="title"><title>${_("Re-Verify")}</title></%block>
 
 <%block name="js_extra">
 <script src="${static.url('js/vendor/responsive-carousel/responsive-carousel.js')}"></script>
@@ -161,7 +161,7 @@
                 <div class="prompt-verify">
                   <h3 class="title">Before proceeding, please review carefully</h3>
 
-                   <p class="copy"> ${_("Once you verify your photo looks good and your name is correct, you can finish your re-verification and return to your course.  You will not have another chance to re-verify.")}</p>
+                   <p class="copy"> ${_("Once you verify your photo looks good and your name is correct, you can finish your re-verification and return to your course.  <strong>Note: You will not have another chance to re-verify.</strong>")}</p>
 
                   <ul class="list-actions">
                     <li class="action action-verify">

@@ -4,27 +4,58 @@
 <!--TODO replace this with a shiny loopy thing to actually print out all courses-->
 
 % if reverifications["must_reverify"]:
-<div class="wrapper-msg urgency-high">
-  <div class="msg msg-reverify has-actions">
-      <div class="msg-content">
-        <h2 class="title">${_("You need to re-verify to continue")}</h2>
-        % for item in reverifications["must_reverify"]:
-        <div class="copy">
-          <p class='activation-message'>
-          	${_('To continue in the verified track in <strong>{course_name}</strong>, you need to re-verify your identity by {date}.').format(course_name=item.course_name, date=item.date)}
-          </p>
+  % if len(reverifications["must_reverify"]) > 1:
+
+  <div class="wrapper-msg urgency-high">
+    <div class="msg msg-reverify has-actions">
+        <div class="msg-content">
+          <h2 class="title">${_("You need to re-verify to continue")}</h2>
+          <div class="copy">
+            <p class="activation-message">
+            ${_("To continue in the verified track in the following courses, you need to re-verify your identity:")}
+            </p>
+            <ul class="reverify-list">
+              % for item in reverifications["must_reverify"]:
+                <li class="item">
+                  ${_('<strong>{course_name}</strong>: Re-verify by {date}').format(course_name=item.course_name, date=item.date)}
+                </li>
+              % endfor
+            </ul>
+          </div>
         </div>
+        <nav class="nav-actions">
+          <h3 class="sr">Notification Actions</h3>
+          <ul>
+            <li class="nav-item"><a class="btn action-primary action-reverify" href="${reverse('verify_student_midcourse_reverify_dash')}">Re-verify</a></li>
+          </ul>
+        </nav>
       </div>
-      <nav class="nav-actions">
-        <h3 class="sr">Notification Actions</h3>
-        <ul>
-          <li class="nav-item"><a class="btn action-primary action-reverify" href="${reverse('verify_student_midcourse_reverify_dash')}">Re-verify</a></li>
-        </ul>
-      </nav>
     </div>
   </div>
-</div>
-% endfor
+
+  % elif reverifications["must_reverify"]:
+  <div class="wrapper-msg urgency-high">
+    <div class="msg msg-reverify has-actions">
+        <div class="msg-content">
+          <h2 class="title">${_("You need to re-verify to continue")}</h2>
+          % for item in reverifications["must_reverify"]:
+          <div class="copy">
+            <p class='activation-message'>
+              ${_('To continue in the verified track in <strong>{course_name}</strong>, you need to re-verify your identity by {date}.').format(course_name=item.course_name, date=item.date)}
+            </p>
+          </div>
+        </div>
+        <nav class="nav-actions">
+          <h3 class="sr">Notification Actions</h3>
+          <ul>
+            <li class="nav-item"><a class="btn action-primary action-reverify" href="${reverse('verify_student_midcourse_reverify_dash')}">Re-verify</a></li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+  % endfor
+  %endif
 %endif
 
 %if reverifications["denied"]:
