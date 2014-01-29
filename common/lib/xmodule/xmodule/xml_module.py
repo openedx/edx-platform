@@ -6,8 +6,7 @@ import sys
 from lxml import etree
 
 from xblock.fields import Dict, Scope, ScopeIds
-from xmodule.x_module import XModuleDescriptor, policy_key
-from xmodule.modulestore import Location
+from xmodule.x_module import XModuleDescriptor
 from xmodule.modulestore.inheritance import own_metadata, InheritanceKeyValueStore
 from xmodule.modulestore.xml_exporter import EdxJSONEncoder
 from xblock.runtime import KvsFieldData
@@ -176,7 +175,7 @@ class XmlDescriptor(XModuleDescriptor):
         return etree.parse(file_object, parser=edx_xml_parser).getroot()
 
     @classmethod
-    def load_file(cls, filepath, fs, def_id):
+    def load_file(cls, filepath, fs, def_id):  # pylint: disable=invalid-name
         '''
         Open the specified file in fs, and call cls.file_to_xml on it,
         returning the lxml object.
@@ -184,8 +183,8 @@ class XmlDescriptor(XModuleDescriptor):
         Add details and reraise on error.
         '''
         try:
-            with fs.open(filepath) as file:
-                return cls.file_to_xml(file)
+            with fs.open(filepath) as xml_file:
+                return cls.file_to_xml(xml_file)
         except Exception as err:
             # Add info about where we are, but keep the traceback
             msg = 'Unable to load file contents at path %s for item %s: %s ' % (

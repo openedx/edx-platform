@@ -157,7 +157,6 @@ class CourseRole(GroupBasedRole):
         # direct copy from auth.authz.get_all_course_role_groupnames will refactor to one impl asap
         groupnames = []
 
-        # pylint: disable=no-member
         if isinstance(self.location, Location):
             try:
                 groupnames.append('{0}_{1}'.format(role, self.location.course_id))
@@ -193,8 +192,6 @@ class OrgRole(GroupBasedRole):
     A named role in a particular org
     """
     def __init__(self, role, location):
-        # pylint: disable=no-member
-
         location = Location(location)
         super(OrgRole, self).__init__(['{}_{}'.format(role, location.org)])
 

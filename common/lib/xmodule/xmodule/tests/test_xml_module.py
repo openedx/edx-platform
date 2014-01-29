@@ -119,13 +119,11 @@ class InheritingFieldDataTest(unittest.TestCase):
         parent = self.get_a_block(usage_id="parent")
         parent.inherited = "Changed!"
         self.assertEqual(parent.inherited, "Changed!")
-        parent_id = "parent"
         for child_num in range(10):
             usage_id = "child_{}".format(child_num)
             child = self.get_a_block(usage_id=usage_id)
             child.parent = "parent"
             self.assertEqual(child.inherited, "Changed!")
-            parent_id = usage_id
 
     def test_not_inherited(self):
         # Fields not in the inherited_names list won't be inherited.

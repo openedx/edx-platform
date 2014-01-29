@@ -18,10 +18,9 @@ from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import make_error_tracker, exc_info_to_str
 from xmodule.course_module import CourseDescriptor
 from xmodule.mako_module import MakoDescriptorSystem
-from xmodule.x_module import XMLParsingSystem, prefer_xmodules, policy_key
+from xmodule.x_module import XMLParsingSystem, policy_key
 
 from xmodule.html_module import HtmlDescriptor
-from xblock.core import XBlock
 from xblock.fields import ScopeIds
 from xblock.field_data import DictFieldData
 from xblock.runtime import DictKeyValueStore, IdReader, IdGenerator
@@ -222,6 +221,7 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
         # load_item should actually be get_instance, because it expects the course-specific
         # policy to be loaded.  For now, just add the course_id here...
         def load_item(location):
+            """Return the XBlock for the specified location"""
             return xmlstore.get_instance(course_id, Location(location))
 
         resources_fs = OSFS(xmlstore.data_dir / course_dir)
@@ -509,6 +509,9 @@ class XMLModuleStore(ModuleStoreReadBase):
             course_id = CourseDescriptor.make_id(org, course, url_name)
 
             def get_policy(usage_id):
+                """
+                Return the policy dictionary to be applied to the specified XBlock usage
+                """
                 return policy.get(policy_key(usage_id), {})
 
             system = ImportSystem(
@@ -570,7 +573,7 @@ class XMLModuleStore(ModuleStoreReadBase):
                     html = f.read().decode('utf-8')
                     # tabs are referenced in policy.json through a 'slug' which is just the filename without the .html suffix
                     slug = os.path.splitext(os.path.basename(filepath))[0]
-                    loc = course_descriptor.scope_ids.usage_id._replace(category=category, name=slug)
+                    loc = course_descriptor.scope_ids.usage_id.replace(category=category, name=slug)
                     module = system.construct_xblock_from_class(
                         HtmlDescriptor,
                         # We're loading a descriptor, so student_id is meaningless
