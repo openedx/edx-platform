@@ -15,7 +15,11 @@ New documentation, *Building a Course with edX Studio*, is available online_. Yo
 
 .. _online: http://edx.readthedocs.org/projects/ca/en/latest/
 
-There is new documentation on `managing discussions <http://edx.readthedocs.org/projects/ca/en/latest/discussions.html>`_ and `best practices for discussion moderators <http://edx.readthedocs.org/projects/ca/en/latest/discussion_guidance_moderators.html>`_.
+There is new documentation on:
+
+* `Managing discussions <http://edx.readthedocs.org/projects/ca/en/latest/discussions.html>`_ 
+* `Best practices for discussion moderators <http://edx.readthedocs.org/projects/ca/en/latest/discussion_guidance_moderators.html>`_
+* `Using external graders <http://ca.readthedocs.org/en/latest/external_graders.html>`_
 
 
 ==========================
@@ -36,7 +40,7 @@ edX Learning Management System
 
 * When a student sets the speed for a video, that speed setting is now saved and used when the student views subsequent videos. (BLD-237)
 
-* In the Video component, the settings on the **Advanced** tab now include **Transcript Download Allowed** and **Video Download Allowed**, and **Download Video** has been merged into **Video Sources** to eliminate redundancy. A description of each setting is available at :ref:`Video Advanced Options`. (BLD-364, BLD-368)
+* In the Video component, the settings on the **Advanced** tab now include **Transcript Download Allowed** and **Video Download Allowed**, and **Download Video** has been merged into **Video Sources** to eliminate redundancy. A description of each setting is available at `Video Advanced Options <http://ca.readthedocs.org/en/latest/create_video.html#advanced-options>`_. (BLD-364, BLD-368)
 
 * For numerical response problems, students can now enter negative exponents in the same ways they can enter positive exponents. For example, students can enter ``4.9e-9`` or ``4.9*10^-9``. (BLD-434)
 
