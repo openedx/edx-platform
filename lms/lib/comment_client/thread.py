@@ -11,7 +11,8 @@ class Thread(models.Model):
         'closed', 'tags', 'votes', 'commentable_id', 'username', 'user_id',
         'created_at', 'updated_at', 'comments_count', 'unread_comments_count',
         'at_position_list', 'children', 'type', 'highlighted_title',
-        'highlighted_body', 'endorsed', 'read', 'group_id', 'group_name', 'pinned', 'abuse_flaggers'
+        'highlighted_body', 'endorsed', 'read', 'group_id', 'group_name', 'pinned',
+        'abuse_flaggers', 'resp_skip', 'resp_limit', 'resp_total'
     ]
 
     updatable_fields = [
