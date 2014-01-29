@@ -55,14 +55,14 @@ class Command(BaseCommand):
             raise CommandError("No user found identified by {}".format(args[1]))
 
         try:
-            locator_string = args[2]
+            package_id = args[2]
         except IndexError:
-            locator_string = None
+            package_id = None
 
-        return location, user, locator_string
+        return location, user, package_id
 
     def handle(self, *args, **options):
-        location, user, locator_string = self.parse_args(*args)
+        location, user, package_id = self.parse_args(*args)
 
         migrator = SplitMigrator(
             draft_modulestore=modulestore('default'),
@@ -71,4 +71,4 @@ class Command(BaseCommand):
             loc_mapper=loc_mapper(),
         )
 
-        migrator.migrate_mongo_course(location, user, locator_string)
+        migrator.migrate_mongo_course(location, user, package_id)
