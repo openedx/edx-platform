@@ -510,7 +510,8 @@ oauth_consumer_key="", oauth_signature="frVp4JuvT1mVXlxktiAUjQ7%2F1cw%3D"'}
 
         if action == 'replaceResultRequest':
             self.system.publish(
-                event={
+                self,
+                {
                     'event_name': 'grade',
                     'value': score * self.max_score(),
                     'max_value': self.max_score(),

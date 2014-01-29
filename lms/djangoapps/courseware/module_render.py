@@ -291,7 +291,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
                                                   position, wrap_xmodule_display, grade_bucket_type,
                                                   static_asset_path)
 
-    def publish(event, custom_user=None):
+    def publish(block, event, custom_user=None):
         """A function that allows XModules to publish events. This only supports grade changes right now."""
         if event.get('event_name') != 'grade':
             return

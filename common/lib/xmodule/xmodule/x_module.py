@@ -988,11 +988,14 @@ class DescriptorSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable
             # global function that the application can override.
             return descriptor_global_handler_url(block, handler_name, suffix, query, thirdparty)
 
-    def resources_url(self, resource):
+    def resource_url(self, resource):
         raise NotImplementedError("edX Platform doesn't currently implement XBlock resource urls")
 
     def local_resource_url(self, block, uri):
         raise NotImplementedError("edX Platform doesn't currently implement XBlock resource urls")
+
+    def publish(self, block, event):
+        raise NotImplementedError("edX Platform doesn't currently implement XBlock publish")
 
 
 class XMLParsingSystem(DescriptorSystem):
@@ -1101,10 +1104,8 @@ class ModuleSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abs
         self.course_id = course_id
         self.user_is_staff = user is not None and user.is_staff
 
-        if publish is None:
-            publish = lambda e: None
-
-        self.publish = publish
+        if publish:
+            self.publish = publish
 
         self.open_ended_grading_interface = open_ended_grading_interface
         self.s3_interface = s3_interface
@@ -1143,11 +1144,14 @@ class ModuleSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abs
     def get_block(self, block_id):
         raise NotImplementedError("XModules must use get_module to load other modules")
 
-    def resources_url(self, resource):
+    def resource_url(self, resource):
         raise NotImplementedError("edX Platform doesn't currently implement XBlock resource urls")
 
     def local_resource_url(self, block, uri):
         raise NotImplementedError("edX Platform doesn't currently implement XBlock resource urls")
+
+    def publish(self, block, event):
+        pass
 
 
 class DoNothingCache(object):
