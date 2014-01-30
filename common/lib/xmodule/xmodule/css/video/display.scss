@@ -78,37 +78,6 @@ div.video {
        background-color: black;
     }
 
-    .button {
-      @include transition(none);
-      display: block;
-      font-weight: 800;
-      line-height: 46px;
-      margin-left: 0;
-      margin-right: 0;
-      padding-left: 15px;
-      text-indent: -9999px;
-      -webkit-font-smoothing: antialiased;
-      box-shadow: 1px 0 0 #555, inset 1px 0 0 #555;
-      color: #fff;
-      cursor: pointer;
-      border-left: 1px solid #000;
-      border-right: 1px solid #000;
-
-      &:hover {
-        background-color: #444;
-        color: #fff;
-        text-decoration: none;
-        outline: 0;
-      }
-
-      &:active,
-      &:focus {
-        color: #fff;
-        background-color: #444;
-        text-decoration: none;
-      }
-    }
-
     .spinner {
       @include transform(translate(-50%, -50%));
       position: absolute;
@@ -195,6 +164,37 @@ div.video {
         }
       }
 
+      .video-button {
+        @include transition(none);
+        display: block;
+        font-weight: 800;
+        line-height: 46px;
+        margin: 0;
+        padding: 0 0 0 15px;
+        text-indent: -9999px;
+        -webkit-font-smoothing: antialiased;
+        box-shadow: 1px 0 0 #555, inset 1px 0 0 #555;
+        color: #fff;
+        cursor: pointer;
+        border-width: 0 1px;
+        border-style: solid;
+        border-color: #000;
+
+        &:hover {
+          background-color: #444;
+          color: #fff;
+          text-decoration: none;
+          outline: 0;
+        }
+
+        &:active,
+        &:focus {
+          color: #fff;
+          background-color: #444;
+          text-decoration: none;
+        }
+      }
+
       div.slider {
         @include clearfix();
         @include transform(scaleY(0.5) translate3d(0, 50%, 0));
@@ -261,7 +261,7 @@ div.video {
           margin-bottom: 0;
 
           a {
-            @extend .button;
+            @extend .video-button;
             background-image: url('../images/vcr.png');
             background-position: 15px 15px ;
             background-repeat: no-repeat;
@@ -393,13 +393,14 @@ div.video {
           }
 
           & > a {
-            @extend .button;
+            @extend .video-button;
             @include clearfix();
             background-image: url('../images/closed-arrow.png');
             background-position: 10px center;
             background-repeat: no-repeat;
             min-width: 116px;
             text-indent: 0;
+            color: #999;
 
             @media (max-width: 1024px) {
               min-width: 0;
@@ -454,7 +455,7 @@ div.video {
           }
 
           & > a {
-            @extend .button;
+            @extend .video-button;
             @include clearfix();
             background-image: url('../images/volume.png');
             background-position: 10px center;
@@ -508,7 +509,7 @@ div.video {
         }
 
         a.add-fullscreen {
-          @extend .button;
+          @extend .video-button;
           background: url(../images/fullscreen.png) center no-repeat;
           border-left: none;
           float: left;
@@ -518,7 +519,7 @@ div.video {
 
 
         a.quality_control {
-          @extend .button;
+          @extend .video-button;
           background: url(../images/hd.png) center no-repeat;
           border-left: none;
           display: none;
@@ -536,7 +537,7 @@ div.video {
 
         div.lang {
           & > a.hide-subtitles {
-            @extend .button;
+            @extend .video-button;
             @include transition(none);
             box-shadow: inset 1px 0 0 #555;
             background: url('../images/cc.png') center no-repeat;
