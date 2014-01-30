@@ -34,7 +34,6 @@
       ${_("Home")} | class.stanford.edu
     % else:
        ${page_title_breadcrumbs(self.pagetitle())}
-      </title>
       ## this needs to be here to prevent the title from mysteriously appearing in the body, in one case
       <!--<%block name="pagetitle" />-->
 
@@ -49,6 +48,8 @@
         })(this);
       </script>
     % endif
+      </title>
+
   </%block>
 
   <script type="text/javascript" src="/jsi18n/"></script>
