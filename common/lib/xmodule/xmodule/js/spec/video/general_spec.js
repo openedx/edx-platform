@@ -202,6 +202,12 @@
                     expect(state.youtubeId()).toEqual('abcdefghijkl');
                 });
             });
+
+            describe('speed is absent in the list of video speed', function () {
+                it('return the video id for 1.0x speed', function () {
+                    expect(state.youtubeId('0.0')).toEqual('cogebirgzzM');
+                });
+            });
         });
 
         describe('YouTube video in FireFox will cue first', function () {
