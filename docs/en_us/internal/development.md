@@ -21,13 +21,30 @@ Install the following:
 
 ### Databases
 
-First start up the mongo daemon. E.g. to start it up in the background
-using a config file:
+First start up the MongoDB daemon. E.g. to start it up in the background
+using a config file (sometimes using `sudo` is required):
 
     mongod --config /usr/local/etc/mongod.conf &
 
-Check out the course data directories that you want to work with into the
-`GITHUB_REPO_ROOT` (by default, `../data`). Then run the following command:
+On some Linux distributions the configuration script is located at:
+
+    /etc/mongodb.conf
+
+If MongoDB does not start properly, it might be the case that there is a stray
+lock file somewhere, or that the configuration file is corrupt. In this case
+try deleting the lock files, and then running the MongoDB repair script:
+
+    sudo rm -rf /data/db/mongod.lock
+    sudo rm -rf /var/lib/mongodb/mongod.lock
+    sudo -u mongodb mongod -f /usr/local/etc/mongod.conf --repair
+
+To verify that MongoDB started up OK, run the MongoDB client:
+
+    mongo
+
+After MongoDB daemon is successfully running, check out the course data
+directories that you want to work with into the `GITHUB_REPO_ROOT` (by default,
+`../data`). Then run the following command:
 
     rake resetdb
 
