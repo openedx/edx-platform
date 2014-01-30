@@ -186,7 +186,6 @@
                 it('render the caption', function () {
                     var captionsData;
 
-                    state = jasmine.initializePlayer();
                     captionsData = jasmine.stubbedCaption;
                     $('.subtitles li[data-index]').each(
                         function (index, link) {
@@ -201,7 +200,6 @@
                 });
 
                 it('add a padding element to caption', function () {
-                    state = jasmine.initializePlayer();
                     expect($('.subtitles li:first').hasClass('spacing'))
                         .toBe(true);
                     expect($('.subtitles li:last').hasClass('spacing'))
@@ -210,31 +208,39 @@
 
 
                 it('bind all the caption link', function () {
-                    state = jasmine.initializePlayer();
+                    var handlerList = ['captionMouseOverOut', 'captionClick',
+                        'captionMouseDown', 'captionFocus', 'captionBlur',
+                        'captionKeyDown'
+                    ];
+
+                    $.each(handlerList, function(index, handler) {
+                        spyOn(state.videoCaption, handler);
+                    });
                     $('.subtitles li[data-index]').each(
                         function (index, link) {
 
-                        expect($(link)).toHandleWith(
-                            'mouseover', state.videoCaption.captionMouseOverOut
-                        );
-                        expect($(link)).toHandleWith(
-                            'mouseout', state.videoCaption.captionMouseOverOut
-                        );
-                        expect($(link)).toHandleWith(
-                            'mousedown', state.videoCaption.captionMouseDown
-                        );
-                        expect($(link)).toHandleWith(
-                            'click', state.videoCaption.captionClick
-                        );
-                        expect($(link)).toHandleWith(
-                            'focus', state.videoCaption.captionFocus
-                        );
-                        expect($(link)).toHandleWith(
-                            'blur', state.videoCaption.captionBlur
-                        );
-                        expect($(link)).toHandleWith(
-                            'keydown', state.videoCaption.captionKeyDown
-                        );
+
+                        $(link).trigger('mouseover');
+                        expect(state.videoCaption.captionMouseOverOut).toHaveBeenCalled();
+
+                        state.videoCaption.captionMouseOverOut.reset();
+                        $(link).trigger('mouseout');
+                        expect(state.videoCaption.captionMouseOverOut).toHaveBeenCalled();
+
+                        $(this).click();
+                        expect(state.videoCaption.captionClick).toHaveBeenCalled();
+
+                        $(this).trigger('mousedown');
+                        expect(state.videoCaption.captionMouseDown).toHaveBeenCalled();
+
+                        $(this).trigger('focus');
+                        expect(state.videoCaption.captionFocus).toHaveBeenCalled();
+
+                        $(this).trigger('blur');
+                        expect(state.videoCaption.captionBlur).toHaveBeenCalled();
+
+                        $(this).trigger('keydown');
+                        expect(state.videoCaption.captionKeyDown).toHaveBeenCalled();
                     });
                 });
 
