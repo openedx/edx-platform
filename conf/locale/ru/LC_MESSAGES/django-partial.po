@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
 "POT-Creation-Date: 2014-01-30 13:12+0400\n"
-"PO-Revision-Date: 2014-01-30 13:29+0300\n"
+"PO-Revision-Date: 2014-01-30 13:35+0300\n"
 "Last-Translator: JK <korvin.lucky@gmail.com>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
@@ -2335,7 +2335,7 @@ msgstr "Дополнительное образование детей"
 
 #: lms/djangoapps/branding/views.py:108
 msgid "Supplementary courses"
-msgstr "Вспомогательный курс"
+msgstr "Вспомогательные курсы"
 
 #: lms/djangoapps/courseware/features/video.py:111
 msgid "ERROR: No playable video sources found!"

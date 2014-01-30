@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
 "POT-Creation-Date: 2014-01-30 13:12+0400\n"
-"PO-Revision-Date: 2014-01-30 13:26+0300\n"
+"PO-Revision-Date: 2014-01-30 13:52+0300\n"
 "Last-Translator: JK <korvin.lucky@gmail.com>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
@@ -83,7 +83,7 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/views/import_export.py:81
 msgid "We only support uploading a .tar.gz file."
-msgstr ""
+msgstr "Мы поддерживаем загрузку только .tar.gz файлов."
 
 #: cms/djangoapps/contentstore/views/import_export.py:118
 msgid "File upload corrupted. Please try again"
@@ -91,7 +91,7 @@ msgstr "Загруженный файл поврежден. Пожалуйста
 
 #: cms/djangoapps/contentstore/views/import_export.py:206
 msgid "Could not find the course.xml file in the package."
-msgstr ""
+msgstr "Невозможно найти course.xml  в этом пакете."
 
 #: cms/djangoapps/contentstore/views/tabs.py:38
 #: lms/templates/courseware/courseware-error.html:5
@@ -2127,12 +2127,18 @@ msgid ""
 "assignment type for subsections that are to be graded, and you can open a "
 "subsection for further editing."
 msgstr ""
+"Вы можете создавать новые разделы и подразделы, устанавливать даты "
+"публикации разделов, а также создавать новые блоки в существующих "
+"подразделах. Вы можете устанавливать тип оценавния подраздела и открывать "
+"подраздел для будующего редактирования."
 
 #: cms/templates/overview.html:272
 msgid ""
 "In addition, you can drag and drop sections, subsections, and units to "
 "reorganize your course."
 msgstr ""
+"В дополнение, вы можете перетаскивать разделы, подразделы и блоки для "
+"реорганизации курса."
 
 #: cms/templates/overview.html:288
 msgid "Section Release Date"
@@ -2390,6 +2396,10 @@ msgid ""
 "video, and estimated time requirements. Students use About pages to choose "
 "new courses to take."
 msgstr ""
+"Другая информация из этой страницы отображается на странице \"О Курсе\". Она "
+"включает в себя общую информацию о курсе, изображение курса, вводное видео, "
+"оцениваемое время выполнения. Студенты используют страницу \"О Курсе\" для "
+"выбора нового курса."
 
 #: cms/templates/settings.html:300 cms/templates/settings_advanced.html:96
 #: cms/templates/settings_graders.html:145
@@ -2443,6 +2453,9 @@ msgid ""
 "can edit manual policies, which are JSON-based key and value pairs that "
 "control specific course settings."
 msgstr ""
+"Расширенные настройки управляют функциональностью курса. На этой странице вы "
+"можете вручную отредактировать настройки, которые задаются JSON-ключом и "
+"значением соответствующей настройки курса."
 
 #: cms/templates/settings_advanced.html:84
 #, fuzzy
@@ -2934,9 +2947,8 @@ msgstr "Все права защищены."
 #: cms/templates/widgets/footer.html:13
 #: lms/templates/static_templates/tos.html:4
 #: lms/templates/static_templates/tos.html:7
-#, fuzzy
 msgid "Terms of Service"
-msgstr "Я согласен с условиями предоставления услуг"
+msgstr "Условия предоставления услуг"
 
 #: cms/templates/widgets/footer.html:16
 #: lms/templates/static_templates/privacy.html:4
@@ -3129,24 +3141,20 @@ msgid "name"
 msgstr "имя"
 
 #: cms/templates/widgets/units.html:43
-#, fuzzy
 msgid "Delete this unit"
-msgstr "Удалить этот раздел"
+msgstr "Удалить этот блок"
 
 #: cms/templates/widgets/units.html:43
-#, fuzzy
 msgid "Delete unit"
-msgstr "Удалить"
+msgstr "Удалить блок"
 
 #: cms/templates/widgets/units.html:46
-#, fuzzy
 msgid "Drag to sort"
-msgstr "Для изменения порядка - перетащите"
+msgstr "Перетащите для сортировки"
 
 #: cms/templates/widgets/units.html:46
-#, fuzzy
 msgid "Drag to reorder unit"
-msgstr "Для изменения порядка - перетащите"
+msgstr "Перетащите для изменения порядка блоков"
 
 #: common/djangoapps/course_modes/models.py:43
 msgid "Honor Code Certificate"
@@ -3187,16 +3195,14 @@ msgid "Student"
 msgstr "Студент"
 
 #: common/djangoapps/student/middleware.py:25
-#, fuzzy
 msgid ""
 "Your account has been disabled. If you believe this was done in error, "
 "please contact us at {link_start}{support_email}{link_end}"
 msgstr ""
-"Ваши права на создание курсов в Студии edX были отозваны. Если Вы считаете, "
-"что это ошибка, обратитесь к "
+"Ваша учетная запись была отключена. Если Вы считаете, что это было сделано "
+"по ошибке, обратитесь по {link_start}{support_email}{link_end}"
 
 #: common/djangoapps/student/middleware.py:33
-#, fuzzy
 msgid "Disabled Account"
 msgstr "Отключенная Учетная запись"
 
@@ -4391,23 +4397,20 @@ msgid "Slug that points to the wiki for this course"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py:166
-#, fuzzy
 msgid "Date that enrollment for this class is opened"
-msgstr "Даты контроля вашего курса можно посмотреть."
+msgstr "Дата открытия регистрации на курс"
 
 #: common/lib/xmodule/xmodule/course_module.py:167
-#, fuzzy
 msgid "Date that enrollment for this class is closed"
-msgstr "Зарегистрироваться на личный экзамен"
+msgstr "Дата закрытия регистрации на курс"
 
 #: common/lib/xmodule/xmodule/course_module.py:168
 msgid "Start time when this module is visible"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py:171
-#, fuzzy
 msgid "Date that this class ends"
-msgstr "Срок, до которого можно сдавать эту задачу"
+msgstr "Дата окончания курса"
 
 #: common/lib/xmodule/xmodule/course_module.py:172
 #, fuzzy
@@ -7252,7 +7255,7 @@ msgstr "Все"
 
 #: lms/templates/courses_list.html:27
 msgid "Current"
-msgstr "Текущае"
+msgstr "Текущие"
 
 #: lms/templates/courses_list.html:29
 msgid "Past"
@@ -8324,15 +8327,13 @@ msgstr "Следующая страница"
 
 #: lms/templates/sysadmin_dashboard.html:53
 #: lms/templates/sysadmin_dashboard_gitlogs.html:52
-#, fuzzy
 msgid "Sysadmin Dashboard"
-msgstr "Личный кабинет"
+msgstr "Кабинет системного администратора"
 
 #: lms/templates/sysadmin_dashboard.html:56
 #: lms/templates/sysadmin_dashboard_gitlogs.html:55
-#, fuzzy
 msgid "Users"
-msgstr "Пользователь"
+msgstr "Пользователи"
 
 #: lms/templates/sysadmin_dashboard.html:58
 #: lms/templates/sysadmin_dashboard_gitlogs.html:57
@@ -8347,29 +8348,24 @@ msgid "Git Logs"
 msgstr ""
 
 #: lms/templates/sysadmin_dashboard.html:63
-#, fuzzy
 msgid "User Management"
-msgstr "Имя пользователя"
+msgstr "Управление пользователями"
 
 #: lms/templates/sysadmin_dashboard.html:70
-#, fuzzy
 msgid "Email or username"
 msgstr "Адрес или имя пользователя"
 
 #: lms/templates/sysadmin_dashboard.html:86
-#, fuzzy
 msgid "Delete user"
-msgstr "Удалить"
+msgstr "Удалить пользователя"
 
 #: lms/templates/sysadmin_dashboard.html:87
-#, fuzzy
 msgid "Create user"
-msgstr "Создать"
+msgstr "Создать пользователя"
 
 #: lms/templates/sysadmin_dashboard.html:94
-#, fuzzy
 msgid "Download list of all users (csv file)"
-msgstr "CSV всех профилей студентов"
+msgstr "Скачать список всех пользователей (csv фаил)"
 
 #: lms/templates/sysadmin_dashboard.html:100
 #, fuzzy
@@ -8433,9 +8429,8 @@ msgstr ""
 
 #: lms/templates/sysadmin_dashboard_gitlogs.html:73
 #: lms/templates/sysadmin_dashboard_gitlogs.html:100
-#, fuzzy
 msgid "Course ID"
-msgstr "Курс: "
+msgstr "Идентификатор курса"
 
 #: lms/templates/sysadmin_dashboard_gitlogs.html:74
 #, fuzzy
