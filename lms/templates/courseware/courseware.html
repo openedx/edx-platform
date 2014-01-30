@@ -1,8 +1,19 @@
 <%! from django.utils.translation import ugettext as _ %>
+<%! from microsite_configuration import page_title_breadcrumbs %>
 <%inherit file="/main.html" />
 <%namespace name='static' file='/static_content.html'/>
+<%def name="course_name()">
+ <% return _("{course_number} Courseware").format(course_number=course.display_number_with_default) %>
+</%def>
+
 <%block name="bodyclass">courseware ${course.css_class}</%block>
-<%block name="title"><title>${_("{course_number} Courseware").format(course_number=course.display_number_with_default) | h}</title></%block>
+<%block name="title"><title>
+    % if section_title: 
+${page_title_breadcrumbs(section_title, course_name())}
+    % else:
+${page_title_breadcrumbs(course_name())}
+    %endif 
+</title></%block>
 
 <%block name="headextra">
 <%static:css group='style-course-vendor'/>

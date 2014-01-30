@@ -113,7 +113,7 @@
   <script src="${static.url('js/course_info.js')}"></script>
 </%block>
 
-<%block name="title"><title>${_("About {course.display_number_with_default}").format(course=course) | h}</title></%block>
+<%block name="pagetitle">${_("About {course.display_number_with_default}").format(course=course) | h}</%block>
 
 <section class="course-info">
   <header class="course-profile">

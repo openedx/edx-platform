@@ -1,5 +1,6 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%! from microsite_configuration.middleware import MicrositeConfiguration %>
+<%! from microsite_configuration import page_title_breadcrumbs %>
 
 <%namespace name='static' file='static_content.html'/>
 <%! from django.utils import html %>
@@ -28,11 +29,14 @@
 <!--[if gt IE 9]><!--><html lang="${LANGUAGE_CODE}"><!--<![endif]-->
 <head>
   <%block name="title">
+      <title>
     % if stanford_theme_enabled():
-      <title>${_("Home")} | class.stanford.edu</title>
+      ${_("Home")} | class.stanford.edu
     % else:
-      ## "edX" should not be translated
-      <title>${MicrositeConfiguration.get_microsite_configuration_value('platform_name', settings.PLATFORM_NAME)}</title>
+       ${page_title_breadcrumbs(self.pagetitle())}
+      </title>
+      ## this needs to be here to prevent the title from mysteriously appearing in the body, in one case
+      <!--<%block name="pagetitle" />-->
 
       <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
