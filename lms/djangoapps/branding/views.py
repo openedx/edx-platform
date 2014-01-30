@@ -12,6 +12,8 @@ from microsite_configuration.middleware import MicrositeConfiguration
 from edxmako.shortcuts import marketing_link
 from util.cache import cache_if_anonymous
 
+from courseware.courses import get_courses
+from django.utils.translation import ugettext_lazy as _
 
 @ensure_csrf_cookie
 @cache_if_anonymous
@@ -70,3 +72,60 @@ def courses(request):
     #  we do not expect this case to be reached in cases where
     #  marketing is enabled or the courses are not browsable
     return courseware.views.courses(request)
+
+
+SUBJECTS = (
+        ('economy', _('Economy')),
+        ('french', _('French Language')),
+        ('english', _('English Language')),
+        ('german', _('German Language')),
+        ('litrature', _('Literature')),
+        ('natural_science', _('Natural Science')),
+        ('ecology', _('Ecology')),
+        ('technology', _('Technology')),
+        ('social_studies', _('Social Studies')),
+        ('law', _('Law')),
+        ('astronomy', _('Astronomy')),
+        ('biology', _('Biology')),
+        ('world_art', _('World Art')),
+        ('mathematics', _('Mathematics')),
+        ('russian', _('Russian Language')),
+        ('chemistry', _('Chemistry')),
+        ('physical_culture', _('Physical Culture')),
+        ('physics', _('Physics')),
+        ('geography', _('Geography')),
+        ('obg', _('OBG')),
+        ('history', _('History')),
+        ('computer_science', _('Computer Science')),
+        ('psychology', _('Psychology')),
+    )
+
+
+DESTINY = (
+        ("advanced_training", _("Advanced training courses")),
+        ("trainging_olymp", _("Training for the Olympics")),
+        ("extra_education", _("Extra children's education")),
+        ("supplementary", _("Supplementary courses")),
+    )
+
+@ensure_csrf_cookie
+@cache_if_anonymous
+def courses_list(request, status = "all", subject="all", destiny="all"):
+    all_courses =  get_courses(request.user)
+    courses = []
+    for course in all_courses:
+        if (status == "new"):
+            if (not course.is_newish): continue
+        elif (status ==  "past"):
+            if (not course.has_ended()): continue
+        elif (status == "current"):
+            if (not course.has_started()): continue
+        elif (status != "all"):
+            continue
+        if (subject != "all"):
+            if not (subject in course.tags or dict(SUBJECTS).get(subject, '') in course.tags): continue
+        if (destiny != "all"):
+            if not (destiny in course.tags or dict(DESTINY).get(subject, '') in course.tags): continue
+        courses += [course]
+    context = {'courses': courses, 'destiny': destiny, 'subject': subject}
+    return render_to_response("courses_list.html", context)
