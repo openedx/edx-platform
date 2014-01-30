@@ -46,6 +46,34 @@ class CourseAuthorizationFormTest(ModuleStoreTestCase):
         self.assertTrue(CourseAuthorization.instructor_email_enabled(self.course.id))
 
     @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': True})
+    def test_repeat_course(self):
+        # Initially course shouldn't be authorized
+        self.assertFalse(CourseAuthorization.instructor_email_enabled(self.course.id))
+        # Test authorizing the course, which should totally work
+        form_data = {'course_id': self.course.id, 'email_enabled': True}
+        form = CourseAuthorizationAdminForm(data=form_data)
+        # Validation should work
+        self.assertTrue(form.is_valid())
+        form.save()
+        # Check that this course is authorized
+        self.assertTrue(CourseAuthorization.instructor_email_enabled(self.course.id))
+
+        # Now make a new course authorization with the same course id that tries to turn email off
+        form_data = {'course_id': self.course.id, 'email_enabled': False}
+        form = CourseAuthorizationAdminForm(data=form_data)
+        # Validation should not work because course_id field is unique
+        self.assertFalse(form.is_valid())
+        self.assertEquals(
+            "Course authorization with this Course id already exists.",
+            form._errors['course_id'][0]  # pylint: disable=protected-access
+        )
+        with self.assertRaisesRegexp(ValueError, "The CourseAuthorization could not be created because the data didn't validate."):
+            form.save()
+
+        # Course should still be authorized (invalid attempt had no effect)
+        self.assertTrue(CourseAuthorization.instructor_email_enabled(self.course.id))
+
+    @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': True})
     def test_form_typo(self):
         # Munge course id
         bad_id = self.course.id + '_typo'
