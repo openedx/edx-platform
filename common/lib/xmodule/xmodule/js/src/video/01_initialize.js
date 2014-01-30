@@ -382,8 +382,10 @@ function (VideoPlayer, CookieStorage) {
             isTouch = onTouchBasedDevice() || '',
             storage = CookieStorage('video_player'),
             speed = storage.getItem('video_speed_' + id) ||
+                el.data('speed') ||
                 storage.getItem('general_speed') ||
-                el.data('speed').toFixed(2).replace(/\.00$/, '.0') || '1.0';
+                el.data('general-speed') ||
+                '1.0';
 
         if (isTouch) {
             el.addClass('is-touch');
@@ -397,7 +399,7 @@ function (VideoPlayer, CookieStorage) {
             id: id,
             isFullScreen: false,
             isTouch: isTouch,
-            speed: speed,
+            speed: Number(speed).toFixed(2).replace(/\.00$/, '.0'),
             storage: storage
         });
 
