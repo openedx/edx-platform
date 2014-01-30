@@ -40,6 +40,7 @@ def main():
     logging.basicConfig(stream=sys.stdout, level=logging.INFO)
     create_dir_if_necessary(LOCALE_DIR)
     source_msgs_dir = CONFIGURATION.source_messages_dir
+    remove_file(source_msgs_dir.joinpath('django.po'))
 
     makemessages = "django-admin.py makemessages -l en"
     ignores = " ".join('--ignore="{}/*"'.format(d) for d in CONFIGURATION.ignore_dirs)
