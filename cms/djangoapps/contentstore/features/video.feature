@@ -43,16 +43,6 @@ Feature: CMS.Video Component
     Then the correct Youtube video is shown
 
   # 7
-  Scenario: Closed captions become visible when the mouse hovers over CC button
-    Given I have created a Video component with subtitles
-    And Make sure captions are closed
-    Then Captions become "invisible"
-    And I hover over button "CC"
-    Then Captions become "visible"
-    And I hover over button "volume"
-    Then Captions become "invisible"
-
-  # 8
   # Disabled 11/26 due to flakiness in master.
   # Enabled back on 11/29.
   Scenario: When enter key is pressed on a caption shows an outline around it
@@ -62,7 +52,7 @@ Feature: CMS.Video Component
     Then I press "enter" button on caption line with data-index "0"
     And I see caption line with data-index "0" has class "focused"
 
-  # 9
+  # 8
   Scenario: When start end end times are specified, a range on slider is shown
     Given I have created a Video component with subtitles
     And Make sure captions are closed

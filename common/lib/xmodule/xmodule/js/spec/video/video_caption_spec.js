@@ -210,6 +210,7 @@
 
 
                 it('bind all the caption link', function () {
+                    state = jasmine.initializePlayer();
                     $('.subtitles li[data-index]').each(
                         function (index, link) {
 

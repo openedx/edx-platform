@@ -23,20 +23,20 @@ def does_not_autoplay(_step, video_type):
     assert(world.css_find('.%s' % video_type)[0]['data-autoplay'] == 'False')
 
 
-@step('the course has a Video component in (.*) mode$')
+@step('the course has a Video component in (.*) mode(?:\:)?$')
 def view_video(_step, player_mode):
 
     i_am_registered_for_the_course(_step, coursenum)
 
     # Make sure we have a video
-    add_video_to_course(coursenum, player_mode.lower())
+    add_video_to_course(coursenum, player_mode.lower(), _step.hashes)
     visit_scenario_item('SECTION')
 
 
-@step('a video "([^"]*)" in "([^"]*)" mode in position "([^"]*)" of sequential$')
+@step('a video "([^"]*)" in "([^"]*)" mode in position "([^"]*)" of sequential(?:\:)?$')
 def add_video(_step, player_id, player_mode, position):
     sequence[player_id] = position
-    add_video_to_course(coursenum, player_mode.lower(), display_name=player_id)
+    add_video_to_course(coursenum, player_mode.lower(), _step.hashes, display_name=player_id)
 
 
 @step('I open the section with videos$')
@@ -60,47 +60,43 @@ def check_video_speed(_step, player_id, speed):
     speed_css = '.speeds p.active'
     assert world.css_has_text(speed_css, '{0}x'.format(speed))
 
-def add_video_to_course(course, player_mode, display_name='Video'):
+def add_video_to_course(course, player_mode, hashes, display_name='Video'):
     category = 'video'
 
     kwargs = {
         'parent_location': section_location(course),
         'category': category,
-        'display_name': display_name
+        'display_name': display_name,
+        'metadata': {},
     }
 
     if player_mode == 'html5':
-        kwargs.update({
-            'metadata': {
-                'youtube_id_1_0': '',
-                'youtube_id_0_75': '',
-                'youtube_id_1_25': '',
-                'youtube_id_1_5': '',
-                'html5_sources': HTML5_SOURCES
-            }
+        kwargs['metadata'].update({
+            'youtube_id_1_0': '',
+            'youtube_id_0_75': '',
+            'youtube_id_1_25': '',
+            'youtube_id_1_5': '',
+            'html5_sources': HTML5_SOURCES
         })
     if player_mode == 'youtube_html5':
-        kwargs.update({
-            'metadata': {
-                'html5_sources': HTML5_SOURCES
-            }
+        kwargs['metadata'].update({
+            'html5_sources': HTML5_SOURCES
         })
     if player_mode == 'youtube_html5_unsupported_video':
-        kwargs.update({
-            'metadata': {
-                'html5_sources': HTML5_SOURCES_INCORRECT
-            }
+        kwargs['metadata'].update({
+            'html5_sources': HTML5_SOURCES_INCORRECT
         })
     if player_mode == 'html5_unsupported_video':
-        kwargs.update({
-            'metadata': {
-                'youtube_id_1_0': '',
-                'youtube_id_0_75': '',
-                'youtube_id_1_25': '',
-                'youtube_id_1_5': '',
-                'html5_sources': HTML5_SOURCES_INCORRECT
-            }
+        kwargs['metadata'].update({
+            'youtube_id_1_0': '',
+            'youtube_id_0_75': '',
+            'youtube_id_1_25': '',
+            'youtube_id_1_5': '',
+            'html5_sources': HTML5_SOURCES_INCORRECT
         })
+
+    if hashes:
+        kwargs['metadata'].update(hashes[0])
 
     world.ItemFactory.create(**kwargs)
 

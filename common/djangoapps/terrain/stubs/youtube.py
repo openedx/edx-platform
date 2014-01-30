@@ -61,6 +61,14 @@ class StubYouTubeHandler(StubHttpRequestHandler):
 
             self._send_video_response(youtube_id, "I'm youtube.")
 
+        elif 'transcript_translation' in self.path:
+
+            params = urlparse(self.path)
+            youtube_id = params.path.split('/').pop()
+
+            from pudb import set_trace; set_trace()
+            self._send_video_response(youtube_id, "I'm youtube.")
+
         else:
             self.send_response(
                 404, content="Unused url", headers={'Content-type': 'text/plain'}
