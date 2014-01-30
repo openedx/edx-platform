@@ -41,7 +41,7 @@ from course_modes.models import CourseMode
 from student.models import (
     Registration, UserProfile, PendingNameChange,
     PendingEmailChange, CourseEnrollment, unique_id_for_user,
-    CourseEnrollmentAllowed, UserStanding,
+    CourseEnrollmentAllowed, UserStanding, LoginFailures
 )
 from student.forms import PasswordResetFormNoActive
 
@@ -607,6 +607,17 @@ def login_user(request, error=""):
             # This is actually the common case, logging in user without external linked login
             AUDIT_LOG.info("User %s w/o external auth attempting login", user)
 
+    # see if account has been locked out due to excessive login failres
+    user_found_by_email_lookup = user
+    if user_found_by_email_lookup and LoginFailures.is_feature_enabled():
+        if LoginFailures.is_user_locked_out(user_found_by_email_lookup):
+            return HttpResponse(
+                json.dumps({
+                    'success': False,
+                    'value': _('This account has been temporarily locked due to excessive login failures. Try again later.')
+                })
+            )
+
     # if the user doesn't exist, we want to set the username to an invalid
     # username so that authentication is guaranteed to fail and we can take
     # advantage of the ratelimited backend
@@ -618,12 +629,20 @@ def login_user(request, error=""):
         return HttpResponse(json.dumps({'success': False,
                                         'value': _('Too many failed login attempts. Try again later.')}))
     if user is None:
+        # tick the failed login counters if the user exists in the database
+        if user_found_by_email_lookup and LoginFailures.is_feature_enabled():
+            LoginFailures.increment_lockout_counter(user_found_by_email_lookup)
+
         # if we didn't find this username earlier, the account for this email
         # doesn't exist, and doesn't have a corresponding password
         if username != "":
             AUDIT_LOG.warning(u"Login failed - password for {0} is invalid".format(email))
         return HttpResponse(json.dumps({'success': False,
                                         'value': _('Email or password is incorrect.')}))
+
+    # successful login, clear failed login attempts counters, if applicable
+    if LoginFailures.is_feature_enabled():
+        LoginFailures.clear_lockout_counter(user)
 
     if user is not None and user.is_active:
         try:

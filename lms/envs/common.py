@@ -208,6 +208,9 @@ FEATURES = {
     'ALLOW_COURSE_STAFF_GRADE_DOWNLOADS': False,
 
     'ENABLED_PAYMENT_REPORTS': ["refund_report", "itemized_purchase_report", "university_revenue_share", "certificate_status"],
+
+    # Turn off account locking if failed login attempts exceeds a limit
+    'ENABLE_MAX_FAILED_LOGIN_ATTEMPTS': False,
 }
 
 # Used for A/B testing
@@ -1195,3 +1198,7 @@ LINKEDIN_API = {
     'EMAIL_WHITELIST': [],
     'COMPANY_ID': '2746406',
 }
+
+##### ACCOUNT LOCKOUT DEFAULT PARAMETERS #####
+MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED = 5
+MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS = 15 * 60

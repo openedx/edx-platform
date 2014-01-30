@@ -66,6 +66,9 @@ FEATURES = {
     # If set to True, Studio won't restrict the set of advanced components
     # to just those pre-approved by edX
     'ALLOW_ALL_ADVANCED_COMPONENTS': False,
+
+    # Turn off account locking if failed login attempts exceeds a limit
+    'ENABLE_MAX_FAILED_LOGIN_ATTEMPTS': False,
 }
 ENABLE_JASMINE = False
 
@@ -485,3 +488,8 @@ YOUTUBE_API = {
     'url': "http://video.google.com/timedtext",
     'params': {'lang': 'en', 'v': 'set_youtube_id_of_11_symbols_here'}
 }
+
+
+##### ACCOUNT LOCKOUT DEFAULT PARAMETERS #####
+MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED = 5
+MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS = 15 * 60
