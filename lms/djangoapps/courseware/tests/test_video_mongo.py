@@ -14,7 +14,6 @@ from . import BaseTestXmodule
 from .test_video_xml import SOURCE_XML
 from django.conf import settings
 from xmodule.video_module import _create_youtube_string
-from cache_toolbox.core import del_cached_content
 from xmodule.exceptions import NotFoundError
 
 class TestVideo(BaseTestXmodule):
@@ -655,10 +654,8 @@ def _upload_file(file, location):
         content,
         tempfile_path=None
     )
-    del_cached_content(thumbnail_location)
 
     if thumbnail_content is not None:
         content.thumbnail_location = thumbnail_location
 
     contentstore().save(content)
-    del_cached_content(content.location)

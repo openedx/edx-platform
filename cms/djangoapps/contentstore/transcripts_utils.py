@@ -9,7 +9,6 @@ import logging
 from pysrt import SubRipTime, SubRipItem, SubRipFile
 from lxml import etree
 
-from cache_toolbox.core import del_cached_content
 from django.conf import settings
 from django.utils.translation import ugettext as _
 
@@ -83,8 +82,7 @@ def save_subs_to_store(subs, subs_id, item):
         item.location.org, item.location.course, filename
     )
     content = StaticContent(content_location, filename, mime_type, filedata)
-    contentstore().save(content)
-    del_cached_content(content_location)
+    contentstore(delete_from_toolbox_cache=True).save(content)
     return content_location
 
 
@@ -198,8 +196,7 @@ def remove_subs_from_store(subs_id, item):
     )
     try:
         content = contentstore().find(content_location)
-        contentstore().delete(content.get_id())
-        del_cached_content(content.location)
+        contentstore(delete_from_toolbox_cache=True).delete(content.get_id())
         log.info("Removed subs %s from store", subs_id)
     except NotFoundError:
         pass
