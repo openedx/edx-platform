@@ -114,12 +114,6 @@ class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
         # assert that footer template has been properly overriden on homepage
         self.assertNotContains(resp, 'This is a Test Microsite footer')
 
-        # assert that the edX partners section is not in the HTML
-        self.assertContains(resp, '<section class="university-partners university-partners2x6">')
-
-        # assert that the edX partners tag line is not in the HTML
-        self.assertContains(resp, 'Explore free courses from')
-
 
     def test_microsite_course_enrollment(self):
         """
