@@ -285,6 +285,13 @@ $footer_margin: ($baseline/4) 0 ($baseline*1.5) 0;
 
 // ====================
 
+// VIEWS: homepage
+$homepage__header--gradient__color--alpha: lighten($blue, 15%);
+$homepage__header--gradient__color--bravo: saturate($blue, 30%);
+$homepage__header--background: lighten($blue, 15%);
+
+// ====================
+
 // IMAGES: backgrounds
 $homepage-bg-image: '../images/homepage-bg.jpg';
 
