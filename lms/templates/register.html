@@ -53,20 +53,17 @@
       });
 
       $('#register-form').on('ajax:success', function(event, json, xhr) {
-        if(json.success) {
-          if(json.redirect_url){
-            location.href=json.redirect_url;
-          }
-          else {
-            location.href="${reverse('dashboard')}";
-          }
-       } else {
-         toggleSubmitButton(true);
-         $('.status.message.submission-error').addClass('is-shown').focus();
-         $('.status.message.submission-error .message-copy').html(json.value).stop().css("display", "block");
-         $(".field-error").removeClass('field-error');
-         $("[data-field='"+json.field+"']").addClass('field-error')
-       }
+        var url = json.redirect_url || "${reverse('dashboard')}";
+        location.href = url;
+      });
+
+      $('#register-form').on('ajax:error', function(event, jqXHR, textStatus) {
+        toggleSubmitButton(true);
+        json = $.parseJSON(jqXHR.responseText);
+        $('.status.message.submission-error').addClass('is-shown').focus();
+        $('.status.message.submission-error .message-copy').html(json.value).stop().css("display", "block");
+        $(".field-error").removeClass('field-error');
+        $("[data-field='"+json.field+"']").addClass('field-error')
       });
     })(this);
 
