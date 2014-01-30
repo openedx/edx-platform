@@ -23,7 +23,7 @@ class SplitMigrator(object):
         self.draft_modulestore = draft_modulestore
         self.loc_mapper = loc_mapper
 
-    def migrate_mongo_course(self, course_location, user_id, new_package_id=None):
+    def migrate_mongo_course(self, course_location, user, new_package_id=None):
         """
         Create a new course in split_mongo representing the published and draft versions of the course from the
         original mongo store. And return the new_package_id (which the caller can also get by calling
@@ -32,7 +32,7 @@ class SplitMigrator(object):
         If the new course already exists, this raises DuplicateItemError
 
         :param course_location: a Location whose category is 'course' and points to the course
-        :param user_id: the user whose action is causing this migration
+        :param user: the user whose action is causing this migration
         :param new_package_id: (optional) the Locator.package_id for the new course. Defaults to
         whatever translate_location_to_locator returns
         """
@@ -48,18 +48,18 @@ class SplitMigrator(object):
         new_course_root_locator = self.loc_mapper.translate_location(old_course_id, course_location)
         new_course = self.split_modulestore.create_course(
             course_location.org, original_course.display_name,
-            user_id, id_root=new_package_id,
+            user.id, id_root=new_package_id,
             fields=self._get_json_fields_translate_children(original_course, old_course_id, True),
             root_block_id=new_course_root_locator.block_id,
             master_branch=new_course_root_locator.branch
         )
 
-        self._copy_published_modules_to_course(new_course, course_location, old_course_id, user_id)
-        self._add_draft_modules_to_course(new_package_id, old_course_id, course_location, user_id)
+        self._copy_published_modules_to_course(new_course, course_location, old_course_id, user)
+        self._add_draft_modules_to_course(new_package_id, old_course_id, course_location, user)
 
         return new_package_id
 
-    def _copy_published_modules_to_course(self, new_course, old_course_loc, old_course_id, user_id):
+    def _copy_published_modules_to_course(self, new_course, old_course_loc, old_course_id, user):
         """
         Copy all of the modules from the 'direct' version of the course to the new split course.
         """
@@ -79,7 +79,7 @@ class SplitMigrator(object):
                     old_course_id, module.location, True, add_entry_if_missing=True
                 )
                 _new_module = self.split_modulestore.create_item(
-                    course_version_locator, module.category, user_id,
+                    course_version_locator, module.category, user.id,
                     block_id=new_locator.block_id,
                     fields=self._get_json_fields_translate_children(module, old_course_id, True),
                     continue_version=True
@@ -94,7 +94,7 @@ class SplitMigrator(object):
         # children which meant some pointers were to non-existent locations in 'direct'
         self.split_modulestore.internal_clean_children(course_version_locator)
 
-    def _add_draft_modules_to_course(self, new_package_id, old_course_id, old_course_loc, user_id):
+    def _add_draft_modules_to_course(self, new_package_id, old_course_id, old_course_loc, user):
         """
         update each draft. Create any which don't exist in published and attach to their parents.
         """
@@ -124,12 +124,12 @@ class SplitMigrator(object):
                         if name != 'children' and field.is_set_on(module):
                             field.write_to(split_module, field.read_from(module))
 
-                    _new_module = self.split_modulestore.update_item(split_module, user_id)
+                    _new_module = self.split_modulestore.update_item(split_module, user.id)
                 else:
                     # only a draft version (aka, 'private'). parent needs updated too.
                     # create a new course version just in case the current head is also the prod head
                     _new_module = self.split_modulestore.create_item(
-                        new_draft_course_loc, module.category, user_id,
+                        new_draft_course_loc, module.category, user.id,
                         block_id=new_locator.block_id,
                         fields=self._get_json_fields_translate_children(module, old_course_id, True)
                     )
@@ -156,7 +156,7 @@ class SplitMigrator(object):
                             new_parent_cursor = idx + 1
                             break
                 new_parent.children.insert(new_parent_cursor, new_block_id)
-                new_parent = self.split_modulestore.update_item(new_parent, user_id)
+                new_parent = self.split_modulestore.update_item(new_parent, user.id)
 
     def _get_json_fields_translate_children(self, xblock, old_course_id, published):
         """

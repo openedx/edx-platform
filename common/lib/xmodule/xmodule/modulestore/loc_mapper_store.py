@@ -93,7 +93,7 @@ class LocMapperStore(object):
                 package_id = "{0.org}.{0.course}".format(course_location)
         # very like _interpret_location_id but w/o the _id
         location_id = self._construct_location_son(
-            course_location.org, course_location.course, 
+            course_location.org, course_location.course,
             course_location.name if course_location.category == 'course' else None
         )
 
@@ -219,6 +219,11 @@ class LocMapperStore(object):
             return None
         result = None
         for candidate in maps:
+            if get_course and 'name' in candidate['_id']:
+                candidate_id = candidate['_id']
+                return Location(
+                    'i4x', candidate_id['org'], candidate_id['course'], 'course', candidate_id['name']
+                )
             old_course_id = self._generate_location_course_id(candidate['_id'])
             for old_name, cat_to_usage in candidate['block_map'].iteritems():
                 for category, block_id in cat_to_usage.iteritems():
@@ -240,7 +245,7 @@ class LocMapperStore(object):
                         candidate['course_id'], branch=candidate['draft_branch'], block_id=block_id
                     )
                     self._cache_location_map_entry(old_course_id, location, published_locator, draft_locator)
-                    
+
                     if get_course and category == 'course':
                         result = location
                     elif not get_course and block_id == locator.block_id:
@@ -261,8 +266,6 @@ class LocMapperStore(object):
             return cached
 
         location_id = self._interpret_location_course_id(old_style_course_id, location)
-        if old_style_course_id is None:
-            old_style_course_id = self._generate_location_course_id(location_id)
 
         maps = self.location_map.find(location_id)
         maps = list(maps)
@@ -320,10 +323,10 @@ class LocMapperStore(object):
             return {'_id': self._construct_location_son(location.org, location.course, location.name)}
         else:
             return bson.son.SON([('_id.org', location.org), ('_id.course', location.course)])
-    
+
     def _generate_location_course_id(self, entry_id):
         """
-        Generate a Location course_id for the given entry's id
+        Generate a Location course_id for the given entry's id.
         """
         # strip id envelope if any
         entry_id = entry_id.get('_id', entry_id)
@@ -334,7 +337,7 @@ class LocMapperStore(object):
             return '{0[_id.org]}/{0[_id.course]}'.format(entry_id)
         else:
             return '{0[org]}/{0[course]}'.format(entry_id)
-    
+
     def _construct_location_son(self, org, course, name=None):
         """
         Construct the SON needed to repr the location for either a query or an insertion
@@ -401,6 +404,8 @@ class LocMapperStore(object):
         """
         Get the course Locator for this old course id
         """
+        if not old_course_id:
+            return None
         entry = self.cache.get(old_course_id)
         if entry is not None:
             if published:
@@ -425,6 +430,8 @@ class LocMapperStore(object):
         """
         For quick lookup of courses
         """
+        if not old_course_id:
+            return
         self.cache.set(old_course_id, (published_course_locator, draft_course_locator))
 
     def _cache_location_map_entry(self, old_course_id, location, published_usage, draft_usage):

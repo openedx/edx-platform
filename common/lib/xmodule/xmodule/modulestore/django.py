@@ -152,6 +152,9 @@ def clear_existing_modulestores():
     _MODULESTORES.clear()
     # pylint: disable=W0603
     global _loc_singleton
+    cache = getattr(_loc_singleton, "cache", None)
+    if cache:
+        cache.clear()
     _loc_singleton = None
 
 
