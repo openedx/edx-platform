@@ -240,6 +240,18 @@ class VideoModule(VideoFields, XModule):
             elif self.sub:
                 track_url = self.runtime.handler_url(self, 'download_transcript')
 
+        if self.language in self.transcripts:
+            current_language = self.language
+        elif self.sub:
+            current_language = 'en'
+        elif self.transcripts:
+            current_language = self.transcripts.keys()[0]
+        else:
+            # this for the case, when for currently selected video,
+            # there are no translations and English subtitles are not set by instructor.
+            current_language = json.dumps(None)
+
+
         return self.system.render_template('video.html', {
             'ajax_url': self.system.ajax_url + '/save_user_state',
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', False),
@@ -261,7 +273,7 @@ class VideoModule(VideoFields, XModule):
             # configuration setting field.
             'yt_test_timeout': 1500,
             'yt_test_url': settings.YOUTUBE_TEST_URL,
-            'language': self.language,
+            'language': current_language,
             'transcripts': json.dumps(self.transcripts),
             'transcript_translation_url': self.runtime.handler_url(self, 'transcript_translation')
         })
