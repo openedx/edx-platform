@@ -392,6 +392,14 @@ function goto( mode)
   %else:
   <p>${_("User requires forum administrator privileges to perform administration tasks.  See instructor.")}</p>
   %endif
+  
+  <br />
+  <h2>${_("Explanation of Roles:")}</h2>
+  <p>${_("Forum Moderators: can edit or delete any post, remove misuse flags, close and re-open threads, endorse "
+  "responses, and see posts from all cohorts (if the course is cohorted). Moderators' posts are marked as 'staff'.")}</p>
+  <p>${_("Forum Admins: have moderator privileges, as well as the ability to edit the list of forum moderators "
+  "(e.g. to appoint a new moderator). Admins' posts are marked as 'staff'.")}</p>
+  <p>${_("Community TAs: have forum moderator privileges, and their posts are labelled 'Community TA'.")}</p>
 %endif
 
 ##-----------------------------------------------------------------------------
