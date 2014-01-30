@@ -941,13 +941,13 @@ def create_account(request, post_override=None):
 
         if len(post_vars[field_name]) < min_length:
             error_str = {
-                'username': _('Username must be minimum of two characters long.'),
-                'email': _('A properly formatted e-mail is required.'),
-                'name': _('Your legal name must be a minimum of two characters long.'),
-                'password': _('A valid password is required.'),
-                'terms_of_service': _('Accepting Terms of Service is required.'),
-                'honor_code': _('Agreeing to the Honor Code is required.'),
-                'level_of_education': _('A level of education is required.'),
+                'username': _('Username must be minimum of two characters long'),
+                'email': _('A properly formatted e-mail is required'),
+                'name': _('Your legal name must be a minimum of two characters long'),
+                'password': _('A valid password is required'),
+                'terms_of_service': _('Accepting Terms of Service is required'),
+                'honor_code': _('Agreeing to the Honor Code is required'),
+                'level_of_education': _('A level of education is required'),
                 'gender': _('Your gender is required'),
                 'year_of_birth': _('Your year of birth is required'),
                 'mailing_address': _('Your mailing address is required'),
