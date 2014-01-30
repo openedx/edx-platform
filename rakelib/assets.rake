@@ -1,4 +1,5 @@
 # Theming constants
+
 USE_CUSTOM_THEME = ENV_TOKENS.has_key?('FEATURES') && ENV_TOKENS['FEATURES']['USE_CUSTOM_THEME']
 if USE_CUSTOM_THEME
     THEME_NAME = ENV_TOKENS['THEME_NAME']
@@ -23,17 +24,22 @@ def xmodule_cmd(watch=false, debug=false)
 end
 
 def coffee_cmd(watch=false, debug=false)
+    brew_paths = ["lms/", "cms/", "common/"]
+    if USE_CUSTOM_THEME
+      # put theme path first just to be safe;
+      brew_paths.unshift(THEME_ROOT)
+    end
+
     if watch && Launchy::Application.new.host_os_family.darwin?
         available_files = Process::getrlimit(:NOFILE)[0]
         if available_files < MINIMAL_DARWIN_NOFILE_LIMIT
             Process.setrlimit(:NOFILE, MINIMAL_DARWIN_NOFILE_LIMIT)
-
         end
     end
     if watch
-        "node_modules/.bin/coffee --compile --watch lms/ cms/ common/"
+        "node_modules/.bin/coffee --compile --watch #{brew_paths.join(' ')}"
     else
-        "node_modules/.bin/coffee --compile `find lms/ cms/ common/ -type f -name *.coffee` "
+        "node_modules/.bin/coffee --compile `find #{brew_paths.join(' ')} -type f -name *.coffee` "
     end
 end
 
