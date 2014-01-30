@@ -1,4 +1,5 @@
-ACCEPTANCE_DB = 'test_root/db/test_edx.db'
+ACCEPTANCE_DB = File.join(REPO_ROOT, 'test_root/db/test_edx.db')
+ACCEPTANCE_DB_CACHE = File.join(REPO_ROOT, 'common/test/db_cache/lettuce.db')
 ACCEPTANCE_REPORT_DIR = report_dir_path('acceptance')
 directory ACCEPTANCE_REPORT_DIR
 
@@ -21,12 +22,31 @@ task :setup_acceptance_db do
     # migrations from the upgrade tables in the DB.
     # But for now for either system (lms or cms), use the lms
     # definitions to sync and migrate.
+
+    # Since we are using SQLLite, we can reset the database by deleting it on disk.
     if File.exists?(ACCEPTANCE_DB)
         File.delete(ACCEPTANCE_DB)
     end
 
-    sh(django_admin('lms', 'acceptance', 'syncdb', '--noinput'))
-    sh(django_admin('lms', 'acceptance', 'migrate', '--noinput'))
+    # To speed up migrations, we check for a cached database file and start from that.
+    # The cached database file should be checked into the repo
+    if File.exists?(ACCEPTANCE_DB_CACHE)
+
+        # Copy the cached database to the test root directory
+        sh("cp #{ACCEPTANCE_DB_CACHE} #{ACCEPTANCE_DB}")
+
+        # Run migrations to update the db, starting from its cached state
+        sh(django_admin('lms', 'acceptance', 'migrate', '--noinput'))
+
+    # If no cached database exists, syncdb before migrating, then create the cache
+    else
+        sh(django_admin('lms', 'acceptance', 'syncdb', '--noinput'))
+        sh(django_admin('lms', 'acceptance', 'migrate', '--noinput'))
+
+        # Create the cache if it doesn't already exist
+        sh("cp #{ACCEPTANCE_DB} #{ACCEPTANCE_DB_CACHE}")
+    end
+
 end
 
 task :prep_for_acceptance_tests => [

@@ -168,17 +168,8 @@ namespace :'test:bok_choy' do
         # Invalidate the cache
         BOK_CHOY_CACHE.flush()
 
-        # HACK: Since the CMS depends on the existence of some database tables
-        # that are now in common but used to be in LMS (Role/Permissions for Forums)
-        # we need to create/migrate the database tables defined in the LMS.
-        # We might be able to address this by moving out the migrations from
-        # lms/django_comment_client, but then we'd have to repair all the existing
-        # migrations from the upgrade tables in the DB.
-        # But for now for either system (lms or cms), use the lms
-        # definitions to sync and migrate.
-        sh(django_admin('lms', 'bok_choy', 'reset_db', '--noinput'))
-        sh(django_admin('lms', 'bok_choy', 'syncdb', '--noinput'))
-        sh(django_admin('lms', 'bok_choy', 'migrate', '--noinput'))
+        # Reset the database
+        sh("#{REPO_ROOT}/scripts/reset-test-db.sh")
 
         # Collect static assets
         Rake::Task["gather_assets"].invoke('lms', 'bok_choy')
