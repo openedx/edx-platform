@@ -152,13 +152,13 @@
 <script type="text/javascript">
   (function() {
    $(document).delegate('#register_form', 'ajax:success', function(data, json, xhr) {
-     if(json.success) {
-       location.href="${reverse('dashboard')}";
-     } else {
-       $(".field-error").removeClass('field-error');
-       $('#register_error').html(json.value).stop().css("display", "block");
-       $("[data-field='"+json.field+"']").addClass('field-error')
-     }
+     location.href="${reverse('dashboard')}";
+    });
+   $(document).delegate('#register_form', 'ajax:error', function(event, jqXHR, textStatus) {
+     json = $.parseJSON(jqXHR.responseText);
+     $(".field-error").removeClass('field-error');
+     $('#register_error').html(json.value).stop().css("display", "block");
+     $("[data-field='"+json.field+"']").addClass('field-error')
     });
 
    // removing close link's default behavior

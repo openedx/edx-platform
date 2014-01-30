@@ -897,13 +897,13 @@ def create_account(request, post_override=None):
         if a not in post_vars:
             js['value'] = _("Error (401 {field}). E-mail us.").format(field=a)
             js['field'] = a
-            return HttpResponse(json.dumps(js))
+            return JsonResponse(js, status=400)
 
     if extra_fields.get('honor_code', 'required') == 'required' and \
             post_vars.get('honor_code', 'false') != u'true':
         js['value'] = _("To enroll, you must follow the honor code.").format(field=a)
         js['field'] = 'honor_code'
-        return HttpResponse(json.dumps(js))
+        return JsonResponse(js, status=400)
 
     # Can't have terms of service for certain SHIB users, like at Stanford
     tos_required = (
@@ -919,7 +919,7 @@ def create_account(request, post_override=None):
         if post_vars.get('terms_of_service', 'false') != u'true':
             js['value'] = _("You must accept the terms of service.").format(field=a)
             js['field'] = 'terms_of_service'
-            return HttpResponse(json.dumps(js))
+            return JsonResponse(js, status=400)
 
     # Confirm appropriate fields are there.
     # TODO: Check e-mail format is correct.
@@ -957,21 +957,21 @@ def create_account(request, post_override=None):
             }
             js['value'] = error_str[field_name]
             js['field'] = field_name
-            return HttpResponse(json.dumps(js))
+            return JsonResponse(js, status=400)
 
     try:
         validate_email(post_vars['email'])
     except ValidationError:
         js['value'] = _("Valid e-mail is required.").format(field=a)
         js['field'] = 'email'
-        return HttpResponse(json.dumps(js))
+        return JsonResponse(js, status=400)
 
     try:
         validate_slug(post_vars['username'])
     except ValidationError:
         js['value'] = _("Username should only consist of A-Z and 0-9, with no spaces.").format(field=a)
         js['field'] = 'username'
-        return HttpResponse(json.dumps(js))
+        return JsonResponse(js, status=400)
 
     # Ok, looks like everything is legit.  Create the account.
     ret = _do_create_account(post_vars)
@@ -1007,7 +1007,10 @@ def create_account(request, post_override=None):
         except:
             log.warning('Unable to send activation email to user', exc_info=True)
             js['value'] = _('Could not send activation e-mail.')
-            return HttpResponse(json.dumps(js))
+            # What is the correct status code to use here? I think it's 500, because
+            # the problem is on the server's end -- but also, the account was created.
+            # Seems like the core part of the request was successful.
+            return JsonResponse(js, status=500)
 
     # Immediately after a user creates an account, we log them in. They are only
     # logged in until they close the browser. They can't log in again until they click
@@ -1034,14 +1037,12 @@ def create_account(request, post_override=None):
             login_user.save()
             AUDIT_LOG.info(u"Login activated on extauth account - {0} ({1})".format(login_user.username, login_user.email))
 
-    redirect_url = try_change_enrollment(request)
-
     dog_stats_api.increment("common.student.account_created")
 
-    response_params = {'success': True,
-                       'redirect_url': redirect_url}
-
-    response = HttpResponse(json.dumps(response_params))
+    response = JsonResponse({
+        'success': True,
+        'redirect_url': try_change_enrollment(request),
+    })
 
     # set the login cookie for the edx marketing site
     # we want this cookie to be accessed via javascript

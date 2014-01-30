@@ -107,31 +107,25 @@ require(["jquery", "jquery.cookie"], function($) {
     $("label").removeClass("is-focused");
   });
 
-  // form validation
-  function postJSON(url, data, callback) {
-    $.ajax({type:'POST',
-      url: url,
-      dataType: 'json',
-      data: data,
-      success: callback,
-      headers : {'X-CSRFToken': $.cookie('csrftoken')}
-    });
-  }
-
   $('form#register_form').submit(function(e) {
     e.preventDefault();
     var submit_data = $('#register_form').serialize();
 
-    postJSON('/create_account',
-      submit_data,
-      function(json) {
-        if(json.success) {
-          location.href = "${'/course'}";
-        } else {
-          $('#register_error').html(json.value).stop().addClass('is-shown');
-        }
-      }
-    );
+    $.ajax({
+      url: '/create_account',
+      type: 'POST',
+      dataType: 'json',
+      data: submit_data,
+      headers: {'X-CSRFToken': $.cookie('csrftoken')},
+      success: function(json) {
+        location.href = "/course";
+      },
+      error: function(jqXHR, textStatus, errorThrown) {
+        json = $.parseJSON(jqXHR.responseText);
+        $('#register_error').html(json.value).stop().addClass('is-shown');
+      },
+      notifyOnError: false
+    });
   });
 });
   </script>
