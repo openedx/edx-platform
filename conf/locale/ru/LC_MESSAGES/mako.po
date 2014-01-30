@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
-"POT-Creation-Date: 2014-01-24 14:34+0400\n"
+"POT-Creation-Date: 2014-01-30 13:12+0400\n"
 "PO-Revision-Date: 2013-11-29 19:04+0300\n"
 "Last-Translator: JK <korvin.lucky@gmail.com>\n"
 "Language-Team: Select LTD\n"
@@ -5507,6 +5507,121 @@ msgstr ""
 msgid "Select Audit"
 msgstr "Выберите Вашу секцию:"
 
+#: lms/djangoapps/branding/views.py:78
+msgid "Economy"
+msgstr ""
+
+#: lms/djangoapps/branding/views.py:79
+msgid "French Language"
+msgstr ""
+
+#: lms/djangoapps/branding/views.py:80
+msgid "English Language"
+msgstr ""
+
+#: lms/djangoapps/branding/views.py:81
+msgid "German Language"
+msgstr ""
+
+#: lms/djangoapps/branding/views.py:82
+#, fuzzy
+msgid "Literature"
+msgstr "Лекции"
+
+#: lms/djangoapps/branding/views.py:83
+#, fuzzy
+msgid "Natural Science"
+msgstr "Реальный размер"
+
+#: lms/djangoapps/branding/views.py:84
+msgid "Ecology"
+msgstr ""
+
+#: lms/djangoapps/branding/views.py:85
+msgid "Technology"
+msgstr ""
+
+#: lms/djangoapps/branding/views.py:86
+#, fuzzy
+msgid "Social Studies"
+msgstr "Социальный педагог"
+
+#: lms/djangoapps/branding/views.py:87
+msgid "Law"
+msgstr ""
+
+#: lms/djangoapps/branding/views.py:88
+msgid "Astronomy"
+msgstr ""
+
+#: lms/djangoapps/branding/views.py:89
+msgid "Biology"
+msgstr ""
+
+#: lms/djangoapps/branding/views.py:90
+msgid "World Art"
+msgstr ""
+
+#: lms/djangoapps/branding/views.py:91
+msgid "Mathematics"
+msgstr ""
+
+#: lms/djangoapps/branding/views.py:92
+msgid "Russian Language"
+msgstr ""
+
+#: lms/djangoapps/branding/views.py:93
+msgid "Chemistry"
+msgstr ""
+
+#: lms/djangoapps/branding/views.py:94
+msgid "Physical Culture"
+msgstr ""
+
+#: lms/djangoapps/branding/views.py:95
+msgid "Physics"
+msgstr ""
+
+#: lms/djangoapps/branding/views.py:96
+msgid "Geography"
+msgstr ""
+
+#: lms/djangoapps/branding/views.py:97
+msgid "OBG"
+msgstr ""
+
+#: lms/djangoapps/branding/views.py:98
+#, fuzzy
+msgid "History"
+msgstr "Посмотреть историю"
+
+#: lms/djangoapps/branding/views.py:99
+#, fuzzy
+msgid "Computer Science"
+msgstr "например Введение в Математический Анализ"
+
+#: lms/djangoapps/branding/views.py:100
+msgid "Psychology"
+msgstr ""
+
+#: lms/djangoapps/branding/views.py:105
+#, fuzzy
+msgid "Advanced training courses"
+msgstr "Расширенные настройки"
+
+#: lms/djangoapps/branding/views.py:106
+msgid "Training for the Olympics"
+msgstr ""
+
+#: lms/djangoapps/branding/views.py:107
+msgid "Extra children's education"
+msgstr ""
+
+#: lms/djangoapps/branding/views.py:108
+#, fuzzy
+msgid "Supplementary courses"
+msgstr "Текущие курсы"
+
 #: lms/djangoapps/courseware/features/video.py:111 lms/templates/video.html:55
 msgid "ERROR: No playable video sources found!"
 msgstr ""
@@ -7138,9 +7253,35 @@ msgid ""
 "about {platform_name}, please email {email}."
 msgstr ""
 
-#: lms/templates/course.html:10
+#: lms/templates/course.html:10 lms/templates/courses_list.html:28
 msgid "New"
 msgstr "Новый"
+
+#: lms/templates/courses_list.html:6 lms/templates/navigation.html:100
+#: lms/templates/sysadmin_dashboard.html:57
+#: lms/templates/sysadmin_dashboard_gitlogs.html:56
+#: lms/templates/courseware/courses.html:6
+msgid "Courses"
+msgstr "Курсы"
+
+#: lms/templates/courses_list.html:26 lms/templates/courses_list.html:32
+#: lms/templates/courses_list.html:38
+msgid "All"
+msgstr ""
+
+#: lms/templates/courses_list.html:27
+#, fuzzy
+msgid "Current"
+msgstr "Текущая роль:"
+
+#: lms/templates/courses_list.html:29
+msgid "Past"
+msgstr ""
+
+#: lms/templates/courses_list.html:43
+#, fuzzy
+msgid "Search"
+msgstr "Поиск сообщений"
 
 #: lms/templates/dashboard.html:14
 msgid "Dashboard"
@@ -7794,12 +7935,6 @@ msgstr "Завершить сеанс"
 #: lms/templates/navigation.html:97
 msgid "How it Works"
 msgstr "Механизм работы"
-
-#: lms/templates/navigation.html:100 lms/templates/sysadmin_dashboard.html:57
-#: lms/templates/sysadmin_dashboard_gitlogs.html:56
-#: lms/templates/courseware/courses.html:6
-msgid "Courses"
-msgstr "Курсы"
 
 #: lms/templates/navigation.html:103
 msgid "Schools"
@@ -12837,9 +12972,6 @@ msgstr "Войдите в {span_start}{platform_name}{span_end}"
 
 #~ msgid "Delete Category"
 #~ msgstr "Удалить категорию"
-
-#~ msgid "Lectures"
-#~ msgstr "Лекции"
 
 #~ msgid "Labs"
 #~ msgstr "Лабораторные"
