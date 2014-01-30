@@ -1,0 +1,80 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%inherit file="main.html" />
+
+<%namespace name='static' file='static_content.html'/>
+
+<%block name="title"><title>${_("Courses")}</title></%block>
+<%! from microsite_configuration.middleware import MicrositeConfiguration %>
+<%!
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+from courseware.courses import course_image_url, get_course_about_section
+from branding.views import SUBJECTS as subjects
+from branding.views import DESTINY as destinys
+%>
+
+
+
+<section class="search-course" style="border-bottom: 1px solid #8a8c8f;
+box-shadow: 0 1px 5px 0 rgba(0,0,0,0.1);">
+  <section class="container" style="text-align:right;">
+<form role="form" id="course_list" method="post" action="/courses_list" >
+<ul style="
+    list-style-type: none;
+    display: inline-block;
+">
+  <li style="display: inline-block; padding-right:10px"><a href="${reverse('courses_list', args=[subject, destiny, "all"])}">${_("All")}</a></li>
+  <li style="display: inline-block; padding-right:10px"><a href="${reverse('courses_list', args=[subject, destiny, "current"])}">${_("Current")}</a></li>
+  <li style="display: inline-block; padding-right:10px"><a href="${reverse('courses_list', args=[subject, destiny, "new"])}">${_("New")}</a></li>
+  <li style="display: inline-block; padding-right:10px"><a href="${reverse('courses_list', args=[subject, destiny, "past"])}">${_("Past")}</a></li>
+</ul>
+<select id="subject-select" name="subject" style="margin-right:10px">
+  <option value="all">${_("All")}</option>
+  %for code, dsc in subjects:
+  <option value="${code}" ${"selected" if code == subject else "" }>${_(dsc)}</option>
+  %endfor
+</select>
+<select id="destiny-select" name="destiny" style="margin-right:10px">
+  <option value="all">${_("All")}</option>
+  %for code, dsc in destinys:
+  <option value="${code}" ${"selected" if code == destiny else "" }>${_(dsc)}</option>
+  %endfor
+</select>
+<button type="submit" id="submit" name="submit" class="action action-primary" style="color: white; margin-left:10px">${_("Search")}</button>
+</form>
+</section>
+</section>
+
+<section class="find-courses">
+  <section class="container">
+    <section class="courses">
+      <ul class="courses-listing">
+        %for course in courses:
+        <li class="courses-listing-item">
+          <%include file="course.html" args="course=course" />
+        </li>
+        %endfor
+      </ul>
+    </section>
+  </section>
+</section>
+<%block name="js_extra">
+  <script type="text/javascript">
+
+String.prototype.supplant = function (o) {
+    return this.replace(/{([^{}]*)}/g,
+        function (a, b) {
+            var r = o[b];
+            return typeof r === 'string' || typeof r === 'number' ? r : a;
+        }
+    );
+};
+
+  $('form#course_list').submit(function(e) {
+    e.preventDefault();
+    var submit_data = $('#course_list').serialize();
+
+    location.href = "/courses_list/{subject}/{destiny}/{status}/".supplant({ subject: $("#subject-select").val(), destiny: $("#destiny-select").val(), status: "all"});
+  });
+  </script>
+</%block>

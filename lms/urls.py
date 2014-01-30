@@ -215,6 +215,10 @@ if settings.COURSEWARE_ENABLED:
         # url(r'^save_circuit/(?P<circuit>[^/]*)$', 'circuit.views.save_circuit'),
 
         url(r'^courses/?$', 'branding.views.courses', name="courses"),
+
+        url(r'^courses_list/?$', 'branding.views.courses_list'),
+        url(r'^courses_list/(?P<subject>[^/]+)/(?P<destiny>[^/]+)/(?P<status>[^/]+)/?$', 'branding.views.courses_list', name="courses_list"),
+
         url(r'^change_enrollment$',
             'student.views.change_enrollment', name="change_enrollment"),
         url(r'^change_email_settings$', 'student.views.change_email_settings', name="change_email_settings"),
