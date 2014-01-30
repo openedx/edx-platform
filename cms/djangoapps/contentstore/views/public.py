@@ -10,8 +10,6 @@ from edxmako.shortcuts import render_to_response
 
 from external_auth.views import ssl_login_shortcut
 
-from microsite_configuration.middleware import MicrositeConfiguration
-
 __all__ = ['signup', 'login_page', 'howitworks']
 
 
@@ -31,14 +29,10 @@ def login_page(request):
     Display the login form.
     """
     csrf_token = csrf(request)['csrf_token']
-    return render_to_response(
-        'login.html',
-        {
-            'csrf': csrf_token,
-            'forgot_password_link': "//{base}/login#forgot-password-modal".format(base=settings.LMS_BASE),
-            'platform_name': MicrositeConfiguration.get_microsite_configuration_value('platform_name', settings.PLATFORM_NAME),
-        }
-    )
+    return render_to_response('login.html', {
+        'csrf': csrf_token,
+        'forgot_password_link': "//{base}/login#forgot-password-modal".format(base=settings.LMS_BASE),
+    })
 
 
 def howitworks(request):

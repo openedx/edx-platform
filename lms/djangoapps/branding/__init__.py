@@ -2,10 +2,15 @@ from xmodule.modulestore.django import modulestore
 from xmodule.course_module import CourseDescriptor
 from django.conf import settings
 
-from microsite_configuration.middleware import MicrositeConfiguration
+
+def pick_subdomain(domain, options, default='default'):
+    for option in options:
+        if domain.startswith(option):
+            return option
+    return default
 
 
-def get_visible_courses():
+def get_visible_courses(domain=None):
     """
     Return the set of CourseDescriptors that should be visible in this branded instance
     """
@@ -15,52 +20,31 @@ def get_visible_courses():
                if isinstance(c, CourseDescriptor)]
     courses = sorted(courses, key=lambda course: course.number)
 
-    subdomain = MicrositeConfiguration.get_microsite_configuration_value('subdomain')
-
-    # See if we have filtered course listings in this domain
-    filtered_visible_ids = None
-
-    # this is legacy format which is outside of the microsite feature
-    if hasattr(settings, 'COURSE_LISTINGS') and subdomain in settings.COURSE_LISTINGS:
-        filtered_visible_ids = frozenset(settings.COURSE_LISTINGS[subdomain])
-
-    filtered_by_org = MicrositeConfiguration.get_microsite_configuration_value('course_org_filter')
-
-    if filtered_by_org:
-        return [course for course in courses if course.location.org == filtered_by_org]
-    if filtered_visible_ids:
-        return [course for course in courses if course.id in filtered_visible_ids]
+    if domain and settings.FEATURES.get('SUBDOMAIN_COURSE_LISTINGS'):
+        subdomain = pick_subdomain(domain, settings.COURSE_LISTINGS.keys())
+        visible_ids = frozenset(settings.COURSE_LISTINGS[subdomain])
+        return [course for course in courses if course.id in visible_ids]
     else:
-        # Let's filter out any courses in an "org" that has been declared to be
-        # in a Microsite
-        org_filter_out_set = MicrositeConfiguration.get_all_microsite_orgs()
-        return [course for course in courses if course.location.org not in org_filter_out_set]
+        return courses
 
 
-def get_university_for_request():
+def get_university(domain=None):
     """
     Return the university name specified for the domain, or None
     if no university was specified
     """
-    return MicrositeConfiguration.get_microsite_configuration_value('university')
+    if not settings.FEATURES['SUBDOMAIN_BRANDING'] or domain is None:
+        return None
+
+    subdomain = pick_subdomain(domain, settings.SUBDOMAIN_BRANDING.keys())
+    return settings.SUBDOMAIN_BRANDING.get(subdomain)
 
 
-def get_logo_url():
+def get_logo_url(domain=None):
     """
     Return the url for the branded logo image to be used
     """
-
-    # if the MicrositeConfiguration has a value for the logo_image_url
-    # let's use that
-    image_url = MicrositeConfiguration.get_microsite_configuration_value('logo_image_url')
-    if image_url:
-        return '{static_url}{image_url}'.format(
-            static_url=settings.STATIC_URL,
-            image_url=image_url
-        )
-
-    # otherwise, use the legacy means to configure this
-    university = MicrositeConfiguration.get_microsite_configuration_value('university')
+    university = get_university(domain)
 
     if university is None:
         return '{static_url}images/header-logo.png'.format(

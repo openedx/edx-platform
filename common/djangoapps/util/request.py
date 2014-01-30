@@ -1,6 +1,5 @@
 """ Utility functions related to HTTP requests """
 from django.conf import settings
-from microsite_configuration.middleware import MicrositeConfiguration
 
 
 def safe_get_host(request):
@@ -15,4 +14,4 @@ def safe_get_host(request):
     if isinstance(settings.ALLOWED_HOSTS, (list, tuple)) and '*' not in settings.ALLOWED_HOSTS:
         return request.get_host()
     else:
-        return MicrositeConfiguration.get_microsite_configuration_value('site_domain', settings.SITE_NAME)
+        return settings.SITE_NAME

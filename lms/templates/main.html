@@ -1,5 +1,4 @@
 <%! from django.utils.translation import ugettext as _ %>
-<%! from microsite_configuration.middleware import MicrositeConfiguration %>
 
 <%namespace name='static' file='static_content.html'/>
 <%! from django.utils import html %>
@@ -32,9 +31,10 @@
       <title>${_("Home")} | class.stanford.edu</title>
     % else:
       ## "edX" should not be translated
-      <title>${MicrositeConfiguration.get_microsite_configuration_value('platform_name', settings.PLATFORM_NAME)}</title>
+      <title>edX</title>
 
       <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
 
       <script type="text/javascript">
         /* immediately break out of an iframe if coming from the marketing website */
@@ -49,7 +49,7 @@
 
   <script type="text/javascript" src="/jsi18n/"></script>
 
-  <link rel="icon" type="image/x-icon" href="${static.url(MicrositeConfiguration.get_microsite_configuration_value('favicon_path', settings.FAVICON_PATH))}" />
+  <link rel="icon" type="image/x-icon" href="${static.url(settings.FAVICON_PATH)}" />
 
   <%static:css group='style-vendor'/>
   <%static:css group='style-app'/>
@@ -59,27 +59,8 @@
   <%static:js group='main_vendor'/>
 
   <%block name="headextra"/>
-
-<%
-  if theme_enabled():
-    header_extra_file = 'theme-head-extra.html'
-    header_file = 'theme-header.html'
-    google_analytics_file = 'theme-google-analytics.html'
-    footer_file = 'theme-footer.html'
-
-    style_overrides_file = None
-
-  else:
-    header_extra_file = None
-    header_file = MicrositeConfiguration.get_microsite_template_path('navigation.html')
-    google_analytics_file = MicrositeConfiguration.get_microsite_template_path('google_analytics.html')
-    footer_file = MicrositeConfiguration.get_microsite_template_path('footer.html')
-
-    style_overrides_file = MicrositeConfiguration.get_microsite_configuration_value('css_overrides_file')
-%>
-
-  % if header_extra_file:
-    <%include file="${header_extra_file}" />
+  % if theme_enabled():
+    <%include file="theme-head-extra.html" />
   % endif
 
   <!--[if lt IE 9]>
@@ -90,15 +71,14 @@
   <meta name="google-site-verification" content="_mipQ4AtZQDNmbtOkwehQDOgCxUUV2fb_C0b6wbiRHY" />
 
   % if not course:
-    <%include file="${google_analytics_file}" />
+    % if theme_enabled():
+      <%include file="theme-google-analytics.html" />
+    % else:
+      <%include file="google_analytics.html" />
+    % endif
   % endif
 
   <%include file="widgets/segment-io.html" />
-
-
-% if style_overrides_file:
-  <link rel="stylesheet" type="text/css" href="${static.url(style_overrides_file)}" />
-% endif
 
 </head>
 
@@ -107,17 +87,21 @@
 
   <%include file="mathjax_accessible.html" />
 
-% if not suppress_toplevel_navigation:
-  <%include file="${header_file}" />
-%endif
+% if theme_enabled():
+  <%include file="theme-header.html" />
+% elif not suppress_toplevel_navigation:
+  <%include file="navigation.html" />
+% endif
 
   <section class="content-wrapper" id="content">
     ${self.body()}
     <%block name="bodyextra"/>
   </section>
 
-% if not suppress_toplevel_navigation:
-  <%include file="${footer_file}" />
+% if theme_enabled():
+  <%include file="theme-footer.html" />
+% elif not suppress_toplevel_navigation:
+  <%include file="footer.html" />
 % endif
 
   <script>window.baseUrl = "${settings.STATIC_URL}";</script>
@@ -134,5 +118,3 @@
     html.escape(enrollment_action)
   ) if course_id and enrollment_action else ""
 }</%def>
-
-
