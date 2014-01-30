@@ -960,7 +960,7 @@ def create_account(request, post_override=None):
         return HttpResponse(json.dumps(js))
 
     # enforce password complexity as an optional feature
-    if settings.FEATURES.get('USE_PASSWORD_POLICY_ENFORCEMENT', False):
+    if settings.FEATURES.get('ENFORCE_PASSWORD_POLICY', False):
         try:
             password = post_vars['password']
 
@@ -970,7 +970,7 @@ def create_account(request, post_override=None):
         except ValidationError, err:
             js['value'] = _('Password: ') + '; '.join(err.messages)
             js['field'] = 'password'
-            return HttpResponse(json.dumps(js))
+            return JsonResponse(js, status=400)
 
     # Ok, looks like everything is legit.  Create the account.
     ret = _do_create_account(post_vars)

@@ -204,7 +204,7 @@ FEATURES = {
     'ENABLE_S3_GRADE_DOWNLOADS': False,
 
     # whether to use password policy enforcement or not
-    'USE_PASSWORD_POLICY_ENFORCEMENT': False,
+    'ENFORCE_PASSWORD_POLICY': False,
 
     # Give course staff unrestricted access to grade downloads (if set to False,
     # only edX superusers can perform the downloads)

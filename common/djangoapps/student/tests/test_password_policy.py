@@ -11,266 +11,229 @@ from mock import patch
 from django.test.utils import override_settings
 
 
-@patch.dict("django.conf.settings.FEATURES", {'USE_PASSWORD_POLICY_ENFORCEMENT': True})
+@patch.dict("django.conf.settings.FEATURES", {'ENFORCE_PASSWORD_POLICY': True})
 class TestPasswordPolicy(TestCase):
     """
     Go through some password policy tests to make sure things are properly working
     """
-
-    def check_for_post_code(self, code, url, data={}):
-            """
-            Check that we got the expected code when accessing url via POST.
-            Returns the HTTP response.
-            `self` is a class that subclasses TestCase.
-
-            `code` is a status code for HTTP responses.
-
-            `url` is a url pattern for which we want to test the response.
-            """
-            resp = self.client.post(url, data)
-            self.assertEqual(resp.status_code, code,
-                             "got code %d for url '%s'. Expected code %d"
-                             % (resp.status_code, url, code))
-            return resp
-
-    def _do_register_attempt(self, username, email, password):
-        """
-        Helper method to make the call to the do registration
-        """
-        resp = self.check_for_post_code(200, reverse('create_account'), {
-            'username': username,
-            'email': email,
-            'password': password,
+    def setUp(self):
+        super(TestPasswordPolicy, self).setUp()
+        self.url = reverse('create_account')
+        self.url_params = {
+            'username': 'foo_bar' + uuid.uuid4().hex,
+            'email': 'foo' + uuid.uuid4().hex + '@bar.com',
             'name': 'username',
             'terms_of_service': 'true',
             'honor_code': 'true',
-        })
-        data = json.loads(resp.content)
-        return data
-
-    def _get_unique_username(self):
-        """
-        Generate a random username
-        """
-        return 'foo_bar' + uuid.uuid4().hex
-
-    def _get_unique_email(self):
-        """
-        Generate a random email address
-        """
-        return 'foo' + uuid.uuid4().hex + '@bar.com'
+        }
 
     @override_settings(PASSWORD_MIN_LENGTH=6)
-    def test_password_length(self):
-        """
-        Assert that a too short password will fail and a good length one will pass
-        """
-        data = self._do_register_attempt(
-            self._get_unique_username(),
-            self._get_unique_email(),
-            'aaa'
+    def test_password_length_too_short(self):
+        self.url_params['password'] = 'aaa'
+        response = self.client.post(self.url, self.url_params)
+        self.assertEqual(response.status_code, 400)
+        obj = json.loads(response.content)
+        self.assertEqual(
+            obj['value'],
+            "Password: Invalid Length (must be 6 characters or more)",
         )
-        self.assertEqual(data['success'], False)
-        self.assertEqual(data['value'], "Password: Invalid Length (must be 6 characters or more)")
 
-        data = self._do_register_attempt(
-            self._get_unique_username(),
-            self._get_unique_email(),
-            'ThisIsALongerPassword'
-        )
-        self.assertEqual(data['success'], True)
+    @override_settings(PASSWORD_MIN_LENGTH=6)
+    def test_password_length_long_enough(self):
+        self.url_params['password'] = 'ThisIsALongerPassword'
+        response = self.client.post(self.url, self.url_params)
+        self.assertEqual(response.status_code, 200)
+        obj = json.loads(response.content)
+        self.assertTrue(obj['success'])
 
     @override_settings(PASSWORD_MAX_LENGTH=12)
-    def test_bad_too_long_password(self):
-        """
-        Assert that a password that is too long will fail
-        """
-        data = self._do_register_attempt(
-            self._get_unique_username(),
-            self._get_unique_email(),
-            'ThisPasswordIsWayTooLong'
+    def test_password_length_too_long(self):
+        self.url_params['password'] = 'ThisPasswordIsWayTooLong'
+        response = self.client.post(self.url, self.url_params)
+        self.assertEqual(response.status_code, 400)
+        obj = json.loads(response.content)
+        self.assertEqual(
+            obj['value'],
+            "Password: Invalid Length (must be 12 characters or less)",
         )
-        self.assertEqual(data['success'], False)
-        self.assertEqual(data['value'], "Password: Invalid Length (must be 12 characters or less)")
 
     @patch.dict("django.conf.settings.PASSWORD_COMPLEXITY", {'UPPER': 3})
-    def test_enough_upper_case_letters(self):
-        """
-        Assert the rules regarding minimum upper case letters in a password
-        """
-        data = self._do_register_attempt(
-            self._get_unique_username(),
-            self._get_unique_email(),
-            'thisshouldfail'
+    def test_password_not_enough_uppercase(self):
+        self.url_params['password'] = 'thisshouldfail'
+        response = self.client.post(self.url, self.url_params)
+        self.assertEqual(response.status_code, 400)
+        obj = json.loads(response.content)
+        self.assertEqual(
+            obj['value'],
+            "Password: Must be more complex (must contain 3 or more uppercase characters)",
         )
-        self.assertEqual(data['success'], False)
-        self.assertEqual(data['value'], "Password: Must be more complex (must contain 3 or more uppercase characters)")
 
-        data = self._do_register_attempt(
-            self._get_unique_username(),
-            self._get_unique_email(),
-            'ThisShouldPass'
-        )
-        self.assertEqual(data['success'], True)
+    @patch.dict("django.conf.settings.PASSWORD_COMPLEXITY", {'UPPER': 3})
+    def test_password_enough_uppercase(self):
+        self.url_params['password'] = 'ThisShouldPass'
+        response = self.client.post(self.url, self.url_params)
+        self.assertEqual(response.status_code, 200)
+        obj = json.loads(response.content)
+        self.assertTrue(obj['success'])
 
     @patch.dict("django.conf.settings.PASSWORD_COMPLEXITY", {'LOWER': 3})
-    def test_enough_lower_case_letters(self):
-        """
-        Assert the rules regarding minimum lower case letters in a password
-        """
-        data = self._do_register_attempt(
-            self._get_unique_username(),
-            self._get_unique_email(),
-            'THISSHOULDFAIL'
+    def test_password_not_enough_lowercase(self):
+        self.url_params['password'] = 'THISSHOULDFAIL'
+        response = self.client.post(self.url, self.url_params)
+        self.assertEqual(response.status_code, 400)
+        obj = json.loads(response.content)
+        self.assertEqual(
+            obj['value'],
+            "Password: Must be more complex (must contain 3 or more lowercase characters)",
         )
-        self.assertEqual(data['success'], False)
-        self.assertEqual(data['value'], "Password: Must be more complex (must contain 3 or more lowercase characters)")
 
-        data = self._do_register_attempt(
-            self._get_unique_username(),
-            self._get_unique_email(),
-            'ThisShouldPass'
+    @patch.dict("django.conf.settings.PASSWORD_COMPLEXITY", {'LOWER': 3})
+    def test_password_not_enough_lowercase(self):
+        self.url_params['password'] = 'ThisShouldPass'
+        response = self.client.post(self.url, self.url_params)
+        self.assertEqual(response.status_code, 200)
+        obj = json.loads(response.content)
+        self.assertTrue(obj['success'])
+
+    @patch.dict("django.conf.settings.PASSWORD_COMPLEXITY", {'DIGITS': 3})
+    def test_not_enough_digits(self):
+        self.url_params['password'] = 'thishasnodigits'
+        response = self.client.post(self.url, self.url_params)
+        self.assertEqual(response.status_code, 400)
+        obj = json.loads(response.content)
+        self.assertEqual(
+            obj['value'],
+            "Password: Must be more complex (must contain 3 or more digits)",
         )
-        self.assertEqual(data['success'], True)
 
     @patch.dict("django.conf.settings.PASSWORD_COMPLEXITY", {'DIGITS': 3})
     def test_enough_digits(self):
-        """
-        Assert the rules regarding minimum lower case letters in a password
-        """
-        data = self._do_register_attempt(
-            self._get_unique_username(),
-            self._get_unique_email(),
-            'thishasnodigits'
-        )
-        self.assertEqual(data['success'], False)
-        self.assertEqual(data['value'], "Password: Must be more complex (must contain 3 or more digits)")
+        self.url_params['password'] = 'Th1sSh0uldPa88'
+        response = self.client.post(self.url, self.url_params)
+        self.assertEqual(response.status_code, 200)
+        obj = json.loads(response.content)
+        self.assertTrue(obj['success'])
 
-        data = self._do_register_attempt(
-            self._get_unique_username(),
-            self._get_unique_email(),
-            'Th1sSh0uldPa88'
+    @patch.dict("django.conf.settings.PASSWORD_COMPLEXITY", {'PUNCTUATION': 3})
+    def test_not_enough_punctuations(self):
+        self.url_params['password'] = 'thisshouldfail'
+        response = self.client.post(self.url, self.url_params)
+        self.assertEqual(response.status_code, 400)
+        obj = json.loads(response.content)
+        self.assertEqual(
+            obj['value'],
+            "Password: Must be more complex (must contain 3 or more punctuation characters)",
         )
-        self.assertEqual(data['success'], True)
 
     @patch.dict("django.conf.settings.PASSWORD_COMPLEXITY", {'PUNCTUATION': 3})
     def test_enough_punctuations(self):
-        """
-        Assert the rules regarding minimum punctuation count in a password
-        """
-        data = self._do_register_attempt(
-            self._get_unique_username(),
-            self._get_unique_email(),
-            'thisshouldfail'
-        )
-        self.assertEqual(data['success'], False)
-        self.assertEqual(data['value'], "Password: Must be more complex (must contain 3 or more punctuation characters)")
-
-        data = self._do_register_attempt(
-            self._get_unique_username(),
-            self._get_unique_email(),
-            'Th!sSh.uldPa$*'
-        )
-        print 'result = {0}'.format(data)
-        self.assertEqual(data['success'], True)
+        self.url_params['password'] = 'Th!sSh.uldPa$*'
+        response = self.client.post(self.url, self.url_params)
+        self.assertEqual(response.status_code, 200)
+        obj = json.loads(response.content)
+        self.assertTrue(obj['success'])
 
     @patch.dict("django.conf.settings.PASSWORD_COMPLEXITY", {'WORDS': 3})
-    def test_enough_words(self):
-        """
-        Assert the rules regarding minimum word count in password
-        """
-        data = self._do_register_attempt(
-            self._get_unique_username(),
-            self._get_unique_email(),
-            'thisshouldfail'
-        )
-        self.assertEqual(data['success'], False)
-        self.assertEqual(data['value'], "Password: Must be more complex (must contain 3 or more unique words)")
-
-        data = self._do_register_attempt(
-            self._get_unique_username(),
-            self._get_unique_email(),
-            u'this should pass'
-        )
-        self.assertEqual(data['success'], True)
-
-    @patch.dict("django.conf.settings.PASSWORD_COMPLEXITY", {'PUNCTUATION': 3})
-    @patch.dict("django.conf.settings.PASSWORD_COMPLEXITY", {'WORDS': 3})
-    @patch.dict("django.conf.settings.PASSWORD_COMPLEXITY", {'DIGITS': 3})
-    @patch.dict("django.conf.settings.PASSWORD_COMPLEXITY", {'LOWER': 3})
-    @patch.dict("django.conf.settings.PASSWORD_COMPLEXITY", {'UPPER': 3})
-    def test_multiple_errors(self):
-        """
-        Make sure we assert against all violations
-        """
-        data = self._do_register_attempt(
-            self._get_unique_username(),
-            self._get_unique_email(),
-            'thisshouldfail'
-        )
-        self.assertEqual(data['success'], False)
+    def test_not_enough_words(self):
+        self.url_params['password'] = 'thisshouldfail'
+        response = self.client.post(self.url, self.url_params)
+        self.assertEqual(response.status_code, 400)
+        obj = json.loads(response.content)
         self.assertEqual(
-            data['value'],
-            "Password: Must be more complex ("
+            obj['value'],
+            "Password: Must be more complex (must contain 3 or more unique words)",
+        )
+
+    @patch.dict("django.conf.settings.PASSWORD_COMPLEXITY", {'WORDS': 3})
+    def test_enough_wordss(self):
+        self.url_params['password'] = u'this should pass'
+        response = self.client.post(self.url, self.url_params)
+        self.assertEqual(response.status_code, 200)
+        obj = json.loads(response.content)
+        self.assertTrue(obj['success'])
+
+    @patch.dict("django.conf.settings.PASSWORD_COMPLEXITY", {
+        'PUNCTUATION': 3,
+        'WORDS': 3,
+        'DIGITS': 3,
+        'LOWER': 3,
+        'UPPER': 3,
+    })
+    def test_multiple_errors_fail(self):
+        self.url_params['password'] = 'thisshouldfail'
+        response = self.client.post(self.url, self.url_params)
+        self.assertEqual(response.status_code, 400)
+        obj = json.loads(response.content)
+        errstring = ("Password: Must be more complex ("
             "must contain 3 or more uppercase characters, "
             "must contain 3 or more digits, "
             "must contain 3 or more punctuation characters, "
             "must contain 3 or more unique words"
-            ")"
-        )
+            ")")
+        self.assertEqual(obj['value'], errstring)
 
-        data = self._do_register_attempt(
-            self._get_unique_username(),
-            self._get_unique_email(),
-            u'tH1s Sh0u!d P3#$'
-        )
-        self.assertEqual(data['success'], True)
+    @patch.dict("django.conf.settings.PASSWORD_COMPLEXITY", {
+        'PUNCTUATION': 3,
+        'WORDS': 3,
+        'DIGITS': 3,
+        'LOWER': 3,
+        'UPPER': 3,
+    })
+    def test_multiple_errors_pass(self):
+        self.url_params['password'] = u'tH1s Sh0u!d P3#$'
+        response = self.client.post(self.url, self.url_params)
+        self.assertEqual(response.status_code, 200)
+        obj = json.loads(response.content)
+        self.assertTrue(obj['success'])
 
     @override_settings(PASSWORD_DICTIONARY=['foo', 'bar'])
     @override_settings(PASSWORD_DICTIONARY_EDIT_DISTANCE_THRESHOLD=1)
-    def test_dictionary_similarity(self):
-        """
-        Assert that passwords should not be too similar to a set of words
-        """
-        data = self._do_register_attempt(
-            self._get_unique_username(),
-            self._get_unique_email(),
-            'foo'
+    def test_dictionary_similarity_fail1(self):
+        self.url_params['password'] = 'foo'
+        response = self.client.post(self.url, self.url_params)
+        self.assertEqual(response.status_code, 400)
+        obj = json.loads(response.content)
+        self.assertEqual(
+            obj['value'],
+            "Password: Too similar to a restricted dictionary word.",
         )
-        self.assertEqual(data['success'], False)
-        self.assertEqual(data['value'], "Password: Too similar to a restricted dictionary word.")
 
-        data = self._do_register_attempt(
-            self._get_unique_username(),
-            self._get_unique_email(),
-            'bar'
+    @override_settings(PASSWORD_DICTIONARY=['foo', 'bar'])
+    @override_settings(PASSWORD_DICTIONARY_EDIT_DISTANCE_THRESHOLD=1)
+    def test_dictionary_similarity_fail2(self):
+        self.url_params['password'] = 'bar'
+        response = self.client.post(self.url, self.url_params)
+        self.assertEqual(response.status_code, 400)
+        obj = json.loads(response.content)
+        self.assertEqual(
+            obj['value'],
+            "Password: Too similar to a restricted dictionary word.",
         )
-        self.assertEqual(data['success'], False)
-        self.assertEqual(data['value'], "Password: Too similar to a restricted dictionary word.")
 
-        # try one that is just one character different from the restricted dictionary
-        data = self._do_register_attempt(
-            self._get_unique_username(),
-            self._get_unique_email(),
-            'fo0'
+    @override_settings(PASSWORD_DICTIONARY=['foo', 'bar'])
+    @override_settings(PASSWORD_DICTIONARY_EDIT_DISTANCE_THRESHOLD=1)
+    def test_dictionary_similarity_fail3(self):
+        self.url_params['password'] = 'fo0'
+        response = self.client.post(self.url, self.url_params)
+        self.assertEqual(response.status_code, 400)
+        obj = json.loads(response.content)
+        self.assertEqual(
+            obj['value'],
+            "Password: Too similar to a restricted dictionary word.",
         )
-        self.assertEqual(data['success'], False)
-        self.assertEqual(data['value'], "Password: Too similar to a restricted dictionary word.")
 
-        data = self._do_register_attempt(
-            self._get_unique_username(),
-            self._get_unique_email(),
-            u'this_is_ok'
-        )
-        self.assertEqual(data['success'], True)
+    @override_settings(PASSWORD_DICTIONARY=['foo', 'bar'])
+    @override_settings(PASSWORD_DICTIONARY_EDIT_DISTANCE_THRESHOLD=1)
+    def test_dictionary_similarity_pass(self):
+        self.url_params['password'] = 'this_is_ok'
+        response = self.client.post(self.url, self.url_params)
+        self.assertEqual(response.status_code, 200)
+        obj = json.loads(response.content)
+        self.assertTrue(obj['success'])
 
     def test_with_unicode(self):
-        """
-        Make sure the library we are using is OK with unicode characters
-        """
-        data = self._do_register_attempt(
-            self._get_unique_username(),
-            self._get_unique_email(),
-            u'四節比分和七年前'
-        )
-        self.assertEqual(data['success'], True)
+        self.url_params['password'] = u'四節比分和七年前'
+        response = self.client.post(self.url, self.url_params)
+        self.assertEqual(response.status_code, 200)
+        obj = json.loads(response.content)
+        self.assertTrue(obj['success'])
