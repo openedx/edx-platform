@@ -210,7 +210,7 @@
 
 
                 it('bind all the caption link', function () {
-                    $('.subtitles li[datindex]').each(
+                    $('.subtitles li[data-index]').each(
                         function (index, link) {
 
                         expect($(link)).toHandleWith(
@@ -457,7 +457,7 @@
                 expect(Caption.loaded).toBeTruthy();
             });
 
-            msg = 'on success: change language on touch devices and when ' +
+            msg = 'on success: change language on touch devices when ' +
                  'captions have not rendered yet';
             it(msg, function () {
                 state.isTouch = true;
