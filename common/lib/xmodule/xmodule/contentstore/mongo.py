@@ -67,7 +67,8 @@ class MongoContentStore(ContentStore):
 
         if self.delete_from_cache:
             self.delete_from_cache(
-                Location(*[content_id[i] for i in  ['tag', 'org', 'course', 'category', 'name']])
+                StaticContent.compute_location(
+                    content_id['org'], content_id['course'], content_id['name'], content_id['revision'])
             )
 
 
