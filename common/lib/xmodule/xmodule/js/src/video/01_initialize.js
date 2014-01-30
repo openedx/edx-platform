@@ -278,7 +278,7 @@ function (VideoPlayer, CookieStorage) {
                     return regExp.test(value.toString());
                 },
                 // List of keys that will be extracted form the configuration.
-                extractKeys = ['speed', 'language'],
+                extractKeys = ['speed', 'transcript-language'],
                 // Compatibility keys used to change names of some parameters in
                 // the final configuration.
                 compatKeys = {
@@ -387,8 +387,9 @@ function (VideoPlayer, CookieStorage) {
                 el.data('speed') ||
                 storage.getItem('general_speed') ||
                 el.data('general-speed') ||
-                '1.0';
-            lang = storage.getItem('language') || el.data('language') || 'en';
+                '1.0',
+
+            lang = storage.getItem('language') || el.data('transcript-language') || 'en';
 
         if (isTouch) {
             el.addClass('is-touch');

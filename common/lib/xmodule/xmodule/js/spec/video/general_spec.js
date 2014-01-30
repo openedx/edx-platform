@@ -258,7 +258,7 @@
 
         it('getCurrentLanguage', function () {
             loadFixtures('video.html');
-            $('.video').data('language', 'de');
+            $('.video').data('transcript-language', 'de');
             state = new Video('#example');
 
             expect(state.getCurrentLanguage()).toBe('de');

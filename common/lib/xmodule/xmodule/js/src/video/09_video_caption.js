@@ -106,14 +106,14 @@ function () {
      */
     function renderElements() {
         var Caption = this.videoCaption,
-            transcripts = this.config.transcripts;
+            languages = this.config.transcriptLanguages;
         Caption.loaded = false;
 
         Caption.subtitlesEl = this.el.find('ol.subtitles');
         Caption.container = this.el.find('.lang');
         Caption.hideSubtitlesEl = this.el.find('a.hide-subtitles');
 
-        if (transcripts && _.keys(transcripts).length > 1) {
+        if (languages && _.keys(languages).length > 1) {
             Caption.showLanguageMenu = true;
             Caption.renderLanguages();
         }
@@ -295,7 +295,7 @@ function () {
         var self = this,
             menu = $('<ol class="langs-list menu">'),
             currentLang = this.getCurrentLanguage(),
-            langsList = this.config.transcripts;
+            langsList = this.config.transcriptLanguages;
 
         $.each(langsList, function(code, label) {
             var li = $('<li data-lang-code="' + code + '" />'),

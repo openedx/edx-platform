@@ -109,7 +109,7 @@
                 describe('is rendered', function () {
                     it('if languages more than 1', function () {
                         state = jasmine.initializePlayer();
-                        var transcripts = state.config.transcripts,
+                        var transcripts = state.config.transcriptLanguages,
                             langCodes = _.keys(transcripts),
                             langLabels = _.values(transcripts);
 
@@ -168,7 +168,7 @@
                 describe('is not rendered', function () {
                     it('if just 1 language', function () {
                         state = jasmine.initializePlayer(null, {
-                            'transcripts': {"en": "English"}
+                            'transcriptLanguages': {"en": "English"}
                         });
 
                         expect($('.langs-list')).not.toExist();
