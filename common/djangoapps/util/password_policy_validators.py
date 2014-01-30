@@ -82,11 +82,11 @@ def validate_password_dictionary(value):
     """
     Insures that the password is not too similar to a defined set of dictionary words
     """
-    password_match_threshold = getattr(settings, "PASSWORD_MATCH_THRESHOLD", None)
+    password_max_edit_distance = getattr(settings, "PASSWORD_DICTIONARY_EDIT_DISTANCE_THRESHOLD", None)
     password_dictionary = getattr(settings, "PASSWORD_DICTIONARY", None)
 
-    if password_match_threshold and password_dictionary:
+    if password_max_edit_distance and password_dictionary:
         for word in password_dictionary:
-            distance = nltk.metrics.distance.binary_distance(value, word)
-            if distance <= password_match_threshold:
-                raise ValidationError(_("Based on a dictionary word."), code="dictionary_word")
+            distance = nltk.metrics.distance.edit_distance(value, word)
+            if distance <= password_max_edit_distance:
+                raise ValidationError(_("Too similar to a restricted dictionary word."), code="dictionary_word")
