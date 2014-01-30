@@ -159,7 +159,7 @@ class VideoFields(object):
         default={}
         )
 
-    language = String(
+    transcripts_language = String(
         help="Preferred language for transcripts",
         display_name="Preferred language for transcripts",
         scope=Scope.preferences,
@@ -206,11 +206,11 @@ class VideoModule(VideoFields, XModule):
     js_module_name = "Video"
 
     def handle_ajax(self, dispatch, data):
-        ACCEPTED_KEYS = ['speed', 'language']
+        accepted_keys = ['speed', 'transcripts_language']
 
         if dispatch == 'save_user_state':
             for key in data:
-                if hasattr(self, key) and key in ACCEPTED_KEYS:
+                if hasattr(self, key) and key in accepted_keys:
                     setattr(self, key, json.loads(data[key]))
                     if key == 'speed':
                         self.global_speed = self.speed
@@ -240,17 +240,18 @@ class VideoModule(VideoFields, XModule):
             elif self.sub:
                 track_url = self.runtime.handler_url(self, 'download_transcript')
 
-        if self.language in self.transcripts:
-            current_language = self.language
+        if self.transcripts_language in self.transcripts:
+            transcripts_language = self.transcripts_language
         elif self.sub:
-            current_language = 'en'
+            transcripts_language = 'en'
         elif self.transcripts:
-            current_language = self.transcripts.keys()[0]
+            transcripts_language = self.transcripts.keys()[0]
         else:
             # this for the case, when for currently selected video,
             # there are no translations and English subtitles are not set by instructor.
-            current_language = json.dumps(None)
+            transcripts_language = json.dumps(None)
 
+        transcripts_languages = {k: settings.ALL_LANGUAGES[k] for k in self.transcripts}
 
         return self.system.render_template('video.html', {
             'ajax_url': self.system.ajax_url + '/save_user_state',
@@ -273,8 +274,8 @@ class VideoModule(VideoFields, XModule):
             # configuration setting field.
             'yt_test_timeout': 1500,
             'yt_test_url': settings.YOUTUBE_TEST_URL,
-            'language': current_language,
-            'transcripts': json.dumps(self.transcripts),
+            'transcripts_language': transcripts_language,
+            'transcripts_languages': json.dumps(transcripts_languages),
             'transcript_translation_url': self.runtime.handler_url(self, 'transcript_translation')
         })
 
@@ -315,17 +316,17 @@ class VideoModule(VideoFields, XModule):
         request.GET should contain language code, for example: en".
         """
         try:
-            language = request.GET.get('language')
+            transcripts_language = request.GET.get('language')
         except Exception:
             log.info("Invalid download_transcript GET request parameters.")
             return Response(status=400)
 
-        if language not in ['en'].extend(self.transcripts):
+        if transcripts_language not in ['en'].extend(self.transcripts):
             log.info("transcript_translation is not available for given language.")
             return Response(status=404)
 
         try:
-            subs = self.get_transcript(language)
+            subs = self.get_transcript(transcripts_language)
         except (NotFoundError):
             log.debug("Can't find content in storage for %s transcript", self.sub)
             return Response(status=404)
@@ -351,15 +352,15 @@ class VideoModule(VideoFields, XModule):
         """
         try:
             video_id = request.GET.get('videoId')
-            language = request.GET.get('language')
+            transcripts_language = request.GET.get('language')
         except Exception:
             log.info("Invalid transcript_translation GET request parameters.")
             return Response(status=400)
 
-        if language != self.language:
-            self.language = language
+        if transcripts_language != self.transcripts_language:
+            self.transcripts_language = transcripts_language
 
-        if language == 'en':
+        if transcripts_language == 'en':
             if self.sub:
                 filename = 'subs_{0}.srt.sjson'.format(self.sub)
                 content_location = StaticContent.compute_location(
@@ -373,7 +374,7 @@ class VideoModule(VideoFields, XModule):
                 log.info("transcript_translation is not available for given language.")
                 return Response(status=404)
 
-        if language not in self.transcripts:
+        if transcripts_language not in self.transcripts:
             log.info("transcript_translation is not available for given language.")
             return Response(status=404)
 
@@ -392,7 +393,7 @@ class VideoModule(VideoFields, XModule):
             return Response(status=404)
 
         speed = youtube_ids[video_id]
-        filename = '{0}_subs_{1}.srt.sjson'.format(language, video_id)
+        filename = '{0}_subs_{1}.srt.sjson'.format(transcripts_language, video_id)
         content_location = StaticContent.compute_location(
             self.location.org, self.location.course, filename
         )
@@ -407,7 +408,7 @@ class VideoModule(VideoFields, XModule):
                 content_location_1_0 = StaticContent.compute_location(
                     self.location.org,
                     self.location.course,
-                    '{0}_subs_{1}.srt.sjson'.format(language, self.youtube_id_1_0)
+                    '{0}_subs_{1}.srt.sjson'.format(transcripts_language, self.youtube_id_1_0)
                 )
                 try:
                     sjson_transcripts_1_0 = contentstore().find(content_location_1_0)
@@ -419,13 +420,13 @@ class VideoModule(VideoFields, XModule):
             if generate_1_0_version: #generating for all speeds
                 try:
                     content_location_uploaded_srt = StaticContent.compute_location(
-                        self.location.org, self.location.course, self.transcripts[language]
+                        self.location.org, self.location.course, self.transcripts[transcripts_language]
                     )
                     srt_transcripts = contentstore().find(content_location_uploaded_srt)
                 except (NotFoundError):
-                    log.info("No srt file for language %s for transcript", language)
+                    log.info("No srt file for language %s for transcript", transcripts_language)
                     return Response(status=404)
-                source_subs_ext = os.path.splitext(self.transcripts[language])[1][1:]
+                source_subs_ext = os.path.splitext(self.transcripts[transcripts_language])[1][1:]
                 source_subs_filedata = json.loads(srt_transcripts)
                 try:
                     generate_subs_from_source(
@@ -433,7 +434,7 @@ class VideoModule(VideoFields, XModule):
                         source_subs_ext,
                         source_subs_filedata,
                         self,
-                        language
+                        transcripts_language
                     )
                 except Exception as exc:
                     log.info(exc.msg)
@@ -444,7 +445,7 @@ class VideoModule(VideoFields, XModule):
                 # at this point we should have srt.sjson for speed 1.0 in database
                 source_subs = json.loads(contentstore().find(content_location_1_0))
                 subs = generate_subs(youtube_ids[video_id], 1.0, source_subs)
-                save_subs_to_store(subs, video_id, self, language)
+                save_subs_to_store(subs, video_id, self, transcripts_language)
                 sjson_transcripts = json.dumps(subs, indent=2)
 
         response = Response(sjson_transcripts.data)
@@ -604,10 +605,10 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
             xml.append(ele)
 
         # sorting for easy testing of resulting xml
-        for language in sorted(self.transcripts.keys()):
+        for transcripts_language in sorted(self.transcripts.keys()):
             ele = etree.Element('transcript')
-            ele.set('language', language)
-            ele.set('src', self.transcripts[language])
+            ele.set('language', transcripts_language)
+            ele.set('src', self.transcripts[transcripts_language])
             xml.append(ele)
 
         return xml
