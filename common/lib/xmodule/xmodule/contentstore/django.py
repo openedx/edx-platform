@@ -1,9 +1,7 @@
 from __future__ import absolute_import
 from importlib import import_module
 
-
 from django.conf import settings
-from cache_toolbox.core import del_cached_content
 
 _CONTENTSTORE = {}
 
@@ -26,6 +24,7 @@ def contentstore(name='default', delete_from_toolbox_cache=False):
         options.update(settings.CONTENTSTORE['DOC_STORE_CONFIG'])
 
         if delete_from_toolbox_cache == True:
+            from cache_toolbox.core import del_cached_content
             options.update({'delete_from_cache': del_cached_content})
 
         if 'ADDITIONAL_OPTIONS' in settings.CONTENTSTORE:
