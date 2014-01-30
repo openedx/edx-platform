@@ -43,7 +43,7 @@ class TestLTI(BaseTestXmodule):
             u'launch_presentation_return_url': '',
             u'lti_message_type': u'basic-lti-launch-request',
             u'lti_version': 'LTI-1p0',
-            u'role': u'student',
+            u'roles': u'Student',
 
             u'resource_link_id': module_id,
             u'lis_result_sourcedid': sourcedId,
