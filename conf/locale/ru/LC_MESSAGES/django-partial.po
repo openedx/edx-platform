@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
 "POT-Creation-Date: 2014-01-30 13:12+0400\n"
-"PO-Revision-Date: 2013-11-29 17:59+0300\n"
+"PO-Revision-Date: 2014-01-30 13:29+0300\n"
 "Last-Translator: JK <korvin.lucky@gmail.com>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
@@ -2229,35 +2229,35 @@ msgstr "Copyright"
 
 #: lms/djangoapps/branding/views.py:78
 msgid "Economy"
-msgstr ""
+msgstr "Экономика"
 
 #: lms/djangoapps/branding/views.py:79
 msgid "French Language"
-msgstr ""
+msgstr "Французский язык"
 
 #: lms/djangoapps/branding/views.py:80
 msgid "English Language"
-msgstr ""
+msgstr "Английский язык"
 
 #: lms/djangoapps/branding/views.py:81
 msgid "German Language"
-msgstr ""
+msgstr "Немецкий язык"
 
 #: lms/djangoapps/branding/views.py:82
 msgid "Literature"
-msgstr ""
+msgstr "Литература"
 
 #: lms/djangoapps/branding/views.py:83
 msgid "Natural Science"
-msgstr ""
+msgstr "Естествознание"
 
 #: lms/djangoapps/branding/views.py:84
 msgid "Ecology"
-msgstr ""
+msgstr "Экология"
 
 #: lms/djangoapps/branding/views.py:85
 msgid "Technology"
-msgstr ""
+msgstr "Технология"
 
 #: lms/djangoapps/branding/views.py:86
 #, fuzzy
@@ -2266,47 +2266,47 @@ msgstr "Социальный педагог"
 
 #: lms/djangoapps/branding/views.py:87
 msgid "Law"
-msgstr ""
+msgstr "Право"
 
 #: lms/djangoapps/branding/views.py:88
 msgid "Astronomy"
-msgstr ""
+msgstr "Астрономия"
 
 #: lms/djangoapps/branding/views.py:89
 msgid "Biology"
-msgstr ""
+msgstr "Биология"
 
 #: lms/djangoapps/branding/views.py:90
 msgid "World Art"
-msgstr ""
+msgstr "МХК"
 
 #: lms/djangoapps/branding/views.py:91
 msgid "Mathematics"
-msgstr ""
+msgstr "Математика"
 
 #: lms/djangoapps/branding/views.py:92
 msgid "Russian Language"
-msgstr ""
+msgstr "Русский язык"
 
 #: lms/djangoapps/branding/views.py:93
 msgid "Chemistry"
-msgstr ""
+msgstr "Химия"
 
 #: lms/djangoapps/branding/views.py:94
 msgid "Physical Culture"
-msgstr ""
+msgstr "Физическая культура"
 
 #: lms/djangoapps/branding/views.py:95
 msgid "Physics"
-msgstr ""
+msgstr "Физика"
 
 #: lms/djangoapps/branding/views.py:96
 msgid "Geography"
-msgstr ""
+msgstr "География"
 
 #: lms/djangoapps/branding/views.py:97
 msgid "OBG"
-msgstr ""
+msgstr "ОБЖ"
 
 #: lms/djangoapps/branding/views.py:98 lms/templates/wiki/history.html:5
 #, fuzzy
@@ -2315,27 +2315,27 @@ msgstr "Посмотреть историю"
 
 #: lms/djangoapps/branding/views.py:99
 msgid "Computer Science"
-msgstr ""
+msgstr "Информатика"
 
 #: lms/djangoapps/branding/views.py:100
 msgid "Psychology"
-msgstr ""
+msgstr "Психология"
 
 #: lms/djangoapps/branding/views.py:105
 msgid "Advanced training courses"
-msgstr ""
+msgstr "Курсы повышения квалификации"
 
 #: lms/djangoapps/branding/views.py:106
 msgid "Training for the Olympics"
-msgstr ""
+msgstr "Подготовка к олимпиаде"
 
 #: lms/djangoapps/branding/views.py:107
 msgid "Extra children's education"
-msgstr ""
+msgstr "Дополнительное образование детей"
 
 #: lms/djangoapps/branding/views.py:108
 msgid "Supplementary courses"
-msgstr ""
+msgstr "Вспомогательный курс"
 
 #: lms/djangoapps/courseware/features/video.py:111
 msgid "ERROR: No playable video sources found!"

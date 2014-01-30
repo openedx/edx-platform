@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
 "POT-Creation-Date: 2014-01-30 13:12+0400\n"
-"PO-Revision-Date: 2013-11-29 19:04+0300\n"
+"PO-Revision-Date: 2014-01-30 13:26+0300\n"
 "Last-Translator: JK <korvin.lucky@gmail.com>\n"
 "Language-Team: Select LTD\n"
 "Language: ru\n"
@@ -470,28 +470,24 @@ msgid "Expand All Sections"
 msgstr "Развернуть все разделы"
 
 #: cms/static/js/views/overview.js:99 cms/templates/overview.html:190
-#, fuzzy
 msgid "Release date:"
-msgstr "Дата начала"
+msgstr "Дата публикации:"
 
 #: cms/static/js/views/overview.js:100
 msgid "{month}/{day}/{year} at {hour}:{minute} UTC"
 msgstr "{day}/{month}/{year} в {hour}:{minute} UTC"
 
 #: cms/static/js/views/overview.js:103 cms/templates/overview.html:192
-#, fuzzy
 msgid "Edit section release date"
-msgstr "Дата начала раздела"
+msgstr "Изменить дату публикации:"
 
 #: cms/static/js/views/paging.js:87
-#, fuzzy
 msgid "ascending"
-msgstr "ожидание"
+msgstr "возрастание"
 
 #: cms/static/js/views/paging.js:89
-#, fuzzy
 msgid "descending"
-msgstr "ожидание"
+msgstr "убывание"
 
 #: cms/static/js/views/paging_header.js:42
 #, python-format
@@ -2104,7 +2100,6 @@ msgid "Schedule"
 msgstr "Расписание"
 
 #: cms/templates/overview.html:197
-#, fuzzy
 msgid "Delete section"
 msgstr "Удалить этот раздел"
 
@@ -2122,7 +2117,6 @@ msgid "Delete this subsection"
 msgstr "Удалить этот подраздел"
 
 #: cms/templates/overview.html:234
-#, fuzzy
 msgid "Delete subsection"
 msgstr "Удалить этот подраздел"
 
@@ -3905,9 +3899,8 @@ msgstr ""
 "сдавать"
 
 #: common/lib/xmodule/xmodule/capa_module.py:103
-#, fuzzy
 msgid "Show Answer"
-msgstr "Показать ответы:"
+msgstr "Показать ответ"
 
 #: common/lib/xmodule/xmodule/capa_module.py:104
 msgid ""
@@ -4605,9 +4598,8 @@ msgid "Use drag and drop to reorder the content in your course."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py:280
-#, fuzzy
 msgid "Renaming Sections"
-msgstr "Настройки оценивания"
+msgstr "Переименование разделов"
 
 #: common/lib/xmodule/xmodule/course_module.py:281
 msgid "Rename Sections by clicking the Section name from the Course Outline."
@@ -4797,9 +4789,8 @@ msgid "General"
 msgstr "Основной раздел"
 
 #: common/lib/xmodule/xmodule/discussion_module.py:25
-#, fuzzy
 msgid "Category"
-msgstr "Название категории"
+msgstr "Категория"
 
 #: common/lib/xmodule/xmodule/discussion_module.py:26
 msgid "Week 1"
@@ -4988,7 +4979,6 @@ msgid "Whether this student has voted on the poll"
 msgstr "Число попыток студента ответить на эту задачу."
 
 #: common/lib/xmodule/xmodule/poll_module.py:33
-#, fuzzy
 msgid "Student answer"
 msgstr "Ответ студента"
 
@@ -5010,9 +5000,8 @@ msgid "Display name for this module."
 msgstr "Отображаемое имя для этого объекта."
 
 #: common/lib/xmodule/xmodule/video_module.py:43
-#, fuzzy
 msgid "Video"
-msgstr "видео"
+msgstr "Видео"
 
 #: common/lib/xmodule/xmodule/video_module.py:47
 msgid "Current position in the video"
@@ -5509,118 +5498,111 @@ msgstr "Выберите Вашу секцию:"
 
 #: lms/djangoapps/branding/views.py:78
 msgid "Economy"
-msgstr ""
+msgstr "Экономика"
 
 #: lms/djangoapps/branding/views.py:79
 msgid "French Language"
-msgstr ""
+msgstr "Французский язык"
 
 #: lms/djangoapps/branding/views.py:80
 msgid "English Language"
-msgstr ""
+msgstr "Английский язык"
 
 #: lms/djangoapps/branding/views.py:81
 msgid "German Language"
-msgstr ""
+msgstr "Немецкий язык"
 
 #: lms/djangoapps/branding/views.py:82
-#, fuzzy
 msgid "Literature"
-msgstr "Лекции"
+msgstr "Литература"
 
 #: lms/djangoapps/branding/views.py:83
-#, fuzzy
 msgid "Natural Science"
-msgstr "Реальный размер"
+msgstr "Естествознание"
 
 #: lms/djangoapps/branding/views.py:84
 msgid "Ecology"
-msgstr ""
+msgstr "Экология"
 
 #: lms/djangoapps/branding/views.py:85
 msgid "Technology"
-msgstr ""
+msgstr "Технология"
 
 #: lms/djangoapps/branding/views.py:86
-#, fuzzy
 msgid "Social Studies"
-msgstr "Социальный педагог"
+msgstr "Обществознание"
 
 #: lms/djangoapps/branding/views.py:87
 msgid "Law"
-msgstr ""
+msgstr "Право"
 
 #: lms/djangoapps/branding/views.py:88
 msgid "Astronomy"
-msgstr ""
+msgstr "Астрономия"
 
 #: lms/djangoapps/branding/views.py:89
 msgid "Biology"
-msgstr ""
+msgstr "Биология"
 
 #: lms/djangoapps/branding/views.py:90
 msgid "World Art"
-msgstr ""
+msgstr "МХК"
 
 #: lms/djangoapps/branding/views.py:91
 msgid "Mathematics"
-msgstr ""
+msgstr "Математика"
 
 #: lms/djangoapps/branding/views.py:92
 msgid "Russian Language"
-msgstr ""
+msgstr "Русский язык"
 
 #: lms/djangoapps/branding/views.py:93
 msgid "Chemistry"
-msgstr ""
+msgstr "Химия"
 
 #: lms/djangoapps/branding/views.py:94
 msgid "Physical Culture"
-msgstr ""
+msgstr "Физическая культура"
 
 #: lms/djangoapps/branding/views.py:95
 msgid "Physics"
-msgstr ""
+msgstr "Физика"
 
 #: lms/djangoapps/branding/views.py:96
 msgid "Geography"
-msgstr ""
+msgstr "География"
 
 #: lms/djangoapps/branding/views.py:97
 msgid "OBG"
-msgstr ""
+msgstr "ОБЖ"
 
 #: lms/djangoapps/branding/views.py:98
-#, fuzzy
 msgid "History"
-msgstr "Посмотреть историю"
+msgstr "История"
 
 #: lms/djangoapps/branding/views.py:99
-#, fuzzy
 msgid "Computer Science"
-msgstr "например Введение в Математический Анализ"
+msgstr "Информатика"
 
 #: lms/djangoapps/branding/views.py:100
 msgid "Psychology"
-msgstr ""
+msgstr "Психология"
 
 #: lms/djangoapps/branding/views.py:105
-#, fuzzy
 msgid "Advanced training courses"
-msgstr "Расширенные настройки"
+msgstr "Курсы повышения квалификации"
 
 #: lms/djangoapps/branding/views.py:106
 msgid "Training for the Olympics"
-msgstr ""
+msgstr "Подготовка к олимпиаде"
 
 #: lms/djangoapps/branding/views.py:107
 msgid "Extra children's education"
-msgstr ""
+msgstr "Дополнительное образование детей"
 
 #: lms/djangoapps/branding/views.py:108
-#, fuzzy
 msgid "Supplementary courses"
-msgstr "Текущие курсы"
+msgstr "Вспомогательные курсы"
 
 #: lms/djangoapps/courseware/features/video.py:111 lms/templates/video.html:55
 msgid "ERROR: No playable video sources found!"
@@ -5672,7 +5654,7 @@ msgstr "Неверный пароль"
 #: lms/djangoapps/dashboard/sysadmin.py:150
 #: lms/djangoapps/dashboard/tests/test_sysadmin.py:275
 msgid "All ok!"
-msgstr ""
+msgstr "Все в порядке!"
 
 #: lms/djangoapps/dashboard/sysadmin.py:157
 #: lms/djangoapps/dashboard/sysadmin.py:229
@@ -6119,7 +6101,6 @@ msgid "List of Staff"
 msgstr "Список преподавателей"
 
 #: lms/djangoapps/instructor/views/legacy.py:528
-#, fuzzy
 msgid "List of Instructors"
 msgstr "Инструкторы курса"
 
@@ -6161,15 +6142,15 @@ msgid "Failed to send email! ({error_message})"
 msgstr "Не удалось отправить электронное письмо. Причина: {error_message}"
 
 #: lms/djangoapps/instructor/views/legacy.py:760
-#, fuzzy
 msgid ""
 "Your email was successfully queued for sending. Please note that for large "
 "classes, it may take up to an hour (or more, if other courses are "
 "simultaneously sending email) to send all emails."
 msgstr ""
 "Ваше электронное письмо успешно поставлено в очередь для отправки. Не "
-"забудьте, что для больших открытых курсов (~10к), это можнт занять около 1-2 "
-"часов для отправки всех писем."
+"забудьте, что для больших открытых курсов, отправка всех писем может занять "
+"около 1-2 часов (и даже больше при одновременной рассылке писем из "
+"нескольких курсов)"
 
 #: lms/djangoapps/instructor/views/legacy.py:767
 msgid "Your email was successfully queued for sending."
@@ -7267,21 +7248,19 @@ msgstr "Курсы"
 #: lms/templates/courses_list.html:26 lms/templates/courses_list.html:32
 #: lms/templates/courses_list.html:38
 msgid "All"
-msgstr ""
+msgstr "Все"
 
 #: lms/templates/courses_list.html:27
-#, fuzzy
 msgid "Current"
-msgstr "Текущая роль:"
+msgstr "Текущае"
 
 #: lms/templates/courses_list.html:29
 msgid "Past"
-msgstr ""
+msgstr "Прошедшие"
 
 #: lms/templates/courses_list.html:43
-#, fuzzy
 msgid "Search"
-msgstr "Поиск сообщений"
+msgstr "Поиск"
 
 #: lms/templates/dashboard.html:14
 msgid "Dashboard"
@@ -12218,9 +12197,8 @@ msgstr ""
 #: lms/templates/wiki/includes/article_menu.html:30
 #: lms/templates/wiki/includes/article_menu.html:40
 #: lms/templates/wiki/includes/article_menu.html:56
-#, fuzzy
 msgid "{span_start}active{span_end}"
-msgstr "Войдите в {span_start}{platform_name}{span_end}"
+msgstr "{span_start}активен{span_end}"
 
 #~ msgid "advanced"
 #~ msgstr "другие"
