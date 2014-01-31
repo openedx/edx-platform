@@ -414,6 +414,7 @@ class MidCourseReverifyView(View):
             return render_to_response("verify_student/midcourse_photo_reverification.html", context)
 
 
+@login_required
 def midcourse_reverify_dash(request):
     """
     Shows the "course reverification dashboard", which displays the reverification status (must reverify,
@@ -436,6 +437,7 @@ def midcourse_reverify_dash(request):
         "user_full_name": user.profile.name,
         'reverifications': reverifications,
         'referer': request.META.get('HTTP_REFERER'),
+        'billing_email': settings.PAYMENT_SUPPORT_EMAIL,
     }
     return render_to_response("verify_student/midcourse_reverify_dash.html", context)
 

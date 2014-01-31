@@ -489,6 +489,7 @@ def dashboard(request):
                'verification_msg': verification_msg,
                'show_refund_option_for': show_refund_option_for,
                'denied_banner': denied_banner,
+               'billing_email': settings.PAYMENT_SUPPORT_EMAIL,
                }
 
     return render_to_response('dashboard.html', context)

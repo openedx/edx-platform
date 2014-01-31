@@ -154,7 +154,6 @@
               </div>
 
 
-              <!-- TODO janky -->
               <img id="face_image" src="" style="display: none;"/>
 
               <nav class="nav-wizard" id="face_id_next_button_nav">
@@ -176,7 +175,7 @@
                     <form id="reverify_form" method="post">
                       <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
                       <input type="hidden" name="course_id" value="${course_id}">
-                      <input class="action-primary disabled" type="button" id="midcourse_reverify_button" value="Submit photos &amp; re-verify" name="payment">
+                      <input class="action-primary disabled" type="button" id="midcourse_reverify_button" value="${_('Submit photos &amp; re-verify')}" name="payment">
                     </form>
                   </li>
                 </ol>

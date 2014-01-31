@@ -1,7 +1,5 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
-<!--TODO replace this with something a clever deisgn person approves of-->
-<!--TODO replace this with a shiny loopy thing to actually print out all courses-->
 
 % if reverifications["must_reverify"]:
   % if len(reverifications["must_reverify"]) > 1:
@@ -17,14 +15,14 @@
             <ul class="reverify-list">
               % for item in reverifications["must_reverify"]:
                 <li class="item">
-                  ${_('<strong>{course_name}</strong>: Re-verify by {date}').format(course_name=item.course_name, date=item.date)}
+                  ${_('{course_name}: Re-verify by {date}').format(course_name="<strong>item.course_name</strong>", date=item.date)}
                 </li>
               % endfor
             </ul>
           </div>
         </div>
         <nav class="nav-actions">
-          <h3 class="sr">Notification Actions</h3>
+          <h3 class="sr">${_('Notification Actions')}</h3>
           <ul>
             <li class="nav-item"><a class="btn action-primary action-reverify" href="${reverse('verify_student_midcourse_reverify_dash')}">Re-verify</a></li>
           </ul>
@@ -41,12 +39,12 @@
           % for item in reverifications["must_reverify"]:
           <div class="copy">
             <p class='activation-message'>
-              ${_('To continue in the ID Verified track in <strong>{course_name}</strong>, you need to re-verify your identity by {date}.').format(course_name=item.course_name, date=item.date)}
+              ${_('To continue in the ID Verified track in {course_name}, you need to re-verify your identity by {date}.').format(course_name="<strong>" + item.course_name + "</strong>", date=item.date)}
             </p>
           </div>
         </div>
         <nav class="nav-actions">
-          <h3 class="sr">Notification Actions</h3>
+          <h3 class="sr">${_('Notification Actions')}</h3>
           <ul>
             <li class="nav-item"><a class="btn action-primary action-reverify" href="${reverse('verify_student_midcourse_reverify_dash')}">Re-verify</a></li>
           </ul>
@@ -67,12 +65,14 @@
         % if item.display:
         <div class="copy">
           <p class='activation-message'>
-            ${_('Your re-verification for <strong>{course_name}</strong> failed and you are no longer eligible for a Verified Certificate.  If you think this is in error, please contact us at support@edx.org.').format(course_name=item.course_name)}
+            ${_('Your re-verification for {course_name} failed and you are no longer eligible for a Verified Certificate.  If you think this is in error, please contact us at {email}.').format(course_name="<strong>" + item.course_name+ "</strong>", email='<a class="contact-link" href="mailto:{email}">{email}</a>'.format(
+                email=billing_email
+              ))}
           </p>
         </div>
       </div>
       <div class="action-dismiss">
-        <button class="button-dismiss" id="failed-verification-button-dismiss"><i class="icon-remove-sign"></i> <span class="sr">Dismiss</span></button>
+        <button class="button-dismiss" id="failed-verification-button-dismiss"><i class="icon-remove-sign"></i> <span class="sr">${_('Dismiss')}</span></button>
       </div>
     </div>
   </div>

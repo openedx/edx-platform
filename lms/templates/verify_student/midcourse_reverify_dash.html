@@ -18,76 +18,76 @@
 
         <div class="copy">
 
-          % if reverifications["must_reverify"]: # if 1st IF YOU HAVE REVERIFIES
-            % if len(reverifications["must_reverify"]) > 1: # if 2nd IF YOU HAVE >1 REVERIFIES
+          % if reverifications["must_reverify"]: # If you have reverifications to do
+            % if len(reverifications["must_reverify"]) > 1: # If you have >1 reverifications
               <div class="wrapper-reverify-open">
                 <h3 class="title">${_("You currently need to re-verify for the following courses:")}</h3>
                 <ul class="reverification-list">
-                % for course_id, course_name, course_number, date, status, display in reverifications["must_reverify"]: # for 1st
+                % for item in reverifications["must_reverify"]: # for 1st
                   <li class="item">
                     <div class="course-info">
-                      <h3 class="course-name">${course_name} (${course_number})</h3>
-                      <p class="deadline">Re-verify by <strong>${date}</strong></p>
+                      <h3 class="course-name">${item.course_name} (${item.course_number})</h3>
+                      <p class="deadline">${_('Re-verify by {date}').format(date="<strong>" + item.date + "</strong>")}</p>
                     </div>
-                    <p class="reverify-status"><a class="btn action-primary action-reverify" href="${reverse('verify_student_midcourse_reverify', kwargs={'course_id': course_id})}">Re-verify for ${course_number}</a></p>
-                  </li>
-                % endfor # closed for 1st
-                </ul>
-              </div>
-
-            % elif reverifications["must_reverify"]: # con't 2nd if
-              <div class="wrapper-reverify-open">
-                <h3 class="title">${_("You currently need to re-verify for the following course:")}</h3>
-
-                <ul class="reverification-list">
-                % for course_id, course_name, course_number, date, status, display in reverifications["must_reverify"]:
-                  <li class="item">
-                    <div class="course-info">
-                      <h3 class="course-name">${course_name} (${course_number})</h3>
-                      <p class="deadline">Re-verify by <strong>${date}</strong></p>
-                    </div>
-                    <p class="reverify-status"><a class="btn action-primary action-reverify" href="${reverse('verify_student_midcourse_reverify', kwargs={'course_id': course_id})}">Re-verify for ${course_number}</a></p>
+                    <p class="reverify-status"><a class="btn action-primary action-reverify" href="${reverse('verify_student_midcourse_reverify', kwargs={'course_id': item.course_id})}">Re-verify for ${item.course_number}</a></p>
                   </li>
                 % endfor
                 </ul>
               </div>
-          %endif #close 2nd if
+
+            % else: # You only have one reverification
+              <div class="wrapper-reverify-open">
+                <h3 class="title">${_("You currently need to re-verify for the following course:")}</h3>
+
+                <ul class="reverification-list">
+                % for item in reverifications["must_reverify"]:
+                  <li class="item">
+                    <div class="course-info">
+                      <h3 class="course-name">${item.course_name} (${item.course_number})</h3>
+                      <p class="deadline">${_('Re-verify by {date}').format(date="<strong>" + item.date + "</strong>")}</p>
+                    </div>
+                    <p class="reverify-status"><a class="btn action-primary action-reverify" href="${reverse('verify_student_midcourse_reverify', kwargs={'course_id': item.course_id})}">Re-verify for ${item.course_number}</a></p>
+                  </li>
+                % endfor
+                </ul>
+              </div>
+          %endif
         % else:
         <div class="wrapper-reverify-open">
           <p class="title">${_("You have no re-verifications at present.")}</p>
           </div>
-        %endif #close first if
+        %endif
 
-          % if reverifications["pending"] or reverifications["approved"] or reverifications["denied"]: #open a 1st if
+          % if reverifications["pending"] or reverifications["approved"] or reverifications["denied"]:
             <div class="wrapper-reverify-status">
               <h3 class="title">${_("The status of your submitted re-verifications:")}</h3>
               <ul class="reverification-list reverification-status">
 
-              % for course_id, course_name, course_number, date, status, display in reverifications["pending"]:
+              % for item in reverifications["pending"]:
                 <li class="item pending">
                   <div class="course-info">
-                    <h3 class="course-name">${course_name} (${course_number})</h3>
-                    <p class="deadline">Re-verify by <strong>${date}</strong></p>
+                    <h3 class="course-name">${item.course_name} (${item.course_number})</h3>
+                    <p class="deadline">${_('Re-verify by {date}').format(date="<strong>" + item.date + "</strong>")}</p>
                   </div>
                   <p class="reverify-status pending">${_("Pending")}</p>
                 </li>
               % endfor
 
-              % for course_id, course_name, course_number, date, status, display in reverifications["approved"]:
+              % for item in reverifications["approved"]:
                 <li class="item complete">
                   <div class="course-info">
-                    <h3 class="course-name">${course_name} (${course_number})</h3>
-                    <p class="deadline">Re-verify by <strong>${date}</strong></p>
+                    <h3 class="course-name">${item.course_name} (${item.course_number})</h3>
+                    <p class="deadline">${_('Re-verify by {date}').format(date="<strong>" + item.date + "</strong>")}</p>
                   </div>
                   <p class="reverify-status complete">${_("Complete")}</p>
                 </li>
               % endfor
 
-              % for course_id, course_name, course_number, date, status, display in reverifications["denied"]:
+              % for item in reverifications["denied"]:
                 <li class="item failed">
                   <div class="course-info">
-                    <h3 class="course-name">${course_name} (${course_number})</h3>
-                    <p class="deadline">Re-verify by <strong>${date}</strong></p>
+                    <h3 class="course-name">${item.course_name} (${item.course_number})</h3>
+                    <p class="deadline">${_('Re-verify by {date}').format(date="<strong>" + item.date + "</strong>")}</p>
                   </div>
                   <p class="reverify-status">${_("Failed")}</p>
                 </li>
@@ -95,12 +95,18 @@
 
               </ul>
             </div>
-          % endif # close a 1st if
+          % endif
 
           % if reverifications["must_reverify"]:
-            <p class="support">Don't want to re-verify right now? <a href="${referer}">Return to where you left off <i class="icon-angle-right"></i></a></p>
+            <p class="support">${_("Don't want to re-verify right now? {a_start}Return to where you left off{a_end}").format(
+                a_start='<a href="{url}">'.format(url=referer),
+                a_end="</a>",
+              )}</p>
           % else:
-          <p class="support"><a href="${referer}">Return to where you left off <i class="icon-angle-right"></i></a></p>
+          <p class="support">${_("{a_start}Return to where you left off{a_end}").format(
+                a_start='<a href="{url}">'.format(url=referer),
+                a_end="</a>",
+              )}</p>
           % endif
 
         </div>
@@ -128,7 +134,7 @@
           <div class="faq-item">
             <h3 class="title faq-question">${_("What if I have trouble with my re-verification?")}</h3>
             <div class="copy faq-answer">
-              <p>Because of the short time that re-verification is open, you <strong>will not be able to correct a failed verification</strong>. If you think there was an error in the review, please contact us at <a href="stuff">support@edx.org</a>.</p>
+              <p>${_('Because of the short time that re-verification is open, you <strong>will not be able to correct a failed verification</strong>. If you think there was an error in the review, please contact us at {email}').format(email='<a class="contact-link" href="mailto:{email}"">{email}</a>.'.format(email=billing_email))}</p>
             </div>
           </div>
         </div>
