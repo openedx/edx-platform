@@ -10,14 +10,14 @@ from i18n.execute import execute
 TRANSIFEX_HEADER = 'Translations in this file have been downloaded from %s'
 TRANSIFEX_URL = 'https://www.transifex.com/projects/p/edx-studio/'
 
+
 def push():
     execute('tx push -s')
 
+
 def pull():
-    for locale in CONFIGURATION.locales:
-        if locale != CONFIGURATION.source_locale:
-            print "Pulling %s from transifex..." % locale
-            execute('tx pull -l %s' % locale)
+    print "Pulling languages from transifex..."
+    execute('tx pull --mode=reviewed --all')
     clean_translated_locales()
 
 

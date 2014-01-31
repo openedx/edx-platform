@@ -50,6 +50,7 @@ def merge(locale, target='django.po', sources=('django-partial.po',), fail_if_mi
     # clean up redunancies in the metadata
     merged_filename = locale_directory.joinpath('merged.po')
     clean_metadata(merged_filename)
+    clean_line_numbers(merged_filename)
 
     # rename merged.po -> django.po (default)
     target_filename = locale_directory.joinpath(target)
@@ -72,6 +73,17 @@ def clean_metadata(file):
     pomsgs = pofile(file)
     # The msgcat tool marks the metadata as fuzzy, but it's ok as it is.
     pomsgs.metadata_is_fuzzy = False
+    pomsgs.save()
+
+
+def clean_line_numbers(file):
+    """
+    Remove occurrence line numbers so that the generated files don't generate a lot of
+    line noise when they're committed.
+    """
+    pomsgs = pofile(file)
+    for entry in pomsgs:
+        entry.occurrences = [(filename, None) for (filename, lineno) in entry.occurrences]
     pomsgs.save()
 
 
