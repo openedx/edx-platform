@@ -13,6 +13,8 @@ from xmodule.modulestore.xml_importer import import_from_xml
 # Mixed modulestore depends on django, so we'll manually configure some django settings
 # before importing the module
 from django.conf import settings
+import unittest
+import copy
 if not settings.configured:
     settings.configure()
 
@@ -245,3 +247,25 @@ class TestMixedModuleStore(object):
         assert_equals(Location(parents[0]).org, 'edX')
         assert_equals(Location(parents[0]).course, 'toy')
         assert_equals(Location(parents[0]).name, '2012_Fall')
+
+class TestMixedMSInit(unittest.TestCase):
+    """
+    Test initializing w/o a reference_type
+    """
+    def setUp(self):
+        unittest.TestCase.setUp(self)
+        options = copy.copy(OPTIONS)
+        del options['reference_type']
+        self.connection = pymongo.MongoClient(
+            host=HOST,
+            port=PORT,
+            tz_aware=True,
+        )
+        self.store = MixedModuleStore(**options)
+
+    def test_use_locations(self):
+        """
+        Test that use_locations defaulted correctly
+        """
+        self.assertTrue(self.store.use_locations)
+

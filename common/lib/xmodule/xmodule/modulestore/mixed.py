@@ -36,7 +36,7 @@ class MixedModuleStore(ModuleStoreWriteBase):
         self.mappings = mappings
         # temporary code for transition period
         if reference_type is None:
-            log.warn("reference_type not specified in MixedModuleStore settings.",
+            log.warn("reference_type not specified in MixedModuleStore settings. %s",
                 "Will default temporarily to the to-be-deprecated Location.")
         self.use_locations = (reference_type != 'Locator')
         if 'default' not in stores:
