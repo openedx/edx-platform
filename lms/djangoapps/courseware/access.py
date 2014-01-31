@@ -343,7 +343,7 @@ def _dispatch(table, action, user, obj):
               action)
         return result
 
-    raise ValueError("Unknown action for object type '{0}': '{1}'".format(
+    raise ValueError(u"Unknown action for object type '{0}': '{1}'".format(
         type(obj), action))
 
 

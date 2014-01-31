@@ -66,7 +66,6 @@ class MockStaffGradingService(object):
                                            'min_for_ml': 10})
                            ]})
 
-
     def save_grade(self, course_id, grader_id, submission_id, score, feedback, skipped, rubric_scores,
                    submission_flagged):
         return self.get_next(course_id, 'fake location', grader_id)
@@ -81,7 +80,7 @@ class StaffGradingService(GradingService):
         config['system'] = LmsModuleSystem(
             static_url='/static',
             track_function=None,
-            get_module = None,
+            get_module=None,
             render_template=render_to_string,
             replace_urls=None,
         )
@@ -92,7 +91,6 @@ class StaffGradingService(GradingService):
         self.save_grade_url = self.url + '/save_grade/'
         self.get_problem_list_url = self.url + '/get_problem_list/'
         self.get_notifications_url = self.url + "/get_notifications/"
-
 
     def get_problem_list(self, course_id, grader_id):
         """
@@ -112,7 +110,6 @@ class StaffGradingService(GradingService):
         """
         params = {'course_id': course_id, 'grader_id': grader_id}
         return self.get(self.get_problem_list_url, params)
-
 
     def get_next(self, course_id, location, grader_id):
         """
@@ -136,7 +133,6 @@ class StaffGradingService(GradingService):
                             params={'location': location,
                                     'grader_id': grader_id})
         return json.dumps(self._render_rubric(response))
-
 
     def save_grade(self, course_id, grader_id, submission_id, score, feedback, skipped, rubric_scores,
                    submission_flagged):

@@ -110,12 +110,12 @@ def instance_key(model, instance_or_pk):
 
 
 def set_cached_content(content):
-    cache.set(str(content.location), content)
+    cache.set(unicode(content.location).encode("utf-8"), content)
 
 
 def get_cached_content(location):
-    return cache.get(str(location))
+    return cache.get(unicode(location).encode("utf-8"))
 
 
 def del_cached_content(location):
-    cache.delete(str(location))
+    cache.delete(unicode(location).encode("utf-8"))

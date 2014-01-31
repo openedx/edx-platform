@@ -84,8 +84,8 @@ require(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape"],
                 if (required) {
                     return required;
                 }
-                if (item !== encodeURIComponent(item)) {
-                    return gettext('Please do not use any spaces or special characters in this field.');
+                if (/\s/g.test(item)) {
+                    return gettext('Please do not use any spaces in this field.');
                 }
                 return '';
             };
