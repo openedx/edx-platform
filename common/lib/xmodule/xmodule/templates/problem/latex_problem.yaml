@@ -98,7 +98,7 @@ data: |
     Where is the earth? </p>
         <p>
           <optionresponse>
-            <optioninput options="('up','down')" correct="down"/>
+            <optioninput options="('up','down')" correct="down" label="Where is the earth?"/>
           </optionresponse>
         </p>
         <p>
@@ -108,7 +108,7 @@ data: |
     What is Einstein's equation for the energy equivalent of a mass [mathjaxinline]m[/mathjaxinline]? </p>
         <p>
           <symbolicresponse expect="m*c^2">
-            <textline size="90" correct_answer="m*c^2" math="1"/>
+            <textline size="90" correct_answer="m*c^2" math="1" label="Enter Einstein's equation"/>
           </symbolicresponse>
         </p>
         <p>
@@ -120,7 +120,7 @@ data: |
           <p style="display:inline">Energy saved = </p>
           <numericalresponse inline="1" answer="0.52">
             <responseparam description="Numerical Tolerance" type="tolerance" default="0.02" name="tol"/>
-            <formulaequationinput/>
+            <formulaequationinput label="Enter the equation"/>
           </numericalresponse>
           <p style="display:inline">&#xA0;EJ/year</p>
         </p>
@@ -131,7 +131,7 @@ data: |
     What color is a banana? </p>
         <p>
           <choiceresponse>
-            <checkboxgroup>
+            <checkboxgroup label="What color is a banana?">
               <choice correct="false" name="1">
                 <text>Red</text>
               </choice>
@@ -154,7 +154,7 @@ data: |
     In what U.S. state is Detroit located? </p>
         <p>
           <stringresponse answer="Michigan">
-            <textline/>
+            <textline label="What state contains Michigan?"/>
           </stringresponse>
         </p>
         <p>
@@ -179,7 +179,7 @@ data: |
     Enter a python list of two numbers which sum to 10, eg [9,1]: </p>
         <p>
           <customresponse cfn="sumtest" expect="[1,9]">
-            <textline correct_answer="[1,9]"/>
+            <textline correct_answer="[1,9]" label="Enter the python list"/>
           </customresponse>
         </p>
         <p>
