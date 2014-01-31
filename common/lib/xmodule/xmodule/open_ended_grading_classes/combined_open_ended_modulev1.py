@@ -933,9 +933,7 @@ class CombinedOpenEndedV1Module():
         success, can_reset, error = self.check_if_student_has_done_needed_grading()
         if not can_reset:
             return {'error': error, 'success': False}
-        if self.student_attempts >= self.max_attempts - 1:
-            if self.student_attempts == self.max_attempts - 1:
-                self.student_attempts += 1
+        if self.student_attempts >= self.max_attempts:
             return {
                 'success': False,
                 # This is a student_facing_error
