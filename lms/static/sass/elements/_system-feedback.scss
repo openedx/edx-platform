@@ -5,10 +5,15 @@
 
 // UI : message
 .wrapper-msg {
-  box-shadow: 0 0 5px $shadow-d1 inset;
+  display: block;
   margin-bottom: ($baseline/4);
+  box-shadow: 0 0 5px $shadow-d1 inset;
+  background: $notify-banner-bg-1;
   padding: $baseline ($baseline*1.5);
-  background: $notify-banner-bg1;
+
+  &.is-hidden {
+    display: none;
+  }
 
   // basic object
   .msg {
@@ -84,13 +89,17 @@
         border: none;
         text-shadow: none;
         color: inherit;
+
+        &:hover {
+          color: $action-primary-bg;
+        }
       }
     }
   }
 
   // object variations
   &.urgency-high {
-    background: $notify-banner-bg1;
+    background: $notify-banner-bg-1;
 
     .msg {
       color: $white;
@@ -98,7 +107,7 @@
   }
 
   &.urgency-mid {
-    background: $notify-banner-bg2;
+    background: $notify-banner-bg-2;
 
     .msg {
       color: $white;
@@ -106,7 +115,7 @@
   }
 
   &.urgency-low {
-    background: $notify-banner-bg3;
+    background: $notify-banner-bg-3;
 
     .msg {
       color: $black;
@@ -125,6 +134,7 @@
     border-top: 3px solid $success-color;
   }
 }
+
 
 // prompts
 

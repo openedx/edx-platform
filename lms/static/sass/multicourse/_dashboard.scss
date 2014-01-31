@@ -171,11 +171,11 @@
           }
 
           .course-name {
+            @include line-height(12);
             display: inline-block;
             vertical-align: top;
             width: 80%;
             color: inherit;
-            line-height: 1.4;
           }
         }
       }

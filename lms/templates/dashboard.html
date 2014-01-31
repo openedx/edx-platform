@@ -29,7 +29,7 @@
         type: "post",
         data: { 'user_id': ${user.id}, }
         })
-      $("#failed-verification-banner").css("display","none");
+      $("#failed-verification-banner").addClass('is-hidden');
       })
 
     $("#upgrade-to-verified").click(function(event) {

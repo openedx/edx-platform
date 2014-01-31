@@ -1853,10 +1853,10 @@
             }
 
             .reverify-status {
+              @extend %t-weight4;
               border-top: 1px solid $light-gray;
               background-color: $m-gray-l4;
               color: $success-color;
-              font-weight: 600;
             }
           }
 
@@ -1872,10 +1872,10 @@
             }
 
             .reverify-status {
+              @extend %t-weight4;
               border-top: 1px solid $light-gray;
               background-color: $m-gray-l4;
               color: $warning-color;
-              font-weight: 600;
             }
           }
 
@@ -1891,10 +1891,10 @@
             }
 
             .reverify-status {
+              @extend %t-weight4;
               border-top: 1px solid $light-gray;
               background-color: $m-gray-l4;
               color: $alert-color;
-              font-weight: 600;
             }
           }
         }
@@ -2261,7 +2261,7 @@
 //reverify notification special styles
 .msg-reverify {
   .reverify-list {
-    margin: 5px 0;
+    margin: ($baseline/4) 0;
   }
 }
 

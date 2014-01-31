@@ -12,7 +12,7 @@
           <h2 class="title">${_("You need to re-verify to continue")}</h2>
           <div class="copy">
             <p class="activation-message">
-            ${_("To continue in the verified track in the following courses, you need to re-verify your identity:")}
+            ${_("To continue in the ID Verified track in the following courses, you need to re-verify your identity:")}
             </p>
             <ul class="reverify-list">
               % for item in reverifications["must_reverify"]:
@@ -41,7 +41,7 @@
           % for item in reverifications["must_reverify"]:
           <div class="copy">
             <p class='activation-message'>
-              ${_('To continue in the verified track in <strong>{course_name}</strong>, you need to re-verify your identity by {date}.').format(course_name=item.course_name, date=item.date)}
+              ${_('To continue in the ID Verified track in <strong>{course_name}</strong>, you need to re-verify your identity by {date}.').format(course_name=item.course_name, date=item.date)}
             </p>
           </div>
         </div>
