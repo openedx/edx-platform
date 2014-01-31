@@ -205,7 +205,7 @@ class ModuleStoreTestCase(TestCase):
         to update metadata.
         """
         store = editable_modulestore('direct')
-        store.update_item(course, 'testuser')
+        store.update_item(course, '**replace_user**')
         updated_course = store.get_instance(course.id, course.location)
         return updated_course
 

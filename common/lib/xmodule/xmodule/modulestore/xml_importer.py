@@ -4,14 +4,13 @@ import mimetypes
 from path import path
 import json
 
-from xblock.fields import Scope
-
 from .xml import XMLModuleStore, ImportSystem, ParentTracker
 from xmodule.modulestore import Location
 from xmodule.contentstore.content import StaticContent
 from .inheritance import own_metadata
 from xmodule.errortracker import make_error_tracker
 from .store_utilities import rewrite_nonportable_content_links
+import xblock
 
 log = logging.getLogger(__name__)
 
@@ -312,7 +311,7 @@ def import_module(
 
     logging.debug('processing import of module {}...'.format(module.location.url()))
 
-    if 'data' in module.fields and do_import_static:
+    if do_import_static and 'data' in module.fields and isinstance(module.fields['data'], xblock.fields.String):
         # we want to convert all 'non-portable' links in the module_data
         # (if it is a string) to portable strings (e.g. /static/)
         module.data = rewrite_nonportable_content_links(
@@ -327,7 +326,7 @@ def import_module(
     if 'index_in_children_list' in getattr(module, 'xml_attributes', []):
         del module.xml_attributes['index_in_children_list']
 
-    store.update_item(module, None, allow_not_found=allow_not_found)
+    store.update_item(module, '**replace_user**', allow_not_found=allow_not_found)
 
 
 def import_course_draft(
@@ -372,7 +371,7 @@ def import_course_draft(
     # First it is necessary to order the draft items by their desired index in the child list
     # (order os.walk returns them in is not guaranteed).
     drafts = dict()
-    for dirname, dirnames, filenames in os.walk(draft_dir + "/vertical"):
+    for dirname, _dirnames, filenames in os.walk(draft_dir + "/vertical"):
         for filename in filenames:
             module_path = os.path.join(dirname, filename)
             with open(module_path, 'r') as f:
@@ -459,7 +458,7 @@ def import_course_draft(
 
                             if non_draft_location.url() not in sequential.children:
                                 sequential.children.insert(index, non_draft_location.url())
-                                store.update_item(sequential, 'importer')
+                                store.update_item(sequential, '**replace_user**')
 
                         import_module(
                             module, draft_store, course_data_path,

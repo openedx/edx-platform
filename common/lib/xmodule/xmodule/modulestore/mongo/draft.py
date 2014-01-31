@@ -174,7 +174,7 @@ class DraftModuleStore(MongoModuleStore):
 
         xblock.location = draft_loc
         super(DraftModuleStore, self).update_item(xblock, user)
-        # don't allow locations to truly represent thenmselves as draft outside of this file
+        # don't allow locations to truly represent themselves as draft outside of this file
         xblock.location = as_published(xblock.location)
 
     def delete_item(self, location, delete_all_versions=False, **kwargs):
@@ -220,7 +220,7 @@ class DraftModuleStore(MongoModuleStore):
                         rents = [Location(mom) for mom in self.get_parent_locations(child, None)]
                         if (len(rents) == 1 and rents[0] == Location(location)):  # the 1 is this original_published
                             self.delete_item(child, True)
-        super(DraftModuleStore, self).update_item(draft, None)
+        super(DraftModuleStore, self).update_item(draft, '**replace_user**')
         self.delete_item(location)
 
     def unpublish(self, location):

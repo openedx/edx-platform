@@ -124,7 +124,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         course.advanced_modules = component_types
 
-        store.update_item(course, self.user.username)
+        store.update_item(course, self.user.id)
 
         # just pick one vertical
         descriptor = store.get_items(Location('i4x', 'edX', 'simple', 'vertical', None, None))[0]
@@ -263,7 +263,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.assertIn('graceperiod', own_metadata(html_module))
         self.assertEqual(html_module.graceperiod, new_graceperiod)
 
-        draft_store.update_item(html_module, self.user.username)
+        draft_store.update_item(html_module, self.user.id)
 
         # read back to make sure it reads as 'own-metadata'
         html_module = draft_store.get_item(Location('i4x', 'edX', 'simple', 'html', 'test_html', None))
@@ -379,7 +379,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.assertEqual(course.tabs, expected_tabs)
 
         item.display_name = 'Updated'
-        module_store.update_item(item, self.user.username)
+        module_store.update_item(item, self.user.id)
 
         course = module_store.get_item(course_location)
 
@@ -829,7 +829,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.assertIsInstance(html_module.data, basestring)
         new_data = html_module.data = html_module.data.replace('/static/', '/c4x/{0}/{1}/asset/'.format(
             source_location.org, source_location.course))
-        module_store.update_item(html_module, None)
+        module_store.update_item(html_module, self.user.id)
 
         html_module = module_store.get_instance(source_location.course_id, html_module_location)
         self.assertEqual(new_data, html_module.data)
@@ -862,7 +862,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         chapter.data = 'chapter data'
 
         with self.assertRaises(InvalidVersionError):
-            draft_store.update_item(chapter, 'user')
+            draft_store.update_item(chapter, self.user.id)
 
         self.assertRaises(InvalidVersionError, draft_store.unpublish, location)
 
@@ -982,7 +982,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
                                            'sequential', 'vertical_sequential', None]))
         private_location_no_draft = private_vertical.location.replace(revision=None)
         sequential.children.append(private_location_no_draft.url())
-        module_store.update_item(sequential, 'user')
+        module_store.update_item(sequential, self.user.id)
 
         # read back the sequential, to make sure we have a pointer to
         sequential = module_store.get_item(Location(['i4x', 'edX', 'toy',
@@ -1766,7 +1766,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         module_store.create_and_save_xmodule(new_component_location)
         parent = verticals[0]
         parent.children.append(new_component_location.url())
-        module_store.update_item(parent, 'user')
+        module_store.update_item(parent, self.user.id)
 
         # flush the cache
         module_store.refresh_cached_metadata_inheritance_tree(new_component_location)
@@ -1783,7 +1783,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         # now let's define an override at the leaf node level
         #
         new_module.graceperiod = timedelta(1)
-        module_store.update_item(new_module, self.user.username)
+        module_store.update_item(new_module, self.user.id)
 
         # flush the cache and refetch
         module_store.refresh_cached_metadata_inheritance_tree(new_component_location)
@@ -1897,7 +1897,7 @@ class MetadataSaveTestCase(ModuleStoreTestCase):
             delattr(self.video_descriptor, field_name)
 
         self.assertNotIn('html5_sources', own_metadata(self.video_descriptor))
-        get_modulestore(location).update_item(self.video_descriptor, 'testuser')
+        get_modulestore(location).update_item(self.video_descriptor, '**replace_user**')
         module = get_modulestore(location).get_item(location)
 
         self.assertNotIn('html5_sources', own_metadata(module))

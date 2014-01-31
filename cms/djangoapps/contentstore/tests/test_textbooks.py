@@ -59,7 +59,7 @@ class TextbookIndexTestCase(CourseTestCase):
         ]
         self.course.pdf_textbooks = content
         store = get_modulestore(self.course.location)
-        store.update_item(self.course, self.user.pk)
+        store.update_item(self.course, self.user.id)
 
         resp = self.client.get(
             self.url,
@@ -197,7 +197,7 @@ class TextbookDetailTestCase(CourseTestCase):
         # MongoKeyValueStore before we update the mongo datastore.
         self.course.save()
         self.store = get_modulestore(self.course.location)
-        self.store.update_item(self.course, self.user.pk)
+        self.store.update_item(self.course, self.user.id)
         self.url_nonexist = self.course_locator.url_reverse("textbooks", "20")
 
     def test_get_1(self):

@@ -330,7 +330,7 @@ def create_new_course(request):
         definition_data=overview_template.get('data')
     )
 
-    initialize_course_tabs(new_course)
+    initialize_course_tabs(new_course, request.user)
 
     new_location = loc_mapper().translate_location(new_course.location.course_id, new_course.location, False, True)
     # can't use auth.add_users here b/c it requires request.user to already have Instructor perms in this course
@@ -416,7 +416,7 @@ def course_info_update_handler(request, tag=None, package_id=None, branch=None, 
         return JsonResponse(get_course_updates(updates_location, provided_id))
     elif request.method == 'DELETE':
         try:
-            return JsonResponse(delete_course_update(updates_location, request.json, provided_id))
+            return JsonResponse(delete_course_update(updates_location, request.json, provided_id, request.user))
         except:
             return HttpResponseBadRequest(
                 "Failed to delete",
@@ -425,7 +425,7 @@ def course_info_update_handler(request, tag=None, package_id=None, branch=None, 
     # can be either and sometimes django is rewriting one to the other:
     elif request.method in ('POST', 'PUT'):
         try:
-            return JsonResponse(update_course_updates(updates_location, request.json, provided_id))
+            return JsonResponse(update_course_updates(updates_location, request.json, provided_id, request.user))
         except:
             return HttpResponseBadRequest(
                 "Failed to save",
@@ -478,7 +478,7 @@ def settings_handler(request, tag=None, package_id=None, branch=None, version_gu
             )
         else:  # post or put, doesn't matter.
             return JsonResponse(
-                CourseDetails.update_from_json(locator, request.json),
+                CourseDetails.update_from_json(locator, request.json, request.user),
                 encoder=CourseSettingsEncoder
             )
 
@@ -525,15 +525,15 @@ def grading_handler(request, tag=None, package_id=None, branch=None, version_gui
             # None implies update the whole model (cutoffs, graceperiod, and graders) not a specific grader
             if grader_index is None:
                 return JsonResponse(
-                    CourseGradingModel.update_from_json(locator, request.json),
+                    CourseGradingModel.update_from_json(locator, request.json, request.user),
                     encoder=CourseSettingsEncoder
                 )
             else:
                 return JsonResponse(
-                    CourseGradingModel.update_grader_from_json(locator, request.json)
+                    CourseGradingModel.update_grader_from_json(locator, request.json, request.user)
                 )
         elif request.method == "DELETE" and grader_index is not None:
-            CourseGradingModel.delete_grader(locator, grader_index)
+            CourseGradingModel.delete_grader(locator, grader_index, request.user)
             return JsonResponse()
 
 
@@ -624,7 +624,8 @@ def advanced_settings_handler(request, package_id=None, branch=None, version_gui
                 return JsonResponse(CourseMetadata.update_from_json(
                     course_module,
                     request.json,
-                    filter_tabs=filter_tabs
+                    filter_tabs=filter_tabs,
+                    user=request.user
                 ))
             except (TypeError, ValueError) as err:
                 return HttpResponseBadRequest(
@@ -742,7 +743,7 @@ def textbooks_list_handler(request, tag=None, package_id=None, branch=None, vers
         if not any(tab['type'] == 'pdf_textbooks' for tab in course.tabs):
             course.tabs.append({"type": "pdf_textbooks"})
         course.pdf_textbooks = textbooks
-        store.update_item(course, request.user.username)
+        store.update_item(course, request.user.id)
         return JsonResponse(course.pdf_textbooks)
     elif request.method == 'POST':
         # create a new textbook for the course
@@ -760,7 +761,7 @@ def textbooks_list_handler(request, tag=None, package_id=None, branch=None, vers
             tabs = course.tabs
             tabs.append({"type": "pdf_textbooks"})
             course.tabs = tabs
-        store.update_item(course, request.user.username)
+        store.update_item(course, request.user.id)
         resp = JsonResponse(textbook, status=201)
         resp["Location"] = locator.url_reverse('textbooks', textbook["id"])
         return resp
@@ -811,7 +812,7 @@ def textbooks_detail_handler(request, tid, tag=None, package_id=None, branch=Non
             course.pdf_textbooks = new_textbooks
         else:
             course.pdf_textbooks.append(new_textbook)
-        store.update_item(course, request.user.username)
+        store.update_item(course, request.user.id)
         return JsonResponse(new_textbook, status=201)
     elif request.method == 'DELETE':
         if not textbook:
@@ -820,7 +821,7 @@ def textbooks_detail_handler(request, tid, tag=None, package_id=None, branch=Non
         new_textbooks = course.pdf_textbooks[0:i]
         new_textbooks.extend(course.pdf_textbooks[i + 1:])
         course.pdf_textbooks = new_textbooks
-        store.update_item(course, request.user.username)
+        store.update_item(course, request.user.id)
         return JsonResponse()
 
 

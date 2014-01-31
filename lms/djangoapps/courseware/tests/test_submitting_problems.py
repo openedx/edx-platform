@@ -231,7 +231,7 @@ class TestCourseGrader(TestSubmittingProblems):
 
         self.course.grading_policy = grading_policy
         store = editable_modulestore('direct')
-        store.update_item(self.course, 'add_grading_policy')
+        store.update_item(self.course, '**replace_user**')
         self.refresh_course()
 
     def get_grade_summary(self):

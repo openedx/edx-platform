@@ -57,8 +57,9 @@ from pytz import UTC
 
 from xmodule.errortracker import null_error_tracker
 from xmodule.x_module import prefer_xmodules
-from xmodule.modulestore.locator import BlockUsageLocator, DefinitionLocator, CourseLocator, VersionTree, LocalId, \
-    Locator
+from xmodule.modulestore.locator import (
+    BlockUsageLocator, DefinitionLocator, CourseLocator, VersionTree, LocalId, Locator
+)
 from xmodule.modulestore.exceptions import InsufficientSpecificationError, VersionConflictError, DuplicateItemError
 from xmodule.modulestore import inheritance, ModuleStoreWriteBase, Location, SPLIT_MONGO_MODULESTORE_TYPE
 
@@ -938,7 +939,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         self.db_connection.insert_course_index(index_entry)
         return self.get_course(CourseLocator(package_id=new_id, branch=master_branch))
 
-    def update_item(self, descriptor, user_id, force=False):
+    def update_item(self, descriptor, user_id, allow_not_found=False, force=False):
         """
         Save the descriptor's fields. it doesn't descend the course dag to save the children.
         Return the new descriptor (updated location).

@@ -67,7 +67,7 @@ class Basetranscripts(CourseTestCase):
         # hI10vDNYz4M - valid Youtube ID with transcripts.
         # JMD_ifUUfsU, AKqURZnYqpk, DYpADpL7jAY - valid Youtube IDs without transcripts.
         self.item.data = '<video youtube="0.75:JMD_ifUUfsU,1.0:hI10vDNYz4M,1.25:AKqURZnYqpk,1.50:DYpADpL7jAY" />'
-        modulestore().update_item(self.item, 'test_transcripts')
+        modulestore().update_item(self.item, self.user.id)
 
         self.item = modulestore().get_item(self.item_location)
         # Remove all transcripts for current module.
@@ -137,7 +137,7 @@ class TestUploadtranscripts(Basetranscripts):
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.ogv"/>
             </video>
         """)
-        modulestore().update_item(self.item, 'test_transcripts')
+        modulestore().update_item(self.item, self.user.id)
 
         link = reverse('upload_transcripts')
         filename = os.path.splitext(os.path.basename(self.good_srt_file.name))[0]
@@ -214,7 +214,7 @@ class TestUploadtranscripts(Basetranscripts):
         item_locator, item_location = self._get_locator(resp)
         item = modulestore().get_item(item_location)
         item.data = '<non_video youtube="0.75:JMD_ifUUfsU,1.0:hI10vDNYz4M" />'
-        modulestore().update_item(item, 'test_transcripts')
+        modulestore().update_item(item, self.user.id)
 
         # non_video module: testing
 
@@ -234,7 +234,7 @@ class TestUploadtranscripts(Basetranscripts):
 
     def test_fail_bad_xml(self):
         self.item.data = '<<<video youtube="0.75:JMD_ifUUfsU,1.25:AKqURZnYqpk,1.50:DYpADpL7jAY" />'
-        modulestore().update_item(self.item, 'test_transcripts')
+        modulestore().update_item(self.item, self.user.id)
 
         link = reverse('upload_transcripts')
         filename = os.path.splitext(os.path.basename(self.good_srt_file.name))[0]
@@ -346,7 +346,7 @@ class TestDownloadtranscripts(Basetranscripts):
 
     def test_success_download_youtube(self):
         self.item.data = '<video youtube="1:JMD_ifUUfsU" />'
-        modulestore().update_item(self.item, 'test_transcripts')
+        modulestore().update_item(self.item, self.user.id)
 
         subs = {
             'start': [100, 200, 240],
@@ -373,7 +373,7 @@ class TestDownloadtranscripts(Basetranscripts):
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.ogv"/>
             </video>
         """.format(subs_id))
-        modulestore().update_item(self.item, 'test_transcripts')
+        modulestore().update_item(self.item, self.user.id)
 
         subs = {
             'start': [100, 200, 240],
@@ -433,7 +433,7 @@ class TestDownloadtranscripts(Basetranscripts):
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.ogv"/>
             </videoalpha>
         """.format(subs_id))
-        modulestore().update_item(item, 'test_transcripts')
+        modulestore().update_item(item, self.user.id)
 
         subs = {
             'start': [100, 200, 240],
@@ -458,7 +458,7 @@ class TestDownloadtranscripts(Basetranscripts):
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.ogv"/>
             </video>
         """)
-        modulestore().update_item(self.item, 'test_transcripts')
+        modulestore().update_item(self.item, self.user.id)
 
         link = reverse('download_transcripts')
         resp = self.client.get(link, {'locator': self.item_locator})
@@ -472,7 +472,7 @@ class TestDownloadtranscripts(Basetranscripts):
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.ogv"/>
             </video>
         """)
-        modulestore().update_item(self.item, 'test_transcripts')
+        modulestore().update_item(self.item, self.user.id)
 
         link = reverse('download_transcripts')
         resp = self.client.get(link, {'locator': self.item_locator})
@@ -488,7 +488,7 @@ class TestDownloadtranscripts(Basetranscripts):
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.ogv"/>
             </video>
         """.format(subs_id))
-        modulestore().update_item(self.item, 'test_transcripts')
+        modulestore().update_item(self.item, self.user.id)
 
         subs = {
             'start': [100, 200, 240],
@@ -541,7 +541,7 @@ class TestChecktranscripts(Basetranscripts):
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.ogv"/>
             </video>
         """.format(subs_id))
-        modulestore().update_item(self.item, 'test_transcripts')
+        modulestore().update_item(self.item, self.user.id)
 
         subs = {
             'start': [100, 200, 240],
@@ -585,7 +585,7 @@ class TestChecktranscripts(Basetranscripts):
 
     def test_check_youtube(self):
         self.item.data = '<video youtube="1:JMD_ifUUfsU" />'
-        modulestore().update_item(self.item, 'test_transcripts')
+        modulestore().update_item(self.item, self.user.id)
 
         subs = {
             'start': [100, 200, 240],
@@ -684,7 +684,7 @@ class TestChecktranscripts(Basetranscripts):
                 <source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.ogv"/>
             </videoalpha>
         """.format(subs_id))
-        modulestore().update_item(item, 'test_transcript')
+        modulestore().update_item(item, self.user.id)
 
         subs = {
             'start': [100, 200, 240],

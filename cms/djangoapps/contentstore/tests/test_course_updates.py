@@ -123,7 +123,7 @@ class CourseUpdateTest(CourseTestCase):
         modulestore('direct').create_and_save_xmodule(location)
         course_updates = modulestore('direct').get_item(location)
         course_updates.data = 'bad news'
-        modulestore('direct').update_item(course_updates, 'test_course_updates')
+        modulestore('direct').update_item(course_updates, self.user.id)
 
         init_content = '<iframe width="560" height="315" src="http://www.youtube.com/embed/RocY-Jd93XU" frameborder="0">'
         content = init_content + '</iframe>'

@@ -27,6 +27,7 @@ class MixedModuleStore(ModuleStoreWriteBase):
         """
         Initialize a MixedModuleStore. Here we look into our passed in kwargs which should be a
         collection of other modulestore configuration informations
+
         :param reference_type: either Location or Locator to indicate what type of reference this app
         uses.
         """
@@ -182,6 +183,7 @@ class MixedModuleStore(ModuleStoreWriteBase):
     def has_item(self, course_id, reference):
         """
         Does the course include the xblock who's id is reference?
+
         :param course_id: a course_id or package_id (slashed or dotted)
         :param reference: a Location or BlockUsageLocator
         """
@@ -282,6 +284,7 @@ class MixedModuleStore(ModuleStoreWriteBase):
         """
         returns the course module associated with the course_id. If no such course exists,
         it returns None
+
         :param course_id: must be either a string course_id or a CourseLocator
         """
         store = self._get_modulestore_for_courseid(

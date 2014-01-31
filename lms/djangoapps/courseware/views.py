@@ -1,7 +1,6 @@
 import logging
 import urllib
 
-from functools import partial
 from collections import defaultdict
 
 from django.conf import settings
@@ -10,7 +9,7 @@ from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from django.http import Http404, HttpResponse, HttpResponseRedirect
+from django.http import Http404, HttpResponse
 from django.shortcuts import redirect
 from edxmako.shortcuts import render_to_response, render_to_string
 from django_future.csrf import ensure_csrf_cookie
@@ -240,7 +239,7 @@ def index(request, course_id, chapter=None, section=None,
     registered = registered_for_course(course, user)
     if not registered:
         # TODO (vshnayder): do course instructors need to be registered to see course?
-        log.debug('User %s tried to view course %s but is not enrolled', user, course.location.url())
+        log.debug(u'User %s tried to view course %s but is not enrolled', user, course.location.url())
         return redirect(reverse('about_course', args=[course.id]))
 
     masq = setup_masquerade(request, staff_access)

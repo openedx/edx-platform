@@ -142,7 +142,7 @@ def _clone_modules(modulestore, modules, source_location, dest_location):
 
             module.children = new_children
 
-        modulestore.update_item(module, '_clone_modules')
+        modulestore.update_item(module, '**replace_user**')
 
 
 def clone_course(modulestore, contentstore, source_location, dest_location, delete_original=False):
