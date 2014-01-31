@@ -33,11 +33,7 @@
     
   <%block name="title">
       <title>
-    % if stanford_theme_enabled():
-      ${_("Home")} | class.stanford.edu
-    % else:
        ${page_title_breadcrumbs(self.pagetitle())}
-    % endif
       </title>
   </%block>
 
