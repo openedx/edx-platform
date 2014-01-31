@@ -125,7 +125,7 @@ def courses_list(request, status = "all", subject="all", destiny="all"):
         if (subject != "all"):
             if not (subject in course.tags or dict(SUBJECTS).get(subject, '') in course.tags): continue
         if (destiny != "all"):
-            if not (destiny in course.tags or dict(DESTINY).get(subject, '') in course.tags): continue
+            if not (destiny in course.tags or dict(DESTINY).get(destiny, '') in course.tags): continue
         courses += [course]
     context = {'courses': courses, 'destiny': destiny, 'subject': subject}
     return render_to_response("courses_list.html", context)
