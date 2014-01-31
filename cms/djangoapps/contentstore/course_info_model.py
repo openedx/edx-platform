@@ -56,7 +56,7 @@ def get_course_updates(location, provided_id):
     return course_upd_collection
 
 
-def update_course_updates(location, update, passed_id=None):
+def update_course_updates(location, update, passed_id=None, user=None):
     """
     Either add or update the given course update. It will add it if the passed_id is absent or None. It will update it if
     it has an passed_id which has a valid value. Until updates have distinct values, the passed_id is the location url + an index
@@ -102,7 +102,7 @@ def update_course_updates(location, update, passed_id=None):
 
     # update db record
     course_updates.data = html.tostring(course_html_parsed)
-    modulestore('direct').update_item(course_updates, 'course_info_model')
+    modulestore('direct').update_item(course_updates, user.id if user else None)
 
     return {
         "id": idx,
@@ -125,7 +125,7 @@ def _course_info_content(html_parsed):
 
 
 # pylint: disable=unused-argument
-def delete_course_update(location, update, passed_id):
+def delete_course_update(location, update, passed_id, user):
     """
     Delete the given course_info update from the db.
     Returns the resulting course_updates b/c their ids change.
@@ -158,7 +158,7 @@ def delete_course_update(location, update, passed_id):
         # update db record
         course_updates.data = html.tostring(course_html_parsed)
         store = modulestore('direct')
-        store.update_item(course_updates, 'course_info_model')
+        store.update_item(course_updates, user.id)
 
     return get_course_updates(location, None)
 

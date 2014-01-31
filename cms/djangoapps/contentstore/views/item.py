@@ -160,7 +160,7 @@ def xblock_handler(request, tag=None, package_id=None, branch=None, version_guid
             delete_children = str_to_bool(request.REQUEST.get('recurse', 'False'))
             delete_all_versions = str_to_bool(request.REQUEST.get('all_versions', 'False'))
 
-            return _delete_item_at_location(old_location, delete_children, delete_all_versions)
+            return _delete_item_at_location(old_location, delete_children, delete_all_versions, request.user)
         else:  # Since we have a package_id, we are updating an existing xblock.
             return _save_item(
                 request,
@@ -185,7 +185,8 @@ def xblock_handler(request, tag=None, package_id=None, branch=None, version_guid
             dest_location = _duplicate_item(
                 parent_location,
                 duplicate_source_location,
-                request.json.get('display_name')
+                request.json.get('display_name'),
+                request.user
             )
             course_location = loc_mapper().translate_locator_to_location(BlockUsageLocator(parent_locator), get_course=True)
             dest_locator = loc_mapper().translate_location(course_location.course_id, dest_location, False, True)
@@ -272,10 +273,10 @@ def _save_item(request, usage_loc, item_location, data=None, children=None, meta
                     field.write_to(existing_item, value)
 
         if existing_item.category == 'video':
-            manage_video_subtitles_save(existing_item, existing_item)
+            manage_video_subtitles_save(existing_item, existing_item, request.user)
 
     # commit to datastore
-    store.update_item(existing_item, request.user)
+    store.update_item(existing_item, request.user.id)
 
     result = {
         'id': unicode(usage_loc),
@@ -284,7 +285,7 @@ def _save_item(request, usage_loc, item_location, data=None, children=None, meta
     }
 
     if grader_type is not None:
-        result.update(CourseGradingModel.update_section_grader_type(existing_item, grader_type))
+        result.update(CourseGradingModel.update_section_grader_type(existing_item, grader_type, request.user))
 
     # Make public after updating the xblock, in case the caller asked
     # for both an update and a publish.
@@ -339,14 +340,14 @@ def _create_item(request):
     # TODO replace w/ nicer accessor
     if not 'detached' in parent.runtime.load_block_type(category)._class_tags:
         parent.children.append(dest_location.url())
-        get_modulestore(parent.location).update_item(parent, request.user)
+        get_modulestore(parent.location).update_item(parent, request.user.id)
 
     course_location = loc_mapper().translate_locator_to_location(parent_locator, get_course=True)
     locator = loc_mapper().translate_location(course_location.course_id, dest_location, False, True)
     return JsonResponse({"locator": unicode(locator)})
 
 
-def _duplicate_item(parent_location, duplicate_source_location, display_name=None):
+def _duplicate_item(parent_location, duplicate_source_location, display_name=None, user=None):
     """
     Duplicate an existing xblock as a child of the supplied parent_location.
     """
@@ -379,8 +380,8 @@ def _duplicate_item(parent_location, duplicate_source_location, display_name=Non
     if source_item.has_children:
         dest_module.children = []
         for child in source_item.children:
-            dest_module.children.append(_duplicate_item(dest_location, Location(child)).url())
-        get_modulestore(dest_location).update_item(dest_module, 'user')
+            dest_module.children.append(_duplicate_item(dest_location, Location(child), user=user).url())
+        get_modulestore(dest_location).update_item(dest_module, user.id if user else None)
 
     if not 'detached' in source_item.runtime.load_block_type(category)._class_tags:
         parent = get_modulestore(parent_location).get_item(parent_location)
@@ -391,12 +392,12 @@ def _duplicate_item(parent_location, duplicate_source_location, display_name=Non
             parent.children.insert(source_index + 1, dest_location.url())
         else:
             parent.children.append(dest_location.url())
-        get_modulestore(parent_location).update_item(parent, 'user')
+        get_modulestore(parent_location).update_item(parent, user.id if user else None)
 
     return dest_location
 
 
-def _delete_item_at_location(item_location, delete_children=False, delete_all_versions=False):
+def _delete_item_at_location(item_location, delete_children=False, delete_all_versions=False, user=None):
     """
     Deletes the item at with the given Location.
 
@@ -419,7 +420,7 @@ def _delete_item_at_location(item_location, delete_children=False, delete_all_ve
         for parent_loc in parent_locs:
             parent = modulestore('direct').get_item(parent_loc)
             parent.children.remove(item_url)
-            modulestore('direct').update_item(parent, 'user')
+            modulestore('direct').update_item(parent, user.id if user else None)
 
     return JsonResponse()
 

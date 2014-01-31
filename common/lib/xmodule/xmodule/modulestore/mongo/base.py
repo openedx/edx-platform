@@ -716,7 +716,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
             course.tabs = existing_tabs
             # Save any changes to the course to the MongoKeyValueStore
             course.save()
-            self.update_item(course, 'create_and_save_xmodule')
+            self.update_item(course, '**replace_user**')
 
     def fire_updated_modulestore_signal(self, course_id, location):
         """
@@ -833,7 +833,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
             course.tabs = [tab for tab in existing_tabs if tab.get('url_slug') != location.name]
             # Save the updates to the course to the MongoKeyValueStore
             course.save()
-            self.update_item(course, 'delete_item')
+            self.update_item(course, '**replace_user**')
 
         # Must include this to avoid the django debug toolbar (which defines the deprecated "safe=False")
         # from overriding our default value set in the init method.

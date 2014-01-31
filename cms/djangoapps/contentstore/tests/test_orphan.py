@@ -34,7 +34,7 @@ class TestOrphan(CourseTestCase):
             parent_location = self.course.location.replace(category=parent_category, name=parent_name)
             parent = editable_modulestore('direct').get_item(parent_location)
             parent.children.append(location.url())
-            editable_modulestore('direct').update_item(parent, self.user.pk)
+            editable_modulestore('direct').update_item(parent, self.user.id)
 
     def test_mongo_orphan(self):
         """

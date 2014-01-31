@@ -151,7 +151,7 @@ class ItemFactory(XModuleFactory):
         # replace the display name with an optional parameter passed in from the caller
         if display_name is not None:
             metadata['display_name'] = display_name
-        module = store.create_and_save_xmodule(location, metadata=metadata, definition_data=data)
+        store.create_and_save_xmodule(location, metadata=metadata, definition_data=data)
 
         module = store.get_item(location)
 
@@ -163,6 +163,6 @@ class ItemFactory(XModuleFactory):
 
         if 'detached' not in module._class_tags:
             parent.children.append(location.url())
-            store.update_item(parent, 'factory')
+            store.update_item(parent, '**replace_user**')
 
         return store.get_item(location)

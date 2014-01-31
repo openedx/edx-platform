@@ -201,7 +201,7 @@ class TestMixedModuleStore(object):
     def test_update_item(self):
         # FIXME update
         with assert_raises(NotImplementedError):
-            self.store.update_item(self.fake_location, None)
+            self.store.update_item(self.fake_location, '**replace_user**')
 
     def test_delete_item(self):
         with assert_raises(NotImplementedError):
