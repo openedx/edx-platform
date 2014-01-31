@@ -115,9 +115,13 @@ class OpenResponseTest(UniqueCourseTest):
         (e.g. from AI, instructor, or peer grading)
         `assessment_type` is either "ai" or "peer".
         """
+        # Because the check function involves fairly complicated actions
+        # (navigating through several screens), we give it more time to complete
+        # than the default.
         feedback_promise = Promise(
             self._check_feedback_func(assessment_type),
-            'Got feedback for {0} problem'.format(assessment_type)
+            'Got feedback for {0} problem'.format(assessment_type),
+            timeout=600, try_interval=5
         )
         return fulfill(feedback_promise)
 
