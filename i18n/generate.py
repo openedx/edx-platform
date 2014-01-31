@@ -103,7 +103,7 @@ def validate_files(dir, files_to_merge):
 def main():
     logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
-    for locale in CONFIGURATION.locales:
+    for locale in CONFIGURATION.translated_locales:
         merge_files(locale)
     # Dummy text is not required. Don't raise exception if files are missing.
     merge_files(CONFIGURATION.dummy_locale, fail_if_missing=False)

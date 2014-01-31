@@ -32,7 +32,7 @@ BABEL_CONFIG = BASE_DIR.relpathto(LOCALE_DIR.joinpath('babel.cfg'))
 # Use relpath to reduce noise in logs
 BABEL_OUT = BASE_DIR.relpathto(CONFIGURATION.source_messages_dir.joinpath('mako.po'))
 
-SOURCE_WARN = 'This English source file is machine-generated. Do not check it into git.'
+EDX_MARKER = "edX translation file"
 
 LOG = logging.getLogger(__name__)
 
@@ -104,8 +104,8 @@ def fix_header(po):
     po.metadata_is_fuzzy = []   # remove [u'fuzzy']
     header = po.header
     fixes = (
-        ('SOME DESCRIPTIVE TITLE', 'edX translation file\n' + SOURCE_WARN),
-        ('Translations template for PROJECT.', 'edX translation file\n' + SOURCE_WARN),
+        ('SOME DESCRIPTIVE TITLE', EDX_MARKER),
+        ('Translations template for PROJECT.', EDX_MARKER),
         ('YEAR', '%s' % datetime.utcnow().year),
         ('ORGANIZATION', 'edX'),
         ("THE PACKAGE'S COPYRIGHT HOLDER", "EdX"),

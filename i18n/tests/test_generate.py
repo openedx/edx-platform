@@ -8,6 +8,7 @@ from unittest import TestCase
 from polib import pofile
 from pytz import UTC
 
+from i18n import extract
 from i18n import generate
 from i18n.config import CONFIGURATION
 
@@ -27,6 +28,7 @@ class TestGenerate(TestCase):
         """
         Tests merge script on English source files.
         """
+        extract.main()
         filename = os.path.join(CONFIGURATION.source_messages_dir, random_name())
         generate.merge(CONFIGURATION.source_locale, target=filename)
         self.assertTrue(os.path.exists(filename))
@@ -41,7 +43,7 @@ class TestGenerate(TestCase):
         after start of test suite)
         """
         generate.main()
-        for locale in CONFIGURATION.locales:
+        for locale in CONFIGURATION.translated_locales:
             for filename in ('django', 'djangojs'):
                 mofile = filename+'.mo'
                 path = os.path.join(CONFIGURATION.get_messages_dir(locale), mofile)

@@ -30,14 +30,14 @@ codekit-config.json
 
 ### Internationalization artifacts
 *.mo
+*.po
+!django.po
+!django.mo
+!djangojs.po
+!djangojs.mo
 conf/locale/en/LC_MESSAGES/*.po
-!messages.po
-### Remove when we have real Esperanto translations. For now, ignore
-### dummy Esperanto files.
-conf/locale/eo/*
-## Remove when we officially support these languages.
-conf/locale/fr
-conf/locale/ko_KR
+conf/locale/en/LC_MESSAGES/*.mo
+conf/locale/messages.mo
 
 ### Testing artifacts
 .testids/

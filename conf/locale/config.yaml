@@ -1,33 +1,55 @@
 # Configuration for i18n workflow.
 
 locales:
-    - en
+    - en  # English - Source Language
+    - ach  # Acoli
+    - ar  # Arabic
+    - bg_BG  # Bulgarian (Bulgaria)
+    - bn  # Bengali
+    - bn_BD  # Bengali (Bangladesh)
+    - cs  # Czech
+    - cy  # Welsh
+    - de_DE  # German (Germany)
+    - en@lolcat  # LOLCAT English
+    - en@pirate  # Pirate English
+    - es_419  # Spanish (Latin America)
+    - es_EC  # Spanish (Ecuador)
+    - es_ES  # Spanish (Spain)
+    - es_MX  # Spanish (Mexico)
+    - es_US  # Spanish (United States)
+    - et_EE  # Estonian (Estonia)
+    - fa  # Persian
+    - fa_IR  # Persian (Iran)
+    - fi_FI  # Finnish (Finland)
+    - fr  # French
+    - gl  # Galician
+    - he  # Hebrew
+    - hi  # Hindi
+    - hy_AM  # Armenian (Armenia)
+    - id  # Indonesian
+    - it_IT  # Italian (Italy)
+    - ja_JP  # Japanese (Japan)
+    - km_KH  # Khmer (Cambodia)
+    - ko_KR  # Korean (Korea)
+    - lt_LT  # Lithuanian (Lithuania)
+    - ml  # Malayalam
+    - nb  # Norwegian Bokmål
+    - nl_NL  # Dutch (Netherlands)
+    - pl  # Polish
+    - pt_BR  # Portuguese (Brazil)
+    - pt_PT  # Portuguese (Portugal)
+    - ru  # Russian
+    - si  # Sinhala
+    - sk  # Slovak
+    - sl  # Slovenian
+    - th  # Thai
+    - tr_TR  # Turkish (Turkey)
+    - uk  # Ukranian
+    - vi  # Vietnamese
+    - zh_CN  # Chinese (China)
+    - zh_CN.GB2312  # Chinese (China) (GB2312)
+    - zh_TW  # Chinese (Taiwan)
 
-    # More languages we might want someday, these have started on Transifex.
-    # fr
-    # ko_KR
-    # ru
-    # es_419
-    # ja_JP
-    # pt_BR
-    # zh_CN
-    # zh_TW
-    # ar
-    # es_ES
-    # fa_IR
-    # tr_TR
-    # de_DE
-    # id
-    # hi
-    # vi
-    # pt_PT
-    # lt_LT
-    # gl
-    # it_IT
-    # cs
-    # et_EE
-    # nb
-    # sk
 
 # The locale used for fake-accented English, for testing.
 dummy-locale: eo
