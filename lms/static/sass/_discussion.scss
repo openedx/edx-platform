@@ -1296,22 +1296,30 @@ body.discussion {
       }
 
       .row-item-full {
-
-        .email-setting {
+        
+        .notification-checkbox {
           display: inline-block;
-          text-align: center;
-          vertical-align: middle;
-          margin-left: $baseline/2;
+          padding: $baseline/4 0 $baseline/2 0;
+          margin-right: $baseline/2;
+          border-radius: 5px;
+          border: 1px solid gray;
+          
+          .email-setting {
+            display: inline-block;
+            text-align: center;
+            vertical-align: middle;
+            margin-left: $baseline/2;
+          }
+  
+          .icon {
+            display: inline-block;
+          }
+      
+          .email-setting:checked ~ .icon {
+            color: $green;
+          }
         }
-
-        .icon {
-          display: inline-block;
-        }
-    
-        .email-setting:checked ~ .icon {
-          color: $green;
-        }
-
+        
         .row-description {
           display: inline-block;
           width:80%;
