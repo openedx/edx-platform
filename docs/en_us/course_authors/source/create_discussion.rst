@@ -16,8 +16,12 @@ See the following topics:
 * :ref:`A Student's View of the Discussion`
 
 
-Before you add a Discussion component, it is generally a good idea to add an HTML component that 
-introduces the topic to be discussed. The Discussion component itself does not contain any text and may be easy for students to overlook. 
+Before you add a Discussion component, it is generally a good idea to add an HTML component that introduces the topic to be discussed. The Discussion component itself does not contain any text and may be easy for students to overlook. 
+
+Also see the following chapters:
+
+* :ref:`Discussions`
+* :ref:`Guidance for Discussion Moderators`ß
 
 .. _Create a Discussion Component:
 

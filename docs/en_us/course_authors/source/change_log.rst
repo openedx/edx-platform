@@ -13,6 +13,8 @@ Change Log
 
    * - Date
      - Change
+   * - 01/29/2014
+     - Added the chapter :ref:`Using an Instant Hangout in Your Course`.
    * - 01/21/2014
      - Added more detailed instructions to :ref:`Zooming image`
    * - 01/14/2014
