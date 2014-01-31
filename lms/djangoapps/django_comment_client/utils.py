@@ -1,7 +1,6 @@
 import pytz
 from collections import defaultdict
 import logging
-import urllib
 from datetime import datetime
 
 from django.contrib.auth.models import User
@@ -12,7 +11,7 @@ from django.utils import simplejson
 from django_comment_common.models import Role, FORUM_ROLE_STUDENT
 from django_comment_client.permissions import check_permissions_by_view
 
-import edxmako
+from edxmako import lookup_template
 import pystache_custom as pystache
 
 from xmodule.modulestore.django import modulestore
@@ -307,7 +306,7 @@ def get_metadata_for_threads(course_id, threads, user, user_info):
 
 
 def render_mustache(template_name, dictionary, *args, **kwargs):
-    template = edxmako.lookup['main'].get_template(template_name).source
+    template = lookup_template('main', template_name).source
     return pystache.render(template, dictionary)
 
 

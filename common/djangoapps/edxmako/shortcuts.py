@@ -18,7 +18,7 @@ import logging
 
 from microsite_configuration.middleware import MicrositeConfiguration
 
-import edxmako
+from edxmako import lookup_template
 import edxmako.middleware
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -100,7 +100,7 @@ def render_to_string(template_name, dictionary, context=None, namespace='main'):
     if context:
         context_dictionary.update(context)
     # fetch and render template
-    template = edxmako.lookup[namespace].get_template(template_name)
+    template = lookup_template(namespace, template_name)
     return template.render_unicode(**context_dictionary)
 
 
