@@ -47,7 +47,7 @@ $(function () {
       
       categoryData = categories[ section['category'] ]
     
-      categoryData['data'].append( [tickIndex, section['percent']] )
+      categoryData['data'].append( tickIndex, [section['percent']] )
       ticks.append( [tickIndex, section['label'] ] )
     
       if section['category'] in detail_tooltips:
@@ -56,7 +56,7 @@ $(function () {
           detail_tooltips[ section['category'] ] = [ section['detail'], ]
           
       if 'mark' in section:
-          droppedScores.append( [tickIndex, 0.05] )
+          droppedScores.append( [tickIndex, .05] )
           dropped_score_tooltips.append( section['mark']['detail'] )
         
       tickIndex += 1
@@ -71,7 +71,8 @@ $(function () {
   overviewBarX = tickIndex
   extraColorIndex = len(categories) #Keeping track of the next color to use for categories not in categories[]
   
-  if show_grade_breakdown:    
+  if show_grade_breakdown:
+    tickIndex += sectionSpacer
     for section in grade_summary['grade_breakdown']:
         if section['percent'] > 0:
             if section['category'] in categories:
@@ -82,19 +83,17 @@ $(function () {
         
             series.append({
                 'label' : section['category'] + "-grade_breakdown",
-                'data' : [ [overviewBarX, section['percent']] ],
+                'data' : [ [overviewBarX, section['percent']] ], ##
                 'color' : color
             })
             
             detail_tooltips[section['category'] + "-grade_breakdown"] = [ section['detail'] ]
-  
+    
     ticks += [ [overviewBarX, "Total"] ]
-    tickIndex += 1 + sectionSpacer
+    tickIndex += 5*sectionSpacer
   
   totalScore = grade_summary['percent']
   detail_tooltips['Dropped Scores'] = dropped_score_tooltips
-  
-  
   ## ----------------------------- Grade cutoffs ------------------------- ##
   
   grade_cutoff_ticks = [ [1, "100%"], [0, "0%"] ]
@@ -116,7 +115,13 @@ $(function () {
   var grade_cutoff_ticks = ${ json.dumps(grade_cutoff_ticks) }
   
   //Always be sure that one series has the xaxis set to 2, or the second xaxis labels won't show up
-  series.push( {label: 'Dropped Scores', data: droppedScores, points: {symbol: "cross", show: true, radius: 3}, bars: {show: false}, color: "#333"} );
+  series.push( {
+    label: 'Dropped Scores',
+    data: droppedScores,
+    points: {show: false, symbol: "cross", radius: 3}, // Points have been hidden, change this to "show: true" to make visible again.
+    bars: {show: false},
+    color: "#333"
+  });
   
   // Allow for arbitrary grade markers e.g. ['A', 'B', 'C'], ['Pass'], etc.
   var ascending_grades = grade_cutoff_ticks.map(function (el) { return el[0]; }); // Percentage point (in decimal) of each grade cutoff

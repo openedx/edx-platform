@@ -1,4 +1,5 @@
 div.profile-wrapper {
+  position: relative;
   color: #000;
 
   section.user-info {
@@ -237,6 +238,26 @@ div.profile-wrapper {
               }
             }
           }
+        }
+      }
+    }
+    
+    div#graph-sidebar {
+      position: absolute;
+      top: 100px;
+      right: 50px;
+      height: 450px;
+      width: 250px;
+      
+      h2 {
+        text-transform: none;
+        padding: 7px 0;
+        margin: 0 0 10px 0;
+        border-bottom: 1px solid #e3e3e3;
+      }
+      p {
+        span.dropped {
+          color: $lighter-base-font-color;
         }
       }
     }
