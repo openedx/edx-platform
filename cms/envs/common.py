@@ -487,3 +487,6 @@ INSTALLED_APPS = INSTALLED_APPS + (
 # Years allowed range
 DELTA_YEAR = 12
 MAX_YEAR_ALLOWED = 70 
+
+ALLOWED_HOSTS = ['iaen.edu.ec']
+
