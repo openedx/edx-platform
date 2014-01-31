@@ -14,7 +14,7 @@
     <input type="hidden" name="problem_id" value="${ problem['name'] }" />
 
     % if check_button:
-    <input class="check ${ check_button }" type="button" value="${ check_button }" />
+    <input class="check ${ check_button }" type="button" data-checking="${ check_button_checking }" value="${ check_button }" />
     % endif
     % if reset_button:
     <input class="reset" type="button" value="${_('Reset')}" />
