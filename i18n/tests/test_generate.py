@@ -16,7 +16,7 @@ class TestGenerate(TestCase):
     """
     Tests functionality of i18n/generate.py
     """
-    generated_files = ('django-partial.po', 'djangojs.po', 'mako.po')
+    generated_files = ('django-partial.po', 'djangojs-partial.po', 'mako.po')
 
     def setUp(self):
         # Subtract 1 second to help comparisons with file-modify time succeed,

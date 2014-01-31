@@ -6,7 +6,7 @@ See https://edx-wiki.atlassian.net/wiki/display/ENG/PO+File+workflow
 This task extracts all English strings from all source code
 and produces three human-readable files:
    conf/locale/en/LC_MESSAGES/django-partial.po
-   conf/locale/en/LC_MESSAGES/djangojs.po
+   conf/locale/en/LC_MESSAGES/djangojs-partial.po
    conf/locale/en/LC_MESSAGES/mako.po
 
 This task will clobber any existing django.po file.
@@ -42,14 +42,14 @@ def main():
     source_msgs_dir = CONFIGURATION.source_messages_dir
     remove_file(source_msgs_dir.joinpath('django.po'))
 
+    # Extract strings from mako templates.
+    babel_mako_cmd = 'pybabel extract -F %s -c "Translators:" . -o %s' % (BABEL_CONFIG, BABEL_OUT)
+    execute(babel_mako_cmd, working_directory=BASE_DIR)
+
     makemessages = "django-admin.py makemessages -l en"
     ignores = " ".join('--ignore="{}/*"'.format(d) for d in CONFIGURATION.ignore_dirs)
     if ignores:
         makemessages += " " + ignores
-
-    # Extract strings from mako templates.
-    babel_mako_cmd = 'pybabel extract -F %s -c "Translators:" . -o %s' % (BABEL_CONFIG, BABEL_OUT)
-    execute(babel_mako_cmd, working_directory=BASE_DIR)
 
     # Extract strings from django source files, including .py files.
     make_django_cmd = makemessages + ' --extension html'
@@ -64,6 +64,13 @@ def main():
     os.rename(
         source_msgs_dir.joinpath('django.po'),
         source_msgs_dir.joinpath('django-partial.po')
+    )
+
+    # makemessages creates 'djangojs.po'. This filename is hardcoded.
+    # Rename it to djangojs-partial.po to enable merging into djangojs.po later.
+    os.rename(
+        source_msgs_dir.joinpath('djangojs.po'),
+        source_msgs_dir.joinpath('djangojs-partial.po')
     )
 
     # Segment the generated files.

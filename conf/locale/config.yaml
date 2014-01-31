@@ -53,7 +53,7 @@ segment:
         django-studio.po:       #  produces this .po file..
             - cms/*             #   by segregating strings from these files.
         # Anything that doesn't match a pattern stays in the original file.
-    djangojs.po:
+    djangojs-partial.po:
         djangojs-studio.po:
             - cms/*
     mako.po:
@@ -69,5 +69,5 @@ generate_merge:
         - mako-studio.po
         - messages.po
     djangojs.po:
-        - djangojs.po
+        - djangojs-partial.po
         - djangojs-studio.po

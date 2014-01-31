@@ -37,7 +37,7 @@ def clean_locale(locale):
     Iterates over machine-generated files.
     """
     dirname = CONFIGURATION.get_messages_dir(locale)
-    for filename in ('django-partial.po', 'djangojs.po', 'mako.po'):
+    for filename in ('django-partial.po', 'djangojs-partial.po', 'mako.po'):
         clean_file(dirname.joinpath(filename))
 
 def clean_file(file):
