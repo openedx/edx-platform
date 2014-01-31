@@ -6,6 +6,8 @@ import json
 import logging
 import decimal
 import datetime
+import crum
+from track.views import server_track
 from pytz import UTC
 
 from edxmako.shortcuts import render_to_response
@@ -38,6 +40,10 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from .exceptions import WindowExpiredException
 
 log = logging.getLogger(__name__)
+
+EVENT_NAME_USER_ENTERED_MIDCOURSE_REVERIFY_VIEW = 'edx.course.enrollment.reverify.started'
+EVENT_NAME_USER_SUBMITTED_MIDCOURSE_REVERIFY = 'edx.course.enrollment.reverify.submitted'
+EVENT_NAME_USER_REVERIFICATION_REVIEWED_BY_SOFTWARESECURE = 'edx.course.enrollment.reverify.reviewed'
 
 class VerifyView(View):
 
@@ -251,6 +257,13 @@ def results_callback(request):
             "Result {} not understood. Known results: PASS, FAIL, SYSTEM FAIL".format(result)
         )
 
+    # If this is a reverification, log an event
+    if attempt.window:
+        course_id = window.course_id
+        course = course_from_id(course_id)
+        course_enrollment = CourseEnrollment.get_or_create_enrollment(attempt.user, course_id)
+        course_enrollment.emit_event(EVENT_NAME_USER_REVERIFICATION_REVIEWED_BY_SOFTWARESECURE)
+
     return HttpResponse("OK!")
 
 
@@ -345,6 +358,9 @@ class MidCourseReverifyView(View):
         display this view
         """
         course = course_from_id(course_id)
+        course_enrollment = CourseEnrollment.get_or_create_enrollment(request.user, course_id)
+        course_enrollment.update_enrollment(mode="verified")
+        course_enrollment.emit_event(EVENT_NAME_USER_ENTERED_MIDCOURSE_REVERIFY_VIEW)
         context = {
             "user_full_name": request.user.profile.name,
             "error": False,
@@ -353,8 +369,8 @@ class MidCourseReverifyView(View):
             "course_org": course.display_org_with_default,
             "course_num": course.display_number_with_default,
             "reverify": True,
-
         }
+
         return render_to_response("verify_student/midcourse_photo_reverification.html", context)
 
     @method_decorator(login_required)
@@ -376,6 +392,9 @@ class MidCourseReverifyView(View):
 
             attempt.save()
             attempt.submit()
+            course_enrollment = CourseEnrollment.get_or_create_enrollment(request.user, course_id)
+            course_enrollment.update_enrollment(mode="verified")
+            course_enrollment.emit_event(EVENT_NAME_USER_SUBMITTED_MIDCOURSE_REVERIFY)
             return HttpResponseRedirect(reverse('verify_student_midcourse_reverification_confirmation'))
 
         except WindowExpiredException:
