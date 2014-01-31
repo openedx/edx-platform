@@ -76,6 +76,7 @@ def wrap_xblock(runtime_class, block, view, frag, context, display_name_only=Fal
     template_context = {
         'content': block.display_name if display_name_only else frag.content,
         'classes': css_classes,
+        'display_name': block.display_name_with_default,
         'data_attributes': ' '.join(u'data-{}="{}"'.format(key, value) for key, value in data.items()),
     }
 

@@ -15,7 +15,7 @@ class CourseNavPage(PageObject):
     url = None
 
     def is_browser_on_page(self):
-        return self.is_css_present('section.course-index')
+        return self.is_css_present('div.course-index')
 
     @property
     def sections(self):

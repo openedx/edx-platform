@@ -185,28 +185,28 @@ ${fragment.foot_html()}
  <%include file="/courseware/course_navigation.html" args="active_page='courseware'" />
 % endif
 
-<section class="container">
+<div class="container">
   <div class="course-wrapper">
 
 % if accordion:
-    <section aria-label="${_('Course Navigation')}" class="course-index">
+    <div class="course-index">
       <header id="open_close_accordion">
         <a href="#">${_("close")}</a>
       </header>
 
       <div id="accordion" style="display: none">
-        <nav>
+        <nav aria-label="${_('Course Navigation')}">
           ${accordion}
         </nav>
       </div>
-    </section>
+    </div>
 % endif
 
     <section class="course-content">
       ${fragment.body_html()}
     </section>
   </div>
-</section>
+</div>
 
 % if show_chat:
   <div id="chat-wrapper">

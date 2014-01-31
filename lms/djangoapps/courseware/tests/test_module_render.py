@@ -406,7 +406,7 @@ class TestHtmlModifiers(ModuleStoreTestCase):
         )
         result_fragment = module.render('student_view')
 
-        self.assertIn('section class="xblock xblock-student_view xmodule_display xmodule_HtmlModule"', result_fragment.content)
+        self.assertIn('div class="xblock xblock-student_view xmodule_display xmodule_HtmlModule"', result_fragment.content)
 
     def test_xmodule_display_wrapper_disabled(self):
         module = render.get_module(
@@ -419,7 +419,7 @@ class TestHtmlModifiers(ModuleStoreTestCase):
         )
         result_fragment = module.render('student_view')
 
-        self.assertNotIn('section class="xblock xblock-student_view xmodule_display xmodule_HtmlModule"', result_fragment.content)
+        self.assertNotIn('div class="xblock xblock-student_view xmodule_display xmodule_HtmlModule"', result_fragment.content)
 
     def test_static_link_rewrite(self):
         module = render.get_module(
