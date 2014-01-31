@@ -10,6 +10,8 @@ import string       # pylint: disable=W0402
 import urllib
 import uuid
 import time
+from collections import defaultdict
+from pytz import UTC
 
 from django.conf import settings
 from django.contrib.auth import logout, authenticate, login
@@ -45,7 +47,7 @@ from student.models import (
 )
 from student.forms import PasswordResetFormNoActive
 
-from verify_student.models import SoftwareSecurePhotoVerification
+from verify_student.models import SoftwareSecurePhotoVerification, MidcourseReverificationWindow
 from certificates.models import CertificateStatuses, certificate_status_for_student
 
 from xmodule.course_module import CourseDescriptor
@@ -82,6 +84,7 @@ log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
 
 Article = namedtuple('Article', 'title url author image deck publication publish_date')
+ReverifyInfo = namedtuple('ReverifyInfo', 'course_id course_name course_number date status display')  # pylint: disable=C0103
 
 
 def csrf_token(context):
@@ -179,6 +182,88 @@ def cert_info(user, course):
         return {}
 
     return _cert_info(user, course, certificate_status_for_student(user, course.id))
+
+
+def reverification_info(course_enrollment_pairs, user, statuses):
+    """
+    Returns reverification-related information for *all* of user's enrollments whose
+    reverification status is in status_list
+
+    Args:
+        course_enrollment_pairs (list): list of (course, enrollment) tuples
+        user (User): the user whose information we want
+        statuses (list): a list of reverification statuses we want information for
+            example: ["must_reverify", "denied"]
+
+    Returns:
+        dictionary of lists: dictionary with one key per status, e.g.
+            dict["must_reverify"] = []
+            dict["must_reverify"] = [some information]
+    """
+    reverifications = defaultdict(list)
+    for (course, enrollment) in course_enrollment_pairs:
+        info = single_course_reverification_info(user, course, enrollment)
+        if info:
+            reverifications[info.status].append(info)
+
+    # Sort the data by the reverification_end_date
+    for status in statuses:
+        if reverifications[status]:
+            reverifications[status].sort(key=lambda x: x.date)
+    return reverifications
+
+
+def single_course_reverification_info(user, course, enrollment):  # pylint: disable=invalid-name
+    """Returns midcourse reverification-related information for user with enrollment in course.
+
+    If a course has an open re-verification window, and that user has a verified enrollment in
+    the course, we return a tuple with relevant information. Returns None if there is no info..
+
+    Args:
+        user (User): the user we want to get information for
+        course (Course): the course in which the student is enrolled
+        enrollment (CourseEnrollment): the object representing the type of enrollment user has in course
+
+    Returns:
+        ReverifyInfo: (course_id, course_name, course_number, date, status)
+        OR, None: None if there is no re-verification info for this enrollment
+    """
+    window = MidcourseReverificationWindow.get_window(course.id, datetime.datetime.now(UTC))
+
+    # If there's no window OR the user is not verified, we don't get reverification info
+    if (not window) or (enrollment.mode != "verified"):
+        return None
+    return ReverifyInfo(
+        course.id, course.display_name, course.number,
+        window.end_date.strftime('%B %d, %Y %X %p'),
+        SoftwareSecurePhotoVerification.user_status(user, window)[0],
+        SoftwareSecurePhotoVerification.display_status(user, window),
+    )
+
+
+def get_course_enrollment_pairs(user, course_org_filter, org_filter_out_set):
+    """
+    Get the relevant set of (Course, CourseEnrollment) pairs to be displayed on
+    a student's dashboard.
+    """
+    for enrollment in CourseEnrollment.enrollments_for_user(user):
+        try:
+            course = course_from_id(enrollment.course_id)
+
+            # if we are in a Microsite, then filter out anything that is not
+            # attributed (by ORG) to that Microsite
+            if course_org_filter and course_org_filter != course.location.org:
+                continue
+            # Conversely, if we are not in a Microsite, then let's filter out any enrollments
+            # with courses attributed (by ORG) to Microsites
+            elif course.location.org in org_filter_out_set:
+                continue
+
+            yield (course, enrollment)
+        except ItemNotFoundError:
+            log.error("User {0} enrolled in non-existent course {1}"
+                      .format(user.username, enrollment.course_id))
+
 
 
 def _cert_info(user, course, cert_status):
@@ -321,11 +406,6 @@ def complete_course_mode_info(course_id, enrollment):
 def dashboard(request):
     user = request.user
 
-    # Build our (course, enrollment) list for the user, but ignore any courses that no
-    # longer exist (because the course IDs have changed). Still, we don't delete those
-    # enrollments, because it could have been a data push snafu.
-    course_enrollment_pairs = []
-
     # for microsites, we want to filter and only show enrollments for courses within
     # the microsites 'ORG'
     course_org_filter = MicrositeConfiguration.get_microsite_configuration_value('course_org_filter')
@@ -338,23 +418,10 @@ def dashboard(request):
     if course_org_filter:
         org_filter_out_set.remove(course_org_filter)
 
-    for enrollment in CourseEnrollment.enrollments_for_user(user):
-        try:
-            course = course_from_id(enrollment.course_id)
-
-            # if we are in a Microsite, then filter out anything that is not
-            # attributed (by ORG) to that Microsite
-            if course_org_filter and course_org_filter != course.location.org:
-                continue
-            # Conversely, if we are not in a Microsite, then let's filter out any enrollments
-            # with courses attributed (by ORG) to Microsites
-            elif course.location.org in org_filter_out_set:
-                continue
-
-            course_enrollment_pairs.append((course, enrollment))
-        except ItemNotFoundError:
-            log.error(u"User {0} enrolled in non-existent course {1}"
-                      .format(user.username, enrollment.course_id))
+    # Build our (course, enrollment) list for the user, but ignore any courses that no
+    # longer exist (because the course IDs have changed). Still, we don't delete those
+    # enrollments, because it could have been a data push snafu.
+    course_enrollment_pairs = list(get_course_enrollment_pairs(user, course_org_filter, org_filter_out_set))
 
     course_optouts = Optout.objects.filter(user=user).values_list('course_id', flat=True)
 
@@ -386,7 +453,12 @@ def dashboard(request):
     )
 
     # Verification Attempts
+    # Used to generate the "you must reverify for course x" banner
     verification_status, verification_msg = SoftwareSecurePhotoVerification.user_status(user)
+
+    # Gets data for midcourse reverifications, if any are necessary or have failed
+    statuses = ["approved", "denied", "pending", "must_reverify"]
+    reverifications = reverification_info(course_enrollment_pairs, user, statuses)
 
     show_refund_option_for = frozenset(course.id for course, _enrollment in course_enrollment_pairs
                                        if _enrollment.refundable())
@@ -398,6 +470,10 @@ def dashboard(request):
     except ExternalAuthMap.DoesNotExist:
         pass
 
+    # If there are *any* denied reverifications that have not been toggled off,
+    # we'll display the banner
+    denied_banner = any(item.display for item in reverifications["denied"])
+
     context = {'course_enrollment_pairs': course_enrollment_pairs,
                'course_optouts': course_optouts,
                'message': message,
@@ -408,9 +484,12 @@ def dashboard(request):
                'all_course_modes': course_modes,
                'cert_statuses': cert_statuses,
                'show_email_settings_for': show_email_settings_for,
+               'reverifications': reverifications,
                'verification_status': verification_status,
                'verification_msg': verification_msg,
                'show_refund_option_for': show_refund_option_for,
+               'denied_banner': denied_banner,
+               'billing_email': settings.PAYMENT_SUPPORT_EMAIL,
                }
 
     return render_to_response('dashboard.html', context)

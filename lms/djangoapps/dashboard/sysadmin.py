@@ -47,7 +47,6 @@ from xmodule.modulestore.xml import XMLModuleStore
 log = logging.getLogger(__name__)
 
 
-
 class SysadminDashboardView(TemplateView):
     """Base class for sysadmin dashboard views with common methods"""
 
@@ -675,7 +674,7 @@ class GitLogs(TemplateView):
                 mdb = mongoengine.connect(mongo_db['db'], host=mongo_db['host'])
         except mongoengine.connection.ConnectionError:
             log.exception('Unable to connect to mongodb to save log, '
-                              'please check MONGODB_LOG settings.')
+                          'please check MONGODB_LOG settings.')
 
         if course_id is None:
             # Require staff if not going to specific course

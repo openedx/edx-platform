@@ -224,6 +224,15 @@ $error-color: $error-red;
 $warning-color: $m-pink;
 $confirm-color: $m-green;
 
+// Notifications
+$notify-banner-bg-1: rgb(56,56,56);
+$notify-banner-bg-2: rgb(136,136,136);
+$notify-banner-bg-3: rgb(223,223,223);
+
+$alert-color: rgb(212, 64, 64); //rich red
+$warning-color: rgb(237, 189, 60); //rich yellow
+$success-color: rgb(37, 184, 90); //rich green
+
 // ====================
 
 // MISC: visual horizontal rules
@@ -308,3 +317,8 @@ $video-thumb-url: '../images/courses/video-thumb.jpg';
 $f-serif: 'Bree Serif', Georgia, Cambria, 'Times New Roman', Times, serif;
 $f-sans-serif: 'Open Sans','Helvetica Neue', Helvetica, Arial, sans-serif;
 $f-monospace: 'Bitstream Vera Sans Mono', Consolas, Courier, monospace;
+
+// SPLINT: colors
+
+$msg-bg: $action-primary-bg;
+

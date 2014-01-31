@@ -23,6 +23,15 @@
         $(this).closest('.message.is-expandable').toggleClass('is-expanded');
     }
 
+    $("#failed-verification-button-dismiss").click(function(event) {
+      $.ajax({
+        url: "${reverse('verify_student_toggle_failed_banner_off')}",
+        type: "post",
+        data: { 'user_id': ${user.id}, }
+        })
+      $("#failed-verification-banner").addClass('is-hidden');
+      })
+
     $("#upgrade-to-verified").click(function(event) {
       user = $(event.target).data("user");
       course = $(event.target).data("course-id");
@@ -152,6 +161,12 @@
   </script>
 </%block>
 
+% if reverifications["must_reverify"] or reverifications["denied"]:
+  <section class="dashboard-banner">
+    <%include file='dashboard/_dashboard_prompt_midcourse_reverify.html' />
+  </section>
+% endif
+
 <section class="container dashboard" id="dashboard-main" aria-hidden="false">
 
   %if message:
@@ -188,6 +203,8 @@
         % endif
 
         <%include file='dashboard/_dashboard_status_verification.html' />
+
+        <%include file='dashboard/_dashboard_reverification_sidebar.html' />
 
       </ul>
     </section>

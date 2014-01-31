@@ -2,6 +2,7 @@ import logging
 import urllib
 
 from functools import partial
+from collections import defaultdict
 
 from django.conf import settings
 from django.core.context_processors import csrf
@@ -29,6 +30,7 @@ from courseware.models import StudentModule, StudentModuleHistory
 from course_modes.models import CourseMode
 
 from student.models import UserTestGroup, CourseEnrollment
+from student.views import course_from_id, single_course_reverification_info
 from util.cache import cache, cache_if_anonymous
 from xblock.fragment import Fragment
 from xmodule.modulestore import Location
@@ -265,7 +267,8 @@ def index(request, course_id, chapter=None, section=None,
             'fragment': Fragment(),
             'staff_access': staff_access,
             'masquerade': masq,
-            'xqa_server': settings.FEATURES.get('USE_XQA_SERVER', 'http://xqa:server@content-qa.mitx.mit.edu/xqa')
+            'xqa_server': settings.FEATURES.get('USE_XQA_SERVER', 'http://xqa:server@content-qa.mitx.mit.edu/xqa'),
+            'reverifications': fetch_reverify_banner_info(request, course_id),
             }
 
         # Only show the chat if it's enabled by the course and in the
@@ -451,9 +454,19 @@ def course_info(request, course_id):
     course = get_course_with_access(request.user, course_id, 'load')
     staff_access = has_access(request.user, course, 'staff')
     masq = setup_masquerade(request, staff_access)    # allow staff to toggle masquerade on info page
+    reverifications = fetch_reverify_banner_info(request, course_id)
 
-    return render_to_response('courseware/info.html', {'request': request, 'course_id': course_id, 'cache': None,
-            'course': course, 'staff_access': staff_access, 'masquerade': masq})
+    context = {
+        'request': request,
+        'course_id': course_id,
+        'cache': None,
+        'course': course,
+        'staff_access': staff_access,
+        'masquerade': masq,
+        'reverifications': reverifications,
+    }
+
+    return render_to_response('courseware/info.html', context)
 
 
 @ensure_csrf_cookie
@@ -654,6 +667,7 @@ def _progress(request, course_id, student_id):
         'grade_summary': grade_summary,
         'staff_access': staff_access,
         'student': student,
+        'reverifications': fetch_reverify_banner_info(request, course_id)
     }
 
     with grades.manual_transaction():
@@ -661,6 +675,21 @@ def _progress(request, course_id, student_id):
 
     return response
 
+
+def fetch_reverify_banner_info(request, course_id):
+    """
+    Fetches needed context variable to display reverification banner in courseware
+    """
+    reverifications = defaultdict(list)
+    user = request.user
+    if not user.id:
+        return reverifications
+    enrollment = CourseEnrollment.get_or_create_enrollment(request.user, course_id)
+    course = course_from_id(course_id)
+    info = single_course_reverification_info(user, course, enrollment)
+    if info:
+        reverifications[info.status].append(info)
+    return reverifications
 
 @login_required
 def submission_history(request, course_id, student_username, location):

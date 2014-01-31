@@ -454,6 +454,8 @@ INSTALLED_APPS = (
 
     # Dark-launching languages
     'dark_lang',
+    # Student identity reverification
+    'reverification',
 )
 
 
