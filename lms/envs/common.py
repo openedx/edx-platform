@@ -465,7 +465,7 @@ HTTPS = 'on'
 ROOT_URLCONF = 'lms.urls'
 IGNORABLE_404_ENDS = ('favicon.ico')
 # NOTE: Please set ALLOWED_HOSTS to some sane value, as we do not allow the default '*'
-ALLOWED_HOSTS = ['iaen.edu.ec']
+#ALLOWED_HOSTS = ['iaen.edu.ec']
 
 # Platform Email
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
