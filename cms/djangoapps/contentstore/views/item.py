@@ -113,7 +113,8 @@ def xblock_handler(request, tag=None, package_id=None, branch=None, version_guid
 
                 return render_to_response('component.html', {
                     'preview': get_preview_html(request, component),
-                    'editor': content
+                    'editor': content,
+                    'display_name': component.display_name,
                 })
         elif request.method == 'DELETE':
             delete_children = str_to_bool(request.REQUEST.get('recurse', 'False'))

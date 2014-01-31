@@ -154,3 +154,16 @@ def see_component_in_position(step, display_name, index):
         return world.css_text(component_css, int(index)).startswith(display_name.upper())
 
     world.wait_for(find_problem, timeout_msg='Did not find the duplicated problem')
+
+
+@step(u'I see the display name is "([^"]*)"')
+def check_component_display_name(step, display_name):
+    label = world.css_text(".component-header")
+    assert display_name == label
+
+
+@step(u'I change the display name to "([^"]*)"')
+def change_display_name(step, display_name):
+    world.edit_component_and_select_settings()
+    world.css_fill("ul.settings-list li:first-child input", display_name)
+    world.save_component(step)
