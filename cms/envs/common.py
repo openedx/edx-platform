@@ -488,5 +488,10 @@ INSTALLED_APPS = INSTALLED_APPS + (
 DELTA_YEAR = 12
 MAX_YEAR_ALLOWED = 70 
 
-#ALLOWED_HOSTS = ['iaen.edu.ec']
+ALLOWED_HOSTS = [
+    'beta.cms.iaen.edu.ec',
+    'beta.evex.iaen.edu.ec',
+    'upex.iaen.edu.ec',
+    'cms.iaen.edu.ec'
+    ]
 
