@@ -21,7 +21,7 @@ if not on_rtd:  # only import and set the theme if we're building docs locally
 sys.path.append(os.path.abspath('../../../'))
 sys.path.append(os.path.abspath('../../'))
 
-from docs.shared.conf import *
+#from docs.shared.conf import *
 
 sys.path.insert(0, os.path.abspath('.'))
 
@@ -36,7 +36,7 @@ templates_path.append('source/_templates')
 html_static_path.append('source/_static')
 
 project = u'edX Data Documentation'
-copyright = u'2013, edX'
+copyright = u'2014, edX'
 
 # The short X.Y version.
 version = ''
