@@ -23,7 +23,7 @@ templates_path.append('source/_templates')
 html_static_path.append('source/_static')
 
 project = u'edX Data Documentation'
-copyright = u'2013, edX Documentation Team'
+copyright = u'2014, edX'
 
 # The short X.Y version.
 version = ''
