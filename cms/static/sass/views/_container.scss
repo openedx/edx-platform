@@ -901,6 +901,10 @@ body.unit {
     &.editing {
       padding-top: 0;
     }
+
+    .drag-handle {
+      display: none;
+    }
   }
 }
 

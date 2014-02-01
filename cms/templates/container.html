@@ -1,12 +1,13 @@
 <%inherit file="base.html" />
 <%!
-  from django.core.urlresolvers import reverse
-  from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
 %>
 <%block name="title">${_("Container")}</%block>
 <%block name="bodyclass">is-signedin course uploads view-container</%block>
 
 <%namespace name='static' file='static_content.html'/>
+<%namespace name="units" file="widgets/units.html" />
 
 <%block name="header_extras">
 % for template_name in [ ]:
@@ -20,17 +21,19 @@
 <script type='text/javascript'>
     require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit", "jquery.ui"],
             function(doc, $, ModuleModel, UnitEditView, ui) {
+                var model;
                 window.unit_location_analytics = '${unit_locator}';
 
                 // tabs
                 $('.tab-group').tabs();
 
+                model = new ModuleModel({
+                    id: '${unit_locator}',
+                    state: '${unit_state}'
+                });
                 new UnitEditView({
-                    el: $('.main-wrapper'),
-                    model: new ModuleModel({
-                        id: '${unit_locator}',
-                        state: '${unit_state}'
-                    })
+                    el: $('.wrapper'),
+                    model: model
                 });
 
                 $('.new-component-template').each(function(){
@@ -71,100 +74,15 @@
                 % for locator in components:
                 <li class="component" data-locator="${locator}"/>
                 % endfor
-                <li class="new-component-item adding">
-                    <div class="new-component">
-                        <h5>${_("Add New Component")}</h5>
-                        <ul class="new-component-type">
-                            % for type, templates in sorted(component_templates.items()):
-                            <li>
-                                % if type == 'advanced' or len(templates) > 1:
-                                <a href="#" class="multiple-templates" data-type="${type}">
-                                    % else:
-                                    % for __, category, __, __ in templates:
-                                    <a href="#" class="single-template" data-type="${type}" data-category="${category}">
-                                        % endfor
-                                        % endif
-                                        <span class="large-template-icon large-${type}-icon"></span>
-                                        <span class="name">${type}</span>
-                                    </a>
-                            </li>
-                            % endfor
-                        </ul>
-                    </div>
-                    % for type, templates in sorted(component_templates.items()):
-                    % if len(templates) > 1 or type == 'advanced':
-                    <div class="new-component-templates new-component-${type}">
-                        % if type == "problem":
-                        <div class="tab-group tabs">
-                            <ul class="problem-type-tabs nav-tabs">
-                                <li class="current">
-                                    <a class="link-tab" href="#tab1">${_("Common Problem Types")}</a>
-                                </li>
-                                <li>
-                                    <a class="link-tab" href="#tab2">${_("Advanced")}</a>
-                                </li>
-                            </ul>
-                            % endif
-                            <div class="tab current" id="tab1">
-                                <ul class="new-component-template">
-                                    % for name, category, has_markdown, boilerplate_name in sorted(templates):
-                                    % if has_markdown or type != "problem":
-                                    % if boilerplate_name is None:
-                                    <li class="editor-md empty">
-                                        <a href="#" data-category="${category}">
-                                            <span class="name">${name}</span>
-                                        </a>
-                                    </li>
-
-                                    % else:
-                                    <li class="editor-md">
-                                        <a href="#" data-category="${category}"
-                                           data-boilerplate="${boilerplate_name}">
-                                            <span class="name">${name}</span>
-                                        </a>
-                                    </li>
-                                    % endif
-                                    % endif
-
-                                    %endfor
-                                </ul>
-                            </div>
-                            % if type == "problem":
-                            <div class="tab" id="tab2">
-                                <ul class="new-component-template">
-                                    % for name, category, has_markdown, boilerplate_name in sorted(templates):
-                                    % if not has_markdown:
-                                    <li class="editor-manual">
-                                        <a href="#" data-category="${category}"
-                                           data-boilerplate="${boilerplate_name}">
-                                            <span class="name">${name}</span>
-                                        </a>
-                                    </li>
-                                    % endif
-                                    % endfor
-                                </ul>
-                            </div>
-                        </div>
-                        % endif
-                        <a href="#" class="cancel-button">Cancel</a>
-                    </div>
-                    % endif
-                    % endfor
-                </li>
             </ol>
         </article>
 
         <aside class="content-supplementary" role="complimentary">
             <div class="bit">
-                <h3 class="title-3">${_("What files are listed here?")}</h3>
-            	<p>${_("In addition to the files you upload on this page, any files that you add to the course appear in this list. These files include your course image, textbook chapters, and files that appear on your Course Handouts sidebar.")}</p>
-            </div>
-            <div class="bit">
                 <h3 class="title-3">${_("What can I do on this page?")}</h3>
-                 <ul class="list-details">
-          			<li class="item-detail">${_("You can upload new files or view, download, or delete existing files. You can lock a file so that people who are not enrolled in your course cannot access that file.")}</li>
-          			<li class="item-detail">${_("Use the URL listed for a file to create a link to that file in the Course Handouts sidebar or in the body of the course.")}</li>
-        		</ul>
+                <ul class="list-details">
+                    <li class="item-detail">${_("Not much since this is read-only! TODO: need some real doc here...")}</li>
+                </ul>
             </div>
         </aside>
     </section>
