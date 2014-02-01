@@ -6,7 +6,7 @@
  <% return _("{course_number} Courseware").format(course_number=course.display_number_with_default) %>
 </%def>
 
-<%block name="bodyclass">courseware ${course.css_class}</%block>
+<%block name="bodyclass">courseware ${course.css_class or ''}</%block>
 <%block name="title"><title>
     % if section_title: 
 ${page_title_breadcrumbs(section_title, course_name())}
