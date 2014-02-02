@@ -1,0 +1,17 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%!
+  from django.core.urlresolvers import reverse
+%>
+
+<%namespace name='static' file='../static_content.html'/>
+
+<li class="status status-verification is-accepted">
+  <span class="title status-title">
+    ${_("Preferred Language")}
+    (<a href="#change_language" rel="leanModal" class="edit-email">${_("edit")}</a>)
+  </span>
+  <span class="data">English (US)</span>
+</li>
+
+
+

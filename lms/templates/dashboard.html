@@ -193,6 +193,8 @@
           </span> <span class="data">${ user.email | h }</span>
         </li>
 
+        <%include file='dashboard/_dashboard_info_language.html' />
+
         % if external_auth_map is None or 'shib' not in external_auth_map.external_domain:
         <li class="controls--account">
           <span class="title"><div class="icon"></div><a href="#password_reset_complete" rel="leanModal" id="pwd_reset_button">${_("Reset Password")}</a></span>
@@ -328,6 +330,8 @@
     </div>
   </div>
 </section>
+
+<%include file='modal/_modal-settings-language.html' />
 
 <section id="apply_name_change" class="modal" aria-hidden="true">
   <div class="inner-wrapper" role="dialog" aria-labelledby="change-name-title">
