@@ -228,11 +228,12 @@
     padding-bottom: 0;
   }
 
+  .title-super {
+    @extend %hd-delta;
+  }
+
   h3, .title {
-    @extend %t-title7;
-    margin: 0 0 ($baseline/4) 0;
-    color: $gray-d2;
-    font-weight: 600;
+    @extend %hd-epsilon;
   }
 
   p, .copy {

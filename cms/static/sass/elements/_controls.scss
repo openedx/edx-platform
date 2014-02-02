@@ -365,3 +365,33 @@
     }
   }
 }
+
+// ====================
+
+// UI: toggle editing state
+.ui-toggle-edit {
+
+  // STATE: not editing (implied)
+  .ui-toggle-edit-display {
+    @include transition(opacity $tmg-f1 ease-in-out 0s);
+    @extend %ui-shown;
+  }
+
+  .ui-toggle-edit-form {
+    @include transition(opacity $tmg-f1 ease-in-out 0s);
+    @extend %ui-hidden;
+  }
+
+  // STATE: is editing
+  &.is-editing {
+
+    .ui-toggle-edit-form {
+      @extend %ui-shown;
+    }
+
+    .ui-toggle-edit-display {
+      @extend %ui-hidden;
+    }
+  }
+}
+
