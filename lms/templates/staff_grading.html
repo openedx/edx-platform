@@ -1,0 +1,418 @@
+<html>
+<style type="text/css">
+table.gridtable {
+font-family: verdana,arial,sans-serif;
+font-size:11px;
+color:#333333;
+border-width: 1px;
+border-color: #666666;
+border-collapse: collapse;
+}
+table.gridtable th {
+border-width: 1px;
+padding: 8px;
+border-style: solid;
+border-color: #666666;
+background-color: #dedede;
+}
+table.gridtable td {
+border-width: 1px;
+padding: 8px;
+border-style: solid;
+border-color: #666666;
+background-color: #ffffff;
+}
+
+.grading_modal {
+    position: fixed;
+    z-index:100;
+    top: 0px;
+    left: 0px;
+    height:100%;
+    width:100%;
+    background: #000;
+    display: none;
+    }
+</style>
+
+<!----------------------------------------------------------------------------- -->
+
+<section id="${modid}_section">
+  <h1>${display_name}</h1>
+
+  % if is_staff:
+    <hr width="80%"/>
+    <font color="red">For Course Staff: 
+        <a id="${modid}_grading_trig" rel="leanModal" href="#${modid}_grading_modal">Click Here to Grade Submissions</a>
+    </font>
+    <a id="${modid}_enter_grade_trig" rel="leanModal" href="#${modid}_enter_grade_modal" style="display:none;">enter grade</a>
+  % endif
+
+  % if rs:
+    <hr width="80%"/>    
+    <p>You have previously submitted:</p>
+    <table class="gridtable"><tr><th>Filename</th><th>Date</th><th>Grade</th><th>Comments</th></tr>
+    % for fstat in rs:
+        <tr>
+	    <td><a href='javascript:js_${modid}.getFile({"fn":"${fstat['student_filename']}"})'>${fstat['student_filename']}</a></td>
+	    <td>${fstat['created'][:16]}</td>
+	    <td>${fstat.get('score','(not graded yet)')}</td>
+	    <td>
+	    % if fstat.get('annotated_staff_filename', ''):
+	        <a href='javascript:js_${modid}.downloadAnnotated("")'>${fstat['annotated_staff_filename']}</a> |
+	    % endif
+	    ${fstat.get('staff_comments','')}</td>
+	</tr>
+    % endfor
+    </table>
+    <p>The maximum grade on this assignment is ${max_score}</p>
+
+  % endif
+
+    <hr width="80%"/>    
+
+  % if is_past_due:
+    <p>Due date is past - no more uploads allowed.</p>
+  % elif is_graded:
+    <p>Your assignment has already been submitted and graded.</p>
+  % else:
+    <form enctype="multipart/form-data" method="post" name="${modid}_fileinfo">
+        File to upload:
+        <input type="file" name="file" required id="sga_file2upload" />
+    </form>
+    <div id="output"></div>
+
+     <br/>
+    <a id="${modid}_SendFile" href="#" class="button upload-button new-button"><i class="icon-plus"></i>&nbsp; Upload New File</a>
+  % endif
+
+  % if is_staff:
+
+  <section class="modal grading_modal" id="${modid}_grading_modal" style="width:80%; left:10%; top:10%; height:80%; overflow:auto;" >
+    <div class="inner-wrapper" style="color:black">
+        <h2>Staff Graded Assignment</h2>
+      <div class="staff_grading" style="display:block">
+          <div id="sg_instructions"><p>Instructions: Click on a filename to download
+student's submission.  Enter numerical grade (max: ${max_score}) and
+optional comments.  Upload a file, e.g. annotated PDF, for additional
+feedback to students.  "UNgrade" will erase the grade and allow the
+student to upload a new file.</p><p>All actions are logged.</p></div>
+  
+          <div id="sg_table"></div>
+  
+      </div>
+      <a class="modal_close" href="#"></a>
+    </div>
+  </section>
+  
+  <section class="modal" id="${modid}_enter_grade_modal" style="width:60%; left:20%; top:20%; height:50%; overflow:auto;" >
+    <div class="inner-wrapper" style="color:gray">
+      <header>
+        <h2>Enter Grade</h2>
+      </header>
+      <div class="staff_grading" style="display:block">
+          <h3><div id="student_name"></div></h3>
+          <form enctype="multipart/form-data" id="${modid}_grade_form" action="" method="post">
+  	    Grade: <input type="text" name="grade"> <div id="grade_msg"></div>
+  	    Comment (max 1023 characters): <textarea name="comment" rows="4"></textarea>
+	    Annotated file (optional): <input type="file" name="file" id="sga_file2upload" />
+  	    <input type="hidden" name="username">
+  	    <input type="submit" value="Submit Grade" />
+  	    <input type="submit" value="Cancel" />
+	    <div id="gf_output"></div>
+  	</form>
+      </div>
+    </div>
+  </section>
+  
+  % endif
+
+</section>
+
+
+<script type="text/javascript" >
+
+js_sga = (function(modid){
+    
+    var mid = modid;
+    var sgasec = $('#' + mid + '_section');
+
+    function blink(selector){
+	$(selector).fadeOut('slow', function(){
+	    $(this).fadeIn('slow', function(){
+		blink(this);
+            });
+	});
+    }
+
+    function add_csrf(data){
+	data['csrfmiddlewaretoken'] = '${csrf_token}';
+	return data
+    }
+
+    function submitAssignmentFile() {
+        return uploadFile(mid + "_fileinfo", 'output', true, 'upload', true, '', '');
+    }
+
+    function uploadFile(inputid, outputid, required, action, dojump, uname, callback) {
+	var oOutput = sgasec.find('#' + outputid);
+	oOutput.html('<p>Uploading...<img src="/static/images/spinner.gif"/></p>');
+
+	oData = new FormData(document.forms.namedItem(inputid));
+	oData.append("csrfmiddlewaretoken", "${csrf_token}");
+	if (uname){
+	    oData.append('uname', uname);	// for uploading annotated file
+	}
+
+	var sgafn = $(inputid).find('#sga_file2upload').val(); 
+	if (required & (sgafn=='')){
+	    oOutput.html("Please selct a file");
+	    return false;
+	}
+
+	var oReq = new XMLHttpRequest();
+	oReq.open("POST", "${ajax_url}/" + action, true);
+	oReq.addEventListener('progress', function(e) {
+	    // var done = e.position || e.loaded, total = e.totalSize || e.total;
+            // console.log('xhr progress: ' + (Math.floor(done/total*1000)/10) + '%');
+	    oOutput.html('<p>Uploading...<font color="green">Storing</font></p>');
+	}, false);
+	if ( oReq.upload ) {
+            oReq.upload.onprogress = function(e) {
+		var done = e.position || e.loaded, total = e.totalSize || e.total;
+		console.log('xhr.upload progress: ' + done + ' / ' + total + ' = ' + (Math.floor(done/total*1000)/10) + '%');
+		pct = (Math.floor(done/total*1000)/10);
+		if (pct>90){
+	            oOutput.html('<p>Uploading...' + pct + '% <font color="red" id="storing">Storing...</font></p>');
+		    blink('#storing');
+		}else{
+    	            oOutput.html('<p>Uploading...' + pct + '%</p>');
+		}
+            };
+	};
+	oReq.onload = function(oEvent) {
+	    if (oReq.status == 200) {
+		oOutput.innerHTML = "<font color='green'>Uploaded!</font>";
+		data = JSON.parse(oReq.responseText);
+		if (dojump){
+ 		    window.location.replace('${jump_to_id}');	// reload page
+		}
+	    } else {
+		oOutput.innerHTML = "Error " +
+		    oReq.status + " occurred uploading your file.<br \/>";
+	    }
+	};
+	oReq.send(oData);
+	if (callback){
+	    return callback();
+	}
+	return false;
+    }
+    
+    function getFile(pdata){
+	$.post( "${ajax_url}/download", pdata)
+	    .done(function( data ) {
+		if (data.ok){
+	            window.open(data.url, "download", "_blank");
+		}else{
+	            alert(data.msg);
+		}
+	    });
+    }
+    
+    function isNumber(n) {
+	return !isNaN(parseFloat(n)) && isFinite(n);
+    }
+    
+    function doneWithGrade(){
+	sgasec.find('#' + mid + '_enter_grade_modal').hide();
+	sgasec.find('#' + mid + '_grading_trig').click();
+	gform = sgasec.find('#' + mid + '_grade_form');
+	gform.find("input[type=text], textarea").val(""); // clear form
+	gform.find('#sga_file2upload').val("");	// clear file input
+	gform.find('#gf_output').html("");
+	sgasec.find('#grade_msg').html("");
+    }
+    
+    function removeGrade(uname){
+	$.post("${ajax_url}/unscore", {'uname': uname})
+	    .done(function( data ) {
+		if (data.ok){
+		    console.log("Grade for " + uname + " Removed");
+		}else{
+		    alert(data.msg);
+		}
+		getGradeSubmissions();
+	    });
+    }
+    
+    function downloadAnnotated(uname){
+        pdata = {'uname': uname};
+	$.post( "${ajax_url}/downloadAnnotated", pdata)
+	    .done(function( data ) {
+		if (data.ok){
+	            window.open(data.url, "download", "_blank");
+		}else{
+	            alert(data.msg);
+		}
+	    });
+    }
+
+    function enterGrade(uname){
+	gm = sgasec.find('#' + mid + '_grading_modal');
+	gm.hide();
+	sgasec.find('#' + mid + '_enter_grade_trig').click();
+	// sgasec.find('#' + mid + '_enter_grade_modal').show();
+	sgasec.find('#student_name').html("Grade for "+ uname);
+	gform = sgasec.find('#' + mid + '_grade_form');
+	gform.find("input[name=username]").val(uname);
+	gform.find('#gf_output').html("");
+	
+	sgasec.find('#' + mid + '_grade_form').submit(function(event) {
+	    event.stopImmediatePropagation();
+	    console.log(event);
+            $(this).submit(function() {		// disable further clicks
+		return false;
+	    });
+	    event.preventDefault();
+	    button = $('input[type=submit][clicked=true]').val()
+	    if (button=="Cancel"){
+		return doneWithGrade();
+	    }
+	    if (button=="Submit Grade"){
+		gform = sgasec.find('#' + mid + '_grade_form');
+		// validate grade
+		grade = gform.find("input[name=grade]").val();
+		the_uname = gform.find("input[name=username]").val();
+		gnum = parseFloat(grade);
+		if ((!isNumber(grade)) | (gnum < 0) | (gnum > ${max_score})) {
+	            gform.find('#grade_msg').html("<font color='red'>Grade must be a valid number; max=${max_score}</font>");
+		}else{
+	            grade = parseFloat(grade);
+   	            comments = gform.find("textarea[name=comment]").val();
+		    pdata = {'grade': grade, 'comments': comments, 'uname': the_uname};
+		    pdata = add_csrf(pdata);
+
+                    do_score = function(){
+		      $.post("${ajax_url}/score", pdata)
+			.done(function( data ) {
+		            if (data.ok){
+				console.log("Grade for " + the_uname + " Entered");
+				doneWithGrade();
+		            }else{
+				alert(data.msg);
+			    }
+			    getGradeSubmissions();
+			    setTimeout( function() {  getGradeSubmissions(); }, 1000);
+			});
+		    }
+
+                    // if uploading an annotated file, then submit file using uploadFile
+		    var sgafn = gform.find('#sga_file2upload').val();
+		    if (sgafn){
+		        console.log('uploading annotated');
+			console.log(sgafn);
+		        uploadFile(mid + "_grade_form", 'gf_output',
+			           false, 'uploadAnnotated', false, the_uname,
+				   do_score);
+		    }else{
+		        do_score();
+		    }
+		}
+            }
+	});
+    }
+    
+    $("form input[type=submit]").click(function() {
+	$("input[type=submit]",$(this).parents("form")).removeAttr("clicked");
+	$(this).attr("clicked", "true");
+    });
+    
+    function funcname(name){
+	return 'javascript:js_' + mid + '.' + name;
+    }
+
+    function grade_link(item){
+	fn = funcname('enterGrade');
+	return '<a href="' + funcname('enterGrade') + '(\'' + item['username'] + '\')">' + 'Enter grade' + '</a>';
+    }
+    
+    function download_annotated_link(item){
+	fn = funcname('downloadAnnotated');
+	return '<a href="' + funcname('downloadAnnotated') + '(\'' + item['username'] + '\')">' + item['annotated_staff_filename'] + '</a> | ';
+    }
+
+    function ungrade_link(item){
+	return '<a href="' + funcname('removeGrade') + '(\'' + item['username'] + '\')">' + 'UNgrade' + '</a>';
+    }
+    
+    function staff_link(item){
+	return '<a href="' + funcname('getFile') + '({\'uname\':\'' + item['username'] + '\'})">' + item['student_filename'] + '</a>';
+    }
+    
+    function update_sg_table(data){
+	hs = '<table class="gridtable"><tr><th>Username</th><th>Name</th><th>Filename</th><th>Created</th><th>Grade</th><th>Comments</th></tr>';
+	data.forEach(function(item){
+            hs = hs + "<tr>";
+	    hs = hs + "<td>" + item['username'] + "</td>";
+	    hs = hs + "<td>" + item['name'] + "</td>";
+	    hs = hs + "<td>" + staff_link(item) + "</td>";
+	    hs = hs + "<td>" + item['created'] + "</td>";
+	    hs = hs + "<td>" + item['score'] + "</td>";
+	    hs = hs + "<td>" 
+	    if (item['annotated_staff_filename']){
+	        hs = hs + download_annotated_link(item);
+	    }
+	    hs = hs + item['staff_comments'] + "</td>";
+	    hs = hs + "<td>" + grade_link(item) + "</td>";
+	    hs = hs + "<td>" + ungrade_link(item) + "</td>";
+            hs = hs + "</tr>";
+	});
+	hs = hs + "</table>";
+	sgasec.find('#sg_table').html(hs);
+    }   
+    
+    function getGradeSubmissions(){
+	gm = sgasec.find('#' + mid + '_grading_modal');
+	gm.show()
+	$.ajax({
+            url: "${ajax_url}/list",
+            type: "POST",
+            data: "",
+            success: function(data) {
+		update_sg_table(data);
+		// console.log(data);
+            },
+            error: function() {
+		alert('Error: cannot connect to server');
+            }
+	});
+    }
+    
+    sgasec.find('#' + mid + '_grading_trig').click(getGradeSubmissions);
+    sgasec.find('#' + mid + '_SendFile').click(submitAssignmentFile);
+    sgasec.find('#' + mid + '_grading_trig').leanModal();
+    sgasec.find('#' + mid + '_enter_grade_trig').leanModal();
+
+    sgfun = { 'enterGrade' : enterGrade,
+	      'removeGrade': removeGrade,
+	      'getFile': getFile,
+	      'funcname': funcname,
+	      'grade_link': grade_link,
+	      'mid': mid,
+	      'sgasec': sgasec,
+	      'submitAssignmentFile': submitAssignmentFile,
+	      'downloadAnnotated': downloadAnnotated,
+	      'update_sg_table': update_sg_table,
+	      'getGradeSubmissions': getGradeSubmissions
+	    }
+
+    return sgfun;
+
+}('${modid}') );
+
+js_${modid} = js_sga;
+
+</script>
+
+</html>
