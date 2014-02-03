@@ -43,17 +43,7 @@ def run_tests(system, report_dir, test_id=nil, stop_on_failure=true)
     end
 
     cmd = django_admin(system, :test, 'test', test_id)
-    test_sh(run_under_coverage(cmd, system))
-end
-
-# Run documentation tests
-desc "Run documentation tests"
-task :test_docs do
-    # Be sure that sphinx can build docs w/o exceptions.
-    test_message = "If test fails, you shoud run '%s' and look at whole output and fix exceptions.
-(You shouldn't fix rst warnings and errors for this to pass, just get rid of exceptions.)"
-    puts (test_message  % ["rake doc[docs,verbose]"]).colorize( :light_green )
-    test_sh('rake builddocs')
+    test_sh(system, run_under_coverage(cmd, system))
 end
 
 task :clean_test_files do
@@ -113,7 +103,7 @@ Dir["common/lib/*"].select{|lib| File.directory?(lib)}.each do |lib|
         args.with_defaults(:test_id => lib)
         ENV['NOSE_XUNIT_FILE'] = File.join(report_dir, "nosetests.xml")
         cmd = "nosetests --id-file=#{test_ids} #{args.test_id}"
-        test_sh(run_under_coverage(cmd, lib))
+        test_sh(lib, run_under_coverage(cmd, lib))
     end
     TEST_TASK_DIRS << lib
 
@@ -139,9 +129,6 @@ namespace :test do
     desc "Run all python tests"
     task :python, [:test_id]
 end
-
-desc "Run all tests"
-task :test, [:test_id] => [:test_docs, 'test:python', 'i18n:test']
 
 desc "Build the html, xml, and diff coverage reports"
 task :coverage => :report_dirs do
@@ -176,3 +163,7 @@ task :coverage => :report_dirs do
         puts "\n"
     end
 end
+
+# Other Rake files append additional tests to the main test command.
+desc "Run all unit tests"
+task :test, [:test_id] => 'test:python'
