@@ -56,7 +56,7 @@ h1 {
   font-weight: 600;
   color: $gray-d3;
 
-  .subtitle {
+  .navigation, .navigation-divider, .subtitle {
     @extend %t-title7;
     position: relative;
     top: ($baseline/4);
@@ -318,6 +318,41 @@ p, ul, ol, dl {
 
     // layout with actions
     &.has-subtitle {
+
+      .nav-actions {
+        bottom: -($baseline*1.5);
+      }
+    }
+
+    // layout with actions
+    &.has-navigation {
+
+      .navigation-link {
+        display: inline-block;
+        overflow: hidden; 
+        max-width: 150px;
+        color: inherit;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+
+        &:hover {
+          color: $blue-s1;
+
+          &:after {
+          	color: $gray-l2;
+          }
+        }
+      }
+
+      .navigation-link:after {
+          content: "/";
+          margin: 0px $baseline/4;
+          color: inherit;
+
+          &:hover {
+          	color: inherit;
+          }
+        }
 
       .nav-actions {
         bottom: -($baseline*1.5);

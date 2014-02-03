@@ -49,10 +49,14 @@ from django.utils.translation import ugettext as _
 
 
 <div class="wrapper-mast wrapper">
-    <header class="mast has-actions has-subtitle">
+    <header class="mast has-actions has-navigation">
         <h1 class="page-header">
-            <small class="subtitle">${_("Content")}</small>
-            <span class="sr">&gt; </span>${_("Container")}
+            <small class="navigation navigation-parents">
+                <a href="#" class="navigation-link navigation-parent-previous">${_("Parent of Unit Page")}</a>
+                <a href="#" class="navigation-link navigation-parent">${_("Unit Page Super Long Title Name Goes Here Yeah Whats Up Parent")}</a>
+            </small>
+            <span class="sr">&gt; </span>
+            <span class="container-page-name">${_("Container")}</span>
         </h1>
 
         <nav class="nav-actions">
@@ -67,8 +71,8 @@ from django.utils.translation import ugettext as _
 </div>
 
 <div class="wrapper-content wrapper">
-    <section class="content">
-        <article class="unit-body window">
+    <section class="content-area">
+        <article class="content-primary window">
             <p class="unit-name-input"><label for="unit-display-name-input">${_("Display Name:")}</label><input type="text" value="${unit.display_name_with_default | h}" id="unit-display-name-input" class="unit-display-name-input" /></p>
             <ol class="components">
                 % for locator in components:

@@ -13,11 +13,6 @@ body.course.container,.view-container {
   }
   //end problem selector reqs
 
-  .main-column {
-    clear: both;
-    float: left;
-    width: 70%;
-  }
 
   .unit-body.published {
     .components > li {
@@ -29,7 +24,10 @@ body.course.container,.view-container {
     }
   }
 
-  .unit-body {
+  .content-primary {
+    clear: both;
+    float: left;
+    width: 70%;
 
     .unit-name-input {
       padding: $baseline 2*$baseline;
@@ -958,7 +956,7 @@ body.unit {
 
 // Unit Page Sidebar
 
-.sidebar {
+.content-supplementary {
 
   label {
     @extend %t-title8;
