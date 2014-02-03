@@ -59,7 +59,7 @@ end
 task :clean_test_files do
     desc "Clean fixture files used by tests and .pyc files"
     sh("git clean -fqdx test_root/logs test_root/data test_root/staticfiles test_root/uploads")
-    sh("find . -type f -name *.pyc -delete")
+    sh("find . -type f -name \"*.pyc\" -delete")
 end
 
 task :clean_reports_dir => REPORT_DIR do
