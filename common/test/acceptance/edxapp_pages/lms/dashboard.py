@@ -12,19 +12,22 @@ class DashboardPage(PageObject):
     courses she/he has registered for.
     """
 
-    name = "lms.dashboard"
-
-    def url(self, **kwargs):
-        return BASE_URL + "/dashboard"
+    url = BASE_URL + "/dashboard"
 
     def is_browser_on_page(self):
         return self.is_css_present('section.my-courses')
 
+    @property
     def available_courses(self):
         """
         Return list of the names of available courses (e.g. "999 edX Demonstration Course")
         """
-        return self.css_text('section.info > hgroup > h3 > a')
+        def _get_course_name(el):
+            # The first component in the link text is the course number
+            _, course_name = el.text.split(' ', 1)
+            return course_name
+
+        return self.css_map('section.info > hgroup > h3 > a', _get_course_name)
 
     def view_course(self, course_id):
         """

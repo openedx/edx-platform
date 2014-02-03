@@ -5,34 +5,49 @@ Fixture to create a course and course components (XBlocks).
 import json
 import datetime
 from textwrap import dedent
+from collections import namedtuple
 import requests
 from lazy import lazy
-from bok_choy.web_app_fixture import WebAppFixture, WebAppFixtureError
 from . import STUDIO_BASE_URL
 
 
-class StudioApiFixture(WebAppFixture):
+class StudioApiLoginError(Exception):
+    """
+    Error occurred while logging in to the Studio API.
+    """
+    pass
+
+
+class StudioApiFixture(object):
     """
     Base class for fixtures that use the Studio restful API.
     """
 
     @lazy
-    def session_cookies(self):
+    def session(self):
         """
-        Log in as a staff user, then return the cookies for the session (as a dict)
-        Raises a `WebAppFixtureError` if the login fails.
+        Log in as a staff user, then return a `requests` `session` object for the logged in user.
+        Raises a `StudioApiLoginError` if the login fails.
         """
+        # Use auto-auth to retrieve session for a logged in user
+        session = requests.Session()
+        response = session.get(STUDIO_BASE_URL + "/auto_auth?staff=true")
 
-        # Use auto-auth to retrieve session cookies for a logged in user
-        response = requests.get(STUDIO_BASE_URL + "/auto_auth?staff=true")
-
-        # Return the cookies from the request
+        # Return the session from the request
         if response.ok:
-            return {key: val for key, val in response.cookies.items()}
+            return session
 
         else:
             msg = "Could not log in to use Studio restful API.  Status code: {0}".format(response.status_code)
-            raise WebAppFixtureError(msg)
+            raise StudioApiLoginError(msg)
+
+    @lazy
+    def session_cookies(self):
+        """
+        Log in as a staff user, then return the cookies for the session (as a dict)
+        Raises a `StudioApiLoginError` if the login fails.
+        """
+        return {key: val for key, val in self.session.cookies.items()}
 
     @lazy
     def headers(self):
@@ -96,6 +111,11 @@ class XBlockFixtureDesc(object):
             'publish': self.publish
         }
 
+        # Need to handle detached categories differently, since they are not published
+        # This may change in the future.
+        if self.category in ['static_tab']:
+            del payload['publish']
+
         if parent_loc is not None:
             payload['parent_locator'] = parent_loc
 
@@ -119,6 +139,19 @@ class XBlockFixtureDesc(object):
             self.category, self.data, self.metadata,
             self.grader_type, self.publish, self.children
         )
+
+
+# Description of course updates to add to the course
+# `date` is a str (e.g. "January 29, 2014)
+# `content` is also a str (e.g. "Test course")
+CourseUpdateDesc = namedtuple("CourseUpdateDesc", ['date', 'content'])
+
+
+class CourseFixtureError(Exception):
+    """
+    Error occurred while installing a course fixture.
+    """
+    pass
 
 
 class CourseFixture(StudioApiFixture):
@@ -160,6 +193,8 @@ class CourseFixture(StudioApiFixture):
         if end_date is not None:
             self._course_details['end_date'] = end_date.isoformat()
 
+        self._updates = []
+        self._handouts = []
         self._children = []
 
     def __str__(self):
@@ -178,14 +213,33 @@ class CourseFixture(StudioApiFixture):
         self._children.extend(args)
         return self
 
+    def add_update(self, update):
+        """
+        Add an update to the course.  `update` should be a `CourseUpdateDesc`.
+        """
+        self._updates.append(update)
+
+    def add_handout(self, asset_name):
+        """
+        Add the handout named `asset_name` to the course info page.
+        Note that this does not actually *create* the static asset; it only links to it.
+        """
+        self._handouts.append(asset_name)
+
     def install(self):
         """
         Create the course and XBlocks within the course.
         This is NOT an idempotent method; if the course already exists, this will
-        raise a `WebAppFixtureError`.  You should use unique course identifiers to avoid
+        raise a `CourseFixtureError`.  You should use unique course identifiers to avoid
         conflicts between tests.
         """
         self._create_course()
+
+        # Remove once STUD-1248 is resolved
+        self._update_loc_map()
+
+        self._install_course_updates()
+        self._install_course_handouts()
         self._configure_course()
         self._create_xblock_children(self._course_loc, self._children)
 
@@ -196,33 +250,46 @@ class CourseFixture(StudioApiFixture):
         """
         return "{org}.{number}.{run}/branch/draft/block/{run}".format(**self._course_dict)
 
+    @property
+    def _updates_loc(self):
+        """
+        Return the locator string for the course updates
+        """
+        return "{org}.{number}.{run}/branch/draft/block/updates".format(**self._course_dict)
+
+    @property
+    def _handouts_loc(self):
+        """
+        Return the locator string for the course handouts
+        """
+        return "{org}.{number}.{run}/branch/draft/block/handouts".format(**self._course_dict)
+
     def _create_course(self):
         """
         Create the course described in the fixture.
         """
         # If the course already exists, this will respond
         # with a 200 and an error message, which we ignore.
-        response = requests.post(
+        response = self.session.post(
             STUDIO_BASE_URL + '/course',
             data=self._encode_post_dict(self._course_dict),
-            headers=self.headers,
-            cookies=self.session_cookies
+            headers=self.headers
         )
 
         try:
             err = response.json().get('ErrMsg')
 
         except ValueError:
-            raise WebAppFixtureError(
+            raise CourseFixtureError(
                 "Could not parse response from course request as JSON: '{0}'".format(
                     response.content))
 
         # This will occur if the course identifier is not unique
         if err is not None:
-            raise WebAppFixtureError("Could not create course {0}.  Error message: '{1}'".format(self, err))
+            raise CourseFixtureError("Could not create course {0}.  Error message: '{1}'".format(self, err))
 
         if not response.ok:
-            raise WebAppFixtureError(
+            raise CourseFixtureError(
                 "Could not create course {0}.  Status was {1}".format(
                     self._course_dict, response.status_code))
 
@@ -233,17 +300,17 @@ class CourseFixture(StudioApiFixture):
         url = STUDIO_BASE_URL + '/settings/details/' + self._course_loc
 
         # First, get the current values
-        response = requests.get(url, headers=self.headers, cookies=self.session_cookies)
+        response = self.session.get(url, headers=self.headers)
 
         if not response.ok:
-            raise WebAppFixtureError(
+            raise CourseFixtureError(
                 "Could not retrieve course details.  Status was {0}".format(
                     response.status_code))
 
         try:
             details = response.json()
         except ValueError:
-            raise WebAppFixtureError(
+            raise CourseFixtureError(
                 "Could not decode course details as JSON: '{0}'".format(old_details)
             )
 
@@ -251,16 +318,74 @@ class CourseFixture(StudioApiFixture):
         details.update(self._course_details)
 
         # POST the updated details to Studio
-        response = requests.post(
+        response = self.session.post(
             url, data=self._encode_post_dict(details),
             headers=self.headers,
-            cookies=self.session_cookies
         )
 
         if not response.ok:
-            raise WebAppFixtureError(
+            raise CourseFixtureError(
                 "Could not update course details to '{0}'.  Status was {1}.".format(
                     self._course_details, response.status_code))
+
+    def _install_course_handouts(self):
+        """
+        Add handouts to the course info page.
+        """
+        url = STUDIO_BASE_URL + '/xblock/' + self._handouts_loc
+
+        # Construct HTML with each of the handout links
+        handouts_li = [
+            '<li><a href="/static/{handout}">Example Handout</a></li>'.format(handout=handout)
+             for handout in self._handouts
+        ]
+        handouts_html = '<ol class="treeview-handoutsnav">{}</ol>'.format("".join(handouts_li))
+
+        # Update the course's handouts HTML
+        payload = json.dumps({
+            'children': None,
+            'data': handouts_html,
+            'id': self._handouts_loc,
+            'metadata': dict()
+        })
+
+        response = self.session.post(url, data=payload, headers=self.headers)
+
+        if not response.ok:
+            raise CourseFixtureError(
+                "Could not update course handouts.  Status was {0}".format(response.status_code))
+
+    def _install_course_updates(self):
+        """
+        Add updates to the course, if any are configured.
+        """
+        url = STUDIO_BASE_URL + '/course_info_update/' + self._updates_loc
+
+        for update in self._updates:
+
+            # Add the update to the course
+            date, content = update
+            payload = json.dumps({'date': date, 'content': content})
+            response = self.session.post(url, headers=self.headers, data=payload)
+
+            if not response.ok:
+                raise CourseFixtureError(
+                    "Could not add update to course: {0}.  Status was {1}".format(
+                        update, response.status_code))
+
+    def _update_loc_map(self):
+        """
+        Force update of the location map.
+        """
+        # We perform a GET request to force Studio to update the course location map.
+        # This is a (minor) bug in the Studio RESTful API: STUD-1248
+        url = "{base}/course_info/{course}".format(base=STUDIO_BASE_URL, course=self._course_loc)
+        response = self.session.get(url, headers={'Accept': 'text/html'})
+
+        if not response.ok:
+            raise CourseFixtureError(
+                "Could not load Studio dashboard to trigger location map update.  Status was {0}".format(
+                    response.status_code))
 
     def _create_xblock_children(self, parent_loc, xblock_descriptions):
         """
@@ -276,40 +401,40 @@ class CourseFixture(StudioApiFixture):
         and `xblock_desc` (an `XBlockFixtureDesc` instance).
         """
         # Create the new XBlock
-        response = requests.post(
+        response = self.session.post(
             STUDIO_BASE_URL + '/xblock',
             data=xblock_desc.serialize(parent_loc=parent_loc),
             headers=self.headers,
-            cookies=self.session_cookies
         )
 
         if not response.ok:
             msg = "Could not create {0}.  Status was {1}".format(xblock_desc, response.status_code)
-            raise WebAppFixtureError(msg)
+            raise CourseFixtureError(msg)
 
         try:
             loc = response.json().get('locator')
 
         except ValueError:
-            raise WebAppFixtureError("Could not decode JSON from '{0}'".format(response.content))
+            raise CourseFixtureError("Could not decode JSON from '{0}'".format(response.content))
 
         if loc is not None:
 
             # Configure the XBlock
-            response = requests.post(
+            response = self.session.post(
                 STUDIO_BASE_URL + '/xblock/' + loc,
                 data=xblock_desc.serialize(),
                 headers=self.headers,
-                cookies=self.session_cookies
             )
 
             if response.ok:
                 return loc
             else:
-                raise WebAppFixtureError("Could not update {0}".format(xblock_desc))
+                raise CourseFixtureError(
+                    "Could not update {0}.  Status code: {1}".format(
+                        xblock_desc, response.status_code))
 
         else:
-            raise WebAppFixtureError("Could not retrieve location of {0}".format(xblock_desc))
+            raise CourseFixtureError("Could not retrieve location of {0}".format(xblock_desc))
 
     def _encode_post_dict(self, post_dict):
         """

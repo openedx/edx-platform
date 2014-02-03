@@ -12,10 +12,7 @@ class LoginPage(PageObject):
     Login page for Studio.
     """
 
-    name = "studio.login"
-
-    def url(self):
-        return BASE_URL + "/signin"
+    url = BASE_URL + "/signin"
 
     def is_browser_on_page(self):
         return self.is_css_present('body.view-signin')
