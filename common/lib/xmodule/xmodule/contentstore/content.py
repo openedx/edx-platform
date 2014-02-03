@@ -112,15 +112,6 @@ class StaticContent(object):
         return Location(path.split('/'))
 
     @staticmethod
-    def get_id_from_path(path):
-        return get_id_from_location(get_location_from_path(path))
-
-    @staticmethod
-    def convert_legacy_static_url(path, course_namespace):
-        loc = StaticContent.compute_location(course_namespace.org, course_namespace.course, path)
-        return StaticContent.get_url_path_from_location(loc)
-
-    @staticmethod
     def convert_legacy_static_url_with_course_id(path, course_id):
         """
         Returns a path to a piece of static content when we are provided with a filepath and
