@@ -83,6 +83,11 @@ class ErrorDescriptor(ErrorFields, XModuleDescriptor):
     def _construct(cls, system, contents, error_msg, location):
         location = Location(location)
 
+        if error_msg is None:
+            # this string is not marked for translation because we don't have
+            # access to the user context, and this will only be seen by staff
+            error_msg = 'Error not available'
+
         if location.category == 'error':
             location = location.replace(
                 # Pick a unique url_name -- the sha1 hash of the contents.
@@ -97,7 +102,6 @@ class ErrorDescriptor(ErrorFields, XModuleDescriptor):
         field_data = DictFieldData({
             'error_msg': str(error_msg),
             'contents': contents,
-            'display_name': 'Error: ' + location.url(),
             'location': location,
             'category': 'error'
         })
@@ -125,7 +129,7 @@ class ErrorDescriptor(ErrorFields, XModuleDescriptor):
         )
 
     @classmethod
-    def from_descriptor(cls, descriptor, error_msg='Error not available'):
+    def from_descriptor(cls, descriptor, error_msg=None):
         return cls._construct(
             descriptor.runtime,
             str(descriptor),
@@ -135,7 +139,7 @@ class ErrorDescriptor(ErrorFields, XModuleDescriptor):
 
     @classmethod
     def from_xml(cls, xml_data, system, id_generator,  # pylint: disable=arguments-differ
-                 error_msg='Error not available'):
+                 error_msg=None):
         '''Create an instance of this descriptor from the supplied data.
 
         Does not require that xml_data be parseable--just stores it and exports
@@ -154,7 +158,7 @@ class ErrorDescriptor(ErrorFields, XModuleDescriptor):
                 if error_node is not None:
                     error_msg = error_node.text
                 else:
-                    error_msg = 'Error not available'
+                    error_msg = None
 
         except etree.XMLSyntaxError:
             # Save the error to display later--overrides other problems
