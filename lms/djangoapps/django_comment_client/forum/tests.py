@@ -11,7 +11,7 @@ from django_comment_client.forum import views
 
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from nose.tools import assert_true  # pylint: disable=E0611
-from mock import patch, Mock
+from mock import patch, Mock, ANY
 
 import logging
 
@@ -85,6 +85,26 @@ class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):
         self.assertEqual(self.response.status_code, 404)
 
 
+def make_mock_thread_data(text, thread_id, include_children):
+    thread_data = {
+        "id": thread_id,
+        "type": "thread",
+        "title": text,
+        "body": text,
+        "commentable_id": "dummy_commentable_id",
+        "resp_total": 42,
+        "resp_skip": 25,
+        "resp_limit": 5,
+    }
+    if include_children:
+        thread_data["children"] = [{
+            "id": "dummy_comment_id",
+            "type": "comment",
+            "body": text,
+        }]
+    return thread_data
+
+
 def make_mock_request_impl(text, thread_id=None):
     def mock_request_impl(*args, **kwargs):
         url = args[1]
@@ -92,30 +112,13 @@ def make_mock_request_impl(text, thread_id=None):
             return Mock(
                 status_code=200,
                 text=json.dumps({
-                    "collection": [{
-                        "id": "dummy_thread_id",
-                        "type": "thread",
-                        "commentable_id": "dummy_commentable_id",
-                        "title": text,
-                        "body": text,
-                    }]
+                    "collection": [make_mock_thread_data(text, "dummy_thread_id", False)]
                 })
             )
         elif thread_id and url.endswith(thread_id):
             return Mock(
                 status_code=200,
-                text=json.dumps({
-                    "id": thread_id,
-                    "type": "thread",
-                    "title": text,
-                    "body": text,
-                    "commentable_id": "dummy_commentable_id",
-                    "children": [{
-                        "id": "dummy_comment_id",
-                        "type": "comment",
-                        "body": text,
-                    }],
-                })
+                text=json.dumps(make_mock_thread_data(text, thread_id, True))
             )
         else: # user query
             return Mock(
@@ -127,6 +130,116 @@ def make_mock_request_impl(text, thread_id=None):
                 })
             )
     return mock_request_impl
+
+
+class StringEndsWithMatcher(object):
+    def __init__(self, suffix):
+        self.suffix = suffix
+
+    def __eq__(self, other):
+        return other.endswith(self.suffix)
+
+
+class PartialDictMatcher(object):
+    def __init__(self, expected_values):
+        self.expected_values = expected_values
+
+    def __eq__(self, other):
+        return all([
+            key in other and other[key] == value
+            for key, value in self.expected_values.iteritems()
+        ])
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@patch('requests.request')
+class SingleThreadTestCase(ModuleStoreTestCase):
+    def setUp(self):
+        self.course = CourseFactory.create()
+        self.student = UserFactory.create()
+        CourseEnrollmentFactory.create(user=self.student, course_id=self.course.id)
+
+    def test_ajax(self, mock_request):
+        text = "dummy content"
+        thread_id = "test_thread_id"
+        mock_request.side_effect = make_mock_request_impl(text, thread_id)
+
+        request = RequestFactory().get(
+            "dummy_url",
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+        request.user = self.student
+        response = views.single_thread(
+            request,
+            self.course.id,
+            "dummy_discussion_id",
+            "test_thread_id"
+        )
+
+        self.assertEquals(response.status_code, 200)
+        response_data = json.loads(response.content)
+        self.assertEquals(
+            response_data["content"],
+            make_mock_thread_data(text, thread_id, True)
+        )
+        mock_request.assert_called_with(
+            "get",
+            StringEndsWithMatcher(thread_id), # url
+            data=None,
+            params=PartialDictMatcher({"mark_as_read": True, "user_id": 1, "recursive": True}),
+            headers=ANY,
+            timeout=ANY
+        )
+
+    def test_skip_limit(self, mock_request):
+        text = "dummy content"
+        thread_id = "test_thread_id"
+        response_skip = "45"
+        response_limit = "15"
+        mock_request.side_effect = make_mock_request_impl(text, thread_id)
+
+        request = RequestFactory().get(
+            "dummy_url",
+            {"resp_skip": response_skip, "resp_limit": response_limit},
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest"
+        )
+        request.user = self.student
+        response = views.single_thread(
+            request,
+            self.course.id,
+            "dummy_discussion_id",
+            "test_thread_id"
+        )
+        self.assertEquals(response.status_code, 200)
+        response_data = json.loads(response.content)
+        self.assertEquals(
+            response_data["content"],
+            make_mock_thread_data(text, thread_id, True)
+        )
+        mock_request.assert_called_with(
+            "get",
+            StringEndsWithMatcher(thread_id), # url
+            data=None,
+            params=PartialDictMatcher({
+                "mark_as_read": True,
+                "user_id": 1,
+                "recursive": True,
+                "resp_skip": response_skip,
+                "resp_limit": response_limit,
+            }),
+            headers=ANY,
+            timeout=ANY
+        )
+
+    def test_post(self, mock_request):
+        request = RequestFactory().post("dummy_url")
+        response = views.single_thread(
+            request,
+            self.course.id,
+            "dummy_discussion_id",
+            "dummy_thread_id"
+        )
+        self.assertEquals(response.status_code, 405)
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)

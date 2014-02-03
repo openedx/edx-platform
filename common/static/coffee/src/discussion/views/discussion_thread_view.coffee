@@ -1,6 +1,9 @@
 if Backbone?
   class @DiscussionThreadView extends DiscussionContentView
 
+    INITIAL_RESPONSE_PAGE_SIZE = 25
+    SUBSEQUENT_RESPONSE_PAGE_SIZE = 100
+
     events:
       "click .discussion-submit-post": "submitComment"
       "click .add-response-btn": "scrollToAddResponse"
@@ -11,6 +14,7 @@ if Backbone?
     initialize: ->
       super()
       @createShowView()
+      @responses = new Comments()
 
     renderTemplate: ->
       @template = _.template($("#thread-template").html())
@@ -18,7 +22,6 @@ if Backbone?
 
     render: ->
       @$el.html(@renderTemplate())
-      @$el.find(".loading").hide()
       @delegateEvents()
 
       @renderShowView()
@@ -27,26 +30,95 @@ if Backbone?
       @$("span.timeago").timeago()
       @makeWmdEditor "reply-body"
       @renderAddResponseButton()
-      @renderResponses()
+      @responses.on("add", @renderResponse)
+      # Without a delay, jQuery doesn't add the loading extension defined in
+      # utils.coffee before safeAjax is invoked, which results in an error
+      setTimeout(
+        => @loadResponses(INITIAL_RESPONSE_PAGE_SIZE, @$el.find(".responses"), true),
+        100
+      )
       @
 
     cleanup: ->
       if @responsesRequest?
         @responsesRequest.abort()
 
-    renderResponses: ->
-      setTimeout(=>
-        @$el.find(".loading").show()
-      , 200)
+    loadResponses: (responseLimit, elem, firstLoad) ->
       @responsesRequest = DiscussionUtil.safeAjax
         url: DiscussionUtil.urlFor('retrieve_single_thread', @model.get('commentable_id'), @model.id)
+        data:
+          resp_skip: @responses.size()
+          resp_limit: responseLimit if responseLimit
+        $elem: elem
+        $loading: elem
+        takeFocus: true
+        complete: =>
+          @responseRequest = null
         success: (data, textStatus, xhr) =>
-          @responsesRequest = null
-          @$el.find(".loading").remove()
           Content.loadContentInfos(data['annotated_content_info'])
-          comments = new Comments(data['content']['children'])
-          comments.each @renderResponse
+          @responses.add(data['content']['children'])
+          @renderResponseCountAndPagination(data['content']['resp_total'])
           @trigger "thread:responses:rendered"
+        error: =>
+          if firstLoad
+            DiscussionUtil.discussionAlert(
+              gettext("Sorry"),
+              gettext("We had some trouble loading responses. Please reload the page.")
+            )
+          else
+            DiscussionUtil.discussionAlert(
+              gettext("Sorry"),
+              gettext("We had some trouble loading more responses. Please try again.")
+            )
+
+    renderResponseCountAndPagination: (responseTotal) =>
+      @$el.find(".response-count").html(
+        interpolate(
+          ngettext(
+            "%(numResponses)s response",
+            "%(numResponses)s responses",
+            responseTotal
+          ),
+          {numResponses: responseTotal},
+          true
+        )
+      )
+      responsePagination = @$el.find(".response-pagination")
+      responsePagination.empty()
+      if responseTotal > 0
+        responsesRemaining = responseTotal - @responses.size()
+        showingResponsesText =
+          if responsesRemaining == 0
+            gettext("Showing all responses")
+          else
+            interpolate(
+              ngettext(
+                "Showing first response",
+                "Showing first %(numResponses)s responses",
+                @responses.size()
+              ),
+              {numResponses: @responses.size()},
+              true
+            )
+        responsePagination.append($("<span>").addClass("response-display-count").html(
+          _.escape(showingResponsesText)
+        ))
+        if responsesRemaining > 0
+          if responsesRemaining < SUBSEQUENT_RESPONSE_PAGE_SIZE
+            responseLimit = null
+            buttonText = gettext("Load all responses")
+          else
+            responseLimit = SUBSEQUENT_RESPONSE_PAGE_SIZE
+            buttonText = interpolate(
+              gettext("Load next %(numResponses)s responses"),
+              {numResponses: responseLimit},
+              true
+            )
+          loadMoreButton = $("<button>").addClass("load-response-button").html(
+            _.escape(buttonText)
+          )
+          loadMoreButton.click((event) => @loadResponses(responseLimit, loadMoreButton))
+          responsePagination.append(loadMoreButton)
 
     renderResponse: (response) =>
         response.set('thread', @model)

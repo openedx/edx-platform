@@ -361,7 +361,7 @@ def safe_content(content):
         'at_position_list', 'children', 'highlighted_title', 'highlighted_body',
         'courseware_title', 'courseware_url', 'unread_comments_count',
         'read', 'group_id', 'group_name', 'group_string', 'pinned', 'abuse_flaggers',
-        'stats'
+        'stats', 'resp_skip', 'resp_limit', 'resp_total',
 
     ]
 
