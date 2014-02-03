@@ -26,6 +26,11 @@
   %>
 
   <%include file="${google_analytics_file}" />
+  
+  ## OG (Open Graph) title and description added below to give social media info to display
+  ## (https://developers.facebook.com/docs/opengraph/howtos/maximizing-distribution-media-content#tags)
+  <meta property="og:title" content="${get_course_about_section(course, 'title')}" />
+  <meta property="og:description" content="${get_course_about_section(course, 'short_description')}" />
 </%block>
 
 <%block name="js_extra">
