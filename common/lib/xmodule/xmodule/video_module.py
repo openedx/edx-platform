@@ -416,7 +416,7 @@ class VideoModule(VideoFields, XModule):
                     '{0}_subs_{1}.srt.sjson'.format(transcript_language, self.youtube_id_1_0)
                 )
                 try:
-                    sjson_transcript_1_0 = contentstore().find(content_location_1_0)
+                    sjson_transcript = contentstore().find(content_location_1_0)
                 except (NotFoundError):
                     generate_1_0_version = True
             else:

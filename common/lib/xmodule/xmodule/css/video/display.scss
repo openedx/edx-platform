@@ -164,7 +164,7 @@ div.video {
         }
       }
 
-      .video-button {
+      %video-button {
         @include transition(none);
         display: block;
         font-weight: 800;
@@ -261,7 +261,7 @@ div.video {
           margin-bottom: 0;
 
           a {
-            @extend .video-button;
+            @extend %video-button;
             background-image: url('../images/vcr.png');
             background-position: 15px 15px ;
             background-repeat: no-repeat;
@@ -393,14 +393,13 @@ div.video {
           }
 
           & > a {
-            @extend .video-button;
+            @extend %video-button;
             @include clearfix();
             background-image: url('../images/closed-arrow.png');
             background-position: 10px center;
             background-repeat: no-repeat;
             min-width: 116px;
             text-indent: 0;
-            color: #999;
 
             @media (max-width: 1024px) {
               min-width: 0;
@@ -415,6 +414,7 @@ div.video {
               padding: 0 lh(.25) 0 lh(.5);
               line-height: 46px;
               text-transform: uppercase;
+              color: #999;
 
               @media (max-width: 1024px) {
                 display: none;
@@ -455,7 +455,7 @@ div.video {
           }
 
           & > a {
-            @extend .video-button;
+            @extend %video-button;
             @include clearfix();
             background-image: url('../images/volume.png');
             background-position: 10px center;
@@ -509,7 +509,7 @@ div.video {
         }
 
         a.add-fullscreen {
-          @extend .video-button;
+          @extend %video-button;
           background: url(../images/fullscreen.png) center no-repeat;
           border-left: none;
           float: left;
@@ -519,7 +519,7 @@ div.video {
 
 
         a.quality_control {
-          @extend .video-button;
+          @extend %video-button;
           background: url(../images/hd.png) center no-repeat;
           border-left: none;
           display: none;
@@ -537,7 +537,7 @@ div.video {
 
         div.lang {
           & > a.hide-subtitles {
-            @extend .video-button;
+            @extend %video-button;
             @include transition(none);
             box-shadow: inset 1px 0 0 #555;
             background: url('../images/cc.png') center no-repeat;

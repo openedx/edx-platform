@@ -67,3 +67,18 @@ Feature: LMS.Video component
     Then video "B" should start playing at speed "0.50"
     When I open video "C"
     Then video "C" should start playing at speed "1.0"
+
+  # 9
+  Scenario: Video components' language menu works correctly
+    Given the course has a Video component in Youtube mode:
+    | transcripts           | sub         |
+    | {"zh": "OEoXaMPEzfM"} | OEoXaMPEzfM |
+    And I make sure captions are closed
+    And I see video menu "language" with following items:
+    | lang-code     | label       |
+    | en            | English     |
+    | zh            | Chinese     |
+    And I select language with code "zh"
+    Then I see "好 各位同学" text in the captions
+    And I select language with code "en"
+    And I see "Hi, welcome to Edx." text in the captions
