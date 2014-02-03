@@ -20,6 +20,7 @@ class RegisterPage(PageObject):
         super(RegisterPage, self).__init__(browser)
         self._course_id = course_id
 
+    @property
     def url(self):
         """
         URL for the registration page of a course.

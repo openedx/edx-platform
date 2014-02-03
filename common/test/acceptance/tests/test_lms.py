@@ -6,16 +6,16 @@ from bok_choy.web_app_test import WebAppTest
 from bok_choy.promise import EmptyPromise, fulfill_before
 
 from .helpers import UniqueCourseTest, load_data_str
-from ..edxapp_pages.studio.auto_auth import AutoAuthPage
-from ..edxapp_pages.lms.login import LoginPage
-from ..edxapp_pages.lms.find_courses import FindCoursesPage
-from ..edxapp_pages.lms.course_about import CourseAboutPage
-from ..edxapp_pages.lms.register import RegisterPage
-from ..edxapp_pages.lms.course_info import CourseInfoPage
-from ..edxapp_pages.lms.tab_nav import TabNavPage
-from ..edxapp_pages.lms.course_nav import CourseNavPage
-from ..edxapp_pages.lms.progress import ProgressPage
-from ..edxapp_pages.lms.video import VideoPage
+from ..pages.studio.auto_auth import AutoAuthPage
+from ..pages.lms.login import LoginPage
+from ..pages.lms.find_courses import FindCoursesPage
+from ..pages.lms.course_about import CourseAboutPage
+from ..pages.lms.register import RegisterPage
+from ..pages.lms.course_info import CourseInfoPage
+from ..pages.lms.tab_nav import TabNavPage
+from ..pages.lms.course_nav import CourseNavPage
+from ..pages.lms.progress import ProgressPage
+from ..pages.lms.video import VideoPage
 from ..fixtures.course import CourseFixture, XBlockFixtureDesc, CourseUpdateDesc
 
 

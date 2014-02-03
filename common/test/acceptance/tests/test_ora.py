@@ -4,12 +4,12 @@ Tests for ORA (Open Response Assessment) through the LMS UI.
 
 import json
 from bok_choy.promise import fulfill, Promise
-from ..edxapp_pages.studio.auto_auth import AutoAuthPage
-from ..edxapp_pages.lms.course_info import CourseInfoPage
-from ..edxapp_pages.lms.tab_nav import TabNavPage
-from ..edxapp_pages.lms.course_nav import CourseNavPage
-from ..edxapp_pages.lms.open_response import OpenResponsePage
-from ..edxapp_pages.lms.progress import ProgressPage
+from ..pages.studio.auto_auth import AutoAuthPage
+from ..pages.lms.course_info import CourseInfoPage
+from ..pages.lms.tab_nav import TabNavPage
+from ..pages.lms.course_nav import CourseNavPage
+from ..pages.lms.open_response import OpenResponsePage
+from ..pages.lms.progress import ProgressPage
 from ..fixtures.course import XBlockFixtureDesc, CourseFixture
 from ..fixtures.xqueue import XQueueResponseFixture
 
