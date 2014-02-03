@@ -44,6 +44,7 @@ from xblock.runtime import KvsFieldData
 
 log = logging.getLogger(__name__)
 
+all_languages = {i[0]: i[1] for i in settings.ALL_LANGUAGES}
 
 class VideoFields(object):
     """Fields for `VideoModule` and `VideoDescriptor`."""
@@ -251,7 +252,7 @@ class VideoModule(VideoFields, XModule):
             # there are no translations and English subtitles are not set by instructor.
             transcript_language = json.dumps(None)
 
-        transcript_languages = {k: settings.ALL_LANGUAGES[k] for k in self.transcripts}
+        transcript_languages = {k: all_languages[k] for k in self.transcripts}
 
         return self.system.render_template('video.html', {
             'ajax_url': self.system.ajax_url + '/save_user_state',
