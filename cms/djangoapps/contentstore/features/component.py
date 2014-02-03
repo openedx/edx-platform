@@ -8,6 +8,8 @@
 from lettuce import world, step
 from nose.tools import assert_true, assert_in  # pylint: disable=E0611
 
+DISPLAY_NAME = "Display Name"
+
 
 @step(u'I add this type of single step component:$')
 def add_a_single_step_component(step):
@@ -165,5 +167,13 @@ def check_component_display_name(step, display_name):
 @step(u'I change the display name to "([^"]*)"')
 def change_display_name(step, display_name):
     world.edit_component_and_select_settings()
-    world.css_fill("ul.settings-list li:first-child input", display_name)
+    index = world.get_setting_entry_index(DISPLAY_NAME)
+    world.set_field_value(index, display_name)
+    world.save_component(step)
+
+
+@step(u'I unset the display name')
+def unset_display_name(step):
+    world.edit_component_and_select_settings()
+    world.revert_setting_entry(DISPLAY_NAME)
     world.save_component(step)
