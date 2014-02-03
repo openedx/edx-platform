@@ -96,7 +96,7 @@ def main():
     # Dummy text is not required. Don't raise exception if files are missing.
     merge_files(CONFIGURATION.dummy_locale, fail_if_missing=False)
 
-    compile_cmd = 'django-admin.py compilemessages'
+    compile_cmd = 'django-admin.py compilemessages -v0'
     execute(compile_cmd, working_directory=BASE_DIR)
 
 
