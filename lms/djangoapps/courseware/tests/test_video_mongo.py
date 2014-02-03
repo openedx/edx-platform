@@ -6,6 +6,8 @@ import os
 import tempfile
 import textwrap
 from functools import partial
+import requests
+from webob import Request
 
 from xmodule.contentstore.content import StaticContent
 from xmodule.modulestore import Location
@@ -527,6 +529,24 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
         self.assertFalse(self.item_module.track_visible)
 
 
+class TestVideoHandlers(TestVideo):
+    def test_download_transcript_not_exist(self):
+        request = Request.blank('/download?language=ua')
+        response = self.item_module.transcript(request=request, dispatch='download')
+        self.assertEqual(response.status, '404 Not Found')
+
+    @patch('xmodule.video_module.VideoModule.get_transcript', return_value='Subs!')
+    def test_download_exist(self, __):
+        request = Request.blank('/download?language=ua')
+        response = self.item_module.transcript(request=request, dispatch='download')
+        self.assertEqual(response.body, 'Subs!')
+
+    def test_translation(self):
+        request = Request.blank('/download?language=ua')
+        response = self.item_module.transcript(request=request, dispatch='download')
+        self.assertEqual(response.status, '404 Not Found')
+
+
 class TestVideoGetTranscriptsMethod(TestVideo):
     """
     Make sure that `get_transcript` method works correctly
@@ -567,9 +587,8 @@ class TestVideoGetTranscriptsMethod(TestVideo):
             """)
 
         _upload_file(good_sjson, self.item_module.location)
-        subs_id = _get_subs_id(good_sjson.name)
-
-        text = item.get_transcript(subs_id)
+        item.sub = _get_subs_id(good_sjson.name)
+        text = item.get_transcript('en')
         expected_text = "Hi, welcome to Edx.\nLet's start with what is on your screen right now."
 
         self.assertEqual(text, expected_text)
@@ -579,7 +598,7 @@ class TestVideoGetTranscriptsMethod(TestVideo):
         item = self.item_descriptor.xmodule_runtime.xmodule_instance
 
         with self.assertRaises(NotFoundError):
-            item.get_transcript('wrong')
+            item.get_transcript('wrong', 'en')
 
     def test_value_error(self):
         self.item_module.render('student_view')
@@ -588,10 +607,10 @@ class TestVideoGetTranscriptsMethod(TestVideo):
         good_sjson = _create_file(content='bad content')
 
         _upload_file(good_sjson, self.item_module.location)
-        subs_id = _get_subs_id(good_sjson.name)
+        item.sub = _get_subs_id(good_sjson.name)
 
         with self.assertRaises(ValueError):
-            item.get_transcript(subs_id)
+            item.get_transcript('en')
 
     def test_key_error(self):
         self.item_module.render('student_view')
@@ -611,11 +630,10 @@ class TestVideoGetTranscriptsMethod(TestVideo):
             """)
 
         _upload_file(good_sjson, self.item_module.location)
-        subs_id = _get_subs_id(good_sjson.name)
+        item.sub = _get_subs_id(good_sjson.name)
 
         with self.assertRaises(KeyError):
-            item.get_transcript(subs_id)
-
+            item.get_transcript('en')
 
 def _clear_assets(location):
     store = contentstore()

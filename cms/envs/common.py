@@ -26,7 +26,8 @@ Longer TODO:
 
 import sys
 import lms.envs.common
-from lms.envs.common import USE_TZ, TECH_SUPPORT_EMAIL, PLATFORM_NAME, BUGS_EMAIL, DOC_STORE_CONFIG, enable_microsites
+from lms.envs.common import (USE_TZ, TECH_SUPPORT_EMAIL, PLATFORM_NAME,
+    BUGS_EMAIL, DOC_STORE_CONFIG, enable_microsites, ALL_LANGUAGES)
 from path import path
 
 from lms.lib.xblock.mixin import LmsBlockMixin

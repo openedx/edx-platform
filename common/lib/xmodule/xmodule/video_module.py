@@ -44,8 +44,6 @@ from xblock.runtime import KvsFieldData
 
 log = logging.getLogger(__name__)
 
-LANGUAGES = {i[0]: i[1] for i in settings.ALL_LANGUAGES}
-
 
 class VideoFields(object):
     """Fields for `VideoModule` and `VideoDescriptor`."""
@@ -253,6 +251,7 @@ class VideoModule(VideoFields, XModule):
             # there are no translations and English subtitles are not set by instructor.
             transcript_language = json.dumps(None)
 
+        LANGUAGES = {i[0]: i[1] for i in settings.ALL_LANGUAGES}
         transcript_languages = {k: LANGUAGES[k] for k in self.transcripts}
         if self.sub:
             transcript_languages.update({'en': 'English'})
@@ -302,7 +301,6 @@ class VideoModule(VideoFields, XModule):
             subs_id = self.youtube_id_1_0
             filename = '{0}_subs_{1}.srt.sjson'.format(lang, subs_id)
 
-        filename = 'subs_{0}.srt.sjson'.format(subs_id)
         content_location = StaticContent.compute_location(
             self.location.org, self.location.course, filename
         )
@@ -313,30 +311,42 @@ class VideoModule(VideoFields, XModule):
         return HTMLParser().unescape("\n".join(text))
 
     @XBlock.handler
-    def download_transcript(self, request, ___):
+    def transcript(self, request, dispatch):
+        """
+        Entry point for transcript handlers.
+        """
+        if dispatch not in ['download', 'translation']:
+            log.debug("Dispatch is not allowed")
+            return Response(status=404)
+
+        if ('language' not in request.GET or
+            'videoId' not in request.GET and dispatch == 'translation'):
+            log.info("Invalid /transcript GET parameters.")
+            return Response(status=400)
+
+        dispatcher = {
+            'download': self.download_to_student,
+            'translation': self.translation,
+        }
+
+        return dispatcher[dispatch](request.GET)
+
+    def download_to_student(self, multidict):
         """
         This is called to get transcript file without timecodes to student.
 
-        request.GET should contain language code, for example: en".
+        multidict: webob multidict, contains 2 chars language code.
         """
-        try:
-            transcript_language = request.GET.get('language')
-        except Exception:
-            log.info("Invalid download_transcript GET request parameters.")
-            return Response(status=400)
-
-        if transcript_language not in ['en'].extend(self.transcripts):
+        lang = multidict.get('language')
+        if lang not in ['en'] + self.transcripts.keys():
             log.info("transcript_translation is not available for given language.")
             return Response(status=404)
 
         try:
-            subs = self.get_transcript(transcript_language)
-        except (NotFoundError):
-            log.debug("Can't find content in storage for %s transcript", self.sub)
+            subs = self.get_transcript(lang)
+        except (NotFoundError, ValueError, KeyError):
+            log.debug("Video@download exception")
             return Response(status=404)
-        except (ValueError, KeyError):
-            log.debug("Invalid transcript JSON.")
-            return Response(status=400)
 
         response = Response(
             subs,
@@ -344,27 +354,20 @@ class VideoModule(VideoFields, XModule):
                 ('Content-Disposition', 'attachment; filename="{0}.txt"'.format(self.sub)),
             ])
         response.content_type = "text/plain; charset=utf-8"
-
         return response
 
-    @XBlock.handler
-    def transcript_translation(self, request, __):
+    def translation(self, multidict):
         """
         This is called to get transcript file for specific language.
 
-        request.GET should contain language code, for example: en", and video_id.
+        multidict: webob multidict, contains 2 chars language code and video_id
         """
-        try:
-            video_id = request.GET.get('videoId')
-            transcript_language = request.GET.get('language')
-        except Exception:
-            log.info("Invalid transcript_translation GET request parameters.")
-            return Response(status=400)
+        lang, video_id = multidict.get('language'), multidict.get('videoId')
 
-        if transcript_language != self.transcript_language:
-            self.transcript_language = transcript_language
+        if lang != self.transcript_language:
+            self.transcript_language = lang
 
-        if transcript_language == 'en':
+        if lang == 'en':
             if self.sub:
                 filename = 'subs_{0}.srt.sjson'.format(self.sub)
                 content_location = StaticContent.compute_location(
@@ -378,7 +381,7 @@ class VideoModule(VideoFields, XModule):
                 log.info("transcript_translation is not available for given language.")
                 return Response(status=404)
 
-        if transcript_language not in self.transcripts:
+        if lang not in self.transcripts:
             log.info("transcript_translation is not available for given language.")
             return Response(status=404)
 
@@ -397,7 +400,7 @@ class VideoModule(VideoFields, XModule):
             return Response(status=404)
 
         speed = youtube_ids[video_id]
-        filename = '{0}_subs_{1}.srt.sjson'.format(transcript_language, video_id)
+        filename = '{0}_subs_{1}.srt.sjson'.format(lang, video_id)
         content_location = StaticContent.compute_location(
             self.location.org, self.location.course, filename
         )
@@ -424,13 +427,13 @@ class VideoModule(VideoFields, XModule):
             if generate_1_0_version: #generating for all speeds
                 try:
                     content_location_uploaded_srt = StaticContent.compute_location(
-                        self.location.org, self.location.course, self.transcripts[transcript_language]
+                        self.location.org, self.location.course, self.transcripts[lang]
                     )
                     srt_transcript = contentstore().find(content_location_uploaded_srt)
                 except (NotFoundError):
-                    log.info("No srt file for language %s for transcript", transcript_language)
+                    log.info("No srt file for language %s for transcript", lang)
                     return Response(status=404)
-                source_subs_ext = os.path.splitext(self.transcripts[transcript_language])[1][1:]
+                source_subs_ext = os.path.splitext(self.transcripts[lang])[1][1:]
                 source_subs_filedata = json.loads(srt_transcript)
                 try:
                     generate_subs_from_source(
@@ -438,7 +441,7 @@ class VideoModule(VideoFields, XModule):
                         source_subs_ext,
                         source_subs_filedata,
                         self,
-                        transcript_language
+                        lang
                     )
                 except Exception as exc:
                     log.info(exc.msg)
@@ -449,7 +452,7 @@ class VideoModule(VideoFields, XModule):
                 # at this point we should have srt.sjson for speed 1.0 in database
                 source_subs = json.loads(contentstore().find(content_location_1_0))
                 subs = generate_subs(youtube_ids[video_id], 1.0, source_subs)
-                save_subs_to_store(subs, video_id, self, transcript_language)
+                save_subs_to_store(subs, video_id, self, lang)
                 sjson_transcript = json.dumps(subs, indent=2)
 
         response = Response(sjson_transcript.data)
@@ -459,8 +462,9 @@ class VideoModule(VideoFields, XModule):
 class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor):
     """Descriptor for `VideoModule`."""
     module_class = VideoModule
-    download_transcript = module_attr('download_transcript')
-    transcript_translation = module_attr('transcript_translation')
+    transcript = module_attr('transcript')
+    # download_transcript = module_attr('download_transcript')
+    # transcript_translation = module_attr('transcript_translation')
 
     tabs = [
         {

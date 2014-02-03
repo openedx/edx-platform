@@ -1267,7 +1267,7 @@ LINKEDIN_API = {
 MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED = 5
 MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS = 15 * 60
 
-ALL_LANGUAGES = [
+ALL_LANGUAGES = (
     ('aa', u'Afar'),
     ('ab', u'Abkhazian'),
     ('af', u'Afrikaans'),
@@ -1298,7 +1298,6 @@ ALL_LANGUAGES = [
     ('cs', u'Czech'),
     ('ch', u'Chamorro'),
     ('ce', u'Chechen'),
-    ('zh', u'Chinese'),
     ('cu', u'Church Slavic; Old Slavonic; Church Slavonic; Old Bulgarian; Old Church Slavonic'),
     ('cv', u'Chuvash'),
     ('kw', u'Cornish'),
@@ -1321,7 +1320,6 @@ ALL_LANGUAGES = [
     ('fa', u'Persian'),
     ('fj', u'Fijian'),
     ('fi', u'Finnish'),
-    ('fr', u'French'),
     ('fr', u'French'),
     ('fy', u'Western Frisian'),
     ('ff', u'Fulah'),
@@ -1418,13 +1416,11 @@ ALL_LANGUAGES = [
     ('qu', u'Quechua'),
     ('rm', u'Romansh'),
     ('ro', u'Romanian; Moldavian; Moldovan'),
-    ('ro', u'Romanian; Moldavian; Moldovan'),
     ('rn', u'Rundi'),
     ('ru', u'Russian'),
     ('sg', u'Sango'),
     ('sa', u'Sanskrit'),
     ('si', u'Sinhala; Sinhalese'),
-    ('sk', u'Slovak'),
     ('sk', u'Slovak'),
     ('sl', u'Slovenian'),
     ('se', u'Northern Sami'),
@@ -1472,4 +1468,4 @@ ALL_LANGUAGES = [
     ('za', u'Zhuang; Chuang'),
     ('zh', u'Chinese'),
     ('zu', u'Zulu')
-]
+)
