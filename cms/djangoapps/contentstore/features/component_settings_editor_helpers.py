@@ -5,6 +5,7 @@ from lettuce import world
 from nose.tools import assert_equal, assert_in  # pylint: disable=E0611
 from terrain.steps import reload_the_page
 from common import type_in_codemirror
+from selenium.webdriver.common.keys import Keys
 
 
 @world.absorb
@@ -219,3 +220,18 @@ def get_setting_entry_index(label):
                 return index
         return None
     return world.retry_on_exception(get_index)
+
+
+@world.absorb
+def set_field_value(index, value):
+    """
+    Set the field to the specified value.
+
+    Note: we cannot use css_fill here because the value is not set
+    until after you move away from that field.
+    Instead we will find the element, set its value, then hit the Tab key
+    to get to the next field.
+    """
+    elem = world.css_find('div.wrapper-comp-setting input.setting-input')[index]
+    elem.value = value
+    elem.type(Keys.TAB)
