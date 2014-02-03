@@ -238,7 +238,7 @@ class VideoModule(VideoFields, XModule):
             if self.track:
                 track_url = self.track
             elif self.sub:
-                track_url = self.runtime.handler_url(self, 'download_transcript')
+                track_url = self.runtime.handler_url(self, 'transcript') + '/download'
 
         if self.transcript_language in self.transcripts:
             transcript_language = self.transcript_language
@@ -279,7 +279,7 @@ class VideoModule(VideoFields, XModule):
             'yt_test_url': settings.YOUTUBE_TEST_URL,
             'transcript_language': transcript_language,
             'transcript_languages': json.dumps(transcript_languages),
-            'transcript_translation_url': self.runtime.handler_url(self, 'transcript_translation')
+            'transcript_translation_url': self.runtime.handler_url(self, 'transcript') + '/translation'
         })
 
     def get_transcript(self, lang):

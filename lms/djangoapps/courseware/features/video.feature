@@ -69,7 +69,7 @@ Feature: LMS.Video component
     Then video "C" should start playing at speed "1.0"
 
   # 9
-  Scenario: Video components' language menu works correctly
+  Scenario: Language menu in Video component works correctly
     Given the course has a Video component in Youtube mode:
     | transcripts           | sub         |
     | {"zh": "OEoXaMPEzfM"} | OEoXaMPEzfM |
