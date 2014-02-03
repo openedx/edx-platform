@@ -15,7 +15,7 @@ class FindCoursesPage(PageObject):
     url = BASE_URL
 
     def is_browser_on_page(self):
-        return self.browser.title == "edX"
+        return "edX" in self.browser.title
 
     @property
     def course_id_list(self):
