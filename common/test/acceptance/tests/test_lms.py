@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 E2E tests for the LMS.
 """
@@ -17,6 +18,7 @@ from ..pages.lms.course_info import CourseInfoPage
 from ..pages.lms.tab_nav import TabNavPage
 from ..pages.lms.course_nav import CourseNavPage
 from ..pages.lms.progress import ProgressPage
+from ..pages.lms.dashboard import DashboardPage
 from ..pages.lms.video import VideoPage
 from ..pages.xblock.acid import AcidView
 from ..fixtures.course import CourseFixture, XBlockFixtureDesc, CourseUpdateDesc
@@ -66,6 +68,30 @@ class RegistrationTest(UniqueCourseTest):
         # Check that we're registered for the course
         course_names = dashboard.available_courses
         self.assertIn(self.course_info['display_name'], course_names)
+
+
+class LanguageTest(UniqueCourseTest):
+    """
+    Tests that the change language functionality on the dashboard works
+    """
+
+    def setUp(self):
+        """
+        Initiailize dashboard page
+        """
+        super(LanguageTest, self).setUp()
+        self.dashboard_page = DashboardPage(self.browser)
+    
+    def test_change_lang(self):
+        AutoAuthPage(self.browser, course_id=self.course_id).visit()
+        self.dashboard_page.visit()
+        # Change language to Esperanto
+        self.dashboard_page.change_language()
+        self.fail()
+        self.dashboard_page.visit()
+        body = self.browser.body
+        matches = re.match(u'^FÏND ÇØÜRSÉS.+$', body)
+        self.assertTrue(matches is not None)
 
 
 class HighLevelTabTest(UniqueCourseTest):

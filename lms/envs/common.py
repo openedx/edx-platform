@@ -501,8 +501,8 @@ LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
 
 # Sourced from http://www.localeplanet.com/icu/ and wikipedia
 LANGUAGES = (
-    ('eo', u'Dummy Language (Esperanto)'),  # Dummy language used for testing
-    ('fake2', u'Fake translations'),        # Another dummy language for testing (not pushed to prod)
+    ('en', u'English'),
+    ('eo', u'Dummy Language (Esperanto)'),  # Dummy languaged used for testing
 
     ('ach', u'Acholi'),  # Acoli
     ('ar', u'العربية'),  # Arabic

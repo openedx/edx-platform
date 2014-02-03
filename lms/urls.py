@@ -62,6 +62,8 @@ urlpatterns = ('',  # nopep8
     url(r'^user_api/', include('user_api.urls')),
 
     url(r'^', include('waffle.urls')),
+
+    url(r'^i18n/', include('django.conf.urls.i18n')),
 )
 
 # if settings.FEATURES.get("MULTIPLE_ENROLLMENT_ROLES"):

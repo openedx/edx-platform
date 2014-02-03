@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Student dashboard page.
 """
@@ -59,3 +60,8 @@ class DashboardPage(PageObject):
             return "a.enter-course:nth-of-type({0})".format(link_index + 1)
         else:
             return None
+
+    def change_language(self):
+        self.css_click(".edit-language")
+        self.select_option("language", "eo")
+        self.css_click("#submit-lang")

@@ -27,6 +27,7 @@ from django.http import (HttpResponse, HttpResponseBadRequest, HttpResponseForbi
 from django.shortcuts import redirect
 from django_future.csrf import ensure_csrf_cookie
 from django.utils.http import cookie_date, base36_to_int
+from django.utils import translation
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST, require_GET
 
@@ -45,6 +46,7 @@ from student.firebase_token_generator import create_token
 
 from verify_student.models import SoftwareSecurePhotoVerification, MidcourseReverificationWindow
 from certificates.models import CertificateStatuses, certificate_status_for_student
+from dark_lang.models import DarkLangConfig
 
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -468,6 +470,9 @@ def dashboard(request):
     # we'll display the banner
     denied_banner = any(item.display for item in reverifications["denied"])
 
+    language_options = DarkLangConfig.current().released_languages_list
+    current_language = translation.get_language_info(translation.get_language())
+
     context = {'course_enrollment_pairs': course_enrollment_pairs,
                'course_optouts': course_optouts,
                'message': message,
@@ -484,6 +489,8 @@ def dashboard(request):
                'show_refund_option_for': show_refund_option_for,
                'denied_banner': denied_banner,
                'billing_email': settings.PAYMENT_SUPPORT_EMAIL,
+               'language_options': language_options,
+               'current_language': current_language,
                }
 
     return render_to_response('dashboard.html', context)

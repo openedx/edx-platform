@@ -1,4 +1,5 @@
 <%! from django.utils.translation import ugettext as _ %>
+<%! from django.template import RequestContext %>
 
 <%!
   from django.core.urlresolvers import reverse
@@ -81,6 +82,16 @@
                $("#password_reset_complete_link").click();
              });
     });
+
+    $("#change_language_form").submit(function(event, xhr) {
+      $.post('/i18n/setlang/',
+        {"language": language,},
+        function(data) {
+          if (data.success){
+            location.reload();
+          }
+          })
+      });
 
     $("#change_email_form").submit(function(){
       var new_email = $('#new_email_field').val();
