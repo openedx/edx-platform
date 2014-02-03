@@ -1,17 +1,15 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%! from courseware.courses import get_course_info_section %>
 
-<%inherit file="/main.html" />
-<%namespace name='static' file='/static_content.html'/>
+<%inherit file="../main.html" />
+<%namespace name='static' file='../static_content.html'/>
 
-<%block name="pagetitle">${__("{course_number} Course Info").format(course_number=course.display_number_with_default)}</%block>
+<%block name="pagetitle">${_("{course_number} Course Info").format(course_number=course.display_number_with_default)}</%block>
 
 <%block name="headextra">
 <%static:css group='style-course-vendor'/>
 <%static:css group='style-course'/>
 </%block>
-
-<%block name="title"><title>${_("{course_number} Course Info").format(course_number=course.display_number_with_default)}</title></%block>
 
 <%include file="/dashboard/_dashboard_prompt_midcourse_reverify.html" />
 
