@@ -48,7 +48,7 @@ from django_comment_common.utils import seed_permissions_roles
 from student.models import CourseEnrollment
 
 from xmodule.html_module import AboutDescriptor
-from xmodule.modulestore.locator import BlockUsageLocator
+from xmodule.modulestore.locator import BlockUsageLocator, CourseLocator
 from course_creators.views import get_course_creator_status, add_user_with_status_unrequested
 from contentstore import utils
 from student.roles import CourseInstructorRole, CourseStaffRole, CourseCreatorRole, GlobalStaff
@@ -168,76 +168,55 @@ def _accessible_courses_list(request):
         """
         Get courses to which this user has access
         """
+        if GlobalStaff().has_user(request.user):
+            return course.location.course != 'templates'
+
         return (has_course_access(request.user, course.location)
                 # pylint: disable=fixme
                 # TODO remove this condition when templates purged from db
                 and course.location.course != 'templates'
-                and course.location.org != ''
-                and course.location.course != ''
-                and course.location.name != '')
+                )
     courses = filter(course_filter, courses)
     return courses
 
 
+# pylint: disable=invalid-name
 def _accessible_courses_list_from_groups(request):
     """
     List all courses available to the logged in user by reversing access group names
     """
     courses_list = []
-    course_id_list = []
+    course_ids = set()
 
-    user_staff_group_names = request.user.groups.filter(Q(name__startswith='instructor_') | Q(name__startswith='staff_')).values_list('name', flat=True)
-    # first try to get new and unique group names (course_id's) before querying database
+    user_staff_group_names = request.user.groups.filter(
+        Q(name__startswith='instructor_') | Q(name__startswith='staff_')
+    ).values_list('name', flat=True)
+
+    # we can only get course_ids from role names with the new format (instructor_org/number/run or
+    # instructor_org.number.run but not instructor_number).
     for user_staff_group_name in user_staff_group_names:
-        # to avoid duplication try to convert all course_id's to new format e.g. "edX.course.run"
-        course_id = re.sub(r'^(instructor_|staff_)', '', user_staff_group_name).replace('/', '.')
-        if len(course_id.split('.')) == 3:
-            if course_id not in course_id_list:
-                course_id_list.append(course_id)
+        # to avoid duplication try to convert all course_id's to format with dots e.g. "edx.course.run"
+        if user_staff_group_name.startswith("instructor_"):
+            # strip starting text "instructor_"
+            course_id = user_staff_group_name[11:]
         else:
-            # old group format: course number only e.g. "course"
-            # not preferable (so return)
-            #
-            # Note: We can try to get course with only course number if there is exactly
-            #  one course with this course number
-            return (False, courses_list)
+            # strip starting text "staff_"
+            course_id = user_staff_group_name[6:]
 
-    for course_id in course_id_list:
-        # new group format: id of course e.g. "edX.course.run"
-        org, course, name = course_id.split('.')
-        course_location = Location('i4x', org, course, 'course', name)
-        try:
-            course = modulestore('direct').get_item(course_location)
-            courses_list.append(course)
-        except ItemNotFoundError:
-            course = None
+        course_ids.add(course_id.replace('/', '.').lower())
 
-        if not course:
-            # since access groups are being stored in lowercase, also do a case-insensitive search
-            # for the potential course id.
-            course_search_location = bson.son.SON({
-                '_id.tag': 'i4x',
-                # pylint: disable=no-member
-                '_id.org': re.compile(u'^{}$'.format(course_location.org), re.IGNORECASE | re.UNICODE),
-                # pylint: disable=no-member
-                '_id.course': re.compile(u'^{}$'.format(course_location.course), re.IGNORECASE | re.UNICODE),
-                '_id.category': 'course',
-                # pylint: disable=no-member
-                '_id.name': re.compile(u'^{}$'.format(course_location.name), re.IGNORECASE | re.UNICODE)
-            })
-            courses = modulestore().collection.find(course_search_location, fields=('_id'))
-            if courses.count() == 1:
-                course_id = courses[0].get('_id')
-                course_location = Location('i4x', course_id.get('org'), course_id.get('course'), 'course', course_id.get('name'))
-                try:
-                    course = modulestore('direct').get_item(course_location)
-                    courses_list.append(course)
-                except ItemNotFoundError:
-                    return (False, courses_list)
-            else:
-                return (False, courses_list)
+    for course_id in course_ids:
+        # get course_location with lowercase idget_item
+        course_location = loc_mapper().translate_locator_to_location(
+            CourseLocator(package_id=course_id), get_course=True, lower_only=True
+        )
+        if course_location is None:
+            raise ItemNotFoundError(course_id)
 
-    return (True, courses_list)
+        course = modulestore('direct').get_course(course_location.course_id)
+        courses_list.append(course)
+
+    return courses_list
 
 
 @login_required
@@ -252,13 +231,16 @@ def course_listing(request):
         # user has global access so no need to get courses from django groups
         courses = _accessible_courses_list(request)
     else:
-        success, courses_from_groups = _accessible_courses_list_from_groups(request)
-        if success:
-            courses = courses_from_groups
-        else:
+        try:
+            courses = _accessible_courses_list_from_groups(request)
+        except ItemNotFoundError:
             # user have some old groups or there was some error getting courses from django groups
             # so fallback to iterating through all courses
             courses = _accessible_courses_list(request)
+
+            # update location entry in "loc_mapper" for user courses (add keys 'lower_id' and 'lower_course_id')
+            for course in courses:
+                loc_mapper().create_map_entry(course.location)
 
     def format_course_for_view(course):
         """
