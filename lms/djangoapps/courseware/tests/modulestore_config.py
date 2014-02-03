@@ -25,5 +25,6 @@ MAPPINGS = {
     'edX/open_ended/2012_Fall': 'xml',
     'edX/due_date/2013_fall': 'xml',
     'edX/open_ended_nopath/2012_Fall': 'xml',
+    'edX/detached_pages/2014': 'xml',
 }
 TEST_DATA_MIXED_MODULESTORE = mixed_store_config(TEST_DATA_DIR, MAPPINGS)

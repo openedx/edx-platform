@@ -574,8 +574,8 @@ class XMLModuleStore(ModuleStoreReadBase):
                     # tabs are referenced in policy.json through a 'slug' which is just the filename without the .html suffix
                     slug = os.path.splitext(os.path.basename(filepath))[0]
                     loc = course_descriptor.scope_ids.usage_id.replace(category=category, name=slug)
-                    module = system.construct_xblock_from_class(
-                        HtmlDescriptor,
+                    module = system.construct_xblock(
+                        category,
                         # We're loading a descriptor, so student_id is meaningless
                         # We also don't have separate notions of definition and usage ids yet,
                         # so we use the location for both

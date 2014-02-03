@@ -155,6 +155,11 @@ class StaticTabDateTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
             category="static_tab", parent_location=self.course.location,
             data="OOGIE BLOOGIE", display_name="new_tab"
         )
+        # The following XML course is closed; we're testing that
+        # static tabs still appear when the course is already closed
+        self.xml_data = "static 463139"
+        self.xml_url = "8e4cce2b4aaf4ba28b1220804619e41f"
+        self.xml_course_id = 'edX/detached_pages/2014'
 
     def test_logged_in(self):
         self.setup_user()
@@ -168,6 +173,21 @@ class StaticTabDateTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn("OOGIE BLOOGIE", resp.content)
+
+    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
+    def test_logged_in_xml(self):
+        self.setup_user()
+        url = reverse('static_tab', args=[self.xml_course_id, self.xml_url])
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn(self.xml_data, resp.content)
+
+    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
+    def test_anonymous_user_xml(self):
+        url = reverse('static_tab', args=[self.xml_course_id, self.xml_url])
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn(self.xml_data, resp.content)
 
 
 class TextbooksTestCase(TestCase):
