@@ -324,6 +324,11 @@ class VideoModule(VideoFields, XModule):
             log.info("Invalid /transcript GET parameters.")
             return Response(status=400)
 
+        lang = request.GET.get('language')
+        if lang not in ['en'] + self.transcripts.keys():
+            log.info("Video: transcript facilities are not available for given language.")
+            return Response(status=404)
+
         dispatcher = {
             'download': self.download_to_student,
             'translation': self.translation,
@@ -338,10 +343,6 @@ class VideoModule(VideoFields, XModule):
         multidict: webob multidict, contains 2 chars language code.
         """
         lang = multidict.get('language')
-        if lang not in ['en'] + self.transcripts.keys():
-            log.info("transcript_translation is not available for given language.")
-            return Response(status=404)
-
         try:
             subs = self.get_transcript(lang)
         except (NotFoundError, ValueError, KeyError):
@@ -351,8 +352,9 @@ class VideoModule(VideoFields, XModule):
         response = Response(
             subs,
             headerlist=[
-                ('Content-Disposition', 'attachment; filename="{0}.txt"'.format(self.sub)),
-            ])
+                ('Content-Disposition', 'attachment; filename="{0}.txt"'.format(lang)),
+            ]
+        )
         response.content_type = "text/plain; charset=utf-8"
         return response
 
@@ -380,10 +382,6 @@ class VideoModule(VideoFields, XModule):
             else:
                 log.info("transcript_translation is not available for given language.")
                 return Response(status=404)
-
-        if lang not in self.transcripts:
-            log.info("transcript_translation is not available for given language.")
-            return Response(status=404)
 
         youtube_ids = {self.youtube_id_1_0: 1.0}
 
