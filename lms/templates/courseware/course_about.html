@@ -140,9 +140,8 @@
             <a href="${course_target}">
           %endif
 
-          <span class="register disabled">
-            ${_("You are registered for this course {course.display_number_with_default}").format(course=course) | h}
-          </span>
+          <span class="register disabled">${_("You are registered for this course")}</span>
+          
           %if show_courseware_link:
             <strong>${_("View Courseware")}</strong>
             </a>
