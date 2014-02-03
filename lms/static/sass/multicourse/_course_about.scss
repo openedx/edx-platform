@@ -152,28 +152,18 @@
             text-transform: uppercase;
             text-align: center;
             float: left;
-            margin: 1px 0 0 0;
+            margin: 1px flex-gutter(8) 0 0;
             @include transition(none);
-            width: flex-grid(6);
+            width: flex-grid(5, 8);
           }
 
           #register_error {
-            float: left;
             background: $error-red;
             border: 1px solid rgb(202, 17, 17);
             color: rgb(143, 14, 14);
             display: none;
             padding: 12px;
             margin-top: 5px;
-            
-            a {
-              color: white;
-              text-decoration: underline;
-              
-              &:hover {
-                text-decoration: none;
-              }
-            }
           }
         }
       }
@@ -351,19 +341,6 @@
             font-weight: 700;
             margin-bottom: 15px;
           }
-        }
-      }
-    }
-    
-    section.unauth-tos p {
-      font-weight: bold;
-      
-      a {
-        font-weight: bold;
-        text-decoration: underline;
-        
-        &:hover {
-          text-decoration: none;
         }
       }
     }
