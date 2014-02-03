@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 This is the common settings file, intended to set sane defaults. If you have a
 piece of configuration that's dependent on a set of feature flags being set,
@@ -499,8 +500,56 @@ FAVICON_PATH = 'images/favicon.ico'
 TIME_ZONE = 'America/New_York'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
 
+# Sourced from http://www.localeplanet.com/icu/ and wikipedia
 LANGUAGES = (
-    ('eo', 'Esperanto'),
+    ('eo', u'Dummy Language (Esperanto)'),  # Dummy languaged used for testing
+
+    ('ach', u'Acholi'),  # Acoli
+    ('ar', u'العربية'),  # Arabic
+    ('bg-bg', u'български (България)'),  # Bulgarian (Bulgaria)
+    ('bn', u'বাংলা'),  # Bengali
+    ('bn-bd', u'বাংলা (বাংলাদেশ)'),  # Bengali (Bangladesh)
+    ('cs', u'Čeština'),  # Czech
+    ('cy', u'Cymraeg'),  # Welsh
+    ('de-de', u'Deutsch (Deutschland)'),  # German (Germany)
+    ('en@lolcat', u'LOLCAT English'),  # LOLCAT English
+    ('en@pirate', u'Pirate English'),  # Pirate English
+    ('es-419', u'Español (Latinoamérica)'),  # Spanish (Latin America)
+    ('es-ec', u'Español (Ecuador)'),  # Spanish (Ecuador)
+    ('es-es', u'Español (España)'),  # Spanish (Spain)
+    ('es-mx', u'Español (México)'),  # Spanish (Mexico)
+    ('es-us', u'Español (Estados Unidos)'),  # Spanish (United States)
+    ('et-ee', u'Eesti (Eesti)'),  # Estonian (Estonia)
+    ('fa', u'فارسی'),  # Persian
+    ('fa-ir', u'فارسی (ایران)'),  # Persian (Iran)
+    ('fi-fi', u'Suomi (Suomi)'),  # Finnish (Finland)
+    ('fr', u'Français'),  # French
+    ('gl', u'Galego'),  # Galician
+    ('he', u'עברית'),  # Hebrew
+    ('hi', u'हिन्दी'),  # Hindi
+    ('hy-am', u'Հայերէն (Հայաստանի Հանրապետութիւն)'),  # Armenian (Armenia)
+    ('id', u'Bahasa Indonesia'),  # Indonesian
+    ('it-it', u'Italiano (Italia)'),  # Italian (Italy)
+    ('ja-jp', u'日本語(日本)'),  # Japanese (Japan)
+    ('km-kh', u'ភាសាខ្មែរ (កម្ពុជា)'),  # Khmer (Cambodia)
+    ('ko-kr', u'한국어(대한민국)'),  # Korean (Korea)
+    ('lt-lt', u'Lietuvių (Lietuva)'),  # Lithuanian (Lithuania)
+    ('ml', u'മലയാളം'),  # Malayalam
+    ('nb', u'Norsk bokmål'),  # Norwegian Bokmål
+    ('nl-nl', u'Nederlands (Nederland)'),  # Dutch (Netherlands)
+    ('pl', u'Polski'),  # Polish
+    ('pt-br', u'Português (Brasil)'),  # Portuguese (Brazil)
+    ('pt-pt', u'Português (Portugal)'),  # Portuguese (Portugal)
+    ('ru', u'Русский'),  # Russian
+    ('si', u'සිංහල'),  # Sinhala
+    ('sk', u'Slovenčina'),  # Slovak
+    ('sl', u'Slovenščina'),  # Slovenian
+    ('th', u'ไทย'),  # Thai
+    ('tr-tr', u'Türkçe (Türkiye)'),  # Turkish (Turkey)
+    ('uk', u'Українська'),  # Uknranian
+    ('vi', u'Tiếng Việt'),  # Vietnamese
+    ('zh-cn', u'大陆简体'),  # Chinese (China)
+    ('zh-tw', u'台灣正體'),  # Chinese (Taiwan)
 )
 
 USE_I18N = True

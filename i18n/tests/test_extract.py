@@ -17,7 +17,7 @@ class TestExtract(TestCase):
     """
     Tests functionality of i18n/extract.py
     """
-    generated_files = ('django-partial.po', 'djangojs.po', 'mako.po')
+    generated_files = ('django-partial.po', 'djangojs-partial.po', 'mako.po')
 
     def setUp(self):
         # Skip this test because it takes too long (>1 minute)

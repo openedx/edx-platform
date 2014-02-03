@@ -1,7 +1,6 @@
 """
 Tests of DarkLangMiddleware
 """
-
 from django.contrib.auth.models import User
 from django.http import HttpRequest
 
@@ -121,6 +120,24 @@ class DarkLangMiddlewareTests(TestCase):
             'rel-ter;q=1.0, rel;q=0.5',
             self.process_request(accept='rel-ter;q=1.0, rel;q=0.5')
         )
+
+    def test_accept_mixed_case(self):
+        self.assertAcceptEquals(
+            'rel-TER;q=1.0, REL;q=0.5',
+            self.process_request(accept='rel-TER;q=1.0, REL;q=0.5')
+        )
+
+        DarkLangConfig(
+            released_languages=('REL-TER'),
+            changed_by=self.user,
+            enabled=True
+        ).save()
+
+        self.assertAcceptEquals(
+            'rel-ter;q=1.0',
+            self.process_request(accept='rel-ter;q=1.0, rel;q=0.5')
+        )
+
 
     def assertSessionLangEquals(self, value, request):
         """

@@ -69,5 +69,11 @@ class Configuration(object):
         """
         return self.get_messages_dir(self.source_locale)
 
+    @property
+    def translated_locales(self):
+        """
+        Returns the set of locales to be translated (ignoring the source_locale).
+        """
+        return sorted(set(self.locales) - set([self.source_locale]))
 
 CONFIGURATION = Configuration(LOCALE_DIR.joinpath('config.yaml').normpath())

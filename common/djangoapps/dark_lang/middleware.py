@@ -45,7 +45,7 @@ class DarkLangMiddleware(object):
         """
         ``True`` iff one of the values in ``self.released_langs`` is a prefix of ``lang_code``.
         """
-        return any(lang_code.startswith(released_lang) for released_lang in self.released_langs)
+        return any(lang_code.lower().startswith(released_lang.lower()) for released_lang in self.released_langs)
 
     def _format_accept_value(self, lang, priority=1.0):
         """

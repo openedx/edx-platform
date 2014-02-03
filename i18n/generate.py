@@ -50,6 +50,7 @@ def merge(locale, target='django.po', sources=('django-partial.po',), fail_if_mi
     # clean up redunancies in the metadata
     merged_filename = locale_directory.joinpath('merged.po')
     clean_metadata(merged_filename)
+    clean_line_numbers(merged_filename)
 
     # rename merged.po -> django.po (default)
     target_filename = locale_directory.joinpath(target)
@@ -75,6 +76,17 @@ def clean_metadata(file):
     pomsgs.save()
 
 
+def clean_line_numbers(file):
+    """
+    Remove occurrence line numbers so that the generated files don't generate a lot of
+    line noise when they're committed.
+    """
+    pomsgs = pofile(file)
+    for entry in pomsgs:
+        entry.occurrences = [(filename, None) for (filename, lineno) in entry.occurrences]
+    pomsgs.save()
+
+
 def validate_files(dir, files_to_merge):
     """
     Asserts that the given files exist.
@@ -91,7 +103,7 @@ def validate_files(dir, files_to_merge):
 def main():
     logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
-    for locale in CONFIGURATION.locales:
+    for locale in CONFIGURATION.translated_locales:
         merge_files(locale)
     # Dummy text is not required. Don't raise exception if files are missing.
     merge_files(CONFIGURATION.dummy_locale, fail_if_missing=False)

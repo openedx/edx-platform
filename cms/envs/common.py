@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 This is the common settings file, intended to set sane defaults. If you have a
 piece of configuration that's dependent on a set of feature flags being set,
@@ -254,10 +255,7 @@ STATICFILES_DIRS = [
 TIME_ZONE = 'America/New_York'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
 
-LANGUAGES = (
-    ('eo', 'Esperanto'),
-)
-
+LANGUAGES = lms.envs.common.LANGUAGES
 USE_I18N = True
 USE_L10N = True
 
