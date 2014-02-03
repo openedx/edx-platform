@@ -12,6 +12,7 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 
+from capa.tests.response_xml_factory import OptionResponseXMLFactory
 from xblock.field_data import FieldData
 from xblock.runtime import Runtime
 from xblock.fields import ScopeIds
@@ -21,14 +22,14 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
 from xmodule.x_module import XModuleDescriptor
-import courseware.module_render as render
+
+from courseware import module_render as render
+from courseware.courses import get_course_with_access, course_image_url, get_course_info_section
+from courseware.model_data import FieldDataCache
+from courseware.tests.factories import StudentModuleFactory, UserFactory
 from courseware.tests.tests import LoginEnrollmentTestCase
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
-from courseware.model_data import FieldDataCache
 
-from courseware.courses import get_course_with_access, course_image_url, get_course_info_section
-
-from .factories import UserFactory
 from lms.lib.xblock.runtime import quote_slashes
 
 
@@ -506,8 +507,42 @@ class TestHtmlModifiers(ModuleStoreTestCase):
             result_fragment.content
         )
 
-    @patch('courseware.module_render.has_access', Mock(return_value=True))
-    def test_histogram(self):
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@patch.dict('django.conf.settings.FEATURES', {'DISPLAY_DEBUG_INFO_TO_STAFF': True, 'DISPLAY_HISTOGRAMS_TO_STAFF': True})
+@patch('courseware.module_render.has_access', Mock(return_value=True))
+class TestStaffDebugInfo(ModuleStoreTestCase):
+    """Tests to verify that Staff Debug Info panel and histograms are displayed to staff."""
+
+    def setUp(self):
+        self.user = UserFactory.create()
+        self.request = RequestFactory().get('/')
+        self.request.user = self.user
+        self.request.session = {}
+        self.course = CourseFactory.create()
+
+        problem_xml = OptionResponseXMLFactory().build_xml(
+            question_text='The correct answer is Correct',
+            num_inputs=2,
+            weight=2,
+            options=['Correct', 'Incorrect'],
+            correct_option='Correct'
+        )
+        self.descriptor = ItemFactory.create(
+            category='problem',
+            data=problem_xml,
+            display_name='Option Response Problem'
+        )
+
+        self.location = self.descriptor.location
+        self.field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+            self.course.id,
+            self.user,
+            self.descriptor
+        )
+
+    @patch.dict('django.conf.settings.FEATURES', {'DISPLAY_DEBUG_INFO_TO_STAFF': False})
+    def test_staff_debug_info_disabled(self):
         module = render.get_module(
             self.user,
             self.request,
@@ -516,11 +551,19 @@ class TestHtmlModifiers(ModuleStoreTestCase):
             self.course.id,
         )
         result_fragment = module.render('student_view')
+        self.assertNotIn('Staff Debug', result_fragment.content)
 
-        self.assertIn(
-            'Staff Debug',
-            result_fragment.content
+    def test_staff_debug_info_enabled(self):
+        module = render.get_module(
+            self.user,
+            self.request,
+            self.location,
+            self.field_data_cache,
+            self.course.id,
         )
+        result_fragment = module.render('student_view')
+        self.assertIn('Staff Debug', result_fragment.content)
+
 
 PER_COURSE_ANONYMIZED_DESCRIPTORS = (LTIDescriptor, )
 

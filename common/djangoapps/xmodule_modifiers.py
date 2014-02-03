@@ -147,7 +147,7 @@ def grade_histogram(module_id):
     return grades
 
 
-def add_histogram(user, block, view, frag, context):  # pylint: disable=unused-argument
+def add_staff_debug_info(user, block, view, frag, context):  # pylint: disable=unused-argument
     """
     Updates the supplied module with a new get_html function that wraps
     the output of the old get_html function with additional information
