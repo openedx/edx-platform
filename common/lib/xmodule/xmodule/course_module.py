@@ -821,6 +821,10 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
 
     @property
     def start_date_text(self):
+        """
+        Returns the desired text corresponding the course's start date.  Prefers .advertised_start,
+        then falls back to .start
+        """
         def try_parse_iso_8601(text):
             try:
                 result = Date().from_json(text)
@@ -835,11 +839,21 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
 
         if isinstance(self.advertised_start, basestring):
             return try_parse_iso_8601(self.advertised_start)
-        elif self.advertised_start is None and self.start is None:
-            # TODO this is an impossible state since the init function forces start to have a value
-            return 'TBD'
+        elif self.start_date_is_still_default:
+            _ = self.runtime.service(self, "i18n").ugettext
+            # Translators: TBD stands for 'To Be Determined' and is used when a course
+            # does not yet have an announced start date.
+            return _('TBD')
         else:
             return (self.advertised_start or self.start).strftime("%b %d, %Y")
+
+    @property
+    def start_date_is_still_default(self):
+        """
+        Checks if the start date set for the course is still default, i.e. .start has not been modified,
+        and .advertised_start has not been set.
+        """
+        return self.advertised_start is None and self.start == CourseFields.start.default
 
     @property
     def end_date_text(self):
