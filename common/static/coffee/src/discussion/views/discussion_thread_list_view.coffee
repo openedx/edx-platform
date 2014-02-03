@@ -174,12 +174,14 @@ if Backbone?
         content.addClass("resolved")
       if thread.get('read')
         content.addClass("read")
-      if thread.get('unread_comments_count') > 0
+      unreadCount = thread.get('unread_comments_count')
+      if unreadCount > 0
         content.find('.comments-count').addClass("unread").attr(
           "data-tooltip",
           interpolate(
-            ngettext('%(unread_count)s new comment', '%(unread_count)s new comments', {'unread_count': thread.get('unread_comments_count')}),
-            [thread.get('unread_comments_count')]
+            ngettext('%(unread_count)s new comment', '%(unread_count)s new comments', unreadCount),
+            {unread_count: thread.get('unread_comments_count')},
+            true
           )
         )
       @highlight(content)
