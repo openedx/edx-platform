@@ -69,5 +69,5 @@ generate_merge:
         - mako-studio.po
         - messages.po
     djangojs.po:
-        - djangojs.po
+        - djangojs-partial.po
         - djangojs-studio.po
