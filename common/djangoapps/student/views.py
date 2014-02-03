@@ -330,7 +330,7 @@ def signin_user(request):
     """
     This view will display the non-modal login form
     """
-    if (settings.FEATURES['AUTH_USE_MIT_CERTIFICATES'] and
+    if (settings.FEATURES['AUTH_USE_CERTIFICATES'] and
             external_auth.views.ssl_get_cert_from_request(request)):
         # SSL login doesn't require a view, so redirect
         # branding and allow that to process the login if it
@@ -357,7 +357,7 @@ def register_user(request, extra_context=None):
     """
     if request.user.is_authenticated():
         return redirect(reverse('dashboard'))
-    if settings.FEATURES.get('AUTH_USE_MIT_CERTIFICATES_IMMEDIATE_SIGNUP'):
+    if settings.FEATURES.get('AUTH_USE_CERTIFICATES_IMMEDIATE_SIGNUP'):
         # Redirect to branding to process their certificate if SSL is enabled
         # and registration is disabled.
         return redirect(reverse('root'))
@@ -645,7 +645,7 @@ def accounts_login(request):
     """
     if settings.FEATURES.get('AUTH_USE_CAS'):
         return redirect(reverse('cas-login'))
-    if settings.FEATURES['AUTH_USE_MIT_CERTIFICATES']:
+    if settings.FEATURES['AUTH_USE_CERTIFICATES']:
         # SSL login doesn't require a view, so redirect
         # to branding and allow that to process the login.
         return redirect(reverse('root'))

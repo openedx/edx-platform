@@ -23,7 +23,7 @@ def signup(request):
     csrf_token = csrf(request)['csrf_token']
     if request.user.is_authenticated():
         return redirect('/course')
-    if settings.FEATURES.get('AUTH_USE_MIT_CERTIFICATES_IMMEDIATE_SIGNUP'):
+    if settings.FEATURES.get('AUTH_USE_CERTIFICATES_IMMEDIATE_SIGNUP'):
         # Redirect to course to login to process their certificate if SSL is enabled
         # and registration is disabled.
         return redirect(reverse('login'))
@@ -38,7 +38,7 @@ def login_page(request):
     Display the login form.
     """
     csrf_token = csrf(request)['csrf_token']
-    if (settings.FEATURES['AUTH_USE_MIT_CERTIFICATES'] and
+    if (settings.FEATURES['AUTH_USE_CERTIFICATES'] and
             ssl_get_cert_from_request(request)):
         # SSL login doesn't require a login view, so redirect
         # to course now that the user is authenticated via

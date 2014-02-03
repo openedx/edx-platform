@@ -23,7 +23,7 @@ def index(request):
     if settings.COURSEWARE_ENABLED and request.user.is_authenticated():
         return redirect(reverse('dashboard'))
 
-    if settings.FEATURES.get('AUTH_USE_MIT_CERTIFICATES'):
+    if settings.FEATURES.get('AUTH_USE_CERTIFICATES'):
         from external_auth.views import ssl_login
         return ssl_login(request)
 

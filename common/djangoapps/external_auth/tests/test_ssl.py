@@ -21,13 +21,14 @@ from edxmako.middleware import MakoMiddleware
 from external_auth.models import ExternalAuthMap
 import external_auth.views
 from student.tests.factories import UserFactory
+from xmodule.modulestore.exceptions import InsufficientSpecificationError
 
 FEATURES_WITH_SSL_AUTH = settings.FEATURES.copy()
-FEATURES_WITH_SSL_AUTH['AUTH_USE_MIT_CERTIFICATES'] = True
+FEATURES_WITH_SSL_AUTH['AUTH_USE_CERTIFICATES'] = True
 FEATURES_WITH_SSL_AUTH_IMMEDIATE_SIGNUP = FEATURES_WITH_SSL_AUTH.copy()
-FEATURES_WITH_SSL_AUTH_IMMEDIATE_SIGNUP['AUTH_USE_MIT_CERTIFICATES_IMMEDIATE_SIGNUP'] = True
+FEATURES_WITH_SSL_AUTH_IMMEDIATE_SIGNUP['AUTH_USE_CERTIFICATES_IMMEDIATE_SIGNUP'] = True
 FEATURES_WITHOUT_SSL_AUTH = settings.FEATURES.copy()
-FEATURES_WITHOUT_SSL_AUTH['AUTH_USE_MIT_CERTIFICATES'] = False
+FEATURES_WITHOUT_SSL_AUTH['AUTH_USE_CERTIFICATES'] = False
 
 
 @override_settings(FEATURES=FEATURES_WITH_SSL_AUTH)
@@ -192,7 +193,8 @@ class SSLClientTest(TestCase):
         the user doesn't get presented with the registration page.
         """
         # Expect a NotImplementError from course page as we don't have anything else built
-        with self.assertRaisesRegexp(NotImplementedError, 'coming soon'):
+        with self.assertRaisesRegexp(InsufficientSpecificationError,
+                                     'Must provide one of url, version_guid, package_id'):
             self.client.get(
                 reverse('signup'), follow=True,
                 SSL_CLIENT_S_DN=self.AUTH_DN.format(self.USER_NAME, self.USER_EMAIL))
@@ -200,7 +202,8 @@ class SSLClientTest(TestCase):
         self.assertIn('_auth_user_id', self.client.session)
 
         # Now that we are logged in, make sure we don't see the registration page
-        with self.assertRaisesRegexp(NotImplementedError, 'coming soon'):
+        with self.assertRaisesRegexp(InsufficientSpecificationError,
+                                     'Must provide one of url, version_guid, package_id'):
             self.client.get(reverse('signup'), follow=True)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')

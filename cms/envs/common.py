@@ -43,7 +43,7 @@ FEATURES = {
 
     'ENABLE_DISCUSSION_SERVICE': False,
 
-    'AUTH_USE_MIT_CERTIFICATES': False,
+    'AUTH_USE_CERTIFICATES': False,
 
     # email address for studio staff (eg to request course creation)
     'STUDIO_REQUEST_EMAIL': '',
