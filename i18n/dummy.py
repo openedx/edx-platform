@@ -1,33 +1,33 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-r"""
-Creates new localization properties files in a dummy language.
-
-Each property file is derived from the equivalent en_US file, with these
-transformations applied:
-
-1. Every vowel is replaced with an equivalent with extra accent marks.
-
-2. Every string is padded out to +30% length to simulate verbose languages
-   (such as German) to see if layout and flows work properly.
-
-3. Every string is terminated with a '#' character to make it easier to detect
-   truncation.
-
-Example use::
-
-    >>> from dummy import Dummy
-    >>> c = Dummy()
-    >>> c.convert("My name is Bond, James Bond")
-    u'M\xfd n\xe4m\xe9 \xefs B\xf8nd, J\xe4m\xe9s B\xf8nd \u2360\u03c3\u044f\u0454\u043c \u03b9\u03c1#'
-    >>> print c.convert("My name is Bond, James Bond")
-    Mý nämé ïs Bønd, Jämés Bønd Ⱡσяєм ιρ#
-    >>> print c.convert("don't convert <a href='href'>tag ids</a>")
-    døn't çønvért <a href='href'>täg ïds</a> Ⱡσяєм ιρѕυ#
-    >>> print c.convert("don't convert %(name)s tags on %(date)s")
-    døn't çønvért %(name)s tägs øn %(date)s Ⱡσяєм ιρѕ#
 
 """
+Generate test translation files from human-readable po files.
 
+Dummy language is specified in configuration file (see config.py)
+two letter language codes reference:
+see http://www.loc.gov/standards/iso639-2/php/code_list.php
+
+Django will not localize in languages that django itself has not been
+localized for. So we are using a well-known language (default='eo').
+Django languages are listed in django.conf.global_settings.LANGUAGES
+
+po files can be generated with this:
+django-admin.py makemessages --all --extension html -l en
+
+Usage:
+
+$ ./dummy.py
+
+generates output conf/locale/$DUMMY_LOCALE/LC_MESSAGES,
+where $DUMMY_LOCALE is the dummy_locale value set in the i18n config
+"""
+
+import os
+import polib
+
+from i18n.config import CONFIGURATION
+from i18n.execute import create_dir_if_necessary
 from i18n.converter import Converter
 
 # Substitute plain characters with accented lookalikes.
@@ -74,10 +74,32 @@ PAD_FACTOR = 1.33
 
 
 class Dummy(Converter):
-    """
-    A string converter that generates dummy strings with fake accents
-    and lorem ipsum padding.
+    r"""
+    Creates new localization properties files in a dummy language.
 
+    Each property file is derived from the equivalent en_US file, with these
+    transformations applied:
+
+    1. Every vowel is replaced with an equivalent with extra accent marks.
+
+    2. Every string is padded out to +30% length to simulate verbose languages
+       (such as German) to see if layout and flows work properly.
+
+    3. Every string is terminated with a '#' character to make it easier to detect
+       truncation.
+
+    Example use::
+
+        >>> from dummy import Dummy
+        >>> c = Dummy()
+        >>> c.convert("My name is Bond, James Bond")
+        u'M\xfd n\xe4m\xe9 \xefs B\xf8nd, J\xe4m\xe9s B\xf8nd \u2360\u03c3\u044f\u0454\u043c \u03b9\u03c1#'
+        >>> print c.convert("My name is Bond, James Bond")
+        Mý nämé ïs Bønd, Jämés Bønd Ⱡσяєм ιρ#
+        >>> print c.convert("don't convert <a href='href'>tag ids</a>")
+        døn't çønvért <a href='href'>täg ïds</a> Ⱡσяєм ιρѕυ#
+        >>> print c.convert("don't convert %(name)s tags on %(date)s")
+        døn't çønvért %(name)s tägs øn %(date)s Ⱡσяєм ιρѕ#
     """
     def convert(self, string):
         result = Converter.convert(self, string)
@@ -134,3 +156,49 @@ class Dummy(Converter):
             if original[-1] == '\n' and translated[-1] != '\n':
                 translated += '\n'
         return translated
+
+
+def make_dummy(file, locale):
+    """
+    Takes a source po file, reads it, and writes out a new po file
+    in :param locale: containing a dummy translation.
+    """
+    if not os.path.exists(file):
+        raise IOError('File does not exist: %s' % file)
+    pofile = polib.pofile(file)
+    converter = Dummy()
+    for msg in pofile:
+        converter.convert_msg(msg)
+
+    # Apply declaration for English pluralization rules so that ngettext will
+    # do something reasonable.
+    pofile.metadata['Plural-Forms'] = 'nplurals=2; plural=(n != 1);'
+
+    new_file = new_filename(file, locale)
+    create_dir_if_necessary(new_file)
+    pofile.save(new_file)
+
+
+def new_filename(original_filename, new_locale):
+    """Returns a filename derived from original_filename, using new_locale as the locale"""
+    orig_dir = os.path.dirname(original_filename)
+    msgs_dir = os.path.basename(orig_dir)
+    orig_file = os.path.basename(original_filename)
+    return os.path.abspath(os.path.join(orig_dir, '../..', new_locale, msgs_dir, orig_file))
+
+
+def main():
+    """
+    Generate dummy strings for all source po files.
+    """
+    LOCALE = CONFIGURATION.dummy_locale
+    SOURCE_MSGS_DIR = CONFIGURATION.source_messages_dir
+    print "Processing source language files into dummy strings:"
+    for source_file in CONFIGURATION.source_messages_dir.walkfiles('*.po'):
+        print '   ', source_file.relpath()
+        make_dummy(SOURCE_MSGS_DIR.joinpath(source_file), LOCALE)
+    print
+
+
+if __name__ == '__main__':
+    sys.exit(main())

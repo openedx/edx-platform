@@ -14,7 +14,7 @@ namespace :i18n do
 
   desc "Simulate international translation by generating dummy strings corresponding to source strings."
   task :dummy => "i18n:extract" do
-    sh(File.join(REPO_ROOT, "i18n", "make_dummy.py"))
+    sh(File.join(REPO_ROOT, "i18n", "dummy.py"))
   end
 
   namespace :validate do
