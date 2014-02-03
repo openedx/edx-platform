@@ -28,7 +28,7 @@ def signup(request):
         # and registration is disabled.
         return redirect(reverse('login'))
 
-    return render_to_response('signup.html', {'csrf': csrf_token})
+    return render_to_response('register.html', {'csrf': csrf_token})
 
 
 @ssl_login_shortcut
