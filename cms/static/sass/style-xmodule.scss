@@ -1,29 +1,28 @@
-// studio - xmodule architecture
+// studio - xmodule compile
 // ====================
 
-// libs and resets *do not edit*
-@import 'bourbon/bourbon'; // lib - bourbon
+// libraries and resets
+// --------------------
+@import 'utilities/bourbon/bourbon'; // lib - http://bourbon.io
+@import 'utilities/reset'; // global resets
 
-// VENDOR + REBASE *referenced/used vendor presentation and reset*
-// ====================
-@import 'reset';
+// utilities and assets
+// --------------------
+// utilities
+@import 'utilities/variables'; // settings/values/placeholders
+@import 'utilities/mixins'; // mixins and functions
+@import 'utilities/mixins-inherited'; // (inherited)
+@import 'utilities/extends'; // re-usable extends, placeholders, archetypes
 
-// BASE  *default edX offerings*
-// ====================
-// base - utilities
-@import 'variables';
-@import 'mixins';
-@import 'mixins-inherited';
-
-// base - assets
-@import 'assets/fonts';
+// assets
+@import 'assets/fonts'; // imported/used fonts
 @import 'assets/graphics'; // sprites, basic img/figure/svg styling
 @import 'assets/anims'; // animations
 
-// base - starter
-@import 'base';
-
+// general, elements, and views
+// --------------------
 // base - elements
+@import 'elements/base';
 @import 'elements/typography';
 @import 'elements/icons'; // references to icons used
 @import 'elements/controls'; // buttons, link styles, sliders, etc.

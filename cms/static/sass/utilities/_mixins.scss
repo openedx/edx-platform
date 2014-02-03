@@ -1,0 +1,55 @@
+// studio - utilities - mixins
+// ====================
+
+// shorthand
+@mixin pos-abs ($top: auto, $right: auto, $bottom: auto, $left: auto) {
+  position: absolute;
+  top: $top;
+  right: $right;
+  bottom: $bottom;
+  left: $left;
+}
+
+// --------------------
+
+// font sizing
+@mixin font-size($sizeValue: 16){
+  font-size: $sizeValue + px;
+  font-size: ($sizeValue/10) + rem;
+}
+
+// --------------------
+
+// line height
+@mixin line-height($fontSize: auto){
+  line-height: ($fontSize*1.48) + px;
+  line-height: (($fontSize/10)*1.48) + rem;
+}
+
+// --------------------
+
+// mixins - sizing
+@mixin size($width: $baseline, $height: $baseline) {
+  height: $height;
+  width: $width;
+}
+
+// mixins - sizing (square dimensions)
+@mixin square($size: $baseline) {
+  @include size($size);
+}
+
+// --------------------
+
+// mixins - placeholder styling
+@mixin placeholder($color) {
+  :-moz-placeholder {
+    color: $color;
+  }
+  ::-webkit-input-placeholder {
+    color: $color;
+  }
+  :-ms-input-placeholder {
+     color: $color;
+  }
+}
