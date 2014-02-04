@@ -243,7 +243,6 @@ Annotator.Plugin.Share = (function(_super) {
 	};
 	
 	Share.prototype.initAPI = function() {
-		console.log("initAPI");
 		// -- Detect API in the URL -- //
 		/*
 		The first option is to give a known id of an annotation
@@ -291,7 +290,6 @@ Annotator.Plugin.Share = (function(_super) {
 		return API;
 	}
 	Share.prototype.runningAPI =  function (annotations,API){
-		console.log("runningAPI");
 		var wrapper = $('.annotator-wrapper').parent()[0],
 			mplayer,
 			osda,

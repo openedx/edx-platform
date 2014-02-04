@@ -156,7 +156,6 @@ function vjsAnnotation_(options){
 	}
 	player.one('loadedRangeSlider', initialVideoFinished);//Loaded RangeSlider
 	
-	console.log("Loaded Annotation Plugin");
 }
 videojs.plugin('annotations', vjsAnnotation_);
 
@@ -405,7 +404,6 @@ vjsAnnotation.prototype = {
 		}
 	},
 	refreshDisplay: function(){
-		console.log("loadingAnnotations");
 		var count = 0, 
 			allannotations = this.annotator.plugins['Store'].annotations;
 		
@@ -2069,7 +2067,6 @@ Annotator.Plugin.VideoJS = (function(_super) {
 	VideoJS.prototype.input = null;
 
 	VideoJS.prototype.pluginInit = function() {
-		console.log("VideoJS-pluginInit");
 		//Check that annotator is working
 		if (!Annotator.supported()) {
 			return;
@@ -2098,7 +2095,6 @@ Annotator.Plugin.VideoJS = (function(_super) {
 
 	// New JSON for the database
 	VideoJS.prototype.pluginSubmit = function(field, annotation) {
-		console.log("Plug-pluginSubmit");
 		//Select the new JSON for the Object to save
 		if (this.EditVideoAn()){
 			var annotator = this.annotator,
@@ -2205,7 +2201,6 @@ Annotator.Plugin.VideoJS = (function(_super) {
 		//local functions
 		//-- Editor
 		function annotationEditorHidden(editor) {
-			console.log("annotationEditorHidden");
 			if (EditVideoAn()){
 				var index = annotator.editor.VideoJS;
 				annotator.mplayer[index].rangeslider.hide(); //Hide Range Slider
@@ -2215,7 +2210,6 @@ Annotator.Plugin.VideoJS = (function(_super) {
 			annotator.unsubscribe("annotationEditorHidden", annotationEditorHidden);
 		};
 		function annotationEditorShown(editor,annotation) {
-			console.log("annotationEditorShown");
 			for (var index in annotator.an){
 				annotator.an[index].editAnnotation(annotation,editor);
 			}
@@ -2223,7 +2217,6 @@ Annotator.Plugin.VideoJS = (function(_super) {
 		};
 		//-- Annotations
 		function annotationDeleted(annotation) {
-			console.log("annotationDeleted");
 			
 			if (isVideoJS(annotation))
 				self._deleteAnnotation(annotation);
@@ -2236,7 +2229,6 @@ Annotator.Plugin.VideoJS = (function(_super) {
 			annotator.viewer.unsubscribe("hide", hideViewer);
 		};
 		function annotationViewerShown(viewer,annotations) {
-			console.log("annotationViewerShown");
 			
 			var separation = viewer.element.hasClass(viewer.classes.invert.y)?5:-5,
 				newpos = {
