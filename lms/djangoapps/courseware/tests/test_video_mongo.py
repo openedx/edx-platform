@@ -77,7 +77,7 @@ class TestVideoYouTube(TestVideo):
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', False),
             'yt_test_timeout': 1500,
             'yt_test_url': 'https://gdata.youtube.com/feeds/api/videos/',
-            'transcripts' : '{"ua": "ukrainian_translation.srt"}',
+            'transcripts' : '{"uk": "ukrainian_translation.srt"}',
         }
 
         self.assertEqual(
@@ -529,22 +529,41 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
         self.assertFalse(self.item_descriptor.track_visible)
 
 
+def _create_srt_file(content=None, lang='uk'):
+    """
+    Create srt file in filesystem.
+    """
+    content = content or textwrap.dedent("""
+        0
+        00:00:00,10 --> 00:00:00,100
+        Привіт, edX вітає вас.
+    """)
+    srt_file = tempfile.NamedTemporaryFile(suffix=".srt")
+    srt_file.content_type = 'application/x-subrip'
+    srt_file.write(content)
+    srt_file.seek(0)
+    return srt_file
+
+
 class TestVideoHandlers(TestVideo):
 
+    non_en_file = _create_srt_file()
     DATA = """
         <video show_captions="true"
         display_name="A Name"
         >
             <source src="example.mp4"/>
             <source src="example.webm"/>
+            <transcript language="uk" src="{}"/>
         </video>
-    """
+    """.format(os.path.split(non_en_file.name)[1])
+
     MODEL_DATA = {
         'data': DATA
     }
 
     def test_language_is_not_supported(self):
-        request = Request.blank('/download?language=ua')
+        request = Request.blank('/download?language=ru')
         response = self.item_descriptor.transcript(request=request, dispatch='download')
         self.assertEqual(response.status, '404 Not Found')
 
@@ -561,12 +580,12 @@ class TestVideoHandlers(TestVideo):
 
     def test_translation_fails(self):
         # no videoId
-        request = Request.blank('/translation?language=ua')
+        request = Request.blank('/translation?language=ru')
         response = self.item_descriptor.transcript(request=request, dispatch='translation')
         self.assertEqual(response.status, '400 Bad Request')
 
         # videoId not found
-        request = Request.blank('/translation?language=ua&videoId=12345')
+        request = Request.blank('/translation?language=ru&videoId=12345')
         response = self.item_descriptor.transcript(request=request, dispatch='translation')
         self.assertEqual(response.status, '404 Not Found')
 
@@ -587,6 +606,25 @@ class TestVideoHandlers(TestVideo):
 
         item.sub = subs_id
         request = Request.blank('/translation?language=en&videoId={}'.format(subs_id))
+        response = self.item_descriptor.transcript(request=request, dispatch='translation')
+        self.assertDictEqual(json.loads(response.body), subs)
+
+    def test_translaton_non_en_non_youtube_success(self):
+        subs =  {
+            u'end': [100],
+            u'start': [10],
+            u'text': [
+            u'\u041f\u0440\u0438\u0432\u0456\u0442, edX \u0432\u0456\u0442\u0430\u0454 \u0432\u0430\u0441.'
+        ]}
+        _upload_srt_file(self.non_en_file, self.item_descriptor.location, os.path.split(self.non_en_file.name)[1])
+        subs_id = _get_subs_id(self.non_en_file.name)
+        # to get instance
+        self.item_descriptor.render('student_view')
+        item = self.item_descriptor.xmodule_runtime.xmodule_instance
+
+        # manually clean youtube_id_1_0, as it has default value
+        item.youtube_id_1_0 = ""
+        request = Request.blank('/translation?language=uk&videoId={}'.format(subs_id))
         response = self.item_descriptor.transcript(request=request, dispatch='translation')
         self.assertDictEqual(json.loads(response.body), subs)
 
@@ -704,8 +742,8 @@ def _create_file(content=''):
 
     return sjson_file
 
-def _upload_file(file, location):
-    filename = 'subs_{}.srt.sjson'.format(_get_subs_id(file.name))
+def _upload_file(file, location, default_filename='subs_{}.srt.sjson'):
+    filename = default_filename.format(_get_subs_id(file.name))
     mime_type = file.content_type
 
     content_location = StaticContent.compute_location(
@@ -724,5 +762,16 @@ def _upload_file(file, location):
     if thumbnail_content is not None:
         content.thumbnail_location = thumbnail_location
 
+    contentstore().save(content)
+    del_cached_content(content.location)
+
+
+def _upload_srt_file(file, location, filename):
+    mime_type = file.content_type
+    content_location = StaticContent.compute_location(
+        location.org, location.course, filename
+    )
+    sc_partial = partial(StaticContent, content_location, filename, mime_type)
+    content = sc_partial(file.read())
     contentstore().save(content)
     del_cached_content(content.location)
