@@ -132,7 +132,7 @@ div.profile-wrapper {
     }
   }
 
-  section.course-info {
+  div.course-info {
     @extend .content;
 
     header {
@@ -153,13 +153,12 @@ div.profile-wrapper {
       width: 100%;
     }
 
-    > ol {
+    > div.chapters {
       border-top: 1px solid #e3e3e3;
-      list-style: none;
       margin-top: lh();
       padding-left: 0;
 
-      > li {
+      > section {
         @extend .clearfix;
         border-bottom: 1px solid #e3e3e3;
         display: table;
@@ -182,13 +181,12 @@ div.profile-wrapper {
           width: flex-grid(2, 9);
         }
 
-        ol.sections {
+        div.sections {
           display: table-cell;
-          list-style: none;
           padding-left: flex-gutter(9);
           width: flex-grid(7, 9);
 
-          > li {
+          > div {
             padding:0 0 lh() 0;
 
             &:first-child {
@@ -214,7 +212,7 @@ div.profile-wrapper {
               font-size: em(14);
             }
 
-            section.scores {
+            div.scores {
               margin: lh(.5) 0;
 
               h3 {

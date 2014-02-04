@@ -110,10 +110,10 @@
   <%include file="${header_file}" />
 %endif
 
-  <section class="content-wrapper" id="content">
+  <div class="content-wrapper" id="content">
     ${self.body()}
     <%block name="bodyextra"/>
-  </section>
+  </div>
 
 % if not suppress_toplevel_navigation:
   <%include file="${footer_file}" />
