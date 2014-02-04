@@ -3,23 +3,23 @@ Acceptance tests for Studio.
 """
 from bok_choy.web_app_test import WebAppTest
 
-from ..edxapp_pages.studio.asset_index import AssetIndexPage
-from ..edxapp_pages.studio.auto_auth import AutoAuthPage
-from ..edxapp_pages.studio.checklists import ChecklistsPage
-from ..edxapp_pages.studio.course_import import ImportPage
-from ..edxapp_pages.studio.course_info import CourseUpdatesPage
-from ..edxapp_pages.studio.edit_tabs import StaticPagesPage
-from ..edxapp_pages.studio.export import ExportPage
-from ..edxapp_pages.studio.howitworks import HowitworksPage
-from ..edxapp_pages.studio.index import DashboardPage
-from ..edxapp_pages.studio.login import LoginPage
-from ..edxapp_pages.studio.manage_users import CourseTeamPage
-from ..edxapp_pages.studio.overview import CourseOutlinePage
-from ..edxapp_pages.studio.settings import SettingsPage
-from ..edxapp_pages.studio.settings_advanced import AdvancedSettingsPage
-from ..edxapp_pages.studio.settings_graders import GradingPage
-from ..edxapp_pages.studio.signup import SignupPage
-from ..edxapp_pages.studio.textbooks import TextbooksPage
+from ..pages.studio.asset_index import AssetIndexPage
+from ..pages.studio.auto_auth import AutoAuthPage
+from ..pages.studio.checklists import ChecklistsPage
+from ..pages.studio.course_import import ImportPage
+from ..pages.studio.course_info import CourseUpdatesPage
+from ..pages.studio.edit_tabs import StaticPagesPage
+from ..pages.studio.export import ExportPage
+from ..pages.studio.howitworks import HowitworksPage
+from ..pages.studio.index import DashboardPage
+from ..pages.studio.login import LoginPage
+from ..pages.studio.manage_users import CourseTeamPage
+from ..pages.studio.overview import CourseOutlinePage
+from ..pages.studio.settings import SettingsPage
+from ..pages.studio.settings_advanced import AdvancedSettingsPage
+from ..pages.studio.settings_graders import GradingPage
+from ..pages.studio.signup import SignupPage
+from ..pages.studio.textbooks import TextbooksPage
 from ..fixtures.course import CourseFixture
 
 from .helpers import UniqueCourseTest
