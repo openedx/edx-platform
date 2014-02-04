@@ -409,10 +409,6 @@ DOC_STORE_CONFIG = {
     'collection': 'modulestore',
 }
 
-# Should we initialize the modulestores at startup, or wait until they are
-# needed?
-INIT_MODULESTORE_ON_STARTUP = True
-
 ############# XBlock Configuration ##########
 
 # This should be moved into an XBlock Runtime/Application object
