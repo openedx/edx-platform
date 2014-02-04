@@ -56,7 +56,7 @@
 
                     runs(function () {
                         expect($.ajaxWithPrefix).toHaveBeenCalledWith({
-                            url: '/transcript_translation',
+                            url: '/transcript/translation',
                             notifyOnError: false,
                             data: {
                                 videoId: 'Z5KLxerq05Y',

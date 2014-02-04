@@ -203,7 +203,7 @@
                 });
             });
 
-            describe('speed is absent in the list of video speed', function () {
+            describe('speed is absent in the list of video speeds', function () {
                 it('return the video id for 1.0x speed', function () {
                     expect(state.youtubeId('0.0')).toEqual('cogebirgzzM');
                 });

@@ -143,7 +143,7 @@
                         }
                     };
                 }
-            } else if (settings.url == '/transcript_translation') {
+            } else if (settings.url == '/transcript/translation') {
                 return settings.success(jasmine.stubbedCaption);
             } else if (settings.url.match(/.+\/problem_get$/)) {
                 return settings.success({

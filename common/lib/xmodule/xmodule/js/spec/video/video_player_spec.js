@@ -39,7 +39,7 @@
                     expect(state.youtubeId('1.0')).toEqual('Z5KLxerq05Y');
                     expect(state.speed).toEqual('1.50');
                     expect(state.config.transcriptTranslationUrl)
-                        .toEqual('/transcript_translation');
+                        .toEqual('/transcript/translation');
                 });
 
                 it('create video speed control', function () {
