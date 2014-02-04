@@ -130,7 +130,7 @@ if Backbone?
         view.afterInsert()
 
     renderAddResponseButton: ->
-      if @model.hasResponses()
+      if @model.hasResponses() and @model.can('can_reply')
         @$el.find('div.add-response').show()
       else
         @$el.find('div.add-response').hide()
