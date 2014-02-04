@@ -6,7 +6,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.django import loc_mapper
 
 import json
-from .utils import CourseTestCase
+from contentstore.tests.utils import CourseTestCase
 
 
 class ChecklistTestCase(CourseTestCase):

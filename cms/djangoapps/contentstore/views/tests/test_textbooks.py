@@ -1,7 +1,6 @@
 import json
 from unittest import TestCase
-from .utils import CourseTestCase
-from django.core.urlresolvers import reverse
+from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import get_modulestore
 from xmodule.modulestore.inheritance import own_metadata
 
