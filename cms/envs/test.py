@@ -146,6 +146,9 @@ CACHES = {
 
 }
 
+# Add external_auth to Installed apps for testing
+INSTALLED_APPS += ('external_auth', )
+
 # hide ratelimit warnings while running tests
 filterwarnings('ignore', message='No request passed to the backend, unable to rate-limit')
 

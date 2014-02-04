@@ -9,7 +9,7 @@
 from .common import *
 from .dev import *
 
-FEATURES['AUTH_USE_MIT_CERTIFICATES'] = True
+FEATURES['AUTH_USE_CERTIFICATES'] = True
 
 FEATURES['USE_DJANGO_PIPELINE'] = False      # don't recompile scss
 
