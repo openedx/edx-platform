@@ -1,6 +1,6 @@
 /* 
 Share Annotation Plugin v1.0 (https://github.com/danielcebrian/share-annotator)
-Copyright (C) 2014 Daniel Cebrián Robles
+Copyright (C) 2014 Daniel Cebri√°n Robles
 License: https://github.com/danielcebrian/share-annotator/blob/master/License.rst
 
 This program is free software; you can redistribute it and/or
