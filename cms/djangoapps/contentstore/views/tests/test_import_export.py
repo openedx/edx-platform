@@ -12,7 +12,7 @@ import logging
 from uuid import uuid4
 from pymongo import MongoClient
 
-from .utils import CourseTestCase
+from contentstore.tests.utils import CourseTestCase
 from django.test.utils import override_settings
 from django.conf import settings
 from xmodule.modulestore.django import loc_mapper

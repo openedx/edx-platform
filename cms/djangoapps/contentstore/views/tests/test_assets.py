@@ -10,7 +10,7 @@ from datetime import datetime
 from io import BytesIO
 from pytz import UTC
 import json
-from .utils import CourseTestCase
+from contentstore.tests.utils import CourseTestCase
 from contentstore.views import assets
 from xmodule.contentstore.content import StaticContent
 from xmodule.modulestore import Location
