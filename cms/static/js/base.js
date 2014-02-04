@@ -66,9 +66,6 @@ domReady(function() {
         }
     });
 
-    // container navigation links - tooltips on overflow
-    $('a.navigation-link').bind('mouseenter', overflowTooltip);
-
     // general link management - new window/tab
     $('a[rel="external"]').attr('title', gettext('This link will open in a new browser window/tab')).bind('click', linkNewWindow);
 
@@ -119,12 +116,6 @@ domReady(function() {
 
     IframeUtils.iframeBinding();
 });
-
-function overflowTooltip(e) {
-    (e).preventDefault();
-    if ($(this).offsetWidth < this.scrollWidth && !this.attr('data-tooltip'))
-        $this.attr('data-tooltip', $this.text()); 
-}
 
 function smoothScrollLink(e) {
     (e).preventDefault();

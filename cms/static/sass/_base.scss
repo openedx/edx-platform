@@ -56,7 +56,7 @@ h1 {
   font-weight: 600;
   color: $gray-d3;
 
-  .navigation, .navigation-divider, .subtitle {
+  .navigation, .subtitle {
     @extend %t-title7;
     position: relative;
     top: ($baseline/4);
@@ -324,38 +324,41 @@ p, ul, ol, dl {
       }
     }
 
-    // layout with actions
+    // layout with navigation
     &.has-navigation {
 
+      .nav-actions {
+        bottom: -($baseline*1.5);
+      }
+
       .navigation-link {
+        @extend %cont-truncated;
         display: inline-block;
-        overflow: hidden; 
         max-width: 150px;
-        color: inherit;
-        text-overflow: ellipsis;
-        white-space: nowrap;
 
-        &:hover {
-          color: $blue-s1;
+        &.navigation-current {
+          @extend %ui-disabled;
+          color: $gray;
 
-          &:after {
-          	color: $gray-l2;
+          &:before {
+            color: $gray;
           }
         }
       }
 
-      .navigation-link:after {
-          content: "/";
-          margin: 0px $baseline/4;
-          color: inherit;
+      .navigation-link:before {
+        content: " / ";
+        margin: ($baseline/4);
+        color: $gray;
 
-          &:hover {
-          	color: inherit;
-          }
+        &:hover {
+          color: $gray;
         }
+      }
 
-      .nav-actions {
-        bottom: -($baseline*1.5);
+      .navigation .navigation-link:first-child:before {
+        content: "";
+        margin: 0;
       }
     }
   }
