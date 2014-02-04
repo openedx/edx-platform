@@ -1,34 +1,34 @@
-// studio - xmodule compile
+// studio - style compile - xmodule extend
 // ====================
 
-// libraries and resets
+// common libraries
 // --------------------
-@import 'utilities/bourbon/bourbon'; // lib - http://bourbon.io
-@import 'utilities/reset'; // global resets
+@import 'common/utilities/bourbon/bourbon';                     // lib - http://bourbon.io (ref from /common/)
 
 // utilities and assets
 // --------------------
 // utilities
-@import 'utilities/variables'; // settings/values/placeholders
-@import 'utilities/mixins'; // mixins and functions
-@import 'utilities/mixins-inherited'; // (inherited)
-@import 'utilities/extends'; // re-usable extends, placeholders, archetypes
+@import 'utilities/variables';                                  // settings/values/placeholders
+@import 'utilities/reset';                                      // global resets
+@import 'utilities/mixins';                                     // mixins and functions
+@import 'utilities/mixins-inherited';                           // mixins and functions (inherited)
+@import 'utilities/extends';                                    // re-usable extends, placeholders, archetypes
 
 // assets
-@import 'assets/fonts'; // imported/used fonts
-@import 'assets/graphics'; // sprites, basic img/figure/svg styling
-@import 'assets/anims'; // animations
+@import 'assets/fonts';                                         // imported/used fonts
+@import 'assets/graphics';                                      // sprites, basic img/figure/svg styling
+@import 'assets/anims';                                         // animations
 
 // general, elements, and views
 // --------------------
-// base - elements
+// elements
 @import 'elements/base';
 @import 'elements/typography';
-@import 'elements/icons'; // references to icons used
-@import 'elements/controls'; // buttons, link styles, sliders, etc.
-@import 'elements/navigation'; // all archetypes of navigation
+@import 'elements/icons';                                       // references to icons used
+@import 'elements/controls';                                    // buttons, link styles, sliders, etc.
+@import 'elements/navigation';                                  // all archetypes of navigation
 
-// xmodule
-@import 'xmodule/modules/css/module-styles.scss';
-@import 'xmodule/descriptors/css/module-styles.scss';
-@import 'elements/xmodules'; // styling for Studio-specific contexts
+// elements - xmodule specific
+@import 'xmodule/modules/css/module-styles.scss';               // (ref from /common/static/xmodule)
+@import 'xmodule/descriptors/css/module-styles.scss';           // (ref from /common/static/xmodule)
+@import 'elements/xmodules';                                    // styling for Studio-specific contexts

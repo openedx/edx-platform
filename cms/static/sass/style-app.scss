@@ -1,39 +1,39 @@
 // studio - style compile
 // ====================
 
-// libraries and resets
+// common libraries
 // --------------------
-@import 'utilities/bourbon/bourbon'; // lib - http://bourbon.io
-@import 'utilities/reset'; // global resets
+@import 'common/utilities/bourbon/bourbon';                     // lib - http://bourbon.io (ref from /common/)
 
 // utilities and assets
 // --------------------
 // utilities
-@import 'utilities/variables'; // settings/values/placeholders
-@import 'utilities/mixins'; // mixins and functions
-@import 'utilities/mixins-inherited'; // mixins and functions
-@import 'utilities/extends'; // re-usable extends, placeholders, archetypes
+@import 'utilities/variables';                                  // settings/values/placeholders
+@import 'utilities/reset';                                      // global resets
+@import 'utilities/mixins';                                     // mixins and functions
+@import 'utilities/mixins-inherited';                           // mixins and functions (inherited)
+@import 'utilities/extends';                                    // re-usable extends, placeholders, archetypes
 
 // assets
-@import 'assets/fonts'; // imported/used fonts
-@import 'assets/graphics'; // sprites, basic img/figure/svg styling
-@import 'assets/anims'; // animations
+@import 'assets/fonts';                                         // imported/used fonts
+@import 'assets/graphics';                                      // sprites, basic img/figure/svg styling
+@import 'assets/anims';                                         // animations
 
 // general, elements, and views
 // --------------------
-// base - elements
+// elements
 @import 'elements/base';
 @import 'elements/typography';
-@import 'elements/icons'; // references to icons used
-@import 'elements/controls'; // buttons, link styles, sliders, etc.
-@import 'elements/navigation'; // all archetypes of navigation
+@import 'elements/icons';                                        // references to icons used
+@import 'elements/controls';                                     // buttons, link styles, sliders, etc.
+@import 'elements/navigation';                                   // all archetypes of navigation
 @import 'elements/forms';
 @import 'elements/header';
 @import 'elements/footer';
 @import 'elements/sock';
 @import 'elements/tender-widget';
-@import 'elements/system-feedback'; // alerts, notifications, states
-@import 'elements/system-help'; // help UI
-@import 'elements/modal'; // interstitial UI, dialogs, modal windows
-@import 'elements/vendor'; // overrides to vendor-provided styling
+@import 'elements/system-feedback';                               // alerts, notifications, states
+@import 'elements/system-help';                                   // help UI
+@import 'elements/modal';                                         // interstitial UI, dialogs, modal windows
 @import 'elements/modal-window';
+@import 'elements/vendor';                                        // overrides to vendor-provided styling
