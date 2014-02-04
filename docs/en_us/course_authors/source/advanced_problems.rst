@@ -307,6 +307,8 @@ Studio, you'll use `MathJax <http://www.mathjax.org>`_ to change your
 plain text into "beautiful math." For more information about how to use
 MathJax in Studio, see :ref:`MathJax in Studio`.
 
+.. warning:: Math expression input problems cannot currently include any any kind of complex numbers. This includes negative numbers raised to fractional powers, such as (-1)^(1/2).
+
 .. image:: Images/MathExpressionInputExample.gif
  :alt: Image of math expression input problem
 
