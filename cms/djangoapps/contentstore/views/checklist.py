@@ -1,6 +1,8 @@
 import json
 import copy
 
+from django.conf import settings
+
 from util.json_request import JsonResponse
 from django.http import HttpResponseBadRequest
 from django.contrib.auth.decorators import login_required
@@ -114,8 +116,14 @@ def expand_checklist_action_url(course_module, checklist):
     urlconf_map = {
         "ManageUsers": "course_team",
         "CourseOutline": "course",
+        "StaticPages": "tabs",
         "SettingsDetails": "settings/details",
         "SettingsGrading": "settings/grading",
+        "SettingsAdvanced": "settings/advanced",
+    }
+    lms_urlconf_map = {
+        "Wiki": "course_wiki",
+        "Forum": "discussion/forum",
     }
 
     for item in expanded_checklist.get('items'):
@@ -125,5 +133,11 @@ def expand_checklist_action_url(course_module, checklist):
             ctx_loc = course_module.location
             location = loc_mapper().translate_location(ctx_loc.course_id, ctx_loc, False, True)
             item['action_url'] = location.url_reverse(url_prefix, '')
+        elif action_url in lms_urlconf_map:
+            lms_base = settings.LMS_BASE
+            course_id = course_module.location.course_id
+            url_postfix = lms_urlconf_map[action_url]
+            url = 'http://' + lms_base + '/courses/' + course_id + '/' + url_postfix
+            item['action_url'] = url
 
     return expanded_checklist
