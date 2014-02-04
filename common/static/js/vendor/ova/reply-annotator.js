@@ -66,12 +66,9 @@ Annotator.Plugin.Reply = (function(_super) {
 	Reply.prototype.pluginSubmit = function(field, annotation) {
 		var replyItem = $(this.annotator.editor.element).find(".reply-item span.parent-annotation"),
 			parent = replyItem.html()!=''?replyItem.html():'0';
-                console.log(parent);
-                console.log(replyItem.html());
 		if (parent!='0') annotation.media = 'comment';
 		annotation.parent = parent;//set 0, because it is not a reply
-		console.log(annotation.parent);
-                return annotation.parent;
+        return annotation.parent;
 	};
 	
 
