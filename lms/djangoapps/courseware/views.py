@@ -562,6 +562,9 @@ def course_about(request, course_id):
         reg_then_add_to_cart_link = "{reg_url}?course_id={course_id}&enrollment_action=add_to_cart".format(
             reg_url=reverse('register_user'), course_id=course.id)
 
+    # see if we have already filled up all allowed enrollments
+    is_course_full = CourseEnrollment.is_course_full(course)
+
     return render_to_response('courseware/course_about.html',
                               {'course': course,
                                'registered': registered,
@@ -569,7 +572,8 @@ def course_about(request, course_id):
                                'registration_price': registration_price,
                                'in_cart': in_cart,
                                'reg_then_add_to_cart_link': reg_then_add_to_cart_link,
-                               'show_courseware_link': show_courseware_link})
+                               'show_courseware_link': show_courseware_link,
+                               'is_course_full': is_course_full})
 
 
 @ensure_csrf_cookie
