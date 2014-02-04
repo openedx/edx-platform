@@ -922,6 +922,40 @@ CatchAnnotation.prototype = {
             //search
             this._refreshReplies(evt);
         }else if(action=='deleteAnnotation'){
+            /*require(["js/views/feedback_prompt","gettext"], function(PromptView, gettext){
+                var confirm = new PromptView.Warning({
+                    title: gettext('Warning: Delete Annotation'),
+                    message: gettext('Would you like to delete this annotation?'),
+                    actions:{
+                        primary:{
+                            text: gettext('Yes, delete annotation.'),
+                            click: function(view){
+                                view.hide();
+                                var annotator = this.annotator,
+                                    item = $(evt.target).parents('.annotationItem:first'),
+                                    id = item.attr('annotationId'),
+                                    store = annotator.plugins.Store,
+                                    annotations = store.annotations,
+                                    permissions = annotator.plugins.Permissions;
+                                var annotation;
+                                annotations.forEach(function(ann){
+                                   if(ann.id == id)
+                                       annotation = ann;
+                                });
+                                var authorized = permissions.options.userAuthorize('delete', annotation,permissions.user);
+                                if(authorized)
+                                    annotator.deleteAnnotation(annotation);
+                            }
+                        },
+                        secondary:{
+                            text: gettext('Cancel'),
+                            click:function(view){
+                                view.hide();
+                            }
+                        }
+                    }
+                })
+            });*/
             if(confirm("Would you like to delete the annotation?")){
                 var annotator = this.annotator,
                         item = $(evt.target).parents('.annotationItem:first'),
@@ -1095,11 +1129,32 @@ CatchAnnotation.prototype = {
                     annotation = item.data('annotation');
         var authorized = permissions.options.userAuthorize('delete', annotation,permissions.user);
         if(authorized){
-            //annotator.deleteAnnotation(annotation);
+            /*require(["js/views/feedback_prompt","gettext"], function(PromptView){
+                var confirm = new PromptView.Warning({
+                    title: gettext('Warning: Delete Reply'),
+                    message: gettext('Would you like to delete this reply?'),
+                    actions:{
+                        primary:{
+                            text: gettext('Yes, delete reply.'),
+                            click: function(view){
+                                view.hide();
+                                annotator.plugins['Store']._apiRequest('destroy', annotation, function(){});
+                                item.remove();
+                            }
+                        },
+                        secondary:{
+                            text: gettext('Cancel'),
+                            click:function(view){
+                                view.hide();
+                            }
+                        }
+                    }
+                })
+            });*/
             if(confirm('Would you like to delete this reply?')){
               annotator.plugins['Store']._apiRequest('destroy', annotation, function(){});
               item.remove();
-          }
+            }
         }
     }
 }
