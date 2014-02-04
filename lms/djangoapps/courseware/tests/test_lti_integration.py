@@ -27,15 +27,15 @@ class TestLTI(BaseTestXmodule):
         mocked_signature_after_sign = u'my_signature%3D'
         mocked_decoded_signature = u'my_signature='
 
-        lti_id = self.item_module.lti_id
-        module_id = unicode(urllib.quote(self.item_module.id))
+        lti_id = self.item_descriptor.lti_id
+        module_id = unicode(urllib.quote(self.item_descriptor.id))
         user_id = unicode(self.item_descriptor.xmodule_runtime.anonymous_student_id)
 
         sourcedId = u':'.join(urllib.quote(i) for i in (lti_id, module_id, user_id))
 
         lis_outcome_service_url = 'https://{host}{path}'.format(
                 host=self.item_descriptor.xmodule_runtime.hostname,
-                path=self.item_descriptor.xmodule_runtime.handler_url(self.item_module, 'grade_handler', thirdparty=True).rstrip('/?')
+                path=self.item_descriptor.xmodule_runtime.handler_url(self.item_descriptor, 'grade_handler', thirdparty=True).rstrip('/?')
             )
         self.correct_headers = {
             u'user_id': user_id,
@@ -59,13 +59,13 @@ class TestLTI(BaseTestXmodule):
         saved_sign = oauthlib.oauth1.Client.sign
 
         self.expected_context = {
-            'display_name': self.item_module.display_name,
+            'display_name': self.item_descriptor.display_name,
             'input_fields': self.correct_headers,
-            'element_class': self.item_module.category,
-            'element_id': self.item_module.location.html_id(),
+            'element_class': self.item_descriptor.category,
+            'element_id': self.item_descriptor.location.html_id(),
             'launch_url': 'http://www.example.com',  # default value
             'open_in_a_new_page': True,
-            'form_url': self.item_descriptor.xmodule_runtime.handler_url(self.item_module, 'preview_handler').rstrip('/?'),
+            'form_url': self.item_descriptor.xmodule_runtime.handler_url(self.item_descriptor, 'preview_handler').rstrip('/?'),
         }
 
         def mocked_sign(self, *args, **kwargs):
@@ -88,11 +88,11 @@ class TestLTI(BaseTestXmodule):
         self.addCleanup(patcher.stop)
 
     def test_lti_constructor(self):
-        generated_content = self.item_module.render('student_view').content
+        generated_content = self.item_descriptor.render('student_view').content
         expected_content =  self.runtime.render_template('lti.html', self.expected_context)
         self.assertEqual(generated_content, expected_content)
 
     def test_lti_preview_handler(self):
-        generated_content = self.item_module.preview_handler(None, None).body
+        generated_content = self.item_descriptor.preview_handler(None, None).body
         expected_content = self.runtime.render_template('lti_form.html', self.expected_context)
         self.assertEqual(generated_content, expected_content)
