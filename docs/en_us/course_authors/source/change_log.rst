@@ -13,6 +13,8 @@ Change Log
 
    * - Date
      - Change
+   * - 02/04/14
+     - Added :ref:`Additional Tools` topic with :ref:`Multiple Choice and Numerical Input` and :ref:`Protein Builder`
    * - 01/29/2014
      - Added the chapter :ref:`Using an Instant Hangout in Your Course`.
    * - 01/21/2014
