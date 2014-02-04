@@ -71,12 +71,12 @@ def wrap_xblock(runtime_class, block, view, frag, context, display_name_only=Fal
         data['runtime-class'] = runtime_class
         data['runtime-version'] = frag.js_init_version
         data['block-type'] = block.scope_ids.block_type
-        data['usage-id'] = quote_slashes(str(block.scope_ids.usage_id))
+        data['usage-id'] = quote_slashes(unicode(block.scope_ids.usage_id).encode('utf-8'))
 
     template_context = {
         'content': block.display_name if display_name_only else frag.content,
         'classes': css_classes,
-        'data_attributes': ' '.join('data-{}="{}"'.format(key, value) for key, value in data.items()),
+        'data_attributes': ' '.join(u'data-{}="{}"'.format(key, value) for key, value in data.items()),
     }
 
     return wrap_fragment(frag, render_to_string('xblock_wrapper.html', template_context))
