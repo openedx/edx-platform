@@ -113,10 +113,6 @@ MODULESTORE = {
     }
 }
 
-# Starting modulestores generates log messages.  If we wait to init modulestores,
-# then those messages will be silenced by the test runner.
-INIT_MODULESTORE_ON_STARTUP = False
-
 CONTENTSTORE = {
     'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
     'DOC_STORE_CONFIG': {

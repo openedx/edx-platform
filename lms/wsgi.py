@@ -10,9 +10,8 @@ from xmodule.modulestore.django import modulestore
 
 # Trigger a forced initialization of our modulestores since this can take a
 # while to complete and we want this done before HTTP requests are accepted.
-if settings.INIT_MODULESTORE_ON_STARTUP:
-    for store_name in settings.MODULESTORE:
-        modulestore(store_name)
+for store_name in settings.MODULESTORE:
+    modulestore(store_name)
 
 
 # This application object is used by the development server
