@@ -3,7 +3,7 @@ Tests for contentstore/views/user.py.
 """
 import json
 from contentstore.tests.utils import CourseTestCase
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User
 from student.models import CourseEnrollment
 from xmodule.modulestore.django import loc_mapper
 from student.roles import CourseStaffRole, CourseInstructorRole

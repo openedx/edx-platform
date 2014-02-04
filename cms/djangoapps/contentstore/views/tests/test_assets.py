@@ -114,6 +114,7 @@ class PaginationTestCase(AssetsTestCase):
             self.assertGreaterEqual(name1, name2)
             self.assertGreaterEqual(name2, name3)
 
+
 class UploadTestCase(AssetsTestCase):
     """
     Unit tests for uploading a file
