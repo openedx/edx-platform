@@ -53,7 +53,6 @@ class CourseUpdateTest(CourseTestCase):
             content, json.loads(refetched.content)['content'], "get w/ provided id"
         )
 
-
         # now put in an evil update
         content = '<ol/>'
         payload = get_response(content, 'January 11, 2013')

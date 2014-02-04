@@ -113,7 +113,6 @@ class ChecklistTestCase(CourseTestCase):
         self.assertEqual('CourseOutline', get_first_item(persisted_checklist).get('action_url'))
         self.compare_checklists(persisted_checklist, returned_checklist)
 
-
     def test_update_checklists_delete_unsupported(self):
         """ Delete operation is not supported. """
         update_url = self.location.url_reverse('checklists/', '100')
