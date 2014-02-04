@@ -153,9 +153,11 @@ class XBlockAcidBase(WebAppTest):
         """
 
         self.outline.visit()
-        unit = self.outline.section('Test Section').subsection('Test Subsection').toggle_expand().unit('Test Unit').go_to()
+        subsection = self.outline.section('Test Section').subsection('Test Subsection')
+        unit = subsection.toggle_expand().unit('Test Unit').go_to()
+        container = unit.components[0].go_to_container()
 
-        acid_block = AcidView(self.browser, unit.components[0].preview_selector)
+        acid_block = AcidView(self.browser, container.xblocks[0].preview_selector)
         self.assertTrue(acid_block.init_fn_passed)
         self.assertTrue(acid_block.child_tests_passed)
         self.assertTrue(acid_block.resource_url_passed)
@@ -164,13 +166,16 @@ class XBlockAcidBase(WebAppTest):
         self.assertTrue(acid_block.scope_passed('preferences'))
         self.assertTrue(acid_block.scope_passed('user_info'))
 
+    # This will fail until we support editing on the container page
+    @expectedFailure
     def test_acid_block_editor(self):
         """
         Verify that all expected acid block tests pass in studio preview
         """
 
         self.outline.visit()
-        unit = self.outline.section('Test Section').subsection('Test Subsection').toggle_expand().unit('Test Unit').go_to()
+        subsection = self.outline.section('Test Section').subsection('Test Subsection')
+        unit = subsection.toggle_expand().unit('Test Unit').go_to()
 
         unit.edit_draft()
 

@@ -214,7 +214,6 @@
     display: inline-block;
 
     .action-button {
-      @include transition(all $tmg-f2 ease-in-out 0s);
       border-radius: 3px;
       padding: ($baseline/4) ($baseline/2);
       height: ($baseline*1.5);
