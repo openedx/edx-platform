@@ -21,7 +21,7 @@ DB_OVERRIDES = dict(
     PORT=os.environ.get('DB_MIGRATION_PORT', DATABASES['default']['PORT']),
 )
 
-if not DB_OVERRIDES['PASSWORD']:
+if DB_OVERRIDES['PASSWORD'] is None:
     raise ImproperlyConfigured("No database password was provided for running "
                                "migrations.  This is fatal.")
 
