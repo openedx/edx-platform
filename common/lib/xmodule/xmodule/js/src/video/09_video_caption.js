@@ -211,10 +211,9 @@ function () {
      *     false: No caption file was specified, or an empty string was
      *         specified.
      */
-    function fetchCaption() {
+    function fetchCaption(notLoaded) {
         var self = this,
             Caption = self.videoCaption;
-
         // Check whether the captions file was specified. This is the point
         // where we either stop with the caption panel (so that a white empty
         // panel to the right of the video will not be shown), or carry on
@@ -223,20 +222,25 @@ function () {
             return false;
         }
 
-        if (this.videoCaption.loaded) {
-            this.videoCaption.hideCaptions(false);
-        } else {
+        if (!this.videoCaption.loaded || notLoaded) {
             this.videoCaption.hideCaptions(this.hide_captions);
+        } else {
+            this.videoCaption.hideCaptions(false);
+        }
+
+        if (this.fetchXHR && this.fetchXHR.abort) {
+            this.fetchXHR.abort();
         }
 
         // Fetch the captions file. If no file was specified, or if an error
         // occurred, then we hide the captions panel, and the "CC" button
-        $.ajaxWithPrefix({
+        this.fetchXHR = $.ajaxWithPrefix({
             url: self.config.transcriptTranslationUrl,
             notifyOnError: false,
             data: {
                 videoId: this.youtubeId(),
-                language: this.getCurrentLanguage()
+                language: this.getCurrentLanguage(),
+                speed: this.speed,
             },
             success: function (captions) {
                 Caption.captions = captions.text;
