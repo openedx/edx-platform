@@ -14,8 +14,9 @@ import os
 from django.core.exceptions import ImproperlyConfigured
 
 DB_OVERRIDES = dict(
-    USER=os.environ.get('DB_MIGRATION_USER', 'root'),
     PASSWORD=os.environ.get('DB_MIGRATION_PASS', None),
+    ENGINE=os.environ.get('DB_MIGRATION_ENGINE', DATABASES['default']['ENGINE'])
+    USER=os.environ.get('DB_MIGRATION_USER', DATABASES['default']['USER']),
     NAME=os.environ.get('DB_MIGRATION_NAME', DATABASES['default']['NAME']),
     HOST=os.environ.get('DB_MIGRATION_HOST', DATABASES['default']['HOST']),
     PORT=os.environ.get('DB_MIGRATION_PORT', DATABASES['default']['PORT']),
