@@ -7,6 +7,8 @@ from pkg_resources import resource_string
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xblock.core import Scope, String
+from urlparse import urlparse
+from os.path import splitext, basename
 
 import textwrap
 
@@ -133,12 +135,9 @@ class VideoAnnotationModule(AnnotatableFields, XModule):
         if 'youtu' in srcurl:
             return 'video/youtube'
         else:
-            spliturl = srcurl.split(".")
-            extensionplus1 = spliturl[len(spliturl) - 1]
-            spliturl = extensionplus1.split("?")
-            extensionplus2 = spliturl[0]
-            spliturl = extensionplus2.split("#")
-            return 'video/' + spliturl[0]
+            disassembled = urlparse(srcurl)
+            filename, file_ext = splitext(basename(disassembled.path))
+            return 'video/' + file_ext.replace(".","")
 
     def get_html(self):
         """ Renders parameters to template. """
