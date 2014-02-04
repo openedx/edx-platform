@@ -5,7 +5,7 @@ from path import path
 
 # BASE_DIR is the working directory to execute django-admin commands from.
 # Typically this should be the 'edx-platform' directory.
-BASE_DIR = path(__file__).abspath().dirname().joinpath('..').normpath()
+BASE_DIR = path(__file__).abspath().dirname().dirname()
 
 # LOCALE_DIR contains the locale files.
 # Typically this should be 'edx-platform/conf/locale'

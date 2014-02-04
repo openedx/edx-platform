@@ -1,5 +1,11 @@
 # --- Internationalization tasks
 
+I18N_REPORT_DIR = report_dir_path('i18n')
+I18N_XUNIT_REPORT = File.join(I18N_REPORT_DIR, 'nosetests.xml')
+
+directory I18N_REPORT_DIR
+
+
 namespace :i18n do
 
   desc "Extract localizable strings from sources"
@@ -57,10 +63,9 @@ namespace :i18n do
   end
 
   desc "Run tests for the internationalization library"
-  task :test do
-    test = File.join(REPO_ROOT, "i18n", "tests")
+  task :test => [I18N_REPORT_DIR, :clean_reports_dir] do
     pythonpath_prefix = "PYTHONPATH=#{REPO_ROOT}/i18n:$PYTHONPATH"
-    sh("#{pythonpath_prefix} nosetests #{test}")
+    test_sh("i18n", "#{pythonpath_prefix} nosetests #{REPO_ROOT}/i18n/tests --with-xunit --xunit-file=#{I18N_XUNIT_REPORT}")
   end
 
   # Commands for automating the process of including translations in edx-platform.
@@ -79,3 +84,7 @@ namespace :i18n do
   end
 
 end
+
+
+# Add i18n tests to the main test command
+task :test => :'i18n:test'

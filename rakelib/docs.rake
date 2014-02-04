@@ -42,4 +42,18 @@ desc "Build docs and show them in browser"
 task :doc, [:type, :quiet] =>  :builddocs do |t, args|
     Rake::Task["showdocs"].invoke(args.type, args.quiet)
 end
-# --- Develop and public documentation ---
+
+
+# Run documentation tests
+desc "Run documentation tests"
+task :test_docs do
+    # Be sure that sphinx can build docs w/o exceptions.
+    test_message = "If a docs test fails, you should run '%s' and look at whole output and fix exceptions.
+(You shouldn't fix rst warnings and errors for this to pass, just get rid of exceptions.)"
+    puts (test_message  % ["rake doc[docs,verbose]"]).colorize( :light_green )
+    test_sh('docs', 'rake builddocs')
+end
+
+
+# Add documentation tests to the main test command
+task :test => :'test_docs'
