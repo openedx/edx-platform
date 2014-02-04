@@ -24,8 +24,8 @@ where $DUMMY_LOCALE is the dummy_locale value set in the i18n config
 """
 
 import sys
-import os
 import polib
+from path import path
 
 from i18n.config import CONFIGURATION
 from i18n.execute import create_dir_if_necessary
@@ -164,7 +164,7 @@ def make_dummy(file, locale):
     Takes a source po file, reads it, and writes out a new po file
     in :param locale: containing a dummy translation.
     """
-    if not os.path.exists(file):
+    if not path(file).exists():
         raise IOError('File does not exist: %s' % file)
     pofile = polib.pofile(file)
     converter = Dummy()
@@ -182,10 +182,9 @@ def make_dummy(file, locale):
 
 def new_filename(original_filename, new_locale):
     """Returns a filename derived from original_filename, using new_locale as the locale"""
-    orig_dir = os.path.dirname(original_filename)
-    msgs_dir = os.path.basename(orig_dir)
-    orig_file = os.path.basename(original_filename)
-    return os.path.abspath(os.path.join(orig_dir, '../..', new_locale, msgs_dir, orig_file))
+    f = path(original_filename)
+    new_file = f.parent.parent.parent / new_locale / f.parent.name / f.name
+    return new_file.abspath()
 
 
 def main():
