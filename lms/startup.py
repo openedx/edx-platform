@@ -48,8 +48,8 @@ def enable_theme():
     theme_root = settings.ENV_ROOT / "themes" / settings.THEME_NAME
 
     # Include the theme's templates in the template search paths
-    settings.TEMPLATE_DIRS.append(theme_root / 'templates')
-    settings.MAKO_TEMPLATES['main'].append(theme_root / 'templates')
+    settings.TEMPLATE_DIRS.insert(0, theme_root / 'templates')
+    settings.MAKO_TEMPLATES['main'].insert(0, theme_root / 'templates')
     edxmako.startup.run()
 
     # Namespace the theme's static files to 'themes/<theme_name>' to
