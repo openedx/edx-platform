@@ -23,6 +23,7 @@ generates output conf/locale/$DUMMY_LOCALE/LC_MESSAGES,
 where $DUMMY_LOCALE is the dummy_locale value set in the i18n config
 """
 
+import sys
 import os
 import polib
 
