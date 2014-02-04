@@ -602,7 +602,7 @@ class CertificateItem(OrderItem):
         etc
         """
         query = use_read_replica_if_available(
-            CertificateItem.objects.filter(course_id=course_id, mode='verified', status=status).aggregate(Sum(field_to_aggregate)))[field_to_aggregate + '__sum']
+            CertificateItem.objects.filter(course_id=course_id, mode='verified', status=status)).aggregate(Sum(field_to_aggregate))[field_to_aggregate + '__sum']
         if query is None:
             return Decimal(0.00)
         else:
@@ -615,4 +615,4 @@ class CertificateItem(OrderItem):
                 course_id=course_id,
                 mode='verified',
                 status='purchased',
-                unit_cost__gt=(CourseMode.min_course_price_for_verified_for_currency(course_id, 'usd'))).count())
+                unit_cost__gt=(CourseMode.min_course_price_for_verified_for_currency(course_id, 'usd')))).count()
