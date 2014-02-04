@@ -28,7 +28,7 @@ from instructor_task.views import instructor_task_status
 
 
 TEST_COURSE_ORG = 'edx'
-TEST_COURSE_NAME = 'Test Course'
+TEST_COURSE_NAME = 'test course'
 TEST_COURSE_NUMBER = '1.23x'
 TEST_SECTION_NAME = "Problem"
 TEST_COURSE_ID = 'edx/1.23x/test_course'
