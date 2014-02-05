@@ -142,6 +142,7 @@ You must set dates and times for enrollment and for the course.
 From the **Settings** menu, select **Schedule and Details**.  
 
 .. image:: Images/schedule.png
+  :alt: An image of the course schedule page.
 
 .. note:: 
 
@@ -152,6 +153,41 @@ Follow the on-screen text to enter the course and enrollment schedule.
 .. note::
 
     The Time fields on this page reflect the current time zone in your browser, depending on your geography. Course start times for students are shown as UTC.
+
+Students see the course start date on their dashboards:
+
+.. image:: Images/dashboard-course.png
+ :alt: An image of a course listing in the student dashboard, with the start date circled.
+
+.. _Set the Advertised Start Date:
+
+==============================
+Set the Advertised Start Date
+==============================
+
+You can set an advertised start date for your course that is different than the course start date you set in the **Schedule and Details** page. You may want to do this if there is uncertainty about the exact start date. For example, you could advertise the start date as **Spring, 2014**.
+
+To set an advertised start date:
+
+#. From the **Settings** menu, select **Advanced Settings**.
+#. Find the policy key **advertised_start**. The default value is **null**.
+#. Enter the date you want as an advertised start date.  You can use any string, enclosed in double quotation marks. If you format the string as a date (for example, as 02/01/2014), the value is parsed and presented to students as a date.
+
+  .. image:: Images/advertised_start.png
+   :alt: Image of the advertised start date policy key
+
+4. Click **Save Changes** at the bottom of the page.
+
+The start date shown on the student's dashboard is now the value of the advertised_start policy key:
+
+.. image:: Images/dashboard-course_adver_start.png
+ :alt: An image of a course listing in the student dashboard, with the advertised start date circled.
+
+If you do not change the default course start date (01/01/2030), and the advertised_start policy value is null, then the student dashboard does not list a start date for the course.  Students just see that the course has not yet started:
+
+.. image:: Images/dashboard-course_not_started.png
+ :alt: Image of a course listing in the student dashboard, with no start date.
+
 
 .. _`Describe Your Course`:
 
