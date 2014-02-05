@@ -2,6 +2,8 @@
 E2E tests for the LMS.
 """
 
+from unittest import skip
+
 from bok_choy.web_app_test import WebAppTest
 from bok_choy.promise import EmptyPromise, fulfill_before
 
@@ -213,6 +215,7 @@ class VideoTest(UniqueCourseTest):
         # Auto-auth register for the course
         AutoAuthPage(self.browser, course_id=self.course_id).visit()
 
+    @skip("BLD-563: Video Player Stuck on Pause")
     def test_video_player(self):
         """
         Play a video in the courseware.

@@ -17,7 +17,7 @@ class VideoPage(PageObject):
     url = None
 
     def is_browser_on_page(self):
-        return self.is_css_present('section.xmodule_VideoModule')
+        return self.is_css_present('div.xmodule_VideoModule')
 
     @property
     def elapsed_time(self):
