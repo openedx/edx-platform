@@ -101,7 +101,7 @@ class StubXQueueServiceTest(unittest.TestCase):
             )
 
             # Wait for the delayed grade response
-            self._wait_for_mock_called(logger.error, max_time=10)
+            self._wait_for_mock_called(logger.error)
 
             # Expect that we do NOT receive a response
             # and that an error message is logged
@@ -152,7 +152,7 @@ class StubXQueueServiceTest(unittest.TestCase):
         """
         # Wait for the server to POST back to the callback URL
         # If it takes too long, continue anyway
-        self._wait_for_mock_called(post_mock, max_time=10)
+        self._wait_for_mock_called(post_mock)
 
         # Check the response posted back to us
         # This is the default response
@@ -164,7 +164,7 @@ class StubXQueueServiceTest(unittest.TestCase):
         # Check that the POST request was made with the correct params
         post_mock.assert_called_with(callback_url, data=expected_callback_dict)
 
-    def _wait_for_mock_called(self, mock_obj, max_time=10):
+    def _wait_for_mock_called(self, mock_obj, max_time=120):
         """
         Wait for `mock` (a `Mock` object) to be called.
         If seconds elapsed exceeds `max_time`, continue without error.
