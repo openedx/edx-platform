@@ -3,7 +3,7 @@ High-level tab navigation.
 """
 
 from bok_choy.page_object import PageObject
-from bok_choy.promise import EmptyPromise, fulfill_after
+from bok_choy.promise import Promise, EmptyPromise, fulfill_after, fulfill
 
 
 class TabNavPage(PageObject):
@@ -49,8 +49,9 @@ class TabNavPage(PageObject):
     def _tab_css(self, tab_name):
         """
         Return the CSS to click for `tab_name`.
+        If no tabs exist for that name, return `None`.
         """
-        all_tabs = self.css_text('ol.course-tabs li a')
+        all_tabs = self._tab_names
 
         try:
             tab_index = all_tabs.index(tab_name)
@@ -58,6 +59,19 @@ class TabNavPage(PageObject):
             return None
         else:
             return 'ol.course-tabs li:nth-of-type({0}) a'.format(tab_index + 1)
+
+    @property
+    def _tab_names(self):
+        """
+        Return the list of available tab names.  If no tab names
+        are available, wait for them to load.  Raises a `BrokenPromiseError`
+        if the tab names fail to load.
+        """
+        def _check_func():
+            tab_names = self.css_text('ol.course-tabs li a')
+            return (len(tab_names) > 0, tab_names)
+
+        return fulfill(Promise(_check_func, "Get all tab names"))
 
     def _is_on_tab_promise(self, tab_name):
         """
