@@ -13,7 +13,7 @@ class ProgressPage(CoursePage):
     URL_PATH = "progress"
 
     def is_browser_on_page(self):
-        has_course_info = self.is_css_present('section.course-info')
+        has_course_info = self.is_css_present('div.course-info')
         has_graph = self.is_css_present('div#grade-detail-graph')
         return has_course_info and has_graph
 
@@ -45,7 +45,7 @@ class ProgressPage(CoursePage):
         Return the CSS index of the chapter with `title`.
         Returns `None` if it cannot find such a chapter.
         """
-        chapter_css = 'ol.chapters li h2'
+        chapter_css = 'div.chapters section h2'
         chapter_titles = self.css_map(chapter_css, lambda el: el.text.lower().strip())
 
         try:
@@ -64,7 +64,7 @@ class ProgressPage(CoursePage):
         # This is a hideous CSS selector that means:
         # Get the links containing the section titles in `chapter_index`.
         # The link text is the section title.
-        section_css = 'ol.chapters>li:nth-of-type({0}) ol.sections li h3 a'.format(chapter_index)
+        section_css = 'div.chapters>section:nth-of-type({0}) div.sections div h3 a'.format(chapter_index)
         section_titles = self.css_map(section_css, lambda el: el.text.lower().strip())
 
         # The section titles also contain "n of m possible points" on the second line
@@ -91,7 +91,7 @@ class ProgressPage(CoursePage):
         # This is CSS selector means:
         # Get the scores for the chapter at `chapter_index` and the section at `section_index`
         # Example text of the retrieved elements: "0/1"
-        score_css = "ol.chapters>li:nth-of-type({0}) ol.sections>li:nth-of-type({1}) section.scores>ol>li".format(
+        score_css = "div.chapters>section:nth-of-type({0}) div.sections>div:nth-of-type({1}) div.scores>ol>li".format(
             chapter_index, section_index
         )
 
