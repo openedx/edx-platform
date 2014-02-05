@@ -11,6 +11,8 @@ Change Log
 
    * - Date
      - Change
+   * - 02/05/14
+     - Added section :ref:`Set the Advertised Start Date`
    * - 02/04/14
      - Added the :ref:`Student Data` and :ref:`Grades` chapters.
    * - 
