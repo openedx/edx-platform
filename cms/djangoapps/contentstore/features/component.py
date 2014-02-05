@@ -28,7 +28,7 @@ def see_a_single_step_component(step):
     for step_hash in step.hashes:
         component = step_hash['Component']
         assert_in(component, ['Discussion', 'Video'])
-        component_css = 'section.xmodule_{}Module'.format(component)
+        component_css = 'div.xmodule_{}Module'.format(component)
         assert_true(world.is_css_present(component_css),
                     "{} couldn't be found".format(component))
 
@@ -48,7 +48,7 @@ def add_a_multi_step_component(step, is_advanced, category):
 def see_a_multi_step_component(step, category):
 
     # Wait for all components to finish rendering
-    selector = 'li.component section.xblock-student_view'
+    selector = 'li.component div.xblock-student_view'
     world.wait_for(lambda _: len(world.css_find(selector)) == len(step.hashes))
 
     for idx, step_hash in enumerate(step.hashes):
@@ -73,11 +73,11 @@ def see_a_multi_step_component(step, category):
 
 @step(u'I see a "([^"]*)" Problem component$')
 def see_a_problem_component(step, category):
-    component_css = 'section.xmodule_CapaModule'
+    component_css = 'div.xmodule_CapaModule'
     assert_true(world.is_css_present(component_css),
                 'No problem was added to the unit.')
 
-    problem_css = 'li.component section.xblock-student_view'
+    problem_css = 'li.component div.xblock-student_view'
     actual_text = world.css_text(problem_css)
     assert_in(category.upper(), actual_text)
 
@@ -150,7 +150,7 @@ def duplicated_component(step, ordinal):
 
 @step(u'I see a Problem component with display name "([^"]*)" in position "([^"]*)"$')
 def see_component_in_position(step, display_name, index):
-    component_css = 'section.xmodule_CapaModule'
+    component_css = 'div.xmodule_CapaModule'
 
     def find_problem(_driver):
         return world.css_text(component_css, int(index)).startswith(display_name.upper())
