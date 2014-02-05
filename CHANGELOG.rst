@@ -5,6 +5,11 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Blades: Fix for the list metadata editor that gets into a bad state where "Add"
+  is disabled. BLD-821.
+
+Blades: Add view for field type Dict in Studio. BLD-658.
+
 Blades: Refactor stub implementation of LTI Provider. BLD-601.
 
 LMS: In left accordion and progress page, due dates are now displayed in time
