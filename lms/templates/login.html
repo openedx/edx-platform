@@ -7,14 +7,14 @@
 
 <%block name="pagetitle">${_("Log into your {platform_name} Account").format(platform_name=platform_name)}</%block>
 
+<%block name="bodyclass">view-login</%block>
+
 <%block name="js_extra">
   <script type="text/javascript">
     $(function() {
 
-      var view_name = 'view-login';
-
       // adding js class for styling with accessibility in mind
-      $('body').addClass('js').addClass(view_name);
+      $('body').addClass('js');
 
       // show forgot password modal UI if URL contains matching DOM ID
       if ($.deparam.fragment()['forgot-password-modal'] !== undefined) {
