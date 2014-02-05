@@ -625,7 +625,7 @@ def advanced_settings_handler(request, package_id=None, branch=None, version_gui
                     course_module,
                     request.json,
                     filter_tabs=filter_tabs,
-                    user=request.user
+                    user=request.user,
                 ))
             except (TypeError, ValueError) as err:
                 return HttpResponseBadRequest(

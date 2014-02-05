@@ -85,7 +85,7 @@ class TestViewAuth(ModuleStoreTestCase, LoginEnrollmentTestCase):
         urls.extend([
             reverse('book', kwargs={'course_id': course.id,
                                     'book_index': index})
-            for index, _book in enumerate(course.textbooks)
+            for index in xrange(len(course.textbooks))
         ])
         for url in urls:
             check_for_get_code(self, 200, url)

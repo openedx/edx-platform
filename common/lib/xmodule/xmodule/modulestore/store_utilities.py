@@ -126,7 +126,8 @@ def _clone_modules(modulestore, modules, source_location, dest_location):
 
         if 'data' in module.fields and module.fields['data'].is_set_on(module) and isinstance(module.data, basestring):
             module.data = rewrite_nonportable_content_links(
-                source_location.course_id, dest_location.course_id, module.data)
+                source_location.course_id, dest_location.course_id, module.data
+            )
 
         # repoint children
         if module.has_children:

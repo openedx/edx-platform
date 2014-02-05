@@ -418,15 +418,13 @@ class ModuleStoreWrite(ModuleStoreRead):
         Update the given xblock's persisted repr. Pass the user's unique id which the persistent store
         should save with the update if it has that ability.
 
-        :param allow_not_found: whether this method should raise an exception of the given xblock
+        :param allow_not_found: whether this method should raise an exception if the given xblock
         has not been persisted before.
-
-        For version tracking and conflict detecting persistence stores
+        :param force: fork the structure and don't update the course draftVersion if there's a version
+        conflict (only applicable to version tracking and conflict detecting persistence stores)
 
         :raises VersionConflictError: if package_id and version_guid given and the current
-        version head != version_guid and force is not True.
-        :param force: fork the structure and don't update the course draftVersion if the above
-
+        version head != version_guid and force is not True. (only applicable to version tracking stores)
         """
         pass
 
@@ -438,12 +436,11 @@ class ModuleStoreWrite(ModuleStoreRead):
 
         :param delete_all_versions: removes both the draft and published version of this item from
         the course if using draft and old mongo. Split may or may not implement this.
-
-        For version tracking and conflict detecting persistence stores
+        :param force: fork the structure and don't update the course draftVersion if there's a version
+        conflict (only applicable to version tracking and conflict detecting persistence stores)
 
         :raises VersionConflictError: if package_id and version_guid given and the current
-        version head != version_guid and force is not True.
-        :param force: fork the structure and don't update the course draftVersion if the above
+        version head != version_guid and force is not True. (only applicable to version tracking stores)
         """
         pass
 

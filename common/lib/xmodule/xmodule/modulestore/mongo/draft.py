@@ -168,9 +168,9 @@ class DraftModuleStore(MongoModuleStore):
         try:
             if not self.has_item(None, draft_loc):
                 self.convert_to_draft(xblock.location)
-        except ItemNotFoundError, e:
+        except ItemNotFoundError:
             if not allow_not_found:
-                raise e
+                raise
 
         xblock.location = draft_loc
         super(DraftModuleStore, self).update_item(xblock, user)

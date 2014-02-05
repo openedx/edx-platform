@@ -9,7 +9,6 @@ from functools import partial
 from static_replace import replace_static_urls
 from xmodule_modifiers import wrap_xblock
 
-from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseBadRequest, HttpResponse
@@ -18,9 +17,8 @@ from django.views.decorators.http import require_http_methods
 
 from xblock.fields import Scope
 from xblock.fragment import Fragment
-from xblock.core import XBlock
 
-import xmodule.x_module
+import xmodule
 from xmodule.modulestore.django import modulestore, loc_mapper
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 from xmodule.modulestore.inheritance import own_metadata
@@ -185,7 +183,7 @@ def xblock_handler(request, tag=None, package_id=None, branch=None, version_guid
                 parent_location,
                 duplicate_source_location,
                 request.json.get('display_name'),
-                request.user
+                request.user,
             )
             course_location = loc_mapper().translate_locator_to_location(BlockUsageLocator(parent_locator), get_course=True)
             dest_locator = loc_mapper().translate_location(course_location.course_id, dest_location, False, True)
@@ -379,7 +377,8 @@ def _duplicate_item(parent_location, duplicate_source_location, display_name=Non
     if source_item.has_children:
         dest_module.children = []
         for child in source_item.children:
-            dest_module.children.append(_duplicate_item(dest_location, Location(child), user=user).url())
+            dupe = _duplicate_item(dest_location, Location(child), user=user)
+            dest_module.children.append(dupe.url())
         get_modulestore(dest_location).update_item(dest_module, user.id if user else None)
 
     if not 'detached' in source_item.runtime.load_block_type(category)._class_tags:
