@@ -37,6 +37,15 @@ class Command(BaseCommand):
             courseenrollment__course_id=source)
 
         for user in source_students:
+            if CourseEnrollment.is_enrolled(student, dest):
+                # Un Enroll from source course but don't mess
+                # with the enrollment in the destination course.
+                CourseEnrollment.unenroll(user,source)
+                print("Unenrolled {} from {}".format(user.username, source))
+                msg = "Skipping {}, already enrolled in destination course {}"
+                print(msg.format(user.username, dest))
+                continue
+
             print("Moving {}.".format(user.username))
             # Find the old enrollment.
             enrollment = CourseEnrollment.objects.get(user=user,
