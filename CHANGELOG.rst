@@ -21,6 +21,8 @@ LMS:  If the course start date is kept at the default studio value (Jan 1, 2030)
 and advertised_start is not set, the start date is not displayed in the
 /courses tile view, the course about page, or the dashboard
 
+LMS: Add ability to redirect to a splash screen.
+
 Blades: Add role parameter to LTI. BLD-583.
 
 Blades: Bugfix "In Firefox YouTube video with start time plays from 00:00:00".
