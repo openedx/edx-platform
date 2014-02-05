@@ -20,6 +20,7 @@ from pkg_resources import resource_string
 import datetime
 import copy
 from webob import Response
+from collections import OrderedDict
 
 from django.conf import settings
 
@@ -252,7 +253,8 @@ class VideoModule(VideoFields, XModule):
             transcript_language = json.dumps(None)
 
         languages = {i[0]: i[1] for i in settings.ALL_LANGUAGES}
-        transcript_languages = {k: languages[k] for k in self.transcripts}
+        # OrderedDict for easy testing of rendered context in tests
+        transcript_languages = OrderedDict({k: languages[k] for k in self.transcripts})
         if self.sub:
             transcript_languages.update({'en': 'English'})
 

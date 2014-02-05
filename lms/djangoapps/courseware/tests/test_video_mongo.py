@@ -61,12 +61,12 @@ class TestVideoYouTube(TestVideo):
 
         expected_context = {
             'ajax_url': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
+            'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', False),
             'data_dir': getattr(self, 'data_dir', None),
-            'caption_asset_path': '/static/subs/',
-            'show_captions': 'true',
             'display_name': u'A Name',
             'end': 3610.0,
             'id': self.item_descriptor.location.html_id(),
+            'show_captions': 'true',
             'sources': sources,
             'speed': 'null',
             'general_speed': 1.0,
@@ -74,12 +74,12 @@ class TestVideoYouTube(TestVideo):
             'sub': u'a_sub_file.srt.sjson',
             'track': None,
             'youtube_streams': _create_youtube_string(self.item_descriptor),
-            'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', False),
             'yt_test_timeout': 1500,
             'yt_test_url': 'https://gdata.youtube.com/feeds/api/videos/',
-            'transcripts' : '{"uk": "ukrainian_translation.srt"}',
+            'transcript_language': 'en',
+            'transcript_languages' : '{"uk": "Ukrainian", "en": "English"}',
+            'transcript_translation_url': self.item_descriptor.xmodule_runtime.handler_url(self.item_descriptor, 'transcript') + '/translation',
         }
-
         self.assertEqual(
             context,
             self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context),
@@ -118,7 +118,6 @@ class TestVideoNonYouTube(TestVideo):
         expected_context = {
             'ajax_url': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
             'data_dir': getattr(self, 'data_dir', None),
-            'caption_asset_path': '/static/subs/',
             'show_captions': 'true',
             'display_name': u'A Name',
             'end': 3610.0,
@@ -133,7 +132,9 @@ class TestVideoNonYouTube(TestVideo):
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', True),
             'yt_test_timeout': 1500,
             'yt_test_url': 'https://gdata.youtube.com/feeds/api/videos/',
-            'transcripts': '{}'
+            'transcript_language': 'en',
+            'transcript_languages' : '{"en": "English"}',
+            'transcript_translation_url': self.item_descriptor.xmodule_runtime.handler_url(self.item_descriptor, 'transcript') + '/translation',
         }
 
         self.assertEqual(
