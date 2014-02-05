@@ -1,7 +1,7 @@
-div.profile-wrapper {
+.profile-wrapper {
   color: #000;
 
-  section.user-info {
+  .user-info {
     @extend .sidebar;
     border-left: 1px solid #d3d3d3;
     border-radius: 0px 4px 4px 0;
@@ -63,15 +63,15 @@ div.profile-wrapper {
           }
         }
 
-        div#description {
+        #description {
           font-size: 12px;
         }
 
-        a#change_language,
-        a#change_location,
-        a.edit-email,
-        a.name-edit,
-        a.email-edit {
+        #change_language,
+        #change_location,
+        .edit-email,
+        .name-edit,
+        .email-edit {
           color: #999;
           font-size: 12px;
           position: absolute;
@@ -91,12 +91,12 @@ div.profile-wrapper {
           margin-top: 4px;
         }
 
-        a.deactivate {
+        .deactivate {
           color: #aaa;
           font-style: italic;
         }
 
-        input#pwd_reset_button {
+        #pwd_reset_button {
           background: none;
           border: none;
           box-shadow: none;
@@ -117,7 +117,7 @@ div.profile-wrapper {
       }
     }
 
-    div#change_password_pop {
+    #change_password_pop {
       border-bottom: 1px solid #d3d3d3;
       box-shadow: 0 1px 0 #eee;
       color: #4D4D4D;
@@ -132,7 +132,7 @@ div.profile-wrapper {
     }
   }
 
-  div.course-info {
+  .course-info {
     @extend .content;
 
     header {
@@ -148,12 +148,12 @@ div.profile-wrapper {
       }
     }
 
-    div#grade-detail-graph {
+    #grade-detail-graph {
       min-height: 400px;
       width: 100%;
     }
 
-    > div.chapters {
+    > .chapters {
       border-top: 1px solid #e3e3e3;
       margin-top: lh();
       padding-left: 0;
@@ -181,7 +181,7 @@ div.profile-wrapper {
           width: flex-grid(2, 9);
         }
 
-        div.sections {
+        .sections {
           display: table-cell;
           padding-left: flex-gutter(9);
           width: flex-grid(7, 9);
@@ -212,7 +212,7 @@ div.profile-wrapper {
               font-size: em(14);
             }
 
-            div.scores {
+            .scores {
               margin: lh(.5) 0;
 
               h3 {
