@@ -30,7 +30,7 @@ class AnnotatableFields(object):
         scope=Scope.settings,
         default='Text Annotation',
     )
-    tags = String(
+    instructor_tags = String(
         display_name="Tags for Assignments",
         help="Add tags that automatically highlight in a certain color using the comma-separated form, i.e. imagery:red,parallelism:blue",
         scope=Scope.settings,
@@ -82,7 +82,7 @@ class TextAnnotationModule(AnnotatableFields, XModule):
         """ Renders parameters to template. """
         context = {
             'display_name': self.display_name_with_default,
-            'tag': self.tags,
+            'tag': self.instructor_tags,
             'source': self.source,
             'instructions_html': self.instructions,
             'content_html': self._render_content(),
