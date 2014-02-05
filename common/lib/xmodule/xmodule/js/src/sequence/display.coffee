@@ -21,7 +21,9 @@ class @Sequence
 
   updatePageTitle: ->
     # update the page title to include the current section
-    document.title = @link_for(@position).data('title') + @base_page_title
+    position_link = @link_for(@position)
+    if position_link and position_link.data('title')
+        document.title = position_link.data('title') + @base_page_title
     
   hookUpProgressEvent: ->
     $('.problems-wrapper').bind 'progressChanged', @updateProgress
