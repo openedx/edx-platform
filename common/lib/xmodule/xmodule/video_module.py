@@ -399,12 +399,11 @@ class VideoModule(VideoFields, XModule):
             NotFoundError: when srt subtitles do not exist,
             and exceptions from generate_subs_from_source.
         """
-        storage_filename = self.subs_filename(source_subs_id, self.transcript_language)
         try:
-            sjson_transcript = self.asset(storage_filename).data
+            sjson_transcript = self.asset(source_subs_id, self.transcript_language).data
         except (NotFoundError):  # generating
             self.generate_sjson(user_filename, result_subs_dict)
-            sjson_transcript =  self.asset(storage_filename).data
+            sjson_transcript =  self.asset(source_subs_id, self.transcript_language).data
         return sjson_transcript
 
     def get_non_youtube_non_english_subs(self, user_filename):
@@ -434,8 +433,8 @@ class VideoModule(VideoFields, XModule):
         for youtube videos, if there is not html5 subtitles
         """
         video_id = multidict.get('videoId')
-        if self.transcript_language == 'en': # for English, youtube and non-youtube
-            # videos associated with self.sub field
+        if self.transcript_language == 'en':
+            # for English, youtube and non-youtube, videos are associated with self.sub field
             if self.sub:
                 response = Response(self.asset(self.sub).data)
                 response.content_type = 'application/json'
@@ -444,14 +443,14 @@ class VideoModule(VideoFields, XModule):
                 log.debug("transcript_translation is not available for language 'en'.")
                 return Response(status=404)
 
-        # Non-English case:
-        # non-youtube case: (generate sjson if there is no one) and just give subtitles back.
-        # youtube case: (generate sjson if there is no one for all speeds)  and just give subtitles back.
+        # Non-English non-youtube  case:
+        # Generate sjson if there is no one, and just give subtitles back.
         user_filename = self.transcripts[self.transcript_language]
-        if not self.youtube_id_1_0: # non-youtube case
+        if not self.youtube_id_1_0:
             return self.get_non_youtube_non_english_subs(user_filename)
 
         # Non-English youtube case:
+        # Generate sjson if there is no one [for all speeds],  and just give subtitles back.
         yt_ids = [self.youtube_id_0_75, self.youtube_id_1_0, self.youtube_id_1_25, self.youtube_id_1_5]
         yt_speeds = [0.75, 1.00, 1.25, 1.50]
         youtube_ids =  {p[0]: p[1] for p in zip(yt_ids, yt_speeds) if p[0]}

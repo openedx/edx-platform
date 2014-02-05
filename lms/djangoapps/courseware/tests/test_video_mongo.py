@@ -612,18 +612,20 @@ class TestVideoHandlers(TestVideo):
     def test_translaton_non_en_non_youtube_success(self):
         subs =  {
             u'end': [100],
-            u'start': [10],
+            u'start': [12],
             u'text': [
             u'\u041f\u0440\u0438\u0432\u0456\u0442, edX \u0432\u0456\u0442\u0430\u0454 \u0432\u0430\u0441.'
         ]}
+        self.non_en_file.seek(0)
         _upload_srt_file(self.non_en_file, self.item_descriptor.location, os.path.split(self.non_en_file.name)[1])
         subs_id = _get_subs_id(self.non_en_file.name)
+
         # to get instance
         self.item_descriptor.render('student_view')
         item = self.item_descriptor.xmodule_runtime.xmodule_instance
-
         # manually clean youtube_id_1_0, as it has default value
         item.youtube_id_1_0 = ""
+
         request = Request.blank('/translation?language=uk&videoId={}'.format(subs_id))
         response = self.item_descriptor.transcript(request=request, dispatch='translation')
         self.assertDictEqual(json.loads(response.body), subs)
@@ -635,6 +637,7 @@ class TestVideoHandlers(TestVideo):
             u'text': [
             u'\u041f\u0440\u0438\u0432\u0456\u0442, edX \u0432\u0456\u0442\u0430\u0454 \u0432\u0430\u0441.'
         ]}
+        self.non_en_file.seek(0)
         _upload_srt_file(self.non_en_file, self.item_descriptor.location, os.path.split(self.non_en_file.name)[1])
         subs_id = _get_subs_id(self.non_en_file.name)
         # to get instance
@@ -658,7 +661,6 @@ class TestVideoHandlers(TestVideo):
             u'\u041f\u0440\u0438\u0432\u0456\u0442, edX \u0432\u0456\u0442\u0430\u0454 \u0432\u0430\u0441.'
         ]}
         self.assertDictEqual(json.loads(response.body), calculated_0_75)
-
         # 1_5 will be generated from 1_0
         item = self.item_descriptor.xmodule_runtime.xmodule_instance
         item.youtube_id_1_5 = '1_5'
@@ -771,6 +773,7 @@ def _clear_assets(location):
     assets, __ = store.get_all_content_for_course(content_location)
     for asset in assets:
         asset_location = Location(asset["_id"])
+        del_cached_content(asset_location)
         id = StaticContent.get_id_from_location(asset_location)
         store.delete(id)
 
@@ -783,7 +786,6 @@ def _create_file(content=''):
     sjson_file.content_type = 'application/json'
     sjson_file.write(textwrap.dedent(content))
     sjson_file.seek(0)
-
     return sjson_file
 
 def _upload_file(file, location, default_filename='subs_{}.srt.sjson'):
@@ -795,6 +797,7 @@ def _upload_file(file, location, default_filename='subs_{}.srt.sjson'):
     )
 
     sc_partial = partial(StaticContent, content_location, filename, mime_type)
+
     content = sc_partial(file.read())
 
     (thumbnail_content, thumbnail_location) = contentstore().generate_thumbnail(
