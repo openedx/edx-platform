@@ -66,7 +66,7 @@ def save_subs_to_store(subs, subs_id, item, language='en'):
     Args:
     `subs_id`: str, subtitles id
     `item`: video module instance
-    `language`: two chars str ('ua'), language of translation of transcripts
+    `language`: two chars str ('uk'), language of translation of transcripts
 
     Returns: location of saved subtitles.
     """

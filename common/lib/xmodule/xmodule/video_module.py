@@ -282,32 +282,47 @@ class VideoModule(VideoFields, XModule):
             'transcript_translation_url': self.runtime.handler_url(self, 'transcript') + '/translation'
         })
 
+    def subs_filename(self, subs_id, lang='en'):
+        """
+        Generate proper filename for storage.
+        """
+        if lang == 'en':
+            return 'subs_{0}.srt.sjson'.format(subs_id)
+        else:
+            return '{0}_subs_{1}.srt.sjson'.format(lang, subs_id)
+
+    def asset_location(self,  filename):
+        """
+        Return asset location.
+        """
+        return  StaticContent.compute_location(
+            self.location.org, self.location.course, filename
+        )
+
+    def asset(self, subs_id, lang='en'):
+        """
+        Get asset from contentstore, location is build from subs_id and lang.
+        """
+        return contentstore().find(
+            self.asset_location(
+                self.subs_filename(subs_id, lang)
+            )
+        )
+
     def get_transcript(self, lang):
         '''
         Returns transcript without timecodes.
 
         Args:
             `lang`: str, 2 chars language id.
-
         Raises:
             - NotFoundError if cannot find transcript file in storage.
             - ValueError if transcript file is incorrect JSON.
             - KeyError if transcript file has incorrect format.
         '''
-        if lang == 'en':
-            subs_id = self.sub
-            filename = 'subs_{0}.srt.sjson'.format(subs_id)
-        else:
-            subs_id = self.youtube_id_1_0
-            filename = '{0}_subs_{1}.srt.sjson'.format(lang, subs_id)
-
-        content_location = StaticContent.compute_location(
-            self.location.org, self.location.course, filename
-        )
-
-        data = contentstore().find(content_location).data
+        subs_id = self.sub if lang == 'en' else self.youtube_id_1_0
+        data = self.asset(subs_id, lang).data
         text = json.loads(data)['text']
-
         return HTMLParser().unescape("\n".join(text))
 
     @XBlock.handler
@@ -361,53 +376,51 @@ class VideoModule(VideoFields, XModule):
         response.content_type = "text/plain; charset=utf-8"
         return response
 
-
-    def asset_location(self,  filename):
+    def generate_sjson(self, user_filename, result_subs_dict):
         """
-        Return asset location.
+        Generates sjson from srt.
         """
-        return  StaticContent.compute_location(
-            self.location.org, self.location.course, filename
+        srt_transcripts = contentstore().find(self.asset_location(user_filename))
+        generate_subs_from_source(
+            result_subs_dict,
+            os.path.splitext(user_filename)[1][1:],
+            srt_transcripts.data.decode('utf8'),
+            self,
+            self.transcript_language
         )
 
-    def subs_filename(self, subs_id, lang='en'):
+    def get_sjson(self, user_filename, source_subs_id, result_subs_dict):
         """
-        Generate proper filename for storage.
+        Get sjson if already exists, otherwise generate it.
+
+        Generate sjson with subs_id name, from user uploaded srt.
+
+        Raises:
+            NotFoundError: when srt subtitles do not exist,
+            and exceptions from generate_subs_from_source.
         """
-        if lang == 'en':
-            return 'subs_{0}.srt.sjson'.format(subs_id)
-        else:
-            return '{0}_subs_{1}.srt.sjson'.format(lang, subs_id)
+        storage_filename = self.subs_filename(source_subs_id, self.transcript_language)
+        try:
+            sjson_transcript = self.asset(storage_filename).data
+        except (NotFoundError):  # generating
+            self.generate_sjson(user_filename, result_subs_dict)
+            sjson_transcript =  self.asset(storage_filename).data
+        return sjson_transcript
 
     def get_non_youtube_non_english_subs(self, user_filename):
         """
         Generate sjson if there is no one and give subtitles.
         """
         user_subs_id = os.path.splitext(user_filename)[0]
-        storage_filename = self.subs_filename(user_subs_id, self.transcript_language)
         try:
-            sjson_transcript = contentstore().find(self.asset_location(storage_filename))
-        except (NotFoundError):  # generating
-            log.debug("Can't find content in storage for %s transcript: generating.", user_filename)
-            try:
-                srt_transcript = contentstore().find(self.asset_location(user_filename))
-            except (NotFoundError):
-                log.info("Can't find uploaded transcripts: %s", user_filename)
-                return Response(status=404)
-            try:
-                generate_subs_from_source(
-                    {1.0: user_subs_id},
-                    os.path.splitext(user_filename)[1][1:],
-                    srt_transcript.data.decode('utf8'),
-                    self,
-                    self.transcript_language
-                )
-            except Exception as exc:
-                log.info(exc.message)
-                return Response(status=404)
-
-            sjson_transcript =  contentstore().find(self.asset_location(storage_filename))
-        response = Response(sjson_transcript.data)
+            sjson_transcript =  self.get_sjson(user_filename, user_subs_id, {1.0: user_subs_id})
+        except NotFoundError:
+            log.info("Can't find uploaded transcripts: %s", user_filename)
+            return Response(status=404)
+        except Exception as exc:
+            log.info(exc.message)
+            return Response(status=404)
+        response = Response(sjson_transcript)
         response.content_type = 'application/json'
         return response
 
@@ -421,16 +434,10 @@ class VideoModule(VideoFields, XModule):
         for youtube videos, if there is not html5 subtitles
         """
         video_id = multidict.get('videoId')
-        if self.transcript_language == 'en':
-            # for English, youtube and non-youtube
+        if self.transcript_language == 'en': # for English, youtube and non-youtube
             # videos associated with self.sub field
             if self.sub:
-                filename = 'subs_{0}.srt.sjson'.format(self.sub)
-                content_location = StaticContent.compute_location(
-                    self.location.org, self.location.course, filename
-                )
-                sjson_transcript = contentstore().find(content_location)
-                response = Response(sjson_transcript.data)
+                response = Response(self.asset(self.sub).data)
                 response.content_type = 'application/json'
                 return response
             else:
@@ -440,80 +447,48 @@ class VideoModule(VideoFields, XModule):
         # Non-English case:
         # non-youtube case: (generate sjson if there is no one) and just give subtitles back.
         # youtube case: (generate sjson if there is no one for all speeds)  and just give subtitles back.
+        user_filename = self.transcripts[self.transcript_language]
         if not self.youtube_id_1_0: # non-youtube case
-            user_filename = self.transcripts[self.transcript_language]
             return self.get_non_youtube_non_english_subs(user_filename)
 
-        yt_ids = [
-            self.youtube_id_0_75,
-            self.youtube_id_1_0,
-            self.youtube_id_1_25,
-            self.youtube_id_1_5
-        ]
-        yt_speeds = ['0.75', '1.00', '1.25', '1.50']
-        youtube_ids =  {p[0]: p[1] for p in zip(yt_speeds, yt_ids) if p[1]}
-
-        if video_id not in youtube_ids:
-            log.info("Incorrect video_id %s for transcript translation", video_id)
-            return Response(status=404)
-
-        speed = youtube_ids[video_id]
-        filename = '{0}_subs_{1}.srt.sjson'.format(self.transcript_language, video_id)
-        content_location = StaticContent.compute_location(
-            self.location.org, self.location.course, filename
-        )
-
+        # Non-English youtube case:
+        yt_ids = [self.youtube_id_0_75, self.youtube_id_1_0, self.youtube_id_1_25, self.youtube_id_1_5]
+        yt_speeds = [0.75, 1.00, 1.25, 1.50]
+        youtube_ids =  {p[0]: p[1] for p in zip(yt_ids, yt_speeds) if p[0]}
         try:
-            sjson_transcript = contentstore().find(content_location)
-        except (NotFoundError):  # generating
+            sjson_transcript = self.asset(video_id, self.transcript_language).data
+        except (NotFoundError):  # generating sjson
             generate_1_0_version = False
             log.info("Can't find content in storage for %s transcript: generating.", video_id)
-            # check if sjson version of transcript for 1.0 speed exists:
-            if speed != 1.0:
-                content_location_1_0 = StaticContent.compute_location(
-                    self.location.org,
-                    self.location.course,
-                    '{0}_subs_{1}.srt.sjson'.format(transcript_language, self.youtube_id_1_0)
+            if video_id != self.youtube_id_1_0: # check if sjson version of transcript for 1.0 speed exists.
+                content_location_1_0 = self.asset_location(
+                    self.subs_filename(self.youtube_id_1_0, self.transcript_language)
                 )
                 try:
-                    sjson_transcript = contentstore().find(content_location_1_0)
+                    sjson_transcript = contentstore().find(content_location_1_0).data
                 except (NotFoundError):
                     generate_1_0_version = True
-            else:
-                generate_1_0_version = True
+                else:  # this is faster than generate for all speeds
+                    source_subs = json.loads(contentstore().find(content_location_1_0).data)
+                    subs = generate_subs(youtube_ids[video_id], 1.0, source_subs)
+                    save_subs_to_store(subs, video_id, self, self.transcript_language)
+                    sjson_transcript = json.dumps(subs, indent=2)
+            if video_id == self.youtube_id_1_0 or generate_1_0_version:  #generating for all speeds
+                try:
+                    self.generate_sjson(
+                        self.transcripts[self.transcript_language],
+                        {speed: video_id for video_id, speed in youtube_ids.iteritems()}
+                    )
+                    sjson_transcript = self.asset(video_id, self.transcript_language).data
 
-            if generate_1_0_version: #generating for all speeds
-                try:
-                    content_location_uploaded_srt = StaticContent.compute_location(
-                        self.location.org, self.location.course, self.transcripts[lang]
-                    )
-                    srt_transcript = contentstore().find(content_location_uploaded_srt)
-                except (NotFoundError):
-                    log.info("No srt file for language %s for transcript", lang)
+                except NotFoundError:
+                    log.info("Can't find uploaded transcripts: %s", user_filename)
                     return Response(status=404)
-                source_subs_ext = os.path.splitext(self.transcripts[lang])[1][1:]
-                source_subs_filedata = json.loads(srt_transcript)
-                try:
-                    generate_subs_from_source(
-                        {speed: video_id for video_id, speed in youtube_ids.iteritems()},
-                        source_subs_ext,
-                        source_subs_filedata,
-                        self,
-                        lang
-                    )
                 except Exception as exc:
-                    log.info(exc.msg)
+                    log.info(exc.message)
                     return Response(status=404)
 
-                sjson_transcript = contentstore().find(content_location)
-            else: # generate only for needed speed != 1.0
-                # at this point we should have srt.sjson for speed 1.0 in database
-                source_subs = json.loads(contentstore().find(content_location_1_0))
-                subs = generate_subs(youtube_ids[video_id], 1.0, source_subs)
-                save_subs_to_store(subs, video_id, self, lang)
-                sjson_transcript = json.dumps(subs, indent=2)
-
-        response = Response(sjson_transcript.data)
+        response = Response(sjson_transcript)
         response.content_type = 'application/json'
         return response
 

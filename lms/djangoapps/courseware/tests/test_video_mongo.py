@@ -535,7 +535,7 @@ def _create_srt_file(content=None, lang='uk'):
     """
     content = content or textwrap.dedent("""
         0
-        00:00:00,10 --> 00:00:00,100
+        00:00:00,12 --> 00:00:00,100
         Привіт, edX вітає вас.
     """)
     srt_file = tempfile.NamedTemporaryFile(suffix=".srt")
@@ -627,6 +627,50 @@ class TestVideoHandlers(TestVideo):
         request = Request.blank('/translation?language=uk&videoId={}'.format(subs_id))
         response = self.item_descriptor.transcript(request=request, dispatch='translation')
         self.assertDictEqual(json.loads(response.body), subs)
+
+    def test_translation_non_en_youtube(self):
+        subs =  {
+            u'end': [100],
+            u'start': [12],
+            u'text': [
+            u'\u041f\u0440\u0438\u0432\u0456\u0442, edX \u0432\u0456\u0442\u0430\u0454 \u0432\u0430\u0441.'
+        ]}
+        _upload_srt_file(self.non_en_file, self.item_descriptor.location, os.path.split(self.non_en_file.name)[1])
+        subs_id = _get_subs_id(self.non_en_file.name)
+        # to get instance
+
+        # youtube 1_0 request, will generate for all speeds for existing ids
+        self.item_descriptor.render('student_view')
+        item = self.item_descriptor.xmodule_runtime.xmodule_instance
+        item.youtube_id_1_0 = subs_id
+        item.youtube_id_0_75 = '0_75'
+        request = Request.blank('/translation?language=uk&videoId={}'.format(subs_id))
+        response = self.item_descriptor.transcript(request=request, dispatch='translation')
+        self.assertDictEqual(json.loads(response.body), subs)
+
+        # 0_75 subs are exist
+        request = Request.blank('/translation?language=uk&videoId={}'.format('0_75'))
+        response = self.item_descriptor.transcript(request=request, dispatch='translation')
+        calculated_0_75 = {
+            u'end': [75],
+            u'start': [9],
+            u'text': [
+            u'\u041f\u0440\u0438\u0432\u0456\u0442, edX \u0432\u0456\u0442\u0430\u0454 \u0432\u0430\u0441.'
+        ]}
+        self.assertDictEqual(json.loads(response.body), calculated_0_75)
+
+        # 1_5 will be generated from 1_0
+        item = self.item_descriptor.xmodule_runtime.xmodule_instance
+        item.youtube_id_1_5 = '1_5'
+        request = Request.blank('/translation?language=uk&videoId={}'.format('1_5'))
+        response = self.item_descriptor.transcript(request=request, dispatch='translation')
+        calculated_1_5 = {
+            u'end': [150],
+            u'start': [18],
+            u'text': [
+            u'\u041f\u0440\u0438\u0432\u0456\u0442, edX \u0432\u0456\u0442\u0430\u0454 \u0432\u0430\u0441.'
+        ]}
+        self.assertDictEqual(json.loads(response.body), calculated_1_5)
 
 
 class TestVideoGetTranscriptsMethod(TestVideo):
