@@ -271,10 +271,7 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
       @$spinner = $('<span class="spinner-in-field-icon"></span>');
 
     render: =>
-      display_name = @model.get('metadata').display_name
-      if not display_name:
-        display_name = gettext '[Untitled]'
-      @$('.unit-display-name-input').val(display_name)
+      @$('.unit-display-name-input').val(@model.get('metadata').display_name)
 
     setEnabled: =>
       disabled = @model.get('state') == 'public'
@@ -288,9 +285,6 @@ define ["jquery", "jquery.ui", "gettext", "backbone",
       metadata = $.extend({}, @model.get('metadata'))
       metadata.display_name = @$('.unit-display-name-input').val()
       @model.save(metadata: metadata)
-      display_name = metadata.display_name
-      if not display_name:
-        display_name = gettext '[Untitled]'
       # Update name shown in the right-hand side location summary.
       $('.unit-location .editing .unit-name').html(metadata.display_name)
       analytics.track "Edited Unit Name",
