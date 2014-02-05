@@ -46,13 +46,13 @@ div.course-wrapper {
       }
     }
 
-    ol.vert-mod {
+    .vert-mod {
       padding: 0;
       margin: 0;
       line-height: 1.4;
       list-style: none;
 
-      > li {
+      > div {
         @extend .clearfix;
         border-bottom: 1px solid #ddd;
         margin-bottom: 15px;
@@ -230,6 +230,12 @@ div.course-wrapper {
   margin-bottom: 30px;
 
 
+}
+
+.xblock {
+  &:focus {
+    outline: 0;
+  }
 }
 
 textarea.short-form-response {

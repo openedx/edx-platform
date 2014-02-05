@@ -22,12 +22,12 @@ class @Conditional
         parentId = parentEl.attr 'id'
 
         if response.message is false
-          if parentId.indexOf('vert') is 0
+          if parentEl.hasClass('vert')
             parentEl.hide()
           else
             $(element).hide()
         else
-          if parentId.indexOf('vert') is 0
+          if parentEl.hasClass('vert')
             parentEl.show()
           else
             $(element).show()
