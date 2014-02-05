@@ -19,6 +19,8 @@ ${page_title_breadcrumbs(course_name())}
 <%static:css group='style-course-vendor'/>
 <%static:css group='style-course'/>
 
+<%block name="nav_skip">#course-content</%block>
+
 <%include file="../discussion/_js_head_dependencies.html" />
 
   % if show_chat:
@@ -202,7 +204,7 @@ ${fragment.foot_html()}
     </div>
 % endif
 
-    <section class="course-content">
+    <section class="course-content" id="course-content">
       ${fragment.body_html()}
     </section>
   </div>

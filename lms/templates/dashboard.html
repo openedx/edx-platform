@@ -10,6 +10,7 @@
 
 <%block name="pagetitle">${_("Dashboard")}</%block>
 <%block name="bodyclass">view-dashboard is-authenticated</%block>
+<%block name="nav_skip">#my-courses</%block>
 
 <%block name="js_extra">
   <script type="text/javascript">
@@ -211,7 +212,7 @@
 
   </section>
 
-  <section class="my-courses">
+  <section class="my-courses" id="my-courses">
     <header>
       <h2>${_("Current Courses")}</h2>
     </header>

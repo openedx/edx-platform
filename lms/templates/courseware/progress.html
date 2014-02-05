@@ -10,6 +10,7 @@
 <%namespace name="progress_graph" file="/courseware/progress_graph.js"/>
 
 <%block name="pagetitle">${_("{course_number} Progress").format(course_number=course.display_number_with_default) | h}</%block>
+<%block name="nav_skip">#course-info-progress</%block>
 
 <%!
     from django.core.urlresolvers import reverse
@@ -32,7 +33,7 @@ ${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph",
 <div class="container">
   <div class="profile-wrapper">
 
-    <div class="course-info">
+    <div class="course-info" id="course-info-progress" aria-label="${_('Course Progress')}">
       <header>
       <h1>${_("Course Progress for Student '{username}' ({email})").format(username=student.username, email=student.email)}</h1>
       </header>
