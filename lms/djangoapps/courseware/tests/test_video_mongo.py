@@ -197,7 +197,6 @@ class TestGetHtmlMethod(BaseTestXmodule):
 
         expected_context = {
             'data_dir': getattr(self, 'data_dir', None),
-            'caption_asset_path': '/static/subs/',
             'show_captions': 'true',
             'display_name': u'A Name',
             'end': 3610.0,
@@ -225,11 +224,14 @@ class TestGetHtmlMethod(BaseTestXmodule):
             )
 
             self.initialize_module(data=DATA)
-            track_url = self.item_descriptor.xmodule_runtime.handler_url(self.item_descriptor, 'download_transcript')
+            track_url = self.item_descriptor.xmodule_runtime.handler_url(self.item_descriptor, 'transcript') + '/download'
 
             context = self.item_descriptor.render('student_view').content
 
             expected_context.update({
+                'transcript_languages' : '{"en": "English"}' if self.item_descriptor.sub else '{}',
+                'transcript_language': 'en' if self.item_descriptor.sub else json.dumps(None),
+                'transcript_translation_url': self.item_descriptor.xmodule_runtime.handler_url(self.item_descriptor, 'transcript') + '/translation',
                 'ajax_url': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
                 'track': track_url if data['expected_track_url'] == u'a_sub_file.srt.sjson' else data['expected_track_url'],
                 'sub': data['sub'],
@@ -304,7 +306,6 @@ class TestGetHtmlMethod(BaseTestXmodule):
 
         expected_context = {
             'data_dir': getattr(self, 'data_dir', None),
-            'caption_asset_path': '/static/subs/',
             'show_captions': 'true',
             'display_name': u'A Name',
             'end': 3610.0,
@@ -319,6 +320,8 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', True),
             'yt_test_timeout': 1500,
             'yt_test_url': 'https://gdata.youtube.com/feeds/api/videos/',
+            'transcript_language': 'en',
+            'transcript_languages' : '{"en": "English"}',
         }
 
         for data in cases:
@@ -331,6 +334,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             context = self.item_descriptor.render('student_view').content
 
             expected_context.update({
+                'transcript_translation_url': self.item_descriptor.xmodule_runtime.handler_url(self.item_descriptor, 'transcript') + '/translation',
                 'ajax_url': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
                 'sources': data['result'],
                 'id': self.item_descriptor.location.html_id(),
