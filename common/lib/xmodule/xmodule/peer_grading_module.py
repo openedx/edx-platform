@@ -541,7 +541,15 @@ class PeerGradingModule(PeerGradingFields, XModule):
             problem_list_dict = problem_list_json
             success = problem_list_dict['success']
             if 'error' in problem_list_dict:
-                error_text = problem_list_dict['error']
+                # A bit of a hack: `error_text` is meant to be set
+                # to `problem_list_dict['error']`. We're overwriting that
+                # here with something less scary-looking.
+                # Once we fix it on the ora side, we can reset this to
+                # `problem_list_dict['error']`
+                error_text = (
+                    "Have you made any submissions for that problem? " 
+                    "If you haven't, please try making one."
+                )
 
             problem_list = problem_list_dict['problem_list']
 
