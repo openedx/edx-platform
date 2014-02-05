@@ -6,13 +6,15 @@ import time
 import logging
 from .xqueue import StubXQueueService
 from .youtube import StubYouTubeService
+from .ora import StubOraService
 
 
-USAGE = "USAGE: python -m stubs.start SERVICE_NAME PORT_NUM"
+USAGE = "USAGE: python -m stubs.start SERVICE_NAME PORT_NUM [CONFIG_KEY=CONFIG_VAL, ...]"
 
 SERVICES = {
     'xqueue': StubXQueueService,
-    'youtube': StubYouTubeService
+    'youtube': StubYouTubeService,
+    'ora': StubOraService
 }
 
 # Log to stdout, including debug messages
@@ -21,7 +23,7 @@ logging.basicConfig(level=logging.DEBUG, format="%(levelname)s %(message)s")
 
 def get_args():
     """
-    Parse arguments, returning tuple of `(service_name, port_num)`.
+    Parse arguments, returning tuple of `(service_name, port_num, config_dict)`.
     Exits with a message if arguments are invalid.
     """
     if len(sys.argv) < 3:
@@ -30,6 +32,7 @@ def get_args():
 
     service_name = sys.argv[1]
     port_num = sys.argv[2]
+    config_dict = _parse_config_args(sys.argv[3:])
 
     if service_name not in SERVICES:
         print "Unrecognized service '{0}'.  Valid choices are: {1}".format(
@@ -45,17 +48,40 @@ def get_args():
         print "Port '{0}' must be a positive integer".format(port_num)
         sys.exit(1)
 
-    return service_name, port_num
+    return service_name, port_num, config_dict
+
+
+def _parse_config_args(args):
+    """
+    Parse stub configuration arguments, which are strings of the form "KEY=VAL".
+    `args` is a list of arguments from the command line.
+    Any argument that does not match the "KEY=VAL" format will be logged and skipped.
+
+    Returns a dictionary with the configuration keys and values.
+    """
+    config_dict = dict()
+    for config_str in args:
+        try:
+            components = config_str.split('=')
+            if len(components) >= 2:
+                config_dict[components[0]] = "=".join(components[1:])
+
+        except:
+            print "Warning: could not interpret config value '{0}'".format(config_str)
+            pass
+
+    return config_dict
 
 
 def main():
     """
     Start a server; shut down on keyboard interrupt signal.
     """
-    service_name, port_num = get_args()
+    service_name, port_num, config_dict = get_args()
     print "Starting stub service '{0}' on port {1}...".format(service_name, port_num)
 
     server = SERVICES[service_name](port_num=port_num)
+    server.config.update(config_dict)
 
     try:
         while True:

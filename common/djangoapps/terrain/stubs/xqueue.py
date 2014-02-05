@@ -4,11 +4,12 @@ Stub implementation of XQueue for acceptance tests.
 Configuration values:
     "default" (dict): Default response to be sent to LMS as a grade for a submission
     "<submission>" (dict): Grade response to return for submissions containing the text <submission>
+    "register_submission_url" (str): URL to send grader payloads when we receive a submission
 
 If no grade response is configured, a default response will be returned.
 """
 
-from .http import StubHttpRequestHandler, StubHttpService
+from .http import StubHttpRequestHandler, StubHttpService, require_params
 import json
 import copy
 from requests import post
@@ -23,6 +24,7 @@ class StubXQueueHandler(StubHttpRequestHandler):
     DEFAULT_RESPONSE_DELAY = 2
     DEFAULT_GRADE_RESPONSE = {'correct': True, 'score': 1, 'msg': ''}
 
+    @require_params('POST', 'xqueue_body', 'xqueue_header')
     def do_POST(self):
         """
         Handle a POST request from the client
@@ -35,6 +37,10 @@ class StubXQueueHandler(StubHttpRequestHandler):
 
         # Respond only to grading requests
         if self._is_grade_request():
+
+            # If configured, send the grader payload to other services.
+            self._register_submission(self.post_dict['xqueue_body'])
+
             try:
                 xqueue_header = json.loads(self.post_dict['xqueue_header'])
                 callback_url = xqueue_header['lms_callback_url']
@@ -118,7 +124,7 @@ class StubXQueueHandler(StubHttpRequestHandler):
         # There is a danger here that a submission will match multiple response patterns.
         # Rather than fail silently (which could cause unpredictable behavior in tests)
         # we abort and log a debugging message.
-        for pattern, response in self.server.config.iteritems():
+        for pattern, response in self.server.queue_responses:
 
             if pattern in xqueue_body_json:
                 if grade_response is None:
@@ -150,7 +156,44 @@ class StubXQueueHandler(StubHttpRequestHandler):
         post(postback_url, data=data)
         self.log_message("XQueue: sent grading response {0} to {1}".format(data, postback_url))
 
+    def _register_submission(self, xqueue_body_json):
+        """
+        If configured, send the submission's grader payload to another service.
+        """
+        url = self.server.config.get('register_submission_url')
+
+        # If not configured, do not need to send anything
+        if url is not None:
+
+            try:
+                xqueue_body = json.loads(xqueue_body_json)
+            except ValueError:
+                self.log_error(
+                    "Could not decode XQueue body as JSON: '{0}'".format(xqueue_body_json))
+
+            else:
+
+                # Retrieve the grader payload, which should be a JSON-encoded dict.
+                # We pass the payload directly to the service we are notifying, without
+                # inspecting the contents.
+                grader_payload = xqueue_body.get('grader_payload')
+
+                if grader_payload is not None:
+                    response = post(url, data={'grader_payload': grader_payload})
+                    if not response.ok:
+                        self.log_error(
+                            "Could register submission at URL '{0}'.  Status was {1}".format(
+                                url, response.status_code))
+
+                else:
+                    self.log_message(
+                        "XQueue body is missing 'grader_payload' key: '{0}'".format(xqueue_body)
+                    )
+
     def _is_grade_request(self):
+        """
+        Return a boolean indicating whether the requested URL indicates a submission.
+        """
         return 'xqueue/submit' in self.path
 
 
@@ -160,3 +203,19 @@ class StubXQueueService(StubHttpService):
     """
 
     HANDLER_CLASS = StubXQueueHandler
+    NON_QUEUE_CONFIG_KEYS = ['default', 'register_submission_url']
+
+    @property
+    def queue_responses(self):
+        """
+        Returns a list of (pattern, response) tuples, where `pattern` is a pattern
+        to match in the XQueue body, and `response` is a dictionary to return
+        as the response from the grader.
+
+        Every configuration key is a queue name,
+        except for 'default' and 'register_submission_url' which have special meaning
+        """
+        return {
+            key:val for key, val in self.config.iteritems()
+            if key not in self.NON_QUEUE_CONFIG_KEYS
+        }.items()

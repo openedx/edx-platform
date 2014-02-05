@@ -6,10 +6,58 @@ from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
 import urlparse
 import threading
 import json
+from functools import wraps
 from lazy import lazy
 
 from logging import getLogger
 LOGGER = getLogger(__name__)
+
+
+def require_params(method, *required_keys):
+    """
+    Decorator to ensure that the method has all the required parameters.
+
+    Example:
+
+        @require_params('GET', 'id', 'state')
+        def handle_request(self):
+            # ....
+
+    would send a 400 response if no GET parameters were specified
+    for 'id' or 'state' (or if those parameters had empty values).
+
+    The wrapped function should be a method of a `StubHttpRequestHandler`
+    subclass.
+
+    Currently, "GET" and "POST" are the only supported methods.
+    """
+    def decorator(func):
+        @wraps(func)
+        def wrapper(self, *args, **kwargs):
+
+            # Read either GET querystring params or POST dict params
+            if method == "GET":
+                params = self.get_params
+            elif method == "POST":
+                params = self.post_dict
+            else:
+                raise ValueError("Unsupported method '{method}'".format(method=method))
+
+            # Check for required values
+            missing = []
+            for key in required_keys:
+                if params.get(key) is None:
+                    missing.append(key)
+
+            if len(missing) > 0:
+                msg = "Missing required key(s) {keys}".format(keys=",".join(missing))
+                self.send_response(400, content=msg, headers={'Content-type': 'text/plain'})
+
+            # If nothing is missing, execute the function as usual
+            else:
+                return func(self, *args, **kwargs)
+        return wrapper
+    return decorator
 
 
 class StubHttpRequestHandler(BaseHTTPRequestHandler, object):
@@ -70,7 +118,26 @@ class StubHttpRequestHandler(BaseHTTPRequestHandler, object):
         """
         Return the GET parameters (querystring in the URL).
         """
-        return urlparse.parse_qs(self.path)
+        query = urlparse.urlparse(self.path).query
+
+        # By default, `parse_qs` returns a list of values for each param
+        # For convenience, we replace lists of 1 element with just the element
+        return {
+            k:v[0] if len(v) == 1 else v
+            for k,v in urlparse.parse_qs(query).items()
+        }
+
+    @lazy
+    def path_only(self):
+        """
+        Return the URL path without GET parameters.
+        Removes the trailing slash if there is one.
+        """
+        path = urlparse.urlparse(self.path).path
+        if path.endswith('/'):
+            return path[:-1]
+        else:
+            return path
 
     def do_PUT(self):
         """

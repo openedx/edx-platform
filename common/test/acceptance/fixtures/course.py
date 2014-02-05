@@ -29,7 +29,7 @@ class StudioApiFixture(object):
         Log in as a staff user, then return a `requests` `session` object for the logged in user.
         Raises a `StudioApiLoginError` if the login fails.
         """
-        # Use auto-auth to retrieve session for a logged in user
+        # Use auto-auth to retrieve the session for a logged in user
         session = requests.Session()
         response = session.get(STUDIO_BASE_URL + "/auto_auth?staff=true")
 
