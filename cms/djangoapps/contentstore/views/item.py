@@ -1,26 +1,31 @@
 """Views for items (modules)."""
 
+import hashlib
 import logging
 from uuid import uuid4
 
+from collections import OrderedDict
 from functools import partial
 from static_replace import replace_static_urls
 from xmodule_modifiers import wrap_xblock
 
+from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseBadRequest
+from django.http import HttpResponseBadRequest, HttpResponse
+from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_http_methods
 
 from xblock.fields import Scope
+from xblock.fragment import Fragment
 from xblock.core import XBlock
 
+import xmodule.x_module
 from xmodule.modulestore.django import modulestore, loc_mapper
 from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationError
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.locator import BlockUsageLocator
 from xmodule.modulestore import Location
-from xmodule.x_module import prefer_xmodules
 
 from util.json_request import expect_json, JsonResponse
 from util.string_utils import str_to_bool
@@ -31,16 +36,32 @@ from ..utils import get_modulestore
 
 from .access import has_course_access
 from .helpers import _xmodule_recurse
-from preview import handler_prefix, get_preview_html
-from edxmako.shortcuts import render_to_response, render_to_string
+from contentstore.views.preview import get_preview_fragment
+from edxmako.shortcuts import render_to_string
 from models.settings.course_grading import CourseGradingModel
-from django.utils.translation import ugettext as _
+from cms.lib.xblock.runtime import handler_url
 
 __all__ = ['orphan_handler', 'xblock_handler']
 
 log = logging.getLogger(__name__)
 
 CREATE_IF_NOT_FOUND = ['course_info']
+
+
+# In order to allow descriptors to use a handler url, we need to
+# monkey-patch the x_module library.
+# TODO: Remove this code when Runtimes are no longer created by modulestores
+xmodule.x_module.descriptor_global_handler_url = handler_url
+
+
+def hash_resource(resource):
+    """
+    Hash a :class:`xblock.fragment.FragmentResource
+    """
+    md5 = hashlib.md5()
+    for data in resource:
+        md5.update(data)
+    return md5.hexdigest()
 
 
 # pylint: disable=unused-argument
@@ -88,7 +109,42 @@ def xblock_handler(request, tag=None, package_id=None, branch=None, version_guid
         old_location = loc_mapper().translate_locator_to_location(locator)
 
         if request.method == 'GET':
-            if 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
+            accept_header = request.META.get('HTTP_ACCEPT', 'application/json')
+
+            if 'application/x-fragment+json' in accept_header:
+                component = modulestore().get_item(old_location)
+
+                # Wrap the generated fragment in the xmodule_editor div so that the javascript
+                # can bind to it correctly
+                component.runtime.wrappers.append(partial(wrap_xblock, 'StudioRuntime'))
+
+                try:
+                    editor_fragment = component.render('studio_view')
+                # catch exceptions indiscriminately, since after this point they escape the
+                # dungeon and surface as uneditable, unsaveable, and undeletable
+                # component-goblins.
+                except Exception as exc:                          # pylint: disable=W0703
+                    log.debug("Unable to render studio_view for %r", component, exc_info=True)
+                    editor_fragment = Fragment(render_to_string('html_error.html', {'message': str(exc)}))
+
+                modulestore().save_xmodule(component)
+
+                preview_fragment = get_preview_fragment(request, component)
+
+                hashed_resources = OrderedDict()
+                for resource in editor_fragment.resources + preview_fragment.resources:
+                    hashed_resources[hash_resource(resource)] = resource
+
+                return JsonResponse({
+                    'html': render_to_string('component.html', {
+                        'preview': preview_fragment.content,
+                        'editor': editor_fragment.content,
+                        'label': component.display_name or component.scope_ids.block_type,
+                    }),
+                    'resources': hashed_resources.items()
+                })
+
+            elif 'application/json' in accept_header:
                 fields = request.REQUEST.get('fields', '').split(',')
                 if 'graderType' in fields:
                     # right now can't combine output of this w/ output of _get_module_info, but worthy goal
@@ -97,25 +153,8 @@ def xblock_handler(request, tag=None, package_id=None, branch=None, version_guid
                 rsp = _get_module_info(locator)
                 return JsonResponse(rsp)
             else:
-                component = modulestore().get_item(old_location)
-                # Wrap the generated fragment in the xmodule_editor div so that the javascript
-                # can bind to it correctly
-                component.runtime.wrappers.append(partial(wrap_xblock, handler_prefix))
+                return HttpResponse(status=406)
 
-                try:
-                    content = component.render('studio_view').content
-                # catch exceptions indiscriminately, since after this point they escape the
-                # dungeon and surface as uneditable, unsaveable, and undeletable
-                # component-goblins.
-                except Exception as exc:                          # pylint: disable=W0703
-                    log.debug("Unable to render studio_view for %r", component, exc_info=True)
-                    content = render_to_string('html_error.html', {'message': str(exc)})
-
-                return render_to_response('component.html', {
-                    'preview': get_preview_html(request, component),
-                    'editor': content,
-                    'label': component.display_name or component.category,
-                })
         elif request.method == 'DELETE':
             delete_children = str_to_bool(request.REQUEST.get('recurse', 'False'))
             delete_all_versions = str_to_bool(request.REQUEST.get('all_versions', 'False'))
@@ -281,7 +320,7 @@ def _create_item(request):
     data = None
     template_id = request.json.get('boilerplate')
     if template_id is not None:
-        clz = XBlock.load_class(category, select=prefer_xmodules)
+        clz = parent.runtime.load_block_type(category)
         if clz is not None:
             template = clz.get_template(template_id)
             if template is not None:

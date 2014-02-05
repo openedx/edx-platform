@@ -24,7 +24,6 @@ from django_comment_client.utils import has_forum_access
 from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from student.models import CourseEnrollment
 from bulk_email.models import CourseAuthorization
-from lms.lib.xblock.runtime import handler_prefix
 
 
 from .tools import get_units_with_due_date, title_or_url
@@ -206,7 +205,7 @@ def _section_send_email(course_id, access, course):
         ScopeIds(None, None, None, 'i4x://dummy_org/dummy_course/html/dummy_name')
     )
     fragment = course.system.render(html_module, 'studio_view')
-    fragment = wrap_xblock(partial(handler_prefix, course_id), html_module, 'studio_view', fragment, None)
+    fragment = wrap_xblock('LmsRuntime', html_module, 'studio_view', fragment, None, extra_data={"course-id": course_id})
     email_editor = fragment.content
     section_data = {
         'section_key': 'send_email',

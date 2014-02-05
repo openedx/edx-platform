@@ -1,7 +1,8 @@
 #pylint: disable=E1101
 
-import shutil
+import json
 import mock
+import shutil
 
 from textwrap import dedent
 
@@ -503,7 +504,9 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         This verifies that a video caption url is as we expect it to be
         """
         resp = self._test_preview(Location('i4x', 'edX', 'toy', 'video', 'sample_video', None))
-        self.assertContains(resp, 'data-caption-asset-path="/c4x/edX/toy/asset/subs_"')
+        self.assertEquals(resp.status_code, 200)
+        content = json.loads(resp.content)
+        self.assertIn('data-caption-asset-path="/c4x/edX/toy/asset/subs_"', content['html'])
 
     def _test_preview(self, location):
         """ Preview test case. """
@@ -514,7 +517,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         locator = loc_mapper().translate_location(
             course_items[0].location.course_id, location, True, True
         )
-        resp = self.client.get_html(locator.url_reverse('xblock'))
+        resp = self.client.get_fragment(locator.url_reverse('xblock'))
         self.assertEqual(resp.status_code, 200)
         # TODO: uncomment when preview no longer has locations being returned.
         # _test_no_locations(self, resp)

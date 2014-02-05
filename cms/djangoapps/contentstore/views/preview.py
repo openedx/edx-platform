@@ -1,11 +1,12 @@
 import logging
+import hashlib
 from functools import partial
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponseBadRequest
 from django.contrib.auth.decorators import login_required
-from edxmako.shortcuts import render_to_response, render_to_string
+from edxmako.shortcuts import render_to_string
 
 from xmodule_modifiers import replace_static_urls, wrap_xblock
 from xmodule.error_module import ErrorDescriptor
@@ -15,6 +16,7 @@ from xmodule.x_module import ModuleSystem
 from xblock.runtime import KvsFieldData
 from xblock.django.request import webob_to_django_response, django_to_webob_request
 from xblock.exceptions import NoSuchHandlerError
+from xblock.fragment import Fragment
 
 from lms.lib.xblock.field_data import LmsFieldData
 from lms.lib.xblock.runtime import quote_slashes, unquote_slashes
@@ -31,20 +33,6 @@ from contentstore.views.access import get_user_role
 __all__ = ['preview_handler']
 
 log = logging.getLogger(__name__)
-
-
-def handler_prefix(block, handler='', suffix=''):
-    """
-    Return a url prefix for XBlock handler_url. The full handler_url
-    should be '{prefix}/{handler}/{suffix}?{query}'.
-
-    Trailing `/`s are removed from the returned url.
-    """
-    return reverse('preview_handler', kwargs={
-        'usage_id': quote_slashes(unicode(block.scope_ids.usage_id).encode('utf-8')),
-        'handler': handler,
-        'suffix': suffix,
-    }).rstrip('/?')
 
 
 @login_required
@@ -91,7 +79,11 @@ class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
     An XModule ModuleSystem for use in Studio previews
     """
     def handler_url(self, block, handler_name, suffix='', query='', thirdparty=False):
-        return handler_prefix(block, handler_name, suffix) + '?' + query
+        return reverse('preview_handler', kwargs={
+            'usage_id': quote_slashes(unicode(block.scope_ids.usage_id).encode('utf-8')),
+            'handler': handler_name,
+            'suffix': suffix,
+        }) + '?' + query
 
 
 def _preview_module_system(request, descriptor):
@@ -123,7 +115,7 @@ def _preview_module_system(request, descriptor):
         # Set up functions to modify the fragment produced by student_view
         wrappers=(
             # This wrapper wraps the module in the template specified above
-            partial(wrap_xblock, handler_prefix, display_name_only=descriptor.location.category == 'static_tab'),
+            partial(wrap_xblock, 'PreviewRuntime', display_name_only=descriptor.location.category == 'static_tab'),
 
             # This wrapper replaces urls in the output that start with /static
             # with the correct course-specific url for the static content
@@ -153,15 +145,15 @@ def _load_preview_module(request, descriptor):
     return descriptor
 
 
-def get_preview_html(request, descriptor):
+def get_preview_fragment(request, descriptor):
     """
     Returns the HTML returned by the XModule's student_view,
     specified by the descriptor and idx.
     """
     module = _load_preview_module(request, descriptor)
     try:
-        content = module.render("student_view").content
+        fragment = module.render("student_view")
     except Exception as exc:                          # pylint: disable=W0703
         log.debug("Unable to render student_view for %r", module, exc_info=True)
-        content = render_to_string('html_error.html', {'message': str(exc)})
-    return content
+        fragment = Fragment(render_to_string('html_error.html', {'message': str(exc)}))
+    return fragment
