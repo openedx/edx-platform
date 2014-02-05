@@ -42,7 +42,7 @@ log = logging.getLogger(__name__)
 
 def generateUUID():  # pylint: disable=C0103
     """ Utility function; generates UUIDs """
-    return str(uuid.uuid4)
+    return str(uuid.uuid4())
 
 
 class VerificationException(Exception):
@@ -142,7 +142,7 @@ class PhotoVerification(StatusModel):
     # user IDs or something too easily guessable.
     receipt_id = models.CharField(
         db_index=True,
-        default=generateUUID,
+        default=lambda: generateUUID(),
         max_length=255,
     )
 
