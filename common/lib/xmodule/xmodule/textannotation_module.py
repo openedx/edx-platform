@@ -59,6 +59,7 @@ class TextAnnotationModule(AnnotatableFields, XModule):
 
         self.instructions = self._extract_instructions(xmltree)
         self.content = etree.tostring(xmltree, encoding='unicode')
+        self.element_id = self.location.html_id().split("-")[-1]
 
     def _extract_instructions(self, xmltree):
         """ Removes <instructions> from the xmltree and returns them as a string, otherwise None. """
@@ -76,6 +77,7 @@ class TextAnnotationModule(AnnotatableFields, XModule):
             'tag': self.instructor_tags,
             'source': self.source,
             'instructions_html': self.instructions,
+            'element_id': self.element_id,
             'content_html': self.content,
             'annotation_storage': self.annotation_storage_url
         }

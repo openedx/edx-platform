@@ -53,6 +53,7 @@ class VideoAnnotationModule(AnnotatableFields, XModule):
 
         self.instructions = self._extract_instructions(xmltree)
         self.content = etree.tostring(xmltree, encoding='unicode')
+        self.element_id = self.location.html_id().split("-")[-1]
 
     def _extract_instructions(self, xmltree):
         """ Removes <instructions> from the xmltree and returns them as a string, otherwise None. """
@@ -81,6 +82,7 @@ class VideoAnnotationModule(AnnotatableFields, XModule):
             'instructions_html': self.instructions,
             'sourceUrl': self.sourceurl,
             'typeSource': extension,
+            'element_id': self.element_id,
             'poster': self.poster_url,
             'annotation_storage': self.annotation_storage_url
         }
