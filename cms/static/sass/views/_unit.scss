@@ -881,19 +881,23 @@ body.unit {
       padding: $baseline/4 $baseline/2;
       top: 0;
       left: 0;
-      border-bottom: 1px solid $gray-l4;
-      background: $gray-l5;
     }
 
     .component-header {
       display: inline-block;
-      width: 50%;
-      vertical-align: middle;
+      overflow: hidden;
+      padding: $baseline/2 0px 0px $baseline/4;
+      max-width: 60%;
+      color: $gray-l1;
+      text-overflow: ellipsis;
+      white-space: nowrap; 
+      font-weight: 300;
     }
 
     .component-actions {
       display: inline-block;
       float: right;
+      max-width: 40%;
       vertical-align: middle;
       text-align: center;
     }
@@ -934,6 +938,7 @@ body.unit {
         .action-button-text {
           padding-left: 1px;
           vertical-align: bottom;
+          text-transform: uppercase;
           line-height: 17px;
         }
 

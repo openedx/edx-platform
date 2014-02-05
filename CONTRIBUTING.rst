@@ -186,7 +186,7 @@ By opening up a pull request, we expect the following things:
    unable to participate in the review process.
 
 3. If you have questions, you will ask them by either commenting on the pull
-   request or asking us in IRC or on the mailing list. 
+   request or asking us in IRC or on the mailing list.
 
 4. If you do not respond to comments on your pull request within 7 days, we
    will close it. You are welcome to re-open it when you are ready to engage.
@@ -239,7 +239,7 @@ generated. Click on the "View Reports" link on your pull request to be brought
 to the Jenkins report page. In a column on the left side of the page are a few
 links, including "Diff Coverage Report" and "Diff Quality Report". View each of
 these reports (making note that the Diff Quality report has two tabs - one for
-pep8, and one for Pylint). 
+pep8, and one for Pylint).
 
 Make sure your quality coverage is 100% and your test coverage is at least 95%.
 Adjust your code appropriately if these metrics are not high enough. Be sure to
@@ -307,7 +307,7 @@ commits, and comments.
 
 
 .. _individual contributor agreement: http://code.edx.org/individual-contributor-agreement.pdf
-.. _edx-platform testing documentation: https://github.com/edx/edx-platform/blob/master/docs/internal/testing.md
+.. _edx-platform testing documentation: https://github.com/edx/edx-platform/blob/master/docs/en_us/internal/testing.md
 .. _mailing list: https://groups.google.com/forum/#!forum/edx-code
 .. _IRC channel: http://www.irchelp.org/irchelp/new2irc.html
 .. _pull request 1322: https://github.com/edx/edx-platform/pull/1322

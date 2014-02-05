@@ -77,6 +77,7 @@ def get_test_system(course_id=''):
         open_ended_grading_interface=open_ended_grading_interface,
         course_id=course_id,
         error_descriptor_class=ErrorDescriptor,
+        get_user_role=Mock(is_staff=False),
     )
 
 

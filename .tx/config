@@ -13,9 +13,9 @@ source_file = conf/locale/en/LC_MESSAGES/django-studio.po
 source_lang = en
 type = PO
 
-[edx-platform.djangojs]
-file_filter = conf/locale/<lang>/LC_MESSAGES/djangojs.po
-source_file = conf/locale/en/LC_MESSAGES/djangojs.po
+[edx-platform.djangojs-partial]
+file_filter = conf/locale/<lang>/LC_MESSAGES/djangojs-partial.po
+source_file = conf/locale/en/LC_MESSAGES/djangojs-partial.po
 source_lang = en
 type = PO
 

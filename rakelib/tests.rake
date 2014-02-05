@@ -22,10 +22,15 @@ def run_tests(system, report_dir, test_id=nil, stop_on_failure=true)
     # to the Djangoapps we want to test.  Otherwise, it will
     # run tests on all installed packages.
 
-    default_test_id = "#{system}/djangoapps common/djangoapps"
+    # We need to use $DIR/*, rather than just $DIR so that
+    # django-nose will import them early in the test process,
+    # thereby making sure that we load any django models that are
+    # only defined in test files.
+
+    default_test_id = "#{system}/djangoapps/* common/djangoapps/*"
 
     if system == :lms || system == :cms
-        default_test_id += " #{system}/lib"
+        default_test_id += " #{system}/lib/*"
     end
 
     if test_id.nil?
@@ -54,7 +59,7 @@ end
 task :clean_test_files do
     desc "Clean fixture files used by tests and .pyc files"
     sh("git clean -fqdx test_root/logs test_root/data test_root/staticfiles test_root/uploads")
-    sh("find . -type f -name *.pyc -delete")
+    sh("find . -type f -name \"*.pyc\" -delete")
 end
 
 task :clean_reports_dir => REPORT_DIR do

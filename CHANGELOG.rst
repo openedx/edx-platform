@@ -5,12 +5,22 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Blades: Add role parameter to LTI. BLD-583.
+
 Blades: Bugfix "In Firefox YouTube video with start time plays from 00:00:00".
 BLD-708.
 
 Blades: Fix bug when image response in Firefox does not retain input. BLD-711.
 
 Blades: Give numerical response tolerance as a range. BLD-25.
+
+Common: Add a utility app for building databased-backed configuration
+  for specific application features. Includes admin site customization
+  for easier administration and tracking.
+
+Common: Add the ability to dark-launch site translations. These languages
+  will be unavailable to users except through the use of a specific query
+  parameter.
 
 Blades: Allow user with BetaTester role correctly use LTI. BLD-641.
 
@@ -322,6 +332,8 @@ assessors to edit the original submitter's work.
 
 LMS: Fixed a bug that caused links from forum user profile pages to
 threads to lead to 404s if the course id contained a '-' character.
+
+Studio/LMS: Add password policy enforcement to new account creation
 
 Studio/LMS: Added ability to set due date formatting through Studio's Advanced
 Settings.  The key is due_date_display_format, and the value should be a format

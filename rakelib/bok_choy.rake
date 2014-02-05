@@ -29,22 +29,44 @@ BOK_CHOY_SERVERS = {
     :cms => { :port => 8031, :log => File.join(BOK_CHOY_LOG_DIR, "bok_choy_studio.log") }
 }
 
+BOK_CHOY_STUBS = {
+
+    :xqueue => {
+        :port => 8040,
+        :log => File.join(BOK_CHOY_LOG_DIR, "bok_choy_xqueue.log")
+    }
+}
+
+# For the time being, stubs are used by both the bok-choy and lettuce acceptance tests
+# For this reason, the stubs package is currently located in the Django app called "terrain"
+# where other lettuce configuration is stored.
+BOK_CHOY_STUB_DIR = File.join(REPO_ROOT, "common", "djangoapps", "terrain")
+
 BOK_CHOY_CACHE = Dalli::Client.new('localhost:11211')
 
 
-# Start the server we will run tests on
+# Start the servers we will run tests on
 def start_servers()
     BOK_CHOY_SERVERS.each do | service, info |
         address = "0.0.0.0:#{info[:port]}"
         cmd = "coverage run --rcfile=#{BOK_CHOY_COVERAGE_RC} -m manage #{service} --settings bok_choy runserver #{address} --traceback --noreload"
         singleton_process(cmd, logfile=info[:log])
     end
-end
 
+    BOK_CHOY_STUBS.each do | service, info |
+        Dir.chdir(BOK_CHOY_STUB_DIR) do
+            singleton_process(
+                "python -m stubs.start #{service} #{info[:port]}",
+                logfile=info[:log]
+            )
+        end
+    end
+
+end
 
 # Wait until we get a successful response from the servers or time out
 def wait_for_test_servers()
-    BOK_CHOY_SERVERS.each do | service, info |
+    BOK_CHOY_SERVERS.merge(BOK_CHOY_STUBS).each do | service, info |
         ready = wait_for_server("0.0.0.0", info[:port])
         if not ready
             fail("Could not contact #{service} test server")
@@ -144,23 +166,8 @@ namespace :'test:bok_choy' do
     desc "Process assets and set up database for bok-choy tests"
     task :setup => [:check_services, :install_prereqs, BOK_CHOY_LOG_DIR] do
 
-        # Clear any test data already in Mongo
-        clear_mongo()
-
-        # Invalidate the cache
-        BOK_CHOY_CACHE.flush()
-
-        # HACK: Since the CMS depends on the existence of some database tables
-        # that are now in common but used to be in LMS (Role/Permissions for Forums)
-        # we need to create/migrate the database tables defined in the LMS.
-        # We might be able to address this by moving out the migrations from
-        # lms/django_comment_client, but then we'd have to repair all the existing
-        # migrations from the upgrade tables in the DB.
-        # But for now for either system (lms or cms), use the lms
-        # definitions to sync and migrate.
-        sh(django_admin('lms', 'bok_choy', 'reset_db', '--noinput'))
-        sh(django_admin('lms', 'bok_choy', 'syncdb', '--noinput'))
-        sh(django_admin('lms', 'bok_choy', 'migrate', '--noinput'))
+        # Reset the database
+        sh("#{REPO_ROOT}/scripts/reset-test-db.sh")
 
         # Collect static assets
         Rake::Task["gather_assets"].invoke('lms', 'bok_choy')
@@ -173,20 +180,25 @@ namespace :'test:bok_choy' do
         :check_services, BOK_CHOY_LOG_DIR, BOK_CHOY_REPORT_DIR, :clean_reports_dir
     ] do |t, args|
 
+        # Clear any test data already in Mongo or MySQL and invalidate the cache
+        clear_mongo()
+        BOK_CHOY_CACHE.flush()
+        sh(django_admin('lms', 'bok_choy', 'flush', '--noinput'))
+
         # Ensure the test servers are available
-        puts "Starting test servers...".red
+        puts "Starting test servers...".green
         start_servers()
-        puts "Waiting for servers to start...".red
+        puts "Waiting for servers to start...".green
         wait_for_test_servers()
 
         begin
-            puts "Running test suite...".red
+            puts "Running test suite...".green
             run_bok_choy(args.test_spec)
         rescue
             puts "Tests failed!".red
             exit 1
         ensure
-            puts "Cleaning up databases...".red
+            puts "Cleaning up databases...".green
             cleanup()
         end
     end

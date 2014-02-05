@@ -1,7 +1,8 @@
 """
-Test helper functions.
+Test helper functions and base classes.
 """
 from path import path
+from bok_choy.web_app_test import WebAppTest
 
 
 def load_data_str(rel_path):
@@ -12,3 +13,32 @@ def load_data_str(rel_path):
     full_path = path(__file__).abspath().dirname() / "data" / rel_path  #pylint: disable=E1120
     with open(full_path) as data_file:
         return data_file.read()
+
+
+class UniqueCourseTest(WebAppTest):
+    """
+    Test that provides a unique course ID.
+    """
+
+    COURSE_ID_SEPARATOR = "/"
+
+    def __init__(self, *args, **kwargs):
+        """
+        Create a unique course ID.
+        """
+        self.course_info = {
+            'org': 'test_org',
+            'number': self.unique_id,
+            'run': 'test_run',
+            'display_name': 'Test Course' + self.unique_id
+        }
+
+        super(UniqueCourseTest, self).__init__(*args, **kwargs)
+
+    @property
+    def course_id(self):
+        return self.COURSE_ID_SEPARATOR.join([
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run']
+        ])

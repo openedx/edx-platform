@@ -372,7 +372,7 @@ class LoncapaProblem(object):
             # TODO: figure out where to get file submissions when rescoring.
             if 'filesubmission' in responder.allowed_inputfields and student_answers is None:
                 _ = self.capa_system.i18n.ugettext
-                raise Exception(_("Cannot rescore problems with possible file submissions"))
+                raise Exception(_(u"Cannot rescore problems with possible file submissions"))
 
             # use 'student_answers' only if it is provided, and if it might contain a file
             # submission that would not exist in the persisted "student_answers".

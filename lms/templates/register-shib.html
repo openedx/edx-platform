@@ -12,7 +12,7 @@
 <%! from datetime import date %>
 <%! import calendar %>
 
-<%block name="title"><title>${_("Preferences for {platform_name}").format(platform_name=settings.PLATFORM_NAME)}</title></%block>
+<%block name="pagetitle">${_("Preferences for {platform_name}").format(platform_name=settings.PLATFORM_NAME)}</%block>
 
 <%block name="js_extra">
   <script type="text/javascript">
@@ -51,15 +51,17 @@
       });
 
       $('#register-form').on('ajax:success', function(event, json, xhr) {
-        if(json.success) {
-          location.href="${reverse('dashboard')}";
-       } else {
-         toggleSubmitButton(true);
-         $('.status.message.submission-error').addClass('is-shown').focus();
-         $('.status.message.submission-error .message-copy').html(json.value).stop().css("display", "block");
-         $(".field-error").removeClass('field-error');
-         $("[data-field='"+json.field+"']").addClass('field-error')
-       }
+        var url = json.redirect_url || "${reverse('dashboard')}";
+        location.href = url;
+      });
+
+      $('#register-form').on('ajax:error', function(event, jqXHR, textStatus) {
+        toggleSubmitButton(true);
+        json = $.parseJSON(jqXHR.responseText);
+        $('.status.message.submission-error').addClass('is-shown').focus();
+        $('.status.message.submission-error .message-copy').html(json.value).stop().css("display", "block");
+        $(".field-error").removeClass('field-error');
+        $("[data-field='"+json.field+"']").addClass('field-error')
       });
     })(this);
 

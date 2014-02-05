@@ -38,6 +38,12 @@ MONGO_MODULESTORE['OPTIONS']['fs_root'] = (TEST_ROOT / "data").abspath()
 XML_MODULESTORE = MODULESTORE['default']['OPTIONS']['stores']['xml']
 XML_MODULESTORE['OPTIONS']['data_dir'] = (TEST_ROOT / "data").abspath()
 
+# Configure the LMS to use our stub XQueue implementation
+XQUEUE_INTERFACE['url'] = 'http://localhost:8040'
+
+# Configure the LMS to use our stub ORA implementation
+OPEN_ENDED_GRADING_INTERFACE['url'] = 'http://localhost:8041/'
+
 # Enable django-pipeline and staticfiles
 STATIC_ROOT = (TEST_ROOT / "staticfiles").abspath()
 PIPELINE = True

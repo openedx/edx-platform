@@ -1,0 +1,806 @@
+# #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
+# edX community translations have been downloaded from Portuguese (Brazil) (http://www.transifex.com/projects/p/edx-platform/language/pt_BR/).
+# Copyright (C) 2014 EdX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# 
+# Translators:
+# andreibosco <andreibosco@gmail.com>, 2013
+# andreibosco <andreibosco@gmail.com>, 2013
+# brk0_0, 2013
+# brunojm <brunojm@gmail.com>, 2014
+# brunojm <brunojm@gmail.com>, 2014
+# LucasPPires <lucaspylespires@hotmail.com>, 2014
+# LucasPPires <lucaspylespires@hotmail.com>, 2014
+# niels006 <niels006@gmail.com>, 2014
+# niels006 <niels006@gmail.com>, 2014
+# brk0_0, 2013
+# RenataBarboza, 2013
+# RenataBarboza, 2013-2014
+# rpietrobon <pietr007@gmail.com>, 2013-2014
+# #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
+# edX translation file.
+# Copyright (C) 2014 EdX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# 
+# Translators:
+# andreibosco <andreibosco@gmail.com>, 2013
+# brk0_0, 2013
+# brunojm <brunojm@gmail.com>, 2014
+# niels006 <niels006@gmail.com>, 2014
+# niels006 <niels006@gmail.com>, 2014
+# RenataBarboza, 2013
+msgid ""
+msgstr ""
+"Project-Id-Version: edx-platform\n"
+"Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
+"POT-Creation-Date: 2014-02-03 11:33-0500\n"
+"PO-Revision-Date: 2014-02-03 16:50+0000\n"
+"Last-Translator: cpennington <cale@edx.org>\n"
+"Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/edx-platform/language/pt_BR/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: pt_BR\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: cms/static/js/base.js lms/static/js/verify_student/photocapture.js
+msgid "This link will open in a new browser window/tab"
+msgstr "Este link será aberto em uma nova janela/aba do navegador"
+
+#: cms/static/js/base.js cms/static/js/views/asset.js
+#: cms/static/js/views/course_info_update.js
+#: cms/static/js/views/show_textbook.js cms/static/js/views/validation.js
+#: lms/static/admin/js/admin/DateTimeShortcuts.js
+#: lms/static/admin/js/admin/DateTimeShortcuts.js
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
+msgid "Video slider"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
+msgid "Pause"
+msgstr "Pausa"
+
+#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
+msgid "Play"
+msgstr "Reproduzir"
+
+#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
+msgid "Fill browser"
+msgstr "Preencher navegador"
+
+#: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
+msgid "Exit full browser"
+msgstr "Sair da tela cheia do navegador"
+
+#: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
+msgid "HD on"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/js/src/video/05_video_quality_control.js
+msgid "HD off"
+msgstr "Alta definição desativada"
+
+#: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
+#: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
+msgid "Video position"
+msgstr "Posição do vídeo"
+
+#: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
+msgid "Video ended"
+msgstr "Vídeo encerrado"
+
+#: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
+msgid "%(value)s hour"
+msgid_plural "%(value)s hours"
+msgstr[0] "%(value)s hora"
+msgstr[1] "%(value)s horas"
+
+#: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
+msgid "%(value)s minute"
+msgid_plural "%(value)s minutes"
+msgstr[0] "%(value)s minuto"
+msgstr[1] "%(value)s minutos"
+
+#: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
+msgid "%(value)s second"
+msgid_plural "%(value)s seconds"
+msgstr[0] "%(value)s segundo"
+msgstr[1] "%(value)s segundos"
+
+#: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
+msgid "Volume"
+msgstr "Volume"
+
+#. Translators: Volume level equals 0%.
+#: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
+msgid "Muted"
+msgstr "Mudo"
+
+#. Translators: Volume level in range (0,20]%
+#: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
+msgid "Very low"
+msgstr "Muito baixo"
+
+#. Translators: Volume level in range (20,40]%
+#: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
+msgid "Low"
+msgstr "Baixo"
+
+#. Translators: Volume level in range (40,60]%
+#: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
+msgid "Average"
+msgstr "Médio"
+
+#. Translators: Volume level in range (60,80]%
+#: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
+msgid "Loud"
+msgstr "Alto"
+
+#. Translators: Volume level in range (80,100)%
+#: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
+msgid "Very loud"
+msgstr "Muito alto"
+
+#. Translators: Volume level equals 100%.
+#: common/lib/xmodule/xmodule/js/src/video/07_video_volume_control.js
+msgid "Maximum"
+msgstr "Máximo"
+
+#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+msgid "Caption will be displayed when "
+msgstr "A legenda aparecerá quando"
+
+#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+msgid "Turn on captions"
+msgstr "Ativar legenda"
+
+#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+msgid "Turn off captions"
+msgstr ""
+
+#: common/static/js/src/jquery.timeago.locale.js
+#, c-format
+msgid "%s ago"
+msgstr "%s atrás"
+
+#: common/static/js/src/jquery.timeago.locale.js
+#, c-format
+msgid "%s from now"
+msgstr "%s a partir de agora"
+
+#: common/static/js/src/jquery.timeago.locale.js
+msgid "less than a minute"
+msgstr "menos de um minuto"
+
+#: common/static/js/src/jquery.timeago.locale.js
+msgid "about a minute"
+msgstr "aproximadamente um minuto"
+
+#: common/static/js/src/jquery.timeago.locale.js
+#, c-format
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] "%d minutos"
+msgstr[1] "%d minutos"
+
+#: common/static/js/src/jquery.timeago.locale.js
+msgid "about an hour"
+msgstr "aproximadamente uma hora"
+
+#: common/static/js/src/jquery.timeago.locale.js
+#, c-format
+msgid "about %d hour"
+msgid_plural "about %d hours"
+msgstr[0] "aproximadamente %d horas"
+msgstr[1] "aproximadamente %d horas"
+
+#: common/static/js/src/jquery.timeago.locale.js
+msgid "a day"
+msgstr "um dia"
+
+#: common/static/js/src/jquery.timeago.locale.js
+#, c-format
+msgid "%d day"
+msgid_plural "%d days"
+msgstr[0] "%d dia"
+msgstr[1] "%d dia"
+
+#: common/static/js/src/jquery.timeago.locale.js
+msgid "about a month"
+msgstr "aproximadamente um mês"
+
+#: common/static/js/src/jquery.timeago.locale.js
+#, c-format
+msgid "%d month"
+msgid_plural "%d months"
+msgstr[0] "%d meses"
+msgstr[1] "%d meses"
+
+#: common/static/js/src/jquery.timeago.locale.js
+msgid "about a year"
+msgstr "aproximadamente um ano"
+
+#: common/static/js/src/jquery.timeago.locale.js
+#, c-format
+msgid "%d year"
+msgid_plural "%d years"
+msgstr[0] "%d anos"
+msgstr[1] "%d anos"
+
+#: lms/static/admin/js/SelectFilter2.js
+#, c-format
+msgid "Available %s"
+msgstr "%s disponíveis"
+
+#: lms/static/admin/js/SelectFilter2.js
+#, c-format
+msgid ""
+"This is the list of available %s. You may choose some by selecting them in "
+"the box below and then clicking the \"Choose\" arrow between the two boxes."
+msgstr ""
+"Esta é a lista de %s disponíveis. Você pode escolher alguns selecionando-os "
+"na caixa abaixo e clicando na seta \"Escolher\" entre as duas caixas. "
+
+#: lms/static/admin/js/SelectFilter2.js
+#, c-format
+msgid "Type into this box to filter down the list of available %s."
+msgstr "Digite nesta caixa para filtrar a lista de %s disponíveis."
+
+#: lms/static/admin/js/SelectFilter2.js
+msgid "Filter"
+msgstr "Filtrar"
+
+#: lms/static/admin/js/SelectFilter2.js
+msgid "Choose all"
+msgstr "Escolher todos"
+
+#: lms/static/admin/js/SelectFilter2.js
+#, c-format
+msgid "Click to choose all %s at once."
+msgstr "Clique para escolher todos %s de uma vez."
+
+#: lms/static/admin/js/SelectFilter2.js
+msgid "Choose"
+msgstr "Escolher"
+
+#: lms/static/admin/js/SelectFilter2.js
+msgid "Remove"
+msgstr "Remover"
+
+#: lms/static/admin/js/SelectFilter2.js
+#, c-format
+msgid "Chosen %s"
+msgstr "%s escolhidos"
+
+#: lms/static/admin/js/SelectFilter2.js
+#, c-format
+msgid ""
+"This is the list of chosen %s. You may remove some by selecting them in the "
+"box below and then clicking the \"Remove\" arrow between the two boxes."
+msgstr ""
+"Esta é a lista de %s escolhidos. Você pode remover alguns selecionando-os na"
+" caixa abaixo e clicando na seta \"Remover\" entre as duas caixas."
+
+#: lms/static/admin/js/SelectFilter2.js
+msgid "Remove all"
+msgstr "Remover todos"
+
+#: lms/static/admin/js/SelectFilter2.js
+#, c-format
+msgid "Click to remove all chosen %s at once."
+msgstr "Clique para remover todos os %s escolhidos de uma só vez."
+
+#: lms/static/admin/js/actions.js lms/static/admin/js/actions.min.js
+msgid "%(sel)s of %(cnt)s selected"
+msgid_plural "%(sel)s of %(cnt)s selected"
+msgstr[0] "%(sel)s de %(cnt)s selecionado"
+msgstr[1] "%(sel)s de %(cnt)s selecionados"
+
+#: lms/static/admin/js/actions.js lms/static/admin/js/actions.min.js
+msgid ""
+"You have unsaved changes on individual editable fields. If you run an "
+"action, your unsaved changes will be lost."
+msgstr ""
+
+#: lms/static/admin/js/actions.js lms/static/admin/js/actions.min.js
+msgid ""
+"You have selected an action, but you haven't saved your changes to "
+"individual fields yet. Please click OK to save. You'll need to re-run the "
+"action."
+msgstr ""
+
+#: lms/static/admin/js/actions.js lms/static/admin/js/actions.min.js
+msgid ""
+"You have selected an action, and you haven't made any changes on individual "
+"fields. You're probably looking for the Go button rather than the Save "
+"button."
+msgstr ""
+
+#. Translators: the names of months, keep the pipe (|) separators.
+#: lms/static/admin/js/calendar.js lms/static/admin/js/dateparse.js
+msgid ""
+"January|February|March|April|May|June|July|August|September|October|November|December"
+msgstr ""
+"Janeiro|Fevereiro|Março|Abril|Maio|Junho|Julho|Agosto|Setembro|Outubro|Novembro|Dezembro"
+
+#. Translators: abbreviations for days of the week, keep the pipe (|)
+#. separators.
+#: lms/static/admin/js/calendar.js
+msgid "S|M|T|W|T|F|S"
+msgstr "Dom|Seg|Ter|Qua|Qui|Sex|Sáb"
+
+#: lms/static/admin/js/collapse.js lms/static/admin/js/collapse.js.c
+#: lms/static/admin/js/collapse.min.js
+msgid "Show"
+msgstr "Mostrar"
+
+#: lms/static/admin/js/collapse.js lms/static/admin/js/collapse.min.js
+msgid "Hide"
+msgstr "Ocultar"
+
+#. Translators: the names of days, keep the pipe (|) separators.
+#: lms/static/admin/js/dateparse.js
+msgid "Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday"
+msgstr "Domingo|Segunda|Terça|Quarta|Quinta|Sexta|Sábado"
+
+#: lms/static/admin/js/admin/DateTimeShortcuts.js
+#: lms/static/admin/js/admin/DateTimeShortcuts.js
+msgid "Now"
+msgstr "Agora"
+
+#: lms/static/admin/js/admin/DateTimeShortcuts.js
+msgid "Clock"
+msgstr "Relógio"
+
+#: lms/static/admin/js/admin/DateTimeShortcuts.js
+msgid "Choose a time"
+msgstr "Escolher um horário"
+
+#: lms/static/admin/js/admin/DateTimeShortcuts.js
+msgid "Midnight"
+msgstr "Meia-noite"
+
+#: lms/static/admin/js/admin/DateTimeShortcuts.js
+msgid "6 a.m."
+msgstr "06:00"
+
+#: lms/static/admin/js/admin/DateTimeShortcuts.js
+msgid "Noon"
+msgstr "Meio-dia"
+
+#: lms/static/admin/js/admin/DateTimeShortcuts.js
+#: lms/static/admin/js/admin/DateTimeShortcuts.js
+msgid "Today"
+msgstr "Hoje"
+
+#: lms/static/admin/js/admin/DateTimeShortcuts.js
+msgid "Calendar"
+msgstr "Calendário"
+
+#: lms/static/admin/js/admin/DateTimeShortcuts.js
+msgid "Yesterday"
+msgstr "Ontem"
+
+#: lms/static/admin/js/admin/DateTimeShortcuts.js
+msgid "Tomorrow"
+msgstr "Amanhã"
+
+#: lms/static/js/Markdown.Editor.js
+msgid ""
+"<p><b>Insert Hyperlink</b></p><p>http://example.com/ \"optional title\"</p>"
+msgstr ""
+"<p><b>Inserir Hiperlink</b></p><p>http://examplo.com/ \"título "
+"opcional\"</p>"
+
+#: lms/static/js/Markdown.Editor.js
+msgid ""
+"<p><b>Insert Image (upload file or type "
+"url)</b></p><p>http://example.com/images/diagram.jpg \"optional "
+"title\"<br><br></p>"
+msgstr ""
+"<p><b>Insira a Imagem (suba um arquivo ou digite "
+"url)</b></p><p>http://example.com/images/diagram.jpg \"título "
+"opcional\"<br><br></p>"
+
+#: lms/static/js/Markdown.Editor.js
+msgid "Markdown Editing Help"
+msgstr "Ajuda para Editar Markdown"
+
+#: lms/static/js/Markdown.Editor.js
+msgid "Bold (Ctrl+B)"
+msgstr "Negrito (Ctrl+B)"
+
+#: lms/static/js/Markdown.Editor.js
+msgid "Italic (Ctrl+I)"
+msgstr "Itálico (Ctrl+I)"
+
+#: lms/static/js/Markdown.Editor.js
+msgid "Hyperlink (Ctrl+L)"
+msgstr "Hiperlink (Ctrl+L)"
+
+#: lms/static/js/Markdown.Editor.js
+msgid "Blockquote (Ctrl+Q)"
+msgstr "Citação em bloco (Ctrl+Q)"
+
+#: lms/static/js/Markdown.Editor.js
+msgid "Code Sample (Ctrl+K)"
+msgstr "Amostra de Código (Ctrl+K)"
+
+#: lms/static/js/Markdown.Editor.js
+msgid "Image (Ctrl+G)"
+msgstr "Imagem (Ctrl+G)"
+
+#: lms/static/js/Markdown.Editor.js
+msgid "Numbered List (Ctrl+O)"
+msgstr "Lista numerada (Ctrl+O)"
+
+#: lms/static/js/Markdown.Editor.js
+msgid "Bulleted List (Ctrl+U)"
+msgstr "Lista com Marcadores (Ctrl+U)"
+
+#: lms/static/js/Markdown.Editor.js
+msgid "Heading (Ctrl+H)"
+msgstr "Cabeçalho (Ctrl+H)"
+
+#: lms/static/js/Markdown.Editor.js
+msgid "Horizontal Rule (Ctrl+R)"
+msgstr "Regra horizontal (Ctrl+R)"
+
+#: lms/static/js/Markdown.Editor.js
+msgid "Undo (Ctrl+Z)"
+msgstr "Desfazer (Ctrl+Z)"
+
+#: lms/static/js/Markdown.Editor.js
+msgid "Redo (Ctrl+Y)"
+msgstr "Refazer (Ctrl+Y)"
+
+#: lms/static/js/Markdown.Editor.js
+msgid "Redo (Ctrl+Shift+Z)"
+msgstr "Refazer (Ctrl+Shift+Z)"
+
+#: lms/static/js/Markdown.Editor.js
+msgid "strong text"
+msgstr "texto forte"
+
+#: lms/static/js/Markdown.Editor.js
+msgid "emphasized text"
+msgstr "texto enfatizado"
+
+#: lms/static/js/Markdown.Editor.js
+msgid "enter image description here"
+msgstr "insira a descrição da imagem aqui"
+
+#: lms/static/js/Markdown.Editor.js
+msgid "enter link description here"
+msgstr "insira a descrição do link aqui"
+
+#: lms/static/js/Markdown.Editor.js
+msgid "Blockquote"
+msgstr "Citação em bloco"
+
+#: lms/static/js/Markdown.Editor.js lms/static/js/Markdown.Editor.js
+msgid "enter code here"
+msgstr "insira o código aqui"
+
+#: lms/static/js/Markdown.Editor.js
+msgid "List item"
+msgstr "Lista de itens"
+
+#: lms/static/js/Markdown.Editor.js
+msgid "Heading"
+msgstr "Cabeçalho"
+
+#: cms/static/js/base.js
+msgid "This link will open in a modal window"
+msgstr "Este link irá abrir em uma janela modal"
+
+#: cms/static/js/base.js
+msgid "Delete this "
+msgstr "Deletar isso"
+
+#: cms/static/js/base.js
+msgid "Deleting this "
+msgstr "Deletando isso"
+
+#: cms/static/js/base.js
+msgid "Yes, delete this "
+msgstr "Sim, deletar isso"
+
+#: cms/static/js/base.js cms/static/js/views/course_info_update.js
+msgid "Deleting&hellip;"
+msgstr "Deletando&hellip; "
+
+#: cms/static/js/index.js
+msgid "Please do not use any spaces in this field."
+msgstr ""
+
+#: cms/static/js/index.js
+msgid ""
+"The combined length of the organization, course number, and course run "
+"fields cannot be more than 65 characters."
+msgstr ""
+"O comprimento combinado dos campos de organização, número e período do curso"
+" não pode ultrapassar 65 caracteres. "
+
+#: cms/static/js/index.js
+msgid "Required field."
+msgstr "Campo obrigatório."
+
+#: cms/static/js/sock.js
+msgid "Hide Studio Help"
+msgstr "Ocultar Ajuda do Studio"
+
+#: cms/static/js/sock.js
+msgid "Looking for Help with Studio?"
+msgstr "Procurando por Ajuda em relação ao Studio? "
+
+#: cms/static/js/models/course.js cms/static/js/models/section.js
+msgid "You must specify a name"
+msgstr "Você deve especificar um nome "
+
+#: cms/static/js/models/section.js cms/static/js/views/asset.js
+#: cms/static/js/views/course_info_handout.js
+#: cms/static/js/views/course_info_update.js cms/static/js/views/overview.js
+#: cms/static/js/views/overview.js.c
+msgid "Saving&hellip;"
+msgstr "Salvando&hellip;"
+
+#: cms/static/js/models/uploads.js
+msgid ""
+"Only <%= fileTypes %> files can be uploaded. Please select a file ending in "
+"<%= fileExtensions %> to upload."
+msgstr ""
+"Apenas arquivos <%= fileTypes %> podem ser subidos. Por favor selecione uma "
+"extensão de arquivo com um final <%= fileExtensions %> para subi-lo."
+
+#: cms/static/js/models/uploads.js
+msgid "or"
+msgstr "ou"
+
+#: cms/static/js/models/settings/course_details.js
+msgid "The course must have an assigned start date."
+msgstr "O curso deve ter uma data de início designada."
+
+#: cms/static/js/models/settings/course_details.js
+msgid "The course end date cannot be before the course start date."
+msgstr "A data do final do curso não pode ser anterior à data de início. "
+
+#: cms/static/js/models/settings/course_details.js
+msgid "The course start date cannot be before the enrollment start date."
+msgstr ""
+"A data de início do curso não pode ser anterior à data de início da "
+"matrícula. "
+
+#: cms/static/js/models/settings/course_details.js
+msgid "The enrollment start date cannot be after the enrollment end date."
+msgstr ""
+"A data de início da matrícula não pode ser posterior à data final para a "
+"matrícula. "
+
+#: cms/static/js/models/settings/course_details.js
+msgid "The enrollment end date cannot be after the course end date."
+msgstr ""
+"A data final de matrícula não pode ser posterior à data do final do curso. "
+
+#: cms/static/js/models/settings/course_details.js
+msgid "Key should only contain letters, numbers, _, or -"
+msgstr "A chave deve conter apenas letras, números, _, ou -"
+
+#: cms/static/js/models/settings/course_grader.js
+msgid "There's already another assignment type with this name."
+msgstr "Já existe um outro tipo de tarefa com este nome."
+
+#: cms/static/js/models/settings/course_grader.js
+msgid "Please enter an integer between 0 and 100."
+msgstr "Por favor insira um número inteiro entre 0 e 100."
+
+#: cms/static/js/models/settings/course_grader.js
+msgid "Please enter an integer greater than 0."
+msgstr "Por favor adicione um número inteiro maior do que 0."
+
+#: cms/static/js/models/settings/course_grader.js
+msgid "Please enter non-negative integer."
+msgstr "Por favor adicione um número inteiro não negativo."
+
+#: cms/static/js/models/settings/course_grader.js
+msgid "Cannot drop more <% attrs.types %> than will assigned."
+msgstr "Não é possível arrastar mais <% attrs.types %> do que os assinalados."
+
+#: cms/static/js/models/settings/course_grading_policy.js
+msgid "Grace period must be specified in HH:MM format."
+msgstr "O prazo de tolerância deve ser especificado no formato HH:MM. "
+
+#: cms/static/js/views/asset.js
+msgid "Delete File Confirmation"
+msgstr "Confirmar que o arquivo será deletado"
+
+#: cms/static/js/views/asset.js
+msgid ""
+"Are you sure you wish to delete this item. It cannot be reversed!\n"
+"\n"
+"Also any content that links/refers to this item will no longer work (e.g. broken images and/or links)"
+msgstr ""
+"Você tem certeza que deseja excluir este ítem? A operação não pode ser revertida!\n"
+"\n"
+"\n"
+"Além disso, qualquer conteúdo que possua links ou se refira a este ítem não irá funcionar mais (ex.: imagens e/ou links quebrados) "
+
+#: cms/static/js/views/asset.js cms/static/js/views/show_textbook.js
+msgid "Delete"
+msgstr "Deletar"
+
+#: cms/static/js/views/asset.js
+msgid "Your file has been deleted."
+msgstr "O seu arquivo foi deletado."
+
+#: cms/static/js/views/assets.js
+msgid "Name"
+msgstr "Nome"
+
+#: cms/static/js/views/assets.js
+msgid "Date Added"
+msgstr "Data Adicionada"
+
+#: cms/static/js/views/course_info_update.js
+msgid "Are you sure you want to delete this update?"
+msgstr "Você tem certeza de que deseja deletar essa atualização?"
+
+#: cms/static/js/views/course_info_update.js
+msgid "This action cannot be undone."
+msgstr "Esta ação não pode ser desfeita."
+
+#: cms/static/js/views/course_info_update.js
+msgid "OK"
+msgstr ""
+
+#: cms/static/js/views/edit_chapter.js
+msgid "Upload a new PDF to “<%= name %>”"
+msgstr "Subir um novo PDF em “<%= name %>”"
+
+#: cms/static/js/views/edit_textbook.js
+#: cms/static/js/views/overview_assignment_grader.js
+msgid "Saving"
+msgstr "Salvando"
+
+#: cms/static/js/views/import.js
+msgid "There was an error with the upload"
+msgstr "Houve um erro durante a subida do arquivo"
+
+#: cms/static/js/views/import.js
+msgid ""
+"File format not supported. Please upload a file with a <code>tar.gz</code> "
+"extension."
+msgstr ""
+"Não há suporte para esse formato de arquivo. Por favor suba um arquivo com "
+"uma extensão <code>tar.gz</code>."
+
+#: cms/static/js/views/overview.js
+msgid "Collapse All Sections"
+msgstr "Colapsar todas as seções"
+
+#: cms/static/js/views/overview.js
+msgid "Expand All Sections"
+msgstr "Expandir todas as seções"
+
+#: cms/static/js/views/overview.js
+msgid "Release date:"
+msgstr "Data de lançamento:"
+
+#: cms/static/js/views/overview.js
+msgid "{month}/{day}/{year} at {hour}:{minute} UTC"
+msgstr "{day}/{month}/{year} às {hour}:{minute} UTC"
+
+#: cms/static/js/views/overview.js
+msgid "Edit section release date"
+msgstr "Editar a seção com a data de lançamento"
+
+#: cms/static/js/views/overview_assignment_grader.js
+msgid "Not Graded"
+msgstr ""
+
+#: cms/static/js/views/paging.js
+msgid "ascending"
+msgstr "crescente"
+
+#: cms/static/js/views/paging.js
+msgid "descending"
+msgstr "decrescente"
+
+#: cms/static/js/views/paging_header.js
+msgid ""
+"Showing %(current_span)s%(start)s-%(end)s%(end_span)s out of "
+"%(total_span)s%(total)s total%(end_span)s, sorted by "
+"%(order_span)s%(sort_order)s%(end_span)s %(sort_direction)s"
+msgstr ""
+"Mostrando %(current_span)s%(start)s-%(end)s%(end_span)s de "
+"%(total_span)s%(total)s total%(end_span)s, ordenado por "
+"%(order_span)s%(sort_order)s%(end_span)s %(sort_direction)s"
+
+#: cms/static/js/views/section_edit.js
+msgid "Your change could not be saved"
+msgstr "As alterações não foram salvas"
+
+#: cms/static/js/views/section_edit.js
+msgid "Return and resolve this issue"
+msgstr "Voltar e resolver este problema"
+
+#: cms/static/js/views/show_textbook.js
+msgid "Delete “<%= name %>”?"
+msgstr "Deletar “<%= name %>”?"
+
+#: cms/static/js/views/show_textbook.js
+msgid ""
+"Deleting a textbook cannot be undone and once deleted any reference to it in"
+" your courseware's navigation will also be removed."
+msgstr ""
+"Deletar um livro texto não pode ser desfeito. Uma vez que o livro seja "
+"deletado qualquer referência a ele durante a navegação pelo seu material "
+"didático também será removida. "
+
+#: cms/static/js/views/show_textbook.js
+msgid "Deleting"
+msgstr "Deletando"
+
+#: cms/static/js/views/uploads.js
+msgid "We're sorry, there was an error"
+msgstr "Desculpe, ocorreu um erro"
+
+#: cms/static/js/views/validation.js
+msgid "You've made some changes"
+msgstr "Você fez algumas alterações"
+
+#: cms/static/js/views/validation.js
+msgid "Your changes will not take effect until you save your progress."
+msgstr "As alterações não terão efeito até que você salve o seu progresso."
+
+#: cms/static/js/views/validation.js
+msgid "You've made some changes, but there are some errors"
+msgstr "Você fez algumas alterações, mas há erros"
+
+#: cms/static/js/views/validation.js
+msgid ""
+"Please address the errors on this page first, and then save your progress."
+msgstr ""
+"Por favor, primeiro corrija os erros nesta página e somente depois salve o "
+"seu progresso. "
+
+#: cms/static/js/views/validation.js
+msgid "Save Changes"
+msgstr "Salvar Alterações"
+
+#: cms/static/js/views/validation.js
+msgid "Your changes have been saved."
+msgstr "Suas alterações foram salvas."
+
+#: cms/static/js/views/settings/advanced.js
+msgid ""
+"Your changes will not take effect until you save your progress. Take care "
+"with key and value formatting, as validation is not implemented."
+msgstr ""
+"As alterações não terão efeito até que você salve seu progresso. Verifique a"
+" formatação da chave e valor, pois a validação não está implementada. "
+
+#: cms/static/js/views/settings/advanced.js
+msgid "Your policy changes have been saved."
+msgstr "As alterações na política foram salvas."
+
+#: cms/static/js/views/settings/advanced.js
+msgid ""
+"Please note that validation of your policy key and value pairs is not "
+"currently in place yet. If you are having difficulties, please review your "
+"policy pairs."
+msgstr ""
+"Por favor note que a validação dos pares de chave e valor da política ainda "
+"não está implementada. Se você tiver problemas, por favor revise seus pares "
+"referentes à política. "
+
+#: cms/static/js/views/settings/main.js
+msgid "Upload your course image."
+msgstr "Suba a foto do seu curso."
+
+#: cms/static/js/views/settings/main.js
+msgid "Files must be in JPEG or PNG format."
+msgstr "Os arquivos devem estar nos formatos JPEG ou PNG."

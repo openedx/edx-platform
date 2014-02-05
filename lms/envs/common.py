@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 This is the common settings file, intended to set sane defaults. If you have a
 piece of configuration that's dependent on a set of feature flags being set,
@@ -203,11 +204,17 @@ FEATURES = {
     # grades CSV files to S3 and give links for downloads.
     'ENABLE_S3_GRADE_DOWNLOADS': False,
 
+    # whether to use password policy enforcement or not
+    'ENFORCE_PASSWORD_POLICY': False,
+
     # Give course staff unrestricted access to grade downloads (if set to False,
     # only edX superusers can perform the downloads)
     'ALLOW_COURSE_STAFF_GRADE_DOWNLOADS': False,
 
     'ENABLED_PAYMENT_REPORTS': ["refund_report", "itemized_purchase_report", "university_revenue_share", "certificate_status"],
+
+    # Turn off account locking if failed login attempts exceeds a limit
+    'ENABLE_MAX_FAILED_LOGIN_ATTEMPTS': False,
 }
 
 # Used for A/B testing
@@ -277,7 +284,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.request',
     'django.core.context_processors.static',
     'django.contrib.messages.context_processors.messages',
-    #'django.core.context_processors.i18n',
+    'django.core.context_processors.i18n',
     'django.contrib.auth.context_processors.auth',  # this is required for admin
     'django.core.context_processors.csrf',
 
@@ -492,14 +499,60 @@ FAVICON_PATH = 'images/favicon.ico'
 # Locale/Internationalization
 TIME_ZONE = 'America/New_York'  # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
-LANGUAGES = ()
 
-# We want i18n to be turned off in production, at least until we have full localizations.
-# Thus we want the Django translation engine to be disabled. Otherwise even without
-# localization files, if the user's browser is set to a language other than us-en,
-# strings like "login" and "password" will be translated and the rest of the page will be
-# in English, which is confusing.
-USE_I18N = False
+# Sourced from http://www.localeplanet.com/icu/ and wikipedia
+LANGUAGES = (
+    ('eo', u'Dummy Language (Esperanto)'),  # Dummy languaged used for testing
+
+    ('ach', u'Acholi'),  # Acoli
+    ('ar', u'العربية'),  # Arabic
+    ('bg-bg', u'български (България)'),  # Bulgarian (Bulgaria)
+    ('bn', u'বাংলা'),  # Bengali
+    ('bn-bd', u'বাংলা (বাংলাদেশ)'),  # Bengali (Bangladesh)
+    ('cs', u'Čeština'),  # Czech
+    ('cy', u'Cymraeg'),  # Welsh
+    ('de-de', u'Deutsch (Deutschland)'),  # German (Germany)
+    ('en@lolcat', u'LOLCAT English'),  # LOLCAT English
+    ('en@pirate', u'Pirate English'),  # Pirate English
+    ('es-419', u'Español (Latinoamérica)'),  # Spanish (Latin America)
+    ('es-ec', u'Español (Ecuador)'),  # Spanish (Ecuador)
+    ('es-es', u'Español (España)'),  # Spanish (Spain)
+    ('es-mx', u'Español (México)'),  # Spanish (Mexico)
+    ('es-us', u'Español (Estados Unidos)'),  # Spanish (United States)
+    ('et-ee', u'Eesti (Eesti)'),  # Estonian (Estonia)
+    ('fa', u'فارسی'),  # Persian
+    ('fa-ir', u'فارسی (ایران)'),  # Persian (Iran)
+    ('fi-fi', u'Suomi (Suomi)'),  # Finnish (Finland)
+    ('fr', u'Français'),  # French
+    ('gl', u'Galego'),  # Galician
+    ('he', u'עברית'),  # Hebrew
+    ('hi', u'हिन्दी'),  # Hindi
+    ('hy-am', u'Հայերէն (Հայաստանի Հանրապետութիւն)'),  # Armenian (Armenia)
+    ('id', u'Bahasa Indonesia'),  # Indonesian
+    ('it-it', u'Italiano (Italia)'),  # Italian (Italy)
+    ('ja-jp', u'日本語(日本)'),  # Japanese (Japan)
+    ('km-kh', u'ភាសាខ្មែរ (កម្ពុជា)'),  # Khmer (Cambodia)
+    ('ko-kr', u'한국어(대한민국)'),  # Korean (Korea)
+    ('lt-lt', u'Lietuvių (Lietuva)'),  # Lithuanian (Lithuania)
+    ('ml', u'മലയാളം'),  # Malayalam
+    ('nb', u'Norsk bokmål'),  # Norwegian Bokmål
+    ('nl-nl', u'Nederlands (Nederland)'),  # Dutch (Netherlands)
+    ('pl', u'Polski'),  # Polish
+    ('pt-br', u'Português (Brasil)'),  # Portuguese (Brazil)
+    ('pt-pt', u'Português (Portugal)'),  # Portuguese (Portugal)
+    ('ru', u'Русский'),  # Russian
+    ('si', u'සිංහල'),  # Sinhala
+    ('sk', u'Slovenčina'),  # Slovak
+    ('sl', u'Slovenščina'),  # Slovenian
+    ('th', u'ไทย'),  # Thai
+    ('tr-tr', u'Türkçe (Türkiye)'),  # Turkish (Turkey)
+    ('uk', u'Українська'),  # Uknranian
+    ('vi', u'Tiếng Việt'),  # Vietnamese
+    ('zh-cn', u'大陆简体'),  # Chinese (China)
+    ('zh-tw', u'台灣正體'),  # Chinese (Taiwan)
+)
+
+USE_I18N = True
 USE_L10N = True
 
 # Localization strings (e.g. django.po) are under this directory
@@ -635,10 +688,12 @@ MIDDLEWARE_CLASSES = (
 
     'django.contrib.messages.middleware.MessageMiddleware',
     'track.middleware.TrackMiddleware',
-    'edxmako.middleware.MakoMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
 
     'course_wiki.course_nav.Middleware',
+
+    # Allows us to dark-launch particular languages
+    'dark_lang.middleware.DarkLangMiddleware',
 
     # Detects user-requested locale from 'accept-language' header in http request
     'django.middleware.locale.LocaleMiddleware',
@@ -651,6 +706,8 @@ MIDDLEWARE_CLASSES = (
 
     # catches any uncaught RateLimitExceptions and returns a 403 instead of a 500
     'ratelimitbackend.middleware.RateLimitMiddleware',
+    # needs to run after locale middleware (or anything that modifies the request context)
+    'edxmako.middleware.MakoMiddleware',
 
     # For A/B testing
     'waffle.middleware.WaffleMiddleware',
@@ -976,6 +1033,9 @@ INSTALLED_APPS = (
     'djcelery',
     'south',
 
+    # Database-backed configuration
+    'config_models',
+
     # Monitor the status of services
     'service_status',
 
@@ -1054,6 +1114,15 @@ INSTALLED_APPS = (
 
     # Student Identity Verification
     'verify_student',
+
+    # Dark-launching languages
+    'dark_lang',
+
+    # Microsite configuration
+    'microsite_configuration',
+
+    # Student Identity Reverification
+    'reverification',
 )
 
 ######################### MARKETING SITE ###############################
@@ -1152,14 +1221,21 @@ if FEATURES.get('AUTH_USE_CAS'):
 
 ###################### Registration ##################################
 
-# Remove some of the fields from the list to not display them
-REGISTRATION_OPTIONAL_FIELDS = set([
-    'level_of_education',
-    'gender',
-    'year_of_birth',
-    'mailing_address',
-    'goals',
-])
+# For each of the fields, give one of the following values:
+# - 'required': to display the field, and make it mandatory
+# - 'optional': to display the field, and make it non-mandatory
+# - 'hidden': to not display the field
+
+REGISTRATION_EXTRA_FIELDS = {
+    'level_of_education': 'optional',
+    'gender': 'optional',
+    'year_of_birth': 'optional',
+    'mailing_address': 'optional',
+    'goals': 'optional',
+    'honor_code': 'required',
+    'city': 'hidden',
+    'country': 'hidden',
+}
 
 ###################### Grade Downloads ######################
 GRADES_DOWNLOAD_ROUTING_KEY = HIGH_MEM_QUEUE
@@ -1169,6 +1245,14 @@ GRADES_DOWNLOAD = {
     'BUCKET': 'edx-grades',
     'ROOT_PATH': '/tmp/edx-s3/grades',
 }
+
+#### PASSWORD POLICY SETTINGS #####
+
+PASSWORD_MIN_LENGTH = None
+PASSWORD_MAX_LENGTH = None
+PASSWORD_COMPLEXITY = {}
+PASSWORD_DICTIONARY_EDIT_DISTANCE_THRESHOLD = None
+PASSWORD_DICTIONARY = []
 
 ##################### LinkedIn #####################
 INSTALLED_APPS += ('django_openid_auth',)
@@ -1180,3 +1264,7 @@ LINKEDIN_API = {
     'EMAIL_WHITELIST': [],
     'COMPANY_ID': '2746406',
 }
+
+##### ACCOUNT LOCKOUT DEFAULT PARAMETERS #####
+MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED = 5
+MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS = 15 * 60

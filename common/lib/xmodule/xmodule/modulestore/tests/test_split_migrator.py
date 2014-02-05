@@ -271,7 +271,8 @@ class TestMigration(unittest.TestCase):
                 self.compare_dags(presplit, pre_child, split_child, published)
 
     def test_migrator(self):
-        self.migrator.migrate_mongo_course(self.course_location, random.getrandbits(32))
+        user = mock.Mock(id=1)
+        self.migrator.migrate_mongo_course(self.course_location, user)
         # now compare the migrated to the original course
         self.compare_courses(self.old_mongo, True)
         self.compare_courses(self.draft_mongo, False)

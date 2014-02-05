@@ -13,6 +13,6 @@ Scenario: I can navigate to all high - level tabs in a course
         | TabName       | PageTitle             |
         | Courseware    | 6.002x Courseware     |
         | Course Info   | 6.002x Course Info    |
-        | Custom Tab    | 6.002x Custom Tab     |
-        | Wiki          | edX Wiki              |
+        | Custom Tab    | Custom Tab | 6.002x   |
+        | Wiki          | Wiki | edX            |
         | Progress      | 6.002x Progress       |

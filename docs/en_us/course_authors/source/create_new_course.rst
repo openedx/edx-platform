@@ -319,6 +319,8 @@ For example, the following navigation bar includes a
 
 You can use static pages for a syllabus, grading policy, course handouts, or any other purpose.
 
+You can also add an instant hangout to a static page.  See :ref:`Using an Instant Hangout in Your Course` for more information.
+
 .. note:: The Course Info, Discussion, Wiki, and Progress pages are displayed to students by default. You cannot delete these pages.   
 
 To create a static page:

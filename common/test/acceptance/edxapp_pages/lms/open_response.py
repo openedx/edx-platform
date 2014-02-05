@@ -11,13 +11,7 @@ class OpenResponsePage(PageObject):
     Open-ended response in the courseware.
     """
 
-    name = "lms.open_response"
-
-    def url(self):
-        """
-        Open-response isn't associated with a particular URL.
-        """
-        raise NotImplementedError
+    url = None
 
     def is_browser_on_page(self):
         return self.is_css_present('section.xmodule_CombinedOpenEndedModule')
@@ -115,6 +109,19 @@ class OpenResponsePage(PageObject):
                 return None
 
         return map(map_feedback, labels)
+
+    @property
+    def written_feedback(self):
+        """
+        Return the written feedback from the grader (if any).
+        If no feedback available, returns None.
+        """
+        feedback = self.css_text('div.written-feedback')
+
+        if len(feedback) > 0:
+            return feedback[0]
+        else:
+            return None
 
     @property
     def alert_message(self):
@@ -224,14 +231,11 @@ class OpenResponsePage(PageObject):
         if assessment_type == 'self':
             return EmptyPromise(lambda: self.has_rubric, "Rubric has appeared")
 
-        elif assessment_type == 'ai':
+        elif assessment_type == 'ai' or assessment_type == "peer":
             return EmptyPromise(
                 lambda: self.grader_status != 'Unanswered',
                 "Problem status is no longer 'unanswered'"
             )
-
-        elif assessment_type == 'peer':
-            return EmptyPromise(lambda: False, "Peer assessment not yet implemented")
 
         else:
             self.warning("Unrecognized assessment type '{0}'".format(assessment_type))

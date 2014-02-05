@@ -294,7 +294,7 @@ This video has been encoded at 4 different speeds: `0.75x`, `1x`, `1.25x`, and `
 
 More on `url_name`
 ==================
-Every content element (within a course) should have a unique id.  This id is formed as `{category}/{url_name}`, or automatically generated from the content if `url_name` is not specified.  Categories are the different tag types ('chapter', 'problem', 'html', 'sequential', etc).  Url_name is a string containing a-z, A-Z, dot (.), underscore (_), and ':'.  This is what appears in urls that point to this object.
+Every content element (within a course) should have a unique id.  This id is formed as `{category}/{url_name}`, or automatically generated from the content if `url_name` is not specified.  Categories are the different tag types ('chapter', 'problem', 'html', 'sequential', etc).  Url_name is a string containing a-z, A-Z, 0-9, dot (.), underscore (_), and ':'.  This is what appears in urls that point to this object.
 
 Colon (':') is special--when looking for the content definition in an xml, ':' will be replaced with '/'.  This allows organizing content into folders.  For example, given the pointer tag
 
@@ -567,7 +567,77 @@ If you want to customize the courseware tabs displayed for your course, specify 
 *********
 Textbooks
 *********
-Support is currently provided for HTML-based and PDF-based textbooks. In addition to enabling the display of textbooks in tabs (see above), specific information about the location of textbook content must be configured.  
+Support is currently provided for image-based, HTML-based and PDF-based textbooks. In addition to enabling the display of textbooks in tabs (see above), specific information about the location of textbook content must be configured.  
+
+Image-based Textbooks
+=====================
+
+Configuration
+-------------
+
+Image-based textbooks are configured at the course level in the XML markup.  Here is an example:  
+
+.. code-block:: xml
+
+  <course>
+    <textbook title="Textbook 1" book_url="https://www.example.com/textbook_1/" />
+    <textbook title="Textbook 2" book_url="https://www.example.com/textbook_2/" />
+    <chapter url_name="Overview">
+    <chapter url_name="First week">
+  </course>
+
+
+Each `textbook` element is displayed on a different tab.  The `title` attribute is used as the tab's name, and the `book_url` attribute points to the remote directory that contains the images of the text.  Note the trailing slash on the end of the `book_url` attribute.
+
+The images must be stored in the same directory as the `book_url`, with filenames matching `pXXX.png`, where `XXX` is a three-digit number representing the page number (with leading zeroes as necessary).  Pages start at `p001.png`.
+
+Each textbook must also have its own table of contents.  This is read from the `book_url` location, by appending `toc.xml`.  This file contains a `table_of_contents` parent element, with `entry` elements nested below it.  Each `entry`  has attributes for `name`, `page_label`, and `page`, as well as an optional `chapter` attribute.  An arbitrary number of levels of nesting of `entry` elements within other `entry` elements is supported, but you're likely to only want two levels.  The `page` represents the actual page to link to, while the `page_label` matches the displayed page number on that page.  Here's an example:
+
+.. code-block:: xml
+
+  <table_of_contents>
+    <entry page="1" page_label="i" name="Title" />
+    <entry page="2" page_label="ii" name="Preamble">
+      <entry page="2" page_label="ii" name="Copyright"/>
+      <entry page="3" page_label="iii" name="Brief Contents"/>
+      <entry page="5" page_label="v" name="Contents"/>
+      <entry page="9" page_label="1" name="About the Authors"/>
+      <entry page="10" page_label="2" name="Acknowledgments"/>
+      <entry page="11" page_label="3" name="Dedication"/>
+      <entry page="12" page_label="4" name="Preface"/>
+    </entry>
+    <entry page="15" page_label="7" name="Introduction to edX" chapter="1">
+      <entry page="15" page_label="7" name="edX in the Modern World"/>
+      <entry page="18" page_label="10" name="The edX Method"/>
+      <entry page="18" page_label="10" name="A Description of edX"/>
+      <entry page="29" page_label="21" name="A Brief History of edX"/>
+      <entry page="51" page_label="43" name="Introduction to edX"/>
+      <entry page="56" page_label="48" name="Endnotes"/>
+    </entry>
+    <entry page="73" page_label="65" name="Art and Photo Credits" chapter="30">
+      <entry page="73" page_label="65" name="Molecular Models"/>
+      <entry page="73" page_label="65" name="Photo Credits"/>
+    </entry>
+    <entry page="77" page_label="69" name="Index" />
+  </table_of_contents>
+
+
+Linking from Content
+--------------------
+
+It is possible to add links to specific pages in a textbook by using a URL that encodes the index of the textbook and the page number.  The URL is of the form `/course/book/${bookindex}/$page}`.  If the page is omitted from the URL, the first page is assumed.
+
+You can use a `customtag` to create a template for such links.  For example, you can create a `book` template in the `customtag` directory, containing:
+
+.. code-block:: xml
+
+  <img src="/static/images/icons/textbook_icon.png"/> More information given in <a href="/course/book/${book}/${page}">the text</a>. 
+
+The course content can then link to page 25 using the `customtag` element:
+
+.. code-block:: xml
+
+  <customtag book="0" page="25" impl="book"/>
 
 
 HTML-based Textbooks

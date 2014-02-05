@@ -137,6 +137,7 @@ Step 4. Create a Video Component
 #. When the new video component appears, click **Edit**. The video editor opens to the **Basic** tab.
 
    .. image:: Images/VideoComponentEditor.gif
+    :alt: Image of the video component editor
 
    You'll replace the default values with your own. 
    
@@ -168,6 +169,8 @@ Step 4. Create a Video Component
 
 #. Click **Save.**
   
+.. _Video Advanced Options:
+
 Advanced Options
 ----------------
 

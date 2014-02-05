@@ -19,6 +19,9 @@ GENERAL_PAIRS = [
 
 @ddt.ddt
 class TestLocations(TestCase):
+    """
+    Tests of :class:`.Location`
+    """
     @ddt.data(
         "tag://org/course/category/name",
         "tag://org/course/category/name@revision"
@@ -173,6 +176,8 @@ class TestLocations(TestCase):
             loc.course_id  # pylint: disable=pointless-statement
 
     def test_replacement(self):
+        # pylint: disable=protected-access
+
         self.assertEquals(
             Location('t://o/c/c/n@r')._replace(name='new_name'),
             Location('t://o/c/c/new_name@r'),

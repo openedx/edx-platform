@@ -4,9 +4,14 @@
 <div class="group-visibility-label">{{group_string}}</div>
 
     <div class="thread-content-wrapper"></div>
-
+    <div class="add-response post-extended-content">
+        <button class="button add-response-btn">
+            <i class="icon icon-reply"></i>
+            <span class="add-response-btn-text">${_('Add A Response')}</span>
+        </button>
+    </div>
     <ol class="responses post-extended-content">
-        <li class="loading"><div class="loading-animation"><span class="sr">${_("Loading content")})</span></div></li>
+        <li class="loading"><div class="loading-animation"><span class="sr">${_("Loading content")}</span></div></li>
     </ol>
     <form class="local discussion-reply-new post-extended-content"  data-id="{{id}}">
         <h4>${_("Post a response:")}</h4>

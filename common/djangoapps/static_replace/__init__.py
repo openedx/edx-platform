@@ -19,7 +19,7 @@ def _url_replace_regex(prefix):
     To anyone contemplating making this more complicated:
     http://xkcd.com/1171/
     """
-    return r"""
+    return ur"""
         (?x)                      # flags=re.VERBOSE
         (?P<quote>\\?['"])        # the opening quotes
         (?P<prefix>{prefix})      # the prefix
@@ -152,7 +152,7 @@ def replace_static_urls(text, data_directory, course_id=None, static_asset_path=
         return "".join([quote, url, quote])
 
     return re.sub(
-        _url_replace_regex('(?:{static_url}|/static/)(?!{data_dir})'.format(
+        _url_replace_regex(u'(?:{static_url}|/static/)(?!{data_dir})'.format(
             static_url=settings.STATIC_URL,
             data_dir=static_asset_path or data_directory
         )),

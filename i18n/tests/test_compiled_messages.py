@@ -13,7 +13,6 @@ from unittest import TestCase
 
 from i18n.config import CONFIGURATION, LOCALE_DIR
 
-
 @ddt.ddt
 class TestCompiledMessages(TestCase):
     """
@@ -22,7 +21,7 @@ class TestCompiledMessages(TestCase):
 
     PO_FILES = ['django.po', 'djangojs.po']
 
-    @ddt.data(*CONFIGURATION.locales)
+    @ddt.data(*CONFIGURATION.translated_locales)
     def test_translated_messages(self, locale):
         message_dir = LOCALE_DIR / locale / 'LC_MESSAGES'
         for pofile_name in self.PO_FILES:

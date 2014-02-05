@@ -12,14 +12,7 @@ class CourseNavPage(PageObject):
     Navigate sections and sequences in the courseware.
     """
 
-    name = "lms.course_nav"
-
-    def url(self, **kwargs):
-        """
-        Since course navigation appears on multiple pages,
-        it doesn't have a particular URL.
-        """
-        raise NotImplementedError
+    url = None
 
     def is_browser_on_page(self):
         return self.is_css_present('section.course-index')

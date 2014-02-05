@@ -17,6 +17,7 @@
         <a class="seq_${item['type']} inactive progress-${item['progress_status']}"
            data-id="${item['id']}"
            data-element="${idx+1}"
+           data-title="${item['title']}"
            href="javascript:void(0);">
             <p aria-hidden="false">${item['title']}<span class="sr">, ${item['type']}</span></p>
           </a>

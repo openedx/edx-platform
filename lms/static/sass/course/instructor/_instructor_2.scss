@@ -526,30 +526,15 @@ section.instructor-dashboard-content-2 {
     font-size: $body-font-size * 4/5;
   }
 
-  .info-badge {
-    // float: right;
-    position: absolute;
-    top: $baseline / 2;
-    right: $baseline / 2;
-    width: 17px;
-    height: 17px;
-    background: url('../images/info-icon-dark.png') left center no-repeat;
-    opacity: 0.35;
-    &:hover, &:focus  { opacity: 0.45; }
-    &:active { opacity: 0.5; }
-  }
-
   .info {
-    display: none;
-
     @include box-sizing(border-box);
     max-height: $content-height;
     padding: $baseline;
 
     border: 1px solid $light-gray;
-    border-top: none;
     color: $lighter-base-font-color;
     line-height: 1.3em;
+    font-size: .85em;
   }
 
   .member-list {

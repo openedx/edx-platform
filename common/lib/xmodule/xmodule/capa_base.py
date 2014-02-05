@@ -328,6 +328,10 @@ class CapaMixin(CapaFields):
 
         if total > 0:
             if self.weight is not None:
+                # Progress objects expect total > 0
+                if self.weight == 0:
+                    return None
+
                 # scale score and total by weight/total:
                 score = score * self.weight / total
                 total = self.weight
@@ -838,11 +842,14 @@ class CapaMixin(CapaFields):
         Publishes the student's current grade to the system as an event
         """
         score = self.lcp.get_score()
-        self.runtime.publish({
-            'event_name': 'grade',
-            'value': score['score'],
-            'max_value': score['total'],
-        })
+        self.runtime.publish(
+            self,
+            {
+                'event_name': 'grade',
+                'value': score['score'],
+                'max_value': score['total'],
+            }
+        )
 
         return {'grade': score['score'], 'max_grade': score['total']}
 

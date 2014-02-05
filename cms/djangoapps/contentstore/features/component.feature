@@ -112,3 +112,19 @@ Feature: CMS.Component Adding
         Then I see a Problem component with display name "Blank Common Problem" in position "0"
         And I see a Problem component with display name "Duplicate of 'Blank Common Problem'" in position "1"
         And I see a Problem component with display name "Multiple Choice" in position "2"
+
+    Scenario: I can set the display name of a component
+        Given I am in Studio editing a new unit
+        When I add a "Text" "HTML" component
+        Then I see the display name is "Text"
+        When I change the display name to "I'm the Cuddliest!"
+        Then I see the display name is "I'm the Cuddliest!"
+
+    Scenario: If a component has no display name, the category is displayed
+        Given I am in Studio editing a new unit
+        When I add a "Blank Advanced Problem" "Advanced Problem" component
+        Then I see the display name is "Blank Advanced Problem"
+        When I change the display name to ""
+        Then I see the display name is "problem"
+        When I unset the display name
+        Then I see the display name is "Blank Advanced Problem"

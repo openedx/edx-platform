@@ -129,9 +129,9 @@ class ConditionalModuleBasicTest(unittest.TestCase):
         html = modules['cond_module'].render('student_view').content
         expected = modules['cond_module'].xmodule_runtime.render_template('conditional_ajax.html', {
             'ajax_url': modules['cond_module'].xmodule_runtime.ajax_url,
-            'element_id': 'i4x-edX-conditional_test-conditional-SampleConditional',
-            'id': 'i4x://edX/conditional_test/conditional/SampleConditional',
-            'depends': 'i4x-edX-conditional_test-problem-SampleProblem',
+            'element_id': u'i4x-edX-conditional_test-conditional-SampleConditional',
+            'id': u'i4x://edX/conditional_test/conditional/SampleConditional',
+            'depends': u'i4x-edX-conditional_test-problem-SampleProblem',
         })
         self.assertEquals(expected, html)
 
@@ -225,9 +225,9 @@ class ConditionalModuleXmlTest(unittest.TestCase):
             {
                 # Test ajax url is just usage-id / handler_name
                 'ajax_url': 'i4x://HarvardX/ER22x/conditional/condone/xmodule_handler',
-                'element_id': 'i4x-HarvardX-ER22x-conditional-condone',
-                'id': 'i4x://HarvardX/ER22x/conditional/condone',
-                'depends': 'i4x-HarvardX-ER22x-problem-choiceprob'
+                'element_id': u'i4x-HarvardX-ER22x-conditional-condone',
+                'id': u'i4x://HarvardX/ER22x/conditional/condone',
+                'depends': u'i4x-HarvardX-ER22x-problem-choiceprob'
             }
         )
         self.assertEqual(html, html_expect)

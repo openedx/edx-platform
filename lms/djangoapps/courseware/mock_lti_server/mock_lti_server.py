@@ -185,7 +185,7 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
         '''
         self._send_head(status_code)
         if getattr(self.server, 'grade_data', False):  # lti can be graded
-            url = "//{}:{}".format(self.server.server_host, self.server.server_port)
+            url = "//%s:%s" % self.server.server_address
             response_str = textwrap.dedent("""
                 <html>
                     <head>
@@ -196,13 +196,14 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
                             <h2>Graded IFrame loaded</h2>
                             <h3>Server response is:</h3>
                             <h3 class="result">{}</h3>
+                            <h5>Role: {role}</h5>
                         </div>
                         <form action="{url}/grade" method="post">
                             <input type="submit" name="submit-button" value="Submit">
                         </form>
                     </body>
                 </html>
-            """).format(message, url=url)
+            """).format(message, role=self.post_dict['roles'], url=url)
         else: # lti can't be graded
             response_str = textwrap.dedent("""
                 <html>
@@ -214,6 +215,7 @@ class MockLTIRequestHandler(BaseHTTPRequestHandler):
                             <h2>IFrame loaded</h2>
                             <h3>Server response is:</h3>
                             <h3 class="result">{}</h3>
+
                         </div>
                     </body>
                 </html>

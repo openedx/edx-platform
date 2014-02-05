@@ -26,6 +26,8 @@ from .session_kv_store import SessionKeyValueStore
 from .helpers import render_from_lms
 from ..utils import get_course_for_item
 
+from contentstore.views.access import get_user_role
+
 __all__ = ['preview_handler']
 
 log = logging.getLogger(__name__)
@@ -39,7 +41,7 @@ def handler_prefix(block, handler='', suffix=''):
     Trailing `/`s are removed from the returned url.
     """
     return reverse('preview_handler', kwargs={
-        'usage_id': quote_slashes(str(block.scope_ids.usage_id)),
+        'usage_id': quote_slashes(unicode(block.scope_ids.usage_id).encode('utf-8')),
         'handler': handler,
         'suffix': suffix,
     }).rstrip('/?')
@@ -132,6 +134,7 @@ def _preview_module_system(request, descriptor):
             ),
         ),
         error_descriptor_class=ErrorDescriptor,
+        get_user_role=lambda: get_user_role(request.user, descriptor.location, course_id),
     )
 
 

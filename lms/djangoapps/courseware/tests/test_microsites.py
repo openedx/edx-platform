@@ -72,7 +72,7 @@ class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertContains(resp, 'This is a Test Microsite Overlay')   # Overlay test message
         self.assertContains(resp, 'test_microsite/images/header-logo.png')  # logo swap
         self.assertContains(resp, 'test_microsite/css/test_microsite.css')  # css override
-        self.assertContains(resp, '<title>Test Microsite</title>')   # page title
+        self.assertContains(resp, 'Test Microsite')   # page title
 
         # assert that test course display name is visible
         self.assertContains(resp, 'Robot_Super_Course')
@@ -113,12 +113,6 @@ class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
         # assert that footer template has been properly overriden on homepage
         self.assertNotContains(resp, 'This is a Test Microsite footer')
-
-        # assert that the edX partners section is not in the HTML
-        self.assertContains(resp, '<section class="university-partners university-partners2x6">')
-
-        # assert that the edX partners tag line is not in the HTML
-        self.assertContains(resp, 'Explore free courses from')
 
 
     def test_microsite_course_enrollment(self):

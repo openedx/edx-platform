@@ -217,7 +217,7 @@ class Command(BaseCommand):
         """
         Send an email. Return True if it succeeded, False if it didn't.
         """
-        fromaddr = settings.DEFAULT_FROM_EMAIL
+        fromaddr = u'no-reply@notifier.edx.org'
         toaddr = u'{} <{}>'.format(user.profile.name, user.email)
         msg = EmailMessage(subject, body, fromaddr, (toaddr,))
         msg.content_subtype = "html"

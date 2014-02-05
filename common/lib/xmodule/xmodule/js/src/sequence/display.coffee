@@ -5,6 +5,7 @@ class @Sequence
     @num_contents = @contents.length
     @id = @el.data('id')
     @ajaxUrl = @el.data('ajax-url')
+    @base_page_title = " | " + document.title
     @initProgress()
     @bind()
     @render parseInt(@el.data('position'))
@@ -18,7 +19,10 @@ class @Sequence
   initProgress: ->
     @progressTable = {}  # "#problem_#{id}" -> progress
 
-
+  updatePageTitle: ->
+    # update the page title to include the current section
+    document.title = @link_for(@position).data('title') + @base_page_title
+    
   hookUpProgressEvent: ->
     $('.problems-wrapper').bind 'progressChanged', @updateProgress
 
@@ -100,6 +104,7 @@ class @Sequence
       @position = new_position
       @toggleArrows()
       @hookUpProgressEvent()
+      @updatePageTitle()
 
       sequence_links = @$('#seq_content a.seqnav')
       sequence_links.click @goto

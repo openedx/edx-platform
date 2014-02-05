@@ -62,7 +62,8 @@ Feature: LMS.Video component
     And I reload the page
     When I open video "A"
     Then video "A" should start playing at speed "2.0"
+    And I select the "1.0" speed on video "A"
     When I open video "B"
     Then video "B" should start playing at speed "0.50"
     When I open video "C"
-    Then video "C" should start playing at speed "0.50"
+    Then video "C" should start playing at speed "1.0"

@@ -107,7 +107,7 @@ def add_video_to_course(course, player_mode, display_name='Video'):
 
 @step('youtube server is up and response time is (.*) seconds$')
 def set_youtube_response_timeout(_step, time):
-    world.youtube.set_config('time_to_response', float(time))
+    world.youtube.config['time_to_response'] = float(time)
 
 
 @step('when I view the video it has rendered in (.*) mode$')

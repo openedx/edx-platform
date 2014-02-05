@@ -3,12 +3,15 @@ import os
 import string
 import random
 import re
-from unittest import TestCase
 
+from unittest import TestCase
+from mock import patch
 from polib import pofile
 from pytz import UTC
 
+from i18n import extract
 from i18n import generate
+from i18n import dummy
 from i18n.config import CONFIGURATION
 
 
@@ -16,7 +19,12 @@ class TestGenerate(TestCase):
     """
     Tests functionality of i18n/generate.py
     """
-    generated_files = ('django-partial.po', 'djangojs.po', 'mako.po')
+    generated_files = ('django-partial.po', 'djangojs-partial.po', 'mako.po')
+
+    @classmethod
+    def setUpClass(cls):
+        extract.main()
+        dummy.main()
 
     def setUp(self):
         # Subtract 1 second to help comparisons with file-modify time succeed,
@@ -32,6 +40,7 @@ class TestGenerate(TestCase):
         self.assertTrue(os.path.exists(filename))
         os.remove(filename)
 
+    @patch.object(CONFIGURATION, 'locales', ['eo'])
     def test_main(self):
         """
         Runs generate.main() which should merge source files,
@@ -41,7 +50,7 @@ class TestGenerate(TestCase):
         after start of test suite)
         """
         generate.main()
-        for locale in CONFIGURATION.locales:
+        for locale in CONFIGURATION.translated_locales:
             for filename in ('django', 'djangojs'):
                 mofile = filename+'.mo'
                 path = os.path.join(CONFIGURATION.get_messages_dir(locale), mofile)

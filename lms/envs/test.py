@@ -73,6 +73,7 @@ COMMON_TEST_DATA_ROOT = COMMON_ROOT / "test" / "data"
 # Where the content data is checked out.  This may not exist on jenkins.
 GITHUB_REPO_ROOT = ENV_ROOT / "data"
 
+USE_I18N = True
 
 XQUEUE_INTERFACE = {
     "url": "http://sandbox-xqueue.edx.org",

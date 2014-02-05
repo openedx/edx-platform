@@ -22,15 +22,17 @@ from ..edxapp_pages.studio.signup import SignupPage
 from ..edxapp_pages.studio.textbooks import TextbooksPage
 from ..fixtures.course import CourseFixture
 
+from .helpers import UniqueCourseTest
+
 
 class LoggedOutTest(WebAppTest):
     """
     Smoke test for pages in Studio that are visible when logged out.
     """
 
-    @property
-    def page_object_classes(self):
-        return [LoginPage, HowitworksPage, SignupPage]
+    def setUp(self):
+        super(LoggedOutTest, self).setUp()
+        self.pages = [LoginPage(self.browser), HowitworksPage(self.browser), SignupPage(self.browser)]
 
     def test_page_existence(self):
         """
@@ -38,8 +40,8 @@ class LoggedOutTest(WebAppTest):
         Rather than fire up the browser just to check each url,
         do them all sequentially in this testcase.
         """
-        for page in ['login', 'howitworks', 'signup']:
-            self.ui.visit('studio.{0}'.format(page))
+        for page in self.pages:
+            page.visit()
 
 
 class LoggedInPagesTest(WebAppTest):
@@ -47,57 +49,51 @@ class LoggedInPagesTest(WebAppTest):
     Tests that verify the pages in Studio that you can get to when logged
     in and do not have a course yet.
     """
-    @property
-    def page_object_classes(self):
-        return [AutoAuthPage, DashboardPage]
+
+    def setUp(self):
+        super(LoggedInPagesTest, self).setUp()
+        self.auth_page = AutoAuthPage(self.browser, staff=True)
+        self.dashboard_page = DashboardPage(self.browser)
 
     def test_dashboard_no_courses(self):
         """
         Make sure that you can get to the dashboard page without a course.
         """
-        self.ui.visit('studio.auto_auth', staff=True)
-        self.ui.visit('studio.dashboard')
+        self.auth_page.visit()
+        self.dashboard_page.visit()
 
 
-class CoursePagesTest(WebAppTest):
+class CoursePagesTest(UniqueCourseTest):
     """
     Tests that verify the pages in Studio that you can get to when logged
     in and have a course.
     """
 
+    COURSE_ID_SEPARATOR = "."
+
     def setUp(self):
         """
-        Create a unique identifier for the course used in this test.
+        Install a course with no content using a fixture.
         """
-        # Define a unique course identifier
-        self.course_info = {
-            'org': 'test_org',
-            'number': '101',
-            'run': 'test_' + self.unique_id,
-            'display_name': 'Test Course ' + self.unique_id
-        }
+        super(UniqueCourseTest, self).setUp()
 
-        # Ensure that the superclass sets up
-        super(CoursePagesTest, self).setUp()
-
-    @property
-    def page_object_classes(self):
-        return [
-            AutoAuthPage, AssetIndexPage, ChecklistsPage, ImportPage, CourseUpdatesPage,
-            StaticPagesPage, ExportPage, CourseTeamPage, CourseOutlinePage,
-            SettingsPage, AdvancedSettingsPage, GradingPage, TextbooksPage
-        ]
-
-    @property
-    def fixtures(self):
-        super_fixtures = super(CoursePagesTest, self).fixtures
-        course_fix = CourseFixture(
+        CourseFixture(
             self.course_info['org'],
             self.course_info['number'],
             self.course_info['run'],
             self.course_info['display_name']
-        )
-        return set(super_fixtures + [course_fix])
+        ).install()
+
+        self.auth_page = AutoAuthPage(self.browser, staff=True)
+
+        self.pages = [
+            clz(self.browser, self.course_info['org'], self.course_info['number'], self.course_info['run'])
+            for clz in [
+                AssetIndexPage, ChecklistsPage, ImportPage, CourseUpdatesPage,
+                StaticPagesPage, ExportPage, CourseTeamPage, CourseOutlinePage, SettingsPage,
+                AdvancedSettingsPage, GradingPage, TextbooksPage
+            ]
+        ]
 
     def test_page_existence(self):
         """
@@ -105,14 +101,9 @@ class CoursePagesTest(WebAppTest):
         Rather than fire up the browser just to check each url,
         do them all sequentially in this testcase.
         """
-        pages = [
-            'uploads', 'checklists', 'import', 'updates', 'tabs', 'export',
-            'team', 'outline', 'settings', 'advanced', 'grading', 'textbooks'
-        ]
-
         # Log in
-        self.ui.visit('studio.auto_auth', staff=True)
+        self.auth_page.visit()
 
-        course_id = '{org}.{number}.{run}'.format(**self.course_info)
-        for page in pages:
-            self.ui.visit('studio.{0}'.format(page), course_id=course_id)
+        # Verify that each page is available
+        for page in self.pages:
+            page.visit()

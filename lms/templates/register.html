@@ -14,7 +14,7 @@
 <%! from datetime import date %>
 <%! import calendar %>
 
-<%block name="title"><title>${_("Register for {platform_name}").format(platform_name=platform_name)}</title></%block>
+<%block name="pagetitle">${_("Register for {platform_name}").format(platform_name=platform_name)}</%block>
 
 <%block name="js_extra">
   <script type="text/javascript">
@@ -53,20 +53,17 @@
       });
 
       $('#register-form').on('ajax:success', function(event, json, xhr) {
-        if(json.success) {
-          if(json.redirect_url){
-            location.href=json.redirect_url;
-          }
-          else {
-            location.href="${reverse('dashboard')}";
-          }
-       } else {
-         toggleSubmitButton(true);
-         $('.status.message.submission-error').addClass('is-shown').focus();
-         $('.status.message.submission-error .message-copy').html(json.value).stop().css("display", "block");
-         $(".field-error").removeClass('field-error');
-         $("[data-field='"+json.field+"']").addClass('field-error')
-       }
+        var url = json.redirect_url || "${reverse('dashboard')}";
+        location.href = url;
+      });
+
+      $('#register-form').on('ajax:error', function(event, jqXHR, textStatus) {
+        toggleSubmitButton(true);
+        json = $.parseJSON(jqXHR.responseText);
+        $('.status.message.submission-error').addClass('is-shown').focus();
+        $('.status.message.submission-error .message-copy').html(json.value).stop().css("display", "block");
+        $(".field-error").removeClass('field-error');
+        $("[data-field='"+json.field+"']").addClass('field-error')
       });
     })(this);
 
@@ -184,14 +181,33 @@
       </div>
 
       <div class="group group-form group-form-secondary group-form-personalinformation">
-        <h2 class="sr">${_("Optional Personal Information")}</h2>
+        <h2 class="sr">${_("Extra Personal Information")}</h2>
 
         <ol class="list-input">
-          % if 'level_of_education' in settings.REGISTRATION_OPTIONAL_FIELDS:
+          % if settings.REGISTRATION_EXTRA_FIELDS['city'] != 'hidden':
+          <li class="field ${settings.REGISTRATION_EXTRA_FIELDS['city']} text" id="field-city">
+            <label for="city">${_('City')}</label>
+            <input id="city" type="text" name="city" value="" placeholder="${_('example: New York')}" aria-describedby="city-tip" ${'required aria-required="true"' if settings.REGISTRATION_EXTRA_FIELDS['city'] == 'required' else ''} />
+          </li>
+          % endif
+          % if settings.REGISTRATION_EXTRA_FIELDS['country'] != 'hidden':
           <li class="field-group">
-            <div class="field select" id="field-education-level">
+          <div class="field ${settings.REGISTRATION_EXTRA_FIELDS['country']} select" id="field-country">
+              <label for="country">${_("Country")}</label>
+              <select id="country" name="country" ${'required aria-required="true"' if settings.REGISTRATION_EXTRA_FIELDS['country'] == 'required' else ''}>
+                <option value="">--</option>
+                %for code, country_name in COUNTRIES:
+                <option value="${code}">${ unicode(country_name) }</option>
+                %endfor
+              </select>
+            </div>
+          </li>
+          % endif
+          % if settings.REGISTRATION_EXTRA_FIELDS['level_of_education'] != 'hidden':
+          <li class="field-group">
+          <div class="field ${settings.REGISTRATION_EXTRA_FIELDS['level_of_education']} select" id="field-education-level">
               <label for="education-level">${_("Highest Level of Education Completed")}</label>
-              <select id="education-level" name="level_of_education">
+              <select id="education-level" name="level_of_education" ${'required aria-required="true"' if settings.REGISTRATION_EXTRA_FIELDS['level_of_education'] == 'required' else ''}>
                 <option value="">--</option>
                 %for code, ed_level in UserProfile.LEVEL_OF_EDUCATION_CHOICES:
                 <option value="${code}">${ed_level}</option>
@@ -200,11 +216,11 @@
             </div>
           </li>
           % endif
-          % if 'gender' in settings.REGISTRATION_OPTIONAL_FIELDS:
+          % if settings.REGISTRATION_EXTRA_FIELDS['gender'] != 'hidden':
           <li class="field-group">
-            <div class="field select" id="field-gender">
+            <div class="field ${settings.REGISTRATION_EXTRA_FIELDS['gender']} select" id="field-gender">
               <label for="gender">${_("Gender")}</label>
-              <select id="gender" name="gender">
+              <select id="gender" name="gender" ${'required aria-required="true"' if settings.REGISTRATION_EXTRA_FIELDS['gender'] == 'required' else ''}>
                 <option value="">--</option>
                 %for code, gender in UserProfile.GENDER_CHOICES:
                 <option value="${code}">${gender}</option>
@@ -213,11 +229,11 @@
             </div>
           </li>
           % endif
-          % if 'year_of_birth' in settings.REGISTRATION_OPTIONAL_FIELDS:
+          % if settings.REGISTRATION_EXTRA_FIELDS['year_of_birth'] != 'hidden':
           <li class="field-group">
-            <div class="field select" id="field-yob">
+            <div class="field ${settings.REGISTRATION_EXTRA_FIELDS['year_of_birth']} select" id="field-yob">
               <label for="yob">${_("Year of Birth")}</label>
-              <select id="yob" name="year_of_birth">
+              <select id="yob" name="year_of_birth" ${'required aria-required="true"' if settings.REGISTRATION_EXTRA_FIELDS['year_of_birth'] == 'required' else ''}>
                 <option value="">--</option>
                 %for year in UserProfile.VALID_YEARS:
                 <option value="${year}">${year}</option>
@@ -230,20 +246,20 @@
       </div>
 
       <div class="group group-form group-form-personalinformation2">
-        <h2 class="sr">${_("Optional Personal Information")}</h2>
+        <h2 class="sr">${_("Extra Personal Information")}</h2>
 
         <ol class="list-input">
-          % if 'mailing_address' in settings.REGISTRATION_OPTIONAL_FIELDS:
-          <li class="field text" id="field-address-mailing">
+          % if settings.REGISTRATION_EXTRA_FIELDS['mailing_address'] != 'hidden':
+          <li class="field ${settings.REGISTRATION_EXTRA_FIELDS['mailing_address']} text" id="field-address-mailing">
             <label for="address-mailing">${_("Mailing Address")}</label>
-            <textarea id="address-mailing" name="mailing_address" value=""></textarea>
+            <textarea id="address-mailing" name="mailing_address" value="" ${'required aria-required="true"' if settings.REGISTRATION_EXTRA_FIELDS['mailing_address'] == 'required' else ''}></textarea>
           </li>
           % endif
 
-          % if 'goals' in settings.REGISTRATION_OPTIONAL_FIELDS:
-          <li class="field text" id="field-goals">
+          % if settings.REGISTRATION_EXTRA_FIELDS['goals'] != 'hidden':
+          <li class="field ${settings.REGISTRATION_EXTRA_FIELDS['goals']} text" id="field-goals">
             <label for="goals">${_("Please share with us your reasons for registering with {platform_name}").format(platform_name=platform_name)}</label>
-            <textarea id="goals" name="goals" value=""></textarea>
+            <textarea id="goals" name="goals" value="" ${'required aria-required="true"' if settings.REGISTRATION_EXTRA_FIELDS['goals'] == 'required' else ''}></textarea>
           </li>
           % endif
         </ol>
@@ -256,17 +272,16 @@
           <li class="field-group">
 
             % if has_extauth_info is UNDEFINED or ask_for_tos :
-
             <div class="field required checkbox" id="field-tos">
               <input id="tos-yes" type="checkbox" name="terms_of_service" value="true" required aria-required="true" />
               <label for="tos-yes">${_('I agree to the {link_start}Terms of Service{link_end}').format(
                 link_start='<a href="{url}" class="new-vp">'.format(url=marketing_link('TOS')),
                 link_end='</a>')}</label>
             </div>
-
             % endif
 
-            <div class="field required checkbox" id="field-honorcode">
+            % if settings.REGISTRATION_EXTRA_FIELDS['honor_code'] != 'hidden':
+            <div class="field ${settings.REGISTRATION_EXTRA_FIELDS['honor_code']} checkbox" id="field-honorcode">
               <input id="honorcode-yes" type="checkbox" name="honor_code" value="true" />
               <%
                 ## TODO: provide a better way to override these links
@@ -279,6 +294,7 @@
                 link_start='<a href="{url}" class="new-vp">'.format(url=honor_code_path),
                 link_end='</a>')}</label>
             </div>
+            % endif
           </li>
         </ol>
       </div>

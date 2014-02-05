@@ -14,9 +14,7 @@ class AutoAuthPage(PageObject):
     this url will create a user and log them in.
     """
 
-    name = "studio.auto_auth"
-
-    def url(self, username=None, email=None, password=None, staff=None, course_id=None):  #pylint: disable=W0221
+    def __init__(self, browser, username=None, email=None, password=None, staff=None, course_id=None):
         """
         Auto-auth is an end-point for HTTP GET requests.
         By default, it will create accounts with random user credentials,
@@ -29,31 +27,34 @@ class AutoAuthPage(PageObject):
 
         Note that "global staff" is NOT the same as course staff.
         """
-
-        # The base URL, used for creating a random user
-        url = BASE_URL + "/auto_auth"
+        super(AutoAuthPage, self).__init__(browser)
 
         # Create query string parameters if provided
-        params = {}
+        self._params = {}
 
         if username is not None:
-            params['username'] = username
+            self._params['username'] = username
 
         if email is not None:
-            params['email'] = email
+            self._params['email'] = email
 
         if password is not None:
-            params['password'] = password
+            self._params['password'] = password
 
         if staff is not None:
-            params['staff'] = "true" if staff else "false"
+            self._params['staff'] = "true" if staff else "false"
 
         if course_id is not None:
-            params['course_id'] = course_id
+            self._params['course_id'] = course_id
 
-        query_str = urllib.urlencode(params)
+    @property
+    def url(self):
+        """
+        Construct the URL.
+        """
+        url = BASE_URL + "/auto_auth"
+        query_str = urllib.urlencode(self._params)
 
-        # Append the query string to the base URL
         if query_str:
             url += "?" + query_str
 

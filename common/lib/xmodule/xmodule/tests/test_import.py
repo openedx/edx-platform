@@ -78,6 +78,7 @@ class BaseCourseTestCase(unittest.TestCase):
 
 
 class GenericXBlock(XBlock):
+    """XBlock for testing pure xblock xml import"""
     has_children = True
     field1 = String(default="something", scope=Scope.user_state)
     field2 = Integer(scope=Scope.user_state)
@@ -85,6 +86,9 @@ class GenericXBlock(XBlock):
 
 @ddt.ddt
 class PureXBlockImportTest(BaseCourseTestCase):
+    """
+    Tests of import pure XBlocks (not XModules) from xml
+    """
 
     def assert_xblocks_are_good(self, block):
         """Assert a number of conditions that must be true for `block` to be good."""

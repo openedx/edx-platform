@@ -173,7 +173,7 @@ def instructor_dashboard(request, course_id):
 
         # complete the url using information about the current course:
         (org, course_name, _) = course_id.split("/")
-        return "i4x://" + org + "/" + course_name + "/" + urlname
+        return u"i4x://{org}/{name}/{url}".format(org=org, name=course_name, url=urlname)
 
     def get_student_from_identifier(unique_student_identifier):
         """Gets a student object using either an email address or username"""
@@ -782,7 +782,7 @@ def instructor_dashboard(request, course_id):
         logs and swallows errors.
         """
         url = settings.ANALYTICS_SERVER_URL + \
-            "get?aname={}&course_id={}&apikey={}".format(analytics_name,
+            u"get?aname={}&course_id={}&apikey={}".format(analytics_name,
                                                          course_id,
                                                          settings.ANALYTICS_API_KEY)
         try:

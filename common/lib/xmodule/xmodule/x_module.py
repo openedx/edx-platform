@@ -223,7 +223,7 @@ class XModuleMixin(XBlockMixin):
                 try:
                     child = self.runtime.get_block(child_loc)
                 except ItemNotFoundError:
-                    log.exception('Unable to load item {loc}, skipping'.format(loc=child_loc))
+                    log.exception(u'Unable to load item {loc}, skipping'.format(loc=child_loc))
                     continue
                 self._child_instances.append(child)
 
@@ -538,7 +538,6 @@ class ResourceTemplates(object):
                     template = yaml.safe_load(template_content)
                     template['template_id'] = template_file
                     templates.append(template)
-
         return templates
 
     @classmethod
@@ -546,7 +545,7 @@ class ResourceTemplates(object):
         if getattr(cls, 'template_dir_name', None):
             dirname = os.path.join('templates', cls.template_dir_name)
             if not resource_isdir(__name__, dirname):
-                log.warning("No resource directory {dir} found when loading {cls_name} templates".format(
+                log.warning(u"No resource directory {dir} found when loading {cls_name} templates".format(
                     dir=dirname,
                     cls_name=cls.__name__,
                 ))
@@ -988,11 +987,14 @@ class DescriptorSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable
             # global function that the application can override.
             return descriptor_global_handler_url(block, handler_name, suffix, query, thirdparty)
 
-    def resources_url(self, resource):
+    def resource_url(self, resource):
         raise NotImplementedError("edX Platform doesn't currently implement XBlock resource urls")
 
     def local_resource_url(self, block, uri):
         raise NotImplementedError("edX Platform doesn't currently implement XBlock resource urls")
+
+    def publish(self, block, event):
+        raise NotImplementedError("edX Platform doesn't currently implement XBlock publish")
 
 
 class XMLParsingSystem(DescriptorSystem):
@@ -1026,7 +1028,7 @@ class ModuleSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abs
             open_ended_grading_interface=None, s3_interface=None,
             cache=None, can_execute_unsafe_code=None, replace_course_urls=None,
             replace_jump_to_id_urls=None, error_descriptor_class=None, get_real_user=None,
-            field_data=None,
+            field_data=None, get_user_role=None,
             **kwargs):
         """
         Create a closure around the system environment.
@@ -1079,6 +1081,9 @@ class ModuleSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abs
         get_real_user - function that takes `anonymous_student_id` and returns real user_id,
         associated with `anonymous_student_id`.
 
+        get_user_role - A function that returns user role. Implementation is different
+            for LMS and Studio.
+
         field_data - the `FieldData` to use for backing XBlock storage.
         """
 
@@ -1101,10 +1106,8 @@ class ModuleSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abs
         self.course_id = course_id
         self.user_is_staff = user is not None and user.is_staff
 
-        if publish is None:
-            publish = lambda e: None
-
-        self.publish = publish
+        if publish:
+            self.publish = publish
 
         self.open_ended_grading_interface = open_ended_grading_interface
         self.s3_interface = s3_interface
@@ -1117,6 +1120,8 @@ class ModuleSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abs
         self.xmodule_instance = None
 
         self.get_real_user = get_real_user
+
+        self.get_user_role = get_user_role
 
     def get(self, attr):
         """	provide uniform access to attributes (like etree)."""
@@ -1143,11 +1148,14 @@ class ModuleSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abs
     def get_block(self, block_id):
         raise NotImplementedError("XModules must use get_module to load other modules")
 
-    def resources_url(self, resource):
+    def resource_url(self, resource):
         raise NotImplementedError("edX Platform doesn't currently implement XBlock resource urls")
 
     def local_resource_url(self, block, uri):
         raise NotImplementedError("edX Platform doesn't currently implement XBlock resource urls")
+
+    def publish(self, block, event):
+        pass
 
 
 class DoNothingCache(object):

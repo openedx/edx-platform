@@ -1350,6 +1350,18 @@ class CapaModuleTest(unittest.TestCase):
             mock_log.reset_mock()
 
     @patch('xmodule.capa_base.Progress')
+    def test_get_progress_no_error_if_weight_zero(self, mock_progress):
+        """
+        Check that if the weight is 0 get_progress does not try to create a Progress object.
+        """
+        mock_progress.return_value = True
+        module = CapaFactory.create()
+        module.weight = 0
+        progress = module.get_progress()
+        self.assertIsNone(progress)
+        self.assertFalse(mock_progress.called)
+
+    @patch('xmodule.capa_base.Progress')
     def test_get_progress_calculate_progress_fraction(self, mock_progress):
         """
         Check that score and total are calculated correctly for the progress fraction.

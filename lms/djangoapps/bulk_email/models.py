@@ -219,7 +219,7 @@ class CourseAuthorization(models.Model):
     Enable the course email feature on a course-by-course basis.
     """
     # The course that these features are attached to.
-    course_id = models.CharField(max_length=255, db_index=True)
+    course_id = models.CharField(max_length=255, db_index=True, unique=True)
 
     # Whether or not to enable instructor email
     email_enabled = models.BooleanField(default=False)

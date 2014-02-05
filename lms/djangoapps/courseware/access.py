@@ -343,7 +343,7 @@ def _dispatch(table, action, user, obj):
               action)
         return result
 
-    raise ValueError("Unknown action for object type '{0}': '{1}'".format(
+    raise ValueError(u"Unknown action for object type '{0}': '{1}'".format(
         type(obj), action))
 
 
@@ -466,3 +466,20 @@ def _has_staff_access_to_descriptor(user, descriptor, course_context=None):
     descriptor: something that has a location attribute
     """
     return _has_staff_access_to_location(user, descriptor.location, course_context)
+
+
+def get_user_role(user, course_id):
+    """
+    Return corresponding string if user has staff, instructor or student
+    course role in LMS.
+    """
+    from courseware.courses import get_course
+    course = get_course(course_id)
+    if is_masquerading_as_student(user):
+        return 'student'
+    elif has_access(user, course, 'instructor'):
+        return 'instructor'
+    elif has_access(user, course, 'staff'):
+        return 'staff'
+    else:
+        return 'student'
