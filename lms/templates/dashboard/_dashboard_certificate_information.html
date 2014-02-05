@@ -3,6 +3,15 @@
 <%! from django.utils.translation import ugettext as _ %>
 
 <%
+  if settings.FEATURES.get('USE_CME_REGISTRATION', False):
+    cert_text = "CME Certificate"
+    cert_text_after = ""
+  else:
+    cert_text = "Statement"
+    cert_text_after = " of Accomplishment"
+%>
+
+<%
 if cert_status['status'] == 'generating':
     status_css_class = 'course-status-certrendering'
 elif cert_status['status'] == 'ready':
@@ -14,23 +23,21 @@ else:
 %>
 <div class="message message-status ${status_css_class} is-shown">
 
-% if course.may_certify() and cert_status['status'] == 'processing':
-      <p class="message-copy">${_("Your final standing is unrequested or unavailable at this time.")}</p>
-% elif cert_status['status'] == 'processing':
+% if cert_status['status'] == 'processing':
       <p class="message-copy">${_("Final course details are being wrapped up at this time. Your final standing will be available shortly.")}</p>
 % elif cert_status['status'] in ('generating', 'ready', 'notpassing', 'restricted'):
       <p class="message-copy">${_("Your final grade:")}
       <span class="grade-value">${"{0:.0f}%".format(float(cert_status['grade'])*100)}</span>.
       % if cert_status['status'] == 'notpassing' and enrollment.mode != 'audit':
-         ${_("Grade required for a statement of accomplishment:")} <span class="grade-value">
+         ${_("Grade required for a {certtext}{certtextafter}:").format(certtext=cert_text, certtextafter=cert_text_after)} <span class="grade-value">
            ${"{0:.0f}%".format(float(course.lowest_passing_grade)*100)}</span>.
       % elif cert_status['status'] == 'restricted' and enrollment.mode == 'verified':
           <p class="message-copy">
-          ${_("Your verified statement of accomplishment is being held pending confirmation that the issuance of your statement of accomplishment is in compliance with strict U.S. embargoes on Iran, Cuba, Syria and Sudan. If you think our system has mistakenly identified you as being connected with one of those countries, please let us know by contacting {email}. If you would like a refund on your statement of accomplishment, please contact our billing address {billing_email}").format(email='<a class="contact-link" href="mailto:{email}">{email}</a>.'.format(email=settings.CONTACT_EMAIL), billing_email='<a class="contact-link" href="mailto:{email}">{email}</a>'.format(email=settings.PAYMENT_SUPPORT_EMAIL))}
+          ${_("Your verified {certtext}{certtextafter} is being held pending confirmation that the issuance of your {certtext}{certtextafter} is in compliance with strict U.S. embargoes on Iran, Cuba, Syria and Sudan. If you think our system has mistakenly identified you as being connected with one of those countries, please let us know by contacting {email}. If you would like a refund on your {certtext}{certtextafter}, please contact our billing address {billing_email}").format(email='<a class="contact-link" href="mailto:{email}">{email}</a>.'.format(email=settings.CONTACT_EMAIL), certtext=cert_text, certtextafter=cert_text_after, billing_email='<a class="contact-link" href="mailto:{email}">{email}</a>'.format(email=settings.PAYMENT_SUPPORT_EMAIL))}
           </p>
       % elif cert_status['status'] == 'restricted':
           <p class="message-copy">
-          ${_("Your statement of accomplishment is being held pending confirmation that the issuance of your statement of accomplishment is in compliance with strict U.S. embargoes on Iran, Cuba, Syria and Sudan. If you think our system has mistakenly identified you as being connected with one of those countries, please let us know by contacting {email}.").format(email='<a class="contact-link" href="mailto:{email}">{email}</a>.'.format(email=settings.CONTACT_EMAIL))}
+          ${_("Your {certtext}{certtextafter} is being held pending confirmation that the issuance of your {certtext}{certtextafter} is in compliance with strict U.S. embargoes on Iran, Cuba, Syria and Sudan. If you think our system has mistakenly identified you as being connected with one of those countries, please let us know by contacting {email}.").format(email='<a class="contact-link" href="mailto:{email}">{email}</a>.'.format(email=settings.CONTACT_EMAIL), certtext=cert_text, certtextafter=cert_text_after)}
           </p>
       % endif
       </p>
@@ -40,23 +47,23 @@ else:
   <ul class="actions">
     % if cert_status['show_disabled_download_button']:
       <li class="action"><span class="disabled">
-          ${_("Your Statement of Accomplishment is Generating")}</span></li>
+          ${_("Your {certtext}{certtextafter} is Generating").format(certtext=cert_text, certtextafter=cert_text_after)}</span></li>
     % elif cert_status['show_download_url'] and enrollment.mode == 'honor':
       <li class="action action-certificate">
       <a class="btn" href="${cert_status['download_url']}"
          title="${_('This link will open/download a PDF document')}">
-         ${_("Download Your Statement of Accomplishment (PDF)")}</a></li>
+         ${_("Download Your {certtext}{certtextafter} (PDF)").format(certtext=cert_text, certtextafter=cert_text_after)}</a></li>
     % elif cert_status['show_download_url'] and enrollment.mode == 'verified' and cert_status['mode'] == 'honor':
       <li class="action">
-      <p>${_('Since we did not have a valid set of verification photos from you when statements of accomplishment were generated, we could not grant you a verified statement of accomplishment. An honor code statement of accomplishment has been granted instead.')}</p>
+      <p>${_('Since we did not have a valid set of verification photos from you when {certtext}s{certtextafter} were generated, we could not grant you a verified {certtext}{certtextafter}. An honor code {certtext}{certtextafter} has been granted instead.').format(certtext=cert_text, certtextafter=cert_text_after)}</p>
       <a class="btn" href="${cert_status['download_url']}"
          title="${_('This link will open/download a PDF document')}">
-         ${_("Download Your Statement of Accomplishment (PDF)")}</a></li>
+         ${_("Download Your {certtext}{certtextafter} (PDF)").format(certtext=cert_text, certtextafter=cert_text_after)}</a></li>
     % elif cert_status['show_download_url'] and enrollment.mode == 'verified':
       <li class="action">
       <a class="btn" href="${cert_status['download_url']}"
-         title="${_('This link will open/download a PDF document of your verified statement of accomplishment.')}">
-         ${_("Download Your ID Verified Statement of Accomplishment of Achievement (PDF)")}</a></li>
+         title="${_('This link will open/download a PDF document of your verified {certtext}{certtextafter}.').format(certtext=cert_text, certtextafter=cert_text_after)}">
+         ${_("Download Your ID Verified {certtext}{certtextafter} (PDF)").format(certtext=cert_text, certtextafter=cert_text_after)}</a></li>
     % endif
 
     % if cert_status['show_survey_button']:

@@ -9,6 +9,16 @@
 <%namespace name='static' file='static_content.html'/>
 
 <%block name="pagetitle">${_("Dashboard")}</%block>
+
+<%
+  if settings.FEATURES.get('USE_CME_REGISTRATION', False):
+    cert_text = "CME Certificate"
+    cert_text_after = ""
+  else:
+    cert_text = "Statement"
+    cert_text_after = " of Accomplishment"
+%>
+
 <%block name="bodyclass">view-dashboard is-authenticated</%block>
 
 <%block name="js_extra">
@@ -346,11 +356,11 @@
     <div id="change_name_body">
       <form id="change_name_form">
         <div id="change_name_error" class="modal-form-error"> </div>
-        <p>${_("To uphold the credibility of {platform} Statements of Accomplishment, all name changes will be logged and recorded.").format(platform=settings.PLATFORM_NAME)}</p>
+        <p>${_("To uphold the credibility of {platform} {certtext}s{certtextafter}, all name changes will be logged and recorded.").format(platform=settings.PLATFORM_NAME, certtext=cert_text, certtextafter=cert_text_after)}</p>
         <br/>
         <fieldset>
           <div class="input-group">
-            <label>${_("Enter your desired full name, as it will appear on the {platform} Statements of Accomplishment:").format(platform=settings.PLATFORM_NAME)}</label>
+            <label>${_("Enter your desired full name, as it will appear on the {platform} {certtext}s{certtextafter}:").format(platform=settings.PLATFORM_NAME, certtext=cert_text, certtextafter=cert_text_after)}</label>
             <input id="new_name_field" value="" type="text" />
             <label>${_("Reason for name change:")}</label>
             <textarea id="name_rationale_field" value=""></textarea>

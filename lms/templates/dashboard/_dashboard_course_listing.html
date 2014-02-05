@@ -57,8 +57,8 @@
         </h3>
       </hgroup>
 
-      % if course.may_certify() and cert_status and not enrollment.mode == 'audit':
-      <%include file='_dashboard_certificate_information.html' args='cert_status=cert_status,course=course, enrollment=enrollment'/>
+      % if (course.may_certify() and cert_status and (cert_status['status'] != 'processing')) or (course.has_ended() and cert_status and (not enrollment.mode == 'audit')):
+        <%include file='_dashboard_certificate_information.html' args='cert_status=cert_status, course=course, enrollment=enrollment'/>
       % endif
 
       % if course_mode_info['show_upsell']:
