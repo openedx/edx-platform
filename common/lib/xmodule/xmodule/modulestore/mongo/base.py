@@ -223,7 +223,6 @@ def namedtuple_to_son(namedtuple, prefix=''):
     # pylint: disable=protected-access
     for idx, field_name in enumerate(namedtuple._fields):
         son[prefix + field_name] = namedtuple[idx]
-    # pylint: enable=protected-access
     return son
 
 
@@ -256,6 +255,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
     """
     A Mongodb backed ModuleStore
     """
+    reference_type = Location
 
     # TODO (cpennington): Enable non-filesystem filestores
     # pylint: disable=C0103
@@ -313,7 +313,6 @@ class MongoModuleStore(ModuleStoreWriteBase):
         self.error_tracker = error_tracker
         self.render_template = render_template
         self.ignore_write_events_on_courses = []
-        self.reference_type = Location
 
     def compute_metadata_inheritance_tree(self, location):
         '''
@@ -794,17 +793,17 @@ class MongoModuleStore(ModuleStoreWriteBase):
                                    for child in xblock.children]
                 payload.update({'definition.children': xblock.children})
             self._update_single_item(xblock.location, payload)
+            # for static tabs, their containing course also records their display name
             if xblock.category == 'static_tab':
                 course = self._get_course_for_item(xblock.location)
-                existing_tabs = course.tabs or []
-                for tab in existing_tabs:
+                # find the course's reference to this tab and update the name.
+                for tab in course.tabs:
                     if tab.get('url_slug') == xblock.location.name:
-                        if xblock.fields['display_name'].is_set_on(xblock):
+                        # only update if changed
+                        if tab['name'] != xblock.display_name:
                             tab['name'] = xblock.display_name
-                        break
-                course.tabs = existing_tabs
-                # Save the updates to the course to the MongoKeyValueStore
-                self.update_item(course, user)
+                            self.update_item(course, user)
+                            break
 
             # recompute (and update) the metadata inheritance tree which is cached
             # was conditional on children or metadata having changed before dhm made one update to rule them all
@@ -831,8 +830,6 @@ class MongoModuleStore(ModuleStoreWriteBase):
             course = self._get_course_for_item(item.location)
             existing_tabs = course.tabs or []
             course.tabs = [tab for tab in existing_tabs if tab.get('url_slug') != location.name]
-            # Save the updates to the course to the MongoKeyValueStore
-            course.save()
             self.update_item(course, '**replace_user**')
 
         # Must include this to avoid the django debug toolbar (which defines the deprecated "safe=False")

@@ -261,7 +261,7 @@ class LocatorTest(TestCase):
 
     def test_relative(self):
         """
-        It seems we used to use colons in names; so, ensure they're acceptable.
+        Test making a relative usage locator.
         """
         package_id = 'mit.eecs-1'
         branch = 'foo'

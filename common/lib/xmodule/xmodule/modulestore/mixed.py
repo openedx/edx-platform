@@ -59,22 +59,35 @@ class MixedModuleStore(ModuleStoreWriteBase):
         mapping = self.mappings.get(course_id, 'default')
         return self.modulestores[mapping]
 
+    def _locator_to_location(self, reference):
+        """
+        Convert the referenced locator to a location casting to and from a string as necessary
+        """
+        stringify = isinstance(reference, basestring)
+        if stringify:
+            reference = BlockUsageLocator(url=reference)
+        location = loc_mapper().translate_locator_to_location(reference)
+        return location.url() if stringify else location
+
+    def _location_to_locator(self, course_id, reference):
+        """
+        Convert the referenced location to a locator casting to and from a string as necessary
+        """
+        stringify = isinstance(reference, basestring)
+        if stringify:
+            reference = Location(reference)
+        locator = loc_mapper().translate_location(course_id, reference, reference.revision == 'draft', True)
+        return unicode(locator) if stringify else locator
+
     def _incoming_reference_adaptor(self, store, course_id, reference):
         """
         Convert the reference to the type the persistence layer wants
         """
         if issubclass(store.reference_type, Location if self.use_locations else Locator):
             return reference
-        stringify = isinstance(reference, basestring)
         if store.reference_type == Location:
-            if stringify:
-                reference = BlockUsageLocator(url=reference)
-            location = loc_mapper().translate_locator_to_location(reference)
-            return location.url() if stringify else location
-        if stringify:
-            reference = Location(reference)
-        locator = loc_mapper().translate_location(course_id, reference, reference.revision == 'draft', True)
-        return unicode(locator) if stringify else locator
+            return self._locator_to_location(reference)
+        return self._location_to_locator(course_id, reference)
 
     def _outgoing_reference_adaptor(self, store, course_id, reference):
         """
@@ -82,19 +95,33 @@ class MixedModuleStore(ModuleStoreWriteBase):
         """
         if issubclass(store.reference_type, Location if self.use_locations else Locator):
             return reference
-        stringify = isinstance(reference, basestring)
         if store.reference_type == Location:
-            if stringify:
-                reference = Location(reference)
-            locator = loc_mapper().translate_location(
-                course_id, reference, reference.revision == 'draft', True
-            )
-            return unicode(locator) if stringify else locator
-        else:
-            if stringify:
-                reference = BlockUsageLocator(url=reference)
-            location = loc_mapper().translate_locator_to_location(reference)
-            return location.url() if stringify else location
+            return self._location_to_locator(course_id, reference)
+        return self._locator_to_location(reference)
+
+    def _xblock_adaptor_iterator(self, adaptor, string_converter, store, course_id, xblock):
+        """
+        Change all reference fields in this xblock to the type expected by the receiving layer
+        """
+        for field in xblock.fields.itervalues():
+            if field.is_set_on(xblock):
+                if isinstance(field, Reference):
+                    field.write_to(
+                        xblock,
+                        adaptor(store, course_id, field.read_from(xblock))
+                    )
+                elif isinstance(field, ReferenceList):
+                    field.write_to(
+                        xblock,
+                        [
+                            adaptor(store, course_id, ref)
+                            for ref in field.read_from(xblock)
+                        ]
+                    )
+                elif isinstance(field, String):
+                    # replace links within the string
+                    string_converter(field, xblock)
+        return xblock
 
     def _incoming_xblock_adaptor(self, store, course_id, xblock):
         """
@@ -103,22 +130,9 @@ class MixedModuleStore(ModuleStoreWriteBase):
         string_converter = self._get_string_converter(
             course_id, store.reference_type, xblock.location
         )
-        for field in xblock.fields.itervalues():
-            if field.is_set_on(xblock):
-                if isinstance(field, Reference):
-                    field.write_to(
-                        xblock,
-                        self._incoming_reference_adaptor(store, course_id, field.read_from(xblock)))
-                elif isinstance(field, ReferenceList):
-                    field.write_to(
-                        xblock,
-                        [self._incoming_reference_adaptor(store, course_id, ref)
-                         for ref in field.read_from(xblock)]
-                    )
-                elif string_converter is not None and isinstance(field, String):
-                    # replace links within the string
-                    string_converter(field, xblock)
-        return xblock
+        return self._xblock_adaptor_iterator(
+            self._incoming_reference_adaptor, string_converter, store, course_id, xblock
+        )
 
     def _outgoing_xblock_adaptor(self, store, course_id, xblock):
         """
@@ -127,22 +141,9 @@ class MixedModuleStore(ModuleStoreWriteBase):
         string_converter = self._get_string_converter(
             course_id, xblock.location.__class__, xblock.location
         )
-        for field in xblock.fields.itervalues():
-            if field.is_set_on(xblock):
-                if isinstance(field, Reference):
-                    field.write_to(
-                        xblock,
-                        self._outgoing_reference_adaptor(store, course_id, field.read_from(xblock)))
-                elif isinstance(field, ReferenceList):
-                    field.write_to(
-                        xblock,
-                        [self._outgoing_reference_adaptor(store, course_id, ref)
-                         for ref in field.read_from(xblock)]
-                    )
-                elif string_converter is not None and isinstance(field, String):
-                    # replace links within the string
-                    string_converter(field, xblock)
-        return xblock
+        return self._xblock_adaptor_iterator(
+            self._outgoing_reference_adaptor, string_converter, store, course_id, xblock
+        )
 
     CONVERT_RE = re.compile(r"/jump_to_id/({}+)".format(ALLOWED_ID_CHARS))
 
@@ -152,9 +153,9 @@ class MixedModuleStore(ModuleStoreWriteBase):
         with the correct rewritten link for the target type
         """
         if self.use_locations and reference_type == Location:
-            return None
+            return lambda field, xblock: None
         if not self.use_locations and issubclass(reference_type, Locator):
-            return None
+            return lambda field, xblock: None
         if isinstance(from_base_addr, Location):
             def mapper(found_id):
                 """

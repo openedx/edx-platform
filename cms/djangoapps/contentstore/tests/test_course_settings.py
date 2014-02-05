@@ -120,8 +120,8 @@ class CourseDetailsTestCase(CourseTestCase):
 
             self.assertContains(response, "Introducing Your Course")
             self.assertContains(response, "Course Image")
-            self.assertNotContains(response,"Course Overview")
-            self.assertNotContains(response,"Course Introduction Video")
+            self.assertNotContains(response, "Course Overview")
+            self.assertNotContains(response, "Course Introduction Video")
             self.assertNotContains(response, "Requirements")
 
     def test_regular_site_fetch(self):
@@ -141,8 +141,8 @@ class CourseDetailsTestCase(CourseTestCase):
 
             self.assertContains(response, "Introducing Your Course")
             self.assertContains(response, "Course Image")
-            self.assertContains(response,"Course Overview")
-            self.assertContains(response,"Course Introduction Video")
+            self.assertContains(response, "Course Overview")
+            self.assertContains(response, "Course Introduction Video")
             self.assertContains(response, "Requirements")
 
 
@@ -259,7 +259,8 @@ class CourseGradingTest(CourseTestCase):
     def test_update_grader_from_json(self):
         test_grader = CourseGradingModel.fetch(self.course_locator)
         altered_grader = CourseGradingModel.update_grader_from_json(
-            self.course_locator, test_grader.graders[1], self.user)
+            self.course_locator, test_grader.graders[1], self.user
+        )
         self.assertDictEqual(test_grader.graders[1], altered_grader, "Noop update")
 
         test_grader.graders[1]['min_count'] = test_grader.graders[1].get('min_count') + 2
@@ -293,7 +294,8 @@ class CourseGradingTest(CourseTestCase):
     def test_delete_grace_period(self):
         test_grader = CourseGradingModel.fetch(self.course_locator)
         CourseGradingModel.update_grace_period_from_json(
-            self.course_locator, test_grader.grace_period, self.user)
+            self.course_locator, test_grader.grace_period, self.user
+        )
         # update_grace_period_from_json doesn't return anything, so query the db for its contents.
         altered_grader = CourseGradingModel.fetch(self.course_locator)
         self.assertEqual(test_grader.grace_period, altered_grader.grace_period, "Noop update")
@@ -445,9 +447,10 @@ class CourseMetadataEditingTest(CourseTestCase):
 
     def test_update_from_json(self):
         test_model = CourseMetadata.update_from_json(
-            self.course, {
+            self.course,
+            {
                 "advertised_start": "start A",
-                "days_early_for_beta": 2
+                "days_early_for_beta": 2,
             },
             user=self.user
          )
@@ -458,9 +461,10 @@ class CourseMetadataEditingTest(CourseTestCase):
         self.update_check(test_model)
         # now change some of the existing metadata
         test_model = CourseMetadata.update_from_json(
-            fresh, {
+            fresh,
+            {
                 "advertised_start": "start B",
-                "display_name": "jolly roger"
+                "display_name": "jolly roger",
             },
             user=self.user
         )
@@ -479,9 +483,8 @@ class CourseMetadataEditingTest(CourseTestCase):
 
     def test_delete_key(self):
         test_model = CourseMetadata.update_from_json(
-            self.fullcourse, {
-                "unsetKeys": ['showanswer', 'xqa_key']
-            },
+            self.fullcourse,
+            {"unsetKeys": ['showanswer', 'xqa_key']},
             user=self.user
         )
         # ensure no harm

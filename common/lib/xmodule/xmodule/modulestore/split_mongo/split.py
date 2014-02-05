@@ -100,6 +100,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
     A Mongodb backed ModuleStore supporting versions, inheritance,
     and sharing.
     """
+    reference_type = Locator
     def __init__(self, doc_store_config, fs_root, render_template,
                  default_class=None,
                  error_tracker=null_error_tracker,
@@ -111,7 +112,6 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
 
         super(SplitMongoModuleStore, self).__init__(**kwargs)
         self.loc_mapper = loc_mapper
-        self.reference_type = Locator
 
         self.db_connection = MongoConnection(**doc_store_config)
         self.db = self.db_connection.database
