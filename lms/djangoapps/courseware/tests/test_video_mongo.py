@@ -380,7 +380,7 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
         self.assertTrue(self.item_descriptor.download_video)
         self.assertFalse(self.item_descriptor.source_visible)
 
-    @patch('xmodule.x_module.XModuleDescriptor.editable_metadata_fields', new_callable=PropertyMock)
+    @patch('xmodule.video_module.VideoDescriptor.editable_metadata_fields', new_callable=PropertyMock)
     def test_download_video_is_explicitly_set(self, mock_editable_fields):
         mock_editable_fields.return_value = {
             'download_video': {
@@ -426,6 +426,9 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
                 'field_name': 'track',
                 'options': [],
             },
+            'transcripts': {
+                # purely mocked
+            }
         }
         metadata = {
             'track': '',
@@ -465,7 +468,7 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
         self.assertTrue(self.item_descriptor.download_track)
         self.assertTrue(self.item_descriptor.track_visible)
 
-    @patch('xmodule.x_module.XModuleDescriptor.editable_metadata_fields', new_callable=PropertyMock)
+    @patch('xmodule.video_module.VideoDescriptor.editable_metadata_fields', new_callable=PropertyMock)
     def test_download_track_is_explicitly_set(self, mock_editable_fields):
         mock_editable_fields.return_value = {
             'download_track': {
@@ -500,6 +503,9 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
                 'value': u'',
                 'field_name': 'source',
                 'options': [],
+            },
+            'transcripts': {
+                # purely mocked
             },
         }
         metadata = {
@@ -592,6 +598,10 @@ class TestVideoHandlers(TestVideo):
 
         #language is 'en' but self.sub is None
         request = Request.blank('/translation?language=en&videoId=12345')
+        # to get instance
+        self.item_descriptor.render('student_view')
+        item = self.item_descriptor.xmodule_runtime.xmodule_instance
+        item.sub = ""
         response = self.item_descriptor.transcript(request=request, dispatch='translation')
         self.assertEqual(response.status, '404 Not Found')
 
