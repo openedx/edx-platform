@@ -307,11 +307,11 @@ EO
 
         command -v brew &>/dev/null || {
             output "Installing brew"
-            /usr/bin/ruby <(curl -fsSkL raw.github.com/mxcl/homebrew/go)
+			/usr/bin/ruby -e "$(curl -fsSL https://raw.github.com/Homebrew/homebrew/go/install)"
         }
         command -v git &>/dev/null || {
-            output "Installing git"
-            brew install git
+            output "Installing git and Brewfile bundle"
+			brew install && brew bundle $BASE/edx-platform/Brewfile
         }
 
         ;;
