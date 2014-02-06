@@ -1,3 +1,4 @@
-        <conditional condition="require_attempted" required="problem/choiceprob">
-            <html url_name="secret_page" />
-        </conditional>
+<conditional correct="True" sources="i4x://edX/cond_test/problem/choiceprob">
+    <html>Conditionally shown page</html>
+    <show sources="i4x://edX/cond_test/html/congrats; i4x://edX/cond_test/html/secret_page"/>
+</conditional>

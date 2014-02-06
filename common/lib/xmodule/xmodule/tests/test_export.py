@@ -78,6 +78,7 @@ class RoundTripTestCase(unittest.TestCase):
         "toy",
         "simple",
         "conditional_and_poll",
+        "conditional",
         "self_assessment",
         "graphic_slider_tool",
         "test_exam_registration",
