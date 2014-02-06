@@ -18,6 +18,8 @@ from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.modulestore.django import loc_mapper
+from xmodule.exceptions import NotFoundError
+from cache_toolbox.core import get_cached_content
 
 
 class AssetsTestCase(CourseTestCase):
@@ -67,6 +69,49 @@ class BasicAssetsTestCase(AssetsTestCase):
 
         # Note: Actual contentType for textbook.pdf in asset.json is 'text/pdf'
         self.assertEqual(content.content_type, 'application/pdf')
+
+    def test_asset_caching(self):
+        resp = self.upload_asset()
+        self.assertEquals(resp.status_code, 200)
+        resp = self.client.get(self.url, HTTP_ACCEPT='application/json')
+        asset_id = json.loads(resp.content)['assets'][0]['id']
+        asset_location = StaticContent.get_location_from_path(asset_id)
+
+        # ask for asset and so cache it
+        resp = self.client.get(asset_id)
+
+        # check that asset is in contentstore
+        content = contentstore().find(asset_location)
+
+        # check that asset is in cache
+        self.assertEqual('asset-1', get_cached_content(asset_location).data)
+
+        # remove asset from content store
+        contentstore().delete(content.get_id())
+
+        # check that asset is not in contentswore
+        with self.assertRaises(NotFoundError):
+            contentstore().find(asset_location)
+
+        # but asset still in cache
+        self.assertEqual('asset-1', get_cached_content(asset_location).data)
+
+        # add asset to contentstore again
+        resp = self.upload_asset()
+        self.assertEquals(resp.status_code, 200)
+
+        # check that asset is in contentstore again
+        content = contentstore().find(asset_location)
+
+        # remove it from contentstore and from cache
+        contentstore(delete_from_toolbox_cache=True).delete(content.get_id())
+
+        # chech that asset not in contentstore
+        with self.assertRaises(NotFoundError):
+            contentstore().find(asset_location)
+
+        # check that asset not in cache
+        self.assertEqual(None, get_cached_content(asset_location))
 
 
 class PaginationTestCase(AssetsTestCase):

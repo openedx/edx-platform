@@ -17,11 +17,16 @@ def load_function(path):
     return getattr(import_module(module_path), name)
 
 
-def contentstore(name='default'):
+def contentstore(name='default', delete_from_toolbox_cache=False):
     if name not in _CONTENTSTORE:
         class_ = load_function(settings.CONTENTSTORE['ENGINE'])
         options = {}
         options.update(settings.CONTENTSTORE['DOC_STORE_CONFIG'])
+
+        if delete_from_toolbox_cache == True:
+            from cache_toolbox.core import del_cached_content
+            options.update({'delete_from_cache': del_cached_content})
+
         if 'ADDITIONAL_OPTIONS' in settings.CONTENTSTORE:
             if name in settings.CONTENTSTORE['ADDITIONAL_OPTIONS']:
                 options.update(settings.CONTENTSTORE['ADDITIONAL_OPTIONS'][name])

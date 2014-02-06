@@ -40,6 +40,8 @@ class MongoContentStore(ContentStore):
 
         self.fs_files = _db[bucket + ".files"]  # the underlying collection GridFS uses
 
+        self.delete_from_cache = kwargs.get('delete_from_cache')
+
     def save(self, content):
         content_id = content.get_id()
 
@@ -62,6 +64,13 @@ class MongoContentStore(ContentStore):
     def delete(self, content_id):
         if self.fs.exists({"_id": content_id}):
             self.fs.delete(content_id)
+
+        if self.delete_from_cache:
+            self.delete_from_cache(
+                StaticContent.compute_location(
+                    content_id['org'], content_id['course'], content_id['name'], content_id['revision'])
+            )
+
 
     def find(self, location, throw_on_not_found=True, as_stream=False):
         content_id = StaticContent.get_id_from_location(location)
