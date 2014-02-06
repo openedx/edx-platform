@@ -48,6 +48,10 @@ from xmodule.vertical_module import VerticalDescriptor
 from xmodule.wrapper_module import WrapperDescriptor
 from xmodule.tests import get_test_descriptor_system, get_test_system
 
+
+# A dictionary that maps specific XModuleDescriptor classes without children
+# to a list of sample field values to test with.
+# TODO: Add more types of sample data
 LEAF_XMODULES = {
     AnnotatableDescriptor: [{}],
     CapaDescriptor: [{}],
@@ -63,6 +67,9 @@ LEAF_XMODULES = {
 }
 
 
+# A dictionary that maps specific XModuleDescriptor classes with children
+# to a list of sample field values to test with.
+# TODO: Add more types of sample data
 CONTAINER_XMODULES = {
     ConditionalDescriptor: [{}],
     CourseDescriptor: [{}],
@@ -83,7 +90,8 @@ NOT_STUDIO_EDITABLE = (
 
 def flatten(class_dict):
     """
-    Flatten a dict from cls -> [fields, ...] to a list of the form [(cls, fields), ...]
+    Flatten a dict from cls -> [fields, ...] and yields values of the form (cls, fields)
+    for each entry in the dictionary value.
     """
     for cls, fields_list in class_dict.items():
         for fields in fields_list:
@@ -200,9 +208,14 @@ class ContainerModuleFactory(LeafModuleFactory):
 
 
 @ddt.ddt
-class TestXBlockWrapper(object):
+class XBlockWrapperTestMixin(object):
+    """
+    This is a mixin for building tests of the implementation of the XBlock
+    api by wrapping XModule native functions.
 
-    __test__ = False
+    You can creat an actual test case by inheriting from this class and UnitTest,
+    and implement skip_if_invalid and check_property.
+    """
 
     def skip_if_invalid(self, descriptor_cls):
         """
@@ -244,9 +257,10 @@ class TestXBlockWrapper(object):
         raise SkipTest("XBlock support in XModules not yet fully implemented")
 
 
-class TestStudentView(TestXBlockWrapper, TestCase):
-    __test__ = True
-
+class TestStudentView(XBlockWrapperTestMixin, TestCase):
+    """
+    This tests that student_view and XModule.get_html produce the same results.
+    """
     def skip_if_invalid(self, descriptor_cls):
         if descriptor_cls.module_class.student_view != XModule.student_view:
             raise SkipTest(descriptor_cls.__name__ + " implements student_view")
@@ -261,9 +275,10 @@ class TestStudentView(TestXBlockWrapper, TestCase):
         )
 
 
-class TestStudioView(TestXBlockWrapper, TestCase):
-    __test__ = True
-
+class TestStudioView(XBlockWrapperTestMixin, TestCase):
+    """
+    This tests that studio_view and XModuleDescriptor.get_html produce the same results
+    """
     def skip_if_invalid(self, descriptor_cls):
         if descriptor_cls in NOT_STUDIO_EDITABLE:
             raise SkipTest(descriptor_cls.__name__ + " is not editable in studio")
@@ -300,3 +315,25 @@ class TestXModuleHandler(TestCase):
         response = self.module.xmodule_handler(self.request)
         self.assertIsInstance(response, webob.Response)
         self.assertEqual(response.body, '{}')
+
+
+class TestXmlExport(XBlockWrapperTestMixin, TestCase):
+    """
+    This tests that XModuleDescriptor.export_to_xml and add_xml_to_node produce the same results.
+    """
+    def skip_if_invalid(self, descriptor_cls):
+        if descriptor_cls.add_xml_to_node != XModuleDescriptor.add_xml_to_node:
+            raise SkipTest(descriptor_cls.__name__ + " implements add_xml_to_node")
+
+    def check_property(self, descriptor):
+        xmodule_api_fs = MemoryFS()
+        xblock_api_fs = MemoryFS()
+
+        descriptor.runtime.export_fs = xblock_api_fs
+        xblock_node = etree.Element('unknown')
+        descriptor.add_xml_to_node(xblock_node)
+
+        xmodule_node = etree.fromstring(descriptor.export_to_xml(xmodule_api_fs))
+
+        self.assertEquals(list(xmodule_api_fs.walk()), list(xblock_api_fs.walk()))
+        self.assertEquals(etree.tostring(xmodule_node), etree.tostring(xblock_node))
