@@ -5,55 +5,61 @@
 .. _Appendix E:
 
 
-==========================
-APPENDIX E: Problem Types
-==========================
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+APPENDIX E: Problem and Tool XML
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Option Response
-===============
+This appendix provides information about the XML for most problem and tool types in Studio:
 
-The Option Response input type allows the student to choose from a collection of
-answer options, presented as a drop-down list.
+:ref:`Checkbox`
+:ref:`Chemical Equation Response`
+:ref:`Custom Response`
+:ref:`Formula Response`
+:ref:`Image Response`
+:ref:`Multiple Choice`
+:ref:`Numerical Response`
+:ref:`Option Response`
+:ref:`Schematic Response`
+:ref:`String Response`
 
-Option Response is structurally similar to Multiple Choice. Some conceptual
-differences between the two include the following.
+.. _Checkbox:
 
-* The Multiple Choice radio button format makes it easier for students to read very long response options.
+Choice Response (Checkbox)
+---------------------------
 
-* The Option Response drop-down input format makes it more likely for students to think of an answer and then search for it, rather than relying purely on recognition to answer the question. The Multiple Choice format is more explicit and visual. This makes it a more appropriate choice for presenting tricky or complicated answer options which are intended to get the student to pause and think.
+**To designate an answer as correct, add correct="true"**
+**Available in Simple Editor**
 
 Sample Problem:
 
-.. image:: ../Images/image287.png
-    :width: 600
-    :alt: Image of an option response problem
+.. image:: ../Images/CheckboxExample.gif
+ :alt: Image of a checkbox problem
 
-**Problem Code:**
+
+**Sample Problem XML**
 
 .. code-block:: xml
 
   <problem>
+  <startouttext/>
+    <p>Learning about the benefits of preventative healthcare can be particularly difficult. Check all of the reasons below why this may be the case.</p>
 
-   <p>Option Response is most similar to __________.</p>
-
-    <optionresponse>
-     <optioninput
-       options="('Multiple Choice','String Response',
-                'Numerical Response','External Response',
-                'Image Response')"
-      correct="Multiple Choice"/>1
-    </optionresponse>
+  <choiceresponse>
+  <checkboxgroup>
+  <choice correct="true"><text>A large amount of time passes between undertaking a preventative measure and seeing the result.</text></choice>
+  <choice correct="false"><text>Non-immunized people will always fall sick.</text></choice>
+  <choice correct="true"><text>If others are immunized, fewer people will fall sick regardless of a particular individual's choice to get immunized or not.</text></choice>
+  <choice correct="true"><text>Trust in healthcare professionals and government officials is fragile.</text></choice>
+  </checkboxgroup>
 
    <solution>
-     <div class="detailed-solution">
-       <p>Explanation</p>
-        <p>Like Option Response, Multiple Choice also allows students to select
-       from a variety of pre-written responses.</p>
-     </div>
-    </solution>
+   <div class="detailed-solution">
+   <p>Explanation</p>
+   <p>People who are not immunized against a disease may still not fall sick from the disease. If someone is trying to learn whether or not preventative measures against the disease have any impact, he or she may see these people and conclude, since they have remained healthy despite not being immunized, that immunizations have no effect. Consequently, he or she would tend to believe that immunization  (or other preventative measures) have fewer benefits than they actually do.</p>
+   </div>
+   </solution>
+  </choiceresponse>
   </problem>
-
-
 
 
 **Template**
@@ -61,40 +67,334 @@ Sample Problem:
 .. code-block:: xml
 
   <problem>
+  <startouttext/>
+    <p>Question text</p>
 
-    <optionresponse>
-     options="('A','B')"
-      correct="A"/>
-    </optionresponse>
+  <choiceresponse>
 
-    <solution>
-      <div class="detailed-solution">
-      </div>
-    </solution>
+  <checkboxgroup>
+  <choice correct="false"><text>Answer option 1 (incorrect)</text></choice>
+  <choice correct="true"><text>Answer option 2 (correct)</text></choice>
+  </checkboxgroup>
+
+   <solution>
+   <div class="detailed-solution">
+   <p>Explanation</p>
+   <p>Explanation text</p>
+   </div>
+   </solution>
+
+  </choiceresponse>
   </problem>
 
 
 
+.. _Chemical Equation Response:
+
+Chemical Equation Response
+--------------------------
+
+**TEMPLATE? DO WE HAVE MORE INFORMATION ABOUT HOW TO CREATE THESE?**
+**DO THESE WORK?**
+
+The chemical equation problem type allows the student to enter chemical equations. The grader evaluates student responses by using a Python script that you create and embed in the problem.
+
+**Sample Problem**
+
+.. image:: ../Images/ChemicalEquationExample.png
+ :alt: Image of a chemical equation response problem
+
+**Sample Problem XML**:
+
+.. code-block:: xml
+
+  <problem>
+    <startouttext/>
+    <p>Some problems may ask for a particular chemical equation. Practice by writing out the following reaction in the box below.</p>
+    
+  \( \text{H}_2\text{SO}_4 \longrightarrow \text { H}^+ + \text{ HSO}_4^-\)
+
+    <customresponse>
+      <chemicalequationinput size="50"/>
+      <answer type="loncapa/python">
+
+  if chemcalc.chemical_equations_equal(submission[0], 'H2SO4 -> H^+ + HSO4^-'):
+      correct = ['correct']
+  else:
+      correct = ['incorrect']
+
+      </answer>
+    </customresponse>
+    <p>Some tips:</p>
+    <ul>
+    <li>Use real element symbols.</li>
+    <li>Create subscripts by using plain text.</li>
+    <li>Create superscripts by using a caret (^).</li>
+    <li>Create the reaction arrow (\(\longrightarrow\)) by using "->".</li>
+    </ul>
+
+    <endouttext/>
+  
+   <solution>
+   <div class="detailed-solution">
+   <p>Solution</p>
+   <p>To create this equation, enter the following:</p>
+     <p>H2SO4 -> H^+ + HSO4^-</p>
+   </div>
+   </solution>
+  </problem>
+
+
+.. _Custom Response:
+
+Custom Response ("Write-Your-Own-Grader")
+------------------------------------------
+
+In write-your-own-grader problems (also called “custom Python-evaluated input” problems), the grader evaluates a student’s response using a Python script that you create and embed in the problem. Students can enter more than one line of text.
+
+**Sample Problem**
+
+.. image:: ../Images/CustomPythonExample.png
+ :alt: Image of a custom response problem
+
+
+**Sample Problem XML**:
+
+.. code-block:: xml
+
+  <problem>
+  <p>This question has two parts.</p>
+
+  <script type="loncapa/python">
+
+  def test_add(expect, ans):
+      try:
+          a1=int(ans[0])
+          a2=int(ans[1])
+          return (a1+a2) == int(expect)
+      except ValueError:
+          return False
+
+  def test_add_to_ten(expect, ans):
+      return test_add(10, ans)
+
+  </script>
+
+  <p>Part 1: Enter two integers that sum to 10. </p>
+  <customresponse cfn="test_add_to_ten">
+          <textline size="10" correct_answer="3"/><br/>
+          <textline size="10" correct_answer="7"/>
+  </customresponse>
+
+  <p>Part 2: Enter two integers that sum to 20. </p>
+  <customresponse cfn="test_add" expect="20">
+          <textline size="10"/><br/>
+          <textline size="10"/>
+  </customresponse>
+
+      <solution>
+          <div class="detailed-solution">
+              <p>Explanation</p>
+                 <p>For part 1, any two numbers of the form <i>n</i> and <i>10-n</i>, where <i>n</i> is any integer, will work. One possible answer would be the pair 0 and 10.</p>
+                <p>For part 2, any pair <i>x</i> and <i>20-x</i> will work, where <i>x</i> is any real number with a finite decimal representation. Both inputs have to be entered either in standard decimal notation or in scientific exponential notation. One possible answer would be the pair 0.5 and 19.5. Another way to write this would be 5e-1 and 1.95e1.</p>
+          </div>
+      </solution>
+  </problem>
+
+**Templates**
+
+The following template includes suggested correct answers (to include these, add a ``correct_answer`` attribute to the ``<textline>`` tag).
+
+.. code-block:: xml
+
+  <problem>
+
+  <script type="loncapa/python">
+  def test_add(expect,ans):
+    a1=float(ans[0])
+    a2=float(ans[1])
+    return (a1+a2)== float(expect)
+  </script>
+
+
+  <p>Enter two real numbers that sum to 20: </p>
+  <customresponse cfn="test_add" expect="20">
+          <textline size="10" correct_answer="11"/><br/>
+          <textline size="10" correct_answer="9"/>
+  </customresponse>
+
+      <solution>
+          <div class="detailed-solution">
+          </div>
+      </solution>
+  </problem>
+
+The following template does not include suggested correct answers.
+
+.. code-block:: xml
+
+  <problem>
+
+  <script type="loncapa/python">
+  def test_add(expect,ans):
+    a1=float(ans[0])
+    a2=float(ans[1])
+    return (a1+a2)== float(expect)
+  </script>
+
+
+  <p>Enter two real numbers that sum to 20: </p>
+  <customresponse cfn="test_add" expect="20">
+          <textline size="10" /><br/>
+          <textline size="10" />
+  </customresponse>
+
+      <solution>
+          <div class="detailed-solution">
+          </div>
+      </solution>
+  </problem>
+
+.. _Formula Response:
+
+Formula Response (Math Expression Input Problems)
+-------------------------------------------------
+
+**Sample Problem**
+
+.. image:: ../Images/MathExpressionInput_XML.png
+ :width: 600
+ :alt: Image of a math expression input problem
+
+**Sample Problem XML**
+
+.. code-block:: xml
+
+  <problem>
+    <p>Some problems may ask for a mathematical expression. Practice creating mathematical expressions by answering the questions below.</p>
+    <p>Notes:</p>
+    <ul>
+      <li>Use standard arithmetic operation symbols.</li>
+      <li>Indicate multiplication explicitly by using an asterisk (*).</li>
+      <li>Use a caret (^) to raise to a power.</li>
+      <li>Use an underscore (_) to indicate a subscript.</li>        
+      <li>Use parentheses to specify the order of operations.</li>
+    </ul>
+
+    <p>Write an expression for the product of R_1, R_2, and the inverse of R_3.</p>
+    <formularesponse type="ci" samples="R_1,R_2,R_3@1,2,3:3,4,5#10" answer="$VoVi">
+      <responseparam type="tolerance" default="0.00001"/>
+      <formulaequationinput size="20" />
+    </formularesponse>
+
+  <script type="loncapa/python">
+  VoVi = "(R_1*R_2)/R_3"
+  </script>
+
+    <p>Let <i>x</i> be a variable, and let <i>n</i> be an arbitrary constant. What is the derivative of <i>x<sup>n</sup></i>?</p>
+  <script type="loncapa/python">
+  derivative = "n*x^(n-1)"
+  </script>
+    <formularesponse type="ci" samples="x,n@1,2:3,4#10" answer="$derivative">
+      <responseparam type="tolerance" default="0.00001"/>
+      <formulaequationinput size="20" />
+    </formularesponse>
+
+    <solution>
+      <div class="detailed-solution">
+        <p>Explanation</p>
+
+      </div>
+    </solution>
+  </problem>
+
 **XML Attribute Information**
 
-<optionresponse>
+<script>
 
 
-  .. image:: ../Images/option_response1.png
+  .. image:: ../Images/formularesponse.png
 
 
-<optioninput>
+<formularesponse>
 
-  .. image:: ../Images/optionresponse2.png
 
+  .. image:: ../Images/formularesponse3.png
+
+Children may include ``<formulaequationinput/>``.
+
+If you do not need to specify any samples, you should look into the use of the
+Numerical Response input type, as it provides all the capabilities of Formula
+Response without the need to specify any unknown variables.
+
+<responseparam>
+
+
+  .. image:: ../Images/formularesponse6.png
+
+<formulaequationinput/>
+
+========= ============================================= =====
+Attribute                  Description                  Notes
+========= ============================================= =====
+size      (optional) defines the size (i.e. the width)
+          of the input box displayed to students for
+          typing their math expression.
+========= ============================================= =====
+
+.. _Image Response:
+
+Image Response
+--------------
+
+The Image Response input type presents an image and accepts clicks on the image as an answer.
+Images have to be uploaded to the courseware Assets directory. Response clicks are marked as correct if they are within a certain specified sub rectangle of the image canvas.
+
+*Note The Mozilla Firefox browser is currently not supported for this problem type.*
+
+Sample Problem:
+
+.. image:: ../Images/image294.png
+ :width: 600
+
+
+**Problem Code**:
+
+.. code-block:: xml
+
+  <problem>
+    <p><b>Example Problem</b></p>
+  <startouttext/>
+      <p>You are given three shapes. Click on the triangle.</p>
+      <endouttext/>
+      <imageresponse>
+      <imageinput src="/c4x/edX/edX101/asset/threeshapes.png" width="220" height="150" rectangle="(80,40)-(130,90)" />
+      </imageresponse>
+  </problem>
+  Template
+  <problem>
+      <imageresponse>
+      <imageinput src="Path_to_Image_File.png" width="220" height="150" rectangle="(80,40)-(130,90)" />
+      </imageresponse>
+  </problem>
+
+XML Attribute Information
+
+
+<imageresponse>
+
+  .. image:: ../Images/imageresponse1.png
+
+<imageinput>
+
+  .. image:: ../Images/imageresponse2.png
 
 .. raw:: latex
 
-      \newpage %
-
+.. _Multiple Choice:
 
 Multiple Choice
-===============
+---------------
 
 
 The Multiple Choice input type allows the student to select at most one choice
@@ -185,229 +485,10 @@ Sample Problem:
 
   .. image:: ../Images/multipleresponse3.png
 
-
-.. raw:: latex
-
-      \newpage %
-
-
-Checkbox
-========
-
-The Checkbox input type allows the student to select zero or more choices from a
-collection of answer choices, presented as a list of checkboxes.
-
-Remark: Questions with one Checkbox input type have exactly one correct
-response. All the choices marked as correct="true" have to be selected for the
-submitted answer (i.e. the response) to be considered correct.
-
-In particular, the response of no boxes checked off could be the single correct
-response, and a Checkbox question, unlike a Multiple Choice question, cannot
-have zero correct responses.
-
-Sample Problem:
-
-.. image:: ../Images/image290.png
- :width: 600
- :alt: Image of a checkbox problem
-
-
-**Problem Code:**
-
-.. code-block:: xml
-
-  <problem>
-  <startouttext/>
-    <p>How many correct responses can a Checkbox question have?</p>
-
-  <choiceresponse>
-  <checkboxgroup>
-  <choice correct="false"><text>Zero</text></choice>
-  <choice correct="true"><text>One</text></choice>
-  <choice correct="false"><text>Two or more</text></choice>
-  <choice correct="false"><text>Nobody knows</text></choice>
-  <choice correct="true"><text>Somebody might know :)</text></choice>
-  </checkboxgroup>
-  </choiceresponse>
-  </problem>
-
-
-**Template**
-
-.. code-block:: xml
-
-  <problem>
-
-  <choiceresponse>
-  <checkboxgroup>
-  <choice correct="false"><text>Zero</text></choice>
-  <choice correct="true"><text>One</text></choice>
-  </checkboxgroup>
-  </choiceresponse>
-  </problem>
-
-.. raw:: latex
-
-     \newpage %
-
-
-String Response
-===============
-
-The String Response input type provides an input box in which the student can
-enter a line of text, which is then checked against a specified expected answer.
-
-A String Response input does not provide any answer suggestions, so it can be a
-good way to get the students to engage with the material more deeply in a
-sequence and look up, figure out, or remember the correct answer themselves.
-
-Note that a student's answer in a String Response is marked as correct if it
-matches every character of the expected answer. This can be a problem with
-international spelling, dates, or anything where the format of the answer is not
-clear.
-
-Sample Problem:
-
-.. image:: ../Images/image291.png
- :width: 600
- :alt: Image of a string response problem
-
-**Problem Code:**
-
-.. code-block:: xml
-
-  <problem>
-    <p><b>Example Problem</b></p>
-    <p>What is the name of this unit? (What response type is this?)</p>
-    <stringresponse answer="String Response" type="ci">
-      <textline size="20"/>
-    </stringresponse>
-    <solution>
-      <div class="detailed-solution">
-        <p>Explanation</p>
-        <p>The name of this unit is "String Response," written without the punctuation.</p>
-        <p>Arbitrary capitalization is accepted.</p>
-      </div>
-    </solution>
-  </problem>
-
-**Template**
-
-.. code-block:: xml
-
-  <problem>
-    <stringresponse answer="REPLACE_THIS" type="ci">
-      <textline size="20"/>
-    </stringresponse>
-    <solution>
-      <div class="detailed-solution">
-      </div>
-    </solution>
-  </problem>
-
-
-This response type allows to add more than one answer. Use `additional_answer`  tag to add more answers.
-
-You can add `regexp` to value of `type` attribute, for example: `type="ci regexp"` or `type="regexp"` or `type="regexp cs"`.
-In this case, any answer and hint will be treated as regular expressions.
-Regular expression has to match whole answer, for answer to be correct.
-Student answers "foobar", "o foo" or " ==foo==", will be correct if teacher has set answer=".*foo.*" with type="regexp".
-
-**Template**
-
-.. code-block:: xml
-
-    <problem>
-        <stringresponse answer="a1" type="ci regexp">
-            <additional_answer>\d5</additional_answer>
-            <additional_answer>a3</additional_answer>
-            <textline size="20"/>
-            <hintgroup>
-                <stringhint answer="a0" type="ci" name="ha0" />
-                <stringhint answer="a4" type="ci" name="ha4" />
-                <stringhint answer="^\d" type="ci" name="re1" />
-                <hintpart on="ha0">
-                    <startouttext />+1<endouttext />
-                </hintpart >
-                <hintpart on="ha4">
-                    <startouttext />-1<endouttext />
-                </hintpart >
-                <hintpart on="re1">
-                    <startouttext />Any number+5<endouttext />
-                </hintpart >
-            </hintgroup>
-        </stringresponse>
-    </problem>
-
-
-**XML Attribute Information**
-
-<stringresponse>
-
- .. raw:: html
-
-      <table border="1" class="docutils" width="60%">
-        <colgroup>
-        <col width="15%">
-        <col width="75%">
-        <col width="10%">
-        </colgroup>
-        <thead valign="bottom">
-        <tr class="row-odd"><th class="head">Attribute</th>
-        <th class="head">Description</th>
-        <th class="head">Notes</th>
-        </tr>
-        </thead>
-        <tbody valign="top">
-        <tr class="row-even"><td>type</td>
-        <td>(optional) “[ci] [regex]”. Add “ci” if the student response should be graded case-insensitively. The default is to take case into consideration when grading. Add “regexp” for correct answer to be treated as regular expression.</td>
-        <td>&nbsp;</td>
-        </tr>
-        <tr class="row-odd"><td>answer</td>
-        <td>The string that is used to compare with student answer. If "regexp" is not presented in value of <em>type</em> attribute, student should enter value equal to exact value of this attribute in order to get credit. If  "regexp" is presented in value of <em>type</em> attribute, value of <em>answer</em> is treated as regular expression and exact match of this expression and student answer will be done. If search is successful, student will get credit.</td>
-        <td>&nbsp;</td>
-        </tr>
-        </tbody>
-      </table>
-
-      <table border="1" class="docutils" width="60%">
-        <colgroup>
-        <col width="15%">
-        <col width="75%">
-        <col width="10%">
-        </colgroup>
-        <thead valign="bottom">
-        <tr class="row-odd"><th class="head">Children</th>
-        <th class="head">Description</th>
-        <th class="head">Notes</th>
-        </tr>
-        </thead>
-        <tbody valign="top">
-        <tr class="row-even"><td>textline</td>
-        <td>used to accept student input. See description below.</td>
-        <td>&nbsp;</td>
-        </tr>
-        <tr class="row-odd"><td>additional_answer</td>
-        <td>todo</td>
-        <td>&nbsp;</td>
-        </tr>
-        </tbody>
-      </table>
-
-
-<textline>
-
-  .. image:: ../Images/stringresponse2.png
-
-<additional_answer> - Can be unlimited number of this tags. Any tag adds one more additional answer for matching.
-
-.. raw:: latex
-
-      \newpage %
-
+.. _Numerical Response:
 
 Numerical Response
-==================
+------------------
 
 The Numerical Response input type accepts a line of text input from the student
 and evaluates the input for correctness based on its numerical value. The input
@@ -701,361 +782,98 @@ The default included functions are the following:
 
 .. raw:: latex
 
-      \newpage %
 
 
+.. _Option Response:
 
-Formula Response
-================
+Option Response (Dropdown)
+--------------------------
 
-The Formula Response input type accepts a line of text representing a
-mathematical expression from the student and evaluates the input for equivalence
-to a mathematical expression provided by the grader. Correctness is based on
-numerical sampling of the symbolic expressions.
+The Option Response input type allows the student to choose from a collection of
+answer options, presented as a drop-down list.
 
-The syntax of the answers is shared with that of the Numerical Response,
-including default variables and functions. The difference between the two
-response types is that the Formula Response grader may specify unknown
-variables. The student's response is compared against the instructor's
-response, with the unknown variable(s) sampled at random values, as specified
-by the problem author.
+Option Response is structurally similar to Multiple Choice. Some conceptual
+differences between the two include the following.
 
-The answer is correct if both the student-provided response and the grader's
-mathematical expression are equivalent to specified numerical tolerance, over a
-specified range of values for each variable.
+* The Multiple Choice radio button format makes it easier for students to read very long response options.
 
-This kind of response type can handle symbolic expressions. However, it places
-an extra burden on the problem author to specify the allowed variables in the
-expression and the numerical ranges over which the variables must be sampled in
-order to test for correctness.
-
-A further note about the variables: when the following Greek letters are typed
-out, an appropriate character is substituted:
-
-  ``alpha beta gamma delta epsilon varepsilon zeta eta theta vartheta iota
-  kappa lambda mu nu xi pi rho sigma tau upsilon phi varphi chi psi omega``
-
-Note: ``epsilon`` is the lunate version, whereas ``varepsilon`` looks like a
-backward 3.
+* The Option Response drop-down input format makes it more likely for students to think of an answer and then search for it, rather than relying purely on recognition to answer the question. The Multiple Choice format is more explicit and visual. This makes it a more appropriate choice for presenting tricky or complicated answer options which are intended to get the student to pause and think.
 
 Sample Problem:
 
-.. image:: ../Images/image293.png
- :width: 600
- :alt: Image of a formula response problem
+.. image:: ../Images/image287.png
+    :width: 600
+    :alt: Image of an option response problem
 
-**Problem Code**:
+**Problem Code:**
 
 .. code-block:: xml
 
   <problem>
-    <p><b>Example Problem</b></p>
-    <p>This is a short introduction to the Formula Response editor.</p>
 
-    <p>Write an expression for the product of R_1, R_2, and the inverse of R_3.</p>
-    <formularesponse type="ci" samples="R_1,R_2,R_3@1,2,3:3,4,5#10" answer="$VoVi">
-      <responseparam type="tolerance" default="0.00001"/>
-      <formulaequationinput size="40" />
-    </formularesponse>
+   <p>Option Response is most similar to __________.</p>
 
-    <p>Let <i>c</i> denote the speed of light. What is the relativistic energy <i>E</i> of an object of mass <i>m</i>?</p>
-  <script type="loncapa/python">
-  VoVi = "(R_1*R_2)/R_3"
-  </script>
-    <formularesponse type="cs" samples="m,c@1,2:3,4#10" answer="m*c^2">
-      <responseparam type="tolerance" default="0.00001"/>
-      <text><i>E</i> =</text> <formulaequationinput size="40"/>
-    </formularesponse>
+    <optionresponse>
+     <optioninput
+       options="('Multiple Choice','String Response',
+                'Numerical Response','External Response',
+                'Image Response')"
+      correct="Multiple Choice"/>1
+    </optionresponse>
 
-    <p>Let <i>x</i> be a variable, and let <i>n</i> be an arbitrary constant. What is the derivative of <i>x<sup>n</sup></i>?</p>
-  <script type="loncapa/python">
-  derivative = "n*x^(n-1)"
-  </script>
-    <formularesponse type="ci" samples="x,n@1,2:3,4#10" answer="$derivative">
-      <responseparam type="tolerance" default="0.00001"/>
-      <formulaequationinput size="40" />
-    </formularesponse>
+   <solution>
+     <div class="detailed-solution">
+       <p>Explanation</p>
+        <p>Like Option Response, Multiple Choice also allows students to select
+       from a variety of pre-written responses.</p>
+     </div>
+    </solution>
+  </problem>
 
-    <!-- Example problem specifying only one variable -->
-    <formularesponse type="ci" samples="x@1,9#10" answer="x**2 - x + 4">
-      <responseparam type="tolerance" default="0.00001"/>
-      <formulaequationinput size="40" />
-    </formularesponse>
+
+
+
+**Template**
+
+.. code-block:: xml
+
+  <problem>
+
+    <optionresponse>
+     options="('A','B')"
+      correct="A"/>
+    </optionresponse>
 
     <solution>
       <div class="detailed-solution">
-        <p>Explanation</p>
-        <p>Use standard arithmetic operation symbols and indicate multiplication explicitly.</p>
-        <p>Use the symbol <tt>^</tt> to raise to a power.</p>
-        <p>Use parentheses to specify order of operations.</p>
       </div>
     </solution>
   </problem>
 
-XML Attribute Information
-
-<script>
 
 
-  .. image:: ../Images/formularesponse.png
+**XML Attribute Information**
+
+<optionresponse>
 
 
-<formularesponse>
+  .. image:: ../Images/option_response1.png
 
 
-  .. image:: ../Images/formularesponse3.png
+<optioninput>
 
-Children may include ``<formulaequationinput/>``.
+  .. image:: ../Images/optionresponse2.png
 
-If you do not need to specify any samples, you should look into the use of the
-Numerical Response input type, as it provides all the capabilities of Formula
-Response without the need to specify any unknown variables.
-
-<responseparam>
-
-
-  .. image:: ../Images/formularesponse6.png
-
-<formulaequationinput/>
-
-========= ============================================= =====
-Attribute                  Description                  Notes
-========= ============================================= =====
-size      (optional) defines the size (i.e. the width)
-          of the input box displayed to students for
-          typing their math expression.
-========= ============================================= =====
 
 .. raw:: latex
 
       \newpage %
 
 
-Image Response
-==============
-
-The Image Response input type presents an image and accepts clicks on the image as an answer.
-Images have to be uploaded to the courseware Assets directory. Response clicks are marked as correct if they are within a certain specified sub rectangle of the image canvas.
-
-*Note The Mozilla Firefox browser is currently not supported for this problem type.*
-
-Sample Problem:
-
-.. image:: ../Images/image294.png
- :width: 600
-
-
-**Problem Code**:
-
-.. code-block:: xml
-
-  <problem>
-    <p><b>Example Problem</b></p>
-  <startouttext/>
-      <p>You are given three shapes. Click on the triangle.</p>
-      <endouttext/>
-      <imageresponse>
-      <imageinput src="/c4x/edX/edX101/asset/threeshapes.png" width="220" height="150" rectangle="(80,40)-(130,90)" />
-      </imageresponse>
-  </problem>
-  Template
-  <problem>
-      <imageresponse>
-      <imageinput src="Path_to_Image_File.png" width="220" height="150" rectangle="(80,40)-(130,90)" />
-      </imageresponse>
-  </problem>
-
-XML Attribute Information
-
-
-<imageresponse>
-
-  .. image:: ../Images/imageresponse1.png
-
-<imageinput>
-
-  .. image:: ../Images/imageresponse2.png
-
-.. raw:: latex
-
-      \newpage %
-
-.. _Custom Response:
-
-Custom Response
-===============
-
-A Custom Response input type accepts one or more lines of text input from the student and evaluate the inputs for correctness using an embedded Python script.
-
-Sample Problem:
-
-.. image:: ../Images/image295.png
- :width: 600
- :alt: Image of a custom response problem
-
-
-**Problem Code**:
-
-.. code-block:: xml
-
-  <problem>
-    <p><b>Example Problem</b></p>
-  <script type="loncapa/python">
-
-  def test_add_to_ten(expect,ans):
-    try:
-      a1=int(ans[0])
-      a2=int(ans[1])
-    except ValueError:
-      a1=0
-      a2=0
-    return (a1+a2)==10
-
-  def test_add(expect,ans):
-    try:
-      a1=float(ans[0])
-      a2=float(ans[1])
-    except ValueError:
-      a1=0
-      a2=0
-    return (a1+a2)== float(expect)
-  </script>
-
-    <p>This question consists of two parts. </p>
-  <p>First, enter two integers which sum to 10. </p>
-  <customresponse cfn="test_add_to_ten">
-          <textline size="40" /><br/>
-          <textline size="40" />
-  </customresponse>
-
-    <p>Now enter two (finite) decimals which sum to 20.</p>
-  <customresponse cfn="test_add" expect="20">
-          <textline size="40" /><br/>
-          <textline size="40" />
-  </customresponse>
-
-      <solution>
-          <div class="detailed-solution">
-              <p>Explanation</p>
-            <p>For the first part, any two numbers of the form <i>n</i>
-              and <i>10-n</i>, where <i>n</i> is any integer, will work.
-              One possible answer would be the pair 0 and 10.
-            </p>
-            <p>For the second part, any pair <i>x</i> and <i>20-x</i> will work, where <i>x</i> is any real number with a finite decimal representation. Both inputs have to be entered either in standard decimal notation or in scientific exponential notation. One possible answer would be the pair 0.5 and 19.5. Another way to write this would be 5e-1 and 1.95e1.
-            </p>
-          </div>
-      </solution>
-  </problem>
-
-**Templates**
-
-*With displayed suggested correct answers*
-
-.. code-block:: xml
-
-  <problem>
-
-  <script type="loncapa/python">
-  def test_add(expect,ans):
-    a1=float(ans[0])
-    a2=float(ans[1])
-    return (a1+a2)== float(expect)
-  </script>
-
-
-  <p>Enter two real numbers which sum to 20: </p>
-  <customresponse cfn="test_add" expect="20">
-          <textline size="40" correct_answer="11"/><br/>
-          <textline size="40" correct_answer="9"/>
-  </customresponse>
-
-      <solution>
-          <div class="detailed-solution">
-          </div>
-      </solution>
-  </problem>
-
-
-**Templates**
-
-*With NO suggested correct answers*
-
-
-.. code-block:: xml
-
-  <problem>
-
-  <script type="loncapa/python">
-  def test_add(expect,ans):
-    a1=float(ans[0])
-    a2=float(ans[1])
-    return (a1+a2)== float(expect)
-  </script>
-
-
-  <p>Enter two real numbers which sum to 20: </p>
-  <customresponse cfn="test_add" expect="20">
-          <textline size="40" /><br/>
-          <textline size="40" />
-  </customresponse>
-
-      <solution>
-          <div class="detailed-solution">
-          </div>
-      </solution>
-  </problem>
-
-
-.. raw:: latex
-
-      \newpage %
-
-.. _Chemical Equation Response:
-
-Chemical Equation Response
-==========================
-
-The Chemical Equation Response input type is a special type of Custom Response
-that allows the student to enter chemical equations as answers.
-
-Sample Problem:
-
-.. image:: ../Images/image296.png
- :width: 600
- :alt: Image of a chemical equation response problem
-
-**Problem Code**:
-
-.. code-block:: xml
-
-  <problem>
-    <p><b>Example Problem</b></p>
-    <startouttext/>
-    <p>Some problems may ask for a particular chemical equation. Practice by writing out the following reaction in the box below.</p>
-    <center>\( \text{H}_2\text{SO}_4 \longrightarrow \text{ H}^+ + \text{ HSO}_4^-\)</center>
-    <br/>
-    <customresponse>
-      <chemicalequationinput size="50"/>
-      <answer type="loncapa/python">
-
-  if chemcalc.chemical_equations_equal(submission[0], 'H2SO4 -> H^+ + HSO4^-'):
-      correct = ['correct']
-  else:
-      correct = ['incorrect']
-
-  </answer>
-    </customresponse>
-    <p> Some tips:<ul><li>Only real element symbols are permitted.</li><li>Subscripts are entered with plain text.</li><li>Superscripts are indicated with a caret (^).</li><li>The reaction arrow (\(\longrightarrow\)) is indicated with "->".</li></ul>
-     So, you can enter "H2SO4 -> H^+ + HSO4^-".</p>
-    <endouttext/>
-  </problem>
-
-.. raw:: latex
-
-      \newpage %
+.. _Schematic Response:
 
 Schematic Response
-==================
+------------------
 
 The Schematic Response input type provides an interactive grid on which the
 student can construct a schematic answer, such as a circuit.
@@ -1135,3 +953,171 @@ Sample Problem:
             </div>
         </solution>
     </problem>
+
+.. _String Response:
+
+
+
+String Response
+---------------
+
+The String Response input type provides an input box in which the student can
+enter a line of text, which is then checked against a specified expected answer.
+
+A String Response input does not provide any answer suggestions, so it can be a
+good way to get the students to engage with the material more deeply in a
+sequence and look up, figure out, or remember the correct answer themselves.
+
+Note that a student's answer in a String Response is marked as correct if it
+matches every character of the expected answer. This can be a problem with
+international spelling, dates, or anything where the format of the answer is not
+clear.
+
+Sample Problem:
+
+.. image:: ../Images/image291.png
+ :width: 600
+ :alt: Image of a string response problem
+
+**Problem Code:**
+
+.. code-block:: xml
+
+  <problem>
+    <p><b>Example Problem</b></p>
+    <p>What is the name of this unit? (What response type is this?)</p>
+    <stringresponse answer="String Response" type="ci">
+      <textline size="20"/>
+    </stringresponse>
+    <solution>
+      <div class="detailed-solution">
+        <p>Explanation</p>
+        <p>The name of this unit is "String Response," written without the punctuation.</p>
+        <p>Arbitrary capitalization is accepted.</p>
+      </div>
+    </solution>
+  </problem>
+
+**Template**
+
+.. code-block:: xml
+
+  <problem>
+    <stringresponse answer="REPLACE_THIS" type="ci">
+      <textline size="20"/>
+    </stringresponse>
+    <solution>
+      <div class="detailed-solution">
+      </div>
+    </solution>
+  </problem>
+
+
+This response type allows to add more than one answer. Use `additional_answer`  tag to add more answers.
+
+You can add `regexp` to value of `type` attribute, for example: `type="ci regexp"` or `type="regexp"` or `type="regexp cs"`.
+In this case, any answer and hint will be treated as regular expressions.
+Regular expression has to match whole answer, for answer to be correct.
+Student answers "foobar", "o foo" or " ==foo==", will be correct if teacher has set answer=".*foo.*" with type="regexp".
+
+**Template**
+
+.. code-block:: xml
+
+    <problem>
+        <stringresponse answer="a1" type="ci regexp">
+            <additional_answer>\d5</additional_answer>
+            <additional_answer>a3</additional_answer>
+            <textline size="20"/>
+            <hintgroup>
+                <stringhint answer="a0" type="ci" name="ha0" />
+                <stringhint answer="a4" type="ci" name="ha4" />
+                <stringhint answer="^\d" type="ci" name="re1" />
+                <hintpart on="ha0">
+                    <startouttext />+1<endouttext />
+                </hintpart >
+                <hintpart on="ha4">
+                    <startouttext />-1<endouttext />
+                </hintpart >
+                <hintpart on="re1">
+                    <startouttext />Any number+5<endouttext />
+                </hintpart >
+            </hintgroup>
+        </stringresponse>
+    </problem>
+
+
+**XML Attribute Information**
+
+<stringresponse>
+
+ .. raw:: html
+
+      <table border="1" class="docutils" width="60%">
+        <colgroup>
+        <col width="15%">
+        <col width="75%">
+        <col width="10%">
+        </colgroup>
+        <thead valign="bottom">
+        <tr class="row-odd"><th class="head">Attribute</th>
+        <th class="head">Description</th>
+        <th class="head">Notes</th>
+        </tr>
+        </thead>
+        <tbody valign="top">
+        <tr class="row-even"><td>type</td>
+        <td>(optional) “[ci] [regex]”. Add “ci” if the student response should be graded case-insensitively. The default is to take case into consideration when grading. Add “regexp” for correct answer to be treated as regular expression.</td>
+        <td>&nbsp;</td>
+        </tr>
+        <tr class="row-odd"><td>answer</td>
+        <td>The string that is used to compare with student answer. If "regexp" is not presented in value of <em>type</em> attribute, student should enter value equal to exact value of this attribute in order to get credit. If  "regexp" is presented in value of <em>type</em> attribute, value of <em>answer</em> is treated as regular expression and exact match of this expression and student answer will be done. If search is successful, student will get credit.</td>
+        <td>&nbsp;</td>
+        </tr>
+        </tbody>
+      </table>
+
+      <table border="1" class="docutils" width="60%">
+        <colgroup>
+        <col width="15%">
+        <col width="75%">
+        <col width="10%">
+        </colgroup>
+        <thead valign="bottom">
+        <tr class="row-odd"><th class="head">Children</th>
+        <th class="head">Description</th>
+        <th class="head">Notes</th>
+        </tr>
+        </thead>
+        <tbody valign="top">
+        <tr class="row-even"><td>textline</td>
+        <td>used to accept student input. See description below.</td>
+        <td>&nbsp;</td>
+        </tr>
+        <tr class="row-odd"><td>additional_answer</td>
+        <td>todo</td>
+        <td>&nbsp;</td>
+        </tr>
+        </tbody>
+      </table>
+
+
+<textline>
+
+  .. image:: ../Images/stringresponse2.png
+
+<additional_answer> - Can be unlimited number of this tags. Any tag adds one more additional answer for matching.
+
+.. raw:: latex
+
+
+
+
+
+
+
+
+
+
+
+
