@@ -18,7 +18,7 @@ output() {
 
 SELF_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 REQUIREMENTS_DIR="$SELF_DIR/../requirements/system"
-BREW_FILE=$REQUIREMENTS_DIR/"mac_os_x/brew-formulas.txt"
+BREW_FILE="$SELF_DIR/../Brewfile"
 APT_REPOS_FILE=$REQUIREMENTS_DIR/"ubuntu/apt-repos.txt"
 APT_PKGS_FILE=$REQUIREMENTS_DIR/"ubuntu/apt-packages.txt"
 
@@ -70,20 +70,13 @@ EO
 
         output "Installing OSX requirements"
         if [[ ! -r $BREW_FILE ]]; then
-            error "$BREW_FILE does not exist, please include the brew formulas file in the requirements/system/mac_os_x directory"
+            error "$BREW_FILE does not exist, please include the brew formulas file in the Brewfile"
             exit 1
         fi
 
         # for some reason openssl likes to be installed by itself first
         brew install openssl
-
-        # brew errors if the package is already installed
-        for pkg in $(cat $BREW_FILE); do
-            grep $pkg <(brew list) &>/dev/null || {
-                output "Installing $pkg"
-                brew install $pkg
-            }
-        done
+        brew bundle $BREW_FILE
 
         # paths where brew likes to install python scripts
         PATH=/usr/local/share/python:/usr/local/bin:$PATH
