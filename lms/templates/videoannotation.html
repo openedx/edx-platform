@@ -60,12 +60,8 @@
 		uri = window.location.protocol;
 		for (var index = 0; index <= 9; index += 1) uri += lms_location.split("/")[index]+"/"; //Get the unit url
 	}
-<<<<<<< HEAD
 	var unit_id = $('#sequence-list').find('.active').attr("data-element");
         uri += unit_id;
-=======
-        uri += "${element_id}";
->>>>>>> b8e1e746cdf07cab7e891a19735792206db5f670
 	var pagination = 100,
 	 is_staff = !('${user.is_staff}'=='False'),
         options = {
