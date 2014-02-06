@@ -5,6 +5,9 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+LMS: In left accordion and progress page, due dates are now displayed in time
+zone specified by settings.TIME_ZONE, instead of UTC always
+
 LMS:  If the course start date is kept at the default studio value (Jan 1, 2030)
 and advertised_start is not set, the start date is not displayed in the
 /courses tile view, the course about page, or the dashboard
