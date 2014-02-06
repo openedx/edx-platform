@@ -158,14 +158,14 @@ class VideoFields(object):
         display_name="Additional translations for transcript",
         scope=Scope.settings,
         default={}
-        )
+    )
 
     transcript_language = String(
         help="Preferred language for transcript",
         display_name="Preferred language for transcript",
         scope=Scope.preferences,
         default="en"
-        )
+    )
 
 
 class VideoModule(VideoFields, XModule):
@@ -239,7 +239,7 @@ class VideoModule(VideoFields, XModule):
             if self.track:
                 track_url = self.track
             elif self.sub:
-                track_url = self.runtime.handler_url(self, 'transcript') + '/download'
+                track_url = self.runtime.handler_url(self, 'transcript').rstrip('/?') + '/download'
 
         if self.transcript_language in self.transcripts:
             transcript_language = self.transcript_language
@@ -281,7 +281,7 @@ class VideoModule(VideoFields, XModule):
             'yt_test_url': settings.YOUTUBE_TEST_URL,
             'transcript_language': transcript_language,
             'transcript_languages': json.dumps(transcript_languages),
-            'transcript_translation_url': self.runtime.handler_url(self, 'transcript') + '/translation'
+            'transcript_translation_url': self.runtime.handler_url(self, 'transcript').rstrip('/?') + '/translation'
         })
 
     def subs_filename(self, subs_id, lang='en'):

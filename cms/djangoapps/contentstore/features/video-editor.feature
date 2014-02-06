@@ -1,5 +1,5 @@
 @shard_3
-Feature: CMS.Video Component Editor
+Feature: CMS Video Component Editor
   As a course author, I want to be able to create video components.
 
   Scenario: User can view Video metadata

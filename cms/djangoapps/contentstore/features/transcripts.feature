@@ -1,5 +1,5 @@
 @shard_3
-Feature: CMS.Transcripts
+Feature: CMS Transcripts
   As a course author, I want to be able to create video components.
 
     # For transcripts acceptance tests there are 3 available caption

@@ -1,5 +1,5 @@
 @shard_3
-Feature: CMS.Video Component
+Feature: CMS Video Component
   As a course author, I want to be able to view my created videos in Studio.
 
   # 1
