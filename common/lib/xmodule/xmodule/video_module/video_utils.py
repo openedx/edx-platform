@@ -19,4 +19,4 @@ def create_youtube_string(module):
                     if pair[1]]
                 )
 
-# TODO: create get_transcripts_file()
+
