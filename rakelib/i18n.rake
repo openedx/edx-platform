@@ -9,7 +9,7 @@ directory I18N_REPORT_DIR
 namespace :i18n do
 
   desc "Extract localizable strings from sources"
-  task :extract => "i18n:validate:gettext" do
+  task :extract => ["i18n:validate:gettext", "assets:coffee"] do
     sh(File.join(REPO_ROOT, "i18n", "extract.py"))
   end
 
