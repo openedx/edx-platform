@@ -7,6 +7,17 @@ functionality
 
 import webob
 import ddt
+from factory import (
+    BUILD_STRATEGY,
+    Factory,
+    lazy_attribute,
+    LazyAttributeSequence,
+    post_generation,
+    SubFactory,
+    use_strategy,
+)
+from fs.memoryfs import MemoryFS
+from lxml import etree
 from mock import Mock
 from unittest.case import SkipTest, TestCase
 
@@ -15,7 +26,7 @@ from xblock.fields import ScopeIds
 
 from xmodule.modulestore import Location
 
-from xmodule.x_module import ModuleSystem, XModule, XModuleDescriptor
+from xmodule.x_module import ModuleSystem, XModule, XModuleDescriptor, DescriptorSystem
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.annotatable_module import AnnotatableDescriptor
 from xmodule.capa_module import CapaDescriptor
@@ -37,30 +48,30 @@ from xmodule.vertical_module import VerticalDescriptor
 from xmodule.wrapper_module import WrapperDescriptor
 from xmodule.tests import get_test_descriptor_system, get_test_system
 
-LEAF_XMODULES = (
-    AnnotatableDescriptor,
-    CapaDescriptor,
-    CombinedOpenEndedDescriptor,
-    DiscussionDescriptor,
-    GraphicalSliderToolDescriptor,
-    HtmlDescriptor,
-    PeerGradingDescriptor,
-    PollDescriptor,
-    WordCloudDescriptor,
+LEAF_XMODULES = {
+    AnnotatableDescriptor: [{}],
+    CapaDescriptor: [{}],
+    CombinedOpenEndedDescriptor: [{}],
+    DiscussionDescriptor: [{}],
+    GraphicalSliderToolDescriptor: [{}],
+    HtmlDescriptor: [{}],
+    PeerGradingDescriptor: [{}],
+    PollDescriptor: [{'display_name': 'Poll Display Name'}],
+    WordCloudDescriptor: [{}],
     # This is being excluded because it has dependencies on django
     #VideoDescriptor,
-)
+}
 
 
-CONTAINER_XMODULES = (
-    ConditionalDescriptor,
-    CourseDescriptor,
-    CrowdsourceHinterDescriptor,
-    RandomizeDescriptor,
-    SequenceDescriptor,
-    VerticalDescriptor,
-    WrapperDescriptor,
-)
+CONTAINER_XMODULES = {
+    ConditionalDescriptor: [{}],
+    CourseDescriptor: [{}],
+    CrowdsourceHinterDescriptor: [{}],
+    RandomizeDescriptor: [{}],
+    SequenceDescriptor: [{}],
+    VerticalDescriptor: [{}],
+    WrapperDescriptor: [{}],
+}
 
 # These modules are editable in studio yet
 NOT_STUDIO_EDITABLE = (
@@ -70,60 +81,122 @@ NOT_STUDIO_EDITABLE = (
 )
 
 
-def leaf_module_runtime():
-    return get_test_system()
+def flatten(class_dict):
+    """
+    Flatten a dict from cls -> [fields, ...] to a list of the form [(cls, fields), ...]
+    """
+    for cls, fields_list in class_dict.items():
+        for fields in fields_list:
+            yield (cls, fields)
 
 
-def leaf_descriptor(descriptor_cls, idx=0):
-    location = Location('i4x://org/course/category/name')
-    runtime = get_test_descriptor_system()
-    return runtime.construct_xblock_from_class(
-        descriptor_cls,
-        ScopeIds(None, descriptor_cls.__name__, location, location),
-        DictFieldData({'url_name': '{}_{}'.format(descriptor_cls, idx)}),
-    )
+@use_strategy(BUILD_STRATEGY)
+class ModuleSystemFactory(Factory):
+    FACTORY_FOR = ModuleSystem
+
+    @classmethod
+    def _build(cls, target_class, *args, **kwargs):
+        return get_test_system(*args, **kwargs)
 
 
-def leaf_module(descriptor_cls, idx=0):
-    """Returns a descriptor that is ready to proxy as an xmodule"""
-    descriptor = leaf_descriptor(descriptor_cls, idx)
-    descriptor.xmodule_runtime = leaf_module_runtime()
-    return descriptor
+@use_strategy(BUILD_STRATEGY)
+class DescriptorSystemFactory(Factory):
+    FACTORY_FOR = DescriptorSystem
+
+    @classmethod
+    def _build(cls, target_class, *args, **kwargs):
+        return get_test_descriptor_system(*args, **kwargs)
 
 
-def container_module_runtime(depth):
-    runtime = leaf_module_runtime()
-    if depth == 0:
-        runtime.get_module.side_effect = lambda x: leaf_module(HtmlDescriptor)
-    else:
-        runtime.get_module.side_effect = lambda x: container_module(VerticalDescriptor, depth - 1)
-    runtime.position = 2
-    return runtime
+class LeafModuleRuntimeFactory(ModuleSystemFactory):
+    pass
 
 
-def container_descriptor(descriptor_cls, depth):
-    """Return an instance of `descriptor_cls` with `depth` levels of children"""
-    location = Location('i4x://org/course/category/name')
-    runtime = get_test_descriptor_system()
+class ContainerModuleRuntimeFactory(ModuleSystemFactory):
+    @post_generation
+    def depth(self, create, depth, **kwargs):
+        if depth == 0:
+            self.get_module.side_effect = lambda x: LeafModuleFactory(descriptor_cls=HtmlDescriptor)
+        else:
+            self.get_module.side_effect = lambda x: ContainerModuleFactory(descriptor_cls=VerticalDescriptor, depth=depth-1)
 
-    if depth == 0:
-        runtime.load_item.side_effect = lambda x: leaf_module(HtmlDescriptor)
-    else:
-        runtime.load_item.side_effect = lambda x: container_module(VerticalDescriptor, depth - 1)
+    @post_generation
+    def position(self, create, position=2, **kwargs):
+        self.position = position
 
-    return runtime.construct_xblock_from_class(
-        descriptor_cls,
-        ScopeIds(None, descriptor_cls.__name__, location, location),
-        DictFieldData({
-            'children': range(3)
-        }),
-    )
 
-def container_module(descriptor_cls, depth):
-    """Returns a descriptor that is ready to proxy as an xmodule"""
-    descriptor = container_descriptor(descriptor_cls, depth)
-    descriptor.xmodule_runtime = container_module_runtime(depth)
-    return descriptor
+class ContainerDescriptorRuntimeFactory(DescriptorSystemFactory):
+    @post_generation
+    def depth(self, create, depth, **kwargs):
+        if depth == 0:
+            self.load_item.side_effect = lambda x: LeafModuleFactory(descriptor_cls=HtmlDescriptor)
+        else:
+            self.load_item.side_effect = lambda x: ContainerModuleFactory(descriptor_cls=VerticalDescriptor, depth=depth-1)
+
+    @post_generation
+    def position(self, create, position=2, **kwargs):
+        self.position = position
+
+
+@use_strategy(BUILD_STRATEGY)
+class LeafDescriptorFactory(Factory):
+    FACTORY_FOR = XModuleDescriptor
+
+    runtime = SubFactory(DescriptorSystemFactory)
+    url_name = LazyAttributeSequence('{.block_type}_{}'.format)
+
+    @lazy_attribute
+    def location(self):
+        return Location('i4x://org/course/category/{}'.format(self.url_name))
+
+    @lazy_attribute
+    def block_type(self):
+        return self.descriptor_cls.__name__
+
+    @lazy_attribute
+    def definition_id(self):
+        return self.location
+
+    @lazy_attribute
+    def usage_id(self):
+        return self.location
+
+    @classmethod
+    def _build(cls, target_class, *args, **kwargs):
+        runtime = kwargs.pop('runtime')
+        desc_cls = kwargs.pop('descriptor_cls')
+        block_type = kwargs.pop('block_type')
+        def_id = kwargs.pop('definition_id')
+        usage_id = kwargs.pop('usage_id')
+
+        block = runtime.construct_xblock_from_class(
+            desc_cls,
+            ScopeIds(None, block_type, def_id, usage_id),
+            DictFieldData(dict(**kwargs))
+        )
+        block.save()
+        return block
+
+
+class LeafModuleFactory(LeafDescriptorFactory):
+
+    @post_generation
+    def xmodule_runtime(self, create, xmodule_runtime, **kwargs):
+        if xmodule_runtime is None:
+            xmodule_runtime = LeafModuleRuntimeFactory()
+
+        self.xmodule_runtime = xmodule_runtime
+
+
+class ContainerDescriptorFactory(LeafDescriptorFactory):
+    runtime = SubFactory(ContainerDescriptorRuntimeFactory)
+    children = range(3)
+
+
+class ContainerModuleFactory(LeafModuleFactory):
+    @lazy_attribute
+    def xmodule_runtime(self):
+        return ContainerModuleRuntimeFactory(depth=self.depth)
 
 
 @ddt.ddt
@@ -142,30 +215,32 @@ class TestXBlockWrapper(object):
 
     # Test that for all of the leaf XModule Descriptors,
     # the test property holds
-    @ddt.data(*LEAF_XMODULES)
-    def test_leaf_node(self, descriptor_cls):
+    @ddt.data(*flatten(LEAF_XMODULES))
+    def test_leaf_node(self, cls_and_fields):
+        descriptor_cls, fields = cls_and_fields
         self.skip_if_invalid(descriptor_cls)
-        descriptor = leaf_module(descriptor_cls)
+        descriptor = LeafModuleFactory(descriptor_cls=descriptor_cls, **fields)
         self.check_property(descriptor)
 
     # Test that when an xmodule is generated from descriptor_cls
     # with only xmodule children, the test property holds
-    @ddt.data(*CONTAINER_XMODULES)
-    def test_container_node_xmodules_only(self, descriptor_cls):
+    @ddt.data(*flatten(CONTAINER_XMODULES))
+    def test_container_node_xmodules_only(self, cls_and_fields):
+        descriptor_cls, fields = cls_and_fields
         self.skip_if_invalid(descriptor_cls)
-        descriptor = container_module(descriptor_cls, 2)
+        descriptor = ContainerModuleFactory(descriptor_cls=descriptor_cls, depth=2, **fields)
         self.check_property(descriptor)
 
     # Test that when an xmodule is generated from descriptor_cls
     # with mixed xmodule and xblock children, the test property holds
-    @ddt.data(*CONTAINER_XMODULES)
-    def test_container_node_mixed(self, descriptor_cls):
+    @ddt.data(*flatten(CONTAINER_XMODULES))
+    def test_container_node_mixed(self, cls_and_fields):
         raise SkipTest("XBlock support in XDescriptor not yet fully implemented")
 
     # Test that when an xmodule is generated from descriptor_cls
     # with only xblock children, the test property holds
-    @ddt.data(*CONTAINER_XMODULES)
-    def test_container_node_xblocks_only(self, descriptor_cls):
+    @ddt.data(*flatten(CONTAINER_XMODULES))
+    def test_container_node_xblocks_only(self, cls_and_fields):
         raise SkipTest("XBlock support in XModules not yet fully implemented")
 
 
