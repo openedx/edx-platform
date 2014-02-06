@@ -32,14 +32,7 @@ class TextAnnotationModuleTestCase(unittest.TestCase):
             DictFieldData({'data':self.sample_xml}),
             ScopeIds(None, None, None, None)
         )
-    
-    def test_render_content(self):
-        content = self.mod._render_content()
-        self.assertIsNotNone(content)
-        el = etree.fromstring(content)
-        self.assertIsNotNone(el)
-        self.assertFalse('display_name' in el.attrib, "Display Name should have been deleted from Content")
-    
+
     def test_extract_instructions(self):
         xmltree = etree.fromstring(self.sample_xml)
 
@@ -53,6 +46,9 @@ class TextAnnotationModuleTestCase(unittest.TestCase):
         self.assertIsNone(actual)
     
     def test_get_html(self):
-        context = self.mod.get_html()
-        for key in ['display_name', 'tag','source','element_id','instructions_html','content_html','annotation_storage']:
+        """
+        Tests the function that passes in all the information in the context that will be used in templates/textannotation.html
+        """
+        context = self.mod.get_html()  # pylint: disable=W0212
+        for key in ['display_name', 'tag', 'source', 'instructions_html', 'content_html', 'annotation_storage']:
             self.assertIn(key, context)

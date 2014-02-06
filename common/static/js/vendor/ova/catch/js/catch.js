@@ -568,7 +568,6 @@ CatchAnnotation.prototype = {
         var moreBut = this.element.find('.annotationListButtons .moreButtonCatch');
         moreBut.html('More');
         
-        setTimeout();
     },
 
 //    

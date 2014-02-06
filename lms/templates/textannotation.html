@@ -163,10 +163,8 @@
             }
         },
     };
-	
-
-	var imgURLRoot = "${settings.STATIC_URL}" + "js/vendor/ova/catch/img/";
-	tinyMCE.baseURL = "${settings.STATIC_URL}" + "js/vendor/ova";
+    tinyMCE.baseURL = "${settings.STATIC_URL}" + "js/vendor/ova";
+    var imgURLRoot = "${settings.STATIC_URL}" + "js/vendor/ova/catch/img/";
 	
     if (typeof Annotator != 'undefined'){
     	    //remove old instances

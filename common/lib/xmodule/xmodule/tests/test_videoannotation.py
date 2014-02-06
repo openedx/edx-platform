@@ -29,87 +29,13 @@ class VideoAnnotationModuleTestCase(unittest.TestCase):
             DictFieldData({'data':self.sample_xml, 'sourceUrl':sample_sourceURL}),
             ScopeIds(None, None, None, None)
         )
-    
-    def test_annotation_class_attr_default(self):
-        xml = '<annotation title="x" body="y" problem="0">test</annotation>'
-        el = etree.fromstring(xml)
 
-        expected_attr = { 'class': { 'value': 'annotatable-span highlight' } }
-        actual_attr = self.mod._get_annotation_class_attr(0, el)
-
-        self.assertIsInstance(actual_attr, dict)
-        self.assertDictEqual(expected_attr, actual_attr)
-
-    def test_annotation_class_attr_with_valid_highlight(self):
-        xml = '<annotation title="x" body="y" problem="0" highlight="{highlight}">test</annotation>'
-
-        for color in self.mod.highlight_colors:
-            el = etree.fromstring(xml.format(highlight=color))
-            value = 'annotatable-span highlight highlight-{highlight}'.format(highlight=color)
-
-            expected_attr = { 'class': {
-                'value': value,
-                '_delete': 'highlight' }
-            }
-            actual_attr = self.mod._get_annotation_class_attr(0, el)
-
-            self.assertIsInstance(actual_attr, dict)
-            self.assertDictEqual(expected_attr, actual_attr)
-
-    def test_annotation_class_attr_with_invalid_highlight(self):
-        xml = '<annotation title="x" body="y" problem="0" highlight="{highlight}">test</annotation>'
-
-        for invalid_color in ['rainbow', 'blink', 'invisible', '', None]:
-            el = etree.fromstring(xml.format(highlight=invalid_color))
-            expected_attr = { 'class': {
-                'value': 'annotatable-span highlight',
-                '_delete': 'highlight' }
-            }
-            actual_attr = self.mod._get_annotation_class_attr(0, el)
-
-            self.assertIsInstance(actual_attr, dict)
-            self.assertDictEqual(expected_attr, actual_attr)
-    
-    def test_annotation_data_attr(self):
-        el = etree.fromstring('<annotation title="bar" body="foo" problem="0">test</annotation>')
-
-        expected_attr = {
-            'data-comment-body': {'value': 'foo', '_delete': 'body' },
-            'data-comment-title': {'value': 'bar', '_delete': 'title'},
-            'data-problem-id': {'value': '0', '_delete': 'problem'}
-        }
-        
-        actual_attr = self.mod._get_annotation_data_attr(0, el)
-        
-        self.assertIsInstance(actual_attr, dict)
-        self.assertDictEqual(expected_attr, actual_attr)
-    
-    def test_render_annotation(self):
-        expected_html = '<span class="annotatable-span highlight highlight-yellow" data-comment-title="x" data-comment-body="y" data-problem-id="0">z</span>'
-        expected_el = etree.fromstring(expected_html)
-
-        actual_el = etree.fromstring('<annotation title="x" body="y" problem="0" highlight="yellow">z</annotation>')
-        self.mod._render_annotation(0, actual_el)
-
-        self.assertEqual(expected_el.tag, actual_el.tag)
-        self.assertEqual(expected_el.text, actual_el.text)
-        self.assertDictEqual(dict(expected_el.attrib), dict(actual_el.attrib))
-    
-    def test_render_content(self):
-        content = self.mod._render_content()
-        el = etree.fromstring(content)
-
-        self.assertEqual('div', element.tag, 'root tag is a div')
-
-        expected_num_annotations = 5
-        actual_num_annotations = element.xpath('count(//span[contains(@class,"annotatable-span")])')
-        self.assertEqual(expected_num_annotations, actual_num_annotations, 'check number of annotations')
-    
     def test_extract_instructions(self):
         xmltree = etree.fromstring(self.sample_xml)
 
         expected_xml = u"<div><p>Video Test Instructions.</p></div>"
-        actual_xml = self.mod._extract_instructions(xmltree)
+        actual_xml = self.mod._extract_instructions(xmltree)  # pylint: disable=W0212
+
         self.assertIsNotNone(actual_xml)
         self.assertEqual(expected_xml.strip(), actual_xml.strip())
 
@@ -126,6 +52,9 @@ class VideoAnnotationModuleTestCase(unittest.TestCase):
         self.assertEqual(expectedNotYoutube, result1)
     
     def test_get_html(self):
-        context = self.mod.get_html()
-        for key in ['display_name', 'element_id', 'content_html', 'instructions_html', 'sourceUrl','typeSource','poster','alert','annotation_storage']:
+        """
+        Tests to make sure variables passed in truly exist within the html once it is all rendered.
+        """
+        context = self.mod.get_html()  # pylint: disable=W0212
+        for key in ['display_name', 'instructions_html', 'sourceUrl', 'typeSource', 'poster', 'annotation_storage']:
             self.assertIn(key, context)

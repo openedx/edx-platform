@@ -602,4 +602,3 @@ function setInnerText(element, text) {
   setInnerText(style, css);
   document.getElementsByTagName("head")[0].appendChild(style);
 })();
-

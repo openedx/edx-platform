@@ -30,25 +30,17 @@ def create_token(secret, data):
     return _encode_token(secret, data)
 
 
-if sys.version_info < (2, 7):
-    def _encode(bytes_data):
-        '''
-        Takes a json object, string, or binary and
-        uses python's urlsafe_b64encode to encode data
-        and make it safe pass along in a url.
-        To make sure it does not conflict with variables
-        we make sure equal signs are removed.
-        More info: docs.python.org/2/library/base64.html
-        '''
-        encoded = urlsafe_b64encode(bytes(bytes_data))
-        return encoded.decode('utf-8').replace('=', '')
-else:
-    def _encode(bytes_info):
-        '''
-        Same as above function but for Python 2.7 or later
-        '''
-        encoded = urlsafe_b64encode(bytes_info)
-        return encoded.decode('utf-8').replace('=', '')
+def _encode(bytes_info):
+    '''
+    Takes a json object, string, or binary and
+    uses python's urlsafe_b64encode to encode data
+    and make it safe pass along in a url.
+    To make sure it does not conflict with variables
+    we make sure equal signs are removed.
+    More info: docs.python.org/2/library/base64.html
+    '''
+    encoded = urlsafe_b64encode(bytes_info)
+    return encoded.decode('utf-8').replace('=', '')
 
 
 def _encode_json(obj):
