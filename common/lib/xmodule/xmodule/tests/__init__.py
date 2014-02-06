@@ -31,13 +31,13 @@ DATA_DIR = MODULE_DIR.parent.parent.parent.parent / "test" / "data"
 
 
 open_ended_grading_interface = {
-        'url': 'blah/',
-        'username': 'incorrect_user',
-        'password': 'incorrect_pass',
-        'staff_grading' : 'staff_grading',
-        'peer_grading' : 'peer_grading',
-        'grading_controller' : 'grading_controller'
-    }
+    'url': 'blah/',
+    'username': 'incorrect_user',
+    'password': 'incorrect_pass',
+    'staff_grading': 'staff_grading',
+    'peer_grading': 'peer_grading',
+    'grading_controller': 'grading_controller',
+}
 
 
 class TestModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
