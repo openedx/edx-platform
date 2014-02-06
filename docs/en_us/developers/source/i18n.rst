@@ -14,6 +14,13 @@ See also:
 * `Django Translation guidelines <https://docs.djangoproject.com/en/dev/topics/i18n/translation/>`_
 * `Django Format localization <https://docs.djangoproject.com/en/dev/topics/i18n/formatting/>`_
 
+Presented in this document are the following sections:
+
+* `General internationalization rules`_
+* `Editing source files`_
+* `Coverage testing`_
+* `Style guidelines`_
+
 
 General internationalization rules
 **********************************
@@ -57,9 +64,17 @@ do:
    produce the best translation.  They have a "Translators:" marker. They must
    appear on the line preceding the text they describe.
 
-The code samples below show how to do each of these things.  Note that you have
-to take into account not just the programming language involved, but the type
-of file: Javascript embedded in an HTML Mako template is treated differently
+The code samples below show how to do each of these things for:
+
+* `Python source code`_
+* `Django template files`_
+* `Mako template files`_
+* `Javascript files`_
+* `Coffeescript files`_
+* `Other kinds of code`_
+
+Note that you have to take into account not just the programming language involved,
+but the type of file: Javascript embedded in an HTML Mako template is treated differently
 than Javascript in a pure .js file.
 
 Python source code
@@ -210,16 +225,20 @@ the strings, or checking the translations into Github, see use cases).
  
     $ rake i18n:generate
 
-4. Django should be ready to go. The next time you run Studio or LMS with a
-   browser set to Esperanto, the accented-English strings (from step 3, above)
-   should be displayed.  Be sure that your settings for ``USE_I18N`` and
-   ``USE_L10N`` are both set to True.  ``USE_I18N`` is set to False by default
-   in common.py, but is set to True in development settings files.
+4. Django should be ready to go. The next time you run Studio or LMS, append
+   ``?preview-lang=eo`` to the URL to turn on Esperanto as a dark language. The
+   accented-English strings (from step 3, above) should be displayed.
 
-5. With your browser set to Esperanto, review the pages affected by your code
-   and verify that you see fake translations. If you see plain English instead,
-   your code is not being properly translated. Review the steps in editing
-   source files (above).
+   If you experience issues, be sure that your settings for ``USE_I18N`` and
+   ``USE_L10N`` are both set to True.
+
+5. With Esperanto turned on as a dark language (see Step 4), review the pages
+   affected by your code and verify that you see fake translations. If you see
+   plain English instead, your code is not being properly translated. Review 
+   the steps in editing source files (above). 
+
+6. When you are done reviewing, append ``?clear-lang`` to the LMS or Studio URL
+   to reset your session to English.
 
 
 Coverage testing
