@@ -564,6 +564,65 @@ class TestStaffDebugInfo(ModuleStoreTestCase):
         result_fragment = module.render('student_view')
         self.assertIn('Staff Debug', result_fragment.content)
 
+    @patch.dict('django.conf.settings.FEATURES', {'DISPLAY_HISTOGRAMS_TO_STAFF': False})
+    def test_histogram_disabled(self):
+        module = render.get_module(
+            self.user,
+            self.request,
+            self.location,
+            self.field_data_cache,
+            self.course.id,
+        )
+        result_fragment = module.render('student_view')
+        self.assertNotIn('histrogram', result_fragment.content)
+
+    def test_histogram_enabled_for_unscored_xmodules(self):
+        """Histograms should not display for xmodules which are not scored."""
+
+        html_descriptor = ItemFactory.create(
+            category='html',
+            data='Here are some course details.'
+        )
+        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+            self.course.id,
+            self.user,
+            self.descriptor
+        )
+        with patch('xmodule_modifiers.grade_histogram') as mock_grade_histogram:
+            mock_grade_histogram.return_value = []
+            module = render.get_module(
+                self.user,
+                self.request,
+                html_descriptor.location,
+                field_data_cache,
+                self.course.id,
+            )
+            module.render('student_view')
+            self.assertFalse(mock_grade_histogram.called)
+
+    def test_histogram_enabled_for_scored_xmodules(self):
+        """Histograms should display for xmodules which are scored."""
+
+        StudentModuleFactory.create(
+            course_id=self.course.id,
+            module_state_key=self.location,
+            student=UserFactory(),
+            grade=1,
+            max_grade=1,
+            state="{}",
+        )
+        with patch('xmodule_modifiers.grade_histogram') as mock_grade_histogram:
+            mock_grade_histogram.return_value = []
+            module = render.get_module(
+                self.user,
+                self.request,
+                self.location,
+                self.field_data_cache,
+                self.course.id,
+            )
+            module.render('student_view')
+            self.assertTrue(mock_grade_histogram.called)
+
 
 PER_COURSE_ANONYMIZED_DESCRIPTORS = (LTIDescriptor, )
 

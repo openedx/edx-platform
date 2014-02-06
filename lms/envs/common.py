@@ -57,6 +57,7 @@ FEATURES = {
     'USE_DJANGO_PIPELINE': True,
 
     'DISPLAY_DEBUG_INFO_TO_STAFF': True,
+    'DISPLAY_HISTOGRAMS_TO_STAFF': False,  # For large courses this slows down courseware access for staff.
 
     'REROUTE_ACTIVATION_EMAIL': False,  # nonempty string = address for all activation emails
     'DEBUG_LEVEL': 0,  # 0 = lowest level, least verbose, 255 = max level, most verbose
