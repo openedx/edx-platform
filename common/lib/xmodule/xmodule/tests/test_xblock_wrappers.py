@@ -6,9 +6,9 @@ functionality
 # pylint: disable=protected-access
 
 import webob
-from nose.tools import assert_equal, assert_is_instance  # pylint: disable=E0611
-from unittest.case import SkipTest
+import ddt
 from mock import Mock
+from unittest.case import SkipTest, TestCase
 
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
@@ -69,189 +69,141 @@ NOT_STUDIO_EDITABLE = (
     PollDescriptor
 )
 
+
+def leaf_module_runtime():
+    return get_test_system()
+
+
+def leaf_descriptor(descriptor_cls, idx=0):
+    location = Location('i4x://org/course/category/name')
+    runtime = get_test_descriptor_system()
+    return runtime.construct_xblock_from_class(
+        descriptor_cls,
+        ScopeIds(None, descriptor_cls.__name__, location, location),
+        DictFieldData({'url_name': '{}_{}'.format(descriptor_cls, idx)}),
+    )
+
+
+def leaf_module(descriptor_cls, idx=0):
+    """Returns a descriptor that is ready to proxy as an xmodule"""
+    descriptor = leaf_descriptor(descriptor_cls, idx)
+    descriptor.xmodule_runtime = leaf_module_runtime()
+    return descriptor
+
+
+def container_module_runtime(depth):
+    runtime = leaf_module_runtime()
+    if depth == 0:
+        runtime.get_module.side_effect = lambda x: leaf_module(HtmlDescriptor)
+    else:
+        runtime.get_module.side_effect = lambda x: container_module(VerticalDescriptor, depth - 1)
+    runtime.position = 2
+    return runtime
+
+
+def container_descriptor(descriptor_cls, depth):
+    """Return an instance of `descriptor_cls` with `depth` levels of children"""
+    location = Location('i4x://org/course/category/name')
+    runtime = get_test_descriptor_system()
+
+    if depth == 0:
+        runtime.load_item.side_effect = lambda x: leaf_module(HtmlDescriptor)
+    else:
+        runtime.load_item.side_effect = lambda x: container_module(VerticalDescriptor, depth - 1)
+
+    return runtime.construct_xblock_from_class(
+        descriptor_cls,
+        ScopeIds(None, descriptor_cls.__name__, location, location),
+        DictFieldData({
+            'children': range(3)
+        }),
+    )
+
+def container_module(descriptor_cls, depth):
+    """Returns a descriptor that is ready to proxy as an xmodule"""
+    descriptor = container_descriptor(descriptor_cls, depth)
+    descriptor.xmodule_runtime = container_module_runtime(depth)
+    return descriptor
+
+
+@ddt.ddt
 class TestXBlockWrapper(object):
-    """Helper methods used in test case classes below."""
 
-    @property
-    def leaf_module_runtime(self):
-        return get_test_system()
+    __test__ = False
 
-    def leaf_descriptor(self, descriptor_cls):
-        location = Location('i4x://org/course/category/name')
-        runtime = get_test_descriptor_system()
-        return runtime.construct_xblock_from_class(
-            descriptor_cls,
-            ScopeIds(None, descriptor_cls.__name__, location, location),
-            DictFieldData({}),
-        )
+    def skip_if_invalid(self, descriptor_cls):
+        """
+        Raise SkipTest if this descriptor_cls shouldn't be tested.
+        """
+        pass
 
-    def leaf_module(self, descriptor_cls):
-        """Returns a descriptor that is ready to proxy as an xmodule"""
-        descriptor = self.leaf_descriptor(descriptor_cls)
-        descriptor.xmodule_runtime = self.leaf_module_runtime
-        return descriptor
-
-    def container_module_runtime(self, depth):
-        runtime = self.leaf_module_runtime
-        if depth == 0:
-            runtime.get_module.side_effect = lambda x: self.leaf_module(HtmlDescriptor)
-        else:
-            runtime.get_module.side_effect = lambda x: self.container_module(VerticalDescriptor, depth - 1)
-        runtime.position = 2
-        return runtime
-
-    def container_descriptor(self, descriptor_cls, depth):
-        """Return an instance of `descriptor_cls` with `depth` levels of children"""
-        location = Location('i4x://org/course/category/name')
-        runtime = get_test_descriptor_system()
-
-        if depth == 0:
-            runtime.load_item.side_effect = lambda x: self.leaf_module(HtmlDescriptor)
-        else:
-            runtime.load_item.side_effect = lambda x: self.container_module(VerticalDescriptor, depth - 1)
-
-        return runtime.construct_xblock_from_class(
-            descriptor_cls,
-            ScopeIds(None, descriptor_cls.__name__, location, location),
-            DictFieldData({
-                'children': range(3)
-            }),
-        )
-
-    def container_module(self, descriptor_cls, depth):
-        """Returns a descriptor that is ready to proxy as an xmodule"""
-        descriptor = self.container_descriptor(descriptor_cls, depth)
-        descriptor.xmodule_runtime = self.container_module_runtime(depth)
-        return descriptor
-
-class TestStudentView(TestXBlockWrapper):
+    def check_property(self, descriptor):
+        raise SkipTest("check_property not defined")
 
     # Test that for all of the leaf XModule Descriptors,
-    # the student_view wrapper returns the same thing in its content
-    # as get_html returns
-    def test_student_view_leaf_node(self):
-        for descriptor_cls in LEAF_XMODULES:
-            yield self.check_student_view_leaf_node, descriptor_cls
+    # the test property holds
+    @ddt.data(*LEAF_XMODULES)
+    def test_leaf_node(self, descriptor_cls):
+        self.skip_if_invalid(descriptor_cls)
+        descriptor = leaf_module(descriptor_cls)
+        self.check_property(descriptor)
 
-    # Check that when an xmodule is instantiated from descriptor_cls
-    # it generates the same thing from student_view that it does from get_html
-    def check_student_view_leaf_node(self, descriptor_cls):
+    # Test that when an xmodule is generated from descriptor_cls
+    # with only xmodule children, the test property holds
+    @ddt.data(*CONTAINER_XMODULES)
+    def test_container_node_xmodules_only(self, descriptor_cls):
+        self.skip_if_invalid(descriptor_cls)
+        descriptor = container_module(descriptor_cls, 2)
+        self.check_property(descriptor)
 
-        if descriptor_cls.module_class.student_view != XModule.student_view:
-            raise SkipTest(descriptor_cls.__name__ + " implements student_view")
-
-        descriptor = self.leaf_module(descriptor_cls)
-        assert_equal(
-            descriptor._xmodule.get_html(),
-            descriptor.render('student_view').content
-        )
-
-    # Test that for all container XModule Descriptors,
-    # their corresponding XModule renders the same thing using student_view
-    # as it does using get_html, under the following conditions:
-    # a) All of its descendents are xmodules
-    # b) Some of its descendents are xmodules and some are xblocks
-    # c) All of its descendents are xblocks
-    def test_student_view_container_node(self):
-        for descriptor_cls in CONTAINER_XMODULES:
-            yield self.check_student_view_container_node_xmodules_only, descriptor_cls
-            yield self.check_student_view_container_node_mixed, descriptor_cls
-            yield self.check_student_view_container_node_xblocks_only, descriptor_cls
-
-    # Check that when an xmodule is generated from descriptor_cls
-    # with only xmodule children, it generates the same html from student_view
-    # as it does using get_html
-    def check_student_view_container_node_xmodules_only(self, descriptor_cls):
-
-        if descriptor_cls.module_class.student_view != XModule.student_view:
-            raise SkipTest(descriptor_cls.__name__ + " implements student_view")
-
-        descriptor = self.container_module(descriptor_cls, 2)
-        assert_equal(
-            descriptor._xmodule.get_html(),
-            descriptor.render('student_view').content
-        )
-
-    # Check that when an xmodule is generated from descriptor_cls
-    # with mixed xmodule and xblock children, it generates the same html from student_view
-    # as it does using get_html
-    def check_student_view_container_node_mixed(self, descriptor_cls):
+    # Test that when an xmodule is generated from descriptor_cls
+    # with mixed xmodule and xblock children, the test property holds
+    @ddt.data(*CONTAINER_XMODULES)
+    def test_container_node_mixed(self, descriptor_cls):
         raise SkipTest("XBlock support in XDescriptor not yet fully implemented")
 
-    # Check that when an xmodule is generated from descriptor_cls
-    # with only xblock children, it generates the same html from student_view
-    # as it does using get_html
-    def check_student_view_container_node_xblocks_only(self, descriptor_cls):
+    # Test that when an xmodule is generated from descriptor_cls
+    # with only xblock children, the test property holds
+    @ddt.data(*CONTAINER_XMODULES)
+    def test_container_node_xblocks_only(self, descriptor_cls):
         raise SkipTest("XBlock support in XModules not yet fully implemented")
 
 
-class TestStudioView(TestXBlockWrapper):
+class TestStudentView(TestXBlockWrapper, TestCase):
+    __test__ = True
 
-    # Test that for all of the Descriptors listed in LEAF_XMODULES,
-    # the studio_view wrapper returns the same thing in its content
-    # as get_html returns
-    def test_studio_view_leaf_node(self):
-        for descriptor_cls in LEAF_XMODULES:
-            yield self.check_studio_view_leaf_node, descriptor_cls
+    def skip_if_invalid(self, descriptor_cls):
+        if descriptor_cls.module_class.student_view != XModule.student_view:
+            raise SkipTest(descriptor_cls.__name__ + " implements student_view")
 
-    # Check that when a descriptor is instantiated from descriptor_cls
-    # it generates the same thing from studio_view that it does from get_html
-    def check_studio_view_leaf_node(self, descriptor_cls):
+    def check_property(self, descriptor):
+        """
+        Assert that both student_view and get_html render the same.
+        """
+        self.assertEqual(
+            descriptor._xmodule.get_html(),
+            descriptor.render('student_view').content
+        )
+
+
+class TestStudioView(TestXBlockWrapper, TestCase):
+    __test__ = True
+
+    def skip_if_invalid(self, descriptor_cls):
         if descriptor_cls in NOT_STUDIO_EDITABLE:
             raise SkipTest(descriptor_cls.__name__ + " is not editable in studio")
 
         if descriptor_cls.studio_view != XModuleDescriptor.studio_view:
             raise SkipTest(descriptor_cls.__name__ + " implements studio_view")
 
-        descriptor = self.leaf_descriptor(descriptor_cls)
-        assert_equal(descriptor.get_html(), descriptor.render('studio_view').content)
+    def check_property(self, descriptor):
+        """
+        Assert that studio_view and get_html render the same.
+        """
+        self.assertEqual(descriptor.get_html(), descriptor.render('studio_view').content)
 
 
-    # Test that for all of the Descriptors listed in CONTAINER_XMODULES
-    # render the same thing using studio_view as they do using get_html, under the following conditions:
-    # a) All of its descendants are xmodules
-    # b) Some of its descendants are xmodules and some are xblocks
-    # c) All of its descendants are xblocks
-    def test_studio_view_container_node(self):
-        for descriptor_cls in CONTAINER_XMODULES:
-            yield self.check_studio_view_container_node_xmodules_only, descriptor_cls
-            yield self.check_studio_view_container_node_mixed, descriptor_cls
-            yield self.check_studio_view_container_node_xblocks_only, descriptor_cls
-
-
-    # Check that when a descriptor is generated from descriptor_cls
-    # with only xmodule children, it generates the same html from studio_view
-    # as it does using get_html
-    def check_studio_view_container_node_xmodules_only(self, descriptor_cls):
-        if descriptor_cls in NOT_STUDIO_EDITABLE:
-            raise SkipTest(descriptor_cls.__name__ + "is not editable in studio")
-
-        if descriptor_cls.studio_view != XModuleDescriptor.studio_view:
-            raise SkipTest(descriptor_cls.__name__ + " implements studio_view")
-
-        descriptor = self.container_descriptor(descriptor_cls, 2)
-        assert_equal(descriptor.get_html(), descriptor.render('studio_view').content)
-
-    # Check that when a descriptor is generated from descriptor_cls
-    # with mixed xmodule and xblock children, it generates the same html from studio_view
-    # as it does using get_html
-    def check_studio_view_container_node_mixed(self, descriptor_cls):
-        if descriptor_cls in NOT_STUDIO_EDITABLE:
-            raise SkipTest(descriptor_cls.__name__ + "is not editable in studio")
-
-        raise SkipTest("XBlock support in XDescriptor not yet fully implemented")
-
-    # Check that when a descriptor is generated from descriptor_cls
-    # with only xblock children, it generates the same html from studio_view
-    # as it does using get_html
-    def check_studio_view_container_node_xblocks_only(self, descriptor_cls):
-        if descriptor_cls in NOT_STUDIO_EDITABLE:
-            raise SkipTest(descriptor_cls.__name__ + "is not editable in studio")
-
-        raise SkipTest("XBlock support in XModules not yet fully implemented")
-
-
-class TestXModuleHandler(TestXBlockWrapper):
+class TestXModuleHandler(TestCase):
     """
     Tests that the xmodule_handler function correctly wraps handle_ajax
     """
@@ -271,5 +223,5 @@ class TestXModuleHandler(TestXBlockWrapper):
 
     def test_xmodule_handler_return_value(self):
         response = self.module.xmodule_handler(self.request)
-        assert_is_instance(response, webob.Response)
-        assert_equal(response.body, '{}')
+        self.assertIsInstance(response, webob.Response)
+        self.assertEqual(response.body, '{}')
