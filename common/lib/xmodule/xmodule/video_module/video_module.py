@@ -341,7 +341,7 @@ class VideoModule(VideoFields, XModule):
             log.debug("Dispatch is not allowed")
             return Response(status=404)
 
-        if ('language' not in request.GET or \
+        if ('language' not in request.GET or
             'videoId' not in request.GET and dispatch == 'translation'):
             log.info("Invalid /transcript GET parameters.")
             return Response(status=400)
