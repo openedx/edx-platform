@@ -312,7 +312,6 @@ EO
         command -v git &>/dev/null || {
             output "Installing git"
             brew install git
-			brew bundle $BASE/edx-platform/Brewfile
         }
 
         ;;
