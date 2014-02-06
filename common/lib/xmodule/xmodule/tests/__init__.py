@@ -112,7 +112,7 @@ class ModelsTest(unittest.TestCase):
 
     def test_load_class(self):
         vc = XModuleDescriptor.load_class('video')
-        vc_str = "<class 'xmodule.video_module.VideoDescriptor'>"
+        vc_str = "<class 'xmodule.video_module.video_module.VideoDescriptor'>"
         self.assertEqual(str(vc), vc_str)
 
 

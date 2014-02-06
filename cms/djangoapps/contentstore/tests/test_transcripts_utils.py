@@ -16,7 +16,7 @@ from xmodule.contentstore.content import StaticContent
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.exceptions import NotFoundError
 from xmodule.contentstore.django import contentstore, _CONTENTSTORE
-from xmodule.util import transcripts_utils
+from xmodule.video_module import transcripts_utils
 
 from contentstore.tests.modulestore_config import TEST_MODULESTORE
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)

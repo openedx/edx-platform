@@ -26,7 +26,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationErr
 from util.json_request import JsonResponse
 from xmodule.modulestore.locator import BlockUsageLocator
 
-from xmodule.util.transcripts_utils import (
+from xmodule.video_module.transcripts_utils import (
     generate_subs_from_source,
     generate_srt_from_sjson, remove_subs_from_store,
     download_youtube_subs, get_transcripts_from_youtube,

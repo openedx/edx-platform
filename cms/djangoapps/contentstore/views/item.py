@@ -27,7 +27,7 @@ from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.locator import BlockUsageLocator
 from xmodule.modulestore import Location
 from xmodule.x_module import prefer_xmodules
-from xmodule.util.transcripts_utils import manage_video_subtitles_save
+from xmodule.video_module import manage_video_subtitles_save
 
 from util.json_request import expect_json, JsonResponse
 from util.string_utils import str_to_bool

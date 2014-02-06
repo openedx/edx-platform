@@ -34,11 +34,12 @@ from xmodule.exceptions import NotFoundError
 from xblock.core import XBlock
 from xblock.fields import Scope, String, Float, Boolean, List, Integer, ScopeIds, Dict
 from xmodule.fields import RelativeTime
-from xmodule.util.transcripts_utils import (
+from .transcripts_utils import (
     generate_subs_from_source,
     save_subs_to_store,
     generate_subs,
 )
+from .video_utils import create_youtube_string
 
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore
 from xblock.runtime import KvsFieldData
@@ -186,24 +187,25 @@ class VideoModule(VideoFields, XModule):
 
     # To make sure that js files are called in proper order we use numerical
     # index. We do that to avoid issues that occurs in tests.
+    module = __name__.replace('.video_module', '', 2)
     js = {
         'js': [
-            resource_string(__name__, 'js/src/video/00_cookie_storage.js'),
-            resource_string(__name__, 'js/src/video/00_resizer.js'),
-            resource_string(__name__, 'js/src/video/01_initialize.js'),
-            resource_string(__name__, 'js/src/video/025_focus_grabber.js'),
-            resource_string(__name__, 'js/src/video/02_html5_video.js'),
-            resource_string(__name__, 'js/src/video/03_video_player.js'),
-            resource_string(__name__, 'js/src/video/04_video_control.js'),
-            resource_string(__name__, 'js/src/video/05_video_quality_control.js'),
-            resource_string(__name__, 'js/src/video/06_video_progress_slider.js'),
-            resource_string(__name__, 'js/src/video/07_video_volume_control.js'),
-            resource_string(__name__, 'js/src/video/08_video_speed_control.js'),
-            resource_string(__name__, 'js/src/video/09_video_caption.js'),
-            resource_string(__name__, 'js/src/video/10_main.js')
+            resource_string(module, 'js/src/video/00_cookie_storage.js'),
+            resource_string(module, 'js/src/video/00_resizer.js'),
+            resource_string(module, 'js/src/video/01_initialize.js'),
+            resource_string(module, 'js/src/video/025_focus_grabber.js'),
+            resource_string(module, 'js/src/video/02_html5_video.js'),
+            resource_string(module, 'js/src/video/03_video_player.js'),
+            resource_string(module, 'js/src/video/04_video_control.js'),
+            resource_string(module, 'js/src/video/05_video_quality_control.js'),
+            resource_string(module, 'js/src/video/06_video_progress_slider.js'),
+            resource_string(module, 'js/src/video/07_video_volume_control.js'),
+            resource_string(module, 'js/src/video/08_video_speed_control.js'),
+            resource_string(module, 'js/src/video/09_video_caption.js'),
+            resource_string(module, 'js/src/video/10_main.js')
         ]
     }
-    css = {'scss': [resource_string(__name__, 'css/video/display.scss')]}
+    css = {'scss': [resource_string(module, 'css/video/display.scss')]}
     js_module_name = "Video"
 
     def handle_ajax(self, dispatch, data):
@@ -274,7 +276,7 @@ class VideoModule(VideoFields, XModule):
             'start': self.start_time.total_seconds(),
             'sub': self.sub,
             'track': track_url,
-            'youtube_streams': _create_youtube_string(self),
+            'youtube_streams': create_youtube_string(self),
             # TODO: Later on the value 1500 should be taken from some global
             # configuration setting field.
             'yt_test_timeout': 1500,
@@ -614,7 +616,7 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
         Returns an xml string representing this module.
         """
         xml = etree.Element('video')
-        youtube_string = _create_youtube_string(self)
+        youtube_string = create_youtube_string(self)
         # Mild workaround to ensure that tests pass -- if a field
         # is set to its default value, we don't need to write it out.
         if youtube_string and youtube_string != '1.00:OEoXaMPEzfM':
@@ -777,25 +779,3 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
                 field_data[attr] = value
 
         return field_data
-
-
-
-
-def _create_youtube_string(module):
-    """
-    Create a string of Youtube IDs from `module`'s metadata
-    attributes. Only writes a speed if an ID is present in the
-    module.  Necessary for backwards compatibility with XML-based
-    courses.
-    """
-    youtube_ids = [
-        module.youtube_id_0_75,
-        module.youtube_id_1_0,
-        module.youtube_id_1_25,
-        module.youtube_id_1_5
-    ]
-    youtube_speeds = ['0.75', '1.00', '1.25', '1.50']
-    return ','.join([':'.join(pair)
-                     for pair
-                     in zip(youtube_speeds, youtube_ids)
-                     if pair[1]])

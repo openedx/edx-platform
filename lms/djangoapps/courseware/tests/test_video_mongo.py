@@ -15,7 +15,7 @@ from xmodule.contentstore.django import contentstore
 from . import BaseTestXmodule
 from .test_video_xml import SOURCE_XML
 from django.conf import settings
-from xmodule.video_module import _create_youtube_string
+from xmodule.video_module import create_youtube_string
 from cache_toolbox.core import del_cached_content
 from xmodule.exceptions import NotFoundError
 
@@ -73,7 +73,7 @@ class TestVideoYouTube(TestVideo):
             'start': 3603.0,
             'sub': u'a_sub_file.srt.sjson',
             'track': None,
-            'youtube_streams': _create_youtube_string(self.item_descriptor),
+            'youtube_streams': create_youtube_string(self.item_descriptor),
             'yt_test_timeout': 1500,
             'yt_test_url': 'https://gdata.youtube.com/feeds/api/videos/',
             'transcript_language': 'en',

@@ -20,7 +20,8 @@ from mock import Mock
 from . import LogicTest
 from lxml import etree
 from xmodule.modulestore import Location
-from xmodule.video_module import VideoDescriptor, _create_youtube_string
+from xmodule.video_module import VideoDescriptor
+from xmodule.video_module.video_utils import create_youtube_string
 from .test_import import DummySystem
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
@@ -150,7 +151,7 @@ class VideoDescriptorTest(unittest.TestCase):
         descriptor.youtube_id_1_25 = '1EeWXzPdhSA'
         descriptor.youtube_id_1_5 = 'rABDYkeK0x8'
         expected = "0.75:izygArpw-Qo,1.00:p2Q6BrNhdh8,1.25:1EeWXzPdhSA,1.50:rABDYkeK0x8"
-        self.assertEqual(_create_youtube_string(descriptor), expected)
+        self.assertEqual(create_youtube_string(descriptor), expected)
 
     def test_create_youtube_string_missing(self):
         """
@@ -165,7 +166,7 @@ class VideoDescriptorTest(unittest.TestCase):
         descriptor.youtube_id_1_0 = 'p2Q6BrNhdh8'
         descriptor.youtube_id_1_25 = '1EeWXzPdhSA'
         expected = "0.75:izygArpw-Qo,1.00:p2Q6BrNhdh8,1.25:1EeWXzPdhSA"
-        self.assertEqual(_create_youtube_string(descriptor), expected)
+        self.assertEqual(create_youtube_string(descriptor), expected)
 
 
 class VideoDescriptorImportTestCase(unittest.TestCase):
