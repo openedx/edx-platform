@@ -10,7 +10,7 @@ class CourseOutlinePage(CoursePage):
     Course Outline page in Studio.
     """
 
-    URL_PATH = "course"
+    url_path = "course"
 
     def is_browser_on_page(self):
         return self.is_css_present('body.view-outline')
