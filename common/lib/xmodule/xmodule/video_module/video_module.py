@@ -295,11 +295,11 @@ class VideoModule(VideoFields, XModule):
         else:
             return '{0}_subs_{1}.srt.sjson'.format(lang, subs_id)
 
-    def asset_location(self,  filename):
+    def asset_location(self, filename):
         """
         Return asset location.
         """
-        return  StaticContent.compute_location(
+        return StaticContent.compute_location(
             self.location.org, self.location.course, filename
         )
 
@@ -341,7 +341,7 @@ class VideoModule(VideoFields, XModule):
             log.debug("Dispatch is not allowed")
             return Response(status=404)
 
-        if ('language' not in request.GET or
+        if ('language' not in request.GET or \
             'videoId' not in request.GET and dispatch == 'translation'):
             log.info("Invalid /transcript GET parameters.")
             return Response(status=400)
@@ -407,7 +407,7 @@ class VideoModule(VideoFields, XModule):
             sjson_transcript = self.asset(source_subs_id, self.transcript_language).data
         except (NotFoundError):  # generating
             self.generate_sjson(user_filename, result_subs_dict)
-            sjson_transcript =  self.asset(source_subs_id, self.transcript_language).data
+            sjson_transcript = self.asset(source_subs_id, self.transcript_language).data
         return sjson_transcript
 
     def get_non_youtube_non_english_subs(self, user_filename):
@@ -416,7 +416,7 @@ class VideoModule(VideoFields, XModule):
         """
         user_subs_id = os.path.splitext(user_filename)[0]
         try:
-            sjson_transcript =  self.get_sjson(user_filename, user_subs_id, {1.0: user_subs_id})
+            sjson_transcript = self.get_sjson(user_filename, user_subs_id, {1.0: user_subs_id})
         except NotFoundError:
             log.info("Can't find uploaded transcripts: %s", user_filename)
             return Response(status=404)
@@ -457,13 +457,15 @@ class VideoModule(VideoFields, XModule):
         # Generate sjson if there is no one [for all speeds],  and just give subtitles back.
         yt_ids = [self.youtube_id_0_75, self.youtube_id_1_0, self.youtube_id_1_25, self.youtube_id_1_5]
         yt_speeds = [0.75, 1.00, 1.25, 1.50]
-        youtube_ids =  {p[0]: p[1] for p in zip(yt_ids, yt_speeds) if p[0]}
+        youtube_ids = {p[0]: p[1] for p in zip(yt_ids, yt_speeds) if p[0]}
         try:
             sjson_transcript = self.asset(video_id, self.transcript_language).data
         except (NotFoundError):  # generating sjson
             generate_1_0_version = False
             log.info("Can't find content in storage for %s transcript: generating.", video_id)
-            if video_id != self.youtube_id_1_0: # check if sjson version of transcript for 1.0 speed exists.
+
+            # check if sjson version of transcript for 1.0 speed exists.
+            if video_id != self.youtube_id_1_0:
                 content_location_1_0 = self.asset_location(
                     self.subs_filename(self.youtube_id_1_0, self.transcript_language)
                 )
@@ -494,6 +496,7 @@ class VideoModule(VideoFields, XModule):
         response = Response(sjson_transcript)
         response.content_type = 'application/json'
         return response
+
 
 class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor):
     """Descriptor for `VideoModule`."""
