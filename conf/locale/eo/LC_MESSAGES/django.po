@@ -27,16 +27,22 @@
 # Copyright (C) 2013 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
+# #-#-#-#-#  wiki.po (PROJECT VERSION)  #-#-#-#-#
+# Translations template for PROJECT.
+# Copyright (C) 2014 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2014.
+# 
 msgid ""
 msgstr ""
-"Project-Id-Version: EdX Studio\n"
-"Report-Msgid-Bugs-To: translation_team@edx.org\n"
-"POT-Creation-Date: 2013-05-02 13:13-0400\n"
-"PO-Revision-Date: 2013-05-02 13:27-0400\n"
-"Last-Translator: \n"
-"Language-Team: translation team <translation_team@edx.org>\n"
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2014-02-06 11:51-0500\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 1.3\n"
 "Language: en\n"
@@ -130,6 +136,11 @@ msgstr "Çøürsé ïd nøt spéçïfïéd Ⱡ'σяє#"
 #: common/djangoapps/student/views.py
 msgid "Course id is invalid"
 msgstr "Çøürsé ïd ïs ïnvälïd Ⱡ'σя#"
+
+#: common/djangoapps/student/views.py
+#: lms/templates/courseware/course_about.html
+msgid "Course is full"
+msgstr "Çøürsé ïs füll Ⱡ'#"
 
 #: common/djangoapps/student/views.py
 msgid "You are not enrolled in this course"
@@ -621,6 +632,12 @@ msgstr ""
 msgid "General"
 msgstr "Généräl #"
 
+#. Translators: TBD stands for 'To Be Determined' and is used when a course
+#. does not yet have an announced start date.
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "TBD"
+msgstr "TBD Ⱡ'σя#"
+
 #: common/lib/xmodule/xmodule/video_module.py
 msgid "A YouTube URL or a link to a file hosted anywhere on the web."
 msgstr ""
@@ -1066,7 +1083,7 @@ msgstr "Çøüldn't fïnd mødülé før ürl: {0} Ⱡ'σяєм ι#"
 msgid "Username"
 msgstr "Ûsérnämé #"
 
-#: lms/djangoapps/instructor/views/tools.py cms/templates/signup.html
+#: lms/djangoapps/instructor/views/tools.py cms/templates/register.html
 #: lms/templates/dashboard.html lms/templates/register-shib.html
 #: lms/templates/register.html lms/templates/register.html
 #: lms/templates/sysadmin_dashboard.html
@@ -1104,10 +1121,11 @@ msgstr "résçøréd #"
 msgid "reset"
 msgstr "rését Ⱡ'σяєм ι#"
 
+#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: This is a past-tense verb that is inserted into task progress
 #. messages as {action}.
 #: lms/djangoapps/instructor_task/tasks.py
-#: lms/templates/wiki/plugins/attachments/index.html
+#: lms/templates/wiki/plugins/attachments/index.html wiki/models/article.py
 msgid "deleted"
 msgstr "délétéd #"
 
@@ -1502,6 +1520,7 @@ msgstr "Çürrénçý #"
 #: lms/templates/shoppingcart/receipt.html
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 #: lms/templates/shoppingcart/verified_cert_receipt.html
+#: wiki/plugins/attachments/forms.py
 msgid "Description"
 msgstr "Désçrïptïøn Ⱡ#"
 
@@ -2567,6 +2586,7 @@ msgstr ""
 "     Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/templates/wiki/plugins/attachments/index.html
+#: wiki/plugins/attachments/wiki_plugin.py
 msgid "Attachments"
 msgstr "Àttäçhménts Ⱡ#"
 
@@ -2908,10 +2928,10 @@ msgstr "Péndïng #"
 msgid "Forgot password?"
 msgstr "Førgøt pässwørd? Ⱡ'σ#"
 
-#: cms/templates/login.html cms/templates/signup.html lms/templates/login.html
-#: lms/templates/login_modal.html lms/templates/provider_login.html
-#: lms/templates/provider_login.html lms/templates/register.html
-#: lms/templates/sysadmin_dashboard.html
+#: cms/templates/login.html cms/templates/register.html
+#: lms/templates/login.html lms/templates/login_modal.html
+#: lms/templates/provider_login.html lms/templates/provider_login.html
+#: lms/templates/register.html lms/templates/sysadmin_dashboard.html
 #: lms/templates/university_profile/edge.html
 msgid "Password"
 msgstr "Pässwørd #"
@@ -2921,12 +2941,12 @@ msgstr "Pässwørd #"
 msgid "Admin"
 msgstr "Àdmïn Ⱡ'σяєм ι#"
 
-#: cms/templates/signup.html cms/templates/widgets/header.html
+#: cms/templates/register.html cms/templates/widgets/header.html
 #: lms/templates/index.html
 msgid "Sign Up"
 msgstr "Sïgn Ûp #"
 
-#: cms/templates/signup.html lms/templates/register-shib.html
+#: cms/templates/register.html lms/templates/register-shib.html
 #: lms/templates/register.html
 msgid "Public Username"
 msgstr "Püßlïç Ûsérnämé Ⱡ'#"
@@ -2961,7 +2981,7 @@ msgstr "Prïväçý Pølïçý Ⱡ'#"
 
 #: cms/templates/widgets/header.html lms/templates/help_modal.html
 #: lms/templates/navigation.html lms/templates/static_templates/help.html
-#: lms/templates/static_templates/help.html
+#: lms/templates/static_templates/help.html wiki/plugins/help/wiki_plugin.py
 msgid "Help"
 msgstr "Hélp Ⱡ'σяєм#"
 
@@ -3914,6 +3934,11 @@ msgstr ""
 "änd än ästérïsk (*)</strong>. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
 "α∂ιριѕι¢ιηg єłι#"
 
+#: lms/templates/login.html lms/templates/register-shib.html
+#: lms/templates/register.html lms/templates/register.html
+msgid "example: username@domain.com"
+msgstr "éxämplé: üsérnämé@dømäïn.çøm Ⱡ'σяєм #"
+
 #: lms/templates/login.html
 msgid "Account Preferences"
 msgstr "Àççøünt Préférénçés Ⱡ'σя#"
@@ -4198,11 +4223,6 @@ msgstr ""
 "∂σłσя#"
 
 #: lms/templates/register-shib.html lms/templates/register.html
-#: lms/templates/register.html
-msgid "example: username@domain.com"
-msgstr "éxämplé: üsérnämé@dømäïn.çøm Ⱡ'σяєм #"
-
-#: lms/templates/register-shib.html lms/templates/register.html
 msgid "Account Acknowledgements"
 msgstr "Àççøünt Àçknøwlédgéménts Ⱡ'σяє#"
 
@@ -4402,13 +4422,13 @@ msgstr ""
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ι#"
 
 #: lms/templates/seq_module.html lms/templates/seq_module.html
-msgid "Section Navigation"
-msgstr "Séçtïøn Nävïgätïøn Ⱡ'σ#"
-
-#: lms/templates/seq_module.html lms/templates/seq_module.html
 #: lms/templates/discussion/mustache/_pagination.mustache
 msgid "Previous"
 msgstr "Prévïøüs #"
+
+#: lms/templates/seq_module.html lms/templates/seq_module.html
+msgid "Section Navigation"
+msgstr "Séçtïøn Nävïgätïøn Ⱡ'σ#"
 
 #: lms/templates/seq_module.html lms/templates/seq_module.html
 #: lms/templates/discussion/mustache/_pagination.mustache
@@ -5050,11 +5070,8 @@ msgid "About {course.display_number_with_default}"
 msgstr "Àßøüt {course.display_number_with_default} Ⱡ'σяєм ιρѕυ#"
 
 #: lms/templates/courseware/course_about.html
-msgid ""
-"You are registered for this course {course.display_number_with_default}"
-msgstr ""
-"Ýøü äré régïstéréd før thïs çøürsé {course.display_number_with_default} "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+msgid "You are registered for this course"
+msgstr "Ýøü äré régïstéréd før thïs çøürsé Ⱡ'σяєм ιρ#"
 
 #: lms/templates/courseware/course_about.html
 msgid "View Courseware"
@@ -5776,6 +5793,10 @@ msgid "{course_number} Progress"
 msgstr "{course_number} Prøgréss Ⱡ'σяє#"
 
 #: lms/templates/courseware/progress.html
+msgid "Course Progress"
+msgstr "Çøürsé Prøgréss Ⱡ'#"
+
+#: lms/templates/courseware/progress.html
 msgid "Course Progress for Student '{username}' ({email})"
 msgstr "Çøürsé Prøgréss før Stüdént '{username}' ({email}) Ⱡ'σяєм ιρѕυм ∂#"
 
@@ -5926,6 +5947,10 @@ msgstr "Çøürsé Çømplétéd - {end_date} Ⱡ'σяєм #"
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course Started - {start_date}"
 msgstr "Çøürsé Stärtéd - {start_date} Ⱡ'σяєм #"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Course has not yet started"
+msgstr "Çøürsé häs nøt ýét stärtéd Ⱡ'σяєм#"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course Starts - {start_date}"
@@ -6166,6 +6191,7 @@ msgstr "néw pøst tïtlé Ⱡ'#"
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/mustache/_inline_discussion.mustache
 #: lms/templates/discussion/mustache/_inline_discussion_cohorted.mustache
+#: wiki/forms.py wiki/forms.py wiki/forms.py
 msgid "Title"
 msgstr "Tïtlé Ⱡ'σяєм ι#"
 
@@ -6256,12 +6282,6 @@ msgstr "Vïéw äs {name} Ⱡ'#"
 #: lms/templates/discussion/mustache/_inline_thread_cohorted.mustache
 msgid "Add A Response"
 msgstr "Àdd À Réspønsé Ⱡ'#"
-
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/mustache/_inline_thread.mustache
-#: lms/templates/discussion/mustache/_inline_thread_cohorted.mustache
-msgid "Loading content"
-msgstr "Løädïng çøntént Ⱡ'#"
 
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/mustache/_inline_thread_show.mustache
@@ -6481,6 +6501,11 @@ msgstr "Ûsér Prøfïlé Ⱡ#"
 #: lms/templates/discussion/user_profile.html
 msgid "Active Threads"
 msgstr "Àçtïvé Thréäds Ⱡ'#"
+
+#: lms/templates/discussion/mustache/_inline_thread.mustache
+#: lms/templates/discussion/mustache/_inline_thread_cohorted.mustache
+msgid "Loading content"
+msgstr "Løädïng çøntént Ⱡ'#"
 
 #: lms/templates/discussion/mustache/_inline_thread.mustache
 #: lms/templates/discussion/mustache/_inline_thread_cohorted.mustache
@@ -10228,7 +10253,7 @@ msgstr "Døn't hävé ä Stüdïø Àççøünt? Sïgn üp! Ⱡ'σяєм ιρѕ#
 msgid "Required Information to Sign In to edX Studio"
 msgstr "Réqüïréd Ìnførmätïøn tø Sïgn Ìn tø édX Stüdïø Ⱡ'σяєм ιρѕυм#"
 
-#: cms/templates/login.html cms/templates/signup.html
+#: cms/templates/login.html cms/templates/register.html
 msgid "Email Address"
 msgstr "Émäïl Àddréss Ⱡ'#"
 
@@ -10500,6 +10525,109 @@ msgstr ""
 #: cms/templates/overview.html
 msgid "Form Actions"
 msgstr "Førm Àçtïøns Ⱡ#"
+
+#: cms/templates/register.html
+msgid "Sign Up for edX Studio"
+msgstr "Sïgn Ûp før édX Stüdïø Ⱡ'σяє#"
+
+#: cms/templates/register.html
+msgid "Already have a Studio Account? Sign in"
+msgstr "Àlréädý hävé ä Stüdïø Àççøünt? Sïgn ïn Ⱡ'σяєм ιρѕ#"
+
+#: cms/templates/register.html
+msgid ""
+"Ready to start creating online courses? Sign up below and start creating "
+"your first edX course today."
+msgstr ""
+"Réädý tø stärt çréätïng ønlïné çøürsés? Sïgn üp ßéløw änd stärt çréätïng "
+"ýøür fïrst édX çøürsé tødäý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: cms/templates/register.html
+msgid "Required Information to Sign Up for edX Studio"
+msgstr "Réqüïréd Ìnførmätïøn tø Sïgn Ûp før édX Stüdïø Ⱡ'σяєм ιρѕυм #"
+
+#: cms/templates/register.html
+msgid ""
+"This will be used in public discussions with your courses and in our edX101 "
+"support forums"
+msgstr ""
+"Thïs wïll ßé üséd ïn püßlïç dïsçüssïøns wïth ýøür çøürsés änd ïn øür édX101 "
+"süppørt førüms Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#: cms/templates/register.html
+msgid "Your Location"
+msgstr "Ýøür Løçätïøn Ⱡ'#"
+
+#: cms/templates/register.html
+msgid "Preferred Language"
+msgstr "Préférréd Längüägé Ⱡ'σ#"
+
+#: cms/templates/register.html
+msgid "I agree to the {a_start} Terms of Service {a_end}"
+msgstr "Ì ägréé tø thé {a_start} Térms øf Sérvïçé {a_end} Ⱡ'σяєм ιρѕυм ∂#"
+
+#: cms/templates/register.html
+msgid "Create My Account &amp; Start Authoring Courses"
+msgstr "Çréäté Mý Àççøünt &amp; Stärt Àüthørïng Çøürsés Ⱡ'σяєм ιρѕυм #"
+
+#: cms/templates/register.html
+msgid "Common Studio Questions"
+msgstr "Çømmøn Stüdïø Qüéstïøns Ⱡ'σяє#"
+
+#: cms/templates/register.html
+msgid "Who is Studio for?"
+msgstr "Whø ïs Stüdïø før? Ⱡ'σ#"
+
+#: cms/templates/register.html
+msgid ""
+"Studio is for anyone that wants to create online courses that leverage the "
+"global edX platform. Our users are often faculty members, teaching "
+"assistants and course staff, and members of instructional technology groups."
+msgstr ""
+"Stüdïø ïs før änýøné thät wänts tø çréäté ønlïné çøürsés thät lévérägé thé "
+"gløßäl édX plätførm. Øür üsérs äré øftén fäçültý mémßérs, téäçhïng "
+"ässïstänts änd çøürsé stäff, änd mémßérs øf ïnstrüçtïønäl téçhnøløgý grøüps."
+" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυ#"
+
+#: cms/templates/register.html
+msgid "How technically savvy do I need to be to create courses in Studio?"
+msgstr ""
+"Høw téçhnïçällý sävvý dø Ì nééd tø ßé tø çréäté çøürsés ïn Stüdïø? Ⱡ'σяєм "
+"ιρѕυм ∂σłσя #"
+
+#: cms/templates/register.html
+msgid ""
+"Studio is designed to be easy to use by almost anyone familiar with common "
+"web-based authoring environments (Wordpress, Moodle, etc.). No programming "
+"knowledge is required, but for some of the more advanced features, a "
+"technical background would be helpful. As always, we are here to help, so "
+"don't hesitate to dive right in."
+msgstr ""
+"Stüdïø ïs désïgnéd tø ßé éäsý tø üsé ßý älmøst änýøné fämïlïär wïth çømmøn "
+"wéß-ßäséd äüthørïng énvïrønménts (Wørdpréss, Møødlé, étç.). Nø prøgrämmïng "
+"knøwlédgé ïs réqüïréd, ßüt før sømé øf thé møré ädvänçéd féätürés, ä "
+"téçhnïçäl ßäçkgrøünd wøüld ßé hélpfül. Às älwäýs, wé äré héré tø hélp, sø "
+"døn't hésïtäté tø dïvé rïght ïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
+"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт #"
+
+#: cms/templates/register.html
+msgid "I've never authored a course online before. Is there help?"
+msgstr ""
+"Ì'vé névér äüthøréd ä çøürsé ønlïné ßéføré. Ìs théré hélp? Ⱡ'σяєм ιρѕυм "
+"∂σłσ#"
+
+#: cms/templates/register.html
+msgid ""
+"Absolutely. We have created an online course, edX101, that describes some "
+"best practices: from filming video, creating exercises, to the basics of "
+"running an online course. Additionally, we're always here to help, just drop"
+" us a note."
+msgstr ""
+"Àßsølütélý. Wé hävé çréätéd än ønlïné çøürsé, édX101, thät désçrïßés sømé "
+"ßést präçtïçés: frøm fïlmïng vïdéø, çréätïng éxérçïsés, tø thé ßäsïçs øf "
+"rünnïng än ønlïné çøürsé. Àddïtïønällý, wé'ré älwäýs héré tø hélp, jüst drøp"
+" üs ä nøté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ "
+"∂σ єιυѕмσ∂ т#"
 
 #: cms/templates/settings.html
 msgid "Schedule &amp; Details Settings"
@@ -10891,109 +11019,6 @@ msgstr ""
 "Ýøü çän älsø çréäté ässïgnmént týpés, süçh äs høméwørk, läßs, qüïzzés, änd "
 "éxäms, änd spéçïfý høw müçh øf ä stüdént's grädé éäçh ässïgnmént týpé ïs "
 "wørth. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι#"
-
-#: cms/templates/signup.html
-msgid "Sign Up for edX Studio"
-msgstr "Sïgn Ûp før édX Stüdïø Ⱡ'σяє#"
-
-#: cms/templates/signup.html
-msgid "Already have a Studio Account? Sign in"
-msgstr "Àlréädý hävé ä Stüdïø Àççøünt? Sïgn ïn Ⱡ'σяєм ιρѕ#"
-
-#: cms/templates/signup.html
-msgid ""
-"Ready to start creating online courses? Sign up below and start creating "
-"your first edX course today."
-msgstr ""
-"Réädý tø stärt çréätïng ønlïné çøürsés? Sïgn üp ßéløw änd stärt çréätïng "
-"ýøür fïrst édX çøürsé tødäý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
-
-#: cms/templates/signup.html
-msgid "Required Information to Sign Up for edX Studio"
-msgstr "Réqüïréd Ìnførmätïøn tø Sïgn Ûp før édX Stüdïø Ⱡ'σяєм ιρѕυм #"
-
-#: cms/templates/signup.html
-msgid ""
-"This will be used in public discussions with your courses and in our edX101 "
-"support forums"
-msgstr ""
-"Thïs wïll ßé üséd ïn püßlïç dïsçüssïøns wïth ýøür çøürsés änd ïn øür édX101 "
-"süppørt førüms Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
-
-#: cms/templates/signup.html
-msgid "Your Location"
-msgstr "Ýøür Løçätïøn Ⱡ'#"
-
-#: cms/templates/signup.html
-msgid "Preferred Language"
-msgstr "Préférréd Längüägé Ⱡ'σ#"
-
-#: cms/templates/signup.html
-msgid "I agree to the {a_start} Terms of Service {a_end}"
-msgstr "Ì ägréé tø thé {a_start} Térms øf Sérvïçé {a_end} Ⱡ'σяєм ιρѕυм ∂#"
-
-#: cms/templates/signup.html
-msgid "Create My Account &amp; Start Authoring Courses"
-msgstr "Çréäté Mý Àççøünt &amp; Stärt Àüthørïng Çøürsés Ⱡ'σяєм ιρѕυм #"
-
-#: cms/templates/signup.html
-msgid "Common Studio Questions"
-msgstr "Çømmøn Stüdïø Qüéstïøns Ⱡ'σяє#"
-
-#: cms/templates/signup.html
-msgid "Who is Studio for?"
-msgstr "Whø ïs Stüdïø før? Ⱡ'σ#"
-
-#: cms/templates/signup.html
-msgid ""
-"Studio is for anyone that wants to create online courses that leverage the "
-"global edX platform. Our users are often faculty members, teaching "
-"assistants and course staff, and members of instructional technology groups."
-msgstr ""
-"Stüdïø ïs før änýøné thät wänts tø çréäté ønlïné çøürsés thät lévérägé thé "
-"gløßäl édX plätførm. Øür üsérs äré øftén fäçültý mémßérs, téäçhïng "
-"ässïstänts änd çøürsé stäff, änd mémßérs øf ïnstrüçtïønäl téçhnøløgý grøüps."
-" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυ#"
-
-#: cms/templates/signup.html
-msgid "How technically savvy do I need to be to create courses in Studio?"
-msgstr ""
-"Høw téçhnïçällý sävvý dø Ì nééd tø ßé tø çréäté çøürsés ïn Stüdïø? Ⱡ'σяєм "
-"ιρѕυм ∂σłσя #"
-
-#: cms/templates/signup.html
-msgid ""
-"Studio is designed to be easy to use by almost anyone familiar with common "
-"web-based authoring environments (Wordpress, Moodle, etc.). No programming "
-"knowledge is required, but for some of the more advanced features, a "
-"technical background would be helpful. As always, we are here to help, so "
-"don't hesitate to dive right in."
-msgstr ""
-"Stüdïø ïs désïgnéd tø ßé éäsý tø üsé ßý älmøst änýøné fämïlïär wïth çømmøn "
-"wéß-ßäséd äüthørïng énvïrønménts (Wørdpréss, Møødlé, étç.). Nø prøgrämmïng "
-"knøwlédgé ïs réqüïréd, ßüt før sømé øf thé møré ädvänçéd féätürés, ä "
-"téçhnïçäl ßäçkgrøünd wøüld ßé hélpfül. Às älwäýs, wé äré héré tø hélp, sø "
-"døn't hésïtäté tø dïvé rïght ïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
-"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт #"
-
-#: cms/templates/signup.html
-msgid "I've never authored a course online before. Is there help?"
-msgstr ""
-"Ì'vé névér äüthøréd ä çøürsé ønlïné ßéføré. Ìs théré hélp? Ⱡ'σяєм ιρѕυм "
-"∂σłσ#"
-
-#: cms/templates/signup.html
-msgid ""
-"Absolutely. We have created an online course, edX101, that describes some "
-"best practices: from filming video, creating exercises, to the basics of "
-"running an online course. Additionally, we're always here to help, just drop"
-" us a note."
-msgstr ""
-"Àßsølütélý. Wé hävé çréätéd än ønlïné çøürsé, édX101, thät désçrïßés sømé "
-"ßést präçtïçés: frøm fïlmïng vïdéø, çréätïng éxérçïsés, tø thé ßäsïçs øf "
-"rünnïng än ønlïné çøürsé. Àddïtïønällý, wé'ré älwäýs héré tø hélp, jüst drøp"
-" üs ä nøté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ "
-"∂σ єιυѕмσ∂ т#"
 
 #: cms/templates/textbooks.html cms/templates/textbooks.html
 #: cms/templates/widgets/header.html
@@ -11405,3 +11430,696 @@ msgstr "Dräg tø réørdér ünït Ⱡ'σя#"
 # empty
 msgid "This is a key string."
 msgstr "Thïs ïs ä kéý strïng. Ⱡ'σя#"
+
+#: wiki/admin.py wiki/models/article.py
+msgid "created"
+msgstr "çréätéd #"
+
+#: wiki/forms.py
+msgid "Only localhost... muahahaha"
+msgstr "Ønlý løçälhøst... müähähähä Ⱡ'σяєм#"
+
+#: wiki/forms.py
+msgid "Initial title of the article. May be overridden with revision titles."
+msgstr ""
+"Ìnïtïäl tïtlé øf thé ärtïçlé. Mäý ßé øvérrïddén wïth révïsïøn tïtlés. Ⱡ'σяєм"
+" ιρѕυм ∂σłσя ѕ#"
+
+#: wiki/forms.py
+msgid "Type in some contents"
+msgstr "Týpé ïn sømé çønténts Ⱡ'σя#"
+
+#: wiki/forms.py
+msgid ""
+"This is just the initial contents of your article. After creating it, you "
+"can use more complex features like adding plugins, meta data, related "
+"articles etc..."
+msgstr ""
+"Thïs ïs jüst thé ïnïtïäl çønténts øf ýøür ärtïçlé. Àftér çréätïng ït, ýøü "
+"çän üsé møré çømpléx féätürés lïké äddïng plügïns, métä dätä, rélätéd "
+"ärtïçlés étç... Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ι#"
+
+#: wiki/forms.py wiki/forms.py
+msgid "Contents"
+msgstr "Çønténts #"
+
+#: wiki/forms.py wiki/forms.py
+msgid "Summary"
+msgstr "Sümmärý #"
+
+#: wiki/forms.py
+msgid ""
+"Give a short reason for your edit, which will be stated in the revision log."
+msgstr ""
+"Gïvé ä shørt réäsøn før ýøür édït, whïçh wïll ßé stätéd ïn thé révïsïøn løg."
+" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт #"
+
+#: wiki/forms.py
+msgid ""
+"While you were editing, someone else changed the revision. Your contents "
+"have been automatically merged with the new contents. Please review the text"
+" below."
+msgstr ""
+"Whïlé ýøü wéré édïtïng, søméøné élsé çhängéd thé révïsïøn. Ýøür çønténts "
+"hävé ßéén äütømätïçällý mérgéd wïth thé néw çønténts. Pléäsé révïéw thé téxt"
+" ßéløw. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢#"
+
+#: wiki/forms.py
+msgid "No changes made. Nothing to save."
+msgstr "Nø çhängés mädé. Nøthïng tø sävé. Ⱡ'σяєм ι#"
+
+#: wiki/forms.py
+msgid "Select an option"
+msgstr "Séléçt än øptïøn Ⱡ'σ#"
+
+#: wiki/forms.py
+msgid "Slug"
+msgstr "Slüg Ⱡ'σяєм#"
+
+#: wiki/forms.py
+msgid ""
+"This will be the address where your article can be found. Use only "
+"alphanumeric characters and - or _. Note that you cannot change the slug "
+"after creating the article."
+msgstr ""
+"Thïs wïll ßé thé äddréss whéré ýøür ärtïçlé çän ßé føünd. Ûsé ønlý "
+"älphänümérïç çhäräçtérs änd - ør _. Nøté thät ýøü çännøt çhängé thé slüg "
+"äftér çréätïng thé ärtïçlé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
+"α∂ιριѕι¢ιηg #"
+
+#: wiki/forms.py
+msgid "Write a brief message for the article's history log."
+msgstr "Wrïté ä ßrïéf méssägé før thé ärtïçlé's hïstørý løg. Ⱡ'σяєм ιρѕυм ∂σ#"
+
+#: wiki/forms.py
+msgid "A slug may not begin with an underscore."
+msgstr "À slüg mäý nøt ßégïn wïth än ündérsçøré. Ⱡ'σяєм ιρѕυ#"
+
+#: wiki/forms.py
+#, python-format
+msgid "A deleted article with slug \"%s\" already exists."
+msgstr "À délétéd ärtïçlé wïth slüg \"%s\" älréädý éxïsts. Ⱡ'σяєм ιρѕυм #"
+
+#: wiki/forms.py
+#, python-format
+msgid "A slug named \"%s\" already exists."
+msgstr "À slüg näméd \"%s\" älréädý éxïsts. Ⱡ'σяєм ι#"
+
+#: wiki/forms.py
+msgid "Yes, I am sure"
+msgstr "Ýés, Ì äm süré Ⱡ'#"
+
+#: wiki/forms.py
+msgid "Purge"
+msgstr "Pürgé Ⱡ'σяєм ι#"
+
+#: wiki/forms.py
+msgid ""
+"Purge the article: Completely remove it (and all its contents) with no undo."
+" Purging is a good idea if you want to free the slug such that users can "
+"create new articles in its place."
+msgstr ""
+"Pürgé thé ärtïçlé: Çømplétélý rémøvé ït (änd äll ïts çønténts) wïth nø ündø."
+" Pürgïng ïs ä gøød ïdéä ïf ýøü wänt tø fréé thé slüg süçh thät üsérs çän "
+"çréäté néw ärtïçlés ïn ïts pläçé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
+"α∂ιριѕι¢ιηg єłιт,#"
+
+#: wiki/forms.py wiki/plugins/attachments/forms.py
+#: wiki/plugins/images/forms.py
+msgid "You are not sure enough!"
+msgstr "Ýøü äré nøt süré énøügh! Ⱡ'σяє#"
+
+#: wiki/forms.py
+msgid "While you tried to delete this article, it was modified. TAKE CARE!"
+msgstr ""
+"Whïlé ýøü trïéd tø délété thïs ärtïçlé, ït wäs mødïfïéd. TÀKÉ ÇÀRÉ! Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕ#"
+
+#: wiki/forms.py
+msgid "Lock article"
+msgstr "Løçk ärtïçlé Ⱡ#"
+
+#: wiki/forms.py
+msgid "Deny all users access to edit this article."
+msgstr "Déný äll üsérs äççéss tø édït thïs ärtïçlé. Ⱡ'σяєм ιρѕυм#"
+
+#: wiki/forms.py
+msgid "Permissions"
+msgstr "Pérmïssïøns Ⱡ#"
+
+#: wiki/forms.py
+msgid "Owner"
+msgstr "Øwnér Ⱡ'σяєм ι#"
+
+#: wiki/forms.py
+msgid "Enter the username of the owner."
+msgstr "Éntér thé üsérnämé øf thé øwnér. Ⱡ'σяєм ι#"
+
+#: wiki/forms.py
+msgid "(none)"
+msgstr "(nøné) Ⱡ'σяєм ιρѕ#"
+
+#: wiki/forms.py
+msgid "Inherit permissions"
+msgstr "Ìnhérït pérmïssïøns Ⱡ'σя#"
+
+#: wiki/forms.py
+msgid ""
+"Check here to apply the above permissions recursively to articles under this"
+" one."
+msgstr ""
+"Çhéçk héré tø äpplý thé äßøvé pérmïssïøns réçürsïvélý tø ärtïçlés ündér thïs"
+" øné. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
+
+#: wiki/forms.py
+msgid "Permission settings for the article were updated."
+msgstr "Pérmïssïøn séttïngs før thé ärtïçlé wéré üpdätéd. Ⱡ'σяєм ιρѕυм ∂#"
+
+#: wiki/forms.py
+msgid "Your permission settings were unchanged, so nothing saved."
+msgstr ""
+"Ýøür pérmïssïøn séttïngs wéré ünçhängéd, sø nøthïng sävéd. Ⱡ'σяєм ιρѕυм "
+"∂σłσ#"
+
+#: wiki/forms.py
+msgid "No user with that username"
+msgstr "Nø üsér wïth thät üsérnämé Ⱡ'σяєм#"
+
+#: wiki/forms.py
+msgid "Article locked for editing"
+msgstr "Àrtïçlé løçkéd før édïtïng Ⱡ'σяєм#"
+
+#: wiki/forms.py
+msgid "Article unlocked for editing"
+msgstr "Àrtïçlé ünløçkéd før édïtïng Ⱡ'σяєм #"
+
+#: wiki/forms.py
+msgid "Filter..."
+msgstr "Fïltér... #"
+
+#: wiki/core/plugins/base.py
+msgid "Settings for plugin"
+msgstr "Séttïngs før plügïn Ⱡ'σя#"
+
+#: wiki/models/article.py wiki/models/pluginbase.py
+#: wiki/plugins/attachments/models.py
+msgid "current revision"
+msgstr "çürrént révïsïøn Ⱡ'σ#"
+
+#: wiki/models/article.py
+msgid ""
+"The revision being displayed for this article. If you need to do a roll-"
+"back, simply change the value of this field."
+msgstr ""
+"Thé révïsïøn ßéïng dïspläýéd før thïs ärtïçlé. Ìf ýøü nééd tø dø ä røll-"
+"ßäçk, sïmplý çhängé thé välüé øf thïs fïéld. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢т#"
+
+#: wiki/models/article.py
+msgid "modified"
+msgstr "mødïfïéd #"
+
+#: wiki/models/article.py
+msgid "Article properties last modified"
+msgstr "Àrtïçlé prøpértïés läst mødïfïéd Ⱡ'σяєм ι#"
+
+#: wiki/models/article.py
+msgid "owner"
+msgstr "øwnér Ⱡ'σяєм ι#"
+
+#: wiki/models/article.py
+msgid ""
+"The owner of the article, usually the creator. The owner always has both "
+"read and write access."
+msgstr ""
+"Thé øwnér øf thé ärtïçlé, üsüällý thé çréätør. Thé øwnér älwäýs häs ßøth "
+"réäd änd wrïté äççéss. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: wiki/models/article.py
+msgid "group"
+msgstr "grøüp Ⱡ'σяєм ι#"
+
+#: wiki/models/article.py
+msgid ""
+"Like in a UNIX file system, permissions can be given to a user according to "
+"group membership. Groups are handled through the Django auth system."
+msgstr ""
+"Lïké ïn ä ÛNÌX fïlé sýstém, pérmïssïøns çän ßé gïvén tø ä üsér äççørdïng tø "
+"grøüp mémßérshïp. Grøüps äré händléd thrøügh thé Djängø äüth sýstém. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιρ#"
+
+#: wiki/models/article.py
+msgid "group read access"
+msgstr "grøüp réäd äççéss Ⱡ'σ#"
+
+#: wiki/models/article.py
+msgid "group write access"
+msgstr "grøüp wrïté äççéss Ⱡ'σ#"
+
+#: wiki/models/article.py
+msgid "others read access"
+msgstr "øthérs réäd äççéss Ⱡ'σ#"
+
+#: wiki/models/article.py
+msgid "others write access"
+msgstr "øthérs wrïté äççéss Ⱡ'σя#"
+
+#: wiki/models/article.py
+#, python-format
+msgid "Article without content (%(id)d)"
+msgstr "Àrtïçlé wïthøüt çøntént (%(id)d) Ⱡ'σяєм ι#"
+
+#: wiki/models/article.py
+msgid "content type"
+msgstr "çøntént týpé Ⱡ#"
+
+#: wiki/models/article.py
+msgid "object ID"
+msgstr "øßjéçt ÌD #"
+
+#: wiki/models/article.py
+msgid "Article for object"
+msgstr "Àrtïçlé før øßjéçt Ⱡ'σ#"
+
+#: wiki/models/article.py
+msgid "Articles for object"
+msgstr "Àrtïçlés før øßjéçt Ⱡ'σя#"
+
+#: wiki/models/article.py
+msgid "revision number"
+msgstr "révïsïøn nümßér Ⱡ'#"
+
+#: wiki/models/article.py
+msgid "IP address"
+msgstr "ÌP äddréss Ⱡ#"
+
+#: wiki/models/article.py
+msgid "user"
+msgstr "üsér Ⱡ'σяєм#"
+
+#: wiki/models/article.py
+msgid "locked"
+msgstr "løçkéd Ⱡ'σяєм ιρѕ#"
+
+#: wiki/models/article.py wiki/models/pluginbase.py
+msgid "article"
+msgstr "ärtïçlé #"
+
+#: wiki/models/article.py
+msgid "article contents"
+msgstr "ärtïçlé çønténts Ⱡ'σ#"
+
+#: wiki/models/article.py
+msgid "article title"
+msgstr "ärtïçlé tïtlé Ⱡ'#"
+
+#: wiki/models/article.py
+msgid ""
+"Each revision contains a title field that must be filled out, even if the "
+"title has not changed"
+msgstr ""
+"Éäçh révïsïøn çøntäïns ä tïtlé fïéld thät müst ßé fïlléd øüt, évén ïf thé "
+"tïtlé häs nøt çhängéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: wiki/models/pluginbase.py
+msgid "original article"
+msgstr "ørïgïnäl ärtïçlé Ⱡ'σ#"
+
+#: wiki/models/pluginbase.py
+msgid "Permissions are inherited from this article"
+msgstr "Pérmïssïøns äré ïnhérïtéd frøm thïs ärtïçlé Ⱡ'σяєм ιρѕυм#"
+
+#: wiki/models/pluginbase.py
+msgid "A plugin was changed"
+msgstr "À plügïn wäs çhängéd Ⱡ'σя#"
+
+#: wiki/models/pluginbase.py
+msgid ""
+"The revision being displayed for this plugin.If you need to do a roll-back, "
+"simply change the value of this field."
+msgstr ""
+"Thé révïsïøn ßéïng dïspläýéd før thïs plügïn.Ìf ýøü nééd tø dø ä røll-ßäçk, "
+"sïmplý çhängé thé välüé øf thïs fïéld. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢#"
+
+#: wiki/models/urlpath.py
+msgid "Cache lookup value for articles"
+msgstr "Çäçhé løøküp välüé før ärtïçlés Ⱡ'σяєм ι#"
+
+#: wiki/models/urlpath.py
+msgid "slug"
+msgstr "slüg Ⱡ'σяєм#"
+
+#: wiki/models/urlpath.py
+msgid "(root)"
+msgstr "(røøt) Ⱡ'σяєм ιρѕ#"
+
+#: wiki/models/urlpath.py
+msgid "URL path"
+msgstr "ÛRL päth #"
+
+#: wiki/models/urlpath.py
+msgid "URL paths"
+msgstr "ÛRL päths #"
+
+#: wiki/models/urlpath.py
+msgid "Sorry but you cannot have a root article with a slug."
+msgstr ""
+"Sørrý ßüt ýøü çännøt hävé ä røøt ärtïçlé wïth ä slüg. Ⱡ'σяєм ιρѕυм ∂σ#"
+
+#: wiki/models/urlpath.py
+msgid "A non-root note must always have a slug."
+msgstr "À nøn-røøt nøté müst älwäýs hävé ä slüg. Ⱡ'σяєм ιρѕυ#"
+
+#: wiki/models/urlpath.py
+#, python-format
+msgid "There is already a root node on %s"
+msgstr "Théré ïs älréädý ä røøt nødé øn %s Ⱡ'σяєм ιρ#"
+
+#: wiki/models/urlpath.py
+msgid ""
+"Articles who lost their parents\n"
+"===============================\n"
+"\n"
+"The children of this article have had their parents deleted. You should probably find a new home for them."
+msgstr ""
+"Àrtïçlés whø løst théïr pärénts\n"
+"===============================\n"
+"\n"
+"Thé çhïldrén øf thïs ärtïçlé hävé häd théïr pärénts délétéd. Ýøü shøüld prøßäßlý fïnd ä néw hømé før thém. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg є#"
+
+#: wiki/models/urlpath.py
+msgid "Lost and found"
+msgstr "Løst änd føünd Ⱡ'#"
+
+#: wiki/plugins/attachments/forms.py
+msgid "A short summary of what the file contains"
+msgstr "À shørt sümmärý øf whät thé fïlé çøntäïns Ⱡ'σяєм ιρѕυ#"
+
+#: wiki/plugins/attachments/forms.py
+msgid "Yes I am sure..."
+msgstr "Ýés Ì äm süré... Ⱡ'σ#"
+
+#: wiki/plugins/attachments/markdown_extensions.py
+msgid "Click to download file"
+msgstr "Çlïçk tø døwnløäd fïlé Ⱡ'σяє#"
+
+#: wiki/plugins/attachments/models.py
+msgid ""
+"The revision of this attachment currently in use (on all articles using the "
+"attachment)"
+msgstr ""
+"Thé révïsïøn øf thïs ättäçhmént çürréntlý ïn üsé (øn äll ärtïçlés üsïng thé "
+"ättäçhmént) Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: wiki/plugins/attachments/models.py
+msgid "original filename"
+msgstr "ørïgïnäl fïlénämé Ⱡ'σ#"
+
+#: wiki/plugins/attachments/models.py
+msgid "attachment"
+msgstr "ättäçhmént Ⱡ#"
+
+#: wiki/plugins/attachments/models.py
+msgid "attachments"
+msgstr "ättäçhménts Ⱡ#"
+
+#: wiki/plugins/attachments/models.py
+msgid "file"
+msgstr "fïlé Ⱡ'σяєм#"
+
+#: wiki/plugins/attachments/models.py
+msgid "attachment revision"
+msgstr "ättäçhmént révïsïøn Ⱡ'σя#"
+
+#: wiki/plugins/attachments/models.py
+msgid "attachment revisions"
+msgstr "ättäçhmént révïsïøns Ⱡ'σя#"
+
+#: wiki/plugins/attachments/views.py
+#, python-format
+msgid "%s was successfully added."
+msgstr "%s wäs süççéssfüllý äddéd. Ⱡ'σяєм#"
+
+#: wiki/plugins/attachments/views.py wiki/plugins/attachments/views.py
+#, python-format
+msgid "Your file could not be saved: %s"
+msgstr "Ýøür fïlé çøüld nøt ßé sävéd: %s Ⱡ'σяєм ι#"
+
+#: wiki/plugins/attachments/views.py wiki/plugins/attachments/views.py
+msgid ""
+"Your file could not be saved, probably because of a permission error on the "
+"web server."
+msgstr ""
+"Ýøür fïlé çøüld nøt ßé sävéd, prøßäßlý ßéçäüsé øf ä pérmïssïøn érrør øn thé "
+"wéß sérvér. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: wiki/plugins/attachments/views.py
+#, python-format
+msgid "%s uploaded and replaces old attachment."
+msgstr "%s üpløädéd änd répläçés øld ättäçhmént. Ⱡ'σяєм ιρѕυ#"
+
+#: wiki/plugins/attachments/views.py
+msgid ""
+"Your new file will automatically be renamed to match the file already "
+"present. Files with different extensions are not allowed."
+msgstr ""
+"Ýøür néw fïlé wïll äütømätïçällý ßé rénäméd tø mätçh thé fïlé älréädý "
+"présént. Fïlés wïth dïfférént éxténsïøns äré nøt älløwéd. Ⱡ'σяєм ιρѕυм ∂σłσя"
+" ѕιт αмєт, ¢σηѕє¢тєтυ#"
+
+#: wiki/plugins/attachments/views.py
+#, python-format
+msgid "Current revision changed for %s."
+msgstr "Çürrént révïsïøn çhängéd før %s. Ⱡ'σяєм ι#"
+
+#: wiki/plugins/attachments/views.py
+#, python-format
+msgid "Added a reference to \"%(att)s\" from \"%(art)s\"."
+msgstr "Àddéd ä référénçé tø \"%(att)s\" frøm \"%(art)s\". Ⱡ'σяєм ιρѕυм #"
+
+#: wiki/plugins/attachments/views.py
+#, python-format
+msgid "The file %s was deleted."
+msgstr "Thé fïlé %s wäs délétéd. Ⱡ'σяє#"
+
+#: wiki/plugins/attachments/views.py
+#, python-format
+msgid "This article is no longer related to the file %s."
+msgstr "Thïs ärtïçlé ïs nø løngér rélätéd tø thé fïlé %s. Ⱡ'σяєм ιρѕυм ∂#"
+
+#: wiki/plugins/attachments/wiki_plugin.py
+#, python-format
+msgid "A file was changed: %s"
+msgstr "À fïlé wäs çhängéd: %s Ⱡ'σяє#"
+
+#: wiki/plugins/attachments/wiki_plugin.py
+#, python-format
+msgid "A file was deleted: %s"
+msgstr "À fïlé wäs délétéd: %s Ⱡ'σяє#"
+
+#: wiki/plugins/images/forms.py
+#, python-format
+msgid ""
+"New image %s was successfully uploaded. You can use it by selecting it from "
+"the list of available images."
+msgstr ""
+"Néw ïmägé %s wäs süççéssfüllý üpløädéd. Ýøü çän üsé ït ßý séléçtïng ït frøm "
+"thé lïst øf äväïläßlé ïmägés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢ση#"
+
+#: wiki/plugins/images/forms.py
+msgid "Are you sure?"
+msgstr "Àré ýøü süré? Ⱡ'#"
+
+#: wiki/plugins/images/models.py
+msgid "image"
+msgstr "ïmägé Ⱡ'σяєм ι#"
+
+#: wiki/plugins/images/models.py
+msgid "images"
+msgstr "ïmägés Ⱡ'σяєм ιρѕ#"
+
+#: wiki/plugins/images/models.py
+#, python-format
+msgid "Image: %s"
+msgstr "Ìmägé: %s #"
+
+#: wiki/plugins/images/models.py
+msgid "Current revision not set!!"
+msgstr "Çürrént révïsïøn nøt sét!! Ⱡ'σяєм#"
+
+#: wiki/plugins/images/models.py
+msgid "image revision"
+msgstr "ïmägé révïsïøn Ⱡ'#"
+
+#: wiki/plugins/images/models.py
+msgid "image revisions"
+msgstr "ïmägé révïsïøns Ⱡ'#"
+
+#: wiki/plugins/images/models.py
+#, python-format
+msgid "Image Revsion: %d"
+msgstr "Ìmägé Révsïøn: %d Ⱡ'σ#"
+
+#: wiki/plugins/images/views.py
+#, python-format
+msgid "%s has been restored"
+msgstr "%s häs ßéén réstøréd Ⱡ'σя#"
+
+#: wiki/plugins/images/views.py
+#, python-format
+msgid "%s has been marked as deleted"
+msgstr "%s häs ßéén märkéd äs délétéd Ⱡ'σяєм #"
+
+#: wiki/plugins/images/views.py
+#, python-format
+msgid "%(file)s has been changed to revision #%(revision)d"
+msgstr "%(file)s häs ßéén çhängéd tø révïsïøn #%(revision)d Ⱡ'σяєм ιρѕυм ∂#"
+
+#: wiki/plugins/images/views.py
+#, python-format
+msgid "%(file)s has been saved."
+msgstr "%(file)s häs ßéén sävéd. Ⱡ'σяє#"
+
+#: wiki/plugins/images/wiki_plugin.py
+msgid "Images"
+msgstr "Ìmägés Ⱡ'σяєм ιρѕ#"
+
+#: wiki/plugins/images/wiki_plugin.py
+#, python-format
+msgid "An image was added: %s"
+msgstr "Àn ïmägé wäs äddéd: %s Ⱡ'σяє#"
+
+#: wiki/plugins/links/wiki_plugin.py
+msgid "Links"
+msgstr "Lïnks Ⱡ'σяєм ι#"
+
+#: wiki/plugins/notifications/forms.py
+msgid "Notifications"
+msgstr "Nøtïfïçätïøns Ⱡ'#"
+
+#: wiki/plugins/notifications/forms.py
+msgid "When this article is edited"
+msgstr "Whén thïs ärtïçlé ïs édïtéd Ⱡ'σяєм#"
+
+#: wiki/plugins/notifications/forms.py
+msgid "Also receive emails about article edits"
+msgstr "Àlsø réçéïvé émäïls äßøüt ärtïçlé édïts Ⱡ'σяєм ιρѕ#"
+
+#: wiki/plugins/notifications/forms.py
+msgid "Your notification settings were updated."
+msgstr "Ýøür nøtïfïçätïøn séttïngs wéré üpdätéd. Ⱡ'σяєм ιρѕυ#"
+
+#: wiki/plugins/notifications/forms.py
+msgid "Your notification settings were unchanged, so nothing saved."
+msgstr ""
+"Ýøür nøtïfïçätïøn séttïngs wéré ünçhängéd, sø nøthïng sävéd. Ⱡ'σяєм ιρѕυм "
+"∂σłσ#"
+
+#: wiki/plugins/notifications/models.py
+#, python-format
+msgid "%(user)s subscribing to %(article)s (%(type)s)"
+msgstr "%(user)s süßsçrïßïng tø %(article)s (%(type)s) Ⱡ'σяєм ιρѕυм #"
+
+#: wiki/plugins/notifications/models.py
+#, python-format
+msgid "Article deleted: %s"
+msgstr "Àrtïçlé délétéd: %s Ⱡ'σя#"
+
+#: wiki/plugins/notifications/models.py
+#, python-format
+msgid "Article modified: %s"
+msgstr "Àrtïçlé mødïfïéd: %s Ⱡ'σя#"
+
+#: wiki/plugins/notifications/models.py
+#, python-format
+msgid "New article created: %s"
+msgstr "Néw ärtïçlé çréätéd: %s Ⱡ'σяє#"
+
+#: wiki/views/accounts.py
+msgid "You are now sign up... and now you can sign in!"
+msgstr "Ýøü äré nøw sïgn üp... änd nøw ýøü çän sïgn ïn! Ⱡ'σяєм ιρѕυм #"
+
+#: wiki/views/accounts.py
+msgid "You are no longer logged in. Bye bye!"
+msgstr "Ýøü äré nø løngér løggéd ïn. Býé ßýé! Ⱡ'σяєм ιρѕ#"
+
+#: wiki/views/accounts.py
+msgid "You are now logged in! Have fun!"
+msgstr "Ýøü äré nøw løggéd ïn! Hävé fün! Ⱡ'σяєм ι#"
+
+#: wiki/views/article.py
+#, python-format
+msgid "New article '%s' created."
+msgstr "Néw ärtïçlé '%s' çréätéd. Ⱡ'σяєм#"
+
+#: wiki/views/article.py
+#, python-format
+msgid "There was an error creating this article: %s"
+msgstr "Théré wäs än érrør çréätïng thïs ärtïçlé: %s Ⱡ'σяєм ιρѕυм#"
+
+#: wiki/views/article.py
+msgid "There was an error creating this article."
+msgstr "Théré wäs än érrør çréätïng thïs ärtïçlé. Ⱡ'σяєм ιρѕυ#"
+
+#: wiki/views/article.py
+msgid ""
+"This article cannot be deleted because it has children or is a root article."
+msgstr ""
+"Thïs ärtïçlé çännøt ßé délétéd ßéçäüsé ït häs çhïldrén ør ïs ä røøt ärtïçlé."
+" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт #"
+
+#: wiki/views/article.py
+msgid ""
+"This article together with all its contents are now completely gone! Thanks!"
+msgstr ""
+"Thïs ärtïçlé tøgéthér wïth äll ïts çønténts äré nøw çømplétélý gøné! Thänks!"
+" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт #"
+
+#: wiki/views/article.py
+#, python-format
+msgid ""
+"The article \"%s\" is now marked as deleted! Thanks for keeping the site "
+"free from unwanted material!"
+msgstr ""
+"Thé ärtïçlé \"%s\" ïs nøw märkéd äs délétéd! Thänks før kéépïng thé sïté "
+"fréé frøm ünwäntéd mätérïäl! Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+
+#: wiki/views/article.py
+msgid "Your changes were saved."
+msgstr "Ýøür çhängés wéré sävéd. Ⱡ'σяє#"
+
+#: wiki/views/article.py
+msgid "A new revision of the article was succesfully added."
+msgstr "À néw révïsïøn øf thé ärtïçlé wäs süççésfüllý äddéd. Ⱡ'σяєм ιρѕυм ∂σ#"
+
+#: wiki/views/article.py
+msgid "Restoring article"
+msgstr "Réstørïng ärtïçlé Ⱡ'σ#"
+
+#: wiki/views/article.py
+#, python-format
+msgid "The article \"%s\" and its children are now restored."
+msgstr "Thé ärtïçlé \"%s\" änd ïts çhïldrén äré nøw réstøréd. Ⱡ'σяєм ιρѕυм ∂#"
+
+#: wiki/views/article.py
+#, python-format
+msgid "The article %s is now set to display revision #%d"
+msgstr "Thé ärtïçlé %s ïs nøw sét tø dïspläý révïsïøn #%d Ⱡ'σяєм ιρѕυм ∂#"
+
+#: wiki/views/article.py
+msgid "New title"
+msgstr "Néw tïtlé #"
+
+#: wiki/views/article.py
+#, python-format
+msgid "Merge between Revision #%(r1)d and Revision #%(r2)d"
+msgstr "Mérgé ßétwéén Révïsïøn #%(r1)d änd Révïsïøn #%(r2)d Ⱡ'σяєм ιρѕυм ∂#"
+
+#: wiki/views/article.py
+#, python-format
+msgid ""
+"A new revision was created: Merge between Revision #%(r1)d and Revision "
+"#%(r2)d"
+msgstr ""
+"À néw révïsïøn wäs çréätéd: Mérgé ßétwéén Révïsïøn #%(r1)d änd Révïsïøn "
+"#%(r2)d Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
