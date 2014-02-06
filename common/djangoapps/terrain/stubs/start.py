@@ -4,6 +4,7 @@ Command-line utility to start a stub service.
 import sys
 import time
 import logging
+from .comments import StubCommentsService
 from .xqueue import StubXQueueService
 from .youtube import StubYouTubeService
 from .ora import StubOraService
@@ -14,7 +15,8 @@ USAGE = "USAGE: python -m stubs.start SERVICE_NAME PORT_NUM [CONFIG_KEY=CONFIG_V
 SERVICES = {
     'xqueue': StubXQueueService,
     'youtube': StubYouTubeService,
-    'ora': StubOraService
+    'ora': StubOraService,
+    'comments': StubCommentsService,
 }
 
 # Log to stdout, including debug messages
