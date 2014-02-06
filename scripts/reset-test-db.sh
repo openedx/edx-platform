@@ -23,7 +23,6 @@
 ############################################################################
 
 DB_CACHE_DIR="common/test/db_cache"
-DB_FIXTURE_DIR="common/test/db_fixtures"
 
 # Clear out the test database
 ./manage.py lms --settings bok_choy reset_db --traceback --noinput
@@ -53,5 +52,3 @@ else
     mysqldump -u root --no-data --skip-comments --skip-dump-date test > $DB_CACHE_DIR/bok_choy_schema.sql
 fi
 
-# Load database fixtures
-./manage.py lms --settings bok_choy loaddata $DB_FIXTURE_DIR/*.json

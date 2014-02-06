@@ -61,7 +61,10 @@ class DashboardPage(PageObject):
         else:
             return None
 
-    def change_language(self):
+    def change_language(self, code):
+        """
+        Change the language on the dashboard to the language corresponding with `code`.
+        """
         self.css_click(".edit-language")
-        self.select_option("language", "eo")
+        self.select_option("language", code)
         self.css_click("#submit-lang")
