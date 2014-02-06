@@ -78,7 +78,9 @@ class TestVideoYouTube(TestVideo):
             'yt_test_url': 'https://gdata.youtube.com/feeds/api/videos/',
             'transcript_language': 'en',
             'transcript_languages' : '{"uk": "Ukrainian", "en": "English"}',
-            'transcript_translation_url': self.item_descriptor.xmodule_runtime.handler_url(self.item_descriptor, 'transcript') + '/translation',
+            'transcript_translation_url': self.item_descriptor.xmodule_runtime.handler_url(
+                self.item_descriptor, 'transcript'
+            ).rstrip('/?') + '/translation',
         }
         self.assertEqual(
             context,
@@ -134,7 +136,9 @@ class TestVideoNonYouTube(TestVideo):
             'yt_test_url': 'https://gdata.youtube.com/feeds/api/videos/',
             'transcript_language': 'en',
             'transcript_languages' : '{"en": "English"}',
-            'transcript_translation_url': self.item_descriptor.xmodule_runtime.handler_url(self.item_descriptor, 'transcript') + '/translation',
+            'transcript_translation_url': self.item_descriptor.xmodule_runtime.handler_url(
+                self.item_descriptor, 'transcript'
+            ).rstrip('/?    ') + '/translation',
         }
 
         self.assertEqual(
@@ -224,14 +228,18 @@ class TestGetHtmlMethod(BaseTestXmodule):
             )
 
             self.initialize_module(data=DATA)
-            track_url = self.item_descriptor.xmodule_runtime.handler_url(self.item_descriptor, 'transcript') + '/download'
+            track_url = self.item_descriptor.xmodule_runtime.handler_url(
+                self.item_descriptor, 'transcript'
+            ).rstrip('/?') + '/download'
 
             context = self.item_descriptor.render('student_view').content
 
             expected_context.update({
                 'transcript_languages' : '{"en": "English"}' if self.item_descriptor.sub else '{}',
                 'transcript_language': 'en' if self.item_descriptor.sub else json.dumps(None),
-                'transcript_translation_url': self.item_descriptor.xmodule_runtime.handler_url(self.item_descriptor, 'transcript') + '/translation',
+                'transcript_translation_url': self.item_descriptor.xmodule_runtime.handler_url(
+                    self.item_descriptor, 'transcript'
+                ).rstrip('/?') + '/translation',
                 'ajax_url': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
                 'track': track_url if data['expected_track_url'] == u'a_sub_file.srt.sjson' else data['expected_track_url'],
                 'sub': data['sub'],
@@ -334,7 +342,9 @@ class TestGetHtmlMethod(BaseTestXmodule):
             context = self.item_descriptor.render('student_view').content
 
             expected_context.update({
-                'transcript_translation_url': self.item_descriptor.xmodule_runtime.handler_url(self.item_descriptor, 'transcript') + '/translation',
+                'transcript_translation_url': self.item_descriptor.xmodule_runtime.handler_url(
+                    self.item_descriptor, 'transcript'
+                ).rstrip('/?') + '/translation',
                 'ajax_url': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
                 'sources': data['result'],
                 'id': self.item_descriptor.location.html_id(),
