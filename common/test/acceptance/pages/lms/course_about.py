@@ -11,7 +11,7 @@ class CourseAboutPage(CoursePage):
     Course about page (with registration button)
     """
 
-    URL_PATH = "about"
+    url_path = "about"
 
     def is_browser_on_page(self):
         return self.is_css_present('section.course-info')

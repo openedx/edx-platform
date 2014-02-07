@@ -13,7 +13,7 @@ class CoursePage(PageObject):
 
     # Overridden by subclasses to provide the relative path within the course
     # Does not need to include the leading forward or trailing slash
-    URL_PATH = ""
+    url_path = ""
 
     def __init__(self, browser, course_org, course_num, course_run):
         """
@@ -35,7 +35,7 @@ class CoursePage(PageObject):
         Construct a URL to the page within the course.
         """
         return "/".join([
-            BASE_URL, self.URL_PATH,
+            BASE_URL, self.url_path,
             "{course_org}.{course_num}.{course_run}".format(**self.course_info),
             "branch", "draft", "block", self.course_info['course_run']
         ])

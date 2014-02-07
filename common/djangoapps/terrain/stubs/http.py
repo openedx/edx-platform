@@ -202,6 +202,13 @@ class StubHttpRequestHandler(BaseHTTPRequestHandler, object):
         if content is not None:
             self.wfile.write(content)
 
+    def send_json_response(self, content):
+        """
+        Send a response with status code 200, the given content serialized as
+        JSON, and the Content-Type header set appropriately
+        """
+        self.send_response(200, json.dumps(content), {"Content-Type": "application/json"})
+
     def _format_msg(self, format_str, *args):
         """
         Format message for logging.

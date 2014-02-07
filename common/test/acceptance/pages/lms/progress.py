@@ -10,7 +10,7 @@ class ProgressPage(CoursePage):
     Student progress page.
     """
 
-    URL_PATH = "progress"
+    url_path = "progress"
 
     def is_browser_on_page(self):
         has_course_info = self.is_css_present('div.course-info')

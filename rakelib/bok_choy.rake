@@ -41,6 +41,11 @@ BOK_CHOY_STUBS = {
         :port => 8041,
         :log => File.join(BOK_CHOY_LOG_DIR, "bok_choy_ora.log"),
         :config => ''
+    },
+
+    :comments => {
+        :port => 4567,
+        :log => File.join(BOK_CHOY_LOG_DIR, "bok_choy_comments.log")
     }
 }
 

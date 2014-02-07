@@ -10,7 +10,7 @@ class GradingPage(CoursePage):
     Course Grading Settings page.
     """
 
-    URL_PATH = "settings/grading"
+    url_path = "settings/grading"
 
     def is_browser_on_page(self):
         return self.is_css_present('body.grading')
