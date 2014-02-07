@@ -201,6 +201,12 @@
 
   <section class="container">
     <section class="details">
+      % if staff_access and studio_url is not None:
+        <div class="wrap-instructor-info studio-view">
+          <a class="instructor-info-action" href="${studio_url}">${_("View About Page in studio")}</a>
+        </div>
+      % endif
+      
       <nav>
         <a href="#" class="active">${_("Overview")}</a>
       ##  <a href="#">${_("FAQ")}</a>
