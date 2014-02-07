@@ -268,8 +268,6 @@ function (HTML5Video, Resizer) {
                     .onPlaybackQualityChange
             }
         });
-
-        // state.trigger('videoCaption.fetchCaption', true);
     }
 
     // ***************************************************************
@@ -359,16 +357,15 @@ function (HTML5Video, Resizer) {
     }
 
     function onSpeedChange(newSpeed) {
-        var time = this.videoPlayer.currentTime;
+        var time = this.videoPlayer.currentTime,
+            isFlash = this.currentPlayerMode === 'flash';
 
-        if (this.currentPlayerMode === 'flash') {
+        if (isFlash) {
             this.videoPlayer.currentTime = Time.convert(
                 time,
                 parseFloat(this.speed),
                 newSpeed
             );
-
-            this.trigger('videoCaption.fetchCaption');
         }
 
         newSpeed = parseFloat(newSpeed).toFixed(2).replace(/\.00$/, '.0');

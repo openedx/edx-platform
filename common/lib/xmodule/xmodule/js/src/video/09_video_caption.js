@@ -129,7 +129,8 @@ function () {
     //     Bind any necessary function callbacks to DOM events (click,
     //     mousemove, etc.).
     function bindHandlers() {
-        var Caption = this.videoCaption;
+        var self = this,
+            Caption = this.videoCaption;
 
         $(window).bind('resize', Caption.resize);
         Caption.hideSubtitlesEl.on({
@@ -151,6 +152,12 @@ function () {
                 mouseleave: onContainerMouseLeave
             });
         }
+
+        this.el.on('speedchange', function () {
+            if (self.currentPlayerMode === 'flash') {
+                Caption.fetchCaption();
+            }
+        });
     }
 
     function onContainerMouseEnter(event) {
@@ -211,7 +218,7 @@ function () {
      *     false: No caption file was specified, or an empty string was
      *         specified.
      */
-    function fetchCaption(notLoaded) {
+    function fetchCaption() {
         var self = this,
             Caption = self.videoCaption;
         // Check whether the captions file was specified. This is the point
@@ -222,10 +229,10 @@ function () {
             return false;
         }
 
-        if (!this.videoCaption.loaded || notLoaded) {
-            this.videoCaption.hideCaptions(this.hide_captions);
-        } else {
+        if (this.videoCaption.loaded) {
             this.videoCaption.hideCaptions(false);
+        } else {
+            this.videoCaption.hideCaptions(this.hide_captions);
         }
 
         if (this.fetchXHR && this.fetchXHR.abort) {
@@ -239,8 +246,7 @@ function () {
             notifyOnError: false,
             data: {
                 videoId: this.youtubeId(),
-                language: this.getCurrentLanguage(),
-                speed: this.speed,
+                language: this.getCurrentLanguage()
             },
             success: function (captions) {
                 Caption.captions = captions.text;
