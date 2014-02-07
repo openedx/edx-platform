@@ -17,6 +17,8 @@ from xmodule.seq_module import SequenceModule
 from xmodule.vertical_module import VerticalModule
 from xmodule.x_module import shim_xmodule_js, XModuleDescriptor, XModule
 from lms.lib.xblock.runtime import quote_slashes
+from xmodule.modulestore import MONGO_MODULESTORE_TYPE
+from xmodule.modulestore.django import modulestore, loc_mapper
 
 log = logging.getLogger(__name__)
 
@@ -152,17 +154,33 @@ def grade_histogram(module_id):
     return grades
 
 
-def add_staff_debug_info(user, block, view, frag, context):  # pylint: disable=unused-argument
+def add_staff_markup(user, block, view, frag, context):  # pylint: disable=unused-argument
     """
     Updates the supplied module with a new get_html function that wraps
     the output of the old get_html function with additional information
-    for admin users only, including a histogram of student answers and the
-    definition of the xmodule
+    for admin users only, including a histogram of student answers, the
+    definition of the xmodule, and a link to view the module in Studio
+    if it is a Studio edited, mongo stored course.
 
-    Does nothing if module is a SequenceModule or a VerticalModule.
+    Does nothing if module is a SequenceModule.
     """
     # TODO: make this more general, eg use an XModule attribute instead
-    if isinstance(block, (SequenceModule, VerticalModule)):
+    if isinstance(block, VerticalModule):
+        # check that the course is a mongo backed Studio course before doing work
+        is_mongo_course = modulestore().get_modulestore_type(block.course_id) == MONGO_MODULESTORE_TYPE
+        is_studio_course = block.course_edit_method == "Studio"
+
+        if is_studio_course and is_mongo_course:
+            # get relative url/location of unit in Studio
+            locator = loc_mapper().translate_location(block.course_id, block.location, False, True)
+            # build edit link to unit in CMS
+            edit_link = "//" + settings.CMS_BASE + locator.url_reverse('unit', '')
+            # return edit link in rendered HTML for display
+            return wrap_fragment(frag, render_to_string("edit_unit_link.html", {'frag_content': frag.content, 'edit_link': edit_link}))
+        else:
+            return frag
+
+    if isinstance(block, SequenceModule):
         return frag
 
     block_id = block.id

@@ -37,7 +37,7 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore, ModuleI18nService
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.util.duedate import get_extended_due_date
-from xmodule_modifiers import replace_course_urls, replace_jump_to_id_urls, replace_static_urls, add_staff_debug_info, wrap_xblock
+from xmodule_modifiers import replace_course_urls, replace_jump_to_id_urls, replace_static_urls, add_staff_markup, wrap_xblock
 from xmodule.lti_module import LTIModule
 from xmodule.x_module import XModuleDescriptor
 
@@ -371,7 +371,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
 
     if settings.FEATURES.get('DISPLAY_DEBUG_INFO_TO_STAFF'):
         if has_access(user, descriptor, 'staff', course_id):
-            block_wrappers.append(partial(add_staff_debug_info, user))
+            block_wrappers.append(partial(add_staff_markup, user))
 
     # These modules store data using the anonymous_student_id as a key.
     # To prevent loss of data, we will continue to provide old modules with

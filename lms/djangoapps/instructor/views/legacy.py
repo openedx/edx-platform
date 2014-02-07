@@ -844,7 +844,6 @@ def instructor_dashboard(request, course_id):
 
     # determine if this is a studio-backed course so we can provide a link to edit this course in studio
     is_studio_course = modulestore().get_modulestore_type(course_id) != XML_MODULESTORE_TYPE
-
     studio_url = None
     if is_studio_course:
         studio_url = get_cms_course_link(course)
