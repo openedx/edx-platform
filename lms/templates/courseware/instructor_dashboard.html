@@ -30,7 +30,7 @@
 %endif
 </%block>
 
-<%include file="/courseware/course_navigation.html" args="active_page='instructor'" />
+<%include file="/courseware/course_navigation.html" args="active_page='instructor', studio_url=studio_url" />
 
 <style type="text/css">
 table.stat_table {
@@ -120,11 +120,6 @@ function goto( mode)
   %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BETA_DASHBOARD'):
     <div class="beta-button-wrapper"><a href="${ beta_dashboard_url }">${_("Try New Beta Dashboard")}</a></div>
   %endif
-  %if studio_url:
-    ## not checking access because if user can see this, they are at least course staff (with studio edit access)
-    <div class="studio-edit-link"><a href="${studio_url}" target="_blank">${_('Edit Course In Studio')}</a></div>
-  %endif
-
 
   <section class="instructor-dashboard-content" id="instructor-dashboard-content">
     <h1>${_("Instructor Dashboard")}</h1>

@@ -31,7 +31,9 @@ ${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph",
 </%block>
 
 <%include file="/dashboard/_dashboard_prompt_midcourse_reverify.html" />
-<%include file="/courseware/course_navigation.html" args="active_page='progress'" />
+
+<%studio_link_text = ${_("View Grading in Studio")}%>
+<%include file="/courseware/course_navigation.html" args="active_page='progress', studio_url=studio_url, studio_link_text=studio_link_text" />
 
 <div class="container">
   <div class="profile-wrapper">

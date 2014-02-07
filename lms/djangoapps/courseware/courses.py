@@ -315,12 +315,12 @@ def sort_by_announcement(courses):
     return courses
 
 
-def get_cms_course_link(course):
+def get_cms_block_link(block, page):
     """
-    Returns a link to course_index for editing the course in cms,
-    assuming that the course is actually cms-backed.
+    Returns a link to block_index for editing the course in cms,
+    assuming that the block is actually cms-backed.
     """
     locator = loc_mapper().translate_location(
-        course.location.course_id, course.location, False, True
+        block.location.course_id, block.location, False, True
     )
-    return "//" + settings.CMS_BASE + locator.url_reverse('course/', '')
+    return "//" + settings.CMS_BASE + locator.url_reverse(page, '')

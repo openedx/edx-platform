@@ -15,8 +15,14 @@ div.course-wrapper {
 
   section.course-content {
     @extend .content;
+    position: relative;
     padding: 40px;
+    padding-top: 70px;
     line-height: 1.6;
+
+    .edit-unit-in-cms {
+      text-align: right;
+    }
 
     h1 {
       margin: 0 0 lh();

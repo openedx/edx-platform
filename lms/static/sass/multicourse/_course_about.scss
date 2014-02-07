@@ -28,6 +28,16 @@
       min-width: 760px;
       position: relative;
       z-index: 2;
+      
+      #edit-in-cms-wrapper {
+        position: absolute;
+        top: -45px;
+        right: -1px;
+        padding: 10px;
+        background: $course-header-bg;
+        border: 1px solid $border-color-3;
+        @include box-sizing(border-box);
+      }
 
       > div.table {
         display: table;

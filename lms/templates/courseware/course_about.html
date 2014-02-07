@@ -123,6 +123,12 @@
 <section class="course-info">
   <header class="course-profile">
     <div class="intro-inner-wrapper">
+      % if staff_access and studio_url is not None:
+        <div id="edit-in-cms-wrapper">
+          <a href="${studio_url}" id="edit-in-cms">${_("View About Page in Studio")}</a>
+        </div>
+      % endif
+      
       <div class="table">
       <section class="intro">
         <hgroup>

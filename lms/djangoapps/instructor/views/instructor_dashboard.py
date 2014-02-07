@@ -19,7 +19,7 @@ from xmodule.modulestore.django import modulestore
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 from courseware.access import has_access
-from courseware.courses import get_course_by_id, get_cms_course_link
+from courseware.courses import get_course_by_id, get_cms_block_link
 from django_comment_client.utils import has_forum_access
 from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from student.models import CourseEnrollment
@@ -28,6 +28,12 @@ from bulk_email.models import CourseAuthorization
 
 from .tools import get_units_with_due_date, title_or_url
 
+def get_studio_url(course, course_id, page):
+    is_studio_course = (modulestore().get_modulestore_type(course_id) == MONGO_MODULESTORE_TYPE)
+    studio_link = None
+    if is_studio_course:
+      studio_link = get_cms_block_link(course, page)
+    return studio_link
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
@@ -65,9 +71,9 @@ def instructor_dashboard_2(request, course_id):
        is_studio_course and CourseAuthorization.instructor_email_enabled(course_id):
         sections.append(_section_send_email(course_id, access, course))
 
-    studio_url = None
-    if is_studio_course:
-        studio_url = get_cms_course_link(course)
+    studio_url = get_studio_url(course, course_id, 'course')
+
+    import sys; sys.stderr.write("\n\n" + studio_url + "\n\n")  ## <-----------------------------------------------########
 
     enrollment_count = sections[0]['enrollment_count']
     disable_buttons = False
@@ -78,6 +84,7 @@ def instructor_dashboard_2(request, course_id):
     context = {
         'course': course,
         'old_dashboard_url': reverse('instructor_dashboard', kwargs={'course_id': course_id}),
+        'staff_access': access['staff'],
         'studio_url': studio_url,
         'sections': sections,
         'disable_buttons': disable_buttons,
