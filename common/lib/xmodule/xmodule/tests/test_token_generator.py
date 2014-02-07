@@ -1,13 +1,12 @@
 """
 This test will run for firebase_token_generator.py.
 """
+import unittest
 
-from django.test import TestCase
-
-from student.firebase_token_generator import _encode, _encode_json, _encode_token, create_token
+from xmodule.firebase_token_generator import _encode, _encode_json, _encode_token, create_token
 
 
-class TokenGenerator(TestCase):
+class TokenGenerator(unittest.TestCase):
     """
     Tests for the file firebase_token_generator.py
     """

@@ -43,7 +43,7 @@ li.token-input-input-token {
 
 div.token-input-dropdown {
     position: absolute;
-    width: 120px;
+    width: 400px;
     background-color: #fff;
     overflow: hidden;
     border-left: 1px solid #ccc;

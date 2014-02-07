@@ -68,10 +68,8 @@
 
     	//Grab uri of the course
     	var parts = window.location.href.split("/"), 
-    		uri = '',
-		courseid;
+    		uri = '';
 	for (var index = 0; index <= 6; index += 1) uri += parts[index]+"/"; //Get the unit url
-	courseid = parts[4] + "/" + parts[5] + "/" + parts[6];
         var pagination = 100,
 		is_staff = false,
         options = {
@@ -130,7 +128,7 @@
                   },
             },
             auth: {
-                tokenUrl: location.protocol+'//'+location.host+"/token?course_id="+courseid
+                token: "${token}"
             },
             store: {
                 // The endpoint of the store on your server.
