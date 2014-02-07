@@ -1,6 +1,6 @@
 /* 
 Open Video Annotation v1.0 (http://openvideoannotation.org/)
-Copyright (C) 2014 CHS (Harvard University), Daniel Cebri‡n Robles and Phil Desenne 
+Copyright (C) 2014 CHS (Harvard University), Daniel Cebrian Robles and Phil Desenne 
 License: https://github.com/CtrHellenicStudies/OpenVideoAnnotation/blob/master/License.rst
 
 This program is free software; you can redistribute it and/or
@@ -2389,6 +2389,8 @@ OpenVideoAnnotation.Annotator = function (element, options) {
 	if (typeof options.optionsAnnotator.highlightTags!='undefined')
 		this.annotator.addPlugin("HighlightTags", options.optionsAnnotator.highlightTags);
 
+	if (typeof options.optionsAnnotator.diacriticMarks != 'undefined')
+		this.annotator.addPlugin("Diacritics", options.optionsAnnotator.diacriticMarks);
          
 	/*
 	this.annotator.addPlugin("Filter", {

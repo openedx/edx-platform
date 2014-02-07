@@ -78,6 +78,21 @@
             "accessibility": "js/src/accessibility_tools",
             "draggabilly": "js/vendor/draggabilly.pkgd",
             "URI": "js/vendor/URI.min",
+            "annotator": "js/vendor/ova/annotator-full",
+            "video.dev": "js/vendor/ova/video.dev",
+            "vjs.youtube": 'js/vendor/ova/vjs.youtube',
+            "rangeslider": 'js/vendor/ova/rangeslider',
+            "share-annotator": 'js/vendor/ova/share-annotator',
+            "tinymce-annotator": 'js/vendor/ova/tinymce.min',
+            "richText-annotator": 'js/vendor/ova/richText-annotator',
+            "reply-annotator": 'js/vendor/ova/reply-annotator',
+            "tags-annotator": 'js/vendor/ova/tags-annotator',
+            "diacritic-annotator": 'js/vendor/ova/diacritic-annotator',
+            "flagging-annotator": 'js/vendor/ova/flagging-annotator',
+            "jquery-Watch": 'js/vendor/ova/jquery-Watch',
+            "ova": 'js/vendor/ova/ova',
+            "catch": 'js/vendor/ova/catch/js/catch',
+            "handlebars": 'js/vendor/ova/catch/js/handlebars-1.1.2',
 
             // externally hosted files
             "tender": "//edxedge.tenderapp.com/tender_widget",
@@ -88,7 +103,7 @@
                 // and leaves the path component intact.
                 "//www.youtube.com/player_api?noext",
                 // if youtube fails to load, fallback on a local file
-                // so that require doesn't fall over
+                // so that require doesnt fall over
                 "js/src/youtube_fallback"
             ]
         },
@@ -217,6 +232,40 @@
             "coffee/src/logger": {
                 exports: "Logger",
                 deps: ["coffee/src/ajax_prefix"]
+            },
+            "video.dev": {
+                exports:"videojs"
+            },
+            "vjs.youtube": {
+                deps: ["video.dev"]
+            },
+            "rangeslider": {
+                deps: ["video.dev"]
+            },
+            "annotator": {
+                exports: "Annotator"
+            },
+            "share-annotator": {
+                deps: ["annotator"]
+            },
+            "richText-annotator": {
+                deps: ["annotator", "tinymce"]
+            },
+            "reply-annotator": {
+                deps: ["annotator"]
+            },
+            "tags-annotator": {
+                deps: ["annotator"]
+            },
+            "diacritic-annotator": {
+                deps: ["annotator"]
+            },
+            "flagging-annotator": {
+                deps: ["annotator"]
+            },
+            "ova":{
+                exports: "ova",
+                deps: ["annotator", "video.dev", "vjs.youtube", "rangeslider", "share-annotator", "tinymce", "richText-annotator", "reply-annotator", "tags-annotator", "flagging-annotator", "diacritic-annotator", "jquery-Watch", "catch", "handlebars", "URI"]
             }
         },
         // load jquery and gettext automatically

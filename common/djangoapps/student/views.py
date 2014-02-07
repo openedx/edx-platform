@@ -41,7 +41,6 @@ from student.models import (
     CourseEnrollmentAllowed, UserStanding, LoginFailures
 )
 from student.forms import PasswordResetFormNoActive
-from student.firebase_token_generator import create_token
 
 from verify_student.models import SoftwareSecurePhotoVerification, MidcourseReverificationWindow
 from certificates.models import CertificateStatuses, certificate_status_for_student
@@ -1652,26 +1651,3 @@ def change_email_settings(request):
         track.views.server_track(request, "change-email-settings", {"receive_emails": "no", "course": course_id}, page='dashboard')
 
     return JsonResponse({"success": True})
-
-
-@login_required
-def token(request):
-    '''
-    Return a token for the backend of annotations.
-    It uses the course id to retrieve a variable that contains the secret
-    token found in inheritance.py. It also contains information of when
-    the token was issued. This will be stored with the user along with
-    the id for identification purposes in the backend.
-    '''
-    course_id = request.GET.get("course_id")
-    course = course_from_id(course_id)
-    dtnow = datetime.datetime.now()
-    dtutcnow = datetime.datetime.utcnow()
-    delta = dtnow - dtutcnow
-    newhour, newmin = divmod((delta.days * 24 * 60 * 60 + delta.seconds + 30) // 60, 60)
-    newtime = "%s%+02d:%02d" % (dtnow.isoformat(), newhour, newmin)
-    secret = course.annotation_token_secret
-    custom_data = {"issuedAt": newtime, "consumerKey": secret, "userId": request.user.email, "ttl": 86400}
-    newtoken = create_token(secret, custom_data)
-    response = HttpResponse(newtoken, mimetype="text/plain")
-    return response

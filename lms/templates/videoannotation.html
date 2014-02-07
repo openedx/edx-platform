@@ -48,8 +48,8 @@
 	$('.annotatable-toggle-instructions').on('click', onClickHideInstructions);
 	
 	//Grab uri of the course
-    var parts = window.location.href.split("/"), 
-    	uri = '',
+	var parts = window.location.href.split("/"), 
+		uri = '',
 	courseid;
 	for (var index = 0; index <= 9; index += 1) uri += parts[index]+"/"; //Get the unit url
 	courseid = parts[4] + "/" + parts[5] + "/" + parts[6];
@@ -119,7 +119,7 @@
                   },
             },
             auth: {
-                tokenUrl: location.protocol+'//'+location.host+"/token?course_id="+courseid
+                token: "${token}"
             },
             store: {
                 // The endpoint of the store on your server.
@@ -127,7 +127,6 @@
 
                 annotationData: {
                     uri: uri,
-
                 },
 
                 urls: {
@@ -162,33 +161,38 @@
             }
         },
     };
-	
-	var imgURLRoot = "${settings.STATIC_URL}" + "js/vendor/ova/catch/img/";
-	tinyMCE.baseURL = "${settings.STATIC_URL}" + "js/vendor/ova";
-	
-	//remove old instances
-    if (Annotator._instances.length !== 0) {
-      $('#videoHolder').annotator("destroy");
-    }
-    delete ova;
-    //Load the plugin Video/Text Annotation
-    var ova = new OpenVideoAnnotation.Annotator($('#videoHolder'),options);
-    
-    ova.annotator.addPlugin('Tags');
-
-    
-    
-    //Catch
-    var annotator = ova.annotator,
+    tinyMCE.baseURL = "${settings.STATIC_URL}" + "js/vendor/ova";
+    var imgURLRoot = "${settings.STATIC_URL}" + "js/vendor/ova/catch/img/";
+	var startova = function(){
+           //remove old instances
+        if (Annotator._instances.length !== 0) {
+          $('#videoHolder').annotator("destroy");
+        }
+        delete ova;
+        //Load the plugin Video/Text Annotation
+        var ova = new OpenVideoAnnotation.Annotator($('#videoHolder'),options);
+        ova.annotator.addPlugin('Tags');
+        
+        //Catch
+        var annotator = ova.annotator,
         catchOptions = {
             media:'video',
             externalLink:false,
             imageUrlRoot:imgURLRoot,
             showMediaSelector: false,
             showPublicPrivate: true,
-	    userId:'${user.email}',
+            userId:'${user.email}',
             pagination:pagination,//Number of Annotations per load in the pagination,
             flags:is_staff
         },
         Catch = new CatchAnnotation($('#catchDIV'),catchOptions);
+    }
+
+    if (typeof Annotator != 'undefined'){
+    	startova();
+    } else{
+        require(["ova"], function(ova){
+            startova();
+        });
+    }
 </script>
