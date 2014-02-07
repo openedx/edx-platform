@@ -142,9 +142,6 @@ class CapaTargetedFeedbackTest(unittest.TestCase):
 
         self.assertRegexpMatches(without_new_lines, r"<div>.*'wrong-1'.*'wrong-2'.*'correct-1'.*'wrong-3'.*</div>")
         self.assertNotRegexpMatches(without_new_lines, r"feedback1|feedback2|feedback3|feedbackC")
-        # Check that calling it multiple times yields the same thing
-        the_html2 = problem.get_html()
-        self.assertEquals(the_html, the_html2)
 
     def test_targeted_feedback_student_answer1(self):
         xml_str = textwrap.dedent("""
@@ -210,9 +207,6 @@ class CapaTargetedFeedbackTest(unittest.TestCase):
 
         self.assertRegexpMatches(without_new_lines, r"<targetedfeedback explanation-id=\"feedback3\">.*3rd WRONG solution")
         self.assertNotRegexpMatches(without_new_lines, r"feedback1|feedback2|feedbackC")
-        # Check that calling it multiple times yields the same thing
-        the_html2 = problem.get_html()
-        self.assertEquals(the_html, the_html2)
 
     def test_targeted_feedback_student_answer2(self):
         xml_str = textwrap.dedent("""
@@ -346,9 +340,6 @@ class CapaTargetedFeedbackTest(unittest.TestCase):
         self.assertRegexpMatches(without_new_lines, r"<targetedfeedback explanation-id=\"feedbackC\".*solution explanation")
         self.assertNotRegexpMatches(without_new_lines, r"<div>\{.*'1_solution_1'.*\}</div>")
         self.assertNotRegexpMatches(without_new_lines, r"feedback2|feedback3")
-        # Check that calling it multiple times yields the same thing
-        the_html2 = problem.get_html()
-        self.assertEquals(the_html, the_html2)
 
     def test_targeted_feedback_no_show_solution_explanation(self):
         xml_str = textwrap.dedent("""

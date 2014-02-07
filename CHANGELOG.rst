@@ -188,7 +188,7 @@ duplicated "\index".
 Studio: Support answer pools for multiple choice question choices, so authors can provide
 multiple incorrect and correct choices for a question and have 1 correct choice and n-1
 incorrect choices randomly selected and shuffled before being presented to the student.
-In XML: <choicegroup answer-pool="4"> enables an answer pool of 4 choices: 3
+In XML: <multiplechoiceresponse answer-pool="4"> enables an answer pool of 4 choices: 3
 correct choices and 1 incorrect choice. To provide multiple solution expanations, wrap
 all solution elements within a <solutionset>, and make sure to add an attribute called
 "explanation-id" to both the <solution> tag and its corresponding <choice> tag, and be
