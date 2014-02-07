@@ -111,6 +111,7 @@ msgid "Student"
 msgstr "Stüdént #"
 
 #: common/djangoapps/student/middleware.py
+#, python-brace-format
 msgid ""
 "Your account has been disabled. If you believe this was done in error, "
 "please contact us at {link_start}{support_email}{link_end}"
@@ -130,6 +131,11 @@ msgstr "Çøürsé ïd nøt spéçïfïéd Ⱡ'σяє#"
 #: common/djangoapps/student/views.py
 msgid "Course id is invalid"
 msgstr "Çøürsé ïd ïs ïnvälïd Ⱡ'σя#"
+
+#: common/djangoapps/student/views.py
+#: lms/templates/courseware/course_about.html
+msgid "Course is full"
+msgstr "Çøürsé ïs füll Ⱡ'#"
 
 #: common/djangoapps/student/views.py
 msgid "You are not enrolled in this course"
@@ -195,16 +201,19 @@ msgid "Unexpected account status"
 msgstr "Ûnéxpéçtéd äççøünt stätüs Ⱡ'σяєм#"
 
 #: common/djangoapps/student/views.py
+#, python-brace-format
 msgid "An account with the Public Username '{username}' already exists."
 msgstr ""
 "Àn äççøünt wïth thé Püßlïç Ûsérnämé '{username}' älréädý éxïsts. Ⱡ'σяєм "
 "ιρѕυм ∂σłσя #"
 
 #: common/djangoapps/student/views.py
+#, python-brace-format
 msgid "An account with the Email '{email}' already exists."
 msgstr "Àn äççøünt wïth thé Émäïl '{email}' älréädý éxïsts. Ⱡ'σяєм ιρѕυм ∂#"
 
 #: common/djangoapps/student/views.py
+#, python-brace-format
 msgid "Error (401 {field}). E-mail us."
 msgstr "Érrør (401 {field}). É-mäïl üs. Ⱡ'σяєм ι#"
 
@@ -326,42 +335,52 @@ msgid "Invalid ID"
 msgstr "Ìnvälïd ÌD Ⱡ#"
 
 #: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
 msgid "Invalid Length ({0})"
 msgstr "Ìnvälïd Léngth ({0}) Ⱡ'σя#"
 
 #: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
 msgid "must be {0} characters or more"
 msgstr "müst ßé {0} çhäräçtérs ør møré Ⱡ'σяєм #"
 
 #: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
 msgid "must be {0} characters or less"
 msgstr "müst ßé {0} çhäräçtérs ør léss Ⱡ'σяєм #"
 
 #: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
 msgid "Must be more complex ({0})"
 msgstr "Müst ßé møré çømpléx ({0}) Ⱡ'σяєм#"
 
 #: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
 msgid "must contain {0} or more uppercase characters"
 msgstr "müst çøntäïn {0} ør møré üppérçäsé çhäräçtérs Ⱡ'σяєм ιρѕυм#"
 
 #: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
 msgid "must contain {0} or more lowercase characters"
 msgstr "müst çøntäïn {0} ør møré løwérçäsé çhäräçtérs Ⱡ'σяєм ιρѕυм#"
 
 #: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
 msgid "must contain {0} or more digits"
 msgstr "müst çøntäïn {0} ør møré dïgïts Ⱡ'σяєм ι#"
 
 #: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
 msgid "must contain {0} or more punctuation characters"
 msgstr "müst çøntäïn {0} ør møré pünçtüätïøn çhäräçtérs Ⱡ'σяєм ιρѕυм #"
 
 #: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
 msgid "must contain {0} or more non ascii characters"
 msgstr "müst çøntäïn {0} ør møré nøn äsçïï çhäräçtérs Ⱡ'σяєм ιρѕυм#"
 
 #: common/djangoapps/util/password_policy_validators.py
+#, python-brace-format
 msgid "must contain {0} or more unique words"
 msgstr "müst çøntäïn {0} ør møré ünïqüé wørds Ⱡ'σяєм ιρѕ#"
 
@@ -401,6 +420,7 @@ msgstr ""
 "ßý thät féédßäçk. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid "Error {err} in evaluating hint function {hintfn}."
 msgstr "Érrør {err} ïn évälüätïng hïnt fünçtïøn {hintfn}. Ⱡ'σяєм ιρѕυм ∂#"
 
@@ -409,6 +429,7 @@ msgid "(Source code line unavailable)"
 msgstr "(Søürçé çødé lïné ünäväïläßlé) Ⱡ'σяєм #"
 
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid "See XML source line {sourcenum}."
 msgstr "Séé XML søürçé lïné {sourcenum}. Ⱡ'σяєм ι#"
 
@@ -419,22 +440,26 @@ msgstr ""
 "∂σłσ#"
 
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid "Could not interpret '{student_answer}' as a number."
 msgstr "Çøüld nøt ïntérprét '{student_answer}' äs ä nümßér. Ⱡ'σяєм ιρѕυм ∂#"
 
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid "You may not use variables ({bad_variables}) in numerical problems."
 msgstr ""
 "Ýøü mäý nøt üsé värïäßlés ({bad_variables}) ïn nümérïçäl prøßléms. Ⱡ'σяєм "
 "ιρѕυм ∂σłσя #"
 
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid "factorial function evaluated outside its domain:'{student_answer}'"
 msgstr ""
 "fäçtørïäl fünçtïøn évälüätéd øütsïdé ïts dømäïn:'{student_answer}' Ⱡ'σяєм "
 "ιρѕυм ∂σłσя #"
 
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid "Invalid math syntax: '{student_answer}'"
 msgstr "Ìnvälïd mäth sýntäx: '{student_answer}' Ⱡ'σяєм ιρѕ#"
 
@@ -465,6 +490,7 @@ msgstr ""
 "∂σłσя#"
 
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid ""
 "Unable to deliver your submission to grader (Reason: {error_msg}). Please "
 "try again later."
@@ -479,10 +505,12 @@ msgstr ""
 "Ìnvälïd grädér réplý. Pléäsé çøntäçt thé çøürsé stäff. Ⱡ'σяєм ιρѕυм ∂σ#"
 
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid "Invalid input: {bad_input} not permitted in answer."
 msgstr "Ìnvälïd ïnpüt: {bad_input} nøt pérmïttéd ïn änswér. Ⱡ'σяєм ιρѕυм ∂#"
 
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid ""
 "factorial function not permitted in answer for this problem. Provided answer"
 " was: {bad_input}"
@@ -491,12 +519,14 @@ msgstr ""
 " wäs: {bad_input} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid "Invalid input: Could not parse '{bad_input}' as a formula."
 msgstr ""
 "Ìnvälïd ïnpüt: Çøüld nøt pärsé '{bad_input}' äs ä førmülä. Ⱡ'σяєм ιρѕυм "
 "∂σłσ#"
 
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid "Invalid input: Could not parse '{bad_input}' as a formula"
 msgstr ""
 "Ìnvälïd ïnpüt: Çøüld nøt pärsé '{bad_input}' äs ä førmülä Ⱡ'σяєм ιρѕυм ∂σł#"
@@ -504,6 +534,7 @@ msgstr ""
 #. Translators: 'SchematicResponse' is a problem type and should not be
 #. translated.
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid "Error in evaluating SchematicResponse. The error was: {error_msg}"
 msgstr ""
 "Érrør ïn évälüätïng SçhémätïçRéspønsé. Thé érrør wäs: {error_msg} Ⱡ'σяєм "
@@ -515,6 +546,7 @@ msgstr ""
 "Thé Stäff änswér çøüld nøt ßé ïntérprétéd äs ä nümßér. Ⱡ'σяєм ιρѕυм ∂σ#"
 
 #: common/lib/capa/capa/responsetypes.py
+#, python-brace-format
 msgid "Could not interpret '{given_answer}' as a number."
 msgstr "Çøüld nøt ïntérprét '{given_answer}' äs ä nümßér. Ⱡ'σяєм ιρѕυм ∂#"
 
@@ -560,6 +592,7 @@ msgstr ""
 "Prøßlém müst ßé rését ßéføré ït çän ßé çhéçkéd ägäïn. Ⱡ'σяєм ιρѕυм ∂σ#"
 
 #: common/lib/xmodule/xmodule/capa_base.py
+#, python-brace-format
 msgid "You must wait at least {wait} seconds between submissions."
 msgstr ""
 "Ýøü müst wäït ät léäst {wait} séçønds ßétwéén süßmïssïøns. Ⱡ'σяєм ιρѕυм "
@@ -567,6 +600,7 @@ msgstr ""
 
 #. Translators: {msg} will be replaced with a problem's error message.
 #: common/lib/xmodule/xmodule/capa_base.py
+#, python-brace-format
 msgid "Error: {msg}"
 msgstr "Érrør: {msg} Ⱡ#"
 
@@ -621,6 +655,12 @@ msgstr ""
 msgid "General"
 msgstr "Généräl #"
 
+#. Translators: TBD stands for 'To Be Determined' and is used when a course
+#. does not yet have an announced start date.
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "TBD"
+msgstr "TBD Ⱡ'σя#"
+
 #: common/lib/xmodule/xmodule/video_module.py
 msgid "A YouTube URL or a link to a file hosted anywhere on the web."
 msgstr ""
@@ -656,6 +696,7 @@ msgid "ERROR: No playable video sources found!"
 msgstr "ÉRRØR: Nø pläýäßlé vïdéø søürçés føünd! Ⱡ'σяєм ιρѕ#"
 
 #: lms/djangoapps/dashboard/git_import.py
+#, python-brace-format
 msgid ""
 "Path {0} doesn't exist, please create it, or configure a different path with"
 " GIT_REPO_DIR"
@@ -688,12 +729,14 @@ msgid "The underlying module store does not support import."
 msgstr "Thé ündérlýïng mødülé støré døés nøt süppørt ïmpørt. Ⱡ'σяєм ιρѕυм ∂σ#"
 
 #: lms/djangoapps/dashboard/sysadmin.py
+#, python-brace-format
 msgid "Failed in authenticating {0}, error {1}\n"
 msgstr ""
 "Fäïléd ïn äüthéntïçätïng {0}, érrør {1}\n"
 " Ⱡ'σяєм ιρѕυ#\n"
 
 #: lms/djangoapps/dashboard/sysadmin.py
+#, python-brace-format
 msgid "Failed in authenticating {0}\n"
 msgstr ""
 "Fäïléd ïn äüthéntïçätïng {0}\n"
@@ -725,6 +768,7 @@ msgid "email must end in"
 msgstr "émäïl müst énd ïn Ⱡ'σ#"
 
 #: lms/djangoapps/dashboard/sysadmin.py
+#, python-brace-format
 msgid "Failed - email {0} already exists as external_id"
 msgstr "Fäïléd - émäïl {0} älréädý éxïsts äs éxtérnäl_ïd Ⱡ'σяєм ιρѕυм #"
 
@@ -737,22 +781,27 @@ msgid "email address required (not username)"
 msgstr "émäïl äddréss réqüïréd (nøt üsérnämé) Ⱡ'σяєм ιρѕ#"
 
 #: lms/djangoapps/dashboard/sysadmin.py
+#, python-brace-format
 msgid "Oops, failed to create user {0}, IntegrityError"
 msgstr "Øøps, fäïléd tø çréäté üsér {0}, ÌntégrïtýÉrrør Ⱡ'σяєм ιρѕυм #"
 
 #: lms/djangoapps/dashboard/sysadmin.py
+#, python-brace-format
 msgid "User {0} created successfully!"
 msgstr "Ûsér {0} çréätéd süççéssfüllý! Ⱡ'σяєм #"
 
 #: lms/djangoapps/dashboard/sysadmin.py
+#, python-brace-format
 msgid "Cannot find user with email address {0}"
 msgstr "Çännøt fïnd üsér wïth émäïl äddréss {0} Ⱡ'σяєм ιρѕ#"
 
 #: lms/djangoapps/dashboard/sysadmin.py
+#, python-brace-format
 msgid "Cannot find user with username {0} - {1}"
 msgstr "Çännøt fïnd üsér wïth üsérnämé {0} - {1} Ⱡ'σяєм ιρѕυ#"
 
 #: lms/djangoapps/dashboard/sysadmin.py
+#, python-brace-format
 msgid "Deleted user {0}"
 msgstr "Délétéd üsér {0} Ⱡ'σ#"
 
@@ -825,6 +874,7 @@ msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 #: lms/djangoapps/dashboard/tests/test_sysadmin.py
+#, python-brace-format
 msgid ""
 "The course {0} already exists in the data directory! (reloading anyway)"
 msgstr ""
@@ -838,10 +888,12 @@ msgstr ""
 "∂σłσ#"
 
 #: lms/djangoapps/dashboard/sysadmin.py
+#, python-brace-format
 msgid "Failed to clone repository to {0}"
 msgstr "Fäïléd tø çløné répøsïtørý tø {0} Ⱡ'σяєм ι#"
 
 #: lms/djangoapps/dashboard/sysadmin.py
+#, python-brace-format
 msgid "Loaded course {0} {1}<br/>Errors:"
 msgstr "Løädéd çøürsé {0} {1}<br/>Érrørs: Ⱡ'σяєм ι#"
 
@@ -871,6 +923,7 @@ msgid "Information about all courses"
 msgstr "Ìnførmätïøn äßøüt äll çøürsés Ⱡ'σяєм #"
 
 #: lms/djangoapps/dashboard/sysadmin.py
+#, python-brace-format
 msgid "Error - cannot get course with ID {0}<br/><pre>{1}</pre>"
 msgstr ""
 "Érrør - çännøt gét çøürsé wïth ÌD {0}<br/><pre>{1}</pre> Ⱡ'σяєм ιρѕυм ∂σł#"
@@ -1014,12 +1067,14 @@ msgstr ""
 " ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂#"
 
 #: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
 msgid "Successfully changed due date for student {0} for {1} to {2}"
 msgstr ""
 "Süççéssfüllý çhängéd düé däté før stüdént {0} før {1} tø {2} Ⱡ'σяєм ιρѕυм "
 "∂σłσ#"
 
 #: lms/djangoapps/instructor/views/api.py
+#, python-brace-format
 msgid "Successfully reset due date for student {0} for {1} to {2}"
 msgstr ""
 "Süççéssfüllý rését düé däté før stüdént {0} før {1} tø {2} Ⱡ'σяєм ιρѕυм "
@@ -1059,6 +1114,7 @@ msgid "Unable to parse date: "
 msgstr "Ûnäßlé tø pärsé däté:  Ⱡ'σяє#"
 
 #: lms/djangoapps/instructor/views/tools.py
+#, python-brace-format
 msgid "Couldn't find module for url: {0}"
 msgstr "Çøüldn't fïnd mødülé før ürl: {0} Ⱡ'σяєм ι#"
 
@@ -1066,7 +1122,7 @@ msgstr "Çøüldn't fïnd mødülé før ürl: {0} Ⱡ'σяєм ι#"
 msgid "Username"
 msgstr "Ûsérnämé #"
 
-#: lms/djangoapps/instructor/views/tools.py cms/templates/signup.html
+#: lms/djangoapps/instructor/views/tools.py cms/templates/register.html
 #: lms/templates/dashboard.html lms/templates/register-shib.html
 #: lms/templates/register.html lms/templates/register.html
 #: lms/templates/sysadmin_dashboard.html
@@ -1081,6 +1137,7 @@ msgid "Extended Due Date"
 msgstr "Éxténdéd Düé Däté Ⱡ'σ#"
 
 #: lms/djangoapps/instructor/views/tools.py
+#, python-brace-format
 msgid "Users with due date extensions for {0}"
 msgstr "Ûsérs wïth düé däté éxténsïøns før {0} Ⱡ'σяєм ιρѕ#"
 
@@ -1089,6 +1146,7 @@ msgid "Unit"
 msgstr "Ûnït Ⱡ'σяєм#"
 
 #: lms/djangoapps/instructor/views/tools.py
+#, python-brace-format
 msgid "Due date extensions for {0} {1} ({2})"
 msgstr "Düé däté éxténsïøns før {0} {1} ({2}) Ⱡ'σяєм ιρѕ#"
 
@@ -1127,11 +1185,13 @@ msgid "No status information available"
 msgstr "Nø stätüs ïnførmätïøn äväïläßlé Ⱡ'σяєм ι#"
 
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "No task_output information found for instructor_task {0}"
 msgstr ""
 "Nø täsk_øütpüt ïnførmätïøn føünd før ïnstrüçtør_täsk {0} Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "No parsable task_output information found for instructor_task {0}: {1}"
 msgstr ""
 "Nø pärsäßlé täsk_øütpüt ïnførmätïøn føünd før ïnstrüçtør_täsk {0}: {1} "
@@ -1146,6 +1206,7 @@ msgid "No message provided"
 msgstr "Nø méssägé prøvïdéd Ⱡ'σя#"
 
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Invalid task_output information found for instructor_task {0}: {1}"
 msgstr ""
 "Ìnvälïd täsk_øütpüt ïnførmätïøn føünd før ïnstrüçtør_täsk {0}: {1} Ⱡ'σяєм "
@@ -1156,6 +1217,7 @@ msgid "No progress status information available"
 msgstr "Nø prøgréss stätüs ïnførmätïøn äväïläßlé Ⱡ'σяєм ιρѕυ#"
 
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "No parsable task_input information found for instructor_task {0}: {1}"
 msgstr ""
 "Nø pärsäßlé täsk_ïnpüt ïnførmätïøn føünd før ïnstrüçtør_täsk {0}: {1} Ⱡ'σяєм"
@@ -1164,12 +1226,14 @@ msgstr ""
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {attempted} and {succeeded} are counts.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Progress: {action} {succeeded} of {attempted} so far"
 msgstr "Prøgréss: {action} {succeeded} øf {attempted} sø fär Ⱡ'σяєм ιρѕυм ∂σ#"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {student} is a student identifier.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Unable to find submission to be {action} for student '{student}'"
 msgstr ""
 "Ûnäßlé tø fïnd süßmïssïøn tø ßé {action} før stüdént '{student}' Ⱡ'σяєм "
@@ -1178,6 +1242,7 @@ msgstr ""
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {student} is a student identifier.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Problem failed to be {action} for student '{student}'"
 msgstr ""
 "Prøßlém fäïléd tø ßé {action} før stüdént '{student}' Ⱡ'σяєм ιρѕυм ∂σ#"
@@ -1185,12 +1250,14 @@ msgstr ""
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {student} is a student identifier.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Problem successfully {action} for student '{student}'"
 msgstr ""
 "Prøßlém süççéssfüllý {action} før stüdént '{student}' Ⱡ'σяєм ιρѕυм ∂σ#"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Unable to find any students with submissions to be {action}"
 msgstr ""
 "Ûnäßlé tø fïnd äný stüdénts wïth süßmïssïøns tø ßé {action} Ⱡ'σяєм ιρѕυм "
@@ -1199,6 +1266,7 @@ msgstr ""
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {attempted} is a count.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Problem failed to be {action} for any of {attempted} students"
 msgstr ""
 "Prøßlém fäïléd tø ßé {action} før äný øf {attempted} stüdénts Ⱡ'σяєм ιρѕυм "
@@ -1207,6 +1275,7 @@ msgstr ""
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {attempted} is a count.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Problem successfully {action} for {attempted} students"
 msgstr ""
 "Prøßlém süççéssfüllý {action} før {attempted} stüdénts Ⱡ'σяєм ιρѕυм ∂σ#"
@@ -1214,18 +1283,21 @@ msgstr ""
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {succeeded} and {attempted} are counts.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Problem {action} for {succeeded} of {attempted} students"
 msgstr ""
 "Prøßlém {action} før {succeeded} øf {attempted} stüdénts Ⱡ'σяєм ιρѕυм ∂σł#"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Unable to find any recipients to be {action}"
 msgstr "Ûnäßlé tø fïnd äný réçïpïénts tø ßé {action} Ⱡ'σяєм ιρѕυм#"
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {attempted} is a count.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Message failed to be {action} for any of {attempted} recipients "
 msgstr ""
 "Méssägé fäïléd tø ßé {action} før äný øf {attempted} réçïpïénts  Ⱡ'σяєм "
@@ -1234,6 +1306,7 @@ msgstr ""
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {attempted} is a count.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Message successfully {action} for {attempted} recipients"
 msgstr ""
 "Méssägé süççéssfüllý {action} før {attempted} réçïpïénts Ⱡ'σяєм ιρѕυм ∂σł#"
@@ -1241,6 +1314,7 @@ msgstr ""
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {succeeded} and {attempted} are counts.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Message {action} for {succeeded} of {attempted} recipients"
 msgstr ""
 "Méssägé {action} før {succeeded} øf {attempted} réçïpïénts Ⱡ'σяєм ιρѕυм "
@@ -1249,18 +1323,21 @@ msgstr ""
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {succeeded} and {attempted} are counts.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid "Status: {action} {succeeded} of {attempted}"
 msgstr "Stätüs: {action} {succeeded} øf {attempted} Ⱡ'σяєм ιρѕυм#"
 
 #. Translators: {skipped} is a count.  This message is appended to task
 #. progress status messages.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid " (skipping {skipped})"
 msgstr " (skïppïng {skipped}) Ⱡ'σя#"
 
 #. Translators: {total} is a count.  This message is appended to task progress
 #. status messages.
 #: lms/djangoapps/instructor_task/views.py
+#, python-brace-format
 msgid " (out of {total})"
 msgstr " (øüt øf {total}) Ⱡ'σ#"
 
@@ -1297,6 +1374,7 @@ msgid "Add to profile"
 msgstr "Àdd tø prøfïlé Ⱡ'#"
 
 #: lms/djangoapps/open_ended_grading/staff_grading_service.py
+#, python-brace-format
 msgid ""
 "Could not contact the external grading server. Please contact the "
 "development team at {email}."
@@ -1341,6 +1419,7 @@ msgstr ""
 " pøïnt øf çøntäçt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
 
 #: lms/djangoapps/open_ended_grading/utils.py
+#, python-brace-format
 msgid "for course {0} and student {1}."
 msgstr "før çøürsé {0} änd stüdént {1}. Ⱡ'σяєм ι#"
 
@@ -1408,6 +1487,7 @@ msgid "Trying to add a different currency into the cart"
 msgstr "Trýïng tø ädd ä dïfférént çürrénçý ïntø thé çärt Ⱡ'σяєм ιρѕυм #"
 
 #: lms/djangoapps/shoppingcart/models.py
+#, python-brace-format
 msgid ""
 "Please visit your <a href=\"{dashboard_link}\">dashboard</a> to see your new"
 " enrollments."
@@ -1420,16 +1500,19 @@ msgid "[Refund] User-Requested Refund"
 msgstr "[Réfünd] Ûsér-Réqüéstéd Réfünd Ⱡ'σяєм #"
 
 #: lms/djangoapps/shoppingcart/models.py
+#, python-brace-format
 msgid "Mode {mode} does not exist for {course_id}"
 msgstr "Mødé {mode} døés nøt éxïst før {course_id} Ⱡ'σяєм ιρѕυ#"
 
 #: lms/djangoapps/shoppingcart/models.py
+#, python-brace-format
 msgid "Certificate of Achievement, {mode_name} for course {course}"
 msgstr ""
 "Çértïfïçäté øf Àçhïévémént, {mode_name} før çøürsé {course} Ⱡ'σяєм ιρѕυм "
 "∂σłσ#"
 
 #: lms/djangoapps/shoppingcart/models.py
+#, python-brace-format
 msgid ""
 "Note - you have up to 2 weeks into the course to unenroll from the Verified "
 "Certificate option and receive a full refund. To receive your refund, "
@@ -1602,11 +1685,13 @@ msgstr "Thé çøürsé ýøü réqüéstéd døés nøt éxïst. Ⱡ'σяєм �
 
 #: lms/djangoapps/shoppingcart/views.py
 #: lms/djangoapps/shoppingcart/tests/test_views.py
+#, python-brace-format
 msgid "The course {0} is already in your cart."
 msgstr "Thé çøürsé {0} ïs älréädý ïn ýøür çärt. Ⱡ'σяєм ιρѕ#"
 
 #: lms/djangoapps/shoppingcart/views.py
 #: lms/djangoapps/shoppingcart/tests/test_views.py
+#, python-brace-format
 msgid "You are already registered in course {0}."
 msgstr "Ýøü äré älréädý régïstéréd ïn çøürsé {0}. Ⱡ'σяєм ιρѕυ#"
 
@@ -1619,6 +1704,7 @@ msgid "You do not have permission to view this page."
 msgstr "Ýøü dø nøt hävé pérmïssïøn tø vïéw thïs pägé. Ⱡ'σяєм ιρѕυм#"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#, python-brace-format
 msgid "The payment processor did not return a required parameter: {0}"
 msgstr ""
 "Thé päýmént prøçéssør dïd nøt rétürn ä réqüïréd pärämétér: {0} Ⱡ'σяєм ιρѕυм "
@@ -1626,6 +1712,7 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#, python-brace-format
 msgid "The payment processor returned a badly-typed value {0} for param {1}."
 msgstr ""
 "Thé päýmént prøçéssør rétürnéd ä ßädlý-týpéd välüé {0} før päräm {1}. Ⱡ'σяєм"
@@ -1639,6 +1726,7 @@ msgstr ""
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#, python-brace-format
 msgid ""
 "The amount charged by the processor {0} {1} is different than the total cost"
 " of the order {2} {3}."
@@ -1647,6 +1735,7 @@ msgstr ""
 " øf thé ørdér {2} {3}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#, python-brace-format
 msgid ""
 "\n"
 "            <p class=\"error_msg\">\n"
@@ -1669,6 +1758,7 @@ msgstr ""
 "             Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νє#"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#, python-brace-format
 msgid ""
 "\n"
 "                <p class=\"error_msg\">\n"
@@ -1689,6 +1779,7 @@ msgstr ""
 "                 Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ єχєя#"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#, python-brace-format
 msgid ""
 "\n"
 "                <p class=\"error_msg\">\n"
@@ -1707,6 +1798,7 @@ msgstr ""
 "                 Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. #"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#, python-brace-format
 msgid ""
 "\n"
 "                <p class=\"error_msg\">\n"
@@ -1899,6 +1991,7 @@ msgstr ""
 "päýmént Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
+#, python-brace-format
 msgid ""
 "\n"
 "            There is a problem with our CyberSource merchant configuration.  Please let us know at {0}\n"
@@ -2653,6 +2746,7 @@ msgid "There are no attachments for this article."
 msgstr "Théré äré nø ättäçhménts før thïs ärtïçlé. Ⱡ'σяєм ιρѕυ#"
 
 #: cms/djangoapps/contentstore/transcripts_utils.py
+#, python-brace-format
 msgid ""
 "Can't receive transcripts from Youtube for {youtube_id}. Status code: "
 "{statuc_code}."
@@ -2669,6 +2763,7 @@ msgid "We support only SubRip (*.srt) transcripts format."
 msgstr "Wé süppørt ønlý SüßRïp (*.srt) tränsçrïpts førmät. Ⱡ'σяєм ιρѕυм ∂#"
 
 #: cms/djangoapps/contentstore/transcripts_utils.py
+#, python-brace-format
 msgid ""
 "Something wrong with SubRip transcripts file during parsing. Inner message "
 "is {error_message}"
@@ -2695,6 +2790,7 @@ msgid "Upload completed"
 msgstr "Ûpløäd çømplétéd Ⱡ'σ#"
 
 #: cms/djangoapps/contentstore/views/course.py
+#, python-brace-format
 msgid ""
 "Unable to create course '{name}'.\n"
 "\n"
@@ -2746,10 +2842,12 @@ msgid "Could not find the course.xml file in the package."
 msgstr "Çøüld nøt fïnd thé çøürsé.xml fïlé ïn thé päçkägé. Ⱡ'σяєм ιρѕυм ∂#"
 
 #: cms/djangoapps/contentstore/views/item.py
+#, python-brace-format
 msgid "Duplicate of {0}"
 msgstr "Düplïçäté øf {0} Ⱡ'σ#"
 
 #: cms/djangoapps/contentstore/views/item.py
+#, python-brace-format
 msgid "Duplicate of '{0}'"
 msgstr "Düplïçäté øf '{0}' Ⱡ'σ#"
 
@@ -2778,10 +2876,12 @@ msgid "Insufficient permissions"
 msgstr "Ìnsüffïçïént pérmïssïøns Ⱡ'σяє#"
 
 #: cms/djangoapps/contentstore/views/user.py
+#, python-brace-format
 msgid "Could not find user by email address '{email}'."
 msgstr "Çøüld nøt fïnd üsér ßý émäïl äddréss '{email}'. Ⱡ'σяєм ιρѕυм #"
 
 #: cms/djangoapps/contentstore/views/user.py
+#, python-brace-format
 msgid "User {email} has registered but has not yet activated his/her account."
 msgstr ""
 "Ûsér {email} häs régïstéréd ßüt häs nøt ýét äçtïvätéd hïs/hér äççøünt. "
@@ -2908,10 +3008,10 @@ msgstr "Péndïng #"
 msgid "Forgot password?"
 msgstr "Førgøt pässwørd? Ⱡ'σ#"
 
-#: cms/templates/login.html cms/templates/signup.html lms/templates/login.html
-#: lms/templates/login_modal.html lms/templates/provider_login.html
-#: lms/templates/provider_login.html lms/templates/register.html
-#: lms/templates/sysadmin_dashboard.html
+#: cms/templates/login.html cms/templates/register.html
+#: lms/templates/login.html lms/templates/login_modal.html
+#: lms/templates/provider_login.html lms/templates/provider_login.html
+#: lms/templates/register.html lms/templates/sysadmin_dashboard.html
 #: lms/templates/university_profile/edge.html
 msgid "Password"
 msgstr "Pässwørd #"
@@ -2921,12 +3021,12 @@ msgstr "Pässwørd #"
 msgid "Admin"
 msgstr "Àdmïn Ⱡ'σяєм ι#"
 
-#: cms/templates/signup.html cms/templates/widgets/header.html
+#: cms/templates/register.html cms/templates/widgets/header.html
 #: lms/templates/index.html
 msgid "Sign Up"
 msgstr "Sïgn Ûp #"
 
-#: cms/templates/signup.html lms/templates/register-shib.html
+#: cms/templates/register.html lms/templates/register-shib.html
 #: lms/templates/register.html
 msgid "Public Username"
 msgstr "Püßlïç Ûsérnämé Ⱡ'#"
@@ -3562,6 +3662,10 @@ msgid "FAQ"
 msgstr "FÀQ Ⱡ'σя#"
 
 #: lms/templates/footer.html
+msgid "{platform_name} Logo"
+msgstr "{platform_name} Løgø Ⱡ'σя#"
+
+#: lms/templates/footer.html
 msgid ""
 "{platform_name} is a non-profit created by founding partners {Harvard} and "
 "{MIT} whose mission is to bring the best of higher education to students of "
@@ -3914,6 +4018,11 @@ msgstr ""
 "änd än ästérïsk (*)</strong>. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
 "α∂ιριѕι¢ιηg єłι#"
 
+#: lms/templates/login.html lms/templates/register-shib.html
+#: lms/templates/register.html lms/templates/register.html
+msgid "example: username@domain.com"
+msgstr "éxämplé: üsérnämé@dømäïn.çøm Ⱡ'σяєм #"
+
 #: lms/templates/login.html
 msgid "Account Preferences"
 msgstr "Àççøünt Préférénçés Ⱡ'σя#"
@@ -4198,11 +4307,6 @@ msgstr ""
 "∂σłσя#"
 
 #: lms/templates/register-shib.html lms/templates/register.html
-#: lms/templates/register.html
-msgid "example: username@domain.com"
-msgstr "éxämplé: üsérnämé@dømäïn.çøm Ⱡ'σяєм #"
-
-#: lms/templates/register-shib.html lms/templates/register.html
 msgid "Account Acknowledgements"
 msgstr "Àççøünt Àçknøwlédgéménts Ⱡ'σяє#"
 
@@ -4402,13 +4506,13 @@ msgstr ""
 "ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ι#"
 
 #: lms/templates/seq_module.html lms/templates/seq_module.html
-msgid "Section Navigation"
-msgstr "Séçtïøn Nävïgätïøn Ⱡ'σ#"
-
-#: lms/templates/seq_module.html lms/templates/seq_module.html
 #: lms/templates/discussion/mustache/_pagination.mustache
 msgid "Previous"
 msgstr "Prévïøüs #"
+
+#: lms/templates/seq_module.html lms/templates/seq_module.html
+msgid "Section Navigation"
+msgstr "Séçtïøn Nävïgätïøn Ⱡ'σ#"
 
 #: lms/templates/seq_module.html lms/templates/seq_module.html
 #: lms/templates/discussion/mustache/_pagination.mustache
@@ -5050,11 +5154,8 @@ msgid "About {course.display_number_with_default}"
 msgstr "Àßøüt {course.display_number_with_default} Ⱡ'σяєм ιρѕυ#"
 
 #: lms/templates/courseware/course_about.html
-msgid ""
-"You are registered for this course {course.display_number_with_default}"
-msgstr ""
-"Ýøü äré régïstéréd før thïs çøürsé {course.display_number_with_default} "
-"Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+msgid "You are registered for this course"
+msgstr "Ýøü äré régïstéréd før thïs çøürsé Ⱡ'σяєм ιρ#"
 
 #: lms/templates/courseware/course_about.html
 msgid "View Courseware"
@@ -5776,6 +5877,10 @@ msgid "{course_number} Progress"
 msgstr "{course_number} Prøgréss Ⱡ'σяє#"
 
 #: lms/templates/courseware/progress.html
+msgid "Course Progress"
+msgstr "Çøürsé Prøgréss Ⱡ'#"
+
+#: lms/templates/courseware/progress.html
 msgid "Course Progress for Student '{username}' ({email})"
 msgstr "Çøürsé Prøgréss før Stüdént '{username}' ({email}) Ⱡ'σяєм ιρѕυм ∂#"
 
@@ -5926,6 +6031,10 @@ msgstr "Çøürsé Çømplétéd - {end_date} Ⱡ'σяєм #"
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course Started - {start_date}"
 msgstr "Çøürsé Stärtéd - {start_date} Ⱡ'σяєм #"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Course has not yet started"
+msgstr "Çøürsé häs nøt ýét stärtéd Ⱡ'σяєм#"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course Starts - {start_date}"
@@ -6258,12 +6367,6 @@ msgid "Add A Response"
 msgstr "Àdd À Réspønsé Ⱡ'#"
 
 #: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/mustache/_inline_thread.mustache
-#: lms/templates/discussion/mustache/_inline_thread_cohorted.mustache
-msgid "Loading content"
-msgstr "Løädïng çøntént Ⱡ'#"
-
-#: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/mustache/_inline_thread_show.mustache
 #: lms/templates/discussion/mustache/_profile_thread.mustache
 msgid "This thread is closed."
@@ -6481,6 +6584,11 @@ msgstr "Ûsér Prøfïlé Ⱡ#"
 #: lms/templates/discussion/user_profile.html
 msgid "Active Threads"
 msgstr "Àçtïvé Thréäds Ⱡ'#"
+
+#: lms/templates/discussion/mustache/_inline_thread.mustache
+#: lms/templates/discussion/mustache/_inline_thread_cohorted.mustache
+msgid "Loading content"
+msgstr "Løädïng çøntént Ⱡ'#"
 
 #: lms/templates/discussion/mustache/_inline_thread.mustache
 #: lms/templates/discussion/mustache/_inline_thread_cohorted.mustache
@@ -10228,7 +10336,7 @@ msgstr "Døn't hävé ä Stüdïø Àççøünt? Sïgn üp! Ⱡ'σяєм ιρѕ#
 msgid "Required Information to Sign In to edX Studio"
 msgstr "Réqüïréd Ìnførmätïøn tø Sïgn Ìn tø édX Stüdïø Ⱡ'σяєм ιρѕυм#"
 
-#: cms/templates/login.html cms/templates/signup.html
+#: cms/templates/login.html cms/templates/register.html
 msgid "Email Address"
 msgstr "Émäïl Àddréss Ⱡ'#"
 
@@ -10500,6 +10608,109 @@ msgstr ""
 #: cms/templates/overview.html
 msgid "Form Actions"
 msgstr "Førm Àçtïøns Ⱡ#"
+
+#: cms/templates/register.html
+msgid "Sign Up for edX Studio"
+msgstr "Sïgn Ûp før édX Stüdïø Ⱡ'σяє#"
+
+#: cms/templates/register.html
+msgid "Already have a Studio Account? Sign in"
+msgstr "Àlréädý hävé ä Stüdïø Àççøünt? Sïgn ïn Ⱡ'σяєм ιρѕ#"
+
+#: cms/templates/register.html
+msgid ""
+"Ready to start creating online courses? Sign up below and start creating "
+"your first edX course today."
+msgstr ""
+"Réädý tø stärt çréätïng ønlïné çøürsés? Sïgn üp ßéløw änd stärt çréätïng "
+"ýøür fïrst édX çøürsé tødäý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: cms/templates/register.html
+msgid "Required Information to Sign Up for edX Studio"
+msgstr "Réqüïréd Ìnførmätïøn tø Sïgn Ûp før édX Stüdïø Ⱡ'σяєм ιρѕυм #"
+
+#: cms/templates/register.html
+msgid ""
+"This will be used in public discussions with your courses and in our edX101 "
+"support forums"
+msgstr ""
+"Thïs wïll ßé üséd ïn püßlïç dïsçüssïøns wïth ýøür çøürsés änd ïn øür édX101 "
+"süppørt førüms Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#: cms/templates/register.html
+msgid "Your Location"
+msgstr "Ýøür Løçätïøn Ⱡ'#"
+
+#: cms/templates/register.html
+msgid "Preferred Language"
+msgstr "Préférréd Längüägé Ⱡ'σ#"
+
+#: cms/templates/register.html
+msgid "I agree to the {a_start} Terms of Service {a_end}"
+msgstr "Ì ägréé tø thé {a_start} Térms øf Sérvïçé {a_end} Ⱡ'σяєм ιρѕυм ∂#"
+
+#: cms/templates/register.html
+msgid "Create My Account &amp; Start Authoring Courses"
+msgstr "Çréäté Mý Àççøünt &amp; Stärt Àüthørïng Çøürsés Ⱡ'σяєм ιρѕυм #"
+
+#: cms/templates/register.html
+msgid "Common Studio Questions"
+msgstr "Çømmøn Stüdïø Qüéstïøns Ⱡ'σяє#"
+
+#: cms/templates/register.html
+msgid "Who is Studio for?"
+msgstr "Whø ïs Stüdïø før? Ⱡ'σ#"
+
+#: cms/templates/register.html
+msgid ""
+"Studio is for anyone that wants to create online courses that leverage the "
+"global edX platform. Our users are often faculty members, teaching "
+"assistants and course staff, and members of instructional technology groups."
+msgstr ""
+"Stüdïø ïs før änýøné thät wänts tø çréäté ønlïné çøürsés thät lévérägé thé "
+"gløßäl édX plätførm. Øür üsérs äré øftén fäçültý mémßérs, téäçhïng "
+"ässïstänts änd çøürsé stäff, änd mémßérs øf ïnstrüçtïønäl téçhnøløgý grøüps."
+" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυ#"
+
+#: cms/templates/register.html
+msgid "How technically savvy do I need to be to create courses in Studio?"
+msgstr ""
+"Høw téçhnïçällý sävvý dø Ì nééd tø ßé tø çréäté çøürsés ïn Stüdïø? Ⱡ'σяєм "
+"ιρѕυм ∂σłσя #"
+
+#: cms/templates/register.html
+msgid ""
+"Studio is designed to be easy to use by almost anyone familiar with common "
+"web-based authoring environments (Wordpress, Moodle, etc.). No programming "
+"knowledge is required, but for some of the more advanced features, a "
+"technical background would be helpful. As always, we are here to help, so "
+"don't hesitate to dive right in."
+msgstr ""
+"Stüdïø ïs désïgnéd tø ßé éäsý tø üsé ßý älmøst änýøné fämïlïär wïth çømmøn "
+"wéß-ßäséd äüthørïng énvïrønménts (Wørdpréss, Møødlé, étç.). Nø prøgrämmïng "
+"knøwlédgé ïs réqüïréd, ßüt før sømé øf thé møré ädvänçéd féätürés, ä "
+"téçhnïçäl ßäçkgrøünd wøüld ßé hélpfül. Às älwäýs, wé äré héré tø hélp, sø "
+"døn't hésïtäté tø dïvé rïght ïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
+"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт #"
+
+#: cms/templates/register.html
+msgid "I've never authored a course online before. Is there help?"
+msgstr ""
+"Ì'vé névér äüthøréd ä çøürsé ønlïné ßéføré. Ìs théré hélp? Ⱡ'σяєм ιρѕυм "
+"∂σłσ#"
+
+#: cms/templates/register.html
+msgid ""
+"Absolutely. We have created an online course, edX101, that describes some "
+"best practices: from filming video, creating exercises, to the basics of "
+"running an online course. Additionally, we're always here to help, just drop"
+" us a note."
+msgstr ""
+"Àßsølütélý. Wé hävé çréätéd än ønlïné çøürsé, édX101, thät désçrïßés sømé "
+"ßést präçtïçés: frøm fïlmïng vïdéø, çréätïng éxérçïsés, tø thé ßäsïçs øf "
+"rünnïng än ønlïné çøürsé. Àddïtïønällý, wé'ré älwäýs héré tø hélp, jüst drøp"
+" üs ä nøté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ "
+"∂σ єιυѕмσ∂ т#"
 
 #: cms/templates/settings.html
 msgid "Schedule &amp; Details Settings"
@@ -10891,109 +11102,6 @@ msgstr ""
 "Ýøü çän älsø çréäté ässïgnmént týpés, süçh äs høméwørk, läßs, qüïzzés, änd "
 "éxäms, änd spéçïfý høw müçh øf ä stüdént's grädé éäçh ässïgnmént týpé ïs "
 "wørth. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι#"
-
-#: cms/templates/signup.html
-msgid "Sign Up for edX Studio"
-msgstr "Sïgn Ûp før édX Stüdïø Ⱡ'σяє#"
-
-#: cms/templates/signup.html
-msgid "Already have a Studio Account? Sign in"
-msgstr "Àlréädý hävé ä Stüdïø Àççøünt? Sïgn ïn Ⱡ'σяєм ιρѕ#"
-
-#: cms/templates/signup.html
-msgid ""
-"Ready to start creating online courses? Sign up below and start creating "
-"your first edX course today."
-msgstr ""
-"Réädý tø stärt çréätïng ønlïné çøürsés? Sïgn üp ßéløw änd stärt çréätïng "
-"ýøür fïrst édX çøürsé tødäý. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
-
-#: cms/templates/signup.html
-msgid "Required Information to Sign Up for edX Studio"
-msgstr "Réqüïréd Ìnførmätïøn tø Sïgn Ûp før édX Stüdïø Ⱡ'σяєм ιρѕυм #"
-
-#: cms/templates/signup.html
-msgid ""
-"This will be used in public discussions with your courses and in our edX101 "
-"support forums"
-msgstr ""
-"Thïs wïll ßé üséd ïn püßlïç dïsçüssïøns wïth ýøür çøürsés änd ïn øür édX101 "
-"süppørt førüms Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
-
-#: cms/templates/signup.html
-msgid "Your Location"
-msgstr "Ýøür Løçätïøn Ⱡ'#"
-
-#: cms/templates/signup.html
-msgid "Preferred Language"
-msgstr "Préférréd Längüägé Ⱡ'σ#"
-
-#: cms/templates/signup.html
-msgid "I agree to the {a_start} Terms of Service {a_end}"
-msgstr "Ì ägréé tø thé {a_start} Térms øf Sérvïçé {a_end} Ⱡ'σяєм ιρѕυм ∂#"
-
-#: cms/templates/signup.html
-msgid "Create My Account &amp; Start Authoring Courses"
-msgstr "Çréäté Mý Àççøünt &amp; Stärt Àüthørïng Çøürsés Ⱡ'σяєм ιρѕυм #"
-
-#: cms/templates/signup.html
-msgid "Common Studio Questions"
-msgstr "Çømmøn Stüdïø Qüéstïøns Ⱡ'σяє#"
-
-#: cms/templates/signup.html
-msgid "Who is Studio for?"
-msgstr "Whø ïs Stüdïø før? Ⱡ'σ#"
-
-#: cms/templates/signup.html
-msgid ""
-"Studio is for anyone that wants to create online courses that leverage the "
-"global edX platform. Our users are often faculty members, teaching "
-"assistants and course staff, and members of instructional technology groups."
-msgstr ""
-"Stüdïø ïs før änýøné thät wänts tø çréäté ønlïné çøürsés thät lévérägé thé "
-"gløßäl édX plätførm. Øür üsérs äré øftén fäçültý mémßérs, téäçhïng "
-"ässïstänts änd çøürsé stäff, änd mémßérs øf ïnstrüçtïønäl téçhnøløgý grøüps."
-" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυ#"
-
-#: cms/templates/signup.html
-msgid "How technically savvy do I need to be to create courses in Studio?"
-msgstr ""
-"Høw téçhnïçällý sävvý dø Ì nééd tø ßé tø çréäté çøürsés ïn Stüdïø? Ⱡ'σяєм "
-"ιρѕυм ∂σłσя #"
-
-#: cms/templates/signup.html
-msgid ""
-"Studio is designed to be easy to use by almost anyone familiar with common "
-"web-based authoring environments (Wordpress, Moodle, etc.). No programming "
-"knowledge is required, but for some of the more advanced features, a "
-"technical background would be helpful. As always, we are here to help, so "
-"don't hesitate to dive right in."
-msgstr ""
-"Stüdïø ïs désïgnéd tø ßé éäsý tø üsé ßý älmøst änýøné fämïlïär wïth çømmøn "
-"wéß-ßäséd äüthørïng énvïrønménts (Wørdpréss, Møødlé, étç.). Nø prøgrämmïng "
-"knøwlédgé ïs réqüïréd, ßüt før sømé øf thé møré ädvänçéd féätürés, ä "
-"téçhnïçäl ßäçkgrøünd wøüld ßé hélpfül. Às älwäýs, wé äré héré tø hélp, sø "
-"døn't hésïtäté tø dïvé rïght ïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
-"α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт #"
-
-#: cms/templates/signup.html
-msgid "I've never authored a course online before. Is there help?"
-msgstr ""
-"Ì'vé névér äüthøréd ä çøürsé ønlïné ßéføré. Ìs théré hélp? Ⱡ'σяєм ιρѕυм "
-"∂σłσ#"
-
-#: cms/templates/signup.html
-msgid ""
-"Absolutely. We have created an online course, edX101, that describes some "
-"best practices: from filming video, creating exercises, to the basics of "
-"running an online course. Additionally, we're always here to help, just drop"
-" us a note."
-msgstr ""
-"Àßsølütélý. Wé hävé çréätéd än ønlïné çøürsé, édX101, thät désçrïßés sømé "
-"ßést präçtïçés: frøm fïlmïng vïdéø, çréätïng éxérçïsés, tø thé ßäsïçs øf "
-"rünnïng än ønlïné çøürsé. Àddïtïønällý, wé'ré älwäýs héré tø hélp, jüst drøp"
-" üs ä nøté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ "
-"∂σ єιυѕмσ∂ т#"
 
 #: cms/templates/textbooks.html cms/templates/textbooks.html
 #: cms/templates/widgets/header.html
