@@ -23,6 +23,7 @@ from external_auth.models import ExternalAuthMap
 
 TEST_DATA_MIXED_MODULESTORE = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {})
 
+
 class LoginTest(TestCase):
     '''
     Test student.views.login_user() view
@@ -224,7 +225,11 @@ class ExternalAuthShibTest(ModuleStoreTestCase):
         """
         response = self.client.post(reverse('login'), {'email': self.user_w_map.email, 'password': ''})
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, json.dumps({'success': False, 'redirect': reverse('shib-login')}))
+        obj = json.loads(response.content)
+        self.assertEqual(obj, {
+            'success': False,
+            'redirect': reverse('shib-login'),
+        })
 
     @unittest.skipUnless(settings.FEATURES.get('AUTH_USE_SHIB'), "AUTH_USE_SHIB not set")
     def test__get_course_enrollment_domain(self):
