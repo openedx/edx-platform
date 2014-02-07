@@ -160,44 +160,14 @@ client error are correctly passed through to the client.
 LMS: Improve performance of page load and thread list load for
 discussion tab
 
-Studio: Support targeted feedback, which allows for authors to provide explanations for
-incorrect choice selections for multiple choice question choices that will automatically
-display. These are intended to help steer a student to the correct answer. Thus, they are
-best used for quizzes that allow multiple attempts. To provide targeted feedback, add an
-element called <targetedfeedbackset> right before your <solution> or <solutionset>, and in
-this element, provide a <targetedfeedback> for each feedback. Within <targetedfeedback>
-you can specify your text explanation. Both the <targetedfeedback> and <choice> should have
-the same explanation-id attribute.
-
-Studio: Added feature to allow instructors to specify wait time between attempts
-of the same quiz. In a problem's settings, instructors can specify how many
-seconds student's are locked out of submitting another attempt of the same quiz.
-The timer starts as soon as they submit an attempt for grading. Note that this
-does not prevent a student from starting to work on another quiz attempt. It only
-prevents the students from submitting a bunch of attempts in rapid succession.
-
-LMS: The wiki markup cheatsheet dialog is now accessible to screen readers.
-(LMS-1303)
+LMS: The wiki markup cheatsheet dialog is now accessible to people with
+disabilites.  (LMS-1303)
 
 Common: Add skip links for accessibility to CMS and LMS. (LMS-1311)
 
 Studio: Change course overview page, checklists, assets, import, export, and course staff
 management page URLs to a RESTful interface. Also removed "\listing", which
 duplicated "\index".
-
-Studio: Support answer pools for multiple choice question choices, so authors can provide
-multiple incorrect and correct choices for a question and have 1 correct choice and n-1
-incorrect choices randomly selected and shuffled before being presented to the student.
-In XML: <multiplechoiceresponse answer-pool="4"> enables an answer pool of 4 choices: 3
-correct choices and 1 incorrect choice. To provide multiple solution expanations, wrap
-all solution elements within a <solutionset>, and make sure to add an attribute called
-"explanation-id" to both the <solution> tag and its corresponding <choice> tag, and be
-sure that the value for this "explanation-id" attribute is the same for both. Note that
-this feature is only supported in the advanced XML problem editor, not the regular one.
-Also note that if you want your question to have a different set of answers for different
-attempts, be sure in the problem settings in Studio to set "Randomization" to "Always"
-
-LMS: Fixed accessibility bug where users could not tab through wiki (LMS-1307)
 
 Blades: When start time and end time are specified for a video, a visual range
 will be shown on the time slider to highlight the place in the video that will
