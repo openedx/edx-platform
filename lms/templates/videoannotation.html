@@ -60,7 +60,8 @@
 		uri = window.location.protocol;
 		for (var index = 0; index <= 9; index += 1) uri += lms_location.split("/")[index]+"/"; //Get the unit url
 	}
-	
+	var unit_id = $('#sequence-list').find('.active').attr("data-element");
+        uri += unit_id;
 	var pagination = 100,
 	 is_staff = !('${user.is_staff}'=='False'),
         options = {
@@ -162,33 +163,35 @@
             }
         },
     };
+    tinyMCE.baseURL = "${settings.STATIC_URL}" + "js/vendor/ova";
+    var imgURLRoot = "${settings.STATIC_URL}" + "js/vendor/ova/catch/img/";
 	
-	var imgURLRoot = "${settings.STATIC_URL}" + "js/vendor/ova/catch/img/";
-	tinyMCE.baseURL = "${settings.STATIC_URL}" + "js/vendor/ova";
-	
-	//remove old instances
-    if (Annotator._instances.length !== 0) {
-      $('#videoHolder').annotator("destroy");
-    }
-    delete ova;
-    //Load the plugin Video/Text Annotation
-    var ova = new OpenVideoAnnotation.Annotator($('#videoHolder'),options);
-    
-    ova.annotator.addPlugin('Tags');
+    if (typeof Annotator != 'undefined'){
+    	    //remove old instances
+	    if (Annotator._instances.length !== 0) {
+	      $('#videoHolder').annotator("destroy");
+	    }
+	    delete ova;
+	    //Load the plugin Video/Text Annotation
+	    var ova = new OpenVideoAnnotation.Annotator($('#videoHolder'),options);
+	    
+	    ova.annotator.addPlugin('Tags');
 
-    
-    
-    //Catch
-    var annotator = ova.annotator,
-        catchOptions = {
-            media:'video',
-            externalLink:false,
-            imageUrlRoot:imgURLRoot,
-            showMediaSelector: false,
-            showPublicPrivate: true,
-	    userId:'${user.email}',
-            pagination:pagination,//Number of Annotations per load in the pagination,
-            flags:is_staff
-        },
-        Catch = new CatchAnnotation($('#catchDIV'),catchOptions);
+	    
+	    
+	    //Catch
+	    var annotator = ova.annotator,
+		catchOptions = {
+		    media:'video',
+		    externalLink:false,
+		    imageUrlRoot:imgURLRoot,
+		    showMediaSelector: false,
+		    showPublicPrivate: true,
+		    userId:'${user.email}',
+		    pagination:pagination,//Number of Annotations per load in the pagination,
+		    flags:is_staff
+		},
+		Catch = new CatchAnnotation($('#catchDIV'),catchOptions);
+
+    }
 </script>
