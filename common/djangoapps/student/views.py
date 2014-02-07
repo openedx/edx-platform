@@ -918,12 +918,12 @@ def _do_create_account(post_vars):
         if len(User.objects.filter(username=post_vars['username'])) > 0:
             js['value'] = _("An account with the Public Username '{username}' already exists.").format(username=post_vars['username'])
             js['field'] = 'username'
-            return HttpResponse(json.dumps(js))
+            return JsonResponse(js, status=400)
 
         if len(User.objects.filter(email=post_vars['email'])) > 0:
             js['value'] = _("An account with the Email '{email}' already exists.").format(email=post_vars['email'])
             js['field'] = 'email'
-            return HttpResponse(json.dumps(js))
+            return JsonResponse(js, status=400)
 
         raise
 
