@@ -24,7 +24,7 @@ $(document).ready(function(){
   </script>
 </%block>
 
-<%block name="bodyclass">${course.css_class}</%block>
+<%block name="bodyclass">${course.css_class or ''}</%block>
 <section class="container">
   <div class="info-wrapper">
     % if user.is_authenticated():
