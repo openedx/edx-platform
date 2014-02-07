@@ -8,6 +8,7 @@
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.stack.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.symbol.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/jquery.csvToTable.js')}"></script>
+  <script type="text/javascript" src="//datatables.net/download/build/jquery.dataTables.min.js"></script>
   <script type="text/javascript" src="${static.url('js/jquery.gradebook.js')}"></script>
 </%block>
 
@@ -16,7 +17,23 @@
 <%static:css group='style-course'/>
 
   <style type="text/css">
-
+.dataTables_length {
+width: 40%;
+float: left;
+}
+.dataTables_filter {
+width: 50%;
+float: right;
+text-align: right;
+}
+.dataTables_info {
+width: 60%;
+float: left;
+}
+.dataTables_paginate {
+float: right;
+text-align: right;
+}
   </style>
 
   <script type="text/javascript">
@@ -25,9 +42,21 @@
         {
           tableClass: 'grade-table'
           }).bind("loadComplete",function() { 
-            $('#CSVTable tbody').children('tr').each(function() {$('.student-table > tbody:last').append($('<tr>').append($(this).children('td')[0]))});
-            $('#CSVTable thead').children('th').each(function() {$(this).children('td')[0].remove()});
-            var gradebook = new Gradebook($('.gradebook-content'));
+            $('#CSVTable table').dataTable({
+        "sScrollY": "600px",
+        "sScrollX": "100%",
+        "bScrollCollapse": true,
+        "oLanguage": {
+            "sLengthMenu": "${_("Display _MENU_ records per page")}",
+            "sZeroRecords": "${_("Nothing found - sorry")}",
+            "sInfo": "${_("Showing _START_ to _END_ of _TOTAL_ records")}",
+            "sInfoEmpty": "${_("Showing 0 to 0 of 0 records")}",
+            "sInfoFiltered": "${_("(filtered from _MAX_ total records)")}",	
+            "sSearch": "${_("Search students")}:",
+            "oPaginate": {
+                 "sNext": "${_("Next page")}",
+                 "sPrevious": "${_("Previous page")}"
+      }     }             });
       });;
     });
   </script>
@@ -37,29 +66,13 @@
 <%include file="/courseware/course_navigation.html" args="active_page=''" />
 
 <section class="container">
-<div class="gradebook-wrapper">
-  <section class="gradebook-content">
-    <h1>${_("Gradebook")}</h1>
-    Таблица обновленна 24.01.2014 в 04:10:13 (GMT+4)<br>
+<div class="wrapper">
+  <section class="content">
+    <h1>${_("Grade summary")}</h1>
+    Таблица обновляется ежедневно в 5:00 (GMT+4)<br>
     <a href='https://edu.olimpiada.ru/edx/${course.id.replace('/','_')}.csv'> Таблица в CSV формате (кодировка UTF-8) </a><br>
-    <table class="student-table">
-      <thead>
-        <tr>
-          <th>
-            <form class="student-search">
-              <input type="search" class="student-search-field" placeholder="${_('Search students')}" />
-            </form>
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        
-      </tbody>
-    </table>
 
-
-
-    <div id="CSVTable" class="grades">
+    <div id="CSVTable" class="grades>
     </div>
   </section>
 </div>

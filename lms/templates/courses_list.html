@@ -7,6 +7,7 @@
 <%! from microsite_configuration.middleware import MicrositeConfiguration %>
 <%!
 from django.utils.translation import ugettext as _
+from django.utils.translation import pgettext
 from django.core.urlresolvers import reverse
 from courseware.courses import course_image_url, get_course_about_section
 from branding.views import SUBJECTS as subjects
@@ -25,7 +26,7 @@ box-shadow: 0 1px 5px 0 rgba(0,0,0,0.1);">
 ">
   <li style="display: inline-block; padding-right:10px"><a href="${reverse('courses_list', args=[subject, destiny, "all"])}">${_("All")}</a></li>
   <li style="display: inline-block; padding-right:10px"><a href="${reverse('courses_list', args=[subject, destiny, "current"])}">${_("Current")}</a></li>
-  <li style="display: inline-block; padding-right:10px"><a href="${reverse('courses_list', args=[subject, destiny, "new"])}">${_("New")}</a></li>
+  <li style="display: inline-block; padding-right:10px"><a href="${reverse('courses_list', args=[subject, destiny, "new"])}">${pgettext("many", "New")}</a></li>
   <li style="display: inline-block; padding-right:10px"><a href="${reverse('courses_list', args=[subject, destiny, "past"])}">${_("Past")}</a></li>
 </ul>
 <select id="subject-select" name="subject" style="margin-right:10px">

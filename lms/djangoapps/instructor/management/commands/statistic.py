@@ -278,7 +278,7 @@ def fullstat(request = None):
         except:
             pass
     datatable['data'] = data
-    return_csv('full_stat.csv',datatable, open("/var/www/fullstat.csv", "wb"))
+    return_csv('full_stat.csv',datatable, open("/var/www/edx/fullstat.csv", "wb"))
 
 
 
@@ -363,7 +363,7 @@ def fullstat(request = None):
             except:
                 pass
         datatable['data'] = data
-        return_csv(course.id,datatable, open("/var/www/" + course.id.replace('/','_') + ".csv", "wb"))
+        return_csv(course.id,datatable, open("/var/www/edx/" + course.id.replace('/','_') + ".csv", "wb"))
 
     return True
 

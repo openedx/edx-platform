@@ -214,9 +214,9 @@ if settings.COURSEWARE_ENABLED:
         # url(r'^edit_circuit/(?P<circuit>[^/]*)$', 'circuit.views.edit_circuit'),
         # url(r'^save_circuit/(?P<circuit>[^/]*)$', 'circuit.views.save_circuit'),
 
-        url(r'^courses/?$', 'branding.views.courses', name="courses"),
+#        url(r'^courses/?$', 'branding.views.courses', name="courses"),
 
-        url(r'^courses_list/?$', 'branding.views.courses_list'),
+        url(r'^courses_list/?$', 'branding.views.courses_list', name="courses"),
         url(r'^courses_list/(?P<subject>[^/]+)/(?P<destiny>[^/]+)/(?P<status>[^/]+)/?$', 'branding.views.courses_list', name="courses_list"),
 
         url(r'^change_enrollment$',

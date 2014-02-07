@@ -13,6 +13,7 @@ from edxmako.shortcuts import marketing_link
 from util.cache import cache_if_anonymous
 
 from courseware.courses import get_courses
+from courseware.courses import sort_by_announcement
 from django.utils.translation import ugettext_lazy as _
 
 @ensure_csrf_cookie
@@ -127,5 +128,6 @@ def courses_list(request, status = "all", subject="all", destiny="all"):
         if (destiny != "all"):
             if not (destiny in course.tags or dict(DESTINY).get(destiny, '') in course.tags): continue
         courses += [course]
+    courses = sort_by_announcement(courses)
     context = {'courses': courses, 'destiny': destiny, 'subject': subject}
     return render_to_response("courses_list.html", context)

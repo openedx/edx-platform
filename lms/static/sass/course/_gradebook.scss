@@ -212,3 +212,131 @@ div.gradebook-wrapper {
 }
 
 
+div.grades {
+		.left-shadow,
+		.right-shadow {
+			position: absolute;
+			top: 0;
+			z-index: 9999;
+			width: 20px;
+			pointer-events: none;
+		}
+
+		.left-shadow {
+			left: 0;
+			background-image: -webkit-gradient(linear, left, rgba(0, 0, 0, .1), rgba(0, 0, 0, 0) 20%), -webkit-gradient(linear, left, rgba(0, 0, 0, .1), rgba(0, 0, 0, 0));
+			background-image:  -webkit-linear-gradient(left, rgba(0, 0, 0, .1), rgba(0, 0, 0, 0) 20%), -webkit-linear-gradient(left, rgba(0, 0, 0, .1), rgba(0, 0, 0, 0));
+			background-image:     -moz-linear-gradient(left, rgba(0, 0, 0, .1), rgba(0, 0, 0, 0) 20%), -moz-linear-gradient(left, rgba(0, 0, 0, .1), rgba(0, 0, 0, 0));
+			background-image:      -ms-linear-gradient(left, rgba(0, 0, 0, .1), rgba(0, 0, 0, 0) 20%), -ms-linear-gradient(left, rgba(0, 0, 0, .1), rgba(0, 0, 0, 0));
+			background-image:       -o-linear-gradient(left, rgba(0, 0, 0, .1), rgba(0, 0, 0, 0) 20%), -o-linear-gradient(left, rgba(0, 0, 0, .1), rgba(0, 0, 0, 0));
+		}
+
+		.right-shadow {
+			right: 0;
+			background-image: -webkit-gradient(linear, right, rgba(0, 0, 0, .1), rgba(0, 0, 0, 0) 20%), -webkit-gradient(linear, right, rgba(0, 0, 0, .1), rgba(0, 0, 0, 0));
+			background-image:  -webkit-linear-gradient(right, rgba(0, 0, 0, .1), rgba(0, 0, 0, 0) 20%), -webkit-linear-gradient(right, rgba(0, 0, 0, .1), rgba(0, 0, 0, 0));
+			background-image:     -moz-linear-gradient(right, rgba(0, 0, 0, .1), rgba(0, 0, 0, 0) 20%), -moz-linear-gradient(right, rgba(0, 0, 0, .1), rgba(0, 0, 0, 0));
+			background-image:      -ms-linear-gradient(right, rgba(0, 0, 0, .1), rgba(0, 0, 0, 0) 20%), -ms-linear-gradient(right, rgba(0, 0, 0, .1), rgba(0, 0, 0, 0));
+			background-image:       -o-linear-gradient(right, rgba(0, 0, 0, .1), rgba(0, 0, 0, 0) 20%), -o-linear-gradient(right, rgba(0, 0, 0, .1), rgba(0, 0, 0, 0));
+		}
+	}
+
+div	.grade-table {
+		cursor: move;
+		@include transition(none);
+		@include user-select(none);
+
+		td,
+		th {
+			text-align: center;
+			white-space: nowrap;
+		}
+
+		thead th {
+			position: relative;
+			height: 50px;
+			@include linear-gradient(top, $cell-border-color, #ddd);
+			font-size: 10px;
+			line-height: 10px;
+			font-weight: bold;
+			text-align: center;
+			box-shadow: 0 1px 0 $table-border-color inset, 0 2px 0 rgba(255, 255, 255, .7) inset;
+			border-left: 1px solid #ccc;
+			padding-left: 10px;
+			padding-right: 10px;
+
+			&:first-child {
+				border-radius: 5px 0 0 0;
+				box-shadow: 1px 1px 0 $table-border-color inset, 1px 2px 0 rgba(255, 255, 255, .7) inset;
+				border-left: none;
+			}
+
+			&:last-child {
+				border-radius: 0 3px 0 0;
+				box-shadow: -1px 1px 0 $table-border-color inset, -1px 2px 0 rgba(255, 255, 255, .7) inset;
+			}
+
+			.assignment {
+				margin: 9px 0;
+			}
+
+			.type,
+			.number,
+			.max {
+				display: block;
+			}
+
+			.max {
+				height: 12px;
+				@include linear-gradient(top, #c6c6c6, #bababa);
+				font-size: 9px;
+				line-height: 12px;
+				color: #fff;
+			}
+		}
+
+		tr {
+			border-right: 1px solid $table-border-color;
+		}
+
+		tr:first-child td {
+			border-top: 1px solid $table-border-color;
+		}
+
+		tr:last-child td {
+			border-bottom: 1px solid $table-border-color;
+		}
+
+		td {
+			height: 50px;
+			border-bottom: 1px solid $cell-border-color;
+			background: #f3f3f3;
+			font-size: 13px;
+			line-height: 50px;
+			border-left: 1px solid $cell-border-color;
+			word-break: keep-all;
+		}
+
+		tr:nth-child(odd) td {
+			background-color: #fbfbfb;
+		}
+	}
+
+    h1 {
+      @extend .top-header;
+    }
+
+	.student-table tr:hover td,
+	.grade-table tr:hover td,
+    .student-table tr:focus td,
+	.grade-table tr:focus td,
+	.student-table tr.highlight td,
+	.grade-table tr.highlight td {
+		border-color: #74b7d6;
+		@include linear-gradient(#8ed6f7, #76cbf4);
+		color: #333;
+
+		a {
+			color: #333;
+		}
+	}
