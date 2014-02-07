@@ -2,19 +2,25 @@
 Tests of XML export
 """
 
-from datetime import datetime, timedelta, tzinfo
-from tempfile import mkdtemp
-import unittest
-import shutil
-from textwrap import dedent
+import ddt
+import lxml.etree
 import mock
-
+import os
 import pytz
+import shutil
+import tarfile
+import unittest
+import uuid
+
+from datetime import datetime, timedelta, tzinfo
 from fs.osfs import OSFS
 from path import path
-import uuid
-import tarfile
-import os
+from tempfile import mkdtemp
+from textwrap import dedent
+
+from xblock.core import XBlock
+from xblock.fields import String, Scope, Integer
+from xblock.test.tools import blocks_are_equivalent
 
 from xmodule.modulestore import Location
 from xmodule.modulestore.xml import XMLModuleStore
@@ -23,6 +29,7 @@ from xmodule.modulestore.xml_exporter import (
 )
 from xmodule.tests import DATA_DIR
 from xmodule.tests.helpers import directories_equal
+from xmodule.x_module import XModuleMixin
 
 
 def strip_filenames(descriptor):
@@ -43,6 +50,16 @@ def strip_filenames(descriptor):
     descriptor.save()
 
 
+class PureXBlock(XBlock):
+
+    """Class for testing pure XBlocks."""
+
+    has_children = True
+    field1 = String(default="something", scope=Scope.user_state)
+    field2 = Integer(scope=Scope.user_state)
+
+
+@ddt.ddt
 class RoundTripTestCase(unittest.TestCase):
     """
     Check that our test courses roundtrip properly.
@@ -51,8 +68,25 @@ class RoundTripTestCase(unittest.TestCase):
     Thus we make sure that export and import work properly.
     """
 
+
+    def setUp(self):
+        self.maxDiff = None
+        self.temp_dir = mkdtemp()
+        self.addCleanup(shutil.rmtree, self.temp_dir)
+
     @mock.patch('xmodule.course_module.requests.get')
-    def check_export_roundtrip(self, data_dir, course_dir, mock_get):
+    @ddt.data(
+        "toy",
+        "simple",
+        "conditional_and_poll",
+        "self_assessment",
+        "graphic_slider_tool",
+        "test_exam_registration",
+        "word_cloud",
+        "pure_xblock",
+    )
+    @XBlock.register_temp_plugin(PureXBlock, 'pure')
+    def test_export_roundtrip(self, course_dir, mock_get):
 
         # Patch network calls to retrieve the textbook TOC
         mock_get.return_value.text = dedent("""
@@ -64,11 +98,11 @@ class RoundTripTestCase(unittest.TestCase):
         root_dir = path(self.temp_dir)
         print("Copying test course to temp dir {0}".format(root_dir))
 
-        data_dir = path(data_dir)
+        data_dir = path(DATA_DIR)
         shutil.copytree(data_dir / course_dir, root_dir / course_dir)
 
         print("Starting import")
-        initial_import = XMLModuleStore(root_dir, course_dirs=[course_dir])
+        initial_import = XMLModuleStore(root_dir, course_dirs=[course_dir], xblock_mixins=(XModuleMixin,))
 
         courses = initial_import.get_courses()
         self.assertEquals(len(courses), 1)
@@ -78,14 +112,15 @@ class RoundTripTestCase(unittest.TestCase):
         # will still be there.
         print("Starting export")
         fs = OSFS(root_dir)
-        export_fs = fs.makeopendir(course_dir)
+        initial_course.runtime.export_fs = fs.makeopendir(course_dir)
+        root = lxml.etree.Element('root')
 
-        xml = initial_course.export_to_xml(export_fs)
-        with export_fs.open('course.xml', 'w') as course_xml:
-            course_xml.write(xml)
+        initial_course.add_xml_to_node(root)
+        with initial_course.runtime.export_fs.open('course.xml', 'w') as course_xml:
+            lxml.etree.ElementTree(root).write(course_xml)
 
         print("Starting second import")
-        second_import = XMLModuleStore(root_dir, course_dirs=[course_dir])
+        second_import = XMLModuleStore(root_dir, course_dirs=[course_dir], xblock_mixins=(XModuleMixin,))
 
         courses2 = second_import.get_courses()
         self.assertEquals(len(courses2), 1)
@@ -98,48 +133,24 @@ class RoundTripTestCase(unittest.TestCase):
         strip_filenames(initial_course)
         strip_filenames(exported_course)
 
-        self.assertEquals(initial_course, exported_course)
+        self.assertTrue(blocks_are_equivalent(initial_course, exported_course))
         self.assertEquals(initial_course.id, exported_course.id)
         course_id = initial_course.id
 
         print("Checking key equality")
-        self.assertEquals(sorted(initial_import.modules[course_id].keys()),
-                          sorted(second_import.modules[course_id].keys()))
+        self.assertItemsEqual(
+            initial_import.modules[course_id].keys(),
+            second_import.modules[course_id].keys()
+        )
 
         print("Checking module equality")
         for location in initial_import.modules[course_id].keys():
             print("Checking", location)
-            self.assertEquals(initial_import.modules[course_id][location],
-                              second_import.modules[course_id][location])
+            self.assertTrue(blocks_are_equivalent(
+                initial_import.modules[course_id][location],
+                second_import.modules[course_id][location]
+            ))
 
-    def setUp(self):
-        self.maxDiff = None
-        self.temp_dir = mkdtemp()
-        self.addCleanup(shutil.rmtree, self.temp_dir)
-
-    def test_toy_roundtrip(self):
-        self.check_export_roundtrip(DATA_DIR, "toy")
-
-    def test_simple_roundtrip(self):
-        self.check_export_roundtrip(DATA_DIR, "simple")
-
-    def test_conditional_and_poll_roundtrip(self):
-        self.check_export_roundtrip(DATA_DIR, "conditional_and_poll")
-
-    def test_selfassessment_roundtrip(self):
-        #Test selfassessment xmodule to see if it exports correctly
-        self.check_export_roundtrip(DATA_DIR, "self_assessment")
-
-    def test_graphicslidertool_roundtrip(self):
-        #Test graphicslidertool xmodule to see if it exports correctly
-        self.check_export_roundtrip(DATA_DIR, "graphic_slider_tool")
-
-    def test_exam_registration_roundtrip(self):
-        # Test exam_registration xmodule to see if it exports correctly
-        self.check_export_roundtrip(DATA_DIR, "test_exam_registration")
-
-    def test_word_cloud_roundtrip(self):
-        self.check_export_roundtrip(DATA_DIR, "word_cloud")
 
 
 class TestEdxJsonEncoder(unittest.TestCase):
