@@ -283,6 +283,10 @@ EDX_API_KEY = None
 ####################### Shoppingcart ###########################
 FEATURES['ENABLE_SHOPPING_CART'] = True
 
+####################### IP blocking ###########################
+if LIMIT_ACCESS_COUNTRIES:
+    MIDDLEWARE_CLASSES += ('util.request.BlockedIpMiddleware',)
+
 #####################################################################
 # Lastly, see if the developer has any local overrides.
 try:
