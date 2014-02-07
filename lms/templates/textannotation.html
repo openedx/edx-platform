@@ -56,6 +56,8 @@
 		uri = window.location.protocol;
 		for (var index = 0; index <= 9; index += 1) uri += lms_location.split("/")[index]+"/"; //Get the unit url
 	}
+        var unit_id = $('#sequence-list').find('.active').attr("data-element");
+        uri += unit_id;
 	var pagination = 100,
 		is_staff = !('${user.is_staff}'=='False'),
         options = {
@@ -166,6 +168,7 @@
     tinyMCE.baseURL = "${settings.STATIC_URL}" + "js/vendor/ova";
     var imgURLRoot = "${settings.STATIC_URL}" + "js/vendor/ova/catch/img/";
 	var startova = function(){
+    if (typeof Annotator != 'undefined'){
         //remove old instances
         if (Annotator._instances.length !== 0) {
         $('#textHolder').annotator("destroy");
@@ -176,17 +179,17 @@
         
         //Catch
         var annotator = ova.annotator,
-        catchOptions = {
-            media:'text',
-            externalLink:false,
-            imageUrlRoot:imgURLRoot,
-            showMediaSelector: false,
-            showPublicPrivate: true,
+		catchOptions = {
+		    media:'text',
+		    externalLink:false,
+		    imageUrlRoot:imgURLRoot,
+		    showMediaSelector: false,
+		    showPublicPrivate: true,
             userId:'${user.email}',
-            pagination:pagination,//Number of Annotations per load in the pagination,
-            flags:is_staff
-        },
-        Catch = new CatchAnnotation($('#catchDIV'),catchOptions);
+		    pagination:pagination,//Number of Annotations per load in the pagination,
+		    flags:is_staff
+		},
+		Catch = new CatchAnnotation($('#catchDIV'),catchOptions);
     }
     if (typeof Annotator != 'undefined'){
     	startova();
