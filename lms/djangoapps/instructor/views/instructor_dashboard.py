@@ -67,7 +67,7 @@ def instructor_dashboard_2(request, course_id):
 
     studio_url = None
     if is_studio_course:
-        studio_url = get_cms_course_link(course)
+        studio_url = get_cms_course_link(course, 'course')
 
     enrollment_count = sections[0]['enrollment_count']
     disable_buttons = False
