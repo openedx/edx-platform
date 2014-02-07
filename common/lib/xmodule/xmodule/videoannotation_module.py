@@ -51,73 +51,6 @@ class VideoAnnotationModule(AnnotatableFields, XModule):
 
         self.instructions = self._extract_instructions(xmltree)
         self.content = etree.tostring(xmltree, encoding='unicode')
-        self.highlight_colors = ['yellow', 'orange', 'purple', 'blue', 'green']
-
-    def _get_annotation_class_attr(self, element):
-        """ Returns a dict with the CSS class attribute to set on the annotation
-            and an XML key to delete from the element.
-         """
-
-        attr = {}
-        cls = ['annotatable-span', 'highlight']
-        highlight_key = 'highlight'
-        color = element.get(highlight_key)
-
-        if color is not None:
-            if color in self.highlight_colors:
-                cls.append('highlight-' + color)
-            attr['_delete'] = highlight_key
-        attr['value'] = ' '.join(cls)
-
-        return {'class': attr}
-
-    def _get_annotation_data_attr(self, element):
-        """ Returns a dict in which the keys are the HTML data attributes
-            to set on the annotation element. Each data attribute has a
-            corresponding 'value' and (optional) '_delete' key to specify
-            an XML attribute to delete.
-        """
-
-        data_attrs = {}
-        attrs_map = {
-            'body': 'data-comment-body',
-            'title': 'data-comment-title',
-            'problem': 'data-problem-id'
-        }
-
-        for xml_key in attrs_map.keys():
-            if xml_key in element.attrib:
-                value = element.get(xml_key, '')
-                html_key = attrs_map[xml_key]
-                data_attrs[html_key] = {'value': value, '_delete': xml_key}
-
-        return data_attrs
-
-    def _render_annotation(self, element):
-        """ Renders an annotation element for HTML output.  """
-        attr = {}
-        attr.update(self._get_annotation_class_attr(element))
-        attr.update(self._get_annotation_data_attr(element))
-
-        element.tag = 'span'
-
-        for key in attr.keys():
-            element.set(key, attr[key]['value'])
-            if '_delete' in attr[key] and attr[key]['_delete'] is not None:
-                delete_key = attr[key]['_delete']
-                del element.attrib[delete_key]
-
-    def _render_content(self):
-        """ Renders annotatable content with annotation spans and returns HTML. """
-        xmltree = etree.fromstring(self.content)
-        xmltree.tag = 'div'
-        if 'display_name' in xmltree.attrib:
-            del xmltree.attrib['display_name']
-
-        for element in xmltree.findall('.//annotation'):
-            self._render_annotation(element)
-
-        return etree.tostring(xmltree, encoding='unicode')
 
     def _extract_instructions(self, xmltree):
         """ Removes <instructions> from the xmltree and returns them as a string, otherwise None. """
@@ -150,8 +83,6 @@ class VideoAnnotationModule(AnnotatableFields, XModule):
             'sourceUrl': self.sourceurl,
             'typeSource': extension,
             'poster': self.poster_url,
-            'alert': self,
-            'content_html': self._render_content(),
             'annotation_storage': self.annotation_storage_url
         }
 
