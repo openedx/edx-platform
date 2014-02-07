@@ -3,11 +3,13 @@ This test file will test registration, login, activation, and session activity t
 """
 import time
 import mock
+import unittest
 
 from django.test.utils import override_settings
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.conf import settings
+from django.contrib.auth.models import User
 
 from contentstore.tests.utils import parse_json, user, registration, AjaxEnabledTestClient
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -18,6 +20,7 @@ import datetime
 from pytz import UTC
 
 from freezegun import freeze_time
+
 
 @override_settings(MODULESTORE=TEST_MODULESTORE)
 class ContentStoreTestCase(ModuleStoreTestCase):
@@ -118,6 +121,32 @@ class AuthTestCase(ContentStoreTestCase):
     def test_create_account(self):
         self.create_account(self.username, self.email, self.pw)
         self.activate_user(self.email)
+
+    def test_create_account_username_already_exists(self):
+        User.objects.create_user(self.username, self.email, self.pw)
+        resp = self._create_account(self.username, "abc@def.com", "password")
+        # we have a constraint on unique usernames, so this should fail
+        self.assertEqual(resp.status_code, 400)
+
+    def test_create_account_pw_already_exists(self):
+        User.objects.create_user(self.username, self.email, self.pw)
+        resp = self._create_account("abcdef", "abc@def.com", self.pw)
+        # we can have two users with the same password, so this should succeed
+        self.assertEqual(resp.status_code, 200)
+
+    @unittest.skipUnless(settings.SOUTH_TESTS_MIGRATE, "South migrations required")
+    def test_create_account_email_already_exists(self):
+        User.objects.create_user(self.username, self.email, self.pw)
+        resp = self._create_account("abcdef", self.email, "password")
+        # This is tricky. Django's user model doesn't have a constraint on
+        # unique email addresses, but we *add* that constraint during the
+        # migration process:
+        # see common/djangoapps/student/migrations/0004_add_email_index.py
+        #
+        # The behavior we *want* is for this account creation request
+        # to fail, due to this uniqueness constraint, but the request will
+        # succeed if the migrations have not run.
+        self.assertEqual(resp.status_code, 400)
 
     def test_login(self):
         self.create_account(self.username, self.email, self.pw)
