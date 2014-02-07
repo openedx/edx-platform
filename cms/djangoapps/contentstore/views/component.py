@@ -62,6 +62,7 @@ else:
         'lti',
         'concept',
         'openassessment',  # edx-ora2
+        'image_explorer',
     ] + OPEN_ENDED_COMPONENT_TYPES + NOTE_COMPONENT_TYPES
 
 ADVANCED_COMPONENT_CATEGORY = 'advanced'

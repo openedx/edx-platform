@@ -1,0 +1,47 @@
+<%! from django.utils.translation import ugettext as _ %>
+
+<div class="image-explorer-xmodule-wrapper">
+    <h2>${title}</h2>
+    % if description_html:
+    <div class="image-explorer-description">
+        ${description_html}
+    </div>
+    % endif
+    <div class="image-explorer-wrapper">
+        <img src="${background.src}" class="image-explorer-background" />
+        % for hotspot in hotspots:
+            <%
+                hotspot_reveal_style = 'style="{0}{1}"'.format(
+                    'width: ' + hotspot.feedback.width + 'px;' if hotspot.feedback.width else '',
+                    'height: ' + hotspot.feedback.height + 'px;' if hotspot.feedback.height else ''
+                )
+                hotspot_style = 'style="position: absolute; top: {0}px; left: {1}px;"'.format(hotspot.y, hotspot.x)
+            %>
+            <a class="image-explorer-hotspot" ${hotspot_style} href="#">
+                <div class="image-explorer-hotspot-reveal" ${hotspot_reveal_style}>
+                    <div class="image-explorer-close-reveal"></div>
+
+                    <div class="image-explorer-hotspot-content-wrapper">
+                        % if hotspot.feedback.header:
+                            <span class="image-explorer-hotspot-reveal-header">
+                                ${hotspot.feedback.header}
+                            </span>
+                        % endif
+                        % if hotspot.feedback.body:
+                            <span class="image-explorer-hotspot-reveal-body">
+                                ${hotspot.feedback.body}
+                            </span>
+                        % endif
+                        % if hotspot.feedback.youtube:
+                            <div class="image-explorer-hotspot-reveal-youtube">
+                                <iframe id="player" type="text/html" width="${hotspot.feedback.youtube.width}" height="${hotspot.feedback.youtube.height}" src="//www.youtube.com/embed/${hotspot.feedback.youtube.video_id}?enablejsapi=1" frameborder="0"></iframe>
+                            </div>
+                        % endif
+                    </div>
+                </div>
+            </a>
+        % endfor
+    </div>
+</div>
+
+
