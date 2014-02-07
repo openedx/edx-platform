@@ -1,6 +1,3 @@
-.. raw:: latex
-
-      \newpage %
 
 .. _Appendix E:
 
@@ -11,24 +8,21 @@ APPENDIX E: Problem and Tool XML
 
 This appendix provides information about the XML for most problem and tool types in Studio:
 
-:ref:`Checkbox`
-:ref:`Chemical Equation Response`
-:ref:`Custom Response`
-:ref:`Formula Response`
-:ref:`Image Response`
-:ref:`Multiple Choice`
-:ref:`Numerical Response`
-:ref:`Option Response`
-:ref:`Schematic Response`
-:ref:`String Response`
+* :ref:`Checkbox`
+* :ref:`Chemical Equation Response`
+* :ref:`Custom Response`
+* :ref:`Formula Response`
+* :ref:`Image Response`
+* :ref:`Multiple Choice`
+* :ref:`Numerical Response`
+* :ref:`Option Response`
+* :ref:`Schematic Response`
+* :ref:`String Response`
 
 .. _Checkbox:
 
 Choice Response (Checkbox)
 ---------------------------
-
-**To designate an answer as correct, add correct="true"**
-**Available in Simple Editor**
 
 Sample Problem:
 
@@ -93,9 +87,6 @@ Sample Problem:
 
 Chemical Equation Response
 --------------------------
-
-**TEMPLATE? DO WE HAVE MORE INFORMATION ABOUT HOW TO CREATE THESE?**
-**DO THESE WORK?**
 
 The chemical equation problem type allows the student to enter chemical equations. The grader evaluates student responses by using a Python script that you create and embed in the problem.
 
@@ -262,7 +253,7 @@ Formula Response (Math Expression Input Problems)
 
 **Sample Problem**
 
-.. image:: ../Images/MathExpressionInput_XML.png
+.. image:: ../Images/MathExpressionInputExample.gif
  :width: 600
  :alt: Image of a math expression input problem
 
@@ -368,10 +359,14 @@ Sample Problem:
       <p>You are given three shapes. Click on the triangle.</p>
       <endouttext/>
       <imageresponse>
-      <imageinput src="/c4x/edX/edX101/asset/threeshapes.png" width="220" height="150" rectangle="(80,40)-(130,90)" />
+      <imageinput src="/static/threeshapes.png" width="220" height="150" rectangle="(80,40)-(130,90)" />
       </imageresponse>
   </problem>
-  Template
+
+Template
+
+.. code-block:: xml
+
   <problem>
       <imageresponse>
       <imageinput src="Path_to_Image_File.png" width="220" height="150" rectangle="(80,40)-(130,90)" />
@@ -388,8 +383,6 @@ XML Attribute Information
 <imageinput>
 
   .. image:: ../Images/imageresponse2.png
-
-.. raw:: latex
 
 .. _Multiple Choice:
 
@@ -780,9 +773,6 @@ The default included functions are the following:
 - Hyperbolic trig functions and their inverses: sinh, cosh, tanh, sech, csch,
   coth, arcsinh, arccosh, arctanh, arcsech, arccsch, arccoth
 
-.. raw:: latex
-
-
 
 .. _Option Response:
 
@@ -863,11 +853,6 @@ Sample Problem:
 <optioninput>
 
   .. image:: ../Images/optionresponse2.png
-
-
-.. raw:: latex
-
-      \newpage %
 
 
 .. _Schematic Response:
@@ -1107,8 +1092,6 @@ Student answers "foobar", "o foo" or " ==foo==", will be correct if teacher has 
   .. image:: ../Images/stringresponse2.png
 
 <additional_answer> - Can be unlimited number of this tags. Any tag adds one more additional answer for matching.
-
-.. raw:: latex
 
 
 
