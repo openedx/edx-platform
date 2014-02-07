@@ -51,8 +51,10 @@ locales:
     - zh_TW  # Chinese (Taiwan)
 
 
-# The locale used for fake-accented English, for testing.
-dummy-locale: eo
+# The locales used for fake-accented English, for testing.
+dummy_locales:
+    - eo
+    - fake2
 
 # Directories we don't search for strings.
 ignore_dirs:
