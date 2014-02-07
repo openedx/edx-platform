@@ -24,7 +24,7 @@ class @Sequence
     position_link = @link_for(@position)
     if position_link and position_link.data('title')
         document.title = position_link.data('title') + @base_page_title
-    
+
   hookUpProgressEvent: ->
     $('.problems-wrapper').bind 'progressChanged', @updateProgress
 
@@ -90,7 +90,7 @@ class @Sequence
     if @position != new_position
       if @position != undefined
         @mark_visited @position
-        modx_full_url = '#{@ajaxUrl}/goto_position'
+        modx_full_url = "#{@ajaxUrl}/goto_position"
         $.postWithPrefix modx_full_url, position: new_position
 
       # On Sequence change, fire custom event "sequence:change" on element.
