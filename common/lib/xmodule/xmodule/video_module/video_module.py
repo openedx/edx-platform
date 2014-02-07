@@ -142,7 +142,7 @@ class VideoFields(object):
         help="The name of the timed transcript track (for non-Youtube videos).",
         display_name="HTML5 Transcript",
         scope=Scope.settings,
-        default=""
+        default="OEoXaMPEzfM"
     )
     speed = Float(
         help="The last speed that was explicitly set by user for the video.",
