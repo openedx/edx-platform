@@ -100,7 +100,7 @@ function (HTML5Video, Resizer) {
         };
 
         if (state.currentPlayerMode !== 'flash') {
-            // state.videoPlayer.playerVars.html5 = 1;
+            state.videoPlayer.playerVars.html5 = 1;
         }
 
         // There is a bug which prevents YouTube API to correctly set the speed
