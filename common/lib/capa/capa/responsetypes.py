@@ -344,12 +344,15 @@ class LoncapaResponse(object):
             hintmode = hintgroup.get('mode', 'always')
             for hintpart in hintgroup.findall('hintpart'):
                 if hintpart.get('on') in hints_to_show:
-                    hint_text = hintpart.find('text').text
+                    if hintpart.find('text') is not None:
+                        hint_text = hintpart.find('text').text
+                    elif hintpart.text:
+                        hint_text = hintpart.text
                     # make the hint appear after the last answer box in this
                     # response
                     aid = self.answer_ids[-1]
                     new_cmap.set_hint_and_mode(aid, hint_text, hintmode)
-            log.debug('after hint: new_cmap = %s', new_cmap)
+
 
     @abc.abstractmethod
     def get_score(self, student_answers):
@@ -718,6 +721,7 @@ class MultipleChoiceResponse(LoncapaResponse):
     # TODO: handle direction and randomize
 
     tags = ['multiplechoiceresponse']
+    hint_tag = 'choicehint'
     max_inputfields = 1
     allowed_inputfields = ['choicegroup']
     correct_choices = None
@@ -726,6 +730,10 @@ class MultipleChoiceResponse(LoncapaResponse):
         # call secondary setup for MultipleChoice questions, to set name
         # attributes
         self.mc_setup_response()
+
+        # These two fields are used for hint matching
+        self.regexp = True
+        self.case_insensitive = True
 
         # define correct choices (after calling secondary setup)
         xml = self.xml
@@ -770,6 +778,24 @@ class MultipleChoiceResponse(LoncapaResponse):
 
     def get_answers(self):
         return {self.answer_id: self.correct_choices}
+
+    def check_string(self, expected, given):
+        flags = re.IGNORECASE if self.case_insensitive else 0
+        regexp = re.compile('^' + '|'.join(expected) + '$', flags=flags | re.UNICODE)
+        result = re.search(regexp, given)
+        return bool(result)
+
+    def check_hint_condition(self, hxml_set, student_answers):
+        # stolen from StringResponse.check_hint_condition
+        given = student_answers[self.answer_id].strip()
+        hints_to_show = []
+        for hxml in hxml_set:
+            name = hxml.get('name')
+            hinted_answer = contextualize_text(hxml.get('answer'), self.context).strip()
+
+            if self.check_string([hinted_answer], given):
+                hints_to_show.append(name)
+        return hints_to_show
 
 
 @registry.register
@@ -1050,7 +1076,6 @@ class StringResponse(LoncapaResponse):
         ]
 
     def setup_response(self):
-
         self.backward = '_or_' in self.xml.get('answer').lower()
         self.regexp = False
         self.case_insensitive = False
@@ -1147,7 +1172,6 @@ class CustomResponse(LoncapaResponse):
     Custom response.  The python code to be run should be in <answer>...</answer>
     or in a <script>...</script>
     """
-
     tags = ['customresponse']
 
     allowed_inputfields = ['textline', 'textbox', 'crystallography',
