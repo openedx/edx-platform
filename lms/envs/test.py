@@ -85,8 +85,6 @@ XQUEUE_INTERFACE = {
 }
 XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5  # seconds
 
-TIME_ZONE = 'UTC'
-
 # Don't rely on a real staff grading backend
 MOCK_STAFF_GRADING = True
 MOCK_PEER_GRADING = True
