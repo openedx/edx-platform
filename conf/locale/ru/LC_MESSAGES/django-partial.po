@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: translation_team@edx.org\n"
-"POT-Creation-Date: 2014-01-30 13:12+0400\n"
+"POT-Creation-Date: 2014-02-03 14:55+0400\n"
 "PO-Revision-Date: 2014-01-30 13:35+0300\n"
 "Last-Translator: JK <korvin.lucky@gmail.com>\n"
 "Language-Team: Select LTD\n"
@@ -2171,7 +2171,7 @@ msgstr ""
 msgid "You have made {sub} submissions."
 msgstr "Вы сделали {sub} попыток."
 
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py:943
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py:941
 msgid ""
 "You have attempted this question {your} times. You are only allowed to "
 "attempt it {allowed} times."
@@ -2179,7 +2179,7 @@ msgstr ""
 "Вы пытались ответить на этот вопрос {your} раз. Вы можете это сделать только "
 "{allowed} раз."
 
-#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py:1118
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py:1116
 msgid "The problem state got out-of-sync.  Please try reloading the page."
 msgstr ""
 "Произошла рассинхронизация состояния задачи. Пожалуйста, перезагрузите "
@@ -2228,98 +2228,98 @@ msgid "Copyright"
 msgstr "Copyright"
 
 #: lms/djangoapps/branding/views.py:78
-msgid "Economy"
-msgstr "Экономика"
-
-#: lms/djangoapps/branding/views.py:79
-msgid "French Language"
-msgstr "Французский язык"
-
-#: lms/djangoapps/branding/views.py:80
 msgid "English Language"
 msgstr "Английский язык"
 
+#: lms/djangoapps/branding/views.py:79
+msgid "Astronomy"
+msgstr "Астрономия"
+
+#: lms/djangoapps/branding/views.py:80
+msgid "Biology"
+msgstr "Биология"
+
 #: lms/djangoapps/branding/views.py:81
-msgid "German Language"
-msgstr "Немецкий язык"
+msgid "Geography"
+msgstr "География"
 
 #: lms/djangoapps/branding/views.py:82
-msgid "Literature"
-msgstr "Литература"
-
-#: lms/djangoapps/branding/views.py:83
 msgid "Natural Science"
 msgstr "Естествознание"
 
-#: lms/djangoapps/branding/views.py:84
-msgid "Ecology"
-msgstr "Экология"
+#: lms/djangoapps/branding/views.py:83
+msgid "Computer Science"
+msgstr "Информатика"
+
+#: lms/djangoapps/branding/views.py:84 lms/templates/wiki/history.html:5
+#, fuzzy
+msgid "History"
+msgstr "Посмотреть историю"
 
 #: lms/djangoapps/branding/views.py:85
-msgid "Technology"
-msgstr "Технология"
+msgid "Literature"
+msgstr "Литература"
 
 #: lms/djangoapps/branding/views.py:86
+msgid "Mathematics"
+msgstr "Математика"
+
+#: lms/djangoapps/branding/views.py:87
+msgid "World Art"
+msgstr "МХК"
+
+#: lms/djangoapps/branding/views.py:88
+msgid "German Language"
+msgstr "Немецкий язык"
+
+#: lms/djangoapps/branding/views.py:89
+msgid "OBG"
+msgstr "ОБЖ"
+
+#: lms/djangoapps/branding/views.py:90
 #, fuzzy
 msgid "Social Studies"
 msgstr "Социальный педагог"
 
-#: lms/djangoapps/branding/views.py:87
+#: lms/djangoapps/branding/views.py:91
 msgid "Law"
 msgstr "Право"
 
-#: lms/djangoapps/branding/views.py:88
-msgid "Astronomy"
-msgstr "Астрономия"
-
-#: lms/djangoapps/branding/views.py:89
-msgid "Biology"
-msgstr "Биология"
-
-#: lms/djangoapps/branding/views.py:90
-msgid "World Art"
-msgstr "МХК"
-
-#: lms/djangoapps/branding/views.py:91
-msgid "Mathematics"
-msgstr "Математика"
-
 #: lms/djangoapps/branding/views.py:92
+msgid "Psychology"
+msgstr "Психология"
+
+#: lms/djangoapps/branding/views.py:93
 msgid "Russian Language"
 msgstr "Русский язык"
 
-#: lms/djangoapps/branding/views.py:93
-msgid "Chemistry"
-msgstr "Химия"
-
 #: lms/djangoapps/branding/views.py:94
-msgid "Physical Culture"
-msgstr "Физическая культура"
+msgid "Technology"
+msgstr "Технология"
 
 #: lms/djangoapps/branding/views.py:95
 msgid "Physics"
 msgstr "Физика"
 
 #: lms/djangoapps/branding/views.py:96
-msgid "Geography"
-msgstr "География"
+msgid "Physical Culture"
+msgstr "Физическая культура"
 
 #: lms/djangoapps/branding/views.py:97
-msgid "OBG"
-msgstr "ОБЖ"
+msgid "French Language"
+msgstr "Французский язык"
 
-#: lms/djangoapps/branding/views.py:98 lms/templates/wiki/history.html:5
-#, fuzzy
-msgid "History"
-msgstr "Посмотреть историю"
+#: lms/djangoapps/branding/views.py:98
+msgid "Chemistry"
+msgstr "Химия"
 
 #: lms/djangoapps/branding/views.py:99
-msgid "Computer Science"
-msgstr "Информатика"
+msgid "Ecology"
+msgstr "Экология"
 
 #: lms/djangoapps/branding/views.py:100
-msgid "Psychology"
-msgstr "Психология"
+msgid "Economy"
+msgstr "Экономика"
 
 #: lms/djangoapps/branding/views.py:105
 msgid "Advanced training courses"
