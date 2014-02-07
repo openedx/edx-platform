@@ -15,7 +15,14 @@ namespace :i18n do
 
   desc "Compile localizable strings from sources, extracting strings first."
   task :generate => "i18n:extract" do
-    sh(File.join(REPO_ROOT, "i18n", "generate.py"))
+    cmd = File.join(REPO_ROOT, "i18n", "generate.py")
+    sh("#{cmd}")
+  end
+
+  desc "Compile localizable strings from sources, extracting strings first, and complain if files are missing."
+  task :generate_strict => "i18n:extract" do
+    cmd = File.join(REPO_ROOT, "i18n", "generate.py")
+    sh("#{cmd} --strict")
   end
 
   desc "Simulate international translation by generating dummy strings corresponding to source strings."
@@ -72,7 +79,7 @@ namespace :i18n do
   # Will eventually be run by jenkins.
   namespace :robot do
     desc "Pull source strings, generate po and mo files, and validate"
-    task :pull => ["i18n:transifex:pull", "i18n:extract", "i18n:dummy", "i18n:generate"] do
+    task :pull => ["i18n:transifex:pull", "i18n:extract", "i18n:dummy", "i18n:generate_strict"] do
       sh('git clean -fdX conf/locale')
       Rake::Task["i18n:test"].invoke
       sh('git add conf/locale')

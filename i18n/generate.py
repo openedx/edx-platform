@@ -13,7 +13,11 @@ languages to generate.
 
 """
 
-import os, sys, logging
+import argparse
+import logging
+import os
+import sys
+
 from polib import pofile
 
 from i18n.config import BASE_DIR, CONFIGURATION
@@ -100,11 +104,16 @@ def validate_files(dir, files_to_merge):
             raise Exception("I18N: Cannot generate because file not found: {0}".format(pathname))
 
 
-def main():
+def main(argv=None):
     logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
+    parser = argparse.ArgumentParser(description="Generate merged and compiled message files.")
+    parser.add_argument("--strict", action='store_true', help="Complain about missing files.")
+
+    args = parser.parse_args(argv or [])
+
     for locale in CONFIGURATION.translated_locales:
-        merge_files(locale)
+        merge_files(locale, fail_if_missing=args.strict)
     # Dummy text is not required. Don't raise exception if files are missing.
     merge_files(CONFIGURATION.dummy_locale, fail_if_missing=False)
 
@@ -113,4 +122,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv[1:])
