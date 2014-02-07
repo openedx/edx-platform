@@ -239,8 +239,11 @@ def single_thread(request, course_id, discussion_id, thread_id):
     cc_user = cc.User.from_django_user(request.user)
     user_info = cc_user.to_dict()
 
+    # Currently, the front end always loads responses via AJAX, even for this
+    # page; it would be a nice optimization to avoid that extra round trip to
+    # the comments service.
     thread = cc.Thread.find(thread_id).retrieve(
-        recursive=True,
+        recursive=request.is_ajax(),
         user_id=request.user.id,
         response_skip=request.GET.get("resp_skip"),
         response_limit=request.GET.get("resp_limit")
