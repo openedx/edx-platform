@@ -39,6 +39,12 @@ def import_static_content(
         for filename in filenames:
 
             content_path = os.path.join(dirname, filename)
+
+            if filename.endswith('~'):
+                if verbose:
+                    log.debug('skipping static content %s...', content_path)
+                continue
+
             if verbose:
                 log.debug('importing static content %s...', content_path)
 
