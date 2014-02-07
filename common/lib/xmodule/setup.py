@@ -41,6 +41,7 @@ XMODULES = [
     "raw = xmodule.raw_module:RawDescriptor",
     "crowdsource_hinter = xmodule.crowdsource_hinter:CrowdsourceHinterDescriptor",
     "lti = xmodule.lti_module:LTIDescriptor",
+    "image_explorer = xmodule.image_explorer:ImageExplorerDescriptor",
 ]
 
 setup(

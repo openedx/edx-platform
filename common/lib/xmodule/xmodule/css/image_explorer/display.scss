@@ -1,0 +1,74 @@
+.image-explorer-description {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.image-explorer-wrapper {
+    position: relative;
+}
+
+.image-explorer-hotspot-reveal {
+    background-color: rgba(0, 101, 189, 0.80);
+    color: #000000;
+    left: 100%;
+    position: absolute;
+    top: 25%;
+    width: 300px;
+    z-index: 1;
+    display: none;
+}
+
+.image-explorer-hotspot-content-wrapper {
+    margin: 10px 20px 10px 10px;
+}
+
+.image-explorer-hotspot-reveal.active {
+    display: block;
+    opacity: 1;
+}
+
+.image-explorer-hotspot-reveal-header {
+    font-family: "Open Sans Regular";
+    font-size: 16px;
+}
+
+.image-explorer-wrapper a.image-explorer-hotspot {
+    background: url("../images/image-explorer-hotspot-sprite.png") no-repeat scroll 0 0 rgba(0, 0, 0, 0);
+    width: 41px;
+    height: 41px;
+    display: block;
+    text-decoration: none;
+    -webkit-transition: all 0.0s linear 0s;
+    -moz-transition: all 0.0s linear 0s;
+    transition: all 0.0s linear 0s;
+}
+
+.image-explorer-wrapper a.image-explorer-hotspot:hover {
+    background-position: 0px -43px
+}
+
+a.image-explorer-hotspot .image-explorer-hotspot-reveal .image-explorer-hotspot-reveal-header p {
+    margin: 10px 0px 10px 20px;
+}
+
+.image-explorer-hotspot-reveal-body {
+    font-family: "Open Sans Regular";
+    font-size: 14px;
+}
+
+a.image-explorer-hotspot .image-explorer-hotspot-reveal .image-explorer-hotspot-reveal-body ul {
+    list-style-type: disc;
+}
+
+a.image-explorer-hotspot .image-explorer-hotspot-reveal .image-explorer-hotspot-reveal-body ul li {
+    margin: 0 0 24px 17px;
+}
+
+.image-explorer-close-reveal {
+    background: url("../images/image-explorer-reveal-close.png") no-repeat scroll 0 0 rgba(0, 0, 0, 0);
+    float: right;
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
+    margin-top: 5px;
+}
