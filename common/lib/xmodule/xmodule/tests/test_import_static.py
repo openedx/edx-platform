@@ -1,5 +1,7 @@
+"""
+Tests that check that we ignore the appropriate files when importing courses.
+"""
 import unittest
-from path import path
 from mock import Mock
 from xmodule.modulestore import Location
 from xmodule.modulestore.xml_importer import import_static_content
@@ -7,8 +9,9 @@ from xmodule.tests import DATA_DIR
 
 
 class IgnoredFilesTestCase(unittest.TestCase):
+    "Tests for ignored files"
     def test_ignore_tilde_static_files(self):
-        course_dir= DATA_DIR / "tilde"
+        course_dir = DATA_DIR / "tilde"
         loc = Location("edX", "tilde", "Fall_2012")
         content_store = Mock()
         content_store.generate_thumbnail.return_value = ("content", "location")

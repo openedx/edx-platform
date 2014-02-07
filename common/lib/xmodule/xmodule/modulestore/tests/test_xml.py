@@ -1,3 +1,7 @@
+"""
+Tests around our XML modulestore, including importing
+well-formed and not-well-formed XML.
+"""
 import os.path
 import unittest
 from glob import glob
@@ -12,6 +16,7 @@ from xmodule.modulestore import Location, XML_MODULESTORE_TYPE
 from .test_modulestore import check_path_to_location
 from xmodule.tests import DATA_DIR
 
+
 def glob_tildes_at_end(path):
     """
     A wrapper for the `glob.glob` function, but it always returns
@@ -24,6 +29,9 @@ def glob_tildes_at_end(path):
 
 
 class TestXMLModuleStore(unittest.TestCase):
+    """
+    Test around the XML modulestore
+    """
     def test_path_to_location(self):
         """Make sure that path_to_location works properly"""
 
@@ -57,7 +65,7 @@ class TestXMLModuleStore(unittest.TestCase):
         assert errors == []
 
     @patch("xmodule.modulestore.xml.glob.glob", side_effect=glob_tildes_at_end)
-    def test_tilde_files_ignored(self, fake_glob):
+    def test_tilde_files_ignored(self, _fake_glob):
         modulestore = XMLModuleStore(DATA_DIR, course_dirs=['tilde'], load_error_modules=False)
         course_module = modulestore.modules['edX/tilde/2012_Fall']
         about_location = Location({
@@ -70,4 +78,3 @@ class TestXMLModuleStore(unittest.TestCase):
         about_module = course_module[about_location]
         self.assertIn("GREEN", about_module.data)
         self.assertNotIn("RED", about_module.data)
-
