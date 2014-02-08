@@ -5,6 +5,7 @@ Provide tests for git_add_course management command.
 import unittest
 import os
 import shutil
+import StringIO
 import subprocess
 
 from django.conf import settings
@@ -14,7 +15,8 @@ from django.test.utils import override_settings
 
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-import dashboard.management.commands.git_add_course as git_add_course
+import dashboard.git_import as git_import
+from dashboard.git_import import GitImportError
 
 TEST_MONGODB_LOG = {
     'host': 'localhost',
@@ -43,8 +45,9 @@ class TestGitAddCourse(ModuleStoreTestCase):
         Convenience function for testing command failures
         """
         with self.assertRaises(SystemExit):
-            self.assertRaisesRegexp(CommandError, regex,
-                                    call_command('git_add_course', *args))
+            with self.assertRaisesRegexp(CommandError, regex):
+                call_command('git_add_course', *args,
+                             stderr=StringIO.StringIO())
 
     def test_command_args(self):
         """
@@ -78,27 +81,42 @@ class TestGitAddCourse(ModuleStoreTestCase):
         """
         Various exit path tests for test_add_repo
         """
-        self.assertEqual(git_add_course.GIT_IMPORT_NO_DIR,
-                         git_add_course.add_repo(self.TEST_REPO, None))
-        try:
-            os.mkdir(getattr(settings, 'GIT_REPO_DIR'))
-        except OSError:
-            pass
-        self.assertEqual(git_add_course.GIT_IMPORT_URL_BAD,
-                         git_add_course.add_repo('foo', None))
+        with self.assertRaisesRegexp(GitImportError, GitImportError.NO_DIR):
+            git_import.add_repo(self.TEST_REPO, None)
 
-        self.assertEqual(
-            git_add_course.GIT_IMPORT_CANNOT_PULL,
-            git_add_course.add_repo('file:///foobar.git', None)
-        )
+        os.mkdir(getattr(settings, 'GIT_REPO_DIR'))
+        self.addCleanup(shutil.rmtree, getattr(settings, 'GIT_REPO_DIR'))
+
+        with self.assertRaisesRegexp(GitImportError, GitImportError.URL_BAD):
+            git_import.add_repo('foo', None)
+
+        with self.assertRaisesRegexp(GitImportError, GitImportError.CANNOT_PULL):
+            git_import.add_repo('file:///foobar.git', None)
 
         # Test git repo that exists, but is "broken"
         bare_repo = os.path.abspath('{0}/{1}'.format(settings.TEST_ROOT, 'bare.git'))
-        os.mkdir(os.path.abspath(bare_repo))
-        subprocess.call(['git', '--bare', 'init', ], cwd=bare_repo)
+        os.mkdir(bare_repo)
+        self.addCleanup(shutil.rmtree, bare_repo)
+        subprocess.check_output(['git', '--bare', 'init', ], stderr=subprocess.STDOUT,
+                                cwd=bare_repo)
 
-        self.assertEqual(
-            git_add_course.GIT_IMPORT_BAD_REPO,
-            git_add_course.add_repo('file://{0}'.format(bare_repo), None)
-        )
-        shutil.rmtree(bare_repo)
+        with self.assertRaisesRegexp(GitImportError, GitImportError.BAD_REPO):
+            git_import.add_repo('file://{0}'.format(bare_repo), None)
+
+    def test_detached_repo(self):
+        """
+        Test repo that is in detached head state.
+        """
+        repo_dir = getattr(settings, 'GIT_REPO_DIR')
+        # Test successful import from command
+        try:
+            os.mkdir(repo_dir)
+        except OSError:
+            pass
+        self.addCleanup(shutil.rmtree, repo_dir)
+        git_import.add_repo(self.TEST_REPO, repo_dir / 'edx4edx_lite')
+        subprocess.check_output(['git', 'checkout', 'HEAD~2', ],
+                                stderr=subprocess.STDOUT,
+                                cwd=repo_dir / 'edx4edx_lite')
+        with self.assertRaisesRegexp(GitImportError, GitImportError.CANNOT_PULL):
+            git_import.add_repo(self.TEST_REPO, repo_dir / 'edx4edx_lite')

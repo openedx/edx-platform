@@ -80,14 +80,22 @@ class TestLocationMapper(unittest.TestCase):
         Request translation, check package_id, block_id, and branch
         """
         prob_locator = loc_mapper().translate_location(
-            old_style_course_id, 
-            location, 
+            old_style_course_id,
+            location,
             published= (branch=='published'),
             add_entry_if_missing=add_entry
         )
         self.assertEqual(prob_locator.package_id, new_style_package_id)
         self.assertEqual(prob_locator.block_id, block_id)
         self.assertEqual(prob_locator.branch, branch)
+
+        course_locator = loc_mapper().translate_location_to_course_locator(
+           old_style_course_id,
+           location,
+           published=(branch == 'published'),
+        )
+        self.assertEqual(course_locator.package_id, new_style_package_id)
+        self.assertEqual(course_locator.branch, branch)
 
     def test_translate_location_read_only(self):
         """
@@ -106,7 +114,7 @@ class TestLocationMapper(unittest.TestCase):
 
         new_style_package_id = '{}.geek_dept.{}.baz_run'.format(org, course)
         block_map = {
-            'abc123': {'problem': 'problem2'}, 
+            'abc123': {'problem': 'problem2'},
             'def456': {'problem': 'problem4'},
             'ghi789': {'problem': 'problem7'},
         }
@@ -131,7 +139,7 @@ class TestLocationMapper(unittest.TestCase):
 
         # add a distractor course (note that abc123 has a different translation in this one)
         distractor_block_map = {
-            'abc123': {'problem': 'problem3'}, 
+            'abc123': {'problem': 'problem3'},
             'def456': {'problem': 'problem4'},
             'ghi789': {'problem': 'problem7'},
         }
@@ -389,14 +397,20 @@ class TrivialCache(object):
     def __init__(self):
         self.cache = {}
 
-    def get(self, key):
+    def get(self, key, default=None):
         """
         Mock the .get
         """
-        return self.cache.get(key)
+        return self.cache.get(key, default)
 
     def set_many(self, entries):
         """
         mock set_many
         """
         self.cache.update(entries)
+
+    def set(self, key, entry):
+        """
+        mock set
+        """
+        self.cache[key] = entry

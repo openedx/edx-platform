@@ -1,16 +1,33 @@
 import sys
 import logging
 from xmodule.mako_module import MakoDescriptorSystem
-from xmodule.x_module import XModuleDescriptor
 from xmodule.modulestore.locator import BlockUsageLocator, LocalId
 from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import exc_info_to_str
-from xblock.runtime import DbModel
+from xblock.runtime import KvsFieldData, IdReader
 from ..exceptions import ItemNotFoundError
 from .split_mongo_kvs import SplitMongoKVS
 from xblock.fields import ScopeIds
+from xmodule.modulestore.loc_mapper_store import LocMapperStore
 
 log = logging.getLogger(__name__)
+
+
+class SplitMongoIdReader(IdReader):
+    """
+    An :class:`~xblock.runtime.IdReader` associated with a particular
+    :class:`.CachingDescriptorSystem`.
+    """
+    def __init__(self, system):
+        self.system = system
+
+    def get_definition_id(self, usage_id):
+        usage = self.system.load_item(usage_id)
+        return usage.definition_locator
+
+    def get_block_type(self, def_id):
+        definition = self.system.modulestore.db_connection.get_definition(def_id)
+        return definition['category']
 
 
 class CachingDescriptorSystem(MakoDescriptorSystem):
@@ -34,7 +51,12 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         module_data: a dict mapping Location -> json that was cached from the
             underlying modulestore
         """
-        super(CachingDescriptorSystem, self).__init__(load_item=self._load_item, **kwargs)
+        super(CachingDescriptorSystem, self).__init__(
+            id_reader=SplitMongoIdReader(self),
+            field_data=None,
+            load_item=self._load_item,
+            **kwargs
+        )
         self.modulestore = modulestore
         self.course_entry = course_entry
         self.lazy = lazy
@@ -42,7 +64,9 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         # Compute inheritance
         modulestore.inherit_settings(
             course_entry['structure'].get('blocks', {}),
-            course_entry['structure'].get('blocks', {}).get(course_entry['structure'].get('root'))
+            course_entry['structure'].get('blocks', {}).get(
+                LocMapperStore.encode_key_for_mongo(course_entry['structure'].get('root'))
+            )
         )
         self.default_class = default_class
         self.local_modules = {}
@@ -62,10 +86,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
             if json_data is None:
                 raise ItemNotFoundError(block_id)
 
-        class_ = XModuleDescriptor.load_class(
-            json_data.get('category'),
-            self.default_class
-        )
+        class_ = self.load_block_type(json_data.get('category'))
         return self.xblock_from_json(class_, block_id, json_data, course_entry_override)
 
     # xblock's runtime does not always pass enough contextual information to figure out
@@ -106,7 +127,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
             json_data.get('fields', {}),
             json_data.get('_inherited_settings'),
         )
-        field_data = DbModel(kvs)
+        field_data = KvsFieldData(kvs)
 
         try:
             module = self.construct_xblock_from_class(
@@ -131,7 +152,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem):
         module.edited_on = edit_info.get('edited_on')
         module.previous_version = edit_info.get('previous_version')
         module.update_version = edit_info.get('update_version')
-        module.definition_locator = self.modulestore.definition_locator(definition)
+        module.definition_locator = definition_id
         # decache any pending field settings
         module.save()
 

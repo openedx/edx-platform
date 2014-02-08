@@ -1,0 +1,25 @@
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="initial-scale=1.0">
+  </head>
+  <body>
+    <p>{% blocktrans with name=student_name %}
+      Dear {{student_name}},
+    {% endblocktrans %}</p>
+
+    <p>{% blocktrans with name=course_name %} 
+    Congratulations on earning your certificate in {{course_name}}!
+    Since you have an account on LinkedIn, you can display your hard earned
+    credential for your colleagues to see.  Click the button below to add the
+    certificate to your profile.
+    {% endblocktrans %}</p>
+
+    <p><a href="{{url|safe}}">
+      <span>in<span>
+      {% blocktrans %}Add to profile{% endblocktrans %}
+    </a></p>
+  </body>
+</html>

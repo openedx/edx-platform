@@ -30,14 +30,29 @@ URL_RE = re.compile("""
 
 # TODO (cpennington): We should decide whether we want to expand the
 # list of valid characters in a location
-INVALID_CHARS = re.compile(r"[^\w.-]")
+INVALID_CHARS = re.compile(r"[^\w.%-]", re.UNICODE)
 # Names are allowed to have colons.
-INVALID_CHARS_NAME = re.compile(r"[^\w.:-]")
+INVALID_CHARS_NAME = re.compile(r"[^\w.:%-]", re.UNICODE)
 
 # html ids can contain word chars and dashes
-INVALID_HTML_CHARS = re.compile(r"[^\w-]")
+INVALID_HTML_CHARS = re.compile(r"[^\w-]", re.UNICODE)
 
 _LocationBase = namedtuple('LocationBase', 'tag org course category name revision')
+
+
+def _check_location_part(val, regexp):
+    """
+    Check that `regexp` doesn't match inside `val`. If it does, raise an exception
+
+    Args:
+        val (string): The value to check
+        regexp (re.RegexObject): The regular expression specifying invalid characters
+
+    Raises:
+        InvalidLocationError: Raised if any invalid character is found in `val`
+    """
+    if val is not None and regexp.search(val) is not None:
+        raise InvalidLocationError("Invalid characters in {!r}.".format(val))
 
 
 class Location(_LocationBase):
@@ -145,7 +160,6 @@ class Location(_LocationBase):
         Components may be set to None, which may be interpreted in some contexts
         to mean wildcard selection.
         """
-
         if (org is None and course is None and category is None and name is None and revision is None):
             location = loc_or_tag
         else:
@@ -161,30 +175,25 @@ class Location(_LocationBase):
             check_list(list_)
 
         def check_list(list_):
-            def check(val, regexp):
-                if val is not None and regexp.search(val) is not None:
-                    log.debug('invalid characters val="%s", list_="%s"' % (val, list_))
-                    raise InvalidLocationError("Invalid characters in '%s'." % (val))
-
             list_ = list(list_)
             for val in list_[:4] + [list_[5]]:
-                check(val, INVALID_CHARS)
+                _check_location_part(val, INVALID_CHARS)
             # names allow colons
-            check(list_[4], INVALID_CHARS_NAME)
+            _check_location_part(list_[4], INVALID_CHARS_NAME)
 
         if isinstance(location, Location):
             return location
         elif isinstance(location, basestring):
             match = URL_RE.match(location)
             if match is None:
-                log.debug('location is instance of %s but no URL match' % basestring)
+                log.debug(u"location %r doesn't match URL", location)
                 raise InvalidLocationError(location)
             groups = match.groupdict()
             check_dict(groups)
             return _LocationBase.__new__(_cls, **groups)
         elif isinstance(location, (list, tuple)):
             if len(location) not in (5, 6):
-                log.debug('location has wrong length')
+                log.debug(u'location has wrong length')
                 raise InvalidLocationError(location)
 
             if len(location) == 5:
@@ -207,9 +216,9 @@ class Location(_LocationBase):
         """
         Return a string containing the URL for this location
         """
-        url = "{0.tag}://{0.org}/{0.course}/{0.category}/{0.name}".format(self)
+        url = u"{0.tag}://{0.org}/{0.course}/{0.category}/{0.name}".format(self)
         if self.revision:
-            url += "@" + self.revision
+            url += u"@{rev}".format(rev=self.revision)  # pylint: disable=E1101
         return url
 
     def html_id(self):
@@ -217,7 +226,7 @@ class Location(_LocationBase):
         Return a string with a version of the location that is safe for use in
         html id attributes
         """
-        id_string = "-".join(str(v) for v in self.list() if v is not None)
+        id_string = u"-".join(v for v in self.list() if v is not None)
         return Location.clean_for_html(id_string)
 
     def dict(self):
@@ -231,6 +240,9 @@ class Location(_LocationBase):
         return list(self)
 
     def __str__(self):
+        return str(self.url().encode("utf-8"))
+
+    def __unicode__(self):
         return self.url()
 
     def __repr__(self):
@@ -245,9 +257,23 @@ class Location(_LocationBase):
         Throws an InvalidLocationError is this location does not represent a course.
         """
         if self.category != 'course':
-            raise InvalidLocationError('Cannot call course_id for {0} because it is not of category course'.format(self))
+            raise InvalidLocationError(u'Cannot call course_id for {0} because it is not of category course'.format(self))
 
         return "/".join([self.org, self.course, self.name])
+
+    def _replace(self, **kwargs):
+        """
+        Return a new :class:`Location` with values replaced
+        by the values specified in `**kwargs`
+        """
+        for name, value in kwargs.iteritems():
+            if name == 'name':
+                _check_location_part(value, INVALID_CHARS_NAME)
+            else:
+                _check_location_part(value, INVALID_CHARS)
+
+        # namedtuple is an old-style class, so don't use super
+        return _LocationBase._replace(self, **kwargs)
 
     def replace(self, **kwargs):
         '''
@@ -430,7 +456,7 @@ class ModuleStoreReadBase(ModuleStoreRead):
         self,
         doc_store_config=None,  # ignore if passed up
         metadata_inheritance_cache_subsystem=None, request_cache=None,
-        modulestore_update_signal=None, xblock_mixins=(),
+        modulestore_update_signal=None, xblock_mixins=(), xblock_select=None,
         # temporary parms to enable backward compatibility. remove once all envs migrated
         db=None, collection=None, host=None, port=None, tz_aware=True, user=None, password=None
     ):
@@ -442,6 +468,7 @@ class ModuleStoreReadBase(ModuleStoreRead):
         self.modulestore_update_signal = modulestore_update_signal
         self.request_cache = request_cache
         self.xblock_mixins = xblock_mixins
+        self.xblock_select = xblock_select
 
     def _get_errorlog(self, location):
         """

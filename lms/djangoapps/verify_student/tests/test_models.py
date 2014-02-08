@@ -1,18 +1,25 @@
 # -*- coding: utf-8 -*-
-from datetime import timedelta
+from datetime import timedelta, datetime
 import json
+from xmodule.modulestore.tests.factories import CourseFactory
 from nose.tools import (
     assert_in, assert_is_none, assert_equals, assert_not_equals, assert_raises,
     assert_true, assert_false
 )
 from mock import MagicMock, patch
+import pytz
 from django.test import TestCase
+from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
+from django.test.utils import override_settings
 from django.conf import settings
 import requests
 import requests.exceptions
 
 from student.tests.factories import UserFactory
-from verify_student.models import SoftwareSecurePhotoVerification, VerificationException
+from verify_student.models import (
+    SoftwareSecurePhotoVerification, VerificationException,
+)
+from reverification.tests.factories import MidcourseReverificationWindowFactory
 from util.testing import UrlResetMixin
 import verify_student.models
 
@@ -208,6 +215,23 @@ class TestPhotoVerification(TestCase):
 
         return attempt
 
+    def test_fetch_photo_id_image(self):
+        user = UserFactory.create()
+        orig_attempt = SoftwareSecurePhotoVerification(user=user, window=None)
+        orig_attempt.save()
+
+        old_key = orig_attempt.photo_id_key
+
+        window = MidcourseReverificationWindowFactory(
+            course_id="ponies",
+            start_date=datetime.now(pytz.utc) - timedelta(days=5),
+            end_date=datetime.now(pytz.utc) + timedelta(days=5)
+        )
+        new_attempt = SoftwareSecurePhotoVerification(user=user, window=window)
+        new_attempt.save()
+        new_attempt.fetch_photo_id_image()
+        assert_equals(new_attempt.photo_id_key, old_key)
+
     def test_submissions(self):
         """Test that we set our status correctly after a submission."""
         # Basic case, things go well.
@@ -339,6 +363,37 @@ class TestPhotoVerification(TestCase):
         status = SoftwareSecurePhotoVerification.user_status(user)
         self.assertEquals(status, ('must_reverify', "No photo ID was provided."))
 
+        # test for correct status for reverifications
+        window = MidcourseReverificationWindowFactory()
+        reverify_status = SoftwareSecurePhotoVerification.user_status(user=user, window=window)
+        self.assertEquals(reverify_status, ('must_reverify', ''))
+
+        reverify_attempt = SoftwareSecurePhotoVerification(user=user, window=window)
+        reverify_attempt.status = 'approved'
+        reverify_attempt.save()
+
+        reverify_status = SoftwareSecurePhotoVerification.user_status(user=user, window=window)
+        self.assertEquals(reverify_status, ('approved', ''))
+
+        reverify_attempt.status = 'denied'
+        reverify_attempt.save()
+
+        reverify_status = SoftwareSecurePhotoVerification.user_status(user=user, window=window)
+        self.assertEquals(reverify_status, ('denied', ''))
+
+    def test_display(self):
+        user = UserFactory.create()
+        window = MidcourseReverificationWindowFactory()
+        attempt = SoftwareSecurePhotoVerification(user=user, window=window, status="denied")
+        attempt.save()
+
+        # We expect the verification to be displayed by default
+        self.assertEquals(SoftwareSecurePhotoVerification.display_status(user, window), True)
+
+        # Turn it off
+        SoftwareSecurePhotoVerification.display_off(user.id)
+        self.assertEquals(SoftwareSecurePhotoVerification.display_status(user, window), False)
+
     def test_parse_error_msg_success(self):
         user = UserFactory.create()
         attempt = SoftwareSecurePhotoVerification(user=user)
@@ -362,3 +417,101 @@ class TestPhotoVerification(TestCase):
             attempt.error_msg = msg
             parsed_error_msg = attempt.parsed_error_msg()
             self.assertEquals(parsed_error_msg, "There was an error verifying your ID photos.")
+
+
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+@patch.dict(settings.VERIFY_STUDENT, FAKE_SETTINGS)
+@patch('verify_student.models.S3Connection', new=MockS3Connection)
+@patch('verify_student.models.Key', new=MockKey)
+@patch('verify_student.models.requests.post', new=mock_software_secure_post)
+class TestMidcourseReverification(TestCase):
+    """ Tests for methods that are specific to midcourse SoftwareSecurePhotoVerification objects """
+    def setUp(self):
+        self.course_id = "MITx/999/Robot_Super_Course"
+        self.course = CourseFactory.create(org='MITx', number='999', display_name='Robot Super Course')
+        self.user = UserFactory.create()
+
+    def test_user_is_reverified_for_all(self):
+
+        # if there are no windows for a course, this should return True
+        self.assertTrue(SoftwareSecurePhotoVerification.user_is_reverified_for_all(self.course_id, self.user))
+
+        # first, make three windows
+        window1 = MidcourseReverificationWindowFactory(
+            course_id=self.course_id,
+            start_date=datetime.now(pytz.UTC) - timedelta(days=15),
+            end_date=datetime.now(pytz.UTC) - timedelta(days=13),
+        )
+
+        window2 = MidcourseReverificationWindowFactory(
+            course_id=self.course_id,
+            start_date=datetime.now(pytz.UTC) - timedelta(days=10),
+            end_date=datetime.now(pytz.UTC) - timedelta(days=8),
+        )
+
+        window3 = MidcourseReverificationWindowFactory(
+            course_id=self.course_id,
+            start_date=datetime.now(pytz.UTC) - timedelta(days=5),
+            end_date=datetime.now(pytz.UTC) - timedelta(days=3),
+        )
+
+        # make two SSPMidcourseReverifications for those windows
+        attempt1 = SoftwareSecurePhotoVerification(
+            status="approved",
+            user=self.user,
+            window=window1
+        )
+        attempt1.save()
+
+        attempt2 = SoftwareSecurePhotoVerification(
+            status="approved",
+            user=self.user,
+            window=window2
+        )
+        attempt2.save()
+
+        # should return False because only 2 of 3 windows have verifications
+        self.assertFalse(SoftwareSecurePhotoVerification.user_is_reverified_for_all(self.course_id, self.user))
+
+        attempt3 = SoftwareSecurePhotoVerification(
+            status="must_retry",
+            user=self.user,
+            window=window3
+        )
+        attempt3.save()
+
+        # should return False because the last verification exists BUT is not approved
+        self.assertFalse(SoftwareSecurePhotoVerification.user_is_reverified_for_all(self.course_id, self.user))
+
+        attempt3.status = "approved"
+        attempt3.save()
+
+        # should now return True because all windows have approved verifications
+        self.assertTrue(SoftwareSecurePhotoVerification.user_is_reverified_for_all(self.course_id, self.user))
+
+    def test_original_verification(self):
+        orig_attempt = SoftwareSecurePhotoVerification(user=self.user)
+        orig_attempt.save()
+        window = MidcourseReverificationWindowFactory(
+            course_id=self.course_id,
+            start_date=datetime.now(pytz.UTC) - timedelta(days=15),
+            end_date=datetime.now(pytz.UTC) - timedelta(days=13),
+        )
+        midcourse_attempt = SoftwareSecurePhotoVerification(user=self.user, window=window)
+        self.assertEquals(midcourse_attempt.original_verification(user=self.user), orig_attempt)
+
+    def test_user_has_valid_or_pending(self):
+        window = MidcourseReverificationWindowFactory(
+            course_id=self.course_id,
+            start_date=datetime.now(pytz.UTC) - timedelta(days=15),
+            end_date=datetime.now(pytz.UTC) - timedelta(days=13),
+        )
+
+        attempt = SoftwareSecurePhotoVerification(status="must_retry", user=self.user, window=window)
+        attempt.save()
+
+        assert_false(SoftwareSecurePhotoVerification.user_has_valid_or_pending(user=self.user, window=window))
+
+        attempt.status = "approved"
+        attempt.save()
+        assert_true(SoftwareSecurePhotoVerification.user_has_valid_or_pending(user=self.user, window=window))

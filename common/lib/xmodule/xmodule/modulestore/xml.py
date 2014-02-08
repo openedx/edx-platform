@@ -1,4 +1,5 @@
 import hashlib
+import itertools
 import json
 import logging
 import os
@@ -17,17 +18,17 @@ from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import make_error_tracker, exc_info_to_str
 from xmodule.course_module import CourseDescriptor
 from xmodule.mako_module import MakoDescriptorSystem
-from xmodule.x_module import XMLParsingSystem, XModuleDescriptor
+from xmodule.x_module import XMLParsingSystem, policy_key
 
 from xmodule.html_module import HtmlDescriptor
-from xblock.core import XBlock
 from xblock.fields import ScopeIds
 from xblock.field_data import DictFieldData
+from xblock.runtime import DictKeyValueStore, IdReader, IdGenerator
 
 from . import ModuleStoreReadBase, Location, XML_MODULESTORE_TYPE
 
 from .exceptions import ItemNotFoundError
-from .inheritance import compute_inherited_metadata
+from .inheritance import compute_inherited_metadata, inheriting_field_data
 
 edx_xml_parser = etree.XMLParser(dtd_validation=False, load_dtd=False,
                                  remove_comments=True, remove_blank_text=True)
@@ -49,7 +50,7 @@ def clean_out_mako_templating(xml_string):
 class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
     def __init__(self, xmlstore, course_id, course_dir,
                  error_tracker, parent_tracker,
-                 load_error_modules=True, **kwargs):
+                 load_error_modules=True, id_reader=None, **kwargs):
         """
         A class that handles loading from xml.  Does some munging to ensure that
         all elements have unique slugs.
@@ -59,6 +60,10 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
         self.unnamed = defaultdict(int)  # category -> num of new url_names for that category
         self.used_names = defaultdict(set)  # category -> set of used url_names
         self.org, self.course, self.url_name = course_id.split('/')
+        if id_reader is None:
+            id_reader = LocationReader()
+        id_generator = CourseLocationGenerator(self.org, self.course)
+
         # cdodge: adding the course_id as passed in for later reference rather than having to recomine the org/course/url_name
         self.course_id = course_id
         self.load_error_modules = load_error_modules
@@ -165,8 +170,10 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                 make_name_unique(xml_data)
 
                 descriptor = create_block_from_xml(
-                    etree.tostring(xml_data, encoding='unicode'), self, self.org,
-                    self.course, xmlstore.default_class)
+                    etree.tostring(xml_data, encoding='unicode'),
+                    self,
+                    id_generator,
+                )
             except Exception as err:
                 if not self.load_error_modules:
                     raise
@@ -174,30 +181,34 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
                 # Didn't load properly.  Fall back on loading as an error
                 # descriptor.  This should never error due to formatting.
 
-                msg = "Error loading from xml. " + unicode(err)[:200]
-                log.warning(msg)
-                # Normally, we don't want lots of exception traces in our logs from common
-                # content problems.  But if you're debugging the xml loading code itself,
-                # uncomment the next line.
-                #   log.exception(msg)
+                msg = "Error loading from xml. %s"
+                log.warning(
+                    msg,
+                    unicode(err)[:200],
+                    # Normally, we don't want lots of exception traces in our logs from common
+                    # content problems.  But if you're debugging the xml loading code itself,
+                    # uncomment the next line.
+                    # exc_info=True
+                )
+
+                msg = msg % (unicode(err)[:200])
 
                 self.error_tracker(msg)
                 err_msg = msg + "\n" + exc_info_to_str(sys.exc_info())
                 descriptor = ErrorDescriptor.from_xml(
                     xml,
                     self,
-                    self.org,
-                    self.course,
+                    id_generator,
                     err_msg
                 )
 
             descriptor.data_dir = course_dir
 
-            xmlstore.modules[course_id][descriptor.location] = descriptor
+            xmlstore.modules[course_id][descriptor.scope_ids.usage_id] = descriptor
 
-            if hasattr(descriptor, 'children'):
+            if descriptor.has_children:
                 for child in descriptor.get_children():
-                    parent_tracker.add_parent(child.location, descriptor.location)
+                    parent_tracker.add_parent(child.scope_ids.usage_id, descriptor.scope_ids.usage_id)
 
             # After setting up the descriptor, save any changes that we have
             # made to attributes on the descriptor to the underlying KeyValueStore.
@@ -205,50 +216,95 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
             return descriptor
 
         render_template = lambda template, context: u''
+
         # TODO (vshnayder): we are somewhat architecturally confused in the loading code:
         # load_item should actually be get_instance, because it expects the course-specific
         # policy to be loaded.  For now, just add the course_id here...
-        load_item = lambda location: xmlstore.get_instance(course_id, location)
+        def load_item(location):
+            """Return the XBlock for the specified location"""
+            return xmlstore.get_instance(course_id, Location(location))
+
         resources_fs = OSFS(xmlstore.data_dir / course_dir)
+
         super(ImportSystem, self).__init__(
             load_item=load_item,
             resources_fs=resources_fs,
             render_template=render_template,
             error_tracker=error_tracker,
             process_xml=process_xml,
+            id_reader=id_reader,
             **kwargs
         )
 
+    # id_generator is ignored, because each ImportSystem is already local to
+    # a course, and has it's own id_generator already in place
+    def add_node_as_child(self, block, node, id_generator):
+        child_block = self.process_xml(etree.tostring(node))
+        block.children.append(child_block.scope_ids.usage_id)
 
-def create_block_from_xml(xml_data, system, org=None, course=None, default_class=None):
+
+class LocationReader(IdReader):
+    """
+    IdReader for definition and usage ids that are Locations
+    """
+    def get_definition_id(self, usage_id):
+        return usage_id
+
+    def get_block_type(self, def_id):
+        location = def_id
+        return location.category
+
+
+class CourseLocationGenerator(IdGenerator):
+    """
+    IdGenerator for Location-based definition ids and usage ids
+    based within a course
+    """
+    def __init__(self, org, course):
+        self.org = org
+        self.course = course
+        self.autogen_ids = itertools.count(0)
+
+    def create_usage(self, def_id):
+        return Location(def_id)
+
+    def create_definition(self, block_type, slug=None):
+        assert block_type is not None
+        if slug is None:
+            slug = 'autogen_{}_{}'.format(block_type, self.autogen_ids.next())
+        location = Location('i4x', self.org, self.course, block_type, slug)
+        return location
+
+
+def create_block_from_xml(xml_data, system, id_generator):
     """
     Create an XBlock instance from XML data.
 
-    `xml_data' is a string containing valid xml.
+    Args:
+        xml_data (string): A string containing valid xml.
+        system (XMLParsingSystem): The :class:`.XMLParsingSystem` used to connect the block
+            to the outside world.
+        id_generator (IdGenerator): An :class:`~xblock.runtime.IdGenerator` that
+            will be used to construct the usage_id and definition_id for the block.
 
-    `system` is an XMLParsingSystem.
-
-    `org` and `course` are optional strings that will be used in the generated
-    block's url identifiers.
-
-    `default_class` is the class to instantiate of the XML indicates a class
-    that can't be loaded.
-
-    Returns the fully instantiated XBlock.
+    Returns:
+        XBlock: The fully instantiated :class:`~xblock.core.XBlock`.
 
     """
     node = etree.fromstring(xml_data)
-    raw_class = XModuleDescriptor.load_class(node.tag, default_class)
+    raw_class = system.load_block_type(node.tag)
     xblock_class = system.mixologist.mix(raw_class)
 
     # leave next line commented out - useful for low-level debugging
     # log.debug('[create_block_from_xml] tag=%s, class=%s' % (node.tag, xblock_class))
 
-    url_name = node.get('url_name', node.get('slug'))
-    location = Location('i4x', org, course, node.tag, url_name)
+    block_type = node.tag
+    url_name = node.get('url_name')
+    def_id = id_generator.create_definition(block_type, url_name)
+    usage_id = id_generator.create_usage(def_id)
 
-    scope_ids = ScopeIds(None, location.category, location, location)
-    xblock = xblock_class.parse_xml(node, system, scope_ids)
+    scope_ids = ScopeIds(None, block_type, def_id, usage_id)
+    xblock = xblock_class.parse_xml(node, system, scope_ids, id_generator)
     return xblock
 
 
@@ -265,10 +321,8 @@ class ParentTracker(object):
         """
         Add a parent of child location to the set of parents.  Duplicate calls have no effect.
 
-        child and parent must be something that can be passed to Location.
+        child and parent must be :class:`.Location` instances.
         """
-        child = Location(child)
-        parent = Location(parent)
         s = self._parents.setdefault(child, set())
         s.add(parent)
 
@@ -276,7 +330,6 @@ class ParentTracker(object):
         """
         returns True iff child has some parents.
         """
-        child = Location(child)
         return child in self._parents
 
     def make_known(self, location):
@@ -288,7 +341,6 @@ class ParentTracker(object):
         """
         Return a list of the parents of this child.  If not is_known(child), will throw a KeyError
         """
-        child = Location(child)
         return list(self._parents[child])
 
 
@@ -326,6 +378,9 @@ class XMLModuleStore(ModuleStoreReadBase):
 
         self.parent_trackers = defaultdict(ParentTracker)
 
+        # All field data will be stored in an inheriting field data.
+        self.field_data = inheriting_field_data(kvs=DictKeyValueStore())
+
         # If we are specifically asked for missing courses, that should
         # be an error.  If we are asked for "all" courses, find the ones
         # that have a course.xml. We sort the dirs in alpha order so we always
@@ -357,8 +412,8 @@ class XMLModuleStore(ModuleStoreReadBase):
 
         if course_descriptor is not None and not isinstance(course_descriptor, ErrorDescriptor):
             self.courses[course_dir] = course_descriptor
-            self._location_errors[course_descriptor.location] = errorlog
-            self.parent_trackers[course_descriptor.id].make_known(course_descriptor.location)
+            self._location_errors[course_descriptor.scope_ids.usage_id] = errorlog
+            self.parent_trackers[course_descriptor.id].make_known(course_descriptor.scope_ids.usage_id)
         else:
             # Didn't load course.  Instead, save the errors elsewhere.
             self.errored_courses[course_dir] = errorlog
@@ -368,7 +423,8 @@ class XMLModuleStore(ModuleStoreReadBase):
         String representation - for debugging
         '''
         return '<XMLModuleStore data_dir=%r, %d courses, %d modules>' % (
-            self.data_dir, len(self.courses), len(self.modules))
+            self.data_dir, len(self.courses), len(self.modules)
+        )
 
     def load_policy(self, policy_path, tracker):
         """
@@ -451,6 +507,13 @@ class XMLModuleStore(ModuleStoreReadBase):
                                      "(or 'name') set.  Set url_name.")
 
             course_id = CourseDescriptor.make_id(org, course, url_name)
+
+            def get_policy(usage_id):
+                """
+                Return the policy dictionary to be applied to the specified XBlock usage
+                """
+                return policy.get(policy_key(usage_id), {})
+
             system = ImportSystem(
                 xmlstore=self,
                 course_id=course_id,
@@ -458,8 +521,11 @@ class XMLModuleStore(ModuleStoreReadBase):
                 error_tracker=tracker,
                 parent_tracker=self.parent_trackers[course_id],
                 load_error_modules=self.load_error_modules,
-                policy=policy,
+                get_policy=get_policy,
                 mixins=self.xblock_mixins,
+                default_class=self.default_class,
+                select=self.xblock_select,
+                field_data=self.field_data,
             )
 
             course_descriptor = system.process_xml(etree.tostring(course_data, encoding='unicode'))
@@ -507,9 +573,9 @@ class XMLModuleStore(ModuleStoreReadBase):
                     html = f.read().decode('utf-8')
                     # tabs are referenced in policy.json through a 'slug' which is just the filename without the .html suffix
                     slug = os.path.splitext(os.path.basename(filepath))[0]
-                    loc = Location('i4x', course_descriptor.location.org, course_descriptor.location.course, category, slug)
-                    module = system.construct_xblock_from_class(
-                        HtmlDescriptor,
+                    loc = course_descriptor.scope_ids.usage_id.replace(category=category, name=slug)
+                    module = system.construct_xblock(
+                        category,
                         # We're loading a descriptor, so student_id is meaningless
                         # We also don't have separate notions of definition and usage ids yet,
                         # so we use the location for both
@@ -525,7 +591,7 @@ class XMLModuleStore(ModuleStoreReadBase):
                                 module.display_name = tab['name']
                     module.data_dir = course_dir
                     module.save()
-                    self.modules[course_descriptor.id][module.location] = module
+                    self.modules[course_descriptor.id][module.scope_ids.usage_id] = module
                 except Exception, e:
                     logging.exception("Failed to load %s. Skipping... \
                             Exception: %s", filepath, unicode(e))

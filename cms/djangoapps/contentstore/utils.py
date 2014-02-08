@@ -13,10 +13,10 @@ from xmodule.modulestore import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from django_comment_common.utils import unseed_permissions_roles
-from auth.authz import _delete_course_group
 from xmodule.modulestore.store_utilities import delete_course
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.draft import DIRECT_ONLY_CATEGORIES
+from student.roles import CourseInstructorRole, CourseStaffRole
 
 
 log = logging.getLogger(__name__)
@@ -35,7 +35,7 @@ def delete_course_and_groups(course_id, commit=False):
     module_store = modulestore('direct')
     content_store = contentstore()
 
-    org, course_num, run = course_id.split("/")
+    org, course_num, _ = course_id.split("/")
     module_store.ignore_write_events_on_courses.append('{0}/{1}'.format(org, course_num))
 
     loc = CourseDescriptor.id_to_location(course_id)
@@ -47,7 +47,10 @@ def delete_course_and_groups(course_id, commit=False):
         # in the django layer, we need to remove all the user permissions groups associated with this course
         if commit:
             try:
-                _delete_course_group(loc)
+                staff_role = CourseStaffRole(loc)
+                staff_role.remove_users(*staff_role.users_with_role())
+                instructor_role = CourseInstructorRole(loc)
+                instructor_role.remove_users(*instructor_role.users_with_role())
             except Exception as err:
                 log.error("Error in deleting course groups for {0}: {1}".format(loc, err))
 
@@ -140,7 +143,7 @@ def get_lms_link_for_item(location, preview=False, course_id=None):
         else:
             lms_base = settings.LMS_BASE
 
-        lms_link = "//{lms_base}/courses/{course_id}/jump_to/{location}".format(
+        lms_link = u"//{lms_base}/courses/{course_id}/jump_to/{location}".format(
             lms_base=lms_base,
             course_id=course_id,
             location=Location(location)
@@ -176,7 +179,7 @@ def get_lms_link_for_about_page(location):
         about_base = None
 
     if about_base is not None:
-        lms_link = "//{about_base_url}/courses/{course_id}/about".format(
+        lms_link = u"//{about_base_url}/courses/{course_id}/about".format(
             about_base_url=about_base,
             course_id=Location(location).course_id
         )
@@ -188,7 +191,7 @@ def get_lms_link_for_about_page(location):
 
 def course_image_url(course):
     """Returns the image url for the course."""
-    loc = course.location._replace(tag='c4x', category='asset', name=course.course_image)
+    loc = StaticContent.compute_location(course.location.org, course.location.course, course.course_image)
     path = StaticContent.get_url_path_from_location(loc)
     return path
 

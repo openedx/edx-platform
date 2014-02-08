@@ -1,4 +1,5 @@
 <%! from django.utils.translation import ugettext as _ %>
+<%! from microsite_configuration.middleware import MicrositeConfiguration %>
 
 <%inherit file="main.html" />
 
@@ -13,7 +14,7 @@
 <%! from datetime import date %>
 <%! import calendar %>
 
-<%block name="title"><title>${_("Register for {platform_name}").format(platform_name=settings.PLATFORM_NAME)}</title></%block>
+<%block name="pagetitle">${_("Register for {platform_name}").format(platform_name=platform_name)}</%block>
 
 <%block name="js_extra">
   <script type="text/javascript">
@@ -52,20 +53,17 @@
       });
 
       $('#register-form').on('ajax:success', function(event, json, xhr) {
-        if(json.success) {
-          if(json.redirect_url){
-            location.href=json.redirect_url;
-          }
-          else {
-            location.href="${reverse('dashboard')}";
-          }
-       } else {
-         toggleSubmitButton(true);
-         $('.status.message.submission-error').addClass('is-shown').focus();
-         $('.status.message.submission-error .message-copy').html(json.value).stop().css("display", "block");
-         $(".field-error").removeClass('field-error');
-         $("[data-field='"+json.field+"']").addClass('field-error')
-       }
+        var url = json.redirect_url || "${reverse('dashboard')}";
+        location.href = url;
+      });
+
+      $('#register-form').on('ajax:error', function(event, jqXHR, textStatus) {
+        toggleSubmitButton(true);
+        json = $.parseJSON(jqXHR.responseText);
+        $('.status.message.submission-error').addClass('is-shown').focus();
+        $('.status.message.submission-error .message-copy').html(json.value).stop().css("display", "block");
+        $(".field-error").removeClass('field-error');
+        $("[data-field='"+json.field+"']").addClass('field-error')
       });
     })(this);
 
@@ -76,13 +74,13 @@
         $submitButton.
           removeClass('is-disabled').
           removeProp('disabled').
-          html("${_('Create My {platform_name} Account').format(platform_name=settings.PLATFORM_NAME)}");
+          html("${_('Create My {platform_name} Account').format(platform_name=platform_name)}");
       }
       else {
         $submitButton.
           addClass('is-disabled').
           prop('disabled', true).
-          html(gettext('Processing your account information &hellip;'));
+          text("${_(u'Processing your account information…')}");
       }
     }
   </script>
@@ -92,7 +90,7 @@
   <header>
     <h1 class="title">
       <span class="title-super">${_("Welcome!")}</span>
-      <span class="title-sub">${_("Register below to create your {platform_name} account").format(platform_name=settings.PLATFORM_NAME)}</span>
+      <span class="title-sub">${_("Register below to create your {platform_name} account").format(platform_name=platform_name)}</span>
     </h1>
   </header>
 </section>
@@ -104,11 +102,11 @@
 
       <!-- status messages -->
       <div role="alert" class="status message">
-        <h3 class="message-title">${_("We're sorry, {platform_name} enrollment is not available in your region").format(platform_name=settings.PLATFORM_NAME)}</h3>
+        <h3 class="message-title">${_("We're sorry, {platform_name} enrollment is not available in your region").format(platform_name=platform_name)}</h3>
       </div>
 
       <div role="alert" class="status message submission-error" tabindex="-1">
-        <h3 class="message-title">${_("The following errors occured while processing your registration:")} </h3>
+        <h3 class="message-title">${_("The following errors occurred while processing your registration:")} </h3>
         <ul class="message-copy"> </ul>
       </div>
 
@@ -189,14 +187,33 @@
       </div>
 
       <div class="group group-form group-form-secondary group-form-personalinformation">
-        <h2 class="sr">${_("Optional Personal Information")}</h2>
+        <h2 class="sr">${_("Extra Personal Information")}</h2>
 
         <ol class="list-input">
-          % if 'level_of_education' in settings.REGISTRATION_OPTIONAL_FIELDS:
+          % if settings.REGISTRATION_EXTRA_FIELDS['city'] != 'hidden':
+          <li class="field ${settings.REGISTRATION_EXTRA_FIELDS['city']} text" id="field-city">
+            <label for="city">${_('City')}</label>
+            <input id="city" type="text" name="city" value="" placeholder="${_('example: New York')}" aria-describedby="city-tip" ${'required aria-required="true"' if settings.REGISTRATION_EXTRA_FIELDS['city'] == 'required' else ''} />
+          </li>
+          % endif
+          % if settings.REGISTRATION_EXTRA_FIELDS['country'] != 'hidden':
           <li class="field-group">
-            <div class="field select" id="field-education-level">
+          <div class="field ${settings.REGISTRATION_EXTRA_FIELDS['country']} select" id="field-country">
+              <label for="country">${_("Country")}</label>
+              <select id="country" name="country" ${'required aria-required="true"' if settings.REGISTRATION_EXTRA_FIELDS['country'] == 'required' else ''}>
+                <option value="">--</option>
+                %for code, country_name in COUNTRIES:
+                <option value="${code}">${ unicode(country_name) }</option>
+                %endfor
+              </select>
+            </div>
+          </li>
+          % endif
+          % if settings.REGISTRATION_EXTRA_FIELDS['level_of_education'] != 'hidden':
+          <li class="field-group">
+          <div class="field ${settings.REGISTRATION_EXTRA_FIELDS['level_of_education']} select" id="field-education-level">
               <label for="education-level">${_("Highest Level of Education Completed")}</label>
-              <select id="education-level" name="level_of_education">
+              <select id="education-level" name="level_of_education" ${'required aria-required="true"' if settings.REGISTRATION_EXTRA_FIELDS['level_of_education'] == 'required' else ''}>
                 <option value="">--</option>
                 %for code, ed_level in UserProfile.LEVEL_OF_EDUCATION_CHOICES:
                 <option value="${code}">${ed_level}</option>
@@ -205,11 +222,11 @@
             </div>
           </li>
           % endif
-          % if 'gender' in settings.REGISTRATION_OPTIONAL_FIELDS:
+          % if settings.REGISTRATION_EXTRA_FIELDS['gender'] != 'hidden':
           <li class="field-group">
-            <div class="field select" id="field-gender">
+            <div class="field ${settings.REGISTRATION_EXTRA_FIELDS['gender']} select" id="field-gender">
               <label for="gender">${_("Gender")}</label>
-              <select id="gender" name="gender">
+              <select id="gender" name="gender" ${'required aria-required="true"' if settings.REGISTRATION_EXTRA_FIELDS['gender'] == 'required' else ''}>
                 <option value="">--</option>
                 %for code, gender in UserProfile.GENDER_CHOICES:
                 <option value="${code}">${gender}</option>
@@ -218,11 +235,11 @@
             </div>
           </li>
           % endif
-          % if 'year_of_birth' in settings.REGISTRATION_OPTIONAL_FIELDS:
+          % if settings.REGISTRATION_EXTRA_FIELDS['year_of_birth'] != 'hidden':
           <li class="field-group">
-            <div class="field select" id="field-yob">
+            <div class="field ${settings.REGISTRATION_EXTRA_FIELDS['year_of_birth']} select" id="field-yob">
               <label for="yob">${_("Year of Birth")}</label>
-              <select id="yob" name="year_of_birth">
+              <select id="yob" name="year_of_birth" ${'required aria-required="true"' if settings.REGISTRATION_EXTRA_FIELDS['year_of_birth'] == 'required' else ''}>
                 <option value="">--</option>
                 %for year in UserProfile.VALID_YEARS:
                 <option value="${year}">${year}</option>
@@ -235,20 +252,20 @@
       </div>
 
       <div class="group group-form group-form-personalinformation2">
-        <h2 class="sr">${_("Optional Personal Information")}</h2>
+        <h2 class="sr">${_("Extra Personal Information")}</h2>
 
         <ol class="list-input">
-          % if 'mailing_address' in settings.REGISTRATION_OPTIONAL_FIELDS:
-          <li class="field text" id="field-address-mailing">
+          % if settings.REGISTRATION_EXTRA_FIELDS['mailing_address'] != 'hidden':
+          <li class="field ${settings.REGISTRATION_EXTRA_FIELDS['mailing_address']} text" id="field-address-mailing">
             <label for="address-mailing">${_("Mailing Address")}</label>
-            <textarea id="address-mailing" name="mailing_address" value=""></textarea>
+            <textarea id="address-mailing" name="mailing_address" value="" ${'required aria-required="true"' if settings.REGISTRATION_EXTRA_FIELDS['mailing_address'] == 'required' else ''}></textarea>
           </li>
           % endif
 
-          % if 'goals' in settings.REGISTRATION_OPTIONAL_FIELDS:
-          <li class="field text" id="field-goals">
-            <label for="goals">${_("Please share with us your reasons for registering with {platform_name}").format(platform_name=settings.PLATFORM_NAME)}</label>
-            <textarea id="goals" name="goals" value=""></textarea>
+          % if settings.REGISTRATION_EXTRA_FIELDS['goals'] != 'hidden':
+          <li class="field ${settings.REGISTRATION_EXTRA_FIELDS['goals']} text" id="field-goals">
+            <label for="goals">${_("Please share with us your reasons for registering with {platform_name}").format(platform_name=platform_name)}</label>
+            <textarea id="goals" name="goals" value="" ${'required aria-required="true"' if settings.REGISTRATION_EXTRA_FIELDS['goals'] == 'required' else ''}></textarea>
           </li>
           % endif
         </ol>
@@ -261,7 +278,6 @@
           <li class="field-group">
 
             % if has_extauth_info is UNDEFINED or ask_for_tos :
-
             <div class="field required checkbox" id="field-tos">
               <input id="tos-yes" type="checkbox" name="terms_of_service" value="true" required aria-required="true" />
               <label for="tos-yes">${_('I agree to the {link_start1}Terms of Service{link_end} and {link_start2}Privacy Policy{link_end}').format(
@@ -270,10 +286,10 @@
                 link_start2='<a href="{url}#privacy" class="new-vp">'.format(url=marketing_link('TOS')),
                 )}</label>
             </div>
-
             % endif
 
-            <div class="field required checkbox" id="field-honorcode">
+            % if settings.REGISTRATION_EXTRA_FIELDS['honor_code'] != 'hidden':
+            <div class="field ${settings.REGISTRATION_EXTRA_FIELDS['honor_code']} checkbox" id="field-honorcode">
               <input id="honorcode-yes" type="checkbox" name="honor_code" value="true" />
               <%
                 ## TODO: provide a better way to override these links
@@ -286,6 +302,7 @@
                 link_start='<a href="{url}" class="new-vp">'.format(url=honor_code_path),
                 link_end='</a>')}</label>
             </div>
+            % endif
           </li>
         </ol>
       </div>
@@ -302,50 +319,13 @@
   </section>
 
   <aside role="complementary">
-    <header>
-      <h3 class="sr">${_("Registration Help")}</h3>
-    </header>
 
-    % if has_extauth_info is UNDEFINED:
+<%
+  # allow for microsite overrides on the registration sidebars, otherwise default to pre-existing ones
+  sidebar_file = MicrositeConfiguration.get_microsite_template_path('register-sidebar.html')
+%>
 
-    <div class="cta">
-      <h3>${_("Already registered?")}</h3>
-      <p class="instructions">
-        <a href="${reverse('signin_user')}${login_query()}">
-          ${_("Click here to log in.")}
-        </a>
-      </p>
-    </div>
+    <%include file="${sidebar_file}" />
 
-    % endif
-
-    ## TODO: Use a %block tag or something to allow themes to
-    ##       override in a more generalizable fashion.
-    % if not self.stanford_theme_enabled():
-      <div class="cta cta-welcome">
-        <h3>${_("Welcome to {platform_name}").format(platform_name=settings.PLATFORM_NAME)}</h3>
-        <p>${_("Registering with {platform_name} gives you access to all of our current and future free courses. Not ready to take a course just yet? Registering puts you on our mailing list - we will update you as courses are added.").format(platform_name=settings.PLATFORM_NAME)}</p>
-      </div>
-    % endif
-
-    <div class="cta cta-nextsteps">
-      <h3>${_("Next Steps")}</h3>
-      % if self.stanford_theme_enabled():
-        <p>${_("You will receive an activation email.  You must click on the activation link to complete the process.  Don't see the email?  Check your spam folder and mark emails from class.stanford.edu as 'not spam', since you'll want to be able to receive email from your courses.")}</p>
-      % else:
-      <p>${_("As part of joining {platform_name}, you will receive an activation email.  You must click on the activation link to complete the process.  Don't see the email?  Check your spam folder and mark {platform_name} emails as 'not spam'.  At {platform_name}, we communicate mostly through email.").format(platform_name=settings.PLATFORM_NAME)}</p>
-      % endif
-    </div>
-
-    % if settings.MKTG_URL_LINK_MAP.get('FAQ'):
-      <div class="cta cta-help">
-        <h3>${_("Need Help?")}</h3>
-        <p>${_("Need help in registering with {platform_name}?").format(platform_name=settings.PLATFORM_NAME)}
-          <a href="${marketing_link('FAQ')}">
-              ${_("View our FAQs for answers to commonly asked questions.")}
-          </a>
-          ${_("Once registered, most questions can be answered in the course specific discussion forums or through the FAQs.")}</p>
-      </div>
-    % endif
   </aside>
 </section>

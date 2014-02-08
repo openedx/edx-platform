@@ -1,0 +1,5 @@
+path.py
+Django >=1.4,<1.5
+pytz
+-e git+https://github.com/edx/XBlock.git#egg=XBlock
+lxml

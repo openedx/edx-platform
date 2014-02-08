@@ -308,11 +308,17 @@ describe 'Problem', ->
         states = [
           {
             desc: 'rectangle is drawn correctly',
-            data: {'rectangle': '(10,10)-(30,30)'}
+            data: {
+              'rectangle': '(10,10)-(30,30)',
+              'regions': null
+            }
           },
           {
             desc: 'region is drawn correctly',
-            data: {'regions': '[[10,10],[30,30],[70,30],[20,30]]'}
+            data: {
+              'rectangle': null,
+              'regions': '[[10,10],[30,30],[70,30],[20,30]]'
+            }
           },
           {
             desc: 'mixed shapes are drawn correctly',
@@ -387,7 +393,7 @@ describe 'Problem', ->
           ctx.lineWidth = "2";
 
           $.each coords, (key, value) =>
-            types[key](value) if types[key]?
+            types[key](value) if types[key]? and value
 
           return canvas
 

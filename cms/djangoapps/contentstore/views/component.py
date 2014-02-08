@@ -14,13 +14,14 @@ from xmodule.modulestore.django import modulestore
 from xmodule.util.date_utils import get_default_time_display
 from xmodule.modulestore.django import loc_mapper
 from xmodule.modulestore.locator import BlockUsageLocator
-from xmodule.x_module import XModuleDescriptor
 
+from xblock.core import XBlock
 from xblock.django.request import webob_to_django_response, django_to_webob_request
 from xblock.exceptions import NoSuchHandlerError
 from xblock.fields import Scope
 from xblock.plugin import PluginMissingError
 from xblock.runtime import Mixologist
+from xmodule.x_module import prefer_xmodules
 
 from lms.lib.xblock.runtime import unquote_slashes
 
@@ -28,7 +29,7 @@ from contentstore.utils import get_lms_link_for_item, compute_unit_state, UnitSt
 
 from models.settings.course_grading import CourseGradingModel
 
-from .access import has_access
+from .access import has_course_access
 
 __all__ = ['OPEN_ENDED_COMPONENT_TYPES',
            'ADVANCED_COMPONENT_POLICY_KEY',
@@ -44,12 +45,20 @@ COMPONENT_TYPES = ['discussion', 'html', 'problem', 'video']
 
 OPEN_ENDED_COMPONENT_TYPES = ["combinedopenended", "peergrading"]
 NOTE_COMPONENT_TYPES = ['notes']
-ADVANCED_COMPONENT_TYPES = [
-    'annotatable',
-    'word_cloud',
-    'graphical_slider_tool',
-    'lti',
-] + OPEN_ENDED_COMPONENT_TYPES + NOTE_COMPONENT_TYPES
+
+if settings.FEATURES.get('ALLOW_ALL_ADVANCED_COMPONENTS'):
+    ADVANCED_COMPONENT_TYPES = sorted(set(name for name, class_ in XBlock.load_classes()) - set(COMPONENT_TYPES))
+else:
+
+    ADVANCED_COMPONENT_TYPES = [
+        'annotatable',
+        'textannotation',  # module for annotating text (with annotation table)
+        'videoannotation',  # module for annotating video (with annotation table)
+        'word_cloud',
+        'graphical_slider_tool',
+        'lti',
+    ] + OPEN_ENDED_COMPONENT_TYPES + NOTE_COMPONENT_TYPES
+
 ADVANCED_COMPONENT_CATEGORY = 'advanced'
 ADVANCED_COMPONENT_POLICY_KEY = 'advanced_modules'
 
@@ -138,7 +147,7 @@ def _load_mixed_class(category):
     """
     Load an XBlock by category name, and apply all defined mixins
     """
-    component_class = XModuleDescriptor.load_class(category)
+    component_class = XBlock.load_class(category, select=prefer_xmodules)
     mixologist = Mixologist(settings.XBLOCK_MIXINS)
     return mixologist.mix(component_class)
 
@@ -258,8 +267,7 @@ def unit_handler(request, tag=None, package_id=None, branch=None, version_guid=N
         preview_lms_base = settings.FEATURES.get('PREVIEW_LMS_BASE')
 
         preview_lms_link = (
-            '//{preview_lms_base}/courses/{org}/{course}/'
-            '{course_name}/courseware/{section}/{subsection}/{index}'
+            u'//{preview_lms_base}/courses/{org}/{course}/{course_name}/courseware/{section}/{subsection}/{index}'
         ).format(
             preview_lms_base=preview_lms_base,
             lms_base=settings.LMS_BASE,
@@ -304,7 +312,7 @@ def _get_item_in_course(request, locator):
 
     Verifies that the caller has permission to access this item.
     """
-    if not has_access(request.user, locator):
+    if not has_course_access(request.user, locator):
         raise PermissionDenied()
 
     old_location = loc_mapper().translate_locator_to_location(locator)

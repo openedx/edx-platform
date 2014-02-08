@@ -3,9 +3,21 @@
 
 <%namespace name='static' file='../static_content.html'/>
 
-<%block name="title"><title>${_("Courses")}</title></%block>
+<%block name="pagetitle">${_("Courses")}</%block>
+<%! from microsite_configuration.middleware import MicrositeConfiguration %>
 
 <section class="find-courses">
+
+<%
+  course_index_overlay_text = MicrositeConfiguration.get_microsite_configuration_value('course_index_overlay_text', _("Explore free courses from leading universities."))
+
+  # not sure why this is, but if I use static.url('images/edx_bw.png') then the HTML rendering
+  # of this template goes wonky
+
+  logo_file = MicrositeConfiguration.get_microsite_configuration_value(
+    'course_index_overlay_logo_file', settings.STATIC_URL + 'images/edx_bw.png')
+%>
+
   <header class="search">
     <div class="inner-wrapper main-search">
       <hgroup>
@@ -13,13 +25,13 @@
           % if self.stanford_theme_enabled():
             <img src="${static.url('themes/stanford/images/seal.png')}" alt="Stanford Seal Logo" />
           % else:
-            <img src="${static.url('images/edx_bw.png')}" alt="Black and White edX Logo" />
+            <img src='${logo_file}' alt="${MicrositeConfiguration.get_microsite_configuration_value('platform_name', settings.PLATFORM_NAME)} Logo" />
           % endif
         </div>
         % if self.stanford_theme_enabled():
           <h2>${_("Public courses from {university_name}!").format(university_name="Stanford University")}</h2>
         % else:
-          <h2>${_("Explore free courses from leading universities.")}</h2>
+          <h2>${course_index_overlay_text}</h2>
         % endif
       </hgroup>
     </div>

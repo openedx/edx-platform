@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.core.context_processors import csrf
 from django.contrib.auth.models import User
+from django.views.decorators.http import require_GET
 import newrelic.agent
 
 from edxmako.shortcuts import render_to_response
@@ -38,7 +39,6 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
         'sort_key': 'date',
         'sort_order': 'desc',
         'text': '',
-        'tags': '',
         'commentable_id': discussion_id,
         'course_id': course_id,
         'user_id': request.user.id,
@@ -80,7 +80,7 @@ def get_threads(request, course_id, discussion_id=None, per_page=THREADS_PER_PAG
                               strip_none(extract(request.GET,
                                                  ['page', 'sort_key',
                                                   'sort_order', 'text',
-                                                  'tags', 'commentable_ids', 'flagged'])))
+                                                  'commentable_ids', 'flagged'])))
 
     threads, page, num_pages = cc.Thread.search(query_params)
 
@@ -132,7 +132,7 @@ def inline_discussion(request, course_id, discussion_id):
     cohorts_list = list()
 
     if is_cohorted:
-        cohorts_list.append({'name': 'All Groups', 'id': None})
+        cohorts_list.append({'name': _('All Groups'), 'id': None})
 
         #if you're a mod, send all cohorts and let you pick
 
@@ -201,9 +201,6 @@ def forum_form_discussion(request, course_id):
         #    query_params={'follower_id': request.user.id},
         #)
 
-        #trending_tags = cc.search_trending_tags(
-        #    course_id,
-        #)
         with newrelic.agent.FunctionTrace(nr_transaction, "get_cohort_info"):
             cohorts = get_course_cohorts(course_id)
             cohorted_commentables = get_cohorted_commentables(course_id)
@@ -214,7 +211,6 @@ def forum_form_discussion(request, course_id):
             'csrf': csrf(request)['csrf_token'],
             'course': course,
             #'recent_active_threads': recent_active_threads,
-            #'trending_tags': trending_tags,
             'staff_access': has_access(request.user, course, 'staff'),
             'threads': saxutils.escape(json.dumps(threads), escapedict),
             'thread_pages': query_params['num_pages'],
@@ -234,6 +230,7 @@ def forum_form_discussion(request, course_id):
         return render_to_response('discussion/index.html', context)
 
 
+@require_GET
 @login_required
 def single_thread(request, course_id, discussion_id, thread_id):
     nr_transaction = newrelic.agent.current_transaction()
@@ -242,19 +239,20 @@ def single_thread(request, course_id, discussion_id, thread_id):
     cc_user = cc.User.from_django_user(request.user)
     user_info = cc_user.to_dict()
 
-    thread = cc.Thread.find(thread_id).retrieve(recursive=True, user_id=request.user.id)
+    thread = cc.Thread.find(thread_id).retrieve(
+        recursive=True,
+        user_id=request.user.id,
+        response_skip=request.GET.get("resp_skip"),
+        response_limit=request.GET.get("resp_limit")
+    )
 
     if request.is_ajax():
         with newrelic.agent.FunctionTrace(nr_transaction, "get_annotated_content_infos"):
             annotated_content_info = utils.get_annotated_content_infos(course_id, thread, request.user, user_info=user_info)
-        context = {'thread': thread.to_dict(), 'course_id': course_id}
-        # TODO: Remove completely or switch back to server side rendering
-        # html = render_to_string('discussion/_ajax_single_thread.html', context)
         content = utils.safe_content(thread.to_dict())
         with newrelic.agent.FunctionTrace(nr_transaction, "add_courseware_context"):
             add_courseware_context([content], course)
         return utils.JsonResponse({
-            #'html': html,
             'content': content,
             'annotated_content_info': annotated_content_info,
         })
@@ -287,10 +285,6 @@ def single_thread(request, course_id, discussion_id, thread_id):
         #    query_params={'follower_id': request.user.id},
         #)
 
-        #trending_tags = cc.search_trending_tags(
-        #    course_id,
-        #)
-
         with newrelic.agent.FunctionTrace(nr_transaction, "get_metadata_for_threads"):
             annotated_content_info = utils.get_metadata_for_threads(course_id, threads, request.user, user_info)
 
@@ -307,7 +301,6 @@ def single_thread(request, course_id, discussion_id, thread_id):
             'annotated_content_info': saxutils.escape(json.dumps(annotated_content_info), escapedict),
             'course': course,
             #'recent_active_threads': recent_active_threads,
-            #'trending_tags': trending_tags,
             'course_id': course.id,   # TODO: Why pass both course and course.id to template?
             'thread_id': thread_id,
             'threads': saxutils.escape(json.dumps(threads), escapedict),
@@ -322,7 +315,7 @@ def single_thread(request, course_id, discussion_id, thread_id):
             'cohorted_commentables': cohorted_commentables
         }
 
-        return render_to_response('discussion/single_thread.html', context)
+        return render_to_response('discussion/index.html', context)
 
 
 @login_required

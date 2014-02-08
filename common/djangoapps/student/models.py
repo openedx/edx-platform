@@ -10,31 +10,34 @@ file and check it in at the same time as your model changes. To do that,
 2. ./manage.py lms schemamigration student --auto description_of_your_change
 3. Add the migration file created in edx-platform/common/djangoapps/student/migrations/
 """
-from datetime import datetime
+import crum
+from datetime import datetime, timedelta
 import hashlib
 import json
 import logging
+from pytz import UTC
 import uuid
+from collections import defaultdict
 
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.utils.crypto import get_random_string
 from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.db import models, transaction, IntegrityError
+from django.db.models import Count
 from django.db.models.signals import post_save
 from django.dispatch import receiver, Signal
 import django.dispatch
 from django.forms import ModelForm, forms
 from django.core.exceptions import ObjectDoesNotExist
-
-from course_modes.models import CourseMode
-import lms.lib.comment_client as cc
-from pytz import UTC
-import crum
-
+from django_countries import CountryField
 from track import contexts
 from track.views import server_track
 from eventtracking import tracker
+
+from course_modes.models import CourseMode
+import lms.lib.comment_client as cc
+from util.query import use_read_replica_if_available
 
 unenroll_done = Signal(providing_args=["course_enrollment"])
 log = logging.getLogger(__name__)
@@ -212,6 +215,8 @@ class UserProfile(models.Model):
         choices=LEVEL_OF_EDUCATION_CHOICES
     )
     mailing_address = models.TextField(blank=True, null=True)
+    city = models.TextField(blank=True, null=True)
+    country = CountryField(blank=True, null=True)
     goals = models.TextField(blank=True, null=True)
     allow_certificate = models.BooleanField(default=1)
 
@@ -317,6 +322,68 @@ class PendingEmailChange(models.Model):
 
 EVENT_NAME_ENROLLMENT_ACTIVATED = 'edx.course.enrollment.activated'
 EVENT_NAME_ENROLLMENT_DEACTIVATED = 'edx.course.enrollment.deactivated'
+
+
+class LoginFailures(models.Model):
+    """
+    This model will keep track of failed login attempts
+    """
+    user = models.ForeignKey(User)
+    failure_count = models.IntegerField(default=0)
+    lockout_until = models.DateTimeField(null=True)
+
+    @classmethod
+    def is_feature_enabled(cls):
+        """
+        Returns whether the feature flag around this functionality has been set
+        """
+        return settings.FEATURES['ENABLE_MAX_FAILED_LOGIN_ATTEMPTS']
+
+    @classmethod
+    def is_user_locked_out(cls, user):
+        """
+        Static method to return in a given user has his/her account locked out
+        """
+        try:
+            record = LoginFailures.objects.get(user=user)
+            if not record.lockout_until:
+                return False
+
+            now = datetime.now(UTC)
+            until = record.lockout_until
+            is_locked_out = until and now < until
+
+            return is_locked_out
+        except ObjectDoesNotExist:
+            return False
+
+    @classmethod
+    def increment_lockout_counter(cls, user):
+        """
+        Ticks the failed attempt counter
+        """
+        record, _ = LoginFailures.objects.get_or_create(user=user)
+        record.failure_count = record.failure_count + 1
+        max_failures_allowed = settings.MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED
+
+        # did we go over the limit in attempts
+        if record.failure_count >= max_failures_allowed:
+            # yes, then store when this account is locked out until
+            lockout_period_secs = settings.MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS
+            record.lockout_until = datetime.now(UTC) + timedelta(seconds=lockout_period_secs)
+
+        record.save()
+
+    @classmethod
+    def clear_lockout_counter(cls, user):
+        """
+        Removes the lockout counters (normally called after a successful login)
+        """
+        try:
+            entry = LoginFailures.objects.get(user=user)
+            entry.delete()
+        except ObjectDoesNotExist:
+            return
 
 
 class CourseEnrollment(models.Model):
@@ -614,6 +681,22 @@ class CourseEnrollment(models.Model):
             courseenrollment__course_id=course_id,
             courseenrollment__is_active=True
         )
+
+    @classmethod
+    def enrollment_counts(cls, course_id):
+        """
+        Returns a dictionary that stores the total enrollment count for a course, as well as the
+        enrollment count for each individual mode.
+        """
+        # Unfortunately, Django's "group by"-style queries look super-awkward
+        query = use_read_replica_if_available(cls.objects.filter(course_id=course_id, is_active=True).values('mode').order_by().annotate(Count('mode')))
+        total = 0
+        d = defaultdict(int)
+        for item in query:
+            d[item['mode']] = item['mode__count']
+            total += item['mode__count']
+        d['total'] = total
+        return d
 
     def activate(self):
         """Makes this `CourseEnrollment` record active. Saves immediately."""

@@ -20,6 +20,7 @@ from django.contrib.auth.hashers import UNUSABLE_PASSWORD
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import int_to_base36
 from django.core.urlresolvers import reverse
+from django.http import HttpResponse
 
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -30,7 +31,7 @@ from textwrap import dedent
 
 from student.models import anonymous_id_for_user, user_by_anonymous_id, CourseEnrollment, unique_id_for_user
 from student.views import (process_survey_link, _cert_info, password_reset, password_reset_confirm_wrapper,
-                           change_enrollment, complete_course_mode_info)
+                           change_enrollment, complete_course_mode_info, token, course_from_id)
 from student.tests.factories import UserFactory, CourseModeFactory
 from student.tests.test_email import mock_render_to_string
 
@@ -556,3 +557,26 @@ class AnonymousLookupTable(TestCase):
         anonymous_id = anonymous_id_for_user(self.user, self.course.id)
         real_user = user_by_anonymous_id(anonymous_id)
         self.assertEqual(self.user, real_user)
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class Token(ModuleStoreTestCase):
+    """
+    Test for the token generator. This creates a random course and passes it through the token file which generates the
+    token that will be passed in to the annotation_storage_url.
+    """
+    request_factory = RequestFactory()
+    COURSE_SLUG = "100"
+    COURSE_NAME = "test_course"
+    COURSE_ORG = "edx"
+
+    def setUp(self):
+        self.course = CourseFactory.create(org=self.COURSE_ORG, display_name=self.COURSE_NAME, number=self.COURSE_SLUG)
+        self.user = User.objects.create(username="username", email="username")
+        self.req = self.request_factory.post('/token?course_id=edx/100/test_course', {'user': self.user})
+        self.req.user = self.user
+
+    def test_token(self):
+        expected = HttpResponse("eyJhbGciOiAiSFMyNTYiLCAidHlwIjogIkpXVCJ9.eyJpc3N1ZWRBdCI6ICIyMDE0LTAxLTIzVDE5OjM1OjE3LjUyMjEwNC01OjAwIiwgImNvbnN1bWVyS2V5IjogInh4eHh4eHh4LXh4eHgteHh4eC14eHh4LXh4eHh4eHh4eHh4eCIsICJ1c2VySWQiOiAidXNlcm5hbWUiLCAidHRsIjogODY0MDB9.OjWz9mzqJnYuzX-f3uCBllqJUa8PVWJjcDy_McfxLvc", mimetype="text/plain")
+        response = token(self.req)
+        self.assertEqual(expected.content.split('.')[0], response.content.split('.')[0])

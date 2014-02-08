@@ -1,4 +1,6 @@
 <%! from django.utils.translation import ugettext as _ %>
+<%! from microsite_configuration.middleware import MicrositeConfiguration %>
+<%! from microsite_configuration import page_title_breadcrumbs %>
 
 <%namespace name='static' file='static_content.html'/>
 <%! from django.utils import html %>
@@ -8,49 +10,50 @@
 ## templates have access to these functions, and we can import these
 ## into non-inheriting templates via the %namespace tag.
 <%def name="theme_enabled()">
-  <% return settings.FEATURES["USE_CUSTOM_THEME"] %>
+  <% return settings.FEATURES.get("USE_CUSTOM_THEME", False) %>
 </%def>
 
 <%def name="stanford_theme_enabled()">
-  <% return theme_enabled() and getattr(settings, "THEME_NAME") == "stanford" %>
+  <%
+    if not theme_enabled():
+      return False
+
+    return getattr(settings, "THEME_NAME", None) == "stanford"
+  %>
 </%def>
 
 <%def name="carnegie_theme_enabled()">
   <% return theme_enabled() and getattr(settings, "THEME_NAME") == "carnegie" %>
 </%def>
 
+## this needs to be here to prevent the title from mysteriously appearing in the body, in one case
+<%def name="pagetitle()" />
 <!DOCTYPE html>
-<!--[if IE 7]><html class="ie ie7 lte9 lte8 lte7" lang="en-us"><![endif]-->
-<!--[if IE 8]><html class="ie ie8 lte9 lte8" lang="en-us"><![endif]-->
-<!--[if IE 9]><html class="ie ie9 lte9" lang="en-us"><![endif]-->
-<!--[if gt IE 9]><!--><html lang="en-us"><!--<![endif]-->
+<!--[if IE 7]><html class="ie ie7 lte9 lte8 lte7" lang="${LANGUAGE_CODE}"><![endif]-->
+<!--[if IE 8]><html class="ie ie8 lte9 lte8" lang="${LANGUAGE_CODE}"><![endif]-->
+<!--[if IE 9]><html class="ie ie9 lte9" lang="${LANGUAGE_CODE}"><![endif]-->
+<!--[if gt IE 9]><!--><html lang="${LANGUAGE_CODE}"><!--<![endif]-->
 <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    
   <%block name="title">
-    % if stanford_theme_enabled():
-      <title>${_("Home")} | class.stanford.edu</title>
-    % elif carnegie_theme_enabled():
-      <title>${_("Home")} | CLASlite</title>
-    % else:
-      ## "edX" should not be translated
-      <title>edX</title>
-
-      <meta http-equiv="X-UA-Compatible" content="IE=edge">
-      <meta name="viewport" content="width=device-width, initial-scale=1">
-
-      <script type="text/javascript">
-        /* immediately break out of an iframe if coming from the marketing website */
-        (function(window) {
-          if (window.location !== window.top.location) {
-            window.top.location = window.location;
-          }
-        })(this);
-      </script>
-    % endif
+      <title>
+       ${page_title_breadcrumbs(self.pagetitle())}
+      </title>
   </%block>
+
+  <script type="text/javascript">
+    /* immediately break out of an iframe if coming from the marketing website */
+    (function(window) {
+      if (window.location !== window.top.location) {
+        window.top.location = window.location;
+      }
+    })(this);
+  </script>
 
   <script type="text/javascript" src="/jsi18n/"></script>
 
-  <link rel="icon" type="image/x-icon" href="${static.url(settings.FAVICON_PATH)}" />
+  <link rel="icon" type="image/x-icon" href="${static.url(MicrositeConfiguration.get_microsite_configuration_value('favicon_path', settings.FAVICON_PATH))}" />
 
   <%static:css group='style-vendor'/>
   <%static:css group='style-app'/>
@@ -60,8 +63,27 @@
   <%static:js group='main_vendor'/>
 
   <%block name="headextra"/>
-  % if theme_enabled():
-    <%include file="theme-head-extra.html" />
+
+<%
+  if theme_enabled():
+    header_extra_file = 'theme-head-extra.html'
+    header_file = 'theme-header.html'
+    google_analytics_file = 'theme-google-analytics.html'
+    footer_file = 'theme-footer.html'
+
+    style_overrides_file = None
+
+  else:
+    header_extra_file = None
+    header_file = MicrositeConfiguration.get_microsite_template_path('navigation.html')
+    google_analytics_file = MicrositeConfiguration.get_microsite_template_path('google_analytics.html')
+    footer_file = MicrositeConfiguration.get_microsite_template_path('footer.html')
+
+    style_overrides_file = MicrositeConfiguration.get_microsite_configuration_value('css_overrides_file')
+%>
+
+  % if header_extra_file:
+    <%include file="${header_extra_file}" />
   % endif
 
   <!--[if lt IE 9]>
@@ -72,37 +94,34 @@
   <meta name="google-site-verification" content="_mipQ4AtZQDNmbtOkwehQDOgCxUUV2fb_C0b6wbiRHY" />
 
   % if not course:
-    % if theme_enabled():
-      <%include file="theme-google-analytics.html" />
-    % else:
-      <%include file="google_analytics.html" />
-    % endif
+    <%include file="${google_analytics_file}" />
   % endif
 
   <%include file="widgets/segment-io.html" />
 
+
+% if style_overrides_file:
+  <link rel="stylesheet" type="text/css" href="${static.url(style_overrides_file)}" />
+% endif
+
 </head>
 
-<body class="<%block name='bodyclass'/>">
+<body class="<%block name='bodyclass'/> lang_${LANGUAGE_CODE}">
   <a class="nav-skip" href="#content">${_("Skip to this view's content")}</a>
 
   <%include file="mathjax_accessible.html" />
 
-% if theme_enabled():
-  <%include file="theme-header.html" />
-% elif not suppress_toplevel_navigation:
-  <%include file="navigation.html" />
-% endif
+% if not suppress_toplevel_navigation:
+  <%include file="${header_file}" />
+%endif
 
   <section class="content-wrapper" id="content">
     ${self.body()}
     <%block name="bodyextra"/>
   </section>
 
-% if theme_enabled():
-  <%include file="theme-footer.html" />
-% elif not suppress_toplevel_navigation:
-  <%include file="footer.html" />
+% if not suppress_toplevel_navigation:
+  <%include file="${footer_file}" />
 % endif
 
   <script>window.baseUrl = "${settings.STATIC_URL}";</script>
@@ -119,3 +138,5 @@
     html.escape(enrollment_action)
   ) if course_id and enrollment_action else ""
 }</%def>
+
+

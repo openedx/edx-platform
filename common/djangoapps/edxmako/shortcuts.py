@@ -16,7 +16,9 @@ from django.template import Context
 from django.http import HttpResponse
 import logging
 
-import edxmako
+from microsite_configuration.middleware import MicrositeConfiguration
+
+from edxmako import lookup_template
 import edxmako.middleware
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -35,13 +37,18 @@ def marketing_link(name):
     # link_map maps URLs from the marketing site to the old equivalent on
     # the Django site
     link_map = settings.MKTG_URL_LINK_MAP
-    if settings.FEATURES.get('ENABLE_MKTG_SITE') and name in settings.MKTG_URLS:
+    enable_mktg_site = MicrositeConfiguration.get_microsite_configuration_value(
+        'ENABLE_MKTG_SITE',
+        settings.FEATURES.get('ENABLE_MKTG_SITE', False)
+    )
+
+    if enable_mktg_site and name in settings.MKTG_URLS:
         # special case for when we only want the root marketing URL
         if name == 'ROOT':
             return settings.MKTG_URLS.get('ROOT')
         return settings.MKTG_URLS.get('ROOT') + settings.MKTG_URLS.get(name)
     # only link to the old pages when the marketing site isn't on
-    elif not settings.FEATURES.get('ENABLE_MKTG_SITE') and name in link_map:
+    elif not enable_mktg_site and name in link_map:
         # don't try to reverse disabled marketing links
         if link_map[name] is not None:
             return reverse(link_map[name])
@@ -71,6 +78,10 @@ def marketing_link_context_processor(request):
 
 
 def render_to_string(template_name, dictionary, context=None, namespace='main'):
+
+    # see if there is an override template defined in the microsite
+    template_name = MicrositeConfiguration.get_microsite_template_path(template_name)
+
     context_instance = Context(dictionary)
     # add dictionary to context_instance
     context_instance.update(dictionary or {})
@@ -89,7 +100,7 @@ def render_to_string(template_name, dictionary, context=None, namespace='main'):
     if context:
         context_dictionary.update(context)
     # fetch and render template
-    template = edxmako.lookup[namespace].get_template(template_name)
+    template = lookup_template(namespace, template_name)
     return template.render_unicode(**context_dictionary)
 
 
@@ -98,5 +109,9 @@ def render_to_response(template_name, dictionary=None, context_instance=None, na
     Returns a HttpResponse whose content is filled with the result of calling
     lookup.get_template(args[0]).render with the passed arguments.
     """
+
+    # see if there is an override template defined in the microsite
+    template_name = MicrositeConfiguration.get_microsite_template_path(template_name)
+
     dictionary = dictionary or {}
     return HttpResponse(render_to_string(template_name, dictionary, context_instance, namespace), **kwargs)

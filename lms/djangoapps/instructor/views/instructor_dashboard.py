@@ -28,6 +28,9 @@ from lms.lib.xblock.runtime import handler_prefix
 from class_dashboard.dashboard_data import get_section_display_name, get_array_section_has_problem
 
 
+from .tools import get_units_with_due_date, title_or_url
+
+
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def instructor_dashboard_2(request, course_id):
@@ -59,6 +62,9 @@ def instructor_dashboard_2(request, course_id):
       # coffee files that are included but will not run.
 #        _section_metrics(course_id, access),
     ]
+
+    if (settings.FEATURES.get('INDIVIDUAL_DUE_DATES') and access['instructor']):
+        sections.insert(3, _section_extensions(course))
 
     # Gate access to course email by feature flag & by course-specific authorization
     if settings.FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and \
@@ -162,6 +168,21 @@ def _section_student_admin(course_id, access):
         'reset_student_attempts_url': reverse('reset_student_attempts', kwargs={'course_id': course_id}),
         'rescore_problem_url': reverse('rescore_problem', kwargs={'course_id': course_id}),
         'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': course_id}),
+    }
+    return section_data
+
+
+def _section_extensions(course):
+    """ Provide data for the corresponding dashboard section """
+    section_data = {
+        'section_key': 'extensions',
+        'section_display_name': _('Extensions'),
+        'units_with_due_dates': [(title_or_url(unit), unit.location.url())
+                                 for unit in get_units_with_due_date(course)],
+        'change_due_date_url': reverse('change_due_date', kwargs={'course_id': course.id}),
+        'reset_due_date_url': reverse('reset_due_date', kwargs={'course_id': course.id}),
+        'show_unit_extensions_url': reverse('show_unit_extensions', kwargs={'course_id': course.id}),
+        'show_student_extensions_url': reverse('show_student_extensions', kwargs={'course_id': course.id}),
     }
     return section_data
 

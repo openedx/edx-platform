@@ -8,7 +8,7 @@
 
 <%inherit file="../mktg_iframe.html" />
 
-<%block name="title"><title>${_("About {course_number}").format(course_number=course.display_number_with_default) | h}</title></%block>
+<%block name="pagetitle">${_("About {course_number}").format(course_number=course.display_number_with_default) | h}</%block>
 
 <%block name="bodyclass">view-iframe-content view-partial-mktgregister</%block>
 
@@ -37,7 +37,7 @@
         window.top.location.href = "${reverse('register_user')}?course_id=${course.id}&enrollment_action=enroll";
       } else {
         $('#register_error').html(
-            (xhr.responseText ? xhr.responseText : '${_("An error occurred. Please try again later.")}')
+            (xhr.responseText ? xhr.responseText : "${_("An error occurred. Please try again later.")}")
         ).css("display", "block");
       }
     });

@@ -9,7 +9,6 @@ import os
 import subprocess
 import time
 import StringIO
-from datetime import datetime
 
 from django.conf import settings
 from django.contrib.auth import authenticate
@@ -20,6 +19,7 @@ from django.db import IntegrityError
 from django.http import HttpResponse, Http404
 from django.utils.decorators import method_decorator
 from django.utils.html import escape
+from django.utils import timezone
 from django.utils.translation import ugettext as _
 from django.views.decorators.cache import cache_control
 from django.views.generic.base import TemplateView
@@ -29,8 +29,9 @@ from edxmako.shortcuts import render_to_response
 import mongoengine
 
 from courseware.courses import get_course_by_id
-from courseware.roles import CourseStaffRole, CourseInstructorRole
-import dashboard.management.commands.git_add_course as git_add_course
+import dashboard.git_import as git_import
+from dashboard.git_import import GitImportError
+from student.roles import CourseStaffRole, CourseInstructorRole
 from dashboard.models import CourseImportLog
 from external_auth.models import ExternalAuthMap
 from external_auth.views import generate_password
@@ -214,7 +215,7 @@ class Users(SysadminDashboardView):
                 external_credentials=json.dumps(credentials),
             )
             eamap.user = user
-            eamap.dtsignup = datetime.now()
+            eamap.dtsignup = timezone.now()
             eamap.save()
 
         msg += _('User {0} created successfully!').format(user)
@@ -368,7 +369,7 @@ class Courses(SysadminDashboardView):
 
         msg = u''
 
-        logging.debug(_('Adding course using git repo {0}').format(gitloc))
+        log.debug('Adding course using git repo {0}'.format(gitloc))
 
         # Grab logging output for debugging imports
         output = StringIO.StringIO()
@@ -376,28 +377,38 @@ class Courses(SysadminDashboardView):
         import_log_handler.setLevel(logging.DEBUG)
 
         logger_names = ['xmodule.modulestore.xml_importer',
-                        'dashboard.management.commands.git_add_course',
-                        'xmodule.modulestore.xml', 'xmodule.seq_module', ]
+                        'dashboard.git_import',
+                        'xmodule.modulestore.xml',
+                        'xmodule.seq_module', ]
         loggers = []
 
         for logger_name in logger_names:
             logger = logging.getLogger(logger_name)
-            logger.old_level = logger.level
             logger.setLevel(logging.DEBUG)
             logger.addHandler(import_log_handler)
             loggers.append(logger)
 
-        git_add_course.add_repo(gitloc, None)
+        error_msg = ''
+        try:
+            git_import.add_repo(gitloc, None)
+        except GitImportError as ex:
+            error_msg = str(ex)
         ret = output.getvalue()
 
         # Remove handler hijacks
         for logger in loggers:
-            logger.setLevel(logger.old_level)
+            logger.setLevel(logging.NOTSET)
             logger.removeHandler(import_log_handler)
 
-        msg = u"<h4 style='color:blue'>{0} {1}</h4>".format(
-            _('Added course from'), gitloc)
-        msg += _("<pre>{0}</pre>").format(escape(ret))
+        if error_msg:
+            msg_header = error_msg
+            color = 'red'
+        else:
+            msg_header = _('Added Course')
+            color = 'blue'
+
+        msg = u"<h4 style='color:{0}'>{1}</h4>".format(color, msg_header)
+        msg += "<pre>{0}</pre>".format(escape(ret))
         return msg
 
     def import_xml_course(self, gitloc, datatable):
@@ -422,7 +433,9 @@ class Courses(SysadminDashboardView):
             cwd = settings.DATA_DIR
         cwd = os.path.abspath(cwd)
         try:
-            cmd_output = escape(subprocess.check_output(cmd, cwd=cwd))
+            cmd_output = escape(
+                subprocess.check_output(cmd, stderr=subprocess.STDOUT, cwd=cwd)
+            )
         except subprocess.CalledProcessError:
             return _('Unable to clone or pull repository. Please check your url.')
 
@@ -660,8 +673,8 @@ class GitLogs(TemplateView):
             else:
                 mdb = mongoengine.connect(mongo_db['db'], host=mongo_db['host'])
         except mongoengine.connection.ConnectionError:
-            logging.exception(_('Unable to connect to mongodb to save log, '
-                                'please check MONGODB_LOG settings.'))
+            log.exception('Unable to connect to mongodb to save log, '
+                          'please check MONGODB_LOG settings.')
 
         if course_id is None:
             # Require staff if not going to specific course
@@ -672,8 +685,8 @@ class GitLogs(TemplateView):
             try:
                 course = get_course_by_id(course_id)
             except Exception:  # pylint: disable=broad-except
-                cilset = None
-                error_msg = _('Cannot find course {0}').format(course_id)
+                log.info('Cannot find course {0}'.format(course_id))
+                raise Http404
 
             # Allow only course team, instructors, and staff
             if not (request.user.is_staff or

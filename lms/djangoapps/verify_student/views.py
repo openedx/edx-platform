@@ -5,6 +5,10 @@ Views for the verification flow
 import json
 import logging
 import decimal
+import datetime
+import crum
+from track.views import server_track
+from pytz import UTC
 
 from edxmako.shortcuts import render_to_response
 
@@ -22,15 +26,24 @@ from django.contrib.auth.decorators import login_required
 
 from course_modes.models import CourseMode
 from student.models import CourseEnrollment
-from student.views import course_from_id
+from student.views import course_from_id, reverification_info
 from shoppingcart.models import Order, CertificateItem
 from shoppingcart.processors.CyberSource import (
     get_signed_purchase_params, get_purchase_endpoint
 )
-from verify_student.models import SoftwareSecurePhotoVerification
+from verify_student.models import (
+    SoftwareSecurePhotoVerification,
+)
+from reverification.models import MidcourseReverificationWindow
 import ssencrypt
+from xmodule.modulestore.exceptions import ItemNotFoundError
+from .exceptions import WindowExpiredException
 
 log = logging.getLogger(__name__)
+
+EVENT_NAME_USER_ENTERED_MIDCOURSE_REVERIFY_VIEW = 'edx.course.enrollment.reverify.started'
+EVENT_NAME_USER_SUBMITTED_MIDCOURSE_REVERIFY = 'edx.course.enrollment.reverify.submitted'
+EVENT_NAME_USER_REVERIFICATION_REVIEWED_BY_SOFTWARESECURE = 'edx.course.enrollment.reverify.reviewed'
 
 class VerifyView(View):
 
@@ -42,7 +55,6 @@ class VerifyView(View):
             - Taking the id photo
             - Confirming that the photos and payment price are correct
               before proceeding to payment
-
         """
         upgrade = request.GET.get('upgrade', False)
 
@@ -245,6 +257,13 @@ def results_callback(request):
             "Result {} not understood. Known results: PASS, FAIL, SYSTEM FAIL".format(result)
         )
 
+    # If this is a reverification, log an event
+    if attempt.window:
+        course_id = window.course_id
+        course = course_from_id(course_id)
+        course_enrollment = CourseEnrollment.get_or_create_enrollment(attempt.user, course_id)
+        course_enrollment.emit_event(EVENT_NAME_USER_REVERIFICATION_REVIEWED_BY_SOFTWARESECURE)
+
     return HttpResponse("OK!")
 
 
@@ -323,10 +342,136 @@ class ReverifyView(View):
             return render_to_response("verify_student/photo_reverification.html", context)
 
 
+class MidCourseReverifyView(View):
+    """
+    The mid-course reverification view.
+    Needs to perform these functions:
+        - take new face photo
+        - retrieve the old id photo
+        - submit these photos to photo verification service
+
+    Does not need to worry about pricing
+    """
+    @method_decorator(login_required)
+    def get(self, request, course_id):
+        """
+        display this view
+        """
+        course = course_from_id(course_id)
+        course_enrollment = CourseEnrollment.get_or_create_enrollment(request.user, course_id)
+        course_enrollment.update_enrollment(mode="verified")
+        course_enrollment.emit_event(EVENT_NAME_USER_ENTERED_MIDCOURSE_REVERIFY_VIEW)
+        context = {
+            "user_full_name": request.user.profile.name,
+            "error": False,
+            "course_id": course_id,
+            "course_name": course.display_name_with_default,
+            "course_org": course.display_org_with_default,
+            "course_num": course.display_number_with_default,
+            "reverify": True,
+        }
+
+        return render_to_response("verify_student/midcourse_photo_reverification.html", context)
+
+    @method_decorator(login_required)
+    def post(self, request, course_id):
+        """
+        submits the reverification to SoftwareSecure
+        """
+        try:
+            now = datetime.datetime.now(UTC)
+            window = MidcourseReverificationWindow.get_window(course_id, now)
+            if window is None:
+                raise WindowExpiredException
+            attempt = SoftwareSecurePhotoVerification(user=request.user, window=window)
+            b64_face_image = request.POST['face_image'].split(",")[1]
+
+            attempt.upload_face_image(b64_face_image.decode('base64'))
+            attempt.fetch_photo_id_image()
+            attempt.mark_ready()
+
+            attempt.save()
+            attempt.submit()
+            course_enrollment = CourseEnrollment.get_or_create_enrollment(request.user, course_id)
+            course_enrollment.update_enrollment(mode="verified")
+            course_enrollment.emit_event(EVENT_NAME_USER_SUBMITTED_MIDCOURSE_REVERIFY)
+            return HttpResponseRedirect(reverse('verify_student_midcourse_reverification_confirmation'))
+
+        except WindowExpiredException:
+            log.exception(
+                "User {} attempted to re-verify, but the window expired before the attempt".format(request.user.id)
+            )
+            return HttpResponseRedirect(reverse('verify_student_reverification_window_expired'))
+
+        except Exception:
+            log.exception(
+                "Could not submit verification attempt for user {}".format(request.user.id)
+            )
+            context = {
+                "user_full_name": request.user.profile.name,
+                "error": True,
+            }
+            return render_to_response("verify_student/midcourse_photo_reverification.html", context)
+
+
+@login_required
+def midcourse_reverify_dash(request):
+    """
+    Shows the "course reverification dashboard", which displays the reverification status (must reverify,
+    pending, approved, failed, etc) of all courses in which a student has a verified enrollment.
+    """
+    user = request.user
+    course_enrollment_pairs = []
+    for enrollment in CourseEnrollment.enrollments_for_user(user):
+        try:
+            course_enrollment_pairs.append((course_from_id(enrollment.course_id), enrollment))
+        except ItemNotFoundError:
+            log.error("User {0} enrolled in non-existent course {1}"
+                      .format(user.username, enrollment.course_id))
+
+    statuses = ["approved", "pending", "must_reverify", "denied"]
+
+    reverifications = reverification_info(course_enrollment_pairs, user, statuses)
+
+    context = {
+        "user_full_name": user.profile.name,
+        'reverifications': reverifications,
+        'referer': request.META.get('HTTP_REFERER'),
+        'billing_email': settings.PAYMENT_SUPPORT_EMAIL,
+    }
+    return render_to_response("verify_student/midcourse_reverify_dash.html", context)
+
+
+def toggle_failed_banner_off(request):
+    """
+    Finds all denied midcourse reverifications for a user and permanently toggles
+    the "Reverification Failed" banner off for those verifications.
+    """
+    user_id = request.POST.get('user_id')
+    SoftwareSecurePhotoVerification.display_off(user_id)
+
+
 @login_required
 def reverification_submission_confirmation(_request):
     """
     Shows the user a confirmation page if the submission to SoftwareSecure was successful
     """
-
     return render_to_response("verify_student/reverification_confirmation.html")
+
+
+@login_required
+def midcourse_reverification_confirmation(_request):  # pylint: disable=C0103
+    """
+    Shows the user a confirmation page if the submission to SoftwareSecure was successful
+    """
+    return render_to_response("verify_student/midcourse_reverification_confirmation.html")
+
+
+@login_required
+def reverification_window_expired(_request):
+    """
+    Displays an error page if a student tries to submit a reverification, but the window
+    for that reverification has already expired.
+    """
+    # TODO need someone to review the copy for this template
+    return render_to_response("verify_student/reverification_window_expired.html")

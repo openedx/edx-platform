@@ -20,6 +20,7 @@ V1_SETTINGS_ATTRIBUTES = [
     "accept_file_upload",
     "skip_spelling_checks",
     "due",
+    "extended_due",
     "graceperiod",
     "weight",
     "min_to_calibrate",
@@ -250,17 +251,17 @@ class CombinedOpenEndedFields(object):
         default=False,
         scope=Scope.settings
     )
-    track_changes = Boolean(
-        display_name="Peer Track Changes",
-        help=("EXPERIMENTAL FEATURE FOR PEER GRADING ONLY:  "
-              "If set to 'True', peer graders will be able to make changes to the student "
-              "submission and those changes will be tracked and shown along with the graded feedback."),
-        default=False,
-        scope=Scope.settings
-    )
     due = Date(
         help="Date that this problem is due by",
         scope=Scope.settings
+    )
+    extended_due = Date(
+        help="Date that this problem is due by for a particular student. This "
+             "can be set by an instructor, and will override the global due "
+             "date if it is set to a date that is later than the global due "
+             "date.",
+        default=None,
+        scope=Scope.user_state,
     )
     graceperiod = Timedelta(
         help="Amount of time after the due date that submissions will be accepted",
@@ -508,7 +509,7 @@ class CombinedOpenEndedDescriptor(CombinedOpenEndedFields, RawDescriptor):
     def non_editable_metadata_fields(self):
         non_editable_fields = super(CombinedOpenEndedDescriptor, self).non_editable_metadata_fields
         non_editable_fields.extend([CombinedOpenEndedDescriptor.due, CombinedOpenEndedDescriptor.graceperiod,
-                                    CombinedOpenEndedDescriptor.markdown, CombinedOpenEndedDescriptor.version, CombinedOpenEndedDescriptor.track_changes])
+                                    CombinedOpenEndedDescriptor.markdown, CombinedOpenEndedDescriptor.version])
         return non_editable_fields
 
     # Proxy to CombinedOpenEndedModule so that external callers don't have to know if they're working

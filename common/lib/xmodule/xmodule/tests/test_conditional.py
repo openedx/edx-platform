@@ -9,7 +9,7 @@ from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 from xmodule.error_module import NonStaffErrorDescriptor
 from xmodule.modulestore import Location
-from xmodule.modulestore.xml import ImportSystem, XMLModuleStore
+from xmodule.modulestore.xml import ImportSystem, XMLModuleStore, CourseLocationGenerator
 from xmodule.conditional_module import ConditionalDescriptor
 from xmodule.tests import DATA_DIR, get_test_system, get_test_descriptor_system
 
@@ -32,7 +32,6 @@ class DummySystem(ImportSystem):
             error_tracker=Mock(),
             parent_tracker=Mock(),
             load_error_modules=load_error_modules,
-            policy={},
         )
 
     def render_template(self, template, context):
@@ -61,8 +60,7 @@ class ConditionalFactory(object):
             source_descriptor = NonStaffErrorDescriptor.from_xml(
                 'some random xml data',
                 system,
-                org=source_location.org,
-                course=source_location.course,
+                id_generator=CourseLocationGenerator(source_location.org, source_location.course),
                 error_msg='random error message'
             )
         else:
@@ -131,9 +129,9 @@ class ConditionalModuleBasicTest(unittest.TestCase):
         html = modules['cond_module'].render('student_view').content
         expected = modules['cond_module'].xmodule_runtime.render_template('conditional_ajax.html', {
             'ajax_url': modules['cond_module'].xmodule_runtime.ajax_url,
-            'element_id': 'i4x-edX-conditional_test-conditional-SampleConditional',
-            'id': 'i4x://edX/conditional_test/conditional/SampleConditional',
-            'depends': 'i4x-edX-conditional_test-problem-SampleProblem',
+            'element_id': u'i4x-edX-conditional_test-conditional-SampleConditional',
+            'id': u'i4x://edX/conditional_test/conditional/SampleConditional',
+            'depends': u'i4x-edX-conditional_test-problem-SampleProblem',
         })
         self.assertEquals(expected, html)
 
@@ -227,9 +225,9 @@ class ConditionalModuleXmlTest(unittest.TestCase):
             {
                 # Test ajax url is just usage-id / handler_name
                 'ajax_url': 'i4x://HarvardX/ER22x/conditional/condone/xmodule_handler',
-                'element_id': 'i4x-HarvardX-ER22x-conditional-condone',
-                'id': 'i4x://HarvardX/ER22x/conditional/condone',
-                'depends': 'i4x-HarvardX-ER22x-problem-choiceprob'
+                'element_id': u'i4x-HarvardX-ER22x-conditional-condone',
+                'id': u'i4x://HarvardX/ER22x/conditional/condone',
+                'depends': u'i4x-HarvardX-ER22x-problem-choiceprob'
             }
         )
         self.assertEqual(html, html_expect)

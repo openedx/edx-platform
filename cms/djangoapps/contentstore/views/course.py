@@ -35,10 +35,9 @@ from models.settings.course_details import CourseDetails, CourseSettingsEncoder
 
 from models.settings.course_grading import CourseGradingModel
 from models.settings.course_metadata import CourseMetadata
-from auth.authz import create_all_course_groups, is_user_in_creator_group
 from util.json_request import expect_json
 
-from .access import has_access
+from .access import has_course_access
 from .tabs import initialize_course_tabs
 from .component import (
     OPEN_ENDED_COMPONENT_TYPES, NOTE_COMPONENT_TYPES,
@@ -52,6 +51,10 @@ from xmodule.html_module import AboutDescriptor
 from xmodule.modulestore.locator import BlockUsageLocator
 from course_creators.views import get_course_creator_status, add_user_with_status_unrequested
 from contentstore import utils
+from student.roles import CourseInstructorRole, CourseStaffRole, CourseCreatorRole
+from student import auth
+
+from microsite_configuration.middleware import MicrositeConfiguration
 
 __all__ = ['course_info_handler', 'course_handler', 'course_info_update_handler',
            'settings_handler',
@@ -66,7 +69,7 @@ def _get_locator_and_course(package_id, branch, version_guid, block_id, user, de
     for the view functions in this file.
     """
     locator = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block_id)
-    if not has_access(user, locator):
+    if not has_course_access(user, locator):
         raise PermissionDenied()
     course_location = loc_mapper().translate_locator_to_location(locator)
     course_module = modulestore().get_item(course_location, depth=depth)
@@ -97,12 +100,13 @@ def course_handler(request, tag=None, package_id=None, branch=None, version_guid
     DELETE
         json: delete this branch from this course (leaving off /branch/draft would imply delete the course)
     """
-    if 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
+    response_format = request.REQUEST.get('format', 'html')
+    if response_format == 'json' or 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
         if request.method == 'GET':
-            raise NotImplementedError('coming soon')
+            return JsonResponse(_course_json(request, package_id, branch, version_guid, block))
         elif request.method == 'POST':  # not sure if this is only post. If one will have ids, it goes after access
             return create_new_course(request)
-        elif not has_access(
+        elif not has_course_access(
             request.user,
             BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
         ):
@@ -123,6 +127,37 @@ def course_handler(request, tag=None, package_id=None, branch=None, version_guid
 
 
 @login_required
+def _course_json(request, package_id, branch, version_guid, block):
+    """
+    Returns a JSON overview of a course
+    """
+    __, course = _get_locator_and_course(
+        package_id, branch, version_guid, block, request.user, depth=None
+    )
+    return _xmodule_json(course, course.location.course_id)
+
+
+def _xmodule_json(xmodule, course_id):
+    """
+    Returns a JSON overview of an XModule
+    """
+    locator = loc_mapper().translate_location(
+        course_id, xmodule.location, published=False, add_entry_if_missing=True
+    )
+    is_container = xmodule.has_children
+    result = {
+        'display_name': xmodule.display_name,
+        'id': unicode(locator),
+        'category': xmodule.category,
+        'is_draft': getattr(xmodule, 'is_draft', False),
+        'is_container': is_container,
+    }
+    if is_container:
+        result['children'] = [_xmodule_json(child, course_id) for child in xmodule.get_children()]
+    return result
+
+
+@login_required
 @ensure_csrf_cookie
 def course_listing(request):
     """
@@ -136,7 +171,7 @@ def course_listing(request):
         """
         Get courses to which this user has access
         """
-        return (has_access(request.user, course.location)
+        return (has_course_access(request.user, course.location)
                 # pylint: disable=fixme
                 # TODO remove this condition when templates purged from db
                 and course.location.course != 'templates'
@@ -207,7 +242,7 @@ def create_new_course(request):
 
     Returns the URL for the course overview page.
     """
-    if not is_user_in_creator_group(request.user):
+    if not auth.has_access(request.user, CourseCreatorRole()):
         raise PermissionDenied()
 
     org = request.json.get('org')
@@ -216,7 +251,7 @@ def create_new_course(request):
     run = request.json.get('run')
 
     try:
-        dest_location = Location('i4x', org, number, 'course', run)
+        dest_location = Location(u'i4x', org, number, u'course', run)
     except InvalidLocationError as error:
         return JsonResponse({
             "ErrMsg": _("Unable to create course '{name}'.\n\n{err}").format(
@@ -251,8 +286,10 @@ def create_new_course(request):
     course_search_location = bson.son.SON({
         '_id.tag': 'i4x',
         # cannot pass regex to Location constructor; thus this hack
-        '_id.org': re.compile('^{}$'.format(dest_location.org), re.IGNORECASE),
-        '_id.course': re.compile('^{}$'.format(dest_location.course), re.IGNORECASE),
+        # pylint: disable=E1101
+        '_id.org': re.compile(u'^{}$'.format(dest_location.org), re.IGNORECASE | re.UNICODE),
+        # pylint: disable=E1101
+        '_id.course': re.compile(u'^{}$'.format(dest_location.course), re.IGNORECASE | re.UNICODE),
         '_id.category': 'course',
     })
     courses = modulestore().collection.find(course_search_location, fields=('_id'))
@@ -297,7 +334,10 @@ def create_new_course(request):
     initialize_course_tabs(new_course)
 
     new_location = loc_mapper().translate_location(new_course.location.course_id, new_course.location, False, True)
-    create_all_course_groups(request.user, new_location)
+    # can't use auth.add_users here b/c it requires request.user to already have Instructor perms in this course
+    # however, we can assume that b/c this user had authority to create the course, the user can add themselves
+    CourseInstructorRole(new_location).add_users(request.user)
+    auth.add_users(request.user, CourseStaffRole(new_location), request.user)
 
     # seed the forums
     seed_permissions_roles(new_course.location.course_id)
@@ -370,7 +410,7 @@ def course_info_update_handler(request, tag=None, package_id=None, branch=None, 
         provided_id = None
 
     # check that logged in user has permissions to this item (GET shouldn't require this level?)
-    if not has_access(request.user, updates_location):
+    if not has_course_access(request.user, updates_location):
         raise PermissionDenied()
 
     if request.method == 'GET':
@@ -413,15 +453,21 @@ def settings_handler(request, tag=None, package_id=None, branch=None, version_gu
     if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
         upload_asset_url = locator.url_reverse('assets/')
 
+        # see if the ORG of this course can be attributed to a 'Microsite'. In that case, the
+        # course about page should be editable in Studio
+        about_page_editable = not MicrositeConfiguration.get_microsite_configuration_value_for_org(
+            course_module.location.org,
+            'ENABLE_MKTG_SITE',
+            settings.FEATURES.get('ENABLE_MKTG_SITE', False)
+        )
+
         return render_to_response('settings.html', {
             'context_course': course_module,
             'course_locator': locator,
             'lms_link_for_about_page': utils.get_lms_link_for_about_page(course_module.location),
             'course_image_url': utils.course_image_url(course_module),
             'details_url': locator.url_reverse('/settings/details/'),
-            'about_page_editable': not settings.FEATURES.get(
-                'ENABLE_MKTG_SITE', False
-            ),
+            'about_page_editable': about_page_editable,
             'upload_asset_url': upload_asset_url
         })
     elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):

@@ -1,14 +1,25 @@
 #pylint: disable=C0111
-
+import datetime
 import os
+import pytz
+from mock import patch
+from pytz import UTC
+from nose.tools import assert_equal
+from splinter.exceptions import ElementDoesNotExist
 
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from lettuce import world, step
 from lettuce.django import django_url
-from common import course_id, visit_scenario_item
 
-from courseware.tests.factories import InstructorFactory
+from common import course_id, visit_scenario_item
+from courseware.tests.factories import InstructorFactory, BetaTesterFactory
+
+from courseware.access import has_access
+from student.tests.factories import UserFactory
+
+from nose.tools import assert_equals
+from common import course_id, visit_scenario_item
 
 
 @step('I view the LTI and error is shown$')
@@ -61,12 +72,13 @@ def incorrect_lti_is_rendered(_step):
     assert world.is_css_present('iframe', wait_time=2)
     assert not world.is_css_present('.link_lti_new_window', wait_time=0)
     assert not world.is_css_present('.error_message', wait_time=0)
+
     #inside iframe test content is presented
     check_lti_iframe_content("Wrong LTI signature")
 
 
-@step('the course has correct LTI credentials$')
-def set_correct_lti_passport(_step):
+@step('the course has correct LTI credentials with registered (.*)$')
+def set_correct_lti_passport(_step, user='Instructor'):
     coursenum = 'test_course'
     metadata = {
         'lti_passports': ["correct_lti_id:{}:{}".format(
@@ -74,7 +86,8 @@ def set_correct_lti_passport(_step):
             world.lti_server.oauth_settings['client_secret']
         )]
     }
-    i_am_registered_for_the_course(coursenum, metadata)
+
+    i_am_registered_for_the_course(coursenum, metadata, user)
 
 
 @step('the course has incorrect LTI credentials$')
@@ -86,7 +99,9 @@ def set_incorrect_lti_passport(_step):
             "incorrect_lti_secret_key"
         )]
     }
+
     i_am_registered_for_the_course(coursenum, metadata)
+
 
 @step('the course has an LTI component with (.*) fields(?:\:)?$') #, new_page is(.*), is_graded is(.*)
 def add_correct_lti_to_course(_step, fields):
@@ -95,6 +110,7 @@ def add_correct_lti_to_course(_step, fields):
         'lti_id': 'correct_lti_id',
         'launch_url': world.lti_server.oauth_settings['lti_base'] + world.lti_server.oauth_settings['lti_endpoint'],
     }
+
     if fields.strip() == 'incorrect_lti_id':  # incorrect fields
         metadata.update({
             'lti_id': 'incorrect_lti_id'
@@ -126,8 +142,7 @@ def add_correct_lti_to_course(_step, fields):
     visit_scenario_item('LTI')
 
 
-def create_course(course, metadata):
-
+def create_course_for_lti(course, metadata):
     # First clear the modulestore so we don't try to recreate
     # the same course twice
     # This also ensures that the necessary templates are loaded
@@ -181,16 +196,38 @@ def create_course(course, metadata):
         metadata={'graded': True, 'format': 'Homework'})
 
 
-def i_am_registered_for_the_course(course, metadata):
-    # Create the course
-    create_course(course, metadata)
+@patch.dict('courseware.access.settings.FEATURES', {'DISABLE_START_DATES': False})
+def i_am_registered_for_the_course(coursenum, metadata, user='Instructor'):
+    # Create user
+    if user == 'BetaTester':
+        # Create the course
+        now = datetime.datetime.now(pytz.UTC)
+        tomorrow = now + datetime.timedelta(days=5)
+        metadata.update({'days_early_for_beta': 5, 'start': tomorrow})
+        create_course_for_lti(coursenum, metadata)
+        course_descriptor = world.scenario_dict['COURSE']
+        course_location = world.scenario_dict['COURSE'].location
 
-    # Create an instructor
-    instructor = InstructorFactory(course=world.scenario_dict['COURSE'].location)
+        # create beta tester
+        user = BetaTesterFactory(course=course_location)
+        normal_student = UserFactory()
+        instructor = InstructorFactory(course=course_location)
+
+        assert not has_access(normal_student, course_descriptor, 'load')
+        assert has_access(user, course_descriptor, 'load')
+        assert has_access(instructor, course_descriptor, 'load')
+    else:
+        metadata.update({'start': datetime.datetime(1970, 1, 1, tzinfo=UTC)})
+        create_course_for_lti(coursenum, metadata)
+        course_descriptor = world.scenario_dict['COURSE']
+        course_location = world.scenario_dict['COURSE'].location
+        user = InstructorFactory(course=course_location)
 
     # Enroll the user in the course and log them in
-    world.enroll_user(instructor, course_id(course))
-    world.log_in(username=instructor.username, password='test')
+    if has_access(user, course_descriptor, 'load'):
+        world.enroll_user(user, course_id(coursenum))
+
+    world.log_in(username=user.username, password='test')
 
 
 def check_lti_popup():
@@ -205,11 +242,11 @@ def check_lti_popup():
         url = world.browser.url
         basename = os.path.basename(url)
         pathname = os.path.splitext(basename)[0]
-
         if pathname == u'correct_lti_endpoint':
             break
 
     result = world.css_find('.result').first.text
+
     assert result == u'This is LTI tool. Success.'
 
     world.browser.driver.close() # Close the pop-up window
@@ -254,4 +291,27 @@ def click_grade(_step):
     with world.browser.get_iframe(iframe_name) as iframe:
         iframe.find_by_name('submit-button').first.click()
         assert iframe.is_text_present('LTI consumer (edX) responded with XML content')
+
+
+@step('I see in iframe that LTI role is (.*)$')
+def check_role(_step, role):
+    world.is_css_present('iframe')
+    location = world.scenario_dict['LTI'].location.html_id()
+    iframe_name = 'ltiFrame-' + location
+    with world.browser.get_iframe(iframe_name) as iframe:
+        expected_role = 'Role: ' + role
+        role = world.retry_on_exception(
+            lambda: iframe.find_by_tag('h5').first.value,
+            max_attempts=5,
+            ignored_exceptions=ElementDoesNotExist
+        )
+        assert_equal(expected_role, role)
+
+
+@step('I switch to (.*)$')
+def switch_view(_step, view):
+    staff_status = world.css_find('#staffstatus').first
+    if staff_status.text != view:
+        world.css_click('#staffstatus')
+        world.wait_for_ajax_complete()
 

@@ -1,15 +1,14 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
+
 <%inherit file="../main.html" />
 <%block name="bodyclass">register verification-process step-requirements ${'is-upgrading' if upgrade else ''}</%block>
-<%block name="title">
-  <title>
+<%block name="pagetitle">
     %if upgrade:
       ${_("Upgrade Your Registration for {}").format(course_name)}
     %else:
       ${_("Register for {}").format(course_name)}
     %endif
-  </title>
 </%block>
 
 <%block name="content">
@@ -169,7 +168,7 @@
           %if upgrade:
             <span class="help help-inline">${_("Missing something? You can always continue to audit this course instead.")}</span>
           %else:
-            <span class="help help-inline">${_("Missing something? You can always {a_start} audit this course instead {a_end}").format(a_start='<a href="/course_modes/choose/' + course_id + '">', a_end="</a>")}</span>
+            <span class="help help-inline">${_("Missing something? You can always {a_start}audit this course instead{a_end}").format(a_start='<a href="/course_modes/choose/' + course_id + '">', a_end="</a>")}</span>
           %endif
 
           <ol class="wizard-steps">

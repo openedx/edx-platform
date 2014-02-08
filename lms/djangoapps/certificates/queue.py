@@ -181,14 +181,16 @@ class XQueueCertInterface(object):
             is_whitelisted = self.whitelist.filter(
                 user=student, course_id=course_id, whitelist=True).exists()
             enrollment_mode = CourseEnrollment.enrollment_mode_for_user(student, course_id)
+            mode_is_verified = (enrollment_mode == GeneratedCertificate.MODES.verified)
+            user_is_verified = SoftwareSecurePhotoVerification.user_is_verified(student)
+            user_is_reverified = SoftwareSecurePhotoVerification.user_is_reverified_for_all(course_id, student)
             org = course_id.split('/')[0]
             course_num = course_id.split('/')[1]
             cert_mode = enrollment_mode
-            if enrollment_mode == GeneratedCertificate.MODES.verified and SoftwareSecurePhotoVerification.user_is_verified(student):
+            if (mode_is_verified and user_is_verified and user_is_reverified):
                 template_pdf = "certificate-template-{0}-{1}-verified.pdf".format(
                     org, course_num)
-            elif (enrollment_mode == GeneratedCertificate.MODES.verified and not
-                    SoftwareSecurePhotoVerification.user_is_verified(student)):
+            elif (mode_is_verified and not (user_is_verified and user_is_reverified)):
                 template_pdf = "certificate-template-{0}-{1}.pdf".format(
                     org, course_num)
                 cert_mode = GeneratedCertificate.MODES.honor

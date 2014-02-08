@@ -15,15 +15,25 @@
 
 %>
 <%namespace name='static' file='../static_content.html'/>
+<%! from microsite_configuration.middleware import MicrositeConfiguration %>
 
 <%inherit file="../main.html" />
 
 <%block name="headextra">
-  % if self.theme_enabled():
-    <%include file="../theme-google-analytics.html" />
-  % else:
-    <%include file="../google_analytics.html" />
-  % endif
+
+  <%
+    if self.theme_enabled():
+      google_analytics_file = u'../' + MicrositeConfiguration.get_microsite_configuration_value('google_analytics_file', 'theme-google-analytics.html')
+    else:
+      google_analytics_file = '../google_analytics.html'
+  %>
+
+  <%include file="${google_analytics_file}" />
+  
+  ## OG (Open Graph) title and description added below to give social media info to display
+  ## (https://developers.facebook.com/docs/opengraph/howtos/maximizing-distribution-media-content#tags)
+  <meta property="og:title" content="${get_course_about_section(course, 'title')}" />
+  <meta property="og:description" content="${get_course_about_section(course, 'short_description')}" />
 </%block>
 
 <%block name="js_extra">
@@ -131,7 +141,7 @@
   <script src="${static.url('js/course_info.js')}"></script>
 </%block>
 
-<%block name="title"><title>${_("About {course.display_number_with_default}").format(course=course) | h}</title></%block>
+<%block name="pagetitle">${_("About {course.display_number_with_default}").format(course=course) | h}</%block>
 
 <section class="course-info">
   <header class="course-profile">
@@ -248,6 +258,7 @@
       <section class="course-sidebar">
         <section class="course-summary">
           <header>
+            % if MicrositeConfiguration.get_microsite_configuration_value('course_about_show_social_links', True):
             <div class="social-sharing">
               <div class="sharing-message">${_("Share with friends and family!")}</div>
               ## TODO: this should probably be an overrideable block,
@@ -261,17 +272,28 @@
                   <img src="${static.url('images/social/email-sharing.png')}" alt="Email someone to say you've registered for this course">
                 </a>
               % else:
-                <a href="http://twitter.com/intent/tweet?text=I+just+registered+for+${course.number}+${get_course_about_section(course, 'title')}+through+@edxonline:+http://www.edx.org${reverse('about_course', args=[course.id])}" class="share">
+                <%
+                  site_domain = MicrositeConfiguration.get_microsite_configuration_value('site_domain', 'www.edx.org')
+                  platform_name = MicrositeConfiguration.get_microsite_configuration_value('platform_name', 'edX')
+
+                  tweet_action = "http://twitter.com/intent/tweet?text=I+just+registered+for+"+course.number+"+"+get_course_about_section(course, 'title')+"+through+"+MicrositeConfiguration.get_microsite_configuration_value('course_about_twitter_account', '@edxonline')+":+http://"+site_domain+reverse('about_course', args=[course.id])
+
+                  facebook_link = MicrositeConfiguration.get_microsite_configuration_value('course_about_facebook_link', 'http://www.facebook.com/EdxOnline')
+
+                  email_subject = "mailto:?subject=Take%20a%20course%20with%20"+platform_name+"%20online&body=I%20just%20registered%20for%20"+course.number+"%20"+get_course_about_section(course, 'title')+"%20through%20"+platform_name+"%20http://"+site_domain+reverse('about_course', args=[course.id])
+                %>
+                <a href="${tweet_action}" class="share">
                   <img src="${static.url('images/social/twitter-sharing.png')}" alt="Tweet that you've registered for this course">
                 </a>
-                <a href="http://www.facebook.com/EdxOnline" class="share">
+                <a href="${facebook_link}" class="share">
                   <img src="${static.url('images/social/facebook-sharing.png')}" alt="Post a Facebook message to say you've registered for this course">
                 </a>
-                <a href="mailto:?subject=Take%20a%20course%20with%20edX%20online&body=I%20just%20registered%20for%20${course.number}%20${get_course_about_section(course, 'title')}%20through%20edX:+http://edx.org/${reverse('about_course', args=[course.id])}" class="share">
+                <a href="${email_subject}" class="share">
                   <img src="${static.url('images/social/email-sharing.png')}" alt="Email someone to say you've registered for this course">
                 </a>
               % endif
             </div>
+            % endif
           </header>
       
           <ol class="important-dates">

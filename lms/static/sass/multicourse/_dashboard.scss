@@ -133,6 +133,52 @@
           }
         }
       }
+
+      .reverify-status-list {
+        padding: 0 0 0 ($baseline/2);
+        margin: ($baseline/4) 0;
+
+        .status-item {
+          @extend %t-copy-sub2;
+          margin-bottom: 7px;
+          border-bottom: 0;
+          padding: 0;
+
+          [class^="icon-"] {
+            display: inline-block;
+            vertical-align: top;
+            margin: ($baseline/10) ($baseline/4) 0 0;
+          }
+
+          &.is-open [class^="icon-"] {
+            color: $action-primary-bg;
+          }
+
+          &.is-pending [class^="icon-"] {
+            color: $warning-color;
+          }
+
+          &.is-approved [class^="icon-"] {
+            color: $success-color;
+          }
+
+          &.is-denied [class^="icon-"] {
+            color: $alert-color;
+          }
+
+          .label {
+            @extend %text-sr;
+          }
+
+          .course-name {
+            @include line-height(12);
+            display: inline-block;
+            vertical-align: top;
+            width: 80%;
+            color: inherit;
+          }
+        }
+      }
     }
 
     .news-carousel {
@@ -749,11 +795,9 @@
       }
 
       &.course-status-certnotavailable {
-        // background: #fee8d6;
       }
 
       &.course-status-certrendering {
-        // background: #d9e7db;
 
         .cta {
           margin-top: 2px;
@@ -761,7 +805,13 @@
       }
 
       &.course-status-certavailable {
-        // background: #d9e7db;
+
+        .action-certificate {
+
+          .btn {
+            @extend %btn-inherited-primary;
+          }
+        }
       }
     }
 

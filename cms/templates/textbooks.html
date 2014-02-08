@@ -34,7 +34,7 @@ require(["js/models/section", "js/collections/textbook", "js/views/list_textbook
       $(window).on("beforeunload", function() {
           var dirty = textbooks.find(function(textbook) { return textbook.isDirty(); });
           if(dirty) {
-              return gettext("You have unsaved changes. Do you really want to leave this page?");
+              return "${_('You have unsaved changes. Do you really want to leave this page?')}";
           }
       })
   })

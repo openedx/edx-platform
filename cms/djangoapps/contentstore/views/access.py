@@ -1,10 +1,10 @@
-from auth.authz import STAFF_ROLE_NAME, INSTRUCTOR_ROLE_NAME
-from auth.authz import is_user_in_course_group_role
 from ..utils import get_course_location_for_item
 from xmodule.modulestore.locator import CourseLocator
+from student.roles import CourseStaffRole, GlobalStaff, CourseInstructorRole
+from student import auth
 
 
-def has_access(user, location, role=STAFF_ROLE_NAME):
+def has_course_access(user, location, role=CourseStaffRole):
     """
     Return True if user allowed to access this piece of data
     Note that the CMS permissions model is with respect to courses
@@ -14,14 +14,23 @@ def has_access(user, location, role=STAFF_ROLE_NAME):
     will not be in both INSTRUCTOR and STAFF groups, so we have to cascade our
     queries here as INSTRUCTOR has all the rights that STAFF do
     """
+    if GlobalStaff().has_user(user):
+        return True
     if not isinstance(location, CourseLocator):
+        # this can be expensive if location is not category=='course'
         location = get_course_location_for_item(location)
-    _has_access = is_user_in_course_group_role(user, location, role)
-    # if we're not in STAFF, perhaps we're in INSTRUCTOR groups
-    if not _has_access and role == STAFF_ROLE_NAME:
-        _has_access = is_user_in_course_group_role(
-                user,
-                location,
-                INSTRUCTOR_ROLE_NAME
-        )
-    return _has_access
+    return auth.has_access(user, role(location))
+
+
+def get_user_role(user, location, context):
+    """
+    Return corresponding string if user has staff or instructor role in Studio.
+    This will not return student role because its purpose for using in Studio.
+
+    :param location: a descriptor.location
+    :param context: a course_id
+    """
+    if auth.has_access(user, CourseInstructorRole(location, context)):
+        return 'instructor'
+    else:
+        return 'staff'

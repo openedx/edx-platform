@@ -94,6 +94,18 @@ function(BaseView, _, MetadataModel, AbstractEditor, VideoList) {
 
         templateName: "metadata-string-entry",
 
+        render: function () {
+            AbstractEditor.prototype.render.apply(this);
+
+            // If the model has property `non editable` equals `true`,
+            // the field is disabled, but user is able to clear it.
+            if (this.model.get('non_editable')) {
+                this.$el.find('#' + this.uniqueId)
+                    .prop('readonly', true)
+                    .addClass('is-disabled');
+            }
+        },
+
         getValueFromEditor : function () {
             return this.$el.find('#' + this.uniqueId).val();
         },

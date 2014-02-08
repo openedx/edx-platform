@@ -2,35 +2,55 @@
 <%namespace name='static' file='static_content.html'/>
 
 <div class="wrapper wrapper-component-editor">
-	<div class="component-editor">
-		<div class="component-edit-header">
-  			<span class="component-name"></span>
-  	  		<ul class="nav-edit-modes">
-  	  			<li id="editor-mode" class="mode active-mode" aria-controls="editor-tab" role="tab">
-  	  				<a href="#">${_("Editor")}</a>
-	  			</li>
-	  			<li id="settings-mode" class="mode active-mode" aria-controls="settings-tab" role="tab">
-	  				<a href="#">${_("Settings")}</a>
-	  			</li>
-	  		</ul>
-		</div> <!-- Editor Header -->
+    <div class="component-editor">
+        <div class="component-edit-header">
+            <span class="component-name"></span>
+            <ul class="nav-edit-modes">
+                <li id="editor-mode" class="mode active-mode" aria-controls="editor-tab" role="tab">
+                    <a href="#">${_("Editor")}</a>
+                </li>
+                <li id="settings-mode" class="mode active-mode" aria-controls="settings-tab" role="tab">
+                    <a href="#">${_("Settings")}</a>
+                </li>
+            </ul>
+        </div> <!-- Editor Header -->
 
-		<div class="component-edit-modes">
-	        <div class="module-editor">
-	            ${editor}
-	        </div>
-		</div>
-		<div class="row module-actions">
-	  		<a href="#" class="save-button action-primary action">${_("Save")}</a>
-	  		<a href="#" class="cancel-button action-secondary action">${_("Cancel")}</a>
-		</div> <!-- Module Actions-->
+        <div class="component-edit-modes">
+            <div class="module-editor">
+                ${editor}
+            </div>
+        </div>
+        <div class="row module-actions">
+            <a href="#" class="save-button action-primary action">${_("Save")}</a>
+            <a href="#" class="cancel-button action-secondary action">${_("Cancel")}</a>
+        </div> <!-- Module Actions-->
   </div>
 </div>
-
-<div class="component-actions">
-  <a href="#" class="edit-button standard"><span class="edit-icon"></span>${_("Edit")}</a>
-  <a href="#" class="delete-button standard"><span class="delete-icon"></span>${_("Delete")}</a>
+<div class="wrapper wrapper-component-action-header">
+    <div class="component-header">
+    ${label}
+    </div>
+    <ul class="component-actions">
+      <li class="action-item action-edit">
+        <a href="#" class="edit-button action-button">
+            <i class="icon-edit"></i>
+            <span class="action-button-text">${_("Edit")}</span>
+        </a>
+      </li>
+      <li class="action-item action-duplicate">
+        <a href="#" data-tooltip="${_("Duplicate")}" class="duplicate-button action-button">
+            <i class="icon-copy"></i>
+            <span class="sr">${_("Duplicate this component")}</span>
+        </a>
+      </li>
+      <li class="action-item action-delete">
+        <a href="#" data-tooltip="${_("Delete")}" class="delete-button action-button">
+            <i class="icon-trash"></i>
+            <span class="sr">${_("Delete this component")}</span>
+        </a>
+      </li>
+    </ul>
 </div>
-<span data-tooltip='${_("Drag to reorder")}' class="drag-handle"></span>
+<span data-tooltip="${_("Drag to reorder")}" class="drag-handle"></span>
 ${preview}
 

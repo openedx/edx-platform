@@ -164,7 +164,7 @@ require(["domReady!", "jquery", "js/models/module_info", "coffee/src/views/unit"
               % endif
               ${_("with the subsection {link_start}{name}{link_end}").format(
                   name=subsection.display_name_with_default,
-                  link_start='<a href="{url}">'.format(url=subsection_url),
+                  link_start=u'<a href="{url}">'.format(url=subsection_url),
                   link_end='</a>',
                 )}
               </p>

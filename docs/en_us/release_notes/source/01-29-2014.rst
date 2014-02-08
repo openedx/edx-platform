@@ -1,0 +1,72 @@
+###################################
+January 29, 2014
+###################################
+
+You can now access the public edX roadmap_ for details about the currently planned product direction.
+
+.. _roadmap: https://edx-wiki.atlassian.net/wiki/display/OPENPROD/OpenEdX+Public+Product+Roadmap
+
+
+*************
+edX Studio
+*************
+
+New documentation, *Building a Course with edX Studio*, is available online_. You can also download the new guide as a PDF from the edX Studio user interface.
+
+.. _online: http://edx.readthedocs.org/projects/ca/en/latest/
+
+There is new documentation on:
+
+* `Managing discussions <http://edx.readthedocs.org/projects/ca/en/latest/discussions.html>`_ 
+* `Best practices for discussion moderators <http://edx.readthedocs.org/projects/ca/en/latest/discussion_guidance_moderators.html>`_
+* `Using external graders <http://ca.readthedocs.org/en/latest/external_graders.html>`_
+
+
+==========================
+Changes and Updates
+==========================
+
+* In edX Studio, you can now duplicate components within a unit. See the documentation on `duplicating components <http://edx.readthedocs.org/projects/ca/en/latest/organizing_course.html#duplicate-a-component>`_ for more information. (STUD-1186)
+
+* You can now use single quotation marks without escaping them when you specify option response answers. The single quotation mark must be between two alphabet characters.  (LMS-2031)
+
+
+
+***************************************
+edX Learning Management System
+***************************************
+
+* A problem that caused the dashboard to not load if there were unicode or space characters in the course image has been fixed. (LMS-2073, STUD-1197)
+
+* When a student sets the speed for a video, that speed setting is now saved and used when the student views subsequent videos. (BLD-237)
+
+* In the Video component, the settings on the **Advanced** tab now include **Transcript Download Allowed** and **Video Download Allowed**, and **Download Video** has been merged into **Video Sources** to eliminate redundancy. A description of each setting is available at `Video Advanced Options <http://ca.readthedocs.org/en/latest/create_video.html#advanced-options>`_. (BLD-364, BLD-368)
+
+* For numerical response problems, students can now enter negative exponents in the same ways they can enter positive exponents. For example, students can enter ``4.9e-9`` or ``4.9*10^-9``. (BLD-434)
+
+* For text input problems, course teams can now use regular expressions to allow some flexibility in students' answers. For example, if a question asks students to name the birthplace of Bill Clinton, students can answer "Hope, AR", "Hope, Arkansas", or "Arkansas."
+
+* The video length now appears when a student first views the video component. The student no longer has to start the video to see the total time. (BLD-529)
+
+* Grading in unreleased LTI components did not work correctly for users with the Beta Tester role. This problem has been resolved. (BLD-641)
+
+* In Firefox, videos started playing from 00:00 even if the instructor specified a different start time for the video. Videos now start from the specified start time. (BLD-708)
+
+
+***************************************
+Discussions
+***************************************
+
+* The Discussion search field now expands when it gets focus through the keyboard. (FOR-203)
+
+
+***************************************
+Open Response Assessments
+***************************************
+
+* If a student submitted a response to be peer graded when the XQueue was down, the submission was lost. The LMS now prevents response submissions when the XQueue is down. Students see an error message that tells them to try to submit the response later. (ORA-197)
+
+* Large comments in peer grading caused database issues. Comments now have a 5000 character limit, which prevents this problem. (ORA-201)
+ 
+* In self assessments, students had to submit responses before the deadline for the problem passed, but didn't have to perform the self assessment of their responses before the deadline. Students must now submit both the response to the problem and their self assessment of that response before the deadline for the problem. (ORA-202) 
+

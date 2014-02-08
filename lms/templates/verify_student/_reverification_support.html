@@ -6,19 +6,14 @@
       <li class="help-item help-item-whyreverify">
         <h3 class="title">${_("Why Do I Need to Re-Verify?")}</h3>
         <div class="copy">
-          <p>${_("There was a problem with your original verification.  To make sure that your identity is correctly associated with your course progress, we need to retake your photo and a photo of your identification document.  If you don't have a valid identification document, contact {link_start}{support_email}{link_end}.").format(
-          support_email=settings.DEFAULT_FEEDBACK_EMAIL,
-          link_start=u'<a href="mailto:{address}?subject={subject_line}">'.format(
-                                address=settings.DEFAULT_FEEDBACK_EMAIL,
-                                subject_line=_('Problem with ID re-verification')),
-          link_end=u'</a>')}</p>
+          <p>${_("At key points in a course, the professor will ask you to re-verify your identity. We will send the new photo to be matched up with the photo of the original ID you submitted when you signed up for the course.")}</p>
         </div>
       </li>
 
       <li class="help-item help-item-technical">
         <h3 class="title">${_("Having Technical Trouble?")}</h3>
         <div class="copy">
-          <p>${_("Please make sure your browser is updated to the {strong_start}{a_start}most recent version possible{a_end}{strong_end}. Also, please make sure your {strong_start}web cam is plugged in, turned on, and allowed to function in your web browser (commonly adjustable in your browser settings).{strong_end}").format(a_start='<a rel="external" href="http://browsehappy.com/">', a_end="</a>", strong_start="<strong>", strong_end="</strong>")}</p>
+          <p>${_("Please make sure your browser is updated to the <strong>{a_start}most recent version possible{a_end}</strong>. Also, please make sure your <strong>web cam is plugged in, turned on, and allowed to function in your web browser (commonly adjustable in your browser settings)</strong>").format(a_start='<a rel="external" href="http://browsehappy.com/">', a_end="</a>")}</p>
         </div>
       </li>
 

@@ -35,15 +35,18 @@ define(["backbone", "underscore", "gettext"], function(Backbone, _, gettext) {
                 collection = view.collection,
                 start = collection.start,
                 count = collection.size(),
+                sortName = view.sortDisplayName(),
+                sortDirectionName = view.sortDirectionName(),
                 end = start + count,
                 total = collection.totalCount,
-                fmts = gettext('Showing %(current_span)s%(start)s-%(end)s%(end_span)s out of %(total_span)s%(total)s total%(end_span)s, sorted by %(order_span)s%(sort_order)s%(end_span)s');
+                fmts = gettext('Showing %(current_span)s%(start)s-%(end)s%(end_span)s out of %(total_span)s%(total)s total%(end_span)s, sorted by %(order_span)s%(sort_order)s%(end_span)s %(sort_direction)s');
 
             return '<p>' + interpolate(fmts, {
                     start: Math.min(start + 1, end),
                     end: end,
                     total: total,
-                    sort_order: gettext('Date Added'),
+                    sort_order: sortName,
+                    sort_direction: sortDirectionName,
                     current_span: '<span class="count-current-shown">',
                     total_span: '<span class="count-total">',
                     order_span: '<span class="sort-order">',

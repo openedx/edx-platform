@@ -9,6 +9,7 @@ from factory import Factory, lazy_attribute, post_generation, Sequence
 from lxml import etree
 
 from xmodule.modulestore.inheritance import InheritanceMixin
+from xmodule.x_module import only_xmodules
 
 
 class XmlImportData(object):
@@ -19,7 +20,7 @@ class XmlImportData(object):
     def __init__(self, xml_node, xml=None, org=None, course=None,
                  default_class=None, policy=None,
                  filesystem=None, parent=None,
-                 xblock_mixins=()):
+                 xblock_mixins=(), xblock_select=None):
 
         self._xml_node = xml_node
         self._xml_string = xml
@@ -28,6 +29,7 @@ class XmlImportData(object):
         self.default_class = default_class
         self.filesystem = filesystem
         self.xblock_mixins = xblock_mixins
+        self.xblock_select = xblock_select
         self.parent = parent
 
         if policy is None:
@@ -47,7 +49,8 @@ class XmlImportData(object):
         return u"XmlImportData{!r}".format((
             self._xml_node, self._xml_string, self.org,
             self.course, self.default_class, self.policy,
-            self.filesystem, self.parent, self.xblock_mixins
+            self.filesystem, self.parent, self.xblock_mixins,
+            self.xblock_select,
         ))
 
 
@@ -65,6 +68,7 @@ class XmlImportFactory(Factory):
 
     filesystem = MemoryFS()
     xblock_mixins = (InheritanceMixin,)
+    xblock_select = only_xmodules
     url_name = Sequence(str)
     attribs = {}
     policy = {}
@@ -115,6 +119,10 @@ class XmlImportFactory(Factory):
 class CourseFactory(XmlImportFactory):
     """Factory for <course> nodes"""
     tag = 'course'
+    org = 'edX'
+    course = 'xml_test_course'
+    name = '101'
+    static_asset_path = 'xml_test_course'
 
 
 class SequenceFactory(XmlImportFactory):

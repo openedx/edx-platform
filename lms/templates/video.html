@@ -17,8 +17,11 @@
     ${'data-webm-source="{}"'.format(sources.get('webm')) if sources.get('webm') else ''}
     ${'data-ogg-source="{}"'.format(sources.get('ogv')) if sources.get('ogv') else ''}
 
+    data-save-state-url="${ajax_url}"
     data-caption-data-dir="${data_dir}"
     data-show-captions="${show_captions}"
+    data-general-speed="${general_speed}"
+    data-speed="${speed}"
     data-start="${start}"
     data-end="${end}"
     data-caption-asset-path="${caption_asset_path}"
@@ -56,8 +59,7 @@
           </section>
           <div class="video-player-post"></div>
           <section class="video-controls is-hidden">
-              <div class="slider" title="Video position"></div>
-
+              <div class="slider" title="${_('Video position')}"></div>
               <div>
                   <ul class="vcr">
                       <li><a class="video_control" href="#" title="${_('Play')}" role="button" aria-disabled="false"></a></li>
@@ -108,5 +110,3 @@
     % endif
   </ul>
 </div>
-
-

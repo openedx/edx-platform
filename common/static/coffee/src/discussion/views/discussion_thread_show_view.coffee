@@ -2,14 +2,17 @@ if Backbone?
   class @DiscussionThreadShowView extends DiscussionContentView
 
     events:
-      "click .discussion-vote": "toggleVote"
+      "click .vote-btn":
+        (event) -> @toggleVote(event)
+      "keydown .vote-btn":
+        (event) -> DiscussionUtil.activateOnSpace(event, @toggleVote)
       "click .discussion-flag-abuse": "toggleFlagAbuse"
-      "keypress .discussion-flag-abuse":
-        (event) -> DiscussionUtil.activateOnEnter(event, toggleFlagAbuse)
+      "keydown .discussion-flag-abuse":
+        (event) -> DiscussionUtil.activateOnSpace(event, @toggleFlagAbuse)
       "click .admin-pin": "togglePin"
       "click .action-follow": "toggleFollowing"
-      "keypress .action-follow":
-        (event) -> DiscussionUtil.activateOnEnter(event, toggleFollowing)
+      "keydown .action-follow":
+        (event) -> DiscussionUtil.activateOnSpace(event, @toggleFollowing)
       "click .action-edit": "edit"
       "click .action-delete": "_delete"
       "click .action-openclose": "toggleClosed"
@@ -28,7 +31,7 @@ if Backbone?
     render: ->
       @$el.html(@renderTemplate())
       @delegateEvents()
-      @renderVoted()
+      @renderVote()
       @renderFlagged()
       @renderPinned()
       @renderAttrs()
@@ -38,83 +41,39 @@ if Backbone?
       @highlight @$("h1,h3")
       @
 
-    renderVoted: =>
-      if window.user.voted(@model)
-        @$("[data-role=discussion-vote]").addClass("is-cast")
-        @$("[data-role=discussion-vote] span.sr").html("votes (click to remove your vote)")
-      else
-        @$("[data-role=discussion-vote]").removeClass("is-cast")
-        @$("[data-role=discussion-vote] span.sr").html("votes (click to vote)")
-        
     renderFlagged: =>
       if window.user.id in @model.get("abuse_flaggers") or (DiscussionUtil.isFlagModerator and @model.get("abuse_flaggers").length > 0)
         @$("[data-role=thread-flag]").addClass("flagged")  
         @$("[data-role=thread-flag]").removeClass("notflagged")
         @$(".discussion-flag-abuse").attr("aria-pressed", "true")
-        @$(".discussion-flag-abuse .flag-label").html("Misuse Reported")
+        @$(".discussion-flag-abuse").attr("data-tooltip", gettext("Click to remove report"))
+        @$(".discussion-flag-abuse .flag-label").html(interpolate(gettext("Misuse Reported, %(start_sr_span)s click to remove report%(end_span)s"), {"start_sr_span": "<span class='sr'>", "end_span": "</span>"}, true))
       else
         @$("[data-role=thread-flag]").removeClass("flagged")  
         @$("[data-role=thread-flag]").addClass("notflagged")      
         @$(".discussion-flag-abuse").attr("aria-pressed", "false")
-        @$(".discussion-flag-abuse .flag-label").html("Report Misuse")
+        @$(".discussion-flag-abuse .flag-label").html(gettext("Report Misuse"))
 
     renderPinned: =>
       if @model.get("pinned")
         @$("[data-role=thread-pin]").addClass("pinned")  
         @$("[data-role=thread-pin]").removeClass("notpinned")  
-        @$(".discussion-pin .pin-label").html("Pinned")
+        @$(".discussion-pin .pin-label").html(gettext("Pinned"))
       else
         @$("[data-role=thread-pin]").removeClass("pinned")  
         @$("[data-role=thread-pin]").addClass("notpinned")  
-        @$(".discussion-pin .pin-label").html("Pin Thread")
+        @$(".discussion-pin .pin-label").html(gettext("Pin Thread"))
 
 
     updateModelDetails: =>
-      @renderVoted()
+      @renderVote()
       @renderFlagged()
       @renderPinned()
-      @$("[data-role=discussion-vote] .votes-count-number").html(@model.get("votes")["up_count"] + '<span class ="sr"></span>')
-      if window.user.voted(@model)
-        @$("[data-role=discussion-vote] .votes-count-number span.sr").html("votes (click to remove your vote)")
-      else
-        @$("[data-role=discussion-vote] .votes-count-number span.sr").html("votes (click to vote)")
-
 
     convertMath: ->
       element = @$(".post-body")
       element.html DiscussionUtil.postMathJaxProcessor DiscussionUtil.markdownWithHighlight element.text()
       MathJax.Hub.Queue ["Typeset", MathJax.Hub, element[0]]
-
-    toggleVote: (event) ->
-      event.preventDefault()
-      if window.user.voted(@model)
-        @unvote()
-      else
-        @vote()
-
-    vote: ->
-      window.user.vote(@model)
-      url = @model.urlFor("upvote")
-      DiscussionUtil.safeAjax
-        $elem: @$(".discussion-vote")
-        url: url
-        type: "POST"
-        success: (response, textStatus) =>
-          if textStatus == 'success'
-            @model.set(response, {silent: true})
-
-
-    unvote: ->
-      window.user.unvote(@model)
-      url = @model.urlFor("unvote")
-      DiscussionUtil.safeAjax
-        $elem: @$(".discussion-vote")
-        url: url
-        type: "POST"
-        success: (response, textStatus) =>
-          if textStatus == 'success'
-            @model.set(response, {silent: true})
-
 
     edit: (event) ->
       @trigger "thread:edit", event
@@ -139,7 +98,7 @@ if Backbone?
           if textStatus == 'success'
             @model.set('pinned', true)
         error: =>
-          $('.admin-pin').text("Pinning not currently available")
+          $('.admin-pin').text(gettext("Pinning is not currently available"))
        
     unPin: ->
       url = @model.urlFor("unPinThread")

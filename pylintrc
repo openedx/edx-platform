@@ -127,7 +127,13 @@ generated-members=
     build,
 # For xblocks
     fields,
-
+# For locations
+    tag,
+    org,
+    course,
+    category,
+    name,
+    revision,
 
 [BASIC]
 

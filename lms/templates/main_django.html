@@ -1,16 +1,10 @@
 <!DOCTYPE html>
-{% load compressed %}{% load sekizai_tags i18n %}{% load url from future %}{% load staticfiles %}
-<html>
+{% load compressed %}{% load sekizai_tags i18n microsite %}{% load url from future %}{% load staticfiles %}
+<html lang="{{LANGUAGE_CODE}}">
 <head>
-  {% block title %}
-    {% if THEME_NAME == "stanford" %}
-      <title>Home | class.stanford.edu</title>
-    {% else %}
-      <title>edX</title>
-    {% endif %}
-  {% endblock %}
-  
-  <link rel="icon" type="image/x-icon" href="{% static FAVICON_PATH %}" />
+  {% block title %}<title>{% platform_name %}</title>{% endblock %}
+
+  <link rel="icon" type="image/x-icon" href="{% static "images/favicon.ico" %}" />
 
   {% compressed_css 'style-vendor' %}
   {% compressed_css 'style-app' %}
@@ -36,7 +30,7 @@
   <meta name="path_prefix" content="{{EDX_ROOT_URL}}">
 </head>
 
-<body class="{% block bodyclass %}{% endblock %}">
+<body class="{% block bodyclass %}{% endblock %} lang_{{LANGUAGE_CODE}}">
   <a class="nav-skip" href="#content">{% trans "Skip to this view's content" %}</a>
   {% if FEATURES.USE_CUSTOM_THEME %}
     {% include "theme-header.html" %}

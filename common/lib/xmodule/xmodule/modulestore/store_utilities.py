@@ -73,13 +73,13 @@ def rewrite_nonportable_content_links(source_course_id, dest_course_id, text):
     # NOTE: ultimately link updating is not a hard requirement, so if something blows up with
     # the regex subsitution, log the error and continue
     try:
-        c4x_link_base = '{0}/'.format(StaticContent.get_base_url_path_for_course_assets(course_location))
+        c4x_link_base = u'{0}/'.format(StaticContent.get_base_url_path_for_course_assets(course_location))
         text = re.sub(_prefix_only_url_replace_regex(c4x_link_base), portable_asset_link_subtitution, text)
     except Exception, e:
         logging.warning("Error going regex subtituion %r on text = %r.\n\nError msg = %s", c4x_link_base, text, str(e))
 
     try:
-        jump_to_link_base = '/courses/{org}/{course}/{run}/jump_to/i4x://{org}/{course}/'.format(
+        jump_to_link_base = u'/courses/{org}/{course}/{run}/jump_to/i4x://{org}/{course}/'.format(
             org=org, course=course, run=run
         )
         text = re.sub(_prefix_and_category_url_replace_regex(jump_to_link_base), portable_jump_to_link_substitution, text)
@@ -94,7 +94,7 @@ def rewrite_nonportable_content_links(source_course_id, dest_course_id, text):
     #
     if source_course_id != dest_course_id:
         try:
-            generic_courseware_link_base = '/courses/{org}/{course}/{run}/'.format(
+            generic_courseware_link_base = u'/courses/{org}/{course}/{run}/'.format(
                 org=org, course=course, run=run
             )
             text = re.sub(_prefix_only_url_replace_regex(generic_courseware_link_base), portable_asset_link_subtitution, text)
@@ -199,7 +199,7 @@ def clone_course(modulestore, contentstore, source_location, dest_location, dele
 
     # now iterate through all of the assets, also updating the thumbnail pointer
 
-    assets,__ = contentstore.get_all_content_for_course(source_location)
+    assets, __ = contentstore.get_all_content_for_course(source_location)
     for asset in assets:
         asset_loc = Location(asset["_id"])
         content = contentstore.find(asset_loc)
@@ -260,7 +260,7 @@ def delete_course(modulestore, contentstore, source_location, commit=False):
     _delete_assets(contentstore, thumbs, commit)
 
     # then delete all of the assets
-    assets,__ = contentstore.get_all_content_for_course(source_location)
+    assets, __ = contentstore.get_all_content_for_course(source_location)
     _delete_assets(contentstore, assets, commit)
 
     # then delete all course modules

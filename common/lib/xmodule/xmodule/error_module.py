@@ -1,5 +1,5 @@
 """
-Modules that get shown to the users when an error has occured while
+Modules that get shown to the users when an error has occurred while
 loading or rendering other modules
 """
 
@@ -81,12 +81,15 @@ class ErrorDescriptor(ErrorFields, XModuleDescriptor):
 
     @classmethod
     def _construct(cls, system, contents, error_msg, location):
+        location = Location(location)
 
-        if isinstance(location, dict) and 'course' in location:
-            location = Location(location)
-        if isinstance(location, Location) and location.name is None:
+        if error_msg is None:
+            # this string is not marked for translation because we don't have
+            # access to the user context, and this will only be seen by staff
+            error_msg = 'Error not available'
+
+        if location.category == 'error':
             location = location.replace(
-                category='error',
                 # Pick a unique url_name -- the sha1 hash of the contents.
                 # NOTE: We could try to pull out the url_name of the errored descriptor,
                 # but url_names aren't guaranteed to be unique between descriptor types,
@@ -99,7 +102,6 @@ class ErrorDescriptor(ErrorFields, XModuleDescriptor):
         field_data = DictFieldData({
             'error_msg': str(error_msg),
             'contents': contents,
-            'display_name': 'Error: ' + location.url(),
             'location': location,
             'category': 'error'
         })
@@ -127,7 +129,7 @@ class ErrorDescriptor(ErrorFields, XModuleDescriptor):
         )
 
     @classmethod
-    def from_descriptor(cls, descriptor, error_msg='Error not available'):
+    def from_descriptor(cls, descriptor, error_msg=None):
         return cls._construct(
             descriptor.runtime,
             str(descriptor),
@@ -136,8 +138,8 @@ class ErrorDescriptor(ErrorFields, XModuleDescriptor):
         )
 
     @classmethod
-    def from_xml(cls, xml_data, system, org=None, course=None,
-                 error_msg='Error not available'):
+    def from_xml(cls, xml_data, system, id_generator,  # pylint: disable=arguments-differ
+                 error_msg=None):
         '''Create an instance of this descriptor from the supplied data.
 
         Does not require that xml_data be parseable--just stores it and exports
@@ -156,13 +158,13 @@ class ErrorDescriptor(ErrorFields, XModuleDescriptor):
                 if error_node is not None:
                     error_msg = error_node.text
                 else:
-                    error_msg = 'Error not available'
+                    error_msg = None
 
         except etree.XMLSyntaxError:
             # Save the error to display later--overrides other problems
             error_msg = exc_info_to_str(sys.exc_info())
 
-        return cls._construct(system, xml_data, error_msg, location=Location('i4x', org, course, None, None))
+        return cls._construct(system, xml_data, error_msg, location=id_generator.create_definition('error'))
 
     def export_to_xml(self, resource_fs):
         '''

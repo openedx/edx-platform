@@ -107,7 +107,7 @@ def course_image_url(course):
     if course.static_asset_path or modulestore().get_modulestore_type(course.location.course_id) == XML_MODULESTORE_TYPE:
         return '/static/' + (course.static_asset_path or getattr(course, 'data_dir', '')) + "/images/course_image.jpg"
     else:
-        loc = course.location.replace(tag='c4x', category='asset', name=course.course_image)
+        loc = StaticContent.compute_location(course.location.org, course.location.course, course.course_image)
         _path = StaticContent.get_url_path_from_location(loc)
         return _path
 
@@ -295,7 +295,7 @@ def get_courses(user, domain=None):
     '''
     Returns a list of courses available, sorted by course.number
     '''
-    courses = branding.get_visible_courses(domain)
+    courses = branding.get_visible_courses()
     courses = [c for c in courses if has_access(user, c, 'see_exists')]
 
     courses = sorted(courses, key=lambda course: course.number)

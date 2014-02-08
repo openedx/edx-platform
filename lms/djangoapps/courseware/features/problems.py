@@ -42,13 +42,15 @@ def view_problem(step, problem_type):
 def set_external_grader_response(step, correctness):
     assert(correctness in ['correct', 'incorrect'])
 
-    response_dict = {'correct': True if correctness == 'correct' else False,
-                    'score': 1 if correctness == 'correct' else 0,
-                    'msg': 'Your problem was graded %s' % correctness}
+    response_dict = {
+        'correct': True if correctness == 'correct' else False,
+        'score': 1 if correctness == 'correct' else 0,
+        'msg': 'Your problem was graded {0}'.format(correctness)
+    }
 
     # Set the fake xqueue server to always respond
     # correct/incorrect when asked to grade a problem
-    world.xqueue.set_config('grade_response', response_dict)
+    world.xqueue.config['default'] = response_dict
 
 
 @step(u'I answer a "([^"]*)" problem "([^"]*)ly"')

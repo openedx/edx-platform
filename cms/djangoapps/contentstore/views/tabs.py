@@ -1,7 +1,7 @@
 """
 Views related to course tabs
 """
-from access import has_access
+from access import has_course_access
 from util.json_request import expect_json, JsonResponse
 
 from django.http import HttpResponseNotFound
@@ -35,10 +35,15 @@ def initialize_course_tabs(course):
     # This logic is repeated in xmodule/modulestore/tests/factories.py
     # so if you change anything here, you need to also change it there.
     course.tabs = [
+        # Translators: "Courseware" is the title of the page where you access a course's videos and problems.
         {"type": "courseware", "name": _("Courseware")},
+        # Translators: "Course Info" is the name of the course's information and updates page
         {"type": "course_info", "name": _("Course Info")},
+        # Translators: "Discussion" is the title of the course forum page
         {"type": "discussion", "name": _("Discussion")},
+        # Translators: "Wiki" is the title of the course's wiki page
         {"type": "wiki", "name": _("Wiki")},
+        # Translators: "Progress" is the title of the student's grade information page
         {"type": "progress", "name": _("Progress")},
     ]
 
@@ -63,7 +68,7 @@ def tabs_handler(request, tag=None, package_id=None, branch=None, version_guid=N
     Instead use the general xblock URL (see item.xblock_handler).
     """
     locator = BlockUsageLocator(package_id=package_id, branch=branch, version_guid=version_guid, block_id=block)
-    if not has_access(request.user, locator):
+    if not has_course_access(request.user, locator):
         raise PermissionDenied()
 
     old_location = loc_mapper().translate_locator_to_location(locator)

@@ -15,6 +15,7 @@ from django.http import HttpResponse, Http404
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
+from django.utils.translation import ugettext as _
 
 from xmodule.contentstore.content import StaticContent
 from xmodule.exceptions import NotFoundError
@@ -37,7 +38,7 @@ from ..transcripts_utils import (
     TranscriptsRequestValidationException
 )
 
-from .access import has_access
+from .access import has_course_access
 
 __all__ = [
     'upload_transcripts',
@@ -439,15 +440,15 @@ def _validate_transcripts_data(request):
     """
     data = json.loads(request.GET.get('data', '{}'))
     if not data:
-        raise TranscriptsRequestValidationException('Incoming video data is empty.')
+        raise TranscriptsRequestValidationException(_('Incoming video data is empty.'))
 
     try:
         item = _get_item(request, data)
     except (ItemNotFoundError, InvalidLocationError, InsufficientSpecificationError):
-        raise TranscriptsRequestValidationException("Can't find item by locator.")
+        raise TranscriptsRequestValidationException(_("Can't find item by locator."))
 
     if item.category != 'video':
-        raise TranscriptsRequestValidationException('Transcripts are supported only for "video" modules.')
+        raise TranscriptsRequestValidationException(_('Transcripts are supported only for "video" modules.'))
 
     # parse data form request.GET.['data']['video'] to useful format
     videos = {'youtube': '', 'html5': {}}
@@ -546,11 +547,11 @@ def _get_item(request, data):
     locator = BlockUsageLocator(data.get('locator'))
     old_location = loc_mapper().translate_locator_to_location(locator)
 
-    # This is placed before has_access() to validate the location,
-    # because has_access() raises InvalidLocationError if location is invalid.
+    # This is placed before has_course_access() to validate the location,
+    # because has_course_access() raises InvalidLocationError if location is invalid.
     item = modulestore().get_item(old_location)
 
-    if not has_access(request.user, locator):
+    if not has_course_access(request.user, locator):
         raise PermissionDenied()
 
     return item

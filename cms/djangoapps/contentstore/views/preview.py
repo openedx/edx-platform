@@ -12,7 +12,7 @@ from xmodule.error_module import ErrorDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.modulestore.django import modulestore
 from xmodule.x_module import ModuleSystem
-from xblock.runtime import DbModel
+from xblock.runtime import KvsFieldData
 from xblock.django.request import webob_to_django_response, django_to_webob_request
 from xblock.exceptions import NoSuchHandlerError
 
@@ -25,6 +25,8 @@ import static_replace
 from .session_kv_store import SessionKeyValueStore
 from .helpers import render_from_lms
 from ..utils import get_course_for_item
+
+from contentstore.views.access import get_user_role
 
 __all__ = ['preview_handler']
 
@@ -39,7 +41,7 @@ def handler_prefix(block, handler='', suffix=''):
     Trailing `/`s are removed from the returned url.
     """
     return reverse('preview_handler', kwargs={
-        'usage_id': quote_slashes(str(block.scope_ids.usage_id)),
+        'usage_id': quote_slashes(unicode(block.scope_ids.usage_id).encode('utf-8')),
         'handler': handler,
         'suffix': suffix,
     }).rstrip('/?')
@@ -132,6 +134,7 @@ def _preview_module_system(request, descriptor):
             ),
         ),
         error_descriptor_class=ErrorDescriptor,
+        get_user_role=lambda: get_user_role(request.user, descriptor.location, course_id),
     )
 
 
@@ -142,7 +145,7 @@ def _load_preview_module(request, descriptor):
     request: The active django request
     descriptor: An XModuleDescriptor
     """
-    student_data = DbModel(SessionKeyValueStore(request))
+    student_data = KvsFieldData(SessionKeyValueStore(request))
     descriptor.bind_for_student(
         _preview_module_system(request, descriptor),
         LmsFieldData(descriptor._field_data, student_data),  # pylint: disable=protected-access

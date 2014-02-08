@@ -2,7 +2,7 @@
 
 <%inherit file="main.html" />
 <%namespace name='static' file='static_content.html'/>
-<%block name="title"><title>${_("{course_number} Textbook").format(course_number=course.display_number_with_default) | h}</title></%block>
+<%block name="pagetitle">${_("{course_number} Textbook").format(course_number=course.display_number_with_default) | h}</%block>
 
 <%block name="headextra">
 <%static:css group='style-course-vendor'/>

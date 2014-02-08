@@ -26,7 +26,7 @@ class MathRenderer(object):
     tags = ['math']
 
     def __init__(self, system, xml):
-        r'''
+        r"""
         Render math using latex-like formatting.
 
         Examples:
@@ -37,7 +37,7 @@ class MathRenderer(object):
         We convert these to [mathjax]...[/mathjax] and [mathjaxinline]...[/mathjaxinline]
 
         TODO: use shorter tags (but this will require converting problem XML files!)
-        '''
+        """
         self.system = system
         self.xml = xml
 
@@ -79,13 +79,13 @@ registry.register(MathRenderer)
 
 
 class SolutionRenderer(object):
-    '''
+    """
     A solution is just a <span>...</span> which is given an ID, that is used for displaying an
     extended answer (a problem "solution") after "show answers" is pressed.
 
     Note that the solution content is NOT rendered and returned in the HTML. It is obtained by an
     ajax call.
-    '''
+    """
     tags = ['solution']
 
     def __init__(self, system, xml):

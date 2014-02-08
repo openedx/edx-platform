@@ -372,6 +372,7 @@ class @CombinedOpenEnded
       @rub.initialize(@location)
       @child_state = 'assessing'
       @find_assessment_elements()
+      @answer_area.val(response.student_response)
       @rebind()
       answer_area_div = @$(@answer_area_div_sel)
       answer_area_div.html(response.student_response)
@@ -456,7 +457,7 @@ class @CombinedOpenEnded
 
           @rebind()
         else
-          @errors_area.html(response.error)
+          @gentle_alert response.error
     else
       @errors_area.html(@out_of_sync_message)
 

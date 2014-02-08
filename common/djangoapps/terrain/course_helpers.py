@@ -1,6 +1,7 @@
 # pylint: disable=C0111
 # pylint: disable=W0621
 
+import urllib
 from lettuce import world
 from django.contrib.auth.models import User, Group
 from student.models import CourseEnrollment
@@ -27,12 +28,13 @@ def create_user(uname, password):
 
 
 @world.absorb
-def log_in(username='robot', password='test', email='robot@edx.org', name='Robot'):
+def log_in(username='robot', password='test', email='robot@edx.org', name="Robot"):
     """
     Use the auto_auth feature to programmatically log the user in
     """
-    url = '/auto_auth?username=%s&password=%s&name=%s&email=%s' % (username,
-          password, name, email)
+    url = '/auto_auth'
+    params = { 'username': username, 'password': password, 'email': email, 'full_name': name }
+    url += "?" + urllib.urlencode(params)
     world.visit(url)
 
     # Save the user info in the world scenario_dict for use in the tests

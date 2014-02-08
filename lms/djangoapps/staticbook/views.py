@@ -130,6 +130,7 @@ def html_index(request, course_id, book_index, chapter=None):
         for entry in textbook['chapters']:
             entry['url'] = remap_static_url(entry['url'], course)
 
+    student = request.user
     return render_to_response(
         'static_htmlbook.html',
         {
@@ -137,6 +138,7 @@ def html_index(request, course_id, book_index, chapter=None):
             'course': course,
             'textbook': textbook,
             'chapter': chapter,
+            'student': student,
             'staff_access': staff_access,
             'notes_enabled': notes_enabled,
         },

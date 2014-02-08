@@ -16,10 +16,12 @@ from mock import Mock
 from path import path
 
 from xblock.field_data import DictFieldData
+
 from xmodule.x_module import ModuleSystem, XModuleDescriptor, XModuleMixin
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.error_module import ErrorDescriptor
+from xmodule.modulestore.xml import LocationReader
 
 
 # Location of common test DATA directory
@@ -75,6 +77,7 @@ def get_test_system(course_id=''):
         open_ended_grading_interface=open_ended_grading_interface,
         course_id=course_id,
         error_descriptor_class=ErrorDescriptor,
+        get_user_role=Mock(is_staff=False),
     )
 
 
@@ -88,6 +91,8 @@ def get_test_descriptor_system():
         error_tracker=Mock(),
         render_template=mock_render_template,
         mixins=(InheritanceMixin, XModuleMixin),
+        field_data=DictFieldData({}),
+        id_reader=LocationReader(),
     )
 
 

@@ -5,7 +5,66 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Blades: Add role parameter to LTI. BLD-583.
+
+Blades: Bugfix "In Firefox YouTube video with start time plays from 00:00:00".
+BLD-708.
+
+Blades: Fix bug when image response in Firefox does not retain input. BLD-711.
+
+Blades: Give numerical response tolerance as a range. BLD-25.
+
+Common: Add a utility app for building databased-backed configuration
+  for specific application features. Includes admin site customization
+  for easier administration and tracking.
+
+Common: Add the ability to dark-launch site translations. These languages
+  will be unavailable to users except through the use of a specific query
+  parameter.
+
+Blades: Allow user with BetaTester role correctly use LTI. BLD-641.
+
+Blades: Video player persist speed preferences between videos. BLD-237.
+
+Blades: Change the download video field to a dropdown that will allow students
+to download the first source listed in the alternate sources. BLD-364.
+
+Blades: Change the track field to a dropdown that will allow students
+to download the transcript of the video without timecodes. BLD-368.
+
+Blades: Video player start-end time range is now shown even before Play is
+clicked. Video player VCR time shows correct non-zero total time for YouTube
+videos even before Play is clicked. BLD-529.
+
+Studio: Add ability to duplicate components on the unit page.
+
+Blades: Adds CookieStorage utility for video player that provides convenient
+  way to work with cookies.
+
+Blades: Fix comparison of float numbers. BLD-434.
+
+Blades: Allow regexp strings as the correct answer to a string response question. BLD-475.
+
+Common: Add feature flags to allow developer use of pure XBlocks
+  - ALLOW_ALL_ADVANCED_COMPONENTS disables the hard-coded list of advanced
+    components in Studio, and allows any xblock to be added as an
+    advanced component in Studio settings
+  - XBLOCK_SELECT_FUNCTION allows the insertion of a custom function
+    to limit loading of XBlocks with (including allowing pure xblocks)
+
+Studio: Add sorting by column to the Files & Uploads page.
+See mongo_indexes.md for new indices that should be added.
+
+Common: Previously, theming was activated by providing a value for the THEME_NAME
+  setting. Now, theming is activated by setting the "USE_CUSTOM_THEME" feature
+  flag to True -- a THEME_NAME setting is still required to determine *which*
+  theme to use.
+
+Studio: Newly-created courses default to being published on Jan 1, 2030
+
 Studio: Added pagination to the Files & Uploads page.
+
+Common: Centralized authorization mechanisms and removed the app-specific ones.
 
 Blades: Video player improvements:
   - Disable edX controls on iPhone/iPod (native controls are used).
@@ -271,6 +330,8 @@ assessors to edit the original submitter's work.
 
 LMS: Fixed a bug that caused links from forum user profile pages to
 threads to lead to 404s if the course id contained a '-' character.
+
+Studio/LMS: Add password policy enforcement to new account creation
 
 Studio/LMS: Added ability to set due date formatting through Studio's Advanced
 Settings.  The key is due_date_display_format, and the value should be a format

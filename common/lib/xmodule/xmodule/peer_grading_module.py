@@ -1,19 +1,21 @@
 import json
 import logging
 
-from lxml import etree
-
 from datetime import datetime
+from lxml import etree
 from pkg_resources import resource_string
-from .capa_module import ComplexEncoder
-from .x_module import XModule, module_attr
-from xmodule.raw_module import RawDescriptor
-from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
-from .timeinfo import TimeInfo
-from xblock.fields import Dict, String, Scope, Boolean, Float
-from xmodule.fields import Date, Timedelta
+from xblock.fields import Dict, String, Scope, Boolean, Float, Reference
 
+from xmodule.capa_module import ComplexEncoder
+from xmodule.fields import Date, Timedelta
+from xmodule.modulestore import Location
+from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
+from xmodule.raw_module import RawDescriptor
+from xmodule.timeinfo import TimeInfo
+from xmodule.util.duedate import get_extended_due_date
+from xmodule.x_module import XModule, module_attr
 from xmodule.open_ended_grading_classes.peer_grading_service import PeerGradingService, GradingServiceError, MockPeerGradingService
+
 from open_ended_grading_classes import combined_open_ended_rubric
 from django.utils.timezone import UTC
 
@@ -21,6 +23,7 @@ log = logging.getLogger(__name__)
 
 
 EXTERNAL_GRADER_NO_CONTACT_ERROR = "Failed to contact external graders.  Please notify course staff."
+MAX_ALLOWED_FEEDBACK_LENGTH = 5000
 
 
 class PeerGradingFields(object):
@@ -31,7 +34,7 @@ class PeerGradingFields(object):
         default=False,
         scope=Scope.settings
     )
-    link_to_location = String(
+    link_to_location = Reference(
         display_name="Link to Problem Location",
         help='The location of the problem being graded. Only used when "Show Single Problem" is True.',
         default="",
@@ -46,6 +49,14 @@ class PeerGradingFields(object):
     due = Date(
         help="Due date that should be displayed.",
         scope=Scope.settings)
+    extended_due = Date(
+        help="Date that this problem is due by for a particular student. This "
+             "can be set by an instructor, and will override the global due "
+             "date if it is set to a date that is later than the global due "
+             "date.",
+        default=None,
+        scope=Scope.user_state,
+    )
     graceperiod = Timedelta(
         help="Amount of grace to give on the due date.",
         scope=Scope.settings
@@ -86,13 +97,9 @@ class PeerGradingModule(PeerGradingFields, XModule):
     _VERSION = 1
 
     js = {
-        'js': [
-            resource_string(__name__, 'js/src/peergrading/ice.min.js'),
-        ],
         'coffee': [
             resource_string(__name__, 'js/src/peergrading/peer_grading.coffee'),
             resource_string(__name__, 'js/src/peergrading/peer_grading_problem.coffee'),
-            resource_string(__name__, 'js/src/peergrading/track_changes.coffee'),
             resource_string(__name__, 'js/src/collapsible.coffee'),
             resource_string(__name__, 'js/src/javascript_loader.coffee'),
         ]
@@ -128,7 +135,8 @@ class PeerGradingModule(PeerGradingFields, XModule):
                 self.linked_problem = self.system.get_module(linked_descriptors[0])
 
         try:
-            self.timeinfo = TimeInfo(self.due, self.graceperiod)
+            self.timeinfo = TimeInfo(
+                get_extended_due_date(self), self.graceperiod)
         except Exception:
             log.error("Error parsing due date information in location {0}".format(self.location))
             raise
@@ -336,6 +344,10 @@ class PeerGradingModule(PeerGradingFields, XModule):
         if data.get("submission_flagged", False) in ["false", False, "False", "FALSE"]:
             required.append("rubric_scores[]")
         success, message = self._check_required(data, set(required))
+        if not success:
+            return self._err_response(message)
+
+        success, message = self._check_feedback_length(data)
         if not success:
             return self._err_response(message)
 
@@ -552,13 +564,13 @@ class PeerGradingModule(PeerGradingFields, XModule):
 
         good_problem_list = []
         for problem in problem_list:
-            problem_location = problem['location']
+            problem_location = Location(problem['location'])
             try:
                 descriptor = self._find_corresponding_module_for_location(problem_location)
             except (NoPathToItem, ItemNotFoundError):
                 continue
             if descriptor:
-                problem['due'] = descriptor.due
+                problem['due'] = get_extended_due_date(descriptor)
                 grace_period = descriptor.graceperiod
                 try:
                     problem_timeinfo = TimeInfo(problem['due'], grace_period)
@@ -600,10 +612,10 @@ class PeerGradingModule(PeerGradingFields, XModule):
                 log.error(
                     "Peer grading problem in peer_grading_module called with no get parameters, but use_for_single_location is False.")
                 return {'html': "", 'success': False}
-            problem_location = self.link_to_location
+            problem_location = Location(self.link_to_location)
 
         elif data.get('location') is not None:
-            problem_location = data.get('location')
+            problem_location = Location(data.get('location'))
 
         module = self._find_corresponding_module_for_location(problem_location)
 
@@ -615,7 +627,6 @@ class PeerGradingModule(PeerGradingFields, XModule):
             'ajax_url': ajax_url,
             # Checked above
             'staff_access': False,
-            'track_changes': getattr(module, 'track_changes', False),
             'use_single_location': self.use_for_single_location_local,
         })
 
@@ -633,6 +644,15 @@ class PeerGradingModule(PeerGradingFields, XModule):
         }
 
         return json.dumps(state)
+
+    def _check_feedback_length(self, data):
+        feedback = data.get("feedback")
+        if feedback and len(feedback) > MAX_ALLOWED_FEEDBACK_LENGTH:
+            return False, "Feedback is too long, Max length is {0} characters.".format(
+                MAX_ALLOWED_FEEDBACK_LENGTH
+            )
+        else:
+            return True, ""
 
 
 class PeerGradingDescriptor(PeerGradingFields, RawDescriptor):
@@ -652,8 +672,8 @@ class PeerGradingDescriptor(PeerGradingFields, RawDescriptor):
     metadata_translations = {
         'is_graded': 'graded',
         'attempts': 'max_attempts',
-        'due_data' : 'due'
-        }
+        'due_data': 'due'
+    }
 
     @property
     def non_editable_metadata_fields(self):

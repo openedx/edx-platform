@@ -60,7 +60,7 @@ function (HTML5Video, Resizer) {
     //     via the 'state' object. Much easier to work this way - you don't
     //     have to do repeated jQuery element selects.
     function _initialize(state) {
-        var youTubeId, player;
+        var youTubeId, player, duration;
 
         // The function is called just once to apply pre-defined configurations
         // by student before video starts playing. Waits until the video's
@@ -70,6 +70,7 @@ function (HTML5Video, Resizer) {
             if (state.currentPlayerMode !== 'flash') {
                 state.videoPlayer.onSpeedChange(state.speed);
             }
+            state.videoPlayer.player.setVolume(state.currentVolume);
         });
 
         if (state.videoType === 'youtube') {
@@ -85,7 +86,7 @@ function (HTML5Video, Resizer) {
 
         // At the start, the initial value of the variable
         // `seekToStartTimeOldSpeed` should always differ from the value
-        // returned by the duration function.
+        // of `state.speed` variable.
         state.videoPlayer.seekToStartTimeOldSpeed = 'void';
 
         state.videoPlayer.playerVars = {
@@ -133,11 +134,20 @@ function (HTML5Video, Resizer) {
 
                 _resize(state, videoWidth, videoHeight);
 
+                duration = state.videoPlayer.duration();
+
                 state.trigger(
                     'videoControl.updateVcrVidTime',
                     {
                         time: 0,
-                        duration: state.videoPlayer.duration()
+                        duration: duration
+                    }
+                );
+
+                state.trigger(
+                    'videoProgressSlider.updateStartEndTimeRegion',
+                    {
+                        duration: duration
                     }
                 );
             }, false);
@@ -165,6 +175,22 @@ function (HTML5Video, Resizer) {
                     videoHeight = player.attr('height') || player.height();
 
                 _resize(state, videoWidth, videoHeight);
+
+                // After initialization, update the VCR with total time.
+                // At this point only the metadata duration is available (not
+                // very precise), but it is better than having 00:00:00 for
+                // total time.
+                if (state.youtubeMetadataReceived) {
+                    // Metadata was already received, and is available.
+                    _updateVcrAndRegion(state);
+                } else {
+                    // We wait for metadata to arrive, before we request the update
+                    // of the VCR video time, and of the start-end time region.
+                    // Metadata contains duration of the video.
+                    state.el.on('metadata_received', function () {
+                        _updateVcrAndRegion(state);
+                    });
+                }
             });
         }
 
@@ -173,7 +199,26 @@ function (HTML5Video, Resizer) {
         }
     }
 
-    function _resize (state, videoWidth, videoHeight) {
+    function _updateVcrAndRegion(state) {
+        var duration = state.videoPlayer.duration();
+
+        state.trigger(
+            'videoControl.updateVcrVidTime',
+            {
+                time: 0,
+                duration: duration
+            }
+        );
+
+        state.trigger(
+            'videoProgressSlider.updateStartEndTimeRegion',
+            {
+                duration: duration
+            }
+        );
+    }
+
+    function _resize(state, videoWidth, videoHeight) {
         state.resizer = new Resizer({
                 element: state.videoEl,
                 elementRatio: videoWidth/videoHeight,
@@ -279,7 +324,7 @@ function (HTML5Video, Resizer) {
         }
     }
 
-    function onSpeedChange(newSpeed, updateCookie) {
+    function onSpeedChange(newSpeed) {
         var time = this.videoPlayer.currentTime,
             methodName, youtubeId;
 
@@ -302,7 +347,7 @@ function (HTML5Video, Resizer) {
             }
         );
 
-        this.setSpeed(newSpeed, updateCookie);
+        this.setSpeed(newSpeed, true);
 
         if (
             this.currentPlayerMode === 'html5' &&
@@ -331,6 +376,15 @@ function (HTML5Video, Resizer) {
         }
 
         this.el.trigger('speedchange', arguments);
+
+        $.ajax({
+            url: this.config.saveStateUrl,
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                speed: newSpeed
+            },
+        });
     }
 
     // Every 200 ms, if the video is playing, we call the function update, via
@@ -389,16 +443,20 @@ function (HTML5Video, Resizer) {
             end: true
         });
 
-        if (this.config.show_captions) {
+        if (this.config.showCaptions) {
             this.trigger('videoCaption.pause', null);
         }
 
-        // When only `startTime` is set, the video will play to the end
-        // starting at `startTime`. After the first time the video reaches the
-        // end, `startTime` and `endTime` are disabled. The video will play
-        // from start to the end on subsequent runs.
-        this.videoPlayer.startTime = 0;
-        this.videoPlayer.endTime = null;
+        if (this.videoPlayer.skipOnEndedStartEndReset) {
+            this.videoPlayer.skipOnEndedStartEndReset = undefined;
+        } else {
+            // When only `startTime` is set, the video will play to the end
+            // starting at `startTime`. After the first time the video reaches the
+            // end, `startTime` and `endTime` are disabled. The video will play
+            // from start to the end on subsequent runs.
+            this.videoPlayer.startTime = 0;
+            this.videoPlayer.endTime = null;
+        }
 
         // Sometimes `onEnded` events fires when `currentTime` not equal
         // `duration`. In this case, slider doesn't reach the end point of
@@ -421,7 +479,7 @@ function (HTML5Video, Resizer) {
 
         this.trigger('videoControl.pause', null);
 
-        if (this.config.show_captions) {
+        if (this.config.showCaptions) {
             this.trigger('videoCaption.pause', null);
         }
 
@@ -450,7 +508,7 @@ function (HTML5Video, Resizer) {
             end: false
         });
 
-        if (this.config.show_captions) {
+        if (this.config.showCaptions) {
             this.trigger('videoCaption.play', null);
         }
 
@@ -534,7 +592,6 @@ function (HTML5Video, Resizer) {
                     var key = value.toFixed(2).replace(/\.00$/, '.0');
 
                     _this.videos[key] = baseSpeedSubs;
-
                     _this.speeds.push(key);
                 });
 
@@ -545,8 +602,8 @@ function (HTML5Video, Resizer) {
                         currentSpeed: this.speed
                     }
                 );
-
-                this.setSpeed($.cookie('video_speed'));
+                this.setSpeed(this.speed);
+                this.trigger('videoSpeedControl.setSpeed', this.speed);
             }
         }
 
@@ -580,12 +637,21 @@ function (HTML5Video, Resizer) {
             case this.videoPlayer.PlayerState.ENDED:
                 this.videoPlayer.onEnded();
                 break;
+            case this.videoPlayer.PlayerState.CUED:
+                this.videoPlayer.player.seekTo(this.videoPlayer.startTime, true);
+                // We need to call play() explicitly because after the call
+                // to functions cueVideoById() followed by seekTo() the video
+                // is in a PAUSED state.
+                //
+                // Why? This is how the YouTube API is implemented.
+                this.videoPlayer.play();
+                break;
         }
     }
 
     function updatePlayTime(time) {
         var duration = this.videoPlayer.duration(),
-            durationChange, tempStartTime, tempEndTime;
+            durationChange, tempStartTime, tempEndTime, youTubeId;
 
         if (
             duration > 0 &&
@@ -651,20 +717,12 @@ function (HTML5Video, Resizer) {
                 }
             }
 
-            // Rebuild the slider start-end range (if it doesn't take up the
-            // whole slider). Remember that endTime === null means the end time
-            // is set to the end of video by default.
-            if (!(
-                this.videoPlayer.startTime === 0 &&
-                this.videoPlayer.endTime === null
-            )) {
-                this.trigger(
-                    'videoProgressSlider.updateStartEndTimeRegion',
-                    {
-                        duration: duration
-                    }
-                );
-            }
+            this.trigger(
+                'videoProgressSlider.updateStartEndTimeRegion',
+                {
+                    duration: duration
+                }
+            );
 
             // If this is not a duration change (if it is, we continue playing
             // from current time), then we need to seek the video to the start
@@ -677,7 +735,38 @@ function (HTML5Video, Resizer) {
                 this.videoPlayer.startTime > 0 &&
                 !(tempStartTime === 0 && tempEndTime === null)
             ) {
-                this.videoPlayer.player.seekTo(this.videoPlayer.startTime);
+                // After a bug came up (BLD-708: "In Firefox YouTube video with
+                // start time plays from 00:00:00") the video refused to play
+                // from start time, and only played from the beginning.
+                //
+                // It turned out that for some reason if Firefox you couldn't
+                // seek beyond some amount of time before the video loaded.
+                // Very strange, but in Chrome there is no such bug.
+                //
+                // HTML5 video sources play fine from start time in both Chrome
+                // and Firefox.
+                if (this.browserIsFirefox && this.videoType === 'youtube') {
+                    if (this.currentPlayerMode === 'flash') {
+                        youTubeId = this.youtubeId();
+                    } else {
+                        youTubeId = this.youtubeId('1.0');
+                    }
+
+                    // When we will call cueVideoById() for some strange reason
+                    // an ENDED event will be fired. It really does no damage
+                    // except for the fact that the end time is reset to null.
+                    // We do not want this.
+                    //
+                    // The flag `skipOnEndedStartEndReset` will notify the
+                    // onEnded() callback for the ENDED event that just this
+                    // once there is no need in resetting the start and end
+                    // times
+                    this.videoPlayer.skipOnEndedStartEndReset = true;
+
+                    this.videoPlayer.player.cueVideoById(youTubeId, this.videoPlayer.startTime);
+                } else {
+                    this.videoPlayer.player.seekTo(this.videoPlayer.startTime);
+                }
             }
 
             // Reset back the actual startTime and endTime if they have been
@@ -734,10 +823,40 @@ function (HTML5Video, Resizer) {
      * This instability is internal to the player API (or browser internals).
      */
     function duration() {
-        var dur = this.videoPlayer.player.getDuration();
+        var dur;
 
-        if (!isFinite(dur)) {
-            dur = this.getDuration();
+        // Sometimes the YouTube API doesn't finish instantiating all of it's
+        // methods, but the execution point arrives here.
+        //
+        // This happens when you have start and end times set, and click "Edit"
+        // in Studio, and then "Save". The Video editor dialog closes, the
+        // video reloads, but the start-end range is not visible.
+        if (this.videoPlayer.player.getDuration) {
+            dur = this.videoPlayer.player.getDuration();
+        }
+
+        // For YouTube videos, before the video starts playing, the API
+        // function player.getDuration() will return 0. This means that the VCR
+        // will show total time as 0 when the page just loads (before the user
+        // clicks the Play button).
+        //
+        // We can do betterin a case when dur is 0 (or less than 0). We can ask
+        // the getDuration() function for total time, which will query the
+        // metadata for a duration.
+        //
+        // Be careful! Often the metadata duration is not very precise. It
+        // might differ by one or two seconds against the actual time as will
+        // be reported later on by the player.getDuration() API function.
+        if (!isFinite(dur) || dur <= 0) {
+            if (this.videoType === 'youtube') {
+                dur = this.getDuration();
+            }
+        }
+
+        // Just in case the metadata is garbled, or something went wrong, we
+        // have a final check.
+        if (!isFinite(dur) || dur <= 0) {
+            dur = 0;
         }
 
         return Math.floor(dur);

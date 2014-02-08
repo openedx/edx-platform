@@ -117,7 +117,7 @@ def dump_module(module, destination=None, inherited=False, defaults=False):
 
     destination[module.location.url()] = {
         'category': module.location.category,
-        'children': module.children if hasattr(module, 'children') else [],
+        'children': [str(child) for child in getattr(module, 'children', [])],
         'metadata': filtered_metadata,
     }
 
@@ -132,7 +132,7 @@ def dump_module(module, destination=None, inherited=False, defaults=False):
                 return False
             elif field.scope != Scope.settings:
                 return False
-            elif defaults == True:
+            elif defaults:
                 return True
             else:
                 return field.values != field.default

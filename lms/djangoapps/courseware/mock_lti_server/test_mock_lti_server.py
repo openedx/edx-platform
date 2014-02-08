@@ -57,7 +57,7 @@ class MockLTIServerTest(unittest.TestCase):
         #wrong number of params and no signature
         payload = {
             'user_id': 'default_user_id',
-            'role': 'student',
+            'roles': 'Student',
             'oauth_nonce': '',
             'oauth_timestamp': '',
         }
@@ -73,7 +73,7 @@ class MockLTIServerTest(unittest.TestCase):
         """
         payload = {
             'user_id': 'default_user_id',
-            'role': 'student',
+            'roles': 'Student',
             'oauth_nonce': '',
             'oauth_timestamp': '',
             'oauth_consumer_key': 'test_client_key',
@@ -100,7 +100,7 @@ class MockLTIServerTest(unittest.TestCase):
         """
         payload = {
             'user_id': 'default_user_id',
-            'role': 'student',
+            'roles': 'Student',
             'oauth_nonce': '',
             'oauth_timestamp': '',
             'oauth_consumer_key': 'test_client_key',
@@ -126,7 +126,7 @@ class MockLTIServerTest(unittest.TestCase):
 
         payload = {
             'user_id': 'default_user_id',
-            'role': 'student',
+            'roles': 'Student',
             'oauth_nonce': '',
             'oauth_timestamp': '',
             'oauth_consumer_key': 'test_client_key',

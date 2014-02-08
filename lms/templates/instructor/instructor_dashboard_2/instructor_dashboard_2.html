@@ -1,6 +1,7 @@
 <%! from django.utils.translation import ugettext as _ %>
-<%inherit file="/main.html" />
 <%! from django.core.urlresolvers import reverse %>
+
+<%inherit file="/main.html" />
 <%namespace name='static' file='/static_content.html'/>
 
 ## ----- Tips on adding something to the new instructor dashboard -----
@@ -15,6 +16,8 @@
 ##   when clicked. The .coffee files use the name=xx to pick out inputs, not id=
 ## 5. Implement your standard django/python in lms/djangoapps/instructor/views/api.py
 ## 6. And tests go in lms/djangoapps/instructor/tests/
+
+<%block name="pagetitle">${_("Instructor Dashboard")}</%block>
 
 <%block name="headextra">
   <%static:css group='style-course-vendor'/>

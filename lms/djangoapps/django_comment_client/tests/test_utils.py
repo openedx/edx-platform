@@ -1,14 +1,19 @@
+import json
+import mock
 from datetime import datetime
+from pytz import UTC
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.utils import override_settings
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
-from django_comment_common.models import Role, Permission
 from django_comment_client.tests.factories import RoleFactory
+from django_comment_client.tests.unicode import UnicodeTestMixin
 import django_comment_client.utils as utils
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
+from edxmako import add_lookup
+
 
 class DictionaryTestCase(TestCase):
     def test_extract(self):
@@ -128,7 +133,13 @@ class CoursewareContextTestCase(ModuleStoreTestCase):
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class CategoryMapTestCase(ModuleStoreTestCase):
     def setUp(self):
-        self.course = CourseFactory.create(org="TestX", number="101", display_name="Test Course")
+        self.course = CourseFactory.create(
+            org="TestX", number="101", display_name="Test Course",
+            # This test needs to use a course that has already started --
+            # discussion topics only show up if the course has already started,
+            # and the default start date for courses is Jan 1, 2030.
+            start=datetime(2012, 2, 3, tzinfo=UTC)
+        )
         # Courses get a default discussion topic on creation, so remove it
         self.course.discussion_topics = {}
         self.course.save()
@@ -489,3 +500,24 @@ class CategoryMapTestCase(ModuleStoreTestCase):
                 "children": ["Chapter A", "Chapter B", "Chapter C"]
             }
         )
+
+
+class JsonResponseTestCase(TestCase, UnicodeTestMixin):
+    def _test_unicode_data(self, text):
+        response = utils.JsonResponse(text)
+        reparsed = json.loads(response.content)
+        self.assertEqual(reparsed, text)
+
+
+class RenderMustacheTests(TestCase):
+    """
+    Test the `render_mustache` utility function.
+    """
+
+    @mock.patch('edxmako.LOOKUP', {})
+    def test_it(self):
+        """
+        Basic test.
+        """
+        add_lookup('main', '', package=__name__)
+        self.assertEqual(utils.render_mustache('test.mustache', {}), 'Testing 1 2 3.\n')

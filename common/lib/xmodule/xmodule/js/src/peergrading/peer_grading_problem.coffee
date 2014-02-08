@@ -165,7 +165,6 @@ class @PeerGradingProblem
   prompt_container_sel: '.prompt-container'
   rubric_container_sel: '.rubric-container'
   flag_student_container_sel: '.flag-student-container'
-  answer_unknown_container_sel: '.answer-unknown-container'
   calibration_panel_sel: '.calibration-panel'
   grading_panel_sel: '.grading-panel'
   content_panel_sel: '.content-panel'
@@ -190,7 +189,6 @@ class @PeerGradingProblem
   interstitial_page_button_sel: '.interstitial-page-button'
   calibration_interstitial_page_button_sel: '.calibration-interstitial-page-button'
   flag_checkbox_sel: '.flag-checkbox'
-  answer_unknown_checkbox_sel: '.answer-unknown-checkbox'
   calibration_text_sel: '.calibration-text'
   grading_text_sel: '.grading-text'
   calibration_feedback_wrapper_sel: '.calibration-feedback-wrapper'
@@ -214,7 +212,6 @@ class @PeerGradingProblem
     @prompt_container = @$(@prompt_container_sel)
     @rubric_container = @$(@rubric_container_sel)
     @flag_student_container = @$(@flag_student_container_sel)
-    @answer_unknown_container = @$(@answer_unknown_container_sel)
     @calibration_panel = @$(@calibration_panel_sel)
     @grading_panel = @$(@grading_panel_sel)
     @content_panel = @$(@content_panel_sel)
@@ -256,7 +253,6 @@ class @PeerGradingProblem
     @interstitial_page_button = @$(@interstitial_page_button_sel)
     @calibration_interstitial_page_button = @$(@calibration_interstitial_page_button_sel)
     @flag_student_checkbox = @$(@flag_checkbox_sel)
-    @answer_unknown_checkbox = @$(@answer_unknown_checkbox_sel)
 
     $(window).keydown @keydown_handler
     $(window).keyup @keyup_handler
@@ -326,7 +322,8 @@ class @PeerGradingProblem
       submission_key: @submission_key_input.val()
       feedback: feedback_content
       submission_flagged: @flag_student_checkbox.is(':checked')
-      answer_unknown: @answer_unknown_checkbox.is(':checked')
+      # hardcoding answer_unknown to false
+      answer_unknown: false
     return data
 
 
@@ -474,7 +471,6 @@ class @PeerGradingProblem
       @calibration_panel.find(@grading_text_sel).hide()
       @grading_panel.find(@grading_text_sel).hide()
       @flag_student_container.hide()
-      @answer_unknown_container.hide()
       @peer_grading_instructions.hide()
       @feedback_area.attr('disabled', true)
       feedback_text = "Once you are done learning to grade, and are grading your peers' work, you will be asked to share written feedback with them in addition to scoring them."
@@ -515,7 +511,6 @@ class @PeerGradingProblem
       @calibration_panel.find(@grading_text_sel).show()
       @grading_panel.find(@grading_text_sel).show()
       @flag_student_container.show()
-      @answer_unknown_container.show()
       @peer_grading_instructions.show()
       if @tracking_changes()
         @ice_legend.show()
@@ -524,7 +519,6 @@ class @PeerGradingProblem
       else
         @feedback_area.val("")
       @feedback_area.attr('disabled', false)
-      @answer_unknown_checkbox.removeAttr("checked")
       @flag_student_checkbox.removeAttr("checked")
       @submit_button.show()
       @submit_button.unbind('click')

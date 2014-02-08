@@ -181,7 +181,7 @@ def run_main_task(entry_id, task_fcn, action_name):
     task_input = json.loads(entry.task_input)
 
     # construct log message:
-    fmt = 'task "{task_id}": course "{course_id}" input "{task_input}"'
+    fmt = u'task "{task_id}": course "{course_id}" input "{task_input}"'
     task_info_string = fmt.format(task_id=task_id, course_id=course_id, task_input=task_input)
 
     TASK_LOG.info('Starting update (nothing %s yet): %s', action_name, task_info_string)
@@ -190,7 +190,7 @@ def run_main_task(entry_id, task_fcn, action_name):
     # that is running.
     request_task_id = _get_current_task().request.id
     if task_id != request_task_id:
-        fmt = 'Requested task did not match actual task "{actual_id}": {task_info}'
+        fmt = u'Requested task did not match actual task "{actual_id}": {task_info}'
         message = fmt.format(actual_id=request_task_id, task_info=task_info_string)
         TASK_LOG.error(message)
         raise ValueError(message)
@@ -416,15 +416,15 @@ def rescore_problem_module_state(xmodule_instance_args, module_descriptor, stude
     if 'success' not in result:
         # don't consider these fatal, but false means that the individual call didn't complete:
         TASK_LOG.warning(u"error processing rescore call for course {course}, problem {loc} and student {student}: "
-                         "unexpected response {msg}".format(msg=result, course=course_id, loc=module_state_key, student=student))
+                         u"unexpected response {msg}".format(msg=result, course=course_id, loc=module_state_key, student=student))
         return UPDATE_STATUS_FAILED
     elif result['success'] not in ['correct', 'incorrect']:
         TASK_LOG.warning(u"error processing rescore call for course {course}, problem {loc} and student {student}: "
-                         "{msg}".format(msg=result['success'], course=course_id, loc=module_state_key, student=student))
+                         u"{msg}".format(msg=result['success'], course=course_id, loc=module_state_key, student=student))
         return UPDATE_STATUS_FAILED
     else:
         TASK_LOG.debug(u"successfully processed rescore call for course {course}, problem {loc} and student {student}: "
-                       "{msg}".format(msg=result['success'], course=course_id, loc=module_state_key, student=student))
+                       u"{msg}".format(msg=result['success'], course=course_id, loc=module_state_key, student=student))
         return UPDATE_STATUS_SUCCEEDED
 
 
@@ -558,7 +558,7 @@ def push_grades_to_s3(_xmodule_instance_args, _entry_id, course_id, _task_input,
     grades_store = GradesStore.from_config()
     grades_store.store_rows(
         course_id,
-        "{}_grade_report_{}.csv".format(course_id_prefix, timestamp_str),
+        u"{}_grade_report_{}.csv".format(course_id_prefix, timestamp_str),
         rows
     )
 
@@ -566,7 +566,7 @@ def push_grades_to_s3(_xmodule_instance_args, _entry_id, course_id, _task_input,
     if len(err_rows) > 1:
         grades_store.store_rows(
             course_id,
-            "{}_grade_report_{}_err.csv".format(course_id_prefix, timestamp_str),
+            u"{}_grade_report_{}_err.csv".format(course_id_prefix, timestamp_str),
             err_rows
         )
 

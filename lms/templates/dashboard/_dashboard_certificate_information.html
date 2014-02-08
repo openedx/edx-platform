@@ -42,7 +42,7 @@ else:
       <li class="action"><span class="disabled">
           ${_("Your Statement of Accomplishment is Generating")}</span></li>
     % elif cert_status['show_download_url'] and enrollment.mode == 'honor':
-      <li class="action">
+      <li class="action action-certificate">
       <a class="btn" href="${cert_status['download_url']}"
          title="${_('This link will open/download a PDF document')}">
          ${_("Download Your Statement of Accomplishment (PDF)")}</a></li>

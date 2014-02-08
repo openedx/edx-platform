@@ -66,6 +66,7 @@ def create_modulestore_instance(engine, doc_store_config, options):
         request_cache=request_cache,
         modulestore_update_signal=Signal(providing_args=['modulestore', 'course_id', 'location']),
         xblock_mixins=getattr(settings, 'XBLOCK_MIXINS', ()),
+        xblock_select=getattr(settings, 'XBLOCK_SELECT_FUNCTION', None),
         doc_store_config=doc_store_config,
         **_options
     )
@@ -83,7 +84,7 @@ def get_default_store_name_for_current_request():
 
     # get mapping information which is defined in configurations
     mappings = getattr(settings, 'HOSTNAME_MODULESTORE_DEFAULT_MAPPINGS', None)
-   
+
     # compare hostname against the regex expressions set of mappings
     # which will tell us which store name to use
     if hostname and mappings:
@@ -151,6 +152,9 @@ def clear_existing_modulestores():
     _MODULESTORES.clear()
     # pylint: disable=W0603
     global _loc_singleton
+    cache = getattr(_loc_singleton, "cache", None)
+    if cache:
+        cache.clear()
     _loc_singleton = None
 
 

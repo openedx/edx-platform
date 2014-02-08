@@ -81,7 +81,7 @@ function () {
         // handle, behaves as a slider named 'video slider'.
         state.videoControl.sliderEl.find('.ui-slider-handle').attr({
             'role': 'slider',
-            'title': gettext('video slider')
+            'title': gettext('Video slider')
         });
     }
 

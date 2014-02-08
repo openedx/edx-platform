@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <%! from django.utils.translation import ugettext as _ %>
-<html>
+<html lang="${LANGUAGE_CODE}">
 <head>
   ## "edX" should not be translated
-  <%block name="title"><title>edX</title></%block>
+  <%block name="pagetitle"></%block>
 
   <script type="text/javascript" src="/static/js/vendor/jquery.min.js"></script>
   <script type="text/javascript" src="/static/js/course_groups/cohorts.js"></script>

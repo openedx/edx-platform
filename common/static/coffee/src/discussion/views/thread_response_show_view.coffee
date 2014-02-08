@@ -1,13 +1,16 @@
 if Backbone?
   class @ThreadResponseShowView extends DiscussionContentView
     events:
-        "click .vote-btn": "toggleVote"
+        "click .vote-btn":
+          (event) -> @toggleVote(event)
+        "keydown .vote-btn":
+          (event) -> DiscussionUtil.activateOnSpace(event, @toggleVote)
         "click .action-endorse": "toggleEndorse"
         "click .action-delete": "_delete"
         "click .action-edit": "edit"
         "click .discussion-flag-abuse": "toggleFlagAbuse"
-        "keypress .discussion-flag-abuse":
-          (event) -> DiscussionUtil.activateOnEnter(event, toggleFlagAbuse)
+        "keydown .discussion-flag-abuse":
+          (event) -> DiscussionUtil.activateOnSpace(event, @toggleFlagAbuse)
 
     $: (selector) ->
         @$el.find(selector)
@@ -23,9 +26,7 @@ if Backbone?
     render: ->
       @$el.html(@renderTemplate())
       @delegateEvents()
-      if window.user.voted(@model)
-        @$(".vote-btn").addClass("is-cast")
-        @$(".vote-btn span.sr").html("votes (click to remove your vote)")
+      @renderVote()
       @renderAttrs()
       @renderFlagged()
       @$el.find(".posted-details").timeago()
@@ -41,43 +42,10 @@ if Backbone?
     markAsStaff: ->
       if DiscussionUtil.isStaff(@model.get("user_id"))
         @$el.addClass("staff")
-        @$el.prepend('<div class="staff-banner">staff</div>')
+        @$el.prepend('<div class="staff-banner">' + gettext('staff') + '</div>')
       else if DiscussionUtil.isTA(@model.get("user_id"))
         @$el.addClass("community-ta")
-        @$el.prepend('<div class="community-ta-banner">Community TA</div>')
-
-    toggleVote: (event) ->
-      event.preventDefault()
-      @$(".vote-btn").toggleClass("is-cast")
-      if @$(".vote-btn").hasClass("is-cast")
-        @vote()
-        @$(".vote-btn span.sr").html("votes (click to remove your vote)")
-      else
-        @unvote()
-        @$(".vote-btn span.sr").html("votes (click to vote)")
-
-    vote: ->
-      url = @model.urlFor("upvote")
-      @$(".votes-count-number").html((parseInt(@$(".votes-count-number").html()) + 1) + '<span class="sr"></span>')
-      DiscussionUtil.safeAjax
-        $elem: @$(".discussion-vote")
-        url: url
-        type: "POST"
-        success: (response, textStatus) =>
-          if textStatus == 'success'
-            @model.set(response)
-
-    unvote: ->
-      url = @model.urlFor("unvote")
-      @$(".votes-count-number").html((parseInt(@$(".votes-count-number").html()) - 1)+'<span class="sr"></span>')
-      DiscussionUtil.safeAjax
-        $elem: @$(".discussion-vote")
-        url: url
-        type: "POST"
-        success: (response, textStatus) =>
-          if textStatus == 'success'
-            @model.set(response)
-            
+        @$el.prepend('<div class="community-ta-banner">' + gettext('Community TA') + '</div>')
 
     edit: (event) ->
         @trigger "response:edit", event
@@ -107,12 +75,14 @@ if Backbone?
         @$("[data-role=thread-flag]").addClass("flagged")  
         @$("[data-role=thread-flag]").removeClass("notflagged")
         @$(".discussion-flag-abuse").attr("aria-pressed", "true")
-        @$(".discussion-flag-abuse .flag-label").html("Misuse Reported")
+        @$(".discussion-flag-abuse").attr("data-tooltip", gettext("Misuse Reported, click to remove report"))
+        @$(".discussion-flag-abuse .flag-label").html(interpolate(gettext("Misuse Reported, %(start_sr_span)s click to remove report%(end_span)s"), {"start_sr_span": "<span class='sr'>", "end_span": "</span>"}, true))
       else
         @$("[data-role=thread-flag]").removeClass("flagged")  
         @$("[data-role=thread-flag]").addClass("notflagged")      
         @$(".discussion-flag-abuse").attr("aria-pressed", "false")
-        @$(".discussion-flag-abuse .flag-label").html("Report Misuse")   
+        @$(".discussion-flag-abuse .flag-label").html(gettext("Report Misuse"))
         
     updateModelDetails: =>
+      @renderVote()
       @renderFlagged()

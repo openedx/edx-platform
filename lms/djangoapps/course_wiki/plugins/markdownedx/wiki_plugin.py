@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from django.core.urlresolvers import reverse_lazy
-
 from wiki.core.plugins.base import BasePlugin
 from wiki.core.plugins import registry as plugin_registry
 

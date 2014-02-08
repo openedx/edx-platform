@@ -12,7 +12,7 @@ class StubYouTubeServiceTest(unittest.TestCase):
     def setUp(self):
         self.server = StubYouTubeService()
         self.url = "http://127.0.0.1:{0}/".format(self.server.port)
-        self.server.set_config('time_to_response', 0.0)
+        self.server.config['time_to_response'] = 0.0
         self.addCleanup(self.server.shutdown)
 
     def test_unused_url(self):
@@ -24,7 +24,7 @@ class StubYouTubeServiceTest(unittest.TestCase):
             self.url + 'test_youtube/OEoXaMPEzfM?v=2&alt=jsonc&callback=callback_func'
         )
 
-        self.assertEqual('callback_func({"message": "I\'m youtube."})', response.content)
+        self.assertEqual('callback_func({"data": {"duration": 60, "message": "I\'m youtube.", "id": "OEoXaMPEzfM"}})', response.content)
 
     def test_transcript_url_equal(self):
         response = requests.get(

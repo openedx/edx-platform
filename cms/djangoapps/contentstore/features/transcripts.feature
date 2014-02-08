@@ -146,20 +146,21 @@ Feature: CMS.Transcripts
         Then I see status message "found"
         And I see value "t_not_exist" in the field "HTML5 Transcript"
 
+    # Disabled 1/29/14 due to flakiness observed in master
     #10
-    Scenario: User sets youtube_id w/o local but with server subs and one html5 link w/o subs
-        Given I have created a Video component
-        And I edit the component
-
-        And I enter a "http://youtu.be/t__eq_exist" source to field number 1
-        Then I see status message "not found"
-        And I see button "import"
-        And I click transcript button "import"
-        Then I see status message "found"
-
-        And I enter a "t_not_exist.mp4" source to field number 2
-        Then I see status message "found"
-        And I see value "t__eq_exist" in the field "HTML5 Transcript"
+    #Scenario: User sets youtube_id w/o local but with server subs and one html5 link w/o subs
+    #    Given I have created a Video component
+    #    And I edit the component
+    #
+    #    And I enter a "http://youtu.be/t__eq_exist" source to field number 1
+    #    Then I see status message "not found"
+    #    And I see button "import"
+    #    And I click transcript button "import"
+    #    Then I see status message "found"
+    #
+    #    And I enter a "t_not_exist.mp4" source to field number 2
+    #    Then I see status message "found"
+    #    And I see value "t__eq_exist" in the field "HTML5 Transcript"
 
     #11
     Scenario: User sets youtube_id w/o local but with server subs and one html5 link w/o transcripts w/o import action, then another one html5 link w/o transcripts

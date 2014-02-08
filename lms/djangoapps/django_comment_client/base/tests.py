@@ -1,14 +1,18 @@
 import logging
+import json
 
 from django.test.utils import override_settings
-from django.test.client import Client
+from django.test.client import Client, RequestFactory
 from django.contrib.auth.models import User
-from student.tests.factories import CourseEnrollmentFactory
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from django.core.urlresolvers import reverse
 from django.core.management import call_command
 from util.testing import UrlResetMixin
+from django_comment_common.utils import seed_permissions_roles
+from django_comment_client.base import views
+from django_comment_client.tests.unicode import UnicodeTestMixin
 
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from nose.tools import assert_true, assert_equal  # pylint: disable=E0611
@@ -71,7 +75,7 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
                                             "user_id":"1","username":"robot",\
                                             "votes":{"count":0,"up_count":0,\
                                             "down_count":0,"point":0},\
-                                            "abuse_flaggers":[],"tags":[],\
+                                            "abuse_flaggers":[],\
                                             "type":"thread","group_id":null,\
                                             "pinned":false,\
                                             "endorsed":false,\
@@ -119,7 +123,7 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
                                             "user_id":"1","username":"robot",\
                                             "votes":{"count":0,"up_count":0,\
                                             "down_count":0,"point":0},\
-                                            "abuse_flaggers":[1],"tags":[],\
+                                            "abuse_flaggers":[1],\
                                             "type":"thread","group_id":null,\
                                             "pinned":false,\
                                             "endorsed":false,\
@@ -179,7 +183,7 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
                                             "user_id":"1","username":"robot",\
                                             "votes":{"count":0,"up_count":0,\
                                             "down_count":0,"point":0},\
-                                            "abuse_flaggers":[],"tags":[],\
+                                            "abuse_flaggers":[],\
                                             "type":"thread","group_id":null,\
                                             "pinned":false,\
                                             "endorsed":false,\
@@ -334,3 +338,121 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
         assert_equal(call_list, mock_request.call_args_list)
 
         assert_equal(response.status_code, 200)
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class CreateThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
+    def setUp(self):
+        self.course = CourseFactory.create()
+        seed_permissions_roles(self.course.id)
+        self.student = UserFactory.create()
+        CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
+
+    @patch('lms.lib.comment_client.utils.requests.request')
+    def _test_unicode_data(self, text, mock_request):
+        mock_request.return_value.text = "{}"
+        request = RequestFactory().post("dummy_url", {"body": text, "title": text})
+        request.user = self.student
+        request.view_name = "create_thread"
+        response = views.create_thread(request, course_id=self.course.id, commentable_id="test_commentable")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(mock_request.called)
+        self.assertEqual(mock_request.call_args[1]["data"]["body"], text)
+        self.assertEqual(mock_request.call_args[1]["data"]["title"], text)
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class UpdateThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
+    def setUp(self):
+        self.course = CourseFactory.create()
+        seed_permissions_roles(self.course.id)
+        self.student = UserFactory.create()
+        CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
+
+    @patch('lms.lib.comment_client.utils.requests.request')
+    def _test_unicode_data(self, text, mock_request):
+        mock_request.return_value.text = json.dumps({
+            "user_id": str(self.student.id),
+            "closed": False,
+        })
+        request = RequestFactory().post("dummy_url", {"body": text, "title": text})
+        request.user = self.student
+        request.view_name = "update_thread"
+        response = views.update_thread(request, course_id=self.course.id, thread_id="dummy_thread_id")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(mock_request.called)
+        self.assertEqual(mock_request.call_args[1]["data"]["body"], text)
+        self.assertEqual(mock_request.call_args[1]["data"]["title"], text)
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class CreateCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
+    def setUp(self):
+        self.course = CourseFactory.create()
+        seed_permissions_roles(self.course.id)
+        self.student = UserFactory.create()
+        CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
+
+    @patch('lms.lib.comment_client.utils.requests.request')
+    def _test_unicode_data(self, text, mock_request):
+        mock_request.return_value.text = json.dumps({
+            "closed": False,
+        })
+        request = RequestFactory().post("dummy_url", {"body": text})
+        request.user = self.student
+        request.view_name = "create_comment"
+        response = views.create_comment(request, course_id=self.course.id, thread_id="dummy_thread_id")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(mock_request.called)
+        self.assertEqual(mock_request.call_args[1]["data"]["body"], text)
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class UpdateCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
+    def setUp(self):
+        self.course = CourseFactory.create()
+        seed_permissions_roles(self.course.id)
+        self.student = UserFactory.create()
+        CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
+
+    @patch('lms.lib.comment_client.utils.requests.request')
+    def _test_unicode_data(self, text, mock_request):
+        mock_request.return_value.text = json.dumps({
+            "user_id": str(self.student.id),
+            "closed": False,
+        })
+        request = RequestFactory().post("dummy_url", {"body": text})
+        request.user = self.student
+        request.view_name = "update_comment"
+        response = views.update_comment(request, course_id=self.course.id, comment_id="dummy_comment_id")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(mock_request.called)
+        self.assertEqual(mock_request.call_args[1]["data"]["body"], text)
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class CreateSubCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
+    def setUp(self):
+        self.course = CourseFactory.create()
+        seed_permissions_roles(self.course.id)
+        self.student = UserFactory.create()
+        CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
+
+    @patch('lms.lib.comment_client.utils.requests.request')
+    def _test_unicode_data(self, text, mock_request):
+        mock_request.return_value.text = json.dumps({
+            "closed": False,
+            "depth": 1,
+        })
+        request = RequestFactory().post("dummy_url", {"body": text})
+        request.user = self.student
+        request.view_name = "create_sub_comment"
+        response = views.create_sub_comment(request, course_id=self.course.id, comment_id="dummy_comment_id")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(mock_request.called)
+        self.assertEqual(mock_request.call_args[1]["data"]["body"], text)

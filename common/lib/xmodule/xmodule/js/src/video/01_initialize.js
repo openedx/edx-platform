@@ -14,21 +14,8 @@
 
 define(
 'video/01_initialize.js',
-['video/03_video_player.js'],
-function (VideoPlayer) {
-    // window.console.log() is expected to be available. We do not support
-    // browsers which lack this functionality.
-
-    // The function gettext() is defined by a vendor library. If, however, it
-    // is undefined, it is a simple wrapper. It is used to return a different
-    // version of the string passed (translated string, etc.). In the basic
-    // case, the original string is returned.
-    if (typeof(window.gettext) == 'undefined') {
-        window.gettext = function (s) {
-            return s;
-        };
-    }
-
+['video/03_video_player.js', 'video/00_cookie_storage.js'],
+function (VideoPlayer, CookieStorage) {
     /**
      * @function
      *
@@ -88,7 +75,6 @@ function (VideoPlayer) {
     function _makeFunctionsPublic(state) {
         var methodsDict = {
             bindTo: bindTo,
-            checkStartEndTimes: checkStartEndTimes,
             fetchMetadata: fetchMetadata,
             getDuration: getDuration,
             getVideoMetadata: getVideoMetadata,
@@ -141,7 +127,7 @@ function (VideoPlayer) {
     //     Configure displaying of captions.
     //
     //     Option
-    //         this.config.show_captions = true | false
+    //         this.config.showCaptions = true | false
     //
     //     Defines whether or not captions are shown on first viewing.
     //
@@ -151,7 +137,7 @@ function (VideoPlayer) {
     //     represents the user's choice of having the subtitles shown or
     //     hidden. This choice is stored in cookies.
     function _configureCaptions(state) {
-        if (state.config.show_captions) {
+        if (state.config.showCaptions) {
             state.hide_captions = ($.cookie('hide_captions') === 'true');
         } else {
             state.hide_captions = true;
@@ -185,7 +171,7 @@ function (VideoPlayer) {
     //         true: Parsing of YouTube video IDs went OK, and we can proceed
     //             onwards to play YouTube videos.
     function _parseYouTubeIDs(state) {
-        if (state.parseYoutubeStreams(state.config.youtubeStreams)) {
+        if (state.parseYoutubeStreams(state.config.streams)) {
             state.videoType = 'youtube';
 
             return true;
@@ -241,10 +227,9 @@ function (VideoPlayer) {
 
         if (!state.config.sub || !state.config.sub.length) {
             state.config.sub = '';
-            state.config.show_captions = false;
+            state.config.showCaptions = false;
         }
-
-        state.setSpeed($.cookie('video_speed'));
+        state.setSpeed(state.speed);
 
         return true;
     }
@@ -286,6 +271,79 @@ function (VideoPlayer) {
         return dfd.promise();
     }
 
+    function _getConfiguration(data) {
+            var isBoolean = function (value) {
+                    var regExp = /^true$/i;
+                    return regExp.test(value.toString());
+                },
+                // List of keys that will be extracted form the configuration.
+                extractKeys = ['speed'],
+                // Compatibility keys used to change names of some parameters in
+                // the final configuration.
+                compatKeys = {
+                    'start': 'startTime',
+                    'end': 'endTime'
+                },
+                // Conversions used to pre-process some configuration data.
+                conversions = {
+                    'showCaptions': isBoolean,
+                    'autoplay': isBoolean,
+                    'autohideHtml5': isBoolean,
+                    'ytTestTimeout': function (value) {
+                        value = parseInt(value, 10);
+
+                        if (!isFinite(value)) {
+                            value = 1500;
+                        }
+
+                        return value;
+                    },
+                    'startTime': function (value) {
+                        value = parseInt(value, 10);
+
+                        if (!isFinite(value) || value < 0) {
+                            return 0;
+                        }
+
+                        return value;
+                    },
+                    'endTime': function (value) {
+                        value = parseInt(value, 10);
+
+                        if (!isFinite(value) || value === 0) {
+                            return null;
+                        }
+
+                        return value;
+                     }
+                },
+                config = {};
+
+            $.each(data, function(option, value) {
+                // Extract option that is in `extractKeys`.
+                if ($.inArray(option, extractKeys) !== -1) {
+                    return;
+                }
+
+                // Change option name to key that is in `compatKeys`.
+                if (compatKeys[option]) {
+                    option = compatKeys[option];
+                }
+
+                // Pre-process data.
+                if (conversions[option]) {
+                    if ($.isFunction(conversions[option])) {
+                        value = conversions[option].call(this, value);
+                    } else {
+                        throw new TypeError(option + ' is not a function.');
+                    }
+                }
+                config[option] = value;
+            });
+
+            return config;
+        }
+
     // ***************************************************************
     // Public functions start here.
     // These are available via the 'state' object. Their context ('this'
@@ -316,74 +374,62 @@ function (VideoPlayer) {
     // The function set initial configuration and preparation.
 
     function initialize(element) {
-        var _this = this,
-            regExp = /^true$/i,
-            data, tempYtTestTimeout;
-        // This is used in places where we instead would have to check if an
-        // element has a CSS class 'fullscreen'.
-        this.__dfd__ = $.Deferred();
-        this.isFullScreen = false;
-        this.isTouch = onTouchBasedDevice() || '';
+        var self = this,
+            el = $(element).find('.video'),
+            container = el.find('.video-wrapper'),
+            id = el.attr('id').replace(/video_/, ''),
+            __dfd__ = $.Deferred(),
+            isTouch = onTouchBasedDevice() || '',
+            storage = CookieStorage('video_player'),
+            speed = storage.getItem('video_speed_' + id) ||
+                el.data('speed') ||
+                storage.getItem('general_speed') ||
+                el.data('general-speed') ||
+                '1.0';
 
-        // The parent element of the video, and the ID.
-        this.el = $(element).find('.video');
-        this.elVideoWrapper = this.el.find('.video-wrapper');
-        this.id = this.el.attr('id').replace(/video_/, '');
-
-        if (this.isTouch) {
-            this.el.addClass('is-touch');
+        if (isTouch) {
+            el.addClass('is-touch');
         }
 
-        // jQuery .data() return object with keys in lower camelCase format.
-        data = this.el.data();
+        $.extend(this, {
+            __dfd__: __dfd__,
+            el: el,
+            container: container,
+            currentVolume: 100,
+            id: id,
+            isFullScreen: false,
+            isTouch: isTouch,
+            speed: Number(speed).toFixed(2).replace(/\.00$/, '.0'),
+            storage: storage
+        });
 
         console.log(
-            '[Video info]: Initializing video with id "' + this.id + '".'
+            '[Video info]: Initializing video with id "' + id + '".'
         );
 
         // We store all settings passed to us by the server in one place. These
         // are "read only", so don't modify them. All variable content lives in
         // 'state' object.
-        this.config = {
+        // jQuery .data() return object with keys in lower camelCase format.
+        this.config = $.extend({}, _getConfiguration(el.data()), {
             element: element,
-
-            startTime:          data['start'],
-            endTime:            data['end'],
-            caption_data_dir:   data['captionDataDir'],
-            caption_asset_path: data['captionAssetPath'],
-            show_captions:      regExp.test(data['showCaptions'].toString()),
-            youtubeStreams:     data['streams'],
-            autohideHtml5:      regExp.test(data['autohideHtml5'].toString()),
-            sub:                data['sub'],
-            mp4Source:          data['mp4Source'],
-            webmSource:         data['webmSource'],
-            oggSource:          data['oggSource'],
-            ytTestUrl:          data['ytTestUrl'],
             fadeOutTimeout:     1400,
             captionsFreezeTime: 10000,
             availableQualities: ['hd720', 'hd1080', 'highres']
-        };
+        });
 
-        // Make sure that start end end times are valid. If not, they will be
-        // set to `null` and will not be used later on.
-        this.checkStartEndTimes();
-
-        // Check if the YT test timeout has been set. If not, or it is in
-        // improper format, then set to default value.
-        tempYtTestTimeout = parseInt(data['ytTestTimeout'], 10);
-        if (!isFinite(tempYtTestTimeout)) {
-            tempYtTestTimeout = 1500;
+        if (this.config.endTime < this.config.startTime) {
+            this.config.endTime = null;
         }
-        this.config.ytTestTimeout = tempYtTestTimeout;
 
         if (!(_parseYouTubeIDs(this))) {
 
             // If we do not have YouTube ID's, try parsing HTML5 video sources.
             if (!_prepareHTML5Video(this)) {
 
-                this.__dfd__.reject();
+                __dfd__.reject();
                 // Non-YouTube sources were not found either.
-                return this.__dfd__.promise();
+                return __dfd__.promise();
             }
 
             console.log('[Video info]: Start player in HTML5 mode.');
@@ -405,13 +451,13 @@ function (VideoPlayer) {
                     if (err) {
                         console.log(
                             '[Video info]: YouTube returned an error for ' +
-                            'video with id "' + _this.id + '".'
+                            'video with id "' + id + '".'
                         );
 
                         // When the youtube link doesn't work for any reason
                         // (for example, the great firewall in china) any
                         // alternate sources should automatically play.
-                        if (!_prepareHTML5Video(_this)) {
+                        if (!_prepareHTML5Video(self)) {
                             console.log(
                                 '[Video info]: Continue loading ' +
                                 'YouTube video.'
@@ -419,15 +465,15 @@ function (VideoPlayer) {
 
                             // Non-YouTube sources were not found either.
 
-                            _this.el.find('.video-player div')
+                            el.find('.video-player div')
                                 .removeClass('hidden');
-                            _this.el.find('.video-player h3')
+                            el.find('.video-player h3')
                                 .addClass('hidden');
 
                             // If in reality the timeout was to short, try to
                             // continue loading the YouTube video anyways.
-                            _this.fetchMetadata();
-                            _this.parseSpeed();
+                            self.fetchMetadata();
+                            self.parseSpeed();
                         } else {
                             console.log(
                                 '[Video info]: Change player mode to HTML5.'
@@ -435,51 +481,23 @@ function (VideoPlayer) {
 
                             // In-browser HTML5 player does not support quality
                             // control.
-                            _this.el.find('a.quality_control').hide();
+                            el.find('a.quality_control').hide();
                         }
                     } else {
                         console.log(
                             '[Video info]: Start player in YouTube mode.'
                         );
 
-                        _this.fetchMetadata();
-                        _this.parseSpeed();
+                        self.fetchMetadata();
+                        self.parseSpeed();
                     }
 
-                    _setConfigurations(_this);
-                    _renderElements(_this);
+                    _setConfigurations(self);
+                    _renderElements(self);
                 });
         }
 
-        return this.__dfd__.promise();
-    }
-
-    /*
-     * function checkStartEndTimes()
-     *
-     * Validate config.startTime and config.endTime times.
-     *
-     * We can check at this time if the times are proper integers, and if they
-     * make general sense. I.e. if start time is => 0 and <= end time.
-     *
-     * An invalid start time will be reset to 0. An invalid end time will be
-     * set to `null`. It the task for the appropriate player API to figure out
-     * if start time and/or end time are greater than the length of the video.
-     */
-    function checkStartEndTimes() {
-        this.config.startTime = parseInt(this.config.startTime, 10);
-        if (!isFinite(this.config.startTime) || this.config.startTime < 0) {
-            this.config.startTime = 0;
-        }
-
-        this.config.endTime = parseInt(this.config.endTime, 10);
-        if (
-            !isFinite(this.config.endTime) ||
-            this.config.endTime < this.config.startTime ||
-            this.config.endTime === 0
-        ) {
-            this.config.endTime = null;
-        }
+        return __dfd__.promise();
     }
 
     // function parseYoutubeStreams(state, youtubeStreams)
@@ -559,16 +577,32 @@ function (VideoPlayer) {
     //     example the length of the video can be determined from the meta
     //     data.
     function fetchMetadata() {
-        var _this = this;
+        var _this = this,
+            metadataXHRs = [];
 
         this.metadata = {};
 
         $.each(this.videos, function (speed, url) {
-            _this.getVideoMetadata(url, function (data) {
+            var xhr = _this.getVideoMetadata(url, function (data) {
                 if (data.data) {
                     _this.metadata[data.data.id] = data.data;
                 }
             });
+
+            metadataXHRs.push(xhr);
+        });
+
+        $.when.apply(this, metadataXHRs).done(function () {
+            _this.el.trigger('metadata_received');
+
+            // Not only do we trigger the "metadata_received" event, we also
+            // set a flag to notify that metadata has been received. This
+            // allows for code that will miss the "metadata_received" event
+            // to know that metadata has been received. This is important in
+            // cases when some code will subscribe to the "metadata_received"
+            // event after it has been triggered.
+            _this.youtubeMetadataReceived = true;
+
         });
     }
 
@@ -579,22 +613,32 @@ function (VideoPlayer) {
         this.speeds = ($.map(this.videos, function (url, speed) {
             return speed;
         })).sort();
-
-        this.setSpeed($.cookie('video_speed'));
     }
 
-    function setSpeed(newSpeed, updateCookie) {
-        if (_.indexOf(this.speeds, newSpeed) !== -1) {
+    function setSpeed(newSpeed, updateStorage) {
+        // Possible speeds for each player type.
+        // flash =          [0.75, 1, 1.25, 1.5]
+        // html5 =          [0.75, 1, 1.25, 1.5]
+        // youtube html5 =  [0.25, 0.5, 1, 1.5, 2]
+        var map = {
+                '0.25': '0.75',
+                '0.50': '0.75',
+                '0.75': '0.50',
+                '1.25': '1.50',
+                '2.0': '1.50'
+            },
+            useSession = true;
+
+        if (_.contains(this.speeds, newSpeed)) {
             this.speed = newSpeed;
         } else {
-            this.speed = '1.0';
+            newSpeed = map[newSpeed];
+            this.speed = _.contains(this.speeds, newSpeed) ? newSpeed : '1.0';
         }
 
-        if (updateCookie) {
-            $.cookie('video_speed', this.speed, {
-                expires: 3650,
-                path: '/'
-            });
+        if (updateStorage) {
+            this.storage.setItem('video_speed_' + this.id, this.speed, useSession);
+            this.storage.setItem('general_speed', this.speed, useSession);
         }
     }
 
@@ -632,7 +676,11 @@ function (VideoPlayer) {
     }
 
     function getDuration() {
-        return this.metadata[this.youtubeId()].duration;
+        try {
+            return this.metadata[this.youtubeId()].duration;
+        } catch (err) {
+            return this.metadata[this.youtubeId('1.0')].duration;
+        }
     }
 
     /*
@@ -646,8 +694,9 @@ function (VideoPlayer) {
      *
      *     state.videoPlayer.pause({'param1': 10});
      */
-    function trigger(objChain, extraParameters) {
-        var i, tmpObj, chain;
+    function trigger(objChain) {
+        var extraParameters = Array.prototype.slice.call(arguments, 1),
+            i, tmpObj, chain;
 
         // Remember that 'this' is the 'state' object.
         tmpObj = this;
@@ -669,7 +718,7 @@ function (VideoPlayer) {
             }
         }
 
-        tmpObj(extraParameters);
+        tmpObj.apply(this, extraParameters);
 
         return true;
     }

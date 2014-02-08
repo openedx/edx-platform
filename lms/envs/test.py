@@ -73,6 +73,7 @@ COMMON_TEST_DATA_ROOT = COMMON_ROOT / "test" / "data"
 # Where the content data is checked out.  This may not exist on jenkins.
 GITHUB_REPO_ROOT = ENV_ROOT / "data"
 
+USE_I18N = True
 
 XQUEUE_INTERFACE = {
     "url": "http://sandbox-xqueue.edx.org",
@@ -258,7 +259,6 @@ XQUEUE_PORT = 8040
 YOUTUBE_PORT = 8031
 LTI_PORT = 8765
 
-
 ################### Make tests faster
 
 #http://slacy.com/blog/2012/04/make-your-tests-faster-in-django-1-4/
@@ -295,3 +295,36 @@ openid.oidutil.log = lambda message, level = 0: None
 
 ### QUERYABLE APP ###
 INSTALLED_APPS += ('queryable_student_module',)
+
+# set up some testing for microsites
+MICROSITE_CONFIGURATION = {
+    "test_microsite": {
+        "domain_prefix": "testmicrosite",
+        "university": "test_microsite",
+        "platform_name": "Test Microsite",
+        "logo_image_url": "test_microsite/images/header-logo.png",
+        "email_from_address": "test_microsite@edx.org",
+        "payment_support_email": "test_microsite@edx.org",
+        "ENABLE_MKTG_SITE": False,
+        "SITE_NAME": "test_microsite.localhost",
+        "course_org_filter": "TestMicrositeX",
+        "course_about_show_social_links": False,
+        "css_overrides_file": "test_microsite/css/test_microsite.css",
+        "show_partners": False,
+        "show_homepage_promo_video": False,
+        "course_index_overlay_text": "This is a Test Microsite Overlay Text.",
+        "course_index_overlay_logo_file": "test_microsite/images/header-logo.png",
+        "homepage_overlay_html": "<h1>This is a Test Microsite Overlay HTML</h1>"
+    }
+}
+
+if len(MICROSITE_CONFIGURATION.keys()) > 0:
+    enable_microsites(
+        MICROSITE_CONFIGURATION,
+        SUBDOMAIN_BRANDING,
+        VIRTUAL_UNIVERSITIES,
+        microsites_root=COMMON_ROOT / "test" / 'test_microsites'
+    )
+
+######### LinkedIn ########
+LINKEDIN_API['COMPANY_ID'] = '0000000'

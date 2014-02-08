@@ -1,10 +1,15 @@
-import os, string, random
+# -*- coding: utf-8 -*-
+"""Tests of i18n/dummy.py"""
+
 from unittest import TestCase
+
+import ddt
 from polib import POEntry
 
-import dummy
+from i18n import dummy
 
 
+@ddt.ddt
 class TestDummy(TestCase):
     """
     Tests functionality of i18n/dummy.py
@@ -13,39 +18,52 @@ class TestDummy(TestCase):
     def setUp(self):
         self.converter = dummy.Dummy()
 
-    def test_dummy(self):
+    def assertUnicodeEquals(self, str1, str2):
+        """Just like assertEquals, but doesn't put Unicode into the fail message.
+
+        Either nose, or rake, or something, deals very badly with unusual
+        Unicode characters in the assertions, so we use repr here to keep
+        things safe.
+
+        """
+        self.assertEquals(
+            str1, str2,
+            "Mismatch: %r != %r" % (str1, str2),
+        )
+
+    @ddt.data(
+        (u"hello my name is Bond, James Bond",
+         u"héllø mý nämé ïs Bønd, Jämés Bønd Ⱡ'σяєм ι#"),
+
+        (u"don't convert <a href='href'>tag ids</a>",
+         u"døn't çønvért <a href='href'>täg ïds</a> Ⱡ'σяєм ιρѕυ#"),
+
+        (u"don't convert %(name)s tags on %(date)s",
+         u"døn't çønvért %(name)s tägs øn %(date)s Ⱡ'σяєм ιρѕ#"),
+    )
+    def test_dummy(self, data):
         """
         Tests with a dummy converter (adds spurious accents to strings).
         Assert that embedded HTML and python tags are not converted.
         """
-        test_cases = [
-            ("hello my name is Bond, James Bond",
-             u'h\xe9ll\xf8 m\xfd n\xe4m\xe9 \xefs B\xf8nd, J\xe4m\xe9s B\xf8nd Lorem i#'),
-
-            ('don\'t convert <a href="href">tag ids</a>',
-             u'd\xf8n\'t \xe7\xf8nv\xe9rt <a href="href">t\xe4g \xefds</a> Lorem ipsu#'),
-
-            ('don\'t convert %(name)s tags on %(date)s',
-             u"d\xf8n't \xe7\xf8nv\xe9rt %(name)s t\xe4gs \xf8n %(date)s Lorem ips#")
-        ]
-        for source, expected in test_cases:
-            result = self.converter.convert(source)
-            self.assertEquals(result, expected)
+        source, expected = data
+        result = self.converter.convert(source)
+        self.assertUnicodeEquals(result, expected)
 
     def test_singular(self):
         entry = POEntry()
-        entry.msgid = 'A lovely day for a cup of tea.'
-        expected = u'\xc0 l\xf8v\xe9l\xfd d\xe4\xfd f\xf8r \xe4 \xe7\xfcp \xf8f t\xe9\xe4. Lorem i#'
+        entry.msgid = "A lovely day for a cup of tea."
+        expected = u"À løvélý däý før ä çüp øf téä. Ⱡ'σяєм #"
         self.converter.convert_msg(entry)
-        self.assertEquals(entry.msgstr, expected)
+        self.assertUnicodeEquals(entry.msgstr, expected)
 
     def test_plural(self):
         entry = POEntry()
-        entry.msgid = 'A lovely day for a cup of tea.'
-        entry.msgid_plural = 'A lovely day for some cups of tea.'
-        expected_s = u'\xc0 l\xf8v\xe9l\xfd d\xe4\xfd f\xf8r \xe4 \xe7\xfcp \xf8f t\xe9\xe4. Lorem i#'
-        expected_p = u'\xc0 l\xf8v\xe9l\xfd d\xe4\xfd f\xf8r s\xf8m\xe9 \xe7\xfcps \xf8f t\xe9\xe4. Lorem ip#'
+        entry.msgid = "A lovely day for a cup of tea."
+        entry.msgid_plural = "A lovely day for some cups of tea."
+        expected_s = u"À løvélý däý før ä çüp øf téä. Ⱡ'σяєм #"
+        expected_p = u"À løvélý däý før sømé çüps øf téä. Ⱡ'σяєм ιρ#"
         self.converter.convert_msg(entry)
         result = entry.msgstr_plural
-        self.assertEquals(result['0'], expected_s)
-        self.assertEquals(result['1'], expected_p)
+        self.assertUnicodeEquals(result['0'], expected_s)
+        self.assertUnicodeEquals(result['1'], expected_p)

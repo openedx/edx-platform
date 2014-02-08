@@ -71,17 +71,35 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) inset;
 }
 
-@mixin discussion-wmd-preview {
+@mixin discussion-wmd-preview-container {
   width: 100%;
-  min-height: 40px;
-  padding: 25px 20px 10px 20px;
   @include box-sizing(border-box);
   border: 1px solid #aaa;
   border-top: none;
   border-radius: 0 0 3px 3px;
   background: #eee;
-  color: #333;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) inset;
+}
+
+@mixin discussion-new-post-wmd-preview-container {
+  @include discussion-wmd-preview-container;
+  border-color: #333;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) inset;
+}
+
+@mixin discussion-wmd-preview-label {
+  width: 100%;
+  padding-top: 3px;
+  padding-left: 5px;
+  color: #bbb;
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+@mixin discussion-wmd-preview {
+  width: 100%;
+  padding: 10px 20px;
+  color: #333;
 }
 
 @-webkit-keyframes fadeIn {
@@ -309,7 +327,7 @@ body.discussion {
       }
     }
 
-    .edit-post-title, .edit-post-tags {
+    .edit-post-title {
       width: 100%;
       height: 40px;
       padding: 0 10px;
@@ -322,21 +340,6 @@ body.discussion {
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) inset;
     }
 
-    .tagsinput {
-      padding: 10px;
-      @include box-sizing(border-box);
-      border: 1px solid #aaa;
-      border-radius: 3px;
-      background: #fff;
-      font-family: 'Monaco', monospace;
-      font-size: 13px;
-      line-height: 1.6;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) inset;
-
-      span.tag {
-        margin-bottom: 0;
-      }
-    }
   }
 
   .new-post-form {
@@ -369,48 +372,19 @@ body.discussion {
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) inset;
     }
 
-    .tagsinput {
-      padding: 10px;
-      @include box-sizing(border-box);
-      border: 1px solid #333;
-      border-radius: 3px;
-      background: #fff;
-      font-family: 'Monaco', monospace;
-      font-size: 13px;
-      line-height: 1.6;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) inset;
+    .new-post-body .wmd-preview-container {
+      @include discussion-new-post-wmd-preview-container;
+    }
 
-      span.tag {
-        margin-bottom: 0;
-      }
+    .new-post-body .wmd-preview-label {
+      @include discussion-wmd-preview-label;
     }
 
     .new-post-body .wmd-preview {
       @include discussion-wmd-preview;
-      position: relative;
-      width: 100%;
-      //height: 50px;
-      margin-top: -1px;
-      padding: 25px 20px 10px 20px;
-      @include box-sizing(border-box);
-      border: 1px solid #333;
-      border-radius: 0 0 3px 3px;
-      background: #e6e6e6;
-      color: #333;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) inset;
     }
 
-    .new-post-preview-label {
-      position: absolute;
-      top: 4px;
-      left: 4px;
-      color: #aaa;
-      text-transform: uppercase;
-      font-size: 11px;
-    }
-
-    .new-post-title,
-    .new-post-tags {
+    .new-post-title {
       width: 100%;
       height: 40px;
       padding: 0 10px;
@@ -418,13 +392,10 @@ body.discussion {
       border-radius: 3px;
       border: 1px solid #333;
       font-size: 16px;
+      font-weight: 700;
       font-family: 'Open Sans', sans-serif;
       color: #333;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) inset;
-    }
-
-    .new-post-title {
-      font-weight: 700;
     }
 
     .submit {
@@ -461,20 +432,6 @@ body.discussion {
   }
 
 
-
-  .thread-tags {
-    margin-top: $baseline;
-  }
-
-  .thread-tag {
-    margin-right: 5px;
-    padding: 3px $baseline/2 6px;
-    border: 1px solid #90c4d7;
-    border-radius: 3px;
-    background: #c5eeff;
-    color: #333;
-    font-size: 13px;
-  }
 
   .thread-title {
     display: block;
@@ -548,33 +505,6 @@ body.discussion {
     &::-webkit-input-placeholder {
       color: #888;
     }
-  }
-
-  .wmd-preview {
-    @include box-sizing(border-box);
-    @include transition(all .2s ease-out 0s);
-    position: relative;
-    overflow: hidden;
-    margin-bottom: 5px;
-    padding: 25px $baseline $baseline/2 $baseline;
-    border: 1px solid #c8c8c8;
-    border-top-width: 0;
-    border-radius: 0 0 3px 3px;
-    font-family: $sans-serif;
-
-    &:before {
-      content: 'PREVIEW';
-      position: absolute;
-      top: 3px;
-      left: 5px;
-      font-size: 11px;
-      color: #bbb;
-    }
-
-    p {
-      font-family: $sans-serif;
-    }
-    background-color: #fafafa;
   }
 
   .wmd-button-row {
@@ -1256,6 +1186,8 @@ body.discussion {
 
   .blank-slate {
 
+    padding: 40px 40px 10px;
+
     section {
       border-bottom: 1px solid #ccc;
     }
@@ -1364,22 +1296,30 @@ body.discussion {
       }
 
       .row-item-full {
-
-        .email-setting {
+        
+        .notification-checkbox {
           display: inline-block;
-          text-align: center;
-          vertical-align: middle;
-          margin-left: $baseline/2;
+          padding: $baseline/4 0 $baseline/2 0;
+          margin-right: $baseline/2;
+          border-radius: 5px;
+          border: 1px solid gray;
+          
+          .email-setting {
+            display: inline-block;
+            text-align: center;
+            vertical-align: middle;
+            margin-left: $baseline/2;
+          }
+  
+          .icon {
+            display: inline-block;
+          }
+      
+          .email-setting:checked ~ .icon {
+            color: $green;
+          }
         }
-
-        .icon {
-          display: inline-block;
-        }
-    
-        .email-setting:checked ~ .icon {
-          color: $green;
-        }
-
+        
         .row-description {
           display: inline-block;
           width:80%;
@@ -1406,7 +1346,6 @@ body.discussion {
 
   .discussion-article {
     position: relative;
-    padding: $baseline*2;
     min-height: 468px;         
 
     a {
@@ -1467,7 +1406,8 @@ body.discussion {
   }
 
   .discussion-post {
-    padding: $baseline/2 $baseline;
+    padding: $baseline*2 $baseline*2 $baseline $baseline*2;
+    box-shadow: 0 1px 3px $shadow;
 
     > header .vote-btn {
       position: relative;
@@ -1513,7 +1453,7 @@ body.discussion {
   .responses {
     list-style: none;
     margin-top: $baseline;
-    padding: 0;
+    padding: 0px $baseline*2;
 
     > li {
       position: relative;
@@ -1578,6 +1518,27 @@ body.discussion {
 
     .posted-by {
       font-weight: 700;
+    }
+  }
+
+  div.add-response {
+    margin-top: $baseline;
+    padding: 0px 30px;
+
+    button.add-response-btn {
+      @include white-button;
+      position: relative;
+      padding: 0px 30px;
+      border: 1px solid #b2b2b2;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, .15);
+      font-size: 13px;
+      text-align: left;
+      @include animation(fadeIn .3s);
+      width: 100%;
+
+      span.add-response-btn-text {
+        padding-left: 4px;
+      }
     }
   }
 
@@ -1853,7 +1814,7 @@ body.discussion {
 
 
   .discussion-reply-new {
-    padding: $baseline;
+    padding: 0.5*$baseline 30px $baseline;
     @include clearfix;
     @include transition(opacity .2s linear 0s);
 
@@ -1869,6 +1830,14 @@ body.discussion {
 
   .wmd-input {
     @include discussion-wmd-input;
+  }
+
+  .wmd-preview-container {
+    @include discussion-wmd-preview-container;
+  }
+
+  .wmd-preview-label {
+    @include discussion-wmd-preview-label;
   }
 
   .wmd-preview {
@@ -1918,8 +1887,28 @@ body.discussion {
     margin-top: $baseline*2;
 
     > li {
-      margin: 0 $baseline $baseline !important;
       padding: 26px 30px $baseline !important;
+    }
+  }
+
+  div.add-response.post-extended-content {
+    margin-top: $baseline;
+    margin-bottom: 20px; 
+
+    button.add-response-btn {
+      @include white-button;
+      position: relative;
+      border: 1px solid #b2b2b2;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, .15);
+      font-size: 13px;
+      text-align: left;
+      @include animation(fadeIn .3s);
+      width: 100%; 
+      padding-left: 30px;
+
+      span.add-response-btn-text {
+        padding-left: 4px;
+      }
     }
   }
 
@@ -2000,7 +1989,7 @@ body.discussion {
         @include transition(all .2s linear 0s);
 
         .discussion-post {
-          padding: 12px $baseline 0 $baseline;
+          padding: 12px 30px 0px;
           @include clearfix;
 
           .inline-comment-count {
@@ -2151,32 +2140,19 @@ body.discussion {
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) inset;
       }
 
+      .new-post-body .wmd-preview-container {
+        @include discussion-new-post-wmd-preview-container;
+      }
+
+      .new-post-body .wmd-preview-label {
+        @include discussion-wmd-preview-label;
+      }
+
       .new-post-body .wmd-preview {
         @include discussion-wmd-preview;
-        position: relative;
-        width: 100%;
-        //height: 50px;
-        margin-top: -1px;
-        padding: 25px $baseline $baseline/2 $baseline;
-        @include box-sizing(border-box);
-        border: 1px solid #333;
-        border-radius: 0 0 3px 3px;
-        background: #e6e6e6;
-        color: #333;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) inset;
       }
 
-      .new-post-preview-label {
-        position: absolute;
-        top: 4px;
-        left: 4px;
-        font-size: 11px;
-        color: #aaa;
-        text-transform: uppercase;
-      }
-
-      .new-post-title,
-      .new-post-tags {
+      .new-post-title{
         width: 100%;
         height: 40px;
         padding: 0 $baseline/2;
@@ -2184,29 +2160,10 @@ body.discussion {
         border-radius: 3px;
         border: 1px solid #333;
         font-size: 16px;
+        font-weight: 700;
         font-family: 'Open Sans', sans-serif;
         color: #333;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) inset;
-      }
-
-      .new-post-title {
-        font-weight: 700;
-      }
-
-      .tagsinput {
-        padding: $baseline/2;
-        @include box-sizing(border-box);
-        border: 1px solid #333;
-        border-radius: 3px;
-        background: $white;
-        font-family: 'Monaco', monospace;
-        font-size: 13px;
-        line-height: 1.6;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) inset;
-
-        span.tag {
-          margin-bottom: 0;
-        }
       }
 
       .submit {
@@ -2240,20 +2197,6 @@ body.discussion {
           text-shadow: none;
         }
       }
-    }
-
-    .thread-tags {
-      margin: $baseline 0;
-    }
-
-    .thread-tag {
-      padding: 3px $baseline/2 6px;
-      margin-right: 5px;
-      border-radius: 3px;
-      color: #333;
-      background: #c5eeff;
-      border: 1px solid #90c4d7;
-      font-size: 13px;
     }
 
     .thread-title {
@@ -2343,33 +2286,6 @@ body.discussion {
       &::-webkit-input-placeholder {
         color: #888;
       }
-    }
-
-    .wmd-preview {
-      position: relative;
-      font-family: $sans-serif;
-      padding: 25px $baseline $baseline/2 $baseline;
-      margin-bottom: 5px;
-      @include box-sizing(border-box);
-      border: 1px solid #c8c8c8;
-      border-top-width: 0;
-      border-radius: 0 0 3px 3px;
-      overflow: hidden;
-      @include transition(all .2s ease-out 0s);
-
-      &:before {
-        content: 'PREVIEW';
-        position: absolute;
-        top: 3px;
-        left: 5px;
-        font-size: 11px;
-        color: #bbb;
-      }
-
-      p {
-        font-family: $sans-serif;
-      }
-      background-color: #fafafa;
     }
 
     .wmd-button-row {
@@ -2519,7 +2435,7 @@ body.discussion {
       }
     }
 
-    .edit-post-title, .edit-post-tags {
+    .edit-post-title {
       width: 100%;
       height: 40px;
       padding: 0 $baseline/2;
@@ -2531,36 +2447,6 @@ body.discussion {
       color: #333;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) inset;
     }
-
-    .tagsinput {
-      padding: $baseline/2;
-      @include box-sizing(border-box);
-      border: 1px solid #aaa;
-      border-radius: 3px;
-      background: $white;
-      font-family: 'Monaco', monospace;
-      font-size: 13px;
-      line-height: 1.6;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) inset;
-
-      span.tag {
-        margin-bottom: 0;
-      }
-    }
-  }
-
-  .thread-tags {
-    margin: $baseline 0;
-  }
-
-  .thread-tag {
-    padding: 3px $baseline/2 6px;
-    margin-right: 5px;
-    border-radius: 3px;
-    color: #333;
-    background: #c5eeff;
-    border: 1px solid #90c4d7;
-    font-size: 13px;
   }
 }
 
@@ -2686,4 +2572,33 @@ display:none;
 .notflagged span {
   color: #333;
   font-style: italic;
+}
+
+.response-count {
+  margin-top: $baseline;
+  padding: 0px 3*$baseline;
+}
+
+.response-pagination {
+  padding: 0px 1.5*$baseline;
+
+  .response-display-count {
+    display: block;
+    padding: 0.5*$baseline 1.5*$baseline;
+  }
+
+  .load-response-button {
+    display: block;
+    @include white-button;
+    font: normal 1em/1.6em $sans-serif;
+    position: relative;
+    padding: 0px 1.5*$baseline;
+    margin: $baseline/2 0px;
+    border: 1px solid #b2b2b2;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .15);
+    font-size: 13px;
+    text-align: left;
+    @include animation(fadeIn .3s);
+    width: 100%;
+  }
 }

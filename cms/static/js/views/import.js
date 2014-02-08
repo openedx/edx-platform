@@ -124,7 +124,7 @@ define(
             /**
              * Give error message at the list element that corresponds to the stage
              * where the error occurred.
-             * @param {int} stageNo Stage of import process at which error occured.
+             * @param {int} stageNo Stage of import process at which error occurred.
              * @param {string} msg Error message to display.
              */
             stageError: function (stageNo, msg) {

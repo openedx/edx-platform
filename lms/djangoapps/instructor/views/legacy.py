@@ -34,7 +34,7 @@ from bulk_email.models import CourseEmail, CourseAuthorization
 from courseware import grades
 from courseware.access import has_access
 from courseware.courses import get_course_with_access, get_cms_course_link
-from courseware.roles import (
+from student.roles import (
     CourseStaffRole, CourseInstructorRole, CourseBetaTesterRole, GlobalStaff
 )
 from courseware.models import StudentModule
@@ -64,12 +64,7 @@ from xblock.fields import ScopeIds
 from django.utils.translation import ugettext as _u
 from lms.lib.xblock.runtime import handler_prefix
 
-from bulk_email.models import CourseEmail
-import datetime
-from hashlib import md5
-from html_to_text import html_to_text
-from bulk_email import tasks
-
+from microsite_configuration.middleware import MicrositeConfiguration
 
 log = logging.getLogger(__name__)
 
@@ -179,7 +174,7 @@ def instructor_dashboard(request, course_id):
 
         # complete the url using information about the current course:
         (org, course_name, _) = course_id.split("/")
-        return "i4x://" + org + "/" + course_name + "/" + urlname
+        return u"i4x://{org}/{name}/{url}".format(org=org, name=course_name, url=urlname)
 
     def get_student_from_identifier(unique_student_identifier):
         """Gets a student object using either an email address or username"""
@@ -788,7 +783,7 @@ def instructor_dashboard(request, course_id):
         logs and swallows errors.
         """
         url = settings.ANALYTICS_SERVER_URL + \
-            "get?aname={}&course_id={}&apikey={}".format(analytics_name,
+            u"get?aname={}&course_id={}&apikey={}".format(analytics_name,
                                                          course_id,
                                                          settings.ANALYTICS_API_KEY)
         try:
@@ -1047,7 +1042,7 @@ def _role_members_table(role, title, course_id):
     Return a data table of usernames and names of users in group_name.
 
     Arguments:
-        role -- a courseware.roles.AccessRole
+        role -- a student.roles.AccessRole
         title -- a descriptive title to show the user
 
     Returns:
@@ -1125,7 +1120,7 @@ def remove_user_from_role(request, username_or_email, role, group_title, event_n
     Arguments:
        request: django request--used for tracking log
        username_or_email: who to remove.  Decide if it's an email by presense of an '@'
-       role: A courseware.roles.AccessRole
+       role: A student.roles.AccessRole
        group_title: what to call this group in messages to user--e.g. "beta-testers".
        event_name: what to call this event when logging to tracking logs.
 
@@ -1300,7 +1295,10 @@ def _do_enroll_students(course, course_id, students, overload=False, auto_enroll
         ceaset.delete()
 
     if email_students:
-        stripped_site_name = settings.SITE_NAME
+        stripped_site_name = MicrositeConfiguration.get_microsite_configuration_value(
+            'SITE_NAME',
+            settings.SITE_NAME
+        )
         registration_url = 'https://' + stripped_site_name + reverse('student.views.register_user')
         #Composition of email
         d = {'site_name': stripped_site_name,
@@ -1309,7 +1307,7 @@ def _do_enroll_students(course, course_id, students, overload=False, auto_enroll
              'auto_enroll': auto_enroll,
              'course_url': 'https://' + stripped_site_name + '/courses/' + course_id,
              'course_about_url': 'https://' + stripped_site_name + '/courses/' + course_id + '/about',
-             'is_shib_course': is_shib_course,
+             'is_shib_course': is_shib_course
              }
 
     for student in new_students:
@@ -1391,7 +1389,10 @@ def _do_unenroll_students(course_id, students, email_students=False):
     old_students, _ = get_and_clean_student_list(students)
     status = dict([x, 'unprocessed'] for x in old_students)
 
-    stripped_site_name = settings.SITE_NAME
+    stripped_site_name = MicrositeConfiguration.get_microsite_configuration_value(
+        'SITE_NAME',
+        settings.SITE_NAME
+    )
     if email_students:
         course = course_from_id(course_id)
         #Composition of email
@@ -1465,22 +1466,43 @@ def send_mail_to_student(student, param_dict):
     Returns a boolean indicating whether the email was sent successfully.
     """
 
-    EMAIL_TEMPLATE_DICT = {'allowed_enroll': ('emails/enroll_email_allowedsubject.txt', 'emails/enroll_email_allowedmessage.txt'),
-                           'enrolled_enroll': ('emails/enroll_email_enrolledsubject.txt', 'emails/enroll_email_enrolledmessage.txt'),
-                           'allowed_unenroll': ('emails/unenroll_email_subject.txt', 'emails/unenroll_email_allowedmessage.txt'),
-                           'enrolled_unenroll': ('emails/unenroll_email_subject.txt', 'emails/unenroll_email_enrolledmessage.txt')}
+    # add some helpers and microconfig subsitutions
+    if 'course' in param_dict:
+        param_dict['course_name'] = param_dict['course'].display_name_with_default
+    param_dict['site_name'] = MicrositeConfiguration.get_microsite_configuration_value(
+        'SITE_NAME',
+        param_dict.get('site_name', '')
+    )
 
-    subject_template, message_template = EMAIL_TEMPLATE_DICT.get(param_dict['message'], (None, None))
+    subject = None
+    message = None
+
+    message_type = param_dict['message']
+
+    email_template_dict = {
+        'allowed_enroll': ('emails/enroll_email_allowedsubject.txt', 'emails/enroll_email_allowedmessage.txt'),
+        'enrolled_enroll': ('emails/enroll_email_enrolledsubject.txt', 'emails/enroll_email_enrolledmessage.txt'),
+        'allowed_unenroll': ('emails/unenroll_email_subject.txt', 'emails/unenroll_email_allowedmessage.txt'),
+        'enrolled_unenroll': ('emails/unenroll_email_subject.txt', 'emails/unenroll_email_enrolledmessage.txt'),
+    }
+
+    subject_template, message_template = email_template_dict.get(message_type, (None, None))
     if subject_template is not None and message_template is not None:
         subject = render_to_string(subject_template, param_dict)
         message = render_to_string(message_template, param_dict)
 
+    if subject and message:
         # Remove leading and trailing whitespace from body
         message = message.strip()
 
         # Email subject *must not* contain newlines
         subject = ''.join(subject.splitlines())
-        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [student], fail_silently=False)
+        from_address = MicrositeConfiguration.get_microsite_configuration_value(
+            'email_from_address',
+            settings.DEFAULT_FROM_EMAIL
+        )
+
+        send_mail(subject, message, from_address, [student], fail_silently=False)
 
         return True
     else:
