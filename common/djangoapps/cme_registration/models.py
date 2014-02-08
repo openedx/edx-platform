@@ -110,7 +110,7 @@ class CmeUserProfile(UserProfile):
 
     address_1 = models.TextField(blank=True, null=True)
     address_2 = models.TextField(blank=True, null=True)
-    city = models.TextField(blank=True, null=True)
+    city_cme = models.TextField(blank=True, null=True)
     STATE_CHOICES = (('AL', 'Alabama'),
                      ('AK', 'Alaska'),
                      ('AZ', 'Arizona'),
@@ -413,6 +413,6 @@ class CmeUserProfile(UserProfile):
                        ('Zimbabwe', 'Zimbabwe'),
                        ('Other', 'Other'))
 
-    country = models.CharField(blank=True, null=True, max_length=50, choices=COUNTRY_CHOICES)
+    country_cme = models.CharField(blank=True, null=True, max_length=50, choices=COUNTRY_CHOICES)
     GENDER_CHOICES = (('M', 'Male'),
                       ('F', 'Female'))

@@ -1645,7 +1645,7 @@ class CodeResponse(LoncapaResponse):
             'anonymous_student_id': anonymous_student_id,
             'submission_time': qtime,
         }
-        if getattr(self.system, 'send_users_emailaddr_with_coderesponse', False):
+        if getattr(self.capa_system, 'send_users_emailaddr_with_coderesponse', False):
             student_info.update({'student_email': self.system.deanonymized_user_email})
 
         contents.update({'student_info': json.dumps(student_info)})
