@@ -15,7 +15,7 @@ def get_visible_courses():
                if isinstance(c, CourseDescriptor)]
     courses = sorted(courses, key=lambda course: course.number)
 
-    subdomain = MicrositeConfiguration.get_microsite_configuration_value('subdomain')
+    subdomain = MicrositeConfiguration.get_microsite_configuration_value('subdomain', 'default')
 
     # See if we have filtered course listings in this domain
     filtered_visible_ids = None
