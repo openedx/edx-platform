@@ -1227,17 +1227,6 @@ def enable_microsites(microsite_config_dict, subdomain_branding, virtual_univers
             # remove from our configuration as it is not valid
             del microsite_config_dict[microsite_name]
 
-    # Ensure the theme name is visible in templates
-    TEMPLATE_VISIBLE_SETTINGS.append("THEME_NAME")
-
-    # Calculate the location of the theme's files
-    theme_root = ENV_ROOT / "themes" / theme_name
-
-    # Prepend the theme's templates to the template search paths so
-    # that themes can override templates on an as-needed basis
-    TEMPLATE_DIRS.insert(0, theme_root / 'templates')
-    MAKO_TEMPLATES['main'].insert(0, theme_root / 'templates')
-
     # if we have microsites, then let's turn on SUBDOMAIN_BRANDING
     # Note check size of the dict because some microsites might not be found on disk and
     # we could be left with none
