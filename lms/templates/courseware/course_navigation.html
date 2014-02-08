@@ -1,6 +1,11 @@
 ## mako
-<%! from django.utils.translation import ugettext as _ %>
-<%page args="active_page=None" />
+<%!
+from courseware.tabs import get_course_tabs
+from django.utils.translation import ugettext as _
+from django.conf import settings
+%>
+
+<%page args="active_page=None, studio_url=None" />
 
 <%
 if active_page is None and active_page_context is not UNDEFINED:
@@ -38,8 +43,11 @@ def url_class(is_active):
       % endfor
     <%block name="extratabs" />
         % if masquerade is not UNDEFINED:
+          % if staff_access and studio_url is not None:
+              <li style="float:right"><a href="${studio_url}" id="edit-in-cms">${_("Edit in Studio")}</a></li>
+          % endif
           % if staff_access and masquerade is not None:
-          <li style="float:right"><a href="#" id="staffstatus">${_("Staff view")}</a></li>
+            <li style="float:right"><a href="#" id="staffstatus">${_("Staff view")}</a></li>
           % endif
         % endif
     </ol>

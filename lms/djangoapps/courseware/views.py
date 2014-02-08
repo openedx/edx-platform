@@ -20,8 +20,8 @@ from markupsafe import escape
 
 from courseware import grades
 from courseware.access import has_access
-from courseware.courses import (get_courses, get_course_with_access,
-                                get_courses_by_university, sort_by_announcement)
+from courseware.courses import (get_courses, get_course_with_access, get_courses_by_university,
+                                get_course_by_id, get_cms_course_link, sort_by_announcement)
 import courseware.tabs as tabs
 from courseware.masquerade import setup_masquerade
 from courseware.model_data import FieldDataCache
@@ -33,8 +33,8 @@ from student.models import UserTestGroup, CourseEnrollment
 from student.views import course_from_id, single_course_reverification_info
 from util.cache import cache, cache_if_anonymous
 from xblock.fragment import Fragment
-from xmodule.modulestore import Location
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore import Location, MONGO_MODULESTORE_TYPE
+from xmodule.modulestore.django import modulestore, loc_mapper
 from xmodule.modulestore.exceptions import InvalidLocationError, ItemNotFoundError, NoPathToItem
 from xmodule.modulestore.search import path_to_location
 from xmodule.course_module import CourseDescriptor
@@ -68,6 +68,12 @@ def user_groups(user):
 
     return group_names
 
+def get_studio_url(course, course_id, page):
+    is_studio_course = (modulestore().get_modulestore_type(course_id) == MONGO_MODULESTORE_TYPE)
+    studio_link = None
+    if is_studio_course:
+      studio_link = get_cms_course_link(course, page)
+    return studio_link
 
 @ensure_csrf_cookie
 @cache_if_anonymous
@@ -454,6 +460,7 @@ def course_info(request, course_id):
     course = get_course_with_access(request.user, course_id, 'load')
     staff_access = has_access(request.user, course, 'staff')
     masq = setup_masquerade(request, staff_access)    # allow staff to toggle masquerade on info page
+    studio_url = get_studio_url(course, course_id, 'course_info')
     reverifications = fetch_reverify_banner_info(request, course_id)
 
     context = {
@@ -463,6 +470,7 @@ def course_info(request, course_id):
         'course': course,
         'staff_access': staff_access,
         'masquerade': masq,
+        'studio_url': studio_url,
         'reverifications': reverifications,
     }
 
