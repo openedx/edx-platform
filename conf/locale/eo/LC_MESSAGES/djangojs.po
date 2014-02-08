@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-02-11 15:30-0500\n"
-"PO-Revision-Date: 2014-02-11 20:31:26.169682\n"
+"POT-Creation-Date: 2014-02-11 18:19-0500\n"
+"PO-Revision-Date: 2014-02-11 23:20:19.199916\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -59,6 +59,24 @@ msgstr "Çömméntärý Ⱡ#"
 #: common/lib/xmodule/xmodule/js/src/annotatable/display.js
 msgid "Reply to Annotation"
 msgstr "Réplý tö Ànnötätïön Ⱡ'σя#"
+
+#. Translators: %(earned)s is the number of points earned. %(total)s is the
+#. total number of points (examples: 0/1, 1/1, 2/3, 5/10). The total number of
+#. points will always be at least 1. We pluralize based on the total number of
+#. points (example: 0/1 point; 1/2 points);
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid "(%(earned)s/%(possible)s point)"
+msgid_plural "(%(earned)s/%(possible)s points)"
+msgstr[0] "(%(earned)s/%(possible)s pöïnt) Ⱡ'#"
+msgstr[1] "(%(earned)s/%(possible)s pöïnts) Ⱡ'σ#"
+
+#. Translators: %(num_points)s is the number of points possible (examples: 1,
+#. 3, 10). There will always be at least 1 point possible.;
+#: common/lib/xmodule/xmodule/js/src/capa/display.js
+msgid "(%(num_points)s point possible)"
+msgid_plural "(%(num_points)s points possible)"
+msgstr[0] "(%(num_points)s pöïnt pössïßlé) Ⱡ'σя#"
+msgstr[1] "(%(num_points)s pöïnts pössïßlé) Ⱡ'σя#"
 
 #. Translators: the word Answer here refers to the answer to a problem the
 #. student must solve.;
