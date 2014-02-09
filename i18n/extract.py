@@ -15,8 +15,14 @@ and it cannot be overridden.
 
 """
 
-import os, sys, logging
 from datetime import datetime
+import importlib
+import os
+import os.path
+import logging
+import sys
+
+from path import path
 from polib import pofile
 
 from i18n.config import BASE_DIR, LOCALE_DIR, CONFIGURATION
@@ -24,17 +30,13 @@ from i18n.execute import execute, create_dir_if_necessary, remove_file
 from i18n.segment import segment_pofiles
 
 
-# BABEL_CONFIG contains declarations for Babel to extract strings from mako template files
-# Use relpath to reduce noise in logs
-BABEL_CONFIG = BASE_DIR.relpathto(LOCALE_DIR.joinpath('babel.cfg'))
-
-# Strings from mako template files are written to BABEL_OUT
-# Use relpath to reduce noise in logs
-BABEL_OUT = BASE_DIR.relpathto(CONFIGURATION.source_messages_dir.joinpath('mako.po'))
-
 EDX_MARKER = "edX translation file"
 
 LOG = logging.getLogger(__name__)
+
+def base(path1, *paths):
+    """Return a relative path from BASE_DIR to path1 / paths[0] / ... """
+    return BASE_DIR.relpathto(path1.joinpath(*paths))
 
 def main():
     logging.basicConfig(stream=sys.stdout, level=logging.INFO)
@@ -43,7 +45,11 @@ def main():
     remove_file(source_msgs_dir.joinpath('django.po'))
 
     # Extract strings from mako templates.
-    babel_mako_cmd = 'pybabel extract -F %s -c "Translators:" . -o %s' % (BABEL_CONFIG, BABEL_OUT)
+    babel_mako_cmd = 'pybabel extract -F {config} -c "Translators:" . -o {output}'
+    babel_mako_cmd = babel_mako_cmd.format(
+        config=base(LOCALE_DIR, 'babel_mako.cfg'),
+        output=base(CONFIGURATION.source_messages_dir, 'mako.po'),
+    )
     execute(babel_mako_cmd, working_directory=BASE_DIR)
 
     makemessages = "django-admin.py makemessages -l en"
@@ -72,6 +78,20 @@ def main():
         source_msgs_dir.joinpath('djangojs.po'),
         source_msgs_dir.joinpath('djangojs-partial.po')
     )
+
+    # Extract strings from third-party applications.
+    for app_name in CONFIGURATION.third_party:
+        # Import the app to find out where it is.  Then use pybabel to extract
+        # from that directory.
+        app_module = importlib.import_module(app_name)
+        app_dir = path(app_module.__file__).dirname().dirname()
+        babel_cmd = 'pybabel extract -F {config} -c "Translators:" {app} -o {output}'
+        babel_cmd = babel_cmd.format(
+            config=LOCALE_DIR / 'babel_third_party.cfg',
+            app=app_name,
+            output=source_msgs_dir / (app_name + ".po"),
+        )
+        execute(babel_cmd, working_directory=app_dir)
 
     # Segment the generated files.
     segmented_files = segment_pofiles("en")

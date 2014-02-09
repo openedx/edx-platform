@@ -60,13 +60,19 @@
 # burakozalp <realburq@gmail.com>, 2013
 # hgsenel <hgsenel@gmail.com>, 2014
 # hgsenel <hgsenel@gmail.com>, 2014
+# #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
+# Translations template for PROJECT.
+# Copyright (C) 2014 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# 
+# Translators:
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
-"Report-Msgid-Bugs-To: translation_team@edx.org\n"
-"POT-Creation-Date: 2013-05-02 13:13-0400\n"
-"PO-Revision-Date: 2014-01-24 19:20+0000\n"
-"Last-Translator: hgsenel <hgsenel@gmail.com>\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2014-02-06 11:42-0500\n"
+"PO-Revision-Date: 2014-02-06 03:20+0000\n"
+"Last-Translator: nedbat <ned@edx.org>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/projects/p/edx-platform/language/tr_TR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -157,6 +163,11 @@ msgstr "Ders no belirtilmedi."
 #: common/djangoapps/student/views.py
 msgid "Course id is invalid"
 msgstr "Ders no geçersiz"
+
+#: common/djangoapps/student/views.py
+#: lms/templates/courseware/course_about.html
+msgid "Course is full"
+msgstr ""
 
 #: common/djangoapps/student/views.py
 msgid "You are not enrolled in this course"
@@ -608,6 +619,12 @@ msgstr ""
 msgid "General"
 msgstr ""
 
+#. Translators: TBD stands for 'To Be Determined' and is used when a course
+#. does not yet have an announced start date.
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "TBD"
+msgstr ""
+
 #: common/lib/xmodule/xmodule/video_module.py
 msgid "A YouTube URL or a link to a file hosted anywhere on the web."
 msgstr ""
@@ -990,6 +1007,7 @@ msgid "Extensions"
 msgstr "Eklentiler"
 
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
+#: lms/templates/instructor/instructor_dashboard_2/data_download.html
 msgid "Data Download"
 msgstr "Veri İndir"
 
@@ -1370,7 +1388,7 @@ msgstr "Sipariş No"
 msgid "Status"
 msgstr "Durum"
 
-#: lms/djangoapps/shoppingcart/reports.py
+#: lms/djangoapps/shoppingcart/reports.py lms/templates/shoppingcart/list.html
 msgid "Quantity"
 msgstr "Miktar"
 
@@ -1382,11 +1400,15 @@ msgstr "Birim Maliyeti"
 msgid "Total Cost"
 msgstr "Toplam Maliyet"
 
-#: lms/djangoapps/shoppingcart/reports.py
+#: lms/djangoapps/shoppingcart/reports.py lms/templates/shoppingcart/list.html
+#: lms/templates/shoppingcart/receipt.html
 msgid "Currency"
 msgstr "Para"
 
-#: lms/djangoapps/shoppingcart/reports.py
+#: lms/djangoapps/shoppingcart/reports.py lms/templates/shoppingcart/list.html
+#: lms/templates/shoppingcart/receipt.html
+#: lms/templates/shoppingcart/verified_cert_receipt.html
+#: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Description"
 msgstr "Tanımlama"
 
@@ -2061,6 +2083,12 @@ msgstr "Önizleme"
 
 #: lms/templates/wiki/edit.html lms/templates/wiki/history.html
 #: lms/templates/wiki/history.html lms/templates/wiki/includes/cheatsheet.html
+#: lms/templates/dashboard.html lms/templates/dashboard.html
+#: lms/templates/dashboard.html lms/templates/dashboard.html
+#: lms/templates/dashboard.html lms/templates/forgot_password_modal.html
+#: lms/templates/help_modal.html lms/templates/help_modal.html
+#: lms/templates/help_modal.html lms/templates/login_modal.html
+#: lms/templates/signup_modal.html
 msgid "Close Modal"
 msgstr "Kip Kapat"
 
@@ -2626,10 +2654,10 @@ msgstr ""
 msgid "Forgot password?"
 msgstr ""
 
-#: cms/templates/login.html cms/templates/signup.html lms/templates/login.html
-#: lms/templates/login_modal.html lms/templates/provider_login.html
-#: lms/templates/provider_login.html lms/templates/register.html
-#: lms/templates/sysadmin_dashboard.html
+#: cms/templates/login.html cms/templates/register.html
+#: lms/templates/login.html lms/templates/login_modal.html
+#: lms/templates/provider_login.html lms/templates/provider_login.html
+#: lms/templates/register.html lms/templates/sysadmin_dashboard.html
 #: lms/templates/university_profile/edge.html
 msgid "Password"
 msgstr ""
@@ -2639,12 +2667,12 @@ msgstr ""
 msgid "Admin"
 msgstr ""
 
-#: cms/templates/signup.html cms/templates/widgets/header.html
+#: cms/templates/register.html cms/templates/widgets/header.html
 #: lms/templates/index.html
 msgid "Sign Up"
 msgstr ""
 
-#: cms/templates/signup.html lms/templates/register-shib.html
+#: cms/templates/register.html lms/templates/register-shib.html
 #: lms/templates/register.html
 msgid "Public Username"
 msgstr ""
@@ -2677,7 +2705,7 @@ msgstr ""
 
 #: cms/templates/widgets/header.html lms/templates/help_modal.html
 #: lms/templates/navigation.html lms/templates/static_templates/help.html
-#: lms/templates/static_templates/help.html
+#: lms/templates/static_templates/help.html wiki/plugins/help/wiki_plugin.py
 msgid "Help"
 msgstr ""
 
@@ -2818,7 +2846,7 @@ msgstr ""
 
 #: common/templates/course_modes/choose.html
 msgid "or"
-msgstr ""
+msgstr "veya"
 
 #: common/templates/course_modes/choose.html
 msgid "Audit This Course"
@@ -3009,7 +3037,7 @@ msgstr "Ders e-postaları al"
 
 #: lms/templates/dashboard.html
 msgid "Save Settings"
-msgstr ""
+msgstr "Ayarları Kaydet"
 
 #: lms/templates/dashboard.html
 msgid "Password Reset Email Sent"
@@ -3501,11 +3529,11 @@ msgstr "Hesap bilgileriniz işleniyor...."
 
 #: lms/templates/login.html
 msgid "Please log in"
-msgstr ""
+msgstr "Lütfen giriş yapınız"
 
 #: lms/templates/login.html
 msgid "to access your account and courses"
-msgstr ""
+msgstr "hesabınıza ve derslerinize erişebilmeniz için"
 
 #: lms/templates/login.html
 msgid "We're Sorry, {platform_name} accounts are unavailable currently"
@@ -3528,6 +3556,11 @@ msgstr ""
 "{platform_name} hesabınıza giriş yapmak için lütfen aşağıdaki bilgileri "
 "tamamlayın. Gerekli kısımlar  <strong class=\"indicator\"> (*) ve koyu "
 "yazıyla vurgulanmıştır </strong>."
+
+#: lms/templates/login.html lms/templates/register-shib.html
+#: lms/templates/register.html lms/templates/register.html
+msgid "example: username@domain.com"
+msgstr "örnek: kullanıcıadı@domain.com"
 
 #: lms/templates/login.html
 msgid "Account Preferences"
@@ -3790,11 +3823,6 @@ msgid "Will be shown in any discussions or forums you participate in"
 msgstr "İçinde olduğunuz forumlarda ve tartışmalarda gözükecek olan"
 
 #: lms/templates/register-shib.html lms/templates/register.html
-#: lms/templates/register.html
-msgid "example: username@domain.com"
-msgstr "örnek: kullanıcıadı@domain.com"
-
-#: lms/templates/register-shib.html lms/templates/register.html
 msgid "Account Acknowledgements"
 msgstr "Hesap Onayları"
 
@@ -3808,7 +3836,7 @@ msgstr " {link_start}Onur Kodunu{link_end} kabul ediyorum"
 
 #: lms/templates/register-shib.html
 msgid "Update My Account"
-msgstr ""
+msgstr "Hesabımı Güncelle"
 
 #: lms/templates/register-sidebar.html
 msgid "Registration Help"
@@ -3887,7 +3915,7 @@ msgstr ""
 
 #: lms/templates/register.html
 msgid "Welcome!"
-msgstr ""
+msgstr "Hoşgeldiniz!"
 
 #: lms/templates/register.html
 msgid "Register below to create your {platform_name} account"
@@ -3899,7 +3927,7 @@ msgstr "Kayıt olmak için lütfen aşağıdaki alanları doldurun."
 
 #: lms/templates/register.html lms/templates/register.html
 msgid "cannot be changed later"
-msgstr ""
+msgstr "daha sonra değiştirilemez"
 
 #: lms/templates/register.html lms/templates/verify_student/face_upload.html
 msgid "example: Jane Doe"
@@ -3977,13 +4005,13 @@ msgid ""
 msgstr ""
 
 #: lms/templates/seq_module.html lms/templates/seq_module.html
-msgid "Section Navigation"
-msgstr "Bölüm Navigasyonu"
-
-#: lms/templates/seq_module.html lms/templates/seq_module.html
 #: lms/templates/discussion/mustache/_pagination.mustache
 msgid "Previous"
 msgstr "Önceki"
+
+#: lms/templates/seq_module.html lms/templates/seq_module.html
+msgid "Section Navigation"
+msgstr "Bölüm Navigasyonu"
 
 #: lms/templates/seq_module.html lms/templates/seq_module.html
 #: lms/templates/discussion/mustache/_pagination.mustache
@@ -4259,7 +4287,7 @@ msgstr "Platform Sürümü"
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Date"
-msgstr ""
+msgstr "Tarih"
 
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
@@ -4376,7 +4404,7 @@ msgstr "Hız"
 
 #: lms/templates/video.html
 msgid "Volume"
-msgstr ""
+msgstr "Ses Kuvveti"
 
 #: lms/templates/video.html
 msgid "Fill browser"
@@ -4594,9 +4622,8 @@ msgid "About {course.display_number_with_default}"
 msgstr "Hakkında  {course.display_number_with_default}"
 
 #: lms/templates/courseware/course_about.html
-msgid ""
-"You are registered for this course {course.display_number_with_default}"
-msgstr "Bu derse kayıt oldun  {course.display_number_with_default}"
+msgid "You are registered for this course"
+msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "View Courseware"
@@ -4853,7 +4880,7 @@ msgstr "evet"
 
 #: lms/templates/courseware/instructor_dashboard.html
 msgid "Grade Downloads"
-msgstr ""
+msgstr "Not İndirmeler"
 
 #: lms/templates/courseware/instructor_dashboard.html
 #: lms/templates/courseware/instructor_dashboard.html
@@ -5246,6 +5273,10 @@ msgid "{course_number} Progress"
 msgstr "{course_number} İlerleme"
 
 #: lms/templates/courseware/progress.html
+msgid "Course Progress"
+msgstr ""
+
+#: lms/templates/courseware/progress.html
 msgid "Course Progress for Student '{username}' ({email})"
 msgstr "Öğrenci için Ders Gidişatı {username}' ({email})"
 
@@ -5361,7 +5392,7 @@ msgstr "Kaydolunan isim:"
 #: lms/templates/verify_student/_verification_header.html
 #: lms/templates/verify_student/_verification_header.html
 msgid "ID Verified"
-msgstr ""
+msgstr "Kimlik Onaylandı"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course Completed - {end_date}"
@@ -5370,6 +5401,10 @@ msgstr "Kurs Bitti- {end_date}"
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course Started - {start_date}"
 msgstr "Kurs Başladı - {start_date}"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Course has not yet started"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Course Starts - {start_date}"
@@ -5591,6 +5626,7 @@ msgstr "yeni ileti başlığı"
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/mustache/_inline_discussion.mustache
 #: lms/templates/discussion/mustache/_inline_discussion_cohorted.mustache
+#: wiki/forms.py wiki/forms.py wiki/forms.py
 msgid "Title"
 msgstr ""
 
@@ -5614,7 +5650,7 @@ msgstr "Konu hakkında yeni ileti oluştur:"
 
 #: lms/templates/discussion/_new_post.html
 msgid "Filter List"
-msgstr ""
+msgstr "Filtre Listesi"
 
 #: lms/templates/discussion/_new_post.html
 msgid "Filter discussion areas"
@@ -5680,12 +5716,6 @@ msgstr "{name} olarak bak"
 #: lms/templates/discussion/mustache/_inline_thread.mustache
 #: lms/templates/discussion/mustache/_inline_thread_cohorted.mustache
 msgid "Add A Response"
-msgstr ""
-
-#: lms/templates/discussion/_underscore_templates.html
-#: lms/templates/discussion/mustache/_inline_thread.mustache
-#: lms/templates/discussion/mustache/_inline_thread_cohorted.mustache
-msgid "Loading content"
 msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
@@ -5897,6 +5927,11 @@ msgstr "Aktif Tehlikeler"
 
 #: lms/templates/discussion/mustache/_inline_thread.mustache
 #: lms/templates/discussion/mustache/_inline_thread_cohorted.mustache
+msgid "Loading content"
+msgstr ""
+
+#: lms/templates/discussion/mustache/_inline_thread.mustache
+#: lms/templates/discussion/mustache/_inline_thread_cohorted.mustache
 #: lms/templates/discussion/mustache/_profile_thread.mustache
 msgid "View discussion"
 msgstr "Tartışamayı görüntüle"
@@ -5983,7 +6018,7 @@ msgstr "Atla"
 
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html
 msgid "Grade Distribution"
-msgstr ""
+msgstr "Not Dağılımı"
 
 #: lms/templates/instructor/instructor_dashboard_2/analytics.html
 msgid "Loading problem list..."
@@ -6254,7 +6289,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Administration List Management"
-msgstr ""
+msgstr "Yönetici Liste İdaresi"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Getting available lists..."
@@ -6324,7 +6359,7 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Forum Moderators"
-msgstr ""
+msgstr "Forum Moderatörleri"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid ""
@@ -6387,7 +6422,7 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Student Email or Username"
-msgstr ""
+msgstr "Öğrenci E-postası ve Kullanıcı Adı"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Click this link to view the student's progress page:"
@@ -6786,12 +6821,12 @@ msgstr "Seçtiğiniz maddeler:"
 #: lms/templates/shoppingcart/list.html
 #: lms/templates/shoppingcart/receipt.html
 msgid "Unit Price"
-msgstr ""
+msgstr "Birim Fiyatı"
 
 #: lms/templates/shoppingcart/list.html
 #: lms/templates/shoppingcart/receipt.html
 msgid "Price"
-msgstr ""
+msgstr "Ücret"
 
 #: lms/templates/shoppingcart/list.html
 #: lms/templates/shoppingcart/receipt.html
@@ -6824,7 +6859,7 @@ msgstr "sipariş edilen maddeler:"
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Qty"
-msgstr ""
+msgstr "Miktar"
 
 #: lms/templates/shoppingcart/receipt.html
 #: lms/templates/shoppingcart/verified_cert_receipt.html
@@ -6879,19 +6914,19 @@ msgstr ""
 #: lms/templates/verify_student/photo_verification.html
 #: lms/templates/verify_student/show_requirements.html
 msgid "Intro"
-msgstr ""
+msgstr "Giriş"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 #: lms/templates/verify_student/photo_verification.html
 #: lms/templates/verify_student/show_requirements.html
 msgid "Take Photo"
-msgstr ""
+msgstr "Foto Çek"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 #: lms/templates/verify_student/photo_verification.html
 #: lms/templates/verify_student/show_requirements.html
 msgid "Take ID Photo"
-msgstr ""
+msgstr "Kimlik Fotosu Çek"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 #: lms/templates/verify_student/photo_reverification.html
@@ -6938,7 +6973,7 @@ msgstr ""
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Options"
-msgstr ""
+msgstr "Opsiyonlar"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Starts: {start_date}"
@@ -6946,7 +6981,7 @@ msgstr ""
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Go to Course"
-msgstr ""
+msgstr "Derse Git"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Go to your Dashboard"
@@ -6972,7 +7007,7 @@ msgstr ""
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Payment Details"
-msgstr ""
+msgstr "Ödeme Ayrıntıları"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid ""
@@ -6986,7 +7021,7 @@ msgstr ""
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Total"
-msgstr ""
+msgstr "Toplam"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "this"
@@ -7080,7 +7115,7 @@ msgstr "Günümüzün lider üniversitelerinden ücretsiz çevrimiçi dersler al
 
 #: lms/templates/verify_student/_modal_editname.html
 msgid "Edit Your Name"
-msgstr ""
+msgstr "İsminizi Düzeltiniz"
 
 #: lms/templates/verify_student/_modal_editname.html
 #: lms/templates/verify_student/face_upload.html
@@ -7089,7 +7124,7 @@ msgstr ""
 
 #: lms/templates/verify_student/_modal_editname.html
 msgid "Change my name"
-msgstr ""
+msgstr "Adımı değiştir"
 
 #: lms/templates/verify_student/_reverification_support.html
 msgid "Why Do I Need to Re-Verify?"
@@ -7104,7 +7139,7 @@ msgstr ""
 
 #: lms/templates/verify_student/_reverification_support.html
 msgid "Having Technical Trouble?"
-msgstr ""
+msgstr "Teknik Sorunlarınız mı Var?"
 
 #: lms/templates/verify_student/_reverification_support.html
 msgid ""
@@ -7117,7 +7152,7 @@ msgstr ""
 #: lms/templates/verify_student/_reverification_support.html
 #: lms/templates/verify_student/_verification_support.html
 msgid "Have questions?"
-msgstr ""
+msgstr "Sorunuz var mı?"
 
 #: lms/templates/verify_student/_reverification_support.html
 #: lms/templates/verify_student/_verification_support.html
@@ -7181,7 +7216,7 @@ msgstr ""
 
 #: lms/templates/verify_student/face_upload.html
 msgid "Edit Your Full Name"
-msgstr ""
+msgstr "Tam İsminizi Düzenleyin"
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 msgid "Re-Verify"
@@ -7191,7 +7226,7 @@ msgstr ""
 #: lms/templates/verify_student/photo_reverification.html
 #: lms/templates/verify_student/photo_verification.html
 msgid "No Webcam Detected"
-msgstr ""
+msgstr "Webcam Bulunamadı"
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
@@ -7204,7 +7239,7 @@ msgstr ""
 #: lms/templates/verify_student/photo_reverification.html
 #: lms/templates/verify_student/photo_verification.html
 msgid "No Flash Detected"
-msgstr ""
+msgstr "Flash Bulunamadı"
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
@@ -7213,6 +7248,8 @@ msgid ""
 "You don't seem to have Flash installed. {a_start} Get Flash {a_end} to "
 "continue your registration."
 msgstr ""
+"Flash kurudu değil görünüyor.  Kaydınıza devam etmek için {a_start} Flash "
+"Yükle {a_end}"
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
@@ -7259,7 +7296,7 @@ msgstr ""
 #: lms/templates/verify_student/photo_verification.html
 #: lms/templates/verify_student/photo_verification.html
 msgid "Take photo"
-msgstr ""
+msgstr "Fotoğraf çekiniz"
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
@@ -7267,7 +7304,7 @@ msgstr ""
 #: lms/templates/verify_student/photo_verification.html
 #: lms/templates/verify_student/photo_verification.html
 msgid "Looks good"
-msgstr ""
+msgstr "İyi görünüyor"
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
@@ -7281,7 +7318,7 @@ msgstr ""
 #: lms/templates/verify_student/photo_reverification.html
 #: lms/templates/verify_student/photo_verification.html
 msgid "Make sure your face is well-lit"
-msgstr ""
+msgstr "Yüzünüzün iyi aydınlatıldığına emin olunuz"
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
@@ -7307,7 +7344,7 @@ msgstr ""
 #: lms/templates/verify_student/photo_reverification.html
 #: lms/templates/verify_student/photo_verification.html
 msgid "to capture your picture"
-msgstr ""
+msgstr "resminizi çekebilmek için"
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
@@ -7331,13 +7368,13 @@ msgstr ""
 #: lms/templates/verify_student/photo_verification.html
 #: lms/templates/verify_student/photo_verification.html
 msgid "Common Questions"
-msgstr ""
+msgstr "Sıkça Sorulan Sorular"
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
 #: lms/templates/verify_student/photo_verification.html
 msgid "Why do you need my photo?"
-msgstr ""
+msgstr "Neden fotoğrafıma gerek duyuyorsunuz?"
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
@@ -7353,7 +7390,7 @@ msgstr ""
 #: lms/templates/verify_student/photo_verification.html
 #: lms/templates/verify_student/photo_verification.html
 msgid "What do you do with this picture?"
-msgstr ""
+msgstr "Bu resimle ne yapacaksınız?"
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
@@ -7669,7 +7706,7 @@ msgstr "İyi aydınatılsın"
 #: lms/templates/verify_student/photo_reverification.html
 #: lms/templates/verify_student/photo_verification.html
 msgid "Show your whole face"
-msgstr ""
+msgstr "Yüzünüzün tamamını gösteriniz"
 
 #: lms/templates/verify_student/photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
@@ -7745,7 +7782,7 @@ msgstr ""
 
 #: lms/templates/verify_student/photo_verification.html
 msgid "Take Your Photo"
-msgstr ""
+msgstr "Fotoğrafınızı Çekiniz"
 
 #: lms/templates/verify_student/photo_verification.html
 msgid "What if my camera isn't working?"
@@ -9224,7 +9261,7 @@ msgstr "Studio Hesabınız Yok mu? Kaydolun!"
 msgid "Required Information to Sign In to edX Studio"
 msgstr "edX Studio'ya kaydolmak için gerekli bilgi"
 
-#: cms/templates/login.html cms/templates/signup.html
+#: cms/templates/login.html cms/templates/register.html
 msgid "Email Address"
 msgstr "E-posta Adresi"
 
@@ -9489,6 +9526,98 @@ msgstr ""
 msgid "Form Actions"
 msgstr "Form İşlemleri"
 
+#: cms/templates/register.html
+msgid "Sign Up for edX Studio"
+msgstr "edX Stüdyo için Kayıt Ol"
+
+#: cms/templates/register.html
+msgid "Already have a Studio Account? Sign in"
+msgstr "Stüdyo Hesabınız var mı? Giriş yapın"
+
+#: cms/templates/register.html
+msgid ""
+"Ready to start creating online courses? Sign up below and start creating "
+"your first edX course today."
+msgstr ""
+"Çevrimiçi ders yaratmaya hazır mısın? Aşağıda kayıt ol ve bugün ilk edX "
+"dersini yaratmaya başla."
+
+#: cms/templates/register.html
+msgid "Required Information to Sign Up for edX Studio"
+msgstr "edX Studio'ya kaydolmak için gerekli bilgi"
+
+#: cms/templates/register.html
+msgid ""
+"This will be used in public discussions with your courses and in our edX101 "
+"support forums"
+msgstr ""
+"Bu veri kurs içinde yer alan genel tartışmalar kısmında ve edX101 destek "
+"forumlarında yer alacaktır."
+
+#: cms/templates/register.html
+msgid "Your Location"
+msgstr " Bulunduğunuz Yer"
+
+#: cms/templates/register.html
+msgid "Preferred Language"
+msgstr "Tercih Edilen Dil"
+
+#: cms/templates/register.html
+msgid "I agree to the {a_start} Terms of Service {a_end}"
+msgstr "{a_start} Hizmet Şartlarını {a_start} kabul ediyorum"
+
+#: cms/templates/register.html
+msgid "Create My Account &amp; Start Authoring Courses"
+msgstr "Hesabımı yarat &amp; Dersleri Yapmaya Başla"
+
+#: cms/templates/register.html
+msgid "Common Studio Questions"
+msgstr "Sıkça Sorulan Stüdyo Soruları"
+
+#: cms/templates/register.html
+msgid "Who is Studio for?"
+msgstr "Studio kimin için?"
+
+#: cms/templates/register.html
+msgid ""
+"Studio is for anyone that wants to create online courses that leverage the "
+"global edX platform. Our users are often faculty members, teaching "
+"assistants and course staff, and members of instructional technology groups."
+msgstr ""
+"Stüdyo çevrimiçi ders yaratmak isteyen herkes için global bir edX "
+"platformudur. Kullanıcılarımız genellikle fakülte üyeleri, öğretim üyeleri "
+"ve eğitim teknoloji gruplarından oluşur."
+
+#: cms/templates/register.html
+msgid "How technically savvy do I need to be to create courses in Studio?"
+msgstr "Stüdyoda dersler oluşturmak için teknik olarak neler bilmeliyim?"
+
+#: cms/templates/register.html
+msgid ""
+"Studio is designed to be easy to use by almost anyone familiar with common "
+"web-based authoring environments (Wordpress, Moodle, etc.). No programming "
+"knowledge is required, but for some of the more advanced features, a "
+"technical background would be helpful. As always, we are here to help, so "
+"don't hesitate to dive right in."
+msgstr ""
+
+#: cms/templates/register.html
+msgid "I've never authored a course online before. Is there help?"
+msgstr ""
+"Ben daha önce online olarak hiç ders açmadım. Bana yardım edebilir misiniz?"
+
+#: cms/templates/register.html
+msgid ""
+"Absolutely. We have created an online course, edX101, that describes some "
+"best practices: from filming video, creating exercises, to the basics of "
+"running an online course. Additionally, we're always here to help, just drop"
+" us a note."
+msgstr ""
+"Tabii ki. edX101 adında online bir ders var ve bu şu bilgilere sahip: video "
+"çekme, egzersizler yaratma ve online ders oluşturmanın temel kullanım "
+"koşulları. Ayrıca, eğer yardım istiyorsanız, bize bir not bırakmanız "
+"yeterli. "
+
 #: cms/templates/settings.html
 msgid "Schedule &amp; Details Settings"
 msgstr "Takvim &amp; Ayrıntılar Ayarlar"
@@ -9546,7 +9675,7 @@ msgstr "Ders Takvimi"
 
 #: cms/templates/settings.html
 msgid "Dates that control when your course can be viewed"
-msgstr ""
+msgstr "Dersinizin ne zaman görülebileceğini belirleyen tarihler"
 
 #: cms/templates/settings.html
 msgid "First day the course begins"
@@ -9605,6 +9734,13 @@ msgid ""
 " Manager\">PM</abbr> or Conrad Warre <a rel=\"email\" class=\"action action-"
 "email\" href=\"mailto:conrad@edx.org\">(conrad@edx.org)</a>."
 msgstr ""
+"Bu tarihler <strong>dersinizin görülebileceği günleri</strong> "
+"etkilemektedir, ama bunlar <strong>ders özetinizde yer alan tarihler "
+"değildir</strong>. Dersinizin özet sayfasında yer aldığı gibi başlangıç ve "
+"kayıt tarihlerinizi belirlemek için, <abbr title=\"Program "
+"Manager\">PM</abbr> veya Conrad Warre <a rel=\"email\" class=\"action "
+"action-email\" href=\"mailto:conrad@edx.org\">(conrad@edx.org)</a> "
+"sayfalarında yer alan komutları izleyiniz."
 
 #: cms/templates/settings.html
 msgid "Introducing Your Course"
@@ -9640,12 +9776,16 @@ msgid ""
 "You can manage this image along with all of your other <a href='{}'>files "
 "&amp; uploads</a>"
 msgstr ""
+"Bu imgeyi ve diğerlerini yönetmek için <a href='{}'>dosyalar &amp; "
+"yüklemeler</a>  "
 
 #: cms/templates/settings.html
 msgid ""
 "Your course currently does not have an image. Please upload one (JPEG or PNG"
 " format, and minimum suggested dimensions are 375px wide by 200px tall)"
 msgstr ""
+"Dersiniz şu anda bir resme sahip değil. Lütfen bir tane yükleyiniz (JPEG "
+"veya PNG formatında ve minimum 375 pk en x 200 pk boy öçülerinde)"
 
 #: cms/templates/settings.html
 msgid ""
@@ -9831,98 +9971,6 @@ msgid ""
 "exams, and specify how much of a student's grade each assignment type is "
 "worth."
 msgstr ""
-
-#: cms/templates/signup.html
-msgid "Sign Up for edX Studio"
-msgstr "edX Stüdyo için Kayıt Ol"
-
-#: cms/templates/signup.html
-msgid "Already have a Studio Account? Sign in"
-msgstr "Stüdyo Hesabınız var mı? Giriş yapın"
-
-#: cms/templates/signup.html
-msgid ""
-"Ready to start creating online courses? Sign up below and start creating "
-"your first edX course today."
-msgstr ""
-"Çevrimiçi ders yaratmaya hazır mısın? Aşağıda kayıt ol ve bugün ilk edX "
-"dersini yaratmaya başla."
-
-#: cms/templates/signup.html
-msgid "Required Information to Sign Up for edX Studio"
-msgstr "edX Studio'ya kaydolmak için gerekli bilgi"
-
-#: cms/templates/signup.html
-msgid ""
-"This will be used in public discussions with your courses and in our edX101 "
-"support forums"
-msgstr ""
-"Bu veri kurs içinde yer alan genel tartışmalar kısmında ve edX101 destek "
-"forumlarında yer alacaktır."
-
-#: cms/templates/signup.html
-msgid "Your Location"
-msgstr " Bulunduğunuz Yer"
-
-#: cms/templates/signup.html
-msgid "Preferred Language"
-msgstr "Tercih Edilen Dil"
-
-#: cms/templates/signup.html
-msgid "I agree to the {a_start} Terms of Service {a_end}"
-msgstr "{a_start} Hizmet Şartlarını {a_start} kabul ediyorum"
-
-#: cms/templates/signup.html
-msgid "Create My Account &amp; Start Authoring Courses"
-msgstr "Hesabımı yarat &amp; Dersleri Yapmaya Başla"
-
-#: cms/templates/signup.html
-msgid "Common Studio Questions"
-msgstr "Sıkça Sorulan Stüdyo Soruları"
-
-#: cms/templates/signup.html
-msgid "Who is Studio for?"
-msgstr "Studio kimin için?"
-
-#: cms/templates/signup.html
-msgid ""
-"Studio is for anyone that wants to create online courses that leverage the "
-"global edX platform. Our users are often faculty members, teaching "
-"assistants and course staff, and members of instructional technology groups."
-msgstr ""
-"Stüdyo çevrimiçi ders yaratmak isteyen herkes için global bir edX "
-"platformudur. Kullanıcılarımız genellikle fakülte üyeleri, öğretim üyeleri "
-"ve eğitim teknoloji gruplarından oluşur."
-
-#: cms/templates/signup.html
-msgid "How technically savvy do I need to be to create courses in Studio?"
-msgstr "Stüdyoda dersler oluşturmak için teknik olarak neler bilmeliyim?"
-
-#: cms/templates/signup.html
-msgid ""
-"Studio is designed to be easy to use by almost anyone familiar with common "
-"web-based authoring environments (Wordpress, Moodle, etc.). No programming "
-"knowledge is required, but for some of the more advanced features, a "
-"technical background would be helpful. As always, we are here to help, so "
-"don't hesitate to dive right in."
-msgstr ""
-
-#: cms/templates/signup.html
-msgid "I've never authored a course online before. Is there help?"
-msgstr ""
-"Ben daha önce online olarak hiç ders açmadım. Bana yardım edebilir misiniz?"
-
-#: cms/templates/signup.html
-msgid ""
-"Absolutely. We have created an online course, edX101, that describes some "
-"best practices: from filming video, creating exercises, to the basics of "
-"running an online course. Additionally, we're always here to help, just drop"
-" us a note."
-msgstr ""
-"Tabii ki. edX101 adında online bir ders var ve bu şu bilgilere sahip: video "
-"çekme, egzersizler yaratma ve online ders oluşturmanın temel kullanım "
-"koşulları. Ayrıca, eğer yardım istiyorsanız, bize bir not bırakmanız "
-"yeterli. "
 
 #: cms/templates/textbooks.html cms/templates/textbooks.html
 #: cms/templates/widgets/header.html
@@ -10323,3 +10371,636 @@ msgstr "Üniteleri yeniden düzenlemek için sürükle"
 # empty
 msgid "This is a key string."
 msgstr "Bu bir anahtar dizisidir."
+
+#: wiki/admin.py wiki/models/article.py
+msgid "created"
+msgstr ""
+
+#: wiki/forms.py
+msgid "Only localhost... muahahaha"
+msgstr ""
+
+#: wiki/forms.py
+msgid "Initial title of the article. May be overridden with revision titles."
+msgstr ""
+
+#: wiki/forms.py
+msgid "Type in some contents"
+msgstr ""
+
+#: wiki/forms.py
+msgid ""
+"This is just the initial contents of your article. After creating it, you "
+"can use more complex features like adding plugins, meta data, related "
+"articles etc..."
+msgstr ""
+
+#: wiki/forms.py wiki/forms.py
+msgid "Contents"
+msgstr ""
+
+#: wiki/forms.py wiki/forms.py
+msgid "Summary"
+msgstr ""
+
+#: wiki/forms.py
+msgid ""
+"Give a short reason for your edit, which will be stated in the revision log."
+msgstr ""
+
+#: wiki/forms.py
+msgid ""
+"While you were editing, someone else changed the revision. Your contents "
+"have been automatically merged with the new contents. Please review the text"
+" below."
+msgstr ""
+
+#: wiki/forms.py
+msgid "No changes made. Nothing to save."
+msgstr ""
+
+#: wiki/forms.py
+msgid "Select an option"
+msgstr ""
+
+#: wiki/forms.py
+msgid "Slug"
+msgstr ""
+
+#: wiki/forms.py
+msgid ""
+"This will be the address where your article can be found. Use only "
+"alphanumeric characters and - or _. Note that you cannot change the slug "
+"after creating the article."
+msgstr ""
+
+#: wiki/forms.py
+msgid "Write a brief message for the article's history log."
+msgstr ""
+
+#: wiki/forms.py
+msgid "A slug may not begin with an underscore."
+msgstr ""
+
+#: wiki/forms.py
+#, python-format
+msgid "A deleted article with slug \"%s\" already exists."
+msgstr ""
+
+#: wiki/forms.py
+#, python-format
+msgid "A slug named \"%s\" already exists."
+msgstr ""
+
+#: wiki/forms.py
+msgid "Yes, I am sure"
+msgstr ""
+
+#: wiki/forms.py
+msgid "Purge"
+msgstr ""
+
+#: wiki/forms.py
+msgid ""
+"Purge the article: Completely remove it (and all its contents) with no undo."
+" Purging is a good idea if you want to free the slug such that users can "
+"create new articles in its place."
+msgstr ""
+
+#: wiki/forms.py wiki/plugins/attachments/forms.py
+#: wiki/plugins/images/forms.py
+msgid "You are not sure enough!"
+msgstr ""
+
+#: wiki/forms.py
+msgid "While you tried to delete this article, it was modified. TAKE CARE!"
+msgstr ""
+
+#: wiki/forms.py
+msgid "Lock article"
+msgstr ""
+
+#: wiki/forms.py
+msgid "Deny all users access to edit this article."
+msgstr ""
+
+#: wiki/forms.py
+msgid "Permissions"
+msgstr ""
+
+#: wiki/forms.py
+msgid "Owner"
+msgstr ""
+
+#: wiki/forms.py
+msgid "Enter the username of the owner."
+msgstr ""
+
+#: wiki/forms.py
+msgid "(none)"
+msgstr ""
+
+#: wiki/forms.py
+msgid "Inherit permissions"
+msgstr ""
+
+#: wiki/forms.py
+msgid ""
+"Check here to apply the above permissions recursively to articles under this"
+" one."
+msgstr ""
+
+#: wiki/forms.py
+msgid "Permission settings for the article were updated."
+msgstr ""
+
+#: wiki/forms.py
+msgid "Your permission settings were unchanged, so nothing saved."
+msgstr ""
+
+#: wiki/forms.py
+msgid "No user with that username"
+msgstr ""
+
+#: wiki/forms.py
+msgid "Article locked for editing"
+msgstr ""
+
+#: wiki/forms.py
+msgid "Article unlocked for editing"
+msgstr ""
+
+#: wiki/forms.py
+msgid "Filter..."
+msgstr ""
+
+#: wiki/core/plugins/base.py
+msgid "Settings for plugin"
+msgstr ""
+
+#: wiki/models/article.py wiki/models/pluginbase.py
+#: wiki/plugins/attachments/models.py
+msgid "current revision"
+msgstr ""
+
+#: wiki/models/article.py
+msgid ""
+"The revision being displayed for this article. If you need to do a roll-"
+"back, simply change the value of this field."
+msgstr ""
+
+#: wiki/models/article.py
+msgid "modified"
+msgstr ""
+
+#: wiki/models/article.py
+msgid "Article properties last modified"
+msgstr ""
+
+#: wiki/models/article.py
+msgid "owner"
+msgstr ""
+
+#: wiki/models/article.py
+msgid ""
+"The owner of the article, usually the creator. The owner always has both "
+"read and write access."
+msgstr ""
+
+#: wiki/models/article.py
+msgid "group"
+msgstr ""
+
+#: wiki/models/article.py
+msgid ""
+"Like in a UNIX file system, permissions can be given to a user according to "
+"group membership. Groups are handled through the Django auth system."
+msgstr ""
+
+#: wiki/models/article.py
+msgid "group read access"
+msgstr ""
+
+#: wiki/models/article.py
+msgid "group write access"
+msgstr ""
+
+#: wiki/models/article.py
+msgid "others read access"
+msgstr ""
+
+#: wiki/models/article.py
+msgid "others write access"
+msgstr ""
+
+#: wiki/models/article.py
+#, python-format
+msgid "Article without content (%(id)d)"
+msgstr ""
+
+#: wiki/models/article.py
+msgid "content type"
+msgstr ""
+
+#: wiki/models/article.py
+msgid "object ID"
+msgstr ""
+
+#: wiki/models/article.py
+msgid "Article for object"
+msgstr ""
+
+#: wiki/models/article.py
+msgid "Articles for object"
+msgstr ""
+
+#: wiki/models/article.py
+msgid "revision number"
+msgstr ""
+
+#: wiki/models/article.py
+msgid "IP address"
+msgstr ""
+
+#: wiki/models/article.py
+msgid "user"
+msgstr ""
+
+#: wiki/models/article.py
+msgid "locked"
+msgstr ""
+
+#: wiki/models/article.py wiki/models/pluginbase.py
+msgid "article"
+msgstr ""
+
+#: wiki/models/article.py
+msgid "article contents"
+msgstr ""
+
+#: wiki/models/article.py
+msgid "article title"
+msgstr ""
+
+#: wiki/models/article.py
+msgid ""
+"Each revision contains a title field that must be filled out, even if the "
+"title has not changed"
+msgstr ""
+
+#: wiki/models/pluginbase.py
+msgid "original article"
+msgstr ""
+
+#: wiki/models/pluginbase.py
+msgid "Permissions are inherited from this article"
+msgstr ""
+
+#: wiki/models/pluginbase.py
+msgid "A plugin was changed"
+msgstr ""
+
+#: wiki/models/pluginbase.py
+msgid ""
+"The revision being displayed for this plugin.If you need to do a roll-back, "
+"simply change the value of this field."
+msgstr ""
+
+#: wiki/models/urlpath.py
+msgid "Cache lookup value for articles"
+msgstr ""
+
+#: wiki/models/urlpath.py
+msgid "slug"
+msgstr ""
+
+#: wiki/models/urlpath.py
+msgid "(root)"
+msgstr ""
+
+#: wiki/models/urlpath.py
+msgid "URL path"
+msgstr ""
+
+#: wiki/models/urlpath.py
+msgid "URL paths"
+msgstr ""
+
+#: wiki/models/urlpath.py
+msgid "Sorry but you cannot have a root article with a slug."
+msgstr ""
+
+#: wiki/models/urlpath.py
+msgid "A non-root note must always have a slug."
+msgstr ""
+
+#: wiki/models/urlpath.py
+#, python-format
+msgid "There is already a root node on %s"
+msgstr ""
+
+#: wiki/models/urlpath.py
+msgid ""
+"Articles who lost their parents\n"
+"===============================\n"
+"\n"
+"The children of this article have had their parents deleted. You should probably find a new home for them."
+msgstr ""
+
+#: wiki/models/urlpath.py
+msgid "Lost and found"
+msgstr ""
+
+#: wiki/plugins/attachments/forms.py
+msgid "A short summary of what the file contains"
+msgstr ""
+
+#: wiki/plugins/attachments/forms.py
+msgid "Yes I am sure..."
+msgstr ""
+
+#: wiki/plugins/attachments/markdown_extensions.py
+msgid "Click to download file"
+msgstr ""
+
+#: wiki/plugins/attachments/models.py
+msgid ""
+"The revision of this attachment currently in use (on all articles using the "
+"attachment)"
+msgstr ""
+
+#: wiki/plugins/attachments/models.py
+msgid "original filename"
+msgstr ""
+
+#: wiki/plugins/attachments/models.py
+msgid "attachment"
+msgstr ""
+
+#: wiki/plugins/attachments/models.py
+msgid "attachments"
+msgstr ""
+
+#: wiki/plugins/attachments/models.py
+msgid "file"
+msgstr ""
+
+#: wiki/plugins/attachments/models.py
+msgid "attachment revision"
+msgstr ""
+
+#: wiki/plugins/attachments/models.py
+msgid "attachment revisions"
+msgstr ""
+
+#: wiki/plugins/attachments/views.py
+#, python-format
+msgid "%s was successfully added."
+msgstr ""
+
+#: wiki/plugins/attachments/views.py wiki/plugins/attachments/views.py
+#, python-format
+msgid "Your file could not be saved: %s"
+msgstr ""
+
+#: wiki/plugins/attachments/views.py wiki/plugins/attachments/views.py
+msgid ""
+"Your file could not be saved, probably because of a permission error on the "
+"web server."
+msgstr ""
+
+#: wiki/plugins/attachments/views.py
+#, python-format
+msgid "%s uploaded and replaces old attachment."
+msgstr ""
+
+#: wiki/plugins/attachments/views.py
+msgid ""
+"Your new file will automatically be renamed to match the file already "
+"present. Files with different extensions are not allowed."
+msgstr ""
+
+#: wiki/plugins/attachments/views.py
+#, python-format
+msgid "Current revision changed for %s."
+msgstr ""
+
+#: wiki/plugins/attachments/views.py
+#, python-format
+msgid "Added a reference to \"%(att)s\" from \"%(art)s\"."
+msgstr ""
+
+#: wiki/plugins/attachments/views.py
+#, python-format
+msgid "The file %s was deleted."
+msgstr ""
+
+#: wiki/plugins/attachments/views.py
+#, python-format
+msgid "This article is no longer related to the file %s."
+msgstr ""
+
+#: wiki/plugins/attachments/wiki_plugin.py
+#, python-format
+msgid "A file was changed: %s"
+msgstr ""
+
+#: wiki/plugins/attachments/wiki_plugin.py
+#, python-format
+msgid "A file was deleted: %s"
+msgstr ""
+
+#: wiki/plugins/images/forms.py
+#, python-format
+msgid ""
+"New image %s was successfully uploaded. You can use it by selecting it from "
+"the list of available images."
+msgstr ""
+
+#: wiki/plugins/images/forms.py
+msgid "Are you sure?"
+msgstr ""
+
+#: wiki/plugins/images/models.py
+msgid "image"
+msgstr ""
+
+#: wiki/plugins/images/models.py
+msgid "images"
+msgstr ""
+
+#: wiki/plugins/images/models.py
+#, python-format
+msgid "Image: %s"
+msgstr ""
+
+#: wiki/plugins/images/models.py
+msgid "Current revision not set!!"
+msgstr ""
+
+#: wiki/plugins/images/models.py
+msgid "image revision"
+msgstr ""
+
+#: wiki/plugins/images/models.py
+msgid "image revisions"
+msgstr ""
+
+#: wiki/plugins/images/models.py
+#, python-format
+msgid "Image Revsion: %d"
+msgstr ""
+
+#: wiki/plugins/images/views.py
+#, python-format
+msgid "%s has been restored"
+msgstr ""
+
+#: wiki/plugins/images/views.py
+#, python-format
+msgid "%s has been marked as deleted"
+msgstr ""
+
+#: wiki/plugins/images/views.py
+#, python-format
+msgid "%(file)s has been changed to revision #%(revision)d"
+msgstr ""
+
+#: wiki/plugins/images/views.py
+#, python-format
+msgid "%(file)s has been saved."
+msgstr ""
+
+#: wiki/plugins/images/wiki_plugin.py
+msgid "Images"
+msgstr ""
+
+#: wiki/plugins/images/wiki_plugin.py
+#, python-format
+msgid "An image was added: %s"
+msgstr ""
+
+#: wiki/plugins/links/wiki_plugin.py
+msgid "Links"
+msgstr ""
+
+#: wiki/plugins/notifications/forms.py
+msgid "Notifications"
+msgstr ""
+
+#: wiki/plugins/notifications/forms.py
+msgid "When this article is edited"
+msgstr ""
+
+#: wiki/plugins/notifications/forms.py
+msgid "Also receive emails about article edits"
+msgstr ""
+
+#: wiki/plugins/notifications/forms.py
+msgid "Your notification settings were updated."
+msgstr ""
+
+#: wiki/plugins/notifications/forms.py
+msgid "Your notification settings were unchanged, so nothing saved."
+msgstr ""
+
+#: wiki/plugins/notifications/models.py
+#, python-format
+msgid "%(user)s subscribing to %(article)s (%(type)s)"
+msgstr ""
+
+#: wiki/plugins/notifications/models.py
+#, python-format
+msgid "Article deleted: %s"
+msgstr ""
+
+#: wiki/plugins/notifications/models.py
+#, python-format
+msgid "Article modified: %s"
+msgstr ""
+
+#: wiki/plugins/notifications/models.py
+#, python-format
+msgid "New article created: %s"
+msgstr ""
+
+#: wiki/views/accounts.py
+msgid "You are now sign up... and now you can sign in!"
+msgstr ""
+
+#: wiki/views/accounts.py
+msgid "You are no longer logged in. Bye bye!"
+msgstr ""
+
+#: wiki/views/accounts.py
+msgid "You are now logged in! Have fun!"
+msgstr ""
+
+#: wiki/views/article.py
+#, python-format
+msgid "New article '%s' created."
+msgstr ""
+
+#: wiki/views/article.py
+#, python-format
+msgid "There was an error creating this article: %s"
+msgstr ""
+
+#: wiki/views/article.py
+msgid "There was an error creating this article."
+msgstr ""
+
+#: wiki/views/article.py
+msgid ""
+"This article cannot be deleted because it has children or is a root article."
+msgstr ""
+
+#: wiki/views/article.py
+msgid ""
+"This article together with all its contents are now completely gone! Thanks!"
+msgstr ""
+
+#: wiki/views/article.py
+#, python-format
+msgid ""
+"The article \"%s\" is now marked as deleted! Thanks for keeping the site "
+"free from unwanted material!"
+msgstr ""
+
+#: wiki/views/article.py
+msgid "Your changes were saved."
+msgstr ""
+
+#: wiki/views/article.py
+msgid "A new revision of the article was succesfully added."
+msgstr ""
+
+#: wiki/views/article.py
+msgid "Restoring article"
+msgstr ""
+
+#: wiki/views/article.py
+#, python-format
+msgid "The article \"%s\" and its children are now restored."
+msgstr ""
+
+#: wiki/views/article.py
+#, python-format
+msgid "The article %s is now set to display revision #%d"
+msgstr ""
+
+#: wiki/views/article.py
+msgid "New title"
+msgstr ""
+
+#: wiki/views/article.py
+#, python-format
+msgid "Merge between Revision #%(r1)d and Revision #%(r2)d"
+msgstr ""
+
+#: wiki/views/article.py
+#, python-format
+msgid ""
+"A new revision was created: Merge between Revision #%(r1)d and Revision "
+"#%(r2)d"
+msgstr ""
