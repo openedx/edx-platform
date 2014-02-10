@@ -11,9 +11,6 @@ from django.http import HttpResponseNotFound
 from django.core.exceptions import PermissionDenied
 from xmodule.modulestore.django import loc_mapper
 
-from xmodule.modulestore.inheritance import own_metadata
-
-
 from ..utils import get_modulestore
 from .access import has_course_access
 from xmodule.course_module import CourseDescriptor

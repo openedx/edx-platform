@@ -2,7 +2,6 @@ import json
 from unittest import TestCase
 from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import get_modulestore
-from xmodule.modulestore.inheritance import own_metadata
 
 from contentstore.views.course import (
     validate_textbooks_json, validate_textbook_json, TextbookValidationError)
