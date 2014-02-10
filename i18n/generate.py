@@ -115,7 +115,8 @@ def main(argv=None):
     for locale in CONFIGURATION.translated_locales:
         merge_files(locale, fail_if_missing=args.strict)
     # Dummy text is not required. Don't raise exception if files are missing.
-    merge_files(CONFIGURATION.dummy_locale, fail_if_missing=False)
+    for locale in CONFIGURATION.dummy_locales:
+        merge_files(locale, fail_if_missing=False)
 
     compile_cmd = 'django-admin.py compilemessages'
     execute(compile_cmd, working_directory=BASE_DIR)

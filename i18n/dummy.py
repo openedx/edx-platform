@@ -31,98 +31,22 @@ from i18n.config import CONFIGURATION
 from i18n.execute import create_dir_if_necessary
 from i18n.converter import Converter
 
-# Substitute plain characters with accented lookalikes.
-# http://tlt.its.psu.edu/suggestions/international/web/codehtml.html#accent
-TABLE = {
-    'A': u'À',
-    'a': u'ä',
-    'b': u'ß',
-    'C': u'Ç',
-    'c': u'ç',
-    'E': u'É',
-    'e': u'é',
-    'I': u'Ì',
-    'i': u'ï',
-    'O': u'Ø',
-    'o': u'ø',
-    'U': u'Û',
-    'u': u'ü',
-    'Y': u'Ý',
-    'y': u'ý',
-}
 
+class BaseDummyConverter(Converter):
+    """Base class for dummy converters.
 
-# The print industry's standard dummy text, in use since the 1500s
-# see http://www.lipsum.com/, then fed through a "fancy-text" converter.
-# The string should start with a space, so that it joins nicely with the text
-# that precedes it.  The Lorem contains an apostrophe since French often does,
-# and translated strings get put into single-quoted strings, which then break.
-LOREM = " " + " ".join(     # join and split just make the string easier here.
-    u"""
-    Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂
-    тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм
-    νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα
-    ¢σммσ∂σ ¢σηѕєqυαт.  ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє
-    νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт
-    ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂
-    єѕт łαвσяυм.
-    """.split()
-)
+    String conversion goes through a character map, then gets padded.
 
-# To simulate more verbose languages (like German), pad the length of a string
-# by a multiple of PAD_FACTOR
-PAD_FACTOR = 1.33
-
-
-class Dummy(Converter):
-    r"""
-    Creates new localization properties files in a dummy language.
-
-    Each property file is derived from the equivalent en_US file, with these
-    transformations applied:
-
-    1. Every vowel is replaced with an equivalent with extra accent marks.
-
-    2. Every string is padded out to +30% length to simulate verbose languages
-       (such as German) to see if layout and flows work properly.
-
-    3. Every string is terminated with a '#' character to make it easier to detect
-       truncation.
-
-    Example use::
-
-        >>> from dummy import Dummy
-        >>> c = Dummy()
-        >>> c.convert("My name is Bond, James Bond")
-        u'M\xfd n\xe4m\xe9 \xefs B\xf8nd, J\xe4m\xe9s B\xf8nd \u2360\u03c3\u044f\u0454\u043c \u03b9\u03c1#'
-        >>> print c.convert("My name is Bond, James Bond")
-        Mý nämé ïs Bønd, Jämés Bønd Ⱡσяєм ιρ#
-        >>> print c.convert("don't convert <a href='href'>tag ids</a>")
-        døn't çønvért <a href='href'>täg ïds</a> Ⱡσяєм ιρѕυ#
-        >>> print c.convert("don't convert %(name)s tags on %(date)s")
-        døn't çønvért %(name)s tägs øn %(date)s Ⱡσяєм ιρѕ#
     """
-    def convert(self, string):
-        result = Converter.convert(self, string)
-        return self.pad(result)
+    TABLE = {}
 
     def inner_convert_string(self, string):
-        for k, v in TABLE.items():
-            string = string.replace(k, v)
-        return string
+        for old, new in self.TABLE.items():
+            string = string.replace(old, new)
+        return self.pad(string)
 
     def pad(self, string):
-        """add some lorem ipsum text to the end of string"""
-        size = len(string)
-        if size < 7:
-            target = size * 3
-        else:
-            target = int(size*PAD_FACTOR)
-        return string + self.terminate(LOREM[:(target-size)])
-
-    def terminate(self, string):
-        """replaces the final char of string with #"""
-        return string[:-1] + '#'
+        return string
 
     def convert_msg(self, msg):
         """
@@ -159,15 +83,95 @@ class Dummy(Converter):
         return translated
 
 
-def make_dummy(file, locale):
+class Dummy(BaseDummyConverter):
+    r"""
+    Creates new localization properties files in a dummy language.
+
+    Each property file is derived from the equivalent en_US file, with these
+    transformations applied:
+
+    1. Every vowel is replaced with an equivalent with extra accent marks.
+
+    2. Every string is padded out to +30% length to simulate verbose languages
+       (such as German) to see if layout and flows work properly.
+
+    3. Every string is terminated with a '#' character to make it easier to detect
+       truncation.
+
+    Example use::
+
+        >>> from dummy import Dummy
+        >>> c = Dummy()
+        >>> c.convert("My name is Bond, James Bond")
+        u'M\xfd n\xe4m\xe9 \xefs B\xf8nd, J\xe4m\xe9s B\xf8nd \u2360\u03c3\u044f\u0454\u043c \u03b9\u03c1#'
+        >>> print c.convert("My name is Bond, James Bond")
+        Mý nämé ïs Bønd, Jämés Bønd Ⱡσяєм ιρ#
+        >>> print c.convert("don't convert <a href='href'>tag ids</a>")
+        døn't çønvért <a href='href'>täg ïds</a> Ⱡσяєм ιρѕυ#
+        >>> print c.convert("don't convert %(name)s tags on %(date)s")
+        døn't çønvért %(name)s tägs øn %(date)s Ⱡσяєм ιρѕ#
+
+    """
+    # Substitute plain characters with accented lookalikes.
+    # http://tlt.its.psu.edu/suggestions/international/web/codehtml.html#accent
+    TABLE = dict(zip(
+        u"AabCcEeIiOoUuYy",
+        u"ÀäßÇçÉéÌïÖöÛüÝý"
+    ))
+
+    # The print industry's standard dummy text, in use since the 1500s
+    # see http://www.lipsum.com/, then fed through a "fancy-text" converter.
+    # The string should start with a space, so that it joins nicely with the text
+    # that precedes it.  The Lorem contains an apostrophe since French often does,
+    # and translated strings get put into single-quoted strings, which then break.
+    LOREM = " " + " ".join(     # join and split just make the string easier here.
+        u"""
+        Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂
+        тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм
+        νєηιαм, qυιѕ ησѕтяυ∂ єχєя¢ιтαтιση υłłαм¢σ łαвσяιѕ ηιѕι υт αłιqυιρ єχ єα
+        ¢σммσ∂σ ¢σηѕєqυαт.  ∂υιѕ αυтє ιяυяє ∂σłσя ιη яєρяєнєη∂єяιт ιη νσłυρтαтє
+        νєłιт єѕѕє ¢ιłłυм ∂σłσяє єυ ƒυgιαт ηυłłα ραяιαтυя. єχ¢єρтєυя ѕιηт σ¢¢αє¢αт
+        ¢υρι∂αтαт ηση ρяσι∂єηт, ѕυηт ιη ¢υłρα qυι σƒƒι¢ια ∂єѕєяυηт мσłłιт αηιм ι∂
+        єѕт łαвσяυм.
+        """.split()
+    )
+
+    # To simulate more verbose languages (like German), pad the length of a string
+    # by a multiple of PAD_FACTOR
+    PAD_FACTOR = 1.33
+
+    def pad(self, string):
+        """add some lorem ipsum text to the end of string"""
+        size = len(string)
+        if size < 7:
+            target = size * 3
+        else:
+            target = int(size * self.PAD_FACTOR)
+        pad_len = target - size - 1
+        return string + self.LOREM[:pad_len] + "#"
+
+
+class Dummy2(BaseDummyConverter):
+    """A second dummy converter.
+
+    Like Dummy, but uses a different obvious but readable automatic conversion:
+    Strikes-through many letters, and turns lower-case letters upside-down.
+
+    """
+    TABLE = dict(zip(
+        u"ABCDEGHIJKLOPRTUYZabcdefghijklmnopqrstuvwxyz",
+        u"ȺɃȻĐɆǤĦƗɈꝀŁØⱣɌŦɄɎƵɐqɔpǝɟƃɥᴉɾʞlɯuødbɹsʇnʌʍxʎz"
+    ))
+
+
+def make_dummy(filename, locale, converter):
     """
     Takes a source po file, reads it, and writes out a new po file
     in :param locale: containing a dummy translation.
     """
-    if not path(file).exists():
-        raise IOError('File does not exist: %s' % file)
-    pofile = polib.pofile(file)
-    converter = Dummy()
+    if not path(filename).exists():
+        raise IOError('File does not exist: %r' % filename)
+    pofile = polib.pofile(filename)
     for msg in pofile:
         converter.convert_msg(msg)
 
@@ -175,7 +179,7 @@ def make_dummy(file, locale):
     # do something reasonable.
     pofile.metadata['Plural-Forms'] = 'nplurals=2; plural=(n != 1);'
 
-    new_file = new_filename(file, locale)
+    new_file = new_filename(filename, locale)
     create_dir_if_necessary(new_file)
     pofile.save(new_file)
 
@@ -191,12 +195,12 @@ def main():
     """
     Generate dummy strings for all source po files.
     """
-    LOCALE = CONFIGURATION.dummy_locale
     SOURCE_MSGS_DIR = CONFIGURATION.source_messages_dir
-    print "Processing source language files into dummy strings:"
-    for source_file in CONFIGURATION.source_messages_dir.walkfiles('*.po'):
-        print '   ', source_file.relpath()
-        make_dummy(SOURCE_MSGS_DIR.joinpath(source_file), LOCALE)
+    for locale, converter in zip(CONFIGURATION.dummy_locales, [Dummy(), Dummy2()]):
+        print "Processing source language files into dummy strings, locale {}:".format(locale)
+        for source_file in CONFIGURATION.source_messages_dir.walkfiles('*.po'):
+            print '   ', source_file.relpath()
+            make_dummy(SOURCE_MSGS_DIR.joinpath(source_file), locale, converter)
     print
 
 
