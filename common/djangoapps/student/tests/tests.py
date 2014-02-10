@@ -68,8 +68,11 @@ class ResetPasswordTests(TestCase):
         bad_pwd_resp = password_reset(bad_pwd_req)
         # If they've got an unusable password, we return a successful response code
         self.assertEquals(bad_pwd_resp.status_code, 200)
-        self.assertEquals(bad_pwd_resp.content, json.dumps({'success': True,
-                                                            'value': "('registration/password_reset_done.html', [])"}))
+        obj = json.loads(bad_pwd_resp.content)
+        self.assertEquals(obj, {
+            'success': True,
+            'value': "('registration/password_reset_done.html', [])",
+        })
 
     @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
     def test_nonexist_email_password_reset(self):
@@ -80,12 +83,19 @@ class ResetPasswordTests(TestCase):
         # Note: even if the email is bad, we return a successful response code
         # This prevents someone potentially trying to "brute-force" find out which emails are and aren't registered with edX
         self.assertEquals(bad_email_resp.status_code, 200)
-        self.assertEquals(bad_email_resp.content, json.dumps({'success': True,
-                                                              'value': "('registration/password_reset_done.html', [])"}))
+        obj = json.loads(bad_email_resp.content)
+        self.assertEquals(obj, {
+            'success': True,
+            'value': "('registration/password_reset_done.html', [])",
+        })
 
-    @unittest.skipIf(settings.FEATURES.get('DISABLE_RESET_EMAIL_TEST', False),
-                         dedent("""Skipping Test because CMS has not provided necessary templates for password reset.
-                                If LMS tests print this message, that needs to be fixed."""))
+    @unittest.skipIf(
+        settings.FEATURES.get('DISABLE_RESET_EMAIL_TEST', False),
+        dedent("""
+            Skipping Test because CMS has not provided necessary templates for password reset.
+            If LMS tests print this message, that needs to be fixed.
+        """)
+    )
     @patch('django.core.mail.send_mail')
     @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
     def test_reset_password_email(self, send_email):
@@ -94,9 +104,11 @@ class ResetPasswordTests(TestCase):
         good_req = self.request_factory.post('/password_reset/', {'email': self.user.email})
         good_resp = password_reset(good_req)
         self.assertEquals(good_resp.status_code, 200)
-        self.assertEquals(good_resp.content,
-                          json.dumps({'success': True,
-                                      'value': "('registration/password_reset_done.html', [])"}))
+        obj = json.loads(good_resp.content)
+        self.assertEquals(obj, {
+            'success': True,
+            'value': "('registration/password_reset_done.html', [])",
+        })
 
         ((subject, msg, from_addr, to_addrs), sm_kwargs) = send_email.call_args
         self.assertIn("Password reset", subject)
