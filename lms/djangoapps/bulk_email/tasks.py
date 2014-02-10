@@ -370,23 +370,8 @@ def _filter_optouts_from_recipients(to_list, course_id):
 def _get_source_address(course_id, course_title):
     """
     Calculates an email address to be used as the 'from-address' for sent emails.
-
-    Makes a unique from name and address for each course, e.g.
-
-        "COURSE_TITLE" Course Staff <coursenum-no-reply@courseupdates.edx.org>
-
     """
-    course_title_no_quotes = re.sub(r'"', '', course_title)
-
-    # For the email address, get the course.  Then make sure that it can be used
-    # in an email address, by substituting a '_' anywhere a non-(ascii, period, or dash)
-    # character appears.
-    from_addr = u'"{0}" Course Staff <{1}-{2}>'.format(
-        course_title_no_quotes,
-        re.sub(r"[^\w.-]", '_', course_id.course),
-        settings.BULK_EMAIL_DEFAULT_FROM_EMAIL
-    )
-    return from_addr
+    return unicode(settings.BULK_EMAIL_DEFAULT_FROM_EMAIL)
 
 
 def _send_course_email(entry_id, email_id, to_list, global_email_context, subtask_status):
