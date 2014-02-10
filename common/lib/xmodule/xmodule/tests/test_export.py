@@ -44,8 +44,8 @@ def strip_filenames(descriptor):
         if 'filename' in descriptor.xml_attributes:
             del descriptor.xml_attributes['filename']
 
-    for d in descriptor.get_children():
-        strip_filenames(d)
+    for child in descriptor.get_children():
+        strip_filenames(child)
 
     descriptor.save()
 
@@ -67,7 +67,6 @@ class RoundTripTestCase(unittest.TestCase):
     And we compare original import with second import (after export).
     Thus we make sure that export and import work properly.
     """
-
 
     def setUp(self):
         self.maxDiff = None
@@ -111,8 +110,8 @@ class RoundTripTestCase(unittest.TestCase):
         # export to the same directory--that way things like the custom_tags/ folder
         # will still be there.
         print("Starting export")
-        fs = OSFS(root_dir)
-        initial_course.runtime.export_fs = fs.makeopendir(course_dir)
+        file_system = OSFS(root_dir)
+        initial_course.runtime.export_fs = file_system.makeopendir(course_dir)
         root = lxml.etree.Element('root')
 
         initial_course.add_xml_to_node(root)
@@ -150,7 +149,6 @@ class RoundTripTestCase(unittest.TestCase):
                 initial_import.modules[course_id][location],
                 second_import.modules[course_id][location]
             ))
-
 
 
 class TestEdxJsonEncoder(unittest.TestCase):
