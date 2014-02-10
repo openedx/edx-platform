@@ -1298,8 +1298,9 @@ def password_reset(request):
                   from_email=settings.DEFAULT_FROM_EMAIL,
                   request=request,
                   domain_override=request.get_host())
-    return HttpResponse(json.dumps({'success': True,
+        return HttpResponse(json.dumps({'success': True,
                                         'value': render_to_string('registration/password_reset_done.html', {})}))
+    return HttpResponse(json.dumps({'success': False}))
 
 
 def password_reset_confirm_wrapper(
