@@ -27,20 +27,18 @@ from xblock.fields import ScopeIds
 from xmodule.modulestore import Location
 
 from xmodule.x_module import ModuleSystem, XModule, XModuleDescriptor, DescriptorSystem
-from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.annotatable_module import AnnotatableDescriptor
 from xmodule.capa_module import CapaDescriptor
 from xmodule.course_module import CourseDescriptor
 from xmodule.combined_open_ended_module import CombinedOpenEndedDescriptor
 from xmodule.discussion_module import DiscussionDescriptor
-from xmodule.error_module import ErrorDescriptor
 from xmodule.gst_module import GraphicalSliderToolDescriptor
 from xmodule.html_module import HtmlDescriptor
 from xmodule.peer_grading_module import PeerGradingDescriptor
 from xmodule.poll_module import PollDescriptor
 from xmodule.word_cloud_module import WordCloudDescriptor
 from xmodule.crowdsource_hinter import CrowdsourceHinterDescriptor
-from xmodule.video_module import VideoDescriptor
+#from xmodule.video_module import VideoDescriptor
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.conditional_module import ConditionalDescriptor
 from xmodule.randomize_module import RandomizeDescriptor
@@ -100,54 +98,91 @@ def flatten(class_dict):
 
 @use_strategy(BUILD_STRATEGY)
 class ModuleSystemFactory(Factory):
+    """
+    Factory to build a test ModuleSystem. Creation is
+    performed by :func:`xmodule.tests.get_test_system`, so
+    arguments for that function are valid factory attributes.
+    """
     FACTORY_FOR = ModuleSystem
 
     @classmethod
-    def _build(cls, target_class, *args, **kwargs):
+    def _build(cls, target_class, *args, **kwargs):  # pylint: disable=unused-argument
+        """See documentation from :meth:`factory.Factory._build`"""
         return get_test_system(*args, **kwargs)
 
 
 @use_strategy(BUILD_STRATEGY)
 class DescriptorSystemFactory(Factory):
+    """
+    Factory to build a test DescriptorSystem. Creation is
+    performed by :func:`xmodule.tests.get_test_descriptor_system`, so
+    arguments for that function are valid factory attributes.
+    """
     FACTORY_FOR = DescriptorSystem
 
     @classmethod
-    def _build(cls, target_class, *args, **kwargs):
+    def _build(cls, target_class, *args, **kwargs):  # pylint: disable=unused-argument
+        """See documentation from :meth:`factory.Factory._build`"""
         return get_test_descriptor_system(*args, **kwargs)
 
 
-class LeafModuleRuntimeFactory(ModuleSystemFactory):
-    pass
-
-
 class ContainerModuleRuntimeFactory(ModuleSystemFactory):
+    """
+    Factory to generate a ModuleRuntime that generates children when asked
+    for them, for testing container XModules.
+    """
     @post_generation
-    def depth(self, create, depth, **kwargs):
+    def depth(self, create, depth, **kwargs):  # pylint: disable=unused-argument
+        """
+        When `depth` is specified as a Factory parameter, creates a
+        tree of children with that many levels.
+        """
+        # pylint: disable=no-member
         if depth == 0:
             self.get_module.side_effect = lambda x: LeafModuleFactory(descriptor_cls=HtmlDescriptor)
         else:
-            self.get_module.side_effect = lambda x: ContainerModuleFactory(descriptor_cls=VerticalDescriptor, depth=depth-1)
+            self.get_module.side_effect = lambda x: ContainerModuleFactory(descriptor_cls=VerticalDescriptor, depth=depth - 1)
 
     @post_generation
-    def position(self, create, position=2, **kwargs):
+    def position(self, create, position=2, **kwargs):  # pylint: disable=unused-argument, method-hidden
+        """
+        Update the position attribute of the generated ModuleRuntime.
+        """
         self.position = position
 
 
 class ContainerDescriptorRuntimeFactory(DescriptorSystemFactory):
+    """
+    Factory to generate a DescriptorRuntime that generates children when asked
+    for them, for testing container XModuleDescriptors.
+    """
     @post_generation
-    def depth(self, create, depth, **kwargs):
+    def depth(self, create, depth, **kwargs):  # pylint: disable=unused-argument
+        """
+        When `depth` is specified as a Factory parameter, creates a
+        tree of children with that many levels.
+        """
+        # pylint: disable=no-member
         if depth == 0:
             self.load_item.side_effect = lambda x: LeafModuleFactory(descriptor_cls=HtmlDescriptor)
         else:
-            self.load_item.side_effect = lambda x: ContainerModuleFactory(descriptor_cls=VerticalDescriptor, depth=depth-1)
+            self.load_item.side_effect = lambda x: ContainerModuleFactory(descriptor_cls=VerticalDescriptor, depth=depth - 1)
 
     @post_generation
-    def position(self, create, position=2, **kwargs):
+    def position(self, create, position=2, **kwargs):  # pylint: disable=unused-argument, method-hidden
+        """
+        Update the position attribute of the generated ModuleRuntime.
+        """
         self.position = position
 
 
 @use_strategy(BUILD_STRATEGY)
 class LeafDescriptorFactory(Factory):
+    """
+    Factory to generate leaf XModuleDescriptors.
+    """
+    # pylint: disable=missing-docstring
+
     FACTORY_FOR = XModuleDescriptor
 
     runtime = SubFactory(DescriptorSystemFactory)
@@ -159,7 +194,7 @@ class LeafDescriptorFactory(Factory):
 
     @lazy_attribute
     def block_type(self):
-        return self.descriptor_cls.__name__
+        return self.descriptor_cls.__name__  # pylint: disable=no-member
 
     @lazy_attribute
     def definition_id(self):
@@ -170,7 +205,7 @@ class LeafDescriptorFactory(Factory):
         return self.location
 
     @classmethod
-    def _build(cls, target_class, *args, **kwargs):
+    def _build(cls, target_class, *args, **kwargs):  # pylint: disable=unused-argument
         runtime = kwargs.pop('runtime')
         desc_cls = kwargs.pop('descriptor_cls')
         block_type = kwargs.pop('block_type')
@@ -187,24 +222,38 @@ class LeafDescriptorFactory(Factory):
 
 
 class LeafModuleFactory(LeafDescriptorFactory):
-
+    """
+    Factory to generate leaf XModuleDescriptors that are prepped to be
+    used as XModules.
+    """
     @post_generation
-    def xmodule_runtime(self, create, xmodule_runtime, **kwargs):
+    def xmodule_runtime(self, create, xmodule_runtime, **kwargs):  # pylint: disable=method-hidden, unused-argument
+        """
+        Set the xmodule_runtime to make this XModuleDescriptor usable
+        as an XModule.
+        """
         if xmodule_runtime is None:
-            xmodule_runtime = LeafModuleRuntimeFactory()
+            xmodule_runtime = ModuleSystemFactory()
 
         self.xmodule_runtime = xmodule_runtime
 
 
 class ContainerDescriptorFactory(LeafDescriptorFactory):
+    """
+    Factory to generate XModuleDescriptors that are containers.
+    """
     runtime = SubFactory(ContainerDescriptorRuntimeFactory)
     children = range(3)
 
 
 class ContainerModuleFactory(LeafModuleFactory):
+    """
+    Factory to generate XModuleDescriptors that are containers
+    and are ready to act as XModules.
+    """
     @lazy_attribute
     def xmodule_runtime(self):
-        return ContainerModuleRuntimeFactory(depth=self.depth)
+        return ContainerModuleRuntimeFactory(depth=self.depth)  # pylint: disable=no-member
 
 
 @ddt.ddt
@@ -223,7 +272,11 @@ class XBlockWrapperTestMixin(object):
         """
         pass
 
-    def check_property(self, descriptor):
+    def check_property(self, descriptor):  # pylint: disable=unused-argument
+        """
+        Execute assertions to verify that the property under test is true for
+        the supplied descriptor.
+        """
         raise SkipTest("check_property not defined")
 
     # Test that for all of the leaf XModule Descriptors,
@@ -247,13 +300,13 @@ class XBlockWrapperTestMixin(object):
     # Test that when an xmodule is generated from descriptor_cls
     # with mixed xmodule and xblock children, the test property holds
     @ddt.data(*flatten(CONTAINER_XMODULES))
-    def test_container_node_mixed(self, cls_and_fields):
+    def test_container_node_mixed(self, cls_and_fields):  # pylint: disable=unused-argument
         raise SkipTest("XBlock support in XDescriptor not yet fully implemented")
 
     # Test that when an xmodule is generated from descriptor_cls
     # with only xblock children, the test property holds
     @ddt.data(*flatten(CONTAINER_XMODULES))
-    def test_container_node_xblocks_only(self, cls_and_fields):
+    def test_container_node_xblocks_only(self, cls_and_fields):  # pylint: disable=unused-argument
         raise SkipTest("XBlock support in XModules not yet fully implemented")
 
 
