@@ -54,7 +54,7 @@ class ChecklistTestCase(CourseTestCase):
         # Save the changed `checklists` to the underlying KeyValueStore before updating the modulestore
         self.course.save()
         modulestore = get_modulestore(self.course.location)
-        modulestore.update_metadata(self.course.location, own_metadata(self.course))
+        modulestore.update_item(self.course, self.user.id)
         self.assertEqual(self.get_persisted_checklists(), None)
         response = self.client.get(self.checklists_url)
         self.assertEqual(payload, response.content)

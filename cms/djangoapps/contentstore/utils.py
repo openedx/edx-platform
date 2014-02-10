@@ -222,16 +222,6 @@ def compute_unit_state(unit):
         return UnitState.public
 
 
-def update_item(location, value):
-    """
-    If value is None, delete the db entry. Otherwise, update it using the correct modulestore.
-    """
-    if value is None:
-        get_modulestore(location).delete_item(location)
-    else:
-        get_modulestore(location).update_item(location, value)
-
-
 def add_extra_panel_tab(tab_type, course):
     """
     Used to add the panel tab to a course if it does not exist.
