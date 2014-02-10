@@ -2,7 +2,7 @@
 <%! from django.template.defaultfilters import escapejs %>
 <%! from django_comment_client.permissions import has_permission %>
 
-<script type="text/template" id="thread-template">
+<script aria-hidden="true" type="text/template" id="thread-template">
     <article class="discussion-article" data-id="${'<%- id %>'}">
         <div class="thread-content-wrapper"></div>
         <div class="response-count"/>
@@ -30,7 +30,7 @@
     </article>
 </script>
 
-<script type="text/template" id="thread-show-template">
+<script aria-hidden="true" type="text/template" id="thread-show-template">
   <div class="discussion-post">
       <header>
       ${"<% if (obj.group_id) { %>"}
@@ -92,7 +92,7 @@
   </div>
 </script>
 
-<script type="text/template" id="thread-edit-template">
+<script aria-hidden="true" type="text/template" id="thread-edit-template">
   <div class="discussion-post edit-post-form">
     <h1>${_("Editing post")}</h1>
     <ul class="edit-post-form-errors"></ul>
@@ -108,7 +108,7 @@
   </div>
 </script>
 
-<script type="text/template" id="thread-response-template">
+<script aria-hidden="true" type="text/template" id="thread-response-template">
     <div class="discussion-response"></div>
     <ol class="comments">
         <li class="new-comment response-local">
@@ -127,7 +127,7 @@
     </ol>
 </script>
 
-<script type="text/template" id="thread-response-show-template">
+<script aria-hidden="true" type="text/template" id="thread-response-show-template">
     <header class="response-local">
         <a href="#" class="vote-btn" role="button" aria-pressed="false"><!-- DiscussionContentView.renderVote() populates this --></a>
         <a href="javascript:void(0)" class="endorse-btn action-endorse" style="cursor: default; display: none;" data-tooltip="${_('endorse') | h}"><span class="check-icon" style="pointer-events: none; "></span></a>
@@ -149,7 +149,7 @@
     </ul>
 </script>
 
-<script type="text/template" id="thread-response-edit-template">
+<script aria-hidden="true" type="text/template" id="thread-response-edit-template">
   <div class="edit-post-form">
     <h1>${_("Editing response")}</h1>
     <ul class="edit-post-form-errors"></ul>
@@ -161,7 +161,7 @@
   </div>
 </script>
 
-<script type="text/template" id="response-comment-show-template">
+<script aria-hidden="true" type="text/template" id="response-comment-show-template">
   <div id="comment_${'<%- id %>'}">
     <div class="response-body">${'<%- body %>'}</div>
     <div class="discussion-flag-abuse notflagged" data-role="thread-flag" data-tooltip="${_('Report Misuse') | h}" role="button" aria-pressed="false" tabindex="0">
@@ -188,7 +188,7 @@
   </div>
 </script>
 
-<script type="text/template" id="thread-list-item-template">
+<script aria-hidden="true" type="text/template" id="thread-list-item-template">
     <a href="${'<%- id %>'}" data-id="${'<%- id %>'}">
         <span class="title">${"<%- title %>"}</span>
         <% 
@@ -231,7 +231,7 @@
         <span class="votes-count">+${'<%='}${js_block}${'%>'}</span>
     </a>
 </script>
-<script type="text/template" id="discussion-home">
+<script aria-hidden="true" type="text/template" id="discussion-home">
   <div class="discussion-article blank-slate">
     <section class="home-header">
       <span class="label">${_("DISCUSSION HOME:")}</span>
