@@ -74,6 +74,7 @@ COMMON_TEST_DATA_ROOT = COMMON_ROOT / "test" / "data"
 GITHUB_REPO_ROOT = ENV_ROOT / "data"
 
 USE_I18N = True
+LANGUAGE_CODE = 'en'  # tests assume they will get English.
 
 XQUEUE_INTERFACE = {
     "url": "http://sandbox-xqueue.edx.org",
