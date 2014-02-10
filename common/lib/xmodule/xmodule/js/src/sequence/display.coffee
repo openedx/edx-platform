@@ -2,6 +2,7 @@ class @Sequence
   constructor: (element) ->
     @el = $(element).find('.sequence')
     @contents = @$('.seq_contents')
+    @content_container = @$('#seq_content')
     @num_contents = @contents.length
     @id = @el.data('id')
     @ajaxUrl = @el.data('ajax-url')
@@ -22,8 +23,8 @@ class @Sequence
   updatePageTitle: ->
     # update the page title to include the current section
     position_link = @link_for(@position)
-    if position_link and position_link.data('title')
-        document.title = position_link.data('title') + @base_page_title
+    if position_link and position_link.attr('title')
+        document.title = position_link.attr('title') + @base_page_title
 
   hookUpProgressEvent: ->
     $('.problems-wrapper').bind 'progressChanged', @updateProgress
@@ -97,10 +98,12 @@ class @Sequence
       # Added for aborting video bufferization, see ../video/10_main.js
       @el.trigger "sequence:change"
       @mark_active new_position
-      @$('#seq_content').html @contents.eq(new_position - 1).text()
-      XBlock.initializeBlocks(@$('#seq_content'))
+      
+      current_tab = @contents.eq(new_position - 1)
+      @content_container.html(current_tab.text()).attr("aria-labelledby", current_tab.attr("aria-labelledby"))
+      
+      XBlock.initializeBlocks(@content_container)
 
-      MathJax.Hub.Queue(["Typeset", MathJax.Hub, "seq_content"]) # NOTE: Actually redundant. Some other MathJax call also being performed
       window.update_schematics() # For embedded circuit simulator exercises in 6.002x
 
       @position = new_position
@@ -108,10 +111,12 @@ class @Sequence
       @hookUpProgressEvent()
       @updatePageTitle()
 
-      sequence_links = @$('#seq_content a.seqnav')
+      sequence_links = @content_container.find('a.seqnav')
       sequence_links.click @goto
-    @$("a.active").blur()
-
+      # Focus on the first available xblock.
+      @content_container.find('.vert .xblock :first').focus()
+    @$("a.active").blur()  
+    
   goto: (event) =>
     event.preventDefault()
     if $(event.target).hasClass 'seqnav' # Links from courseware <a class='seqnav' href='n'>...</a>
@@ -187,8 +192,11 @@ class @Sequence
     .addClass("visited")
 
   mark_active: (position) ->
+    # Mark the correct tab as selected, for a11y helpfulness.
+    @$("#sequence-list a[aria-selected='true']").attr("aria-selected", "false")
     # Don't overwrite class attribute to avoid changing Progress class
     element = @link_for(position)
     element.removeClass("inactive")
     .removeClass("visited")
     .addClass("active")
+    .attr("aria-selected", "true")
