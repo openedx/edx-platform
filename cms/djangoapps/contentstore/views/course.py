@@ -20,7 +20,6 @@ from edxmako.shortcuts import render_to_response
 
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore, loc_mapper
-from xmodule.modulestore.inheritance import own_metadata
 from xmodule.contentstore.content import StaticContent
 
 from xmodule.modulestore.exceptions import (

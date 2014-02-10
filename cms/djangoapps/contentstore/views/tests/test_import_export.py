@@ -12,7 +12,7 @@ import logging
 from uuid import uuid4
 from pymongo import MongoClient
 
-from .utils import CourseTestCase
+from contentstore.tests.utils import CourseTestCase
 from django.test.utils import override_settings
 from django.conf import settings
 from xmodule.modulestore.django import loc_mapper
@@ -24,6 +24,7 @@ TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
 
 log = logging.getLogger(__name__)
+
 
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
 class ImportTestCase(CourseTestCase):
@@ -178,7 +179,7 @@ class ImportTestCase(CourseTestCase):
 
         def try_tar(tarpath):
             with open(tarpath) as tar:
-                args = { "name": tarpath, "course-data": [tar] }
+                args = {"name": tarpath, "course-data": [tar]}
                 resp = self.client.post(self.url, args)
             self.assertEquals(resp.status_code, 400)
             self.assertTrue("SuspiciousFileOperation" in resp.content)
