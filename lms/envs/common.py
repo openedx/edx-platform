@@ -508,6 +508,7 @@ LANGUAGES = (
     ('cs', u'Čeština'),  # Czech
     ('cy', u'Cymraeg'),  # Welsh
     ('de-de', u'Deutsch (Deutschland)'),  # German (Germany)
+    ('el', u'Ελληνικά'),  # Greek
     ('en@lolcat', u'LOLCAT English'),  # LOLCAT English
     ('en@pirate', u'Pirate English'),  # Pirate English
     ('es-419', u'Español (Latinoamérica)'),  # Spanish (Latin America)

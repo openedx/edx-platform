@@ -8,7 +8,7 @@ local filesystem into machine-readable .mo files. This is typically
 necessary as part of the build process since these .mo files are
 needed by Django when serving the web app.
 
-The configuration file (in edx-platform/conf/locale/config) specifies which
+The configuration file (in edx-platform/conf/locale/config.yaml) specifies which
 languages to generate.
 
 """
