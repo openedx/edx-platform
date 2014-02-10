@@ -239,29 +239,6 @@
 
 // ====================
 
-%btn-reset {
-  background: none;
-  border: none;
-  font-size: inherit;
-  box-shadow: none;
-  text-shadow: none;
-}
-
-// button that appears visually as a link
-%btn-link {
-  @extend %btn-reset;
-  color: $link-color;
-  text-decoration: none;
-  @include transition(all 0.1s linear 0s);
-
-  &:hover, &:focus {
-    color: $link-color;
-    text-decoration: underline;
-  }
-}
-
-// ====================
-
   // application: canned actions
   .btn {
     font-family: $f-sans-serif;

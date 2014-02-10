@@ -342,25 +342,5 @@
   .list-input {
     margin-bottom: $baseline;
   }
-
-  .list-actions {
-
-    .action-item {
-      @extend %wipe-last-child;
-      display: inline-block;
-      vertical-align: middle;
-      margin-right: ($baseline/4);
-    }
-
-    .action-submit {
-      color: $white;
-      padding-top: ($baseline/3);
-      padding-bottom: ($baseline/3);
-    }
-
-    .action-cancel {
-      @extend %btn-link;
-    }
-  }
 }
 
