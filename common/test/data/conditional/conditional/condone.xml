@@ -1,4 +1,4 @@
-<conditional correct="True" sources="i4x://edX/cond_test/problem/choiceprob">
+<conditional correct="True" sources="i4x://edX/cond_test/problem/choiceprob; i4x://edX/different_course/html/for_testing_import_rewrites">
     <html>Conditionally shown page</html>
     <show sources="i4x://edX/cond_test/html/congrats; i4x://edX/cond_test/html/secret_page"/>
 </conditional>

@@ -1,7 +1,7 @@
 #pylint: disable=E1101
-'''
-Tests for importing with no static
-'''
+"""
+Tests for import_from_xml using the mongo modulestore.
+"""
 
 from django.test.client import Client
 from django.test.utils import override_settings
@@ -32,7 +32,7 @@ TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().
 
 
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE, MODULESTORE=TEST_MODULESTORE)
-class ContentStoreImportNoStaticTest(ModuleStoreTestCase):
+class ContentStoreImportTest(ModuleStoreTestCase):
     """
     Tests that rely on the toy and test_import_course courses.
     NOTE: refactor using CourseFactory so they do not.
@@ -130,7 +130,52 @@ class ContentStoreImportNoStaticTest(ModuleStoreTestCase):
         self.assertIn('/static/', handouts.data)
 
     def test_tab_name_imports_correctly(self):
-        module_store, content_store, course, course_location = self.load_test_import_course()
+        _module_store, _content_store, course, _course_location = self.load_test_import_course()
         print "course tabs = {0}".format(course.tabs)
-        self.assertEqual(course.tabs[2]['name'],'Syllabus')
-        
+        self.assertEqual(course.tabs[2]['name'], 'Syllabus')
+
+    def test_rewrite_reference_list(self):
+        module_store = modulestore('direct')
+        target_location = Location(['i4x', 'testX', 'conditional_copy', 'course', 'copy_run'])
+        import_from_xml(
+            module_store,
+            'common/test/data/',
+            ['conditional'],
+            target_location_namespace=target_location
+        )
+        conditional_module = module_store.get_item(
+            Location(['i4x', 'testX', 'conditional_copy', 'conditional', 'condone'])
+        )
+        self.assertIsNotNone(conditional_module)
+        self.assertListEqual(
+            [
+                u'i4x://testX/conditional_copy/problem/choiceprob',
+                u'i4x://edX/different_course/html/for_testing_import_rewrites'
+            ],
+            conditional_module.sources_list
+        )
+        self.assertListEqual(
+            [
+                u'i4x://testX/conditional_copy/html/congrats',
+                u'i4x://testX/conditional_copy/html/secret_page'
+            ],
+            conditional_module.show_tag_list
+        )
+
+    def test_rewrite_reference(self):
+        module_store = modulestore('direct')
+        target_location = Location(['i4x', 'testX', 'peergrading_copy', 'course', 'copy_run'])
+        import_from_xml(
+            module_store,
+            'common/test/data/',
+            ['open_ended'],
+            target_location_namespace=target_location
+        )
+        peergrading_module = module_store.get_item(
+            Location(['i4x', 'testX', 'peergrading_copy', 'peergrading', 'PeerGradingLinked'])
+        )
+        self.assertIsNotNone(peergrading_module)
+        self.assertEqual(
+            u'i4x://testX/peergrading_copy/combinedopenended/SampleQuestion',
+            peergrading_module.link_to_location
+        )
