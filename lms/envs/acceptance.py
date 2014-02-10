@@ -19,7 +19,7 @@ import logging
 logging.basicConfig(filename=TEST_ROOT / "log" / "lms_acceptance.log", level=logging.ERROR)
 
 import os
-from random import choice, randint
+from random import choice
 import string
 
 

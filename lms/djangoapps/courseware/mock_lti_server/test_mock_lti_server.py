@@ -1,12 +1,9 @@
 """
 Test for Mock_LTI_Server
 """
-import mock
 from mock import Mock
 import unittest
 import threading
-import textwrap
-import urllib
 import requests
 from mock_lti_server import MockLTIServer
 

@@ -10,7 +10,7 @@ verify_student/start?course_id=MITx/6.002x/2013_Spring # create
 
 """
 import urllib
-from mock import patch, Mock, ANY
+from mock import patch, Mock
 import pytz
 from datetime import timedelta, datetime
 

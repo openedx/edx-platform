@@ -9,7 +9,6 @@ import re
 import requests
 
 from collections import defaultdict, OrderedDict
-from functools import partial
 from markupsafe import escape
 from requests.status_codes import codes
 from StringIO import StringIO

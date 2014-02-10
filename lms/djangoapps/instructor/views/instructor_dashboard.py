@@ -1,7 +1,6 @@
 """
 Instructor Dashboard Views
 """
-from functools import partial
 
 from django.utils.translation import ugettext as _
 from django_future.csrf import ensure_csrf_cookie

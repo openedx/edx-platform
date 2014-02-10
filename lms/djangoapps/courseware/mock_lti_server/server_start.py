@@ -4,7 +4,6 @@ Mock LTI server for manual testing.
 Used for manual testing and testing on sandbox.
 """
 
-import threading
 from mock_lti_server import MockLTIServer
 
 server_port = 8034
