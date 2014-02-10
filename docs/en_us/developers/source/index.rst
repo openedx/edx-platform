@@ -15,12 +15,22 @@ Contents:
     :maxdepth: 2
 
     overview.rst
-    common-lib.rst
-    djangoapps.rst
 
-    overview.rst
-    common-lib.rst
+APIs
+-----
+
+.. toctree::
+    :maxdepth: 2
+
     djangoapps.rst
+    common-lib.rst
+
+Internationalization
+---------------------
+
+.. toctree::
+    :maxdepth: 2
+
     i18n.rst
     i18n_translators_guide.rst
 
