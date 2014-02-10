@@ -17,7 +17,6 @@ from django.views.decorators.http import require_POST, require_GET
 from django.views.decorators import csrf
 from django.core.files.storage import get_storage_class
 from django.utils.translation import ugettext as _
-from django.contrib.auth.models import User
 
 from edxmako.shortcuts import render_to_string
 from courseware.courses import get_course_with_access, get_course_by_id
@@ -26,7 +25,6 @@ from course_groups.cohorts import get_cohort_id, is_commentable_cohorted
 from django_comment_client.utils import JsonResponse, JsonError, extract, add_courseware_context
 
 from django_comment_client.permissions import check_permissions_by_view, cached_has_permission
-from django_comment_common.models import Role
 from courseware.access import has_access
 
 log = logging.getLogger(__name__)

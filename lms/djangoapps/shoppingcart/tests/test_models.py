@@ -2,8 +2,6 @@
 Tests for the Shopping Cart Models
 """
 import smtplib
-import StringIO
-from textwrap import dedent
 from boto.exception import BotoServerError  # this is a super-class of SESError and catches connection errors
 
 from mock import patch, MagicMock, sentinel
@@ -17,7 +15,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from shoppingcart.models import (Order, OrderItem, CertificateItem, InvalidCartItem, PaidCourseRegistration,
-                                 OrderItemSubclassPK, PaidCourseRegistrationAnnotation)
+                                 OrderItemSubclassPK)
 from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
 from course_modes.models import CourseMode

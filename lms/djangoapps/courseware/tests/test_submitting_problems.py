@@ -17,7 +17,6 @@ from django.test.utils import override_settings
 
 # Need access to internal func to put users in the right group
 from courseware import grades
-from courseware.model_data import FieldDataCache
 from courseware.models import StudentModule
 
 from xmodule.modulestore.django import modulestore, editable_modulestore

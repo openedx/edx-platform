@@ -6,8 +6,6 @@ import json
 import logging
 import decimal
 import datetime
-import crum
-from track.views import server_track
 from pytz import UTC
 
 from edxmako.shortcuts import render_to_response
@@ -21,7 +19,6 @@ from django.views.decorators.http import require_POST
 from django.views.generic.base import View
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
-from django.utils.http import urlencode
 from django.contrib.auth.decorators import login_required
 
 from course_modes.models import CourseMode

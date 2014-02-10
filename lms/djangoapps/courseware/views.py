@@ -1,7 +1,6 @@
 import logging
 import urllib
 
-from functools import partial
 from collections import defaultdict
 
 from django.conf import settings
@@ -10,7 +9,7 @@ from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from django.http import Http404, HttpResponse, HttpResponseRedirect
+from django.http import Http404, HttpResponse
 from django.shortcuts import redirect
 from edxmako.shortcuts import render_to_response, render_to_string
 from django_future.csrf import ensure_csrf_cookie
@@ -20,12 +19,11 @@ from markupsafe import escape
 
 from courseware import grades
 from courseware.access import has_access
-from courseware.courses import (get_courses, get_course_with_access,
-                                get_courses_by_university, sort_by_announcement)
+from courseware.courses import get_courses, get_course_with_access, sort_by_announcement
 import courseware.tabs as tabs
 from courseware.masquerade import setup_masquerade
 from courseware.model_data import FieldDataCache
-from .module_render import toc_for_course, get_module_for_descriptor, get_module
+from .module_render import toc_for_course, get_module_for_descriptor
 from courseware.models import StudentModule, StudentModuleHistory
 from course_modes.models import CourseMode
 

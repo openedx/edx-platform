@@ -6,7 +6,6 @@ from decimal import Decimal
 import pytz
 import logging
 import smtplib
-import unicodecsv
 
 from boto.exception import BotoServerError  # this is a super-class of SESError and catches connection errors
 from django.dispatch import receiver
@@ -34,7 +33,7 @@ from util.query import use_read_replica_if_available
 from verify_student.models import SoftwareSecurePhotoVerification
 
 from .exceptions import (InvalidCartItem, PurchasedCallbackException, ItemAlreadyInCartException,
-                         AlreadyEnrolledInCourseException, CourseDoesNotExistException, ReportException)
+                         AlreadyEnrolledInCourseException, CourseDoesNotExistException)
 
 from microsite_configuration.middleware import MicrositeConfiguration
 

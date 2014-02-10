@@ -3,10 +3,9 @@ Ideally, it will be the only place that needs to know about any special settings
 like DISABLE_START_DATES"""
 import logging
 from datetime import datetime, timedelta
-from functools import partial
 
 from django.conf import settings
-from django.contrib.auth.models import Group, AnonymousUser
+from django.contrib.auth.models import AnonymousUser
 
 from xmodule.course_module import CourseDescriptor
 from xmodule.error_module import ErrorDescriptor
