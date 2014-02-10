@@ -1,7 +1,6 @@
 """ Unit tests for checklist methods in views.py. """
 from contentstore.utils import get_modulestore
 from contentstore.views.checklist import expand_checklist_action_url
-from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.django import loc_mapper
 

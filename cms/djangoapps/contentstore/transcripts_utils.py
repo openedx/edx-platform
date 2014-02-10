@@ -17,7 +17,6 @@ from xmodule.exceptions import NotFoundError
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore import Location
-from xmodule.modulestore.inheritance import own_metadata
 
 from .utils import get_modulestore
 
