@@ -258,11 +258,11 @@ def _do_cme_create_account(post_vars):
     cme_user_profile.stanford_department = post_vars.get('stanford_department')
     cme_user_profile.address_1 = post_vars.get('address_1')
     cme_user_profile.address_2 = post_vars.get('address_2')
-    cme_user_profile.city = post_vars.get('city')
+    cme_user_profile.city_cme = post_vars.get('city')
     cme_user_profile.state = post_vars.get('state')
     cme_user_profile.county_province = post_vars.get('county_province')
     cme_user_profile.postal_code = post_vars.get('postal_code')
-    cme_user_profile.country = post_vars.get('country')
+    cme_user_profile.country_cme = post_vars.get('country')
 
     try:
         cme_user_profile.save()
