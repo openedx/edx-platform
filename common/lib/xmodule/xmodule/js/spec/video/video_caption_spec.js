@@ -8,10 +8,7 @@
                 .andReturn(null);
 
             state = jasmine.initializePlayer();
-
             videoControl = state.videoControl;
-
-            $.fn.scrollTo.reset();
         });
 
         afterEach(function () {
@@ -21,6 +18,8 @@
             // had before. Removing of `source` tag, not `video` tag, stops
             // loading video source and clears the memory.
             $('source').remove();
+            $.fn.scrollTo.reset();
+            state.storage.clear();
 
             window.onTouchBasedDevice = oldOTBD;
         });
