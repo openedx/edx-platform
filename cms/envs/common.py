@@ -27,7 +27,7 @@ Longer TODO:
 import sys
 import lms.envs.common
 from lms.envs.common import (
-    USE_TZ, TECH_SUPPORT_EMAIL, PLATFORM_NAME, BUGS_EMAIL, DOC_STORE_CONFIG, enable_microsites, ALL_LANGUAGES
+    USE_TZ, TECH_SUPPORT_EMAIL, PLATFORM_NAME, BUGS_EMAIL, DOC_STORE_CONFIG, ALL_LANGUAGES
 )
 from path import path
 
@@ -84,6 +84,9 @@ FEATURES = {
 
     # Toggles embargo functionality
     'EMBARGO': False,
+
+    # Turn on/off Microsites feature
+    'USE_MICROSITES': False,
 }
 ENABLE_JASMINE = False
 

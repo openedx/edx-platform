@@ -1,5 +1,5 @@
 <%! from django.utils.translation import ugettext as _ %>
-<%! from microsite_configuration.middleware import MicrositeConfiguration %>
+<%! from microsite_configuration import microsite %>
 
 <%inherit file="main.html" />
 
@@ -314,7 +314,7 @@
 
 <%
   # allow for microsite overrides on the registration sidebars, otherwise default to pre-existing ones
-  sidebar_file = MicrositeConfiguration.get_microsite_template_path('register-sidebar.html')
+  sidebar_file = microsite.get_template_path('register-sidebar.html')
 %>
 
     <%include file="${sidebar_file}" />

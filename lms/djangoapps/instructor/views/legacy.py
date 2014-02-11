@@ -61,7 +61,7 @@ from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 from django.utils.translation import ugettext as _u
 
-from microsite_configuration.middleware import MicrositeConfiguration
+from microsite_configuration import microsite
 
 log = logging.getLogger(__name__)
 
@@ -1285,7 +1285,7 @@ def _do_enroll_students(course, course_id, students, overload=False, auto_enroll
         ceaset.delete()
 
     if email_students:
-        stripped_site_name = MicrositeConfiguration.get_microsite_configuration_value(
+        stripped_site_name = microsite.get_value(
             'SITE_NAME',
             settings.SITE_NAME
         )
@@ -1379,7 +1379,7 @@ def _do_unenroll_students(course_id, students, email_students=False):
     old_students, _ = get_and_clean_student_list(students)
     status = dict([x, 'unprocessed'] for x in old_students)
 
-    stripped_site_name = MicrositeConfiguration.get_microsite_configuration_value(
+    stripped_site_name = microsite.get_value(
         'SITE_NAME',
         settings.SITE_NAME
     )
@@ -1459,7 +1459,7 @@ def send_mail_to_student(student, param_dict):
     # add some helpers and microconfig subsitutions
     if 'course' in param_dict:
         param_dict['course_name'] = param_dict['course'].display_name_with_default
-    param_dict['site_name'] = MicrositeConfiguration.get_microsite_configuration_value(
+    param_dict['site_name'] = microsite.get_value(
         'SITE_NAME',
         param_dict.get('site_name', '')
     )
@@ -1487,7 +1487,7 @@ def send_mail_to_student(student, param_dict):
 
         # Email subject *must not* contain newlines
         subject = ''.join(subject.splitlines())
-        from_address = MicrositeConfiguration.get_microsite_configuration_value(
+        from_address = microsite.get_value(
             'email_from_address',
             settings.DEFAULT_FROM_EMAIL
         )
