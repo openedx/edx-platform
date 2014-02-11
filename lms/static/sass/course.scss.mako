@@ -1,8 +1,8 @@
 @import 'bourbon/bourbon';
 
+@import 'base/variables';
 @import 'base/reset';
 @import 'base/font_face';
-@import 'base/variables';
 @import 'base/mixins';
 
 ## THEMING
