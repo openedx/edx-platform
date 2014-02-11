@@ -276,6 +276,7 @@ PIPELINE_CSS = {
         'source_filenames': [
             'css/vendor/normalize.css',
             'css/vendor/font-awesome.css',
+            'css/vendor/html5-input-polyfills/number-polyfill.css',
             'js/vendor/CodeMirror/codemirror.css',
             'css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css',
             'css/vendor/jquery.qtip.min.css',
