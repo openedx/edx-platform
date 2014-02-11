@@ -272,7 +272,7 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
             'end_time': datetime.timedelta(seconds=0.0),
             'track': '',
             'download_track': False,
-            'download_video': False,
+            'download_video': True,
             'html5_sources': ['http://www.example.com/source.mp4'],
             'data': ''
         })

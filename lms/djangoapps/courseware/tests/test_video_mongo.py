@@ -198,6 +198,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'end': 3610.0,
             'id': None,
             'sources': {
+                'main': u'example.mp4',
                 u'mp4': u'example.mp4',
                 u'webm': u'example.webm'
             },
