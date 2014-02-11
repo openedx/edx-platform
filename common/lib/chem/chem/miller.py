@@ -49,7 +49,7 @@ def segment_to_fraction(distance):
     with nice fractions (which produce small Miller indices), he may want shift
     to new origin if segments are like S = (0.015, > 0.05, >0.05) - close to zero
     in one coordinate. He may update S to (0, >0.05, >0.05) and shift origin.
-    In this way he can recieve nice small fractions. Also there is can be
+    In this way he can receive nice small fractions. Also there is can be
     degenerated case when S = (0.015, 0.012, >0.05) - if update S to (0, 0, >0.05) -
     it is a line. This case  should be considered separately. Small nice Miller
     numbers and possibility to create very small segments can not be implemented

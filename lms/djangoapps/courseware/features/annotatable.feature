@@ -15,7 +15,7 @@ Feature: LMS.Annotatable Component
     And I click "Reply to annotation" on passage <problem>
     Then I am scrolled to that annotation problem
     When I answer that annotation problem
-    Then I recieve feedback on that annotation problem
+    Then I receive feedback on that annotation problem
     When I click "Return to annotation" on that problem
     Then I am scrolled to the annotatable component
 

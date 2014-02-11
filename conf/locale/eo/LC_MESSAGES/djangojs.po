@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-02-11 18:19-0500\n"
-"PO-Revision-Date: 2014-02-11 23:20:19.199916\n"
+"POT-Creation-Date: 2014-02-14 16:00-0500\n"
+"PO-Revision-Date: 2014-02-14 21:00:58.182145\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -100,6 +100,106 @@ msgstr "ünänswéréd Ⱡ#"
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Status: unsubmitted"
 msgstr "Stätüs: ünsüßmïttéd Ⱡ'σя#"
+
+#. Translators: A "rating" is a score a student gives to indicate how well
+#. they feel they were graded on this problem
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
+msgid "You need to pick a rating before you can submit."
+msgstr "Ýöü nééd tö pïçk ä rätïng ßéföré ýöü çän süßmït. Ⱡ'σяєм ιρѕυм #"
+
+#. Translators: this message appears when transitioning between openended
+#. grading
+#. types (i.e. self assesment to peer assessment). Sometimes, if a student
+#. did not perform well at one step, they cannot move on to the next one.
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
+msgid "Your score did not meet the criteria to move to the next step."
+msgstr ""
+"Ýöür sçöré dïd nöt méét thé çrïtérïä tö mövé tö thé néxt stép. Ⱡ'σяєм ιρѕυм "
+"∂σłσя#"
+
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
+#: lms/static/coffee/src/staff_grading/staff_grading.js
+msgid "Submit"
+msgstr "Süßmït Ⱡ'σяєм ιρѕ#"
+
+#. Translators: one clicks this button after one has finished filling out the
+#. grading
+#. form for an openended assessment
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
+msgid "Submit assessment"
+msgstr "Süßmït ässéssmént Ⱡ'σ#"
+
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
+msgid ""
+"Your response has been submitted. Please check back later for your grade."
+msgstr ""
+"Ýöür réspönsé häs ßéén süßmïttéd. Pléäsé çhéçk ßäçk lätér för ýöür grädé. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#. Translators: this button is clicked to submit a student's rating of
+#. an evaluator's assessment
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
+msgid "Submit post-assessment"
+msgstr "Süßmït pöst-ässéssmént Ⱡ'σяє#"
+
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
+msgid "Answer saved, but not yet submitted."
+msgstr "Ànswér sävéd, ßüt nöt ýét süßmïttéd. Ⱡ'σяєм ιρ#"
+
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
+msgid ""
+"Please confirm that you wish to submit your work. You will not be able to "
+"make any changes after submitting."
+msgstr ""
+"Pléäsé çönfïrm thät ýöü wïsh tö süßmït ýöür wörk. Ýöü wïll nöt ßé äßlé tö "
+"mäké äný çhängés äftér süßmïttïng. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
+msgid ""
+"You are trying to upload a file that is too large for our system.  Please "
+"choose a file under 2MB or paste a link to it into the answer box."
+msgstr ""
+"Ýöü äré trýïng tö üplöäd ä fïlé thät ïs töö lärgé för öür sýstém.  Pléäsé "
+"çhöösé ä fïlé ündér 2MB ör pästé ä lïnk tö ït ïntö thé änswér ßöx. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ι#"
+
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
+msgid ""
+"Are you sure you want to remove your previous response to this question?"
+msgstr ""
+"Àré ýöü süré ýöü wänt tö rémövé ýöür prévïöüs réspönsé tö thïs qüéstïön? "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
+msgid "Moved to next step."
+msgstr "Mövéd tö néxt stép. Ⱡ'σя#"
+
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
+msgid ""
+"File uploads are required for this question, but are not supported in your "
+"browser. Try the newest version of Google Chrome. Alternatively, if you have"
+" uploaded the image to another website, you can paste a link to it into the "
+"answer box."
+msgstr ""
+"Fïlé üplöäds äré réqüïréd för thïs qüéstïön, ßüt äré nöt süppörtéd ïn ýöür "
+"ßröwsér. Trý thé néwést vérsïön öf Gööglé Çhrömé. Àltérnätïvélý, ïf ýöü hävé"
+" üplöädéd thé ïmägé tö änöthér wéßsïté, ýöü çän pästé ä lïnk tö ït ïntö thé "
+"änswér ßöx. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ "
+"∂σ єιυѕмσ∂ тє#"
+
+#. Translators: "Show Question" is some text that, when clicked, shows a
+#. question's
+#. content that had been hidden
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
+msgid "Show Question"
+msgstr "Shöw Qüéstïön Ⱡ'#"
+
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
+#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
+msgid "Hide Question"
+msgstr "Hïdé Qüéstïön Ⱡ'#"
 
 #: common/lib/xmodule/xmodule/js/src/sequence/display.js
 msgid ""
@@ -1009,20 +1109,16 @@ msgid "Try loading again"
 msgstr "Trý löädïng ägäïn Ⱡ'σ#"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
-msgid "<%= num %> available"
-msgstr "<%= num %> äväïläßlé Ⱡ'#"
+msgid "<%= num %> available "
+msgstr "<%= num %> äväïläßlé  Ⱡ'#"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
-msgid "<%= num %> graded"
-msgstr "<%= num %> grädéd Ⱡ#"
+msgid "<%= num %> graded "
+msgstr "<%= num %> grädéd  Ⱡ#"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "<%= num %> more needed to start ML"
 msgstr "<%= num %> möré néédéd tö stärt ML Ⱡ'σяєм#"
-
-#: lms/static/coffee/src/staff_grading/staff_grading.js
-msgid "Submit"
-msgstr "Süßmït Ⱡ'σяєм ιρѕ#"
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "Re-check for submissions"

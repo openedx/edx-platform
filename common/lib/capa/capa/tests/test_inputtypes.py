@@ -812,7 +812,7 @@ class ChemicalEquationTest(unittest.TestCase):
 
     def test_ajax_bad_method(self):
         """
-        With a bad dispatch, we shouldn't recieve anything
+        With a bad dispatch, we shouldn't receive anything
         """
         response = self.the_input.handle_ajax("obviously_not_real", {})
         self.assertEqual(response, {})
@@ -923,7 +923,7 @@ class FormulaEquationTest(unittest.TestCase):
 
     def test_ajax_bad_method(self):
         """
-        With a bad dispatch, we shouldn't recieve anything
+        With a bad dispatch, we shouldn't receive anything
         """
         response = self.the_input.handle_ajax("obviously_not_real", {})
         self.assertEqual(response, {})
