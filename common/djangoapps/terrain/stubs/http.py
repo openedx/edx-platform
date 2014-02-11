@@ -236,7 +236,7 @@ class StubHttpService(HTTPServer, object):
         Configure the server to listen on localhost.
         Default is to choose an arbitrary open port.
         """
-        address = ('127.0.0.1', port_num)
+        address = ('0.0.0.0', port_num)
         HTTPServer.__init__(self, address, self.HANDLER_CLASS)
 
         # Create a dict to store configuration values set by the client

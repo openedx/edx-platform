@@ -5,6 +5,8 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Blades: Refactor stub implementation of LTI Provider. BLD-601.
+
 LMS: In left accordion and progress page, due dates are now displayed in time
 zone specified by settings.TIME_ZONE, instead of UTC always
 
