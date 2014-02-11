@@ -66,6 +66,14 @@ ignore_dirs:
     - common/static/xmodule/modules
     - common/static/xmodule/descriptors
 
+
+# Third-party installed apps that we also extract strings from.  When adding a
+# file here, also add it to the django.po merge files below, and to the
+# .tx/config file so that it will be pushed to and pulled from transifex.
+third_party:
+    - wiki
+
+
 # How should .po files be segmented?  See i18n/segment.py for details. Strings
 # that are only found in a particular segment are segregated into that .po file
 # so that translators can focus on separate parts of the product.
@@ -93,6 +101,7 @@ generate_merge:
         - mako.po
         - mako-studio.po
         - messages.po
+        - wiki.po
     djangojs.po:
         - djangojs-partial.po
         - djangojs-studio.po

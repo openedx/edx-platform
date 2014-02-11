@@ -384,7 +384,7 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
             'start_time': datetime.timedelta(seconds=1),
             'end_time': datetime.timedelta(seconds=60),
             'track': 'http://www.example.com/track',
-            'download_track': True,
+            # 'download_track': True,
             'html5_sources': ['http://www.example.com/source.mp4'],
             'data': '',
         })
@@ -414,7 +414,7 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
             'start_time': datetime.timedelta(seconds=1),
             'end_time': datetime.timedelta(seconds=60),
             'track': 'http://www.example.com/track',
-            'download_track': True,
+            # 'download_track': True,
             'html5_sources': ['http://www.example.com/source.mp4'],
             'data': ''
         })
@@ -444,7 +444,7 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
             'start_time': datetime.timedelta(seconds=1),
             'end_time': datetime.timedelta(seconds=60),
             'track': 'http://www.example.com/track',
-            'download_track': True,
+            # 'download_track': True,
             'html5_sources': ['http://www.example.com/source.mp4'],
             'data': ''
         })

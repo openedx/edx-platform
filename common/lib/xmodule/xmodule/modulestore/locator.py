@@ -488,6 +488,19 @@ class BlockUsageLocator(CourseLocator):
             raise ValueError('Could not parse "%s" as a package_id' % package_id)
         self._set_value(parse, 'block', self.set_block_id)
 
+    @classmethod
+    def make_relative(cls, course_locator, block_id):
+        """
+        Return a new instance which has the given block_id in the given course
+        :param course_locator: may be a BlockUsageLocator in the same snapshot
+        """
+        return BlockUsageLocator(
+            package_id=course_locator.package_id,
+            version_guid=course_locator.version_guid,
+            branch=course_locator.branch,
+            block_id=block_id
+        )
+
     def __unicode__(self):
         """
         Return a string representing this location.

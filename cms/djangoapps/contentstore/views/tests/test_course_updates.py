@@ -53,7 +53,6 @@ class CourseUpdateTest(CourseTestCase):
             content, json.loads(refetched.content)['content'], "get w/ provided id"
         )
 
-
         # now put in an evil update
         content = '<ol/>'
         payload = get_response(content, 'January 11, 2013')
@@ -123,7 +122,7 @@ class CourseUpdateTest(CourseTestCase):
         modulestore('direct').create_and_save_xmodule(location)
         course_updates = modulestore('direct').get_item(location)
         course_updates.data = 'bad news'
-        modulestore('direct').update_item(location, course_updates.data)
+        modulestore('direct').update_item(course_updates, self.user.id)
 
         init_content = '<iframe width="560" height="315" src="http://www.youtube.com/embed/RocY-Jd93XU" frameborder="0">'
         content = init_content + '</iframe>'

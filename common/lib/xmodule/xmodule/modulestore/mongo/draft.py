@@ -11,11 +11,9 @@ from datetime import datetime
 from xmodule.exceptions import InvalidVersionError
 from xmodule.modulestore import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateItemError
-from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.mongo.base import location_to_query, namedtuple_to_son, get_course_id_no_run, MongoModuleStore
 import pymongo
 from pytz import UTC
-from xblock.fields import Scope
 
 DRAFT = 'draft'
 # Things w/ these categories should never be marked as version='draft'
@@ -109,7 +107,7 @@ class DraftModuleStore(MongoModuleStore):
         return super(DraftModuleStore, self).create_xmodule(draft_loc, definition_data, metadata, system)
 
 
-    def get_items(self, location, course_id=None, depth=0):
+    def get_items(self, location, course_id=None, depth=0, qualifiers=None):
         """
         Returns a list of XModuleDescriptor instances for the items
         that match location. Any element of location that is None is treated
@@ -146,7 +144,9 @@ class DraftModuleStore(MongoModuleStore):
         draft_location = as_draft(source_location)
         if draft_location.category in DIRECT_ONLY_CATEGORIES:
             raise InvalidVersionError(source_location)
-        original['_id'] = draft_location.dict()
+        if not original:
+            raise ItemNotFoundError
+        original['_id'] = namedtuple_to_son(draft_location)
         try:
             self.collection.insert(original)
         except pymongo.errors.DuplicateKeyError:
@@ -157,60 +157,27 @@ class DraftModuleStore(MongoModuleStore):
 
         return self._load_items([original])[0]
 
-    def update_item(self, location, data, allow_not_found=False):
+    def update_item(self, xblock, user, allow_not_found=False):
         """
-        Set the data in the item specified by the location to
-        data
+        Save the current values to persisted version of the xblock
 
         location: Something that can be passed to Location
         data: A nested dictionary of problem data
         """
-        draft_loc = as_draft(location)
+        draft_loc = as_draft(xblock.location)
         try:
-            draft_item = self.get_item(location)
-            if not getattr(draft_item, 'is_draft', False):
-                self.convert_to_draft(location)
-        except ItemNotFoundError, e:
+            if not self.has_item(None, draft_loc):
+                self.convert_to_draft(xblock.location)
+        except ItemNotFoundError:
             if not allow_not_found:
-                raise e
+                raise
 
-        return super(DraftModuleStore, self).update_item(draft_loc, data)
+        xblock.location = draft_loc
+        super(DraftModuleStore, self).update_item(xblock, user)
+        # don't allow locations to truly represent themselves as draft outside of this file
+        xblock.location = as_published(xblock.location)
 
-    def update_children(self, location, children):
-        """
-        Set the children for the item specified by the location to
-        children
-
-        location: Something that can be passed to Location
-        children: A list of child item identifiers
-        """
-        draft_loc = as_draft(location)
-        draft_item = self.get_item(location)
-        if not getattr(draft_item, 'is_draft', False):
-            self.convert_to_draft(location)
-
-        return super(DraftModuleStore, self).update_children(draft_loc, children)
-
-    def update_metadata(self, location, metadata):
-        """
-        Set the metadata for the item specified by the location to
-        metadata
-
-        location: Something that can be passed to Location
-        metadata: A nested dictionary of module metadata
-        """
-        draft_loc = as_draft(location)
-        draft_item = self.get_item(location)
-
-        if not getattr(draft_item, 'is_draft', False):
-            self.convert_to_draft(location)
-
-        if 'is_draft' in metadata:
-            del metadata['is_draft']
-
-        return super(DraftModuleStore, self).update_metadata(draft_loc, metadata)
-
-    def delete_item(self, location, delete_all_versions=False):
+    def delete_item(self, location, delete_all_versions=False, **kwargs):
         """
         Delete an item from this modulestore
 
@@ -243,7 +210,6 @@ class DraftModuleStore(MongoModuleStore):
 
         draft.published_date = datetime.now(UTC)
         draft.published_by = published_by_id
-        super(DraftModuleStore, self).update_item(location, draft.get_explicitly_set_fields_by_scope(Scope.content))
         if draft.has_children:
             if original_published is not None:
                 # see if children were deleted. 2 reasons for children lists to differ:
@@ -254,8 +220,7 @@ class DraftModuleStore(MongoModuleStore):
                         rents = [Location(mom) for mom in self.get_parent_locations(child, None)]
                         if (len(rents) == 1 and rents[0] == Location(location)):  # the 1 is this original_published
                             self.delete_item(child, True)
-            super(DraftModuleStore, self).update_children(location, draft.children)
-        super(DraftModuleStore, self).update_metadata(location, own_metadata(draft))
+        super(DraftModuleStore, self).update_item(draft, '**replace_user**')
         self.delete_item(location)
 
     def unpublish(self, location):

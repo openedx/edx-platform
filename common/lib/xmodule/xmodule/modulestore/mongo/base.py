@@ -38,10 +38,6 @@ from xblock.core import XBlock
 
 log = logging.getLogger(__name__)
 
-# TODO (cpennington): This code currently operates under the assumption that
-# there is only one revision for each item. Once we start versioning inside the CMS,
-# that assumption will have to change
-
 
 def get_course_id_no_run(location):
     '''
@@ -224,6 +220,7 @@ def namedtuple_to_son(namedtuple, prefix=''):
     Converts a namedtuple into a SON object with the same key order
     """
     son = SON()
+    # pylint: disable=protected-access
     for idx, field_name in enumerate(namedtuple._fields):
         son[prefix + field_name] = namedtuple[idx]
     return son
@@ -258,6 +255,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
     """
     A Mongodb backed ModuleStore
     """
+    reference_type = Location
 
     # TODO (cpennington): Enable non-filesystem filestores
     # pylint: disable=C0103
@@ -299,9 +297,11 @@ class MongoModuleStore(ModuleStoreWriteBase):
 
         # Force mongo to maintain an index over _id.* that is in the same order
         # that is used when querying by a location
+        # pylint: disable=no-member, protected_access
         self.collection.ensure_index(
             zip(('_id.' + field for field in Location._fields), repeat(1)),
         )
+        # pylint: enable=no-member, protected_access
 
         if default_class is not None:
             module_path, _, class_name = default_class.rpartition('.')
@@ -363,11 +363,6 @@ class MongoModuleStore(ModuleStoreWriteBase):
             """
             Helper method for computing inherited metadata for a specific location url
             """
-            # check for presence of metadata key. Note that a given module may not yet be fully formed.
-            # example: update_item -> update_children -> update_metadata sequence on new item create
-            # if we get called here without update_metadata called first then 'metadata' hasn't been set
-            # as we're not fully transactional at the DB layer. Same comment applies to below key name
-            # check
             my_metadata = results_by_url[url].get('metadata', {})
 
             # go through all the children and recurse, but only if we have
@@ -443,6 +438,9 @@ class MongoModuleStore(ModuleStoreWriteBase):
         del item['_id']
 
     def _query_children_for_cache_children(self, items):
+        """
+        Generate a pymongo in query for finding the items and return the payloads
+        """
         # first get non-draft in a round-trip
         query = {
             '_id': {'$in': [namedtuple_to_son(Location(item)) for item in items]}
@@ -531,8 +529,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         '''
         Returns a list of course descriptors.
         '''
-        # TODO (vshnayder): Why do I have to specify i4x here?
-        course_filter = Location("i4x", category="course")
+        course_filter = Location(category="course")
         return [
             course
             for course
@@ -555,6 +552,16 @@ class MongoModuleStore(ModuleStoreWriteBase):
         if item is None:
             raise ItemNotFoundError(location)
         return item
+
+    def get_course(self, course_id):
+        """
+        Get the course with the given courseid (org/course/run)
+        """
+        id_components = course_id.split('/')
+        try:
+            return self.get_item(Location('i4x', id_components[0], id_components[1], 'course', id_components[2]))
+        except ItemNotFoundError:
+            return None
 
     def has_item(self, course_id, location):
         """
@@ -599,7 +606,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         """
         return self.get_item(location, depth=depth)
 
-    def get_items(self, location, course_id=None, depth=0):
+    def get_items(self, location, course_id=None, depth=0, qualifiers=None):
         items = self.collection.find(
             location_to_query(location),
             sort=[('revision', pymongo.ASCENDING)],
@@ -664,13 +671,13 @@ class MongoModuleStore(ModuleStoreWriteBase):
         # Save any changes to the xmodule to the MongoKeyValueStore
         xmodule.save()
         self.collection.save({
-                '_id': xmodule.location.dict(),
-                'metadata': own_metadata(xmodule),
-                'definition': {
-                    'data': xmodule.get_explicitly_set_fields_by_scope(Scope.content),
-                    'children': xmodule.children if xmodule.has_children else []
-                }
-            })
+            '_id': namedtuple_to_son(xmodule.location),
+            'metadata': own_metadata(xmodule),
+            'definition': {
+                'data': xmodule.get_explicitly_set_fields_by_scope(Scope.content),
+                'children': xmodule.children if xmodule.has_children else []
+            }
+        })
         # recompute (and update) the metadata inheritance tree which is cached
         self.refresh_cached_metadata_inheritance_tree(xmodule.location)
         self.fire_updated_modulestore_signal(get_course_id_no_run(xmodule.location), xmodule.location)
@@ -708,7 +715,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
             course.tabs = existing_tabs
             # Save any changes to the course to the MongoKeyValueStore
             course.save()
-            self.update_metadata(course.location, course.get_explicitly_set_fields_by_scope(Scope.settings))
+            self.update_item(course, '**replace_user**')
 
     def fire_updated_modulestore_signal(self, course_id, location):
         """
@@ -754,7 +761,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         # See http://www.mongodb.org/display/DOCS/Updating for
         # atomic update syntax
         result = self.collection.update(
-            {'_id': Location(location).dict()},
+            {'_id': namedtuple_to_son(Location(location))},
             {'$set': update},
             multi=False,
             upsert=True,
@@ -765,73 +772,56 @@ class MongoModuleStore(ModuleStoreWriteBase):
         if result['n'] == 0:
             raise ItemNotFoundError(location)
 
-    def update_item(self, location, data, allow_not_found=False):
+    def update_item(self, xblock, user, allow_not_found=False):
         """
-        Set the data in the item specified by the location to
-        data
+        Update the persisted version of xblock to reflect its current values.
 
         location: Something that can be passed to Location
         data: A nested dictionary of problem data
         """
         try:
-            self._update_single_item(location, {'definition.data': data})
+            definition_data = xblock.get_explicitly_set_fields_by_scope()
+            if len(definition_data) == 1 and 'data' in definition_data:
+                definition_data = definition_data['data']
+            payload = {
+                'definition.data': definition_data,
+                'metadata': own_metadata(xblock),
+            }
+            if xblock.has_children:
+                # convert all to urls
+                xblock.children = [child.url() if isinstance(child, Location) else child
+                                   for child in xblock.children]
+                payload.update({'definition.children': xblock.children})
+            self._update_single_item(xblock.location, payload)
+            # for static tabs, their containing course also records their display name
+            if xblock.category == 'static_tab':
+                course = self._get_course_for_item(xblock.location)
+                # find the course's reference to this tab and update the name.
+                for tab in course.tabs:
+                    if tab.get('url_slug') == xblock.location.name:
+                        # only update if changed
+                        if tab['name'] != xblock.display_name:
+                            tab['name'] = xblock.display_name
+                            self.update_item(course, user)
+                            break
+
+            # recompute (and update) the metadata inheritance tree which is cached
+            # was conditional on children or metadata having changed before dhm made one update to rule them all
+            self.refresh_cached_metadata_inheritance_tree(xblock.location)
+            # fire signal that we've written to DB
+            self.fire_updated_modulestore_signal(get_course_id_no_run(xblock.location), xblock.location)
         except ItemNotFoundError:
             if not allow_not_found:
                 raise
 
-    def update_children(self, location, children):
-        """
-        Set the children for the item specified by the location to
-        children
-
-        location: Something that can be passed to Location
-        children: A list of child item identifiers
-        """
-        # Normalize the children to urls
-        children = [Location(child).url() for child in children]
-
-        self._update_single_item(location, {'definition.children': children})
-        # recompute (and update) the metadata inheritance tree which is cached
-        self.refresh_cached_metadata_inheritance_tree(Location(location))
-        # fire signal that we've written to DB
-        self.fire_updated_modulestore_signal(get_course_id_no_run(Location(location)), Location(location))
-
-    def update_metadata(self, location, metadata):
-        """
-        Set the metadata for the item specified by the location to
-        metadata
-
-        location: Something that can be passed to Location
-        metadata: A nested dictionary of module metadata
-        """
-        # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
-        # if we add one then we need to also add it to the policy information (i.e. metadata)
-        # we should remove this once we can break this reference from the course to static tabs
-        loc = Location(location)
-        if loc.category == 'static_tab':
-            course = self._get_course_for_item(loc)
-            existing_tabs = course.tabs or []
-            for tab in existing_tabs:
-                if tab.get('url_slug') == loc.name:
-                    tab['name'] = metadata.get('display_name', tab.get('name'))
-                    break
-            course.tabs = existing_tabs
-            # Save the updates to the course to the MongoKeyValueStore
-            course.save()
-            self.update_metadata(course.location, own_metadata(course))
-
-        self._update_single_item(location, {'metadata': metadata})
-        # recompute (and update) the metadata inheritance tree which is cached
-        self.refresh_cached_metadata_inheritance_tree(loc)
-        self.fire_updated_modulestore_signal(get_course_id_no_run(Location(location)), Location(location))
-
-    def delete_item(self, location, delete_all_versions=False):
+    # pylint: disable=unused-argument
+    def delete_item(self, location, **kwargs):
         """
         Delete an item from this modulestore
 
         location: Something that can be passed to Location
-        delete_all_versions: is here because the DraftMongoModuleStore needs it and we need to keep the interface the same. It is unused.
         """
+        # pylint: enable=unused-argument
         # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
         # if we add one then we need to also add it to the policy information (i.e. metadata)
         # we should remove this once we can break this reference from the course to static tabs
@@ -840,9 +830,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
             course = self._get_course_for_item(item.location)
             existing_tabs = course.tabs or []
             course.tabs = [tab for tab in existing_tabs if tab.get('url_slug') != location.name]
-            # Save the updates to the course to the MongoKeyValueStore
-            course.save()
-            self.update_metadata(course.location, own_metadata(course))
+            self.update_item(course, '**replace_user**')
 
         # Must include this to avoid the django debug toolbar (which defines the deprecated "safe=False")
         # from overriding our default value set in the init method.
@@ -889,7 +877,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
         item_locs -= all_reachable
         return list(item_locs)
 
-    def _create_new_field_data(self, category, location, definition_data, metadata):
+    def _create_new_field_data(self, _category, _location, definition_data, metadata):
         """
         To instantiate a new xmodule which will be saved latter, set up the dbModel and kvs
         """

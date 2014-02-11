@@ -6,6 +6,8 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
 from django.shortcuts import redirect
+from django.utils.translation import ugettext as _
+
 from wiki.core.exceptions import NoRootURL
 from wiki.models import URLPath, Article
 
@@ -79,12 +81,19 @@ def course_wiki_redirect(request, course_id):
             # recerate it.
             urlpath.delete()
 
+        content = cgi.escape(
+            # Translators: this string includes wiki markup.  Leave the ** and the _ alone.
+            _("This is the wiki for **{organization}**'s _{course_name}_.").format(
+                organization=course.display_org_with_default,
+                course_name=course.display_name_with_default,
+            )
+        )
         urlpath = URLPath.create_article(
             root,
             course_slug,
             title=course_slug,
-            content=cgi.escape(u"This is the wiki for **{0}**'s _{1}_.".format(course.display_org_with_default, course.display_name_with_default)),
-            user_message="Course page automatically created.",
+            content=content,
+            user_message=_("Course page automatically created."),
             user=None,
             ip_address=None,
             article_kwargs={'owner': None,
@@ -112,12 +121,12 @@ def get_or_create_root():
         pass
 
     starting_content = "\n".join((
-    "Welcome to the edX Wiki",
-    "===",
-    "Visit a course wiki to add an article."))
+        _("Welcome to the edX Wiki"),
+        "===",
+        _("Visit a course wiki to add an article."),
+    ))
 
-    root = URLPath.create_root(title="Wiki",
-                        content=starting_content)
+    root = URLPath.create_root(title=_("Wiki"), content=starting_content)
     article = root.article
     article.group = None
     article.group_read = True

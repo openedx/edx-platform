@@ -10,7 +10,7 @@ from datetime import datetime
 from io import BytesIO
 from pytz import UTC
 import json
-from .utils import CourseTestCase
+from contentstore.tests.utils import CourseTestCase
 from contentstore.views import assets
 from xmodule.contentstore.content import StaticContent
 from xmodule.modulestore import Location
@@ -113,6 +113,7 @@ class PaginationTestCase(AssetsTestCase):
         else:
             self.assertGreaterEqual(name1, name2)
             self.assertGreaterEqual(name2, name3)
+
 
 class UploadTestCase(AssetsTestCase):
     """

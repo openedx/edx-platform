@@ -11,6 +11,7 @@ from student.tests.factories import AdminFactory
 from student.auth import add_users
 from contentstore.views.access import get_user_role
 
+
 class RolesTest(TestCase):
     """
     Tests for user roles.
