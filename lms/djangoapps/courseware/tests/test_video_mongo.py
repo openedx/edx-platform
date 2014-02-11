@@ -5,6 +5,7 @@ from mock import patch, PropertyMock
 import os
 import tempfile
 import textwrap
+import unittest
 from functools import partial
 
 from xmodule.contentstore.content import StaticContent
@@ -70,7 +71,7 @@ class TestVideoYouTube(TestVideo):
             'general_speed': 1.0,
             'start': 3603.0,
             'sub': u'a_sub_file.srt.sjson',
-            'track': None,
+            'track': '',
             'youtube_streams': _create_youtube_string(self.item_module),
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', False),
             'yt_test_timeout': 1500,
@@ -125,7 +126,7 @@ class TestVideoNonYouTube(TestVideo):
             'general_speed': 1.0,
             'start': 3603.0,
             'sub': u'a_sub_file.srt.sjson',
-            'track': None,
+            'track': '',
             'youtube_streams': '1.00:OEoXaMPEzfM',
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', True),
             'yt_test_timeout': 1500,
@@ -205,7 +206,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'sub': u'a_sub_file.srt.sjson',
             'speed': 'null',
             'general_speed': 1.0,
-            'track': None,
+            'track': u'http://www.example.com/track',
             'youtube_streams': '1.00:OEoXaMPEzfM',
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', True),
             'yt_test_timeout': 1500,
@@ -220,13 +221,14 @@ class TestGetHtmlMethod(BaseTestXmodule):
             )
 
             self.initialize_module(data=DATA)
-            track_url = self.item_descriptor.xmodule_runtime.handler_url(self.item_module, 'download_transcript')
+            # track_url = self.item_descriptor.xmodule_runtime.handler_url(self.item_module, 'download_transcript')
 
             context = self.item_module.render('student_view').content
 
             expected_context.update({
                 'ajax_url': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
-                'track': track_url if data['expected_track_url'] == u'a_sub_file.srt.sjson' else data['expected_track_url'],
+                # 'track': track_url if data['expected_track_url'] == u'a_sub_file.srt.sjson' else data['expected_track_url'],
+                'track': u'http://www.example.com/track' if data['track'] else '',
                 'sub': data['sub'],
                 'id': self.item_module.location.html_id(),
             })
@@ -309,7 +311,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'general_speed': 1.0,
             'start': 3603.0,
             'sub': u'a_sub_file.srt.sjson',
-            'track': None,
+            'track': '',
             'youtube_streams': '1.00:OEoXaMPEzfM',
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', True),
             'yt_test_timeout': 1500,
@@ -447,6 +449,7 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
         self.assertNotIn('source', fields)
         self.assertFalse(self.item_module.download_video)
 
+    @unittest.skip('Skipped due to the reason described in BLD-811')
     def test_track_is_not_empty(self):
         metatdata = {
             'track': 'http://example.org/track',
@@ -460,6 +463,7 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
         self.assertTrue(self.item_module.download_track)
         self.assertTrue(self.item_module.track_visible)
 
+    @unittest.skip('Skipped due to the reason described in BLD-811')
     @patch('xmodule.x_module.XModuleDescriptor.editable_metadata_fields', new_callable=PropertyMock)
     def test_download_track_is_explicitly_set(self, mock_editable_fields):
         mock_editable_fields.return_value = {
@@ -510,7 +514,7 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
         self.assertFalse(self.item_module.download_track)
         self.assertTrue(self.item_module.track_visible)
 
-
+    @unittest.skip('Skipped due to the reason described in BLD-811')
     def test_track_is_empty(self):
         metatdata = {
             'track': '',

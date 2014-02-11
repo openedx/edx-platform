@@ -119,7 +119,7 @@ class VideoFields(object):
     # `track` is deprecated field and should not be used in future.
     # `download_track` is used instead.
     track = String(
-        help="The external URL to download the timed transcript track.",
+        help="The external URL to download the timed transcript track. This appears as a link beneath the video.",
         display_name="Download Transcript",
         scope=Scope.settings,
         default=''
@@ -215,11 +215,14 @@ class VideoModule(VideoFields, XModule):
             elif self.html5_sources:
                 sources['main'] = self.html5_sources[0]
 
-        if self.download_track:
-            if self.track:
-                track_url = self.track
-            elif self.sub:
-                track_url = self.runtime.handler_url(self, 'download_transcript')
+        # Commented due to the reason described in BLD-811.
+        # if self.download_track:
+        #     if self.track:
+        #         track_url = self.track
+        #     elif self.sub:
+        #         track_url = self.runtime.handler_url(self, 'download_transcript')
+
+        track_url = self.track
 
         return self.system.render_template('video.html', {
             'ajax_url': self.system.ajax_url + '/save_user_state',
@@ -335,12 +338,13 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
 
         editable_fields = self.editable_metadata_fields
 
-        self.track_visible = False
-        if self.track:
-            self.track_visible = True
-            download_track = editable_fields['download_track']
-            if not download_track['explicitly_set']:
-                self.download_track = True
+        # Commented due to the reason described in BLD-811.
+        # self.track_visible = False
+        # if self.track:
+        #     self.track_visible = True
+        #     download_track = editable_fields['download_track']
+        #     if not download_track['explicitly_set']:
+        #         self.download_track = True
 
         self.source_visible = False
         if self.source:
@@ -359,11 +363,15 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
     def editable_metadata_fields(self):
         editable_fields = super(VideoDescriptor, self).editable_metadata_fields
 
-        if hasattr(self, 'track_visible'):
-            if self.track_visible:
-                editable_fields['track']['non_editable'] = True
-            else:
-                editable_fields.pop('track')
+        # Commented due to the reason described in BLD-811.
+        # if hasattr(self, 'track_visible'):
+        #     if self.track_visible:
+        #         editable_fields['track']['non_editable'] = True
+        #     else:
+        #         editable_fields.pop('track')
+
+        if 'download_track' in editable_fields:
+            editable_fields.pop('download_track')
 
         if hasattr(self, 'source_visible'):
             if self.source_visible:
