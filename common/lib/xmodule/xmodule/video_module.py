@@ -563,6 +563,10 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
                     value = deserialize_field(cls.fields[attr], value)
                 field_data[attr] = value
 
+        # Add `source` for backwards compatibility if xml doesn't  have `download_video`.
+        if 'download_video' not in field_data and sources:
+            field_data['source'] = field_data['html5_sources'][0]
+
         return field_data
 
 
