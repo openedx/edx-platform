@@ -3,8 +3,9 @@ Test finding orphans via the view and django config
 """
 import json
 from contentstore.tests.utils import CourseTestCase
-from xmodule.modulestore.django import editable_modulestore, loc_mapper
+from xmodule.modulestore.django import loc_mapper
 from student.models import CourseEnrollment
+from xmodule.modulestore.django import modulestore
 
 class TestOrphan(CourseTestCase):
     """
@@ -28,13 +29,14 @@ class TestOrphan(CourseTestCase):
 
     def _create_item(self, category, name, data, metadata, parent_category, parent_name, runtime):
         location = self.course.location.replace(category=category, name=name)
-        editable_modulestore('direct').create_and_save_xmodule(location, data, metadata, runtime)
+        store = modulestore('direct')
+        store.create_and_save_xmodule(location, data, metadata, runtime)
         if parent_name:
             # add child to parent in mongo
             parent_location = self.course.location.replace(category=parent_category, name=parent_name)
-            parent = editable_modulestore('direct').get_item(parent_location)
+            parent = store.get_item(parent_location)
             parent.children.append(location.url())
-            editable_modulestore('direct').update_item(parent, self.user.id)
+            store.update_item(parent, self.user.id)
 
     def test_mongo_orphan(self):
         """

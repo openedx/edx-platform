@@ -229,7 +229,7 @@ class TestCourseGrader(TestSubmittingProblems):
         """
 
         self.course.grading_policy = grading_policy
-        store = editable_modulestore('direct')
+        store = editable_modulestore()
         store.update_item(self.course, '**replace_user**')
         self.refresh_course()
 
