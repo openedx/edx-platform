@@ -1011,13 +1011,13 @@ class CodeResponseTest(ResponseTest):
         student_ans = {}
         for ans_id in answer_ids:
             student_ans[ans_id] = TEST_STUDENT_RESP
-        self.problem.system.send_users_emailaddr_with_coderesponse = True
-        self.problem.system.deanonymized_user_email = TEST_EMAIL
+        self.problem.capa_system.send_users_emailaddr_with_coderesponse = True
+        self.problem.capa_system.deanonymized_user_email = TEST_EMAIL
         mock_qinterface = mock.Mock()
         # side_effect needed b/c get_score destructures the return value of send_to_queue
         mock_send_to_queue = mock.Mock(side_effect=itertools.repeat((False, "OK")))
         mock_qinterface.send_to_queue = mock_send_to_queue
-        self.problem.system.xqueue['interface'] = mock_qinterface
+        self.problem.capa_system.xqueue['interface'] = mock_qinterface
         self.problem.grade_answers(student_ans)
         # From docstring of send_to_queue:  "The operation of xqueue is agnostic to the contents of (argument) 'body'"
         (_, kwargs) = mock_send_to_queue.call_args
