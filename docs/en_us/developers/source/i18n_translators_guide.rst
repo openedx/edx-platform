@@ -104,19 +104,22 @@ the project to begin translating it. For help documentation on Transifex, see th
 help desk <http://support.transifex.com/customer/portal/topics/414107-translators/articles>`_.
 Before you begin, be sure you've reviewed the `Guidelines for Translators`_.
 
-When visiting a language page, you will see a list of seven distinct resources to translate:
+When visiting a language page, you will see a list of ten distinct resources to translate:
 
 .. image:: images/project-resources.png
 
-We request that you focus on translating the non-Studio resources first. That is, please first
-translate and review these resources:
+Focus on translating the non-Studio resources first. That is, please first
+translate and review these resources, in this order, before anything else:
 
   * messages
   * mako
   * django-partial
   * djangojs-partial
+  * wiki
+  * notifier-django
+  * comments-service
 
-Once the above resources are 100% translated and reviewed, move on to the Studio resources:
+*Only after* the above resources are 100% translated and reviewed, move on to the Studio resources:
 
   * mako-studio
   * djangojs-studio
