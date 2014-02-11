@@ -1,10 +1,12 @@
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse, HttpResponseBadRequest
 from rest_framework import authentication
 from rest_framework import filters
 from rest_framework import permissions
 from rest_framework import viewsets
-from user_api.models import UserPreference
+from user_api.models import UserPreference, LANGUAGE_KEY
 from user_api.serializers import UserSerializer, UserPreferenceSerializer
 
 
@@ -43,3 +45,18 @@ class UserPreferenceViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = UserPreferenceSerializer
     paginate_by = 10
     paginate_by_param = "page_size"
+
+
+@login_required
+def set_language(request):
+    """
+    This view is called when the user would like to set a language preference
+    """
+    user = request.user
+    lang_pref = request.POST.get('language', None)
+
+    if lang_pref:
+        UserPreference.set_preference(user, LANGUAGE_KEY, lang_pref)
+        return HttpResponse('{"success": true}')
+
+    return HttpResponseBadRequest('no language provided')

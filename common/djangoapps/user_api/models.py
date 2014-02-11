@@ -1,6 +1,8 @@
 from django.contrib.auth.models import User
 from django.db import models
 
+LANGUAGE_KEY = 'pref-lang'
+
 
 class UserPreference(models.Model):
     """A user's preference, stored as generic text to be processed by client"""
@@ -10,3 +12,26 @@ class UserPreference(models.Model):
 
     class Meta:
         unique_together = ("user", "key")
+
+    @classmethod
+    def set_preference(cls, user, preference_key, preference_value):
+        """
+        Sets the user preference for a given key
+        """
+        user_pref, _ = cls.objects.get_or_create(user=user, key=preference_key)
+        user_pref.value = preference_value
+        user_pref.save()
+
+    @classmethod
+    def get_preference(cls, user, preference_key):
+        """
+        Gets the user preference value for a given key
+
+        Returns None if there isn't a preference for the given key
+        """
+
+        try:
+            user_pref = cls.objects.get(user=user, key=preference_key)
+            return user_pref.value
+        except cls.DoesNotExist:
+            return None

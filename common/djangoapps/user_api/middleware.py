@@ -2,8 +2,6 @@
 Middleware for UserPreferences
 """
 
-from django.utils.translation.trans_real import parse_accept_lang_header
-
 from user_api.models import UserPreference, LANGUAGE_KEY
 
 
@@ -17,11 +15,10 @@ class UserPreferenceMiddleware(object):
 
     def process_request(self, request):
         """
-        If a user's UserPreference contains a language preference,
-        stick that preference in the session.
+        If a user's UserPreference contains a language preference and there is
+        no language set on the session, use the user's preference.
         """
-
-        query = UserPreference.objects.filter(user=request.user, key=LANGUAGE_KEY)
-        if query.exists():
-            # there should only be one result for query
-            request.session['django_language'] = query[0].value
+        if 'django_language' not in request.session and request.user.is_authenticated():
+            user_pref = UserPreference.get_preference(request.user, LANGUAGE_KEY)
+            if user_pref:
+                request.session['django_language'] = user_pref

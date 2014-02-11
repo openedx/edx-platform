@@ -83,15 +83,17 @@
              });
     });
 
-    $("#change_language_form").submit(function(event, xhr) {
-      $.post('/i18n/setlang/',
-        {"language": language,},
-        function(data) {
-          if (data.success){
-            location.reload();
-          }
-          })
-      });
+    $("#submit-lang").click(function(event, xhr) {
+        event.preventDefault();
+        $.post('/user_api/setlang/',
+            {"language": $('#settings-language-value').val()})
+        .done(
+            function(data){
+                // submit form as normal
+                $('.settings-language-form').submit();
+            }
+        );
+    });
 
     $("#change_email_form").submit(function(){
       var new_email = $('#new_email_field').val();

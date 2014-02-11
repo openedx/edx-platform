@@ -1,13 +1,13 @@
 import base64
 
-from django.contrib.auth.models import User
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.core.urlresolvers import reverse
 import json
 import re
 from student.tests.factories import UserFactory
 from unittest import SkipTest
-from user_api.models import UserPreference
+from user_api.models import UserPreference, LANGUAGE_KEY
 from user_api.tests.factories import UserPreferenceFactory
 
 
@@ -17,21 +17,9 @@ USER_PREFERENCE_LIST_URI = "/user_api/v1/user_prefs/"
 
 
 @override_settings(EDX_API_KEY=TEST_API_KEY)
-class UserApiTestCase(TestCase):
-    def setUp(self):
-        super(UserApiTestCase, self).setUp()
-        self.users = [
-            UserFactory.create(
-                email="test{0}@test.org".format(i),
-                profile__name="Test {0}".format(i)
-            )
-            for i in range(5)
-        ]
-        self.prefs = [
-            UserPreferenceFactory.create(user=self.users[0], key="key0"),
-            UserPreferenceFactory.create(user=self.users[0], key="key1"),
-            UserPreferenceFactory.create(user=self.users[1], key="key0")
-        ]
+class ApiTestCase(TestCase):
+
+    LIST_URI = USER_LIST_URI
 
     def basic_auth(self, username, password):
         return {'HTTP_AUTHORIZATION': 'Basic ' + base64.b64encode('%s:%s' % (username, password))}
@@ -100,6 +88,32 @@ class UserApiTestCase(TestCase):
         self.assertEqual(response.status_code, 405)
 
 
+class NoUserApiTestCase(ApiTestCase):
+    def test_get_list_empty(self):
+        result = self.get_json(self.LIST_URI)
+        self.assertEqual(result["count"], 0)
+        self.assertIsNone(result["next"])
+        self.assertIsNone(result["previous"])
+        self.assertEqual(result["results"], [])
+
+
+class UserApiTestCase(ApiTestCase):
+    def setUp(self):
+        super(UserApiTestCase, self).setUp()
+        self.users = [
+            UserFactory.create(
+                email="test{0}@test.org".format(i),
+                profile__name="Test {0}".format(i)
+            )
+            for i in range(5)
+        ]
+        self.prefs = [
+            UserPreferenceFactory.create(user=self.users[0], key="key0"),
+            UserPreferenceFactory.create(user=self.users[0], key="key1"),
+            UserPreferenceFactory.create(user=self.users[1], key="key0")
+        ]
+
+
 class UserViewSetTest(UserApiTestCase):
     LIST_URI = USER_LIST_URI
 
@@ -137,17 +151,10 @@ class UserViewSetTest(UserApiTestCase):
     def test_basic_auth(self):
         # ensure that having basic auth headers in the mix does not break anything
         self.assertHttpOK(
-                self.request_with_auth("get", self.LIST_URI, **self.basic_auth('someuser', 'somepass')))
+            self.request_with_auth("get", self.LIST_URI,
+                                   **self.basic_auth('someuser', 'somepass')))
         self.assertHttpForbidden(
-                self.client.get(self.LIST_URI, **self.basic_auth('someuser', 'somepass')))
-
-    def test_get_list_empty(self):
-        User.objects.all().delete()
-        result = self.get_json(self.LIST_URI)
-        self.assertEqual(result["count"], 0)
-        self.assertIsNone(result["next"])
-        self.assertIsNone(result["previous"])
-        self.assertEqual(result["results"], [])
+            self.client.get(self.LIST_URI, **self.basic_auth('someuser', 'somepass')))
 
     def test_get_list_nonempty(self):
         result = self.get_json(self.LIST_URI)
@@ -244,14 +251,6 @@ class UserPreferenceViewSetTest(UserApiTestCase):
     @override_settings(EDX_API_KEY=None)
     def test_debug_auth(self):
         self.assertHttpOK(self.client.get(self.LIST_URI))
-
-    def test_get_list_empty(self):
-        UserPreference.objects.all().delete()
-        result = self.get_json(self.LIST_URI)
-        self.assertEqual(result["count"], 0)
-        self.assertIsNone(result["next"])
-        self.assertIsNone(result["previous"])
-        self.assertEqual(result["results"], [])
 
     def test_get_list_nonempty(self):
         result = self.get_json(self.LIST_URI)
@@ -357,3 +356,29 @@ class UserPreferenceViewSetTest(UserApiTestCase):
                 "url": uri,
             }
         )
+
+
+class TestLanguageSetting(TestCase):
+    """
+    Test setting languages
+    """
+    def test_set_preference_happy(self):
+        user = UserFactory.create()
+        self.client.login(username=user.username, password='test')
+
+        lang = 'en'
+        response = self.client.post(reverse('user_api_set_language'), {'language': lang})
+
+        self.assertEqual(response.status_code, 200)
+        user_pref = UserPreference.get_preference(user, LANGUAGE_KEY)
+        self.assertEqual(user_pref, lang)
+
+    def test_set_preference_missing_lang(self):
+        user = UserFactory.create()
+        self.client.login(username=user.username, password='test')
+
+        response = self.client.post(reverse('user_api_set_language'))
+
+        self.assertEqual(response.status_code, 400)
+
+        self.assertIsNone(UserPreference.get_preference(user, LANGUAGE_KEY))
