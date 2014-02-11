@@ -401,10 +401,10 @@ class TestCmeRegistration(TestCase):
                                                          stanford_department='stanford_department',
                                                          address_1='address_1',
                                                          address_2='address_2',
-                                                         city='city',
+                                                         city_cme='city',
                                                          state='state',
                                                          postal_code='postal_code',
-                                                         country='country',
+                                                         country_cme='country',
                                                          county_province='county_province'
                                                          )
 
@@ -460,10 +460,10 @@ class TestCmeRegistration(TestCase):
                                                          stanford_department='stanford_department',
                                                          address_1='address_1',
                                                          address_2='address_2',
-                                                         city='city',
+                                                         city_cme='city',
                                                          state='state',
                                                          postal_code='postal_code',
-                                                         country='country',
+                                                         country_cme='country',
                                                          county_province='county_province',
                                                          specialty='Patient care',
                                                          sub_specialty='Legs and feet',
