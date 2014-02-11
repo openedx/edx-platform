@@ -619,6 +619,7 @@ body.course.unit,.view-unit {
 
     //component-setting-entry
     .field.comp-setting-entry {
+      @include transition(opacity $tmg-f2 ease-in-out 0s);
       background-color: $white;
       padding: $baseline;
       border-bottom: 1px solid $gray-l2;
@@ -640,7 +641,6 @@ body.course.unit,.view-unit {
       }
 
       &:hover {
-        @include transition(opacity $tmg-f2 ease-in-out 0s);
         opacity: 1.0;
       }
 
@@ -654,9 +654,7 @@ body.course.unit,.view-unit {
       }
 
       .wrapper-comp-setting {
-        display: inline-block;
         min-width: 300px;
-        width: 55%;
         top: 0;
         vertical-align: top;
         margin-bottom:5px;
@@ -670,7 +668,7 @@ body.course.unit,.view-unit {
         display: inline-block;
         position: relative;
         left: 0;
-        width: 33%;
+        width: 25%;
         min-width: 100px;
         margin-right: ($baseline/2);
         font-weight: 600;
@@ -774,7 +772,6 @@ body.course.unit,.view-unit {
         display: inline-block;
         font-color: $gray-l6;
         min-width: ($baseline*10);
-        width: 35%;
         vertical-align: top;
       }
 
@@ -858,6 +855,77 @@ body.course.unit,.view-unit {
           // STATE: disabled
           &.is-disabled {
 
+          }
+        }
+      }
+
+      // TYPE: Dict
+      .metadata-dict {
+        * {
+          @include box-sizing(border-box);
+        }
+
+        // label
+        .setting-label {
+            vertical-align: top;
+            margin-top: ($baseline*.75);
+        }
+
+        // inputs and labels
+        .wrapper-dict-settings {
+          width: 55%;
+          display: inline-block;
+          min-width: 240px;
+
+          // enumerated fields
+          .list-settings {
+            margin: ($baseline/2) 0 0;
+
+            .list-settings-item {
+              margin-bottom: ($baseline/2);
+            }
+
+            // inputs
+            .input {
+              width: 43%;
+              margin-right: ($baseline/4);
+              vertical-align: middle;
+              display: inline-block;
+
+              &.input-value {
+                margin-right: ($baseline/2);
+              }
+            }
+          }
+        }
+
+        .setting-clear {
+          vertical-align: top;
+          margin: ($baseline*.75) 0 0 0;
+        }
+
+        .create-setting {
+          @extend %ui-btn-flat-outline;
+          @extend %t-action3;
+          display: block;
+          width: 88%;
+          padding: ($baseline/2);
+          font-weight: 600;
+
+          *[class^="icon-"] {
+            margin-right: ($baseline/4);
+          }
+        }
+
+        .remove-setting {
+          @include transition(color 0.25s ease-in-out);
+          @include font-size(20);
+          display: inline-block;
+          background: transparent;
+          color: $blue-l3;
+
+          &:hover {
+            color: $blue;
           }
         }
       }
