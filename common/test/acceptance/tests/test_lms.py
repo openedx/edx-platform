@@ -87,6 +87,26 @@ class LanguageTest(UniqueCourseTest):
         self.dashboard_page.visit()
         # Change language to Dummy Esperanto
         self.dashboard_page.change_language("eo")
+
+        # This string is unicode for "ÇÜRRÉNT ÇØÜRSÉS", which should appear in our Dummy Esperanto page
+        seektext = u"\xc7\xdcRR\xc9NT \xc7\xd8\xdcRS\xc9S"
+        self.browser.is_text_present(seektext)
+        self.assertTrue(self.browser.is_text_present(seektext))
+
+    def test_language_persists(self):
+        auto_auth_page = AutoAuthPage(self.browser, course_id=self.course_id)
+        auto_auth_page.visit()
+
+        self.dashboard_page.visit()
+        # Change language to Dummy Esperanto
+        self.dashboard_page.change_language("eo")
+
+        # destroy session
+        self.browser._cookie_manager.delete()
+
+        # log back in
+        auto_auth_page.visit()
+
         self.dashboard_page.visit()
         # This string is unicode for "ÇÜRRÉNT ÇØÜRSÉS", which should appear in our Dummy Esperanto page
         seektext = u"\xc7\xdcRR\xc9NT \xc7\xd8\xdcRS\xc9S"
