@@ -36,14 +36,20 @@ class AssetsTestCase(CourseTestCase):
 
 
 class BasicAssetsTestCase(AssetsTestCase):
+    location = Location(['i4x', 'foo', 'bar', 'asset', 'my_file_name.jpg'])
+    TEST_LMS_BASE = 'localhost:8000'
+
     def test_basic(self):
         resp = self.client.get(self.url, HTTP_ACCEPT='text/html')
         self.assertEquals(resp.status_code, 200)
 
     def test_static_url_generation(self):
-        location = Location(['i4x', 'foo', 'bar', 'asset', 'my_file_name.jpg'])
-        path = StaticContent.get_static_path_from_location(location)
+        path = StaticContent.get_static_path_from_location(self.location)
         self.assertEquals(path, '/static/my_file_name.jpg')
+
+    def test_lms_url_generation(self):
+        url = self.TEST_LMS_BASE + StaticContent.get_url_path_from_location(self.location)
+        self.assertEquals(url, 'localhost:8000/i4x/foo/bar/asset/my_file_name.jpg')
 
     def test_pdf_asset(self):
         module_store = modulestore('direct')
