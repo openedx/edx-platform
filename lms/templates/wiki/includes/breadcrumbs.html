@@ -1,5 +1,8 @@
 ## mako
-<%! from django.core.urlresolvers import reverse %>
+<%!
+  from django.core.urlresolvers import reverse
+  from django.utils.translation import ugettext as _
+%>
 
 %if urlpath is not Undefined and urlpath:
 <header>
@@ -29,7 +32,7 @@
     %if create_article_root:
     <a class="add-article-btn btn pull-left" href="${reverse('wiki:create', kwargs={'path' : create_article_root.path})}" style="padding: 7px;">
       <span class="icon-plus"></span>
-      Add article
+      ${_("Add article")}
     </a>
     %endif
   </div>

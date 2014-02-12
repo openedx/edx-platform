@@ -30,7 +30,7 @@ from xmodule.contentstore.django import contentstore
 from xmodule.contentstore.content import StaticContent
 from xmodule.exceptions import NotFoundError
 from xblock.core import XBlock
-from xblock.fields import Scope, String, Float, Boolean, List, Integer, ScopeIds
+from xblock.fields import Scope, String, Float, Boolean, List, ScopeIds
 from xmodule.fields import RelativeTime
 
 from xmodule.modulestore.inheritance import InheritanceKeyValueStore
@@ -46,10 +46,10 @@ class VideoFields(object):
         default="Video",
         scope=Scope.settings
     )
-    position = Integer(
+    saved_video_position = RelativeTime(
         help="Current position in the video",
         scope=Scope.user_state,
-        default=0
+        default=datetime.timedelta(seconds=0)
     )
     show_captions = Boolean(
         help="This controls whether or not captions are shown by default.",
@@ -167,7 +167,7 @@ class VideoModule(VideoFields, XModule):
     # index. We do that to avoid issues that occurs in tests.
     js = {
         'js': [
-            resource_string(__name__, 'js/src/video/00_cookie_storage.js'),
+            resource_string(__name__, 'js/src/video/00_video_storage.js'),
             resource_string(__name__, 'js/src/video/00_resizer.js'),
             resource_string(__name__, 'js/src/video/01_initialize.js'),
             resource_string(__name__, 'js/src/video/025_focus_grabber.js'),
@@ -186,14 +186,20 @@ class VideoModule(VideoFields, XModule):
     js_module_name = "Video"
 
     def handle_ajax(self, dispatch, data):
-        ACCEPTED_KEYS = ['speed']
+        accepted_keys = ['speed', 'saved_video_position']
 
         if dispatch == 'save_user_state':
             for key in data:
-                if hasattr(self, key) and key in ACCEPTED_KEYS:
-                    setattr(self, key, json.loads(data[key]))
+                if hasattr(self, key) and key in accepted_keys:
+                    if key == 'saved_video_position':
+                        relative_position = RelativeTime.isotime_to_timedelta(data[key])
+                        self.saved_video_position = relative_position
+                    else:
+                        setattr(self, key, json.loads(data[key]))
                     if key == 'speed':
                         self.global_speed = self.speed
+
+            log.debug(u"Test.")
 
             return json.dumps({'success': True})
 
@@ -238,6 +244,7 @@ class VideoModule(VideoFields, XModule):
             'sources': sources,
             'speed': json.dumps(self.speed),
             'general_speed': self.global_speed,
+            'saved_video_position': self.saved_video_position.total_seconds(),
             'start': self.start_time.total_seconds(),
             'sub': self.sub,
             'track': track_url,
@@ -294,6 +301,7 @@ class VideoModule(VideoFields, XModule):
         response.content_type="text/plain; charset=utf-8"
 
         return response
+
 
 
 class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor):

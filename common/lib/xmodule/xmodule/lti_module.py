@@ -289,7 +289,7 @@ class LTIModule(LTIFields, XModule):
         While testing locally and on Jenkins, mock_lti_server use http.referer
         to obtain scheme, so it is ok to have http(s) anyway.
         """
-        scheme = 'http' if 'sandbox' in self.system.hostname else 'https'
+        scheme = 'http' if 'sandbox' in self.system.hostname or self.system.debug else 'https'
         uri = '{scheme}://{host}{path}'.format(
             scheme=scheme,
             host=self.system.hostname,
@@ -325,7 +325,11 @@ class LTIModule(LTIFields, XModule):
         the link being launched.
         lti_id should be context_id by meaning.
         """
-        return u':'.join(urllib.quote(i) for i in (self.lti_id, self.get_resource_link_id(), self.get_user_id()))
+        return "{id}:{resource_link}:{user_id}".format(
+            id=urllib.quote(self.lti_id),
+            resource_link=urllib.quote(self.get_resource_link_id()),
+            user_id=urllib.quote(self.get_user_id())
+        )
 
     def get_course(self):
         """

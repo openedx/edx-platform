@@ -95,8 +95,17 @@ Feature: CMS.Problem Editor
     And I delete "1" component
     Then I see no components
 
+  # This is a very specific scenario for a bug where editing a component in draft
+  # impacted the published version.
+  Scenario: Changes to draft problem do not impact published version
+    Given I have created a Blank Common Problem
+    When I publish the unit
+    And I click on "edit a draft"
+    And I change the display name to "draft"
+    And I click on "delete draft"
+    Then the problem display name is "Blank Common Problem"
 
-  # Disabled 11/13/2013 after failing in master
+# Disabled 11/13/2013 after failing in master
   # The screenshot showed that the LaTeX editor had the text "hi",
   # but Selenium timed out waiting for the text to appear.
   # It also caused later tests to fail with "UnexpectedAlertPresent"

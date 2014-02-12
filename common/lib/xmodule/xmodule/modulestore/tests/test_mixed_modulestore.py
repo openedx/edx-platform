@@ -13,6 +13,8 @@ from xmodule.modulestore.xml_importer import import_from_xml
 # Mixed modulestore depends on django, so we'll manually configure some django settings
 # before importing the module
 from django.conf import settings
+import unittest
+import copy
 if not settings.configured:
     settings.configure()
 
@@ -37,6 +39,7 @@ OPTIONS = {
         XML_COURSEID2: 'xml',
         IMPORT_COURSEID: 'default'
     },
+    'reference_type': 'Location',
     'stores': {
         'xml': {
             'ENGINE': 'xmodule.modulestore.xml.XMLModuleStore',
@@ -182,6 +185,7 @@ class TestMixedModuleStore(object):
             )
 
     def test_get_items(self):
+        # NOTE: use get_course if you just want the course. get_items only allows wildcarding of category and name
         modules = self.store.get_items(Location('i4x', None, None, 'course', None), IMPORT_COURSEID)
         assert_equals(len(modules), 1)
         assert_equals(modules[0].location.course, self.import_course)
@@ -190,21 +194,14 @@ class TestMixedModuleStore(object):
         assert_equals(len(modules), 1)
         assert_equals(modules[0].location.course, 'toy')
 
-        modules = self.store.get_items(Location('i4x', None, None, 'course', None), XML_COURSEID2)
+        modules = self.store.get_items(Location('i4x', 'edX', 'simple', 'course', None), XML_COURSEID2)
         assert_equals(len(modules), 1)
         assert_equals(modules[0].location.course, 'simple')
 
     def test_update_item(self):
+        # FIXME update
         with assert_raises(NotImplementedError):
-            self.store.update_item(self.fake_location, None)
-
-    def test_update_children(self):
-        with assert_raises(NotImplementedError):
-            self.store.update_children(self.fake_location, None)
-
-    def test_update_metadata(self):
-        with assert_raises(NotImplementedError):
-            self.store.update_metadata(self.fake_location, None)
+            self.store.update_item(self.fake_location, '**replace_user**')
 
     def test_delete_item(self):
         with assert_raises(NotImplementedError):
@@ -250,3 +247,25 @@ class TestMixedModuleStore(object):
         assert_equals(Location(parents[0]).org, 'edX')
         assert_equals(Location(parents[0]).course, 'toy')
         assert_equals(Location(parents[0]).name, '2012_Fall')
+
+class TestMixedMSInit(unittest.TestCase):
+    """
+    Test initializing w/o a reference_type
+    """
+    def setUp(self):
+        unittest.TestCase.setUp(self)
+        options = copy.copy(OPTIONS)
+        del options['reference_type']
+        self.connection = pymongo.MongoClient(
+            host=HOST,
+            port=PORT,
+            tz_aware=True,
+        )
+        self.store = MixedModuleStore(**options)
+
+    def test_use_locations(self):
+        """
+        Test that use_locations defaulted correctly
+        """
+        self.assertTrue(self.store.use_locations)
+

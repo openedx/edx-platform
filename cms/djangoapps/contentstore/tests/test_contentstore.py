@@ -47,8 +47,6 @@ from xmodule.exceptions import NotFoundError
 
 from django_comment_common.utils import are_permissions_roles_seeded
 from xmodule.exceptions import InvalidVersionError
-import datetime
-from pytz import UTC
 from uuid import uuid4
 from pymongo import MongoClient
 from student.models import CourseEnrollment
@@ -126,11 +124,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         course.advanced_modules = component_types
 
-        # Save the data that we've just changed to the underlying
-        # MongoKeyValueStore before we update the mongo datastore.
-        course.save()
-
-        store.update_metadata(course.location, own_metadata(course))
+        store.update_item(course, self.user.id)
 
         # just pick one vertical
         descriptor = store.get_items(Location('i4x', 'edX', 'simple', 'vertical', None, None))[0]
@@ -269,7 +263,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.assertIn('graceperiod', own_metadata(html_module))
         self.assertEqual(html_module.graceperiod, new_graceperiod)
 
-        draft_store.update_metadata(html_module.location, own_metadata(html_module))
+        draft_store.update_item(html_module, self.user.id)
 
         # read back to make sure it reads as 'own-metadata'
         html_module = draft_store.get_item(Location('i4x', 'edX', 'simple', 'html', 'test_html', None))
@@ -385,8 +379,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.assertEqual(course.tabs, expected_tabs)
 
         item.display_name = 'Updated'
-        item.save()
-        module_store.update_metadata(item.location, own_metadata(item))
+        module_store.update_item(item, self.user.id)
 
         course = module_store.get_item(course_location)
 
@@ -834,9 +827,9 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         html_module = module_store.get_instance(source_location.course_id, html_module_location)
 
         self.assertIsInstance(html_module.data, basestring)
-        new_data = html_module.data.replace('/static/', '/c4x/{0}/{1}/asset/'.format(
+        new_data = html_module.data = html_module.data.replace('/static/', '/c4x/{0}/{1}/asset/'.format(
             source_location.org, source_location.course))
-        module_store.update_item(html_module_location, new_data)
+        module_store.update_item(html_module, self.user.id)
 
         html_module = module_store.get_instance(source_location.course_id, html_module_location)
         self.assertEqual(new_data, html_module.data)
@@ -858,22 +851,18 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         draft_store = modulestore('draft')
         direct_store = modulestore('direct')
 
-        CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
+        course = CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
 
         location = Location('i4x://MITx/999/chapter/neuvo')
         # Ensure draft mongo store does not allow us to create chapters either directly or via convert to draft
         self.assertRaises(InvalidVersionError, draft_store.create_and_save_xmodule, location)
         direct_store.create_and_save_xmodule(location)
         self.assertRaises(InvalidVersionError, draft_store.convert_to_draft, location)
+        chapter = draft_store.get_instance(course.id, location)
+        chapter.data = 'chapter data'
 
-        self.assertRaises(InvalidVersionError, draft_store.update_item, location, 'chapter data')
-
-        # taking advantage of update_children and other functions never checking that the ids are valid
-        self.assertRaises(InvalidVersionError, draft_store.update_children, location,
-                          ['i4x://MITx/999/problem/doesntexist'])
-
-        self.assertRaises(InvalidVersionError, draft_store.update_metadata, location,
-                          {'due': datetime.datetime.now(UTC)})
+        with self.assertRaises(InvalidVersionError):
+            draft_store.update_item(chapter, self.user.id)
 
         self.assertRaises(InvalidVersionError, draft_store.unpublish, location)
 
@@ -992,8 +981,8 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         sequential = module_store.get_item(Location(['i4x', 'edX', 'toy',
                                            'sequential', 'vertical_sequential', None]))
         private_location_no_draft = private_vertical.location.replace(revision=None)
-        module_store.update_children(sequential.location, sequential.children +
-                                     [private_location_no_draft.url()])
+        sequential.children.append(private_location_no_draft.url())
+        module_store.update_item(sequential, self.user.id)
 
         # read back the sequential, to make sure we have a pointer to
         sequential = module_store.get_item(Location(['i4x', 'edX', 'toy',
@@ -1285,31 +1274,6 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.assertFalse(Location(['i4x', 'edX', 'toy', 'vertical', 'vertical_test', None])
                          in course.system.module_data)
 
-    def test_export_course_with_unknown_metadata(self):
-        module_store = modulestore('direct')
-        content_store = contentstore()
-
-        import_from_xml(module_store, 'common/test/data/', ['toy'])
-        location = CourseDescriptor.id_to_location('edX/toy/2012_Fall')
-
-        root_dir = path(mkdtemp_clean())
-
-        course = module_store.get_item(location)
-
-        metadata = own_metadata(course)
-        # add a bool piece of unknown metadata so we can verify we don't throw an exception
-        metadata['new_metadata'] = True
-
-        # Save the data that we've just changed to the underlying
-        # MongoKeyValueStore before we update the mongo datastore.
-        course.save()
-        module_store.update_metadata(location, metadata)
-
-        print 'Exporting to tempdir = {0}'.format(root_dir)
-
-        # export out to a tempdir
-        export_to_xml(module_store, content_store, location, root_dir, 'test_export')
-
     def test_export_course_without_content_store(self):
         module_store = modulestore('direct')
         content_store = contentstore()
@@ -1319,16 +1283,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         import_from_xml(module_store, 'common/test/data/', ['toy'])
         location = CourseDescriptor.id_to_location('edX/toy/2012_Fall')
 
-        # Add a sequence
-
         stub_location = Location(['i4x', 'edX', 'toy', 'sequential', 'vertical_sequential'])
-        sequential = module_store.get_item(stub_location)
-        module_store.update_children(sequential.location, sequential.children)
-
-        # Get course and export it without a content_store
-
-        course = module_store.get_item(location)
-        course.save()
 
         root_dir = path(mkdtemp_clean())
 
@@ -1343,7 +1298,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
             module_store, root_dir, ['test_export_no_content_store'],
             draft_store=None,
             static_content_store=None,
-            target_location_namespace=course.location
+            target_location_namespace=location
         )
 
         # Verify reimported course
@@ -1810,7 +1765,8 @@ class ContentStoreTest(ModuleStoreTestCase):
         # crate a new module and add it as a child to a vertical
         module_store.create_and_save_xmodule(new_component_location)
         parent = verticals[0]
-        module_store.update_children(parent.location, parent.children + [new_component_location.url()])
+        parent.children.append(new_component_location.url())
+        module_store.update_item(parent, self.user.id)
 
         # flush the cache
         module_store.refresh_cached_metadata_inheritance_tree(new_component_location)
@@ -1827,8 +1783,7 @@ class ContentStoreTest(ModuleStoreTestCase):
         # now let's define an override at the leaf node level
         #
         new_module.graceperiod = timedelta(1)
-        new_module.save()
-        module_store.update_metadata(new_module.location, own_metadata(new_module))
+        module_store.update_item(new_module, self.user.id)
 
         # flush the cache and refetch
         module_store.refresh_cached_metadata_inheritance_tree(new_component_location)
@@ -1942,10 +1897,7 @@ class MetadataSaveTestCase(ModuleStoreTestCase):
             delattr(self.video_descriptor, field_name)
 
         self.assertNotIn('html5_sources', own_metadata(self.video_descriptor))
-        get_modulestore(location).update_metadata(
-            location,
-            own_metadata(self.video_descriptor)
-        )
+        get_modulestore(location).update_item(self.video_descriptor, '**replace_user**')
         module = get_modulestore(location).get_item(location)
 
         self.assertNotIn('html5_sources', own_metadata(module))
@@ -2001,7 +1953,7 @@ def _course_factory_create_course():
     Creates a course via the CourseFactory and returns the locator for it.
     """
     course = CourseFactory.create(org='MITx', course='999', display_name='Robot Super Course')
-    return loc_mapper().translate_location(course.location.course_id, course.location, True, True)
+    return loc_mapper().translate_location(course.id, course.location, False, True)
 
 
 def _get_course_id(test_course_data):

@@ -107,6 +107,7 @@ define(["backbone"], function(Backbone) {
     Metadata.FLOAT_TYPE = "Float";
     Metadata.GENERIC_TYPE = "Generic";
     Metadata.LIST_TYPE = "List";
+    Metadata.DICT_TYPE = "Dict";
     Metadata.VIDEO_LIST_TYPE = "VideoList";
     Metadata.RELATIVE_TIME_TYPE = "RelativeTime";
 

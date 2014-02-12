@@ -31,7 +31,11 @@ class TestLTI(BaseTestXmodule):
         module_id = unicode(urllib.quote(self.item_module.id))
         user_id = unicode(self.item_descriptor.xmodule_runtime.anonymous_student_id)
 
-        sourcedId = u':'.join(urllib.quote(i) for i in (lti_id, module_id, user_id))
+        sourcedId = "{id}:{resource_link}:{user_id}".format(
+            id=urllib.quote(lti_id),
+            resource_link=urllib.quote(module_id),
+            user_id=urllib.quote(user_id)
+        )
 
         lis_outcome_service_url = 'https://{host}{path}'.format(
                 host=self.item_descriptor.xmodule_runtime.hostname,

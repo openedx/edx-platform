@@ -68,6 +68,9 @@ exclude_patterns = ['build']
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'edXDocs'
 
+project = u'edX Platform Developer Documentation'
+copyright = u'2014, edX'
+
 # --- Mock modules ------------------------------------------------------------
 
 # Mock all the modules that the readthedocs build can't import

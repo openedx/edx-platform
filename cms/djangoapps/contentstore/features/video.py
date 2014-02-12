@@ -198,3 +198,17 @@ def click_button_video(_step, button_type):
     button = button_type.strip()
     world.css_click(VIDEO_BUTTONS[button])
 
+
+@step('I seek video to "([^"]*)" seconds$')
+def seek_video_to_n_seconds(_step, seconds):
+    time = float(seconds.strip())
+    jsCode = "$('.video').data('video-player-state').videoPlayer.onSlideSeek({{time: {0:f}}})".format(time)
+    world.browser.execute_script(jsCode)
+
+
+@step('I see video starts playing from "([^"]*)" position$')
+def start_playing_video_from_n_seconds(_step, position):
+    world.wait_for(
+        func=lambda _: world.css_html('.vidtime')[:4] == position.strip(),
+        timeout=5
+    )

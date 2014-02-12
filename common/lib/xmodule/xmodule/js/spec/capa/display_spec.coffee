@@ -93,7 +93,7 @@ describe 'Problem', ->
         @problem.el.data('progress_status', 'foo')
         @problem.el.data('progress_detail', '1/1')
         @problem.renderProgressState()
-        expect(@problem.$('.problem-progress').html()).toEqual "(1/1 points)"
+        expect(@problem.$('.problem-progress').html()).toEqual "(1/1 point)"
 
   describe 'render', ->
     beforeEach ->

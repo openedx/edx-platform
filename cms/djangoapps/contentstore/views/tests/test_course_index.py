@@ -9,6 +9,7 @@ from xmodule.modulestore.django import loc_mapper
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore import parsers
 
+
 class TestCourseIndex(CourseTestCase):
     """
     Unit tests for getting the list of courses and the course outline.
@@ -24,7 +25,6 @@ class TestCourseIndex(CourseTestCase):
             number='test-2.3_course',
             display_name='dotted.course.name-2',
         )
-
 
     def check_index_and_outline(self, authed_client):
         """

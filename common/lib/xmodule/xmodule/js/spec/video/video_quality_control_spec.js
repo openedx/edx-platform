@@ -12,6 +12,7 @@
         afterEach(function () {
             $('source').remove();
             window.onTouchBasedDevice = oldOTBD;
+            state.storage.clear();
         });
 
         describe('constructor', function () {
@@ -20,9 +21,15 @@
             });
 
             it('render the quality control', function () {
-                var container = state.videoControl.secondaryControlsEl;
+                waitsFor(function () {
+                    return state.videoControl;
+                }, 'videoControl is present', 5000);
 
-                expect(container).toContain('a.quality_control');
+                runs(function () {
+                    var container = state.videoControl.secondaryControlsEl;
+
+                    expect(container).toContain('a.quality_control');
+                });
             });
 
             it('add ARIA attributes to quality control', function () {

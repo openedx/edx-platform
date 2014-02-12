@@ -339,7 +339,7 @@ class ModuleStoreRead(object):
         pass
 
     @abstractmethod
-    def get_items(self, location, course_id=None, depth=0):
+    def get_items(self, location, course_id=None, depth=0, qualifiers=None):
         """
         Returns a list of XModuleDescriptor instances for the items
         that match location. Any element of location that is None is treated
@@ -379,6 +379,15 @@ class ModuleStoreRead(object):
         pass
 
     @abstractmethod
+    def get_orphans(self, course_location, branch):
+        """
+        Get all of the xblocks in the given course which have no parents and are not of types which are
+        usually orphaned. NOTE: may include xblocks which still have references via xblocks which don't
+        use children to point to their dependents.
+        """
+        pass
+
+    @abstractmethod
     def get_errored_courses(self):
         """
         Return a dictionary of course_dir -> [(msg, exception_str)], for each
@@ -404,44 +413,34 @@ class ModuleStoreWrite(ModuleStoreRead):
     __metaclass__ = ABCMeta
 
     @abstractmethod
-    def update_item(self, location, data, allow_not_found=False):
+    def update_item(self, xblock, user_id=None, allow_not_found=False, force=False):
         """
-        Set the data in the item specified by the location to
-        data
+        Update the given xblock's persisted repr. Pass the user's unique id which the persistent store
+        should save with the update if it has that ability.
 
-        location: Something that can be passed to Location
-        data: A nested dictionary of problem data
-        """
-        pass
+        :param allow_not_found: whether this method should raise an exception if the given xblock
+        has not been persisted before.
+        :param force: fork the structure and don't update the course draftVersion if there's a version
+        conflict (only applicable to version tracking and conflict detecting persistence stores)
 
-    @abstractmethod
-    def update_children(self, location, children):
-        """
-        Set the children for the item specified by the location to
-        children
-
-        location: Something that can be passed to Location
-        children: A list of child item identifiers
+        :raises VersionConflictError: if package_id and version_guid given and the current
+        version head != version_guid and force is not True. (only applicable to version tracking stores)
         """
         pass
 
     @abstractmethod
-    def update_metadata(self, location, metadata):
+    def delete_item(self, location, user_id=None, delete_all_versions=False, delete_children=False, force=False):
         """
-        Set the metadata for the item specified by the location to
-        metadata
+        Delete an item from persistence. Pass the user's unique id which the persistent store
+        should save with the update if it has that ability.
 
-        location: Something that can be passed to Location
-        metadata: A nested dictionary of module metadata
-        """
-        pass
+        :param delete_all_versions: removes both the draft and published version of this item from
+        the course if using draft and old mongo. Split may or may not implement this.
+        :param force: fork the structure and don't update the course draftVersion if there's a version
+        conflict (only applicable to version tracking and conflict detecting persistence stores)
 
-    @abstractmethod
-    def delete_item(self, location):
-        """
-        Delete an item from this modulestore
-
-        location: Something that can be passed to Location
+        :raises VersionConflictError: if package_id and version_guid given and the current
+        version head != version_guid and force is not True. (only applicable to version tracking stores)
         """
         pass
 

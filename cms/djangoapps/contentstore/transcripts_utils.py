@@ -17,7 +17,6 @@ from xmodule.exceptions import NotFoundError
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore import Location
-from xmodule.modulestore.inheritance import own_metadata
 
 from .utils import get_modulestore
 
@@ -280,16 +279,16 @@ def generate_srt_from_sjson(sjson_subs, speed):
     return output
 
 
-def save_module(item):
+def save_module(item, user):
     """
     Proceed with additional save operations.
     """
     item.save()
     store = get_modulestore(Location(item.id))
-    store.update_metadata(item.id, own_metadata(item))
+    store.update_item(item, user.id if user else None)
 
 
-def copy_or_rename_transcript(new_name, old_name, item, delete_old=False):
+def copy_or_rename_transcript(new_name, old_name, item, delete_old=False, user=None):
     """
     Renames `old_name` transcript file in storage to `new_name`.
 
@@ -303,12 +302,12 @@ def copy_or_rename_transcript(new_name, old_name, item, delete_old=False):
     transcripts = contentstore().find(content_location).data
     save_subs_to_store(json.loads(transcripts), new_name, item)
     item.sub = new_name
-    save_module(item)
+    save_module(item, user)
     if delete_old:
         remove_subs_from_store(old_name, item)
 
 
-def manage_video_subtitles_save(old_item, new_item):
+def manage_video_subtitles_save(old_item, new_item, user):
     """
     Does some specific things, that can be done only on save.
 
@@ -340,7 +339,7 @@ def manage_video_subtitles_save(old_item, new_item):
         # copy_or_rename_transcript changes item.sub of module
         try:
             # updates item.sub with `video_id`, if it is successful.
-            copy_or_rename_transcript(video_id, sub_name, new_item)
+            copy_or_rename_transcript(video_id, sub_name, new_item, user=user)
         except NotFoundError:
             # subtitles file `sub_name` is not presented in the system. Nothing to copy or rename.
             log.debug(

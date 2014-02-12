@@ -1,12 +1,11 @@
 """ Unit tests for checklist methods in views.py. """
 from contentstore.utils import get_modulestore
 from contentstore.views.checklist import expand_checklist_action_url
-from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.django import loc_mapper
 
 import json
-from .utils import CourseTestCase
+from contentstore.tests.utils import CourseTestCase
 
 
 class ChecklistTestCase(CourseTestCase):
@@ -54,7 +53,7 @@ class ChecklistTestCase(CourseTestCase):
         # Save the changed `checklists` to the underlying KeyValueStore before updating the modulestore
         self.course.save()
         modulestore = get_modulestore(self.course.location)
-        modulestore.update_metadata(self.course.location, own_metadata(self.course))
+        modulestore.update_item(self.course, self.user.id)
         self.assertEqual(self.get_persisted_checklists(), None)
         response = self.client.get(self.checklists_url)
         self.assertEqual(payload, response.content)
@@ -112,7 +111,6 @@ class ChecklistTestCase(CourseTestCase):
         # compare_checklists will verify that returned_checklist DOES have expanded action URLs.
         self.assertEqual('CourseOutline', get_first_item(persisted_checklist).get('action_url'))
         self.compare_checklists(persisted_checklist, returned_checklist)
-
 
     def test_update_checklists_delete_unsupported(self):
         """ Delete operation is not supported. """

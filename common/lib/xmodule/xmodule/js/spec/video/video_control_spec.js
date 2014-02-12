@@ -10,6 +10,7 @@
 
         afterEach(function () {
             $('source').remove();
+            state.storage.clear();
             window.onTouchBasedDevice = oldOTBD;
         });
 

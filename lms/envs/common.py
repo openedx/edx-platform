@@ -506,6 +506,7 @@ LANGUAGES = (
     ('bg-bg', u'български (България)'),  # Bulgarian (Bulgaria)
     ('bn', u'বাংলা'),  # Bengali
     ('bn-bd', u'বাংলা (বাংলাদেশ)'),  # Bengali (Bangladesh)
+    ('ca@valencia', u'Català (València)'),  # Catalan (Valencia)
     ('cs', u'Čeština'),  # Czech
     ('cy', u'Cymraeg'),  # Welsh
     ('de-de', u'Deutsch (Deutschland)'),  # German (Germany)
@@ -687,6 +688,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'track.middleware.TrackMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'splash.middleware.SplashMiddleware',
 
     'course_wiki.course_nav.Middleware',
 
@@ -1095,6 +1097,9 @@ INSTALLED_APPS = (
     'django_comment_client',
     'django_comment_common',
     'notes',
+
+    # Splash screen
+    'splash',
 
     # Monitoring
     'datadog',
