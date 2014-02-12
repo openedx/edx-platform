@@ -506,6 +506,12 @@ function (HTML5Video, Resizer) {
 
     function onEnded() {
         var time = this.videoPlayer.duration();
+        this.videoPlayer.log(
+            'stop_video',
+            {
+                currentTime: this.videoPlayer.currentTime
+            }
+        );
 
         this.trigger('videoControl.pause', null);
         this.trigger('videoProgressSlider.notifyThroughHandleEnd', {
