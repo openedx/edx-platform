@@ -112,7 +112,8 @@ def xblock_handler(request, tag=None, package_id=None, branch=None, version_guid
             accept_header = request.META.get('HTTP_ACCEPT', 'application/json')
 
             if 'application/x-fragment+json' in accept_header:
-                component = modulestore().get_item(old_location)
+                store = get_modulestore(old_location)
+                component = store.get_item(old_location)
 
                 # Wrap the generated fragment in the xmodule_editor div so that the javascript
                 # can bind to it correctly
@@ -127,7 +128,7 @@ def xblock_handler(request, tag=None, package_id=None, branch=None, version_guid
                     log.debug("Unable to render studio_view for %r", component, exc_info=True)
                     editor_fragment = Fragment(render_to_string('html_error.html', {'message': str(exc)}))
 
-                modulestore().save_xmodule(component)
+                store.save_xmodule(component)
 
                 preview_fragment = get_preview_fragment(request, component)
 

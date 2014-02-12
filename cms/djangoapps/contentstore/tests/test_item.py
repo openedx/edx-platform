@@ -538,6 +538,41 @@ class TestEditItem(ItemTest):
         draft = self.get_item_from_modulestore(self.problem_locator, True)
         self.assertEqual(draft.due, datetime(2077, 10, 10, 4, 0, tzinfo=UTC))
 
+    def test_published_and_draft_contents_with_update(self):
+        """ Create a draft and publish it then modify the draft and check that published content is not modified """
+
+        # Make problem public.
+        resp = self.client.ajax_post(
+            self.problem_update_url,
+            data={'publish': 'make_public'}
+        )
+        self.assertIsNotNone(self.get_item_from_modulestore(self.problem_locator, False))
+
+        # Now make a draft
+        resp = self.client.ajax_post(
+            self.problem_update_url,
+            data={
+                'id': self.problem_locator,
+                'metadata': {},
+                'data': "<p>Problem content draft.</p>",
+                'publish': 'create_draft'
+            }
+        )
+
+        # Both published and draft content should be different
+        published = self.get_item_from_modulestore(self.problem_locator, False)
+        draft = self.get_item_from_modulestore(self.problem_locator, True)
+        self.assertNotEqual(draft.data, published.data)
+
+        # Get problem by 'xblock_handler'
+        resp = self.client.get('/xblock/' + self.problem_locator, HTTP_ACCEPT='application/x-fragment+json')
+        self.assertEqual(resp.status_code, 200)
+
+        # Both published and draft content should still be different
+        published = self.get_item_from_modulestore(self.problem_locator, False)
+        draft = self.get_item_from_modulestore(self.problem_locator, True)
+        self.assertNotEqual(draft.data, published.data)
+
 
 @ddt.ddt
 class TestComponentHandler(TestCase):
