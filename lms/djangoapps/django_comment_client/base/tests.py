@@ -102,7 +102,7 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
                 'anonymous': False, 'course_id': u'MITx/999/Robot_Super_Course',
             },
             params={'request_id': ANY},
-            headers={'X-Edx-Api-Key': 'PUT_YOUR_API_KEY_HERE'},
+            headers=ANY,
             timeout=5
         )
         assert_equal(response.status_code, 200)
@@ -139,7 +139,7 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
                 {
                     'data': None,
                     'params': {'mark_as_read': True, 'request_id': ANY},
-                    'headers': {'X-Edx-Api-Key': 'PUT_YOUR_API_KEY_HERE'},
+                    'headers': ANY,
                     'timeout': 5
                 }
             ),
@@ -148,7 +148,7 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
                 {
                     'data': {'user_id': '1'},
                     'params': {'request_id': ANY},
-                    'headers': {'X-Edx-Api-Key': 'PUT_YOUR_API_KEY_HERE'},
+                    'headers': ANY,
                     'timeout': 5
                 }
             ),
@@ -157,7 +157,7 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
                 {
                     'data': None,
                     'params': {'mark_as_read': True, 'request_id': ANY},
-                    'headers': {'X-Edx-Api-Key': 'PUT_YOUR_API_KEY_HERE'},
+                    'headers': ANY,
                     'timeout': 5
                 }
             )
@@ -199,7 +199,7 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
                 {
                     'data': None,
                     'params': {'mark_as_read': True, 'request_id': ANY},
-                    'headers': {'X-Edx-Api-Key': 'PUT_YOUR_API_KEY_HERE'},
+                    'headers': ANY,
                     'timeout': 5
                 }
             ),
@@ -208,7 +208,7 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
                 {
                     'data': {'user_id': '1'},
                     'params': {'request_id': ANY},
-                    'headers': {'X-Edx-Api-Key': 'PUT_YOUR_API_KEY_HERE'},
+                    'headers': ANY,
                     'timeout': 5
                 }
             ),
@@ -217,7 +217,7 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
                 {
                     'data': None,
                     'params': {'mark_as_read': True, 'request_id': ANY},
-                    'headers': {'X-Edx-Api-Key': 'PUT_YOUR_API_KEY_HERE'},
+                    'headers': ANY,
                     'timeout': 5
                 }
             )
@@ -255,7 +255,7 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
                 {
                     'data': None,
                     'params': {'request_id': ANY},
-                    'headers': {'X-Edx-Api-Key': 'PUT_YOUR_API_KEY_HERE'},
+                    'headers': ANY,
                     'timeout': 5
                 }
             ),
@@ -264,7 +264,7 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
                 {
                     'data': {'user_id': '1'},
                     'params': {'request_id': ANY},
-                    'headers': {'X-Edx-Api-Key': 'PUT_YOUR_API_KEY_HERE'},
+                    'headers': ANY,
                     'timeout': 5
                 }
             ),
@@ -273,7 +273,7 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
                 {
                     'data': None,
                     'params': {'request_id': ANY},
-                    'headers': {'X-Edx-Api-Key': 'PUT_YOUR_API_KEY_HERE'},
+                    'headers': ANY,
                     'timeout': 5
                 }
             )
@@ -311,7 +311,7 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
                 {
                     'data': None,
                     'params': {'request_id': ANY},
-                    'headers': {'X-Edx-Api-Key': 'PUT_YOUR_API_KEY_HERE'},
+                    'headers': ANY,
                     'timeout': 5
                 }
             ),
@@ -320,7 +320,7 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
                 {
                     'data': {'user_id': '1'},
                     'params': {'request_id': ANY},
-                    'headers': {'X-Edx-Api-Key': 'PUT_YOUR_API_KEY_HERE'},
+                    'headers': ANY,
                     'timeout': 5
                 }
             ),
@@ -329,7 +329,7 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
                 {
                     'data': None,
                     'params': {'request_id': ANY},
-                    'headers': {'X-Edx-Api-Key': 'PUT_YOUR_API_KEY_HERE'},
+                    'headers': ANY,
                     'timeout': 5
                 }
             )
