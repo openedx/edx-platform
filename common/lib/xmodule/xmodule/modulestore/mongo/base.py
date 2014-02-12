@@ -878,6 +878,15 @@ class MongoModuleStore(ModuleStoreWriteBase):
         item_locs -= all_reachable
         return list(item_locs)
 
+    def get_courses_for_wiki(self, wiki_slug):
+        """
+        Return the list of courses which use this wiki
+        :param wiki_slug: the wiki id
+        :return: list of course locations
+        """
+        courses = self.collection.find({'definition.data.wiki_slug': wiki_slug})
+        return [Location(course['_id']) for course in courses]
+
     def _create_new_field_data(self, _category, _location, definition_data, metadata):
         """
         To instantiate a new xmodule which will be saved latter, set up the dbModel and kvs

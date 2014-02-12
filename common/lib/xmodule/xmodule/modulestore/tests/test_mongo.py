@@ -37,6 +37,9 @@ RENDER_TEMPLATE = lambda t_n, d, ctx = None, nsp = 'main': ''
 
 class TestMongoModuleStore(object):
     '''Tests!'''
+    # Explicitly list the courses to load (don't want the big one)
+    courses = ['toy', 'simple', 'simple_with_draft', 'test_unicode']
+
     @classmethod
     def setupClass(cls):
         cls.connection = pymongo.MongoClient(
@@ -74,9 +77,7 @@ class TestMongoModuleStore(object):
         # Also test draft store imports
         #
         draft_store = DraftModuleStore(doc_store_config, FS_ROOT, RENDER_TEMPLATE, default_class=DEFAULT_CLASS)
-        # Explicitly list the courses to load (don't want the big one)
-        courses = ['toy', 'simple', 'simple_with_draft', 'test_unicode']
-        import_from_xml(store, DATA_DIR, courses, draft_store=draft_store, static_content_store=content_store)
+        import_from_xml(store, DATA_DIR, TestMongoModuleStore.courses, draft_store=draft_store, static_content_store=content_store)
 
         # also test a course with no importing of static content
         import_from_xml(
@@ -273,6 +274,24 @@ class TestMongoModuleStore(object):
             {'displayname': 'hello'}
         )
 
+    def test_get_courses_for_wiki(self):
+        """
+        Test the get_courses_for_wiki method
+        """
+        for course_id in self.courses:
+            courses = self.store.get_courses_for_wiki(course_id)
+            assert_equals(len(courses), 1)
+            assert_equals(Location('i4x', 'edX', course_id, 'course', '2012_Fall'), courses[0])
+        course_locs = self.store.get_courses_for_wiki('no_such_wiki')
+        assert_equals(len(course_locs), 0)
+        # now set two to have same wiki
+        course = self.store.get_course('edX/toy/2012_Fall')
+        course.wiki_slug = 'simple'
+        self.store.save_xmodule(course)
+        courses = self.store.get_courses_for_wiki('simple')
+        assert_equals(len(courses), 2)
+        for course_id in ['toy', 'simple']:
+            assert_in(Location('i4x', 'edX', course_id, 'course', '2012_Fall'), courses)
 
 class TestMongoKeyValueStore(object):
     """
