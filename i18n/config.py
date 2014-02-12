@@ -5,7 +5,7 @@ from path import path
 
 # BASE_DIR is the working directory to execute django-admin commands from.
 # Typically this should be the 'edx-platform' directory.
-BASE_DIR = path(__file__).abspath().dirname().joinpath('..').normpath()
+BASE_DIR = path(__file__).abspath().dirname().dirname()
 
 # LOCALE_DIR contains the locale files.
 # Typically this should be 'edx-platform/conf/locale'
@@ -17,6 +17,7 @@ class Configuration(object):
     Reads localization configuration in json format.
     """
     DEFAULTS = {
+        'dummy_locales': [],
         'generate_merge': {},
         'ignore_dirs': [],
         'locales': ['en'],
@@ -41,18 +42,6 @@ class Configuration(object):
         if name in self.DEFAULTS:
             return self._config.get(name, self.DEFAULTS[name])
         raise AttributeError("Configuration has no such setting: {!r}".format(name))
-
-    @property
-    def dummy_locale(self):
-        """
-        Returns a locale to use for the dummy text, e.g. 'eo'.
-        Throws exception if no dummy-locale is declared.
-        The locale is a string.
-        """
-        dummy = self._config.get('dummy-locale', None)
-        if not dummy:
-            raise Exception('Could not read dummy-locale from configuration file.')
-        return dummy
 
     def get_messages_dir(self, locale):
         """

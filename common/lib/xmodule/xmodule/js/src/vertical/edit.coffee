@@ -6,4 +6,4 @@ class @VerticalDescriptor extends XModule.Descriptor
     )
 
   save: ->
-    children: $('.vert-mod li', @element).map((idx, el) -> $(el).data('id')).toArray()
+    children: $('.vert-mod div', @element).map((idx, el) -> $(el).data('id')).toArray()

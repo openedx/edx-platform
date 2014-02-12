@@ -33,13 +33,13 @@ class TestDummy(TestCase):
 
     @ddt.data(
         (u"hello my name is Bond, James Bond",
-         u"héllø mý nämé ïs Bønd, Jämés Bønd Ⱡ'σяєм ι#"),
+         u"héllö mý nämé ïs Bönd, Jämés Bönd Ⱡ'σяєм ι#"),
 
         (u"don't convert <a href='href'>tag ids</a>",
-         u"døn't çønvért <a href='href'>täg ïds</a> Ⱡ'σяєм ιρѕυ#"),
+         u"dön't çönvért <a href='href'>täg ïds</a> Ⱡ'σяєм#"),
 
         (u"don't convert %(name)s tags on %(date)s",
-         u"døn't çønvért %(name)s tägs øn %(date)s Ⱡ'σяєм ιρѕ#"),
+         u"dön't çönvért %(name)s tägs ön %(date)s Ⱡ'σяєм #"),
     )
     def test_dummy(self, data):
         """
@@ -53,7 +53,7 @@ class TestDummy(TestCase):
     def test_singular(self):
         entry = POEntry()
         entry.msgid = "A lovely day for a cup of tea."
-        expected = u"À løvélý däý før ä çüp øf téä. Ⱡ'σяєм #"
+        expected = u"À lövélý däý för ä çüp öf téä. Ⱡ'σяєм #"
         self.converter.convert_msg(entry)
         self.assertUnicodeEquals(entry.msgstr, expected)
 
@@ -61,8 +61,8 @@ class TestDummy(TestCase):
         entry = POEntry()
         entry.msgid = "A lovely day for a cup of tea."
         entry.msgid_plural = "A lovely day for some cups of tea."
-        expected_s = u"À løvélý däý før ä çüp øf téä. Ⱡ'σяєм #"
-        expected_p = u"À løvélý däý før sømé çüps øf téä. Ⱡ'σяєм ιρ#"
+        expected_s = u"À lövélý däý för ä çüp öf téä. Ⱡ'σяєм #"
+        expected_p = u"À lövélý däý för sömé çüps öf téä. Ⱡ'σяєм ιρ#"
         self.converter.convert_msg(entry)
         result = entry.msgstr_plural
         self.assertUnicodeEquals(result['0'], expected_s)

@@ -23,9 +23,9 @@ def create_component_instance(step, category, component_type=None, is_advanced=F
 
     component_button_css = 'span.large-{}-icon'.format(category.lower())
     if category == 'problem':
-        module_css = 'section.xmodule_CapaModule'
+        module_css = 'div.xmodule_CapaModule'
     else:
-        module_css = 'section.xmodule_{}Module'.format(category.title())
+        module_css = 'div.xmodule_{}Module'.format(category.title())
 
     # Count how many of that module is on the page. Later we will
     # assert that one more was added.

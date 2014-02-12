@@ -219,7 +219,7 @@ Python script that you create and embed in the problem. These problems
 can be any type. Numerical input and text input problems are the most
 popular write-your-own-grader.
 
-.. image:: Images/WriteYourOwnGraderExample.gif
+.. image:: Images/CustomPythonExample.png
  :alt: Image of a write your own grader problem
 
 Create a Write-Your-Own-Grader Problem
@@ -295,20 +295,53 @@ To create a image mapped input problem:
 Math Expression Input
 ---------------------
 
-In math expression input problems, students enter text that represents
-a mathematical expression, and Studio changes that text to a symbolic
-expression that appears below the field where the student is typing.
-Unlike numerical input problems, which only allow integers and a few
-select constants, math expression problems can include more complicated
-symbolic expressions.
-
-When you create a math expression input problem for your students in
-Studio, you'll use `MathJax <http://www.mathjax.org>`_ to change your
-plain text into "beautiful math." For more information about how to use
-MathJax in Studio, see :ref:`MathJax in Studio`.
+In math expression input problems, students enter text that represents a mathematical expression into a field, and the LMS changes that text to a symbolic expression that appears below that field. 
 
 .. image:: Images/MathExpressionInputExample.gif
  :alt: Image of math expression input problem
+
+Unlike numerical input problems, which only allow integers and a few select constants, math expression problems can include unknown variables and more complicated symbolic expressions. The grader uses a numerical sampling to determine whether the student's response matches the instructor-provided math expression, to a specified numerical tolerance. The instructor must specify the allowed variables in the expression as well as the range of values for each variable.
+
+.. warning:: Math expression input problems cannot currently include negative numbers raised to fractional powers, such as (-1)^(1/2). Math expression input problems can include complex numbers raised to fractional powers, or positive non-complex numbers raised to fractional powers.
+
+When you create a math expression input problem in Studio, you'll use `MathJax <http://www.mathjax.org>`_ to change your plain text into "beautiful math." For more information about how to use MathJax in Studio, see :ref:`MathJax in Studio`.
+
+The LMS automatically converts the following Greek letter names into the corresponding Greek characters when a student types them in the answer field:
+
+.. list-table::
+   :widths: 20 20 20 20
+   :header-rows: 0
+
+   * - alpha
+     - beta
+     - gamma
+     - delta
+   * - epsilon
+     - varepsilon
+     - zeta
+     - eta
+   * - theta
+     - vartheta
+     - iota
+     - kappa
+   * - lambda
+     - mu
+     - nu
+     - xi
+   * - pi
+     - rho
+     - sigma
+     - tau
+   * - upsilon
+     - phi
+     - varphi
+     - chi
+   * - psi
+     - omega
+     - 
+     - 
+
+note:: ``epsilon`` is the lunate version, whereas ``varepsilon`` looks like a backward 3.
 
 Create a Math Expression Input Problem
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

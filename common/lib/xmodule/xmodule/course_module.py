@@ -13,7 +13,7 @@ from xmodule.seq_module import SequenceDescriptor, SequenceModule
 from xmodule.graders import grader_from_conf
 import json
 
-from xblock.fields import Scope, List, String, Dict, Boolean
+from xblock.fields import Scope, List, String, Dict, Boolean, Integer
 from .fields import Date
 from xmodule.modulestore.locator import CourseLocator
 from django.utils.timezone import UTC
@@ -364,7 +364,7 @@ class CourseFields(object):
     # way to add in course-specific styling. There needs to be a discussion
     # about the right way to do this, but arjun will address this ASAP. Also
     # note that the courseware template needs to change when this is removed.
-    css_class = String(help="DO NOT USE THIS", scope=Scope.settings)
+    css_class = String(help="DO NOT USE THIS", scope=Scope.settings, default="")
 
     # TODO: This is a quick kludge to allow CS50 (and other courses) to
     # specify their own discussion forums as external links by specifying a
@@ -383,6 +383,9 @@ class CourseFields(object):
 
     display_coursenumber = String(help="An optional display string for the course number that will get rendered in the LMS",
                                   scope=Scope.settings)
+
+    max_student_enrollments_allowed = Integer(help="Limit the number of students allowed to enroll in this course.",
+                                              scope=Scope.settings)
 
 class CourseDescriptor(CourseFields, SequenceDescriptor):
     module_class = SequenceModule
@@ -821,6 +824,10 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
 
     @property
     def start_date_text(self):
+        """
+        Returns the desired text corresponding the course's start date.  Prefers .advertised_start,
+        then falls back to .start
+        """
         def try_parse_iso_8601(text):
             try:
                 result = Date().from_json(text)
@@ -835,11 +842,21 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
 
         if isinstance(self.advertised_start, basestring):
             return try_parse_iso_8601(self.advertised_start)
-        elif self.advertised_start is None and self.start is None:
-            # TODO this is an impossible state since the init function forces start to have a value
-            return 'TBD'
+        elif self.start_date_is_still_default:
+            _ = self.runtime.service(self, "i18n").ugettext
+            # Translators: TBD stands for 'To Be Determined' and is used when a course
+            # does not yet have an announced start date.
+            return _('TBD')
         else:
             return (self.advertised_start or self.start).strftime("%b %d, %Y")
+
+    @property
+    def start_date_is_still_default(self):
+        """
+        Checks if the start date set for the course is still default, i.e. .start has not been modified,
+        and .advertised_start has not been set.
+        """
+        return self.advertised_start is None and self.start == CourseFields.start.default
 
     @property
     def end_date_text(self):

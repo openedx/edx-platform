@@ -43,6 +43,8 @@
         ${_("Course Completed - {end_date}").format(end_date=course.end_date_text)}
         % elif course.has_started():
         ${_("Course Started - {start_date}").format(start_date=course.start_date_text)}
+        % elif course.start_date_is_still_default: # Course start date TBD
+        ${_("Course has not yet started")}
         % else:   # hasn't started yet
         ${_("Course Starts - {start_date}").format(start_date=course.start_date_text)}
         % endif

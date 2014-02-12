@@ -405,8 +405,9 @@ class XMLModuleStore(ModuleStoreReadBase):
         try:
             course_descriptor = self.load_course(course_dir, errorlog.tracker)
         except Exception as e:
-            msg = "ERROR: Failed to load course '{0}': {1}".format(course_dir.encode("utf-8"),
-                    unicode(e))
+            msg = "ERROR: Failed to load course '{0}': {1}".format(
+                course_dir.encode("utf-8"), unicode(e)
+            )
             log.exception(msg)
             errorlog.tracker(msg)
 
@@ -566,6 +567,9 @@ class XMLModuleStore(ModuleStoreReadBase):
 
         for filepath in glob.glob(path / '*'):
             if not os.path.isfile(filepath):
+                continue
+
+            if filepath.endswith('~'):  # skip *~ files
                 continue
 
             with open(filepath) as f:

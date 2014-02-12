@@ -255,8 +255,8 @@ class ViewsTestCase(TestCase):
         response = self.client.get(url)
         self.assertFalse('<script>' in response.content)
 
-
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+# setting TIME_ZONE explicitly
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE, TIME_ZONE="America/New_York")
 class BaseDueDateTests(ModuleStoreTestCase):
     """
     Base class that verifies that due dates are rendered correctly on a page
@@ -289,8 +289,8 @@ class BaseDueDateTests(ModuleStoreTestCase):
         self.request = self.request_factory.get("foo")
         self.request.user = self.user
 
-        self.time_with_utc = "due Sep 18, 2013 at 11:30 UTC"
-        self.time_without_utc = "due Sep 18, 2013 at 11:30"
+        self.time_with_tz = "due Sep 18, 2013 at 07:30 EDT"
+        self.time_without_tz = "due Sep 18, 2013 at 07:30"
 
     def test_backwards_compatability(self):
         # The test course being used has show_timezone = False in the policy file
@@ -299,35 +299,34 @@ class BaseDueDateTests(ModuleStoreTestCase):
         # remove the timezone.
         course = self.set_up_course(due_date_display_format=None, show_timezone=False)
         text = self.get_text(course)
-        self.assertIn(self.time_without_utc, text)
-        self.assertNotIn(self.time_with_utc, text)
+        self.assertIn(self.time_without_tz, text)
+        self.assertNotIn(self.time_with_tz, text)
         # Test that show_timezone has been cleared (which means you get the default value of True).
         self.assertTrue(course.show_timezone)
 
     def test_defaults(self):
         course = self.set_up_course()
         text = self.get_text(course)
-        self.assertIn(self.time_with_utc, text)
+        self.assertIn(self.time_with_tz, text)
 
     def test_format_none(self):
         # Same for setting the due date to None
         course = self.set_up_course(due_date_display_format=None)
         text = self.get_text(course)
-        self.assertIn(self.time_with_utc, text)
+        self.assertIn(self.time_with_tz, text)
 
     def test_format_plain_text(self):
         # plain text due date
         course = self.set_up_course(due_date_display_format="foobar")
         text = self.get_text(course)
-        self.assertNotIn(self.time_with_utc, text)
+        self.assertNotIn(self.time_with_tz, text)
         self.assertIn("due foobar", text)
 
     def test_format_date(self):
-
         # due date with no time
         course = self.set_up_course(due_date_display_format=u"%b %d %y")
         text = self.get_text(course)
-        self.assertNotIn(self.time_with_utc, text)
+        self.assertNotIn(self.time_with_tz, text)
         self.assertIn("due Sep 18 13", text)
 
     def test_format_hidden(self):
@@ -342,7 +341,7 @@ class BaseDueDateTests(ModuleStoreTestCase):
         course = self.set_up_course(due_date_display_format=u"%%%", show_timezone=False)
         text = self.get_text(course)
         self.assertNotIn("%%%", text)
-        self.assertIn(self.time_with_utc, text)
+        self.assertIn(self.time_with_tz, text)
 
 
 class TestProgressDueDate(BaseDueDateTests):

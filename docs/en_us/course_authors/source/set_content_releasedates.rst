@@ -159,7 +159,6 @@ When you edit a draft of a unit, you can view the unit's contents in two ways.
 * To view the unpublished content as you're working on it, click **Preview**.
 
 .. image:: Images/Viz_Revise_ViewLiveandPreview.png
- :width: 800
  :alt: Image of draft unit
 
 When you're ready to publish the draft of your revised content, 

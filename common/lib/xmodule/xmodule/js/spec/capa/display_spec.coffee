@@ -52,19 +52,19 @@ describe 'Problem', ->
       expect(window.update_schematics).toHaveBeenCalled()
 
     it 'bind answer refresh on button click', ->
-      expect($('section.action input:button')).toHandleWith 'click', @problem.refreshAnswers
+      expect($('div.action input:button')).toHandleWith 'click', @problem.refreshAnswers
 
     it 'bind the check button', ->
-      expect($('section.action input.check')).toHandleWith 'click', @problem.check_fd
+      expect($('div.action input.check')).toHandleWith 'click', @problem.check_fd
 
     it 'bind the reset button', ->
-      expect($('section.action input.reset')).toHandleWith 'click', @problem.reset
+      expect($('div.action input.reset')).toHandleWith 'click', @problem.reset
 
     it 'bind the show button', ->
-      expect($('section.action button.show')).toHandleWith 'click', @problem.show
+      expect($('div.action button.show')).toHandleWith 'click', @problem.show
 
     it 'bind the save button', ->
-      expect($('section.action input.save')).toHandleWith 'click', @problem.save
+      expect($('div.action input.save')).toHandleWith 'click', @problem.save
 
     it 'bind the math input', ->
       expect($('input.math')).toHandleWith 'keyup', @problem.refreshMath

@@ -6,7 +6,7 @@
  <% return _("{course_number} Courseware").format(course_number=course.display_number_with_default) %>
 </%def>
 
-<%block name="bodyclass">courseware ${course.css_class}</%block>
+<%block name="bodyclass">courseware ${course.css_class or ''}</%block>
 <%block name="title"><title>
     % if section_title: 
 ${page_title_breadcrumbs(section_title, course_name())}
@@ -18,6 +18,8 @@ ${page_title_breadcrumbs(course_name())}
 <%block name="headextra">
 <%static:css group='style-course-vendor'/>
 <%static:css group='style-course'/>
+
+<%block name="nav_skip">#course-content</%block>
 
 <%include file="../discussion/_js_head_dependencies.html" />
 
@@ -165,6 +167,10 @@ ${page_title_breadcrumbs(course_name())}
   </script>
 % endif
 
+<script type="text/template" id="image-modal-tpl">
+  <%static:include path="js/imageModal.underscore" />
+</script>
+
 ${fragment.foot_html()}
 
 </%block>
@@ -185,28 +191,28 @@ ${fragment.foot_html()}
  <%include file="/courseware/course_navigation.html" args="active_page='courseware'" />
 % endif
 
-<section class="container">
+<div class="container">
   <div class="course-wrapper">
 
 % if accordion:
-    <section aria-label="${_('Course Navigation')}" class="course-index">
+    <div class="course-index">
       <header id="open_close_accordion">
         <a href="#">${_("close")}</a>
       </header>
 
       <div id="accordion" style="display: none">
-        <nav>
+        <nav aria-label="${_('Course Navigation')}">
           ${accordion}
         </nav>
       </div>
-    </section>
+    </div>
 % endif
 
-    <section class="course-content">
+    <section class="course-content" id="course-content">
       ${fragment.body_html()}
     </section>
   </div>
-</section>
+</div>
 
 % if show_chat:
   <div id="chat-wrapper">

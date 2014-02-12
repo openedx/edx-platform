@@ -29,5 +29,5 @@ class TestConfiguration(TestCase):
         self.assertIsNotNone(locales)
         self.assertIsInstance(locales, list)
         self.assertIn('en', locales)
-        self.assertEqual('eo', CONFIGURATION.dummy_locale)
+        self.assertEqual('eo', CONFIGURATION.dummy_locales[0])
         self.assertEqual('en', CONFIGURATION.source_locale)

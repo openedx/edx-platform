@@ -10,6 +10,7 @@ locales:
     - cs  # Czech
     - cy  # Welsh
     - de_DE  # German (Germany)
+    - el  # Greek
     - en@lolcat  # LOLCAT English
     - en@pirate  # Pirate English
     - es_419  # Spanish (Latin America)
@@ -51,8 +52,10 @@ locales:
     - zh_TW  # Chinese (Taiwan)
 
 
-# The locale used for fake-accented English, for testing.
-dummy-locale: eo
+# The locales used for fake-accented English, for testing.
+dummy_locales:
+    - eo
+    - fake2
 
 # Directories we don't search for strings.
 ignore_dirs:

@@ -160,7 +160,7 @@ class Users(SysadminDashboardView):
         email_domain = getattr(settings, 'SSL_AUTH_EMAIL_DOMAIN', 'MIT.EDU')
 
         msg = u''
-        if settings.FEATURES['AUTH_USE_MIT_CERTIFICATES']:
+        if settings.FEATURES['AUTH_USE_CERTIFICATES']:
             if not '@' in uname:
                 email = '{0}@{1}'.format(uname, email_domain)
             else:
@@ -202,7 +202,7 @@ class Users(SysadminDashboardView):
         profile.name = name
         profile.save()
 
-        if settings.FEATURES['AUTH_USE_MIT_CERTIFICATES']:
+        if settings.FEATURES['AUTH_USE_CERTIFICATES']:
             credential_string = getattr(settings, 'SSL_AUTH_DN_FORMAT_STRING',
                                         '/C=US/ST=Massachusetts/O=Massachusetts Institute of Technology/OU=Client CA v1/CN={0}/emailAddress={1}')
             credentials = credential_string.format(name, email)

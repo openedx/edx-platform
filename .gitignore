@@ -18,6 +18,7 @@ cms/envs/private.py
 .idea/
 .redcar/
 codekit-config.json
+.pycharm_helpers/
 
 ### NFS artifacts
 .nfs*
@@ -37,6 +38,8 @@ codekit-config.json
 !djangojs.mo
 conf/locale/en/LC_MESSAGES/*.po
 conf/locale/en/LC_MESSAGES/*.mo
+conf/locale/fake*/LC_MESSAGES/*.po
+conf/locale/fake*/LC_MESSAGES/*.mo
 conf/locale/messages.mo
 
 ### Testing artifacts
@@ -89,3 +92,4 @@ build
 lms/lib/comment_client/python
 autodeploy.properties
 .ws_migrations_complete
+dist

@@ -226,14 +226,14 @@
           width: 100%;
 
           .university {
-            border-right: 1px solid $border-color-2;
             color: $lighter-base-font-color;
             letter-spacing: 1px;
-            margin-right: 10px;
-            padding-right: 10px;
           }
 
           .start-date  {
+            border-left: 1px solid $border-color-2;
+            margin-left: 5px;
+            padding-left: 10px;
             color: $lighter-base-font-color;
             letter-spacing: 1px;
           }

@@ -196,6 +196,17 @@
                     });
                 });
 
+                it('speed_change_video event is not logged when speed not change', function () {
+                    expect(state.videoPlayer.log).not.toHaveBeenCalledWith(
+                        'speed_change_video',
+                        {
+                            current_time: state.videoPlayer.currentTime,
+                            old_speed: state.speed,
+                            new_speed: state.speed
+                        }
+                    );
+                });
+
                 it('log the play_video event', function () {
                     expect(state.videoPlayer.log).toHaveBeenCalledWith(
                         'play_video', { currentTime: 0 }

@@ -28,6 +28,7 @@ Contents
    open_response_assessment
    google_hangouts
    tools
+   additional_tools
    set_content_releasedates
    view_course_content
    export_import_course
@@ -36,6 +37,8 @@ Contents
    ora_students
    discussions
    discussion_guidance_moderators
+   course_student
+   course_grades
    glossary
 
 

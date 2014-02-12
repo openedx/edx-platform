@@ -3,7 +3,6 @@ Tests related to the Microsites feature
 """
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
-from unittest import skip
 
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 

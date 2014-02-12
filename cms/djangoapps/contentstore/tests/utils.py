@@ -57,6 +57,13 @@ class AjaxEnabledTestClient(Client):
         """
         return self.get(path, data or {}, follow, HTTP_ACCEPT="application/json", **extra)
 
+    def get_fragment(self, path, data=None, follow=False, **extra):
+        """
+        Convenience method for client.get which sets the accept type to application/x-fragment+json
+        """
+        return self.get(path, data or {}, follow, HTTP_ACCEPT="application/x-fragment+json", **extra)
+
+
 
 @override_settings(MODULESTORE=TEST_MODULESTORE)
 class CourseTestCase(ModuleStoreTestCase):

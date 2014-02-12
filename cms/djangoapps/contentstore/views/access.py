@@ -22,13 +22,13 @@ def has_course_access(user, location, role=CourseStaffRole):
     return auth.has_access(user, role(location))
 
 
-def get_user_role(user, location, context):
+def get_user_role(user, location, context=None):
     """
     Return corresponding string if user has staff or instructor role in Studio.
     This will not return student role because its purpose for using in Studio.
 
-    :param location: a descriptor.location
-    :param context: a course_id
+    :param location: a descriptor.location (which may be a Location or a CourseLocator)
+    :param context: a course_id. This is not used if location is a CourseLocator.
     """
     if auth.has_access(user, CourseInstructorRole(location, context)):
         return 'instructor'

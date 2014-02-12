@@ -10,7 +10,11 @@ def run_acceptance_tests(system, harvest_args)
 
     report_file = File.join(ACCEPTANCE_REPORT_DIR, "#{system}.xml")
     report_args = "--with-xunit --xunit-file #{report_file}"
-    test_sh(django_admin(system, 'acceptance', 'harvest', '--debug-mode', '--verbosity 2', report_args, harvest_args))
+    cmd = django_admin(
+        system, 'acceptance', 'harvest', '--debug-mode',
+        '--verbosity 2', report_args, harvest_args
+    )
+    test_sh("#{system} acceptance tests", cmd)
 end
 
 task :setup_acceptance_db do
@@ -76,11 +80,15 @@ namespace :test do
             end
 
             desc "Run acceptance tests for the #{system} without collectstatic or db migrations"
-            task "#{system}:fast", [:harvest_args] => [
-                :clean_reports_dir, ACCEPTANCE_REPORT_DIR,
-            ] do |t, args|
+            task "#{system}:fast", [:harvest_args] => [:clean_reports_dir, ACCEPTANCE_REPORT_DIR] do |t, args|
                 args.with_defaults(:harvest_args => '')
-                run_acceptance_tests(system, args.harvest_args)
+
+                begin
+                    run_acceptance_tests(system, args.harvest_args)
+                ensure
+                    Rake::Task[:'test:clean_mongo'].reenable
+                    Rake::Task[:'test:clean_mongo'].invoke
+                end
             end
         end
     end

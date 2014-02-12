@@ -1,4 +1,4 @@
-define ["coffee/src/views/module_edit", "js/models/module_info", "xmodule"], (ModuleEdit, ModuleModel) ->
+define ["jquery", "coffee/src/views/module_edit", "js/models/module_info", "xmodule"], ($, ModuleEdit, ModuleModel) ->
 
     describe "ModuleEdit", ->
       beforeEach ->
@@ -24,7 +24,7 @@ define ["coffee/src/views/module_edit", "js/models/module_info", "xmodule"], (Mo
           </section>
         </li>
         """
-        spyOn($.fn, 'load').andReturn(@moduleData)
+        spyOn($, 'ajax').andReturn(@moduleData)
 
         @moduleEdit = new ModuleEdit(
           el: $(".component")
@@ -56,13 +56,62 @@ define ["coffee/src/views/module_edit", "js/models/module_info", "xmodule"], (Mo
           beforeEach ->
             spyOn(@moduleEdit, 'loadDisplay')
             spyOn(@moduleEdit, 'delegateEvents')
+            spyOn($.fn, 'append')
+            spyOn($, 'getScript')
+
+            window.loadedXBlockResources = undefined
+
             @moduleEdit.render()
+            $.ajax.mostRecentCall.args[0].success(
+              html: '<div>Response html</div>'
+              resources: [
+                ['hash1', {kind: 'text', mimetype: 'text/css', data: 'inline-css'}],
+                ['hash2', {kind: 'url', mimetype: 'text/css', data: 'css-url'}],
+                ['hash3', {kind: 'text', mimetype: 'application/javascript', data: 'inline-js'}],
+                ['hash4', {kind: 'url', mimetype: 'application/javascript', data: 'js-url'}],
+                ['hash5', {placement: 'head', mimetype: 'text/html', data: 'head-html'}],
+                ['hash6', {placement: 'not-head', mimetype: 'text/html', data: 'not-head-html'}],
+              ]
+            )
 
           it "loads the module preview and editor via ajax on the view element", ->
-            expect(@moduleEdit.$el.load).toHaveBeenCalledWith("/xblock/#{@moduleEdit.model.id}", jasmine.any(Function))
-            @moduleEdit.$el.load.mostRecentCall.args[1]()
+            expect($.ajax).toHaveBeenCalledWith(
+              url: "/xblock/#{@moduleEdit.model.id}"
+              type: "GET"
+              headers:
+                Accept: 'application/x-fragment+json'
+              success: jasmine.any(Function)
+            )
             expect(@moduleEdit.loadDisplay).toHaveBeenCalled()
             expect(@moduleEdit.delegateEvents).toHaveBeenCalled()
+
+          it "loads inline css from fragments", ->
+            expect($('head').append).toHaveBeenCalledWith("<style type='text/css'>inline-css</style>")
+
+          it "loads css urls from fragments", ->
+            expect($('head').append).toHaveBeenCalledWith("<link rel='stylesheet' href='css-url' type='text/css'>")
+
+          it "loads inline js from fragments", ->
+            expect($('head').append).toHaveBeenCalledWith("<script>inline-js</script>")
+
+          it "loads js urls from fragments", ->
+            expect($.getScript).toHaveBeenCalledWith("js-url")
+
+          it "loads head html", ->
+            expect($('head').append).toHaveBeenCalledWith("head-html")
+
+          it "doesn't load body html", ->
+            expect($.fn.append).not.toHaveBeenCalledWith('not-head-html')
+
+          it "doesn't reload resources", ->
+            count = $('head').append.callCount
+            $.ajax.mostRecentCall.args[0].success(
+              html: '<div>Response html 2</div>'
+              resources: [
+                ['hash1', {kind: 'text', mimetype: 'text/css', data: 'inline-css'}],
+              ]
+            )
+            expect($('head').append.callCount).toBe(count)
 
         describe "loadDisplay", ->
           beforeEach ->

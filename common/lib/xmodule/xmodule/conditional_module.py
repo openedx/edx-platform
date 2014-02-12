@@ -222,9 +222,9 @@ class ConditionalDescriptor(ConditionalFields, SequenceDescriptor):
         show_tag_list = []
         for child in xml_object:
             if child.tag == 'show':
-                location = ConditionalDescriptor.parse_sources(child, system)
-                children.extend(location)
-                show_tag_list.extend(location.url())  # pylint: disable=no-member
+                locations = ConditionalDescriptor.parse_sources(child, system)
+                children.extend(locations)
+                show_tag_list.extend(location.url() for location in locations)  # pylint: disable=no-member
             else:
                 try:
                     descriptor = system.process_xml(etree.tostring(child))
@@ -244,6 +244,5 @@ class ConditionalDescriptor(ConditionalFields, SequenceDescriptor):
                     tag_name='show', sources=location)
                 xml_object.append(etree.fromstring(show_str))
             else:
-                xml_object.append(
-                    etree.fromstring(child.export_to_xml(resource_fs)))
+                self.runtime.add_block_as_child_node(child, xml_object)
         return xml_object

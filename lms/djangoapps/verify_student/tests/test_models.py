@@ -2,11 +2,8 @@
 from datetime import timedelta, datetime
 import json
 from xmodule.modulestore.tests.factories import CourseFactory
-from nose.tools import (
-    assert_in, assert_is_none, assert_equals, assert_not_equals, assert_raises,
-    assert_true, assert_false
-)
-from mock import MagicMock, patch
+from nose.tools import assert_is_none, assert_equals, assert_raises, assert_true, assert_false
+from mock import patch
 import pytz
 from django.test import TestCase
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
@@ -20,8 +17,6 @@ from verify_student.models import (
     SoftwareSecurePhotoVerification, VerificationException,
 )
 from reverification.tests.factories import MidcourseReverificationWindowFactory
-from util.testing import UrlResetMixin
-import verify_student.models
 
 FAKE_SETTINGS = {
     "SOFTWARE_SECURE": {

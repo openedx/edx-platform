@@ -139,7 +139,7 @@ class AnnotatableSteps(object):
         self.active_problem = problem
 
     def active_problem_selector(self, subselector):
-        return 'section[data-problem-id="{}"] {}'.format(
+        return 'div[data-problem-id="{}"] {}'.format(
             world.scenario_dict['PROBLEMS'][self.active_problem].location.url(),
             subselector,
         )

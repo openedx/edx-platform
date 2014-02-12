@@ -85,7 +85,6 @@ XQUEUE_INTERFACE = {
 }
 XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5  # seconds
 
-
 # Don't rely on a real staff grading backend
 MOCK_STAFF_GRADING = True
 MOCK_PEER_GRADING = True
@@ -113,10 +112,6 @@ MODULESTORE = {
         }
     }
 }
-
-# Starting modulestores generates log messages.  If we wait to init modulestores,
-# then those messages will be silenced by the test runner.
-INIT_MODULESTORE_ON_STARTUP = False
 
 CONTENTSTORE = {
     'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',

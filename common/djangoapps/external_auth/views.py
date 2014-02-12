@@ -253,7 +253,7 @@ def _signup(request, eamap, retfun=None):
     # save this for use by student.views.create_account
     request.session['ExternalAuthMap'] = eamap
 
-    if settings.FEATURES.get('AUTH_USE_MIT_CERTIFICATES_IMMEDIATE_SIGNUP', ''):
+    if settings.FEATURES.get('AUTH_USE_CERTIFICATES_IMMEDIATE_SIGNUP', ''):
         # do signin immediately, by calling create_account, instead of asking
         # student to fill in form.  MIT students already have information filed.
         username = eamap.external_email.split('@', 1)[0]
@@ -362,7 +362,7 @@ def ssl_login_shortcut(fn):
         call.
         """
 
-        if not settings.FEATURES['AUTH_USE_MIT_CERTIFICATES']:
+        if not settings.FEATURES['AUTH_USE_CERTIFICATES']:
             return fn(*args, **kwargs)
         request = args[0]
 
@@ -394,7 +394,7 @@ def ssl_login_shortcut(fn):
 def ssl_login(request):
     """
     This is called by branding.views.index when
-    FEATURES['AUTH_USE_MIT_CERTIFICATES'] = True
+    FEATURES['AUTH_USE_CERTIFICATES'] = True
 
     Used for MIT user authentication.  This presumes the web server
     (nginx) has been configured to require specific client
@@ -408,7 +408,7 @@ def ssl_login(request):
     Else continues on with student.views.index, and no authentication.
     """
     # Just to make sure we're calling this only at MIT:
-    if not settings.FEATURES['AUTH_USE_MIT_CERTIFICATES']:
+    if not settings.FEATURES['AUTH_USE_CERTIFICATES']:
         return HttpResponseForbidden()
 
     cert = ssl_get_cert_from_request(request)

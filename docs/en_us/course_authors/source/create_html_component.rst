@@ -83,7 +83,7 @@ To create an HTML component:
 
    An empty component appears at the bottom of the unit.
 
-  .. image:: Images/HTMLComponent_Edit.gif
+  .. image:: Images/HTMLComponent_Edit.png
    :alt: Image of an empty HTML component
 
 3. In the empty component, click **Edit**.

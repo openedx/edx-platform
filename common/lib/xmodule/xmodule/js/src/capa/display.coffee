@@ -19,11 +19,11 @@ class @Problem
 
     problem_prefix = @element_id.replace(/problem_/,'')
     @inputs = @$("[id^=input_#{problem_prefix}_]")
-    @$('section.action input:button').click @refreshAnswers
-    @$('section.action input.check').click @check_fd
-    @$('section.action input.reset').click @reset
-    @$('section.action button.show').click @show
-    @$('section.action input.save').click @save
+    @$('div.action input:button').click @refreshAnswers
+    @$('div.action input.check').click @check_fd
+    @$('div.action input.reset').click @reset
+    @$('div.action button.show').click @show
+    @$('div.action input.save').click @save
 
     @bindResetCorrectness()
 

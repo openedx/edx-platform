@@ -16,14 +16,14 @@
 
 <%block name="pagetitle">${_("Register for {platform_name}").format(platform_name=platform_name)}</%block>
 
+<%block name="bodyclass">view-register</%block>
+
 <%block name="js_extra">
   <script type="text/javascript">
     $(function() {
 
-      var view_name = 'view-register';
-
       // adding js class for styling with accessibility in mind
-      $('body').addClass('js').addClass(view_name);
+      $('body').addClass('js');
 
       // new window/tab opening
       $('a[rel="external"], a[class="new-vp"]')

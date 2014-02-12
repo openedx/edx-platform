@@ -24,20 +24,20 @@ from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.xml import LocationReader
 
 
+MODULE_DIR = path(__file__).dirname()
 # Location of common test DATA directory
 # '../../../../edx-platform/common/test/data/'
-MODULE_DIR = path(__file__).dirname()
-DATA_DIR = path.joinpath(*MODULE_DIR.splitall()[:-4]) / 'test/data/'
+DATA_DIR = MODULE_DIR.parent.parent.parent.parent / "test" / "data"
 
 
 open_ended_grading_interface = {
-        'url': 'blah/',
-        'username': 'incorrect_user',
-        'password': 'incorrect_pass',
-        'staff_grading' : 'staff_grading',
-        'peer_grading' : 'peer_grading',
-        'grading_controller' : 'grading_controller'
-    }
+    'url': 'blah/',
+    'username': 'incorrect_user',
+    'password': 'incorrect_pass',
+    'staff_grading': 'staff_grading',
+    'peer_grading': 'peer_grading',
+    'grading_controller': 'grading_controller',
+}
 
 
 class TestModuleSystem(ModuleSystem):  # pylint: disable=abstract-method

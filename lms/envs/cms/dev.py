@@ -8,7 +8,7 @@ Settings for the LMS that runs alongside the CMS on AWS
 
 from ..dev import *
 
-FEATURES['AUTH_USE_MIT_CERTIFICATES'] = False
+FEATURES['AUTH_USE_CERTIFICATES'] = False
 
 SUBDOMAIN_BRANDING['edge'] = 'edge'
 SUBDOMAIN_BRANDING['preview.edge'] = 'edge'
