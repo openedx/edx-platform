@@ -44,8 +44,6 @@ Accessibility Improvements
 
 * In the student Progress tab, ordered list tags (<ol>) were replaced with <div> tags, to improve how screen readers interpret the screen.
 
-* The default course CSS class was changed from null to an empty string. [Benefit to screen readers?] 
-
 * IDs were added to parts of the course navigation where they were missing, making it easier to skip parts of the course when using a screen reader.
 
 * Updates to unit pages now make navigation more accessible to screen readers.
