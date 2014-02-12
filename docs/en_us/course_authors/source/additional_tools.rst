@@ -13,27 +13,38 @@ Individual course teams frequently create tools and problem types that don't hav
 
 Below, you'll find the information you need to create the following tools.
 
-* :ref:`Gene Editor`
+* :ref:`Gene Explorer`
 * :ref:`Interactive Periodic Table`
 * :ref:`Molecule Editor`
 * :ref:`Multiple Choice and Numerical Input`
 * :ref:`Protein Builder`
 
-.. _Gene Editor:
+.. _Gene Explorer:
 
 **************************
-Genex Gene Editor
+Gene Explorer
 **************************
 
-.. warning:: Description of gene editor--I'm not sure what this tool does, exactly. Help?
+The Gene Explorer (GeneX), from the biology department at `UMB <http://www.umb.edu/>`_, simulates the transcription, splicing, processing, and translation of a small hypothetical eukaryotic gene. GeneX allows students to make specific mutations in a gene sequence, and it then calculates and displays the effects of the mutations on the mRNA and protein. 
 
-.. image:: /Images/GeneEditor.gif
-  :alt: Image of the interactive periodic table
+Specifically, the Gene Explorer does the following:
 
-.. _Create the Gene Editor:
+#. Finds the promoter and terminator
+#. Reads the DNA sequence to produce the pre-mRNA
+#. Finds the splice sites
+#. Splices and tails the mRNA
+#. Finds the start codon
+#. Translates the mRNA
+
+.. image:: /Images/GeneExplorer.png
+  :alt: Image of the Gene Explorer
+
+For more information about the Gene Explorer, see `The Gene Explorer <http://intro.bio.umb.edu/GX/>`_.
+
+.. _Create the Gene Explorer:
 
 ==========================
-Create the Gene Editor
+Create the Gene Explorer
 ==========================
 
 #. In the unit where you want to create the problem, click **Problem** under **Add New Component**, and then click the **Advanced** tab.
@@ -43,40 +54,32 @@ Create the Gene Editor
 #. Click **Save**.
 
 =====================
-Gene Editor Code
+Gene Explorer Code
 =====================
-
-.. warning:: Jean-Michel, can you provide problem text for this?
 
 ::
 
-<problem>
-<script type="loncapa/python">
-def genex_grader(expect,ans):
-    if ans=="CORRECT": return True
-    import json
-    ans=json.loads(ans)
-    return ans["genex_answer"]=="CORRECT"
-</script>
-<customresponse cfn="genex_grader">
-<editageneinput width="818" height="1000" dna_sequence="TAAGGCTATAACCGAGATTGATGCCTTGTGCGATAAGGTGTGTCCCCCCCCAAAGTGTCGGATGTCGAGTGCGCGTGCAAAAAAAAACAAAGGCGAGGACCTTAAGAAGGTGTGAGGGGGCGCTCGAT" genex_dna_sequence="TAAGGCTATAACCGAGATTGATGCCTTGTGCGATAAGGTGTGTCCCCCCCCAAAGTGTCGGATGTCGAGTGCGCGTGCAAAAAAAAACAAAGGCGAGGACCTTAAGAAGGTGTGAGGGGGCGCTCGAT" genex_problem_number="2"/>
-</customresponse>
-</problem>
-
-.. note::
+  <problem>
+  <p>Make a single base pair substitution mutation in the gene below that results in a protein that is longer than the protein produced by the original gene. When you are satisfied with your change and its effect, click the <b>SUBMIT</b> button.</p>
+  <p>Note that a "single base pair substitution mutation" is when a single base is changed to another base; for example, changing the A at position 80 to a T. Deletions and insertions are not allowed.</p>
+  <script type="loncapa/python">
+  def genex_grader(expect,ans):
+      if ans=="CORRECT": return True
+      import json
+      ans=json.loads(ans)
+      return ans["genex_answer"]=="CORRECT"
+  </script>
+  <customresponse cfn="genex_grader">
+  <editageneinput width="818" height="1000" dna_sequence="TAAGGCTATAACCGAGATTGATGCCTTGTGCGATAAGGTGTGTCCCCCCCCAAAGTGTCGGATGTCGAGTGCGCGTGCAAAAAAAAACAAAGGCGAGGACCTTAAGAAGGTGTGAGGGGGCGCTCGAT" genex_dna_sequence="TAAGGCTATAACCGAGATTGATGCCTTGTGCGATAAGGTGTGTCCCCCCCCAAAGTGTCGGATGTCGAGTGCGCGTGCAAAAAAAAACAAAGGCGAGGACCTTAAGAAGGTGTGAGGGGGCGCTCGAT" genex_problem_number="2"/>
+  </customresponse>
+  </problem>
 
 In this code:
 
 * **width** and **height** specify the dimensions of the application, in pixels.
 * **genex_dna_sequence** is the default DNA sequence that appears when the problem opens.
 * **dna_sequence** contains the application's state and the student's answer. This value must be the same as **genex_dna_sequence**. 
-* **genex_problem_number** determines what the user has to find to answer the problem correctly. It is hard-coded in the Java GWT code that is used to produce the JS. Its value can range from 1 to 5 and corresponds to the 5 'Edit a Gene' problems encountered in 7.00x.
-
-.. warning:: Jean-Michel: I'm not sure what to say about **genex_problem_number, since this info is just for 7.00x. Would something like this work?
-
-  **genex_problem_number** specifies the number of the problem. This number is based on the five gene editor problems in the MITx 7.00x course--for example, if you want this problem to look like the second gene editor problem in the 7.00x course, you would set the **genex_problem_number** value to 2. The number must be 1, 2, 3, 4, or 5.
-
-  (This seems a little odd--do all courses have to use the same five gene editor problems?)
+* **genex_problem_number** specifies the number of the problem. This number is based on the five gene editor problems in the MITx 7.00x course--for example, if you want this problem to look like the second gene editor problem in the 7.00x course, you would set the **genex_problem_number** value to 2. The number must be 1, 2, 3, 4, or 5.
 
 
 .. _Interactive Periodic Table:
@@ -121,9 +124,7 @@ To create the periodic table, you need an HTML component.
 Molecule Editor
 ************************
 
-.. warning:: Jean-Michel: I started creating documentation for this a couple of weeks ago, based on the molecule editor in the demo course. In addition to the problem XML that you provided, that problem included some HTML text as well. Can you look over it and let me know if you think it's OK to keep that in? (To be honest, the two collapsible sections in the HTML component look kind of ugly in the LMS, so I'm happy to hear any suggestions for them.)
-
-Students can use the molecule editor to learn how to create molecules. The molecule editor allows students to draw molecules that follow the rules for covalent bond formation and formal charge, but are chemically impossible. The molecule editor warns students if they try to submit a structure that is not possible.
+Students can use the molecule editor to learn how to create molecules. The molecule editor allows students to draw molecules that follow the rules for covalent bond formation and formal charge, even if the molecules are chemically impossible, are unstable, or do not exist in living systems. The molecule editor warns students if they try to submit a structure that is chemically impossible.
 
 The molecule editor incorporates two tools: the JSME molecule editor created by Peter Erl and Bruno Bienfait, and JSmol, a JavaScript-based molecular viewer from Jmol. (You don't need to download either of these tools--Studio uses them automatically.) For more information about the JSME molecule editor, see `JSME Molecule Editor <http://peter-ertl.com/jsme/index.html>`_. For more information about JSmol, see `JSmol <http://sourceforge.net/projects/jsmol/>`_.
 
@@ -140,11 +141,11 @@ To create a molecule editor, you need the following files:
 
 * MoleculeAnswer.png
 * MoleculeEditor_HTML.png
-* Molecules_Dopamine.mol
+* dopamine.mol
 
 To download all of these files in a .zip archive, go to http://files.edx.org/MoleculeEditorFiles.zip.
 
-.. note:: The molecule that appears when the tool starts is a dopamine molecule. To use a different molecule, download the .mol file for that molecule from the `list of molecules <http://www.biotopics.co.uk/jsmol/molecules/>`_ on the `BioTopics <http://www.biotopics.co.uk/>`_ website. Then, upload the .mol file to the **Files & Uploads** page for your course in Studio, and change "Molecules_Dopamine.mol" in the example code to the name of your .mol file.
+.. note:: The molecule that appears when the tool starts is a dopamine molecule. To use a different molecule, download the .mol file for that molecule from the `list of molecules <http://www.biotopics.co.uk/jsmol/molecules/>`_ on the `BioTopics <http://www.biotopics.co.uk/>`_ website. Then, upload the .mol file to the **Files & Uploads** page for your course in Studio, and change "dopamine.mol" in the example code to the name of your .mol file.
 
 To create the molecule editor that appears in the image above, you need an HTML component followed by a Problem component.
 
@@ -219,14 +220,6 @@ Problem Component
 
 **Problem 1**
 
-.. warning:: Jean-Michel: The code for Problem 3 is the code that's in the problem in the demo course (except that I changed the name of the dopamine.mol file to Dopamine_Molecule.mol). Is it still usable?  (If not, no big deal.) 
-  
-    Also, can you supply sample text for the two sample problems you've provided? (For the first one, for example, it could just be "The dopamine molecule, as shown, cannot make strong hydrogen bonds. Edit the dopamine molecule so that it can make strong hydrogen bonds." But I'm not sure what the second one is trying to do.)
-
-    In problems 1 and 2, the file path is "/static/**molecules**/dopamine.mol". Should this just be "static/dopamine.mol"?
-
-    And one more thing: Problem 3 includes an answer. Do we want to do that for the other problems?
-
 ::
 
   <problem>
@@ -239,7 +232,7 @@ Problem Component
       return any(res == "Can Make Ionic Bonds" for res in mol_info)
       </script>
     <customresponse cfn="check1">
-      <editamoleculeinput file="/static/Molecules_Dopamine.mol">
+      <editamoleculeinput file="/static/dopamine.mol">
           </editamoleculeinput>
     </customresponse>
     <solution>
@@ -252,6 +245,7 @@ Problem Component
 ::
 
   <problem>
+  <p>The dopamine molecule, as shown, cannot make strong hydrogen bonds. Edit the dopamine molecule so that it can make strong hydrogen bonds.</p>
   <script type="loncapa/python">
   def grader_1(expect, ans):
       import json
@@ -259,7 +253,7 @@ Problem Component
       return any(res == "Cannot Make Strong Hydrogen Bonds" for res in mol_info)
   </script>
     <customresponse cfn="grader_1">
-      <editamoleculeinput file="/static/molecules/dopamine.mol">
+      <editamoleculeinput file="/static/dopamine.mol">
       </editamoleculeinput>
     </customresponse>
   </problem>
@@ -268,7 +262,8 @@ Problem Component
 
 ::
 
-  <problem">
+  <problem>
+  <p>The dopamine molecule has an intermediate hydrophobicity. Edit the dopamine molecule so that it is more hydrophobic.</p>
   <script type="loncapa/python">
   def grader_2(expect, ans):
       import json
@@ -279,7 +274,7 @@ Problem Component
       return hydrophobicity_index &gt; .490
   </script>
     <customresponse cfn="grader_2">
-      <editamoleculeinput file="/static/molecules/dopamine.mol">
+      <editamoleculeinput file="/static/dopamine.mol">
       </editamoleculeinput>
   </customresponse>
   </problem>
