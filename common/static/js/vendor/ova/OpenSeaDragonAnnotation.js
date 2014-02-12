@@ -71,8 +71,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
         this.isAnnotating = false; //If the user is annotating
         this.isDrawing = false; //if the user is drawing something
         
-		//Init
-		this.init();
+	//Init
+	this.init();
 	};
 	
 	//-- Methods
@@ -98,7 +98,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 			var self = this;
 		},
 		newAnnotation:function(){
-			console.log("new annotation");
 			var annotator = this.annotator;
 			
 			//This variable is to say the editor that we want create an image annotation
@@ -348,25 +347,24 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 		_createNewButton:function(){
 			var viewer = this.viewer,
 				onFocusHandler          = $.delegate( this, onFocus ),
-		        onBlurHandler           = $.delegate( this, onBlur ),
-		        onModeAnnotationHandler  = $.delegate( this, this.modeAnnotation );
-			/* Buttons */
-			var viewer = this.viewer;
-			var self = this;
-			console.log(this);
-			viewer.modeAnnotation = new $.Button({
-		        element:    viewer.modeAnnotation ? $.getElement( viewer.modeAnnotation ) : null,
-		        clickTimeThreshold: viewer.clickTimeThreshold,
-		        clickDistThreshold: viewer.clickDistThreshold,
-		        tooltip:    "New Annotation",
-		        srcRest:    self.resolveUrl( viewer.prefixUrl,"newan_rest.png"),
-		        srcGroup:  	self.resolveUrl( viewer.prefixUrl,"newan_grouphover.png"),
-		        srcHover:   self.resolveUrl( viewer.prefixUrl,"newan_hover.png"),
-		        srcDown:    self.resolveUrl( viewer.prefixUrl,"newan_pressed.png"),
-		        onRelease:  onModeAnnotationHandler,
-		        onFocus:    onFocusHandler,
-		        onBlur:     onBlurHandler
-		    });
+				onBlurHandler           = $.delegate( this, onBlur ),
+				onModeAnnotationHandler  = $.delegate( this, this.modeAnnotation );
+				/* Buttons */
+				var viewer = this.viewer;
+				var self = this;
+				viewer.modeAnnotation = new $.Button({
+					element:    viewer.modeAnnotation ? $.getElement( viewer.modeAnnotation ) : null,
+					clickTimeThreshold: viewer.clickTimeThreshold,
+					clickDistThreshold: viewer.clickDistThreshold,
+					tooltip:    "New Annotation",
+					srcRest:    self.resolveUrl( viewer.prefixUrl,"newan_rest.png"),
+					srcGroup:  	self.resolveUrl( viewer.prefixUrl,"newan_grouphover.png"),
+					srcHover:   self.resolveUrl( viewer.prefixUrl,"newan_hover.png"),
+					srcDown:    self.resolveUrl( viewer.prefixUrl,"newan_pressed.png"),
+					onRelease:  onModeAnnotationHandler,
+					onFocus:    onFocusHandler,
+					onBlur:     onBlurHandler
+				    });
 		    
 		    //- Wrapper Annotation Menu
 			viewer.wrapperAnnotation = new $.ButtonGroup({
@@ -443,10 +441,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 			
 			elem[0].style.display = 'block'; //Show the adder
 		
-			//TODO- Fix in full screen mode
-			positionAdder.left = startPoint.x + (endPoint.x - startPoint.x) / 2 - positionAnnotator.x;
-			positionAdder.top = startPoint.y + (endPoint.y - startPoint.y) / 2; //It is not necessary fix with - positionAnnotator.y
-		
+			positionAdder.left = (startPoint.x - positionAnnotator.x) + (endPoint.x - startPoint.x) / 2;
+			positionAdder.top =  (startPoint.y - positionAnnotator.y) + (endPoint.y - startPoint.y) / 2; //It is not necessary fix with - positionAnnotator.y
 			elem.css(positionAdder);
 		},
 		resolveUrl: function( prefix, url ) {
