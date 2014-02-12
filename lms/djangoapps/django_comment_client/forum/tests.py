@@ -271,6 +271,25 @@ class CommentsServiceRequestHeadersTestCase(UrlResetMixin, ModuleStoreTestCase):
         for actual in mock_request.call_args_list:
             self.assertEqual(expected, actual)
 
+    def test_accept_language(self, mock_request):
+        lang = "eo"
+        text = "dummy content"
+        thread_id = "test_thread_id"
+        mock_request.side_effect = make_mock_request_impl(text, thread_id)
+
+        self.client.get(
+            reverse(
+                "django_comment_client.forum.views.single_thread",
+                kwargs={
+                    "course_id": self.course.id,
+                    "discussion_id": "dummy",
+                    "thread_id": thread_id,
+                }
+            ),
+            HTTP_ACCEPT_LANGUAGE=lang,
+        )
+        self.assert_all_calls_have_header(mock_request, "Accept-Language", lang)
+
     @override_settings(COMMENTS_SERVICE_KEY="test_api_key")
     def test_api_key(self, mock_request):
         mock_request.side_effect = make_mock_request_impl("dummy", "dummy")
