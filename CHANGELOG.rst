@@ -14,6 +14,8 @@ Blades: Add view for field type Dict in Studio. BLD-658.
 
 Blades: Refactor stub implementation of LTI Provider. BLD-601.
 
+Studio: Added ability to edit course short descriptions that appear on the course catalog page.
+
 LMS: In left accordion and progress page, due dates are now displayed in time
 zone specified by settings.TIME_ZONE, instead of UTC always
 

@@ -73,6 +73,9 @@ FEATURES = {
 
     # Turn off account locking if failed login attempts exceeds a limit
     'ENABLE_MAX_FAILED_LOGIN_ATTEMPTS': False,
+
+    # Allow editing of short description in course settings in cms
+    'EDITABLE_SHORT_DESCRIPTION': True,
 }
 ENABLE_JASMINE = False
 
