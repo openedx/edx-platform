@@ -1,5 +1,10 @@
 <%! from django.utils.translation import ugettext as _ %>
-
+<style type="text/css">
+      .openseadragon1 {
+          width: 800px;
+          height: 600px;
+      }
+    </style>
 <div class="annotatable-wrapper">
 	<div class="annotatable-header">
 		% if display_name is not UNDEFINED and display_name is not None:
@@ -19,11 +24,7 @@
 	% endif
 	<div class="annotatable-section">
 		<div class="annotatable-content">
-		    <div id="videoHolder">
-				<video id="vid1" class="video-js vjs-default-skin" controls preload="none" width="640" height="264" poster="${poster}">
-					<source src="${sourceUrl}" type='${typeSource}' />
-				</video>
-			</div> 
+		    	<div id="imageHolder" class="openseadragon1"></div>
 			<div id="catchDIV">
 				<div class="annotationListContainer">${_('You do not have any notes.')}</div>
 			</div>
@@ -143,42 +144,109 @@
                     limit:pagination,
                     offset:0,
                     uri:uri,
-                    media:'video',
+                    media:'image',
 		    userid:'${user.email}',
                 }
             },
+	    richText: {
+	        tinymce:{
+	            selector: "li.annotator-item textarea",
+		    plugins: "media image insertdatetime link code",
+		    menubar: false,
+		toolbar_items_size: 'small',
+		extended_valid_elements : "iframe[src|frameborder|style|scrolling|class|width|height|name|align|id]",
+		toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media rubric | code ",
+	    }
+	},
         },
-        optionsVideoJS: {techOrder: ["html5","flash","youtube"]},
-        optionsRS: {},
-        optionsOVA: {posBigNew:'none'},
-        optionsRichText: {
-            tinymce:{
-                selector: "li.annotator-item textarea",
-                plugins: "media image insertdatetime link code",
-                menubar: false,
-                toolbar_items_size: 'small',
-                extended_valid_elements : "iframe[src|frameborder|style|scrolling|class|width|height|name|align|id]",
-                toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media rubric | code ",
-            }
-        },
-    };
+        	optionsOpenSeadragon:{
+		        /*id:                 "contentDiv",
+				prefixUrl:          "images/",
+		        debugMode: true,
+		        showNavigator:true,
+				useCanvas: true,
+				showNavigationControl: true,
+				visibilityRatio: 0.1,
+				minZoomLevel: 0.001,
+				maxZoomLevel: 10,
+				zoomPerClick: 1.4,
+				tileSources: ["testpattern.dzi", "data/tall.dzi"],*/
+				id:                 "imageHolder",
+				prefixUrl:           "${settings.STATIC_URL}" + "js/vendor/ova/images/",
+				navigatorSizeRatio: 0.25,
+				wrapHorizontal:     true,
+				tileSources:   [
+					{ 
+		                Image:  {
+		                    xmlns: "http://schemas.microsoft.com/deepzoom/2009",
+		                    Url: "http://static.seadragon.com/content/misc/milwaukee_files/",
+		                    TileSize: "254", 
+		                    Overlap: "1", 
+		                    Format: "jpg", 
+		                    ServerFormat: "Default",
+		                    Size: { 
+		                        Width: "15497",
+		                        Height: "5378"
+		                    }
+		                }
+		            },
+					{ 
+		                Image:  {
+		                    xmlns: "http://schemas.microsoft.com/deepzoom/2009",
+		                    Url: "http://cache.zoom.it/content/WwI0_files/",
+		                    TileSize: "254", 
+		                    Overlap: "1", 
+		                    Format: "jpg", 
+		                    ServerFormat: "Default",
+		                    Size: { 
+		                        Width: "5816",
+		                        Height: "3961"
+		                    }
+		                }
+		            },{ 
+		                Image:  {
+		                    xmlns: "http://schemas.microsoft.com/deepzoom/2009",
+		                    Url: "http://static.seadragon.com/content/misc/carina-nebula_files/",
+		                    TileSize: "254", 
+		                    Overlap: "1", 
+		                    Format: "jpg", 
+		                    ServerFormat: "Default",
+		                    Size: { 
+		                        Width: "29566",
+		                        Height: "14321"
+		                    }
+		                }
+		            },
+					{
+						height: 512*256,
+						width:  512*256,
+						tileSize: 256,
+						minLevel: 8,
+						getTileUrl: function( level, x, y ){
+						    return "http://s3.amazonaws.com/com.modestmaps.bluemarble/"+(level-8)+"-r"+y+"-c"+x+".jpg";
+						}
+					},
+				],
+		    },
+		    optionsOSDA:{}
+        };
     tinyMCE.baseURL = "${settings.STATIC_URL}" + "js/vendor/ova";
     var imgURLRoot = "${settings.STATIC_URL}" + "js/vendor/ova/catch/img/";
 	
     if (typeof Annotator != 'undefined'){
     	    //remove old instances
 	    if (Annotator._instances.length !== 0) {
-	      $('#videoHolder').annotator("destroy");
+	      $('#imageHolder').annotator("destroy");
 	    }
-	    delete ova;
-	    //Load the plugin Video/Text Annotation
-	    var ova = new OpenVideoAnnotation.Annotator($('#videoHolder'),options);
-	    ova.annotator.addPlugin('Tags');
+	    delete osda;
+	    //Load the plugin Image/Text Annotation
+	var osda = new OpenSeadragonAnnotation($('#imageHolder'),options); 
+	    osda.annotator.addPlugin('Tags');
 	    
 	    //Catch
-	    var annotator = ova.annotator,
+	    var annotator = osda.annotator,
 		catchOptions = {
-		    media:'video',
+		    media:'image',
 		    externalLink:false,
 		    imageUrlRoot:imgURLRoot,
 		    showMediaSelector: false,
