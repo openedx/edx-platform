@@ -1,0 +1,68 @@
+###################################
+February 12, 2014
+###################################
+
+You can now access the public edX roadmap_ for details about the currently planned product direction.
+
+.. _roadmap: https://edx-wiki.atlassian.net/wiki/display/OPENPROD/OpenEdX+Public+Product+Roadmap
+
+
+New documentation, *Building a Course with edX Studio*, is available online_. You can also download the new guide as a PDF from the edX Studio user interface.
+
+.. _online: http://edx.readthedocs.org/projects/ca/en/latest/
+
+Recent documentation additions include:
+
+* `Set the Advertised Start Date <http://edx.readthedocs.org/projects/ca/en/latest/create_new_course.html#set-the-advertised-start-date>`_
+* `Full Screen Image <http://edx.readthedocs.org/projects/ca/en/latest/tools.html#full-screen-image>`_
+
+
+*************
+edX Studio
+*************
+
+
+* The improved layout of components in a unit page now includes visual separation of the header, making clear that the display name for each component is not rendered to students.
+
+* The new Full Screen Image tool allows students to enlarge an image, so they can see all the detail in context. You can create a full screen image with a new HTML component template. For more information, see the `updated documentation <http://edx.readthedocs.org/projects/ca/en/latest/tools.html#full-screen-image>`_.
+
+* If you do not change the default course start date (01/01/2030), and the advertised_start policy value is null, then the student dashboard does not now list a start date for the course. Students just see that the course has not yet started. For more information, see the `updated documentation <http://edx.readthedocs.org/projects/ca/en/latest/create_new_course.html#set-the-advertised-start-date>`_.
+
+
+***************************************
+edX Learning Management System
+***************************************
+
+
+===========================
+Accessibility Improvements
+===========================
+
+* Needless section tags were removed from the student's view of the courseware, so they are no longer announced by screen readers.
+
+* Extraneous title blocks were removed from breadcrumbs, so they are no longer read by screen readers.
+
+* In the student Progress tab, ordered list tags (<ol>) were replaced with <div> tags, to improve how screen readers interpret the screen.
+
+* IDs were added to parts of the course navigation where they were missing, making it easier to skip parts of the course when using a screen reader.
+
+* Updates to unit pages now make navigation more accessible to screen readers.
+
+* Modal dialog boxes and script templates are now hidden from screen readers. 
+
+* Mathjax messages that are specific to Internet Explorer are no longer shown when students are using a different browser.
+
+* Alt text was added to the course footer logo.
+
+* The character set meta tag was added to the main course template.
+
+* The DOCTYPE declaration was added to the top of the main course template.	
+
+
+
+***************************************
+Discussions
+***************************************
+
+* The **Add a Response** button no longer appears in forum threads when students are not allowed to respond. (FOR-452)
+
