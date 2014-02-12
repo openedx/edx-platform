@@ -106,6 +106,20 @@ class DraftModuleStore(MongoModuleStore):
             raise InvalidVersionError(location)
         return super(DraftModuleStore, self).create_xmodule(draft_loc, definition_data, metadata, system)
 
+    def save_xmodule(self, xmodule):
+        """
+        Save the given xmodule (will either create or update based on whether id already exists).
+        Pulls out the data definition v metadata v children locally but saves it all.
+
+        :param xmodule:
+        """
+        orig_location = xmodule.location
+
+        xmodule.location = as_draft(orig_location)
+        try:
+            super(DraftModuleStore, self).save_xmodule(xmodule)
+        finally:
+            xmodule.location = orig_location
 
     def get_items(self, location, course_id=None, depth=0, qualifiers=None):
         """
