@@ -205,7 +205,7 @@ class JsonResponse(HttpResponse):
 
 class JsonError(HttpResponse):
     def __init__(self, error_messages=[], status=400):
-        if isinstance(error_messages, str):
+        if isinstance(error_messages, basestring):
             error_messages = [error_messages]
         content = simplejson.dumps({'errors': error_messages},
                                    indent=2,

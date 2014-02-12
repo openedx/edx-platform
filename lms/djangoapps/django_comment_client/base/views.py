@@ -83,6 +83,11 @@ def create_thread(request, course_id, commentable_id):
     else:
         anonymous_to_peers = False
 
+    if 'title' not in post or not post['title'].strip():
+        return JsonError(_("Title can't be empty"))
+    if 'body' not in post or not post['body'].strip():
+        return JsonError(_("Body can't be empty"))
+
     thread = cc.Thread(**extract(post, ['body', 'title']))
     thread.update_attributes(**{
         'anonymous': anonymous,
@@ -139,6 +144,10 @@ def update_thread(request, course_id, thread_id):
     """
     Given a course id and thread id, update a existing thread, used for both static and ajax submissions
     """
+    if 'title' not in request.POST or not request.POST['title'].strip():
+        return JsonError(_("Title can't be empty"))
+    if 'body' not in request.POST or not request.POST['body'].strip():
+        return JsonError(_("Body can't be empty"))
     thread = cc.Thread.find(thread_id)
     thread.update_attributes(**extract(request.POST, ['body', 'title']))
     thread.save()
@@ -154,6 +163,9 @@ def _create_comment(request, course_id, thread_id=None, parent_id=None):
     called from create_comment to do the actual creation
     """
     post = request.POST
+
+    if 'body' not in post or not post['body'].strip():
+        return JsonError(_("Body can't be empty"))
     comment = cc.Comment(**extract(post, ['body']))
 
     course = get_course_with_access(request.user, course_id, 'load')
@@ -221,6 +233,8 @@ def update_comment(request, course_id, comment_id):
     handles static and ajax submissions
     """
     comment = cc.Comment.find(comment_id)
+    if 'body' not in request.POST or not request.POST['body'].strip():
+        return JsonError(_("Body can't be empty"))
     comment.update_attributes(**extract(request.POST, ['body']))
     comment.save()
     if request.is_ajax():
