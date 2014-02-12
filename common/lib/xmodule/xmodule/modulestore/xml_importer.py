@@ -6,6 +6,7 @@ import json
 
 from .xml import XMLModuleStore, ImportSystem, ParentTracker
 from xmodule.modulestore import Location
+from xblock.fields import Scope, Reference, ReferenceList
 from xmodule.contentstore.content import StaticContent
 from .inheritance import own_metadata
 from xmodule.errortracker import make_error_tracker
@@ -424,7 +425,7 @@ def import_course_draft(
                     # aka sequential), so we have to replace the location.name
                     # with the XML filename that is part of the pack
                     fn, fileExtension = os.path.splitext(filename)
-                    descriptor.location = descriptor.location._replace(name=fn)
+                    descriptor.location = descriptor.location.replace(name=fn)
 
                     index = int(descriptor.xml_attributes['index_in_children_list'])
                     if index in drafts:
@@ -442,13 +443,13 @@ def import_course_draft(
             for descriptor in drafts[key]:
                 try:
                     def _import_module(module):
-                        module.location = module.location._replace(revision='draft')
+                        module.location = module.location.replace(revision='draft')
                         # make sure our parent has us in its list of children
                         # this is to make sure private only verticals show up
                         # in the list of children since they would have been
                         # filtered out from the non-draft store export
                         if module.location.category == 'vertical':
-                            non_draft_location = module.location._replace(revision=None)
+                            non_draft_location = module.location.replace(revision=None)
                             sequential_url = module.xml_attributes['parent_sequential_url']
                             index = int(module.xml_attributes['index_in_children_list'])
 
@@ -456,7 +457,7 @@ def import_course_draft(
 
                             # IMPORTANT: Be sure to update the sequential
                             # in the NEW namespace
-                            seq_location = seq_location._replace(
+                            seq_location = seq_location.replace(
                                 org=target_location_namespace.org,
                                 course=target_location_namespace.course
                             )
@@ -486,20 +487,21 @@ def remap_namespace(module, target_location_namespace):
     if target_location_namespace is None:
         return module
 
+    original_location = module.location
+
     # This looks a bit wonky as we need to also change the 'name' of the
     # imported course to be what the caller passed in
     if module.location.category != 'course':
-        module.location = module.location._replace(
+        module.location = module.location.replace(
             tag=target_location_namespace.tag,
             org=target_location_namespace.org,
             course=target_location_namespace.course
         )
     else:
-        original_location = module.location
         #
         # module is a course module
         #
-        module.location = module.location._replace(
+        module.location = module.location.replace(
             tag=target_location_namespace.tag,
             org=target_location_namespace.org,
             course=target_location_namespace.course,
@@ -524,22 +526,41 @@ def remap_namespace(module, target_location_namespace):
 
         module.save()
 
-    # then remap children pointers since they too will be re-namespaced
+    all_fields = module.get_explicitly_set_fields_by_scope(Scope.content)
+    all_fields.update(module.get_explicitly_set_fields_by_scope(Scope.settings))
     if hasattr(module, 'children'):
-        children_locs = module.children
-        if children_locs is not None and children_locs != []:
-            new_locs = []
-            for child in children_locs:
-                child_loc = Location(child)
-                new_child_loc = child_loc._replace(
-                    tag=target_location_namespace.tag,
-                    org=target_location_namespace.org,
-                    course=target_location_namespace.course
-                )
+        all_fields['children'] = module.children
 
-                new_locs.append(new_child_loc.url())
+    def convert_ref(reference):
+        """
+        Convert a reference to the new namespace, but only
+        if the original namespace matched the original course.
 
-            module.children = new_locs
+        Otherwise, returns the input value.
+        """
+        new_ref = reference
+        ref = Location(reference)
+        in_original_namespace = (original_location.tag == ref.tag and
+                                 original_location.org == ref.org and
+                                 original_location.course == ref.course)
+        if in_original_namespace:
+            new_ref = ref.replace(
+                tag=target_location_namespace.tag,
+                org=target_location_namespace.org,
+                course=target_location_namespace.course
+            ).url()
+        return new_ref
+
+    for field in all_fields:
+        if isinstance(module.fields.get(field), Reference):
+            new_ref = convert_ref(getattr(module, field))
+            setattr(module, field, new_ref)
+            module.save()
+        elif isinstance(module.fields.get(field), ReferenceList):
+            references = getattr(module, field)
+            new_references = [convert_ref(reference) for reference in references]
+            setattr(module, field, new_references)
+            module.save()
 
     return module
 
