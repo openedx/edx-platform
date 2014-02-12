@@ -85,14 +85,7 @@ component to your course. To do this, follow these steps.
    .. image:: Images/AdvancedComponent.gif
      :alt: Image of the Add a New Component panel with the Advanced component option
 
-When you click the Advanced component, you see the following list.
-
-.. image:: Images/SpecProbs_List.gif
-  :alt: Image of the Advanced component list
-
-You can now create annotations, open response assessments, and word
-clouds in your course. More information about how to create each problem
-is provided in the page for that problem type.
+When you click the Advanced component, you can see **Annotation** and **Word cloud** in the list. More information about how to create each problem is provided in the page for that problem type.
 
 .. _Annotation:
 
