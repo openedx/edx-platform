@@ -11,7 +11,7 @@ from pkg_resources import resource_string
 from xmodule.x_module import XModule
 from xmodule.modulestore import Location
 from xmodule.seq_module import SequenceDescriptor
-from xblock.fields import Scope, List
+from xblock.fields import Scope, ReferenceList
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 
@@ -20,7 +20,8 @@ log = logging.getLogger('edx.' + __name__)
 
 class ConditionalFields(object):
     has_children = True
-    show_tag_list = List(help="List of urls of children that are references to external modules", scope=Scope.content)
+    show_tag_list = ReferenceList(help="List of urls of children that are references to external modules", scope=Scope.content)
+    sources_list = ReferenceList(help="List of sources upon which this module is conditional", scope=Scope.content)
 
 
 class ConditionalModule(ConditionalFields, XModule):
@@ -184,37 +185,45 @@ class ConditionalDescriptor(ConditionalFields, SequenceDescriptor):
 
     has_score = False
 
-    @staticmethod
-    def parse_sources(xml_element, system, return_descriptor=False):
-        """Parse xml_element 'sources' attr and:
-        if return_descriptor=True - return list of descriptors
-        if return_descriptor=False - return list of locations
+    def __init__(self, *args, **kwargs):
         """
+        Create an instance of the conditional module.
+        """
+        super(ConditionalDescriptor, self).__init__(*args, **kwargs)
+        # Convert sources xml_attribute to a ReferenceList field type so Location/Locator
+        # substitution can be done.
+        if not self.sources_list:
+            if 'sources' in self.xml_attributes and isinstance(self.xml_attributes['sources'], basestring):
+                sources = ConditionalDescriptor.parse_sources(self.xml_attributes)
+                self.sources_list = sources
+
+    @staticmethod
+    def parse_sources(xml_element):
+        """ Parse xml_element 'sources' attr and return a list of location strings. """
         result = []
         sources = xml_element.get('sources')
         if sources:
             locations = [location.strip() for location in sources.split(';')]
             for location in locations:
                 if Location.is_valid(location):  # Check valid location url.
-                    location = Location(location)
-                    try:
-                        if return_descriptor:
-                            descriptor = system.load_item(location)
-                            result.append(descriptor)
-                        else:
-                            result.append(location)
-                    except ItemNotFoundError:
-                        msg = "Invalid module by location."
-                        log.exception(msg)
-                        system.error_tracker(msg)
+                    result.append(location)
         return result
 
     def get_required_module_descriptors(self):
-        """Returns a list of XModuleDescritpor instances upon
+        """Returns a list of XModuleDescriptor instances upon
         which this module depends.
         """
-        return ConditionalDescriptor.parse_sources(
-            self.xml_attributes, self.system, True)
+        descriptors = []
+        for location in self.sources_list:
+            try:
+                descriptor = self.system.load_item(Location(location))
+                descriptors.append(descriptor)
+            except ItemNotFoundError:
+                msg = "Invalid module by location."
+                log.exception(msg)
+                self.system.error_tracker(msg)
+
+        return descriptors
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
@@ -222,9 +231,10 @@ class ConditionalDescriptor(ConditionalFields, SequenceDescriptor):
         show_tag_list = []
         for child in xml_object:
             if child.tag == 'show':
-                locations = ConditionalDescriptor.parse_sources(child, system)
-                children.extend(locations)
-                show_tag_list.extend(location.url() for location in locations)  # pylint: disable=no-member
+                locations = ConditionalDescriptor.parse_sources(child)
+                for location in locations:
+                    children.append(Location(location))
+                    show_tag_list.append(location)
             else:
                 try:
                     descriptor = system.process_xml(etree.tostring(child))
@@ -236,13 +246,22 @@ class ConditionalDescriptor(ConditionalFields, SequenceDescriptor):
         return {'show_tag_list': show_tag_list}, children
 
     def definition_to_xml(self, resource_fs):
+        def to_string(string_list):
+            """ Convert List of strings to a single string with "; " as the separator. """
+            return "; ".join(string_list)
+
         xml_object = etree.Element(self._tag_name)
         for child in self.get_children():
             location = str(child.location)
-            if location in self.show_tag_list:
-                show_str = u'<{tag_name} sources="{sources}" />'.format(
-                    tag_name='show', sources=location)
-                xml_object.append(etree.fromstring(show_str))
-            else:
+            if location not in self.show_tag_list:
                 self.runtime.add_block_as_child_node(child, xml_object)
+
+        if self.show_tag_list:
+            show_str = u'<{tag_name} sources="{sources}" />'.format(
+                tag_name='show', sources=to_string(self.show_tag_list))
+            xml_object.append(etree.fromstring(show_str))
+
+        # Overwrite the original sources attribute with the value from sources_list, as
+        # Locations may have been changed to Locators.
+        self.xml_attributes['sources'] = to_string(self.sources_list)
         return xml_object
