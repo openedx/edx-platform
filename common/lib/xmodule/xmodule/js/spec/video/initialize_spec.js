@@ -110,6 +110,20 @@ function (Initialize) {
                 });
             });
 
+            it('data contains position 0, async is true', function () {
+                itSpec({
+                    asyncVal: true,
+                    speedVal: undefined,
+                    positionVal: 0,
+                    data: {
+                        saved_video_position: 0
+                    },
+                    ajaxData: {
+                        saved_video_position: Time.formatFull(Math.round(0))
+                    }
+                });
+            });
+
             return;
 
             function itSpec(value) {
