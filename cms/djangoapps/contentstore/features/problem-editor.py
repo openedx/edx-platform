@@ -62,6 +62,11 @@ def my_display_name_change_is_persisted_on_save(step):
     verify_modified_display_name()
 
 
+@step('the problem display name is "(.*)"$')
+def verify_problem_display_name(step, name):
+    assert_equal(name.upper(), world.browser.find_by_css('.problem-header').text)
+
+
 @step('I can specify special characters in the display name')
 def i_can_modify_the_display_name_with_special_chars(_step):
     index = world.get_setting_entry_index(DISPLAY_NAME)

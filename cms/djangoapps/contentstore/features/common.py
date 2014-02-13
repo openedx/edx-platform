@@ -396,6 +396,11 @@ def i_replace_w_draft(_step):
     world.css_click("a.publish-draft")
 
 
+@step(u'I click on "delete draft"$')
+def i_delete_draft(_step):
+    world.css_click("a.delete-draft")
+
+
 @step(u'I publish the unit$')
 def publish_unit(_step):
     world.select_option('visibility-select', 'public')
