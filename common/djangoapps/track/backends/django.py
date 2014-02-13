@@ -28,7 +28,7 @@ LOGFIELDS = [
     'agent',
     'page',
     'time',
-    'host'
+    'host',
 ]
 
 
