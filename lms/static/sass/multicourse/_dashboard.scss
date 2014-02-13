@@ -857,13 +857,16 @@
   // status - language
   .status-language {
 
-    .icon, .title {
-      display: inline-block !important; // needed for LMS horrible specificity
+    .icon {
+      @include font-size(17);
+      display: inline-block;
       vertical-align: middle;
+      margin-right: ($baseline/4);
+      color: $black;
     }
 
-    .icon {
-      margin-right: ($baseline/4);
+    .title .icon {
+      opacity: 0.75; // needed to overcome bad specificity elsewhere
     }
   }
 
