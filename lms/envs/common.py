@@ -503,6 +503,7 @@ LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGES = (
     ('en', u'English'),
     ('eo', u'Dummy Language (Esperanto)'),  # Dummy languaged used for testing
+    ('fake2', u'Fake translations'),        # Another dummy language for testing (not pushed to prod)
 
     ('ach', u'Acholi'),  # Acoli
     ('ar', u'العربية'),  # Arabic
