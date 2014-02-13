@@ -248,7 +248,7 @@ STATICFILES_DIRS = [
     LMS_ROOT / "static",
 
     # This is how you would use the textbook images locally
-    # ("book", ENV_ROOT / "book_images")
+    # ("book", ENV_ROOT / "book_images"),
 ]
 
 # Locale/Internationalization

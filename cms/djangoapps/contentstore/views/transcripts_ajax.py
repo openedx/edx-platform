@@ -47,7 +47,7 @@ __all__ = [
     'choose_transcripts',
     'replace_transcripts',
     'rename_transcripts',
-    'save_transcripts'
+    'save_transcripts',
 ]
 
 log = logging.getLogger(__name__)
