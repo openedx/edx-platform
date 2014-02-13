@@ -521,15 +521,12 @@ defined::
     HELLO = _("Hello")
     GOODBYE = _("Goodbye")
 
-    _ = ugettext
-
     def get_greeting(hello):
         if hello:
-            return _(HELLO)
+            return ugettext(HELLO)
         else:
-            return _(GOODBYE)
+            return ugettext(GOODBYE)
 
-Here we define ``_()`` as a pass-through function, so the string will be
-found during extraction, but won't be translated too early.  Then we redefine
-``_()`` to be the real translation lookup function, and use it at runtime to
-get the localized string.
+Here we define ``_()`` as a pass-through function, so the string will be found
+during extraction, but won't be translated too early.  Then we use the real
+translation function at runtime to get the localized string.
