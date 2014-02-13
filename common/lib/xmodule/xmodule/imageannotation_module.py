@@ -20,6 +20,9 @@ class AnnotatableFields(object):
                     Add the instructions to the assignment here.
                 </p>
             </instructions>
+            <p>
+                Lorem ipsum dolor sit amet, at amet animal petentium nec. Id augue nemore postulant mea. Ex eam dicant noluisse expetenda, alia admodum abhorreant qui et. An ceteros expetenda mea, tale natum ipsum quo no, ut pro paulo alienum noluisse.
+            </p>
         </annotatable>
         """))
     display_name = String(
@@ -28,8 +31,6 @@ class AnnotatableFields(object):
         scope=Scope.settings,
         default='Image Annotation',
     )
-    sourceurl = String(help="The external source URL for the image.", display_name="Source URL", scope=Scope.settings, default="http://image-js.zencoder.com/oceans-clip.mp4")
-    poster_url = String(help="Poster Image URL", display_name="Poster URL", scope=Scope.settings, default="")
     annotation_storage_url = String(help="Location of Annotation backend", scope=Scope.settings, default="http://your_annotation_storage.com", display_name="Url for Annotation Storage")
 
 
@@ -50,7 +51,7 @@ class ImageAnnotationModule(AnnotatableFields, XModule):
         xmltree = etree.fromstring(self.data)
 
         self.instructions = self._extract_instructions(xmltree)
-        self.content = etree.tostring(xmltree, encoding='unicode')
+        self.openseadragonjson = etree.tostring(xmltree, encoding='unicode')
 
     def _extract_instructions(self, xmltree):
         """ Removes <instructions> from the xmltree and returns them as a string, otherwise None. """
@@ -61,29 +62,13 @@ class ImageAnnotationModule(AnnotatableFields, XModule):
             return etree.tostring(instructions, encoding='unicode')
         return None
 
-    def _get_extension(self, srcurl):
-        ''' get the extension of a given url '''
-        if 'youtu' in srcurl:
-            return 'image/youtube'
-        else:
-            spliturl = srcurl.split(".")
-            extensionplus1 = spliturl[len(spliturl) - 1]
-            spliturl = extensionplus1.split("?")
-            extensionplus2 = spliturl[0]
-            spliturl = extensionplus2.split("#")
-            return 'image/' + spliturl[0]
-
     def get_html(self):
         """ Renders parameters to template. """
-        extension = self._get_extension(self.sourceurl)
-
         context = {
             'display_name': self.display_name_with_default,
             'instructions_html': self.instructions,
-            'sourceUrl': self.sourceurl,
-            'typeSource': extension,
-            'poster': self.poster_url,
-            'annotation_storage': self.annotation_storage_url
+            'annotation_storage': self.annotation_storage_url,
+            'openseadragonjson': self.openseadragonjson
         }
 
         return self.system.render_template('imageannotation.html', context)

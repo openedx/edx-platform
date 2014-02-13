@@ -35,7 +35,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 		annotator
 			//-- Finished the Annotator DOM
 			.subscribe("annotationsLoaded", function (annotations){
-				console.log("annotationsLoaded");
 				if (!self.annotationInstance) {
 					self.annotationInstance = new $._annotation({
 						viewer: self,
@@ -536,7 +535,6 @@ Annotator.Plugin.OpenSeaDragon = (function(_super) {
 	OpenSeaDragon.prototype.input = null;
 
 	OpenSeaDragon.prototype.pluginInit = function() {
-		console.log("OpenSeaDragon-pluginInit");
 		//Check that annotator is working
 		if (!Annotator.supported()) {
 			return;
@@ -566,7 +564,6 @@ Annotator.Plugin.OpenSeaDragon = (function(_super) {
 	
 	// New JSON for the database
 	OpenSeaDragon.prototype.pluginSubmit = function(field, annotation) {
-		console.log("Plug-pluginSubmit");
 		//Select the new JSON for the Object to save
 		if (this.EditOpenSeaDragonAn()){
 			var annotator = this.annotator,
@@ -650,7 +647,6 @@ Annotator.Plugin.OpenSeaDragon = (function(_super) {
 		//local functions
 		//-- Editor
 		function annotationEditorHidden(editor) {
-			console.log("annotationEditorHidden");
 			if (EditOpenSeaDragonAn()){
 				annotator.osda._reset();
 				annotator.osda.refreshDisplay(); //Reload the display of annotations
@@ -659,14 +655,11 @@ Annotator.Plugin.OpenSeaDragon = (function(_super) {
 			annotator.unsubscribe("annotationEditorHidden", annotationEditorHidden);
 		};
 		function annotationEditorShown(editor,annotation) {
-			console.log("annotationEditorShown");
 			annotator.osda.editAnnotation(annotation,editor);
 			annotator.subscribe("annotationEditorHidden", annotationEditorHidden);
 		};
 		//-- Annotations
 		function annotationDeleted(annotation) {
-			console.log("annotationDeleted");
-			
 			if (isOpenSeaDragon(annotation))
 				self._deleteAnnotation(annotation);
 		};
@@ -678,10 +671,16 @@ Annotator.Plugin.OpenSeaDragon = (function(_super) {
 			annotator.viewer.unsubscribe("hide", hideViewer);
 		};
 		function annotationViewerShown(viewer,annotations) {
+			var wrapper = jQuery('.annotator-wrapper').offset();
+
+			//Fix with positionCanvas
+			var startPoint = {x: parseFloat(viewer.element[0].style.left),
+				y: parseFloat(viewer.element[0].style.top)};
+		
 			var separation = viewer.element.hasClass(viewer.classes.invert.y)?5:-5,
 				newpos = {
-					top: parseFloat(viewer.element[0].style.top)+separation,
-					left: parseFloat(viewer.element[0].style.left)
+					top: (startPoint.y - wrapper.top)+separation,
+					left: (startPoint.x - wrapper.left)
 				};
 			viewer.element.css(newpos);
 			
