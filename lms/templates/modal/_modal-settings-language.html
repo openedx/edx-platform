@@ -7,10 +7,21 @@
 
 <section id="change_language" class="modal modal-settings-language" aria-hidden="true">
   <div class="inner-wrapper" role="dialog" aria-labelledby="change_language_title">
-    <button class="close-modal">&#10005; <span class="sr">${_('Close Modal')}</span></button>
+    <button class="close-modal">&#10005;
+      <span class="sr">
+        ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
+        ${_('Close Modal')}
+      </span>
+    </button>
 
     <header>
-      <h2><span id="change_language_title">${_("Change Preferred Language")}</span><span class="sr">, ${_("modal open")}</span></h2>
+      <h2>
+        <span id="change_language_title">${_("Change Preferred Language")}</span>
+        <span class="sr">,
+          ## Translators: this text gives status on if the modal interface (a menu or piece of UI that takes the full focus of the screen) is open or not
+          ${_("modal open")}
+        </span>
+      </h2>
       <hr/>
     </header>
     <div id="change_language_body">
