@@ -277,6 +277,36 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
             'data': ''
         })
 
+    def test_from_xml_missing_download_track(self):
+        """
+        Ensure that attributes have the right values if they aren't
+        explicitly set in XML.
+        """
+        module_system = DummySystem(load_error_modules=True)
+        xml_data = '''
+            <video display_name="Test Video"
+                   youtube="1.0:p2Q6BrNhdh8,1.25:1EeWXzPdhSA"
+                   show_captions="true">
+              <source src="http://www.example.com/source.mp4"/>
+              <track src="http://www.example.com/track"/>
+            </video>
+        '''
+        output = VideoDescriptor.from_xml(xml_data, module_system, Mock())
+        self.assert_attributes_equal(output, {
+            'youtube_id_0_75': '',
+            'youtube_id_1_0': 'p2Q6BrNhdh8',
+            'youtube_id_1_25': '1EeWXzPdhSA',
+            'youtube_id_1_5': '',
+            'show_captions': True,
+            'start_time': datetime.timedelta(seconds=0.0),
+            'end_time': datetime.timedelta(seconds=0.0),
+            'track': 'http://www.example.com/track',
+            'download_track': True,
+            'download_video': True,
+            'html5_sources': ['http://www.example.com/source.mp4'],
+            'data': ''
+        })
+
     def test_from_xml_no_attributes(self):
         """
         Make sure settings are correct if none are explicitly set in XML.
