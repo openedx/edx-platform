@@ -674,6 +674,7 @@ function (VideoPlayer, VideoStorage) {
     }
 
     function saveState(async, data) {
+
         if (!($.isPlainObject(data))) {
             data = {
                 saved_video_position: this.videoPlayer.currentTime
@@ -684,7 +685,7 @@ function (VideoPlayer, VideoStorage) {
             this.storage.setItem('speed', data.speed, true);
         }
 
-        if (data.saved_video_position) {
+        if (data.hasOwnProperty('saved_video_position')) {
             this.storage.setItem('savedVideoPosition', data.saved_video_position, true);
 
             data.saved_video_position = Time.formatFull(data.saved_video_position);
