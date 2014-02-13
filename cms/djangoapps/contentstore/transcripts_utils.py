@@ -307,6 +307,15 @@ def copy_or_rename_transcript(new_name, old_name, item, delete_old=False, user=N
         remove_subs_from_store(old_name, item)
 
 
+def get_html5_ids(html5_sources):
+    """
+    Helper method to parse out an HTML5 source into the ideas
+    NOTE: This assumes that '/' are not in the filename
+    """
+    html5_ids = [x.split('/')[-1].rsplit('.', 1)[0] for x in html5_sources]
+    return html5_ids
+
+
 def manage_video_subtitles_save(old_item, new_item, user):
     """
     Does some specific things, that can be done only on save.
@@ -326,8 +335,7 @@ def manage_video_subtitles_save(old_item, new_item, user):
     """
 
     # 1.
-    # assume '.' and '/' are not in filenames
-    html5_ids = [x.split('/')[-1].split('.')[0] for x in new_item.html5_sources]
+    html5_ids = get_html5_ids(new_item.html5_sources)
     possible_video_id_list = [new_item.youtube_id_1_0] + html5_ids
     sub_name = new_item.sub
     for video_id in possible_video_id_list:
