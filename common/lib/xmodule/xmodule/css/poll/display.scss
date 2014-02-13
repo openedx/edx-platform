@@ -1,4 +1,4 @@
-section.poll_question {
+div.poll_question {
   @media print {
     display: block;
     width: auto;
@@ -20,7 +20,7 @@ section.poll_question {
     font-size: 1.9em;
 
     &.problem-header {
-      section.staff {
+      div.staff {
         margin-top: 30px;
         font-size: 80%;
       }
