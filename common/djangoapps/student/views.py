@@ -63,6 +63,7 @@ import external_auth.views
 
 from bulk_email.models import Optout, CourseAuthorization
 import shoppingcart
+from user_api.models import UserPreference, LANGUAGE_KEY
 
 import track.views
 
@@ -472,13 +473,13 @@ def dashboard(request):
 
     language_options = DarkLangConfig.current().released_languages_list
 
-    if not language_options:
-        language_options = [settings.LANGUAGE_CODE]
+    language_options.append(settings.LANGUAGE_CODE)
 
-    try:
-        current_language = translation.get_language_info(translation.get_language())
-    except KeyError:
-        current_language = translation.get_language_info(settings.LANGUAGE_CODE)
+    cur_lang_code = UserPreference.get_preference(request.user, LANGUAGE_KEY)
+    if cur_lang_code:
+        current_language = settings.LANGUAGE_DICT[cur_lang_code]
+    else:
+        current_language = settings.LANGUAGE_DICT[settings.LANGUAGE_CODE]
 
     context = {
         'course_enrollment_pairs': course_enrollment_pairs,
@@ -499,6 +500,7 @@ def dashboard(request):
         'billing_email': settings.PAYMENT_SUPPORT_EMAIL,
         'language_options': language_options,
         'current_language': current_language,
+        'current_language_code': cur_lang_code,
     }
 
     return render_to_response('dashboard.html', context)

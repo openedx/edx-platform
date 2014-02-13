@@ -16,9 +16,9 @@ class UserPreferenceMiddleware(object):
     def process_request(self, request):
         """
         If a user's UserPreference contains a language preference and there is
-        no language set on the session, use the user's preference.
+        no language set on the session (i.e. from dark language overrides), use the user's preference.
         """
-        if 'django_language' not in request.session and request.user.is_authenticated():
+        if request.user.is_authenticated() and 'django_language' not in request.session:
             user_pref = UserPreference.get_preference(request.user, LANGUAGE_KEY)
             if user_pref:
                 request.session['django_language'] = user_pref

@@ -34,7 +34,7 @@
             % for abbrv in language_options:
               % for language in settings.LANGUAGES:
                 % if abbrv == language[0]:
-                  % if abbrv == current_language['code']:
+                  % if abbrv == current_language_code:
                     <option value="${language[0]}" selected="selected">${language[1]}</option>
                   % else:
                     <option value="${language[0]}">${language[1]}</option>

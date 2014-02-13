@@ -555,6 +555,8 @@ LANGUAGES = (
     ('zh-tw', u'台灣正體'),  # Chinese (Taiwan)
 )
 
+LANGUAGE_DICT = dict(LANGUAGES)
+
 USE_I18N = True
 USE_L10N = True
 
