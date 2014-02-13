@@ -50,14 +50,8 @@ have one.
 Joining A Translation Team
 ==========================
 
-1. Once you've set up your account, visit one (or more!) of the edX projects to request
+1. Once you've set up your account, visit the `edx-platform project <https://www.transifex.com/projects/p/edx-platform/>`_
    to become a translator for your language.
-
-   Projects include:
-
-     * `edx-platform <https://www.transifex.com/projects/p/edx-platform/>`_
-     * `edx-comments-service <https://www.transifex.com/projects/p/edx-comments-service/>`_
-     * `edx-notifier <https://www.transifex.com/projects/p/edx-notifier/>`_
 
 2. When you visit the project page, it looks like this.  If your language is listed, click
    on the name of the language to go to the language's page. Here is an example of choosing
