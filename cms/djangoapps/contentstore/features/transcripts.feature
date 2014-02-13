@@ -677,3 +677,19 @@ Feature: CMS.Transcripts
         And I edit the component
         Then I see status message "not found"
 
+    #36 Uploading subtitles for file with periods in it should properly set the transcript name and keep the periods
+    Scenario: File name and name of subs are different
+        Given I have created a Video component
+        And I edit the component
+
+        And I enter a "video_name_1.1.2.mp4" source to field number 1
+        And I see status message "not found"
+        And I upload the transcripts file "test_transcripts.srt"
+        Then I see status message "uploaded_successfully"
+        And I see value "video_name_1.1.2" in the field "HTML5 Transcript"
+
+        And I save changes
+        Then when I view the video it does show the captions
+
+        And I edit the component
+        Then I see status message "found"
