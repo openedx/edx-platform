@@ -180,6 +180,8 @@ Advanced Options
 
    * - **Display Name**
      - The name that you want your students to see. This is the same as the **Display Name** field on the **Basic** tab.
+   * - **Download Transcript**
+     - The transcript file for the video. This file is usually an .srt file, but can also be a .txt or .pdf file. This setting is related to **Transcript Download Allowed.** If you set **Transcript Download Allowed** to **True**, and you specify a file in the **Download Transcript** field, your students can download the file you've specified. If you set **Transcript Download Allowed** to **True** but you leave the **Download Transcript** field blank, students can download the transcript as a .txt file. 
    * - **End Time**
      - The time, formatted as hours, minutes, and seconds (HH:MM:SS), when you want the video to end.
    * - **HTML5 Transcript**
