@@ -471,27 +471,35 @@ def dashboard(request):
     denied_banner = any(item.display for item in reverifications["denied"])
 
     language_options = DarkLangConfig.current().released_languages_list
-    current_language = translation.get_language_info(translation.get_language())
 
-    context = {'course_enrollment_pairs': course_enrollment_pairs,
-               'course_optouts': course_optouts,
-               'message': message,
-               'external_auth_map': external_auth_map,
-               'staff_access': staff_access,
-               'errored_courses': errored_courses,
-               'show_courseware_links_for': show_courseware_links_for,
-               'all_course_modes': course_modes,
-               'cert_statuses': cert_statuses,
-               'show_email_settings_for': show_email_settings_for,
-               'reverifications': reverifications,
-               'verification_status': verification_status,
-               'verification_msg': verification_msg,
-               'show_refund_option_for': show_refund_option_for,
-               'denied_banner': denied_banner,
-               'billing_email': settings.PAYMENT_SUPPORT_EMAIL,
-               'language_options': language_options,
-               'current_language': current_language,
-               }
+    if not language_options:
+        language_options = [settings.LANGUAGE_CODE]
+
+    try:
+        current_language = translation.get_language_info(translation.get_language())
+    except KeyError:
+        current_language = translation.get_language_info(settings.LANGUAGE_CODE)
+
+    context = {
+        'course_enrollment_pairs': course_enrollment_pairs,
+        'course_optouts': course_optouts,
+        'message': message,
+        'external_auth_map': external_auth_map,
+        'staff_access': staff_access,
+        'errored_courses': errored_courses,
+        'show_courseware_links_for': show_courseware_links_for,
+        'all_course_modes': course_modes,
+        'cert_statuses': cert_statuses,
+        'show_email_settings_for': show_email_settings_for,
+        'reverifications': reverifications,
+        'verification_status': verification_status,
+        'verification_msg': verification_msg,
+        'show_refund_option_for': show_refund_option_for,
+        'denied_banner': denied_banner,
+        'billing_email': settings.PAYMENT_SUPPORT_EMAIL,
+        'language_options': language_options,
+        'current_language': current_language,
+    }
 
     return render_to_response('dashboard.html', context)
 
