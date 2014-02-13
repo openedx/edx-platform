@@ -18,6 +18,7 @@ from ..pages.lms.tab_nav import TabNavPage
 from ..pages.lms.course_nav import CourseNavPage
 from ..pages.lms.progress import ProgressPage
 from ..pages.lms.video import VideoPage
+from ..pages.xblock.acid import AcidView
 from ..fixtures.course import CourseFixture, XBlockFixtureDesc, CourseUpdateDesc
 
 
@@ -103,11 +104,13 @@ class HighLevelTabTest(UniqueCourseTest):
                     XBlockFixtureDesc('problem', 'Test Problem 1', data=load_data_str('multiple_choice.xml')),
                     XBlockFixtureDesc('problem', 'Test Problem 2', data=load_data_str('formula_problem.xml')),
                     XBlockFixtureDesc('html', 'Test HTML'),
-            )),
+                )
+            ),
             XBlockFixtureDesc('chapter', 'Test Section 2').add_children(
                 XBlockFixtureDesc('sequential', 'Test Subsection 2'),
                 XBlockFixtureDesc('sequential', 'Test Subsection 3'),
-        )).install()
+            )
+        ).install()
 
         # Auto-auth register for the course
         AutoAuthPage(self.browser, course_id=self.course_id).visit()
@@ -252,3 +255,48 @@ class VideoTest(UniqueCourseTest):
             # latency through the ssh tunnel
             self.assertGreaterEqual(self.video.elapsed_time, 0)
             self.assertGreaterEqual(self.video.duration, self.video.elapsed_time)
+
+
+class XBlockAcidTest(UniqueCourseTest):
+    """
+    Tests that verify that XBlock integration is working correctly
+    """
+
+    def setUp(self):
+        """
+        Create a unique identifier for the course used in this test.
+        """
+        # Ensure that the superclass sets up
+        super(XBlockAcidTest, self).setUp()
+
+        course_fix = CourseFixture(
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run'],
+            self.course_info['display_name']
+        )
+
+        course_fix.add_children(
+            XBlockFixtureDesc('chapter', 'Test Section').add_children(
+                XBlockFixtureDesc('sequential', 'Test Subsection').add_children(
+                    XBlockFixtureDesc('acid', 'Acid Block')
+                )
+            )
+        ).install()
+
+        AutoAuthPage(self.browser, course_id=self.course_id).visit()
+
+        self.course_info_page = CourseInfoPage(self.browser, self.course_id)
+        self.tab_nav = TabNavPage(self.browser)
+
+        self.course_info_page.visit()
+        self.tab_nav.go_to_tab('Courseware')
+
+    def test_acid_block(self):
+        """
+        Verify that all expected acid block tests pass in the lms.
+        """
+        acid_block = AcidView(self.browser, '.xblock-student_view[data-block-type=acid]')
+        self.assertTrue(acid_block.init_fn_passed)
+        self.assertTrue(acid_block.doc_ready_passed)
+        self.assertTrue(acid_block.scope_passed('user_state'))

@@ -10,6 +10,7 @@ import static_replace
 from django.conf import settings
 from django.utils.timezone import UTC
 from edxmako.shortcuts import render_to_string
+from xblock.exceptions import InvalidScopeError
 from xblock.fragment import Fragment
 
 from xmodule.seq_module import SequenceModule
@@ -199,7 +200,15 @@ def add_staff_debug_info(user, block, view, frag, context):  # pylint: disable=u
     if mstart is not None:
         is_released = "<font color='red'>Yes!</font>" if (now > mstart) else "<font color='green'>Not yet</font>"
 
-    staff_context = {'fields': [(name, field.read_from(block)) for name, field in block.fields.items()],
+    field_contents = []
+    for name, field in block.fields.items():
+        try:
+            field_contents.append((name, field.read_from(block)))
+        except InvalidScopeError:
+            log.warning("Unable to read field in Staff Debug information", exc_info=True)
+            field_contents.append((name, "WARNING: Unable to read field"))
+
+    staff_context = {'fields': field_contents,
                      'xml_attributes': getattr(block, 'xml_attributes', {}),
                      'location': block.location,
                      'xqa_key': block.xqa_key,
