@@ -227,7 +227,6 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
             return None
 
     student_data = KvsFieldData(DjangoKeyValueStore(field_data_cache))
-    descriptor._field_data = LmsFieldData(descriptor._field_data, student_data)
 
 
     def make_xqueue_callback(dispatch='score_update'):
@@ -433,6 +432,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
             'i18n': ModuleI18nService(),
         },
         get_user_role=lambda: get_user_role(user, course_id),
+        descriptor_runtime=descriptor.runtime,
     )
 
     # pass position specified in URL to module through ModuleSystem
@@ -451,8 +451,8 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
     else:
         system.error_descriptor_class = NonStaffErrorDescriptor
 
-    descriptor.xmodule_runtime = system
-    descriptor.scope_ids = descriptor.scope_ids._replace(user_id=user.id)
+    descriptor.bind_for_student(system, LmsFieldData(descriptor._field_data, student_data))  # pylint: disable=protected-access
+    descriptor.scope_ids = descriptor.scope_ids._replace(user_id=user.id)  # pylint: disable=protected-access
     return descriptor
 
 

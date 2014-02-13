@@ -83,6 +83,7 @@ class StaffGradingService(GradingService):
             get_module=None,
             render_template=render_to_string,
             replace_urls=None,
+            descriptor_runtime=None,
         )
         super(StaffGradingService, self).__init__(config)
         self.url = config['url'] + config['staff_grading']

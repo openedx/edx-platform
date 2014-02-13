@@ -1048,7 +1048,7 @@ class ModuleSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abs
     """
     def __init__(
             self, static_url, track_function, get_module, render_template,
-            replace_urls, user=None, filestore=None,
+            replace_urls, descriptor_runtime, user=None, filestore=None,
             debug=False, hostname="", xqueue=None, publish=None, node_path="",
             anonymous_student_id='', course_id=None,
             open_ended_grading_interface=None, s3_interface=None,
@@ -1088,6 +1088,8 @@ class ModuleSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abs
         replace_urls - TEMPORARY - A function like static_replace.replace_urls
                          that capa_module can use to fix up the static urls in
                          ajax results.
+
+        descriptor_runtime - A `DescriptorSystem` to use for loading xblocks by id
 
         anonymous_student_id - Used for tracking modules with student id
 
@@ -1148,6 +1150,7 @@ class ModuleSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abs
         self.get_real_user = get_real_user
 
         self.get_user_role = get_user_role
+        self.descriptor_runtime = descriptor_runtime
 
     def get(self, attr):
         """	provide uniform access to attributes (like etree)."""
@@ -1172,7 +1175,7 @@ class ModuleSystem(ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abs
         return self.handler_url(self.xmodule_instance, 'xmodule_handler', '', '').rstrip('/?')
 
     def get_block(self, block_id):
-        raise NotImplementedError("XModules must use get_module to load other modules")
+        return self.get_module(self.descriptor_runtime.get_block(block_id))
 
     def resource_url(self, resource):
         raise NotImplementedError("edX Platform doesn't currently implement XBlock resource urls")
