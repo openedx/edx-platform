@@ -854,6 +854,19 @@
     }
   }
 
+  // status - language
+  .status-language {
+
+    .icon, .title {
+      display: inline-block !important; // needed for LMS horrible specificity
+      vertical-align: middle;
+    }
+
+    .icon {
+      margin-right: ($baseline/4);
+    }
+  }
+
   // status - verification
   .status-verification {
 
