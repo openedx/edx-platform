@@ -7,6 +7,7 @@ import string  # pylint: disable=W0402
 import re
 import bson
 
+from django.db.models import Q
 from django.utils.translation import ugettext as _
 from django.contrib.auth.decorators import login_required
 from django_future.csrf import ensure_csrf_cookie
@@ -50,7 +51,7 @@ from xmodule.html_module import AboutDescriptor
 from xmodule.modulestore.locator import BlockUsageLocator
 from course_creators.views import get_course_creator_status, add_user_with_status_unrequested
 from contentstore import utils
-from student.roles import CourseInstructorRole, CourseStaffRole, CourseCreatorRole
+from student.roles import CourseInstructorRole, CourseStaffRole, CourseCreatorRole, GlobalStaff
 from student import auth
 
 from microsite_configuration.middleware import MicrositeConfiguration
@@ -156,11 +157,9 @@ def _xmodule_json(xmodule, course_id):
     return result
 
 
-@login_required
-@ensure_csrf_cookie
-def course_listing(request):
+def _accessible_courses_list(request):
     """
-    List all courses available to the logged in user
+    List all courses available to the logged in user by iterating through all the courses
     """
     courses = modulestore('direct').get_courses()
 
@@ -177,6 +176,89 @@ def course_listing(request):
                 and course.location.course != ''
                 and course.location.name != '')
     courses = filter(course_filter, courses)
+    return courses
+
+
+def _accessible_courses_list_from_groups(request):
+    """
+    List all courses available to the logged in user by reversing access group names
+    """
+    courses_list = []
+    course_id_list = []
+
+    user_staff_group_names = request.user.groups.filter(Q(name__startswith='instructor_') | Q(name__startswith='staff_')).values_list('name', flat=True)
+    # first try to get new and unique group names (course_id's) before querying database
+    for user_staff_group_name in user_staff_group_names:
+        # to avoid duplication try to convert all course_id's to new format e.g. "edX.course.run"
+        course_id = re.sub(r'^(instructor_|staff_)', '', user_staff_group_name).replace('/', '.')
+        if len(course_id.split('.')) == 3:
+            if course_id not in course_id_list:
+                course_id_list.append(course_id)
+        else:
+            # old group format: course number only e.g. "course"
+            # not preferable (so return)
+            #
+            # Note: We can try to get course with only course number if there is exactly
+            #  one course with this course number
+            return (False, courses_list)
+
+    for course_id in course_id_list:
+        # new group format: id of course e.g. "edX.course.run"
+        org, course, name = course_id.split('.')
+        course_location = Location('i4x', org, course, 'course', name)
+        try:
+            course = modulestore('direct').get_item(course_location)
+            courses_list.append(course)
+        except ItemNotFoundError:
+            course = None
+
+        if not course:
+            # since access groups are being stored in lowercase, also do a case-insensitive search
+            # for the potential course id.
+            course_search_location = bson.son.SON({
+                '_id.tag': 'i4x',
+                # pylint: disable=no-member
+                '_id.org': re.compile(u'^{}$'.format(course_location.org), re.IGNORECASE | re.UNICODE),
+                # pylint: disable=no-member
+                '_id.course': re.compile(u'^{}$'.format(course_location.course), re.IGNORECASE | re.UNICODE),
+                '_id.category': 'course',
+                # pylint: disable=no-member
+                '_id.name': re.compile(u'^{}$'.format(course_location.name), re.IGNORECASE | re.UNICODE)
+            })
+            courses = modulestore().collection.find(course_search_location, fields=('_id'))
+            if courses.count() == 1:
+                course_id = courses[0].get('_id')
+                course_location = Location('i4x', course_id.get('org'), course_id.get('course'), 'course', course_id.get('name'))
+                try:
+                    course = modulestore('direct').get_item(course_location)
+                    courses_list.append(course)
+                except ItemNotFoundError:
+                    return (False, courses_list)
+            else:
+                return (False, courses_list)
+
+    return (True, courses_list)
+
+
+@login_required
+@ensure_csrf_cookie
+def course_listing(request):
+    """
+    List all courses available to the logged in user
+    Try to get all courses by first reversing django groups and fallback to old method if it fails
+    Note: overhead of pymongo reads will increase if getting courses from django groups fails
+    """
+    if GlobalStaff().has_user(request.user):
+        # user has global access so no need to get courses from django groups
+        courses = _accessible_courses_list(request)
+    else:
+        success, courses_from_groups = _accessible_courses_list_from_groups(request)
+        if success:
+            courses = courses_from_groups
+        else:
+            # user have some old groups or there was some error getting courses from django groups
+            # so fallback to iterating through all courses
+            courses = _accessible_courses_list(request)
 
     def format_course_for_view(course):
         """
