@@ -83,6 +83,10 @@ class ApiTestCase(TestCase):
         """Assert that the given response has the status code 403"""
         self.assertEqual(response.status_code, 403)
 
+    def assertHttpBadRequest(self, response):
+        """Assert that the given response has the status code 403"""
+        self.assertEqual(response.status_code, 400)
+
     def assertHttpMethodNotAllowed(self, response):
         """Assert that the given response has the status code 405"""
         self.assertEqual(response.status_code, 405)
@@ -358,7 +362,7 @@ class UserPreferenceViewSetTest(UserApiTestCase):
         )
 
 
-class TestLanguageSetting(TestCase):
+class TestLanguageSetting(ApiTestCase):
     """
     Test setting languages
     """
@@ -369,7 +373,7 @@ class TestLanguageSetting(TestCase):
         lang = 'en'
         response = self.client.post(reverse('user_api_set_language'), {'language': lang})
 
-        self.assertEqual(response.status_code, 200)
+        self.assertHttpOK(response)
         user_pref = UserPreference.get_preference(user, LANGUAGE_KEY)
         self.assertEqual(user_pref, lang)
 
@@ -379,6 +383,6 @@ class TestLanguageSetting(TestCase):
 
         response = self.client.post(reverse('user_api_set_language'))
 
-        self.assertEqual(response.status_code, 400)
+        self.assertHttpBadRequest(response)
 
         self.assertIsNone(UserPreference.get_preference(user, LANGUAGE_KEY))

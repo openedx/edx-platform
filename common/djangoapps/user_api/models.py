@@ -24,15 +24,15 @@ class UserPreference(models.Model):
         user_pref.save()
 
     @classmethod
-    def get_preference(cls, user, preference_key):
+    def get_preference(cls, user, preference_key, default=None):
         """
         Gets the user preference value for a given key
 
-        Returns None if there isn't a preference for the given key
+        Returns the given default if there isn't a preference for the given key
         """
 
         try:
             user_pref = cls.objects.get(user=user, key=preference_key)
             return user_pref.value
         except cls.DoesNotExist:
-            return None
+            return default
