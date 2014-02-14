@@ -204,7 +204,7 @@ class ModuleStoreTestCase(TestCase):
         'course' is an instance of CourseDescriptor for which we want
         to update metadata.
         """
-        store = editable_modulestore('direct')
+        store = editable_modulestore()
         store.update_item(course, '**replace_user**')
         updated_course = store.get_instance(course.id, course.location)
         return updated_course

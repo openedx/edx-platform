@@ -49,7 +49,7 @@ from certificates.models import CertificateStatuses, certificate_status_for_stud
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore import MONGO_MODULESTORE_TYPE
+from xmodule.modulestore import XML_MODULESTORE_TYPE
 
 from collections import namedtuple
 
@@ -441,7 +441,7 @@ def dashboard(request):
     show_email_settings_for = frozenset(
         course.id for course, _enrollment in course_enrollment_pairs if (
             settings.FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and
-            modulestore().get_modulestore_type(course.id) == MONGO_MODULESTORE_TYPE and
+            modulestore().get_modulestore_type(course.id) != XML_MODULESTORE_TYPE and
             CourseAuthorization.instructor_email_enabled(course.id)
         )
     )
