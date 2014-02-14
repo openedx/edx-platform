@@ -108,6 +108,23 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
         )
         assert_equal(response.status_code, 200)
 
+    def test_delete_comment(self, mock_request):
+        mock_request.return_value.text = json.dumps({
+            "user_id": str(self.student.id),
+            "closed": False,
+        })
+        test_comment_id = "test_comment_id"
+        request = RequestFactory().post("dummy_url", {"id": test_comment_id})
+        request.user = self.student
+        request.view_name = "delete_comment"
+        response = views.delete_comment(request, course_id=self.course.id, comment_id=test_comment_id)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(mock_request.called)
+        args = mock_request.call_args[0]
+        self.assertEqual(args[0], "delete")
+        self.assertTrue(args[1].endswith("/{}".format(test_comment_id)))
+
     def _setup_mock_request(self, mock_request, include_depth=False):
         """
         Ensure that mock_request returns the data necessary to make views
