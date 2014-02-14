@@ -5,7 +5,6 @@ from mock import patch, PropertyMock
 import os
 import tempfile
 import textwrap
-import unittest
 from functools import partial
 
 from xmodule.contentstore.content import StaticContent
@@ -20,7 +19,6 @@ from xmodule.exceptions import NotFoundError
 
 class TestVideo(BaseTestXmodule):
     """Integration tests: web client + mongo."""
-
     CATEGORY = "video"
     DATA = SOURCE_XML
     METADATA = {}
@@ -71,7 +69,7 @@ class TestVideoYouTube(TestVideo):
             'general_speed': 1.0,
             'start': 3603.0,
             'sub': u'a_sub_file.srt.sjson',
-            'track': '',
+            'track': None,
             'youtube_streams': _create_youtube_string(self.item_module),
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', False),
             'yt_test_timeout': 1500,
@@ -126,7 +124,7 @@ class TestVideoNonYouTube(TestVideo):
             'general_speed': 1.0,
             'start': 3603.0,
             'sub': u'a_sub_file.srt.sjson',
-            'track': '',
+            'track': None,
             'youtube_streams': '1.00:OEoXaMPEzfM',
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', True),
             'yt_test_timeout': 1500,
@@ -145,7 +143,6 @@ class TestGetHtmlMethod(BaseTestXmodule):
     '''
     CATEGORY = "video"
     DATA = SOURCE_XML
-    maxDiff = None
     METADATA = {}
 
     def setUp(self):
@@ -222,14 +219,13 @@ class TestGetHtmlMethod(BaseTestXmodule):
             )
 
             self.initialize_module(data=DATA)
-            # track_url = self.item_descriptor.xmodule_runtime.handler_url(self.item_module, 'download_transcript')
+            track_url = self.item_descriptor.xmodule_runtime.handler_url(self.item_module, 'download_transcript')
 
             context = self.item_module.render('student_view').content
 
             expected_context.update({
                 'ajax_url': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
-                # 'track': track_url if data['expected_track_url'] == u'a_sub_file.srt.sjson' else data['expected_track_url'],
-                'track': u'http://www.example.com/track' if data['track'] else '',
+                'track': track_url if data['expected_track_url'] == u'a_sub_file.srt.sjson' else data['expected_track_url'],
                 'sub': data['sub'],
                 'id': self.item_module.location.html_id(),
             })
@@ -312,7 +308,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'general_speed': 1.0,
             'start': 3603.0,
             'sub': u'a_sub_file.srt.sjson',
-            'track': '',
+            'track': None,
             'youtube_streams': '1.00:OEoXaMPEzfM',
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', True),
             'yt_test_timeout': 1500,
@@ -426,7 +422,7 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
             },
         }
         metadata = {
-            'track': '',
+            'track': None,
             'source': 'http://example.org/video.mp4',
             'html5_sources': ['http://youtu.be/OEoXaMPEzfM.mp4'],
         }
@@ -449,85 +445,6 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
 
         self.assertNotIn('source', fields)
         self.assertFalse(self.item_module.download_video)
-
-    @unittest.skip('Skipped due to the reason described in BLD-811')
-    def test_track_is_not_empty(self):
-        metatdata = {
-            'track': 'http://example.org/track',
-        }
-
-        self.initialize_module(metadata=metatdata)
-        fields = self.item_descriptor.editable_metadata_fields
-
-        self.assertIn('track', fields)
-        self.assertEqual(self.item_module.track, 'http://example.org/track')
-        self.assertTrue(self.item_module.download_track)
-        self.assertTrue(self.item_module.track_visible)
-
-    @unittest.skip('Skipped due to the reason described in BLD-811')
-    @patch('xmodule.x_module.XModuleDescriptor.editable_metadata_fields', new_callable=PropertyMock)
-    def test_download_track_is_explicitly_set(self, mock_editable_fields):
-        mock_editable_fields.return_value = {
-            'download_track': {
-                'default_value': False,
-                'explicitly_set': True,
-                'display_name': 'Transcript Download Allowed',
-                'help': 'Show a link beneath the video to allow students to download the transcript.',
-                'type': 'Boolean',
-                'value': False,
-                'field_name': 'download_track',
-                'options': [
-                    {'display_name': "True", "value": True},
-                    {'display_name': "False", "value": False}
-                ],
-            },
-            'track': {
-                'default_value': '',
-                'explicitly_set': False,
-                'display_name': 'Download Transcript',
-                'help': 'The external URL to download the timed transcript track.',
-                'type': 'Generic',
-                'value': u'http://example.org/track',
-                'field_name': 'track',
-                'options': [],
-            },
-            'source': {
-                'default_value': '',
-                'explicitly_set': False,
-                'display_name': 'Download Video',
-                'help': 'The external URL to download the video.',
-                'type': 'Generic',
-                'value': u'',
-                'field_name': 'source',
-                'options': [],
-            },
-        }
-        metadata = {
-            'source': '',
-            'track': 'http://example.org/track',
-        }
-
-        self.initialize_module(metadata=metadata)
-        fields = self.item_descriptor.editable_metadata_fields
-
-        self.assertIn('track', fields)
-        self.assertEqual(self.item_module.track, 'http://example.org/track')
-        self.assertFalse(self.item_module.download_track)
-        self.assertTrue(self.item_module.track_visible)
-
-    @unittest.skip('Skipped due to the reason described in BLD-811')
-    def test_track_is_empty(self):
-        metatdata = {
-            'track': '',
-        }
-
-        self.initialize_module(metadata=metatdata)
-        fields = self.item_descriptor.editable_metadata_fields
-
-        self.assertNotIn('track', fields)
-        self.assertEqual(self.item_module.track, '')
-        self.assertFalse(self.item_module.download_track)
-        self.assertFalse(self.item_module.track_visible)
 
 
 class TestVideoGetTranscriptsMethod(TestVideo):
@@ -552,7 +469,7 @@ class TestVideoGetTranscriptsMethod(TestVideo):
         self.item_module.render('student_view')
         item = self.item_descriptor.xmodule_runtime.xmodule_instance
 
-        good_sjson = _create_file(content="""
+        good_sjson = _create_file(content=textwrap.dedent("""\
                 {
                   "start": [
                     270,
@@ -567,13 +484,22 @@ class TestVideoGetTranscriptsMethod(TestVideo):
                     "Let&#39;s start with what is on your screen right now."
                   ]
                 }
-            """)
+            """))
 
         _upload_file(good_sjson, self.item_module.location)
         subs_id = _get_subs_id(good_sjson.name)
 
         text = item.get_transcript(subs_id)
-        expected_text = "Hi, welcome to Edx.\nLet's start with what is on your screen right now."
+        expected_text = textwrap.dedent("""\
+            0
+            00:00:00,270 --> 00:00:02,720
+            Hi, welcome to Edx.
+
+            1
+            00:00:02,720 --> 00:00:05,430
+            Let&#39;s start with what is on your screen right now.
+
+            """)
 
         self.assertEqual(text, expected_text)
 

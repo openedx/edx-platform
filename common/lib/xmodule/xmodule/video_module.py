@@ -13,12 +13,12 @@ in XML.
 import json
 import logging
 
-from HTMLParser import HTMLParser
 from lxml import etree
 from pkg_resources import resource_string
 import datetime
 import copy
 from webob import Response
+from pysrt import SubRipTime, SubRipItem
 
 from django.conf import settings
 
@@ -116,8 +116,6 @@ class VideoFields(object):
         display_name="Video Sources",
         scope=Scope.settings,
     )
-    # `track` is deprecated field and should not be used in future.
-    # `download_track` is used instead.
     track = String(
         help="The external URL to download the timed transcript track. This appears as a link beneath the video.",
         display_name="Download Transcript",
@@ -215,14 +213,11 @@ class VideoModule(VideoFields, XModule):
             elif self.html5_sources:
                 sources['main'] = self.html5_sources[0]
 
-        # Commented due to the reason described in BLD-811.
-        # if self.download_track:
-        #     if self.track:
-        #         track_url = self.track
-        #     elif self.sub:
-        #         track_url = self.runtime.handler_url(self, 'download_transcript')
-
-        track_url = self.track
+        if self.download_track:
+            if self.track:
+                track_url = self.track
+            elif self.sub:
+                track_url = self.runtime.handler_url(self, 'download_transcript')
 
         return self.system.render_template('video.html', {
             'ajax_url': self.system.ajax_url + '/save_user_state',
@@ -250,14 +245,14 @@ class VideoModule(VideoFields, XModule):
 
     def get_transcript(self, subs_id):
         '''
-        Returns transcript without timecodes.
+        Returns transcript in *.srt format.
 
         Args:
             `subs_id`: str, subtitles id
 
         Raises:
             - NotFoundError if cannot find transcript file in storage.
-            - ValueError if transcript file is incorrect JSON.
+            - ValueError if transcript file is empty or incorrect JSON.
             - KeyError if transcript file has incorrect format.
         '''
 
@@ -265,11 +260,13 @@ class VideoModule(VideoFields, XModule):
         content_location = StaticContent.compute_location(
             self.location.org, self.location.course, filename
         )
+        sjson_transcripts = contentstore().find(content_location)
+        str_subs = _generate_srt_from_sjson(json.loads(sjson_transcripts.data), speed=1.0)
+        if not str_subs:
+            log.debug('generate_srt_from_sjson produces no subtitles')
+            raise ValueError
 
-        data = contentstore().find(content_location).data
-        text = json.loads(data)['text']
-
-        return HTMLParser().unescape("\n".join(text))
+        return str_subs
 
 
     @XBlock.handler
@@ -289,9 +286,9 @@ class VideoModule(VideoFields, XModule):
         response = Response(
             subs,
             headerlist=[
-                ('Content-Disposition', 'attachment; filename="{0}.txt"'.format(self.sub)),
+                ('Content-Disposition', 'attachment; filename="{0}.srt"'.format(self.sub)),
             ])
-        response.content_type="text/plain; charset=utf-8"
+        response.content_type="application/x-subrip"
 
         return response
 
@@ -317,15 +314,6 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
         '''
         Mostly handles backward compatibility issues.
 
-        Track was deprecated field, but functionality was reverted,
-        this is commented out because might be used in future.
-        ###
-        `track` is deprecated field.
-        If `track` field exists show `track` field on front-end as not-editable
-        but clearable. Dropdown `download_track` is a new field and it has value
-        True.
-        ###
-
         `source` is deprecated field.
         a) If `source` exists and `source` is not `html5_sources`: show `source`
             field on front-end as not-editable but clearable. Dropdown is a new
@@ -344,14 +332,6 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
 
         editable_fields = self.editable_metadata_fields
 
-        # Commented due to the reason described in BLD-811.
-        # self.track_visible = False
-        # if self.track:
-        #     self.track_visible = True
-        #     download_track = editable_fields['download_track']
-        #     if not download_track['explicitly_set']:
-        #         self.download_track = True
-
         self.source_visible = False
         if self.source:
             # If `source` field value exist in the `html5_sources` field values,
@@ -368,16 +348,6 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
     @property
     def editable_metadata_fields(self):
         editable_fields = super(VideoDescriptor, self).editable_metadata_fields
-
-        # Commented due to the reason described in BLD-811.
-        # if hasattr(self, 'track_visible'):
-        #     if self.track_visible:
-        #         editable_fields['track']['non_editable'] = True
-        #     else:
-        #         editable_fields.pop('track')
-
-        if 'download_track' in editable_fields:
-            editable_fields.pop('download_track')
 
         if hasattr(self, 'source_visible'):
             if self.source_visible:
@@ -577,9 +547,16 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
                     value = deserialize_field(cls.fields[attr], value)
                 field_data[attr] = value
 
-        # Add `source` for backwards compatibility if xml doesn't  have `download_video`.
+        # For backwards compatibility: Add `source` if XML doesn't have `download_video`
+        # attribute.
         if 'download_video' not in field_data and sources:
             field_data['source'] = field_data['html5_sources'][0]
+
+        # For backwards compatibility: if XML doesn't have `download_track` attribute,
+        # it means that it is an old format. So, if `track` has some value,
+        # `download_track` needs to have value `True`.
+        if 'download_track' not in field_data and track is not None:
+            field_data['download_track'] = True
 
         return field_data
 
@@ -602,3 +579,60 @@ def _create_youtube_string(module):
                      for pair
                      in zip(youtube_speeds, youtube_ids)
                      if pair[1]])
+
+
+def _generate_subs(speed, source_speed, source_subs):
+    """
+    Generate transcripts from one speed to another speed.
+
+    Args:
+    `speed`: float, for this speed subtitles will be generated,
+    `source_speed`: float, speed of source_subs
+    `soource_subs`: dict, existing subtitles for speed `source_speed`.
+
+    Returns:
+    `subs`: dict, actual subtitles.
+    """
+    if speed == source_speed:
+        return source_subs
+
+    coefficient = 1.0 * speed / source_speed
+    subs = {
+        'start': [
+            int(round(timestamp * coefficient)) for
+            timestamp in source_subs['start']
+        ],
+        'end': [
+            int(round(timestamp * coefficient)) for
+            timestamp in source_subs['end']
+        ],
+        'text': source_subs['text']}
+    return subs
+
+
+def _generate_srt_from_sjson(sjson_subs, speed):
+    """Generate transcripts with speed = 1.0 from sjson to SubRip (*.srt).
+
+    :param sjson_subs: "sjson" subs.
+    :param speed: speed of `sjson_subs`.
+    :returns: "srt" subs.
+    """
+
+    output = ''
+
+    equal_len = len(sjson_subs['start']) == len(sjson_subs['end']) == len(sjson_subs['text'])
+    if not equal_len:
+        return output
+
+    sjson_speed_1 = _generate_subs(speed, 1, sjson_subs)
+
+    for i in range(len(sjson_speed_1['start'])):
+        item = SubRipItem(
+            index=i,
+            start=SubRipTime(milliseconds=sjson_speed_1['start'][i]),
+            end=SubRipTime(milliseconds=sjson_speed_1['end'][i]),
+            text=sjson_speed_1['text'][i]
+        )
+        output += (unicode(item))
+        output += '\n'
+    return output
