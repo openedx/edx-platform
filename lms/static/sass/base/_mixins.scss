@@ -97,6 +97,26 @@
 %ui-depth4 { z-index: 10000; }
 %ui-depth5 { z-index: 100000; }
 
+// extends - UI - utility - nth-type style clearing
+%wipe-first-child {
+
+  &:first-child {
+    margin-top: 0;
+    border-top: none;
+    padding-top: 0;
+  }
+}
+
+// extends - UI - utility - nth-type style clearing
+%wipe-last-child {
+
+  &:last-child {
+    margin-bottom: 0;
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+}
+
 // extends -hidden elems - screenreaders
 %text-sr {
   border: 0;

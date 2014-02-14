@@ -2,6 +2,7 @@ from django.db import IntegrityError
 from django.test import TestCase
 from student.tests.factories import UserFactory
 from user_api.tests.factories import UserPreferenceFactory
+from user_api.models import UserPreference
 
 
 class UserPreferenceModelTest(TestCase):
@@ -26,3 +27,21 @@ class UserPreferenceModelTest(TestCase):
             key="testkey3",
             value="\xe8\xbf\x99\xe6\x98\xaf\xe4\xb8\xad\xe5\x9b\xbd\xe6\x96\x87\xe5\xad\x97'"
         )
+
+    def test_get_set_preference(self):
+        # Checks that you can set a preference and get that preference later
+        # Also, tests that no preference is returned for keys that are not set
+
+        user = UserFactory.create()
+        key = 'testkey'
+        value = 'testvalue'
+
+        # does a round trip
+        UserPreference.set_preference(user, key, value)
+        pref = UserPreference.get_preference(user, key)
+
+        self.assertEqual(pref, value)
+
+        # get preference for key that doesn't exist for user
+        pref = UserPreference.get_preference(user, 'testkey_none')
+        self.assertIsNone(pref)

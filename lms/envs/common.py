@@ -501,7 +501,8 @@ LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
 
 # Sourced from http://www.localeplanet.com/icu/ and wikipedia
 LANGUAGES = (
-    ('eo', u'Dummy Language (Esperanto)'),  # Dummy language used for testing
+    ('en', u'English'),
+    ('eo', u'Dummy Language (Esperanto)'),  # Dummy languaged used for testing
     ('fake2', u'Fake translations'),        # Another dummy language for testing (not pushed to prod)
 
     ('ach', u'Acholi'),  # Acoli
@@ -553,6 +554,8 @@ LANGUAGES = (
     ('zh-cn', u'大陆简体'),  # Chinese (China)
     ('zh-tw', u'台灣正體'),  # Chinese (Taiwan)
 )
+
+LANGUAGE_DICT = dict(LANGUAGES)
 
 USE_I18N = True
 USE_L10N = True
@@ -697,6 +700,10 @@ MIDDLEWARE_CLASSES = (
 
     # Allows us to dark-launch particular languages
     'dark_lang.middleware.DarkLangMiddleware',
+
+    # Allows us to set user preferences
+    # should be after DarkLangMiddleware
+    'lang_pref.middleware.LanguagePreferenceMiddleware',
 
     # Detects user-requested locale from 'accept-language' header in http request
     'django.middleware.locale.LocaleMiddleware',

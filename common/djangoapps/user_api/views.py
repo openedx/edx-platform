@@ -4,8 +4,8 @@ from rest_framework import authentication
 from rest_framework import filters
 from rest_framework import permissions
 from rest_framework import viewsets
-from user_api.models import UserPreference
 from user_api.serializers import UserSerializer, UserPreferenceSerializer
+from user_api.models import UserPreference
 
 
 class ApiKeyHeaderPermission(permissions.BasePermission):

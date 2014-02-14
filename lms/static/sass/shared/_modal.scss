@@ -325,3 +325,37 @@
   @extend .modal;
 }
 
+// --------------------
+
+// CASE: language settings
+.modal-settings-language {
+
+  // general reset
+  .list-input, .list-actions {
+    @extend %ui-no-list;
+  }
+
+  .settings-language-select .select {
+    width: 100%;
+  }
+
+  .list-input {
+    margin-bottom: $baseline;
+  }
+
+  .actions-supplemental {
+    padding: 0 ($baseline*2) $baseline ($baseline*2);
+
+    .list-actions-item {
+      @extend %t-copy-sub1;
+      color: $base-font-color;
+      text-align: center;
+    }
+
+    .action {
+      display: block;
+      margin-top: ($baseline/4);
+    }
+  }
+}
+
