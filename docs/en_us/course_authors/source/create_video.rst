@@ -193,7 +193,7 @@ The following options appear on the **Advanced** tab in the Video component.
 
   * If you set **Transcript Download Allowed** to **True**, and you specify a file in the **Download Transcript** field, the file you've specified will be available for students to download. 
 
-  * If you set **Transcript Download Allowed** to **True**, but you leave the **Download Transcript** field blank, the .srt transcript will be available. 
+  * If you set **Transcript Download Allowed** to **True**, but you leave the **Download Transcript** field blank, the .srt transcript that automatically plays with the video will be available. 
 
 * **End Time**: The time, formatted as hours, minutes, and seconds (HH:MM:SS), when you want the video to end.
 
