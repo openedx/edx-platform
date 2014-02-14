@@ -11,8 +11,14 @@ Change Log
 
    * - Date
      - Change
+   * - 02/14/14
+     - Added :ref:`Additional Transcripts` section to :ref:`Working with Video Components`; updated :ref:`Video Advanced Options` 
+   * - 02/11/14
+     - Added :ref:`Gene Editor` and updated :ref:`Interactive Periodic Table` and :ref:`Molecule Editor` in :ref:`Additional Tools`
    * - 02/07/14
      - Added section on :ref:`Full Screen Image`.
+   * - 02/06/14
+     - Added :ref:`Interactive Periodic Table` and :ref:`Molecule Editor` to :ref:`Additional Tools`
    * - 02/05/14
      - Added section :ref:`Set the Advertised Start Date`.
    * - 02/04/14
