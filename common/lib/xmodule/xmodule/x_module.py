@@ -142,6 +142,10 @@ class XModuleMixin(XBlockMixin):
     )
 
     @property
+    def system(self):
+        return self.runtime
+
+    @property
     def course_id(self):
         return self.runtime.course_id
 
@@ -400,7 +404,6 @@ class XModule(XModuleMixin, HTMLSnippet, XBlock):  # pylint: disable=abstract-me
         self.descriptor = descriptor
         super(XModule, self).__init__(*args, **kwargs)
         self._loaded_children = None
-        self.system = self.runtime
         self.runtime.xmodule_instance = self
 
     def __unicode__(self):
@@ -634,7 +637,6 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
         XModuleDescriptor.__init__ takes the same arguments as xblock.core:XBlock.__init__
         """
         super(XModuleDescriptor, self).__init__(*args, **kwargs)
-        self.system = self.runtime
         # update_version is the version which last updated this xblock v prev being the penultimate updater
         # leaving off original_version since it complicates creation w/o any obv value yet and is computable
         # by following previous until None
