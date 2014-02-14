@@ -156,6 +156,9 @@ THEME_NAME = ENV_TOKENS.get('THEME_NAME', None)
 #Timezone overrides
 TIME_ZONE = ENV_TOKENS.get('TIME_ZONE', TIME_ZONE)
 
+# Push to LMS overrides
+GIT_REPO_EXPORT_DIR = ENV_TOKENS.get('GIT_REPO_EXPORT_DIR', '/edx/var/edxapp/export_course_repos')
+
 # Translation overrides
 LANGUAGES = ENV_TOKENS.get('LANGUAGES', LANGUAGES)
 LANGUAGE_CODE = ENV_TOKENS.get('LANGUAGE_CODE', LANGUAGE_CODE)

@@ -96,6 +96,11 @@ urlpatterns += patterns('',
     url(r'^i18n.js$', 'django.views.i18n.javascript_catalog', js_info_dict),
 )
 
+
+if settings.FEATURES.get('ENABLE_EXPORT_GIT'):
+    urlpatterns += (url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/export_git/(?P<name>[^/]+)$',
+                        'contentstore.views.export_git', name='export_git'),)
+
 if settings.FEATURES.get('ENABLE_SERVICE_STATUS'):
     urlpatterns += patterns('',
         url(r'^status/', include('service_status.urls')),
