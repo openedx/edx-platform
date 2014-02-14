@@ -16,13 +16,13 @@ from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import Location
 from xmodule.contentstore.content import StaticContent
-from xmodule.util.date_utils import get_default_time_display
 from xmodule.modulestore import InvalidLocationError
 from xmodule.exceptions import NotFoundError
 from django.core.exceptions import PermissionDenied
 from xmodule.modulestore.django import loc_mapper
 from xmodule.modulestore.locator import BlockUsageLocator
 
+from util.date_utils import get_default_time_display
 from util.json_request import JsonResponse
 from django.http import HttpResponseNotFound
 from django.utils.translation import ugettext as _
