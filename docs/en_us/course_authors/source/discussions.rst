@@ -19,13 +19,13 @@ For options you can use to run and moderate discussions, see the following topic
 .. _Organizing_discussions:
 
 *************************************************
-Setting up discussions for your course
+Set up discussions for your course
 *************************************************
 
 Discussions in an edX course include both the specific topics that you add to course units as discussion components, and  broader forums on course-wide areas of interest, such as Feedback, Troubleshooting, or Technical Help, that you can add as discussion categories. 
 
 ============================================
-Adding units with a discussion component
+Add units with a discussion component
 ============================================
 
 Typically, all units are added during the design and creation of your course in Studio. To add a component to a unit, follow the instructions in :ref:`Working with Discussion Components`.   
@@ -33,7 +33,7 @@ Typically, all units are added during the design and creation of your course in 
 This type of discussion is subject to the release date of the section that contains it. Students cannot contribute to these discussions until that date.
 
 =====================================
-Creating discussion categories
+Create discussion categories
 =====================================
 All courses have a static page named **Discussion**. When you create a course, a discussion category named General is available for you to include by default. You can add more discussion categories to guide how students share and find information during your course. Categories might include Feedback, Troubleshooting, or Technical Help. Discussions in these categories can begin as soon as your course is available.
 
@@ -95,7 +95,7 @@ When students click the **Discussion** static page for your course, the drop-dow
 .. _Assigning_discussion_roles:
 
 ==========================================
-Assigning discussion administration roles 
+Assign discussion administration roles 
 ==========================================
 
 You can designate a team of people to help you run course discussions. Different options for working with discussion posts are available to discussion administrators with these roles:
@@ -105,6 +105,8 @@ You can designate a team of people to help you run course discussions. Different
 * Forum community TAs have the same options for working with discussions as moderators. Responses and comments made by community TAs are marked as "Community TA".
 
 * Forum admins have the same options for working with discussions as moderators. Admins can also assign these discussion management roles to more people while your course is running, or remove a role from a user whenever necessary. Responses and comments made by admins are marked as "Staff".
+
+**Note**: Discussion responses and comments made by course staff and instructors are also marked as "Staff".
 
 Before you can assign roles to your discussion administrators, you need their email addresses. 
 
@@ -117,7 +119,7 @@ To assign a role:
 
 #. View the live version of your course.
 
-#. Click **Instructor Dashboard** then **Try New Beta Dashboard**.
+#. Click **Instructor** then **Try New Beta Dashboard**.
 
 #. Click **Membership**.
 
@@ -127,18 +129,18 @@ To assign a role:
 
 #. To remove an assigned role, view the list of users and then click revoke access (the **X**) next to that email address. 
 
-You can also use the older version of the Instructor Dashboard. You need the usernames of your discussion modertors or students. Click **Forum Admin**, enter the username in the appropriate field, then click the **Add** button for the role you want to assign.  
+You can also use the older version of the Instructor Dashboard. You need the usernames of your discussion moderators or students. Click **Forum Admin**, enter the username in the appropriate field, then click the **Add** button for the role you want to assign.  
 
 .. _Running_discussions:
 
 *********************
-Running a discussion
+Run a discussion
 *********************
 
 On an ongoing basis, discussion administrators run the course discussions by making contributions and guiding student posts into threads. Techniques that you can use throughout your course to make discussions successful follow.
 
 ========================
-Seeding a discussion
+Seed a discussion
 ======================== 
 
 Before you contribute to a discussion, you can decide whether you want to be identified as a staff member or community TA, or to appear like other students' work. Depending on the subject and your purpose, one or the other might be more appropriate to spark discussion and inform students.
@@ -152,7 +154,7 @@ You can also post anonymously. Regardless of your role, you can choose to make a
 note:: Posts by discussion administrators do not include a colored "Staff" or "Community TA" banner. Only responses to posts and comments made on responses do.
 
 ==========================================
-Using conventions in discussion subjects
+Use conventions in discussion subjects
 ==========================================
 
 To identify certain types of posts and make them easier for your students to find, you can define a set of standard tags to include at the beginning of the subject. Examples follow.
@@ -167,7 +169,7 @@ To identify certain types of posts and make them easier for your students to fin
 
 
 ======================================
-Minimizing thread proliferation
+Minimize thread proliferation
 ======================================
 
 To encourage longer, threaded discussions rather than many similar, separate posts, discussion administrators can use these techniques. However, be aware that long threads (with more than a 200 responses and comments) can be difficult to read and slow to display, and can therefore result in an unsatisfactory experience in the discussion.
@@ -194,7 +196,7 @@ To encourage longer, threaded discussions rather than many similar, separate pos
 .. _Moderating_discussions:
 
 ***********************
-Moderating discussions
+Moderate discussions
 ***********************
 
 Discussion administrators monitor discussions and keep them productive. They can also collect inforrmation, such as areas of particular confusion or interest, and relay it to the course staff. 
@@ -204,7 +206,7 @@ Developing and sustaining a positive discussion culture requires that sufficient
 For information on setting up moderators for your course, see :ref:`Assigning_discussion_roles`.
 
 ========================================
-Providing guidelines for students
+Provide guidelines for students
 ========================================
 
 You can develop a set of best practices for discussion participation and make them avaialbe to students as a course handout file or as a static page. These guidelines can define your expectations and optionally introduce features of edX discussions. 
@@ -212,7 +214,7 @@ You can develop a set of best practices for discussion participation and make th
 .. For a template that you can use to develop your own guidelines, see :ref:`Discussion Forum Guidelines`.
 
 ========================================
-Developing a positive forum culture
+Develop a positive forum culture
 ========================================
 
 Monitors can cultivate qualities in their own discussion interactions to make their influence positive and their time productive.
@@ -236,7 +238,7 @@ Monitors can cultivate qualities in their own discussion interactions to make th
 For a template that you can use to develop guidelines for your course moderators, see :ref:`Guidance for Discussion Moderators`.
 
 ==================
-Editing posts 
+Edit posts 
 ==================
 
 Posts and responses can be edited by discussion moderators, community TAs, and admins. Posts that include spoilers or solutions, or that contain inappropriate or off-topic material, should be edited quickly to remove text, images, or links. 
@@ -250,7 +252,7 @@ Posts and responses can be edited by discussion moderators, community TAs, and a
 #. Communicate the reason for your change. For example, "Posting a solution violates the honor code."
 
 ==================
-Deleting posts 
+Delete posts 
 ==================
 
 Posts and responses can be deleted by discussion moderators, community TAs, and admins. Posts that include spam or abusive language may need to be deleted, rather than edited. 
@@ -266,7 +268,7 @@ Posts and responses can be deleted by discussion moderators, community TAs, and 
 **Important**: If a post is threatening or indicates serious harmful intent, contact campus security at your institution. Report the incident before taking any other action. 
 
 ==================================
-Responding to reports of misuse
+Respond to reports of misuse
 ==================================
 
 Students can use the **Report Misuse** flag to indicate posts that they find inappropriate. Moderators, community TAs, and admins can check for posts that have been flagged in this way and edit or delete them as needed.
@@ -280,18 +282,9 @@ Students can use the **Report Misuse** flag to indicate posts that they find ina
 #. Edit or delete the post. Alternatively, leave the post unchanged and click **Misuse Reported** or the flag to remove  the notification.
 
 ===============
-Blocking users
+Block users
 ===============
 
-For students who continue to misuse the discussion, you can block further particpation by unenrolling the student from the course. 
+For students who continue to misuse the course discussions, you can unenroll the student from the course. See :ref:`unenroll_student`. If the enrollment period for the course is over, the student cannot re-enroll.
 
-#. View the live version of your course.
-
-#. On the Instructor Dashboard click **Try New Beta Dashboard**.
-
-#. To get the student's email address, on the Instructor Dashboard click **Data Download** > **List enrolled students' profile information**.  
-
-#. To unenroll the student, click **Membership** and in the Batch Enrollment section enter the email address.
-
-#. Click **Unenroll**.
 

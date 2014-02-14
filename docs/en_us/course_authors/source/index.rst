@@ -37,6 +37,9 @@ Contents
    ora_students
    discussions
    discussion_guidance_moderators
+   course_data
+   course_enrollment
+   course_staffing
    course_student
    course_grades
    glossary
