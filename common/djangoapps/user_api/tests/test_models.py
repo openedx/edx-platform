@@ -29,7 +29,8 @@ class UserPreferenceModelTest(TestCase):
         )
 
     def test_get_set_preference(self):
-        # tests for the getters and setters of preferences
+        # Checks that you can set a preference and get that preference later
+        # Also, tests that no preference is returned for keys that are not set
 
         user = UserFactory.create()
         key = 'testkey'

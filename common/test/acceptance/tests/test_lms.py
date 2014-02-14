@@ -6,7 +6,7 @@ E2E tests for the LMS.
 from unittest import skip
 
 from bok_choy.web_app_test import WebAppTest
-from bok_choy.promise import EmptyPromise, fulfill_before
+from bok_choy.promise import EmptyPromise, fulfill_before, fulfill, Promise
 
 from .helpers import UniqueCourseTest, load_data_str
 from ..pages.studio.auto_auth import AutoAuthPage
@@ -74,6 +74,15 @@ class LanguageTest(UniqueCourseTest):
     """
     Tests that the change language functionality on the dashboard works
     """
+ 
+    @property
+    def _changed_lang_promise(self):
+     
+        def _check_func():
+            text = self.dashboard_page.current_courses_text
+            return (len(text) > 0, text)
+           
+        return Promise(_check_func, "language changed")
 
     def setUp(self):
         """
@@ -84,6 +93,8 @@ class LanguageTest(UniqueCourseTest):
 
         self.test_new_lang = 'eo'
         # This string is unicode for "ÇÜRRÉNT ÇØÜRSÉS", which should appear in our Dummy Esperanto page
+        # We store the string this way because Selenium seems to try and read in strings from
+        # the HTML in this format. Ideally we could just store the raw ÇÜRRÉNT ÇØÜRSÉS string here
         self.current_courses_text = u'\xc7\xdcRR\xc9NT \xc7\xd6\xdcRS\xc9S'
 
         self.username = "test"
@@ -113,9 +124,10 @@ class LanguageTest(UniqueCourseTest):
         auto_auth_page.visit()
 
         self.dashboard_page.visit()
+
+        changed_text = fulfill(self._changed_lang_promise)
         # We should see the dummy-language text on the page
-        self.browser.is_text_present(self.current_courses_text)
-        self.assertTrue(self.browser.is_text_present(self.current_courses_text))
+        self.assertIn(self.current_courses_text, changed_text)
 
 
 class HighLevelTabTest(UniqueCourseTest):

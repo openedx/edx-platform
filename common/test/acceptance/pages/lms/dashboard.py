@@ -19,6 +19,14 @@ class DashboardPage(PageObject):
         return self.is_css_present('section.my-courses')
 
     @property
+    def current_courses_text(self):
+        text_items = self.css_text('section#my-courses')
+        if len(text_items) > 0:
+            return text_items[0]
+        else:
+            return ""
+
+    @property
     def available_courses(self):
         """
         Return list of the names of available courses (e.g. "999 edX Demonstration Course")
