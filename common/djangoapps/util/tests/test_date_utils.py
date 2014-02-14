@@ -1,11 +1,21 @@
-"""Tests for util.date_utils"""
+# -*- coding: utf-8 -*-
+"""
+Tests for util.date_utils
+"""
 
 from datetime import datetime, timedelta, tzinfo
+from functools import partial
+import unittest
 
+import ddt
+from mock import patch
 from nose.tools import assert_equals, assert_false  # pylint: disable=E0611
-from pytz import UTC, timezone
+from pytz import UTC
 
-from util.date_utils import get_default_time_display, get_time_display, almost_same_datetime
+from util.date_utils import (
+    get_default_time_display, get_time_display, almost_same_datetime,
+    strftime_localized,
+)
 
 
 def test_get_default_time_display():
@@ -106,3 +116,106 @@ def test_almost_same_datetime():
             timedelta(minutes=10)
         )
     )
+
+
+def fake_ugettext(text, translations):
+    """
+    A fake implementation of ugettext, for testing.
+    """
+    return translations.get(text, text)
+
+
+def fake_pgettext(context, text, translations):
+    """
+    A fake implementation of pgettext, for testing.
+    """
+    return translations.get((context, text), text)
+
+
+@ddt.ddt
+class StrftimeLocalizedTest(unittest.TestCase):
+    """
+    Tests for strftime_localized.
+    """
+    @ddt.data(
+        ("%Y", "2013"),
+        ("%m/%d/%y", "02/14/13"),
+        ("hello", "hello"),
+        (u'%Y년 %m월 %d일', u"2013년 02월 14일"),
+        ("%a, %b %d, %Y", "Thu, Feb 14, 2013"),
+        ("%I:%M:%S %p", "04:41:17 PM"),
+    )
+    def test_usual_strftime_behavior(self, (fmt, expected)):
+        dtime = datetime(2013, 02, 14, 16, 41, 17)
+        self.assertEqual(expected, strftime_localized(dtime, fmt))
+        # strftime doesn't like Unicode, so do the work in UTF8.
+        self.assertEqual(expected, dtime.strftime(fmt.encode('utf8')).decode('utf8'))
+
+    @ddt.data(
+        ("SHORT_DATE", "Feb 14, 2013"),
+        ("LONG_DATE", "Thursday, February 14, 2013"),
+        ("TIME", "04:41:17 PM"),
+        ("%x %X!", "Feb 14, 2013 04:41:17 PM!"),
+    )
+    def test_shortcuts(self, (fmt, expected)):
+        dtime = datetime(2013, 02, 14, 16, 41, 17)
+        self.assertEqual(expected, strftime_localized(dtime, fmt))
+
+    @patch('util.date_utils.pgettext', partial(fake_pgettext, translations={
+        ("abbreviated month name", "Feb"): "XXfebXX",
+        ("month name", "February"): "XXfebruaryXX",
+        ("abbreviated weekday name", "Thu"): "XXthuXX",
+        ("weekday name", "Thursday"): "XXthursdayXX",
+        ("am/pm indicator", "PM"): "XXpmXX",
+    }))
+    @ddt.data(
+        ("SHORT_DATE", "XXfebXX 14, 2013"),
+        ("LONG_DATE", "XXthursdayXX, XXfebruaryXX 14, 2013"),
+        ("DATE_TIME", "XXfebXX 14, 2013 at 16:41"),
+        ("TIME", "04:41:17 XXpmXX"),
+        ("%x %X!", "XXfebXX 14, 2013 04:41:17 XXpmXX!"),
+    )
+    def test_translated_words(self, (fmt, expected)):
+        dtime = datetime(2013, 02, 14, 16, 41, 17)
+        self.assertEqual(expected, strftime_localized(dtime, fmt))
+
+    @patch('util.date_utils.ugettext', partial(fake_ugettext, translations={
+        "SHORT_DATE_FORMAT": "date(%Y.%m.%d)",
+        "LONG_DATE_FORMAT": "date(%A.%Y.%B.%d)",
+        "DATE_TIME_FORMAT": "date(%Y.%m.%d@%H.%M)",
+        "TIME_FORMAT": "%Hh.%Mm.%Ss",
+    }))
+    @ddt.data(
+        ("SHORT_DATE", "date(2013.02.14)"),
+        ("Look: %x", "Look: date(2013.02.14)"),
+        ("LONG_DATE", "date(Thursday.2013.February.14)"),
+        ("DATE_TIME", "date(2013.02.14@16.41)"),
+        ("TIME", "16h.41m.17s"),
+        ("The time is: %X", "The time is: 16h.41m.17s"),
+        ("%x %X", "date(2013.02.14) 16h.41m.17s"),
+    )
+    def test_translated_formats(self, (fmt, expected)):
+        dtime = datetime(2013, 02, 14, 16, 41, 17)
+        self.assertEqual(expected, strftime_localized(dtime, fmt))
+
+    @patch('util.date_utils.ugettext', partial(fake_ugettext, translations={
+        "SHORT_DATE_FORMAT": "oops date(%Y.%x.%d)",
+        "TIME_FORMAT": "oops %Hh.%Xm.%Ss",
+    }))
+    @ddt.data(
+        ("SHORT_DATE", "Feb 14, 2013"),
+        ("TIME", "04:41:17 PM"),
+    )
+    def test_recursion_protection(self, (fmt, expected)):
+        dtime = datetime(2013, 02, 14, 16, 41, 17)
+        self.assertEqual(expected, strftime_localized(dtime, fmt))
+
+    @ddt.data(
+        "%",
+        "Hello%"
+        "%Y/%m/%d%",
+    )
+    def test_invalid_format_strings(self, fmt):
+        dtime = datetime(2013, 02, 14, 16, 41, 17)
+        with self.assertRaises(ValueError):
+            strftime_localized(dtime, fmt)
