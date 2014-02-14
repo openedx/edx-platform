@@ -21,7 +21,7 @@ from xmodule.x_module import prefer_xmodules
 
 ######################### Testing overrides ####################################
 
-# Needed for the reset database management command
+# Needed for the `reset_db` management command
 INSTALLED_APPS += ('django_extensions',)
 
 # Redirect to the test_root folder within the repo

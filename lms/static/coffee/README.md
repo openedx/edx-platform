@@ -34,9 +34,10 @@ Conveniently, you can install Node via `apt-get`, then use npm:
 Compiling
 ---------
 
-CoffeeScript is compiled when you update assets using the command:
-
-    $ paver update_assets
+The dev server will automatically compile coffeescript files that have changed.
+Simply start the server using:
+    
+    $ rake runserver
 
 Testing
 -------
