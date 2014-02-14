@@ -2,8 +2,9 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 from django.contrib.sessions.middleware import SessionMiddleware
 
-from user_api.middleware import UserPreferenceMiddleware
-from user_api.models import UserPreference, LANGUAGE_KEY
+from lang_pref.middleware import LanguagePreferenceMiddleware
+from user_api.models import UserPreference
+from lang_pref import LANGUAGE_KEY
 from student.tests.factories import UserFactory
 
 
@@ -13,7 +14,7 @@ class TestUserPreferenceMiddleware(TestCase):
     """
 
     def setUp(self):
-        self.middleware = UserPreferenceMiddleware()
+        self.middleware = LanguagePreferenceMiddleware()
         self.session_middleware = SessionMiddleware()
         self.user = UserFactory.create()
         self.request = RequestFactory().get('/somewhere')

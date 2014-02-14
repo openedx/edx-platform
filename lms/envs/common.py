@@ -703,7 +703,7 @@ MIDDLEWARE_CLASSES = (
 
     # Allows us to set user preferences
     # should be after DarkLangMiddleware
-    'user_api.middleware.UserPreferenceMiddleware',
+    'lang_pref.middleware.LanguagePreferenceMiddleware',
 
     # Detects user-requested locale from 'accept-language' header in http request
     'django.middleware.locale.LocaleMiddleware',

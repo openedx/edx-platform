@@ -1,9 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
 
-# this is the UserPreference key for the user's preferred language
-LANGUAGE_KEY = 'pref-lang'
-
 
 class UserPreference(models.Model):
     """A user's preference, stored as generic text to be processed by client"""

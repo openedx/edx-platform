@@ -29,6 +29,8 @@ class UserPreferenceModelTest(TestCase):
         )
 
     def test_get_set_preference(self):
+        # tests for the getters and setters of preferences
+
         user = UserFactory.create()
         key = 'testkey'
         value = 'testvalue'

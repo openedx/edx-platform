@@ -95,6 +95,7 @@ class LanguageTest(UniqueCourseTest):
         self.dashboard_page.visit()
         # Change language to Dummy Esperanto
         self.dashboard_page.change_language(self.test_new_lang)
+        # We should see the dummy-language text on the page
         self.assertTrue(self.browser.is_text_present(self.current_courses_text))
 
     def test_language_persists(self):
@@ -112,7 +113,7 @@ class LanguageTest(UniqueCourseTest):
         auto_auth_page.visit()
 
         self.dashboard_page.visit()
-        # This string is unicode for "ÇÜRRÉNT ÇØÜRSÉS", which should appear in our Dummy Esperanto page
+        # We should see the dummy-language text on the page
         self.browser.is_text_present(self.current_courses_text)
         self.assertTrue(self.browser.is_text_present(self.current_courses_text))
 

@@ -1,11 +1,12 @@
 """
-Middleware for UserPreferences
+Middleware for Language Preferences
 """
 
-from user_api.models import UserPreference, LANGUAGE_KEY
+from user_api.models import UserPreference
+from lang_pref import LANGUAGE_KEY
 
 
-class UserPreferenceMiddleware(object):
+class LanguagePreferenceMiddleware(object):
     """
     Middleware for user preferences.
 

@@ -2,12 +2,11 @@ import base64
 
 from django.test import TestCase
 from django.test.utils import override_settings
-from django.core.urlresolvers import reverse
 import json
 import re
 from student.tests.factories import UserFactory
 from unittest import SkipTest
-from user_api.models import UserPreference, LANGUAGE_KEY
+from user_api.models import UserPreference
 from user_api.tests.factories import UserPreferenceFactory
 
 
@@ -84,7 +83,7 @@ class ApiTestCase(TestCase):
         self.assertEqual(response.status_code, 403)
 
     def assertHttpBadRequest(self, response):
-        """Assert that the given response has the status code 403"""
+        """Assert that the given response has the status code 400"""
         self.assertEqual(response.status_code, 400)
 
     def assertHttpMethodNotAllowed(self, response):
@@ -92,7 +91,7 @@ class ApiTestCase(TestCase):
         self.assertEqual(response.status_code, 405)
 
 
-class NoUserApiTestCase(ApiTestCase):
+class EmptyUserTestCase(ApiTestCase):
     def test_get_list_empty(self):
         result = self.get_json(self.LIST_URI)
         self.assertEqual(result["count"], 0)
@@ -360,29 +359,3 @@ class UserPreferenceViewSetTest(UserApiTestCase):
                 "url": uri,
             }
         )
-
-
-class TestLanguageSetting(ApiTestCase):
-    """
-    Test setting languages
-    """
-    def test_set_preference_happy(self):
-        user = UserFactory.create()
-        self.client.login(username=user.username, password='test')
-
-        lang = 'en'
-        response = self.client.post(reverse('user_api_set_language'), {'language': lang})
-
-        self.assertHttpOK(response)
-        user_pref = UserPreference.get_preference(user, LANGUAGE_KEY)
-        self.assertEqual(user_pref, lang)
-
-    def test_set_preference_missing_lang(self):
-        user = UserFactory.create()
-        self.client.login(username=user.username, password='test')
-
-        response = self.client.post(reverse('user_api_set_language'))
-
-        self.assertHttpBadRequest(response)
-
-        self.assertIsNone(UserPreference.get_preference(user, LANGUAGE_KEY))

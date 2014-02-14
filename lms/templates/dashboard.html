@@ -85,7 +85,7 @@
 
     $("#submit-lang").click(function(event, xhr) {
         event.preventDefault();
-        $.post('/user_api/v1/setlang/',
+        $.post('/lang_pref/setlang/',
             {"language": $('#settings-language-value').val()})
         .done(
             function(data){

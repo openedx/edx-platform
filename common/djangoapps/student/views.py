@@ -62,7 +62,8 @@ import external_auth.views
 
 from bulk_email.models import Optout, CourseAuthorization
 import shoppingcart
-from user_api.models import UserPreference, LANGUAGE_KEY
+from user_api.models import UserPreference
+from lang_pref import LANGUAGE_KEY
 
 import track.views
 
@@ -472,13 +473,17 @@ def dashboard(request):
 
     language_options = DarkLangConfig.current().released_languages_list
 
+    # add in the default language if it's not in the list of released languages
     if settings.LANGUAGE_CODE not in language_options:
         language_options.append(settings.LANGUAGE_CODE)
 
+    # try to get the prefered language for the user
     cur_lang_code = UserPreference.get_preference(request.user, LANGUAGE_KEY)
     if cur_lang_code:
+        # if the user has a preference, get the name from the code
         current_language = settings.LANGUAGE_DICT[cur_lang_code]
     else:
+        # if the user doesn't have a preference, use the default language
         current_language = settings.LANGUAGE_DICT[settings.LANGUAGE_CODE]
 
     context = {
