@@ -7,6 +7,7 @@ from student.tests.factories import UserFactory
 from user_api.models import UserPreference
 from lang_pref import LANGUAGE_KEY
 
+
 class TestLanguageSetting(TestCase):
     """
     Test setting languages

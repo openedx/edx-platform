@@ -7,6 +7,7 @@ from django.http import HttpResponse, HttpResponseBadRequest
 from user_api.models import UserPreference
 from lang_pref import LANGUAGE_KEY
 
+
 @login_required
 def set_language(request):
     """

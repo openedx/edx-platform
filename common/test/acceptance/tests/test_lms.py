@@ -74,14 +74,12 @@ class LanguageTest(UniqueCourseTest):
     """
     Tests that the change language functionality on the dashboard works
     """
- 
+
     @property
     def _changed_lang_promise(self):
-     
         def _check_func():
             text = self.dashboard_page.current_courses_text
             return (len(text) > 0, text)
-           
         return Promise(_check_func, "language changed")
 
     def setUp(self):
@@ -106,8 +104,10 @@ class LanguageTest(UniqueCourseTest):
         self.dashboard_page.visit()
         # Change language to Dummy Esperanto
         self.dashboard_page.change_language(self.test_new_lang)
+
+        changed_text = fulfill(self._changed_lang_promise)
         # We should see the dummy-language text on the page
-        self.assertTrue(self.browser.is_text_present(self.current_courses_text))
+        self.assertIn(self.current_courses_text, changed_text)
 
     def test_language_persists(self):
         auto_auth_page = AutoAuthPage(self.browser, username=self.username, password=self.password, email=self.email, course_id=self.course_id)
