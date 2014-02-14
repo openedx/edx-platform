@@ -1496,7 +1496,7 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         """
         if fields is None:
             return {}
-        cls = self.mixologist.mix(XBlock.load_class(category, select=prefer_xmodules))
+        cls = self.mixologist.mix(XBlock.load_class(category, select=self.xblock_select))
         result = collections.defaultdict(dict)
         for field_name, value in fields.iteritems():
             field = getattr(cls, field_name)

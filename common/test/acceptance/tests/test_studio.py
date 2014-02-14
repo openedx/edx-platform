@@ -159,6 +159,7 @@ class XBlockAcidBase(WebAppTest):
         self.assertTrue(acid_block.init_fn_passed)
         self.assertTrue(acid_block.doc_ready_passed)
         self.assertTrue(acid_block.child_tests_passed)
+        self.assertTrue(acid_block.resource_url_passed)
         self.assertTrue(acid_block.scope_passed('user_state'))
 
     def test_acid_block_editor(self):
@@ -175,6 +176,7 @@ class XBlockAcidBase(WebAppTest):
         self.assertTrue(acid_block.init_fn_passed)
         self.assertTrue(acid_block.doc_ready_passed)
         self.assertTrue(acid_block.child_tests_passed)
+        self.assertTrue(acid_block.resource_url_passed)
         self.assertTrue(acid_block.scope_passed('content'))
         self.assertTrue(acid_block.scope_passed('settings'))
 

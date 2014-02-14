@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 import logging
 import hashlib
 from functools import partial
@@ -21,6 +23,7 @@ from xblock.fragment import Fragment
 
 from lms.lib.xblock.field_data import LmsFieldData
 from lms.lib.xblock.runtime import quote_slashes, unquote_slashes
+from cms.lib.xblock.runtime import local_resource_url
 
 from util.sandboxing import can_execute_unsafe_code
 
@@ -86,6 +89,9 @@ class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
             'handler': handler_name,
             'suffix': suffix,
         }) + '?' + query
+
+    def local_resource_url(self, block, uri):
+        return local_resource_url(block, uri)
 
 
 def _preview_module_system(request, descriptor):

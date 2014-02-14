@@ -61,6 +61,13 @@ class AcidView(PageObject):
             self.test_passed('.child-values-match')
         ])
 
+    @property
+    def resource_url_passed(self):
+        """
+        Whether the resource-url test passed in this view of the :class:`.AcidBlock`.
+        """
+        return self.test_passed('.local-resource-test')
+
     def scope_passed(self, scope):
         return all(
             self.test_passed('.scope-storage-test.scope-{} {}'.format(scope, test))
