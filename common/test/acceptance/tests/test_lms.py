@@ -82,16 +82,18 @@ class LanguageTest(UniqueCourseTest):
         super(LanguageTest, self).setUp()
         self.dashboard_page = DashboardPage(self.browser)
 
+        self.test_new_lang = 'eo'
+        # This string is unicode for "ÇÜRRÉNT ÇØÜRSÉS", which should appear in our Dummy Esperanto page
+        self.current_courses_text = u"\xc7\xdcRR\xc9NT \xc7\xd8\xdcRS\xc9S"
+
     def test_change_lang(self):
         AutoAuthPage(self.browser, course_id=self.course_id).visit()
         self.dashboard_page.visit()
         # Change language to Dummy Esperanto
-        self.dashboard_page.change_language("eo")
+        self.dashboard_page.change_language(self.test_new_lang)
 
-        # This string is unicode for "ÇÜRRÉNT ÇØÜRSÉS", which should appear in our Dummy Esperanto page
-        seektext = u"\xc7\xdcRR\xc9NT \xc7\xd8\xdcRS\xc9S"
-        self.browser.is_text_present(seektext)
-        self.assertTrue(self.browser.is_text_present(seektext))
+        self.browser.is_text_present(self.current_courses_text)
+        self.assertTrue(self.browser.is_text_present(self.current_courses_text))
 
     def test_language_persists(self):
         auto_auth_page = AutoAuthPage(self.browser, course_id=self.course_id)
@@ -99,7 +101,7 @@ class LanguageTest(UniqueCourseTest):
 
         self.dashboard_page.visit()
         # Change language to Dummy Esperanto
-        self.dashboard_page.change_language("eo")
+        self.dashboard_page.change_language(self.test_new_lang)
 
         # destroy session
         self.browser._cookie_manager.delete()
@@ -109,9 +111,8 @@ class LanguageTest(UniqueCourseTest):
 
         self.dashboard_page.visit()
         # This string is unicode for "ÇÜRRÉNT ÇØÜRSÉS", which should appear in our Dummy Esperanto page
-        seektext = u"\xc7\xdcRR\xc9NT \xc7\xd8\xdcRS\xc9S"
-        self.browser.is_text_present(seektext)
-        self.assertTrue(self.browser.is_text_present(seektext))
+        self.browser.is_text_present(self.current_courses_text)
+        self.assertTrue(self.browser.is_text_present(self.current_courses_text))
 
 
 class HighLevelTabTest(UniqueCourseTest):

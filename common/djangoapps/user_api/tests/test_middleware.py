@@ -14,10 +14,9 @@ class TestUserPreferenceMiddleware(TestCase):
 
     def setUp(self):
         self.middleware = UserPreferenceMiddleware()
-        self.request_factory = RequestFactory()
         self.session_middleware = SessionMiddleware()
         self.user = UserFactory.create()
-        self.request = self.request_factory.get('/somewhere')
+        self.request = RequestFactory().get('/somewhere')
         self.request.user = self.user
         self.session_middleware.process_request(self.request)
 
