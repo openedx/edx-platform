@@ -1,5 +1,7 @@
+.. _Tracking Logs:
+
 ===============
- Tracking Logs
+Tracking Logs
 ===============
 
 The following is an inventory of all LMS event types.
@@ -121,10 +123,10 @@ The Student Event Type table lists the event types logged for interaction with t
 |                                   |                               |                     |                 +---------------------+---------------+---------------------------------------------------------------------+
 |                                   |                               |                     |                 | ``speed``           | string        | Video speed in use (i.e., 0.75, 1.0, 1.25, 1.50).                   |
 +-----------------------------------+-------------------------------+---------------------+-----------------+---------------------+---------------+---------------------------------------------------------------------+
-| ``seek_video``                    | Fired when a user uses the    | Video               | Browser         | ``old_time``        |               | The time in the video that the user is coming from.                 |
-|                                   | scroll bar or the transcript  |                     |                 |                     |               |                                                                     |
-|                                   | to go to a different point in |                     |                 +---------------------+---------------+---------------------------------------------------------------------+
-|                                   | the video file.               |                     |                 | ``new_time``        |               | The time in the video that the user is going to.                    |
+| ``seek_video``                    | Fired when the playback bar   | Video               | Browser         | ``old_time``        |               | The time in the video that the user is coming from.                 |
+|                                   | or transcript is used to go   |                     |                 |                     |               |                                                                     |
+|                                   | to a different point in the   |                     |                 +---------------------+---------------+---------------------------------------------------------------------+
+|                                   | video file.                   |                     |                 | ``new_time``        |               | The time in the video that the user is going to.                    |
 |                                   |                               |                     |                 +---------------------+---------------+---------------------------------------------------------------------+
 |                                   |                               |                     |                 | ``type``            |               | The navigational method used to change position within the video.   |
 +-----------------------------------+-------------------------------+---------------------+-----------------+---------------------+---------------+---------------------------------------------------------------------+
