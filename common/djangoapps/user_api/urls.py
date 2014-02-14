@@ -9,5 +9,5 @@ user_api_router.register(r'user_prefs', user_api_views.UserPreferenceViewSet)
 urlpatterns = patterns(
     '',
     url(r'^v1/', include(user_api_router.urls)),
-    url(r'^setlang/', 'user_api.views.set_language', name='user_api_set_language')
+    url(r'^v1/setlang/', 'user_api.views.set_language', name='user_api_set_language')
 )
