@@ -206,7 +206,9 @@
           </span> <span class="data">${ user.email | h }</span>
         </li>
 
+        %if len(language_options) > 1:
         <%include file='dashboard/_dashboard_info_language.html' />
+        %endif
 
         % if external_auth_map is None or 'shib' not in external_auth_map.external_domain:
         <li class="controls--account">

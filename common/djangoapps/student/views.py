@@ -472,7 +472,8 @@ def dashboard(request):
 
     language_options = DarkLangConfig.current().released_languages_list
 
-    language_options.append(settings.LANGUAGE_CODE)
+    if settings.LANGUAGE_CODE not in language_options:
+        language_options.append(settings.LANGUAGE_CODE)
 
     cur_lang_code = UserPreference.get_preference(request.user, LANGUAGE_KEY)
     if cur_lang_code:
