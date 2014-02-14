@@ -13,9 +13,12 @@ def get_default_time_display(dtime):
     """
     Converts a datetime to a string representation. This is the default
     representation used in Studio and LMS.
-    It is of the form "Apr 09, 2013 at 16:00 UTC".
+
+    It will use the "DATE_TIME" format in the current language, if provided,
+    or defaults to "Apr 09, 2013 at 16:00 UTC".
 
     If None is passed in for dt, an empty string will be returned.
+
     """
     if dtime is None:
         return u""
@@ -26,8 +29,9 @@ def get_default_time_display(dtime):
             timezone = dtime.strftime('%z')
     else:
         timezone = u" UTC"
-    return unicode(dtime.strftime(u"%b %d, %Y at %H:%M{tz}")).format(
-        tz=timezone).strip()
+
+    localized = strftime_localized(dtime, "DATE_TIME")
+    return (localized + timezone).strip()
 
 
 def get_time_display(dtime, format_string=None, coerce_tz=None):
@@ -53,7 +57,7 @@ def get_time_display(dtime, format_string=None, coerce_tz=None):
     if dtime is None or format_string is None:
         return get_default_time_display(dtime)
     try:
-        return unicode(dtime.strftime(format_string))
+        return unicode(strftime_localized(dtime, format_string))
     except ValueError:
         return get_default_time_display(dtime)
 
@@ -363,3 +367,7 @@ MONTHS = {
     # date-time formats. See http://strftime.org for details.
     12: pgettext('month name', 'December'),
 }
+
+# Now that we are done defining constants, we have to restore the real pgettext
+# so that the functions in this module will have the right definition.
+pgettext = real_pgettext
