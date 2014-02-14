@@ -86,10 +86,14 @@ We strongly recommend that you associate a timed transcript with your video. Tra
 
 To create or obtain a transcript, you can work with a company that provides captioning services. EdX works with `3Play Media <http://www.3playmedia.com>`_. `YouTube <http://www.youtube.com/>`_ also provides captioning services. 
 
+
+
 Transcript Format
 -----------------
 
-Your transcript must be an .srt file.
+To play automatically with the video, your transcript must be an .srt file.
+
+If you want to provide downloadable transcripts in a format such as .txt or .pdf in addition to your .srt transcript, see :ref:`Additional Transcripts`.
 
 .. note:: Some past courses have used .sjson files for video transcripts. If transcripts in your course uses this format, see :ref:`Steps for sjson files`. We don't recommend that you use .sjson files.
 
@@ -142,7 +146,7 @@ Step 4. Create a Video Component
    You'll replace the default values with your own. 
    
 #. In the **Display Name** field, enter the name you want students to see when they hover the mouse 
-   over the unit in the course accordion. This text also appears as a header for the video.
+   over the unit in the course ribbon. This text also appears as a header for the video.
 
 #. In the **Video URL** field, enter the URL of the video. For example, the URL may resemble one of the following.
 
@@ -155,7 +159,7 @@ Step 4. Create a Video Component
 
 #. Next to **Timed Transcript**, select an option.
 
-   - If edX already has a transcript for your video, Studio automatically finds the transcript and associates the transcript with the video. For example, edX may have a transcript for your video if you're using a video from an existing course.
+   - If edX already has a transcript for your video--for example, if you're using a video from an existing course--Studio automatically finds the transcript and associates the transcript with the video.
      
      If you want to modify the transcript, click **Download to Edit**. You can then make your changes and upload the new file by clicking **Upload New Timed Transcript**.
 
@@ -163,9 +167,14 @@ Step 4. Create a Video Component
 
    - If neither edX nor YouTube has a transcript for your video, and your transcript uses the .srt format, click **Upload New Timed Transcript** to upload the transcript file from your computer. 
 
-     .. note:: If your transcript uses the .sjson format, do not use this setting. For more information, see :ref:`Steps for sjson files`.
+     .. note:: 
 
-#. Optionally, click **Advanced** to set more options for the video. For a description of each option, see the table below.
+        * If your transcript uses the .sjson format, do not use this setting. For more information, see :ref:`Steps for sjson files`.
+
+        * If you want to provide a transcript in a format such as .txt or .pdf, do not use this setting to upload the transcript. For more information, see :ref:`Additional Transcripts`. 
+    
+
+#. Optionally, click **Advanced** to set more options for the video. For a description of each option, see the list below.
 
 #. Click **Save.**
   
@@ -174,29 +183,51 @@ Step 4. Create a Video Component
 Advanced Options
 ----------------
 
-.. list-table::
-   :widths: 20 80
-   :header-rows: 0
+The following options appear on the **Advanced** tab in the Video component.
 
-   * - **Display Name**
-     - The name that you want your students to see. This is the same as the **Display Name** field on the **Basic** tab.
-   * - **End Time**
-     - The time, formatted as hours, minutes, and seconds (HH:MM:SS), when you want the video to end.
-   * - **HTML5 Transcript**
-     - If you uploaded an .srt file on the **Basic** tab, the name of your .srt file appears in this field by default. You don't have to change this setting.
-       If your transcript uses an .sjson file, see :ref:`Steps for sjson files`.
-   * - **Show Transcript**
-     - Specifies whether you want the transcript to show by default. Students can always turn transcripts on or off while they watch the video.
-   * - **Start Time**
-     - The time, formatted as hours, minutes, and seconds (HH:MM:SS), when you want the video to begin. 
-   * - **Transcript Download Allowed**
-     - Specifies whether you want to allow your students to download a copy of the transcript. 
-   * - **Video Download Allowed**
-     - Specifies whether you want to allow your students to download a copy of the video.
-   * - **Video Sources**
-     - Additional locations where you've posted the video. This field must contain a URL that ends in .mpeg, .mp4, .ogg, or .webm.
-   * - **YouTube ID, YouTube ID for .75x speed, YouTube ID for 1.25x speed, YouTube ID for 1.5x speed**
-     - If you have uploaded separate videos to YouTube for different speeds of your video, enter the YouTube IDs for these videos in these fields.
+* **Display Name**: The name that you want your students to see. This is the same as the **Display Name** field on the **Basic** tab.
+
+* **Download Transcript**: The URL for the transcript file for the video. This file is usually an .srt file, but can also be a .txt or .pdf file. (For more information aobut .txt and .pdf files, see :ref:`Additional Transcripts`.) The URL can be an external URL, such as **http://example.org/transcript.srt**, or the URL for a file that you've uploaded to your **Files & Uploads** page, such as **/static/example.srt**.
+
+  This setting is related to **Transcript Download Allowed**. 
+
+  * If you set **Transcript Download Allowed** to **True**, and you specify a file in the **Download Transcript** field, the file you've specified will be available for students to download. 
+
+  * If you set **Transcript Download Allowed** to **True**, but you leave the **Download Transcript** field blank, the .srt transcript that automatically plays with the video will be available. 
+
+* **End Time**: The time, formatted as hours, minutes, and seconds (HH:MM:SS), when you want the video to end.
+
+* **HTML5 Transcript**: If you uploaded an .srt file on the **Basic** tab, the name of your .srt file appears in this field by default. You don't have to change this setting.
+  
+  If your transcript uses an .sjson file, see :ref:`Steps for sjson files`.
+
+* **Show Transcript**: Specifies whether you want the transcript to show by default. Students can always turn transcripts on or off while they watch the video.
+
+* **Start Time**: The time, formatted as hours, minutes, and seconds (HH:MM:SS), when you want the video to begin. 
+
+* **Transcript Download Allowed**: Specifies whether you want to allow your students to download a copy of the transcript. 
+
+* **Video Download Allowed**: Specifies whether you want to allow your students to download a copy of the video.
+
+* **Video Sources**: Additional locations where you've posted the video. This field must contain a URL that ends in .mpeg, .mp4, .ogg, or .webm.
+
+* **YouTube ID, YouTube ID for .75x speed, YouTube ID for 1.25x speed, YouTube ID for 1.5x speed**: If you have uploaded separate videos to YouTube for different speeds of your video, enter the YouTube IDs for these videos in these fields.
+
+
+.. _Additional Transcripts:
+
+**********************
+Additional Transcripts
+**********************
+
+You can provide your students with a downloadable transcript in a format such as .txt or .pdf in addition to the .srt transcript that plays along with the video.
+
+#. Upload the .txt or .pdf transcript to the **Files & Uploads** page or host it on an external website.
+
+#. In the Video component, click the **Advanced** tab.
+
+#. In the **Download Transcript** field, enter the URL for the transcript. For more information, see :ref:`Video Advanced Options`.
+
 
 .. _Steps for sjson files:
 
