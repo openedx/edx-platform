@@ -420,6 +420,19 @@ body.course.unit,.view-unit {
       }
     }
 
+    // Special xBlock and xModule styling
+    .xblock-type-container {
+
+      .xblock-header-elementlevel {
+        line-height: $baseline*2;
+        min-height: $baseline*2;
+      }
+
+      .xblock-render-elementlevel {
+        display: none;
+      }
+    }
+
     .xblock-student_view {
       padding: 2*$baseline $baseline $baseline;
       overflow-x: auto;
@@ -1330,4 +1343,33 @@ body.unit {
 //  hides latex compiler button if settings mode is-active
 div.wrapper-comp-editor.is-inactive ~ div.launch-latex-compiler{
  display: none;
+}
+
+// ====================
+
+// xblock - unit page container
+
+body.unit .xblock-type-container {
+  @extend %wrap-xblock;
+  margin: 0;
+
+  &:hover {
+    @include transition(all $tmg-f2 linear 0s);
+    border-color: $blue;
+    box-shadow: 0 0 1px $shadow-d1;
+  }
+
+  .xblock-header {
+    margin-bottom: 0;
+    border-bottom: 0;
+    border-radius: ($baseline/5);
+
+    .xblock-details {
+      font-size: .9em;
+    }
+  }
+
+  .xblock-render {
+    display: none;
+  }
 }
