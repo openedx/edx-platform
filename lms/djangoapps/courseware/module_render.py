@@ -25,8 +25,6 @@ from lms.lib.xblock.runtime import LmsModuleSystem, unquote_slashes
 from edxmako.shortcuts import render_to_string
 from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
 from student.models import anonymous_id_for_user, user_by_anonymous_id
-from util.json_request import JsonResponse
-from util.sandboxing import can_execute_unsafe_code
 from xblock.core import XBlock
 from xblock.fields import Scope
 from xblock.runtime import KvsFieldData, KeyValueStore
@@ -41,6 +39,10 @@ from xmodule.util.duedate import get_extended_due_date
 from xmodule_modifiers import replace_course_urls, replace_jump_to_id_urls, replace_static_urls, add_staff_debug_info, wrap_xblock
 from xmodule.lti_module import LTIModule
 from xmodule.x_module import XModuleDescriptor
+
+from util.date_utils import strftime_localized
+from util.json_request import JsonResponse
+from util.sandboxing import can_execute_unsafe_code
 
 
 log = logging.getLogger(__name__)
@@ -428,10 +430,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
         wrappers=block_wrappers,
         get_real_user=user_by_anonymous_id,
         services={
-            # django.utils.translation implements the gettext.Translations
-            # interface (it has ugettext, ungettext, etc), so we can use it
-            # directly as the runtime i18n service.
-            'i18n': django.utils.translation,
+            'i18n': ModuleI18nService(),
         },
         get_user_role=lambda: get_user_role(user, course_id),
     )
@@ -652,3 +651,20 @@ def _check_files_limits(files):
                 return msg
 
     return None
+
+
+class ModuleI18nService(object):
+    """
+    Implement the XBlock runtime "i18n" service.
+
+    Mostly a pass-through to Django's translation module.
+    django.utils.translation implements the gettext.Translations interface (it
+    has ugettext, ungettext, etc), so we can use it directly as the runtime
+    i18n service.
+
+    """
+    def __getattr__(self, name):
+        return getattr(django.utils.translation, name)
+
+    def strftime(self, *args, **kwargs):
+        return strftime_localized(*args, **kwargs)
