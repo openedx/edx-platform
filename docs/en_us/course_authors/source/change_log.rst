@@ -4,7 +4,6 @@
 Change Log
 **********
 
-
 .. list-table::
    :widths: 10 80
    :header-rows: 1
@@ -12,10 +11,12 @@ Change Log
    * - Date
      - Change
    * - 02/14/14
-     - Added :ref:`Additional Transcripts` section to :ref:`Working with Video Components`; updated :ref:`Video Advanced Options` 
+     - Added :ref:`Additional Transcripts` section to :ref:`Working with Video Components`; 
+       updated :ref:`Video Advanced Options` 
+   * -
      - Added the :ref:`Course Data`, :ref:`Course_Staffing`, and :ref:`Enrollment` chapters. 
    * - 02/11/14
-     - Added :ref:`Gene Editor` and updated :ref:`Interactive Periodic Table` and :ref:`Molecule Editor` in :ref:`Additional Tools`
+     - Added :ref:`Gene Explorer` and updated :ref:`Interactive Periodic Table` and :ref:`Molecule Editor` in :ref:`Additional Tools`
    * - 02/07/14
      - Added section on :ref:`Full Screen Image`.
    * - 02/06/14

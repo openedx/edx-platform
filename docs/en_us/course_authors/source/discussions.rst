@@ -190,7 +190,7 @@ To encourage longer, threaded discussions rather than many similar, separate pos
   You can respond to a redundant post or response by pasting in a link to the thread that you prefer students to contribute to, and then prevent further thread interaction by closing the entire post or a specific response. Click the **Close** button that displays below the post or response to close it. 
 
 * Provide post/response/comment guidelines.
-  A set of :ref:`Discussion Forum Guidelines` or a post in the General discussion can provide guidance about when to create a new thread, respond to an existing post, or comment on a response. 
+  A set of :ref:`Guidance for Discussion Moderators` or a post in the General discussion can provide guidance about when to create a new thread, respond to an existing post, or comment on a response. 
 
 
 .. _Moderating_discussions:
