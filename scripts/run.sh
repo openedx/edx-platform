@@ -1,1 +1,1 @@
-rake lms
+paver lms
