@@ -51,11 +51,18 @@ def print_js_test_cmds(mode)
     end
 end
 
+# Paver migration hack: because the CoffeeScript-specific asset command has been deprecated,
+# we compile CoffeeScript ourselves
+def compile_coffeescript()
+    sh("node_modules/.bin/coffee --compile `find lms cms common -type f -name \"*.coffee\"`")
+end
 
 namespace :'test:js' do
 
     desc "Run the JavaScript tests and print results to the console"
-    task :run, [:env] => [:clean_test_files, :'assets:coffee', JS_REPORT_DIR] do |t, args|
+    task :run, [:env] => [:clean_test_files, JS_REPORT_DIR] do |t, args|
+        compile_coffeescript()
+
         if args[:env].nil?
             puts "Running all test suites.  To run a specific test suite, try:"
             print_js_test_cmds('run')
@@ -64,7 +71,9 @@ namespace :'test:js' do
     end
 
     desc "Run the JavaScript tests in your default browser"
-    task :dev, [:env] => [:clean_test_files, :'assets:coffee:_watch'] do |t, args|
+    task :dev, [:env] => [:clean_test_files] do |t, args|
+        compile_coffeescript()
+
         if args[:env].nil?
             puts "Error: No test suite specified.  Try one of these instead:"
             print_js_test_cmds('dev')
@@ -74,7 +83,8 @@ namespace :'test:js' do
     end
 
     desc "Run all JavaScript tests and collect coverage information"
-    task :coverage => [:clean_reports_dir, :clean_test_files, :'assets:coffee', JS_REPORT_DIR] do
+    task :coverage => [:clean_reports_dir, :clean_test_files, JS_REPORT_DIR] do
+        compile_coffeescript()
         js_test_tool(nil, 'run', true)
     end
 end

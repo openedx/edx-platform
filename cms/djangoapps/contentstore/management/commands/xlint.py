@@ -1,6 +1,5 @@
 """
 Verify the structure of courseware as to it's suitability for import
-To run test: rake cms:xlint DATA_DIR=../data [COURSE_DIR=content-edx-101 (optional parameter)]
 """
 from django.core.management.base import BaseCommand, CommandError
 from xmodule.modulestore.xml_importer import perform_xlint

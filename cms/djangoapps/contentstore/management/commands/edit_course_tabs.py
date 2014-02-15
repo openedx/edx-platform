@@ -5,8 +5,6 @@
 #
 # Run it this way:
 #   ./manage.py cms --settings dev edit_course_tabs --course Stanford/CS99/2013_spring
-# Or via rake:
-#   rake django-admin[edit_course_tabs,cms,dev,"--course Stanford/CS99/2013_spring --delete 4"]
 #
 from optparse import make_option
 from django.core.management.base import BaseCommand, CommandError
