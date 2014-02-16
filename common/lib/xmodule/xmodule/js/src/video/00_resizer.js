@@ -1,4 +1,4 @@
-(function (requirejs, require, define) {
+(function (requirejs, require, define) { // ;)
 
 define(
 'video/00_resizer.js',
