@@ -105,6 +105,8 @@ class LanguageTest(UniqueCourseTest):
         # Change language to Dummy Esperanto
         self.dashboard_page.change_language(self.test_new_lang)
 
+        self.dashboard_page.visit()
+
         changed_text = fulfill(self._changed_lang_promise)
         # We should see the dummy-language text on the page
         self.assertIn(self.current_courses_text, changed_text)
