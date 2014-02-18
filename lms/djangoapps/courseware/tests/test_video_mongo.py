@@ -420,13 +420,23 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
                 'display_name': 'Download Transcript',
                 'help': 'The external URL to download the timed transcript track.',
                 'type': 'Generic',
-                'value': u'',
+                'value': u'http://some_track.srt',
                 'field_name': 'track',
                 'options': [],
             },
+            'download_track': {
+                'default_value': False,
+                'explicitly_set': False,
+                'display_name': 'Transcript Download Allowed',
+                'help': 'Show a link beneath the video to allow students to download the transcript. Note: You must add a link to the HTML5 Transcript field above.',
+                'type': 'Generic',
+                'value': False,
+                'field_name': 'download_track',
+                'options': [],
+            }
         }
         metadata = {
-            'track': None,
+            'track': u'http://some_track.srt',
             'source': 'http://example.org/video.mp4',
             'html5_sources': ['http://youtu.be/OEoXaMPEzfM.mp4'],
         }
@@ -437,6 +447,7 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
         self.assertIn('source', fields)
         self.assertFalse(self.item_module.download_video)
         self.assertTrue(self.item_module.source_visible)
+        self.assertTrue(self.item_module.download_track)
 
     def test_source_is_empty(self):
         metadata = {

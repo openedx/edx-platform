@@ -351,6 +351,13 @@ class VideoDescriptor(VideoFields, TabsEditingDescriptor, EmptyDataRawDescriptor
                 if not download_video['explicitly_set']:
                     self.download_video = True
 
+        # for backward compatibility.
+        # If course was existed and was not re-imported by the moment of adding `download_track` field,
+        # we should enable `download_track` if following is true:
+        download_track = editable_fields['download_track']
+        if not download_track['explicitly_set'] and self.track:
+            self.download_track = True
+
     @property
     def editable_metadata_fields(self):
         editable_fields = super(VideoDescriptor, self).editable_metadata_fields
