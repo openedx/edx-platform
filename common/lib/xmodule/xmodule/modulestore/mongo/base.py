@@ -880,8 +880,8 @@ class MongoModuleStore(ModuleStoreWriteBase):
 
     def get_courses_for_wiki(self, wiki_slug):
         """
-        Return the list of courses which use this wiki
-        :param wiki_slug: the wiki id
+        Return the list of courses which use this wiki_slug
+        :param wiki_slug: the course wiki root slug
         :return: list of course locations
         """
         courses = self.collection.find({'definition.data.wiki_slug': wiki_slug})

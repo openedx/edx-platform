@@ -278,20 +278,38 @@ class TestMongoModuleStore(object):
         """
         Test the get_courses_for_wiki method
         """
-        for course_id in self.courses:
-            courses = self.store.get_courses_for_wiki(course_id)
-            assert_equals(len(courses), 1)
-            assert_equals(Location('i4x', 'edX', course_id, 'course', '2012_Fall'), courses[0])
-        course_locs = self.store.get_courses_for_wiki('no_such_wiki')
-        assert_equals(len(course_locs), 0)
-        # now set two to have same wiki
-        course = self.store.get_course('edX/toy/2012_Fall')
-        course.wiki_slug = 'simple'
-        self.store.save_xmodule(course)
-        courses = self.store.get_courses_for_wiki('simple')
-        assert_equals(len(courses), 2)
-        for course_id in ['toy', 'simple']:
-            assert_in(Location('i4x', 'edX', course_id, 'course', '2012_Fall'), courses)
+        for course_number in self.courses:
+            course_locations = self.store.get_courses_for_wiki(course_number)
+            assert_equals(len(course_locations), 1)
+            assert_equals(Location('i4x', 'edX', course_number, 'course', '2012_Fall'), course_locations[0])
+
+        course_locations = self.store.get_courses_for_wiki('no_such_wiki')
+        assert_equals(len(course_locations), 0)
+
+        # set toy course to share the wiki with simple course
+        toy_course = self.store.get_course('edX/toy/2012_Fall')
+        toy_course.wiki_slug = 'simple'
+        self.store.update_item(toy_course)
+
+        # now toy_course should not be retrievable with old wiki_slug
+        course_locations = self.store.get_courses_for_wiki('toy')
+        assert_equals(len(course_locations), 0)
+
+        # but there should be two courses with wiki_slug 'simple'
+        course_locations = self.store.get_courses_for_wiki('simple')
+        assert_equals(len(course_locations), 2)
+        for course_number in ['toy', 'simple']:
+            assert_in(Location('i4x', 'edX', course_number, 'course', '2012_Fall'), course_locations)
+
+        # configure simple course to use unique wiki_slug.
+        simple_course = self.store.get_course('edX/simple/2012_Fall')
+        simple_course.wiki_slug = 'edX.simple.2012_Fall'
+        self.store.update_item(simple_course)
+        # it should be retrievable with its new wiki_slug
+        course_locations = self.store.get_courses_for_wiki('edX.simple.2012_Fall')
+        assert_equals(len(course_locations), 1)
+        assert_in(Location('i4x', 'edX', 'simple', 'course', '2012_Fall'), course_locations)
+
 
 class TestMongoKeyValueStore(object):
     """

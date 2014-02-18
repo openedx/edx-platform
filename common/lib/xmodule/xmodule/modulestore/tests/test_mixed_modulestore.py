@@ -368,6 +368,24 @@ class TestMixedModuleStore(LocMapperSetupSansDjango):
         orphans = self.store.get_orphans(self.course_locations[self.MONGO_COURSEID], None)
         self.assertEqual(len(orphans), 0, "unexpected orphans: {}".format(orphans))
 
+    @ddt.data('direct')
+    def test_get_courses_for_wiki(self, default_ms):
+        """
+        Test the get_courses_for_wiki method
+        """
+        self.initdb(default_ms)
+        course_locations = self.store.get_courses_for_wiki('toy')
+        self.assertEqual(len(course_locations), 1)
+        self.assertIn(Location('i4x', 'edX', 'toy', 'course', '2012_Fall'), course_locations)
+
+        course_locations = self.store.get_courses_for_wiki('simple')
+        self.assertEqual(len(course_locations), 1)
+        self.assertIn(Location('i4x', 'edX', 'simple', 'course', '2012_Fall'), course_locations)
+
+        self.assertEqual(len(self.store.get_courses_for_wiki('edX.simple.2012_Fall')), 0)
+        self.assertEqual(len(self.store.get_courses_for_wiki('no_such_wiki')), 0)
+
+
 #=============================================================================================================
 # General utils for not using django settings
 #=============================================================================================================

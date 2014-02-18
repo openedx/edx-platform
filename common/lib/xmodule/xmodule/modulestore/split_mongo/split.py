@@ -1645,3 +1645,14 @@ class SplitMongoModuleStore(ModuleStoreWriteBase):
         be a json dict key.
         """
         structure['blocks'][LocMapperStore.encode_key_for_mongo(block_id)] = content
+
+    def get_courses_for_wiki(self, wiki_slug):
+        """
+        Return the list of courses which use this wiki_slug
+        :param wiki_slug: the course wiki root slug
+        :return: list of course locations
+
+        Todo: Needs to be implemented.
+        """
+        courses = []
+        return courses
