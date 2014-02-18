@@ -980,6 +980,7 @@
     width: flex-grid(12,12);
     border-radius: ($baseline/10);
     background: $m-gray-l4;
+    padding: ($baseline*.75) $baseline;
 
     .help-inline, .wizard-steps {
 
