@@ -20,6 +20,7 @@ from mock import patch, ANY
 
 log = logging.getLogger(__name__)
 
+CS_PREFIX = "http://localhost:4567/api/v1"
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 @patch('lms.lib.comment_client.utils.requests.request')
@@ -93,7 +94,7 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
         assert_true(mock_request.called)
         mock_request.assert_called_with(
             'post',
-            'http://localhost:4567/api/v1/i4x-MITx-999-course-Robot_Super_Course/threads',
+            '{prefix}/i4x-MITx-999-course-Robot_Super_Course/threads'.format(prefix=CS_PREFIX),
             data={
                 'body': u'this is a post',
                 'anonymous_to_peers': False, 'user_id': 1,
@@ -107,21 +108,27 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
         )
         assert_equal(response.status_code, 200)
 
+    def _setup_mock_request(self, mock_request, include_depth=False):
+        """
+        Ensure that mock_request returns the data necessary to make views
+        function correctly
+        """
+        mock_request.return_value.status_code = 200
+        data = {
+            "user_id": str(self.student.id),
+            "closed": False,
+        }
+        if include_depth:
+            data["depth"] = 0
+        mock_request.return_value.text = json.dumps(data)
+
     def _test_request_error(self, view_name, view_kwargs, data, mock_request):
         """
         Submit a request against the given view with the given data and ensure
         that the result is a 400 error and that no data was posted using
         mock_request
         """
-        mock_request.return_value.status_code = 200
-        # This represents the minimum fields required for views to function
-        cs_data = {
-            "user_id": str(self.student.id),
-            "closed": False,
-        }
-        if view_name == "create_sub_comment":
-            cs_data["depth"] = 0
-        mock_request.return_value.text = json.dumps(cs_data)
+        self._setup_mock_request(mock_request, include_depth=(view_name == "create_sub_comment"))
 
         response = self.client.post(reverse(view_name, kwargs=view_kwargs), data=data)
         self.assertEqual(response.status_code, 400)
@@ -240,6 +247,29 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
             mock_request
         )
 
+    def test_update_comment_basic(self, mock_request):
+        self._setup_mock_request(mock_request)
+        comment_id = "test_comment_id"
+        updated_body = "updated body"
+
+        response = self.client.post(
+            reverse(
+                "update_comment",
+                kwargs={"course_id": self.course_id, "comment_id": comment_id}
+            ),
+            data={"body": updated_body}
+        )
+
+        self.assertEqual(response.status_code, 200)
+        mock_request.assert_called_with(
+            "put",
+            "{prefix}/comments/{comment_id}".format(prefix=CS_PREFIX, comment_id=comment_id),
+            headers=ANY,
+            params=ANY,
+            timeout=ANY,
+            data={"body": updated_body}
+        )
+
     def test_flag_thread(self, mock_request):
         mock_request.return_value.status_code = 200
         mock_request.return_value.text = u'{"title":"Hello",\
@@ -268,7 +298,7 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
 
         call_list = [
             (
-                ('get', 'http://localhost:4567/api/v1/threads/518d4237b023791dca00000d'),
+                ('get', '{prefix}/threads/518d4237b023791dca00000d'.format(prefix=CS_PREFIX)),
                 {
                     'data': None,
                     'params': {'mark_as_read': True, 'request_id': ANY},
@@ -277,7 +307,7 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
                 }
             ),
             (
-                ('put', 'http://localhost:4567/api/v1/threads/518d4237b023791dca00000d/abuse_flag'),
+                ('put', '{prefix}/threads/518d4237b023791dca00000d/abuse_flag'.format(prefix=CS_PREFIX)),
                 {
                     'data': {'user_id': '1'},
                     'params': {'request_id': ANY},
@@ -286,7 +316,7 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
                 }
             ),
             (
-                ('get', 'http://localhost:4567/api/v1/threads/518d4237b023791dca00000d'),
+                ('get', '{prefix}/threads/518d4237b023791dca00000d'.format(prefix=CS_PREFIX)),
                 {
                     'data': None,
                     'params': {'mark_as_read': True, 'request_id': ANY},
@@ -328,7 +358,7 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
 
         call_list = [
             (
-                ('get', 'http://localhost:4567/api/v1/threads/518d4237b023791dca00000d'),
+                ('get', '{prefix}/threads/518d4237b023791dca00000d'.format(prefix=CS_PREFIX)),
                 {
                     'data': None,
                     'params': {'mark_as_read': True, 'request_id': ANY},
@@ -337,7 +367,7 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
                 }
             ),
             (
-                ('put', 'http://localhost:4567/api/v1/threads/518d4237b023791dca00000d/abuse_unflag'),
+                ('put', '{prefix}/threads/518d4237b023791dca00000d/abuse_unflag'.format(prefix=CS_PREFIX)),
                 {
                     'data': {'user_id': '1'},
                     'params': {'request_id': ANY},
@@ -346,7 +376,7 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
                 }
             ),
             (
-                ('get', 'http://localhost:4567/api/v1/threads/518d4237b023791dca00000d'),
+                ('get', '{prefix}/threads/518d4237b023791dca00000d'.format(prefix=CS_PREFIX)),
                 {
                     'data': None,
                     'params': {'mark_as_read': True, 'request_id': ANY},
@@ -384,7 +414,7 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
 
         call_list = [
             (
-                ('get', 'http://localhost:4567/api/v1/comments/518d4237b023791dca00000d'),
+                ('get', '{prefix}/comments/518d4237b023791dca00000d'.format(prefix=CS_PREFIX)),
                 {
                     'data': None,
                     'params': {'request_id': ANY},
@@ -393,7 +423,7 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
                 }
             ),
             (
-                ('put', 'http://localhost:4567/api/v1/comments/518d4237b023791dca00000d/abuse_flag'),
+                ('put', '{prefix}/comments/518d4237b023791dca00000d/abuse_flag'.format(prefix=CS_PREFIX)),
                 {
                     'data': {'user_id': '1'},
                     'params': {'request_id': ANY},
@@ -402,7 +432,7 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
                 }
             ),
             (
-                ('get', 'http://localhost:4567/api/v1/comments/518d4237b023791dca00000d'),
+                ('get', '{prefix}/comments/518d4237b023791dca00000d'.format(prefix=CS_PREFIX)),
                 {
                     'data': None,
                     'params': {'request_id': ANY},
@@ -440,7 +470,7 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
 
         call_list = [
             (
-                ('get', 'http://localhost:4567/api/v1/comments/518d4237b023791dca00000d'),
+                ('get', '{prefix}/comments/518d4237b023791dca00000d'.format(prefix=CS_PREFIX)),
                 {
                     'data': None,
                     'params': {'request_id': ANY},
@@ -449,7 +479,7 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
                 }
             ),
             (
-                ('put', 'http://localhost:4567/api/v1/comments/518d4237b023791dca00000d/abuse_unflag'),
+                ('put', '{prefix}/comments/518d4237b023791dca00000d/abuse_unflag'.format(prefix=CS_PREFIX)),
                 {
                     'data': {'user_id': '1'},
                     'params': {'request_id': ANY},
@@ -458,7 +488,7 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase):
                 }
             ),
             (
-                ('get', 'http://localhost:4567/api/v1/comments/518d4237b023791dca00000d'),
+                ('get', '{prefix}/comments/518d4237b023791dca00000d'.format(prefix=CS_PREFIX)),
                 {
                     'data': None,
                     'params': {'request_id': ANY},
