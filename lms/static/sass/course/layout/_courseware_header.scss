@@ -19,7 +19,7 @@ nav.course-material {
     margin-left: 10px;
 
     li {
-      float: left;
+      float: $left;
       list-style: none;
       margin-right: 6px;
 
@@ -120,7 +120,7 @@ header.global.slim {
 
   h1.logo {
     margin: 0 10px 0 13px;
-    padding-right: 20px;
+    #{$padding-right}: 20px;
 
     &:before {
       @extend %faded-vertical-divider;
@@ -128,7 +128,7 @@ header.global.slim {
       display: block;
       height: 35px;
       position: absolute;
-      right: 3px;
+      #{$right}: 3px;
       top: 0;
       width: 1px;
     }
@@ -156,7 +156,7 @@ header.global.slim {
   h2 {
     display: block;
     width: 700px;
-    float: left;
+    float: flip(left, right);
     font-size: 0.9em;
     font-weight: 600;
     color: $lighter-base-font-color;

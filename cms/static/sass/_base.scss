@@ -279,25 +279,25 @@ p, ul, ol, dl {
       @include clearfix();
 
       .page-header {
-        float: left;
         width: flex-grid(6,12);
-        margin-right: flex-gutter();
+        float: flip(left, right);
+        #{$margin-right}: flex-gutter();
       }
 
       .nav-actions {
         position: relative;
         bottom: -($baseline*0.75);
-        float: right;
         width: flex-grid(6,12);
-        text-align: right;
+        float: flip(left, right);
+        text-align: $right;
 
         .nav-item {
           display: inline-block;
           vertical-align: top;
-          margin-right: ($baseline/2);
+          #{$margin-right}: ($baseline/2);
 
           &:last-child {
-            margin-right: 0;
+            #{$margin-right}: 0;
           }
         }
 
@@ -500,21 +500,21 @@ p, ul, ol, dl {
 
 .main-column {
   clear: both;
-  float: left;
+  float: $left;
   width: 70%;
 }
 
 .sidebar {
-  float: right;
+  float: $right;
   width: 28%;
 }
 
 .left {
-  float: left;
+  float: $left;
 }
 
 .right {
-  float: right;
+  float: $right;
 }
 
 // ====================
@@ -539,7 +539,7 @@ p, ul, ol, dl {
 .item-actions {
   position: absolute;
   top: 5px;
-  right: 5px;
+  #{$right}: 5px;
 
   .edit-button,
   .delete-button,

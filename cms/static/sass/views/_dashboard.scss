@@ -14,20 +14,18 @@
 
   // ====================
 
-  // basic layout
-  .content-primary, .content-supplementary {
-    @include box-sizing(border-box);
-    float: left;
-  }
+	// basic layout
+	.content-primary, .content-supplementary {
+	  @include box-sizing(border-box);
+	}
 
-  .content-primary {
-    width: flex-grid(9, 12);
-    margin-right: flex-gutter();
-  }
+	.content-primary {
+	  @extend %ui-col-wide;
+	}
 
-  .content-supplementary {
-    width: flex-grid(3, 12);
-  }
+	.content-supplementary {
+	  @extend %ui-col-narrow;
+	}
 
   // ====================
 

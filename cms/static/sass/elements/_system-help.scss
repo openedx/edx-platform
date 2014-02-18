@@ -24,14 +24,14 @@
     @include clearfix();
 
     .copy {
-      float: left;
+      float: flip(left, right);
       width: flex-grid(8,12);
-      margin-right: flex-gutter();
+      #{$margin-right}: flex-gutter();
     }
 
     .nav-introduction-supplementary {
       @extend %t-copy-sub2;
-      float: right;
+      float: flip(right, left);
       width: flex-grid(4,12);
       display: block;
       text-align: right;

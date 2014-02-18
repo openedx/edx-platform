@@ -12,14 +12,14 @@
 .icon-inline {
   display: inline-block;
   vertical-align: middle;
-  margin-right: ($baseline/4);
+  #{$margin-right}: ($baseline/4);
 }
 
 // ui - badges
 .wrapper-ui-badge {
   position: absolute;
   top: -1px;
-  left: ($baseline*1.5);
+  #{$left}: ($baseline*1.5);
   width: 100%;
 }
 

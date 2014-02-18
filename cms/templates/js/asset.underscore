@@ -14,7 +14,7 @@
     <%= date_added %>
 </td>
 <td class="embed-col">
-    <input type="text" class="embeddable-xml-input" value="<%= portable_url %>" readonly>
+    <input type="text" class="embeddable-xml-input" value="<%= portable_url %>" readonly dir="ltr">
 </td>
 <td class="embed-col">
     <input type="text" class="embeddable-xml-input" value="<%= external_url %>" readonly>
