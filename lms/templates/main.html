@@ -3,7 +3,7 @@
 <!--[if IE 8]><html class="ie ie8 lte9 lte8" lang="${LANGUAGE_CODE}"><![endif]-->
 <!--[if IE 9]><html class="ie ie9 lte9" lang="${LANGUAGE_CODE}"><![endif]-->
 <!--[if gt IE 9]><!--><html lang="${LANGUAGE_CODE}"><!--<![endif]-->
-<head>
+<head dir="rtl">
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <%! from django.utils.translation import ugettext as _ %>
@@ -117,18 +117,25 @@
 </head>
 
 <body class="<%block name='bodyclass'/> lang_${LANGUAGE_CODE}">
-  <a class="nav-skip" href="<%block name="nav_skip">#content</%block>">${_("Skip to this view's content")}</a>
+  <div class="window-wrap" dir="rtl">
+    <a class="nav-skip" href="<%block name="nav_skip">#content</%block>">${_("Skip to this view's content")}</a>
 
-  <%include file="mathjax_accessible.html" />
+    <%include file="mathjax_accessible.html" />
 
-  <%include file="${header_file}" />
+  % if not suppress_toplevel_navigation:
+    <%include file="${header_file}" />
+  %endif
 
-  <div class="content-wrapper" id="content">
-    ${self.body()}
-    <%block name="bodyextra"/>
+    <div class="content-wrapper" id="content">
+      ${self.body()}
+      <%block name="bodyextra"/>
+    </div>
+
+  % if not suppress_toplevel_navigation:
+    <%include file="${footer_file}" />
+  % endif
+
   </div>
-
-  <%include file="${footer_file}" />
 
   <script>window.baseUrl = "${settings.STATIC_URL}";</script>
   <%static:js group='application'/>

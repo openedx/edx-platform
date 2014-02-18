@@ -7,7 +7,7 @@
 <!--[if IE 8]><html class="ie8 lte9 lte8" lang="${LANGUAGE_CODE}"><![endif]-->
 <!--[if IE 9]><html class="ie9 lte9" lang="${LANGUAGE_CODE}"><![endif]-->
 <!--[if gt IE 9]><!--><html lang="${LANGUAGE_CODE}"><!--<![endif]-->
-  <head>
+  <head dir="rtl">
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <title>
@@ -341,7 +341,7 @@
     % endif
 
     <!-- view -->
-    <div class="wrapper wrapper-view">
+    <div class="wrapper wrapper-view" dir="rtl">
         <% online_help_token = self.online_help_token() if hasattr(self, 'online_help_token') else None %>
         <%include file="widgets/header.html" args="online_help_token=online_help_token" />
 
