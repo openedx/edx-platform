@@ -37,7 +37,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-02-11 18:20-0500\n"
+"POT-Creation-Date: 2014-02-14 16:00-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -507,7 +507,12 @@ msgstr ""
 "trý ägäïn lätér. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
 
 #. Translators: 'grader' refers to the edX automatic code grader.
+#. Translators: the `grader` refers to the grading service open response
+#. problems
+#. are sent to, either to be machine-graded, peer-graded, or instructor-
+#. graded.
 #: common/lib/capa/capa/responsetypes.py
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
 msgid "Invalid grader reply. Please contact the course staff."
 msgstr ""
 "Ìnvälïd grädér réplý. Pléäsé çöntäçt thé çöürsé stäff. Ⱡ'σяєм ιρѕυм ∂σ#"
@@ -672,6 +677,219 @@ msgid "A YouTube URL or a link to a file hosted anywhere on the web."
 msgstr ""
 "À ÝöüTüßé ÛRL ör ä lïnk tö ä fïlé höstéd änýwhéré ön thé wéß. Ⱡ'σяєм ιρѕυм "
 "∂σłσя#"
+
+#. Translators: "Self" is used to denote an openended response that is self-
+#. graded
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
+msgid "Self"
+msgstr "Sélf Ⱡ'σяєм#"
+
+#. Translators: "AI" is used to denote an openended response that is machine-
+#. graded
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
+msgid "AI"
+msgstr "ÀÌ Ⱡ'#"
+
+#. Translators: "Peer" is used to denote an openended response that is peer-
+#. graded
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
+msgid "Peer"
+msgstr "Péér Ⱡ'σяєм#"
+
+#. Translators: "Not started" is used to communicate to a student that their
+#. response
+#. has not yet been graded
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
+msgid "Not started."
+msgstr "Nöt stärtéd. Ⱡ#"
+
+#. Translators: "Being scored." is used to communicate to a student that their
+#. response
+#. are in the process of being scored
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
+msgid "Being scored."
+msgstr "Béïng sçöréd. Ⱡ'#"
+
+#. Translators: "Scoring finished" is used to communicate to a student that
+#. their response
+#. have been scored, but the full scoring process is not yet complete
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
+msgid "Scoring finished."
+msgstr "Sçörïng fïnïshéd. Ⱡ'σ#"
+
+#. Translators: "Complete" is used to communicate to a student that their
+#. openended response has been fully scored
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
+msgid "Complete."
+msgstr "Çömplété. #"
+
+#. Translators: "Scored rubric" appears to a user as part of a longer
+#. string that looks something like: "Scored rubric from grader 1".
+#. "Scored" is an adjective that modifies the noun "rubric".
+#. That longer string appears when a user is viewing a graded rubric
+#. returned from one of the graders of their openended response problem.
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
+msgid "Scored rubric"
+msgstr "Sçöréd rüßrïç Ⱡ'#"
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
+#, python-brace-format
+msgid ""
+"You have attempted this question {number_of_student_attempts} times. You are"
+" only allowed to attempt it {max_number_of_attempts} times."
+msgstr ""
+"Ýöü hävé ättémptéd thïs qüéstïön {number_of_student_attempts} tïmés. Ýöü äré"
+" önlý ällöwéd tö ättémpt ït {max_number_of_attempts} tïmés. Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт#"
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_modulev1.py
+msgid "The problem state got out-of-sync. Please try reloading the page."
+msgstr ""
+"Thé prößlém stäté göt öüt-öf-sýnç. Pléäsé trý rélöädïng thé pägé. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя #"
+
+#. Translators: "Self-Assessment" refers to the self-assessed mode of
+#. openended evaluation
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py
+msgid "Self-Assessment"
+msgstr "Sélf-Àsséssmént Ⱡ'#"
+
+#. Translators: "Peer-Assessment" refers to the peer-assessed mode of
+#. openended evaluation
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py
+msgid "Peer-Assessment"
+msgstr "Péér-Àsséssmént Ⱡ'#"
+
+#. Translators: "Instructor-Assessment" refers to the instructor-assessed mode
+#. of openended evaluation
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py
+msgid "Instructor-Assessment"
+msgstr "Ìnstrüçtör-Àsséssmént Ⱡ'σя#"
+
+#. Translators: "AI-Assessment" refers to the machine-graded mode of openended
+#. evaluation
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/combined_open_ended_rubric.py
+msgid "AI-Assessment"
+msgstr "ÀÌ-Àsséssmént Ⱡ'#"
+
+#. Translators: 'tag' is one of 'feedback', 'submission_id',
+#. 'grader_id', or 'score'. They are categories that a student
+#. responds to when filling out a post-assessment survey
+#. of his or her grade from an openended problem.
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
+#, python-brace-format
+msgid ""
+"Could not find needed tag {tag_name} in the survey responses. Please try "
+"submitting again."
+msgstr ""
+"Çöüld nöt fïnd néédéd täg {tag_name} ïn thé sürvéý réspönsés. Pléäsé trý "
+"süßmïttïng ägäïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
+msgid "There was an error saving your feedback. Please contact course staff."
+msgstr ""
+"Théré wäs än érrör sävïng ýöür féédßäçk. Pléäsé çöntäçt çöürsé stäff. Ⱡ'σяєм"
+" ιρѕυм ∂σłσя ѕ#"
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
+msgid "Couldn't submit feedback."
+msgstr "Çöüldn't süßmït féédßäçk. Ⱡ'σяєм#"
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
+msgid "Successfully saved your feedback."
+msgstr "Süççéssfüllý sävéd ýöür féédßäçk. Ⱡ'σяєм ι#"
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
+msgid "Unable to save your feedback. Please try again later."
+msgstr ""
+"Ûnäßlé tö sävé ýöür féédßäçk. Pléäsé trý ägäïn lätér. Ⱡ'σяєм ιρѕυм ∂σ#"
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
+msgid "Successfully saved your submission."
+msgstr "Süççéssfüllý sävéd ýöür süßmïssïön. Ⱡ'σяєм ιρ#"
+
+#. Translators: the `grader` refers to the grading service open response
+#. problems
+#. are sent to, either to be machine-graded, peer-graded, or instructor-
+#. graded.
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
+msgid ""
+"Unable to submit your submission to the grader. Please try again later."
+msgstr ""
+"Ûnäßlé tö süßmït ýöür süßmïssïön tö thé grädér. Pléäsé trý ägäïn lätér. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#. Translators: the `grader` refers to the grading service open response
+#. problems
+#. are sent to, either to be machine-graded, peer-graded, or instructor-
+#. graded.
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
+msgid "Error getting feedback from grader."
+msgstr "Érrör géttïng féédßäçk fröm grädér. Ⱡ'σяєм ιρ#"
+
+#. Translators: the `grader` refers to the grading service open response
+#. problems
+#. are sent to, either to be machine-graded, peer-graded, or instructor-
+#. graded.
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
+msgid "No feedback available from grader."
+msgstr "Nö féédßäçk äväïläßlé fröm grädér. Ⱡ'σяєм ιρ#"
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
+msgid "Error handling action. Please try again."
+msgstr "Érrör händlïng äçtïön. Pléäsé trý ägäïn. Ⱡ'σяєм ιρѕυ#"
+
+#. Translators: this string appears once an openended response
+#. is submitted but before it has been graded
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/open_ended_module.py
+msgid ""
+"Your response has been submitted. Please check back later for your grade."
+msgstr ""
+"Ýöür réspönsé häs ßéén süßmïttéd. Pléäsé çhéçk ßäçk lätér för ýöür grädé. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#. Translators: "Not started" communicates to a student that their response
+#. has not yet been graded
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py
+msgid "Not started"
+msgstr "Nöt stärtéd Ⱡ#"
+
+#. Translators: "In progress" communicates to a student that their response
+#. is currently in the grading process
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py
+msgid "In progress"
+msgstr "Ìn prögréss Ⱡ#"
+
+#. Translators: "Done" communicates to a student that their response
+#. has been fully graded
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py
+msgid "Done"
+msgstr "Döné Ⱡ'σяєм#"
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py
+msgid ""
+"We could not find a file in your submission. Please try choosing a file or "
+"pasting a URL to your file into the answer box."
+msgstr ""
+"Wé çöüld nöt fïnd ä fïlé ïn ýöür süßmïssïön. Pléäsé trý çhöösïng ä fïlé ör "
+"pästïng ä ÛRL tö ýöür fïlé ïntö thé änswér ßöx. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,"
+" ¢σηѕє¢тєт#"
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/openendedchild.py
+msgid ""
+"We are having trouble saving your file. Please try another file or paste a "
+"URL to your file into the answer box."
+msgstr ""
+"Wé äré hävïng tröüßlé sävïng ýöür fïlé. Pléäsé trý änöthér fïlé ör pästé ä "
+"ÛRL tö ýöür fïlé ïntö thé änswér ßöx. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
+
+#: common/lib/xmodule/xmodule/open_ended_grading_classes/self_assessment_module.py
+msgid "Error saving your score.  Please notify course staff."
+msgstr ""
+"Érrör sävïng ýöür sçöré.  Pléäsé nötïfý çöürsé stäff. Ⱡ'σяєм ιρѕυм ∂σ#"
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
 msgid "Navigation"
@@ -1022,6 +1240,18 @@ msgstr "Ré-öpén thréäd Ⱡ'#"
 #: lms/djangoapps/django_comment_client/mustache_helpers.py
 msgid "Close thread"
 msgstr "Çlösé thréäd Ⱡ#"
+
+#: lms/djangoapps/django_comment_client/base/views.py
+#: lms/djangoapps/django_comment_client/base/views.py
+msgid "Title can't be empty"
+msgstr "Tïtlé çän't ßé émptý Ⱡ'σя#"
+
+#: lms/djangoapps/django_comment_client/base/views.py
+#: lms/djangoapps/django_comment_client/base/views.py
+#: lms/djangoapps/django_comment_client/base/views.py
+#: lms/djangoapps/django_comment_client/base/views.py
+msgid "Body can't be empty"
+msgstr "Bödý çän't ßé émptý Ⱡ'σя#"
 
 #: lms/djangoapps/django_comment_client/base/views.py
 #: lms/djangoapps/django_comment_client/base/views.py
@@ -2775,6 +3005,89 @@ msgstr "révïsïöns #"
 msgid "There are no attachments for this article."
 msgstr "Théré äré nö ättäçhménts för thïs ärtïçlé. Ⱡ'σяєм ιρѕυ#"
 
+#: cms/djangoapps/contentstore/git_export_utils.py
+#, python-brace-format
+msgid ""
+"GIT_REPO_EXPORT_DIR not set or path {0} doesn't exist, please create it, or "
+"configure a different path with GIT_REPO_EXPORT_DIR"
+msgstr ""
+"GÌT_RÉPÖ_ÉXPÖRT_DÌR nöt sét ör päth {0} döésn't éxïst, pléäsé çréäté ït, ör "
+"çönfïgüré ä dïfférént päth wïth GÌT_RÉPÖ_ÉXPÖRT_DÌR Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυ#"
+
+#: cms/djangoapps/contentstore/git_export_utils.py
+msgid ""
+"Non writable git url provided. Expecting something like: "
+"git@github.com:mitocw/edx4edx_lite.git"
+msgstr ""
+"Nön wrïtäßlé gït ürl prövïdéd. Éxpéçtïng söméthïng lïké: "
+"gït@gïthüß.çöm:mïtöçw/édx4édx_lïté.gït Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: cms/djangoapps/contentstore/git_export_utils.py
+msgid ""
+"If using http urls, you must provide the username and password in the url. "
+"Similar to https://user:pass@github.com/user/course."
+msgstr ""
+"Ìf üsïng http ürls, ýöü müst prövïdé thé üsérnämé änd pässwörd ïn thé ürl. "
+"Sïmïlär tö https://üsér:päss@gïthüß.çöm/üsér/çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυ#"
+
+#: cms/djangoapps/contentstore/git_export_utils.py
+msgid "Unable to determine branch, repo in detached HEAD mode"
+msgstr ""
+"Ûnäßlé tö détérmïné ßränçh, répö ïn détäçhéd HÉÀD mödé Ⱡ'σяєм ιρѕυм ∂σ#"
+
+#: cms/djangoapps/contentstore/git_export_utils.py
+msgid "Unable to update or clone git repository."
+msgstr "Ûnäßlé tö üpdäté ör çlöné gït répösïtörý. Ⱡ'σяєм ιρѕυ#"
+
+#: cms/djangoapps/contentstore/git_export_utils.py
+msgid "Unable to export course to xml."
+msgstr "Ûnäßlé tö éxpört çöürsé tö xml. Ⱡ'σяєм ι#"
+
+#: cms/djangoapps/contentstore/git_export_utils.py
+msgid "Unable to configure git username and password"
+msgstr "Ûnäßlé tö çönfïgüré gït üsérnämé änd pässwörd Ⱡ'σяєм ιρѕυм#"
+
+#: cms/djangoapps/contentstore/git_export_utils.py
+msgid ""
+"Unable to commit changes. This is usually because there are no changes to be"
+" committed"
+msgstr ""
+"Ûnäßlé tö çömmït çhängés. Thïs ïs üsüällý ßéçäüsé théré äré nö çhängés tö ßé"
+" çömmïttéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмє#"
+
+#: cms/djangoapps/contentstore/git_export_utils.py
+msgid ""
+"Unable to push changes.  This is usually because the remote repository "
+"cannot be contacted"
+msgstr ""
+"Ûnäßlé tö püsh çhängés.  Thïs ïs üsüällý ßéçäüsé thé rémöté répösïtörý "
+"çännöt ßé çöntäçtéd Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#: cms/djangoapps/contentstore/git_export_utils.py
+msgid "Bad course location provided"
+msgstr "Bäd çöürsé löçätïön prövïdéd Ⱡ'σяєм #"
+
+#: cms/djangoapps/contentstore/git_export_utils.py
+msgid "Missing branch on fresh clone"
+msgstr "Mïssïng ßränçh ön frésh çlöné Ⱡ'σяєм #"
+
+#: cms/djangoapps/contentstore/git_export_utils.py
+msgid "Command was: {0!r}. Working directory was: {1!r}"
+msgstr "Çömmänd wäs: {0!r}. Wörkïng dïréçtörý wäs: {1!r} Ⱡ'σяєм ιρѕυм#"
+
+#: cms/djangoapps/contentstore/git_export_utils.py
+msgid "Command output was: {0!r}"
+msgstr "Çömmänd öütpüt wäs: {0!r} Ⱡ'σяє#"
+
+#: cms/djangoapps/contentstore/git_export_utils.py
+msgid ""
+"Directory already exists, doing a git reset and pull instead of git clone."
+msgstr ""
+"Dïréçtörý älréädý éxïsts, döïng ä gït rését änd püll ïnstéäd öf gït çlöné. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
 #: cms/djangoapps/contentstore/transcripts_utils.py
 #, python-brace-format
 msgid ""
@@ -2814,6 +3127,14 @@ msgstr "Öpén Éndéd Pänél Ⱡ'σ#"
 #: cms/djangoapps/contentstore/utils.py lms/templates/notes.html
 msgid "My Notes"
 msgstr "Mý Nötés #"
+
+#: cms/djangoapps/contentstore/management/commands/git_export.py
+msgid ""
+"Take the specified course and attempt to export it to a git repository\n"
+". Course directory must already be a git repository. Usage:  git_export <course_loc> <git_url>"
+msgstr ""
+"Täké thé spéçïfïéd çöürsé änd ättémpt tö éxpört ït tö ä gït répösïtörý\n"
+". Çöürsé dïréçtörý müst älréädý ßé ä gït répösïtörý. Ûsägé:  gït_éxpört <course_loc> <git_url> Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕ#"
 
 #: cms/djangoapps/contentstore/views/assets.py
 msgid "Upload completed"
@@ -2858,6 +3179,10 @@ msgstr ""
 "Théré ïs älréädý ä çöürsé défïnéd wïth thé sämé örgänïzätïön änd çöürsé "
 "nümßér. Pléäsé çhängé ät léäst öné fïéld tö ßé ünïqüé. Ⱡ'σяєм ιρѕυм ∂σłσя "
 "ѕιт αмєт, ¢σηѕє¢тєтυ#"
+
+#: cms/djangoapps/contentstore/views/export_git.py
+msgid "Course successfully exported to git repository"
+msgstr "Çöürsé süççéssfüllý éxpörtéd tö gït répösïtörý Ⱡ'σяєм ιρѕυм #"
 
 #: cms/djangoapps/contentstore/views/import_export.py
 msgid "We only support uploading a .tar.gz file."
@@ -5032,10 +5357,32 @@ msgstr "Süßmïttéd Rüßrïç Ⱡ'σ#"
 msgid "Toggle Full Rubric"
 msgstr "Tögglé Füll Rüßrïç Ⱡ'σ#"
 
+#. Translators: an example of what this string will look
+#. like is: "Scored rubric from grader 1", where
+#. "Scored rubric" replaces {result_of_task} and
+#. "1" replaces {number}.
+#. This string appears when a user is viewing one of
+#. their graded rubrics for an openended response problem.
+#. the number distinguishes between the different
+#. graded rubrics the user might have received
+#: lms/templates/combinedopenended/combined_open_ended_results.html
+msgid "{result_of_task} from grader {number}"
+msgstr "{result_of_task} fröm grädér {number} Ⱡ'σя#"
+
+#. Translators: "See full feedback" is the text of
+#. a link that allows a user to see more detailed
+#. feedback from a self, peer, or instructor
+#. graded openended problem
 #: lms/templates/combinedopenended/open_ended_result_table.html
 msgid "See full feedback"
 msgstr "Séé füll féédßäçk Ⱡ'σ#"
 
+#. Translators: this text forms a link that, when
+#. clicked, allows a user to respond to the feedback
+#. the user received on his or her openended problem
+#. Translators: when "Respond to Feedback" is clicked, a survey
+#. appears on which a user can respond to the feedback the user
+#. received on an openended problem
 #: lms/templates/combinedopenended/open_ended_result_table.html
 #: lms/templates/combinedopenended/openended/open_ended_evaluation.html
 msgid "Respond to Feedback"
@@ -5080,6 +5427,16 @@ msgstr "Àddïtïönäl çömménts: Ⱡ'σя#"
 #: lms/templates/combinedopenended/openended/open_ended_evaluation.html
 msgid "Submit Feedback"
 msgstr "Süßmït Féédßäçk Ⱡ'#"
+
+#. Translators: "Response" labels an area that contains the user's
+#. Response to an openended problem. It is a noun.
+#. Translators: "Response" labels a text area into which a user enters
+#. his or her response to a prompt from an openended problem.
+#: lms/templates/combinedopenended/openended/open_ended.html
+#: lms/templates/combinedopenended/selfassessment/self_assessment_prompt.html
+#: lms/templates/open_ended_problems/open_ended_flagged_problems.html
+msgid "Response"
+msgstr "Réspönsé #"
 
 #: lms/templates/combinedopenended/openended/open_ended.html
 msgid "Unanswered"
@@ -7323,10 +7680,6 @@ msgid "No flagged problems exist."
 msgstr "Nö fläggéd prößléms éxïst. Ⱡ'σяєм#"
 
 #: lms/templates/open_ended_problems/open_ended_flagged_problems.html
-msgid "Response"
-msgstr "Réspönsé #"
-
-#: lms/templates/open_ended_problems/open_ended_flagged_problems.html
 msgid "Unflag"
 msgstr "Ûnfläg Ⱡ'σяєм ιρѕ#"
 
@@ -9190,7 +9543,8 @@ msgid "close alert"
 msgstr "çlösé älért Ⱡ#"
 
 #: cms/templates/checklists.html cms/templates/export.html
-#: cms/templates/import.html cms/templates/widgets/header.html
+#: cms/templates/export_git.html cms/templates/import.html
+#: cms/templates/widgets/header.html
 msgid "Tools"
 msgstr "Tööls Ⱡ'σяєм ι#"
 
@@ -9569,6 +9923,62 @@ msgstr ""
 "Ûsé än ärçhïvé prögräm tö éxträçt thé dätä fröm thé .tär.gz fïlé. Éxträçtéd "
 "dätä ïnçlüdés thé çöürsé.xml fïlé, äs wéll äs süßföldérs thät çöntäïn çöürsé"
 " çöntént. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιη#"
+
+#: cms/templates/export_git.html
+msgid "Export Course to Git"
+msgstr "Éxpört Çöürsé tö Gït Ⱡ'σя#"
+
+#: cms/templates/export_git.html cms/templates/export_git.html
+#: cms/templates/widgets/header.html
+msgid "Export to Git"
+msgstr "Éxpört tö Gït Ⱡ'#"
+
+#: cms/templates/export_git.html
+msgid "About Export to Git"
+msgstr "Àßöüt Éxpört tö Gït Ⱡ'σя#"
+
+#: cms/templates/export_git.html
+msgid "Use this to export your course to its git repository."
+msgstr ""
+"Ûsé thïs tö éxpört ýöür çöürsé tö ïts gït répösïtörý. Ⱡ'σяєм ιρѕυм ∂σ#"
+
+#: cms/templates/export_git.html
+msgid ""
+"This will then trigger an automatic update of the main LMS site and update "
+"the contents of your course visible there to students if automatic git "
+"imports are configured."
+msgstr ""
+"Thïs wïll thén trïggér än äütömätïç üpdäté öf thé mäïn LMS sïté änd üpdäté "
+"thé çönténts öf ýöür çöürsé vïsïßlé théré tö stüdénts ïf äütömätïç gït "
+"ïmpörts äré çönfïgüréd. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg"
+" #"
+
+#: cms/templates/export_git.html
+msgid "Export Course to Git:"
+msgstr "Éxpört Çöürsé tö Gït: Ⱡ'σя#"
+
+#: cms/templates/export_git.html
+msgid ""
+"giturl must be defined in your course settings before you can export to git."
+msgstr ""
+"gïtürl müst ßé défïnéd ïn ýöür çöürsé séttïngs ßéföré ýöü çän éxpört tö gït."
+" Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт #"
+
+#: cms/templates/export_git.html
+msgid "Export Failed"
+msgstr "Éxpört Fäïléd Ⱡ'#"
+
+#: cms/templates/export_git.html
+msgid "Export Succeeded"
+msgstr "Éxpört Süççéédéd Ⱡ'σ#"
+
+#: cms/templates/export_git.html
+msgid "Your course:"
+msgstr "Ýöür çöürsé: Ⱡ#"
+
+#: cms/templates/export_git.html
+msgid "Course git url:"
+msgstr "Çöürsé gït ürl: Ⱡ'#"
 
 #: cms/templates/howitworks.html
 msgid "Welcome"
@@ -10853,6 +11263,18 @@ msgid "Information for prospective students"
 msgstr "Ìnförmätïön för pröspéçtïvé stüdénts Ⱡ'σяєм ιρ#"
 
 #: cms/templates/settings.html
+msgid "Course Short Description"
+msgstr "Çöürsé Shört Désçrïptïön Ⱡ'σяє#"
+
+#: cms/templates/settings.html
+msgid ""
+"Appears on the course catalog page when students roll over the course name. "
+"Limit to ~150 characters"
+msgstr ""
+"Àppéärs ön thé çöürsé çätälög pägé whén stüdénts röll övér thé çöürsé nämé. "
+"Lïmït tö ~150 çhäräçtérs Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+
+#: cms/templates/settings.html
 msgid "Course Overview"
 msgstr "Çöürsé Övérvïéw Ⱡ'#"
 
@@ -11153,7 +11575,7 @@ msgstr ""
 " téxt äs ä sïnglé çhäptér änd éntér ä nämé öf ýöür çhöïçé ïn thé Çhäptér "
 "Nämé fïéld. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ι#"
 
-#: cms/templates/unit.html
+#: cms/templates/unit.html cms/templates/ux/reference/unit.html
 msgid "Individual Unit"
 msgstr "Ìndïvïdüäl Ûnït Ⱡ'#"
 
@@ -11325,6 +11747,10 @@ msgstr ""
 "Àn äçtïvätïön lïnk häs ßéén sént tö {email}, älöng wïth ïnstrüçtïöns för "
 "äçtïvätïng ýöür äççöünt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
+#: cms/templates/ux/reference/container.html
+msgid "Container"
+msgstr "Çöntäïnér #"
+
 #: cms/templates/widgets/footer.html
 msgid "All rights reserved."
 msgstr "Àll rïghts résérvéd. Ⱡ'σя#"
@@ -11449,6 +11875,10 @@ msgstr "Àdvänçéd Édïtör Ⱡ'#"
 #: cms/templates/widgets/problem-edit.html
 msgid "Toggle Cheatsheet"
 msgstr "Tögglé Çhéätshéét Ⱡ'σ#"
+
+#: cms/templates/widgets/problem-edit.html
+msgid "Label"
+msgstr "Läßél Ⱡ'σяєм ι#"
 
 #: cms/templates/widgets/sock.html
 msgid "Looking for Help with Studio?"

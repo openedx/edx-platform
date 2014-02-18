@@ -530,3 +530,24 @@ defined::
 Here we define ``_()`` as a pass-through function, so the string will be found
 during extraction, but won't be translated too early.  Then we use the real
 translation function at runtime to get the localized string.
+
+Multiline Strings
+=================
+
+Translator notes must directly prepend the string literals to which they refer.
+For example, the translator note here will not be passed along to translators::
+    # Translators: you will not be able to see this note because
+    # I do not directly prepend the line with the translated string literal.
+    # See the line directly below this one does not contain part of the string?
+    long_translated_string = _(
+        "I am a long string, with many, many words. So many words that it is "
+        "advisable that I be split over this line."
+    )
+
+In such a case, make sure you format your code so that the string begins on
+a line directly below the translator note::
+    # Translators: you will be able to see this note.
+    # See how the line directly below this one contains the start of the string?
+    long_translated_string = _("I am a long string, with many, many words. "
+                               "So many words that it is advisable that I "
+                               "be split over this line.")

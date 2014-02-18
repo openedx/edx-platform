@@ -55,7 +55,7 @@ class RubricPage(PageObject):
         num_categories = self.categories
         if len(scores) != len(num_categories):
             raise ScoreMismatchError(
-                "Recieved {0} scores but there are {1} rubric categories".format(
+                "Received {0} scores but there are {1} rubric categories".format(
                     len(scores), num_categories))
 
         # Set the score for each category

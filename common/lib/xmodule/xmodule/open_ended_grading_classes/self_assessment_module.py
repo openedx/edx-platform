@@ -125,8 +125,9 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         rubric_html = rubric_dict['html']
 
         # we'll render it
-        context = {'rubric': rubric_html,
-                   'max_score': self._max_score,
+        context = {
+            'rubric': rubric_html,
+            'max_score': self._max_score,
         }
 
         if self.child_state == self.ASSESSING:
@@ -233,7 +234,11 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
             # This is a dev_facing_error
             log.error("Non-integer score value passed to save_assessment, or no score list present.")
             # This is a student_facing_error
-            return {'success': False, 'error': "Error saving your score.  Please notify course staff."}
+            _ = self.system.service(self, "i18n").ugettext
+            return {
+                'success': False,
+                'error': _("Error saving your score.  Please notify course staff.")
+            }
 
         # Record score as assessment and rubric scores as post assessment
         self.record_latest_score(score)
@@ -266,9 +271,11 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         self.record_latest_post_assessment(data['hint'])
         self.change_state(self.DONE)
 
-        return {'success': True,
-                'message_html': '',
-                'allow_reset': self._allow_reset()}
+        return {
+            'success': True,
+            'message_html': '',
+            'allow_reset': self._allow_reset(),
+        }
 
     def latest_post_assessment(self, system):
         latest_post_assessment = super(SelfAssessmentModule, self).latest_post_assessment(system)
