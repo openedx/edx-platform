@@ -132,8 +132,9 @@ class OpenResponsePage(PageObject):
         """
         Submit a response for grading.
         """
-        with self.handle_alert():
-            self.css_click('input.submit-button')
+        self.css_click('input.submit-button')
+        # modal dialog confirmation
+        self.css_click('button.ok-button')
 
         # Ensure that the submission completes
         self._wait_for_submitted(self.assessment_type)
