@@ -295,7 +295,7 @@
   }
 
   .details {
-    float: left;
+    float: flip(left, right);
     margin-right: flex-gutter();
     width: flex-grid(8);
     font: normal 1em/1.6em $serif;
@@ -384,7 +384,7 @@
 
   .course-sidebar {
     @include box-sizing(border-box);
-    float: left;
+    float: flip(left, right);
     width: flex-grid(4);
 
     > section {

@@ -6,16 +6,14 @@
   // LAYOUT: page
   .content-primary, .content-supplementary {
     @include box-sizing(border-box);
-    float: left;
   }
 
   .content-primary {
-    width: flex-grid(9, 12);
-    margin-right: flex-gutter();
+    @extend %ui-col-wide;
   }
 
   .content-supplementary {
-    width: flex-grid(3, 12);
+    @extend %ui-col-narrow;
   }
 
   // ELEM: content
@@ -123,7 +121,7 @@
       // ELEM: item - metadata
       .item-metadata {
         width: flex-grid(5, 9);
-        margin-right: flex-gutter();
+        #{$margin-right}: flex-gutter();
 
         .user-username, .user-email {
           display: inline-block;
@@ -134,7 +132,7 @@
           @include transition(color $tmg-f2 ease-in-out 0s);
           @extend %t-title4;
           @extend %t-strong;
-          margin: 0 ($baseline/2) ($baseline/10) 0;
+          margin: flip(0 ($baseline/2) ($baseline/10) 0, 0 0 ($baseline/10) ($baseline/2));
           color: $gray-d4;
         }
 

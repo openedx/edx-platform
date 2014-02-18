@@ -1,8 +1,8 @@
 .course-index {
   @extend .sidebar;
   @extend .tran;
-  border-radius: 3px 0 0 3px;
-  border-right: 1px solid $border-color-2;
+  border-radius: flip(3px 0 0 3px, 0 3px 3px 0);
+  #{$border-right}: 1px solid $border-color-2;
 
   #open_close_accordion {
     display: none;

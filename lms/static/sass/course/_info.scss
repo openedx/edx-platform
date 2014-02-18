@@ -80,7 +80,7 @@ div.info-wrapper {
   section.handouts {
     @extend .sidebar;
     border-radius: 0 4px 4px 0;
-    border-left: 1px solid #ddd;
+    #{$border-left}: 1px solid #ddd;
     box-shadow: none;
     font-size: 14px;
 
