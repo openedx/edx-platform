@@ -107,7 +107,7 @@ def _filter_unstarted_categories(category_map):
                         if key != "start_date":
                             filtered_map["entries"][child][key] = unfiltered_map["entries"][child][key]
                 else:
-                    print "filtering %s" % child, unfiltered_map["entries"][child]["start_date"]
+                    log.debug(u"Filtering out:%s with start_date: %s", child, unfiltered_map["entries"][child]["start_date"])
             else:
                 if unfiltered_map["subcategories"][child]["start_date"] < now:
                     filtered_map["children"].append(child)

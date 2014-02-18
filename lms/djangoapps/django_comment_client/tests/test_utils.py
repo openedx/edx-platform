@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import json
 import mock
 from datetime import datetime
@@ -296,7 +298,7 @@ class CategoryMapTestCase(ModuleStoreTestCase):
         now = datetime.now()
         later = datetime.max
         self.create_discussion("Chapter 1", "Discussion 1", start=now)
-        self.create_discussion("Chapter 1", "Discussion 2", start=later)
+        self.create_discussion("Chapter 1", "Discussion 2 обсуждение", start=later)
         self.create_discussion("Chapter 2", "Discussion", start=now)
         self.create_discussion("Chapter 2 / Section 1 / Subsection 1", "Discussion", start=later)
         self.create_discussion("Chapter 2 / Section 1 / Subsection 2", "Discussion", start=later)
