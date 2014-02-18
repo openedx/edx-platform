@@ -106,9 +106,9 @@
       % if enrollment.mode != "verified":
       <a href="#unenroll-modal" class="unenroll" rel="leanModal" data-course-id="${course.id}" data-course-number="${course.number}" onclick="document.getElementById('track-info').innerHTML='Are you sure you want to unregister from'; document.getElementById('refund-info').innerHTML=''">${_('Unregister')}</a>
       % elif show_refund_option:
-      <a href="#unenroll-modal" class="unenroll" rel="leanModal" data-course-id="${course.id}" data-course-number="${course.number}" onclick="document.getElementById('track-info').innerHTML='Are you sure you want to unregister from the verified certificate track of'; document.getElementById('refund-info').innerHTML=gettext('You will be refunded the amount you paid.')">${_('Unregister')}</a>
+      <a href="#unenroll-modal" class="unenroll" rel="leanModal" data-course-id="${course.id}" data-course-number="${course.number}" onclick="document.getElementById('track-info').innerHTML=gettext('Are you sure you want to unregister from the verified certificate track of'); document.getElementById('refund-info').innerHTML=gettext('You will be refunded the amount you paid.')">${_('Unregister')}</a>
       % else:
-      <a href="#unenroll-modal" class="unenroll" rel="leanModal" data-course-id="${course.id}" data-course-number="${course.number}" onclick="document.getElementById('track-info').innerHTML='Are you sure you want to unregister from the verified certificate track of'; document.getElementById('refund-info').innerHTML=gettext('The refund deadline for this course has passed, so you will not receive a refund.')">${_('Unregister')}</a>
+      <a href="#unenroll-modal" class="unenroll" rel="leanModal" data-course-id="${course.id}" data-course-number="${course.number}" onclick="document.getElementById('track-info').innerHTML=gettext('Are you sure you want to unregister from the verified certificate track of'); document.getElementById('refund-info').innerHTML=gettext('The refund deadline for this course has passed, so you will not receive a refund.')">${_('Unregister')}</a>
       % endif
 
 % if show_email_settings:
