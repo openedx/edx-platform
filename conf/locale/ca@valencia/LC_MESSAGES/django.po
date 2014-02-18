@@ -1,5 +1,5 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
-# edX translation file.
+# edX community translations have been downloaded from Catalan (Valencian) (http://www.transifex.com/projects/p/edx-platform/language/ca@valencia/).
 # Copyright (C) 2014 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
@@ -11,7 +11,7 @@
 # 
 # Translators:
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
-# edX translation file
+# edX community translations have been downloaded from Catalan (Valencian) (http://www.transifex.com/projects/p/edx-platform/language/ca@valencia/)
 # Copyright (C) 2014 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
@@ -38,7 +38,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-02-11 19:10-0500\n"
+"POT-Creation-Date: 2014-02-15 08:19-0500\n"
 "PO-Revision-Date: 2014-02-12 14:59+0000\n"
 "Last-Translator: sarina <sarina@edx.org>\n"
 "Language-Team: Catalan (Valencian) (http://www.transifex.com/projects/p/edx-platform/language/ca@valencia/)\n"
@@ -120,7 +120,6 @@ msgid "Student"
 msgstr ""
 
 #: common/djangoapps/student/middleware.py
-#, python-brace-format
 msgid ""
 "Your account has been disabled. If you believe this was done in error, "
 "please contact us at {link_start}{support_email}{link_end}"
@@ -200,17 +199,14 @@ msgid "Unexpected account status"
 msgstr ""
 
 #: common/djangoapps/student/views.py
-#, python-brace-format
 msgid "An account with the Public Username '{username}' already exists."
 msgstr ""
 
 #: common/djangoapps/student/views.py
-#, python-brace-format
 msgid "An account with the Email '{email}' already exists."
 msgstr ""
 
 #: common/djangoapps/student/views.py
-#, python-brace-format
 msgid "Error (401 {field}). E-mail us."
 msgstr ""
 
@@ -326,53 +322,394 @@ msgstr ""
 msgid "Invalid ID"
 msgstr ""
 
+#. Translators: the translation for "LONG_DATE_FORMAT" must be a format
+#. string for formatting dates in a long form.  For example, the
+#. American English form is "%A, %B %d %Y".
+#. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgid "LONG_DATE_FORMAT"
+msgstr ""
+
+#. Translators: the translation for "DATE_TIME_FORMAT" must be a format
+#. string for formatting dates with times.  For example, the American
+#. English form is "%b %d, %Y at %H:%M".
+#. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgid "DATE_TIME_FORMAT"
+msgstr ""
+
+#. Translators: the translation for "SHORT_DATE_FORMAT" must be a
+#. format string for formatting dates in a brief form.  For example,
+#. the American English form is "%b %d %Y".
+#. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgid "SHORT_DATE_FORMAT"
+msgstr ""
+
+#. Translators: the translation for "TIME_FORMAT" must be a format
+#. string for formatting times.  For example, the American English
+#. form is "%H:%M:%S". See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgid "TIME_FORMAT"
+msgstr ""
+
+#. Translators: This is an AM/PM indicator for displaying times.  It is
+#. used for the %p directive in date-time formats. See http://strftime.org
+#. for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "am/pm indicator"
+msgid "AM"
+msgstr ""
+
+#. Translators: This is an AM/PM indicator for displaying times.  It is
+#. used for the %p directive in date-time formats. See http://strftime.org
+#. for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "am/pm indicator"
+msgid "PM"
+msgstr ""
+
+#. Translators: this is a weekday name that will be used when displaying
+#. dates, as in "Monday Februrary 10, 2014". It is used for the %A
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "weekday name"
+msgid "Monday"
+msgstr ""
+
+#. Translators: this is a weekday name that will be used when displaying
+#. dates, as in "Tuesday Februrary 11, 2014". It is used for the %A
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "weekday name"
+msgid "Tuesday"
+msgstr ""
+
+#. Translators: this is a weekday name that will be used when displaying
+#. dates, as in "Wednesday Februrary 12, 2014". It is used for the %A
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "weekday name"
+msgid "Wednesday"
+msgstr ""
+
+#. Translators: this is a weekday name that will be used when displaying
+#. dates, as in "Thursday Februrary 13, 2014". It is used for the %A
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "weekday name"
+msgid "Thursday"
+msgstr ""
+
+#. Translators: this is a weekday name that will be used when displaying
+#. dates, as in "Friday Februrary 14, 2014". It is used for the %A
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "weekday name"
+msgid "Friday"
+msgstr ""
+
+#. Translators: this is a weekday name that will be used when displaying
+#. dates, as in "Saturday Februrary 15, 2014". It is used for the %A
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "weekday name"
+msgid "Saturday"
+msgstr ""
+
+#. Translators: this is a weekday name that will be used when displaying
+#. dates, as in "Sunday Februrary 16, 2014". It is used for the %A
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "weekday name"
+msgid "Sunday"
+msgstr ""
+
+#. Translators: this is an abbreviated weekday name that will be used when
+#. displaying dates, as in "Mon Feb 10, 2014". It is used for the %a
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "abbreviated weekday name"
+msgid "Mon"
+msgstr ""
+
+#. Translators: this is an abbreviated weekday name that will be used when
+#. displaying dates, as in "Tue Feb 11, 2014". It is used for the %a
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "abbreviated weekday name"
+msgid "Tue"
+msgstr ""
+
+#. Translators: this is an abbreviated weekday name that will be used when
+#. displaying dates, as in "Wed Feb 12, 2014". It is used for the %a
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "abbreviated weekday name"
+msgid "Wed"
+msgstr ""
+
+#. Translators: this is an abbreviated weekday name that will be used when
+#. displaying dates, as in "Thu Feb 13, 2014". It is used for the %a
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "abbreviated weekday name"
+msgid "Thu"
+msgstr ""
+
+#. Translators: this is an abbreviated weekday name that will be used when
+#. displaying dates, as in "Fri Feb 14, 2014". It is used for the %a
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "abbreviated weekday name"
+msgid "Fri"
+msgstr ""
+
+#. Translators: this is an abbreviated weekday name that will be used when
+#. displaying dates, as in "Sat Feb 15, 2014". It is used for the %a
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "abbreviated weekday name"
+msgid "Sat"
+msgstr ""
+
+#. Translators: this is an abbreviated weekday name that will be used when
+#. displaying dates, as in "Sun Feb 16, 2014". It is used for the %a
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "abbreviated weekday name"
+msgid "Sun"
+msgstr ""
+
+#. Translators: this is an abbreviated month name that will be used when
+#. displaying dates, as in "Jan 10, 2014". It is used for the %b
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "abbreviated month name"
+msgid "Jan"
+msgstr ""
+
+#. Translators: this is an abbreviated month name that will be used when
+#. displaying dates, as in "Feb 10, 2014". It is used for the %b
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "abbreviated month name"
+msgid "Feb"
+msgstr ""
+
+#. Translators: this is an abbreviated month name that will be used when
+#. displaying dates, as in "Mar 10, 2014". It is used for the %b
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "abbreviated month name"
+msgid "Mar"
+msgstr ""
+
+#. Translators: this is an abbreviated month name that will be used when
+#. displaying dates, as in "Apr 10, 2014". It is used for the %b
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "abbreviated month name"
+msgid "Apr"
+msgstr ""
+
+#. Translators: this is an abbreviated month name that will be used when
+#. displaying dates, as in "May 10, 2014". It is used for the %b
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "abbreviated month name"
+msgid "May"
+msgstr ""
+
+#. Translators: this is an abbreviated month name that will be used when
+#. displaying dates, as in "Jun 10, 2014". It is used for the %b
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "abbreviated month name"
+msgid "Jun"
+msgstr ""
+
+#. Translators: this is an abbreviated month name that will be used when
+#. displaying dates, as in "Jul 10, 2014". It is used for the %b
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "abbreviated month name"
+msgid "Jul"
+msgstr ""
+
+#. Translators: this is an abbreviated month name that will be used when
+#. displaying dates, as in "Aug 10, 2014". It is used for the %b
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "abbreviated month name"
+msgid "Aug"
+msgstr ""
+
+#. Translators: this is an abbreviated month name that will be used when
+#. displaying dates, as in "Sep 10, 2014". It is used for the %b
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "abbreviated month name"
+msgid "Sep"
+msgstr ""
+
+#. Translators: this is an abbreviated month name that will be used when
+#. displaying dates, as in "Oct 10, 2014". It is used for the %b
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "abbreviated month name"
+msgid "Oct"
+msgstr ""
+
+#. Translators: this is an abbreviated month name that will be used when
+#. displaying dates, as in "Nov 10, 2014". It is used for the %b
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "abbreviated month name"
+msgid "Nov"
+msgstr ""
+
+#. Translators: this is an abbreviated month name that will be used when
+#. displaying dates, as in "Dec 10, 2014". It is used for the %b
+#. directive in date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "abbreviated month name"
+msgid "Dec"
+msgstr ""
+
+#. Translators: this is a month name that will be used when displaying
+#. dates, as in "January 10, 2014". It is used for the %B directive in
+#. date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "month name"
+msgid "January"
+msgstr ""
+
+#. Translators: this is a month name that will be used when displaying
+#. dates, as in "February 10, 2014". It is used for the %B directive in
+#. date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "month name"
+msgid "February"
+msgstr ""
+
+#. Translators: this is a month name that will be used when displaying
+#. dates, as in "March 10, 2014". It is used for the %B directive in
+#. date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "month name"
+msgid "March"
+msgstr ""
+
+#. Translators: this is a month name that will be used when displaying
+#. dates, as in "April 10, 2014". It is used for the %B directive in
+#. date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "month name"
+msgid "April"
+msgstr ""
+
+#. Translators: this is a month name that will be used when displaying
+#. dates, as in "May 10, 2014". It is used for the %B directive in
+#. date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "month name"
+msgid "May"
+msgstr ""
+
+#. Translators: this is a month name that will be used when displaying
+#. dates, as in "June 10, 2014". It is used for the %B directive in
+#. date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "month name"
+msgid "June"
+msgstr ""
+
+#. Translators: this is a month name that will be used when displaying
+#. dates, as in "July 10, 2014". It is used for the %B directive in
+#. date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "month name"
+msgid "July"
+msgstr ""
+
+#. Translators: this is a month name that will be used when displaying
+#. dates, as in "August 10, 2014". It is used for the %B directive in
+#. date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "month name"
+msgid "August"
+msgstr ""
+
+#. Translators: this is a month name that will be used when displaying
+#. dates, as in "September 10, 2014". It is used for the %B directive in
+#. date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "month name"
+msgid "September"
+msgstr ""
+
+#. Translators: this is a month name that will be used when displaying
+#. dates, as in "October 10, 2014". It is used for the %B directive in
+#. date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "month name"
+msgid "October"
+msgstr ""
+
+#. Translators: this is a month name that will be used when displaying
+#. dates, as in "November 10, 2014". It is used for the %B directive in
+#. date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "month name"
+msgid "November"
+msgstr ""
+
+#. Translators: this is a month name that will be used when displaying
+#. dates, as in "December 10, 2014". It is used for the %B directive in
+#. date-time formats. See http://strftime.org for details.
+#: common/djangoapps/util/date_utils.py
+msgctxt "month name"
+msgid "December"
+msgstr ""
+
 #: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
 msgid "Invalid Length ({0})"
 msgstr ""
 
 #: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
 msgid "must be {0} characters or more"
 msgstr ""
 
 #: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
 msgid "must be {0} characters or less"
 msgstr ""
 
 #: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
 msgid "Must be more complex ({0})"
 msgstr ""
 
 #: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
 msgid "must contain {0} or more uppercase characters"
 msgstr ""
 
 #: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
 msgid "must contain {0} or more lowercase characters"
 msgstr ""
 
 #: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
 msgid "must contain {0} or more digits"
 msgstr ""
 
 #: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
 msgid "must contain {0} or more punctuation characters"
 msgstr ""
 
 #: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
 msgid "must contain {0} or more non ascii characters"
 msgstr ""
 
 #: common/djangoapps/util/password_policy_validators.py
-#, python-brace-format
 msgid "must contain {0} or more unique words"
 msgstr ""
 
@@ -403,7 +740,6 @@ msgid ""
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
 msgid "Error {err} in evaluating hint function {hintfn}."
 msgstr ""
 
@@ -412,7 +748,6 @@ msgid "(Source code line unavailable)"
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
 msgid "See XML source line {sourcenum}."
 msgstr ""
 
@@ -421,22 +756,18 @@ msgid "There was a problem with the staff answer to this problem."
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
 msgid "Could not interpret '{student_answer}' as a number."
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
 msgid "You may not use variables ({bad_variables}) in numerical problems."
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
 msgid "factorial function evaluated outside its domain:'{student_answer}'"
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
 msgid "Invalid math syntax: '{student_answer}'"
 msgstr ""
 
@@ -459,7 +790,6 @@ msgid "CustomResponse: check function returned an invalid dictionary!"
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
 msgid ""
 "Unable to deliver your submission to grader (Reason: {error_msg}). Please "
 "try again later."
@@ -471,31 +801,26 @@ msgid "Invalid grader reply. Please contact the course staff."
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
 msgid "Invalid input: {bad_input} not permitted in answer."
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
 msgid ""
 "factorial function not permitted in answer for this problem. Provided answer"
 " was: {bad_input}"
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
 msgid "Invalid input: Could not parse '{bad_input}' as a formula."
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
 msgid "Invalid input: Could not parse '{bad_input}' as a formula"
 msgstr ""
 
 #. Translators: 'SchematicResponse' is a problem type and should not be
 #. translated.
 #: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
 msgid "Error in evaluating SchematicResponse. The error was: {error_msg}"
 msgstr ""
 
@@ -504,7 +829,6 @@ msgid "The Staff answer could not be interpreted as a number."
 msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
-#, python-brace-format
 msgid "Could not interpret '{given_answer}' as a number."
 msgstr ""
 
@@ -545,13 +869,11 @@ msgid "Problem must be reset before it can be checked again."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/capa_base.py
-#, python-brace-format
 msgid "You must wait at least {wait} seconds between submissions."
 msgstr ""
 
 #. Translators: {msg} will be replaced with a problem's error message.
 #: common/lib/xmodule/xmodule/capa_base.py
-#, python-brace-format
 msgid "Error: {msg}"
 msgstr ""
 
@@ -635,7 +957,6 @@ msgstr ""
 #. Translators: this string includes wiki markup.  Leave the ** and the _
 #. alone.
 #: lms/djangoapps/course_wiki/views.py
-#, python-brace-format
 msgid "This is the wiki for **{organization}**'s _{course_name}_."
 msgstr ""
 
@@ -656,7 +977,6 @@ msgid "ERROR: No playable video sources found!"
 msgstr ""
 
 #: lms/djangoapps/dashboard/git_import.py
-#, python-brace-format
 msgid ""
 "Path {0} doesn't exist, please create it, or configure a different path with"
 " GIT_REPO_DIR"
@@ -685,12 +1005,10 @@ msgid "The underlying module store does not support import."
 msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
 msgid "Failed in authenticating {0}, error {1}\n"
 msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
 msgid "Failed in authenticating {0}\n"
 msgstr ""
 
@@ -720,7 +1038,6 @@ msgid "email must end in"
 msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
 msgid "Failed - email {0} already exists as external_id"
 msgstr ""
 
@@ -733,27 +1050,22 @@ msgid "email address required (not username)"
 msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
 msgid "Oops, failed to create user {0}, IntegrityError"
 msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
 msgid "User {0} created successfully!"
 msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
 msgid "Cannot find user with email address {0}"
 msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
 msgid "Cannot find user with username {0} - {1}"
 msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
 msgid "Deleted user {0}"
 msgstr ""
 
@@ -819,7 +1131,6 @@ msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
 #: lms/djangoapps/dashboard/tests/test_sysadmin.py
-#, python-brace-format
 msgid ""
 "The course {0} already exists in the data directory! (reloading anyway)"
 msgstr ""
@@ -829,12 +1140,10 @@ msgid "Unable to clone or pull repository. Please check your url."
 msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
 msgid "Failed to clone repository to {0}"
 msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
 msgid "Loaded course {0} {1}<br/>Errors:"
 msgstr ""
 
@@ -864,7 +1173,6 @@ msgid "Information about all courses"
 msgstr ""
 
 #: lms/djangoapps/dashboard/sysadmin.py
-#, python-brace-format
 msgid "Error - cannot get course with ID {0}<br/><pre>{1}</pre>"
 msgstr ""
 
@@ -937,6 +1245,18 @@ msgstr ""
 
 #: lms/djangoapps/django_comment_client/base/views.py
 #: lms/djangoapps/django_comment_client/base/views.py
+msgid "Title can't be empty"
+msgstr ""
+
+#: lms/djangoapps/django_comment_client/base/views.py
+#: lms/djangoapps/django_comment_client/base/views.py
+#: lms/djangoapps/django_comment_client/base/views.py
+#: lms/djangoapps/django_comment_client/base/views.py
+msgid "Body can't be empty"
+msgstr ""
+
+#: lms/djangoapps/django_comment_client/base/views.py
+#: lms/djangoapps/django_comment_client/base/views.py
 msgid "Comment level too deep"
 msgstr ""
 
@@ -996,12 +1316,10 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
-#, python-brace-format
 msgid "Successfully changed due date for student {0} for {1} to {2}"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
-#, python-brace-format
 msgid "Successfully reset due date for student {0} for {1} to {2}"
 msgstr ""
 
@@ -1039,7 +1357,6 @@ msgid "Unable to parse date: "
 msgstr ""
 
 #: lms/djangoapps/instructor/views/tools.py
-#, python-brace-format
 msgid "Couldn't find module for url: {0}"
 msgstr ""
 
@@ -1062,7 +1379,6 @@ msgid "Extended Due Date"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/tools.py
-#, python-brace-format
 msgid "Users with due date extensions for {0}"
 msgstr ""
 
@@ -1071,7 +1387,6 @@ msgid "Unit"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/tools.py
-#, python-brace-format
 msgid "Due date extensions for {0} {1} ({2})"
 msgstr ""
 
@@ -1111,12 +1426,10 @@ msgid "No status information available"
 msgstr ""
 
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid "No task_output information found for instructor_task {0}"
 msgstr ""
 
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid "No parsable task_output information found for instructor_task {0}: {1}"
 msgstr ""
 
@@ -1129,7 +1442,6 @@ msgid "No message provided"
 msgstr ""
 
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid "Invalid task_output information found for instructor_task {0}: {1}"
 msgstr ""
 
@@ -1138,110 +1450,94 @@ msgid "No progress status information available"
 msgstr ""
 
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid "No parsable task_input information found for instructor_task {0}: {1}"
 msgstr ""
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {attempted} and {succeeded} are counts.
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid "Progress: {action} {succeeded} of {attempted} so far"
 msgstr ""
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {student} is a student identifier.
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid "Unable to find submission to be {action} for student '{student}'"
 msgstr ""
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {student} is a student identifier.
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid "Problem failed to be {action} for student '{student}'"
 msgstr ""
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {student} is a student identifier.
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid "Problem successfully {action} for student '{student}'"
 msgstr ""
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid "Unable to find any students with submissions to be {action}"
 msgstr ""
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {attempted} is a count.
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid "Problem failed to be {action} for any of {attempted} students"
 msgstr ""
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {attempted} is a count.
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid "Problem successfully {action} for {attempted} students"
 msgstr ""
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {succeeded} and {attempted} are counts.
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid "Problem {action} for {succeeded} of {attempted} students"
 msgstr ""
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid "Unable to find any recipients to be {action}"
 msgstr ""
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {attempted} is a count.
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid "Message failed to be {action} for any of {attempted} recipients "
 msgstr ""
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {attempted} is a count.
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid "Message successfully {action} for {attempted} recipients"
 msgstr ""
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {succeeded} and {attempted} are counts.
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid "Message {action} for {succeeded} of {attempted} recipients"
 msgstr ""
 
 #. Translators: {action} is a past-tense verb that is localized separately.
 #. {succeeded} and {attempted} are counts.
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid "Status: {action} {succeeded} of {attempted}"
 msgstr ""
 
 #. Translators: {skipped} is a count.  This message is appended to task
 #. progress status messages.
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid " (skipping {skipped})"
 msgstr ""
 
 #. Translators: {total} is a count.  This message is appended to task progress
 #. status messages.
 #: lms/djangoapps/instructor_task/views.py
-#, python-brace-format
 msgid " (out of {total})"
 msgstr ""
 
@@ -1269,7 +1565,6 @@ msgid "Add to profile"
 msgstr ""
 
 #: lms/djangoapps/open_ended_grading/staff_grading_service.py
-#, python-brace-format
 msgid ""
 "Could not contact the external grading server. Please contact the "
 "development team at {email}."
@@ -1308,7 +1603,6 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/open_ended_grading/utils.py
-#, python-brace-format
 msgid "for course {0} and student {1}."
 msgstr ""
 
@@ -1363,7 +1657,6 @@ msgid "Trying to add a different currency into the cart"
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
-#, python-brace-format
 msgid ""
 "Please visit your <a href=\"{dashboard_link}\">dashboard</a> to see your new"
 " enrollments."
@@ -1374,17 +1667,14 @@ msgid "[Refund] User-Requested Refund"
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
-#, python-brace-format
 msgid "Mode {mode} does not exist for {course_id}"
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
-#, python-brace-format
 msgid "Certificate of Achievement, {mode_name} for course {course}"
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
-#, python-brace-format
 msgid ""
 "Note - you have up to 2 weeks into the course to unenroll from the Verified "
 "Certificate option and receive a full refund. To receive your refund, "
@@ -1551,13 +1841,11 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/views.py
 #: lms/djangoapps/shoppingcart/tests/test_views.py
-#, python-brace-format
 msgid "The course {0} is already in your cart."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/views.py
 #: lms/djangoapps/shoppingcart/tests/test_views.py
-#, python-brace-format
 msgid "You are already registered in course {0}."
 msgstr ""
 
@@ -1570,13 +1858,11 @@ msgid "You do not have permission to view this page."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#, python-brace-format
 msgid "The payment processor did not return a required parameter: {0}"
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#, python-brace-format
 msgid "The payment processor returned a badly-typed value {0} for param {1}."
 msgstr ""
 
@@ -1586,14 +1872,12 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#, python-brace-format
 msgid ""
 "The amount charged by the processor {0} {1} is different than the total cost"
 " of the order {2} {3}."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#, python-brace-format
 msgid ""
 "\n"
 "            <p class=\"error_msg\">\n"
@@ -1607,7 +1891,6 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#, python-brace-format
 msgid ""
 "\n"
 "                <p class=\"error_msg\">\n"
@@ -1620,7 +1903,6 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#, python-brace-format
 msgid ""
 "\n"
 "                <p class=\"error_msg\">\n"
@@ -1632,7 +1914,6 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#, python-brace-format
 msgid ""
 "\n"
 "                <p class=\"error_msg\">\n"
@@ -1768,7 +2049,6 @@ msgid ""
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
-#, python-brace-format
 msgid ""
 "\n"
 "            There is a problem with our CyberSource merchant configuration.  Please let us know at {0}\n"
@@ -2432,8 +2712,74 @@ msgstr ""
 msgid "There are no attachments for this article."
 msgstr ""
 
+#: cms/djangoapps/contentstore/git_export_utils.py
+msgid ""
+"GIT_REPO_EXPORT_DIR not set or path {0} doesn't exist, please create it, or "
+"configure a different path with GIT_REPO_EXPORT_DIR"
+msgstr ""
+
+#: cms/djangoapps/contentstore/git_export_utils.py
+msgid ""
+"Non writable git url provided. Expecting something like: "
+"git@github.com:mitocw/edx4edx_lite.git"
+msgstr ""
+
+#: cms/djangoapps/contentstore/git_export_utils.py
+msgid ""
+"If using http urls, you must provide the username and password in the url. "
+"Similar to https://user:pass@github.com/user/course."
+msgstr ""
+
+#: cms/djangoapps/contentstore/git_export_utils.py
+msgid "Unable to determine branch, repo in detached HEAD mode"
+msgstr ""
+
+#: cms/djangoapps/contentstore/git_export_utils.py
+msgid "Unable to update or clone git repository."
+msgstr ""
+
+#: cms/djangoapps/contentstore/git_export_utils.py
+msgid "Unable to export course to xml."
+msgstr ""
+
+#: cms/djangoapps/contentstore/git_export_utils.py
+msgid "Unable to configure git username and password"
+msgstr ""
+
+#: cms/djangoapps/contentstore/git_export_utils.py
+msgid ""
+"Unable to commit changes. This is usually because there are no changes to be"
+" committed"
+msgstr ""
+
+#: cms/djangoapps/contentstore/git_export_utils.py
+msgid ""
+"Unable to push changes.  This is usually because the remote repository "
+"cannot be contacted"
+msgstr ""
+
+#: cms/djangoapps/contentstore/git_export_utils.py
+msgid "Bad course location provided"
+msgstr ""
+
+#: cms/djangoapps/contentstore/git_export_utils.py
+msgid "Missing branch on fresh clone"
+msgstr ""
+
+#: cms/djangoapps/contentstore/git_export_utils.py
+msgid "Command was: {0!r}. Working directory was: {1!r}"
+msgstr ""
+
+#: cms/djangoapps/contentstore/git_export_utils.py
+msgid "Command output was: {0!r}"
+msgstr ""
+
+#: cms/djangoapps/contentstore/git_export_utils.py
+msgid ""
+"Directory already exists, doing a git reset and pull instead of git clone."
+msgstr ""
+
 #: cms/djangoapps/contentstore/transcripts_utils.py
-#, python-brace-format
 msgid ""
 "Can't receive transcripts from Youtube for {youtube_id}. Status code: "
 "{statuc_code}."
@@ -2448,7 +2794,6 @@ msgid "We support only SubRip (*.srt) transcripts format."
 msgstr ""
 
 #: cms/djangoapps/contentstore/transcripts_utils.py
-#, python-brace-format
 msgid ""
 "Something wrong with SubRip transcripts file during parsing. Inner message "
 "is {error_message}"
@@ -2466,12 +2811,17 @@ msgstr ""
 msgid "My Notes"
 msgstr ""
 
+#: cms/djangoapps/contentstore/management/commands/git_export.py
+msgid ""
+"Take the specified course and attempt to export it to a git repository\n"
+". Course directory must already be a git repository. Usage:  git_export <course_loc> <git_url>"
+msgstr ""
+
 #: cms/djangoapps/contentstore/views/assets.py
 msgid "Upload completed"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/course.py
-#, python-brace-format
 msgid ""
 "Unable to create course '{name}'.\n"
 "\n"
@@ -2499,6 +2849,10 @@ msgid ""
 "number. Please change at least one field to be unique."
 msgstr ""
 
+#: cms/djangoapps/contentstore/views/export_git.py
+msgid "Course successfully exported to git repository"
+msgstr ""
+
 #: cms/djangoapps/contentstore/views/import_export.py
 msgid "We only support uploading a .tar.gz file."
 msgstr ""
@@ -2512,12 +2866,10 @@ msgid "Could not find the course.xml file in the package."
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/item.py
-#, python-brace-format
 msgid "Duplicate of {0}"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/item.py
-#, python-brace-format
 msgid "Duplicate of '{0}'"
 msgstr ""
 
@@ -2546,12 +2898,10 @@ msgid "Insufficient permissions"
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/user.py
-#, python-brace-format
 msgid "Could not find user by email address '{email}'."
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/user.py
-#, python-brace-format
 msgid "User {email} has registered but has not yet activated his/her account."
 msgstr ""
 
@@ -8087,7 +8437,8 @@ msgid "close alert"
 msgstr ""
 
 #: cms/templates/checklists.html cms/templates/export.html
-#: cms/templates/import.html cms/templates/widgets/header.html
+#: cms/templates/export_git.html cms/templates/import.html
+#: cms/templates/widgets/header.html
 msgid "Tools"
 msgstr ""
 
@@ -8412,6 +8763,55 @@ msgid ""
 "Use an archive program to extract the data from the .tar.gz file. Extracted "
 "data includes the course.xml file, as well as subfolders that contain course"
 " content."
+msgstr ""
+
+#: cms/templates/export_git.html
+msgid "Export Course to Git"
+msgstr ""
+
+#: cms/templates/export_git.html cms/templates/export_git.html
+#: cms/templates/widgets/header.html
+msgid "Export to Git"
+msgstr ""
+
+#: cms/templates/export_git.html
+msgid "About Export to Git"
+msgstr ""
+
+#: cms/templates/export_git.html
+msgid "Use this to export your course to its git repository."
+msgstr ""
+
+#: cms/templates/export_git.html
+msgid ""
+"This will then trigger an automatic update of the main LMS site and update "
+"the contents of your course visible there to students if automatic git "
+"imports are configured."
+msgstr ""
+
+#: cms/templates/export_git.html
+msgid "Export Course to Git:"
+msgstr ""
+
+#: cms/templates/export_git.html
+msgid ""
+"giturl must be defined in your course settings before you can export to git."
+msgstr ""
+
+#: cms/templates/export_git.html
+msgid "Export Failed"
+msgstr ""
+
+#: cms/templates/export_git.html
+msgid "Export Succeeded"
+msgstr ""
+
+#: cms/templates/export_git.html
+msgid "Your course:"
+msgstr ""
+
+#: cms/templates/export_git.html
+msgid "Course git url:"
 msgstr ""
 
 #: cms/templates/howitworks.html
@@ -9492,6 +9892,16 @@ msgid "Information for prospective students"
 msgstr ""
 
 #: cms/templates/settings.html
+msgid "Course Short Description"
+msgstr ""
+
+#: cms/templates/settings.html
+msgid ""
+"Appears on the course catalog page when students roll over the course name. "
+"Limit to ~150 characters"
+msgstr ""
+
+#: cms/templates/settings.html
 msgid "Course Overview"
 msgstr ""
 
@@ -10003,6 +10413,10 @@ msgstr ""
 
 #: cms/templates/widgets/problem-edit.html
 msgid "Toggle Cheatsheet"
+msgstr ""
+
+#: cms/templates/widgets/problem-edit.html
+msgid "Label"
 msgstr ""
 
 #: cms/templates/widgets/sock.html
