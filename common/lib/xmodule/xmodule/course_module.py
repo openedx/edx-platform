@@ -828,13 +828,17 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         Returns the desired text corresponding the course's start date.  Prefers .advertised_start,
         then falls back to .start
         """
+        i18n = self.runtime.service(self, "i18n")
+        _ = i18n.ugettext
+        strftime = i18n.strftime
+
         def try_parse_iso_8601(text):
             try:
                 result = Date().from_json(text)
                 if result is None:
                     result = text.title()
                 else:
-                    result = result.strftime("%b %d, %Y")
+                    result = strftime(result, "SHORT_DATE")
             except ValueError:
                 result = text.title()
 
@@ -843,12 +847,12 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         if isinstance(self.advertised_start, basestring):
             return try_parse_iso_8601(self.advertised_start)
         elif self.start_date_is_still_default:
-            _ = self.runtime.service(self, "i18n").ugettext
             # Translators: TBD stands for 'To Be Determined' and is used when a course
             # does not yet have an announced start date.
             return _('TBD')
         else:
-            return (self.advertised_start or self.start).strftime("%b %d, %Y")
+            when = self.advertised_start or self.start
+            return strftime(when, "SHORT_DATE")
 
     @property
     def start_date_is_still_default(self):
@@ -865,7 +869,11 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
 
         If the course does not have an end date set (course.end is None), an empty string will be returned.
         """
-        return '' if self.end is None else self.end.strftime("%b %d, %Y")
+        if self.end is None:
+            return ''
+        else:
+            strftime = self.runtime.service(self, "i18n").strftime
+            return strftime(self.end, "SHORT_DATE")
 
     @property
     def forum_posts_allowed(self):

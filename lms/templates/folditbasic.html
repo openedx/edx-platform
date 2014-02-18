@@ -1,7 +1,7 @@
 <%! from django.utils.translation import ugettext as _ %>
 
 <%!
-from xmodule.util.date_utils import get_default_time_display
+from util.date_utils import get_default_time_display
 %>
 <div class="folditbasic">
 <p><strong>${_("Due:")}</strong> ${get_default_time_display(due)}
