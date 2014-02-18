@@ -4,6 +4,7 @@ Student dashboard page.
 """
 
 from bok_choy.page_object import PageObject
+from bok_choy.promise import Promise, EmptyPromise, fulfill_after, fulfill
 from . import BASE_URL
 
 
@@ -19,14 +20,6 @@ class DashboardPage(PageObject):
         return self.is_css_present('section.my-courses')
 
     @property
-    def current_courses_text(self):
-        text_items = self.css_text('section#my-courses')
-        if len(text_items) > 0:
-            return text_items[0]
-        else:
-            return ""
-
-    @property
     def available_courses(self):
         """
         Return list of the names of available courses (e.g. "999 edX Demonstration Course")
@@ -37,6 +30,47 @@ class DashboardPage(PageObject):
             return course_name
 
         return self.css_map('section.info > hgroup > h3 > a', _get_course_name)
+
+    def change_language(self, code):
+        """
+        Change the language on the dashboard to the language corresponding with `code`.
+        """
+        # Get the current section heading, so we can compare it to the heading
+        # when we change the language.
+        old_text = self.current_courses_text
+
+        lang_changed = EmptyPromise(
+            lambda: old_text != self.current_courses_text,
+            "Current courses text changed"
+        )
+
+        with fulfill_after(lang_changed):
+            self.css_click(".edit-language")
+            self.select_option("language", code)
+            self.css_click("#submit-lang")
+
+    @property
+    def is_dummy_lang(self):
+        """
+        Return a boolean indicating whether dashboard is displaying dummy translation strings.
+        """
+        return u"ÇÜRRÉNT".encode('utf-8') in self.current_courses_text.encode('utf-8')
+
+    @property
+    def current_courses_text(self):
+        """
+        Return the text of the "current courses" title.
+        """
+        def _check_func():
+            text_items = self.css_text('section#my-courses')
+            if len(text_items) < 1:
+                return (False, None)
+            elif not text_items[0]:
+                return (False, None)
+            else:
+                return (True, text_items[0])
+
+        return fulfill(Promise(_check_func, "Retrieved current courses title"))
 
     def view_course(self, course_id):
         """
@@ -68,11 +102,3 @@ class DashboardPage(PageObject):
             return "a.enter-course:nth-of-type({0})".format(link_index + 1)
         else:
             return None
-
-    def change_language(self, code):
-        """
-        Change the language on the dashboard to the language corresponding with `code`.
-        """
-        self.css_click(".edit-language")
-        self.select_option("language", code)
-        self.css_click("#submit-lang")
