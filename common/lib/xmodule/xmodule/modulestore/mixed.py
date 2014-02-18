@@ -44,6 +44,13 @@ class MixedModuleStore(ModuleStoreWriteBase):
             raise Exception('Missing a default modulestore in the MixedModuleStore __init__ method.')
 
         for key, store in stores.items():
+            is_xml = 'XMLModuleStore' in store['ENGINE']
+            if is_xml:
+                store['OPTIONS']['course_ids'] = [
+                    course_id
+                    for course_id, store_key in self.mappings.iteritems()
+                    if store_key == key
+                ]
             self.modulestores[key] = create_modulestore_instance(
                 store['ENGINE'],
                 # XMLModuleStore's don't have doc store configs
