@@ -36,6 +36,9 @@ urlpatterns = patterns('',  # nopep8
 
     url(r'^xmodule/', include('pipeline_js.urls')),
     url(r'^heartbeat$', include('heartbeat.urls')),
+
+    url(r'^user_api/', include('user_api.urls')),
+    url(r'^lang_pref/', include('lang_pref.urls')),
 )
 
 # User creation and updating views
@@ -95,6 +98,11 @@ urlpatterns += patterns('',
     # Serve catalog of localized strings to be rendered by Javascript
     url(r'^i18n.js$', 'django.views.i18n.javascript_catalog', js_info_dict),
 )
+
+
+if settings.FEATURES.get('ENABLE_EXPORT_GIT'):
+    urlpatterns += (url(r'^(?P<org>[^/]+)/(?P<course>[^/]+)/export_git/(?P<name>[^/]+)$',
+                        'contentstore.views.export_git', name='export_git'),)
 
 if settings.FEATURES.get('ENABLE_SERVICE_STATUS'):
     urlpatterns += patterns('',

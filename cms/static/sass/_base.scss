@@ -56,7 +56,7 @@ h1 {
   font-weight: 600;
   color: $gray-d3;
 
-  .subtitle {
+  .navigation, .subtitle {
     @extend %t-title7;
     position: relative;
     top: ($baseline/4);
@@ -321,6 +321,44 @@ p, ul, ol, dl {
 
       .nav-actions {
         bottom: -($baseline*1.5);
+      }
+    }
+
+    // layout with navigation
+    &.has-navigation {
+
+      .nav-actions {
+        bottom: -($baseline*1.5);
+      }
+
+      .navigation-link {
+        @extend %cont-truncated;
+        display: inline-block;
+        max-width: 150px;
+
+        &.navigation-current {
+          @extend %ui-disabled;
+          color: $gray;
+
+          &:before {
+            color: $gray;
+          }
+        }
+      }
+
+      .navigation-link:before {
+        content: " / ";
+        margin: ($baseline/4);
+        color: $gray;
+
+        &:hover {
+          color: $gray;
+        }
+      }
+
+      .navigation .navigation-link:first-child:before {
+        content: "";
+        margin: 0;
       }
     }
   }

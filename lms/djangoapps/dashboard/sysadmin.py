@@ -38,7 +38,7 @@ from external_auth.views import generate_password
 from student.models import CourseEnrollment, UserProfile, Registration
 import track.views
 from xmodule.contentstore.django import contentstore
-from xmodule.modulestore import MONGO_MODULESTORE_TYPE
+from xmodule.modulestore import XML_MODULESTORE_TYPE
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.store_utilities import delete_course
 from xmodule.modulestore.xml import XMLModuleStore
@@ -530,8 +530,8 @@ class Courses(SysadminDashboardView):
                                       course_id, escape(str(err))
                                   )
 
-            is_mongo_course = (modulestore().get_modulestore_type(course_id) == MONGO_MODULESTORE_TYPE)
-            if course_found and not is_mongo_course:
+            is_xml_course = (modulestore().get_modulestore_type(course_id) == XML_MODULESTORE_TYPE)
+            if course_found and is_xml_course:
                 cdir = course.data_dir
                 self.def_ms.courses.pop(cdir)
 
@@ -546,7 +546,7 @@ class Courses(SysadminDashboardView):
                              u"{0} = {1} ({2})</font>".format(
                                  cdir, course.id, course.display_name))
 
-            elif course_found and is_mongo_course:
+            elif course_found and not is_xml_course:
                 # delete course that is stored with mongodb backend
                 loc = course.location
                 content_store = contentstore()

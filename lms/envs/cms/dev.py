@@ -30,15 +30,24 @@ modulestore_options = {
 
 MODULESTORE = {
     'default': {
-        'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
-        'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
-        'OPTIONS': modulestore_options,
-    },
-    'draft': {
-        'ENGINE': 'xmodule.modulestore.mongo.DraftMongoModuleStore',
-        'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
-        'OPTIONS': modulestore_options,
-    },
+        'ENGINE': 'xmodule.modulestore.mixed.MixedModuleStore',
+        'OPTIONS': {
+            'reference_type': 'Location',
+            'mappings': {},
+            'stores': {
+                'default': {
+                    'ENGINE': 'xmodule.modulestore.mongo.MongoModuleStore',
+                    'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
+                    'OPTIONS': modulestore_options,
+                },
+                'draft': {
+                    'ENGINE': 'xmodule.modulestore.mongo.DraftMongoModuleStore',
+                    'DOC_STORE_CONFIG': DOC_STORE_CONFIG,
+                    'OPTIONS': modulestore_options,
+                },
+            },
+        }
+    }
 }
 
 CONTENTSTORE = {

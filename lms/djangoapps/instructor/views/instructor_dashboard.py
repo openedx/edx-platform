@@ -13,7 +13,7 @@ from django.conf import settings
 
 from xmodule_modifiers import wrap_xblock
 from xmodule.html_module import HtmlDescriptor
-from xmodule.modulestore import MONGO_MODULESTORE_TYPE
+from xmodule.modulestore import XML_MODULESTORE_TYPE
 from xmodule.modulestore.django import modulestore
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
@@ -34,7 +34,7 @@ def instructor_dashboard_2(request, course_id):
     """Display the instructor dashboard for a course."""
 
     course = get_course_by_id(course_id, depth=None)
-    is_studio_course = (modulestore().get_modulestore_type(course_id) == MONGO_MODULESTORE_TYPE)
+    is_studio_course = (modulestore().get_modulestore_type(course_id) != XML_MODULESTORE_TYPE)
 
     access = {
         'admin': request.user.is_staff,

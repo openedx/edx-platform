@@ -195,7 +195,7 @@ namespace :'test:bok_choy' do
         # Clear any test data already in Mongo or MySQL and invalidate the cache
         clear_mongo()
         BOK_CHOY_CACHE.flush()
-        sh(django_admin('lms', 'bok_choy', 'flush', '--noinput'))
+        sh(django_admin('lms', 'bok_choy', 'loaddata', 'common/test/db_fixtures/*.json'))
 
         # Ensure the test servers are available
         puts "Starting test servers...".green

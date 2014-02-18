@@ -280,7 +280,7 @@ us there!
 
 **Tips on Using IRC**
 
-For clients, the `webchat <webchat.freenode.net>`_ is easiest, because you
+For clients, the `webchat <http://webchat.freenode.net>`_ is easiest, because you
 don't need to install anything and it's cross-platform.  `ChatZilla
 <http://chatzilla.hacksrus.com/>`_ is almost as easy -- it's a Firefox
 extension, and works anywhere Firefox does. For an installed application,

@@ -45,11 +45,12 @@ from student.firebase_token_generator import create_token
 
 from verify_student.models import SoftwareSecurePhotoVerification, MidcourseReverificationWindow
 from certificates.models import CertificateStatuses, certificate_status_for_student
+from dark_lang.models import DarkLangConfig
 
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore import MONGO_MODULESTORE_TYPE
+from xmodule.modulestore import XML_MODULESTORE_TYPE
 
 from collections import namedtuple
 
@@ -61,6 +62,8 @@ import external_auth.views
 
 from bulk_email.models import Optout, CourseAuthorization
 import shoppingcart
+from user_api.models import UserPreference
+from lang_pref import LANGUAGE_KEY
 
 import track.views
 
@@ -441,7 +444,7 @@ def dashboard(request):
     show_email_settings_for = frozenset(
         course.id for course, _enrollment in course_enrollment_pairs if (
             settings.FEATURES['ENABLE_INSTRUCTOR_EMAIL'] and
-            modulestore().get_modulestore_type(course.id) == MONGO_MODULESTORE_TYPE and
+            modulestore().get_modulestore_type(course.id) != XML_MODULESTORE_TYPE and
             CourseAuthorization.instructor_email_enabled(course.id)
         )
     )
@@ -468,23 +471,42 @@ def dashboard(request):
     # we'll display the banner
     denied_banner = any(item.display for item in reverifications["denied"])
 
-    context = {'course_enrollment_pairs': course_enrollment_pairs,
-               'course_optouts': course_optouts,
-               'message': message,
-               'external_auth_map': external_auth_map,
-               'staff_access': staff_access,
-               'errored_courses': errored_courses,
-               'show_courseware_links_for': show_courseware_links_for,
-               'all_course_modes': course_modes,
-               'cert_statuses': cert_statuses,
-               'show_email_settings_for': show_email_settings_for,
-               'reverifications': reverifications,
-               'verification_status': verification_status,
-               'verification_msg': verification_msg,
-               'show_refund_option_for': show_refund_option_for,
-               'denied_banner': denied_banner,
-               'billing_email': settings.PAYMENT_SUPPORT_EMAIL,
-               }
+    language_options = DarkLangConfig.current().released_languages_list
+
+    # add in the default language if it's not in the list of released languages
+    if settings.LANGUAGE_CODE not in language_options:
+        language_options.append(settings.LANGUAGE_CODE)
+
+    # try to get the prefered language for the user
+    cur_lang_code = UserPreference.get_preference(request.user, LANGUAGE_KEY)
+    if cur_lang_code:
+        # if the user has a preference, get the name from the code
+        current_language = settings.LANGUAGE_DICT[cur_lang_code]
+    else:
+        # if the user doesn't have a preference, use the default language
+        current_language = settings.LANGUAGE_DICT[settings.LANGUAGE_CODE]
+
+    context = {
+        'course_enrollment_pairs': course_enrollment_pairs,
+        'course_optouts': course_optouts,
+        'message': message,
+        'external_auth_map': external_auth_map,
+        'staff_access': staff_access,
+        'errored_courses': errored_courses,
+        'show_courseware_links_for': show_courseware_links_for,
+        'all_course_modes': course_modes,
+        'cert_statuses': cert_statuses,
+        'show_email_settings_for': show_email_settings_for,
+        'reverifications': reverifications,
+        'verification_status': verification_status,
+        'verification_msg': verification_msg,
+        'show_refund_option_for': show_refund_option_for,
+        'denied_banner': denied_banner,
+        'billing_email': settings.PAYMENT_SUPPORT_EMAIL,
+        'language_options': language_options,
+        'current_language': current_language,
+        'current_language_code': cur_lang_code,
+    }
 
     return render_to_response('dashboard.html', context)
 

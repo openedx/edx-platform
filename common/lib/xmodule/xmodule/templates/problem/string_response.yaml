@@ -9,7 +9,7 @@ metadata:
         The answer is correct if it matches every character of the expected answer. This can be a problem with  
         international spelling, dates, or anything where the format of the answer is not clear.
     
-        Which US state has Lansing as its capital?
+        >>Which US state has Lansing as its capital?<<
 
         = Michigan
         
@@ -29,9 +29,9 @@ data: |
     The answer is correct if it matches every character of the expected answer. This can be a problem with international spelling, dates, or anything where the format of the answer is not clear. 
     </p>
 
-     <p >Which US state has Lansing as its capital? </p>
+     <p>Which US state has Lansing as its capital? </p>
      <stringresponse answer="Michigan" type="ci">
-      <textline size="20"/>
+      <textline size="20" label="Which US state has Lansing as its capital?"/>
      </stringresponse>
         <solution>
             <div class="detailed-solution">

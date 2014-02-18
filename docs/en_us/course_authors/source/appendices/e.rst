@@ -8,27 +8,62 @@ APPENDIX E: Problem and Tool XML
 
 This appendix provides information about the XML for most problem and tool types in Studio:
 
-* :ref:`Checkbox`
-* :ref:`Chemical Equation Response`
+* :ref:`General`
+* :ref:`Choice Response`
+* :ref:`Chemical Equation Input`
 * :ref:`Custom Response`
 * :ref:`Formula Response`
 * :ref:`Image Response`
-* :ref:`Multiple Choice`
+* :ref:`Multiple Choice Response`
 * :ref:`Numerical Response`
 * :ref:`Option Response`
 * :ref:`Schematic Response`
 * :ref:`String Response`
 
-.. _Checkbox:
 
-Choice Response (Checkbox)
----------------------------
+.. _General:
 
-Sample Problem:
+General
+-------
+ 
+Most problems have the following tags.
+
+.. list-table::
+   :widths: 20 80
+
+   * - ``<problem> </problem>``
+     - These must be the first and last tags for any content created in the Advanced
+       Editor in a Problem component.
+   * - ``<startouttext/>``
+     - The ``<startouttext />`` tag indicates the beginning of a line or block of text.
+   * - ``<endouttext/>``
+     - The ``<endouttext />`` tag indicates the end of a line or block of text.
+   * - ``<solution> <div class="detailed-solution"> </div> </solution>`` (optional)
+     - If you want to include more information in the problem, such as a detailed explanation of the problem's answer, you'll enter the text between the two ``<div>`` tags, which are inside the ``<solution>`` tags. (These tags do not have to be on the same line.)
+
+.. _Choice Response:
+
+Choice Response (Checkbox Problems)
+-----------------------------------
+
+Although you can create checkbox problems by using the Simple Editor in Studio, you may want to see or change the problem's underlying XML.
+
+**Sample Problem**
 
 .. image:: ../Images/CheckboxExample.gif
  :alt: Image of a checkbox problem
 
+**Tags**
+
+.. list-table::
+   :widths: 20 80
+
+   * - ``<choiceresponse>``
+     - Specifies that the problem lists answer options for students to choose from.
+   * - ``<checkboxgroup>``
+     - A child of ``<choiceresponse>``. Specifies that the problem is a checkbox problem.
+   * - ``<choice>``
+     - A child of ``<checkboxgroup>``. Designates an answer option. Each choice must include the ``correct`` attribute, set to ``true`` (for a correct answer) or ``false`` (for an incorrect answer). For checkbox problems, more than one option can be a correct answer.
 
 **Sample Problem XML**
 
@@ -36,20 +71,31 @@ Sample Problem:
 
   <problem>
   <startouttext/>
-    <p>Learning about the benefits of preventative healthcare can be particularly difficult. Check all of the reasons below why this may be the case.</p>
+    <p>Learning about the benefits of preventative healthcare can be particularly
+     difficult. Check all of the reasons below why this may be the case.</p>
 
   <choiceresponse>
-  <checkboxgroup>
-  <choice correct="true"><text>A large amount of time passes between undertaking a preventative measure and seeing the result.</text></choice>
-  <choice correct="false"><text>Non-immunized people will always fall sick.</text></choice>
-  <choice correct="true"><text>If others are immunized, fewer people will fall sick regardless of a particular individual's choice to get immunized or not.</text></choice>
-  <choice correct="true"><text>Trust in healthcare professionals and government officials is fragile.</text></choice>
-  </checkboxgroup>
+    <checkboxgroup>
+      <choice correct="true"><text>A large amount of time passes between undertaking
+      a preventative measure and seeing the result.</text></choice>
+      <choice correct="false"><text>Non-immunized people will always fall sick.</text>
+      </choice>
+      <choice correct="true"><text>If others are immunized, fewer people will fall 
+      sick regardless of a particular individual's choice to get immunized or not.
+      </text></choice>
+      <choice correct="true"><text>Trust in healthcare professionals and government 
+      officials is fragile.</text></choice>
+    </checkboxgroup>
 
    <solution>
    <div class="detailed-solution">
    <p>Explanation</p>
-   <p>People who are not immunized against a disease may still not fall sick from the disease. If someone is trying to learn whether or not preventative measures against the disease have any impact, he or she may see these people and conclude, since they have remained healthy despite not being immunized, that immunizations have no effect. Consequently, he or she would tend to believe that immunization  (or other preventative measures) have fewer benefits than they actually do.</p>
+   <p>People who are not immunized against a disease may still not fall sick from the 
+   disease. If someone is trying to learn whether or not preventative measures 
+   against the disease have any impact, he or she may see these people and conclude, 
+   since they have remained healthy despite not being immunized, that immunizations 
+   have no effect. Consequently, he or she would tend to believe that immunization 
+   (or other preventative measures) have fewer benefits than they actually do.</p>
    </div>
    </solution>
   </choiceresponse>
@@ -73,27 +119,39 @@ Sample Problem:
 
    <solution>
    <div class="detailed-solution">
-   <p>Explanation</p>
-   <p>Explanation text</p>
+   <p>Solution or Explanation Heading</p>
+   <p>Solution or explanation text</p>
    </div>
    </solution>
 
   </choiceresponse>
   </problem>
 
+.. _Chemical Equation Input:
 
+Chemical Equation Input (Chemical Equation Problems)
+----------------------------------------------------
 
-.. _Chemical Equation Response:
-
-Chemical Equation Response
---------------------------
-
-The chemical equation problem type allows the student to enter chemical equations. The grader evaluates student responses by using a Python script that you create and embed in the problem.
+In chemical equation problems, students enter text that represents a chemical equation into a text box. The LMS converts that text into a chemical equation below the text box.
 
 **Sample Problem**
 
 .. image:: ../Images/ChemicalEquationExample.png
  :alt: Image of a chemical equation response problem
+
+**Required Tags**
+
+.. list-table::
+   :widths: 20 80
+
+   * - ``<customresponse>``
+     - Indicates that this problem has a custom response. The ``<customresponse>`` tags must surround the ``<chemicalequation>`` tags.
+   * - ``<chemicalequationinput>``
+     - A child of ``<customresponse>``. Indicates that the answer to this problem is a chemical equation.
+   * - ``<answer type=loncapa/python>``
+     - A child of ``<chemicalequationinput>``. Contains the Python script that grades the problem.
+
+Chemical equation problems use MathJax to create formulas. For more information about using MathJax in Studio, see :ref:`MathJax in Studio`.
 
 **Sample Problem XML**:
 
@@ -135,19 +193,60 @@ The chemical equation problem type allows the student to enter chemical equation
    </solution>
   </problem>
 
+**Problem Template**:
+
+.. code-block:: xml
+
+  <problem>
+    <startouttext/>
+    <p>Problem text</p>
+
+    <customresponse>
+      <chemicalequationinput size="50"/>
+      <answer type="loncapa/python">
+
+  if chemcalc.chemical_equations_equal(submission[0], 'TEXT REPRESENTING CHEMICAL EQUATION'):
+      correct = ['correct']
+  else:
+      correct = ['incorrect']
+
+      </answer>
+    </customresponse>
+
+    <endouttext/>
+  
+   <solution>
+   <div class="detailed-solution">
+   <p>Solution or Explanation Header</p>
+   <p>Solution or explanation text</p>
+   </div>
+   </solution>
+  </problem>
+
 
 .. _Custom Response:
 
-Custom Response ("Write-Your-Own-Grader")
-------------------------------------------
+Custom Response ("Custom Python-Evaluated Input") Problems
+-----------------------------------------------------------
 
-In write-your-own-grader problems (also called “custom Python-evaluated input” problems), the grader evaluates a student’s response using a Python script that you create and embed in the problem. Students can enter more than one line of text.
+In custom Python-evaluated input (also called “write-your-own-grader”) problems, the grader evaluates a student’s response using a Python script that you create and embed in the problem. 
 
 **Sample Problem**
 
 .. image:: ../Images/CustomPythonExample.png
  :alt: Image of a custom response problem
 
+.. list-table::
+   :widths: 20 80
+
+   * - ``<script type="loncapa/python">``
+     - Indicates that the problem contains a Python script.
+   * - ``<customresponse cfn="test_add_to_ten">``
+     - 
+   * - ``<customresponse cfn="test_add" expect="20">``
+     - 
+   * - <textline size="10" correct_answer="3"/>
+     - This tag includes the ``size`` and ``correct_answer`` attributes. The ``correct_answer`` attribute is optional.
 
 **Sample Problem XML**:
 
@@ -183,18 +282,18 @@ In write-your-own-grader problems (also called “custom Python-evaluated input�
           <textline size="10"/>
   </customresponse>
 
-      <solution>
-          <div class="detailed-solution">
-              <p>Explanation</p>
-                 <p>For part 1, any two numbers of the form <i>n</i> and <i>10-n</i>, where <i>n</i> is any integer, will work. One possible answer would be the pair 0 and 10.</p>
-                <p>For part 2, any pair <i>x</i> and <i>20-x</i> will work, where <i>x</i> is any real number with a finite decimal representation. Both inputs have to be entered either in standard decimal notation or in scientific exponential notation. One possible answer would be the pair 0.5 and 19.5. Another way to write this would be 5e-1 and 1.95e1.</p>
-          </div>
-      </solution>
+  <solution>
+      <div class="detailed-solution">
+          <p>Explanation</p>
+          <p>For part 1, any two numbers of the form <i>n</i> and <i>10-n</i>, where <i>n</i> is any integer, will work. One possible answer would be the pair 0 and 10.</p>
+          <p>For part 2, any pair <i>x</i> and <i>20-x</i> will work, where <i>x</i> is any real number with a finite decimal representation. Both inputs have to be entered either in standard decimal notation or in scientific exponential notation. One possible answer would be the pair 0.5 and 19.5. Another way to write this would be 5e-1 and 1.95e1.</p>
+      </div>
+  </solution>
   </problem>
 
 **Templates**
 
-The following template includes suggested correct answers (to include these, add a ``correct_answer`` attribute to the ``<textline>`` tag).
+The following template includes answers that appear when the student clicks **Show Answer**. 
 
 .. code-block:: xml
 
@@ -208,7 +307,7 @@ The following template includes suggested correct answers (to include these, add
   </script>
 
 
-  <p>Enter two real numbers that sum to 20: </p>
+  <p>Problem text</p>
   <customresponse cfn="test_add" expect="20">
           <textline size="10" correct_answer="11"/><br/>
           <textline size="10" correct_answer="9"/>
@@ -216,11 +315,13 @@ The following template includes suggested correct answers (to include these, add
 
       <solution>
           <div class="detailed-solution">
+            <p>Solution or Explanation Heading</p>
+            <p>Solution or explanation text</p>
           </div>
       </solution>
   </problem>
 
-The following template does not include suggested correct answers.
+The following template does not return answers when the student clicks **Show Answer**. If your problem doesn't include answers for the student to see, make sure to set **Show Answer** to **Never** in the problem component.
 
 .. code-block:: xml
 
@@ -242,6 +343,8 @@ The following template does not include suggested correct answers.
 
       <solution>
           <div class="detailed-solution">
+            <p>Solution or Explanation Heading</p>
+            <p>Solution or explanation text</p>
           </div>
       </solution>
   </problem>
@@ -254,8 +357,20 @@ Formula Response (Math Expression Input Problems)
 **Sample Problem**
 
 .. image:: ../Images/MathExpressionInputExample.gif
- :width: 600
  :alt: Image of a math expression input problem
+
+.. list-table::
+   :widths: 20 80
+   :header-rows: 1
+
+   * - ``<formularesponse>``
+     - 
+   * - ``<formulaequationinput>``
+     - 
+   * - ``<script type="loncapa/python">``
+     - 
+   * - ``<textline size="10" correct_answer="3"/>``
+     - This tag includes the ``size`` and ``correct_answer`` attributes. The ``correct_answer`` attribute is optional.
 
 **Sample Problem XML**
 
@@ -268,7 +383,7 @@ Formula Response (Math Expression Input Problems)
       <li>Use standard arithmetic operation symbols.</li>
       <li>Indicate multiplication explicitly by using an asterisk (*).</li>
       <li>Use a caret (^) to raise to a power.</li>
-      <li>Use an underscore (_) to indicate a subscript.</li>        
+      <li>Use an underscore (_) to indicate a subscript.</li>
       <li>Use parentheses to specify the order of operations.</li>
     </ul>
 
@@ -293,11 +408,35 @@ Formula Response (Math Expression Input Problems)
 
     <solution>
       <div class="detailed-solution">
-        <p>Explanation</p>
-
+        <p>Explanation or Solution Header</p>
+        <p>Explanation or solution text</p>
       </div>
     </solution>
   </problem>
+
+**Template XML**
+
+.. code-block:: xml
+
+  <problem>
+    <p>Problem text</p>
+    <formularesponse type="ci" samples="VARIABLES@LOWER_BOUNDS:UPPER_BOUNDS#NUMBER_OF_SAMPLES" answer="$VoVi">
+      <responseparam type="tolerance" default="0.00001"/>
+      <formulaequationinput size="20" />
+    </formularesponse>
+
+  <script type="loncapa/python">
+  VoVi = "(R_1*R_2)/R_3"
+  </script>
+
+    <solution>
+      <div class="detailed-solution">
+        <p>Explanation or Solution Header</p>
+        <p>Explanation or solution text</p>
+      </div>
+    </solution>
+  </problem>
+
 
 **XML Attribute Information**
 
@@ -335,19 +474,23 @@ size      (optional) defines the size (i.e. the width)
 
 .. _Image Response:
 
-Image Response
---------------
+Image Response (Image Mapped Input Problems)
+--------------------------------------------
 
-The Image Response input type presents an image and accepts clicks on the image as an answer.
-Images have to be uploaded to the courseware Assets directory. Response clicks are marked as correct if they are within a certain specified sub rectangle of the image canvas.
-
-*Note The Mozilla Firefox browser is currently not supported for this problem type.*
-
-Sample Problem:
+**Sample Problem**
 
 .. image:: ../Images/image294.png
- :width: 600
+ :alt: Image of an image mapped input problem
 
+**XML Tags**
+
+.. list-table::
+   :widths: 20 80
+
+   * - ``<imageresponse>``
+     - Indicates that the problem is an image mapped input problem.
+   * - ``<imageinput>``
+     - Specifies the image file and the region the student must click. This tag includes the ``src``, ``width``, ``height``, and ``rectangle`` attributes.
 
 **Problem Code**:
 
@@ -355,26 +498,28 @@ Sample Problem:
 
   <problem>
     <p><b>Example Problem</b></p>
-  <startouttext/>
-      <p>You are given three shapes. Click on the triangle.</p>
+     <startouttext/>
+      <p>In the image below, click the triangle.</p>
       <endouttext/>
       <imageresponse>
       <imageinput src="/static/threeshapes.png" width="220" height="150" rectangle="(80,40)-(130,90)" />
       </imageresponse>
   </problem>
 
-Template
+**Problem Template**
 
 .. code-block:: xml
 
   <problem>
-      <imageresponse>
-      <imageinput src="Path_to_Image_File.png" width="220" height="150" rectangle="(80,40)-(130,90)" />
-      </imageresponse>
+    <startouttext/>
+      <p>In the image below, click the triangle.</p>
+    <endouttext/>
+        <imageresponse>
+         <imageinput src="IMAGE FILE PATH" width="NUMBER" height="NUMBER" rectangle="(X-AXIS,Y-AXIS)-(X-AXIS,Y-AXIS)" />
+        </imageresponse>
   </problem>
 
-XML Attribute Information
-
+**XML Attribute Information**
 
 <imageresponse>
 
@@ -384,59 +529,51 @@ XML Attribute Information
 
   .. image:: ../Images/imageresponse2.png
 
-.. _Multiple Choice:
+.. _Multiple Choice Response:
 
-Multiple Choice
----------------
+Multiple Choice Response (Multiple Choice Problems)
+-----------------------------------------------------
 
+Although you can create multiple choice problems by using the Simple Editor in Studio, you may want to see or change the problem's underlying XML.
 
-The Multiple Choice input type allows the student to select at most one choice
-from a collection of answer choices, presented as a list of radio buttons.
+**Sample Problem**
 
-A Multiple Choice problem can have more than one correct answer, depending on
-how many choices are marked as correct in the underlying XML. If all choices are
-marked as incorrect, there is no correct response.
-
-Multiple Choice is structurally similar to Option Response. Some conceptual
-differences between the two include the following.
-
-• The Multiple Choice radio button format makes it easier for students to read very long response options.
-
-• The Option Response drop-down input format makes it more likely for students to think of an answer and then search for it, rather than relying purely on recognition to answer the question.
-
-• The Multiple Choice format is more explicit and visual. This makes it a more appropriate choice for presenting tricky or complicated answer options which are intended to get the student to pause and think.
-
-Sample Problem:
-
-.. image:: ../Images/image289.png
- :width: 600
+.. image:: ../Images/MultipleChoiceExample.gif
  :alt: Image of a multiple choice problem
+
+**XML Tags**
+
+.. list-table::
+   :widths: 20 80
+
+   * - ``<multiplechoiceresponse>``
+     - Indicates that the problem is a multiple choice problem.
+   * - ``<choicegroup type="MultipleChoice">``
+     - Indicates the beginning of the list of options.
+   * - ``<choice>``
+     - Lists an option. This tag includes the ``correct`` and ``name`` attributes.
 
 **Problem Code:**
 
 .. code-block:: xml
 
   <problem>
-  <p><b>Example Problem</b></p>
-  <p>How many correct responses can a Multiple Choice question have?</p>
-      <multiplechoiceresponse>
-     <choicegroup type="MultipleChoice">
-        <choice correct="false" name="one">Only one</choice>
-        <choice correct="false" name="zeroone">Only zero or one</choice>
-        <choice correct="true" name="zeromore">Zero or more</choice>
-        <choice correct="false" name="onemore">Only one or more</choice>
-        <choice correct="false" name="noone">Nobody knows</choice>
-        <choice correct="true" name="someone">Somebody might know :)</choice>
+  <p>Lateral inhibition, as was first discovered in the horsehoe crab...</p>
+  <multiplechoiceresponse>
+    <choicegroup type="MultipleChoice">
+      <choice correct="false">is a property of touch sensation, referring to the ability of crabs to detect nearby predators.</choice>
+      <choice correct="false">is a property of hearing, referring to the ability of crabs to detect low frequency noises.</choice>
+      <choice correct="false">is a property of vision, referring to the ability of crabs eyes to enhance contrasts.</choice>
+      <choice correct="true">has to do with the ability of crabs to use sonar to detect fellow horseshoe crabs nearby.</choice>
+      <choice correct="false">has to do with a weighting system in the crabs skeleton that allows it to balance in turbulent water.</choice>
     </choicegroup>
-    </multiplechoiceresponse>
+  </multiplechoiceresponse>
   <solution>
-        <div class="detailed-solution">
-          <p>Explanation</p>
-            <p>It depends on how many choices are marked as correct in the underlying XML.</p>
-  <p>Note that if all choices are marked as incorrect, there is no
-          correct response.</p>
-        </div>
-    </solution>
+    <div class="detailed-solution">
+      <p>Explanation</p>
+      <p>Horseshoe crabs were essential to the discovery of lateral inhibition, a property of vision present in horseshoe crabs as well as humans, that enables enhancement of contrast at edges of objects as was demonstrated in class. In 1967, Haldan Hartline received the Nobel prize for his research on vision and in particular his research investigating lateral inhibition using horseshoe crabs.</p>
+    </div>
+  </solution>
   </problem>
 
 
@@ -445,17 +582,18 @@ Sample Problem:
 .. code-block:: xml
 
   <problem>
-
+  <p>Question text</p>
   <multiplechoiceresponse>
     <choicegroup type="MultipleChoice">
-      <choice correct="false" name="a">A</choice>
-      <choice correct="true" name="b">B</choice>
+      <choice correct="false" name="a">Incorrect choice</choice>
+      <choice correct="true" name="b">Correct choice</choice>
     </choicegroup>
   </multiplechoiceresponse>
 
   <solution>
     <div class="detailed-solution">
-
+    <p>Explanation or solution header</p>
+    <p>Explanation or solution text</p>
     </div>
   </solution>
   </problem>
@@ -776,66 +914,81 @@ The default included functions are the following:
 
 .. _Option Response:
 
-Option Response (Dropdown)
---------------------------
+Option Response (Dropdown Problems)
+-----------------------------------
 
-The Option Response input type allows the student to choose from a collection of
-answer options, presented as a drop-down list.
+Although you can create dropdown problems by using the Simple Editor in Studio, you may want to see or change the problem's underlying XML.
 
-Option Response is structurally similar to Multiple Choice. Some conceptual
-differences between the two include the following.
+**Sample Problem**
 
-* The Multiple Choice radio button format makes it easier for students to read very long response options.
-
-* The Option Response drop-down input format makes it more likely for students to think of an answer and then search for it, rather than relying purely on recognition to answer the question. The Multiple Choice format is more explicit and visual. This makes it a more appropriate choice for presenting tricky or complicated answer options which are intended to get the student to pause and think.
-
-Sample Problem:
-
-.. image:: ../Images/image287.png
-    :width: 600
+.. image:: ../Images/DropdownExample.gif
     :alt: Image of an option response problem
+
+**XML Tags**
+
+.. list-table::
+   :widths: 20 80
+
+   * - ``<optionresponse>``
+     - Indicates that the problem is a dropdown problem.
+   * - ``<optioninput>``
+     - Lists the answer options. This tag includes the ``options`` and ``correct`` attributes.
+
 
 **Problem Code:**
 
 .. code-block:: xml
 
   <problem>
-
-   <p>Option Response is most similar to __________.</p>
-
-    <optionresponse>
-     <optioninput
-       options="('Multiple Choice','String Response',
-                'Numerical Response','External Response',
-                'Image Response')"
-      correct="Multiple Choice"/>1
-    </optionresponse>
-
-   <solution>
-     <div class="detailed-solution">
-       <p>Explanation</p>
-        <p>Like Option Response, Multiple Choice also allows students to select
-       from a variety of pre-written responses.</p>
-     </div>
-    </solution>
+  <p>
+    <em>This exercise first appeared in HarvardX's PH207x Health in Numbers: Quantitative Methods in Clinical &amp; Public Health Research course, fall 2012.</em>
+  </p>
+  <p>What type of data are the following?</p>
+  <p>Age:</p>
+  <optionresponse>
+    <optioninput options="('Nominal','Discrete','Continuous')" correct="Continuous"/>
+  </optionresponse>
+  <p>Age, rounded to the nearest year:</p>
+  <optionresponse>
+    <optioninput options="('Nominal','Discrete','Continuous')" correct="Discrete"/>
+  </optionresponse>
+  <p>Life stage - infant, child, and adult:</p>
+  <optionresponse>
+    <optioninput options="('Nominal','Discrete','Continuous')" correct="Nominal"/>
+  </optionresponse>
   </problem>
-
-
-
 
 **Template**
 
 .. code-block:: xml
 
   <problem>
+  <p>
+    Problem text</p>
+  <optionresponse>
+    <optioninput options="('Option 1','Option 2','Option 3')" correct="Option 2"/>
+  </optionresponse>
+    <solution>
+      <div class="detailed-solution">
+      <p>Explanation or Solution Header</p>
+      <p>Explanation or solution text</p>
+      </div>
+    </solution>
+  </problem>
 
+.. code-block:: xml
+
+  <problem>
+   <p>Problem text</p>
     <optionresponse>
      options="('A','B')"
       correct="A"/>
     </optionresponse>
-
+   
     <solution>
       <div class="detailed-solution">
+      <p>Explanation or Solution Header</p>
+      <p>Explanation or solution text</p>
       </div>
     </solution>
   </problem>
@@ -857,24 +1010,15 @@ Sample Problem:
 
 .. _Schematic Response:
 
-Schematic Response
-------------------
+Schematic Response (Circuit Schematic Problems)
+-----------------------------------------------
 
 The Schematic Response input type provides an interactive grid on which the
 student can construct a schematic answer, such as a circuit.
 
-Sample Problem:
+**Sample Problem**
 
-.. image:: ../Images/image297.png
- :width: 600
- :alt: Image of a schematic response problem
-
-.. image:: ../Images/image298.png
- :width: 600
- :alt: Image of a schematic response problem
-
-.. image:: ../Images/image299.png
- :width: 600
+.. image:: ../Images/CircuitSchematicExample.gif
  :alt: Image of a schematic response explanation
 
 **Problem Code**:
@@ -883,8 +1027,7 @@ Sample Problem:
 
 
     <problem>
-      Make a voltage divider that splits the provided voltage evenly.
-
+      <p>Make a voltage divider that splits the provided voltage evenly.</p>
     <schematicresponse>
     <center>
     <schematic height="500" width="600" parts="g,r" analyses="dc"
@@ -897,12 +1040,10 @@ Sample Problem:
       if response[0] == 'dc':
           for node in response[1:]:
               dc_value = node['output']
-
     if dc_value == .5:
       correct = ['correct']
     else:
       correct = ['incorrect']
-
     </answer>
     </schematicresponse>
     <schematicresponse>
@@ -927,7 +1068,6 @@ Sample Problem:
       correct = ['incorrect']
     </answer>
     </schematicresponse>
-
         <solution>
             <div class="detailed-solution">
                 <p>Explanation</p>
@@ -941,46 +1081,76 @@ Sample Problem:
 
 .. _String Response:
 
+String Response (Text Input Problems)
+-------------------------------------
 
+Although you can create text input problems by using the Simple Editor in Studio, you may want to see or change the problem's underlying XML. For example, you can add hints that appear when students enter common incorrect answers, or modify the problem's XML so that students can submit regular expressions as answers. 
 
-String Response
----------------
+The regular expression that the student enters must contain the part of the answer that the instructor specifies. For example, if an instructor has specified  ``<answer=".*example answer.*" type="regexp">``, correct answers include ``example answered``, ``two example answers``, or even ``==example answer==``, but not ``examples`` or ``example anser``.
 
-The String Response input type provides an input box in which the student can
-enter a line of text, which is then checked against a specified expected answer.
+You can add ``regexp`` to the value of the ``type`` attribute, for example: ``type="ci regexp"`` or ``type="regexp"`` or ``type="regexp cs"``. In this case, any answer or hint will be treated as regular expressions.
 
-A String Response input does not provide any answer suggestions, so it can be a
-good way to get the students to engage with the material more deeply in a
-sequence and look up, figure out, or remember the correct answer themselves.
+**Sample Problem**
 
-Note that a student's answer in a String Response is marked as correct if it
-matches every character of the expected answer. This can be a problem with
-international spelling, dates, or anything where the format of the answer is not
-clear.
-
-Sample Problem:
-
-.. image:: ../Images/image291.png
- :width: 600
+.. image:: ../Images/TextInputExample.gif
  :alt: Image of a string response problem
 
-**Problem Code:**
+**XML Tags**
+
+.. list-table::
+   :widths: 20 80
+
+   * - ``<stringresponse>``
+     - Indicates that the problem is a text input problem. 
+   * - ``<textline>``
+     - Child of ``<stringresponse>``. Lists the answer options.
+   * - ``<additional_answer>`` (optional)
+     - Specifies an additional correct answer for the problem. A problem can contain an unlimited number of additional answers.
+   * - ``<hintgroup>`` (optional)
+     - Indicates that the instructor has provided hints for certain common incorrect answers.
+   * - ``<stringhint />`` (optional)
+     - Child of ``<hintgroup>``. Specifies the text of the incorrect answer to provide the hint for. Contains answer, type, name.
+   * - ``<hintpart>``
+     - Contains the name from ``<stringhint>``. Associates the incorrect answer with the hint text for that incorrect answer.
+   * - ``<startouttext />``
+     - Indicates the beginning of the text of the hint.
+   * - ``<endouttext />``
+     - Indicates the end of the text of the hint.
+
+**Sample Problem Code**
 
 .. code-block:: xml
 
   <problem>
-    <p><b>Example Problem</b></p>
-    <p>What is the name of this unit? (What response type is this?)</p>
-    <stringresponse answer="String Response" type="ci">
-      <textline size="20"/>
-    </stringresponse>
-    <solution>
-      <div class="detailed-solution">
-        <p>Explanation</p>
-        <p>The name of this unit is "String Response," written without the punctuation.</p>
-        <p>Arbitrary capitalization is accepted.</p>
-      </div>
-    </solution>
+  <p>
+    <em>This problem is adapted from an exercise that first appeared in MITx's 14.73x The Challenges of Global Poverty course, spring 2013.</em>
+  </p>
+  <p>What is the technical term that refers to the fact that, when enough people sleep under a bednet, the disease may altogether disappear?</p>
+  <stringresponse answer=".*herd immunity.*" type="ci regexp">
+         <additional_answer>community immunity</additional_answer>
+          <additional_answer>population immunity</additional_answer>
+          <textline size="20"/>
+          <hintgroup>
+              <stringhint answer="contact immunity" type="ci" name="contact_immunity_hint" />
+              <hintpart on="contact_immunity_hint">
+                  <startouttext />
+                  In contact immunity, a vaccinated individual passes along his immunity to another person through contact with feces or bodily fluids. The answer to the question above refers to the form of immunity that occurs when so many members of a population are protected, an infectious disease is unlikely to spread to the unprotected population.
+                  <endouttext />
+              </hintpart >
+              <stringhint answer="firewall immunity" type="ci" name="firewall_immunity_hint" />
+              <hintpart on="firewall_immunity_hint">
+                  <startouttext />
+                  Although a firewall provides protection for a population, the term "firewall" is used more in computing and technology than in epidemiology.
+                  <endouttext />
+              </hintpart >
+          </hintgroup>
+  </stringresponse>
+  <solution>
+    <div class="detailed-solution">
+      <p>Explanation</p>
+      <p>The correct answer is <b>herd immunity</b>. As more and more people use bednets, the risk of malaria begins to fall for everyone – users and non-users alike. This can fall to such a low probability that malaria is effectively eradicated from the group (even when the group does not have 100% bednet coverage).</p>
+    </div>
+  </solution>
   </problem>
 
 **Template**
@@ -988,49 +1158,33 @@ Sample Problem:
 .. code-block:: xml
 
   <problem>
-    <stringresponse answer="REPLACE_THIS" type="ci">
-      <textline size="20"/>
-    </stringresponse>
-    <solution>
+      <p>Problem text</p>
+      <stringresponse answer="**.Correct answer 1.**" type="ci regexp">
+          <additional_answer>Correct answer 2</additional_answer>
+          <additional_answer>Correct answer 3</additional_answer>
+          <textline size="20"/>
+          <hintgroup>
+              <stringhint answer="Incorrect answer A" type="ci" name="hintA" />
+                <hintpart on="hintA">
+                    <startouttext />Text of hint for incorrect answer A<endouttext />
+                </hintpart >
+              <stringhint answer="Incorrect answer B" type="ci" name="hintB" />
+                <hintpart on="hintB">
+                    <startouttext />Text of hint for incorrect answer B<endouttext />
+                </hintpart >
+              <stringhint answer="Incorrect answer C" type="ci" name="hintC" />
+                <hintpart on="hintC">
+                    <startouttext />Text of hint for incorrect answer C<endouttext />
+                </hintpart >
+          </hintgroup>
+      </stringresponse>
+      <solution>
       <div class="detailed-solution">
+      <p>Explanation or Solution Header</p>
+      <p>Explanation or solution text</p>
       </div>
     </solution>
   </problem>
-
-
-This response type allows to add more than one answer. Use `additional_answer`  tag to add more answers.
-
-You can add `regexp` to value of `type` attribute, for example: `type="ci regexp"` or `type="regexp"` or `type="regexp cs"`.
-In this case, any answer and hint will be treated as regular expressions.
-Regular expression has to match whole answer, for answer to be correct.
-Student answers "foobar", "o foo" or " ==foo==", will be correct if teacher has set answer=".*foo.*" with type="regexp".
-
-**Template**
-
-.. code-block:: xml
-
-    <problem>
-        <stringresponse answer="a1" type="ci regexp">
-            <additional_answer>\d5</additional_answer>
-            <additional_answer>a3</additional_answer>
-            <textline size="20"/>
-            <hintgroup>
-                <stringhint answer="a0" type="ci" name="ha0" />
-                <stringhint answer="a4" type="ci" name="ha4" />
-                <stringhint answer="^\d" type="ci" name="re1" />
-                <hintpart on="ha0">
-                    <startouttext />+1<endouttext />
-                </hintpart >
-                <hintpart on="ha4">
-                    <startouttext />-1<endouttext />
-                </hintpart >
-                <hintpart on="re1">
-                    <startouttext />Any number+5<endouttext />
-                </hintpart >
-            </hintgroup>
-        </stringresponse>
-    </problem>
-
 
 **XML Attribute Information**
 
@@ -1090,17 +1244,3 @@ Student answers "foobar", "o foo" or " ==foo==", will be correct if teacher has 
 <textline>
 
   .. image:: ../Images/stringresponse2.png
-
-<additional_answer> - Can be unlimited number of this tags. Any tag adds one more additional answer for matching.
-
-
-
-
-
-
-
-
-
-
-
-

@@ -5,7 +5,7 @@
 
   header.course-profile {
     background: $course-profile-bg;
-    @include background-image(url($homepage-bg-image));
+    background-image: $homepage-bg-image;
     background-size: cover;
     box-shadow: 0 1px 80px 0 rgba(0,0,0, 0.5);
     border-bottom: 1px solid $border-color-3;

@@ -67,19 +67,19 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
           <ol class="list-input">
             <li class="field text is-not-editable" id="field-course-organization">
               <label for="course-organization">${_("Organization")}</label>
-              <input title="${_('This field is disabled: this information cannot be changed.')}" type="text" 
+              <input title="${_('This field is disabled: this information cannot be changed.')}" type="text"
                 class="long" id="course-organization" readonly />
             </li>
 
             <li class="field text is-not-editable" id="field-course-number">
               <label for="course-number">${_("Course Number")}</label>
-              <input title="${_('This field is disabled: this information cannot be changed.')}" type="text" 
+              <input title="${_('This field is disabled: this information cannot be changed.')}" type="text"
                 class="short" id="course-number" readonly>
             </li>
 
             <li class="field text is-not-editable" id="field-course-name">
               <label for="course-name">${_("Course Name")}</label>
-              <input title="${_('This field is disabled: this information cannot be changed.')}" type="text" 
+              <input title="${_('This field is disabled: this information cannot be changed.')}" type="text"
                 class="long" id="course-name" readonly />
             </li>
           </ol>
@@ -93,7 +93,7 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
 
             <ul class="list-actions">
               <li class="action-item">
-                <a title="${_('Send a note to students via email')}" 
+                <a title="${_('Send a note to students via email')}"
                     href="mailto:someone@domain.com?Subject=Enroll%20in%20${context_course.display_name_with_default}&body=The%20course%20&quot;${context_course.display_name_with_default}&quot;,%20provided%20by%20edX,%20is%20open%20for%20enrollment.%20Please%20navigate%20to%20this%20course%20at%20https:${lms_link_for_about_page}%20to%20enroll." class="action action-primary">
                     <i class="icon-envelope-alt icon-inline"></i>${_("Invite your students")}</a>
               </li>
@@ -198,6 +198,14 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
                 <span class="tip">${_("Information for prospective students")}</span>
               </header>
               <ol class="list-input">
+                % if short_description_editable:
+                <li class="field text" id="field-course-short-description">
+                  <label for="course-overview">${_("Course Short Description")}</label>
+                  <textarea class="text" id="course-short-description"></textarea>
+                  <span class="tip tip-stacked">${_("Appears on the course catalog page when students roll over the course name. Limit to ~150 characters")}</span>
+                </li>
+                % endif
+
                 % if about_page_editable:
                 <li class="field text" id="field-course-overview">
                   <label for="course-overview">${_("Course Overview")}</label>

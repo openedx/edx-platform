@@ -149,10 +149,17 @@ class OpenResponseTest(UniqueCourseTest):
         def _inner_check():
             self.course_nav.go_to_sequential('Self-Assessed')
             self.course_nav.go_to_sequential(section_name)
-            feedback = self.open_response.rubric.feedback
+
+            try:
+                feedback = self.open_response.rubric.feedback
+
+            # Unsuccessful if the rubric hasn't loaded
+            except BrokenPromise:
+                return (False, None)
 
             # Successful if `feedback` is a non-empty list
-            return (bool(feedback), feedback)
+            else:
+                return (bool(feedback), feedback)
 
         return _inner_check
 

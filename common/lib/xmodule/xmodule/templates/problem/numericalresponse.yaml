@@ -9,13 +9,13 @@ metadata:
        The answer is correct if it is within a specified numerical tolerance
        of the expected answer.
 
-       Enter the numerical value of Pi:
+       >>Enter the numerical value of Pi:<<
        = 3.14159 +- .02
        
-       Enter the approximate value of 502*9:
+       >>Enter the approximate value of 502*9:<<
        = 4518 +- 15%
 
-       Enter the number of fingers on a human hand:
+       >>Enter the number of fingers on a human hand<<
        = 5
 
        [explanation]
@@ -47,19 +47,19 @@ data: |
    <p>Enter the numerical value of Pi:
        <numericalresponse answer="3.14159">
            <responseparam type="tolerance" default=".02" />
-           <formulaequationinput />
+           <formulaequationinput label="Enter the numerical value of Pi" />
        </numericalresponse>
    </p>
    <p>Enter the approximate value of 502*9:
        <numericalresponse answer="$computed_response">
            <responseparam type="tolerance" default="15%"/>
-           <formulaequationinput />
+           <formulaequationinput label="Enter the approximate value of 502 times 9"/>
        </numericalresponse>
    </p>
 
    <p>Enter the number of fingers on a human hand:
        <numericalresponse answer="5">
-           <formulaequationinput />
+           <formulaequationinput label="Enter the number of fingers on a human hand"/>
        </numericalresponse>
    </p>
        <solution>

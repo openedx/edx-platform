@@ -55,7 +55,10 @@ DISCUSSION_SETTINGS = {
 FEATURES = {
     'SAMPLE': False,
     'USE_DJANGO_PIPELINE': True,
-    'DISPLAY_HISTOGRAMS_TO_STAFF': True,
+
+    'DISPLAY_DEBUG_INFO_TO_STAFF': True,
+    'DISPLAY_HISTOGRAMS_TO_STAFF': False,  # For large courses this slows down courseware access for staff.
+
     'REROUTE_ACTIVATION_EMAIL': False,  # nonempty string = address for all activation emails
     'DEBUG_LEVEL': 0,  # 0 = lowest level, least verbose, 255 = max level, most verbose
 
@@ -498,7 +501,8 @@ LANGUAGE_CODE = 'en'  # http://www.i18nguy.com/unicode/language-identifiers.html
 
 # Sourced from http://www.localeplanet.com/icu/ and wikipedia
 LANGUAGES = (
-    ('eo', u'Dummy Language (Esperanto)'),  # Dummy language used for testing
+    ('en', u'English'),
+    ('eo', u'Dummy Language (Esperanto)'),  # Dummy languaged used for testing
     ('fake2', u'Fake translations'),        # Another dummy language for testing (not pushed to prod)
 
     ('ach', u'Acholi'),  # Acoli
@@ -506,6 +510,7 @@ LANGUAGES = (
     ('bg-bg', u'български (България)'),  # Bulgarian (Bulgaria)
     ('bn', u'বাংলা'),  # Bengali
     ('bn-bd', u'বাংলা (বাংলাদেশ)'),  # Bengali (Bangladesh)
+    ('ca@valencia', u'Català (València)'),  # Catalan (Valencia)
     ('cs', u'Čeština'),  # Czech
     ('cy', u'Cymraeg'),  # Welsh
     ('de-de', u'Deutsch (Deutschland)'),  # German (Germany)
@@ -549,6 +554,8 @@ LANGUAGES = (
     ('zh-cn', u'大陆简体'),  # Chinese (China)
     ('zh-tw', u'台灣正體'),  # Chinese (Taiwan)
 )
+
+LANGUAGE_DICT = dict(LANGUAGES)
 
 USE_I18N = True
 USE_L10N = True
@@ -687,11 +694,16 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'track.middleware.TrackMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'splash.middleware.SplashMiddleware',
 
     'course_wiki.course_nav.Middleware',
 
     # Allows us to dark-launch particular languages
     'dark_lang.middleware.DarkLangMiddleware',
+
+    # Allows us to set user preferences
+    # should be after DarkLangMiddleware
+    'lang_pref.middleware.LanguagePreferenceMiddleware',
 
     # Detects user-requested locale from 'accept-language' header in http request
     'django.middleware.locale.LocaleMiddleware',
@@ -1095,6 +1107,9 @@ INSTALLED_APPS = (
     'django_comment_client',
     'django_comment_common',
     'notes',
+
+    # Splash screen
+    'splash',
 
     # Monitoring
     'datadog',

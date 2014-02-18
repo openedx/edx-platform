@@ -27,6 +27,7 @@
 @import 'elements/typography';
 @import 'elements/icons'; // references to icons used
 @import 'elements/controls'; // buttons, link styles, sliders, etc.
+@import 'elements/xblocks'; //  studio rendering chrome for xblocks
 
 // base - specific views
 @import 'views/account';
@@ -41,9 +42,11 @@
 @import 'views/static-pages';
 @import 'views/subsection';
 @import 'views/unit';
+@import 'views/container';
 @import 'views/users';
 @import 'views/checklists';
 @import 'views/textbooks';
+@import 'views/export-git';
 
 // base - contexts
 @import 'contexts/ie'; // ie-specific rules (mostly for known/older bugs)

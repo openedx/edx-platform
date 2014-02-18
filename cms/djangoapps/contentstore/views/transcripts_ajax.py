@@ -126,17 +126,17 @@ def upload_transcripts(request):
             video_name = video_dict['video']
             # We are creating transcripts for every video source,
             # for the case that in future, some of video sources can be deleted.
-            statuses[video_name] = copy_or_rename_transcript(video_name, sub_attr, item)
+            statuses[video_name] = copy_or_rename_transcript(video_name, sub_attr, item, user=request.user)
             try:
                 # updates item.sub with `video_name` if it is successful.
-                copy_or_rename_transcript(video_name, sub_attr, item)
+                copy_or_rename_transcript(video_name, sub_attr, item, user=request.user)
                 selected_name = video_name  # name to write to item.sub field, chosen at random.
             except NotFoundError:
                 # subtitles file `sub_attr` is not presented in the system. Nothing to copy or rename.
                 return error_response(response, "Can't find transcripts in storage for {}".format(sub_attr))
 
         item.sub = selected_name  # write one of  new subtitles names to item.sub attribute.
-        save_module(item)
+        save_module(item, request.user)
         response['subs'] = item.sub
         response['status'] = 'Success'
     else:
@@ -389,7 +389,7 @@ def choose_transcripts(request):
 
     if item.sub != html5_id:  # update sub value
         item.sub = html5_id
-        save_module(item)
+        save_module(item, request.user)
     response = {'status': 'Success',  'subs': item.sub}
     return JsonResponse(response)
 
@@ -420,7 +420,7 @@ def replace_transcripts(request):
         return error_response(response, e.message)
 
     item.sub = youtube_id
-    save_module(item)
+    save_module(item, request.user)
     response = {'status': 'Success',  'subs': item.sub}
     return JsonResponse(response)
 
@@ -483,7 +483,7 @@ def rename_transcripts(request):
     for new_name in videos['html5'].keys():  # copy subtitles for every HTML5 source
         try:
             # updates item.sub with new_name if it is successful.
-            copy_or_rename_transcript(new_name, old_name, item)
+            copy_or_rename_transcript(new_name, old_name, item, user=request.user)
         except NotFoundError:
             # subtitles file `item.sub` is not presented in the system. Nothing to copy or rename.
             error_response(response, "Can't find transcripts in storage for {}".format(old_name))
@@ -519,10 +519,10 @@ def save_transcripts(request):
         for metadata_key, value in metadata.items():
             setattr(item, metadata_key, value)
 
-        save_module(item)  # item becomes updated with new values
+        save_module(item, request.user)  # item becomes updated with new values
 
         if new_sub:
-            manage_video_subtitles_save(None, item)
+            manage_video_subtitles_save(None, item, request.user)
         else:
             # If `new_sub` is empty, it means that user explicitly does not want to use
             # transcripts for current video ids and we remove all transcripts from storage.

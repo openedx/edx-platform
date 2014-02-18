@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Student dashboard page.
 """
@@ -16,6 +17,14 @@ class DashboardPage(PageObject):
 
     def is_browser_on_page(self):
         return self.is_css_present('section.my-courses')
+
+    @property
+    def current_courses_text(self):
+        text_items = self.css_text('section#my-courses')
+        if len(text_items) > 0:
+            return text_items[0]
+        else:
+            return ""
 
     @property
     def available_courses(self):
@@ -59,3 +68,11 @@ class DashboardPage(PageObject):
             return "a.enter-course:nth-of-type({0})".format(link_index + 1)
         else:
             return None
+
+    def change_language(self, code):
+        """
+        Change the language on the dashboard to the language corresponding with `code`.
+        """
+        self.css_click(".edit-language")
+        self.select_option("language", code)
+        self.css_click("#submit-lang")

@@ -52,7 +52,7 @@ class CourseGradingModel(object):
                     }
 
     @staticmethod
-    def update_from_json(course_locator, jsondict):
+    def update_from_json(course_locator, jsondict, user):
         """
         Decode the json into CourseGradingModel and save any changes. Returns the modified model.
         Probably not the usual path for updates as it's too coarse grained.
@@ -65,16 +65,14 @@ class CourseGradingModel(object):
         descriptor.raw_grader = graders_parsed
         descriptor.grade_cutoffs = jsondict['grade_cutoffs']
 
-        get_modulestore(course_old_location).update_item(
-            course_old_location, descriptor.get_explicitly_set_fields_by_scope(Scope.content)
-        )
+        get_modulestore(course_old_location).update_item(descriptor, user.id)
 
-        CourseGradingModel.update_grace_period_from_json(course_locator, jsondict['grace_period'])
+        CourseGradingModel.update_grace_period_from_json(course_locator, jsondict['grace_period'], user)
 
         return CourseGradingModel.fetch(course_locator)
 
     @staticmethod
-    def update_grader_from_json(course_location, grader):
+    def update_grader_from_json(course_location, grader, user):
         """
         Create or update the grader of the given type (string key) for the given course. Returns the modified
         grader which is a full model on the client but not on the server (just a dict)
@@ -91,14 +89,12 @@ class CourseGradingModel(object):
         else:
             descriptor.raw_grader.append(grader)
 
-        get_modulestore(course_old_location).update_item(
-            course_old_location, descriptor.get_explicitly_set_fields_by_scope(Scope.content)
-        )
+        get_modulestore(course_old_location).update_item(descriptor, user.id)
 
         return CourseGradingModel.jsonize_grader(index, descriptor.raw_grader[index])
 
     @staticmethod
-    def update_cutoffs_from_json(course_location, cutoffs):
+    def update_cutoffs_from_json(course_location, cutoffs, user):
         """
         Create or update the grade cutoffs for the given course. Returns sent in cutoffs (ie., no extra
         db fetch).
@@ -107,14 +103,12 @@ class CourseGradingModel(object):
         descriptor = get_modulestore(course_old_location).get_item(course_old_location)
         descriptor.grade_cutoffs = cutoffs
 
-        get_modulestore(course_old_location).update_item(
-            course_old_location, descriptor.get_explicitly_set_fields_by_scope(Scope.content)
-        )
+        get_modulestore(course_old_location).update_item(descriptor, user.id)
 
         return cutoffs
 
     @staticmethod
-    def update_grace_period_from_json(course_location, graceperiodjson):
+    def update_grace_period_from_json(course_location, graceperiodjson, user):
         """
         Update the course's default grace period. Incoming dict is {hours: h, minutes: m} possibly as a
         grace_period entry in an enclosing dict. It is also safe to call this method with a value of
@@ -132,12 +126,10 @@ class CourseGradingModel(object):
             grace_timedelta = timedelta(**graceperiodjson)
             descriptor.graceperiod = grace_timedelta
 
-            get_modulestore(course_old_location).update_metadata(
-                course_old_location, descriptor.get_explicitly_set_fields_by_scope(Scope.settings)
-            )
+            get_modulestore(course_old_location).update_item(descriptor, user.id)
 
     @staticmethod
-    def delete_grader(course_location, index):
+    def delete_grader(course_location, index, user):
         """
         Delete the grader of the given type from the given course.
         """
@@ -150,12 +142,10 @@ class CourseGradingModel(object):
             # force propagation to definition
             descriptor.raw_grader = descriptor.raw_grader
 
-        get_modulestore(course_old_location).update_item(
-            course_old_location, descriptor.get_explicitly_set_fields_by_scope(Scope.content)
-        )
+        get_modulestore(course_old_location).update_item(descriptor, user.id)
 
     @staticmethod
-    def delete_grace_period(course_location):
+    def delete_grace_period(course_location, user):
         """
         Delete the course's grace period.
         """
@@ -164,9 +154,7 @@ class CourseGradingModel(object):
 
         del descriptor.graceperiod
 
-        get_modulestore(course_old_location).update_metadata(
-            course_old_location, descriptor.get_explicitly_set_fields_by_scope(Scope.settings)
-        )
+        get_modulestore(course_old_location).update_item(descriptor, user.id)
 
     @staticmethod
     def get_section_grader_type(location):
@@ -178,7 +166,7 @@ class CourseGradingModel(object):
         }
 
     @staticmethod
-    def update_section_grader_type(descriptor, grader_type):
+    def update_section_grader_type(descriptor, grader_type, user):
         if grader_type is not None and grader_type != u'notgraded':
             descriptor.format = grader_type
             descriptor.graded = True
@@ -186,9 +174,7 @@ class CourseGradingModel(object):
             del descriptor.format
             del descriptor.graded
 
-        get_modulestore(descriptor.location).update_metadata(
-            descriptor.location, descriptor.get_explicitly_set_fields_by_scope(Scope.settings)
-        )
+        get_modulestore(descriptor.location).update_item(descriptor, user.id)
         return {'graderType': grader_type}
 
     @staticmethod

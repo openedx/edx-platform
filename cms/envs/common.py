@@ -73,6 +73,9 @@ FEATURES = {
 
     # Turn off account locking if failed login attempts exceeds a limit
     'ENABLE_MAX_FAILED_LOGIN_ATTEMPTS': False,
+
+    # Allow editing of short description in course settings in cms
+    'EDITABLE_SHORT_DESCRIPTION': True,
 }
 ENABLE_JASMINE = False
 
@@ -276,6 +279,7 @@ PIPELINE_CSS = {
         'source_filenames': [
             'css/vendor/normalize.css',
             'css/vendor/font-awesome.css',
+            'css/vendor/html5-input-polyfills/number-polyfill.css',
             'js/vendor/CodeMirror/codemirror.css',
             'css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css',
             'css/vendor/jquery.qtip.min.css',
@@ -452,8 +456,13 @@ INSTALLED_APPS = (
 
     # Dark-launching languages
     'dark_lang',
+
     # Student identity reverification
     'reverification',
+
+    # User preferences
+    'user_api',
+    'django_openid_auth',
 )
 
 

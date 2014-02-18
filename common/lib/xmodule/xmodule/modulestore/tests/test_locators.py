@@ -259,6 +259,24 @@ class LocatorTest(TestCase):
         testobj = BlockUsageLocator(package_id=package_id, branch=branch, block_id=block_id)
         self.check_block_locn_fields(testobj, 'Cannot handle colon', package_id=package_id, branch=branch, block=block_id)
 
+    def test_relative(self):
+        """
+        Test making a relative usage locator.
+        """
+        package_id = 'mit.eecs-1'
+        branch = 'foo'
+        baseobj = CourseLocator(package_id=package_id, branch=branch)
+        block_id = 'problem:with-colon~2'
+        testobj = BlockUsageLocator.make_relative(baseobj, block_id)
+        self.check_block_locn_fields(
+            testobj, 'Cannot make relative to course', package_id=package_id, branch=branch, block=block_id
+        )
+        block_id = 'completely_different'
+        testobj = BlockUsageLocator.make_relative(testobj, block_id)
+        self.check_block_locn_fields(
+            testobj, 'Cannot make relative to block usage', package_id=package_id, branch=branch, block=block_id
+        )
+
     def test_repr(self):
         testurn = 'mit.eecs.6002x/' + BRANCH_PREFIX + 'published/' + BLOCK_PREFIX + 'HW3'
         testobj = BlockUsageLocator(package_id=testurn)

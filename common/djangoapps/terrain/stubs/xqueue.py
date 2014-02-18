@@ -13,7 +13,7 @@ from .http import StubHttpRequestHandler, StubHttpService, require_params
 import json
 import copy
 from requests import post
-import threading
+from threading import Timer
 
 
 class StubXQueueHandler(StubHttpRequestHandler):
@@ -70,10 +70,8 @@ class StubXQueueHandler(StubHttpRequestHandler):
                     callback_url, xqueue_header, self.post_dict['xqueue_body']
                 )
 
-                threading.Timer(
-                    self.server.config.get('response_delay', self.DEFAULT_RESPONSE_DELAY),
-                    delayed_grade_func
-                ).start()
+                delay = self.server.config.get('response_delay', self.DEFAULT_RESPONSE_DELAY)
+                Timer(delay, delayed_grade_func).start()
 
         # If we get a request that's not to the grading submission
         # URL, return an error

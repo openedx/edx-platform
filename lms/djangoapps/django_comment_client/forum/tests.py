@@ -11,7 +11,7 @@ from django_comment_client.forum import views
 
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from nose.tools import assert_true  # pylint: disable=E0611
-from mock import patch, Mock, ANY
+from mock import patch, Mock, ANY, call
 
 import logging
 
@@ -240,6 +240,67 @@ class SingleThreadTestCase(ModuleStoreTestCase):
             "dummy_thread_id"
         )
         self.assertEquals(response.status_code, 405)
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@patch('requests.request')
+class CommentsServiceRequestHeadersTestCase(UrlResetMixin, ModuleStoreTestCase):
+    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
+    def setUp(self):
+        username = "foo"
+        password = "bar"
+
+        # Invoke UrlResetMixin
+        super(CommentsServiceRequestHeadersTestCase, self).setUp()
+        self.course = CourseFactory.create()
+        self.student = UserFactory.create(username=username, password=password)
+        CourseEnrollmentFactory.create(user=self.student, course_id=self.course.id)
+        self.assertTrue(
+            self.client.login(username=username, password=password)
+        )
+
+    def assert_all_calls_have_header(self, mock_request, key, value):
+        expected = call(
+            ANY, # method
+            ANY, # url
+            data=ANY,
+            params=ANY,
+            headers=PartialDictMatcher({key: value}),
+            timeout=ANY
+        )
+        for actual in mock_request.call_args_list:
+            self.assertEqual(expected, actual)
+
+    def test_accept_language(self, mock_request):
+        lang = "eo"
+        text = "dummy content"
+        thread_id = "test_thread_id"
+        mock_request.side_effect = make_mock_request_impl(text, thread_id)
+
+        self.client.get(
+            reverse(
+                "django_comment_client.forum.views.single_thread",
+                kwargs={
+                    "course_id": self.course.id,
+                    "discussion_id": "dummy",
+                    "thread_id": thread_id,
+                }
+            ),
+            HTTP_ACCEPT_LANGUAGE=lang,
+        )
+        self.assert_all_calls_have_header(mock_request, "Accept-Language", lang)
+
+    @override_settings(COMMENTS_SERVICE_KEY="test_api_key")
+    def test_api_key(self, mock_request):
+        mock_request.side_effect = make_mock_request_impl("dummy", "dummy")
+
+        self.client.get(
+            reverse(
+                "django_comment_client.forum.views.forum_form_discussion",
+                kwargs={"course_id": self.course.id}
+            ),
+        )
+        self.assert_all_calls_have_header(mock_request, "X-Edx-Api-Key", "test_api_key")
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)

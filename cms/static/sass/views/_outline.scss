@@ -105,34 +105,15 @@
   }
 
 
-  // general action list styles (section and subsection)
+  // UI: general action list styles (section and subsection)
+
   .expand-collapse {
-    @include transition(all $tmg-f2 linear 0s);
-    display: inline-block;
-    vertical-align: top;
+    @extend %expand-collapse;
     margin: 0 ($baseline/4);
-    color: $gray-l2;
-
-    &:hover {
-      color: $blue;
-    }
-
-    .ui-toggle-expansion {
-      @include transition(all $tmg-f2 ease-in-out 0s);
-      @include font-size(18);
-      display: inline-block;
-      vertical-align: middle;
-      margin-right: ($baseline/4);
-      color: $gray-l3;
-    }
-
-    &.expand .ui-toggle-expansion {
-      @include transform(rotate(-90deg));
-      @include transform-origin(50% 50%);
-    }
-
   }
 
+  // UI: element actions list
+  // TODO: outline page can be updated to reflect styling from %actions-header extend in _controls.scss
   .actions-list {
     display: inline-block;
     margin-bottom: 0;
@@ -141,7 +122,7 @@
   .actions-item {
     @include font-size(13);
     display: inline-block;
-    padding: 0 4px;
+    padding: 0 ($baseline/5);
     vertical-align: middle;
 
     .action {
