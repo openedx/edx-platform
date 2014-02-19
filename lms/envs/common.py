@@ -218,6 +218,10 @@ FEATURES = {
 
     # Turn off account locking if failed login attempts exceeds a limit
     'ENABLE_MAX_FAILED_LOGIN_ATTEMPTS': False,
+
+    # Turn on third-party auth. Disabled for now because full implementations
+    # are not yet available.
+    'ENABLE_THIRD_PARTY_AUTH': False,
 }
 
 # Used for A/B testing
@@ -1279,6 +1283,12 @@ LINKEDIN_API = {
     'EMAIL_WHITELIST': [],
     'COMPANY_ID': '2746406',
 }
+
+##### Third-party auth opitons ################################################
+if FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
+    # Seam for later. Force a loud error until implementations are available.
+    raise NotImplementedError(
+        'Third-party auth not yet implemented; disable in common.py')
 
 ##### ACCOUNT LOCKOUT DEFAULT PARAMETERS #####
 MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED = 5
