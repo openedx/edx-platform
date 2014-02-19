@@ -775,13 +775,14 @@ class MultipleChoiceResponse(LoncapaResponse):
                 else:
                     choice.set("name", name)
 
-    def late_transforms(self):
-        """Rearrangements run late in the __init__ process.
-            Cannot do these at response init time, as not enough
-            other stuff exists at that time.
+    def late_transforms(self, problem):
+        """
+        Rearrangements run late in the __init__ process.
+        Cannot do these at response init time, as not enough
+        other stuff exists at that time.
         """
         self.do_shuffle(self.xml)
-        self.do_answer_pool(self.xml)
+        self.do_answer_pool(self.xml, problem)
 
     def get_score(self, student_answers):
         """
@@ -881,7 +882,21 @@ class MultipleChoiceResponse(LoncapaResponse):
         rng.shuffle(middle)
         return head + middle + tail
 
-    def do_answer_pool(self, tree):
+    def get_rng(self, problem):
+        """
+        Get the random number generator to be shared by responses
+        off the problem, creating it on the problem if needed.
+        """
+        # Multiple answer-pool questions share one rng stored on the problem.
+        # If each question got its own rng, the structure
+        # could appear predictable to the student, e.g. (c) keeps being the
+        # correct choice.
+        # TODO: could make the sharing some sort of authoring option
+        if not hasattr(problem, 'shared_rng'):
+            problem.shared_rng = random.Random(self.context['seed'])
+        return problem.shared_rng
+
+    def do_answer_pool(self, tree, problem):
         """
         Implements the answer-pool subsetting operation in-place on the tree.
         Allows for problem questions with a pool of answers, from which answer options shown to the student
@@ -893,15 +908,7 @@ class MultipleChoiceResponse(LoncapaResponse):
         Calling this a second time does nothing.
         """
         choicegroups = tree.xpath("choicegroup[@answer-pool]")
-
-        # Uses self.seed -- but want to randomize every time reaches this problem,
-        # so problem's "randomization" should be set to "always"
-        rnd = random.Random(self.context['seed'])
-        
-        # TODO: currently, each choicegroup uses the seed from the problem.
-        # This has the unfortunate effect of making choicegroups look similar
-        # when we have many in one problem. Could perturb the rnd a little
-        # per choicegroup so they look different.
+        rng = self.get_rng(problem)
 
         for choicegroup in choicegroups:
             num_str = choicegroup.get('answer-pool')
@@ -923,7 +930,7 @@ class MultipleChoiceResponse(LoncapaResponse):
                 choicegroup.remove(choice)
 
             # Sample from the answer pool to get the subset choices and solution id
-            (solution_id, subset_choices) = self.sample_from_answer_pool(choices_list, rnd, num_choices)
+            (solution_id, subset_choices) = self.sample_from_answer_pool(choices_list, rng, num_choices)
 
             # Add back in randomly selected choices
             for choice in subset_choices:
@@ -939,7 +946,7 @@ class MultipleChoiceResponse(LoncapaResponse):
                     if solution.get('explanation-id') != solution_id:
                         solutionset.remove(solution)
 
-    def sample_from_answer_pool(self, choices, rnd, num_pool):
+    def sample_from_answer_pool(self, choices, rng, num_pool):
         """
         Takes in:
             1. list of choices
@@ -972,15 +979,15 @@ class MultipleChoiceResponse(LoncapaResponse):
         num_incorrect = min(num_incorrect, len(incorrect_choices))
 
         # Select the one correct choice
-        index = rnd.randint(0, len(correct_choices) - 1)
+        index = rng.randint(0, len(correct_choices) - 1)
         correct_choice = correct_choices[index]
         solution_id = correct_choice.get('explanation-id')
 
-        # Put together the result, pushing most of the work onto rnd.shuffle()
+        # Put together the result, pushing most of the work onto rng.shuffle()
         subset_choices = [correct_choice]
-        rnd.shuffle(incorrect_choices)
+        rng.shuffle(incorrect_choices)
         subset_choices += incorrect_choices[:num_incorrect]
-        rnd.shuffle(subset_choices)
+        rng.shuffle(subset_choices)
 
         return (solution_id, subset_choices)
 

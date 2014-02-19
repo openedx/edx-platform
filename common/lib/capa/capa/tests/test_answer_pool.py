@@ -359,12 +359,13 @@ class CapaAnswerPoolTest(unittest.TestCase):
 
         """)
 
-        problem = new_loncapa_problem(xml_str, seed=723)
+        problem = new_loncapa_problem(xml_str)
         the_html = problem.get_html()
         print the_html
 
         str1 = r"<div>.*\[.*'wrong-3'.*'correct-2'.*'wrong-2'.*'wrong-4'.*\].*</div>"
-        str2 = r"<div>.*\[.*'correct-2'.*'wrong-2'.*'wrong-3'.*\].*</div>"
+        str2 = r"<div>.*\[.*'wrong-2'.*'wrong-1'.*'correct-2'.*\].*</div>"    # rng shared
+        # str2 = r"<div>.*\[.*'correct-2'.*'wrong-2'.*'wrong-3'.*\].*</div>"  # rng independent
 
         str3 = r"<div>\{.*'1_solution_2'.*\}</div>"
         str4 = r"<div>\{.*'1_solution_4'.*\}</div>"
@@ -447,11 +448,12 @@ class CapaAnswerPoolTest(unittest.TestCase):
 
         problem = new_loncapa_problem(xml_str, seed=9)
         the_html = problem.get_html()
+        print the_html
 
         str1 = r"<div>.*\[.*'wrong-4'.*'wrong-3'.*'correct-1'.*\].*</div>"
-        str2 = r"<div>.*\[.*'wrong-1'.*'wrong-4'.*'wrong-3'.*'correct-1'.*\].*</div>"
+        str2 = r"<div>.*\[.*'wrong-2'.*'wrong-3'.*'wrong-4'.*'correct-2'.*\].*</div>"
         str3 = r"<div>\{.*'1_solution_1'.*\}</div>"
-        str4 = r"<div>\{.*'1_solution_3'.*\}</div>"
+        str4 = r"<div>\{.*'1_solution_4'.*\}</div>"
 
         self.assertRegexpMatches(the_html, str1)
         self.assertRegexpMatches(the_html, str2)
@@ -462,6 +464,72 @@ class CapaAnswerPoolTest(unittest.TestCase):
 
         self.assertRegexpMatches(without_new_lines, str1 + r".*" + str2)
         self.assertRegexpMatches(without_new_lines, str3 + r".*" + str4)
+
+    def test_answer_pool_random_consistent(self):
+        """
+        The point of this test is to make sure that the exact randomization
+        per seed does not change.
+        """
+        xml_str = textwrap.dedent("""
+            <problem>
+            <multiplechoiceresponse>
+              <choicegroup type="MultipleChoice" answer-pool="2">
+                <choice correct="false">wrong-1</choice>
+                <choice correct="false">wrong-2</choice>
+                <choice correct="true">correct-1</choice>
+                <choice correct="false">wrong-3</choice>
+                <choice correct="false">wrong-4</choice>
+                <choice correct="true">correct-2</choice>
+                <choice correct="true">correct-3</choice>
+              </choicegroup>
+            </multiplechoiceresponse>
+            
+            <multiplechoiceresponse>
+              <choicegroup type="MultipleChoice" answer-pool="3">
+                <choice correct="false">wrong-1</choice>
+                <choice correct="false">wrong-2</choice>
+                <choice correct="true">correct-1</choice>
+                <choice correct="false">wrong-3</choice>
+                <choice correct="false">wrong-4</choice>
+                <choice correct="true">correct-2</choice>
+                <choice correct="true">correct-3</choice>
+              </choicegroup>
+            </multiplechoiceresponse>
+            
+            <multiplechoiceresponse>
+              <choicegroup type="MultipleChoice" answer-pool="2">
+                <choice correct="false">wrong-1</choice>
+                <choice correct="false">wrong-2</choice>
+                <choice correct="true">correct-1</choice>
+                <choice correct="false">wrong-3</choice>
+                <choice correct="false">wrong-4</choice>
+                <choice correct="true">correct-2</choice>
+                <choice correct="true">correct-3</choice>
+              </choicegroup>
+            </multiplechoiceresponse>
+
+            <multiplechoiceresponse>
+              <choicegroup type="MultipleChoice" answer-pool="3">
+                <choice correct="false">wrong-1</choice>
+                <choice correct="false">wrong-2</choice>
+                <choice correct="true">correct-1</choice>
+                <choice correct="false">wrong-3</choice>
+                <choice correct="false">wrong-4</choice>
+                <choice correct="true">correct-2</choice>
+                <choice correct="true">correct-3</choice>
+              </choicegroup>
+            </multiplechoiceresponse>
+        </problem>
+        """)
+
+        problem = new_loncapa_problem(xml_str)
+        the_html = problem.get_html()
+        str1 = (r"<div>.*\[.*'correct-2'.*'wrong-2'.*\].*</div>.*" +
+                r"<div>.*\[.*'wrong-1'.*'correct-2'.*'wrong-4'.*\].*</div>.*" +
+                r"<div>.*\[.*'correct-1'.*'wrong-4'.*\].*</div>.*" +
+                r"<div>.*\[.*'wrong-1'.*'wrong-2'.*'correct-1'.*\].*</div>")
+        without_new_lines = the_html.replace("\n", "")
+        self.assertRegexpMatches(without_new_lines, str1)
 
     def test_answer_pool_and_no_answer_pool(self):
         xml_str = textwrap.dedent("""
