@@ -23,6 +23,7 @@ class Configuration(object):
         'locales': ['en'],
         'segment': {},
         'source_locale': 'en',
+        'third_party': [],
     }
 
     def __init__(self, filename):

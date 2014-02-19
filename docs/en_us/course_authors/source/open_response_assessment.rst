@@ -6,7 +6,7 @@ Open Response Assessment Problems
 Introduction to Open Response Assessments
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. note:: Open response assessments are still in beta. We recommend that
+.. warning:: Open response assessments are still in beta. We recommend that
           you test them thoroughly in a practice course and only add them to
           courses that are **not** already running.
 
@@ -152,6 +152,8 @@ options.
 Create an Open Response Assessment Problem
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. warning:: Open response assessments are still in beta. To enable open response assessments in your course, you'll need to work with your edX program manager.
+
 Creating an open response assessment is a multi-step process.
 
 * :ref:`Step 1`
@@ -171,10 +173,7 @@ Each of these steps is described in detail below.
 Step 1. Create the ORA Component
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-#. Add the advanced component for open response assessments. To do this,
-   add the "peergrading","combinedopenended" key value to the **advanced_modules** policy key on the **Advanced
-   Settings** page. (For more information, see the instructions in
-   :ref:`Specialized Problems`.)
+#. Modify your course's advanced settings to allow open response assessments. For more information about how to do this, contact your edX program manager.
 #. In Studio, open the unit where you want to create the ORA.
 #. Under **Add New Component**, click **Advanced**, and then click
    **Open Response Assessment**.

@@ -3,21 +3,13 @@
 Specialized Problems
 ====================
 
-Specialized problems are advanced problems such as annotations, open
-response assessments, and word clouds. These problems are available
-through the Advanced component in Studio. To add the Advanced component
-to your course, you'll modify your course's advanced settings. The
-Advanced component then appears under **Add New Component** in each
-unit.
+Specialized problems are advanced problems such as annotations. These problems are available through the Advanced component in Studio. To add the Advanced component to your course, you'll modify your course's advanced settings. The Advanced component then appears under **Add New Component** in each unit.
 
 -  :ref:`Annotation` Annotation problems ask students to respond to
    questions about a specific block of text. The question appears above
    the text when the student hovers the mouse over the highlighted text
    so that students can think about the question as they read.
--  :ref:`Open Response Assessment` Open response assessment problems allow students
-   to enter short answer or essay responses that students or a computer
-   algorithm can then grade.
-
+- :ref:`Word Cloud` Word clouds arrange text that students enter - for example, in response to a question - into a colorful graphic that students can see. 
 
 .. _ Add Advanced Component:
 
@@ -47,10 +39,6 @@ component to your course. To do this, follow these steps.
 
    -  For annotations, enter **"annotatable"**.
 
-   -  For open response assessments, enter
-      **"combinedopenended","peergrading"**. (Include the comma but no
-      spaces between the words.)
-
    -  For word clouds, enter **"word_cloud"**.
 
    You can enter more than one problem type at a time. When you do,
@@ -58,15 +46,14 @@ component to your course. To do this, follow these steps.
    separate each problem type with a comma, but do not include any
    spaces.
    
-   For example, if you wanted to add annotations, open response
-   assessments, and word cloud problems in your course, you would enter
+   For example, if you wanted to add annotations and word cloud problems in your course, you would enter
    the following between the brackets.
 
    ::
 
-       "annotatable","combinedopenended","peergrading","word_cloud"
+       "annotatable","word_cloud"
 
-   .. image:: Images/AdvSettings_Before.gif
+   .. image:: Images/AdvSettings_Before.png
      :alt: Image of the Manual Policy Definition section of the Advanced Settings page, with specialized problems added
 
 #. At the bottom of the page, click **Save Changes**.
@@ -76,7 +63,7 @@ component to your course. To do this, follow these steps.
 
    The text in the **Policy Value** field now appears as follows.
 
-   .. image:: Images/AdvSettings_After.gif
+   .. image:: Images/AdvSettings_After.png
      :alt: Image of the Manual Policy Definition section of the Advanced Settings page, with specialized problems added after saving
 
 #. Return to the unit where you want to add the specialized problem. The
@@ -85,14 +72,7 @@ component to your course. To do this, follow these steps.
    .. image:: Images/AdvancedComponent.gif
      :alt: Image of the Add a New Component panel with the Advanced component option
 
-When you click the Advanced component, you see the following list.
-
-.. image:: Images/SpecProbs_List.gif
-  :alt: Image of the Advanced component list
-
-You can now create annotations, open response assessments, and word
-clouds in your course. More information about how to create each problem
-is provided in the page for that problem type.
+When you click the Advanced component, you can see **Annotation** and **Word cloud** in the list. More information about how to create each problem is provided in the page for that problem type.
 
 .. _Annotation:
 
@@ -172,17 +152,3 @@ Add the **Annotation problem** segment of the problem.
 #. Click **Save**.
 
 
-.. _Open Response Assessment:
-
-Open Response Assessment
-------------------------
-
-
-In open response assessments, tens of thousands of students can receive feedback 
-on written responses of varying lengths as well as files, such as computer code or 
-images, that the students upload. 
-
-
-Because open response assessments are more complex than most other problem types,
-they have a separate section. For more information about these problems, see 
-:ref:`Open Response Assessment Problems`.

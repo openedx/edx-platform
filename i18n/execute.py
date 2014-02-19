@@ -10,6 +10,7 @@ def execute(command, working_directory=BASE_DIR):
     Command is a string to pass to the shell.
     Output is ignored.
     """
+    LOG.info("Executing in %s ...", working_directory)
     LOG.info(command)
     subprocess.check_call(command, cwd=working_directory, stderr=subprocess.STDOUT, shell=True)
 

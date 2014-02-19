@@ -16,7 +16,7 @@ from webob import Response
 from webob.multidict import MultiDict
 
 from xblock.core import XBlock
-from xblock.fields import Scope, Integer, Float, List, XBlockMixin, String
+from xblock.fields import Scope, Integer, Float, List, XBlockMixin, String, Dict
 from xblock.fragment import Fragment
 from xblock.plugin import default_select
 from xblock.runtime import Runtime
@@ -790,6 +790,8 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
                 editor_type = "Float"
             elif isinstance(field, List):
                 editor_type = "List"
+            elif isinstance(field, Dict):
+                editor_type = "Dict"
             elif isinstance(field, RelativeTime):
                 editor_type = "RelativeTime"
             metadata_fields[field.name]['type'] = editor_type

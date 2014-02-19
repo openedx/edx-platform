@@ -60,6 +60,8 @@ You can access this self-reported information for all of the students who are en
 
 The student data that is available to course staff always reflects the set of live, current enrollments. Students can register for your course throughout the defined enrollment period, and they can unregister from a course at any time, which unenrolls them. Students can also change their email addresses and full names at any time. As a result, you may want to download student data periodically to gain insights into how the student population changes over time. 
 
+.. _View and download student data:
+
 ==========================================
 View and download student data
 ==========================================
@@ -81,9 +83,9 @@ To view or download student data:
    A table of the student data displays, with one row for each enrolled student. Longer values, such as student goals, are truncated.
 
  .. image:: Images/StudentData_Table.png
-    :alt: Table with columns for the collected data points and rows for each student on the Instructor Dashboard
+  :alt: Table with columns for the collected data points and rows for each student on the Instructor Dashboard
 
-   **Note**:: In the future, edX may also request that students select a language and location. This data is not collected at this time.
+ .. note:: In the future, edX may also request that students select a language and location. This data is not collected at this time.
 
 5. To download student enrollment data in a CSV file, click **Download profile information as a CSV**.
 
@@ -115,7 +117,7 @@ To display demographic data for your students:
    .. image:: Images/Distribution_Gender.png
     :alt: Table with columns for different possible values for level of education completed and total count reported for each value
 
-    "No Data" is the sum of the students for whom no value exists for the demographic. 
+   "No Data" is the sum of the students for whom no value exists for the demographic. 
 
   Data for individual students is not shown, and you cannot download data directly from this page. See :ref:`View and download student data`.
 

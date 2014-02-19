@@ -398,7 +398,7 @@ Case Sensitivity and Text Input Problems
 By default, text input problems do not require a case sensitive response. You can change this
 and require a case sensitive answer.
 
-To make a text input response case sensitive, you must use the :ref:`Advanced Editor`.
+To make a text input response case sensitive, you must use :ref:`Advanced Editor`.
 
 In the advanced editor, you see that the **type** attribute of the **stringresponse** 
 element equals **ci**, for *case insensitive*. For example:
@@ -426,7 +426,7 @@ By default, the response field for text input problems is 20 characters long.
 You should preview the unit to ensure that the length of the response input field
 accommodates the correct answer, and provides extra space for possible incorrect answers.
 
-If the default response field length is not sufficient, you can change it using the :ref:`Advanced Editor`.
+If the default response field length is not sufficient, you can change it using :ref:`Advanced Editor`.
 
 In the advanced editor, in the XML block for the answer, you see that the **size** attribute of the **textline** 
 element equals **20**:
@@ -444,3 +444,9 @@ To change the response field length, change the value of the **size** attribute:
     <stringresponse answer="Democratic Republic of the Congo" type="ci">
       <textline size="40"/>
     </stringresponse>
+
+====================================================
+Hints and Regular Expressions in Text Input Problems
+====================================================
+
+You can provide hints for common incorrect answers in text input problems. You can also set a text input problem to allow a regular expression as an answer. To do this, you'll have to modify the problem's XML in the Advanced Editor. For more information, see :ref:`String Response`.

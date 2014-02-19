@@ -62,6 +62,11 @@ def my_display_name_change_is_persisted_on_save(step):
     verify_modified_display_name()
 
 
+@step('the problem display name is "(.*)"$')
+def verify_problem_display_name(step, name):
+    assert_equal(name.upper(), world.browser.find_by_css('.problem-header').text)
+
+
 @step('I can specify special characters in the display name')
 def i_can_modify_the_display_name_with_special_chars(_step):
     index = world.get_setting_entry_index(DISPLAY_NAME)
@@ -253,12 +258,6 @@ def verify_high_level_source_links(step, visible):
                     msg="Expected not to find the latex button but it is present.")
 
     world.cancel_component(step)
-    if visible:
-        assert_true(world.is_css_present('.upload-button'),
-                    msg="Expected to find the upload button but it is not present.")
-    else:
-        assert_true(world.is_css_not_present('.upload-button'),
-                    msg="Expected not to find the upload button but it is present.")
 
 
 def verify_modified_weight():

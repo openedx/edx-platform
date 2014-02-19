@@ -10,6 +10,7 @@ var CourseDetails = Backbone.Model.extend({
         enrollment_start: null,
         enrollment_end: null,
         syllabus: null,
+        short_description: "",
         overview: "",
         intro_video: null,
         effort: null,	// an int or null,

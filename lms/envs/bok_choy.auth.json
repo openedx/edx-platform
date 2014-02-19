@@ -51,6 +51,7 @@
             "ENGINE": "xmodule.modulestore.mixed.MixedModuleStore",
             "OPTIONS": {
                 "mappings": {},
+                "reference_type": "Location",
                 "stores": {
                     "default": {
                         "DOC_STORE_CONFIG": {

@@ -7,7 +7,10 @@
     <div class="visibility-control visibility-control-response">
         <div class="inner">
         </div>
-        <label class="section-header section-header-response" for="answer_${module_id}">Response</label>
+        <label class="section-header section-header-response" for="answer_${module_id}">
+        ## Translators: "Response" labels an area that contains the user's
+        ## Response to an openended problem. It is a noun.
+        ${_("Response")}</label>
     </div>
   <textarea rows="${rows}" cols="${cols}" name="answer" class="answer short-form-response" id="answer_${module_id}">${previous_answer|h}</textarea>
 

@@ -231,7 +231,8 @@
   cursor: default;
   pointer-events: none;
   box-shadow: none;
-  :hover, :focus {
+
+  &:hover, &:focus {
     pointer-events: none;
   }
 }

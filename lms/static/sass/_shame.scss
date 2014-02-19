@@ -201,9 +201,10 @@
 
 // ====================
 
-// Verification: overriding reset link style for nav/header
+// Verification fixes
 .verification-process {
 
+  //overriding reset link style for nav/header
   header.global {
 
     .logo a:hover, .logo:active, .logo a:focus {
@@ -215,6 +216,11 @@
     .nav-global a:hover, .nav-global a:active, .nav-global a:focus {
       border: none;
     }
+  }
+
+  // overriding ridiculous hover on input type=button
+  #content .action-primary:hover {
+    background-image: none;
   }
 }
 

@@ -3,9 +3,10 @@ from dogapi import dog_stats_api
 import json
 import logging
 import requests
-import settings
+from django.conf import settings
 from time import time
 from uuid import uuid4
+from django.utils.translation import get_language
 
 log = logging.getLogger(__name__)
 
@@ -52,7 +53,10 @@ def request_timer(request_id, method, url):
 def perform_request(method, url, data_or_params=None, *args, **kwargs):
     if data_or_params is None:
         data_or_params = {}
-    headers = {'X-Edx-Api-Key': settings.API_KEY}
+    headers = {
+        'X-Edx-Api-Key': getattr(settings, "COMMENTS_SERVICE_KEY", None),
+        'Accept-Language': get_language(),
+    }
     request_id = uuid4()
     request_id_dict = {'request_id': request_id}
 

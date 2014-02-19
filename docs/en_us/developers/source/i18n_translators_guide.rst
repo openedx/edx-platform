@@ -50,14 +50,8 @@ have one.
 Joining A Translation Team
 ==========================
 
-1. Once you've set up your account, visit one (or more!) of the edX projects to request
+1. Once you've set up your account, visit the `edx-platform project <https://www.transifex.com/projects/p/edx-platform/>`_
    to become a translator for your language.
-
-   Projects include:
-
-     * `edx-platform <https://www.transifex.com/projects/p/edx-platform/>`_
-     * `edx-comments-service <https://www.transifex.com/projects/p/edx-comments-service/>`_
-     * `edx-notifier <https://www.transifex.com/projects/p/edx-notifier/>`_
 
 2. When you visit the project page, it looks like this.  If your language is listed, click
    on the name of the language to go to the language's page. Here is an example of choosing
@@ -104,19 +98,22 @@ the project to begin translating it. For help documentation on Transifex, see th
 help desk <http://support.transifex.com/customer/portal/topics/414107-translators/articles>`_.
 Before you begin, be sure you've reviewed the `Guidelines for Translators`_.
 
-When visiting a language page, you will see a list of seven distinct resources to translate:
+When visiting a language page, you will see a list of ten distinct resources to translate:
 
 .. image:: images/project-resources.png
 
-We request that you focus on translating the non-Studio resources first. That is, please first
-translate and review these resources:
+Focus on translating the non-Studio resources first. That is, please first
+translate and review these resources, in this order, before anything else:
 
   * messages
   * mako
   * django-partial
   * djangojs-partial
+  * wiki
+  * notifier-django
+  * comments-service
 
-Once the above resources are 100% translated and reviewed, move on to the Studio resources:
+*Only after* the above resources are 100% translated and reviewed, move on to the Studio resources:
 
   * mako-studio
   * djangojs-studio

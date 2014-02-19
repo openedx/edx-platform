@@ -4,14 +4,14 @@ import mimetypes
 from path import path
 import json
 
-from xblock.fields import Scope
-
 from .xml import XMLModuleStore, ImportSystem, ParentTracker
 from xmodule.modulestore import Location
+from xblock.fields import Scope, Reference, ReferenceList
 from xmodule.contentstore.content import StaticContent
 from .inheritance import own_metadata
 from xmodule.errortracker import make_error_tracker
 from .store_utilities import rewrite_nonportable_content_links
+import xblock
 
 log = logging.getLogger(__name__)
 
@@ -318,43 +318,13 @@ def import_module(
 
     logging.debug('processing import of module {}...'.format(module.location.url()))
 
-    content = {}
-    for field in module.fields.values():
-        if field.scope != Scope.content:
-            continue
-        try:
-            content[field.name] = module._field_data.get(module, field.name)
-        except KeyError:
-            # Ignore any missing keys in _field_data
-            pass
-
-    module_data = {}
-    if 'data' in content:
-        module_data = content['data']
-    else:
-        module_data = content
-
-    if isinstance(module_data, basestring) and do_import_static:
+    if do_import_static and 'data' in module.fields and isinstance(module.fields['data'], xblock.fields.String):
         # we want to convert all 'non-portable' links in the module_data
         # (if it is a string) to portable strings (e.g. /static/)
-        module_data = rewrite_nonportable_content_links(
+        module.data = rewrite_nonportable_content_links(
             source_course_location.course_id,
-            dest_course_location.course_id, module_data
+            dest_course_location.course_id, module.data
         )
-
-    if allow_not_found:
-        store.update_item(
-            module.location, module_data, allow_not_found=allow_not_found
-        )
-    else:
-        store.update_item(module.location, module_data)
-
-    if hasattr(module, 'children') and module.children != []:
-        store.update_children(module.location, module.children)
-
-    # NOTE: It's important to use own_metadata here to avoid writing
-    # inherited metadata everywhere.
-
     # remove any export/import only xml_attributes
     # which are used to wire together draft imports
     if 'parent_sequential_url' in getattr(module, 'xml_attributes', []):
@@ -362,9 +332,8 @@ def import_module(
 
     if 'index_in_children_list' in getattr(module, 'xml_attributes', []):
         del module.xml_attributes['index_in_children_list']
-    module.save()
 
-    store.update_metadata(module.location, dict(own_metadata(module)))
+    store.update_item(module, '**replace_user**', allow_not_found=allow_not_found)
 
 
 def import_course_draft(
@@ -409,7 +378,7 @@ def import_course_draft(
     # First it is necessary to order the draft items by their desired index in the child list
     # (order os.walk returns them in is not guaranteed).
     drafts = dict()
-    for dirname, dirnames, filenames in os.walk(draft_dir + "/vertical"):
+    for dirname, _dirnames, filenames in os.walk(draft_dir + "/vertical"):
         for filename in filenames:
             module_path = os.path.join(dirname, filename)
             with open(module_path, 'r') as f:
@@ -456,7 +425,7 @@ def import_course_draft(
                     # aka sequential), so we have to replace the location.name
                     # with the XML filename that is part of the pack
                     fn, fileExtension = os.path.splitext(filename)
-                    descriptor.location = descriptor.location._replace(name=fn)
+                    descriptor.location = descriptor.location.replace(name=fn)
 
                     index = int(descriptor.xml_attributes['index_in_children_list'])
                     if index in drafts:
@@ -474,13 +443,13 @@ def import_course_draft(
             for descriptor in drafts[key]:
                 try:
                     def _import_module(module):
-                        module.location = module.location._replace(revision='draft')
+                        module.location = module.location.replace(revision='draft')
                         # make sure our parent has us in its list of children
                         # this is to make sure private only verticals show up
                         # in the list of children since they would have been
                         # filtered out from the non-draft store export
                         if module.location.category == 'vertical':
-                            non_draft_location = module.location._replace(revision=None)
+                            non_draft_location = module.location.replace(revision=None)
                             sequential_url = module.xml_attributes['parent_sequential_url']
                             index = int(module.xml_attributes['index_in_children_list'])
 
@@ -488,7 +457,7 @@ def import_course_draft(
 
                             # IMPORTANT: Be sure to update the sequential
                             # in the NEW namespace
-                            seq_location = seq_location._replace(
+                            seq_location = seq_location.replace(
                                 org=target_location_namespace.org,
                                 course=target_location_namespace.course
                             )
@@ -496,7 +465,7 @@ def import_course_draft(
 
                             if non_draft_location.url() not in sequential.children:
                                 sequential.children.insert(index, non_draft_location.url())
-                                store.update_children(sequential.location, sequential.children)
+                                store.update_item(sequential, '**replace_user**')
 
                         import_module(
                             module, draft_store, course_data_path,
@@ -518,20 +487,21 @@ def remap_namespace(module, target_location_namespace):
     if target_location_namespace is None:
         return module
 
+    original_location = module.location
+
     # This looks a bit wonky as we need to also change the 'name' of the
     # imported course to be what the caller passed in
     if module.location.category != 'course':
-        module.location = module.location._replace(
+        module.location = module.location.replace(
             tag=target_location_namespace.tag,
             org=target_location_namespace.org,
             course=target_location_namespace.course
         )
     else:
-        original_location = module.location
         #
         # module is a course module
         #
-        module.location = module.location._replace(
+        module.location = module.location.replace(
             tag=target_location_namespace.tag,
             org=target_location_namespace.org,
             course=target_location_namespace.course,
@@ -556,22 +526,41 @@ def remap_namespace(module, target_location_namespace):
 
         module.save()
 
-    # then remap children pointers since they too will be re-namespaced
+    all_fields = module.get_explicitly_set_fields_by_scope(Scope.content)
+    all_fields.update(module.get_explicitly_set_fields_by_scope(Scope.settings))
     if hasattr(module, 'children'):
-        children_locs = module.children
-        if children_locs is not None and children_locs != []:
-            new_locs = []
-            for child in children_locs:
-                child_loc = Location(child)
-                new_child_loc = child_loc._replace(
-                    tag=target_location_namespace.tag,
-                    org=target_location_namespace.org,
-                    course=target_location_namespace.course
-                )
+        all_fields['children'] = module.children
 
-                new_locs.append(new_child_loc.url())
+    def convert_ref(reference):
+        """
+        Convert a reference to the new namespace, but only
+        if the original namespace matched the original course.
 
-            module.children = new_locs
+        Otherwise, returns the input value.
+        """
+        new_ref = reference
+        ref = Location(reference)
+        in_original_namespace = (original_location.tag == ref.tag and
+                                 original_location.org == ref.org and
+                                 original_location.course == ref.course)
+        if in_original_namespace:
+            new_ref = ref.replace(
+                tag=target_location_namespace.tag,
+                org=target_location_namespace.org,
+                course=target_location_namespace.course
+            ).url()
+        return new_ref
+
+    for field in all_fields:
+        if isinstance(module.fields.get(field), Reference):
+            new_ref = convert_ref(getattr(module, field))
+            setattr(module, field, new_ref)
+            module.save()
+        elif isinstance(module.fields.get(field), ReferenceList):
+            references = getattr(module, field)
+            new_references = [convert_ref(reference) for reference in references]
+            setattr(module, field, new_references)
+            module.save()
 
     return module
 

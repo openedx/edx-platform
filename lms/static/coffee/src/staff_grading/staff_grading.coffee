@@ -427,8 +427,8 @@ class @StaffGrading
 
     else if @state == state_grading
       @ml_error_info_container.html(@ml_error_info)
-      available = _.template(gettext("<%= num %> available"), {num: @num_pending})
-      graded = _.template(gettext("<%= num %> graded"), {num: @num_graded})
+      available = _.template(gettext("<%= num %> available "), {num: @num_pending})
+      graded = _.template(gettext("<%= num %> graded "), {num: @num_graded})
       needed = _.template(gettext("<%= num %> more needed to start ML"),
         {num: Math.max(@min_for_ml - @num_graded, 0)})
       meta_list = $("<div>")

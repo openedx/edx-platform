@@ -25,9 +25,6 @@ MAX_ATTEMPTS = 1
 # Overriden by max_score specified in xml.
 MAX_SCORE = 1
 
-FILE_NOT_FOUND_IN_RESPONSE_MESSAGE = "We could not find a file in your submission.  Please try choosing a file or pasting a link to your file into the answer box."
-ERROR_SAVING_FILE_MESSAGE = "We are having trouble saving your file.  Please try another file or paste a link to your file into the answer box."
-
 
 def upload_to_s3(file_to_upload, keyname, s3_interface):
     '''
@@ -91,12 +88,23 @@ class OpenEndedChild(object):
     DONE = 'done'
 
     # This is used to tell students where they are at in the module
+    _ = lambda text: text
     HUMAN_NAMES = {
-        'initial': 'Not started',
-        'assessing': 'In progress',
-        'post_assessment': 'Done',
-        'done': 'Done',
-        }
+        # Translators: "Not started" communicates to a student that their response
+        # has not yet been graded
+        'initial': _('Not started'),
+        # Translators: "In progress" communicates to a student that their response
+        # is currently in the grading process
+        'assessing': _('In progress'),
+        # Translators: "Done" communicates to a student that their response
+        # has been fully graded
+        'post_assessment': _('Done'),
+        'done': _('Done'),
+    }
+
+    # included to make this act enough like an xblock to get i18n
+    _services_requested = {"i18n": "need"}
+    _combined_services = _services_requested
 
     def __init__(self, system, location, definition, descriptor, static_data,
                  instance_state=None, shared_state=None, **kwargs):
@@ -463,6 +471,8 @@ class OpenEndedChild(object):
         @return: Boolean success, and updated AJAX data dictionary.
         """
 
+        _ = self.system.service(self, "i18n").ugettext
+
         error_message = ""
 
         if not self.accept_file_upload:
@@ -481,7 +491,11 @@ class OpenEndedChild(object):
                 # If success is False, we have not found a link, and no file was attached.
                 # Show error to student.
                 if success is False:
-                    error_message = FILE_NOT_FOUND_IN_RESPONSE_MESSAGE
+                    error_message = _(
+                        "We could not find a file in your submission. "
+                        "Please try choosing a file or pasting a URL to your "
+                        "file into the answer box."
+                    )
 
         except Exception:
             # In this case, an image was submitted by the student, but the image could not be uploaded to S3.  Likely
@@ -490,7 +504,10 @@ class OpenEndedChild(object):
                           "but the image was not able to be uploaded to S3.  This could indicate a configuration "
                           "issue with this deployment and the S3_INTERFACE setting.")
             success = False
-            error_message = ERROR_SAVING_FILE_MESSAGE
+            error_message = _(
+                "We are having trouble saving your file. Please try another "
+                "file or paste a URL to your file into the answer box."
+            )
 
         return success, error_message, data
 
@@ -534,3 +551,23 @@ class OpenEndedChild(object):
             eta_string = ""
 
         return eta_string
+
+    @classmethod
+    def service_declaration(cls, service_name):
+        """
+        This classmethod is copied from XBlock's service_declaration.
+        It is included to make this class act enough like an XBlock
+        to get i18n working on it.
+
+        This is currently only used for i18n, and will return "need"
+        in that case.
+
+        Arguments:
+            service_name (string): the name of the service requested.
+
+        Returns:
+            One of "need", "want", or None.
+
+        """
+        declaration = cls._combined_services.get(service_name)
+        return declaration

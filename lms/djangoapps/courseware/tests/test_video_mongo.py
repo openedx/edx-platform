@@ -68,6 +68,7 @@ class TestVideoYouTube(TestVideo):
             'speed': 'null',
             'general_speed': 1.0,
             'start': 3603.0,
+            'saved_video_position': 0.0,
             'sub': u'a_sub_file.srt.sjson',
             'track': None,
             'youtube_streams': _create_youtube_string(self.item_module),
@@ -123,6 +124,7 @@ class TestVideoNonYouTube(TestVideo):
             'speed': 'null',
             'general_speed': 1.0,
             'start': 3603.0,
+            'saved_video_position': 0.0,
             'sub': u'a_sub_file.srt.sjson',
             'track': None,
             'youtube_streams': '1.00:OEoXaMPEzfM',
@@ -201,6 +203,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 u'webm': u'example.webm'
             },
             'start': 3603.0,
+            'saved_video_position': 0.0,
             'sub': u'a_sub_file.srt.sjson',
             'speed': 'null',
             'general_speed': 1.0,
@@ -307,6 +310,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'speed': 'null',
             'general_speed': 1.0,
             'start': 3603.0,
+            'saved_video_position': 0.0,
             'sub': u'a_sub_file.srt.sjson',
             'track': None,
             'youtube_streams': '1.00:OEoXaMPEzfM',
@@ -416,13 +420,23 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
                 'display_name': 'Download Transcript',
                 'help': 'The external URL to download the timed transcript track.',
                 'type': 'Generic',
-                'value': u'',
+                'value': u'http://some_track.srt',
                 'field_name': 'track',
                 'options': [],
             },
+            'download_track': {
+                'default_value': False,
+                'explicitly_set': False,
+                'display_name': 'Transcript Download Allowed',
+                'help': 'Show a link beneath the video to allow students to download the transcript. Note: You must add a link to the HTML5 Transcript field above.',
+                'type': 'Generic',
+                'value': False,
+                'field_name': 'download_track',
+                'options': [],
+            }
         }
         metadata = {
-            'track': None,
+            'track': u'http://some_track.srt',
             'source': 'http://example.org/video.mp4',
             'html5_sources': ['http://youtu.be/OEoXaMPEzfM.mp4'],
         }
@@ -433,6 +447,7 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
         self.assertIn('source', fields)
         self.assertFalse(self.item_module.download_video)
         self.assertTrue(self.item_module.source_visible)
+        self.assertTrue(self.item_module.download_track)
 
     def test_source_is_empty(self):
         metadata = {

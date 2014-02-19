@@ -5,12 +5,30 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+CMS: Add feature to allow exporting a course to a git repository by
+specifying the giturl in the course settings.
+
+Studo: Fix import/export bug with conditional modules. STUD-149
+
+Blades: Persist student progress in video. BLD-385.
+
+Blades: Fix for the list metadata editor that gets into a bad state where "Add"
+  is disabled. BLD-821.
+
+Blades: Add view for field type Dict in Studio. BLD-658.
+
+Blades: Refactor stub implementation of LTI Provider. BLD-601.
+
+Studio: Added ability to edit course short descriptions that appear on the course catalog page.
+
 LMS: In left accordion and progress page, due dates are now displayed in time
 zone specified by settings.TIME_ZONE, instead of UTC always
 
 LMS:  If the course start date is kept at the default studio value (Jan 1, 2030)
 and advertised_start is not set, the start date is not displayed in the
 /courses tile view, the course about page, or the dashboard
+
+LMS: Add ability to redirect to a splash screen.
 
 Blades: Add role parameter to LTI. BLD-583.
 
@@ -51,6 +69,12 @@ Blades: Adds CookieStorage utility for video player that provides convenient
 Blades: Fix comparison of float numbers. BLD-434.
 
 Blades: Allow regexp strings as the correct answer to a string response question. BLD-475.
+
+Common: MixedModulestore is now the only approved access to the persistence layer
+  - takes a new parameter 'reference_type' which can be 'Location' or 'Locator'. Mixed
+  then tries to ensure that every reference in any xblock gets converted to that type on
+  retrieval. Because we're moving to Locators, the default is Locator; so, you should change
+  all existing configurations to 'Location' (unless you're using split)
 
 Common: Add feature flags to allow developer use of pure XBlocks
   - ALLOW_ALL_ADVANCED_COMPONENTS disables the hard-coded list of advanced

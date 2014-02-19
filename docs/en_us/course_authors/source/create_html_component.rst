@@ -81,6 +81,8 @@ To create an HTML component:
 
 2. In the list that appears, click **Text**.
 
+  .. note:  You can also create a :ref:`Zooming Image` or :ref:`Image Modal`.
+
    An empty component appears at the bottom of the unit.
 
   .. image:: Images/HTMLComponent_Edit.png

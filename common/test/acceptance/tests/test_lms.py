@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 E2E tests for the LMS.
 """
@@ -5,7 +6,7 @@ E2E tests for the LMS.
 from unittest import skip
 
 from bok_choy.web_app_test import WebAppTest
-from bok_choy.promise import EmptyPromise, fulfill_before
+from bok_choy.promise import EmptyPromise, fulfill_before, fulfill, Promise
 
 from .helpers import UniqueCourseTest, load_data_str
 from ..pages.studio.auto_auth import AutoAuthPage
@@ -17,7 +18,9 @@ from ..pages.lms.course_info import CourseInfoPage
 from ..pages.lms.tab_nav import TabNavPage
 from ..pages.lms.course_nav import CourseNavPage
 from ..pages.lms.progress import ProgressPage
+from ..pages.lms.dashboard import DashboardPage
 from ..pages.lms.video import VideoPage
+from ..pages.xblock.acid import AcidView
 from ..fixtures.course import CourseFixture, XBlockFixtureDesc, CourseUpdateDesc
 
 
@@ -67,6 +70,66 @@ class RegistrationTest(UniqueCourseTest):
         self.assertIn(self.course_info['display_name'], course_names)
 
 
+class LanguageTest(UniqueCourseTest):
+    """
+    Tests that the change language functionality on the dashboard works
+    """
+
+    @property
+    def _changed_lang_promise(self):
+        def _check_func():
+            text = self.dashboard_page.current_courses_text
+            return (len(text) > 0, text)
+        return Promise(_check_func, "language changed")
+
+    def setUp(self):
+        """
+        Initiailize dashboard page
+        """
+        super(LanguageTest, self).setUp()
+        self.dashboard_page = DashboardPage(self.browser)
+
+        self.test_new_lang = 'eo'
+        # This string is unicode for "ÇÜRRÉNT ÇØÜRSÉS", which should appear in our Dummy Esperanto page
+        # We store the string this way because Selenium seems to try and read in strings from
+        # the HTML in this format. Ideally we could just store the raw ÇÜRRÉNT ÇØÜRSÉS string here
+        self.current_courses_text = u'\xc7\xdcRR\xc9NT \xc7\xd6\xdcRS\xc9S'
+
+        self.username = "test"
+        self.password = "testpass"
+        self.email = "test@example.com"
+
+    def test_change_lang(self):
+        AutoAuthPage(self.browser, course_id=self.course_id).visit()
+        self.dashboard_page.visit()
+        # Change language to Dummy Esperanto
+        self.dashboard_page.change_language(self.test_new_lang)
+
+        changed_text = fulfill(self._changed_lang_promise)
+        # We should see the dummy-language text on the page
+        self.assertIn(self.current_courses_text, changed_text)
+
+    def test_language_persists(self):
+        auto_auth_page = AutoAuthPage(self.browser, username=self.username, password=self.password, email=self.email, course_id=self.course_id)
+        auto_auth_page.visit()
+
+        self.dashboard_page.visit()
+        # Change language to Dummy Esperanto
+        self.dashboard_page.change_language(self.test_new_lang)
+
+        # destroy session
+        self.browser._cookie_manager.delete()
+
+        # log back in
+        auto_auth_page.visit()
+
+        self.dashboard_page.visit()
+
+        changed_text = fulfill(self._changed_lang_promise)
+        # We should see the dummy-language text on the page
+        self.assertIn(self.current_courses_text, changed_text)
+
+
 class HighLevelTabTest(UniqueCourseTest):
     """
     Tests that verify each of the high-level tabs available within a course.
@@ -103,11 +166,13 @@ class HighLevelTabTest(UniqueCourseTest):
                     XBlockFixtureDesc('problem', 'Test Problem 1', data=load_data_str('multiple_choice.xml')),
                     XBlockFixtureDesc('problem', 'Test Problem 2', data=load_data_str('formula_problem.xml')),
                     XBlockFixtureDesc('html', 'Test HTML'),
-            )),
+                )
+            ),
             XBlockFixtureDesc('chapter', 'Test Section 2').add_children(
                 XBlockFixtureDesc('sequential', 'Test Subsection 2'),
                 XBlockFixtureDesc('sequential', 'Test Subsection 3'),
-        )).install()
+            )
+        ).install()
 
         # Auto-auth register for the course
         AutoAuthPage(self.browser, course_id=self.course_id).visit()
@@ -252,3 +317,48 @@ class VideoTest(UniqueCourseTest):
             # latency through the ssh tunnel
             self.assertGreaterEqual(self.video.elapsed_time, 0)
             self.assertGreaterEqual(self.video.duration, self.video.elapsed_time)
+
+
+class XBlockAcidTest(UniqueCourseTest):
+    """
+    Tests that verify that XBlock integration is working correctly
+    """
+
+    def setUp(self):
+        """
+        Create a unique identifier for the course used in this test.
+        """
+        # Ensure that the superclass sets up
+        super(XBlockAcidTest, self).setUp()
+
+        course_fix = CourseFixture(
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run'],
+            self.course_info['display_name']
+        )
+
+        course_fix.add_children(
+            XBlockFixtureDesc('chapter', 'Test Section').add_children(
+                XBlockFixtureDesc('sequential', 'Test Subsection').add_children(
+                    XBlockFixtureDesc('acid', 'Acid Block')
+                )
+            )
+        ).install()
+
+        AutoAuthPage(self.browser, course_id=self.course_id).visit()
+
+        self.course_info_page = CourseInfoPage(self.browser, self.course_id)
+        self.tab_nav = TabNavPage(self.browser)
+
+        self.course_info_page.visit()
+        self.tab_nav.go_to_tab('Courseware')
+
+    def test_acid_block(self):
+        """
+        Verify that all expected acid block tests pass in the lms.
+        """
+        acid_block = AcidView(self.browser, '.xblock-student_view[data-block-type=acid]')
+        self.assertTrue(acid_block.init_fn_passed)
+        self.assertTrue(acid_block.doc_ready_passed)
+        self.assertTrue(acid_block.scope_passed('user_state'))

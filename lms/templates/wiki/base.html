@@ -1,7 +1,7 @@
 {% extends "main_django.html" %}
 {% load compressed %}{% load sekizai_tags i18n microsite %}{% load url from future %}{% load staticfiles %}
 
-{% block title %}<title>{% block pagetitle %}{% endblock %} | Wiki | {% platform_name %}</title>{% endblock %}
+{% block title %}<title>{% block pagetitle %}{% endblock %} | {% trans "Wiki" %} | {% platform_name %}</title>{% endblock %}
 
 {% block headextra %}
   {% compressed_css 'course' %}

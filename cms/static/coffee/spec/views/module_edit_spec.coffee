@@ -55,6 +55,7 @@ define ["jquery", "coffee/src/views/module_edit", "js/models/module_info", "xmod
         describe "render", ->
           beforeEach ->
             spyOn(@moduleEdit, 'loadDisplay')
+            spyOn(@moduleEdit, 'loadEdit')
             spyOn(@moduleEdit, 'delegateEvents')
             spyOn($.fn, 'append')
             spyOn($, 'getScript')
@@ -74,15 +75,58 @@ define ["jquery", "coffee/src/views/module_edit", "js/models/module_info", "xmod
               ]
             )
 
-          it "loads the module preview and editor via ajax on the view element", ->
+          it "loads the module preview via ajax on the view element", ->
             expect($.ajax).toHaveBeenCalledWith(
-              url: "/xblock/#{@moduleEdit.model.id}"
+              url: "/xblock/#{@moduleEdit.model.id}/student_view"
+              type: "GET"
+              headers:
+                Accept: 'application/x-fragment+json'
+              success: jasmine.any(Function)
+            )
+
+            expect($.ajax).not.toHaveBeenCalledWith(
+              url: "/xblock/#{@moduleEdit.model.id}/studio_view"
               type: "GET"
               headers:
                 Accept: 'application/x-fragment+json'
               success: jasmine.any(Function)
             )
             expect(@moduleEdit.loadDisplay).toHaveBeenCalled()
+            expect(@moduleEdit.loadEdit).not.toHaveBeenCalled()
+            expect(@moduleEdit.delegateEvents).toHaveBeenCalled()
+
+          it "loads the editing view via ajax on demand", ->
+            expect($.ajax).not.toHaveBeenCalledWith(
+              url: "/xblock/#{@moduleEdit.model.id}/studio_view"
+              type: "GET"
+              headers:
+                Accept: 'application/x-fragment+json'
+              success: jasmine.any(Function)
+            )
+            expect(@moduleEdit.loadEdit).not.toHaveBeenCalled()
+
+            @moduleEdit.clickEditButton({'preventDefault': jasmine.createSpy('event.preventDefault')})
+
+            $.ajax.mostRecentCall.args[0].success(
+              html: '<div>Response html</div>'
+              resources: [
+                ['hash1', {kind: 'text', mimetype: 'text/css', data: 'inline-css'}],
+                ['hash2', {kind: 'url', mimetype: 'text/css', data: 'css-url'}],
+                ['hash3', {kind: 'text', mimetype: 'application/javascript', data: 'inline-js'}],
+                ['hash4', {kind: 'url', mimetype: 'application/javascript', data: 'js-url'}],
+                ['hash5', {placement: 'head', mimetype: 'text/html', data: 'head-html'}],
+                ['hash6', {placement: 'not-head', mimetype: 'text/html', data: 'not-head-html'}],
+              ]
+            )
+
+            expect($.ajax).toHaveBeenCalledWith(
+              url: "/xblock/#{@moduleEdit.model.id}/studio_view"
+              type: "GET"
+              headers:
+                Accept: 'application/x-fragment+json'
+              success: jasmine.any(Function)
+            )
+            expect(@moduleEdit.loadEdit).toHaveBeenCalled()
             expect(@moduleEdit.delegateEvents).toHaveBeenCalled()
 
           it "loads inline css from fragments", ->

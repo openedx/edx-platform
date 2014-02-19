@@ -43,8 +43,6 @@ You establish a grading policy for your course when you create it in Studio. Whi
 
    .. image:: Images/Grading_Configuration_Studio.png
      :alt: Studio example of homework assignment type and grading weight
-     :height:283
-     :width:613
 
 For more information, see :ref:`configure`.
 

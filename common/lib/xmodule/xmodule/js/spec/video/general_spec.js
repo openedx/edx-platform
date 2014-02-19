@@ -8,6 +8,8 @@
 
         afterEach(function () {
             $('source').remove();
+            window.VideoState = {};
+            window.VideoState.id = {};
         });
 
         describe('constructor', function () {
@@ -80,7 +82,7 @@
                             '0.75': sub,
                             '1.0': sub,
                             '1.25': sub,
-                            '1.5': sub
+                            '1.50': sub
                         });
                     });
 
@@ -97,7 +99,7 @@
                             '0.75': sub,
                             '1.0': sub,
                             '1.25': sub,
-                            '1.5': sub
+                            '1.50': sub
                         });
                     });
 
@@ -227,10 +229,17 @@
                 expect(state.videoPlayer.skipOnEndedStartEndReset).toBe(true);
             });
 
+            it('when position is not 0: cue is called with stored position value', function () {
+                state.config.savedVideoPosition = 15;
+
+                state.videoPlayer.updatePlayTime(10);
+                expect(state.videoPlayer.player.cueVideoById).toHaveBeenCalledWith('cogebirgzzM', 15);
+            });
+
             it('Handling cue state', function () {
                 spyOn(state.videoPlayer, 'play');
 
-                state.videoPlayer.startTime = 10;
+                state.videoPlayer.seekToTimeOnCued = 10;
                 state.videoPlayer.onStateChange({data: 5});
 
                 expect(state.videoPlayer.player.seekTo).toHaveBeenCalledWith(10, true);
@@ -397,7 +406,7 @@
                     it('save setting for new speed', function () {
 
                         expect(state.storage.getItem('general_speed')).toBe('0.75');
-                        expect(state.storage.getItem('video_speed_' + state.id)).toBe('0.75');
+                        expect(state.storage.getItem('speed', true)).toBe('0.75');
                     });
                 });
 

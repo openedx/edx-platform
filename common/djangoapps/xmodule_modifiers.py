@@ -10,6 +10,7 @@ import static_replace
 from django.conf import settings
 from django.utils.timezone import UTC
 from edxmako.shortcuts import render_to_string
+from xblock.exceptions import InvalidScopeError
 from xblock.fragment import Fragment
 
 from xmodule.seq_module import SequenceModule
@@ -126,8 +127,12 @@ def replace_static_urls(data_dir, block, view, frag, context, course_id=None, st
 
 
 def grade_histogram(module_id):
-    ''' Print out a histogram of grades on a given problem.
-        Part of staff member debug info.
+    '''
+    Print out a histogram of grades on a given problem in staff member debug info.
+
+    Warning: If a student has just looked at an xmodule and not attempted
+    it, their grade is None. Since there will always be at least one such student
+    this function almost always returns [].
     '''
     from django.db import connection
     cursor = connection.cursor()
@@ -147,7 +152,7 @@ def grade_histogram(module_id):
     return grades
 
 
-def add_histogram(user, block, view, frag, context):  # pylint: disable=unused-argument
+def add_staff_debug_info(user, block, view, frag, context):  # pylint: disable=unused-argument
     """
     Updates the supplied module with a new get_html function that wraps
     the output of the old get_html function with additional information
@@ -161,7 +166,7 @@ def add_histogram(user, block, view, frag, context):  # pylint: disable=unused-a
         return frag
 
     block_id = block.id
-    if block.has_score:
+    if block.has_score and settings.FEATURES.get('DISPLAY_HISTOGRAMS_TO_STAFF'):
         histogram = grade_histogram(block_id)
         render_histogram = len(histogram) > 0
     else:
@@ -195,7 +200,15 @@ def add_histogram(user, block, view, frag, context):  # pylint: disable=unused-a
     if mstart is not None:
         is_released = "<font color='red'>Yes!</font>" if (now > mstart) else "<font color='green'>Not yet</font>"
 
-    staff_context = {'fields': [(name, field.read_from(block)) for name, field in block.fields.items()],
+    field_contents = []
+    for name, field in block.fields.items():
+        try:
+            field_contents.append((name, field.read_from(block)))
+        except InvalidScopeError:
+            log.warning("Unable to read field in Staff Debug information", exc_info=True)
+            field_contents.append((name, "WARNING: Unable to read field"))
+
+    staff_context = {'fields': field_contents,
                      'xml_attributes': getattr(block, 'xml_attributes', {}),
                      'location': block.location,
                      'xqa_key': block.xqa_key,

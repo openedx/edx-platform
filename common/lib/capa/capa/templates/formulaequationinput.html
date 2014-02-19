@@ -2,11 +2,12 @@
 <section id="formulaequationinput_${id}" class="inputtype formulaequationinput" ${doinline}>
   <div class="${reported_status}" id="status_${id}">
     <input type="text" name="input_${id}" id="input_${id}"
-	   data-input-id="${id}" value="${value|h}"
-	   % if size:
-	   size="${size}"
-	   % endif
-	   />
+        data-input-id="${id}" value="${value|h}"
+        aria-label="${label}"
+        % if size:
+        size="${size}"
+        % endif
+        />
 
       <p class="status">${reported_status}</p>
 

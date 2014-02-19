@@ -50,6 +50,8 @@ var DetailsView = ValidatingView.extend({
         this.$el.find('#' + this.fieldToSelectorMap['overview']).val(this.model.get('overview'));
         this.codeMirrorize(null, $('#course-overview')[0]);
 
+        this.$el.find('#' + this.fieldToSelectorMap['short_description']).val(this.model.get('short_description'));
+
         this.$el.find('.current-course-introduction-video iframe').attr('src', this.model.videosourceSample());
         this.$el.find('#' + this.fieldToSelectorMap['intro_video']).val(this.model.get('intro_video') || '');
         if (this.model.has('intro_video')) {
@@ -71,6 +73,7 @@ var DetailsView = ValidatingView.extend({
         'enrollment_start' : 'enrollment-start',
         'enrollment_end' : 'enrollment-end',
         'overview' : 'course-overview',
+        'short_description' : 'course-short-description',
         'intro_video' : 'course-introduction-video',
         'effort' : "course-effort",
         'course_image_asset_path': 'course-image-url'
@@ -146,6 +149,9 @@ var DetailsView = ValidatingView.extend({
             }, 1000);
             break;
         case 'course-effort':
+            this.setField(event);
+            break;
+        case 'course-short-description':
             this.setField(event);
             break;
         // Don't make the user reload the page to check the Youtube ID.

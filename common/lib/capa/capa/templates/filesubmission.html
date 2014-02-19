@@ -12,7 +12,7 @@
     % endif
     <p class="debug">${status}</p>
 
-    <input type="file" name="input_${id}" id="input_${id}" value="${value}" multiple="multiple" data-required_files="${required_files|h}" data-allowed_files="${allowed_files|h}"/>
+    <input type="file" name="input_${id}" id="input_${id}" value="${value}" multiple="multiple" data-required_files="${required_files|h}" data-allowed_files="${allowed_files|h}" aria-label="${label}" />
   </div>
     <div class="message">${msg|n}</div>
 </section>
