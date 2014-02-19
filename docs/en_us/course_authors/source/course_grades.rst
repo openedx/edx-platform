@@ -91,7 +91,7 @@ To download a file of student grades:
 
 #. To open or save a grade report file, click the *course_id* \_grade_report_\ *date*.csv file name at the bottom of the page.
 
-**Note**: To prevent the accidental distribution of student data, you can only download these files by clicking the links on this page. You cannot copy a link and save it or email it, as the value for the link that you copy expires within five minutes.
+.. note:: To prevent the accidental distribution of student data, you can only download these files by clicking the links on this page. You cannot copy a link and save it or email it, as the value for the link that you copy expires within five minutes.
 
 =========================================================
 Check the progress of a single student
@@ -144,7 +144,7 @@ View a histogram of scores for a problem
 
 You can view a chart of the score distribution for a specified problem.
 
-**Note**: In order to view the score distribution for a problem, you need its unique identifier. See :ref:`find_URL`.
+.. note:: In order to view the score distribution for a problem, you need its unique identifier. See :ref:`find_URL`.
 
 To display demographic distributions for gender and educational attainment:
 
@@ -201,7 +201,7 @@ To find the unique identifier in the URL for a problem:
 
 #. To copy the identifier that is assigned to the problem, select it, right click, and choose **Copy**.
 
-   **Note**: If the URL does not include "problem/" before the identifer, you will need to specify that module identifier as well. Select and copy both the module identifer and the problem identifier.
+   **Note:** If the URL does not include "problem/" before the identifer, you will need to specify that module identifier as well. Select and copy both the module identifer and the problem identifier.
 
    To close the Staff Debug viewer, click on the browser page outside of the viewer.
 
@@ -209,11 +209,11 @@ To find the unique identifier in the URL for a problem:
 Rescore student submissions
 ===================================================
 
-Each problem that you define for your course includes a correct answer, and may also include a tolerance or acceptable alternatives. If you decide to make a change to these values, you can recore any responses that were already submitted. For a specified problem, you can rescore the work submitted by a single student, or rescore the submissions made by every enrolled student. 
+Each problem that you define for your course includes a correct answer, and may also include a tolerance or acceptable alternatives. If you decide to make a change to these values, you can rescore any responses that were already submitted. For a specified problem, you can rescore the work submitted by a single student, or rescore the submissions made by every enrolled student. 
 
-**Note:** You can only rescore problems that have a correct answer entered in edX Studio. Problems that are scored by an external grader cannot be rescored with this procedure.
+.. note:: You can only rescore problems that have a correct answer entered in edX Studio. Problems that are scored by an external grader cannot be rescored with this procedure.
 
-In order to rescore a problem, you need its unique identifier. See :ref:`find_URL`.
+To rescore a problem, you need its unique identifier. See :ref:`find_URL`.
 
 To rescore a problem:
 
@@ -223,11 +223,13 @@ To rescore a problem:
 
 #. Click **Student Admin**. 
 
-#. To recore a problem for one student, you work in the Student-Specific Grade Adjustment section of the page. Enter the student's email address or username and the problem URL then click **Rescore Student Submission**.
+#. Rescore the problem, either for an individual student or for all students.
 
-#. To rescore a problem for all enrolled students, you work in the Course-Specific Grade Adjustment section of the page. Enter the problem URL then click **Rescore ALL students' problem submissions**. 
+   * To rescore a problem for one student, you work in the **Student-Specific Grade Adjustment** section of the page. Enter the student's email address or username and the problem URL, and then click **Rescore Student Submission**.
 
-#. A dialog opens to indicate that the rescore process is in progress. Click **OK**. 
+   * To rescore a problem for all enrolled students, you work in the **Course-Specific Grade Adjustment** section of the page. Enter the problem URL, and then click **Rescore ALL students' problem submissions**. 
+
+#. When you see a dialog box that notifies you that the rescore process is in progress, click **OK**. 
 
    This process does not take long for a single student, but can take some time to complete for all enrolled students. The process runs in the background, so you can navigate away from this page and do other work while it runs.
 
@@ -243,7 +245,7 @@ When you create a problem, you can limit the number of times that a student can 
 
 For more information about modifying a released problem, including other workarounds, see :ref:`Modifying a Released Problem`.
 
-**Note**: In order to reset the number of attempts for a problem, you need its unique identifier. See :ref:`find_URL`.
+.. note:: To reset the number of attempts for a problem, you need its unique identifier. See :ref:`find_URL`.
 
 To reset student attempts for a problem:
 
