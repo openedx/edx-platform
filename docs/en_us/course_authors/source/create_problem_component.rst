@@ -107,16 +107,17 @@ All problems on the edX platform have several component parts.
 .. note::  Problems can be **open** or **closed.** Closed problems do not
            have a **Check** button. Students can still see questions, solutions,
            and revealed explanations, but they cannot check their work, submit
-           responses, or change their stored score.
+           responses, or change an earlier score.
 
 There are also some attributes of problems that are not immediately
-visible.
+visible. You can set these attributes in Studio.
 
 -  **Randomization.** For some problems, the instructor can specify
    whether a problem will use randomly generated numbers that vary from
    student to student.
 -  **Weight.** Different problems in a particular problem set may be
    given different weights.
+-  **Label.** To improve accessibility for students who have disabilities, each problem needs a descriptive label. The label typically contains part or all of the text of the question in the problem. Most templates include a space for a label. You can find example labels in the documentation for each problem or tool type. 
 
 .. _Studio UI:
 
@@ -158,7 +159,7 @@ the text for you automatically. The toolbar buttons are the following:
 
 The following image shows a multiple choice problem in the Simple Editor.
 
-.. image:: Images/MultipleChoice_SimpleEditor.gif
+.. image:: Images/MultipleChoice_SimpleEditor.png
  :alt: Image of a problem in the simple editor
 
 .. _Advanced Editor:
@@ -173,7 +174,7 @@ For more information about the XML for different problem types, see :ref:`Append
 The following image shows the multiple choice problem above in the Advanced Editor
 instead of the Simple Editor.
 
-.. image:: Images/MultipleChoice_AdvancedEditor.gif
+.. image:: Images/MultipleChoice_AdvancedEditor.png
  :alt: Image of a problem in the advanced editor
 
 .. _Problem Settings:
@@ -182,19 +183,17 @@ instead of the Simple Editor.
 Problem Settings
 ******************
 
-All problems except word cloud and open response assessment problems
-have the following settings. These settings appear on the **Settings** tab in
-the component editor. (The settings for open response assessments and word clouds
-are listed on the page for those problem types.)
+Most problems have the following settings. These settings appear on the **Settings** tab in
+the component editor. 
 
--  Display Name
--  Maximum Attempts
--  Problem Weight
--  Randomization
--  Show Answer
+-  **Display Name**
+-  **Maximum Attempts**
+-  **Problem Weight**
+-  **Randomization**
+-  **Show Answer**
 
-.. image:: Images/ProbComponent_Attributes.gif
- :alt: Image of the problem settings dialog box
+.. image:: Images/ProbComponent_Attributes.png
+ :alt: Image of the Settings tab in a Problem component
 
 ===============
 Display Name

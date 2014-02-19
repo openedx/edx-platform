@@ -30,6 +30,8 @@ Types** tab, and then click the name of the problem. (Note that
 **Checkbox** doesn't appear in the list of common problem types. To
 create a checkbox problem, you'll click **Blank Common Problem**.)
 
+To add labels to these problems, enclose the text that you want to use as a label in two sets of angle brackets (<<>>).
+
 .. _Checkbox:
 
 *******************
@@ -53,6 +55,7 @@ Create a Checkbox Problem
 #. In the Problem component that appears, click **Edit**.
 #. In the component editor, replace the default text with the text of your 
    problem. Enter each answer option on its own line.
+#. Determine the text of the problem to use as a label, and then surround that text with two sets of angle brackets (<<>>).
 #. Select all the answer options, and then click the checkbox button. 
 
    .. image:: Images/ProbComponent_CheckboxIcon.gif
@@ -76,7 +79,7 @@ following.
 ::
 
     Learning about the benefits of preventative healthcare can be particularly 
-    difficult. Check all of the reasons below why this may be the case.
+    difficult. >>Check all of the reasons below why this may be the case.<<
 
     [x] A large amount of time passes between undertaking a preventative measure 
     and seeing the result. 
@@ -122,6 +125,7 @@ To create a dropdown problem, follow these steps.
 #. In the new Problem component that appears, click **Edit**.
 #. Replace the default text with the text for your problem. Enter each of the possible 
    answers on the same line, separated by commas.
+#. Determine the text of the problem to use as a label, and then surround that text with two sets of angle brackets (<<>>).
 #. Select all the answer options, and then click the dropdown button. 
       
    .. image:: Images/ProbCompButton_Dropdown.gif
@@ -145,7 +149,7 @@ following.
 
 ::
 
-    What type of data are the following?
+    >>What type of data are the following?<<
 
     Age:
     [[Nominal, Discrete, (Continuous)]]
@@ -180,6 +184,7 @@ Create a Multiple Choice Problem
 #. When the new Problem component appears, click **Edit**.
 #. In the component editor, replace the sample problem text with the text of your 
    problem. Enter each answer option on its own line.
+#. Determine the text of the problem to use as a label, and then surround that text with two sets of angle brackets (<<>>).
 #. Select all the answer options, and then click the multiple choice button. 
    
    .. image:: Images/ProbCompButton_MultChoice.gif
@@ -204,7 +209,7 @@ following.
 
 ::
 
-    Lateral inhibition, as was first discovered in the horsehoe crab:
+    >>Lateral inhibition, as was first discovered in the horsehoe crab:<<
 
     ( ) is a property of touch sensation, referring to the ability of crabs to 
     detect nearby predators.
@@ -261,7 +266,7 @@ Create a Numerical Input Problem
    Input** on the **Common Problem Types** tab.
 #. When the new Problem component appears, click **Edit**.
 #. In the component editor, replace the sample problem text with your own text.
-
+#. Determine the text of the problem to use as a label, and then surround that text with two sets of angle brackets (<<>>).
 #. Select the text of the answer, and then click the numerical input button. 
 
    .. image:: Images/ProbCompButton_NumInput.gif
@@ -291,7 +296,7 @@ following.
 
 ::
 
-   How many different countries do edX students live in as of May 2013?
+   >>How many different countries do edX students live in as of May 2013?<<
 
    = 193 +- 5%
     
@@ -343,6 +348,7 @@ To create a text input problem, follow these steps.
    on the **Common Problem Types** tab.
 #. In the new Problem component that appears, click **Edit**.
 #. Replace the default text with the text for your problem.
+#. Determine the text of the problem to use as a label, and then surround that text with two sets of angle brackets (<<>>).
 #. Select the text of the answer, and then click the text input button. 
    
    .. image:: Images/ProbCompButton_TextInput.gif
@@ -365,8 +371,8 @@ following.
 
 ::
 
-    What is the technical term that refers to the fact that, when enough people 
-    sleep under a bednet, the disease may altogether disappear?
+    >>What is the technical term that refers to the fact that, when enough people 
+    sleep under a bednet, the disease may altogether disappear?<<
     = herd immunity
 
     [explanation]

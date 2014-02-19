@@ -34,6 +34,8 @@ These problems are easy to access in Studio. To create them, click
 **Problem** under **Add New Component**, click the **Advanced** tab, and
 then click the name of the problem that you want to create.
 
+To add a label for an advanced problem, you'll add a **label** attribute to one of the XML tags for the problem. For more information, see :ref:`Appendix E`.
+
 .. _Circuit Schematic Builder:
 
 
@@ -139,8 +141,6 @@ file that you'll download.
 #. In the problem component editor, replace the example code with the code below.
 #. Click **Save.**
 
-
-
 JavaScript Input Problem Code
 #############################
 
@@ -183,25 +183,17 @@ JavaScript Input Problem Code
 
 .. note::    When you create this problem, keep the following in mind.
 
-             - The webGLDemo.js file defines the three JavaScript functions (**WebGLDemo.getGrade**,
-               **WebGLDemo.getState**, and **WebGLDemo.setState**).
+             - The webGLDemo.js file defines the three JavaScript functions (**WebGLDemo.getGrade**, **WebGLDemo.getState**, and **WebGLDemo.setState**).
 
-             - The JavaScript input problem code uses **WebGLDemo.getGrade**, **WebGLDemo.getState**,
-               and **WebGLDemo.setState** to grade, save, or restore a problem. These functions must
-               be global in scope.
+             - The JavaScript input problem code uses **WebGLDemo.getGrade**, **WebGLDemo.getState**, and **WebGLDemo.setState** to grade, save, or restore a problem. These functions must be global in scope.
 
-             - **WebGLDemo.getState** and **WebGLDemo.setState** are optional. You only have to define
-               these functions if you want to conserve the state of the problem.
+             - **WebGLDemo.getState** and **WebGLDemo.setState** are optional. You only have to define these functions if you want to conserve the state of the problem.
 
-             - **Width** and **height** represent the dimensions of the IFrame that holds the
-               application.
+             - **Width** and **height** represent the dimensions of the IFrame that holds the application.
 
-             - When the problem opens, the cone and the cube are both blue, or "unselected." When
-               you click either shape once, the shape becomes yellow, or "selected." To unselect
-               the shape, click it again. Continue clicking the shape to select and unselect it.
+             - When the problem opens, the cone and the cube are both blue, or "unselected." When you click either shape once, the shape becomes yellow, or "selected." To unselect the shape, click it again. Continue clicking the shape to select and unselect it.
 
-             - The response is graded as correct if the cone is selected (yellow) when the user
-               clicks **Check**.
+             - The response is graded as correct if the cone is selected (yellow) when the user clicks **Check**.
 
              - Clicking **Check** or **Save** registers the problem's current state.
 
