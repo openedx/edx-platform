@@ -282,7 +282,7 @@ To create an HTML component that contains LaTeX code:
    .. image:: Images/HTML_LaTeXEditor.gif
     :alt: Image of the HTML component editor with the Latex compiler.
 
-#. Write Latex code as needed. You can also upload a Latex file into the editor from your computer by clicking **Upload** in the bottomn right corner.
+#. Write Latex code as needed. You can also upload a Latex file into the editor from your computer by clicking **Upload** in the bottom right corner.
 
 #. When you have written or uploaded the Latex code you need, click **Save & Compile to edX XML** in the lower-left corner.
 
