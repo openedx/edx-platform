@@ -179,9 +179,12 @@ class LoncapaProblem(object):
         self.inputs = {}
 
         # Run response late_transforms last (see MultipleChoiceResponse)
-        for response in self.responders.values():
+        # Sort the responses to be in *_1 *_2 ... order.
+        responses = self.responders.values()
+        responses = sorted(responses, key = lambda resp: int(resp.id[resp.id.rindex('_')+1:]) )
+        for response in responses:
             if hasattr(response, 'late_transforms'):
-                response.late_transforms()
+                response.late_transforms(self)
 
         self.extracted_tree = self._extract_html(self.tree)
 
