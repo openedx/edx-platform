@@ -423,6 +423,6 @@ To create a problem written in LaTeX:
 #. In the component editor that appears, click **Edit**.
 #. In the lower left corner of the component editor, click **Launch
    LaTeX Source Compiler**.
-#. Replace the example code with your own code.
+#. Replace the example code with your own code. You can also upload a Latex file into the editor from your computer by clicking **Upload** in the bottomn right corner.
 #. In the lower left corner of the LaTeX source compiler, click **Save &
    Compile to edX XML**.
