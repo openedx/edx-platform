@@ -34,7 +34,8 @@ from path import path
 from lms.lib.xblock.mixin import LmsBlockMixin
 from cms.lib.xblock.mixin import CmsBlockMixin
 from xmodule.modulestore.inheritance import InheritanceMixin
-from xmodule.x_module import XModuleMixin, only_xmodules
+from xmodule.modulestore import only_xmodules
+from xmodule.x_module import XModuleMixin
 from dealer.git import git
 
 ############################ FEATURE CONFIGURATION #############################
@@ -220,7 +221,7 @@ XBLOCK_SELECT_FUNCTION = only_xmodules
 # either by uncommenting them here, or adding them to your private.py
 # You should also enable the ALLOW_ALL_ADVANCED_COMPONENTS feature flag, so that
 # xblocks can be added via advanced settings
-# from xmodule.x_module import prefer_xmodules
+# from xmodule.modulestore import prefer_xmodules
 # XBLOCK_SELECT_FUNCTION = prefer_xmodules
 
 ############################ SIGNAL HANDLERS ################################

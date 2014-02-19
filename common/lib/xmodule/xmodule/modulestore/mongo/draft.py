@@ -106,21 +106,6 @@ class DraftModuleStore(MongoModuleStore):
             raise InvalidVersionError(location)
         return super(DraftModuleStore, self).create_xmodule(draft_loc, definition_data, metadata, system)
 
-    def save_xmodule(self, xmodule):
-        """
-        Save the given xmodule (will either create or update based on whether id already exists).
-        Pulls out the data definition v metadata v children locally but saves it all.
-
-        :param xmodule:
-        """
-        orig_location = xmodule.location
-
-        xmodule.location = as_draft(orig_location)
-        try:
-            super(DraftModuleStore, self).save_xmodule(xmodule)
-        finally:
-            xmodule.location = orig_location
-
     def get_items(self, location, course_id=None, depth=0, qualifiers=None):
         """
         Returns a list of XModuleDescriptor instances for the items
@@ -159,7 +144,7 @@ class DraftModuleStore(MongoModuleStore):
         if draft_location.category in DIRECT_ONLY_CATEGORIES:
             raise InvalidVersionError(source_location)
         if not original:
-            raise ItemNotFoundError
+            raise ItemNotFoundError(source_location)
         original['_id'] = namedtuple_to_son(draft_location)
         try:
             self.collection.insert(original)
@@ -171,7 +156,7 @@ class DraftModuleStore(MongoModuleStore):
 
         return self._load_items([original])[0]
 
-    def update_item(self, xblock, user, allow_not_found=False):
+    def update_item(self, xblock, user=None, allow_not_found=False):
         """
         Save the current values to persisted version of the xblock
 
@@ -187,7 +172,7 @@ class DraftModuleStore(MongoModuleStore):
                 raise
 
         xblock.location = draft_loc
-        super(DraftModuleStore, self).update_item(xblock, user)
+        super(DraftModuleStore, self).update_item(xblock, user, allow_not_found)
         # don't allow locations to truly represent themselves as draft outside of this file
         xblock.location = as_published(xblock.location)
 

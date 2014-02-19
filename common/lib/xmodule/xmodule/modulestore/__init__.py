@@ -7,11 +7,15 @@ import logging
 import re
 
 from collections import namedtuple
+import collections
 
 from abc import ABCMeta, abstractmethod
+from xblock.plugin import default_select
 
 from .exceptions import InvalidLocationError, InsufficientSpecificationError
 from xmodule.errortracker import make_error_tracker
+from xblock.runtime import Mixologist
+from xblock.core import XBlock
 
 log = logging.getLogger('edx.modulestore')
 
@@ -529,9 +533,75 @@ class ModuleStoreReadBase(ModuleStoreRead):
                 return c
         return None
 
+    def update_item(self, xblock, user_id=None, allow_not_found=False, force=False):
+        """
+        Update the given xblock's persisted repr. Pass the user's unique id which the persistent store
+        should save with the update if it has that ability.
+
+        :param allow_not_found: whether this method should raise an exception if the given xblock
+        has not been persisted before.
+        :param force: fork the structure and don't update the course draftVersion if there's a version
+        conflict (only applicable to version tracking and conflict detecting persistence stores)
+
+        :raises VersionConflictError: if package_id and version_guid given and the current
+        version head != version_guid and force is not True. (only applicable to version tracking stores)
+        """
+        raise NotImplementedError
+
+    def delete_item(self, location, user_id=None, delete_all_versions=False, delete_children=False, force=False):
+        """
+        Delete an item from persistence. Pass the user's unique id which the persistent store
+        should save with the update if it has that ability.
+
+        :param delete_all_versions: removes both the draft and published version of this item from
+        the course if using draft and old mongo. Split may or may not implement this.
+        :param force: fork the structure and don't update the course draftVersion if there's a version
+        conflict (only applicable to version tracking and conflict detecting persistence stores)
+
+        :raises VersionConflictError: if package_id and version_guid given and the current
+        version head != version_guid and force is not True. (only applicable to version tracking stores)
+        """
+        raise NotImplementedError
 
 class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
     '''
     Implement interface functionality that can be shared.
     '''
-    pass
+    def __init__(self, **kwargs):
+        super(ModuleStoreWriteBase, self).__init__(**kwargs)
+        # TODO: Don't have a runtime just to generate the appropriate mixin classes (cpennington)
+        # This is only used by partition_fields_by_scope, which is only needed because
+        # the split mongo store is used for item creation as well as item persistence
+        self.mixologist = Mixologist(self.xblock_mixins)
+
+    def partition_fields_by_scope(self, category, fields):
+        """
+        Return dictionary of {scope: {field1: val, ..}..} for the fields of this potential xblock
+
+        :param category: the xblock category
+        :param fields: the dictionary of {fieldname: value}
+        """
+        if fields is None:
+            return {}
+        cls = self.mixologist.mix(XBlock.load_class(category, select=prefer_xmodules))
+        result = collections.defaultdict(dict)
+        for field_name, value in fields.iteritems():
+            field = getattr(cls, field_name)
+            result[field.scope][field_name] = value
+        return result
+
+
+def only_xmodules(identifier, entry_points):
+    """Only use entry_points that are supplied by the xmodule package"""
+    from_xmodule = [entry_point for entry_point in entry_points if entry_point.dist.key == 'xmodule']
+
+    return default_select(identifier, from_xmodule)
+
+
+def prefer_xmodules(identifier, entry_points):
+    """Prefer entry_points from the xmodule package"""
+    from_xmodule = [entry_point for entry_point in entry_points if entry_point.dist.key == 'xmodule']
+    if from_xmodule:
+        return default_select(identifier, from_xmodule)
+    else:
+        return default_select(identifier, entry_points)

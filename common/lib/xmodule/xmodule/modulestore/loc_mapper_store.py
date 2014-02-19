@@ -119,7 +119,8 @@ class LocMapperStore(object):
 
         return package_id
 
-    def translate_location(self, old_style_course_id, location, published=True, add_entry_if_missing=True):
+    def translate_location(self, old_style_course_id, location, published=True,
+                           add_entry_if_missing=True, passed_block_id=None):
         """
         Translate the given module location to a Locator. If the mapping has the run id in it, then you
         should provide old_style_course_id with that run id in it to disambiguate the mapping if there exists more
@@ -137,6 +138,8 @@ class LocMapperStore(object):
         :param add_entry_if_missing: a boolean as to whether to raise ItemNotFoundError or to create an entry if
         the course
         or block is not found in the map.
+        :param passed_block_id: what block_id to assign and save if none is found
+        (only if add_entry_if_missing)
 
         NOTE: unlike old mongo, draft branches contain the whole course; so, it applies to all category
         of locations including course.
@@ -158,7 +161,7 @@ class LocMapperStore(object):
                 self.create_map_entry(course_location)
                 entry = self.location_map.find_one(location_id)
             else:
-                raise ItemNotFoundError()
+                raise ItemNotFoundError(location)
         elif len(maps) == 1:
             entry = maps[0]
         else:
@@ -172,7 +175,9 @@ class LocMapperStore(object):
         block_id = entry['block_map'].get(self.encode_key_for_mongo(location.name))
         if block_id is None:
             if add_entry_if_missing:
-                block_id = self._add_to_block_map(location, location_id, entry['block_map'])
+                block_id = self._add_to_block_map(
+                    location, location_id, entry['block_map'], passed_block_id
+                )
             else:
                 raise ItemNotFoundError(location)
         elif isinstance(block_id, dict):
@@ -188,7 +193,7 @@ class LocMapperStore(object):
             elif add_entry_if_missing:
                 block_id = self._add_to_block_map(location, location_id, entry['block_map'])
             else:
-                raise ItemNotFoundError()
+                raise ItemNotFoundError(location)
         else:
             raise InvalidLocationError()
 
@@ -297,7 +302,7 @@ class LocMapperStore(object):
         maps = self.location_map.find(location_id)
         maps = list(maps)
         if len(maps) == 0:
-            raise ItemNotFoundError()
+            raise ItemNotFoundError(location)
         elif len(maps) == 1:
             entry = maps[0]
         else:
@@ -315,18 +320,19 @@ class LocMapperStore(object):
         else:
             return draft_course_locator
 
-    def _add_to_block_map(self, location, location_id, block_map):
+    def _add_to_block_map(self, location, location_id, block_map, block_id=None):
         '''add the given location to the block_map and persist it'''
-        if self._block_id_is_guid(location.name):
-            # This makes the ids more meaningful with a small probability of name collision.
-            # The downside is that if there's more than one course mapped to from the same org/course root
-            # the block ids will likely be out of sync and collide from an id perspective. HOWEVER,
-            # if there are few == org/course roots or their content is unrelated, this will work well.
-            block_id = self._verify_uniqueness(location.category + location.name[:3], block_map)
-        else:
-            # if 2 different category locations had same name, then they'll collide. Make the later
-            # mapped ones unique
-            block_id = self._verify_uniqueness(location.name, block_map)
+        if block_id is None:
+            if self._block_id_is_guid(location.name):
+                # This makes the ids more meaningful with a small probability of name collision.
+                # The downside is that if there's more than one course mapped to from the same org/course root
+                # the block ids will likely be out of sync and collide from an id perspective. HOWEVER,
+                # if there are few == org/course roots or their content is unrelated, this will work well.
+                block_id = self._verify_uniqueness(location.category + location.name[:3], block_map)
+            else:
+                # if 2 different category locations had same name, then they'll collide. Make the later
+                # mapped ones unique
+                block_id = self._verify_uniqueness(location.name, block_map)
         encoded_location_name = self.encode_key_for_mongo(location.name)
         block_map.setdefault(encoded_location_name, {})[location.category] = block_id
         self.location_map.update(location_id, {'$set': {'block_map': block_map}})

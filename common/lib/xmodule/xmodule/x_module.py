@@ -580,22 +580,6 @@ class ResourceTemplates(object):
                     return template
 
 
-def prefer_xmodules(identifier, entry_points):
-    """Prefer entry_points from the xmodule package"""
-    from_xmodule = [entry_point for entry_point in entry_points if entry_point.dist.key == 'xmodule']
-    if from_xmodule:
-        return default_select(identifier, from_xmodule)
-    else:
-        return default_select(identifier, entry_points)
-
-
-def only_xmodules(identifier, entry_points):
-    """Only use entry_points that are supplied by the xmodule package"""
-    from_xmodule = [entry_point for entry_point in entry_points if entry_point.dist.key == 'xmodule']
-
-    return default_select(identifier, from_xmodule)
-
-
 @XBlock.needs("i18n")
 class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
     """
