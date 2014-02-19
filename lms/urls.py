@@ -330,6 +330,9 @@ if settings.COURSEWARE_ENABLED:
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/notes$', 'notes.views.notes', name='notes'),
         url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/notes/', include('notes.urls')),
 
+        # LTI endpoints listing
+        url(r'^courses/(?P<course_id>[^/]+/[^/]+/[^/]+)/lti_rest_endpoints/',
+            'courseware.views.get_course_lti_endpoints', name='lti_rest_endpoints'),
     )
 
     # allow course staff to change to student view of courseware
