@@ -26,6 +26,9 @@ def run():
     if settings.FEATURES.get('USE_MICROSITES', False):
         enable_microsites()
 
+    if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH', False):
+        enable_third_party_auth()
+
 
 def enable_theme():
     """
@@ -99,3 +102,14 @@ def enable_microsites():
         edxmako.startup.run()
 
         settings.STATICFILES_DIRS.insert(0, microsites_root)
+
+
+def enable_third_party_auth():
+    """
+    Enable the use of third_party_auth, which allows users to sign in to edX
+    using other identity providers. For configuration details, see
+    common/djangoapps/third_party_auth/settings.py.
+    """
+
+    from third_party_auth import settings as auth_settings
+    auth_settings.apply_settings(settings.THIRD_PARTY_AUTH, settings)
