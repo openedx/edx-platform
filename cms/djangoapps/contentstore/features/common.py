@@ -404,3 +404,8 @@ def i_delete_draft(_step):
 @step(u'I publish the unit$')
 def publish_unit(_step):
     world.select_option('visibility-select', 'public')
+
+
+@step(u'I unpublish the unit$')
+def unpublish_unit(_step):
+    world.select_option('visibility-select', 'private')
