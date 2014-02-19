@@ -13,7 +13,6 @@ from django.core.cache import cache
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpResponse
-import django.utils
 from django.views.decorators.csrf import csrf_exempt
 
 from capa.xqueue_interface import XQueueInterface
@@ -33,14 +32,13 @@ from xblock.django.request import django_to_webob_request, webob_to_django_respo
 from xmodule.error_module import ErrorDescriptor, NonStaffErrorDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
 from xmodule.modulestore import Location
-from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.django import modulestore, ModuleI18nService
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.util.duedate import get_extended_due_date
 from xmodule_modifiers import replace_course_urls, replace_jump_to_id_urls, replace_static_urls, add_staff_debug_info, wrap_xblock
 from xmodule.lti_module import LTIModule
 from xmodule.x_module import XModuleDescriptor
 
-from util.date_utils import strftime_localized
 from util.json_request import JsonResponse
 from util.sandboxing import can_execute_unsafe_code
 
@@ -651,20 +649,3 @@ def _check_files_limits(files):
                 return msg
 
     return None
-
-
-class ModuleI18nService(object):
-    """
-    Implement the XBlock runtime "i18n" service.
-
-    Mostly a pass-through to Django's translation module.
-    django.utils.translation implements the gettext.Translations interface (it
-    has ugettext, ungettext, etc), so we can use it directly as the runtime
-    i18n service.
-
-    """
-    def __getattr__(self, name):
-        return getattr(django.utils.translation, name)
-
-    def strftime(self, *args, **kwargs):
-        return strftime_localized(*args, **kwargs)

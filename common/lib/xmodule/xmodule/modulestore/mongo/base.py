@@ -263,6 +263,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
     def __init__(self, doc_store_config, fs_root, render_template,
                  default_class=None,
                  error_tracker=null_error_tracker,
+                 i18n_service=None,
                  **kwargs):
         """
         :param doc_store_config: must have a host, db, and collection entries. Other common entries: port, tz_aware.
@@ -312,6 +313,8 @@ class MongoModuleStore(ModuleStoreWriteBase):
         self.fs_root = path(fs_root)
         self.error_tracker = error_tracker
         self.render_template = render_template
+        self.i18n_service = i18n_service
+
         self.ignore_write_events_on_courses = []
 
     def compute_metadata_inheritance_tree(self, location):
@@ -498,6 +501,10 @@ class MongoModuleStore(ModuleStoreWriteBase):
         if apply_cached_metadata:
             cached_metadata = self.get_cached_metadata_inheritance_tree(location)
 
+        services = {}
+        if self.i18n_service:
+            services["i18n"] = self.i18n_service
+
         # TODO (cdodge): When the 'split module store' work has been completed, we should remove
         # the 'metadata_inheritance_tree' parameter
         system = CachingDescriptorSystem(
@@ -510,6 +517,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
             cached_metadata=cached_metadata,
             mixins=self.xblock_mixins,
             select=self.xblock_select,
+            services=services,
         )
         return system.load_item(location)
 
@@ -631,6 +639,10 @@ class MongoModuleStore(ModuleStoreWriteBase):
         if metadata is None:
             metadata = {}
         if system is None:
+            services = {}
+            if self.i18n_service:
+                services["i18n"] = self.i18n_service
+
             system = CachingDescriptorSystem(
                 modulestore=self,
                 module_data={},
@@ -641,6 +653,7 @@ class MongoModuleStore(ModuleStoreWriteBase):
                 cached_metadata={},
                 mixins=self.xblock_mixins,
                 select=self.xblock_select,
+                services=services,
             )
         xblock_class = system.load_block_type(location.category)
         if definition_data is None:

@@ -408,7 +408,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             # set the due_date_display_format to what would have been shown previously (with no timezone).
             # Then remove show_timezone so that if the user clears out the due_date_display_format,
             # they get the default date display.
-            self.due_date_display_format = u"%b %d, %Y at %H:%M"
+            self.due_date_display_format = "DATE_TIME"
             delattr(self, 'show_timezone')
 
         # NOTE: relies on the modulestore to call set_grading_policy() right after
