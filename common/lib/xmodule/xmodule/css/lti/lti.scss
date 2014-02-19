@@ -1,3 +1,16 @@
+h2.problem-header {
+  display: inline-block;
+}
+
+div.problem-progress {
+  display: inline-block;
+  padding-left: 5px;
+  color: #666;
+  font-weight: 100;
+  font-size: em(16);
+}
+
+
 div.lti {
     // align center
     margin: 0 auto;
@@ -30,5 +43,17 @@ div.lti {
         height: 800px;
         display: block;
         border: 0px;
+    }
+
+    h4.problem-feedback-label {
+        font-weight: 100;
+        font-size: em(16);
+        font-family: "Source Sans", "Open Sans", Verdana, Geneva, sans-serif, sans-serif;
+    }
+
+    div.problem-feedback {
+        margin-top: 5px;
+        margin-bottom: 5px;
+
     }
 }
