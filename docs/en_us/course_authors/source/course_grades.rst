@@ -201,7 +201,7 @@ To find the unique identifier in the URL for a problem:
 
 #. To copy the identifier that is assigned to the problem, select it, right click, and choose **Copy**.
 
-    **Note:** If the URL does not include "problem/" before the identifer, you will need to specify that module identifier as well. Select and copy both the module identifer and the problem identifier.
+   **Note:** If the URL does not include "problem/" before the identifer, you will need to specify that module identifier as well. Select and copy both the module identifer and the problem identifier.
 
    To close the Staff Debug viewer, click on the browser page outside of the viewer.
 
@@ -225,7 +225,7 @@ To rescore a problem:
 
 #. Rescore the problem, either for an individual student or for all students.
 
-   * To rescore a problem for one student, you work in the **Student-Specific Grade Adjustment** section of the page. Enter the student's email address or username and the problem URL, amd then click **Rescore Student Submission**.
+   * To rescore a problem for one student, you work in the **Student-Specific Grade Adjustment** section of the page. Enter the student's email address or username and the problem URL, and then click **Rescore Student Submission**.
 
    * To rescore a problem for all enrolled students, you work in the **Course-Specific Grade Adjustment** section of the page. Enter the problem URL, and then click **Rescore ALL students' problem submissions**. 
 
@@ -245,7 +245,7 @@ When you create a problem, you can limit the number of times that a student can 
 
 For more information about modifying a released problem, including other workarounds, see :ref:`Modifying a Released Problem`.
 
-.. note:: In order to reset the number of attempts for a problem, you need its unique identifier. See :ref:`find_URL`.
+.. note:: To reset the number of attempts for a problem, you need its unique identifier. See :ref:`find_URL`.
 
 To reset student attempts for a problem:
 
