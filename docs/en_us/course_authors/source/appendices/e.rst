@@ -41,6 +41,9 @@ Most problems have the following tags.
    * - ``<solution> <div class="detailed-solution"> </div> </solution>`` (optional)
      - If you want to include more information in the problem, such as a detailed explanation of the problem's answer, you'll enter the text between the two ``<div>`` tags, which are inside the ``<solution>`` tags. (These tags do not have to be on the same line.)
 
+Additionally, all problems must include a **label** attribute. This attribute adds a descriptive label that helps visually impaired students navigate through the problem.
+You'll add a **label** attribute to one of the XML tags for the problem. Each example problem below includes a label.
+
 .. _Choice Response:
 
 Choice Response (Checkbox Problems)
@@ -61,7 +64,7 @@ Although you can create checkbox problems by using the Simple Editor in Studio, 
    * - ``<choiceresponse>``
      - Specifies that the problem lists answer options for students to choose from.
    * - ``<checkboxgroup>``
-     - A child of ``<choiceresponse>``. Specifies that the problem is a checkbox problem.
+     - A child of ``<choiceresponse>``. Specifies that the problem is a checkbox problem. Can include a ``direction`` attribute and a ``label`` attribute.
    * - ``<choice>``
      - A child of ``<checkboxgroup>``. Designates an answer option. Each choice must include the ``correct`` attribute, set to ``true`` (for a correct answer) or ``false`` (for an incorrect answer). For checkbox problems, more than one option can be a correct answer.
 
@@ -75,7 +78,7 @@ Although you can create checkbox problems by using the Simple Editor in Studio, 
      difficult. Check all of the reasons below why this may be the case.</p>
 
   <choiceresponse>
-    <checkboxgroup>
+    <checkboxgroup direction="vertical" label="">
       <choice correct="true"><text>A large amount of time passes between undertaking
       a preventative measure and seeing the result.</text></choice>
       <choice correct="false"><text>Non-immunized people will always fall sick.</text>
