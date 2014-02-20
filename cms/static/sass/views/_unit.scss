@@ -15,9 +15,11 @@ body.course.unit,
   //end problem selector reqs
 
   .main-column {
-    clear: both;
-    float: left;
-    width: 70%;
+    @extend %ui-col-wide;
+  }
+
+  .sidebar {
+    @extend %ui-col-narrow;
   }
 
   .unit-body.published {
@@ -771,7 +773,7 @@ body.unit {
 
     .component-actions {
       display: inline-block;
-      float: right;
+      float: flip(right, left);
       max-width: 40%;
       vertical-align: middle;
       text-align: center;

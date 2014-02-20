@@ -7,12 +7,10 @@
   .content-primary,
   .content-supplementary {
     @include box-sizing(border-box);
-    float: left;
   }
 
   .content-primary {
-    width: flex-grid(9, 12);
-    margin-right: flex-gutter();
+    @extend %ui-col-wide;
 
     .no-outline-content {
       @extend %ui-well;
@@ -33,7 +31,7 @@
   }
 
   .content-supplementary {
-    width: flex-grid(3, 12);
+    @extend %ui-col-narrow;
   }
 
 
@@ -243,7 +241,7 @@
       .item-actions {
         position: relative;
         display: inline-block;
-        float: right;
+        float: flip(right, left);
         margin-bottom: ($baseline/2);
         top: 0;
       }
@@ -252,7 +250,7 @@
         padding: 0 0 0 8px;
 
         &:last-child {
-          padding-right: 4px;
+          #{$padding-right}: 4px;
         }
 
         &.pubdate {
@@ -374,7 +372,7 @@
       @extend %ui-depth1;
       position: absolute;
       top: 0;
-      right: 5px;
+      #{$right}: 5px;
       padding: 2px 5px;
       color: $gray-l2;
 
@@ -398,7 +396,7 @@
       z-index: 1;
       position: absolute;
       top: -4px;
-      right: 0;
+      #{$right}: 0;
       margin: 0;
       box-shadow: 0 1px 2px rgba(0, 0, 0, .2);
       border: 1px solid $gray-l2;
@@ -466,7 +464,8 @@
 
   // unit styles
   .courseware-unit {
-    margin: -1px 0 0 ($baseline*1.75);
+    margin-top: -1px;
+    #{$margin-left}: ($baseline*1.75);
 
     &.add-new-unit {
       margin: 5px ($baseline*1.75) 0 ($baseline*1.75);
@@ -565,13 +564,13 @@
 
 
       .field {
-        float: left;
+        float: flip(left, right);
         margin: 0 ($baseline/2) ($baseline/2);
 
         label,
         input {
           display: block;
-          text-align: left;
+          text-align: $left;
         }
 
         label {

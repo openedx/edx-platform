@@ -5,13 +5,11 @@
 
   .content-primary, .content-supplementary {
     @include box-sizing(border-box);
-    float: left;
   }
 
   .content-primary {
     @extend %ui-window;
-    width: flex-grid(9, 12);
-    margin-right: flex-gutter();
+    @extend %ui-col-wide;
     padding: $baseline ($baseline*1.5);
   }
 
@@ -67,16 +65,17 @@
 
       .title-2 {
         width: flex-grid(4, 9);
-        margin: 0 flex-gutter() 0 0;
-        float: left;
+        margin: 0;
+        #{$margin-right}: flex-gutter();
+        float: flip(left, right);
       }
 
       .tip {
         @extend %t-copy-sub2;
         width: flex-grid(5, 9);
-        float: right;
+        float: flip(right, left);
         margin-top: ($baseline/2);
-        text-align: right;
+        text-align: $right;
         color: $gray-l2;
       }
     }
@@ -373,7 +372,7 @@
         }
 
         .field {
-          float: left;
+          float: flip(left, right);
           width: flex-grid(3, 9);
           margin-bottom: ($baseline/4);
           margin-right: flex-gutter();
@@ -385,7 +384,7 @@
           .tip {
             position: absolute;
             top: 0;
-            right: 0;
+            #{$right}: 0;
           }
         }
       }
@@ -895,6 +894,6 @@
   }
 
   .content-supplementary {
-    width: flex-grid(3, 12);
+    @extend %ui-col-narrow;
   }
 }
