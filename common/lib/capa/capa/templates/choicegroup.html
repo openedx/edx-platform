@@ -1,33 +1,45 @@
+<%
+    fieldset_width = 775
+    fieldset_message_width = 0
+    if (not msg is UNDEFINED) and (len(msg) > 0):
+        fieldset_width = 480
+        fieldset_message_width = 295
+
+%>
 <form class="choicegroup capa_inputtype" id="inputtype_${id}">
     <style>
-        #fieldset_container {
+        #fieldset_container_${id} {
             margin: 0 auto;
             overflow: hidden;
             position: relative;
+            height: 100;
             width: 100%;
         }
 
-        #fieldset {
+        #fieldset_${id} {
             float: left;
             margin: 0 auto;
-            width: 50%;
+            word-wrap: normal;
+            height: 100%;
+            width:${fieldset_width}px;
+
 
         }
 
-        #fieldset_message {
+        #fieldset_message_${id} {
             background: #99CCFF;
             color: #FFFFFF;
             font-family: arial;
             float: right;
-            height: 100%;
-            margin: 0 auto;
+            height: 250px;
+            margin: 5 auto;
             padding: 10px;
             position: absolute;
             right: 0;
-            width: 50%;
+            width:${fieldset_message_width}px;
         }
 
-        #fieldset_message_title {
+        #fieldset_message_title_${id} {
             color: #FFFFFF;
             font-family: arial;
             font-size: 18pt;
@@ -46,9 +58,9 @@
         % endif
     % endif
     </div>
-    <div id="fieldset_container">
-        <div id="fieldset">
-            <fieldset>
+    <div id="fieldset_container_${id}">
+        <div id="fieldset_${id}">
+            <fieldset role="radiogroup" aria-label="${label}">
                 % for choice_id, choice_description in choices:
                 <label for="input_${id}_${choice_id}"
                     ## If the student has selected this choice...
@@ -66,16 +78,14 @@
                     % endif
                     % endif
                     >
-                    <input type="${input_type}" name="input_${id}${name_array_suffix}" id="input_${id}_${choice_id}" aria-describedby="answer_${id}" value="${choice_id}"
+                    <input type="${input_type}" name="input_${id}${name_array_suffix}" id="input_${id}_${choice_id}" aria-role="radio" aria-describedby="answer_${id}" value="${choice_id}"
                     ## If the student selected this choice...
                     % if input_type == 'radio' and ( (isinstance(value, basestring) and (choice_id == value))  or  (not isinstance(value, basestring) and choice_id in value) ):
                     checked="true"
                     % elif input_type != 'radio' and choice_id in value:
                     checked="true"
                     % endif
-
                     /> ${choice_description}
-
                     % if input_type == 'radio' and ( (isinstance(value, basestring) and (choice_id == value))  or  (not isinstance(value, basestring) and choice_id in value) ):
                     <%
                         if status == 'correct':
@@ -97,16 +107,15 @@
         ## Message/hint display block -- empty/invisible unless msg is populated
         <div
             % if (not msg is UNDEFINED) and (len(msg) > 0):
-            id="fieldset_message"
+            id="fieldset_message_${id}"
             % endif
         >
             % if (not msg is UNDEFINED) and (len(msg) > 0):
-            <span id="fieldset_message_title">Feedback</span>
+            <span id="fieldset_message_title_${id}">Feedback</span>
             ${msg}
             % endif
         </div>
     </div>
-
     % if show_correctness == "never" and (value or status not in ['unsubmitted']):
     <div class="capa_alert">${submitted_message}</div>
     %endif

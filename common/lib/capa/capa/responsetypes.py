@@ -718,6 +718,10 @@ class ChoiceResponse(LoncapaResponse):
 
 @registry.register
 class MultipleChoiceResponse(LoncapaResponse):
+    """
+    MultipleChoiceResponse is a specialized ChoiceResponse type responsible
+    for handling all aspects of MCQ behavior, including hinting
+    """
     # TODO: handle direction and randomize
 
     tags = ['multiplechoiceresponse']
@@ -780,7 +784,12 @@ class MultipleChoiceResponse(LoncapaResponse):
         return {self.answer_id: self.correct_choices}
 
     def check_string(self, expected, given):
-        flags = re.IGNORECASE if self.case_insensitive else 0
+        """
+        Attempt to match the given value with what the caller expects
+        For now we ignore the case -- at some point we might add a switch
+        We're also a bit lenient in terms of matching at the present time
+        """
+        flags = re.IGNORECASE
         regexp = re.compile('^' + '|'.join(expected) + '$', flags=flags | re.UNICODE)
         result = re.search(regexp, given)
         return bool(result)
