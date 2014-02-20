@@ -31,7 +31,7 @@ body.course.feature-edit-dialog {
       border-radius: ($baseline/5);
       background-color: $gray-l4;
       padding: 7px;
-      text-align: left;
+      text-align: $left;
 
       .title {
         @extend %t-title5;
@@ -78,7 +78,7 @@ body.course.feature-edit-dialog {
           .action-item {
             @extend %t-action4;
             display: inline-block;
-            margin-right: ($baseline*0.75);
+            margin: 0 ($baseline*0.75);
 
             &:last-child {
               margin-right: 0;

@@ -35,7 +35,7 @@
 
       [class^="icon-"] {
         @include font-size(14);
-        margin-right: ($baseline/4);
+        #{$margin-right}: ($baseline/4);
       }
 
       &:hover {
@@ -84,11 +84,11 @@
         @include clearfix();
 
         .action-item {
-          float: left;
-          margin-right: ($baseline/2);
+          float: flip(left, right);
+          #{$margin-right}: ($baseline/2);
 
           &:last-child {
-            margin-right: 0;
+            #{$margin-right}: 0;
           }
 
           .action {
@@ -98,7 +98,7 @@
             [class^="icon-"] {
               @include font-size(18);
               vertical-align: middle;
-              margin-right: $baseline/4;
+              #{$margin-right}: $baseline/4;
 
             }
 

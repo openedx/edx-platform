@@ -5,12 +5,10 @@
 
   .content-primary, .content-supplementary {
     @include box-sizing(border-box);
-    float: left;
   }
 
   .content-primary {
-    width: flex-grid(9, 12);
-    margin-right: flex-gutter();
+    @extend %ui-col-wide;
   }
 
   // checklists - general
@@ -58,15 +56,16 @@
       .checklist-title {
         @include transition(color $tmg-f2 ease-in-out 0s);
         width: flex-grid(6, 9);
-        margin: 0 flex-gutter() 0 0;
-        float: left;
+        margin: 0;
+        #{$margin-right}: flex-gutter();
+        float: flip(left, right);
 
         .ui-toggle-expansion {
           @include transition(all $tmg-f2 ease-in-out 0s);
           @include font-size(21);
           display: inline-block;
           vertical-align: middle;
-          margin-right: ($baseline/2);
+          #{$margin-right}: ($baseline/2);
           color: $gray-l4;
         }
 
@@ -86,9 +85,9 @@
       .checklist-status {
         @extend %t-copy-sub1;
         width: flex-grid(3, 9);
-        float: right;
+        float: flip(right, left);
         margin-top: ($baseline/2);
-        text-align: right;
+        text-align: $right;
         color: $gray-l2;
 
 
@@ -127,7 +126,7 @@
 
       .action-primary {
         @include green-button();
-        float: left;
+        float: flip(left, right);
 
         .icon-add {
           @include font-size(12);
@@ -141,7 +140,7 @@
         @include grey-button();
         @extend %t-action3;
         font-weight: 400;
-        float: right;
+        float: flip(right, left);
 
         .icon-delete {
           @include font-size(12);
@@ -227,14 +226,15 @@
       .task-input {
         display: inline-block;
         vertical-align: text-top;
-        float: left;
-        margin: ($baseline/2) flex-gutter() 0 0;
+        float: flip(left, right);
+        margin-top: ($baseline/2);
+        #{$margin-right}: flex-gutter();
       }
 
       .task-details {
         display: inline-block;
         vertical-align: text-top;
-        float: left;
+        float: flip(left, right);
         width: flex-grid(6,9);
         font-weight: 500;
 
@@ -264,7 +264,7 @@
         @include clearfix();
         display: inline-block;
         vertical-align: middle;
-        float: right;
+        float: flip(right, left);
         width: flex-grid(2,9);
         margin: ($baseline/2) 0 0 flex-gutter();
         opacity: 0.0;
@@ -340,6 +340,6 @@
   }
 
   .content-supplementary {
-    width: flex-grid(3, 12);
+    @extend %ui-col-narrow;
   }
 }

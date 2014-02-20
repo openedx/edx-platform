@@ -17,16 +17,14 @@
 	// basic layout
 	.content-primary, .content-supplementary {
 	  @include box-sizing(border-box);
-	  float: left;
 	}
 
 	.content-primary {
-	  width: flex-grid(9, 12);
-	  margin-right: flex-gutter();
+	  @extend %ui-col-wide;
 	}
 
 	.content-supplementary {
-	  width: flex-grid(3, 12);
+	  @extend %ui-col-narrow;
 	}
 
 	// ====================
@@ -344,7 +342,7 @@
       // course title
       .course-title {
         @extend %t-title4;
-        margin: 0 ($baseline*2) ($baseline/4) 0;
+        margin-bottom: ($baseline/4);
         font-weight: 300;
       }
 

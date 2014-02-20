@@ -1,6 +1,31 @@
 // studio - utilities - mixins and extends
 // ====================
 
+// right to left mixins and variables
+@function flip($value_ltr, $value_rtl) {
+  @if $rtl { @return $value_rtl; }
+  @else { @return $value_ltr; }
+}
+
+$padding-left:    padding-left;
+$padding-right:   padding-right;
+$margin-left:     margin-left;
+$margin-right:    margin-right;
+$border-right:    border-right;
+$left:            left;
+$right:           right;
+
+@if $rtl {
+  $padding-left:  padding-right;
+  $padding-right: padding-left;
+  $margin-left:   margin-right;
+  $margin-right:  margin-left;
+  $border-right:  border-left;
+  $left:          right;
+  $right:         left;
+}
+
+
 // mixins - font sizing
 @mixin font-size($sizeValue: 16){
   font-size: $sizeValue + px;
@@ -86,6 +111,20 @@
   @include box-sizing(border-box);
   width: 100%;
 }
+
+// layout placeholders
+%ui-col-wide  {
+  width: flex-grid(9, 12);
+  #{$margin-right}: flex-gutter();
+  float: flip(left, right);
+}
+
+%ui-col-narrow  {
+  width: flex-grid(3, 12);
+  float: flip(left, right);
+}
+
+
 
 // extends - UI - window
 %ui-window {
