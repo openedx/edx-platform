@@ -4,18 +4,19 @@ Advanced Problems
 =================
 
 Advanced problems are problems such as drag and drop, circuit schematic
-builder, and math expression problems. These problems appear on the
+builder, and math expression problems. Many of these problems appear on the
 Advanced tab when you create a new Problem component. Studio provides
 templates for these problems, but the problems open directly in the
 **Advanced Editor** and have to be created in XML.
 
+-  :ref:`Chemical Equation` In chemical equation problems, students enter text that represents a chemical equation into a text box. 
 -  :ref:`Circuit Schematic Builder` In circuit schematic problems, students
    create and modify circuits on an interactive grid and submit
    computer-generated analyses of the circuits for grading.
 -  :ref:`Custom JavaScript Display and Grading` With custom JavaScript display
    and grading problems, you can incorporate problem types that you've created
    in HTML into Studio via an IFrame.
--  :ref:`Write-Your-Own-Grader` Write-your-own-grader problems
+-  :ref:`Write Your Own Grader` Write-your-own-grader problems
    evaluate students' responses using an embedded Python script that you
    create. These problems can be any type.
 -  :ref:`Drag and Drop` Drag and drop problems require students to drag text
@@ -36,8 +37,104 @@ then click the name of the problem that you want to create.
 
 To add a label for an advanced problem, you'll add a **label** attribute to one of the XML tags for the problem. For more information, see :ref:`Appendix E`.
 
-.. _Circuit Schematic Builder:
+.. _Chemical Equation Input:
 
+Chemical Equation
+-----------------
+
+In chemical equation problems, students enter text that represents a chemical equation into a text box. The LMS converts that text into a chemical equation below the text box.
+
+**Sample Problem**
+
+.. image:: /Images/ChemicalEquationExample.png
+ :alt: Image of a chemical equation problem
+
+**Required Tags**
+
+.. list-table::
+   :widths: 20 80
+
+   * - ``<customresponse>``
+     - Indicates that this problem has a custom response. The ``<customresponse>`` tags must surround the ``<chemicalequation>`` tags.
+   * - ``<chemicalequationinput>``
+     - A child of ``<customresponse>``. Indicates that the answer to this problem is a chemical equation. Must contain the ``size`` and ``label`` attributes.
+   * - ``<answer type=loncapa/python>``
+     - A child of ``<chemicalequationinput>``. Contains the Python script that grades the problem.
+
+Chemical equation problems use MathJax to create formulas. For more information about using MathJax in Studio, see :ref:`MathJax in Studio`.
+
+**Sample Problem XML**:
+
+.. code-block:: xml
+
+  <problem>
+    <startouttext/>
+    <p>Some problems may ask for a particular chemical equation. Practice by writing out the following reaction in the box below.</p>
+    
+  \( \text{H}_2\text{SO}_4 \longrightarrow \text { H}^+ + \text{ HSO}_4^-\)
+
+    <customresponse>
+      <chemicalequationinput size="50" label="Practice by writing out the following reaction in the box below."/>
+      <answer type="loncapa/python">
+
+  if chemcalc.chemical_equations_equal(submission[0], 'H2SO4 -> H^+ + HSO4^-'):
+      correct = ['correct']
+  else:
+      correct = ['incorrect']
+
+      </answer>
+    </customresponse>
+    <p>Some tips:</p>
+    <ul>
+    <li>Use real element symbols.</li>
+    <li>Create subscripts by using plain text.</li>
+    <li>Create superscripts by using a caret (^).</li>
+    <li>Create the reaction arrow (\(\longrightarrow\)) by using "->".</li>
+    </ul>
+
+    <endouttext/>
+  
+   <solution>
+   <div class="detailed-solution">
+   <p>Solution</p>
+   <p>To create this equation, enter the following:</p>
+     <p>H2SO4 -> H^+ + HSO4^-</p>
+   </div>
+   </solution>
+  </problem>
+
+**Problem Template**:
+
+.. code-block:: xml
+
+  <problem>
+    <startouttext/>
+    <p>Problem text</p>
+
+    <customresponse>
+      <chemicalequationinput size="50" label="label text"/>
+      <answer type="loncapa/python">
+
+  if chemcalc.chemical_equations_equal(submission[0], 'TEXT REPRESENTING CHEMICAL EQUATION'):
+      correct = ['correct']
+  else:
+      correct = ['incorrect']
+
+      </answer>
+    </customresponse>
+
+    <endouttext/>
+  
+   <solution>
+   <div class="detailed-solution">
+   <p>Solution or Explanation Header</p>
+   <p>Solution or explanation text</p>
+   </div>
+   </solution>
+  </problem>
+
+
+.. _Circuit Schematic Builder:
 
 Circuit Schematic Builder
 -------------------------
@@ -199,17 +296,13 @@ JavaScript Input Problem Code
 
 
 
-.. _Write-Your-Own-Grader:
+.. _Custom Python Evaluated Input:
 
-Write-Your-Own-Grader ("Custom Python-Evaluated Input")
+Custom Python-Evaluated Input ("Write-Your-Own-Grader")
 -------------------------------------------------------
 
 
-In write-your-own-grader problems (also called "custom Python-evaluated
-input" problems), the grader evaluates a student's response using a
-Python script that you create and embed in the problem. These problems
-can be any type. Numerical input and text input problems are the most
-popular write-your-own-grader.
+In custom Python-evaluated input  (also called "write-your-own-grader problems" problems), the grader evaluates a student's response using a Python script that you create and embed in the problem. These problems can be any type. Numerical input and text input problems are the most popular write-your-own-grader problems.
 
 .. image:: Images/CustomPythonExample.png
  :alt: Image of a write your own grader problem
@@ -229,6 +322,107 @@ To create a write-your-own-grader problem:
 For more information about write-your-own-grader problems, see `CustomResponse XML and Python
 Script <https://edx.readthedocs.org/en/latest/course_data_formats/custom_response.html>`_.
 
+**Sample Problem XML**:
+
+.. code-block:: xml
+
+  <problem>
+  <p>This question has two parts.</p>
+
+  <script type="loncapa/python">
+
+  def test_add(expect, ans):
+      try:
+          a1=int(ans[0])
+          a2=int(ans[1])
+          return (a1+a2) == int(expect)
+      except ValueError:
+          return False
+
+  def test_add_to_ten(expect, ans):
+      return test_add(10, ans)
+
+  </script>
+
+  <p>Part 1: Enter two integers that sum to 10. </p>
+  <customresponse cfn="test_add_to_ten">
+          <textline size="10" correct_answer="3" label="Integer #1"/><br/>
+          <textline size="10" correct_answer="7" label="Integer #2"/>
+  </customresponse>
+
+  <p>Part 2: Enter two integers that sum to 20. </p>
+  <customresponse cfn="test_add" expect="20">
+          <textline size="10" label="Integer #1"/><br/>
+          <textline size="10" label="Integer #2"/>
+  </customresponse>
+
+  <solution>
+      <div class="detailed-solution">
+          <p>Explanation</p>
+          <p>For part 1, any two numbers of the form <i>n</i> and <i>10-n</i>, where <i>n</i> is any integer, will work. One possible answer would be the pair 0 and 10.</p>
+          <p>For part 2, any pair <i>x</i> and <i>20-x</i> will work, where <i>x</i> is any real number with a finite decimal representation. Both inputs have to be entered either in standard decimal notation or in scientific exponential notation. One possible answer would be the pair 0.5 and 19.5. Another way to write this would be 5e-1 and 1.95e1.</p>
+      </div>
+  </solution>
+  </problem>
+
+**Templates**
+
+The following template includes answers that appear when the student clicks **Show Answer**. 
+
+.. code-block:: xml
+
+  <problem>
+
+  <script type="loncapa/python">
+  def test_add(expect,ans):
+    a1=float(ans[0])
+    a2=float(ans[1])
+    return (a1+a2)== float(expect)
+  </script>
+
+
+  <p>Problem text</p>
+  <customresponse cfn="test_add" expect="20">
+          <textline size="10" correct_answer="11" label="Integer #1"/><br/>
+          <textline size="10" correct_answer="9" label="Integer #2"/>
+  </customresponse>
+
+      <solution>
+          <div class="detailed-solution">
+            <p>Solution or Explanation Heading</p>
+            <p>Solution or explanation text</p>
+          </div>
+      </solution>
+  </problem>
+
+The following template does not return answers when the student clicks **Show Answer**. If your problem doesn't include answers for the student to see, make sure to set **Show Answer** to **Never** in the problem component.
+
+.. code-block:: xml
+
+  <problem>
+
+  <script type="loncapa/python">
+  def test_add(expect,ans):
+    a1=float(ans[0])
+    a2=float(ans[1])
+    return (a1+a2)== float(expect)
+  </script>
+
+
+  <p>Enter two real numbers that sum to 20: </p>
+  <customresponse cfn="test_add" expect="20">
+          <textline size="10"  label="Integer #1"/><br/>
+          <textline size="10"  label="Integer #2"/>
+  </customresponse>
+
+      <solution>
+          <div class="detailed-solution">
+            <p>Solution or Explanation Heading</p>
+            <p>Solution or explanation text</p>
+          </div>
+      </solution>
+  </problem>
+
 .. _Drag and Drop:
 
 Drag and Drop
@@ -237,7 +431,7 @@ Drag and Drop
 In drag and drop problems, students respond to a question by dragging
 text or objects to a specific location on an image.
 
-.. image:: Images/DragAndDropExample.gif
+.. image:: Images/DragAndDropProblem.png
  :alt: Image of a drag and drop problem
 
 Create a Drag and Drop Problem

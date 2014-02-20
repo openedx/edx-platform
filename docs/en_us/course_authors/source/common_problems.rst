@@ -30,7 +30,58 @@ Types** tab, and then click the name of the problem. (Note that
 **Checkbox** doesn't appear in the list of common problem types. To
 create a checkbox problem, you'll click **Blank Common Problem**.)
 
-To add labels to these problems, enclose the text that you want to use as a label in two sets of angle brackets (<<>>).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+To add labels to these problems, enclose the text that you want to use as a label in two sets of angle brackets (<<>>)
+
+
+
+Just in case you want to see the XML, we've provided it
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 .. _Checkbox:
 
@@ -76,7 +127,7 @@ Create a Checkbox Problem
 For the example problem above, the text in the Problem component is the
 following.
 
-::
+.. code-block:: xml
 
     Learning about the benefits of preventative healthcare can be particularly 
     difficult. >>Check all of the reasons below why this may be the case.<<
@@ -96,6 +147,72 @@ following.
     have no effect. Consequently, he or she would tend to believe that immunization 
     (or other preventative measures) have fewer benefits than they actually do.
     [explanation]
+
+==========================
+Checkbox Problem XML
+==========================
+
+.. code-block:: xml
+
+  <problem>
+  <startouttext/>
+    <p>Learning about the benefits of preventative healthcare can be particularly
+     difficult. Check all of the reasons below why this may be the case.</p>
+
+  <choiceresponse>
+    <checkboxgroup direction="vertical" label="Check all of the reasons below why this may be the case">
+      <choice correct="true"><text>A large amount of time passes between undertaking
+      a preventative measure and seeing the result.</text></choice>
+      <choice correct="false"><text>Non-immunized people will always fall sick.</text>
+      </choice>
+      <choice correct="true"><text>If others are immunized, fewer people will fall 
+      sick regardless of a particular individual's choice to get immunized or not.
+      </text></choice>
+      <choice correct="true"><text>Trust in healthcare professionals and government 
+      officials is fragile.</text></choice>
+    </checkboxgroup>
+
+   <solution>
+   <div class="detailed-solution">
+   <p>Explanation</p>
+   <p>People who are not immunized against a disease may still not fall sick from the 
+   disease. If someone is trying to learn whether or not preventative measures 
+   against the disease have any impact, he or she may see these people and conclude, 
+   since they have remained healthy despite not being immunized, that immunizations 
+   have no effect. Consequently, he or she would tend to believe that immunization 
+   (or other preventative measures) have fewer benefits than they actually do.</p>
+   </div>
+   </solution>
+  </choiceresponse>
+  </problem>
+
+
+=============================
+Checkbox Problem XML Template
+=============================
+
+.. code-block:: xml
+
+  <problem>
+  <startouttext/>
+    <p>Question text</p>
+
+  <choiceresponse>
+
+  <checkboxgroup direction="vertical" label="label text">
+  <choice correct="false"><text>Answer option 1 (incorrect)</text></choice>
+  <choice correct="true"><text>Answer option 2 (correct)</text></choice>
+  </checkboxgroup>
+
+   <solution>
+   <div class="detailed-solution">
+   <p>Solution or Explanation Heading</p>
+   <p>Solution or explanation text</p>
+   </div>
+   </solution>
+
+  </choiceresponse>
+  </problem>
 
 
 .. _Dropdown:
@@ -157,6 +274,12 @@ following.
     [[Nominal, (Discrete), Continuous]]
     Life stage - infant, child, and adult:
     [[(Nominal), Discrete, Continuous]]
+
+==========================
+Dropdown Problem XML
+==========================
+
+
 
 
 .. _Multiple Choice:
