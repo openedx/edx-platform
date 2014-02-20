@@ -21,7 +21,7 @@ These are properties and methods available on ``self.runtime`` when a view or ha
   that the block is being executed in. The same student in two different courses
   will have two different ids.
 
-* publish(event): Emit events to the surrounding system. Events are dictionaries with
+* publish(block,event): Emit events to the surrounding system. Events are dictionaries with
   at least the key 'event_type', which identifies the other fields.
 
   TODO: Link to the authoritive list of event types.
