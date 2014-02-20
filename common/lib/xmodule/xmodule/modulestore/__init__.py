@@ -261,6 +261,24 @@ class Location(_LocationBase):
 
         return "/".join([self.org, self.course, self.name])
 
+    COURSE_ID_RE = re.compile("""
+        (?P<org>[^/]+)/
+        (?P<course>[^/]+)/
+        (?P<name>.*)
+        """, re.VERBOSE)
+
+    @staticmethod
+    def parse_course_id(course_id):
+        """
+        Given a org/course/name course_id, return a dict of {"org": org, "course": course, "name": name}
+
+        If the course_id is not of the right format, raise ValueError
+        """
+        match = Location.COURSE_ID_RE.match(course_id)
+        if match is None:
+            raise ValueError("{} is not of form ORG/COURSE/NAME".format(course_id))
+        return match.groupdict()
+
     def _replace(self, **kwargs):
         """
         Return a new :class:`Location` with values replaced

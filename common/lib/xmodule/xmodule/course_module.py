@@ -802,8 +802,10 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         '''Convert the given course_id (org/course/name) to a location object.
         Throws ValueError if course_id is of the wrong format.
         '''
-        org, course, name = course_id.split('/')
-        return Location('i4x', org, course, 'course', name)
+        course_id_dict = Location.parse_course_id(course_id)
+        course_id_dict['tag'] = 'i4x'
+        course_id_dict['category'] = 'course'
+        return Location(course_id_dict)
 
     @staticmethod
     def location_to_id(location):

@@ -557,9 +557,11 @@ class MongoModuleStore(ModuleStoreWriteBase):
         """
         Get the course with the given courseid (org/course/run)
         """
-        id_components = course_id.split('/')
+        id_components = Location.parse_course_id(course_id)
+        id_components['tag'] = 'i4x'
+        id_components['category'] = 'course'
         try:
-            return self.get_item(Location('i4x', id_components[0], id_components[1], 'course', id_components[2]))
+            return self.get_item(Location(id_components))
         except ItemNotFoundError:
             return None
 

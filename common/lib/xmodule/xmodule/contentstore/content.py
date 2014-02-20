@@ -117,11 +117,11 @@ class StaticContent(object):
         Returns a path to a piece of static content when we are provided with a filepath and
         a course_id
         """
-        org, course_num, __ = course_id.split("/")
 
         # Generate url of urlparse.path component
         scheme, netloc, orig_path, params, query, fragment = urlparse(path)
-        loc = StaticContent.compute_location(org, course_num, orig_path)
+        course_id_dict = Location.parse_course_id(course_id)
+        loc = StaticContent.compute_location(course_id_dict['org'], course_id_dict['course'], orig_path)
         loc_url = StaticContent.get_url_path_from_location(loc)
 
         # Reconstruct with new path

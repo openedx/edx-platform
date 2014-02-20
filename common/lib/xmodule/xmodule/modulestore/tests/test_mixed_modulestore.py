@@ -78,8 +78,11 @@ class TestMixedModuleStore(object):
             tz_aware=True,
         )
         cls.connection.drop_database(DB)
-        cls.fake_location = Location(['i4x', 'foo', 'bar', 'vertical', 'baz'])
-        cls.import_org, cls.import_course, cls.import_run = IMPORT_COURSEID.split('/')
+        cls.fake_location = Location('i4x', 'foo', 'bar', 'vertical', 'baz')
+        import_course_dict = Location.parse_course_id(IMPORT_COURSEID)
+        cls.import_org = import_course_dict['org']
+        cls.import_course = import_course_dict['course']
+        cls.import_run = import_course_dict['name']
         # NOTE: Creating a single db for all the tests to save time.  This
         # is ok only as long as none of the tests modify the db.
         # If (when!) that changes, need to either reload the db, or load
