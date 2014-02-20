@@ -150,7 +150,7 @@ class CourseUpdateTest(CourseTestCase):
 
     def test_post_course_update(self):
         """
-        Test posting a course update through api on a newly created course updates location map with course_updates
+        Test that a user can successfully post on course updates of a course whose location in not in loc_mapper
         """
         # create a course via the view handler
         course_location = Location(['i4x', 'Org_1', 'Course_1', 'course', 'Run_1'])
@@ -174,7 +174,6 @@ class CourseUpdateTest(CourseTestCase):
             package_id=course_location.course_id.replace('/', '.'), branch=branch, version_guid=version, block_id=block
         )
 
-        # test that user can successfully post on course updates whose location in not added in loc_mapper
         content = u"Sample update"
         payload = {'content': content, 'date': 'January 8, 2013'}
         course_update_url = updates_locator.url_reverse('course_info_update')
@@ -185,3 +184,9 @@ class CourseUpdateTest(CourseTestCase):
 
         payload = json.loads(resp.content)
         self.assertHTMLEqual(payload['content'], content)
+
+        # now test that calling translate_location returns a locator whose block_id is 'updates'
+        updates_location = course_location.replace(category='course_info', name=block)
+        updates_locator = loc_mapper().translate_location(course_location.course_id, updates_location)
+        self.assertTrue(isinstance(updates_locator, BlockUsageLocator))
+        self.assertEqual(updates_locator.block_id, block)
