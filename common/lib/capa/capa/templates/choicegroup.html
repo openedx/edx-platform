@@ -1,16 +1,28 @@
+<%
+    fieldset_width = 775
+    fieldset_message_width = 0
+    if (not msg is UNDEFINED) and (len(msg) > 0):
+        fieldset_width = 480
+        fieldset_message_width = 295
+
+%>
 <form class="choicegroup capa_inputtype" id="inputtype_${id}">
     <style>
         #fieldset_container_${id} {
             margin: 0 auto;
             overflow: hidden;
             position: relative;
+            height: 100;
             width: 100%;
         }
 
         #fieldset_${id} {
             float: left;
             margin: 0 auto;
-            width: 50%;
+            word-wrap: normal;
+            height: 100%;
+            width:${fieldset_width}px;
+
 
         }
 
@@ -19,12 +31,12 @@
             color: #FFFFFF;
             font-family: arial;
             float: right;
-            height: 100%;
-            margin: 0 auto;
+            height: 250px;
+            margin: 5 auto;
             padding: 10px;
             position: absolute;
             right: 0;
-            width: 50%;
+            width:${fieldset_message_width}px;
         }
 
         #fieldset_message_title_${id} {
