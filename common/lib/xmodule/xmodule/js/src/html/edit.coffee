@@ -28,11 +28,9 @@ class @HTMLEditingDescriptor
       convert_urls : false,
       # TODO: we should share this CSS with studio (and LMS)
       content_css : "#{baseUrl}/css/tiny-mce.css",
-      # The default popup_css path uses an absolute path referencing page in which tinyMCE is being hosted.
-      # Supply the correct relative path instead.
-      popup_css: "#{baseUrl}/js/vendor/tiny_mce/themes/advanced/skins/default/dialog.css",
       formats : {
         # Disable h4, h5, and h6 styles as we don't have CSS for them.
+        # TODO: this doesn't seem to be working with the upgrade.
         h4: {},
         h5: {},
         h6: {},
@@ -41,13 +39,13 @@ class @HTMLEditingDescriptor
       },
       # Disable visual aid on borderless table.
       visual:false,
+      plugins: "textcolor, link, image",
       # We may want to add "styleselect" when we collect all styles used throughout the LMS
-      toolbar : "formatselect,fontselect,bold,italic,underline,forecolor,|,bullist,numlist,outdent,indent,|,link,unlink,image,|,blockquote,wrapAsCode,",
-      theme_advanced_toolbar_location : "top",
-      theme_advanced_toolbar_align : "left",
-      theme_advanced_statusbar_location : "none",
-      theme_advanced_resizing : true,
-      theme_advanced_blockformats : "p,pre,h1,h2,h3",
+      # Can have a single toolbar by just specifying "toolbar". Splitting for now so all are visible.
+      toolbar1 : "formatselect fontselect bold italic underline forecolor",
+      toolbar2 : "bullist numlist outdent indent | blockquote wrapAsCode | link unlink | image",
+      # TODO: i18n
+      block_formats : "Paragraph=p;Preformatted=pre;Heading 1=h1;Heading 2=h2;Heading 3=h3",
       width: '100%',
       height: '400px',
       menubar: false,
