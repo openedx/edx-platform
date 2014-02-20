@@ -4,7 +4,7 @@ Unit page in Studio
 
 from bok_choy.page_object import PageObject
 from bok_choy.query import SubQuery
-from bok_choy.promise import EmptyPromise, fulfill
+from bok_choy.promise import Promise, EmptyPromise, fulfill
 
 from . import BASE_URL
 
@@ -27,12 +27,17 @@ class UnitPage(PageObject):
         return self.is_css_present('body.view-unit')
 
     def component(self, title):
-        return Component(
-            self.browser,
-            self.q(css=Component.BODY_SELECTOR).filter(
+        return Component(self.browser, self._locator(title))
+
+    def _locator(self, title):
+        def _check_func():
+            locators = self.q(css=Component.BODY_SELECTOR).filter(
                 SubQuery(css=Component.NAME_SELECTOR).filter(text=title)
-            )[0]['data-locator']
-        )
+            ).map(lambda el: el['data-locator']).results
+
+            return (len(locators) > 0, locators[0])
+
+        return fulfill(Promise(_check_func, "Found data locator for component"))
 
 
 class Component(PageObject):
