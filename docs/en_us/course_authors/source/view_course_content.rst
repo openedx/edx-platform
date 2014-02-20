@@ -13,6 +13,8 @@ From within Studio, you can test your course in two ways:
 * :ref:`Preview Your Course`
 * :ref:`View Your Live Course`
 
+For information about setting up a beta test for your course, see :ref:`Beta_Testing`.
+
 .. _Preview Your Course:
 
 ***********************
@@ -32,9 +34,9 @@ You can enter Preview mode in two ways.
  
 * On any subsection page, click **Preview Drafts**.
 
-.. image:: Images/preview_draft.png
-  :width: 800
-  :alt: Image of a subsection with the Preview Drafts button circled
+  .. image:: Images/preview_draft.png
+   :width: 800
+   :alt: Image of a subsection with the Preview Drafts button circled
  
 * On any Unit page, click **Preview**.
  
@@ -59,11 +61,13 @@ You can enter Preview mode in two ways.
 View Your Live Course
 ***********************
 
-When you view your course as an staff member (that is, using the same account you use to build the course in Studio),
+When you view your course as a course team member (that is, using the same account you use to build the course in Studio),
 you see all the units of your course that are set to **Public**, regardless of the release dates of the containing section or subsection.
  
 You do not see units that are set to **Private**. To see Private units, you must use Preview mode as described above.
  
+When you view your live course, you can execute tests to make sure your course works the way you intend. For example, the course team can work through all of the problems to verify that the correct answer gets a green check for correct, and that any answer other than the correct one gets a red X for incorrect. 
+
 You can view the live course from three different places in Studio:
  
 * The **Course Outline** page.

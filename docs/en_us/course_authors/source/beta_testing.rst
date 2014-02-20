@@ -4,52 +4,205 @@
 Beta Testing a Course
 #############################
 
-Let's add beta testers to the current section on Testing Your Course. The first step is viewing live (already covered), but the real testing of your course is done by going through it as a student, doing the work, and making sure everything works as it should. 
+When a course is being designed in Studio, the course team can choose **View Live** to assess progress, find problems, and mimic the student experience. A more thorough test is done by giving early access to the course to beta testers who interact with the course exactly as students will. Beta testers are not members of the course team or staff. They are enrolled as students, but see the course materials before enrolled students do. 
 
+Beta testers identify issues, find bugs, and experience errors before enrolled students do. To help you make sure that everything works as it should, they use their own computers and internet connections to view videos, follow links, and complete problems. 
 
+* :ref:`Beta_Process`
+* :ref:`Qualities_Testers`
+* :ref:`What_Test`
+* :ref:`How_Testers_See_Course`
+* :ref:`Add_Testers`
+* :ref:`Issue_Reporting_During_Course`
 
-Beta testers get early access to the course and can go through the course ahead of time to make sure everything works as it should before it goes live. Beta testing catches issues, bugs, or errors before students in the world-wide course do. It's very valuable and highly recommended for all courses.
+.. _Beta_Process:
 
+******************************************
+The Beta Testing Process
+******************************************
 
-Note that beta testers see the entire course as students would see it, only earlier. All of the content that is set to public will be visible. Anything still in draft or set to private will NOT be visible to beta testers.
+During a beta test, you gather information about the experience of taking your course in an effort to improve its quality. The phases of the beta testing process, and some questions that you may find useful to consider as you prepare for each phase, follow.
 
-*********************************
-Select the beta testers
-*********************************
+#. **Planning**: What are the objectives? What is the schedule for testing? 
 
-Ideal beta testers are 1) at least one person who knows the content well enough to recognize something wrong or missing and 2) at least one person someone less familiar with the content to be able to notice something that's not clear. Both should have a list of all correct answers for all problems.
+#. **Recruitment**: How many testers do you need? How much time do you expect testers to spend? When do you need them to complete their feedback? 
 
-* Beta Testers can view the course before the Course Start Date. 
+#. **Provide access to your course**: Can testers access your entire course immediately, or are its sections and subsections available at different times? How will that affect the schedule?
 
+#. **Collect feedback**: How do you want testers to provide feedback? Who checks for feedback, and how often?  
 
-*********************************
-Add the beta testers
-*********************************
+#. **Evaluate feedback**: How is feedback evaluated? Who decides what changes to make as a result, and on what schedule?
 
-Only course staff can add beta testers.
-Basic outline for setting up beta testers:
-1. In advanced settings, set days_early to the number of days before launch you would like the course to be accessible to beta testers.
-2. To enroll beta testers in the course, they must first be registered for the course. There are a couple of options, depending on whether they've registered.
-a) Not registered? Not sure? Manually enroll usernames or emails from the instructor dashboard (enrollment) and check send link, then go to (manage groups) and add beta testers using same usernames or emails.  
-b) Already registered for the course? Just add a beta tester (instructor dashboard > manage groups) with the same username or email associated with their edX account.
+#. **Conclusion**: How do you acknowledge the efforts of your testers? What do you share with them about the results of their efforts? 
 
-While still in manage groups, verify your beta testers by clicking List Beta Testers.
+.. _Qualities_Testers:
 
-NOTE: Course staff as beta testers must add themselves as beta testers using a different username or email than the one associated with their course staff role. When beta testing, log in using the beta tester account.
+***************************************
+Qualities of Good Beta Testers
+***************************************
 
-3) Once a beta tester is registered for the course and added as a beta tester, they will see the course on their dashboard and the Access Courseware button will appear. 
+A beta test is valuable in part because it is unscripted. Your beta testers are not following a predetermined series of steps, or using a particular computer environment, when they access your course. When you recruit your beta testers, however, you may find these skills and characteristics to be helpful.
 
-4) Go to course and start testing! 
+* Curiosity.
+
+* Attention to detail for identifying problems and inconsistencies.
+
+* Solid communication skills for reporting problems to course staff. 
+
+Your beta testers should also have varying levels of knowledge about the course content:
+
+* To recognize when material is wrong or missing, at least one tester should know the content well.
+
+* To identify material that is unclear, at least one tester should be less familiar with the content. 
+
+Depending on the objectives you set for your beta test, you may want to consider recruiting testers who use assistive technologies, who have different native languages, or who have varying levels of familiarity with computer software.
+
+=========================================
+Using Course Staff as Beta Testers 
+=========================================
+
+Course staff can provide valuable feedback about your course. However, they are typically stakeholders in the success of your course and have a significant amount of knowledge about it. As a result, they can be too close to the course to interact with it in the same way as students will. They can also be either reluctant to provide feedback, or overly zealous.
+
+If you do want a staff member to be a beta tester, a different, second email address must be used for this additional role. The privileges of the course staff role override those of a beta tester, so a second registration on the site, activation, and enrollment in the course are necessary using this second email address. The staff member must log in using the second email address (with the beta tester role) to test the course as a student.
+
+.. _What_Test:
 
 *********************************
 What to Test
 *********************************
 
-Test everything in the course: 
+Beta testers should interact with everything in the course. 
 
-all links, watch all videos, click video/transcript download links, and do all problems. Make sure everything works as it should, that the correct answer for assignments gets a green check for correct, and non-correct answers (anything other than the correct answer) gets a red X for incorrect. 
+* Click all links.
 
-Log any issues, changes, errors, or questions for the course team.
+* Watch all videos.
 
+* Download video transcripts and other files.
 
+* Complete all problems. 
+
+As they work, beta testers log issues, changes, errors, and questions for the course team.
+
+**Note**: Beta testers can make discussion posts and wiki contributions. You may want to ask your testers not to make posts or contributions about unreleased courseware, and alert your discussion administration team to watch for posts from the beta testers.
+
+.. _How_Testers_See_Course:
+
+******************************************
+How Beta Testers See Course Content
+******************************************
+
+To beta test a course, you: 
+
+* Define a number of days before section and subsection release days for testing to begin.
+
+* Identify beta testers.
+
+Designated beta testers see course content before students can. Beta testers access courseware: 
+
++-------------------------------------------+------+------+
+|                                           | Yes  |  No  |
++===========================================+======+======+
+| Before the Course Enrollment Date         |  X   |      |
++-------------------------------------------+------+------+
+| Before the Course Start Date              |  X   |      |
++-------------------------------------------+------+------+
+| Before the section Release Day            |  X   |      |
++-------------------------------------------+------+------+
+| Before the subsection Release Day         |  X   |      |
++-------------------------------------------+------+------+
+| Before the unit is Public                 |      |   X  |
++-------------------------------------------+------+------+
+| Before a draft replaces a live unit       |      |   X  |
++-------------------------------------------+------+------+
+
+The course team can continue to add content in Studio after the beta test begins. When new content is ready for testing, be sure to change the **Visibility** setting for any units that are Private to Public. See :ref:`Units` or :ref:`Publishing Your Course`.
+
+================================
+Define When the Beta Test Starts
+================================
+
+To define the start of the beta test, you use Studio to specify a number of days before the **Release Day** of each section and subsection in your course. 
+
+#. In Studio, select **Settings** > **Advanced Settings**.
+
+#. Scroll down to the ``days_early_for_beta`` **Policy Key**.
+
+#. Set the **Policy Value** to a number of days before section and subsection **Release Day**s. 
+
+#. Click **Save Changes**.
+
+===========
+Example
+===========
+
+Beta tester access to courseware for a course with ``days_early_for_beta`` = 20 and 2 sections:
+
++------------------------------------------------+--------------------------------------------------+
+| Course Enrollment Date = 31 August             | 31 August; earlier if enrolled by course staff   |
++------------------------------------------------+--------------------------------------------------+
+| Course Start Date = 15 September               | 26 August                                        |
++------------------------------------------------+--------------------------------------------------+
+| section 1 Release Day = 15 September           | 26 August                                        | 
++------------------------------------------------+--------------------------------------------------+
+| section 2 Release Day = 22 September           | 2 September                                      |
++------------------------------------------------+--------------------------------------------------+
+| subsection 1 Release Day = 22 September        | 2 September                                      |
++------------------------------------------------+--------------------------------------------------+
+| subsection 2 Release Day = 24 September        | 4 September                                      |
++------------------------------------------------+--------------------------------------------------+
+| subsection 2, unit 1 Visibility = Public       | 4 September                                      |
++------------------------------------------------+--------------------------------------------------+
+| subsection 2, unit 2 Visibility = Public;      | 4 September for Public version;                  |
+| draft in progress                              | No access to draft                               |
++------------------------------------------------+--------------------------------------------------+
+| subsection 2, unit 3 Visibility = Private      | No access                                        |
++------------------------------------------------+--------------------------------------------------+
+
+In this example, the beta testers cannot access all of the courseware when the beta test starts on 26 August: they can access section 1 but not section 2. You may want to provide a schedule of section availability to your testers so that they can plan their time appropriately. Future release dates do not display to the beta testers in the courseware.
+
+.. _Add_Testers:
+
+*********************************
+Add the Beta Testers
+*********************************
+
+Before you can add beta testers:
+
+* You need the email address of each beta tester. 
+
+* Each beta tester must register a user account for that email address, activate the account, and be enrolled in your course. 
+
+**Note**: If the beta test starts before the **Enrollment Start Date**, testers cannot enroll themselves. To streamline this process, ask the beta testers to register and activate their accounts. Then, you can enroll the beta testers and select the **Auto Enroll** and **Notify students by email** options. See :ref:`Enrollment`.
+
+To add a beta tester:
+
+#. View the live version of your course.
+
+#. Click **Instructor** then **Try New Beta Dashboard**.
+
+#. Click **Membership**.
+
+#. In the Administration List Management section, use the drop-down list to select **Beta Testers**.
+
+#. Under the list of users who currently have that role, enter an email address and click **Add Beta Tester**.
+
+  * If you add beta testers after the defined start of the beta test, they see your course on their dashboards when they log in. 
+
+  * If you add beta testers before the test starts, they do not see your course. You may need to remind them when the test begins. 
+
+To remove the Beta Testers role, view the list of beta testers and then click revoke access (the **X**) next to that email address. 
+
+.. _Issue_Reporting_During_Course:
+
+*********************************
+Issue Reporting During a Course
+*********************************
+
+Despite the efforts of the course team and the beta testers, additional problems, questions, and issues can occur while a course is running. 
+
+* Often, students report issues by asking questions in a discussion. Your discussion administration team can watch for posts that indicate problems.
+
+* To let students know the best way to report problems, you can use the Course Info page or a discussion post. 
+
+.. per Mark 19 Feb 14: eventually we want to provide more guidance for students:  course issues, use discussions, platform issues submit issue to edx.
 
