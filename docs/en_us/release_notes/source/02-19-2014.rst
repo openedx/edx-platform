@@ -31,6 +31,8 @@ edX Studio
 
 * A problem with importing a course that has conditionals into a course of a different name is now fixed. (STUD-149)
 
+* Previously, when you canceled changes in a component, then reopened the component, your changes were still present. This problem is resolved.  When you now click **Cancel** in a component, your changes since the last save are properly discarded. (STUD-235)
+
 * A problem with changing a unit from Public to Private, which caused the error message "Studio's having trouble saving your work. The studio servers encountered an error" is fixed. (STUD-1316) 
 
 * The workflows for adding Latex HTML components and problems written in Latex are changed. You can no longer upload Latex files directly from the unit page.  See the following sections in documentation for more information:  `Import LaTeX Code into an HTML Component <http://edx.readthedocs.org/projects/ca/en/latest/create_html_component.html#import-latex-code>`_ and `Problem Written in LaTeX <http://edx.readthedocs.org/projects/ca/en/latest/advanced_problems.html#problem-written-in-latex>`_.
