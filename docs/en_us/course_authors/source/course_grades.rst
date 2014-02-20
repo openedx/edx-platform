@@ -201,7 +201,7 @@ To find the unique identifier in the URL for a problem:
 
 #. To copy the identifier that is assigned to the problem, select it, right click, and choose **Copy**.
 
-   **Note:** If the URL does not include "problem/" before the identifer, you will need to specify that module identifier as well. Select and copy both the module identifer and the problem identifier.
+   .. note:: If the URL does not include "problem/" before the identifer, you will need to specify that module identifier as well. Select and copy both the module identifer and the problem identifier.
 
    To close the Staff Debug viewer, click on the browser page outside of the viewer.
 
