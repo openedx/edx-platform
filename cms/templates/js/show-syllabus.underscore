@@ -1,0 +1,49 @@
+ <div class="view-syllabus">
+
+<div class="wrap-syllabus">
+    <header>
+        <h3 class="syllabus-title"><%= name %></h3>
+    </header>
+
+<% if(topics.length > 1) {%>
+    <p><a href="#" class="topic-toggle
+        <% if(showTopics){ print('hide'); } else { print('show'); } %>-topics">
+        <i class="ui-toggle-expansion icon-caret-<% if(showTopics){ print('down'); } else { print('right'); } %>"></i>
+        <%= topics.length %> Topics
+    </a></p>
+<% } else if(topics.length === 1) { %>
+    <p>
+        <%= topics.at(0).get("description") %>
+    </p>
+<% } %>
+
+
+<% if(showTopics) { %>
+<ol class="topics">
+  <% topics.each(function(topic) { %>
+    <li class="topic">
+        <span class="topic-name"><%= topic.get('name') %></span>
+        <span class="topic-description"><%= topic.get('description') %></span>
+    </li>
+  <% }) %>
+</ol>
+<% } %>
+
+</div>
+
+
+<ul  class="actions syllabus-actions">
+    <li class="action action-view">
+        <a href="//<%= CMS.URL.LMS_BASE %>/courses/<%= course.org %>/<%= course.num %>/<%= course.url_name %>/pdfbook/<%= bookindex %>/" class="view"><%= gettext("View Live") %></a>
+    </li>
+    <li class="action action-edit">
+        <button class="edit"><%= gettext("Edit") %></button>
+    </li>
+    <li class="action action-delete">
+        <button class="delete action-icon"><i class="icon-trash"></i><span><%= gettext("Delete") %></span></button>
+    </li>
+</ul>
+
+
+
+</div>

@@ -21,6 +21,7 @@ from collections import defaultdict
 
 from django.conf import settings
 from django.contrib.auth.models import User
+from cities.models import City
 from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.db import models, IntegrityError
 from django.db.models import Count
@@ -33,6 +34,7 @@ from django_countries import CountryField
 from track import contexts
 from track.views import server_track
 from eventtracking import tracker
+from django.utils.translation import ugettext as _
 
 from course_modes.models import CourseMode
 import lms.lib.comment_client as cc
@@ -187,9 +189,9 @@ class UserProfile(models.Model):
 
     # Optional demographic data we started capturing from Fall 2012
     this_year = datetime.now(UTC).year
-    VALID_YEARS = range(this_year, this_year - 120, -1)
+    VALID_YEARS = range((this_year-settings.DELTA_YEAR), this_year - settings.MAX_YEAR_ALLOWED, -1)
     year_of_birth = models.IntegerField(blank=True, null=True, db_index=True)
-    GENDER_CHOICES = (('m', 'Male'), ('f', 'Female'), ('o', 'Other'))
+    GENDER_CHOICES = (('m', _('Male')), ('f', _('Female')), ('o', _('Other')))
     gender = models.CharField(
         blank=True, null=True, max_length=6, db_index=True, choices=GENDER_CHOICES
     )
@@ -199,15 +201,15 @@ class UserProfile(models.Model):
     # ('p_se', 'Doctorate in science or engineering'),
     # ('p_oth', 'Doctorate in another field'),
     LEVEL_OF_EDUCATION_CHOICES = (
-        ('p', 'Doctorate'),
-        ('m', "Master's or professional degree"),
-        ('b', "Bachelor's degree"),
-        ('a', "Associate's degree"),
-        ('hs', "Secondary/high school"),
-        ('jhs', "Junior secondary/junior high/middle school"),
-        ('el', "Elementary/primary school"),
-        ('none', "None"),
-        ('other', "Other")
+        ('p', _('Doctorate')),
+        ('m', _("Master's or professional degree")),
+        ('b', _("Bachelor's degree")),
+        ('a', _("Associate's degree")),
+        ('hs', _("Secondary/high school")),
+        ('jhs', _("Junior secondary/junior high/middle school")),
+        ('el', _("Elementary/primary school")),
+        ('none', _("None")),
+        ('other', _("Other"))
     )
     level_of_education = models.CharField(
         blank=True, null=True, max_length=6, db_index=True,
@@ -218,6 +220,9 @@ class UserProfile(models.Model):
     country = CountryField(blank=True, null=True)
     goals = models.TextField(blank=True, null=True)
     allow_certificate = models.BooleanField(default=1)
+    #EVEX fields
+    cedula = models.CharField(max_length=32, blank=True, null=True)
+    city = models.ForeignKey(City, default=None, blank=True, null=True)
 
     def get_meta(self):
         js_str = self.meta
@@ -399,7 +404,7 @@ class CourseEnrollment(models.Model):
                attribute), this method will automatically save it before
                adding an enrollment for it.
 
-        `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall)
+        `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall")
 
         It is expected that this method is called from a method which has already
         verified the user authentication and access.
@@ -508,7 +513,7 @@ class CourseEnrollment(models.Model):
                attribute), this method will automatically save it before
                adding an enrollment for it.
 
-        `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall)
+        `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall")
 
         `mode` is a string specifying what kind of enrollment this is. The
                default is "honor", meaning honor certificate. Future options
@@ -536,7 +541,7 @@ class CourseEnrollment(models.Model):
 
         `email` Email address of the User to add to enroll in the course.
 
-        `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall)
+        `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall")
 
         `mode` is a string specifying what kind of enrollment this is. The
                default is "honor", meaning honor certificate. Future options
@@ -570,7 +575,7 @@ class CourseEnrollment(models.Model):
                attribute), this method will automatically save it before
                adding an enrollment for it.
 
-        `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall)
+        `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall")
         """
         try:
             record = CourseEnrollment.objects.get(user=user, course_id=course_id)
@@ -588,7 +593,7 @@ class CourseEnrollment(models.Model):
 
         `email` Email address of the User to unenroll from the course.
 
-        `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall)
+        `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall")
         """
         try:
             user = User.objects.get(email=email)
@@ -607,7 +612,7 @@ class CourseEnrollment(models.Model):
                attribute), this method will automatically save it before
                adding an enrollment for it.
 
-        `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall)
+        `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall")
         """
         try:
             record = CourseEnrollment.objects.get(user=user, course_id=course_id)
@@ -646,7 +651,7 @@ class CourseEnrollment(models.Model):
         Returns the enrollment mode for the given user for the given course
 
         `user` is a Django User object
-        `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall)
+        `course_id` is our usual course_id string (e.g. "edX/Test101/2013_Fall")
         """
         try:
             record = CourseEnrollment.objects.get(user=user, course_id=course_id)

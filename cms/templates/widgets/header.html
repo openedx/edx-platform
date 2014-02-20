@@ -21,6 +21,7 @@
             course_team_url = location.url_reverse('course_team')
             assets_url = location.url_reverse('assets')
             textbooks_url = location.url_reverse('textbooks')
+            syllabus_url = location.url_reverse('syllabuses')
             import_url = location.url_reverse('import')
             course_info_url = location.url_reverse('course_info')
             export_url = location.url_reverse('export')
@@ -46,6 +47,9 @@
             <div class="wrapper wrapper-nav-sub">
               <div class="nav-sub">
                 <ul>
+                  <li class="nav-item nav-course-courseware-updates">
+                    <a href="${syllabus_url}">${_("Syllabus")}</a>
+                  </li>
                   <li class="nav-item nav-course-courseware-outline">
                     <a href="${index_url}">${_("Outline")}</a>
                   </li>

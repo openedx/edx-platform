@@ -10,7 +10,10 @@
 
 <%block name="jsextra">
   <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
-
+  <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/tinymce/skins/lightgray/content.min.css')}" />
+  <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/tinymce/skins/lightgray/skin.min.css')}" />
+  <script type="text/javascript" src="${static.url("js/vendor/tinymce/langs/es.js")}"></script>
+  <script type="text/javascript" src="${static.url("js/vendor/tinymce/plugins/table/plugin.min.js")}"></script>
   <script type="text/template" id="upload-dialog-tpl">
     <%static:include path="js/upload-dialog.underscore" />
   </script>
@@ -37,10 +40,11 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
             model: model
         });
         editor.render();
-      },
+       },
       reset: true
     });
 });
+
   </script>
 </%block>
 
@@ -209,14 +213,8 @@ require(["domReady!", "jquery", "js/models/settings/course_details", "js/views/s
                 % if about_page_editable:
                 <li class="field text" id="field-course-overview">
                   <label for="course-overview">${_("Course Overview")}</label>
-                  <textarea class="tinymce text-editor" id="course-overview"></textarea>
-                  <%def name='overview_text()'><%
-                    a_link_start = '<a class="link-courseURL" rel="external" href="'
-                    a_link_end = '">' + _("your course summary page") + '</a>'
-                    a_link = a_link_start + lms_link_for_about_page + a_link_end
-                    text = _("Introductions, prerequisites, FAQs that are used on %s (formatted in HTML)") % a_link
-                    %>${text}</%def>
-                  <span class="tip tip-stacked">${overview_text()}</span>
+                  <textarea id="course-overview"></textarea>
+                  <span class="tip tip-stacked"></span>
                 </li>
                 % endif
 

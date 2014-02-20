@@ -55,6 +55,7 @@ urlpatterns += patterns(
 
 # restful api
 urlpatterns += patterns(
+
     'contentstore.views',
 
     url(r'^$', 'howitworks', name='homepage'),
@@ -84,8 +85,10 @@ urlpatterns += patterns(
     url(r'(?ix)^settings/details/{}$'.format(parsers.URL_RE_SOURCE), 'settings_handler'),
     url(r'(?ix)^settings/grading/{}(/)?(?P<grader_index>\d+)?$'.format(parsers.URL_RE_SOURCE), 'grading_handler'),
     url(r'(?ix)^settings/advanced/{}$'.format(parsers.URL_RE_SOURCE), 'advanced_settings_handler'),
+    url(r'(?ix)^syllabuses/{}$'.format(parsers.URL_RE_SOURCE), 'syllabus_list_handler'),
     url(r'(?ix)^textbooks/{}$'.format(parsers.URL_RE_SOURCE), 'textbooks_list_handler'),
     url(r'(?ix)^textbooks/{}/(?P<tid>\d[^/]*)$'.format(parsers.URL_RE_SOURCE), 'textbooks_detail_handler'),
+    url(r'(?ix)^syllabuses/{}/(?P<tid>\d[^/]*)$'.format(parsers.URL_RE_SOURCE), 'syllabus_detail_handler'),
 )
 
 js_info_dict = {
@@ -116,6 +119,11 @@ if settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING'):
     urlpatterns += (
         url(r'^auto_auth$', 'student.views.auto_auth'),
     )
+
+#ajax call cites
+urlpatterns += (
+    url(r'^city_lookup/$', 'cities.views.lookup_handler', name='lookup_handler'),
+)
 
 if settings.DEBUG:
     try:

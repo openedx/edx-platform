@@ -1,0 +1,14 @@
+<div class="input-wrap field text required field-add-topic-name topic<%= order %>-name
+    <% if (error && error.attributes && error.attributes.name) { print('error'); } %>">
+  <label for="topic<%= order %>-name"><%= gettext("Topic Name") %></label>
+  <input id="topic<%= order %>-name" name="topic<%= order %>-name" class="topic-name short" placeholder="<%= _.str.sprintf(gettext("Topic %s"), order) %>" value="<%= name %>" type="text">
+  <span class="tip tip-stacked"><%= gettext("provide the title/name of the topic that will be used in navigating") %></span>
+</div>
+<div class="input-wrap field text required field-add-topic-description topic<%= order %>-description
+    <% if (error && error.attributes && error.attributes.description) { print('error'); } %>">
+  <label for="topic<%= order %>-description"><%= gettext("String Description") %></label>
+  <textarea id="topic<%= order %>-description"  name="topic<%= order %>-description" class="topic-description text-editor" placeholder="<%= _.str.sprintf(gettext("Topic %s"), order) %>" type="text"><%= description %></textarea>
+  <span class="tip tip-stacked"><%= gettext("provide the description of the topic that will be used in navigating") %></span>
+  <!--<input id="topic<%= order %>-description" name="topic<%= order %>-description" class="topic-description short" placeholder="<%= _.str.sprintf(gettext("Description %s"), order) %>" value="<%= description %>" type="text">-->
+</div>
+<a href="" class="action action-close"><i class="icon-remove-sign"></i> <span class="sr"><%= gettext("delete string") %></span></a>
