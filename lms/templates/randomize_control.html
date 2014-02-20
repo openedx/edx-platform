@@ -1,0 +1,39 @@
+% if is_staff: 
+<div id="randomize_${element_id}_control">
+    <p>
+    <input id="randomize_next" type="button" value="This is randomized module ${choice} of ${num_choices}: Go to next"/>
+    or jump to:
+    <select id="randomize_jump">
+        % for kchoice in range(num_choices):
+	    <% selected = "selected" if kchoice==choice else "" %>
+	    <option value="${kchoice}" ${selected}>${kchoice}</option>
+        % endfor
+    </select>
+    </p>
+</div>
+<hr/>
+
+<script type="text/javascript">
+do_next = function(){
+    $.get( "${ajax_url}/next", function( data ) {
+      $( "#randomize_next" ).html( data );
+      alert( "next successful" );
+      location.reload();
+    });
+}
+$('#randomize_next').click(do_next);
+
+rand_jump = function(){
+    var choice = $('#randomize_jump option:selected').text();
+    $.post( "${ajax_url}/jump", { 'choice': choice},
+      function( data ) {
+        $( "#randomize_next" ).html( data );
+        alert( "jump to " + choice + " successful" );
+        location.reload();
+      });
+}
+
+$('#randomize_jump').change(rand_jump);
+
+</script>
+% endif
