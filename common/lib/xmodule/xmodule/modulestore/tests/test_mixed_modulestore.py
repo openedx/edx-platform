@@ -78,6 +78,8 @@ class TestMixedModuleStore(object):
             tz_aware=True,
         )
         cls.connection.drop_database(DB)
+        cls.addCleanup(cls.connection.drop_database, DB)
+        cls.addCleanup(cls.connection.close)
         cls.fake_location = Location(['i4x', 'foo', 'bar', 'vertical', 'baz'])
         cls.import_org, cls.import_course, cls.import_run = IMPORT_COURSEID.split('/')
         # NOTE: Creating a single db for all the tests to save time.  This
@@ -118,19 +120,9 @@ class TestMixedModuleStore(object):
 
         return store
 
-    @staticmethod
-    def destroy_db(connection):
-        """
-        Destroy the test db.
-        """
-        connection.drop_database(DB)
-
     def setUp(self):
         # make a copy for convenience
         self.connection = TestMixedModuleStore.connection
-
-    def tearDown(self):
-        pass
 
     def test_get_modulestore_type(self):
         """
