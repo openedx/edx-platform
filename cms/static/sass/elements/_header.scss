@@ -27,14 +27,14 @@
   }
 
   .wrapper-l {
-    float: left;
+    float: flip(left, right);
     width: flex-grid(7,12);
   }
 
   .wrapper-r {
-    float: right;
+    float: flip(right, left);
     width: flex-grid(4,12);
-    text-align: right;
+    text-align: $right;
   }
 
   .branding, .info-course, .nav-course, .nav-account, .nav-pitch {
@@ -184,7 +184,7 @@
     padding: ($baseline*0.75) 0;
 
     .nav-sub {
-      text-align: left;
+      text-align: $left;
     }
 
     .nav-account-help {
@@ -238,7 +238,7 @@
 
   .branding {
     width: 20%;
-    margin-right: 2%;
+    #{$margin-right}: 2%;
   }
 
   .nav-account {
@@ -263,7 +263,7 @@
 
     .branding {
       width: 20%;
-      margin-right: 2%;
+      #{$margin-right}: 2%;
     }
 
     .info-course {
