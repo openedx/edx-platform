@@ -1,6 +1,6 @@
 # pylint: disable=E0611
 from nose.tools import assert_equals, assert_raises, assert_false, \
-    assert_true, assert_not_equals
+    assert_true, assert_not_equals, assert_in, assert_not_in
 # pylint: enable=E0611
 import pymongo
 from uuid import uuid4
@@ -217,6 +217,18 @@ class TestMixedModuleStore(object):
         assert_true(IMPORT_COURSEID in course_ids)
         assert_true(XML_COURSEID1 in course_ids)
         assert_true(XML_COURSEID2 in course_ids)
+
+    def test_xml_get_courses(self):
+        """
+        Test that the xml modulestore only loaded the courses from the maps.
+        """
+        courses = self.store.modulestores['xml'].get_courses()
+        assert_equals(len(courses), 2)
+        course_ids = [course.location.course_id for course in courses]
+        assert_in(XML_COURSEID1, course_ids)
+        assert_in(XML_COURSEID2, course_ids)
+        # this course is in the directory from which we loaded courses but not in the map
+        assert_not_in("edX/toy/TT_2012_Fall", course_ids)
 
     def test_get_course(self):
         module = self.store.get_course(IMPORT_COURSEID)
