@@ -39,7 +39,13 @@ class GitImportError(Exception):
     CANNOT_PULL = _('git clone or pull failed!')
     XML_IMPORT_FAILED = _('Unable to run import command.')
     UNSUPPORTED_STORE = _('The underlying module store does not support import.')
+    # Translators: This is an error message when they ask for a
+    # particular version of a git repository and that version isn't
+    # available from the remote source they specified
     REMOTE_BRANCH_MISSING = _('The specified remote branch is not available.')
+    # Translators: Error message shown when they have asked for a git
+    # repository branch, a specific version within a repository, that
+    # doesn't exist, or there is a problem changing to it.
     CANNOT_BRANCH = _('Unable to switch to specified branch. Please check '
                       'your branch name.')
 
@@ -89,7 +95,7 @@ def switch_branch(branch, rdir):
         raise GitImportError(GitImportError.CANNOT_BRANCH)
     branches = []
     for line in output.split('\n'):
-        branches.append(line.strip())
+        branches.append(line.replace('*', '').strip())
 
     if branch not in branches:
         # Checkout with -b since it is remote only
@@ -109,8 +115,12 @@ def switch_branch(branch, rdir):
         raise GitImportError(GitImportError.CANNOT_BRANCH)
 
 
-def add_repo(repo, rdir_in, branch):
-    """This will add a git repo into the mongo modulestore"""
+def add_repo(repo, rdir_in, branch=None):
+    """
+    This will add a git repo into the mongo modulestore.
+    If branch is left as None, it will fetch the most recent
+    version of the current branch.
+    """
     # pylint: disable=R0915
 
     # Set defaults even if it isn't defined in settings

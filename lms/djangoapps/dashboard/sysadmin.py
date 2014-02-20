@@ -438,6 +438,10 @@ class Courses(SysadminDashboardView):
             )
         except subprocess.CalledProcessError as ex:
             log.exception('Git pull or clone output was: %r', ex.output)
+            # Translators: unable to download the course content from
+            # the source git repository. Clone occurs if this is brand
+            # new, and pull is when it is being updated from the
+            # source.
             return _('Unable to clone or pull repository. Please check '
                      'your url. Output was: {0!r}'.format(ex.output))
 
@@ -451,7 +455,11 @@ class Courses(SysadminDashboardView):
                 git_import.switch_branch(branch, gdir)
             except GitImportError as ex:
                 return str(ex)
-            msg += u'<p>{0}: {1}</p>'.format(_('Successfully switched to branch'), branch)
+            # Translators: This is a git repository branch, which is a
+            # specific version of a courses content
+            msg += u'<p>{0}</p>'.format(
+                _('Successfully switched to branch: '
+                  '{branch_name}'.format(branch_name=branch)))
 
         self.def_ms.try_load_course(os.path.abspath(gdir))
         errlog = self.def_ms.errored_courses.get(cdir, '')

@@ -25,6 +25,10 @@ class Command(BaseCommand):
     Pull a git repo and import into the mongo based content database.
     """
 
+    # Translators: A git repository is a place to store a grouping of
+    # versioned files. A branch is a sub grouping of a repository that
+    # has a specific version of the repository. A modulestore is the database used
+    # to store the courses for use on the Web site.
     help = ('Usage: '
             'git_add_course repository_url [directory to check out into] [repository_branch] '
             '\n{0}'.format(_('Import the specified git repository and optional branch into the '
@@ -41,8 +45,8 @@ class Command(BaseCommand):
                                'the git URL')
 
         if len(args) > 3:
-            raise CommandError('This script requires no more than three '
-                               'arguments')
+            raise CommandError('Expected no more than three '
+                               'arguments; recieved {0}'.format(len(args)))
 
         rdir_arg = None
         branch = None

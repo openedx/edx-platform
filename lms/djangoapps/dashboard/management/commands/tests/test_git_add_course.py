@@ -46,6 +46,7 @@ class TestGitAddCourse(ModuleStoreTestCase):
     TEST_COURSE = 'MITx/edx4edx/edx4edx'
     TEST_BRANCH = 'testing_do_not_delete'
     TEST_BRANCH_COURSE = 'MITx/edx4edx_branch/edx4edx'
+    GIT_REPO_DIR = getattr(settings, 'GIT_REPO_DIR')
 
     def assertCommandFailureRegexp(self, regex, *args):
         """
@@ -63,27 +64,27 @@ class TestGitAddCourse(ModuleStoreTestCase):
         self.assertCommandFailureRegexp(
             'This script requires at least one argument, the git URL')
         self.assertCommandFailureRegexp(
-            'This script requires no more than three arguments',
+            'Expected no more than three arguments; recieved 4',
             'blah', 'blah', 'blah', 'blah')
         self.assertCommandFailureRegexp(
             'Repo was not added, check log output for details',
             'blah')
         # Test successful import from command
-        if not os.path.isdir(getattr(settings, 'GIT_REPO_DIR')):
-            os.mkdir(getattr(settings, 'GIT_REPO_DIR'))
-        self.addCleanup(shutil.rmtree, getattr(settings, 'GIT_REPO_DIR'))
+        if not os.path.isdir(self.GIT_REPO_DIR):
+            os.mkdir(self.GIT_REPO_DIR)
+        self.addCleanup(shutil.rmtree, self.GIT_REPO_DIR)
 
         # Make a course dir that will be replaced with a symlink
         # while we are at it.
-        if not os.path.isdir(getattr(settings, 'GIT_REPO_DIR') / 'edx4edx'):
-            os.mkdir(getattr(settings, 'GIT_REPO_DIR') / 'edx4edx')
+        if not os.path.isdir(self.GIT_REPO_DIR / 'edx4edx'):
+            os.mkdir(self.GIT_REPO_DIR / 'edx4edx')
 
         call_command('git_add_course', self.TEST_REPO,
-                     getattr(settings, 'GIT_REPO_DIR') / 'edx4edx_lite')
+                     self.GIT_REPO_DIR / 'edx4edx_lite')
 
         # Test with all three args (branch)
         call_command('git_add_course', self.TEST_REPO,
-                     getattr(settings, 'GIT_REPO_DIR') / 'edx4edx_lite',
+                     self.GIT_REPO_DIR / 'edx4edx_lite',
                      self.TEST_BRANCH)
 
 
@@ -94,8 +95,8 @@ class TestGitAddCourse(ModuleStoreTestCase):
         with self.assertRaisesRegexp(GitImportError, GitImportError.NO_DIR):
             git_import.add_repo(self.TEST_REPO, None, None)
 
-        os.mkdir(getattr(settings, 'GIT_REPO_DIR'))
-        self.addCleanup(shutil.rmtree, getattr(settings, 'GIT_REPO_DIR'))
+        os.mkdir(self.GIT_REPO_DIR)
+        self.addCleanup(shutil.rmtree, self.GIT_REPO_DIR)
 
         with self.assertRaisesRegexp(GitImportError, GitImportError.URL_BAD):
             git_import.add_repo('foo', None, None)
@@ -117,7 +118,7 @@ class TestGitAddCourse(ModuleStoreTestCase):
         """
         Test repo that is in detached head state.
         """
-        repo_dir = getattr(settings, 'GIT_REPO_DIR')
+        repo_dir = self.GIT_REPO_DIR
         # Test successful import from command
         try:
             os.mkdir(repo_dir)
@@ -135,7 +136,7 @@ class TestGitAddCourse(ModuleStoreTestCase):
         """
         Exercise branching code of import
         """
-        repo_dir = getattr(settings, 'GIT_REPO_DIR')
+        repo_dir = self.GIT_REPO_DIR
         # Test successful import from command
         if not os.path.isdir(repo_dir):
             os.mkdir(repo_dir)
@@ -152,6 +153,12 @@ class TestGitAddCourse(ModuleStoreTestCase):
         def_ms = modulestore()
         # Validate that it is different than master
         self.assertIsNotNone(def_ms.get_course(self.TEST_BRANCH_COURSE))
+
+        # Attempt to check out the same branch again to validate branch choosing
+        # works
+        git_import.add_repo(self.TEST_REPO,
+                            repo_dir / 'edx4edx_lite',
+                            self.TEST_BRANCH)
 
         # Delete to test branching back to master
         delete_course(def_ms, contentstore(),
@@ -176,7 +183,7 @@ class TestGitAddCourse(ModuleStoreTestCase):
                                 cwd=bare_repo)
 
         # Build repo dir
-        repo_dir = getattr(settings, 'GIT_REPO_DIR')
+        repo_dir = self.GIT_REPO_DIR
         if not os.path.isdir(repo_dir):
             os.mkdir(repo_dir)
         self.addCleanup(shutil.rmtree, repo_dir)
@@ -206,7 +213,6 @@ class TestGitAddCourse(ModuleStoreTestCase):
             ['git', 'remote', 'rename', 'origin', 'blah', ],
             stderr=subprocess.STDOUT, cwd=rdir
         )
-        try:
+        with self.assertRaises(GitImportError):
             git_import.switch_branch('master', rdir)
-        except GitImportError:
-            self.assertIn('Getting a list of remote branches failed', output.getvalue())
+        self.assertIn('Getting a list of remote branches failed', output.getvalue())
