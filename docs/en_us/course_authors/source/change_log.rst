@@ -10,6 +10,8 @@ Change Log
 
    * - Date
      - Change
+   * - 02/19/14
+     - Updated :ref:`Import LaTeX Code` to reflect new workflow and UI change for creating Latex HTML components.
    * - 02/14/14
      - Added :ref:`Additional Transcripts` section to :ref:`Working with Video Components`; 
        updated :ref:`Video Advanced Options` 
