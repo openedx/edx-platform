@@ -93,6 +93,14 @@ class MultiChoiceResponseTest(ResponseTest):
         self.assert_grade(problem, 'choice_foil_2', 'correct')
         self.assert_grade(problem, 'choice_foil_3', 'incorrect')
 
+    def test_named_multiple_choice_grade_with_hint(self):
+        problem = self.build_problem(choices=[False],
+                                     choice_names=["foil_1"],
+                                     hints=["h1"])
+
+        # Ensure that we get the expected hint
+        self.assert_grade(problem, 'choice_foil_1', 'incorrect', 'h1')
+
 
 class TrueFalseResponseTest(ResponseTest):
     from capa.tests.response_xml_factory import TrueFalseResponseXMLFactory
