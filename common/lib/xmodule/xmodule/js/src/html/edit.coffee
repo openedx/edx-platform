@@ -20,8 +20,8 @@ class @HTMLEditingDescriptor
 #   instances (like sandbox). It is not necessary to explicitly set baseURL when running locally.
     tinyMCE.baseURL = "#{baseUrl}/js/vendor/tiny_mce"
     @tiny_mce_textarea = $(".tiny-mce", @element).tinymce({
-      script_url : "#{baseUrl}/js/vendor/tiny_mce/tiny_mce.js",
-      theme : "advanced",
+      script_url : "#{baseUrl}/js/vendor/tiny_mce/tiny_mce.min.js",
+      theme : "modern",
       skin: 'studio',
       schema: "html5",
       # Necessary to preserve relative URLs to our images.
@@ -42,7 +42,7 @@ class @HTMLEditingDescriptor
       # Disable visual aid on borderless table.
       visual:false,
       # We may want to add "styleselect" when we collect all styles used throughout the LMS
-      theme_advanced_buttons1 : "formatselect,fontselect,bold,italic,underline,forecolor,|,bullist,numlist,outdent,indent,|,blockquote,wrapAsCode,|,link,unlink,|,image,",
+      toolbar : "formatselect,bold,italic,underline,forecolor,|,bullist,numlist,outdent,indent,|,blockquote,wrapAsCode,|,link,unlink,|,image,",
       theme_advanced_toolbar_location : "top",
       theme_advanced_toolbar_align : "left",
       theme_advanced_statusbar_location : "none",
@@ -50,6 +50,8 @@ class @HTMLEditingDescriptor
       theme_advanced_blockformats : "p,pre,h1,h2,h3",
       width: '100%',
       height: '400px',
+      menubar: false,
+      statusbar: false,
       setup : @setupTinyMCE,
       # Cannot get access to tinyMCE Editor instance (for focusing) until after it is rendered.
       # The tinyMCE callback passes in the editor as a paramter.
@@ -74,10 +76,6 @@ class @HTMLEditingDescriptor
         # Visual Editor must be marked as dirty or else we won't populate the Advanced Editor from it.
         ed.isNotDirty = false
     })
-
-    ed.onNodeChange.add((editor, command, e) ->
-      command.setActive('wrapAsCode', e.nodeName == 'CODE')
-    )
 
     @visualEditor = ed
 
