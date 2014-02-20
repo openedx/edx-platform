@@ -738,7 +738,7 @@ def validate_textbook_json(textbook):
         raise TextbookValidationError("must be JSON object")
     if not textbook.get("tab_title"):
         raise TextbookValidationError("must have tab_title")
-    tid = str(textbook.get("id", ""))
+    tid = unicode(textbook.get("id", ""))
     if tid and not tid[0].isdigit():
         raise TextbookValidationError("textbook ID must start with a digit")
     return textbook
@@ -853,7 +853,7 @@ def textbooks_detail_handler(request, tid, tag=None, package_id=None, branch=Non
     )
     store = get_modulestore(course.location)
     matching_id = [tb for tb in course.pdf_textbooks
-                   if str(tb.get("id")) == str(tid)]
+                   if unicode(tb.get("id")) == unicode(tid)]
     if matching_id:
         textbook = matching_id[0]
     else:
