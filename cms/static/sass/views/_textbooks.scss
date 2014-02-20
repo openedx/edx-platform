@@ -5,12 +5,10 @@
 
   .content-primary, .content-supplementary {
     @include box-sizing(border-box);
-    float: left;
   }
 
   .content-primary {
-    width: flex-grid(9, 12);
-    margin-right: flex-gutter();
+    @extend %ui-col-wide;
 
     .no-textbook-content {
       @extend %no-content;
@@ -354,6 +352,6 @@
   }
 }
   .content-supplementary {
-    width: flex-grid(3, 12);
+    @extend %ui-col-narrow;
   }
 }

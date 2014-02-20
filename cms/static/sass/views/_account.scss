@@ -50,12 +50,10 @@
 
   .content-primary, .content-supplementary {
     @include box-sizing(border-box);
-    float: left;
   }
 
   .content-primary {
-    width: flex-grid(8, 12);
-    margin-right: flex-gutter();
+    @extend %ui-col-wide;
 
     form {
       @include box-sizing(border-box);
@@ -211,7 +209,7 @@
   }
 
   .content-supplementary {
-    width: flex-grid(4, 12);
+    @extend %ui-col-narrow;
 
     .bit {
       @extend %t-copy-sub1;
