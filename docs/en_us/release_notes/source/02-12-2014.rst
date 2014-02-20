@@ -38,7 +38,7 @@ edX Learning Management System
 Accessibility Improvements
 ===========================
 
-* Needless section tags were removed from the student's view of the courseware, so they are no longer announced by screen readers.
+* Unnecessary section tags were removed from the student's view of the courseware, so they are no longer announced by screen readers.
 
 * Extraneous title blocks were removed from breadcrumbs, so they are no longer read by screen readers.
 
