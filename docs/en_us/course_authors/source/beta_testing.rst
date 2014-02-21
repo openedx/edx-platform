@@ -4,9 +4,9 @@
 Beta Testing a Course
 #############################
 
-When a course is being designed in Studio, the course team can choose **View Live** to assess progress, find problems, and mimic the student experience. A more thorough test is done by giving early access to the course to beta testers who interact with the course exactly as students will. Beta testers are not members of the course team or staff. They are enrolled as students, but see the course materials before enrolled students do. 
+When a course is being designed in Studio, the course team can choose **View Live** to assess their progress in designing the course, test their work, find gaps and errors, and mimic the student experience. To gather information about the overall experience of taking a course, you can also conduct a beta test of the course. 
 
-Beta testers identify issues, find bugs, and experience errors before enrolled students do. To help you make sure that everything works as it should, they use their own computers and internet connections to view videos, follow links, and complete problems. 
+Beta testers have early access to the course. Beta testers are not members of the course team or staff: they don't have information about "how it's supposed to work". They use their own computers and internet connections to view videos, follow links, and complete problems. They interact with the course exactly as students will, but see the course materials before other enrolled students do. 
 
 * :ref:`Beta_Process`
 * :ref:`Qualities_Testers`
@@ -23,7 +23,7 @@ The Beta Testing Process
 
 During a beta test, you gather information about the experience of taking your course in an effort to improve its quality. The phases of the beta testing process, and some questions that you may find useful to consider as you prepare for each phase, follow.
 
-#. **Planning**: What are the objectives? What is the schedule for testing? 
+#. **Planning**: What are your objectives for the test? What is the schedule for testing? 
 
 #. **Recruitment**: How many testers do you need? How much time do you expect testers to spend? When do you need them to complete their feedback? 
 
@@ -35,13 +35,15 @@ During a beta test, you gather information about the experience of taking your c
 
 #. **Conclusion**: How do you acknowledge the efforts of your testers? What do you share with them about the results of their efforts? 
 
+There is no one answer to any of these questions. They are included here as background on the role that beta testing can play in the preparation of your course. 
+
 .. _Qualities_Testers:
 
 ***************************************
 Qualities of Good Beta Testers
 ***************************************
 
-A beta test is valuable in part because it is unscripted. Your beta testers are not following a predetermined series of steps, or using a particular computer environment, when they access your course. When you recruit your beta testers, however, you may find these skills and characteristics to be helpful.
+A beta test is valuable in part because it is unscripted. Your beta testers are not following a predetermined series of steps, or using a particular computer environment, when they access your course. When you recruit beta testers, however, you may find these skills and characteristics to be helpful.
 
 * Curiosity.
 
@@ -51,7 +53,7 @@ A beta test is valuable in part because it is unscripted. Your beta testers are 
 
 Your beta testers should also have varying levels of knowledge about the course content:
 
-* To recognize when material is wrong or missing, at least one tester should know the content well.
+* To recognize when material is wrong or missing, at least one tester should know the content well. 
 
 * To identify material that is unclear, at least one tester should be less familiar with the content. 
 
@@ -63,7 +65,7 @@ Using Course Staff as Beta Testers
 
 Course staff can provide valuable feedback about your course. However, they are typically stakeholders in the success of your course and have a significant amount of knowledge about it. As a result, they can be too close to the course to interact with it in the same way as students will. They can also be either reluctant to provide feedback, or overly zealous.
 
-If you do want a staff member to be a beta tester, a different, second email address must be used for this additional role. The privileges of the course staff role override those of a beta tester, so a second registration on the site, activation, and enrollment in the course are necessary using this second email address. The staff member must log in using the second email address (with the beta tester role) to test the course as a student.
+If you do want a staff member to be a beta tester, a different, second email address must be used for this additional role. The privileges of the course staff role override those of a beta tester, so a second registration on the site, activation, and enrollment in the course are necessary using this second email address. The staff member must log in using the second email address (with the beta tester role) in order to experience the course as a student.
 
 .. _What_Test:
 
@@ -81,7 +83,7 @@ Beta testers should interact with everything in the course.
 
 * Complete all problems. 
 
-As they work, beta testers log issues, changes, errors, and questions for the course team.
+As they work, beta testers log issues and questions for the course team.
 
 **Note**: Beta testers can make discussion posts and wiki contributions. You may want to ask your testers not to make posts or contributions about unreleased courseware, and alert your discussion administration team to watch for posts from the beta testers.
 
@@ -134,6 +136,8 @@ To define the start of the beta test, you use Studio to specify a number of days
 ===========
 Example
 ===========
+
+.. Is this example helpful? how can we assess whether it is frightening/confusing to course team, or helpful?
 
 Beta tester access to courseware for a course with ``days_early_for_beta`` = 20 and 2 sections:
 
@@ -202,7 +206,7 @@ Despite the efforts of the course team and the beta testers, additional problems
 
 * Often, students report issues by asking questions in a discussion. Your discussion administration team can watch for posts that indicate problems.
 
-* To let students know the best way to report problems, you can use the Course Info page or a discussion post. 
+* To let students know the best way to report problems, you can post information on the Course Info page or post it in a discussion. 
 
 .. per Mark 19 Feb 14: eventually we want to provide more guidance for students:  course issues, use discussions, platform issues submit issue to edx.
 

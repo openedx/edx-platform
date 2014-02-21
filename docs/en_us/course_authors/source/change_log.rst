@@ -10,6 +10,8 @@ Change Log
 
    * - Date
      - Change
+   * - 02/21/14
+     - Added the :ref:`Beta_Testing` chapter. 
    * - 02/19/14
      - Updated :ref:`Import LaTeX Code` to reflect new workflow and UI change for creating Latex HTML components.
    * - 02/18/14
