@@ -4,11 +4,11 @@ Middleware for embargoing courses.
 
 
 from django.shortcuts import redirect
-from django.contrib.gis.geoip import GeoIP
-from django.contrib.gis.geoip.libgeoip import GEOIP_SETTINGS
 from util.request import course_id_from_url
 from embargo.models import EmbargoConfig
 from ipware.ip import get_ip
+import pygeoip
+from django.conf import settings
 
 
 class EmbargoMiddleware(object):
@@ -27,8 +27,8 @@ class EmbargoMiddleware(object):
         if course_id in EmbargoConfig.current().embargoed_courses_list:
 
             # If we're having performance issues, add caching here
-            ip = get_ip(request)  # TODO replace this with the actual get_ip function
-            country_code_from_ip = GeoIP().country_code(ip)
+            ip = get_ip(request)
+            country_code_from_ip = pygeoip.GeoIP(settings.GEOIP_PATH).country_code_by_addr(ip)
             is_embargoed = (country_code_from_ip in EmbargoConfig.current().embargoed_countries_list)
             if is_embargoed:
                 return redirect('embargo')

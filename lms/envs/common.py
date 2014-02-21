@@ -256,6 +256,9 @@ node_paths = [
 ]
 NODE_PATH = ':'.join(node_paths)
 
+# For geolocation ip database
+GEOIP_PATH = REPO_ROOT / "common/static/data/geoip/GeoIP.dat"
+
 
 # Where to look for a status message
 STATUS_MESSAGE_PATH = ENV_ROOT / "status_message.json"

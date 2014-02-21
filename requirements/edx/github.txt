@@ -15,6 +15,8 @@
 -e git+https://github.com/eventbrite/zendesk.git@d53fe0e81b623f084e91776bcf6369f8b7b63879#egg=zendesk
 # TODO clear this library with appropriate people
 -e git+https://github.com/un33k/django-ipware.git@42cb1bb1dc680a60c6452e8bb2b843c2a0382c90#egg=django-ipware
+# TODO clear this library with appropriate people
+-e git+https://github.com/appliedsec/pygeoip.git@95e69341cebf5a6a9fbf7c4f5439d458898bdc3b#egg=pygeoip
 
 # Our libraries:
 -e git+https://github.com/edx/XBlock.git@893cd83dfb24405ce81b07f49c1c2e3053cdc865#egg=XBlock
