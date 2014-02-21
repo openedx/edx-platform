@@ -31,8 +31,9 @@
 		</div>
 	</div>
 </div>
+console.log("${openseadragonjson}");
+<script> 
 
-<script>
 	function onClickHideInstructions(){
 		//Reset function if there is more than one event handler
 		$(this).off();
@@ -172,60 +173,7 @@
 				tileSources: ["testpattern.dzi", "data/tall.dzi"],*/
 				id:                 "imageHolder",
 				prefixUrl:           "${settings.STATIC_URL}" + "js/vendor/ova/images/",
-				navigatorSizeRatio: 0.25,
-				wrapHorizontal:     true,
-				tileSources:   [
-					{ 
-		                Image:  {
-		                    xmlns: "http://schemas.microsoft.com/deepzoom/2009",
-		                    Url: "http://static.seadragon.com/content/misc/milwaukee_files/",
-		                    TileSize: "254", 
-		                    Overlap: "1", 
-		                    Format: "jpg", 
-		                    ServerFormat: "Default",
-		                    Size: { 
-		                        Width: "15497",
-		                        Height: "5378"
-		                    }
-		                }
-		            },
-					{ 
-		                Image:  {
-		                    xmlns: "http://schemas.microsoft.com/deepzoom/2009",
-		                    Url: "http://cache.zoom.it/content/WwI0_files/",
-		                    TileSize: "254", 
-		                    Overlap: "1", 
-		                    Format: "jpg", 
-		                    ServerFormat: "Default",
-		                    Size: { 
-		                        Width: "5816",
-		                        Height: "3961"
-		                    }
-		                }
-		            },{ 
-		                Image:  {
-		                    xmlns: "http://schemas.microsoft.com/deepzoom/2009",
-		                    Url: "http://static.seadragon.com/content/misc/carina-nebula_files/",
-		                    TileSize: "254", 
-		                    Overlap: "1", 
-		                    Format: "jpg", 
-		                    ServerFormat: "Default",
-		                    Size: { 
-		                        Width: "29566",
-		                        Height: "14321"
-		                    }
-		                }
-		            },
-					{
-						height: 512*256,
-						width:  512*256,
-						tileSize: 256,
-						minLevel: 8,
-						getTileUrl: function( level, x, y ){
-						    return "http://s3.amazonaws.com/com.modestmaps.bluemarble/"+(level-8)+"-r"+y+"-c"+x+".jpg";
-						}
-					},
-				],
+				${openseadragonjson}
 		    },
 		    optionsOSDA:{}
         };

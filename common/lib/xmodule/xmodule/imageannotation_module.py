@@ -20,9 +20,26 @@ class AnnotatableFields(object):
                     Add the instructions to the assignment here.
                 </p>
             </instructions>
-            <p>
-                Lorem ipsum dolor sit amet, at amet animal petentium nec. Id augue nemore postulant mea. Ex eam dicant noluisse expetenda, alia admodum abhorreant qui et. An ceteros expetenda mea, tale natum ipsum quo no, ut pro paulo alienum noluisse.
-            </p>
+            <json>
+                navigatorSizeRatio: 0.25,
+                wrapHorizontal:     true,
+                tileSources:   [{
+                    Image:  {
+                        xmlns: "http://schemas.microsoft.com/deepzoom/2009",
+                        Url: "http://static.seadragon.com/content/misc/milwaukee_files/",
+                        TileSize: "254", 
+                        Overlap: "1", 
+                        Format: "jpg", 
+                        ServerFormat: "Default",
+                        showNavigationControl: true,
+                        showNavigator: true,
+                        Size: { 
+                            Width: "15497",
+                            Height: "5378"
+                        }
+		    }
+                },],
+            </json>
         </annotatable>
         """))
     display_name = String(
@@ -51,7 +68,7 @@ class ImageAnnotationModule(AnnotatableFields, XModule):
         xmltree = etree.fromstring(self.data)
 
         self.instructions = self._extract_instructions(xmltree)
-        self.openseadragonjson = etree.tostring(xmltree, encoding='unicode')
+        self.openseadragonjson = self.remove_html_markup(etree.tostring(xmltree.find('json'), encoding='unicode'))
 
     def _extract_instructions(self, xmltree):
         """ Removes <instructions> from the xmltree and returns them as a string, otherwise None. """
@@ -61,6 +78,23 @@ class ImageAnnotationModule(AnnotatableFields, XModule):
             xmltree.remove(instructions)
             return etree.tostring(instructions, encoding='unicode')
         return None
+
+    def remove_html_markup(self, s):
+        tag = False
+        quote = False
+        out = ""
+
+        for c in s:
+            if c == '<' and not quote:
+                tag = True
+            elif c == '>' and not quote:
+                tag = False
+            elif (c == '"' or c == "'") and tag:
+                quote = not quote
+            elif not tag:
+                out = out + c
+
+        return out
 
     def get_html(self):
         """ Renders parameters to template. """
