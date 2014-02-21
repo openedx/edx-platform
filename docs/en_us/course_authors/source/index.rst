@@ -13,6 +13,7 @@ Contents
 
    read_me
    change_log
+   accounts
    get_started
    create_new_course
    establish_grading_policy

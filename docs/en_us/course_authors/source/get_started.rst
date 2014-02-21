@@ -1,7 +1,3 @@
-
-.. image:: Images/image001.png
- :width: 800  
-
 .. _Getting Started with Studio:
 
 ###########################
@@ -15,12 +11,9 @@ Overview
 This chapter describes the tools you use to build an edX course, and how to create your first course:
 
 * :ref:`What is Studio?`
-* :ref:`What is Edge?`
-* :ref:`Get Started on Edge`
 * :ref:`Use Studio on Edge`
 * :ref:`Create Your First Course`
 * :ref:`View Your Course on Edge`
-* :ref:`What is edX.org?`
 * :ref:`Register Your Course on edX.org`
 
 If you are using an instance of Open edX, some specifics in this chapter may not apply.
@@ -40,58 +33,13 @@ With Studio, you can also manage your schedule and course team, set grading poli
 You use Studio directly through your browser. You do not need any additional software.
 
 
-.. _What is Edge?: 
-
-******************
-What is Edge?
-******************
-
-EdX Edge_ is the site where you can create courses with Studio, then run courses through the edX Learning Management System.
-
-EdX Edge_ is also used to host SPOCs, or Small Private Online Courses.
-
-Visually and functionally, edX Edge is the same as edX.org_. 
-However, on Edge you can freely publish courses.  
-There is no course catalog on Edge and other users will not find your course. You must explicitly invite students to participate in your course.
-
-Courses on Edge are not published on edX.org. All course data and accounts on Edge and edX.org are separate.
-
-To publish courses on edX.org, you must have an agreement with edX and specific approval from your university.
-
-.. _Edge: http://edge.edx.org
-.. _edX.org: http://edx.org
-
-   
-.. _Get Started on Edge:
-         
-*******************
-Get Started on Edge
-*******************
-
-Go to https://edge.edx.org, click **Register**, and fill out required information to create your account.
-
-.. note::  Students will see your **Public Username**, not your **Full Name**.
-
-.. note::  If you are at an edX consortium university, you should use your institutional e-mail
-   address.
-
-After you click \ **Create My Account**, you will receive an activation
-e-mail message. To finish creating your account, click the link in the e-mail.
-
-When you log in to Edge, you can view edX101_.	
-
-edX101 is both an example of a course you can build with Studio, 
-and a self-paced walk through of planning, building, and running your own online course.	
-
-.. _edX101: https://edge.edx.org/courses/edX/edX101/How_to_Create_an_edX_Course/about
-
 .. _Use Studio on Edge:
 
 ******************
 Use Studio on Edge
 ******************
 
-You can use Studio_ on Edge to build your own courses.
+You can use Studio_ on Edge_ to build your own courses.
 
 Go to: https://studio.edge.edx.org. Sign in with the account you created on Edge.
 
@@ -163,20 +111,6 @@ You can view the course and see that there is no content yet.
 
 To build your course, keep reading this document.
 
-
-.. _What is edX.org?:
-
-*******************
-What is edX.org?
-*******************
-edX.org_ is the site where edX hosts MOOCs, or Massive Open Online Courses, that are created with our institutional partners. These courses are open to students from around the world.
-
-Courses on edX.org_ are listed publicly.
-
-To publish courses on edX.org, you must have an agreement with edX and specific approval from your university.
-
-
-
 .. _Register Your Course on edx.org:
 
 ************************************
@@ -193,4 +127,5 @@ If your organization has an agreement with edX and you have specific approval, y
    Your course registration page opens in a new tab on the LMS.
 
 #. Click the blue **Register** button to register for your course. After you register for your course, it opens in the LMS.
+
 #. To continue working on your course, in your browser, switch back to the tab that shows Studio. You will still be on the **Course Outline** page.
