@@ -619,8 +619,8 @@ Although you can create multiple choice problems by using the Simple Editor in S
 
 .. _Numerical Response:
 
-Numerical Response
-------------------
+Numerical Response (Numerical Input Problems)
+---------------------------------------------
 
 The Numerical Response input type accepts a line of text input from the student
 and evaluates the input for correctness based on its numerical value. The input
