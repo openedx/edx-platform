@@ -284,6 +284,13 @@ class CapaMixin(CapaFields):
             xqueue=self.runtime.xqueue,
         )
 
+        ### @jbau 2-21-14 edx-west HACK for deanonymized email HERE ###
+        if hasattr(self.runtime, 'send_users_emailaddr_with_coderesponse'):
+            capa_system.send_users_emailaddr_with_coderesponse = self.runtime.send_users_emailaddr_with_coderesponse
+        if hasattr(self.runtime, 'deanonymized_user_email'):
+            capa_system.deanonymized_user_email = self.runtime.deanonymized_user_email
+        ###############################################################
+
         return LoncapaProblem(
             problem_text=text,
             id=self.location.html_id(),
