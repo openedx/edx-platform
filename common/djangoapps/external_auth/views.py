@@ -151,6 +151,7 @@ def _external_login_or_signup(request,
 
     log.info(u"External_Auth login_or_signup for %s : %s : %s : %s", external_domain, external_id, email, fullname)
     uses_shibboleth = settings.FEATURES.get('AUTH_USE_SHIB') and external_domain.startswith(SHIBBOLETH_DOMAIN_PREFIX)
+    uses_certs = settings.FEATURES.get('AUTH_USE_CERTIFICATES')
     internal_user = eamap.user
     if internal_user is None:
         if uses_shibboleth:
@@ -193,6 +194,11 @@ def _external_login_or_signup(request,
             auth_backend = 'django.contrib.auth.backends.ModelBackend'
         user.backend = auth_backend
         AUDIT_LOG.info('Linked user "%s" logged in via Shibboleth', user.email)
+    elif uses_certs:
+        # Certificates are trusted, so just link the user and log the action
+        user = internal_user
+        user.backend = 'django.contrib.auth.backens.ModelBackend'
+        AUDIT_LOG.info('Linked user "%s" logged in via SSL certificate', user.email)
     else:
         user = authenticate(username=uname, password=eamap.internal_password, request=request)
     if user is None:
