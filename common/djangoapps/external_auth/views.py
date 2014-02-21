@@ -197,7 +197,7 @@ def _external_login_or_signup(request,
     elif uses_certs:
         # Certificates are trusted, so just link the user and log the action
         user = internal_user
-        user.backend = 'django.contrib.auth.backens.ModelBackend'
+        user.backend = 'django.contrib.auth.backends.ModelBackend'
         AUDIT_LOG.info('Linked user "%s" logged in via SSL certificate', user.email)
     else:
         user = authenticate(username=uname, password=eamap.internal_password, request=request)

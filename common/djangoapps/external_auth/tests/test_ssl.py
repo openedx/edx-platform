@@ -8,6 +8,7 @@ import StringIO
 import unittest
 
 from django.conf import settings
+from django.contrib.auth import SESSION_KEY
 from django.contrib.auth.models import AnonymousUser, User
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.core.urlresolvers import reverse
@@ -170,7 +171,7 @@ class SSLClientTest(TestCase):
             reverse('dashboard'), follow=True,
             SSL_CLIENT_S_DN=self.AUTH_DN.format(self.USER_NAME, self.USER_EMAIL))
         self.assertIn(reverse('dashboard'), response['location'])
-        self.assertIn('_auth_user_id', self.client.session)
+        self.assertIn(SESSION_KEY, self.client.session)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     @override_settings(FEATURES=FEATURES_WITH_SSL_AUTH_IMMEDIATE_SIGNUP)
@@ -183,7 +184,7 @@ class SSLClientTest(TestCase):
             reverse('register_user'), follow=True,
             SSL_CLIENT_S_DN=self.AUTH_DN.format(self.USER_NAME, self.USER_EMAIL))
         self.assertIn(reverse('dashboard'), response['location'])
-        self.assertIn('_auth_user_id', self.client.session)
+        self.assertIn(SESSION_KEY, self.client.session)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'cms.urls', 'Test only valid in cms')
     @override_settings(FEATURES=FEATURES_WITH_SSL_AUTH_IMMEDIATE_SIGNUP)
@@ -199,7 +200,7 @@ class SSLClientTest(TestCase):
                 reverse('signup'), follow=True,
                 SSL_CLIENT_S_DN=self.AUTH_DN.format(self.USER_NAME, self.USER_EMAIL))
         # assert that we are logged in
-        self.assertIn('_auth_user_id', self.client.session)
+        self.assertIn(SESSION_KEY, self.client.session)
 
         # Now that we are logged in, make sure we don't see the registration page
         with self.assertRaisesRegexp(InsufficientSpecificationError,
@@ -225,7 +226,7 @@ class SSLClientTest(TestCase):
             reverse('signin_user'), follow=True,
             SSL_CLIENT_S_DN=self.AUTH_DN.format(self.USER_NAME, self.USER_EMAIL))
         self.assertIn(reverse('dashboard'), response['location'])
-        self.assertIn('_auth_user_id', self.client.session)
+        self.assertIn(SESSION_KEY, self.client.session)
 
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
@@ -246,11 +247,10 @@ class SSLClientTest(TestCase):
         user.save()
 
         # Make sure we can still login
-        response = self.client.get(
+        self.client.get(
             reverse('signin_user'), follow=True,
             SSL_CLIENT_S_DN=self.AUTH_DN.format(self.USER_NAME, self.USER_EMAIL))
-        print(response)
-        self.assertIn('_auth_user_id', self.client.session)
+        self.assertIn(SESSION_KEY, self.client.session)
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     @override_settings(FEATURES=FEATURES_WITHOUT_SSL_AUTH)
