@@ -316,9 +316,18 @@ def _save_item(request, usage_loc, item_location, data=None, children=None, meta
     # Make public after updating the xblock, in case the caller asked
     # for both an update and a publish.
     if publish and publish == 'make_public':
+        def _publish(block):
+            # This is super gross, but prevents us from publishing something that
+            # we shouldn't. Ideally, all modulestores would have a consistant
+            # interface for publishing. However, as of now, only the DraftMongoModulestore
+            # does, so we have to check for the attribute explicitly.
+            store = get_modulestore(block.location)
+            if hasattr(store, 'publish'):
+                store.publish(block.location, request.user.id)
+
         _xmodule_recurse(
             existing_item,
-            lambda i: modulestore().publish(i.location, request.user.id)
+            _publish
         )
 
     # Note that children aren't being returned until we have a use case.

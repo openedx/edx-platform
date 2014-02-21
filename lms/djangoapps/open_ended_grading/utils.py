@@ -33,6 +33,7 @@ SYSTEM = LmsModuleSystem(
     get_module=None,
     render_template=render_to_string,
     replace_urls=None,
+    descriptor_runtime=None,
 )
 
 

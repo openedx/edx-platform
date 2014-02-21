@@ -69,6 +69,7 @@ def peer_grading_notifications(course, user):
         get_module=None,
         render_template=render_to_string,
         replace_urls=None,
+        descriptor_runtime=None,
     )
     peer_gs = peer_grading_service.PeerGradingService(settings.OPEN_ENDED_GRADING_INTERFACE, system)
     pending_grading = False
@@ -129,6 +130,7 @@ def combined_notifications(course, user):
         get_module=None,
         render_template=render_to_string,
         replace_urls=None,
+        descriptor_runtime=None,
     )
     #Initialize controller query service using our mock system
     controller_qs = ControllerQueryService(settings.OPEN_ENDED_GRADING_INTERFACE, system)

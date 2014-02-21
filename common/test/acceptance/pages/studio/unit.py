@@ -4,7 +4,7 @@ Unit page in Studio
 
 from bok_choy.page_object import PageObject
 from bok_choy.query import SubQuery
-from bok_choy.promise import Promise, EmptyPromise, fulfill
+from bok_choy.promise import EmptyPromise, fulfill
 
 from . import BASE_URL
 
@@ -24,20 +24,32 @@ class UnitPage(PageObject):
         return "{}/unit/{}".format(BASE_URL, self.unit_locator)
 
     def is_browser_on_page(self):
-        return self.is_css_present('body.view-unit')
+        # Wait until all components have been loaded
+        return (
+            self.is_css_present('body.view-unit') and
+            len(self.q(css=Component.BODY_SELECTOR)) == len(self.q(css='{} .xblock-student_view'.format(Component.BODY_SELECTOR)))
+        )
 
-    def component(self, title):
-        return Component(self.browser, self._locator(title))
+    @property
+    def components(self):
+        """
+        Return a list of components loaded on the unit page.
+        """
+        return self.q(css=Component.BODY_SELECTOR).map(lambda el: Component(self.browser, el['data-locator'])).results
 
-    def _locator(self, title):
-        def _check_func():
-            locators = self.q(css=Component.BODY_SELECTOR).filter(
-                SubQuery(css=Component.NAME_SELECTOR).filter(text=title)
-            ).map(lambda el: el['data-locator']).results
-
-            return (len(locators) > 0, locators[0])
-
-        return fulfill(Promise(_check_func, "Found data locator for component"))
+    def edit_draft(self):
+        """
+        Started editing a draft of this unit.
+        """
+        fulfill(EmptyPromise(
+            lambda: self.q(css='.create-draft').present,
+            'Wait for edit draft link to be present'
+        ))
+        self.q(css='.create-draft').click()
+        fulfill(EmptyPromise(
+            lambda: self.q(css='.editing-draft-alert').present,
+            'Wait for draft mode to be activated'
+        ))
 
 
 class Component(PageObject):

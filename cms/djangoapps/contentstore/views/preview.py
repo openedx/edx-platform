@@ -131,6 +131,7 @@ def _preview_module_system(request, descriptor):
         # get_user_role accepts a location or a CourseLocator.
         # If descriptor.location is a CourseLocator, course_id is unused.
         get_user_role=lambda: get_user_role(request.user, descriptor.location, course_id),
+        descriptor_runtime=descriptor.runtime,
     )
 
 
@@ -158,6 +159,6 @@ def get_preview_fragment(request, descriptor):
     try:
         fragment = module.render("student_view")
     except Exception as exc:                          # pylint: disable=W0703
-        log.debug("Unable to render student_view for %r", module, exc_info=True)
+        log.warning("Unable to render student_view for %r", module, exc_info=True)
         fragment = Fragment(render_to_string('html_error.html', {'message': str(exc)}))
     return fragment
