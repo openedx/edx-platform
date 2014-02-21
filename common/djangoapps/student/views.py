@@ -142,6 +142,15 @@ def _get_date_for_press(publish_date):
     return date
 
 
+def embargo(request):
+    """
+    Render the embargo page.
+
+    Explains to the user why they are not able to access a particular embargoed course.
+    """
+    return render_to_response('static_templates/embargo.html')
+
+
 def press(request):
     json_articles = cache.get("student_press_json_articles")
     if json_articles is None:
@@ -723,7 +732,7 @@ def login_user(request, error=""):
             # This is actually the common case, logging in user without external linked login
             AUDIT_LOG.info("User %s w/o external auth attempting login", user)
 
-    # see if account has been locked out due to excessive login failres
+    # see if account has been locked out due to excessive login failures
     user_found_by_email_lookup = user
     if user_found_by_email_lookup and LoginFailures.is_feature_enabled():
         if LoginFailures.is_user_locked_out(user_found_by_email_lookup):
