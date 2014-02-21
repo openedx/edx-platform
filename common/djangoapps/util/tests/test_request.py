@@ -1,9 +1,10 @@
 from django.test.client import RequestFactory
 from django.conf import settings
-from util.request import safe_get_host
+from util.request import safe_get_host, BlockedIpMiddleware
 from django.core.exceptions import SuspiciousOperation
 import unittest
-
+import mock
+import pygeoip
 
 class ResponseTestCase(unittest.TestCase):
     """ Tests for response-related utility functions """
@@ -37,3 +38,34 @@ class ResponseTestCase(unittest.TestCase):
         settings.ALLOWED_HOSTS = ["the_valid_website.com"]
         with self.assertRaises(SuspiciousOperation):
             safe_get_host(request)
+
+
+    def test_block_ip_middleware(self):
+        """ Tests that the safe_get_host function returns the desired host """
+
+        def mock_country_code_by_addr(ip):
+            ip_dict = {
+                '1.0.0.0': 'CU',
+                '2.0.0.0': 'IR',
+                '3.0.0.0': 'SY',
+                '4.0.0.0': 'SD',
+            }
+            return ip_dict.get(ip, 'US')
+
+        with mock.patch('django.conf.settings.LIMIT_ACCESS_COUNTRIES', ['CU', 'IR', 'SY', 'SD']):
+            with mock.patch.object(pygeoip.GeoIP, 'country_code_by_addr') as mocked_method:
+                mocked_method.side_effect = mock_country_code_by_addr
+                blocked_ip_middleware = BlockedIpMiddleware()
+
+                for i in range(1,10):
+                    factory = RequestFactory()
+                    request = factory.request()
+                    ip_address = '%d.0.0.0' %i
+                    request.META['REMOTE_ADDR'] = ip_address
+
+                    result = blocked_ip_middleware.process_request(request)
+                    if i <= 4:
+                        self.assertIsNotNone(result)
+                    else:
+                        self.assertIsNone(result)
+

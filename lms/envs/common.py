@@ -1283,3 +1283,9 @@ LINKEDIN_API = {
 ##### ACCOUNT LOCKOUT DEFAULT PARAMETERS #####
 MAX_FAILED_LOGIN_ATTEMPTS_ALLOWED = 5
 MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS = 15 * 60
+
+
+########################## Limited Access Countries ##########################
+# ip codes for countries to have their ips blocked (due to OFAC)
+LIMIT_ACCESS_COUNTRIES = [] # for OFAC blocking set to ['CU', 'IR', 'SY', 'SD']
+GEOIP_DAT_LOCATION = '../data/GeoIP.dat'
