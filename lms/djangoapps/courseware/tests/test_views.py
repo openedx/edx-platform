@@ -255,8 +255,8 @@ class ViewsTestCase(TestCase):
         response = self.client.get(url)
         self.assertFalse('<script>' in response.content)
 
-# setting TIME_ZONE explicitly
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE, TIME_ZONE="America/New_York")
+# setting TIME_ZONE_DISPLAYED_FOR_DEADLINES explicitly
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE, TIME_ZONE_DISPLAYED_FOR_DEADLINES="UTC")
 class BaseDueDateTests(ModuleStoreTestCase):
     """
     Base class that verifies that due dates are rendered correctly on a page
@@ -289,8 +289,8 @@ class BaseDueDateTests(ModuleStoreTestCase):
         self.request = self.request_factory.get("foo")
         self.request.user = self.user
 
-        self.time_with_tz = "due Sep 18, 2013 at 07:30 EDT"
-        self.time_without_tz = "due Sep 18, 2013 at 07:30"
+        self.time_with_tz = "due Sep 18, 2013 at 11:30 UTC"
+        self.time_without_tz = "due Sep 18, 2013 at 11:30"
 
     def test_backwards_compatability(self):
         # The test course being used has show_timezone = False in the policy file
