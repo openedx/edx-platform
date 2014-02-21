@@ -34,10 +34,10 @@
 
     .new-button {
       @extend %t-action3;
-      margin-left: $baseline;
+      #{$margin-left}: $baseline;
 
       [class^="icon-"] {
-        margin-right: ($baseline/2);
+        #{$margin-right}: ($baseline/2);
       }
     }
   }

@@ -303,9 +303,9 @@
             display: block;
             width: 46%;
             border-bottom: none;
-            margin: 0 ($baseline*0.75) 0 0;
+            margin: flip(0 ($baseline*0.75) 0 0, 0 0 0 ($baseline*0.75));
             padding: ($baseline/4) 0 0 0;
-            float: left;
+            float: $left;
             position: relative;
 
             input, textarea {
@@ -316,7 +316,7 @@
                 @extend %ui-btn-flat-outline;
                 position: absolute;
                 top: 3px;
-                right: 0;
+                #{$right}: 0;
             }
 
           }
