@@ -764,6 +764,9 @@ OpenSeadragonAnnotation = function (element, options) {
 		
 	if (typeof Annotator.Plugin["OpenSeaDragon"] === 'function') 
 		this.annotator.addPlugin("OpenSeaDragon");
+            
+        if (typeof Annotator.Plugin["Flagging"] === 'function') 
+		this.annotator.addPlugin("Flagging");
 
 	//- OpenSeaDragon
 	this.viewer =  OpenSeadragon(options.optionsOpenSeadragon);

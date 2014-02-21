@@ -168,7 +168,6 @@
     tinyMCE.baseURL = "${settings.STATIC_URL}" + "js/vendor/ova";
     var imgURLRoot = "${settings.STATIC_URL}" + "js/vendor/ova/catch/img/";
 	var startova = function(){
-    if (typeof Annotator != 'undefined'){
         //remove old instances
         if (Annotator._instances.length !== 0) {
         $('#textHolder').annotator("destroy");

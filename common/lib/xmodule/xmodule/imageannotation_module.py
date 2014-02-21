@@ -1,12 +1,14 @@
 """
 Module for Image annotations using annotator.
 """
+import datetime
 from lxml import etree
 from pkg_resources import resource_string
 
 from xmodule.x_module import XModule
 from xmodule.raw_module import RawDescriptor
 from xblock.core import Scope, String
+from xmodule.firebase_token_generator import create_token
 
 import textwrap
 
@@ -69,6 +71,9 @@ class ImageAnnotationModule(AnnotatableFields, XModule):
 
         self.instructions = self._extract_instructions(xmltree)
         self.openseadragonjson = self.remove_html_markup(etree.tostring(xmltree.find('json'), encoding='unicode'))
+        self.user = ""
+        if self.runtime.get_real_user is not None:
+            self.user = self.runtime.get_real_user(self.runtime.anonymous_student_id).email
 
     def _extract_instructions(self, xmltree):
         """ Removes <instructions> from the xmltree and returns them as a string, otherwise None. """
@@ -96,13 +101,35 @@ class ImageAnnotationModule(AnnotatableFields, XModule):
 
         return out
 
+    def token(self, userId):
+        '''
+        Return a token for the backend of annotations.
+        It uses the course id to retrieve a variable that contains the secret
+        token found in inheritance.py. It also contains information of when
+        the token was issued. This will be stored with the user along with
+        the id for identification purposes in the backend.
+        '''
+        dtnow = datetime.datetime.now()
+        dtutcnow = datetime.datetime.utcnow()
+        delta = dtnow - dtutcnow
+        newhour, newmin = divmod((delta.days * 24 * 60 * 60 + delta.seconds + 30) // 60, 60)
+        newtime = "%s%+02d:%02d" % (dtnow.isoformat(), newhour, newmin)
+        if "annotation_token_secret" in dir(self):
+            secret = self.annotation_token_secret
+        else:
+            secret = "NoKeyFound"
+        custom_data = {"issuedAt": newtime, "consumerKey": secret, "userId": userId, "ttl": 86400}
+        newtoken = create_token(secret, custom_data)
+        return newtoken
+
     def get_html(self):
         """ Renders parameters to template. """
         context = {
             'display_name': self.display_name_with_default,
             'instructions_html': self.instructions,
             'annotation_storage': self.annotation_storage_url,
-            'openseadragonjson': self.openseadragonjson
+            'openseadragonjson': self.openseadragonjson,
+            'token': self.token(self.user)
         }
 
         return self.system.render_template('imageannotation.html', context)

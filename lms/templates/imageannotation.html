@@ -31,9 +31,8 @@
 		</div>
 	</div>
 </div>
-console.log("${openseadragonjson}");
-<script> 
 
+<script> 
 	function onClickHideInstructions(){
 		//Reset function if there is more than one event handler
 		$(this).off();
@@ -121,7 +120,7 @@ console.log("${openseadragonjson}");
                   },
             },
             auth: {
-                tokenUrl: location.protocol+'//'+location.host+"/token?course_id="+courseid
+                token: "${token}"
             },
             store: {
                 // The endpoint of the store on your server.
@@ -179,16 +178,14 @@ console.log("${openseadragonjson}");
         };
     tinyMCE.baseURL = "${settings.STATIC_URL}" + "js/vendor/ova";
     var imgURLRoot = "${settings.STATIC_URL}" + "js/vendor/ova/catch/img/";
-	
     if (typeof Annotator != 'undefined'){
     	    //remove old instances
 	    if (Annotator._instances.length !== 0) {
-	      $('#imageHolder').annotator("destroy");
+	      $('#imageHolder').annotator("destroy");console.log("ss");
 	    }
 	    delete osda;
 	    //Load the plugin Image/Text Annotation
-	var osda = new OpenSeadragonAnnotation($('#imageHolder'),options); 
-	    osda.annotator.addPlugin('Tags');
+	var osda = new OpenSeadragonAnnotation($('#imageHolder'),options);
 	    
 	    //Catch
 	    var annotator = osda.annotator,
