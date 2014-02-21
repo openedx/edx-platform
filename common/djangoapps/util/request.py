@@ -1,6 +1,7 @@
 """ Utility functions related to HTTP requests """
 from django.conf import settings
 from microsite_configuration.middleware import MicrositeConfiguration
+from track.contexts import COURSE_REGEX
 
 
 def safe_get_host(request):
@@ -16,3 +17,17 @@ def safe_get_host(request):
         return request.get_host()
     else:
         return MicrositeConfiguration.get_microsite_configuration_value('site_domain', settings.SITE_NAME)
+
+
+def course_id_from_url(url):
+    """
+    Extracts the course_id from the given `url`.
+    """
+    url = url or ''
+
+    match = COURSE_REGEX.match(url)
+    course_id = ''
+    if match:
+        course_id = match.group('course_id') or ''
+
+    return course_id
