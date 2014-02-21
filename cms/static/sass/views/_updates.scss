@@ -147,7 +147,7 @@
 	}
 
 	.post-actions {
-		float: right;
+		float: flip(left, right);
 
 		.edit-button,
 		.delete-button{
@@ -171,8 +171,8 @@
 	width: 30%;
 	padding: 20px 30px;
 	margin: 0;
-	border-radius: 0 3px 3px 0;
-	border-left: none;
+	border-radius: flip(0 3px 3px 0, 3px 0 0 3px);
+	#{$border-left}: none;
 	background: $lightGrey;
 
 	.title {
@@ -191,7 +191,7 @@
 
     .edit-icon,
     .delete-icon {
-      margin-right: 4px;
+      #{$margin-right}: 4px;
     }
 	}
 

@@ -31,7 +31,7 @@ body.course.feature-upload {
       vertical-align: middle;
       width: $baseline*23;
       padding: 7px;
-      text-align: left;
+      text-align: $left;
 
       .title {
         @extend %t-title5;

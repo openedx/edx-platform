@@ -15,7 +15,7 @@
     .icon-question-sign {
       display: inline-block;
       vertical-align: baseline;
-      margin-right: ($baseline/4);
+      margin: ($baseline/4);
     }
 
   }
@@ -104,7 +104,7 @@
       position: absolute;
       display: block;
       top: 0;
-      right: 0;
+      #{$right}: 0;
       z-index: 11;
       width: 35px;
       height: 100%;
@@ -132,8 +132,8 @@
 
     .component-actions {
       display: inline-block;
-      float: right;
-      margin-right: $baseline*2;
+      float: flip(right, left);
+      #{$margin-right}: ($baseline*2);
       padding: 8px 0px;
       vertical-align: middle;
       text-align: center;

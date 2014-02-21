@@ -34,10 +34,10 @@
 
     .new-button {
       @include font-size(14);
-      margin-left: $baseline;
+      #{$margin-left}: $baseline;
 
       [class^="icon-"] {
-        margin-right: ($baseline/2);
+        #{$margin-right}: ($baseline/2);
       }
     }
   }
