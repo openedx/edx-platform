@@ -167,20 +167,20 @@ nav {
   &.ui-right {
 
     .wrapper-nav-sub {
-      left: none;
-      right: 0;
+      #{$left}: none;
+      #{$right}: 0;
     }
 
     .nav-sub {
 
       // ui triangle/nub
       &:after {
-        right: $baseline;
+        #{$right}: $baseline;
         margin-right: -10px;
       }
 
       &:before {
-        right: $baseline;
+        #{$right}: $baseline;
         margin-right: -11px;
       }
     }
