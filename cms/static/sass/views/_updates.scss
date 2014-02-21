@@ -28,7 +28,6 @@
 }
 
 .course-updates {
-<<<<<<< HEAD
   padding: 30px 40px;
   margin: 0;
 
@@ -207,15 +206,15 @@
 		}
 
 		h1 {
-			float: none;
-			font-size: 24px;
-			font-weight: 300;
+      @extend %t-title4;
+      @extend %t-light;
+      float: none;
 		}
 
 		h2 {
-			margin-bottom: 18px;
-			font-size: 14px;
-			font-weight: 700;
+			@extend %t-title7;
+      @extend %t-strong;
+      margin-bottom: 18px;
 			line-height: 30px;
 			color: #646464;
 			letter-spacing: 1px;
@@ -223,15 +222,15 @@
 		}
 
 		h3 {
-			margin: 34px 0 11px;
-			font-size: 16px;
-			font-weight: 700;
+			@extend %t-title6;
+      @extend %t-strong;
+      margin: 34px 0 11px;
 		}
 	}
 
 	.update-contents {
 		p {
-			font-size: 16px;
+			@extend %t-copy-base;
 			line-height: 25px;
 		}
 
@@ -264,10 +263,10 @@
 		}
 
 		pre {
-		  margin: 1em 0;
+		  @extend %t-copy-base;
+      margin: 1em 0;
 		  color: $baseFontColor;
 		  font-family: monospace, serif;
-		  font-size: 1em;
 		  white-space: pre-wrap;
 		  word-wrap: break-word;
 		}
@@ -280,13 +279,6 @@
 		}
 	}
 
-	.new-update-button {
-		@include blue-button;
-		display: block;
-		text-align: center;
-		padding: 18px 0;
-		margin-bottom: 28px;
-	}
 
 	.new-update-form {
 		@include edit-box;
@@ -304,12 +296,12 @@
 
 		.edit-button,
 		.delete-button{
-			float: left;
 			@include white-button;
+      @extend %t-action4;
+      @extend %t-regular;
+      float: left;
 	    padding: 3px 10px 4px;
 	    margin-left: 7px;
-	    font-size: 12px;
-	    font-weight: 400;
 
 	    .edit-icon,
 	    .delete-icon {
@@ -329,15 +321,16 @@
 	background: $lightGrey;
 
 	.title {
-		margin-bottom: 24px;
-		font-size: 22px;
-		font-weight: 300;
+		@extend %t-title4;
+    @extend %t-light;
+    margin-bottom: 24px;
 	}
 
 	.edit-button {
+    @include white-button;
+    @extend %t-action4;
+    @extend %t-regular;
 		float: right;
-		@include white-button;
->>>>>>> Studio RTL
     padding: 3px 10px 4px;
     margin-left: 7px;
 

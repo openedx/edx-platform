@@ -785,7 +785,6 @@ section.instructor-dashboard-content-2 {
         .info {
           @include box-sizing(border-box);
           padding: ($baseline/2);
-
           border: 1px solid $light-gray;
           color: $lighter-base-font-color;
           line-height: 1.3em;
@@ -1624,3 +1623,8 @@ input[name="subject"] {
   }
 }
 
+.rtl .instructor-dashboard-wrapper-2 .olddash-button-wrapper,
+.rtl .instructor-dashboard-wrapper-2 .studio-edit-link {
+  left: 2em;
+  right: auto;
+}
