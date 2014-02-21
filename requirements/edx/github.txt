@@ -13,6 +13,8 @@
 -e git+https://github.com/gabrielfalcao/lettuce.git@cccc3978ad2df82a78b6f9648fe2e9baddd22f88#egg=lettuce
 -e git+https://github.com/dementrock/pystache_custom.git@776973740bdaad83a3b029f96e415a7d1e8bec2f#egg=pystache_custom-dev
 -e git+https://github.com/eventbrite/zendesk.git@d53fe0e81b623f084e91776bcf6369f8b7b63879#egg=zendesk
+# TODO clear this library with appropriate people
+-e git+https://github.com/un33k/django-ipware.git@42cb1bb1dc680a60c6452e8bb2b843c2a0382c90#egg=django-ipware
 
 # Our libraries:
 -e git+https://github.com/edx/XBlock.git@893cd83dfb24405ce81b07f49c1c2e3053cdc865#egg=XBlock

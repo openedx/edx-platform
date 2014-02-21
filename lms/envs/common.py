@@ -724,6 +724,8 @@ MIDDLEWARE_CLASSES = (
 
     # for expiring inactive sessions
     'session_inactivity_timeout.middleware.SessionInactivityTimeout',
+
+    'embargo.middleware.EmbargoMiddleware',
 )
 
 ############################### Pipeline #######################################
@@ -1138,6 +1140,8 @@ INSTALLED_APPS = (
 
     # Student Identity Reverification
     'reverification',
+
+    'embargo',
 )
 
 ######################### MARKETING SITE ###############################
