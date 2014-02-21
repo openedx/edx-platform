@@ -17,8 +17,8 @@ header.global {
   }
 
   h1.logo {
-    float: left;
-    margin: -2px 39px 0px 0px;
+    float: flip(left, right);
+    margin: flip(-2px 39px 0 0, -2px 0 0 39px);
     position: relative;
 
     a {
@@ -28,11 +28,11 @@ header.global {
 
   ol {
     &.left {
-      float: left;
+      float: flip(left, right);
     }
 
     &.guest {
-      float: right;
+      float: flip(left, right);
     }
 
     > li {
@@ -105,7 +105,7 @@ header.global {
     }
 
     &.user {
-      float: right;
+      float: flip(right,left);
       margin-top: 4px;
 
       > li.primary {
@@ -171,7 +171,7 @@ header.global {
         display: none;
         padding: 5px 10px;
         position: absolute;
-        right: 0px;
+        #{$right}: 0px;
         top: 34px;
         width: 170px;
         z-index: 3;
@@ -194,7 +194,7 @@ header.global {
           height: 0px;
           position: absolute;
           @include transform(rotate(-45deg));
-          right: 12px;
+          #{$right}: 12px;
           top: -6px;
           width: 0px;
         }
