@@ -6,7 +6,7 @@ body {
 }
 
 body, h1, h2, h3, h4, h5, h6, p, p a:link, p a:visited, a, label {
-  text-align: left;
+  text-align: $left;
   font-family: $sans-serif;
 }
 
@@ -49,7 +49,7 @@ form {
 form.choicegroup {
   label {
     clear: both;
-    float: left;
+    float: $left;
   }
 }
 
