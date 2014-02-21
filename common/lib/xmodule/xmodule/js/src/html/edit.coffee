@@ -19,6 +19,9 @@ class @HTMLEditingDescriptor
 #   This is a workaround for the fact that tinyMCE's baseURL property is not getting correctly set on AWS
 #   instances (like sandbox). It is not necessary to explicitly set baseURL when running locally.
     tinyMCE.baseURL = "#{baseUrl}/js/vendor/tiny_mce"
+#   This is necessary for the LMS bulk e-mail acceptance test. In that particular scenario,
+#   tinyMCE incorrectly decides that the suffix should be "", which means it fails to load files.
+    tinyMCE.suffix = ".min"
     @tiny_mce_textarea = $(".tiny-mce", @element).tinymce({
       script_url : "#{baseUrl}/js/vendor/tiny_mce/tiny_mce.min.js",
       theme : "modern",
