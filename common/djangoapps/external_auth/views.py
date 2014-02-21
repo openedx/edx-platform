@@ -193,21 +193,33 @@ def _external_login_or_signup(request,
         else:
             auth_backend = 'django.contrib.auth.backends.ModelBackend'
         user.backend = auth_backend
-        AUDIT_LOG.info('Linked user "%s" logged in via Shibboleth', user.email)
+        if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
+            AUDIT_LOG.info('Linked user.id: {0} logged in via Shibboleth'.format(user.id))
+        else:
+            AUDIT_LOG.info('Linked user "{0}" logged in via Shibboleth'.format(user.email))
     elif uses_certs:
         # Certificates are trusted, so just link the user and log the action
         user = internal_user
         user.backend = 'django.contrib.auth.backends.ModelBackend'
-        AUDIT_LOG.info('Linked user "%s" logged in via SSL certificate', user.email)
+        if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
+            AUDIT_LOG.info('Linked user_id {0} logged in via SSL certificate'.format(user.id))
+        else:
+            AUDIT_LOG.info('Linked user "{0}" logged in via SSL certificate'.format(user.email))
     else:
         user = authenticate(username=uname, password=eamap.internal_password, request=request)
     if user is None:
         # we want to log the failure, but don't want to log the password attempted:
-        AUDIT_LOG.warning('External Auth Login failed for "%s"', uname)
+        if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
+            AUDIT_LOG.warning('External Auth Login failed')
+        else:
+            AUDIT_LOG.warning('External Auth Login failed for "{0}"'.format(uname))
         return _signup(request, eamap, retfun)
 
     if not user.is_active:
-        AUDIT_LOG.warning('User "%s" is not active after external login', uname)
+        if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
+            AUDIT_LOG.warning('User {0} is not active after external login'.format(user.id))
+        else:
+            AUDIT_LOG.warning('User "{0}" is not active after external login'.format(uname))
         # TODO: improve error page
         msg = 'Account not yet activated: please look for link in your email'
         return default_render_failure(request, msg)
@@ -223,7 +235,10 @@ def _external_login_or_signup(request,
         student.views.try_change_enrollment(enroll_request)
     else:
         student.views.try_change_enrollment(request)
-    AUDIT_LOG.info("Login success - %s (%s)", user.username, user.email)
+    if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
+        AUDIT_LOG.info("Login success - user.id: {0}".format(user.id))
+    else:
+        AUDIT_LOG.info("Login success - {0} ({1})".format(user.username, user.email))
     if retfun is None:
         return redirect('/')
     return retfun()
@@ -812,8 +827,11 @@ def provider_login(request):
             user = User.objects.get(email=email)
         except User.DoesNotExist:
             request.session['openid_error'] = True
-            msg = "OpenID login failed - Unknown user email: %s"
-            AUDIT_LOG.warning(msg, email)
+            if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
+                AUDIT_LOG.warning("OpenID login failed - Unknown user email")
+            else:
+                msg = "OpenID login failed - Unknown user email: {0}".format(email)
+                AUDIT_LOG.warning(msg)
             return HttpResponseRedirect(openid_request_url)
 
         # attempt to authenticate user (but not actually log them in...)
@@ -828,8 +846,11 @@ def provider_login(request):
 
         if user is None:
             request.session['openid_error'] = True
-            msg = "OpenID login failed - password for %s is invalid"
-            AUDIT_LOG.warning(msg, email)
+            if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
+                AUDIT_LOG.warning("OpenID login failed - invalid password")
+            else:
+                msg = "OpenID login failed - password for {0} is invalid".format(email)
+                AUDIT_LOG.warning(msg)
             return HttpResponseRedirect(openid_request_url)
 
         # authentication succeeded, so fetch user information
@@ -839,8 +860,11 @@ def provider_login(request):
             if 'openid_error' in request.session:
                 del request.session['openid_error']
 
-            AUDIT_LOG.info("OpenID login success - %s (%s)",
-                           user.username, user.email)
+            if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
+                AUDIT_LOG.info("OpenID login success - user.id: {0}".format(user.id))
+            else:
+                AUDIT_LOG.info("OpenID login success - {0} ({1})".format(
+                               user.username, user.email))
 
             # redirect user to return_to location
             url = endpoint + urlquote(user.username)
@@ -859,8 +883,11 @@ def provider_login(request):
 
         # the account is not active, so redirect back to the login page:
         request.session['openid_error'] = True
-        msg = "Login failed - Account not active for user %s"
-        AUDIT_LOG.warning(msg, username)
+        if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
+            AUDIT_LOG.warning("Login failed - Account not active for user.id {0}".format(user.id))
+        else:
+            msg = "Login failed - Account not active for user {0}".format(username)
+            AUDIT_LOG.warning(msg)
         return HttpResponseRedirect(openid_request_url)
 
     # determine consumer domain if applicable
