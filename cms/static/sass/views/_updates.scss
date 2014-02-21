@@ -28,6 +28,7 @@
 }
 
 .course-updates {
+<<<<<<< HEAD
   padding: 30px 40px;
   margin: 0;
 
@@ -179,12 +180,170 @@
     @extend %t-action4;
     @extend %t-regular;
     float: right;
+=======
+	padding: 30px 40px;
+	margin: 0;
+
+	.update-list > li {
+		padding: 34px 0 42px;
+		border-top: 1px solid #cbd1db;
+
+		&:first-child {
+			padding-top: 0;
+			border: none;
+		}
+
+		&.editing {
+			position: relative;
+			z-index: 1001;
+			padding: 0;
+			border-top: none;
+			border-radius: 3px;
+			background: #fff;
+
+			.post-preview {
+				display: none;
+			}
+		}
+
+		h1 {
+			float: none;
+			font-size: 24px;
+			font-weight: 300;
+		}
+
+		h2 {
+			margin-bottom: 18px;
+			font-size: 14px;
+			font-weight: 700;
+			line-height: 30px;
+			color: #646464;
+			letter-spacing: 1px;
+			text-transform: uppercase;
+		}
+
+		h3 {
+			margin: 34px 0 11px;
+			font-size: 16px;
+			font-weight: 700;
+		}
+	}
+
+	.update-contents {
+		p {
+			font-size: 16px;
+			line-height: 25px;
+		}
+
+		p + p {
+			margin-top: 25px;
+		}
+
+		.primary {
+			border: 1px solid #ddd;
+			background: #f6f6f6;
+			padding: 20px;
+		}
+
+		ol, ul {
+		  margin: 1em 0;
+		  padding: 0 0 0 1em;
+		  color: $baseFontColor;
+
+		  li {
+		    margin-bottom: 0.708em;
+		  }
+		}
+
+		ol {
+		  list-style: decimal outside none;
+		}
+
+		ul {
+		  list-style: disc outside none;
+		}
+
+		pre {
+		  margin: 1em 0;
+		  color: $baseFontColor;
+		  font-family: monospace, serif;
+		  font-size: 1em;
+		  white-space: pre-wrap;
+		  word-wrap: break-word;
+		}
+
+		code {
+		  color: $baseFontColor;
+		  font-family: monospace, serif;
+		  background: none;
+		  padding: 0;
+		}
+	}
+
+	.new-update-button {
+		@include blue-button;
+		display: block;
+		text-align: center;
+		padding: 18px 0;
+		margin-bottom: 28px;
+	}
+
+	.new-update-form {
+		@include edit-box;
+		margin-bottom: 24px;
+		padding: 30px;
+		border: none;
+
+		textarea {
+			height: 180px;
+		}
+	}
+
+	.post-actions {
+		float: flip(right, left);
+
+		.edit-button,
+		.delete-button{
+			float: left;
+			@include white-button;
+	    padding: 3px 10px 4px;
+	    margin-left: 7px;
+	    font-size: 12px;
+	    font-weight: 400;
+
+	    .edit-icon,
+	    .delete-icon {
+	      margin-right: 4px;
+	    }
+		}
+	}
+}
+
+.course-handouts {
+	@extend %ui-window;
+	width: 30%;
+	padding: 20px 30px;
+	margin: 0;
+	border-radius: flip(0 3px 3px 0, 3px 0 0 3px);
+	#{$border-left}: none;
+	background: $lightGrey;
+
+	.title {
+		margin-bottom: 24px;
+		font-size: 22px;
+		font-weight: 300;
+	}
+
+	.edit-button {
+		float: right;
+		@include white-button;
+>>>>>>> Studio RTL
     padding: 3px 10px 4px;
     margin-left: 7px;
 
     .edit-icon,
     .delete-icon {
-      margin-right: 4px;
+      #{$margin-right}: 4px;
     }
   }
 

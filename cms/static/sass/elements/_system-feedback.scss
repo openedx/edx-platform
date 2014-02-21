@@ -610,27 +610,6 @@
       width: flex-grid(1, 12);
     }
 
-<<<<<<< HEAD
-    .copy {
-      width: flex-grid(7, 12);
-      margin-right: flex-gutter();
-    }
-
-    .nav-actions {
-     width: flex-grid(4, 12);
-     float: right;
-     margin-top: ($baseline/2);
-     text-align: right;
-
-     .nav-item {
-       display: inline-block;
-       vertical-align: middle;
-       margin-right: ($baseline/2);
-
-       &:last-child {
-         margin-right: 0;
-       }
-=======
   	.copy {
   		width: flex-grid(7, 12);
   		#{$margin-right}: flex-gutter();
@@ -650,7 +629,6 @@
   	    &:last-child {
   	      #{$margin-right}: 0;
   	    }
->>>>>>> studio RTL mostly done
 
        .action-primary {
         @extend %t-action4;
