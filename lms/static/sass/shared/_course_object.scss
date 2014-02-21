@@ -22,7 +22,7 @@
       .courses-listing-item {
         width: flex-grid(4);
         margin-right: flex-gutter();
-        float: left;
+        float: flip(left, right);
 
         &:nth-child(3n+3) {
           margin-right: 0;
