@@ -748,7 +748,7 @@ class MultipleChoiceResponse(LoncapaResponse):
         for response in self.xml.xpath("choicegroup"):
             # Is Masking enabled? -- check for shuffle or answer-pool features
             ans_str = response.get("answer-pool")
-            if response.get("shuffle") == "true" or (ans_str is not None and ans_str != "0"):
+            if False: # Temporarily turn off masking
                 self.is_masked = True
                 self.mask_dict = {}
                 rng = random.Random(self.context["seed"])
