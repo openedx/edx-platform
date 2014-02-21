@@ -278,16 +278,15 @@ section.instructor-dashboard-content-2 {
 
 
 .instructor-dashboard-wrapper-2 section.idash-section#membership {
-  $half_width: $baseline * 20;
 
   .vert-left {
     float: left;
-    width: $half_width;
+    width: 45%;
   }
 
   .vert-right {
     float: right;
-    width: $half_width;
+    width: 45%;
   }
 
   select {
@@ -308,7 +307,7 @@ section.instructor-dashboard-content-2 {
     position: absolute;
     display: none;
     padding: $baseline;
-    width: $half_width;
+    width: 45%;
     border: 1px solid $light-gray;
     background-color: $white;
 
@@ -316,7 +315,7 @@ section.instructor-dashboard-content-2 {
       font-weight: bold;
     }
   }
-  
+
   label[for="email-students"]:hover + .email-students-hint {
     display: block;
   }
@@ -325,7 +324,7 @@ section.instructor-dashboard-content-2 {
     position: absolute;
     display: none;
     padding: $baseline;
-    width: $half_width;
+    width: 45%;
     border: 1px solid $light-gray;
     background-color: $white;
 
@@ -647,11 +646,16 @@ section.instructor-dashboard-content-2 {
 
   input[type="button"].add {
     @include idashbutton($blue);
-    position: absolute;
     right: $baseline;
   }
 }
 
 input[name="subject"] {
   width:600px;
+}
+
+.rtl .instructor-dashboard-wrapper-2 .olddash-button-wrapper,
+.rtl .instructor-dashboard-wrapper-2 .studio-edit-link {
+  left: 2em;
+  right: auto;
 }

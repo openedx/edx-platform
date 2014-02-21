@@ -28,8 +28,8 @@
 
   .profile-sidebar {
     background: transparent;
-    float: left;
-    margin-right: flex-gutter();
+    float: flip(left, right);
+    #{$margin-right}: flex-gutter();
     width: flex-grid(3);
 
     header.profile {
@@ -283,7 +283,7 @@
 
   // course listings
   .my-courses {
-    float: left;
+    float: flip(left, right);
     margin: 0px;
     width: flex-grid(9);
 
@@ -357,7 +357,7 @@
 
       .cover {
         @include box-sizing(border-box);
-        float: left;
+        float: flip(left, right);
         height: 100%;
         max-height: 100%;
         margin: 0px;
@@ -374,7 +374,7 @@
 
       .info {
         @include clearfix;
-        padding: 0 10px 0 230px;
+        padding: flip(0 10px 0 230px, 0 230px 0 10px);
 
         > hgroup {
           padding: 0;
@@ -393,7 +393,7 @@
           .date-block {
             position: absolute;
             top: 0;
-            right: 0;
+            #{$right}: 0;
             font-family: $sans-serif;
             font-size: 13px;
             font-style: italic;

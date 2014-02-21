@@ -648,11 +648,11 @@ body.discussion {
     }
 
     .icon {
-      @include transition(all .2s ease-out); 
+      @include transition(all .2s ease-out);
       z-index: 100;
       display: inline-block;
       width: 100%;
-      color: #aeaeae; 
+      color: #aeaeae;
       text-align: center;
       font-size: 28px;
       line-height: 60px;
@@ -764,7 +764,7 @@ body.discussion {
     .browse-topic-drop-icon {
       display: block;
       visibility: visible;
-      @include transition(none);  
+      @include transition(none);
     }
 
     .browse-topic-drop-menu-wrapper {
@@ -1223,7 +1223,7 @@ body.discussion {
     }
     .home-stats {
       padding: $baseline 0;
-      
+
       .label-area {
         display: inline-block;
         min-width: $baseline*5;
@@ -1301,30 +1301,30 @@ body.discussion {
       }
 
       .row-item-full {
-        
+
         .notification-checkbox {
           display: inline-block;
           padding: $baseline/4 0 $baseline/2 0;
           margin-right: $baseline/2;
           border-radius: 5px;
           border: 1px solid gray;
-          
+
           .email-setting {
             display: inline-block;
             text-align: center;
             vertical-align: middle;
             margin-left: $baseline/2;
           }
-  
+
           .icon {
             display: inline-block;
           }
-      
+
           .email-setting:checked ~ .icon {
             color: $green;
           }
         }
-        
+
         .row-description {
           display: inline-block;
           width:80%;
@@ -1351,7 +1351,7 @@ body.discussion {
 
   .discussion-article {
     position: relative;
-    min-height: 468px;         
+    min-height: 468px;
 
     a {
       word-wrap: break-word;
@@ -1898,7 +1898,7 @@ body.discussion {
 
   div.add-response.post-extended-content {
     margin-top: $baseline;
-    margin-bottom: 20px; 
+    margin-bottom: 20px;
 
     button.add-response-btn {
       @include white-button;
@@ -1908,7 +1908,7 @@ body.discussion {
       font-size: 13px;
       text-align: left;
       @include animation(fadeIn .3s);
-      width: 100%; 
+      width: 100%;
       padding-left: 30px;
 
       span.add-response-btn-text {
@@ -2471,6 +2471,7 @@ body.discussion {
       float:right;
       padding-right: 5px;
       font-style: italic;
+      cursor: pointer;
       margin-right: $baseline/2;
       opacity: 0.8;
 
