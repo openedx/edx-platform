@@ -142,7 +142,7 @@ def _get_date_for_press(publish_date):
     return date
 
 
-def embargo(request):
+def embargo(_request):
     """
     Render the embargo page.
 
