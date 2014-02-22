@@ -87,6 +87,7 @@ class StaffGradingFields(object):
     )
     due = Date(help="Date that this problem is due by; uploads allowed until due date is past", scope=Scope.settings)
     done = Boolean(help="Whether the student has answered the problem", scope=Scope.user_state)
+    score_available = Boolean(help="Whether a grade score has been given for the problem", scope=Scope.user_state, default=False)
     score = Float(
         display_name="Grade score",
         help=("Grade score given to assignment by staff."),
@@ -158,20 +159,24 @@ class StaffGradingModule(StaffGradingFields, XModule):
         '''
         rset = self.fstat.get_status()
         newscore = 'unchanged'
-        if rset and rset[0].get('score', None) is not None:
+        if rset and rset[0].get('score', None) is not None and rset[0].get('score', None)!="None":
             newscore = rset[0].get('score')
         elif rset:
             newscore = None
         if (not newscore=='unchanged') and (not self.score == newscore):
-            self.score = newscore
+            if newscore is None:
+                self.score_available = False
+            else:
+                self.score = newscore
+                self.score_available = True
+                log.info("[%s] Set local score for uploaded assignment by %s to %s" % (self.location.name, self.user, self.score))
             self.publish_grade()
-            log.info("[%s] Set local score for uploaded assignment by %s to %s" % (self.location.name, self.user, self.score))
             
     def is_graded(self):
         '''
         Return True if this assignment has been graded
         '''
-        return self.score is not None
+        return self.score_available
 
     def get_score(self):
         """
@@ -183,12 +188,13 @@ class StaffGradingModule(StaffGradingFields, XModule):
         """
         Publishes the student's current grade to the system as an event
         """
+        score = self.score if self.score_available else None
         self.system.publish({
             'event_name': 'grade',
-            'value': self.score,
+            'value': score,
             'max_value': self.the_max_score,
         })
-        return {'grade': self.score, 'max_grade': self.the_max_score}
+        return {'grade': score, 'max_grade': self.the_max_score}
 
     def max_score(self):
         """
@@ -196,14 +202,16 @@ class StaffGradingModule(StaffGradingFields, XModule):
         """
         return self.the_max_score
 
-    def log_action(self, action):
+    def log_action(self, action, event=''):
         '''
         Store historical record of action (a string).  
         Do this to maintain integrity of staff grading records.
         '''
         dt = str(datetime.datetime.now(UTC))
-        self.history[dt] = action
-        log.info('[%s] %s' % (self.location.name, action))
+        self.history[dt] = '%s: %s' % (action, event)
+        log.info('[%s] %s: %s' % (self.location.name, action, event))
+        event_info = {'event': event, 'location': self.location.name}
+        self.system.track_function('SGA_' + action, event_info)
 
     def handle_ajax(self, dispatch, data):
         '''
@@ -215,32 +223,32 @@ class StaffGradingModule(StaffGradingFields, XModule):
             try:
                 link = self.upload_file(data)
                 fd = data['file'][0]
-                self.log_action('upload fn=%s, size=%s' % (fd.size, fd.name))
+                self.log_action('upload','fn=%s, size=%s' % (fd.size, fd.name))
             except Exception as err:
                 return json.dumps({'msg':'Error: failed to upload, please retry'})
             return json.dumps({'msg':'ok', 'url': link})
 
         elif dispatch=='download':
-            self.log_action('download %s' % data)
+            self.log_action('download','%s' % data)
             return self.do_download(data)
 
         elif dispatch=='list':
             return self.list_submissions(data)
 
         elif dispatch=='score' and self.system.user_is_staff:
-            self.log_action('score %s' % data)
+            self.log_action('score', '%s' % data)
             return self.enter_score(data)
 
         elif dispatch=='downloadAnnotated':
-            self.log_action('downloadAnnotated %s' % data)
+            self.log_action('downloadAnnotated', '%s' % data)
             return self.do_download(data, is_annotated=True)
 
         elif dispatch=='uploadAnnotated' and self.system.user_is_staff:
-            self.log_action('uploadAnnotated %s' % data)
+            self.log_action('uploadAnnotated', '%s' % data)
             return self.upload_file(data, is_annotated=True)
 
         elif dispatch=='unscore' and self.system.user_is_staff:
-            self.log_action('unscore %s' % data)
+            self.log_action('unscore', '%s' % data)
             return self.remove_score(data)
 
         else:
@@ -332,7 +340,7 @@ class StaffGradingModule(StaffGradingFields, XModule):
             for k, v in status.items():
                 item[k] = v
             item.save()
-            module.log_action("Saved SDB item %s" % item)
+            module.log_action("Save_SDB", "%s" % item)
             return True, "Saved"
 
         def update_annotated(self, s3_filename, staff_filename, uname):
@@ -357,7 +365,7 @@ class StaffGradingModule(StaffGradingFields, XModule):
                 return False, 'No record found'
             item = rset[0]
             if score is None:
-                self.module.log_action('Removing grade, previously %s' % item)
+                self.module.log_action('remove_grade', 'previously %s' % item)
                 item['score'] = None
                 if 'staff_comments' in item:
                     item.pop('staff_comments')
@@ -466,7 +474,7 @@ class StaffGradingModule(StaffGradingFields, XModule):
             return json.dumps({'ok': False, 'msg':'No files to download'})
         url = key.generate_url(expires_in=60, force_http=True)	# temporary URL from s3
         # redir = '<html><head><meta http-equiv="Refresh" content="0; url=%s" /></head>' % url
-        self.log_action('download uname=%s, fn=%s, url=%s' % (data.get('uname', ''), s3fn, url))
+        self.log_action('download', 'uname=%s, fn=%s, url=%s' % (data.get('uname', ''), s3fn, url))
         return json.dumps({'ok': True, 'url': url})
         
 
@@ -486,7 +494,7 @@ class StaffGradingModule(StaffGradingFields, XModule):
         if is_annotated, then the file is an annotated file (for student, from staff).
         """
         fd = data['file'][0]
-        self.log_action('upload_file fd=%s, size=%s, name=%s' % (fd, fd.size, fd.name))
+        self.log_action('upload_file', 'fd=%s, size=%s, name=%s' % (fd, fd.size, fd.name))
 
         fd.seek(0)
         file_key = self.make_file_name(fd.name)
