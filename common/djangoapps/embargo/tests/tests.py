@@ -6,7 +6,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from django.test import TestCase
 from django.test.utils import override_settings
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
-from embargo.models import EmbargoConfig
+from embargo.models import EmbargoedCourse, EmbargoedState
 from django.test import Client
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
@@ -29,18 +29,18 @@ class EmbargoMiddlewareTests(TestCase):
         self.regular_course.save()
         self.embargoed_page = '/courses/' + self.embargo_course.id + '/info'
         self.regular_page = '/courses/' + self.regular_course.id + '/info'
-        EmbargoConfig(
-            embargoed_countries="CU, IR, SY,SD",
-            embargoed_courses=self.embargo_course.id,
+        EmbargoedCourse(course_id=self.embargo_course.id, embargoed=True).save()
+        EmbargoedState(
+            embargoed_countries="cu, ir, Sy, SD",
             changed_by=self.user,
             enabled=True
         ).save()
-
+        # TODO need to set up & test whitelist/blacklist IPs (IPException model)
         CourseEnrollment.enroll(self.user, self.regular_course.id)
         CourseEnrollment.enroll(self.user, self.embargo_course.id)
 
     def test_countries(self):
-        def mock_country_code_by_addr(ip):
+        def mock_country_code_by_addr(ip_addr):
             """
             Gives us a fake set of IPs
             """
@@ -50,7 +50,7 @@ class EmbargoMiddlewareTests(TestCase):
                 '3.0.0.0': 'SY',
                 '4.0.0.0': 'SD',
             }
-            return ip_dict.get(ip, 'US')
+            return ip_dict.get(ip_addr, 'US')
 
         with mock.patch.object(pygeoip.GeoIP, 'country_code_by_addr') as mocked_method:
             mocked_method.side_effect = mock_country_code_by_addr
