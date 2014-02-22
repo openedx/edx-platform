@@ -4,20 +4,19 @@ Advanced Problems
 =================
 
 Advanced problems are problems such as drag and drop, circuit schematic
-builder, and math expression problems. These problems appear on the
+builder, and math expression problems. Many of these problems appear on the
 Advanced tab when you create a new Problem component. Studio provides
 templates for these problems, but the problems open directly in the
 **Advanced Editor** and have to be created in XML.
 
+-  :ref:`Chemical Equation` In chemical equation problems, students enter text that represents a chemical equation into a text box. 
 -  :ref:`Circuit Schematic Builder` In circuit schematic problems, students
    create and modify circuits on an interactive grid and submit
    computer-generated analyses of the circuits for grading.
 -  :ref:`Custom JavaScript Display and Grading` With custom JavaScript display
    and grading problems, you can incorporate problem types that you've created
    in HTML into Studio via an IFrame.
--  :ref:`Write-Your-Own-Grader` Write-your-own-grader problems
-   evaluate students' responses using an embedded Python script that you
-   create. These problems can be any type.
+-  :ref:`Custom Python Evaluated Input` Custom Python-evaluated input (also called "write-your-own-grader" problems evaluate students' responses using an embedded Python script that you create. These problems can be any type.
 -  :ref:`Drag and Drop` Drag and drop problems require students to drag text
    or objects to a specific location on an image.
 -  :ref:`Image Mapped Input` Image mapped input problems require students to
@@ -36,8 +35,104 @@ then click the name of the problem that you want to create.
 
 To add a label for an advanced problem, you'll add a **label** attribute to one of the XML tags for the problem. For more information, see :ref:`Appendix E`.
 
-.. _Circuit Schematic Builder:
+.. _Chemical Equation Input:
 
+Chemical Equation
+-----------------
+
+In chemical equation problems, students enter text that represents a chemical equation into a text box. The LMS converts that text into a chemical equation below the text box.
+
+**Sample Problem**
+
+.. image:: /Images/ChemicalEquationExample.png
+ :alt: Image of a chemical equation problem
+
+**Required Tags**
+
+.. list-table::
+   :widths: 20 80
+
+   * - ``<customresponse>``
+     - Indicates that this problem has a custom response. The ``<customresponse>`` tags must surround the ``<chemicalequation>`` tags.
+   * - ``<chemicalequationinput>``
+     - A child of ``<customresponse>``. Indicates that the answer to this problem is a chemical equation. Must contain the ``size`` and ``label`` attributes.
+   * - ``<answer type=loncapa/python>``
+     - A child of ``<chemicalequationinput>``. Contains the Python script that grades the problem.
+
+Chemical equation problems use MathJax to create formulas. For more information about using MathJax in Studio, see :ref:`MathJax in Studio`.
+
+**Sample Problem XML**:
+
+.. code-block:: xml
+
+  <problem>
+    <startouttext/>
+    <p>Some problems may ask for a particular chemical equation. Practice by writing out the following reaction in the box below.</p>
+    
+  \( \text{H}_2\text{SO}_4 \longrightarrow \text { H}^+ + \text{ HSO}_4^-\)
+
+    <customresponse>
+      <chemicalequationinput size="50" label="Practice by writing out the following reaction in the box below."/>
+      <answer type="loncapa/python">
+
+  if chemcalc.chemical_equations_equal(submission[0], 'H2SO4 -> H^+ + HSO4^-'):
+      correct = ['correct']
+  else:
+      correct = ['incorrect']
+
+      </answer>
+    </customresponse>
+    <p>Some tips:</p>
+    <ul>
+    <li>Use real element symbols.</li>
+    <li>Create subscripts by using plain text.</li>
+    <li>Create superscripts by using a caret (^).</li>
+    <li>Create the reaction arrow (\(\longrightarrow\)) by using "->".</li>
+    </ul>
+
+    <endouttext/>
+  
+   <solution>
+   <div class="detailed-solution">
+   <p>Solution</p>
+   <p>To create this equation, enter the following:</p>
+     <p>H2SO4 -> H^+ + HSO4^-</p>
+   </div>
+   </solution>
+  </problem>
+
+**Problem Template**:
+
+.. code-block:: xml
+
+  <problem>
+    <startouttext/>
+    <p>Problem text</p>
+
+    <customresponse>
+      <chemicalequationinput size="50" label="label text"/>
+      <answer type="loncapa/python">
+
+  if chemcalc.chemical_equations_equal(submission[0], 'TEXT REPRESENTING CHEMICAL EQUATION'):
+      correct = ['correct']
+  else:
+      correct = ['incorrect']
+
+      </answer>
+    </customresponse>
+
+    <endouttext/>
+  
+   <solution>
+   <div class="detailed-solution">
+   <p>Solution or Explanation Header</p>
+   <p>Solution or explanation text</p>
+   </div>
+   </solution>
+  </problem>
+
+
+.. _Circuit Schematic Builder:
 
 Circuit Schematic Builder
 -------------------------
@@ -59,6 +154,64 @@ Create a Circuit Schematic Builder Problem
 #. In the component that appears, click **Edit**.
 #. In the component editor, replace the example code with your own code.
 #. Click **Save**.
+
+**Problem Code**:
+
+.. code-block:: xml
+
+
+    <problem>
+      <p>Make a voltage divider that splits the provided voltage evenly.</p>
+    <schematicresponse>
+    <center>
+    <schematic height="500" width="600" parts="g,r" analyses="dc"
+    initial_value="[["v",[168,144,0],{"value":"dc(1)","_json_":0},["1","0"]],["r",[296,120,0],{"r":"1","_json_":1},["1","output"]],["L",[296,168,3],{"label":"output","_json_":2},["output"]],["w",[296,216,168,216]],["w",[168,216,168,192]],["w",[168,144,168,120]],["w",[168,120,296,120]],["g",[168,216,0],{"_json_":7},["0"]],["view",-67.49999999999994,-78.49999999999994,1.6000000000000003,"50","10","1G",null,"100","1","1000"]]"
+    />
+    </center>
+    <answer type="loncapa/python">
+    dc_value = "dc analysis not found"
+    for response in submission[0]:
+      if response[0] == 'dc':
+          for node in response[1:]:
+              dc_value = node['output']
+    if dc_value == .5:
+      correct = ['correct']
+    else:
+      correct = ['incorrect']
+    </answer>
+    </schematicresponse>
+    <schematicresponse>
+    <p>Make a high pass filter.</p>
+    <center>
+    <schematic height="500" width="600" parts="g,r,s,c" analyses="ac"
+    submit_analyses="{"ac":[["NodeA",1,9]]}"
+    initial_value="[["v",[160,152,0],{"name":"v1","value":"sin(0,1,1,0,0)","_json_":0},["1","0"]],["w",[160,200,240,200]],["g",[160,200,0],{"_json_":2},["0"]],["L",[240,152,3],{"label":"NodeA","_json_":3},["NodeA"]],["s",[240,152,0],{"color":"cyan","offset":"0","_json_":4},["NodeA"]],["view",64.55878906250004,54.114697265625054,2.5000000000000004,"50","10","1G",null,"100","1","1000"]]"/>
+    </center>
+    <answer type="loncapa/python">
+    ac_values = None
+    for response in submission[0]:
+      if response[0] == 'ac':
+          for node in response[1:]:
+              ac_values = node['NodeA']
+    print "the ac analysis value:", ac_values
+    if ac_values == None:
+      correct = ['incorrect']
+    elif ac_values[0][1] < ac_values[1][1]:
+      correct = ['correct']
+    else:
+      correct = ['incorrect']
+    </answer>
+    </schematicresponse>
+        <solution>
+            <div class="detailed-solution">
+                <p>Explanation</p>
+                <p>A voltage divider that evenly divides the input voltage can be formed with two identically valued resistors, with the sampled voltage taken in between the two.</p>
+                <p><img src="/c4x/edX/edX101/asset/images_voltage_divider.png"/></p>
+                <p>A simple high-pass filter without any further constaints can be formed by simply putting a resister in series with a capacitor. The actual values of the components do not really matter in order to meet the constraints of the problem.</p>
+                <p><img src="/c4x/edX/edX101/asset/images_high_pass_filter.png"/></p>
+            </div>
+        </solution>
+    </problem>
 
 .. _Custom JavaScript Display and Grading:
 
@@ -199,17 +352,13 @@ JavaScript Input Problem Code
 
 
 
-.. _Write-Your-Own-Grader:
+.. _Custom Python Evaluated Input:
 
-Write-Your-Own-Grader ("Custom Python-Evaluated Input")
+Custom Python-Evaluated Input ("Write-Your-Own-Grader")
 -------------------------------------------------------
 
 
-In write-your-own-grader problems (also called "custom Python-evaluated
-input" problems), the grader evaluates a student's response using a
-Python script that you create and embed in the problem. These problems
-can be any type. Numerical input and text input problems are the most
-popular write-your-own-grader.
+In custom Python-evaluated input  (also called "write-your-own-grader problems" problems), the grader evaluates a student's response using a Python script that you create and embed in the problem. These problems can be any type. Numerical input and text input problems are the most popular write-your-own-grader problems.
 
 .. image:: Images/CustomPythonExample.png
  :alt: Image of a write your own grader problem
@@ -229,6 +378,107 @@ To create a write-your-own-grader problem:
 For more information about write-your-own-grader problems, see `CustomResponse XML and Python
 Script <https://edx.readthedocs.org/en/latest/course_data_formats/custom_response.html>`_.
 
+**Sample Problem XML**:
+
+.. code-block:: xml
+
+  <problem>
+  <p>This question has two parts.</p>
+
+  <script type="loncapa/python">
+
+  def test_add(expect, ans):
+      try:
+          a1=int(ans[0])
+          a2=int(ans[1])
+          return (a1+a2) == int(expect)
+      except ValueError:
+          return False
+
+  def test_add_to_ten(expect, ans):
+      return test_add(10, ans)
+
+  </script>
+
+  <p>Part 1: Enter two integers that sum to 10. </p>
+  <customresponse cfn="test_add_to_ten">
+          <textline size="10" correct_answer="3" label="Integer #1"/><br/>
+          <textline size="10" correct_answer="7" label="Integer #2"/>
+  </customresponse>
+
+  <p>Part 2: Enter two integers that sum to 20. </p>
+  <customresponse cfn="test_add" expect="20">
+          <textline size="10" label="Integer #1"/><br/>
+          <textline size="10" label="Integer #2"/>
+  </customresponse>
+
+  <solution>
+      <div class="detailed-solution">
+          <p>Explanation</p>
+          <p>For part 1, any two numbers of the form <i>n</i> and <i>10-n</i>, where <i>n</i> is any integer, will work. One possible answer would be the pair 0 and 10.</p>
+          <p>For part 2, any pair <i>x</i> and <i>20-x</i> will work, where <i>x</i> is any real number with a finite decimal representation. Both inputs have to be entered either in standard decimal notation or in scientific exponential notation. One possible answer would be the pair 0.5 and 19.5. Another way to write this would be 5e-1 and 1.95e1.</p>
+      </div>
+  </solution>
+  </problem>
+
+**Templates**
+
+The following template includes answers that appear when the student clicks **Show Answer**. 
+
+.. code-block:: xml
+
+  <problem>
+
+  <script type="loncapa/python">
+  def test_add(expect,ans):
+    a1=float(ans[0])
+    a2=float(ans[1])
+    return (a1+a2)== float(expect)
+  </script>
+
+
+  <p>Problem text</p>
+  <customresponse cfn="test_add" expect="20">
+          <textline size="10" correct_answer="11" label="Integer #1"/><br/>
+          <textline size="10" correct_answer="9" label="Integer #2"/>
+  </customresponse>
+
+      <solution>
+          <div class="detailed-solution">
+            <p>Solution or Explanation Heading</p>
+            <p>Solution or explanation text</p>
+          </div>
+      </solution>
+  </problem>
+
+The following template does not return answers when the student clicks **Show Answer**. If your problem doesn't include answers for the student to see, make sure to set **Show Answer** to **Never** in the problem component.
+
+.. code-block:: xml
+
+  <problem>
+
+  <script type="loncapa/python">
+  def test_add(expect,ans):
+    a1=float(ans[0])
+    a2=float(ans[1])
+    return (a1+a2)== float(expect)
+  </script>
+
+
+  <p>Enter two real numbers that sum to 20: </p>
+  <customresponse cfn="test_add" expect="20">
+          <textline size="10"  label="Integer #1"/><br/>
+          <textline size="10"  label="Integer #2"/>
+  </customresponse>
+
+      <solution>
+          <div class="detailed-solution">
+            <p>Solution or Explanation Heading</p>
+            <p>Solution or explanation text</p>
+          </div>
+      </solution>
+  </problem>
+
 .. _Drag and Drop:
 
 Drag and Drop
@@ -237,7 +487,7 @@ Drag and Drop
 In drag and drop problems, students respond to a question by dragging
 text or objects to a specific location on an image.
 
-.. image:: Images/DragAndDropExample.gif
+.. image:: Images/DragAndDropProblem.png
  :alt: Image of a drag and drop problem
 
 Create a Drag and Drop Problem
@@ -280,7 +530,32 @@ To create a image mapped input problem:
 #. In the component editor, replace the example code with your own code.
 #. Click **Save**.
 
+**Problem Code**:
 
+.. code-block:: xml
+
+  <problem>
+    <p><b>Example Problem</b></p>
+     <startouttext/>
+      <p>In the image below, click the triangle.</p>
+      <endouttext/>
+      <imageresponse>
+      <imageinput src="/static/threeshapes.png" width="220" height="150" rectangle="(80,40)-(130,90)" />
+      </imageresponse>
+  </problem>
+
+**Problem Template**
+
+.. code-block:: xml
+
+  <problem>
+    <startouttext/>
+      <p>In the image below, click the triangle.</p>
+    <endouttext/>
+        <imageresponse>
+         <imageinput src="IMAGE FILE PATH" width="NUMBER" height="NUMBER" rectangle="(X-AXIS,Y-AXIS)-(X-AXIS,Y-AXIS)" />
+        </imageresponse>
+  </problem>
 
 .. _Math Expression Input:
 
@@ -297,6 +572,16 @@ Unlike numerical input problems, which only allow integers and a few select cons
 .. warning:: Math expression input problems cannot currently include negative numbers raised to fractional powers, such as (-1)^(1/2). Math expression input problems can include complex numbers raised to fractional powers, or positive non-complex numbers raised to fractional powers.
 
 When you create a math expression input problem in Studio, you'll use `MathJax <http://www.mathjax.org>`_ to change your plain text into "beautiful math." For more information about how to use MathJax in Studio, see :ref:`MathJax in Studio`.
+
+**Notes for Students**
+
+When you answer a math expression input problem, follow these guidelines.
+
+* Use standard arithmetic operation symbols.
+* Indicate multiplication explicitly by using an asterisk (*).
+* Use a caret (^) to raise to a power.
+* Use an underscore (_) to indicate a subscript.
+* Use parentheses to specify the order of operations.
 
 The LMS automatically converts the following Greek letter names into the corresponding Greek characters when a student types them in the answer field:
 
@@ -347,9 +632,78 @@ To create a math expression input problem:
 #. In the component editor, replace the example code with your own code.
 #. Click **Save**.
 
+.. list-table::
+   :widths: 20 80
+   :header-rows: 1
+
+   * - ``<formularesponse>``
+     - 
+   * - ``<formulaequationinput>``
+     - This tag includes the ``size`` and ``label`` attributes.
+   * - ``<script type="loncapa/python">``
+     - 
+
+**Sample Problem XML**
+
+.. code-block:: xml
+
+  <problem>
+    <p>Some problems may ask for a mathematical expression. Practice creating mathematical expressions by answering the questions below.</p>
+
+    <p>Write an expression for the product of R_1, R_2, and the inverse of R_3.</p>
+    <formularesponse type="ci" samples="R_1,R_2,R_3@1,2,3:3,4,5#10" answer="$VoVi">
+      <responseparam type="tolerance" default="0.00001"/>
+      <formulaequationinput size="40" label="Enter the equation"/>
+    </formularesponse>
+
+  <script type="loncapa/python">
+  VoVi = "(R_1*R_2)/R_3"
+  </script>
+
+    <p>Let <i>x</i> be a variable, and let <i>n</i> be an arbitrary constant. What is the derivative of <i>x<sup>n</sup></i>?</p>
+  <script type="loncapa/python">
+  derivative = "n*x^(n-1)"
+  </script>
+    <formularesponse type="ci" samples="x,n@1,2:3,4#10" answer="$derivative">
+      <responseparam type="tolerance" default="0.00001"/>
+      <formulaequationinput size="40"  label="Enter the equation"/>
+    </formularesponse>
+
+    <solution>
+      <div class="detailed-solution">
+        <p>Explanation or Solution Header</p>
+        <p>Explanation or solution text</p>
+      </div>
+    </solution>
+  </problem>
+
+**Template XML**
+
+.. code-block:: xml
+
+  <problem>
+    <p>Problem text</p>
+    <formularesponse type="ci" samples="VARIABLES@LOWER_BOUNDS:UPPER_BOUNDS#NUMBER_OF_SAMPLES" answer="$VoVi">
+      <responseparam type="tolerance" default="0.00001"/>
+      <formulaequationinput size="20"  label="Enter the equation"/>
+    </formularesponse>
+
+  <script type="loncapa/python">
+  VoVi = "(R_1*R_2)/R_3"
+  </script>
+
+    <solution>
+      <div class="detailed-solution">
+        <p>Explanation or Solution Header</p>
+        <p>Explanation or solution text</p>
+      </div>
+    </solution>
+  </problem>
+
+
+
 For more information, see `Symbolic Response
 <https://edx.readthedocs.org/en/latest/course_data_formats/symbolic_response.html>`_.
-
 
 .. _Problem with Adaptive Hint:
 

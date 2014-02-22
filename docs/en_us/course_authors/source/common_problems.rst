@@ -30,7 +30,58 @@ Types** tab, and then click the name of the problem. (Note that
 **Checkbox** doesn't appear in the list of common problem types. To
 create a checkbox problem, you'll click **Blank Common Problem**.)
 
-To add labels to these problems, enclose the text that you want to use as a label in two sets of angle brackets (<<>>).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+To add labels to these problems, enclose the text that you want to use as a label in two sets of angle brackets (<<>>)
+
+
+
+Just in case you want to see the XML, we've provided it
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 .. _Checkbox:
 
@@ -76,7 +127,7 @@ Create a Checkbox Problem
 For the example problem above, the text in the Problem component is the
 following.
 
-::
+.. code-block:: xml
 
     Learning about the benefits of preventative healthcare can be particularly 
     difficult. >>Check all of the reasons below why this may be the case.<<
@@ -96,6 +147,72 @@ following.
     have no effect. Consequently, he or she would tend to believe that immunization 
     (or other preventative measures) have fewer benefits than they actually do.
     [explanation]
+
+==========================
+Checkbox Problem XML
+==========================
+
+.. code-block:: xml
+
+  <problem>
+  <startouttext/>
+    <p>Learning about the benefits of preventative healthcare can be particularly
+     difficult. Check all of the reasons below why this may be the case.</p>
+
+  <choiceresponse>
+    <checkboxgroup direction="vertical" label="Check all of the reasons below why this may be the case">
+      <choice correct="true"><text>A large amount of time passes between undertaking
+      a preventative measure and seeing the result.</text></choice>
+      <choice correct="false"><text>Non-immunized people will always fall sick.</text>
+      </choice>
+      <choice correct="true"><text>If others are immunized, fewer people will fall 
+      sick regardless of a particular individual's choice to get immunized or not.
+      </text></choice>
+      <choice correct="true"><text>Trust in healthcare professionals and government 
+      officials is fragile.</text></choice>
+    </checkboxgroup>
+
+   <solution>
+   <div class="detailed-solution">
+   <p>Explanation</p>
+   <p>People who are not immunized against a disease may still not fall sick from the 
+   disease. If someone is trying to learn whether or not preventative measures 
+   against the disease have any impact, he or she may see these people and conclude, 
+   since they have remained healthy despite not being immunized, that immunizations 
+   have no effect. Consequently, he or she would tend to believe that immunization 
+   (or other preventative measures) have fewer benefits than they actually do.</p>
+   </div>
+   </solution>
+  </choiceresponse>
+  </problem>
+
+
+=============================
+Checkbox Problem XML Template
+=============================
+
+.. code-block:: xml
+
+  <problem>
+  <startouttext/>
+    <p>Question text</p>
+
+  <choiceresponse>
+
+  <checkboxgroup direction="vertical" label="label text">
+  <choice correct="false"><text>Answer option 1 (incorrect)</text></choice>
+  <choice correct="true"><text>Answer option 2 (correct)</text></choice>
+  </checkboxgroup>
+
+   <solution>
+   <div class="detailed-solution">
+   <p>Solution or Explanation Heading</p>
+   <p>Solution or explanation text</p>
+   </div>
+   </solution>
+
+  </choiceresponse>
+  </problem>
 
 
 .. _Dropdown:
@@ -158,6 +275,68 @@ following.
     Life stage - infant, child, and adult:
     [[(Nominal), Discrete, Continuous]]
 
+==========================
+Dropdown Problem XML
+==========================
+
+**Problem Code:**
+
+.. code-block:: xml
+
+  <problem>
+  <p>
+    <em>This exercise first appeared in HarvardX's PH207x Health in Numbers: Quantitative Methods in Clinical &amp; Public Health Research course, fall 2012.</em>
+  </p>
+  <p>What type of data are the following?</p>
+  <p>Age:</p>
+  <optionresponse>
+    <optioninput options="('Nominal','Discrete','Continuous')" correct="Continuous" label="Age"/>
+  </optionresponse>
+  <p>Age, rounded to the nearest year:</p>
+  <optionresponse>
+    <optioninput options="('Nominal','Discrete','Continuous')" correct="Discrete" label="Age, rounded to the nearest year"/>
+  </optionresponse>
+  <p>Life stage - infant, child, and adult:</p>
+  <optionresponse>
+    <optioninput options="('Nominal','Discrete','Continuous')" correct="Nominal" label="Life stage"/>
+  </optionresponse>
+  </problem>
+
+**Template**
+
+.. code-block:: xml
+
+  <problem>
+  <p>
+    Problem text</p>
+  <optionresponse>
+    <optioninput options="('Option 1','Option 2','Option 3')" correct="Option 2" label="label text"/>
+  </optionresponse>
+    <solution>
+      <div class="detailed-solution">
+      <p>Explanation or Solution Header</p>
+      <p>Explanation or solution text</p>
+      </div>
+    </solution>
+  </problem>
+
+.. code-block:: xml
+
+  <problem>
+   <p>Problem text</p>
+    <optionresponse>
+     options="('A','B')"
+      correct="A"/>
+      label="label text"
+    </optionresponse>
+   
+    <solution>
+      <div class="detailed-solution">
+      <p>Explanation or Solution Header</p>
+      <p>Explanation or solution text</p>
+      </div>
+    </solution>
+  </problem>
 
 .. _Multiple Choice:
 
@@ -230,6 +409,52 @@ following.
     investigating lateral inhibition using horseshoe crabs.
     [Explanation]
 
+**Problem Code:**
+
+.. code-block:: xml
+
+  <problem>
+  <p>Lateral inhibition, as was first discovered in the horsehoe crab...</p>
+  <multiplechoiceresponse>
+    <choicegroup type="MultipleChoice" label="Lateral inhibition, as was first discovered in the horsehoe crab">
+      <choice correct="false">is a property of touch sensation, referring to the ability of crabs to detect nearby predators.</choice>
+      <choice correct="false">is a property of hearing, referring to the ability of crabs to detect low frequency noises.</choice>
+      <choice correct="false">is a property of vision, referring to the ability of crabs eyes to enhance contrasts.</choice>
+      <choice correct="true">has to do with the ability of crabs to use sonar to detect fellow horseshoe crabs nearby.</choice>
+      <choice correct="false">has to do with a weighting system in the crabs skeleton that allows it to balance in turbulent water.</choice>
+    </choicegroup>
+  </multiplechoiceresponse>
+  <solution>
+    <div class="detailed-solution">
+      <p>Explanation</p>
+      <p>Horseshoe crabs were essential to the discovery of lateral inhibition, a property of vision present in horseshoe crabs as well as humans, that enables enhancement of contrast at edges of objects as was demonstrated in class. In 1967, Haldan Hartline received the Nobel prize for his research on vision and in particular his research investigating lateral inhibition using horseshoe crabs.</p>
+    </div>
+  </solution>
+  </problem>
+
+
+**Template**
+
+.. code-block:: xml
+
+  <problem>
+  <p>Question text</p>
+  <multiplechoiceresponse>
+    <choicegroup type="MultipleChoice" label="label text">
+      <choice correct="false" name="a">Incorrect choice</choice>
+      <choice correct="true" name="b">Correct choice</choice>
+    </choicegroup>
+  </multiplechoiceresponse>
+
+  <solution>
+    <div class="detailed-solution">
+    <p>Explanation or solution header</p>
+    <p>Explanation or solution text</p>
+    </div>
+  </solution>
+  </problem>
+
+
 .. _Numerical Input:
 
 *******************
@@ -240,7 +465,7 @@ In numerical input problems, students enter numbers or specific and
 relatively simple mathematical expressions to answer a question. 
 
 .. image:: Images/NumericalInputExample.gif
- :alt: Image of a numerical input problem
+ :alt: Image of a simple numerical input problem
 
 Note that students' responses don't have to be exact for these problems. You can 
 specify a margin of error, or tolerance. For more information, see the instructions below.
@@ -255,11 +480,108 @@ example shows the way Studio renders students' text responses in
 numerical input problems. To see more examples, scroll down to **Examples**.
 
 .. image:: Images/Math5.gif
- :alt: Image of Studio's rendering of numerical input responses
+ :alt: Image of a numerical input probem rendered by Studio
 
-==================================
-Create a Numerical Input Problem
-==================================
+==================
+Student Answers
+==================
+
+.. _Math Expression Syntax:
+
+Math Expression Syntax
+----------------------
+
+In numerical input problems, the student's input may be more complicated than a
+simple number. Expressions like ``sqrt(3)`` and even ``1+e^(sin(pi/2)+2*i)``
+are valid, and evaluate to 1.73 and -0.13 + 2.47i, respectively.
+
+A summary of the syntax follows:
+
+Numbers
+~~~~~~~
+
+Accepted number types:
+
+- Integers: '2520'
+- Normal floats: '3.14'
+- With no integer part: '.98'
+- Scientific notation: '1.2e-2' (=0.012)
+- More s.n.: '-4.4e+5' = '-4.4e5' (=-440,000)
+- Appending SI suffixes: '2.25k' (=2,250). The full list:
+
+  ====== ========== ===============
+  Suffix Stands for One of these is
+  ====== ========== ===============
+  %      percent    0.01 = 1e-2
+  k      kilo       1000 = 1e3
+  M      mega       1e6
+  G      giga       1e9
+  T      tera       1e12
+  c      centi      0.01 = 1e-2
+  m      milli      0.001 = 1e-3
+  u      micro      1e-6
+  n      nano       1e-9
+  p      pico       1e-12
+  ====== ========== ===============
+
+The largest possible number handled currently is exactly the largest float
+possible (in the Python language). This number is 1.7977e+308. Any expression
+containing larger values will not evaluate correctly, so it's best to avoid
+this situation.
+
+Default Constants
+~~~~~~~~~~~~~~~~~
+
+Simple and commonly used mathematical/scientific constants are included by
+default. These include:
+
+- ``i`` and ``j`` as ``sqrt(-1)``
+- ``e`` as Euler's number (2.718...)
+- ``pi``
+- ``k``: the Boltzmann constant (~1.38e-23 in Joules/Kelvin)
+- ``c``: the speed of light in m/s (2.998e8)
+- ``T``: the positive difference between 0K and 0°C (285.15)
+- ``q``: the fundamental charge (~1.602e-19 Coloumbs)
+
+Operators and Functions
+~~~~~~~~~~~~~~~~~~~~~~~
+
+As expected, the normal operators apply (with normal order of operations):
+``+ - * / ^``. Also provided is a special "parallel resistors" operator given
+by ``||``. For example, an input of ``1 || 2`` would represent the resistance
+of a pair of parallel resistors (of resistance 1 and 2 ohms), evaluating to 2/3
+(ohms).
+
+At the time of writing, factorials written in the form '3!' are invalid, but
+there is a workaround. Students can specify ``fact(3)`` or ``factorial(3)`` to
+access the factorial function.
+
+The default included functions are the following:
+
+- Trig functions: sin, cos, tan, sec, csc, cot
+- Their inverses: arcsin, arccos, arctan, arcsec, arccsc, arccot
+- Other common functions: sqrt, log10, log2, ln, exp, abs
+- Factorial: ``fact(3)`` or ``factorial(3)`` are valid. However, you must take
+  care to only input integers. For example, ``fact(1.5)`` would fail.
+- Hyperbolic trig functions and their inverses: sinh, cosh, tanh, sech, csch,
+  coth, arcsinh, arccosh, arctanh, arcsech, arccsch, arccoth
+
+
+=================================
+Create a Numerical Input Problem 
+=================================
+
+You can create numerical problems in the Simple Editor and in the Advanced Editor regardless of the answer to the problem. If the text of your problem doesn't include any italics, bold formatting, or special characters, you can create the problem in the Simple Editor. If the text of your problem contains special formatting or characters, or if your problem contains a Python script, you'll use the Advanced Editor.
+
+For example, the following example problems require the Advanced Editor. 
+
+.. image:: Images/NumericalInput_Complex.png
+ :alt: Image of a more complex numerical input problem
+
+For more information about including a Python script in your problem, see :ref:`Custom Python Evaluated Input`.
+
+Create a Numerical Input Problem in the Simple Editor
+-------------------------------------------------------
 
 #. Under **Add New Component**, click **Problem**.
 #. In the **Select Problem Component Type** screen, click **Numerical
@@ -291,7 +613,7 @@ Create a Numerical Input Problem
 #. On the **Settings** tab, specify the settings that you want. 
 #. Click **Save**.
 
-For the example problem above, the text in the Problem component is the
+For the first example problem above, the text in the Problem component is the
 following.
 
 ::
@@ -303,6 +625,11 @@ following.
    [explanation]
    As of edX's first birthday, in May 2013, edX students live in 193 different countries.
    [explanation]
+
+
+Create a Numerical Input Problem in the Advanced Editor
+-------------------------------------------------------
+
 
 **Examples**
 
@@ -317,9 +644,136 @@ text that students enter.
  :alt: Image of a numerical input probem rendered by Studio
 .. image:: Images/Math4.gif
  :alt: Image of a numerical input probem rendered by Studio
+.. image:: Images/Math5.gif
+ :alt: Image of a numerical input probem rendered by Studio
 
-For more information, see `Formula Equation Input 
-<https://edx.readthedocs.org/en/latest/course_data_formats/formula_equation_input.html>`_.
+
+**Problem Code**:
+
+.. code-block:: xml
+
+<problem>
+  <p><b>Example Problem</b></p>
+
+<p>What base is the decimal numeral system in?
+    <numericalresponse answer="10">
+        <formulaequationinput label="What base is the decimal numeral system in?"/>
+    </numericalresponse>
+</p>
+
+  <p>What is the value of the standard gravity constant <i>g</i>, measured in m/s<sup>2</sup>? Give your answer to at least two decimal places.
+  <numericalresponse answer="9.80665">
+    <responseparam type="tolerance" default="0.01" />
+    <formulaequationinput label="Give your answer to at least two decimal places"/>
+  </numericalresponse>
+</p>
+
+<!-- Use python script spacing. The following should not be indented! -->
+<script type="loncapa/python">
+computed_response = math.sqrt(math.fsum([math.pow(math.pi,2), math.pow(math.e,2)]))
+</script>
+
+<p>What is the distance in the plane between the points (pi, 0) and (0, e)? You can type math.
+    <numericalresponse answer="$computed_response">
+        <responseparam type="tolerance" default="0.0001" />
+        <formulaequationinput label="What is the distance in the plane between the points (pi, 0) and (0, e)?"/>
+    </numericalresponse>
+</p>
+<solution>
+  <div class="detailed-solution">
+    <p>Explanation</p>
+    <p>The decimal numerical system is base ten.</p>
+    <p>The standard gravity constant is defined to be precisely 9.80665 m/s<sup>2</sup>.
+    This is 9.80 to two decimal places. Entering 9.8 also works.</p>
+    <p>By the distance formula, the distance between two points in the plane is
+       the square root of the sum of the squares of the differences of each coordinate.
+      Even though an exact numerical value is checked in this case, the
+      easiest way to enter this answer is to type
+      <code>sqrt(pi^2+e^2)</code> into the editor.
+      Other answers like <code>sqrt((pi-0)^2+(0-e)^2)</code> also work.
+    </p>
+  </div>
+</solution>
+</problem>
+
+**Templates**
+
+Exact values
+
+.. code-block:: xml
+
+  <problem>
+
+    <numericalresponse answer="10">
+      <formulaequationinput label="label text"/>
+    </numericalresponse>
+
+    <solution>
+    <div class="detailed-solution">
+
+    </div>
+  </solution>
+  </problem>
+
+Answers with decimal precision
+
+.. code-block:: xml
+
+  <problem>
+
+    <numericalresponse answer="9.80665">
+      <responseparam type="tolerance" default="0.01" />
+      <formulaequationinput label="label text"/>
+    </numericalresponse>
+
+    <solution>
+    <div class="detailed-solution">
+
+    </div>
+  </solution>
+  </problem>
+
+Answers with percentage precision
+
+.. code-block:: xml
+
+  <problem>
+
+    <numericalresponse answer="100">
+      <responseparam type="tolerance" default="10%" />
+      <formulaequationinput label="label text"/>
+    </numericalresponse>
+
+    <solution>
+    <div class="detailed-solution">
+
+    </div>
+  </solution>
+  </problem>
+
+Answers with scripts
+
+.. code-block:: xml
+
+  <problem>
+
+  <!-- Use python script spacing. The following should not be indented! -->
+  <script type="loncapa/python">
+  computed_response = math.sqrt(math.fsum([math.pow(math.pi,2), math.pow(math.e,2)]))
+  </script>
+
+    <numericalresponse answer="$computed_response">
+      <responseparam type="tolerance" default="0.0001" />
+      <formulaequationinput label="label text"/>
+    </numericalresponse>
+
+    <solution>
+    <div class="detailed-solution">
+
+    </div>
+  </solution>
+  </problem>
+
 
 .. _Text input:
 
@@ -456,3 +910,105 @@ Hints and Regular Expressions in Text Input Problems
 ====================================================
 
 You can provide hints for common incorrect answers in text input problems. You can also set a text input problem to allow a regular expression as an answer. To do this, you'll have to modify the problem's XML in the Advanced Editor. For more information, see :ref:`String Response`.
+
+Although you can create text input problems by using the Simple Editor in Studio, you may want to see or change the problem's underlying XML. For example, you can add hints that appear when students enter common incorrect answers, or modify the problem's XML so that students can submit regular expressions as answers. 
+
+The regular expression that the student enters must contain the part of the answer that the instructor specifies. For example, if an instructor has specified  ``<answer=".*example answer.*" type="regexp">``, correct answers include ``example answered``, ``two example answers``, or even ``==example answer==``, but not ``examples`` or ``example anser``.
+
+You can add ``regexp`` to the value of the ``type`` attribute, for example: ``type="ci regexp"`` or ``type="regexp"`` or ``type="regexp cs"``. In this case, any answer or hint will be treated as regular expressions.
+
+**Sample Problem**
+
+.. image:: ../Images/TextInputExample.gif
+ :alt: Image of a string response problem
+
+**XML Tags**
+
+.. list-table::
+   :widths: 20 80
+
+   * - ``<stringresponse>``
+     - Indicates that the problem is a text input problem. 
+   * - ``<textline>``
+     - Child of ``<stringresponse>``. Lists the answer options and contains the ``label`` attribute.
+   * - ``<additional_answer>`` (optional)
+     - Specifies an additional correct answer for the problem. A problem can contain an unlimited number of additional answers.
+   * - ``<hintgroup>`` (optional)
+     - Indicates that the instructor has provided hints for certain common incorrect answers.
+   * - ``<stringhint />`` (optional)
+     - Child of ``<hintgroup>``. Specifies the text of the incorrect answer to provide the hint for. Contains answer, type, name.
+   * - ``<hintpart>``
+     - Contains the name from ``<stringhint>``. Associates the incorrect answer with the hint text for that incorrect answer.
+   * - ``<startouttext />``
+     - Indicates the beginning of the text of the hint.
+   * - ``<endouttext />``
+     - Indicates the end of the text of the hint.
+
+**Sample Problem Code**
+
+.. code-block:: xml
+
+  <problem>
+  <p>
+    <em>This problem is adapted from an exercise that first appeared in MITx's 14.73x The Challenges of Global Poverty course, spring 2013.</em>
+  </p>
+  <p>What is the technical term that refers to the fact that, when enough people sleep under a bednet, the disease may altogether disappear?</p>
+  <stringresponse answer=".*herd immunity.*" type="ci regexp">
+         <additional_answer>community immunity</additional_answer>
+          <additional_answer>population immunity</additional_answer>
+          <textline size="20" label="What is the technical term that refers to the fact that, when enough people sleep under a bednet, the disease may altogether disappear?"/>
+          <hintgroup>
+              <stringhint answer="contact immunity" type="ci" name="contact_immunity_hint" />
+              <hintpart on="contact_immunity_hint">
+                  <startouttext />
+                  In contact immunity, a vaccinated individual passes along his immunity to another person through contact with feces or bodily fluids. The answer to the question above refers to the form of immunity that occurs when so many members of a population are protected, an infectious disease is unlikely to spread to the unprotected population.
+                  <endouttext />
+              </hintpart >
+              <stringhint answer="firewall immunity" type="ci" name="firewall_immunity_hint" />
+              <hintpart on="firewall_immunity_hint">
+                  <startouttext />
+                  Although a firewall provides protection for a population, the term "firewall" is used more in computing and technology than in epidemiology.
+                  <endouttext />
+              </hintpart >
+          </hintgroup>
+  </stringresponse>
+  <solution>
+    <div class="detailed-solution">
+      <p>Explanation</p>
+      <p>The correct answer is <b>herd immunity</b>. As more and more people use bednets, the risk of malaria begins to fall for everyone – users and non-users alike. This can fall to such a low probability that malaria is effectively eradicated from the group (even when the group does not have 100% bednet coverage).</p>
+    </div>
+  </solution>
+  </problem>
+
+**Template**
+
+.. code-block:: xml
+
+  <problem>
+      <p>Problem text</p>
+      <stringresponse answer="**.Correct answer 1.**" type="ci regexp">
+          <additional_answer>Correct answer 2</additional_answer>
+          <additional_answer>Correct answer 3</additional_answer>
+          <textline size="20" label="label text"/>
+          <hintgroup>
+              <stringhint answer="Incorrect answer A" type="ci" name="hintA" />
+                <hintpart on="hintA">
+                    <startouttext />Text of hint for incorrect answer A<endouttext />
+                </hintpart >
+              <stringhint answer="Incorrect answer B" type="ci" name="hintB" />
+                <hintpart on="hintB">
+                    <startouttext />Text of hint for incorrect answer B<endouttext />
+                </hintpart >
+              <stringhint answer="Incorrect answer C" type="ci" name="hintC" />
+                <hintpart on="hintC">
+                    <startouttext />Text of hint for incorrect answer C<endouttext />
+                </hintpart >
+          </hintgroup>
+      </stringresponse>
+      <solution>
+      <div class="detailed-solution">
+      <p>Explanation or Solution Header</p>
+      <p>Explanation or solution text</p>
+      </div>
+    </solution>
+  </problem>
