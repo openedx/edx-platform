@@ -8,21 +8,45 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding model 'EmbargoConfig'
-        db.create_table('embargo_embargoconfig', (
+        # Adding model 'EmbargoedCourse'
+        db.create_table('embargo_embargoedcourse', (
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('course_id', self.gf('django.db.models.fields.CharField')(unique=True, max_length=255, db_index=True)),
+            ('embargoed', self.gf('django.db.models.fields.BooleanField')(default=False)),
+        ))
+        db.send_create_signal('embargo', ['EmbargoedCourse'])
+
+        # Adding model 'EmbargoedState'
+        db.create_table('embargo_embargoedstate', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('change_date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
             ('changed_by', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], null=True, on_delete=models.PROTECT)),
             ('enabled', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('embargoed_countries', self.gf('django.db.models.fields.TextField')(blank=True)),
-            ('embargoed_courses', self.gf('django.db.models.fields.TextField')(blank=True)),
         ))
-        db.send_create_signal('embargo', ['EmbargoConfig'])
+        db.send_create_signal('embargo', ['EmbargoedState'])
+
+        # Adding model 'IPException'
+        db.create_table('embargo_ipexception', (
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('change_date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('changed_by', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], null=True, on_delete=models.PROTECT)),
+            ('enabled', self.gf('django.db.models.fields.BooleanField')(default=False)),
+            ('whitelist', self.gf('django.db.models.fields.TextField')(blank=True)),
+            ('blacklist', self.gf('django.db.models.fields.TextField')(blank=True)),
+        ))
+        db.send_create_signal('embargo', ['IPException'])
 
 
     def backwards(self, orm):
-        # Deleting model 'EmbargoConfig'
-        db.delete_table('embargo_embargoconfig')
+        # Deleting model 'EmbargoedCourse'
+        db.delete_table('embargo_embargoedcourse')
+
+        # Deleting model 'EmbargoedState'
+        db.delete_table('embargo_embargoedstate')
+
+        # Deleting model 'IPException'
+        db.delete_table('embargo_ipexception')
 
 
     models = {
@@ -62,14 +86,28 @@ class Migration(SchemaMigration):
             'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
-        'embargo.embargoconfig': {
-            'Meta': {'object_name': 'EmbargoConfig'},
+        'embargo.embargoedcourse': {
+            'Meta': {'object_name': 'EmbargoedCourse'},
+            'course_id': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '255', 'db_index': 'True'}),
+            'embargoed': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
+        },
+        'embargo.embargoedstate': {
+            'Meta': {'object_name': 'EmbargoedState'},
             'change_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'changed_by': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']", 'null': 'True', 'on_delete': 'models.PROTECT'}),
             'embargoed_countries': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'embargoed_courses': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'enabled': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
+        },
+        'embargo.ipexception': {
+            'Meta': {'object_name': 'IPException'},
+            'blacklist': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
+            'change_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'changed_by': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']", 'null': 'True', 'on_delete': 'models.PROTECT'}),
+            'enabled': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'whitelist': ('django.db.models.fields.TextField', [], {'blank': 'True'})
         }
     }
 
