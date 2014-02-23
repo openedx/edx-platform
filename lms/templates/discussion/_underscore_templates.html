@@ -166,6 +166,8 @@
     <div class="response-body">${'<%- body %>'}</div>
     <div class="discussion-flag-abuse notflagged" data-role="thread-flag" data-tooltip="${_('Report Misuse') | h}" role="button" aria-pressed="false" tabindex="0">
       <i class="icon icon-flag"></i><span class="sr flag-label">${_("Report Misuse")}</span></div>
+    <div style="display: none" class="discussion-delete-comment action-delete" data-tooltip="${_('Delete Comment') | h}" role="button" tabindex="0">
+      <i class="icon icon-remove"></i><span class="sr">${_("Delete Comment")}</span></div>
       <% 
       js_block = u"""
         interpolate(

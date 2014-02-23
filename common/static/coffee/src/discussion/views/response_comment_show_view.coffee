@@ -1,11 +1,19 @@
 if Backbone?
   class @ResponseCommentShowView extends DiscussionContentView
 
+    events:
+        "click .action-delete": "_delete"
+
     tagName: "li"
 
     initialize: ->
         super()
         @model.on "change", @updateModelDetails
+
+    abilityRenderer:
+      can_delete:
+        enable: -> @$(".action-delete").show()
+        disable: -> @$(".action-delete").hide()
 
     render: ->
       @template = _.template($("#response-comment-show-template").html())
@@ -40,6 +48,8 @@ if Backbone?
       else if DiscussionUtil.isTA(@model.get("user_id"))
         @$el.find("a.profile-link").after('<span class="community-ta-label">' + gettext('Community TA') + '</span>')
 
+    _delete: (event) ->
+        @trigger "comment:_delete", event
 
     renderFlagged: =>
       if window.user.id in @model.get("abuse_flaggers") or (DiscussionUtil.isFlagModerator and @model.get("abuse_flaggers").length > 0)

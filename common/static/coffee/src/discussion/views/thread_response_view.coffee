@@ -91,6 +91,7 @@ if Backbone?
           body: body
         success: (response, textStatus) ->
           comment.set(response.content)
+          comment.updateInfo(response.annotated_content_info)
           view.render() # This is just to update the id for the most part, but might be useful in general
 
     _delete: (event) =>

@@ -25,7 +25,7 @@ describe "DiscussionContentView", ->
         @threadData = {
             id: '01234567',
             user_id: '567',
-            course_id: 'mitX/999/test',
+            course_id: 'edX/999/test',
             body: 'this is a thread',
             created_at: '2013-04-03T20:08:39Z',
             abuse_flaggers: ['123'],

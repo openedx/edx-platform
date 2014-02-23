@@ -8,6 +8,8 @@ describe 'ResponseCommentShowView', ->
             <div class="response-body"><%- body %></div>
             <div class="discussion-flag-abuse notflagged" data-role="thread-flag" data-tooltip="report misuse">
             <i class="icon"></i><span class="flag-label"></span></div>
+            <div style="display:none" class="discussion-delete-comment action-delete" data-role="comment-delete" data-tooltip="Delete Comment" role="button" aria-pressed="false" tabindex="0">
+              <i class="icon icon-remove"></i><span class="sr delete-label">Delete Comment</span></div>
             <p class="posted-details">&ndash;posted <span class="timeago" title="<%- created_at %>"><%- created_at %></span> by
             <% if (obj.username) { %>
             <a href="<%- user_url %>" class="profile-link"><%- username %></a>
@@ -18,18 +20,17 @@ describe 'ResponseCommentShowView', ->
         """
 
         # set up a model for a new Comment
-        @response = new Comment {
+        @comment = new Comment {
                 id: '01234567',
                 user_id: '567',
-                course_id: 'mitX/999/test',
+                course_id: 'edX/999/test',
                 body: 'this is a response',
                 created_at: '2013-04-03T20:08:39Z',
                 abuse_flaggers: ['123']
                 roles: []
         }
-        @view = new ResponseCommentShowView({ model: @response })
-
-        # spyOn(DiscussionUtil, 'loadRoles').andReturn []
+        @view = new ResponseCommentShowView({ model: @comment })
+        spyOn(@view, "convertMath")
 
     it 'defines the tag', ->
         expect($('#jasmine-fixtures')).toExist
@@ -37,26 +38,36 @@ describe 'ResponseCommentShowView', ->
         expect(@view.el.tagName.toLowerCase()).toBe 'li'
 
     it 'is tied to the model', ->
-        expect(@view.model).toBeDefined();
+        expect(@view.model).toBeDefined()
 
     describe 'rendering', ->
 
         beforeEach ->
             spyOn(@view, 'renderAttrs')
             spyOn(@view, 'markAsStaff')
-            spyOn(@view, 'convertMath')
 
         it 'produces the correct HTML', ->
             @view.render()
             expect(@view.el.innerHTML).toContain('"discussion-flag-abuse notflagged"')
 
         it 'can be flagged for abuse', ->
-            @response.flagAbuse()
-            expect(@response.get 'abuse_flaggers').toEqual ['123', '567']
+            @comment.flagAbuse()
+            expect(@comment.get 'abuse_flaggers').toEqual ['123', '567']
 
         it 'can be unflagged for abuse', ->
             temp_array = []
             temp_array.push(window.user.get('id'))
-            @response.set("abuse_flaggers",temp_array)
-            @response.unflagAbuse()
-            expect(@response.get 'abuse_flaggers').toEqual []
+            @comment.set("abuse_flaggers",temp_array)
+            @comment.unflagAbuse()
+            expect(@comment.get 'abuse_flaggers').toEqual []
+
+    describe 'comment deletion', ->
+
+        it 'triggers the delete event when the delete icon is clicked', ->
+            DiscussionUtil.loadRoles []
+            @comment.updateInfo {ability: {'can_delete': true}}
+            triggerTarget = jasmine.createSpy()
+            @view.bind "comment:_delete", triggerTarget
+            @view.render()
+            @view.$el.find('.action-delete').click()
+            expect(triggerTarget).toHaveBeenCalled()
