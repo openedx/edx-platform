@@ -192,6 +192,10 @@
   cursor: pointer;
 }
 
+#mainCatch .annotationDetail .previewOpenSeaDragon {
+    cursor: pointer;
+}
+
 #mainCatch .annotationDetail .quote {
     font-style:italic;
     color: #666666;

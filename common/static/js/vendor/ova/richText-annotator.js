@@ -115,8 +115,7 @@ Annotator.Plugin.RichText = (function(_super) {
 							}
 				        }
 				    });
-		            ed.insertContent('Main button');
-		            ed.label = 'My Button';
+		            ed.label = 'Rubric Button';
 		        }
 		    });
 		};

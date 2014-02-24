@@ -51,7 +51,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 					}
 					refreshDisplay();
 				} else {
-					self.annotationInstance.refresh(options);
+					self.annotationInstance.refreshDisplay(options);
 				}
 			});
 	};
@@ -575,7 +575,7 @@ Annotator.Plugin.OpenSeaDragon = (function(_super) {
 			annotation.target.container = osda.viewer.id || ""; // - target.container
 			//Save source url
 			var source = osda.viewer.source,
-				tilesUrl = typeof source.tilesUrl!='undefined'?source.tilesUrl:'';
+				tilesUrl = typeof source.tilesUrl!='undefined'?source.tilesUrl:'',
 				functionUrl = typeof source.getTileUrl!='undefined'?source.getTileUrl:'';
 			annotation.target.src = tilesUrl!=''?tilesUrl:(''+functionUrl).replace(/\s+/g, ' '); // - target.src (media source)
 			annotation.target.ext = source.fileFormat || ""; // - target.ext (extension)

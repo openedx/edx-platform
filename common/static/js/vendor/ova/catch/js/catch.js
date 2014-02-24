@@ -222,7 +222,11 @@ annotationDetail:
         '</div>'+
 '{{/if}}'+
 '{{#if mediatypeforgrid.image}}'+
-	'<img src="http://www.paraemigrantes.com/wp-content/themes/daily/images/default-thumb.gif">'+
+	'<div class="previewOpenSeaDragon">'+
+		'<img src="http://www.paraemigrantes.com/wp-content/themes/daily/images/default-thumb.gif">'+
+		'<span class="idAnnotation" style="display:none">{{{ id }}}</span>'+
+            	'<span class="uri" style="display:none">{{{uri}}}</span>'+
+	'</div>'+
 '{{/if}}'+
 
         '<div class="body">'+
@@ -416,6 +420,7 @@ CatchAnnotation.prototype = {
             onSelectionButtonClick = this.__bind(this._onSelectionButtonClick,this),
             onPublicPrivateButtonClick = this.__bind(this._onPublicPrivateButtonClick,this),
             onQuoteMediaButton = this.__bind(this._onQuoteMediaButton,this),
+            onPreviewOpenSeaDragon = this.__bind(this._onPreviewOpenSeaDragon,this),
             onControlRepliesClick = this.__bind(this._onControlRepliesClick,this),
             onMoreButtonClick = this.__bind(this._onMoreButtonClick,this),
             onSearchButtonClick = this.__bind(this._onSearchButtonClick, this),
@@ -439,6 +444,12 @@ CatchAnnotation.prototype = {
             //PlaySelection button
             el.on("click",".annotationItem .annotationDetail .quote", onQuoteMediaButton);
         }
+        //IMAGE
+        if (this.options.media=='image') {
+            //PlaySelection button
+            el.on("click",".annotationItem .annotationDetail .previewOpenSeaDragon", onPreviewOpenSeaDragon);
+        }
+
         
         //controlReplies
         el.on("click",".annotationItem .controlReplies", onControlRepliesClick);
@@ -612,6 +623,23 @@ CatchAnnotation.prototype = {
             isNumber = (typeof rt!='undefined' && !isNaN(parseFloat(rt.start)) && isFinite(rt.start) && !isNaN(parseFloat(rt.end)) && isFinite(rt.end));
         return (isOpenVideojs && isVideo && isNumber);
     },
+    _isImage: function(an){
+		var wrapper = $('.annotator-wrapper').parent()[0],
+			annotator = window.annotator = $.data(wrapper, 'annotator'),
+			rp = an.rangePosition,
+			isOpenSeaDragon = (typeof annotator.osda != 'undefined'),
+			isContainer = (typeof an.target!='undefined' && typeof an.target.container!='undefined' ),
+			isImage = (typeof an.media!='undefined' && an.media=='image'),
+			isRP = (typeof rp!='undefined');
+		if (isOpenSeaDragon && isContainer && isImage && isRP){
+			var source = annotator.osda.viewer.source,
+				isSource = false,
+				tilesUrl = typeof source.tilesUrl!='undefined'?source.tilesUrl:'';
+				functionUrl = typeof source.getTileUrl!='undefined'?source.getTileUrl:'',
+				compareUrl = tilesUrl!=''?tilesUrl:(''+functionUrl).replace(/\s+/g, ' ');
+			if(isContainer) return (an.target.src == compareUrl);
+		}else{return false}
+    },
     _isInList: function (an){
         var annotator = this.annotator,
             isInList = false,
@@ -781,6 +809,48 @@ CatchAnnotation.prototype = {
                                 scrollTop: $(an.highlights[0]).offset().top},
                                 'slow');
                         }
+                    }
+                }
+            }
+        }
+    },
+    _onPreviewOpenSeaDragon: function(evt){
+        var preview = $(evt.target).hasClass('previewOpenSeaDragon')?$(evt.target):$(evt.target).parents('.previewOpenSeaDragon:first'),
+            id = preview.find('.idAnnotation').html(),
+            uri = preview.find('.uri').html();
+        if (typeof id=='undefined' || id==''){
+            this.refreshCatch();
+            this.checkTotAnnotations();
+            id = preview.find('.idAnnotation').html();
+            //clickPlaySelection(evt);
+        }
+        if(this.options.externalLink){
+            uri += (uri.indexOf('?') >= 0)?'&ovaId='+id:'?ovaId='+id;
+            location.href = uri;
+        }else{
+            var allannotations = this.annotator.plugins['Store'].annotations,
+                ovaId = id;
+            for (var item in allannotations) {
+                var an = allannotations[item];
+                if (typeof an.id!='undefined' && an.id == ovaId){//this is the annotation
+                    if(this._isImage(an)){
+                            $(an.highlights).parent().find('.annotator-hl').removeClass('api'); 
+                            //change the color
+                            $(an.highlights).addClass('api');
+			    //change zoom
+			    if (typeof this.annotator!='undefined' && typeof this.annotator.osda!='undefined'){
+			    	var currentBounds = this.annotator.osda.viewer.drawer.viewport.getBounds(),
+    					bounds = typeof an.bounds!='undefined'?an.bounds:{};
+				if (typeof bounds.x!='undefined') currentBounds.x = bounds.x;
+				if (typeof bounds.y!='undefined') currentBounds.y = bounds.y;
+				if (typeof bounds.width!='undefined') currentBounds.width = bounds.width;
+				if (typeof bounds.height!='undefined') currentBounds.height = bounds.height;
+			    	this.annotator.osda.viewer.drawer.viewport.fitBounds(currentBounds); 
+			    }
+                            //animate to the annotation
+                            $('html,body').animate({
+                                scrollTop: $(this.annotator.osda.viewer.element).offset().top},
+                                'slow');
                     }
                 }
             }
