@@ -18,6 +18,8 @@ as discussions and problems—to promote active learning. Adding a video to your
 
 .. note:: Review :ref:`Best Practices for Accessible Media` before adding videos to your course.
 
+.. _Step 1. Create the Video:
+
 ************************
 Step 1. Create the Video
 ************************
@@ -26,6 +28,7 @@ Your video can contain whatever content you want. The `Producing Videos <https:/
 section of our `edX101 <https://edge.edx.org/courses/edX/edX101/How_to_Create_an_edX_Course/about>`_ 
 course has some helpful pointers for creating good video content.
 
+.. _Compression Specifications:
 
 Compression Specifications
 --------------------------

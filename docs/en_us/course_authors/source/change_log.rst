@@ -12,6 +12,8 @@ Change Log
      - Change
    * - 02/24/14
      - Created new chapter, :ref:`Getting Started with edX`.
+   * -
+     - Updated :ref:`Add a Course Video` section
    * - 02/21/14
      - Added the :ref:`Beta_Testing` chapter. 
    * - 02/19/14

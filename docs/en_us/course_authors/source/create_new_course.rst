@@ -230,10 +230,23 @@ The course image should be a minimum of 660 pixels in width by 240 pixels in hei
 
 .. _`Add a Course Video`:
 
-************************
-Add a Course Video
-************************
-The course video appears on the Course Summary page that students see.
+*********************************
+Add a Course Introduction Video
+*********************************
+The course introduction video appears on the Course Summary page that students see. The course video should excite and entice potential students to register, and reveal some of the personality the instructors bring to the course. 
+
+The video should answer these key questions:
+
+* Who is teaching the course?
+* What university or college is the course affiliated with?
+* What topics and concepts are covered in your course?
+* Why should a learner register for your course?
+
+The video should deliver your message as concisely as possible and have a run time of less than 2 minutes. 
+
+Ensure your course introduction video follows the same :ref:`Compression Specifications` and :ref:`Video Formats` guidelines as course content videos.
+
+To add a course introduction video:
 
 
 #. Upload the course video to YouTube. Make note of the code that appears between **watch?v =** and **&feature** in the URL. This code appears in the green box below.
