@@ -24,11 +24,10 @@ from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationErr
 from xmodule.modulestore.inheritance import own_metadata
 from xmodule.modulestore.locator import BlockUsageLocator
 from xmodule.modulestore import Location
+from xmodule.video_module import manage_video_subtitles_save
 
 from util.json_request import expect_json, JsonResponse
 from util.string_utils import str_to_bool
-
-from ..transcripts_utils import manage_video_subtitles_save
 
 from ..utils import get_modulestore
 
@@ -251,6 +250,8 @@ def _save_item(request, usage_loc, item_location, data=None, children=None, meta
         log.error("Can't find item by location.")
         return JsonResponse({"error": "Can't find item by location: " + str(item_location)}, 404)
 
+    old_metadata = own_metadata(existing_item)
+
     if publish:
         if publish == 'make_private':
             _xmodule_recurse(existing_item, lambda i: modulestore().unpublish(i.location))
@@ -299,7 +300,7 @@ def _save_item(request, usage_loc, item_location, data=None, children=None, meta
                     field.write_to(existing_item, value)
 
         if existing_item.category == 'video':
-            manage_video_subtitles_save(existing_item, existing_item, request.user)
+            manage_video_subtitles_save(existing_item, request.user, old_metadata, generate_translation=True)
 
     # commit to datastore
     store.update_item(existing_item, request.user.id)

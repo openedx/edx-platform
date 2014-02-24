@@ -26,12 +26,11 @@ from xmodule.modulestore.exceptions import ItemNotFoundError, InvalidLocationErr
 from util.json_request import JsonResponse
 from xmodule.modulestore.locator import BlockUsageLocator
 
-from ..transcripts_utils import (
+from xmodule.video_module.transcripts_utils import (
     generate_subs_from_source,
     generate_srt_from_sjson, remove_subs_from_store,
     download_youtube_subs, get_transcripts_from_youtube,
     copy_or_rename_transcript,
-    save_module,
     manage_video_subtitles_save,
     TranscriptsGenerationException,
     GetTranscriptsFromYouTubeException,
@@ -136,7 +135,7 @@ def upload_transcripts(request):
                 return error_response(response, "Can't find transcripts in storage for {}".format(sub_attr))
 
         item.sub = selected_name  # write one of  new subtitles names to item.sub attribute.
-        save_module(item, request.user)
+        item.save_with_metadata(request.user)
         response['subs'] = item.sub
         response['status'] = 'Success'
     else:
@@ -272,7 +271,11 @@ def check_transcripts(request):
         #check youtube local and server transcripts for equality
         if transcripts_presence['youtube_server'] and transcripts_presence['youtube_local']:
             try:
-                youtube_server_subs = get_transcripts_from_youtube(youtube_id)
+                youtube_server_subs = get_transcripts_from_youtube(
+                    youtube_id,
+                    settings,
+                    item.runtime.service(item, "i18n")
+                )
                 if json.loads(local_transcripts) == youtube_server_subs:  # check transcripts for equality
                     transcripts_presence['youtube_diff'] = False
             except GetTranscriptsFromYouTubeException:
@@ -389,7 +392,7 @@ def choose_transcripts(request):
 
     if item.sub != html5_id:  # update sub value
         item.sub = html5_id
-        save_module(item, request.user)
+        item.save_with_metadata(request.user)
     response = {'status': 'Success',  'subs': item.sub}
     return JsonResponse(response)
 
@@ -415,12 +418,12 @@ def replace_transcripts(request):
         return error_response(response, 'YouTube id {} is not presented in request data.'.format(youtube_id))
 
     try:
-        download_youtube_subs({1.0: youtube_id}, item)
+        download_youtube_subs({1.0: youtube_id}, item, settings)
     except GetTranscriptsFromYouTubeException as e:
         return error_response(response, e.message)
 
     item.sub = youtube_id
-    save_module(item, request.user)
+    item.save_with_metadata(request.user)
     response = {'status': 'Success',  'subs': item.sub}
     return JsonResponse(response)
 
@@ -519,10 +522,10 @@ def save_transcripts(request):
         for metadata_key, value in metadata.items():
             setattr(item, metadata_key, value)
 
-        save_module(item, request.user)  # item becomes updated with new values
+        item.save_with_metadata(request.user)  # item becomes updated with new values
 
         if new_sub:
-            manage_video_subtitles_save(None, item, request.user)
+            manage_video_subtitles_save(item, request.user)
         else:
             # If `new_sub` is empty, it means that user explicitly does not want to use
             # transcripts for current video ids and we remove all transcripts from storage.

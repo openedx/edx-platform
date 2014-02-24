@@ -25,10 +25,13 @@
     data-saved-video-position="${saved_video_position}"
     data-start="${start}"
     data-end="${end}"
-    data-caption-asset-path="${caption_asset_path}"
+    data-transcript-language="${transcript_language}"
+    data-transcript-languages='${transcript_languages}'
     data-autoplay="${autoplay}"
     data-yt-test-timeout="${yt_test_timeout}"
     data-yt-test-url="${yt_test_url}"
+    data-transcript-translation-url="${transcript_translation_url}"
+    data-transcript-available-translations-url="${transcript_available_translations_url}"
 
     ## For now, the option "data-autohide-html5" is hard coded. This option
     ## either enables or disables autohiding of controls and captions on mouse
@@ -67,12 +70,12 @@
                       <li><div class="vidtime">0:00 / 0:00</div></li>
                   </ul>
                   <div class="secondary-controls">
-                      <div class="speeds">
+                      <div class="speeds menu-container">
                           <a href="#" title="${_('Speeds')}" role="button" aria-disabled="false">
                               <h3>${_('Speed')}</h3>
                               <p class="active"></p>
                           </a>
-                          <ol class="video_speeds" role="menu"></ol>
+                          <ol class="video_speeds menu" role="menu"></ol>
                       </div>
                       <div class="volume">
                           <a href="#" title="${_('Volume')}" role="button" aria-disabled="false"></a>
@@ -83,7 +86,10 @@
                       <a href="#" class="add-fullscreen" title="${_('Fill browser')}" role="button" aria-disabled="false">${_('Fill browser')}</a>
                       <a href="#" class="quality_control" title="${_('HD off')}" role="button" aria-disabled="false">${_('HD off')}</a>
 
-                      <a href="#" class="hide-subtitles" title="${_('Turn off captions')}" role="button" aria-disabled="false">${_('Turn off captions')}</a>
+                      <div class="lang menu-container">
+                        <a href="#" class="hide-subtitles" title="${_('Turn off captions')}" role="button" aria-
+                        disabled="false">${_('Turn off captions')}</a>
+                      </div>
                   </div>
               </div>
           </section>

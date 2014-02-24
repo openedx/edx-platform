@@ -12,7 +12,7 @@ from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 from django.conf import settings
 
-from contentstore import transcripts_utils
+from xmodule.video_module import transcripts_utils
 from contentstore.tests.utils import CourseTestCase
 from cache_toolbox.core import del_cached_content
 from xmodule.modulestore.django import modulestore

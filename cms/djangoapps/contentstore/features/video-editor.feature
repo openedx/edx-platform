@@ -1,6 +1,6 @@
 @shard_3
-Feature: CMS.Video Component Editor
-  As a course author, I want to be able to create video components.
+Feature: CMS Video Component Editor
+  As a course author, I want to be able to create video components
 
   Scenario: User can view Video metadata
     Given I have created a Video component
@@ -17,14 +17,14 @@ Feature: CMS.Video Component Editor
 
   # Sauce Labs cannot delete cookies
   @skip_sauce
-  Scenario: Captions are hidden when "show captions" is false
+  Scenario: Captions are hidden when "transcript display" is false
     Given I have created a Video component with subtitles
-    And I have set "show transcript" to False
+    And I have set "transcript display" to False
     Then when I view the video it does not show the captions
 
   # Sauce Labs cannot delete cookies
   @skip_sauce
-  Scenario: Captions are shown when "show captions" is true
+  Scenario: Captions are shown when "transcript display" is true
     Given I have created a Video component with subtitles
-    And I have set "show transcript" to True
+    And I have set "transcript display" to True
     Then when I view the video it does show the captions
