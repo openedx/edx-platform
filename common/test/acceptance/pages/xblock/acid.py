@@ -42,13 +42,6 @@ class AcidView(PageObject):
         return self.test_passed('.js-init-run')
 
     @property
-    def doc_ready_passed(self):
-        """
-        Whether the document-ready test passed in this view of the :class:`.AcidBlock`.
-        """
-        return self.test_passed('.document-ready-run')
-
-    @property
     def child_tests_passed(self):
         """
         Whether the tests of children passed
