@@ -50,7 +50,7 @@ from dark_lang.models import DarkLangConfig
 from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore import XML_MODULESTORE_TYPE
+from xmodule.modulestore import XML_MODULESTORE_TYPE, Location
 
 from collections import namedtuple
 
@@ -593,12 +593,12 @@ def change_enrollment(request):
 
         current_mode = available_modes[0]
 
-        org, course_num, run = course_id.split("/")
+        course_id_dict = Location.parse_course_id(course_id)
         dog_stats_api.increment(
             "common.student.enrollment",
-            tags=[u"org:{0}".format(org),
-                  u"course:{0}".format(course_num),
-                  u"run:{0}".format(run)]
+            tags=[u"org:{org}".format(**course_id_dict),
+                  u"course:{course}".format(**course_id_dict),
+                  u"run:{name}".format(**course_id_dict)]
         )
 
         CourseEnrollment.enroll(user, course.id, mode=current_mode.slug)
@@ -622,12 +622,12 @@ def change_enrollment(request):
         if not CourseEnrollment.is_enrolled(user, course_id):
             return HttpResponseBadRequest(_("You are not enrolled in this course"))
         CourseEnrollment.unenroll(user, course_id)
-        org, course_num, run = course_id.split("/")
+        course_id_dict = Location.parse_course_id(course_id)
         dog_stats_api.increment(
             "common.student.unenrollment",
-            tags=["org:{0}".format(org),
-                  "course:{0}".format(course_num),
-                  "run:{0}".format(run)]
+            tags=[u"org:{org}".format(**course_id_dict),
+                  u"course:{course}".format(**course_id_dict),
+                  u"run:{name}".format(**course_id_dict)]
         )
         return HttpResponse()
     else:

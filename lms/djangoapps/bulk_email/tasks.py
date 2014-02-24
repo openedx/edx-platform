@@ -45,6 +45,7 @@ from instructor_task.subtasks import (
     check_subtask_is_valid,
     update_subtask_status,
 )
+from xmodule.modulestore import Location
 
 log = get_task_logger(__name__)
 
@@ -372,7 +373,7 @@ def _get_source_address(course_id, course_title):
     # so pull out the course_num.  Then make sure that it can be used
     # in an email address, by substituting a '_' anywhere a non-(ascii, period, or dash)
     # character appears.
-    course_num = course_id.split('/')[1]
+    course_num = Location.parse_course_id(course_id)['course']
     invalid_chars = re.compile(r"[^\w.-]")
     course_num = invalid_chars.sub('_', course_num)
 

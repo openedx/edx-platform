@@ -13,7 +13,7 @@ from django.conf import settings
 
 from xmodule_modifiers import wrap_xblock
 from xmodule.html_module import HtmlDescriptor
-from xmodule.modulestore import XML_MODULESTORE_TYPE
+from xmodule.modulestore import XML_MODULESTORE_TYPE, Location
 from xmodule.modulestore.django import modulestore
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
@@ -102,16 +102,16 @@ def _section_course_info(course_id, access):
     """ Provide data for the corresponding dashboard section """
     course = get_course_by_id(course_id, depth=None)
 
-    course_org, course_num, course_name = course_id.split('/')
+    course_id_dict = Location.parse_course_id(course_id)
 
     section_data = {
         'section_key': 'course_info',
         'section_display_name': _('Course Info'),
         'access': access,
         'course_id': course_id,
-        'course_org': course_org,
-        'course_num': course_num,
-        'course_name': course_name,
+        'course_org': course_id_dict['org'],
+        'course_num': course_id_dict['course'],
+        'course_name': course_id_dict['name'],
         'course_display_name': course.display_name,
         'enrollment_count': CourseEnrollment.num_enrolled_in(course_id),
         'has_started': course.has_started(),
