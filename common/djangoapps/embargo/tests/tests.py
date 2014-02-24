@@ -11,6 +11,8 @@ from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
 from embargo.models import EmbargoConfig
 from courseware.views import course_info
 from django.test import Client
+from student.models import CourseEnrollment
+from student.tests.factories import UserFactory
 import mock
 import pygeoip
 
@@ -22,11 +24,11 @@ class EmbargoMiddlewareTests(TestCase):
     """
     def setUp(self):
         self.client = Client()
-        self.user = User()
+        self.user = UserFactory(username='fred', password='secret')
         self.client.login(username='fred', password='secret')
         self.embargo_course = CourseFactory.create()
         self.embargo_course.save()
-        self.regular_course = CourseFactory.create()
+        self.regular_course = CourseFactory.create(org="Regular")
         self.regular_course.save()
         self.embargoed_page = '/courses/' + self.embargo_course.id + '/info'
         self.regular_page = '/courses/' + self.regular_course.id + '/info'
@@ -36,6 +38,9 @@ class EmbargoMiddlewareTests(TestCase):
             changed_by=self.user,
             enabled=True
         ).save()
+
+        CourseEnrollment.enroll(self.user, self.regular_course.id)
+        CourseEnrollment.enroll(self.user, self.embargo_course.id)
 
 
     def test_countries(self):
@@ -57,11 +62,11 @@ class EmbargoMiddlewareTests(TestCase):
 
             # Accessing a regular course from a blocked IP should succeed
             response = self.client.get(self.regular_page, HTTP_X_FORWARDED_FOR='1.0.0.0', REMOTE_ADDR='1.0.0.0')
-            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.status_code, 404)
 
             # Accessing any course from non-embaroged IPs should succeed
             response = self.client.get(self.regular_page, HTTP_X_FORWARDED_FOR='5.0.0.0', REMOTE_ADDR='5.0.0.0')
-            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.status_code, 404)
 
             response = self.client.get(self.embargoed_page, HTTP_X_FORWARDED_FOR='5.0.0.0', REMOTE_ADDR='5.0.0.0')
-            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.status_code, 404)

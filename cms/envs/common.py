@@ -95,6 +95,9 @@ sys.path.append(PROJECT_ROOT / 'lib')
 sys.path.append(COMMON_ROOT / 'djangoapps')
 sys.path.append(COMMON_ROOT / 'lib')
 
+# For geolocation ip database
+GEOIP_PATH = REPO_ROOT / "common/static/data/geoip/GeoIP.dat"
+
 
 ############################# WEB CONFIGURATION #############################
 # This is where we stick our compiled template files.
@@ -193,6 +196,8 @@ MIDDLEWARE_CLASSES = (
 
     # for expiring inactive sessions
     'session_inactivity_timeout.middleware.SessionInactivityTimeout',
+
+    'embargo.middleware.EmbargoMiddleware',
 )
 
 ############# XBlock Configuration ##########
@@ -463,6 +468,8 @@ INSTALLED_APPS = (
     # User preferences
     'user_api',
     'django_openid_auth',
+
+    'embargo',
 )
 
 
