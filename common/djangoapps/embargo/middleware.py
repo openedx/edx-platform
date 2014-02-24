@@ -28,7 +28,6 @@ class EmbargoMiddleware(object):
 
             # If we're having performance issues, add caching here
             ip = get_ip(request)
-            from nose.tools import set_trace; set_trace()
             country_code_from_ip = pygeoip.GeoIP(settings.GEOIP_PATH).country_code_by_addr(ip)
             is_embargoed = (country_code_from_ip in EmbargoConfig.current().embargoed_countries_list)
             if is_embargoed:
