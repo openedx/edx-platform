@@ -189,7 +189,7 @@ historical_abuse_flaggers
 
 endorsed
 ----------
-  Boolean value, true if a forum moderator or instructor has marked that this ``Comment`` is a correct answer for whatever question the thread was asking. Exists for ``Comment``s that are replies to other ``Comment``s, but in that case ``endorsed`` is always false because there's no way to endorse such comments through the UI.
+  Boolean value, true if a forum moderator or instructor has marked that this ``Comment`` is a correct answer for whatever question the thread was asking. Exists for Comments that are replies to other Comments, but in that case ``endorsed`` is always false because there's no way to endorse such comments through the UI.
 
 comment_thread_id
 -------------------
