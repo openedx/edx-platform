@@ -166,7 +166,7 @@ body.course.unit,.view-unit {
             @include clearfix;
 
             .cancel-button {
-              margin: $baseline 0px $baseline/2 $baseline/2;
+              margin: ($baseline) ($baseline/2) ($baseline/2) ($baseline/2);
               @include white-button;
             }
 
@@ -217,7 +217,7 @@ body.course.unit,.view-unit {
             }
 
             li {
-              float:left;
+              float: flip(left, right);
               display:inline-block;
               text-align:center;
               width: auto;
@@ -290,7 +290,7 @@ body.course.unit,.view-unit {
               font-weight: 500;
 
               .name {
-                float: left;
+                float: flip(left, right);
 
                 [class^="icon-"] {
                   @include transition(opacity $tmg-f2 linear 0s);
