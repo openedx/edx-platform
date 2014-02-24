@@ -79,25 +79,31 @@ def main():
         source_msgs_dir.joinpath('djangojs-partial.po')
     )
 
+    files_to_clean = set()
+
     # Extract strings from third-party applications.
     for app_name in CONFIGURATION.third_party:
         # Import the app to find out where it is.  Then use pybabel to extract
         # from that directory.
         app_module = importlib.import_module(app_name)
         app_dir = path(app_module.__file__).dirname().dirname()
+        output_file = source_msgs_dir / (app_name + ".po")
+        files_to_clean.add(output_file)
+
         babel_cmd = 'pybabel extract -F {config} -c "Translators:" {app} -o {output}'
         babel_cmd = babel_cmd.format(
             config=LOCALE_DIR / 'babel_third_party.cfg',
             app=app_name,
-            output=source_msgs_dir / (app_name + ".po"),
+            output=output_file,
         )
         execute(babel_cmd, working_directory=app_dir)
 
     # Segment the generated files.
     segmented_files = segment_pofiles("en")
+    files_to_clean.update(segmented_files)
 
     # Finish each file.
-    for filename in segmented_files:
+    for filename in files_to_clean:
         LOG.info('Cleaning %s' % filename)
         po = pofile(source_msgs_dir.joinpath(filename))
         # replace default headers with edX headers
