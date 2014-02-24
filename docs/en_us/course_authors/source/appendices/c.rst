@@ -1,7 +1,4 @@
-.. raw:: latex
-  
-      \newpage %
-
+.. _Sample Student Login Guide:
 
 ======================================
 APPENDIX C: Sample Student Login Guide 
