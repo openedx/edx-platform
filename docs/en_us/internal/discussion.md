@@ -74,7 +74,7 @@ To fully test the discussion forum, you might want to act as a moderator or an a
 
 First make sure that the database is up-to-date:
 
-    rake resetdb
+    paver update_db
 
 If you have created users in the edx-platform django apps when the comment service was not running, you will need to one-way sync the users into the comment service back end database:
 
